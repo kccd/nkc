@@ -10,6 +10,7 @@
 #vue_user_panel_float(v-cloak
   @mouseenter="onPanel"
   @mouseleave="outPanel"
+  data-sub-uid=objToStr({subUid: data.user?data.user.subUid:[]})
 )
   transition(name="fade")
     div.content(v-if="show" :style="'top: ' + top+'px;left: ' + left + 'px;'")
@@ -20,8 +21,13 @@
         .user-button
           .fa.fa-remove(@click="outPanel")
         .user_avatar
-          a(:href="'/avatar/' + user.uid + '?t=lg'" target="_blank")
-            img(:src="'/avatar/' + user.uid")
+          .user_avatar_div
+            a(:href="'/avatar/' + user.uid + '?t=lg'" target="_blank")
+              img(:src="'/avatar/' + user.uid")
+            if data.user
+              span(v-if=`${data.user?"true":"false"} && user.uid !== '${data.user.uid}'`)
+                .user_sub_btn(v-if="subUid.indexOf(user.uid) === -1" :onclick="'subscribeUser(\"'+user.uid+'\", true)'") 关注
+                .user_sub_btn.subscribed(v-else :onclick="'subscribeUser(\"'+user.uid+'\", false)'") 取关
           .user_id ID：{{user.uid}}
         .user_div
           a(:href="'/u/' + user.uid" target="_blank").user_name {{user.username}}

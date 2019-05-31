@@ -138,7 +138,7 @@ block title
     if post.toc.toLocaleString() !== post.tlm.toLocaleString()
       p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
   mixin postCredits(post)
-    if post.credits && post.credits.length > 0
+    if post && post.credits && post.credits.length > 0
       .nkcpanel.ThreadPostCredits
         for c,index in post.credits
           -var username = c.fromUser.username
@@ -285,6 +285,8 @@ block content
 
                 .col-xs-12.col-md-12
                   .row
+                    if !thread.reviewed
+                      .thread-review-info 审核中
                     .col-xs-12.col-md-12(style=`margin: 3rem 0 1rem 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
                       if thread.recycleMark
                         .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
@@ -535,12 +537,12 @@ block content
                                     a(href='/exam' target='_blank') 点击这里参加考试
                               else if userPostCountToday >= countLimit
                                 .text-danger
-                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复，且不能发表文章。`
+                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复，且可能需要经过审核以后才显示。`
                                   .h4= `今日已发表${data.userPostCountToday}条回复，`
                                     a(href='/exam' target='_blank') 点击这里参加考试
                                     span ，通过后将获得更多发言权限。
                               else
-                                .form-group.text-danger(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复，且不能发表文章。`
+                                .form-group.text-danger(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复，且可能需要经过审核以后才显示。`
                                   div=`今日已发表${userPostCountToday}条回复，`
                                     a(href='/exam' target='_blank') 点击这里参加考试
                                     span ，通过后将获得更多发言权限。

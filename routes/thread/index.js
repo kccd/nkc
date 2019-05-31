@@ -124,9 +124,15 @@ threadRouter
       for(const f of mainForums) {
         isModerator = await f.isModerator(data.user?data.user.uid: '');
         if(isModerator) break;
-      }  
+      }
     }
 		data.isModerator = isModerator;
+
+    if(!thread.reviewed) {
+      if(!data.user || (!isModerator && data.user.uid !== thread.uid)) ctx.throw(403, "文章还未通过审核，暂无法阅读");
+    }
+
+
 		// const breadcrumbForums = await forum.getBreadcrumbForums();
 		// 判断文章是否被退回或被彻底屏蔽
 		if(thread.recycleMark) {
@@ -188,6 +194,19 @@ threadRouter
 			}
 			if($and.length !== 0) match.$and = $and;
 		}
+		if(data.user) {
+		  match.$or = [
+        {
+          reviewed: true
+        },
+        {
+          reviewed: false,
+          uid: data.user.uid
+        }
+      ]
+    } else {
+		  match.reviewed = true;
+    }
 		// 统计post总数，分页
     const pageSettings = (await db.SettingModel.findOnly({_id: "page"})).c;
 		const count = await db.PostModel.count(match);
@@ -357,6 +376,7 @@ threadRouter
 		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
 		const q = {
 			uid: data.targetUser.uid,
+      reviewed: true,
 			mainForumsId: {$in: fidOfCanGetThreads},
 			recycleMark: {$ne: true}
 		};
@@ -376,6 +396,7 @@ threadRouter
       const sameThreads = await db.ThreadModel.aggregate([
 				{
 					$match: {
+					  reviewed: true,
 						mainForumsId: fids,
 						digest: true,
 						recycleMark: {$ne: true}
@@ -468,6 +489,11 @@ threadRouter
 		const {post} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		const _post = await thread.newPost(post, user, ip);
+
+    // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
+    const needReview = await db.UserModel.contentNeedReview(user.uid, "post");
+    if(!needReview) await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+
     data.post = _post;
 		data.targetUser = await thread.extendUser();
 

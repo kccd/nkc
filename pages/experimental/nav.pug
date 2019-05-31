@@ -1,8 +1,6 @@
-.col-xs-12.col-md-12(style='margin-bottom: 1rem;')
+.col-xs-12.col-md-12(style='margin-bottom: 1rem;').box-shadow-panel
   .e-nav
-    .jumbotron(style='margin-bottom: 1rem;color:#555;')
-      .h2
-        span.fa.fa-cogs=` ${lang('ex', 'management')}`
+    //span=`${lang('ex', 'management')}`
 
     ul.nav.nav-pills
       if permission('visitExperimentalStatus')
@@ -124,9 +122,13 @@
           if permission('experimentalSafeSettings')
             li
               a(href='/e/settings/safe') 安全
+          if permission('experimentalReviewSettings')
+            li
+              a(href='/e/settings/review') 审核
           if permission('experimentalUserAuth')
             li
               a(href='/e/settings/auth') 身份认证
+
           <li role="separator" class="divider"></li>    
           li
             a(href='/e/settings/home/top') 网站首页

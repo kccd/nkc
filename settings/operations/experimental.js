@@ -229,6 +229,10 @@ module.exports = {
       GET: "experimentalUserAuth",
       PATCH: "experimentalUserAuth"
     },
+    review: {
+      GET: "experimentalReviewSettings",
+      PATCH: "experimentalReviewSettings"
+    },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'

@@ -3,12 +3,13 @@
   font-weight: 700;
   color: #555;
 }
+.e-nav{
+  background-color: #f6f6f6!important;
+}
 body{
 }
 .e-nav .nav.nav-pills{
-  background-color: #eee;
   border-radius: 0 0 5px 5px;
-  margin-top: -1.5rem;
 }
 .ItemContainer {
   border-width: 1px;
@@ -100,4 +101,37 @@ body{
 .role-nav:hover{
   text-decoration: none;
   color: #555;
+}
+
+.review-user-span{
+  display: inline-block;
+  height: 2rem;
+  line-height: 2rem;
+  background-color: #2b90d9;
+  color: #fff;
+  margin: 0.5rem;
+  border-radius: 1rem;
+  font-size: 0;
+}
+.review-user-span img{
+  height: 2rem;
+  width: 2rem;
+  border-radius: 1rem;
+  margin-right: 0.5rem;
+  vertical-align: top;
+}
+.review-user-span a{
+  font-size: 1rem;
+  color: #fff;
+}
+.review-user-span a:hover, .review-user-span a:focus{
+  text-decoration: none;
+}
+.review-user-span .fa{
+  height: 2rem;
+  width: 3rem;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 2rem;
+  cursor: pointer;
 }

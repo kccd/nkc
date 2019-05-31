@@ -16,6 +16,7 @@ const appRouter = require('./app');
 const pageRouter = require('./page');
 const examRouter = require('./exam');
 const messageRouter = require('./message');
+const reviewRouter = require("./review");
 const shareRouter = require('./share');
 const smsRouter = require('./sms');
 const postRouter = require('./post');
@@ -62,5 +63,6 @@ settingRouter
   .use("/auth", authRouter.routes(), authRouter.allowedMethods())
   .use('/register', registerRouter.routes(), registerRouter.allowedMethods())
   .use('/shop', shopRouter.routes(), shopRouter.allowedMethods())
+  .use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
   .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = settingRouter;

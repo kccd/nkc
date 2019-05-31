@@ -92,6 +92,14 @@ router
     // await forum.update({$inc: {'tCount.normal': 1}});
 		const thread = await ThreadModel.findOnly({tid: _post.tid});
 		// await thread.update({"$set":{mainForumsId: fids, categoriesId:cids}})
+
+    // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
+    const needReview = await db.UserModel.contentNeedReview(user.uid, "thread");
+    if(!needReview) {
+      await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+      await db.ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
+    }
+
 		data.thread = thread;
 		// 发表自动关注该学科或话题
 		const userSubscribe = await UsersSubscribeModel.findOnly({uid:user.uid});

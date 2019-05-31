@@ -57,9 +57,11 @@ module.exports = async (ctx, next) => {
 		// 获取用户信息
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     await db.UserModel.extendUsersInfo([user]);
+
 		user.newMessage = await user.getNewMessagesCount();
 		user.authLevel = await userPersonal.getAuthLevel();
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
+		user.subUid = await db.SubscribeModel.getUserSubUid(user.uid);
     user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
     languageName = user.generalSettings.language;
     if(user.generalSettings.lotterySettings.status) {

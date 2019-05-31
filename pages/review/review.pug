@@ -1,0 +1,70 @@
+extends ../bootstrap_base
+block title
+  title 内容审核
+  +includeCSS("/review/review.css")
+block content
+  .container-fluid.max-width
+    #data.hidden=objToStr({results: data.results})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-8
+        .p-b-1
+          .paging-button.pointer
+            a.radius-left.button(@click="selectAll") 全选
+            a.button(@click="chooseAll(true)") 通过已选
+            a.button(@click="chooseAll(false)") 不通过已选
+          .paging-button.pointer
+            a.radius-left.radius-right.button(@click="submit") 提交已选
+        include ../publicModules/paging/paging
+        .review-panel-div.box-shadow-panel
+          for r in data.results
+            .review-panel
+              .review-time
+                input(type="checkbox" value=r.post.pid v-model=`selectedPid`)
+              .review-time(title=format("YYYY/MM/DD HH:mm:ss", r.post.toc))=fromNow(r.post.toc)
+              .review-user
+                img(src=`/avatar/${r.user.uid}`).review-user-avatar
+                a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
+              if r.type === "post"
+                .review-info 在文章
+                .review-thread-title
+                  a(href=`/t/${r.thread.tid}` target="_blank")=r.thread.firstPost.t
+                .review-info 下发表回复,
+                .review-thread-title
+                  a(href=r.link target="_blank") 查看原文
+                .review-info 。
+              else
+                .review-info 发表文章
+                .review-thread-title
+                  a(href=`/t/${r.thread.tid}` target="_blank")=r.thread.firstPost.t
+              .review-input-div(v-if=`selectedPid.indexOf('${r.post.pid}') !== -1`)
+                .m-b-1
+                  input(type="radio" :value="true" v-model=`review['${r.post.pid}'].pass`)
+                  span.m-r-1 通过
+                  input(type="radio" :value="false" v-model=`review['${r.post.pid}'].pass`)
+                  span 不通过
+                div(v-if=`!review['${r.post.pid}'].pass`)
+                  input(type="radio" value="toDraft" v-model=`review['${r.post.pid}'].delType`)
+                  span.m-r-1 退修
+                  input(type="radio" value="toRecycle" v-model=`review['${r.post.pid}'].delType`)
+                  span 送回收站
+                  .m-t-1
+                    input(type="checkbox" :value="true" v-model=`review['${r.post.pid}'].noticeType`)
+                    span.m-r-1 通知用户
+                    input(type="checkbox" :value="true" v-model=`review['${r.post.pid}'].illegalType`)
+                    span.m-r-1 标记为违规
+                  .m-t-1
+                    textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.post.pid}'].reason`)
+                .m-t-1
+                  button.btn.btn-sm.btn-primary(@click=`submit('${r.post.pid}')`) 提交
+              .review-post-content!=experimental_render(r.post)
+        include ../publicModules/paging/paging_input
+
+
+
+
+
+
+
+block scripts
+  include ../publicModules/moment
+  +includeJS("/review/review.js")

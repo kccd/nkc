@@ -259,6 +259,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if(!thread) continue;
       r.c.post = post;
       r.c.thread = thread;
+      r.c.deadline = moment(Date.now() + timeout).format("YYYY-MM-DD HH:mm:ss");
     } else if(type === "replyPost") {
       const post = await PostModel.findOne({pid: targetPid});
       if(!post) continue;

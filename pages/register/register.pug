@@ -35,6 +35,9 @@ block content
                 .form-group
                   select.form-control.minimalist-input(v-model.number="nationCode" @click='clearWarning' )
                     option(v-for="nationCode in nationCodes" :value="nationCode.code") +{{nationCode.code}}&nbsp;&nbsp;{{nationCode.chineseName}}
+                  h5.text-info(v-if="nationCode !== '86'")
+                    |【海外用户】请注册后立即绑定邮箱，否则无密保功能。
+                    div(style="margin-top: 0.5rem;") 【海外用户】发表的内容可能需要经过人工审核才显示。
                 .form-group
                   .input-warning(v-if="warning.mobile") {{warning.mobile}}
                   input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit1' type='text' placeholder='手机号' v-model.number="mobile" v-focus="true")

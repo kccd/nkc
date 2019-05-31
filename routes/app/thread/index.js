@@ -9,7 +9,7 @@ theradRouter
 		const forums = await thread.extendForums(['mainForums']);
 		// 验证权限 - new
     await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-
+    if(!thread.reviewed) ctx.throw(403, "文章暂未通过审核，暂无法阅读");
 		// 统计post总数
 		const count = await db.PostModel.count({tid});
 		const paging_ = nkcModules.apiFunction.paging(page, count);
@@ -17,7 +17,7 @@ theradRouter
 		// 查询该文章下的所有post
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
-		const posts = await db.PostModel.find({tid, disabled: false}).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+		const posts = await db.PostModel.find({tid, disabled: false, reviewed: true}).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(posts.map(async post => {
 			await post.extendUser().then(u => u.extendGrade());
 			await post.extendResources();

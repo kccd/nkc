@@ -50,7 +50,7 @@ collectionsRouter
     //   uid: user?user.uid: ''
     // };
     for(const collection of categoryCollection1) {
-      const thread = await ThreadModel.findOne({tid: collection.tid, recycleMark: {$ne: true}})
+      const thread = await ThreadModel.findOne({tid: collection.tid, recycleMark: {$ne: true}, disabled: false, reviewed: true});
       if(thread){
         await thread.extendForums(["mainForums"]);
         try{

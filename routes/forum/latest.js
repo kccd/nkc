@@ -26,6 +26,7 @@ latestRouter
     // 构建置顶文章查询条件
     const toppedThreadMatch = {
       topped: true,
+      reviewed: true,
       mainForumsId: forum.fid,
       disabled: false,
       recycleMark: {$ne: true}
@@ -48,7 +49,21 @@ latestRouter
       match.disabled = false;
     }
 		match.recycleMark = {$ne: true};
-
+    if(data.user) {
+      if(!data.user.certs.includes("editor")) {
+        match.$or = [
+          {
+            reviewed: true
+          },
+          {
+            reviewed: false,
+            uid: data.user.uid
+          }
+        ]
+      }
+    } else {
+      match.reviewed = true;
+    }
 		const count = await db.ThreadModel.count(match);
 		const {apiFunction} = ctx.nkcModules;
 		const paging = apiFunction.paging(page, count, pageSettings.forumThreadList);

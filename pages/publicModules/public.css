@@ -1241,6 +1241,18 @@ footer.footer ul li{
 .thread-panel{
   padding-bottom: 2rem;
 }
+.thread-panel.reviewed{
+  border: 1px solid #9baec8;
+  margin: 0.5rem 0;
+}
+.thread-review-info{
+  height: 2rem;
+  line-height: 2rem;
+  color:#fff;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  background-color: #e85a71;
+}
 .thread-panel:last-child{
   padding-bottom: 0;
 }
@@ -1514,4 +1526,16 @@ span.thread-title-page{
   background: linear-gradient(to top,#3494da 4px,#3494da 0) 1px 5px no-repeat;
   background-size: 4px 14px;
   font-weight:bold;
+}
+.box-shadow-panel>div{
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 3px;
+}
+@media (max-width: 991px) {
+  .box-shadow-panel{
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
