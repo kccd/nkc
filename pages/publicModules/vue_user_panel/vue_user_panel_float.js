@@ -3,6 +3,7 @@ var vue_user_panel_float = new Vue({
   data: {
     show: false,
     panelSwitch: false,
+    subUid: [],
     top: 0,
     left: 0,
     user: {
@@ -17,6 +18,11 @@ var vue_user_panel_float = new Vue({
     },
     usersObj: {},
     timeout: ''
+  },
+  mounted: function() {
+    var data = strToObj(this.$el.getAttribute("data-sub-uid"));
+    console.log(data);
+    this.subUid = data.subUid;
   },
   methods: {
     close: function() {

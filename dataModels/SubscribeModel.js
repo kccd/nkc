@@ -64,7 +64,7 @@ schema.statics.getUserSubUid = async (uid) => {
   const sub = await SubscribeModel.find({
     type: 'user',
     uid
-  });
+  }, {tUid: 1});
   return sub.map(s => s.tUid);
 };
 

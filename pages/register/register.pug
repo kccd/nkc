@@ -35,6 +35,7 @@ block content
                 .form-group
                   select.form-control.minimalist-input(v-model.number="nationCode" @click='clearWarning' )
                     option(v-for="nationCode in nationCodes" :value="nationCode.code") +{{nationCode.code}}&nbsp;&nbsp;{{nationCode.chineseName}}
+                  h5.text-danger(v-if="nationCode !== '86'") 海外手机号注册的用户需绑定邮箱，否则账号安全得不到保障！！！
                 .form-group
                   .input-warning(v-if="warning.mobile") {{warning.mobile}}
                   input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit1' type='text' placeholder='手机号' v-model.number="mobile" v-focus="true")

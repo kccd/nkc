@@ -783,9 +783,9 @@ function subscribeUser(uid, subscribe) {
 	nkcAPI(url, method, {})
 		.then(function() {
 			screenTopAlert(alertInfo);
-			setTimeout(function() {
+			/*setTimeout(function() {
 				window.location.reload();
-			}, 1000);
+			}, 1000);*/
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

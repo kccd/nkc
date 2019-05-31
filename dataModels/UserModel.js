@@ -151,12 +151,20 @@ userSchema.pre('save', function(next) {
 });
 
 userSchema.virtual('operations')
-	.get(function() {
-		return this._operations;
-	})
-	.set(function(operations) {
-		this._operations = operations;
-	});
+  .get(function() {
+    return this._operations;
+  })
+  .set(function(operations) {
+    this._operations = operations;
+  });
+
+userSchema.virtual('subUid')
+  .get(function() {
+    return this._subUid;
+  })
+  .set(function(subUid) {
+    this._subUid = subUid;
+  });
 
 userSchema.virtual('registerType')
 	.get(function() {

@@ -129,17 +129,18 @@ block content
         if data.featuredThreads && data.featuredThreads.length > 0
           .m-b-2
             -let sideThreads = data.featuredThreads
-            -let sideThreadsHeader = "推荐文章"
+            -let sideThreadsHeader = "全站精选"
             include ./side_thread_list
         if data.recommendThreads && data.recommendThreads.length > 0
           .m-b-2
             -let sideThreads = data.recommendThreads
-            -let sideThreadsHeader = "全站精选"
+            -let sideThreadsHeader = "推荐文章"
             include ./side_thread_list
         if data.targetUserFans && data.targetUserFans.length > 0
           .m-b-2
             -let sideUsers = data.targetUserFans
             -let sideUsersHeader = "粉丝"
+              
             -let sideUsersLink = `/u/${data.targetUser.uid}?t=fans`
             include ./side_user_list
         if data.targetUserFollowers && data.targetUserFollowers.length > 0

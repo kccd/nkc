@@ -1515,3 +1515,15 @@ span.thread-title-page{
   background-size: 4px 14px;
   font-weight:bold;
 }
+.box-shadow-panel>div{
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 3px;
+}
+@media (max-width: 991px) {
+  .box-shadow-panel{
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

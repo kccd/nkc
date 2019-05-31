@@ -1,0 +1,22 @@
+extends ../../experimental
+block eTitle
+  title 审核设置
+block eContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h5 审核设置：设置新发表的文章和回复在什么情况下需要审核人员审核。未通过审核的文章不予显示。
+      .col-xs-12.col-md-12#app(v-cloak)
+        ul.nav.nav-tabs
+          li(role="presentation" :class="{'active':this.tab === 'thread'}" @click="switchTab('thread')")
+            a.pointer 发表文章
+          li(role="presentation" :class="{'active':this.tab === 'post'}" @click="switchTab('post')")
+            a.pointer 发表回复
+        div
+          h4 一、白名单
+            small &nbsp;满足以下任一条件的用户发表{{tab==="thread"?"文章":"回复"}}无需审核
+            h5 1、用户等级
+
+
+block scripts
+  +includeJS("/experimental/settings/review/review.js")
