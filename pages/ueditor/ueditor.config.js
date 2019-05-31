@@ -433,7 +433,7 @@
 			tt:     [],
 			u:      [],
 			ul:     ['class', 'style'],
-			video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style']
+			video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style', 'poster']
 		}
     };
 

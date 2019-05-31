@@ -32,6 +32,8 @@ block title
   meta(name='description' content=`${processed}`)
   meta(name='keywords' content=`${thread.firstPost.t}`)
   link(rel='stylesheet' href=`/post/post.css?v=${global.NKC.startTime}`)
+  link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+  +includeJS("/external_pkgs/imageToBig/preview.js")
 block content
   -var mainContainer1400 = true
   .container-fluid.max-width
@@ -119,7 +121,7 @@ block content
             a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${post.pid}")`) 获取分享链接
           .share(id=`copyArea${post.pid}` style="display:none")
             input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
-            button(onclick="copyLink()" id=`copyButton${post.pid}`) 复制
+            button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
           div(style='width: 100%; text-align: center; padding-top: 0.5rem;')
             canvas(id=`${post.pid}Qrcode` style='width: 0px; height: 0px; margin: auto;')
         -var user = post.user
@@ -136,3 +138,7 @@ block scripts
   script(src=`/module_dropdown.js?v=${global.NKC.startTime}`)
   script(src=`/post_to_recycle.js?v=${global.NKC.startTime}`)
   script(src=`/thread_to_recycle.js?v=${global.NKC.startTime}`)
+  script.
+    var preview = new Preview({
+        imgWrap: 'wrap' // 指定该容器里的图片点击预览
+    })
