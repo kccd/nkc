@@ -12,7 +12,7 @@ script(type='text/javascript').
   // 根据不同页面传递不同参数
   var pathName = window.location.pathname;
   var initialFrameHeight = 200;
-  var topOffset = false;
+  var topOffset = 0;
   if(pathName.indexOf("editor") > -1) {
     initialFrameHeight = 500
     topOffset = 50;
@@ -21,10 +21,7 @@ script(type='text/javascript').
   var ue = UE.getEditor('container', {
     toolbars: [
       [
-        'fullscreen', 'undo', 'redo', '|', 'blockquote', 'horizontal', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', '|','inserttable'
-      ],
-      [
-        'bold', 'italic', 'underline', 'strikethrough', '|' ,'superscript', 'subscript', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|'
+        'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', 'inserttable', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|'
       ]
     ],
     maximumWords: 100000, // 最大字符数

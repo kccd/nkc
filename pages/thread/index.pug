@@ -29,7 +29,8 @@ block title
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
     link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
-    link(rel='stylesheet' href=`/external_pkgs/imageToBig/css/index.css?v=${global.NKC.startTime}`)
+    link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+    +includeJS("/external_pkgs/imageToBig/preview.js")
 
   mixin postOptions(post, targetThread, index)
     .inline-block.highlight.post-options(style='float: right;margin-right: 0.5rem;color: #aaaaaa;')
@@ -171,7 +172,7 @@ block content
       include ../module_credit
       include ../module_digest
       .row
-        .col-xs-12.col-md-9
+        .col-xs-12.col-md-9#wrap
           .fullwidthpanel.ThreadBox.nkcpanel
             .row
               .thread-div
@@ -229,7 +230,7 @@ block content
                                     a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`) 获取分享链接
                                   .col-xs-12.col-md-12(id=`copyArea${thread.tid}` style="display:none")
                                     input(type="text", id=`copyLink${thread.tid}`, name=`copyLink${thread.tid}` style="width:inherit")
-                                    button(onclick="copyLink()" id=`copyButton${thread.tid}`) 复制
+                                    button(onclick=`copyLink('${thread.tid}')` id=`copyButton${thread.tid}`) 复制
                                   canvas#threadQrcode.inline-block(style="display:none")
                       if addKcb && data.user && thread.firstPost.uid !== data.user.uid
                         .inline-block.post-thumbsUp(style='color: #aaa;')
@@ -601,8 +602,6 @@ block scripts
   script(src='/module_dropdown.js?v=3')
   script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
   link(href=`/jquery-ui-1.10.4.custom.css?v=${global.NKC.startTime}` rel="stylesheet")
-  +includeJS("/external_pkgs/imageToBig/js/index.js")
-  +includeJS("/external_pkgs/imageToBig/js/jquery.rotate.min.js")
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
   script.
     common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
@@ -623,40 +622,6 @@ block scripts
   if data.user
     script(src=`/media/media_index.js?v=${startTime}`)
   script.
-    //- $(function () {
-    //-   $('.viewer').bootstrapViewer();
-    //- })
-  script.
-    $(function () {
-        $('[data-magnify]').Magnify({
-            Toolbar: [
-                'rotateLeft',
-                'rotateRight',
-                'zoomIn',
-                'zoomOut'
-            ],
-            keyboard:true,
-            draggable:false,
-            movable:true,
-            modalSize:[window.innerWidth,window.innerHeight],
-            beforeOpen:function (obj,data) {
-                //- console.log('beforeOpen')
-            },
-            opened:function (obj,data) {
-                //- console.log('opened')
-            },
-            beforeClose:function (obj,data) {
-                //- console.log('beforeClose')
-            },
-            closed:function (obj,data) {
-                //- console.log('closed')
-            },
-            beforeChange:function (obj,data) {
-                //- console.log('beforeChange')
-            },
-            changed:function (obj,data) {
-                //- console.log('changed')
-            }
-        });
-
+    var preview = new Preview({
+        imgWrap: 'wrap' // 指定该容器里的图片点击预览
     })

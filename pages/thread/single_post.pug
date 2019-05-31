@@ -53,7 +53,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                   a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`) 获取分享链接
                 .col-xs-12.col-md-12(id=`copyArea${post.pid}` style="display:none")
                   input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
-                  button(onclick="copyLink()" id=`copyButton${post.pid}`) 复制
+                  button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
                 canvas.qrcode(id=post.pid+"Qrcode",data-pid=post.pid,style="display:none").inline-block
         if addKcb && post.uid !== data.user.uid
           .inline-block.post-qrcode

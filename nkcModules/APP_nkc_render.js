@@ -564,7 +564,7 @@ function APP_nkc_render(options){
     // }
     // 将图片加上域名前缀
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="http://www.kechuang.org/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="http://www.kechuang.org/r$1" /></a>');
-    html = html.replace(/<img(.*?)src="\/r(.+?)">/img,'<img$1class="PostContentImage" alt="pic" src="https://www.kechuang.org/r$2" />');
+    html = html.replace(/<img(.*?)src="\/r(.+?)".*?>/img,'<img$1class="PostContentImage" alt="pic" src="https://www.kechuang.org/r$2" />');
     html = html.replace(/<img src="(\/default\/default_thumbnail.png)">/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org$1" />');
     html = html.replace(/<img class="PostResourceDownloadThumbnail" src=('|")\/default\/default_thumbnail.png('|")\/>/img,'<img class="emoji" alt="pic" src="https://www.kechuang.org/default/default_thumbnail.png" />');
     return html
@@ -641,8 +641,8 @@ function APP_nkc_render(options){
     var emo = "/twemoji/2/svg/";
     var pcEmoReg = new RegExp(emo,'igm');
     // renderedHTML = renderedHTML.replace(pcEmoReg,"../modules/twemoji/");
-    renderedHTML = renderedHTML.replace(pcEmoReg,"https://www.kechuang.org/twemoji/2/svg/");
-    renderedHTML = renderedHTML.replace(/<img(.*?)src="(.*?)"(.*?)>/igm,"<img$1src='$2'$3 ontouchend='touchend()' ontouchmove='touchend()' ontouchstart='touchstart(\"$2\")' onclick='openImage(\"$2\")'>");    
+    renderedHTML = renderedHTML.replace(pcEmoReg,"https://www.kechuang.org/twemoji/2/svg/");  
+    renderedHTML = renderedHTML.replace(/<img(.*?)src="(.*?)"(.*?)>/igm,"<img$1src='$2'$3 ontouchend='touchend()' ontouchmove='touchend()' ontouchstart='touchstart(\"$2\")' onclick='openImage(\"$2\")'>");  
     // 将视频替换成图片
     renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r(.*?)".*?>(.*?)<\/video>/igm,'<div style="position:relative"><img src="https://www.kechuang.org/frameImg$2" style="width:100%;height:10rem"><span class="play-btn" onclick="openVideo(this,\'/r$2\')"></span></div>');
     // renderedHTML = renderedHTML.replace(/<video src r(.+?)".*?<\/video>/igm,'<video src="http://192.168.11.114:1086/r$1" style="width:100%;height:10rem;" controls poster="http://192.168.11.114:1086/frameImg$1"></video>');

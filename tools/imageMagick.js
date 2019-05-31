@@ -69,12 +69,13 @@ const watermarkifyLogo = (dpi, position, waterSmallPath, path) => {
 };
 
 // username 水印 
-const watermarkifyFont = (dpi, font, position, path) =>{
+const watermarkifyFont = (dpi, font, position, path, temporaryPath) =>{
   if(linux) {
-    return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
+    return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#5c5d6d91', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
   }
-  // return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', 'white', '-weight', 'bolder','-gravity', 'center ' ,'-draw', "text 0,25 'hello'" ,path, path]);
-  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#FFFFFF', '-weight', 'bolder','-stroke','#FFFFFF','-gravity', position ,'-annotate', dpi, font ,path, path]);
+  // return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-background', 'black', '-fill', '#FFF', '-weight', '500','-gravity', position ,'-annotate', dpi, font ,path, path]);
+  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-background', 'black', '-gravity', position ,'-stroke', '#0000004d', '-strokewidth', '2', '-annotate', dpi, font, '-stroke', 'none', '-fill', '#FFF', '-annotate',dpi, font,path, path]);
+  // return spawnProcess('magick', [path, '-gravity', position, '-pointsize', '24', '-stroke', '#717171', '-strokewidth', '2', '-annotate', dpi, font, '-stroke', 'none', '-fill', '#FFF', '-font', fontTtf, '-annotate',dpi, font,temporaryPath]);
 }
 
 // 手机图片上传自动旋转

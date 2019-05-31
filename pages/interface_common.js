@@ -1491,8 +1491,6 @@ function shareTo(shareType, type, str, title, pid){
         var copyButton = "copyVutton"+pid;
         document.getElementById(copyAreaId).style.display = "block";
         document.getElementById(copyLinkId).value = newUrl;
-        var obj = document.getElementById(copyLinkId);
-        obj.select(); 
       }
       if(type == "qq") {
         newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+document.querySelector('meta[name="description"]').getAttribute('content');
@@ -1558,7 +1556,14 @@ function shareTo(shareType, type, str, title, pid){
 }
 
 // 复制
-function copyLink() {
+function copyLink(id) {
+  if(id) {
+    var copyLinkId = "copyLink" + id;
+    var obj = document.getElementById(copyLinkId);
+    obj.select(); 
+  }else{
+    return screenTopWarning("链接复制失败，请手动复制")
+  }
   if(document.execCommand("copy", false, null)) {
     screenTopAlert("链接复制成功");
   }else{
@@ -1699,10 +1704,18 @@ function closeLottery() {
 }
 
 function scrollToBottom() {
+  $("html").css("height", "auto")
+  $("body").css("height", "auto")
   $("html,body").animate({scrollTop: document.body.offsetHeight}, 300)
+  $("html").css("height", "100%")
+  $("body").css("height", "100%")
 }
 function scrollToTop() {
+  $("html").css("height", "auto")
+  $("body").css("height", "auto")
   $("html,body").animate({scrollTop: 0}, 300)
+  $("html").css("height", "100%")
+  $("body").css("height", "100%")
 }
 
 

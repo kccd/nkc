@@ -278,7 +278,7 @@ block content
           a.btn-block(style='display:inline-block', href='javascript:void(0);', onclick=`shareTo('product', 'link', window.location.origin+window.location.pathname, '${product.post.t}', '${product.productId}')`) 获取分享链接
         .col-xs-12.col-md-12(id=`copyArea${product.productId}` style="display:none")
           input(type="text", id=`copyLink${product.productId}`, name=`copyLink${product.productId}` style="width:inherit")
-          button(onclick="copyLink()" id=`copyButton${product.productId}`) 复制
+          button(onclick=`copyLink('${product.productId}')` id=`copyButton${product.productId}`) 复制
         canvas#threadQrcode.inline-block(style='display:none')
 
 block scripts
