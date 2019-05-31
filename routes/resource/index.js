@@ -65,7 +65,7 @@ resourceRouter
     const { imageMagick, ffmpeg } = ctx.tools;
     const settings = ctx.settings;
     const { largeImage, upload } = settings.upload.sizeLimit;
-    const { mediaPath, uploadPath, generateFolderName, thumbnailPath, mediumPath, originPath, frameImgPath} = settings.upload;
+    const { mediaPath, uploadPath, generateFolderName,extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = settings.upload;
     const {selectDiskCharacterUp} = settings.mediaPath;
     
     let mediaRealPath;
@@ -261,8 +261,10 @@ resourceRouter
         if(waterStyle === "siteLogo"){
           await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path)
         }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
-          await imageMagick.watermarkifyLogo(logoCoor, waterGravity, waterSmallPath, path)
-          await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path)
+          await imageMagick.watermarkifyLogo(logoCoor, waterGravity, waterSmallPath, path);
+          var temporaryPath = extGetPath(extension);
+          await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path, temporaryPath);
+          // await fs.copyFile(temporaryPath, path);
         }
       }
       // console.log(width>1024)
