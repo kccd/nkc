@@ -938,11 +938,11 @@ font-size: 14pt;
   margin-top: 4px;
 }
 .ThreadPostBody img{
-  max-height: 800px;
+  /* max-height: 800px; */
   max-width: 100%;
   border-radius: 5px;
-  margin-right: 5px;
-  margin-left: 5px;
+  /* margin-right: 5px; */
+  /* margin-left: 5px; */
 }
 
 .ThreadPostBody blockquote {
@@ -1922,6 +1922,8 @@ margin-left: 5px;
 /*style for twemoji*/
 
 img.emoji {
+  width: 26px;
+  height: 26px;
   /* height: 1.6em;
   width: 1.6em;
   margin: -0.3em .05em -0.3em .1em;

@@ -35,7 +35,7 @@ block content
                       a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('activity', 'link', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`) 获取分享链接
                     .col-xs-12.col-md-12(id=`copyArea${data.activity.acid}` style="display:none")
                       input(type="text", id=`copyLink${data.activity.acid}`, name=`copyLink${data.activity.acid}` style="width:inherit")
-                      button(onclick="copyLink()" id=`copyButton${data.activity.acid}`) 复制
+                      button(onclick=`copyLink('${data.activity.acid}')` id=`copyButton${data.activity.acid}`) 复制
                     .col-xs-12.col-md-12.m-t-1
                       canvas#activityQrcode(style="display:none")
                   //- img(src=`${'/poster/'+data.activity.posterId}` style="width:100%")
