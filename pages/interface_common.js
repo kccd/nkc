@@ -997,6 +997,7 @@ function credit(pid, type, kcb) {
     description.value = '';
     t[0].innerText = title;
     button[1].onclick = function() {
+      button[1].setAttribute("disabled", "disabled");
       if(type === 'xsf') {
         var obj = {
           num: num.value,
@@ -1965,3 +1966,20 @@ function getDayCountByYearMonth(year, month) {
   return count;
 }
 
+/*
+* 设置文章或回复通过审核
+*
+* */
+
+function reviewPost(pid) {
+  if(confirm("确定要通过审核？") === false) return;
+  nkcAPI("/review", "PATCH", {
+    pid: pid
+  })
+    .then(function() {
+      screenTopAlert("执行操作成功！");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}

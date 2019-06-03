@@ -39,7 +39,7 @@ router
     if(obj.disabled) {
       // 直接封禁
       if(para.delType === 'toRecycle') {
-        await targetPost.update({toDraft: false});
+        await targetPost.update({toDraft: false, reviewed: true});
         await db.KcbsRecordModel.insertSystemRecord('postBlocked', data.targetUser, ctx);
         if(para && para.illegalType) {
           await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
@@ -69,6 +69,7 @@ router
         });
         await message.save();
         await ctx.redis.pubMessage(message);
+        if(!targetPost.reviewed) await db.ReviewModel.newReview("disabledPost", targetPost, data.user, para.reason);
       } else {
         // 退回
         await targetPost.update({toDraft: true});
@@ -85,6 +86,7 @@ router
         });
         await message.save();
         await ctx.redis.pubMessage(message);
+        if(!targetPost.reviewed) await db.ReviewModel.newReview("returnPost", targetPost, data.user, para.reason);
       }
     }
     await targetThread.updateThreadMessage();

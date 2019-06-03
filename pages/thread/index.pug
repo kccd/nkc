@@ -108,7 +108,7 @@ block title
         if disablePost && !targetThread
           li
             a(href=`javascript:disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")`)
-              span.fa.fa-eye-slash &nbsp;屏蔽
+              span.fa.fa-eye-slash &nbsp;退修或删除
         if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
           if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
             li
@@ -281,12 +281,13 @@ block content
                                   button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
                               if permission('moveThread') || permission("moveDraft")
                                 div(style='margin-top:0.5rem;')      
-                                  button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 送回收站
+                                  button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 退修或删除
 
                 .col-xs-12.col-md-12
                   .row
                     if !thread.reviewed
-                      .thread-review-info 审核中
+                      -let reviewData = {reviewPid: thread.oc, reviewType: "thread"}
+                      include ../publicModules/module_review
                     .col-xs-12.col-md-12(style=`margin: 3rem 0 1rem 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
                       if thread.recycleMark
                         .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面

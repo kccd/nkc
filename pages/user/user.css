@@ -146,8 +146,9 @@ body{
   padding: 1rem 0;
 }
 .single-post.reviewed{
-  border: 1px solid #9baec8;
+  border: 1px solid #e85a71;
   padding-top: 0;
+  padding-bottom: 0;
 }
 .post-panel hr{
   margin: 0 0.5rem;

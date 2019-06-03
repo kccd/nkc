@@ -1,4 +1,7 @@
 /* margin-top */
+.m-l-05{
+  margin-left: 0.5rem;
+}
 .m-a-1{
   margin: 1rem;
 }
@@ -1242,16 +1245,25 @@ footer.footer ul li{
   padding-bottom: 2rem;
 }
 .thread-panel.reviewed{
-  border: 1px solid #9baec8;
+  border: 1px solid #e85a71;
   margin: 0.5rem 0;
+  padding-bottom: 0.5rem;
 }
 .thread-review-info{
-  height: 2rem;
-  line-height: 2rem;
+  padding: 0.4rem 0 0.6rem 0;
   color:#fff;
+  font-size: 1.2rem;
   margin-bottom: 0.5rem;
   text-align: center;
   background-color: #e85a71;
+}
+.thread-review-info h4{
+  margin: 0.3rem 0;
+}
+.thread-review-link{
+  color: #fff!important;
+  font-weight: 700;
+  text-decoration: underline;
 }
 .thread-panel:last-child{
   padding-bottom: 0;

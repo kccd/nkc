@@ -2,7 +2,7 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .post("/", async (ctx, next) => {
-    const {settings, db, body, params} = ctx;
+    const {settings, db, body, params, nkcModules} = ctx;
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
     const {type} = body;
@@ -51,12 +51,17 @@ router
           usernameLowerCase: ""
         }
       });
+      targetUser.username = "";
+      targetUser.usernameLowerCase = "";
+      await nkcModules.elasticSearch.save("user", targetUser);
     } else if(type === "description") {
       await db.UserModel.updateOne({uid}, {
         $set: {
           description: ""
         }
       });
+      targetUser.description = "";
+      await nkcModules.elasticSearch.save("user", targetUser);
     }
     await next();
   });
