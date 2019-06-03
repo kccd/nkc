@@ -10021,7 +10021,8 @@ UE.plugins['defaultfilter'] = function () {
                                 break;
                             }
                         }
-                        node.setAttr('_src', node.getAttr('src'));
+                        var _newSrc = removeUelParam(node.getAttr('src'))
+                        node.setAttr('_src', _newSrc);
                         break;
                     case 'span':
                         if (browser.webkit && (val = node.getStyle('white-space'))) {
@@ -23463,11 +23464,11 @@ UE.plugins['catchremoteimage'] = function () {
             };
         var isPc = IsPC();
         var imgWidth = {
-            "width": "50%"
+            style:'max-width: 100%'
         }
         if(!isPc) {
             imgWidth = {
-                "width": "100%"
+                style: "max-width: 100%"
             }   
         }
         for (var i = 0, ci; ci = imgs[i++];) {
@@ -23476,6 +23477,8 @@ UE.plugins['catchremoteimage'] = function () {
                 continue;
             }
             var src = ci.getAttribute("_src") || ci.src || "";
+            // 将要上传的图片标记为处理中
+            ci.setAttribute("src", "/default/picloading.png")
             if (/^(https?|ftp):/i.test(src) && !test(src, catcherLocalDomain)) {
                 remoteImages.push(src);
             }else{
@@ -23522,7 +23525,24 @@ UE.plugins['catchremoteimage'] = function () {
                     me.fireEvent('catchremotesuccess')
                 },
                 //回调失败，本次请求超时
-                error: function () {
+                error: function (r) {
+                    try {
+                        var info = r.state !== undefined ? r:eval("(" + r.responseText + ")");
+                    } catch (e) {
+                        return;
+                    }
+                    var i, j, ci, cj, oldSrc, newSrc;
+                    for (i = 0; ci = imgs[i++];) {
+                        oldSrc = ci.getAttribute("_src") || ci.src || "";
+                        if(oldSrc == info.source) {
+                            newSrc = "/default/picdefault.png";
+                            domUtils.setAttributes(ci, {
+                                "src": newSrc,
+                                "_src": newSrc
+                            });
+                            break;
+                        }
+                    }
                     me.fireEvent("catchremoteerror");
                 }
             });
@@ -29878,4 +29898,9 @@ function IsPC() {
         }
     }
     return flag;
+}
+
+function removeUelParam(str) {
+    var url = str.split("?")[0];
+    return url;
 }
