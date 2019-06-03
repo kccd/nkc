@@ -125,7 +125,7 @@ operationRouter
 			});
       await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
 		}
-		if(!thread.reviewed) await ReviewModel.newReview("returnThread", post, user, para.reason);
+		if(!thread.reviewed) await db.ReviewModel.newReview("returnThread", post, user, para.reason);
 		await next()
 	})
   // 移动到回收站
