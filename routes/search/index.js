@@ -223,6 +223,7 @@ router
         } else {
           const user = userObj[uid];
           if(!user || user.certs.includes("banned")) continue;
+          await user.extendGrade();
           await db.UserModel.extendUsersInfo([user]);
           r = {
             docType,

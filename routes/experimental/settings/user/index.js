@@ -70,7 +70,7 @@ userRouter
 		await next();
 	})
 	.patch('/:uid', async (ctx, next) => {
-		const {params, db, body} = ctx;
+		const {params, db, body, nkcModules} = ctx;
 		const {operation} = body;
 		const {uid} = params;
 		const targetUser = await db.UserModel.findOnly({uid});
@@ -141,6 +141,8 @@ userRouter
 			}
 			await targetUser.update(q);
 			await targetUserPersonal.update(q);
+			const targetUser_ = await db.UserModel.findOnly({uid: targetUser.uid});
+			await nkcModules.elasticSearch.save("user", targetUser_);
 		}
 		await next();
 	});

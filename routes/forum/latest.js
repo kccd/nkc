@@ -50,7 +50,8 @@ latestRouter
     }
 		match.recycleMark = {$ne: true};
     if(data.user) {
-      if(!data.user.certs.includes("editor")) {
+      if(!ctx.permission("superModerator")) {
+        const canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
         match.$or = [
           {
             reviewed: true
@@ -58,6 +59,10 @@ latestRouter
           {
             reviewed: false,
             uid: data.user.uid
+          },
+          {
+            reviewed: false,
+            mainForumsId: {$in: canManageFid}
           }
         ]
       }

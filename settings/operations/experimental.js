@@ -288,6 +288,9 @@ module.exports = {
     },
     warning: {
 		  GET: "experimentalWarningLog"
+    },
+    review: {
+		  GET: "experimentalReviewLog"
     }
 	},
   console: {

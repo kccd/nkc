@@ -10,7 +10,8 @@ router
     const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});
     await targetThread.extendForums(['mainForums', 'minorForums']);
     await targetThread.ensurePermission(data.userRoles, data.userGrade, data.user);
-    if(targetPost.disabled) ctx.throw(400, '无法引用已经被禁用的回复');
+    if(targetPost.disabled) ctx.throw(403, '无法引用已经被禁用的回复');
+    if(!targetPost.reviewed) ctx.throw(403, "回复未通过审核，暂无法引用");
     await targetPost.extendUser();
     data.targetUser = targetPost.user;
     targetPost = targetPost.toObject();

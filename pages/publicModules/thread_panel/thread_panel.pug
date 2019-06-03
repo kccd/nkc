@@ -1,6 +1,7 @@
 .thread-panel(class=!thread.reviewed?"reviewed":"")
   if !thread.reviewed
-    .thread-review-info 审核中
+    // -let reviewData = {reviewPid: thread.oc, reviewType: "thread"}
+    include ../module_review
   .thread-panel-author-info
     .thread-panel-author
       a(href=`/u/${thread.uid}` target="_blank")

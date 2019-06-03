@@ -125,6 +125,7 @@ operationRouter
 			});
       await db.KcbsRecordModel.insertSystemRecord('violation', data.targetUser, ctx);
 		}
+		if(!thread.reviewed) await db.ReviewModel.newReview("returnThread", post, user, para.reason);
 		await next()
 	})
   // 移动到回收站
@@ -164,10 +165,15 @@ operationRouter
 		} else {
 			tCount.normal = 1;
     }
-    await targetThread.update({mainForumsId: ['recycle'], disabled: true});
+    await targetThread.update({mainForumsId: ['recycle'], disabled: true, reviewed: true});
     await Promise.all(oldForums.map(async forum => {
       await forum.updateForumMessage();
     }));
+    await db.PostModel.updateOne({pid: targetThread.oc}, {
+      $set: {
+        reviewed: true
+      }
+    });
     await targetThread.updateThreadMessage();
     await targetForum.updateForumMessage();
     /*
@@ -251,7 +257,8 @@ operationRouter
       });
       await message.save();
       await ctx.redis.pubMessage(message);
-		}
+      if(!targetThread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, para.reason);
+    }
 		if(para && para.noticeType === true){
 			let uid = targetThread.uid;
 			const toUser = await db.UsersPersonalModel.findOnly({uid});

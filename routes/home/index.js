@@ -97,6 +97,7 @@ router
 
     data.t = threadListType;
     data.navbar = {highlight: threadListType};
+
     // 关注的专业ID，关注的用户ID，关注的文章ID
     const subFid = [], subUid = [], subTid = [];
 
@@ -111,9 +112,8 @@ router
         disabled: false
       };
       if(user) {
-
-        // 临时处理：给编辑可以看到待审核文章的权限
-        if(!user.certs.includes("editor")) {
+        if(!ctx.permission("superModerator")) {
+          const canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
           q.$or = [
             {
               reviewed: true
@@ -121,10 +121,15 @@ router
             {
               reviewed: false,
               uid: user.uid
+            },
+            {
+              reviewed: false,
+              mainForumsId: {
+                $in: canManageFid
+              }
             }
           ]
         }
-
       } else {
         q.reviewed = true;
       }

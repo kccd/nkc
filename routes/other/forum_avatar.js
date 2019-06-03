@@ -27,7 +27,7 @@ forumAvatarRouter
 		const ext = mime.getExtension(type);
 		const extArr = ['jpg', 'jpeg', 'png'];
 		if(!extArr.includes(ext)) ctx.throw('仅支持jpg、jpeg和png格式的图片');
-		if(size > 5120*1024) ctx.throw(400, '上传的图片不能大于1024kb');
+		if(size > 5120*1024) ctx.throw(400, '上传的图片不能大于5MB');
 		const {forumAvatarify} = tools.imageMagick;
 		const {siteSpecificPath} = settings.statics;
 		const targetPath = siteSpecificPath + '/forum_icon/' + forum.fid + '.png';

@@ -430,8 +430,19 @@ threadSchema.methods.updateThreadMessage = async function() {
   const timeToNow = new Date();
   const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
   const updateObj = {};
-  const lm = await PostModel.findOne({tid: this.tid, disabled: false}).sort({toc: -1});
   const oc = await PostModel.findOne({tid: this.tid}).sort({toc: 1});
+  const lm = await PostModel.findOne({
+    tid: this.tid, disabled: false,
+    $or: [
+      {
+        reviewed: true
+      },
+      {
+        pid: oc.pid,
+        reviewed: false
+      }
+    ]
+  }).sort({toc: -1});
   updateObj.tlm = lm?lm.toc:'';
   updateObj.toc = oc.toc;
   updateObj.lm = lm?lm.pid:'';
@@ -1187,7 +1198,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   for (var i in allMarkThreads) {
     const delThreadLog = await DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
     if(delThreadLog){
-      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true });
+      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true, reviewed: true});
       await PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
       await DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
       const tUser = await UserModel.findOne({uid: delThreadLog.delUserId});

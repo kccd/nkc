@@ -1,3 +1,20 @@
+.crop-image{
+  position: relative;
+}
+.crop-image .default-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  cursor: pointer;
+  text-align: center;
+  line-height: 100%;
+}
+.crop-image .default-image button{
+  margin-top: 8rem;
+}
 #module_crop{
   position: fixed;
   overflow: hidden;

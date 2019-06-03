@@ -13,9 +13,33 @@
     .search-result-abstract!= result.abstract
   else
     .search-result-user-panel
-      a.search-result-avatar(href=`/u/${result.user.uid}` target="_blank")
-        img(src=`/avatar/${result.user.uid}`)
+      .search-result-avatar
+        a(href=`/u/${result.user.uid}` target="_blank")
+          img(src=`/avatar/${result.user.uid}`)
       .search-result-user-info
         a.clear-a-style(href=`/u/${result.user.uid}` target="_blank").search-result-username!=result.username
+          -let targetUser = result.user;
+          small
+            include ../user/module_user_grade
+        if data.user && result.user.uid !== data.user
+          if data.user.subUid.includes(result.user.uid)
+            button.btn.btn-xs.btn-default(onclick=`subscribeUser('${result.user.uid}', false)`) 取关
+          else
+            button.btn.btn-xs.btn-default(onclick=`subscribeUser('${result.user.uid}', true)`) 关注
+          a.m-l-05.btn.btn-xs.btn-default(href=`/message?uid=${result.user.uid}` target="_blank") 私信
         .search-result-certs=result.user.info.certsName
+        .search-result-post
+          div
+            .count=targetUser.threadCount - targetUser.disabledThreadsCount
+            .title 文章
+          div
+            .count=targetUser.postCount - targetUser.disabledPostsCount
+            .title 回复
+          div
+            .count=targetUser.xsf
+            .title 学数分
+          div
+            .count=targetUser.kcb/100
+            .title 科创币
+
         .search-result-description!=result.description

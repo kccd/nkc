@@ -14,7 +14,7 @@ block content
             a.button(@click="chooseAll(false)") 不通过已选
           .paging-button.pointer
             a.radius-left.radius-right.button(@click="submit") 提交已选
-        include ../publicModules/paging/paging
+          include ../publicModules/paging/paging
         .review-panel-div.box-shadow-panel
           for r in data.results
             .review-panel
@@ -57,8 +57,15 @@ block content
                 .m-t-1
                   button.btn.btn-sm.btn-primary(@click=`submit('${r.post.pid}')`) 提交
               .review-post-content!=experimental_render(r.post)
-        include ../publicModules/paging/paging_input
 
+        .p-t-1
+          include ../publicModules/paging/paging_input
+          .paging-button.pointer
+            a.radius-left.button(@click="selectAll") 全选
+            a.button(@click="chooseAll(true)") 通过已选
+            a.button(@click="chooseAll(false)") 不通过已选
+          .paging-button.pointer
+            a.radius-left.radius-right.button(@click="submit") 提交已选
 
 
 

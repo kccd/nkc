@@ -6,14 +6,18 @@ router
     const {nkcModules, data, db, query} = ctx;
     const {page=0} = query;
     const {user} = data;
-    const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
     const q = {
-      mainForumsId: {
-        $in: accessibleFid
-      },
       reviewed: false,
-      disabled: false
+      disabled: false,
+      mainForumsId: {$ne: "recycle"}
     };
+    if(!ctx.permission("superModerator")) {
+      const forums = await db.ForumModel.find({moderators: user.uid});
+      const fid = forums.map(f => f.fid);
+      q.mainForumsId = {
+        $in: fid
+      }
+    }
     const count = await db.PostModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count, 100);
     const posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -71,6 +75,9 @@ router
 
     const post = await db.PostModel.findOne({pid});
 
+    if(!post) ctx.throw(404, `未找到ID为${pid}的post`);
+    if(post.reviewed) ctx.throw(400, "内容已经被审核过了，请刷新");
+
     const forums = await db.ForumModel.find({fid: {$in: post.mainForumsId}});
     let isModerator = ctx.permission('superModerator');
     if(!isModerator) {
@@ -82,15 +89,21 @@ router
 
     if(!isModerator) ctx.throw(403, `您没有权限审核该内容，pid: ${pid}`);
 
+    let type = "passPost";
     await post.update({
       reviewed: true
     });
-    const thread = await db.ThreadModel.findOne({oc: post.pid});
-    if(thread) {
+    const thread = await db.ThreadModel.findOnly({tid: post.tid});
+    if(thread.oc === post.pid) {
       await thread.update({
         reviewed: true
       });
+      type = "passThread";
     }
+    await thread.updateThreadMessage();
+
+    await db.ReviewModel.newReview(type, post, data.user);
+
     await next();
   });
 module.exports = router;

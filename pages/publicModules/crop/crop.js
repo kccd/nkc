@@ -53,20 +53,23 @@ moduleCrop.init = function(callback, o) {
   moduleCrop.cropper = $image.data('cropper');
 
   moduleCrop.complete = function() {
-    screenTopAlert("图片处理中，请稍后...");
-    try{
-      moduleCrop.cropper.getCroppedCanvas().toBlob(function(blob) {
-        callback(blob);
-      });
-    }
-    catch(e)
-    {
-      console.log(e);
-      if(options.errorInfo) {
-        screenTopWarning(options.errorInfo)
+    $(".doing-info.hidden").removeClass("hidden");
+    setTimeout(function() {
+      try{
+        moduleCrop.cropper.getCroppedCanvas().toBlob(function(blob) {
+          callback(blob);
+        });
       }
-    }
-    moduleCrop.cancel();
+      catch(e)
+      {
+        console.log(e);
+        if(options.errorInfo) {
+          screenTopWarning(options.errorInfo)
+        }
+      }
+      moduleCrop.cancel();
+      $(".doing-info").addClass("hidden");
+    }, 500);
   };
 
   // 显示裁剪框
