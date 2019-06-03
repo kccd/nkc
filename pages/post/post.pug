@@ -45,7 +45,8 @@ block content
       .col-xs-12.col-md-9
         .nkcpanel.fullwidthpanel.ThreadBox.post
           if !post.reviewed
-            .thread-review-info 审核中
+            -let reviewData = {reviewPid: post.pid, reviewType: "post"}
+            include ../publicModules/module_review
           .post-info
             .post-header
               .time

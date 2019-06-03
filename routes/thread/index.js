@@ -128,6 +128,7 @@ threadRouter
     }
 		data.isModerator = isModerator;
 
+    // 此人不是专家且文章
     if(!thread.reviewed) {
       if(!data.user || (!isModerator && data.user.uid !== thread.uid)) ctx.throw(403, "文章还未通过审核，暂无法阅读");
     }
@@ -195,15 +196,17 @@ threadRouter
 			if($and.length !== 0) match.$and = $and;
 		}
 		if(data.user) {
-		  match.$or = [
-        {
-          reviewed: true
-        },
-        {
-          reviewed: false,
-          uid: data.user.uid
-        }
-      ]
+		  if(!isModerator) {
+        match.$or = [
+          {
+            reviewed: true
+          },
+          {
+            reviewed: false,
+            uid: data.user.uid
+          }
+        ]
+      }
     } else {
 		  match.reviewed = true;
     }
@@ -217,7 +220,7 @@ threadRouter
 		for(let postSin of postAll){
 			let onLog = await db.DelPostLogModel.findOne({delType: 'toDraft', postType: 'post', postId: postSin.pid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}})
 			if(onLog){
-				await postSin.update({"toDraft":false});
+				await postSin.update({"toDraft":false, reviewed: true});
 				const tUser = await db.UserModel.findOne({uid: onLog.delUserId});
 				data.post = await db.PostModel.findOne({pid: onLog.postId});
 				if(tUser && data.post) {

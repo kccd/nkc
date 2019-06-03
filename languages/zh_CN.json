@@ -241,7 +241,7 @@
     "modifyRoleUsers": "将用户从某个角色中移除",
     "modifyOtherPosts": "修改别人的post",
     "moveThreadToRecycle": "移动文章到回收站",
-    "moveDraft": "退休文章",
+    "moveDraft": "退修文章",
     "displayRecycleMarkThreads": "显示被退回的文章",
     "displayDisabledPosts": "显示被屏蔽的post",
     "unDigestThread": "取消将文章设为文章优秀",

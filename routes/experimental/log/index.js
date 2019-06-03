@@ -12,6 +12,7 @@ const rechargeRouter = require("./recharge");
 const withdrawRouter = require("./withdraw");
 const examRouter = require("./exam");
 const recycleRouter = require("./recycle");
+const reviewRouter = require("./review");
 const warningRouter = require("./warning");
 logRouter
   .get('/', async (ctx, next) => {
@@ -29,5 +30,6 @@ logRouter
   .use('/secret', secretRouter.routes(), secretRouter.allowedMethods())
   .use("/warning", warningRouter.routes(), warningRouter.allowedMethods())
   .use('/behavior', behaviorRouter.routes(), behaviorRouter.allowedMethods())
+  .use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
   .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods());
 module.exports = logRouter;

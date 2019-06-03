@@ -1,0 +1,16 @@
+.thread-review-info
+  -let {reviewPid, reviewType} = reviewData || {};
+  if permission("review") && reviewPid
+    h4 内容未审核
+    | 通过请点击
+    button.btn.btn-xs.btn-default(onclick=`reviewPost('${reviewPid}')`) 通过
+    | &nbsp;  按钮，不通过请点击
+    if reviewType === "post"
+      button.btn.btn-xs.btn-default(onclick=`disablePostClick('${reviewPid}', "post")`) 退修或删除
+    else
+      button.btn.btn-xs.btn-default(onclick=`disablePostClick('${reviewPid}', "thread")`) 退修或删除
+    | 按钮。
+    a.thread-review-link(href=`/review` target="_blank") 待审核列表
+
+  else
+    | 审核中

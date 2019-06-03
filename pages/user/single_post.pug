@@ -1,6 +1,6 @@
 .single-post(class=!post.reviewed?"reviewed":"")
   if !post.reviewed
-    .thread-review-info 审核中
+    include ../publicModules/module_review
   .single-post-info
     .post-time=fromNow(post.time)
     if post.postType === "postToForum"

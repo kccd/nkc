@@ -1214,6 +1214,7 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
   } else {
     passedCount = await ThreadModel.count({
       disabled: false,
+      reviewed: true,
       mainForumsId: {$ne: "recycle"},
       uid
     });

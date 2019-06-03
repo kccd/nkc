@@ -188,7 +188,7 @@
   font-weight: 700;
   font-size: 1rem;
   overflow: hidden;
-  color: #282c37;
+  color: #e85a71;
 }
 .search-result-description{
   color: #282c37;
@@ -206,4 +206,26 @@
 }
 .search-button:focus{
   color: #fff;
+}
+.search-result-post{
+  margin-bottom: 0.5rem;
+}
+.search-result-post>div{
+  height: 3rem;
+  background-color: #d9e1e8;
+  display: inline-block;
+  width: 4.5rem;
+  text-align: center;
+}
+.search-result-post>div>div{
+  height: 50%;
+  line-height: 1.5rem;
+  font-size: 1rem;
+}
+.search-result-post .title{
+  font-size: 1rem;
+}
+.search-result-post .count{
+  font-weight: 700;
+
 }
