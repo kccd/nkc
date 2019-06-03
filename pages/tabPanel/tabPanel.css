@@ -1,5 +1,5 @@
 .panelWall {
-  width: 450px;
+  width: 400px;
   display: inline-block;
   border: 1px solid #eee;
   padding: 0 15px;
@@ -60,7 +60,7 @@
 
 .tagLiLink {
   border-radius: 3px;
-  color: #9baec8;
+  color: #4a535f;
   font-size: 13px;
   padding: 2px 5px;
   margin-right: 5px;
@@ -69,7 +69,7 @@
 }
 
 .tagLiLink:hover {
-  background-color: #9baec8;
+  background-color: #4a535f;
   color: #FFF;
   text-decoration: none;
 }

@@ -261,7 +261,7 @@ resourceRouter
         if(waterStyle === "siteLogo"){
           await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path)
         }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
-          await imageMagick.watermarkifyLogo(logoCoor, waterGravity, waterSmallPath, path);
+          await imageMagick.watermarkifyLogo(transparency, logoCoor, waterGravity, waterSmallPath, path);
           var temporaryPath = extGetPath(extension);
           await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path, temporaryPath);
           // await fs.copyFile(temporaryPath, path);

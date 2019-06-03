@@ -101,7 +101,7 @@
             this.imgBg = document.createElement("div");
             this.imgBg.className = 'img_bgmask';
             util.css(this.imgBg,{position:"fixed",left:0,top:0,width:'100%',height:"100%",fontSize:0,background:'rgba(0,0,0,.6)',display:"none"});
-            this.imgBg.innerHTML = '<div class="popurNode" style="position: absolute;left:0;top:0;width:100%;height:100%;z-index:1"></div><span style="position: absolute;top: 70px;right:20px;z-index: 10;height: 48px;width: 48px;background:#2b90d8;cursor:pointer;border-radius:50%;" class="close_bgmask"></span><div style="position:absolute;left:50%;top:50%;" class="view_img_wrap"><img style="width:100%;height:100%;position: relative;z-index: -1;" src="" alt=""></div>';
+            this.imgBg.innerHTML = '<div class="popurNode" style="position: absolute;left:0;top:0;width:100%;height:100%;z-index:1"></div><span style="position: absolute;top: 70px;right:20px;z-index: 10;height: 48px;width: 48px;background:#2b90d8;cursor:pointer;border-radius:50%;" class="close_bgmask"></span><div class="view_img_wrap"><img style="width:100%;height:100%;position: relative;z-index: -1;" src="" alt=""></div>';
             this.elemPreviewContain.appendChild(this.imgBg);
             this.elemPreviewImg = this.imgBg.getElementsByTagName("img")[0];
             this.moveObj = this.elemPreviewImg.parentNode; // 被移动的元素，这里是图片载体的容器div
@@ -124,14 +124,19 @@
 
                 _this._WIDTH = _this.WIDTH = _this.elemPreviewImg.offsetWidth;
                 _this._HEIGHT = _this.HEIGHT = _this.elemPreviewImg.offsetHeight;
-
-                util.css(_this.moveObj,{
-                    width:_this.WIDTH+"px",
-                    marginLeft:-_this.WIDTH/2+"px",
-                    marginTop:-_this.HEIGHT/2+"px",
-                    left:'50%',
-                    top:'50%'
-                })
+                if(IsPC()) {
+                    util.css(_this.moveObj,{
+                        width:_this.WIDTH+"px",
+                        marginLeft:-_this.WIDTH/2+"px",
+                        marginTop:-_this.HEIGHT/2+"px",
+                        left:'50%',
+                        top:'50%'
+                    })
+                }else{
+                    util.css(_this.moveObj,{
+                        marginTop:-_this.HEIGHT/2+"px"
+                    })
+                }
             }
 
             this.moveObj.addEventListener("mousedown",mousedown,false);
@@ -174,6 +179,9 @@
 			this.elemPreviewCloseBj.onclick = function(){
                 _this.previewClose();
             };
+            this.elemPreviewImg.ondblclick = function() {
+                _this.previewClose();
+            }
             util.addEvent(this.imgBg, "mousewheel", function(event) {
                 stopPre(event)
                 stopPro(event)

@@ -10,6 +10,7 @@ downloadRouter
     const {imageMagick} = ctx.tools;
     const timeStr = new Date().getTime();
     const url = ctx.body.loadsrc;
+    ctx.data.source = url;
 /*    console.log("----*获取目标url*----");
     console.log("----*目标url*----")
     console.log(url)*/
@@ -235,7 +236,6 @@ downloadRouter
       mediaType: mediaType
     });
     ctx.data.r = await r.save();
-    ctx.data.source = url;
     ctx.data.state = "SUCCESS";
     await next()
 });

@@ -68,4 +68,27 @@ schema.statics.getUserSubUid = async (uid) => {
   return sub.map(s => s.tUid);
 };
 
+/**
+ * 自动关注专业
+ * @param {String} uid 用户id
+ * @param {Array} fids 专业fid数组
+ */
+schema.statics.autoAttentionForum = async function(uid, fids) {
+  let SubscribeModel = mongoose.model("subscribes");
+  let SettingModel = mongoose.model("settings");
+  for(let scr of fids) {
+    let subscribeForum = await SubscribeModel.findOne({type: "forum", fid: scr, uid: uid});
+    if(!subscribeForum) {
+      const sid = await SettingModel.operateSystemID('subscribes', 1);
+      let newSubscribeForum = new SubscribeModel({
+        _id: sid,
+        uid: uid,
+        type: "forum",
+        fid: scr
+      })
+      await newSubscribeForum.save();
+    }
+  }
+}
+
 module.exports = mongoose.model('subscribes', schema);

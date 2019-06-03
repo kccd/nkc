@@ -34,6 +34,7 @@ router
 			ForumModel,
 			ThreadModel,
 			UsersSubscribeModel,
+			SubscribeModel,
 		} = db;
 		const {fid} = params;
 		const forum = await ForumModel.findOnly({fid});
@@ -81,73 +82,25 @@ router
     if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');*/
 
 	  const {post} = body;
-		const {c, t, fids, cids} = post;
+		const {c, t, fids, cids, cat, mid} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-    if(t === '') ctx.throw(400, '标题不能为空！');
-
-    const {cat, mid} = post;
+		if(t === '') ctx.throw(400, '标题不能为空！');
+		// 生成一条新的post
 		const _post = await forum.newPost(post, user, ip, cids, mid, fids);
 		data.post = _post;
-    const type = ctx.request.accepts('json', 'html');
-    // await forum.update({$inc: {'tCount.normal': 1}});
+		// 获取当前的thread
 		const thread = await ThreadModel.findOnly({tid: _post.tid});
-		// await thread.update({"$set":{mainForumsId: fids, categoriesId:cids}})
-
+		data.thread = thread;
     // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
     const needReview = await db.UserModel.contentNeedReview(user.uid, "thread");
     if(!needReview) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
       await db.ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
     }
-
-		data.thread = thread;
 		// 发表自动关注该学科或话题
-		const userSubscribe = await UsersSubscribeModel.findOnly({uid:user.uid});
-		if(userSubscribe.subscribeForums){
-			for(let scr of fids){
-				let index = userSubscribe.subscribeForums.indexOf(scr);
-				if(index < 0) {
-					userSubscribe.subscribeForums.unshift(scr)
-				}
-			}
-			await userSubscribe.update({$set:{subscribeForums:userSubscribe.subscribeForums}});
-		}
-		const {selectDiskCharacterDown} = ctx.settings.mediaPath;
-		const {coverPath, frameImgPath} = ctx.settings.upload;
-    const {coverify} = ctx.tools.imageMagick;
-		await thread.extendFirstPost();
-		await thread.firstPost.extendResources();
-		const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg', 'mp4'].indexOf(e.ext.toLowerCase()) > -1);
-		if(cover){
-			const middlePath = selectDiskCharacterDown(cover);
-			let coverMiddlePath;
-			if(cover.ext === "mp4"){
-				coverMiddlePath = path.join(path.resolve(frameImgPath), `/${cover.rid}.jpg`);
-			}else{
-				coverMiddlePath = path.join(middlePath, cover.path);
-			}
-			let coverExists = await fs.exists(coverMiddlePath);
-			if(!coverExists){
-				thread.hasCover = false;
-				await thread.save();
-				// url = `${coverPath}/default.jpg`;
-			}else{
-				await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
-				.catch(e => {
-					thread.hasCover = false;
-					return thread.save()
-				});
-			}
-			// const middlePath = selectDiskCharacterDown(cover);
-			// const coverMiddlePath  = path.join(middlePath, cover.path);
-			// if(cover) {
-			// 	await coverify(coverMiddlePath, `${coverPath}/${_post.tid}.jpg`)
-			// 		.catch(e => {
-			// 			thread.hasCover = false;
-			// 			return thread.save()
-			// 		});
-			// }
-		}
+		await SubscribeModel.autoAttentionForum(user.uid, fids);
+		// 生成封面图
+		await ThreadModel.autoCoverImage(ctx, thread, _post);
 		// 发帖数加一并生成记录
 		const obj = {
 			user,
@@ -165,13 +118,15 @@ router
     await db.KcbsRecordModel.insertSystemRecord('postToForum', user, ctx);
 		// await db.UsersScoreLogModel.insertLog(obj);
 
-    await thread.updateThreadMessage();
+		await thread.updateThreadMessage();
+		
+		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {
       ctx.status = 303;
       return ctx.redirect(`/t/${_post.tid}`);
-    }
+		}
+		
     data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
-
     //帖子曾经在草稿箱中，发表时，删除草稿
     await db.DraftModel.remove({"did":post.did})
     await next();
