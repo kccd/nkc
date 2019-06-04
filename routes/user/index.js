@@ -315,7 +315,6 @@ userRouter
       });
       const results = [];
       for (const thread of threads) {
-        console.log(thread.disabled)
         if(thread.disabled || thread.recycleMark) {
           // 根据权限过滤掉 屏蔽、退休的内容
           if(user) {

@@ -13,56 +13,66 @@ block content
   .container-fluid.max-width
     .row
       include ../nav
-      .hidden#data=objToStr({threads: data.threads})
+      .hidden#data=objToStr({logs: data.logs})
       .col-xs-12.col-md-12#app(v-cloak)
-        h4.text-danger 等待作者修改的文章
+        h5.text-danger 若退修的内容在规定时间内未作修改，则状态会自动变为 已屏蔽
+        .m-b-1
+          include ../../publicModules/paging/paging
         table.table
           thead
             tr
               th 退修时间
-              th 作者
+              th 内容类型
+              th 发表人
               th 文章标题
               th 退修原因
               th 操作者
+              th 状态
           tbody
-            tr(v-for="thread in threads")
-              th {{format("YYYY-MM-DD HH:mm:ss", thread.markTime)}}
+            tr(v-for="log in logs")
+              th {{format("YYYY-MM-DD HH:mm:ss", log.toc)}}
+              th {{log.postType==="post"?"回复":"文章"}}
               th
-                a(:href="'/u/' + thread.firstPost.user.uid" target="_blank") {{thread.firstPost.user.username}}
+                a(:href="'/u/' + log.delUser.uid" target="_blank") {{log.delUser.username}}
               th
-                a(:href="'/t/' + thread.tid" target="_blank") {{thread.firstPost.t}}
+                a(:href="'/t/' + log.thread.tid" target="_blank") {{log.thread.firstPost.t}}
               th
-                div(v-if="!thread.modify")
-                  span {{thread.markReason}}
-                  button.btn.btn-xs.btn-default(@click="thread.modify = true") 修改
+                div(v-if="!log.modify")
+                  span {{log.reason}}
+                  button.btn.btn-xs.btn-default(@click="log.modify = true") 修改
                 div(v-else)
-                  textarea.form-control(rows=4 v-model="thread.markReason")
+                  textarea.form-control(rows=4 v-model="log.reason")
                   .m-t-1
-                    button.btn.btn-xs.btn-success(@click="save(thread)") 保存
-                    button.btn.btn-xs.btn-default(@click="thread.modify = false") 取消
+                    button.btn.btn-xs.btn-success(@click="save(log)") 保存
+                    button.btn.btn-xs.btn-default(@click="log.modify = false") 取消
               th
-                a(href="'/u/' + thread.markUser.uid" target="_blank") {{thread.markUser.username}}
+                a(href="'/u/' + log.targetUser.uid" target="_blank") {{log.targetUser.username}}
+              th
+                span.text-success(v-if="log.modifyType") 已修改
+                span(v-else-if="log.delType === 'toDraft'") 未修改
+                span.text-danger(v-else-if="log.delType === 'toRecycle'") 已屏蔽
+        .m-t-1
+          include ../../publicModules/paging/paging
 block scripts
   include ../../publicModules/moment
   script.
     var app = new Vue({
       el: "#app",
       data: {
-        threads: []
+        logs: []
       },
       mounted: function() {
         var data = getDataById("data");
-        for(var i = 0; i < data.threads.length; i++) {
-          data.threads[i].modify = false;
+        for(var i = 0; i < data.logs.length; i++) {
+          data.logs[i].modify = false;
         }
-        this.threads = data.threads;
+        this.logs = data.logs;
       },
       methods: {
         format: NKC.methods.format,
-        save: function(thread) {
-          const markReason = thread.markReason;
-          nkcAPI("/t/" + thread.tid + "/moveDraft/reason", "PATCH", {
-            reason: markReason
+        save: function(log) {
+          nkcAPI("/t/" + log.thread.tid + "/moveDraft/reason", "PATCH", {
+            log: log
           })
             .then(function() {
               screenTopAlert("保存成功");

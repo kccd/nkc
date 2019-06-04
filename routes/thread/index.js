@@ -495,7 +495,11 @@ threadRouter
 
     // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
     const needReview = await db.UserModel.contentNeedReview(user.uid, "post");
-    if(!needReview) await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+    if(!needReview) {
+      await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+    } else {
+      await db.MessageModel.sendReviewMessage(_post.pid);
+    }
 
     data.post = _post;
 		data.targetUser = await thread.extendUser();

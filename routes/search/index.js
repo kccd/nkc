@@ -6,6 +6,9 @@ router
     const {db, data, query, nkcModules} = ctx;
     let {page=0, t, c, d} = query;
     const {user} = data;
+    // 通过mongodb精准搜索用户名
+    let targetUser, existUser = false;
+
     if(c) {
       if(!d) {
         data.c = Buffer.from(encodeURIComponent(c)).toString("base64");
@@ -79,18 +82,36 @@ router
         resource.highlight = r.highlight;
         return resource;
       });
+
+
+
       // 根据分页设置，计算分页
       let perpage;
       if(t === "user") {
         perpage = searchUserList;
+        targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
       } else if(t === "post") {
         perpage = searchPostList;
       } else if(t === "thread") {
         perpage = searchThreadList;
       } else {
         perpage = searchAllList;
+        targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
       }
       data.paging = nkcModules.apiFunction.paging(page, data.total, perpage);
+
+      if(targetUser) {
+        data.total++;
+        results.push({
+          uid: targetUser.uid,
+          docType: "user",
+          username: targetUser.username,
+          highlight: {
+            username: [`<span style="color: #e85a71;">${targetUser.username}</span>`]
+          }
+        });
+      }
+
     }
 
     // 如果搜索结果不为空
@@ -139,7 +160,6 @@ router
       });
 
       const users = await db.UserModel.find({uid: {$in: [...uids]}});
-
       users.map(user => {
         userObj[user.uid] = user;
       });
@@ -221,6 +241,10 @@ router
             forums
           };
         } else {
+          if(targetUser && targetUser.uid === uid) {
+            if(existUser) continue;
+            existUser = true;
+          }
           const user = userObj[uid];
           if(!user || user.certs.includes("banned")) continue;
           await user.extendGrade();

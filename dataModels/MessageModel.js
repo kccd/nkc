@@ -327,6 +327,13 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if(!thread) continue;
       r.c.post = post;
       r.c.thread = thread;
+    } else if(["newReview", "passReview"].includes(type)) {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      const thread = await ThreadModel.findOne({tid: post.tid});
+      if(!thread) continue;
+      r.c.post = post;
+      r.c.thread = thread;
     }
 
     if(r.c.thread) {
@@ -342,6 +349,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
         htmlToText: false,
         count: 200
       }))[0];
+      r.c.thread.url = `/t/${r.c.thread.tid}`;
     }
     if(r.c.post) {
       r.c.post = r.c.post.toObject();
@@ -350,7 +358,6 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
         disabled: false
       });
       r.c.post.url = `/t/${r.c.post.tid}?page=${step.page}&highlight=${r.c.post.pid}#${r.c.post.pid}`;
-
       r.c.post.c = apiFunction.obtainPureText(r.c.post.c);
     }
     results.push(r);
@@ -423,6 +430,35 @@ messageSchema.statics.clearMessageSTU = async (options) => {
         vd: true
       }
     });
+  }
+};
+
+
+/*
+* 给相应审核人员发送内容审核通知
+*
+* */
+
+messageSchema.statics.sendReviewMessage = async (pid) => {
+  if(!pid) throwErr(500, "pid不能为空");
+  const SettingModel = mongoose.model("settings");
+  const MessageModel = mongoose.model("messages");
+  const redis = require("../redis");
+  let reviewSettings = await SettingModel.findById("review");
+  reviewSettings = reviewSettings.c;
+  const users = await mongoose.model("users").find({certs: {$in: reviewSettings.certsId}}, {uid:1});
+  for(const user of users) {
+    const message = MessageModel({
+      _id: await SettingModel.operateSystemID("messages", 1),
+      r: user.uid,
+      ty: "STU",
+      c: {
+        type: "newReview",
+        pid
+      }
+    });
+    await message.save();
+    await redis.pubMessage(message);
   }
 };
 

@@ -11,7 +11,8 @@ var app = new Vue({
       blacklist: "",
       whitelist: ""
     },
-    conditions: []
+    conditions: [],
+    selectedCertId: ""
   },
   watch: {
     tab: function() {
@@ -19,6 +20,15 @@ var app = new Vue({
     }
   },
   computed: {
+    selectedCerts: function() {
+      var arr = [];
+      var certsId = this.reviewSettings.certsId;
+      for(var i = 0; i < certsId.length; i ++ ) {
+        var cert = this.getCertById(certsId[i]);
+        if(cert) arr.push(cert);
+      }
+      return arr;
+    },
     review: function() {
       return this.reviewSettings[this.tab];
     },
@@ -41,6 +51,36 @@ var app = new Vue({
     this.extendConditions();
   },
   methods: {
+    saveCertId: function() {
+      nkcAPI("/e/settings/review", "PATCH", {
+        type: 'saveCertsId',
+        certsId: app.reviewSettings.certsId
+      })
+        .then(function() {
+          screenTopAlert("保存成功");
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
+    },
+    removeCertId: function(id) {
+      var index = this.reviewSettings.certsId.indexOf(id);
+      if(index !== -1) {
+        this.reviewSettings.certsId.splice(index, 1);
+      }
+    },
+    addCertId: function() {
+      var id = this.selectedCertId;
+      if(!id) return;
+      if(this.reviewSettings.certsId.indexOf(id) === -1) {
+        this.reviewSettings.certsId.push(id);
+      }
+    },
+    getCertById: function(id) {
+      for(var i = 0; i < this.certs.length; i++) {
+        if(this.certs[i]._id === id) return this.certs[i];
+      }
+    },
     extendConditions: function() {
       var arr = [];
       arr.push({

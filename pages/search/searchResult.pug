@@ -14,36 +14,39 @@
   else
     .search-result-user-panel
       .box-shadow-panel
-        div(style="max-width: 100%;width: 40rem;")
+        div(style="max-width: 100%;width: 70rem;")
           .search-result-avatar
             a(href=`/u/${result.user.uid}` target="_blank")
               img(src=`/avatar/${result.user.uid}`)
           .search-result-user-info
-            a.clear-a-style(href=`/u/${result.user.uid}` target="_blank").search-result-username!=result.username
-              -let targetUser = result.user;
-              small
+            .display-i-b.m-r-05
+              a.clear-a-style(href=`/u/${result.user.uid}` target="_blank").search-result-username!=result.username
+                -let targetUser = result.user;
+              .display-i-b
                 include ../user/module_user_grade
-            if data.user && result.user.uid !== data.user
-              if data.user.subUid.includes(result.user.uid)
-                button.btn.btn-xs.btn-default(onclick=`subscribeUser('${result.user.uid}', false)`) 取关
-              else
-                button.btn.btn-xs.btn-default(onclick=`subscribeUser('${result.user.uid}', true)`) 关注
-              a.m-l-05.btn.btn-xs.btn-default(href=`/message?uid=${result.user.uid}` target="_blank") 私信
-            .search-result-certs=result.user.info.certsName
-            .search-result-post
-              div
-                .count=targetUser.threadCount - targetUser.disabledThreadsCount
-                .title 文章
-              div
-                .count=targetUser.postCount - targetUser.disabledPostsCount
-                .title 回复
-              div
-                .count=targetUser.xsf
-                .title 学数分
-              div
-                .count=targetUser.kcb/100
-                .title 科创币
-            .search-result-time
-              div=`注册时间：${targetUser.toc.toLocaleString()}`
-              div(title=targetUser.toc.toLocaleString())=`最后活动：${fromNow(targetUser.tlv)}`
-            .search-result-description!=result.description
+              if data.user && result.user.uid !== data.user
+                .display-i-b
+                  if data.user.subUid.includes(result.user.uid)
+                    button.btn.btn-xs.btn-default(onclick=`subscribeUser('${result.user.uid}', false)`) 取关
+                  else
+                    button.btn.btn-xs.btn-default(onclick=`subscribeUser('${result.user.uid}', true)`) 关注
+                  a.m-l-05.btn.btn-xs.btn-default(href=`/message?uid=${result.user.uid}` target="_blank") 私信
+              .search-result-certs=result.user.info.certsName
+              .search-result-post
+                div
+                  .count=targetUser.threadCount - targetUser.disabledThreadsCount
+                  .title 文章
+                div
+                  .count=targetUser.postCount - targetUser.disabledPostsCount
+                  .title 回复
+                div
+                  .count=targetUser.xsf
+                  .title 学数分
+                div
+                  .count=targetUser.kcb/100
+                  .title 科创币
+            .display-i-b
+              .search-result-time
+                div=`注册时间：${targetUser.toc.toLocaleString()}`
+                div(title=targetUser.toc.toLocaleString())=`最后活动：${fromNow(targetUser.tlv)}`
+              .search-result-description!=result.description

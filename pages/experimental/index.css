@@ -135,3 +135,20 @@ body{
   line-height: 2rem;
   cursor: pointer;
 }
+.cert-panel .form-inline{
+  display: inline-block;
+}
+.cert-panel span{
+  display: inline-block;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  padding: 0 1rem;
+  color: #fff;
+}
+.cert-panel span .fa{
+  margin-left: 0.5rem;
+}
