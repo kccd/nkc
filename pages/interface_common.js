@@ -1972,7 +1972,6 @@ function getDayCountByYearMonth(year, month) {
 * */
 
 function reviewPost(pid) {
-  if(confirm("确定要通过审核？") === false) return;
   nkcAPI("/review", "PATCH", {
     pid: pid
   })

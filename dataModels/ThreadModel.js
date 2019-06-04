@@ -426,13 +426,15 @@ threadSchema.methods.updateThreadEncourage = async function() {
 };
 
 threadSchema.methods.updateThreadMessage = async function() {
+  const ThreadModel = mongoose.model("threads");
+  const thread = await ThreadModel.findOne({tid: this.tid});
   const PostModel = mongoose.model('posts');
   const timeToNow = new Date();
   const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
   const updateObj = {};
-  const oc = await PostModel.findOne({tid: this.tid}).sort({toc: 1});
+  const oc = await PostModel.findOne({tid: thread.tid}).sort({toc: 1});
   const lm = await PostModel.findOne({
-    tid: this.tid, disabled: false,
+    tid: thread.tid, disabled: false,
     $or: [
       {
         reviewed: true
@@ -447,15 +449,15 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.toc = oc.toc;
   updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
-  updateObj.count = await PostModel.count({tid: this.tid});
-  updateObj.countToday = await PostModel.count({tid: this.tid, toc: {$gt: time}});
-  updateObj.countRemain = await PostModel.count({tid: this.tid, disabled: {$ne: true}});
+  updateObj.count = await PostModel.count({tid: thread.tid});
+  updateObj.countToday = await PostModel.count({tid: thread.tid, toc: {$gt: time}});
+  updateObj.countRemain = await PostModel.count({tid: thread.tid, disabled: {$ne: true}});
   updateObj.uid = oc.uid;
 
   const userCount = await PostModel.aggregate([
     {
       $match: {
-        tid: this.tid
+        tid: thread.tid
       }
     },
     {
@@ -467,9 +469,9 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.replyUserCount = userCount.length - 1;
 
 
-  await this.update(updateObj);
-  await PostModel.updateMany({tid: this.tid}, {$set: {mainForumsId: this.mainForumsId}});
-  const forums = await this.extendForums(['mainForums']);
+  await thread.update(updateObj);
+  await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
+  const forums = await thread.extendForums(['mainForums']);
   await Promise.all(forums.map(async forum => {
     await forum.updateForumMessage();
   }));

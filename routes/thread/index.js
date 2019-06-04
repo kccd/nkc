@@ -140,7 +140,7 @@ threadRouter
 			if(!isModerator) {
 				// 访问用户没有查看被退回帖子的权限，若不是自己发表的文章则报权限不足
 				if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
-					if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '权限不足');
+					if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '文章已被退回修改，暂无法阅读。');
 				}
 			}
 			// 取出帖子被退回的原因
