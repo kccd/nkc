@@ -1968,9 +1968,9 @@ function getDayCountByYearMonth(year, month) {
 
 // 点击按钮播放视频
 function openVideo(para, vid) {
-  // 将视频封面替换成video
-  var videoDom = "<video controls='controls' class='mediaVideo' src='"+vid+"' autoplay='autoplay'>你的浏览器可能不支持video标签播放视频。升级吧。</video>";
-  $(para).prev().replaceWith(videoDom);
+  vid = "#" + vid;
+  $(para).next().trigger("play");
+  $(para).next().attr("controls", "controls")
   // 去除当前元素
   $(para).remove();
 }  
