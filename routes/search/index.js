@@ -12,12 +12,12 @@ router
     if(c) {
       if(!d) {
         data.c = Buffer.from(encodeURIComponent(c)).toString("base64");
+        d = Buffer.from(encodeURIComponent(JSON.stringify({a: 1}))).toString("base64");
       } else {
         data.c = c;
         try{
           c = decodeURIComponent(Buffer.from(c, "base64").toString());
         }catch(err) {}
-
       }
     }
     data.t = t;
@@ -100,9 +100,9 @@ router
       }
       data.paging = nkcModules.apiFunction.paging(page, data.total, perpage);
 
-      if(targetUser) {
+      if(targetUser && Number(page) === 0) {
         data.total++;
-        results.push({
+        results.unshift({
           uid: targetUser.uid,
           docType: "user",
           username: targetUser.username,
