@@ -546,11 +546,11 @@ function nkc_render(options){
     // console.log(renderedHTML)
     // 渲染at
     // 取出帖子引用部分，帖子引用部分的at不被渲染
-    var blockDomArray = renderedHTML.match(/<blockquote.*?blockquote>/im);
+    var blockDomArray = renderedHTML.match(/<blockquote cite.*?blockquote>/im);
     var blockDomHtml = "";
     if(blockDomArray){
       blockDomHtml = blockDomArray[0];   
-      renderedHTML = renderedHTML.replace(/<blockquote.*?blockquote>/im,'');
+      renderedHTML = renderedHTML.replace(/<blockquote cite.*?blockquote>/im,'');
     }
     var atUsers = post.atUsers;
     if(atUsers && atUsers.length > 0) {

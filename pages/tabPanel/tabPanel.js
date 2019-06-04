@@ -19,6 +19,10 @@ var panelProto = {
         wallId: "panelWall", // 内壁Id，如无必要，无需另传
         closeId: "panelClose", // 关闭按钮Id，如无必要，无需另传
         headerId: "panelHeader", // 头部Id，如无必要，无需另传
+        headerDomId: "headerDom",
+        bodyDomId: "bodyDom",
+        footerDomId: "footerDom",
+        panelSureButtonId: "panelSureButton",
         contentWallId: "panelContentWall", // content内壁Id，如无必要，无需另传
         headerText: "请选择专业",
         panelExist: false, // panel是否存在
@@ -61,6 +65,7 @@ var panelProto = {
             // 修改被点击input的css数据
             panelShell.style.width = paraRect.width + "px";
             panelProto.createTags(panelProto.config.panelData);
+            panelProto.createSureButton();
         }
         panelProto.config.panelInit = true;
     },
@@ -104,20 +109,33 @@ var panelProto = {
             $("#panelWall").css("width", document.body.scrollWidth)
         }
 
+
+        // 创建头部
+        var headerDom = document.createElement("div");
+        headerDom.setAttribute("id", "headerDom");
         // 创建一个关闭按钮
         var panelClose = document.createElement("span");
         panelClose.innerHTML = "x";
         panelClose.setAttribute('id', panelProto.config.closeId)
         panelClose.className = "panelClose";
-        panelWall.appendChild(panelClose)
-
+        headerDom.appendChild(panelClose);
         // 创建一个header
         var panelHeader = document.createElement("div");
         panelHeader.innerHTML = panelProto.config.headerText;
         panelHeader.setAttribute("id", panelProto.config.headerId);
         panelHeader.className = "panelHeader";
-        panelWall.appendChild(panelHeader)
+        headerDom.appendChild(panelHeader);
+        panelWall.appendChild(headerDom);        
+        
+        // 创建主体部分
+        var bodyDom = document.createElement("div");
+        bodyDom.setAttribute("id", "bodyDom");
+        panelWall.appendChild(bodyDom);
 
+        // 创建底部
+        var footerDom = document.createElement("div");
+        footerDom.setAttribute("id", "footerDom");
+        panelWall.appendChild(footerDom)
     },
     // 创建tags组
     createTags: function(tagArr) {
@@ -138,8 +156,8 @@ var panelProto = {
         panelTag.innerHTML = liDom;
         panelTag.setAttribute("data-floor", floor);
         // 将新建的tags组放入body中
-        var panelWall = panelProto.get(panelProto.config.wallId)
-        panelWall.appendChild(panelTag);
+        var bodyDom = panelProto.get(panelProto.config.bodyDomId)
+        bodyDom.appendChild(panelTag);
     },
     // 消除指定tags组
 
@@ -170,8 +188,26 @@ var panelProto = {
         }
         panelContentUl.innerHTML = liDom;
         panelContentWall.appendChild(panelContentUl);
-        var panelWall = panelProto.get(panelProto.config.wallId);
-        panelWall.appendChild(panelContentWall)
+        var bodyDom = panelProto.get(panelProto.config.bodyDomId);
+        bodyDom.appendChild(panelContentWall)
+    },
+    // 创建确定按钮
+    createSureButton: function() {
+        var panelButtonWall = document.createElement("div");
+        panelButtonWall.className = "panelButtonWall";
+
+        var panelSureButton = document.createElement("button");
+        panelSureButton.setAttribute("id", panelProto.config.panelSureButtonId)
+        panelSureButton.className = "panelSureButton editorBtn btn btn-primary btn-sm";
+        panelSureButton.innerHTML = "确定";
+        panelSureButton.disabled = true;
+        panelSureButton.addEventListener("click", function() {
+            panelProto.outputContentLast();
+        })
+        panelButtonWall.appendChild(panelSureButton);
+        var footerDom = panelProto.get(panelProto.config.footerDomId);
+        footerDom.appendChild(panelButtonWall)
+        panelWall.appendChild(footerDom)
     },
     // 消除tabContent
     clearPanelContent: function() {
@@ -182,6 +218,8 @@ var panelProto = {
         panelProto.tagsActive(para)
         var dataId = para.getAttribute("data-id");
         var dataName = para.getAttribute("data-name");
+        panelProto.config.contentLast.id = "";
+        panelProto.config.contentLast.name = "不分类";
         // 将当前tags选中放入最终tags选中
         panelProto.config.tagsLast.id = dataId;
         panelProto.config.tagsLast.name = dataName;
@@ -193,8 +231,10 @@ var panelProto = {
         var item = getItemByDataId(dataId);
         var son = item.son;
         var isOpenContent = false;
+        var panelSureButton = panelProto.get(panelProto.config.panelSureButtonId);
         if(son.length == 0) {
-            panelProto.outputTagsLast();
+            panelSureButton.disabled = false;
+            // panelProto.outputTagsLast();
             return;
         }
         for(var i=0;i < son.length;i++) {
@@ -207,8 +247,10 @@ var panelProto = {
             }
         }
         if(isOpenContent) {
+            panelSureButton.disabled = true;
             panelProto.createTags(son);
         }else{
+            panelSureButton.disabled = false;
             panelProto.createPanelContent(son);
         }
     },
@@ -221,7 +263,7 @@ var panelProto = {
         panelProto.config.contentLast.id = dataId;
         panelProto.config.contentLast.name = dataName;
         // 点击即为选中，输出选中的id
-        panelProto.outputContentLast();
+        // panelProto.outputContentLast();
     },
     // 输出选中的tags
     outputTagsLast: function() {
@@ -311,6 +353,11 @@ function clickTags(para) {
 // 点击content 输出选中的id和name
 function clickContent(para) {
     panelProto.clickContent(para);
+}
+
+// 输出选中
+function outChooseTags() {
+    panelProto.outputContentLast();
 }
 
 /**

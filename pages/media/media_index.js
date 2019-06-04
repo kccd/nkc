@@ -278,83 +278,86 @@ function filePaste(e) {
 
 // 上传文件
 function uploadFile() {
-  // console.log(media.uploadFileList)
-  media.netWord = true;
-  var items = media.uploadFileList;
-  if(items.length == 0) return console.log("暂未选择任何文件");
-  if(items.length > 50) return console.log("队列中文件数量不得超过50");
-  sendFile();
-  function sendFile() {
-    if(j >= items.length){
-      j=0;
-      if(!media.haveFileFail){
-        media.uploadFileList = [];
-        media.uploadFileInfoArr = [];
-      }
-      return;
-    }
-    if(items[j].size > 209759635){
-      media.haveFileFail = true;
-      media.uploadFileInfoArr[j].status = "上传失败,单文件不得大于200M";
-      media.uploadFileInfoArr[j].statusType = "fail";
-      media.uploadFileInfoArr[j].process = 0;
-      media.uploadFileInfoArr[j].percent = 0;
-      j++;
-      sendFile();
-    }else{
-      var formData = new FormData();
-      formData.append("file", items[j]);
-      var xhr = new XMLHttpRequest();
-      xhr.upload.onprogress = function(e) {
-        media.uploadFileInfoArr[j].status = "正在上传";
-        var percent = (e.loaded / e.total) *100;
-        percent = percent.toFixed(0);
-        if(parseInt(percent) > 98){
-          percent = 99;
-          if(videoExts.indexOf(media.uploadFileInfoArr[j].ext) > -1) {
-            media.uploadFileInfoArr[j].status = "正在转码";
-          }
+  if(j !== 0) {
+
+  }else{
+    media.netWord = true;
+    // var media.uploadFileList = media.uploadFileList;
+    if(media.uploadFileList.length == 0) return console.log("暂未选择任何文件");
+    if(media.uploadFileList.length > 50) return console.log("队列中文件数量不得超过50");
+    sendFile();
+    function sendFile() {
+      if(j >= media.uploadFileList.length){
+        j=0;
+        if(!media.haveFileFail){
+          media.uploadFileList = [];
+          media.uploadFileInfoArr = [];
         }
-        media.uploadFileInfoArr[j].process = percent;
-        media.uploadFileInfoArr[j].percent = percent;
+        return;
       }
-      xhr.onreadystatechange = function(e) {
-        if(xhr.readyState == 4){
-          loadMedia("all", 12, 0);
-          loadMedia("picture", 12, 0);
-          loadMedia("video", 12, 0);
-          loadMedia("audio", 12, 0);
-          loadMedia("attachment", 12, 0);
-          if(xhr.status >= 200 && xhr.status < 300){
-            media.uploadFileInfoArr[j].status = "上传完成";
-            media.uploadFileInfoArr[j].process = 100;
-            media.uploadFileInfoArr[j].percent = 100;
-            media.uploadFileInfoArr[j].showType = false;
-            j++;
-            sendFile();
-          }else{
-            media.haveFileFail = true;
-            if(media.uploadFileInfoArr[j].realSize > 209759635){
-              media.uploadFileInfoArr[j].status = "上传失败,单文件不得大于200M";
-            }else{
-              var errorInfo = JSON.parse(xhr.responseText);
-              media.uploadFileInfoArr[j].status = errorInfo.error;
+      if(media.uploadFileList[j].size > 209759635){
+        media.haveFileFail = true;
+        media.uploadFileInfoArr[j].status = "上传失败,单文件不得大于200M";
+        media.uploadFileInfoArr[j].statusType = "fail";
+        media.uploadFileInfoArr[j].process = 0;
+        media.uploadFileInfoArr[j].percent = 0;
+        j++;
+        sendFile();
+      }else{
+        var formData = new FormData();
+        formData.append("file", media.uploadFileList[j]);
+        var xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = function(e) {
+          media.uploadFileInfoArr[j].status = "正在上传";
+          var percent = (e.loaded / e.total) *100;
+          percent = percent.toFixed(0);
+          if(parseInt(percent) > 98){
+            percent = 99;
+            if(videoExts.indexOf(media.uploadFileInfoArr[j].ext) > -1) {
+              media.uploadFileInfoArr[j].status = "正在转码";
             }
-            media.uploadFileInfoArr[j].statusType = "fail";
-            media.uploadFileInfoArr[j].process = 0;
-            media.uploadFileInfoArr[j].percent = 0;
-            j++;
-            sendFile();
+          }
+          media.uploadFileInfoArr[j].process = percent;
+          media.uploadFileInfoArr[j].percent = percent;
+        }
+        xhr.onreadystatechange = function(e) {
+          if(xhr.readyState == 4){
+            loadMedia("all", 12, 0);
+            loadMedia("picture", 12, 0);
+            loadMedia("video", 12, 0);
+            loadMedia("audio", 12, 0);
+            loadMedia("attachment", 12, 0);
+            if(xhr.status >= 200 && xhr.status < 300){
+              media.uploadFileInfoArr[j].status = "上传完成";
+              media.uploadFileInfoArr[j].process = 100;
+              media.uploadFileInfoArr[j].percent = 100;
+              media.uploadFileInfoArr[j].showType = false;
+              j++;
+              sendFile();
+            }else{
+              media.haveFileFail = true;
+              if(media.uploadFileInfoArr[j].realSize > 209759635){
+                media.uploadFileInfoArr[j].status = "上传失败,单文件不得大于200M";
+              }else{
+                var errorInfo = JSON.parse(xhr.responseText);
+                media.uploadFileInfoArr[j].status = errorInfo.error;
+              }
+              media.uploadFileInfoArr[j].statusType = "fail";
+              media.uploadFileInfoArr[j].process = 0;
+              media.uploadFileInfoArr[j].percent = 0;
+              j++;
+              sendFile();
+            }
           }
         }
+        xhr.onerror = function(e) {
+          screenTopWarning("网络错误，上传中断，请重试");
+          media.netWord = false;
+        };
+        xhr.open("POST", '/r', true);
+        xhr.setRequestHeader("FROM", "nkcAPI");
+        xhr.send(formData);
       }
-      xhr.onerror = function(e) {
-        screenTopWarning("网络错误，上传中断，请重试");
-        media.netWord = false;
-      };
-      xhr.open("POST", '/r', true);
-      xhr.setRequestHeader("FROM", "nkcAPI");
-      xhr.send(formData);
     }
   }
 }
@@ -365,6 +368,12 @@ function clickButton() {
   document.getElementById("fileList").click();
   // media.haveFileFail = false;
 }
+
+// function textButton() {
+//   console.log(media.uploadFileInfoArr)
+//   console.log(media.uploadFileList);
+//   console.log(j)
+// }
 
 // 文件大小格式化
 function fileSizeFormat(limit) {
@@ -395,7 +404,8 @@ function cancelFailure(index) {
       return;
     }
   }
-  media.uploadFileInfoArr = "";
+  media.uploadFileInfoArr = [];
+  uploadFileList = [];
 }
 
 function IsPC() { 
