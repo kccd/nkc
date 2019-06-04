@@ -302,6 +302,7 @@ resourceRouter
         }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
           await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
         }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.videoAviTransAvi(path, path);
           await ffmpeg.videoAVITransMP4(path, outputVideoPath);
         }
       }catch(e) {
