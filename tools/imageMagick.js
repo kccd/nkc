@@ -61,11 +61,11 @@ const watermarkify = (trans, position, bigWater,path) => {
 };
 
 // sitelogo 水印
-const watermarkifyLogo = (dpi, position, waterSmallPath, path) => {
+const watermarkifyLogo = (trans, dpi, position, waterSmallPath, path) => {
   if(linux) {
-    return spawnProcess('composite', ['-dissolve', '50', '-gravity', position, waterSmallPath, path, path]);
+    return spawnProcess('composite', ['-dissolve', trans, '-gravity', position, waterSmallPath, path, path]);
   }
-  return spawnProcess('magick', ['composite', '-dissolve', '100', '-gravity', position  ,'-geometry', dpi, waterSmallPath, path, path]);
+  return spawnProcess('magick', ['composite', '-dissolve', trans, '-gravity', position  ,'-geometry', dpi, waterSmallPath, path, path]);
 };
 
 // username 水印 

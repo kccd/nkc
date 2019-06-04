@@ -5,8 +5,8 @@ body {
     height:100%;
 }
 * {
-    margin:0;
-    padding:0;
+    /* margin:0;
+    padding:0; */
 }
 /* img {
   width:200px;
@@ -61,14 +61,27 @@ body {
 } */
 
 .img_bgmask .view_img_wrap {
+  position: absolute;
+  left:50%;
+  top:50%;
+  width:40%;
+  vertical-align: middle;
+  cursor:move;
+  z-index: 1002;
+}
+
+@media only screen and (max-width: 400px) {
+  .img_bgmask .view_img_wrap {
     position: absolute;
-    left:50%;
+    width:100%;
+    left:0;
     top:50%;
-    width:40%;
     vertical-align: middle;
     cursor:move;
     z-index: 1002;
+  }
 }
+
 .img_bgmask .view_img_wrap img {
     width:100%;
     height:100%;
