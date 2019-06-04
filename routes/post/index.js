@@ -250,6 +250,9 @@ postRouter
     // 帖子曾经在草稿箱中，发表时，删除草稿
     await db.DraftModel.remove({"desType":desType,"desTypeId":desTypeId})
     await targetUser.updateUserMessage();
+    if(!singlePost.reviewed) {
+      await db.MessageModel.sendReviewMessage(singlePost.pid);
+    }
     await next();
   })
   .use('/:pid/history', history.routes(), history.allowedMethods())

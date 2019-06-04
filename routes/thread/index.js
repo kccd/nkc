@@ -140,7 +140,7 @@ threadRouter
 			if(!isModerator) {
 				// 访问用户没有查看被退回帖子的权限，若不是自己发表的文章则报权限不足
 				if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
-					if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '权限不足');
+					if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '文章已被退回修改，暂无法阅读。');
 				}
 			}
 			// 取出帖子被退回的原因
@@ -495,7 +495,11 @@ threadRouter
 
     // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
     const needReview = await db.UserModel.contentNeedReview(user.uid, "post");
-    if(!needReview) await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+    if(!needReview) {
+      await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+    } else {
+      await db.MessageModel.sendReviewMessage(_post.pid);
+    }
 
     data.post = _post;
 		data.targetUser = await thread.extendUser();

@@ -19,7 +19,19 @@ router
   })
   .patch("/", async (ctx, next) => {
     const {data, db, body} = ctx;
-    const {type, listType, uid, whitelist, blacklist, tab} = body;
+    const {type, listType, uid, whitelist, blacklist, tab, certsId} = body;
+    if(certsId) {
+      for(const id of certsId) {
+        const role = await db.RoleModel.findOne({_id: id});
+        if(!role) ctx.throw(400, `未找到ID为${id}的证书`);
+      }
+      await db.SettingModel.updateOne({_id: "review"}, {
+        $set: {
+          "c.certsId": certsId
+        }
+      });
+      return await next();
+    }
     if(!["thread", "post"].includes(tab)) ctx.throw(400, "参数错误，服务器无法确定是发表文章还是发表回复的审核设置");
     const reviewSettings = (await db.SettingModel.findById("review")).c;
     if(type === "addUser") {

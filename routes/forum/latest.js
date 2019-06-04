@@ -28,8 +28,7 @@ latestRouter
       topped: true,
       reviewed: true,
       mainForumsId: forum.fid,
-      disabled: false,
-      recycleMark: {$ne: true}
+      disabled: false
     };
     if(forum.fid === "recycle") {
       delete toppedThreadMatch.disabled;
@@ -48,7 +47,6 @@ latestRouter
 		if(forum.fid !== "recycle") {
       match.disabled = false;
     }
-		match.recycleMark = {$ne: true};
     if(data.user) {
       if(!ctx.permission("superModerator")) {
         const canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
@@ -82,15 +80,47 @@ latestRouter
       sort = {tlm: -1};
     }
     data.s = s;
-		const threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
+    let threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
 
-		data.threads = await db.ThreadModel.extendThreads(threads, {
+		threads = await db.ThreadModel.extendThreads(threads, {
 		  category: true,
       htmlToText: true
     });
 
 
-		data.type = 'latest';
+    const superModerator = ctx.permission("superModerator");
+    let canManageFid = [];
+    if(data.user) {
+      canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
+    }
+    data.threads = [];
+    for(const thread of threads) {
+      if(forum.fid === "recycle") {
+        // 为了在访问回收站时隐藏"已屏蔽，仅自己可见";
+        thread.disabled = false;
+      }
+      if (thread.recycleMark) {
+        // 根据权限过滤掉 屏蔽、退修的内容
+        if (data.user) {
+          // 不具有特殊权限且不是自己
+          if (!superModerator) {
+            const mainForumsId = thread.mainForumsId;
+            let has = false;
+            for (const fid of mainForumsId) {
+              if (canManageFid.includes(fid)) {
+                has = true;
+              }
+            }
+            if (!has) continue;
+          }
+        } else {
+          continue;
+        }
+      }
+      data.threads.push(thread);
+    }
+
+    data.type = 'latest';
     data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
 		await next();
 	});

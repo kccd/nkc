@@ -96,6 +96,8 @@ router
     if(!needReview) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
       await db.ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
+    } else {
+      await db.MessageModel.sendReviewMessage(_post.pid);
     }
 		// 发表自动关注该学科或话题
 		await SubscribeModel.autoAttentionForum(user.uid, fids);

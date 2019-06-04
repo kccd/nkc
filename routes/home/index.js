@@ -106,10 +106,10 @@ router
         mainForumsId: {
           $in: fidOfCanGetThreads
         },
-        recycleMark: {
+        /*recycleMark: {
           $ne: true
         },
-        disabled: false
+        disabled: false*/
       };
       if(user) {
         if(!ctx.permission("superModerator")) {
@@ -117,11 +117,11 @@ router
           q.$or = [
             {
               reviewed: true
-            },
+            },/*
             {
               reviewed: false,
               uid: user.uid
-            },
+            },*/
             {
               reviewed: false,
               mainForumsId: {
@@ -157,33 +157,25 @@ router
           $ne: true
         },
         disabled: false,
+        reviewed: true,
         $or: [
           {
-            reviewed: true,
-            $or: [
-              {
-                mainForumsId: {
-                  $in: subFid
-                }
-              },
-              {
-                uid: user.uid
-              },
-              {
-                uid: {
-                  $in: subUid
-                }
-              },
-              {
-                tid: {
-                  $in: subTid
-                }
-              }
-            ]
+            mainForumsId: {
+              $in: subFid
+            }
           },
           {
-            reviewed: false,
             uid: user.uid
+          },
+          {
+            uid: {
+              $in: subUid
+            }
+          },
+          {
+            tid: {
+              $in: subTid
+            }
           }
         ]
       };
@@ -201,15 +193,40 @@ router
       uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
       tlm: 1, fid: 1, hasCover: 1,
       mainForumsId: 1, hits: 1, count: 1,
-      digest: 1, reviewed: 1
+      digest: 1, reviewed: 1,
+      disabled: 1, recycleMark: 1
     }).skip(paging.start).limit(paging.perpage).sort(sort);
 
     threads = await db.ThreadModel.extendThreads(threads, {
       htmlToText: true
     });
 
-    if(threadListType === "subscribe") {
-      threads.map(thread => {
+    const superModerator = ctx.permission("superModerator");
+    let canManageFid = [];
+    if(user) {
+      canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
+    }
+    data.threads = [];
+    for(const thread of threads) {
+      if(thread.disabled || thread.recycleMark) {
+        // 根据权限过滤掉 屏蔽、退修的内容
+        if (user) {
+          // 不具有特殊权限且不是自己
+          if (!superModerator) {
+            const mainForumsId = thread.mainForumsId;
+            let has = false;
+            for (const fid of mainForumsId) {
+              if (canManageFid.includes(fid)) {
+                has = true;
+              }
+            }
+            if (!has) continue;
+          }
+        } else {
+          continue;
+        }
+      }
+      if(threadListType === "subscribe") {
         if(subTid.includes(thread.tid)) {
           thread.from = 'subThread';
         } else if(subUid.includes(thread.uid)) {
@@ -219,14 +236,10 @@ router
         } else {
           thread.from = 'subForum';
         }
-      });
-    }
-    /*if(user) {
-      if(threadListType !== "subscribe") {
-        // 加载关注的文章
-        data.subscribeThreads = await db.ThreadModel.getUserSubThreads(user.uid, fidOfCanGetThreads);
       }
-    }*/
+      data.threads.push(thread);
+    }
+
     if(threadListType !== "latest") {
       data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
     }
@@ -235,7 +248,7 @@ router
       data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     }
 
-    data.threads = threads;
+    // data.threads = threads;
     data.paging = paging;
 
     const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(12);

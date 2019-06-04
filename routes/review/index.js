@@ -104,6 +104,17 @@ router
 
     await db.ReviewModel.newReview(type, post, data.user);
 
+    const message = await db.MessageModel({
+      _id: await db.SettingModel.operateSystemID("messages", 1),
+      r: post.uid,
+      ty: "STU",
+      c: {
+        type: "passReview",
+        pid: post.pid
+      }
+    });
+    await message.save();
+    await ctx.redis.pubMessage(message);
     await next();
   });
 module.exports = router;
