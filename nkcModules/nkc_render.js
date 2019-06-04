@@ -498,7 +498,7 @@ function nkc_render(options){
     }
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');
     html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\/\>/img,'<img src="/r/$1" />');
-    html = html.replace(/\<img.*?src="\/r\/(.+?)".*?\/\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
+    html = html.replace(/\<img.*?src="\/r\/(.+?)".*?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     return html
   }
 
