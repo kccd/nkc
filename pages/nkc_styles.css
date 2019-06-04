@@ -3440,12 +3440,12 @@ img.emoji {
 
 .mediaVideo {
   width: 100%;
-  height: 25rem;
+  height: 60rem;
   background-color: black;
 }
 .mediaImage {
   width:100%;
-  height:25rem;
+  height:60rem;
 }
 
 @media only screen and (max-width : 360px) {
@@ -3460,26 +3460,26 @@ img.emoji {
   }
 }
 
-@media only screen and (min-width : 360px) {
+@media only screen and (min-width : 400px) {
   .mediaVideo {
     width: 100%;
-    height: 30rem;
+    height: 60rem;
     background-color: black;
   }
   .mediaImage {
     width:100%;
-    height:30rem;
+    height:60rem;
   }
 }
 
 @media only screen and (min-width : 768px) {
   .mediaVideo {
     width: 100%;
-    height: 35rem;
+    height: 60rem;
     background-color: black;
   }
   .mediaImage {
     width:100%;
-    height:35rem;
+    height: 60rem;
   }
 }

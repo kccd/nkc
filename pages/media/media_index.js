@@ -503,7 +503,7 @@ function mediaInsertUE(rid, fileType, name) {
     //codeResource = "<b>123456</b>"
     codeResource = "<p><img src=" + "/r/" + rid + " width='50%'></p>"
   }else if(fileType === "mp4"){
-    codeResource = "<p><video src=" + "/r/" + rid + " controls style=width:50%;>video</video></p>";
+    codeResource = "<p><br></p><p><video src=" + "/r/" + rid + " controls style=width:50%;>video</video></p>";
     // codeResource = "<p><img src=" + "/frameImg/" + rid + " width='50%'></p>";
   }else if(fileType === "mp3"){
     codeResource = "<audio src=" + "/r/" + rid + " controls>Your browser does not support the audio element</audio>";
