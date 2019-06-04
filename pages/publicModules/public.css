@@ -2,6 +2,9 @@
 .m-l-05{
   margin-left: 0.5rem;
 }
+.m-r-05{
+  margin-right: 0.5rem;
+}
 .m-a-1{
   margin: 1rem;
 }
@@ -1245,17 +1248,22 @@ footer.footer ul li{
   padding-bottom: 2rem;
 }
 .thread-panel.reviewed{
-  border: 1px solid #e85a71;
+  border: 1px solid #ccc;
   margin: 0.5rem 0;
   padding-bottom: 0.5rem;
 }
-.thread-review-info{
-  padding: 0.4rem 0 0.6rem 0;
+.thread-review-info, .thread-disabled-info, .thread-draft-info{
+  padding: 0.3rem 0 0.3rem 0;
   color:#fff;
   font-size: 1.2rem;
-  margin-bottom: 0.5rem;
   text-align: center;
   background-color: #e85a71;
+}
+.thread-disabled-info{
+  background-color: #282c37;
+}
+.thread-draft-info{
+  background-color: #FFBC42;
 }
 .thread-review-info h4{
   margin: 0.3rem 0;

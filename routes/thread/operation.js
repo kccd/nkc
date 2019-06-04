@@ -38,27 +38,35 @@ operationRouter
 	})
   // 修改退修原因
   .patch("/moveDraft/reason", async (ctx, next) => {
-    const {body, db, params} = ctx;
-    const {tid} = params;
-    const {reason} = body;
-    if(!reason) ctx.throw(400, "退修原因不能为空");
+    const {body, db} = ctx;
+    const {log} = body;
+    console.log(log);
+    if(!log.reason) ctx.throw(400, "退修原因不能为空");
     await db.DelPostLogModel.updateOne({
-      threadId: tid,
-      postType: "thread",
-      delType: "toDraft",
-      modifyType: false
+      _id: log._id
     }, {
       $set: {
-        reason: reason
+        reason: log.reason
       }
     });
-    await db.MessageModel.updateOne({
-      ty: "STU",
-      "c.tid": tid,
-      "c.type": "threadWasReturned"
-    }, {
+
+    let mType, obj = {
+      ty: "STU"
+    };
+    if(log.postType === "thread") {
+      mType = "threadWasReturned";
+      obj[`c.tid`] = log.threadId;
+    } else {
+      mType = "postWasReturned";
+      obj[`c.pid`] = log.postId;
+    }
+    obj[`c.type`] = mType;
+
+    console.log(obj);
+
+    await db.MessageModel.updateOne(obj, {
       $set: {
-        "c.rea": reason
+        "c.rea": log.reason
       }
     });
     await next();

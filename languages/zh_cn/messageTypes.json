@@ -19,6 +19,7 @@
   "sellerOrderURL": "卖家查看订单详情的链接",
   "sellerOrderRefundURL": "卖家查看退款申请的链接",
   "buyerOrderRefundURL": "买家查看退款申请的链接",
+  "reviewLink": "内容链接",
 
   "replyPost": "回复被引用",
   "replyThread": "文章被回复",
@@ -40,5 +41,7 @@
   "shopBuyerRefundChange": "【交易系统】订单退款状态更新",
   "shopSellerRefundChange": "【交易系统】订单退款状态更新",
   "warningPost": "建议修改回复",
-  "warningThread": "建议修改文章"
+  "warningThread": "建议修改文章",
+  "newReview": "【审核系统】内容待审核",
+  "passReview": "【审核系统】内容通过审核"
 }

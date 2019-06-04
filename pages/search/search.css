@@ -169,8 +169,8 @@
   padding-right: 1rem;
 }
 .search-result-avatar img{
-  height: 4rem;
-  width: 4rem;
+  height: 7rem;
+  width: 7rem;
   border-radius: 50%;
 }
 .search-result-user-info{
@@ -193,6 +193,12 @@
 .search-result-description{
   color: #282c37;
   font-size: 1.2rem;
+  height: 3.5rem;
+  overflow: hidden;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 .search-button{
   background-color: #2b90d9;
@@ -212,7 +218,7 @@
 }
 .search-result-post>div{
   height: 3rem;
-  background-color: #d9e1e8;
+  background-color: #eee;
   display: inline-block;
   width: 4.5rem;
   text-align: center;
@@ -228,4 +234,8 @@
 .search-result-post .count{
   font-weight: 700;
 
+}
+.search-result-user-info>.display-i-b{
+  vertical-align: top;
+  width: 20rem;
 }

@@ -79,6 +79,8 @@ const getDomByType = (t, app) => {
       return ""
     } else if(t === "postContent") {
       return "item.c.post.c"
+    } else if(t === "reviewLink") {
+      return "openThread(item.c.thread.tid)"
     }
   } else {
     if(t === "threadTitle") {
@@ -123,6 +125,8 @@ const getDomByType = (t, app) => {
       return "'/shop/manage/' + item.c.user.uid + '/order/refund?orderId=' + item.c.order.orderId"
     } else if(t === "postContent") {
       return "item.c.post.c"
+    } else if(t === "reviewLink") {
+      return "item.c.post.pid === item.c.thread.oc?item.c.thread.url:item.c.post.url"
     }
   }
 };

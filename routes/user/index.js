@@ -128,6 +128,15 @@ userRouter
     }
 
     let paging = {};
+
+    let canManageFid = [];
+
+    if(data.user) {
+      canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
+    }
+
+    const superModerator = ctx.permission("superModerator");
+
     if(!t) {
       if(Number(page) === 0) {
         data.userPostSummary = await db.UserModel.getUserPostSummary(targetUser.uid);
@@ -135,19 +144,34 @@ userRouter
       }
       const q = {
         uid,
-        disabled: false,
+        // disabled: false,
         mainForumsId: {$in: accessibleFid}
       };
+      // 如果是已登录用户
       if(user) {
-        q.$or = [
-          {
-            reviewed: true
-          },
-          {
-            reviewed: false,
-            uid: user.uid
-          }
-        ]
+        // 不具有特殊专家权限的用户
+        if(!ctx.permission("superModerator")) {
+          // 获取用户能够管理的专业ID
+          // 三种情况：
+          // 1. 已审核
+          // 2. 未审核，且是自己的发表的内容
+          // 3. 未审核，且是自己有权限管理的专业里的内容
+          q.$or = [
+            {
+              reviewed: true
+            },
+            {
+              reviewed: false,
+              uid: user.uid
+            },
+            {
+              reviewed: false,
+              mainForumsId: {
+                $in: canManageFid
+              }
+            }
+          ]
+        }
       } else {
         q.reviewed = true;
       }
@@ -176,9 +200,27 @@ userRouter
       });
 
       for(const post of posts) {
-        post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
         const thread = threadsObj[post.tid];
-        if(!thread || thread.disabled || thread.recycleMark) continue;
+        if(post.disabled || thread.disabled || thread.recycleMark) {
+          // 根据权限过滤掉 屏蔽、退休的内容
+          if(user) {
+            // 不具有特殊权限且不是自己
+            if(!superModerator && user.uid !== targetUser.uid) {
+              const mainForumsId = post.mainForumsId;
+              let has = false;
+              for(const fid of mainForumsId) {
+                if(canManageFid.includes(fid)) {
+                  has = true;
+                }
+              }
+              if(!has) continue;
+            }
+          } else {
+            continue;
+          }
+        }
+
+        post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
         let firstPost = {};
         let link;
         if(thread.oc === post.pid) {
@@ -196,7 +238,7 @@ userRouter
         if(firstPost.t.length > 20) {
           firstPost.t = firstPost.t.slice(0, 20) + "...";
         }
-        results.push({
+        const result = {
           postType: thread.oc === post.pid?'postToForum': 'postToThread',
           tid: thread.tid,
           hasCover: thread.hasCover,
@@ -206,31 +248,47 @@ userRouter
           title: firstPost.t,
           link,
           reviewed: post.reviewed
-        });
+        };
+        result.toDraft = (result.postType === "postToForum" && thread.recycleMark) || (result.postType === "postToThread" && post.toDraft && post.disabled);
+        result.disabled = (result.postType === "postToForum" && thread.disabled) || (result.postType === "postToThread" && !post.toDraft && post.disabled);
+        results.push(result);
       }
       data.posts = results;
     } else if(t === "thread") {
-      const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
       const q = {
         uid: targetUser.uid,
-        disabled: false,
+        /*disabled: false,
         recycleMark: {
           $ne: true
-        },
+        },*/
         mainForumsId: {
           $in: accessibleFid
         }
       };
       if(user) {
-        q.$or = [
-          {
-            reviewed: true
-          },
-          {
-            reviewed: false,
-            uid: user.uid
-          }
-        ]
+        // 不具有特殊专家权限的用户
+        if(!ctx.permission("superModerator")) {
+          // 获取用户能够管理的专业ID
+          // 三种情况：
+          // 1. 已审核
+          // 2. 未审核，且是自己的发表的内容
+          // 3. 未审核，且是自己有权限管理的专业里的内容
+          q.$or = [
+            {
+              reviewed: true
+            },
+            {
+              reviewed: false,
+              uid: user.uid
+            },
+            {
+              reviewed: false,
+              mainForumsId: {
+                $in: canManageFid
+              }
+            }
+          ]
+        }
       } else {
         q.reviewed = true;
       }
@@ -241,7 +299,9 @@ userRouter
         hasCover: 1,
         oc: 1,
         toc: 1,
-        reviewed: 1
+        reviewed: 1,
+        disabled: 1,
+        recycleMark: 1
       }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       threads = await db.ThreadModel.extendThreads(threads, {
         forum: false,
@@ -255,7 +315,26 @@ userRouter
       });
       const results = [];
       for (const thread of threads) {
-        results.push({
+        if(thread.disabled || thread.recycleMark) {
+          // 根据权限过滤掉 屏蔽、退休的内容
+          if(user) {
+            // 不具有特殊权限且不是自己
+            if(!superModerator && user.uid !== targetUser.uid) {
+              const mainForumsId = thread.mainForumsId;
+              let has = false;
+              for(const fid of mainForumsId) {
+                if(canManageFid.includes(fid)) {
+                  has = true;
+                }
+              }
+              if(!has) continue;
+            }
+          } else {
+            continue;
+          }
+        }
+
+        const result = {
           postType: "postToForum",
           tid: thread.tid,
           hasCover: thread.hasCover,
@@ -265,9 +344,15 @@ userRouter
           content: thread.firstPost.c,
           link: `/t/${thread.tid}`,
           reviewed: thread.reviewed
-        });
+        };
+
+        result.toDraft = thread.recycleMark;
+        result.disabled = thread.disabled;
+
+        results.push(result);
       }
       data.posts = results;
+
     } else {
       // 关注或粉丝
       if(Number(page) >= 1) {

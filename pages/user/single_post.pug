@@ -1,6 +1,10 @@
-.single-post(class=!post.reviewed?"reviewed":"")
+.single-post(class=!post.reviewed || post.toDraft || post.disabled?"reviewed":"")
   if !post.reviewed
     include ../publicModules/module_review
+  if post.toDraft
+    include ../publicModules/module_toDraft
+  if post.disabled
+    include ../publicModules/module_disabled
   .single-post-info
     .post-time=fromNow(post.time)
     if post.postType === "postToForum"
