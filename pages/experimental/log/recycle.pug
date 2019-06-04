@@ -24,7 +24,7 @@ block content
               th 退修时间
               th 内容类型
               th 发表人
-              th 文章标题
+              th 链接
               th 退修原因
               th 操作者
               th 状态
@@ -35,7 +35,7 @@ block content
               th
                 a(:href="'/u/' + log.delUser.uid" target="_blank") {{log.delUser.username}}
               th
-                a(:href="'/t/' + log.thread.tid" target="_blank") {{log.thread.firstPost.t}}
+                a(:href="log.link" target="_blank") {{log.thread.firstPost.t}}
               th
                 div(v-if="!log.modify")
                   span {{log.reason}}
