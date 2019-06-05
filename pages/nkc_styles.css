@@ -3427,12 +3427,17 @@ img.emoji {
   width: 80px;
   height: 80px;
   position: absolute;
-  left: 50%;
+  /* left: 50%;
   margin-left: -40px;
   top: 50%;
-  margin-top: -40px;
+  margin-top: -40px; */
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
   background: url(/default/play.jpg) no-repeat;
-  z-index: 1029;
+  z-index: 1005;
 }
 
 .play-btn:hover{

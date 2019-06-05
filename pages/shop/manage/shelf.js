@@ -139,6 +139,16 @@ $(document).ready(function() {
       $("#saleTimeDom").css("display", "")
     }
   });
+  // $('input[type=radio][name=useparams]').change(function() {
+  //   if(this.value == "yes") {
+  //     $("#nouseParamsDom").css("display", "none");
+  //     $("#useParamsDom").css("display", "");
+  //   }
+  //   if(this.value == "no") {
+  //     $("#nouseParamsDom").css("display", "");
+  //     $("#useParamsDom").css("display", "none");
+  //   }
+  // })
   $('#useparams').change(function() {
     if($("#useparams").prop("checked")){
       $("#nouseParamsDom").css("display", "none");
@@ -162,6 +172,14 @@ $(document).ready(function() {
       $("#vipDisDom").css("display", "none");
     }
   })
+  // $('input[type=radio][name=vipDiscount]').change(function() {
+  //   if(this.value == "yes") {
+  //     $("#vipDisDom").css("display", "");
+  //   }
+  //   if(this.value == "no") {
+  //     $("#vipDisDom").css("display", "none");
+  //   }
+  // })
   $("#isPurchaseLimit").change(function() {
     if($("#isPurchaseLimit").prop("checked")) {
       $("#purchaseLimitDom").css("display", "");
@@ -169,6 +187,14 @@ $(document).ready(function() {
       $("#purchaseLimitDom").css("display", "none");
     }
   })  
+  // $('input[type=radio][name=isPurchaseLimit]').change(function() {
+  //   if(this.value == "yes") {
+  //     $("#purchaseLimitDom").css("display", "");
+  //   }
+  //   if(this.value == "no") {
+  //     $("#purchaseLimitDom").css("display", "none");
+  //   }
+  // })
   $("#isUploadCert").change(function() {
     if($("#isUploadCert").prop("checked")) {
       $("#uploadCertDom").css("display", "");
@@ -176,6 +202,14 @@ $(document).ready(function() {
       $("#uploadCertDom").css("display", "none");
     }
   })
+  // $('input[type=radio][name=isUploadCert]').change(function() {
+  //   if(this.value == "yes") {
+  //     $("#uploadCertDom").css("display", "");
+  //   }
+  //   if(this.value == "no") {
+  //     $("#uploadCertDom").css("display", "none");
+  //   }
+  // })
   $("input[type=radio][name=freightMethod]").change(function() {
     if(this.value == 'payPost') {
       $("#freightPriceDom").css("display", "block");
@@ -555,8 +589,10 @@ function delSingleParam(para) {
  */
 function getSingleParams() {
   var singleParams = [];
-  var isUseParams = $("#useparams").prop("checked");
-  if(isUseParams) {
+  // var isUseParams = $("#useparams").prop("checked");
+  var isUseParams =  $("input[type=radio][name='useparams']:checked").val();
+  console.log(isUseParams)
+  if(isUseParams == "yes") {
     $("#singleParams tbody tr").each(function(index, ele) {
       var obj = {};
       var singleName = $(ele).find(".singleName").val();
