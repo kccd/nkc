@@ -38,14 +38,14 @@ router
       const targetUser = await db.UserModel.findOne({uid}, {uid: 1, username: 1});
       if(!targetUser) ctx.throw(404, `未找到ID为${uid}的用户`);
       if(listType === "blacklist") {
-        if(reviewSettings[tab].special.whitelistUid.includes(uid)) ctx.throw(400, "用户已存在于白名单中，无法添加到黑明单");
+        if(reviewSettings[tab].special.whitelistUid.includes(uid)) ctx.throw(400, "用户已存在于白名单中，无法添加到黑名单");
         const obj = {};
         obj[`c.${tab}.special.blacklistUid`] = uid;
         await db.SettingModel.updateOne({_id: "review"}, {
           $addToSet: obj
         });
       } else {
-        if(reviewSettings[tab].special.blacklistUid.includes(uid)) ctx.throw(400, "用户已存在于黑明单中，无法添加到白名单");
+        if(reviewSettings[tab].special.blacklistUid.includes(uid)) ctx.throw(400, "用户已存在于黑名单中，无法添加到白名单");
         const obj = {};
         obj[`c.${tab}.special.whitelistUid`] = uid;
         await db.SettingModel.updateOne({_id: "review"}, {

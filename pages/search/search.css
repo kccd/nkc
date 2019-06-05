@@ -218,6 +218,7 @@
 }
 .search-result-post>div{
   height: 3rem;
+  margin-bottom: 0.3rem;
   background-color: #eee;
   display: inline-block;
   width: 4.5rem;
@@ -237,5 +238,5 @@
 }
 .search-result-user-info>.display-i-b{
   vertical-align: top;
-  width: 20rem;
+  max-width: 20rem;
 }
