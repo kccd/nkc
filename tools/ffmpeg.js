@@ -66,6 +66,11 @@ const video3GPTransMP4 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', outputPath]);
 }
 
+// AVI格式视频转avi
+const videoAviTransAvi = async(inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath ,'-y',outputPath])
+}
+
 // MP4转码为H264
 const videoMP4TransH264 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-movflags', 'faststart', '-y', outputPath]);
@@ -98,6 +103,7 @@ const audioWMATransMP3 = async (inputPath, outputPath) => {
 module.exports = {
   videoFirstThumbTaker,
   videoTranscode,
+  videoAviTransAvi,
   videoReduceRate,
   videoMoveMetaToFirstThumb,
   videoSetPixelAndscale,

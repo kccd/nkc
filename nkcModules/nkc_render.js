@@ -498,7 +498,7 @@ function nkc_render(options){
     }
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');
     html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\/\>/img,'<img src="/r/$1" />');
-    html = html.replace(/\<img.*?src="\/r\/(.+?)".*?\/\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
+    html = html.replace(/\<img.*?src="\/r\/(.+?)".*?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     return html
   }
 
@@ -564,7 +564,9 @@ function nkc_render(options){
     // console.log(renderedHTML)
     renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
     // 将视频替换成视频封面图
-    renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r(.*?)".*?>(.*?)<\/video>/igm,'<div style="position:relative"><div class="mediaImage" style="background:url(/frameImg$2) center center no-repeat; background-color:black;background-size: contain"></div><span class="play-btn" onclick="openVideo(this,\'/r$2\')"></span></div>');
+    // renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r(.*?)".*?>(.*?)<\/video>/igm,'<div style="position:relative"><div class="mediaImage" style="background:url(/frameImg$2) center center no-repeat; background-color:black;background-size: contain"></div><span class="play-btn" onclick="openVideo(this,\'/r$2\')"></span></div>');
+    renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r\/(.*?)".*?>(.*?)<\/video>/igm,'<div><video class="mediaVideo" id="$2" src="/r/$2" poster="/frameImg/$2" preload="none" controls="controls">您的浏览器不支持video标签，请升级</video></div>');
+    // renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r\/(.*?)".*?>(.*?)<\/video>/igm,'<div><span class="play-btn" onclick="openVideo(this,\'$2\')"></span><video class="mediaVideo" id="$2" src="/r/$2" poster="/frameImg/$2" preload="none">您的浏览器不支持video标签，请升级</video></div>');
     // 下面是旧版的渲染，暂时先不用
     // var atUsers = post.atUsers;
     // if(atUsers && atUsers.length > 0) {

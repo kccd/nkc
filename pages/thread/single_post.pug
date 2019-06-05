@@ -1,5 +1,18 @@
 if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
   div.single-post(style=(post.pid === highlight?'background-color: #fffbdd;padding: 0.5rem;border-radius: 5px;':''))
+    if previousPost
+      // 获取前一条post当天日期零点的时间戳
+      -let prepostTimeStamp = new Date(previousPost.toc)
+      -prepostTimeStamp.setHours(0,0,0,0) 
+      -let prepostTimeStampStr = prepostTimeStamp.getTime()
+      // 获取post当天日期零点的时间戳
+      -let postTimeStamp = new Date(post.toc)
+      -postTimeStamp.setHours(0,0,0,0) 
+      -let postTimeStampStr = postTimeStamp.getTime()
+      if postTimeStampStr > prepostTimeStampStr
+        div.single-post-time
+          div=post.toc.toLocaleString()
+    // 如果两条评论日期时间跨度为24小时，则给第二条评论添加时间戳
     if !previousPost || (post.toc - previousPost.toc) > 24*60*60*1000
       div.single-post-time
         div=post.toc.toLocaleString()
