@@ -110,6 +110,7 @@ router
         $set: obj
       });
     }
+    data.reviewSettings = (await db.SettingModel.findById("review")).c;
     await next();
   });
 module.exports = router;

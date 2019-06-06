@@ -149,9 +149,11 @@ router
         if(s.type === "user") subUid.push(s.tUid);
       });
 
+      let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
+      accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
       q = {
         mainForumsId: {
-          $in: fidOfCanGetThreads
+          $in: accessibleForumsId
         },
         recycleMark: {
           $ne: true

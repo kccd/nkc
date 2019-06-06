@@ -129,7 +129,7 @@ var app = new Vue({
       }
       // 若不存在用户等级对应的设置，则新建一个默认的设置，在保存的时候存入数据库。
       return {
-        gradeId,
+        gradeId: gradeId,
         status: false,
         type: "all",
         count: 10
@@ -218,7 +218,8 @@ var app = new Vue({
         tab: this.tab,
         blacklist: blacklist
       })
-        .then(function() {
+        .then(function(data) {
+          app.reviewSettings[app.tab].blacklist = data.reviewSettings[app.tab].blacklist;
           screenTopAlert("保存成功");
         })
         .catch(function(data) {
@@ -232,7 +233,8 @@ var app = new Vue({
         tab: this.tab,
         whitelist: app.review.whitelist
       })
-        .then(function() {
+        .then(function(data) {
+          app.reviewSettings[app.tab].whitelist = data.reviewSettings[app.tab].whitelist;
           screenTopAlert("保存成功");
         })
         .catch(function(data) {
