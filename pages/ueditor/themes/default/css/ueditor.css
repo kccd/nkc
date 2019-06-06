@@ -1,6 +1,10 @@
 /*基础UI构建
 */
 /* common layer */
+a {
+    color: #428bca;
+}
+
 .edui-default .edui-box {
     border: none;
     padding: 0;
@@ -2010,4 +2014,8 @@ div.edui-box {
 }
 .edui-default  .edui-pastecontainer .edui-button  .edui-state-hover .edui-plaintxticon{
     background-position: -72px -34px;
+}
+.mathFormulaWall {
+    width: 600px;
+    height: 300px;
 }

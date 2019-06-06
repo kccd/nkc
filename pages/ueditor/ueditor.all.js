@@ -14006,6 +14006,9 @@ UE.plugin.register('anchor', function (){
                         + this.options.themePath
                         + this.options.theme +'/images/anchor.gif\') no-repeat scroll left center transparent;cursor: auto;display: inline-block;height: 16px;width: 15px;}',
                     this.document);
+                utils.cssRule('wordLink',
+                    'a{color: #428bca}',
+                    this.document);
             }
         },
        outputRule: function(root){
@@ -14915,6 +14918,7 @@ UE.plugins['paste'] = function () {
 
             //过滤word粘贴过来的冗余属性
             html = UE.filterWord(html);
+            html = html.replace(/<a href=\"file.*?\".*?>.*?<\/a>/img, "")
             //取消了忽略空白的第二个参数，粘贴过来的有些是有空白的，会被套上相关的标签
             var root = UE.htmlparser(html);
             //如果给了过滤规则就先进行过滤
@@ -26298,6 +26302,24 @@ UE.ui = baidu.editor.ui = {};
             rect.top -= this.popup.SHADOW_RADIUS;
             rect.height += this.popup.SHADOW_RADIUS;
             this.popup.showAnchorRect(rect);
+            // if($("#inline").length > 0) {
+            //     $("#inline").minicolors({
+            //         control: 'hue',
+            //         defaultValue: '',
+            //         keywords: '',
+            //         inline: true,
+            //         letterCase: 'lowercase',
+            //         position: 'bottom',
+            //         swatches: [],
+            //         change: function(value, opacity) {
+            //             if( !value ) return;
+            //             if( opacity ) value += ', ' + opacity;
+            //             if( typeof console === 'object' ) {
+            //                 console.log(value);
+            //             }
+            //         }
+            //     });
+            // }
         },
         _onArrowClick: function (event, el){
             if (!this.isDisabled()) {

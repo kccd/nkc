@@ -78,7 +78,7 @@ block name
             .form-group
               label.col-sm-1.control-label 关键词
               .col-sm-8.attentionList
-                input.attention.form-control(type="text" placeholder="关键词总字数不超过200")
+                input.attention.form-control(type="text" placeholder="关键词总字数不超过200，多个关键词请使用英文逗号分隔")
               //- .col-sm-1
               //-   button(onclick="addAttention()") 添加
       .panel.panel-info
@@ -87,12 +87,20 @@ block name
         .panel-body
           .form-horizontal
             .form-group
-              label.col-sm-1.control-label 商多规格
+              label.col-sm-1.control-label 商品多规格
               .col-sm-10
                 .checkbox
                   label
                     input#useparams(type='checkbox')
-                    |  是否使用自定义多规格
+                    |  启用商品多规格自定义功能
+                //- .radio
+                //-   label
+                //-     input#useparams1(type='radio', name='useparams', value='no', checked='')
+                //-     |     不启用
+                //- .radio
+                //-   label
+                //-     input#useparams2(type='radio', name='useparams', value='yes')
+                //-     |     启用
             #useParamsDom(style="display: none")
               .form-group
                 label.col-sm-1.control-label 自定义规格
@@ -174,7 +182,7 @@ block name
                   .checkbox
                     label
                       input#usedis(type='checkbox')
-                      |  是否使用优惠后价格
+                      |  启用价格优惠
               .form-group#disCostDom(style="display:none")
                 label.col-sm-1.control-label 优惠后价格
                 .col-sm-5
@@ -191,7 +199,15 @@ block name
                 .checkbox
                   label
                     input#vipDiscount(type='checkbox')
-                    |  是否使用会员折扣
+                    |  启用会员折扣
+                //- .radio
+                //-   label
+                //-     input#vipDiscount1(type='radio', name='vipDiscount', value='no', checked='')
+                //-     |     不启用
+                //- .radio
+                //-   label
+                //-     input#vipDiscount2(type='radio', name='vipDiscount', value='yes')
+                //-     |     启用
             .form-group#vipDisDom(style="display:none")
               label.col-sm-1.control-label 折扣详情
               .col-sm-5.col-sm-10
@@ -220,17 +236,6 @@ block name
                     input#stockMethod2(type='radio', name='stockCostMethod', value='payReduceStock')
                     |     买家付款减库存
                     b(style="color:red")  （付款减库存，存在超卖风险）
-            //- .form-group
-            //-   label.col-sm-1.control-label 购买限制
-            //-   .col-sm-10
-            //-     .checkbox
-            //-       label
-            //-         input#isPurchaseLimit(type='checkbox')
-            //-         |  是否限购
-            //- .form-group#purchaseLimitDom(style="display:none")
-            //-   label.col-sm-1.control-label 每人限购数量
-            //-   .col-sm-5
-            //-     input.form-control#purchaseLimitCount(type="number", name="")
       .panel.panel-info
         .panel-heading
           | 购买条件
@@ -242,7 +247,15 @@ block name
                 .checkbox
                   label
                     input#isPurchaseLimit(type='checkbox')
-                    |  是否限购
+                    |  启用购买限制
+                //- .radio
+                //-   label
+                //-     input#isPurchaseLimit1(type='radio', name='isPurchaseLimit', value='no', checked='')
+                //-     |     不限购
+                //- .radio
+                //-   label
+                //-     input#isPurchaseLimit2(type='radio', name='isPurchaseLimit', value='yes')
+                //-     |     限购
             .form-group#purchaseLimitDom(style="display:none")
               label.col-sm-1.control-label 每人限购数量
               .col-sm-8
@@ -253,7 +266,15 @@ block name
                 .checkbox
                   label
                     input#isUploadCert(type='checkbox')
-                    |  是否需要上传购买凭证
+                    |  需要上传购买凭证
+                //- .radio
+                //-   label
+                //-     input#isUploadCert1(type='radio', name='isUploadCert', value='no', checked='')
+                //-     |     不需要上传购买凭证
+                //- .radio
+                //-   label
+                //-     input#isUploadCert2(type='radio', name='isUploadCert', value='yes')
+                //-     |     需要上传购买凭证
             .form-group#uploadCertDom(style="display:none")
               label.col-sm-1.control-label 凭证说明
               .col-sm-8
@@ -269,14 +290,14 @@ block name
                 .checkbox
                   label
                     input#priceShowToVisit(type='checkbox')
-                    |  价格是否游客可见
+                    |  游客可见
             .form-group
               label.col-sm-1.control-label 
               .col-sm-10
                 .checkbox
                   label
                     input#priceShowAfterStop(type='checkbox')
-                    |  停售以后，是否显示价格
+                    |  停售后显示价格
       .panel.panel-info
         .panel-heading
           | 运费物流
