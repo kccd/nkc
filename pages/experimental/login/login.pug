@@ -26,10 +26,10 @@ block content
       .form
         .form-group
           label 用户名
-          input.form-control(type="text" value=data.user.username disabled)
+          input.form-control(type="text" value=data.user.username disabled @keyup.enter="submit")
         .form-group
           label 密码
-          input.form-control(type="password" v-model.trim="password")
+          input.form-control(type="password" v-model.trim="password" @keyup.enter="submit")
         .form-group
           h5.text-danger(v-if="error") {{error}}
           h5.text-success(v-if="info") {{info}}
