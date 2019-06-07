@@ -479,7 +479,6 @@ threadSchema.methods.updateThreadMessage = async function() {
 
 threadSchema.methods.newPost = async function(post, user, ip) {
   const SettingModel = mongoose.model('settings');
-  const UsersPersonalModel = require('./UsersPersonalModel');
   const PostModel = mongoose.model('posts');
   const redis = require('../redis');
   const MessageModel = mongoose.model('messages');
@@ -512,9 +511,9 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     });
     await replyWriteOfThread.save();
   }
-  let rpid = '';
+  let rpid = [];
   if(quote && quote[2]) {
-    rpid = quote[2];
+    rpid.push(quote[2]);
   }
   let _post = await new PostModel({
     pid,

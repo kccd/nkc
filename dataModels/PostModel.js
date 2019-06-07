@@ -47,6 +47,7 @@ const postSchema = new Schema({
 	  index: 1,
     default: []
   },
+  // 引用的PID
   rpid: {
     type: [String],
     default: []
