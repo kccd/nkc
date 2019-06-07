@@ -303,6 +303,10 @@ function getProvinceCity(str) {
 	}
 	if(addressArr[1]) {
 		city = addressArr[1];
+		var cityIndex = city.indexOf("&");
+		if(cityIndex > -1) {
+			city = city.substr(0,cityIndex)
+		}
 	}
 	address = province + "/" + city;
 	return address;

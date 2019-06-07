@@ -213,17 +213,17 @@ block scripts
         thumb_image_height: 350,
         source_image_width: 900,
         source_image_height: 900,
-        zoom_area_width: 500,//放大镜的大小
-        zoom_area_height: 500,//放大镜的高度
+        zoom_area_width: 350,//放大镜的大小
+        zoom_area_height: 350,//放大镜的高度
         small_thumbs:5,
         autoplay: false
       });
-      $(".etalage").each(function() {
-        $(this).css("width", "100%")
-      })
-      $(".etalage_thumb_image").each(function() {
-        $(this).css("width", "100%")
-      })
+      //- $(".etalage").each(function() {
+      //-   $(this).css("width", "100%")
+      //- })
+      //- $(".etalage_thumb_image").each(function() {
+      //-   $(this).css("width", "100%")
+      //- })
     });
     $("#city").click(function (e) {
       SelCity(this,e);
