@@ -92,7 +92,7 @@ router
         to: 'bank',
         type: 'pay',
         ordersId: [order.orderId],
-        num: order.orderPrice,
+        num: totalMoney,
         ip: ctx.address,
         port: ctx.port,
         verify: true

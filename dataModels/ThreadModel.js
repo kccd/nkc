@@ -1255,4 +1255,52 @@ threadSchema.statics.autoCoverImage = async (ctx, thread, post) => {
   }
 }
 
+/**
+ * 发布新贴
+ * @param {Object} data
+ * @param {Array} fids 专业id数组，由用户选择
+ * @param {String} fid 专业id， 由路由参数传入
+ */
+// threadSchema.statics.postNewThread = async (data) => {
+//   const UserModel = mongoose.model("users");
+//   const ForumModel = mongoose.model("forums");
+//   const ThreadModel = mongoose.model("threads");
+//   const PostModel = mongoose.model("posts");
+//   const MessageModel = mongoose.model("messages");
+//   const SubscribeModel = mongoose.model("subscribes");
+//   const forum = await ForumModel.findOnly({fid: fid});
+//   // 检测发帖必要的账户信息
+//   const checkInfo = await UserModel.checkUserBaseInfo(data.user);
+//   if(!checkInfo) {
+//     throwErr(400, `因为缺少必要的账户信息，无法完成该操作。包括下面一项或几项: 未设置用户名，未设置头像，未绑定手机号。`);
+//   }
+//   // 判断专业发表权限
+//   await db.ForumModel.publishPermission(data, fids, fid);
+//   // 生成一条post
+//   const _post = await forum.newPost();
+//   // 获取当前的thread
+//   const thread = await ThreadModel.findOnly({tid: _post.tid});
+//   // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
+//   const needReview = await UserModel.contentNeedReview(data.user.uid, "thread");
+//   if(!needReview) {
+//     await PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+//     await ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
+//   }else{
+//     await MessageModel.sendReviewMessage(_post.pid);
+//   }
+//   // 发贴自动关注专业
+//   await SubscribeModel.autoAttentionForum(user.uid, fids);
+//   // 生成封面图
+//   await ThreadModel.autoCoverImage(ctx, thread, _post);
+//   // 发帖数加一，并生成记录
+//   const obj = {
+//     user: data.user,
+//     type: 'score',
+//     key: 'threadCount',
+//     typeIdScoreChange: 'postToForum',
+//     tid: thread
+//   }
+
+// }
+
 module.exports = mongoose.model('threads', threadSchema);
