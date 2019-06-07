@@ -1055,4 +1055,25 @@ forumSchema.statics.getUserSubForums = async (uid, fid) => {
   return userSubForums.filter(f => !!f);
 };
 
+/**
+ * 判断专业发表权限，是否允许在此专业下发表文章
+ * @param {Array} fids 专业id数组
+ * @param {String} fid 专业id
+ * @param {Object} data
+ */
+forumSchema.statics.publishPermission = async (data, fids, fid) => {
+  const ForumModel = mongoose.model("forums");
+  const {userRoles, userGrade, user} = data;
+  const forum = await ForumModel.findOnly({fid});
+  const forums = await ForumModel.find({fid: {$in: fids}});
+  forums.push(forum);
+  for(const f of forums) {
+    await f.ensurePermission(userRoles, userGrade, user);
+  }
+  const childrenForums = await forum.extendChildrenForums();
+  if(childrenForums.length !== 0) {
+    throwErr(400, "该专业下存在其他专业，请到下属专业发表文章");
+  }
+}
+
 module.exports = mongoose.model('forums', forumSchema);

@@ -1252,5 +1252,32 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
   return false
 };
 
+/**
+ * 发表限制检测
+ * @param {Object} user 用户Id
+ */
+userSchema.statics.publishingCheck = async (user) => {
+  const SettingModel = mongoose.model("settings");
+  const ThreadModel = mongoose.model("threads");
+  const postSettings = await SettingModel.findOnly({_id: 'post'});
+  const {authLevelMin, exam} = postSettings.c.postToForum;
+  const {volumeA, volumeB, notPass} = exam;
+  const {status, countLimit, unlimited} = notPass;
+  const apiFunction = require('../nkcModules/apiFunction');
+  const today = apiFunction.today();
+  const todayThreadCount = await ThreadModel.count({toc: {$gt: today}, uid: user.uid});
+  if(authLevelMin > user.authLevel) throwErr(403, `身份认证等级未达要求，发表文章至少需要完成身份认证 ${authLevelMin}`);
+  // ab卷考试是否开启或通过
+  if((!volumeB || !user.authLevel) && (!volumeA || !user.volumeA)) {
+    if(!status) throwErr(403, "权限不足，请提升账号等级");
+    if(!unlimited && countLimit <= todayThreadCount) throwErr(403, `今日发表文章次数已用完，请明天再试。`)
+  }
+  // 发表回复时间、条数限制检查
+  const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
+  if(todayThreadCount >= postToForumCountLimit) throwErr(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
+  const latestThread = await ThreadModel.findOne({uid: user.uid, toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
+  if(latestThread) throwErr(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
+}
+
 
 module.exports = mongoose.model('users', userSchema);
