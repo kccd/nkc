@@ -69,7 +69,7 @@ block content
                     span 卖家：
                     span!=bill.user.username
                     span(style="margin-left:20px;color:#000")
-                      a.btn(href=`/message?uid=${bill.user.uid}`).fa.fa-commenting 联系卖家
+                      a.btn(href=`/message?uid=${bill.user.uid}` target="_blank").fa.fa-commenting 联系卖家
               for cart in bill.carts
                 mixin orderCert(cart) 
                   if cart.product.uploadCert

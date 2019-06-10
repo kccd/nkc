@@ -27,110 +27,49 @@ router
 		}
 	})
 	.post('/', async (ctx, next) => {
-		const {
-			data, params, db, body, address: ip, fs, query, nkcModules
-    } = ctx;
-		const {
-			ForumModel,
-			ThreadModel,
-			UsersSubscribeModel,
-			SubscribeModel,
-		} = db;
+		const {data, params, db, body, address: ip, fs, query, nkcModules} = ctx;
+		const {ForumModel, ThreadModel, SubscribeModel} = db;
 		const {fid} = params;
-		const forum = await ForumModel.findOnly({fid});
-		data.forum = forum;
 	  const {user} = data;
-    if(!await db.UserModel.checkUserBaseInfo(user)) {
-      ctx.throw(400, `因为缺少必要的账户信息，无法完成该操作。包括下面一项或者几项：未设置用户名，未设置头像，未绑定手机号。`);
-    }
-    // if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
-    const forums = await db.ForumModel.find({fid: {$in: body.post.fids}});
-    forums.push(forum);
-    for(const f of forums) {
-      await f.ensurePermission(data.userRoles, data.userGrade, data.user);
-    }
-	  const childrenForums = await forum.extendChildrenForums();
-	  if(childrenForums.length !== 0) {
-	  	ctx.throw(400, '该专业下存在其他专业，请到下属专业发表文章。');
-	  }
-
-	  // 根据发表设置，判断用户是否有权限发表文章
-    // 1. 身份认证等级
-    // 2. 考试
-    // 3. 角色
-    // 4. 等级
-	  const postSettings = await db.SettingModel.findOnly({_id: 'post'});
-	  const {authLevelMin, exam} = postSettings.c.postToForum;
-	  const {volumeA, volumeB, notPass} = exam;
-	  const {status, countLimit, unlimited} = notPass;
-	  const today = nkcModules.apiFunction.today();
-    const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: user.uid});
-    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表文章至少需要完成身份认证 ${authLevelMin}`);
-    if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
-      if(!status) ctx.throw(403, '权限不足，请提升账号等级');
-      if(!unlimited && countLimit <= todayThreadCount) ctx.throw(403, '今日发表文章次数已用完，请明天再试。');
-    }
-
-    // 发表回复时间、条数限制
-    const {postToForumCountLimit, postToForumTimeLimit} = await user.getPostLimit();
-    if(todayThreadCount >= postToForumCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
-    const latestThread = await db.ThreadModel.findOne({uid: user.uid, toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
-    if(latestThread) ctx.throw(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
-
-		/*if(user.authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
-		if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发帖。');
-    if(!user.username) ctx.throw(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');*/
-
 	  const {post} = body;
 		const {c, t, fids, cids, cat, mid} = post;
+		post.title = post.t;
+		post.content = post.c;
+		post.uid = user.uid;
+		post.ip = ip;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(t === '') ctx.throw(400, '标题不能为空！');
-		// 生成一条新的post
-		const _post = await forum.newPost(post, user, ip, cids, mid, fids);
-		data.post = _post;
-		// 获取当前的thread
-		const thread = await ThreadModel.findOnly({tid: _post.tid});
-		data.thread = thread;
-    // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
-    const needReview = await db.UserModel.contentNeedReview(user.uid, "thread");
-    if(!needReview) {
-      await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
-      await db.ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
-    } else {
-      await db.MessageModel.sendReviewMessage(_post.pid);
-    }
-		// 发表自动关注该学科或话题
-		await SubscribeModel.autoAttentionForum(user.uid, fids);
-		// 生成封面图
+		if(fids.length == 0) ctx.throw(400, "请至少选择一个专业");
+		const forum = await ForumModel.findOnly({fid});
+		data.forum = forum;
+		const _post = await db.ThreadModel.postNewThread(post);
+		
+		// 根据thread生成封面图
+		const thread = await db.ThreadModel.findOne({tid: _post.tid});
 		await ThreadModel.autoCoverImage(ctx, thread, _post);
 		// 发帖数加一并生成记录
 		const obj = {
-			user,
+			user: data.user,
 			type: 'score',
 			key: 'threadCount',
 			typeIdOfScoreChange: 'postToForum',
 			tid: thread.tid,
 			pid: thread.oc,
-			fid,
 			ip: ctx.address,
 			port: ctx.port
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
-    await db.KcbsRecordModel.insertSystemRecord('postToForum', user, ctx);
-		// await db.UsersScoreLogModel.insertLog(obj);
-
+		await db.KcbsRecordModel.insertSystemRecord('postToForum', data.user, ctx);
 		await thread.updateThreadMessage();
-		
+		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {
       ctx.status = 303;
       return ctx.redirect(`/t/${_post.tid}`);
 		}
+		data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
 		
-    data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
-    //帖子曾经在草稿箱中，发表时，删除草稿
-    await db.DraftModel.remove({"did":post.did})
     await next();
   })
   .del('/', async (ctx, next) => {

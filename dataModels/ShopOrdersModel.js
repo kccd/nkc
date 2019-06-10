@@ -498,7 +498,7 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
   const KcbsRecordModel = mongoose.model("kcbsRecords");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const MessageModel = mongoose.model("messages");
-  const {orderId, orderStatus, closeStatus, orderPrice, refundStatus} = this;
+  const {orderId, orderStatus, closeStatus,orderFreightPrice, orderPrice, refundStatus} = this;
   let order = await ShopOrdersModel.findById(orderId);
   const orders = await ShopOrdersModel.userExtendOrdersInfo([order]);
   order = orders[0];
@@ -515,7 +515,7 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
     to: order.sellUid,
     description: ``,
     type: "sell",
-    num: orderPrice,
+    num: (orderPrice+orderFreightPrice),
     toc: time,
     ordersId: [orderId]
   });
@@ -525,10 +525,10 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
     finishToc: time
   }});
   await SettingModel.update({_id: 'kcb'}, {$inc: {
-    "c.totalMoney": -1 * orderPrice
+    "c.totalMoney": -1 * (orderPrice+orderFreightPrice)
   }});
   await UserModel.update({uid: order.sellUid}, {$inc: {
-    kcb: orderPrice
+    kcb: (orderPrice+orderFreightPrice)
   }});
   await MessageModel.sendShopMessage({
     type: "shopBuyerConfirmReceipt",

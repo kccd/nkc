@@ -70,10 +70,13 @@ schema.statics.getUserSubUid = async (uid) => {
 
 /**
  * 自动关注专业
- * @param {String} uid 用户id
- * @param {Array} fids 专业fid数组
+ * @param {Object} options 参数对象
+ * @description 参数说明
+ * uid
+ * fids
  */
-schema.statics.autoAttentionForum = async function(uid, fids) {
+schema.statics.autoAttentionForum = async function(options) {
+  const {uid, fids} = options
   let SubscribeModel = mongoose.model("subscribes");
   let SettingModel = mongoose.model("settings");
   for(let scr of fids) {

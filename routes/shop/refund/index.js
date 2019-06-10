@@ -68,7 +68,7 @@ router
       if(param) {
         if(refundMoney > param.productPrice) ctx.throw(400, "退款金额不能超过要退款的商品的金额");
       } else {
-        if(refundMoney > order.orderPrice + order.orderFreightPrice) ctx.throw(400, "退款金额不能超过订单的总金额");
+        if(refundMoney > order.orderPrice) ctx.throw(400, "退款金额不能超过全部商品的总金额");
       }
       r.money = refundMoney;
       if(orderStatus === "unShip") {

@@ -77,7 +77,7 @@ var app = new Vue({
       if(this.param) {
         return this.param.productPrice;
       } else {
-        return this.order.orderPrice + this.order.orderFreightPrice
+        return this.order.orderPrice
       }
     }
   },
@@ -173,7 +173,7 @@ var app = new Vue({
         if(param) {
           if(newRefund.money*100 > param.productPrice) return this.error = "退款金额不能超过退款中的商品的金额";
         } else {
-          if(newRefund.money*100 > this.order.orderPrice + this.order.orderFreightPrice) return this.error = "退款金额不能超过订单金额";
+          if(newRefund.money*100 > this.order.orderPrice) return this.error = "退款金额不能超过商品总金额";
         }
       }
       else return this.error = "请输入正确的退款金额";
