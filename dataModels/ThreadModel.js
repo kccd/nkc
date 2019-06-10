@@ -477,12 +477,13 @@ threadSchema.methods.updateThreadMessage = async function() {
   }));
 };
 
-threadSchema.methods.newPost = async function(post, user, ip) {
+threadSchema.methods.newPost = async function(post) {
   const SettingModel = mongoose.model('settings');
   const PostModel = mongoose.model('posts');
   const redis = require('../redis');
   const MessageModel = mongoose.model('messages');
   const UserModel = mongoose.model('users');
+  const UserGeneralModel = mongoose.model("usersGeneral");
   const ReplyModel = mongoose.model('replies');
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
@@ -503,7 +504,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     }
   }
   const quote = await dbFn.getQuote(c);
-  if(this.uid !== user.uid) {
+  if(this.uid !== post.uid) {
     const replyWriteOfThread = new ReplyModel({
       fromPid: pid,
       toPid: this.oc,
@@ -525,14 +526,14 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     keyWordsEn,
     authorInfos: newAuthInfos,
     originState,
-    ipoc: ip,
-    iplm: ip,
+    ipoc: post.ip,
+    iplm: post.ip,
     l,
     mainForumsId: this.mainForumsId,
     minorForumsId: this.minorForumsId,
     tid: this.tid,
-    uid: user.uid,
-    uidlm: user.uid,
+    uid: post.uid,
+    uidlm: post.uid,
     rpid
   });
   await _post.save();
@@ -577,15 +578,16 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     }
   }
   await this.update({lm: pid});
-  if(!user.generalSettings.lotterySettings.close) {
+  const userGeneral = await UserGeneralModel.findOne({uid: post.uid});
+  if(!userGeneral.lotterySettings.close) {
     const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
     if(!redEnvelopeSettings.c.random.close) {
       const {chance} = redEnvelopeSettings.c.random;
       const number = Math.ceil(Math.random()*100);
       if(number <= chance) {
-        const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
+        const postCountToday = await PostModel.count({uid: post.uid, toc: {$gte: apiFn.today()}});
         if(postCountToday === 1) {
-          await user.generalSettings.update({'lotterySettings.status': true});
+          await userGeneral.update({'lotterySettings.status': true});
         }
       }
     }
@@ -1257,50 +1259,38 @@ threadSchema.statics.autoCoverImage = async (ctx, thread, post) => {
 
 /**
  * 发布新贴
- * @param {Object} data
- * @param {Array} fids 专业id数组，由用户选择
- * @param {String} fid 专业id， 由路由参数传入
+ * @param {Object} options 生成一条新文章的参数组
+ * @return _post
  */
-// threadSchema.statics.postNewThread = async (data) => {
-//   const UserModel = mongoose.model("users");
-//   const ForumModel = mongoose.model("forums");
-//   const ThreadModel = mongoose.model("threads");
-//   const PostModel = mongoose.model("posts");
-//   const MessageModel = mongoose.model("messages");
-//   const SubscribeModel = mongoose.model("subscribes");
-//   const forum = await ForumModel.findOnly({fid: fid});
-//   // 检测发帖必要的账户信息
-//   const checkInfo = await UserModel.checkUserBaseInfo(data.user);
-//   if(!checkInfo) {
-//     throwErr(400, `因为缺少必要的账户信息，无法完成该操作。包括下面一项或几项: 未设置用户名，未设置头像，未绑定手机号。`);
-//   }
-//   // 判断专业发表权限
-//   await db.ForumModel.publishPermission(data, fids, fid);
-//   // 生成一条post
-//   const _post = await forum.newPost();
-//   // 获取当前的thread
-//   const thread = await ThreadModel.findOnly({tid: _post.tid});
-//   // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
-//   const needReview = await UserModel.contentNeedReview(data.user.uid, "thread");
-//   if(!needReview) {
-//     await PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
-//     await ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
-//   }else{
-//     await MessageModel.sendReviewMessage(_post.pid);
-//   }
-//   // 发贴自动关注专业
-//   await SubscribeModel.autoAttentionForum(user.uid, fids);
-//   // 生成封面图
-//   await ThreadModel.autoCoverImage(ctx, thread, _post);
-//   // 发帖数加一，并生成记录
-//   const obj = {
-//     user: data.user,
-//     type: 'score',
-//     key: 'threadCount',
-//     typeIdScoreChange: 'postToForum',
-//     tid: thread
-//   }
-
-// }
+threadSchema.statics.postNewThread = async (options) => {
+  const UserModel = mongoose.model("users");
+  const ForumModel = mongoose.model("forums");
+  const ThreadModel = mongoose.model("threads");
+  const PostModel = mongoose.model("posts");
+  const MessageModel = mongoose.model("messages");
+  const SubscribeModel = mongoose.model("subscribes");
+  const UsersScoreLogModel = mongoose.model("usersScoreLogs");
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const DraftModel = mongoose.model("draft");
+  // 检测权限，是否可以发表
+  await ThreadModel.ensurePublishPermission(options);
+  // 生成一条post
+  const _post = await ForumModel.getNewThread(options);
+  // 获取当前的thread
+  const thread = await ThreadModel.findOnly({tid: _post.tid});
+  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
+  const needReview = await UserModel.contentNeedReview(options.uid, "thread");
+  if(!needReview) {
+    await PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+    await ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
+  }else{
+    await MessageModel.sendReviewMessage(_post.pid);
+  }
+  // 发贴自动关注专业
+  await SubscribeModel.autoAttentionForum(options);
+  //帖子曾经在草稿箱中，发表时，删除草稿
+  await DraftModel.remove({"did": options.did})
+  return _post;
+}
 
 module.exports = mongoose.model('threads', threadSchema);

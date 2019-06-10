@@ -33,63 +33,43 @@ router
 	  const {user} = data;
 	  const {post} = body;
 		const {c, t, fids, cids, cat, mid} = post;
+		post.title = post.t;
+		post.content = post.c;
+		post.uid = user.uid;
+		post.ip = ip;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(t === '') ctx.throw(400, '标题不能为空！');
+		if(fids.length == 0) ctx.throw(400, "请至少选择一个专业");
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
-    if(!await db.UserModel.checkUserBaseInfo(user)) {
-      ctx.throw(400, `因为缺少必要的账户信息，无法完成该操作。包括下面一项或者几项：未设置用户名，未设置头像，未绑定手机号。`);
-    }
-		// 判断专业发表权限
-		await db.ForumModel.publishPermission(data, fids, fid);
-		// 角色等级发表限制检查
-		await db.UserModel.publishingCheck(user);
-		// 生成一条新的post
-		const _post = await forum.newPost(post, user, ip, cids, mid, fids);
-		data.post = _post;
-		// 获取当前的thread
-		const thread = await ThreadModel.findOnly({tid: _post.tid});
-		data.thread = thread;
-    // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
-    const needReview = await db.UserModel.contentNeedReview(user.uid, "thread");
-    if(!needReview) {
-      await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
-      await db.ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
-    } else {
-      await db.MessageModel.sendReviewMessage(_post.pid);
-    }
-		// 发表自动关注该学科或话题
-		await SubscribeModel.autoAttentionForum(user.uid, fids);
-		// 生成封面图
+		const _post = await db.ThreadModel.postNewThread(post);
+		
+		// 根据thread生成封面图
+		const thread = await db.ThreadModel.findOne({tid: _post.tid});
 		await ThreadModel.autoCoverImage(ctx, thread, _post);
 		// 发帖数加一并生成记录
 		const obj = {
-			user,
+			user: data.user,
 			type: 'score',
 			key: 'threadCount',
 			typeIdOfScoreChange: 'postToForum',
 			tid: thread.tid,
 			pid: thread.oc,
-			fid,
 			ip: ctx.address,
 			port: ctx.port
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
-    await db.KcbsRecordModel.insertSystemRecord('postToForum', user, ctx);
-		// await db.UsersScoreLogModel.insertLog(obj);
-
+		await db.KcbsRecordModel.insertSystemRecord('postToForum', data.user, ctx);
 		await thread.updateThreadMessage();
-		
+		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {
       ctx.status = 303;
       return ctx.redirect(`/t/${_post.tid}`);
 		}
+		data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
 		
-    data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
-    //帖子曾经在草稿箱中，发表时，删除草稿
-    await db.DraftModel.remove({"did":post.did})
     await next();
   })
   .del('/', async (ctx, next) => {

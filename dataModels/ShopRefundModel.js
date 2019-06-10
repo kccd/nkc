@@ -191,7 +191,7 @@ schema.methods.returnMoney = async function () {
   for(const p of order.params) {
     description += `${p.count}x${p.product.name}x${p.productParam.name}`;
   }
-  const {orderStatus, refundStatus, orderPrice} = order;
+  const {orderStatus, refundStatus, orderPrice, orderFreightPrice} = order;
   if(refundStatus !=="ing" || !["unShip", "unSign"].includes(orderStatus)) throwErr(400, "订单状态已改变，请刷新");
   if(!["S_AGREE_RM", "P_AGREE_RM"].includes(status)) throwErr(400, "退款申请的状态已改变，请刷新");
   const time = Date.now();
@@ -222,6 +222,7 @@ schema.methods.returnMoney = async function () {
     await UserModel.updateUserKcb(record.to);
   } else if(orderPrice === money) {
     // 情况2
+    // 将商品退款金额打给买家
     const record = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
@@ -234,9 +235,22 @@ schema.methods.returnMoney = async function () {
     }); 
     await record.save();
     await UserModel.updateUserKcb(record.to);
+    // 将运费打给卖家
+    const recordSeller = KcbsRecordModel({
+      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
+      from: "bank",
+      to: sellerId,
+      type: "refund",
+      toc: time,
+      num: orderFreightPrice,
+      description,
+      ordersId: [orderId]
+    })
+    await recordSeller.save();
+    await UserModel.updateUserKcb(recordSeller.to);
   } else if(money < orderPrice) {
     // 情况1
-    const diff = orderPrice - money;
+    const diff = (orderPrice+orderFreightPrice) - money;
     const orderToS = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
