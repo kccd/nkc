@@ -3199,6 +3199,19 @@ img.emoji {
   z-index: 10010;
   transition: display 1s;
 }
+.post-comments{
+  background-color: #d9e1e8;
+  padding: 1rem;
+}
+.post-comments .comment-user img{
+  height: 18px;
+  width: 18px;
+  border-radius: 3px;
+  margin-right: 0.3rem;
+}
+.post-comments .comment-user span{
+  margin-right: 0.3rem;
+}
 .single-post{
   position: relative;
   /*padding-top: 1rem;*/

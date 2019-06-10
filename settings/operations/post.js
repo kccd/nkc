@@ -50,6 +50,9 @@ module.exports = {
     warning: {
 		  POST: "postWarningPost",
       PATCH: "postWarningPatch"
+    },
+    post: {
+		  GET: "postPostGet"
     }
 	}
 };

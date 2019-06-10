@@ -149,7 +149,10 @@ threadRouter
 		}
 		// 构建查询条件
 		const match = {
-			tid
+			tid,
+      parentPostsId: {
+			  $size: 0
+      }
 		};
 		// 只看作者
 		if(t === "author") {

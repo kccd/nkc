@@ -52,6 +52,23 @@ const postSchema = new Schema({
     type: [String],
     default: []
   },
+  // 所有上级post
+  parentPostsId: {
+    type: [String],
+    default: [],
+    index: 1
+  },
+  // 上级post
+  parentPostId: {
+    type: String,
+    default: [],
+    index: 1
+  },
+  // 下一级post数目
+  postCount: {
+    type: Number,
+    default: 0
+  },
   t: {
     type: String,
     default: ''
@@ -787,6 +804,15 @@ postSchema.statics.newPost = async (options) => {
     }
   }
   return _post
+};
+
+
+/*
+* 发表回复，包含楼中楼
+*
+* */
+postSchema.statics.publishPost = async (options) => {
+
 };
 
 module.exports = mongoose.model('posts', postSchema);

@@ -304,6 +304,9 @@ threadSchema.methods.extendUser = async function() {
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
   const throwError = require("../nkcMOdules/throwError");
+  if(!this.forums) {
+    await this.extendForums(["mainForums"]);
+  }
   for(const forum of this.forums) {
     try {
       await forum.ensurePermission(roles, grade, user);
@@ -487,7 +490,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState, parentPostId} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
@@ -515,6 +518,14 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   if(quote && quote[2]) {
     rpid.push(quote[2]);
   }
+  let parentPostsId = [];
+  if(parentPostId) {
+    const parentPost = await PostModel.findOne({pid: parentPostId});
+    if(parentPost) {
+      parentPostsId = parentPost.parentPostsId.concat([parentPostId]);
+      await parentPost.update({$inc: {postCount: 1}});
+    }
+  }
   let _post = await new PostModel({
     pid,
     c,
@@ -533,7 +544,9 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     tid: this.tid,
     uid: user.uid,
     uidlm: user.uid,
-    rpid
+    rpid,
+    parentPostsId,
+    parentPostId
   });
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象

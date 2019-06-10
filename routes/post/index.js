@@ -7,9 +7,10 @@ const recommend = require('./recommend');
 const digestRouter = require('./digest');
 const voteRouter = require('./vote');
 const warningRouter = require("./warning");
-const postRouter = new Router();
+const postRouter = require("./post");
+const router = new Router();
 
-postRouter
+router
   .get('/:pid', async (ctx, next) => {
     const {data, db, query} = ctx;
 		const {token} = query;
@@ -262,5 +263,6 @@ postRouter
   .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())
   .use('/:pid/vote', voteRouter.routes(), voteRouter.allowedMethods())
   .use('/:pid/warning', warningRouter.routes(), warningRouter.allowedMethods())
-  .use('/:pid/quote', quote.routes(), quote.allowedMethods());
-module.exports = postRouter;
+  .use('/:pid/quote', quote.routes(), quote.allowedMethods())
+  .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods());
+module.exports = router;
