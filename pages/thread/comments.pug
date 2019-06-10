@@ -1,0 +1,20 @@
+mixin renderComments(comments)
+  if comments && comments.length > 0
+    .post-comments
+      for comment in comments
+        .post-comment
+          a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
+            img(src=`/avatar/${comment.uid}`)
+            spa=comment.user.username
+          .post-comment-time=fromNow(comment.toc)
+          if comment.parentPostUser
+            span.m-l-1.m-r-1 回复
+            a.display-i-b.post-comment-user(href=`/u/${comment.parentPostUser.uid}` target="_blank")
+              img(src=`/avatar/${comment.parentPostUser.uid}`)
+              spa=comment.parentPostUser.username
+          -comment.c = hideContentByUser(comment.c, data.user, 'thread')
+          .post-comment-content!=experimental_render(comment)
+          button(onclick=`postComment('${comment.tid}', '${comment.pid}')`) 评论
+          div(class=`edit_${comment.pid}_container`)
+          +renderComments(comment.posts)
++renderComments(data.posts)

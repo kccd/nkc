@@ -3200,16 +3200,27 @@ img.emoji {
   transition: display 1s;
 }
 .post-comments{
-  background-color: #d9e1e8;
+  /*background-color: #d9e1e8;*/
   padding: 1rem;
+  padding-right: 0;
+  margin: 0.5rem 0;
+  border: 1px solid #d9e1e8;
+  border-right: none;
 }
-.post-comments .comment-user img{
+.post-comments-div>.post-comments{
+  border-right: 1px solid  #d9e1e8;
+}
+.post-comment .post-comment-time{
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+.post-comments .post-comment-user img{
   height: 18px;
   width: 18px;
   border-radius: 3px;
   margin-right: 0.3rem;
 }
-.post-comments .comment-user span{
+.post-comments .post-comment-user span{
   margin-right: 0.3rem;
 }
 .single-post{

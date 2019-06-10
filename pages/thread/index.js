@@ -923,22 +923,16 @@ function submitPostComment(tid, pid) {
 var comments = {};
 
 function viewPostComments(pid) {
+  var commentsDiv = $("#post_comments_" + pid);
   if(comments[pid]) {
-    return $("#post_comments_" + pid).show();
-  };
+    return commentsDiv.show();
+  }
   nkcAPI("/p/" + pid + "/post", "GET")
     .then(function(data) {
-      var posts = data.posts;
-      if(posts.length === 0) return;
-      comments[pid] = new Vue({
-        el: "#post_comments_"+pid,
-        data: {
-          posts:  posts
-        },
-        methods: {
-          fromNow: NKC.methods.fromNow
-        }
-      });
+      var html = data.html;
+      if(!html) return;
+      commentsDiv.html(html);
+      comments[pid] = html;
     })
     .catch(function(data) {
       screenTopWarning(data);
