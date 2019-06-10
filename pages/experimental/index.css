@@ -152,3 +152,12 @@ body{
 .cert-panel span .fa{
   margin-left: 0.5rem;
 }
+.review-time{
+  margin-left: 0.5rem;
+  color: #e85a71;
+  font-weight: 700;
+}
+tbody tr th {
+  max-width: 12rem;
+  font-size: 1rem;
+}
