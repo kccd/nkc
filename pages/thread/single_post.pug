@@ -88,12 +88,14 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
 
         //- 评论输入框 暂且只有作者能够首先发起评论，之后该条回复的用户才能接着评论
         div
-          a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 回复
+          if data.user
+            a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 回复
           if post.postCount > 0
-            a.pointer(onclick=`viewPostComments('${post.pid}')` class=`show_comments_button_${post.pid}`) 查看回复
-            a.pointer(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`) 折叠回复
+            a.pointer(onclick=`viewPostComments('${post.pid}')` class=`show_comments_button_${post.pid}`)=`查看评论(${post.postCount})`
+            a.pointer(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`
           div(class=`edit_${post.pid}_container`)
           .post-comments-div(id=`post_comments_${post.pid}`)
-          a.pointer(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`) 折叠回复
+          button.btn-block.btn.btn-default.btn-sm(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
+            span.fa.fa-angle-up
 
 

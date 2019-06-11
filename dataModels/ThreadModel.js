@@ -525,7 +525,7 @@ threadSchema.methods.newPost = async function(post) {
     const parentPost = await PostModel.findOne({pid: parentPostId});
     if(parentPost) {
       parentPostsId = parentPost.parentPostsId.concat([parentPostId]);
-      await parentPost.update({$inc: {postCount: 1}});
+      await PostModel.updateMany({pid: {$in: parentPostsId}}, {$inc: {postCount: 1}});
     }
   }
   let _post = await new PostModel({

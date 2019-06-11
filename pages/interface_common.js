@@ -923,12 +923,12 @@ $(function () {
 
   var highlightDom = $(".highlight-dom");
   highlightDom.css("background-color", "rgba(255, 251, 221, 1)");
-  var colorValue = 1;
+  var colorValue = 2;
 
   var colorTimeout = setInterval(function() {
     colorValue -= 0.1;
     if(colorValue < 0) clearInterval(colorTimeout);
-    highlightDom.css("background-color", "rgba(255, 251, 221, "+colorValue+")");
+    highlightDom.css("background-color", "rgba(255, 251, 221, "+(colorValue<1?colorValue:1)+")");
   }, 1000)
 });
 

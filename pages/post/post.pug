@@ -120,20 +120,7 @@ block content
           .post-comments-div
           -let comments = data.posts
           include ../thread/comments
-          //for comment in data.posts
-            .post-comments
-              .post-comment
-                a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
-                  img(src=`/avatar/${comment.uid}`)
-                  spa=comment.user.username
-                if comment.parentPost
-                  span.m-l-1.m-r-1 回复
-                  a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank")
-                    img(src=`/avatar/${comment.parentPost.user.uid}`)
-                    spa=comment.parentPost.user.username
-                .post-comment-time=fromNow(comment.toc)
-                -comment.c = hideContentByUser(comment.c, data.user, 'thread')
-                .post-comment-content!=experimental_render(comment)
+
           include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
         .nkcpanel.post-share.fullwidthpanel

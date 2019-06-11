@@ -2,14 +2,15 @@ var editor = {};
 
 function postComment(tid, pid) {
   var postContainer = $(".edit_"+pid+"_container");
-  postContainer.addClass("m-b-1");
   if(postContainer.html()) {
     return postContainer.show();
   }
-  var subBtn = $('<button class="btn btn-default btn-sm" onclick="submitPostComment(\''+tid+'\', \''+pid+'\')">提交</button>');
-  var quitBtn = $('<button class="btn btn-default btn-sm" onclick="closePostComment(\''+pid+'\')">取消</button>');
+  var subBtn = $('<button class="btn btn-primary btn-sm" onclick="submitPostComment(\''+tid+'\', \''+pid+'\')">提交</button>');
+  var quitBtn = $('<button class="btn btn-default btn-sm m-r-05" onclick="closePostComment(\''+pid+'\')">取消</button>');
+  var btnDiv = $("<div class='text-right m-t-05'></div>");
+  btnDiv.append(quitBtn, subBtn)
   var editDom = $("<div id='edit_"+pid+"' class='m-t-1 m-b-05'></div>");
-  postContainer.append(editDom, subBtn, quitBtn);
+  postContainer.append(editDom, btnDiv);
   editor[pid] = UE.getEditor('edit_' + pid, {
     toolbars: [
       [
@@ -61,7 +62,7 @@ function viewPostComments(pid) {
   if(comments[pid]) {
     return;
   }
-  nkcAPI("/p/" + pid + "/post", "GET")
+  nkcAPI("/p/" + pid, "GET")
     .then(function(data) {
       var html = data.html;
       if(!html) return;

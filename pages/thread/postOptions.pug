@@ -1,0 +1,132 @@
+.inline-block.highlight.post-options(style='float: right;margin-right: 0.5rem;color: #aaaaaa;')
+  .dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
+    span.fa.fa-sliders
+  //-ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
+  ul.dropdown-menu(style='left: auto;right: 0;' data-stopPropagation=true)
+    if comment.url
+      li
+        a(href=comment.url)
+          span.fa.fa-newspaper-o &nbsp;
+          span 详情
+    //-if postTo && !thread.closed
+      li
+        a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
+          span.fa.fa-comment-o &nbsp;
+          span 引用
+    //-if !hideAt
+      li
+        a(href=`javascript:at('${comment.user.username}')`)
+          span.fa.fa-at= ` ${comment.user.username}`
+    //-if targetThread && targetThread.oc === post.pid
+      li
+        a(href=`/t/${thread.tid}?t=author`)
+          .fa.fa-filter &nbsp;只看作者
+
+    //if targetThread && targetThread.oc === post.pid && data.user && data.userOperationsId.includes('collectThread')
+    //
+    //  li
+    //    if data.collected
+    //      a(href=`javascript: addColl('${thread.tid}')`)
+    //        span.fa.fa-folder-o &nbsp;已收藏
+    //    else
+    //      a(href=`javascript: addColl('${thread.tid}')`)
+    //        span.fa.fa-folder-o &nbsp;加入收藏
+    //  li
+    //    if data.subscribed
+    //      a(href=`javascript: unSubThread('${thread.tid}')`)
+    //        span.fa.fa-bookmark-o &nbsp;取消关注
+    //    else
+    //      a(href=`javascript: subThread('${thread.tid}')`)
+    //        span.fa.fa-bookmark-o &nbsp;关注
+    if data.userOperationsId.includes('creditXsf') && data.isModerator
+      li
+        a(href=`javascript:credit('${comment.pid}', 'xsf')`)
+          span.fa.fa-graduation-cap &nbsp;
+          span 评学术分
+    if data.userOperationsId.includes('digestPost') && data.isModerator
+      if !comment.digest
+        li
+          a(href=`javascript:digestPost("${comment.pid}")`)
+            span.fa.fa-star-o &nbsp;设为精选
+      else
+        li
+          a(href=`javascript:unDigestPost("${comment.pid}")`)
+            span.fa.fa-star &nbsp;取消精选
+    if data.user && permission('creditKcb') && comment.uid !== data.user.uid
+      li
+        a(href=`javascript: credit("${comment.pid}", 'kcb', ${data.user.kcb})`)
+          span.fa.fa-cny &nbsp;
+            span 鼓励
+    //- var ownership = data.userOperationsId.includes('modifyOtherPosts')
+    //- ownership = ownership?true:(data.user.uid===post.uid)
+    ////-if addKcb && post.uid !== data.user.uid
+    //  li
+    //    a(href=`javascript: credit("${post.pid}", 'kcb', ${data.user.kcb})`)
+    //      span.fa.fa-thumbs-o-up &nbsp;
+    //      span 鼓励
+    if permission("postWarningPost")
+      li
+        a(href=`javascript:openPostWarningDom("${comment.pid}")`)
+          span.fa.fa-ambulance &nbsp;建议修改
+    -console.log(data.modifyPostTimeLimit * 60 * 60 * 1000 , Date.now() - comment.toc)
+    if data.modifyPostTimeLimit === -1 || (data.modifyPostTimeLimit * 60 * 60 * 1000 >= Date.now() - comment.toc)
+      if (data.user && data.user.uid === comment.uid) || (data.isModerator && permission('modifyOtherPosts'))
+        li
+          a(href=`/editor?ver=ue&type=post&id=${comment.pid}`)
+            span.fa.fa-edit &nbsp;编辑
+    if permission("disabledPost")
+      li
+        a(href=`javascript:disablePostClick('${comment.pid}', "post")`)
+          span.fa.fa-eye-slash &nbsp;退修或删除
+    if !comment.hideHistories || permission('displayPostHideHistories')
+      li
+        a(href=`/p/${comment.pid}/history`)
+          span.fa.fa-history &nbsp;历史版本
+    if data.user
+      li.divider
+        li
+          a(href=`javascript:moduleComplaint.open("post", "${comment.pid}")`)
+            span.fa.fa-minus-circle &nbsp;投诉
+    li.divider
+    li
+      a
+        span.fa.fa-clock-o= ` ${comment.toc.toLocaleString()}`
+    if permission("disabledPost")
+      li
+        -const ipoc = comment.iplm || comment.ipoc;
+        a(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
+          span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
+    //if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
+    //
+    //  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
+    //    li
+    //      a(href=`/editor?ver=ue&type=post&id=${post.pid}`)
+    //        span.fa.fa-edit &nbsp;编辑
+    //if disablePost && !targetThread
+    //  li
+    //    a(href=`javascript:disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")`)
+    //      span.fa.fa-eye-slash &nbsp;退修或删除
+    //if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
+    //  if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
+    //    li
+    //      a(href=`/p/${post.pid}/history`)
+    //        span.fa.fa-history &nbsp;历史版本
+    //if data.user
+    //  li.divider
+    //    if targetThread && targetThread.oc === post.pid
+    //      li
+    //        a(href=`javascript:moduleComplaint.open("thread", "${thread.tid}")`)
+    //          span.fa.fa-minus-circle &nbsp;投诉
+    //    else
+    //      li
+    //        a(href=`javascript:moduleComplaint.open("post", "${post.pid}")`)
+    //          span.fa.fa-minus-circle &nbsp;投诉
+    //li.divider
+    //li
+    //  a
+    //    span.fa.fa-clock-o= ` ${post.toc.toLocaleString()}`
+    //if disablePost
+    //  li
+    //    -const ipoc = post.iplm || post.ipoc;
+    //    a(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
+    //      span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`

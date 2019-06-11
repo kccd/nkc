@@ -8,17 +8,19 @@ const digestRouter = require('./digest');
 const voteRouter = require('./vote');
 const warningRouter = require("./warning");
 const postRouter = require("./post");
+const Path = require("path");
 const router = new Router();
 
 router
   .get('/:pid', async (ctx, next) => {
     const {nkcModules, data, db, query} = ctx;
-		const {token, page=0} = query;
+		const {token, page=0, highlight} = query;
     const {pid} = ctx.params;
+    data.highlight = highlight;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
     await thread.extendFirstPost();
-	  const forums = await thread.extendForums(['mianForums', 'minorForums']);
+	  const forums = await thread.extendForums(['mainForums', 'minorForums']);
     const {user} = data;
     let isModerator = ctx.permission('superModerator');
     if(!isModerator) {
@@ -102,12 +104,7 @@ router
       data.voteUpUsers.push(usersObj [v.uid]);
     }
 
-    const step = await thread.getStep({
-      pid,
-      disabled: data.userOperationsId.includes('displayDisabledPosts')
-    });
-    data.step = step;
-    data.postUrl = `/t/${thread.tid}?highlight=${pid}&page=${step.page}#${pid}`;
+
     data.post.user = await db.UserModel.findOnly({uid: post.uid});
     await db.UserModel.extendUsersInfo([data.post.user]);
     await data.post.user.extendGrade();
@@ -117,9 +114,13 @@ router
     data.thread = thread;
     ctx.template = 'post/post.pug';
 
+    const from = ctx.get("FROM");
+
+    // 修改post时间限制
+    data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
+
     // 获取评论
     const q = {
-      parentPostsId: pid,
       disabled: false
     };
     // 判断是否有权限查看被屏蔽的post
@@ -127,32 +128,97 @@ router
       delete q.disabled;
     }
     // 判断是否有权限查看未审核的post
-    if(!data.user || (!isModerator && data.user.uid !== thread.uid)) {
+    if(data.user) {
+      if(!isModerator) {
+        q.$or = [
+          {
+            reviewed: true
+          },
+          {
+            reviewed: false,
+            uid: data.user.uid
+          }
+        ]
+      }
+    } else {
       q.reviewed = true;
     }
-    // 拓展回复
-    const count = await db.PostModel.count(q);
-    const paging = nkcModules.apiFunction.paging(page, count);
-    posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-    posts = await db.PostModel.extendPosts(posts);
-    const parentPostsId = new Set();
-    posts.map(post => {
-      parentPostsId.add(post.parentPostId);
-    });
-    // 拓展上级post
-    let parentPosts = await db.PostModel.find({pid: {$in: [...parentPostsId]}});
-    const postsObj = {};
-    parentPosts = await db.PostModel.extendPosts(parentPosts);
-    parentPosts.map(p => {
-      postsObj[p.pid] = p;
-    });
-    posts.map(post => {
-      post.parentPost = postsObj[post.parentPostId];
-    });
-    data.posts = posts;
-    data.paging = paging;
-    // 修改post时间限制
-    data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
+    const {threadPostCommentList} = ctx.state.pageSettings;
+    // 文章页 获取评论 树状
+    if(from === "nkcAPI") {
+      q.parentPostId = pid;
+      const count = await db.PostModel.count(q);
+      const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
+      let parentPosts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+      const pids = new Set();
+      parentPosts.map(p => {
+        pids.add(p.pid);
+      });
+      delete q.parentPostId;
+      q.parentPostsId = {$in: [...pids]};
+      let posts = await db.PostModel.find(q);
+      posts = posts.concat(parentPosts);
+      posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+      const postsObj = {};
+      posts = posts.map(post => {
+        post.posts = [];
+        post.parentPost = "";
+        postsObj[post.pid] = post;
+        return post;
+      });
+      const topPosts = [];
+
+      for(const post of posts) {
+        post.url = await db.PostModel.getUrl(post);
+        if(post.parentPostId === pid) {
+          post.parentPost = {
+            user: data.post.user,
+            pid: data.post.pid,
+            uid: data.post.uid,
+            tid: data.post.tid
+          };
+          topPosts.push(post);
+          continue;
+        }
+        const parent = postsObj[post.parentPostId];
+        if(parent) {
+          post.parentPost = {
+            user: parent.user,
+            pid: parent.pid,
+            uid: parent.uid,
+            tid: parent.tid
+          };
+          parent.posts.push(post);
+        }
+      }
+      data.posts = topPosts;
+      data.paging = paging;
+      const template = Path.resolve("./pages/thread/comments.pug");
+      data.html = nkcModules.render(template, data, ctx.state);
+    } else {
+      q.parentPostsId = pid;
+      // 回复详情页 获取评论 平面
+      const count = await db.PostModel.count(q);
+      const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
+      let posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+      posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+      const parentPostsId = new Set();
+      posts.map(post => {
+        parentPostsId.add(post.parentPostId);
+      });
+      // 拓展上级post
+      let parentPosts = await db.PostModel.find({pid: {$in: [...parentPostsId]}});
+      const postsObj = {};
+      parentPosts = await db.PostModel.extendPosts(parentPosts, {uid: data.user? data.user.uid: ""});
+      parentPosts.map(p => {
+        postsObj[p.pid] = p;
+      });
+      posts.map(post => {
+        post.parentPost = postsObj[post.parentPostId];
+      });
+      data.posts = posts;
+      data.paging = paging;
+    }
     await next();
   })
   .patch('/:pid', async (ctx, next) => {

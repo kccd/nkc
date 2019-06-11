@@ -10,6 +10,7 @@ module.exports = {
     searchThreadList: 30,
     searchPostList: 30,
     searchAllList: 30,
-    searchUserList: 30
+    searchUserList: 30,
+    threadPostCommentList: 30
   }
 };

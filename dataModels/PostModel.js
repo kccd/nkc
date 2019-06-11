@@ -806,6 +806,48 @@ postSchema.statics.newPost = async (options) => {
   return _post
 };
 
+/*
+* 获取回复或评论的url
+* @param {String} pid 评论、回复的ID或对象
+* @return {String} 不带域名的url
+* @author pengxiguaa 2019-6-11
+* */
+postSchema.statics.getUrl = async function(pid) {
+  const PostModel = mongoose.model('posts');
+  const SettingModel = mongoose.model("settings");
+  const pageSettings = await SettingModel.findOnly({_id: "page"});
+
+  let post;
+
+  if(pid instanceof String) {
+    post = await PostModel.findOnly({pid});
+  } else {
+    post = pid;
+  }
+
+  const isComment = post.parentPostsId.length !== 0;
+  let posts, perpage;
+  if(!isComment) {
+    perpage = pageSettings.c.threadPostList;
+    posts = await PostModel.find({tid: post.tid}, {pid: 1, _id: 0}).sort({toc: 1});
+  } else {
+    perpage = pageSettings.c.threadPostCommentList;
+    posts = await PostModel.find({parentPostsId: post.parentPostsId[0]}).sort({toc: 1});
+  }
+  let page;
+  for(let i = 0; i < posts.length; i++) {
+    if(posts[i].pid !== post.pid) continue;
+    page = Math.ceil((i+1)/perpage) - 1;
+    if(page < 0) page = 0;
+    break;
+  }
+  if(!isComment) {
+    return `/t/${post.tid}?page=${page}&highlight=${post.pid}#${post.pid}`;
+  } else {
+    return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}#${post.pid}`;
+  }
+};
+
 
 /*
 * 发表回复，包含楼中楼

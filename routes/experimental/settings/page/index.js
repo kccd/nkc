@@ -12,8 +12,9 @@ router
 		const {pageSettings} = body;
     let {
       homeThreadList, searchPostList, searchAllList, userCardThreadList, threadPostList, forumThreadList,
-      userCardUserList, forumUserList, searchThreadList, searchUserList
+      userCardUserList, forumUserList, searchThreadList, searchUserList, threadPostCommentList
     } = pageSettings;
+    threadPostCommentList = parseInt(threadPostCommentList);
     homeThreadList = parseInt(homeThreadList);
     searchPostList = parseInt(searchPostList);
     searchAllList = parseInt(searchAllList);
@@ -29,6 +30,7 @@ router
         homeThreadList,
         userCardThreadList,
         userCardUserList,
+        threadPostCommentList,
         searchThreadList,
         searchPostList,
         searchAllList,
