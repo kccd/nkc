@@ -83,7 +83,7 @@ block content
                   a.options-fa(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
                     span.fa.fa-map-marker(style='margin-left: 2px;') &nbsp;IP
             span 发表于《
-            a(href=`/t/${post.tid}` target='_blank').thread-title= post.thread.firstPost.t
+            a(href=`/t/${post.tid}` ).thread-title= post.thread.firstPost.t
             | 》
           if post.t
             div.ThreadTitle= post.t
@@ -108,9 +108,33 @@ block content
                     a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
           if post.disabled && disablePost
             a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
-        button.btn.btn-default(onclick=`window.location.href="/t/${data.thread.tid}?page=${data.step.page}&step=${data.step.step}&pid=${data.post.pid}"`) 回复
-        button.btn.btn-default(onclick=`window.location.href="${data.postUrl}"`) 查看上下文
+          .m-t-1.m-b-1
+            //button.btn.btn-default.btn-sm(onclick=`window.location.href=" /t/${data.thread.tid}?page=${data.step.page}&step=${data.step.step}&pid=${data.post.pid}"`) 回复
+            //button.btn.btn-default.btn-sm(onclick=`window.location.href="${data.postUrl}"`) 查看上下文
+            a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 回复
+            -let editPost = post;
+            include ../thread/options/toEdit
+          div(class=`edit_${post.pid}_container`)
 
+          include ../publicModules/paging/paging
+          .post-comments-div
+          -let comments = data.posts
+          include ../thread/comments
+          //for comment in data.posts
+            .post-comments
+              .post-comment
+                a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
+                  img(src=`/avatar/${comment.uid}`)
+                  spa=comment.user.username
+                if comment.parentPost
+                  span.m-l-1.m-r-1 回复
+                  a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank")
+                    img(src=`/avatar/${comment.parentPost.user.uid}`)
+                    spa=comment.parentPost.user.username
+                .post-comment-time=fromNow(comment.toc)
+                -comment.c = hideContentByUser(comment.c, data.user, 'thread')
+                .post-comment-content!=experimental_render(comment)
+          include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
         .nkcpanel.post-share.fullwidthpanel
           .pid=`文号 / ${post.pid}`
@@ -138,9 +162,11 @@ block content
                   img(src=`/avatar/${u.uid}`)
 block scripts
 
-  script(src=`/module_dropdown.js?v=${global.NKC.startTime}`)
-  script(src=`/post_to_recycle.js?v=${global.NKC.startTime}`)
-  script(src=`/thread_to_recycle.js?v=${global.NKC.startTime}`)
+  +includeJS(`/module_dropdown.js`)
+  +includeJS(`/post_to_recycle.js`)
+  +includeJS(`/thread_to_recycle.js`)
+  +includeJS(`/thread/comments.js`)
+  include ../ueditor/ueditor
   script.
     var preview = new Preview({
         imgWrap: 'wrap' // 指定该容器里的图片点击预览

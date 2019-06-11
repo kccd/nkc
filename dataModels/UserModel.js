@@ -1160,6 +1160,33 @@ userSchema.statics.checkUserBaseInfo = async function(uid) {
 };
 
 /*
+* 获取用户能修改post的最大时间
+* @param {String/Object} uid 用户ID或用户对象
+* @return {Number} 最大时间（-1为不限制）
+* @author pengxiguaa 2019-6-10
+* */
+userSchema.statics.getModifyPostTimeLimit = async (uid) => {
+  if(!uid) return 0;
+  let user;
+  if(uid instanceof String) {
+    user = await mongoose.model("users").findById(uid);
+  } else {
+    user = uid;
+  }
+  if(!user.roles) await user.extendRoles();
+  if(!user.grade) await user.extendGrade();
+  let modifyPostTimeLimit = 0;
+  for(const role of user.roles) {
+    if(role.modifyPostTimeLimit === -1) {
+      return -1;
+    } else if(role.modifyPostTimeLimit > modifyPostTimeLimit) {
+      modifyPostTimeLimit = role.modifyPostTimeLimit;
+    }
+  }
+  return modifyPostTimeLimit;
+};
+
+/*
 * 判断用户发表的文章或回复是否需要审核
 * @param {String} uid 用户ID
 * @param {String} type 内容类型 post: 回复，thread: 文章
@@ -1277,7 +1304,7 @@ userSchema.statics.publishingCheck = async (user) => {
   if(todayThreadCount >= postToForumCountLimit) throwErr(400, `您当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章，请明天再试。`);
   const latestThread = await ThreadModel.findOne({uid: user.uid, toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
   if(latestThread) throwErr(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
-}
+};
 
 
 module.exports = mongoose.model('users', userSchema);

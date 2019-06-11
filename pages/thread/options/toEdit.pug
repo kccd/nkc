@@ -1,0 +1,3 @@
+if data.modifyPostTimeLimit === -1 || (data.modifyPostTimeLimit*60*60*1000 >= Date.now() - editPost.toc)
+  if (data.user && data.user.uid === editPost.uid) || (data.isModerator && permission('modifyOtherPosts'))
+    a.m-r-1(href=`/editor?ver=ue&type=post&id=${editPost.pid}`) 编辑

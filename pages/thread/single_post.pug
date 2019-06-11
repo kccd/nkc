@@ -1,5 +1,5 @@
 if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
-  div.single-post(style=(post.pid === highlight?'background-color: #fffbdd;padding: 0.5rem;border-radius: 5px;':''))
+  div.single-post(class=post.pid===highlight?"highlight-dom":"")
     if previousPost
       // 获取前一条post当天日期零点的时间戳
       -let prepostTimeStamp = new Date(previousPost.toc)
@@ -87,10 +87,13 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
           a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
 
         //- 评论输入框 暂且只有作者能够首先发起评论，之后该条回复的用户才能接着评论
-        button(onclick=`postComment('${post.tid}', '${post.pid}')`) 评论
-        if post.postCount > 0
-          button(onclick=`viewPostComments('${post.pid}')`) 查看评论
-          button(onclick=`hidePostComments('${post.pid}')`) 收起评论
-        div(class=`edit_${post.pid}_container`)
-        .post-comments-div(id=`post_comments_${post.pid}`)
+        div
+          a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 回复
+          if post.postCount > 0
+            a.pointer(onclick=`viewPostComments('${post.pid}')` class=`show_comments_button_${post.pid}`) 查看回复
+            a.pointer(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`) 折叠回复
+          div(class=`edit_${post.pid}_container`)
+          .post-comments-div(id=`post_comments_${post.pid}`)
+          a.pointer(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`) 折叠回复
+
 

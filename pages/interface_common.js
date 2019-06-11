@@ -921,8 +921,15 @@ $(function () {
     });
   }
 
+  var highlightDom = $(".highlight-dom");
+  highlightDom.css("background-color", "rgba(255, 251, 221, 1)");
+  var colorValue = 1;
 
-
+  var colorTimeout = setInterval(function() {
+    colorValue -= 0.1;
+    if(colorValue < 0) clearInterval(colorTimeout);
+    highlightDom.css("background-color", "rgba(255, 251, 221, "+colorValue+")");
+  }, 1000)
 });
 
 

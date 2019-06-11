@@ -3205,7 +3205,29 @@ img.emoji {
   padding-right: 0;
   margin: 0.5rem 0;
   border: 1px solid #d9e1e8;
+}
+.highlight-dom{
+  background-color: rgba(255, 251, 221, 1);
+}
+.post-comment{
+  margin-bottom: 1rem;
+}
+.post-comment.disabled{
+  background-color: #ddd;
+  padding: 0.5rem;
+}
+.post-comment.toDraft{
+  background-color: #ddd;
+  padding: 0.5rem;
+}
+.post-comment:last-child{
+  margin-bottom: 0;
+}
+.post-comments.border-right-none{
   border-right: none;
+}
+.post-comment-content{
+  margin-top: 0.5rem;
 }
 .post-comments-div>.post-comments{
   border-right: 1px solid  #d9e1e8;

@@ -5,6 +5,7 @@ router
   .get("/", async (ctx, next) => {
     const {nkcModules, db, data, params} = ctx;
     const {pid} = params;
+    data.post = await db.PostModel.findOnly({pid});
     let comments = await db.PostModel.find({
       parentPostsId: pid
     }, {
@@ -17,7 +18,7 @@ router
       if(p.parentPostId !== pid) pidArr.add(p.parentPostId);
     }
     let posts = await db.PostModel.find({pid: {$in: [...pidArr]}});
-    posts = await db.PostModel.extendPosts(posts);
+    posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
     const postsObj = {};
     posts = posts.map(post => {
       post.posts = [];
@@ -36,12 +37,17 @@ router
       }
       const parent = postsObj[post.parentPostId];
       if(parent) {
-        post.parentPostUser = parent.user;
+        post.parentPost = {
+          user: parent.user,
+          pid: parent.pid,
+          uid: parent.uid,
+          tid: parent.tid
+        };
         parent.posts.push(post);
       }
-
     }
     data.posts = topPosts;
+    data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
     const template = Path.resolve("./pages/thread/comments.pug");
     data.html = nkcModules.render(template, data, ctx.state);
     await next();

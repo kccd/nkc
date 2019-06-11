@@ -2,19 +2,36 @@ mixin renderComments(comments)
   if comments && comments.length > 0
     .post-comments
       for comment in comments
-        .post-comment
+        if !comment.reviewed
+          -let reviewData = {reviewPid: comment.pid, reviewType: "post"}
+          include ../publicModules/module_review
+        .post-comment(class=comment.disabled?"disabled":"")
           a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
             img(src=`/avatar/${comment.uid}`)
             spa=comment.user.username
-          .post-comment-time=fromNow(comment.toc)
-          if comment.parentPostUser
+          if comment.parentPost
             span.m-l-1.m-r-1 回复
-            a.display-i-b.post-comment-user(href=`/u/${comment.parentPostUser.uid}` target="_blank")
-              img(src=`/avatar/${comment.parentPostUser.uid}`)
-              spa=comment.parentPostUser.username
+            a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank")
+              img(src=`/avatar/${comment.parentPost.user.uid}`)
+              spa=comment.parentPost.user.username
+          .post-comment-time=fromNow(comment.toc)
           -comment.c = hideContentByUser(comment.c, data.user, 'thread')
           .post-comment-content!=experimental_render(comment)
-          button(onclick=`postComment('${comment.tid}', '${comment.pid}')`) 评论
+          div
+            if comment.disabled && comment.toDraft
+              a.m-r-1(href=`/editor?ver=ue&type=post&id=${comment.pid}`) 回复已被退修，点击修改
+            if comment.disabled
+              a(href=`javascript:enablePost('${comment.pid}')`) 回复已被屏蔽，点击解除
+
+          div
+            -const votePost = comment;
+            include ../module_vote
+            a.pointer.m-r-05(onclick=`postComment('${comment.tid}', '${comment.pid}')`) 回复
+            -let editPost = comment;
+            include ./options/toEdit
+            -let disabledPost = comment;
+            include ./options/disabled
           div(class=`edit_${comment.pid}_container`)
           +renderComments(comment.posts)
 +renderComments(data.posts)
+

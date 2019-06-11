@@ -438,6 +438,7 @@ threadSchema.methods.updateThreadMessage = async function() {
   const oc = await PostModel.findOne({tid: thread.tid}).sort({toc: 1});
   const lm = await PostModel.findOne({
     tid: thread.tid, disabled: false,
+    parentPostId: "",
     $or: [
       {
         reviewed: true
@@ -587,7 +588,6 @@ threadSchema.methods.newPost = async function(post) {
       if(quPost.uid === this.uid) {
         _post.hasQuote = true;
       }
-
     }
   }
   await this.update({lm: pid});

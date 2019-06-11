@@ -494,7 +494,9 @@ threadRouter
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		const _post = await thread.newPost(post, user, ip);
+		post.uid = user.uid;
+		post.ip = ctx.address;
+		const _post = await thread.newPost(post);
 
     // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
     const needReview = await db.UserModel.contentNeedReview(user.uid, "post");

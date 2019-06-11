@@ -12,8 +12,8 @@ const router = new Router();
 
 router
   .get('/:pid', async (ctx, next) => {
-    const {data, db, query} = ctx;
-		const {token} = query;
+    const {nkcModules, data, db, query} = ctx;
+		const {token, page=0} = query;
     const {pid} = ctx.params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
@@ -85,7 +85,7 @@ router
 		// 拓展其他信息
     await post.extendUser();
     await post.extendResources();
-    const posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
+    let posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
     data.post = posts[0];
     const voteUp = await db.PostsVoteModel.find({pid, type: 'up'}).sort({toc: 1});
     const uid = new Set();
@@ -116,6 +116,43 @@ router
     data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
     data.thread = thread;
     ctx.template = 'post/post.pug';
+
+    // 获取评论
+    const q = {
+      parentPostsId: pid,
+      disabled: false
+    };
+    // 判断是否有权限查看被屏蔽的post
+    if(ctx.permission("disabledPost")) {
+      delete q.disabled;
+    }
+    // 判断是否有权限查看未审核的post
+    if(!data.user || (!isModerator && data.user.uid !== thread.uid)) {
+      q.reviewed = true;
+    }
+    // 拓展回复
+    const count = await db.PostModel.count(q);
+    const paging = nkcModules.apiFunction.paging(page, count);
+    posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+    posts = await db.PostModel.extendPosts(posts);
+    const parentPostsId = new Set();
+    posts.map(post => {
+      parentPostsId.add(post.parentPostId);
+    });
+    // 拓展上级post
+    let parentPosts = await db.PostModel.find({pid: {$in: [...parentPostsId]}});
+    const postsObj = {};
+    parentPosts = await db.PostModel.extendPosts(parentPosts);
+    parentPosts.map(p => {
+      postsObj[p.pid] = p;
+    });
+    posts.map(post => {
+      post.parentPost = postsObj[post.parentPostId];
+    });
+    data.posts = posts;
+    data.paging = paging;
+    // 修改post时间限制
+    data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
