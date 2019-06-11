@@ -392,11 +392,15 @@ shopGoodsSchema.methods.onshelf = async function() {
   const ShopGoodsModel = mongoose.model("shopGoods");
   const tools = require("../tools");
   const settings = require("../settings");
-  const thread = await ThreadModel.publishArticle(threadInfo);
-  const {tid, oc} = thread;
+  threadInfo.t = threadInfo.title;
+  threadInfo.c = threadInfo.content;
+  threadInfo.type = "product";
+  const post = await ThreadModel.postNewThread(threadInfo);
+  // const thread = await ThreadModel.publishArticle(threadInfo);
+  const {tid, pid} = post;
   await ShopGoodsModel.update({productId}, {$set: {
     tid,
-    oc,
+    oc: pid,
     productStatus: "insale",
     threadInfo: ""
   }});

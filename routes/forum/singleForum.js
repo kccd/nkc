@@ -33,16 +33,18 @@ router
 	  const {user} = data;
 	  const {post} = body;
 		const {c, t, fids, cids, cat, mid} = post;
-		post.title = post.t;
-		post.content = post.c;
-		post.uid = user.uid;
-		post.ip = ip;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(t === '') ctx.throw(400, '标题不能为空！');
 		if(fids.length == 0) ctx.throw(400, "请至少选择一个专业");
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
-		const _post = await db.ThreadModel.postNewThread(post);
+		let options = post;
+		options.uid = user.uid;
+		options.title = post.t;
+		options.content = post.c;
+		options.type = "article";
+		options.ip = ip;
+		const _post = await db.ThreadModel.postNewThread(options);
 		
 		// 根据thread生成封面图
 		const thread = await db.ThreadModel.findOne({tid: _post.tid});
