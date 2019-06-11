@@ -985,24 +985,24 @@ forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
         parentForum.son.push(forum);
       }
     }
-    if(forum.childrenForums.length == 0) {
-      for(const cate of threadTypes) {
-        if(cate.fid == forum.fid) {
-          forum.son.push({
-            id: "c"+cate.cid,
-            name: cate.name,
-            son:[]
-          })
-        }
+    for(const cate of threadTypes) {
+      if(cate.fid == forum.fid) {
+        forum.son.push({
+          id: "c"+cate.cid,
+          name: cate.name,
+          son:[]
+        })
       }
     }
-    // if(forum.childrenForums.length == 0) {
-    //   forum.son.push({
-    //     id: "",
-    //     name: "不分类",
-    //     son: []
-    //   })
-    // }
+  }
+  for(let forum of forums) {
+    if(forum.childrenForums.length == 0) {
+      forum.son.push({
+        id: "",
+        name: "不分类",
+        son: []
+      })
+    }
   }
   // 我关注的
   const mySubForums = {
@@ -1058,22 +1058,70 @@ forumSchema.statics.getUserSubForums = async (uid, fid) => {
 /**
  * 判断专业发表权限，是否允许在此专业下发表文章
  * @param {Array} fids 专业id数组
- * @param {String} fid 专业id
  * @param {Object} data
  */
-forumSchema.statics.publishPermission = async (data, fids, fid) => {
+forumSchema.statics.publishPermission = async (data, fids) => {
   const ForumModel = mongoose.model("forums");
   const {userRoles, userGrade, user} = data;
-  const forum = await ForumModel.findOnly({fid});
   const forums = await ForumModel.find({fid: {$in: fids}});
-  forums.push(forum);
   for(const f of forums) {
     await f.ensurePermission(userRoles, userGrade, user);
-  }
-  const childrenForums = await forum.extendChildrenForums();
-  if(childrenForums.length !== 0) {
-    throwErr(400, "该专业下存在其他专业，请到下属专业发表文章");
+    let childrenForums = await f.extendChildrenForums();
+    if(childrenForums.length !== 0) {
+      throwErr(400, "该专业下存在其他专业，请到下属专业发表文章");
+    }
   }
 }
 
+/**
+ * -------
+ * 生成一条新的thread
+ * -------
+ * @description ：使用该方法可新生成一条新的thread，并调用newPost方法生成firstPost。
+ * 
+ * @param {Object} options 
+ * @参数说明 options对象中必要参数
+ * | uid   --  用户ID
+ * | fids  --  目标专业的fid数组集合，不可为空
+ * | 其余未作说明的参数为非必要
+ * 
+ * @return {Object} _post 返回一个包含pid、tid等的post，便于后续的业务逻辑中使用
+ * 
+ * @author Kris 2019-06-10
+ */
+forumSchema.statics.createNewThread = async function(options) {
+  if(!options.uid) throwErr(400, "uid不可为空");
+  if(!options.fids || options.fids.length == 0) throwErr(400, "目标专业fids不可为空");
+  const SettingModel = mongoose.model('settings');
+  const ThreadModel = mongoose.model('threads');
+  const ForumModel = mongoose.model('forums');
+  const tid = await SettingModel.operateSystemID('threads', 1);
+  const t = {
+    tid,
+    categoriesId: options.cids,
+    mainForumsId: options.fids,
+    mid: options.uid,
+    uid: options.uid,
+    type: options.type
+  };
+  // 专栏相关，暂时保留，并不启用
+  // --------
+  // if(toMid && toMid !== data.user.uid) {
+  //   const targetPF = await PersonalForumModel.findOnly({uid: toMid});
+  //   if(targetPF.moderators.indexOf(data.user.uid) > -1)
+  //     t.toMid = toMid;
+  //   else
+  //     throw (new Error("only personal forum's moderator is able to post"))
+  // }
+  // --------
+  const thread = await new ThreadModel(t).save();
+  const _post = await thread.createNewPost(options);
+  await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
+  await ForumModel.updateMany({fid: {$in: options.fids}}, {$inc: {
+    'tCount.normal': 1,
+    'countPosts': 1,
+    'countThreads': 1
+  }});
+  return _post;
+};
 module.exports = mongoose.model('forums', forumSchema);

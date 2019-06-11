@@ -69,11 +69,22 @@ schema.statics.getUserSubUid = async (uid) => {
 };
 
 /**
- * 自动关注专业
- * @param {String} uid 用户id
- * @param {Array} fids 专业fid数组
+ * -------
+ * 关注专业
+ * -------
+ * @param {Object} options 
+ * @参数说明 options对象中必要参数
+ * | uid   --  用户ID
+ * | fids  --  目标专业的fid数组集合，不可为空
+ * | 其余未作说明的参数为非必要
+ * 
+ * @return 无返回
+ * 
+ * @author Kris 2019-06-10
  */
-schema.statics.autoAttentionForum = async function(uid, fids) {
+schema.statics.autoAttentionForum = async function(options) {
+  const {uid, fids} = options
+  if(!uid) throwErr(400, "该操作uid不可为空")
   let SubscribeModel = mongoose.model("subscribes");
   let SettingModel = mongoose.model("settings");
   for(let scr of fids) {
