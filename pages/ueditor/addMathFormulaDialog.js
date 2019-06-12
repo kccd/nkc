@@ -2,13 +2,13 @@ UE.registerUI('mathFormula',function(editor,uiName){
     // 获取屏幕分辨率 根据分辨率调节公式输入框的宽度
     var wiw = window.innerWidth;
     var dialogCSS = "width:600px;height:350px;";
-    if(wiw < 743 && wiw > 640) {
+    if(wiw <= 743 && wiw > 640) {
         dialogCSS = "width:500px;height:350px;";
-    }else if(wiw < 640 && wiw > 480) {
+    }else if(wiw <= 640 && wiw > 480) {
         dialogCSS = "width:400px;height:350px;";
-    }else if(wiw < 480 && wiw > 360) {
+    }else if(wiw <= 480 && wiw > 360) {
         dialogCSS = "width:300px;height:350px;";
-    }else if(wiw < 360) {
+    }else if(wiw <= 360) {
         dialogCSS = "width:300px;height:350px;";
     }
     //创建mathFormulaDialog

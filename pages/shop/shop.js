@@ -186,7 +186,7 @@ function numToFloatTwo(str) {
 function banSale(productId) {
   var sureban = confirm("确定禁售该商品吗？");
   if(sureban) {
-    nkcAPI("/e/settings/shop/products/bansale", "PATCH", {productId:productId})
+    nkcAPI("/shop/product/"+productId+"/banSale", "PATCH", {productId:productId})
     .then(function(data) {
       screenTopAlert("禁售成功");
       window.location.reload();

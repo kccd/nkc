@@ -85,7 +85,7 @@ style.
     text-decoration: line-through;
   }
 .row
-  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts')) 
+  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('banSaleProductParams')) 
     if !product.adminBan
       .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
         button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
