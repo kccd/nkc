@@ -1435,7 +1435,7 @@ div.edui-box {
 
 /*link-dialog*/
 .edui-default .edui-for-link .edui-dialog-content {
-    width: 420px;
+    width: 350px;
     height: 200px;
     overflow: hidden;
 }
@@ -1882,8 +1882,8 @@ div.edui-box {
 }
 .edui-default .edui-for-emotion .edui-popup-content iframe
 {
-    width: 514px;
-    height: 380px;
+    width: 250px;
+    height: 250px;
     overflow: hidden;
 }
 .edui-default .edui-for-emotion .edui-popup-content
