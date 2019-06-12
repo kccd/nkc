@@ -343,7 +343,7 @@ function SelCity(obj, e) {
     var ismobile = IsPC();
     if(!ismobile) {
         $("#PoPy").css("left", "0")
-        $("._citys").css("width", document.body.scrollWidth)
+        $("._citys").css("width", window.outerWidth)
     }
     $("#cColse").click(function() {
         Iput.colse()

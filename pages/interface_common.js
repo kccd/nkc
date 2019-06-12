@@ -921,7 +921,12 @@ $(function () {
     });
   }
 
-  var highlightDom = $(".highlight-dom");
+  markDiv(".highlight-dom");
+
+});
+
+function markDiv(klass) {
+  var highlightDom = $(klass);
   highlightDom.css("background-color", "rgba(255, 251, 221, 1)");
   var colorValue = 2;
 
@@ -929,9 +934,15 @@ $(function () {
     colorValue -= 0.1;
     if(colorValue < 0) clearInterval(colorTimeout);
     highlightDom.css("background-color", "rgba(255, 251, 221, "+(colorValue<1?colorValue:1)+")");
-  }, 1000)
-});
+  }, 1000);
 
+  if(highlightDom.length) {
+    var top = highlightDom.offset().top;
+    setTimeout(function() {
+      $("html,body").animate({scrollTop: top-200}, 500)
+    }, 1000);
+  }
+}
 
 function openPostWarningDom(pid) {
   var dom = $("#module_post_warning");

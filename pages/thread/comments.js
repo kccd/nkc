@@ -1,14 +1,23 @@
 var editor = {};
 
-function postComment(tid, pid) {
+function postComment(tid, pid, firstInput) {
   var postContainer = $(".edit_"+pid+"_container");
+  if(!postContainer.length) return;
   if(postContainer.html()) {
-    return postContainer.show();
+    if(postContainer.is(":hidden")) {
+      return postContainer.show();
+    } else {
+      return postContainer.hide();
+    }
+
   }
-  var subBtn = $('<button class="btn btn-primary btn-sm" onclick="submitPostComment(\''+tid+'\', \''+pid+'\')">提交</button>');
-  var quitBtn = $('<button class="btn btn-default btn-sm m-r-05" onclick="closePostComment(\''+pid+'\')">取消</button>');
+  var subBtn = $('<button class="btn btn-primary btn-sm" onclick="submitPostComment(\''+tid+'\', \''+pid+'\', '+firstInput+')">提交</button>');
   var btnDiv = $("<div class='text-right m-t-05'></div>");
-  btnDiv.append(quitBtn, subBtn)
+  if(!firstInput) {
+    var quitBtn = $('<button class="btn btn-default btn-sm m-r-05" onclick="closePostComment(\''+pid+'\')">取消</button>');
+    btnDiv.append(quitBtn);
+  }
+  btnDiv.append(subBtn);
   var editDom = $("<div id='edit_"+pid+"' class='m-t-1 m-b-05'></div>");
   postContainer.append(editDom, btnDiv);
   editor[pid] = UE.getEditor('edit_' + pid, {
@@ -35,17 +44,34 @@ function closePostComment(pid) {
   $(".edit_"+pid+"_container").hide();
 }
 
-function submitPostComment(tid, pid) {
+function submitPostComment(tid, pid, firstInput) {
   var content = editor[pid].getContent();
   nkcAPI("/t/" + tid, "POST", {
+    postType: "comment",
     post: {
       c: content,
       l: "html",
       parentPostId: pid
     }
   })
-    .then(function() {
+    .then(function(data) {
+      var comment = data.comment;
+      var parentPost = comment.parentPost;
+      var html = data.html;
+      var postComments = $("#post_comments_div_" + parentPost.pid);
+      var postComment = $("#post_comment_" + parentPost.pid);
+      if(!postComments.length) {
+        if(!postComment.length) return;
+        /*postComments = $("<div class='post-comments' id='post_comments_div_"+parentPost.pid+"'></div>");
+        postComment.find(".edit_"+parentPost.pid+"_container").before(postComments);*/
+        postComments = $("<div class='post-comments' id='post_comments_div_"+parentPost.pid+"'></div>");
+        postComment.append(postComments);
+      }
+      postComments.append(html);
       screenTopAlert("评论成功");
+      if(!firstInput) closePostComment( pid);
+      markDiv("#post_comment_" + data.comment.pid);
+      editor[pid].execCommand('cleardoc');
     })
     .catch(function(data) {
       screenTopWarning(data);
@@ -54,20 +80,17 @@ function submitPostComment(tid, pid) {
 
 var comments = {};
 
-function viewPostComments(pid) {
+function viewPostComments(tid, pid) {
   var commentsDiv = $("#post_comments_" + pid);
   commentsDiv.show();
+  postComment(tid, pid, true);
   $(".show_comments_button_" + pid).hide();
   $(".hide_comments_button_" + pid).show();
-  if(comments[pid]) {
-    return;
-  }
   nkcAPI("/p/" + pid, "GET")
     .then(function(data) {
       var html = data.html;
-      if(!html) return;
+      comments[pid] = html?html:" ";
       commentsDiv.html(html);
-      comments[pid] = html;
     })
     .catch(function(data) {
       screenTopWarning(data);
@@ -77,5 +100,7 @@ function viewPostComments(pid) {
 function hidePostComments(pid) {
   $(".show_comments_button_" + pid).show();
   $(".hide_comments_button_" + pid).hide();
+  closePostComment(pid);
   $("#post_comments_" + pid).hide();
+
 }

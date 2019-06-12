@@ -173,7 +173,7 @@ const usersGeneralSchema = new Schema({
   displaySettings: {
 	  homeThreadList: {// subscribe, latest
       type: String,
-      default: "subscribe"
+      default: "latest"
     }
   }
 }, {

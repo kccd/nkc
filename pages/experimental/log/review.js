@@ -5,6 +5,8 @@ var app = new Vue({
     reviews: data.reviews
   },
   methods: {
+    format: NKC.methods.format,
+    fromNow: NKC.methods.fromNow,
     toCh: function(t) {
       return {
         "disabledPost": "删除",

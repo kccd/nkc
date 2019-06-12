@@ -32,9 +32,10 @@ block title
     link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
     +includeJS("/external_pkgs/imageToBig/preview.js")
 
-  mixin postOptions(post, targetThread, index)
-    .inline-block.highlight.post-options(style='float: right;margin-right: 0.5rem;color: #aaaaaa;')
-      .dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
+  mixin postOptions(post, targetThread, index, dropType)
+    -dropType = dropType || "dropdown";
+    .inline-block.post-options(style='margin-right: 0;color: #aaaaaa;' class=dropType)
+      div(class=`dropdown-toggle` data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
         span.fa.fa-sliders
         if targetThread
           span &nbsp;操作

@@ -245,15 +245,15 @@ router
             if(existUser) continue;
             existUser = true;
           }
-          const user = userObj[uid];
-          if(!user || user.certs.includes("banned")) continue;
-          await user.extendGrade();
-          await db.UserModel.extendUsersInfo([user]);
+          const u = userObj[uid];
+          if(!u || (u.certs.includes("banned") && !ctx.permission("bannedUser"))) continue;
+          await u.extendGrade();
+          await db.UserModel.extendUsersInfo([u]);
           r = {
             docType,
-            username: highlightObj[`${uid}_username`] || user.username,
-            description: highlightObj[`${uid}_description`] || user.description,
-            user
+            username: highlightObj[`${uid}_username`] || u.username,
+            description: highlightObj[`${uid}_description`] || u.description,
+            user: u
           };
         }
         data.results.push(r);

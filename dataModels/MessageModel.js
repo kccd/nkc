@@ -353,11 +353,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
     }
     if(r.c.post) {
       r.c.post = r.c.post.toObject();
-      const step = await ThreadModel.getPostStep(r.c.post.tid, {
-        pid: r.c.post.pid,
-        disabled: false
-      });
-      r.c.post.url = `/t/${r.c.post.tid}?page=${step.page}&highlight=${r.c.post.pid}#${r.c.post.pid}`;
+      r.c.post.url = await PostModel.getUrl(r.c.post);
       r.c.post.c = apiFunction.obtainPureText(r.c.post.c);
     }
     results.push(r);

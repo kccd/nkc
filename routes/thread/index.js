@@ -5,7 +5,7 @@ const homeTopRouter = require('./homeTop');
 const toppedRouter = require('./topped');
 const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
-
+const Path = require("path");
 
 threadRouter
 	.get('/', async (ctx, next) => {
@@ -492,11 +492,9 @@ threadRouter
 		data.forum = thread.forum;
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-		const {post} = body;
+		const {post, postType} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		post.uid = user.uid;
-		post.ip = ctx.address;
-		const _post = await thread.newPost(post);
+		const _post = await thread.newPost(post, user, ctx.address);
 
     // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
     const needReview = await db.UserModel.contentNeedReview(user.uid, "post");
@@ -544,6 +542,20 @@ threadRouter
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
 		await thread.updateThreadMessage();
+
+		// 发表评论 组装评论dom 返回给前端实时显示
+		if(postType === "comment") {
+      let comment = await db.PostModel.findOnly({pid: data.post.pid});
+      comment = (await db.PostModel.extendPosts([comment], {uid: data.user.uid}))[0];
+      if(comment.parentPostId) {
+        comment.parentPost = await db.PostModel.findOne({pid: comment.parentPostId});
+        comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost]))[0];
+      }
+      data.comment = comment;
+      const template = Path.resolve("./pages/thread/comment.pug");
+      data.html = nkcModules.render(template, data, ctx.state);
+    }
+
 		if(type === 'html') {
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}`)
@@ -564,7 +576,6 @@ threadRouter
       subQuery._id = await db.SettingModel.operateSystemID("subscribes", 1);
       await db.SubscribeModel(subQuery).save();
     }
-
     global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })

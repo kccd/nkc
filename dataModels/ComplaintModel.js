@@ -115,9 +115,10 @@ schema.statics.extendComplaints = async (complaints) => {
   users.map(user => {
     userObj[user.uid] = user;
   });
-  posts.map(post => {
+  for(let post of posts) {
+    post.url = await PostModel.getUrl(post);
     postObj[post.pid] = post;
-  });
+  }
   threads.map(thread => {
     threadObj[thread.tid] = thread;
   });

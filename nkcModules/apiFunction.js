@@ -531,4 +531,61 @@ fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
 	}
   return freightPrice;
 }
+
+/*
+* 获取分页按钮的数值
+* @param {Number} page 当前所在分页数
+* @param {Number} pageCount 总的分页数
+* @return {[Number]} 分页按钮数值，空元素表示省略
+* @author pengxiguaa 2019-6-12
+* */
+fn.getPagingButton= (paging) => {
+  const {page = 0, pageCount = 1} = paging;
+  const arr = [];
+  // 总页数不超过1 无需分页
+  if(pageCount <= 1) return arr;
+
+  let reduce1 = page - 3;
+  let reduce2 =  page + 3;
+
+  let max, min;
+
+  if(reduce1 > 0) {
+    if(reduce2 > pageCount) {
+      max = pageCount;
+      if(reduce1 - (reduce2 - pageCount) < 0) {
+        min = 0;
+      } else {
+        min = reduce1 - (reduce2 - pageCount);
+      }
+    } else {
+      max = reduce2;
+      min = reduce1;
+    }
+  } else {
+    min = 0;
+    if(reduce2 <pageCount) {
+      if(pageCount < (reduce2 - reduce1)) {
+        max = pageCount;
+      } else {
+        max = reduce2 - reduce1;
+      }
+    } else {
+      max = pageCount - 1;
+    }
+  }
+
+  if(min !== 0) {
+    arr.push(0);
+    if(min > 1) {
+      arr.push(null);
+    }
+  }
+  for(let i = 0; i < pageCount; i++) {
+    if(i > min && i <= max) {
+      arr.push(i);
+    }
+  }
+
+};
 module.exports = fn;

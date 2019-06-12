@@ -89,6 +89,7 @@ router
     await post.extendResources();
     let posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
     data.post = posts[0];
+    data.postUrl = await db.PostModel.getUrl(data.post);
     const voteUp = await db.PostsVoteModel.find({pid, type: 'up'}).sort({toc: 1});
     const uid = new Set();
     for(const v of voteUp) {
@@ -113,6 +114,8 @@ router
     data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
     data.thread = thread;
     ctx.template = 'post/post.pug';
+
+    if(data.user) data.complaintTypes = ctx.state.language.complaintTypes;
 
     const from = ctx.get("FROM");
 

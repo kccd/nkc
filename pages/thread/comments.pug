@@ -1,43 +1,7 @@
-mixin renderComments(comments)
-  if comments && comments.length > 0
-    .post-comments
-      for comment in comments
-        if !comment.reviewed
-          -let reviewData = {reviewPid: comment.pid, reviewType: "post"}
-          include ../publicModules/module_review
-        -let klass = [];
-        if comment.disabled
-          -klass.push("disabled");
-        if data.highlight === comment.pid
-          -klass.push("highlight-dom");
-        .post-comment(class=klass id=comment.pid)
-          div
-            a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
-              img(src=`/avatar/${comment.uid}?t=sm`)
-              spa=comment.user.username
-            if comment.parentPost
-              span.m-l-05.m-r-05 回复
-              a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank")
-                img(src=`/avatar/${comment.parentPost.user.uid}?t=sm`)
-                spa=comment.parentPost.user.username
-            .post-comment-time=fromNow(comment.toc)
-            if data.user
-              a.pointer.m-l-05.m-r-05(onclick=`postComment('${comment.tid}', '${comment.pid}')`) 回复评论
-            if comment.digest
-              span.fa.fa-star(style='color: #ffbf16;' title='精选')
-            include ../thread/postOptions
-            .display-i-b.pull-right
-              -const votePost = comment;
-              include ../module_vote
-          -comment.c = hideContentByUser(comment.c, data.user, 'thread')
-          .post-comment-content!=experimental_render(comment)
-          div
-            if comment.disabled && comment.toDraft
-              a.m-r-1(href=`/editor?ver=ue&type=post&id=${comment.pid}`) [此楼已被退修，点击修改]
-            if comment.disabled
-              a(href=`javascript:enablePost('${comment.pid}')`) [此楼已屏蔽，点击解除]
-
-          div(class=`edit_${comment.pid}_container`)
-          +renderComments(comment.posts)
-+renderComments(data.posts)
+mixin renderComments(comments, pid)
+  .post-comments(id=("post_comments_div_" + pid || ""))
+    for comment in comments
+      include ./comment
++renderComments(data.posts, data.post.pid)
+include ../publicModules/paging/paging
 

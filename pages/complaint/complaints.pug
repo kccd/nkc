@@ -29,7 +29,7 @@ block content
               .complaint-info 投诉了用户
               a.complaint-author(:href="'/u/' + c.content.uid" target="_blank") {{c.content.user.username}}
               .complaint-info 所发表的回复
-              a.complaint-link(:href="'/p/' + c.contentId" target="_blank") 查看
+              a.complaint-link(:href="c.content.url" target="_blank") 查看
             span(v-else-if="c.type === 'thread'")
               .complaint-info 投诉了用户
               a.complaint-author(:href="'/u/' + c.content.uid" target="_blank") {{c.content.firstPost.user.username}}

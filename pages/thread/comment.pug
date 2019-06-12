@@ -1,0 +1,44 @@
+if !comment
+  -comment = data.comment;
+if !comment.reviewed
+  -let reviewData = {reviewPid: comment.pid, reviewType: "post"}
+  include ../publicModules/module_review
+-let klass = [];
+if comment.disabled
+  -klass.push("disabled");
+if data.highlight === comment.pid
+  -klass.push("highlight-dom");
+.post-comment(class=klass id=`post_comment_${comment.pid}`)
+  div
+    a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
+      img(src=`/avatar/${comment.uid}?t=sm`)
+      span=comment.user.username
+    //-if data.post.uid === comment.uid
+      span (层主)
+    if comment.parentPost
+      span.m-l-05.m-r-05 回复
+      a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank")
+        //-img(src=`/avatar/${comment.parentPost.user.uid}?t=sm`)
+        span=comment.parentPost.user.username
+      //-if data.post.uid === comment.parentPost.uid
+        span (层主)
+    //-.post-comment-time=fromNow(comment.toc)
+    if data.user
+      a.comment-btn.pointer.m-l-05.m-r-05(onclick=`postComment('${comment.tid}', '${comment.pid}')`) 回评
+    include ../thread/postOptions
+    .display-i-b.pull-right
+      if comment.digest
+        span.fa.fa-star.m-r-05(style='color: #ffbf16;' title='精选')
+      -const votePost = comment;
+      include ../module_vote
+    -comment.c = hideContentByUser(comment.c, data.user, 'thread')
+    .post-comment-content!=experimental_render(comment)
+  div
+    if comment.disabled && comment.toDraft
+      a.m-r-1(href=`/editor?ver=ue&type=post&id=${comment.pid}`) [此楼已被退修，点击修改]
+    if comment.disabled
+      a(href=`javascript:enablePost('${comment.pid}')`) [此楼已屏蔽，点击解除]
+
+  div(class=`edit_${comment.pid}_container`)
+  if comment.posts && comment.posts.length
+    +renderComments(comment.posts, comment.pid)

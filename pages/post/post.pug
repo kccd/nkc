@@ -83,7 +83,7 @@ block content
                   a.options-fa(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
                     span.fa.fa-map-marker(style='margin-left: 2px;') &nbsp;IP
             span 发表于《
-            a(href=`/t/${post.tid}` ).thread-title= post.thread.firstPost.t
+            a(href=data.postUrl ).thread-title= post.thread.firstPost.t
             | 》
           if post.t
             div.ThreadTitle= post.t
@@ -149,6 +149,7 @@ block content
                   img(src=`/avatar/${u.uid}`)
 block scripts
 
+  include ../publicModules/complaint/complaint
   +includeJS(`/module_dropdown.js`)
   +includeJS(`/post_to_recycle.js`)
   +includeJS(`/thread_to_recycle.js`)

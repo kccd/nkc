@@ -40,6 +40,7 @@ const postSchema = new Schema({
   },
   l: {
     type: String,
+    default: "html",
     required: true
   },
   recUsers: {
@@ -844,7 +845,7 @@ postSchema.statics.getUrl = async function(pid) {
   if(!isComment) {
     return `/t/${post.tid}?page=${page}&highlight=${post.pid}#${post.pid}`;
   } else {
-    return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}#${post.pid}`;
+    return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}`;
   }
 };
 
