@@ -82,7 +82,7 @@ function autoHeight( index ) {
             parent = iframe.parentNode.parentNode;
     switch ( index ) {
         case 0:
-            iframe.style.height = "380px";
+            iframe.style.height = "250px";
             parent.style.height = "392px";
             break;
         case 1:
@@ -121,12 +121,12 @@ function createTab( tabName ) {
             tab = $G( tabName ), //获取将要生成的Div句柄
             imagePath = emotion.SmileyPath + emotion.imageFolders[tabName], //获取显示表情和预览表情的路径
             positionLine = 11 / 2, //中间数
-            iWidth = iHeight = 35, //图片长宽
+            iWidth = iHeight = 20, //图片长宽
             iColWidth = 3, //表格剩余空间的显示比例
             tableCss = emotion.imageCss[tabName],
             cssOffset = emotion.imageCssOffset[tabName],
             textHTML = ['<table class="smileytable">'],
-            i = 0, imgNum = emotion.SmileyBox[tabName].length, imgColNum = 11, faceImage,
+            i = 0, imgNum = emotion.SmileyBox[tabName].length, imgColNum = 8, faceImage,
             sUrl, realUrl, posflag, offset, infor;
     for ( ; i < imgNum; ) {
         textHTML.push( '<tr>' );

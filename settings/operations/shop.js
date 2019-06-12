@@ -8,6 +8,9 @@ module.exports = {
       GET: 'visitProductSingle',
       changePara: {
         PATCH: 'changeProductParams'
+      },
+      banSale: {
+        PATCH: 'banSaleProductParams'
       }
     }
   },

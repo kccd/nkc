@@ -401,6 +401,7 @@
     "getUserBanner": "app获取用户主页背景图",
     "modifyUserBanner": "app修改用户主页背景图",
     "APPgetLoginUserSubscribe": "app获取登录用户的关注",
-    "APPgetUserSubscribe": "app获取用户的关注"
+    "APPgetUserSubscribe": "app获取用户的关注",
+    "banSaleProductParams": "管理员禁售商品"
   }
 }

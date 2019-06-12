@@ -771,7 +771,6 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
       if(o.firstPostUser) {
-        console.log(firstPost)
         firstPost.user = usersObj[firstPost.uid];
       }
       thread.firstPost = firstPost;
