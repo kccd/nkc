@@ -25,7 +25,8 @@ router
         post = await db.PostModel.findOne({pid: postId});
         if(!post) continue;
         const step = await db.ThreadModel.getPostStep(thread.tid, {pid: post.pid});
-        log.link = `/t/${thread.tid}?page=${step.page}&highlight=${post.pid}#${post.pid}`;
+        // log.link = `/t/${thread.tid}?page=${step.page}&highlight=${post.pid}#${post.pid}`;
+        log.link = await db.PostModel.getUrl(post);
       }
       thread = (await db.ThreadModel.extendThreads([thread], {
         forum: false,

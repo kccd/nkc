@@ -5,7 +5,7 @@ const homeTopRouter = require('./homeTop');
 const toppedRouter = require('./topped');
 const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
-
+const Path = require("path");
 
 threadRouter
 	.get('/', async (ctx, next) => {
@@ -149,7 +149,10 @@ threadRouter
 		}
 		// 构建查询条件
 		const match = {
-			tid
+			tid,
+      parentPostsId: {
+			  $size: 0
+      }
 		};
 		// 只看作者
 		if(t === "author") {
@@ -244,7 +247,7 @@ threadRouter
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
 		// 添加给被退回的post加上标记
-		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
+		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid}, {postId: 1});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
 		data.posts.map(async post => {
 			const index = toDraftPostsId.indexOf(post.pid);
@@ -482,6 +485,7 @@ threadRouter
 
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
+		await thread.extendFirstPost();
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
 
 		data.thread = thread;
@@ -489,9 +493,12 @@ threadRouter
 		data.forum = thread.forum;
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-		const {post} = body;
+		const {post, postType} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		const _post = await thread.newPost(post, user, ip);
+		if(postType === "comment" && post.c.length > 1000) {
+      ctx.throw(400, "评论内容不能超过1000字符");
+    }
+		const _post = await thread.newPost(post, user, ctx.address);
 
     // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
     const needReview = await db.UserModel.contentNeedReview(user.uid, "post");
@@ -539,6 +546,23 @@ threadRouter
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
 		await thread.updateThreadMessage();
+
+		// 发表评论 组装评论dom 返回给前端实时显示
+		if(postType === "comment") {
+      let comment = await db.PostModel.findOnly({pid: data.post.pid});
+      comment = (await db.PostModel.extendPosts([comment], {uid: data.user.uid}))[0];
+      if(comment.parentPostId) {
+        comment.parentPost = await db.PostModel.findOnly({pid: comment.parentPostId});
+        data.level1Comment = comment.parentPost.parentPostId === "";
+        comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost]))[0];
+      }
+      // 修改post时间限制
+      data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
+      data.comment = comment;
+      const template = Path.resolve("./pages/thread/comment.pug");
+      data.html = nkcModules.render(template, data, ctx.state);
+    }
+
 		if(type === 'html') {
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}`)
@@ -559,7 +583,6 @@ threadRouter
       subQuery._id = await db.SettingModel.operateSystemID("subscribes", 1);
       await db.SubscribeModel(subQuery).save();
     }
-
     global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })

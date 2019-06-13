@@ -59,8 +59,8 @@ block content
                         span= targetUser.username
                     th= record.num/100
                     th
-                      if record.pid
-                        a(href=`/p/${record.pid}` target='_blank')=`文号（${record.pid}）`
+                      if record.post
+                        a(href=record.post.url target="_blank")=`文号（${record.pid}）`
                       if record.ordersId && record.ordersId.length !== 0
                         span=`订单号（${record.ordersId.join(', ')}）`
 
@@ -104,8 +104,8 @@ block content
                       if record.from === user.uid    
                         span= record.num/100
                     th
-                      if record.pid
-                        a(href=`/p/${record.pid}` target='_blank')=`文号（${record.pid}）`
+                      if record.post
+                        a(href=record.post.url target="_blank")=`文号（${record.pid}）`
                       if record.ordersId && record.ordersId.length !== 0
                         span=`订单号（${record.ordersId.join(', ')}）`
 

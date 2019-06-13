@@ -6,16 +6,24 @@ const {appCode} = aliAppCode;
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 let fn = {};
-fn.paging = (page, count, perpage) => {
-  if(page === undefined) page = 0;
+fn.paging = (page = 0, count, perpage) => {
   if(!perpage) perpage = defaultPerpage;
+  page = parseInt(page);
+  const pageCount = Math.ceil(count/perpage);
+  if(page >= pageCount) {
+    if(pageCount > 0) page = pageCount - 1;
+    else page = 0;
+  }
+  const buttonValue = fn.getPagingButton({page, pageCount});
+
   return {
-    page: parseInt(page),
-    perpage: perpage,
+    page,
+    perpage,
     start: page*perpage,
     count: perpage,
-    pageCount: Math.ceil(count/perpage),
-	  aggregate: count
+    pageCount,
+	  aggregate: count,
+    buttonValue
   }
 };
 
@@ -531,4 +539,85 @@ fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
 	}
   return freightPrice;
 }
+
+/*
+* 获取分页按钮的数值
+* @param {Number} page 当前所在分页数
+* @param {Number} pageCount 总的分页数
+* @return {[Number]} 分页按钮数值，空元素表示省略
+* @author pengxiguaa 2019-6-12
+* */
+fn.getPagingButton = (paging) => {
+  const {page = 0, pageCount = 1} = paging;
+  const arr = [];
+  // 总页数不超过1 无需分页
+  if(pageCount <= 1) return arr;
+
+  let reduce1 = page - 3;
+  let reduce2 =  page + 3;
+
+  let max, min;
+
+  if(reduce1 > 0) {
+    if(reduce2 > pageCount) {
+      max = pageCount;
+      if(reduce1 - (reduce2 - pageCount) < 0) {
+        min = 0;
+      } else {
+        min = reduce1 - (reduce2 - pageCount);
+      }
+    } else {
+      max = reduce2;
+      min = reduce1;
+    }
+  } else {
+    min = 0;
+    if(reduce2 <pageCount) {
+      if(pageCount < (reduce2 - reduce1)) {
+        max = pageCount;
+      } else {
+        max = reduce2 - reduce1;
+      }
+    } else {
+      max = pageCount - 1;
+    }
+  }
+
+  if(min !== 0) {
+    arr.push({
+      type: "common",
+      num: 0
+    });
+    if(min > 1) {
+      arr.push({
+        type: "null"
+      });
+    }
+  }
+  for(let i = 0; i < pageCount; i++) {
+    if(i >= min && i <= max) {
+      let type = "common";
+      if(page === i) {
+        type = "active";
+      }
+      arr.push({
+        type,
+        num: i
+      });
+    }
+  }
+  if(max < (pageCount - 1)) {
+    if(max < (pageCount -2)) {
+      arr.push({
+        type: "null"
+      });
+    }
+    arr.push({
+      type: "common",
+      num: pageCount - 1
+    })
+  }
+  return arr;
+};
+
 module.exports = fn;

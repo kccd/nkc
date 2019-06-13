@@ -49,14 +49,13 @@ router
       if(!thread) continue;
       const user = usersObj[post.uid];
       if(!user) continue;
-      const step = await db.ThreadModel.getPostStep(thread.tid, {pid: post.pid});
       let type, link;
       if(thread.oc === post.pid) {
         type = "thread";
         link = `/t/${thread.tid}`;
       } else {
         type = "post";
-        link = `/t/${thread.tid}?page=${step.page}&highlight=${post.pid}#${post.pid}`;
+        link = await db.PostModel.getUrl(post);
       }
       data.results.push({
         post,

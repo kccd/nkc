@@ -68,7 +68,8 @@ router
 
       if(thread.oc !== post.pid) {
         const step = await db.ThreadModel.getPostStep(tid, {pid});
-        log.link = `/t/${tid}?page=${step.page}&highlight=${pid}#${pid}`;
+        // log.link = `/t/${tid}?page=${step.page}&highlight=${pid}#${pid}`;
+        log.link = await db.PostModel.getUrl(pid);
       } else {
         log.link = `/t/${thread.tid}`;
       }

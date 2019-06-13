@@ -32,9 +32,10 @@ block title
     link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
     +includeJS("/external_pkgs/imageToBig/preview.js")
 
-  mixin postOptions(post, targetThread, index)
-    .inline-block.highlight.post-options(style='float: right;margin-right: 0.5rem;color: #aaaaaa;')
-      .dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
+  mixin postOptions(post, targetThread, index, dropType)
+    -dropType = dropType || "dropdown";
+    .inline-block.post-options(style='margin-right: 0;color: #aaaaaa;' class=dropType)
+      div(class=`dropdown-toggle` data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
         span.fa.fa-sliders
         if targetThread
           span &nbsp;操作
@@ -45,10 +46,16 @@ block title
             span.fa.fa-newspaper-o &nbsp;
             span 详情
         if postTo && !thread.closed
-          li
-            a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
-              span.fa.fa-comment-o &nbsp;
-              span 引用
+          if targetThread
+            li
+              a(href=`#container`)
+                span.fa.fa-comment-o &nbsp;
+                span 回复
+          else
+            li
+              a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
+                span.fa.fa-comment-o &nbsp;
+                span 回复
         if !thread.closed
           li
             a(href=`javascript:at('${post.user.username}')`)
@@ -198,7 +205,8 @@ block content
                         if data.isModerator && canManagement
                           a(href=`javascript:displayManagement();` style='text-decoration: none;float: right;')
                             .highlight.fa.fa-cog
-                        +postOptions(thread.firstPost, thread, 0)
+                        .pull-right.m-r-05
+                          +postOptions(thread.firstPost, thread, 0)
                       .inline-block(style='float: right;')
                         .highlight.fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false") &nbsp;分享
                         .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;width:90px;background:none')
@@ -620,6 +628,8 @@ block scripts
   +includeJS('/shop/shop.js')
   include ../publicModules/complaint/complaint
   include ../publicModules/crop/crop
+  include ../publicModules/moment
+  +includeJS("/thread/comments.js")
   //- +includeJS('/jquery/jquery.minicolors.js')
   //- link(href=`/jquery/jquery.minicolors.css?v=${global.NKC.startTime}` rel="stylesheet")
   if data.user

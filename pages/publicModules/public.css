@@ -1,6 +1,12 @@
+.display-n{
+  display: none;
+}
 /* margin-top */
 .m-l-05{
   margin-left: 0.5rem;
+}
+.m-b-05{
+  margin-bottom: 0.5rem;
 }
 .m-r-05{
   margin-right: 0.5rem;

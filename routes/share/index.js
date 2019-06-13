@@ -9,7 +9,12 @@ shareRouter
     const share = await db.ShareModel.findOne({token});
     if(!share) ctx.throw(403, '无效的token');
     const {kcbTotal, uid, tokenType} = share;
-    const shareUrl = share.shareUrl + '?token=' + token;
+    let shareUrl;
+    if(share.shareUrl.includes("?")) {
+      shareUrl = share.shareUrl + '&token=' + token;
+    } else {
+      shareUrl = share.shareUrl + '?token=' + token;
+    }
     await share.update({$inc: {hits: 1}});
     let shareAccessLog = await db.SharesAccessLogModel.findOne({token, ip: ctx.address});
     if(shareAccessLog) {

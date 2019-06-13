@@ -1,0 +1,23 @@
+if creditPost && creditPost.credits && creditPost.credits.length > 0
+  .nkcpanel.ThreadPostCredits
+    for c,index in creditPost.credits
+      -var username = c.fromUser.username
+      -var profile = '/u/'+c.from
+      .ThreadPostCreditItem
+        if c.type === "creditKcb"
+          -c.num = c.num/100;
+        span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
+        span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
+        span.TPCIA
+          a(href=`${profile}` style='text-decoration: none;')
+            img.TPCIAI(src=`/avatar_small/${c.fromUser.uid}`)
+            span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
+        span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
+        span.TPCReason #{c.description}
+        if c.type === 'xsf' && data.user && permission('cancelXsf')
+          a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${creditPost.pid}", ${c._id})`) 撤销
+        if c.type === 'creditKcb' && data.user && permission('modifyKcbRecordReason')
+          if !c.hideDescription
+            a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${creditPost.pid}", ${c._id}, true)`) 屏蔽
+          else
+            a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${creditPost.pid}", ${c._id}, false)`) 取消屏蔽

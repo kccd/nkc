@@ -7,17 +7,21 @@ const recommend = require('./recommend');
 const digestRouter = require('./digest');
 const voteRouter = require('./vote');
 const warningRouter = require("./warning");
-const postRouter = new Router();
+const postRouter = require("./post");
+const Path = require("path");
+const router = new Router();
 
-postRouter
+router
   .get('/:pid', async (ctx, next) => {
-    const {data, db, query} = ctx;
-		const {token} = query;
+    const {nkcModules, data, db, query} = ctx;
+		const {token, page=0, highlight} = query;
     const {pid} = ctx.params;
+    data.highlight = highlight;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
+    data.thread = thread;
     await thread.extendFirstPost();
-	  const forums = await thread.extendForums(['mianForums', 'minorForums']);
+	  const forums = await thread.extendForums(['mainForums', 'minorForums']);
     const {user} = data;
     let isModerator = ctx.permission('superModerator');
     if(!isModerator) {
@@ -84,8 +88,9 @@ postRouter
 		// 拓展其他信息
     await post.extendUser();
     await post.extendResources();
-    const posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
+    let posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
     data.post = posts[0];
+    data.postUrl = await db.PostModel.getUrl(data.post);
     const voteUp = await db.PostsVoteModel.find({pid, type: 'up'}).sort({toc: 1});
     const uid = new Set();
     for(const v of voteUp) {
@@ -101,12 +106,7 @@ postRouter
       data.voteUpUsers.push(usersObj [v.uid]);
     }
 
-    const step = await thread.getStep({
-      pid,
-      disabled: data.userOperationsId.includes('displayDisabledPosts')
-    });
-    data.step = step;
-    data.postUrl = `/t/${thread.tid}?highlight=${pid}&page=${step.page}#${pid}`;
+
     data.post.user = await db.UserModel.findOnly({uid: post.uid});
     await db.UserModel.extendUsersInfo([data.post.user]);
     await data.post.user.extendGrade();
@@ -115,6 +115,146 @@ postRouter
     data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
     data.thread = thread;
     ctx.template = 'post/post.pug';
+
+    if(data.user) data.complaintTypes = ctx.state.language.complaintTypes;
+
+    const from = ctx.get("FROM");
+
+    // 修改post时间限制
+    data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
+    // 获取评论
+    const q = {};
+    // 判断是否有权限查看未审核的post
+    if(data.user) {
+      if(!isModerator) {
+        q.$and = [
+          {
+            $or: [
+              {
+                reviewed: true
+              },
+              {
+                reviewed: false,
+                uid: data.user.uid
+              }
+            ]
+          },
+          {
+            $or: [
+              {
+                disabled: false,
+                toDraft: {$ne: true},
+              },
+              {
+                toDraft: true,
+                uid: data.user.uid
+              }
+            ]
+          }
+        ];
+      }
+    } else {
+      q.reviewed = true;
+      q.disabled = false;
+      q.toDraft = null;
+    }
+    const {threadPostCommentList} = ctx.state.pageSettings;
+    const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: data.post.tid}, {postId: 1, reason: 1});
+    const toDraftPostsId = toDraftPosts.map(post => post.postId);
+    // 文章页 获取评论 树状
+    if(from === "nkcAPI") {
+      q.parentPostId = pid;
+      const count = await db.PostModel.count(q);
+      const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
+      let parentPosts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+      const pids = new Set();
+      parentPosts.map(p => {
+        pids.add(p.pid);
+      });
+      delete q.parentPostId;
+      q.parentPostsId = {$in: [...pids]};
+      let posts = await db.PostModel.find(q).sort({toc: 1});
+      posts = posts.concat(parentPosts);
+      posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+      const postsObj = {};
+      posts = posts.map(post => {
+        const index = toDraftPostsId.indexOf(post.pid);
+        if(index !== -1) {
+          post.reason = toDraftPosts[index].reason;
+        }
+        post.posts = [];
+        post.parentPost = "";
+        postsObj[post.pid] = post;
+        return post;
+      });
+      const topPosts = [];
+
+      for(const post of posts) {
+        post.url = await db.PostModel.getUrl(post);
+        if(post.parentPostId === pid) {
+          post.parentPost = {
+            user: data.post.user,
+            pid: data.post.pid,
+            uid: data.post.uid,
+            tid: data.post.tid
+          };
+          topPosts.push(post);
+          continue;
+        }
+        let parent;
+        if(post.parentPostsId.length >= 5) {
+          // 限制层数 3
+          parent = postsObj[post.parentPostsId[4]];
+        } else {
+          parent = postsObj[post.parentPostId];
+        }
+        if(parent) {
+          post.parentPost = {
+            user: parent.user,
+            pid: parent.pid,
+            uid: parent.uid,
+            tid: parent.tid
+          };
+          parent.posts.push(post);
+        }
+      }
+      data.posts = topPosts;
+      data.paging = paging;
+      const template = Path.resolve("./pages/thread/comments.pug");
+      data.html = nkcModules.render(template, data, ctx.state);
+    } else {
+      q.parentPostsId = pid;
+      // 回复详情页 获取评论 平面
+      const count = await db.PostModel.count(q);
+      const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
+      let posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+      posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+      const parentPostsId = new Set();
+      await Promise.all(posts.map(async post => {
+        post.url = await db.PostModel.getUrl(post);
+        const index = toDraftPostsId.indexOf(post.pid);
+        if(index !== -1) {
+          post.reason = toDraftPosts[index].reason;
+        }
+        parentPostsId.add(post.parentPostId);
+      }));
+      // 拓展上级post
+      let parentPosts = await db.PostModel.find({pid: {$in: [...parentPostsId]}});
+      const postsObj = {};
+      parentPosts = await db.PostModel.extendPosts(parentPosts, {uid: data.user? data.user.uid: ""});
+      parentPosts.map(p => {
+        /*const index = toDraftPostsId.indexOf(post.pid);
+        if(index !== -1) {
+          post.reason = toDraftPosts[index].reason;
+        }*/
+        postsObj[p.pid] = p;
+      });
+      posts.map(post => {
+        post.parentPost = postsObj[post.parentPostId];
+      });
+      data.posts = posts;
+      data.paging = paging;
+    }
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
@@ -129,6 +269,7 @@ postRouter
 	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
+    if(targetPost.parentPostId && c.length > 1000) ctx.throw(400, "评论内容不能超过1000字节");
     const targetThread = await targetPost.extendThread();
     const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
@@ -235,7 +376,9 @@ postRouter
     let {page} = await targetThread.getStep({pid, disabled: q.disabled});
     let postId = `#${pid}`;
     page = `?page=${page}`;
-    data.redirect = `/t/${targetThread.tid}?&pid=${targetPost.pid}`;
+    const redirectUrl = await db.PostModel.getUrl(pid);
+    // data.redirect = `/t/${targetThread.tid}?&pid=${targetPost.pid}`;
+    data.redirect = redirectUrl;
     data.targetUser = targetUser;
     // 帖子再重新发表时，解除退回的封禁
     // 删除日志中modifyType改为true
@@ -262,5 +405,6 @@ postRouter
   .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())
   .use('/:pid/vote', voteRouter.routes(), voteRouter.allowedMethods())
   .use('/:pid/warning', warningRouter.routes(), warningRouter.allowedMethods())
-  .use('/:pid/quote', quote.routes(), quote.allowedMethods());
-module.exports = postRouter;
+  .use('/:pid/quote', quote.routes(), quote.allowedMethods())
+  .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods());
+module.exports = router;

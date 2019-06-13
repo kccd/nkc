@@ -571,6 +571,7 @@
   "experimentalReviewSettings": "后台管理-审核设置",
   "review": "审核发表的内容",
   "experimentalReviewLog": "后台管理-查看审核记录",
+  "banSaleProductParams": "禁售商品",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

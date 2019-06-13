@@ -1,5 +1,5 @@
 if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
-  div.single-post(style=(post.pid === highlight?'background-color: #fffbdd;padding: 0.5rem;border-radius: 5px;':''))
+  div.single-post(class=post.pid===highlight?"highlight-dom":"")
     if previousPost
       // 获取前一条post当天日期零点的时间戳
       -let prepostTimeStamp = new Date(previousPost.toc)
@@ -16,7 +16,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
     if !previousPost || (post.toc - previousPost.toc) > 24*60*60*1000
       div.single-post-time
         div=post.toc.toLocaleString()
-    .post-body(id= `${post.pid}` style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
+    .post-body( style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
       if !post.reviewed
         -let reviewData = {reviewPid: post.pid, reviewType: "post"}
         include ../publicModules/module_review
@@ -26,7 +26,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
       div
         .inline-block(style='margin-bottom: 0;')
           a(href=`/u/${post.uid}`)
-            img(src=`/avatar/${post.uid}` style='width: 25px; height: 25px;border-radius: 50%;margin-right: 0.5rem;margin-top: -3px;')
+            img(src=`/avatar/${post.uid}` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
             span= post.user.username
           -const targetUser = post.user;
           include ../user/module_user_grade_icon
@@ -38,56 +38,71 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         .inline-block(style='float: right;')
           -var floornumber = data.paging.start+index
           span.lighttext= floornumber + '楼'
-        if data.user
-          +postOptions(post, '',index)
-        .inline-block.post-qrcode
-          .fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
-          .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;background: none')
-            .ThreadTitle22(style="border: 1px solid #bababa;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background: #ffffff;")
-              div.changeDis(style='width: 100%;')
-                p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
-                .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
-                p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;")= post.pid
-                .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
-              div.changeDisNone.text-center(style='width: 100%;')
-                .col-xs-12.col-md-12
-                  .col-xs-3.col-md-3(style="padding:0px")
-                    a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                      img(src="/default/QQ.png" style="")
-                  .col-xs-3.col-md-3(style="padding:0px")
-                    a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                      img(src="/default/qzone.png" style="")
-                  .col-xs-3.col-md-3(style="padding:0px")
-                    a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                      img(src="/default/weibo.png" style="")
-                  .col-xs-3.col-md-3(style="padding:0px")
-                    a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                      img(src="/default/weChat.png" style="")
-                .col-xs-12.col-md-12
-                  a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`) 获取分享链接
-                .col-xs-12.col-md-12(id=`copyArea${post.pid}` style="display:none")
-                  input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
-                  button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
-                canvas.qrcode(id=post.pid+"Qrcode",data-pid=post.pid,style="display:none").inline-block
-        if addKcb && post.uid !== data.user.uid
-          .inline-block.post-qrcode
-            .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`)
-        .inline-block.post-thumbsUp
-          //- const recUsers = post.recUsers || [];
-          //if data.user && recUsers.includes(data.user.uid)
-          //  span(data-pid=post.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-          //else
-          //  span(data-pid=post.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-          -const votePost = post;
-          include ../module_vote
         .clearfix
         if(post.t && post.t !== '' && index !== 0)
           div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
         -post.c = hideContentByUser(post.c, data.user, 'thread')
-        div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
+        div.ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
         if post.toc.toLocaleString() !== post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-        +postCredits(post)
+        //+postCredits(post)
+        -let creditPost = post;
+        include ./postCredits
         if post.disabled && disablePost
           a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
 
+        //- 评论输入框 暂且只有作者能够首先发起评论，之后该条回复的用户才能接着评论
+        div
+          .single-post-options.text-right
+            if permission("quotePost") && !data.thread.close
+              span.pointer.m-r-05(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
+                span.fa.fa-comment-o &nbsp;
+                span 回复
+            if post.postCount > 0
+              span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论(${post.postCount})`
+            else if data.user
+              span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论`
+            span.pointer.m-r-05(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`
+            -const votePost = post;
+            include ../module_vote
+            if addKcb && post.uid !== data.user.uid
+              .inline-block.post-qrcode
+                .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`)
+            .inline-block.post-qrcode
+              .fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
+              .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;background: none')
+                .ThreadTitle22(style="border: 1px solid #bababa;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background: #ffffff;")
+                  div.changeDis(style='width: 100%;')
+                    p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
+                    .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
+                    p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;")= post.pid
+                    .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
+                  div.changeDisNone.text-center(style='width: 100%;')
+                    .col-xs-12.col-md-12
+                      .col-xs-3.col-md-3(style="padding:0px")
+                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+                          img(src="/default/QQ.png" style="")
+                      .col-xs-3.col-md-3(style="padding:0px")
+                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+                          img(src="/default/qzone.png" style="")
+                      .col-xs-3.col-md-3(style="padding:0px")
+                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+                          img(src="/default/weibo.png" style="")
+                      .col-xs-3.col-md-3(style="padding:0px")
+                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+                          img(src="/default/weChat.png" style="")
+                    .col-xs-12.col-md-12
+                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`) 获取分享链接
+                    .col-xs-12.col-md-12(id=`copyArea${post.pid}` style="display:none")
+                      input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
+                      button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
+                    canvas.qrcode(id=post.pid + "Qrcode",data-pid=post.pid,style="display:none").inline-block
+            if data.user
+              -let dropType = "dropup";
+              +postOptions(post, '',index, dropType)
+          .post-comments-div(id=`post_comments_${post.pid}`)
+            .text-center 加载评论中，请稍候...
+          if data.user
+            div(class=`edit_${post.pid}_container`)
+          .m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
+            span.fa.fa-angle-up

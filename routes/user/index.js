@@ -233,7 +233,9 @@ userRouter
             m.disabled = false;
           }
           const obj = await db.ThreadModel.getPostStep(thread.tid, m);
-          link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
+          const targetUrl = await db.PostModel.getUrl(post.pid);
+          // link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
+          link = targetUrl;
         }
         if(firstPost.t.length > 20) {
           firstPost.t = firstPost.t.slice(0, 20) + "...";

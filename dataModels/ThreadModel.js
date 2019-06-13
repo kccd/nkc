@@ -304,6 +304,9 @@ threadSchema.methods.extendUser = async function() {
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
   const throwError = require("../nkcMOdules/throwError");
+  if(!this.forums) {
+    await this.extendForums(["mainForums"]);
+  }
   for(const forum of this.forums) {
     try {
       await forum.ensurePermission(roles, grade, user);
@@ -435,6 +438,7 @@ threadSchema.methods.updateThreadMessage = async function() {
   const oc = await PostModel.findOne({tid: thread.tid}).sort({toc: 1});
   const lm = await PostModel.findOne({
     tid: thread.tid, disabled: false,
+    parentPostId: "",
     $or: [
       {
         reviewed: true
@@ -449,9 +453,9 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.toc = oc.toc;
   updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
-  updateObj.count = await PostModel.count({tid: thread.tid});
-  updateObj.countToday = await PostModel.count({tid: thread.tid, toc: {$gt: time}});
-  updateObj.countRemain = await PostModel.count({tid: thread.tid, disabled: {$ne: true}});
+  updateObj.count = await PostModel.count({tid: thread.tid, parentPostId: ""});
+  updateObj.countToday = await PostModel.count({tid: thread.tid, toc: {$gt: time}, parentPostId: ""});
+  updateObj.countRemain = await PostModel.count({tid: thread.tid, disabled: {$ne: true}, parentPostId: ""});
   updateObj.uid = oc.uid;
 
   const userCount = await PostModel.aggregate([
@@ -487,7 +491,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState, parentPostId} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
@@ -515,6 +519,14 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   if(quote && quote[2]) {
     rpid.push(quote[2]);
   }
+  let parentPostsId = [];
+  if(parentPostId) {
+    const parentPost = await PostModel.findOne({pid: parentPostId});
+    if(parentPost) {
+      parentPostsId = parentPost.parentPostsId.concat([parentPostId]);
+      await PostModel.updateMany({pid: {$in: parentPostsId}}, {$inc: {postCount: 1}});
+    }
+  }
   let _post = await new PostModel({
     pid,
     c,
@@ -531,6 +543,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     mainForumsId: this.mainForumsId,
     minorForumsId: this.minorForumsId,
     tid: this.tid,
+    parentPostsId,
+    parentPostId,
     uid: user.uid,
     uidlm: user.uid,
     rpid
@@ -573,7 +587,6 @@ threadSchema.methods.newPost = async function(post, user, ip) {
       if(quPost.uid === this.uid) {
         _post.hasQuote = true;
       }
-
     }
   }
   await this.update({lm: pid});
@@ -601,7 +614,8 @@ threadSchema.statics.getPostStep = async (tid, obj) => {
   const perpage = pageSettings.c.threadPostList;
   const pid = obj.pid;
   const q = {
-    tid
+    tid,
+    parentPostId: ""
   };
   if(obj.disabled === false) q.disabled = false;
   const posts = await PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});
