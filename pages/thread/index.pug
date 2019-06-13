@@ -504,7 +504,7 @@ block content
                               button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
                           .form-group(style="background-color:#fff;")
                             //- div#ReplyContent
-                            include ../ueditor/ueditor.pug
+                            script#container(name='content', type='text/plain')
                           .form-group
                           //- .nkcpanel(id='file-uploading' target='/r')
                           //-   //uploader section
@@ -630,6 +630,8 @@ block scripts
   include ../publicModules/crop/crop
   include ../publicModules/moment
   include ../ueditor/ueditorBase
+  +includeJS("/thread/initPostInput.js")
+  //include ../ueditor/ueditor.pug
   +includeJS("/thread/comments.js")
   //- +includeJS('/jquery/jquery.minicolors.js')
   //- link(href=`/jquery/jquery.minicolors.css?v=${global.NKC.startTime}` rel="stylesheet")
