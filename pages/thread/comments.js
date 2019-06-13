@@ -23,13 +23,16 @@ function postComment(tid, pid, firstInput) {
   btnDiv.append(subBtn);
   var editDom = $("<div id='edit_"+pid+"' class='m-t-1 m-b-05'></div>");
   editContainer.append(editDom, btnDiv);
+  if(editor[pid] && editor[pid].destroy) {
+    editor[pid].destroy();
+  }
   editor[pid] = UE.getEditor('edit_' + pid, {
     toolbars: [
       [
         'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', 'inserttable', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|'
       ]
     ],
-    maximumWords: 500, // 最大字符数
+    maximumWords: 200, // 最大字符数
     initialFrameHeight: 100, // 编辑器高度
     autoHeightEnabled:false, // 编辑器是否随着行数增加而自动长高
     scaleEnabled: false, // 是否允许拉长
