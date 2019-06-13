@@ -614,7 +614,8 @@ threadSchema.statics.getPostStep = async (tid, obj) => {
   const perpage = pageSettings.c.threadPostList;
   const pid = obj.pid;
   const q = {
-    tid
+    tid,
+    parentPostId: ""
   };
   if(obj.disabled === false) q.disabled = false;
   const posts = await PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});

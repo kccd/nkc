@@ -827,7 +827,7 @@ postSchema.statics.getUrl = async function(pid) {
   let posts, perpage;
   if(!isComment) {
     perpage = pageSettings.c.threadPostList;
-    posts = await PostModel.find({tid: post.tid}, {pid: 1, _id: 0}).sort({toc: 1});
+    posts = await PostModel.find({tid: post.tid, parentPostId: ""}, {pid: 1, _id: 0}).sort({toc: 1});
   } else {
     perpage = pageSettings.c.threadPostCommentList;
     posts = await PostModel.find({parentPostsId: post.parentPostsId[0]}).sort({toc: 1});

@@ -378,7 +378,7 @@ forumSchema.methods.updateForumMessage = async function() {
 	const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
 	let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}, parentPostId: ""});
 	countPosts = countPosts - countThreads;
-	const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true, parentPostId: ""});
+	const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
 	const normal = countThreads - digest;
 	const tCount = {
 		digest,
