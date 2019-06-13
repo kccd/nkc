@@ -72,6 +72,8 @@ if data.highlight === comment.pid
     if comment.disabled && permission("disabledPost")
       a(href=`javascript:enablePost('${comment.pid}')`) [此楼已屏蔽，点击解除]
 
-  div(class=`edit_${comment.pid}_container`)
+
+  include ./postEdit
+
   if comment.posts && comment.posts.length
     +renderComments(comment.posts, comment.pid)

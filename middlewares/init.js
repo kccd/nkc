@@ -56,13 +56,15 @@ module.exports = async (ctx, next) => {
 	  ctx.data.twemoji = settings.editor.twemoji;
 		ctx.data.getcode = false;
 	  // - 初始化网站设置
-    const webSettings = await db.SettingModel.find({_id: {$in: ['server', 'page']}});
-    let serverSettings, pageSettings;
+    const webSettings = await db.SettingModel.find({_id: {$in: ['server', 'page', 'post']}});
+    let serverSettings, pageSettings, postSettings;
     for(const s of webSettings) {
       if(s._id === "server") serverSettings = s.c;
       if(s._id === "page") pageSettings = s.c;
+      if(s._id === "post") postSettings = s.c;
     }
     ctx.state.pageSettings = pageSettings;
+    ctx.state.postSettings = postSettings;
 	  ctx.data.serverSettings = {
 			websiteName: serverSettings.websiteName,
 		  github: serverSettings.github,

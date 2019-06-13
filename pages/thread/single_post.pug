@@ -103,6 +103,8 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
           .post-comments-div(id=`post_comments_${post.pid}`)
             .text-center 加载评论中，请稍候...
           if data.user
-            div(class=`edit_${post.pid}_container`)
+            -let comment = post;
+            include ./postEdit
+            //div(class=`edit_${post.pid}_container`)
           .m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
             span.fa.fa-angle-up

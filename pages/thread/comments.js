@@ -3,7 +3,9 @@ var editor = {};
 function postComment(tid, pid, firstInput) {
   var postContainer = $(".edit_"+pid+"_container");
   if(!postContainer.length) return;
-  if(postContainer.html()) {
+  var editContainer = $(".edit_"+pid+"_container_input");
+  if(!editContainer.length) return;
+  if(editContainer.html()) {
     if(postContainer.is(":hidden")) {
       return postContainer.show();
     } else if(!firstInput) {
@@ -20,7 +22,7 @@ function postComment(tid, pid, firstInput) {
   }
   btnDiv.append(subBtn);
   var editDom = $("<div id='edit_"+pid+"' class='m-t-1 m-b-05'></div>");
-  postContainer.append(editDom, btnDiv);
+  editContainer.append(editDom, btnDiv);
   editor[pid] = UE.getEditor('edit_' + pid, {
     toolbars: [
       [
