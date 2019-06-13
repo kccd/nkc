@@ -23,6 +23,9 @@ function postComment(tid, pid, firstInput) {
   btnDiv.append(subBtn);
   var editDom = $("<div id='edit_"+pid+"' class='m-t-1 m-b-05'></div>");
   editContainer.append(editDom, btnDiv);
+  if(editor[pid] && editor[pid].destroy) {
+    editor[pid].destroy();
+  }
   editor[pid] = UE.getEditor('edit_' + pid, {
     toolbars: [
       [
