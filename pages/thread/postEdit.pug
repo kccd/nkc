@@ -1,0 +1,34 @@
+//- 判断用户是否有权限回复 发表限制
+.edit-container(class=`edit_${comment.pid}_container`)
+  if data.user
+    if data.thread.closed
+      h5 主题已关闭，暂不能发表回复/评论
+    else
+      -const {exam, authLevelMin} = state.postSettings.postToThread;
+      -const {volumeA, volumeB, notPass} = exam;
+      -const {unlimited, countLimit} = notPass;
+      if data.user.authLevel < authLevelMin
+        h5.text-danger 身份认证等级未达要求，
+          |点击
+          a(href=`/u/${data.user.uid}/settings/verify/${authLevelMin}`) 这里
+          |完成相应身份认证。
+      else
+        if !data.user.volumeA && !data.user.volumeB
+          if !notPass.status
+            h5.text-danger 您还未参加考试，暂不能发表回复/评论。
+              br
+              |点击
+              a(href='/exam' target='_blank') 这里
+              | 参加考试，通过后将获得更多发言权限。
+          else if !unlimited
+            h5.text-danger=`您还未参加考试，每天只能发表${countLimit}条回复/评论，且可能需要经过审核以后才显示。`
+              br
+              |点击
+              a(href='/exam' target='_blank') 这里
+              | 参加考试，通过后将获得更多发言权限。
+            div(class=`edit_${comment.pid}_container_input`)
+          else
+            div(class=`edit_${comment.pid}_container_input`)
+        else
+          if (data.user.volumeA && volumeA) || (data.user.volumeB && volumeB)
+          div(class=`edit_${comment.pid}_container_input`)

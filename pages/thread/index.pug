@@ -541,18 +541,18 @@ block content
                                 +inputPanel
                               else if countLimit === 0
                                 .text-danger
-                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，暂不能发表文章和回复。`
+                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，暂不能发表文章和回复/评论。`
                                   .h4
                                     a(href='/exam' target='_blank') 点击这里参加考试
                               else if userPostCountToday >= countLimit
                                 .text-danger
-                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复，且可能需要经过审核以后才显示。`
-                                  .h4= `今日已发表${data.userPostCountToday}条回复，`
+                                  .h4(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复/评论，且可能需要经过审核以后才显示。`
+                                  .h4= `今日已发表${data.userPostCountToday}条回复/评论，`
                                     a(href='/exam' target='_blank') 点击这里参加考试
                                     span ，通过后将获得更多发言权限。
                               else
-                                .form-group.text-danger(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复，且可能需要经过审核以后才显示。`
-                                  div=`今日已发表${userPostCountToday}条回复，`
+                                .form-group.text-danger(style='margin-bottom: 0rem;')=`您还未参加考试，每天只能发表${countLimit}条回复/评论，且可能需要经过审核以后才显示。`
+                                  div=`今日已发表${userPostCountToday}条回复/评论，`
                                     a(href='/exam' target='_blank') 点击这里参加考试
                                     span ，通过后将获得更多发言权限。
                                 +inputPanel
@@ -561,7 +561,7 @@ block content
                           else
                             .col-xs-12.col-md-12(style='margin: 2rem 0;')
                               .h4.text-center(style='color: #aaaaaa;')
-                                span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复
+                                span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复/评论
 
 
                       include ../exam_notification.pug
@@ -629,6 +629,7 @@ block scripts
   include ../publicModules/complaint/complaint
   include ../publicModules/crop/crop
   include ../publicModules/moment
+  include ../ueditor/ueditorBase
   +includeJS("/thread/comments.js")
   //- +includeJS('/jquery/jquery.minicolors.js')
   //- link(href=`/jquery/jquery.minicolors.css?v=${global.NKC.startTime}` rel="stylesheet")

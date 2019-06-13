@@ -3227,6 +3227,9 @@ img.emoji {
   border-top: 1px solid #f3f3f3;
   padding-top: 0.3rem;
 }
+.edit-container{
+  display: none;
+}
 .post-comment.disabled{
   background-color: #ddd;
   padding: 0.5rem;

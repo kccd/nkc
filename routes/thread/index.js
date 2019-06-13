@@ -463,15 +463,15 @@ threadRouter
     const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: user.uid});
     let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: user.uid});
     todayPostCount = todayPostCount - todayThreadCount;
-    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复至少需要完成身份认证 ${authLevelMin}`);
+    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复/评论至少需要完成身份认证 ${authLevelMin}`);
     if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
       if(!status) ctx.throw(403, '权限不足，请提升账号等级');
-      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复次数已用完，请参加考试提升等级，或者明天再试。');
+      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复/评论次数已用完，请参加考试提升等级，或者明天再试。');
     }
 
     // 发表回复时间、条数限制
     const {postToThreadCountLimit, postToThreadTimeLimit} = await user.getPostLimit();
-    if(todayPostCount >= postToThreadCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToThreadCountLimit}条回复，请明天再试。`);
+    if(todayPostCount >= postToThreadCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToThreadCountLimit}条回复/评论，请明天再试。`);
     const latestThread = await db.ThreadModel.findOne({uid: user.uid}).sort({toc: -1});
     const q = {
       uid: user.uid,
@@ -481,12 +481,12 @@ threadRouter
       q.tid = {$ne: latestThread.tid}
     }
     const latestPost = await db.PostModel.findOne(q);
-    if(latestPost) ctx.throw(400, `您当前的账号等级限定发表回复间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
+    if(latestPost) ctx.throw(400, `您当前的账号等级限定发表回复/评论间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
 
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
 		await thread.extendFirstPost();
-		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
+		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复/评论');
 
 		data.thread = thread;
 		await thread.extendForums(['mainForums', 'minorForums']);
