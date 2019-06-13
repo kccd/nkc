@@ -206,7 +206,8 @@ router
               m.disabled = false;
             }
             const obj = await db.ThreadModel.getPostStep(thread.tid, m);
-            link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
+            // link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
+            link = await db.PostModel.getUrl(post);
           }
 
           const forums = thread.forums.map(forum => {

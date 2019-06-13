@@ -66,7 +66,8 @@ router
         }
       };
       const step = await db.ThreadModel.getPostStep(thread.tid, {pid});
-      review.link = `/t/${thread.tid}?page=${step.page}&highlight=${pid}#${pid}`;
+      // review.link = `/t/${thread.tid}?page=${step.page}&highlight=${pid}#${pid}`;
+      review.link = await db.PostModel.getUrl(pid);
       data.reviews.push(review);
     }
     data.paging = paging;
