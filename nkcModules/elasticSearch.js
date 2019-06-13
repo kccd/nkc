@@ -210,6 +210,7 @@ func.search = async (t, c, options) => {
       pre_tags: ['<span style="color: #e85a71;">'],
       post_tags: ['</span>'],
       fields: {
+        pid: {},
         title: {},
         content: {},
         username: {},
@@ -235,6 +236,7 @@ func.search = async (t, c, options) => {
                           should: [
                             createMatch("title", c, 5, relation),
                             createMatch("content", c, 2, relation),
+                            createMatch("pid", c, 100, relation),
                             createMatch("abstractEN", c, 50, relation),
                             createMatch("abstractCN", c, 50, relation),
                             createMatch("keywordsEN", c, 80, relation),

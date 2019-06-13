@@ -247,7 +247,7 @@ threadRouter
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
 		// 添加给被退回的post加上标记
-		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
+		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid}, {postId: 1});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
 		data.posts.map(async post => {
 			const index = toDraftPostsId.indexOf(post.pid);
@@ -485,6 +485,7 @@ threadRouter
 
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
+		await thread.extendFirstPost()
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
 
 		data.thread = thread;
@@ -548,9 +549,12 @@ threadRouter
       let comment = await db.PostModel.findOnly({pid: data.post.pid});
       comment = (await db.PostModel.extendPosts([comment], {uid: data.user.uid}))[0];
       if(comment.parentPostId) {
-        comment.parentPost = await db.PostModel.findOne({pid: comment.parentPostId});
+        comment.parentPost = await db.PostModel.findOnly({pid: comment.parentPostId});
+        data.level1Comment = comment.parentPost.parentPostId === "";
         comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost]))[0];
       }
+      // 修改post时间限制
+      data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
       data.comment = comment;
       const template = Path.resolve("./pages/thread/comment.pug");
       data.html = nkcModules.render(template, data, ctx.state);

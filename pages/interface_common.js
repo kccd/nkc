@@ -939,7 +939,7 @@ function markDiv(klass) {
   if(highlightDom.length) {
     var top = highlightDom.offset().top;
     setTimeout(function() {
-      $("html,body").animate({scrollTop: top-200}, 500)
+      $("html,body").animate({scrollTop: top-300}, 500)
     }, 1000);
   }
 }

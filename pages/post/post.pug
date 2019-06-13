@@ -156,6 +156,9 @@ block scripts
   +includeJS(`/thread/comments.js`)
   include ../ueditor/ueditor
   script.
+    $(".dropdown-menu.stop-propagation").on("click",function (e) {
+      e.stopPropagation();
+    });
     var preview = new Preview({
         imgWrap: 'wrap' // 指定该容器里的图片点击预览
     })

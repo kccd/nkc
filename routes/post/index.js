@@ -19,6 +19,7 @@ router
     data.highlight = highlight;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
+    data.thread = thread;
     await thread.extendFirstPost();
 	  const forums = await thread.extendForums(['mainForums', 'minorForums']);
     const {user} = data;
@@ -121,32 +122,45 @@ router
 
     // 修改post时间限制
     data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
-
     // 获取评论
-    const q = {
-      disabled: false
-    };
-    // 判断是否有权限查看被屏蔽的post
-    if(ctx.permission("disabledPost")) {
-      delete q.disabled;
-    }
+    const q = {};
     // 判断是否有权限查看未审核的post
     if(data.user) {
       if(!isModerator) {
-        q.$or = [
+        q.$and = [
           {
-            reviewed: true
+            $or: [
+              {
+                reviewed: true
+              },
+              {
+                reviewed: false,
+                uid: data.user.uid
+              }
+            ]
           },
           {
-            reviewed: false,
-            uid: data.user.uid
+            $or: [
+              {
+                disabled: false,
+                toDraft: {$ne: true},
+              },
+              {
+                toDraft: true,
+                uid: data.user.uid
+              }
+            ]
           }
-        ]
+        ];
       }
     } else {
       q.reviewed = true;
+      q.disabled = false;
+      q.toDraft = null;
     }
     const {threadPostCommentList} = ctx.state.pageSettings;
+    const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: data.post.tid}, {postId: 1, reason: 1});
+    const toDraftPostsId = toDraftPosts.map(post => post.postId);
     // 文章页 获取评论 树状
     if(from === "nkcAPI") {
       q.parentPostId = pid;
@@ -159,11 +173,15 @@ router
       });
       delete q.parentPostId;
       q.parentPostsId = {$in: [...pids]};
-      let posts = await db.PostModel.find(q);
+      let posts = await db.PostModel.find(q).sort({toc: 1});
       posts = posts.concat(parentPosts);
       posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
       const postsObj = {};
       posts = posts.map(post => {
+        const index = toDraftPostsId.indexOf(post.pid);
+        if(index !== -1) {
+          post.reason = toDraftPosts[index].reason;
+        }
         post.posts = [];
         post.parentPost = "";
         postsObj[post.pid] = post;
@@ -183,7 +201,13 @@ router
           topPosts.push(post);
           continue;
         }
-        const parent = postsObj[post.parentPostId];
+        let parent;
+        if(post.parentPostsId.length >= 5) {
+          // 限制层数 3
+          parent = postsObj[post.parentPostsId[4]];
+        } else {
+          parent = postsObj[post.parentPostId];
+        }
         if(parent) {
           post.parentPost = {
             user: parent.user,
@@ -206,14 +230,23 @@ router
       let posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
       posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
       const parentPostsId = new Set();
-      posts.map(post => {
+      await Promise.all(posts.map(async post => {
+        post.url = await db.PostModel.getUrl(post);
+        const index = toDraftPostsId.indexOf(post.pid);
+        if(index !== -1) {
+          post.reason = toDraftPosts[index].reason;
+        }
         parentPostsId.add(post.parentPostId);
-      });
+      }));
       // 拓展上级post
       let parentPosts = await db.PostModel.find({pid: {$in: [...parentPostsId]}});
       const postsObj = {};
       parentPosts = await db.PostModel.extendPosts(parentPosts, {uid: data.user? data.user.uid: ""});
       parentPosts.map(p => {
+        /*const index = toDraftPostsId.indexOf(post.pid);
+        if(index !== -1) {
+          post.reason = toDraftPosts[index].reason;
+        }*/
         postsObj[p.pid] = p;
       });
       posts.map(post => {

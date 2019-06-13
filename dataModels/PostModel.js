@@ -685,9 +685,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
         }
       }
     }
-
     return post.toObject();
-
   });
 
 };

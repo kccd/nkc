@@ -46,10 +46,16 @@ block title
             span.fa.fa-newspaper-o &nbsp;
             span 详情
         if postTo && !thread.closed
-          li
-            a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
-              span.fa.fa-comment-o &nbsp;
-              span 引用
+          if targetThread
+            li
+              a(href=`#container`)
+                span.fa.fa-comment-o &nbsp;
+                span 回复
+          else
+            li
+              a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
+                span.fa.fa-comment-o &nbsp;
+                span 回复
         if !thread.closed
           li
             a(href=`javascript:at('${post.user.username}')`)
@@ -199,7 +205,8 @@ block content
                         if data.isModerator && canManagement
                           a(href=`javascript:displayManagement();` style='text-decoration: none;float: right;')
                             .highlight.fa.fa-cog
-                        +postOptions(thread.firstPost, thread, 0)
+                        .pull-right.m-r-05
+                          +postOptions(thread.firstPost, thread, 0)
                       .inline-block(style='float: right;')
                         .highlight.fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false") &nbsp;分享
                         .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;width:90px;background:none')

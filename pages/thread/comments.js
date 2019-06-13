@@ -6,13 +6,14 @@ function postComment(tid, pid, firstInput) {
   if(postContainer.html()) {
     if(postContainer.is(":hidden")) {
       return postContainer.show();
-    } else {
+    } else if(!firstInput) {
       return postContainer.hide();
+    } else {
+      return;
     }
-
   }
   var subBtn = $('<button class="btn btn-primary btn-sm" onclick="submitPostComment(\''+tid+'\', \''+pid+'\', '+firstInput+')">提交</button>');
-  var btnDiv = $("<div class='text-right m-t-05'></div>");
+  var btnDiv = $("<div class='text-right m-t-05 m-b-1'></div>");
   if(!firstInput) {
     var quitBtn = $('<button class="btn btn-default btn-sm m-r-05" onclick="closePostComment(\''+pid+'\')">取消</button>');
     btnDiv.append(quitBtn);
@@ -58,20 +59,29 @@ function submitPostComment(tid, pid, firstInput) {
       var comment = data.comment;
       var parentPost = comment.parentPost;
       var html = data.html;
-      var postComments = $("#post_comments_div_" + parentPost.pid);
-      var postComment = $("#post_comment_" + parentPost.pid);
-      if(!postComments.length) {
-        if(!postComment.length) return;
-        /*postComments = $("<div class='post-comments' id='post_comments_div_"+parentPost.pid+"'></div>");
-        postComment.find(".edit_"+parentPost.pid+"_container").before(postComments);*/
-        postComments = $("<div class='post-comments' id='post_comments_div_"+parentPost.pid+"'></div>");
-        postComment.append(postComments);
+      if(data.level1Comment) {
+        viewPostComments(tid, pid, 999999, function() {
+          screenTopAlert("评论成功");
+          if(!firstInput) closePostComment( pid);
+          markDiv("#post_comment_" + data.comment.pid);
+          editor[pid].execCommand('cleardoc');
+        });
+      } else {
+        var postComments = $("#post_comments_div_" + parentPost.pid);
+        var postComment = $("#post_comment_" + parentPost.pid);
+        if(!postComments.length) {
+          if(!postComment.length) return;
+          /*postComments = $("<div class='post-comments' id='post_comments_div_"+parentPost.pid+"'></div>");
+          postComment.find(".edit_"+parentPost.pid+"_container").before(postComments);*/
+          postComments = $("<div class='post-comments' id='post_comments_div_"+parentPost.pid+"'></div>");
+          postComment.append(postComments);
+        }
+        postComments.append(html);
+        screenTopAlert("评论成功");
+        if(!firstInput) closePostComment( pid);
+        markDiv("#post_comment_" + data.comment.pid);
+        editor[pid].execCommand('cleardoc');
       }
-      postComments.append(html);
-      screenTopAlert("评论成功");
-      if(!firstInput) closePostComment( pid);
-      markDiv("#post_comment_" + data.comment.pid);
-      editor[pid].execCommand('cleardoc');
     })
     .catch(function(data) {
       screenTopWarning(data);
@@ -80,21 +90,58 @@ function submitPostComment(tid, pid, firstInput) {
 
 var comments = {};
 
-function viewPostComments(tid, pid) {
+function viewPostComments(tid, pid, page, callback) {
   var commentsDiv = $("#post_comments_" + pid);
   commentsDiv.show();
   postComment(tid, pid, true);
   $(".show_comments_button_" + pid).hide();
   $(".hide_comments_button_" + pid).show();
-  nkcAPI("/p/" + pid, "GET")
+  var url = "/p/" + pid;
+  if(page) {
+    url = "/p/" + pid + "?page=" + page;
+  }
+  nkcAPI(url, "GET")
     .then(function(data) {
       var html = data.html;
+      var buttonValue = data.paging.buttonValue;
       comments[pid] = html?html:" ";
       commentsDiv.html(html);
+      var pagingDom = createPageDom(buttonValue, tid, pid);
+      commentsDiv.prepend(pagingDom);
+      commentsDiv.append(pagingDom.clone());
+      $(".dropdown-menu.stop-propagation").on("click",function (e) {
+        e.stopPropagation();
+      });
+      if(callback) callback();
     })
     .catch(function(data) {
       screenTopWarning(data);
     })
+}
+
+function createPageDom(buttonValue, tid, pid) {
+  var dom = $("<div class='paging-button post-comments-page'></div>");
+  for(var i = 0; i < buttonValue.length; i++) {
+    var b = buttonValue[i];
+    var btn;
+    var klass = "";
+    if(i === 0) {
+      klass = "radius-left"
+    }
+    if(i === (buttonValue.length - 1)) {
+      klass = "radius-right"
+    }
+    if(b.type === "active") {
+      klass += " active";
+    }
+    if(b.type === "null") {
+      btn = $("<a class='pointer button "+klass+"' >...</a>");
+    } else {
+      btn = $('<a onclick="viewPostComments(\''+ tid +'\', \''+ pid +'\', ' + b.num + ')" class="pointer button '+ klass+'">'+(b.num + 1)+'</a>');
+    }
+    dom.append(btn);
+  }
+  return dom;
 }
 
 function hidePostComments(pid) {
