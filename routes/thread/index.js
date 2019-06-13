@@ -463,7 +463,7 @@ threadRouter
     const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: user.uid});
     let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: user.uid});
     todayPostCount = todayPostCount - todayThreadCount;
-    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复至少需要完成身份认证 ${authLevelMin}`);
+    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复/评论至少需要完成身份认证 ${authLevelMin}`);
     if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
       if(!status) ctx.throw(403, '权限不足，请提升账号等级');
       if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复/评论次数已用完，请参加考试提升等级，或者明天再试。');
