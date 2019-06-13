@@ -375,7 +375,9 @@ router
     let {page} = await targetThread.getStep({pid, disabled: q.disabled});
     let postId = `#${pid}`;
     page = `?page=${page}`;
-    data.redirect = `/t/${targetThread.tid}?&pid=${targetPost.pid}`;
+    const redirectUrl = await db.PostModel.getUrl(pid);
+    // data.redirect = `/t/${targetThread.tid}?&pid=${targetPost.pid}`;
+    data.redirect = redirectUrl;
     data.targetUser = targetUser;
     // 帖子再重新发表时，解除退回的封禁
     // 删除日志中modifyType改为true

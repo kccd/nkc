@@ -817,8 +817,7 @@ postSchema.statics.getUrl = async function(pid) {
   const pageSettings = await SettingModel.findOnly({_id: "page"});
 
   let post;
-
-  if(pid instanceof String) {
+  if(typeof(pid) == "string") {
     post = await PostModel.findOnly({pid});
   } else {
     post = pid;
