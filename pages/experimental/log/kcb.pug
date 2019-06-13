@@ -65,7 +65,7 @@ block content
                 th {{record.description}}
                   span.text-danger {{record.hideDescription?"【已屏蔽】":""}}
                 th
-                  a(v-if="record.pid" :href="'/p/' + record.pid") {{record.pid}}
+                  a(v-if="record.pid" :href="record.post.url") {{record.pid}}
                 th {{record.ip}}:{{record.port}}
                 th {{record.verify?"是":"否"}}
           include ../../interface_navigation_paging

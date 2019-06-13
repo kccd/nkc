@@ -485,7 +485,7 @@ threadRouter
 
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
-		await thread.extendFirstPost()
+		await thread.extendFirstPost();
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
 
 		data.thread = thread;

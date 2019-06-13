@@ -19,6 +19,9 @@ router
 			await behavior.extendUser();
 			await behavior.extendOperation();
 			await behavior.extendPost();
+			if(behavior.post) {
+        behavior.post.url = await db.PostModel.getUrl(behavior.post);
+      }
 			return behavior;
 		}));
 		ctx.template = 'experimental/log/info.pug';

@@ -54,7 +54,7 @@ block content
                   a(:href="'/u/' + record.operator.uid" target='_blank') {{record.operator.username}}
                 th {{record.description}}
                 th
-                  a(:href="'/p/' + record.pid" target="_blank") {{record.pid}}
+                  a(:href="record.post.url" target="_blank") {{record.pid}}
                 th
                   a(target='_blank' :href="'http://www.ip138.com/ips138.asp?ip='+record.ip+'&action=2'") {{record.ip}}
                 th
