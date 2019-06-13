@@ -26,9 +26,12 @@
               |点击
               a(href='/exam' target='_blank') 这里
               | 参加考试，通过后将获得更多发言权限。
+            h5 200字以内，仅用于简单交流，重要讨论请采用回复功能。
             div(class=`edit_${comment.pid}_container_input`)
           else
+            h5 200字以内，仅用于简单交流，重要讨论请采用回复功能。
             div(class=`edit_${comment.pid}_container_input`)
         else
           if (data.user.volumeA && volumeA) || (data.user.volumeB && volumeB)
-          div(class=`edit_${comment.pid}_container_input`)
+            h5 200字以内，仅用于简单交流，重要讨论请采用回复功能。
+            div(class=`edit_${comment.pid}_container_input`)
