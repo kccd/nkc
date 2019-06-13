@@ -269,6 +269,7 @@ router
 	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
+    if(targetPost.parentPostId && c.length > 1000) ctx.throw(400, "评论内容不能超过1000字节");
     const targetThread = await targetPost.extendThread();
     const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
