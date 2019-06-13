@@ -151,8 +151,9 @@ block scripts
   +includeJS(`/module_dropdown.js`)
   +includeJS(`/post_to_recycle.js`)
   +includeJS(`/thread_to_recycle.js`)
+  //include ../ueditor/ueditor
+  include ../ueditor/ueditorBase
   +includeJS(`/thread/comments.js`)
-  include ../ueditor/ueditor
   script.
     $(".dropdown-menu.stop-propagation").on("click",function (e) {
       e.stopPropagation();
