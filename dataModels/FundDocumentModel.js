@@ -51,6 +51,26 @@ const documentSchema = new Schema({
 		default: null,
 		maxlength: [200, '摘要不能超过200字。']
 	},
+  // 中文摘要
+  abstractCn: {
+    type: String,
+    default: ""
+  },
+  // 英文摘要
+  abstractEn: {
+    type: String,
+    default: ""
+  },
+  // 中文关键词
+  keyWordsCn: {
+    type: Array,
+    default: []
+  },
+  // 英文关键词
+  keyWordsEn: {
+    type: Array,
+    default: []
+  },
 	c: {
 		type: String,
 		default: null,

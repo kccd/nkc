@@ -406,7 +406,7 @@ fundApplicationFormSchema.methods.extendMembers = async function() {
 
 	return this.members = await Promise.all(applicationUsers.map(async aUser => {
 		await aUser.extendUser();
-		return aUser;
+		return aUser.toObject();
 	}));
 };
 

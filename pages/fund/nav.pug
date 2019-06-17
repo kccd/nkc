@@ -1,33 +1,30 @@
 -const {fundList} = data;
-.fund-nav
-  ol.breadcrumb(style='margin-bottom: 0;')
+.fund-navbar.m-b-1
+  ul
     li
-      a(href="/fund") 首页
-    span &nbsp;&nbsp;&nbsp;
+      a(href="/fund")
+        .fa.fa-home &nbsp;首页
     li
-      a(href="/fund/info") 基金简介
-    span &nbsp;&nbsp;&nbsp;
+      a(href="/fund/info")
+        .fa.fa-file-text-o &nbsp;基金简介
     li
-      a(href="/fund/bills") 财务公开
-    span &nbsp;&nbsp;&nbsp;
+      a(href="/fund/bills")
+        .fa.fa-rmb &nbsp;财务公开
     if data.user
       li
-        a(href=`/fund/me`) 我的申请&nbsp;
+        a(href=`/fund/me`)
+          .fa.fa-user-circle-o &nbsp;我的申请
         if data.fundNotify > 0
           span.redFontColor= data.fundNotify
-      span &nbsp;&nbsp;&nbsp;
-
     if data.fund
       li
         a(href=`/fund/list/${data.fund._id}`)= data.fund.name
     if data.fund && data.applicationForm && data.applicationForm.code
-      span &nbsp;&nbsp;/&nbsp;&nbsp;
       li
         a(href=`/fund/a/${data.applicationForm._id}`)= data.applicationForm.code
     if data.nav
       if data.fund || data.applicationForm
-        span &nbsp;&nbsp;/&nbsp;&nbsp;
+        span /&nbsp;&nbsp;
       span= data.nav
     if data.fundSettings.readOnly
       h3(style='color: #888;') 科创基金已开启只读模式
-br

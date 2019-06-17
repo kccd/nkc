@@ -63,7 +63,13 @@ const fundApplicationUserSchema = new Schema({
 		default: false,
 		index: 1
 	}
-}, {collection: 'fundApplicationUsers'});
+}, {
+  collection: 'fundApplicationUsers',
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
+});
 
 fundApplicationUserSchema.virtual('user')
 	.get(function() {

@@ -21,12 +21,11 @@ userRouter
     const {data, db, query} = ctx;
     const {username, uid} = query;
     const targetUsers = [];
-    if(username !== undefined) {
-      // const users = await db.UserModel.find({usernameLowerCase: new RegExp(username.toLowerCase(), 'i')});
+    if(username) {
       const user = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
     	if(user) targetUsers.push(user);
     }
-    if(uid !== undefined) {
+    if(uid) {
     	const user = await db.UserModel.findOne({uid});
     	if(user) targetUsers.push(user);
     }

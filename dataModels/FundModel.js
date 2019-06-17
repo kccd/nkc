@@ -62,6 +62,16 @@ const fundSchema = new Schema({
 		  required: true
 	  }
   },
+  reminder: {
+    inputUserInfo: {
+      type: String,
+      default: ""
+    },
+    inputProject: {
+      type: String,
+      default: ""
+    }
+  },
 	display: {
     type: Boolean,
     default: true,

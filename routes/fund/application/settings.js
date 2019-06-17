@@ -31,8 +31,12 @@ settingsRouter
 		data.s = s;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
 		data.lifePhotos = await userPersonal.extendLifePhotos();
-		ctx.template = 'interface_fund_apply.pug';
+		ctx.template = 'fund/apply/editForm.pug';
 		await applicationForm.update({'lock.submitted': false});
+		if(applicationForm.toObject) {
+      data.applicationForm = applicationForm.toObject();
+    }
+
 		await next();
 	});
 module.exports = settingsRouter;

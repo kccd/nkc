@@ -1,0 +1,11 @@
+extends ../bootstrap_base
+block title
+  +includeCSS("/fund/fund.css")
+  block fundTitle
+block content
+  .container-fluid.max-width.fund
+    include ./nav
+    block fundContent
+block scripts
+  +includeJS("/fund/fund.js")
+  block fundScripts

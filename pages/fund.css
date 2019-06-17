@@ -306,6 +306,13 @@ input[type="radio"], input[type="checkbox"]{
 }
 .fund-nav > ul > li:first-child a{
 }
+.fund-nav > ol > li > a{
+  font-weight: 700;
+  color: #2b90d9;
+}
+.fund-nav > ol > li > a:hover, .fund-nav > ol > li > a:focus{
+  color: #2b90d9;
+}
 .info{
   height: 20rem;
   width: 100%;
