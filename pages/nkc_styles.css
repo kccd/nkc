@@ -2754,7 +2754,7 @@ img.emoji {
 }
 .post-body{
   overflow: visible;
-  padding: 1rem 0 0.5rem 0;
+  padding: 1rem 0 0.25rem 0;
   margin: 0;
   border-top: 1px solid #eeeeee;
 }
@@ -3203,17 +3203,32 @@ img.emoji {
 .post-comments{
   /*border-left: 1px solid #d9e1e8;*/
   padding: 0 0 0 1rem;
-  margin: 1rem 0;
+  margin: 0.1rem 0;
 }
 .post-comments-div{
   display: none;
 }
+.post-comments-page{
+  display: block!important;
+}
 .highlight-dom{
   background-color: rgba(255, 251, 221, 1);
+}
+.post-comment-body{
+  transition: background-color 300ms;
+}
+.post-comment-body:hover{
+  background-color: rgba(217, 225, 232, 0.5);
+  /*background-color: #ffd700;*/
 }
 .post-comment{
   margin-bottom: 0.5rem;
   position: relative;
+  border-top: 1px solid #f3f3f3;
+  padding-top: 0.3rem;
+}
+.edit-container{
+  display: none;
 }
 .post-comment.disabled{
   background-color: #ddd;
@@ -3252,7 +3267,7 @@ img.emoji {
   margin-right: 0.3rem;
 }
 .post-comments .post-comment-user span{
-  margin-right: 0.3rem;
+  /*margin-right: 0.3rem;*/
 }
 .single-post{
   position: relative;

@@ -42,20 +42,26 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         if(post.t && post.t !== '' && index !== 0)
           div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
         -post.c = hideContentByUser(post.c, data.user, 'thread')
-        div.ThreadPostBody(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
+        div.ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
         if post.toc.toLocaleString() !== post.tlm.toLocaleString()
           p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-        +postCredits(post)
+        //+postCredits(post)
+        -let creditPost = post;
+        include ./postCredits
         if post.disabled && disablePost
           a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
 
         //- 评论输入框 暂且只有作者能够首先发起评论，之后该条回复的用户才能接着评论
         div
           .single-post-options.text-right
+            if permission("quotePost") && !data.thread.close
+              span.pointer.m-r-05(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
+                span.fa.fa-comment-o &nbsp;
+                span 回复
             if post.postCount > 0
-              span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`查看评论(${post.postCount})`
+              span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论(${post.postCount})`
             else if data.user
-              span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`添加评论`
+              span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论`
             span.pointer.m-r-05(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`
             -const votePost = post;
             include ../module_vote
@@ -95,8 +101,10 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
               -let dropType = "dropup";
               +postOptions(post, '',index, dropType)
           .post-comments-div(id=`post_comments_${post.pid}`)
-            .text-center 加载评论中，请稍后...
+            .text-center 加载评论中，请稍候...
           if data.user
-            div(class=`edit_${post.pid}_container`)
+            -let comment = post;
+            include ./postEdit
+            //div(class=`edit_${post.pid}_container`)
           .m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
             span.fa.fa-angle-up

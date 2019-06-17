@@ -10021,7 +10021,10 @@ UE.plugins['defaultfilter'] = function () {
                                 break;
                             }
                         }
-                        var _newSrc = removeUelParam(node.getAttr('src'))
+                        // var _newSrc = removeUelParam(node.getAttr('src'));
+                        // 图片自动上传url不再对参数进行处理
+                        // 对于微信等的webp格式图片交由服务器进行单独处理
+                        var _newSrc = node.getAttr('src');
                         node.setAttr('_src', _newSrc);
                         break;
                     case 'span':
@@ -23526,6 +23529,7 @@ UE.plugins['catchremoteimage'] = function () {
                         //     }
                         // }
                     }
+                    window.loadMediaRe()
                     me.fireEvent('catchremotesuccess')
                 },
                 //回调失败，本次请求超时

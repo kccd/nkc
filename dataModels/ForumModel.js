@@ -376,7 +376,7 @@ forumSchema.methods.updateForumMessage = async function() {
 	const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
 	childrenFid.push(this.fid);
 	const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
-	let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}});
+	let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}, parentPostId: ""});
 	countPosts = countPosts - countThreads;
 	const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
 	const normal = countThreads - digest;
@@ -385,7 +385,7 @@ forumSchema.methods.updateForumMessage = async function() {
 		normal
 	};
 	const {today} = require('../nkcModules/apiFunction');
-	const countPostsToday = await PostModel.count({mainForumsId: {$in: childrenFid}, toc: {$gt: today()}});
+	const countPostsToday = await PostModel.count({mainForumsId: {$in: childrenFid}, toc: {$gt: today()}, parentPostId: ""});
   await this.update({tCount, countPosts, countThreads, countPostsToday});
   const updateParentForumsMessage = async (forum) => {
     if(forum.parentsId.length === 0) return;

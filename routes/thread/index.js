@@ -247,7 +247,7 @@ threadRouter
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
 		// 添加给被退回的post加上标记
-		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid});
+		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid}, {postId: 1});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
 		data.posts.map(async post => {
 			const index = toDraftPostsId.indexOf(post.pid);
@@ -463,15 +463,15 @@ threadRouter
     const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: user.uid});
     let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: user.uid});
     todayPostCount = todayPostCount - todayThreadCount;
-    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复至少需要完成身份认证 ${authLevelMin}`);
+    if(authLevelMin > user.authLevel) ctx.throw(403,`身份认证等级未达要求，发表回复/评论至少需要完成身份认证 ${authLevelMin}`);
     if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
       if(!status) ctx.throw(403, '权限不足，请提升账号等级');
-      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复次数已用完，请参加考试提升等级，或者明天再试。');
+      if(!unlimited && countLimit <= todayPostCount) ctx.throw(403, '今日发表回复/评论次数已用完，请参加考试提升等级，或者明天再试。');
     }
 
     // 发表回复时间、条数限制
     const {postToThreadCountLimit, postToThreadTimeLimit} = await user.getPostLimit();
-    if(todayPostCount >= postToThreadCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToThreadCountLimit}条回复，请明天再试。`);
+    if(todayPostCount >= postToThreadCountLimit) ctx.throw(400, `您当前的账号等级每天最多只能发表${postToThreadCountLimit}条回复/评论，请明天再试。`);
     const latestThread = await db.ThreadModel.findOne({uid: user.uid}).sort({toc: -1});
     const q = {
       uid: user.uid,
@@ -481,11 +481,12 @@ threadRouter
       q.tid = {$ne: latestThread.tid}
     }
     const latestPost = await db.PostModel.findOne(q);
-    if(latestPost) ctx.throw(400, `您当前的账号等级限定发表回复间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
+    if(latestPost) ctx.throw(400, `您当前的账号等级限定发表回复/评论间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
 
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
-		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复');
+		await thread.extendFirstPost();
+		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复/评论');
 
 		data.thread = thread;
 		await thread.extendForums(['mainForums', 'minorForums']);
@@ -494,6 +495,9 @@ threadRouter
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post, postType} = body;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
+		if(postType === "comment" && post.c.length > 1000) {
+      ctx.throw(400, "评论内容不能超过1000字符");
+    }
 		const _post = await thread.newPost(post, user, ctx.address);
 
     // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
@@ -548,9 +552,12 @@ threadRouter
       let comment = await db.PostModel.findOnly({pid: data.post.pid});
       comment = (await db.PostModel.extendPosts([comment], {uid: data.user.uid}))[0];
       if(comment.parentPostId) {
-        comment.parentPost = await db.PostModel.findOne({pid: comment.parentPostId});
+        comment.parentPost = await db.PostModel.findOnly({pid: comment.parentPostId});
+        data.level1Comment = comment.parentPost.parentPostId === "";
         comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost]))[0];
       }
+      // 修改post时间限制
+      data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
       data.comment = comment;
       const template = Path.resolve("./pages/thread/comment.pug");
       data.html = nkcModules.render(template, data, ctx.state);

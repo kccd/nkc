@@ -11,6 +11,6 @@ module.exports = {
     searchPostList: 30,
     searchAllList: 30,
     searchUserList: 30,
-    threadPostCommentList: 30
+    threadPostCommentList: 10
   }
 };

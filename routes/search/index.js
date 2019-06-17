@@ -83,8 +83,6 @@ router
         return resource;
       });
 
-
-
       // 根据分页设置，计算分页
       let perpage;
       if(t === "user") {
@@ -111,7 +109,6 @@ router
           }
         });
       }
-
     }
 
     // 如果搜索结果不为空
@@ -142,6 +139,9 @@ router
             }
             if(r.highlight.abstractCN) {
               highlightObj[r.pid + "_abstractCN"] = "摘要：" + r.highlight.abstractCN;
+            }
+            if(r.highlight.pid) {
+              highlightObj[r.pid + "_pid"] = "文号：" + r.highlight.pid;
             }
           } else if(r.docType === "user") {
             highlightObj[r.uid + "_username"] = r.highlight.username;
@@ -222,6 +222,7 @@ router
             link,
             title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
             abstract:
+              highlightObj[`${pid}_pid`] ||
               highlightObj[`${pid}_keywordsEN`] ||
               highlightObj[`${pid}_keywordsCN`] ||
               highlightObj[`${pid}_abstractEN`] ||

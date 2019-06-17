@@ -107,10 +107,12 @@ xsfsRecordSchema.statics.extendXsfsRecords = async (records) => {
     if(!usersObj[u.uid]) usersObj[u.uid] = [];
     usersObj[u.uid] = u;
   });
-  posts.map(p => {
+  await Promise.all(posts.map(async p => {
     if(!postsObj[p.pid]) postsObj[p.pid] = [];
+    p = p.toObject();
+    p.url = await PostModel.getUrl(p);
     postsObj[p.pid] = p;
-  });
+  }));
   return records.map(r => {
     r = r.toObject();
     r.user = usersObj[r.uid];

@@ -16,6 +16,7 @@ router
     data.targetUser = targetPost.user;
     targetPost = targetPost.toObject();
     data.message = xsflimit(targetPost);
+    data.postUrl = await db.PostModel.getUrl(targetPost);
     await next();
   });
 

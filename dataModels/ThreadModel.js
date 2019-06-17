@@ -453,9 +453,9 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.toc = oc.toc;
   updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
-  updateObj.count = await PostModel.count({tid: thread.tid});
-  updateObj.countToday = await PostModel.count({tid: thread.tid, toc: {$gt: time}});
-  updateObj.countRemain = await PostModel.count({tid: thread.tid, disabled: {$ne: true}});
+  updateObj.count = await PostModel.count({tid: thread.tid, parentPostId: ""});
+  updateObj.countToday = await PostModel.count({tid: thread.tid, toc: {$gt: time}, parentPostId: ""});
+  updateObj.countRemain = await PostModel.count({tid: thread.tid, disabled: {$ne: true}, parentPostId: ""});
   updateObj.uid = oc.uid;
 
   const userCount = await PostModel.aggregate([
@@ -614,7 +614,8 @@ threadSchema.statics.getPostStep = async (tid, obj) => {
   const perpage = pageSettings.c.threadPostList;
   const pid = obj.pid;
   const q = {
-    tid
+    tid,
+    parentPostId: ""
   };
   if(obj.disabled === false) q.disabled = false;
   const posts = await PostModel.find(q, {pid: 1, _id: 0}).sort({toc: 1});

@@ -6,16 +6,24 @@ const {appCode} = aliAppCode;
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 let fn = {};
-fn.paging = (page, count, perpage) => {
-  if(page === undefined) page = 0;
+fn.paging = (page = 0, count, perpage) => {
   if(!perpage) perpage = defaultPerpage;
+  page = parseInt(page);
+  const pageCount = Math.ceil(count/perpage);
+  if(page >= pageCount) {
+    if(pageCount > 0) page = pageCount - 1;
+    else page = 0;
+  }
+  const buttonValue = fn.getPagingButton({page, pageCount});
+
   return {
-    page: parseInt(page),
-    perpage: perpage,
+    page,
+    perpage,
     start: page*perpage,
     count: perpage,
-    pageCount: Math.ceil(count/perpage),
-	  aggregate: count
+    pageCount,
+	  aggregate: count,
+    buttonValue
   }
 };
 
@@ -539,7 +547,7 @@ fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
 * @return {[Number]} 分页按钮数值，空元素表示省略
 * @author pengxiguaa 2019-6-12
 * */
-fn.getPagingButton= (paging) => {
+fn.getPagingButton = (paging) => {
   const {page = 0, pageCount = 1} = paging;
   const arr = [];
   // 总页数不超过1 无需分页
@@ -576,16 +584,40 @@ fn.getPagingButton= (paging) => {
   }
 
   if(min !== 0) {
-    arr.push(0);
+    arr.push({
+      type: "common",
+      num: 0
+    });
     if(min > 1) {
-      arr.push(null);
+      arr.push({
+        type: "null"
+      });
     }
   }
   for(let i = 0; i < pageCount; i++) {
-    if(i > min && i <= max) {
-      arr.push(i);
+    if(i >= min && i <= max) {
+      let type = "common";
+      if(page === i) {
+        type = "active";
+      }
+      arr.push({
+        type,
+        num: i
+      });
     }
   }
-
+  if(max < (pageCount - 1)) {
+    if(max < (pageCount -2)) {
+      arr.push({
+        type: "null"
+      });
+    }
+    arr.push({
+      type: "common",
+      num: pageCount - 1
+    })
+  }
+  return arr;
 };
+
 module.exports = fn;

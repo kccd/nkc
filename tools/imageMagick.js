@@ -39,6 +39,11 @@ const hhh = "480";
 const os = platform();
 const linux = (os === 'linux');
 
+// 图片格式转化（webp）
+const imageExtTurn = (path, newpath) => {
+  return spawnProcess('magick', ['convert', path, newpath])
+}
+
 // 图片缩小
 const imageNarrow = path => {
   return spawnProcess('magick', ['convert', path, '-resize', `${www}>`,path])
@@ -396,6 +401,7 @@ const turnVideo = async(inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath])
 }
 module.exports = {
+  imageExtTurn,
   avatarify,
   attachify,
   watermarkify,

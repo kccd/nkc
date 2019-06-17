@@ -1183,7 +1183,6 @@ userSchema.statics.getModifyPostTimeLimit = async (uid) => {
       modifyPostTimeLimit = role.modifyPostTimeLimit;
     }
   }
-  console.log(modifyPostTimeLimit);
   return modifyPostTimeLimit;
 };
 

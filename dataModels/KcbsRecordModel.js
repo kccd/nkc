@@ -270,8 +270,10 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   for(const thread of threads) {
     threadsObj[thread.fid] = thread;
   }
-  for(const post of posts) {
-    postsObj[post.fid] = post;
+  for(let post of posts) {
+    post = post.toObject();
+    post.url = await PostModel.getUrl(post);
+    postsObj[post.pid] = post;
   }
   return records.map(r => {
     r = r.toObject();
@@ -284,7 +286,9 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     }
     if(r.tid) r.thread = threadsObj[r.tid];
     if(r.fid) r.forum = forumsObj[r.fid];
-    if(r.pid) r.post = postsObj[r.pid];
+    if(r.pid) {
+      r.post = postsObj[r.pid];
+    }
     r.kcbsType = typesObj[r.type];
     return r
   });
