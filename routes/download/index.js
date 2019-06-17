@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const downloadRouter = new Router();
 const fss = require("fs");
+const pathh = require('path');
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 
 downloadRouter
@@ -43,6 +44,8 @@ downloadRouter
                     ext = "bmp";
                 }else if(res.headers['content-type'] === "image/svg+xml"){
                     ext = "svg";
+                }else if(res.headers['content-type'] === "image/webp"){
+                    ext = "webp";
                 }else{
                     error = new Error('不是图片');
                     reject(error)
@@ -80,12 +83,19 @@ downloadRouter
     let funcResult = await downloadImg(url, './tmp/upload_'+timeStr);
     
     //获得图片格式和尺寸
-    const {uploadPath, generateFolderName, thumbnailPath} = settings.upload;
-    const {selectDiskCharacterUp} = settings.mediaPath;
-    const extension = funcResult.exts;
-    const size = funcResult.sizes;
-    const name = timeStr + '.' + extension;
-    const path = './tmp/' + 'upload_' +  timeStr + '.' + extension;
+    const {mediaPath, uploadPath, generateFolderName,extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = settings.upload;
+    let {selectDiskCharacterUp} = settings.mediaPath;
+    let extension = funcResult.exts;
+    // 如果是webp格式图片，则转换为jpg
+    if(extension == "webp") {
+      extension = "jpg";
+      let oldPath = pathh.resolve('./tmp/' + 'upload_' +  timeStr + '.' + "webp");
+      let newPath = pathh.resolve('./tmp/' + 'upload_' +  timeStr + '.' + "jpg");
+      await imageMagick.imageExtTurn(oldPath, newPath);
+    }
+    let size = funcResult.sizes;
+    let name = timeStr + '.' + extension;
+    let path = pathh.resolve('./tmp/' + 'upload_' +  timeStr + '.' + extension);
     // 图片最大尺寸
     const {largeImage} = settings.upload.sizeLimit;
     // 根据自增id定义图片名称
@@ -106,10 +116,44 @@ downloadRouter
     // // 路径+图片名称 d:\nkc\resources\upload/2018/04/279472.png
     // const descFile = descPath + saveName;
     // 如果格式满足则生成缩略图
-    const descPathOfThumbnail = generateFolderName(thumbnailPath); // 存放路径
-    const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 路径+名称
+    const descPathOfThumbnail = generateFolderName(thumbnailPath); // 略缩图存放路径
+    const descPathOfMedium = generateFolderName(mediumPath); // 中号图存放路径
+    const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 略缩图路径+名称
+    const mediumFilePath = mediumPath + descPathOfThumbnail + saveName; // 中号图路径 + 名称
+    // 获取原图id
+    const descPathOfOrigin = generateFolderName(originPath); // 原图存放路径
+    originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
+    let originSaveName = originId + '.' + extension;
+    const originFilePath = originPath + descPathOfOrigin + originSaveName; // 原图存放路径
+    // 获取图片尺寸
+    const { width, height } = await imageMagick.info(path);
+    // 生成无水印原图
+    if(width > 3840 || size > 5242880) {
+      await imageMagick.originify(path, originFilePath)
+    }else{
+      await fs.copyFile(path, originFilePath);
+    }
+    const ro = new ctx.db.OriginImageModel({
+      originId,
+      path: middlePath + originSaveName,
+      tpath: middlePath + originSaveName,
+      ext: extension,
+      uid: ctx.data.user.uid,
+      toc: Date.now()
+    });
+    ctx.data.ro = await ro.save();
     // 生成略缩图
-    await imageMagick.thumbnailify(path, thumbnailFilePath);
+    if(width > 150 || size > 51200) {
+      await imageMagick.thumbnailify(path, thumbnailFilePath);
+    }else{
+      await fs.copyFile(path, thumbnailFilePath);
+    }
+    // 生成中号图
+    if(width > 640 || size > 102400) {
+      await imageMagick.mediumify(path, mediumFilePath);
+    }else{
+      await fs.copyFile(path, mediumFilePath)
+    }
     // 获取个人水印设置
     const waterSetting = await ctx.db.UsersGeneralModel.findOne({uid: ctx.data.user.uid});
     const waterAdd = waterSetting?waterSetting.waterSetting.waterAdd : true;
@@ -180,8 +224,6 @@ downloadRouter
         logoCoor = "+0+0";
         userCoor = "+0+0"
       }
-    // 获取图片尺寸
-    const { width, height } = await imageMagick.info(path);
     // 如果图片宽度大于1024，则将图片宽度缩为1024
     if(width > 1920 && size > largeImage){
       await imageMagick.imageNarrow(path)
@@ -191,8 +233,9 @@ downloadRouter
       if(waterStyle === "siteLogo"){
         await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path);
       }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
-        await imageMagick.watermarkifyLogo(logoCoor, waterGravity, waterSmallPath, path)
-        await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path)
+        await imageMagick.watermarkifyLogo(transparency, logoCoor, waterGravity, waterSmallPath, path);
+        var temporaryPath = extGetPath(extension);
+        await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path, temporaryPath)
       }
     }
     // console.log(width>1024)

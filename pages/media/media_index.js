@@ -137,10 +137,16 @@ function loadMedia(type, q, s, turn) {
   })
 }
 
+
 // 向上翻页
 function prevPage() {
   var type = media.mediaType;
   loadMedia(type, quota, skip, 'prev')
+}
+
+
+window.loadMediaRe = function() {
+  prevPage()
 }
 
 // 向下翻页
@@ -501,7 +507,7 @@ function mediaInsertUE(rid, fileType, name) {
   var codeResource = "";
   if(fileType === "jpg" || fileType === "png" || fileType === "gif" || fileType === "bmp" || fileType === "jpeg" || fileType === "svg"){
     //codeResource = "<b>123456</b>"
-    codeResource = "<p><img src=" + "/r/" + rid + " width='50%'></p>"
+    codeResource = "<p><img src=" + "/r/" + rid + " style='max-width:100%'></p>"
   }else if(fileType === "mp4"){
     codeResource = "<p><br></p><p><video src=" + "/r/" + rid + " controls style=width:50%;>video</video></p>";
     // codeResource = "<p><img src=" + "/frameImg/" + rid + " width='50%'></p>";
