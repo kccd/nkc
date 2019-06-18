@@ -29,8 +29,8 @@ function nkc_render(options){
   var default_whitelist = xss.whiteList;
   default_whitelist.font = ['color']
   default_whitelist.code = ['class']
-  default_whitelist.span = ['class', 'style', 'aria-hidden'];
-  default_whitelist.a = ['href', 'title', 'target', 'style'];
+  default_whitelist.span = ['class', 'style', 'contenteditable', 'dataType'];
+  default_whitelist.a = ['target', 'href', 'title', 'class', 'style'];
   default_whitelist.p = ['align','style'];
   default_whitelist.div = ['style','class','contenteditable'];
   default_whitelist.table = ['border','width','cellpadding','cellspacing'];
@@ -65,6 +65,7 @@ function nkc_render(options){
         left: true,
         fontSize: true,
         display: true,
+        "background-image": true,
         "font-weight":true,
         "font-size":true,
         "font-style":true,

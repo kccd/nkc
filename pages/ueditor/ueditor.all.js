@@ -23439,6 +23439,10 @@ UE.plugins['catchremoteimage'] = function () {
         ajax = UE.ajax;
 
     /* 设置默认值 */
+    me.setOpt({
+        imgCount: 0,
+        imgTotal: 0
+    })
     if (me.options.catchRemoteImageEnable === false) return;
     me.setOpt({
         catchRemoteImageEnable: false
@@ -23469,6 +23473,7 @@ UE.plugins['catchremoteimage'] = function () {
                 }
                 return false;
             };
+        me.options.imgTotal = imgs.length;
         var isPc = IsPC();
         var imgWidth = {
             style:'max-width: 100%'
@@ -23500,6 +23505,7 @@ UE.plugins['catchremoteimage'] = function () {
             catchremoteimage(remoteImages, {
                 //成功抓取
                 success: function (r) {
+                    me.options.imgCount++;
                     try {
                         var info = r.state !== undefined ? r:eval("(" + r.responseText + ")");
                     } catch (e) {
@@ -23534,6 +23540,7 @@ UE.plugins['catchremoteimage'] = function () {
                 },
                 //回调失败，本次请求超时
                 error: function (r) {
+                    me.options.imgCount++;
                     try {
                         var info = r.state !== undefined ? r:eval("(" + r.responseText + ")");
                     } catch (e) {
