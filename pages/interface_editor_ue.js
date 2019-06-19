@@ -24,7 +24,22 @@ function articleTransfer() {
 /**
  * 保存草稿
  */
+function saveToThreadWithCheck() {
+  // 获取自动上传的图片总数以及已传图片的数量
+  var imgTotal = ue.options.imgTotal;
+  var imgCount = ue.options.imgCount;
+  if(imgCount < imgTotal) {
+    $("#saveToThreadWithCheckDom").modal("show");
+  }else{
+    saveDraft();
+  }
+}
+
+/**
+ * 保存草稿
+ */
 function saveDraft() {
+  $("#saveToThreadWithCheckDom").modal("hide");
   articleTransfer();
   // 获取url相关参数
   var query = getSearchKV();
@@ -91,21 +106,30 @@ function saveDraft() {
 }
 
 /**
+ * 发表文章
+ */
+function postToThreadWithCheck() {
+    // 获取自动上传的图片总数以及已传图片的数量
+    var imgTotal = ue.options.imgTotal;
+    var imgCount = ue.options.imgCount;
+    if(imgCount < imgTotal) {
+      $("#postToThreadWithCheckDom").modal("show");
+    }else{
+      onPost();
+    }
+}
+
+/**
  * 提交回复
  */
 function onPost() {
+  $("#postToThreadWithCheckDom").modal("hide");
   articleTransfer();
   // 获取url相关参数
   var query = getSearchKV();
   var queryType = query.type;
   var queryId = query.id;
   var queryCat = query.cat;
-  // 获取自动上传的图片总数以及已传图片的数量
-  var imgTotal = ue.options.imgTotal;
-  var imgCount = ue.options.imgCount;
-  if(imgCount < imgTotal) {
-    return screenTopWarning("图片正在上传，请稍等...")
-  }
   // 文章内容相关
   var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''; // 引用
   // var transferContent = ue.getContent(); // 转移区内容
