@@ -37,4 +37,31 @@ script(type='text/javascript').
     enableAutoSave: false, // 是否启动自动保存
     elementPathEnabled: false, // 是否显示元素路径
     imageScaleEnabled: false, // 启用图片拉伸缩放
+    imgTotal: 0, 
+    imgCount: 0
   });
+
+div#postToThreadWithCheckDom.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel")
+  div.modal-dialog(role='document')
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-label='Close')
+          span(aria-hidden='true') ×
+      .modal-body
+        p 图片自动上传尚未执行完毕，是否仍然发起提交
+      .modal-footer
+        button.btn.btn-default(type='button', data-dismiss='modal') 再等会儿
+        button.btn.btn-primary(type='button' onclick="onPost()") 立即提交
+
+
+div#saveToThreadWithCheckDom.modal.fade(tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel")
+  div.modal-dialog(role='document')
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-label='Close')
+          span(aria-hidden='true') ×
+      .modal-body
+        p 图片自动上传尚未执行完毕，是否仍然保存草稿
+      .modal-footer
+        button.btn.btn-default(type='button', data-dismiss='modal') 再等会儿
+        button.btn.btn-primary(type='button' onclick="saveDraft()") 立即保存
