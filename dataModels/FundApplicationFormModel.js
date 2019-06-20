@@ -714,6 +714,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
       l: "html"
     });
     await FundApplicationForm.updateOne({_id: this._id}, {$set: {tid: formPost.tid}});
+    await ThreadModel.updateOne({tid: formPost.tid}, {$set: {reviewed: true}});
   } else {
     await formThread.update({mainForumsId: fundForumsId});
     const formPost = await PostModel.findOnly({pid: formThread.oc});
