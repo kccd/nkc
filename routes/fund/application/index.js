@@ -89,6 +89,8 @@ applicationRouter
 
 	// 申请表展示页
 	.get('/:_id', async (ctx, next) => {
+/*    const {tid} = ctx.data.applicationForm;
+    return ctx.redirect(`/t/${tid}`);*/
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
 		if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
@@ -96,8 +98,15 @@ applicationRouter
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
 		if(!applicationForm.fund.ensureOperatorPermission('admin', user) && applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
-		ctx.template = 'interface_fund_applicationForm.pug';
+		ctx.template = 'fund/applicationForm.pug';
 		const page = query.page? parseInt(query.page): 0;
+		// 已发表的申请，项目内容从文章读取
+    if(applicationForm.tid) {
+      const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
+      applicationForm.project = await db.PostModel.findOnly({pid: thread.oc});
+    }
+
+
 		const q = {
 			applicationFormId: applicationForm._id,
 			type: 'comment'
@@ -204,7 +213,8 @@ applicationRouter
 				const selectedUserUid = newMembers.map(s => s.uid);
 				// 从数据库中标记未被选择的用户
 				for(let u of members) {
-					if(!selectedUserUid.includes(u.uid)) await db.FundApplicationUserModel.updateMany({uid: u.uid}, {$set: {removed: true}});
+					if(!selectedUserUid.includes(u.uid))
+					  await db.FundApplicationUserModel.updateOne({_id: u._id, uid: u.uid}, {$set: {removed: true}});
 				}
 				// 写入新提交的数据库中不存在的用户信息
 				for(let u of newMembers) {
@@ -220,6 +230,18 @@ applicationRouter
 							authLevel
 						});
 						await newApplicationUser.save();
+						// 给组员发送通知
+						const message = db.MessageModel({
+              _id: await db.SettingModel.operateSystemID("messages", 1),
+              r: u.uid,
+              ty: "STU",
+              c: {
+                type: "fundMember",
+                applicationFormId: applicationForm._id
+              }
+            });
+						await message.save();
+						await ctx.redis.pubMessage(message);
 					}
 				}
 				updateObj.from = 'team';

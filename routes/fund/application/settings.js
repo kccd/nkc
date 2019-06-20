@@ -23,9 +23,8 @@ settingsRouter
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
 		if(s === 4) {
-			const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-			const forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
-			data.forumList = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
+      data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
+      data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		}
 		if(s > 5) ctx.throw(404, 'not found');
 		data.s = s;

@@ -80,6 +80,7 @@ operationRouter
 		if(tid === undefined) ctx.throw(400, '参数不正确');
 		// 根据tid添加退回标记
 		let thread = await db.ThreadModel.findOne({tid});
+    if(thread.type === "fund") ctx.throw(403, "科创基金类文章无法退修");
     let isModerator = ctx.permission('superModerator');
     if(!isModerator) {
       const forums = await thread.extendForums(['mainForums']);

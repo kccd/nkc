@@ -84,6 +84,7 @@ remittanceRouter
 							name,
 							account: number
 						}
+            await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
 					} catch (err) {
 						const {subCode} = err;
 						let description;
@@ -107,6 +108,7 @@ remittanceRouter
 						});
 						await applicationForm.update({remittance});
 						await newDocument.save();
+            await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
 						return await next();
 					}
 				}
@@ -134,7 +136,9 @@ remittanceRouter
 			obj.submittedReport = false;
 		}
 		await applicationForm.update(obj);
-		await next();
+    await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+
+    await next();
 	})
 	.get('/apply', async (ctx, next) => {
 		const {data, db} = ctx;
@@ -260,6 +264,7 @@ remittanceRouter
 				await applicationForm.update(updateObj);
 				await newDocument.save();
 			}
+      await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
 		} else {
 			// 人工审核
 			// 申请第一期拨款不需要附带文章
@@ -312,6 +317,7 @@ remittanceRouter
 							obj.c = `申请第 ${i+1} 期拨款`;
 							obj.support = true;
 							obj._id = reportId_2;
+							obj.type = "system";
 							const report_2 = db.FundDocumentModel(obj);
 							await report_1.save(); // 提交的报告
 							await report_2.save(); // 自动生成的报告
@@ -325,6 +331,7 @@ remittanceRouter
 					break;
 				}
 			}
+      await db.MessageModel.sendFundMessage(applicationForm._id, "financialStaff");
 		}
 		await next();
 	})

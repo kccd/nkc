@@ -54,11 +54,16 @@ block content
                       span 商城
                       span(style="margin-left:15px") 
                         button.btn.btn-sm.btn-danger(onclick=`clearKind(${forum.fid})`) 清除类别
+                    else if data.forum.kindName === "fund"
+                      span 基金
+                      span(style="margin-left:15px")
+                        button.btn.btn-sm.btn-danger(onclick=`clearKind(${forum.fid})`) 清除类别
               .form-group
                 label.col-sm-2.control-label 选择类别
                 .col-sm-3
                   select.form-control#kinds
                     option(value="shop") 商城
+                    option(value="fund") 基金
                   button.btn.btn-default(style='margin-top: 0.5rem;' onclick=`saveKind()`) 保存类别
               .form-group
                 label.col-sm-2.control-label 移动至

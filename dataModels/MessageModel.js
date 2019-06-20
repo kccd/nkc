@@ -43,7 +43,7 @@ const messageSchema = new Schema({
   *   file 一般文件
   *
   * pid
-  * type 
+  * type
   *   typeThread 回复帖子
   *   typePost  回复单条回复
   * */
@@ -98,7 +98,7 @@ const messageSchema = new Schema({
     virtuals: true
   }
 });
-/* 
+/*
   判断用户是否有权限发送信息
   @param fromUid 当前用户ID
   @param toUid 对方用户ID
@@ -206,6 +206,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const PostModel = mongoose.model("posts");
   const UserModel = mongoose.model("users");
   const ThreadModel = mongoose.model("threads");
+  const FundApplicationFormModel = mongoose.model("fundApplicationForms");
   const ShopOrdersModel = mongoose.model("shopOrders");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const apiFunction = require("../nkcModules/apiFunction");
@@ -215,7 +216,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
 
   for(let r of arr) {
     r = r.toObject();
-    const {type, pid, targetPid, targetUid, tid, orderId, refundId} = r.c;
+    const {type, pid, targetPid, targetUid, tid, orderId, refundId, applicationFormId} = r.c;
     if(type === "at") {
       const post = await PostModel.findOne({pid: targetPid});
       if(!post) continue;
@@ -334,6 +335,15 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if(!thread) continue;
       r.c.post = post;
       r.c.thread = thread;
+    } else if(["fundAdmin", "fundApplicant", "fundMember"]) {
+      let applicationForm = await FundApplicationFormModel.findOne({_id: applicationFormId});
+      if(!applicationForm) continue;
+      applicationForm = applicationForm.toObject();
+      const user = await UserModel.findOne({uid: applicationForm.uid});
+      if(!user) continue;
+      r.c.user = user;
+      applicationForm.url = `/fund/a/${applicationForm._id}`;
+      r.c.applicationForm = applicationForm;
     }
 
     if(r.c.thread) {
@@ -455,6 +465,53 @@ messageSchema.statics.sendReviewMessage = async (pid) => {
     });
     await message.save();
     await redis.pubMessage(message);
+  }
+};
+
+/*
+* 基金通知
+* */
+messageSchema.statics.sendFundMessage = async (applicationFormId, type) => {
+  const FundApplicationFormModel = mongoose.model("fundApplicationForms");
+  const FundModel = mongoose.model("funds");
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
+  const MessageModel = mongoose.model("messages");
+  const redis = require("../redis");
+  const form = await FundApplicationFormModel.findOnly({_id: applicationFormId});
+  const fund = await FundModel.findOnly({_id: form.fundId});
+  if(type === "applicant") {
+    const message = MessageModel({
+      _id: await SettingModel.operateSystemID("messages", 1),
+      ty: "STU",
+      r: form.uid,
+      c: {
+        type: "fundApplicant",
+        applicationFormId: form._id
+      }
+    });
+    await message.save();
+    await redis.pubMessage(message);
+  } else {
+    const {certs, appointed} = fund[type];
+    let users = await UserModel.find({certs: {$in: certs}}, {uid: 1});
+    const uids = users.map(user => user.uid);
+    let appointed_ = appointed.filter(uid => !uids.includes(uid));
+    const aUsers = await UserModel.find({uid: {$in: appointed_}}, {uid: 1});
+    users = users.concat(aUsers);
+    for(const user of users) {
+      const message = MessageModel({
+        _id: await SettingModel.operateSystemID("messages", 1),
+        ty: "STU",
+        r: user.uid,
+        c: {
+          type: "fundAdmin",
+          applicationFormId: form._id
+        }
+      });
+      await message.save();
+      await redis.pubMessage(message);
+    }
   }
 };
 

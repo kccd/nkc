@@ -1,8 +1,11 @@
 body{
-  background-color: #fafafa;
+  background-color: #fff;
 }
 .fund input.form-control, .fund .btn, .fund textarea.form-control{
-  border-radius: 0;
+  /*border-radius: 0;*/
+}
+input[type="radio"], input[type="checkbox"] {
+  margin: 4px 0 0;
 }
 .fund-navbar ul{
   padding: 0.5rem;
@@ -60,7 +63,7 @@ body{
   background-color: #2b90d9;
 }
 .edit-fund-steps{
-  padding: 0.5rem 0 1rem 0;
+  padding: 2rem 0 2rem 0;
   border-bottom: 1px solid #eee;
 }
 .edit-fund-body{

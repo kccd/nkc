@@ -97,6 +97,9 @@
 .p-a-1{
   padding: 1rem;
 }
+.p-t-0{
+  padding-top: 0;
+}
 .p-t-1{
   padding-top: 1rem;
 }
@@ -199,7 +202,6 @@
 .b-s-50{
   box-shadow: 0 0 50px rgba(0,0,0,0.2);
 }
-
 .pointer{
   cursor: pointer;
 }

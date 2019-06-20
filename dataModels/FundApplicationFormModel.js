@@ -70,7 +70,7 @@ const fundApplicationFormSchema = new Schema({
   },
   budgetMoney: { // 预算
     type: Schema.Types.Mixed,
-    default: null
+    default: []
     /*
     {
       purpose: String,
@@ -203,9 +203,13 @@ const fundApplicationFormSchema = new Schema({
 	},
 	category: {
 		type: String,
-		default: null,
-		index: 1
+		default: ""
 	},
+  tid: {
+    type: String,
+    default: "",
+    index: 1
+  },
   lock: {
   	submitted: { // 用于判断用户当前申请表是否已提交
   		type: Boolean,
@@ -366,10 +370,9 @@ fundApplicationFormSchema.pre('save', async function(next) {
 	const fund = await this.extendFund();
 	const {code, status, supportersId} = this;
 	const {submitted} = status;
-	// 网友支持
-	if(fund.supportCount <= supportersId.length) {
-		status.usersSupport = true;
-	}
+
+	/*// 网友支持功能暂时屏蔽，所有申请默认通过
+  status.usersSupport = true;*/
 
 
 	// 生成申请表编号
@@ -499,7 +502,11 @@ fundApplicationFormSchema.methods.extendReportThreads = async function() {
 
 fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const PhotoModel = require('./PhotoModel');
+	const ForumModel = mongoose.model("forums");
+	const ThreadModel = mongoose.model("threads");
+	const PostModel = mongoose.model("posts");
 	const FundDocumentModel = require('./FundDocumentModel');
+	const FundApplicationUserModel = mongoose.model("fundApplicationUsers");
 	const FundApplicationFormHistoryModel = require('./FundApplicationHistoryModel');
 	const FundApplicationForm = mongoose.model('fundApplicationForms');
 	const {
@@ -523,6 +530,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		objector,
 		category,
 		disabled,
+    supportersId
 	} = this;
 	const {
 		money,
@@ -558,7 +566,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	} else {
 		if(!project.t) throw '请填写项目名称！';
 		if(!project.c) throw '请输入项目名称！';
-		if(!project.abstract && detailedProject) throw '请输入项目摘要！';
+		if(!project.abstractCn && detailedProject) throw '请输入项目摘要！';
 	}
 
 	//其他信息判断
@@ -614,7 +622,13 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 		}
 		for(let m of members) {
 			if(disagreeUsers.includes(m.uid) || notModifiedUsers.includes(m.uid)) {
-				await m.update({removed: true});
+			  await FundApplicationUserModel.updateOne({
+          applicationFormId: this._id, uid: m.uid
+        }, {
+			    $set: {
+			      removed: true
+          }
+        });
 			}
 		}
 
@@ -666,8 +680,55 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	newObj.projectAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'projectAudit'}).sort({toc: -1});
 	newObj.moneyAudit = await FundDocumentModel.findOne({applicationFormId: this._id, type: 'moneyAudit'}).sort({toc: -1});
 	const newHistory = new FundApplicationFormHistoryModel(newObj);
+
+  // 网友支持
+  if(fund.supportCount <= supportersId.length) {
+    status.usersSupport = true;
+    if(fund.auditType === "person") {
+      await mongoose.model("messages").sendFundMessage(this._id, "expert");
+    }
+  }
+
 	await this.save();
 	await newHistory.save();
+
+	const fundForums = await ForumModel.find({kindName: "fund"});
+	let fundForumsId = fundForums.map(f => f.fid);
+	if(!fundForumsId.includes(category)) fundForumsId.unshift(category);
+	// 生成文章
+  let formThread;
+  if(this.tid) {
+    formThread = await ThreadModel.findOne({tid: this.tid});
+  }
+  if(!formThread) {
+    const formPost = await ForumModel.createNewThread({
+      fids: fundForumsId,
+      uid: this.uid,
+      type: "fund",
+      c: project.c,
+      t: project.t,
+      abstractEn: project.abstractEn,
+      abstractCn: project.abstractCn,
+      keyWordsEn: project.keyWordsEn,
+      keyWordsCn: project.keyWordsCn,
+      l: "html"
+    });
+    await FundApplicationForm.updateOne({_id: this._id}, {$set: {tid: formPost.tid}});
+  } else {
+    await formThread.update({mainForumsId: fundForumsId});
+    const formPost = await PostModel.findOnly({pid: formThread.oc});
+    formPost.c = project.c;
+    formPost.t = project.t;
+    formPost.abstractEn = project.abstractEn;
+    formPost.abstractCn = project.abstractCn;
+    formPost.keyWordsEn = project.keyWordsEn;
+    formPost.keyWordsCn = project.keyWordsCn;
+    formPost.l = "html";
+    formPost.mainForumsId = fundForumsId;
+    formPost.uid = this.uid;
+    await formPost.save();
+  }
+
 };
 
 const FundApplicationFormModel = mongoose.model('fundApplicationForms', fundApplicationFormSchema);

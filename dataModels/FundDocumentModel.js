@@ -44,12 +44,12 @@ const documentSchema = new Schema({
 	t: {
 		type: String,
 		default: null,
-		maxlength: [50, '标题不能超过50字。']
+		maxlength: [200, '标题不能超过50字。']
 	},
 	abstract: {
 		type: String,
 		default: null,
-		maxlength: [200, '摘要不能超过200字。']
+		maxlength: [1000, '摘要不能超过200字。']
 	},
   // 中文摘要
   abstractCn: {
@@ -74,7 +74,7 @@ const documentSchema = new Schema({
 	c: {
 		type: String,
 		default: null,
-		maxlength: [20000, '内容不能超过2万字。']
+		maxlength: [100000, '内容不能超过2万字。']
 	},
 	disabled: {
 		type: Boolean,

@@ -71,6 +71,6 @@ function moveThreadToRedit(id,para){
       screenTopAlert("已将文章退回，请等待刷新")
     })
     .catch(function(data){
-      screenTopAlert(data.error)
+      screenTopWarning(data.error)
     })
 }

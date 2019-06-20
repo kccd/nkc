@@ -20,6 +20,9 @@
   "sellerOrderRefundURL": "卖家查看退款申请的链接",
   "buyerOrderRefundURL": "买家查看退款申请的链接",
   "reviewLink": "内容链接",
+  "applicationFormURL": "申请表链接",
+  "applicationFormId": "申请表ID",
+  "applicationFormCode": "申请表编号",
 
   "replyPost": "回复被引用",
   "replyThread": "文章被回复",
@@ -43,5 +46,8 @@
   "warningPost": "建议修改回复",
   "warningThread": "建议修改文章",
   "newReview": "【审核系统】内容待审核",
-  "passReview": "【审核系统】内容通过审核"
+  "passReview": "【审核系统】内容通过审核",
+  "fundApplicant": "【基金系统】申请状态更新",
+  "fundAdmin": "【基金系统】申请待处理",
+  "fundMember": "【基金系统】组队邀请"
 }
