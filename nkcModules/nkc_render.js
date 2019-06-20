@@ -500,11 +500,13 @@ function nkc_render(options){
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');
     // 如果是外站图片，在渲染时需要将图片替换成本站默认图
     var imgsArray = html.match(/\<img.*?\>/igm);
-    for(var im = 0;im < imgsArray.length; im++) {
-      if(/http/igm.test(imgsArray[im])) {
-        if(!/kechuang/igm.test(imgsArray[im])) {
-          var newStr = '<img src="/default/picdefault.png" />';
-          html = html.replace(imgsArray[im], newStr)
+    if(imgsArray) {
+      for(var im = 0;im < imgsArray.length; im++) {
+        if(/http/igm.test(imgsArray[im])) {
+          if(!/kechuang/igm.test(imgsArray[im])) {
+            var newStr = '<img src="/default/picdefault.png" />';
+            html = html.replace(imgsArray[im], newStr)
+          }
         }
       }
     }
