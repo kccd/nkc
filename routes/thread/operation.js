@@ -253,19 +253,23 @@ operationRouter
 				const delLog = new db.DelPostLogModel(para);
 				await delLog.save();
 			}
-      const mId = await db.SettingModel.operateSystemID('messages', 1);
-      const message = db.MessageModel({
-        _id: mId,
-        ty: 'STU',
-        r: targetThread.uid,
-        c: {
-          type: 'bannedThread',
-          tid: targetThread.tid,
-          rea: para?para.reason:''
-        }
-      });
-      await message.save();
-      await ctx.redis.pubMessage(message);
+      if(para && para.noticeType) {
+        const mId = await db.SettingModel.operateSystemID('messages', 1);
+        const message = db.MessageModel({
+          _id: mId,
+          ty: 'STU',
+          r: targetThread.uid,
+          c: {
+            type: 'bannedThread',
+            tid: targetThread.tid,
+            rea: para?para.reason:''
+          }
+        });
+        await message.save();
+        await ctx.redis.pubMessage(message);
+      }
+
+
       if(!targetThread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, para.reason);
     }
 		if(para && para.noticeType === true){
