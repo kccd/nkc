@@ -78,13 +78,13 @@ block content
                   input#parseURL(type='checkbox' checked)
                   span &nbsp;处理URL&nbsp;
               .form-group
-                  button#post.btn.btn-primary(type='submit' onclick="onPost()") 发表
+                  button#post.btn.btn-primary(type='submit' onclick="postToThreadWithCheck()") 发表
               if !['forum_declare'].includes(data.type)
                 .form-group
                 -if (!data.targetUser)
-                  button#draft.btn.btn-primary(type='submit' onclick="saveDraft()") 保存草稿
+                  button#draft.btn.btn-primary(type='submit' onclick="saveToThreadWithCheck()") 保存草稿
                 -else if(data.targetUser.uid === data.user.uid)
-                  button#draft.btn.btn-primary(type='submit' onclick="saveDraft()") 保存草稿
+                  button#draft.btn.btn-primary(type='submit' onclick="saveToThreadWithCheck()") 保存草稿
                 //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
                   button#draft.btn.btn-primary(type='submit') 保存草稿
                 .form-group
@@ -107,8 +107,8 @@ block scripts
   //- if data.ver == "ue"
   link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-  script(src="/jquery-1.10.2.js")
-  script(src="/jquery-ui-1.10.4.custom.js")
+  //- script(src="/jquery-1.10.2.js")
+  //- script(src="/jquery-ui-1.10.4.custom.js")
   +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
