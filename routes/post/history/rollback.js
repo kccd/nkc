@@ -4,7 +4,7 @@ const router = new Router();
 router
   .get('/:_id', async (ctx, next) => {
     const {pid, _id} = ctx.params;
-    const {db, data, address, port} = ctx;
+    const {db, data, address, port, nkcModules} = ctx;
     const {user} = data;
 
     const {PostModel, HistoriesModel, ThreadModel} = db;
@@ -32,7 +32,7 @@ router
     	q.disabled = false;
     }
     const {page} = await targetThread.getStep(q);
-    return ctx.redirect(`/t/${originPost.tid}?page=${page}&highlight=${pid}#${pid}`);
+    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${originPost.tid}?page=${page}&highlight=${pid}#${pid}`));
   });
 
 module.exports = router;

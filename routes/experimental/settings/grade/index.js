@@ -2,10 +2,10 @@ const Router = require('koa-router');
 const router = new Router();
 router
 	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
+		const {data, db, nkcModules} = ctx;
 		const grade = await db.UsersGradeModel.findOne().sort({score: 1});
 		if(grade) {
-			return ctx.redirect(`/e/settings/grade/${grade._id}`);
+			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/e/settings/grade/${grade._id}`));
 		}
 		data.grades = await db.UsersGradeModel.find().sort({score: 1});
 		ctx.template = 'experimental/settings/grade.pug';

@@ -540,6 +540,23 @@ fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
   return freightPrice;
 }
 
+/**
+ * 生成新的app跳转的url
+ * @param {*} state 这里必须传入ctx.state
+ * @param {*} url 
+ */
+fn.generateAppLink = (state, url) => {
+	if(state.apptype && state.apptype === "app") {
+		let paramIndex = url.indexOf("?");
+		if(paramIndex > -1) {
+			url += "&apptype=app"
+		}else{
+			url += "?apptype=app";
+		}
+	}
+	return url;
+}
+
 /*
 * 获取分页按钮的数值
 * @param {Number} page 当前所在分页数

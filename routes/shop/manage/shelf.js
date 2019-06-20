@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const shelfRouter = new Router();
 shelfRouter
   .use('/', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, nkcModules} = ctx;
     const {user} = data;
     // 检测店铺信息是否已完善，如果不完善则跳转到店铺信息设置
     // const store = await db.ShopStoresModel.findOne({uid: user.uid});
@@ -14,18 +14,18 @@ shelfRouter
     // }
     const dealInfo = await db.ShopDealInfoModel.findOne({uid: user.uid});
     if(!data.dealInfo || !data.dealInfo.dataPerfect) {
-      return ctx.redirect(`/shop/manage/${user.uid}/info`)
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/shop/manage/${user.uid}/info`))
     }
     await next();
   })
 	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
+		const {data, db, nkcModules} = ctx;
     const {user} = data;
     // 检测是否被封禁商品上架功能
     const homeSetting = await db.ShopSettingsModel.findOne({type: "homeSetting"});
     if(homeSetting.banList) {
       if(homeSetting.banList.indexOf(user.uid) > -1) {
-        return ctx.redirect('/shop/manage');
+        return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/shop/manage'));
       }
     }
     data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);

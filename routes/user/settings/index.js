@@ -19,11 +19,11 @@ const displayRouter = require("./display");
 const redEnvelopeRouter = require('./redEnvelope');
 settingRouter
 	.use('/', async (ctx, next) => {
-		const {data, params, db} = ctx;
+		const {data, params, db, nkcModules} = ctx;
 		const {user} = data;
 		const {uid} = params;
 		if(!user || user.uid !== uid) ctx.throw(403, '权限不足');
-		if(!user.username) return ctx.redirect('/register');
+		if(!user.username) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/register'));
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
 		data.authLevel = await userPersonal.getAuthLevel();
 		await next();

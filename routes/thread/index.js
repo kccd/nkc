@@ -236,7 +236,7 @@ threadRouter
 			const disabled = data.userOperationsId.includes('displayDisabledPosts');
 			const {page, step} = await thread.getStep({pid, disabled});
 			ctx.status = 303;
-			return ctx.redirect(`/t/${tid}?&page=${page}&highlight=${pid}#${pid}`);
+			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}?&page=${page}&highlight=${pid}#${pid}`));
 		}
 		if(last_page) {
 			page = pageCount -1;
@@ -565,7 +565,7 @@ threadRouter
 
 		if(type === 'html') {
 			ctx.status = 303;
-			return ctx.redirect(`/t/${tid}`)
+			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}`))
 		}
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
 		//帖子曾经在草稿箱中，发表时，删除草稿

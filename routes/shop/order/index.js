@@ -3,9 +3,9 @@ const router = new Router();
 const singleOrderRouter = require('./singleOrder');
 router
   .use('/', async (ctx, next) => {
-    const {data} = ctx;
+    const {data, nkcModules} = ctx;
     const {user} = data;
-    if(!user) return ctx.redirect('/login');
+    if(!user) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/login'));
     await next();
   })
   /* .use('/', async (ctx, next) => {

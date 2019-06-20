@@ -18,15 +18,14 @@ block head
     title bootstrap_base
   
 block body
-
-  block navbar
-    if !data.apptype 
+  if !state.apptype || state.apptype !== "app"
+    block navbar
       include ./publicModules/navbar/navbar.pug
 
   block content
     h1 hello world!
-  block footer
-    if !data.apptype
+  if !state.apptype || state.apptype !== "app"
+    block footer
       include ./publicModules/footer/footer
   if data.user
     //- 添加好友的窗口，原生js（待改）
@@ -56,7 +55,7 @@ block body
   +includeJS('/publicModules/common.js')
   
   //-app使用的js
-  if data.apptype
+  if state.apptype
     +includeJS("/appAPi/api.js")
     +includeJS("/appAPi/app.js")
 

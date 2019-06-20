@@ -4,12 +4,6 @@ const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
 module.exports = async (ctx, next) => {
-  const {query, data} = ctx;
-  if(query.apptype && query.apptype === "app") {
-    data.apptype = "app";
-  }else{
-    data.apptype = false;
-  }
   const {filePath, fileName, resource, fs} = ctx;
   if(filePath && ctx.method === 'GET') {
 	  if(ctx.lastModified && ctx.fresh) {

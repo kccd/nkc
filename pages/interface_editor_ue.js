@@ -53,6 +53,9 @@ function saveDraft() {
   if(title.length > 50) {
     return screenTopWarning("文章标题50字以内");
   }
+  if(!queryType || queryType == "forum" || desType == "forum") {
+    queryType = 'forum';
+  }
   var post = {
     t: title,
     c: content,

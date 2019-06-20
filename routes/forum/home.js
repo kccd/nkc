@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const homeRouter = new Router();
 homeRouter
 	.get('/', async (ctx, next) => {
-		const {data} = ctx;
+		const {data, nkcModules} = ctx;
 		const {forum} = data;
 		await forum.extendValuableThreads();
 		await forum.extendBasicThreads();
@@ -11,7 +11,7 @@ homeRouter
 			forum.basicThreads.length === 0 &&
 			!forum.declare
 		) {
-			return ctx.redirect(`/f/${forum.fid}/latest`);
+			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest`));
 		}
 		await next();
 	});

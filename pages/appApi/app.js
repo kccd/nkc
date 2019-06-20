@@ -5,6 +5,8 @@ $(document).ready(function() {
   // 获取url的apptype参数，要么为app，要么为false
   var apptype = getQueryVariable("apptype");
   if(apptype === "app") {
+    // 去掉body的paddingTop
+    $("body").css("padding-top", "0");
     // 监听全局a标签的点击事件
     // 并阻止链接点击跳转
     var allLinks = document.querySelectorAll("a");
@@ -38,10 +40,19 @@ apiready = function() {
  * @param {} urlStr 
  */
 function appOpenUrl(urlStr) {
-  urlStr = urlStr + "?apptype=app";
+  var parmIndex = urlStr.indexOf("?");
+  if(parmIndex > -1) {
+    urlStr = urlStr + "&apptype=app";
+  }else{
+    urlStr = urlStr + "?apptype=app";
+  }
+  console.log(urlStr)
   api.openWin({
-    name: "latest",
-    url: urlStr
+    name: urlStr,
+    url: "widget://html/common/threadInfo.html",
+    pageParam: {
+      realUrl: urlStr
+    }
   })
 }
 
