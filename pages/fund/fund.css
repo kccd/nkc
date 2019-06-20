@@ -1,0 +1,145 @@
+body{
+  background-color: #fff;
+}
+.fund input.form-control, .fund .btn, .fund textarea.form-control{
+  /*border-radius: 0;*/
+}
+input[type="radio"], input[type="checkbox"] {
+  margin: 4px 0 0;
+}
+.fund-navbar ul{
+  padding: 0.5rem;
+  margin: 0;
+}
+.fund-navbar ul li{
+  list-style: none;
+  display: inline-block;
+}
+.fund-navbar ul li a{
+  display: inline-block;
+  height: 3rem;
+  line-height: 3rem;
+  padding: 0 0.7rem;
+  border-radius: 3px;
+  font-weight: 700;
+  color: #9baec8;
+  transition: color 200ms;
+}
+.fund-navbar ul li a:hover, .fund-navbar ul li a:focus{
+  text-decoration: none;
+  color: #282c37;
+}
+.edit-fund-step{
+  display: inline-block;
+}
+.edit-fund-step .fund-step-line{
+  display: inline-block;
+  height: 1px;
+  background-color: #d9e1e8;
+  margin: 0 0.5rem;
+  width: 30px;
+  vertical-align: middle;
+}
+.edit-fund-step .fund-step-num{
+  display: inline-block;
+  color: #fff;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  line-height: 1.5rem;
+  text-align: center;
+  background-color: #d9e1e8;
+}
+.edit-fund-step .fund-step-name{
+  display: inline-block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #d9e1e8;
+}
+.edit-fund-step.completed .fund-step-name{
+  color: #2b90d9;
+}
+.edit-fund-step.completed .fund-step-num{
+  background-color: #2b90d9;
+}
+.edit-fund-steps{
+  padding: 2rem 0 2rem 0;
+  border-bottom: 1px solid #eee;
+}
+.edit-fund-body{
+  min-height: 40rem;
+  margin-top: 2rem;
+}
+.fund-user-panel{
+  display: inline-block;
+  background-color: #2b90d9;
+  color: #fff;
+  font-size: 0;
+  height: 2rem;
+  line-height: 2rem;
+  cursor: pointer;
+  border-radius: 1rem;
+  margin: 0 0.5rem 0.5rem 0;
+}
+.fund-user{
+  margin: 1rem 0;
+}
+.fund-user-panel img{
+  height: 2rem;
+  vertical-align: top;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+.fund-user-panel a{
+  font-size: 1rem;
+  color: #fff;
+}
+.fund-user-panel a:hover, .fund-user-panel a:focus{
+  text-decoration: none;
+  color: #fff;
+}
+.fund-user-panel .fa{
+  padding: 0 1rem;
+  font-size: 1rem;
+}
+.fund-user-panel .fa:hover{
+  color: #f6f6f6;
+}
+.edit-fund-buttons{
+  text-align: center;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+.fund-reminder-user-info{
+  font-size: 1rem;
+  color: red;
+  margin-top: 0.8rem;
+}
+.fund-uploaded-photo>div{
+  position: relative;
+  display: inline-block;
+}
+.fund-uploaded-photo img{
+  display: inline-block;
+  height: 8rem;
+  margin: 0 0.8rem 0.8rem 0;
+}
+.fund-uploaded-photo{
+  display: inline-block;
+}
+.fund-uploaded-photo .fa{
+  height: 2rem;
+  width: 2rem;
+  background-color: #e85a71;
+  color: #fff;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  line-height: 2rem;
+  text-align: center;
+  right:0.8rem;
+}
+.fund-uploaded-photo .fa.add{
+  background-color: #2b90d9;
+}

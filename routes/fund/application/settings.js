@@ -23,16 +23,19 @@ settingsRouter
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
 		if(s === 4) {
-			const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-			const forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
-			data.forumList = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
+      data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
+      data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		}
 		if(s > 5) ctx.throw(404, 'not found');
 		data.s = s;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
 		data.lifePhotos = await userPersonal.extendLifePhotos();
-		ctx.template = 'interface_fund_apply.pug';
+		ctx.template = 'fund/apply/editForm.pug';
 		await applicationForm.update({'lock.submitted': false});
+		if(applicationForm.toObject) {
+      data.applicationForm = applicationForm.toObject();
+    }
+
 		await next();
 	});
 module.exports = settingsRouter;

@@ -14,8 +14,7 @@ const apiFn = require('../../../nkcModules/apiFunction');
 applicationRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query} = ctx;
-		const page = query.page?parseInt(query.page): 0;
-		const {type} = query;
+		const {page = 0, type} = query;
 		const q = {
 			disabled: false,
 			'status.submitted': true
@@ -90,6 +89,8 @@ applicationRouter
 
 	// 申请表展示页
 	.get('/:_id', async (ctx, next) => {
+/*    const {tid} = ctx.data.applicationForm;
+    return ctx.redirect(`/t/${tid}`);*/
 		const {data, query, db} = ctx;
 		const {user, applicationForm} = data;
 		if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
@@ -97,8 +98,15 @@ applicationRouter
 		const membersId = members.map(m => m.uid);
 		// 未提交时仅自己和全部组员可见
 		if(!applicationForm.fund.ensureOperatorPermission('admin', user) && applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
-		ctx.template = 'interface_fund_applicationForm.pug';
+		ctx.template = 'fund/applicationForm.pug';
 		const page = query.page? parseInt(query.page): 0;
+		// 已发表的申请，项目内容从文章读取
+    if(applicationForm.tid) {
+      const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
+      applicationForm.project = await db.PostModel.findOnly({pid: thread.oc});
+    }
+
+
 		const q = {
 			applicationFormId: applicationForm._id,
 			type: 'comment'
@@ -188,7 +196,7 @@ applicationRouter
 			if(from === 'personal') {
 				if(!fund.applicationMethod.personal) ctx.throw(400, '抱歉！该基金暂不允许个人申请。');
 				for (let aUser of members) {
-					await aUser.update({removed: true});
+				  await db.FundApplicationUserModel.updateMany({uid: aUser.uid}, {$set: {removed: true}});
 				}
 				updateObj.from = 'personal';
 				await applicationForm.update(updateObj);
@@ -205,7 +213,8 @@ applicationRouter
 				const selectedUserUid = newMembers.map(s => s.uid);
 				// 从数据库中标记未被选择的用户
 				for(let u of members) {
-					if(!selectedUserUid.includes(u.uid)) await u.update({removed: true});
+					if(!selectedUserUid.includes(u.uid))
+					  await db.FundApplicationUserModel.updateOne({_id: u._id, uid: u.uid}, {$set: {removed: true}});
 				}
 				// 写入新提交的数据库中不存在的用户信息
 				for(let u of newMembers) {
@@ -221,6 +230,18 @@ applicationRouter
 							authLevel
 						});
 						await newApplicationUser.save();
+						// 给组员发送通知
+						const message = db.MessageModel({
+              _id: await db.SettingModel.operateSystemID("messages", 1),
+              r: u.uid,
+              ty: "STU",
+              c: {
+                type: "fundMember",
+                applicationFormId: applicationForm._id
+              }
+            });
+						await message.save();
+						await ctx.redis.pubMessage(message);
 					}
 				}
 				updateObj.from = 'team';
@@ -284,16 +305,24 @@ applicationRouter
 					type: 'project',
 					t: project.t,
 					abstract: project.abstract,
+          abstractCn: project.abstractCn,
+          abstractEn: project.abstractEn,
+          keyWordsCn: project.keyWordsCn,
+          keyWordsEn: project.keyWordsEn,
 					c: project.c
 				});
 				await newDocument.save();
 				updateObj.projectId = documentId;
 				await applicationForm.update(updateObj);
 			} else {
-				if(project !== undefined){
-					if(project.t) applicationForm.project.t = project.t;
-					if(project.c) applicationForm.project.c = project.c;
-					if(project.abstract) applicationForm.project.abstract = project.abstract;
+				if(project){
+					applicationForm.project.t = project.t;
+					applicationForm.project.c = project.c;
+          applicationForm.project.abstractCn = project.abstractCn;
+          applicationForm.project.abstractEn = project.abstractEn;
+          applicationForm.project.keyWordsCn = project.keyWordsCn;
+          applicationForm.project.keyWordsEn = project.keyWordsEn;
+					applicationForm.project.abstract = project.abstract;
 					await applicationForm.project.save();
 					data.redirect = `/fund/a/${applicationForm._id}/settings?s=3`;
 				}
@@ -414,8 +443,7 @@ applicationRouter
 	.use('/', async (ctx, next) => {
 		const {data} = ctx;
 		const {user} = data;
-		const {applicationForm} = data;
-		const {fund} = applicationForm;
+		const {applicationForm, fund} = data;
 		let hasPermission = false;
 		if(user) {
 			hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('expert', user) || fund.ensureOperatorPermission('censor', user);

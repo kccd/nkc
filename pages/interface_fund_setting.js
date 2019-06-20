@@ -78,6 +78,11 @@ function loadSettings() {
 	fundObj.description.detailed = $('#detailedDescription').val();
 	fundObj.description.terms = $('#terms').val();
 
+	fundObj.reminder = {};
+	fundObj.reminder.inputProject = $("#inputProject").val();
+  fundObj.reminder.inputUserInfo = $("#inputUserInfo").val();
+  if(!fundObj.reminder.inputProject || !fundObj.reminder.inputUserInfo) screenTopWarning("所有温馨提示不能为空");
+
 	//背景颜色，banner，logo
 	fundObj.color = $('#fundColor').val() || '#7f9eb2';
 	var banner = $('#fundImageDisplay').attr('imageId');

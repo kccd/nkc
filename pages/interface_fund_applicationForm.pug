@@ -88,125 +88,7 @@ block content
       .col-xs-12.col-md-9
         //-.panel.panel-default
           .panel-body
-        include interface_fund_apply_messages
-        if applicationForm.reportThreads.length > 0
-          br
-          hr
-          h4(style=`font-weight:600;`) 与项目有关的最新文章
-          .selectedThreads
-            -for(let i = 0; i < applicationForm.reportThreads.length; i++)
-              -const thread = applicationForm.reportThreads[i];
-              -const firstPost = thread.firstPost;
-              .threadList
-                .col-xs-10.col-md-10
-                  span 文号：
-                  span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-                  a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
-                  span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
-                  br
-                  a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
-
-
-        //- 拨款详情
-        .panel.panel-default.m-t-1
-          .panel-body
-            h3.text-center= `拨款详情`
-            table.table
-              thead
-                tr
-                  th #
-                  th 金额
-                  th 状态
-              tbody
-                -for(let i = 0; i < applicationForm.remittance.length; i++)
-                  -const r = applicationForm.remittance[i];
-                  tr
-                    th= `第${i+1}期`
-                    th= `${r.money}元`
-                    if r.status
-                      th.greenFontColor= `已拨款`
-                    else
-                      th= `未拨款`            
-
-        //- 最新进展
-        .panel.panel-default
-          .panel-body
-            h3.text-center= `最新进展`
-            .timer-shaft
-              -const length = data.reports.length;
-              -for(let i = 0; i < data.reports.length; i++)
-                -const r = data.reports[i];
-                if r.type === 'userInfoAudit'
-                  if r.support
-                    -r.c = `用户信息通过审核${r.c?`。审核评语：${r.c}`: ''}`;
-                  else
-                    -r.c = `用户信息未通过审核，等待申请人修改。审核意见：${r.c}`;
-                if r.type === 'projectAudit'
-                  if r.support
-                    -r.c = `项目信息通过审核${r.c?`。审核评语：${r.c}`: ''}`;
-                  else
-                    -r.c = `项目信息未通过审核，等待申请人修改。审核意见：${r.c}`;
-                if r.type === 'moneyAudit'
-                  -const str = applicationForm.fixedMoney?'资金用途': '资金预算';
-                  if r.support
-                    -r.c = `${str}通过审核${r.c?`。审核评语：${r.c}`: ''}`;
-                  else
-                    -r.c = `${str}未通过审核，等待申请人修改。审核意见：${r.c}`;
-                if r.type === 'adminAudit'
-                  if r.support
-                    -r.c = `管理员复核通过，开始项目${r.c?`。审核评语：${r.c}`: ''}`;
-                  else
-                    -r.c = `管理员复核未通过，等待申请人修改。审核意见：${r.c}`;
-                if r.type === 'completedAudit'
-                  if r.support
-                    -r.c = `结题报告审核通过${r.c?`。审核评语：${r.c}`: ''}`;
-                  else
-                    -r.c = `结题报告审核未通过，等待申请人修改。审核意见：${r.c}`;
-                if r.type === 'vote'
-                  if r.support
-                    -r.c = `网友 ${r.user.username} 表示的支持${r.c?`。并说：${r.c}`: ''}`;
-                  else
-                    -r.c = `网友 ${r.user.username} 表示反对。并说：${r.c}`;
-                if r.type === 'remittance'
-                  if !r.support
-                    -r.c = `拨款失败：${r.c}`;
-                if ['remittance', 'completedAudit', 'adminAudit', 'moneyAudit', 'projectAudit', 'userInfoAudit'].includes(r.type)
-                  -r.c = r.c.replace(/\n/g, '<br/>');
-                  -r.c = r.c.replace(/\s/g, '&nbsp;');
-                div.time!= `${fromNow(r.toc)}&nbsp;&nbsp;&nbsp;${r.toc.toLocaleString()}`
-                  div(style='position: absolute;')
-                  if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)
-                    span &nbsp;&nbsp;
-                    if r.disabled
-                      a(href=`javascript: disabledReport(${applicationForm._id},${r._id},false)`) 解除屏蔽
-                    else
-                      a(href=`javascript: disabledReport(${applicationForm._id},${r._id},true)`) 屏蔽
-                div.content(style=i === length-1?`border: none;`:'')
-                  -r.c = hideContentByUser(r.c, data.user, 'thread')
-                  if r.support === false
-                    div.redFontColor!= experimental_render(r)
-                  else if r.support === true
-                    div.greenFontColor!= experimental_render(r)
-                  else
-                    div!= experimental_render(r)  
-              if status.completed
-                div.time!= `${fromNow(applicationForm.timeOfCompleted)}&nbsp;&nbsp;&nbsp;${applicationForm.timeOfCompleted.toLocaleString()}`
-                  div(style='position: absolute;')
-                div.content.greenFontColor=`完成`
-        if applicationForm.threadsId.completed
-          h4(style='margin-bottom: 0') 结题报告
-          .selectedThreads
-            -for(let i = 0; i < applicationForm.threads.completed.length; i++)
-              -const thread = applicationForm.threads.completed[i];
-              -const firstPost = thread.firstPost;
-              .threadList
-                .col-xs-10.col-md-10
-                  span 文号：
-                  span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-                  a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
-                  span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
-                  br
-                  a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
+        include ./fund/form
 
         //- if data.reports.length !== 0
         //-   hr
@@ -221,47 +103,48 @@ block content
         //-       div!= experimental_render(r)
         //-       br
         //-   br
-        -const url = `/fund/a/${applicationForm._id}`;
-        -const skipId = '#comment';
-        if comments.length > 0
-          #comment
-          include interface_fund_page
-          
-          h4 评论
-          hr(style='margin: 0.5rem 0')
-          -for (let comment of comments)
-            .fund-comment
-              .comment-info
-              .comment-content
-                a(href=`/u/${comment.user.uid}`)= comment.user.username
-                if applicationForm.uid === comment.user.uid
-                  span (申请人)
-                span &nbsp;发表于&nbsp;
-                span= fromNow(comment.toc)
-                if isAdmin
-                  span &nbsp;&nbsp;
-                  if comment.disabled
-                    a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},false)`) 解除屏蔽
-                  else
-                    a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},true)`) 屏蔽
-                -comment.c = hideContentByUser(comment.c, data.user, 'thread')
-                div(style='word-break:break-all;')!= experimental_render(comment)
-              hr(style='margin: 0.5rem 0') 
-            br
+        //-
+          -const url = `/fund/a/${applicationForm._id}`;
+          -const skipId = '#comment';
+          if comments.length > 0
+            #comment
             include interface_fund_page
 
-        h4 发表评论
-        if !data.user
-          h4.redFontColor 您还没有登录，请先登录。
-        else
-          textarea.form-control#commentContent(rows=8 placeholder='填写评论')
-          br
-          button.btn.btn-default(onclick=`submitComment(${applicationForm._id})`) 发表
-          span &nbsp;
-          a.btn.btn-default(href=`/editor?id=${applicationForm._id}&type=application&cat=c`) 去编辑器
-          br
-          br
-
+            h4 评论
+            hr(style='margin: 0.5rem 0')
+            -for (let comment of comments)
+              .fund-comment
+                .comment-info
+                .comment-content
+                  a(href=`/u/${comment.user.uid}`)= comment.user.username
+                  if applicationForm.uid === comment.user.uid
+                    span (申请人)
+                  span &nbsp;发表于&nbsp;
+                  span= fromNow(comment.toc)
+                  if isAdmin
+                    span &nbsp;&nbsp;
+                    if comment.disabled
+                      a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},false)`) 解除屏蔽
+                    else
+                      a(href=`javascript: disabledComment(${applicationForm._id},${comment._id},true)`) 屏蔽
+                  -comment.c = hideContentByUser(comment.c, data.user, 'thread')
+                  div(style='word-break:break-all;')!= experimental_render(comment)
+                hr(style='margin: 0.5rem 0')
+              br
+              include interface_fund_page
+        //-
+          h4 发表评论
+          if !data.user
+            h4.redFontColor 您还没有登录，请先登录。
+          else
+            textarea.form-control#commentContent(rows=8 placeholder='填写评论')
+            br
+            button.btn.btn-default(onclick=`submitComment(${applicationForm._id})`) 发表
+            span &nbsp;
+            a.btn.btn-default(href=`/editor?id=${applicationForm._id}&type=application&cat=c`) 去编辑器
+            br
+            br
+        a(href=`/t/${applicationForm.tid}#container`).btn.btn-default 去评论
       .col-xs-12.col-md-3
         //无效的申请表
         -let displayNext = true;

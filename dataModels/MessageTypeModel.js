@@ -81,6 +81,12 @@ const getDomByType = (t, app) => {
       return "item.c.post.c"
     } else if(t === "reviewLink") {
       return "openThread(item.c.thread.tid)"
+    } else if(t === "applicationFormURL") {
+      return "item.c.applicationForm.url"
+    } else if(t === "applicationFormID") {
+      return "item.c.applicationForm._id"
+    } else if(t === "applicationFormCode") {
+      return "item.c.applicationForm.code"
     }
   } else {
     if(t === "threadTitle") {
@@ -127,6 +133,12 @@ const getDomByType = (t, app) => {
       return "item.c.post.c"
     } else if(t === "reviewLink") {
       return "item.c.post.pid === item.c.thread.oc?item.c.thread.url:item.c.post.url"
+    } else if(t === "applicationFormURL") {
+      return "item.c.applicationForm.url"
+    } else if(t === "applicationFormID") {
+      return "item.c.applicationForm._id"
+    } else if(t === "applicationFormCode") {
+      return "item.c.applicationForm.code"
     }
   }
 };

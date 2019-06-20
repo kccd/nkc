@@ -14,6 +14,9 @@
 .m-a-1{
   margin: 1rem;
 }
+.m-t-05{
+  margin-top: 0.5rem;
+}
 .m-t-1{
   margin-top: 1rem;
 }
@@ -93,6 +96,9 @@
 /* padding-top */
 .p-a-1{
   padding: 1rem;
+}
+.p-t-0{
+  padding-top: 0;
 }
 .p-t-1{
   padding-top: 1rem;
@@ -196,7 +202,6 @@
 .b-s-50{
   box-shadow: 0 0 50px rgba(0,0,0,0.2);
 }
-
 .pointer{
   cursor: pointer;
 }
@@ -1553,7 +1558,7 @@ span.thread-title-page{
   background-size: 4px 14px;
   font-weight:bold;
 }
-.box-shadow-panel>div{
+.box-shadow-panel>*{
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
   padding: 1rem;
   background-color: #fff;
@@ -1563,5 +1568,8 @@ span.thread-title-page{
   .box-shadow-panel{
     padding-left: 0;
     padding-right: 0;
+  }
+  .box-shadow-panel>*{
+    border-radius: 0;
   }
 }

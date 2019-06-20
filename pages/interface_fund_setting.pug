@@ -10,7 +10,7 @@ block content
   -const thread = fund? fund.thread: '';
   -const paper = fund? fund.paper: '';
   .container-fluid.max-width
-    include interface_fund_nav
+    include ./interface_fund_nav
     .panel.panel-default
       .panel-body
         .row
@@ -70,6 +70,8 @@ block content
                 h5 条款
               .col-xs-12.col-md-5
                 textarea.form-control#terms(type="text" placeholder="基金条款" rows=15)=fund ? fund.description.terms : ''
+
+
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 banner背景颜色
@@ -381,6 +383,20 @@ block content
                 label.checkbox-inline
                   input(type='checkbox' name='conflict' checked=fund ? fund.conflict.other : false)
                   h5 与相同设置的基金互斥
+            hr
+            h4 温馨提示：
+            hr
+
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 填写自我介绍时的提示
+              .col-xs-12.col-md-5
+                textarea.form-control#inputUserInfo(type="text" placeholder="填写自我介绍时的提示" rows=10)=fund ? fund.reminder.inputUserInfo : ''
+            .fund-setting-list
+              .col-xs-12.col-md-2
+                h5 填写项目内容时的提示
+              .col-xs-12.col-md-5
+                textarea.form-control#inputProject(type="text" placeholder="填写项目内容时的提示" rows=15)=fund ? fund.reminder.inputProject : ''
             .fund-setting-list
               .col-xs-12.col-md-2.col-md-offset-5
                 br

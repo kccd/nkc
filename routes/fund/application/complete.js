@@ -76,6 +76,7 @@ completeRouter
 		await newDocument.save();
 		await newReport.save();
 		await applicationForm.save();
+		await db.MessageModel.sendFundMessage(applicationForm._id, "expert");
 		await next();
 	})
 	.get('/audit', async (ctx, next) => {
@@ -115,6 +116,7 @@ completeRouter
 		} else {
 			await applicationForm.update({'status.completed': false, completedAudit: false});
 		}
+    await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
 		await next();
 	});
 module.exports = completeRouter;

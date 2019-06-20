@@ -115,7 +115,7 @@ auditRouter
 			if(!applicationForm.status.projectPassed) ctx.throw(400, '专家审核暂未通过，请等待。');
 			const {uid} = lock;
 			if(user.uid !== uid) {
-				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他管理员复核。');
+				ctx.throw(400, '抱歉！您的审核已超时，该申请表正在被其他管理员复核。');
 			}
 			const {c, support, factMoney, remittance, needThreads} = body;
 			if(support) {
@@ -178,6 +178,17 @@ auditRouter
 			applicationForm.tlm = Date.now();
 		}
 		await applicationForm.save();
+
+		if(type === "project") {
+		  if(support) {
+		    await db.MessageModel.sendFundMessage(applicationForm._id, "admin");
+      } else {
+        await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+      }
+    } else if(type === "admin") {
+      await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+    }
+
 		await next();
 	});
 module.exports = auditRouter;

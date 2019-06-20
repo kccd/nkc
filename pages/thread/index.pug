@@ -109,9 +109,10 @@ block title
         if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
           
           if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
-            li
-              a(href=`/editor?ver=ue&type=post&id=${post.pid}`)
-                span.fa.fa-edit &nbsp;编辑
+            if !targetThread || targetThread.type !== "fund"
+              li
+                a(href=`/editor?ver=ue&type=post&id=${post.pid}`)
+                  span.fa.fa-edit &nbsp;编辑
         if disablePost && !targetThread
           li
             a(href=`javascript:disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")`)
@@ -178,6 +179,7 @@ block content
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
       include ../module_digest
+
       .row
         .col-xs-12.col-md-9#wrap
           .fullwidthpanel.ThreadBox.nkcpanel
@@ -288,7 +290,9 @@ block content
                                   include ../forumlist_dropdown.pug
                                   button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
                               if permission('moveThread') || permission("moveDraft")
-                                div(style='margin-top:0.5rem;')      
+                                if data.thread.type === "fund"
+                                  h5.text-danger 科创基金类文章无法退修
+                                div(style='margin-top:0.5rem;')
                                   button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 退修或删除
 
                 .col-xs-12.col-md-12
@@ -300,7 +304,8 @@ block content
                       if thread.recycleMark
                         .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
                         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
-                      .h3.thread-title.text-center= thread.firstPost.t
+                      if thread.type !== "fund"
+                        .h3.thread-title.text-center= thread.firstPost.t
                       -const post = thread.firstPost;
                       -post.c = hideContentByUser(post.c, data.user, 'thread')
                       if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"
@@ -394,69 +399,73 @@ block content
                           else
                             for agad,index in agencyAddArray
                               span(style="margin-right:10px")!=`${agad}`
+                      if thread.type !== "fund"
+                        .thread-info.text-center(style="margin-top:1rem")
+                          a(href=`/u/${thread.uid}`)
+                            img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                            span= ` ${thread.firstPost.user.username}`
+                          span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
+                          if thread.firstPost.originState && thread.firstPost.originState !== "0"
+                            -var levelText = getOriginLevel(thread.firstPost.originState);
+                            if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
+                              span(style="color:#9baec8;margin-right:3px") 原创
+                            span(class="dropdown")
+                              a(id="dropdown-level" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")
+                                span.fa.fa-caret-square-o-down(style="color:#b5b4b4")
+                              .dropdown-menu(aria-labelledby='dropdown-level')
+                                span(style="padding:5px")!=`${levelText}`
 
-                      .thread-info.text-center(style="margin-top:1rem")
-                        a(href=`/u/${thread.uid}`)
-                          img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-                          span= ` ${thread.firstPost.user.username}`
-                        span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
-                        if thread.firstPost.originState && thread.firstPost.originState !== "0"
-                          -var levelText = getOriginLevel(thread.firstPost.originState);
-                          if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
-                            span(style="color:#9baec8;margin-right:3px") 原创
-                          span(class="dropdown")
-                            a(id="dropdown-level" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")
-                              span.fa.fa-caret-square-o-down(style="color:#b5b4b4")
-                            .dropdown-menu(aria-labelledby='dropdown-level')
-                              span(style="padding:5px")!=`${levelText}`
+                        //- if post.authorInfos && post.authorInfos.length > 0
+                        //-   .panel.panel-default(style="border:0;margin-bottom:0")
+                        //-     .panel-heading.paperHeader 作者信息
+                        //-     .panel-body
+                        //-       ol(style="padding-left:20px")
+                        //-         for auth in post.authorInfos
+                        //-           if auth
+                        //-             li(style="font-weight:bold")
+                        //-               span!=`${auth.name}. `
+                        //-               if auth.kcid
+                        //-               if auth.agency
+                        //-                 span!=`${auth.agency}. `
+                        //-               if auth.agencyAdd
+                        //-                 span!=`${auth.agencyAdd}.   `
 
-                      //- if post.authorInfos && post.authorInfos.length > 0
-                      //-   .panel.panel-default(style="border:0;margin-bottom:0")
-                      //-     .panel-heading.paperHeader 作者信息
-                      //-     .panel-body
-                      //-       ol(style="padding-left:20px")
-                      //-         for auth in post.authorInfos
-                      //-           if auth
-                      //-             li(style="font-weight:bold")
-                      //-               span!=`${auth.name}. `
-                      //-               if auth.kcid
-                      //-               if auth.agency
-                      //-                 span!=`${auth.agency}. `
-                      //-               if auth.agencyAdd
-                      //-                 span!=`${auth.agencyAdd}.   `
-
-                      //-               if auth.isContract
-                      //-                 span
-                      //-                   span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
-                      if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product" 
-                        .abstract(style="margin-top:1rem;")
-                          if post.abstractCn.length !== 0
+                        //-               if auth.isContract
+                        //-                 span
+                        //-                   span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                        if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
+                          .abstract(style="margin-top:1rem;")
+                            if post.abstractCn.length !== 0
+                              .panel.panel-default(style="border:0;margin-bottom:0")
+                                .panel-heading.paperHeader 中文摘要
+                                .panel-body!=LineFeedConversion(post.abstractCn)
+                            if post.abstractEn.length !== 0
+                              .panel.panel-default(style="border:0;margin-bottom:0")
+                                .panel-heading.paperHeader Abstract
+                                .panel-body!=LineFeedConversion(post.abstractEn)
+                        if (post.keyWordsCn.length !== 0 || post.keyWordsEn.length !== 0) && data.thread.type !== "product"
+                          .keyWords(style="margin-top:1rem;")
                             .panel.panel-default(style="border:0;margin-bottom:0")
-                              .panel-heading.paperHeader 中文摘要
-                              .panel-body!=LineFeedConversion(post.abstractCn)
-                          if post.abstractEn.length !== 0
-                            .panel.panel-default(style="border:0;margin-bottom:0")
-                              .panel-heading.paperHeader Abstract
-                              .panel-body!=LineFeedConversion(post.abstractEn)
-                      if (post.keyWordsCn.length !== 0 || post.keyWordsEn.length !== 0) && data.thread.type !== "product" 
-                        .keyWords(style="margin-top:1rem;")
-                          .panel.panel-default(style="border:0;margin-bottom:0")
-                            .panel-heading.paperHeader 关键词
-                            .panel-body(style="padding:5px")
-                              if post.keyWordsCn.length !== 0
-                                div
-                                  for keyCn in post.keyWordsCn
-                                    span.keyWordstagCn(style="cursor:pointer" onclick=`turnSearch("${keyCn}")`)!=keyCn
-                              if post.keyWordsEn.length !== 0
-                                div(style="margin-top:5px")
-                                  for keyEn in post.keyWordsEn
-                                    span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
+                              .panel-heading.paperHeader 关键词
+                              .panel-body(style="padding:5px")
+                                if post.keyWordsCn.length !== 0
+                                  div
+                                    for keyCn in post.keyWordsCn
+                                      span.keyWordstagCn(style="cursor:pointer" onclick=`turnSearch("${keyCn}")`)!=keyCn
+                                if post.keyWordsEn.length !== 0
+                                  div(style="margin-top:5px")
+                                    for keyEn in post.keyWordsEn
+                                      span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
                       if data.paging.page === 0
                         if data.thread.type == "article"
                           div.thread-content.ThreadPostBody!= experimental_render(post)
                         else if data.thread.type == "product"
                           div.thread-content.ThreadPostBody
                             include ./product/product.pug
+                        else if data.thread.type === "fund"
+                          include ../fund/initData
+                          div.thread-content.ThreadPostBody
+                            include ./fund/fund.pug
                         +postEditTime(post)
                         +postCredits(data.posts[0])
                       else
@@ -573,6 +582,9 @@ block content
 
         .col-xs-12.col-md-3
           .hidden-xs.hidden-sm#rightDom
+            if data.thread.type === "fund"
+              include ../fund/initData
+              include ../fund/options
             -var user = data.thread.firstPost.user
             if user
               include ../interface_thread_userpatch.pug

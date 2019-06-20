@@ -361,8 +361,9 @@ function cutContent(str,num) {
  * 换行转换
  */
 function LineFeedConversion(str) {
-	let strs = str.replace(new RegExp("\n", "gm"),'<br/>');
-	return strs
+	str = str.replace(new RegExp("\n", "gm"),'<br/>');
+  str = str.replace(new RegExp("\s", "gm"), "&nbsp;");
+	return str
 }
 
 /**

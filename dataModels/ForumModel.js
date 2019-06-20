@@ -364,7 +364,17 @@ forumSchema.methods.extendNoticeThreads = async function() {
   });
 	return this.noticeThreads = await ThreadModel.extendThreads(threads);
 };
-
+/*
+* 更新多个专业的数据
+* @param {[String]} fids 专业ID数组
+* @author pengxiguaa 2019-6-20
+* */
+forumSchema.statics.updateForumsMessage = async (fids) => {
+  const forums = await mongoose.model("forums").find({fid: {$in: fids}});
+  for(const forum of forums) {
+    await forum.updateForumMessage();
+  }
+};
 /* 
   更新当前专业信息，再更新上级所有专业的信息
   @author pengxiguaa 2019/1/26

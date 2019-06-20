@@ -306,6 +306,13 @@ input[type="radio"], input[type="checkbox"]{
 }
 .fund-nav > ul > li:first-child a{
 }
+.fund-nav > ol > li > a{
+  font-weight: 700;
+  color: #2b90d9;
+}
+.fund-nav > ol > li > a:hover, .fund-nav > ol > li > a:focus{
+  color: #2b90d9;
+}
 .info{
   height: 20rem;
   width: 100%;
@@ -642,17 +649,14 @@ input[type="radio"], input[type="checkbox"]{
 
 .fund-apply-status ul li.next{
   background-color: rgba(0,0,0,0);
-  height: 4rem;
-  color: #aaa;
-  padding: 0;
-  margin: -1rem 0;
-  font-size: 2.6rem;
-  animation: myfirst 1s;
-  -moz-animation: myfirst 1s;	/* Firefox */
-  -webkit-animation: myfirst 1s;	/* Safari 和 Chrome */
-  -o-animation: myfirst 1s;	/* Opera */
-  animation-iteration-count: infinite;
-  -webkit-animation-iteration-count: infinite;
+  color: #b9b9b9;
+  padding: 0 0.2rem;
+  /*animation: myfirst 1s;*/
+  /*-moz-animation: myfirst 1s;	!* Firefox *!*/
+  /*-webkit-animation: myfirst 1s;	!* Safari 和 Chrome *!*/
+  /*-o-animation: myfirst 1s;	!* Opera *!*/
+  /*animation-iteration-count: infinite;*/
+  /*-webkit-animation-iteration-count: infinite;*/
 }
 
 .fund-apply-status ul{
@@ -661,24 +665,36 @@ input[type="radio"], input[type="checkbox"]{
   margin: 0;
 }
 .fund-apply-status ul li{
-  line-height: 3rem;
-  height: 3rem;
+  line-height: 2.5rem;
+  height: 2.5rem;
   text-align: center;
-  width: 100%;
+  position: relative;
+  display: inline-block;
   list-style: none;
-  background-color: rgba(0,0,0,0);
-  font-size: 1.5rem;
-  color: #777;
-  margin: 1rem 0;
+  background-color: #b9b9b9;
+  color: #fff;
+  padding: 0 1rem;
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
   border-radius: 4px;
 }
+/*.fund-apply-status ul li:after{
+  content: "";
+  height: 2.5rem;
+  width: 2rem;
+  position: absolute;
+  right: -2rem;
+  top: 0;
+  border-radius: 0 1rem 1rem 0;
+  background-color: red;
+
+}*/
 .fund-apply-status ul li:first-child{
   margin-top: 0;
 }
 .fund-apply-status ul li.passed{
-  background-color: rgba(0,0,0,0);
-  color: #5bc0de;
-  border: 1px solid rgba(0,0,0,0);
+  background-color: #fc8409;
+  color: #fff;
 }
 .fund-li{
   padding: 0.8rem 0;
@@ -835,9 +851,24 @@ input[type="radio"], input[type="checkbox"]{
   color: #aaa;
   display: none;
 }
-#budgetMoney, .selectedThreads, .unselectedThreads{
+#budgetMoney, .unselectedThreads{
   padding: 1rem 0;
   /*background-color: #efefef;*/
+}
+#budgetMoney{
+  padding: 0;
+}
+.applicationForm-table{
+  font-size: 1.2rem;
+}
+.budgetMoney-total{
+  text-align: right;
+  color: #e85a71;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.selectedThreads{
+  padding-bottom: 0;
 }
 /*.unselectedThreads{*/
   /*overflow-y:scroll;*/
@@ -980,15 +1011,15 @@ input[type="radio"], input[type="checkbox"]{
   color: #777;
 }
 .threadList a{
-  /*color: #555;*/
-  color: #2aabd2;
-  font-weight: 700;
+  color: #2b90d9;
+  font-size: 1.2rem;
 }
 .threadList{
-  background-color: #fff;
   padding: 0.3rem 0;
+  font-size: 1.2rem;
   margin: 0.5rem 0;
-  border: 1px solid #dedede;
+  background-color: #eee;
+  border-right: 3px;
 }
 
 .displayNone{
@@ -1124,44 +1155,94 @@ input[type="radio"], input[type="checkbox"]{
 #remittanceList > div{
   margin: 0.5rem 0;
 }
-
+.timer-shaft{
+  overflow: hidden;
+}
 .timer-shaft .time{
-  height: 4rem;
-  line-height: 4rem;
+  height: 3rem;
+  line-height: 3rem;
   position:relative;
   color: #aaa;
   font-size: 1.2rem;
   margin: 0;
-  padding-left: 1rem;
-}
-.timer-shaft .time > div{
-  height: 1rem;
-  width: 1rem;
-  left: -0.5rem;
-  top: 1.5rem;
-  position: absolute;
-  border-radius: 50%;
-  background-color: #339fd1;
 }
 .timer-shaft .content{
   border-left: #ccc solid 2px;
+  margin-left: 0.3rem;
   padding-left: 1rem;
 }
 .timer-shaft .content>div{
   word-break:break-all;
 }
-
+span.applicationForm-report-icon{
+  color: #2b90d9;
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
+.applicationForm-report-icon img{
+  height: 1.6rem;
+  margin-top: -2px;
+  width: 1.6rem;
+  border-radius: 50%;
+}
+.applicationForm-report-icon a{
+  margin-left: 0.3rem;
+}
+span.applicationForm-report-icon.system{
+  color: #9baec8;
+}
 .applicationForm .h3, .applicationForm .h4{
   font-weight: 600;
   color: #333;
+}
+.applicationForm-report-content{
+  padding-left: 1rem;
+  border-left: 2px solid #ddd;
+  margin-left: 0.5rem;
 }
 .applicationForm img{
   max-width: 100%;
 }
 .applicationForm .id{
-  font-size: 3rem;
-  font-weight: 600;
-  color: #555;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #282c37;
+}
+.applicationForm-header{
+  font-size: 1.4rem;
+  height: 2rem;
+  line-height: 2.2rem;
+  font-weight: 700;
+  padding-left: 5px;
+  border-left: 5px solid #e85a71;
+  margin-bottom: 1rem;
+}
+.applicationForm-abstract{
+
+}
+.applicationForm-abstract-header{
+  height: 2rem;
+  line-height: 2rem;
+  border-left: 4px solid #ddd;
+  padding-left: 0.5rem;
+  color: #282c37;
+  font-weight: 700;
+  font-size: 1rem;
+  background-color: #f5f5f5;
+}
+.applicationForm-title{
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 700;
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+}
+.applicationForm-abstract-content{
+  padding: 1.2rem;
+  font-size: 1.2rem;
+}
+.applicationForm .id a{
+  color: #282c37;
 }
 .applicationForm .status{
   font-size: 2rem;
@@ -1250,7 +1331,7 @@ input[type="radio"], input[type="checkbox"]{
   overflow: hidden;
 }
 .vote-user a{
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   text-decoration: none;
 }
 
@@ -1282,6 +1363,25 @@ input[type="radio"], input[type="checkbox"]{
 }
 .choose-anonymous.active .anonymous>div{
   background-color: #5bc0de;
+}
+.applicationForm-keyword{
+  display: inline-block;
+  height: 1.6rem;
+  line-height: 1.6rem;
+  text-align: center;
+  margin: 0 0.5rem 0.5rem 0;
+  padding: 0 0.5rem;
+  color: #fff;
+  font-size: 1rem;
+  background-color: #2b90d9;
+  border-radius: 3px;
+}
+.applicationForm-keyword.en{
+  background-color: #b6c828;
+}
+.applicationForm-keyword:hover,.applicationForm-keyword:focus{
+  text-decoration: none;
+  color: #fff;
 }
 @media screen and (max-width: 768px) {
   .popupPanel-body{
