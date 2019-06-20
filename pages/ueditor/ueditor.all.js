@@ -10021,7 +10021,10 @@ UE.plugins['defaultfilter'] = function () {
                                 break;
                             }
                         }
-                        var _newSrc = removeUelParam(node.getAttr('src'))
+                        // var _newSrc = removeUelParam(node.getAttr('src'));
+                        // 图片自动上传url不再对参数进行处理
+                        // 对于微信等的webp格式图片交由服务器进行单独处理
+                        var _newSrc = node.getAttr('src');
                         node.setAttr('_src', _newSrc);
                         break;
                     case 'span':
@@ -23436,6 +23439,10 @@ UE.plugins['catchremoteimage'] = function () {
         ajax = UE.ajax;
 
     /* 设置默认值 */
+    me.setOpt({
+        imgCount: 0,
+        imgTotal: 0
+    })
     if (me.options.catchRemoteImageEnable === false) return;
     me.setOpt({
         catchRemoteImageEnable: false
@@ -23466,6 +23473,7 @@ UE.plugins['catchremoteimage'] = function () {
                 }
                 return false;
             };
+        me.options.imgTotal = imgs.length;
         var isPc = IsPC();
         var imgWidth = {
             style:'max-width: 100%'
@@ -23497,6 +23505,7 @@ UE.plugins['catchremoteimage'] = function () {
             catchremoteimage(remoteImages, {
                 //成功抓取
                 success: function (r) {
+                    me.options.imgCount++;
                     try {
                         var info = r.state !== undefined ? r:eval("(" + r.responseText + ")");
                     } catch (e) {
@@ -23526,10 +23535,12 @@ UE.plugins['catchremoteimage'] = function () {
                         //     }
                         // }
                     }
+                    window.loadMediaRe()
                     me.fireEvent('catchremotesuccess')
                 },
                 //回调失败，本次请求超时
                 error: function (r) {
+                    me.options.imgCount++;
                     try {
                         var info = r.state !== undefined ? r:eval("(" + r.responseText + ")");
                     } catch (e) {

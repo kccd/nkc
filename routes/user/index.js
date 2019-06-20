@@ -231,10 +231,7 @@ userRouter
           if(!ctx.permission("displayDisabledPosts")) {
             m.disabled = false;
           }
-          const obj = await db.ThreadModel.getPostStep(thread.tid, m);
-          const targetUrl = await db.PostModel.getUrl(post.pid);
-          // link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
-          link = targetUrl;
+          link = await db.PostModel.getUrl(post.pid);
         }
         if(firstPost.t.length > 20) {
           firstPost.t = firstPost.t.slice(0, 20) + "...";
@@ -298,11 +295,13 @@ userRouter
       let threads = await db.ThreadModel.find(q, {
         tid: 1,
         hasCover: 1,
+        uid: 1,
         oc: 1,
         toc: 1,
         reviewed: 1,
         disabled: 1,
-        recycleMark: 1
+        recycleMark: 1,
+        mainForumsId: 1
       }).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       threads = await db.ThreadModel.extendThreads(threads, {
         forum: false,
@@ -321,7 +320,7 @@ userRouter
           if(user) {
             // 不具有特殊权限且不是自己
             if(!superModerator && user.uid !== targetUser.uid) {
-              const mainForumsId = thread.mainForumsId;
+              const mainForumsId = thread.mainForumsId || [];
               let has = false;
               for(const fid of mainForumsId) {
                 if(canManageFid.includes(fid)) {

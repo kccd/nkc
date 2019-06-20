@@ -234,6 +234,7 @@ var panelProto = {
         var panelSureButton = panelProto.get(panelProto.config.panelSureButtonId);
         if(son.length == 0) {
             panelSureButton.disabled = false;
+            panelSureButton.style.backgroundColor = "#2b90d9";
             // panelProto.outputTagsLast();
             return;
         }
@@ -248,9 +249,11 @@ var panelProto = {
         }
         if(isOpenContent) {
             panelSureButton.disabled = true;
+            panelSureButton.style.backgroundColor = "#9baec8";
             panelProto.createTags(son);
         }else{
             panelSureButton.disabled = false;
+            panelSureButton.style.backgroundColor = "#2b90d9";
             panelProto.createPanelContent(son);
         }
     },

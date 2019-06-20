@@ -29,8 +29,8 @@ function nkc_render(options){
   var default_whitelist = xss.whiteList;
   default_whitelist.font = ['color']
   default_whitelist.code = ['class']
-  default_whitelist.span = ['class', 'style', 'aria-hidden'];
-  default_whitelist.a = ['href', 'title', 'target', 'style'];
+  default_whitelist.span = ['class', 'style', 'contenteditable', 'dataType'];
+  default_whitelist.a = ['target', 'href', 'title', 'class', 'style'];
   default_whitelist.p = ['align','style'];
   default_whitelist.div = ['style','class','contenteditable'];
   default_whitelist.table = ['border','width','cellpadding','cellspacing'];
@@ -65,6 +65,7 @@ function nkc_render(options){
         left: true,
         fontSize: true,
         display: true,
+        "background-image": true,
         "font-weight":true,
         "font-size":true,
         "font-style":true,
@@ -498,7 +499,11 @@ function nkc_render(options){
     }
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');
     html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\/\>/img,'<img src="/r/$1" />');
-    html = html.replace(/\<img.*?src="\/r\/(.+?)".*?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
+    // 如果是默认图片则跳过
+    html = html.replace(/\<img.*?src="\/default\/picdefault.png".+?\>/img, '');
+    // 如果是表情也跳过
+    html = html.replace(/\<img src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
+    html = html.replace(/\<img class=".*?" src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     return html
   }
 

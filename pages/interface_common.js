@@ -381,9 +381,12 @@ var common=(function(){
   }
   common.URLifyHTML = function(content){
     return content.replace(URLExtractRegex,function(match,p1,p2){
-      // p3 = p2.replace(/(https|http):\/\//igm,'');
-      // return p1+'<a href="http://'+ p3 +'">'+p2+'</a>';
-      return p1+'<a href="'+p2+'">'+p2+'</a>';
+      // 这里将原链接的http头部去掉，统一加上http
+      // 不是https也没关系，浏览器只识别是否有头部，点击连接会自动跳转
+      // 如果不加头部则变为相对路径
+      p3 = p2.replace(/(https|http):\/\//igm,'');
+      return p1+'<a href="http://'+ p2 +'">'+p2+'</a>';
+      // return p1+'<a href="'+p2+'">'+p2+'</a>';
     })
   }
 
