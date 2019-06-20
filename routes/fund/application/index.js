@@ -103,10 +103,11 @@ applicationRouter
 		// 已发表的申请，项目内容从文章读取
     if(applicationForm.tid) {
       const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
-      applicationForm.project = await db.PostModel.findOnly({pid: thread.oc});
+      const firstPost= await db.PostModel.findOnly({pid: thread.oc});
+      await firstPost.extendResources();
+      await firstPost.extendUser();
+      applicationForm.project = firstPost;
     }
-
-
 		const q = {
 			applicationFormId: applicationForm._id,
 			type: 'comment'
