@@ -367,7 +367,7 @@ var common=(function(){
   var common = {}
 
   var URLTestRegex = new RegExp("^"+URLRegexStem+"$","i")
-  var URLExtractRegex = /([^“”‘’\/<\'\"\(\[\]\=]|^)\b((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#\/%=~_|$])/gi
+  var URLExtractRegex = /([^“”‘’\/<\'\"\(\[\]\=]|^)\b((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#\/%=~_|$])/gi;
 
   common.URLifyMarkdown = function(content){
     return content.replace(URLExtractRegex,function(match,p1,p2){
@@ -379,15 +379,16 @@ var common=(function(){
       return p1+'[url]'+p2+'[/url]'
     })
   }
+  var rule = /([^“”‘’\/<\'\"\(\[\]\=]|^)\b((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#\/%=~_|$])/gi;
   common.URLifyHTML = function(content){
-    return content.replace(URLExtractRegex,function(match,p1,p2){
-      // 这里将原链接的http头部去掉，统一加上http
-      // 不是https也没关系，浏览器只识别是否有头部，点击连接会自动跳转
-      // 如果不加头部则变为相对路径
-      p3 = p2.replace(/(https|http):\/\//igm,'');
-      return p1+'<a href="http://'+ p2 +'">'+p2+'</a>';
-      // return p1+'<a href="'+p2+'">'+p2+'</a>';
-    })
+    var result = content.replace(rule,function(a,b,c,d,e){
+      if(b.indexOf(">") == -1) {
+        return `${b}<a href="https://${c}" target="_blank">${c}</a>`
+      }else{
+        return `${a}`
+      }
+    });
+    return result;
   }
 
   function mapWithPromise(arr,func,k){

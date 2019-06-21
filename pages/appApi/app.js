@@ -46,10 +46,15 @@ function appOpenUrl(urlStr) {
   }else{
     urlStr = urlStr + "?apptype=app";
   }
+  // 根据打开的不同类型去除不同模板
+  var windowFile = "widget://html/common/commonInfo.html";
+  if(urlStr.indexOf("/t/") > -1) {
+    windowFile = "widget://html/common/threadInfo.html";
+  }
   console.log(urlStr)
   api.openWin({
     name: urlStr,
-    url: "widget://html/common/threadInfo.html",
+    url: windowFile,
     pageParam: {
       realUrl: urlStr
     }
