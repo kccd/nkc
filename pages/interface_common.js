@@ -382,10 +382,15 @@ var common=(function(){
   var rule = /([^“”‘’\/<\'\"\(\[\]\=]|^)\b((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#\/%=~_|$])/gi;
   common.URLifyHTML = function(content){
     return content.replace(rule,function(a,b,c,d,e){
-      if(b.indexOf(">") === -1) {
+      /*if(b.indexOf(">") === -1) {
         return `${b}<a href="http://${c}" target="_blank">${c}</a>`
       }else{
         return `${a}`
+      }*/
+      if(b.indexOf(">") === -1) {
+        return b +'<a href="http://'+c+'" target="_blank">' + c + '</a>'
+      }else{
+        return a
       }
     });
   }
