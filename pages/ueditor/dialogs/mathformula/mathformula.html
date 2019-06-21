@@ -76,6 +76,14 @@
     dialog.onok = function(){
       // 获取公式源代码
       var formulaCodeText = $("#mathInput").val();
+      if(formulaCodeText.indexOf("\\[") > -1) {
+        formulaCodeText = formulaCodeText.replace("\\[", "$$$");
+        formulaCodeText = formulaCodeText.replace("\\]", "$$$");
+      }
+      if(formulaCodeText.indexOf("\\(") > -1){
+        formulaCodeText = formulaCodeText.replace("\\(", "$");
+        formulaCodeText = formulaCodeText.replace("\\)", "$");
+      }
       var formulaCode = formulaCodeText.substr(0, 2);
       if(formulaCode == "$$") {
           editor.execCommand('insertformulacode', '<span contenteditable="false" style="max-width:100%">'+formulaCodeText+'</span><span><br></span>');

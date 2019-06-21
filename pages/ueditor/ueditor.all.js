@@ -6912,7 +6912,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     getStyleValue("padding-top")- getStyleValue("padding-bottom") +'px';
 
                 container.style.zIndex = options.zIndex;
-
+                var doubleStr = "[\'\\[\',\'\\]\']";
                 var html = ( ie && browser.version < 9  ? '' : '<!DOCTYPE html>') +
                     '<html xmlns=\'http://www.w3.org/1999/xhtml\' class=\'view\' ><head>' +
                     '<style type=\'text/css\'>' +
@@ -6925,7 +6925,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     'p{margin:5px 0;}</style>' +
                     ( options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
-                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\'], [\'\\(\',\'\\)\']],displayMath: [[\'$$\',\'$$\'], [\'\\[\',\'\\]\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
+                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\'], [\'\\(\',\'\\)\']],displayMath: [[\'$$\',\'$$\'], '+doubleStr+'],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
                     '<script async=\'async\' src=\'/ueditor/MathJax-2.6-latest/MathJax.js\'></script>' +
                     '</head><body class=\'view\' id=\'view\'></body>' +
                     '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +
