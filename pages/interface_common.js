@@ -388,7 +388,7 @@ var common=(function(){
         return `${a}`
       }*/
       if(b.indexOf(">") === -1) {
-        return b +'<a href="http://${c}" target="_blank">' + c + '</a>'
+        return b +'<a href="http://'+c+'" target="_blank">' + c + '</a>'
       }else{
         return a
       }
