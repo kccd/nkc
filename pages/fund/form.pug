@@ -97,51 +97,36 @@ include ../interface_fund_apply_messages
           -displayNext = false;
     .fund-apply-status
       ul
-        mixin pointer(s1, s2 , text, r)
-          -const passed = s1? 'passed': '';
-          -let info = '';
-          if r
-            if s1
-              -info= '完成';
-            else
-              if r.verify
-                -info= '完成';
-              else
-                if r.status
-                  -info= '未确认';
-                else
-                  if r.passed
-                    -info= '已申请';
-                  else if r.passed === false
-                    -info= '未通过'
-                  else
-                    if r.apply
-                      -info= '已申请';
-                    else
-                      -info='未申请';
-          li(class=passed)= text + info
+        li(class=submitted?"passed":"") 提交申请
+        li.next.fa.fa-chevron-right
+        if fund.supportCount > 0
+          li(class=usersSupport? "passed" : "")=`网友支持${fund.supportCount?`(${fund.supportCount})`:""}`
           li.next.fa.fa-chevron-right
-        +pointer(submitted, usersSupport, '提交申请')
         if fund.auditType === "person"
-          +pointer(usersSupport, projectPassed, `网友支持${fund.supportCount?`(${fund.supportCount})`:""}`)
-          //-+pointer(usersSupport, projectPassed, `网友支持`)
-          +pointer(projectPassed, adminSupport,'专家审核')
-          -const count = applicationForm.remittance.length;
-          if count > 0
-            +pointer(adminSupport, applicationForm.remittance[0].status && applicationForm.remittance[0].verify,'管理员复核')
-            -for (let i = 0; i < applicationForm.remittance.length; i++)
-              -const r = applicationForm.remittance[i];
-              -const r2 = applicationForm.remittance[1+i];
-              if r2
-                +pointer(r.status && r.verify, r2.status && r2.verify, `第${i + 1}期拨款（${r.money}元）`, r)
-            -const lastRemittance = applicationForm.remittance[applicationForm.remittance.length-1];
-            +pointer(lastRemittance.status && lastRemittance.verify, completed, `第${count}期拨款（${lastRemittance.money}元）`, lastRemittance)
-          else
-            +pointer(adminSupport, remittance,'管理员复核')
-            +pointer(remittance, completed, '拨款')
+          li(class=projectPassed? "passed" : "") 专家审核
+          li.next.fa.fa-chevron-right
+          li(class=adminSupport? "passed" : "") 管理员复核
+          li.next.fa.fa-chevron-right
+        if applicationForm.remittance.length > 0
+          for r, index in applicationForm.remittance
+            -let info = "";
+            if r.verify
+              -info = "完成"
+            else if r.status
+              -info = "未确认"
+            else if r.passed
+              -info = "已申请"
+            else if r.passed === false
+              -info = "未通过"
+            else if r.apply
+              -info = "已申请"
+            else
+              -info = "未申请"
+            li(class=r.status&&r.verify? "passed" : "")=`第${index+1}期拨款（${r.money}元） ${info}`
+            li.next.fa.fa-chevron-right
         else
-          +pointer(usersSupport, remittance, `网友支持${fund.supportCount?`(${fund.supportCount})`:""}`)
-          +pointer(remittance, completed, '拨款')
+          li(class=remittance? "passed" : "") 拨款
+          li.next.fa.fa-chevron-right
         if completed
           li.passed 结题
         else
@@ -183,7 +168,7 @@ if data.reports && data.reports.length && data.reports.length > 0
             else
               span.applicationForm-report-icon
                 img(src=`/avatar/${applicationForm.uid}?t=sm`)
-                a(href=`/u/${applicationForm.uid}` target="_blank")=applicationForm.applicant.user.username
+                a(hrefA=`/u/${applicationForm.uid}` target="_blank")=applicationForm.applicant.user.username
             span(title=r.toc.toLocaleString())=fromNow(r.toc)
             if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)
               if r.disabled

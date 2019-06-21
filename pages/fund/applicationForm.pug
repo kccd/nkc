@@ -8,9 +8,14 @@ block fundContent
     .col-xs-12.col-md-8.box-shadow-panel
       div(style="padding: 2rem;")
         include ./form
-        hr
-        if !applicationForm.disabled && applicationForm.tid && data.user
-          a.btn.btn-default(href=`/t/${applicationForm.tid}#container` target="_blank") 去评论
+        .m-t-3
+          .applicationForm-header 最新评论
+          include ../publicModules/paging/paging
+          include ./applicationFormComments
+          include ../publicModules/paging/paging
+          div
+            if !applicationForm.disabled && applicationForm.tid && data.user
+              a.btn.btn-default(href=`/t/${applicationForm.tid}#container` target="_blank") 去评论
     .col-xs-12.col-md-3
       include ./options
       if !applicationForm.status.submitted
