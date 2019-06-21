@@ -1383,6 +1383,39 @@ span.applicationForm-report-icon.system{
   text-decoration: none;
   color: #fff;
 }
+.form-user-info{
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+.form-time{
+  display: inline-block;
+  font-weight: 700;
+  color: #9baec8;
+}
+.applicationForm-comment{
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+.applicationForm-comment:last-child{
+  border-bottom: none;
+}
+.form-user-info img{
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+.form-user-info span{
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2b90d9;
+}
+.form-comment-content{
+  padding: 0.5rem 0;
+}
+.form-comment-content img{
+  max-width: 100%;
+}
 @media screen and (max-width: 768px) {
   .popupPanel-body{
     width: 100%;

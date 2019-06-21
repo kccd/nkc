@@ -107,20 +107,21 @@ applicationRouter
       await firstPost.extendResources();
       await firstPost.extendUser();
       applicationForm.project = firstPost;
+      const q = {
+        tid: applicationForm.tid,
+        pid: {$ne: thread.oc},
+        disabled: false,
+        reviewed: true,
+        toDraft: {$ne: true}
+      };
+      // if(!fund.ensureOperatorPermission('admin', user)) q.disabled = false;
+      const length = await db.PostModel.count(q);
+      const paging = apiFn.paging(page, length);
+      data.paging = paging;
+      const comments = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+      data.comments = await db.PostModel.extendPosts(comments);
     }
-		const q = {
-			applicationFormId: applicationForm._id,
-			type: 'comment'
-		};
-		if(!fund.ensureOperatorPermission('admin', user)) q.disabled = false;
-		const length = await db.FundDocumentModel.count(q);
-		const paging = apiFn.paging(page, length);
-		const comments = await db.FundDocumentModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-		await Promise.all(comments.map(async comment => {
-			await comment.extendUser();
-			await comment.extendResources();
-		}));
-		applicationForm.comments = comments;
+
 		await applicationForm.extendSupporters();
 		await applicationForm.extendObjectors();
 		await applicationForm.extendReportThreads();
@@ -152,7 +153,6 @@ applicationRouter
 			await r.extendResources();
     }));
 		data.auditComments = auditComments;
-		data.paging = paging;
 		await next();
 	})
 
