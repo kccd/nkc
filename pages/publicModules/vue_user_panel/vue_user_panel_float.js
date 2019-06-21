@@ -21,7 +21,6 @@ var vue_user_panel_float = new Vue({
   },
   mounted: function() {
     var data = strToObj(this.$el.getAttribute("data-sub-uid"));
-    console.log(data);
     this.subUid = data.subUid;
   },
   methods: {

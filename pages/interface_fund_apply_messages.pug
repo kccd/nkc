@@ -161,28 +161,29 @@
               -used=0;
               -displaySuggest = true;
               -displayFact = true;
-              table.table.table-striped.applicationForm-table
-                thead
-                  tr
-                    th 用途
-                    th 数量
-                    th 单价（元）
-                    th 合计（元）
-                    th 专家建议（元）
-                    th 实际批准（元）
-                tbody
-                  for p in applicationForm.budgetMoney
-                    -const total = p.count*p.money;
-                    -aggregate += total;
-                    -suggest += p.suggest;
-                    -fact += p.fact;
+              .table-responsive
+                table.table.table-striped.applicationForm-table
+                  thead
                     tr
-                      th=p.purpose
-                      th=p.count
-                      th=p.money
-                      th=total
-                      th=p.suggest?p.suggest: total
-                      th=p.fact?p.fact:total
+                      th 用途
+                      th 数量
+                      th 单价（元）
+                      th 合计（元）
+                      th 专家建议（元）
+                      th 实际批准（元）
+                  tbody
+                    for p in applicationForm.budgetMoney
+                      -const total = p.count*p.money;
+                      -aggregate += total;
+                      -suggest += p.suggest;
+                      -fact += p.fact;
+                      tr
+                        th=p.purpose
+                        th=p.count
+                        th=p.money
+                        th=total
+                        th=p.suggest?p.suggest: total
+                        th=p.fact?p.fact:total
               //-
                 .fund-money-list.head.adminAudit
                   .purpose 用途
@@ -207,25 +208,26 @@
               -aggregate=0;
               -suggest=0;
               -displaySuggest = true;
-              table.table.table-striped.applicationForm-table
-                thead
-                  tr
-                    th 用途
-                    th 数量
-                    th 单价（元）
-                    th 合计（元）
-                    th 专家建议（元）
-                tbody
-                  for p in applicationForm.budgetMoney
-                    -const total = p.count*p.money;
-                    -aggregate += total;
-                    -suggest += p.suggest;
+              .table-responsive
+                table.table.table-striped.applicationForm-table
+                  thead
                     tr
-                      th=p.purpose
-                      th=p.count
-                      th=p.money
-                      th=total
-                      th=p.suggest
+                      th 用途
+                      th 数量
+                      th 单价（元）
+                      th 合计（元）
+                      th 专家建议（元）
+                  tbody
+                    for p in applicationForm.budgetMoney
+                      -const total = p.count*p.money;
+                      -aggregate += total;
+                      -suggest += p.suggest;
+                      tr
+                        th=p.purpose
+                        th=p.count
+                        th=p.money
+                        th=total
+                        th=p.suggest
               //-
                 .fund-money-list.head.projectAudit
                   .purpose 用途
@@ -245,23 +247,24 @@
                     .suggest= p.suggest
             else
               -aggregate=0;
-              table.table.table-striped.applicationForm-table
-                thead
-                  tr
-                    th 用途
-                    th 数量
-                    th 单价（元）
-                    th 合计（元）
-                tbody
-                  for p in applicationForm.budgetMoney
-                    -const total = p.count*p.money;
-                    -aggregate += total;
-                    -suggest += p.suggest;
+              .table-responsive
+                table.table.table-striped.applicationForm-table
+                  thead
                     tr
-                      th=p.purpose
-                      th=p.count
-                      th=p.money
-                      th=total
+                      th 用途
+                      th 数量
+                      th 单价（元）
+                      th 合计（元）
+                  tbody
+                    for p in applicationForm.budgetMoney
+                      -const total = p.count*p.money;
+                      -aggregate += total;
+                      -suggest += p.suggest;
+                      tr
+                        th=p.purpose
+                        th=p.count
+                        th=p.money
+                        th=total
               //-
                 .fund-money-list.head
                   .purpose 用途
@@ -289,22 +292,23 @@
           if applicationForm.actualMoney.length !== 0
             h5 实际使用：
             -let actualAggregate = 0;
-            table.table.table-striped.applicationForm-table
-              thead
-                tr
-                  th 用途
-                  th 数量
-                  th 单价（元）
-                  th 合计（元）
-              tbody
-                for a in applicationForm.actualMoney
-                  -const total = a.count*a.money;
-                  -actualAggregate += total;
+            .table-responsive
+              table.table.table-striped.applicationForm-table
+                thead
                   tr
-                    th=a.purpose
-                    th=a.count
-                    th=a.money
-                    th=total
+                    th 用途
+                    th 数量
+                    th 单价（元）
+                    th 合计（元）
+                tbody
+                  for a in applicationForm.actualMoney
+                    -const total = a.count*a.money;
+                    -actualAggregate += total;
+                    tr
+                      th=a.purpose
+                      th=a.count
+                      th=a.money
+                      th=total
             //-
               .fund-money-list.head
                 .purpose 用途
