@@ -85,11 +85,24 @@
       //   formulaCodeText = formulaCodeText.replace("\\)", "$");
       // }
       var formulaCode = formulaCodeText.substr(0, 2);
-      if(formulaCode == "$$") {
+      if(formulaCode.indexOf("$") > -1) {
+        if(formulaCode === "$$"){
           editor.execCommand('insertformulacode', '<span contenteditable="false" style="max-width:100%">'+formulaCodeText+'</span><span><br></span>');
-      }else {
+        }else{
           editor.execCommand('insertformulacode', '<span contenteditable="false">'+formulaCodeText+'</span>&nbsp;');
+        }
+      }else{
+        editor.execCommand('insertformulacode', '<span>'+formulaCodeText+'</span>&nbsp;');
       }
+      // if(formulaCode == "$$") {
+      //   editor.execCommand('insertformulacode', '<span contenteditable="false" style="max-width:100%">'+formulaCodeText+'</span><span><br></span>');
+      // }else if(formulaCode == "\\["){
+      //   editor.execCommand('insertformulacode', '<span>'+formulaCodeText+'</span>&nbsp;');
+      // }else if(formulaCode === "\\(") {
+      //   editor.execCommand('insertformulacode', '<span>'+formulaCodeText+'</span>&nbsp;');
+      // }else{
+      //   editor.execCommand('insertformulacode', '<span contenteditable="false">'+formulaCodeText+'</span>&nbsp;');
+      // }
       dialog.close();
       return false;
     }
