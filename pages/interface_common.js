@@ -1053,6 +1053,7 @@ function credit(pid, type, kcb) {
           })
           .catch(function(data) {
             screenTopWarning(data.error)
+            button[1].removeAttribute("disabled");
           })
       } else if(type === 'kcb') {
 
@@ -1068,6 +1069,7 @@ function credit(pid, type, kcb) {
           })
           .catch(function(data) {
             screenTopWarning(data.error || data);
+            button[1].removeAttribute("disabled");
           });
       }
     }

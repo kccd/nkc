@@ -561,15 +561,15 @@ footer.footer ul li{
   width: 70%;
   position: fixed;
   top: 0;
-  left: -70%;
+  right: -70%;
   z-index: 10003;
   height: 100%;
   overflow-y: scroll;
   background-color: #fff;
-  transition: left 300ms;
+  transition: right 300ms;
 }
 .nkc-drawer-body.active{
-  left: 0;
+  right: 0;
 }
 .nkc-drawer-avatar{
   text-align: center;
@@ -589,8 +589,8 @@ footer.footer ul li{
   font-size: 1rem;
 }
 .nkc-drawer-avatar img{
-  height: 4.5rem;
-  width: 4.5rem;
+  height: 6rem;
+  width: 6rem;
   border-radius: 50%;
 }
 .nkc-drawer-count{
@@ -640,7 +640,7 @@ footer.footer ul li{
   text-align: center;
 }
 .nkc-drawer-header{
-  height: 4.5rem;
+  height: 2.5rem;
   position: relative;
 }
 .nkc-drawer-settings{
@@ -663,7 +663,7 @@ footer.footer ul li{
   top: 0;
   bottom: 0;
   margin: auto;
-  height: 3rem;
+  height: 2rem;
   min-width: 4rem;
   padding: 0 0.5rem;
   text-align: center;
@@ -716,8 +716,8 @@ footer.footer ul li{
   height: 3.4rem;
   line-height: 3.4rem;
 }
-.nkc-drawer-list li:hover{
-  background-color: #d9e1e8;
+.nkc-drawer-list li:active{
+  background-color: #eee;
 }
 .nkc-drawer-list-line{
   background-color: #e5e5e5;
@@ -737,10 +737,9 @@ footer.footer ul li{
   color: #999;
   text-decoration: none;
 }
-
 .nkc-drawer-right{
   height: 0;
-  right: 0;
+  left: 0;
   top: 0;
   position: fixed;
   width: 30%;

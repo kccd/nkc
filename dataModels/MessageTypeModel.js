@@ -87,6 +87,8 @@ const getDomByType = (t, app) => {
       return "item.c.applicationForm._id"
     } else if(t === "applicationFormCode") {
       return "item.c.applicationForm.code"
+    } else if(t === "xsfCount") {
+      return "item.c.num"
     }
   } else {
     if(t === "threadTitle") {
@@ -139,6 +141,8 @@ const getDomByType = (t, app) => {
       return "item.c.applicationForm._id"
     } else if(t === "applicationFormCode") {
       return "item.c.applicationForm.code"
+    } else if(t === "xsfCount") {
+      return "item.c.num"
     }
   }
 };

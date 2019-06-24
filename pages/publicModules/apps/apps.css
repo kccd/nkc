@@ -1,0 +1,25 @@
+.module-apps{
+  /*background-color: #eee;*/
+}
+.module-app{
+  overflow: hidden;
+  width: 4rem;
+  margin-right: 1rem;
+  text-decoration: none;
+  display: inline-block;
+  color: #282c37;
+  font-weight: 700;
+}
+.module-app:hover, .module-app:focus{
+  text-decoration: none;
+  color: #282c37;
+}
+.module-app img{
+  height: 4rem;
+  width: 4rem;
+  border-radius: 3px;
+  display: block;
+}
+.module-app span{
+  font-size: 1rem;
+}

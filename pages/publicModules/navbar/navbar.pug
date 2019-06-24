@@ -14,9 +14,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      //- 手机屏幕 未登录状态时显示菜单按钮
-      //-if !data.user && 0
-        .hidden-md.hidden-lg.navbar-brand.fa.fa-bars(onclick="openNKCDrawer()")
       a.navbar-brand(href="/" )= `${data.serverSettings?data.serverSettings.websiteName: '科创论坛'}`
       if data.user
         //- 已登录状态 显示头像
@@ -44,8 +41,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
         .nkc-drawer-body
           if data.user
             .nkc-drawer-header
-              a(href=`/u/${data.user.uid}/settings`).nkc-drawer-settings.nkc-drawer-link
-                .fa.fa-cog &nbsp;资料设置
               a.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum?"disabled":"" href='/message') 新消息
                 span.message-switch(class=!messageSum?"disabled":"")=messageSum
             .nkc-drawer-avatar
@@ -82,6 +77,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                   span.fa.fa-user-circle-o &nbsp;个人名片
                   span.pull-right.fa.fa-angle-right
               li
+                a(href=`/message`)
+                  span.fa.fa-envelope-o &nbsp;短消息
+                  span.pull-right.fa.fa-angle-right
+              li
                 a(href=`/u/${data.user.uid}/collections/unclassified`)
                   span.fa.fa-folder-o &nbsp;收藏
                   span.pull-right.fa.fa-angle-right
@@ -97,7 +96,11 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                 a(href=`/account/finance`)
                   span.fa.fa-file-text-o &nbsp;账单
                   span.pull-right.fa.fa-angle-right
-
+            ul.nkc-drawer-list
+              li
+                a(href=`/u/${data.user.uid}/settings`)
+                  span.fa.fa-cog &nbsp;资料设置
+                  span.pull-right.fa.fa-angle-right
             ul.nkc-drawer-list
               li
                 a(href=`/shop/order`)

@@ -6,7 +6,7 @@ block content
   .container-fluid.max-width
     #data.hidden=objToStr({results: data.results})
     .row#app(v-cloak)
-      .col-xs-12.col-md-8
+      .col-xs-12.col-md-9
         .p-b-1
           .paging-button.pointer
             a.radius-left.button(@click="selectAll") 全选
@@ -20,22 +20,40 @@ block content
             .review-panel
               .review-time
                 input(type="checkbox" value=r.post.pid v-model=`selectedPid`)
-              .review-time(title=format("YYYY/MM/DD HH:mm:ss", r.post.toc))=fromNow(r.post.toc)
+              .review-info 时间：
+              .review-time=`${format("YYYY/MM/DD HH:mm:ss", r.post.toc)}`
+              .review-info 用户：
               .review-user
-                img(src=`/avatar/${r.user.uid}`).review-user-avatar
+                //-img(src=`/avatar/${r.user.uid}`).review-user-avatar
                 a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
               if r.type === "post"
-                .review-info 在文章
+                .review-info 类型：
+                .review-time 回复
+                .review-info 标题：
                 .review-thread-title
                   a(href=`/t/${r.thread.tid}` target="_blank")=r.thread.firstPost.t
-                .review-info 下发表回复,
+                .review-infpubMessageo 专业：
                 .review-thread-title
-                  a(href=r.link target="_blank") 查看原文
-                .review-info 。
+                  for f, index in r.thread.forums
+                    if index > 0
+                      span ,
+                    a(href=`/t/${f.fid}` target="_blank")=f.displayName
+
+                .review-info ，
+                .review-thread-title
+                  a(href=r.link target="_blank") 查看回复
               else
-                .review-info 发表文章
+                .review-info 类型：
+                .review-time 文章
+                .review-info 标题：
                 .review-thread-title
                   a(href=`/t/${r.thread.tid}` target="_blank")=r.thread.firstPost.t
+                .review-info 专业：
+                .review-thread-title
+                  for f, index in r.thread.forums
+                    if index > 0
+                      span ,
+                    a(href=`/t/${f.fid}` target="_blank")=f.displayName
               .review-input-div(v-if=`selectedPid.indexOf('${r.post.pid}') !== -1`)
                 .m-b-1
                   input(type="radio" :value="true" v-model=`review['${r.post.pid}'].pass`)
