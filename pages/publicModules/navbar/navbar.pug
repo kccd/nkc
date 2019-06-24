@@ -44,8 +44,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
         .nkc-drawer-body
           if data.user
             .nkc-drawer-header
-              a(href=`/u/${data.user.uid}/settings`).nkc-drawer-settings.nkc-drawer-link
-                .fa.fa-cog &nbsp;资料设置
               a.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum?"disabled":"" href='/message') 新消息
                 span.message-switch(class=!messageSum?"disabled":"")=messageSum
             .nkc-drawer-avatar
@@ -97,7 +95,11 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
                 a(href=`/account/finance`)
                   span.fa.fa-file-text-o &nbsp;账单
                   span.pull-right.fa.fa-angle-right
-
+            ul.nkc-drawer-list
+              li
+                a(href=`/u/${data.user.uid}/settings`)
+                  span.fa.fa-cog &nbsp;资料设置
+                  span.pull-right.fa.fa-angle-right
             ul.nkc-drawer-list
               li
                 a(href=`/shop/order`)
