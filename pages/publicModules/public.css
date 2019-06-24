@@ -663,7 +663,7 @@ footer.footer ul li{
   top: 0;
   bottom: 0;
   margin: auto;
-  height: 3rem;
+  height: 2rem;
   min-width: 4rem;
   padding: 0 0.5rem;
   text-align: center;
@@ -716,8 +716,8 @@ footer.footer ul li{
   height: 3.4rem;
   line-height: 3.4rem;
 }
-.nkc-drawer-list li:hover{
-  background-color: #d9e1e8;
+.nkc-drawer-list li:active{
+  background-color: #eee;
 }
 .nkc-drawer-list-line{
   background-color: #e5e5e5;
@@ -737,7 +737,6 @@ footer.footer ul li{
   color: #999;
   text-decoration: none;
 }
-
 .nkc-drawer-right{
   height: 0;
   left: 0;

@@ -14,9 +14,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      //- 手机屏幕 未登录状态时显示菜单按钮
-      //-if !data.user && 0
-        .hidden-md.hidden-lg.navbar-brand.fa.fa-bars(onclick="openNKCDrawer()")
       a.navbar-brand(href="/" )= `${data.serverSettings?data.serverSettings.websiteName: '科创论坛'}`
       if data.user
         //- 已登录状态 显示头像
@@ -78,6 +75,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade
               li
                 a(href=`/u/${data.user.uid}`)
                   span.fa.fa-user-circle-o &nbsp;个人名片
+                  span.pull-right.fa.fa-angle-right
+              li
+                a(href=`/message`)
+                  span.fa.fa-envelope-o &nbsp;短消息
                   span.pull-right.fa.fa-angle-right
               li
                 a(href=`/u/${data.user.uid}/collections/unclassified`)

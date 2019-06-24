@@ -188,12 +188,6 @@ block content
                 .col-xs-12.col-md-12
                   .thread-management
                     .title
-                      for forum in thread.forums
-                        a(href=`/f/${forum.fid}` style='text-decoration: none;margin-right: 0.5rem;')
-                          span(style=`padding: 2px 5px;color: #ffffff;border-radius:5px;background-color: ${forum.color}`)= forum.displayName
-                      //-if thread.forum.parentForum
-                        a(href=`/f/${thread.forum.parentForum.fid}` style='text-decoration: none;margin-right: 0.5rem;')
-                          span(style=`padding: 2px 5px;color: #ffffff;border-radius:5px;background-color: ${thread.forum.parentForum.color}`)= thread.forum.parentForum.displayName
                       if thread.forum
                         a(href=`/f/${thread.forum.fid}` style='text-decoration: none;')
                           span(style=`padding: 2px 5px;color: #ffffff;border-radius:5px;background-color: ${thread.forum.color}`)= thread.forum.displayName
@@ -207,60 +201,6 @@ block content
                         if data.isModerator && canManagement
                           a(href=`javascript:displayManagement();` style='text-decoration: none;float: right;')
                             .highlight.fa.fa-cog
-                        .pull-right.m-r-05
-                          +postOptions(thread.firstPost, thread, 0)
-                      .inline-block(style='float: right;')
-                        .highlight.fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false") &nbsp;分享
-                        .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;width:90px;background:none')
-                          div(style="display:inline-block;width:100%;vertical-align:top;text-align:right;")
-                            .ThreadTitle2(style="display:inline-block;max-width:100%;vertical-align:top;")
-                              .ThreadTitle22(style="border: 1px solid #ddd;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background:#FFFFFF")
-                                div.changeDis(style="width:100%")
-                                  p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
-                                  .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
-                                  -var tpid = thread.firstPost.pid
-                                  p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
-                                  .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
-                                  p.lighttext.airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
-                                div.changeDisNone.text-center(style='width: 100%;')
-                                  .col-xs-12.col-md-12
-                                    .col-xs-3.col-md-3(style="padding:0px")
-                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                        img(src="/default/QQ.png" style="")
-                                    .col-xs-3.col-md-3(style="padding:0px")
-                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qzone', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                        img(src="/default/qzone.png" style="")
-                                    .col-xs-3.col-md-3(style="padding:0px")
-                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weibo', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                        img(src="/default/weibo.png" style="")
-                                    .col-xs-3.col-md-3(style="padding:0px")
-                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                        img(src="/default/weChat.png" style="")
-                                  .col-xs-12.col-md-12
-                                    a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`) 获取分享链接
-                                  .col-xs-12.col-md-12(id=`copyArea${thread.tid}` style="display:none")
-                                    input(type="text", id=`copyLink${thread.tid}`, name=`copyLink${thread.tid}` style="width:inherit")
-                                    button(onclick=`copyLink('${thread.tid}')` id=`copyButton${thread.tid}`) 复制
-                                  canvas#threadQrcode.inline-block(style="display:none")
-                      if addKcb && data.user && thread.firstPost.uid !== data.user.uid
-                        .inline-block.post-thumbsUp(style='color: #aaa;')
-                          .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励
-                      .inline-block.post-thumbsUp
-                        //span &nbsp;
-                        //-const recUsers = thread.firstPost.recUsers || [];
-                        //if data.user && recUsers.includes(data.user.uid)
-                        //  span(data-pid=thread.firstPost.pid).thumbsUp.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-                        //else
-                        //  span(data-pid=thread.firstPost.pid).thumbsDown.fa.fa-thumbs-o-up=`${recUsers.length || ''}`
-                        // - post = thread.firstPost;
-                        - const votePost = thread.firstPost;
-                        include ../module_vote
-                      if thread.firstPost.digest
-                        .inline-block.post-thumbsUp
-                          span &nbsp;
-                          span.fa.fa-star(style='color: #ffbf16;' title='精选')
-
-
                       if data.user
                         div.managementDiv(style='display: none;margin-top: 1rem;')
                           .form-inline
@@ -300,7 +240,7 @@ block content
                     if !thread.reviewed
                       -let reviewData = {reviewPid: thread.oc, reviewType: "thread"}
                       include ../publicModules/module_review
-                    .col-xs-12.col-md-12(style=`margin: 3rem 0 1rem 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
+                    .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
                       if thread.recycleMark
                         .h4.text-center(style='color: #ff5a0b;') 本文已被退回修改，请作者点击编辑按钮进入编辑界面
                         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${thread.reason}`
@@ -358,8 +298,6 @@ block content
                                       li.list-group-item(style="padding:3px")
                                         div 邮政编码：
                                         div!=`${auth.contractObj.contractCode}`
-                                  //- span
-                                  //-   span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
                           else
                             for auth,index in post.authorInfos
                               span(style="margin-right:10px;font-weight: bold;")
@@ -384,14 +322,7 @@ block content
                                       li.list-group-item(style="padding:3px")
                                         div 邮政编码：
                                         div!=`${auth.contractObj.contractCode}`
-                                  //- span
-                                  //-   span.fa.fa-envelope-open-o(onclick="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
-                          //- if thread.firstPost.originState && thread.firstPost.originState !== "0"
-                          //-   -var levelText = getOriginLevel(thread.firstPost.originState);
-                          //-   if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
-                          //-     span(style="color:#9baec8;margin-right:3px") 原创
-                          //-   a()
-                          //-     span.fa.fa-caret-square-o-down(style="color:#b5b4b4" onclick="originTextShow(this)" onmouseout="originTextClose()" data-text=`${levelText}`)
+
                         .thread-info.text-center(style="color:#000;margin-top:1rem")
                           if post.authorInfos.length > 1
                             for agad,index in agencyAddArray
@@ -400,7 +331,7 @@ block content
                             for agad,index in agencyAddArray
                               span(style="margin-right:10px")!=`${agad}`
                       if thread.type !== "fund"
-                        .thread-info.text-center(style="margin-top:1rem")
+                        .thread-info.text-center(style="margin-top:1.5rem")
                           a(href=`/u/${thread.uid}`)
                             img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                             span= ` ${thread.firstPost.user.username}`
@@ -414,25 +345,10 @@ block content
                                 span.fa.fa-caret-square-o-down(style="color:#b5b4b4")
                               .dropdown-menu(aria-labelledby='dropdown-level')
                                 span(style="padding:5px")!=`${levelText}`
-
-                        //- if post.authorInfos && post.authorInfos.length > 0
-                        //-   .panel.panel-default(style="border:0;margin-bottom:0")
-                        //-     .panel-heading.paperHeader 作者信息
-                        //-     .panel-body
-                        //-       ol(style="padding-left:20px")
-                        //-         for auth in post.authorInfos
-                        //-           if auth
-                        //-             li(style="font-weight:bold")
-                        //-               span!=`${auth.name}. `
-                        //-               if auth.kcid
-                        //-               if auth.agency
-                        //-                 span!=`${auth.agency}. `
-                        //-               if auth.agencyAdd
-                        //-                 span!=`${auth.agencyAdd}.   `
-
-                        //-               if auth.isContract
-                        //-                 span
-                        //-                   span.fa.fa-id-card(onmouseover="originPanelShow(this)" onmouseout="originPanelClose()" data-email=`${auth.contractObj.contractEmail}` data-tel=`${auth.contractObj.contractTel}` data-add=`${auth.contractObj.contractAdd}` data-code=`${auth.contractObj.contractCode}`)
+                          for forum, index in thread.forums
+                            if index > 0
+                              span ,
+                            a(href=`/f/${forum.fid}`)=forum.displayName
                         if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
                           .abstract(style="margin-top:1rem;")
                             if post.abstractCn.length !== 0
@@ -457,9 +373,9 @@ block content
                                     for keyEn in post.keyWordsEn
                                       span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
                       if data.paging.page === 0
-                        if data.thread.type == "article"
+                        if data.thread.type === "article"
                           div.thread-content.ThreadPostBody!= experimental_render(post)
-                        else if data.thread.type == "product"
+                        else if data.thread.type === "product"
                           div.thread-content.ThreadPostBody
                             include ./product/product.pug
                         else if data.thread.type === "fund"
@@ -478,6 +394,57 @@ block content
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
                       if post.disabled && disablePost
                         a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+                      .m-t-05
+                        span 来自&nbsp;
+                        for forum, index in thread.forums
+                          if index > 0
+                            span ,
+                          a(href=`/f/${forum.fid}`)=forum.displayName
+                        .pull-right.text-right
+                          if thread.firstPost.digest
+                            .inline-block
+                              span.fa.fa-star(style='color: #ffbf16;' title='精选')
+                              span &nbsp;
+                          - const votePost = thread.firstPost;
+                          .inline-block(style="vertical-align: text-top;")
+                            include ../module_vote
+                          if addKcb && data.user && thread.firstPost.uid !== data.user.uid
+                            .inline-block(style='color: #aaa;')
+                              .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
+                          .highlight.fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: #aaa;") &nbsp;分享&nbsp;
+                          .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;width:90px;background:none')
+                            div(style="display:inline-block;width:100%;vertical-align:top;text-align:right;")
+                              .ThreadTitle2(style="display:inline-block;max-width:100%;vertical-align:top;")
+                                .ThreadTitle22(style="border: 1px solid #ddd;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background:#FFFFFF")
+                                  div.changeDis(style="width:100%")
+                                    p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
+                                    .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
+                                    -var tpid = thread.firstPost.pid
+                                    p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
+                                    .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
+                                    p.lighttext.airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
+                                  div.changeDisNone.text-center(style='width: 100%;')
+                                    .col-xs-12.col-md-12
+                                      .col-xs-3.col-md-3(style="padding:0px")
+                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
+                                          img(src="/default/QQ.png" style="")
+                                      .col-xs-3.col-md-3(style="padding:0px")
+                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qzone', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
+                                          img(src="/default/qzone.png" style="")
+                                      .col-xs-3.col-md-3(style="padding:0px")
+                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weibo', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
+                                          img(src="/default/weibo.png" style="")
+                                      .col-xs-3.col-md-3(style="padding:0px")
+                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
+                                          img(src="/default/weChat.png" style="")
+                                    .col-xs-12.col-md-12
+                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`) 获取分享链接
+                                    .col-xs-12.col-md-12(id=`copyArea${thread.tid}` style="display:none")
+                                      input(type="text", id=`copyLink${thread.tid}`, name=`copyLink${thread.tid}` style="width:inherit")
+                                      button(onclick=`copyLink('${thread.tid}')` id=`copyButton${thread.tid}`) 复制
+                                    canvas#threadQrcode.inline-block(style="display:none")
+                          if data.user
+                            +postOptions(thread.firstPost, thread, 0)
           .fullwidthpanel.ThreadBox.nkcpanel
             .row
               .thread-div
