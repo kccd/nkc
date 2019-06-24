@@ -15,8 +15,9 @@
   color: #282c37;
 }
 .module-app img{
-  height: 4rem;
-  width: 4rem;
+  height: 3rem;
+  margin-left: 0.5rem;
+  width: 3rem;
   border-radius: 3px;
   display: block;
 }
