@@ -34,13 +34,8 @@ obj.pubDisconnect = async (uid) => {
 obj.pubMessage = async (message) => {
   if(message.ty === 'STU') {
     await db.UsersGeneralModel.update({uid: message.r, 'messageSettings.chat.reminder': false}, {$set: {'messageSettings.chat.reminder': true}});
-    console.log(`1:`);
-    console.log(message);
     const messageArr = await db.MessageModel.extendSTUMessages([message]);
-    console.log(messageArr);
     message = messageArr[0] || '';
-    console.log(`2:`);
-    console.log(message);
     const messageType = await db.MessageTypeModel.findOnly({_id: "STU"});
     message.c.messageType = {
       name: messageType.name,
