@@ -1,11 +1,13 @@
 +includeCSS("/publicModules/apps/apps.css")
-.module-apps.m-t-1
++listHeader("应用")
+.module-apps
   a.module-app(href="/fund")
-    img(src=`/statics/apps/fund.jpg`)
+    img(src=`/statics/apps/fund.png`)
     span 科创基金
-  a.module-app(href="/exam")
-    img(src=`/statics/apps/exam.png`)
-    span 考试系统
-  a.module-app(href="/fund")
+  if data.user
+    a.module-app(href="/exam")
+      img(src=`/statics/apps/exam.png`)
+      span 考试系统
+  a.module-app(href="/tools/index.htm" target="_blank")
     img(src=`/statics/apps/tools.png`)
     span 计算工具
