@@ -179,7 +179,6 @@ block content
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
       include ../module_digest
-
       .row
         .col-xs-12.col-md-9#wrap
           .fullwidthpanel.ThreadBox.nkcpanel
@@ -347,7 +346,7 @@ block content
                                 span(style="padding:5px")!=`${levelText}`
                           for forum, index in thread.forums
                             if index > 0
-                              span ,
+                              span ,&nbsp;
                             a(href=`/f/${forum.fid}`)=forum.displayName
                         if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
                           .abstract(style="margin-top:1rem;")
@@ -398,7 +397,7 @@ block content
                         span 来自&nbsp;
                         for forum, index in thread.forums
                           if index > 0
-                            span ,
+                            span ,&nbsp;
                           a(href=`/f/${forum.fid}`)=forum.displayName
                         .pull-right.text-right
                           if thread.firstPost.digest

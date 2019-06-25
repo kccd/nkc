@@ -36,7 +36,8 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2.hidden-sm.hidden-xs#leftDom
-        include ../publicModules/post_button
+        .hidden-xs
+          include ../publicModules/post_button
         .forum-description
           .col-xs-6
             .forum-count-number= data.forum.countThreads
@@ -73,7 +74,7 @@ block content
                 +forumPanel("细分专业", data.forum.childrenForums)
               if data.sameLevelForums && data.sameLevelForums.length > 0
                 +forumPanel("同级专业", data.sameLevelForums, true)
-        include ../publicModules/forums_nav/forums_block
+        //-include ../publicModules/forums_nav/forums_block
 
       .col-xs-12.col-md-7
         .row
@@ -113,7 +114,7 @@ block content
             .col-xs-12.col-md-12.m-t-1
               .m-b-1
                 //- 手机导航 其他文章链接
-                include ../publicModules/mobile_drawer/mobile_drawer
+                include ../publicModules/mobile_drawer/right_drawer
                 include ../publicModules/paging/forum_nav
                 -let showPagingSortButton = true;
                 -let showPagingDigestButton = true;
@@ -216,8 +217,5 @@ block content
         include ../module_scrollTo
 
 block scripts
+  +includeJS("/forum/forum.js")
   include ../publicModules/vue_user_panel/vue_user_panel_float
-  script.
-    function showSameForums() {
-      $(".sameForums").slideToggle();
-    }

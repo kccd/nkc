@@ -727,7 +727,7 @@ threadRouter
 		await db.KcbsRecordModel.insertSystemRecord('postToThread', user, ctx);
 		// await db.UsersScoreLogModel.insertLog(obj);
 
-		if(!_post.hasQuote && thread.uid !== user.uid) {
+		if(!_post.hasQuote && thread.uid !== user.uid && postType !== "comment") {
       const messageId = await db.SettingModel.operateSystemID('messages', 1);
       const message = db.MessageModel({
         _id: messageId,
@@ -753,6 +753,21 @@ threadRouter
       comment = (await db.PostModel.extendPosts([comment], {uid: data.user.uid}))[0];
       if(comment.parentPostId) {
         comment.parentPost = await db.PostModel.findOnly({pid: comment.parentPostId});
+        if(comment.parentPost.uid !== data.user.uid) {
+          const message = db.MessageModel({
+            _id: await db.SettingModel.operateSystemID("messages", 1),
+            r: comment.parentPost.uid,
+            ty: "STU",
+            ip: ctx.address,
+            port: ctx.port,
+            c: {
+              type: "comment",
+              pid: comment.pid
+            }
+          });
+          await message.save();
+          await ctx.redis.pubMessage(message);
+        }
         data.level1Comment = comment.parentPost.parentPostId === "";
         comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost]))[0];
       }
@@ -783,7 +798,7 @@ threadRouter
       subQuery._id = await db.SettingModel.operateSystemID("subscribes", 1);
       await db.SubscribeModel(subQuery).save();
     }
-    global.NKC.io.of('/thread').NKC.postToThread(data.post);
+    //-global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())

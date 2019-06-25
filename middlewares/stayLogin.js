@@ -126,5 +126,21 @@ module.exports = async (ctx, next) => {
 	data.userRoles = userRoles;
 	data.userGrade = userGrade;
   data.user = user;
+
+  // 专业树状结构，第二层以上的专业都在第二层显示
+  ctx.state.forumsTree = await db.ForumModel.getForumsTreeLevel2(
+    data.userRoles,
+    data.userGrade,
+    data.user
+  );
+  // 获取用户关注的专业
+  if(data.user) {
+    const visibleFid = await db.ForumModel.visibleFid(
+      data.userRoles,
+      data.userGrade,
+      data.user
+    );
+    ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, visibleFid);
+  }
 	await next();
 };

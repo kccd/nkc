@@ -148,6 +148,8 @@ const getDomByType = (t, app) => {
 };
 const getAppVueDom = (template) => {
   let {content, parameters} = template;
+  content = content.replace(/\n/ig, "<br>");
+  content = content.replace(/\s/ig, "&nbsp;");
   content = content.replace(/\[url=(.*?)\((.*?)\)]/ig, (v1, v2, v3) => {
     let url, name;
     if(!parameters.includes(v2)) {
@@ -175,6 +177,8 @@ const getAppVueDom = (template) => {
 };
 const getWebVueDom = (template) => {
   let {content, parameters} = template;
+  content = content.replace(/\n/ig, "<br>");
+  content = content.replace(/\s/ig, "&nbsp;");
   content = content.replace(/\[url=(.*?)\((.*?)\)]/ig, (v1, v2, v3) => {
     let url, name;
     if(!parameters.includes(v2)) {

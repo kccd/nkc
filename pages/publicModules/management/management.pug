@@ -2,12 +2,15 @@ if permissionsOr(["visitExperimentalStatus", "complaintGet", "review"])
   +includeCSS("/publicModules/management/management.css")
   +listHeader("管理")
   .module-managements
-    a.module-management(href="/e")
-      .fa.fa-cogs
-      span &nbsp;后台管理
-    a.module-management(href="/review")
-      .fa.fa-shield
-      span &nbsp;审核内容
-    a.module-management(href="/complaint")
-      .fa.fa-minus-circle
-      span &nbsp;投诉列表
+    if permission("visitExperimentalStatus")
+      a.module-management(href="/e")
+        .fa.fa-cogs
+        span &nbsp;后台管理
+    if permission("complaintGet")
+      a.module-management(href="/review")
+        .fa.fa-shield
+        span &nbsp;审核内容
+    if permission("review")
+      a.module-management(href="/complaint")
+        .fa.fa-minus-circle
+        span &nbsp;投诉列表

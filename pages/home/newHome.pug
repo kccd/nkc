@@ -5,6 +5,7 @@ block title
   +includeCSS("/home/subscription.css")
 
 block content
+  //-div(style="width: 300px;height: 300px;background-color: red;position: fixed;top: 0;left: 0;")
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
@@ -16,7 +17,7 @@ block content
         .row
           .col-xs-12.col-md-12
             .m-b-1
-              include ../publicModules/mobile_drawer/mobile_drawer
+              include ../publicModules/mobile_drawer/right_drawer
               -let showPagingSortButton = true;
               -let showHomeButton = true;
               include ../publicModules/paging/paging
@@ -73,8 +74,8 @@ block content
               -let sideThreadsHeader= "推荐文章"
               include ../publicModules/side_thread_list
           include ../publicModules/active_users
-          include ../publicModules/management/common
-        //include ../publicModules/web_info_side.pug
+          //-include ../publicModules/management/common
+        //-include ../publicModules/web_info_side.pug
         include ../module_scrollTo
 block footer
   include ../publicModules/footer/footer

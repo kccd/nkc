@@ -1821,25 +1821,30 @@ function numToFloatTwo(str) {
 
 var nkcDrawerBodyTop = 0;
 
-function openNKCDrawer() {
-  $(".nkc-drawer").addClass("active");
-  $(".nkc-drawer-body").addClass("active");
-  $(".nkc-drawer-right").addClass("active");
+function openNKCDrawer(type) {
+  $(".nkc-drawer-"+type).addClass("active");
+  $(".nkc-drawer-"+type+"-body").addClass("active");
+  $(".nkc-drawer-"+type+"-mask").addClass("active");
   stopBodyScroll(true);
+  if(type === "left") {
+    closeNKCDrawer("right");
+  } else {
+    closeNKCDrawer("left");
+  }
 }
-function closeNKCDrawer() {
-  $(".nkc-drawer").removeClass("active");
-  $(".nkc-drawer-right").removeClass("active");
-  $(".nkc-drawer-body").removeClass("active");
+function closeNKCDrawer(type) {
+  $(".nkc-drawer-"+type).removeClass("active");
+  $(".nkc-drawer-"+type+"-mask").removeClass("active");
+  $(".nkc-drawer-"+type+"-body").removeClass("active");
   stopBodyScroll(false);
 }
 
-function toggleNKCDrawer() {
-  var nkcDrawer = $(".nkc-drawer");
+function toggleNKCDrawer(type) {
+  var nkcDrawer = $(".nkc-drawer-"+type);
   if(nkcDrawer.hasClass('active')) {
-    closeNKCDrawer();
+    closeNKCDrawer(type);
   } else {
-    openNKCDrawer();
+    openNKCDrawer(type);
   }
 }
 
@@ -2035,4 +2040,19 @@ function reviewPost(pid) {
     .catch(function(data) {
       screenTopWarning(data);
     })
+}
+/*
+* 折叠首页、状态栏的专业列表
+* */
+function switchChildren(fid, e) {
+  var forumBlockChildren = $(".forum-block-children[data-fid='"+fid+"']");
+  forumBlockChildren.slideToggle();
+  var fa = $(e);
+  if(fa.hasClass("fa-angle-down")) {
+    fa.removeClass("fa-angle-down");
+    fa.addClass("fa-angle-up");
+  } else {
+    fa.removeClass("fa-angle-up");
+    fa.addClass("fa-angle-down");
+  }
 }

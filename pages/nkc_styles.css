@@ -87,7 +87,7 @@ h1, h2, h3, h4, h5, p{
   font-size: 9pt;
 }
 body {
-  padding-top: 65px;
+  padding-top: 60px;
   /*padding-top: 52px;*/
   width: 100%;
 }
@@ -1556,11 +1556,21 @@ margin-left: 5px;
 }
 .nkcshade .navbar-brand{
   font-size: 1.4em;
+  height: 45px;
+  line-height: 45px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 10px;
+  margin: 0;
 }
 .nkcshade a.navbar-brand{
   font-size: 1.6em;
+
 }
 
+.collapse.navbar-collapse ul.nav.navbar-nav>li>a{
+  /*padding-top: 12px;*/
+}
 .nkcshade a.navbar-brand:link, .nkcshade a.navbar-brand:hover, .nkcshade a.navbar-brand:active, .nkcshade a.navbar-brand:visited{
   color: #2b90d9;
   text-decoration: none;
@@ -1977,6 +1987,7 @@ img.emoji {
 
 .navbar-default {
   border-color: transparent;
+  height: 45px;
 }
 .redPoint{
   background-color: red;
@@ -2514,6 +2525,7 @@ img.emoji {
 }
 
 .userInfo img{
+  margin-top: -2px;
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 50%;
@@ -2525,11 +2537,14 @@ img.emoji {
   padding-left: 0.5rem;
 }
 .userInfo-m{
+
+}
+.userInfo-m{
   display: none;
   float: right;
   min-width: 4em;
   position: relative;
-  padding-top: 8px;
+  padding-top: 7px!important;
   padding-bottom: 8px;
 }
 .userInfo-m-point{
@@ -2547,8 +2562,8 @@ img.emoji {
 }
 .userInfo-m img{
   float: right;
-  width: 2.8rem;
-  height: 2.8rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
   display:inline-block;
   margin-left: 0.5rem;
@@ -3509,6 +3524,28 @@ img.emoji {
 }
 .navbar button.navbar-toggle{
   border: none;
+  padding-left: 0;
+  padding-top: 3px;
+  /*margin-right: 0;*/
+  margin-top: 5px;
+  margin-bottom: 0;
+  padding-right: 0;
+}
+ul.nav.navbar-nav.navbar-md>li>a{
+  height: 45px;
+  padding-top: 13px;
+}
+.navbar-md.navbar-search{
+  padding-top: 6px!important;
+}
+.navbar button.navbar-toggle .icon-bar{
+  margin-top: 6px;
+}
+.navbar-md .userInfo{
+  height: 45px;
+}
+.navbar button.navbar-toggle:hover{
+  background-color: rgba(0, 0, 0, 0);
 }
 .play-btn{
   display: inline-block;
