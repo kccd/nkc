@@ -143,6 +143,9 @@ router
             if(r.highlight.pid) {
               highlightObj[r.pid + "_pid"] = "文号：" + r.highlight.pid;
             }
+            if(r.highlight.authors) {
+              highlightObj[r.pid + "_authors"] = "作者：" + r.highlight.authors;
+            }
           } else if(r.docType === "user") {
             highlightObj[r.uid + "_username"] = r.highlight.username;
             highlightObj[r.uid + "_description"] = r.highlight.description;
@@ -223,6 +226,7 @@ router
             title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
             abstract:
               highlightObj[`${pid}_pid`] ||
+              highlightObj[`${pid}_authors`] ||
               highlightObj[`${pid}_keywordsEN`] ||
               highlightObj[`${pid}_keywordsCN`] ||
               highlightObj[`${pid}_abstractEN`] ||

@@ -1575,7 +1575,9 @@ margin-left: 5px;
   color: #2b90d9;
   text-decoration: none;
 }
-
+.nkcshade .website-logo{
+  line-height: 47px;
+}
 /* Lets add an arrow after each link  */
 
 .notusing .ThreadPostBody a[href]:after {
@@ -2544,7 +2546,7 @@ img.emoji {
   float: right;
   min-width: 4em;
   position: relative;
-  padding-top: 7px!important;
+  /*padding-top: 7px!important;*/
   padding-bottom: 8px;
 }
 .userInfo-m-point{
@@ -2563,14 +2565,17 @@ img.emoji {
 .userInfo-m img{
   float: right;
   width: 2.5rem;
+  margin-top: 7px;
   height: 2.5rem;
   border-radius: 50%;
   display:inline-block;
   margin-left: 0.5rem;
 }
 .userInfo-m a{
-  font-size: 1.2rem;
-  line-height: 3rem;
+  font-size: 1rem;
+  line-height: 45px;
+  font-weight:  700;
+  color: #6c6c6c!important;
 }
 .userInfo-m a:hover, .userInfo-m a:active, .userInfo-m a:link, .userInfo-m a:visited{
   color: #282c37;
@@ -3536,6 +3541,8 @@ ul.nav.navbar-nav.navbar-md>li>a{
   padding-top: 13px;
 }
 .navbar-md.navbar-search{
+  width: 20rem;
+  margin-left: 3rem;
   padding-top: 6px!important;
 }
 .navbar button.navbar-toggle .icon-bar{

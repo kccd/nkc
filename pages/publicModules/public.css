@@ -1660,12 +1660,13 @@ span.thread-title-page{
   border-right: none;
 }
 .navbar-search{
-  width: 13rem;
+  width: 12.3rem;
   position: relative;
   padding-top: 6px;
 }
 .navbar-search input{
   width: 100%!important;
+  font-size: 13px;
   border: 1px solid #eee;
   box-shadow: none;
 }
@@ -1680,8 +1681,8 @@ span.thread-title-page{
 }
 @media (max-width: 346px) {
   .navbar-search{
-    width: 10rem;
-    padding-top:8px;
+    width: 9rem;
+    /*padding-top:8px;*/
   }
   .navbar-search input{
     width: 5rem;
@@ -1689,8 +1690,8 @@ span.thread-title-page{
 }
 @media (min-width: 420px) {
   .navbar-search{
-    width: 19rem;
-    padding-top:8px;
+    width: 17rem;
+    /*padding-top:8px;*/
   }
   .navbar-search input{
     width: 14rem;
