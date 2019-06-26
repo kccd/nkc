@@ -1825,12 +1825,12 @@ function openNKCDrawer(type) {
   $(".nkc-drawer-"+type).addClass("active");
   $(".nkc-drawer-"+type+"-body").addClass("active");
   $(".nkc-drawer-"+type+"-mask").addClass("active");
-  stopBodyScroll(true);
   if(type === "left") {
     closeNKCDrawer("right");
   } else {
     closeNKCDrawer("left");
   }
+  stopBodyScroll(true);
 }
 function closeNKCDrawer(type) {
   $(".nkc-drawer-"+type).removeClass("active");
@@ -1857,7 +1857,8 @@ function stopBodyScroll (isFixed) {
   if (isFixed) {
     nkcDrawerBodyTop = window.scrollY;
     bodyEl.style.position = 'fixed';
-    bodyEl.style.top = -nkcDrawerBodyTop + 'px'
+    bodyEl.style.top = -nkcDrawerBodyTop + 'px';
+    console.log(bodyEl.style.position)
   } else {
     bodyEl.style.position = '';
     bodyEl.style.top = '';
