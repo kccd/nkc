@@ -47,6 +47,15 @@ voteRouter
 				}];
 			}
 			await applicationForm.update(obj);
+
+			// 如果是自动审核，当通过网友支持后无需管理员处理，只需要通知用户即可
+			if(fund.auditType === 'system') {
+			  await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
+      } else {
+        // 若是人工审核，通过网友支持后则需要相应专家人员处理
+        await db.MessageModel.sendFundMessage(applicationForm._id, "expert");
+      }
+
 		}
 		await next();
 	});

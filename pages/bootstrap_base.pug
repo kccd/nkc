@@ -6,6 +6,8 @@ block head
   meta(name="viewport" content="width=device-width, initial-scale=1")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   link(rel='shortcut icon' href='/favicon.ico')
+  if state.apptype
+    +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
   +includeCSS('/Draft.css')
   +includeCSS('/katex.min.css')
@@ -36,6 +38,9 @@ block body
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   +includeJS('/jquery/jquery-1.11.1.js')
   +includeJS('/jquery-ui-1.10.4.custom.js')
+  //-app使用的js
+  if state.apptype
+    +includeJS("/appAPi/app.js")
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/twemoji/2/twemoji.min.js')
   +includeJS('/Promise/promise.min.js')
@@ -53,11 +58,6 @@ block body
   +includeJS('/moment/locale/zh-cn.js')
   //- 新版common.js
   +includeJS('/publicModules/common.js')
-  
-  //-app使用的js
-  if state.apptype
-    +includeJS("/appAPi/api.js")
-    +includeJS("/appAPi/app.js")
 
   if data.user
     script!=`NKC.config.hasLogged = true;`

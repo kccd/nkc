@@ -11,7 +11,111 @@ threadRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query} = ctx;
 		const {user} = data;
-		const {from, keywords, applicationFormId, self} = query;
+		const {from, keywords, self, type, title, pid, applicationFormId} = query;
+    if(type === "applicationFormSearch") {
+      const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId});
+      const users = await applicationForm.extendMembers();
+      const usersId = users.map(u => u.uid);
+      usersId.push(user.uid);
+
+      let posts = [];
+      if(pid) {
+        const post = await db.PostModel.findOne({pid, uid: {$in: usersId}, disabled: false, recycleMark: false, reviewed: true});
+        if(post) posts.push(post);
+      }
+      if(title) {
+        const q = {
+          t: new RegExp(`${title}`, "gi"),
+          uid: {$in: usersId},
+          disabled: false, reviewed: true
+        };
+        if(pid) {
+          q.pid = {$ne: pid};
+        }
+        const ps = await db.PostModel.find(q).sort({toc: -1});
+        posts = posts.concat(ps);
+      }
+
+      data.posts = [];
+      for(const post of posts) {
+        const thread = await db.ThreadModel.findOne({oc: post.pid});
+        if(thread) {
+          thread.firstPost = post;
+          data.posts.push(thread.toObject());
+        }
+      }
+    } else if(type === "myPosts") {
+      const threads = await db.ThreadModel.find({
+        uid: user.uid, disabled: false, recycleMark: false, reviewed: true
+      }).sort({toc: -1}).limit(20);
+      data.posts = [];
+      for(const thread of threads) {
+        const post = await db.PostModel.findOne({pid: thread.oc});
+        if(post) {
+          thread.firstPost = post;
+          data.posts.push(thread.toObject());
+        }
+      }
+    } else if(from === "applicationForm") {
+      const outPostObj = (post) => {
+        return {
+          toc: post.toc.toLocaleString(),
+          tid: post.tid,
+          username: post.user.username,
+          uid: post.uid,
+          t: post.t,
+          pid: post.pid
+        }
+      };
+      const perpage = (page, length) => {
+        const perpage = 20;
+        const start = perpage*page;
+        return {
+          page,
+          start,
+          perpage,
+          pageCount: Math.ceil(length/perpage)
+        }
+      };
+      const page = query.page? parseInt(query.page): 0;
+      data.paging = {page: 0, pageCount: 1, perpage: 8};
+      const threads = [];
+      let targetThreads = [];
+      if(self === 'true') {
+        const length = await db.ThreadModel.count({uid: user.uid, disabled: false});
+        const paging= perpage(page, length);
+        targetThreads = await db.ThreadModel.find({uid: user.uid, disabled: false}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+        data.paging = paging;
+      } else {
+        const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId});
+        const users = await applicationForm.extendMembers();
+        const usersId = users.map(u => u.uid);
+        usersId.push(user.uid);
+        const post = await db.PostModel.findOne({pid: keywords, uid: {$in: usersId}, disabled: false});
+        if(post !== null) {
+          await post.extendThread();
+          if(post.pid === post.thread.oc) {
+            await post.extendUser();
+            threads.push(outPostObj(post));
+          }
+        }
+        const targetUser = await db.UserModel.findOne({usernameLowerCase: keywords.toLowerCase()});
+        if(targetUser !== null && usersId.includes(targetUser.uid)) {
+          const length = await db.ThreadModel.count({uid: targetUser.uid, disabled: false});
+          const paging = perpage(page, length);
+          targetThreads = await db.ThreadModel.find({uid: targetUser.uid, disabled: false}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+          data.paging = paging;
+        }
+      }
+      for(let t of targetThreads) {
+        const post = await t.extendFirstPost();
+        await post.extendUser();
+        threads.push(outPostObj(post))
+      }
+      data.threads = threads;
+    }
+    await next();
+    /*const {from, keywords, applicationFormId, self} = query;
 		if(from === 'applicationForm') {
 			const outPostObj = (post) => {
 				return {
@@ -70,7 +174,7 @@ threadRouter
 			}
 			data.threads = threads;
 		}
-		await next();
+		await next();*/
 	})
 	.get('/:tid', async (ctx, next) => {
 		const {data, params, db, query, nkcModules, body} = ctx;
@@ -347,6 +451,102 @@ threadRouter
 			}
 		}
 		data.userAddress = userAddress;
+
+		// 基金文章
+		if(thread.type === "fund") {
+		  const user = data.user;
+      let applicationForm = await db.FundApplicationFormModel.findOne({tid: thread.tid});
+      if(!applicationForm) {
+        applicationForm = await db.FundApplicationFormModel.findOne({_id: _id});
+        if(!applicationForm) ctx.throw(400, '未找到指定申请表。');
+      }
+      await applicationForm.extendFund();
+      const {fund, budgetMoney} = applicationForm;
+      if(fund.history && ctx.method !== 'GET') {
+        ctx.throw(400, '申请表所在基金已被设置为历史基金，申请表只供浏览。');
+      }
+      await applicationForm.extendMembers();
+      await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
+      applicationForm.project = thread.firstPost;
+      /*await applicationForm.extendProject();
+      if(applicationForm.project) {
+        await applicationForm.project.extendResources();
+      }*/
+      await applicationForm.extendThreads();
+      await applicationForm.extendForum();
+      if(fund.money.fixed) {
+        applicationForm.money = fund.money.fixed;
+        applicationForm.factMoney = fund.money.fixed;
+      } else {
+        let money = 0;
+        let factMoney = 0;
+        if(budgetMoney !== null && budgetMoney.length !== 0 && typeof budgetMoney !== 'string'){
+          for (let b of applicationForm.budgetMoney) {
+            money += (b.count*b.money);
+            factMoney += b.fact;
+          }
+        }
+        applicationForm.money = money;
+        applicationForm.factMoney = factMoney;
+      }
+      data.applicationForm = applicationForm;
+      data.fund = applicationForm.fund;
+
+      if(applicationForm.disabled && !applicationForm.fund.ensureOperatorPermission('admin', user)) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
+      const {applicant, members} = applicationForm;
+      const membersId = members.map(m => m.uid);
+      // 未提交时仅自己和全部组员可见
+      if(!applicationForm.fund.ensureOperatorPermission('admin', user) && applicationForm.status.submitted !== true && user.uid !== applicant.uid && !membersId.includes(user.uid)) ctx.throw(403,'权限不足');
+      await applicationForm.extendSupporters();
+      await applicationForm.extendObjectors();
+      await applicationForm.extendReportThreads();
+      const auditComments = {};
+      if(!applicationForm.status.projectPassed) {
+        auditComments.userInfoAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'userInfoAudit', disabled: false}).sort({toc: -1});
+        auditComments.projectAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'projectAudit', disabled: false}).sort({toc: -1});
+        auditComments.moneyAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'moneyAudit', disabled: false}).sort({toc: -1});
+      }
+      if(!applicationForm.status.adminSupport) {
+        auditComments.adminAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'adminAudit', disabled: false}).sort({toc: -1});
+      }
+      if(applicationForm.status.completed === false) {
+        auditComments.completedAudit = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'completedAudit', disabled: false}).sort({toc: -1});
+      }
+      if(applicationForm.useless === 'giveUp') {
+        data.report = await db.FundDocumentModel.findOne({applicationFormId: applicationForm._id, type: 'report', disabled: false}).sort({toc: -1});
+      }
+      const q_ = {
+        type: {$in: ['report', 'completedReport', 'system', 'completedAudit', 'adminAudit', 'userInfoAudit', 'projectAudit', 'moneyAudit', 'remittance']},
+        applicationFormId: applicationForm._id
+      };
+      if(!applicationForm.fund.ensureOperatorPermission('admin', user)) {
+        q_.disabled = false;
+      }
+      data.reports = await db.FundDocumentModel.find(q_).sort({toc: 1});
+      await Promise.all(data.reports.map(async r => {
+        await r.extendUser();
+        await r.extendResources();
+      }));
+      data.auditComments = auditComments;
+      let hasPermission = false;
+      if(user) {
+        hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('expert', user) || fund.ensureOperatorPermission('censor', user);
+      }
+      //拦截申请表敏感信息
+      if(!user || (applicationForm && !data.userOperationsId.includes('displayFundApplicationFormSecretInfo') && applicationForm.uid !== user.uid && !hasPermission)) {
+        const {applicant, members} = applicationForm;
+        applicant.mobile = null;
+        applicant.idCardNumber = null;
+        applicationForm.account.paymentType = null;
+        applicationForm.account.number = null;
+        for(let m of members) {
+          m.mobile = null;
+          m.idCardNumber = null;
+        }
+      }
+    }
+
+
     await db.UserModel.extendUsersInfo([data.thread.firstPost.user]);
 		await thread.extendLastPost();
 		if(data.user) {

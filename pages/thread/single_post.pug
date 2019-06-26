@@ -77,26 +77,27 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                     .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
                     p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;")= post.pid
                     .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
-                  div.changeDisNone.text-center(style='width: 100%;')
-                    .col-xs-12.col-md-12
-                      .col-xs-3.col-md-3(style="padding:0px")
-                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                          img(src="/default/QQ.png" style="")
-                      .col-xs-3.col-md-3(style="padding:0px")
-                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                          img(src="/default/qzone.png" style="")
-                      .col-xs-3.col-md-3(style="padding:0px")
-                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                          img(src="/default/weibo.png" style="")
-                      .col-xs-3.col-md-3(style="padding:0px")
-                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                          img(src="/default/weChat.png" style="")
-                    .col-xs-12.col-md-12
-                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`) 获取分享链接
-                    .col-xs-12.col-md-12(id=`copyArea${post.pid}` style="display:none")
-                      input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
-                      button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
-                    canvas.qrcode(id=post.pid + "Qrcode",data-pid=post.pid,style="display:none").inline-block
+                  if !state.apptype
+                    div.changeDisNone.text-center(style='width: 100%;')
+                      .col-xs-12.col-md-12
+                        .col-xs-3.col-md-3(style="padding:0px")
+                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+                            img(src="/default/QQ.png" style="")
+                        .col-xs-3.col-md-3(style="padding:0px")
+                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+                            img(src="/default/qzone.png" style="")
+                        .col-xs-3.col-md-3(style="padding:0px")
+                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+                            img(src="/default/weibo.png" style="")
+                        .col-xs-3.col-md-3(style="padding:0px")
+                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+                            img(src="/default/weChat.png" style="")
+                      .col-xs-12.col-md-12
+                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`) 获取分享链接
+                      .col-xs-12.col-md-12(id=`copyArea${post.pid}` style="display:none")
+                        input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
+                        button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
+                      canvas.qrcode(id=post.pid + "Qrcode",data-pid=post.pid,style="display:none").inline-block
             if data.user
               -let dropType = "dropup";
               +postOptions(post, '',index, dropType)

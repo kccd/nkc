@@ -498,10 +498,21 @@ function nkc_render(options){
       }
     }
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');
+    // 如果是外站图片，在渲染时需要将图片替换成本站默认图
+    var imgsArray = html.match(/\<img.*?\>/igm);
+    if(imgsArray) {
+      for(var im = 0;im < imgsArray.length; im++) {
+        if(/http/igm.test(imgsArray[im])) {
+          if(!/kechuang/igm.test(imgsArray[im])) {
+            var newStr = '<img src="/default/picdefault.png" />';
+            html = html.replace(imgsArray[im], newStr)
+          }
+        }
+      }
+    }
     html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\/\>/img,'<img src="/r/$1" />');
     // 如果是默认图片则跳过
-    html = html.replace(/\<img.*?src="\/default\/picdefault.png".+?\>/img, '');
-    // 如果是表情也跳过
+    // html = html.replace(/\<img.*?src="\/default\/picdefault.png".+?\>/img, '');
     html = html.replace(/\<img src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     html = html.replace(/\<img class=".*?" src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     return html
@@ -526,6 +537,7 @@ function nkc_render(options){
     switch (lang) {
       case 'html':
       renderedHTML = pwbb_experimental(post,true) //straight thru html
+
       break;
 
       case 'pwbb':

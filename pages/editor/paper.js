@@ -8,6 +8,7 @@ var paperProto = {
     enableAuthorInfos: true, // 是否启用作者信息
     enableOriginState: true, // 是否启用原创声明
 
+    abstractHeader: "文章摘要(选填)",
     abstractCn: "", // 默认中文摘要
     abstractEn: "", // 默认英文摘要
     keyWordsCn: [], // 默认中文关键词
@@ -45,6 +46,7 @@ var paperProto = {
   // 初始化摘要
   initAbstract: function() {
     if(paperProto.config.enableAbstract) {
+      $("#abstract .edit-header").text(paperProto.config.abstractHeader);
       var abstractDom = paperProto.get("abstract");
       if(abstractDom) {
         abstractDom.style.display = "";

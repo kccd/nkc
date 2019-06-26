@@ -1,0 +1,8 @@
+{
+  "userInfoAudit": "用户信息审核",
+  "projectAudit": "项目信息审核",
+  "moneyAudit": "资金预算审核",
+  "adminAudit": "管理员复核",
+  "completedAudit": "结题报告审核",
+  "remittance": "拨款"
+}

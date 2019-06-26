@@ -166,6 +166,11 @@ router
       q.parentPostId = pid;
       const count = await db.PostModel.count(q);
       const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
+      if(paging.page >= paging.pageCount) {
+        if(paging.pageCount > 0) paging.page = paging.pageCount - 1;
+        else paging.page = 0;
+        paging.start = paging.page * paging.perpage
+      }
       let parentPosts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
       const pids = new Set();
       parentPosts.map(p => {
@@ -284,6 +289,9 @@ router
     	if(targetPost.disabled && !targetPost.toDraft) {
     		ctx.throw(403, '回复已被屏蔽，暂不能修改');
 	    }
+    }
+    if(targetThread.oc === pid && targetThread.type === "fund") {
+      ctx.throw(403, "无法编辑科创基金类文章");
     }
     if(targetThread.oc === pid && !t) ctx.throw(400, '标题不能为空!');
     const targetUser = await targetPost.extendUser();

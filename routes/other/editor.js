@@ -94,6 +94,7 @@ editorRouter
       }
       return await next();
     } else if(type === 'application') {
+      ctx.throw(403, "编辑器暂不支持编辑科创基金的内容");
       ctx.template = 'interface_editor_test.pug';
     	const applicationForm = await db.FundApplicationFormModel.findOnly({_id: id});
     	if(cat === 'p') {

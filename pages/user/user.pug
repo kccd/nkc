@@ -1,5 +1,6 @@
 extends ../bootstrap_base
 block title
+  meta(name='description' content=`${data.targetUser.description}` || '暂无名片介绍')
   title=`${data.targetUser.username || data.targetUser.uid} - ${data.serverSettings.websiteName}`
   +includeCSS("/user/user.css")
 block content

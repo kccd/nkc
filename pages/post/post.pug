@@ -124,18 +124,19 @@ block content
         .nkcpanel.post-share.fullwidthpanel
           .pid=`文号 / ${post.pid}`
           hr
-          .share 分享到：
-            img(src='/default/QQ.png' onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${data.thread.firstPost.t}', '${post.pid}')`)
-            img(src='/default/qzone.png' onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-            img(src='/default/weibo.png' onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-            img(src='/default/weChat.png' onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-          .share.text-center.m-t-1
-            a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${post.pid}")`) 获取分享链接
-          .share(id=`copyArea${post.pid}` style="display:none")
-            input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
-            button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
-          div(style='width: 100%; text-align: center; padding-top: 0.5rem;')
-            canvas(id=`${post.pid}Qrcode` style='width: 0px; height: 0px; margin: auto;')
+          if !state.apptype
+            .share 分享到：
+              img(src='/default/QQ.png' onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${data.thread.firstPost.t}', '${post.pid}')`)
+              img(src='/default/qzone.png' onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+              img(src='/default/weibo.png' onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+              img(src='/default/weChat.png' onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+            .share.text-center.m-t-1
+              a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${post.pid}")`) 获取分享链接
+            .share(id=`copyArea${post.pid}` style="display:none")
+              input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
+              button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
+            div(style='width: 100%; text-align: center; padding-top: 0.5rem;')
+              canvas(id=`${post.pid}Qrcode` style='width: 0px; height: 0px; margin: auto;')
         -var user = post.user
         include ../interface_thread_userpatch.pug
         if data.voteUpUsers.length !== 0

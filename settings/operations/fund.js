@@ -89,12 +89,12 @@ module.exports = {
 			settings: {
 				GET: 'visitFundApplicationFormSettings'
 			},
-			comment: {
+			/*comment: {
 				POST: 'addFundApplicationComment',
 				PARAMETER: {
 					DELETE: 'deleteFundApplicationComment'
 				}
-			},
+			},*/
 			member: {
 				PATCH: 'modifyFundApplicationMember'
 			},

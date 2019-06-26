@@ -1,0 +1,77 @@
+-const applicationForm = data.applicationForm;
+-const comments = applicationForm.comments;
+-const {useless, fund, status, disabled, lock, completedAudit, submittedReport} = applicationForm;
+-const {submitted, usersSupport, projectPassed, adminSupport, remittance, completed, successful, excellent} = status;
+-let isExpert = false, isAdmin = false, isCensor = false, isFinancialStaff = false, isCommentator = false, isVoter = false;
+-let displayReport = false, displayApplyRemittance = false;
+-let displayModify = false, displayGiveUp = false, displayComplete = false;
+-let displayExpertAudit = false, displayAdminAudit = false, displayRemittance = false, displayReportAudit = false;
+-let displayCompleteAudit = false, displayExcellent = false, displayDisabled = false, displayVote = false, displayCommentInput = false;
+-let needRemittance = false, needReportAudit = false, needCompletedAudit = false;
+-let useful = (useless === null && disabled === false), modifyAccount = false;
+-let remittanceError, displayRestore;
+
+if useful && status.adminSupport && status.completed !== true
+  -for(let i = 0; i < applicationForm.remittance.length; i++)
+    -const r = applicationForm.remittance[i];
+    if r.status !== true
+      -needRemittance = true;
+    if r.status === false
+      -modifyAccount = true;
+      -remittanceError = {subCode: r.subCode, description: r.description};
+    else if r.status === null && !completedAudit
+    if data.user && data.user.uid === applicationForm.uid && lock.submitted
+      -displayApplyRemittance = true;
+
+//通过了管理员复核 显示项目报告按钮
+if status.adminSupport && data.user && data.user.uid === applicationForm.uid
+  -displayReport = true;
+if data.user
+  if ensureFundOperatorPermission('expert', data.user, fund)
+    -isExpert = true;
+  if ensureFundOperatorPermission('admin', data.user, fund)
+    -isAdmin = true;
+  if ensureFundOperatorPermission('censor', data.user, fund)
+    -isCensor = true;
+  if ensureFundOperatorPermission('financialStaff', data.user, fund)
+    -isFinancialStaff = true;
+  if ensureFundOperatorPermission('commentator', data.user, fund)
+    -isCommentator = true;
+  if ensureFundOperatorPermission('voter', data.user, fund)
+    -isVoter = true;
+  //自己的申请表
+  if data.user.uid === applicationForm.uid && useful
+    // 未提交，审核未通过 显示修改按钮
+    if !lock.submitted && (!adminSupport || modifyAccount)
+      -displayModify = true;
+    //未结题，通过了所有审核 显示结题按钮
+    if !status.completed && status.adminSupport && lock.submitted
+      -displayComplete = true;
+    if !status.adminSupport
+      -displayGiveUp = true;
+if isExpert && useful
+  if usersSupport && projectPassed === null
+    -displayExpertAudit = true;
+  -let applyRemittance = false;
+  -for(let r of applicationForm.remittance)
+    if r.apply && r.passed === null
+      -applyRemittance = true;
+  if submittedReport && applyRemittance
+    -needReportAudit = true;
+  if completedAudit
+    -needCompletedAudit = true;
+if isAdmin && useful && projectPassed && adminSupport === null
+  -displayAdminAudit = true;
+if isAdmin && applicationForm.useless === 'giveUp'
+  -displayRestore = true;
+if isFinancialStaff && useful && needRemittance
+  -displayRemittance = true;
+if isAdmin && useful
+  if completed
+    -displayExcellent = true;
+
+if useful && submitted
+  -displayVote = true;
+
++includeCSS("/fund.css")
++includeJS("/interface_fund_applicationForm.js")

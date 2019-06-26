@@ -6912,7 +6912,6 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     getStyleValue("padding-top")- getStyleValue("padding-bottom") +'px';
 
                 container.style.zIndex = options.zIndex;
-
                 var html = ( ie && browser.version < 9  ? '' : '<!DOCTYPE html>') +
                     '<html xmlns=\'http://www.w3.org/1999/xhtml\' class=\'view\' ><head>' +
                     '<style type=\'text/css\'>' +
@@ -6925,7 +6924,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     'p{margin:5px 0;}</style>' +
                     ( options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
-                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\'], [\'\\(\',\'\\)\']],displayMath: [[\'$$\',\'$$\'], [\'\\[\',\'\\]\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
+                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\']],displayMath: [[\'$$\',\'$$\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
                     '<script async=\'async\' src=\'/ueditor/MathJax-2.6-latest/MathJax.js\'></script>' +
                     '</head><body class=\'view\' id=\'view\'></body>' +
                     '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +
@@ -23437,23 +23436,19 @@ UE.plugins['customstyle'] = function() {
 UE.plugins['catchremoteimage'] = function () {
     var me = this,
         ajax = UE.ajax;
-
-    /* 设置默认值 */
-    me.setOpt({
-        imgCount: 0,
-        imgTotal: 0
-    })
     if (me.options.catchRemoteImageEnable === false) return;
     me.setOpt({
         catchRemoteImageEnable: false
     });
 
     me.addListener("afterpaste", function () {
+        // 当前上传图片数量可以重新计数
+        // 已上传的图片为本站图片，本站图片不予以上传至服务器
+        me.options.imgCount = 0;
         me.fireEvent("catchRemoteImage");
     });
 
     me.addListener("catchRemoteImage", function () {
-
         var catcherLocalDomain = me.getOpt('catcherLocalDomain'),
             catcherActionUrl = me.getActionUrl(me.getOpt('catcherActionName')),
             catcherUrlPrefix = me.getOpt('catcherUrlPrefix'),
@@ -23494,6 +23489,7 @@ UE.plugins['catchremoteimage'] = function () {
             if (/^(https?|ftp):/i.test(src) && !test(src, catcherLocalDomain)) {
                 remoteImages.push(src);
             }else{
+                me.options.imgCount++;
                 // 如果是本站图片则去掉域名
                 domUtils.setAttributes(ci, {
                     "src": GetUrlRelativePath(src),
@@ -29909,12 +29905,16 @@ UE.registerUI('autosave', function(editor) {
 function GetUrlRelativePath(url){
     // var url = document.location.toString();
     var arrUrl = url.split("//");
-    var start = arrUrl[1].indexOf("/");
-    var relUrl = arrUrl[1].substring(start);//stop省略，截取从start开始到结尾的所有字符
-    if(relUrl.indexOf("?") != -1){
-        relUrl = relUrl.split("?")[0];
+    if(arrUrl.length > 1) {
+        var start = arrUrl[1].indexOf("/");
+        var relUrl = arrUrl[1].substring(start);//stop省略，截取从start开始到结尾的所有字符
+        if(relUrl.indexOf("?") != -1){
+            relUrl = relUrl.split("?")[0];
+        }
+        return relUrl;
+    }else{
+        return url;
     }
-    return relUrl;
 }
 
 

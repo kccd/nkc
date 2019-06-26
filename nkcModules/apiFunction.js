@@ -10,10 +10,10 @@ fn.paging = (page = 0, count, perpage) => {
   if(!perpage) perpage = defaultPerpage;
   page = parseInt(page);
   const pageCount = Math.ceil(count/perpage);
-  if(page >= pageCount) {
+  /*if(page >= pageCount) {
     if(pageCount > 0) page = pageCount - 1;
     else page = 0;
-  }
+  }*/
   const buttonValue = fn.getPagingButton({page, pageCount});
 
   return {

@@ -1,33 +1,31 @@
 extends ../bootstrap_base
 block title
+  meta(name='description' content=`${data.forum.description}` || '暂无专业介绍')
   title=`${data.forum.displayName} - ${data.serverSettings.websiteName}`
   +includeCSS("/forum/forum.css")
 block content
-  mixin forumPanel(header, forums)
+  mixin forumPanel(header, forums, hidden)
     .forum-panel
       .forums-nav-header
-        h5= header
-      .home-topic-item-div.text-left
+        h5(class=hidden?"pointer":"" onclick=hidden?"showSameForums()":"")
+          if hidden
+            .fa.fa-angle-down(style="color:rgba(0,0,0,0)") &nbsp;
+          span=header
+          if hidden
+            .fa.fa-angle-down
+      .home-topic-item-div.text-left(class=hidden?"sameForums":"" style=hidden?"display:none":"")
         -const length = forums.length;
-        for f, index in forums
+        for forumData, index in forums
           if index < 20
-            a(
-              href=`/f/${f.fid}`
-              style=`background-color: ${f.color};`
-              title=f.description
-            ).topic-item
-              if f.iconFileName
-                img(
-                  src=`/forum_avatar/${f.fid}`
-                )
-              span=f.displayName
+            include ../publicModules/forums_nav/forum_block
         if length >= 20
-          a(
-            href=`/f`
-            style=`background-color: #9be1e8;`
-            title='查看更多'
-          ).topic-item
-            span 查看更多
+          .text-center
+            a(
+              href=`/f`
+              style=`color: #aaa`
+              title='查看更多'
+            )
+              span 查看更多
   mixin moderator(users)
     .forum-user-panel
       .forums-user-header
@@ -72,11 +70,11 @@ block content
             .row
               if data.forum.parentForums && data.forum.parentForums.length > 0
                 +forumPanel("上级专业", data.forum.parentForums)
-              if data.sameLevelForums && data.sameLevelForums.length > 0
-                +forumPanel("同级专业", data.sameLevelForums)
               if data.forum.childrenForums && data.forum.childrenForums.length > 0
                 +forumPanel("细分专业", data.forum.childrenForums)
-        include ../publicModules/forums_nav/forums_nav
+              if data.sameLevelForums && data.sameLevelForums.length > 0
+                +forumPanel("同级专业", data.sameLevelForums, true)
+        include ../publicModules/forums_nav/forums_block
 
       .col-xs-12.col-md-7
         .row
@@ -220,5 +218,7 @@ block content
 
 block scripts
   include ../publicModules/vue_user_panel/vue_user_panel_float
-
-
+  script.
+    function showSameForums() {
+      $(".sameForums").slideToggle();
+    }

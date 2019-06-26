@@ -80,6 +80,7 @@ operationRouter
 		if(tid === undefined) ctx.throw(400, '参数不正确');
 		// 根据tid添加退回标记
 		let thread = await db.ThreadModel.findOne({tid});
+    if(thread.type === "fund") ctx.throw(403, "科创基金类文章无法退修");
     let isModerator = ctx.permission('superModerator');
     if(!isModerator) {
       const forums = await thread.extendForums(['mainForums']);
@@ -252,19 +253,23 @@ operationRouter
 				const delLog = new db.DelPostLogModel(para);
 				await delLog.save();
 			}
-      const mId = await db.SettingModel.operateSystemID('messages', 1);
-      const message = db.MessageModel({
-        _id: mId,
-        ty: 'STU',
-        r: targetThread.uid,
-        c: {
-          type: 'bannedThread',
-          tid: targetThread.tid,
-          rea: para?para.reason:''
-        }
-      });
-      await message.save();
-      await ctx.redis.pubMessage(message);
+      if(para && para.noticeType) {
+        const mId = await db.SettingModel.operateSystemID('messages', 1);
+        const message = db.MessageModel({
+          _id: mId,
+          ty: 'STU',
+          r: targetThread.uid,
+          c: {
+            type: 'bannedThread',
+            tid: targetThread.tid,
+            rea: para?para.reason:''
+          }
+        });
+        await message.save();
+        await ctx.redis.pubMessage(message);
+      }
+
+
       if(!targetThread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, para.reason);
     }
 		if(para && para.noticeType === true){

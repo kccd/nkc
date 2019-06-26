@@ -102,7 +102,7 @@ reportRouter
 				r.passed = support;
 				let str = `第 ${i+1} 期拨款申请通过审核`;
 				if(!support) {
-					str = `第 ${i+1} 期拨款申请未通过审核。原因：${c}`;
+					str = `第 ${i+1} 期拨款申请未通过审核\n${c}`;
 				}
 				await applicationForm.update({remittance, submittedReport: false});
 				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
