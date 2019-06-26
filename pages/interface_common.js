@@ -1858,7 +1858,6 @@ function stopBodyScroll (isFixed) {
     nkcDrawerBodyTop = window.scrollY;
     bodyEl.style.position = 'fixed';
     bodyEl.style.top = -nkcDrawerBodyTop + 'px';
-    console.log(bodyEl.style.position)
   } else {
     bodyEl.style.position = '';
     bodyEl.style.top = '';
