@@ -447,7 +447,7 @@ applicationRouter
 		const {applicationForm, fund} = data;
 		let hasPermission = false;
 		if(user) {
-			hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('expert', user) || fund.ensureOperatorPermission('censor', user);
+			hasPermission = fund.ensureOperatorPermission('admin', user) || fund.ensureOperatorPermission('censor', user);
 		}
 		//拦截申请表敏感信息
 		if(!user || (applicationForm && !data.userOperationsId.includes('displayFundApplicationFormSecretInfo') && applicationForm.uid !== user.uid && !hasPermission)) {
