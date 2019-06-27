@@ -1,0 +1,244 @@
+body{
+  background-color: #7296a3;
+}
+.apply-column{
+  min-height: 50rem;
+}
+.apply-column img{
+  width: 20rem;
+  max-width: 100%;
+}
+.apply-column .apply-button{
+  border: 1px solid #e85a71;
+  display: inline-block;
+  line-height: 2.8rem;
+  height: 2.8rem;
+  padding: 0 1rem;
+  border-radius: 3px;
+  background-color: #e85a71;
+  color: #fff;
+}
+.apply-column .apply-button:hover, .apply-column .apply-button:focus{
+  text-decoration: none;
+}
+.apply-column .apply-button:active{
+  background-color: #d0485e;
+}
+.apply-column-banner{
+  width: 100%;
+  height: 20rem;
+  font-size: 3rem;
+  color: #aaa;
+  line-height: 20rem;
+  border-radius: 3px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #ddd;
+}
+img.apply-column-banner{
+  height: auto;
+}
+.apply-column-avatar{
+  display: inline-block;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 3px;
+  height: 10rem;
+  cursor: pointer;
+  color: #aaa;
+  width: 10rem;
+  background-color: #ddd;
+  text-align: center;
+  line-height: 10rem;
+}
+.column{
+  min-height: 50rem;
+  max-width: 1000px;
+  width: 100%;
+  margin: auto;
+}
+.column-banner{
+  width: 100%;
+  border-radius: 3px;
+}
+.column-info{
+  position: relative;
+  min-height: 7rem;
+  background-color: rgba(255,255,255,0.4);
+  width: 100%;
+  padding-left: 20rem;
+}
+.column-avatar{
+  position: absolute;
+  top: -9rem;
+  left: 2rem;
+  background-color: #fff;
+  padding: 6px;
+  border-radius: 7px;
+}
+.column-avatar img{
+  height: 15rem;
+  width: 15rem;
+  border-radius: 7px;
+}
+@media (max-width: 767px) {
+  .column-avatar{
+    height: 4rem;
+    width: 4rem;
+  }
+}
+.column-name{
+  margin-top: 1rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+.column-abbr{
+  margin-top: 0.5rem;
+  font-size: 1.2rem;
+}
+.column-other-info>div{
+  display: inline-block;
+}
+.column-other-info>div:last-child{
+  float: right;
+  padding-top: 2rem;
+}
+.column-sub-button{
+  height: 3rem;
+  position: relative;
+  vertical-align: top;
+  border: 1px solid #2b90d9;
+  font-weight: 700;
+  display: inline-block;
+  border-radius: 3px;
+}
+.column-sub-button span{
+  line-height: 3rem;
+  text-align: center;
+  color: #565656;
+  padding-right: 1rem;
+}
+.column-sub-button button{
+  height: 100%;
+  border: none;
+  padding-right: 1rem;
+  background-color: rgba(0,0,0,0);
+  color: #2b90d9;
+  padding-left: 1rem;
+}
+.column-sub-button button:focus{
+  outline: none;
+}
+.column-user-avatar{
+  text-align: center;
+}
+.column-user-avatar img{
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+}
+.column-user-username{
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: 700;
+}
+.column-user-description{
+  text-align: center;
+}
+.column-management .col-xs-4{
+  height: 5rem;
+  cursor: pointer;
+  color: #555;
+}
+.column-management .col-xs-4:hover{
+  text-decoration: none;
+  color: #282c37;
+}
+.column-management .col-xs-4:focus{
+  text-decoration: none;
+}
+.column-management .col-xs-4 .fa{
+  display: block;
+  width: 100%;
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1.6rem;
+  text-align: center;
+}
+.column-management .name{
+  display: block;
+  text-align: center;
+}
+.column-header{
+  color: #9baec8;
+  height: 2rem;
+  line-height: 2rem;
+}
+.column-settings-nav{
+
+}
+.column-settings-nav a{
+  display: inline-block;
+  height: 2.8rem;
+  padding: 0 1rem;
+  margin-right: 0.5rem;
+  line-height: 2.8rem;
+  border-radius: 3px;
+  color: #9baec8;
+}
+.column-settings-nav a:hover, .column-settings-nav a:focus{
+  text-decoration: none;
+}
+.column-settings-nav a:hover, .column-settings-nav a.active{
+  background-color: #2b90d9;
+  color: #fff;
+}
+.column-settings-banner{
+  position: relative;
+  cursor: pointer;
+}
+.column-settings-banner:after{
+  content: "点击选择图片";
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  top: 0;
+  left: 0;
+  padding-top: 4rem;
+  background-color: rgba(0,0,0,0.5);
+  text-align: center;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+.column-settings-banner img{
+  width: 100%;
+  border-radius: 3px;
+}
+.column-settings-avatar{
+  text-align: center;
+  margin-top: 1rem;
+  display: inline-block;
+  position: relative;
+}
+.column-settings-avatar:after{
+  content: "点击选择图片";
+  font-size: 1.2rem;
+  position: absolute;
+  padding-top: 6rem;
+  font-weight: 700;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0,0.5);
+  text-align: center;
+  top: 0;
+  left: 0;
+  color: #fff;
+}
+.column-settings-avatar img{
+  border-radius: 3px;
+  width: 14rem;
+}
+.column-settings-post-category{
+  /*border-right: 1px solid #eee;*/
+}

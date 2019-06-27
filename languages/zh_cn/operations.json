@@ -572,6 +572,13 @@
   "review": "审核发表的内容",
   "experimentalReviewLog": "后台管理-查看审核记录",
   "banSaleProductParams": "禁售商品",
+  "column_apply": "专栏申请",
+  "column_get": "专栏列表",
+  "column_single_get": "访问专栏首页",
+  "column_single_avatar_get": "获取专栏头像",
+  "column_single_banner_get": "获取专栏背景",
+  "column_single_settings": "专栏设置",
+  "column_single_settings_post": "专栏文章管理",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

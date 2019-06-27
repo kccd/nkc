@@ -33,7 +33,8 @@ const fund = require('./fund');
 const login = require('./login');
 const logout = require('./logout');
 const me = require('./me');
-const m = require('./personalForum');
+const column = require('./column');
+const m = require('./columns');
 const p = require('./post');
 const problem = require('./problem');
 const register = require('./register');
@@ -194,6 +195,8 @@ operationObj.operationTree = {
     complaint, // 用户投诉
 
     review, // 审核
+
+    column, // 专栏申请
 	}
 };
 module.exports = operationObj;

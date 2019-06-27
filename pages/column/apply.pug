@@ -1,0 +1,32 @@
+extends ../columns/columnBase
+block columnTitle
+  title 开设专栏
+block content
+  .container-fluid.max-width
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12.text-center(@click="selectBanner" )
+        .apply-column-banner(v-if="!bannerUrl")
+          .fa.fa-upload &nbsp; 上传封面
+        img.apply-column-banner(v-else :src="bannerUrl")
+      .col-xs-12.col-md-12.text-center
+        .apply-column-avatar(v-if="!avatarUrl" @click="selectAvatar" )
+          .fa.fa-upload &nbsp; 上传头像
+        img.apply-column-avatar(v-else :src="avatarUrl" @click="selectAvatar" )
+      .col-xs-12.col-md-6.col-md-offset-3
+        .form
+          .form-group
+            h4 专栏名（不超过30字符）
+            input.form-control(type="text" v-model.trim="column.name")
+          .form-group
+            h4 专栏简介（不超过60字符）
+            textarea.form-control(rows=3 v-model.trim="column.abbr")
+          .form-group
+            h4 专栏介绍（不超过1000字符）
+            textarea.form-control(rows=9 v-model.trim="column.description")
+          .form-group
+            h5.text-danger(v-if="error") {{error}}
+            h5.text-success(v-if="info") {{info}}
+            button.btn.btn-primary.btn-block(@click="submit") 提交
+block scripts
+  include ../publicModules/crop/crop
+  +includeJS("/column/apply.js")

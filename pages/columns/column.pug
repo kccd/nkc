@@ -1,0 +1,61 @@
+extends ./columnBase
+block columnTitle
+  title=`${data.column.name}`
+block content
+  .container-fluid.max-width
+    .column
+      .row
+        .col-xs-12.col-md-12.box-shadow-panel.m-b-1
+          div
+            img.column-banner(src=`/m/${data.column._id}/banner`)
+            .column-info
+              .column-avatar
+                img(src=`/m/${data.column._id}/avatar`)
+              .column-other-info
+                div
+                  .column-name=data.column.name
+                  .column-abbr=data.column.abbr
+                div
+                  .column-sub-button
+                    button 投稿
+                  .column-sub-button
+                    button + 订阅
+                    span=data.column.subCount
+        .col-xs-12.col-md-8.box-shadow-panel.m-b-1
+          div
+            p Lorem ipsum dolor sit amet, consectetur adipisicing elit. A consequatur dolorum, error esse est exercitationem explicabo nemo suscipit voluptate! A corporis distinctio dolor esse iusto nemo neque rem rerum sapiente.
+        .col-xs-12.col-md-4.box-shadow-panel
+          div.m-b-1
+            .column-user
+              .column-header
+                .fa.fa-user &nbsp;专栏主
+              .column-user-avatar
+                img(src=`/avatar/${data.column.uid}`)
+              .column-user-username=data.column.user.username
+              .column-user-description=data.column.user.description
+          div.m-b-1
+            .column-management
+              .column-header
+                .fa.fa-cog &nbsp;专栏管理
+              .row
+                a(href=`/m/${data.column._id}/settings`).col-xs-4
+                  .fa.fa-wrench
+                  .name 资料设置
+                a.col-xs-4
+                  .fa.fa-newspaper-o
+                  .name 文章管理
+                a.col-xs-4
+                  .fa.fa-bell-o
+                  .name 投稿通知
+          div.m-b-1
+            .column-threads
+              .column-header
+                .fa.fa-bullhorn &nbsp;公告通知
+          div.m-b-1
+            .column-threads
+              .column-header
+                .fa.fa-fire &nbsp; 栏主推荐
+
+
+
+block scripts

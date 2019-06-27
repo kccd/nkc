@@ -1306,5 +1306,22 @@ userSchema.statics.publishingCheck = async (user) => {
   if(latestThread) throwErr(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
 };
 
+/*
+* 验证用户是否有权限开设专栏
+* @param {String} uid 用户ID
+* @return {Boolean} 是否有权限
+* @author pengxiguaa 2019-6-26
+* */
+userSchema.statics.ensureApplyColumnPermission = async (uid) => {
+  const user = await mongoose.model("users").findOne({uid});
+  if(!user) return false;
+  const columnSettings = await mongoose.model("settings").findById("column");
+  const {xsfCount, digestCount, userGrade} = columnSettings.c;
+  if(user.xsf < xsfCount) return false;
+  await user.extendGrade();
+  if(user.grade._id < userGrade) return false;
+  const count = await mongoose.model("threads").count({uid, digest: true});
+  return count >= digestCount;
+};
 
 module.exports = mongoose.model('users', userSchema);

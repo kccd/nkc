@@ -46,6 +46,10 @@ moduleCrop.init = function(callback, o) {
     $(".crop-select-panel").css("display", "none");
   }
 
+  if(moduleCrop.cropper && moduleCrop.cropper.destroy && options.aspectRatio) {
+    moduleCrop.cropper.setAspectRatio(options.aspectRatio);
+  }
+
   var $image = $('#module_crop_image');
 
   $image.cropper(options);
@@ -57,7 +61,7 @@ moduleCrop.init = function(callback, o) {
     setTimeout(function() {
       try{
         moduleCrop.cropper.getCroppedCanvas().toBlob(function(blob) {
-          callback(blob);
+          callback(blob, moduleCrop.name);
         });
       }
       catch(e)
@@ -73,7 +77,15 @@ moduleCrop.init = function(callback, o) {
   };
 
   // 显示裁剪框
-  moduleCrop.show = function() {
+  moduleCrop.show = function(options) {
+    if(options) {
+      if(options.name) {
+        moduleCrop.name = options.name;
+      }
+      if(options.aspectRatio) {
+        moduleCrop.cropper.setAspectRatio(options.aspectRatio);
+      }
+    }
     $("#module_crop").show();
     stopBodyScroll(true);
   };
