@@ -2544,7 +2544,7 @@ img.emoji {
 .userInfo-m{
   display: none;
   float: right;
-  min-width: 4em;
+  /*min-width: 4em;*/
   position: relative;
   /*padding-top: 7px!important;*/
   padding-bottom: 8px;
