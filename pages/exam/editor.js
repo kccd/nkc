@@ -36,6 +36,11 @@ var app = new Vue({
     var data = document.getElementById('data');
     data = JSON.parse(data.innerHTML);
     if(data.question) {
+      if(data.question.type === "ans") {
+        data.question.answer[1] = "";
+        data.question.answer[2] = "";
+        data.question.answer[3] = "";
+      }
       this.extendAnswers(data.question);
       if(data.question.public) {
         data.question.forum = '';
@@ -54,9 +59,9 @@ var app = new Vue({
       this.question.forum = forum;
     },
     extendAnswers: function(question) {
-      if(question.type === 'ans') {
+      /*if(question.type === 'ans') {
         return question.answerObj = [{text: question.answer[0]}]
-      };
+      }*/
       var answer = question.answer;
       var answerObj = [];
       for(var i = 0; i < answer.length; i++) {
