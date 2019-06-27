@@ -25,21 +25,22 @@ block content
                   h5=`专栏：`
                     a(href=`/m/${applicant.uid}` target="_blank")=`去查看`
                   h5=`真实姓名：${applicant.name}`
-                  h5=`联系电话：${applicant.mobile}`
-                  h5= `身份证号码：${applicationForm.applicant.idCardNumber || '暂未输入'}`
-                  h5= `联系方式：${applicationForm.applicant.mobile || '暂未输入'}`
-                  -let paymentType;
-                  if applicationForm.account.paymentType === 'alipay'
-                    -paymentType = '支付宝';
-                  else if applicationForm.account.paymentType === 'bankCard'
-                    -paymentType = '银行卡';
-                  else
-                    -paymentType = '暂未选择';
-                  h5= `收款方式：${paymentType}`
-                  if paymentType === '银行卡'
-                    h5= `银行全称：${applicationForm.account.bankName || '暂未填写'}`
-                    h5= `户名：${applicationForm.account.name || '暂未填写'}`
-                  h5= `收款账号：${applicationForm.account.number || '暂未输入'}`
+                  if applicant.idCardNumber
+                    h5=`联系电话：${applicant.mobile}`
+                    h5= `身份证号码：${applicationForm.applicant.idCardNumber || '暂未输入'}`
+                    h5= `联系方式：${applicationForm.applicant.mobile || '暂未输入'}`
+                    -let paymentType;
+                    if applicationForm.account.paymentType === 'alipay'
+                      -paymentType = '支付宝';
+                    else if applicationForm.account.paymentType === 'bankCard'
+                      -paymentType = '银行卡';
+                    else
+                      -paymentType = '暂未选择';
+                    h5= `收款方式：${paymentType}`
+                    if paymentType === '银行卡'
+                      h5= `银行全称：${applicationForm.account.bankName || '暂未填写'}`
+                      h5= `户名：${applicationForm.account.name || '暂未填写'}`
+                    h5= `收款账号：${applicationForm.account.number || '暂未输入'}`
                   h5=`生活照：`
                   .row
                     .col-xs-12.col-md-12

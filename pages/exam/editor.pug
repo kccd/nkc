@@ -30,7 +30,7 @@ block content
             .form-group
               label(class="col-sm-2 control-label") 答题方式
               .col-sm-10
-                div(v-if='question._id')
+                div(v-if='question._id && question.auth === true')
                   h5 {{question.type==='ch4'?'选择': '填空'}}
                 div(v-else)  
                   <label class="radio-inline">
@@ -42,7 +42,7 @@ block content
             .form-group
               label(class="col-sm-2 control-label") 试题难度
               .col-sm-10
-                div(v-if='question._id')
+                div(v-if='question._id && question.auth === true')
                   h5 {{question.volume==='A'?'A(基础级)': 'B(专业级)'}}
                 div(v-else)  
                   <label class="radio-inline">
@@ -54,7 +54,7 @@ block content
             .form-group
               label(class="col-sm-2 control-label") 试题类型
               .col-sm-10
-                div(v-if='question._id')
+                div(v-if='question._id && question.auth === true')
                   h5 {{question.public?'公共题': '专业题'}}
                 div(v-else)  
                   <label class="radio-inline">
