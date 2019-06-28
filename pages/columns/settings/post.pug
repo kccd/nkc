@@ -2,11 +2,80 @@ extends ./base
 block columnTitle
   title 内容管理
 block settingsContent
-  .row
-    .col-xs-12.col-md-3
-      .column-settings-post-category
-        h5.text-center 文章分类
-        button.btn.btn-default 添加分类
-    .col-xs-12.col-md-8.col-md-offset-1
-      p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus enim hic molestiae quis veniam! Accusantium aliquam beatae deserunt et, hic laudantium magni odit omnis quod sed totam ut, vel, voluptas!
+  #data.hidden=objToStr({categories: data.categories, column: data.column})
+  .row#app(v-cloak)
+    .col-xs-12.col-md-3.m-b-2
+      h5.text-center 文章分类
+      .column-settings-post-categories
+        .column-settings-post-category(v-for="c in categories" @click="selectCategory(c)" :class="{'active': c === category}")
+          span {{c.name}}
+            .pull-right
+              span {{c.count || ""}}
+              | &nbsp;
+              .fa.fa-angle-right
 
+      .text-center.m-t-1
+        button.btn.btn-default.btn-sm(@click="addCategory") 添加分类
+    .col-xs-12.col-md-9
+      div(v-if="category")
+        div(v-if="!editInfo")
+          .column-settings-category-name.h3.m-t-0 {{category.name}}
+            span.p-l-1
+            .fa.fa-pencil(@click="editInfo = !editInfo") &nbsp;编辑
+            .fa.fa-trash(@click="removeCategory(category)") &nbsp;删除
+          p {{category.description}}
+        .form(v-else)
+          .form-group
+            label 分类名（不超过50字符）
+            input.form-control(type="text" v-model.tirm="category.name")
+          .form-group
+            label 分类简介（不超过100字符）
+            textarea.form-control(v-model.tirm="category.description" rows=5)
+          .form-group
+            h5.text-danger(v-if="error") {{error}}
+            button.btn.btn-primary.btn-sm(@click="saveInfo") 保存
+            button.btn.btn-default.btn-sm(@click="cancelAdd") 取消
+      .column-settings-posts(v-if="category")
+        .blank(v-if="!columnPosts || columnPosts.length === 0") 空空如也~
+        div(v-else)
+          div
+            .paging-button
+              a.radius-left.button.pointer(@click="selectMulPosts" :class="{'active': selectMul, 'radius-right':!selectMul}") 管理
+              a.radius-right.button.pointer(@click="selectAll" v-if="selectMul") 全选
+            .paging-button(v-if="selectedColumnPostsId.length > 0")
+              a.radius-left.button.pointer(@click="moveSelected") 移动
+              a.radius-right.button.pointer(@click="removeSelected") 删除
+            .paging-button
+              a.button.pointer(v-for="b, index in paging.buttonValue"
+                :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
+                @click="selectPage(b.type, b.num)"
+              ) {{b.num>=0?b.num+1:"..."}}
+          .column-settings-post(v-for="p in columnPosts")
+            .post-radio(v-if="selectMul")
+              .checkbox
+                label
+                  input(type="checkbox" :value="p._id" v-model="selectedColumnPostsId")
+            .post-content
+              a(:href="p.post.url" target="_blank").post-title {{p.thread.firstPost.t}}
+              .post-info
+                span.m-r-1 类型：{{p.type==="thread"?"文章":"回复"}}
+                span 时间：{{format("YYYY/MM/DD HH:mm:ss", p.top)}}
+          div
+            .paging-button
+              a.radius-left.button.pointer(@click="selectMulPosts" :class="{'active': selectMul, 'radius-right':!selectMul}") 管理
+              a.radius-right.button.pointer(@click="selectAll" v-if="selectMul") 全选
+            .paging-button(v-if="selectedColumnPostsId.length > 0")
+              a.radius-left.button.pointer(@click="moveSelected") 移动
+              a.radius-right.button.pointer(@click="removeSelected") 删除
+            .paging-button
+              a.button.pointer(v-for="b, index in paging.buttonValue"
+                :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
+                @click="selectPage(b.type, b.num)"
+              ) {{b.num>=0?b.num+1:"..."}}
+
+
+block scripts
+  -const column = data.column;
+  include ../../publicModules/toColumn/toColumn
+  include ../../publicModules/moment
+  +includeJS("/columns/settings/post.js")

@@ -24,5 +24,18 @@ const schema = new Schema({
 }, {
   collection: "columnPostCategories"
 });
+/*
+* 拓展专栏内容分类
+* */
+schema.statics.extendCategories = async (categories) => {
+  const ColumnPostModel = mongoose.model("columnPosts");
+  const results = [];
+  for(let c of categories) {
+    c = c.toObject();
+    c.count = await ColumnPostModel.count({cid: c._id});
+    results.push(c);
+  }
+  return results;
+};
 
 module.exports = mongoose.model("columnPostCategories", schema);

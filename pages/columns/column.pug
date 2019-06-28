@@ -5,7 +5,7 @@ block content
   .container-fluid.max-width
     .column
       .row
-        .col-xs-12.col-md-12.box-shadow-panel.m-b-1
+        .col-xs-12.col-md-12.m-b-2
           div
             img.column-banner(src=`/m/${data.column._id}/banner`)
             .column-info
@@ -21,37 +21,50 @@ block content
                   .column-sub-button
                     button + 订阅
                     span=data.column.subCount
-        .col-xs-12.col-md-8.box-shadow-panel.m-b-1
+          hr
+        .col-xs-12.col-md-8.m-b-2
           div
-            p Lorem ipsum dolor sit amet, consectetur adipisicing elit. A consequatur dolorum, error esse est exercitationem explicabo nemo suscipit voluptate! A corporis distinctio dolor esse iusto nemo neque rem rerum sapiente.
-        .col-xs-12.col-md-4.box-shadow-panel
-          div.m-b-1
+            include ../publicModules/paging/paging
+            for columnPost in data.columnPosts
+              include ./singleColumnPost
+            include ../publicModules/paging/paging_input
+        .col-xs-12.col-md-3.col-md-offset-1
+          div.m-b-2
             .column-user
-              .column-header
+              //-.column-header
                 .fa.fa-user &nbsp;专栏主
               .column-user-avatar
                 img(src=`/avatar/${data.column.uid}`)
-              .column-user-username=data.column.user.username
+              a(href=`/u/${data.column.uid}`).column-user-username=data.column.user.username
+              if data.user && data.user.uid !== data.column.uid
+                .column-user-button
+                  a(href=`/message?uid=${data.column.uid}` target="_blank") 私信
+                  if data.user.subUid.includes(data.column.uid)
+                    a.pointer(href=`javascript:subscribeUser("${data.column.uid}", false)` target="_blank") 取关
+                  else
+                    a.pointer(href=`javascript:subscribeUser("${data.column.uid}", true)` target="_blank") 关注
               .column-user-description=data.column.user.description
-          div.m-b-1
-            .column-management
-              .column-header
-                .fa.fa-cog &nbsp;专栏管理
-              .row
-                a(href=`/m/${data.column._id}/settings`).col-xs-4
-                  .fa.fa-wrench
-                  .name 资料设置
-                a.col-xs-4
-                  .fa.fa-newspaper-o
-                  .name 文章管理
-                a.col-xs-4
-                  .fa.fa-bell-o
-                  .name 投稿通知
-          div.m-b-1
+
+          if data.user && data.user.uid === data.column.uid
+            div.m-b-2
+              .column-management
+                .column-header
+                  .fa.fa-cog &nbsp;专栏管理
+                .row
+                  a(href=`/m/${data.column._id}/settings`).col-xs-4
+                    .fa.fa-wrench
+                    .name 资料设置
+                  a(href=`/m/${data.column._id}/settings/post`).col-xs-4
+                    .fa.fa-newspaper-o
+                    .name 文章管理
+                  a.col-xs-4
+                    .fa.fa-bell-o
+                    .name 投稿通知
+          div.m-b-2
             .column-threads
               .column-header
                 .fa.fa-bullhorn &nbsp;公告通知
-          div.m-b-1
+          div.m-b-2
             .column-threads
               .column-header
                 .fa.fa-fire &nbsp; 栏主推荐

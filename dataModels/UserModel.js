@@ -1324,4 +1324,13 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
   return count >= digestCount;
 };
 
+/*
+* 获取用户的专栏
+* @param {String} uid 用户ID
+* @return {Object} 专栏对象
+* */
+userSchema.statics.getUserColumn = async (uid) => {
+  return await mongoose.model("columns").findOne({uid});
+};
+
 module.exports = mongoose.model('users', userSchema);

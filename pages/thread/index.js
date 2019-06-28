@@ -1,4 +1,7 @@
 $(document).ready(function(){
+  if(window.moduleToColumn) {
+    moduleToColumn.init();
+  }
 	//编辑器缩放
 	if($(".w-e-text-container").length === 0) return;
 	$(".w-e-text-container").resizable({
@@ -71,6 +74,36 @@ $(document).ready(function(){
   }
 
 });
+function addToColumn(pid, columnId) {
+  moduleToColumn.show(function(data) {
+    var columnId = data.columnId;
+    var categoryId = data.categoryId;
+    nkcAPI("/m/" + columnId + "/post", "POST", {
+      type: "addToColumn",
+      categoryId: categoryId,
+      postsId: [pid]
+    })
+      .then(function() {
+        window.location.reload();
+        moduleToColumn.hide();
+      })
+      .catch(function(data) {
+        screenTopWarning(data);
+      });
+  });
+}
+function removeToColumn(pid, columnId) {
+  nkcAPI("/m/" + columnId + "/post", "POST", {
+    type: "removeColumnPostByPid",
+    postsId: [pid]
+  })
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    });
+}
 
 function get_selection(the_id)
 {

@@ -18,6 +18,11 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  nameLowerCase: {
+    type: String,
+    required: true,
+    index: 1
+  },
   abbr: {
     type: String,
     required: true,

@@ -41,6 +41,14 @@ block title
           span &nbsp;操作
       //-ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
       ul.dropdown-menu(style='left: auto;right: 0;' data-stopPropagation=true)
+        if targetThread && data.authorColumn
+          li
+            if !data.addedToColumn
+              a(href=`javascript:addToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
+                span.fa.fa-share-square-o &nbsp;推送到我的专栏
+            else
+              a(href=`javascript:removeToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
+                span.fa.fa-share-square-o &nbsp;从我的专栏撤稿
         li
           a(href=`/p/${post.pid}`)
             span.fa.fa-newspaper-o &nbsp;
@@ -579,6 +587,10 @@ block content
     include ../thread_to_recycle.pug
     include ../post_to_recycle.pug
     include ../publicModules/post_warning
+    if data.authorColumn
+      -const column = data.authorColumn
+      include ../publicModules/toColumn/toColumn
+
 block scripts
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src='/commonmark/dist/commonmark.js')

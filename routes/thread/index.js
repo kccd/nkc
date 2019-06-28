@@ -380,6 +380,15 @@ threadRouter
           uid: thread.uid
         });
       }
+			// 专栏判断
+      if(thread.uid === data.user.uid) {
+        data.authorColumn = await db.UserModel.getUserColumn(thread.uid);
+        if(data.authorColumn) {
+          // 判断是否已经加入专栏
+          const columnPost = await db.ColumnPostModel.findOne({tid: thread.tid, columnId: data.authorColumn._id, type: "thread"});
+          data.addedToColumn = !!columnPost;
+        }
+      }
 		}
 		// data.ads = (await db.SettingModel.findOnly({type: 'system'})).ads;
 		// 判断是否显示在专栏加精、置顶...按钮

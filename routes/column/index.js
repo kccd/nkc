@@ -15,7 +15,7 @@ router
     if(!banner) ctx.throw(400, "专栏背景不能为空");
     if(!name) ctx.throw(400, "专栏名不能为空");
     if(contentLength(name) > 60) ctx.throw(400, "专栏名不能超过60字符");
-    const sameName = await db.ColumnModel.findOne({name});
+    const sameName = await db.ColumnModel.findOne({nameLowerCase: name.toLocaleString()});
     if(sameName) ctx.throw(400, "专栏名已存在，请更换");
     if(!abbr) ctx.throw(400, "专栏名简介不能为空");
     if(contentLength(abbr) > 120) ctx.throw(400, "专栏简介不能超过120字符");
@@ -25,12 +25,19 @@ router
       _id: await db.SettingModel.operateSystemID("columns", 1),
       uid: data.user.uid,
       name,
+      nameLowerCase: name.toLocaleString(),
       abbr,
       description
+    });
+    const category = db.ColumnPostCategoryModel({
+      columnId: column._id,
+      name: "自定义分类",
+      description: "专栏主自定义分类"
     });
     await nkcModules.file.saveColumnAvatar(column._id, avatar);
     await nkcModules.file.saveColumnBanner(column._id, banner);
     await column.save();
+    await category.save();
     data.column = column;
     await next();
   })

@@ -1,6 +1,7 @@
 const Router = require("koa-router");
 const router = new Router();
 const columnRouter = require("./column");
+
 router
   .get("/", async (ctx, next) => {
     await next();
