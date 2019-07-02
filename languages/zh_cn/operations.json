@@ -579,6 +579,10 @@
   "column_single_banner_get": "获取专栏背景",
   "column_single_settings": "专栏设置",
   "column_single_settings_post": "专栏文章管理",
+  "column_single_subscribe": "订阅/取消订阅专栏",
+  "experimentalColumnSettings": "后台管理-专栏设置",
+  "column_single_contribute": "向专栏投稿",
+  "column_single_settings_contribute": "专栏主处理投稿申请",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

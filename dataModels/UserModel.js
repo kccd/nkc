@@ -1308,19 +1308,31 @@ userSchema.statics.publishingCheck = async (user) => {
 
 /*
 * 验证用户是否有权限开设专栏
-* @param {String} uid 用户ID
+* @param {String/Object} uid 用户ID/用户对象
 * @return {Boolean} 是否有权限
 * @author pengxiguaa 2019-6-26
 * */
 userSchema.statics.ensureApplyColumnPermission = async (uid) => {
-  const user = await mongoose.model("users").findOne({uid});
+  let user;
+  if(typeof uid === "string") {
+    user = await mongoose.model("users").findOne({uid});
+  } else {
+    user = uid;
+  }
   if(!user) return false;
   const columnSettings = await mongoose.model("settings").findById("column");
-  const {xsfCount, digestCount, userGrade} = columnSettings.c;
+  const {xsfCount, digestCount, userGrade, threadCount} = columnSettings.c;
   if(user.xsf < xsfCount) return false;
-  await user.extendGrade();
-  if(user.grade._id < userGrade) return false;
-  const count = await mongoose.model("threads").count({uid, digest: true});
+  if(!user.grade) await user.extendGrade();
+  if(!userGrade.includes(user.grade._id)) return false;
+  const userThreadCount = await mongoose.model("threads").count({
+    uid,
+    disabled: false,
+    recycleMark: false,
+    reviewed: true
+  });
+  if(userThreadCount < threadCount) return false;
+  const count = await mongoose.model("threads").count({uid, digest: true, disabled: false, recycleMark: false, reviewed: true});
   return count >= digestCount;
 };
 

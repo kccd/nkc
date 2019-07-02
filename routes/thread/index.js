@@ -9,10 +9,24 @@ const Path = require("path");
 
 threadRouter
 	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
+		const {data, db, query, nkcModules} = ctx;
 		const {user} = data;
 		const {from, keywords, self, type, title, pid, applicationFormId} = query;
-    if(type === "applicationFormSearch") {
+		// 通用接口，用于查询自己的文章
+		if(type === "selfThreads") {
+      const {page=0} = query;
+      const q = {
+        uid: user.uid,
+        disabled: false,
+        recycleMark: {$ne: true},
+        reviewed: true
+      };
+      const count = await db.ThreadModel.count(q);
+      const paging = nkcModules.apiFunction.paging(page, count);
+      let threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      data.threads = await db.ThreadModel.extendThreads(threads);
+      data.paging = paging;
+    } else if(type === "applicationFormSearch") {
       const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId});
       const users = await applicationForm.extendMembers();
       const usersId = users.map(u => u.uid);

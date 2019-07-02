@@ -10,9 +10,10 @@ if column
            .text-center.m-t-3.m-b-3(v-if="loading") 加载中...
            div(v-else)
              .radio(v-for="c in categories")
-               label
+               label(v-if="excludes.indexOf(c._id) === -1")
+                 span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;
                  input(type="radio" :value="c._id" v-model="categoryId")
-                 | {{c.name}}
+                 span {{c.name}}
          .modal-footer
            button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消
            button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定

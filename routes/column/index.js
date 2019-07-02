@@ -6,7 +6,8 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {data, db, body, nkcModules, tools} = ctx;
+    const {data, db, body, nkcModules, tools, state} = ctx;
+    if(!state.columnPermission) ctx.throw(403, "您的账号暂未满足开设专栏的条件");
     const {contentLength} = tools.checkString;
     const {files, fields} = body;
     const {avatar, banner} = files;
@@ -30,9 +31,11 @@ router
       description
     });
     const category = db.ColumnPostCategoryModel({
+      _id: await db.SettingModel.operateSystemID("columnPostCategories", 1),
       columnId: column._id,
-      name: "自定义分类",
-      description: "专栏主自定义分类"
+      default: true,
+      name: "未分类",
+      description: "未分类的文章"
     });
     await nkcModules.file.saveColumnAvatar(column._id, avatar);
     await nkcModules.file.saveColumnBanner(column._id, banner);
@@ -42,6 +45,7 @@ router
     await next();
   })
   .get("/apply", async (ctx, next) => {
+    if(!ctx.state.columnPermission) ctx.throw(403, "您的账号暂未满足开设专栏的条件");
     ctx.template = "column/apply.pug";
     await next();
   });

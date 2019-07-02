@@ -14,6 +14,9 @@ var app = new Vue({
   },
   mounted: function() {
     moduleCrop.init(this.selectedImage);
+    NKC.methods.initSelectColor(function(hex) {
+      app.column.color = hex;
+    });
   },
   methods: {
     selectedImage: function(data, name) {
@@ -66,6 +69,7 @@ var app = new Vue({
       formData.append("name", column.name);
       formData.append("abbr", column.abbr);
       formData.append("description", column.description);
+      if(column.color) formData.append("color", column.color);
       uploadFilePromise("/m/" + this.column._id, formData, function(e, a) {
         app.info = "提交中..." + a;
       }, "PATCH")

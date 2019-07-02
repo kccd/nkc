@@ -5,12 +5,12 @@ block settingsContent
   .hidden#data=objToStr({column: data.column})
   .row#app(v-cloak)
     .col-xs-12.col-md-12
+    .col-xs-12.col-md-8.col-md-offset-2.m-t-3.m-b-3
       .column-settings-banner(@click="selectBanner")
         img(:src="bannerUrl")
       .text-center
         .column-settings-avatar(@click="selectAvatar")
           img(:src="avatarUrl")
-    .col-xs-12.col-md-8.col-md-offset-2.m-t-3.m-b-3
       .form
         .form-group
           h4 专栏名（不超过30字符）
@@ -20,11 +20,15 @@ block settingsContent
           textarea.form-control(rows=3 v-model.trim="column.abbr")
         .form-group
           h4 专栏介绍（不超过1000字符）
-          textarea.form-control(rows=9 v-model.trim="column.description")
+          textarea.form-control(rows=6 v-model.trim="column.description")
+        .form-group
+          h4 专栏首页背景颜色
+          input.form-control(data-control="selectColor" v-model.trim="column.color")
         .form-group
           h5.text-danger(v-if="error") {{error}}
           h5.text-success(v-if="info") {{info}}
           button.btn.btn-primary.btn-block(@click="submit") 提交
 block scripts
   include ../../publicModules/crop/crop
+  include ../../publicModules/selectColor
   +includeJS("/columns/settings/info.js")

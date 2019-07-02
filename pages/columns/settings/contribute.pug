@@ -1,0 +1,54 @@
+extends ./base
+block columnTitle
+  title 投稿通知
+block settingsContent
+  #data.hidden=objToStr({contributes: data.contributes, column: data.column, categories: data.categories})
+  .row#app(v-cloak)
+    .col-xs-12.col-md-3.contribute-list-nav
+      a(href=`/m/${data.column._id}/settings/contribute` class=!data.t?"active":"") 未处理
+        .pull-right
+          span=data.unresolvedCount|| ""
+          | &nbsp;
+          .fa.fa-angle-right
+      a(href=`/m/${data.column._id}/settings/contribute?t=passed` class=data.t==="passed"?"active":"") 已处理
+        .pull-right
+          span=data.resolvedCount|| ""
+          | &nbsp;
+          .fa.fa-angle-right
+    .col-xs-12.col-md-9
+      if data.contributes.length === 0
+        h4.text-center.m-t-4 空空如也~
+      else
+        include ../../publicModules/paging/paging
+        div
+          .contribute-list-li(v-for="c in contributes")
+            a(:href="'/u/' + c.uid" target="_blank") {{c.user.username}}
+            span &nbsp;&nbsp;{{fromNow(c.toc)}}&nbsp;&nbsp;投稿文章&nbsp;&nbsp;
+            a(:href="'/t/' + c.tid" target="_blank") {{c.thread.firstPost.t}}
+            .m-t-05(v-if="c.description")
+              p 补充说明：{{c.description}}
+            .m-t-05
+              div(v-if="c.passed === null")
+                .radio
+                  label
+                    input(type="radio" :value="true" v-model="c.agree")
+                    span.m-r-05 同意
+                  label
+                    input(type="radio" :value="false" v-model="c.agree")
+                    | 拒绝
+                .radio(v-if="c.agree")
+                  label(v-for="category in categories")
+                    input(type="radio" :value="category._id" v-model="c.cid")
+                    span.m-r-05 {{category.name}}
+                .m-b-05(v-else-if="c.agree === false")
+                  h5 拒绝理由（选填）
+                  textarea.form-control(rows=3 style="max-width:30rem")
+                button.btn.btn-success.btn-sm(v-if="c.agree !== ''" @click="submit(c)") 提交
+              div(v-else-if="c.passed")
+                h5.text-success 已同意
+              div(v-else)
+                h5.text-danger 已拒绝
+        include ../../publicModules/paging/paging_input
+block scripts
+  include ../../publicModules/moment
+  +includeJS("/columns/settings/contribute.js")

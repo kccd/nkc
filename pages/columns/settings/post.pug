@@ -8,7 +8,7 @@ block settingsContent
       h5.text-center 文章分类
       .column-settings-post-categories
         .column-settings-post-category(v-for="c in categories" @click="selectCategory(c)" :class="{'active': c === category}")
-          span {{c.name}}
+          span {{c.name}} {{c.default?"(默认)":""}}
             .pull-right
               span {{c.count || ""}}
               | &nbsp;
@@ -20,9 +20,10 @@ block settingsContent
       div(v-if="category")
         div(v-if="!editInfo")
           .column-settings-category-name.h3.m-t-0 {{category.name}}
+            small &nbsp;{{category.default?"默认分类":""}}
             span.p-l-1
             .fa.fa-pencil(@click="editInfo = !editInfo") &nbsp;编辑
-            .fa.fa-trash(@click="removeCategory(category)") &nbsp;删除
+            .fa.fa-trash(@click="removeCategory(category)" v-if="!category.default") &nbsp;删除
           p {{category.description}}
         .form(v-else)
           .form-group

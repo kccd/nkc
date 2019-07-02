@@ -45,15 +45,15 @@ exports.saveColumnBanner = async (columnId, file) => {
   await ei.resize({
     src: file.path,
     dst: upload.columnBannerPath + "/" + columnId + "_sm.jpg",
-    height: 200,
-    width: 800,
+    height: 720,
+    width: 1280,
     quality: 90
   });
   await ei.resize({
     src: file.path,
     dst: upload.columnBannerPath + "/" + columnId + ".jpg",
-    height: 350,
-    width: 1400,
+    height: 480,
+    width: 1920,
     quality: 90
   });
   await fsSync.unlink(file.path);

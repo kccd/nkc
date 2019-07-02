@@ -12,6 +12,7 @@ module.exports = {
     category: {
       GET: "column_single_settings_post",
       POST: "column_single_settings_post",
+      PATCH: "column_single_settings_post",
       PARAMETER: {
         DELETE: "column_single_settings_post",
         PATCH: "column_single_settings_post"
@@ -21,12 +22,26 @@ module.exports = {
       POST: "column_single_settings_post",
       GET: "column_single_settings_post"
     },
+    subscribe: {
+      POST: "column_single_subscribe"
+    },
     settings: {
       GET: "column_single_settings",
       post: {
         GET: "column_single_settings_post",
         POST: "column_single_settings_post"
+      },
+      contribute: {
+        GET: "column_single_settings_contribute",
+        POST: "column_single_settings_contribute"
+      },
+      category: {
+        GET: "column_single_settings_post"
       }
+    },
+    contribute: {
+      GET: "column_single_contribute",
+      POST: "column_single_contribute"
     }
   }
 };

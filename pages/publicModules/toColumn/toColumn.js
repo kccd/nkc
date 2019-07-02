@@ -8,12 +8,17 @@ moduleToColumn.init = function(callback) {
     el: "#moduleToColumnVue",
     data: {
       uid: uid,
+      selectMul: false,
       columnId: columnId,
       categories: [],
+      exclude: [],
       category: "",
       column: "",
       loading: true,
       categoryId: "",
+
+      categoriesId: [],
+
       info: "",
       error: ""
     },
@@ -22,12 +27,41 @@ moduleToColumn.init = function(callback) {
         show: false
       });
     },
+    computed: {
+      excludes: function() {
+        var this_ = this;
+        var exclude = this.exclude;
+        var arr = [].concat(exclude);
+        var func = function(ids) {
+          for(var i = 0; i < ids.length; i++) {
+            var id = ids[i];
+            var childrenId = this_.getChildren(id);
+            arr = arr.concat(childrenId);
+            func(childrenId);
+          }
+        };
+        func(exclude);
+        return arr;
+      }
+    },
     methods: {
-      show: function(func) {
+      getChildren: function(_id) {
+        var arr = [];
+        for(var i = 0; i < this.categories.length; i++) {
+          var c = this.categories[i];
+          if(c.parentId === _id) arr.push(c._id);
+        }
+        return arr;
+      },
+      show: function(func, options) {
         var this_ = this;
         if(func) moduleToColumn.callback = func;
+        if(options) {
+          this.exclude = options.exclude || [];
+          this.selectMul = options.selectMul || false;
+        }
         $('#moduleToColumn').modal("show");
-        nkcAPI("/m/" + this.columnId + "/category", "GET")
+        nkcAPI("/m/" + this.columnId + "/category?t=list", "GET")
           .then(function(data) {
             this_.column = data.column;
             this_.categories = data.categories;
@@ -54,8 +88,8 @@ moduleToColumn.init = function(callback) {
       }
     }
   });
-  moduleToColumn.show = function(callback) {
-    moduleToColumn.app.show(callback);
+  moduleToColumn.show = function(callback, options) {
+    moduleToColumn.app.show(callback, options);
   };
   moduleToColumn.hide = function() {
     moduleToColumn.app.hide();

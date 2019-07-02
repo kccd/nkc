@@ -1580,7 +1580,7 @@ span.thread-title-page{
   font-weight:bold;
 }
 .box-shadow-panel>*{
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  box-shadow: 0 0 3px rgba(0,0,0,0.1);
   padding: 1rem;
   background-color: #fff;
   border-radius: 3px;

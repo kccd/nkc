@@ -1,34 +1,78 @@
 extends ./columnBase
 block columnTitle
   title=`${data.column.name}`
+  style.
+    body{
+      padding-top: 0;
+      background-color: #f6f6f6;
+    }
+    .navbar.nkcshade{
+      background-color: rgba(246, 246, 246, 0.95);
+    }
+  style=`body{background-color: ${data.column.color};}`
 block content
+  .column-banner-body
+    .column-banner(style=`background-image:url(/m/${data.column._id}/banner)`)
+    .column
+      .column-info
+        .column-avatar
+          img(src=`/m/${data.column._id}/avatar`)
+        .column-other-info
+          div
+            .column-name=data.column.name
+            .column-abbr=data.column.abbr
+          div
+            .column-sub-button.active
+              a(href=data.user?`/m/${data.column._id}/contribute`:"/login")
+                button 投稿
+            .column-sub-button
+              //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
+              if !data.user
+                a(href="/login" target="_blank")
+                  button + 订阅
+              else
+                if data.subscribedColumn
+                  button(onclick=`subscribeColumn(${data.column._id}, false)`) 已订阅
+                else
+                  button(onclick=`subscribeColumn(${data.column._id}, true)`) + 订阅
+              if data.column.subCount > 0
+                span=data.column.subCount
   .container-fluid.max-width
     .column
       .row
-        .col-xs-12.col-md-12.m-b-2
-          div
-            img.column-banner(src=`/m/${data.column._id}/banner`)
-            .column-info
-              .column-avatar
-                img(src=`/m/${data.column._id}/avatar`)
-              .column-other-info
-                div
-                  .column-name=data.column.name
-                  .column-abbr=data.column.abbr
-                div
-                  .column-sub-button
-                    button 投稿
-                  .column-sub-button
-                    button + 订阅
-                    span=data.column.subCount
-          hr
-        .col-xs-12.col-md-8.m-b-2
+        .col-xs-12.col-md-8.m-b-2.box-shadow-panel.m-t-2
           div
             include ../publicModules/paging/paging
-            for columnPost in data.columnPosts
-              include ./singleColumnPost
+            .column-posts-body
+              for columnPost in data.columnPosts
+                include ./singleColumnPost
             include ../publicModules/paging/paging_input
-        .col-xs-12.col-md-3.col-md-offset-1
+        .col-xs-12.col-md-4.box-shadow-panel.m-t-2
+          if data.user && data.user.uid === data.column.uid
+            div.m-b-2
+              .column-management
+                .column-header
+                  .fa.fa-cog &nbsp;专栏管理
+                .row.m-t-1
+                  a(href=`/m/${data.column._id}/settings`).col-xs-4
+                    .fa.fa-wrench
+                    .name 专栏设置
+                  a(href=`/m/${data.column._id}/settings/post`).col-xs-4
+                    .fa.fa-newspaper-o
+                    .name 文章管理
+                  a(href=`/m/${data.column._id}/settings/contribute`).col-xs-4
+                    .fa.fa-bell-o
+                    .name 投稿通知
+                    if data.contributeCount > 0
+                      .contribute-count=data.contributeCount
+                .column-fast-set-btn 快捷设置&nbsp;
+                  .fa.fa-caret-down
+                .form.column-fast-set-body
+                  .form-group
+                    label 专栏背景
+                    input.form-control(data-control="selectColor" id="columnColor" value=data.column.color)
+                  .form-group
+                    button.btn.btn-block.btn-primary(onclick="saveSettings()") 保存
           div.m-b-2
             .column-user
               //-.column-header
@@ -43,23 +87,8 @@ block content
                     a.pointer(href=`javascript:subscribeUser("${data.column.uid}", false)` target="_blank") 取关
                   else
                     a.pointer(href=`javascript:subscribeUser("${data.column.uid}", true)` target="_blank") 关注
-              .column-user-description=data.column.user.description
-
-          if data.user && data.user.uid === data.column.uid
-            div.m-b-2
-              .column-management
-                .column-header
-                  .fa.fa-cog &nbsp;专栏管理
-                .row
-                  a(href=`/m/${data.column._id}/settings`).col-xs-4
-                    .fa.fa-wrench
-                    .name 资料设置
-                  a(href=`/m/${data.column._id}/settings/post`).col-xs-4
-                    .fa.fa-newspaper-o
-                    .name 文章管理
-                  a.col-xs-4
-                    .fa.fa-bell-o
-                    .name 投稿通知
+              if data.column.user.description
+                .column-user-description=data.column.user.description
           div.m-b-2
             .column-threads
               .column-header
@@ -70,5 +99,7 @@ block content
                 .fa.fa-fire &nbsp; 栏主推荐
 
 
-
+  .hidden#data=objToStr({columnId: data.column._id, color: data.column.color})
 block scripts
+  include ../publicModules/selectColor
+  +includeJS("/columns/column.js")

@@ -1,4 +1,4 @@
--const {type, post, thread} = columnPost
+-const {type, post, thread, category, columnId} = columnPost
 -const {firstPost} = thread;
 .column-post
   .column-post-body(class=thread.hasCover?"cover":"")
@@ -16,5 +16,4 @@
             span=post.user.username
         .column-post-time=fromNow(post.toc)
         .column-post-forums
-          for f in thread.forums
-            a.column-post-forum(href=`/f/${f.fid}`)= f.displayName
+          a.column-post-forum(href=`/m/${columnId}?t=${category._id}`)= category.name

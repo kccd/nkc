@@ -59,16 +59,30 @@ schema.statics.extendColumnPosts = async (columnPosts) => {
   const PostModel = mongoose.model("posts");
   const ThreadModel = mongoose.model("threads");
   const UserModel = mongoose.model("users");
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
   const pid = new Set();
   const tid = new Set();
   const uid = new Set();
+  const cid = new Set();
   const postsObj = {}, threadsObj = {};
   columnPosts.map(post => {
     pid.add(post.pid);
     tid.add(post.tid);
+    cid.add(post.cid);
   });
   let threads = await ThreadModel.find({tid: {$in: [...tid]}});
-  threads = await ThreadModel.extendThreads(threads, {htmlToText: true});
+  threads = await ThreadModel.extendThreads(threads, {
+    htmlToText: true,
+    category: false,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: true,
+    firstPostResource: false,
+    count: 150,
+    forum: false,
+    lastPost: false,
+    lastPostUser: false
+  });
   threads.map(thread => {
     threadsObj[thread.tid] = thread;
   });
@@ -81,6 +95,11 @@ schema.statics.extendColumnPosts = async (columnPosts) => {
   const users = await UserModel.find({uid: {$in: [...uid]}});
   users.map(user => {
     usersObj[user.uid] = user;
+  });
+  const categories = await ColumnPostCategoryModel.find({_id: {$in: [...cid]}});
+  const categoriesObj = {};
+  categories.map(c => {
+    categoriesObj[c._id] = c;
   });
   const results = [];
   for(let p of columnPosts) {
@@ -95,6 +114,7 @@ schema.statics.extendColumnPosts = async (columnPosts) => {
       p.post.user = usersObj[p.post.uid];
     }
     p.post.url = await PostModel.getUrl(p.pid);
+    p.category = categoriesObj[p.cid];
     results.push(p)
   }
   return results;

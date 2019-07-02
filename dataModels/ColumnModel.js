@@ -8,6 +8,10 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  color: {
+    type: String,
+    default: "#f4f4f4"
+  },
   toc: {
     type: Date,
     default: Date.now,
