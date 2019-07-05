@@ -27,8 +27,10 @@ router
     if(!banner) ctx.throw(400, "专栏Banner不能为空");
     if(!name) ctx.throw(400, "专栏名不能为空");
     if(contentLength(name) > 60) ctx.throw(400, "专栏名不能超过60字符");
-    const sameName = await db.ColumnModel.findOne({nameLowerCase: name.toLocaleString()});
+    let sameName = await db.ColumnModel.findOne({nameLowerCase: name.toLocaleString()});
     if(sameName) ctx.throw(400, "专栏名已存在，请更换");
+    sameName = await db.UserModel.findOne({usernameLowerCase: name.toLocaleString()});
+    if(sameName) ctx.throw(400, "专栏名与用户名冲突，请更换");
     if(!abbr) ctx.throw(400, "专栏名简介不能为空");
     if(contentLength(abbr) > 120) ctx.throw(400, "专栏简介不能超过120字符");
     // if(!description) ctx.throw(400, "专栏介绍不能为空");

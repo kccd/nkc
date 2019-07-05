@@ -48,7 +48,7 @@ const schema = new Schema({
   },
   description: {
     type:  String,
-    required: true
+    default: "",
   },
   // 是否关闭
   closed: {
