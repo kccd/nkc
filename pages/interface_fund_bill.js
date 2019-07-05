@@ -140,14 +140,18 @@ function submit(id) {
 
 function jump(obj){
 	if(obj.from.type === 'fundPool') {
-		window.location.href = '/fund/bills';
+		openToNewLocation('/fund/bills');
+		// window.location.href = '/fund/bills';
 	} else if(obj.from.type === 'fund') {
-		window.location.href = '/fund/list/'+obj.from.id+'/bills';
+		openToNewLocation('/fund/list/'+obj.from.id+'/bills')
+		// window.location.href = '/fund/list/'+obj.from.id+'/bills';
 	} else {
 		if(obj.to.type === 'fund') {
-			window.location.href = '/fund/list/'+obj.to.id+'/bills';
+			openToNewLocation('/fund/list/'+obj.to.id+'/bills')
+			// window.location.href = '/fund/list/'+obj.to.id+'/bills';
 		} else {
-			window.location.href = '/fund/bills';
+			openToNewLocation('/fund/bills')
+			// window.location.href = '/fund/bills';
 		}
 	}
 }

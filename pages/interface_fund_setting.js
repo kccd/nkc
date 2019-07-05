@@ -359,11 +359,14 @@ function submit(id) {
 		.then(function(data){
 			var fund = data.fund;
 			if(fundObj.disabled) {
-				window.location.href = '/fund/list';
+				// window.location.href = '/fund/list';
+				openToNewLocation('/fund/list')
 			} else if(fundObj.history) {
-				window.location.href = '/fund/history';
+				// window.location.href = '/fund/history';
+				openToNewLocation('/fund/history')
 			} else {
-				window.location.href = '/fund/list/'+fund._id.toLowerCase();
+				// window.location.href = '/fund/list/'+fund._id.toLowerCase();
+				openToNewLocation('/fund/list/'+fund._id.toLowerCase());
 			}
 		})
 		.catch(function(data){

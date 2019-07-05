@@ -79,4 +79,4 @@ if pageCount > 1
           input(type="number" id="paging_nav_input")
           |页
           button(
-            onclick=`var newPage = Number($("#paging_nav_input").val());window.location.href='${state.url}?page='+(newPage>0?newPage-1:0)+'${skipId || ''}${query}'`) 确定
+            onclick=`var newPage = Number($("#paging_nav_input").val());openToNewLocation('${state.url}?page='+(newPage>0?newPage-1:0)+'${skipId || ''}${query}')`) 确定

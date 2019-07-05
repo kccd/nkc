@@ -11,7 +11,8 @@ var app = new Vue({
       if(!confirm('确定要删除分类“'+name+'”?')) return;
       nkcAPI('/problem/type/' + cid, 'delete', {})
         .then(function() {
-          window.location.href = '/problem/list?cid=0';
+          // window.location.href = '/problem/list?cid=0';
+          openToNewLocation('/problem/list?cid=0');
         })
         .catch(function(data) {
           screenTopWarning(data.error || data);
@@ -42,7 +43,8 @@ var app = new Vue({
         })
     },
     addProblem: function(typeId) {
-      window.location.href = '/problem/add?cid=' + typeId;
+      // window.location.href = '/problem/add?cid=' + typeId;
+      openToNewLocation('/problem/add?cid=' + typeId)
     }
   }
 });

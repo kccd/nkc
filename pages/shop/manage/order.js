@@ -132,7 +132,8 @@ function openEditOrderModal(sellUid, orderId) {
  */
 function visitLogisticsInfo(sellUid,orderId) {
   var targetUrl = '/shop/manage/'+sellUid+'/order/logositics?orderId='+orderId;
-  window.location.href = targetUrl;
+  // window.location.href = targetUrl;
+  openToNewLocation(targetUrl);
 }
 
 

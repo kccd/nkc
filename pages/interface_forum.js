@@ -281,7 +281,8 @@ function fastVisit(value) {
 	var arr = value.split(':');
 	if(arr.length !== 2) return;
 	var fid = arr[1];
-	window.location.href = '/f/' + fid;
+  // window.location.href = '/f/' + fid;
+  openToNewLocation('/f/' + fid);
 }
 
 window.onresize = function() {

@@ -10,7 +10,8 @@ function submit(ordersId) {
     hiddenInput();
     $('#success').removeClass('hidden');
     setTimeout(function() {
-      window.location.href = '/shop/order';
+      // window.location.href = '/shop/order';
+      openToNewLocation('/shop/order');
     }, 3000);
   })
   .catch(function(data) {

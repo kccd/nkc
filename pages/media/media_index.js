@@ -289,8 +289,12 @@ function uploadFile() {
   }else{
     media.netWord = true;
     // var media.uploadFileList = media.uploadFileList;
-    if(media.uploadFileList.length == 0) return console.log("暂未选择任何文件");
-    if(media.uploadFileList.length > 50) return console.log("队列中文件数量不得超过50");
+    if(media.uploadFileList.length == 0) return screenTopWarning("暂未选择任何文件");
+    // if(media.uploadFileList.length > 50) {
+    //   media.uploadFileList = [];
+    //   media.uploadFileInfoArr = [];
+    //   return screenTopWarning("队列中文件数量不得超过50");
+    // }
     sendFile();
     function sendFile() {
       if(j >= media.uploadFileList.length){

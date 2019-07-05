@@ -14,6 +14,7 @@ $(function () {
       inputFrom = '';
       inputTo = '';
     }
-    window.location.href = '/e/behavior?&page=0&type=all' + inputFrom + inputTo + inputIp;
+    // window.location.href = '/e/behavior?&page=0&type=all' + inputFrom + inputTo + inputIp;
+    openToNewLocation('/e/behavior?&page=0&type=all' + inputFrom + inputTo + inputIp);
   })
 })

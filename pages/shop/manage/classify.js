@@ -8,7 +8,8 @@ function addClassify(storeId) {
     nkcAPI('/shop/manage/'+storeId+'/classify/add', "POST", {newClassifyName:newClassifyName})
     .then(function(data) {
       screenTopAlert("添加成功");
-      window.location.href = '/shop/manage/'+storeId+'/classify';
+      // window.location.href = '/shop/manage/'+storeId+'/classify';
+      openToNewLocation('/shop/manage/'+storeId+'/classify');
     })
     .catch(function(data) {
       screenTopWarning(data || data.error);
@@ -24,7 +25,8 @@ function delClassify(storeId, name) {
   nkcAPI('/shop/manage/'+storeId+'/classify/del', "POST", {classifyName:classifyName})
   .then(function(data) {
     screenTopAlert("删除成功");
-    window.location.href = '/shop/manage/'+storeId+'/classify';
+    // window.location.href = '/shop/manage/'+storeId+'/classify';
+    openToNewLocation('/shop/manage/'+storeId+'/classify');
   })
   .catch(function(data) {
     screenTopWarning(data || data.error)

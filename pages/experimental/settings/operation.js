@@ -55,7 +55,8 @@ function deleteOperationType(id) {
 	if(confirm('确认要删除当前分类？') === false) return;
 	nkcAPI('/e/settings/operation/'+ id, 'DELETE', {})
 		.then(function() {
-			window.location.href = '/e/settings/operation';
+			// window.location.href = '/e/settings/operation';
+			openToNewLocation('/e/settings/operation');
 		})
 		.catch(function(data) {
 			screenTopAlert(data.error || data);

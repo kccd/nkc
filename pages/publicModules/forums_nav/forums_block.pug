@@ -5,11 +5,11 @@
 
 
 div
-  if data.subForums && data.subForums.length >0
+  if state.subForums && state.subForums.length >0
     .forums-nav-header
       +listHeader("我关注的")
     .home-topic-item-div
-      for forum in data.subForums
+      for forum in state.subForums
         .forum-block
           .forum-block-info
             if forum.iconFileName
@@ -19,7 +19,7 @@ div
             a(href=`/f/${forum.fid}` title=`${forum.description}`).forum-block-name=forum.displayName
   .forums-nav-header
     +listHeader("话题")
-  for pf in data.forums
+  for pf in state.forumsTree
     if pf.forumType === "topic"
       .forum-block.hide-children
         .forum-block-info
@@ -41,7 +41,7 @@ div
                   a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName
   .forums-nav-header
     +listHeader("学科")
-  for pf in data.forums
+  for pf in state.forumsTree
     if pf.forumType === "discipline"
       .forum-block.hide-children
         .forum-block-info
@@ -61,4 +61,3 @@ div
                   else
                     .forum-block-icon(style=`background-color: ${cf.color}`)
                   a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName
-+includeJS("/publicModules/forums_nav/forums_block.js")

@@ -19,7 +19,8 @@ function submit(id) {
 			screenTopAlert('提交成功');
 			var url = data.redirect;
 			setTimeout(function() {
-				window.location.href = url;
+				// window.location.href = url;
+				openToNewLocation(url);
 			}, 1500);
 		})
 		.catch(function(data) {

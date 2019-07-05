@@ -31,7 +31,7 @@ router
     threads = await db.ThreadModel.extendThreads(threads, {
       lastPost: false,
       lastPostUser: false,
-      forum: false,
+      forum: true,
       category: false,
       firstPostResource: false
     });

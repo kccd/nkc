@@ -15,7 +15,8 @@ var app = new Vue({
   methods: {
     format: NKC.methods.format,
     search: function() {
-      window.location.href = "/e/log/recharge?t=" + app.t + "&content=" + app.content;
+      // window.location.href = "/e/log/recharge?t=" + app.t + "&content=" + app.content;
+      openToNewLocation("/e/log/recharge?t=" + app.t + "&content=" + app.content);
     }
   }
 });

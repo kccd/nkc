@@ -219,14 +219,18 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
     const {type, pid, targetPid, targetUid, tid, orderId, refundId, applicationFormId} = r.c;
     if(type === "at") {
       const post = await PostModel.findOne({pid: targetPid});
-      if(!post) continue;
+      if (!post) continue;
       const thread = await ThreadModel.findOne({tid: post.tid});
-      if(!thread) continue;
+      if (!thread) continue;
       const user = await UserModel.findOne({uid: targetUid});
-      if(!user) continue;
+      if (!user) continue;
       r.c.post = post;
       r.c.user = user;
       r.c.thread = thread;
+    } else if(type === "xsf") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      r.c.post = post;
     } else if(type === "digestPost") {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
@@ -273,13 +277,20 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       r.c.post = post;
     } else if(type === "replyThread") {
       const post = await PostModel.findOne({pid: targetPid});
-      if(!post) continue;
+      if (!post) continue;
       const thread = await ThreadModel.findOne({tid: post.tid});
-      if(!thread) continue;
+      if (!thread) continue;
+      const user = await UserModel.findOne({uid: post.uid});
+      if (!user) continue;
+      r.c.user = user;
+      r.c.thread = thread;
+      r.c.post = post;
+    } else if(type === "comment") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
       const user = await UserModel.findOne({uid: post.uid});
       if(!user) continue;
       r.c.user = user;
-      r.c.thread = thread;
       r.c.post = post;
     } else if(type === "userAuthApply") {
       const user = await UserModel.findOne({uid: targetUid});

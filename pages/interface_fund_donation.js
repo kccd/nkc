@@ -81,7 +81,8 @@ function ensureBill() {
 					if(bill.verify) {
 						$('#message').text('系统已确认，支付成功！');
 						setTimeout(function(){
-							window.location.href='/fund';
+							// window.location.href='/fund';
+							openToNewLocation('/fund');
 						}, 3000);
 					} else {
 						if(bill.error) {

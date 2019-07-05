@@ -68,8 +68,9 @@ router
     const {_id} = params;
     const questionDB = await db.QuestionModel.findOnly({_id});
     if(questionDB.disabled) ctx.throw(403, '试题已被屏蔽');
-    if(questionDB.auth !== null && !ctx.permission('modifyAllQuestions')) ctx.throw(403, '试题已被审核过了，无法修改');
-    const {type, public, auth} = questionDB;
+    if(questionDB.auth === true && !ctx.permission('modifyAllQuestions')) ctx.throw(403, '试题已被审核过了，无法修改');
+    let {type, auth, volume} = questionDB;
+    let publicQuestion = questionDB.public;
     const {fields, files} = body;
     const {file} = files;
     let {question} = fields;
@@ -79,11 +80,20 @@ router
       answer,
       fid
     } = question;
-    if(!public){
+    if(auth === false || auth === null) {
+      type = question.type;
+      publicQuestion = question.public;
+      volume = question.volume;
+      if(!type) ctx.throw(400, '答题方式不能为空');
+      if(!volume) ctx.throw(400, '试题难度不能为空');
+    }
+    if(!publicQuestion){
       if(!fid) ctx.throw(400, '专业领域不能为空');
       const forum = await db.ForumModel.findOne({fid});
       if(!forum) ctx.throw(404, '专业领域不存在，请重新选择');
-    } 
+    } else {
+      fid = "";
+    }
     if(content === '') ctx.throw(400, '试题内容不能为空');
     if(contentLength(content) > 500) ctx.throw(400, '试题内容字数不能超过500');
     // 检测试题答案数量是否正确、内容是否为空
@@ -100,6 +110,9 @@ router
     }
     const q = {
       fid,
+      type,
+      volume,
+      public: publicQuestion,
       content,
       answer,
       hasImage: false

@@ -22,7 +22,8 @@ var app = new Vue({
       this.error = '';
       kcAPI('/e/settings/role', 'POST', {role: role})
         .then(function() {
-          window.location.href = '/e/settings/role/' + role._id;
+          // window.location.href = '/e/settings/role/' + role._id;
+          openToNewLocation('/e/settings/role/' + role._id);
         })
         .catch(function(err) {
           app.error = err.error || err;

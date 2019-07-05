@@ -222,13 +222,14 @@ function redirect(url){
   var urlwithouthash = url.slice(0,url.indexOf('#'))
 
   var urlnow = urlnowpath+urlnowsearch
+  openToNewLocation(url)
 
-  if(urlnow==urlwithouthash){
-    window.location.href = url
-    window.location.reload()
-  }else{
-    window.location.href = url
-  }
+  // if(urlnow==urlwithouthash){
+  //   window.location.href = url
+  //   window.location.reload()
+  // }else{
+  //   window.location.href = url
+  // }
 }
 
 function nkcAPI(operationName,method,remainingParams){  //操作名，参数
@@ -882,7 +883,8 @@ function newForum(forumType) {
 		.then(function(data) {
 			screenTopAlert('新建成功，正在前往设置');
 			setTimeout(function() {
-				window.location.href = '/f/'+data.forum.fid+'/settings';
+        // window.location.href = '/f/'+data.forum.fid+'/settings';
+        openToNewLocation('/f/'+data.forum.fid+'/settings');
 			}, 1500);
 		})
 		.catch(function(data) {
@@ -898,7 +900,8 @@ function deleteForum(fid) {
 		.then(function() {
 			screenTopAlert('删除成功');
 			setTimeout(function() {
-				window.location.href = '/f';
+        // window.location.href = '/f';
+        openToNewLocation('/f');
 			}, 1500)
 		})
 		.catch(function(data) {
@@ -1053,6 +1056,7 @@ function credit(pid, type, kcb) {
           })
           .catch(function(data) {
             screenTopWarning(data.error)
+            button[1].removeAttribute("disabled");
           })
       } else if(type === 'kcb') {
 
@@ -1068,6 +1072,7 @@ function credit(pid, type, kcb) {
           })
           .catch(function(data) {
             screenTopWarning(data.error || data);
+            button[1].removeAttribute("disabled");
           });
       }
     }
@@ -1819,25 +1824,30 @@ function numToFloatTwo(str) {
 
 var nkcDrawerBodyTop = 0;
 
-function openNKCDrawer() {
-  $(".nkc-drawer").addClass("active");
-  $(".nkc-drawer-body").addClass("active");
-  $(".nkc-drawer-right").addClass("active");
+function openNKCDrawer(type) {
+  $(".nkc-drawer-"+type).addClass("active");
+  $(".nkc-drawer-"+type+"-body").addClass("active");
+  $(".nkc-drawer-"+type+"-mask").addClass("active");
+  if(type === "left") {
+    closeNKCDrawer("right");
+  } else {
+    closeNKCDrawer("left");
+  }
   stopBodyScroll(true);
 }
-function closeNKCDrawer() {
-  $(".nkc-drawer").removeClass("active");
-  $(".nkc-drawer-right").removeClass("active");
-  $(".nkc-drawer-body").removeClass("active");
+function closeNKCDrawer(type) {
+  $(".nkc-drawer-"+type).removeClass("active");
+  $(".nkc-drawer-"+type+"-mask").removeClass("active");
+  $(".nkc-drawer-"+type+"-body").removeClass("active");
   stopBodyScroll(false);
 }
 
-function toggleNKCDrawer() {
-  var nkcDrawer = $(".nkc-drawer");
+function toggleNKCDrawer(type) {
+  var nkcDrawer = $(".nkc-drawer-"+type);
   if(nkcDrawer.hasClass('active')) {
-    closeNKCDrawer();
+    closeNKCDrawer(type);
   } else {
-    openNKCDrawer();
+    openNKCDrawer(type);
   }
 }
 
@@ -1850,7 +1860,7 @@ function stopBodyScroll (isFixed) {
   if (isFixed) {
     nkcDrawerBodyTop = window.scrollY;
     bodyEl.style.position = 'fixed';
-    bodyEl.style.top = -nkcDrawerBodyTop + 'px'
+    bodyEl.style.top = -nkcDrawerBodyTop + 'px';
   } else {
     bodyEl.style.position = '';
     bodyEl.style.top = '';
@@ -2034,3 +2044,57 @@ function reviewPost(pid) {
       screenTopWarning(data);
     })
 }
+/*
+* 折叠首页、状态栏的专业列表
+* */
+function switchChildren(fid, e) {
+  var forumBlockChildren = $(".forum-block-children[data-fid='"+fid+"']");
+  forumBlockChildren.slideToggle();
+  var fa = $(e);
+  if(fa.hasClass("fa-angle-down")) {
+    fa.removeClass("fa-angle-down");
+    fa.addClass("fa-angle-up");
+  } else {
+    fa.removeClass("fa-angle-up");
+    fa.addClass("fa-angle-down");
+  }
+}
+
+function reload() {
+  window.location.reload();
+}
+
+
+function openToNewLocation(url) {
+  var apptype = localStorage.getItem("apptype");
+  if(apptype && apptype == "app") {
+    url = addApptypeToUrl(url)
+  }
+  window.location.href = url;
+}
+
+/**
+ * 给url添加apptype参数
+ * @param {*} urlStr 
+ */
+function addApptypeToUrl(url) {
+  var resultUrl = url.split("?")[0];
+  var paramStr = "";
+  var paramsArr;
+  var queryString = (url.indexOf("?") !== -1) ? url.split("?")[1] : "";
+  paramStr = resultUrl + "?apptype=app";
+  if(queryString !== "") {
+    paramsArr = queryString.split("&");
+    for(var i=0;i<paramsArr.length;i++) {
+      paramStr += ("&"+paramsArr[i]);
+    }
+  }
+  return paramStr;
+}
+
+/**
+ * 点击锚点跳转
+ */
+// function clickopenMaodian() {
+
+// }

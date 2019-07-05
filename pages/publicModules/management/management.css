@@ -1,0 +1,11 @@
+.module-management{
+  display: inline-block;
+  margin-right: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #7e8da0;
+}
+.module-management:hover, .module-management:focus{
+  text-decoration: none;
+  color: #282c37;
+}

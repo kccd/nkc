@@ -242,3 +242,8 @@ function verifyRemittance(number, id) {
 			screenTopWarning(data.error)
 		})
 }
+
+function openToEditFundApply(url) {
+	// window.location.href = url;
+	openToNewLocation(url)
+}

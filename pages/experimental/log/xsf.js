@@ -10,7 +10,8 @@ var app = new Vue({
     format: format,
     searchUser: function() {
       if(!this.searchText) return screenTopWarning('输入不能为空');
-      window.location.href = '/e/log/xsf?t=' + this.searchType + '&content=' + this.searchText;
+      // window.location.href = '/e/log/xsf?t=' + this.searchType + '&content=' + this.searchText;
+      openToNewLocation('/e/log/xsf?t=' + this.searchType + '&content=' + this.searchText);
     }
   },
   mounted: function() {

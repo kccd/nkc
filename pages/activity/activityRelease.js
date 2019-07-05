@@ -210,7 +210,8 @@ function submitRelease() {
 
   nkcAPI('/activity/release', "POST" ,{post:post})
   .then(function(data) {
-    window.location.href = "/activity/list";
+    // window.location.href = "/activity/list";
+    openToNewLocation("/activity/list");
   })
   .catch(function(data){
     

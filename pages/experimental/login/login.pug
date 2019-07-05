@@ -53,7 +53,8 @@ block scripts
             password: this.password,
           })
             .then(function(data) {
-              window.location.href = data.redirect;
+              //- window.location.href = data.redirect;
+              openToNewLocation(data.redirect);
             })
             .catch(function(data) {
               app.error = data.error || data;

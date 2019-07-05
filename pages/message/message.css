@@ -658,6 +658,18 @@ body, html{
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
+.mobile-header{
+  text-align: center;
+  position: fixed;
+  background-color: #ffffff;
+  z-index: 100;
+  width: 100%;
+  right: 0;
+  top: 0;
+  border-top: 1px solid #efefef;
+  padding: 0.2rem 0;
+  color: #888888;
+}
 .mobile-footer{
   text-align: center;
   position: fixed;

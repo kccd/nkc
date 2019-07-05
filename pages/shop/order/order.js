@@ -22,7 +22,8 @@ function cancelOrder(orderId) {
  */
 function visitLogisticsInfo(orderId) {
   var targetUrl = '/shop/order/'+orderId+'/logistics';
-  window.location.href = targetUrl;
+  // window.location.href = targetUrl;
+  openToNewLocation(targetUrl)
 }
 
 /**
@@ -47,7 +48,8 @@ function comfirmReceipt(orderId) {
  */
 function payNow(orderId) {
   var targetUrl = "/shop/pay?ordersId=" + orderId;
-  window.location.href = targetUrl;
+  // window.location.href = targetUrl;
+  openToNewLocation(targetUrl);
 }
 
 /**
@@ -57,5 +59,6 @@ function payNow(orderId) {
 // 取出商品所在得tid
 function joinToDiscuss(threadId) {
   var targetUrl = "/t/"+threadId;
-  window.location.href = targetUrl;
+  // window.location.href = targetUrl;
+  openToNewLocation(targetUrl);
 }

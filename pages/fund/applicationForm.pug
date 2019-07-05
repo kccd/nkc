@@ -35,8 +35,8 @@ block fundContent
                     h3.greenFontColor.text-center 已接受
                     p.text-center 等待申请人提交
                   when null
-                    a(href=`javascript: agree(${applicationForm._id})`).btn.btn-info.btn-block=`立即接受`
-                    a(href=`javascript: disagree(${applicationForm._id})`).btn.btn-danger.btn-block=`残忍拒绝`
+                    a(onclick=` agree(${applicationForm._id})`).btn.btn-info.btn-block=`立即接受`
+                    a(onclick=` disagree(${applicationForm._id})`).btn.btn-danger.btn-block=`残忍拒绝`
       //投票
       if displayVote
         .panel.panel-default
@@ -46,9 +46,9 @@ block fundContent
             br
             .row
               .col-xs-6.col-md-6
-                a(href=`javascript: support(${applicationForm._id})`).btn.btn-info.btn-block=`支持`
+                a(onclick=` support(${applicationForm._id})`).btn.btn-info.btn-block=`支持`
               .col-xs-6.col-md-6
-                a(href=`javascript: against(${applicationForm._id})`).btn.btn-danger.btn-block=`反对`
+                a(onclick=` against(${applicationForm._id})`).btn.btn-danger.btn-block=`反对`
             br
             if applicationForm.supporters.length !== 0
               h5=`${applicationForm.supporters.length}位用户表示支持`

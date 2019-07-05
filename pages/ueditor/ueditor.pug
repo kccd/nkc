@@ -11,20 +11,33 @@ script(type='text/javascript', src='/ueditor/ueditor.all.js')
 script(type='text/javascript', src='/ueditor/addMathFormulaDialog.js')
 //- script(type='text/javascript', src='/ueditor/ueditor.parse.js')
 // 实例化编辑器
+-if(state.apptype)
+  script.
+    window.localStorage.setItem("apptype", "app")
+-else
+  script.
+    window.localStorage.removeItem("apptype")
 script(type='text/javascript').
   // 根据不同页面传递不同参数
+  var apptype = window.localStorage.getItem("apptype");
+  var topOffsetValue;
+  if(apptype) {
+    topOffsetValue = 0
+  }else{
+    topOffsetValue = 50;
+  }
   var pathName = window.location.pathname;
   var initialFrameHeight = 200;
   var topOffset = 0;
   if(pathName.indexOf("editor") > -1) {
     initialFrameHeight = 500
-    topOffset = 50;
+    topOffset = topOffsetValue;
   }
   // 获取header高度
   var ue = UE.getEditor('container', {
     toolbars: [
       [
-        'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', 'inserttable', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|'
+        'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', 'inserttable', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
       ]
     ],
     maximumWords: 100000, // 最大字符数

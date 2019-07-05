@@ -1,25 +1,25 @@
 // var hostStr = "www.kechuang.org";
 var hostStr = "192.168.11.114";
 var realUrl = "";
-
+localStorage.setItem("apptype", "app");
+var allLinks = document.querySelectorAll("a");
+var allButtons = document.querySelectorAll("button");
+// 禁止点击连接执行跳转
+Array.prototype.forEach.call(allLinks, function(link) {
+  link.addEventListener("click", function(e) {
+    e.preventDefault();
+  })
+})
+// window.addEventListener("click", function(e) {
+//   console.log("禁止点击")
+//   e.preventDefault();
+// })
 $(document).ready(function() {
   // 获取url的apptype参数，要么为app，要么为false
   var apptype = getQueryVariable("apptype");
   if(apptype === "app") {
     // 去掉body的paddingTop
     $("body").css("padding-top", "0");
-    // 阻止全局的浏览器默认行为
-    window.addEventListener("click", function(e) {
-      e.preventDefault();
-    })
-    // window.addEventListener("beforeunload", function(e) {
-    //   console.log("beforeunload")
-    //   return console.log(document.location.href)
-    // })
-    // window.addEventListener("unload", function(e) {
-    //   console.log("unload")
-    //   return console.log(document.location.href)
-    // })
   }
 })
 
@@ -30,37 +30,58 @@ apiready = function() {
   var allLinks = document.querySelectorAll("a");
   Array.prototype.forEach.call(allLinks, function(link) {
     link.addEventListener("click", function() {
-      var isHostUrl = siteHostLink(this.href);
-      // 如果是本站链接则打开app内页，否则使用外站浏览页打开
-      if(isHostUrl) {
-        appOpenUrl(this.href);
-      }else{
-        api.openWin({
-          name: 'link',
-          url: 'widget://html/link/link.html',
-          pageParam: {
-              name: 'link',
-              linkUrl: this.href
+      if(this.href) {
+        var isHostUrl = siteHostLink(this.href);
+        // 如果是本站链接则打开app内页，否则使用外站浏览页打开
+        if(isHostUrl) {
+          var paramIndex = this.href.indexOf("?");
+          var newHref = "";
+          var equaiHref = false;
+          if(paramIndex > -1) {
+            newHref = (this.href).substring(0, paramIndex)
+          }else{
+            newHref = this.href;
           }
-        });
+          if(newHref.length > 0) {
+            if(api.winName.indexOf(newHref) > -1) {
+              equaiHref = true;
+            }
+          }
+          if(equaiHref) {
+            appFreshUrl(this.href);
+          }else{
+            appOpenUrl(this.href);
+          }
+        }else{
+          api.openWin({
+            name: 'link',
+            url: 'widget://html/link/link.html',
+            pageParam: {
+                name: 'link',
+                linkUrl: this.href
+            }
+          });
+        }
       }
     })
   })
   // 将本页的title和description传入app中
-  getSiteMeta()
+  var locationUrl = window.location.href;
+  var urlType = getShareTypeByUrl(locationUrl);
+  if(urlType !== "common") {
+    getSiteMeta();
+  }
 }
 
-
-
 /**
- * 使用api对象中的方法打开新连接
- * @param {} urlStr 
+ * 给url添加apptype参数
+ * @param {*} urlStr 
  */
-function appOpenUrl(urlStr) {
-  var resultUrl = urlStr.split("?")[0];
+function addApptypeToUrl(url) {
+  var resultUrl = url.split("?")[0];
   var paramStr = "";
   var paramsArr;
-  var queryString = (urlStr.indexOf("?") !== -1) ? urlStr.split("?")[1] : "";
+  var queryString = (url.indexOf("?") !== -1) ? url.split("?")[1] : "";
   paramStr = resultUrl + "?apptype=app";
   if(queryString !== "") {
     paramsArr = queryString.split("&");
@@ -68,12 +89,16 @@ function appOpenUrl(urlStr) {
       paramStr += ("&"+paramsArr[i]);
     }
   }
-  // var parmIndex = urlStr.indexOf("?");
-  // if(parmIndex > -1) {
-  //   urlStr = urlStr + "&apptype=app";
-  // }else{
-  //   urlStr = urlStr + "?apptype=app";
-  // }
+  return paramStr;
+}
+
+
+/**
+ * 使用api对象中的方法打开新连接
+ * @param {} urlStr 
+ */
+function appOpenUrl(urlStr) {
+  var paramStr = addApptypeToUrl(urlStr)
   // 如果是可以分享的类型则使用分享模板打开以便分享，否则使用其他模板打开
   var windowFile = "widget://html/common/commonInfo.html";
   var shareType = getShareTypeByUrl(paramStr);
@@ -83,6 +108,25 @@ function appOpenUrl(urlStr) {
   api.openWin({
     name: paramStr,
     url: windowFile,
+    pageParam: {
+      realUrl: paramStr,
+      shareType: shareType
+    }
+  })
+}
+
+/**
+ * 使用api对象中的方法刷新当前页面的的链接
+ * @param {*} key 
+ */
+function appFreshUrl(urlStr) {
+  var paramStr = addApptypeToUrl(urlStr)
+  var winName = api.winName;
+  var shareType = api.pageParam.shareType;
+  api.openFrame({
+    name: winName,
+    url: paramStr,
+    reload: true,
     pageParam: {
       realUrl: paramStr,
       shareType: shareType
@@ -122,8 +166,17 @@ function siteHostLink(urlStr) {
  * 获取当前页面的meta中的title和description
  */
 function getSiteMeta() {
-  var title = document.getElementsByTagName("title")[0].text;
-  var description = document.getElementsByName("description")[0].getAttribute("content");
+  var title, description;
+  try{
+    title = document.getElementsByTagName("title")[0].text;
+  }catch(e){
+    title = "来自科创论坛的分享";
+  }
+  try {
+    description = document.getElementsByName("description")[0].getAttribute("content");
+  }catch(e) {
+    description = "倡导科学理性，发展科技爱好";
+  }
   var para = {
     title: title,
     description: description

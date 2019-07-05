@@ -83,7 +83,8 @@ function deleteProblem(_id) {
 		.then(function() {
 			screenTopAlert('删除成功');
 			setTimeout(function(){
-				window.location.href = '/problem/list';
+				// window.location.href = '/problem/list';
+				openToNewLocation('/problem/list')
 			}, 1000);
 		})
 		.catch(function(data) {

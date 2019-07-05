@@ -955,6 +955,67 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
   return result;
 };
 
+/*
+* 获取专业树状结构，第二层和超过两层的都显示在第二层
+* @param {[object]} userRoles 用户的证书对象所组成的数组
+* @param {object} userGrade 用户的等级对象
+* @param {object} user 用户对象
+* @return {[Object]} 专业树状结构
+* @author pengxiguaa 2019-6-25
+* */
+forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => {
+  const ForumModel = mongoose.model("forums");
+  let fid = await ForumModel.visibleFid(userRoles, userGrade, user);
+  let forums = await ForumModel.find({
+    fid: {
+      $in: fid
+    }
+  }, {
+    fid: 1,
+    displayName: 1,
+    forumType: 1,
+    color: 1,
+    parentsId: 1,
+    iconFileName: 1,
+    description: 1
+  }).sort({order: 1});
+
+  const forumsObj = {};
+  forums = forums.map(forum => {
+    forum = forum.toObject();
+    forum.childrenForums = [];
+    forumsObj[forum.fid] = forum;
+    return forum;
+  });
+
+  const insertChildForums = (parentsId, forum) => {
+    const parentForums = [];
+    for(const id of parentsId) {
+      const f = forumsObj[id];
+      if(f) parentForums.push(f);
+    }
+    for(const f of parentForums) {
+      if(f.parentsId.length === 0) {
+        f.childrenForums.push(forum);
+      } else {
+        insertChildForums(f.parentsId, forum);
+      }
+    }
+  };
+
+  let tree = [];
+
+  for(const forum of forums) {
+    if(forum.parentsId.length === 0) {
+      tree.push(forum);
+    } else {
+      insertChildForums(forum.parentsId, forum);
+    }
+  }
+
+  return tree;
+};
+
 /**
  * 获取新的专业树形结构
  */
@@ -1056,6 +1117,14 @@ forumSchema.statics.getUserSubForums = async (uid, fid) => {
     fid: {
       $in: fids
     }
+  }, {
+    fid: 1,
+    displayName: 1,
+    forumType: 1,
+    color: 1,
+    parentsId: 1,
+    iconFileName: 1,
+    description: 1
   });
   const userSubForums = [];
   subForums.map(forum => {

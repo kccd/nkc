@@ -49,5 +49,6 @@ function searchLogs(){
     return
   }
   var url = '/e/log/public?' + "type=searchLog&" + "sTime="+sTime+"&" + "eTime="+eTime+"&" + "uid="+uid+"&" + "ip="+ip;
-  window.location.href = url;
+  // window.location.href = url;
+  openToNewLocation(url);
 }

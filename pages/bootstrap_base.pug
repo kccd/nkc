@@ -16,13 +16,19 @@ block head
   +includeCSS('/photoswipe/dist/default-skin/default-skin.css')
   +includeCSS('/nkc_styles.css')
   +includeCSS('/publicModules/public.css')
+  +includeCSS('/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css')
   block title
+    meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
   
 block body
-  if !state.apptype || state.apptype !== "app"
-    block navbar
-      include ./publicModules/navbar/navbar.pug
+  block navbar
+    if !state.apptype || state.apptype !== "app"
+      div
+        include ./publicModules/navbar/navbar.pug
+    else 
+      div
+        include ./publicModules/navbar/navLeftBar.pug
 
   block content
     h1 hello world!
@@ -58,7 +64,7 @@ block body
   +includeJS('/moment/locale/zh-cn.js')
   //- 新版common.js
   +includeJS('/publicModules/common.js')
-
+  +includeJS('/ueditor/third-party/SyntaxHighlighter/shCore.js')
   if data.user
     script!=`NKC.config.hasLogged = true;`
     //- 接入即时通信
@@ -97,5 +103,8 @@ block body
         }
       })
     }
+  script.
+    SyntaxHighlighter.all();
+  script.
     console.log('(c)2019 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')

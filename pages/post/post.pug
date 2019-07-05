@@ -69,7 +69,7 @@ block content
                   .options-fa.fa.fa-graduation-cap(onclick=`credit("${post.pid}", 'xsf')`) &nbsp;评学术分
                 if testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc)
                   if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
-                    .options-fa.fa.fa-edit(onclick=`window.location.href="/editor?type=post&id=${post.pid}"`) &nbsp;编辑
+                    .options-fa.fa.fa-edit(onclick=`openToNewLocation("/editor?type=post&id=${post.pid}")`) &nbsp;编辑
                 if disablePost
                   if data.thread.oc !== post.pid
                     .options-fa.fa.fa-eye-slash(onclick=`disablePostClick('${post.pid}', "post")` data-toggle="modal" data-target="#threadRecycleModal" data-whatever="@mdo") &nbsp;屏蔽
@@ -83,7 +83,7 @@ block content
                   a.options-fa(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
                     span.fa.fa-map-marker(style='margin-left: 2px;') &nbsp;IP
             span 发表于《
-            a(href=data.postUrl ).thread-title= post.thread.firstPost.t
+            a(href=data.postUrl )= post.thread.firstPost.t
             | 》
           if post.t
             div.ThreadTitle= post.t
@@ -107,7 +107,7 @@ block content
                   if c.type === 'xsf' && data.user && (c.operatorId === data.user.uid || data.userOperationsId.includes('cancelXsf'))
                     a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
           if post.disabled && disablePost
-            a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+            a(onclick=`enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
           .m-t-1.m-b-1
             a.pointer.m-r-1(href=`/t/${post.tid}#container`) 回复
             a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 评论

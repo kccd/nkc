@@ -49,7 +49,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         -let creditPost = post;
         include ./postCredits
         if post.disabled && disablePost
-          a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+          a(onclick=`enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
 
         //- 评论输入框 暂且只有作者能够首先发起评论，之后该条回复的用户才能接着评论
         div

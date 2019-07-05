@@ -1,11 +1,12 @@
 div.home-post-button
-  -let href = '/editor';
-  if data.forum
-    -href = `/editor?&type=forum&id=${data.forum.fid}`;
-  if !data.user
-    -href = `/login`;
-  a.btn-lg.btn-block(href=href style=`margin-bottom: 0.5rem;`)
-    if data.user
-      span.fa.fa-edit &nbsp;发表文章
-    else
-      span.fa.fa-login &nbsp;登录
+  if 1
+    -let href = '/editor';
+    if data.forum
+      -href = `/editor?&type=forum&id=${data.forum.fid}`;
+    if !data.user
+      -href = `/login`;
+    a.btn-lg.btn-block(href=href style=`margin-bottom: 0.5rem;`)
+      if data.user
+        span.fa.fa-edit &nbsp;发表文章
+      else
+        span.fa.fa-login &nbsp;登录

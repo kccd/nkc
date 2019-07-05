@@ -213,11 +213,13 @@ function getUser() {
 function submitApplicationMethod(last){
 	if(last) {
 		saveApplicationMethod(function() {
-			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+			// window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+			openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s-1));
 		})
 	} else {
 		saveApplicationMethod(function() {
-			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+			// window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+			openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s+1));
 		})
 	}
 }
@@ -348,11 +350,13 @@ function chooseBankCard() {
 function submitApplicantMessages(last) {
 	if(last) {
 		saveApplicantMessages(function(){
-			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+			// window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+			openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s-1));
 		});
 	} else {
 		saveApplicantMessages(function(){
-			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+			// window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+			openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s+1));
 		});
 	}
 }
@@ -427,18 +431,21 @@ function saveProject(callback) {
 
 function toEditor() {
 	saveProject(function(){
-		window.location.href = '/editor?type=application&id='+applicationFormId+'&cat=p';
+		// window.location.href = '/editor?type=application&id='+applicationFormId+'&cat=p';
+		openToNewLocation('/editor?type=application&id='+applicationFormId+'&cat=p');
 	});
 }
 
 function submitProject(last) {
 	if(last) {
 		saveProject(function() {
-			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+			// window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+			openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s-1));
 		});
 	} else {
 		saveProject(function() {
-			window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+			// window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+			openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s+1));
 		});
 	}
 	/*saveProject(id, function(){
@@ -935,13 +942,15 @@ function submitOtherMessages(last) {
 	if(last) {
 		savePurpose(function(){
 			saveThreadsList(function(){
-				window.location.href='/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+				openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s-1));
+				// window.location.href='/fund/a/'+applicationFormId+'/settings?s='+(s-1);
 			})
 		})
 	} else {
 		savePurpose(function(){
 			saveThreadsList(function(){
-				window.location.href='/fund/a/'+applicationFormId+'/settings?s='+(s+1);
+				openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s+1))
+				// window.location.href='/fund/a/'+applicationFormId+'/settings?s='+(s+1);
 			})
 		})
 	}
@@ -954,7 +963,8 @@ function submitApplicationForm() {
 	};
 	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
 		.then(function() {
-			window.location.href = '/fund/a/'+applicationFormId;
+			openToNewLocation('/fund/a/'+applicationFormId);
+			// window.location.href = '/fund/a/'+applicationFormId;
 			// screenTopAlert('提交成功！2s后跳转到申请表详情页面');
 			// setTimeout(function(){
 			// 	window.location.href = '/fund/a/'+applicationFormId;
@@ -970,7 +980,8 @@ function deleteApplicationForm(id) {
 	if(confirm(msg) === true) {
 		nkcAPI('/fund/a/'+id+'?type=delete', 'DELETE', {})
 			.then(function(data) {
-				window.location.href = '/fund/list/'+data.fund._id.toLowerCase();
+				openToNewLocation('/fund/list/'+data.fund._id.toLowerCase())
+				// window.location.href = '/fund/list/'+data.fund._id.toLowerCase();
 			})
 			.catch(function(data) {
 				screenTopWarning(data.error);
@@ -984,7 +995,8 @@ function chooseCategory(fid, displayName) {
 }
 
 function back(){
-	window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+	// window.location.href = '/fund/a/'+applicationFormId+'/settings?s='+(s-1);
+	openToNewLocation('/fund/a/'+applicationFormId+'/settings?s='+(s-1));
 }
 
 

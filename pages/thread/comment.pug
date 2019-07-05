@@ -70,7 +70,7 @@ if data.highlight === comment.pid
         .text-center [本条回复已被退回修改，请作者点击编辑按钮修改]
         p.text-center.text-danger= `退修原因：${comment.reason}`
     if comment.disabled && permission("disabledPost")
-      a(href=`javascript:enablePost('${comment.pid}')`) [此楼已屏蔽，点击解除]
+      a(onclick=`enablePost('${comment.pid}')`) [此楼已屏蔽，点击解除]
 
 
   include ./postEdit

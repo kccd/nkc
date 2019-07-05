@@ -132,13 +132,16 @@ var app = new Vue({
     },
     toEditor: function(q) {
       if(q && q._id) {
-        window.location.href = '/exam/editor?qid=' + q._id;
+        // window.location.href = '/exam/editor?qid=' + q._id;
+        openToNewLocation('/exam/editor?qid=' + q._id)
       } else if(this.category) {
-        window.location.href = '/exam/editor?cid=' + this.category._id;
+        // window.location.href = '/exam/editor?cid=' + this.category._id;
+        openToNewLocation('/exam/editor?cid=' + this.category._id)
       }
     },
     visitSettings: function(c) {
-      window.location.href = '/e/settings/exam?cid=' + c._id;
+      openToNewLocation('/e/settings/exam?cid=' + c._id)
+      // window.location.href = '/e/settings/exam?cid=' + c._id;
     },
     disabledQuestion: function(q, type) {
       var url = '/exam/question/' + q._id + '/disabled';
