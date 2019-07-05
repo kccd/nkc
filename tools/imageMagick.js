@@ -401,9 +401,6 @@ const turnVideo = async(inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath])
 }
 
-// 处理专栏头像
-const ColumnAvatar =
-
 module.exports = {
   imageExtTurn,
   avatarify,
