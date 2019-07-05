@@ -7,11 +7,11 @@ block content
       .col-xs-12.col-md-6.col-md-offset-3
         .text-center(@click="selectBanner" )
           .apply-column-banner(v-if="!bannerUrl")
-            .fa.fa-upload &nbsp; 上传背景
+            .fa.fa-upload &nbsp; 上传Banner
           img.apply-column-banner(v-else :src="bannerUrl")
         .text-center
           .apply-column-avatar(v-if="!avatarUrl" @click="selectAvatar" )
-            .fa.fa-upload &nbsp; 上传头像
+            .fa.fa-upload &nbsp; 上传Logo
           img.apply-column-avatar(v-else :src="avatarUrl" @click="selectAvatar" )
         .form
           .form-group

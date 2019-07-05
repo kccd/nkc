@@ -80,8 +80,8 @@ router
       if(sameName) ctx.throw(400, "专栏名已存在，请更换");
       if(!abbr) ctx.throw(400, "专栏名简介不能为空");
       if(contentLength(abbr) > 120) ctx.throw(400, "专栏简介不能超过120字符");
-      if(!description) ctx.throw(400, "专栏介绍不能为空");
-      if(contentLength(description) > 1000) ctx.throw(400, "专栏介绍不能超过1000字符");
+      // if(!description) ctx.throw(400, "专栏介绍不能为空");
+      // if(contentLength(description) > 1000) ctx.throw(400, "专栏介绍不能超过1000字符");
       if(notice) {
         if(contentLength(notice) > 600) ctx.throw(400, "公告通知不能超过600字符");
         notice = notice.replace(/!\[.*?]\(.*?\)/ig, "");

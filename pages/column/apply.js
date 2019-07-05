@@ -57,11 +57,11 @@ var app = new Vue({
       this.error = "";
       this.info = "";
       var column = this.column;
-      if(!this.avatar) return this.error = "请选择专栏头像";
-      if(!this.banner) return this.error = "请选择专栏背景";
+      if(!this.avatar) return this.error = "请选择专栏Logo";
+      if(!this.banner) return this.error = "请选择专栏Banner";
       if(!column.name) return this.error = "请输入专栏名";
       if(!column.abbr) return this.error = "请输入专栏简介";
-      if(!column.description) return this.error = "请输入专栏介绍";
+      // if(!column.description) return this.error = "请输入专栏介绍";
       var formData = new FormData();
       formData.append("avatar", this.avatar);
       formData.append("banner", this.banner);

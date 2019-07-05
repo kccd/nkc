@@ -88,7 +88,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     span.fa.fa-columns &nbsp;专栏
               else if data.user && state.columnPermission
                 li
-                  a(href=`/column`)
+                  a(href=`/column/apply`)
                     span.fa.fa-columns &nbsp;开设专栏
               li
                 a(href=`/message`)
@@ -258,6 +258,16 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           a(href=`/u/${data.user.uid}`)
             span.fa.fa-user-circle-o &nbsp;个人名片
             span.pull-right.fa.fa-angle-right
+        if state.userColumn
+          li
+            a(href=`/m/${state.userColumn._id}`)
+              span.fa.fa-columns &nbsp;专栏
+              span.pull-right.fa.fa-angle-right
+        else if data.user && state.columnPermission
+          li
+            a(href=`/column/apply`)
+              span.fa.fa-columns &nbsp;开设专栏
+              span.pull-right.fa.fa-angle-right
         li
           a(href=`/message`)
             span.fa.fa-envelope-o &nbsp;短消息

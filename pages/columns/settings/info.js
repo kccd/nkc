@@ -58,7 +58,7 @@ var app = new Vue({
       var column = this.column;
       if(!column.name) return this.error = "请输入专栏名";
       if(!column.abbr) return this.error = "请输入专栏简介";
-      if(!column.description) return this.error = "请输入专栏介绍";
+      // if(!column.description) return this.error = "请输入专栏介绍";
       var formData = new FormData();
       if(this.avatar) {
         formData.append("avatar", this.avatar);

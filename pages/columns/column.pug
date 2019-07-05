@@ -28,7 +28,7 @@ block content
             div
               ul.column-nav
                 li
-                  a(href=`/m/${data.column._id}`) 主页
+                  a(href=`/m/${data.column._id}`) 首页
                 li
                   a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
                     .fa.fa-caret-down
@@ -96,7 +96,7 @@ block content
                   if data.user && data.user.uid === data.column.uid
                     .m-t-1
                       | 点击
-                      a(href=`/u/${data.user.uid}` target="_blank")
+                      a(href=`/u/${data.user.uid}?t=thread` target="_blank")
                         b 个人名片页
                       | 头部的“管理”按钮，可批量将文章推送到专栏。
               else
