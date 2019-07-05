@@ -22184,9 +22184,10 @@ UE.plugins['tablesort'] = function () {
 UE.plugins['contextmenu'] = function () {
     var me = this;
     // me.setOpt('enableContextMenu',true);
-    if(me.getOpt('enableContextMenu') === false || !me.getOpt('enableContextMenu')){
-        return;
-    }
+    // if(me.getOpt('enableContextMenu') === false || !me.getOpt('enableContextMenu')){
+    //     return;
+    // }
+    return;
     var lang = me.getLang( "contextMenu" ),
             menu,
             items = me.options.contextMenu || [
