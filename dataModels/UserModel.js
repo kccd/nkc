@@ -1326,13 +1326,13 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
   if(!user.grade) await user.extendGrade();
   if(!userGrade.includes(user.grade._id)) return false;
   const userThreadCount = await mongoose.model("threads").count({
-    uid,
+    uid: user.uid,
     disabled: false,
-    recycleMark: false,
+    recycleMark: {$ne: true},
     reviewed: true
   });
   if(userThreadCount < threadCount) return false;
-  const count = await mongoose.model("threads").count({uid, digest: true, disabled: false, recycleMark: false, reviewed: true});
+  const count = await mongoose.model("threads").count({uid: user.uid, digest: true, disabled: false, recycleMark: {$ne: true}, reviewed: true});
   return count >= digestCount;
 };
 
@@ -1342,7 +1342,7 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
 * @return {Object} 专栏对象
 * */
 userSchema.statics.getUserColumn = async (uid) => {
-  return await mongoose.model("columns").findOne({uid});
+  return await mongoose.model("columns").findOne({uid, closed: false});
 };
 
 module.exports = mongoose.model('users', userSchema);

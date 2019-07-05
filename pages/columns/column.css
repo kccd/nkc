@@ -96,7 +96,7 @@ img.apply-column-banner{
   box-shadow: 0 0 5px 0 rgba(0,0,0,0.1);
 }
 .column-name{
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   font-size: 2rem;
   font-weight: 700;
 }
@@ -321,7 +321,7 @@ img.apply-column-banner{
   color: #9baec8;
 }
 .post-radio{
-  display: inline-block;
+  display: table-cell;
   vertical-align: top;
 }
 .post-radio .checkbox{
@@ -329,7 +329,15 @@ img.apply-column-banner{
   margin-bottom: 0;
 }
 .post-content{
-  display: inline-block;
+  display: table-cell;
+  padding-top: 0.5rem;
+  width: 10000px;
+}
+.column-settings-post .pull-right{
+  /*display: none;*/
+}
+.column-settings-post:hover .pull-right{
+  display: block;
 }
 .post-title{
   font-size: 1.3rem;
@@ -341,7 +349,10 @@ img.apply-column-banner{
   color: #2b90d9;
 }
 .post-info{
+  display: block;
+  width: 100%;
   font-size: 1rem;
+  padding: 0.5rem 0;
   color: #9baec8;
 }
 .column-settings-post{
@@ -376,8 +387,14 @@ img.apply-column-banner{
 .column-post{
   margin-bottom: 3rem;
 }
+.column-post:hover{
+  /*box-shadow: 0 0 10px 0 rgba(0,0,0,0.2);*/
+}
+.column-posts-body{
+  padding: 1rem 0;
+}
 .column-posts-body .column-post:last-child{
-  margin-bottom: 0.8rem;
+  margin-bottom: 0;
 }
 .column-post-cover{
   display: table-cell;
@@ -395,6 +412,7 @@ img.apply-column-banner{
 }
 .column-post-body.cover .column-post-abstract{
   vertical-align: top;
+  padding-top: 0.3rem;
   width: 10000px;
   display: table-cell;
 }
@@ -407,6 +425,27 @@ img.apply-column-banner{
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+.column-post-content.post{
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+.column-thread-author{
+  font-weight: 700;
+  color: #2b90d9;
+  margin-right: 0.5rem;
+}
+.column-post-management-abstract{
+  color: #9baec8;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+.column-thread-author img{
+  height: 18px;
+  margin-top: -1px;
+  width: 18px;
+  border-radius: 50%;
+  margin-right: 0.2rem;
 }
 .column-post-time{
   display: inline-block;
@@ -524,11 +563,10 @@ img.apply-column-banner{
   line-height: 2rem;
 }
 .column-category-list{
-  background-color: #f6f6f6;
+  background-color: #fefefe;
 }
 .column-category-li{
-  height: 4rem;
-  line-height: 4rem;
+  padding: 1rem 0;
   border-bottom: 1px solid #eee;
   border-radius: 3px;
   padding-left: 0.5rem;
@@ -538,14 +576,81 @@ img.apply-column-banner{
   color: #282c37;
 }
 .column-category-li .pull-right{
-  display: none;
+  /*display: none;*/
 }
 .column-category-li:hover .pull-right{
   display: block;
 }
-.column-category-li:hover{
-  background-color: #d9e1e8;
+.column-category-li:hover, .column-category-li.active{
+  background-color: #eee;
 }
 .column-category-children{
   margin-left: 1rem;
+}
+.column-posts-body-info{
+  text-align: center;
+  margin-top: -1rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #282c37;
+  /*background-color: #d9e1e8;*/
+}
+.column-category{
+  display: block;
+  height: 3rem;
+  line-height: 3rem;
+  color: #282c37;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #f6f6f6;
+}
+.column-category-count{
+  display: inline-block;
+}
+.column-categories .column-category:last-child{
+  border-bottom: none;
+}
+.column-category:hover, .column-category:focus{
+  text-decoration: none;
+  color: #282c37;
+}
+.column-category:hover, .column-category.active{
+  background-color: #f8f8f8;
+}
+.column-categories{
+  padding-top: 0.5rem;
+}
+.column-category-nav{
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+}
+.column-category-nav a{
+  font-size: 1.3rem;
+  color: #282c37;
+  font-weight: 700;
+}
+.column-category-nav a:hover, .column-category-nav a:focus{
+  text-decoration: none;
+  color: #2b90d9;
+}
+.column-category-nav span{
+  padding: 0.5rem;
+}
+.column-category-abbr{
+  color: #767778;
+}
+.column-transfer-user{
+  margin: 1rem 0;
+}
+.column-transfer-user img{
+  height: 2rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  width: 2rem;
+}
+.column-transfer-user span{
+  font-size: 1.2rem;
+  font-weight: 700;
 }

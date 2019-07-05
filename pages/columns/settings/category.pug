@@ -4,22 +4,28 @@ block columnTitle
 block settingsContent
   .hidden#data=objToStr({column: data.column, categoryTree: data.categoryTree, categoryList: data.categoryList})
   .row#app(v-cloak)
-    .col-xs-12.col-md-6
+    .col-xs-12.col-md-12
+      h4.m-b-1
+        a(href=`/m/${data.column._id}/settings/category/add`) 创建新分类
       .column-category-list(v-for="c, index in categoryList")
-        .column-category-li(@click="selectCategoryList(c)")
-          span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;
-          span(v-for='index in (c.level+1)') #
-          span(v-if="c.level >= 0") &nbsp;
-          span {{c.name}}
-            span(v-if="c.default") （默认）
-          .pull-right
-            button.btn.btn-default.btn-xs(@click="move('up', c)") 上移
-            button.btn.btn-default.btn-xs(@click="move('down', c)") 下移
-            button.btn.btn-default.btn-xs(@click="move('top', c)") 置顶
-            button.btn.btn-default.btn-xs(@click="move('bottom', c)") 置底
-      .m-t-1.text-center.m-b-4
-        button.btn.btn-default.btn-sm.p-l-1.p-r-1(@click="addCategory") 新建分类
-    .col-xs-12.col-md-6
+        .column-category-li
+          .row
+            .col-xs-12.col-md-6
+              span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;&nbsp;
+                //span(v-for='index in (c.level+1)') #
+                //span(v-if="c.level >= 0") &nbsp;
+              span {{c.name}}
+                span(v-if="c.default") （默认）
+            .col-xs-12.col-md-6
+
+              .text-right
+                a.btn.btn-default.btn-xs(:href="'/m/' + column._id + '/settings/category/' + c._id") 编辑
+                button.btn.btn-default.btn-xs(@click="move('up', c)") 上移
+                button.btn.btn-default.btn-xs(@click="move('down', c)") 下移
+                button.btn.btn-default.btn-xs(@click="move('top', c)") 移到顶部
+                button.btn.btn-default.btn-xs(@click="move('bottom', c)") 移到底部
+                button.btn.btn-danger.btn-xs(@click="remove(c)") 删除
+    //-.col-xs-12.col-md-12
       .form(v-if="category")
         .form-group(v-if="!category._id")
           h4
@@ -35,7 +41,7 @@ block settingsContent
           span {{getCategoryNameById(category.parentId)}}
 
           div
-            button.btn.btn-success.btn-sm(@click="category.parentId = ''") 作为主分类
+            button.btn.btn-default.btn-sm(@click="category.parentId = ''") 设置为主分类
             button.btn.btn-default.btn-sm(@click="selectCategory") 选择分类
 
         .form-group

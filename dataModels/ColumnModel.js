@@ -8,9 +8,24 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 专栏主上任记录 {uid: String, time: Date}
+  userLogs: {
+    type: Schema.Types.Mixed,
+    required: true
+  },
   color: {
     type: String,
-    default: "#f4f4f4"
+    default: "#f6f6f6"
+  },
+  topped: {
+    type: [Number],
+    default: [],
+    index: 1
+  },
+  // 专栏公告通知
+  notice: {
+    type: String,
+    default: ""
   },
   toc: {
     type: Date,
@@ -34,6 +49,12 @@ const schema = new Schema({
   description: {
     type:  String,
     required: true
+  },
+  // 是否关闭
+  closed: {
+    type: Boolean,
+    default: false,
+    index: 1
   },
   // 专栏的关注数
   subCount: {

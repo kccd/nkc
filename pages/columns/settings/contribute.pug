@@ -27,6 +27,8 @@ block settingsContent
             a(:href="'/t/' + c.tid" target="_blank") {{c.thread.firstPost.t}}
             .m-t-05(v-if="c.description")
               p 补充说明：{{c.description}}
+            .m-t-05(v-if="c.reason")
+              p 拒绝理由：{{c.reason}}
             .m-t-05
               div(v-if="c.passed === null")
                 .radio
@@ -36,13 +38,15 @@ block settingsContent
                   label
                     input(type="radio" :value="false" v-model="c.agree")
                     | 拒绝
-                .radio(v-if="c.agree")
-                  label(v-for="category in categories")
-                    input(type="radio" :value="category._id" v-model="c.cid")
-                    span.m-r-05 {{category.name}}
+                div(v-if="c.agree")
+                  .checkbox(v-for="category in categories")
+                    label
+                      span(v-for="index in category.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                      input(type="checkbox" :value="category._id" v-model="c.cid")
+                      span.m-r-05 {{category.name}}
                 .m-b-05(v-else-if="c.agree === false")
                   h5 拒绝理由（选填）
-                  textarea.form-control(rows=3 style="max-width:30rem")
+                  textarea.form-control(rows=3 style="max-width:30rem" v-model="c.reason")
                 button.btn.btn-success.btn-sm(v-if="c.agree !== ''" @click="submit(c)") 提交
               div(v-else-if="c.passed")
                 h5.text-success 已同意

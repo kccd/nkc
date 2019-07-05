@@ -1682,6 +1682,10 @@ span.thread-title-page{
   border: none;
   background-color: rgba(255,255,255,0.7);
 }
+.post-checkbox label{
+  display: none;
+  min-height: 15px;
+}
 @media (max-width: 346px) {
   .navbar-search{
     width: 9rem;

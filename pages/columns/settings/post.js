@@ -15,7 +15,7 @@ var app = new Vue({
 
     selectedColumnPostsId: [],
 
-    selectMul: false,
+    selectMul: true,
   },
   mounted: function() {
     if(this.categories.length !== 0) {
@@ -28,12 +28,15 @@ var app = new Vue({
     moveSelected: function() {
       var selectedColumnPostsId = this.selectedColumnPostsId;
       if(selectedColumnPostsId.length === 0) return screenTopWarning("请勾选需要处理的文章");
+      this.move(selectedColumnPostsId);
+    },
+    move: function(_id) {
       moduleToColumn.show(function(data) {
-        var categoryId = data.categoryId;
+        var categoriesId = data.categoriesId;
         nkcAPI("/m/" + app.column._id + "/post", "POST", {
           type: "moveById",
-          postsId: selectedColumnPostsId,
-          categoryId: categoryId
+          postsId: _id,
+          categoriesId: categoriesId
         })
           .then(function() {
             app.selectCategory(app.category);
@@ -43,10 +46,27 @@ var app = new Vue({
           .catch(function(data) {
             screenTopWarning(data);
           })
+      }, {
+        selectMul: true
       });
     },
+    movePost: function(type, id) {
+      nkcAPI("/m/" + this.column._id + "/post", "POST", {
+        type: type,
+        postsId: id,
+        categoryId: app.category._id
+      })
+        .then(function(data) {
+          if(data.columnTopped) app.column.topped = data.columnTopped;
+          if(data.categoryTopped) app.category.topped = data.categoryTopped;
+          app.getPosts();
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
+    },
     getCategories: function() {
-      nkcAPI("/m/" + this.column._id + "/category", "GET")
+      nkcAPI("/m/" + this.column._id + "/category?t=list", "GET")
         .then(function(data) {
           app.categories = data.categories;
         })
@@ -72,6 +92,22 @@ var app = new Vue({
     selectMulPosts: function() {
       this.selectMul = !this.selectMul;
       this.selectedColumnPostsId = [];
+    },
+    remove: function(_id) {
+      if(!confirm("确认要从专栏删除该文章？")) return;
+      nkcAPI("/m/" + this.column._id + "/post", "POST", {
+        type: "removeColumnPostById",
+        postsId: _id
+      })
+        .then(function() {
+          app.getCategories();
+          for(var i = 0 ; i < _id.length; i++) {
+            app.removePostById(_id[i]);
+          }
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
     },
     removeSelected: function() {
       if(!confirm("确认要从专栏删除已勾选的文章？")) return;
@@ -117,6 +153,7 @@ var app = new Vue({
     getPosts: function(page) {
       var cid = this.category._id;
       if(page === undefined) page = this.paging.page;
+      // this.columnPosts = [];
       nkcAPI("/m/" + this.column._id + "/post?cid=" + cid + "&page=" + page, "GET")
         .then(function(data) {
           app.columnPosts = data.columnPosts;
@@ -132,8 +169,6 @@ var app = new Vue({
         page: 0,
         buttonValue: []
       };
-      this.editInfo = false;
-      this.selectMul = false;
     },
     selectCategory: function(category) {
       this.init();

@@ -156,6 +156,9 @@ body{
 .single-post-info>*{
   display: inline;
 }
+.post-management-button{
+  display: none;
+}
 .post-time{
   color: #e85a71;
   font-size: 1.2rem;

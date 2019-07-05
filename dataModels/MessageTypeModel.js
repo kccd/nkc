@@ -89,6 +89,14 @@ const getDomByType = (t, app) => {
       return "item.c.applicationForm.code"
     } else if(t === "xsfCount") {
       return "item.c.num"
+    } else if(t === "columnContributeURL") {
+      return "'/m/' + item.c.column._id + '/settings/contribute'";
+    } else if(t === "userContributeURL") {
+      return "'/u/' + item.r + '/contribute'"
+    } else if(t === "columnURL") {
+      return "'/m/' + item.c.column._id"
+    } else if(t === "columnName") {
+      return "item.c.column.name"
     }
   } else {
     if(t === "threadTitle") {
@@ -143,6 +151,14 @@ const getDomByType = (t, app) => {
       return "item.c.applicationForm.code"
     } else if(t === "xsfCount") {
       return "item.c.num"
+    } else if(t === "columnContributeURL") {
+      return "'/m/' + item.c.column._id + '/settings/contribute'";
+    } else if(t === "userContributeURL") {
+      return "'/u/' + item.r + '/contribute'"
+    } else if(t === "columnURL") {
+      return "'/m/' + item.c.column._id"
+    } else if(t === "columnName") {
+      return "item.c.column.name"
     }
   }
 };

@@ -21,7 +21,7 @@ router
     const {contentLength} = tools.checkString;
     const {name, description, parentId} = body;
     if(!name) ctx.throw(400, "分类名不能为空");
-    if(contentLength(name) > 50) ctx.throw(400, "分类名不能超过50字符");
+    if(contentLength(name) > 20) ctx.throw(400, "分类名不能超过20字符");
     if(!description) ctx.throw(400, "分类简介不能为空");
     if(contentLength(description) > 100) ctx.throw(400, "分类简介不能超过100字符");
     const sameName = await db.ColumnPostCategoryModel.findOne({columnId: column._id, name});
@@ -39,6 +39,7 @@ router
     });
     await category.save();
     data.category = category;
+    await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })
   .patch("/", async (ctx, next) => {
@@ -59,12 +60,12 @@ router
     const {categoryId} = ctx.params;
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
-    const category = await db.ColumnPostCategoryModel.findById(categoryId);
+    const category = await db.ColumnPostCategoryModel.findOne({_id: categoryId});
     if(!category) ctx.throw(400, "分类不存在");
     const {contentLength} = tools.checkString;
     const {name, description, parentId} = body;
     if(!name) ctx.throw(400, "分类名不能为空");
-    if(contentLength(name) > 50) ctx.throw(400, "分类名不能超过50字符");
+    if(contentLength(name) > 20) ctx.throw(400, "分类名不能超过20字符");
     if(!description) ctx.throw(400, "分类简介不能为空");
     if(contentLength(description) > 100) ctx.throw(400, "分类简介不能超过100字符");
     const sameName = await db.ColumnPostCategoryModel.findOne({columnId: column._id, name, _id: {$ne: categoryId}});
@@ -78,6 +79,7 @@ router
       parentId,
       description
     });
+    await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })
   // 删除分类

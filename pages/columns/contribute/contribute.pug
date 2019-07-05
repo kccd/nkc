@@ -70,9 +70,10 @@ block content
                 h5
                   b 选择文章分类
                 div
-                  .radio.inline-block.m-r-1(v-for="c in categories")
+                  .checkbox(v-for="c in categories")
                     label
-                      input(type="radio" :value="c._id" v-model="categoryId")
+                      span(v-for="index in c.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                      input(type="checkbox" :value="c._id" v-model="categoriesId")
                       span {{c.name}}
               .form-group
                 h5

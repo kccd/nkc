@@ -4,6 +4,7 @@ const categoryRouter = require("./category");
 const settingsRouter = require("./settings");
 const postRouter = require("./post");
 const subscribeRouter = require("./subscribe");
+const statusRouter = require("./status");
 const contributeRouter = require("./contribute");
 router
   .use("/", async (ctx, next) => {
@@ -11,25 +12,43 @@ router
     const {_id} = params;
     const column = await db.ColumnModel.findById(_id);
     if(!column) ctx.throw(404, `未找到ID为${_id}的专栏`);
+    if(column.closed) ctx.throw(400, "专栏已关闭");
     data.column = column;
     await next();
   })
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
-    const {page = 0} = query;
+    const {page = 0, c} = query;
     ctx.template = "columns/column.pug";
     const {column, user} = data;
     data.column = await column.extendColumn();
-    const categories = await db.ColumnPostCategoryModel.find({columnId: column._id}).sort({toc: 1});
-    data.categories = await db.ColumnPostCategoryModel.extendCategories(categories);
     const q = {
       columnId: column._id
     };
+    const fidOfCanGetThread = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
+    const sort = {};
+    if(c) {
+      const category = await db.ColumnPostCategoryModel.findById(c);
+      if(category.columnId !== column._id) ctx.throw(400, `文章分类【${c}】不存在或已被专栏主删除`);
+      data.category = category;
+      data.categoriesNav = await db.ColumnPostCategoryModel.getCategoryNav(category._id);
+      const childCategoryId = await db.ColumnPostCategoryModel.getChildCategoryId(c);
+      childCategoryId.push(c);
+      q.cid = {$in: childCategoryId};
+      data.c = c;
+      data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread, c);
+      data.toppedId = data.category.topped;
+      sort[`order.cid_${category._id}`] = -1;
+    } else {
+      data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread);
+      data.toppedId = data.column.topped;
+      sort.toc = -1;
+    }
     const count = await db.ColumnPostModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const columnPosts = await db.ColumnPostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
-    data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts);
+    data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
     if(user) {
       const sub = await db.SubscribeModel.findOne({uid: user.uid, type: "column", columnId: column._id});
       data.subscribedColumn = !!sub;
@@ -41,7 +60,8 @@ router
         });
       }
     }
-
+    data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+    data.columnPostcount = await db.ColumnPostModel.count({columnId: column._id});
     await next();
   })
   .patch("/", async (ctx, next) => {
@@ -51,7 +71,7 @@ router
     const {files, fields} = body;
     const type = body.type || fields.type;
     if(!type) {
-      const {abbr, name, description, color} = fields;
+      let {abbr, name, description, color, notice} = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
       if(contentLength(name) > 60) ctx.throw(400, "专栏名不能超过60字符");
@@ -61,9 +81,15 @@ router
       if(contentLength(abbr) > 120) ctx.throw(400, "专栏简介不能超过120字符");
       if(!description) ctx.throw(400, "专栏介绍不能为空");
       if(contentLength(description) > 1000) ctx.throw(400, "专栏介绍不能超过1000字符");
+      if(notice) {
+        if(contentLength(notice) > 600) ctx.throw(400, "公告通知不能超过600字符");
+        notice = notice.replace(/!\[.*?]\(.*?\)/ig, "");
+        notice = notice.replace(/\[.*?]\(.*?\)/ig, "");
+      }
       await column.update({
         name,
         color,
+        notice,
         nameLowerCase: name.toLocaleString(),
         description,
         abbr
@@ -100,5 +126,6 @@ router
   .use("/post", postRouter.routes(), postRouter.allowedMethods())
   .use("/subscribe", subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use("/contribute", contributeRouter.routes(), contributeRouter.allowedMethods())
+  .use("/status", statusRouter.routes(), statusRouter.allowedMethods())
   .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods());
 module.exports = router;

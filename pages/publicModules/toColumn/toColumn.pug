@@ -9,10 +9,15 @@ if column
          .modal-body
            .text-center.m-t-3.m-b-3(v-if="loading") 加载中...
            div(v-else)
-             .radio(v-for="c in categories")
+             .radio(v-if="!selectMul" v-for="c in categories")
                label(v-if="excludes.indexOf(c._id) === -1")
                  span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;
                  input(type="radio" :value="c._id" v-model="categoryId")
+                 span {{c.name}}
+             .checkbox(v-else)
+               label(v-if="excludes.indexOf(c._id) === -1")
+                 span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;
+                 input(type="checkbox" :value="c._id" v-model="categoriesId")
                  span {{c.name}}
          .modal-footer
            button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消

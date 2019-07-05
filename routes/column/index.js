@@ -2,7 +2,18 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
+    if(!ctx.state.columnPermission) ctx.throw(403, "您的账号暂未满足开设专栏的条件");
     ctx.template = "column/column.pug";
+    const {data, db} = ctx;
+    const {user} = data;
+    const column = await db.ColumnModel.findOne({uid: user.uid});
+    if(column && !column.closed) {
+      let url = `/m/${column._id}`;
+      if(ctx.query.apptype === "app") {
+        url += "?apptype=app"
+      }
+      return ctx.redirect(url);
+    }
     await next();
   })
   .post("/", async (ctx, next) => {
@@ -25,6 +36,12 @@ router
     const column = db.ColumnModel({
       _id: await db.SettingModel.operateSystemID("columns", 1),
       uid: data.user.uid,
+      userLogs: [
+        {
+          uid: data.user.uid,
+          time: new Date()
+        }
+      ],
       name,
       nameLowerCase: name.toLocaleString(),
       abbr,
@@ -47,6 +64,19 @@ router
   .get("/apply", async (ctx, next) => {
     if(!ctx.state.columnPermission) ctx.throw(403, "您的账号暂未满足开设专栏的条件");
     ctx.template = "column/apply.pug";
+    const {data, db} = ctx;
+    const {user} = data;
+    const column = await db.ColumnModel.findOne({uid: user.uid});
+    if(column) {
+      let url = `/m/${column._id}`;
+      if(ctx.query.apptype === "app") {
+        url += "?apptype=app"
+      }
+      if(column.closed) {
+        await column.update({closed: false});
+      }
+      return ctx.redirect(url);
+    }
     await next();
   });
 module.exports = router;

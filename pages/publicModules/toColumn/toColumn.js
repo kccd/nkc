@@ -76,6 +76,8 @@ moduleToColumn.init = function(callback) {
       },
       hide: function() {
         $('#moduleToColumn').modal("hide");
+        this.categoryId = "";
+        this.categoriesId = [];
       },
       complete: function() {
         if(!this.categoryId) return screenTopWarning("请选择分类");
@@ -83,7 +85,8 @@ moduleToColumn.init = function(callback) {
         moduleToColumn.callback({
           categoryId: this.categoryId,
           columnId: this.columnId,
-          uid: this.uid
+          uid: this.uid,
+          categoriesId: this.categoriesId
         });
       }
     }

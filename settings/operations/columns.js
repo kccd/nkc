@@ -36,12 +36,26 @@ module.exports = {
         POST: "column_single_settings_contribute"
       },
       category: {
-        GET: "column_single_settings_post"
+        GET: "column_single_settings_post",
+        PARAMETER: {
+          GET: "column_single_settings_post"
+        }
+      },
+      transfer: {
+        GET: "column_single_settings_transfer",
+        POST: "column_single_settings_transfer"
+      },
+      close: {
+        GET: "column_single_settings_close",
+        POST: "column_single_settings_close"
       }
     },
     contribute: {
       GET: "column_single_contribute",
       POST: "column_single_contribute"
+    },
+    status: {
+      GET: "column_single_status"
     }
   }
 };

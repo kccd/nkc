@@ -23,11 +23,15 @@ var app = new Vue({
       var reason = c.reason;
       var cid = c.cid;
       var type = "agree";
-      if(!agree) type = "disagree";
+      if(!agree){
+        type = "disagree"
+      } else {
+        if(cid.length === 0) return screenTopWarning("请选择文章分类");
+      }
       nkcAPI("/m/" + this.column._id + "/settings/contribute", "POST", {
         contributesId: [c._id],
         reason: reason,
-        cid: cid,
+        categoriesId: cid,
         type: type
       })
         .then(function() {

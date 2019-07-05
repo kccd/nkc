@@ -5,6 +5,10 @@ const jsdiff = require('diff');
 const settings = require('../settings');
 moment.locale('zh-cn');
 const languages = require('../languages');
+
+const xss = require('xss');
+
+
 let filters = {
   markdown:render.commonmark_render,
   markdown_safe:render.commonmark_safe,

@@ -84,6 +84,12 @@ block content
       .col-xs-12.col-md-7
         .post-panel.b-s-10.m-b-2
           include ../publicModules/paging/user_card
+          if data.user && data.user.uid === data.targetUser.uid && state.userColumn
+            .paging-button
+              a.pointer.button.radius-left.radius-right(onclick="managementPosts()") 管理
+              span.post-management-button
+                a.pointer.button(onclick="selectAll()") 全选
+                a.pointer.button.radius-right(onclick="toColumn()") 推送到专栏
           include ../publicModules/paging/paging
           if data.t === "thread" || !data.t
             if data.posts.length === 0
@@ -153,5 +159,10 @@ block content
 block scripts
   include ../publicModules/vue_user_panel/vue_user_panel_float
   include ../publicModules/complaint/complaint
+  if state.userColumn
+    -const column = state.userColumn;
+    include ../publicModules/toColumn/toColumn
   +includeJS("/echarts/dist/echarts.min.js")
-  +includeJS("/user/summary.js")
+  if !data.t || data.paging.page !== 0
+    +includeJS("/user/summary.js")
+  +includeJS("/user/user.js")

@@ -9,8 +9,13 @@ const schema = new Schema({
     required: true
   },
   cid: {
-    type: String,
+    type: [Number],
     required: true
+  },
+  pid: {
+    type: String,
+    required: true,
+    index: 1
   },
   toc: {
     type: Date,

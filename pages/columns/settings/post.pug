@@ -5,27 +5,28 @@ block settingsContent
   #data.hidden=objToStr({categories: data.categories, column: data.column})
   .row#app(v-cloak)
     .col-xs-12.col-md-3.m-b-2
-      h5.text-center 文章分类
+      h5.text-center 专栏文章分类
       .column-settings-post-categories
         .column-settings-post-category(v-for="c in categories" @click="selectCategory(c)" :class="{'active': c === category}")
+          span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;&nbsp;
           span {{c.name}} {{c.default?"(默认)":""}}
             .pull-right
               span {{c.count || ""}}
               | &nbsp;
               .fa.fa-angle-right
-
-      .text-center.m-t-1
+      h5.text-center
+      //-.text-center.m-t-1
         button.btn.btn-default.btn-sm(@click="addCategory") 添加分类
     .col-xs-12.col-md-9
       div(v-if="category")
         div(v-if="!editInfo")
           .column-settings-category-name.h3.m-t-0 {{category.name}}
-            small &nbsp;{{category.default?"默认分类":""}}
-            span.p-l-1
-            .fa.fa-pencil(@click="editInfo = !editInfo") &nbsp;编辑
-            .fa.fa-trash(@click="removeCategory(category)" v-if="!category.default") &nbsp;删除
+            small &nbsp;{{category.default?"(默认)":""}}
+            //-span.p-l-1
+              .fa.fa-pencil(@click="editInfo = !editInfo") &nbsp;编辑
+              .fa.fa-trash(@click="removeCategory(category)" v-if="!category.default") &nbsp;删除
           p {{category.description}}
-        .form(v-else)
+        //-.form(v-else)
           .form-group
             label 分类名（不超过50字符）
             input.form-control(type="text" v-model.tirm="category.name")
@@ -41,11 +42,11 @@ block settingsContent
         div(v-else)
           div
             .paging-button
-              a.radius-left.button.pointer(@click="selectMulPosts" :class="{'active': selectMul, 'radius-right':!selectMul}") 管理
-              a.radius-right.button.pointer(@click="selectAll" v-if="selectMul") 全选
+              //-a.radius-left.button.pointer(@click="selectMulPosts" :class="{'active': selectMul, 'radius-right':!selectMul}") 管理
+              a.radius-right.radius-left.button.pointer(@click="selectAll" v-if="selectMul") 全选
             .paging-button(v-if="selectedColumnPostsId.length > 0")
               a.radius-left.button.pointer(@click="moveSelected") 移动
-              a.radius-right.button.pointer(@click="removeSelected") 删除
+              a.radius-right.button.pointer(@click="removeSelected") 撤稿
             .paging-button
               a.button.pointer(v-for="b, index in paging.buttonValue"
                 :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
@@ -58,16 +59,36 @@ block settingsContent
                   input(type="checkbox" :value="p._id" v-model="selectedColumnPostsId")
             .post-content
               a(:href="p.post.url" target="_blank").post-title {{p.thread.firstPost.t}}
-              .post-info
-                span.m-r-1 类型：{{p.type==="thread"?"文章":"回复"}}
-                span 时间：{{format("YYYY/MM/DD HH:mm:ss", p.top)}}
+            .column-post-management-abstract(v-if="p.type === 'post'") {{p.post.c}}...
+            .post-info
+              span.m-r-1 ID：{{p._id}}
+              span.m-r-1 来源：{{p.from==="own"?"自己":"投稿"}}
+              span.m-r-1 类型：{{p.type==="thread"?"文章":"回复"}}
+              span 时间：{{format("YYYY/MM/DD HH:mm:ss", p.top)}}
+            b.text-danger(v-if="p.thread.disabled") 文章已屏蔽，仅后台可见
+            b.text-danger(v-else-if="p.post.disabled") 回复已屏蔽，仅后台可见
+            b.text-danger(v-else-if="p.thread.recycleMark") 文章已退修，仅后台可见
+            b.text-danger(v-else-if="p.post.toDraft") 回复已退修，仅后台可见
+            b.text-danger(v-else-if="!p.thread.reviewed") 文章未审核，仅后台可见
+            b.text-danger(v-else-if="!p.post.reviewed") 回复未审核，仅后台可见
+            div.text-right
+              button.btn.btn-xs.btn-default(v-if="column.topped.indexOf(p._id) === -1" @click="movePost('columnTop', [p._id])") 首页置顶
+              button.btn.btn-xs.btn-default(v-else @click="movePost('unColumnTop', [p._id])") 取消首页置顶
+              button.btn.btn-xs.btn-default(v-if="category.topped.indexOf(p._id) === -1" @click="movePost('categoryTop', [p._id])") 分类置顶
+              button.btn.btn-xs.btn-default(v-else @click="movePost('unCategoryTop', [p._id])") 取消分类置顶
+              button.btn.btn-xs.btn-default(@click="movePost('categoryUp', p._id)") 上移
+              button.btn.btn-xs.btn-default(@click="movePost('categoryDown', p._id)") 下移
+              button.btn.btn-xs.btn-default(@click="movePost('categoryToTop', [p._id])") 上移到顶部
+              button.btn.btn-xs.btn-default(@click="movePost('categoryToBottom', [p._id])") 下移到底部
+              button.btn.btn-xs.btn-success(@click="move([p._id])") 移动
+              button.btn.btn-xs.btn-danger(@click="remove([p._id])") 撤稿
           div
             .paging-button
-              a.radius-left.button.pointer(@click="selectMulPosts" :class="{'active': selectMul, 'radius-right':!selectMul}") 管理
-              a.radius-right.button.pointer(@click="selectAll" v-if="selectMul") 全选
+              //-a.radius-left.button.pointer(@click="selectMulPosts" :class="{'active': selectMul, 'radius-right':!selectMul}") 管理
+              a.radius-right.button.pointer.radius-left(@click="selectAll" v-if="selectMul") 全选
             .paging-button(v-if="selectedColumnPostsId.length > 0")
               a.radius-left.button.pointer(@click="moveSelected") 移动
-              a.radius-right.button.pointer(@click="removeSelected") 删除
+              a.radius-right.button.pointer(@click="removeSelected") 撤稿
             .paging-button
               a.button.pointer(v-for="b, index in paging.buttonValue"
                 :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"

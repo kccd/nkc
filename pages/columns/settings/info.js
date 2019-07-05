@@ -66,6 +66,9 @@ var app = new Vue({
       if(this.banner) {
         formData.append("banner", this.banner);
       }
+      if(column.notice) {
+        formData.append("notice", column.notice);
+      }
       formData.append("name", column.name);
       formData.append("abbr", column.abbr);
       formData.append("description", column.description);

@@ -8,6 +8,17 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 内容来源 own: 自己, contribute: 投稿【, reprint: 转载】
+  from: {
+    type: String,
+    default: "own"
+  },
+  // 文章排序
+  order: {
+    type: Schema.Types.Mixed,
+    required: true,
+    index: 1
+  },
   // 对应内容的创建时间
   top: {
     type: Date,
@@ -32,8 +43,8 @@ const schema = new Schema({
   },
   // 专栏内的文章分类ID
   cid: {
-    type: Number,
-    default: null,
+    type: [Number],
+    default: [],
     index: 1
   },
   // 在专栏隐藏
@@ -54,7 +65,7 @@ const schema = new Schema({
 /*
 * 拓展专栏的内容
 * */
-schema.statics.extendColumnPosts = async (columnPosts) => {
+schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   if(columnPosts.length === 0) return [];
   const PostModel = mongoose.model("posts");
   const ThreadModel = mongoose.model("threads");
@@ -63,14 +74,25 @@ schema.statics.extendColumnPosts = async (columnPosts) => {
   const pid = new Set();
   const tid = new Set();
   const uid = new Set();
-  const cid = new Set();
+  let cid = [];
   const postsObj = {}, threadsObj = {};
   columnPosts.map(post => {
     pid.add(post.pid);
     tid.add(post.tid);
-    cid.add(post.cid);
+    cid = cid.concat(post.cid);
   });
-  let threads = await ThreadModel.find({tid: {$in: [...tid]}});
+  const threadMatch = {
+    tid: {
+      $in: [...tid]
+    }
+  };
+  if(fidOfCanGetThread) {
+    threadMatch.recycleMark = {$ne: true};
+    threadMatch.disabled = false;
+    threadMatch.reviewed = true;
+    threadMatch.mainForumsId = {$in: fidOfCanGetThread};
+  }
+  let threads = await ThreadModel.find(threadMatch);
   threads = await ThreadModel.extendThreads(threads, {
     htmlToText: true,
     category: false,
@@ -86,7 +108,15 @@ schema.statics.extendColumnPosts = async (columnPosts) => {
   threads.map(thread => {
     threadsObj[thread.tid] = thread;
   });
-  const posts = await PostModel.find({pid: {$in: [...pid]}});
+  const postMatch = {
+    pid: {$in: [...pid]}
+  };
+  if(fidOfCanGetThread) {
+    postMatch.toDraft = {$ne: true};
+    postMatch.disabled = false;
+    postMatch.mainForumsId = {$in: fidOfCanGetThread};
+  }
+  const posts = await PostModel.find(postMatch);
   posts.map(post => {
     postsObj[post.pid] = post;
     uid.add(post.uid);
@@ -96,7 +126,7 @@ schema.statics.extendColumnPosts = async (columnPosts) => {
   users.map(user => {
     usersObj[user.uid] = user;
   });
-  const categories = await ColumnPostCategoryModel.find({_id: {$in: [...cid]}});
+  const categories = await ColumnPostCategoryModel.find({_id: {$in: cid}});
   const categoriesObj = {};
   categories.map(c => {
     categoriesObj[c._id] = c;
@@ -105,19 +135,60 @@ schema.statics.extendColumnPosts = async (columnPosts) => {
   for(let p of columnPosts) {
     p = p.toObject();
     p.thread = threadsObj[p.tid];
+    if(!p.thread) continue;
     if(p.type === "thread") {
       p.post = p.thread.firstPost;
     } else {
       p.post = postsObj[p.pid];
+      if(!p.post) continue;
       p.post = p.post.toObject();
       p.post.c = obtainPureText(p.post.c, true, 200);
       p.post.user = usersObj[p.post.uid];
     }
     p.post.url = await PostModel.getUrl(p.pid);
-    p.category = categoriesObj[p.cid];
+    p.categories = [];
+    for(const id of p.cid) {
+      const c = categoriesObj[id];
+      if(c) {
+        p.categories.push(c);
+      }
+    }
     results.push(p)
   }
   return results;
+};
+/*
+* 生成在各分类的排序
+* */
+schema.statics.getCategoriesOrder = async (categoriesId) => {
+  const order = {};
+  const SettingModel = mongoose.model("settings");
+  for(const _id of categoriesId) {
+    order[`cid_${_id}`] = await SettingModel.operateSystemID('columnPostOrders', 1);
+  }
+  return order;
+};
+
+schema.statics.getToppedColumnPosts = async (columnId, fidOfCanGetThread, cid) => {
+  const ColumnPostModel = mongoose.model("columnPosts");
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const ColumnModel = mongoose.model("columns");
+  const column = await ColumnModel.findOne({_id: columnId});
+  if(!column) return [];
+  let columnPosts = [];
+  let columnPostsId = [];
+  if(!cid) {
+    columnPostsId = column.topped;
+  } else {
+    const category = await ColumnPostCategoryModel.findOne({_id: cid});
+    if(!category) return [];
+    columnPostsId = category.topped;
+  }
+  for(const _id of columnPostsId) {
+    const columnPost = await ColumnPostModel.findOne({_id});
+    if(columnPost) columnPosts.push(columnPost);
+  }
+  return await ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
 };
 
 module.exports = mongoose.model("columnPosts", schema);

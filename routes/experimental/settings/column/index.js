@@ -12,7 +12,7 @@ router
     const {body, db} = ctx;
     let {
       xsfCount, digestCount, userGrade,
-      contributeInfo, threadCount
+      contributeInfo, threadCount, transferInfo, closeColumnInfo
     } = body;
     xsfCount = parseInt(xsfCount);
     if(xsfCount < 0) ctx.throw(400, "学术分不能小于0");
@@ -25,6 +25,8 @@ router
       return !!g;
     }));
     if(!contributeInfo) ctx.throw(400, "投稿说明不能为空");
+    if(!transferInfo) ctx.throw(400, "专栏转让说明不能为空");
+    if(!closeColumnInfo) ctx.throw(400, "关闭专栏说明不能为空");
     await db.SettingModel.updateOne({
       _id: "column"
     }, {
@@ -33,7 +35,9 @@ router
         "c.digestCount": digestCount,
         "c.userGrade": userGrade,
         "c.contributeInfo": contributeInfo,
-        "c.threadCount": threadCount
+        "c.threadCount": threadCount,
+        "c.transferInfo": transferInfo,
+        "c.closeColumnInfo": closeColumnInfo
       }
     });
     await next();

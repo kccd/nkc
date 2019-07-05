@@ -49,7 +49,7 @@ module.exports = async (ctx, next) => {
 	  ctx.tools = tools;
 	  ctx.redis = redis;
     ctx.state = {
-      url: ctx.url.replace(/\?.*/ig, ""),
+      url: ctx.url.replace(/\?.*/ig, "")
     };
     ctx.settings = settings;
 	  ctx.data.site = settings.site;

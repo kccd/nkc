@@ -583,6 +583,9 @@
   "experimentalColumnSettings": "后台管理-专栏设置",
   "column_single_contribute": "向专栏投稿",
   "column_single_settings_contribute": "专栏主处理投稿申请",
+  "column_single_status": "专栏运营统计",
+  "column_single_settings_transfer": "专栏转让",
+  "column_single_settings_close": "关闭专栏",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

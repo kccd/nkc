@@ -32,9 +32,8 @@ var app = new Vue({
         app.category = c;
       }, 200)
     },
-    remove: function() {
+    remove: function(category) {
       if(!confirm("确认要删除该分类？")) return;
-      var category = this.category;
       nkcAPI("/m/" + this.column._id + "/category/" + category._id, "DELETE")
         .then(function() {
           app.initData(function() {

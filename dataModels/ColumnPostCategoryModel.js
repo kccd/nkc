@@ -7,6 +7,11 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  topped: {
+    type: [Number],
+    default: [],
+    index: 1
+  },
   order: {
     type: Number,
     default: 1000,
@@ -15,6 +20,11 @@ const schema = new Schema({
   parentId: {
     type: Number,
     default: null,
+    index: 1
+  },
+  level: {
+    type: Number,
+    default: 0,
     index: 1
   },
   default: {
@@ -105,4 +115,83 @@ schema.statics.getCategoryList = async (columnId) => {
   return arr;
 };
 
+schema.statics.findById = async (_id) => {
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const category = await ColumnPostCategoryModel.findOne({_id});
+  if(category) {
+    const categories = await ColumnPostCategoryModel.extendCategories([category]);
+    return categories[0];
+  }
+  return null;
+};
+
+schema.statics.getCategoryNav = async (_id) => {
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const category = await ColumnPostCategoryModel.findOne({_id});
+  if(!category) return [];
+  const categories = await ColumnPostCategoryModel.find({columnId: category.columnId});
+  const categoriesObj = {};
+  categories.map(c => {
+    categoriesObj[c._id] = c;
+  });
+  const arr = [];
+  const func = (category) => {
+    arr.unshift(category);
+    if(category.parentId) {
+      const parentCategory = categoriesObj[category.parentId];
+      if(parentCategory) func(parentCategory);
+    }
+  };
+  func(category);
+  return arr;
+};
+/*
+* 计算专栏文章分类的等级
+* @param {String} _id 专栏ID
+* */
+schema.statics.computeCategoryOrder = async (_id) => {
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const categoriesList = await ColumnPostCategoryModel.getCategoryList(_id);
+  await Promise.all(categoriesList.map(async c => {
+    await ColumnPostCategoryModel.updateOne({
+      _id: c._id
+    }, {
+      $set: {
+        level: c.level
+      }
+    });
+  }));
+};
+/*
+* 获取所有下级分类
+* @param {Number} categoryId 分类ID
+* @return [Object] 所有分类对象组成的数组
+* @author pengxiguaa 2019-7-5
+* */
+schema.statics.getChildCategory = async (categoryId) => {
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const category = await ColumnPostCategoryModel.findOne({_id: categoryId});
+  const results = [];
+  const categories = await ColumnPostCategoryModel.getCategoryList(category.columnId);
+  const func = (category) => {
+    for(const c of categories) {
+      if(c.parentId === category._id) {
+        results.push(c);
+        func(c);
+      }
+    }
+  };
+  func(category);
+  return results;
+};
+/*
+* 获取所有下级分类ID
+* @param {Number} categoryId 分类ID
+* @return [Object] 所有分类ID组成的数组
+* @author pengxiguaa 2019-7-5
+* */
+schema.statics.getChildCategoryId = async (categoryId) => {
+  const results = await mongoose.model("columnPostCategories").getChildCategory(categoryId);
+  return results.map(r => r._id);
+};
 module.exports = mongoose.model("columnPostCategories", schema);
