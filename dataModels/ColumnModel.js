@@ -60,6 +60,11 @@ const schema = new Schema({
   subCount: {
     type: Number,
     default: 0
+  },
+  // 自定义链接
+  links: {
+    type: Schema.Types.Mixed,
+    default: []
   }
 }, {
   collection: "columns"
@@ -92,5 +97,4 @@ schema.statics.extendColumns = async (columns) => {
   }
   return results;
 };
-
 module.exports = mongoose.model("columns", schema);

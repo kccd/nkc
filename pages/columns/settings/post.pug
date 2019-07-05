@@ -2,7 +2,7 @@ extends ./base
 block columnTitle
   title 内容管理
 block settingsContent
-  #data.hidden=objToStr({categories: data.categories, column: data.column})
+  #data.hidden=objToStr({categories: data.categories, column: data.column, count: data.count})
   .row#app(v-cloak)
     .col-xs-12.col-md-3.m-b-2
       h5.text-center 专栏文章分类
@@ -64,7 +64,9 @@ block settingsContent
               span.m-r-1 ID：{{p._id}}
               span.m-r-1 来源：{{p.from==="own"?"自己":"投稿"}}
               span.m-r-1 类型：{{p.type==="thread"?"文章":"回复"}}
-              span 时间：{{format("YYYY/MM/DD HH:mm:ss", p.top)}}
+              span.m-r-1 时间：{{format("YYYY/MM/DD HH:mm:ss", p.top)}}
+              span(v-if="category._id === 'all'") 分类：
+                span(v-for="c in p.categories") {{c.name}}&nbsp;
             b.text-danger(v-if="p.thread.disabled") 文章已屏蔽，仅后台可见
             b.text-danger(v-else-if="p.post.disabled") 回复已屏蔽，仅后台可见
             b.text-danger(v-else-if="p.thread.recycleMark") 文章已退修，仅后台可见
@@ -74,13 +76,14 @@ block settingsContent
             div.text-right
               button.btn.btn-xs.btn-default(v-if="column.topped.indexOf(p._id) === -1" @click="movePost('columnTop', [p._id])") 首页置顶
               button.btn.btn-xs.btn-default(v-else @click="movePost('unColumnTop', [p._id])") 取消首页置顶
-              button.btn.btn-xs.btn-default(v-if="category.topped.indexOf(p._id) === -1" @click="movePost('categoryTop', [p._id])") 分类置顶
-              button.btn.btn-xs.btn-default(v-else @click="movePost('unCategoryTop', [p._id])") 取消分类置顶
-              button.btn.btn-xs.btn-default(@click="movePost('categoryUp', p._id)") 上移
-              button.btn.btn-xs.btn-default(@click="movePost('categoryDown', p._id)") 下移
-              button.btn.btn-xs.btn-default(@click="movePost('categoryToTop', [p._id])") 上移到顶部
-              button.btn.btn-xs.btn-default(@click="movePost('categoryToBottom', [p._id])") 下移到底部
-              button.btn.btn-xs.btn-success(@click="move([p._id])") 移动
+              span.m-l-05(v-if="category && category._id !== 'all'")
+                button.btn.btn-xs.btn-default(v-if="category.topped.indexOf(p._id) === -1" @click="movePost('categoryTop', [p._id])") 分类置顶
+                button.btn.btn-xs.btn-default(v-else @click="movePost('unCategoryTop', [p._id])") 取消分类置顶
+                button.btn.btn-xs.btn-default(@click="movePost('categoryUp', p._id)") 上移
+                button.btn.btn-xs.btn-default(@click="movePost('categoryDown', p._id)") 下移
+                button.btn.btn-xs.btn-default(@click="movePost('categoryToTop', [p._id])") 上移到顶部
+                button.btn.btn-xs.btn-default(@click="movePost('categoryToBottom', [p._id])") 下移到底部
+              button.btn.btn-xs.btn-success(@click="move([p._id], p.cid)") 移动
               button.btn.btn-xs.btn-danger(@click="remove([p._id])") 撤稿
           div
             .paging-button

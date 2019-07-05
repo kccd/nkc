@@ -29,3 +29,7 @@ function saveSettings() {
       screenTopWarning(d)
     })
 }
+
+function openNewWindow(url) {
+  window.open(url);
+}

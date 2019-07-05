@@ -59,6 +59,7 @@ moduleToColumn.init = function(callback) {
         if(options) {
           this.exclude = options.exclude || [];
           this.selectMul = options.selectMul || false;
+          this.categoriesId = options.selectedCid || [];
         }
         $('#moduleToColumn').modal("show");
         nkcAPI("/m/" + this.columnId + "/category?t=list", "GET")

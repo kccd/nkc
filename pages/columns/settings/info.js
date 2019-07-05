@@ -69,6 +69,7 @@ var app = new Vue({
       if(column.notice) {
         formData.append("notice", column.notice);
       }
+      formData.append("links", JSON.stringify(column.links));
       formData.append("name", column.name);
       formData.append("abbr", column.abbr);
       formData.append("description", column.description);
@@ -83,6 +84,28 @@ var app = new Vue({
           app.info = "";
           app.error = data.error || data;
         })
+    },
+    addLink: function() {
+      this.column.links.push({
+        name: "",
+        url: ""
+      });
+    },
+    moveLink: function(type, index) {
+      if(type === "up") {
+        if(index === 0) return;
+        var lastLink = app.column.links[index-1];
+        Vue.set(app.column.links, index-1, app.column.links[index]);
+        Vue.set(app.column.links, index, lastLink);
+      } else if(type === "down") {
+        if((index + 1) === app.column.links.length) return;
+        var nextLink = app.column.links[index+1];
+        Vue.set(app.column.links, index+1, app.column.links[index]);
+        Vue.set(app.column.links, index, nextLink);
+      }
+    },
+    removeLink: function(index) {
+      this.column.links.splice(index, 1);
     }
   }
 });

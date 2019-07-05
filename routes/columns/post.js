@@ -7,13 +7,15 @@ router
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     const q = {
-      columnId: column._id,
-      cid
+      columnId: column._id
     };
+    const sort = {};
+    if(cid) {
+      q.cid = cid;
+      sort[`order.cid_${cid}`] = -1;
+    }
     const count = await db.ColumnPostModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const sort = {};
-    sort[`order.cid_${cid}`] = -1;
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts);
     data.paging = paging;
@@ -62,6 +64,7 @@ router
         await db.ColumnPostModel.remove({_id, columnId: column._id});
         await db.ColumnModel.update({_id: column._id}, {$pull: {topped: _id}});
       }
+      await db.ColumnPostCategoryModel.removeToppedThreads(column._id);
     } else if(type === "removeColumnPostByPid") { // 通过pid删除专栏内容
       for(const pid of postsId) {
         const post = await db.ColumnPostModel.findOne({columnId: column._id, pid});
@@ -70,6 +73,7 @@ router
           await db.ColumnModel.update({_id: column._id}, {$pull: {topped: post._id}});
         }
       }
+      await db.ColumnPostCategoryModel.removeToppedThreads(column._id);
     } else if(type === "moveById") { // 更改专栏内容分类
       if(!categoriesId || categoriesId.length === 0) ctx.throw(400, "文章分类不能为空");
       for(const _id of categoriesId) {
@@ -96,6 +100,7 @@ router
           }
         });
       }
+      await db.ColumnPostCategoryModel.removeToppedThreads(column._id);
     } else if(type === "columnTop") {
       for(const _id of postsId) {
         const p = await db.ColumnPostModel.findOne({columnId: column._id, _id});

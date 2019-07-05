@@ -191,7 +191,7 @@ threadRouter
 		await next();*/
 	})
 	.get('/:tid', async (ctx, next) => {
-		const {data, params, db, query, nkcModules, body} = ctx;
+		const {data, params, db, query, nkcModules, body, state} = ctx;
 		const ip = ctx.address;
 		let {token, paraId} = query;
 		let {page = 0, pid, last_page, highlight, step, t} = query;
@@ -386,6 +386,9 @@ threadRouter
 		// 若不是游客访问，加载用户的最新发表的文章
 		if(data.user) {
 			data.usersThreads = await data.user.getUsersThreads();
+			if(state.userColumn) {
+			  data.columnCategories = await db.ColumnPostCategoryModel.getCategoryList(state.userColumn._id);
+      }
 			if(thread.uid === data.user.uid) {
 			  // 标记未读的回复提醒为已读状态
         await db.MessageModel.clearMessageSTU({
@@ -666,7 +669,7 @@ threadRouter
 	})
 	.post('/:tid', async (ctx, next) => {
 		const {
-			data, nkcModules, params, db, body, address: ip
+			data, nkcModules, params, db, body, state, address: ip
 		} = ctx;
 		const {user} = data;
 
@@ -718,6 +721,7 @@ threadRouter
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post, postType} = body;
+		const {columnCategoriesId} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(postType === "comment" && post.c.length > 1000) {
       ctx.throw(400, "评论内容不能超过1000字符");
@@ -734,6 +738,11 @@ threadRouter
 
     data.post = _post;
 		data.targetUser = await thread.extendUser();
+
+		// 转发到专栏
+    if(columnCategoriesId.length > 0 && state.userColumn) {
+      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [data.thread.oc]);
+    }
 
 		// 生成记录
 		const obj = {

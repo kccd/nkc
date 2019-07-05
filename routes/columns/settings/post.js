@@ -6,6 +6,7 @@ router
     const {data, db} = ctx;
     const {column} = data;
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+    data.count = await db.ColumnPostModel.count({columnId: column._id});
     data.highlight = "post";
     await next();
   });

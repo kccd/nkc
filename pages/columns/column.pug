@@ -13,38 +13,64 @@ block columnTitle
 block content
   .column-banner-body
     .column-banner(style=`background-image:url(/m/${data.column._id}/banner)`)
-    .column
-      .column-info
+      .column
         .column-avatar
           img(src=`/m/${data.column._id}/avatar`)
-        .column-other-info
-          div
+        .column-info
+          .column-other-info
             .column-name=data.column.name
             .column-abbr=data.column.abbr
-          div
-            .column-sub-button.active
-              if !data.user || data.user.uid !== data.column.uid
-                a(href=data.user?`/m/${data.column._id}/contribute`:"/login" target="_blank")
-                  button 投稿
-              else
-                a(href="/editor?from=column" target="_blank")
-                  button 发表
-            .column-sub-button
-              //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
-              if !data.user
-                a(href="/login" target="_blank")
-                  button + 订阅
-              else
-                if data.subscribedColumn
-                  button(onclick=`subscribeColumn(${data.column._id}, false)`) 已订阅
+  div.m-t-2.box-shadow-panel
+    .column
+      div
+        .row
+          .col-xs-12.col-md-9
+            div
+              ul.column-nav
+                li
+                  a(href=`/m/${data.column._id}`) 主页
+                li
+                  a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
+                    .fa.fa-caret-down
+                  ul.dropdown-menu
+                    li
+                      a(href=`/m/${data.column._id}` style="overflow:hidden;")
+                        span 全部
+                    for c in data.categories
+                      li
+                        a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
+                          -for(var i = 0; i < c.level; i++)
+                            span &nbsp;&nbsp;&nbsp;&nbsp;
+                          span=c.name
+                    //li.divider(role="separator")
+                for link in data.column.links
+                  li
+                    a(onclick=`openNewWindow('${link.url}')`)= link.name
+          .col-xs-12.col-md-3
+            .column-button
+              .column-sub-button.active
+                if !data.user || data.user.uid !== data.column.uid
+                  a(href=data.user ? `/m/${data.column._id}/contribute`: "/login" target="_blank")
+                    button 投稿
                 else
-                  button(onclick=`subscribeColumn(${data.column._id}, true)`) + 订阅
-              if data.column.subCount > 0
-                span=data.column.subCount
+                  a(href="/editor?from=column" target="_blank")
+                    button 发表
+              .column-sub-button
+                //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
+                if !data.user
+                  a(href="/login" target="_blank")
+                    button + 订阅
+                else
+                  if data.subscribedColumn
+                    button(onclick=`subscribeColumn(${data.column._id}, false)`) 已订阅
+                  else
+                    button(onclick=`subscribeColumn(${data.column._id}, true)`) + 订阅
+                if data.column.subCount > 0
+                  span=data.column.subCount
   .container-fluid.max-width
     .column
       .row
-        .col-xs-12.col-md-8.m-b-1.box-shadow-panel.m-t-2
+        .col-xs-12.col-md-8.box-shadow-panel.m-t-2
           div
             if data.category
               .column-category-nav

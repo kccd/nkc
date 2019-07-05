@@ -8,6 +8,7 @@ router
     const {t} = query;
     if(t === "list") {
       data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+      data.count = await db.ColumnPostModel.count({columnId: column._id});
     } else {
       const categories = await db.ColumnPostCategoryModel.find({columnId: column._id}).sort({toc: 1});
       data.categories = await db.ColumnPostCategoryModel.extendCategories(categories);

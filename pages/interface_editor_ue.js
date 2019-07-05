@@ -110,6 +110,40 @@ function saveDraft() {
   })
 }
 
+/*
+* 转发到专栏
+* */
+function selectColumnCategories(dom, columnId) {
+  dom = $(dom);
+  var checked = dom.prop("checked");
+  if(checked) {
+    $("#postToColumn").show();
+  } else {
+    $("#postToColumn").hide();
+    $("#postToColumn input").prop("checked", false);
+  }
+}
+
+function getSelectedColumnCategoriesId() {
+  var columnCategoriesId = [];
+  if($("#checkboxToColumn").prop("checked")) {
+    var columnCategoriesDom = $("#postToColumn input");
+    if(columnCategoriesDom.length) {
+      for(var i = 0;  i < columnCategoriesDom.length; i++) {
+        var d = columnCategoriesDom.eq(i);
+        if(d.prop("checked")) {
+          columnCategoriesId.push(d.val());
+        }
+      }
+    }
+    if(columnCategoriesId.length === 0) {
+      geid('ButtonReply').disabled=false;
+      throw("请选择专栏文章分类");
+    }
+  }
+  return columnCategoriesId;
+}
+
 /**
  * 发表文章
  */
@@ -198,6 +232,12 @@ function onPost() {
     }catch(e) {
       screenTopWarning(e);
       return;
+    }
+    // 转发到专栏
+    try{
+      post.columnCategoriesId = getSelectedColumnCategoriesId();
+    } catch(err) {
+      return screenTopWarning(err);
     }
     for(var i in paperObj) {
       post[i] = paperObj[i]

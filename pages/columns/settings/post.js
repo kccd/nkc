@@ -1,4 +1,9 @@
 var data = getDataById("data");
+data.categories.unshift({
+  _id: "all",
+  name: "全部",
+  count: data.count,
+});
 var app = new Vue({
   el: "#app",
   data: {
@@ -30,7 +35,7 @@ var app = new Vue({
       if(selectedColumnPostsId.length === 0) return screenTopWarning("请勾选需要处理的文章");
       this.move(selectedColumnPostsId);
     },
-    move: function(_id) {
+    move: function(_id, selectedCid) {
       moduleToColumn.show(function(data) {
         var categoriesId = data.categoriesId;
         nkcAPI("/m/" + app.column._id + "/post", "POST", {
@@ -47,7 +52,8 @@ var app = new Vue({
             screenTopWarning(data);
           })
       }, {
-        selectMul: true
+        selectMul: true,
+        selectedCid: selectedCid
       });
     },
     movePost: function(type, id) {
@@ -68,6 +74,11 @@ var app = new Vue({
     getCategories: function() {
       nkcAPI("/m/" + this.column._id + "/category?t=list", "GET")
         .then(function(data) {
+          data.categories.unshift({
+            name: "全部",
+            count: data.count,
+            _id: "all"
+          });
           app.categories = data.categories;
         })
         .catch(function(data) {
@@ -153,8 +164,11 @@ var app = new Vue({
     getPosts: function(page) {
       var cid = this.category._id;
       if(page === undefined) page = this.paging.page;
-      // this.columnPosts = [];
-      nkcAPI("/m/" + this.column._id + "/post?cid=" + cid + "&page=" + page, "GET")
+      var url = "/m/" + this.column._id + "/post?page=" + page;
+      if(cid !== "all") {
+        url += "&cid=" + cid;
+      }
+      nkcAPI(url, "GET")
         .then(function(data) {
           app.columnPosts = data.columnPosts;
           app.paging = data.paging;

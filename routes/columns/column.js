@@ -18,7 +18,8 @@ router
   })
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
-    const {page = 0, c} = query;
+    let {page = 0, c} = query;
+    c = Number(c);
     ctx.template = "columns/column.pug";
     const {column, user} = data;
     data.column = await column.extendColumn();
@@ -71,7 +72,7 @@ router
     const {files, fields} = body;
     const type = body.type || fields.type;
     if(!type) {
-      let {abbr, name, description, color, notice} = fields;
+      let {abbr, name, description, color, notice, links = []} = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
       if(contentLength(name) > 60) ctx.throw(400, "专栏名不能超过60字符");
@@ -86,9 +87,25 @@ router
         notice = notice.replace(/!\[.*?]\(.*?\)/ig, "");
         notice = notice.replace(/\[.*?]\(.*?\)/ig, "");
       }
+      if(links) {
+        links = JSON.parse(links);
+        const links_ = [];
+        for(const link of links) {
+          const {name, url} = link;
+          if(!name) ctx.throw(400, "自定义链接名不能为空");
+          if(!url) ctx.throw(400, "自定义链接不能为空");
+          if(contentLength(name) > 20) ctx.throw(400, "自定义链接名不能超过20字节");
+          links_.push({
+            name,
+            url
+          });
+        }
+        links = links_;
+      }
       await column.update({
         name,
         color,
+        links,
         notice,
         nameLowerCase: name.toLocaleString(),
         description,

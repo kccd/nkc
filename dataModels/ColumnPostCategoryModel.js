@@ -194,4 +194,27 @@ schema.statics.getChildCategoryId = async (categoryId) => {
   const results = await mongoose.model("columnPostCategories").getChildCategory(categoryId);
   return results.map(r => r._id);
 };
+
+/*
+* 操作分类内容时，移除不在该分类下的置顶文章
+* @param {Number} columnId 专栏ID
+* */
+schema.statics.removeToppedThreads = async (columnId) => {
+  const ColumnPostCategories = mongoose.model("columnPostCategories");
+  const ColumnPostModel = mongoose.model("columnPosts");
+  const categories = await ColumnPostCategories.find({columnId});
+  await Promise.all(categories.map(async c => {
+    let {topped} = c;
+    const markId = [];
+    const columnPosts = await ColumnPostModel.find({_id: {$in: topped}});
+    for(const columnPost of columnPosts) {
+      if(!columnPost.cid.includes(c._id)) {
+        markId.push(columnPost._id);
+      }
+    }
+    topped = topped.filter(t => !markId.includes(t));
+    await c.update({topped});
+  }));
+};
+
 module.exports = mongoose.model("columnPostCategories", schema);

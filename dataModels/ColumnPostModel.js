@@ -191,4 +191,50 @@ schema.statics.getToppedColumnPosts = async (columnId, fidOfCanGetThread, cid) =
   return await ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
 };
 
+/*
+* 向专栏推送文章
+* @param {Number} columnId 专栏对象
+* @param {[Number]} categoriesId 专栏文章分类ID数组
+* @param [String] postsId postId数组
+* */
+schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const PostModel = mongoose.model("posts");
+  const ThreadModel = mongoose.model("threads");
+  const SettingModel = mongoose.model("settings");
+  const ColumnPostModel = mongoose.model("columnPosts");
+  const column = await mongoose.model("columns").findOne({_id: columnId});
+  if(!categoriesId || categoriesId.length === 0) throwErr(400, "文章分类不能为空");
+  const categoriesId_ = [];
+  for(const _id of categoriesId) {
+    const c = await ColumnPostCategoryModel.findOne({_id, columnId});
+    if(c) categoriesId_.push(_id);
+  }
+  for(const pid of postsId) {
+    let columnPost = await ColumnPostModel.findOne({columnId, pid});
+    const order = await ColumnPostModel.getCategoriesOrder(categoriesId);
+    if(columnPost) {
+      await columnPost.update({
+        cid: categoriesId,
+        order
+      });
+      continue;
+    }
+    const post = await PostModel.findOne({pid});
+    if(!post) continue;
+    const thread = await ThreadModel.findOne({tid: post.tid});
+    columnPost = ColumnPostModel({
+      _id: await SettingModel.operateSystemID("columnPosts", 1),
+      tid: thread.tid,
+      top: post.toc,
+      order,
+      pid,
+      type: thread.oc === pid? "thread": "post",
+      columnId: column._id,
+      cid: categoriesId_
+    });
+    await columnPost.save();
+  }
+};
+
 module.exports = mongoose.model("columnPosts", schema);

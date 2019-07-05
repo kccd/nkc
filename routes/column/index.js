@@ -51,8 +51,8 @@ router
       _id: await db.SettingModel.operateSystemID("columnPostCategories", 1),
       columnId: column._id,
       default: true,
-      name: "未分类",
-      description: "未分类的文章"
+      name: "默认分类",
+      description: "默认分类"
     });
     await nkcModules.file.saveColumnAvatar(column._id, avatar);
     await nkcModules.file.saveColumnBanner(column._id, banner);

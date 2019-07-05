@@ -384,6 +384,14 @@ function submit(tid){
 	// }
 	
 	geid('ButtonReply').disabled=true;
+
+  // 转发到专栏
+  try{
+    post.columnCategoriesId = getSelectedColumnCategoriesId();
+  } catch(err) {
+    return screenTopWarning(err);
+  }
+
 	return nkcAPI('/t/' + tid, 'POST', {
 		post:post,
 	})
@@ -900,4 +908,36 @@ function turnSearch(text) {
 		var url = "/search?c="+text;
 		window.location.href = url;
 	}
+}
+
+function selectColumnCategories(dom, columnId) {
+  dom = $(dom);
+  var checked = dom.prop("checked");
+  if(checked) {
+    $("#postToColumn").show();
+  } else {
+    $("#postToColumn").hide();
+    $("#postToColumn input").prop("checked", false);
+  }
+}
+
+
+function getSelectedColumnCategoriesId() {
+  var columnCategoriesId = [];
+  if($("#checkboxToColumn").prop("checked")) {
+    var columnCategoriesDom = $("#postToColumn input");
+    if(columnCategoriesDom.length) {
+      for(var i = 0;  i < columnCategoriesDom.length; i++) {
+        var d = columnCategoriesDom.eq(i);
+        if(d.prop("checked")) {
+          columnCategoriesId.push(d.val());
+        }
+      }
+    }
+    if(columnCategoriesId.length === 0) {
+      geid('ButtonReply').disabled=false;
+      throw("请选择专栏文章分类");
+    }
+  }
+  return columnCategoriesId;
 }

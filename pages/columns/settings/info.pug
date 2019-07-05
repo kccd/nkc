@@ -28,9 +28,22 @@ block settingsContent
           h4 公告通知（不超过600字符，支持部分markdown）
           textarea.form-control(rows=5 v-model.trim="column.notice")
         .form-group
+          h4 自定义链接
+          div
+            div(v-for="link,index in column.links")
+              .form-inline.m-t-05
+                label 链接{{index+1}}：
+                input.form-control(type="text" v-model="link.name" placeholder="链接名(不超过20字节)")
+                input.form-control(type="text" v-model="link.url" placeholder="链接")
+                button.btn.btn-sm.btn-default(@click="moveLink('up', index)") 上移
+                button.btn.btn-sm.btn-default(@click="moveLink('down', index)") 下移
+                button.btn.btn-sm.btn-danger(@click="removeLink(index)") 删除
+            .m-t-05
+              button.btn.btn-sm.btn-default(@click="addLink") 添加自定义链接
+        .form-group
           h5.text-danger(v-if="error") {{error}}
           h5.text-success(v-if="info") {{info}}
-          button.btn.btn-primary.btn-block(@click="submit") 提交
+          button.btn.btn-primary.btn-block(@click="submit") 保存
           .m-t-1.text-right
             a.m-r-1(href=`/m/${data.column._id}/settings/transfer`) 专栏转让
             a(href=`/m/${data.column._id}/settings/close`) 关闭专栏

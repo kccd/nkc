@@ -23,6 +23,14 @@
 .m-t-1{
   margin-top: 1rem;
 }
+@media (min-width: 768px) {
+  .m-t-md-2{
+    margin-top: 2rem;
+  }
+  .m-b-md-2{
+    margin-bottom: 2rem;
+  }
+}
 .m-t-2{
   margin-top: 2rem;
 }
@@ -1581,7 +1589,7 @@ span.thread-title-page{
 }
 .box-shadow-panel>*{
   box-shadow: 0 0 3px rgba(0,0,0,0.1);
-  padding: 1rem;
+  padding: 15px;
   background-color: #fff;
   border-radius: 3px;
 }
