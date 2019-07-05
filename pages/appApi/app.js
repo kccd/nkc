@@ -19,7 +19,9 @@ $(document).ready(function() {
   var apptype = getQueryVariable("apptype");
   if(apptype === "app") {
     // 去掉body的paddingTop
-    $("body").css("padding-top", "0");
+    if(location.pathname === "/") {
+      $("body").css("padding-top", "10px");
+    }
   }
 })
 

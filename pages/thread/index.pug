@@ -181,7 +181,7 @@ block content
       include ../module_digest
       .row
         .col-xs-12.col-md-9#wrap
-          .fullwidthpanel.ThreadBox.nkcpanel
+          .fullwidthpanel.ThreadBox.nkcpanel(style=`${state.apptype}?padding-top:0`)
             .row
               .thread-div
                 .col-xs-12.col-md-12
@@ -592,8 +592,9 @@ block scripts
   script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
   link(href=`/jquery-ui-1.10.4.custom.css?v=${global.NKC.startTime}` rel="stylesheet")
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
-  script.
-    common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
+  if !state.apptype
+    script.
+      common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
