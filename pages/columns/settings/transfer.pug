@@ -87,7 +87,7 @@ block scripts
             password: password
           })
             .then(function() {
-              window.location.href = "/m/" + app.column._id;
+              openToNewLocation("/m/" + app.column._id);
             })
             .catch(function(data) {
               app.error = data.error || data;
