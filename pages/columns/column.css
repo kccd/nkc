@@ -379,6 +379,7 @@ img.apply-column-banner{
 .column-post-title{
   display: -webkit-box;
   overflow: hidden;
+  word-break: break-all;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   max-height: 4.5rem;
@@ -436,7 +437,7 @@ img.apply-column-banner{
   margin-top: 1rem;
   overflow: hidden;
   color: #515d6d;
-
+  word-break: break-all;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;

@@ -126,6 +126,12 @@ block content
                   for targetUser in data.users
                     .col-xs-12.col-md-6
                       include ../publicModules/user_panel/user_panel_md
+          if data.user && data.user.uid === data.targetUser.uid && state.userColumn
+            .paging-button
+              a.pointer.button.radius-left.radius-right(onclick="managementPosts()") 管理
+              span.post-management-button
+                a.pointer.button(onclick="selectAll()") 全选
+                a.pointer.button.radius-right(onclick="toColumn()") 推送到专栏
           include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
         include ../module_scrollTo
