@@ -56,17 +56,17 @@ block title
         if postTo && !thread.closed
           if targetThread
             li
-              a(href=`#container`)
+              a(onclick="quotePostWithout()")
                 span.fa.fa-comment-o &nbsp;
                 span 回复
           else
             li
-              a(href=`javascript:quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
+              a(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
                 span.fa.fa-comment-o &nbsp;
                 span 回复
         if !thread.closed
           li
-            a(href=`javascript:at('${post.user.username}')`)
+            a(onclick=`at('${post.user.username}')`)
               span.fa.fa-at= ` ${post.user.username}`
         if targetThread && targetThread.oc === post.pid
           li
@@ -77,41 +77,41 @@ block title
 
           li
             if data.collected
-              a(href=`javascript: addColl('${thread.tid}')`)
+              a(onclick=`addColl('${thread.tid}')`)
                 span.fa.fa-folder-o &nbsp;已收藏
             else
-              a(href=`javascript: addColl('${thread.tid}')`)
+              a(onclick=`addColl('${thread.tid}')`)
                 span.fa.fa-folder-o &nbsp;加入收藏
           li
             if data.subscribed
-              a(href=`javascript: unSubThread('${thread.tid}')`)
+              a(onclick=`unSubThread('${thread.tid}')`)
                 span.fa.fa-bookmark-o &nbsp;取消关注
             else
-              a(href=`javascript: subThread('${thread.tid}')`)
+              a(onclick=`subThread('${thread.tid}')`)
                 span.fa.fa-bookmark-o &nbsp;关注
         if addCredit
           li
-            a(href=`javascript:credit('${post.pid}', 'xsf')`)
+            a(onclick=`credit('${post.pid}', 'xsf')`)
               span.fa.fa-graduation-cap &nbsp;
               span 评学术分
         if digestPost && !post.digest
           li
-            a(href=`javascript:digestPost("${post.pid}")`)
+            a(onclick=`digestPost("${post.pid}")`)
               span.fa.fa-star-o &nbsp;设为精选
         if unDigestPost && post.digest
           li
-            a(href=`javascript:unDigestPost("${post.pid}")`)
+            a(onclick=`unDigestPost("${post.pid}")`)
               span.fa.fa-star &nbsp;取消精选
         - var ownership = data.userOperationsId.includes('modifyOtherPosts')
         - ownership = ownership?true:(data.user.uid===post.uid)
         //-if addKcb && post.uid !== data.user.uid
           li
-            a(href=`javascript: credit("${post.pid}", 'kcb', ${data.user.kcb})`)
+            a(onclick=` credit("${post.pid}", 'kcb', ${data.user.kcb})`)
               span.fa.fa-thumbs-o-up &nbsp;
               span 鼓励
         if permission("postWarningPost")
           li
-            a(href=`javascript:openPostWarningDom("${post.pid}")`)
+            a(onclick=`openPostWarningDom("${post.pid}")`)
               span.fa.fa-ambulance &nbsp;建议修改
 
         if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
@@ -123,7 +123,7 @@ block title
                   span.fa.fa-edit &nbsp;编辑
         if disablePost && !targetThread
           li
-            a(href=`javascript:disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")`)
+            a(onclick=`disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")`)
               span.fa.fa-eye-slash &nbsp;退修或删除
         if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
           if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
@@ -134,11 +134,11 @@ block title
           li.divider
             if targetThread && targetThread.oc === post.pid
               li
-                a(href=`javascript:moduleComplaint.open("thread", "${thread.tid}")`)
+                a(onclick=`moduleComplaint.open("thread", "${thread.tid}")`)
                   span.fa.fa-minus-circle &nbsp;投诉
             else
               li
-                a(href=`javascript:moduleComplaint.open("post", "${post.pid}")`)
+                a(onclick=`moduleComplaint.open("post", "${post.pid}")`)
                   span.fa.fa-minus-circle &nbsp;投诉
         li.divider
         li
@@ -189,7 +189,7 @@ block content
       include ../module_digest
       .row
         .col-xs-12.col-md-9#wrap
-          .fullwidthpanel.ThreadBox.nkcpanel
+          .fullwidthpanel.ThreadBox.nkcpanel(style=`${state.apptype}?padding-top:0`)
             .row
               .thread-div
                 .col-xs-12.col-md-12
@@ -206,7 +206,7 @@ block content
                             -canManagement = true;
                             -break;
                         if data.isModerator && canManagement
-                          a(href=`javascript:displayManagement();` style='text-decoration: none;float: right;')
+                          a(onclick="displayManagement();" style='text-decoration: none;float: right;')
                             .highlight.fa.fa-cog
                       if data.user
                         div.managementDiv(style='display: none;margin-top: 1rem;')
@@ -282,11 +282,11 @@ block content
                               span(style="margin-right:10px;font-weight: bold;")
                                 if auth.kcid.length > 0
                                   span(style="cursor: pointer;" onclick=`turnUser(${auth.kcid})`)!=`${auth.name}`
-                                  if auth.agencyIndex
+                                  if auth.agencyIndex && agencyAddArray.length > 1
                                     sup!=`${auth.agencyIndex}`
                                 else
                                   span!=`${auth.name}`
-                                  if auth.agencyIndex
+                                  if auth.agencyIndex && agencyAddArray.length > 1
                                     sup!=`${auth.agencyIndex}`
                                 if auth.isContract
                                   span(class="dropdown")
@@ -400,7 +400,7 @@ block content
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
                       if post.disabled && disablePost
-                        a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+                        a(onclick=`enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
                       .m-t-05
                         span 来自&nbsp;
                         for forum, index in thread.forums
@@ -430,26 +430,27 @@ block content
                                     p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
                                     .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
                                     p.lighttext.airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
-                                  div.changeDisNone.text-center(style='width: 100%;')
-                                    .col-xs-12.col-md-12
-                                      .col-xs-3.col-md-3(style="padding:0px")
-                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                          img(src="/default/QQ.png" style="")
-                                      .col-xs-3.col-md-3(style="padding:0px")
-                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qzone', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                          img(src="/default/qzone.png" style="")
-                                      .col-xs-3.col-md-3(style="padding:0px")
-                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weibo', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                          img(src="/default/weibo.png" style="")
-                                      .col-xs-3.col-md-3(style="padding:0px")
-                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                          img(src="/default/weChat.png" style="")
-                                    .col-xs-12.col-md-12
-                                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`) 获取分享链接
-                                    .col-xs-12.col-md-12(id=`copyArea${thread.tid}` style="display:none")
-                                      input(type="text", id=`copyLink${thread.tid}`, name=`copyLink${thread.tid}` style="width:inherit")
-                                      button(onclick=`copyLink('${thread.tid}')` id=`copyButton${thread.tid}`) 复制
-                                    canvas#threadQrcode.inline-block(style="display:none")
+                                  if !state.apptype
+                                    div.changeDisNone.text-center(style='width: 100%;')
+                                      .col-xs-12.col-md-12
+                                        .col-xs-3.col-md-3(style="padding:0px")
+                                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
+                                            img(src="/default/QQ.png" style="")
+                                        .col-xs-3.col-md-3(style="padding:0px")
+                                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qzone', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
+                                            img(src="/default/qzone.png" style="")
+                                        .col-xs-3.col-md-3(style="padding:0px")
+                                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weibo', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
+                                            img(src="/default/weibo.png" style="")
+                                        .col-xs-3.col-md-3(style="padding:0px")
+                                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
+                                            img(src="/default/weChat.png" style="")
+                                      .col-xs-12.col-md-12
+                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`) 获取分享链接
+                                      .col-xs-12.col-md-12(id=`copyArea${thread.tid}` style="display:none")
+                                        input(type="text", id=`copyLink${thread.tid}`, name=`copyLink${thread.tid}` style="width:inherit")
+                                        button(onclick=`copyLink('${thread.tid}')` id=`copyButton${thread.tid}`) 复制
+                                      canvas#threadQrcode.inline-block(style="display:none")
                           if data.user
                             +postOptions(thread.firstPost, thread, 0)
           .fullwidthpanel.ThreadBox.nkcpanel
@@ -555,9 +556,10 @@ block content
                         include ../exam_notification.pug
 
                     else
-                      .col-xs-12.col-md-12
-                        :markdown
-                          想参与大家的讨论？现在就 [登录](/login) 或者 [注册](/register)。
+                      if !state.apptype
+                        .col-xs-12.col-md-12
+                          :markdown
+                            想参与大家的讨论？现在就 [登录](/login) 或者 [注册](/register)。
 
         .col-xs-12.col-md-3
           .hidden-xs.hidden-sm#rightDom
@@ -607,8 +609,9 @@ block scripts
   script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
   link(href=`/jquery-ui-1.10.4.custom.css?v=${global.NKC.startTime}` rel="stylesheet")
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
-  script.
-    common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
+  if !state.apptype
+    script.
+      common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
@@ -617,8 +620,8 @@ block scripts
   script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
   //- script(src=`/interface_attachment_uploader.js?v=${global.NKC.startTime}`)
   //- script(type='text/jsx;harmony=true' src=`/interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
-  script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
-  script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)
+  //- script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
+  //- script(type="text/javascript" src=`/newEditor_reply.js?v=${global.NKC.startTime}`)
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
   include ../publicModules/complaint/complaint

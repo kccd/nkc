@@ -82,7 +82,8 @@ function displaySelect1() {
 			var childrenForums = getChildrenForums1(selectedArr[i]);
 			if(childrenForums.length === 0) {
 				if(disabledCategory) {
-					return window.location.href = '/f/'+selectedArr[i]+'/settings';
+					// return window.location.href = '/f/'+selectedArr[i]+'/settings';
+					return openToNewLocation('/f/'+selectedArr[i]+'/settings');
 				}
 				var types = getThreadTypes1(selectedArr[i]);
 				types.push({name: '不分类', cid: ''});

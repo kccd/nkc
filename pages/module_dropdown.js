@@ -85,7 +85,8 @@ function displaySelect() {
 			var childrenForums = getChildrenForums(selectedArr[i]);
 			if(childrenForums.length === 0) {
 				if(disabledCategory) {
-					return window.location.href = '/f/'+selectedArr[i]+'/settings';
+					// return window.location.href = '/f/'+selectedArr[i]+'/settings';
+					return openToNewLocation('/f/'+selectedArr[i]+'/settings');
 				}
 				if(!noShowCategory){
 					var types = getThreadTypes(selectedArr[i]);

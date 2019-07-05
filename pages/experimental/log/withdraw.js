@@ -15,7 +15,8 @@ var app = new Vue({
   methods: {
     format: NKC.methods.format,
     search: function() {
-      window.location.href = "/e/log/withdraw?t=" + app.t + "&content=" + app.content;
+      // window.location.href = "/e/log/withdraw?t=" + app.t + "&content=" + app.content;
+      openToNewLocation("/e/log/withdraw?t=" + app.t + "&content=" + app.content);
     },
     success: function(record) {
       if(confirm("此操作将会把“调用接口”的状态改为“成功”，确定要继续吗？") === false) return;

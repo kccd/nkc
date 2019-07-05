@@ -385,7 +385,8 @@ function productToShelf(uid) {
   .then(function(data) {
     screenTopAlert("上架成功");
     var targetUrl = '/shop/manage/' + uid + '/goodslist';
-    window.location.href = targetUrl;
+    // window.location.href = targetUrl;
+    openToNewLocation(targetUrl);
   })
   .catch(function(data){
     screenTopWarning(data.error || data);
@@ -1172,7 +1173,8 @@ function editProductShelf(uid, productId) {
   nkcAPI('/shop/manage/'+uid+'/goodslist/editProduct', "PATCH", post)
   .then(function(data) {
     screenTopAlert("修改成功");
-    window.location.href = "/shop/manage/"+uid+"/goodslist";
+    // window.location.href = "/shop/manage/"+uid+"/goodslist";
+    openToNewLocation("/shop/manage/"+uid+"/goodslist");
   })
   .catch(function(data) {
     screenTopWarning(data.error || data);

@@ -11,7 +11,7 @@ productRouter
     const productArr = await db.ShopGoodsModel.extendProductsInfo(products);
     const product = productArr[0];
     if(product) {
-      return ctx.redirect(`/t/${product.tid}`)
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${product.tid}`))
     }else{
       return ctx.throw(400,"商品不存在")
     }

@@ -36,7 +36,8 @@ var app = new Vue({
       if(confirm('确认要删除“' + this.role.displayName + '”证书？') === false) return;
       kcAPI('/e/settings/role/' + app.role._id, 'DELETE', {})
         .then(function() {
-          window.location.href = '/e/settings/role';
+          // window.location.href = '/e/settings/role';
+          openToNewLocation('/e/settings/role');
         })
         .catch(function(err) {
           screenTopWarning(err);

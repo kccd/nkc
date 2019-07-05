@@ -71,12 +71,14 @@ var app = new Vue({
       if(type === "user") t = "&t=user";
       if(type === "thread") t = "&t=thread";
       if(type === "post") t = "&t=post";
-      window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
+      // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
+      openToNewLocation("/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options)
     },
     // 搜索
     search: function() {
       if(!this.c) return screenTopWarning("请输入关键词");
-      window.location.href = "/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options;
+      openToNewLocation("/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options)
+      // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options;
     }
   },
   mounted: function() {

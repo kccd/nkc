@@ -245,10 +245,12 @@ function submittedReportAudit(support, id, number) {
 		.then(function() {
 			screenTopAlert('提交成功。');
 			if(obj.support) {
-				window.location.href = '/fund/a/'+id;
+				// window.location.href = '/fund/a/'+id;
+				openToNewLocation('/fund/a/'+id);
 			}else {
 				setTimeout(function() {
-					window.location.href = '/fund/a/'+id;
+					// window.location.href = '/fund/a/'+id;
+					openToNewLocation('/fund/a/'+id);
 				}, 1200)
 			}
 		})

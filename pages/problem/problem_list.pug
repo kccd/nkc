@@ -13,7 +13,7 @@ block content
             -var cls = ['mdui-btn','mdui-btn-raised','mdui-ripple','mdui-btn-block'];
             if(data.cid === type._id)
               -cls.push('active');
-            -var link = `window.location.href = '/problem/list?cid=${type._id}'`
+            -var link = `openToNewLocation('/problem/list?cid=${type._id}')`
             button.mdui-m-t-1(class=cls onclick=link)= `${type.name} ${type.count}`
         <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-btn-block" @click='addType'>新建分类</button>
       .mdui-col-xs-12.mdui-col-md-10

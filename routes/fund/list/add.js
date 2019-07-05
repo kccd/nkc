@@ -3,9 +3,9 @@ const addRouter = new Router();
 addRouter
 // 该基金项目下的基金申请
 	.use('/', async (ctx, next) => {
-		const {data, db} = ctx;
+		const {data, db, nkcModules} = ctx;
 		const {user} = data;
-		if(!user.username) return ctx.redirect('/register');
+		if(!user.username) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/register'));
 		const {fundId} = ctx.params;
 		const fund = await db.FundModel.findOne({_id: fundId.toUpperCase(), canApply: true});
 		if(!fund) ctx.throw(400, '抱歉！该基金项目暂不能申请。');

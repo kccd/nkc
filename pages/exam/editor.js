@@ -150,7 +150,8 @@ var app = new Vue({
       }, method)
         .then(function () {
           if(question._id) {
-            window.location.href = document.referrer;
+            // window.location.href = document.referrer;
+            openToNewLocation(document.referrer);
           } else {
             app.submitting = '';
             app.submitted = true;

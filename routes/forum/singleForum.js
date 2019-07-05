@@ -11,19 +11,19 @@ const path = require('path');
 const router = new Router();
 router
   .get('/', async (ctx) => {
-		const {data, params, db} = ctx;
+		const {data, params, db, nkcModules} = ctx;
 		const {user} = data;
 		const {fid} = params;
 		const forum = await db.ForumModel.findOnly({fid});
 		if(user) {
 			const behavior = await db.UsersBehaviorModel.findOne({fid, uid: user.uid});
 			if(behavior) {
-				return ctx.redirect(`/f/${forum.fid}/latest`);
+				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest`));
 			} else {
-				return ctx.redirect(`/f/${forum.fid}/home`);
+				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/home`));
 			}
 		} else {
-			return ctx.redirect(`/f/${forum.fid}/home`);
+			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/home`));
 		}
 	})
 	.post('/', async (ctx, next) => {
@@ -74,7 +74,7 @@ router
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {
       ctx.status = 303;
-      return ctx.redirect(`/t/${_post.tid}`);
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${_post.tid}`));
 		}
 		data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
 		

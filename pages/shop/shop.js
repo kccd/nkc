@@ -41,7 +41,8 @@ function addToCart(id, count) {
   kcAPI('/shop/cart', 'POST', {productParamId: id, count: count})
     .then(function(data) {
       if(!data.user){
-        window.location.href="/login";
+        // window.location.href="/login";
+        openToNewLocation("/login");
       }else{
         screenTopAlert('添加成功');
       }
@@ -123,7 +124,8 @@ function submitProductToBill() {
   }
   // 获取规格
   var paraId = $("#paraId").text();
-  window.location.href = "/shop/bill?paraId="+paraId+"&productCount="+productCount
+  // window.location.href = "/shop/bill?paraId="+paraId+"&productCount="+productCount;
+  openToNewLocation("/shop/bill?paraId="+paraId+"&productCount="+productCount);
 }
 
 /**

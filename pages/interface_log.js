@@ -17,7 +17,8 @@ function submit() {
 	if(end) {
 		url = url==='/log'? url+'?end='+end: url+'&end='+end;
 	}
-	window.location.href = url;
+	// window.location.href = url;
+	openToNewLocation(url);
 }
 
 function loadTime() {

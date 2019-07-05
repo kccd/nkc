@@ -724,19 +724,20 @@ block content
       .ms-mask(v-if="socketInfo" :class="{'hide': socketInfo.text==='已连接'}") {{socketInfo.text}}
       .mobile-settings(v-if="showMobileSettings")
         +settings
-      .mobile-footer(v-if="showMobileNavbar")
-        .col-xs-3(:class="{active: showMobileList}" @click="initMobile('showMobileList')")
-          .fa.fa-list-ul
-          .bar-name 消息
-        .col-xs-3(:class="{active: showMobileContacts}" @click="initMobile('showMobileContacts')")
-          .fa.fa-user
-          .bar-name 联系人
-        .col-xs-3(:class="{active: showMobileGroups}" @click="initMobile('showMobileGroups')")
-          .fa.fa-users
-          .bar-name 分组
-        .col-xs-3(:class="{active: showMobileSettings}" @click="initMobile('showMobileSettings')")
-          .fa.fa-cog
-          .bar-name 设置
+      if !state.apptype
+        .mobile-footer(v-if="showMobileNavbar")
+          .col-xs-3(:class="{active: showMobileList}" @click="initMobile('showMobileList')")
+            .fa.fa-list-ul
+            .bar-name 消息
+          .col-xs-3(:class="{active: showMobileContacts}" @click="initMobile('showMobileContacts')")
+            .fa.fa-user
+            .bar-name 联系人
+          .col-xs-3(:class="{active: showMobileGroups}" @click="initMobile('showMobileGroups')")
+            .fa.fa-users
+            .bar-name 分组
+          .col-xs-3(:class="{active: showMobileSettings}" @click="initMobile('showMobileSettings')")
+            .fa.fa-cog
+            .bar-name 设置
 
       //- 手机-信息列表
       .mobile-user-list(v-if="showMobileList")

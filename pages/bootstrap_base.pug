@@ -6,6 +6,8 @@ block head
   meta(name="viewport" content="width=device-width, initial-scale=1")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   link(rel='shortcut icon' href='/favicon.ico')
+  if state.apptype
+    +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
   +includeCSS('/Draft.css')
   +includeCSS('/katex.min.css')
@@ -14,18 +16,25 @@ block head
   +includeCSS('/photoswipe/dist/default-skin/default-skin.css')
   +includeCSS('/nkc_styles.css')
   +includeCSS('/publicModules/public.css')
+  +includeCSS('/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css')
   block title
+    meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
   
 block body
-
   block navbar
-    include ./publicModules/navbar/navbar.pug
+    if !state.apptype || state.apptype !== "app"
+      div
+        include ./publicModules/navbar/navbar.pug
+    else 
+      div
+        include ./publicModules/navbar/navLeftBar.pug
 
   block content
     h1 hello world!
-  block footer
-    include ./publicModules/footer/footer
+  if !state.apptype || state.apptype !== "app"
+    block footer
+      include ./publicModules/footer/footer
   if data.user
     //- 添加好友的窗口，原生js（待改）
     include module_add_Friend.pug
@@ -35,6 +44,9 @@ block body
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   +includeJS('/jquery/jquery-1.11.1.js')
   +includeJS('/jquery-ui-1.10.4.custom.js')
+  //-app使用的js
+  if state.apptype
+    +includeJS("/appAPi/app.js")
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/twemoji/2/twemoji.min.js')
   +includeJS('/Promise/promise.min.js')
@@ -52,7 +64,7 @@ block body
   +includeJS('/moment/locale/zh-cn.js')
   //- 新版common.js
   +includeJS('/publicModules/common.js')
-
+  +includeJS('/ueditor/third-party/SyntaxHighlighter/shCore.js')
   if data.user
     script!=`NKC.config.hasLogged = true;`
     //- 接入即时通信
@@ -91,5 +103,8 @@ block body
         }
       })
     }
+  script.
+    SyntaxHighlighter.all();
+  script.
     console.log('(c)2019 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')

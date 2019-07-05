@@ -9,10 +9,10 @@ const goodslistRouter = require('./goodslist');
 const manageRouter = new Router();
 manageRouter
   .get('/', async (ctx, next) => {
-    const {data, db, params} = ctx;
+    const {data, db, params, nkcModules} = ctx;
     const {user} = data;
     if(!user) {
-      return ctx.redirect('/login');
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/login'));
     }
     // 验证是否有进入卖家中心的权限
     // 暂时登陆用户默认都可以进入卖家中心
@@ -23,7 +23,7 @@ manageRouter
     //   return ctx.redirect(`/shop/manage/${store.storeId}/home`)
     // }
     data.active = "home";
-    return ctx.redirect(`/shop/manage/${user.uid}/home`)
+    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/shop/manage/${user.uid}/home`))
   })
   .use('/:uid', async (ctx, next) => {
     const {data, db, params, query} = ctx;
@@ -45,9 +45,9 @@ manageRouter
     await next();
   })
   .get('/:uid', async (ctx, next) => {
-    const {data, db, params} = ctx;
+    const {data, db, params, nkcModules} = ctx;
     const {user} = data;
-    return ctx.redirect(`/shop/manage/${user.uid}/home`);
+    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/shop/manage/${user.uid}/home`));
   })
   .use('/:uid/home', homeRouter.routes(), homeRouter.allowedMethods())
   .use('/:uid/shelf', shelfRouter.routes(), shelfRouter.allowedMethods())

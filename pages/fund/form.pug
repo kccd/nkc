@@ -49,8 +49,8 @@ include ../interface_fund_apply_messages
                     h3.greenFontColor.text-center 已接受
                     p.text-center 等待申请人提交
                   when null
-                    a(href=`javascript: agree(${applicationForm._id})`).btn.btn-info.btn-block=`立即接受`
-                    a(href=`javascript: disagree(${applicationForm._id})`).btn.btn-danger.btn-block=`残忍拒绝`
+                    a(onclick=` agree(${applicationForm._id})`).btn.btn-info.btn-block=`立即接受`
+                    a(onclick=` disagree(${applicationForm._id})`).btn.btn-danger.btn-block=`残忍拒绝`
       else
         //info
         if projectPassed === false
@@ -172,9 +172,9 @@ if data.reports && data.reports.length && data.reports.length > 0
             span(title=r.toc.toLocaleString())=fromNow(r.toc)
             if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)
               if r.disabled
-                a.m-l-05(href=`javascript: disabledReport(${applicationForm._id},${r._id},false)`) 解除屏蔽
+                a.m-l-05(onclick=` disabledReport(${applicationForm._id},${r._id},false)`) 解除屏蔽
               else
-                a.m-l-05(href=`javascript: disabledReport(${applicationForm._id},${r._id},true)`) 屏蔽
+                a.m-l-05(onclick=` disabledReport(${applicationForm._id},${r._id},true)`) 屏蔽
           if r.type === 'userInfoAudit'
             if r.support
               -r.c = `用户信息通过审核${r.c?`。审核评语：${r.c}`: ''}`;

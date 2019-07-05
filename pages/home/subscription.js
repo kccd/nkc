@@ -34,7 +34,8 @@ var forumNav = new Vue({
   },
   methods: {
     openForum: function(forum) {
-      window.location.href= '/f/' + forum.fid;
+      // window.location.href= '/f/' + forum.fid;
+      openToNewLocation('/f/' + forum.fid);
     },
     displayChildForums: function(forum, num) {
 

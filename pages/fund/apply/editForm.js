@@ -253,14 +253,16 @@ var app = new Vue({
     switchStep: function(type) {
       var step = this.step;
       if(step >= 5) {
-        return window.location.href = "/fund/a/" + this.form._id + "/settings?s=" + (step - 1);
+        // return window.location.href = "/fund/a/" + this.form._id + "/settings?s=" + (step - 1);
+        return openToNewLocation("/fund/a/" + this.form._id + "/settings?s=" + (step - 1));
       }
       var url = "/fund/a/" + this.form._id + "/settings?s=" + (step + 1);
       if(type === "last") {
         url = "/fund/a/" + this.form._id + "/settings?s=" + (step - 1)
       }
       this.save(function() {
-        window.location.href = url;
+        // window.location.href = url;
+        openToNewLocation(url)
       });
     },
     saveFunc: function() {
@@ -360,7 +362,8 @@ var app = new Vue({
             callback();
           } else {
             if(app.step === 5) {
-              window.location.href = "/fund/a/" + app.form._id;
+              // window.location.href = "/fund/a/" + app.form._id;
+              openToNewLocation("/fund/a/" + app.form._id);
             } else {
               app.saveInfo = "保存成功";
             }
@@ -389,7 +392,8 @@ appButton = new Vue({
       if(confirm(msg) === true) {
         nkcAPI('/fund/a/'+app.form._id+'?type=delete', 'DELETE', {})
           .then(function(data) {
-            window.location.href = '/fund/list/'+data.fund._id.toLowerCase();
+            // window.location.href = '/fund/list/'+data.fund._id.toLowerCase();
+            openToNewLocation('/fund/list/'+data.fund._id.toLowerCase());
           })
           .catch(function(data) {
             screenTopWarning(data.error);

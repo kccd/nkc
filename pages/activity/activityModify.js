@@ -213,7 +213,8 @@ function submitredit(acid){
     .then(function(data) {    
       screenTopAlert("修改成功！");
       setTimeout(function() {
-        window.location.href = "/activity/list";
+        // window.location.href = "/activity/list";
+        openToNewLocation("/activity/list");
       }, 1500);
     })
     .catch(function(data){

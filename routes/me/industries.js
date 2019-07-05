@@ -3,7 +3,7 @@ const router = new Router();
 
 router
   .post('/', async (ctx, next) => {
-    const {body, data, db} = ctx;
+    const {body, data, db, nkcModules} = ctx;
     const {UsersPersonalModel} = db;
     const {user} = data;
     body.id = Date.now();
@@ -19,7 +19,7 @@ router
     } catch(e) {
       return ctx.throw(400, e.message)
     }
-    return ctx.redirect('/me', 301)
+    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/me'))
   })
   .del('/:id', async (ctx, next) => {
     const {params, data, db} = ctx;

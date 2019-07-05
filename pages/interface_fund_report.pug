@@ -103,9 +103,9 @@ block content
                     if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)
                       span &nbsp;&nbsp;
                       if r.disabled
-                        a(href=`javascript: disabledReport(${applicationForm._id},${r._id},false)`) 解除屏蔽
+                        a(onclick=` disabledReport(${applicationForm._id},${r._id},false)`) 解除屏蔽
                       else
-                        a(href=`javascript: disabledReport(${applicationForm._id},${r._id},true)`) 屏蔽
+                        a(onclick=` disabledReport(${applicationForm._id},${r._id},true)`) 屏蔽
                   div.content(style=i === length-1?`border: none;`:'')
                     -r.c = hideContentByUser(r.c, data.user, 'thread')
                     if r.support === false

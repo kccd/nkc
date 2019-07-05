@@ -57,7 +57,8 @@ block scripts
       // })
       geid('research').addEventListener('click',function(){
         var q = getss()
-        window.location.href = '/search?&q=' + q
+        //- window.location.href = '/search?&q=' + q;
+        openToNewLocation('/search?&q=' + q)
       })
       geid('SearchBox').value = getss();
 
@@ -74,8 +75,9 @@ block scripts
     $(document).ready(function(){
       $("#SearchUsersBtn").click(function(){
         var ss = $('#stringToSearch').val().trim();
-        window.location.href = '/api/operation?operation=viewLocalSearch'
-          +'&users_start=#{data.users_start+data.users_count}&users_count=#{data.users_count}&searchstring='+ss
+        //- window.location.href = '/api/operation?operation=viewLocalSearch'
+          //- +'&users_start=#{data.users_start+data.users_count}&users_count=#{data.users_count}&searchstring='+ss;
+        openToNewLocation('/api/operation?operation=viewLocalSearch' +'&users_start=#{data.users_start+data.users_count}&users_count=#{data.users_count}&searchstring='+ss)
       });
 
     })

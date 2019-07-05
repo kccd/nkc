@@ -149,7 +149,8 @@ $(function() {
 				};
 				nkcAPI('/register/information', 'POST', obj)
 					.then(function(data) {
-						window.location.href = '/u/' + data.user.uid + '/subscribe/register?type=register'
+						// window.location.href = '/u/' + data.user.uid + '/subscribe/register?type=register';
+						openToNewLocation('/u/' + data.user.uid + '/subscribe/register?type=register');
 					})
 					.catch(function(data) {
 						app.warning.error = data.error || data;

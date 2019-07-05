@@ -21,10 +21,12 @@ function submit(){
   //console.log('haha:'+examobj);
   return nkcAPI('/exam/subject','post',examobj)
   .then(function(data){
-    window.location.href = '/exam?status=true&info=恭喜您，考试通过！&type=result&isA=' + data.isA;
+    // window.location.href = '/exam?status=true&info=恭喜您，考试通过！&type=result&isA=' + data.isA;
+    openToNewLocation('/exam?status=true&info=恭喜您，考试通过！&type=result&isA=' + data.isA);
   })
   .catch(function(data){   //测试没通过
-    window.location.href = '/exam?status=false&type=result&info='+encodeURI(data.error);
+    // window.location.href = '/exam?status=false&type=result&info='+encodeURI(data.error);
+    openToNewLocation('/exam?status=false&type=result&info='+encodeURI(data.error));
   })
 }
 

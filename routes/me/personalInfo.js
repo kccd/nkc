@@ -3,7 +3,7 @@ const router = new Router();
 
 router
   .post('/', async (ctx, next) => {
-    const {data, db, body} = ctx;
+    const {data, db, body, nkcModules} = ctx;
     const {QQ, wechat, birthday} = body;
     const {UsersPersonalModel} = db;
     const {user} = data;
@@ -22,7 +22,7 @@ router
     } catch(e) {
       return ctx.throw(400, e.message)
     }
-    return ctx.redirect('/me', 301)
+    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/me'))
   });
 
 module.exports = router;

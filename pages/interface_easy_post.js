@@ -367,7 +367,8 @@ var onGoEditor = function(that) {
         return
       }
       url = '/editor?title='+title+'&content=' + content + '&target=' + type + '/' + key + '&forumID=' + that.forumID;
-      window.location.href = url;
+      // window.location.href = url;
+      openToNewLocation(url);
     }
     else {
       key = that.key;
@@ -376,7 +377,9 @@ var onGoEditor = function(that) {
         return;
       }
       url = '/editor?title='+title+'&content=' + content + '&target=' + type + '/' + key;
-      window.location.href = url;
+      // window.location.href = url;
+      openToNewLocation(url);
+
     }
   }
 };

@@ -10,27 +10,27 @@
 
     if data.userOperationsId.includes('creditXsf') && data.isModerator
       li
-        a(href=`javascript:credit('${comment.pid}', 'xsf')`)
+        a(onclick=`credit('${comment.pid}', 'xsf')`)
           span.fa.fa-graduation-cap &nbsp;
           span 评学术分
     if data.userOperationsId.includes('digestPost') && data.isModerator
       if !comment.digest
         li
-          a(href=`javascript:digestPost("${comment.pid}")`)
+          a(onclick=`digestPost("${comment.pid}")`)
             span.fa.fa-star-o &nbsp;设为精选
       else
         li
-          a(href=`javascript:unDigestPost("${comment.pid}")`)
+          a(onclick=`unDigestPost("${comment.pid}")`)
             span.fa.fa-star &nbsp;取消精选
     if data.user && permission('creditKcb') && comment.uid !== data.user.uid
       li
-        a(href=`javascript: credit("${comment.pid}", 'kcb', ${data.user.kcb})`)
+        a(onclick=` credit("${comment.pid}", 'kcb', ${data.user.kcb})`)
           span.fa.fa-cny &nbsp;
             span 鼓励
 
     if permission("postWarningPost")
       li
-        a(href=`javascript:openPostWarningDom("${comment.pid}")`)
+        a(onclick=`openPostWarningDom("${comment.pid}")`)
           span.fa.fa-ambulance &nbsp;建议修改
     if data.modifyPostTimeLimit === -1 || (data.modifyPostTimeLimit * 60 * 60 * 1000 >= Date.now() - comment.toc)
       if (data.user && data.user.uid === comment.uid) || (data.isModerator && permission('modifyOtherPosts'))
@@ -39,7 +39,7 @@
             span.fa.fa-edit &nbsp;编辑
     if permission("disabledPost")
       li
-        a(href=`javascript:disablePostClick('${comment.pid}', "post")`)
+        a(onclick=`disablePostClick('${comment.pid}', "post")`)
           span.fa.fa-eye-slash &nbsp;退修或删除
     if !comment.hideHistories || permission('displayPostHideHistories')
       li
@@ -48,7 +48,7 @@
     if data.user
       li.divider
         li
-          a(href=`javascript:moduleComplaint.open("post", "${comment.pid}")`)
+          a(onclick=`moduleComplaint.open("post", "${comment.pid}")`)
             span.fa.fa-minus-circle &nbsp;投诉
     li.divider
     li

@@ -40,7 +40,7 @@ block content
                       button(onclick=`applyRemittance(${i}, ${applicationForm._id})`) 申请拨款
                   else if r.status === false
                     if ['PAYEE_USER_INFO_ERROR', 'PAYEE_NOT_EXIST'].includes(r.subCode) && !lock.submitted
-                      button(onclick=`window.location.href="/fund/a/${applicationForm._id}/settings?s=1"`) 去修改
+                      button(onclick=`openToEditFundApply("/fund/a/${applicationForm._id}/settings?s=1")`) 去修改
                     else
                       span 等待财务人员处理
                   else

@@ -108,7 +108,8 @@ var app = new Vue({
         .then(function() {
           app.info = "订单取消成功，正在前往我的订单";
           setTimeout(function() {
-            window.location.href="/shop/order"
+            // window.location.href="/shop/order"
+            openToNewLocation("/shop/order");
           }, 2000); 
         })
         .catch(function(data) {

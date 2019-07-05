@@ -112,7 +112,8 @@ $(function() {
 				}
 				nkcAPI('/login', 'POST', obj)
 					.then(function(data) {
-					  window.location.href = data.redirect;
+						// window.location.href = data.redirect;
+						openToNewLocation(data.redirect);
 					  /*
 						if(
 							document.referrer.toString().indexOf('register')>=0 ||

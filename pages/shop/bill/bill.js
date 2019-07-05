@@ -61,7 +61,8 @@ function submitOrders() {
   $("#submitPay").attr('disabled',true);
   nkcAPI('/shop/order', "POST", {post: data, receInfo: receInfo, paramCert: paramCert})
   .then(function(data) {
-    window.location.href = '/shop/pay?ordersId=' + data.ordersId;
+    // window.location.href = '/shop/pay?ordersId=' + data.ordersId;
+    openToNewLocation('/shop/pay?ordersId=' + data.ordersId);
   })
   .catch(function(data) {
     screenTopWarning(data || data.error);

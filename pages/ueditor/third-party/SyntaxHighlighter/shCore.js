@@ -2306,8 +2306,8 @@ if (typeof(SyntaxHighlighter) == 'undefined') var SyntaxHighlighter = function()
             if (this.getParam('toolbar'))
                 attachEvent(findElement(div, '.toolbar'), 'click', sh.toolbar.handler);
 
-            if (this.getParam('quick-code'))
-                attachEvent(findElement(div, '.code'), 'dblclick', quickCodeHandler);
+            // if (this.getParam('quick-code'))
+            //     attachEvent(findElement(div, '.code'), 'dblclick', quickCodeHandler);
 
             return div;
         },

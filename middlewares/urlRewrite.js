@@ -5,14 +5,14 @@ const rs = [
 ];
 
 module.exports = (ctx, next) => {
-  const {url} = ctx;
+  const {url, nkcModules} = ctx;
   const res = rs.find(e => {
     return url.match(e.map);
   });
   if(res) {
     redirectUrl = url.replace(res.map, res.to);
     ctx.status = 301;
-    return ctx.redirect(redirectUrl);
+    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, redirectUrl));
   }
   return next()
 };

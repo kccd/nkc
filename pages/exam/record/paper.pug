@@ -80,5 +80,6 @@ block scripts
       var sortby = document.getElementById('sortby').value;
       var cat = document.getElementById('cat').value;
       if(cat === '') return screenTopWarning('搜索关键词不能为空');
-      window.location.href = '/exam/record/paper?sortby=' + sortby + '&cat=' + cat;
+      openToNewLocation('/exam/record/paper?sortby=' + sortby + '&cat=' + cat);
+      //- window.location.href = '/exam/record/paper?sortby=' + sortby + '&cat=' + cat;
     }        

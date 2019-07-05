@@ -162,7 +162,8 @@ function submitProjectAudit(id) {
 		.then(function(data) {
 			screenTopAlert('提交成功！2s后跳转到申请表详情。');
 			setTimeout(function() {
-				window.location.href = '/fund/a/'+id;
+				// window.location.href = '/fund/a/'+id;
+				openToNewLocation('/fund/a/'+id)
 			}, 2000)
 		})
 		.catch(function(data) {
@@ -246,7 +247,8 @@ function submitAdminAudit(id) {
 		.then(function(data) {
 			screenTopAlert('提交成功！2s后跳转到申请表详情。');
 			setTimeout(function() {
-				window.location.href = '/fund/a/'+id;
+				// window.location.href = '/fund/a/'+id;
+				openToNewLocation('/fund/a/'+id);
 			}, 2000)
 		})
 		.catch(function(data) {
@@ -258,7 +260,8 @@ function refuse(id) {
 	if(confirm('确定要执行此操作？') === false) return;
 	nkcAPI('/fund/a/'+id+'?type=refuse', 'DELETE', {})
 		.then(function() {
-			window.location.href = '/fund/a/'+id;
+			// window.location.href = '/fund/a/'+id;
+			openToNewLocation('/fund/a/'+id);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

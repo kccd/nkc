@@ -12,3 +12,7 @@ function deleteFund(name, money, id){
       })
   }
 }
+
+function openToEditFundManage(url) {
+  openToNewLocation(url);
+}

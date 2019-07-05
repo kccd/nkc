@@ -3,7 +3,8 @@ const draftsRouter = new Router();
 draftsRouter
   .use('/', async (ctx, next) => {
     const {user} = ctx.data;
-    if(!user.username) return ctx.redirect('/register');
+    const {nkcModules} = ctx;
+    if(!user.username) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/register'));
     await next();
   })
     .get('/', async(ctx, next) => {
