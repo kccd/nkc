@@ -15063,14 +15063,18 @@ UE.plugins['paste'] = function () {
 
     me.commands['paste'] = {
         execCommand: function (cmd) {
-            if (browser.ie) {
-                getClipboardData.call(me, function (div) {
-                    filter(div);
-                });
-                me.document.execCommand('paste');
-            } else {
-                alert(me.getLang('pastemsg'));
-            }
+            getClipboardData.call(me, function (div) {
+                filter(div);
+            });
+            me.document.execCommand('paste');
+            // if (browser.ie) {
+            //     getClipboardData.call(me, function (div) {
+            //         filter(div);
+            //     });
+            //     me.document.execCommand('paste');
+            // } else {
+            //     alert(me.getLang('pastemsg'));
+            // }
         }
     }
 };
@@ -22179,8 +22183,8 @@ UE.plugins['tablesort'] = function () {
 
 UE.plugins['contextmenu'] = function () {
     var me = this;
-    me.setOpt('enableContextMenu',true);
-    if(me.getOpt('enableContextMenu') === false){
+    // me.setOpt('enableContextMenu',true);
+    if(me.getOpt('enableContextMenu') === false || !me.getOpt('enableContextMenu')){
         return;
     }
     var lang = me.getLang( "contextMenu" ),
