@@ -1306,5 +1306,43 @@ userSchema.statics.publishingCheck = async (user) => {
   if(latestThread) throwErr(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
 };
 
+/*
+* 验证用户是否有权限开设专栏
+* @param {String/Object} uid 用户ID/用户对象
+* @return {Boolean} 是否有权限
+* @author pengxiguaa 2019-6-26
+* */
+userSchema.statics.ensureApplyColumnPermission = async (uid) => {
+  let user;
+  if(typeof uid === "string") {
+    user = await mongoose.model("users").findOne({uid});
+  } else {
+    user = uid;
+  }
+  if(!user) return false;
+  const columnSettings = await mongoose.model("settings").findById("column");
+  const {xsfCount, digestCount, userGrade, threadCount} = columnSettings.c;
+  if(user.xsf < xsfCount) return false;
+  if(!user.grade) await user.extendGrade();
+  if(!userGrade.includes(user.grade._id)) return false;
+  const userThreadCount = await mongoose.model("threads").count({
+    uid: user.uid,
+    disabled: false,
+    recycleMark: {$ne: true},
+    reviewed: true
+  });
+  if(userThreadCount < threadCount) return false;
+  const count = await mongoose.model("threads").count({uid: user.uid, digest: true, disabled: false, recycleMark: {$ne: true}, reviewed: true});
+  return count >= digestCount;
+};
+
+/*
+* 获取用户的专栏
+* @param {String} uid 用户ID
+* @return {Object} 专栏对象
+* */
+userSchema.statics.getUserColumn = async (uid) => {
+  return await mongoose.model("columns").findOne({uid, closed: false});
+};
 
 module.exports = mongoose.model('users', userSchema);

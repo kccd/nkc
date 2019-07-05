@@ -1,0 +1,10 @@
+extends ../columnBase
+block columnTitle
+  title 专栏统计
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h4 运营统计
+block scripts
+  +includeJS("/columns/status/status.js")

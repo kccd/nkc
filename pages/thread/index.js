@@ -1,4 +1,7 @@
 $(document).ready(function(){
+  if(window.moduleToColumn) {
+    moduleToColumn.init();
+  }
 	//编辑器缩放
 	if($(".w-e-text-container").length === 0) return;
 	$(".w-e-text-container").resizable({
@@ -71,6 +74,36 @@ $(document).ready(function(){
   }
 
 });
+function addToColumn(pid, columnId) {
+  moduleToColumn.show(function(data) {
+    var columnId = data.columnId;
+    var categoryId = data.categoryId;
+    nkcAPI("/m/" + columnId + "/post", "POST", {
+      type: "addToColumn",
+      categoryId: categoryId,
+      postsId: [pid]
+    })
+      .then(function() {
+        window.location.reload();
+        moduleToColumn.hide();
+      })
+      .catch(function(data) {
+        screenTopWarning(data);
+      });
+  });
+}
+function removeToColumn(pid, columnId) {
+  nkcAPI("/m/" + columnId + "/post", "POST", {
+    type: "removeColumnPostByPid",
+    postsId: [pid]
+  })
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    });
+}
 
 function get_selection(the_id)
 {
@@ -351,6 +384,14 @@ function submit(tid){
 	// }
 	
 	geid('ButtonReply').disabled=true;
+
+  // 转发到专栏
+  try{
+    post.columnCategoriesId = getSelectedColumnCategoriesId();
+  } catch(err) {
+    return screenTopWarning(err);
+  }
+
 	return nkcAPI('/t/' + tid, 'POST', {
 		post:post,
 	})
@@ -879,4 +920,36 @@ function turnSearch(text) {
 		// window.location.href = url;
 		openToNewLocation(url);
 	}
+}
+
+function selectColumnCategories(dom, columnId) {
+  dom = $(dom);
+  var checked = dom.prop("checked");
+  if(checked) {
+    $("#postToColumn").show();
+  } else {
+    $("#postToColumn").hide();
+    $("#postToColumn input").prop("checked", false);
+  }
+}
+
+
+function getSelectedColumnCategoriesId() {
+  var columnCategoriesId = [];
+  if($("#checkboxToColumn").prop("checked")) {
+    var columnCategoriesDom = $("#postToColumn input");
+    if(columnCategoriesDom.length) {
+      for(var i = 0;  i < columnCategoriesDom.length; i++) {
+        var d = columnCategoriesDom.eq(i);
+        if(d.prop("checked")) {
+          columnCategoriesId.push(d.val());
+        }
+      }
+    }
+    if(columnCategoriesId.length === 0) {
+      geid('ButtonReply').disabled=false;
+      throw("请选择专栏文章分类");
+    }
+  }
+  return columnCategoriesId;
 }

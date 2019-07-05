@@ -3581,6 +3581,14 @@ ul.nav.navbar-nav.navbar-md>li>a{
   max-height:300px
 }
 
+.selected-column-categories{
+  display: none;
+}
+.selected-column-categories.show{
+  display: block;
+}
+
+
 @media only screen and (max-height : 360px) {
   .mediaVideo {
     max-width:100%;

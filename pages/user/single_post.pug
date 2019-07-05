@@ -6,6 +6,9 @@
   if post.disabled
     include ../publicModules/module_disabled
   .single-post-info
+    .post-checkbox.checkbox
+      label
+        input(type="checkbox" data-pid=post.pid)
     .post-time=fromNow(post.time)
     if post.postType === "postToForum"
       .post-type 发表文章

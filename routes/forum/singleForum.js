@@ -27,12 +27,12 @@ router
 		}
 	})
 	.post('/', async (ctx, next) => {
-		const {data, params, db, body, address: ip, fs, query, nkcModules} = ctx;
+		const {data, params, db, body, address: ip, fs, query, nkcModules, state} = ctx;
 		const {ForumModel, ThreadModel, SubscribeModel} = db;
 		const {fid} = params;
 	  const {user} = data;
 	  const {post} = body;
-		const {c, t, fids, cids, cat, mid} = post;
+		const {c, t, fids, cids, cat, mid, columnCategoriesId} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(t === '') ctx.throw(400, '标题不能为空！');
 		if(fids.length == 0) ctx.throw(400, "请至少选择一个专业");
@@ -49,6 +49,12 @@ router
 		// 根据thread生成封面图
 		const thread = await db.ThreadModel.findOne({tid: _post.tid});
 		await ThreadModel.autoCoverImage(ctx, thread, _post);
+
+    // 转发到专栏
+    if(columnCategoriesId.length > 0 && state.userColumn) {
+      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [_post.pid]);
+    }
+
 		// 发帖数加一并生成记录
 		const obj = {
 			user: data.user,

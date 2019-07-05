@@ -208,6 +208,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const ThreadModel = mongoose.model("threads");
   const FundApplicationFormModel = mongoose.model("fundApplicationForms");
   const ShopOrdersModel = mongoose.model("shopOrders");
+  const ColumnModel = mongoose.model("columns");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const apiFunction = require("../nkcModules/apiFunction");
   const results = [];
@@ -216,7 +217,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
 
   for(let r of arr) {
     r = r.toObject();
-    const {type, pid, targetPid, targetUid, tid, orderId, refundId, applicationFormId} = r.c;
+    const {type, pid, targetPid, targetUid, tid, orderId, refundId, applicationFormId, columnId} = r.c;
     if(type === "at") {
       const post = await PostModel.findOne({pid: targetPid});
       if (!post) continue;
@@ -346,7 +347,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if(!thread) continue;
       r.c.post = post;
       r.c.thread = thread;
-    } else if(["fundAdmin", "fundApplicant", "fundMember"]) {
+    } else if(["fundAdmin", "fundApplicant", "fundMember"].includes(type)) {
       let applicationForm = await FundApplicationFormModel.findOne({_id: applicationFormId});
       if(!applicationForm) continue;
       applicationForm = applicationForm.toObject();
@@ -355,6 +356,10 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       r.c.user = user;
       applicationForm.url = `/fund/a/${applicationForm._id}`;
       r.c.applicationForm = applicationForm;
+    } else if(["newColumnContribute", "columnContributeChange"].includes(type)) {
+      const column = await ColumnModel.findOne({_id: columnId});
+      if(!column) continue;
+      r.c.column = column;
     }
 
     if(r.c.thread) {

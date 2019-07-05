@@ -1,0 +1,25 @@
+if column
+  .modal.fade#moduleToColumn(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-uid=column.uid data-column-id=column._id)
+     .modal-dialog.modal-sm(role="document")
+       .modal-content#moduleToColumnVue
+         .modal-header
+           button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            span(aria-hidden="true") &times;
+           h5.modal-title 选择分类
+         .modal-body
+           .text-center.m-t-3.m-b-3(v-if="loading") 加载中...
+           div(v-else)
+             .radio(v-if="!selectMul" v-for="c in categories")
+               label(v-if="excludes.indexOf(c._id) === -1")
+                 span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;
+                 input(type="radio" :value="c._id" v-model="categoryId")
+                 span {{c.name}}
+             .checkbox(v-else)
+               label(v-if="excludes.indexOf(c._id) === -1")
+                 span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;
+                 input(type="checkbox" :value="c._id" v-model="categoriesId")
+                 span {{c.name}}
+         .modal-footer
+           button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消
+           button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
+  +includeJS("/publicModules/toColumn/toColumn.js")

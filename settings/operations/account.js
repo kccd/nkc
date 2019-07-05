@@ -10,5 +10,8 @@ module.exports = {
       GET: 'accountWithdraw',
       POST: "accountWithdraw"
     }
+  },
+  contribute: {
+    GET: "visitUserContribute"
   }
 };

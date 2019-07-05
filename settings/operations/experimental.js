@@ -233,6 +233,10 @@ module.exports = {
       GET: "experimentalReviewSettings",
       PATCH: "experimentalReviewSettings"
     },
+    column: {
+		  GET: "experimentalColumnSettings",
+      PATCH: "experimentalColumnSettings"
+    },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'

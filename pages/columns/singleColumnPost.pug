@@ -1,0 +1,34 @@
+-const {from, type, post, thread, categories, columnId, toc} = columnPost
+-const {firstPost} = thread;
+.column-post
+  .column-post-body(class=thread.hasCover?"cover":"")
+    if thread.hasCover
+      .column-post-cover
+        div(style=`background-image:url(/cover/${thread.tid})`)
+    .column-post-abstract
+      if type === "post"
+        .column-post-content.post
+          a.column-thread-author(href=`/u/${post.uid}` target="_blank")
+            span=post.user.username
+          | ：
+          span=post.c
+      .column-post-title
+        a(href=post.url)=firstPost.t
+      if type === "thread"
+        .column-post-content= post.c
+      .column-post-info
+        if data.column.uid !== post.uid
+          a(href=`/u/${post.uid}` target="_blank").column-post-author
+            img(src=`/avatar/${post.uid}?t=sm`)
+            span=post.user.username
+        .column-post-time
+          span.m-r-05=fromNow(toc)
+          if from === "contribute"
+            span 来自投稿
+        .column-post-forums
+          -let category = "";
+          for c in categories
+            if !category || category.level > c.level
+              -category = c;
+          if category
+            a.column-post-forum(href=`/m/${columnId}?c=${category._id}`)= category.name

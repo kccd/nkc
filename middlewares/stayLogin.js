@@ -141,6 +141,8 @@ module.exports = async (ctx, next) => {
       data.user
     );
     ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, visibleFid);
+    ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
   }
 	await next();
 };

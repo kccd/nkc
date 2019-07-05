@@ -41,6 +41,14 @@ block title
           span &nbsp;操作
       //-ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
       ul.dropdown-menu(style='left: auto;right: 0;' data-stopPropagation=true)
+        if targetThread && data.authorColumn
+          li
+            if !data.addedToColumn
+              a(href=`javascript:addToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
+                span.fa.fa-share-square-o &nbsp;推送到我的专栏
+            else
+              a(href=`javascript:removeToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
+                span.fa.fa-share-square-o &nbsp;从我的专栏撤稿
         li
           a(href=`/p/${post.pid}`)
             span.fa.fa-newspaper-o &nbsp;
@@ -490,21 +498,26 @@ block content
                           //-   .panel-heading 我的附件（点击插入帖子）
                           //-   .panel-body(id='list-container')
                           include ../media/media_index.pug
-                          .form-inline
+                          .form
+                            .form-group
+                              .checkbox-inline
+                                label
+                                  input#ParseURL(type='checkbox' checked)
+                                  | 处理URL
+                              if state.userColumn
+                                // -let column = status.column;
+                                // include ../publicModules/toColumn/toColumn
+                                .checkbox-inline
+                                  label
+                                    input(type='checkbox' onclick="selectColumnCategories(this)" id="checkboxToColumn")
+                                    | 同时转发文章到专栏
+                                -let categoriesDomId = "postToColumn";
+                                -let categories = data.columnCategories;
+                                include ../publicModules/toColumn/categoriesDom
+
                             .form-group
                               button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
                               button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
-
-                            .checkbox-inline
-                              label
-                                input#ParseURL(type='checkbox' checked)
-                                | 处理URL
-
-                            if 0
-                              .form-group
-                                button#WiderArea.hidden-xs.btn.btn-default(onclick='widerArea()') 拓展
-                            //- include twemoji.pug
-                            .form-group
                               button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
 
                         if hasMobile
@@ -581,6 +594,10 @@ block content
     include ../thread_to_recycle.pug
     include ../post_to_recycle.pug
     include ../publicModules/post_warning
+    if state.userColumn
+      -const column = state.userColumn
+      include ../publicModules/toColumn/toColumn
+
 block scripts
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src='/commonmark/dist/commonmark.js')
