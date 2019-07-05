@@ -48,7 +48,7 @@ block content
                       each cat in data.categoryNames
                         if cat
                           li
-                            a(href=`javascript:moveTo('${cat}')`) #{cat}
+                            a(onclick=`moveTo('${cat}')`) #{cat}
 
                   button#deletebutton.btn.btn-danger.btn-sm(onclick=`deletebtn("${data.targetUser.uid}")`) 删除
                   //hr.hrNarrowSpace

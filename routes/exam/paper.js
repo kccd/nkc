@@ -14,7 +14,7 @@ paperRouter
     // 该考卷下有未完成的考试
     let paper = await db.ExamsPaperModel.findOne({uid: user.uid, cid, submitted: false, timeOut: false});
     if(paper) {
-      return ctx.redirect(`/exam/paper/${paper._id}?created=true`);
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/exam/paper/${paper._id}?created=true`));
     }
     // 限制条件
     const examSettings = await db.SettingModel.findOnly({_id: 'exam'});
@@ -150,7 +150,7 @@ paperRouter
     });
     await paper.save();
     // 跳转到考试页面
-    return ctx.redirect(`/exam/paper/${paper._id}`);
+    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/exam/paper/${paper._id}`));
   })
   .get('/:_id', async (ctx, next) => {
     const {db, data, params, query, nkcModules} = ctx;

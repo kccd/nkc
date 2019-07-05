@@ -16,7 +16,8 @@ const reviewRouter = require("./review");
 const warningRouter = require("./warning");
 logRouter
   .get('/', async (ctx, next) => {
-    return ctx.redirect(`/e/log/public`);
+    const {nkcModules} =ctx;
+    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/e/log/public`));
   })
   .use("/exam", examRouter.routes(), examRouter.allowedMethods())
   .use("/withdraw", withdrawRouter.routes(), withdrawRouter.allowedMethods())

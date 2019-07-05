@@ -69,7 +69,7 @@ block content
                   .options-fa.fa.fa-graduation-cap(onclick=`credit("${post.pid}", 'xsf')`) &nbsp;评学术分
                 if testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc)
                   if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
-                    .options-fa.fa.fa-edit(onclick=`window.location.href="/editor?type=post&id=${post.pid}"`) &nbsp;编辑
+                    .options-fa.fa.fa-edit(onclick=`openToNewLocation("/editor?type=post&id=${post.pid}")`) &nbsp;编辑
                 if disablePost
                   if data.thread.oc !== post.pid
                     .options-fa.fa.fa-eye-slash(onclick=`disablePostClick('${post.pid}', "post")` data-toggle="modal" data-target="#threadRecycleModal" data-whatever="@mdo") &nbsp;屏蔽
@@ -107,7 +107,7 @@ block content
                   if c.type === 'xsf' && data.user && (c.operatorId === data.user.uid || data.userOperationsId.includes('cancelXsf'))
                     a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
           if post.disabled && disablePost
-            a(href=`javascript:enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+            a(onclick=`enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
           .m-t-1.m-b-1
             a.pointer.m-r-1(href=`/t/${post.tid}#container`) 回复
             a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 评论
@@ -124,18 +124,19 @@ block content
         .nkcpanel.post-share.fullwidthpanel
           .pid=`文号 / ${post.pid}`
           hr
-          .share 分享到：
-            img(src='/default/QQ.png' onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${data.thread.firstPost.t}', '${post.pid}')`)
-            img(src='/default/qzone.png' onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-            img(src='/default/weibo.png' onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-            img(src='/default/weChat.png' onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-          .share.text-center.m-t-1
-            a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${post.pid}")`) 获取分享链接
-          .share(id=`copyArea${post.pid}` style="display:none")
-            input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
-            button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
-          div(style='width: 100%; text-align: center; padding-top: 0.5rem;')
-            canvas(id=`${post.pid}Qrcode` style='width: 0px; height: 0px; margin: auto;')
+          if !state.apptype
+            .share 分享到：
+              img(src='/default/QQ.png' onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${data.thread.firstPost.t}', '${post.pid}')`)
+              img(src='/default/qzone.png' onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+              img(src='/default/weibo.png' onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+              img(src='/default/weChat.png' onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
+            .share.text-center.m-t-1
+              a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${post.pid}")`) 获取分享链接
+            .share(id=`copyArea${post.pid}` style="display:none")
+              input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
+              button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
+            div(style='width: 100%; text-align: center; padding-top: 0.5rem;')
+              canvas(id=`${post.pid}Qrcode` style='width: 0px; height: 0px; margin: auto;')
         -var user = post.user
         include ../interface_thread_userpatch.pug
         if data.voteUpUsers.length !== 0

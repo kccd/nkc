@@ -355,7 +355,9 @@ function submit(tid){
 		post:post,
 	})
 		.then(function(data){
-			window.location.href = data.redirect;
+			// window.location.href = data.redirect;
+			console.log(data.redirect)
+			openToNewLocation(data.redirect);
 		})
 		.catch(function(data){
 			screenTopWarning(data || data.error);
@@ -367,6 +369,11 @@ function submit(tid){
 function cancelQuote(){
 	geid('quoteContent').innerHTML = "";
 	geid('quoteCancel').style.display = "none";
+}
+
+// 无引用回复
+function quotePostWithout() {
+	window.location.href = "#container"
 }
 
 // 点击引用
@@ -414,7 +421,8 @@ function quotePost(pid, number, page){
 			str = '<blockquote cite='+pc.user.username+','+pc.pid+' display="none">'+'引用 '+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
 			geid('quoteContent').innerHTML = str
 			// geid('ReplyContent-elem').innerHTML = str
-			window.location.href='#container'
+			window.location.href='#container';
+			// openToNewLocation('#container');
 		})
 }
 
@@ -426,13 +434,15 @@ function at(username) {
 	if(!ue) return screenTopAlert('权限不足');
 	ue.execCommand('inserthtml', '@'+username);
 	window.location.href = "#container";
+	// openToNewLocation('#container');
 }
 
 function goEditor(){
 	window.localStorage.quoteHtml = document.getElementById("quoteContent").innerHTML;
 	window.localStorage.replyHtml = ue.getContent();
 	//return console.log(window.localStorage)
-	window.location = '/editor?type=thread&id='+replyTarget.trim().split('/')[1]
+	// window.location = '/editor?type=thread&id='+replyTarget.trim().split('/')[1];
+	openToNewLocation('/editor?type=thread&id='+replyTarget.trim().split('/')[1])
 }
 
 function addColl(tid){
@@ -858,13 +868,15 @@ function originPanelClose() {
 
 function turnUser(uid) {
 	if(uid) {
-		window.location.href = "/u/"+uid
+		// window.location.href = "/u/"+uid;
+		openToNewLocation("/u/"+uid);
 	}
 }
 
 function turnSearch(text) {
 	if(text) {
 		var url = "/search?c="+text;
-		window.location.href = url;
+		// window.location.href = url;
+		openToNewLocation(url);
 	}
 }

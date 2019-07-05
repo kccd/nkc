@@ -37,20 +37,22 @@ otherRouter
     await next();
   })
 	.get('index.php', async (ctx, next) => {
+    const {nkcModules} = ctx;
 		const {fid} = ctx.query;
     ctx.status = 301;
 		if(fid) {
-			return ctx.redirect(`/f/${fid}`);
+			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${fid}`));
 		}
-		return ctx.redirect(`/`);
+		return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/`));
 	})
 	.get('read.php', async (ctx, next) => {
+    const {nkcModules} = ctx;
 		const {tid} = ctx.query;
 		ctx.status = 301;
 		if(tid) {
-			return ctx.redirect(`/t/${tid}`);
+			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}`));
 		}
-		return ctx.redirect(`/`);
+		return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/`));
 	})
 	.use('logo', logoRouter.routes(), logoRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())

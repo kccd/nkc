@@ -219,7 +219,8 @@ function submit(id){
 		.then(function() {
 			screenTopAlert('提交成功。');
 			setTimeout(function() {
-				window.location.href = '/fund/a/'+id;
+				// window.location.href = '/fund/a/'+id;
+				openToNewLocation('/fund/a/'+id);
 			}, 1200)
 		})
 		.catch(function(data) {
@@ -239,7 +240,8 @@ function submitCompletedAudit(type, id) {
 	};
 	nkcAPI('/fund/a/'+id+'/complete/audit', 'POST', obj)
 		.then(function() {
-			window.location.href = '/fund/a/'+id;
+			// window.location.href = '/fund/a/'+id;
+			openToNewLocation('/fund/a/'+id);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

@@ -55,16 +55,16 @@ block content
                       h4 您可以
                         a(href=`/u/${data.user.uid}/settings`)= ` 点我 `
                         span 去完善资料，或
-                        a(href=`javascript: disagree(${_id})`)=` 点我 `
+                        a(onclick=` disagree(${_id})`)=` 点我 `
                         span 拒绝
                         a(href=`/m/${applicant.uid}`)= ` ${applicant.user.username} `
                         span 的组队邀请
                     else
                       h4.text-center
                         br
-                        a(href=`javascript: agree(${_id})`)=`立即接受`
+                        a(onclick=` agree(${_id})`)=`立即接受`
                         span &nbsp;&nbsp;&nbsp;&nbsp;
-                        a(href=`javascript: disagree(${_id})`)=`残忍拒绝`
+                        a(onclick=` disagree(${_id})`)=`残忍拒绝`
                   else if member.agree === true
                     .stamp.agree.text-center 已同意
                   else
@@ -84,7 +84,8 @@ block scripts
       .then(function() {
         screenTopAlert('您已拒绝用户的邀请');
         setTimeout(function(){
-          window.location.href = '/fund/a/'+id+'/member';
+          //- window.location.href = '/fund/a/'+id+'/member';
+          openToNewLocation('/fund/a/'+id+'/member');
         }, 2000);
       })
       .catch(function(data) {
@@ -96,7 +97,8 @@ block scripts
       .then(function () {
         screenTopAlert('您已同意用户的邀请');
         setTimeout(function () {
-          window.location.href = '/fund/a/' + id + '/member';
+          //- window.location.href = '/fund/a/' + id + '/member';
+          openToNewLocation('/fund/a/' + id + '/member');
         }, 2000);
       })
       .catch(function (data) {

@@ -58,7 +58,8 @@ function addGrade() {
 			nkcAPI('/e/settings/grade', 'POST', {displayName: displayName, score: score})
 				.then(function(data) {
 					var gradeId = data.grade._id;
-					window.location.href = '/e/settings/grade/'+gradeId;
+					// window.location.href = '/e/settings/grade/'+gradeId;
+					openToNewLocation('/e/settings/grade/'+gradeId);
 				})
 				.catch(function(data) {
 					screenTopWarning(data.error || data);
@@ -71,7 +72,8 @@ function deleteGrade(id) {
 	if(confirm('确认要删除该等级？') === false) return;
 	nkcAPI('/e/settings/grade/'+ id, 'DELETE', {})
 		.then(function() {
-			window.location.href = '/e/settings/grade';
+			// window.location.href = '/e/settings/grade';
+			openToNewLocation('/e/settings/grade');
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error || data);

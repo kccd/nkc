@@ -21,5 +21,6 @@ function orderSearch(uid) {
   var orderEndStamp = new Date(orderEndTime).getTime();
   if(parseInt(orderStartStamp) > parseInt(orderEndStamp)) return screenTopWarning("订单导出开始时间不得晚于结束时间");
 
-  window.location.href = "/shop/manage/" + uid + "/order/orderListToExcel?orderStartStamp=" + orderStartStamp + "&orderEndStamp=" + orderEndStamp;
+  // window.location.href = "/shop/manage/" + uid + "/order/orderListToExcel?orderStartStamp=" + orderStartStamp + "&orderEndStamp=" + orderEndStamp;
+  openToNewLocation("/shop/manage/" + uid + "/order/orderListToExcel?orderStartStamp=" + orderStartStamp + "&orderEndStamp=" + orderEndStamp);
 }

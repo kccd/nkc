@@ -58,7 +58,8 @@ function moveToRecycleBin(id){
 }
 
 function turnTest1(id){
-  window.location.href = "/t/" + id;
+  // window.location.href = "/t/" + id;
+  openToNewLocation("/t/" + id);
 }
 
 // 将帖子退回

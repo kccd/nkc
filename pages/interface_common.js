@@ -222,13 +222,14 @@ function redirect(url){
   var urlwithouthash = url.slice(0,url.indexOf('#'))
 
   var urlnow = urlnowpath+urlnowsearch
+  openToNewLocation(url)
 
-  if(urlnow==urlwithouthash){
-    window.location.href = url
-    window.location.reload()
-  }else{
-    window.location.href = url
-  }
+  // if(urlnow==urlwithouthash){
+  //   window.location.href = url
+  //   window.location.reload()
+  // }else{
+  //   window.location.href = url
+  // }
 }
 
 function nkcAPI(operationName,method,remainingParams){  //操作名，参数
@@ -367,7 +368,7 @@ var common=(function(){
   var common = {}
 
   var URLTestRegex = new RegExp("^"+URLRegexStem+"$","i")
-  var URLExtractRegex = /([^“”‘’\/<\'\"\(\[\]\=]|^)\b((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#\/%=~_|$])/gi
+  var URLExtractRegex = /([^“”‘’\/<\'\"\(\[\]\=]|^)\b((?:(?:https?|ftp|file):\/\/|www\.|ftp\.)[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#\/%=~_|$])/gi;
 
   common.URLifyMarkdown = function(content){
     return content.replace(URLExtractRegex,function(match,p1,p2){
@@ -882,7 +883,8 @@ function newForum(forumType) {
 		.then(function(data) {
 			screenTopAlert('新建成功，正在前往设置');
 			setTimeout(function() {
-				window.location.href = '/f/'+data.forum.fid+'/settings';
+        // window.location.href = '/f/'+data.forum.fid+'/settings';
+        openToNewLocation('/f/'+data.forum.fid+'/settings');
 			}, 1500);
 		})
 		.catch(function(data) {
@@ -898,7 +900,8 @@ function deleteForum(fid) {
 		.then(function() {
 			screenTopAlert('删除成功');
 			setTimeout(function() {
-				window.location.href = '/f';
+        // window.location.href = '/f';
+        openToNewLocation('/f');
 			}, 1500)
 		})
 		.catch(function(data) {
@@ -2056,3 +2059,42 @@ function switchChildren(fid, e) {
     fa.addClass("fa-angle-down");
   }
 }
+
+function reload() {
+  window.location.reload();
+}
+
+
+function openToNewLocation(url) {
+  var apptype = localStorage.getItem("apptype");
+  if(apptype && apptype == "app") {
+    url = addApptypeToUrl(url)
+  }
+  window.location.href = url;
+}
+
+/**
+ * 给url添加apptype参数
+ * @param {*} urlStr 
+ */
+function addApptypeToUrl(url) {
+  var resultUrl = url.split("?")[0];
+  var paramStr = "";
+  var paramsArr;
+  var queryString = (url.indexOf("?") !== -1) ? url.split("?")[1] : "";
+  paramStr = resultUrl + "?apptype=app";
+  if(queryString !== "") {
+    paramsArr = queryString.split("&");
+    for(var i=0;i<paramsArr.length;i++) {
+      paramStr += ("&"+paramsArr[i]);
+    }
+  }
+  return paramStr;
+}
+
+/**
+ * 点击锚点跳转
+ */
+// function clickopenMaodian() {
+
+// }

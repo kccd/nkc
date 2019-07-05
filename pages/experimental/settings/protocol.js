@@ -25,7 +25,8 @@ function addProtocol() {
   nkcAPI("/e/settings/protocol", "POST", post)
   .then(function(data) {
     screenTopAlert("保存成功");
-    window.location.href = '/e/settings/protocol/' + data.protocolTypeId;
+    // window.location.href = '/e/settings/protocol/' + data.protocolTypeId;
+    openToNewLocation('/e/settings/protocol/' + data.protocolTypeId);
   })
   .catch(function(data) {
     screenTopWarning(data || data.error)
@@ -34,7 +35,8 @@ function addProtocol() {
 
 // 跳转到协议修改页
 function turnProtocolUpdate(id) {
-  window.location.href = "/e/settings/protocol/"+id+"?visitType=update";
+  openToNewLocation("/e/settings/protocol/"+id+"?visitType=update");
+  // window.location.href = "/e/settings/protocol/"+id+"?visitType=update";
 }
 
 // 修改协议
@@ -48,7 +50,8 @@ function updateProtocol(id) {
   nkcAPI("/e/settings/protocol/"+id, "PATCH", post)
   .then(function(data) {
     screenTopAlert("保存成功");
-    window.location.href = '/e/settings/protocol/' + data.protocolTypeId;
+    openToNewLocation('/e/settings/protocol/' + data.protocolTypeId);
+    // window.location.href = '/e/settings/protocol/' + data.protocolTypeId;
   })
   .catch(function(data) {
     screenTopWarning(data || data.error)
@@ -63,7 +66,8 @@ function deleteProtocol(id) {
     nkcAPI("/e/settings/protocol/"+id, "POST", post)
     .then(function(data) {
       screenTopAlert("该协议已删除");
-      window.location.href = "/e/settings/protocol"
+      openToNewLocation(/e/settings/protocol);
+      // window.location.href = "/e/settings/protocol"
     })
     .catch(function(data) {
       screenTopWarning(data || data.error);

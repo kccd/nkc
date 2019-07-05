@@ -38,9 +38,9 @@ if applicationForm.status.submitted
           button.btn.btn-primary.btn-block(onclick=`restoreApplicationForm(${applicationForm._id})`) 恢复申请表
         if isAdmin
           if disabled
-            a(href=`javascript: disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
+            a(onclick=` disableApplicationForm(${applicationForm._id}, false)`).btn.btn-danger.btn-block 取消屏蔽
           else
-            a(href=`javascript: disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
+            a(onclick=` disableApplicationForm(${applicationForm._id}, true)`).btn.btn-danger.btn-block 屏蔽
   //-投票
     if displayVote
       .panel.panel-default
@@ -50,9 +50,9 @@ if applicationForm.status.submitted
           br
           .row
             .col-xs-6.col-md-6
-              a(href=`javascript: support(${applicationForm._id})`).btn.btn-info.btn-block=`支持`
+              a(onclick=` support(${applicationForm._id})`).btn.btn-info.btn-block=`支持`
             .col-xs-6.col-md-6
-              a(href=`javascript: against(${applicationForm._id})`).btn.btn-danger.btn-block=`反对`
+              a(onclick=` against(${applicationForm._id})`).btn.btn-danger.btn-block=`反对`
           br
           if applicationForm.supporters.length !== 0
             h5=`${applicationForm.supporters.length}位用户表示支持`

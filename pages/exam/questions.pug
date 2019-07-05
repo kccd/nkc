@@ -57,12 +57,12 @@ block content
               else 
                 span.text-danger.m-r-1 审核未通过
                 if permission('removeAllQuestion')
-                  a.m-r-1(href=`javascript:deleteQuestion('${question._id}')`) 删除
+                  a.m-r-1(onclick=`deleteQuestion('${question._id}')`) 删除
             a(href=`/exam/editor?qid=${question._id}`).m-r-1 编辑
             if !question.disabled
-              a(href=`javascript:disabledQuestion(${question._id})`).m-r-1 屏蔽
+              a(onclick=`disabledQuestion(${question._id})`).m-r-1 屏蔽
             else   
-              a(href=`javascript:enabledQuestion(${question._id})`).m-r-1 解除屏蔽
+              a(onclick=`enabledQuestion(${question._id})`).m-r-1 解除屏蔽
                 
             if question.auth === false || question.disabled
               h5.text-danger 原因：

@@ -1,10 +1,11 @@
 //- 手机导航 其他文章链接
-.hidden-md.hidden-lg
-  .drawer-fixed-button-right(onclick="openRightDrawer()")
-    .fa.fa-angle-double-left
-  .drawer-dom
-    .drawer-mask(onclick="closeDrawer()")
-    .left
-      .dom
-    .right
-      .dom
+if !state.apptype
+  .hidden-md.hidden-lg
+    .drawer-fixed-button-right(onclick="openRightDrawer()")
+      .fa.fa-angle-double-left
+    .drawer-dom
+      .drawer-mask(onclick="closeDrawer()")
+      .left
+        .dom
+      .right
+        .dom

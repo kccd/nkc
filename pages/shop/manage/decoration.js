@@ -222,7 +222,8 @@ function delStoreFeatured(storeId, productId) {
 function saveStoreFeatured(storeId) {
   screenTopAlert("保存成功");
   $('#storeFeaturedModal').modal('hide');
-  window.location.href = '/shop/manage/'+storeId+'/decoration';
+  // window.location.href = '/shop/manage/'+storeId+'/decoration';
+  openToNewLocation('/shop/manage/'+storeId+'/decoration');
 }
 
 
@@ -249,7 +250,8 @@ function addStoreClass(storeId) {
   .then(function(data) {
     screenTopAlert("保存成功");
     $('#storeAddClassPickModal').modal('hide');
-    window.location.href = '/shop/manage/'+storeId+'/decoration';
+    // window.location.href = '/shop/manage/'+storeId+'/decoration';
+    openToNewLocation('/shop/manage/'+storeId+'/decoration');
   })
   .catch(function(data) {
     screenTopWarning(data || data.error);
@@ -266,7 +268,8 @@ function delStoreClass(storeId, index) {
     .then(function(data) {
       screenTopAlert("删除成功");
       $('#storeAddClassPickModal').modal('hide');
-      window.location.href = '/shop/manage/'+storeId+'/decoration';
+      // window.location.href = '/shop/manage/'+storeId+'/decoration';
+      openToNewLocation('/shop/manage/'+storeId+'/decoration')
     })
     .catch(function(data) {
       screenTopWarning(data || data.error);
@@ -365,5 +368,6 @@ function delSingleClassify(storeId, productId, index) {
 function saveStoreClassify(storeId) {
   screenTopAlert("分类推荐成功");
   $('#storeEditClassModal').modal('hide');
-  window.location.href = '/shop/manage/'+storeId+'/decoration';
+  // window.location.href = '/shop/manage/'+storeId+'/decoration';
+  openToNewLocation('/shop/manage/'+storeId+'/decoration')
 }

@@ -13,7 +13,8 @@ function shelfRightNow(uid, productId) {
   .then(function() {
     screenTopAlert("上架成功");
     var targetUrl = '/shop/manage/'+uid+'/goodslist';
-    window.location.href = targetUrl;
+    // window.location.href = targetUrl;
+    openToNewLocation(targetUrl)
   })
   .catch(function(data) {
     screenTopWarning(data || data.error);

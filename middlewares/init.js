@@ -47,9 +47,10 @@ module.exports = async (ctx, next) => {
 	  ctx.db = db;
 	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;
-	  ctx.redis = redis;
+    ctx.redis = redis;
     ctx.state = {
       url: ctx.url.replace(/\?.*/ig, ""),
+      apptype: (ctx.query.apptype && ctx.query.apptype === "app")?"app":""
     };
     ctx.settings = settings;
 	  ctx.data.site = settings.site;

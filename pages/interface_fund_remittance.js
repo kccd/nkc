@@ -16,7 +16,8 @@ function ensureRemittance(id, number) {
 function withdrawApplicationForm(id) {
 	nkcAPI('/fund/a/'+id+'?type=withdraw', 'DELETE', {})
 		.then(function(data) {
-			window.location.href = '/fund/a/'+data.applicationForm._id;
+			// window.location.href = '/fund/a/'+data.applicationForm._id;
+			openToNewLocation('/fund/a/'+data.applicationForm._id);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);
@@ -26,7 +27,8 @@ function withdrawApplicationForm(id) {
 function refuseApplicationForm(id) {
 	nkcAPI('/fund/a/'+id+'?type=refuse', 'DELETE', {})
 		.then(function(data) {
-			window.location.href = '/fund/a/'+data.applicationForm._id;
+			// window.location.href = '/fund/a/'+data.applicationForm._id;
+			openToNewLocation('/fund/a/'+data.applicationForm._id);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

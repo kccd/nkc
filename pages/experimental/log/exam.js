@@ -13,7 +13,8 @@ var app = new Vue({
   methods: {
     search: function() {
       if(!this.content) return screenTopWarning('输入不能为空');
-      window.location.href = '/e/log/exam?t=' + this.t + '&content=' + this.content;
+      // window.location.href = '/e/log/exam?t=' + this.t + '&content=' + this.content;
+      openToNewLocation('/e/log/exam?t=' + this.t + '&content=' + this.content);
     }
   }
 });

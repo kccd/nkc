@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const emailRouter = new Router();
 emailRouter
 	.get('/', async (ctx, next) => {
-		const {data, db, query} = ctx;
+		const {data, db, query, nkcModules} = ctx;
 		const {user} = data;
 		let {email, token, operation} = query;
 		email = (email || "").toLowerCase();

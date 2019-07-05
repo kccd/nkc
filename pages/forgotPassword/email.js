@@ -53,7 +53,8 @@ var app = new Vue({
         .then(function() {
           screenTopAlert('密码修改成功，正在前往登录页面');
           setTimeout(function() {
-            window.location.href = '/login';
+            // window.location.href = '/login';
+            openToNewLocation("/login");
           }, 1000)
         })
         .catch(function(data) {

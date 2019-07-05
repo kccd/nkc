@@ -9,14 +9,14 @@ const experimentalRouter = new Router();
 
 experimentalRouter
   .use("/", async (ctx, next) => {
-    const {data, path, db} = ctx;
+    const {data, path, db, nkcModules} = ctx;
     if(path === "/e/login") return await next();
-    if(!data.user) return ctx.redirect("/login");
+    if(!data.user) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, "/login"));
     const experimentalSettings = await db.SettingModel.findById('safe');
     const {experimentalVerifyPassword, experimentalTimeout} = experimentalSettings.c;
     if(experimentalVerifyPassword) {
       const experimental = ctx.getCookie("experimental");
-      if(!experimental) return ctx.redirect("/e/login");
+      if(!experimental) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, "/e/login"));
       const {uid, time} = experimental;
       if(data.user.uid !== uid || Date.now() - time > experimentalTimeout*60*1000) return ctx.redirect("/e/login");
       ctx.setCookie("experimental", {
@@ -27,7 +27,8 @@ experimentalRouter
     await next();
   })
   .get('/', async (ctx, next) => {
-  	return ctx.redirect('/e/status');
+    const {nkcModules} = ctx;
+  	return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, "/e/status"));
   })
 	.use('/status', statusRouter.routes(), statusRouter.allowedMethods())
   .use('/console', consoleRouter.routes(), consoleRouter.allowedMethods())
