@@ -1,5 +1,3 @@
-// var hostStr = "www.kechuang.org";
-var hostStr = "192.168.11.114";
 var realUrl = "";
 localStorage.setItem("apptype", "app");
 var allLinks = document.querySelectorAll("a");
@@ -156,6 +154,7 @@ function getQueryVariable(key)
  * @param {*} urlStr
  */
 function siteHostLink(urlStr) {
+  var hostStr = window.location.host;
   var hostIndex = urlStr.indexOf(hostStr);
   if(hostIndex === -1) {
     return false;
