@@ -1874,7 +1874,13 @@ function strToObj(str) {
 }
 // 通过dom元素id获取渲染页面时藏在dom中的数据
 function getDataById(id) {
-  return strToObj(document.getElementById(id).innerHTML);
+  var dom = document.getElementById(id);
+  if(dom) {
+    return strToObj(dom.innerHTML);
+  } else {
+    return {};
+  }
+
 }
 
 // 关注文章
