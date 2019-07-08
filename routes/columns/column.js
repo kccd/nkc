@@ -43,7 +43,7 @@ router
     } else {
       data.topped = await db.ColumnPostModel.getToppedColumnPosts(column._id, fidOfCanGetThread);
       data.toppedId = data.column.topped;
-      sort.toc = -1;
+      sort[`order.cid_default`] = -1;
     }
     const count = await db.ColumnPostModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
@@ -72,7 +72,10 @@ router
     const {files, fields} = body;
     const type = body.type || fields.type;
     if(!type) {
-      let {abbr, name, description, color, notice, links = []} = fields;
+      let {
+        abbr, name, description, color, notice, links = [],
+        otherLinks
+      } = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
       if(contentLength(name) > 60) ctx.throw(400, "专栏名不能超过60字符");
@@ -104,10 +107,26 @@ router
         }
         links = links_;
       }
+      if(otherLinks) {
+        otherLinks = JSON.parse(otherLinks);
+        const otherLinks_ = [];
+        for(const link of otherLinks) {
+          const {name, url} = link;
+          if(!name) ctx.throw(400, "友情链接名不能为空");
+          if(!url) ctx.throw(400, "友情链接不能为空");
+          if(contentLength(name) > 20) ctx.throw(400, "友情链接名不能超过20字节");
+          otherLinks_.push({
+            name,
+            url
+          });
+        }
+        otherLinks = otherLinks_;
+      }
       await column.update({
         name,
         color,
         links,
+        otherLinks,
         notice,
         nameLowerCase: name.toLocaleString(),
         description,

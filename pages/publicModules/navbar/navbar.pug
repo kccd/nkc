@@ -161,63 +161,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     .m-a-1
       include ../management/management
       include ../apps/apps
-    if data.user && state.subForums && state.subForums.length > 0
-      .m-a-1
-        +listHeader("我关注的")
-        .home-topic-item-div
-          for forum in state.subForums
-            .forum-block
-              .forum-block-info
-                if forum.iconFileName
-                  img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
-                else
-                  .forum-block-icon(style=`background-color: ${forum.color}`)
-                a(href=`/f/${forum.fid}` title=`${forum.description}`).forum-block-name=forum.displayName
-    .m-a-1
-      .forums-nav-header
-        +listHeader("话题")
-      for pf in state.forumsTree
-        if pf.forumType === "topic"
-          .forum-block
-            .forum-block-info
-              if pf.iconFileName
-                img.forum-block-icon(src=`/forum_avatar/${pf.fid}`)
-              else
-                .forum-block-icon(style=`background-color: ${pf.color}`)
-              a(href=`/f/${pf.fid}` title=`${pf.description}`).forum-block-name=pf.displayName
-            .fa.fa-angle-down(onclick=`switchChildren("${pf.fid}", this)`)
-            if pf.childrenForums && pf.childrenForums.length
-              .forum-block-children(data-fid=pf.fid)
-                for cf in pf.childrenForums
-                  .forum-block.hide-children
-                    .forum-block-info
-                      if cf.iconFileName
-                        img.forum-block-icon(src=`/forum_avatar/${cf.fid}`)
-                      else
-                        .forum-block-icon(style=`background-color: ${cf.color}`)
-                      a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName
-      .forums-nav-header
-        +listHeader("学科")
-      for pf in state.forumsTree
-        if pf.forumType === "discipline"
-          .forum-block
-            .forum-block-info
-              if pf.iconFileName
-                img.forum-block-icon(src=`/forum_avatar/${pf.fid}`)
-              else
-                .forum-block-icon(style=`background-color: ${pf.color}`)
-              a(href=`/f/${pf.fid}` title=`${pf.description}`).forum-block-name=pf.displayName
-            .fa.fa-angle-down(onclick=`switchChildren("${pf.fid}", this)`)
-            if pf.childrenForums && pf.childrenForums.length
-              .forum-block-children(data-fid=pf.fid)
-                for cf in pf.childrenForums
-                  .forum-block.hide-children
-                    .forum-block-info
-                      if cf.iconFileName
-                        img.forum-block-icon(src=`/forum_avatar/${cf.fid}`)
-                      else
-                        .forum-block-icon(style=`background-color: ${cf.color}`)
-                      a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName
+      include ../forums_nav/forums_tree
 .nkc-drawer-right
   .nkc-drawer-right-mask(onclick="closeNKCDrawer('right')")
   .nkc-drawer-right-body

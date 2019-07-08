@@ -1,3 +1,4 @@
+var selectImage;
 var app = new Vue({
   el: "#app",
   data: {
@@ -17,7 +18,7 @@ var app = new Vue({
 
   },
   mounted: function() {
-    moduleCrop.init(this.selectedImage);
+    selectImage = new NKC.methods.selectImage();
   },
   methods: {
     selectedImage: function(data, name) {
@@ -32,6 +33,7 @@ var app = new Vue({
       fileToUrl(data)
         .then(function(url) {
           app.bannerUrl = url;
+          selectImage.close();
         })
     },
     selectedAvatar: function(data) {
@@ -39,18 +41,21 @@ var app = new Vue({
        fileToUrl(data)
         .then(function(url) {
           app.avatarUrl = url;
+          selectImage.close();
         })
     },
     selectBanner: function() {
-      moduleCrop.show({
-        aspectRatio: 4,
-        name: "banner"
+      selectImage.show(function(data){
+        app.selectedBanner(data);
+      }, {
+        aspectRatio: 4
       });
     },
     selectAvatar: function() {
-      moduleCrop.show({
-        aspectRatio: 1,
-        name: "avatar"
+      selectImage.show(function(data){
+        app.selectedAvatar(data);
+      }, {
+        aspectRatio: 1
       });
     },
     submit: function() {

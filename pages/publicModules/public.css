@@ -1618,6 +1618,7 @@ span.thread-title-page{
 }
 .forum-block-children{
   display: none;
+  padding-left: 10px;
 }
 .forum-block-info{
   font-size: 0;

@@ -65,7 +65,13 @@ const schema = new Schema({
   links: {
     type: Schema.Types.Mixed,
     default: []
-  }
+  },
+  // 友情链接
+  otherLinks: {
+    type: Schema.Types.Mixed,
+    default: []
+  },
+
 }, {
   collection: "columns"
 });

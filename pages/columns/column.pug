@@ -181,6 +181,14 @@ block content
                 .column-header
                   .fa.fa-bullhorn &nbsp;公告通知
                 p!=markdown_safe(data.column.notice)
+          if data.column.otherLinks && data.column.otherLinks.length > 0
+            div.m-b-2
+              .column-threads
+                .column-header
+                  .fa.fa-link &nbsp;友情链接
+                .column-links
+                  for link in data.column.otherLinks
+                    a(onclick=`openNewWindow('${link.url}')`)= link.name
           //- div.m-b-2
             .column-threads
               .column-header

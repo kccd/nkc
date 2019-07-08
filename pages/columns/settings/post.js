@@ -57,10 +57,13 @@ var app = new Vue({
       });
     },
     movePost: function(type, id) {
+      if(["sortByPostTimeDES", "sortByPostTimeASC"].indexOf(type) !== -1) {
+        if(!confirm("按发表时间排序后，原有排序将会丢失，确定要执行此操作？")) return;
+      }
       nkcAPI("/m/" + this.column._id + "/post", "POST", {
         type: type,
         postsId: id,
-        categoryId: app.category._id
+        categoryId: app.category._id==="all"? "": app.category._id
       })
         .then(function(data) {
           if(data.columnTopped) app.column.topped = data.columnTopped;
