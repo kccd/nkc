@@ -1,5 +1,6 @@
 const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
+const cookieConfig = require("../config/cookie");
 module.exports = async (ctx, next) => {
 	const {data, db} = ctx;
 	// cookie
@@ -12,7 +13,7 @@ module.exports = async (ctx, next) => {
         cookie = new Buffer(cookie, 'base64').toString();
         if(cookie) {
           const cookies = new Cookies(cookie, {
-            keys: [ctx.settings.cookie.secret]
+            keys: [cookieConfig.secret]
           });
           userInfo = cookies.get('userInfo', {signed: true});
         }

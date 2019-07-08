@@ -2,7 +2,7 @@ extends ../bootstrap_base.pug
 
 block title
   -const thread = data.thread;
-  title= `${thread.firstPost.t} - 科创论坛`
+  title= `${thread.firstPost.t} - 科创`
   meta#replytarget(value=`${data.replyTarget}`)
 
   -let modifyPostTimeLimit = 0;
@@ -551,9 +551,8 @@ block content
                             .col-xs-12.col-md-12(style='margin: 2rem 0;')
                               .h4.text-center(style='color: #aaaaaa;')
                                 span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复/评论
-
-
-                        include ../exam_notification.pug
+                        if !state.apptype
+                          include ../exam_notification.pug
 
                     else
                       if !state.apptype

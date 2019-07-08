@@ -15,15 +15,28 @@ router
 		const {user} = data;
 		const {fid} = params;
 		const forum = await db.ForumModel.findOnly({fid});
-		if(user) {
-			const behavior = await db.UsersBehaviorModel.findOne({fid, uid: user.uid});
-			if(behavior) {
-				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest`));
+		if(ctx.query.token) {
+			if(user) {
+				const behavior = await db.UsersBehaviorModel.findOne({fid, uid: user.uid});
+				if(behavior) {
+					return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest?token=${ctx.query.token}`));
+				} else {
+					return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/home?token=${ctx.query.token}`));
+				}
+			} else {
+				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/home?token=${ctx.query.token}`));
+			}
+		}else{
+			if(user) {
+				const behavior = await db.UsersBehaviorModel.findOne({fid, uid: user.uid});
+				if(behavior) {
+					return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest`));
+				} else {
+					return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/home`));
+				}
 			} else {
 				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/home`));
 			}
-		} else {
-			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/home`));
 		}
 	})
 	.post('/', async (ctx, next) => {
@@ -138,7 +151,7 @@ router
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
 				await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}
-			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
+			// if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
 		}
 		// await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
     data.isModerator = (await forum.isModerator(data.user)) || ctx.permission('superModerator');

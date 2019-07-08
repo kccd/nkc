@@ -231,10 +231,10 @@ var paperProto = {
               disStyle = "display:none"
             }
             if(paperProto.config.authorInfos[i].isContract) {
-              authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+              authorTrs += '<tr class="authorClass"><td><a class="editorBtn btn btn-primary btn-sm" onclick="upToTop(this)"><span class="fa fa-arrow-up"></span></a><a class="editorBtn btn btn-primary btn-sm" onclick="downToBottom(this)"><span class="fa fa-arrow-down"></span></a></td><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" checked/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
               authorTrs += '<tr class="warning"><td colspan="6"><span style="margin-right:1rem;">Email(必填):<input type="text" name="" placeholder="邮箱(登录用户可见)" class="contractEmail" value="'+paperProto.config.authorInfos[i].contractObj.contractEmail+'"/></span><span style="margin-right:1rem;">Tel(选填):<input type="text" name="" placeholder="电话号码(登录用户可见)" class="contractTel" value="'+paperProto.config.authorInfos[i].contractObj.contractTel+'"/></span><span style="margin-right:1rem;">Address(选填):<input type="text" name="" placeholder="地址(登录用户可见)" style="width:300px" class="contractAdd" value="'+paperProto.config.authorInfos[i].contractObj.contractAdd+'"/></span><span>ZipCode(选填):<input type="text" name="" placeholder="邮政编码" style="width:100px" class="contractCode" value="'+paperProto.config.authorInfos[i].contractObj.contractCode+'"/></span></td></tr>';
             }else{
-              authorTrs += '<tr class="authorClass"><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+              authorTrs += '<tr class="authorClass"><td><a class="editorBtn btn btn-primary btn-sm" onclick="upToTop(this)"><span class="fa fa-arrow-up"></span></a><a class="editorBtn btn btn-primary btn-sm" onclick="downToBottom(this)"><span class="fa fa-arrow-down"></span></a></td><td><input class="authorName" type="text" value="'+paperProto.config.authorInfos[i].name+'" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" value="'+paperProto.config.authorInfos[i].kcid+'" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" value="'+paperProto.config.authorInfos[i].agency+'"/></td><td>'+selectDom+'<input class="authorAgencyAdd" type="text" style='+disStyle+' onclick="SetAgencyCity(this)" value="'+paperProto.config.authorInfos[i].agencyAdd+'"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)"/></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
             }
           }
         }
@@ -411,7 +411,7 @@ function removeOneKeyWords(para) {
 // 增加一条作者信息
 function addOneAuthorInfo() {
   var selectDom = getCountryList();
-  var authorAom = '<tr class="authorClass"><td><input class="authorName" type="text" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" style="height:22px" type="text" onclick="SetAgencyCity(this)"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
+  var authorAom = '<tr class="authorClass"><td><a class="editorBtn btn btn-primary btn-sm" onclick="upToTop(this)"><span class="fa fa-arrow-up"></span></a><a class="editorBtn btn btn-primary btn-sm" onclick="downToBottom(this)"><span class="fa fa-arrow-down"></span></a></td><td><input class="authorName" type="text" placeholder="完全公开"/></td><td><input class="authorKcid" type="text" placeholder="KCID为纯数字组成"/></td><td><input class="authorAgency" type="text" /></td><td>'+selectDom+'<input class="authorAgencyAdd" style="height:22px" type="text" onclick="SetAgencyCity(this)"/></td><td><input class="isContract" type="checkbox" onchange="useContractAuthor(this)" /></td><td><a class="editorBtn btn btn-primary btn-sm" onclick="delOneAuthorInfo(this)">删除</a></td></tr>';
   $("#authInfoList").find("tbody").append(authorAom)
 }
 
@@ -426,6 +426,46 @@ function delOneAuthorInfo(para) {
     $(para).parents("tr").remove();
   }
 }
+
+// 上移当前条目
+function upToTop(para) {
+  var parents = $(para).parents(".authorClass");
+  var prev = parents.prev();
+  var next = parents.next();
+  if(next.attr("class") == "warning") {
+    return screenTopWarning("移动条目需关闭本条目通信作者")
+  }
+  if(prev.attr("class") == "warning") {
+    return screenTopWarning("上移本条目需关闭上一条目通信作者")
+  }
+  if(!prev.attr("class")) {
+    return screenTopWarning("已经到了最顶部");
+  }
+  parents.fadeOut("slow",function(){
+    prev.before(parents);
+  }).fadeIn();
+}
+
+// 下移当前条目
+function downToBottom(para) {
+  var parents = $(para).parents(".authorClass");
+  var prev = parents.prev();
+  var next = parents.next();
+  var nextnext = parents.next().next();
+  if(next.attr("class") == "warning") {
+    return screenTopWarning("移动条目需关闭本条目通信作者")
+  }
+  if(nextnext.attr("class") == "warning") {
+    return screenTopWarning("下移本条目需关闭下一条目通信作者")
+  }
+  if(!next.attr("class")) {
+    return screenTopWarning("已经到了最底部");
+  }
+  parents.fadeOut("slow",function(){
+    next.after(parents);
+  }).fadeIn();
+}
+
 
 // 获取全部作者信息
 function outputAuthorInfosList() {
