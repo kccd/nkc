@@ -1,15 +1,15 @@
 //- 左侧专业导航
   @param {[Object]} data.subForums 用户关注的专业对象所组成的数组
-  @param {[Object]} data.forums 专业树状结构数组 通过方法ForumModel.getForumsTree获取
+  @param {[Object]} state.forumsTree 专业树状结构数组 通过方法ForumModel.getForumsTree获取
   @author pengxiguaa 2019-5-6
 
 
 div
-  if data.subForums && data.subForums.length >0
+  if state.subForums && state.subForums.length >0
     .forums-nav-header
       +listHeader("我关注的")
     .home-topic-item-div
-      for f in data.subForums
+      for f in state.subForums
         a(
           href=`/f/${f.fid}`
           style=`background-color: ${f.color || '#808080'};`
@@ -20,7 +20,7 @@ div
           span=f.displayName
   .forums-nav-header
     +listHeader("话题")
-  for pf in data.forums
+  for pf in state.forumsTree
     if pf.forumType === "topic"
       .home-topic-list-li
         a(
@@ -45,7 +45,7 @@ div
               span=cf.displayName
   .forums-nav-header
     +listHeader("学科")
-  for pf in data.forums
+  for pf in state.forumsTree
     if pf.forumType === "discipline"
       .home-topic-list-li
         a(

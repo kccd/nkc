@@ -1881,7 +1881,13 @@ function strToObj(str) {
 }
 // 通过dom元素id获取渲染页面时藏在dom中的数据
 function getDataById(id) {
-  return strToObj(document.getElementById(id).innerHTML);
+  var dom = document.getElementById(id);
+  if(dom) {
+    return strToObj(dom.innerHTML);
+  } else {
+    return {};
+  }
+
 }
 
 // 关注文章
@@ -2066,7 +2072,23 @@ function switchChildren(fid, e) {
     fa.addClass("fa-angle-down");
   }
 }
-
+/*
+* 订阅/取消订阅专栏
+* */
+function subscribeColumn(columnId, type) {
+  var url = "/m/" + columnId + "/subscribe";
+  var method = "POST";
+  var data = {
+    type: type?"subscribe": "unSubscribe"
+  };
+  nkcAPI(url, method, data)
+    .then(function() {
+      window.location.href = "";
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}
 function reload() {
   window.location.reload();
 }

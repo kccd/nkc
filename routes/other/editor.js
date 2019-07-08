@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const editorRouter = new Router();
 editorRouter
   .get('/', async (ctx, next) => {
-    const {data, db, query, nkcModules} = ctx;
+    const {data, db, query, nkcModules, state} = ctx;
     const {dbFunction} = nkcModules;
     const {user} = data;
     data.ver = query.ver;
@@ -123,6 +123,13 @@ editorRouter
     
     const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
     data.allForumList = allForumList;
+
+    if(data.user) {
+      if(state.userColumn) {
+        data.columnCategories = await db.ColumnPostCategoryModel.getCategoryList(state.userColumn._id);
+      }
+    }
+
     await next();
   });
 

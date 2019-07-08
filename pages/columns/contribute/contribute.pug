@@ -1,0 +1,91 @@
+extends ../columnBase
+block columnTitle
+  title 投稿
+block content
+  #data.hidden=objToStr({user: data.user, column: data.column, categories: data.categories})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2(v-if="succeed")
+        .m-t-5
+          .text-center
+            include ../../publicModules/icon-success
+            h3 投稿成功
+            p 等待专栏主审核，审核通过后文章可在专栏显示。
+            a(href=`/m/${data.column._id}`) 返回专栏
+
+      .col-xs-12.col-md-8.col-md-offset-2(v-else)
+        h4
+          b 投稿说明
+        p!=LineFeedConversion(data.columnSettings.contributeInfo)
+        hr
+        h4
+          b 目标专栏
+        .contribute-column.m-b-4
+          img(src=`/m/${data.column._id}/avatar?t=sm`)
+          .contribute-column-info
+            a(href=`/m/${data.column._id}`).name=data.column.name
+            .description=data.column.abbr
+        .row
+          .col-xs-12.col-md-7
+            .form
+              .form-group
+                h5
+                  b 已选择的文章
+                .m-b-3.text-center(v-if="selectedThreads.length === 0") 暂无数据
+                div(v-else)
+                  .contribute-thread(v-for="thread, index in selectedThreads")
+                    .checkbox
+                      button.m-r-05.btn.btn-danger.btn-xs(@click="remove(index)") 删除
+                      a(:href="'/t/' + thread.tid" target="_blank") 【{{thread.tid}}】{{thread.firstPost.t}}
+              .form-group
+                h5
+                  b 我的文章&nbsp;
+                    small 请勾选需要投稿的文章
+                .m-t-05
+                  button.btn.btn-default.btn-xs(@click="showThreads = !showThreads") 点击展开
+                    .fa.fa-caret-down
+                div(v-if="showThreads")
+                  .text-center(v-if="threads.length === 0") 暂无数据
+                  div(v-else).p-t-1
+                    .paging-button
+                      a.button.pointer(v-for="b, index in paging.buttonValue"
+                        :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
+                        @click="selectPage(b.type, b.num)"
+                      ) {{b.num>=0?b.num+1:"..."}}
+                    .contribute-thread(v-for="thread in threads")
+                      .checkbox
+                        label
+                          input(type="checkbox" :value="thread.tid" v-model="chooseTid")
+                        a(:href="'/t/' + thread.tid" target="_blank") 【{{thread.tid}}】{{thread.firstPost.t}}
+                    .paging-button
+                      a.button.pointer(v-for="b, index in paging.buttonValue"
+                        :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
+                        @click="selectPage(b.type, b.num)"
+                      ) {{b.num>=0?b.num+1:"..."}}
+                  .m-t-05
+                    button.btn.btn-default.btn-xs(@click="showThreads = !showThreads") 点击折叠
+                      .fa.fa-caret-down
+                    button(v-if="chooseTid.length > 0" @click="choose").btn.btn-success.btn-xs 确认已选
+              .form-group.m-t-2
+                h5
+                  b 选择文章分类
+                div
+                  .checkbox(v-for="c in categories")
+                    label
+                      span(v-for="index in c.level") &nbsp;&nbsp;&nbsp;&nbsp;
+                      input(type="checkbox" :value="c._id" v-model="categoriesId")
+                      span {{c.name}}
+              .form-group
+                h5
+                  b 补充说明（选填）
+                textarea.form-control(rows=6 v-model="description")
+              .form-group
+                h5.text-danger(v-if="error") {{error}}
+                button.btn.btn-primary.btn-sm(@click="submit") 提交
+          .col-xs-12.col-md-6
+
+block scripts
+  +includeJS("/columns/contribute/contribute.js")
+
+
+

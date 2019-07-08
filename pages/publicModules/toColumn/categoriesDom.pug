@@ -1,0 +1,9 @@
+.selected-column-categories(id=categoriesDomId)
+  if categories
+    for c in categories
+      .checkbox
+        label
+          -for(var i = 0; i < c.level; i++)
+            span &nbsp;&nbsp;&nbsp;&nbsp;
+          input(type="checkbox" value=c._id)
+          span=c.name

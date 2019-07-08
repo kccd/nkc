@@ -1,0 +1,44 @@
+//- 左侧专业导航
+  @param {[Object]} state.subForums 用户关注的专业对象所组成的数组
+  @param {[Object]} state.forumsTree 专业树状结构数组 通过方法ForumModel.getForumsTree获取
+  @author pengxiguaa 2019-7-8
+
+-let topics = [], disciplines = [];
+for forum in state.forumsTree
+  if forum.forumType === "topic"
+    -topics.push(forum);
+  else
+    -disciplines.push(forum);
+
+mixin renderForums(forums)
+  for forum in forums
+    .forum-block.hide-children
+      .forum-block-info
+        if forum.iconFileName
+          img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
+        else
+          .forum-block-icon(style=`background-color: ${forum.color}`)
+        a(href=`/f/${forum.fid}` title=`${forum.description}`).forum-block-name=forum.displayName
+      if forum.childrenForums && forum.childrenForums.length
+        .fa.fa-angle-down(onclick=`switchChildren("${forum.fid}", this)`)
+        .forum-block-children(data-fid=forum.fid)
+          +renderForums(forum.childrenForums)
+div
+  if data.user && state.subForums && state.subForums.length >0
+    .forums-nav-header
+      +listHeader("我关注的")
+    .home-topic-item-div
+      for forum in state.subForums
+        .forum-block
+          .forum-block-info
+            if forum.iconFileName
+              img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
+            else
+              .forum-block-icon(style=`background-color: ${forum.color}`)
+            a(href=`/f/${forum.fid}` title=`${forum.description}`).forum-block-name=forum.displayName
+  .forums-nav-header
+    +listHeader("话题")
+  +renderForums(topics)
+  .forums-nav-header
+    +listHeader("学科")
+  +renderForums(disciplines)

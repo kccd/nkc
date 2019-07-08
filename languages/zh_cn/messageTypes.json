@@ -24,6 +24,7 @@
   "applicationFormId": "申请表ID",
   "applicationFormCode": "申请表编号",
   "xsfCount": "学术分数目",
+  "columnContributeURL": "投稿列表链接",
 
   "replyPost": "回复被引用",
   "replyThread": "文章被回复",
@@ -52,5 +53,7 @@
   "passReview": "【审核系统】内容通过审核",
   "fundApplicant": "【基金系统】申请状态更新",
   "fundAdmin": "【基金系统】申请待处理",
-  "fundMember": "【基金系统】组队邀请"
+  "fundMember": "【基金系统】组队邀请",
+  "newColumnContribute": "【专栏】新的投稿",
+  "columnContributeChange": "【专栏】投稿状态更新"
 }

@@ -400,6 +400,7 @@ const videoToH264 = async(inputPath, outputPath) => {
 const turnVideo = async(inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath])
 }
+
 module.exports = {
   imageExtTurn,
   avatarify,

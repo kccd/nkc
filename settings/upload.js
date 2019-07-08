@@ -40,7 +40,9 @@ const paths = {
   posterPath: 'resources/poster',
   questionImagePath: 'resources/question_image',
   shopCertsPath: 'resources/shop_certs',
-  forumBannerPath: "resources/forum_banner"
+  forumBannerPath: "resources/forum_banner",
+  columnAvatarPath: "resources/column_avatar",
+  columnBannerPath: "resources/column_banner",
 };
 
 const pathsObj = {};

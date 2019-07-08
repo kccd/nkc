@@ -129,7 +129,7 @@ module.exports = async (ctx, next) => {
   data.user = user;
 
   // 专业树状结构，第二层以上的专业都在第二层显示
-  ctx.state.forumsTree = await db.ForumModel.getForumsTreeLevel2(
+  ctx.state.forumsTree = await db.ForumModel.getForumsTree(
     data.userRoles,
     data.userGrade,
     data.user
@@ -142,6 +142,8 @@ module.exports = async (ctx, next) => {
       data.user
     );
     ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, visibleFid);
+    ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
+    ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
   }
 	await next();
 };

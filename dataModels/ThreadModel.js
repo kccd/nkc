@@ -710,6 +710,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       tid: 1,
       mainForumsId: 1,
       voteUp: 1,
+      reviewed: 1,
       voteDown: 1
     });
     posts.map(post => {

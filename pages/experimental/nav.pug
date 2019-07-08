@@ -129,6 +129,9 @@
           if permission('experimentalUserAuth')
             li
               a(href='/e/settings/auth') 身份认证
+          if permission("experimentalColumnSettings")
+            li
+              a(href=`/e/settings/column`) 专栏
 
           <li role="separator" class="divider"></li>    
           li

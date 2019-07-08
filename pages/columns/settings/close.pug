@@ -1,0 +1,33 @@
+extends ../columnBase
+block columnTitle
+  title 关闭专栏
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        h4
+          b 关闭专栏
+        p!=LineFeedConversion(data.columnSettings.closeColumnInfo)
+        hr
+        #page
+          h5 登录密码
+          #data.hidden=objToStr({columnId: data.column._id})
+          .form-inline
+            input.form-control(type="password" id="password")
+          .m-t-05
+            button.btn.btn-danger.btn-sm(onclick="submit()") 确认关闭
+block scripts
+  script.
+    var columnId = getDataById("data").columnId;
+    function submit() {
+      var password = $("#password").val();
+      nkcAPI("/m/" + columnId + "/settings/close", "POST", {
+        password: password
+      })
+        .then(function() {
+          $("#page").html("<h4>专栏已关闭</h4>");
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
+    }

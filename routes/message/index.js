@@ -87,7 +87,14 @@ messageRouter
     for(const c of chats) {
       if(c.tUid === user.uid) continue;
       const {unread, tUid, lmId, tlm, toc} = c;
-      const message = messageObj[lmId];
+      let message = messageObj[lmId];
+      if(!message) {
+        message = {
+          ty: "UTU",
+          c: "",
+          tc: c.toc
+        }
+      }
       const targetUser = userObj[tUid];
       if(!targetUser) continue;
       const friend = friendObj[tUid];

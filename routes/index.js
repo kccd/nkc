@@ -12,7 +12,7 @@ const questionRouter = routers.question;
 const resourceRouter = routers.resource;
 const fundRouter = routers.fund;
 const registerRouter = routers.register;
-const personalForumRouter = routers.personalForum;
+// const personalForumRouter = routers.personalForum;
 const downloadRouter = routers.download;
 const systemRouter = routers.system;
 const problemRouter = routers.problem;
@@ -25,6 +25,8 @@ const friendCategoryRouter = routers.friendCategory;
 const homeRouter = routers.home;
 const shareRouter = routers.share;
 const lotteryRouter = routers.lottery;
+const columnRouter = routers.column;
+const columnsRouter = routers.columns;
 const examRouter = routers.exam;
 const forgotPasswordRouter = routers.forgotPassword;
 const shopRouter = routers.shop;
@@ -35,44 +37,6 @@ const searchRouter = routers.search;
 const protocolRouter = routers.protocol;
 const reviewRouter = routers.review;
 
-
-// 所有请求先经过此中间件
-// // 日常登陆
-// router.use('/', async (ctx, next) => {
-//   await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
-//   await next();
-// });
-//
-//
-// router.use('/', async (ctx, next)  => {
-// 	const {nkcModules, db, data} = ctx;
-// 	const {user} = data;
-// 	const {today} = nkcModules.apiFunction;
-// 	if(user) {
-// 		const toc = Date.now();
-// 		const time = today(toc);
-// 		const dailyLogin = await db.UsersScoreLogModel.findOne({
-// 			uid: user.uid,
-// 			type: 'score',
-// 			operationId: 'dailyLogin',
-// 			toc: {
-// 				$gt: time
-// 			}
-// 		});
-//     if(!dailyLogin) {
-// 			await db.UsersScoreLogModel.insertLog({
-// 				user,
-// 				type: 'score',
-// 				typeIdOfScoreChange: 'dailyLogin',
-// 				port: ctx.port,
-// 				ip: ctx.address,
-// 				key: 'dailyLoginCount'
-// 			});
-// 			await user.updateUserMessage();
-// 		}
-// 	}
-//   await next();
-// });
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
@@ -87,7 +51,7 @@ router.use('/f', forumRouter.routes(), forumRouter.allowedMethods());
 router.use('/e', experimentalRouter.routes(), experimentalRouter.allowedMethods());
 router.use('/q', questionRouter.routes(), questionRouter.allowedMethods());
 router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
-router.use('/m', personalForumRouter.routes(), personalForumRouter.allowedMethods());
+// router.use('/m', personalForumRouter.routes(), personalForumRouter.allowedMethods());
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());
 router.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods());
@@ -105,7 +69,9 @@ router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods());
 router.use('/shop', shopRouter.routes(), shopRouter.allowedMethods());
 router.use('/account', accountRouter.routes(), accountRouter.allowedMethods());
-router.use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
+router.use("/review", reviewRouter.routes(), reviewRouter.allowedMethods());
+router.use("/m", columnsRouter.routes(), columnsRouter.allowedMethods());
+router.use("/column", columnRouter.routes(), columnRouter.allowedMethods());
 router.use('/imageEdit', imageEditRouter.routes(), imageEditRouter.allowedMethods());
 router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = router;

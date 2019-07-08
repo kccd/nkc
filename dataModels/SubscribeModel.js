@@ -15,6 +15,7 @@ const schema = new Schema({
   // 1. thread 关注的文章
   // 2. forum 关注的专业
   // 3. user 关注的用户
+  // 4. column 订阅的专栏
   type: {
     type: String,
     required: true,
@@ -37,6 +38,12 @@ const schema = new Schema({
   tUid: {
     type: String,
     default: "",
+    index: 1
+  },
+  // 专栏ID
+  columnId: {
+    type: Number,
+    default: null,
     index: 1
   },
   // 关注的专业ID

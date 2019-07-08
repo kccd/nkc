@@ -30,6 +30,7 @@
     "debug": "^2.6.9",
     "diff": "^3.4.0",
     "direct-alipay": "^3.0.0",
+    "easyimage": "^3.1.1",
     "echarts": "^4.1.0",
     "elasticsearch": "^14.0.0",
     "farmhash": "^2.1.0",

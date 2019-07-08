@@ -1,0 +1,201 @@
+extends ./columnBase
+block columnTitle
+  title=`${data.column.name}`
+  style.
+    body{
+      padding-top: 0;
+      background-color: #f6f6f6;
+    }
+    .navbar.nkcshade{
+      background-color: rgba(246, 246, 246, 0.95);
+    }
+  style=`body{background-color: ${data.column.color};}`
+block content
+  .column-banner-body
+    .column-banner(style=`background-image:url(/m/${data.column._id}/banner)`)
+      .column
+        .column-avatar
+          img(src=`/m/${data.column._id}/avatar`)
+        .column-info
+          .column-other-info
+            .column-name=data.column.name
+            .column-abbr=data.column.abbr
+  div.m-t-2.box-shadow-panel
+    .column
+      div
+        .row
+          .col-xs-12.col-md-9
+            div
+              ul.column-nav
+                li
+                  a(href=`/m/${data.column._id}`) 首页
+                li
+                  a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
+                    .fa.fa-caret-down
+                  ul.dropdown-menu
+                    li
+                      a(href=`/m/${data.column._id}` style="overflow:hidden;")
+                        span 全部
+                    for c in data.categories
+                      li
+                        a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
+                          -for(var i = 0; i < c.level; i++)
+                            span &nbsp;&nbsp;&nbsp;&nbsp;
+                          span=c.name
+                    //li.divider(role="separator")
+                for link in data.column.links
+                  li
+                    a(onclick=`openNewWindow('${link.url}')`)= link.name
+          .col-xs-12.col-md-3
+            .column-button
+              .column-sub-button.active
+                if !data.user || data.user.uid !== data.column.uid
+                  a(href=data.user ? `/m/${data.column._id}/contribute`: "/login" target="_blank")
+                    button 投稿
+                else
+                  a(href="/editor?from=column" target="_blank")
+                    button 发表
+              .column-sub-button
+                //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
+                if !data.user
+                  a(href="/login" target="_blank")
+                    button + 订阅
+                else
+                  if data.subscribedColumn
+                    button(onclick=`subscribeColumn(${data.column._id}, false)`) 已订阅
+                  else
+                    button(onclick=`subscribeColumn(${data.column._id}, true)`) + 订阅
+                if data.column.subCount > 0
+                  span=data.column.subCount
+  .container-fluid.max-width
+    .column
+      .row
+        .col-xs-12.col-md-8.box-shadow-panel.m-t-2
+          div
+            if data.category
+              .column-category-nav
+                a(href=`/m/${data.column._id}`) 全部
+                for c, index in data.categoriesNav
+                  span /
+                  a(href=`/m/${data.column._id}?c=${c._id}`)= c.name
+                .column-category-abbr=data.category.description
+            if data.paging.page === 0 && data.topped.length > 0
+              .m-t-05
+              for columnPost in data.topped
+                include ./singleColumnPost
+              if data.category
+                .column-posts-body-info — 以上为分类置顶 —
+              else
+                .column-posts-body-info — 以上为专栏置顶 —
+            div(style="margin-bottom: -0.6rem;")
+              include ../publicModules/paging/paging
+            .column-posts-body
+              if data.columnPosts.length === 0 && data.topped.length === 0
+                .text-center.p-t-5.p-b-5
+                  h4 空空如也~
+                  if data.user && data.user.uid === data.column.uid
+                    .m-t-1
+                      | 点击
+                      a(href=`/u/${data.user.uid}?t=thread` target="_blank")
+                        b 个人名片页
+                      | 头部的“管理”按钮，可批量将文章推送到专栏。
+              else
+                for columnPost in data.columnPosts
+                  if data.paging.page !== 0 || !data.toppedId.includes(columnPost._id)
+                    include ./singleColumnPost
+            include ../publicModules/paging/paging_input
+        .col-xs-12.col-md-4.box-shadow-panel.m-t-2
+          if data.user && data.user.uid === data.column.uid
+            div.m-b-2
+              .column-management
+                .column-header
+                  .fa.fa-cog &nbsp;专栏管理
+                .row.m-t-1
+                  //-a(href=`/m/${data.column._id}/status` target="_blank").col-xs-4
+                    .fa.fa-line-chart
+                    .name 统计
+                  a(href=`/m/${data.column._id}/settings/post` target="_blank").col-xs-4
+                    .fa.fa-newspaper-o
+                    .name 文章管理
+                  a(href=`/m/${data.column._id}/settings/contribute` target="_blank").col-xs-4
+                    .fa.fa-bell-o
+                    .name 投稿通知
+                    if data.contributeCount > 0
+                      .contribute-count=data.contributeCount
+                  a(href=`/m/${data.column._id}/settings/category` target="_blank").col-xs-4
+                    .fa.fa-list
+                    .name 分类管理
+                  a(href=`/m/${data.column._id}/settings` target="_blank").col-xs-4
+                    .fa.fa-wrench
+                    .name 专栏设置
+                .column-fast-set-btn 快捷设置&nbsp;
+                  .fa.fa-caret-down
+                .form.column-fast-set-body
+                  .form-group
+                    label 专栏背景
+                    input.form-control(data-control="selectColor" id="columnColor" value=data.column.color)
+                  .form-group
+                    button.btn.btn-block.btn-primary(onclick="saveSettings()") 保存
+          div.m-b-2
+            .column-user
+              //-.column-header
+                .fa.fa-user &nbsp;专栏主
+              .column-user-avatar
+                a(href=`/u/${data.column.uid}`)
+                  img(src=`/avatar/${data.column.uid}`)
+              a(href=`/u/${data.column.uid}`).column-user-username=data.column.user.username
+              if data.user && data.user.uid !== data.column.uid
+                .column-user-button
+                  a(href=`/message?uid=${data.column.uid}` target="_blank") 私信
+                  if data.user.subUid.includes(data.column.uid)
+                    a.pointer(href=`javascript:subscribeUser("${data.column.uid}", false)` target="_blank") 取关
+                  else
+                    a.pointer(href=`javascript:subscribeUser("${data.column.uid}", true)` target="_blank") 关注
+              if data.column.user.description
+                .column-user-description=data.column.user.description
+
+          div.m-b-2
+            .column-management
+              .column-header
+                .fa.fa-list &nbsp;文章分类
+              .column-categories
+                a.column-category(href=`/m/${data.column._id}` class=!data.c?"active":"")
+                  span 全部
+                  .pull-right
+                    if data.columnPostcount > 0
+                      .column-category-count=data.columnPostcount
+                    .fa.fa-angle-right
+                for c in data.categories
+                  a.column-category(href=`/m/${data.column._id}?c=${c._id}` class=Number(data.c)===c._id?"active":"")
+                    -for(var i = 0; i < c.level; i++)
+                      span &nbsp;&nbsp;&nbsp;&nbsp;
+                    span=c.name
+                    .pull-right
+                      if c.count > 0
+                        .column-category-count=c.count
+                      .fa.fa-angle-right
+
+          if data.column.notice
+            div.m-b-2
+              .column-threads
+                .column-header
+                  .fa.fa-bullhorn &nbsp;公告通知
+                p!=markdown_safe(data.column.notice)
+          if data.column.otherLinks && data.column.otherLinks.length > 0
+            div.m-b-2
+              .column-threads
+                .column-header
+                  .fa.fa-link &nbsp;友情链接
+                .column-links
+                  for link in data.column.otherLinks
+                    a(onclick=`openNewWindow('${link.url}')`)= link.name
+          //- div.m-b-2
+            .column-threads
+              .column-header
+                .fa.fa-fire &nbsp; 栏主推荐
+
+
+  .hidden#data=objToStr({columnId: data.column._id, color: data.column.color})
+block scripts
+  include ../publicModules/selectColor
+  +includeJS("/columns/column.js")

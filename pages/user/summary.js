@@ -1,5 +1,6 @@
 $(function() {
   var userPostSummary = getDataById("userSummaryData").userPostSummary;
+  if(!userPostSummary) return;
   var forumsName = [], summaryData = [], colors = [];
 
   for(var i = 0; i < userPostSummary.length; i++) {
