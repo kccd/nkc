@@ -6,6 +6,7 @@ block content
         .col-xs-12.col-md-12.m-b-1
           div
             .column-settings-nav
+              a(href=`/m/${data.column._id}` ) 返回专栏
               a(href=`/m/${data.column._id}/settings` class=data.highlight==="info"?"active":"") 专栏设置
               a(href=`/m/${data.column._id}/settings/category` class=data.highlight==="category"?"active":"") 分类管理
               a(href=`/m/${data.column._id}/settings/post` class=data.highlight==="post"?"active":"") 内容管理

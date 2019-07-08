@@ -114,8 +114,8 @@ block content
                   else
                     -status = 3;
                 p 认证说明：
-                  span.text-danger 上传身份证正反照片完成认证
-                p 注意：请横向摆放，使用手机拍摄，保留周围背景，不要使用扫描件，大小不超过20M，并且只能为.jpg、.jpeg、.png格式。
+                  span.text-danger 上传手持身份证照片完成认证
+                p 注意：请使用手机拍摄，保留周围背景，且保证身份证上的内容清晰可见，不要使用扫描件，大小不超过20M，并且只能为.jpg、.jpeg、.png格式。
                 if handheldIdCard && [4, 5].includes(status)
                   if status === 4
                     h5=`过期时间：${handheldIdCard.expiryDate.toLocaleDateString()}`

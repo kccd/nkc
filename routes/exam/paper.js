@@ -22,8 +22,9 @@ paperRouter
     const paperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
     if(paperCount >= countOneDay) ctx.throw(403, `一天之内只能参加${countOneDay}次考试，今日您的考试次数已用完，请明天再试。`);
     const now = Date.now();
-    const allPaperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: waitingTime*24*60*60*1000}});
     let {stageTime} = user.generalSettings.examSettings;
+    // const allPaperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: waitingTime*24*60*60*1000}});
+    const allPaperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: stageTime}});
     stageTime = new Date(stageTime).getTime();
     if(allPaperCount >= count) {
       if(now > stageTime + waitingTime*24*60*60*1000) {

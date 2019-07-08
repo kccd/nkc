@@ -1,3 +1,4 @@
+var selectImage;
 var data = getDataById("data");
 var app = new Vue({
   el: "#app",
@@ -13,24 +14,18 @@ var app = new Vue({
     error: ""
   },
   mounted: function() {
-    moduleCrop.init(this.selectedImage);
+    selectImage = new NKC.methods.selectImage();
     NKC.methods.initSelectColor(function(hex) {
       app.column.color = hex;
     });
   },
   methods: {
-    selectedImage: function(data, name) {
-      if(name === "avatar") {
-        this.selectedAvatar(data);
-      } else {
-        this.selectedBanner(data);
-      }
-    },
     selectedBanner: function(data) {
       this.banner = data;
       fileToUrl(data)
         .then(function(url) {
           app.bannerUrl = url;
+          selectImage.close();
         })
     },
     selectedAvatar: function(data) {
@@ -38,18 +33,21 @@ var app = new Vue({
       fileToUrl(data)
         .then(function(url) {
           app.avatarUrl = url;
+          selectImage.close();
         })
     },
     selectBanner: function() {
-      moduleCrop.show({
+      selectImage.show(function(data){
+        app.selectedBanner(data);
+      }, {
         aspectRatio: 4,
-        name: "banner"
       });
     },
     selectAvatar: function() {
-      moduleCrop.show({
+      selectImage.show(function(data){
+        app.selectedAvatar(data);
+      }, {
         aspectRatio: 1,
-        name: "avatar"
       });
     },
     submit: function() {
@@ -70,6 +68,7 @@ var app = new Vue({
         formData.append("notice", column.notice);
       }
       formData.append("links", JSON.stringify(column.links));
+      formData.append("otherLinks", JSON.stringify(column.otherLinks));
       formData.append("name", column.name);
       formData.append("abbr", column.abbr);
       formData.append("description", column.description);
@@ -85,27 +84,44 @@ var app = new Vue({
           app.error = data.error || data;
         })
     },
-    addLink: function() {
-      this.column.links.push({
-        name: "",
-        url: ""
-      });
-    },
-    moveLink: function(type, index) {
-      if(type === "up") {
-        if(index === 0) return;
-        var lastLink = app.column.links[index-1];
-        Vue.set(app.column.links, index-1, app.column.links[index]);
-        Vue.set(app.column.links, index, lastLink);
-      } else if(type === "down") {
-        if((index + 1) === app.column.links.length) return;
-        var nextLink = app.column.links[index+1];
-        Vue.set(app.column.links, index+1, app.column.links[index]);
-        Vue.set(app.column.links, index, nextLink);
+    addLink: function(otherLink) {
+      if(otherLink) {
+        this.column.otherLinks.push({
+          name: "",
+          url: ""
+        });
+      } else {
+        this.column.links.push({
+          name: "",
+          url: ""
+        });
       }
     },
-    removeLink: function(index) {
-      this.column.links.splice(index, 1);
+    moveLink: function(type, index, otherLinks) {
+      var links = [];
+      if(otherLinks) {
+        links = app.column.otherLinks;
+      } else {
+        links = app.column.links;
+      }
+      if(type === "up") {
+        if(index === 0) return;
+        var lastLink = links[index-1];
+        Vue.set(links, index-1, links[index]);
+        Vue.set(links, index, lastLink);
+      } else if(type === "down") {
+        if((index + 1) === links.length) return;
+        var nextLink = links[index+1];
+        Vue.set(links, index+1, links[index]);
+        Vue.set(links, index, nextLink);
+      }
+    },
+    removeLink: function(index, otherLinks) {
+      if(otherLinks) {
+        this.column.otherLinks.splice(index, 1);
+      } else {
+        this.column.links.splice(index, 1);
+      }
     }
   }
 });

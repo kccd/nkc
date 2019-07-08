@@ -161,8 +161,9 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
 * 生成在各分类的排序
 * */
 schema.statics.getCategoriesOrder = async (categoriesId) => {
-  const order = {};
   const SettingModel = mongoose.model("settings");
+  const order = {};
+  order[`cid_default`] = await SettingModel.operateSystemID('columnPostOrders', 1);
   for(const _id of categoriesId) {
     order[`cid_${_id}`] = await SettingModel.operateSystemID('columnPostOrders', 1);
   }

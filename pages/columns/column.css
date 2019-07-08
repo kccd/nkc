@@ -701,6 +701,19 @@ img.apply-column-banner{
 .column-nav>li>a:hover{
   color: #2b90d9;
 }
+.column-links a{
+  display: inline-block;
+  cursor: pointer;
+  margin-right: 1rem;
+  color: #555;
+}
+
+.column-links a:hover, .column-links a:focus{
+  text-decoration: none;
+  color: #282c37;
+}
+
+
 @media (max-width: 767px) {
   .column-avatar{
     height: 6rem;

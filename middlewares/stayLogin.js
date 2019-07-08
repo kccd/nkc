@@ -128,7 +128,7 @@ module.exports = async (ctx, next) => {
   data.user = user;
 
   // 专业树状结构，第二层以上的专业都在第二层显示
-  ctx.state.forumsTree = await db.ForumModel.getForumsTreeLevel2(
+  ctx.state.forumsTree = await db.ForumModel.getForumsTree(
     data.userRoles,
     data.userGrade,
     data.user

@@ -36,46 +36,48 @@ block content
 
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-2.hidden-sm.hidden-xs#leftDom
-        .hidden-xs
-          include ../publicModules/post_button
-        .forum-description
-          .col-xs-6
-            .forum-count-number= data.forum.countThreads
-            .forum-count-title 文章
-          .col-xs-6
-            .forum-count-number= data.forum.countPosts
-            .forum-count-title 回复
-          .col-xs-6
-            .forum-count-number= data.subUsersCount
-            .forum-count-title 关注
-          .col-xs-6
-            .forum-count-number= data.forum.countPostsToday
-            .forum-count-title 今日更新
-          .col-xs-12.m-t-1
-            .row
-              .forum-description-content=data.forum.description
-          .col-xs-12
-            .row
-              if data.moderators && data.moderators.length > 0
-                +moderator(data.moderators)
-          if data.threadTypes.length > 0
+      .col-xs-12.col-md-2.hidden-sm.hidden-xs
+        #leftDom
+          .hidden-xs
+            include ../publicModules/post_button
+          .forum-description
+            .col-xs-6
+              .forum-count-number= data.forum.countThreads
+              .forum-count-title 文章
+            .col-xs-6
+              .forum-count-number= data.forum.countPosts
+              .forum-count-title 回复
+            .col-xs-6
+              .forum-count-number= data.subUsersCount
+              .forum-count-title 关注
+            .col-xs-6
+              .forum-count-number= data.forum.countPostsToday
+              .forum-count-title 今日更新
+            .col-xs-12.m-t-1
+              .row
+                .forum-description-content=data.forum.description
             .col-xs-12
               .row
-                h5 文章分类
-                .forum-category
-                  a(class=!data.cat?"active":"" href=`/f/${data.forum.fid}`) 全部
-                  for threadType in data.threadTypes
-                    a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}/latest?cat=${threadType.cid}`)= threadType.name
-          .col-xs-12
-            .row
-              if data.forum.parentForums && data.forum.parentForums.length > 0
-                +forumPanel("上级专业", data.forum.parentForums)
-              if data.forum.childrenForums && data.forum.childrenForums.length > 0
-                +forumPanel("细分专业", data.forum.childrenForums)
-              if data.sameLevelForums && data.sameLevelForums.length > 0
-                +forumPanel("同级专业", data.sameLevelForums, true)
-        //-include ../publicModules/forums_nav/forums_block
+                if data.moderators && data.moderators.length > 0
+                  +moderator(data.moderators)
+            if data.threadTypes.length > 0
+              .col-xs-12
+                .row
+                  h5 文章分类
+                  .forum-category
+                    a(class=!data.cat?"active":"" href=`/f/${data.forum.fid}`) 全部
+                    for threadType in data.threadTypes
+                      a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}/latest?cat=${threadType.cid}`)= threadType.name
+            .col-xs-12
+              .row
+                if data.forum.parentForums && data.forum.parentForums.length > 0
+                  +forumPanel("上级专业", data.forum.parentForums)
+                if data.forum.childrenForums && data.forum.childrenForums.length > 0
+                  +forumPanel("细分专业", data.forum.childrenForums)
+                if data.sameLevelForums && data.sameLevelForums.length > 0
+                  +forumPanel("同级专业", data.sameLevelForums, true)
+        div
+          include ../publicModules/forums_nav/forums_tree
 
       .col-xs-12.col-md-7
         .row
