@@ -75,7 +75,7 @@ block body
       script!=`screenTopAlert("您发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
     -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
     if kcb > 0
-      script!=`screenTopAlert("您发表的内容被评为精选，共获得 ${kcb} 个科创币！")`
+      script!=`screenTopAlert("您发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
 
   block scripts
