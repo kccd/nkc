@@ -146,6 +146,35 @@ const getDomByType = (t, app) => {
     }
   }
 };
+// const getAppVueDom = (template) => {
+//   let {content, parameters} = template;
+//   content = content.replace(/\n/ig, "<br>");
+//   content = content.replace(/\s/ig, "&nbsp;");
+//   content = content.replace(/\[url=(.*?)\((.*?)\)]/ig, (v1, v2, v3) => {
+//     let url, name;
+//     if(!parameters.includes(v2)) {
+//       url = `'${v2}'`;
+//     } else {
+//       url = getDomByType(v2, true);
+//     }
+//     if(!parameters.includes(v3)) {
+//       name = `'${v3}'`;
+//     } else {
+//       name = getDomByType(v3, true);
+//     }
+//     return `&nbsp;<a style="color: #2b90d9;" @click="${url}" target="_blank"><b>{{${name}}}</b></a>&nbsp;`
+//   });
+//   content = content.replace(/\[text=(.*?)]/ig, (v1, v2) => {
+//     let text;
+//     if(!parameters.includes(v2)) {
+//       text = `'${v2}'`;
+//     } else {
+//       text = getDomByType(v2, true);
+//     }
+//     return `&nbsp;<b>{{${text}}}</b>&nbsp;`
+//   });
+//   return content;
+// };
 const getAppVueDom = (template) => {
   let {content, parameters} = template;
   content = content.replace(/\n/ig, "<br>");
@@ -155,21 +184,21 @@ const getAppVueDom = (template) => {
     if(!parameters.includes(v2)) {
       url = `'${v2}'`;
     } else {
-      url = getDomByType(v2, true);
+      url = getDomByType(v2);
     }
     if(!parameters.includes(v3)) {
       name = `'${v3}'`;
     } else {
-      name = getDomByType(v3, true);
+      name = getDomByType(v3);
     }
-    return `&nbsp;<a style="color: #2b90d9;" @click="${url}" target="_blank"><b>{{${name}}}</b></a>&nbsp;`
+    return `&nbsp;<a @click="openNewTarget(${url})" target="_blank" style="color:#2b90d9"><b>{{${name}}}</b></a>&nbsp;`
   });
   content = content.replace(/\[text=(.*?)]/ig, (v1, v2) => {
     let text;
     if(!parameters.includes(v2)) {
       text = `'${v2}'`;
     } else {
-      text = getDomByType(v2, true);
+      text = getDomByType(v2);
     }
     return `&nbsp;<b>{{${text}}}</b>&nbsp;`
   });

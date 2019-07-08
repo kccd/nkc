@@ -47,6 +47,11 @@ apiready = function() {
               equaiHref = true;
             }
           }
+          // 如果是在首页跳转到最新关注推荐等，不打开新页面
+          if(this.pathname === "/" && api.winName === "root") {
+            window.location.href = addApptypeToUrl(this.href)
+            return;
+          }
           if(equaiHref) {
             appFreshUrl(this.href);
           }else{
@@ -71,6 +76,18 @@ apiready = function() {
   if(urlType !== "common") {
     getSiteMeta();
   }
+  api.refreshHeaderLoadDone();
+  // 下拉刷新当前页面
+  api.setRefreshHeaderInfo({
+    bgColor: '#eeeeee',
+    textColor: '#aaaaaa',
+    textDown: '下拉刷新',
+    textUp: '松开刷新',
+    textLoading: '刷新成功，正在加载资源...',
+    showTime: false
+  }, function(ret, err) {
+    window.location.reload()
+  });
 }
 
 /**
@@ -105,6 +122,10 @@ function appOpenUrl(urlStr) {
   if(shareType !== "common") {
     windowFile = "widget://html/common/shareInfo.html"
   }
+  api.execScript({
+    name: "root",
+    script: "shareReadyBan()"
+  })
   api.openWin({
     name: paramStr,
     url: windowFile,
@@ -171,7 +192,7 @@ function getSiteMeta() {
   try{
     title = document.getElementsByTagName("title")[0].text;
   }catch(e){
-    title = "来自科创论坛的分享";
+    title = "来自科创的分享";
   }
   try {
     description = document.getElementsByName("description")[0].getAttribute("content");
