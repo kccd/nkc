@@ -124,7 +124,9 @@ schema.statics.findById = async (_id) => {
   }
   return null;
 };
-
+/*
+* 获取专栏分类层级关系数组
+* */
 schema.statics.getCategoryNav = async (_id) => {
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
   const category = await ColumnPostCategoryModel.findOne({_id});
@@ -184,6 +186,22 @@ schema.statics.getChildCategory = async (categoryId) => {
   func(category);
   return results;
 };
+/*
+* 返回专栏导航中的分类，只显示第一层，其余都在第二层
+* @param {Number} columnId 专栏ID
+* */
+schema.statics.getColumnNavCategory = async (columnId) => {
+  const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
+  const categories = await ColumnPostCategoryModel.find({columnId, level: 0}).sort({order: 1});
+  const results = [];
+  for(let category of categories) {
+    category = category.toObject();
+    category.children = await ColumnPostCategoryModel.getChildCategory(category._id);
+    results.push(category);
+  }
+  return results;
+};
+
 /*
 * 获取所有下级分类ID
 * @param {Number} categoryId 分类ID

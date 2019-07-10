@@ -1,5 +1,6 @@
 if(!NKC) var NKC = {};
 NKC.methods = {};
+NKC.modules = {};
 // 滚动到页面最顶部
 NKC.methods.initScrollTo = function(options, callback) {
   var top = options.top;

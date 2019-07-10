@@ -1468,5 +1468,33 @@ threadSchema.methods.createNewPost = async function(post) {
   }
   return _post
 };
+/*
+* 检验用户是否为文章所在专业的专家
+* @param {String/Object} uid 用户ID或对象
+* @param {String} type "or": 只需是其中一个专业的专家，"and": 必须是所有专业的和专家
+* @return {Boolean} 是否为专家
+* @author pengxiguaa 2019-7-10
+* */
+threadSchema.methods.isModerator = async function(uid, type) {
+  const UserModel = mongoose.model("users");
+  let user;
+  if(typeof uid === "string") {
+    user = await UserModel.findOnly({uid});
+  } else {
+    user = uid;
+  }
+  const forums = await this.extendForums(["mainForums"]);
+  if(type === "or") {
+    for(const forum of forums) {
+      if(await forum.isModerator(user)) return true;
+    }
+    return false;
+  } else {
+    for(const forum of forums) {
+      if(!await forum.isModerator(user)) return false;
+    }
+    return true;
+  }
+};
 
 module.exports = mongoose.model('threads', threadSchema);

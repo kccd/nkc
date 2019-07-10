@@ -1,0 +1,49 @@
+extends ./base
+block columnTitle
+  title 添加内容
+block settingsContent
+  .row
+    .col-xs-12.col-md-12
+      .m-b-1
+        span 自定义条数：
+        input(style="max-width: 5rem;" id="perpage" data-column-id=data.column._id value=data.c)
+        button(type="submit" onclick="setPerpage()") 确定
+      .paging-button
+        a.button.pointer.radius-left.radius-right(onclick="showAll()") 全部展开
+      .paging-button
+        a.button.pointer.radius-left(onclick="selectAll()") 全选
+        a.button.pointer.radius-right(onclick="selectMark()") 添加已选
+      include ../../publicModules/paging/paging
+      if data.threads.length > 0
+        for thread in data.threads
+          .column-thread-panel
+            .checkbox.display-i-b
+              label
+                input(type="checkbox" data-thread-oc=thread.oc)
+            span.column-thread-title(onclick=`showInfo('${thread.tid}')`)=thread.firstPost.t
+            a.column-thread-url(href=`/t/${thread.tid}` target="_blank")
+              .fa.fa-external-link
+            .column-thread-info(data-info-tid=thread.tid)
+              if thread.hasCover
+                .column-thread-cover
+                  img(src=`/cover/${thread.tid}`)
+              .column-thread-content
+                .column-thread-abstract=thread.firstPost.c
+                .column-thread-forums.m-t-05
+                  span 所在专业：
+                  for f in thread.forums
+                    a.m-r-1(href=`/f/${f.fid}` target="_blank")=f.displayName
+      else
+        h4 空空如也，
+          a(href="/edit" target="_blank") 去发表
+      .m-t-05
+        .paging-button
+          a.button.pointer.radius-left.radius-right(onclick="showAll()") 全部展开
+        .paging-button
+          a.button.pointer.radius-left(onclick="selectAll()") 全选
+          a.button.pointer.radius-right(onclick="selectMark()") 添加已选
+        include ../../publicModules/paging/paging_input
+  -const column = data.column;
+  include ../../publicModules/toColumn/toColumn
+block scripts
+  +includeJS("/columns/settings/addPost.js")

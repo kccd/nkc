@@ -1,5 +1,6 @@
 var selectImage;
 var data = getDataById("data");
+var reg = /^(http|https):\/\//i;
 var app = new Vue({
   el: "#app",
   data: {
@@ -20,6 +21,23 @@ var app = new Vue({
     });
   },
   methods: {
+    replaceImageUrl: function(str) {
+      str = str.replace(/!\[.*?]\(.*?\)/ig, "");
+      return str.replace(/\[.*?]\(.*?\)/ig, "");
+    },
+    changed: function(arr, index) {
+      if(index === undefined) {
+        return this.column.notice = this.replaceImageUrl(arr);
+      }
+      var item = arr[index];
+      if(item.url) {
+        if(!reg.test(item.url)) {
+          item.url = "http://" + item.url;
+        }
+      } else {
+        item.content = this.replaceImageUrl(item.content);
+      }
+    },
     selectedBanner: function(data) {
       this.banner = data;
       fileToUrl(data)
@@ -72,7 +90,19 @@ var app = new Vue({
       formData.append("name", column.name);
       formData.append("abbr", column.abbr);
       formData.append("description", column.description);
+      formData.append("navCategory", column.navCategory);
+      formData.append("perpage", column.perpage);
       if(column.color) formData.append("color", column.color);
+
+      for(var i = 0; i < column.blocks.length; i++) {
+        var block = column.blocks[i];
+        if(!block.name) return this.error = "自定义内容标题不能为空";
+        if(!block.content) return this.error = "自定义内容不能为空";
+        block.show = !!block.show;
+      }
+
+      formData.append("blocks", JSON.stringify(column.blocks));
+
       uploadFilePromise("/m/" + this.column._id, formData, function(e, a) {
         app.info = "提交中..." + a;
       }, "PATCH")
@@ -122,6 +152,36 @@ var app = new Vue({
       } else {
         this.column.links.splice(index, 1);
       }
+    },
+    addBlock: function() {
+      if(this.column.blocks.length >= 5) return;
+      this.column.blocks.push({
+        name: "",
+        content: "",
+        show: true
+      });
+    },
+    moveBlock: function(index, type) {
+      var otherBlock;
+      if(type === "up") {
+        if(index === 0) return;
+        otherBlock = this.column.blocks[index-1];
+        this.column.blocks[index-1] = this.column.blocks[index];
+      } else {
+        if((index+1) === this.column.blocks.length) return;
+        otherBlock = this.column.blocks[index + 1];
+        this.column.blocks[index + 1] = this.column.blocks[index];
+      }
+      Vue.set(this.column.blocks, index, otherBlock);
+    },
+    deleteBlock: function(index) {
+      Vue.delete(this.column.blocks, index);
+    },
+    replacePerpage: function() {
+      var perpage = this.column.perpage;
+      perpage = parseInt(perpage);
+      if(isNaN(perpage) || perpage <= 0) perpage = 1;
+      this.column.perpage = perpage;
     }
   }
 });

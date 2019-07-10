@@ -60,6 +60,7 @@ const complaint = require("./complaint");
 const imageEdit = require('./imageEdit');
 const protocol = require('./protocol');
 const review = require("./review");
+const threads = require("./threads");
 const operationObj = {};
 
 
@@ -197,6 +198,8 @@ operationObj.operationTree = {
     review, // 审核
 
     column, // 专栏申请
+
+    threads, // 文章批量管理
 	}
 };
 module.exports = operationObj;

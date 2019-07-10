@@ -77,10 +77,10 @@ $(document).ready(function(){
 function addToColumn(pid, columnId) {
   moduleToColumn.show(function(data) {
     var columnId = data.columnId;
-    var categoryId = data.categoryId;
+    var categoriesId = data.categoriesId;
     nkcAPI("/m/" + columnId + "/post", "POST", {
       type: "addToColumn",
-      categoryId: categoryId,
+      categoriesId: categoriesId,
       postsId: [pid]
     })
       .then(function() {
@@ -90,6 +90,8 @@ function addToColumn(pid, columnId) {
       .catch(function(data) {
         screenTopWarning(data);
       });
+  }, {
+    selectMul: true
   });
 }
 function removeToColumn(pid, columnId) {

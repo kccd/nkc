@@ -1,0 +1,54 @@
+.forum-body{
+  overflow: hidden;
+}
+.forum-name{
+  font-size: 1.3rem;
+}
+.move-thread-forum-name{
+  display: block;
+  height: 2.2rem;
+  line-height: 2.2rem;
+  font-weight: 700;
+}
+.move-thread-child-forums .move-thread-forum-name, .move-thread-selected-forums .move-thread-forum-name {
+  display: inline-block;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+  font-weight: normal;
+  border-radius: 3px;
+  cursor: pointer;
+  margin: 0 0.5rem 0.5rem 0;
+  color: #fff;
+}
+.move-thread-selected-forums h5{
+  font-weight: 700;
+}
+.move-thread-selected-forums{
+  margin-bottom: 0;
+}
+.move-thread-select-forums{
+  max-height: 40rem;
+  overflow-y: scroll;
+  background-color: #eee;
+  padding: 0.5rem;
+  border-radius: 3px;
+}
+.move-thread-select-forums.topic{
+  background-color: #d9e1e8;
+}
+@media (max-width: 767px) {
+  .move-thread-select-forums{
+    max-height: 30rem;
+  }
+}
+.move-thread-thread-type{
+  display: inline-block;
+  margin: 0 0.5rem 0.5rem 0;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+  cursor: pointer;
+  border-radius: 3px;
+  background-color: #999;
+  color: #fff;
+}

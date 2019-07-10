@@ -3,8 +3,8 @@ module.exports = {
 	PARAMETER: {
 		GET: 'visitThread',
 		POST: 'postToThread',
-		moveThread: {
-			PATCH: 'moveThread'
+		disabled: {
+			POST: 'moveThread'
 		},
 		moveDraft: {
 			PATCH: 'moveDraft',
@@ -30,9 +30,9 @@ module.exports = {
 			POST: 'homeTop',
 			DELETE: 'unHomeTop'
 		},
-		switchInPersonalForum: {
+		/*switchInPersonalForum: {
 			PATCH: 'switchInPersonalForum'
-		},
+		},*/
 		close: {
 			POST: 'closeThread',
 			DELETE: 'openThread'

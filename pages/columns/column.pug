@@ -29,23 +29,40 @@ block content
               ul.column-nav
                 li
                   a(href=`/m/${data.column._id}`) 首页
-                li
-                  a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
-                    .fa.fa-caret-down
-                  ul.dropdown-menu
-                    li
-                      a(href=`/m/${data.column._id}` style="overflow:hidden;")
-                        span 全部
-                    for c in data.categories
+                if !data.column.navCategory
+                  li
+                    a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
+                      .fa.fa-caret-down
+                    ul.dropdown-menu
                       li
-                        a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
-                          -for(var i = 0; i < c.level; i++)
-                            span &nbsp;&nbsp;&nbsp;&nbsp;
-                          span=c.name
-                    //li.divider(role="separator")
+                        a(href=`/m/${data.column._id}` style="overflow:hidden;")
+                          span 全部
+                      for c in data.categories
+                        li
+                          a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
+                            -for(var i = 0; i < c.level; i++)
+                              span &nbsp;&nbsp;&nbsp;&nbsp;
+                            span=c.name
+                      //li.divider(role="separator")
+                else
+                  for c in data.navCategories
+                    if c.children && c.children.length
+                      li
+                        a(href=`/m/${data.column._id}?c=${c._id}` style="margin-right: 0;padding-right:0")=c.name
+                        a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                        ul.dropdown-menu
+                          for cc in c.children
+                            li
+                              a(href=`/m/${data.column._id}?c=${cc._id}` style="overflow:hidden")
+                                -for(var i = 0; i < (cc.level - 1); i++)
+                                  span &nbsp;&nbsp;&nbsp;&nbsp;
+                                span=cc.name
+                    else
+                      li
+                        a(href=`/m/${data.column._id}?c=${c._id}`)=c.name
                 for link in data.column.links
                   li
-                    a(onclick=`openNewWindow('${link.url}')`)= link.name
+                    a(title=link.url onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
           .col-xs-12.col-md-3
             .column-button
               .column-sub-button.active
@@ -122,6 +139,9 @@ block content
                     .name 投稿通知
                     if data.contributeCount > 0
                       .contribute-count=data.contributeCount
+                  a(href=`/m/${data.column._id}/settings/post/add` target="_blank").col-xs-4
+                    .fa.fa-plus-circle
+                    .name 添加文章
                   a(href=`/m/${data.column._id}/settings/category` target="_blank").col-xs-4
                     .fa.fa-list
                     .name 分类管理
@@ -153,7 +173,12 @@ block content
                     a.pointer(href=`javascript:subscribeUser("${data.column.uid}", true)` target="_blank") 关注
               if data.column.user.description
                 .column-user-description=data.column.user.description
-
+          if data.column.notice
+            div.m-b-2
+              .column-threads
+                .column-header
+                  .fa.fa-bullhorn &nbsp;公告通知
+                p!=markdown_safe(data.column.notice)
           div.m-b-2
             .column-management
               .column-header
@@ -174,13 +199,21 @@ block content
                       if c.count > 0
                         .column-category-count=c.count
                       .fa.fa-angle-right
-
-          if data.column.notice
+          if data.timeline && data.timeline.length > 0
             div.m-b-2
-              .column-threads
+              .column-management
                 .column-header
-                  .fa.fa-bullhorn &nbsp;公告通知
-                p!=markdown_safe(data.column.notice)
+                  .fa.fa-calendar &nbsp;内容统计
+                .m-t-05
+                  for t in data.timeline
+                    .column-timeline=t.time
+                      .pull-right=`${t.count} 篇`
+          for block in data.column.blocks
+            if block.show
+              div.m-b-2
+                .column-block
+                  .column-header=block.name
+                  p!=markdown_safe(block.content)
           if data.column.otherLinks && data.column.otherLinks.length > 0
             div.m-b-2
               .column-threads
@@ -188,7 +221,7 @@ block content
                   .fa.fa-link &nbsp;友情链接
                 .column-links
                   for link in data.column.otherLinks
-                    a(onclick=`openNewWindow('${link.url}')`)= link.name
+                    a(onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
           //- div.m-b-2
             .column-threads
               .column-header

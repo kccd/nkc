@@ -40,6 +40,7 @@ router
     });
     await category.save();
     data.category = category;
+    data.categories =
     await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })
@@ -99,7 +100,7 @@ router
     if(children > 0) ctx.throw(400, "该分类下还有其他分类，无法删除");
     const postCount = await db.ColumnPostModel.count({columnId: column._id, cid: categoryId});
     if(postCount > 0) ctx.throw(400, "该分类下存在内容，无法删除");
-    await category.remove();
+    await db.ColumnPostCategoryModel.remove({columnId: column._id, _id: category._id});
     await next();
   });
 module.exports = router;

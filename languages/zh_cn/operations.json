@@ -52,6 +52,7 @@
   "visitThread": "阅读文章",
   "postToThread": "回复文章",
   "moveThread": "将文章移动至回收站（只对专家和具有超级专家权限的用户有效）",
+  "moveThreads": "批量移动文章",
   "collectThread": "收藏文章",
   "delCollectThread": "取消文章收藏",
   "digestThread": "将文章设为精选文章",

@@ -68,7 +68,7 @@ router
     let q = {};
     let threadListType;
     if(t) {
-      if(!["latest", "recommend", "subscribe"].includes(t)) t = '';
+      if(!["latest", "recommend", "subscribe", "column"].includes(t)) t = '';
       if(t === "subscribe" && !user) t = '';
       threadListType =  t;
     }
@@ -77,15 +77,19 @@ router
         const {visitorThreadList} = homeSettings;
         if(visitorThreadList === "latest") {
           threadListType = "latest"
-        } else {
+        } else if(visitorThreadList === "recommend") {
           threadListType = "recommend"
+        } else {
+          threadListType = "column";
         }
       } else {
         const {homeThreadList} = user.generalSettings.displaySettings;
         if(homeThreadList === "latest") {
           threadListType = "latest";
-        } else {
+        } else if(homeThreadList === "subscribe") {
           threadListType = "subscribe";
+        } else {
+          threadListType = "column";
         }
       }
     }
@@ -176,65 +180,75 @@ router
           }
         ]
       };
-    } else {
+    } else if(threadListType === "recommend") {
       q = await db.ThreadModel.getRecommendMatch(fidOfCanGetThreads);
+    } else {
+      // 专栏
     }
 
-    const count = await db.ThreadModel.count(q);
-    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
-
-    let sort = {tlm: -1};
-    if(s === "toc") sort = {toc: -1};
-
-    let threads = await db.ThreadModel.find(q, {
-      uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
-      tlm: 1, fid: 1, hasCover: 1,
-      mainForumsId: 1, hits: 1, count: 1,
-      digest: 1, reviewed: 1,
-      disabled: 1, recycleMark: 1
-    }).skip(paging.start).limit(paging.perpage).sort(sort);
-
-    threads = await db.ThreadModel.extendThreads(threads, {
-      htmlToText: true
-    });
-
-    const superModerator = ctx.permission("superModerator");
-    let canManageFid = [];
-    if(user) {
-      canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
-    }
     data.threads = [];
-    for(const thread of threads) {
-      if(thread.disabled || thread.recycleMark) {
-        // 根据权限过滤掉 屏蔽、退修的内容
-        if (user) {
-          // 不具有特殊权限且不是自己
-          if (!superModerator) {
-            const mainForumsId = thread.mainForumsId;
-            let has = false;
-            for (const fid of mainForumsId) {
-              if (canManageFid.includes(fid)) {
-                has = true;
+    let paging;
+    if(["latest", "recommend", "subscribe"].includes(threadListType)) {
+      const count = await db.ThreadModel.count(q);
+      paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+
+      let sort = {tlm: -1};
+      if(s === "toc") sort = {toc: -1};
+
+      let threads = await db.ThreadModel.find(q, {
+        uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
+        tlm: 1, fid: 1, hasCover: 1,
+        mainForumsId: 1, hits: 1, count: 1,
+        digest: 1, reviewed: 1,
+        disabled: 1, recycleMark: 1
+      }).skip(paging.start).limit(paging.perpage).sort(sort);
+
+      threads = await db.ThreadModel.extendThreads(threads, {
+        htmlToText: true
+      });
+
+      const superModerator = ctx.permission("superModerator");
+      let canManageFid = [];
+      if(user) {
+        canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
+      }
+      for(const thread of threads) {
+        if(thread.disabled || thread.recycleMark) {
+          // 根据权限过滤掉 屏蔽、退修的内容
+          if (user) {
+            // 不具有特殊权限且不是自己
+            if (!superModerator) {
+              const mainForumsId = thread.mainForumsId;
+              let has = false;
+              for (const fid of mainForumsId) {
+                if (canManageFid.includes(fid)) {
+                  has = true;
+                }
               }
+              if (!has) continue;
             }
-            if (!has) continue;
+          } else {
+            continue;
           }
-        } else {
-          continue;
         }
-      }
-      if(threadListType === "subscribe") {
-        if(subTid.includes(thread.tid)) {
-          thread.from = 'subThread';
-        } else if(subUid.includes(thread.uid)) {
-          thread.from = 'subFriend';
-        } else if(thread.uid === user.uid) {
-          thread.from = 'own';
-        } else {
-          thread.from = 'subForum';
+        if(threadListType === "subscribe") {
+          if(subTid.includes(thread.tid)) {
+            thread.from = 'subThread';
+          } else if(subUid.includes(thread.uid)) {
+            thread.from = 'subFriend';
+          } else if(thread.uid === user.uid) {
+            thread.from = 'own';
+          } else {
+            thread.from = 'subForum';
+          }
         }
+        data.threads.push(thread);
       }
-      data.threads.push(thread);
+    } else if(threadListType === "column") {
+      const count = await db.ColumnPostModel.count();
+      paging = nkcModules.apiFunction.paging(page, count);
+      const columnPosts = await db.ColumnPostModel.find().sort({top: -1}).skip(paging.start).limit(paging.perpage);
+      data.threads =  await db.ColumnPostModel.extendColumnPosts(columnPosts,fidOfCanGetThreads);
     }
 
     if(threadListType !== "latest") {

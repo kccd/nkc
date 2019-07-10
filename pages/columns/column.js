@@ -31,5 +31,6 @@ function saveSettings() {
 }
 
 function openNewWindow(url) {
+
   window.open(url);
 }

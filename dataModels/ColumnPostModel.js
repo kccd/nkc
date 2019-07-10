@@ -70,15 +70,18 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   const PostModel = mongoose.model("posts");
   const ThreadModel = mongoose.model("threads");
   const UserModel = mongoose.model("users");
+  const ColumnModel = mongoose.model("columns");
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
   const pid = new Set();
   const tid = new Set();
   const uid = new Set();
+  const columnId = new Set();
   let cid = [];
   const postsObj = {}, threadsObj = {};
   columnPosts.map(post => {
     pid.add(post.pid);
     tid.add(post.tid);
+    columnId.add(post.columnId);
     cid = cid.concat(post.cid);
   });
   const threadMatch = {
@@ -92,6 +95,11 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     threadMatch.reviewed = true;
     threadMatch.mainForumsId = {$in: fidOfCanGetThread};
   }
+  const columns = await ColumnModel.find({_id: {$in: [...columnId]}, closed: false, disabled: false});
+  const columnsObj = {};
+  columns.map(column => {
+    columnsObj[column._id] = column;
+  });
   let threads = await ThreadModel.find(threadMatch);
   threads = await ThreadModel.extendThreads(threads, {
     htmlToText: true,
@@ -134,6 +142,8 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   const results = [];
   for(let p of columnPosts) {
     p = p.toObject();
+    p.column = columnsObj[p.columnId];
+    if(!p.column) continue;
     p.thread = threadsObj[p.tid];
     if(!p.thread) continue;
     if(p.type === "thread") {

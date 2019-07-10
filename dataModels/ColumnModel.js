@@ -1,4 +1,5 @@
 const mongoose = require("../settings/database");
+const moment = require("moment");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
@@ -56,6 +57,12 @@ const schema = new Schema({
     default: false,
     index: 1
   },
+  // 是否被屏蔽
+  disabled: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   // 专栏的关注数
   subCount: {
     type: Number,
@@ -71,7 +78,21 @@ const schema = new Schema({
     type: Schema.Types.Mixed,
     default: []
   },
-
+  // 自定义右侧豆腐块
+  blocks: {
+    type: Schema.Types.Mixed,
+    default: []
+  },
+  // 展开分类，专栏导航显示一级分类
+  navCategory: {
+    type: Boolean,
+    default: false
+  },
+  // 每页内容条数
+  perpage: {
+    type: Number,
+    default: 30
+  }
 }, {
   collection: "columns"
 });
@@ -102,5 +123,56 @@ schema.statics.extendColumns = async (columns) => {
     results.push(column);
   }
   return results;
+};
+/*
+* 获取专栏时间线
+* */
+schema.statics.getTimeline = async (columnId) => {
+  const ColumnPostModel = mongoose.model("columnPosts");
+  const firstColumnPost = await ColumnPostModel.findOne({}, {top: 1}).sort({top: 1});
+  const beginTime = firstColumnPost.top;
+  const endTime = new Date();
+  const begin = {
+    year: beginTime.getFullYear(),
+    month: beginTime.getMonth() + 1
+  };
+  const end = {
+    year: endTime.getFullYear(),
+    month: endTime.getMonth() + 1
+  };
+
+  const time = [];
+  let n = 0;
+  while(1) {
+    n++;
+    if(n > 1000) break;
+    const t = {
+      begin: new Date(`${begin.year}-${begin.month}-1 00:00:00`)
+    };
+    begin.month ++;
+    if(begin.month >= 13) {
+      begin.year ++;
+      begin.month = 1;
+    }
+    t.end = new Date(`${begin.year}-${begin.month}-1 00:00:00`);
+    time.push(t);
+    if(begin.year > end.year && begin.month > end.month) break;
+  }
+  const results = [];
+  for(const t of time) {
+    const count = await ColumnPostModel.count({
+      columnId,
+      toc: {
+        $gte: t.begin,
+        $lt: t.end
+      }
+    });
+    if(!count) continue;
+    results.push({
+      time: moment(t.begin).format("YYYY年MM月"),
+      count
+    });
+  }
+  return results.reverse();
 };
 module.exports = mongoose.model("columns", schema);

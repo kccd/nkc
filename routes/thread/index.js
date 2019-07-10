@@ -5,6 +5,7 @@ const homeTopRouter = require('./homeTop');
 const toppedRouter = require('./topped');
 const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
+const disabledRouter = require("./disabled");
 const Path = require("path");
 
 threadRouter
@@ -843,5 +844,6 @@ threadRouter
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())
   .use("/:tid/subscribe", subscribeRouter.routes(), subscribeRouter.allowedMethods())
+  .use("/:tid/disabled", disabledRouter.routes(), disabledRouter.allowedMethods())
 	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

@@ -46,7 +46,7 @@ router
       sort[`order.cid_default`] = -1;
     }
     const count = await db.ColumnPostModel.count(q);
-    const paging = nkcModules.apiFunction.paging(page, count);
+    const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
@@ -61,8 +61,10 @@ router
         });
       }
     }
+    data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     data.columnPostcount = await db.ColumnPostModel.count({columnId: column._id});
+    data.timeline = await db.ColumnModel.getTimeline(column._id);
     await next();
   })
   .patch("/", async (ctx, next) => {
@@ -74,7 +76,7 @@ router
     if(!type) {
       let {
         abbr, name, description, color, notice, links = [],
-        otherLinks
+        otherLinks = [], blocks = [], navCategory, perpage = 1
       } = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
@@ -122,11 +124,29 @@ router
         }
         otherLinks = otherLinks_;
       }
+      if(blocks) {
+        blocks = JSON.parse(blocks);
+        if(blocks.length > 5) ctx.throw(400, "自定义内容数量不能超过5");
+        for(const block of blocks) {
+          if(!block.name) ctx.throw(400, "自定义内容标题不能为空");
+          if(contentLength(block.name) > 20) ctx.throw(400, "自定义标题不能超过20字节");
+          if(!block.content) ctx.throw(400, "自定义内容不能为空");
+          if(contentLength(block.content) > 1000) ctx.throw(400, "自定义内容不能超过1000字节");
+          block.content = block.content.replace(/!\[.*?]\(.*?\)/ig, "");
+          block.content = block.content.replace(/\[.*?]\(.*?\)/ig, "");
+          block.show = !!block.show
+        }
+      }
+      perpage = parseInt(perpage);
+      if(isNaN(perpage) || perpage <= 0) perpage = 1;
       await column.update({
         name,
         color,
+        perpage,
         links,
         otherLinks,
+        navCategory,
+        blocks,
         notice,
         nameLowerCase: name.toLocaleString(),
         description,

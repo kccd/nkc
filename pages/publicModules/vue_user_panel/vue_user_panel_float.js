@@ -6,16 +6,7 @@ var vue_user_panel_float = new Vue({
     subUid: [],
     top: 0,
     left: 0,
-    user: {
-      username: "",
-      description: "",
-      uid: "",
-      certsName: "",
-      kcb: 0,
-      xsf: 0,
-      postCount: 0,
-      threadCount: 0
-    },
+    user: {},
     usersObj: {},
     timeout: ''
   },
@@ -24,6 +15,8 @@ var vue_user_panel_float = new Vue({
     this.subUid = data.subUid;
   },
   methods: {
+    fromNow: NKC.methods.fromNow,
+    format: NKC.methods.format,
     close: function() {
       this.timeout = setTimeout(function() {
         vue_user_panel_float.show = false;
@@ -49,7 +42,7 @@ var vue_user_panel_float = new Vue({
     },
 
     loadUser: function(userString) {
-      clearTimeout(this.timeout)
+      clearTimeout(this.timeout);
       var user = strToObj(userString);
       var position = this.getMousePosition();
       var maxX = $(window).width();
@@ -63,7 +56,6 @@ var vue_user_panel_float = new Vue({
       // if(maxY < top + 300) top = maxY - 320;
       this.left = left;
       this.top = top;
-
       if(this.usersObj[user.uid]) {
         this.user = this.usersObj[user.uid];
         return vue_user_panel_float.show = true;
@@ -78,6 +70,9 @@ var vue_user_panel_float = new Vue({
         description: (targetUser.description ||"暂未填写个人简介").slice(0, 140),
         uid: targetUser.uid,
         kcb: targetUser.kcb,
+        tlv: targetUser.tlv,
+        column: targetUser.column,
+        toc: targetUser.toc,
         xsf: targetUser.xsf,
         postCount: targetUser.postCount - targetUser.disabledPostsCount,
         threadCount: targetUser.threadCount - targetUser.disabledThreadsCount,

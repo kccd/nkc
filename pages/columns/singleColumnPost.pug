@@ -1,4 +1,4 @@
--const {from, type, post, thread, categories, columnId, toc} = columnPost
+-const {column, from, type, post, thread, categories, columnId, toc} = columnPost
 -const {firstPost} = thread;
 .column-post
   .column-post-body(class=thread.hasCover?"cover":"")
@@ -17,18 +17,21 @@
       if type === "thread"
         .column-post-content= post.c
       .column-post-info
-        if data.column.uid !== post.uid
+        if !data.column || data.column.uid !== post.uid
           a(href=`/u/${post.uid}` target="_blank").column-post-author
             img(src=`/avatar/${post.uid}?t=sm`)
             span=post.user.username
         .column-post-time
           span.m-r-05=fromNow(toc)
-          if from === "contribute"
+          if data.column && from === "contribute"
             span 来自投稿
         .column-post-forums
-          -let category = "";
-          for c in categories
-            if !category || category.level > c.level
-              -category = c;
-          if category
-            a.column-post-forum(href=`/m/${columnId}?c=${category._id}`)= category.name
+          if data.column
+            -let category = "";
+            for c in categories
+              if !category || category.level > c.level
+                -category = c;
+            if category
+              a.column-post-forum(href=`/m/${columnId}?c=${category._id}`)= category.name
+          else
+            a.column-post-forum(href=`/m/${columnId}`)= column.name

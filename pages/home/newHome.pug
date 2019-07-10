@@ -19,11 +19,17 @@ block content
             .m-b-1
               include ../publicModules/mobile_drawer/right_drawer
               -let showPagingSortButton = true;
+              if data.t === "column"
+                -showPagingSortButton = false;
               -let showHomeButton = true;
               include ../publicModules/paging/paging
-
-            for thread in data.threads
-              include ../publicModules/thread_panel/thread_panel
+            if data.t === "column"
+              +includeCSS("/columns/column.css")
+              for columnPost in data.threads
+                include ../columns/singleColumnPost
+            else
+              for thread in data.threads
+                include ../publicModules/thread_panel/thread_panel
             -showPagingSortButton = false;
             -showHomeButton = false;
             include ../publicModules/paging/paging_input
