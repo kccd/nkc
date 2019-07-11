@@ -24,6 +24,13 @@ block shopTitle
     .table > tbody > tr > td {
       border: 0
     }
+    .productCountBtn {
+      color: #000;
+      background-color: #9baec8;
+      border: 1px solid #9baec8;
+      text-decoration: none;
+      cursor: pointer;
+    }
 block content
   .hidden#data= JSON.stringify(data.newCartData)
   .container-fluid.max-width
@@ -82,7 +89,7 @@ block content
                       button(onclick=`viewCert('${cart.productParamId}')`).hidden 查看
                   else
                     div 不需凭证
-                tr(style="background-color:#fbfcff;border-bottom:1px solid #f2f7ff")
+                tr(style="background-color:#fbfcff;border-bottom:1px solid #f2f7ff" class=`param${bill.user.uid}`)
                   td(style="border-right:1px solid #f2f7ff;width:30%;")
                     div(style="float:left")
                       img(src=`/r/${cart.product.imgMaster}` style="width:60px;height:60px;margin-right:5px")
@@ -98,13 +105,15 @@ block content
                     else
                       span #{numToFloatTwo(cart.productParam.price)} 
                   td(style="border-right:1px solid #f2f7ff")
-                    span=cart.count
-                  //- td(style="border-right:1px solid #f2f7ff")
-                  //-   span #{numToFloatTwo(calculateFreightPrice(cart.product.freightPrice,cart.count,cart.product.isFreePost))}
+                    button(class="productCountBtn" onclick="countAddOne(this)" productParamId=`${cart.productParamId}` cartId=`${cart._id}`)
+                      span.fa.fa-arrow-up
+                    span(style="margin:0 10px")#productSingleCount=cart.count
+                    button(class="productCountBtn" onclick="countPlusOne(this)" productParamId=`${cart.productParamId}` cartId=`${cart._id}`)
+                      span.fa.fa-arrow-down
                   td.order(paid=`${cart.productParam._id}` data-upload-cert=cart.product.uploadCert?"true": "false") 
                     +orderCert(cart)
                   td(style="border-right:1px solid #f2f7ff;text-align:right")
-                    span(style="color:#ffad11;font-weight:bold;") #{numToFloatTwo((cart.productParam.price * (cart.vipNum / 100))*cart.count)}
+                    span(style="color:#ffad11;font-weight:bold;")#singlePrices #{numToFloatTwo((cart.productParam.price * (cart.vipNum / 100))*cart.count)}
                 if cart.product.uploadCert
                   tr 
                     td(colspan="5" style="text-align:right;font-size:12px") 
@@ -113,7 +122,7 @@ block content
                 if cart.canBuy == false
                   tr
                     td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" limit="yes" colspan="7")!=`该商品剩余购买数量为${cart.remainBuyCount}件`
-              tr(style="background-color:#f2f7ff;")
+              tr(style="background-color:#f2f7ff;" id=`freight${bill.user.uid}`)
                 td(colspan="3" rowspan="2" style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff ") 
                   div(style="font-weight:bold;float:left") 给卖家留言：
                   div 
@@ -123,15 +132,15 @@ block content
                   td
                     span 卖家承担
                   td(style="text-align:right")
-                    span(style="color:#ffad11;font-weight:bold;") 0.00
+                    span(style="color:#ffad11;font-weight:bold;")#freightPrices 0.00
                 else
                   td
                     span 不包邮
                   td(style="text-align:right")
-                    span(style="color:#ffad11;font-weight:bold;") #{numToFloatTwo(bill.maxFreightPrice)}
-              tr(style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff ")
+                    span(style="color:#ffad11;font-weight:bold;")#freightPrices #{numToFloatTwo(bill.maxFreightPrice)}
+              tr(style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff " id=`heji${bill.user.uid}`)
                 td(colspan="2" style="font-weight:bold;") 商品合计(含运费)
-                td.subtotal(style="color:red;font-weight:bold;text-align:right") #{numToFloatTwo(bill.maxFreightPrice + bill.productPrice)}
+                td.subtotal(style="color:red;font-weight:bold;text-align:right" class="hejiPrices") #{numToFloatTwo(bill.maxFreightPrice + bill.productPrice)}
           //- tbody
           //-   mixin orderCert(bill) 
           //-     if bill.product.uploadCert

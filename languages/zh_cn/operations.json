@@ -587,6 +587,8 @@
   "column_single_settings_transfer": "专栏转让",
   "column_single_settings_close": "关闭专栏",
   "visitUserContribute": "查看用户的投稿记录",
+  "billParamAddOne": "[CO]账单商品数量加一",
+  "billParamPlusOne": "[CO]账单商品数量减一",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

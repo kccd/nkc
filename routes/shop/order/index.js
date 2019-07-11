@@ -91,43 +91,51 @@ router
     for(let bill in post) {
       // 检查库存
       for(let cart of post[bill].carts) {
-        if(Number(cart.count) > Number(cart.productParam.stocksSurplus)) ctx.throw(400, `${cart.product.name}+${cart.productParam.name}库存不足`);
+        let cart1 = await db.ShopCartModel.find({_id:cart._id});
+        let newCartArr = await db.ShopCartModel.extendCartsInfo(cart1);
+        let newCart = newCartArr[0];
+        if(Number(newCart.count) > Number(newCart.productParam.stocksSurplus)) ctx.throw(400, `${newCart.product.name}+${newCart.productParam.name}库存不足`);
       }
       const orderId = await db.SettingModel.operateSystemID('shopOrders', 1);
       let newCarts = [];
+      let maxFreightPrice = 0;
+      let productPrice = 0;
       // 添加购买记录
       for(let cart of post[bill].carts) {
+        let cart1 = await db.ShopCartModel.find({_id:cart._id});
+        let newCartArr = await db.ShopCartModel.extendCartsInfo(cart1);
+        let newCart = newCartArr[0];
         let costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
-        let newProductParam = await db.ShopProductsParamModel.findOne({_id:cart.productParamId});
+        let newProductParam = await db.ShopProductsParamModel.findOne({_id:newCart.productParamId});
         if(!newProductParam) ctx.throw(400, "商品规格已被商家修改，请重新下单")
         // 取出会员折扣
         let vipNum = 100;
-        if(cart.product.vipDiscount) {
-          for(let v=0;v<cart.product.vipDisGroup.length;v++) {
-            if(data.user && data.user.authLevel == cart.product.vipDisGroup[v].vipLevel) {
-              vipNum = cart.product.vipDisGroup[v].vipNum;
+        if(newCart.product.vipDiscount) {
+          for(let v=0;v<newCart.product.vipDisGroup.length;v++) {
+            if(data.user && data.user.authLevel == newCart.product.vipDisGroup[v].vipLevel) {
+              vipNum = newCart.product.vipDisGroup[v].vipNum;
             }
           }
-          cart.vipDiscount = true;
+          newCart.vipDiscount = true;
         }else{
-          cart.vipDiscount = true;
+          newCart.vipDiscount = true;
         }
-        cart.vipNum = vipNum
+        newCart.vipNum = vipNum
         let cartObj = {
           costId,
           orderId,
-          productId: cart.productId,
-          productParamId: cart.productParamId,
+          productId: newCart.productId,
+          productParamId: newCart.productParamId,
           productParam: newProductParam,
-          count: cart.count,
-          uid: cart.uid,
-          freightPrice: cart.freightPrice,
-          productPrice: cart.productPrice,
-          singlePrice: cart.productParam.price * (vipNum/100)
+          count: newCart.count,
+          uid: newCart.uid,
+          freightPrice: newCart.freightPrice,
+          productPrice: newCart.productPrice,
+          singlePrice: newCart.productParam.price * (vipNum/100)
         };
         let shopCost = db.ShopCostRecordModel(cartObj);
-        if(paramCert[cart.productParamId]) {
-          await db.ShopCertModel.update({_id: paramCert[cart.productParamId]}, {
+        if(paramCert[newCart.productParamId]) {
+          await db.ShopCertModel.update({_id: paramCert[newCart.productParamId]}, {
             $set: {
               orderId,
               paramId: costId || ""
@@ -135,23 +143,31 @@ router
           })
         }
         await shopCost.save();
-        let buyProduct = await db.ShopGoodsModel.findOne({productId:cart.productId});
+        let buyProduct = await db.ShopGoodsModel.findOne({productId:newCart.productId});
         let buyRecord = buyProduct.buyRecord;
         if(!buyRecord) buyRecord = {};
         if(buyRecord[user.uid]){
-          buyRecord[user.uid].count += cart.count;
+          buyRecord[user.uid].count += newCart.count;
         }else{
           buyRecord[user.uid] = {
-            count: cart.count
+            count: newCart.count
           }
         }
         await buyProduct.update({$set: {buyRecord: buyRecord}});
         // 下单完毕，将商品从购物车中清除
-        await db.ShopCartModel.remove({uid: user.uid, productParamId: cart.productParamId});
+        await db.ShopCartModel.remove({uid: user.uid, productParamId: newCart.productParamId});
         newCarts.push(cartObj);
+        productPrice += cartObj.singlePrice * cartObj.count;
+        let newMaxFreightPrice = newCart.product.freightPrice.firstFreightPrice + (newCart.product.freightPrice.addFreightPrice * newCart.count-1)
+        if(newMaxFreightPrice > maxFreightPrice) {
+          maxFreightPrice = newMaxFreightPrice;
+        }
       }
+      // 重新计算运费和商品价格
+
+      // 获取账单的运费和商品价格
       let order = db.ShopOrdersModel({
-        orderFreightPrice: post[bill].maxFreightPrice,
+        orderFreightPrice: maxFreightPrice,
         orderId: orderId,
         receiveAddress: receiveAddress,
         receiveName: receiveName,
@@ -161,7 +177,7 @@ router
         buyMessage: post[bill].message,
         buyUid: user.uid,
         count: bill.productCount,
-        orderPrice: post[bill].productPrice
+        orderPrice: productPrice
       });
       await order.save();
       // 拓展订单并减库存

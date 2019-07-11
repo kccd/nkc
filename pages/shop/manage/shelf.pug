@@ -448,14 +448,14 @@ block name
               nav(aria-label='Page navigation')
                 ul.pagination(style="margin:0")  
                   li
-                    a(href='javascript:void(0);', aria-label='Previous' onclick="prevPageManage()")
+                    a(aria-label='Previous' onclick="prevPageManage()")
                       span(aria-hidden='true') «
                   li 
                     b#currentSkip 
                     b /
                     b#maxSkip     
                   li
-                    a(href='javascript:void(0);', aria-label='Next' onclick="nextPageManage()")
+                    a(aria-label='Next' onclick="nextPageManage()")
                       span(aria-hidden='true') »            
   #addProductParams.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
     .modal-dialog(role='document')

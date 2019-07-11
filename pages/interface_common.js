@@ -1843,6 +1843,18 @@ function openNKCDrawer(type) {
   stopBodyScroll(true);
 }
 function closeNKCDrawer(type) {
+  if(type === "left"){
+    api.setRefreshHeaderInfo({
+      bgColor: '#eeeeee',
+      textColor: '#aaaaaa',
+      textDown: '下拉刷新',
+      textUp: '松开刷新',
+      textLoading: '刷新成功，正在加载资源...',
+      showTime: false
+    }, function(ret, err) {
+      window.location.reload();
+    });
+  }
   $(".nkc-drawer-"+type).removeClass("active");
   $(".nkc-drawer-"+type+"-mask").removeClass("active");
   $(".nkc-drawer-"+type+"-body").removeClass("active");
@@ -1854,6 +1866,10 @@ function toggleNKCDrawer(type) {
   if(nkcDrawer.hasClass('active')) {
     closeNKCDrawer(type);
   } else {
+    api.setFrameAttr({
+      name: 'latest',
+      bounces: false
+    });
     openNKCDrawer(type);
   }
 }

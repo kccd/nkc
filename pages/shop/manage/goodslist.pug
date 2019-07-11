@@ -33,10 +33,10 @@ block name
                   //- span(style="font-size:12px")=product.name
                 td=product.toc.toLocaleString()
                 td!=`${product.productParams.length}`
-                if !purchaseLimitCount || purchaseLimitCount == -1
+                if !product.purchaseLimitCount || product.purchaseLimitCount == -1
                   td(style="color:darkgreen;") 不限购
                 else 
-                  td(style="color:mediumvioletred")!=`每人限购${purchaseLimitCount}件`
+                  td(style="color:mediumvioletred")!=`每人限购${product.purchaseLimitCount}件`
                 td 暂无统计
                 if product.productStatus == "insale"
                   td(style="color:darkgreen;") 出售中

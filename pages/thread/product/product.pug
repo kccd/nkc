@@ -84,18 +84,30 @@ style.
   .del{
     text-decoration: line-through;
   }
+  .pike {
+    width: 100%;
+    height: 300px;
+  }
 .row
   if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('banSaleProductParams')) 
     if !product.adminBan
       .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
         button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
-  .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px")#productImageDom
+  .col-xs-12.col-sm-12.col-md-12.col-lg-6.pcSlide(style="padding-top:15px")#productImageDom
     ul#etalage
       -for(let rid of product.imgIntroductions)
         li
           img.etalage_thumb_image(src=`/r/${rid}`)
           img.etalage_source_image(src=`/r/${rid}`)
-
+  .col-xs-12.col-sm-12.col-md-12.col-lg-6.moSlide#moSlide
+    .pik1
+      .pike(style="height:250px")
+        -for(let rid of product.imgIntroductions)
+          div
+            img(src=`/r/${rid}` style="width:100%;height:250px")
+      .pike_prev
+      .pike_next
+      .pike_spot
   .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;")#productIntroDom
     p.item 
       span#showText #{cutContent(post.abstractCn,60)}
@@ -173,6 +185,8 @@ style.
         span.location(style="font-size:12px") 库存
         span#stockCount=`${product.productParams[paId].stocksSurplus}`
         span.location(style="font-size:12px") 件
+        if product.purchaseLimitCount && product.purchaseLimitCount !== -1
+          span(style="color:mediumvioletred;font-size:14px")!=`此商品每人限购 ${product.purchaseLimitCount} 件`
     .item
       .row
         span.title.col-xs-12(style="padding-right:0;margin-bottom:15px") 规格
@@ -203,6 +217,7 @@ style.
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  +includeJS('/external_pkgs/pike/pike.min.js')
   +includeJS('/external_pkgs/citySet/city.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
   +includeJS('/thread/product/product.js')
@@ -218,12 +233,35 @@ block scripts
         small_thumbs:5,
         autoplay: false
       });
-      //- $(".etalage").each(function() {
-      //-   $(this).css("width", "100%")
-      //- })
-      //- $(".etalage_thumb_image").each(function() {
-      //-   $(this).css("width", "100%")
-      //- })
+      var myPi1 = new Pike(".pik1", {
+      // automatic: true, //是否自动轮播 (默认false)
+        type: 2, // 轮播的类型(2左右滑动)
+        slide: 500, //轮播滑动的速度(默认800)
+        autoplay: 2000, //自动轮播毫秒 (默认3000)
+        hover: true, //鼠标悬停轮播 (默认false)
+        arrowList: { //自定义箭头图片
+          left: "/default/left.png",
+          right: "/default/right.png",
+          width: 40, //如果不设置宽高,则按照图片默认宽高显示
+          height: 40,
+        },
+        spotList: { //自定义圆点
+          width: 12, //宽
+          height: 12, //高
+          borderRadius: 50, //圆角边框
+          opacity: 0.6,//透明度
+          color: "#eee",//颜色
+          select: { //自定义圆点选中样式
+            width: 18, //宽
+            borderRadius: 50, //圆角边框
+            height: 18, //高
+            color: "black",
+          }
+        },
+        mousewheel: false, //是否开启鼠标滚动轮播(默认false)
+        // loop: true, //是否循环轮播 (默认为: false)
+        spotDirection: "bottom", //圆点的方向(left:左, right:右, top:上, bottom:下, 默认:bottom)
+      });
     });
     $("#city").click(function (e) {
       SelCity(this,e);
