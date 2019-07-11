@@ -1866,14 +1866,18 @@ function toggleNKCDrawer(type) {
   if(nkcDrawer.hasClass('active')) {
     closeNKCDrawer(type);
   } else {
-    api.setFrameAttr({
-      name: 'latest',
-      bounces: false
-    });
-    api.setFrameAttr({
-      name: 'forum',
-      bounces: false
-    });
+    if(api.frameName === "latest") {
+      api.setFrameAttr({
+        name: 'latest',
+        bounces: false
+      });
+    }
+    if(api.frameName === "forum") {
+      api.setFrameAttr({
+        name: 'forum',
+        bounces: false
+      });
+    }
     openNKCDrawer(type);
   }
 }
