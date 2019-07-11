@@ -1870,6 +1870,10 @@ function toggleNKCDrawer(type) {
       name: 'latest',
       bounces: false
     });
+    api.setFrameAttr({
+      name: 'forum',
+      bounces: false
+    });
     openNKCDrawer(type);
   }
 }
