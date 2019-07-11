@@ -18,6 +18,7 @@ script(type='text/javascript', src='/ueditor/addMathFormulaDialog.js')
   script.
     window.localStorage.removeItem("apptype")
 script(type='text/javascript').
+  window.localStorage.setItem("withE", true);
   // 根据不同页面传递不同参数
   var apptype = window.localStorage.getItem("apptype");
   var topOffsetValue;

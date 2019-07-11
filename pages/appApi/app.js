@@ -76,18 +76,47 @@ apiready = function() {
   if(urlType !== "common") {
     getSiteMeta();
   }
-  api.refreshHeaderLoadDone();
+  // 获取编辑器标识
+  var withE = window.localStorage.getItem("withE");
   // 下拉刷新当前页面
-  api.setRefreshHeaderInfo({
-    bgColor: '#eeeeee',
-    textColor: '#aaaaaa',
-    textDown: '下拉刷新',
-    textUp: '松开刷新',
-    textLoading: '刷新成功，正在加载资源...',
-    showTime: false
-  }, function(ret, err) {
-    window.location.reload()
-  });
+  api.refreshHeaderLoadDone();
+  if(window.location.pathname !== "/editor") {
+    api.setRefreshHeaderInfo({
+      bgColor: '#eeeeee',
+      textColor: '#aaaaaa',
+      textDown: '下拉刷新',
+      textUp: '松开刷新',
+      textLoading: '刷新成功，正在加载资源...',
+      showTime: false
+    }, function(ret, err) {
+      window.location.reload();
+    });
+  }
+  /**
+   * 编辑页面退出提示
+   */
+  if(withE) {
+    api.addEventListener({
+      name: 'keyback'
+    }, function(ret, err) {
+      api.confirm({
+          title: '确定要退出吗？',
+          msg: '',
+          buttons: ['确定', '取消']
+      }, function(ret, err){
+          if( ret ){
+                if(ret.buttonIndex == 1){
+                  api.closeWin();
+                }
+          }else{
+                api.closeWin();
+          }
+      });
+
+    });
+  }
+  // 清除编辑器标识
+  window.localStorage.removeItem("withE");
 }
 
 /**
@@ -121,6 +150,14 @@ function appOpenUrl(urlStr) {
   var shareType = getShareTypeByUrl(paramStr);
   if(shareType !== "common") {
     windowFile = "widget://html/common/shareInfo.html"
+  }
+  // 判断是否为编辑页面
+  var editUrlArr = ["/edtior", "/shelf", "/release"];
+  for(var e in editUrlArr) {
+    if(urlStr.indexOf(editUrlArr[e]) > -1) {
+      windowFile = "widget://html/common/editorInfo.html";
+      break;
+    }
   }
   api.execScript({
     name: "root",
@@ -228,8 +265,20 @@ function getShareTypeByUrl(sourceUrl) {
   for(var i in typeObj) {
     if(sourceUrl.indexOf(typeObj[i]) > -1) {
       shareType = i;
+      if(shareType === "user" && sourceUrl.indexOf('settings') > -1) {
+        shareType = "common";
+      }
       break;
     }
   }
   return shareType;
 }
+
+/**
+ * 带有编辑器的页面禁止下拉刷新
+ * 判断是否带有编辑器
+ */
+function linkWithEditor() {
+  var withE = false;
+  return withE;
+} 

@@ -1,7 +1,7 @@
 extends ../bootstrap_base
 block title
   -var post = data.post;
-  -var title = post.t;
+  -var title = post.thread.firstPost.t;
   -var thread = data.thread;
   -const addKcb = data.userOperationsId.includes('creditKcb')
   -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
@@ -20,15 +20,9 @@ block title
 
   - var ownership = data.userOperationsId.includes('modifyOtherPosts')
   - ownership = ownership?true:(data.user && data.user.uid===post.uid)
-
-  if !title
-    -post.c = hideContentByUser(post.c, data.user, 'thread')
-    -title = filterQuote(post.c)
-    -title = title.replace(/<\/?.+?>/g,"")
-    -title = title.slice(0, 50) + '...';
-  title=title
-  if (thread.firstPost && thread.firstPost.c)
-    -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
+  title=`${title} - 科创`
+  -var processed = post.c.replace(/<blockquote cite.*?blockquote>/igm, '')
+  -processed = delAllCode(processed).trim().slice(0,140);
   meta(name='description' content=`${processed}`)
   meta(name='keywords' content=`${thread.firstPost.t}`)
   link(rel='stylesheet' href=`/post/post.css?v=${global.NKC.startTime}`)

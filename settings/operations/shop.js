@@ -149,7 +149,13 @@ module.exports = {
   },
   bill: {
     GET: 'visitShopBill',
-    POST: 'submitShopBill'
+    POST: 'submitShopBill',
+    add: {
+      PATCH: 'billParamAddOne',
+    },
+    plus: {
+      PATCH: 'billParamPlusOne',
+    }
   },
   order: {
     GET: 'visitUserOrder',

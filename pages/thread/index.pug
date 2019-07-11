@@ -30,6 +30,8 @@ block title
     meta(name='keywords' content=`${thread.firstPost.t}`)
     link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
     link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+    +includeCSS("/external_pkgs/viewer/viewer.css")
+    +includeCSS("/external_pkgs/viewer/main.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
 
   mixin postOptions(post, targetThread, index, dropType)
@@ -381,20 +383,20 @@ block content
                                       span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
                       if data.paging.page === 0
                         if data.thread.type === "article"
-                          div.thread-content.ThreadPostBody!= experimental_render(post)
+                          div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
                         else if data.thread.type === "product"
-                          div.thread-content.ThreadPostBody
+                          div.thread-content.ThreadPostBody#thread-content
                             include ./product/product.pug
                         else if data.thread.type === "fund"
                           include ../fund/initData
-                          div.thread-content.ThreadPostBody
+                          div.thread-content.ThreadPostBody#thread-content
                             include ./fund/fund.pug
                         +postEditTime(post)
                         +postCredits(data.posts[0])
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
-                          div.ThreadPostBody!= experimental_render(post)
+                          div.ThreadPostBody#thread-content!= experimental_render(post)
                           +postEditTime(post)
                           +postCredits(data.posts[0])
                         .text-center
@@ -465,7 +467,7 @@ block content
                           a(href=`/t/${thread.tid}`) 全部
                         li(class=data.t==="author"?"active":"")
                           a(href=`/t/${thread.tid}?t=author`) 只看作者
-                    .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')
+                    .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
                       for post, index in data.posts
                         if index !== 0 || data.paging.page !== 0
                           -let previousPost;
@@ -633,7 +635,17 @@ block scripts
   //- link(href=`/jquery/jquery.minicolors.css?v=${global.NKC.startTime}` rel="stylesheet")
   if data.user
     script(src=`/media/media_index.js?v=${startTime}`)
+  +includeJS("/external_pkgs/viewer/viewer.js")
   script.
-    var preview = new Preview({
-        imgWrap: 'wrap' // 指定该容器里的图片点击预览
+    //- var preview = new Preview({
+    //-     imgWrap: 'wrap' // 指定该容器里的图片点击预览
+    //- })
+    $(document).ready(function() {
+      	var options = {
+          navbar: false,
+          title: false,
+          toolbar: false,
+        }
+        new Viewer(document.getElementById('ThreadPostBody'), options);
+        new Viewer(document.getElementById('thread-content'), options);
     })

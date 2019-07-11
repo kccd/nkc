@@ -3589,6 +3589,28 @@ ul.nav.navbar-nav.navbar-md>li>a{
 }
 
 
+@media only screen and (max-width : 480px) {
+  .moSlide {
+    display: block
+  }
+}
+@media only screen and (min-width : 480px) {
+  .moSlide {
+    display: none
+  }
+}
+
+@media only screen and (max-width : 480px) {
+  .pcSlide {
+    display: none
+  }
+}
+@media only screen and (min-width : 480px) {
+  .pcSlide {
+    display: block
+  }
+}
+
 @media only screen and (max-height : 360px) {
   .mediaVideo {
     max-width:100%;
