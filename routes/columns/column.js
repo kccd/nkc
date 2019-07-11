@@ -6,13 +6,21 @@ const postRouter = require("./post");
 const subscribeRouter = require("./subscribe");
 const statusRouter = require("./status");
 const contributeRouter = require("./contribute");
+const disabledRouter = require("./disabled");
 router
   .use("/", async (ctx, next) => {
-    const {db, params, data} = ctx;
+    const {db, params, data, nkcModules} = ctx;
     const {_id} = params;
     const column = await db.ColumnModel.findById(_id);
     if(!column) ctx.throw(404, `未找到ID为${_id}的专栏`);
-    if(column.closed) ctx.throw(400, "专栏已关闭");
+    if(!ctx.permission("column_single_disabled")) {
+      if(column.disabled) {
+        nkcModules.throwError(403, "专栏已封禁", "columnHasBeenBanned");
+      }
+      if(column.closed) {
+        nkcModules.throwError(403, "专栏已关闭", "columnHasBeenClosed");
+      }
+    }
     data.column = column;
     await next();
   })
@@ -185,5 +193,6 @@ router
   .use("/subscribe", subscribeRouter.routes(), subscribeRouter.allowedMethods())
   .use("/contribute", contributeRouter.routes(), contributeRouter.allowedMethods())
   .use("/status", statusRouter.routes(), statusRouter.allowedMethods())
+  .use("/disabled", disabledRouter.routes(), disabledRouter.allowedMethods())
   .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods());
 module.exports = router;

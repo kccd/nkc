@@ -51,7 +51,8 @@ block settingsContent
             .m-t-05
               button.btn.btn-sm.btn-default(@click="addLink") 添加导航链接
         .form-group.p-t-1
-          h4 友情链接
+          h4 友情链接&nbsp;
+            small.text-danger(v-if="column.otherLinksDisabled") 已屏蔽，请修改后联系管理员
           div
             div(v-for="link,index in column.otherLinks")
               .form-inline.m-t-05

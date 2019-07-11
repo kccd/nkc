@@ -28,6 +28,10 @@ const schema = new Schema({
     type: String,
     default: ""
   },
+  noticeDisabled: {
+    type: Boolean,
+    default: false
+  },
   toc: {
     type: Date,
     default: Date.now,
@@ -73,15 +77,28 @@ const schema = new Schema({
     type: Schema.Types.Mixed,
     default: []
   },
+  linksDisabled: {
+    type: Boolean,
+    default: false
+  },
   // 友情链接
   otherLinks: {
     type: Schema.Types.Mixed,
     default: []
   },
+  otherLinksDisabled: {
+    type: Boolean,
+    default: false
+  },
   // 自定义右侧豆腐块
+  // {name, content, show}
   blocks: {
     type: Schema.Types.Mixed,
     default: []
+  },
+  blocksDisabled: {
+    type: Boolean,
+    default: false
   },
   // 展开分类，专栏导航显示一级分类
   navCategory: {

@@ -27,11 +27,12 @@
                 b 移动方式：
                 .radio.inline-block.m-t-0
                   label.m-r-1
-                    input(type="radio" value="replace" v-model="moveType")
-                    | 替换原有专业
-                  label
                     input(type="radio" value="add" v-model="moveType")
                     | 添加专业
+                  label
+                    input(type="radio" value="replace" v-model="moveType")
+                    | 删除原有专业（慎重！！）
+
           .move-thread-select-forums-button
             .paging-button
               a.button.radius-left(@click="forumType = 'topic'" :class="{'active': forumType==='topic'}") 话题

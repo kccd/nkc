@@ -60,6 +60,9 @@ module.exports = {
     },
     status: {
       GET: "column_single_status"
+    },
+    disabled: {
+      POST: "column_single_disabled"
     }
   }
 };

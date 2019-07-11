@@ -765,6 +765,14 @@ img.apply-column-banner{
   vertical-align: top;
   display: table-cell;
 }
+.column-management-button{
+  margin-left: 1rem;
+  cursor: pointer;
+  color: #c7c7c7;
+}
+.column-management-button:hover{
+  color: #282c37;
+}
 @media (max-width: 767px) {
   .column-avatar{
     height: 6rem;
@@ -810,6 +818,7 @@ img.apply-column-banner{
     padding-top: 0;
   }
   .column-nav{
+    /*white-space: nowrap;*/
     /*height: 3rem;*/
     margin-bottom: 0.5rem;
     /*overflow-x: scroll;*/

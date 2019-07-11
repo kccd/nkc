@@ -1,0 +1,19 @@
+.moduleDisabledPostType{
+  margin-bottom: 0.3rem;
+  overflow: hidden;
+}
+.moduleDisabledPostType>div:first-child{
+  border-right: 1px solid #fff;
+}
+.moduleDisabledPostType>div{
+  height: 3rem;
+  cursor: pointer;
+  line-height: 3rem;
+  text-align: center;
+  color: #aaa;
+  background-color: #eee;
+}
+.moduleDisabledPostType>div.active, .moduleDisabledPostType>div:hover{
+  background-color: #2b90d9;
+  color: #fff;
+}

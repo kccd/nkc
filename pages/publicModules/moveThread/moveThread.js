@@ -10,11 +10,12 @@ NKC.modules.MoveThread = function() {
       forums: [],
       selectedForums: [],
       loading: true,
-      moveType: "replace", // replace, add
+      moveType: "add", // replace, add
       forumType: "topic", // discipline, topic
       forum: "",
 
-      submitting: false
+      submitting: false,
+      showRecycle: false
     },
     computed: {
       selectedForumsId: function() {
@@ -40,9 +41,11 @@ NKC.modules.MoveThread = function() {
         if(forum.childrenForums && forum.childrenForums.length > 0) {
           for(var i = 0; i < forum.childrenForums.length; i++) {
             var f = forum.childrenForums[i];
-            if(!f.childrenForums || forum.childrenForums.length === 0) {
-              f.selectedThreadType = "";
-              arr.push(f);
+            if(!f.childrenForums || f.childrenForums.length === 0) {
+              if(this.showRecycle || f.fid !== "recycle") {
+                f.selectedThreadType = "";
+                arr.push(f);
+              }
             }
             this.getAllChildForums(f, arr);
           }
@@ -87,9 +90,12 @@ NKC.modules.MoveThread = function() {
       }
     }
   });
-  this_.open = function(callback) {
+  this_.open = function(callback, options) {
     this_.callback = callback;
     this_.dom.modal("show");
+    if(options) {
+      this_.app.showRecycle = options.showRecycle || false;
+    }
     nkcAPI("/f", "GET")
       .then(function(data) {
         for(var i = 0; i < data.forums.length; i++) {

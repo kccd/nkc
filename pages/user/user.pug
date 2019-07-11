@@ -22,7 +22,7 @@ block content
                     <li role="separator" class="divider"></li>
                   if !data.targetUser.certs.includes("banned") && permission("bannedUser")
                     li
-                      a(onclick=` bannedUser("${data.targetUser.uid}", true)`) 封禁
+                      a(onclick=` bannedUser("${data.targetUser.uid}", true)`) 封禁用户
                     <li role="separator" class="divider"></li>
                   if permission("clearUserInfo")
                     li

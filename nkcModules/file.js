@@ -40,6 +40,15 @@ exports.getColumnAvatar = async (columnId, t) => {
   return filePath;
 };
 
+// 删除专栏头像文件
+exports.deleteColumnAvatar = async (columnId) => {
+  const t = ["", "_sm", "_lg"];
+  for(const tt of t) {
+    const filePath = upload.columnAvatarPath + "/" + columnId + tt + ".jpg";
+    await fsSync.unlink(filePath);
+  }
+};
+
 // 保存专栏背景
 exports.saveColumnBanner = async (columnId, file) => {
   await ei.resize({
@@ -59,6 +68,7 @@ exports.saveColumnBanner = async (columnId, file) => {
   await fsSync.unlink(file.path);
 };
 
+// 获取背景链接
 exports.getColumnBanner = async (columnId, t) => {
   let filePath = upload.columnBannerPath + "/" + columnId + ".jpg";
   if(t) {
@@ -68,4 +78,13 @@ exports.getColumnBanner = async (columnId, t) => {
     filePath = statics.defaultColumnBannerPath;
   }
   return filePath;
+};
+
+// 删除专栏背景文件
+exports.deleteColumnBanner = async (columnId) => {
+  const t = ["", "_sm"];
+  for(const tt of t) {
+    const filePath = upload.columnBannerPath + "/" + columnId + tt + ".jpg";
+    await fsSync.unlink(filePath);
+  }
 };

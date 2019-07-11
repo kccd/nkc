@@ -9,7 +9,7 @@
     if canManagement
       .checkbox.thread-checkbox
         label
-          input(type="checkbox" data-thread-tid=thread.tid)
+          input(type="checkbox" data-thread-id=thread.tid data-post-id=thread.oc)
     .thread-panel-author
       a(href=`/u/${thread.uid}` target="_blank")
         img(src=`/avatar/${thread.uid}?t=sm`)

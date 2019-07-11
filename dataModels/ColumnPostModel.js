@@ -95,7 +95,7 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     threadMatch.reviewed = true;
     threadMatch.mainForumsId = {$in: fidOfCanGetThread};
   }
-  const columns = await ColumnModel.find({_id: {$in: [...columnId]}, closed: false, disabled: false});
+  const columns = await ColumnModel.find({_id: {$in: [...columnId]}});
   const columnsObj = {};
   columns.map(column => {
     columnsObj[column._id] = column;

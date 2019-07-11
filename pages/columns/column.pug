@@ -11,6 +11,7 @@ block columnTitle
     }
   style=`body{background-color: ${data.column.color};}`
 block content
+  -const canManagement = permission("column_single_disabled");
   .column-banner-body
     .column-banner(style=`background-image:url(/m/${data.column._id}/banner)`)
       .column
@@ -22,68 +23,66 @@ block content
             .column-abbr=data.column.abbr
   div.m-t-2.box-shadow-panel
     .column
-      div
-        .row
-          .col-xs-12.col-md-9
-            div
-              ul.column-nav
-                li
-                  a(href=`/m/${data.column._id}`) 首页
-                if !data.column.navCategory
+      .row
+        .col-xs-12.col-md-9
+          ul.column-nav
+            li
+              a(href=`/m/${data.column._id}`) 首页
+            if !data.column.navCategory
+              li
+                a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
+                  .fa.fa-caret-down
+                ul.dropdown-menu
                   li
-                    a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
-                      .fa.fa-caret-down
+                    a(href=`/m/${data.column._id}` style="overflow:hidden;")
+                      span 全部
+                  for c in data.categories
+                    li
+                      a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
+                        -for(var i = 0; i < c.level; i++)
+                          span &nbsp;&nbsp;&nbsp;&nbsp;
+                        span=c.name
+                  //li.divider(role="separator")
+            else
+              for c in data.navCategories
+                if c.children && c.children.length
+                  li
+                    a(href=`/m/${data.column._id}?c=${c._id}` style="margin-right: 0;padding-right:0")=c.name
+                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                     ul.dropdown-menu
-                      li
-                        a(href=`/m/${data.column._id}` style="overflow:hidden;")
-                          span 全部
-                      for c in data.categories
+                      for cc in c.children
                         li
-                          a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
-                            -for(var i = 0; i < c.level; i++)
+                          a(href=`/m/${data.column._id}?c=${cc._id}` style="overflow:hidden")
+                            -for(var i = 0; i < (cc.level - 1); i++)
                               span &nbsp;&nbsp;&nbsp;&nbsp;
-                            span=c.name
-                      //li.divider(role="separator")
+                            span=cc.name
                 else
-                  for c in data.navCategories
-                    if c.children && c.children.length
-                      li
-                        a(href=`/m/${data.column._id}?c=${c._id}` style="margin-right: 0;padding-right:0")=c.name
-                        a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                        ul.dropdown-menu
-                          for cc in c.children
-                            li
-                              a(href=`/m/${data.column._id}?c=${cc._id}` style="overflow:hidden")
-                                -for(var i = 0; i < (cc.level - 1); i++)
-                                  span &nbsp;&nbsp;&nbsp;&nbsp;
-                                span=cc.name
-                    else
-                      li
-                        a(href=`/m/${data.column._id}?c=${c._id}`)=c.name
-                for link in data.column.links
                   li
-                    a(title=link.url onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
-          .col-xs-12.col-md-3
-            .column-button
-              .column-sub-button.active
-                if !data.user || data.user.uid !== data.column.uid
-                  a(href=data.user ? `/m/${data.column._id}/contribute`: "/login" target="_blank")
-                    button 投稿
+                    a(href=`/m/${data.column._id}?c=${c._id}`)=c.name
+            for link in data.column.links
+              li
+                a(title=link.url onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
+        .col-xs-12.col-md-3
+          .column-button
+            .column-sub-button.active
+              if !data.user || data.user.uid !== data.column.uid
+                a(href=data.user ? `/m/${data.column._id}/contribute`: "/login" target="_blank")
+                  button 投稿
+              else
+                a(href="/editor?from=column" target="_blank")
+                  button 发表
+            .column-sub-button
+              //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
+              if !data.user
+                a(href="/login" target="_blank")
+                  button + 订阅
+              else
+                if data.subscribedColumn
+                  button(onclick=`subscribeColumn(${data.column._id}, false)`) 已订阅
                 else
-                  a(href="/editor?from=column" target="_blank")
-                    button 发表
-              .column-sub-button
-                //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
-                if !data.user
-                  a(href="/login" target="_blank")
-                    button + 订阅
-                else
-                  if data.subscribedColumn
-                    button(onclick=`subscribeColumn(${data.column._id}, false)`) 已订阅
-                  else
-                    button(onclick=`subscribeColumn(${data.column._id}, true)`) + 订阅
-                if data.column.subCount > 0
-                  span=data.column.subCount
+                  button(onclick=`subscribeColumn(${data.column._id}, true)`) + 订阅
+              if data.column.subCount > 0
+                span=data.column.subCount
   .container-fluid.max-width
     .column
       .row
@@ -113,15 +112,47 @@ block content
                   if data.user && data.user.uid === data.column.uid
                     .m-t-1
                       | 点击
-                      a(href=`/u/${data.user.uid}?t=thread` target="_blank")
-                        b 个人名片页
-                      | 头部的“管理”按钮，可批量将文章推送到专栏。
+                      a(href=`/m/${data.column._id}/settings/post/add` target="_blank")
+                        b 添加文章
+                      | ，可批量将文章推送到专栏。
               else
                 for columnPost in data.columnPosts
                   if data.paging.page !== 0 || !data.toppedId.includes(columnPost._id)
                     include ./singleColumnPost
             include ../publicModules/paging/paging_input
         .col-xs-12.col-md-4.box-shadow-panel.m-t-2
+          if canManagement
+            div.m-b-2
+              .column-management
+                .column-header
+                  .fa.fa-shield &nbsp;管理
+                .row.m-t-1
+                  if data.column.disabled
+                    h4.text-danger.col-xs-12.text-center 专栏已封禁
+                  else if data.column.closed
+                    h4.text-danger.col-xs-12.text-center 专栏已关闭
+
+                  if !data.column.disabled
+                    a(onclick=`disabledColumn(${data.column._id}, 'disabledColumn')`).col-xs-4
+                      .fa.fa-ban
+                      .name 封禁专栏
+                  else
+                    a(onclick=`disabledColumn(${data.column._id}, 'unDisabledColumn')`).col-xs-4
+                      .fa.fa-ban
+                      .name 解除封禁
+                  a(onclick=`disabledColumn(${data.column._id}, 'logo')`).col-xs-4
+                    .fa.fa-picture-o
+                    .name 删除logo
+                  a(onclick=`disabledColumn(${data.column._id}, 'banner')`).col-xs-4
+                    .fa.fa-picture-o
+                    .name 删除banner
+                  a(onclick=`disabledColumn(${data.column._id}, 'name')`).col-xs-4
+                    .fa.fa-align-center
+                    .name 删除专栏名
+                  a(onclick=`disabledColumn(${data.column._id}, 'abbr')`).col-xs-4
+                    .fa.fa-align-center
+                    .name 删除简介
+
           if data.user && data.user.uid === data.column.uid
             div.m-b-2
               .column-management
@@ -158,8 +189,6 @@ block content
                     button.btn.btn-block.btn-primary(onclick="saveSettings()") 保存
           div.m-b-2
             .column-user
-              //-.column-header
-                .fa.fa-user &nbsp;专栏主
               .column-user-avatar
                 a(href=`/u/${data.column.uid}`)
                   img(src=`/avatar/${data.column.uid}`)
@@ -173,11 +202,16 @@ block content
                     a.pointer(href=`javascript:subscribeUser("${data.column.uid}", true)` target="_blank") 关注
               if data.column.user.description
                 .column-user-description=data.column.user.description
-          if data.column.notice
+          if data.column.notice && (!data.column.noticeDisabled || canManagement)
             div.m-b-2
               .column-threads
                 .column-header
                   .fa.fa-bullhorn &nbsp;公告通知
+                    if canManagement
+                      if data.column.noticeDisabled
+                        .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, 'unDisabledNotice')`) &nbsp;解除屏蔽
+                      else
+                        .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, 'disabledNotice')`) &nbsp;屏蔽
                 p!=markdown_safe(data.column.notice)
           div.m-b-2
             .column-management
@@ -208,27 +242,39 @@ block content
                   for t in data.timeline
                     .column-timeline=t.time
                       .pull-right=`${t.count} 篇`
-          for block in data.column.blocks
-            if block.show
+          if !data.column.blocksDisabled || canManagement
+            if canManagement
               div.m-b-2
                 .column-block
-                  .column-header=block.name
-                  p!=markdown_safe(block.content)
+                  .column-header 所有自定义内容
+                    if data.column.blocksDisabled
+                      .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, "unDisabledBlocks", ${index})`) &nbsp;解除屏蔽
+                    else
+                      .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, "disabledBlocks", ${index})`) &nbsp;屏蔽
+            for block, index in data.column.blocks
+              if block.show
+                div.m-b-2
+                  .column-block
+                    .column-header=block.name
+                    p!=markdown_safe(block.content)
           if data.column.otherLinks && data.column.otherLinks.length > 0
-            div.m-b-2
-              .column-threads
-                .column-header
-                  .fa.fa-link &nbsp;友情链接
-                .column-links
-                  for link in data.column.otherLinks
-                    a(onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
-          //- div.m-b-2
-            .column-threads
-              .column-header
-                .fa.fa-fire &nbsp; 栏主推荐
+            if !data.column.otherLinksDisabled || canManagement
+              div.m-b-2
+                .column-threads
+                  .column-header
+                    .fa.fa-link &nbsp;友情链接
+                      if canManagement
+                        if data.column.otherLinksDisabled
+                          .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, "unDisabledOtherLinks", ${index})`) &nbsp;解除屏蔽
+                        else
+                          .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, "disabledOtherLinks", ${index})`) &nbsp;屏蔽
+                  .column-links
+                    for link in data.column.otherLinks
+                      a(onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
 
 
   .hidden#data=objToStr({columnId: data.column._id, color: data.column.color})
 block scripts
   include ../publicModules/selectColor
   +includeJS("/columns/column.js")
+  +includeJS("/columns/management.js")

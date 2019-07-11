@@ -588,6 +588,9 @@
   "column_single_settings_transfer": "专栏转让",
   "column_single_settings_close": "关闭专栏",
   "visitUserContribute": "查看用户的投稿记录",
+  "movePostsToDraft": "批量将文章或回复退回修改",
+  "movePostsToRecycle": "批量将文章或回复送回收站",
+  "column_single_disabled": "屏蔽专栏",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",
