@@ -92,6 +92,10 @@ body{
 .user-card-panel .user-button .user-button-column{
   border-left: none;
 }
+.user-card-panel .user-button .user-button-column.only-one{
+  border-left: 1px solid #2b90d9;
+  border-radius: 10px;
+}
 .user-card-panel .user-button>*:active, .user-card-panel .user-button>*:visited, .user-card-panel .user-button>*:link{
   color: #2b90d9;
   text-decoration: none;

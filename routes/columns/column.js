@@ -16,7 +16,7 @@ router
     if(!column) ctx.throw(404, `未找到ID为${_id}的专栏`);
     if(!ctx.permission("column_single_disabled")) {
       if(column.disabled) {
-        nkcModules.throwError(403, "专栏已封禁", "columnHasBeenBanned");
+        nkcModules.throwError(403, "专栏已屏蔽", "columnHasBeenBanned");
       }
       if(column.closed) {
         nkcModules.throwError(403, "专栏已关闭", "columnHasBeenClosed");

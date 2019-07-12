@@ -1358,7 +1358,7 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
 * @return {Object} 专栏对象
 * */
 userSchema.statics.getUserColumn = async (uid) => {
-  return await mongoose.model("columns").findOne({uid, closed: false, disabled: false});
+  return await mongoose.model("columns").findOne({uid, closed: false});
 };
 
 module.exports = mongoose.model('users', userSchema);

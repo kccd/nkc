@@ -34,7 +34,72 @@ const schema = new Schema({
 /*
 * 加载消息模板信息
 * */
+/*
+if(app) {
+  if(t === "threadTitle") {
+    return "item.c.thread.firstPost.t"
+  } else if(t === "threadURL") {
+    return "openThread(item.c.thread.tid)";
+  } else if(t === "threadID") {
+    return "item.c.thread.tid"
+  } else if(t === "postContent") {
+    return "item.c.post.c"
+  } else if(t === "postURL") {
+    return "openThread(item.c.post.tid)";
+  } else if(t === "postID") {
+    return "item.c.post.pid"
+  } else if(t === "reason") {
+    return "item.c.rea"
+  } else if(t === "userID") {
+    return "item.c.user.uid"
+  } else if(t === "userURL") {
+    return "openUserHome(item.c.user.uid)";
+  } else if(t === "username") {
+    return "item.c.user.username"
+  } else if(t === "editPostURL") {
+    return "openThread(item.c.post.tid)";
+  } else if(t === "editThreadURL") {
+    return "openThread(item.c.thread.tid)";
+  } else if(t === "deadline") {
+    return "item.c.deadline";
+  } else if(t === "userAuthApplyURL") {
+    return "openUserHome(item.c.user.uid)";
+  } else if(t === "sellerOrderListURL") {
+    return "";
+  } else if(t === "buyerOrderURL") {
+    return "";
+  } else if(t === "orderID") {
+    return "item.c.order.orderId";
+  } else if(t === "sellerOrderURL") {
+    return ""
+  } else if(t === "buyerOrderRefundURL") {
+    return "";
+  } else if(t === "sellerOrderRefundURL") {
+    return ""
+  } else if(t === "postContent") {
+    return "item.c.post.c"
+  } else if(t === "reviewLink") {
+    return "openThread(item.c.thread.tid)"
+  } else if(t === "applicationFormURL") {
+    return "item.c.applicationForm.url"
+  } else if(t === "applicationFormID") {
+    return "item.c.applicationForm._id"
+  } else if(t === "applicationFormCode") {
+    return "item.c.applicationForm.code"
+  } else if(t === "xsfCount") {
+    return "item.c.num"
+  } else if(t === "columnContributeURL") {
+    return "'/m/' + item.c.column._id + '/settings/contribute'";
+  } else if(t === "userContributeURL") {
+    return "'/u/' + item.r + '/contribute'"
+  } else if(t === "columnURL") {
+    return "'/m/' + item.c.column._id"
+  } else if(t === "columnName") {
+    return "item.c.column.name"
+  }
+}
 
+*/
 const getDomByType = (t) => {
   if(t === "threadTitle") {
     return "item.c.thread.firstPost.t"

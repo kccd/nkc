@@ -40,7 +40,6 @@ router
     });
     await category.save();
     data.category = category;
-    data.categories =
     await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })
