@@ -21,6 +21,15 @@ var app = new Vue({
     });
   },
   methods: {
+    contactAdmin: function() {
+      nkcAPI("/m/" + this.column._id + "/contact", "POST", {})
+        .then(function() {
+          screenTopAlert("通知成功，请等待专栏管理员处理");
+        })
+        .catch(function(data) {
+          screenTopWarning(data);
+        })
+    },
     replaceImageUrl: function(str) {
       str = str.replace(/!\[.*?]\(.*?\)/ig, "");
       return str.replace(/\[.*?]\(.*?\)/ig, "");
@@ -115,7 +124,7 @@ var app = new Vue({
         })
     },
     addLink: function(otherLink) {
-      if(otherLink) {
+      if(otherLink === "otherLinks") {
         this.column.otherLinks.push({
           name: "",
           url: ""

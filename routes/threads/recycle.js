@@ -44,6 +44,7 @@ router
         //  更新文章的专业为回收站，并标记为已屏蔽，且设置审核状态为已通过
         await thread.update({
           mainForumsId: ["recycle"],
+          categoriesId: [],
           disabled: true,
           reviewed: true
         });

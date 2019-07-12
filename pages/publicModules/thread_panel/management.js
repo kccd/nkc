@@ -9,13 +9,22 @@ $(function() {
 function getSelectedThreadsId() {
   var dom = $(".thread-checkbox input");
   var threadsId = [];
+  var threads = [];
   for(var i = 0; i < dom.length; i++) {
     var d = dom.eq(i);
     if(d.prop("checked")) {
       threadsId.push(d.attr("data-thread-id"));
+      threads.push({
+        tid: d.attr("data-thread-id"),
+        cids: d.attr("data-thread-cids").split("-"),
+        fids: d.attr("data-thread-fids").split("-")
+      });
     }
   }
-  return threadsId;
+  return {
+    threadsId: threadsId,
+    threads: threads
+  };
 }
 
 
@@ -68,8 +77,16 @@ function disabledSelectedPosts() {
 
 // 移动文章 弹出弹窗选择专业 然后提交到服务器
 function moveSelectedThreads() {
-  var threadsId = getSelectedThreadsId();
+  var obj = getSelectedThreadsId();
+  var threadsId = obj.threadsId;
+  var options = {};
   if(threadsId.length === 0) return screenTopWarning("请至少勾选一篇文章");
+  if(threadsId.length === 1) {
+    var thread = obj.threads[0];
+    options.selectedCategoriesId = thread.cids;
+    options.selectedForumsId = thread.fids;
+  }
+  console.log(options);
   MoveThread.open(function(data) {
     var forums = data.forums;
     var moveType = data.moveType;
@@ -88,7 +105,7 @@ function moveSelectedThreads() {
         MoveThread.unlock();
       })
 
-  })
+  }, options);
 }
 
 // 显示或隐藏勾选框

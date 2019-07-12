@@ -21,6 +21,7 @@ router
     forums.push(recycle);
     await targetThread.update({
       mainForumsId: ["recycle"],
+      categoriesId: [],
       disabled: true,
       reviewed: true
     });

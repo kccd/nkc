@@ -4,6 +4,7 @@ var app = new Vue({
   data: {
     columnSettings: data.columnSettings,
     grades: data.grades,
+    roles: data.roles,
     error: "",
     info: ""
   },

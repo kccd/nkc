@@ -182,73 +182,78 @@ router
       };
     } else if(threadListType === "recommend") {
       q = await db.ThreadModel.getRecommendMatch(fidOfCanGetThreads);
-    } else {
-      // 专栏
+    } else if(threadListType === "column"){
+      q = {
+        mainForumsId: {
+          $in: fidOfCanGetThreads
+        },
+        recycleMark: {
+          $ne: true
+        },
+        disabled: false,
+        reviewed: true,
+        inColumn: true
+      }
     }
 
     data.threads = [];
     let paging;
-    if(["latest", "recommend", "subscribe"].includes(threadListType)) {
-      const count = await db.ThreadModel.count(q);
-      paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
 
-      let sort = {tlm: -1};
-      if(s === "toc") sort = {toc: -1};
+    const count = await db.ThreadModel.count(q);
+    paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
 
-      let threads = await db.ThreadModel.find(q, {
-        uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
-        tlm: 1, fid: 1, hasCover: 1,
-        mainForumsId: 1, hits: 1, count: 1,
-        digest: 1, reviewed: 1,
-        disabled: 1, recycleMark: 1
-      }).skip(paging.start).limit(paging.perpage).sort(sort);
+    let sort = {tlm: -1};
+    if(s === "toc") sort = {toc: -1};
 
-      threads = await db.ThreadModel.extendThreads(threads, {
-        htmlToText: true
-      });
+    let threads = await db.ThreadModel.find(q, {
+      uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
+      tlm: 1, fid: 1, hasCover: 1,
+      mainForumsId: 1, hits: 1, count: 1,
+      digest: 1, reviewed: 1,
+      categoriesId: 1,
+      disabled: 1, recycleMark: 1
+    }).skip(paging.start).limit(paging.perpage).sort(sort);
 
-      const superModerator = ctx.permission("superModerator");
-      let canManageFid = [];
-      if(user) {
-        canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
-      }
-      for(const thread of threads) {
-        if(thread.disabled || thread.recycleMark) {
-          // 根据权限过滤掉 屏蔽、退修的内容
-          if (user) {
-            // 不具有特殊权限且不是自己
-            if (!superModerator) {
-              const mainForumsId = thread.mainForumsId;
-              let has = false;
-              for (const fid of mainForumsId) {
-                if (canManageFid.includes(fid)) {
-                  has = true;
-                }
+    threads = await db.ThreadModel.extendThreads(threads, {
+      htmlToText: true
+    });
+
+    const superModerator = ctx.permission("superModerator");
+    let canManageFid = [];
+    if(user) {
+      canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
+    }
+    for(const thread of threads) {
+      if(thread.disabled || thread.recycleMark) {
+        // 根据权限过滤掉 屏蔽、退修的内容
+        if (user) {
+          // 不具有特殊权限且不是自己
+          if (!superModerator) {
+            const mainForumsId = thread.mainForumsId;
+            let has = false;
+            for (const fid of mainForumsId) {
+              if (canManageFid.includes(fid)) {
+                has = true;
               }
-              if (!has) continue;
             }
-          } else {
-            continue;
+            if (!has) continue;
           }
+        } else {
+          continue;
         }
-        if(threadListType === "subscribe") {
-          if(subTid.includes(thread.tid)) {
-            thread.from = 'subThread';
-          } else if(subUid.includes(thread.uid)) {
-            thread.from = 'subFriend';
-          } else if(thread.uid === user.uid) {
-            thread.from = 'own';
-          } else {
-            thread.from = 'subForum';
-          }
-        }
-        data.threads.push(thread);
       }
-    } else if(threadListType === "column") {
-      const count = await db.ColumnPostModel.count();
-      paging = nkcModules.apiFunction.paging(page, count);
-      const columnPosts = await db.ColumnPostModel.find().sort({top: -1}).skip(paging.start).limit(paging.perpage);
-      data.threads =  await db.ColumnPostModel.extendColumnPosts(columnPosts,fidOfCanGetThreads);
+      if(threadListType === "subscribe") {
+        if(subTid.includes(thread.tid)) {
+          thread.from = 'subThread';
+        } else if(subUid.includes(thread.uid)) {
+          thread.from = 'subFriend';
+        } else if(thread.uid === user.uid) {
+          thread.from = 'own';
+        } else {
+          thread.from = 'subForum';
+        }
+      }
+      data.threads.push(thread);
     }
 
     if(threadListType !== "latest") {

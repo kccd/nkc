@@ -427,6 +427,10 @@ threadRouter
 		}
     data.targetUser = await thread.extendUser();
     await db.UserModel.extendUsersInfo([data.targetUser]);
+    data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
+    if(data.targetColumn) {
+      data.columnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type: "thread", pid: thread.oc});
+    }
 		// 文章访问量加1
 		await thread.update({$inc: {hits: 1}});
 		data.thread = thread;

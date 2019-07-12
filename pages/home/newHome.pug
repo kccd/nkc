@@ -20,23 +20,28 @@ block content
             .m-b-1
               include ../publicModules/mobile_drawer/right_drawer
               -let showPagingSortButton = true;
-              if data.t === "column"
-                -showPagingSortButton = false;
-              -let showHomeButton = true;
               if canManagement
                 .paging-button
                   a.button.radius-left(onclick="managementThreads()") 管理
                   a.button(onclick="selectAll()") 全选
                   a.button(onclick="moveSelectedThreads()") 移动
                   a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+              if data.t === "latest" || data.t === "column" || data.t === "recommend"
+                .paging-button
+                  a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 全部
+                  a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
+                  a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
+                //-.paging-button
+                  if data.user
+                    a.radius-left.button(href=`/?t=subscribe` class=data.t === "subscribe" ? "active" : "") 我的关注
+                    a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
+                  else
+                    a.button.radius-left(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
+                  a.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
+                  a.radius-right.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 最新
               include ../publicModules/paging/paging
-            if data.t === "column"
-              +includeCSS("/columns/column.css")
-              for columnPost in data.threads
-                include ../columns/singleColumnPost
-            else
-              for thread in data.threads
-                include ../publicModules/thread_panel/thread_panel
+            for thread in data.threads
+              include ../publicModules/thread_panel/thread_panel
             -showPagingSortButton = false;
             -showHomeButton = false;
             if canManagement

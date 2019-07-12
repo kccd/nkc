@@ -137,7 +137,7 @@ function getSelectedColumnCategoriesId() {
       }
     }
     if(columnCategoriesId.length === 0) {
-      geid('ButtonReply').disabled=false;
+      geid('post').disabled = false;
       throw("请选择专栏文章分类");
     }
   }

@@ -12,15 +12,6 @@ if data.cat
   -query += `&cat=${data.cat}`;
 //-if data.s
 //-  -query += `&s=${data.s}`;
-if showHomeButton
-  .paging-button
-    if data.user
-      a.radius-left.button(href=`/?t=subscribe` class=data.t==="subscribe"?"active":"") 我的关注
-      a.button(href=`/?t=recommend` class=data.t==="recommend"?"active":"") 推荐
-    else
-      a.button.radius-left(href=`/?t=recommend` class=data.t==="recommend"?"active":"") 推荐
-    a.button(href=`/?t=column` class=data.t==="column"?"active":"") 专栏
-    a.radius-right.button(href=`/?t=latest` class=data.t==="latest"?"active":"") 最新
 if showPagingDigestButton
   .paging-button
     a.radius-left.button(href=`${state.url}` class=!data.d?"active": "") 全部

@@ -191,6 +191,13 @@ const threadSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+
+  // 是否被推送到了专栏
+  inColumn: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 
 }, {toObject: {
@@ -1228,7 +1235,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   for (var i in allMarkThreads) {
     const delThreadLog = await DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
     if(delThreadLog){
-      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true, reviewed: true});
+      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true, reviewed: true, categoriesId: []});
       await PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
       await DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
       const tUser = await UserModel.findOne({uid: delThreadLog.delUserId});

@@ -1703,7 +1703,7 @@ span.thread-title-page{
   top: 7px;
   position: absolute;
   color: #555;
-  right: 0;
+  right: 1px;
   border: none;
   background-color: rgba(255,255,255,0.7);
 }

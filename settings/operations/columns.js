@@ -63,6 +63,9 @@ module.exports = {
     },
     disabled: {
       POST: "column_single_disabled"
+    },
+    contact: {
+      POST: "column_single_contact"
     }
   }
 };

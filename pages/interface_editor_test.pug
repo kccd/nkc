@@ -82,7 +82,7 @@ block content
                   // include ../publicModules/toColumn/toColumn
                   .checkbox-inline
                     label
-                      input(type='checkbox' onclick="selectColumnCategories(this)" id="checkboxToColumn")
+                      input(type='checkbox' onclick="selectColumnCategories(this)" id="checkboxToColumn" checked=data.toColumn)
                       | 同时转发文章到专栏
                   -let categoriesDomId = "postToColumn";
                   -let categories = data.columnCategories;
@@ -148,6 +148,9 @@ block scripts
     $(".bootstrap-tagsinput").click(function () {
       openPanel(this);
     });
+  if data.toColumn
+    script.
+      $("#postToColumn").show();
   //- else
   //-   link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
   //-   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)

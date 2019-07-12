@@ -247,5 +247,32 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
     await columnPost.save();
   }
 };
-
+/*
+* 标记专栏文章所对应的thread，inColumn字段;
+* */
+schema.post("save", async function(columnPost) {
+  if(columnPost.type === "thread") {
+    await mongoose.model("threads").updateOne({tid: columnPost.tid}, {
+      $set: {
+        inColumn: true
+      }
+    });
+  }
+});
+schema.post("remove", async function(columnPost) {
+  if(columnPost.type === "thread") {
+    const count = await mongoose.model("columnPosts").count({
+      _id: {$ne: columnPost._id},
+      type: "thread",
+      tid: columnPost.tid
+    });
+    if(count === 0) {
+      await mongoose.model("threads").updateOne({tid: this.tid}, {
+        $set: {
+          inColumn: false
+        }
+      });
+    }
+  }
+});
 module.exports = mongoose.model("columnPosts", schema);

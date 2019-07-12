@@ -18,6 +18,16 @@ NKC.modules.MoveThread = function() {
       showRecycle: false
     },
     computed: {
+
+      canSelectForums: function() {
+        var forums = this.forums;
+        var arr = [];
+        for(var i = 0; i < forums.length; i++) {
+          arr = arr.concat(forums[i].allChildForums || []);
+        }
+        return arr;
+      },
+
       selectedForumsId: function() {
         var arr = [];
         for(var i = 0; i < this.selectedForums.length; i++) {
@@ -37,6 +47,21 @@ NKC.modules.MoveThread = function() {
       }
     },
     methods: {
+      getCategory: function(forum, categoriesId) {
+        var threadTypes = forum.threadTypes;
+        for(var i = 0; i < threadTypes.length; i++) {
+          var threadType = threadTypes[i];
+          if(categoriesId.indexOf(threadType.cid + "") !== -1) {
+            return threadType;
+          }
+        }
+      },
+      getForumsById: function(fid) {
+        var canSelectForums = this.canSelectForums;
+        for(var i = 0; i < canSelectForums.length; i++) {
+          if(fid === canSelectForums[i].fid) return canSelectForums[i];
+        }
+      },
       getAllChildForums: function(forum, arr) {
         if(forum.childrenForums && forum.childrenForums.length > 0) {
           for(var i = 0; i < forum.childrenForums.length; i++) {
@@ -93,9 +118,6 @@ NKC.modules.MoveThread = function() {
   this_.open = function(callback, options) {
     this_.callback = callback;
     this_.dom.modal("show");
-    if(options) {
-      this_.app.showRecycle = options.showRecycle || false;
-    }
     nkcAPI("/f", "GET")
       .then(function(data) {
         for(var i = 0; i < data.forums.length; i++) {
@@ -104,6 +126,23 @@ NKC.modules.MoveThread = function() {
         }
         this_.app.forums = data.forums;
         this_.app.loading = false;
+        if(options) {
+          this_.app.showRecycle = options.showRecycle || false;
+          if(options.selectedForumsId && options.selectedForumsId.length > 0) {
+            var selectedForums = [];
+            var forumsId = options.selectedForumsId;
+            for(var i = 0; i < forumsId.length; i++) {
+              var f = this_.app.getForumsById(forumsId[i]);
+              if(f) {
+                if(options.selectedCategoriesId) {
+                  f.selectedThreadType = this_.app.getCategory(f, options.selectedCategoriesId);
+                }
+                selectedForums.push(f);
+              }
+            }
+            this_.app.selectedForums = selectedForums;
+          }
+        }
       })
       .catch(function(data) {
         screenTopWarning(data);

@@ -69,7 +69,7 @@ block content
                 a(href=data.user ? `/m/${data.column._id}/contribute`: "/login" target="_blank")
                   button 投稿
               else
-                a(href="/editor?from=column" target="_blank")
+                a(href="/editor?toColumn=true" target="_blank")
                   button 发表
             .column-sub-button
               //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
@@ -128,28 +128,28 @@ block content
                   .fa.fa-shield &nbsp;管理
                 .row.m-t-1
                   if data.column.disabled
-                    h4.text-danger.col-xs-12.text-center 专栏已封禁
+                    h4.text-danger.col-xs-12.text-center 专栏已屏蔽
                   else if data.column.closed
                     h4.text-danger.col-xs-12.text-center 专栏已关闭
 
                   if !data.column.disabled
-                    a(onclick=`disabledColumn(${data.column._id}, 'disabledColumn')`).col-xs-4
+                    a(onclick=`managementColumn(${data.column._id}, 'column', true)`).col-xs-4
                       .fa.fa-ban
-                      .name 封禁专栏
+                      .name 屏蔽专栏
                   else
-                    a(onclick=`disabledColumn(${data.column._id}, 'unDisabledColumn')`).col-xs-4
+                    a(onclick=`managementColumn(${data.column._id}, 'column', false)`).col-xs-4
                       .fa.fa-ban
-                      .name 解除封禁
-                  a(onclick=`disabledColumn(${data.column._id}, 'logo')`).col-xs-4
+                      .name 解除屏蔽
+                  a(onclick=`managementColumn(${data.column._id}, 'logo', true)`).col-xs-4
                     .fa.fa-picture-o
                     .name 删除logo
-                  a(onclick=`disabledColumn(${data.column._id}, 'banner')`).col-xs-4
+                  a(onclick=`managementColumn(${data.column._id}, 'banner', true)`).col-xs-4
                     .fa.fa-picture-o
                     .name 删除banner
-                  a(onclick=`disabledColumn(${data.column._id}, 'name')`).col-xs-4
+                  a(onclick=`managementColumn(${data.column._id}, 'name', true)`).col-xs-4
                     .fa.fa-align-center
                     .name 删除专栏名
-                  a(onclick=`disabledColumn(${data.column._id}, 'abbr')`).col-xs-4
+                  a(onclick=`managementColumn(${data.column._id}, 'abbr', true)`).col-xs-4
                     .fa.fa-align-center
                     .name 删除简介
 
@@ -209,9 +209,9 @@ block content
                   .fa.fa-bullhorn &nbsp;公告通知
                     if canManagement
                       if data.column.noticeDisabled
-                        .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, 'unDisabledNotice')`) &nbsp;解除屏蔽
+                        .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, 'notice', false)`) &nbsp;解除屏蔽
                       else
-                        .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, 'disabledNotice')`) &nbsp;屏蔽
+                        .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, 'notice', true)`) &nbsp;屏蔽
                 p!=markdown_safe(data.column.notice)
           div.m-b-2
             .column-management
@@ -243,14 +243,14 @@ block content
                     .column-timeline=t.time
                       .pull-right=`${t.count} 篇`
           if !data.column.blocksDisabled || canManagement
-            if canManagement
+            if canManagement || data.column.blocks.length > 0
               div.m-b-2
                 .column-block
-                  .column-header 所有自定义内容
+                  .column-header 自定义内容
                     if data.column.blocksDisabled
-                      .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, "unDisabledBlocks", ${index})`) &nbsp;解除屏蔽
+                      .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "blocks", false)`) &nbsp;解除屏蔽
                     else
-                      .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, "disabledBlocks", ${index})`) &nbsp;屏蔽
+                      .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "blocks", true)`) &nbsp;屏蔽
             for block, index in data.column.blocks
               if block.show
                 div.m-b-2
@@ -265,9 +265,9 @@ block content
                     .fa.fa-link &nbsp;友情链接
                       if canManagement
                         if data.column.otherLinksDisabled
-                          .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, "unDisabledOtherLinks", ${index})`) &nbsp;解除屏蔽
+                          .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "otherLinks", false)`) &nbsp;解除屏蔽
                         else
-                          .column-management-button.fa.fa-minus-circle(onclick=`disabledColumn(${data.column._id}, "disabledOtherLinks", ${index})`) &nbsp;屏蔽
+                          .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "otherLinks", true)`) &nbsp;屏蔽
                   .column-links
                     for link in data.column.otherLinks
                       a(onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
@@ -275,6 +275,7 @@ block content
 
   .hidden#data=objToStr({columnId: data.column._id, color: data.column.color})
 block scripts
+  include ../publicModules/commonModal/commonModal
   include ../publicModules/selectColor
   +includeJS("/columns/column.js")
   +includeJS("/columns/management.js")

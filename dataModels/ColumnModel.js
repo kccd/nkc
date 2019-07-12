@@ -109,6 +109,11 @@ const schema = new Schema({
   perpage: {
     type: Number,
     default: 30
+  },
+  // 是否已经通知过管理员了
+  contacted: {
+    type: Boolean,
+    default: false
   }
 }, {
   collection: "columns"

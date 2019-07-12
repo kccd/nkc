@@ -352,10 +352,13 @@ block content
                                 span.fa.fa-caret-square-o-down(style="color:#b5b4b4")
                               .dropdown-menu(aria-labelledby='dropdown-level')
                                 span(style="padding:5px")!=`${levelText}`
-                          for forum, index in thread.forums
-                            if index > 0
-                              span ,&nbsp;
-                            a(href=`/f/${forum.fid}`)=forum.displayName
+                          if data.columnPost
+                            a(href=`/m/${data.targetColumn._id}`)= data.targetColumn.name
+                          else
+                            for forum, index in thread.forums
+                              if index > 0
+                                span ,&nbsp;
+                              a(href=`/f/${forum.fid}`)=forum.displayName
                         if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
                           .abstract(style="margin-top:1rem;")
                             if post.abstractCn.length !== 0
