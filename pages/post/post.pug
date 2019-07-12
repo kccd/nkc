@@ -27,6 +27,8 @@ block title
   meta(name='keywords' content=`${thread.firstPost.t}`)
   link(rel='stylesheet' href=`/post/post.css?v=${global.NKC.startTime}`)
   link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+  +includeCSS("/external_pkgs/viewer/viewer.css")
+  +includeCSS("/external_pkgs/viewer/main.css")
   +includeJS("/external_pkgs/imageToBig/preview.js")
 block content
   -var mainContainer1400 = true
@@ -81,7 +83,7 @@ block content
             | 》
           if post.t
             div.ThreadTitle= post.t
-          div.ThreadPostBody!= experimental_render(post)
+          div.ThreadPostBody#ThreadPostBody!= experimental_render(post)
           if post.credits && post.credits.length > 0
             .nkcpanel.ThreadPostCredits
               for c,index in post.credits
@@ -149,10 +151,19 @@ block scripts
   //include ../ueditor/ueditor
   include ../ueditor/ueditorBase
   +includeJS(`/thread/comments.js`)
+  +includeJS("/external_pkgs/viewer/viewer.js")
   script.
     $(".dropdown-menu.stop-propagation").on("click",function (e) {
       e.stopPropagation();
     });
-    var preview = new Preview({
-        imgWrap: 'wrap' // 指定该容器里的图片点击预览
+    //- var preview = new Preview({
+    //-     imgWrap: 'wrap' // 指定该容器里的图片点击预览
+    //- })
+    $(document).ready(function() {
+      var options = {
+        navbar: false,
+        title: false,
+        toolbar: false,
+      }
+      new Viewer(document.getElementById('ThreadPostBody'), options);
     })

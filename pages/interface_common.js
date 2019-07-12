@@ -1843,17 +1843,19 @@ function openNKCDrawer(type) {
   stopBodyScroll(true);
 }
 function closeNKCDrawer(type) {
-  if(type === "left"){
-    api.setRefreshHeaderInfo({
-      bgColor: '#eeeeee',
-      textColor: '#aaaaaa',
-      textDown: '下拉刷新',
-      textUp: '松开刷新',
-      textLoading: '刷新成功，正在加载资源...',
-      showTime: false
-    }, function(ret, err) {
-      window.location.reload();
-    });
+  if(localStorage.getItem("apptype") === "app") {
+    if(type === "left"){
+      api.setRefreshHeaderInfo({
+        bgColor: '#eeeeee',
+        textColor: '#aaaaaa',
+        textDown: '下拉刷新',
+        textUp: '松开刷新',
+        textLoading: '刷新成功，正在加载资源...',
+        showTime: false
+      }, function(ret, err) {
+        window.location.reload();
+      });
+    }
   }
   $(".nkc-drawer-"+type).removeClass("active");
   $(".nkc-drawer-"+type+"-mask").removeClass("active");
@@ -1866,17 +1868,19 @@ function toggleNKCDrawer(type) {
   if(nkcDrawer.hasClass('active')) {
     closeNKCDrawer(type);
   } else {
-    if(api.frameName === "latest") {
-      api.setFrameAttr({
-        name: 'latest',
-        bounces: false
-      });
-    }
-    if(api.frameName === "forum") {
-      api.setFrameAttr({
-        name: 'forum',
-        bounces: false
-      });
+    if(localStorage.getItem("apptype") === "app") {
+      if(api.frameName === "latest") {
+        api.setFrameAttr({
+          name: 'latest',
+          bounces: false
+        });
+      }
+      if(api.frameName === "forum") {
+        api.setFrameAttr({
+          name: 'forum',
+          bounces: false
+        });
+      }
     }
     openNKCDrawer(type);
   }
