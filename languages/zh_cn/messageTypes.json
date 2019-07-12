@@ -25,6 +25,9 @@
   "applicationFormCode": "申请表编号",
   "xsfCount": "学术分数目",
   "columnContributeURL": "投稿列表链接",
+  "columnName": "专栏名",
+  "columnURL": "专栏链接",
+  "columnInfoType": "专栏信息类型",
 
   "replyPost": "回复被引用",
   "replyThread": "文章被回复",
@@ -55,5 +58,8 @@
   "fundAdmin": "【基金系统】申请待处理",
   "fundMember": "【基金系统】组队邀请",
   "newColumnContribute": "【专栏】新的投稿",
-  "columnContributeChange": "【专栏】投稿状态更新"
+  "disabledColumnInfo": "【专栏】专栏信息被屏蔽",
+  "disabledColumn": "【专栏】专栏被屏蔽",
+  "columnContributeChange": "【专栏】投稿状态更新",
+  "columnContactAdmin": "【专栏】专栏信息已修改"
 }

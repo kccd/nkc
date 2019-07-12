@@ -191,6 +191,13 @@ const threadSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+
+  // 是否被推送到了专栏
+  inColumn: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 
 }, {toObject: {
@@ -1228,7 +1235,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   for (var i in allMarkThreads) {
     const delThreadLog = await DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
     if(delThreadLog){
-      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true, reviewed: true});
+      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true, reviewed: true, categoriesId: []});
       await PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
       await DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
       const tUser = await UserModel.findOne({uid: delThreadLog.delUserId});
@@ -1467,6 +1474,34 @@ threadSchema.methods.createNewPost = async function(post) {
     }
   }
   return _post
+};
+/*
+* 检验用户是否为文章所在专业的专家
+* @param {String/Object} uid 用户ID或对象
+* @param {String} type "or": 只需是其中一个专业的专家，"and": 必须是所有专业的和专家
+* @return {Boolean} 是否为专家
+* @author pengxiguaa 2019-7-10
+* */
+threadSchema.methods.isModerator = async function(uid, type) {
+  const UserModel = mongoose.model("users");
+  let user;
+  if(typeof uid === "string") {
+    user = await UserModel.findOnly({uid});
+  } else {
+    user = uid;
+  }
+  const forums = await this.extendForums(["mainForums"]);
+  if(type === "or") {
+    for(const forum of forums) {
+      if(await forum.isModerator(user)) return true;
+    }
+    return false;
+  } else {
+    for(const forum of forums) {
+      if(!await forum.isModerator(user)) return false;
+    }
+    return true;
+  }
 };
 
 module.exports = mongoose.model('threads', threadSchema);

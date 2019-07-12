@@ -29,7 +29,11 @@ module.exports = {
       GET: "column_single_settings",
       post: {
         GET: "column_single_settings_post",
-        POST: "column_single_settings_post"
+        POST: "column_single_settings_post",
+        add: {
+          GET: "column_single_settings_post",
+          POST: "column_single_settings_post"
+        }
       },
       contribute: {
         GET: "column_single_settings_contribute",
@@ -56,6 +60,12 @@ module.exports = {
     },
     status: {
       GET: "column_single_status"
+    },
+    disabled: {
+      POST: "column_single_disabled"
+    },
+    contact: {
+      POST: "column_single_contact"
     }
   }
 };

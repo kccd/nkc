@@ -4,7 +4,6 @@ $(function() {
   dom.html(leftDom.html());
 });
 
-
 function showSameForums() {
   $(".sameForums").slideToggle();
 }

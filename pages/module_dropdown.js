@@ -322,7 +322,8 @@ function moveThreadToRecycle(id,para) {
 	var fn = function(i) {
 		i++;
 		if(i < tid.length) {
-			moveThread(tid[i], 'recycle', '',para, fn(i));
+		  disabledThread(tid[i], para, fn(i));
+			// moveThread(tid[i], 'recycle', '',para, fn(i));
 		}
 	};
 	fn(n);

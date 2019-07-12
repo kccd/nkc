@@ -47,6 +47,9 @@
   margin-top: 6rem;
 }
 /* margin-bottom */
+.m-b-0{
+  margin-bottom: 0;
+}
 .m-b-1{
   margin-bottom: 1rem;
 }
@@ -312,8 +315,14 @@
 
 }
 .paging-button a{
+  -moz-user-select:none; /*火狐*/
+  -webkit-user-select:none; /*webkit浏览器*/
+  -ms-user-select:none; /*IE10*/
+  -khtml-user-select:none; /*早期浏览器*/
+  user-select:none;
   display: inline-block;
   height: 2rem;
+  cursor: pointer;
   color: #fff;
   line-height: 2rem;
   text-align: center;
@@ -1328,6 +1337,13 @@ footer.footer ul li{
   display: inline-block;
   margin-right: 0.5rem;
 }
+.thread-checkbox{
+  display: inline;
+  vertical-align: text-top;
+}
+.thread-checkbox label{
+  display: none;
+}
 .thread-panel-author:hover, .thread-panel-author:visited, .thread-panel-author:active, .thread-panel-author:link{
   text-decoration: none;
   color: #9baec8;
@@ -1687,7 +1703,7 @@ span.thread-title-page{
   top: 7px;
   position: absolute;
   color: #555;
-  right: 0;
+  right: 1px;
   border: none;
   background-color: rgba(255,255,255,0.7);
 }

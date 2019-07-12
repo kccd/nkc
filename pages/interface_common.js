@@ -1808,6 +1808,17 @@ function enablePost(pid){
       screenTopWarning(data.error)
     })
 }
+function disabledThread(tid, para) {
+  return nkcAPI('/t/'+tid+'/disabled','POST',{
+    para:para
+  })
+    .then(function(){
+      screenTopAlert('已将ID为 '+tid+' 的文章移动至回收站');
+    })
+    .catch(function(data){
+      screenTopWarning('移动ID为 '+tid+' 的文章失败：' + data.error);
+    })
+}
 
 function moveThread(tid,fid,cid,para){
   return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
@@ -2122,12 +2133,28 @@ function reload() {
 }
 
 
-function openToNewLocation(url) {
+function openToNewLocation(url, target) {
   var apptype = localStorage.getItem("apptype");
-  if(apptype && apptype == "app") {
-    url = addApptypeToUrl(url)
+  if(apptype && apptype === "app") {
+    if(siteHostLink(url)) {
+      window.location.href = addApptypeToUrl(url)
+    } else {
+      api.openWin({
+        name: 'link',
+        url: 'widget://html/link/link.html',
+        pageParam: {
+          name: 'link',
+          linkUrl: url
+        }
+      });
+    }
+  } else {
+    if(target === "_blank") {
+      window.open(url);
+    } else {
+      window.location.href = url
+    }
   }
-  window.location.href = url;
 }
 
 /**

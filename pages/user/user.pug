@@ -22,7 +22,7 @@ block content
                     <li role="separator" class="divider"></li>
                   if !data.targetUser.certs.includes("banned") && permission("bannedUser")
                     li
-                      a(onclick=` bannedUser("${data.targetUser.uid}", true)`) 封禁
+                      a(onclick=` bannedUser("${data.targetUser.uid}", true)`) 封禁用户
                     <li role="separator" class="divider"></li>
                   if permission("clearUserInfo")
                     li
@@ -47,13 +47,21 @@ block content
             .user-button
               if data.user
                 a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
+                if data.targetUser.column
+                  a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
                 if data.userSubUid.includes(data.targetUser.uid)
                   a(onclick=` subscribeUser("${data.targetUser.uid}", false)`) 已关注
                 else
                   a(onclick=` subscribeUser("${data.targetUser.uid}", true)`) 关注
               else
                 a(href=`/login`) 私信
+                if data.targetUser.column
+                  a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
+                a(href=`/login`) 私信
                 a(href=`/login`) 关注
+          else if data.targetUser.column
+            .user-button
+              a.user-button-column.only-one(href=`/m/${data.targetUser.column._id}`) 专栏
           .user-number
             .col-xs-3
               .number=data.targetUser.threadCount - data.targetUser.disabledThreadsCount
@@ -67,7 +75,7 @@ block content
             .col-xs-3(title=`科创币：${data.targetUser.kcb/100}`)
               .number=data.targetUser.kcb/100
               .title 科创币
-          .user-description!=markdown(data.targetUser.description || "")
+          .user-description!=markdown_safe(data.targetUser.description || "")
           .user-register=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
         #leftDom.hidden-sm.hidden-xs
           if data.targetUserSubForums && data.targetUserSubForums.length > 0

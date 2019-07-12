@@ -1,25 +1,46 @@
 if column
   .modal.fade#moduleToColumn(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-uid=column.uid data-column-id=column._id)
-     .modal-dialog.modal-sm(role="document")
-       .modal-content#moduleToColumnVue
-         .modal-header
-           button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+    .modal-dialog.modal-sm(role="document")
+      .modal-content#moduleToColumnVue
+        .modal-header
+          button(type="button" class="close" data-dismiss="modal" aria-label="Close")
             span(aria-hidden="true") &times;
-           h5.modal-title 选择分类
-         .modal-body
-           .text-center.m-t-3.m-b-3(v-if="loading") 加载中...
-           div(v-else)
-             .radio(v-if="!selectMul" v-for="c in categories")
-               label(v-if="excludes.indexOf(c._id) === -1")
-                 span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;
-                 input(type="radio" :value="c._id" v-model="categoryId")
-                 span {{c.name}}
-             .checkbox(v-else)
-               label(v-if="excludes.indexOf(c._id) === -1")
-                 span(v-for='index in c.level') &nbsp;&nbsp;&nbsp;
-                 input(type="checkbox" :value="c._id" v-model="categoriesId")
-                 span {{c.name}}
-         .modal-footer
-           button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消
-           button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
+          h5.modal-title 选择分类
+        .modal-body
+          .text-center.m-t-3.m-b-3(v-if="loading") 加载中...
+          div(v-else)
+            div(v-if="!createCategory")
+              .radio(v-if="!selectMul" v-for="c in categories")
+                label(v-if="excludes.indexOf(c._id) === -1")
+                  span(v-html="c.str")
+                  input(type="radio" :value="c._id" v-model="categoryId")
+                  span {{c.name}}
+              .checkbox(v-else)
+                label(v-if="excludes.indexOf(c._id) === -1")
+                  span(v-html="c.str")
+                  input(type="checkbox" :value="c._id" v-model="categoriesId")
+                  span {{c.name}}
+              .text-center
+                .pointer(@click="addCategory").m-t-05.m-b-05
+                  .fa.fa-plus-circle &nbsp;添加分类
+            .m-t-1(v-else)
+              .form(v-if="createCategory")
+                .form-group
+                  label 分类名（不超过20字符）
+                  input.form-control(type="text" v-model.trim="newCategory.name")
+                .form-group
+                  label 分类简介（不超过100字符）
+                  textarea.form-control(v-model.trim="newCategory.description" rows=3)
+                .form-group
+                  label 父级分类
+                  select.form-control(v-model="newCategory.parentId")
+                    option(value="") 无
+                    option(v-for="c in categories" :value="c._id" v-html="c.str + c.name")
+                .form-group
+                  h5.text-danger(v-if="error") {{error}}
+                  button.btn.btn-primary.btn-sm.btn-block(@click="saveCategory") 保存
+                  button.btn.btn-default.btn-sm.btn-block(@click="cancelAddCategory") 取消
+        .modal-footer(v-if="!createCategory")
+          button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消
+          button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
   +includeJS("/publicModules/toColumn/toColumn.js")

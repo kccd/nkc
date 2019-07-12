@@ -68,7 +68,7 @@ router
     let q = {};
     let threadListType;
     if(t) {
-      if(!["latest", "recommend", "subscribe"].includes(t)) t = '';
+      if(!["latest", "recommend", "subscribe", "column"].includes(t)) t = '';
       if(t === "subscribe" && !user) t = '';
       threadListType =  t;
     }
@@ -77,15 +77,19 @@ router
         const {visitorThreadList} = homeSettings;
         if(visitorThreadList === "latest") {
           threadListType = "latest"
-        } else {
+        } else if(visitorThreadList === "recommend") {
           threadListType = "recommend"
+        } else {
+          threadListType = "column";
         }
       } else {
         const {homeThreadList} = user.generalSettings.displaySettings;
         if(homeThreadList === "latest") {
           threadListType = "latest";
-        } else {
+        } else if(homeThreadList === "subscribe") {
           threadListType = "subscribe";
+        } else {
+          threadListType = "column";
         }
       }
     }
@@ -176,12 +180,27 @@ router
           }
         ]
       };
-    } else {
+    } else if(threadListType === "recommend") {
       q = await db.ThreadModel.getRecommendMatch(fidOfCanGetThreads);
+    } else if(threadListType === "column"){
+      q = {
+        mainForumsId: {
+          $in: fidOfCanGetThreads
+        },
+        recycleMark: {
+          $ne: true
+        },
+        disabled: false,
+        reviewed: true,
+        inColumn: true
+      }
     }
 
+    data.threads = [];
+    let paging;
+
     const count = await db.ThreadModel.count(q);
-    const paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+    paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
 
     let sort = {tlm: -1};
     if(s === "toc") sort = {toc: -1};
@@ -191,6 +210,7 @@ router
       tlm: 1, fid: 1, hasCover: 1,
       mainForumsId: 1, hits: 1, count: 1,
       digest: 1, reviewed: 1,
+      categoriesId: 1,
       disabled: 1, recycleMark: 1
     }).skip(paging.start).limit(paging.perpage).sort(sort);
 
@@ -203,7 +223,6 @@ router
     if(user) {
       canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
     }
-    data.threads = [];
     for(const thread of threads) {
       if(thread.disabled || thread.recycleMark) {
         // 根据权限过滤掉 屏蔽、退修的内容

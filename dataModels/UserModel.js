@@ -263,6 +263,14 @@ userSchema.virtual('group')
     this._group = g;
   });
 
+userSchema.virtual('column')
+  .get(function() {
+    return this._column;
+  })
+  .set(function(g) {
+    this._column = g;
+  });
+
 userSchema.virtual('threads')
   .get(function() {
     return this._threads;
@@ -862,6 +870,7 @@ userSchema.methods.getPostLimit = async function() {
 */
 userSchema.statics.extendUsersInfo = async (users) => {
   const RoleModel = mongoose.model('roles');
+  const UserModel = mongoose.model('users');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const uid = new Set(), personalObj = {};
   for(const user of users) {
@@ -890,6 +899,13 @@ userSchema.statics.extendUsersInfo = async (users) => {
     }
     const info = {};
     info.certsName = [];
+    const column = await UserModel.getUserColumn(user.uid);
+    if(column) {
+      user.column = {
+        _id: column._id,
+        name: column.name
+      }
+    }
     for(const cert of certs) {
       const role = await RoleModel.extendRole(cert);
       if(role.displayName) {

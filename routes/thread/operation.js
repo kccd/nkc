@@ -40,7 +40,6 @@ operationRouter
   .patch("/moveDraft/reason", async (ctx, next) => {
     const {body, db} = ctx;
     const {log} = body;
-    console.log(log);
     if(!log.reason) ctx.throw(400, "退修原因不能为空");
     await db.DelPostLogModel.updateOne({
       _id: log._id
@@ -61,8 +60,6 @@ operationRouter
       obj[`c.pid`] = log.postId;
     }
     obj[`c.type`] = mType;
-
-    console.log(obj);
 
     await db.MessageModel.updateOne(obj, {
       $set: {
@@ -376,41 +373,6 @@ operationRouter
       await forum.updateForumMessage();
     }));
     await next();
-  })
-	.patch('/switchInPersonalForum', async (ctx, next) => {
-		const {data, db} = ctx;
-		const {user} = data;
-		const {tid} = ctx.params;
-		const {hideInMid, toppedInMid, digestInMid} = ctx.body;
-		const targetThread = await db.ThreadModel.findOnly({tid});
-		const {mid, toMid} = targetThread;
-		let targetPersonalForum = {};
-		let targetUser = {};
-		if(mid) {
-			targetPersonalForum = await db.PersonalForumModel.findOnly({uid: mid});
-			targetUser = await db.UserModel.findOnly({uid: mid});
-		} else if(toMid) {
-			targetPersonalForum = await db.PersonalForumModel.findOnly({uid: toMid});
-			targetUser = await db.UserModel.findOnly({uid: toMid});
-		} else {
-			ctx.throw(400, '该贴子不在任何人的专栏');
-		}
-		if(targetUser.uid !== user.uid && !targetPersonalForum.moderators.includes(user.uid)) ctx.throw(403, '权限不足');
-		const obj = {};
-		if(hideInMid !== undefined) obj.hideInMid = !!hideInMid;
-		if(digestInMid !== undefined) obj.digestInMid = !!digestInMid;
-		if(toppedInMid !== undefined) {
-			if(toppedInMid){
-				obj.$addToSet = {toppedUsers: user.uid};
-				await targetPersonalForum.update({$addToSet: {toppedThreads: tid}});
-			} else {
-				obj.$pull = {toppedUsers: user.uid};
-				await targetPersonalForum.update({$pull: {toppedThreads: tid}});
-			}
-		}
-		await targetThread.update(obj);
-		data.targetuser = targetUser;
-		await next();
-	});
+  });
 
 module.exports = operationRouter;

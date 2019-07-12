@@ -10,7 +10,8 @@ editorRouter
     if(!await db.UserModel.checkUserBaseInfo(user)) {
       nkcModules.throwError(403, "未完善账号基本信息", "userBaseInfo");
     }
-    const {type, id, cat, title, content} = query;
+    const {type, id, cat, title, content, toColumn} = query;
+    data.toColumn = !!toColumn;
     //发新帖，回复等使用新编辑器
     //重新编辑帖子使用旧版编辑器
     ctx.template = 'interface_editor_test.pug';

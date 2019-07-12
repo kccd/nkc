@@ -356,7 +356,10 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       r.c.user = user;
       applicationForm.url = `/fund/a/${applicationForm._id}`;
       r.c.applicationForm = applicationForm;
-    } else if(["newColumnContribute", "columnContributeChange"].includes(type)) {
+    } else if(["newColumnContribute", "columnContributeChange",
+      "disabledColumn", "disabledColumnInfo",
+      "columnContactAdmin"
+    ].includes(type)) {
       const column = await ColumnModel.findOne({_id: columnId});
       if(!column) continue;
       r.c.column = column;

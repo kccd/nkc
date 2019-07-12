@@ -4,6 +4,11 @@ block title
   title=`${data.forum.displayName} - ${data.serverSettings.websiteName}`
   +includeCSS("/forum/forum.css")
 block content
+  //- 判断用户是否有权限管理专业内的文章
+  -let canManagement = false;
+  if data.isModerator
+    -canManagement = true;
+
   mixin forumPanel(header, forums, hidden)
     .forum-panel
       .forums-nav-header
@@ -118,6 +123,12 @@ block content
               .m-b-1
                 //- 手机导航 其他文章链接
                 include ../publicModules/mobile_drawer/right_drawer
+                if canManagement
+                  .paging-button
+                    a.button.radius-left(onclick="managementThreads()") 管理
+                    a.button(onclick="selectAll()") 全选
+                    a.button(onclick="moveSelectedThreads()") 移动
+                    a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
                 include ../publicModules/paging/forum_nav
                 -let showPagingSortButton = true;
                 -let showPagingDigestButton = true;
@@ -128,6 +139,12 @@ block content
                 div.topped-thread-header - 以上是置顶 -
               for thread in data.threads
                 include ../publicModules/thread_panel/thread_panel
+              if canManagement
+                .paging-button
+                  a.button.radius-left(onclick="managementThreads()") 管理
+                  a.button(onclick="selectAll()") 全选
+                  a.button(onclick="moveSelectedThreads()") 移动
+                  a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
               -showPagingSortButton = false;
               -showPagingDigestButton = false;
               include ../publicModules/paging/paging_input
@@ -220,5 +237,8 @@ block content
         include ../module_scrollTo
 
 block scripts
+  include ../publicModules/moveThread/moveThread
+  include ../publicModules/disabledPost/disabledPost
   +includeJS("/forum/forum.js")
+  +includeJS("/publicModules/thread_panel/management.js")
   include ../publicModules/vue_user_panel/vue_user_panel_float
