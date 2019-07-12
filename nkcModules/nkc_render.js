@@ -514,8 +514,8 @@ function nkc_render(options){
     html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\/\>/img,'<img src="/r/$1" />');
     // 如果是默认图片则跳过
     // html = html.replace(/\<img.*?src="\/default\/picdefault.png".+?\>/img, '');
-    html = html.replace(/\<img src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
-    html = html.replace(/\<img class=".*?" src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
+    // html = html.replace(/\<img src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
+    // html = html.replace(/\<img class=".*?" src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     return html
   }
 

@@ -107,3 +107,111 @@ function inputChange(a) {
 function viewCert(id) {
   window.open("/shop/cert/" + paramCert[id]);
 }
+
+/**
+ * 商品数量加一
+ */
+function countAddOne(para) {
+  $(para).attr("disabled","true");
+  var count = parseInt($(para).next().text());
+  count++;
+  // 获取当前商品总数量,并修改购物车中的商品数量，并检测商品数量是否超过总数量
+  var productParamId = $(para).attr("productParamId");
+  var cartId = $(para).attr("cartId");
+  var post = {
+    productParamId: productParamId,
+    cartId: cartId,
+    count: count
+  }
+  nkcAPI("/shop/bill/add", "PATCH", post)
+  .then(function(data) {
+    $(para).removeAttr("disabled");
+    $(para).next().text(count+"");
+    $(para).parents("tr").find("#singlePrices").text(numToFloatTwo(data.singlePrices));
+    var freightTrId = '#freight' + data.sellUid;
+    $(para).parents("tbody").find(freightTrId).find("#freightPrices").text(numToFloatTwo(data.freightPrices));
+
+    // 店铺商品合计(包含邮费)
+    var productPrices = 0;
+    $(para).parents("tbody").find(".param"+data.sellUid).each(function(){
+      productPrices = productPrices + ($(this).find("#singlePrices").text()*100);
+    })
+    productPrices = productPrices + ($("#freight"+data.sellUid).find("#freightPrices").text() * 100);
+    $("#heji"+data.sellUid).find(".hejiPrices").text(numToFloatTwo(productPrices))
+
+    // 计算账单总计
+    var productTotalPrices = 0;
+    $(para).parents("tbody").find(".hejiPrices").each(function() {
+      productTotalPrices = productTotalPrices + ($(this).text() *100)
+    })
+    $("#totalPrice").text(numToFloatTwo(productTotalPrices))
+
+  })
+  .catch(function(data) {
+    $(para).removeAttr("disabled");
+    return screenTopWarning(data || data.error)
+  })
+}
+
+/**
+ * 商品数量减一
+ */
+function countPlusOne(para) {
+  $(para).attr("disabled","true");
+  var count = parseInt($(para).prev().text());
+  count--;
+  if(count < 1) {
+    $(para).removeAttr("disabled");
+    return screenTopWarning("至少购买一件商品");
+  }
+  var productParamId = $(para).attr("productParamId");
+  var cartId = $(para).attr("cartId");
+  var post = {
+    productParamId: productParamId,
+    cartId: cartId,
+    count: count
+  }
+  nkcAPI("/shop/bill/plus", "PATCH", post)
+  .then(function(data) {
+    $(para).removeAttr("disabled");
+    $(para).prev().text(count+"");
+    $(para).parents("tr").find("#singlePrices").text(numToFloatTwo(data.singlePrices));
+    var freightTrId = '#freight' + data.sellUid;
+    $(para).parents("tbody").find(freightTrId).find("#freightPrices").text(numToFloatTwo(data.freightPrices));
+
+    // 店铺商品合计(包含邮费)
+    var productPrices = 0;
+    $(para).parents("tbody").find(".param"+data.sellUid).each(function(){
+      productPrices = productPrices + ($(this).find("#singlePrices").text()*100);
+    })
+    productPrices = productPrices + ($("#freight"+data.sellUid).find("#freightPrices").text() * 100);
+    $("#heji"+data.sellUid).find(".hejiPrices").text(numToFloatTwo(productPrices))
+
+    // 计算账单总计
+    var productTotalPrices = 0;
+    $(para).parents("tbody").find(".hejiPrices").each(function() {
+      productTotalPrices = productTotalPrices + ($(this).text() *100)
+    })
+    $("#totalPrice").text(numToFloatTwo(productTotalPrices))
+  })
+  .catch(function(data) {
+    $(para).removeAttr("disabled");
+    return screenTopWarning(data || data.error);
+  })
+}
+
+/**
+ * 重新计算商品合计
+ */
+function reCountSinglePrice(count) {
+
+}
+
+/**
+ * 检测当前商品是否限购
+ */
+
+function numToFloatTwo(str) {
+	str = (str/100).toFixed(2);
+	return str;
+} 

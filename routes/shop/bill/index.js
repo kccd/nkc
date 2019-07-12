@@ -103,4 +103,73 @@ router
     ctx.template = 'shop/bill/bill.pug';
     await next();
   })
+  .patch("/add", async(ctx, next) => {
+    const {data, db, body} = ctx;
+    const {user} = data;
+    const {productParamId, cartId, count} = body;
+    let cart = await db.ShopCartModel.findOne({_id: cartId});
+    // 检测商品库存
+    let productParam = await db.ShopProductsParamModel.findOne({_id: productParamId});
+    let paramCount = productParam.stocksSurplus;
+    if(count > paramCount) {
+      ctx.throw(400, "商品数量不得超当前库存");
+    }
+    // 检测限购
+    const product = await db.ShopGoodsModel.findOne({productId: productParam.productId});
+    data.sellUid = product.uid;
+    data.productId = product.productId;
+    if(product.purchaseLimitCount !== -1 && count > product.purchaseLimitCount) ctx.throw(400, `该商品最多可购买 ${product.purchaseLimitCount} 件`);
+    // 计算小计价格(包括vip价格)
+    let vipNum = 100;
+    if(product.vipDiscount) {
+      for(let v=0;v<product.vipDisGroup.length;v++) {
+        if(data.user && data.user.authLevel == product.vipDisGroup[v].vipLevel) {
+          vipNum = product.vipDisGroup[v].vipNum;
+        }
+      }
+    }
+    // 计算商品价格合计(含运费)
+    data.singlePrices = count * (productParam.price * (vipNum / 100))
+    // 计算运费
+    let freightPrices = 0;
+    if(!product.isFreePost) {
+      freightPrices = product.freightPrice.firstFreightPrice + (product.freightPrice.addFreightPrice*(count-1));
+    }
+    data.freightPrices = freightPrices;
+    // 修改购物车中的商品数量
+    await cart.update({$set:{count: cart.count+1}});
+
+    await next();
+  })
+  .patch("/plus", async(ctx, next) => {
+    const {data, db, body} = ctx;
+    const {user} = data;
+    const {productParamId, cartId, count} = body;
+    let cart = await db.ShopCartModel.findOne({_id: cartId});
+    let productParam = await db.ShopProductsParamModel.findOne({_id: productParamId});
+    let product = await db.ShopGoodsModel.findOne({productId: productParam.productId});
+    data.sellUid = product.uid;
+    data.productId = product.productId;
+    // 计算小计价格（包含vip折扣价）
+    // 计算小计价格(包括vip价格)
+    let vipNum = 100;
+    if(product.vipDiscount) {
+      for(let v=0;v<product.vipDisGroup.length;v++) {
+        if(data.user && data.user.authLevel == product.vipDisGroup[v].vipLevel) {
+          vipNum = product.vipDisGroup[v].vipNum;
+        }
+      }
+    }
+    // 计算商品价格合计(含运费)
+    data.singlePrices = count * (productParam.price * (vipNum / 100));
+    // 计算运费
+    let freightPrices = 0;
+    if(!product.isFreePost) {
+      freightPrices = product.freightPrice.firstFreightPrice + (product.freightPrice.addFreightPrice*(count-1));
+    }
+    data.freightPrices = freightPrices;
+    // 修改购物车中的商品数量
+    await cart.update({$set:{count: cart.count-1}});
+    await next();
+  })
 module.exports = router;

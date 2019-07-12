@@ -591,7 +591,7 @@ footer.footer ul li{
   padding-top: 50px;
   z-index: 500;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: #fff;
   transition: right 300ms, left 300ms;
 }

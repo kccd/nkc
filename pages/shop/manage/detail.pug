@@ -82,10 +82,11 @@ block title
     }
 block name
   .row
-    .col-xs-12.col-md-12
-      a.btn.btn-info(onclick="javascript :history.back(-1);")
-        span.fa.fa-backward
-        | &nbsp;返回
+    if !state.apptype 
+      .col-xs-12.col-md-12
+        a.btn.btn-info(onclick="javascript :history.back(-1);")
+          span.fa.fa-backward
+          | &nbsp;返回
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px;margin-top:20px")
       div(style="border:1px solid #ddd;background-color:#eee;padding:20px")
         ul

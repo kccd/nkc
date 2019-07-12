@@ -1,7 +1,7 @@
 extends ../bootstrap_base
 block title
   -var post = data.post;
-  -var title = post.t;
+  -var title = post.thread.firstPost.t;
   -var thread = data.thread;
   -const addKcb = data.userOperationsId.includes('creditKcb')
   -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
@@ -20,19 +20,15 @@ block title
 
   - var ownership = data.userOperationsId.includes('modifyOtherPosts')
   - ownership = ownership?true:(data.user && data.user.uid===post.uid)
-
-  if !title
-    -post.c = hideContentByUser(post.c, data.user, 'thread')
-    -title = filterQuote(post.c)
-    -title = title.replace(/<\/?.+?>/g,"")
-    -title = title.slice(0, 50) + '...';
-  title=title
-  if (thread.firstPost && thread.firstPost.c)
-    -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
+  title=`${title} - 科创`
+  -var processed = post.c.replace(/<blockquote cite.*?blockquote>/igm, '')
+  -processed = delAllCode(processed).trim().slice(0,140);
   meta(name='description' content=`${processed}`)
   meta(name='keywords' content=`${thread.firstPost.t}`)
   link(rel='stylesheet' href=`/post/post.css?v=${global.NKC.startTime}`)
   link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+  +includeCSS("/external_pkgs/viewer/viewer.css")
+  +includeCSS("/external_pkgs/viewer/main.css")
   +includeJS("/external_pkgs/imageToBig/preview.js")
 block content
   -var mainContainer1400 = true
@@ -87,7 +83,7 @@ block content
             | 》
           if post.t
             div.ThreadTitle= post.t
-          div.ThreadPostBody!= experimental_render(post)
+          div.ThreadPostBody#ThreadPostBody!= experimental_render(post)
           if post.credits && post.credits.length > 0
             .nkcpanel.ThreadPostCredits
               for c,index in post.credits
@@ -155,10 +151,19 @@ block scripts
   //include ../ueditor/ueditor
   include ../ueditor/ueditorBase
   +includeJS(`/thread/comments.js`)
+  +includeJS("/external_pkgs/viewer/viewer.js")
   script.
     $(".dropdown-menu.stop-propagation").on("click",function (e) {
       e.stopPropagation();
     });
-    var preview = new Preview({
-        imgWrap: 'wrap' // 指定该容器里的图片点击预览
+    //- var preview = new Preview({
+    //-     imgWrap: 'wrap' // 指定该容器里的图片点击预览
+    //- })
+    $(document).ready(function() {
+      var options = {
+        navbar: false,
+        title: false,
+        toolbar: false,
+      }
+      new Viewer(document.getElementById('ThreadPostBody'), options);
     })
