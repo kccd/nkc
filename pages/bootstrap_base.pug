@@ -54,6 +54,7 @@ block body
   script.
     Vue.config.productionTip = false;
   +includeJS('/qrcode/build/qrcode.js')
+  +includeJS("/sweetalert2/dist/sweetalert2.all.min.js")
   +includeJS('/photoswipe/dist/photoswipe.js')
   +includeJS('/photoswipe/dist/photoswipe-ui-default.js')
   //- 旧版common.js兼容旧的页面
@@ -64,6 +65,7 @@ block body
   +includeJS('/moment/locale/zh-cn.js')
   //- 新版common.js
   +includeJS('/publicModules/common.js')
+  +includeJS("/publicModules/methods.js")
   +includeJS('/ueditor/third-party/SyntaxHighlighter/shCore.js')
   if data.user
     script!=`NKC.config.hasLogged = true;`

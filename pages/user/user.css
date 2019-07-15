@@ -75,7 +75,7 @@ body{
   display: inline-block;
   text-align: center;
   cursor: pointer;
-  line-height: 2.5rem;
+  line-height: 2.4rem;
   background-color: #fff;
   font-size: 1.2rem;
   font-weight: 700;
@@ -94,6 +94,9 @@ body{
 }
 .user-card-panel .user-button .user-button-column.only-one{
   border-left: 1px solid #2b90d9;
+  height: 2rem;
+  font-size: 1rem;
+  line-height: 2rem;
   border-radius: 10px;
 }
 .user-card-panel .user-button>*:active, .user-card-panel .user-button>*:visited, .user-card-panel .user-button>*:link{

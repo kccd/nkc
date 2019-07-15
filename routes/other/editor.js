@@ -69,6 +69,11 @@ editorRouter
         ctx.template = 'interface_editor_test.pug';
       }
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});  //根据tid查询thread表
+      if(data.user) {
+        if(state.userColumn) {
+          data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: targetThread.tid})) > 0;
+        }
+      }
       const forums = await targetThread.extendForums(['mainForums']);
       let isModerator = ctx.permission('superModerator');
       if(!isModerator) {
@@ -119,17 +124,16 @@ editorRouter
 
     if(type === 'thread') {
     	const thread = await db.ThreadModel.findOnly({tid: id});
+      if(data.user) {
+        if(state.userColumn) {
+          data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
+        }
+      }
     	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
     }
     
     const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
     data.allForumList = allForumList;
-
-    if(data.user) {
-      if(state.userColumn) {
-        data.columnCategories = await db.ColumnPostCategoryModel.getCategoryList(state.userColumn._id);
-      }
-    }
 
     await next();
   });

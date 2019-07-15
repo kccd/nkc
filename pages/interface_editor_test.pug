@@ -75,18 +75,12 @@ block content
             //-   .form-inline(style="text-align:center;padding-bottom: 25px;padding-top: 25px;")
             .form
               .form-group
-                input#parseURL(type='checkbox' checked)
-                span &nbsp;处理URL&nbsp;
-                if state.userColumn
-                  // -let column = status.column;
-                  // include ../publicModules/toColumn/toColumn
-                  .checkbox-inline
-                    label
-                      input(type='checkbox' onclick="selectColumnCategories(this)" id="checkboxToColumn" checked=data.toColumn)
-                      | 同时转发文章到专栏
-                  -let categoriesDomId = "postToColumn";
-                  -let categories = data.columnCategories;
-                  include ./publicModules/toColumn/categoriesDom
+                label
+                  input#parseURL(type='checkbox' checked)
+                  span &nbsp;处理URL&nbsp;
+                if state.userColumn && !data.addedToColumn
+                  -const column = state.userColumn
+                  include ./publicModules/toColumn/selectCategories
               .form-group
                 button#post.btn.btn-primary(type='submit' onclick="postToThreadWithCheck()") 发表
                 if !['forum_declare'].includes(data.type)
@@ -97,7 +91,7 @@ block content
                   //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
                     button#draft.btn.btn-primary(type='submit') 保存草稿
                   if data.user
-                    a.btn.btn-default(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
+                    a.btn.btn-default.m-l-05(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
             .form-group
                 div#disnoneplay(style='display:none')= data.content
                 div#draftNowId(style='display:none')= data.content
@@ -125,9 +119,11 @@ block scripts
   script(src=`/nkc_render.js?v=${startTime}`)
   +includeJS("/editor/paper.js")
   script(src=`/interface_editor_ue.js?v=${startTime}`)
+  if state.userColumn && !data.addedToColumn
+    +includeJS("/publicModules/toColumn/selectCategories.js")
   include ./publicModules/crop/crop
   script(src=`/media/media_index.js?v=${startTime}`)
-  script(src=`/forum/forum_choice.js?v=${startTime}`)
+  //script(src=`/forum/forum_choice.js?v=${startTime}`)
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
   script.

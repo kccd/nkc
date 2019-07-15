@@ -84,8 +84,8 @@ block settingsContent
                 button.btn.btn-xs.btn-default(v-else @click="movePost('unCategoryTop', [p._id])") 取消分类置顶
               button.btn.btn-xs.btn-default(@click="movePost('categoryUp', p._id)") 上移
               button.btn.btn-xs.btn-default(@click="movePost('categoryDown', p._id)") 下移
-              button.btn.btn-xs.btn-default(@click="movePost('categoryToTop', [p._id])") 上移到顶部
-              button.btn.btn-xs.btn-default(@click="movePost('categoryToBottom', [p._id])") 下移到底部
+              button.btn.btn-xs.btn-default(@click="movePost('categoryToTop', [p._id])") 上移到最新
+              button.btn.btn-xs.btn-default(@click="movePost('categoryToBottom', [p._id])") 下移到最老
               button.btn.btn-xs.btn-success(@click="move([p._id], p.cid)") 移动
               button.btn.btn-xs.btn-danger(@click="remove([p._id])") 撤稿
           div

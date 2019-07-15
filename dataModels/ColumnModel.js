@@ -105,6 +105,11 @@ const schema = new Schema({
     type: Boolean,
     default: false
   },
+  // 隐藏默认分类
+  hideDefaultCategory: {
+    type: Boolean,
+    default: false,
+  },
   // 每页内容条数
   perpage: {
     type: Number,

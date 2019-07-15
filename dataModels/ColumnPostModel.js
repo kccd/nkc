@@ -215,7 +215,10 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
   const SettingModel = mongoose.model("settings");
   const ColumnPostModel = mongoose.model("columnPosts");
   const column = await mongoose.model("columns").findOne({_id: columnId});
-  if(!categoriesId || categoriesId.length === 0) throwErr(400, "文章分类不能为空");
+  if(!categoriesId || categoriesId.length === 0) {
+    const category = await ColumnPostCategoryModel.findOne({columnId, default: true});
+    categoriesId = [category._id];
+  }
   const categoriesId_ = [];
   for(const _id of categoriesId) {
     const c = await ColumnPostCategoryModel.findOne({_id, columnId});

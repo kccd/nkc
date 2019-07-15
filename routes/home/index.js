@@ -270,7 +270,7 @@ router
     const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(12);
     data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
 
-    ctx.template = "home/newHome.pug";
+    ctx.template = "home/home.pug";
     await next();
   });
 module.exports = router;

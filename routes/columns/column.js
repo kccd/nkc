@@ -85,7 +85,8 @@ router
     if(!type) {
       let {
         abbr, name, description, color, notice, links = [],
-        otherLinks = [], blocks = [], navCategory, perpage = 1
+        otherLinks = [], blocks = [], navCategory, perpage = 30,
+        hideDefaultCategory
       } = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
@@ -153,6 +154,7 @@ router
         color,
         perpage,
         links,
+        hideDefaultCategory,
         otherLinks,
         navCategory,
         blocks,

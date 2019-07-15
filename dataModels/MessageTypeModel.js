@@ -156,7 +156,7 @@ const getDomByType = (t) => {
   } else if(t === "columnContributeURL") {
     return "'/m/' + item.c.column._id + '/settings/contribute'";
   } else if(t === "userContributeURL") {
-    return "'/u/' + item.r + '/contribute'"
+    return "'/account/contribute'"
   } else if(t === "columnURL") {
     return "'/m/' + item.c.column._id"
   } else if(t === "columnName") {
