@@ -37,28 +37,30 @@ block content
                     a(href=`/m/${data.column._id}` style="overflow:hidden;")
                       span 全部
                   for c in data.categories
-                    li
-                      a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
-                        -for(var i = 0; i < c.level; i++)
-                          span &nbsp;&nbsp;&nbsp;&nbsp;
-                        span=c.name
+                    if !data.column.hideDefaultCategory || !c.default
+                      li
+                        a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
+                          -for(var i = 0; i < c.level; i++)
+                            span &nbsp;&nbsp;&nbsp;&nbsp;
+                          span=c.name
                   //li.divider(role="separator")
             else
               for c in data.navCategories
-                if c.children && c.children.length
-                  li
-                    a(href=`/m/${data.column._id}?c=${c._id}` style="margin-right: 0;padding-right:0")=c.name
-                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                    ul.dropdown-menu
-                      for cc in c.children
-                        li
-                          a(href=`/m/${data.column._id}?c=${cc._id}` style="overflow:hidden")
-                            -for(var i = 0; i < (cc.level - 1); i++)
-                              span &nbsp;&nbsp;&nbsp;&nbsp;
-                            span=cc.name
-                else
-                  li
-                    a(href=`/m/${data.column._id}?c=${c._id}`)=c.name
+                if !data.column.hideDefaultCategory || !c.default
+                  if c.children && c.children.length
+                    li
+                      a(href=`/m/${data.column._id}?c=${c._id}` style="margin-right: 0;padding-right:0")=c.name
+                      a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                      ul.dropdown-menu
+                        for cc in c.children
+                          li
+                            a(href=`/m/${data.column._id}?c=${cc._id}` style="overflow:hidden")
+                              -for(var i = 0; i < (cc.level - 1); i++)
+                                span &nbsp;&nbsp;&nbsp;&nbsp;
+                              span=cc.name
+                  else
+                    li
+                      a(href=`/m/${data.column._id}?c=${c._id}`)=c.name
             for link in data.column.links
               li
                 a(title=link.url onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
@@ -225,14 +227,15 @@ block content
                       .column-category-count=data.columnPostcount
                     .fa.fa-angle-right
                 for c in data.categories
-                  a.column-category(href=`/m/${data.column._id}?c=${c._id}` class=Number(data.c)===c._id?"active":"")
-                    -for(var i = 0; i < c.level; i++)
-                      span &nbsp;&nbsp;&nbsp;&nbsp;
-                    span=c.name
-                    .pull-right
-                      if c.count > 0
-                        .column-category-count=c.count
-                      .fa.fa-angle-right
+                  if !data.column.hideDefaultCategory || !c.default
+                    a.column-category(href=`/m/${data.column._id}?c=${c._id}` class=Number(data.c)===c._id?"active":"")
+                      -for(var i = 0; i < c.level; i++)
+                        span &nbsp;&nbsp;&nbsp;&nbsp;
+                      span=c.name
+                      .pull-right
+                        if c.count > 0
+                          .column-category-count=c.count
+                        .fa.fa-angle-right
           if data.timeline && data.timeline.length > 0
             div.m-b-2
               .column-management

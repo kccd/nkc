@@ -101,6 +101,7 @@ var app = new Vue({
       formData.append("description", column.description);
       formData.append("navCategory", column.navCategory);
       formData.append("perpage", column.perpage);
+      formData.append("hideDefaultCategory", column.hideDefaultCategory);
       if(column.color) formData.append("color", column.color);
 
       for(var i = 0; i < column.blocks.length; i++) {

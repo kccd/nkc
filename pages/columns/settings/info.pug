@@ -35,6 +35,14 @@ block settingsContent
           h4 专栏导航
           div
             .radio
+              span 隐藏默认分类：
+              label.m-r-1
+                input(type="radio" :value="true" v-model="column.hideDefaultCategory")
+                | 是
+              label
+                input(type="radio" :value="false" v-model="column.hideDefaultCategory")
+                | 否
+            .radio
               span 展开分类：
               label.m-r-1
                 input(type="radio" :value="true" v-model="column.navCategory")

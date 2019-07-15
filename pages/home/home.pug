@@ -2,7 +2,7 @@ extends ../bootstrap_base
 block title
   title=`${data.serverSettings.websiteName} - ${data.serverSettings.brief}`
   +includeCSS("/swiper/dist/css/swiper.css")
-  +includeCSS("/home/subscription.css")
+  +includeCSS("/home/home.css")
 
 block content
   -const canManagement = permission("superModerator");
@@ -105,7 +105,7 @@ block footer
   include ../publicModules/footer/footer
 block scripts
   +includeJS("/swiper/dist/js/swiper.js")
-  +includeJS("/home/newHome.js")
+  +includeJS("/home/home.js")
   include ../publicModules/vue_user_panel/vue_user_panel_float
   if canManagement
     include ../publicModules/moveThread/moveThread

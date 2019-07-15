@@ -31,7 +31,7 @@ async function operateSystemID(type, op) {
   q.$inc[`c.${type}`] = op;
   const setting = await SettingModel.findOneAndUpdate({_id: 'counters'}, q);
   if(!setting) throw 'counters settings not found';
-  if(!setting.c[type]) {
+  if(setting.c[type] === undefined) {
     setting.c[type] = 1;
     const obj = {
       $set: {}

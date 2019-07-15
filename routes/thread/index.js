@@ -15,18 +15,38 @@ threadRouter
 		const {from, keywords, self, type, title, pid, applicationFormId} = query;
 		// 通用接口，用于查询自己的文章
 		if(type === "selfThreads") {
-      const {page=0} = query;
-      const q = {
-        uid: user.uid,
-        disabled: false,
-        recycleMark: {$ne: true},
-        reviewed: true
-      };
-      const count = await db.ThreadModel.count(q);
-      const paging = nkcModules.apiFunction.paging(page, count);
-      let threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-      data.threads = await db.ThreadModel.extendThreads(threads);
-      data.paging = paging;
+      const {page=0, columnId, pid} = query;
+      let threads = [];
+      if(pid) {
+        threads = await db.ThreadModel.find({oc: pid});
+      } else {
+        const q = {
+          uid: user.uid,
+          disabled: false,
+          recycleMark: {$ne: true},
+          reviewed: true
+        };
+        const count = await db.ThreadModel.count(q);
+        const paging = nkcModules.apiFunction.paging(page, count);
+        data.paging = paging;
+        threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      }
+      threads = await db.ThreadModel.extendThreads(threads, {
+        htmlToText: true
+      });
+      if(columnId) {
+        data.threads = [];
+        const threadsId = threads.map(t => t.oc);
+        const contributes = await db.ColumnContributeModel.find({columnId, pid: {$in: threadsId}, passed: null}, {pid: 1});
+        let columnPosts = await db.ColumnPostModel.find({columnId, pid: {$in: threadsId}}, {pid: 1});
+        const pid = (contributes.map(c => c.pid)).concat(columnPosts.map(c => c.pid));
+        for(const thread of threads) {
+          if(pid.includes(thread.oc)) continue;
+          data.threads.push(thread);
+        }
+      } else {
+        data.threads = threads;
+      }
     } else if(type === "applicationFormSearch") {
       const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId});
       const users = await applicationForm.extendMembers();
@@ -392,7 +412,7 @@ threadRouter
 		if(data.user) {
 			data.usersThreads = await data.user.getUsersThreads();
 			if(state.userColumn) {
-			  data.columnCategories = await db.ColumnPostCategoryModel.getCategoryList(state.userColumn._id);
+			  data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
       }
 			if(thread.uid === data.user.uid) {
 			  // 标记未读的回复提醒为已读状态

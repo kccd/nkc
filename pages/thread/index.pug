@@ -509,16 +509,9 @@ block content
                                 label
                                   input#ParseURL(type='checkbox' checked)
                                   | 处理URL
-                              if state.userColumn
-                                // -let column = status.column;
-                                // include ../publicModules/toColumn/toColumn
-                                .checkbox-inline
-                                  label
-                                    input(type='checkbox' onclick="selectColumnCategories(this)" id="checkboxToColumn")
-                                    | 同时转发文章到专栏
-                                -let categoriesDomId = "postToColumn";
-                                -let categories = data.columnCategories;
-                                include ../publicModules/toColumn/categoriesDom
+                              if state.userColumn && !data.addedToColumn
+                                -const column = state.userColumn
+                                include ../publicModules/toColumn/selectCategories
 
                             .form-group
                               button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
@@ -609,7 +602,7 @@ block scripts
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src='/module_dropdown.js?v=3')
+  +includeJS("/module_dropdown.js")
   script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
   link(href=`/jquery-ui-1.10.4.custom.css?v=${global.NKC.startTime}` rel="stylesheet")
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
@@ -633,6 +626,8 @@ block scripts
   include ../publicModules/moment
   include ../ueditor/ueditorBase
   +includeJS("/thread/initPostInput.js")
+  if state.userColumn && !data.addedToColumn
+    +includeJS("/publicModules/toColumn/selectCategories.js")
   +includeJS("/thread/comments.js")
   //- +includeJS('/jquery/jquery.minicolors.js')
   //- link(href=`/jquery/jquery.minicolors.css?v=${global.NKC.startTime}` rel="stylesheet")
