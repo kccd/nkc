@@ -77,10 +77,10 @@ $(document).ready(function(){
 function addToColumn(pid, columnId) {
   moduleToColumn.show(function(data) {
     var columnId = data.columnId;
-    var categoryId = data.categoryId;
+    var categoriesId = data.categoriesId;
     nkcAPI("/m/" + columnId + "/post", "POST", {
       type: "addToColumn",
-      categoryId: categoryId,
+      categoriesId: categoriesId,
       postsId: [pid]
     })
       .then(function() {
@@ -90,6 +90,8 @@ function addToColumn(pid, columnId) {
       .catch(function(data) {
         screenTopWarning(data);
       });
+  }, {
+    selectMul: true
   });
 }
 function removeToColumn(pid, columnId) {
@@ -922,20 +924,26 @@ function turnSearch(text) {
 	}
 }
 
-function selectColumnCategories(dom, columnId) {
-  dom = $(dom);
-  var checked = dom.prop("checked");
-  if(checked) {
-    $("#postToColumn").show();
-  } else {
-    $("#postToColumn").hide();
-    $("#postToColumn input").prop("checked", false);
-  }
-}
+
+var ColumnCategoriesDom;
+$(function() {
+  if(!NKC.modules.SelectColumnCategories) return;
+  ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+});
+
 
 
 function getSelectedColumnCategoriesId() {
-  var columnCategoriesId = [];
+  if(!window.ColumnCategoriesDom) return [];
+  var status = ColumnCategoriesDom.getStatus();
+  if(status.checkbox) {
+    if(status.selectedCategoriesId.length === 0) {
+      geid('ButtonReply').disabled=false;
+      throw("请选择专栏文章分类");
+    }
+  }
+  return status.selectedCategoriesId;
+  /*var columnCategoriesId = [];
   if($("#checkboxToColumn").prop("checked")) {
     var columnCategoriesDom = $("#postToColumn input");
     if(columnCategoriesDom.length) {
@@ -951,5 +959,5 @@ function getSelectedColumnCategoriesId() {
       throw("请选择专栏文章分类");
     }
   }
-  return columnCategoriesId;
+  return columnCategoriesId;*/
 }

@@ -71,20 +71,33 @@ body{
 }
 .user-card-panel .user-button>*{
   height: 2.5rem;
-  width: 50%;
+  width: 33%;
   display: inline-block;
   text-align: center;
-  line-height: 2.5rem;
+  cursor: pointer;
+  line-height: 2.4rem;
   background-color: #fff;
-  border-radius: 10px 0 0 10px;
   font-size: 1.2rem;
   font-weight: 700;
   transition: background-color 200ms, color 200ms;
   border: 1px solid #2b90d9;
 }
+.user-card-panel .user-button>*:first-child{
+  border-radius: 10px 0 0 10px;
+}
 .user-card-panel .user-button>*:last-child{
   border-radius: 0 10px 10px 0;
   border-left: none;
+}
+.user-card-panel .user-button .user-button-column{
+  border-left: none;
+}
+.user-card-panel .user-button .user-button-column.only-one{
+  border-left: 1px solid #2b90d9;
+  height: 2rem;
+  font-size: 1rem;
+  line-height: 2rem;
+  border-radius: 10px;
 }
 .user-card-panel .user-button>*:active, .user-card-panel .user-button>*:visited, .user-card-panel .user-button>*:link{
   color: #2b90d9;

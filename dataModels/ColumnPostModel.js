@@ -70,15 +70,18 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   const PostModel = mongoose.model("posts");
   const ThreadModel = mongoose.model("threads");
   const UserModel = mongoose.model("users");
+  const ColumnModel = mongoose.model("columns");
   const ColumnPostCategoryModel = mongoose.model("columnPostCategories");
   const pid = new Set();
   const tid = new Set();
   const uid = new Set();
+  const columnId = new Set();
   let cid = [];
   const postsObj = {}, threadsObj = {};
   columnPosts.map(post => {
     pid.add(post.pid);
     tid.add(post.tid);
+    columnId.add(post.columnId);
     cid = cid.concat(post.cid);
   });
   const threadMatch = {
@@ -92,6 +95,11 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     threadMatch.reviewed = true;
     threadMatch.mainForumsId = {$in: fidOfCanGetThread};
   }
+  const columns = await ColumnModel.find({_id: {$in: [...columnId]}});
+  const columnsObj = {};
+  columns.map(column => {
+    columnsObj[column._id] = column;
+  });
   let threads = await ThreadModel.find(threadMatch);
   threads = await ThreadModel.extendThreads(threads, {
     htmlToText: true,
@@ -134,6 +142,8 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
   const results = [];
   for(let p of columnPosts) {
     p = p.toObject();
+    p.column = columnsObj[p.columnId];
+    if(!p.column) continue;
     p.thread = threadsObj[p.tid];
     if(!p.thread) continue;
     if(p.type === "thread") {
@@ -205,7 +215,10 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
   const SettingModel = mongoose.model("settings");
   const ColumnPostModel = mongoose.model("columnPosts");
   const column = await mongoose.model("columns").findOne({_id: columnId});
-  if(!categoriesId || categoriesId.length === 0) throwErr(400, "文章分类不能为空");
+  if(!categoriesId || categoriesId.length === 0) {
+    const category = await ColumnPostCategoryModel.findOne({columnId, default: true});
+    categoriesId = [category._id];
+  }
   const categoriesId_ = [];
   for(const _id of categoriesId) {
     const c = await ColumnPostCategoryModel.findOne({_id, columnId});
@@ -237,5 +250,32 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
     await columnPost.save();
   }
 };
-
+/*
+* 标记专栏文章所对应的thread，inColumn字段;
+* */
+schema.post("save", async function(columnPost) {
+  if(columnPost.type === "thread") {
+    await mongoose.model("threads").updateOne({tid: columnPost.tid}, {
+      $set: {
+        inColumn: true
+      }
+    });
+  }
+});
+schema.post("remove", async function(columnPost) {
+  if(columnPost.type === "thread") {
+    const count = await mongoose.model("columnPosts").count({
+      _id: {$ne: columnPost._id},
+      type: "thread",
+      tid: columnPost.tid
+    });
+    if(count === 0) {
+      await mongoose.model("threads").updateOne({tid: this.tid}, {
+        $set: {
+          inColumn: false
+        }
+      });
+    }
+  }
+});
 module.exports = mongoose.model("columnPosts", schema);

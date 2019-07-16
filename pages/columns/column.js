@@ -1,5 +1,6 @@
 var data = getDataById("data");
 var bodyBackgroundColor = data.color;
+var CommonModal;
 $(function() {
   NKC.methods.initSelectColor(function(color) {
     $("body").css({
@@ -9,7 +10,8 @@ $(function() {
   });
   $(".column-fast-set-btn").click(function() {
     toggleFastSettings();
-  })
+  });
+  CommonModal = new NKC.modules.CommonModal();
 });
 
 function toggleFastSettings() {
@@ -31,5 +33,6 @@ function saveSettings() {
 }
 
 function openNewWindow(url) {
+
   window.open(url);
 }

@@ -66,7 +66,10 @@ router
       }
     } else if(type === "removeColumnPostById") { // 通过ID删除专栏内容
       for(const _id of postsId) {
-        await db.ColumnPostModel.remove({_id, columnId: column._id});
+        const columnPost = await db.ColumnPostModel.findOne({_id, columnId: column._id});
+        if(columnPost) {
+          await columnPost.remove();
+        }
         await db.ColumnModel.update({_id: column._id}, {$pull: {topped: _id}});
       }
       await db.ColumnPostCategoryModel.removeToppedThreads(column._id);

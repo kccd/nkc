@@ -62,7 +62,7 @@
 }
 #vue_user_panel_float .user_sub_btn{
   font-size: 1rem;
-  line-height: 20px;
+  line-height: 15px;
   text-align: center;
   background-color: #2b90d9;
   color: #fff;
@@ -92,6 +92,7 @@
 #vue_user_panel_float .user_name{
   height: 2.3rem;
   overflow: hidden;
+  margin-right: 1rem;
   display: inline-block;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -117,8 +118,8 @@
 #vue_user_panel_float .user_cert{
   font-size: 1rem;
   font-weight: 700;
-  height: 1.8rem;
-  line-height: 1.8rem;
+  height: 1.4rem;
+  line-height: 1.4rem;
   overflow: hidden;
   display: inline-block;
   display: -webkit-box;
@@ -127,7 +128,7 @@
   color: #e85a71;
 }
 #vue_user_panel_float .user_sub{
-  margin-top: 0.2rem;
+  margin-top: 0;
 }
 #vue_user_panel_float .user_info_count{
   font-weight: 700;
@@ -170,4 +171,9 @@
   z-index: 10030;
   color: #fff;
   font-size: 1.4rem;
+}
+#vue_user_panel_float .user_register{
+  font-size: 1rem;
+  color: #fff;
+  /*font-weight: 700;*/
 }

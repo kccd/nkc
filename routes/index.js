@@ -36,7 +36,7 @@ const complaintRouter = routers.complaint;
 const searchRouter = routers.search;
 const protocolRouter = routers.protocol;
 const reviewRouter = routers.review;
-
+const threadsRouter = routers.threads;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
@@ -74,4 +74,5 @@ router.use("/m", columnsRouter.routes(), columnsRouter.allowedMethods());
 router.use("/column", columnRouter.routes(), columnRouter.allowedMethods());
 router.use('/imageEdit', imageEditRouter.routes(), imageEditRouter.allowedMethods());
 router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
+router.use("/threads", threadsRouter.routes(), threadsRouter.allowedMethods());
 module.exports = router;

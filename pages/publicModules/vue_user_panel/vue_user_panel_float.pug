@@ -31,15 +31,16 @@
           .user_id ID：{{user.uid}}
         .user_div
           a(:href="'/u/' + user.uid" target="_blank").user_name {{user.username}}
-
           .user_cert {{user.certsName}}
           .user_description {{user.description}}
+          .user_register {{format("YYYY/MM/DD", user.toc)}}注册，{{fromNow(user.tlv)}}活动
           if data.user
             .user_sub
               span(v-if=`${data.user?"true":"false"} && user.uid !== '${data.user.uid}'`)
+                a.user_sub_btn.btn.btn-xs.btn-default.m-r-05(v-if="user.column" :href="'/m/' + user.column._id" target="_blank") 专栏
+                a.user_sub_btn.btn.btn-xs.btn-default.m-r-05(:href="'/message?uid=' + user.uid" target="_blank") 私信
                 button.user_sub_btn.btn.btn-xs.btn-default(v-if="subUid.indexOf(user.uid) === -1" :onclick="'subscribeUser(\"'+user.uid+'\", true)'") 关注
                 button.user_sub_btn.btn.btn-xs.btn-default(v-else :onclick="'subscribeUser(\"'+user.uid+'\", false)'") 取关
-                a.user_sub_btn.btn.btn-xs.btn-default.m-l-05(:href="'/message?uid=' + user.uid" target="_blank") 私信
       .user_info
         a.clear-a-style(:href="'/u/' + user.uid + '?t=thread'").col-xs-3
           .user_info_count {{user.threadCount}}
@@ -53,4 +54,5 @@
         .col-xs-3
           .user_info_count {{user.kcb/100}}
           .user_info_title 科创币
+include ../moment
 +includeJS("/publicModules/vue_user_panel/vue_user_panel_float.js")

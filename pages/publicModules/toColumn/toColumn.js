@@ -19,12 +19,23 @@ moduleToColumn.init = function(callback) {
 
       categoriesId: [],
 
+      createCategory: false,
+      newCategory: {
+        parentId: "",
+        name: "",
+        description: ""
+      },
+
       info: "",
       error: ""
     },
     mounted: function() {
+      var this_ = this;
       $('#moduleToColumn').modal({
         show: false
+      });
+      $('#moduleCrop').on('hidden.bs.modal', function () {
+        this_.createCategory = false;
       });
     },
     computed: {
@@ -45,6 +56,31 @@ moduleToColumn.init = function(callback) {
       }
     },
     methods: {
+      saveCategory: function() {
+        var this_ = this;
+        var category = this.newCategory;
+        if(!category.name) return this.error = "请输入分类名";
+        if(!category.description) return this.error = "请输入分类介绍";
+        nkcAPI("/m/" + this.column._id + "/category", "POST", category)
+          .then(function() {
+            this_.getCategories();
+            this_.createCategory = false;
+            this_.newCategory = {
+              name: "",
+              description: "",
+              parentId: ""
+            };
+          })
+          .catch(function(data) {
+            this_.error = data.error || data;
+          });
+      },
+      addCategory: function() {
+        this.createCategory = true;
+      },
+      cancelAddCategory: function() {
+        this.createCategory = false;
+      },
       getChildren: function(_id) {
         var arr = [];
         for(var i = 0; i < this.categories.length; i++) {
@@ -53,18 +89,19 @@ moduleToColumn.init = function(callback) {
         }
         return arr;
       },
-      show: function(func, options) {
+      getCategories: function() {
         var this_ = this;
-        if(func) moduleToColumn.callback = func;
-        if(options) {
-          this.exclude = options.exclude || [];
-          this.selectMul = options.selectMul || false;
-          this.categoriesId = options.selectedCid || [];
-        }
-        $('#moduleToColumn').modal("show");
         nkcAPI("/m/" + this.columnId + "/category?t=list", "GET")
           .then(function(data) {
             this_.column = data.column;
+            for(var i = 0; i < data.categories.length; i++) {
+              var c = data.categories[i];
+              var str = "";
+              for(var j = 0; j < c.level; j++) {
+                str += "&nbsp;&nbsp;&nbsp;";
+              }
+              c.str = str;
+            }
             this_.categories = data.categories;
             this_.loading = false;
             if(this_.categories.length > 0) {
@@ -74,6 +111,16 @@ moduleToColumn.init = function(callback) {
           .catch(function(data) {
             this_.error = data.error || data;
           })
+      },
+      show: function(func, options) {
+        if(func) moduleToColumn.callback = func;
+        if(options) {
+          this.exclude = options.exclude || [];
+          this.selectMul = options.selectMul || false;
+          this.categoriesId = options.selectedCid || [];
+        }
+        $('#moduleToColumn').modal("show");
+        this.getCategories();
       },
       hide: function() {
         $('#moduleToColumn').modal("hide");

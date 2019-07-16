@@ -20,17 +20,20 @@ router
       const c = await db.ColumnPostCategoryModel.findOne({_id, columnId: column._id});
       if(!c) ctx.throw(400, `ID为${_id}的分类不存在`);
     }
+    let threadCount = 0;
     for(const tid of threadsId) {
       const thread = await db.ThreadModel.findOne({tid, uid: user.uid});
-      if(!thread) ctx.throw(400, `你不是ID为${tid}的文章作者，请刷新`);
+      if(!thread) continue;
       const p = await db.ColumnPostModel.findOne({
         columnId: column._id,
         pid: thread.oc
       });
-      if(p) ctx.throw(400, `ID为${tid}的文章已经被加入到专栏了，请勿重复投稿`);
+      if(p) continue;
+      // if(p) ctx.throw(400, `ID为${tid}的文章已经被加入到专栏了，请勿重复投稿`);
       let contribute = await db.ColumnContributeModel.findOne({columnId: column._id, pid: thread.oc, passed: null});
       if(contribute) {
-        ctx.throw(400, `ID为${tid}的文章正在等待专栏主审核，请勿重复投稿`);
+        continue;
+        // ctx.throw(400, `ID为${tid}的文章正在等待专栏主审核，请勿重复投稿`);
       }
       contribute = db.ColumnContributeModel({
         _id: await db.SettingModel.operateSystemID("columnContributes", 1),
@@ -42,20 +45,23 @@ router
         columnId: column._id
       });
       await contribute.save();
+      threadCount++;
     }
-    const message = db.MessageModel({
-      _id: await db.SettingModel.operateSystemID("messages", 1),
-      r: column.uid,
-      ty: "STU",
-      ip: ctx.address,
-      port: ctx.port,
-      c: {
-        type: "newColumnContribute",
-        columnId: column._id
-      }
-    });
-    await message.save();
-    await ctx.redis.pubMessage(message);
+    if(threadCount > 0) {
+      const message = db.MessageModel({
+        _id: await db.SettingModel.operateSystemID("messages", 1),
+        r: column.uid,
+        ty: "STU",
+        ip: ctx.address,
+        port: ctx.port,
+        c: {
+          type: "newColumnContribute",
+          columnId: column._id
+        }
+      });
+      await message.save();
+      await ctx.redis.pubMessage(message);
+    }
     await next();
   });
 module.exports = router;

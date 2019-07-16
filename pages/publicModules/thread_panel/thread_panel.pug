@@ -6,6 +6,16 @@
   if thread.recycleMark
     include ../module_toDraft
   .thread-panel-author-info
+    if canManagement
+      .checkbox.thread-checkbox
+        label
+          input(
+            type="checkbox"
+            data-thread-id=thread.tid
+            data-post-id=thread.oc
+            data-thread-fids=thread.mainForumsId.join("-")
+            data-thread-cids=(thread.categoriesId||[]).join("-")
+          )
     .thread-panel-author
       a(href=`/u/${thread.uid}` target="_blank")
         img(src=`/avatar/${thread.uid}?t=sm`)

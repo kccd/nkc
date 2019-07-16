@@ -25,10 +25,10 @@ $(function() {
   });
 });
 
-$('input[name="statusType"]').iCheck({
+/*$('input[name="statusType"]').iCheck({
   checkboxClass: 'icheckbox_minimal-red',
   radioClass: 'iradio_minimal-red',
-});
+});*/
 
 
 function getResults(options) {

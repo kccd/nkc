@@ -52,6 +52,7 @@
   "visitThread": "阅读文章",
   "postToThread": "回复文章",
   "moveThread": "将文章移动至回收站（只对专家和具有超级专家权限的用户有效）",
+  "moveThreads": "批量移动文章",
   "collectThread": "收藏文章",
   "delCollectThread": "取消文章收藏",
   "digestThread": "将文章设为精选文章",
@@ -587,6 +588,10 @@
   "column_single_settings_transfer": "专栏转让",
   "column_single_settings_close": "关闭专栏",
   "visitUserContribute": "查看用户的投稿记录",
+  "movePostsToDraft": "批量将文章退回修改",
+  "movePostsToRecycle": "批量将文章送回收站",
+  "column_single_disabled": "屏蔽专栏信息",
+  "column_single_contact": "专栏主联系管理员",
   "billParamAddOne": "[CO]账单商品数量加一",
   "billParamPlusOne": "[CO]账单商品数量减一",
 

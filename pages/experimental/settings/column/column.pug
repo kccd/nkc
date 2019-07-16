@@ -3,7 +3,7 @@ block eTitle
   title 专栏设置
 block eContent
   .container-fluid.max-width
-    #data.hidden=objToStr({columnSettings: data.columnSettings, grades: data.grades})
+    #data.hidden=objToStr({columnSettings: data.columnSettings, grades: data.grades, roles: data.roles})
     #app.row(v-cloak)
       .col-xs-12.col-md-12
         .form-horizontal
@@ -46,6 +46,15 @@ block eContent
             .col-sm-5
               h5 支持换行、空格
               textarea.form-control(v-model.number="columnSettings.closeColumnInfo" rows=7)
+          .col-xs-12.col-md-12
+            h4 管理员
+          .form-group
+            label.col-sm-2.control-label 通过证书指定
+            .col-sm-5
+              .checkbox.inline-block.m-r-1(v-for="r in roles")
+                label
+                  input(type="checkbox" :value="r._id" v-model="columnSettings.adminCertsId")
+                  span {{r.displayName}}
           .form-group
             label.col-sm-2.control-label
             .col-sm-5

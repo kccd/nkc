@@ -3,7 +3,6 @@ var checkboxBody;
 $(function() {
   checkbox = $(".post-checkbox input[type='checkbox']");
   checkboxBody = $(".post-checkbox label");
-  console.log(21222222222222)
   if(window.moduleToColumn) {
     moduleToColumn.init();
   }

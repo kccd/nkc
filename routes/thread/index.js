@@ -5,6 +5,7 @@ const homeTopRouter = require('./homeTop');
 const toppedRouter = require('./topped');
 const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
+const disabledRouter = require("./disabled");
 const Path = require("path");
 
 threadRouter
@@ -14,18 +15,38 @@ threadRouter
 		const {from, keywords, self, type, title, pid, applicationFormId} = query;
 		// 通用接口，用于查询自己的文章
 		if(type === "selfThreads") {
-      const {page=0} = query;
-      const q = {
-        uid: user.uid,
-        disabled: false,
-        recycleMark: {$ne: true},
-        reviewed: true
-      };
-      const count = await db.ThreadModel.count(q);
-      const paging = nkcModules.apiFunction.paging(page, count);
-      let threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-      data.threads = await db.ThreadModel.extendThreads(threads);
-      data.paging = paging;
+      const {page=0, columnId, pid} = query;
+      let threads = [];
+      if(pid) {
+        threads = await db.ThreadModel.find({oc: pid});
+      } else {
+        const q = {
+          uid: user.uid,
+          disabled: false,
+          recycleMark: {$ne: true},
+          reviewed: true
+        };
+        const count = await db.ThreadModel.count(q);
+        const paging = nkcModules.apiFunction.paging(page, count);
+        data.paging = paging;
+        threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+      }
+      threads = await db.ThreadModel.extendThreads(threads, {
+        htmlToText: true
+      });
+      if(columnId) {
+        data.threads = [];
+        const threadsId = threads.map(t => t.oc);
+        const contributes = await db.ColumnContributeModel.find({columnId, pid: {$in: threadsId}, passed: null}, {pid: 1});
+        let columnPosts = await db.ColumnPostModel.find({columnId, pid: {$in: threadsId}}, {pid: 1});
+        const pid = (contributes.map(c => c.pid)).concat(columnPosts.map(c => c.pid));
+        for(const thread of threads) {
+          if(pid.includes(thread.oc)) continue;
+          data.threads.push(thread);
+        }
+      } else {
+        data.threads = threads;
+      }
     } else if(type === "applicationFormSearch") {
       const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId});
       const users = await applicationForm.extendMembers();
@@ -391,7 +412,7 @@ threadRouter
 		if(data.user) {
 			data.usersThreads = await data.user.getUsersThreads();
 			if(state.userColumn) {
-			  data.columnCategories = await db.ColumnPostCategoryModel.getCategoryList(state.userColumn._id);
+			  data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
       }
 			if(thread.uid === data.user.uid) {
 			  // 标记未读的回复提醒为已读状态
@@ -426,6 +447,10 @@ threadRouter
 		}
     data.targetUser = await thread.extendUser();
     await db.UserModel.extendUsersInfo([data.targetUser]);
+    data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
+    if(data.targetColumn) {
+      data.columnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type: "thread", pid: thread.oc});
+    }
 		// 文章访问量加1
 		await thread.update({$inc: {hits: 1}});
 		data.thread = thread;
@@ -843,5 +868,6 @@ threadRouter
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())
   .use("/:tid/subscribe", subscribeRouter.routes(), subscribeRouter.allowedMethods())
+  .use("/:tid/disabled", disabledRouter.routes(), disabledRouter.allowedMethods())
 	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;
