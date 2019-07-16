@@ -11,7 +11,7 @@ router
       ctx.template = "columns/settings/editPage.pug";
     } else if(t === "edit") {
       const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: id});
-      if(!page) ctx.throw(400, `ID为${id}的自定义页面不存在`);
+      if(!page) ctx.throw(400, `未找到ID为${id}的自定义页面`);
       data.page = page;
       ctx.template = "columns/settings/editPage.pug";
     } else {

@@ -28,7 +28,7 @@ router
     const {type} = body;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
-    if(!page) ctx.throw(400, `ID为${pageId}的自定义页面不存在`);
+    if(!page) ctx.throw(400, `未找到ID为${pageId}的自定义页面`);
     if(type === "modifyContent") {
       const {title, content} = body;
       if(!content) ctx.throw(400, "页面内容不能为空");
@@ -73,7 +73,7 @@ router
     const {pageId} = params;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
-    if(!page) ctx.throw(400, `ID为${pageId}的自定义页面不存在`);
+    if(!page) ctx.throw(400, `未找到ID为${pageId}的自定义页面`);
     await page.remove();
     await next();
   })
@@ -82,7 +82,7 @@ router
     const {pageId} = params;
     const {column, user} = data;
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
-    if(!page) ctx.throw(404, `ID为${pageId}的自定义页面不存在`);
+    if(!page) ctx.throw(404, `未找到ID为${pageId}的自定义页面`);
     if(page.hidden && (!user || column.uid !== user.uid)) ctx.throw(403, "该页面已被专栏主关闭");
     data.page = page;
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
