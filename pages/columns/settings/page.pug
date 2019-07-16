@@ -8,7 +8,8 @@ block settingsContent
         a.btn.btn-default(href=`/m/${data.column._id}/settings/page?t=add`) 新建
       else
         button.btn.btn-default(disabled) 新建
-      h5.text-danger=`最多允许创建${data.columnSettings.pageCount}个自定义页面`
+      h5.text-danger=`最多允许创建${data.columnSettings.pageCount}个自定义页面。`
+      h5.text-danger=`若需添加导航，请复制原文链接后到专栏设置页添加。`
       for page in data.pages
         .row.m-b-2
           .col-xs-12.col-md-8
@@ -16,14 +17,16 @@ block settingsContent
               if page.t
                 a.column-settings-page-title(href=`/m/${data.column._id}/page/${page._id}` target="_blank")=page.t
               .column-settings-page-abstract=page.c
-              .m-t-05.text-right
+              .m-t-05
                 if page.hidden
-                  .pull-left
+                  .pull-right
                     span.text-danger 已关闭
-                a(href=`/m/${data.column._id}/page/${page._id}` target="_blank") 查看原文
+                span=`原文链接：`
+                a(href=data.pageUrl+page._id)=data.pageUrl+page._id
+                button.btn.btn-xs.btn-default.copy-button(data-page-id=page._id data-page-url=data.pageUrl+page._id class=`copy-button-${page._id}`) 复制链接
           .col-xs-12.col-md-4
             .column-settings-page-options
-              button.m-r-05.btn.btn-xs.btn-default(onclick=`toNav(${data.column._id}, ${page._id})`) 加入导航
+              //button.m-r-05.btn.btn-xs.btn-default(onclick=`toNav(${data.column._id}, ${page._id})`) 加入导航
               a.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${page._id}`) 编辑
               if page.hidden
                 button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, false)`) 开启
@@ -31,4 +34,5 @@ block settingsContent
                 button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, true)`) 关闭
               button.btn.btn-xs.btn-danger(onclick=`deletePage(${data.column._id}, ${page._id})`) 删除
 block scripts
+  +includeJS("/clipboard/clipboard.min.js")
   +includeJS("/columns/settings/page.js")

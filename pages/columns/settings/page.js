@@ -36,3 +36,24 @@ function toNav(columnId, pageId) {
       sweetError(data);
     })
 }
+
+$(function() {
+  var button = $(".copy-button");
+  var obj = {};
+  var func = function (i) {
+    var b = button.eq(i);
+    var pageId = b.attr("data-page-id");
+    var url = b.attr("data-page-url");
+    obj[pageId] = new ClipboardJS(".copy-button-" + pageId, {
+      text: function() {
+        return url
+      }
+    });
+    obj[pageId].on("success", function() {
+      screenTopAlert("链接已复制到粘贴板");
+    });
+  };
+  for(var i = 0; i < button.length; i++) {
+    func(i);
+  }
+});
