@@ -13,10 +13,14 @@ block settingsContent
         .row.m-b-2
           .col-xs-12.col-md-8
             .column-settings-page-content
-              a.column-settings-page-title(href=`/m/${data.column._id}/page/${page._id}`)=page.t
-              if page.hidden
-                span 【已关闭】
+              if page.t
+                a.column-settings-page-title(href=`/m/${data.column._id}/page/${page._id}` target="_blank")=page.t
               .column-settings-page-abstract=page.c
+              .m-t-05.text-right
+                if page.hidden
+                  .pull-left
+                    span.text-danger 已关闭
+                a(href=`/m/${data.column._id}/page/${page._id}` target="_blank") 查看原文
           .col-xs-12.col-md-4
             .column-settings-page-options
               button.m-r-05.btn.btn-xs.btn-default(onclick=`toNav(${data.column._id}, ${page._id})`) 加入导航

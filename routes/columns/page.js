@@ -10,7 +10,6 @@ router
     const columnSettings = await db.SettingModel.getSettings("column");
     if(pageCount >= columnSettings.pageCount) ctx.throw(400, `最多允许创建${columnSettings.pageCount}个自定义页面`);
     const {title, content} = body;
-    if(!title) ctx.throw(400, "页面标题不能为空");
     if(!content) ctx.throw(400, "页面内容不能为空");
     const page = db.ColumnPageModel({
       _id: await db.SettingModel.operateSystemID("columnPages", 1),
@@ -32,7 +31,6 @@ router
     if(!page) ctx.throw(400, `ID为${pageId}的自定义页面不存在`);
     if(type === "modifyContent") {
       const {title, content} = body;
-      if(!title) ctx.throw(400, "页面标题不能为空");
       if(!content) ctx.throw(400, "页面内容不能为空");
       await page.update({
         t: title,
@@ -59,7 +57,7 @@ router
         await column.update({
           $addToSet: {
             links: {
-              name: page.t,
+              name: page.t || "新建导航",
               url
             }
           }

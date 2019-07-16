@@ -31,7 +31,6 @@ $(function() {
 
 function save() {
   var title = $("#title").val();
-  if(!title) return sweetError("请输入页面标题");
   var content = ue.getContent();
   if(!content) return sweetError("请输入页面内容");
   var method, url;

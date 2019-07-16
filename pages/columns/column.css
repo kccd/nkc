@@ -787,12 +787,13 @@ img.apply-column-banner{
   margin-bottom: 0.5rem;
 }
 .column-page-title{
-  font-size: 2rem;
+  font-size: 3rem;
+  padding: 1rem;
   text-align: center;
   font-weight: 700;
 }
 .column-page-content{
-  margin-top: 2rem;
+  margin-top: 0;
   position: relative;
   font-size: 16px;
   overflow: hidden;

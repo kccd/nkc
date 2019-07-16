@@ -1,6 +1,9 @@
 extends ./columnBase
 block columnTitle
-  title=`${data.page.t} - ${data.column.name}`
+  if data.page.t
+    title=`${data.page.t} - ${data.column.name}`
+  else
+    title=`${data.column.name}`
   style.
     .column{
       max-width: 850px;
@@ -12,17 +15,18 @@ block content
     .m-t-2.box-shadow-panel
       div
         include ./nav
-        .m-t-3
-        .column-page-title=data.page.t
+      .m-t-2
+        if data.page.t
+          .column-page-title=data.page.t
+        -data.page.c = hideContentByUser(data.page.c, data.user, 'thread')
+        .column-page-content!=experimental_render(data.page)
         if data.user && data.user.uid === data.column.uid
-          .m-t-1.text-center
+          .m-t-1.text-right
             if data.page.hidden
               span.m-t-2.text-danger 已关闭，仅自己可见。
               button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
             else
               button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
             a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
-        -data.page.c = hideContentByUser(data.page.c, data.user, 'thread')
-        .p-a-1.column-page-content!=experimental_render(data.page)
 block scripts
   +includeJS("/columns/settings/page.js")
