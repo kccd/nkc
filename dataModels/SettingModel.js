@@ -111,4 +111,14 @@ settingSchema.statics.findById = async (_id) => {
   if(!setting) throwErr(404, `未找到ID为【${_id}】的系统设置`);
   return setting;
 };
+
+/*
+* 通过ID查找设置 返回settings.c
+* @param {String} _id
+* */
+settingSchema.statics.getSettings = async (_id) => {
+  const settings  = await mongoose.model("settings").findById({_id});
+  return settings.c;
+};
+
 module.exports = mongoose.model('settings', settingSchema);

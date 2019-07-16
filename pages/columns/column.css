@@ -536,7 +536,7 @@ img.apply-column-banner{
   height: 16px;
   font-size: 1rem;
   padding: 0 5px;
-  border-radius: 50%;
+  border-radius: 8px;
   background-color: #e85a71;
   color: #fff;
   text-align: center;
@@ -772,6 +772,33 @@ img.apply-column-banner{
 }
 .column-management-button:hover{
   color: #282c37;
+}
+.column-settings-page-title{
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.column-settings-page-abstract{
+  margin-top: 0.8rem;
+}
+.column-settings-page-content{
+  background-color: #f4f4f4;
+  border-radius: 3px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+.column-page-title{
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 700;
+}
+.column-page-content{
+  margin-top: 2rem;
+  position: relative;
+  font-size: 16px;
+  overflow: hidden;
+}
+.column-page-content img{
+  border-radius: 7px;
 }
 @media (max-width: 767px) {
   .column-avatar{

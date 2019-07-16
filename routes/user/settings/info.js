@@ -4,6 +4,7 @@ infoRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.KCBSettings = (await db.SettingModel.findOne({_id: 'kcb'})).c;
+    data.user.kcb = await db.UserModel.updateUserKcb(data.user.uid);
 		data.modifyUsernameOperation = await db.KcbsTypeModel.findOnly({_id: 'modifyUsername'});
 		ctx.template = 'interface_user_settings_info.pug';
 		await next();

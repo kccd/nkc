@@ -110,11 +110,19 @@ function moveSelectedThreads() {
 
 // 显示或隐藏勾选框
 function managementThreads() {
-  $(".thread-checkbox label").toggle();
+  var labelDom = $(".thread-checkbox label");
+  labelDom.toggle();
+  if(labelDom.css("display") === "none") {
+    $(".thread-checkbox input").prop("checked", false);
+    $(".management-thread-panel").css("display", "none");
+  } else {
+    $(".management-thread-panel").css("display", "inline");
+  }
 }
 
 // 选择全部勾选框或取消全部勾选框
 function selectAll() {
+  if($(".thread-checkbox label").css("display") === "none") return;
   var dom = $(".thread-checkbox input");
   var total = dom.length;
   var selected = 0;

@@ -23,7 +23,7 @@ block content
         .contribute-column.m-b-4
           img(src=`/m/${data.column._id}/avatar?t=sm`)
           .contribute-column-info
-            a(href=`/m/${data.column._id}`).name=data.column.name
+            a(href=`/m/${data.column._id}` target="_blank").name=data.column.name
             .description=data.column.abbr
         .row
           .col-xs-12.col-md-12
@@ -50,19 +50,19 @@ block content
                       input.form-control(type="text" placeholder="文号" v-model="pid")
                       button.btn.btn-primary(@click="search") 搜索
                       button.btn.btn-default(@click="reset") 重置
-                  .text-center.m-t-1(v-if="threads.length === 0") 暂无数据
-                  div(v-else).p-t-1
+                  div.p-t-1
                     .paging-button
-                      a.button.radius-left.radius-right(@click="showAllThreadsInfo") 全部展开
+                      a.button.radius-left(@click="showAllThreadsInfo") 全部展开
+                      a.button.radius-right(@click="checkAll") 全选
                     .paging-button
-                      a.button.radius-left(@click="checkAll") 全选
-                      a.button.radius-right(@click="choose" v-if="chooseTid.length > 0") 添加已选
+                      button.btn.btn-sm.btn-success(@click="choose" v-if="chooseTid.length > 0") 添加已选
                     .paging-button
                       a.button.pointer(v-for="b, index in paging.buttonValue"
                         :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"
                         @click="selectPage(b.type, b.num)"
                       ) {{b.num>=0?b.num+1:"..."}}
-                    .contribute-thread(v-for="thread in threads")
+                    .m-t-1.m-b-1(v-if="threads.length === 0") {{paging.pageCount > 1?"当前页暂无可投稿的文章":"无可投稿的文章"}}
+                    .contribute-thread(v-for="thread in threads" v-else)
                       .checkbox
                         label
                           input(type="checkbox" :value="thread.tid" v-model="chooseTid")
@@ -79,9 +79,9 @@ block content
                               a.m-r-1(v-for="f in thread.forums" :href="'/f/' + f.fid" target="_blank") {{f.displayName}}
                     .paging-button
                       a.button.radius-left.radius-right(@click="showAllThreadsInfo") 全部展开
-                    .paging-button
                       a.button.radius-left(@click="checkAll") 全选
-                      a.button.radius-right(@click="choose" v-if="chooseTid.length > 0") 添加已选
+                    .paging-button
+                      button.btn.btn-sm.btn-success(@click="choose" v-if="chooseTid.length > 0") 添加已选
                     .paging-button
                       a.button.pointer(v-for="b, index in paging.buttonValue"
                         :class="{'active':b.type==='active', 'radius-left': index===0, 'radius-right': index+1 === paging.buttonValue.length}"

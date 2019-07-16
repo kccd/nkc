@@ -1603,7 +1603,7 @@ span.thread-title-page{
   background-size: 4px 14px;
   font-weight:bold;
 }
-.box-shadow-panel>*{
+.box-shadow-panel>div{
   box-shadow: 0 0 3px rgba(0,0,0,0.1);
   padding: 15px;
   background-color: #fff;
@@ -1710,6 +1710,9 @@ span.thread-title-page{
 .post-checkbox label{
   display: none;
   min-height: 15px;
+}
+.management-thread-panel{
+  display: none;
 }
 @media (max-width: 346px) {
   .navbar-search{

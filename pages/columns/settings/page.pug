@@ -1,0 +1,30 @@
+extends ./base
+block columnTitle
+  title 自定义页
+block settingsContent
+  .row
+    .col-xs-12.col-md-12
+      if data.pageCount < data.columnSettings.pageCount
+        a.btn.btn-default(href=`/m/${data.column._id}/settings/page?t=add`) 新建
+      else
+        button.btn.btn-default(disabled) 新建
+      h5.text-danger=`最多允许创建${data.columnSettings.pageCount}个自定义页面`
+      for page in data.pages
+        .row.m-b-2
+          .col-xs-12.col-md-8
+            .column-settings-page-content
+              a.column-settings-page-title(href=`/m/${data.column._id}/page/${page._id}`)=page.t
+              if page.hidden
+                span 【已隐藏】
+              .column-settings-page-abstract=page.c
+          .col-xs-12.col-md-4
+            .column-settings-page-options
+              button.m-r-05.btn.btn-xs.btn-default(onclick=`toNav(${data.column._id}, ${page._id})`) 加入导航
+              a.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${page._id}`) 编辑
+              if page.hidden
+                button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, false)`) 关闭
+              else
+                button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, true)`) 开放
+              button.btn.btn-xs.btn-danger(onclick=`deletePage(${data.column._id}, ${page._id})`) 删除
+block scripts
+  +includeJS("/columns/settings/page.js")

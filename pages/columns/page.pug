@@ -1,0 +1,28 @@
+extends ./columnBase
+block columnTitle
+  title=`${data.page.t} - ${data.column.name}`
+  style.
+    .column{
+      max-width: 850px;
+    }
+  style=`body{background-color: ${data.column.color};}`
+block content
+  include ./banner
+  .column
+    .m-t-2.box-shadow-panel
+      div
+        include ./nav
+        .m-t-3
+        .column-page-title=data.page.t
+        if data.user && data.user.uid === data.column.uid
+          .m-t-1.text-center
+            if data.page.hidden
+              span.m-t-2.text-danger 已关闭，仅自己可见。
+              button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
+            else
+              button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
+            a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
+        -data.page.c = hideContentByUser(data.page.c, data.user, 'thread')
+        .p-a-1.column-page-content!=experimental_render(data.page)
+block scripts
+  +includeJS("/columns/settings/page.js")

@@ -14,7 +14,7 @@ router
     let {
       xsfCount, digestCount, userGrade,
       contributeInfo, threadCount, transferInfo, closeColumnInfo,
-      adminCertsId
+      adminCertsId, pageCount
     } = body;
     xsfCount = parseInt(xsfCount);
     if(xsfCount < 0) ctx.throw(400, "学术分不能小于0");
@@ -33,6 +33,8 @@ router
     if(!contributeInfo) ctx.throw(400, "投稿说明不能为空");
     if(!transferInfo) ctx.throw(400, "专栏转让说明不能为空");
     if(!closeColumnInfo) ctx.throw(400, "关闭专栏说明不能为空");
+    pageCount = parseInt(pageCount);
+    if(pageCount < 0) ctx.throw(400, "自定义页面个数不能小于0");
     await db.SettingModel.updateOne({
       _id: "column"
     }, {
@@ -42,6 +44,7 @@ router
         "c.userGrade": userGrade,
         "c.contributeInfo": contributeInfo,
         "c.threadCount": threadCount,
+        "c.pageCount": pageCount,
         "c.transferInfo": transferInfo,
         "c.closeColumnInfo": closeColumnInfo,
         "c.adminCertsId": adminCertsId

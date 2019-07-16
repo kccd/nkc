@@ -1,0 +1,9 @@
+.column-banner-body
+  .column-banner(style=`background-image:url(/m/${data.column._id}/banner)`)
+    .column
+      .column-avatar
+        img(src=`/m/${data.column._id}/avatar`)
+      .column-info
+        .column-other-info
+          .column-name=data.column.name
+          .column-abbr=data.column.abbr

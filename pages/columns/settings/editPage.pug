@@ -1,0 +1,25 @@
+extends ./base
+block columnTitle
+  title=data.page?"编辑自定义页": "新建自定义页"
+  +includeCSS("/editor/editor.css")
+  +includeCSS("/mdui/css/mdui.min.css")
+block settingsContent
+  .row
+    #data.hidden=objToStr({column: data.column, page: data.page})
+    .col-xs-12.col-md-12
+      .form
+        .form-group
+          label 页面标题
+          input.form-control(type="text" id="title")
+        .form-group
+          label 页面内容
+          #pageContent
+        .form-group
+          include ../../media/media_index
+        .form-group
+          button.btn.btn-primary(onclick="save()") 保存
+block scripts
+  include ../../ueditor/ueditorBase
+  include ../../publicModules/crop/crop
+  +includeJS("/media/media_index.js")
+  +includeJS("/columns/settings/editPage.js")
