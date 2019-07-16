@@ -42,7 +42,7 @@ block content
             .form-group
               label.col-sm-2.control-label
               .col-sm-8
-                button.btn.btn-primary(onclick='submitApp()') 保存
+                button.btn.btn-primary#submitApp(onclick='submitApp()') 保存
         else if data.type === 'histories'
           ul.nav.nav-pills
             li(role='presentation' class=data.os === 'android' ? 'active' : '')
