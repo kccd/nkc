@@ -282,3 +282,13 @@ function linkWithEditor() {
   var withE = false;
   return withE;
 } 
+
+function toAppLogin() {
+  api.closeToWin({
+    name: 'root'
+  });
+  api.execScript({
+    name: "root",
+    script: "openGroupIndex(3)"
+  })
+}
