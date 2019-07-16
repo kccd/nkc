@@ -1869,17 +1869,11 @@ function toggleNKCDrawer(type) {
     closeNKCDrawer(type);
   } else {
     if(localStorage.getItem("apptype") === "app") {
-      if(api.frameName === "latest") {
+      if(api.frameName) {
         api.setFrameAttr({
-          name: 'latest',
+          name: api.frameName,
           bounces: false
-        });
-      }
-      if(api.frameName === "forum") {
-        api.setFrameAttr({
-          name: 'forum',
-          bounces: false
-        });
+        });        
       }
     }
     openNKCDrawer(type);

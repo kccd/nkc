@@ -79,25 +79,25 @@ block content
                        th 我的
                     tbody
                       -let allowed = true;
-                      -const toc =   Math.ceil((Date.now() - user.toc)/(1000*60*60*24));
-                      if threadCount > user.threadCount || postCount > user.postCount || timeToRegister > toc
+                      -const toc =   Math.ceil((Date.now() - data.user.toc)/(1000*60*60*24));
+                      if threadCount > data.user.threadCount || postCount > data.user.postCount || timeToRegister > toc
                         -allowed = false;
                       if authLevel > userAuthLevel
                         -allowed = false;
                       tr
                         th 发帖量
                         th= threadCount
-                        th= user.threadCount
+                        th= data.user.threadCount
                           //if threadCount <= user.threadCount
                           //  span.glyphicon.glyphicon-ok
                       tr
                         th 回帖量
                         th= postCount
-                        th= user.postCount
+                        th= data.user.postCount
                       tr
                         th 账号等级
                         th= 0
-                        th= user.grade?user.grade._id: 0
+                        th= data.user.grade?data.user.grade._id: 0
                       tr
                         th 注册天数
                         th= timeToRegister
@@ -124,32 +124,33 @@ block content
                 h3 补充说明
                 hr
                 div!= markdown_safe(fund.description.detailed)
-          .col-xs-12.col-md-12
-            .panel.panel-default
-              .panel-body.fund-description
-                h3 分享基金
-                hr
-                div.changeDisNone.text-center(style='width: 100%;')
-                  .col-xs-12.col-md-12
-                    .col-xs-3.col-md-3(style="padding:0px")
-                      a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundlist', 'qq', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
-                        img(src="/default/QQ.png" style="")
-                    .col-xs-3.col-md-3(style="padding:0px")
-                      a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundlist', 'qzone', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
-                        img(src="/default/qzone.png" style="")
-                    .col-xs-3.col-md-3(style="padding:0px")
-                      a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundlist', 'weibo', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
-                        img(src="/default/weibo.png" style="")
-                    .col-xs-3.col-md-3(style="padding:0px")
-                      a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundlist', 'weChat', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
-                        img(src="/default/weChat.png" style="")
-                  canvas.qrcode#fundListQrcode(style="display:none")
-                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qq', window.location.origin+window.location.pathname, '科创基金雨行动')`)
-                    //-   img(src="/default/QQ.png" style="width:100%")
-                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qzone', window.location.origin+window.location.pathname, '科创基金雨行动')`)
-                    //-   img(src="/default/qzone.png" style="width:100%")
-                    //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'weibo', window.location.origin+window.location.pathname, '科创基金雨行动')`)
-                    //-   img(src="/default/weibo.png" style="width:100%")
+          if !state.apptype
+            .col-xs-12.col-md-12
+              .panel.panel-default
+                .panel-body.fund-description
+                  h3 分享基金
+                  hr
+                  div.changeDisNone.text-center(style='width: 100%;')
+                    .col-xs-12.col-md-12
+                      .col-xs-3.col-md-3(style="padding:0px")
+                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundlist', 'qq', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
+                          img(src="/default/QQ.png" style="")
+                      .col-xs-3.col-md-3(style="padding:0px")
+                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundlist', 'qzone', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
+                          img(src="/default/qzone.png" style="")
+                      .col-xs-3.col-md-3(style="padding:0px")
+                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundlist', 'weibo', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
+                          img(src="/default/weibo.png" style="")
+                      .col-xs-3.col-md-3(style="padding:0px")
+                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('fundlist', 'weChat', window.location.origin+window.location.pathname, '科创基金', '${fund._id}')`)
+                          img(src="/default/weChat.png" style="")
+                    canvas.qrcode#fundListQrcode(style="display:none")
+                      //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qq', window.location.origin+window.location.pathname, '科创基金雨行动')`)
+                      //-   img(src="/default/QQ.png" style="width:100%")
+                      //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'qzone', window.location.origin+window.location.pathname, '科创基金雨行动')`)
+                      //-   img(src="/default/qzone.png" style="width:100%")
+                      //- .col-xs-4.col-md-4(style="padding:5px" onclick=`shareTo('fundList', 'weibo', window.location.origin+window.location.pathname, '科创基金雨行动')`)
+                      //-   img(src="/default/weibo.png" style="width:100%")
 block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   //- script.
