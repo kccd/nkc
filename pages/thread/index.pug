@@ -557,6 +557,12 @@ block content
                         .col-xs-12.col-md-12
                           :markdown
                             想参与大家的讨论？现在就 [登录](/login) 或者 [注册](/register)。
+                      else
+                        .col-xs-12.col-md-12
+                          p 
+                            span 想参与大家的讨论？现在就 
+                            a(onclick="toAppLogin()") [登录]
+                            span 。
 
         .col-xs-12.col-md-3
           .hidden-xs.hidden-sm#rightDom

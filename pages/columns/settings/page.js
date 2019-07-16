@@ -12,7 +12,7 @@ function setHidden(columnId, pageId, hidden) {
 }
 
 function deletePage(columnId, pageId) {
-  sweetConfirm("确定要执行此操作？")
+  sweetConfirm("确定要删除该页面？")
     .then(function() {
       return nkcAPI("/m/" + columnId + "/page/" + pageId, "DELETE")
     })

@@ -15,16 +15,16 @@ block settingsContent
             .column-settings-page-content
               a.column-settings-page-title(href=`/m/${data.column._id}/page/${page._id}`)=page.t
               if page.hidden
-                span 【已隐藏】
+                span 【已关闭】
               .column-settings-page-abstract=page.c
           .col-xs-12.col-md-4
             .column-settings-page-options
               button.m-r-05.btn.btn-xs.btn-default(onclick=`toNav(${data.column._id}, ${page._id})`) 加入导航
               a.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${page._id}`) 编辑
               if page.hidden
-                button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, false)`) 关闭
+                button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, false)`) 开启
               else
-                button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, true)`) 开放
+                button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${page._id}, true)`) 关闭
               button.btn.btn-xs.btn-danger(onclick=`deletePage(${data.column._id}, ${page._id})`) 删除
 block scripts
   +includeJS("/columns/settings/page.js")
