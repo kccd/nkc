@@ -8,6 +8,7 @@ module.exports = {
     transferInfo: "这段文字将显示在专栏转让页面",
     closeColumnInfo: "这段文字将显示在关闭页面",
     threadCount: 10,
-    adminCertsId: ["editor"]
+    adminCertsId: ["editor"],
+    pageCount: 5, // 自定义页面个数
   }
 };

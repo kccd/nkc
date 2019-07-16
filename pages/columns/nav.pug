@@ -1,0 +1,39 @@
+ul.column-nav
+  li
+    a(href=`/m/${data.column._id}`) 首页
+  if !data.column.navCategory
+    li
+      a(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类&nbsp;
+        .fa.fa-caret-down
+      ul.dropdown-menu
+        li
+          a(href=`/m/${data.column._id}` style="overflow:hidden;")
+            span 全部
+        for c in data.categories
+          if !data.column.hideDefaultCategory || !c.default
+            li
+              a(href=`/m/${data.column._id}?c=${c._id}` style="overflow:hidden;")
+                -for(var i = 0; i < c.level; i++)
+                span &nbsp;&nbsp;&nbsp;&nbsp;
+                span=c.name
+        //li.divider(role="separator")
+  else
+    for c in data.navCategories
+      if !data.column.hideDefaultCategory || !c.default
+        if c.children && c.children.length
+          li
+            a(href=`/m/${data.column._id}?c=${c._id}` style="margin-right: 0;padding-right:0")=c.name
+            a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+            ul.dropdown-menu
+              for cc in c.children
+                li
+                  a(href=`/m/${data.column._id}?c=${cc._id}` style="overflow:hidden")
+                    -for(var i = 0; i < (cc.level - 1); i++)
+                    span &nbsp;&nbsp;&nbsp;&nbsp;
+                    span=cc.name
+        else
+          li
+            a(href=`/m/${data.column._id}?c=${c._id}`)=c.name
+  for link in data.column.links
+    li
+      a(title=link.url onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name

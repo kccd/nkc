@@ -1553,6 +1553,7 @@ margin-left: 5px;
   box-shadow: rgba(0, 0, 0, 0.14) 0px 1px 10px;
   background-color:#f6f6f6;
   line-height: 0;
+  background-color: rgba(250, 250, 250, 0.95);
 }
 .nkcshade .navbar-brand{
   font-size: 1.4em;

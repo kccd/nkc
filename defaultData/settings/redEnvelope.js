@@ -38,6 +38,14 @@ module.exports = {
       maxCount: 5
     },
     share: {
+      column: {
+        order: 1,
+        name: '专栏',
+        status: false,
+        kcb: 1,
+        maxKcb: 5,
+        count: 5
+      },
       forum: {
         order: 1,
         name: '专业',

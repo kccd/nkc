@@ -52,6 +52,12 @@ module.exports = {
       close: {
         GET: "column_single_settings_close",
         POST: "column_single_settings_close"
+      },
+      page: {
+        GET: "column_single_settings_page",
+        editor: {
+          GET: "column_single_settings_page",
+        }
       }
     },
     contribute: {
@@ -66,6 +72,14 @@ module.exports = {
     },
     contact: {
       POST: "column_single_contact"
+    },
+    page: {
+      POST: "column_single_settings_page",
+      PARAMETER: {
+        GET: "column_single_page",
+        PATCH: "column_single_settings_page",
+        DELETE: "column_single_settings_page"
+      }
     }
   }
 };
