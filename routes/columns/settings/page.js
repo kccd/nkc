@@ -1,5 +1,6 @@
 const Router = require("koa-router");
 const router = new Router();
+const serverConfig = require("../../../config/server");
 router
   .get("/", async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
@@ -7,6 +8,7 @@ router
     const {column} = data;
     data.pageCount = await db.ColumnPageModel.count({columnId: column._id});
     data.columnSettings = await db.SettingModel.getSettings("column");
+    data.pageUrl = `${serverConfig.domain}/m/${column._id}/page/`;
     if(t === "add") {
       ctx.template = "columns/settings/editPage.pug";
     } else if(t === "edit") {

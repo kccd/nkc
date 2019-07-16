@@ -1,6 +1,5 @@
 const Router = require("koa-router");
 const router = new Router();
-const serverConfig = require("../../config/server");
 router
   .post("/", async (ctx, next) => {
     const {data, db, body} = ctx;
@@ -45,7 +44,6 @@ router
       });
     } else if(type === "toNav") {
       const {links} = column;
-      const url = `${serverConfig.domain}/m/${column._id}/page/${pageId}`;
       let added = false;
       for(const link of links) {
         if(link.url === url) {

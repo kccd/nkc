@@ -48,7 +48,7 @@ function save() {
   }
   nkcAPI(url, method, body)
     .then(function(data) {
-      openToNewLocation("/m/" + data.column._id + "/page/" + data.page._id);
+      openToNewLocation("/m/" + data.column._id + "/settings/page");
     })
     .catch(function(data) {
       sweetError(data);
