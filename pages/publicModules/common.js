@@ -84,6 +84,7 @@ function uploadFileAPI(url, method, formData, onUploadProgress) {
 }
 
 function sweetSuccess(text) {
+  return screenTopAlert(text);
   Swal.fire({
     type: "success",
     confirmButtonText: "关闭",
@@ -91,6 +92,7 @@ function sweetSuccess(text) {
   });
 }
 function sweetError(text) {
+  return screenTopWarning(text.error || text);
   Swal.fire({
     type: "error",
     confirmButtonText: "关闭",
@@ -113,7 +115,10 @@ function sweetWarning(text) {
 }
 function sweetConfirm(text) {
   return new Promise(function(resolve, reject) {
-    Swal.fire({
+    if(confirm(text)) {
+      resolve();
+    }
+    /*Swal.fire({
       type: "warning",
       confirmButtonText: "确定",
       cancelButtonText: "取消",
@@ -125,6 +130,6 @@ function sweetConfirm(text) {
         if(result.value === true) {
           resolve();
         }
-      })
+      })*/
   });
 }

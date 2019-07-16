@@ -55,6 +55,12 @@ block eContent
                 label
                   input(type="checkbox" :value="r._id" v-model="columnSettings.adminCertsId")
                   span {{r.displayName}}
+          .col-xs-12.col-md-12
+            h4 专栏设置
+          .form-group
+            label.col-sm-2.control-label 自定义页面个数
+            .col-sm-5
+              input.form-control(type="text" v-model.number="columnSettings.pageCount")
           .form-group
             label.col-sm-2.control-label
             .col-sm-5

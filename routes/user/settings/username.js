@@ -10,13 +10,13 @@ router
 		const {contentLength} = ctx.tools.checkString;
 		if(contentLength(newUsername) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
 		const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
-		if(pattern.test(newUsername)) ctx.throw(400, '用户名含有非法字符！')
+		if(pattern.test(newUsername)) ctx.throw(400, '用户名含有非法字符！');
 		if(user.username === newUsername) {
 			ctx.throw(400, '新用户名不能与旧用户名相同');
 		}
 		const kcbSettings = await db.SettingModel.findOne({_id: 'kcb'});
 		if(!kcbSettings) ctx.throw(500, '科创币设置错误：未找到相关设置');
-		const sameUsernameUser = await db.UserModel.findOne({usernameLowerCase: newUsername.toLowerCase()});
+		const sameUsernameUser = await db.UserModel.findOne({uid: {$ne: user.uid}, usernameLowerCase: newUsername.toLowerCase()});
 		if(sameUsernameUser) ctx.throw(400, '用户名已存在');
 		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 		if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');

@@ -22,8 +22,9 @@ block content
               -let showPagingSortButton = true;
               if canManagement
                 .paging-button
-                  a.button.radius-left(onclick="managementThreads()") 管理
-                  a.button(onclick="selectAll()") 全选
+                  a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                .paging-button.management-thread-panel
+                  a.button.radius-left(onclick="selectAll()") 全选
                   a.button(onclick="moveSelectedThreads()") 移动
                   a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
               if data.t === "latest" || data.t === "column" || data.t === "recommend"
@@ -46,8 +47,9 @@ block content
             -showHomeButton = false;
             if canManagement
               .paging-button
-                a.button.radius-left(onclick="managementThreads()") 管理
-                a.button(onclick="selectAll()") 全选
+                a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+              .paging-button.management-thread-panel
+                a.button.radius-left(onclick="selectAll()") 全选
                 a.button(onclick="moveSelectedThreads()") 移动
                 a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
             include ../publicModules/paging/paging_input

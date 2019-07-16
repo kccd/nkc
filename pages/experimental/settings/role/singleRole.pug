@@ -74,8 +74,8 @@ block eContent
                     th 
                       a(:href='"/u/" + user.uid' target='_blank') {{user.username || '用户' + user.uid}}
                     th {{user.xsf}}  
-                    th {{(user.kcb/100)}}
-                    th {{user.threadCount}}  
+                    th {{user.kcb/100}}
+                    th {{user.threadCount}}
                     th {{user.postCount}}
                     th {{format('YYYY/MM/DD HH:mm:ss', user.toc)}}
             .text-right.p-b-3    

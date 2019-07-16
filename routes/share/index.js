@@ -93,7 +93,7 @@ shareRouter
 
   })
 .post('/', async (ctx, next) => {
-  const {query, data, body, db, nkcModules} = ctx;
+  const {data, body, db, nkcModules} = ctx;
   const {ShareModel} = db;
   const {str, type, targetId} = body;
   const {user} = data;

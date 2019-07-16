@@ -125,8 +125,9 @@ block content
                 include ../publicModules/mobile_drawer/right_drawer
                 if canManagement
                   .paging-button
-                    a.button.radius-left(onclick="managementThreads()") 管理
-                    a.button(onclick="selectAll()") 全选
+                    a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                  .paging-button.management-thread-panel
+                    a.button.radius-left(onclick="selectAll()") 全选
                     a.button(onclick="moveSelectedThreads()") 移动
                     a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
                 include ../publicModules/paging/forum_nav
@@ -141,8 +142,9 @@ block content
                 include ../publicModules/thread_panel/thread_panel
               if canManagement
                 .paging-button
-                  a.button.radius-left(onclick="managementThreads()") 管理
-                  a.button(onclick="selectAll()") 全选
+                  a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                .paging-button.management-thread-panel
+                  a.button.radius-left(onclick="selectAll()") 全选
                   a.button(onclick="moveSelectedThreads()") 移动
                   a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
               -showPagingSortButton = false;

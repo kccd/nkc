@@ -12,7 +12,6 @@ function shareShowWeChat() {
 }
 
 function shareToOther(shareType, type, title, pid, description){
-  console.log(description);
   var host = window.location.host;
   var lk = 'http://'+host+'/default/logo3.png';
   var newLink = window.open();

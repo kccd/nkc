@@ -8,6 +8,7 @@ const statusRouter = require("./status");
 const contributeRouter = require("./contribute");
 const disabledRouter = require("./disabled");
 const contactRouter = require("./contact");
+const pageRouter = require("./page");
 router
   .use("/", async (ctx, next) => {
     const {db, params, data, nkcModules} = ctx;
@@ -198,5 +199,6 @@ router
   .use("/status", statusRouter.routes(), statusRouter.allowedMethods())
   .use("/disabled", disabledRouter.routes(), disabledRouter.allowedMethods())
   .use("/contact", contactRouter.routes(), contactRouter.allowedMethods())
+  .use("/page", pageRouter.routes(), pageRouter.allowedMethods())
   .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods());
 module.exports = router;

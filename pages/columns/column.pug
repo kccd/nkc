@@ -6,9 +6,6 @@ block columnTitle
       padding-top: 0;
       background-color: #f6f6f6;
     }
-    .navbar.nkcshade{
-      background-color: rgba(246, 246, 246, 0.95);
-    }
   style=`body{background-color: ${data.column.color};}`
 block content
   -const canManagement = permission("column_single_disabled");
@@ -181,6 +178,9 @@ block content
                   a(href=`/m/${data.column._id}/settings` target="_blank").col-xs-4
                     .fa.fa-wrench
                     .name 专栏设置
+                  a(href=`/m/${data.column._id}/settings/page` target="_blank").col-xs-4
+                    .fa.fa-window-restore
+                    .name 自定义页
                 .column-fast-set-btn 快捷设置&nbsp;
                   .fa.fa-caret-down
                 .form.column-fast-set-body
@@ -274,7 +274,8 @@ block content
                   .column-links
                     for link in data.column.otherLinks
                       a(onclick=`openToNewLocation('${link.url}', '_blank')`)= link.name
-
+          span
+            include ../publicModules/share/column
 
   .hidden#data=objToStr({columnId: data.column._id, color: data.column.color})
 block scripts
