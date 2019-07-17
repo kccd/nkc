@@ -1,6 +1,9 @@
 .display-n{
   display: none;
 }
+a[onclick]{
+  cursor: pointer;
+}
 /* margin-top */
 .m-t-0{
   margin-top: 0;

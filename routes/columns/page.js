@@ -18,6 +18,7 @@ router
     });
     await page.save();
     data.page = page;
+    await db.ColumnPageModel.toSearch(page._id);
     await next();
   })
   .patch("/:pageId", async (ctx, next) => {
@@ -36,6 +37,7 @@ router
         c: content,
         tlm: Date.now()
       });
+      await db.ColumnPageModel.toSearch(page._id);
     } else if(type === "hide") {
       let {hidden} = body;
       hidden = !!hidden;
@@ -79,12 +81,14 @@ router
     const {data, db, params} = ctx;
     const {pageId} = params;
     const {column, user} = data;
+    data.column = await column.extendColumn();
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
     if(!page) ctx.throw(404, `未找到ID为${pageId}的自定义页面`);
     if(page.hidden && (!user || column.uid !== user.uid)) ctx.throw(403, "该页面已被专栏主关闭");
     data.page = page;
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
+    data.timeline = await db.ColumnModel.getTimeline(column._id);
     ctx.template = "columns/page.pug";
     await next();
   });

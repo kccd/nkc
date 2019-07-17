@@ -15,7 +15,7 @@ block settingsContent
           .col-xs-12.col-md-8
             .column-settings-page-content
               if page.t
-                a.column-settings-page-title(href=`/m/${data.column._id}/page/${page._id}` target="_blank")=page.t
+                a.column-settings-page-title(href=`/m/${data.column._id}/page/${page._id}`)=page.t
               .column-settings-page-abstract=page.c
               .m-t-05
                 if page.hidden
