@@ -2,4 +2,8 @@
 -let shareTitle = `${data.column.name}`;
 -let shareId = data.column._id;
 -let shareDescription = data.column.abbr;
+if data.page && data.pageContent
+  if data.page.t
+    -shareTitle = data.page.t
+  -shareDescription = data.pageContent;
 include ./share
