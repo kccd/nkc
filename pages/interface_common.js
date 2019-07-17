@@ -2128,9 +2128,11 @@ function reload() {
 
 
 function openToNewLocation(url, target) {
+  // 检测url是不是本站相对路径
+  var firstChar = url.substr(0, 1);
   var apptype = localStorage.getItem("apptype");
   if(apptype && apptype === "app") {
-    if(siteHostLink(url)) {
+    if(siteHostLink(url) || firstChar === "/") {
       window.location.href = addApptypeToUrl(url)
     } else {
       api.openWin({
