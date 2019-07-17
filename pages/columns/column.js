@@ -33,6 +33,12 @@ function saveSettings() {
 }
 
 function openNewWindow(url) {
+  var origin = window.location.origin;
+  var reg = new RegExp("^" + origin, "i");
+  if(reg.test(url)) {
+    openToNewLocation(url);
+  } else {
+    openToNewLocation(url, "_blank");
+  }
 
-  window.open(url);
 }

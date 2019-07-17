@@ -33,8 +33,6 @@ router
     if(sameName) ctx.throw(400, "专栏名与用户名冲突，请更换");
     if(!abbr) ctx.throw(400, "专栏名简介不能为空");
     if(contentLength(abbr) > 120) ctx.throw(400, "专栏简介不能超过120字符");
-    // if(!description) ctx.throw(400, "专栏介绍不能为空");
-    // if(contentLength(description) > 1000) ctx.throw(400, "专栏介绍不能超过1000字符");
     const column = db.ColumnModel({
       _id: await db.SettingModel.operateSystemID("columns", 1),
       uid: data.user.uid,
@@ -61,6 +59,7 @@ router
     await column.save();
     await category.save();
     data.column = column;
+    await db.ColumnModel.toSearch(column._id);
     await next();
   })
   .get("/apply", async (ctx, next) => {

@@ -13,6 +13,7 @@ router
   .use("/", async (ctx, next) => {
     const {db, params, data, nkcModules} = ctx;
     const {_id} = params;
+    const {user} = data;
     const column = await db.ColumnModel.findById(_id);
     if(!column) ctx.throw(404, `未找到ID为${_id}的专栏`);
     if(!ctx.permission("column_single_disabled")) {
@@ -24,6 +25,12 @@ router
       }
     }
     data.column = column;
+    if(user && user.uid === data.column.uid) {
+      data.contributeCount = await db.ColumnContributeModel.count({
+        columnId: column._id,
+        passed: null
+      });
+    }
     await next();
   })
   .get("/", async (ctx, next) => {
@@ -31,7 +38,7 @@ router
     let {page = 0, c} = query;
     c = Number(c);
     ctx.template = "columns/column.pug";
-    const {column, user} = data;
+    const {column} = data;
     data.column = await column.extendColumn();
     const q = {
       columnId: column._id
@@ -60,20 +67,8 @@ router
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts, fidOfCanGetThread);
-    if(user) {
-      const sub = await db.SubscribeModel.findOne({uid: user.uid, type: "column", columnId: column._id});
-      data.subscribedColumn = !!sub;
-      // 专栏主
-      if(column.uid === user.uid) {
-        data.contributeCount = await db.ColumnContributeModel.count({
-          columnId: column._id,
-          passed: null
-        });
-      }
-    }
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
-    data.columnPostcount = await db.ColumnPostModel.count({columnId: column._id});
     data.timeline = await db.ColumnModel.getTimeline(column._id);
     await next();
   })
@@ -109,13 +104,20 @@ router
         links = JSON.parse(links);
         const links_ = [];
         for(const link of links) {
-          const {name, url} = link;
+          const {name, url, links} = link;
           if(!name) ctx.throw(400, "自定义链接名不能为空");
           if(!url) ctx.throw(400, "自定义链接不能为空");
           if(contentLength(name) > 20) ctx.throw(400, "自定义链接名不能超过20字节");
+          for(const childLink of link.links) {
+            const {name, url} = childLink;
+            if(!name) ctx.throw(400, "自定义链接名不能为空");
+            if(!url) ctx.throw(400, "自定义链接不能为空");
+            if(contentLength(name) > 20) ctx.throw(400, "自定义链接名不能超过20字节");
+          }
           links_.push({
             name,
-            url
+            url,
+            links
           });
         }
         links = links_;
@@ -170,6 +172,7 @@ router
       if(banner) {
         await nkcModules.file.saveColumnBanner(column._id, banner);
       }
+      await db.ColumnModel.toSearch(column._id);
     } else if(type === "color") {
       const {color} = body;
       await column.update({

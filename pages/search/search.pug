@@ -18,7 +18,7 @@ block content
                 input(type="radio" value="or" v-model="relation")
               span.h5 与
                 input(type="radio" value="" v-model="relation")
-          .search-form.form-inline(v-if="t !== 'user'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
             .form-group(v-if="t !== 'user'")
               label 作者筛选：
               input.form-control(type='text' name='c' placeholder='请输入用户名' v-model="author" @keyup.enter="search")
@@ -28,14 +28,14 @@ block content
                 .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'" @click="removeForum(forum)") {{forum.displayName}}
                   .fa.fa-remove
                 button.btn.btn-default.btn-sm(@click="selectForum") 添加
-          .search-form.form-inline(v-if="t !== 'user'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
             .form-group
               label 精选：
               span.h5 全部文章
                 input(type="radio" :value="false" v-model="digest")
               span.h5 &nbsp;&nbsp;只看精选
                 input(type="radio" :value="true" v-model="digest")
-          .search-form.form-inline(v-if="t !== 'user'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
             .form-group
               label 时间范围：
               select(v-model="timeStart.year")
@@ -55,7 +55,7 @@ block content
                   option(value=i)=i
               select(v-model="timeEnd.day")
                 option(v-for="i in timeEndDay" :value="i") {{i}}
-          .search-form.form-inline(v-if="t !== 'user'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
             .form-group
               label 排序方式：
               span.h5 匹配程度
@@ -79,13 +79,15 @@ block content
         .col-xs-12.col-md-12.search-nav
           ul
             li
-              a(class=!data.t? "active" : "" href="javascript:app.clickNav('all')") 全部
+              a(class=!data.t? "active" : "" onclick="app.clickNav('all')") 全部
             li
-              a(class=data.t === "thread" ? "active" : "" href="javascript:app.clickNav('thread')") 文章
+              a(class=data.t === "thread" ? "active" : "" onclick="app.clickNav('thread')") 文章
             li
-              a(class=data.t==="post"?"active":"" href="javascript:app.clickNav('post')") 回复
+              a(class=data.t==="post"?"active":"" onclick="app.clickNav('post')") 回复
             li
-              a(class=data.t==="user"?"active":"" href="javascript:app.clickNav('user')") 用户
+              a(class=data.t === "column" ? "active" : "" onclick="app.clickNav('column')") 专栏
+            li
+              a(class=data.t==="user"?"active":"" onclick="app.clickNav('user')") 用户
         .col-xs-12.col-md-7.search-results
           if data.total > 0
             h5=`约找到 ${data.total} 条结果，耗时 ${data.time/1000} 秒`

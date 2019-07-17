@@ -4,8 +4,7 @@ block columnTitle
 block settingsContent
   .hidden#data=objToStr({column: data.column})
   .row#app(v-cloak)
-    .col-xs-12.col-md-12
-    .col-xs-12.col-md-8.col-md-offset-2.m-t-3.m-b-3
+    .col-xs-12.col-md-8.m-t-3.m-b-3
       .column-settings-banner(@click="selectBanner")
         img(:src="bannerUrl")
       .text-center
@@ -55,11 +54,19 @@ block settingsContent
             div(v-for="link,index in column.links")
               .form-inline.m-t-05
                 label 链接{{index+1}}：
-                input.form-control(type="text" v-model="link.name" placeholder="链接名(不超过20字节)")
+                input.form-control(style="max-width: 14rem;" type="text" v-model="link.name" placeholder="链接名(不超过20字节)")
                 input.form-control(type="text" v-model="link.url" placeholder="链接" @change="changed(column.links, index)")
                 button.btn.btn-sm.btn-default(@click="moveLink('up', index)") 上移
                 button.btn.btn-sm.btn-default(@click="moveLink('down', index)") 下移
+                button.btn.btn-sm.btn-default(@click="addChildLink(index)") 添加子链
                 button.btn.btn-sm.btn-danger(@click="removeLink(index)") 删除
+                .m-l-1.m-t-05.m-b-05(v-if="link.links && link.links.length > 0" v-for="childLink, childIndex of link.links")
+                  label 子链接{{childIndex+1}}：
+                  input.form-control(style="max-width: 14rem;" type="text" v-model="childLink.name" placeholder="链接名(不超过20字节)")
+                  input.form-control(type="text" v-model="childLink.url" placeholder="链接" @change="changed(column.links, index, childIndex)")
+                  button.btn.btn-sm.btn-default(@click="moveChildLink('up', index, childIndex)") 上移
+                  button.btn.btn-sm.btn-default(@click="moveChildLink('down', index, childIndex)") 下移
+                  button.btn.btn-sm.btn-danger(@click="removeChildLink(index, childIndex)") 删除
             .m-t-05
               button.btn.btn-sm.btn-default(@click="addLink") 添加导航链接
         .form-group.p-t-1
@@ -72,7 +79,7 @@ block settingsContent
             div(v-for="link,index in column.otherLinks")
               .form-inline.m-t-05
                 label 链接{{index+1}}：
-                input.form-control(type="text" v-model="link.name" placeholder="链接名(不超过20字节)")
+                input.form-control(style="max-width: 14rem;" type="text" v-model="link.name" placeholder="链接名(不超过20字节)")
                 input.form-control(type="text" v-model="link.url" placeholder="链接" @change="changed(column.otherLinks, index)")
                 button.btn.btn-sm.btn-default(@click="moveLink('up', index, 'otherLinks')") 上移
                 button.btn.btn-sm.btn-default(@click="moveLink('down', index, 'otherLinks')") 下移

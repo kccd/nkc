@@ -11,7 +11,7 @@
         a.clear-a-style.search-result-forum(href=`/f/${forum.fid}`)=forum.displayName
 
     .search-result-abstract!= result.abstract
-  else
+  else if result.docType === "user"
     .search-result-user-panel
       .box-shadow-panel
         div(style="max-width: 100%;width: 70rem;")
@@ -50,3 +50,37 @@
                 div=`注册时间：${targetUser.toc.toLocaleString()}`
                 div(title=targetUser.toc.toLocaleString())=`最后活动：${fromNow(targetUser.tlv)}`
               .search-result-description!=result.description
+  else if result.docType === "column"
+    .search-result-user-panel
+      .box-shadow-panel
+        div(style="max-width: 100%;width: 70rem;")
+          .search-result-avatar
+            a(href=`/m/${result.column._id}` target="_blank")
+              img(src=`/m/${result.column._id}/avatar`)
+          .search-result-user-info
+            .display-i-b.m-r-1
+              a.clear-a-style(href=`/m/${result.column._id}` target="_blank").search-result-username!=result.name
+              -let targetUser = result.user;
+              if data.user
+                .display-i-b
+                  if state.subColumnsId.includes(result.column._id)
+                    button.btn.btn-xs.btn-default(onclick=`subscribeColumn('${result.column._id}', false)`) 已关注
+                  else
+                    button.btn.btn-xs.btn-default(onclick=`subscribeColumn('${result.column._id}', true)`) 关注
+              .m-t-05 专栏主：
+                a(href=`/u/${result.column.uid}` target="_blank")=result.column.user.username
+              .m-t-05=`关注人数：${result.column.subCount}`
+            .display-i-b
+              .search-result-time
+                div=`开设时间：${result.column.toc.toLocaleString()}`
+              .search-result-description.m-t-05!=result.abbr
+
+  else if result.docType === "columnPage"
+    a(href=`/m/${result.page.columnId}/page/${result.page._id}` target="_blank").clear-a-style.search-result-title!= result.t
+    .search-result-info
+      a.clear-a-style.search-result-author(href=`/m/${result.page.columnId}`)
+        img(src=`/m/${result.page.columnId}/avatar`)
+        span=result.column.name
+      span 专栏
+      .search-result-time=fromNow(result.page.toc)
+    .search-result-abstract!= result.c

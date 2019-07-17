@@ -77,7 +77,7 @@ var app = new Vue({
         app.info = "提交中..." + a;
       })
         .then(function(data) {
-          window.location.href = "/m/" + data.column._id;
+          openToNewLocation("/m/" + data.column._id);
         })
         .catch(function(data) {
           app.info = "";

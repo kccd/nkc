@@ -12,7 +12,8 @@ router
 		const {pageSettings} = body;
     let {
       homeThreadList, searchPostList, searchAllList, userCardThreadList, threadPostList, forumThreadList,
-      userCardUserList, forumUserList, searchThreadList, searchUserList, threadPostCommentList
+      userCardUserList, forumUserList, searchThreadList, searchUserList, threadPostCommentList,
+      searchColumnList
     } = pageSettings;
     threadPostCommentList = parseInt(threadPostCommentList);
     homeThreadList = parseInt(homeThreadList);
@@ -25,6 +26,7 @@ router
     userCardThreadList = parseInt(userCardThreadList);
     forumThreadList = parseInt(forumThreadList);
     forumUserList = parseInt(forumUserList);
+    searchColumnList = parseInt(searchColumnList);
 		await db.SettingModel.updateOne({_id: "page"}, {
       c: {
         homeThreadList,
@@ -37,7 +39,8 @@ router
         searchUserList,
         forumThreadList,
         forumUserList,
-        threadPostList
+        threadPostList,
+        searchColumnList
       }
 		});
 		await next();
