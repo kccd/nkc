@@ -83,4 +83,5 @@
         span=result.column.name
       span 专栏
       .search-result-time=fromNow(result.page.toc)
+      a(href=`/m/${result.page.columnId}/page/${result.page._id}` target="_blank") 阅读原文
     .search-result-abstract!= result.c
