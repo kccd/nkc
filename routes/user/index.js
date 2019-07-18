@@ -29,7 +29,11 @@ userRouter
     	const user = await db.UserModel.findOne({uid});
     	if(user) targetUsers.push(user);
     }
-    data.targetUsers = targetUsers;
+    data.targetUsers = [];
+    for(const u of targetUsers) {
+      await db.UserModel.extendUserInfo(u);
+      data.targetUsers.push(u.toObject());
+    }
     await next();
   })
   .get("/:uid", async (ctx, next) => {

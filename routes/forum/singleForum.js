@@ -168,10 +168,13 @@ router
     // 加载相关专业
     await forum.extendRelatedForums(fidArr);
 		fidArr.push(fid);
+		// 拿到当前专业所有下属专业的ID
+    const childForumsId = await db.ForumModel.getAllChildrenFid(forum.fid);
+    childForumsId.push(forum.fid);
 		// 拿到今天所有该专业下的用户浏览记录
 		const behaviors = await db.UsersBehaviorModel.find({
 			timeStamp: {$gt: today()},
-			fid: {$in: fidArr},
+			fid: {$in: childForumsId},
 			operationId: {$in: ['visitForumLatest', 'visitThread', 'visitForumFollowers', 'visitForumVisitors']}
 		}).sort({timeStamp: -1});
 		const usersId = [];

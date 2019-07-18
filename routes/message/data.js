@@ -29,6 +29,7 @@ router
       });
       data.messages = messages.reverse();
       data.targetUser = targetUser;
+      await db.UserModel.extendUserInfo(targetUser);
       data.targetUserGrade = await targetUser.extendGrade();
       await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
       // 判断是否已创建聊天
@@ -73,6 +74,7 @@ router
       const applications = [];
       for(const f of friendsApplications) {
         const targetUser = await db.UserModel.findOne({uid: f.applicantId});
+        await db.UserModel.extendUserInfo(targetUser);
         if(!targetUser) return;
         applications.push({
           _id: f._id,

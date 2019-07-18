@@ -188,12 +188,16 @@ block content
             .friend-count-value {{friend.targetUser.kcb/100}}
       .ms-friend-button
         .col-xs-12.col-md-10.col-md-offset-1
-          .col-xs-6.col-md-6
+          .col-xs-12(v-if="!friend.targetUser.column")
             .row
               a(:href="'/u/' + friend.targetUser.uid" target="_blank").btn.btn-block.btn-default.block-btn 动态
-          .col-xs-6.col-md-6
-            .row
-              a(:href="'/m/' + friend.targetUser.uid" target="_blank").btn.btn-block.btn-default.block-btn 专栏
+          div(v-else)
+            .col-xs-6.col-md-6
+              .row
+                a(:href="'/u/' + friend.targetUser.uid" target="_blank").btn.btn-block.btn-default.block-btn 动态
+            .col-xs-6.col-md-6
+              .row
+                a(:href="'/m/' + friend.targetUser.column._id" target="_blank").btn.btn-block.btn-default.block-btn 专栏
       .ms-friend-information(v-if='friend.info')
         .col-xs-12.col-md-10.col-md-offset-1
           button.btn.btn-block.btn-success(@click="selectUser({type: 'UTU', user: friend.targetUser, friend: friend.info?friend:''})") 发送信息

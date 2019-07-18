@@ -30,6 +30,7 @@ router
     }
     data.users = await Promise.all(users.map(async u => {
       await u.extendGrade();
+      await db.UserModel.extendUserInfo(u);
       u = u.toObject();
       return u;
     }));

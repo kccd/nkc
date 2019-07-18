@@ -9,7 +9,7 @@ module.exports = {
 			GET: 'APPgetLoginUserSubscribe'
 		}
 	},
-	u: {
+	/*u: {
 		PARAMETER: {
 			GET: 'APPgetUserInfo',
 			posts: {
@@ -22,31 +22,31 @@ module.exports = {
 				GET: 'APPgetUserSubscribe'
 			}
 		}
-	},
-	thread: {
+	},*/
+	/*thread: {
 		GET: 'APPgetThreadInfo',
 		PARAMETER: {
 			GET: 'APPvisitThread'
 		}
-	},
+	},*/
 	check: {
 		GET: 'APPcheckout',
 	},
-	forum: {
+	/*forum: {
 		// GET: 'APPgetThreadInfo',
 		PARAMETER: {
 			GET: 'APPvisitForum'
 		}
-	},
-	search: {
+	},*/
+	/*search: {
 		GET: 'APPsearch'
-	},
+	},*/
 	scoreChange: {
 		PARAMETER: {
 			GET: 'APPgetScoreChange'
 		}
 	},
-	latest: {
+	/*latest: {
 		GET: 'APPgetLatestThreads'
-	}
+	}*/
 };

@@ -3,7 +3,6 @@
   @param data.timeline 内容统计
 
 -var canManagement = permission("column_single_disabled");
-
 .m-b-2
   .column-user
     .column-user-avatar
@@ -19,6 +18,8 @@
           a.pointer(href=`javascript:subscribeUser("${data.column.uid}", true)` target="_blank") 关注
     if data.column.user.description
       .column-user-description=data.column.user.description
+.m-b-2
+  include ../../publicModules/share/column
 if data.column.notice && (!data.column.noticeDisabled || canManagement)
   div.m-b-2
     .column-threads
@@ -89,5 +90,3 @@ if data.column.otherLinks && data.column.otherLinks.length > 0
         .column-links
           for link in data.column.otherLinks
             a(onclick=`openNewWindow('${link.url}')`)= link.name
-span
-  include ../../publicModules/share/column

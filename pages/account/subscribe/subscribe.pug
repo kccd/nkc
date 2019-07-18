@@ -1,0 +1,59 @@
+extends ../../bootstrap_base
+block title
+  title 我的关注
+  style.
+    body{
+      display: none;
+      background-color: #f9f9f9;
+    }
+  +includeCSS("/account/subscribe/subscribe.css")
+block content
+  .container-fluid.max-width#subscribe(v-cloak)
+    .row
+      .col-xs-12.col-md-2.box-shadow-panel
+        .p-a-0
+          .subscribe-lists
+            .subscribe-list
+              .fa.fa-navicon
+              | 全部
+            .subscribe-list
+              .fa.fa-columns
+              | 专栏
+            .subscribe-list
+              .fa.fa-tags
+              | 话题
+            .subscribe-list
+              .fa.fa-flask
+              | 学科
+            .subscribe-list
+              .fa.fa-newspaper-o
+              | 文章
+            .subscribe-list
+              .fa.fa-users
+              | 用户
+            .subscribe-list-hr
+            .subscribe-list
+              .fa.fa-globe
+              | 科技达人
+            .subscribe-list
+              .fa.fa-globe
+              | 同学
+            .subscribe-list
+              .fa.fa-globe
+              | 前端干货
+        span
+          .m-t-1.text-center
+            button.btn.btn-xs.btn-default 添加分类
+      .col-xs-12.col-md-9.box-shadow-panel
+        div
+          .row
+            .col-xs-12
+
+            .col-xs-12.col-md-6 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus architecto beatae, debitis, delectus, dicta error excepturi impedit ipsa ipsum minus mollitia nostrum numquam pariatur quam quasi quia veniam voluptate voluptatibus!
+            .col-xs-12.col-md-6 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus architecto beatae, debitis, delectus, dicta error excepturi impedit ipsa ipsum minus mollitia nostrum numquam pariatur quam quasi quia veniam voluptate voluptatibus!
+
+
+
+
+block scripts
+  +includeJS("/account/subscribe/subscribe.js")

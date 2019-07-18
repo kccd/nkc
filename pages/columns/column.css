@@ -570,6 +570,9 @@ img.apply-column-banner{
 .column-fast-set-body{
   display: none;
 }
+.column-share-body{
+  display: none;
+}
 .column-fast-set-btn{
   cursor: pointer;
   height: 2rem;

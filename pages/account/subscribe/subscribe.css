@@ -1,0 +1,22 @@
+.subscribe-lists{
+  padding: 0.5rem;
+}
+.subscribe-list-hr{
+  height: 1px;
+  background-color: #eee;
+  margin: 0.5rem 0;
+}
+.subscribe-list{
+  height: 3rem;
+  padding: 0 0.5rem;
+  line-height: 3rem;
+  cursor: pointer;
+  color: #333;
+}
+.subscribe-list .fa{
+  color: #555;
+  margin-right: 0.5rem;
+}
+.subscribe-list:hover, .subscribe-list.active{
+  background-color: #f4f4f4;
+}
