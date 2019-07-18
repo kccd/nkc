@@ -63,8 +63,15 @@ if data.user && data.user.uid === data.column.uid
         a(href=`/m/${data.column._id}/settings/page`).col-xs-4
           .fa.fa-window-restore
           .name 自定义页
-      .column-fast-set-btn 快捷设置&nbsp;
-        .fa.fa-caret-down
+      .row.m-t-1.text-center.column-fast-set-btn
+        .col-xs-6(onclick="showSetDom()")
+          span 快捷设置&nbsp;
+          .fa.fa-caret-down
+        .col-xs-6(onclick="showShareDom()")
+          span 专栏推广&nbsp;
+          .fa.fa-caret-down
+      .column-share-body.m-t-1.m-b-1
+        include ../../publicModules/share/columnPromotion
       .form.column-fast-set-body
         .form-group
           label 专栏背景

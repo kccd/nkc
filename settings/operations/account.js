@@ -13,5 +13,8 @@ module.exports = {
   },
   contribute: {
     GET: "visitUserContribute"
+  },
+  subscribe: {
+    GET: "account_subscribe"
   }
 };

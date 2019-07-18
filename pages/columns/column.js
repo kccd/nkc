@@ -8,16 +8,15 @@ $(function() {
     });
     bodyBackgroundColor = color;
   });
-  $(".column-fast-set-btn").click(function() {
-    toggleFastSettings();
-  });
   CommonModal = new NKC.modules.CommonModal();
 });
 
-function toggleFastSettings() {
+function showSetDom() {
   $(".column-fast-set-body").toggle();
 }
-
+function showShareDom(){
+  $(".column-share-body").toggle();
+}
 function saveSettings() {
   nkcAPI("/m/" + data.columnId, "PATCH", {
     type: "color",

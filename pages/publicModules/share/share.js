@@ -12,8 +12,13 @@ function shareShowWeChat() {
 }
 
 function shareToOther(shareType, type, title, pid, description){
-  var host = window.location.host;
-  var lk = 'http://'+host+'/default/logo3.png';
+  var origin = window.location.origin;
+  var lk = origin +'/default/logo3.png';
+  if(shareType === "column") {
+    lk = origin + "/m/" + pid + "/avatar"
+  } else if(shareType === "user") {
+    lk = origin + "/avatar/" + pid
+  }
   var newLink = window.open();
   var str = window.location.origin + window.location.pathname;
   if(str){
@@ -24,7 +29,7 @@ function shareToOther(shareType, type, title, pid, description){
     };
     nkcAPI('/s', "POST", para)
       .then(function(data) {
-        var newUrl = 'https://' + host + data.newUrl;
+        var newUrl = origin + data.newUrl;
         if(type === "qq") {
           newLink.location='http://connect.qq.com/widget/shareqq/index.html?url='+newUrl+'&title='+title+'&pics='+lk+'&summary='+description;
         }

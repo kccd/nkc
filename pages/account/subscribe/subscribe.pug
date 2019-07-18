@@ -1,0 +1,17 @@
+extends ../../bootstrap_base
+block title
+  title 我的关注
+  style.
+    body{
+      display: none;
+    }
+block content
+  .container-fluid.max-width#subscribe(v-cloak)
+    .row
+      .col-xs-12.col-md-3
+
+      .col-xs-12.col-md-8.col-md-offset-1
+        p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab consequuntur dolor explicabo hic illum laboriosam laudantium nihil nobis, perferendis placeat, provident quam repellendus, sapiente tenetur veniam voluptas voluptatum. Molestiae, sequi?
+
+block scripts
+  +includeJS("/account/subscribe/subscribe.js")
