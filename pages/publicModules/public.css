@@ -114,6 +114,9 @@ a[onclick]{
 .p-a-1{
   padding: 1rem;
 }
+.p-a-0{
+  padding: 0!important;
+}
 .p-t-0{
   padding-top: 0;
 }

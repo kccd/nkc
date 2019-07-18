@@ -8,7 +8,7 @@ module.exports = (dirname) => {
   filenames = filenames.filter(name => !defaultFileName.includes(name));
   for(const filename of filenames) {
     const filePath = dirname + "/" + filename;
-    if(filename === "home.js") {
+    if(filename === "_index.js") {
       const {get, del, post, patch} = require(filePath);
       if(get) router.get("/", get);
       if(del) router.del("/", del);

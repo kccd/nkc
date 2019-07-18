@@ -84,5 +84,6 @@
       span 专栏
       .search-result-time=fromNow(result.page.toc)
       if !result.page.t
-        a(href=`/m/${result.page.columnId}/page/${result.page._id}` target="_blank") 阅读原文
+        a(href=`/m/${result.page.columnId}/page/${result.page._id}` target="_blank")
+          b 阅读原文
     .search-result-abstract!= result.c
