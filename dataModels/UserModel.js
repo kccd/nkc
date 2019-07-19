@@ -1028,7 +1028,9 @@ userSchema.methods.ensureSubLimit = async function(type) {
   const SubscribeModel = mongoose.model("subscribes");
   const SettingModel = mongoose.model("settings");
   const subSettings = await SettingModel.findById("subscribe");
-  const {subUserCountLimit, subForumCountLimit, subThreadCountLimit} = subSettings.c;
+  const {subUserCountLimit, subForumCountLimit, subThreadCountLimit,
+    subColumnCountLimit
+  } = subSettings.c;
   if(type === "user") {
     if(subUserCountLimit <= 0) throwErr(400, "关注用户功能已关闭");
     const userCount = await SubscribeModel.count({
@@ -1044,12 +1046,19 @@ userSchema.methods.ensureSubLimit = async function(type) {
     });
     if(forumCount >= subForumCountLimit) throwErr(400, "关注专业数量已达上限");
   } else if(type === "thread") {
-    if(subThreadCountLimit <= 0) throwErr(400, "关注文章功能已关闭");
+    if (subThreadCountLimit <= 0) throwErr(400, "关注文章功能已关闭");
     const threadCount = await SubscribeModel.count({
       uid: this.uid,
       type: "thread"
     });
-    if(threadCount >= subThreadCountLimit) throwErr(400, "关注文章数量已达上限");
+    if (threadCount >= subThreadCountLimit) throwErr(400, "关注文章数量已达上限");
+  } else if(type === "column") {
+    if(subColumnCountLimit <= 0) throwErr(400, "关注专栏功能已关闭");
+    const columnCount = await SubscribeModel.count({
+      uid: this.uid,
+      type: "column"
+    });
+    if(columnCount >= subColumnCountLimit) throwErr(400, "关注专栏数量已达上限");
   } else {
     throwErr(500, `未知的type类型：${type}`);
   }

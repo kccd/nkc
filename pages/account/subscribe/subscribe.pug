@@ -10,50 +10,141 @@ block title
 block content
   .container-fluid.max-width#subscribe(v-cloak)
     .row
-      .col-xs-12.col-md-2.box-shadow-panel
+      .col-xs-12.col-md-3.box-shadow-panel
         .p-a-0
           .subscribe-lists
-            .subscribe-list
+            .subscribe-list(@click="selectType('')" :class="{'active':type===''}")
               .fa.fa-navicon
               | 全部
-            .subscribe-list
+              .pull-right(v-if="counts.total") {{counts.total}}
+            .subscribe-list(@click="selectType('column')" :class="{'active':type==='column'}")
               .fa.fa-columns
               | 专栏
-            .subscribe-list
+              .pull-right(v-if="counts.column") {{counts.column}}
+            .subscribe-list(@click="selectType('topic')" :class="{'active':type==='topic'}")
               .fa.fa-tags
               | 话题
-            .subscribe-list
+              .pull-right(v-if="counts.topic") {{counts.topic}}
+            .subscribe-list(@click="selectType('discipline')" :class="{'active':type==='discipline'}")
               .fa.fa-flask
               | 学科
-            .subscribe-list
+              .pull-right(v-if="counts.discipline") {{counts.discipline}}
+            .subscribe-list(@click="selectType('thread')" :class="{'active':type==='thread'}")
               .fa.fa-newspaper-o
               | 文章
-            .subscribe-list
+              .pull-right(v-if="counts.thread") {{counts.thread}}
+            .subscribe-list(@click="selectType('user')" :class="{'active':type==='user'}")
               .fa.fa-users
               | 用户
-            .subscribe-list-hr
-            .subscribe-list
-              .fa.fa-globe
-              | 科技达人
-            .subscribe-list
-              .fa.fa-globe
-              | 同学
-            .subscribe-list
-              .fa.fa-globe
-              | 前端干货
+              .pull-right(v-if="counts.user") {{counts.user}}
+            .subscribe-list-hr(v-if="types && types.length > 0")
+            .subscribe-list(v-for="t in types" :class="{'active':type===t._id}")
+              .subscribe-type-options
+                .fa.fa-pencil(@click="modifyType(t)")
+                .fa.fa-arrow-circle-o-up(@click="moveType(t, 'up')")
+                .fa.fa-arrow-circle-o-down(@click="moveType(t, 'down')")
+                .fa.fa-trash(@click="removeType(t)")
+              div(@click="selectType(t._id)")
+                span(v-if="t.pid") &nbsp;&nbsp;&nbsp;
+                .fa.fa-globe
+                | {{t.name}}
+                .pull-right
+                  span(v-if="t.count") {{t.count}}
         span
           .m-t-1.text-center
-            button.btn.btn-xs.btn-default 添加分类
-      .col-xs-12.col-md-9.box-shadow-panel
+            button.btn.btn-xs.btn-default(@click="addType") 新建分类
+      .col-xs-12.col-md-8.box-shadow-panel
+        mixin paging
+          .paging-button
+            span(v-for="b, index in paging.buttonValue")
+              span(v-if="b.type === 'active'")
+                a.button.active(@click="getData(b.num)"
+                  :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+                ) {{b.num+1}}
+              span(v-else-if="b.type === 'common'")
+                a.button(@click="getData(b.num)"
+                  :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+                ) {{b.num+1}}
+              span(v-else) ...
         div
           .row
-            .col-xs-12
+            .col-xs-12.m-b-05(v-if="paging.buttonValue && paging.buttonValue.length")
+              +paging
+            div(v-if="!loaded")
+              .m-t-5.m-b-5.p-t-5.p-b-5.text-center
+                h4
+                  b 加载中...
+            div(v-else-if="!subscribes.length")
+              .m-t-5.m-b-5.p-t-5.p-b-5.text-center
+                h4
+                  b 空空如也~
+            div(v-else)
+              .col-xs-12.col-md-6(v-for="sub in subscribes")
+                .m-b-1
+                  .small-panel-forum(v-if="sub.type === 'forum'")
+                    .small-forum-icon
+                      div(v-if="!sub.forum.iconFileName" :style="'background-color: ' + sub.forum.color")
+                      img(v-else :src="'/forum_avatar/' + sub.fid")
+                    .small-forum-content
+                      .small-forum-name
+                        a(:href="'/f/' + sub.fid") {{sub.forum.displayName}}
+                        .fa.fa-tag(v-if="sub.forum.forumType === 'topic'")
+                        .fa.fa-flask(v-else)
+                        if data.user
+                          .pull-right
+                            button(v-if="subForumsId.indexOf(sub.fid) === -1" @click="subscribeTarget('forum', sub.fid)") 关注
+                            button.active(v-else="subForumsId.indexOf(sub.fid) === -1" @click="subscribeTarget('forum', sub.fid)") 取关
+                      .small-forum-abbr {{sub.forum.description}}
+                      .small-forum-info
+                        button(@click="moveSub(sub)") 更改分类
 
-            .col-xs-12.col-md-6 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus architecto beatae, debitis, delectus, dicta error excepturi impedit ipsa ipsum minus mollitia nostrum numquam pariatur quam quasi quia veniam voluptate voluptatibus!
-            .col-xs-12.col-md-6 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus architecto beatae, debitis, delectus, dicta error excepturi impedit ipsa ipsum minus mollitia nostrum numquam pariatur quam quasi quia veniam voluptate voluptatibus!
+                  .small-panel-forum(v-else-if="sub.type === 'column'")
+                    .small-forum-icon
+                      img(:src="'/m/' + sub.columnId + '/avatar'")
+                    .small-forum-content
+                      .small-forum-name
+                        a(:href="'/m/' + sub.columnId") {{sub.column.name}}
+                        .fa.fa-columns
+                        if data.user
+                          .pull-right
+                            button(v-if="subColumnsId.indexOf(sub.columnId) === -1" @click="subscribeTarget('column', sub.columnId)") 关注
+                            button.active(v-else="subColumnsId.indexOf(sub.columnId) === -1" @click="subscribeTarget('column', sub.columnId)") 取关
+                      .small-forum-abbr {{sub.column.abbr}}
+                      .small-forum-info
+                        button(@click="moveSub(sub)") 更改分类
+                  .small-panel-forum(v-else-if="sub.type === 'user'")
+                    .small-forum-icon
+                      img(:src="'/avatar/' + sub.tUid")
+                    .small-forum-content
+                      .small-forum-name
+                        a(:href="'/u/' + sub.tUid") {{sub.targetUser.username}}
+                        .fa.fa-user-o
+                        if data.user
+                          .pull-right
+                            button(v-if="subUsersId.indexOf(sub.tUid) === -1" @click="subscribeTarget('user', sub.tUid)") 关注
+                            button.active(v-else="subUsersId.indexOf(sub.tUid) === -1" @click="subscribeTarget('user', sub.tUid)") 取关
+                      .small-forum-abbr {{sub.targetUser.description || "暂未填写个人简介"}}
+                      .small-forum-info
+                        button(@click="moveSub(sub)") 更改分类
+                  .small-panel-forum(v-else-if="sub.type === 'thread'")
+                    .small-forum-content
+                      .small-forum-name
+                        a(:href="'/t/' + sub.tid") {{sub.thread.firstPost.t}}
+                        .fa.fa-newspaper-o
+                        if data.user
+                          .pull-right
+                            button(v-if="subThreadsId.indexOf(sub.tid) === -1" @click="subscribeTarget('thread', sub.tid)") 关注
+                            button.active(v-else="subThreadsId.indexOf(sub.tid) === -1" @click="subscribeTarget('thread', sub.tid)") 取关
+                      .small-forum-abbr {{sub.thread.firstPost.c || "暂未填写个人简介"}}
+                      .small-forum-info
+                        button(@click="moveSub(sub)") 更改分类
+            .col-xs-12(v-if="paging.buttonValue && paging.buttonValue.length")
+              +paging
+
 
 
 
 
 block scripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
   +includeJS("/account/subscribe/subscribe.js")

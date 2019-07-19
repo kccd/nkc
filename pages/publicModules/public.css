@@ -51,7 +51,7 @@ a[onclick]{
 }
 /* margin-bottom */
 .m-b-0{
-  margin-bottom: 0;
+  margin-bottom: 0!important;
 }
 .m-b-1{
   margin-bottom: 1rem;
@@ -1746,4 +1746,72 @@ span.thread-title-page{
   .box-shadow-panel>*{
     border-radius: 0;
   }
+}
+.small-panel-forum{
+  height: 10rem;
+}
+.small-forum-icon{
+  padding-right: 1rem;
+  display: table-cell;
+  vertical-align: top;
+}
+.small-forum-icon>div, .small-forum-icon>img{
+  width: 10rem;
+  height: 10rem;
+  border-radius: 3px;
+}
+.small-forum-content{
+  display: table-cell;
+  width: 10000px;
+  vertical-align: top;
+}
+.small-forum-name{
+  height: 2.2rem;
+  padding-right: 4rem;
+  margin-bottom: 0.8rem;
+  overflow: hidden;
+  font-size: 1.6rem;
+  font-weight: 700;
+  position: relative;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.small-forum-name a{
+  color: #282c37;
+}
+.small-forum-name a:hover, .small-forum-name a:focus{
+  color: #282c37;
+  text-decoration: none;
+}
+.small-forum-abbr{
+  max-height: 3.2rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.small-forum-name button{
+  position: absolute;
+  top: 2px;
+  right: 0;
+  height: 2rem;
+  padding: 0 0.5rem;
+  line-height: 2rem;
+  font-size: 1rem;
+  border-radius: 2px;
+  border: none;
+  background-color: #4fa2dd;
+  color: #fff;
+}
+.small-forum-name .fa{
+  color: #282c37;
+  font-size: 1.2rem;
+  margin-right: 0.3rem;
+}
+.small-forum-name button.active{
+  background-color: #a9c0d5;
+}
+.small-forum-name button:focus{
+  outline: none;
 }

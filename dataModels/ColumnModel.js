@@ -220,14 +220,6 @@ schema.statics.getUserSubColumns = async (uid) => {
   return columns;
 };
 /*
-* 获取用户关注的专栏ID
-* @param {String} uid 用户ID
-* */
-schema.statics.getUserSubColumnsId = async (uid) => {
-  const columns = await mongoose.model("columns").getUserSubColumns(uid);
-  return columns.map(c => c._id);
-};
-/*
 * 更新专栏在搜索数据库中的数据
 * */
 schema.statics.toSearch = async (columnId) => {
