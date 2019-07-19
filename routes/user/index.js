@@ -242,6 +242,7 @@ userRouter
         }
         const result = {
           postType: thread.oc === post.pid?'postToForum': 'postToThread',
+          parentPostId: post.parentPostId,
           tid: thread.tid,
           hasCover: thread.hasCover,
           time: post.toc,
