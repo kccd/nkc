@@ -570,6 +570,9 @@ img.apply-column-banner{
 .column-fast-set-body{
   display: none;
 }
+.column-share-body{
+  display: none;
+}
 .column-fast-set-btn{
   cursor: pointer;
   height: 2rem;
@@ -787,7 +790,7 @@ img.apply-column-banner{
   margin-bottom: 0.5rem;
 }
 .column-page-title{
-  font-size: 3rem;
+  font-size: 2.5rem;
   padding: 1rem;
   text-align: center;
   font-weight: 700;

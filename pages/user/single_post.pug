@@ -16,7 +16,11 @@
     else
       .post-type 在文章
       a(href=`/t/${post.tid}`).post-title=post.title
-      .post-type 下发表回复
+      .post-type 下发表
+        if post.parentPostId
+          | 评论
+        else
+          | 回复
   if post.postType === "postToThread" || !post.hasCover
     a(href=post.link).single-post-content=post.abstract || post.content
   else

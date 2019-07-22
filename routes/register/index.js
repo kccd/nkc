@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const registerRouter = new Router();
-const captcha = require('trek-captcha');
+const captcha = require("../../nkcModules/captcha");
 registerRouter
   .get(['/','/mobile'], async (ctx, next) => {
   	const {data, query} = ctx;
@@ -178,9 +178,9 @@ registerRouter
 		const {data, db} = ctx;
 		const {user} = data;
 		if(user) ctx.throw(400, '您已注册，无法获取图片验证码。');
-		const {token, buffer} = await captcha();
+		const codeData = captcha.createRegisterCode();
 		const imgCode = db.ImgCodeModel({
-			token
+			token: codeData.text
 		});
 		await imgCode.save();
 		ctx.cookies.set('imgCodeId', imgCode._id, {
@@ -189,10 +189,7 @@ registerRouter
 			httpOnly: true
 		});
 		ctx.logIt = true;
-		ctx.status = ctx.response.status;
-		const passed = Date.now() - ctx.reqTime;
-		ctx.set('X-Response-Time', passed);
-		ctx.processTime = passed.toString();
-		return ctx.body = buffer;
+    data.svgData = codeData.data;
+		await next();
 	});
 module.exports = registerRouter;

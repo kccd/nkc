@@ -61,16 +61,15 @@ block content
                   .input-warning(v-if="warning.mobile") {{warning.mobile}}
                   input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='手机号' v-model.number="mobile")
                 .form-group
-                  div(style='width: 50%;display: inline-block;position: relative;')
+                  div(style='vertical-align: top;width: 50%;display: inline-block;position: relative;')
                     .input-warning(v-if="warning.imgCode") {{warning.imgCode}}
                     input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='图形验证码' v-model.trim="imgCode")
-                  .send-code.text-right(@click='changeImgCode')
-                    img(src='/register/code' style='height: 3.5rem;display: inline;' ref='imgCode')
+                  .send-code.text-right(@click='changeImgCode' v-html="svgData" style="vertical-align: top;width: 48%;")
                 .form-group
-                  div(style='width: 50%;display: inline-block;position: relative;')
+                  div(style='vertical-align: top;width: 50%;display: inline-block;position: relative;')
                     .input-warning(v-if="warning.code") {{warning.code}}
                     input.minimalist-input.form-control(@click='clearWarning' @keyup.enter='submit' type='text' placeholder='短信验证码' v-model.trim="code")
-                  .send-code(@click='sendCode') 发送验证码
+                  .send-code(@click='sendCode' style="height:4rem;line-height:4rem;") 发送验证码
                     span(v-if="timeNumber > 0") &nbsp;({{timeNumber}})
               .form-group
                 div(style='margin: 0.5rem 0;color: #d9534f;') {{warning.error}}

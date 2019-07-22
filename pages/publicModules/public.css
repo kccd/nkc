@@ -1,6 +1,9 @@
 .display-n{
   display: none;
 }
+a[onclick]{
+  cursor: pointer;
+}
 /* margin-top */
 .m-t-0{
   margin-top: 0;
@@ -48,7 +51,7 @@
 }
 /* margin-bottom */
 .m-b-0{
-  margin-bottom: 0;
+  margin-bottom: 0!important;
 }
 .m-b-1{
   margin-bottom: 1rem;
@@ -110,6 +113,9 @@
 /* padding-top */
 .p-a-1{
   padding: 1rem;
+}
+.p-a-0{
+  padding: 0!important;
 }
 .p-t-0{
   padding-top: 0;
@@ -1740,4 +1746,85 @@ span.thread-title-page{
   .box-shadow-panel>*{
     border-radius: 0;
   }
+}
+.small-panel-forum{
+  height: 10rem;
+}
+.small-forum-icon{
+  padding-right: 1rem;
+  display: table-cell;
+  vertical-align: top;
+}
+.small-forum-checkbox{
+  display: table-cell;
+  padding-right: 1rem;
+  vertical-align: top;
+}
+.small-forum-icon>div{
+  width: 10rem;
+  background-size: cover;
+  height: 10rem;
+  border-radius: 3px;
+}
+.small-forum-content{
+  display: table-cell;
+  width: 10000px;
+  vertical-align: top;
+}
+.small-forum-name{
+  height: 2.2rem;
+  margin-bottom: 0.8rem;
+  overflow: hidden;
+  padding-right: 2.2rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  position: relative;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.small-forum-name a{
+  color: #282c37;
+}
+.small-forum-name a:hover, .small-forum-name a:focus{
+  color: #282c37;
+  text-decoration: none;
+}
+.small-forum-abbr{
+  height: 3.2rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.small-forum-info button{
+  height: 2rem;
+  padding: 0 0.5rem;
+  line-height: 2rem;
+  font-size: 1rem;
+  border-radius: 2px;
+  border: none;
+  background-color: #4fa2dd;
+  color: #fff;
+}
+.small-forum-info button.active{
+  background-color: #e85a71;
+}
+.small-forum-name span{
+  position: absolute;
+  color: #e85a71;
+  top: 4px;
+  right: 0;
+  font-size: 1.2rem;
+  margin-left: 0.3rem;
+}
+.small-forum-name button.active{
+  background-color: #a9c0d5;
+}
+.small-forum-name button:focus{
+  outline: none;
+}
+.small-forum-info{
+  height: 3.8rem;
+  padding-top: 0.8rem;
 }

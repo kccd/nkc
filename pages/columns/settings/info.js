@@ -1,6 +1,12 @@
 var selectImage;
 var data = getDataById("data");
 var reg = /^(http|https):\/\//i;
+for(var i = 0; i < data.column.links.length; i++) {
+  var link = data.column.links[i];
+  if(!link.links) {
+    link.links = [];
+  }
+}
 var app = new Vue({
   el: "#app",
   data: {
@@ -34,14 +40,21 @@ var app = new Vue({
       str = str.replace(/!\[.*?]\(.*?\)/ig, "");
       return str.replace(/\[.*?]\(.*?\)/ig, "");
     },
-    changed: function(arr, index) {
+    changed: function(arr, index, childIndex) {
       if(index === undefined) {
         return this.column.notice = this.replaceImageUrl(arr);
       }
       var item = arr[index];
       if(item.url) {
-        if(!reg.test(item.url)) {
-          item.url = "http://" + item.url;
+        if(childIndex !== undefined) {
+          var childItem = item.links[childIndex];
+          if(!reg.test(childItem.url)) {
+            childItem.url = "http://" + childItem.url;
+          }
+        } else {
+          if(!reg.test(item.url)) {
+            item.url = "http://" + item.url;
+          }
         }
       } else {
         item.content = this.replaceImageUrl(item.content);
@@ -133,9 +146,18 @@ var app = new Vue({
       } else {
         this.column.links.push({
           name: "",
-          url: ""
+          url: "",
+          links: []
         });
       }
+    },
+    addChildLink: function(index) {
+      var link = this.column.links[index];
+      if(!link.links) link.links = [];
+      link.links.push({
+        name: "",
+        url: ""
+      });
     },
     moveLink: function(type, index, otherLinks) {
       var links = [];
@@ -156,12 +178,34 @@ var app = new Vue({
         Vue.set(links, index, nextLink);
       }
     },
-    removeLink: function(index, otherLinks) {
-      if(otherLinks) {
-        this.column.otherLinks.splice(index, 1);
-      } else {
-        this.column.links.splice(index, 1);
+    moveChildLink: function(type, parentIndex, index) {
+      var links = app.column.links[parentIndex].links;
+      if(type === "up") {
+        if(index === 0) return;
+        var lastLink = links[index-1];
+        Vue.set(links, index-1, links[index]);
+        Vue.set(links, index, lastLink);
+      } else if(type === "down") {
+        if((index + 1) === links.length) return;
+        var nextLink = links[index+1];
+        Vue.set(links, index+1, links[index]);
+        Vue.set(links, index, nextLink);
       }
+    },
+    removeChildLink: function(parentIndex, index) {
+      this.column.links[parentIndex].links.splice(index, 1);
+    },
+    removeLink: function(index, otherLinks) {
+      var links;
+      if(otherLinks) {
+        links = this.column.otherLinks;
+      } else {
+        links = this.column.links;
+      }
+      if(links[index].links && links[index].links.length > 0){
+        return sweetError("该链接下存在子链接，无法删除");
+      }
+      links.splice(index, 1);
     },
     addBlock: function() {
       if(this.column.blocks.length >= 5) return;

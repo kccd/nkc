@@ -6,8 +6,9 @@ router
     const {type} = body;
     const {column, user} = data;
     if(type === "subscribe") {
+      await user.ensureSubLimit("column");
       let sub = await db.SubscribeModel.findOne({uid: user.uid, type: "column", columnId: column._id});
-      if(sub) ctx.throw(400, "您已经订阅过该专栏了，请刷新");
+      if(sub) ctx.throw(400, "您已经关注过该专栏了，请刷新");
       await db.SubscribeModel({
         _id: await db.SettingModel.operateSystemID("subscribes", 1),
         uid: user.uid,

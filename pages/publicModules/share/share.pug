@@ -1,4 +1,5 @@
 if !state.apptype
+  -shareDescription = (shareDescription || "").replace(/\n/ig, " ");
   +includeCSS("/publicModules/share/share.css")
   .share
     .share-icon(onclick=`shareToOther("${shareType}", "qq", "${shareTitle}", "${shareId}", "${shareDescription}")` title="分享给QQ好友")

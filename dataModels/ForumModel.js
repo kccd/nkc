@@ -1133,7 +1133,10 @@ forumSchema.statics.getUserSubForums = async (uid, fid) => {
   });
   return userSubForums.filter(f => !!f);
 };
-
+forumSchema.statics.getUserSubForumsId = async (uid, fid) => {
+  const forums = await mongoose.model("forums").getUserSubForums(uid, fid);
+  return forums.map(f => f.fid);
+};
 /**
  * 判断专业发表权限，是否允许在此专业下发表文章
  * @param {Array} fids 专业id数组

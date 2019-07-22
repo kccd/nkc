@@ -75,6 +75,7 @@ messageRouter
     const friendsArr = await db.FriendModel.find({uid: user.uid, tUid: {$in: [...uidArr]}});
     for(let u of users) {
       await u.extendGrade();
+      await db.UserModel.extendUserInfo(u);
       u = u.toObject();
       userObj[u.uid] = u;
     }
@@ -179,7 +180,8 @@ messageRouter
       const targetUser = await db.UserModel.findOne({uid: tUid});
       if(!targetUser) return;
       f = f.toObject();
-      f.targetUser = targetUser;
+      await db.UserModel.extendUserInfo(targetUser);
+      f.targetUser = targetUser.toObject();
       usersFriends.push(f);
     }));
     data.usersFriends = usersFriends;

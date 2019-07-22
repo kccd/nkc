@@ -13,5 +13,20 @@ module.exports = {
   },
   contribute: {
     GET: "visitUserContribute"
+  },
+  subscribes: {
+    GET: "account_subscribe",
+    PATCH: "account_subscribe",
+    PARAMETER: {
+      PATCH: "account_subscribe"
+    }
+  },
+  subscribe_types: {
+    GET: "account_subscribe",
+    POST: "account_subscribe",
+    PARAMETER: {
+      DELETE: "account_subscribe",
+      PATCH: "account_subscribe"
+    }
   }
 };

@@ -25,13 +25,25 @@ $(function() {
 			btnText1: '提交',
 			sending: false,
 			showTerms: false,
+
+      svgData: ""
 		},
+    mounted: function() {
+		  var dataDom = $("#data");
+		  if(dataDom.length) this.getSvgData();
+    },
 		methods: {
+		  getSvgData: function() {
+        nkcAPI("/register/code?t=" + Date.now(), "GET")
+          .then(function(data) {
+            app.svgData = data.svgData;
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      },
 			changeImgCode: function() {
-				var e = this.$refs.imgCode;
-        var src = e.getAttribute('src');
-        src = src.replace(/\?.*/, '');
-        e.setAttribute('src', src + '?t=' + Date.now());
+				this.getSvgData();
 			},
 			changeTermsStatus: function() {
 				app.showTerms = !app.showTerms;

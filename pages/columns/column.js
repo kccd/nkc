@@ -8,16 +8,15 @@ $(function() {
     });
     bodyBackgroundColor = color;
   });
-  $(".column-fast-set-btn").click(function() {
-    toggleFastSettings();
-  });
   CommonModal = new NKC.modules.CommonModal();
 });
 
-function toggleFastSettings() {
+function showSetDom() {
   $(".column-fast-set-body").toggle();
 }
-
+function showShareDom(){
+  $(".column-share-body").toggle();
+}
 function saveSettings() {
   nkcAPI("/m/" + data.columnId, "PATCH", {
     type: "color",
@@ -33,6 +32,12 @@ function saveSettings() {
 }
 
 function openNewWindow(url) {
+  var origin = window.location.origin;
+  var reg = new RegExp("^" + origin, "i");
+  if(reg.test(url)) {
+    openToNewLocation(url);
+  } else {
+    openToNewLocation(url, "_blank");
+  }
 
-  window.open(url);
 }

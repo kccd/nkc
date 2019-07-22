@@ -71,6 +71,7 @@ var app = new Vue({
       if(type === "user") t = "&t=user";
       if(type === "thread") t = "&t=thread";
       if(type === "post") t = "&t=post";
+      if(type === "column") t = "&t=column";
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
       openToNewLocation("/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options)
     },

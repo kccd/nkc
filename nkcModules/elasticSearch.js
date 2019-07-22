@@ -108,7 +108,7 @@ func.init = async () => {
 func.save = async (docType, document) => {
   const apiFunction = require("../nkcModules/apiFunction");
 
-  if(!["user", "post", "thread"].includes(docType)) throwErr(500, "docType error");
+  if(!["user", "post", "thread", "column", "columnPage"].includes(docType)) throwErr(500, "docType error");
 
   const {
 
@@ -131,8 +131,12 @@ func.save = async (docType, document) => {
     id = `thread_${tid}`;
   } else if(docType === "post") {
     id = `post_${pid}`;
-  } else {
+  } else if(docType === "user") {
     id = `user_${uid}`;
+  } else if(docType === "column") {
+    id = `column_${tid}`;
+  } else if(docType === "columnPage") {
+    id = `columnPage_${tid}`;
   }
 
   return await client.index({
@@ -188,7 +192,8 @@ func.search = async (t, c, options) => {
   page = Number(page);
 
   const {
-    searchThreadList, searchPostList, searchAllList, searchUserList
+    searchThreadList, searchPostList, searchAllList, searchUserList,
+    searchColumnList
   } = (await SettingModel.findById("page")).c;
 
   let size;
@@ -198,6 +203,8 @@ func.search = async (t, c, options) => {
     size = searchPostList;
   } else if(t === "thread") {
     size = searchThreadList;
+  } else if(t === "column") {
+    size = searchColumnList;
   } else {
     size = searchAllList;
   }
@@ -221,51 +228,127 @@ func.search = async (t, c, options) => {
         keywordsCN: {},
         keywordsEN: {},
       }
-    },
-    query: {
-      bool: {
-        must: [
-          {
-            bool: {
-              should: [
-                // 搜索post, thread
-                {
-                  bool: {
-                    must: [
-                      {
-                        bool: {
-                          should: [
-                            createMatch("title", c, 5, relation),
-                            createMatch("content", c, 2, relation),
-                            createMatch("pid", c, 100, relation),
-                            createMatch("authors", c, 80, relation),
-                            createMatch("abstractEN", c, 50, relation),
-                            createMatch("abstractCN", c, 50, relation),
-                            createMatch("keywordsEN", c, 80, relation),
-                            createMatch("keywordsCN", c, 80, relation),
-                          ]
-                        }
-                      }
-                    ]
-                  }
-                },
-                // 搜索用户
-                {
-                  bool: {
-                    should: [
-                      createMatch("username", c, 6, relation),
-                      createMatch("description", c, 3, relation),
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
     }
   };
-
+  body.query = {
+    bool: {
+      must: [ // 最后一个元素用于docType筛选
+        {
+          bool: {
+            should: [ // 第1、2元素是关于文章回复的内容，后边会增加其他筛选条件
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: "thread"
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("title", c, 5, relation),
+                          createMatch("content", c, 2, relation),
+                          createMatch("pid", c, 100, relation),
+                          createMatch("authors", c, 80, relation),
+                          createMatch("abstractEN", c, 50, relation),
+                          createMatch("abstractCN", c, 50, relation),
+                          createMatch("keywordsEN", c, 80, relation),
+                          createMatch("keywordsCN", c, 80, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: "post"
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("title", c, 5, relation),
+                          createMatch("content", c, 2, relation),
+                          createMatch("pid", c, 100, relation),
+                          createMatch("authors", c, 80, relation),
+                          createMatch("abstractEN", c, 50, relation),
+                          createMatch("abstractCN", c, 50, relation),
+                          createMatch("keywordsEN", c, 80, relation),
+                          createMatch("keywordsCN", c, 80, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: "user"
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("username", c, 6, relation),
+                          createMatch("description", c, 3, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: "column"
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("username", c, 6, relation),
+                          createMatch("description", c, 3, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: "columnPage"
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("title", c, 5, relation),
+                          createMatch("content", c, 2, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  };
   if(t === "post") {
     body.query.bool.must.push({
       match: {
@@ -284,76 +367,101 @@ func.search = async (t, c, options) => {
         docType: "user"
       }
     });
-  }
-
-  if(fid && fid.length > 0) {
-    const fidMatch = {
+  } else if(t === "column") {
+    body.query.bool.must.push({
       bool: {
-        should: fid.map(id => {
-          return {
+        should: [
+          {
             match: {
-              mainForumsId: id
+              docType: "column"
+            }
+          },
+          {
+            match: {
+              docType: "columnPage"
             }
           }
-        })
-      }
-    };
-    body.query.bool.must[0].bool.should[0].bool.must.push(fidMatch);
-  }
-
-  if(author) {
-    let uid = "";
-    const user = await UserModel.findOne({usernameLowerCase: (author || "").toLowerCase()});
-    if(user) uid = user.uid;
-    body.query.bool.must[0].bool.should[0].bool.must.push({
-      match: {
-        uid
+        ]
       }
     });
   }
 
-  if(digest) {
-    body.query.bool.must[0].bool.should[0].bool.must.push({
-      match: {
-        digest: true
+  if(!["user", "column"].includes(t)) {
+    if(fid && fid.length > 0) {
+      const fidMatch = {
+        bool: {
+          should: fid.map(id => {
+            return {
+              match: {
+                mainForumsId: id
+              }
+            }
+          })
+        }
+      };
+      body.query.bool.must[0].bool.should[0].bool.must.push(fidMatch);
+      body.query.bool.must[0].bool.should[1].bool.must.push(fidMatch);
+    }
+
+    if(author) {
+      let uid = "";
+      const user = await UserModel.findOne({usernameLowerCase: (author || "").toLowerCase()});
+      if(user) uid = user.uid;
+      const authorMatch = {
+        match: {
+          uid
+        }
+      };
+      body.query.bool.must[0].bool.should[0].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[1].bool.must.push(authorMatch);
+    }
+
+    if(digest) {
+      const digestMatch = {
+        match: {
+          digest: true
+        }
+      };
+      body.query.bool.must[0].bool.should[0].bool.must.push(digestMatch);
+      body.query.bool.must[0].bool.should[1].bool.must.push(digestMatch);
+    }
+
+
+    // 时间范围
+    if(timeStart  || timeEnd) {
+      const range = {
+        toc: {}
+      };
+      if(timeEnd) {
+        range.toc.lt = new Date(new Date(timeEnd).getTime() + 1000);
       }
-    })
+      if(timeStart) {
+        range.toc.gte = timeStart;
+      }
+      body.query.bool.filter = {range};
+    }
+
+    // 按时间排序 升序/降序
+    if(sortType === "time") {
+      const toc = {
+        order: "desc"
+      };
+      if(sort === "asc") {
+        toc.order = "asc";
+      }
+      body.sort.push({toc});
+    } else {
+      // 按匹配程度排序 升序/降序
+      const _score = {
+        order: "desc"
+      };
+      if(sort === "asc") {
+        _score.order = "asc";
+      }
+      body.sort.push({_score});
+    }
   }
 
-
-  // 时间范围
-  if(timeStart  || timeEnd) {
-    const range = {
-      toc: {}
-    };
-    if(timeEnd) {
-      range.toc.lt = new Date(new Date(timeEnd).getTime() + 1000);
-    }
-    if(timeStart) {
-      range.toc.gte = timeStart;
-    }
-    body.query.bool.filter = {range};
-  }
-
-  // 按时间排序 升序/降序
-  if(sortType === "time") {
-    const toc = {
-      order: "desc"
-    };
-    if(sort === "asc") {
-      toc.order = "asc";
-    }
-    body.sort.push({toc});
-  } else {
-    // 按匹配程度排序 升序/降序
-    const _score = {
-      order: "desc"
-    };
-    if(sort === "asc") {
-      _score.order = "asc";
-    }
-    body.sort.push({_score});
-  }
   return await client.search({
     index: indexName,
     type: "documents",

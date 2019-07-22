@@ -4,8 +4,10 @@ router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query, state} = ctx;
     const {pageSettings} = state;
-    let {page = 0, s, t} = query;
+    let {page = 0, s, t, c, d} = query;
     const {user} = data;
+    data.c = c;
+    data.d = d;
     if(s) data.s = s;
     if(user) {
       // 日常登陆
@@ -133,23 +135,58 @@ router
         q.reviewed = true;
       }
     } else if(threadListType === "subscribe") {
-      const subs = await db.SubscribeModel.find({
+      data.subscribeTypes = await db.SubscribeTypeModel.getTypesTree(user.uid);
+      let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
+      accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
+
+      let subscribeType;
+      if(c) {
+        subscribeType = await db.SubscribeTypeModel.findOne({_id: c});
+        if(!subscribeType) delete data.c;
+      }
+      let subscribeMatch = {
         uid: user.uid
-      }, {
+      };
+      if(subscribeType) {
+        let childTypes = await db.SubscribeTypeModel.find({pid: subscribeType._id}, {_id: 1});
+        childTypes = childTypes.map(t => t._id);
+        childTypes.push(c);
+        subscribeMatch.cid = {$in: childTypes};
+      }
+      if(d === "topic") {
+        let topics = await db.ForumModel.find({forumType: "topic"}, {fid: 1});
+        topics = topics.map(f => f.fid);
+        subscribeMatch["$and"] = [
+          {
+            type: "forum",
+            fid: {$in: topics}
+          }
+        ]
+      } else if(d === "discipline") {
+        let disciplines = await db.ForumModel.find({forumType: "discipline"}, {fid: 1});
+        disciplines = disciplines.map(f => f.fid);
+        subscribeMatch["$and"] = [
+          {
+            type: "forum",
+            fid: {$in: disciplines}
+          }
+        ]
+      } else if(d === "user") {
+        subscribeMatch.type = "user";
+      } else if(d === "thread") {
+        subscribeMatch.type = "thread";
+      }
+      const subs = await db.SubscribeModel.find(subscribeMatch, {
         fid: 1,
         tid: 1,
         tUid: 1,
         type: 1
       }).sort({toc: -1});
-
       subs.map(s => {
-        if(s.type === "forum") subFid.push(s.fid);
-        if(s.type === "thread") subTid.push(s.tid);
-        if(s.type === "user") subUid.push(s.tUid);
+        if(s.type === "forum") return subFid.push(s.fid);
+        if(s.type === "thread") return subTid.push(s.tid);
+        if(s.type === "user") return subUid.push(s.tUid);
       });
-
-      let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
-      accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
       q = {
         mainForumsId: {
           $in: accessibleForumsId
@@ -269,7 +306,6 @@ router
 
     const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(12);
     data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
-
     ctx.template = "home/home.pug";
     await next();
   });

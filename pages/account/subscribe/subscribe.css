@@ -1,0 +1,61 @@
+.subscribe-lists{
+  padding: 0.5rem;
+}
+.subscribe-list-hr{
+  height: 1px;
+  background-color: #eee;
+  margin: 0.5rem 0;
+}
+.subscribe-list{
+  height: 3.5rem;
+  padding: 0 0.5rem;
+  line-height: 3.5rem;
+  cursor: pointer;
+  color: #333;
+  position: relative;
+}
+.subscribe-list .fa{
+  color: #555;
+  margin-right: 0.5rem;
+}
+.subscribe-list:hover, .subscribe-list.active{
+  background-color: #f4f4f4;
+}
+.subscribe-list:hover .subscribe-type-options, .subscribe-list.active .subscribe-type-options{
+  background-color: #f4f4f4;
+}
+.subscribe-type-options{
+  display: none;
+  text-align: right;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8rem;
+  background-color: #fff;
+  overflow: hidden;
+  font-size: 1.3rem;
+}
+@media (max-width: 787px) {
+  .subscribe-type-options{
+    display: block;
+  }
+}
+.subscribe-list:hover .subscribe-type-options{
+  display: block;
+}
+.subscribe-category{
+  display: inline-block;
+  height: 2.5rem;
+  padding: 0 1rem;
+  cursor: pointer;
+  line-height: 2.5rem;
+  border-radius: 3px;
+}
+.subscribe-category:hover, .subscribe-category.active{
+  background-color: #2b90d9;
+  color: #fff;
+}
+.subscribe-categories{
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}

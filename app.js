@@ -1,4 +1,5 @@
 const mainRouter = require('./routes');
+const mainRouter2 = require("./routes2");
 const Koa = require('koa');
 require('colors');
 const path = require('path');
@@ -88,5 +89,6 @@ app
   .use(logger)
 	.use(permission)
   .use(mainRouter.routes())
+  .use(mainRouter2.routes())
   .use(body);
 module.exports = app.callback();

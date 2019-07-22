@@ -57,6 +57,12 @@ const schema = new Schema({
     type: String,
     default: "",
     index: 1
+  },
+  // 关注分类ID
+  cid: {
+    type: [Number],
+    default: [],
+    index: 1
   }
 }, {
   collection: "subscribes"
@@ -66,13 +72,52 @@ const schema = new Schema({
 * @param {String} uid 用户ID
 * @author pengxiguaa 2019-4-28
 * */
-schema.statics.getUserSubUid = async (uid) => {
+schema.statics.getUserSubUsersId = async (uid) => {
   const SubscribeModel = mongoose.model("subscribes");
   const sub = await SubscribeModel.find({
     type: 'user',
     uid
   }, {tUid: 1});
   return sub.map(s => s.tUid);
+};
+/*
+* 获取用户关注的专业ID
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-7-19
+* @return {[String]} 专业ID数组
+* */
+schema.statics.getUserSubForumsId = async (uid) => {
+  const subs = await mongoose.model("subscribes").find({
+    type: "forum",
+    uid
+  });
+  return subs.map(s => s.fid);
+};
+/*
+* 获取用户关注的专栏ID
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-7-19
+* @return {[Number]} 专栏ID数组
+* */
+schema.statics.getUserSubColumnsId = async (uid) => {
+  const subs = await mongoose.model("subscribes").find({
+    type: "column",
+    uid
+  });
+  return subs.map(s => s.columnId);
+};
+/*
+* 获取用户关注的文章ID
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-7-19
+* @return {[String]} 文章ID数组
+* */
+schema.statics.getUserSubThreadsId = async (uid) => {
+  const subs = await mongoose.model("subscribes").find({
+    type: "thread",
+    uid
+  });
+  return subs.map(s => s.tid);
 };
 
 /**
@@ -107,6 +152,84 @@ schema.statics.autoAttentionForum = async function(options) {
       await newSubscribeForum.save();
     }
   }
-}
+};
+
+schema.statics.extendSubscribes = async (subscribes) => {
+  const UserModel = mongoose.model("users");
+  const SubscribeModel = mongoose.model("subscribes");
+  const ForumModel = mongoose.model("forums");
+  const ColumnModel = mongoose.model("columns");
+  const ThreadModel = mongoose.model("threads");
+  const uid = new Set(), fid = new Set(), columnId = new Set(), tid = new Set();
+  subscribes.map(s => {
+    const {type} = s;
+    if(type === "user") {
+      uid.add(s.uid);
+      uid.add(s.tUid);
+    } else if(type === "thread") {
+      tid.add(s.tid);
+    } else if(type === "forum") {
+      fid.add(s.fid);
+    } else if(type === "column") {
+      columnId.add(s.columnId);
+    }
+  });
+  const users = await UserModel.find({uid: {$in: [...uid]}});
+  const usersObj = {};
+  users.map(u => {
+    usersObj[u.uid] = u;
+  });
+  let threads = await ThreadModel.find({tid: {$in: [...tid]}});
+  threads = await ThreadModel.extendThreads(threads, {
+    htmlToText: true
+  });
+  const threadsObj = {};
+  threads.map(t => {
+    threadsObj[t.tid] = t;
+  });
+  const columns = await ColumnModel.find({_id: {$in: [...columnId]}});
+  const columnsObj = {};
+  columns.map(c => {
+    columnsObj[c._id] = c;
+  });
+  const forums = await ForumModel.find({fid: {$in: [...fid]}});
+  const forumsObj = {};
+  forums.map(f => {
+    forumsObj[f.fid] = f;
+  });
+  const results = [];
+  for(const s of subscribes) {
+    const subscribe = s.toObject();
+    const {type, uid, tUid, tid, fid, columnId, _id} = subscribe;
+    if(type === "user") {
+      subscribe.user = usersObj[uid];
+      subscribe.targetUser = usersObj[tUid];
+      if(!subscribe.targetUser) {
+        await SubscribeModel.remove({_id});
+        continue;
+      }
+    } else if(type === "forum") {
+      subscribe.forum = forumsObj[fid];
+      if(!subscribe.forum) {
+        await SubscribeModel.remove({_id});
+        continue;
+      }
+    } else if(type === "column") {
+      subscribe.column = columnsObj[columnId];
+      if(!subscribe.column) {
+        await SubscribeModel.remove({_id});
+        continue;
+      }
+    } else {
+      subscribe.thread = threadsObj[tid];
+      if(!subscribe.thread) {
+        await SubscribeModel.remove({_id});
+        continue;
+      }
+    }
+    results.push(subscribe);
+  }
+  return results;
+};
 
 module.exports = mongoose.model('subscribes', schema);

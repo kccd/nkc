@@ -23,7 +23,7 @@ followerRouter
     data.followers = await db.UserModel.find({uid: {$in: uid}}).sort({tlv: -1});
     await db.UserModel.extendUsersInfo(data.followers);
     if(data.user) {
-      data.userSubUid = await db.SubscribeModel.getUserSubUid(data.user.uid);
+      data.userSubUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     }
 		data.type = 'followers';
 		await next();

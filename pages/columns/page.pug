@@ -5,28 +5,39 @@ block columnTitle
   else
     title=`${data.column.name}`
   style.
-    .column{
-      max-width: 850px;
+    body {
+      padding-top: 0;
+      background-color: #f6f6f6;
     }
   style=`body{background-color: ${data.column.color};}`
 block content
-  include ./banner
-  .column
-    .m-t-2.box-shadow-panel
-      div
-        include ./nav
-      .m-t-2
-        if data.page.t
-          .column-page-title=data.page.t
-        -data.page.c = hideContentByUser(data.page.c, data.user, 'thread')
-        .column-page-content!=experimental_render(data.page)
-        if data.user && data.user.uid === data.column.uid
-          .m-t-1.text-right
-            if data.page.hidden
-              span.m-t-2.text-danger 已关闭，仅自己可见。
-              button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
-            else
-              button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
-            a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
+  include ./modules/banner
+  div.m-t-2.box-shadow-panel
+    .column
+      include ./modules/nav
+  .container-fluid.max-width
+    .column
+      .row
+        .col-xs-12.col-md-8.box-shadow-panel.m-t-2
+          div
+            if data.page.t
+              .column-page-title=data.page.t
+            -data.page.c = hideContentByUser(data.page.c, data.user, 'thread')
+            .column-page-content!=experimental_render(data.page)
+            if data.user && data.user.uid === data.column.uid
+              .m-t-1.text-right
+                if data.page.hidden
+                  span.m-t-2.text-danger 已关闭，仅自己可见。
+                  button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, false)`) 开启
+                else
+                  button.btn.btn-xs.btn-default(onclick=`setHidden(${data.column._id}, ${data.page._id}, true)`) 关闭
+                a.m-l-05.btn.btn-xs.btn-default(href=`/m/${data.column._id}/settings/page?t=edit&id=${data.page._id}`) 编辑
+        .col-xs-12.col-md-4.box-shadow-panel.m-t-2
+          include ./modules/management
+          include ./modules/info
 block scripts
+  include ../publicModules/commonModal/commonModal
+  include ../publicModules/selectColor
   +includeJS("/columns/settings/page.js")
+  +includeJS("/columns/column.js")
+  +includeJS("/columns/management.js")

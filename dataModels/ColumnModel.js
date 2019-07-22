@@ -202,4 +202,38 @@ schema.statics.getTimeline = async (columnId) => {
   }
   return results.reverse();
 };
+
+/*
+* 获取用户关注的专栏
+* @param {String} uid 用户ID
+* */
+schema.statics.getUserSubColumns = async (uid) => {
+  const subs = await mongoose.model("subscribes").find({
+    type: "column",
+    uid: uid
+  }, {columnId: 1}).sort({toc: -1});
+  const columns = [];
+  for(const sub of subs) {
+    const column = await mongoose.model("columns").findOne({_id: sub.columnId});
+    if(column) columns.push(column);
+  }
+  return columns;
+};
+/*
+* 更新专栏在搜索数据库中的数据
+* */
+schema.statics.toSearch = async (columnId) => {
+  const column = await mongoose.model("columns").findOne({_id: columnId});
+  if(!column) throwErr(404, `未找到ID为${columnId}的专栏`);
+  const data = {
+    username: column.name,
+    description: column.abbr,
+    uid: column.uid,
+    toc: column.toc,
+    tid: column._id
+  };
+  const es = require("../nkcModules/elasticSearch");
+  await es.save("column", data);
+};
+
 module.exports = mongoose.model("columns", schema);

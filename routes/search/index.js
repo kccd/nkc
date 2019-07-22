@@ -69,7 +69,9 @@ router
     }
 
     // 加载分页设置
-    const {searchThreadList, searchAllList, searchPostList, searchUserList} = (await db.SettingModel.findById("page")).c;
+    const {searchThreadList, searchAllList, searchPostList, searchUserList,
+      searchColumnList
+    } = (await db.SettingModel.findById("page")).c;
 
     // 用户输入了搜索的关键词，进入高级搜索。
     if(c) {
@@ -92,6 +94,8 @@ router
         perpage = searchPostList;
       } else if(t === "thread") {
         perpage = searchThreadList;
+      } else if(t === "column") {
+        perpage = searchColumnList;
       } else {
         perpage = searchAllList;
         targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
@@ -115,13 +119,22 @@ router
     if(results && results.length > 0) {
       data.paging = nkcModules.apiFunction.paging(page, data.total, searchThreadList);
       const postObj = {}, threadObj = {}, userObj = {};
+      const columnObj = {}, columnPageObj = {};
       const pids = new Set();
       const tids = new Set();
       const uids = new Set();
+      const columnId = new Set();
+      const columnPageId = new Set();
       const highlightObj = {};
       results.map(r => {
         pids.add(r.pid);
         uids.add(r.uid);
+        if(r.docType === "column") {
+          columnId.add(r.tid);
+        } else if(r.docType === "columnPage") {
+          columnPageId.add(r.tid);
+        }
+
         if(r.highlight) {
           if(r.docType === "post" || r.docType === "thread") {
             highlightObj[r.pid + "_title"] = r.highlight.title;
@@ -147,10 +160,27 @@ router
               highlightObj[r.pid + "_authors"] = "作者：" + r.highlight.authors;
             }
           } else if(r.docType === "user") {
-            highlightObj[r.uid + "_username"] = r.highlight.username;
-            highlightObj[r.uid + "_description"] = r.highlight.description;
+            if(r.highlight.username) {
+              highlightObj[r.uid + "_username"] = r.highlight.username;
+            }
+            if(r.highlight.description) {
+              highlightObj[r.uid + "_description"] = r.highlight.description;
+            }
+          } else if(r.docType === "column") {
+            if(r.highlight.username) {
+              highlightObj[r.tid + "_name"] = r.highlight.username;
+            }
+            if(r.highlight.description) {
+              highlightObj[r.tid+ "_abbr"] = r.highlight.description;
+            }
+          } else if(r.docType === "columnPage") {
+            if(r.highlight.title) {
+              highlightObj[r.tid + "_t"] = r.highlight.title;
+            }
+            if(r.highlight.content) {
+              highlightObj[r.tid+ "_c"] = r.highlight.content;
+            }
           }
-
         }
 
       });
@@ -185,11 +215,27 @@ router
         threadObj[thread.tid] = thread;
       });
 
+      let columns = await db.ColumnModel.find({_id: {$in: [...columnId]}});
+      columns = await db.ColumnModel.extendColumns(columns);
+      columns.map(column => {
+        columnObj[column._id] = column;
+      });
+      const columnPages = await db.ColumnPageModel.find({_id: {$in: [...columnPageId]}});
+      const pageColumnId = new Set();
+      columnPages.map(page => {
+        columnPageObj[page._id] = page;
+        pageColumnId.add(page.columnId);
+      });
+      const pageColumns = await db.ColumnModel.find({_id: {$in: [...pageColumnId]}});
+      const pageColumnObj = {};
+      pageColumns.map(pc => {
+        pageColumnObj[pc._id] = pc;
+      });
       // 根据文档类型，拓展数据
       loop1:
       for(const result of results) {
         let r;
-        const {docType, pid, uid} = result;
+        const {docType, pid, uid, tid} = result;
         if(["thread", "post"].includes(docType)) {
           const post = postObj[pid];
           if(!post || post.disabled) continue;
@@ -246,7 +292,7 @@ router
             },
             forums
           };
-        } else {
+        } else if(docType === "user") {
           if(targetUser && targetUser.uid === uid) {
             if(existUser) continue;
             existUser = true;
@@ -261,6 +307,34 @@ router
             description: highlightObj[`${uid}_description`] || u.description,
             user: u
           };
+        } else if(docType === "column") {
+          const column = columnObj[tid];
+          if(!column) continue;
+          if(!ctx.permission("column_single_disabled")) {
+            if(!column || column.disabled || column.closed) continue;
+          }
+          r = {
+            docType,
+            name: highlightObj[`${tid}_name`] || column.name,
+            abbr: highlightObj[`${tid}_abbr`] || column.abbr,
+            column
+          };
+        } else if(docType === "columnPage") {
+          const page = columnPageObj[tid];
+          if(!page) continue;
+          const column = pageColumnObj[page.columnId];
+          if(!column) continue;
+          if(!ctx.permission("column_single_disabled")) {
+            if(!column || column.disabled || column.closed) continue;
+          }
+          page.c = nkcModules.apiFunction.obtainPureText(page.c, true, 200);
+          r = {
+            docType,
+            t: highlightObj[`${tid}_t`] || page.t,
+            c: highlightObj[`${tid}_c`] || page.c,
+            column,
+            page
+          }
         }
         data.results.push(r);
       }

@@ -84,41 +84,42 @@ function uploadFileAPI(url, method, formData, onUploadProgress) {
 }
 
 function sweetSuccess(text) {
-  return screenTopAlert(text);
-  Swal.fire({
+  text = text + "";
+  Swal({
     type: "success",
     confirmButtonText: "关闭",
-    text: text.error || text
+    text: text
   });
 }
 function sweetError(text) {
-  return screenTopWarning(text.error || text);
-  Swal.fire({
+  text = text.error || text;
+  text = text + "";
+  Swal({
     type: "error",
     confirmButtonText: "关闭",
     text: text.error || text
   });
 }
 function sweetInfo(text) {
-  Swal.fire({
+  text = text + "";
+  Swal({
     type: "info",
     confirmButtonText: "关闭",
     text: text
   });
 }
 function sweetWarning(text) {
-  Swal.fire({
+  text = text + "";
+  Swal({
     type: "warning",
     confirmButtonText: "关闭",
     text: text
   });
 }
 function sweetConfirm(text) {
+  text = text + "";
   return new Promise(function(resolve, reject) {
-    if(confirm(text)) {
-      resolve();
-    }
-    /*Swal.fire({
+    Swal({
       type: "warning",
       confirmButtonText: "确定",
       cancelButtonText: "取消",
@@ -130,6 +131,24 @@ function sweetConfirm(text) {
         if(result.value === true) {
           resolve();
         }
-      })*/
+      })
+  });
+}
+function sweetQuestion(text) {
+  text = text + "";
+  return new Promise(function(resolve, reject) {
+    Swal({
+      type: "question",
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      text: text,
+      showCancelButton: true,
+      reverseButtons: true
+    })
+      .then(function(result) {
+        if(result.value === true) {
+          resolve();
+        }
+      })
   });
 }

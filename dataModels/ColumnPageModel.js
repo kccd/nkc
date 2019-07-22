@@ -35,4 +35,20 @@ const schema = new Schema({
 }, {
   collection: "columnPages"
 });
+
+/*
+* 更新搜索数据库中的数据
+* */
+schema.statics.toSearch = async (pageId) => {
+  const page = await mongoose.model("columnPages").findOne({_id: pageId});
+  if(!page) throwErr(404, `未找到ID为${pageId}的专栏自定义页`);
+  const data = {
+    tid: page._id,
+    t: page.t,
+    c: page.c,
+    toc: page.toc
+  };
+  const es = require("../nkcModules/elasticSearch");
+  await es.save("columnPage", data);
+};
 module.exports = mongoose.model("columnPages", schema);
