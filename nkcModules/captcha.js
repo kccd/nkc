@@ -9,12 +9,12 @@ class captcha {
   }
 
   static createRegisterCode() {
-    return this.createMath({
-      size: 8,
-      ignoreChars: '0o1IilL',
+    return this.create({
+      size: 4,
+      ignoreChars: '0oO1IilL',
       noise: 5,
       color: true,
-      background: "#cc9966"
+      background: "#fff"
     });
   }
 }
