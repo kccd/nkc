@@ -139,8 +139,6 @@ router
       let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
       accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
 
-      if(c = )
-
       let subscribeType;
       if(c) {
         subscribeType = await db.SubscribeTypeModel.findOne({_id: c});
@@ -203,6 +201,9 @@ router
             mainForumsId: {
               $in: subFid
             }
+          },
+          {
+            uid: user.uid
           },
           {
             uid: {

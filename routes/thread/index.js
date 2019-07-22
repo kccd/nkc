@@ -848,7 +848,7 @@ threadRouter
 		//帖子曾经在草稿箱中，发表时，删除草稿
 		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
 
-		// 回复getUserSubUsersId
+		// 回复自动关注文章
     const subQuery = {
       type: "thread",
       tid,
