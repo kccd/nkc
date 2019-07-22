@@ -35,14 +35,14 @@ if data.targetPost
           table#authInfoList.table.table-border.table-condensed.table-responsive.margin-0(style="padding:0")
             thead
               tr(style="background-color: aliceblue;")
+                th
+                  a.editorBtn.btn.btn-primary.btn-sm(onclick="addOneAuthorInfo()") 添加
                 th 操作
                 th 姓名
                 th KCID(选填)
                 th 机构(选填)
                 th 机构地址(选填)
                 th 通信作者
-                th
-                  a.editorBtn.btn.btn-primary.btn-sm(onclick="addOneAuthorInfo()") 添加
             tbody
 #originState(style="display:none")
   .form-horizontal

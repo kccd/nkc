@@ -40,10 +40,11 @@ module.exports = async (ctx, next) => {
           ctx.body = stream;
           // stream.pipe(ctx.response);
         }else{
-          ctx.response.removeHeader("Content-Length");
-          // ctx.response.writeHead(416, "Request Range Not Satisfiable");
-          ctx.status = 416;
-          ctx.response.end();
+          if(ctx.response) {
+            ctx.response.removeHeader("Content-Length");
+            ctx.status = 416;
+            ctx.response.end();
+          }
         }
       }else{
 

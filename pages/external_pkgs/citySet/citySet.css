@@ -9,6 +9,6 @@ s{position:absolute;top:1px;right:0;width:32px;height:32px;}
 ._citys0 { width: 95%; height: 34px; line-height: 34px; display: inline-block; border-bottom: 2px solid #061086; padding: 0px 5px; font-size:14px; font-weight:bold; margin-left:6px; }
 ._citys0 li { display: inline-block; line-height: 34px; font-size: 15px; color: #888; width: 80px; text-align: center; cursor: pointer; }
 ._citys1 { width: 100%; display: inline-block; padding: 10px 0; }
-._citys1 a { width: 83px; height: 35px; display: unset; background-color: #ffffff; color: #666; margin-left: 6px; margin-top: 3px; line-height: 35px; text-align: center; cursor: pointer; font-size: 12px; border-radius: 5px; overflow: hidden; }
+._citys1 a { width: 83px; height: 35px; display: unset; background-color: #ffffff; color: #666; margin-left: 18px; margin-top: 3px; line-height: 35px; text-align: center; cursor: pointer; font-size: 15px; border-radius: 5px; overflow: hidden; }
 ._citys1 a:hover { color: #fff; background-color: #061086; }
 .AreaS { background-color: #061086 !important; color: #fff !important; }
