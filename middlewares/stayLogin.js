@@ -62,7 +62,6 @@ module.exports = async (ctx, next) => {
 		user.newMessage = await user.getNewMessagesCount();
 		user.authLevel = await userPersonal.getAuthLevel();
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
-		user.subUid = await db.SubscribeModel.getUserSubUid(user.uid);
     user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
     languageName = user.generalSettings.language;
     if(user.generalSettings.lotterySettings.status) {
@@ -141,8 +140,12 @@ module.exports = async (ctx, next) => {
       data.userGrade,
       data.user
     );
+
+    data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+    ctx.state.subUsersId = data.user.subUid;
     ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, visibleFid);
-    ctx.state.subColumnsId = await db.ColumnModel.getUserSubColumnsId(data.user.uid);
+    ctx.state.subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
+    ctx.state.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
     ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
     ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
   }

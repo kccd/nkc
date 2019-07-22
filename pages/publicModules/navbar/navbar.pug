@@ -94,13 +94,14 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                 a(href=`/message`)
                   span.fa.fa-envelope-o &nbsp;消息
               li
-                a(href=`/u/${user.uid}/collections/unclassified`)
+                a(href=`/u/${data.user.uid}/collections/unclassified`)
                   span.fa.fa-folder-o &nbsp;收藏
               li
-                a(href=`/u/${user.uid}/sub/t`)
+                //a(href=`/account/subscribes`)
+                a(href=`/u/${data.user.uid}/sub/t`)
                   span.fa.fa-bookmark-o &nbsp;我的关注
               li
-                a(href=`/u/${user.uid}/drafts`)
+                a(href=`/u/${data.user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
                   span.messageNumber.draftMessage= data.user.draftCount || ''
               li
@@ -111,7 +112,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                   span.fa.fa-trophy &nbsp;活动
               li.divider
               li
-                a(href=`/u/${user.uid}/settings`)
+                a(href=`/u/${data.user.uid}/settings`)
                   span.fa.fa-edit &nbsp;编辑资料
               li.divider
               li
@@ -224,6 +225,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span.fa.fa-folder-o &nbsp;收藏
             span.pull-right.fa.fa-angle-right
         li
+          //a(href=`/account/subscribes`)
           a(href=`/u/${data.user.uid}/sub/t`)
             span.fa.fa-bookmark-o &nbsp;我的关注
             span.pull-right.fa.fa-angle-right

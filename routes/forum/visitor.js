@@ -27,7 +27,7 @@ visitorRouter
     }
     await db.UserModel.extendUsersInfo(data.visitors);
     if(data.user) {
-      data.userSubUid = await db.SubscribeModel.getUserSubUid(data.user.uid);
+      data.userSubUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     }
 		data.type = 'visitors';
 		await next();
