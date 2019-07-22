@@ -3,8 +3,11 @@ var app = new Vue({
   el: "#subscribe",
   data: {
     type: "",
+    category: "",
     paging: {},
     subscribes: [],
+
+    selectedSubId: [],
 
     counts: {
       total: 0,
@@ -21,7 +24,9 @@ var app = new Vue({
     subUsersId: [],
     subForumsId: [],
     subColumnsId: [],
-    subThreadsId: []
+    subThreadsId: [],
+
+    management: false
   },
   mounted: function() {
     $("body").show();
@@ -30,6 +35,25 @@ var app = new Vue({
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   },
   methods: {
+    managementSub: function() {
+      if(this.management) {
+        this.management = false;
+        this.selectedSubId = [];
+      } else {
+        this.management = true;
+      }
+    },
+    selectAll: function() {
+      var subscribesId = [];
+      for(var i = 0; i < this.subscribes.length; i++) {
+        subscribesId.push(this.subscribes[i]._id);
+      }
+      if(this.selectedSubId.length !== subscribesId.length) {
+        this.selectedSubId = subscribesId.concat([]);
+      } else {
+        this.selectedSubId = [];
+      }
+    },
     getTypes: function() {
       nkcAPI("/account/subscribe_types?count=true", "GET")
         .then(function(data) {
@@ -121,19 +145,36 @@ var app = new Vue({
           sweetError(data);
         });
     },
+    initManagement: function() {
+      $(".small-forum-checkbox label").hide();
+      this.management = false;
+      this.selectedSubId = [];
+    },
     selectType: function(type) {
+      this.initManagement();
       this.type = type;
+      this.category = "";
       this.paging = {};
       this.getData();
     },
-    getData: function(page, type) {
+    selectCategory: function(c) {
+      this.initManagement();
+      this.category = c;
+      this.paging = {};
+      this.getData();
+    },
+    getData: function(page, type, category) {
+      this.initManagement();
       if(!type && type !== 0) {
         type = this.type || "all"
+      }
+      if(!category) {
+        category = this.category || "all"
       }
       if(!page && page !== 0) {
         page = this.paging.page || 0;
       }
-      nkcAPI("/account/subscribes?page=" + page + "&t=" + type, "GET")
+      nkcAPI("/account/subscribes?page=" + page + "&t=" + type + "&c=" + category, "GET")
         .then(function(data) {
 
           app.paging = data.paging;
@@ -149,10 +190,24 @@ var app = new Vue({
           sweetError(data);
         })
     },
-    moveSub: function(sub) {
+    moveSubs: function(subId) {
+      var subsId = [];
+      var selectedTypesId = [];
+      if(typeof subId === "number") {
+        subsId = [subId];
+      } else {
+        subsId = this.selectedSubId;
+      }
+      if(!subsId.length) return sweetError("请至少勾选一个");
+      if(subsId.length === 1) {
+        var sub = this.getSubById(subsId[0]);
+        selectedTypesId = sub.cid;
+      }
       SubscribeTypes.open(function(typesId) {
-        nkcAPI("/account/subscribes/" + sub._id, "PATCH", {
-          typesId: typesId
+        nkcAPI("/account/subscribes", "PATCH", {
+          type: "modifyType",
+          typesId: typesId,
+          subscribesId: subsId
         })
           .then(function() {
             SubscribeTypes.close();
@@ -161,10 +216,20 @@ var app = new Vue({
           })
           .catch(function(data) {
             sweetError(data);
-          });
+          })
       }, {
-        selectedTypesId: sub.cid || []
+        selectedTypesId: selectedTypesId
       });
+    },
+    getSubById: function(_id) {
+      var subscribes = this.subscribes;
+      for(var i = 0; i < subscribes.length; i++) {
+        var sub = subscribes[i];
+        if(sub._id === _id) return sub;
+      }
+    },
+    moveSub: function(sub) {
+      this.moveSubs(sub._id);
     }
   }
 });

@@ -1755,8 +1755,14 @@ span.thread-title-page{
   display: table-cell;
   vertical-align: top;
 }
-.small-forum-icon>div, .small-forum-icon>img{
+.small-forum-checkbox{
+  display: table-cell;
+  padding-right: 1rem;
+  vertical-align: top;
+}
+.small-forum-icon>div{
   width: 10rem;
+  background-size: cover;
   height: 10rem;
   border-radius: 3px;
 }
@@ -1767,9 +1773,9 @@ span.thread-title-page{
 }
 .small-forum-name{
   height: 2.2rem;
-  padding-right: 4rem;
   margin-bottom: 0.8rem;
   overflow: hidden;
+  padding-right: 2.2rem;
   font-size: 1.6rem;
   font-weight: 700;
   position: relative;
@@ -1785,16 +1791,13 @@ span.thread-title-page{
   text-decoration: none;
 }
 .small-forum-abbr{
-  max-height: 3.2rem;
+  height: 3.2rem;
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
-.small-forum-name button{
-  position: absolute;
-  top: 2px;
-  right: 0;
+.small-forum-info button{
   height: 2rem;
   padding: 0 0.5rem;
   line-height: 2rem;
@@ -1804,14 +1807,24 @@ span.thread-title-page{
   background-color: #4fa2dd;
   color: #fff;
 }
-.small-forum-name .fa{
-  color: #282c37;
+.small-forum-info button.active{
+  background-color: #e85a71;
+}
+.small-forum-name span{
+  position: absolute;
+  color: #e85a71;
+  top: 4px;
+  right: 0;
   font-size: 1.2rem;
-  margin-right: 0.3rem;
+  margin-left: 0.3rem;
 }
 .small-forum-name button.active{
   background-color: #a9c0d5;
 }
 .small-forum-name button:focus{
   outline: none;
+}
+.small-forum-info{
+  height: 3.8rem;
+  padding-top: 0.8rem;
 }

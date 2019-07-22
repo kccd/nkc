@@ -1333,13 +1333,13 @@ threadSchema.statics.postNewThread = async (options) => {
     await MessageModel.sendReviewMessage(_post.pid);
   }
   // 发贴自动关注专业
-  await SubscribeModel.autoAttentionForum(options);
+  // await SubscribeModel.autoAttentionForum(options);
   // 发表文章删除草稿
   if(options.did) {
     await DraftModel.remove({"did": options.did})
   }
   return _post;
-}
+};
 
 
 /**

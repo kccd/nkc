@@ -21,13 +21,18 @@ $(function() {
 			nationCodes: nationCodes,
 			nationCode: '86',
 			loginType: 'account',// mobile, code, account
-			btnText: '登录'
-		},
+			btnText: '登录',
+      svgData: ""
+
+    },
 		watch: {
 			/*loginType: function() {
 				changeFocus();
 			}*/
 		},
+    mounted: function() {
+      this.getSvgData();
+    },
 		methods: {
 			submit: function() {
 				if(app.btnText === '登录中...') return;
@@ -181,12 +186,18 @@ $(function() {
 						app.warning.error = data.error || data;
 					})
 			},
+      getSvgData: function() {
+        nkcAPI("/register/code?t=" + Date.now(), "GET")
+          .then(function(data) {
+            app.svgData = data.svgData;
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      },
       changeImgCode: function() {
-        var e = this.$refs.imgCode;
-        var src = e.getAttribute('src');
-        src = src.replace(/\?.*/, '');
-        e.setAttribute('src', src + '?t=' + Date.now());
-			}
+        this.getSvgData();
+      },
 		},
 		directives: {
 			focus: {

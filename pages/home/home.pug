@@ -17,9 +17,71 @@ block content
       .col-xs-12.col-md-7
         .row
           .col-xs-12.col-md-12
-            .m-b-1
-              include ../publicModules/mobile_drawer/right_drawer
-              -let showPagingSortButton = true;
+            if 0 && data.t === "subscribe"
+              .m-b-1
+                .subscribe-lists
+                  .subscribe-list
+                    a(href="/?t=subscribe" class=!data.c?"active":"") 全部
+                  .subscribe-list
+                    a(href="/?t=subscribe&c='column'" class=data.c==="column"? "active" : "") 专栏
+                  for t in data.subscribeTypes
+                    .subscribe-list
+                      a(href=`/?t=subscribe&c=${t._id}` class=Number(data.c)===t._id?"active":"")= t.name
+                      if t.childTypes && t.childTypes.length > 0
+                        .fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                        ul.dropdown-menu
+                          for ct in t.childTypes
+                            li
+                              a(href=`/?t=subscribe&c=${ct._id}`)= ct.name
+                .subscribe-lists
+                  .subscribe-list
+                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}`
+                    class=!data.d?"active": ""
+                  ) 全部
+                  .subscribe-list
+                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=topic`
+                    class=data.d==="topic"?"active": ""
+                  ) 话题
+                  .subscribe-list
+                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=discipline`
+                    class=data.d==="discipline"?"active": ""
+                  ) 学科
+                  .subscribe-list
+                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=user`
+                    class=data.d==="user"?"active": ""
+                  ) 用户
+                  .subscribe-list
+                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=thread`
+                    class=data.d==="thread"?"active": ""
+                  ) 文章
+
+            if !data.threads.length
+              .p-t-5.p-b-5.text-center
+                h4
+                  b 空空如也~
+            else
+              .m-b-0
+                include ../publicModules/mobile_drawer/right_drawer
+
+                -let showPagingSortButton = true;
+                if canManagement
+                  .paging-button
+                    a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                  .paging-button.management-thread-panel
+                    a.button.radius-left(onclick="selectAll()") 全选
+                    a.button(onclick="moveSelectedThreads()") 移动
+                    a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+                if data.t === "latest" || data.t === "column" || data.t === "recommend"
+                  .paging-button
+                    a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 全部
+                    a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
+                    a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
+
+                include ../publicModules/paging/paging
+              for thread in data.threads
+                include ../publicModules/thread_panel/thread_panel
+              -showPagingSortButton = false;
+              -showHomeButton = false;
               if canManagement
                 .paging-button
                   a.button.radius-left.radius-right(onclick="managementThreads()") 管理
@@ -27,32 +89,7 @@ block content
                   a.button.radius-left(onclick="selectAll()") 全选
                   a.button(onclick="moveSelectedThreads()") 移动
                   a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-              if data.t === "latest" || data.t === "column" || data.t === "recommend"
-                .paging-button
-                  a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 全部
-                  a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
-                  a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
-                //-.paging-button
-                  if data.user
-                    a.radius-left.button(href=`/?t=subscribe` class=data.t === "subscribe" ? "active" : "") 我的关注
-                    a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
-                  else
-                    a.button.radius-left(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
-                  a.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
-                  a.radius-right.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 最新
-              include ../publicModules/paging/paging
-            for thread in data.threads
-              include ../publicModules/thread_panel/thread_panel
-            -showPagingSortButton = false;
-            -showHomeButton = false;
-            if canManagement
-              .paging-button
-                a.button.radius-left.radius-right(onclick="managementThreads()") 管理
-              .paging-button.management-thread-panel
-                a.button.radius-left(onclick="selectAll()") 全选
-                a.button(onclick="moveSelectedThreads()") 移动
-                a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-            include ../publicModules/paging/paging_input
+              include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
         .hidden-xs.hidden-sm#rightDom
           .hidden-xs.hidden-sm

@@ -16,6 +16,7 @@ module.exports = {
   },
   subscribes: {
     GET: "account_subscribe",
+    PATCH: "account_subscribe",
     PARAMETER: {
       PATCH: "account_subscribe"
     }

@@ -140,6 +140,7 @@ module.exports = async (ctx, next) => {
       data.userGrade,
       data.user
     );
+
     data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     ctx.state.subUsersId = data.user.subUid;
     ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, visibleFid);

@@ -61,7 +61,6 @@ NKC.modules.SubscribeTypes = function() {
       complete: function() {
         var selectedTypesId = this.selectedTypesId;
         this_.callback(selectedTypesId);
-        this_.app.selectedTypesId = [];
       },
       closeForm: function() {
         if(this.fastAdd) {

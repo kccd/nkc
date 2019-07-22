@@ -21,7 +21,7 @@
 .subscribe-list:hover, .subscribe-list.active{
   background-color: #f4f4f4;
 }
-.subscribe-list:hover .subscribe-type-options{
+.subscribe-list:hover .subscribe-type-options, .subscribe-list.active .subscribe-type-options{
   background-color: #f4f4f4;
 }
 .subscribe-type-options{
@@ -42,4 +42,20 @@
 }
 .subscribe-list:hover .subscribe-type-options{
   display: block;
+}
+.subscribe-category{
+  display: inline-block;
+  height: 2.5rem;
+  padding: 0 1rem;
+  cursor: pointer;
+  line-height: 2.5rem;
+  border-radius: 3px;
+}
+.subscribe-category:hover, .subscribe-category.active{
+  background-color: #2b90d9;
+  color: #fff;
+}
+.subscribe-categories{
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
 }

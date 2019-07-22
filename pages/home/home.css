@@ -41,3 +41,40 @@
 .swiper-pagination{
   color: #ffffff;
 }
+.subscribe-lists{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border-bottom: 1px solid #fff;
+  padding: 0 0.5rem;
+  background-color: #f4f4f4;
+}
+.subscribe-list{
+  display: inline-block;
+  position: relative;
+  height: 2rem;
+  margin-bottom: 0.3rem;
+  line-height: 2rem;
+  border-radius: 3px;
+  color: #282c37;
+  font-weight: 700;
+  margin-right: 0.8rem;
+}
+.subscribe-list .fa{
+  padding: 0.3rem;
+  text-align: center;
+  cursor: pointer;
+}
+.subscribe-list>a{
+  color: #282c37;
+}
+.subscribe-list>a:hover, .subscribe-list>a:focus{
+  color: #282c37;
+  text-decoration: none;
+}
+.subscribe-list>a:hover, .subscribe-list>a.active{
+  color: #2b90d9;
+}

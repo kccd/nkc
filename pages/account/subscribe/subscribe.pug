@@ -13,31 +13,37 @@ block content
       .col-xs-12.col-md-3.box-shadow-panel
         .p-a-0
           .subscribe-lists
+            //
+              .subscribe-list(@click="selectType('')" :class="{'active':type===''}")
+                .fa.fa-navicon
+                | 全部
+                .pull-right(v-if="counts.total") {{counts.total}}
+              .subscribe-list(@click="selectType('column')" :class="{'active':type==='column'}")
+                .fa.fa-columns
+                | 专栏
+                .pull-right(v-if="counts.column") {{counts.column}}
+              .subscribe-list(@click="selectType('topic')" :class="{'active':type==='topic'}")
+                .fa.fa-tags
+                | 话题
+                .pull-right(v-if="counts.topic") {{counts.topic}}
+              .subscribe-list(@click="selectType('discipline')" :class="{'active':type==='discipline'}")
+                .fa.fa-flask
+                | 学科
+                .pull-right(v-if="counts.discipline") {{counts.discipline}}
+              .subscribe-list(@click="selectType('thread')" :class="{'active':type==='thread'}")
+                .fa.fa-newspaper-o
+                | 文章
+                .pull-right(v-if="counts.thread") {{counts.thread}}
+              .subscribe-list(@click="selectType('user')" :class="{'active':type==='user'}")
+                .fa.fa-users
+                | 用户
+                .pull-right(v-if="counts.user") {{counts.user}}
             .subscribe-list(@click="selectType('')" :class="{'active':type===''}")
               .fa.fa-navicon
               | 全部
               .pull-right(v-if="counts.total") {{counts.total}}
-            .subscribe-list(@click="selectType('column')" :class="{'active':type==='column'}")
-              .fa.fa-columns
-              | 专栏
-              .pull-right(v-if="counts.column") {{counts.column}}
-            .subscribe-list(@click="selectType('topic')" :class="{'active':type==='topic'}")
-              .fa.fa-tags
-              | 话题
-              .pull-right(v-if="counts.topic") {{counts.topic}}
-            .subscribe-list(@click="selectType('discipline')" :class="{'active':type==='discipline'}")
-              .fa.fa-flask
-              | 学科
-              .pull-right(v-if="counts.discipline") {{counts.discipline}}
-            .subscribe-list(@click="selectType('thread')" :class="{'active':type==='thread'}")
-              .fa.fa-newspaper-o
-              | 文章
-              .pull-right(v-if="counts.thread") {{counts.thread}}
-            .subscribe-list(@click="selectType('user')" :class="{'active':type==='user'}")
-              .fa.fa-users
-              | 用户
-              .pull-right(v-if="counts.user") {{counts.user}}
-            .subscribe-list-hr(v-if="types && types.length > 0")
+            //.subscribe-list-hr(v-if="types && types.length > 0")
+            .subscribe-list-hr
             .subscribe-list(v-for="t in types" :class="{'active':type===t._id}")
               .subscribe-type-options
                 .fa.fa-pencil(@click="modifyType(t)")
@@ -50,11 +56,15 @@ block content
                 | {{t.name}}
                 .pull-right
                   span(v-if="t.count") {{t.count}}
-        span
-          .m-t-1.text-center
-            button.btn.btn-xs.btn-default(@click="addType") 新建分类
+          .text-center.p-t-1.p-b-1.pointer(@click="addType") 新建分类
+
       .col-xs-12.col-md-8.box-shadow-panel
         mixin paging
+          .paging-button
+            a.button.active.radius-left.radius-right(@click="managementSub") 管理
+          .paging-button(v-if="management")
+              a.button.active.radius-left(@click="selectAll") 全选
+              a.button.active.radius-right(@click="moveSubs") 更改分类
           .paging-button
             span(v-for="b, index in paging.buttonValue")
               span(v-if="b.type === 'active'")
@@ -68,7 +78,15 @@ block content
               span(v-else) ...
         div
           .row
-            .col-xs-12.m-b-05(v-if="paging.buttonValue && paging.buttonValue.length")
+            .col-xs-12.m-b-2
+              .subscribe-categories
+                .subscribe-category(@click="selectCategory('')" :class="{'active':category===''}") 全部
+                .subscribe-category(@click="selectCategory('column')" :class="{'active':category==='column'}") 专栏
+                .subscribe-category(@click="selectCategory('topic')" :class="{'active':category==='topic'}") 话题
+                .subscribe-category(@click="selectCategory('discipline')" :class="{'active':category==='discipline'}") 学科
+                .subscribe-category(@click="selectCategory('user')" :class="{'active':category==='user'}") 用户
+                .subscribe-category(@click="selectCategory('thread')" :class="{'active':category==='thread'}") 文章
+            .col-xs-12.m-b-05(v-if="subscribes.length")
               +paging
             div(v-if="!loaded")
               .m-t-5.m-b-5.p-t-5.p-b-5.text-center
@@ -82,63 +100,73 @@ block content
               .col-xs-12.col-md-6(v-for="sub in subscribes")
                 .m-b-1
                   .small-panel-forum(v-if="sub.type === 'forum'")
+                    .small-forum-checkbox(v-if="management")
+                      label
+                        input(type="checkbox" v-model="selectedSubId" :value="sub._id")
                     .small-forum-icon
                       div(v-if="!sub.forum.iconFileName" :style="'background-color: ' + sub.forum.color")
-                      img(v-else :src="'/forum_avatar/' + sub.fid")
+                      div(v-else :style="'background-image: url(/forum_avatar/' + sub.fid + ')'")
                     .small-forum-content
                       .small-forum-name
                         a(:href="'/f/' + sub.fid") {{sub.forum.displayName}}
-                        .fa.fa-tag(v-if="sub.forum.forumType === 'topic'")
-                        .fa.fa-flask(v-else)
-                        if data.user
-                          .pull-right
-                            button(v-if="subForumsId.indexOf(sub.fid) === -1" @click="subscribeTarget('forum', sub.fid)") 关注
-                            button.active(v-else="subForumsId.indexOf(sub.fid) === -1" @click="subscribeTarget('forum', sub.fid)") 取关
+                        span(v-if="sub.forum.forumType === 'topic'") 话题
+                        span(v-else) 学科
                       .small-forum-abbr {{sub.forum.description}}
                       .small-forum-info
+                        if data.user
+                          button(v-if="subForumsId.indexOf(sub.fid) === -1" @click="subscribeTarget('forum', sub.fid)") 关注
+                          button.active(v-else="subForumsId.indexOf(sub.fid) === -1" @click="subscribeTarget('forum', sub.fid)") 取关
                         button(@click="moveSub(sub)") 更改分类
 
                   .small-panel-forum(v-else-if="sub.type === 'column'")
+                    .small-forum-checkbox(v-if="management")
+                      label
+                        input(type="checkbox" v-model="selectedSubId" :value="sub._id")
                     .small-forum-icon
-                      img(:src="'/m/' + sub.columnId + '/avatar'")
+                      div(:style="'background-image: url(/m/' + sub.columnId + '/avatar)'")
                     .small-forum-content
                       .small-forum-name
                         a(:href="'/m/' + sub.columnId") {{sub.column.name}}
-                        .fa.fa-columns
-                        if data.user
-                          .pull-right
-                            button(v-if="subColumnsId.indexOf(sub.columnId) === -1" @click="subscribeTarget('column', sub.columnId)") 关注
-                            button.active(v-else="subColumnsId.indexOf(sub.columnId) === -1" @click="subscribeTarget('column', sub.columnId)") 取关
+                        span 专栏
                       .small-forum-abbr {{sub.column.abbr}}
                       .small-forum-info
+                        if data.user
+                          button(v-if="subColumnsId.indexOf(sub.columnId) === -1" @click="subscribeTarget('column', sub.columnId)") 关注
+                          button.active(v-else="subColumnsId.indexOf(sub.columnId) === -1" @click="subscribeTarget('column', sub.columnId)") 取关
                         button(@click="moveSub(sub)") 更改分类
                   .small-panel-forum(v-else-if="sub.type === 'user'")
+                    .small-forum-checkbox(v-if="management")
+                      label
+                        input(type="checkbox" v-model="selectedSubId" :value="sub._id")
                     .small-forum-icon
-                      img(:src="'/avatar/' + sub.tUid")
+                      div(:style="'background-image: url(/avatar/' + sub.tUid+ ')'")
                     .small-forum-content
                       .small-forum-name
                         a(:href="'/u/' + sub.tUid") {{sub.targetUser.username}}
-                        .fa.fa-user-o
-                        if data.user
-                          .pull-right
-                            button(v-if="subUsersId.indexOf(sub.tUid) === -1" @click="subscribeTarget('user', sub.tUid)") 关注
-                            button.active(v-else="subUsersId.indexOf(sub.tUid) === -1" @click="subscribeTarget('user', sub.tUid)") 取关
+                        span 用户
                       .small-forum-abbr {{sub.targetUser.description || "暂未填写个人简介"}}
                       .small-forum-info
+                        if data.user
+                          button(v-if="subUsersId.indexOf(sub.tUid) === -1" @click="subscribeTarget('user', sub.tUid)") 关注
+                          button.active(v-else="subUsersId.indexOf(sub.tUid) === -1" @click="subscribeTarget('user', sub.tUid)") 取关
                         button(@click="moveSub(sub)") 更改分类
                   .small-panel-forum(v-else-if="sub.type === 'thread'")
+                    .small-forum-checkbox(v-if="management")
+                      label
+                        input(type="checkbox" v-model="selectedSubId" :value="sub._id")
+                    .small-forum-icon(v-if="sub.thread.hasCover")
+                      div(:style="'background-image: url(/cover/' + sub.tid + ')'")
                     .small-forum-content
                       .small-forum-name
                         a(:href="'/t/' + sub.tid") {{sub.thread.firstPost.t}}
-                        .fa.fa-newspaper-o
-                        if data.user
-                          .pull-right
-                            button(v-if="subThreadsId.indexOf(sub.tid) === -1" @click="subscribeTarget('thread', sub.tid)") 关注
-                            button.active(v-else="subThreadsId.indexOf(sub.tid) === -1" @click="subscribeTarget('thread', sub.tid)") 取关
+                        span 文章
                       .small-forum-abbr {{sub.thread.firstPost.c || "暂未填写个人简介"}}
                       .small-forum-info
+                        if data.user
+                          button(v-if="subThreadsId.indexOf(sub.tid) === -1" @click="subscribeTarget('thread', sub.tid)") 关注
+                          button.active(v-else="subThreadsId.indexOf(sub.tid) === -1" @click="subscribeTarget('thread', sub.tid)") 取关
                         button(@click="moveSub(sub)") 更改分类
-            .col-xs-12(v-if="paging.buttonValue && paging.buttonValue.length")
+            .col-xs-12(v-if="subscribes.length")
               +paging
 
 

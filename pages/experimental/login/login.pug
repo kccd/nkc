@@ -57,6 +57,7 @@ block scripts
               openToNewLocation(data.redirect);
             })
             .catch(function(data) {
+              console.log(data);
               app.error = data.error || data;
             })
         }
