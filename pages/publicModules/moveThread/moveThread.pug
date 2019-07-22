@@ -22,7 +22,7 @@
             .move-thread-thread-types(v-if="forum && forum.threadTypes && forum.threadTypes.length")
               .move-thread-thread-type(@click="resetThreadType") 不分类
               .move-thread-thread-type(v-for="t in forum.threadTypes" @click="selectThreadType(t)") {{t.name}}
-            .m-t-05
+            .m-t-05(v-if="!hideMoveType")
               span
                 b 移动方式：
                 .radio.inline-block.m-t-0

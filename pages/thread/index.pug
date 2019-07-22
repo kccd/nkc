@@ -347,7 +347,7 @@ block content
                           span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
                           if thread.firstPost.originState && thread.firstPost.originState !== "0"
                             -var levelText = getOriginLevel(thread.firstPost.originState);
-                            if thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
+                            if thread.firstPost.originState == "3" || thread.firstPost.originState == "4" || thread.firstPost.originState == "5" || thread.firstPost.originState == "6"
                               span(style="color:#9baec8;margin-right:3px") 原创
                             span(class="dropdown")
                               a(id="dropdown-level" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")

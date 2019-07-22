@@ -199,21 +199,36 @@ function onPost() {
   var cids = [];
   if(!queryType || queryType == "forum" || desType == "forum") {
     var panelObj = $("#tabPanel").tagsinput("items");
-    if(panelObj.length == 0) {
-      return screenTopWarning("请选择专业");
-    }else{
-      for(var po=0;po<panelObj.length;po++) {
-        if(fids.indexOf(panelObj[po].fid) == -1) {
-          fids.push(panelObj[po].fid)
-        }
-        if(panelObj[po].cid !== "") {
-          var dealCid = panelObj[po].cid.substr(1);
-          if(cids.indexOf(dealCid) == -1) {
-            cids.push(dealCid)
-          }
-        }
+    $("#newPanelForum").find(".chooseForum").each(function() {
+      var fid = $(this).attr("fid");
+      if(fid) {
+        fids.push(fid)
       }
+    })
+    $("#newPanelForum").find(".chooseCate").each(function() {
+      var cid = $(this).attr("cid");
+      if(cid) {
+        cids.push(cid)
+      }
+    })
+    if(fids.length === 0) {
+      return screenTopWarning("请选择专业");
     }
+    // if(panelObj.length == 0) {
+    //   return screenTopWarning("请选择专业");
+    // }else{
+    //   for(var po=0;po<panelObj.length;po++) {
+    //     if(fids.indexOf(panelObj[po].fid) == -1) {
+    //       fids.push(panelObj[po].fid)
+    //     }
+    //     if(panelObj[po].cid !== "") {
+    //       var dealCid = panelObj[po].cid.substr(1);
+    //       if(cids.indexOf(dealCid) == -1) {
+    //         cids.push(dealCid)
+    //       }
+    //     }
+    //   }
+    // }
     queryId = fids[0];
     queryType = 'forum';
     queryCat = cids[0];
@@ -444,3 +459,129 @@ function mediaInsertUE(srcStr, fileType, name) {
 //     ReHighlightEverything() //interface_common code highlight
 //   }
 // }
+
+// app相关编辑功能
+
+/**
+ * app视频拍摄、上传、及插入
+ */
+function appUpdateVideo() {
+  $("#attach").css("display", "none");
+  api.getPicture({
+    sourceType: 'camera',
+    encodingType: 'jpg',
+    mediaValue: 'video',
+    destinationType: 'url',
+    allowEdit: false,
+    quality: 100,
+    targetWidth: 480,
+    targetHeight: 800,
+    saveToPhotoAlbum: false,
+    videoQuality: "medium"
+  }, function(ret, err) {
+      if (ret) {
+        api.toast({
+          msg: "视频正在处理，请稍后...",
+          duration: 3000,
+          location: "bottom"
+        })
+        api.ajax({
+          url: "http://192.168.11.114:9000/r",
+          method: "post",
+          timeout: 15,
+          headers: {
+            "FROM":"nkcAPI"
+          },
+          data:{
+            values: {},
+            files: {
+              file: ret.data
+            }
+          }
+        },function(ret, err) {
+          if(ret) {
+            mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname);
+            api.toast({
+              msg: "视频已处理",
+              duration: 1000,
+              location: "bottom"
+            })
+          }else{
+            console.log("视频上传失败，请检查网络环境")
+            console.log(JSON.stringify(err))
+          }
+        })
+      } else {
+        console.log("拍摄失败！")
+      }
+  });
+}
+
+/**
+ * app图片拍摄、上传、及插入
+ */
+function appUpdateImage() {
+  $("#attach").css("display", "none");
+  api.getPicture({
+    sourceType: 'camera',
+    encodingType: 'jpg',
+    mediaValue: 'pic',
+    destinationType: 'url',
+    allowEdit: false,
+    quality: 100,
+    targetWidth: 480,
+    targetHeight: 800,
+    saveToPhotoAlbum: false
+  }, function(ret, err) {
+      if (ret) {
+        api.toast({
+          msg: "图片正在处理，请稍后...",
+          duration: 2000,
+          location: "bottom"
+        })
+        api.ajax({
+          url: "http://192.168.11.114:9000/r",
+          method: "post",
+          timeout: 15,
+          headers: {
+            "FROM":"nkcAPI",
+          },
+          data: {
+            values: {},
+            files:{
+              file: ret.data
+            }
+          }
+        }, function(ret ,err) {
+          if(ret) {
+            mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname);
+            api.toast({
+              msg: "图片已处理",
+              duration: 1000,
+              location: "bottom"
+            })
+          }else{
+            console.log(JSON.stringify(err))
+          }
+        })
+      } else {
+        console.log(JSON.stringify(err));
+      }
+  });
+}
+
+/**
+ * 附件模块的隐藏与展开
+ */
+function appAttachHideOrShow() {
+  var attactStatus = $("#attach").css("display");
+  if(attactStatus === "block") {
+    $("#attach").css("display", "none")
+  }else{
+    $("#attach").css("display", "block")
+  }
+}
+
+apiready = function() {
+  console.log(api.frameName)
+}

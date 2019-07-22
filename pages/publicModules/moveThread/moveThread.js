@@ -13,6 +13,7 @@ NKC.modules.MoveThread = function() {
       moveType: "add", // replace, add
       forumType: "topic", // discipline, topic
       forum: "",
+      hideMoveType: false,
 
       submitting: false,
       showRecycle: false
@@ -92,7 +93,10 @@ NKC.modules.MoveThread = function() {
           var f = this.selectedForums[i];
           forums.push({
             fid: f.fid,
-            cid: f.selectedThreadType? f.selectedThreadType.cid: ""
+            cid: f.selectedThreadType? f.selectedThreadType.cid: "",
+            fName: f.displayName,
+            cName: f.selectedThreadType? f.selectedThreadType.name: "",
+            color: f.color
           });
         }
         if(forums.length === 0) return screenTopWarning("请至少选择一个专业");
@@ -141,6 +145,9 @@ NKC.modules.MoveThread = function() {
               }
             }
             this_.app.selectedForums = selectedForums;
+          }
+          if(options.hideMoveType) {
+            this_.app.hideMoveType = true;
           }
         }
       })
