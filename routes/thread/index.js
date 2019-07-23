@@ -750,7 +750,7 @@ threadRouter
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post, postType} = body;
-		const {columnCategoriesId} = post;
+		const {columnCategoriesId = []} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(postType === "comment" && post.c.length > 1000) {
       ctx.throw(400, "评论内容不能超过1000字符");
