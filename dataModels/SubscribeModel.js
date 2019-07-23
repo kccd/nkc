@@ -16,6 +16,7 @@ const schema = new Schema({
   // 2. forum 关注的专业
   // 3. user 关注的用户
   // 4. column 订阅的专栏
+  // 5. collection 收藏的文章
   type: {
     type: String,
     required: true,
@@ -119,6 +120,19 @@ schema.statics.getUserSubThreadsId = async (uid) => {
   });
   return subs.map(s => s.tid);
 };
+/*
+* 获取用户收藏的文章ID
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-7-19
+* @return {[String]} 文章ID数组
+* */
+schema.statics.getUserCollectionThreadsId = async (uid) => {
+  const subs = await mongoose.model("subscribes").find({
+    type: "collection",
+    uid
+  });
+  return subs.map(s => s.tid);
+};
 
 /**
  * -------
@@ -172,6 +186,8 @@ schema.statics.extendSubscribes = async (subscribes) => {
       fid.add(s.fid);
     } else if(type === "column") {
       columnId.add(s.columnId);
+    } else if(type === "collection") {
+      tid.add(s.tid)
     }
   });
   const users = await UserModel.find({uid: {$in: [...uid]}});
@@ -220,7 +236,13 @@ schema.statics.extendSubscribes = async (subscribes) => {
         await SubscribeModel.remove({_id});
         continue;
       }
-    } else {
+    } else if(type === "collection") {
+      subscribe.thread = threadsObj[tid];
+      if(!subscribe.thread) {
+        await SubscribeModel.remove({_id});
+        continue;
+      }
+    } else if(type === "thread") {
       subscribe.thread = threadsObj[tid];
       if(!subscribe.thread) {
         await SubscribeModel.remove({_id});

@@ -1,9 +1,10 @@
 var SubscribeTypes;
+var data = getDataById("data");
 var app = new Vue({
   el: "#subscribe",
   data: {
-    type: "",
-    category: "",
+    type: data.t || "",
+    category: data.c || "",
     paging: {},
     subscribes: [],
 
@@ -25,7 +26,7 @@ var app = new Vue({
     subForumsId: [],
     subColumnsId: [],
     subThreadsId: [],
-
+    collectionThreadsId: [],
     management: false
   },
   mounted: function() {
@@ -124,6 +125,9 @@ var app = new Vue({
       } else if(type === "thread") {
         func = NKC.methods.subscribeThreadPromise;
         subArr = this.subThreadsId;
+      } else if(type === "collection") {
+        func = NKC.methods.collectionThreadPromise;
+        subArr = this.collectionThreadsId;
       } else {
         func = NKC.methods.subscribeUserPromise;
         subArr = this.subUsersId;
@@ -135,10 +139,18 @@ var app = new Vue({
         .then(function() {
           if(sub) {
             subArr.push(id);
-            sweetSuccess("关注成功");
+            if(type === "collection") {
+              sweetSuccess("收藏成功");
+            } else {
+              sweetSuccess("关注成功");
+            }
           } else {
             subArr.splice(index, 1);
-            sweetSuccess("关注已取消");
+            if(type === "collection") {
+              sweetSuccess("收藏已取消");
+            } else {
+              sweetSuccess("关注已取消");
+            }
           }
         })
         .catch(function(data) {
@@ -153,7 +165,6 @@ var app = new Vue({
     selectType: function(type) {
       this.initManagement();
       this.type = type;
-      this.category = "";
       this.paging = {};
       this.getData();
     },
@@ -176,13 +187,25 @@ var app = new Vue({
       }
       nkcAPI("/account/subscribes?page=" + page + "&t=" + type + "&c=" + category, "GET")
         .then(function(data) {
-
+          var subscribes = data.subscribes;
+          var subs = [], subsId = [];
+          for(var i = 0; i < subscribes.length; i++) {
+            var sub = subscribes[i];
+            if(["thread", "collection"].indexOf(sub.type) !== -1) {
+              if(subsId.indexOf(sub.tid) === -1) {
+                subsId.push(sub.tid);
+                subs.push(sub);
+              }
+            }
+          }
+          // app.subscribes = subs;
+          app.subscribes = subscribes;
           app.paging = data.paging;
-          app.subscribes = data.subscribes;
           app.subUsersId = data.subUsersId;
           app.subThreadsId = data.subThreadsId;
           app.subColumnsId = data.subColumnsId;
           app.subForumsId = data.subForumsId;
+          app.collectionThreadsId = data.collectionThreadsId;
 
           app.loaded = true;
         })

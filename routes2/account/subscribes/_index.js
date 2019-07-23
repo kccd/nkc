@@ -3,6 +3,8 @@ module.exports = {
     const {state, data, query, db, nkcModules} = ctx;
     const {user} = data;
     const {t, page, c} = query;
+    data.t = t;
+    data.c = c;
     if(!t) {
       ctx.template = "account/subscribe/subscribe.pug";
       return await next();
@@ -10,10 +12,12 @@ module.exports = {
     let q = {
       uid: user.uid
     };
-    if(t !== "all") {
+    if(t === "other") {
+      q.cid = [];
+    } else if(t !== "all") {
       q.cid = t;
     }
-    if(["all", "thread", "topic", "discipline", "user", "column"].includes(c)) {
+    if(["all", "thread", "topic", "discipline", "user", "column", "collection"].includes(c)) {
       if(c !== "all") {
         if(["topic", "discipline"].includes(c)) {
           q.type = "forum";
@@ -34,6 +38,7 @@ module.exports = {
     data.subUsersId = state.subUsersId;
     data.subColumnsId = state.subColumnsId;
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(user.uid);
+    data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(user.uid);
     data.paging = paging;
     await next();
   },

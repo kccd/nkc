@@ -1,8 +1,36 @@
 const Router = require('koa-router');
 const operationRouter = new Router();
 operationRouter
-// 收藏文章
-	.post('/addColl', async (ctx, next) => {
+  // 收藏文章
+  .post("/collection", async (ctx, next) => {
+    const {body, params, db, data} = ctx;
+    const {tid} = params;
+    const {type} = body;
+    const {user} = data;
+    const thread = await db.ThreadModel.findOnly({tid});
+    if(thread.disabled) ctx.throw(403, '不能收藏已被封禁的文章');
+    await thread.extendForums(['mainForums', 'minorForums']);
+    await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+    let collection = await db.SubscribeModel.findOne({tid: tid, uid: user.uid, type: "collection"});
+    if(type) {
+      if(collection) ctx.throw(400, "文章已收藏，请勿重复提交");
+      collection = db.SubscribeModel({
+        _id: await db.SettingModel.operateSystemID("subscribes", 1),
+        uid: user.uid,
+        tid,
+        type: "collection"
+      });
+      await collection.save();
+    } else {
+      if(!collection) ctx.throw(400, "文章未在收藏夹中，请刷新");
+      const {cid} = collection;
+      await collection.remove();
+      await db.SubscribeTypeModel.updateCount(cid);
+    }
+    data.targetUser = await thread.extendUser();
+    await next();
+  })
+	/*.post('/addColl', async (ctx, next) => {
 		const {tid} = ctx.params;
 		const {db, data} = ctx;
 		const {user} = data;
@@ -35,7 +63,7 @@ operationRouter
     if(!collection) ctx.throw(403,'抱歉，你尚未收藏该文章');
     await collection.remove();
     await next();
-	})
+	})*/
   // 修改退修原因
   .patch("/moveDraft/reason", async (ctx, next) => {
     const {body, db} = ctx;

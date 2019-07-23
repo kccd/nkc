@@ -18,13 +18,22 @@ block content
         .row
           .col-xs-12.col-md-12
             if data.t === "subscribe"
+              mixin subscribeTypes
+                ul.dropdown-menu
+                  for type in data.subscribeTypes
+                    li
+                      a=type.name
+                    if type.childTypes && type.childTypes.length
+                      for tt in type.childTypes
+                        
               .m-b-1
-                .subscribe-lists
+                //.subscribe-lists
                   .subscribe-list
-                    a(href="/?t=subscribe" class=!data.c?"active":"") 全部
+                    a(href=`/?t=subscribe${data.d ?`&d=${data.d}`:""}` class=!data.c?"active":"") 全部
+
                   for t in data.subscribeTypes
                     .subscribe-list
-                      a(href=`/?t=subscribe&c=${t._id}` class=Number(data.c)===t._id?"active":"")= t.name
+                      a(href=`/?t=subscribe${data.d?`&d=${data.d}`:""}&c=${t._id}` class=Number(data.c)===t._id?"active":"")= t.name
                       if t.childTypes && t.childTypes.length > 0
                         .fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                         ul.dropdown-menu
@@ -33,13 +42,15 @@ block content
                               a(href=`/?t=subscribe&c=${ct._id}`)= ct.name
                 .subscribe-lists
                   .subscribe-list
+                    +subscribeTypes
                     a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}`
-                    class=!data.d?"active": ""
-                  ) 全部
+                      class=!data.d?"active": ""
+                    ) 全部
+                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                   .subscribe-list
                     a(href=`/?t=subscribe${data.c ? `&c=${data.c}` : ""}&d=column`
                       class=data.d==="column"? "active" : ""
-                    ) 专栏
+                  ) 专栏
                   .subscribe-list
                     a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}&d=topic`
                     class=data.d==="topic"?"active": ""
@@ -56,6 +67,10 @@ block content
                     a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}&d=thread`
                     class=data.d==="thread"?"active": ""
                   ) 文章
+                  .subscribe-list
+                    a(href=`/?t=subscribe${data.c ? `&c=${data.c}` : ""}&d=collection`
+                      class=data.d === "collection" ? "active" : ""
+                  ) 收藏
 
             if !data.threads.length
               .p-t-5.p-b-5.text-center

@@ -12,12 +12,9 @@ module.exports = {
         PATCH: "modifyReasonThreadReturn"
       }
 		},
-		addColl: {
-			POST: 'collectThread'
-		},
-		delColl: {
-			POST: 'delCollectThread'
-		},
+    collection: {
+      POST: 'collectThread'
+    },
 		/* digest: {
 			POST: 'digestThread',
 			DELETE: 'unDigestThread'

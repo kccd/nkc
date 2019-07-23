@@ -177,6 +177,8 @@ router
         subscribeMatch.type = "thread";
       } else if(d === "column") {
         subscribeMatch.type = "column";
+      } else if(d === "collection") {
+        subscribeMatch.type = "collection";
       }
       const subs = await db.SubscribeModel.find(subscribeMatch, {
         fid: 1,
@@ -187,6 +189,7 @@ router
       }).sort({toc: -1});
       subs.map(s => {
         if(s.type === "forum") return subFid.push(s.fid);
+        if(s.type === "collection") return subTid.push(s.tid);
         if(s.type === "thread") return subTid.push(s.tid);
         if(s.type === "user") return subUid.push(s.tUid);
         if(s.type === "column") return subColumnsId.push(s.columnId);
