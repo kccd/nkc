@@ -22,8 +22,6 @@ block content
                 .subscribe-lists
                   .subscribe-list
                     a(href="/?t=subscribe" class=!data.c?"active":"") 全部
-                  .subscribe-list
-                    a(href="/?t=subscribe&c='column'" class=data.c==="column"? "active" : "") 专栏
                   for t in data.subscribeTypes
                     .subscribe-list
                       a(href=`/?t=subscribe&c=${t._id}` class=Number(data.c)===t._id?"active":"")= t.name
@@ -38,6 +36,10 @@ block content
                     a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}`
                     class=!data.d?"active": ""
                   ) 全部
+                  .subscribe-list
+                    a(href=`/?t=subscribe${data.c ? `&c=${data.c}` : ""}&d=column`
+                      class=data.d==="column"? "active" : ""
+                    ) 专栏
                   .subscribe-list
                     a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}&d=topic`
                     class=data.d==="topic"?"active": ""

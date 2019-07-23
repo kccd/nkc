@@ -53,11 +53,9 @@
   background-color: #f4f4f4;
 }
 .subscribe-list{
+  padding: 0.3rem 0;
   display: inline-block;
   position: relative;
-  height: 2rem;
-  margin-bottom: 0.3rem;
-  line-height: 2rem;
   border-radius: 3px;
   color: #282c37;
   font-weight: 700;
