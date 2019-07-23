@@ -959,17 +959,23 @@ threadSchema.statics.publishArticle = async (options) => {
 * @author pengxiguaa 2019-4-26
 * */
 threadSchema.statics.getAds = async (fid) => {
-  let homeSettings = await mongoose.model("settings").findById("home");
+  const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
-  const ads = [];
-  for(const tid of homeSettings.c.ads) {
-    const thread = await ThreadModel.findOne({tid, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
-    if(thread) ads.push(thread);
-  }
-  return await ThreadModel.extendThreads(ads, {
+  let threads = await ThreadModel.find({tid: {$in: homeSettings.ads}, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
+  threads = await ThreadModel.extendThreads(threads, {
     forum: false,
     lastPost: false
   });
+  const threadsObj = {};
+  threads.map(thread => {
+    threadsObj[thread.tid] = thread;
+  });
+  const ads = [];
+  for(const tid of homeSettings.ads) {
+    const thread = threadsObj[tid];
+    if(thread) ads.push(thread);
+  }
+  return ads;
 };
 /*
 * 加载网站公告

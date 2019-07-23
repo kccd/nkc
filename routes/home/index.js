@@ -38,12 +38,12 @@ router
     }
     console.time(`基本信息`);
     const homeSettings = await db.SettingModel.getSettings("home");
-
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
       user
     );
+
 
     // 排除话题下的文章
     if(!homeSettings.list || !homeSettings.list.topic) {
@@ -57,19 +57,18 @@ router
       const fids = dis.map(t => t.fid);
       fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !fids.includes(fid));
     }
-
     data.homeSettings = homeSettings;
     // 置顶文章轮播图
+
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
+
     // 网站公告
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     // 一周活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsers();
+
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
-
-    const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(12);
-    data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
 
     console.timeEnd(`基本信息`);
     console.time("构造查询条件");
