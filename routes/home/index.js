@@ -101,7 +101,7 @@ router
 
     // 关注的专业ID，关注的用户ID，关注的文章ID
     const subFid = [], subUid = [], subTid = [];
-    let columnId = [];
+    let subColumnsId = [];
     if(threadListType === "latest") {
       q = {
         mainForumsId: {
@@ -189,11 +189,11 @@ router
         if(s.type === "forum") return subFid.push(s.fid);
         if(s.type === "thread") return subTid.push(s.tid);
         if(s.type === "user") return subUid.push(s.tUid);
-        if(s.type === "column") return columnId.push(s.columnId);
+        if(s.type === "column") return subColumnsId.push(s.columnId);
       });
-      if(columnId.length) {
-        const columns = await db.ColumnModel.find({_id: {$in: columnId}, disabled: false, closed: false});
-        columnId = columns.map(c => c._id);
+      if(subColumnsId.length) {
+        const columns = await db.ColumnModel.find({_id: {$in: subColumnsId}, disabled: false, closed: false});
+        subColumnsId = columns.map(c => c._id);
       }
 
       q = {
@@ -212,7 +212,7 @@ router
             }
           },
           {
-            columnId: {$in: columnId}
+            columnId: {$in: subColumnsId}
           },
           {
             uid: {
