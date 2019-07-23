@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
+    console.time(`路由总时间`);
     const {data, nkcModules, db, query, state} = ctx;
     const {pageSettings} = state;
     let {page = 0, s, t, c, d} = query;
@@ -35,8 +36,8 @@ router
         await user.updateUserMessage();
       }
     }
-
-    const homeSettings = (await db.SettingModel.findById("home")).c;
+    console.time(`基本信息`);
+    const homeSettings = await db.SettingModel.getSettings("home");
 
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
@@ -58,7 +59,6 @@ router
     }
 
     data.homeSettings = homeSettings;
-
     // 置顶文章轮播图
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
     // 网站公告
@@ -67,6 +67,12 @@ router
     data.activeUsers = await db.ActiveUserModel.getActiveUsers();
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
+
+    const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(12);
+    data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
+
+    console.timeEnd(`基本信息`);
+    console.time("构造查询条件");
     let q = {};
     let threadListType;
     if(t) {
@@ -232,7 +238,8 @@ router
         inColumn: true
       }
     }
-
+    console.timeEnd("构造查询条件");
+    console.time(`查询文章`);
     data.threads = [];
     let paging;
 
@@ -251,10 +258,11 @@ router
       disabled: 1, recycleMark: 1
     }).skip(paging.start).limit(paging.perpage).sort(sort);
 
+    console.timeEnd(`查询文章`);
+    console.time(`拓展文章`);
     threads = await db.ThreadModel.extendThreads(threads, {
       htmlToText: true
     });
-
     const superModerator = ctx.permission("superModerator");
     let canManageFid = [];
     if(user) {
@@ -292,7 +300,6 @@ router
       }
       data.threads.push(thread);
     }
-
     if(threadListType !== "latest") {
       data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
     }
@@ -300,13 +307,10 @@ router
     if(threadListType !== "recommend") {
       data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     }
-
-    // data.threads = threads;
+    console.timeEnd(`拓展文章`);
     data.paging = paging;
-
-    const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(12);
-    data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
     ctx.template = "home/home.pug";
+    console.timeEnd(`路由总时间`);
     await next();
   });
 module.exports = router;
