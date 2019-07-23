@@ -98,7 +98,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                   span.fa.fa-folder-o &nbsp;收藏
               li
                 //a(href=`/account/subscribes`)
-                a(href=`/u/${data.user.uid}/sub/t`)
+                //a(href=`/u/${data.user.uid}/sub/t`)
+                a(href=`/account/subscribes`)
                   span.fa.fa-bookmark-o &nbsp;我的关注
               li
                 a(href=`/u/${data.user.uid}/drafts`)
@@ -225,8 +226,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span.fa.fa-folder-o &nbsp;收藏
             span.pull-right.fa.fa-angle-right
         li
-          //a(href=`/account/subscribes`)
-          a(href=`/u/${data.user.uid}/sub/t`)
+
+          //a(href=`/u/${data.user.uid}/sub/t`)
+          a(href=`/account/subscribes`)
             span.fa.fa-bookmark-o &nbsp;我的关注
             span.pull-right.fa.fa-angle-right
         li

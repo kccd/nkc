@@ -17,7 +17,7 @@ block content
       .col-xs-12.col-md-7
         .row
           .col-xs-12.col-md-12
-            if 0 && data.t === "subscribe"
+            if data.t === "subscribe"
               .m-b-1
                 .subscribe-lists
                   .subscribe-list
@@ -35,23 +35,23 @@ block content
                               a(href=`/?t=subscribe&c=${ct._id}`)= ct.name
                 .subscribe-lists
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}`
+                    a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}`
                     class=!data.d?"active": ""
                   ) 全部
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=topic`
+                    a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}&d=topic`
                     class=data.d==="topic"?"active": ""
                   ) 话题
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=discipline`
+                    a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}&d=discipline`
                     class=data.d==="discipline"?"active": ""
                   ) 学科
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=user`
+                    a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}&d=user`
                     class=data.d==="user"?"active": ""
                   ) 用户
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=thread`
+                    a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}&d=thread`
                     class=data.d==="thread"?"active": ""
                   ) 文章
 
