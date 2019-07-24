@@ -1964,12 +1964,15 @@ function openLeftDrawer() {
   stopBodyScroll(true);
 }
 function openRightDrawer() {
-  if(api.frameName) {
-    api.setFrameAttr({
-      name: api.frameName,
-      bounces: false
-    });        
+  if(localStorage.getItem("apptype") === "app") {
+    if(api.frameName) {
+      api.setFrameAttr({
+        name: api.frameName,
+        bounces: false
+      });
+    }
   }
+
   var link = $(".drawer-dom .right");
   var linkDom = $("#rightDom");
   var bnt = $(".drawer-fixed-button-right");
@@ -2032,16 +2035,18 @@ function openRightDrawer() {
 }
 
 function closeDrawer() {
-  api.setRefreshHeaderInfo({
-    bgColor: '#eeeeee',
-    textColor: '#aaaaaa',
-    textDown: '下拉刷新',
-    textUp: '松开刷新',
-    textLoading: '刷新成功，正在加载资源...',
-    showTime: false
-  }, function(ret, err) {
-    window.location.reload();
-  });
+  if(localStorage.getItem("apptype") === "app") {
+    api.setRefreshHeaderInfo({
+      bgColor: '#eeeeee',
+      textColor: '#aaaaaa',
+      textDown: '下拉刷新',
+      textUp: '松开刷新',
+      textLoading: '刷新成功，正在加载资源...',
+      showTime: false
+    }, function(ret, err) {
+      window.location.reload();
+    });
+  }
   $(".drawer-dom .left").removeClass("active");
   $(".drawer-dom .right").removeClass("active");
   var bnt = $(".drawer-fixed-button-left");
