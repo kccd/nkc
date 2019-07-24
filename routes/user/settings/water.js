@@ -23,6 +23,12 @@ waterRouter
     }else{
       await new db.UsersGeneralModel({uid:user.uid}).save()
     }
+    // 判断用户是否有专栏
+    const column = await db.ColumnModel.findOne({uid: user.uid});
+    data.hasColumn = false
+    if(column) {
+      data.hasColumn = true;
+    }
     // 判断服务时间是否过期
     // const buyTime = data.waterSetting.waterPayTime
     // console.log(buyTime)

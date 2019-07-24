@@ -43,7 +43,8 @@ block content
                         option(selected=(data.waterSetting.waterStyle==="siteLogo") data="siteLogo" value="siteLogo") 网站LOGO
                         option(selected=(data.waterSetting.waterStyle==="singleLogo") data="singleLogo" value="singleLogo") LOGO(小)
                         option(selected=(data.waterSetting.waterStyle==="userLogo") data="userLogo" value="userLogo") LOGO(小)+用户名
-                        option(selected=(data.waterSetting.waterStyle==="coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
+                        if data.hasColumn
+                          option(selected=(data.waterSetting.waterStyle==="coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
               .form-group
                 label.col-sm-2.control-label 水印添加位置：
                 .col-sm-10(style='margin-bottom: 0.5rem;')

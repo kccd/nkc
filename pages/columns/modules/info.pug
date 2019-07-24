@@ -13,9 +13,9 @@
       .column-user-button
         a(href=`/message?uid=${data.column.uid}` target="_blank") 私信
         if data.user.subUid.includes(data.column.uid)
-          a.pointer(href=`javascript:subscribeUser("${data.column.uid}", false)` target="_blank") 取关
+          a.pointer(onclick=`subscribeUser("${data.column.uid}", false)` target="_blank") 取关
         else
-          a.pointer(href=`javascript:subscribeUser("${data.column.uid}", true)` target="_blank") 关注
+          a.pointer(onclick=`subscribeUser("${data.column.uid}", true)` target="_blank") 关注
     if data.column.user.description
       .column-user-description=data.column.user.description
 .m-b-2
