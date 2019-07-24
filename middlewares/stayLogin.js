@@ -2,7 +2,6 @@ const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
 module.exports = async (ctx, next) => {
-  console.time(1);
 	const {data, db} = ctx;
 	// cookie
 	let userInfo = ctx.cookies.get('userInfo', {signed: true});
@@ -23,8 +22,6 @@ module.exports = async (ctx, next) => {
 		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
 		}
 	}
-	console.timeEnd(1);
-	console.time(2);
 	let userOperationsId = [], userRoles = [], userGrade = {}, user;
 	if(userInfo) {
 		const {username, uid} = JSON.parse(decodeURI(userInfo));
@@ -118,8 +115,6 @@ module.exports = async (ctx, next) => {
       }));
 		}
   }
-  console.timeEnd(2);
-  console.time(3);
   // 根据用户语言设置加载语言对象
   ctx.state.language = languages[languageName];
   ctx.state.lang = (type, operationId) => {
@@ -137,8 +132,6 @@ module.exports = async (ctx, next) => {
     data.userGrade,
     data.user
   );
-  console.timeEnd(3);
-  console.time(4);
   // 获取用户关注的专业
   if(data.user) {
     const visibleFid = await db.ForumModel.visibleFid(
@@ -155,6 +148,5 @@ module.exports = async (ctx, next) => {
     ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
     ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
   }
-  console.timeEnd(4);
 	await next();
 };
