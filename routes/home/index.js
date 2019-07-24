@@ -136,6 +136,8 @@ router
       }
     } else if(threadListType === "subscribe") {
       data.subscribeTypes = await db.SubscribeTypeModel.getTypesTree(user.uid);
+      data.subscribeCount = await db.SubscribeModel.count({uid: user.uid});
+      data.subscribeOtherCount = await db.SubscribeModel.count({uid: user.uid, cid: []});
       let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
       accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
 

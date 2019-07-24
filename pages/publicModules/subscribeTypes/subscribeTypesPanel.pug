@@ -1,12 +1,13 @@
 if data.user && data.navbar && data.navbar.highlight === "subscribe" && data.subscribeTypes && data.subscribeTypes.length
-  +listHeader("自定义分类")
-  -var subCount = 0;
-  for t in data.subscribeTypes
-    -subCount += t.count;
+  +listHeader("我的分类")
+  //subscribeOtherCount
   .subscribe-types
-    a(href=`/?t=subscribe${data.d ? `&d=${data.d}` : ""}` class=!data.c? "active" : "").subscribe-type
+    a(href=`/?t=subscribe${data.d ? `&d=${data.d}` : ""}` class=!data.c ? "active" : "").subscribe-type
       span 全部
-      .pull-right=subCount
+      .pull-right=subscribeCount
+    a(href=`/?t=subscribe${data.d ? `&d=${data.d}` : ""}` class=!data.c ? "active" : "").subscribe-type
+      span 未分类
+      .pull-right=subscribeCount
     for st in data.subscribeTypes
       a(href=`/?t=subscribe&c=${st._id}${data.d?`&d=${data.d}`:""}` class=data.c&&Number(data.c)===st._id?"active":"").subscribe-type
         span=st.name

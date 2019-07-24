@@ -1957,7 +1957,9 @@ function openLeftDrawer() {
   bnt.find('.fa').addClass('fa-angle-double-left');
   bnt.attr("onclick", "closeDrawer()");
   nav.addClass('active');
-  nav.find(".dom").html(navDom.html());
+  if(!nav.find(".dom").html()) {
+    nav.find(".dom").html(navDom.html());
+  }
   $(".drawer-mask").addClass("active");
   stopBodyScroll(true);
 }
@@ -1970,7 +1972,9 @@ function openRightDrawer() {
   bnt.find('.fa').removeClass('fa-angle-double-left');
   bnt.find('.fa').addClass('fa-angle-double-right');
   link.addClass('active');
-  link.find(".dom").html(linkDom.html());
+  if(!link.find(".dom").html()) {
+    link.find(".dom").html(linkDom.html());
+  }
   $(".drawer-mask").addClass("active");
   stopBodyScroll(true);
 }
