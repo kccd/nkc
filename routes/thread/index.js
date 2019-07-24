@@ -616,7 +616,7 @@ threadRouter
 		data.collected = false;
 		data.subscribed = false;
 		if(data.user) {
-			const collection = await db.CollectionModel.findOne({uid: data.user.uid, tid});
+			const collection = await db.SubscribeModel.findOne({uid: data.user.uid, tid, type: "collection"});
 			if(collection) {
 				data.collected = true;
 			}
