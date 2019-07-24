@@ -22,6 +22,7 @@ router
       }).save();
     } else {
       const sub = await db.SubscribeModel.findOne({type: "column", columnId: column._id, uid: user.uid});
+      if(!sub) ctx.throw(400, "您暂未关注该专栏，请刷新");
       cid = sub.cid;
       await sub.remove();
     }

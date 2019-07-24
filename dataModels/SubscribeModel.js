@@ -216,36 +216,31 @@ schema.statics.extendSubscribes = async (subscribes) => {
   const results = [];
   for(const s of subscribes) {
     const subscribe = s.toObject();
-    const {type, uid, tUid, tid, fid, columnId, _id} = subscribe;
+    const {type, uid, tUid, tid, fid, columnId} = subscribe;
     if(type === "user") {
       subscribe.user = usersObj[uid];
       subscribe.targetUser = usersObj[tUid];
       if(!subscribe.targetUser) {
-        await SubscribeModel.remove({_id});
         continue;
       }
     } else if(type === "forum") {
       subscribe.forum = forumsObj[fid];
       if(!subscribe.forum) {
-        await SubscribeModel.remove({_id});
         continue;
       }
     } else if(type === "column") {
       subscribe.column = columnsObj[columnId];
       if(!subscribe.column) {
-        await SubscribeModel.remove({_id});
         continue;
       }
     } else if(type === "collection") {
       subscribe.thread = threadsObj[tid];
       if(!subscribe.thread) {
-        await SubscribeModel.remove({_id});
         continue;
       }
     } else if(type === "thread") {
       subscribe.thread = threadsObj[tid];
       if(!subscribe.thread) {
-        await SubscribeModel.remove({_id});
         continue;
       }
     }
