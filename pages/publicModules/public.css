@@ -1749,6 +1749,7 @@ span.thread-title-page{
 }
 .small-panel-forum{
   height: 10rem;
+  word-break: break-all;
 }
 .small-forum-icon{
   padding-right: 1rem;
