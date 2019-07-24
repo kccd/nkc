@@ -1,6 +1,10 @@
+var SubscribeTypes;
 $(document).ready(function(){
   if(window.moduleToColumn) {
     moduleToColumn.init();
+  }
+  if(NKC.modules.SubscribeTypes) {
+    SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
 	//编辑器缩放
 	if($(".w-e-text-container").length === 0) return;

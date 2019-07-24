@@ -142,24 +142,37 @@ NKC.modules.SubscribeTypes = function() {
   * @author pengxiguaa 2019-7-19
   * */
   // 返回promise
-  this_.subscribeForumPromise = function(id, sub) {
+  this_.subscribeForumPromise = function(id, sub, cid) {
     var method;
     if(sub) {
       method = "POST";
     } else {
       method = "DELETE";
     }
-    return nkcAPI("/f/" + id + "/subscribe", method, {});
+    return nkcAPI("/f/" + id + "/subscribe", method, {cid: cid || []});
   };
   // 执行成功后刷新页面
   this_.subscribeForum = function(id, sub) {
-    this_.subscribeForumPromise(id, sub)
-      .then(function() {
-        window.location.reload();
-      })
-      .catch(function(data) {
-        sweetError(data);
-      })
+    if(sub) {
+      this_.open(function(cid) {
+        this_.subscribeForumPromise(id, sub, cid)
+          .then(function() {
+            this_.close();
+            sweetSuccess("关注成功");
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      });
+    } else {
+      this_.subscribeForumPromise(id, sub)
+        .then(function() {
+          sweetSuccess("关注已取消");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }
   };
   /*
   * 关注专栏
@@ -168,20 +181,34 @@ NKC.modules.SubscribeTypes = function() {
   * @author pengxiguaa 2019-7-19
   * */
   // 返回promise
-  this_.subscribeColumnPromise = function(id, sub) {
+  this_.subscribeColumnPromise = function(id, sub, cid) {
     return nkcAPI("/m/" + id + "/subscribe", "POST", {
-      type: sub? "subscribe":""
+      type: sub? "subscribe":"",
+      cid: cid || []
     });
   };
   // 执行成功后刷新页面
   this_.subscribeColumn = function(id, sub) {
-    this_.subscribeForumPromise(id, sub)
-      .then(function() {
-        window.location.reload();
-      })
-      .catch(function(data) {
-        sweetError(data);
-      })
+    if(sub) {
+      this_.open(function(cid) {
+        this_.subscribeColumnPromise(id, sub, cid)
+          .then(function() {
+            this_.close();
+            sweetSuccess("关注成功");
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      });
+    } else {
+      this_.subscribeColumnPromise(id, sub)
+        .then(function() {
+          sweetSuccess("关注已取消");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }
   };
   /*
   * 关注用户
@@ -190,19 +217,32 @@ NKC.modules.SubscribeTypes = function() {
   * @author pengxiguaa 2019-7-19
   * */
   // 返回promise
-  this_.subscribeUserPromise = function(id, sub) {
+  this_.subscribeUserPromise = function(id, sub, cid) {
     var method = sub? "POST": "DELETE";
-    return nkcAPI("/u/" + id + "/subscribe", method, {});
+    return nkcAPI("/u/" + id + "/subscribe", method, {cid: cid || []});
   };
   // 执行成功后刷新页面
   this_.subscribeUser = function(id, sub) {
-    this_.subscribeUserPromise(id, sub)
-      .then(function() {
-        window.location.reload();
-      })
-      .catch(function(data) {
-        sweetError(data);
-      })
+    if(sub) {
+      this_.open(function(cid) {
+        this_.subscribeUserPromise(id, sub, cid)
+          .then(function() {
+            this_.close();
+            sweetSuccess("关注成功");
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      });
+    } else {
+      this_.subscribeUserPromise(id, sub)
+        .then(function() {
+          sweetSuccess("关注已取消");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }
   };
   /*
   * 关注文章
@@ -211,19 +251,35 @@ NKC.modules.SubscribeTypes = function() {
   * @author pengxiguaa 2019-7-19
   * */
   // 返回promise
-  this_.subscribeThreadPromise = function(id, sub) {
+  this_.subscribeThreadPromise = function(id, sub, cid) {
     var method = sub? "POST": "DELETE";
-    return nkcAPI("/t/" + id + "/subscribe", method, {});
+    return nkcAPI("/t/" + id + "/subscribe", method, {cid: cid || []});
   };
   // 执行成功后刷新页面
   this_.subscribeThread = function(id, sub) {
-    this_.subscribeThreadPromise(id, sub)
-      .then(function() {
-        window.location.reload();
-      })
-      .catch(function(data) {
-        sweetError(data);
-      })
+    if(sub) {
+      this_.open(function(cid) {
+        this_.subscribeThreadPromise(id, sub, cid)
+          .then(function() {
+            this_.close();
+            sweetSuccess("关注成功");
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      });
+    } else {
+      this_.subscribeThreadPromise(id, sub)
+        .then(function() {
+          this_.close();
+          sweetSuccess("关注已取消");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }
+
+
   };
 
   /*
@@ -234,17 +290,32 @@ NKC.modules.SubscribeTypes = function() {
   * */
   // 返回promise
 
-  this_.collectionThreadPromise = function(id, collection) {
-    return nkcAPI("/t/" + id + "/collection", "POST", {type: !!collection});
+  this_.collectionThreadPromise = function(id, collection, cid) {
+    return nkcAPI("/t/" + id + "/collection", "POST", {type: !!collection, cid: cid || []});
   };
 
   this_.collectionThread = function(id, collection) {
-    this_.collectionThreadPromise(id, collection)
-      .then(function() {
-        window.location.reload();
-      })
-      .catch(function(data) {
-        sweetError(data);
-      })
+    if(collection) {
+      this_.open(function(cid) {
+        this_.collectionThreadPromise(id, collection, cid)
+          .then(function() {
+            this_.close();
+            sweetSuccess("收藏成功");
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      });
+    } else {
+      this_.collectionThreadPromise(id, collection)
+        .then(function() {
+          this_.close();
+          sweetSuccess("收藏已取消");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }
   };
 };
+

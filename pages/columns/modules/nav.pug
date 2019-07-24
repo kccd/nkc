@@ -68,8 +68,8 @@
             button + 关注
         else
           if state.subColumnsId.includes(data.column._id)
-            button(onclick=`subscribeColumn(${data.column._id}, false)`) 已关注
+            button(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, false)`) 已关注
           else
-            button(onclick=`subscribeColumn(${data.column._id}, true)`) + 关注
+            button(onclick=`SubscribeTypes.subscribeColumn(${data.column._id}, true)`) + 关注
         if data.column.subCount > 0
           span=data.column.subCount

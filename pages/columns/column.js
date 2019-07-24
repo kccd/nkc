@@ -1,6 +1,6 @@
 var data = getDataById("data");
 var bodyBackgroundColor = data.color;
-var CommonModal;
+var CommonModal, SubscribeTypes;
 $(function() {
   NKC.methods.initSelectColor(function(color) {
     $("body").css({
@@ -9,6 +9,7 @@ $(function() {
     bodyBackgroundColor = color;
   });
   CommonModal = new NKC.modules.CommonModal();
+  SubscribeTypes = new NKC.modules.SubscribeTypes();
 });
 
 function showSetDom() {

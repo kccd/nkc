@@ -13,3 +13,9 @@ var swiper = new Swiper('.swiper-container', {
     disableOnInteraction: false,
   },
 });
+
+var SubscribeTypes;
+$(function() {
+  if(NKC.modules.SubscribeTypes)
+    SubscribeTypes = new NKC.modules.SubscribeTypes();
+});

@@ -141,14 +141,16 @@ router
       let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
       accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
 
-      let subscribeType;
-      if(c) {
-        subscribeType = await db.SubscribeTypeModel.findOne({_id: c});
-        if(!subscribeType) delete data.c;
-      }
       let subscribeMatch = {
         uid: user.uid
       };
+      let subscribeType;
+      if(c === "other") {
+        subscribeMatch.cid = [];
+      } else if(c) {
+        subscribeType = await db.SubscribeTypeModel.findOne({_id: c});
+        if(!subscribeType) delete data.c;
+      }
       if(subscribeType) {
         let childTypes = await db.SubscribeTypeModel.find({pid: subscribeType._id}, {_id: 1});
         childTypes = childTypes.map(t => t._id);
