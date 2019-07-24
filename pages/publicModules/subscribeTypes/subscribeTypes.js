@@ -132,5 +132,119 @@ NKC.modules.SubscribeTypes = function() {
   };
   this_.close = function() {
     this_.dom.modal("hide");
-  }
+  };
+
+  // 关注相关
+  /*
+  * 关注专业（学科、话题）
+  * @param {String} id 专业ID
+  * @param {Boolean} sub 是否关注 false: 取消关注, true: 关注
+  * @author pengxiguaa 2019-7-19
+  * */
+  // 返回promise
+  this_.subscribeForumPromise = function(id, sub) {
+    var method;
+    if(sub) {
+      method = "POST";
+    } else {
+      method = "DELETE";
+    }
+    return nkcAPI("/f/" + id + "/subscribe", method, {});
+  };
+  // 执行成功后刷新页面
+  this_.subscribeForum = function(id, sub) {
+    this_.subscribeForumPromise(id, sub)
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(function(data) {
+        sweetError(data);
+      })
+  };
+  /*
+  * 关注专栏
+  * @param {Number/String} id 专栏ID
+  * @param {Boolean} sub 是否关注 false: 取消关注, true: 关注
+  * @author pengxiguaa 2019-7-19
+  * */
+  // 返回promise
+  this_.subscribeColumnPromise = function(id, sub) {
+    return nkcAPI("/m/" + id + "/subscribe", "POST", {
+      type: sub? "subscribe":""
+    });
+  };
+  // 执行成功后刷新页面
+  this_.subscribeColumn = function(id, sub) {
+    this_.subscribeForumPromise(id, sub)
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(function(data) {
+        sweetError(data);
+      })
+  };
+  /*
+  * 关注用户
+  * @param {String} id 用户ID
+  * @param {Boolean} sub 是否关注 false: 取消关注, true: 关注
+  * @author pengxiguaa 2019-7-19
+  * */
+  // 返回promise
+  this_.subscribeUserPromise = function(id, sub) {
+    var method = sub? "POST": "DELETE";
+    return nkcAPI("/u/" + id + "/subscribe", method, {});
+  };
+  // 执行成功后刷新页面
+  this_.subscribeUser = function(id, sub) {
+    this_.subscribeUserPromise(id, sub)
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(function(data) {
+        sweetError(data);
+      })
+  };
+  /*
+  * 关注文章
+  * @param {String} id 文章ID
+  * @param {Boolean} sub 是否关注 false: 取消关注, true: 关注
+  * @author pengxiguaa 2019-7-19
+  * */
+  // 返回promise
+  this_.subscribeThreadPromise = function(id, sub) {
+    var method = sub? "POST": "DELETE";
+    return nkcAPI("/t/" + id + "/subscribe", method, {});
+  };
+  // 执行成功后刷新页面
+  this_.subscribeThread = function(id, sub) {
+    this_.subscribeThreadPromise(id, sub)
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(function(data) {
+        sweetError(data);
+      })
+  };
+
+  /*
+  * 收藏文章
+  * @param {String} id 文章ID
+  * @param {Boolean} collection false: 取消收藏, true: 收藏
+  * @author pengxiguaa 2019-7-19
+  * */
+  // 返回promise
+
+  this_.collectionThreadPromise = function(id, collection) {
+    return nkcAPI("/t/" + id + "/collection", "POST", {type: !!collection});
+  };
+
+  this_.collectionThread = function(id, collection) {
+    this_.collectionThreadPromise(id, collection)
+      .then(function() {
+        window.location.reload();
+      })
+      .catch(function(data) {
+        sweetError(data);
+      })
+  };
 };

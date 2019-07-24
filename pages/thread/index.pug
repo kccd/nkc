@@ -79,17 +79,17 @@ block title
 
           li
             if data.collected
-              a(onclick=`addColl('${thread.tid}')`)
+              a(onclick=`NKC.methods.collectionThread('${thread.tid}', false)`)
                 span.fa.fa-folder-o &nbsp;已收藏
             else
-              a(onclick=`addColl('${thread.tid}')`)
+              a(onclick=`NKC.methods.collectionThread('${thread.tid}', true)`)
                 span.fa.fa-folder-o &nbsp;加入收藏
           li
             if data.subscribed
-              a(onclick=`unSubThread('${thread.tid}')`)
+              a(onclick=`NKC.methods.subscribeThread('${thread.tid}', false)`)
                 span.fa.fa-bookmark-o &nbsp;取消关注
             else
-              a(onclick=`subThread('${thread.tid}')`)
+              a(onclick=`NKC.methods.subscribeThread('${thread.tid}', true)`)
                 span.fa.fa-bookmark-o &nbsp;关注
         if addCredit
           li
@@ -587,6 +587,7 @@ block content
     include ../thread_to_recycle.pug
     include ../post_to_recycle.pug
     include ../publicModules/post_warning
+    include ../publicModules/subscribeTypes/subscribeTypes
     if state.userColumn
       -const column = state.userColumn
       include ../publicModules/toColumn/toColumn

@@ -12,7 +12,7 @@
         .from(v-if="edit")
           .form-group
             label 分类名(不超过20字符)
-            input.form-control(type="text" v-model.trim="type.name")
+            input.form-control(type="text" v-model.trim="type.name" autofocus="autofocus" @keyup.enter="save")
           .form-group
             label 父分类
             select.form-control(v-model="type.pid")

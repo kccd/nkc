@@ -202,3 +202,24 @@ NKC.methods.subscribeThread = function(id, sub) {
       sweetError(data);
     })
 };
+
+/*
+* 收藏文章
+* @param {String} id 文章ID
+* @param {Boolean} collection false: 取消收藏, true: 收藏
+* @author pengxiguaa 2019-7-19
+* */
+// 返回promise
+NKC.methods.collectionThreadPromise = function(id, collection) {
+  return nkcAPI("/t/" + id + "/collection", "POST", {type: !!collection});
+};
+
+NKC.methods.collectionThread = function(id, collection) {
+  NKC.methods.collectionThreadPromise(id, collection)
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      sweetError(data);
+    })
+};

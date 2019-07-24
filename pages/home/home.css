@@ -49,19 +49,17 @@
   -ms-user-select: none;
   user-select: none;
   border-bottom: 1px solid #fff;
-  padding: 0 0.5rem;
-  background-color: #f4f4f4;
+  /*padding: 0 0.5rem;*/
+  /*background-color: #f4f4f4;*/
 }
 .subscribe-list{
+  padding: 0.3rem 0;
   display: inline-block;
   position: relative;
-  height: 2rem;
-  margin-bottom: 0.3rem;
-  line-height: 2rem;
   border-radius: 3px;
   color: #282c37;
   font-weight: 700;
-  margin-right: 0.8rem;
+  margin-right: 0.65rem;
 }
 .subscribe-list .fa{
   padding: 0.3rem;
@@ -69,12 +67,32 @@
   cursor: pointer;
 }
 .subscribe-list>a{
-  color: #282c37;
+  color: #7e8da0;
+  font-size: 1.25rem;
 }
 .subscribe-list>a:hover, .subscribe-list>a:focus{
-  color: #282c37;
+  color: #7e8da0;
   text-decoration: none;
 }
 .subscribe-list>a:hover, .subscribe-list>a.active{
   color: #2b90d9;
+}
+
+.subscribe-type{
+  display: block;
+  color: #7e8da0;
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 1.2rem;
+}
+.subscribe-type.active{
+  /*background-color: #eee;*/
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2b90d9;
+  /*padding: 0 0.2rem;*/
+}
+.subscribe-type:hover, .subscribe-type:focus{
+  color: #2b90d9;
+  text-decoration: none;
 }

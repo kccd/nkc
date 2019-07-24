@@ -101,7 +101,7 @@ router
 
     // 关注的专业ID，关注的用户ID，关注的文章ID
     const subFid = [], subUid = [], subTid = [];
-
+    let subColumnsId = [];
     if(threadListType === "latest") {
       q = {
         mainForumsId: {
@@ -136,6 +136,8 @@ router
       }
     } else if(threadListType === "subscribe") {
       data.subscribeTypes = await db.SubscribeTypeModel.getTypesTree(user.uid);
+      data.subscribeCount = await db.SubscribeModel.count({uid: user.uid});
+      data.subscribeOtherCount = await db.SubscribeModel.count({uid: user.uid, cid: []});
       let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
       accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
 
@@ -175,18 +177,30 @@ router
         subscribeMatch.type = "user";
       } else if(d === "thread") {
         subscribeMatch.type = "thread";
+      } else if(d === "column") {
+        subscribeMatch.type = "column";
+      } else if(d === "collection") {
+        subscribeMatch.type = "collection";
       }
       const subs = await db.SubscribeModel.find(subscribeMatch, {
         fid: 1,
         tid: 1,
         tUid: 1,
+        columnId: 1,
         type: 1
       }).sort({toc: -1});
       subs.map(s => {
         if(s.type === "forum") return subFid.push(s.fid);
+        if(s.type === "collection") return subTid.push(s.tid);
         if(s.type === "thread") return subTid.push(s.tid);
         if(s.type === "user") return subUid.push(s.tUid);
+        if(s.type === "column") return subColumnsId.push(s.columnId);
       });
+      if(subColumnsId.length) {
+        const columns = await db.ColumnModel.find({_id: {$in: subColumnsId}, disabled: false, closed: false});
+        subColumnsId = columns.map(c => c._id);
+      }
+
       q = {
         mainForumsId: {
           $in: accessibleForumsId
@@ -203,7 +217,7 @@ router
             }
           },
           {
-            uid: user.uid
+            columnId: {$in: subColumnsId}
           },
           {
             uid: {
@@ -247,10 +261,10 @@ router
       tlm: 1, fid: 1, hasCover: 1,
       mainForumsId: 1, hits: 1, count: 1,
       digest: 1, reviewed: 1,
+      columnsId: 1,
       categoriesId: 1,
       disabled: 1, recycleMark: 1
     }).skip(paging.start).limit(paging.perpage).sort(sort);
-
     threads = await db.ThreadModel.extendThreads(threads, {
       htmlToText: true
     });
@@ -287,7 +301,15 @@ router
         } else if(thread.uid === user.uid) {
           thread.from = 'own';
         } else {
-          thread.from = 'subForum';
+          let from = "";
+          for(const columnId of thread.columnsId) {
+            if(subColumnsId.includes(columnId)) {
+              from = "subColumn";
+              break;
+            }
+          }
+          if(!from) from = "subForum";
+          thread.from = from;
         }
       }
       data.threads.push(thread);

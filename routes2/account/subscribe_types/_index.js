@@ -6,9 +6,7 @@ module.exports = {
     if(count) {
       data.counts = {
         total: await db.SubscribeModel.count({uid: user.uid}),
-        column: await db.SubscribeModel.count({uid: user.uid, type: "column"}),
-        user: await db.SubscribeModel.count({uid: user.uid, type: "user"}),
-        thread: await db.SubscribeModel.count({uid: user.uid, type: "thread"}),
+        other: await db.SubscribeModel.count({uid: user.uid, cid: []})
       };
       const forums = await db.ForumModel.find({}, {fid: 1, forumType: 1});
       const topic = [];

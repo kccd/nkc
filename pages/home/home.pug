@@ -12,21 +12,31 @@ block content
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
         include ../publicModules/post_button
         include ../publicModules/management/management
+        include ../publicModules/subscribeTypes/subscribeTypesPanel
         include ../publicModules/apps/apps
         include ../publicModules/forums_nav/forums_tree
       .col-xs-12.col-md-7
         .row
-          .col-xs-12.col-md-12
-            if 0 && data.t === "subscribe"
+          .col-xs-12.col-md-12(style="overflow:hidden;")
+            if data.t === "subscribe"
+              mixin subscribeTypes(d)
+                ul.dropdown-menu
+                  for type in data.subscribeTypes
+                    li
+                      a(href=`/?t=subscribe&c=${type._id}${d?`&d=${d}`:""}`)=type.name
+                    if type.childTypes && type.childTypes.length
+                      for tt in type.childTypes
+                        li
+                          a(href=`/?t=subscribe&c=${tt._id}${d?`&d=${d}`:""}`)
+                            .m-l-1=tt.name
               .m-b-1
-                .subscribe-lists
+                //-.subscribe-lists
                   .subscribe-list
-                    a(href="/?t=subscribe" class=!data.c?"active":"") 全部
-                  .subscribe-list
-                    a(href="/?t=subscribe&c='column'" class=data.c==="column"? "active" : "") 专栏
+                    a(href=`/?t=subscribe${data.d ?`&d=${data.d}`:""}` class=!data.c?"active":"") 全部
+
                   for t in data.subscribeTypes
                     .subscribe-list
-                      a(href=`/?t=subscribe&c=${t._id}` class=Number(data.c)===t._id?"active":"")= t.name
+                      a(href=`/?t=subscribe${data.d?`&d=${data.d}`:""}&c=${t._id}` class=Number(data.c)===t._id?"active":"")= t.name
                       if t.childTypes && t.childTypes.length > 0
                         .fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                         ul.dropdown-menu
@@ -35,26 +45,33 @@ block content
                               a(href=`/?t=subscribe&c=${ct._id}`)= ct.name
                 .subscribe-lists
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}`
-                    class=!data.d?"active": ""
-                  ) 全部
+                    a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}`
+                      class=!data.d?"active": ""
+                    ) 全部
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=topic`
-                    class=data.d==="topic"?"active": ""
-                  ) 话题
+                    a(href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
+                        class=data.d==="column"? "active" : ""
+                    ) 专栏
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=discipline`
-                    class=data.d==="discipline"?"active": ""
-                  ) 学科
+                    a(href=`/?t=subscribe&d=topic${data.c ?`&c=${data.c}`:""}`
+                      class=data.d==="topic"?"active": ""
+                    ) 话题
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=user`
-                    class=data.d==="user"?"active": ""
-                  ) 用户
+                    a(href=`/?t=subscribe&d=discipline${data.c ?`&c=${data.c}`:""} `
+                      class=data.d==="discipline"?"active": ""
+                    ) 学科
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`$c=${data.c}`:""}&d=thread`
-                    class=data.d==="thread"?"active": ""
-                  ) 文章
-
+                    a(href=`/?t=subscribe&d=user${data.c ?`&c=${data.c}`:""}`
+                      class=data.d==="user"?"active": ""
+                    ) 用户
+                  .subscribe-list
+                    a(href=`/?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
+                      class=data.d==="thread"?"active": ""
+                    ) 文章
+                  .subscribe-list
+                    a(href=`/?t=subscribe&d=collection${data.c ?`&c=${data.c}`:""}`
+                      class=data.d === "collection" ? "active" : ""
+                    ) 收藏
             if !data.threads.length
               .p-t-5.p-b-5.text-center
                 h4
