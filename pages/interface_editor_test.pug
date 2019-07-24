@@ -47,18 +47,8 @@ block content
             .form-group
               div#quoteCancel(style='display: none')
                 button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-            //- if data.ver == "ue"
             .form-group
-              include ./ueditor/ueditor.pug     
-            //- if state.apptype
-            //-   .form-group
-            //-     .row
-            //-       .col-md-3.col-sm-3.col-xs-3
-            //-         button.btn.btn-sm.btn-primary(onclick="appUpdateVideo()") 视频录制
-            //-       .col-md-3.col-sm-3.col-xs-3
-            //-         button.btn.btn-sm.btn-primary(onclick="appUpdateImage()") 图片拍摄
-            //-       .col-md-3.col-sm-3.col-xs-3
-            //-         button.btn.btn-sm.btn-primary(onclick="appAttachHideOrShow()") 附件模块
+              include ./ueditor/ueditor.pug
             .form-group
               #transfer
             //- else

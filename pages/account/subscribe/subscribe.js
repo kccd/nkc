@@ -36,6 +36,9 @@ var app = new Vue({
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   },
   methods: {
+    appOpenUrl: function(url) {
+      appOpenUrl(url);
+    },
     managementSub: function() {
       if(this.management) {
         this.management = false;
