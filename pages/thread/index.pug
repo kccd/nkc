@@ -388,7 +388,7 @@ block content
                         if data.thread.type === "article"
                           div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
                         else if data.thread.type === "product"
-                          div.thread-content.ThreadPostBody#thread-content
+                          div.thread-content.ThreadPostBody
                             include ./product/product.pug
                         else if data.thread.type === "fund"
                           include ../fund/initData
@@ -633,5 +633,13 @@ block scripts
           toolbar: false,
         }
         new Viewer(document.getElementById('ThreadPostBody'), options);
-        new Viewer(document.getElementById('thread-content'), options);
+        if($("#productImageDom").length === 0) {
+          new Viewer(document.getElementById('thread-content'), options);
+        }else{
+          new Viewer(document.getElementById('productImageDom'), options);
+          new Viewer(document.getElementById('pikeImpor'), options);
+          new Viewer(document.getElementById('productIntroDom'), options);
+          new Viewer(document.getElementById('productInfoContent'), options);
+        }
+        //- new Viewer(document.getElementById('pikeLook'), options);
     })
