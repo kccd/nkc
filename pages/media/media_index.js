@@ -374,9 +374,7 @@ function uploadFile() {
 
 // 点击选择文件按钮
 function clickButton() {
-  // document.getElementById("fileList").value = "";
   document.getElementById("fileList").click();
-  // media.haveFileFail = false;
 }
 
 // function textButton() {

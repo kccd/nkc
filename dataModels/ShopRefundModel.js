@@ -414,6 +414,8 @@ schema.methods.platformAgreeRM = async function() {
  */
 schema.methods.sellerAgreeRM = async function(reason) {
   const ShopRefundModel = mongoose.model("shopRefunds");
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
+  const ShopProductsParamModel = mongoose.model("shopProductsParams");
   const {time} = await this.ensureRefundPermission(reason, [
     "B_APPLY_RM", 
     "B_APPLY_RP",
@@ -440,6 +442,11 @@ schema.methods.sellerAgreeRM = async function(reason) {
     orderId: this.orderId,
     refundId: this._id
   });
+  // 恢复库存
+  const costRecord = await ShopCostRecordModel.findOne({orderId: this.orderId});
+  const productParam = await ShopProductsParamModel.findOne({_id: costRecord.productParamId});
+  let newPlus = productParam.stocksSurplus + costRecord.count;
+  await productParam.update({$set: {stocksSurplus: newPlus}})
 };
 
 /**

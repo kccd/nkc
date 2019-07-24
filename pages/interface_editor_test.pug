@@ -65,14 +65,10 @@ block content
             //-   .form-group
             //-     div#content_test   
             .form-group
-            //- .nkcpanel(id='file-uploading' target='/r')
-            //-     //uploader section
-            //-     include interface_attachment_uploader_uploader.pug
-            if !state.apptype
+              a.btn.btn-sm.btn-info(onclick="appAttachHideOrShow()" style="width:100%") 
+                span#showOrHideAttach 展开附件
+            #attach(style="display:none")
               include ./media/media_index.pug
-            else
-              #attach(style="display:none")
-                include ./media/media_index.pug
             //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
             //-   .form-horizontal
             //-     .form-group
