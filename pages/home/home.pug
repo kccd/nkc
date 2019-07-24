@@ -12,6 +12,7 @@ block content
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
         include ../publicModules/post_button
         include ../publicModules/management/management
+        include ../publicModules/subscribeTypes/subscribeTypesPanel
         include ../publicModules/apps/apps
         include ../publicModules/forums_nav/forums_tree
       .col-xs-12.col-md-7
@@ -44,51 +45,33 @@ block content
                               a(href=`/?t=subscribe&c=${ct._id}`)= ct.name
                 .subscribe-lists
                   .subscribe-list
-                    +subscribeTypes("")
-                    a(href=`/?t=subscribe`
+                    a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}`
                       class=!data.d?"active": ""
                     ) 全部
-                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                   .subscribe-list
-                    +subscribeTypes("column")
-                    a(href=`/?t=subscribe&d=column`
+                    a(href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
                         class=data.d==="column"? "active" : ""
                     ) 专栏
-                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                   .subscribe-list
-                    +subscribeTypes("topic")
-                    a(href=`/?t=subscribe&d=topic`
+                    a(href=`/?t=subscribe&d=topic${data.c ?`&c=${data.c}`:""}`
                       class=data.d==="topic"?"active": ""
                     ) 话题
-                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                   .subscribe-list
-                    +subscribeTypes("discipline")
-                    a(href=`/?t=subscribe&d=discipline`
+                    a(href=`/?t=subscribe&d=discipline${data.c ?`&c=${data.c}`:""} `
                       class=data.d==="discipline"?"active": ""
                     ) 学科
-                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                   .subscribe-list
-                    +subscribeTypes("user")
-                    a(href=`/?t=subscribe&d=user`
+                    a(href=`/?t=subscribe&d=user${data.c ?`&c=${data.c}`:""}`
                       class=data.d==="user"?"active": ""
                     ) 用户
-                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                   .subscribe-list
-                    +subscribeTypes("thread")
-                    a(href=`/?t=subscribe&d=thread`
+                    a(href=`/?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
                       class=data.d==="thread"?"active": ""
                     ) 文章
-                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                   .subscribe-list
-                    +subscribeTypes("collection")
-                    a(href=`/?t=subscribe&d=collection`
+                    a(href=`/?t=subscribe&d=collection${data.c ?`&c=${data.c}`:""}`
                       class=data.d === "collection" ? "active" : ""
                     ) 收藏
-                    a.fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                  .subscribe-list
-                    +subscribeTypes(data.d)
-                    a.pointer(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") 分类
-                      .fa.fa-caret-down
             if !data.threads.length
               .p-t-5.p-b-5.text-center
                 h4

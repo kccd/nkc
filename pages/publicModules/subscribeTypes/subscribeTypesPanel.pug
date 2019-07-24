@@ -1,0 +1,18 @@
+if data.user && data.navbar && data.navbar.highlight === "subscribe" && data.subscribeTypes && data.subscribeTypes.length
+  +listHeader("自定义分类")
+  -var subCount = 0;
+  for t in data.subscribeTypes
+    -subCount += t.count;
+  .subscribe-types
+    a(href=`/?t=subscribe${data.d ? `&d=${data.d}` : ""}` class=!data.c? "active" : "").subscribe-type
+      span 全部
+      .pull-right=subCount
+    for st in data.subscribeTypes
+      a(href=`/?t=subscribe&c=${st._id}${data.d?`&d=${data.d}`:""}` class=data.c&&Number(data.c)===st._id?"active":"").subscribe-type
+        span=st.name
+        .pull-right=st.count
+      if st.childTypes && st.childTypes.length
+        for sst in st.childTypes
+          a.m-l-1(href=`/?t=subscribe&c=${sst._id}${data.d ? `&d=${data.d}` : ""}` class=data.c && Number(data.c) === sst._id ? "active" : "").subscribe-type
+            span=sst.name
+            .pull-right=sst.count
