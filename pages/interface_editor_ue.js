@@ -600,10 +600,10 @@ function appAttachHideOrShow() {
   loadMediaRe();
   var attactStatus = $("#attach").css("display");
   if(attactStatus === "block") {
-    $("#showOrHideAttach").text("展开附件")
+    $("#showOrHideAttach").text("插入图片、媒体、文件")
     $("#attach").css("display", "none")
   }else{
-    $("#showOrHideAttach").text("收起附件")
+    $("#showOrHideAttach").text("收起附件管理器")
     $("#attach").css("display", "block")
   }
 }
