@@ -68,9 +68,14 @@ subscribeRouter
     let {uid} = ctx.params;
     if(!uid) ctx.throw(400, '参数不正确');
     let {db} = ctx;
+    let {cid = []} = ctx.body;
     let {user} = ctx.data;
     if(user.uid === uid) ctx.throw(400, '关注自己干嘛？');
     await user.ensureSubLimit("user");
+    for(const typeId of cid) {
+      const subType = await db.SubscribeTypeModel.findOne({_id: typeId, uid: user.uid});
+      if(!subType) ctx.throw(400, `未找到ID为${typeId}的关注分类`);
+    }
     let sub = await db.SubscribeModel.findOne({
       type: "user",
       uid: user.uid,
@@ -82,11 +87,12 @@ subscribeRouter
       _id: await db.SettingModel.operateSystemID("subscribes", 1),
       type: "user",
       uid: user.uid,
+      cid,
       tUid: uid
     });
 
     await sub.save();
-
+    await db.SubscribeTypeModel.updateCount(cid);
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
     await db.KcbsRecordModel.insertSystemRecord('followed', ctx.data.targetUser, ctx);
     await next();
@@ -103,9 +109,9 @@ subscribeRouter
       tUid: uid
     });
     if(!sub) ctx.throw(400, '您之前没有关注过该用户，操作无效');
-
+    const cid = sub.cid;
     await sub.remove();
-
+    await db.SubscribeTypeModel.updateCount(cid);
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
     await db.KcbsRecordModel.insertSystemRecord('unFollowed', ctx.data.targetUser, ctx);
     await next();

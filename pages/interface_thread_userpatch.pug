@@ -11,11 +11,11 @@
           if(data.user)
             .inline-block(style='vertical-align: middle;')
               if(user.uid != data.user.uid)
-                - var subscribeUsers = data.user.subscribeUsers || []
+                - var subscribeUsers = state.subUsersId || []
                 if(subscribeUsers.indexOf(user.uid) > -1)
-                  a.btn.btn-sm.subscribe-btn(href='javascript:;' onclick=`subscribeUser("${uid}", false)`)#subscribeButton 取关
+                  a.btn.btn-sm.subscribe-btn(onclick=`SubscribeTypes.subscribeUser("${uid}", false)`)#subscribeButton 取关
                 else
-                  a.btn.btn-sm.subscribe-btn(href='javascript:;' onclick=`subscribeUser("${uid}", true)`)#subscribeButton 关注
+                  a.btn.btn-sm.subscribe-btn(onclick=`SubscribeTypes.subscribeUser("${uid}", true)`)#subscribeButton 关注
         -const targetUser = user;
         include user/module_user_grade
 

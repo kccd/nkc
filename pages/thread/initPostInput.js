@@ -23,4 +23,5 @@ var ue = UE.getEditor('container', {
   enableAutoSave: false, // 是否启动自动保存
   elementPathEnabled: false, // 是否显示元素路径
   imageScaleEnabled: false, // 启用图片拉伸缩放
+  zIndex : 499
 });

@@ -162,6 +162,8 @@ block footer
 block scripts
   +includeJS("/swiper/dist/js/swiper.js")
   +includeJS("/home/home.js")
+  if data.user
+    include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/vue_user_panel/vue_user_panel_float
   if canManagement
     include ../publicModules/moveThread/moveThread

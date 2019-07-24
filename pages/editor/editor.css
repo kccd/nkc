@@ -106,3 +106,21 @@
   color: #FFF;
   background-color: #2b90d9;
 }
+
+@media (max-width: 600px) {
+  .attachButton {
+    display: block
+  }
+  .attachBody {
+    display: none
+  }
+}
+
+@media (min-width: 600px) {
+  .attachButton {
+    display: none
+  }
+  .attachBody {
+    display: block
+  }
+}

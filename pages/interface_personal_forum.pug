@@ -61,17 +61,17 @@ block content
                       div(style='position: absolute; right: 0; top: 0;')
                         if isModerator
                           div
-                            a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
+                            a#enterManagementMode.btn.btn-default(onclick='switchManagementMode()') 管理
                         - var user = data.targetUser
                         if(data.user)
                           if(user.uid != data.user.uid)
                             -var subscribeUsers = data.user.subscribeUsers ? data.user.subscribeUsers : []
                             if(data.subscribed)
                               div
-                                a.subscribeButton.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUser("${user.uid}", false);` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
+                                a.subscribeButton.btn.btn-sm.btn-danger(onclick=`subscribeUser("${user.uid}", false);` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 取关
                             else
                               div
-                                a.subscribeButton.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUser("${user.uid}", true);` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
+                                a.subscribeButton.btn.btn-sm.btn-info(onclick=`subscribeUser("${user.uid}", true);` style='margin-top: 5px; margin-left: 10px;')#subscribeButton 关注
                       hr.hrNarrowSpace
                       div
                         if announcement && announcement != ''
@@ -79,14 +79,14 @@ block content
 
                   .configShit(style='display: none; position: relative;')
                     div(style='position: relative;')
-                      a(href='javascript:;' onclick='uploadForumBanner();' style='display: block; position: relative;')
+                      a(onclick='uploadForumBanner();' style='display: block; position: relative;')
                         div(style='background-image: url(/default/banner_setting.jpg); background-position: center; background-size: contain; position: relative; width: 100%;')
                           img.pfBanner(style='width: 100%; opacity: 0.2;' src=`/pfb/${forum.uid}`)
                           input#personalForumBannerUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`bannerOnChange(${forum.uid})`)
                     div(style='z-index: 1; position: relative;')
                       div(style='width: 19%; margin-top: -10%; height: 0; margin-left: 20px; padding-bottom: 19%; display: inline-block; vertical-align: top;')
                         div(style='background-color: white; width: 100%; padding: 3% 3% 3% 3%; border-radius: 5%; display: inline-block;')
-                          a(href='javascript:;' onclick='uploadForumAvatar();')
+                          a(onclick='uploadForumAvatar();')
                             div(style='background-image: url(/default/icon_setting.jpg); background-position: center; background-size: contain; border-radius: 5%;')
                               img(src=`/pfa/${forum.uid}` width='100%' style='border-radius: 5%; opacity: 0.2;')
                               input#personalForumAvatarUploader(type='file' style='position: absolute; width: 0; height: 0; z-index: -1; opacity: 0;' onchange=`avatarOnChange(${forum.uid})`)
@@ -109,17 +109,17 @@ block content
                       div(style='float: right; vertical-align: top;')
                         if isModerator
                           div
-                            a#enterManagementMode.btn.btn-default(href='javascript:;' onclick='switchManagementMode()') 管理
+                            a#enterManagementMode.btn.btn-default(onclick='switchManagementMode()') 管理
                           div
-                            a.btn.btn-default(href='javascript:;' onclick=`submitConfig("${forum.uid}")`) 保存
+                            a.btn.btn-default(onclick=`submitConfig("${forum.uid}")`) 保存
                       div
                         textarea#announcement(name = 'announcement' placeholder='请输入专栏公告' style='width: 100%;') #{announcement}
 
                   if data.userOperationsId.includes('bannedUser')
                     if data.targetUser.certs.indexOf('banned') > -1
-                      a(href='javascript:;' onclick=`bannedUser("${data.targetUser.uid}", false)`) 解除封禁
+                      a(onclick=`bannedUser("${data.targetUser.uid}", false)`) 解除封禁
                     else
-                      a(href='javascript:;' onclick=`bannedUser("${data.targetUser.uid}", true)`) &nbsp;封禁此人&nbsp;
+                      a(onclick=`bannedUser("${data.targetUser.uid}", true)`) &nbsp;封禁此人&nbsp;
 
 
         ul.nav.nav-tabs(style='margin-top: 0.4rem;')

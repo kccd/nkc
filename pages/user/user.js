@@ -1,11 +1,14 @@
 var checkbox;
 var checkboxBody;
+var SubscribeTypes;
 $(function() {
   checkbox = $(".post-checkbox input[type='checkbox']");
   checkboxBody = $(".post-checkbox label");
   if(window.moduleToColumn) {
     moduleToColumn.init();
   }
+  if(NKC.modules.SubscribeTypes)
+    SubscribeTypes = new NKC.modules.SubscribeTypes();
 });
 function managementPosts() {
   var btn = $("a.button[onclick='managementPosts()']");

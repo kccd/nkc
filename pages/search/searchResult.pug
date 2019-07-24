@@ -27,9 +27,9 @@
               if data.user && result.user.uid !== data.user
                 .display-i-b
                   if data.user.subUid.includes(result.user.uid)
-                    button.btn.btn-xs.btn-default(onclick=`subscribeUser('${result.user.uid}', false)`) 取关
+                    button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', false)`) 取关
                   else
-                    button.btn.btn-xs.btn-default(onclick=`subscribeUser('${result.user.uid}', true)`) 关注
+                    button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeUser('${result.user.uid}', true)`) 关注
                   a.m-l-05.btn.btn-xs.btn-default(href=`/message?uid=${result.user.uid}` target="_blank") 私信
               .search-result-certs=result.user.info.certsName
               .search-result-post
@@ -64,9 +64,9 @@
               if data.user
                 .display-i-b
                   if state.subColumnsId.includes(result.column._id)
-                    button.btn.btn-xs.btn-default(onclick=`subscribeColumn('${result.column._id}', false)`) 已关注
+                    button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeColumn('${result.column._id}', false)`) 已关注
                   else
-                    button.btn.btn-xs.btn-default(onclick=`subscribeColumn('${result.column._id}', true)`) 关注
+                    button.btn.btn-xs.btn-default(onclick=`SubscribeTypes.subscribeColumn('${result.column._id}', true)`) 关注
               .m-t-05 专栏主：
                 a(href=`/u/${result.column.uid}` target="_blank")=result.column.user.username
               .m-t-05=`关注人数：${result.column.subCount}`

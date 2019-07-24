@@ -79,17 +79,17 @@ block title
 
           li
             if data.collected
-              a(onclick=`NKC.methods.collectionThread('${thread.tid}', false)`)
+              a(onclick=`SubscribeTypes.collectionThread('${thread.tid}', false)`)
                 span.fa.fa-folder-o &nbsp;已收藏
             else
-              a(onclick=`NKC.methods.collectionThread('${thread.tid}', true)`)
+              a(onclick=`SubscribeTypes.collectionThread('${thread.tid}', true)`)
                 span.fa.fa-folder-o &nbsp;加入收藏
           li
             if data.subscribed
-              a(onclick=`NKC.methods.subscribeThread('${thread.tid}', false)`)
+              a(onclick=`SubscribeTypes.subscribeThread('${thread.tid}', false)`)
                 span.fa.fa-bookmark-o &nbsp;取消关注
             else
-              a(onclick=`NKC.methods.subscribeThread('${thread.tid}', true)`)
+              a(onclick=`SubscribeTypes.subscribeThread('${thread.tid}', true)`)
                 span.fa.fa-bookmark-o &nbsp;关注
         if addCredit
           li
@@ -388,7 +388,7 @@ block content
                         if data.thread.type === "article"
                           div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
                         else if data.thread.type === "product"
-                          div.thread-content.ThreadPostBody#thread-content
+                          div.thread-content.ThreadPostBody
                             include ./product/product.pug
                         else if data.thread.type === "fund"
                           include ../fund/initData
@@ -623,6 +623,7 @@ block scripts
   +includeJS("/thread/comments.js")
   if data.user
     script(src=`/media/media_index.js?v=${startTime}`)
+    include ../publicModules/subscribeTypes/subscribeTypes
   +includeJS("/external_pkgs/viewer/viewer.js")
   script.
     $(document).ready(function() {
@@ -632,5 +633,13 @@ block scripts
           toolbar: false,
         }
         new Viewer(document.getElementById('ThreadPostBody'), options);
-        new Viewer(document.getElementById('thread-content'), options);
+        if($("#productImageDom").length === 0) {
+          new Viewer(document.getElementById('thread-content'), options);
+        }else{
+          new Viewer(document.getElementById('productImageDom'), options);
+          new Viewer(document.getElementById('pikeImpor'), options);
+          new Viewer(document.getElementById('productIntroDom'), options);
+          new Viewer(document.getElementById('productInfoContent'), options);
+        }
+        //- new Viewer(document.getElementById('pikeLook'), options);
     })

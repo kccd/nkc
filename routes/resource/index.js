@@ -187,8 +187,8 @@ resourceRouter
       if(waterStyle === "userLogo"){
         username = ctx.data.user?ctx.data.user.username : "科创论坛";
       }else if(waterStyle === "coluLogo"){
-        const column = await ctx.db.PersonalForumModel.findOne({uid: ctx.data.user.uid});
-        username = column?column.displayName : ctx.data.user.username+"的专栏";
+        const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
+        username = column?column.name : ctx.data.user.name+"的专栏";
       }else{
         username = "";
       }

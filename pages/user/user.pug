@@ -50,9 +50,9 @@ block content
                 if data.targetUser.column
                   a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
                 if data.userSubUid.includes(data.targetUser.uid)
-                  a(onclick=` subscribeUser("${data.targetUser.uid}", false)`) 已关注
+                  a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", false)`) 已关注
                 else
-                  a(onclick=` subscribeUser("${data.targetUser.uid}", true)`) 关注
+                  a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", true)`) 关注
               else
                 a(href=`/login`) 私信
                 if data.targetUser.column
@@ -175,6 +175,8 @@ block content
 block scripts
   include ../publicModules/vue_user_panel/vue_user_panel_float
   include ../publicModules/complaint/complaint
+  if data.user
+    include ../publicModules/subscribeTypes/subscribeTypes
   if state.userColumn
     -const column = state.userColumn;
     include ../publicModules/toColumn/toColumn

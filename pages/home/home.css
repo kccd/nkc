@@ -96,3 +96,14 @@
   color: #2b90d9;
   text-decoration: none;
 }
+.management-sub-link{
+  text-align: center;
+  color: #9baec8;
+  font-size: 1rem;
+  display: block;
+  margin-top: 1rem;
+}
+.management-sub-link:hover, .management-sub-link:focus{
+  color: #2b90d9;
+  text-decoration: none;
+}

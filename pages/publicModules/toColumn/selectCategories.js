@@ -19,6 +19,11 @@ NKC.modules.SelectColumnCategories = function() {
         description: ""
       },
     },
+    mounted: function() {
+      if(this.choose.length) {
+        this.getCategories();
+      }
+    },
     methods: {
       getCategoryById: function(_id) {
         for(var i = 0; i < this.categories.length; i++) {

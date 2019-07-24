@@ -117,45 +117,58 @@ var app = new Vue({
     subscribeTarget: function(type, id) {
       var sub, index, func, subArr;
       if(type === "forum") {
-        func = NKC.methods.subscribeForumPromise;
+        func = SubscribeTypes.subscribeForumPromise;
         subArr = this.subForumsId;
       } else if(type === "column") {
-        func = NKC.methods.subscribeColumnPromise;
+        func = SubscribeTypes.subscribeColumnPromise;
         subArr = this.subColumnsId;
       } else if(type === "thread") {
-        func = NKC.methods.subscribeThreadPromise;
+        func = SubscribeTypes.subscribeThreadPromise;
         subArr = this.subThreadsId;
       } else if(type === "collection") {
-        func = NKC.methods.collectionThreadPromise;
+        func = SubscribeTypes.collectionThreadPromise;
         subArr = this.collectionThreadsId;
       } else {
-        func = NKC.methods.subscribeUserPromise;
+        func = SubscribeTypes.subscribeUserPromise;
         subArr = this.subUsersId;
       }
 
       index = subArr.indexOf(id);
       sub = (index === -1);
-      func(id, sub)
-        .then(function() {
-          if(sub) {
-            subArr.push(id);
-            if(type === "collection") {
-              sweetSuccess("收藏成功");
+      var promiseFunc;
+      if(sub) {
+        promiseFunc = SubscribeTypes.open;
+      } else {
+        promiseFunc = function(callback) {
+          callback([]);
+        };
+      }
+      promiseFunc(function(cid) {
+        SubscribeTypes.close();
+        func(id, sub, cid)
+          .then(function() {
+            app.getTypes();
+            if(sub) {
+              subArr.push(id);
+              if(type === "collection") {
+                sweetSuccess("收藏成功");
+              } else {
+                sweetSuccess("关注成功");
+              }
             } else {
-              sweetSuccess("关注成功");
+              subArr.splice(index, 1);
+              if(type === "collection") {
+                sweetSuccess("收藏已取消");
+              } else {
+                sweetSuccess("关注已取消");
+              }
             }
-          } else {
-            subArr.splice(index, 1);
-            if(type === "collection") {
-              sweetSuccess("收藏已取消");
-            } else {
-              sweetSuccess("关注已取消");
-            }
-          }
-        })
-        .catch(function(data) {
-          sweetError(data);
-        });
+          })
+          .catch(function(data) {
+            sweetError(data);
+          });
+      });
+
     },
     initManagement: function() {
       $(".small-forum-checkbox label").hide();
