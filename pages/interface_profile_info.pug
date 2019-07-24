@@ -9,9 +9,9 @@
         .ForumName #{user.username}&nbsp;&nbsp;&nbsp;
           if(user.uid != data.user.uid)
             if(data.user.subscribeUsers.indexOf(user.uid) > -1)
-              a.btn.btn-sm.btn-danger(href='javascript:;' onclick=`subscribeUser("${uid}", false)`)#subscribeButton 取关
+              a.btn.btn-sm.btn-danger(onclick=`subscribeUser("${uid}", false)`)#subscribeButton 取关
             else
-              a.btn.btn-sm.btn-info(href='javascript:;' onclick=`subscribeUser("${uid}", true)`)#subscribeButton 关注
+              a.btn.btn-sm.btn-info(onclick=`subscribeUser("${uid}", true)`)#subscribeButton 关注
     include interface_profile_info_section2.pug
           
   .col-xs-12.col-sm-6

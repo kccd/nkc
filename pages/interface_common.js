@@ -1974,6 +1974,52 @@ function openRightDrawer() {
   link.addClass('active');
   if(!link.find(".dom").html()) {
     link.find(".dom").html(linkDom.html());
+    if(localStorage.getItem("apptype") === "app") {
+      var allLinks = document.querySelectorAll("a");
+      Array.prototype.forEach.call(allLinks, function(ll) {
+        ll.addEventListener("click", function(e) {
+          e.preventDefault();
+          if(this.href) {
+            var isHostUrl = siteHostLink(this.href);
+            // 如果是本站链接则打开app内页，否则使用外站浏览页打开
+            if(isHostUrl) {
+              var paramIndex = this.href.indexOf("?");
+              var newHref = "";
+              var equaiHref = false;
+              if(paramIndex > -1) {
+                newHref = (this.href).substring(0, paramIndex)
+              }else{
+                newHref = this.href;
+              }
+              if(newHref.length > 0) {
+                if(api.winName.indexOf(newHref) > -1) {
+                  equaiHref = true;
+                }
+              }
+              // 如果是在首页跳转到最新关注推荐等，不打开新页面
+              if(this.pathname === "/" && api.winName === "root") {
+                window.location.href = addApptypeToUrl(this.href)
+                return;
+              }
+              if(equaiHref) {
+                appFreshUrl(this.href);
+              }else{
+                appOpenUrl(this.href);
+              }
+            }else{
+              api.openWin({
+                name: 'link',
+                url: 'widget://html/link/link.html',
+                pageParam: {
+                    name: 'link',
+                    linkUrl: this.href
+                }
+              });
+            }
+          }
+        })
+      })
+    }
   }
   $(".drawer-mask").addClass("active");
   stopBodyScroll(true);

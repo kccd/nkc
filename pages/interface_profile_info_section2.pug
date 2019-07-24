@@ -3,12 +3,13 @@
     if user.column
       a(href=`/m/${user.column._id}`) 专栏
     a(href=`/u/${user.uid}/collections/unclassified`) 收藏夹
-    a(href=`/message?uid=${user.uid}`) 发私信
+    if !state.apptype
+      a(href=`/message?uid=${user.uid}`) 发私信
 
     if(data.userOperationsId.includes('bannedUser') && !user.certs.includes('banned'))
-      a(href='javascript:void(0)' onclick=`bannedUser("${user.uid}", true)`) 封禁此人
+      a(onclick=`bannedUser("${user.uid}", true)`) 封禁此人
     if(data.userOperationsId.includes('unBannedUser') && user.certs.includes('banned'))
-      a(href='javascript:void(0)' onclick=`bannedUser("${user.uid}", false)`) 解除封禁
+      a(onclick=`bannedUser("${user.uid}", false)`) 解除封禁
 
     br
     span 学术分 #{user.xsf||0}
