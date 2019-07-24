@@ -96,7 +96,7 @@ var app = new Vue({
 
     this.t = data.t;
     this.selectedForums = data.selectedForums || [];
-    var options = data.d;
+    var options = dat拥有证书a.d;
     if(options) {
       try{
         options = JSON.parse(this.base64ToStr(options));

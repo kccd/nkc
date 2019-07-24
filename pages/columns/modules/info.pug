@@ -46,7 +46,7 @@ div.m-b-2
         if !data.column.hideDefaultCategory || !c.default
           a.column-category(href=`/m/${data.column._id}?c=${c._id}` class=Number(data.c)===c._id?"active":"")
             -for(var i = 0; i < c.level; i++)
-            span &nbsp;&nbsp;&nbsp;&nbsp;
+              span &nbsp;&nbsp;&nbsp;&nbsp;
             span=c.name
             .pull-right
               if c.count > 0
