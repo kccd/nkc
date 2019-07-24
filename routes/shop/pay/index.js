@@ -47,7 +47,7 @@ router
       money: ordersInfo.totalMoney,
       ip: ctx.address,
       port: ctx.port,
-      title: ordersInfo.title,
+      title: ordersInfo.description,
       notes: ordersInfo.description,
       backParams: {
         type: 'pay',

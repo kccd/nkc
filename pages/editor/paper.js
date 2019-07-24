@@ -3,7 +3,7 @@ function testThOpen() {
   testTh.open(function(data) {
     var shuchuDemo = "";
     var forumsArr = data.forums;
-    for(var i in forumsArr) {
+    for(var i=0;i < forumsArr.length;i++) {
       shuchuDemo += '<div class="move-thread-forum-name" style="background-color:'+forumsArr[i].color+' "><span class="chooseForum" fid="'+forumsArr[i].fid+'">'+forumsArr[i].fName+'<span class="chooseCate" cid="'+forumsArr[i].cid+'"> '+forumsArr[i].cName+'</span></span></div>';
     }
     $("#newPanelForum").html(shuchuDemo);
