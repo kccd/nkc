@@ -258,6 +258,9 @@ schema.post("save", async function(columnPost) {
     await mongoose.model("threads").updateOne({tid: columnPost.tid}, {
       $set: {
         inColumn: true
+      },
+      $addToSet: {
+        columnsId: columnPost.columnId
       }
     });
   }
@@ -269,13 +272,17 @@ schema.post("remove", async function(columnPost) {
       type: "thread",
       tid: columnPost.tid
     });
+    const obj = {
+      $pull: {
+        columnsId: columnPost.columnId
+      }
+    };
     if(count === 0) {
-      await mongoose.model("threads").updateOne({tid: this.tid}, {
-        $set: {
-          inColumn: false
-        }
-      });
+      obj.$set = {
+        inColumn: false
+      }
     }
+    await mongoose.model("threads").updateOne({tid: columnPost.tid}, obj);
   }
 });
 module.exports = mongoose.model("columnPosts", schema);

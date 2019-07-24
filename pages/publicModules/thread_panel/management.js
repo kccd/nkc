@@ -86,7 +86,6 @@ function moveSelectedThreads() {
     options.selectedCategoriesId = thread.cids;
     options.selectedForumsId = thread.fids;
   }
-  console.log(options);
   MoveThread.open(function(data) {
     var forums = data.forums;
     var moveType = data.moveType;

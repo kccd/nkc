@@ -49,15 +49,13 @@
   -ms-user-select: none;
   user-select: none;
   border-bottom: 1px solid #fff;
-  padding: 0 0.5rem;
-  background-color: #f4f4f4;
+  /*padding: 0 0.5rem;*/
+  /*background-color: #f4f4f4;*/
 }
 .subscribe-list{
+  padding: 0.3rem 0;
   display: inline-block;
   position: relative;
-  height: 2rem;
-  margin-bottom: 0.3rem;
-  line-height: 2rem;
   border-radius: 3px;
   color: #282c37;
   font-weight: 700;
@@ -70,6 +68,7 @@
 }
 .subscribe-list>a{
   color: #282c37;
+  font-size: 1.25rem;
 }
 .subscribe-list>a:hover, .subscribe-list>a:focus{
   color: #282c37;
