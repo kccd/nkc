@@ -2,7 +2,6 @@ const Router = require('koa-router');
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    console.time(`路由总时间`);
     const {data, nkcModules, db, query, state} = ctx;
     const {pageSettings} = state;
     let {page = 0, s, t, c, d} = query;
@@ -36,7 +35,6 @@ router
         await user.updateUserMessage();
       }
     }
-    console.time(`基本信息`);
     const homeSettings = await db.SettingModel.getSettings("home");
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
@@ -70,8 +68,6 @@ router
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
 
-    console.timeEnd(`基本信息`);
-    console.time("构造查询条件");
     let q = {};
     let threadListType;
     if(t) {
@@ -255,8 +251,6 @@ router
         inColumn: true
       }
     }
-    console.timeEnd("构造查询条件");
-    console.time(`查询文章`);
     data.threads = [];
     let paging;
 
@@ -330,10 +324,8 @@ router
     if(threadListType !== "recommend") {
       data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     }
-    console.timeEnd(`拓展文章`);
     data.paging = paging;
     ctx.template = "home/home.pug";
-    console.timeEnd(`路由总时间`);
     await next();
   });
 module.exports = router;
