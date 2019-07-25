@@ -280,7 +280,7 @@ schema.statics.insertSubscribe = async (type, uid, tid) => {
   const SubscribeModel = mongoose.model("subscribes");
   const SubscribeTypeModel = mongoose.model("subscribeTypes");
   let subType = await SubscribeTypeModel.findOne({uid, type});
-  if(!subType) subType = await SubscribeTypeModel.createDefaultType(type, uid);
+  if(!subType) subType = await SubscribeModel.createDefaultType(type, uid);
   let sub = await SubscribeModel.findOne({uid, tid, type: "thread"});
   if(sub) return;
   sub = SubscribeModel({
