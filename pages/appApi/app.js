@@ -166,7 +166,7 @@ function appOpenUrl(urlStr) {
   api.execScript({
     name: "root",
     script: "shareReadyBan()"
-  })
+  });
   api.openWin({
     name: paramStr,
     url: windowFile,

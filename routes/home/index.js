@@ -135,9 +135,11 @@ router
         q.reviewed = true;
       }
     } else if(threadListType === "subscribe") {
-      data.subscribeTypes = await db.SubscribeTypeModel.getTypesTree(user.uid);
-      data.subscribeCount = await db.SubscribeModel.count({uid: user.uid});
-      data.subscribeOtherCount = await db.SubscribeModel.count({uid: user.uid, cid: []});
+      data.subscribeTypes = await db.SubscribeTypeModel.getTypesList(user.uid);
+      data.subscribeCounts = {
+        total: await db.SubscribeModel.count({uid: user.uid}),
+        other: await db.SubscribeModel.count({uid: user.uid, cid: []})
+      };
       let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
       accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
 
@@ -199,7 +201,7 @@ router
         if(s.type === "column") return subColumnsId.push(s.columnId);
       });
       if(subColumnsId.length) {
-        const columns = await db.ColumnModel.find({_id: {$in: subColumnsId}, disabled: false, closed: false});
+        const columns = await db.ColumnModel.find({_id: {$in: subColumnsId}, disabled: false, closed: false}, {_id: 1});
         subColumnsId = columns.map(c => c._id);
       }
 

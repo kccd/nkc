@@ -14,31 +14,6 @@ block content
       .col-xs-12.col-md-3.box-shadow-panel
         .p-a-0
           .subscribe-lists
-            //
-              .subscribe-list(@click="selectType('')" :class="{'active':type===''}")
-                .fa.fa-navicon
-                | 全部
-                .pull-right(v-if="counts.total") {{counts.total}}
-              .subscribe-list(@click="selectType('column')" :class="{'active':type==='column'}")
-                .fa.fa-columns
-                | 专栏
-                .pull-right(v-if="counts.column") {{counts.column}}
-              .subscribe-list(@click="selectType('topic')" :class="{'active':type==='topic'}")
-                .fa.fa-tags
-                | 话题
-                .pull-right(v-if="counts.topic") {{counts.topic}}
-              .subscribe-list(@click="selectType('discipline')" :class="{'active':type==='discipline'}")
-                .fa.fa-flask
-                | 学科
-                .pull-right(v-if="counts.discipline") {{counts.discipline}}
-              .subscribe-list(@click="selectType('thread')" :class="{'active':type==='thread'}")
-                .fa.fa-newspaper-o
-                | 文章
-                .pull-right(v-if="counts.thread") {{counts.thread}}
-              .subscribe-list(@click="selectType('user')" :class="{'active':type==='user'}")
-                .fa.fa-users
-                | 用户
-                .pull-right(v-if="counts.user") {{counts.user}}
             .subscribe-list(@click="selectType('')" :class="{'active':type===''}")
               .fa.fa-navicon
               | 全部
@@ -46,11 +21,19 @@ block content
             .subscribe-list(@click="selectType('other')" :class="{'active':type==='other'}")
               .fa.fa-navicon
               | 未分类
-              .pull-right(v-if="counts.total") {{counts.other}}
-            //.subscribe-list-hr(v-if="types && types.length > 0")
+              .pull-right(v-if="counts.other") {{counts.other}}
+            //-
+              .subscribe-list(v-if="postType" @click="selectType(postType._id)" :class="{'active':type===postType._id}")
+                .fa.fa-navicon
+                | 我发表的
+                .pull-right(v-if="postType.count") {{postType.count}}
+              .subscribe-list(v-if="replayType" @click="selectType(replayType._id)" :class="{'active':type===replayType._id}")
+                .fa.fa-navicon
+                | 我参与的
+                .pull-right(v-if="replayType.count") {{replayType.count}}
             .subscribe-list-hr
             .subscribe-list(v-for="t in types" :class="{'active':type===t._id}")
-              .subscribe-type-options
+              .subscribe-type-options(v-if="!t.type")
                 .fa.fa-pencil(@click="modifyType(t)")
                 .fa.fa-arrow-circle-o-up(@click="moveType(t, 'up')")
                 .fa.fa-arrow-circle-o-down(@click="moveType(t, 'down')")
@@ -114,7 +97,7 @@ block content
                       div(v-else :style="'background-image: url(/forum_avatar/' + sub.fid + ')'")
                     .small-forum-content
                       .small-forum-name
-                        a(@click='appOpenUrl("/f/" + sub.fid)') {{sub.forum.displayName}}
+                        a.pointer(@click='appOpenUrl("/f/" + sub.fid)' :title="sub.forum.displayName") {{sub.forum.displayName}}
                         span(v-if="sub.forum.forumType === 'topic'") 话题
                         span(v-else) 学科
                       .small-forum-abbr {{sub.forum.description}}
@@ -132,7 +115,7 @@ block content
                       div(:style="'background-image: url(/m/' + sub.columnId + '/avatar)'")
                     .small-forum-content
                       .small-forum-name
-                        a(@click='appOpenUrl("/m/" + sub.columnId)') {{sub.column.name}}
+                        a.pointer(@click='appOpenUrl("/m/" + sub.columnId)' :title="sub.column.name") {{sub.column.name}}
                         span 专栏
                       .small-forum-abbr {{sub.column.abbr}}
                       .small-forum-info
@@ -148,7 +131,7 @@ block content
                       div(:style="'background-image: url(/avatar/' + sub.tUid+ ')'")
                     .small-forum-content
                       .small-forum-name
-                        a(@click='appOpenUrl("/u/" + sub.tUid)') {{sub.targetUser.username}}
+                        a.pointer(@click='appOpenUrl("/u/" + sub.tUid)' :title="sub.targetUser.username") {{sub.targetUser.username}}
                         span 用户
                       .small-forum-abbr {{sub.targetUser.description || "暂未填写个人简介"}}
                       .small-forum-info
@@ -164,7 +147,7 @@ block content
                       div(:style="'background-image: url(/cover/' + sub.tid + ')'")
                     .small-forum-content
                       .small-forum-name
-                        a(@click='appOpenUrl("/t/" + sub.tid)') {{sub.thread.firstPost.t}}
+                        a.pointer(@click='appOpenUrl("/t/" + sub.tid)' :title="sub.thread.firstPost.t") {{sub.thread.firstPost.t}}
                         span 文章
                       .small-forum-abbr {{sub.thread.firstPost.c || "暂未填写个人简介"}}
                       .small-forum-info
@@ -182,7 +165,7 @@ block content
                       div(:style="'background-image: url(/cover/' + sub.tid + ')'")
                     .small-forum-content
                       .small-forum-name
-                        a(@click='appOpenUrl("/t/" + sub.tid)') {{sub.thread.firstPost.t}}
+                        a.pointer(@click='appOpenUrl("/t/" + sub.tid)' :title="sub.thread.firstPost.t") {{sub.thread.firstPost.t}}
                         span 收藏
                       .small-forum-abbr {{sub.thread.firstPost.c || "暂未填写个人简介"}}
                       .small-forum-info
@@ -194,11 +177,6 @@ block content
                           button(@click="moveSub(sub)") 更改分类
             .col-xs-12(v-if="subscribes.length")
               +paging
-
-
-
-
-
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes
   +includeJS("/account/subscribe/subscribe.js")
