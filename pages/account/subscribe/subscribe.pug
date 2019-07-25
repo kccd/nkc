@@ -114,7 +114,7 @@ block content
                       div(v-else :style="'background-image: url(/forum_avatar/' + sub.fid + ')'")
                     .small-forum-content
                       .small-forum-name
-                        a(:href="'/f/' + sub.fid" :title="sub.forum.displayName") {{sub.forum.displayName}}
+                        a(@click='appOpenUrl("/f/" + sub.fid)') {{sub.forum.displayName}}
                         span(v-if="sub.forum.forumType === 'topic'") 话题
                         span(v-else) 学科
                       .small-forum-abbr {{sub.forum.description}}
@@ -132,7 +132,7 @@ block content
                       div(:style="'background-image: url(/m/' + sub.columnId + '/avatar)'")
                     .small-forum-content
                       .small-forum-name
-                        a(:href="'/m/' + sub.columnId" :title="sub.column.name") {{sub.column.name}}
+                        a(@click='appOpenUrl("/m/" + sub.columnId)') {{sub.column.name}}
                         span 专栏
                       .small-forum-abbr {{sub.column.abbr}}
                       .small-forum-info
@@ -148,7 +148,7 @@ block content
                       div(:style="'background-image: url(/avatar/' + sub.tUid+ ')'")
                     .small-forum-content
                       .small-forum-name
-                        a(:href="'/u/' + sub.tUid" :title="sub.targetUser.username") {{sub.targetUser.username}}
+                        a(@click='appOpenUrl("/u/" + sub.tUid)') {{sub.targetUser.username}}
                         span 用户
                       .small-forum-abbr {{sub.targetUser.description || "暂未填写个人简介"}}
                       .small-forum-info
@@ -164,7 +164,7 @@ block content
                       div(:style="'background-image: url(/cover/' + sub.tid + ')'")
                     .small-forum-content
                       .small-forum-name
-                        a(:href="'/t/' + sub.tid" :title="sub.thread.firstPost.t") {{sub.thread.firstPost.t}}
+                        a(@click='appOpenUrl("/t/" + sub.tid)') {{sub.thread.firstPost.t}}
                         span 文章
                       .small-forum-abbr {{sub.thread.firstPost.c || "暂未填写个人简介"}}
                       .small-forum-info
@@ -182,7 +182,7 @@ block content
                       div(:style="'background-image: url(/cover/' + sub.tid + ')'")
                     .small-forum-content
                       .small-forum-name
-                        a(:href="'/t/' + sub.tid" :title="sub.thread.firstPost.t") {{sub.thread.firstPost.t}}
+                        a(@click='appOpenUrl("/t/" + sub.tid)') {{sub.thread.firstPost.t}}
                         span 收藏
                       .small-forum-abbr {{sub.thread.firstPost.c || "暂未填写个人简介"}}
                       .small-forum-info
