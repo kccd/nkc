@@ -113,92 +113,20 @@ NKC.methods.renderFormula = function() {
 };
 
 /*
-* 关注专业（学科、话题）
-* @param {String} id 专业ID
-* @param {Boolean} sub 是否关注 false: 取消关注, true: 关注
-* @author pengxiguaa 2019-7-19
+* vue链接兼容APP
+*
 * */
-// 返回promise
-NKC.methods.subscribeForumPromise = function(id, sub) {
-  var method;
-  if(sub) {
-    method = "POST";
+
+NKC.methods.visitUrl = function(url, blank) {
+  if(localStorage.getItem("apptype") === "app") {
+    if(window.appOpenUrl) {
+      window.appOpenUrl(url);
+    }
   } else {
-    method = "DELETE";
+    if(blank) {
+      window.open(url);
+    } else {
+      window.location.href = url;
+    }
   }
-  return nkcAPI("/f/" + id + "/subscribe", method, {});
-};
-// 执行成功后刷新页面
-NKC.methods.subscribeForum = function(id, sub) {
-  NKC.methods.subscribeForumPromise(id, sub)
-    .then(function() {
-      window.location.reload();
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
-};
-/*
-* 关注专栏
-* @param {Number/String} id 专栏ID
-* @param {Boolean} sub 是否关注 false: 取消关注, true: 关注
-* @author pengxiguaa 2019-7-19
-* */
-// 返回promise
-NKC.methods.subscribeColumnPromise = function(id, sub) {
-  return nkcAPI("/m/" + id + "/subscribe", "POST", {
-    type: sub? "subscribe":""
-  });
-};
-// 执行成功后刷新页面
-NKC.methods.subscribeColumn = function(id, sub) {
-  NKC.methods.subscribeForumPromise(id, sub)
-    .then(function() {
-      window.location.reload();
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
-};
-/*
-* 关注用户
-* @param {String} id 用户ID
-* @param {Boolean} sub 是否关注 false: 取消关注, true: 关注
-* @author pengxiguaa 2019-7-19
-* */
-// 返回promise
-NKC.methods.subscribeUserPromise = function(id, sub) {
-  var method = sub? "POST": "DELETE";
-  return nkcAPI("/u/" + id + "/subscribe", method, {});
-};
-// 执行成功后刷新页面
-NKC.methods.subscribeUser = function(id, sub) {
-  NKC.methods.subscribeUserPromise(id, sub)
-    .then(function() {
-      window.location.reload();
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
-};
-/*
-* 关注文章
-* @param {String} id 文章ID
-* @param {Boolean} sub 是否关注 false: 取消关注, true: 关注
-* @author pengxiguaa 2019-7-19
-* */
-// 返回promise
-NKC.methods.subscribeThreadPromise = function(id, sub) {
-  var method = sub? "POST": "DELETE";
-  return nkcAPI("/t/" + id + "/subscribe", method, {});
-};
-// 执行成功后刷新页面
-NKC.methods.subscribeThread = function(id, sub) {
-  NKC.methods.subscribeThreadPromise(id, sub)
-    .then(function() {
-      window.location.reload();
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
 };

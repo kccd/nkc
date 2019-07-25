@@ -13,9 +13,9 @@
       .column-user-button
         a(href=`/message?uid=${data.column.uid}` target="_blank") 私信
         if data.user.subUid.includes(data.column.uid)
-          a.pointer(href=`javascript:subscribeUser("${data.column.uid}", false)` target="_blank") 取关
+          a.pointer(onclick=`SubscribeTypes.subscribeUser("${data.column.uid}", false)` target="_blank") 取关
         else
-          a.pointer(href=`javascript:subscribeUser("${data.column.uid}", true)` target="_blank") 关注
+          a.pointer(onclick=`SubscribeTypes.subscribeUser("${data.column.uid}", true)` target="_blank") 关注
     if data.column.user.description
       .column-user-description=data.column.user.description
 .m-b-2
@@ -46,7 +46,7 @@ div.m-b-2
         if !data.column.hideDefaultCategory || !c.default
           a.column-category(href=`/m/${data.column._id}?c=${c._id}` class=Number(data.c)===c._id?"active":"")
             -for(var i = 0; i < c.level; i++)
-            span &nbsp;&nbsp;&nbsp;&nbsp;
+              span &nbsp;&nbsp;&nbsp;&nbsp;
             span=c.name
             .pull-right
               if c.count > 0

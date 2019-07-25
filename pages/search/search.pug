@@ -107,5 +107,6 @@ block content
     //      button.btn.btn-default(type='submit') 搜索
 block scripts
   include ../publicModules/selectForum/selectForum
-  +includeJS("/publicModules/common.js")
+  if data.user
+    include ../publicModules/subscribeTypes/subscribeTypes
   +includeJS("/search/search.js")

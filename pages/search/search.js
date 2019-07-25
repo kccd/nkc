@@ -1,3 +1,5 @@
+var SubscribeTypes;
+
 var app = new Vue({
   el: "#app",
   data: {
@@ -107,6 +109,9 @@ var app = new Vue({
         if(options.digest) this.digest = options.digest;
         if(options.fid) this.fid = options.fid;
       } catch(err) {}
+    }
+    if(NKC.modules.SubscribeTypes) {
+      SubscribeTypes = new NKC.modules.SubscribeTypes();
     }
   }
 });

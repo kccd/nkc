@@ -107,11 +107,11 @@ block content
                     if !data.forum.childrenForums || data.forum.childrenForums.length === 0
                       if data.subscribed
                         button.btn-sm.forum-sub-btn.btn(
-                          onclick=`subscribeForum("${data.forum.fid}", false)`
+                          onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", false)`
                         ) 已关注
                       else
                         button.btn-sm.forum-sub-btn.btn.success(
-                          onclick=`subscribeForum("${data.forum.fid}", true)`
+                          onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", true)`
                         ) 关注
                       -display = false;
                     if display
@@ -239,6 +239,7 @@ block content
         include ../module_scrollTo
 
 block scripts
+  include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
   +includeJS("/forum/forum.js")

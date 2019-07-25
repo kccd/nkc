@@ -616,7 +616,7 @@ threadRouter
 		data.collected = false;
 		data.subscribed = false;
 		if(data.user) {
-			const collection = await db.CollectionModel.findOne({uid: data.user.uid, tid});
+			const collection = await db.SubscribeModel.findOne({uid: data.user.uid, tid, type: "collection"});
 			if(collection) {
 				data.collected = true;
 			}
@@ -854,12 +854,7 @@ threadRouter
       tid,
       uid: data.user.uid
     };
-    let sub = await db.SubscribeModel.findOne(subQuery);
-    if(!sub) {
-      subQuery.detail = "replay";
-      subQuery._id = await db.SettingModel.operateSystemID("subscribes", 1);
-      await db.SubscribeModel(subQuery).save();
-    }
+    await db.SubscribeModel.insertSubscribe("replay", data.user.uid, tid);
     //-global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })

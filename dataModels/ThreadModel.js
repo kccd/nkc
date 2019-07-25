@@ -198,6 +198,12 @@ const threadSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+  // 被加入到专栏的ID
+  columnsId: {
+    type: [Number],
+    index: 1,
+    default: []
   }
 
 }, {toObject: {

@@ -54,7 +54,7 @@ imgCodeSchema.statics.ensureCode = async (_id, token) => {
 		error.status = 400;
 		throw error;
 	}
-	if(imgCode.token !== token) {
+	if(imgCode.token.toLowerCase() !== token.toLowerCase()) {
 		const error = new Error('图片验证码错误。');
 		error.status = 400;
 		throw error;

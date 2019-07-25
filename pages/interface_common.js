@@ -1957,11 +1957,22 @@ function openLeftDrawer() {
   bnt.find('.fa').addClass('fa-angle-double-left');
   bnt.attr("onclick", "closeDrawer()");
   nav.addClass('active');
-  nav.find(".dom").html(navDom.html());
+  if(!nav.find(".dom").html()) {
+    nav.find(".dom").html(navDom.html());
+  }
   $(".drawer-mask").addClass("active");
   stopBodyScroll(true);
 }
 function openRightDrawer() {
+  if(localStorage.getItem("apptype") === "app") {
+    if(api.frameName) {
+      api.setFrameAttr({
+        name: api.frameName,
+        bounces: false
+      });
+    }
+  }
+
   var link = $(".drawer-dom .right");
   var linkDom = $("#rightDom");
   var bnt = $(".drawer-fixed-button-right");
@@ -1970,12 +1981,72 @@ function openRightDrawer() {
   bnt.find('.fa').removeClass('fa-angle-double-left');
   bnt.find('.fa').addClass('fa-angle-double-right');
   link.addClass('active');
-  link.find(".dom").html(linkDom.html());
+  if(!link.find(".dom").html()) {
+    link.find(".dom").html(linkDom.html());
+    if(localStorage.getItem("apptype") === "app") {
+      var allLinks = document.querySelectorAll("a");
+      Array.prototype.forEach.call(allLinks, function(ll) {
+        ll.addEventListener("click", function(e) {
+          e.preventDefault();
+          if(this.href) {
+            var isHostUrl = siteHostLink(this.href);
+            // 如果是本站链接则打开app内页，否则使用外站浏览页打开
+            if(isHostUrl) {
+              var paramIndex = this.href.indexOf("?");
+              var newHref = "";
+              var equaiHref = false;
+              if(paramIndex > -1) {
+                newHref = (this.href).substring(0, paramIndex)
+              }else{
+                newHref = this.href;
+              }
+              if(newHref.length > 0) {
+                if(api.winName.indexOf(newHref) > -1) {
+                  equaiHref = true;
+                }
+              }
+              // 如果是在首页跳转到最新关注推荐等，不打开新页面
+              if(this.pathname === "/" && api.winName === "root") {
+                window.location.href = addApptypeToUrl(this.href)
+                return;
+              }
+              if(equaiHref) {
+                appFreshUrl(this.href);
+              }else{
+                appOpenUrl(this.href);
+              }
+            }else{
+              api.openWin({
+                name: 'link',
+                url: 'widget://html/link/link.html',
+                pageParam: {
+                    name: 'link',
+                    linkUrl: this.href
+                }
+              });
+            }
+          }
+        })
+      })
+    }
+  }
   $(".drawer-mask").addClass("active");
   stopBodyScroll(true);
 }
 
 function closeDrawer() {
+  if(localStorage.getItem("apptype") === "app") {
+    api.setRefreshHeaderInfo({
+      bgColor: '#eeeeee',
+      textColor: '#aaaaaa',
+      textDown: '下拉刷新',
+      textUp: '松开刷新',
+      textLoading: '刷新成功，正在加载资源...',
+      showTime: false
+    }, function(ret, err) {
+      window.location.reload();
+    });
+  }
   $(".drawer-dom .left").removeClass("active");
   $(".drawer-dom .right").removeClass("active");
   var bnt = $(".drawer-fixed-button-left");

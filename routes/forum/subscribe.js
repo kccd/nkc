@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const subscribeRouter = new Router();
 subscribeRouter
 	.post('/', async (ctx, next) => {
-		const {data, db, params} = ctx;
+		const {data, db, params, body} = ctx;
 		const {fid} = params;
+		const {cid = []} = body;
 		const {user} = data;
 		const forum = await db.ForumModel.findOnly({fid});
 
@@ -28,14 +29,20 @@ subscribeRouter
 
     if(sub) ctx.throw(400, "您已关注过该专业了，请刷新");
 
+    for(const typeId of cid) {
+      const type = await db.SubscribeTypeModel.findOne({_id: typeId, uid: user.uid});
+      if(!type) ctx.throw(400, `未找到ID为${typeId}的关注分类`);
+    }
+
     sub = db.SubscribeModel({
       _id: await db.SettingModel.operateSystemID("subscribes", 1),
       uid: user.uid,
+      cid,
       type: "forum",
       fid
     });
     await sub.save();
-
+    await db.SubscribeTypeModel.updateCount(cid);
 		await db.KcbsRecordModel.insertSystemRecord('subscribeForum', user, ctx);
 		await next();
 	})
@@ -44,18 +51,17 @@ subscribeRouter
 		const {user} = data;
 		const {fid} = params;
 		const forum = await db.ForumModel.findOnly({fid});
-
 		const {subType} = forum;
-
 		if(subType === "force") ctx.throw(400, "关注该专业后不可取消");
-
 		const sub = await db.SubscribeModel.findOne({
       uid: user.uid,
       fid: forum.fid,
       type: "forum"
     });
 		if(!sub) ctx.throw(400, "您未关注过该专业，请刷新");
+		const {cid} = sub;
     await sub.remove();
+    await db.SubscribeTypeModel.updateCount(cid);
     await db.KcbsRecordModel.insertSystemRecord('unSubscribeForum', user, ctx);
 		await next();
 	});

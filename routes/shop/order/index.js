@@ -129,8 +129,8 @@ router
           productParam: newProductParam,
           count: newCart.count,
           uid: newCart.uid,
-          freightPrice: newCart.freightPrice,
-          productPrice: newCart.productPrice,
+          freightPrice: cart.freightPrice,
+          productPrice: cart.productPrice,
           singlePrice: newCart.productParam.price * (vipNum/100)
         };
         let shopCost = db.ShopCostRecordModel(cartObj);

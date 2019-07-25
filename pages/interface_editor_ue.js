@@ -69,7 +69,7 @@ function saveDraft() {
     return screenTopWarning("文章标题50字以内");
   }
 
-  if(!queryType || queryType === "forum" || desType === "forum") {
+  if(!queryType || queryType === "forum") {
     queryType = 'forum';
   }
 
@@ -201,13 +201,13 @@ function onPost() {
     var panelObj = $("#tabPanel").tagsinput("items");
     $("#newPanelForum").find(".chooseForum").each(function() {
       var fid = $(this).attr("fid");
-      if(fid) {
+      if(fid && fid !== "undefined") {
         fids.push(fid)
       }
     })
     $("#newPanelForum").find(".chooseCate").each(function() {
       var cid = $(this).attr("cid");
-      if(cid) {
+      if(cid && cid !== "undefined") {
         cids.push(cid)
       }
     })
@@ -312,7 +312,8 @@ function onPost() {
   return nkcAPI(url, method, data)
   .then(function (result) {
     if(result.redirect) {
-      redirect(result.redirect)
+      openToNewLocation(result.redirect);
+      // redirect(result.redirect)
     } else {
       if(queryType === 'post') {
         redirect()
@@ -466,6 +467,9 @@ function mediaInsertUE(srcStr, fileType, name) {
  * app视频拍摄、上传、及插入
  */
 function appUpdateVideo() {
+  var protocol = window.location.protocol;
+  var host = window.location.host;
+  var url = protocol + "//" + host + "/r";
   $("#attach").css("display", "none");
   api.getPicture({
     sourceType: 'camera',
@@ -486,7 +490,7 @@ function appUpdateVideo() {
           location: "bottom"
         })
         api.ajax({
-          url: "http://192.168.11.114:9000/r",
+          url: url,
           method: "post",
           timeout: 15,
           headers: {
@@ -502,17 +506,24 @@ function appUpdateVideo() {
           if(ret) {
             mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname);
             api.toast({
-              msg: "视频已处理",
+              msg: "视频处理完毕",
               duration: 1000,
               location: "bottom"
             })
           }else{
-            console.log("视频上传失败，请检查网络环境")
-            console.log(JSON.stringify(err))
+            api.toast({
+              msg: "视频处理失败，请检查当前网络环境...",
+              duration: 1000,
+              location: "bottom"
+            })
           }
         })
       } else {
-        console.log("拍摄失败！")
+        api.toast({
+          msg: "已取消视频处理",
+          duration: 1000,
+          location: "bottom"
+        })
       }
   });
 }
@@ -521,6 +532,9 @@ function appUpdateVideo() {
  * app图片拍摄、上传、及插入
  */
 function appUpdateImage() {
+  var protocol = window.location.protocol;
+  var host = window.location.host;
+  var url = protocol + "//" + host + "/r";
   $("#attach").css("display", "none");
   api.getPicture({
     sourceType: 'camera',
@@ -540,7 +554,7 @@ function appUpdateImage() {
           location: "bottom"
         })
         api.ajax({
-          url: "http://192.168.11.114:9000/r",
+          url: url,
           method: "post",
           timeout: 15,
           headers: {
@@ -561,11 +575,20 @@ function appUpdateImage() {
               location: "bottom"
             })
           }else{
+            api.toast({
+              msg: "已取消图片处理",
+              duration: 1000,
+              location: "bottom"
+            })
             console.log(JSON.stringify(err))
           }
         })
       } else {
-        console.log(JSON.stringify(err));
+        api.toast({
+          msg: "已取消图片处理",
+          duration: 1000,
+          location: "bottom"
+        })
       }
   });
 }
@@ -574,14 +597,19 @@ function appUpdateImage() {
  * 附件模块的隐藏与展开
  */
 function appAttachHideOrShow() {
+  loadMediaRe();
   var attactStatus = $("#attach").css("display");
   if(attactStatus === "block") {
+    $("#showOrHideAttach").text("插入图片、媒体、文件")
     $("#attach").css("display", "none")
   }else{
+    $("#showOrHideAttach").text("收起附件管理器")
     $("#attach").css("display", "block")
   }
 }
 
-apiready = function() {
-  console.log(api.frameName)
+function clickUploadButton() {
+  console.log("here")
+  // $("#fileList").;
+  document.getElementById("fileList").click();
 }

@@ -578,6 +578,7 @@ userSchema.statics.createUser = async (option) => {
 	const UsersGeneraModel = mongoose.model('usersGeneral');
 	const MessageModel = mongoose.model('messages');
 	const SmsModel = mongoose.model('sms');
+	const SubscribeTypeModel = mongoose.model("subscribeTypes");
 	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
 
 	const userObj = Object.assign({}, option);
@@ -645,6 +646,8 @@ userSchema.statics.createUser = async (option) => {
       });
 		  await sub.save();
     }
+		await SubscribeModel.createDefaultType("post", uid);
+    await SubscribeModel.createDefaultType("replay", uid);
 
 	} catch (error) {
 		await UserModel.remove({uid});
@@ -658,6 +661,7 @@ userSchema.statics.createUser = async (option) => {
       type: "forum",
       fid: {$in: defaultSubscribeForumsId}
     });
+		await SubscribeTypeModel.remove({uid});
 		const err = new Error(`创建用户出错: ${error}`);
 		err.status = 500;
 		throw err;

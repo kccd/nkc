@@ -47,38 +47,18 @@ block content
             .form-group
               div#quoteCancel(style='display: none')
                 button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-            //- if data.ver == "ue"
             .form-group
-              include ./ueditor/ueditor.pug     
-            //- if state.apptype
-            //-   .form-group
-            //-     .row
-            //-       .col-md-3.col-sm-3.col-xs-3
-            //-         button.btn.btn-sm.btn-primary(onclick="appUpdateVideo()") 视频录制
-            //-       .col-md-3.col-sm-3.col-xs-3
-            //-         button.btn.btn-sm.btn-primary(onclick="appUpdateImage()") 图片拍摄
-            //-       .col-md-3.col-sm-3.col-xs-3
-            //-         button.btn.btn-sm.btn-primary(onclick="appAttachHideOrShow()") 附件模块
+              include ./ueditor/ueditor.pug
             .form-group
               #transfer
             //- else
             //-   .form-group
             //-     div#content_test   
             .form-group
-            //- .nkcpanel(id='file-uploading' target='/r')
-            //-     //uploader section
-            //-     include interface_attachment_uploader_uploader.pug
-            if !state.apptype
+              a.btn.btn-sm.btn-info(onclick="appAttachHideOrShow()" style="width:100%;color: #080808;border: 1px solid #ddd;background-color:#fff").attachButton
+                span#showOrHideAttach 插入图片、媒体、文件
+            #attach.attachBody
               include ./media/media_index.pug
-            else
-              #attach(style="display:none")
-                include ./media/media_index.pug
-            //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-            //-   .form-horizontal
-            //-     .form-group
-            //-       label.col-sm-12 专业分类(必选，最多可选两个)
-            //-       .col-sm-12
-            //-         input#tabPanel.form-control(type='text' autocomplete='off', readonly='true')
             if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
               .form-horizontal
                 .form-group

@@ -232,14 +232,14 @@ style.
                     i.fa.fa-window-close-o
       .panel-body(style="padding:5px")
         // 全部 all
-        .mdui-row-xs-3.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
+        .mdui-row-xs-4.mdui-row-sm-6.mdui-row-md-6.mdui-row-lg-6.mdui-row-xl-6.mdui-grid-list#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
           .mdui-col(v-for = "(all, index) in mediaAllLists")
             .mdui-grid-tile(v-bind:title="all.oname" v-if="!all.dealStatus || all.dealStatus !== 'ing'")
               //- a(v-bind:href="'/r/'+picture.rid" target="_blank" v-bind:title="picture.oname")
-              img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
-              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px")
+              img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:60px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              .mdui-grid-tile-actions(style="max-height:30px;min-height:20px;padding:5px")
                 .mdui-grid-tile-text
-                  .mdui-grid-tile-title(style="font-size:13px") {{all.oname}}
+                  .mdui-grid-tile-title(style="font-size:11px;overflow:unset") {{all.oname}}
                 .mdui-grid-tile-buttons(v-bind:style="['png', 'jpg'].indexOf(all.ext) > -1 ? 'display:block' : 'display:none'")
                   button.mdui-btn.mdui-btn-icon(@click="pictureEdit(all.rid)")
                     i.fa.fa-pencil-square-o

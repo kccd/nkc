@@ -1,6 +1,10 @@
+var SubscribeTypes;
 $(document).ready(function(){
   if(window.moduleToColumn) {
     moduleToColumn.init();
+  }
+  if(NKC.modules.SubscribeTypes) {
+    SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
 	//编辑器缩放
 	if($(".w-e-text-container").length === 0) return;
@@ -488,16 +492,6 @@ function goEditor(){
 	openToNewLocation('/editor?type=thread&id='+replyTarget.trim().split('/')[1])
 }
 
-function addColl(tid){
-	nkcAPI('/t/'+tid+'/addColl', 'post',{})
-		.then(function(res){
-			screenTopAlert('已收藏 '+tid)
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error)
-		})
-}
-
 
 
 
@@ -943,21 +937,5 @@ function getSelectedColumnCategoriesId() {
     }
   }
   return status.selectedCategoriesId;
-  /*var columnCategoriesId = [];
-  if($("#checkboxToColumn").prop("checked")) {
-    var columnCategoriesDom = $("#postToColumn input");
-    if(columnCategoriesDom.length) {
-      for(var i = 0;  i < columnCategoriesDom.length; i++) {
-        var d = columnCategoriesDom.eq(i);
-        if(d.prop("checked")) {
-          columnCategoriesId.push(d.val());
-        }
-      }
-    }
-    if(columnCategoriesId.length === 0) {
-      geid('ButtonReply').disabled=false;
-      throw("请选择专栏文章分类");
-    }
-  }
-  return columnCategoriesId;*/
+
 }

@@ -10,7 +10,7 @@ if(pathName.indexOf("editor") > -1) {
 var ue = UE.getEditor('container', {
   toolbars: [
     [
-      'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', 'inserttable', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|'
+      'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent', '|','link', 'unlink', '|', 'emotion', 'inserttable', '|' ,'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright','|', 'insertcode'
     ]
   ],
   maximumWords: 100000, // 最大字符数
@@ -23,4 +23,5 @@ var ue = UE.getEditor('container', {
   enableAutoSave: false, // 是否启动自动保存
   elementPathEnabled: false, // 是否显示元素路径
   imageScaleEnabled: false, // 启用图片拉伸缩放
+  zIndex : 499
 });

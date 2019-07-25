@@ -101,7 +101,7 @@ style.
           img.etalage_source_image(src=`/r/${rid}`)
   .col-xs-12.col-sm-12.col-md-12.col-lg-6.moSlide#moSlide
     .pik1
-      .pike(style="height:250px")
+      .pike(style="height:250px")#pikeImpor
         -for(let rid of product.imgIntroductions)
           div
             img(src=`/r/${rid}` style="width:100%;height:250px")
@@ -212,7 +212,7 @@ style.
       div(style="border:2px solid #bbe0e1;padding:5px")
         p(style="font-size:15px") 公告
         p(style="font-size:12px")!=product.dealInfo.dealAnnouncement
-  .col-xs-12.col-md-12
+  .col-xs-12.col-md-12#productInfoContent
     div!=experimental_render(post)
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')

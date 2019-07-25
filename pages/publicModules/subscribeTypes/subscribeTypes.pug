@@ -1,37 +1,38 @@
-.modal.fade#moduleSubscribeTypes(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-uid=data.user.uid)
-  .modal-dialog.modal-sm(role="document")
-    .modal-content#moduleSubscribeTypesApp
-      .modal-header
-        button(type="button" class="close" data-dismiss="modal" aria-label="Close")
-          span(aria-hidden="true") &times;
-        h5.modal-title(v-if="edit") {{!type._id?"新建分类":"编辑分类"}}
-        h5.modal-title(v-else) 选择分类
-      .modal-body(v-if="!loaded")
-        .m-t-3.m-b-3.text-center 加载中...
-      .modal-body(v-else)
-        .from(v-if="edit")
-          .form-group
-            label 分类名(不超过20字符)
-            input.form-control(type="text" v-model.trim="type.name")
-          .form-group
-            label 父分类
-            select.form-control(v-model="type.pid")
-              option(:value="null") 无
-              option(v-for="t in parentTypes" :value="t._id" v-if="type._id !== t._id") {{t.name}}
-          .form-group
-            button.btn.btn-sm.btn-block.btn-primary(@click="save") 保存
-            button.btn.btn-sm.btn-block.btn-default(@click="closeForm") 取消
-        div(v-else)
-          .checkbox(v-for="t in types")
-            label
-              span(v-html="'&nbsp;&nbsp;&nbsp;'" v-if="t.pid")
-              input(type="checkbox" :value="t._id" v-model="selectedTypesId")
-              span {{t.name}}
-          .text-center
-            .pointer(@click="addType").m-t-05.m-b-05
-              .fa.fa-plus-circle &nbsp;添加分类
-      .modal-footer(v-if="!edit")
-        button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消
-        button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
+if data.user
+  .modal.fade#moduleSubscribeTypes(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-uid=data.user.uid)
+    .modal-dialog.modal-sm(role="document")
+      .modal-content#moduleSubscribeTypesApp
+        .modal-header
+          button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            span(aria-hidden="true") &times;
+          h5.modal-title(v-if="edit") {{!type._id?"新建分类":"编辑分类"}}
+          h5.modal-title(v-else) 选择分类
+        .modal-body(v-if="!loaded")
+          .m-t-3.m-b-3.text-center 加载中...
+        .modal-body(v-else)
+          .from(v-if="edit")
+            .form-group
+              label 分类名(不超过20字符)
+              input.form-control(type="text" v-model.trim="type.name" autofocus="autofocus" @keyup.enter="save")
+            .form-group
+              label 父分类
+              select.form-control(v-model="type.pid")
+                option(:value="null") 无
+                option(v-for="t in parentTypes" :value="t._id" v-if="type._id !== t._id") {{t.name}}
+            .form-group
+              button.btn.btn-sm.btn-block.btn-primary(@click="save") 保存
+              button.btn.btn-sm.btn-block.btn-default(@click="closeForm") 取消
+          div(v-else)
+            .checkbox(v-for="t in types")
+              label
+                span(v-html="'&nbsp;&nbsp;&nbsp;'" v-if="t.pid")
+                input(type="checkbox" :value="t._id" v-model="selectedTypesId")
+                span {{t.name}}
+            .text-center
+              .pointer(@click="addType").m-t-05.m-b-05
+                .fa.fa-plus-circle &nbsp;添加分类
+        .modal-footer(v-if="!edit")
+          button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消
+          button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
 
-+includeJS("/publicModules/subscribeTypes/subscribeTypes.js")
+  +includeJS("/publicModules/subscribeTypes/subscribeTypes.js")

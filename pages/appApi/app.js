@@ -144,6 +144,10 @@ function addApptypeToUrl(url) {
  * @param {} urlStr 
  */
 function appOpenUrl(urlStr) {
+  var origin = window.location.origin;
+  if(urlStr.indexOf("http") === -1) {
+    urlStr = origin + urlStr
+  }
   var paramStr = addApptypeToUrl(urlStr)
   // 如果是可以分享的类型则使用分享模板打开以便分享，否则使用其他模板打开
   var windowFile = "widget://html/common/commonInfo.html";
@@ -162,7 +166,7 @@ function appOpenUrl(urlStr) {
   api.execScript({
     name: "root",
     script: "shareReadyBan()"
-  })
+  });
   api.openWin({
     name: paramStr,
     url: windowFile,
