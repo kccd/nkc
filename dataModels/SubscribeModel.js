@@ -117,7 +117,7 @@ schema.statics.getUserSubThreadsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "thread",
     uid
-  });
+  }, {tid: 1});
   return subs.map(s => s.tid);
 };
 /*
@@ -170,7 +170,6 @@ schema.statics.autoAttentionForum = async function(options) {
 
 schema.statics.extendSubscribes = async (subscribes) => {
   const UserModel = mongoose.model("users");
-  const SubscribeModel = mongoose.model("subscribes");
   const ForumModel = mongoose.model("forums");
   const ColumnModel = mongoose.model("columns");
   const ThreadModel = mongoose.model("threads");
@@ -248,5 +247,51 @@ schema.statics.extendSubscribes = async (subscribes) => {
   }
   return results;
 };
-
+/*
+* 创建默认关注分类
+* @param {String} type post: 我发表的, replay: 我参与的
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-7-25
+* */
+schema.statics.createDefaultType = async (type, uid) => {
+  const SubscribeTypeModel = mongoose.model("subscribeTypes");
+  let sub = await SubscribeTypeModel.findOne({uid, type});
+  if(!sub) {
+    sub = {
+      _id: await mongoose.model("settings").operateSystemID("subscribeTypes", 1),
+      uid
+    };
+    if(type === "post") {
+      sub.type = type;
+      sub.name = "我发表的";
+    } else {
+      sub.type = type;
+      sub.name = "我参与的";
+    }
+    sub = SubscribeTypeModel(sub);
+    await sub.save();
+  }
+  return sub;
+};
+/*
+* 发表文章之后，向关注表插入一条数据。我发表的
+* */
+schema.statics.insertSubscribe = async (type, uid, tid) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const SubscribeTypeModel = mongoose.model("subscribeTypes");
+  let subType = await SubscribeTypeModel.findOne({uid, type});
+  if(!subType) subType = await SubscribeTypeModel.createDefaultType(type, uid);
+  let sub = await SubscribeModel.findOne({uid, tid, type: "thread"});
+  if(sub) return;
+  sub = SubscribeModel({
+    _id: await mongoose.model("settings").operateSystemID("subscribes", 1),
+    type: "thread",
+    detail: type,
+    uid,
+    tid,
+    cid: [subType._id]
+  });
+  await sub.save();
+  await SubscribeTypeModel.updateCount([subType._id]);
+};
 module.exports = mongoose.model('subscribes', schema);

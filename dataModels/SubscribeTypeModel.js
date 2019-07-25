@@ -8,6 +8,11 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  type: { // 分类的类型。"": 普通分类，可编辑可删除, "post": 我发表的，不可删除, "replay": 我参与的，不可删除
+    type: String,
+    index: 1,
+    default: ""
+  },
   name: {
     type: String,
     required: true
@@ -82,14 +87,23 @@ schema.statics.getTypesTree = async (uid) => {
 schema.statics.getTypesList = async (uid) => {
   const types = await mongoose.model("subscribeTypes").getTypesTree(uid);
   const results = [];
+  let postType, replayType;
   for(const type of types) {
     const childTypes = type.childTypes || [];
     delete type.childTypes;
-    results.push(type);
-    for(const t of childTypes) {
-      results.push(t);
+    if(type.type === "post") {
+      postType = type;
+    } else if(type.type === "replay") {
+      replayType = type;
+    } else {
+      results.push(type);
+      for(const t of childTypes) {
+        results.push(t);
+      }
     }
   }
+  if(replayType) results.unshift(replayType);
+  if(postType) results.unshift(postType);
   return results;
 };
 module.exports = mongoose.model("subscribeTypes", schema);

@@ -21,6 +21,8 @@ var app = new Vue({
 
     loaded: false,
     types: [],
+    postType: "",
+    replayType: "",
 
     subUsersId: [],
     subForumsId: [],
@@ -37,7 +39,8 @@ var app = new Vue({
   },
   methods: {
     appOpenUrl: function(url) {
-      appOpenUrl(url);
+      // appOpenUrl(url);
+      NKC.methods.visitUrl(url);
     },
     managementSub: function() {
       if(this.management) {
@@ -63,6 +66,8 @@ var app = new Vue({
         .then(function(data) {
           app.types = data.types;
           app.counts = data.counts;
+          // app.postType = data.postType;
+          // app.replayType = data.replayType;
         })
         .catch(function(data) {
           sweetError(data);
