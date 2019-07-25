@@ -5,6 +5,7 @@ module.exports = {
     const {tid} = params;
     const type = await db.SubscribeTypeModel.findOne({uid: user.uid, _id: tid});
     if(!type) ctx.throw(400, `未找到ID为${tid}的关注分类`);
+    if(type.type) ctx.throw(400, `默认分类无法更改`);
     data.subscribeType = type;
     await next();
   },

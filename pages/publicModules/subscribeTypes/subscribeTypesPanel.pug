@@ -3,17 +3,12 @@ if data.user && data.navbar && data.navbar.highlight === "subscribe" && data.sub
   .subscribe-types
     a(href=`/?t=subscribe${data.d ? `&d=${data.d}` : ""}` class=!data.c ? "active" : "").subscribe-type
       span 全部
-      .pull-right=data.subscribeCount
-    a(href=`/?t=subscribe&c=other${data.d ? `&d=${data.d}` : ""}` class=data.c === "other"? "active" : "").subscribe-type
+      .pull-right=data.subscribeCounts.total
+    a(href=`/?t=subscribe&c=other${data.d ? `&d=${data.d}` : ""}` class=data.c === "other" ? "active" : "").subscribe-type
       span 未分类
-      .pull-right=data.subscribeOtherCount
+      .pull-right=data.subscribeCounts.other
     for st in data.subscribeTypes
       a(href=`/?t=subscribe&c=${st._id}${data.d?`&d=${data.d}`:""}` class=data.c&&Number(data.c)===st._id?"active":"").subscribe-type
-        span=st.name
+        span(class=st.pid?"m-l-1":"")=st.name
         .pull-right=st.count
-      if st.childTypes && st.childTypes.length
-        for sst in st.childTypes
-          a.m-l-1(href=`/?t=subscribe&c=${sst._id}${data.d ? `&d=${data.d}` : ""}` class=data.c && Number(data.c) === sst._id ? "active" : "").subscribe-type
-            span=sst.name
-            .pull-right=sst.count
     a.management-sub-link(href=`/account/subscribes`) 管理我的分类
