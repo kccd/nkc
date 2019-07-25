@@ -117,7 +117,7 @@ schema.statics.getUserSubThreadsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "thread",
     uid
-  });
+  }, {tid: 1});
   return subs.map(s => s.tid);
 };
 /*
