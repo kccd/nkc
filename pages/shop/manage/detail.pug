@@ -3,7 +3,7 @@ block title
   -const order = data.order
   style.
     .orderStatusLi {
-      margin-bottom:20px;
+      margin-bottom:10px;
       font-size: 14px;
       font-weight: bolder;
       list-style: none;
@@ -12,6 +12,7 @@ block title
       font-size: xx-large;
       color: yellowgreen;
       vertical-align: middle;
+      margin-right: 10px
     }
     .orderCloseStatusMark {
       font-size: xx-large;
@@ -45,7 +46,7 @@ block title
     }
     .infoTitle {
       border-bottom: 2px solid #f1f1f1;
-      margin-bottom: 20px;
+      margin-top: 10px;
       font-size: 20px;
       font-weight: 700;
       color: #ff9638;
@@ -57,16 +58,10 @@ block title
       margin-bottom: 10px
     }
     .infoListLiDt {
-      width:15%;
       display:inline-block;
-      zoom:1;
-      vertical-align:top;
     }
     .infoListLiDd {
-      width:80%;
       display:inline-block;
-      zoom:1;
-      color:#666;
     }
     .infoListLiDd-noneWidth {
       display:inline-block;
@@ -82,186 +77,131 @@ block title
     }
 block name
   .row
-    if !state.apptype 
-      .col-xs-12.col-md-12
-        a.btn.btn-info(onclick="javascript :history.back(-1);")
-          span.fa.fa-backward
-          | &nbsp;返回
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px;margin-top:20px")
       div(style="border:1px solid #ddd;background-color:#eee;padding:20px")
-        ul
-          if order.refundStatus == "ing"
+        if order.refundStatus == "ing"
+          li.orderStatusLi
+            span.fa.fa-exclamation-circle.orderRefundStatusMark
+            span.orderStatusTitle 订单退款处理中
+        if order.closeStatus
+          li.orderStatusLi
+            span.fa.fa-exclamation-circle.orderCloseStatusMark
+            span.orderStatusText 订单已关闭
+          li.orderPrompt 
+            if data.refund
+              span=data.refund.description
+        else
+          if order.orderStatus == "unCost"          
             li.orderStatusLi
-              span.fa.fa-exclamation-circle.orderRefundStatusMark
-              span.orderStatusTitle 订单退款处理中
-          if order.closeStatus
-            li.orderStatusLi
-              span.fa.fa-exclamation-circle.orderCloseStatusMark
-              span.orderStatusTitle 当前订单状态：
-              span.orderStatusText 订单已关闭
+              span.fa.fa-exclamation-circle.orderStatusMark
+              span.orderStatusText 等待买家付款
             li.orderPrompt 
-              if data.refund
-                span=data.refund.description
-          else
-            if order.orderStatus == "unCost"          
-              li.orderStatusLi
-                span.fa.fa-exclamation-circle.orderStatusMark
-                span.orderStatusTitle 当前订单状态：
-                span.orderStatusText 等待买家付款
-              li.orderPrompt 
-                button(onclick=`cancelOrder(${order.orderId})`) 取消订单
-            if order.orderStatus == "unShip"
-              li.orderStatusLi
-                span.fa.fa-exclamation-circle.orderStatusMark
-                span.orderStatusTitle 当前订单状态：
-                span.orderStatusText 买家已付款、等待商家发货
-              li.orderPrompt 
+              button(onclick=`cancelOrder(${order.orderId})`) 取消订单
+          if order.orderStatus == "unShip"
+            li.orderStatusLi
+              span.fa.fa-exclamation-circle.orderStatusMark
+              span.orderStatusText 已付款，等待商家发货
+            li.orderPrompt 
+              span 
+                button(onclick=`openSendGoodsModal(${order.buyUid}, ${order.orderId})`) 发货
+            li.orderPrompt 
+              span 买家已付款，请尽快发货，否则买家有权申请退款
+            li.orderPrompt
+              span 如果无法发货，请及时与买家联系并说明情况
+            li.orderPrompt
+              span 买家申请退款后，须征得买家同意后再操作发货，否则买家有权拒收货物
+          if order.orderStatus == "unSign"
+            li.orderStatusLi
+              span.fa.fa-exclamation-circle.orderStatusMark
+              span.orderStatusText 已发货，等待买家确认收货
+            //-li.orderPrompt
+              span 已发货，您可以
+                span
+                button(onclick=`comfirmReceipt(${order.orderId})`) 提醒
+              span 买家确认收货
+            li.orderPrompt 
+              if !order.trackNumber || order.trackNumber == "no"
+                span 该商品无须物流配送
+              else
+                span 点击查看商品的
                 span 
-                  button(onclick=`openSendGoodsModal(${order.buyUid}, ${order.orderId})`) 发货
-              li.orderPrompt 
-                span 买家已付款，请尽快发货，否则买家有权申请退款
-              li.orderPrompt
-                span 如果无法发货，请及时与买家联系并说明情况
-              li.orderPrompt
-                span 买家申请退款后，须征得买家同意后再操作发货，否则买家有权拒收货物
-            if order.orderStatus == "unSign"
-              li.orderStatusLi
-                span.fa.fa-exclamation-circle.orderStatusMark
-                span.orderStatusTitle 当前订单状态：
-                span.orderStatusText 商家已发货，等待买家确认收货
-              //-li.orderPrompt
-                span 已发货，您可以
-                 span
-                  button(onclick=`comfirmReceipt(${order.orderId})`) 提醒
-                span 买家确认收货
-              li.orderPrompt 
-                if !order.trackNumber || order.trackNumber == "no"
-                  span 该商品无须物流配送
-                else
-                  span 点击查看商品的
-                  span 
-                    a(onclick=`visitLogisticsInfo(${order.sellUid},${order.orderId})` style="cursor:pointer;") 物流信息
-            if order.orderStatus == "finish"
-              li.orderStatusLi
-                span.fa.fa-exclamation-circle.orderStatusMark
-                span.orderStatusTitle 当前订单状态：
-                span.orderStatusText 订单已完成
-              li.orderPrompt
-                span 交易已成功，如果买家提出售后要求，请积极与买家协商，做好售后服务。
+                  a(onclick=`visitLogisticsInfo(${order.sellUid},${order.orderId})` style="cursor:pointer;") 物流信息
+          if order.orderStatus == "finish"
+            li.orderStatusLi
+              span.fa.fa-exclamation-circle.orderStatusMark
+              span.orderStatusText 订单已完成
+            li.orderPrompt
+              span 交易已成功，如果买家提出售后要求，请积极与买家协商，做好售后服务。
     .col-sm-12.col-md-12.col-xs-12
       .panel.panel-default
         .panel-body
-          .col-xs-12
-            h4.infoTitle 
-              span 订单信息
-            .col-xs-12
-              ul.infoListUl
-                li.infoListLi
-                  span.infoListLiDt 收货地址：
-                  span.infoListLiDd!=`${order.receiveName}, ${order.receiveMobile}, ${order.receiveAddress}`
-                li.infoListLi 
-                  span.infoListLiDt 订单编号：
-                  span.infoListLiDd!=`${order.orderId}`
-                li.infoListLi 
-                  span.infoListLiDt 买家：
-                  span.infoListLiDd!=`${order.buyUser.username}`
-                li.infoListLi 
-                  span.infoListLiDt 运单编号：
-                  if order.trackNumber
-                    span.infoListLiDd-noneWidth#trakcNumText!=`${order.trackNumber}`
-                  else
-                    span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
-                  if order.orderStatus == "unSign"
-                    span 
-                      button#editTrackNum(onclick=`editTrackNum()`) 修改
-                      button#saveTrackNum(onclick=`saveTrackNum(${order.sellUid}, ${order.orderId})` style="display:none;") 保存
+          h4.infoTitle 
+            span 订单信息
+          p
+            span.infoCaption 收货地址：
+            span.infoListLiDd!=`${order.receiveName}, ${order.receiveMobile}, ${order.receiveAddress}`
+          p 
+            span.infoCaption 订单编号：
+            span.infoListLiDd!=`${order.orderId}`
+          p 
+            span.infoCaption 买家昵称：
+            span.infoListLiDd!=`${order.buyUser.username}`
+          p 
+            span.infoCaption 运单编号：
+            if order.trackNumber
+              span.infoListLiDd-noneWidth#trakcNumText!=`${order.trackNumber}`
+            else
+              span.infoListLiDd-noneWidth#trakcNumText 暂无物流信息
+            //- if order.orderStatus == "unSign"
+            //-   span 
+            //-     button#editTrackNum(onclick=`editTrackNum()`) 修改
+            //-     button#saveTrackNum(onclick=`saveTrackNum(${order.sellUid}, ${order.orderId})` style="display:none;") 保存
+                
 
-          .col-xs-12
-            h4.infoTitle 
-              span 时间信息
-            .col-xs-6
-              p
-                span.infoCaption 创建时间:
-                if order.orderToc
-                  span.infoContent=order.orderToc.toLocaleString()
-            .col-xs-6
-              p
-                span.infoCaption 发货时间:
-                if order.shipToc
-                  span.infoContent=order.shipToc.toLocaleString()
-            .col-xs-6
-              p
-                span.infoCaption 付款时间:
-                if order.payToc
-                  span.infoContent=order.payToc.toLocaleString()
-            .col-xs-6
-              p
-                span.infoCaption 确认收货时间:
-                if order.finishToc
-                  span.infoContent=order.finishToc.toLocaleString()
-            .col-xs-6
-              p
-                span.infoCaption 订单关闭时间:
-                if order.closeToc
-                  span.infoContent=order.closeToc.toLocaleString()
-
-          .col-xs-12
-            h4.infoTitle 
-              span 商家信息
-            .col-xs-12
-              p
-                span.infoCaption 卖家昵称:
-                span.infoContent!=`${order.sellUser.username}`
-            .col-xs-12
-              p
-                span.infoCaption 电话:
-                //- span.infoContent!=`${order.store.mobile}`
-            .col-xs-12
-              p
-                span.infoCaption 所在地:
-                //- span.infoContent!=`${order.store.address}`
-          //- .col-xs-12
-          //-   h4.infoTitle 
-          //-     span 购买凭证
-          //-   if !order.product.uploadCert
-          //-     .col-xs-12
-          //-       p
-          //-         span.infoCaption 该商品不需要购买凭证
-          //-   else
-          //-     if !data.certs || data.certs.length == 0
-          //-       .col-xs-12
-          //-         p
-          //-           span.infoCaption 缺少购买凭证
-          //-     else
-          //-       .col-xs-12
-          //-         p
-          //-           for cert in data.certs
-          //-             a(href=`/shop/cert/${cert.id}` target="blank")
-          //-               img(src=`/shop/cert/${cert.id}` style="width:100px;height:100px;margin-right:10px")
+          h4.infoTitle 
+            span 时间信息
+          p
+            span.infoCaption 创建时间:
+            if order.orderToc
+              span.infoContent=order.orderToc.toLocaleString()
+          p
+            span.infoCaption 发货时间:
+            if order.shipToc
+              span.infoContent=order.shipToc.toLocaleString()
+          p
+            span.infoCaption 付款时间:
+            if order.payToc
+              span.infoContent=order.payToc.toLocaleString()
+          p
+            span.infoCaption 确认收货:
+            if order.finishToc
+              span.infoContent=order.finishToc.toLocaleString()
+          p
+            span.infoCaption 订单关闭:
+            if order.closeToc
+              span.infoContent=order.closeToc.toLocaleString()
     .col-sm-12.col-md-12.col-xs-12
       .order-address-wrap
         h3(style='border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;')
           span 商品信息
-      table.table.table-striped(style='margin-left:40px')
-        thead
-          tr
-            th 商品名称
-            th 属性
-            th 商品单价
-            th 数量
-        tbody
-          for para in order.params
+      .table-responsive
+        table.table.table-striped
+          thead
             tr
-              td
-                a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
-              td!=`${para.productParam.name}`
-              td #{numToFloatTwo(para.singlePrice)}
-              td!=`${para.count}`
+              th 商品名称
+              th 属性
+              th 商品单价
+              th 数量
+          tbody
+            for para in order.params
+              tr
+                td
+                  a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
+                td!=`${para.productParam.name}`
+                td #{numToFloatTwo(para.singlePrice)}
+                td!=`${para.count}`
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')
-        //- p
-        //-   span(style='font-weight: bold;') 订单总价: 
-        //-   span#totalPrice(style='font-size:20px;text-decoration: line-through;') #{numToFloatTwo(order.orderOriginPrice)}
         p
           span(style='font-weight: bold;') 实付款
           span!=`( 含运费`
