@@ -204,7 +204,6 @@ router
         const columns = await db.ColumnModel.find({_id: {$in: subColumnsId}, disabled: false, closed: false}, {_id: 1});
         subColumnsId = columns.map(c => c._id);
       }
-
       q = {
         mainForumsId: {
           $in: accessibleForumsId
@@ -221,7 +220,7 @@ router
             }
           },
           {
-            columnId: {$in: subColumnsId}
+            columnsId: {$in: subColumnsId}
           },
           {
             uid: {
@@ -256,7 +255,6 @@ router
 
     const count = await db.ThreadModel.count(q);
     paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
-
     let sort = {tlm: -1};
     if(s === "toc") sort = {toc: -1};
 
