@@ -42,6 +42,8 @@ editorRouter
 	    if(type === 'forum' && id) {
         const forum = await db.ForumModel.findOnly({fid: id});
         data.forumType = forum.forumType;
+        const childForumCount = await db.ForumModel.count({parentsId: id});
+        if(!childForumCount) data.forum = forum;
 	    	await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 	    	const breadcrumbForums = await forum.getBreadcrumbForums();
 	    	data.selectedArr = breadcrumbForums.map(forum => forum.fid);
