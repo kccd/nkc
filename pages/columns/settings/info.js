@@ -62,7 +62,7 @@ var app = new Vue({
     },
     selectedBanner: function(data) {
       this.banner = data;
-      fileToUrl(data)
+      NKC.methods.fileToUrl(data)
         .then(function(url) {
           app.bannerUrl = url;
           selectImage.close();
@@ -70,7 +70,7 @@ var app = new Vue({
     },
     selectedAvatar: function(data) {
       this.avatar = data;
-      fileToUrl(data)
+      NKC.methods.fileToUrl(data)
         .then(function(url) {
           app.avatarUrl = url;
           selectImage.close();

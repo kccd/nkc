@@ -6,26 +6,90 @@ function ga(id,attr){return geid(id).getAttribute(attr);}
 function hset(id,content){geid(id).innerHTML=content;}
 function display(id){geid(id).style = 'display:inherit;'}
 
-function jalert(obj){
-  if(screenTopAlert){
-    return screenTopAlert(JSON.stringify(obj))
-  }
-  else {
-    alert(JSON.stringify(obj))
-  }
+/*
+* 发起请求/上传文件
+* @param {String} type 普通请求："post", 上传文件："upload"
+* @param {String} url 服务器地址
+* @param {String} method 请求方法
+* @param {Object/FormData} data 发送的数据。上传文件时data必须为formData对象
+* @param {Function} progress 上传文件时返回上传状态
+*   @param {Object} e 原始上传进度对象
+*   @param {String} percentage 进度百分比，例：87%
+* @return promise
+* @author pengxiguaa 2019-7-26
+* */
+function generalRequest(type, url, method, data, progress) {
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    if(type === "upload" && progress) {
+      xhr.upload.onprogress = function(e) {
+        var num = (e.loaded/e.total)*100;
+        if(num >= 100) num = 100;
+        var percentage = (num).toFixed(1);
+        percentage = percentage + "%";
+        progress(e, percentage);
+      };
+    }
+    xhr.onreadystatechange = function(){
+      var res;
+      if (xhr.readyState === 4){
+        try {
+          res = JSON.parse(xhr.responseText);
+        } catch(e) {
+          res = xhr.responseText
+        }
+        if(xhr.status === 0) {
+          reject('发起请求失败，请检查网络连接');
+        } else if(xhr.status >= 400 || res.error || res instanceof Error) {
+          reject(res);
+        } else {
+          resolve(res);
+        }
+      }
+    };
+    try{
+      if(type === "upload") {
+        xhr.open(method || "POST", url,true);
+        xhr.setRequestHeader("FROM","nkcAPI");
+        xhr.send(data);
+      } else {
+        xhr.open(method, url,true);
+        xhr.setRequestHeader("Content-type","application/json");
+        xhr.setRequestHeader("FROM","nkcAPI");
+        xhr.send(JSON.stringify(data));
+      }
+    }catch(err){
+      reject(err);
+    }
+  })
+}
+/*
+* 发送请求
+* @param {String} url 服务器地址
+* @param {String} method 请求方法
+* @param {Object} data 数据对象
+* @return promise
+* @author pengxiguaa 2019-7-26
+* */
+function nkcAPI(url, method, data) {
+  return generalRequest("post", url, method, data);
+}
+/*
+* 上传文件
+* @param {String} url 服务器地址
+* @param {String} method 请求方法，默认POST
+* @param {FormData} data 数据对象
+* @param {Function} progress 进度
+*   @param {Object} e 原始上传进度对象
+*   @param {String} percentage 进度百分比，例：87%
+* @return promise
+* @author pengxiguaa 2019-7-26
+* */
+function nkcUploadFile(url, method, data, progress) {
+  return generalRequest("upload", url, method, data, progress);
 }
 
-function jwarning(obj){
-  if(screenTopWarning){
-    return screenTopWarning(JSON.stringify(obj))
-  }
-  else {
-    alert(JSON.stringify(obj))
-  }
-}
-
-
-// nkcAPI接口核心
+/*// nkcAPI接口核心
 function generalRequest(obj,opt,callback){
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function(){
@@ -70,7 +134,110 @@ function nkcOperationAPI(obj){
     });
   })
 }
+function nkcAPI(operationName,method,remainingParams){  //操作名，参数
+  remainingParams = remainingParams || {};
+  remainingParams.url = operationName;
+  remainingParams.method = method;
+  return nkcOperationAPI(remainingParams)
+}*/
 
+
+/***********************各种弹出框*******************************************/
+function jalert(obj){
+  if(screenTopAlert){
+    return screenTopAlert(JSON.stringify(obj))
+  }
+  else {
+    alert(JSON.stringify(obj))
+  }
+}
+
+function jwarning(obj){
+  if(screenTopWarning){
+    return screenTopWarning(JSON.stringify(obj))
+  }
+  else {
+    alert(JSON.stringify(obj))
+  }
+}
+
+function sweetAlert(text) {
+  text = (text.error || text) + "";
+  Swal({
+    confirmButtonText: "关闭",
+    text: text
+  });
+}
+
+function sweetSuccess(text) {
+  text = text + "";
+  Swal({
+    type: "success",
+    confirmButtonText: "关闭",
+    text: text
+  });
+}
+function sweetError(text) {
+  text = text.error || text;
+  text = text + "";
+  Swal({
+    type: "error",
+    confirmButtonText: "关闭",
+    text: text.error || text
+  });
+}
+function sweetInfo(text) {
+  text = text + "";
+  Swal({
+    type: "info",
+    confirmButtonText: "关闭",
+    text: text
+  });
+}
+function sweetWarning(text) {
+  text = text + "";
+  Swal({
+    type: "warning",
+    confirmButtonText: "关闭",
+    text: text
+  });
+}
+function sweetConfirm(text) {
+  text = text + "";
+  return new Promise(function(resolve, reject) {
+    Swal({
+      type: "warning",
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      text: text,
+      showCancelButton: true,
+      reverseButtons: true
+    })
+      .then(function(result) {
+        if(result.value === true) {
+          resolve();
+        }
+      })
+  });
+}
+function sweetQuestion(text) {
+  text = text + "";
+  return new Promise(function(resolve, reject) {
+    Swal({
+      type: "question",
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      text: text,
+      showCancelButton: true,
+      reverseButtons: true
+    })
+      .then(function(result) {
+        if(result.value === true) {
+          resolve();
+        }
+      })
+  });
+}
 
 function screenTopAlert(text){
   return screenTopAlertOfStyle(text,'success')
@@ -157,7 +324,8 @@ function screenTopAlertInit(){
   );
 }
 
-screenTopAlertInit()
+screenTopAlertInit();
+/*******************************************************************************/
 
 function redirect(url){
   var urlnowpath = window.location.pathname
@@ -170,81 +338,16 @@ function redirect(url){
   openToNewLocation(url)
 }
 
-function nkcAPI(operationName,method,remainingParams){  //操作名，参数
-  remainingParams = remainingParams || {};
-  remainingParams.url = operationName;
-  remainingParams.method = method;
-  return nkcOperationAPI(remainingParams)
-}
-
-/*var NavBarSearch = {
-  box:geid('SearchBox'),
-  btn:geid('SearchButton'),
-
-  init:function(){
-    console.log('NavBarSearch init...');
-    NavBarSearch.btn.addEventListener('click',NavBarSearch.search);
-
-    NavBarSearch.box.addEventListener('keypress', NavBarSearch.onkeypress);
-
-  },
-
-  onkeypress:function(){
-    e = event ? event :(window.event ? window.event : null);
-    if(e.keyCode===13||e.which===13)
-
-    NavBarSearch.search()
-  },
-
-  search:function(){
-    var searchstr = NavBarSearch.box.value.trim()
-
-    var onSearchResultPage = geid('stringToSearch')?true:false
-
-    var openInNewWindow = null
-    if(!onSearchResultPage){
-      openInNewWindow = window.open('','_blank')
-    }
-    //the tricky part. open new window in sync context to prevent blocking.
-
-    nkcAPI('useSearch',{searchstring:searchstr})
-    .catch(function(err){
-      console.error(err)
-    })
-
-    //    https://www.google.com.hk/search?newwindow=1&safe=strict&source=hp&q=zvs+site%3Awww.kechuang.org
-    var goto =
-    //'https://www.google.com.hk/search?newwindow=1&safe=strict&source=hp&q='
-
-    // 'http://cn.bing.com/search?q='
-    // +encodeURI(searchstr)
-    // +'+site%3Awww.kechuang.org'
-
-    '/api/operation?operation=viewLocalSearch&searchstring='
-    + encodeURI(searchstr);
-
-    (onSearchResultPage?window:openInNewWindow).location.href=goto //alter the address in async context.
-
-    //geid('HiddenLink').setAttribute('href',goto)
-    //geid('HiddenLink').click()
-    //window.location=goto
-    //window.open(goto,'_blank')
-
-  },
-};
-
-NavBarSearch.init()
-*/
 window.ReHighlightEverything = function(){
   $('pre code').each(function(i, block) {
     hljs.highlightBlock(block);
   });
-}
+};
 
 window.HighlightEverything=function(){
-  hljs.configure({tabReplace:'    '})
+  hljs.configure({tabReplace:'    '});
   hljs.initHighlighting()
-}
+};
 
 // Regular Expression for URL validation
 //
@@ -488,129 +591,8 @@ function insertHtmlAtCaret(html) {
   lastEditRange = sel.getRangeAt(0)
 }
 
-function subscribeUserSwitch(targetUid) {
-  var button = $('.subscribeButton');
-  //var button = geid('subscribeButton');
-  //button.className = 'btn btn-sm disabled';
-  for(var i = 0; i < button.length; i++){
-    button[i].className = 'subscribeButton btn btn-sm disabled';
-  }
-  if(button[0].innerHTML === '关注') {
-    nkcAPI('/u/'+targetUid+'/subscribe', 'post', {})
-      .then(function() {
-        screenTopAlert('关注成功');
-        for(var i = 0; i < button.length; i++){
-          button[i].innerHTML = '取关';
-          button[i].className = 'subscribeButton btn btn-sm btn-danger';
-        }
-        /*button.innerHTML = '取关';
-        button.className = 'btn btn-sm btn-danger';*/
-      })
-      .catch(function(data) {
-        screenTopWarning(data.error);
-      })
-  }
-  else if(button[0].innerHTML === '取关') {
-    nkcAPI('/u/'+targetUid+'/subscribe', 'delete', {})
-      .then(function() {
-        screenTopAlert('成功取消关注');
-        for(var i = 0; i < button.length; i++){
-          button[i].innerHTML = '关注';
-          button[i].className = 'subscribeButton btn btn-sm btn-info';
-        }
-        /*button.innerHTML = '关注';
-        button.className = 'btn btn-sm btn-info';*/
-      })
-      .catch(function(data) {
-        screenTopWarning(data.error);
-      })
-  }
-  else {
-    screenTopWarning('未定义的操作.')
-  }
-}
-$('.thumbsUp, .thumbsDown').on('click', function() {
-	var span = $(this);
-	var pid = span.attr('data-pid');
-	if(span.hasClass('thumbsUp')) {
-		thumbsDown(pid, function() {
-			span.removeClass('thumbsUp');
-			span.text(span.text()&&parseInt(span.text())-1>0? parseInt(span.text()) - 1:'');
-			screenTopAlert('取消点赞成功');
-		})
-	}else {
-		thumbsUp(pid, function() {
-			span.addClass('thumbsUp');
-			span.text(span.text()? parseInt(span.text()) + 1:1);
-			screenTopAlert('点赞成功');
-		})
-	}
-});
 
-function thumbsUp(pid, callback) {
-	nkcAPI('/p/'+pid+'/recommend', 'POST', {})
-		.then(function() {
-			callback();
-		})
-		.catch(function(data){
-			screenTopWarning(data.error|| data);
-		})
-}
-
-function thumbsDown(pid, callback) {
-	nkcAPI('/p/'+pid+'/recommend', 'DELETE', {})
-		.then(function() {
-			callback();
-		})
-		.catch(function(data){
-			screenTopWarning(data.error|| data);
-		})
-}
-
-function recommendPostSwitch(e, targetPid, number) {
-  var button = e.target;
-  var content = button.innerHTML.replace(/\(.*\)/, '');
-  if(content === '推介') {
-    nkcAPI('/p/'+targetPid+'/recommend', 'post', {})
-      .then(function(data) {
-        screenTopAlert('推介成功');
-        button.innerHTML = '已推介('+(data.message)+')';
-      })
-      .catch(function(data) {
-        screenTopWarning(data.error);
-      })
-  }
-  else if(content === '已推介') {
-    nkcAPI('/p/'+targetPid+'/recommend', 'delete', {})
-      .then(function(data) {
-        screenTopAlert('成功取消推介');
-        button.innerHTML = '推介('+(data.message)+')';
-      })
-      .catch(function(data) {
-        screenTopWarning(data.error);
-      })
-  }
-  else {
-    screenTopWarning('未定义的操作.')
-  }
-}
-
-function forumListVisibilitySwitch() {
-  var button = geid('FLVS');
-  var indexForumList = geid('indexForumList');
-  var value = button.innerHTML;
-  var visible = '隐藏学院';
-  var invisible = '显示学院';
-  if(value === visible) {
-    indexForumList.style.display = 'none';
-    button.innerHTML = invisible;
-    return true
-  }
-  indexForumList.style.display = 'block';
-  button.innerHTML = visible;
-  return true
-}
-
+/***用户资料设置页面用到的函数，用户资料设置页调整后可删除******************************************************/
 function postUpload(url, data, callback, onprogress) {
 	var xhr = new XMLHttpRequest();
 	xhr.upload.onprogress = function(e) {
@@ -649,8 +631,6 @@ function postUpload(url, data, callback, onprogress) {
 	xhr.setRequestHeader("FROM","nkcAPI");
 	xhr.send(data);
 }
-
-
 function uploadFile(url, id, callback) {
 	$(id).on('change', function() {
 		var inputFile = $(id).get(0);
@@ -675,9 +655,14 @@ $("document").ready(function(){
     lastEditRange = selection.getRangeAt(0)
   })
 });
+/***********************************************************************************************/
 
+/*
+* 上传文件 兼容旧代码
+* */
 function uploadFilePromise(url, data, onprogress, method) {
-  return new Promise(function(resolve, reject) {
+  return nkcUploadFile(url, method, data, onprogress);
+  /*return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
     xhr.upload.onprogress = function(e) {
       if(onprogress) {
@@ -708,7 +693,7 @@ function uploadFilePromise(url, data, onprogress, method) {
     xhr.open(method||"POST",url, true);
     xhr.setRequestHeader("FROM","nkcAPI");
     xhr.send(data);
-  });
+  });*/
 }
 
 
@@ -734,44 +719,6 @@ function bannedUser(uid, banned) {
 		.catch(function(data) {
 			screenTopWarning(data.error||data);
 		});
-}
-// 关注用户
-function subscribeUser(uid, subscribe) {
-	var url = '/u/'+uid+'/subscribe';
-	var method = 'POST';
-	var alertInfo = '关注成功。';
-	if(subscribe === false) {
-		method = 'DELETE';
-		alertInfo = '已取消关注。';
-	}
-	nkcAPI(url, method, {})
-		.then(function() {
-			screenTopAlert(alertInfo);
-			/*setTimeout(function() {
-				window.location.reload();
-			}, 1000);*/
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error);
-		})
-}
-
-// 关注领域
-function subscribeForum(fid, subscribe) {
-	var url = '/f/'+fid+'/subscribe';
-	var method = 'POST';
-	var alertInfo = '关注成功。';
-	if(subscribe === false) {
-		method = 'DELETE';
-		alertInfo = '已取消关注。';
-	}
-	nkcAPI(url, method, {})
-		.then(function() {
-      window.location.reload();
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error);
-		})
 }
 
 // 创建元素
@@ -813,29 +760,6 @@ function iconSwitch() {
 
 }
 
-
-
-// 新建板块
-function newForum(forumType) {
-	var displayName = prompt('请输入名称：');
-	if(displayName === null) {
-		return;
-	}
-	if(displayName === '') {
-		return screenTopWarning('名称不能为空');
-	}
-	nkcAPI('/f', 'POST', {displayName: displayName, forumType: forumType})
-		.then(function(data) {
-			screenTopAlert('新建成功，正在前往设置');
-			setTimeout(function() {
-        // window.location.href = '/f/'+data.forum.fid+'/settings';
-        openToNewLocation('/f/'+data.forum.fid+'/settings');
-			}, 1500);
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error || data);
-		})
-}
 
 function deleteForum(fid) {
 	if(confirm('确定要删除？') === false) {
@@ -1813,27 +1737,6 @@ function getDataById(id) {
 
 }
 
-// 关注文章
-function subThread(tid) {
-  nkcAPI("/t/" + tid + "/subscribe", "POST", {})
-    .then(function() {
-      screenTopAlert("关注成功");
-    })
-    .catch(function(data) {
-      screenTopWarning(data);
-    })
-}
-// 取消关注文章
-function unSubThread(tid) {
-  nkcAPI("/t/" + tid + "/subscribe", "DELETE", {})
-    .then(function() {
-      screenTopAlert("取消关注成功");
-    })
-    .catch(function(data) {
-      screenTopWarning(data);
-    });
-}
-
 
 // 小屏幕 首页左右侧滑页面 可公用
 // 左侧将会复制#leftDom中的内容
@@ -1952,79 +1855,6 @@ function closeDrawer() {
   $(".drawer-mask").removeClass("active");
   stopBodyScroll(false);
 }
-function base64ToFile(data, fileName) {
-  return blobToFile(base64ToBlob(data), fileName);
-}
-function base64ToBlob(data) {
-  var arr = data.split(','),
-  mime = arr[0].match(/:(.*?);/)[1],
-  bstr = atob(arr[1]),
-  n = bstr.length,
-  u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new Blob([u8arr], { type: mime });
-}
-function blobToFile(blob, fileName) {
-  blob.lastModifiedDate = new Date();
-  blob.name = fileName;
-  return blob;
-}
-
-function fileToUrl(file) {
-  return new Promise(function(resolve, reject) {
-    var reads = new FileReader();
-    reads.readAsDataURL(file);
-    reads.onload=function (e) {
-      resolve(this.result);
-    };
-  });
-
-}
-
-/*
-* 清除用户信息
-* @param {String} uid 用户ID
-* @param {String} type 类型， 可选：avatar、banner、description、username
-* */
-function clearUserInfo(uid, type) {
-  if(!confirm("该操作不可撤回，确定要执行？")) return;
-  nkcAPI("/u/" + uid + "/clear", "POST", {
-    type: type
-  })
-    .then(function() {
-      screenTopAlert("删除成功");
-    })
-    .catch(function(data) {
-      screenTopWarning(data);
-    })
-}
-
-
-/*
-* 根据年份和月份计算出当月的天数
-* @param {Number} year 年份
-* @param {Number} month 月份
-* @return {Number} 当月天数
-* */
-function getDayCountByYearMonth(year, month) {
-  year = parseInt(year);
-  month = parseInt(month);
-  var count;
-  if(month === 2) {
-    if((year%4 === 0 && year%100 != 0) || year%400 === 0) {
-      count = 29;
-    } else {
-      count = 28;
-    }
-  } else if([4,6,9,11].indexOf(month) !== -1) {
-    count = 30
-  } else {
-    count = 31
-  }
-  return count;
-}
 
 // 点击按钮播放视频
 function openVideo(para, vid) {
@@ -2037,9 +1867,9 @@ function openVideo(para, vid) {
 
 /*
 * 设置文章或回复通过审核
-*
+* @param {String} pid postId
+* @author pengxiguaa 2019-7-26
 * */
-
 function reviewPost(pid) {
   nkcAPI("/review", "PATCH", {
     pid: pid
@@ -2052,7 +1882,7 @@ function reviewPost(pid) {
     })
 }
 /*
-* 折叠首页、状态栏的专业列表
+* 折叠首页、手机左滑中的专业列表
 * */
 function switchChildren(fid, e) {
   var forumBlockChildren = $(".forum-block-children[data-fid='"+fid+"']");
@@ -2066,23 +1896,7 @@ function switchChildren(fid, e) {
     fa.addClass("fa-angle-down");
   }
 }
-/*
-* 订阅/取消订阅专栏
-* */
-function subscribeColumn(columnId, type) {
-  var url = "/m/" + columnId + "/subscribe";
-  var method = "POST";
-  var data = {
-    type: type?"subscribe": "unSubscribe"
-  };
-  nkcAPI(url, method, data)
-    .then(function() {
-      window.location.href = "";
-    })
-    .catch(function(data) {
-      screenTopWarning(data);
-    })
-}
+
 function reload() {
   window.location.reload();
 }
