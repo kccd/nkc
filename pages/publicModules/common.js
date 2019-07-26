@@ -50,11 +50,7 @@ NKC.methods.getDayCountByYearMonth = function(year, month) {
   return count;
 };
 
-/*
-* base64转文件对象
-* @param {Base64} data base64数据
-* @return 
-* */
+
 NKC.methods.base64ToBlob = function(data) {
   var arr = data.split(','),
     mime = arr[0].match(/:(.*?);/)[1],
@@ -72,7 +68,12 @@ NKC.methods.blobToFile = function(blob, fileName) {
   blob.name = fileName;
   return blob;
 };
-
+/*
+* base64转文件对象
+* @param {Base64} data base64数据
+* @return {Blob} 文件对象
+* @author pengxiguaa 2019-7-26
+* */
 NKC.methods.base64ToFile = function(data, fileName) {
   return NKC.methods.blobToFile(NKC.methods.base64ToBlob(data), fileName);
 };
