@@ -420,6 +420,7 @@ let pugRender = (template, data, state) => {
 	  applicationFormStatus,
 		ensureFundOperatorPermission,
 		startTime: global.NKC.startTime,
+    NODE_ENV: global.NKC.NODE_ENV,
 		getProvinceCity: getProvinceCity,
 		numToFloatTwo: numToFloatTwo,
 		calculateFreightPrice:calculateFreightPrice,

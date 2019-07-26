@@ -70,6 +70,5 @@ block content
                   a(target='_blank' :href="'http://www.ip138.com/ips138.asp?ip='+record.lmOperatorIp+'&action=2'") {{record.lmOperatorIp}}
           include ../../interface_navigation_paging
 block scripts
-  script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
-  script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
+  include ../../publicModules/moment
   script(src=`/experimental/log/xsf.js?v=${global.NKC.startTime}`)

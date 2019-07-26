@@ -67,30 +67,7 @@ block content
           input(style='display:inline-block;' placeholder='手机号码' v-model='test.mobile')
           button(@click='testSendMessage') 测试
         button.mdui-btn.mdui-btn-block.mdui-color-theme.mdui-m-t-3.mdui-m-b-5(@click='save') 保存
-
-
-      //.col-xs-12.c0l-md-12
-      //  ul.nav.nav-pills
-      //    li(v-for="setting in settings" :class="{active: setting.name===type}" @click='changeSettings(setting.name)')
-      //      a(style='cursor: pointer') {{setting.name}}
-
-      //.col-xs-12.col-md-4(v-for="setting in settings")
-        .form
-          .h3 {{setting.name}}
-          .form-group
-            label 验证码有效期（分钟）
-            input.form-control(type='number' v-model.number='setting.validityPeriod')
-          .form-group
-            label 同一手机号每天次数限制
-            input.form-control(type='number' v-model.number='setting.sameMobileOneDay')
-          .form-group
-            label 同一IP每天次数限制
-            input.form-control(type='number' v-model.number='setting.sameIpOneDay')
-          .form-group
-            button.btn.btn-primary(@click='submit') 保存
 block scripts
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/vue/dist/vue.js?v=${global.NKC.startTime}`)
   script(src=`/nationCodes/nationCodes.js?v=${global.NKC.startTime}`)
   script(src=`/experimental/settings/sms.js?v=${global.NKC.startTime}`)
 

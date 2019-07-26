@@ -1,5 +1,4 @@
-// 新的方法将放到nkc对象里，避免变量污染
-var nkc = {};
+
 // 定义最后光标对象
 var lastEditRange;
 function geid(id){return document.getElementById(id);}
@@ -233,9 +232,7 @@ function redirect(url){
 }
 
 function nkcAPI(operationName,method,remainingParams){  //操作名，参数
-  if(!remainingParams){
-    var remainingParams={}
-  }
+  remainingParams = remainingParams || {};
   remainingParams.url = operationName;
   remainingParams.method = method;
   return nkcOperationAPI(remainingParams)
@@ -1408,19 +1405,6 @@ function unDigestPost(pid) {
 		})
 }
 
-function fromNow(t) {
-  if(!moment) throw 'Need to introduce the moment module';
-  moment.locale('zh-cn');
-  return moment(t).fromNow();
-}
-
-function format(s, t) {
-  if(t) {
-    return moment(t).format(s);
-  }
-  return moment().format(s);
-}
-
 function beep(name) {
   var audio = document.getElementById('beep');
   if(audio) {
@@ -1489,42 +1473,7 @@ function initPhotoSwipe(url) {
     gallery.init();
   }
 }
-function closeFrameOfAddFriend() {
-  var dom = $('#addFriend');
-  dom.hide();
-  dom.find('.input').hide();
-  dom.find('.success').hide();
-  dom.find('textarea').val('');
-}
-function openFrameOfAddFriend(user) {
-  var username = user.username;
-  var description = user.description;
-  var uid = user.uid;
-  var dom = $('#addFriend');
-  dom.attr('data-uid', uid);
-  dom.find('.avatar img').attr('src', '/avatar/' + uid);
-  dom.find('.content .username').text(username);
-  dom.find('.content .description').text(description);
-  dom.find('.input').show();
-  dom.find('.success').hide();
-  dom.show();
-}
 
-function addFriendByUid() {
-  var dom = $('#addFriend');
-  var uid = dom.attr('data-uid');
-  var description = dom.find('textarea').val();
-  nkcAPI('/u/' + uid + '/friends', 'POST', {
-    description: description
-  })
-    .then(function(data) {
-      dom.find('.input').hide();
-      dom.find('.success').show();
-    })
-    .catch(function(data) {
-      screenTopWarning(data.error || data);
-    })
-}
 
 function shareTo(shareType, type, str, title, pid){
   var host = window.location.host;

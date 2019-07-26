@@ -646,8 +646,8 @@ userSchema.statics.createUser = async (option) => {
       });
 		  await sub.save();
     }
-		await SubscribeTypeModel.createDefaultType("post", uid);
-    await SubscribeTypeModel.createDefaultType("replay", uid);
+		await SubscribeModel.createDefaultType("post", uid);
+    await SubscribeModel.createDefaultType("replay", uid);
 
 	} catch (error) {
 		await UserModel.remove({uid});

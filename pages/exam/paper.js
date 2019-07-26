@@ -39,7 +39,7 @@ var app = new Vue({
         }
       }
       this.submitted = true;
-      kcAPI('/exam/paper/' + app.paper._id, 'post', {questions: this.questions})
+      nkcAPI('/exam/paper/' + app.paper._id, 'post', {questions: this.questions})
         .then(function(data) {
           app.passed = data.passed;
         })
@@ -56,7 +56,7 @@ var app = new Vue({
     } else {
       href += '?t=' + Date.now();
     }
-    kcAPI(href, 'GET', {})
+    nkcAPI(href, 'GET', {})
       .then(function(data) {
         app.paper = data.paper;
         app.created = !!data.created;
@@ -76,7 +76,7 @@ var app = new Vue({
         setInterval(function() {
           app.compute();
         }, 500);
-        NKC.methods.asyncMathJaxRender();
+        NKC.methods.renderFormula();
       })
       .catch(function(err) {
         screenTopWarning(err);
