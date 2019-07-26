@@ -64,3 +64,22 @@ function toColumn() {
     selectMul: true
   });
 }
+
+/*
+* 清除用户信息
+* @param {String} uid 用户ID
+* @param {String} type 类型， 可选：avatar、banner、description、username
+* @author pengxiguaa 2019-7-26
+* */
+function clearUserInfo(uid, type) {
+  if(!confirm("该操作不可撤回，确定要执行？")) return;
+  nkcAPI("/u/" + uid + "/clear", "POST", {
+    type: type
+  })
+    .then(function() {
+      screenTopAlert("删除成功");
+    })
+    .catch(function(data) {
+      screenTopWarning(data);
+    })
+}

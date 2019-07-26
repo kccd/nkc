@@ -238,3 +238,26 @@ function saveForumsOrder() {
 			screenTopWarning(data.error || data);
 		})
 }
+
+
+// 新建板块
+function newForum(forumType) {
+  var displayName = prompt('请输入名称：');
+  if(displayName === null) {
+    return;
+  }
+  if(displayName === '') {
+    return screenTopWarning('名称不能为空');
+  }
+  nkcAPI('/f', 'POST', {displayName: displayName, forumType: forumType})
+    .then(function(data) {
+      screenTopAlert('新建成功，正在前往设置');
+      setTimeout(function() {
+        // window.location.href = '/f/'+data.forum.fid+'/settings';
+        openToNewLocation('/f/'+data.forum.fid+'/settings');
+      }, 1500);
+    })
+    .catch(function(data) {
+      screenTopWarning(data.error || data);
+    })
+}
