@@ -69,7 +69,7 @@ function saveDraft() {
     return screenTopWarning("文章标题50字以内");
   }
 
-  if(!queryType || queryType === "forum" || desType === "forum") {
+  if(!queryType || queryType === "forum") {
     queryType = 'forum';
   }
 
@@ -198,7 +198,6 @@ function onPost() {
   var fids = [];
   var cids = [];
   if(!queryType || queryType == "forum" || desType == "forum") {
-    var panelObj = $("#tabPanel").tagsinput("items");
     $("#newPanelForum").find(".chooseForum").each(function() {
       var fid = $(this).attr("fid");
       if(fid && fid !== "undefined") {
