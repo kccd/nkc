@@ -50,6 +50,11 @@ NKC.methods.getDayCountByYearMonth = function(year, month) {
   return count;
 };
 
+/*
+* base64转文件对象
+* @param {Base64} data base64数据
+* @return 
+* */
 NKC.methods.base64ToBlob = function(data) {
   var arr = data.split(','),
     mime = arr[0].match(/:(.*?);/)[1],

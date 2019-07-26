@@ -81,7 +81,7 @@ function nkcAPI(url, method, data) {
 * @param {FormData} data 数据对象
 * @param {Function} progress 进度
 *   @param {Object} e 原始上传进度对象
-*   @param {String} percentage 进度百分比，例：87%
+*   @param {String} percentage 进度百分比，例：87.1%
 * @return promise
 * @author pengxiguaa 2019-7-26
 * */
