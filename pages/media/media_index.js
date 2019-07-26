@@ -24,8 +24,7 @@ $(document).ready(function() {
     el: "#mediaList",
     data: {
       mediaType: 'all',
-      activeClass: 'mdui-color-theme-accent',
-      uploadButtonClass: 'mdui-color-grey-300',
+      uploadButtonClass: 'mediaButtonActive',
       uploadFileFail: 'uploadFileFail',
       mediaPictureLists: [],
       mediaVideoLists: [],

@@ -4,7 +4,6 @@ block title
   title 编辑器 - 科创论坛
   
   //- include MathJax.pug
-  link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
   link(rel='stylesheet' href=`/tabPanel/tabPanel.css?v=${global.NKC.startTime}`)
   link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
   link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
@@ -104,7 +103,6 @@ block content
 block scripts
   //- if data.ver == "ue"
   link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
-  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   //- script(src="/jquery-1.10.2.js")
   //- script(src="/jquery-ui-1.10.4.custom.js")
   +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
@@ -149,7 +147,6 @@ block scripts
       $("#postToColumn").show();
   //- else
   //-   link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
-  //-   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   //-   script(src="/jquery-1.10.2.js")
   //-   script(src="/jquery-ui-1.10.4.custom.js")
   //-   script(src='/commonmark/dist/commonmark.js')
