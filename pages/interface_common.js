@@ -1,4 +1,3 @@
-
 // 定义最后光标对象
 var lastEditRange;
 function geid(id){return document.getElementById(id);}
@@ -25,24 +24,8 @@ function jwarning(obj){
   }
 }
 
-function post_api(target,body,callback){
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange=function(){
-    if (xhr.readyState==4)
-    {
-      if(xhr.status==200){
-        callback(null,xhr.responseText);
-      }else {
-        callback(xhr.status.toString()+' '+xhr.responseText);
-      }
-    }
-  }
-  xhr.open("POST","/api/"+target.toString().toLowerCase(),true);
-  xhr.setRequestHeader("Content-type","application/json");
-	xhr.setRequestHeader("FROM","nkcAPI");
-	xhr.send(JSON.stringify(body));
-};
 
+// nkcAPI接口核心
 function generalRequest(obj,opt,callback){
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function(){
@@ -60,14 +43,6 @@ function generalRequest(obj,opt,callback){
       } else {
         callback(null,res);
       }
-     /* if(xhr.status==0||xhr.status>=400) {
-        alert(1);
-        return callback(res);
-      }
-      if(res.error || res instanceof Error) {
-        callback(res);
-      }
-      callback(null,res);*/
     }
   };
 
@@ -80,7 +55,7 @@ function generalRequest(obj,opt,callback){
     callback(err);
   }
 }
-
+// nkcAPI接口核心 promise
 function nkcOperationAPI(obj){
   return new Promise(function(resolve,reject){
     generalRequest(obj,{
@@ -96,35 +71,6 @@ function nkcOperationAPI(obj){
   })
 }
 
-function get_api(target,callback){
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange=function(){
-    if (xhr.readyState==4){
-      if(xhr.status>=200||xhr.status<400){
-        callback(null,xhr.responseText);
-      }else {
-        callback(xhr.status.toString()+' '+xhr.responseText);
-      }
-    }
-  }
-  xhr.open("GET",target.toString().toLowerCase(),true);
-  xhr.send();
-};
-
-function delete_api(target,callback){
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange=function(){
-    if (xhr.readyState==4){
-      if(xhr.status>=200||xhr.status<400){
-        callback(null,xhr.responseText);
-      }else {
-        callback(xhr.status.toString()+' '+xhr.responseText);
-      }
-    }
-  }
-  xhr.open("DELETE",target.toString().toLowerCase(),true);
-  xhr.send();
-};
 
 function screenTopAlert(text){
   return screenTopAlertOfStyle(text,'success')
@@ -222,13 +168,6 @@ function redirect(url){
 
   var urlnow = urlnowpath+urlnowsearch
   openToNewLocation(url)
-
-  // if(urlnow==urlwithouthash){
-  //   window.location.href = url
-  //   window.location.reload()
-  // }else{
-  //   window.location.href = url
-  // }
 }
 
 function nkcAPI(operationName,method,remainingParams){  //操作名，参数
@@ -710,6 +649,8 @@ function postUpload(url, data, callback, onprogress) {
 	xhr.setRequestHeader("FROM","nkcAPI");
 	xhr.send(data);
 }
+
+
 function uploadFile(url, id, callback) {
 	$(id).on('change', function() {
 		var inputFile = $(id).get(0);
@@ -745,7 +686,7 @@ function uploadFilePromise(url, data, onprogress, method) {
         var percentage = (num).toFixed(1);
         percentage = percentage + "%";
         onprogress(e, percentage)
-      };
+      }
     };
     xhr.onreadystatechange=function()
     {
