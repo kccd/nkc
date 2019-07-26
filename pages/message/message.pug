@@ -827,7 +827,26 @@ block content
               +categoriesContent
           //- 手机版 生成模板
           .mobile-templates-dom(style="height: 100%;")
-
+  //- 添加好友的窗口，原生弹窗
+  .addFriend#addFriend
+    .body
+      .header
+        .row
+          .col-md-6.text-left 添加好友
+          .col-md-6.text-right(onclick='closeFrameOfAddFriend()')
+            .fa.fa-remove
+      .content
+        .avatar
+          img.center-block(src=``)
+        .username
+        .description
+        .success.text-center
+          div 请求发送成功
+          buttom.btn.btn-danger(onclick="closeFrameOfAddFriend()") 关闭
+        .input
+          .div-textarea
+            textarea.form-control(placeholder='请填写验证信息')
+          button.btn.btn-block.btn-primary(onclick='addFriendByUid()') 发送
 block footer
 
 block scripts
@@ -855,9 +874,7 @@ block scripts
       }
     }
   script(src=`/transliteration/lib/browser/transliteration.js?v=${global.NKC.startTime}`)
-  script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
-  script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
+  include ../publicModules/moment
   script(src=`/xss/dist/xss.js?v=${global.NKC.startTime}`)
   script(src=`/mdui/js/mdui.js?v=${global.NKC.startTime}`)
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/message/message.js?v=${global.NKC.startTime}`)

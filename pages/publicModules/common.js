@@ -1,85 +1,14 @@
-if(!NKC) var NKC = {};
-NKC.methods = {};
-NKC.modules = {};
+var NKC = {
+  methods: {},
+  modules: {},
+  configs: {}
+};
 
-/*
-* 发起http请求
-* @param url 请求地址
-* @param method 请求类型
-* @param data 请求附带的数据
-* @return promise
-* @author pengxiguaa 2019/1/15
-* */
-function kcAPI(url, method, data) {
-  if(!data) data = {};
-  var params = {};
-  if(['get', 'delete'].indexOf(method.toLowerCase()) !== -1) {
-    params = data;
-  }
-  var options = {
-    method: method,
-    url: url,
-    data: data,
-    params: params,
-    headers: {
-      'FROM': 'nkcAPI'
-    }
-  };
-  return new Promise(function(resolve, reject) {
-    axios(options)
-      .then(function(data) {
-        resolve(data.data);
-      })
-      .catch(function(data) {
-        if(data.response) {
-          if(data.response.data) {
-            if(data.response.data.error) {
-              reject(data.response.data.error);
-            }
-          }
-        } else {
-          reject(data.message || data);
-        }
-      })
-  });
-}
-
-/*
-* 上传文件
-* @param url 请求地址
-* @param method 请求类型
-* @param formData 需要上传的formData数据
-* @param onUploadProgress 上传状态的回调函数
-* @return promise
-* @author pengxiguaa 2019/1/15
-* */
-function uploadFileAPI(url, method, formData, onUploadProgress) {
-  var options = {
-    method: method,
-    url: url,
-    data: formData,
-    headers: {
-      'FROM': 'nkcAPI',
-      'Content-Type':'multipart/form-data'
-    }
-  };
-  if(onUploadProgress) options.onUploadProgress = onUploadProgress;
-  return new Promise(function(resolve, reject) {
-    axios(options)
-      .then(function(data) {
-        resolve(data.data);
-      })
-      .catch(function(data) {
-        if(data.response) {
-          if(data.response.data) {
-            if(data.response.data.error) {
-              reject(data.response.data.error);
-            }
-          }
-        } else {
-          reject(data.message || data);
-        }
-      })
+function sweetAlert(text) {
+  text = (text.error || text) + "";
+  Swal({
+    confirmButtonText: "关闭",
+    text: text
   });
 }
 
@@ -152,3 +81,25 @@ function sweetQuestion(text) {
       })
   });
 }
+
+
+/*
+* 打开链接 兼容APP
+* @param {String} url 链接
+* @param {Boolean} blank 是否在后台打开
+* @author pengxiguaa 2019-7-26
+* */
+
+NKC.methods.visitUrl = function(url, blank) {
+  if(localStorage.getItem("apptype") === "app") {
+    if(window.appOpenUrl) {
+      window.appOpenUrl(url);
+    }
+  } else {
+    if(blank) {
+      window.open(url);
+    } else {
+      window.location.href = url;
+    }
+  }
+};

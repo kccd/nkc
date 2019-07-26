@@ -1,6 +1,0 @@
-.notice.mdui-shadow-3.mdui-m-t-2.mdui-p-a-1
-  .notice-header
-    +listHeader("网站公告")
-  for thread, index in data.noticeThreads
-    div
-      a(href=`/t/${thread.tid}` target='_blank')= `${index + 1}. ${thread.firstPost.t}`
