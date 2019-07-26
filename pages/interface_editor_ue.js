@@ -198,7 +198,6 @@ function onPost() {
   var fids = [];
   var cids = [];
   if(!queryType || queryType == "forum" || desType == "forum") {
-    var panelObj = $("#tabPanel").tagsinput("items");
     $("#newPanelForum").find(".chooseForum").each(function() {
       var fid = $(this).attr("fid");
       if(fid && fid !== "undefined") {

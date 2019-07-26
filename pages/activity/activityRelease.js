@@ -9,76 +9,6 @@ $.getJSON('../location.json',function(data){
 	$('#location').val($('#location').attr('data'));
 });
 
-$("document").ready(function(){
-  //编辑器缩放
-  $(".w-e-text-container").resizable({
-    containment: '#body',
-    minHeight: 100,
-    minWidth: 100,
-    maxWidth: 1400
-  });
-  
-  $("#ReplyContent").on("paste", function(){
-    function test(){
-      $("#text-elem img").each(function(){
-        // 获取当前图片url
-        if(!$(this).attr("srcs")){
-          return true
-        }
-        var newSrc = $(this).attr("srcs")
-        var ownImage = "<img src='" + newSrc + "'>";
-        var isOwnImg = newSrc.indexOf("kechuang");
-        if(isOwnImg !== -1){
-          $(this).replaceWith(ownImage)
-          return true;
-        }
-        // 使用正在下载图片替换当前图片
-        //$(this).attr("src","/resources/site_specific/picupload.png")
-        // console.log("newSrc",newSrc)
-        // 判断图片是不是系统图片
-        var sysimg = new RegExp("file:").test(newSrc)
-        // 如果是系统图片，则不向下执行
-        if(sysimg == true){
-          var elemImg = "<img src='/resources/site_specific/picdefault.png'>"
-          $(this).replaceWith(elemImg)
-          // console.log("图片无法加载")
-          // await $(this).on("error",function(){
-          //   var elemImg = "<img src='./picpass.png'>"
-          //   $(this).replaceWith(elemImg)
-          //   console.log("图片无法加载")
-          // })
-          return true
-        }
-        if(newSrc.length > 10){
-          var data = {
-            loadsrc : newSrc
-          }
-          // console.log("---------发送url-----------",'\n',newSrc)
-          var newimgstr = $(this)
-          
-          nkcAPI("/download", "POST", data)
-          //console.log(fff)
-          .then( function(data){
-            newimgstr.attr("src","")
-            newimgstr.attr("srcs","")
-            var newImg = "<img src='" + "/r/" + data.r.rid + "' style='max-width: 100%'>"
-            newimgstr.replaceWith(newImg)
-            if(list)list.refresh()
-          })
-          .catch( function(err){
-            console.log(err)
-            newimgstr.attr("src","")
-            newimgstr.attr("srcs","")
-            newimgstr.replaceWith("<img src='/resources/site_specific/picdefault.png'>")
-          })
-        }
-      })
-    }
-    setTimeout(function(){test()},5000)
-    
-  })
-})
-
 $('#inputFile').on('change', function() {
 	var file = $('#inputFile')[0].files[0];
 	if(file) {
@@ -187,7 +117,7 @@ function submitRelease() {
   })
 
   // 检查活动详情
-  var description = document.getElementById('text-elem').innerHTML;
+  var description = ue.getContent();
   description = common.URLifyHTML(description);
 
 
@@ -262,42 +192,6 @@ function choosePoster() {
 
 }
 
-// // 图片裁剪
-// function posterCrop() {
-
-//   var $image = $('#poster');
-//   var $saveButton = $("#savePoster");
-//   var options = {
-//     aspectRatio: 16 / 9,
-//     preview: '#poster',
-//     crop: function (e) {
-
-//     }
-//   };
-//   var originalImageURL = $image.attr('src');
-//   var uploadedImageName = 'cropped.jpg';
-//   var uploadedImageType = 'image/jpeg';
-//   var uploadedImageURL;
-
-
-//   // Cropper
-//   $image.cropper(options);
-
-//   $saveButton.on({
-//     click: function() {
-//       var result = $image.cropper("getCroppedCanvas", {maxWidth:4096, maxHeight:4096});
-//       var newImage = new Image();
-//       newImage.src = result.toDataURL("image/png");
-//       newImage.class = "poster";
-//       newImage.id = "poster";
-//       newImage.style = "width:100%";
-//       $("#exampleImg").html(newImage);
-//       // $image.cropper('destroy').cropper(options);
-//     }
-//   });
-// }
-
-// 
 function savePoster() {
   var formData = new FormData();
   formData.append('file', upLoadFile);
