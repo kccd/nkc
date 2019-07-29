@@ -10,9 +10,6 @@ forumAvatarRouter
 		const {siteSpecificPath} = ctx.settings.statics;
 		ctx.filePath = siteSpecificPath + '/forum_icon/' + (iconFileName) + '.png';
 		ctx.type = 'png';
-		ctx.set('Cache-Control', 'public, no-cache');
-		const tlm = await ctx.fs.stat(ctx.filePath);
-		ctx.lastModified = new Date(tlm.mtime).toUTCString();
 		await next();
 	})
 	.post('/:fid', async (ctx, next) => {
