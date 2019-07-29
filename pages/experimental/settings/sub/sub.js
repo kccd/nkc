@@ -6,7 +6,7 @@ var app = new Vue({
     subSettings: ""
   },
   mounted: function() {
-    var data = getDataById("data");
+    var data = NKC.methods.getDataById("data");
     this.subSettings = data.subSettings;
   },
   methods: {

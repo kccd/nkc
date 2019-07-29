@@ -1573,24 +1573,36 @@ function closeLottery() {
     })
 }
 
+
+/*
+* 页面滚动到底部
+* */
 function scrollToBottom() {
-  $("html").css("height", "auto")
-  $("body").css("height", "auto")
-  $("html,body").animate({scrollTop: document.body.offsetHeight}, 300)
-  $("html").css("height", "100%")
-  $("body").css("height", "100%")
+  var htmlDom = $("html");
+  var bodyDom = $("body");
+  htmlDom.css("height", "auto");
+  bodyDom.css("height", "auto");
+  $("html,body").animate({scrollTop: document.body.offsetHeight}, 300);
+  htmlDom.css("height", "100%");
+  bodyDom.css("height", "100%");
 }
+/*
+* 页面滚动到顶部
+* */
 function scrollToTop() {
-  $("html").css("height", "auto")
-  $("body").css("height", "auto")
-  $("html,body").animate({scrollTop: 0}, 300)
-  $("html").css("height", "100%")
-  $("body").css("height", "100%")
+  var htmlDom = $("html");
+  var bodyDom = $("body");
+  htmlDom.css("height", "auto");
+  bodyDom.css("height", "auto");
+  $("html,body").animate({scrollTop: 0}, 300);
+  htmlDom.css("height", "100%");
+  bodyDom.css("height", "100%");
 }
 
 
 var $postRecycleModel = $('#postRecycleModal');
 var $recycleModal = $('#recycleModal');
+
 function disablePostClick(pid, type){
   window.localStorage.pid = pid
   if(type === 'post') {
@@ -1721,22 +1733,6 @@ function stopBodyScroll (isFixed) {
     window.scrollTo(0, nkcDrawerBodyTop) // 回到原先的top
   }
 }
-
-// 字符串转对象，对应pug渲染函数objToStr
-function strToObj(str) {
-  return JSON.parse(decodeURIComponent(str));
-}
-// 通过dom元素id获取渲染页面时藏在dom中的数据
-function getDataById(id) {
-  var dom = document.getElementById(id);
-  if(dom) {
-    return strToObj(dom.innerHTML);
-  } else {
-    return {};
-  }
-
-}
-
 
 // 小屏幕 首页左右侧滑页面 可公用
 // 左侧将会复制#leftDom中的内容
@@ -1946,10 +1942,3 @@ function addApptypeToUrl(url) {
   }
   return paramStr;
 }
-
-/**
- * 点击锚点跳转
- */
-// function clickopenMaodian() {
-
-// }

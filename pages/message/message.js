@@ -5,7 +5,7 @@ var winWidth = $(window).width();
 var xss = window.filterXSS;
 
 var data = document.getElementById('data').innerText;
-var templates = getDataById("templatesData").templates;
+var templates = NKC.methods.getDataById("templatesData").templates;
 
 
 data = JSON.parse(data);

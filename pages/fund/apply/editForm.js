@@ -1,7 +1,7 @@
 
 var ue;
 var appButton;
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 var selectedMembers = [];
 
 for(var i = 0; i < data.form.members.length; i++) {

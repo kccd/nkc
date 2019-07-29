@@ -17,7 +17,7 @@ var moduleComplaint = new Vue({
     reasons: []
   },
   mounted: function() {
-    var data = strToObj(this.$refs.reasons.innerHTML);
+    var data = NKC.methods.strToObj(this.$refs.reasons.innerHTML);
     var reasons = [];
     for(var reason in data.reasons) {
       if(!data.reasons.hasOwnProperty(reason)) continue;

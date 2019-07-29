@@ -55,7 +55,7 @@ var app = new Vue({
     }
   },
   mounted: function() {
-    var data = getDataById("data");
+    var data = NKC.methods.getDataById("data");
     this.messageTypesLanguage = data.messageTypesLanguage;
     this.grades = data.grades;
     this.roles = data.roles;

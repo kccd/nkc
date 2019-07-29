@@ -11,7 +11,7 @@ var vue_forums_Nav = new Vue({
   },
   mounted: function() {
     var data = this.$refs.vue_forums_nav_data;
-    data = strToObj(data.innerHTML);
+    data = NKC.methods.strToObj(data.innerHTML);
     this.forums = data.forums;
     this.subForums = data.subForums;
   },

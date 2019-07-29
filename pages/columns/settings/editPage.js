@@ -1,7 +1,7 @@
 var data;
 var ue;
 $(function() {
-  data = getDataById("data");
+  data = NKC.methods.getDataById("data");
 
   ue = UE.getEditor("pageContent", {
     toolbars: [

@@ -9,11 +9,8 @@ block head
   if state.apptype
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
-  +includeCSS('/Draft.css')
   +includeCSS('/katex.min.css')
   +includeCSS('/font-awesome/css/font-awesome.css')
-  +includeCSS('/photoswipe/dist/photoswipe.css')
-  +includeCSS('/photoswipe/dist/default-skin/default-skin.css')
   +includeCSS('/nkc_styles.css')
   +includeCSS('/publicModules/public.css')
   +includeCSS('/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css')
@@ -40,7 +37,6 @@ block body
     -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   +includeJS('/jquery/jquery-1.11.1.js')
-  +includeJS('/jquery-ui-1.10.4.custom.js')
   //-app使用的js
   if state.apptype
     +includeJS("/appAPi/app.js")
@@ -53,8 +49,6 @@ block body
       Vue.config.productionTip = false;
   +includeJS('/qrcode/build/qrcode.js')
   +includeJS("/sweetalert2/dist/sweetalert2.all.min.js")
-  +includeJS('/photoswipe/dist/photoswipe.js')
-  +includeJS('/photoswipe/dist/photoswipe-ui-default.js')
   //- 新版common.js
   +includeJS('/publicModules/common.js')
   //- 旧版common.js兼容旧的页面
@@ -74,9 +68,7 @@ block body
     if kcb > 0
       script!=`sweetAlert("您发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
-
   block scripts
-
   include ./publicModules/qrcode/qrcode
 
   script.

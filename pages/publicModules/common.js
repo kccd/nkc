@@ -3,14 +3,12 @@ var NKC = {
   modules: {},
   configs: {}
 };
-
 /*
 * 打开链接 兼容APP
 * @param {String} url 链接
 * @param {Boolean} blank 是否在后台打开
 * @author pengxiguaa 2019-7-26
 * */
-
 NKC.methods.visitUrl = function(url, blank) {
   if(localStorage.getItem("apptype") === "app") {
     if(window.appOpenUrl) {
@@ -51,9 +49,10 @@ NKC.methods.getDayCountByYearMonth = function(year, month) {
 };
 
 /*
-* base64转文件对象
+* base64转文件数据
 * @param {Base64} data base64数据
-* @return 
+* @return {Data} 文件数据
+* @author pengxiguaa 2019-7-29
 * */
 NKC.methods.base64ToBlob = function(data) {
   var arr = data.split(','),
@@ -66,17 +65,34 @@ NKC.methods.base64ToBlob = function(data) {
   }
   return new Blob([u8arr], { type: mime });
 };
-
+/*
+* 文件数据转文件
+* @param {Blob} blob 文件数据
+* @param {String} fileName 文件名
+* @return {File} 文件
+* @author pengxiguaa 2019-7-29
+* */
 NKC.methods.blobToFile = function(blob, fileName) {
   blob.lastModifiedDate = new Date();
   blob.name = fileName;
   return blob;
 };
-
+/*
+* base64转文件对象
+* @param {Base64} data base64数据
+* @param {String} fileName 文件名
+* @return {File} 文件对象
+* @author pengxiguaa 2019-7-26
+* */
 NKC.methods.base64ToFile = function(data, fileName) {
   return NKC.methods.blobToFile(NKC.methods.base64ToBlob(data), fileName);
 };
-
+/*
+* 返回文件在本地的URL
+* @param {File} file 文件对象
+* @param {String} URL
+* @author pengxiguaa 2019-7-26
+* */
 NKC.methods.fileToUrl = function(file) {
   return new Promise(function(resolve, reject) {
     var reads = new FileReader();
@@ -85,4 +101,27 @@ NKC.methods.fileToUrl = function(file) {
       resolve(this.result);
     };
   });
+};
+/*
+* 字符串转对象，对应pug渲染函数objToStr
+* @param {String} str 对象字符串
+* @return {Object}
+* @author pengxiguaa 2019-7-26
+* */
+NKC.methods.strToObj = function(str) {
+  return JSON.parse(decodeURIComponent(str));
+};
+/*
+* 获取藏在指定dom中的数据 数据由pug渲染函数objToStr组装
+* @param {String} id dom元素的id
+* @return {Object} 数据对象
+* @author pengxiguaa 2019-7-29
+* */
+NKC.methods.getDataById = function(id) {
+  var dom = document.getElementById(id);
+  if(dom) {
+    return NKC.methods.strToObj(dom.innerHTML);
+  } else {
+    return {};
+  }
 };

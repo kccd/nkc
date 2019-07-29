@@ -1,9 +1,0 @@
-.row
-    ol.breadcrumb.forum-breadcrumb
-      li
-        a(href=`/f` style=`background-color: #808080;`) 全部分类
-      for f in data.breadcrumbForums
-        li
-          a(href=`/f/${f.fid}` title=f.description style=`background-color: ${f.color}`)= f.displayName
-      li
-        a(style=`color: #777777;`)=data.forum.displayName

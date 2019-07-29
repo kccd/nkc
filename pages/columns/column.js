@@ -1,4 +1,4 @@
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 var bodyBackgroundColor = data.color;
 var CommonModal, SubscribeTypes;
 $(function() {

@@ -70,7 +70,6 @@ router
           tid: thread.tid
         });
         await record.save();
-        // data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
       }
       await db.KcbsRecordModel.insertSystemRecord('digestThread', data.targetUser, ctx);
 			log.type = 'score';
@@ -132,6 +131,7 @@ router
     await ctx.redis.pubMessage(message);
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
 		await userPersonal.increasePsnl('system', 1);
+    data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
 		await next();
 	})
 	.del('/', async (ctx, next) => {
