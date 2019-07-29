@@ -41,7 +41,7 @@ var app = new Vue({
     save: function() {
       this.error = '';
       this.saving = true;
-      kcAPI('/save', 'POST', {
+      nkcAPI('/save', 'POST', {
         account: this.account,
         mongodb: this.mongodb,
         elasticSearch: this.elasticSearch,

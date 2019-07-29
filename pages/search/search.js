@@ -24,10 +24,10 @@ var app = new Vue({
   },
   computed: {
     timeStartDay: function() {
-      return getDayCountByYearMonth(this.timeStart.year, this.timeStart.month);
+      return NKC.methods.getDayCountByYearMonth(this.timeStart.year, this.timeStart.month);
     },
     timeEndDay: function() {
-      return getDayCountByYearMonth(this.timeEnd.year, this.timeEnd.month);
+      return NKC.methods.getDayCountByYearMonth(this.timeEnd.year, this.timeEnd.month);
     },
     options: function() {
       var fid = [];
@@ -86,7 +86,7 @@ var app = new Vue({
   },
   mounted: function() {
     vueSelectForum.init({func: this.addForum, canChooseParentForum: true});
-    var data = getDataById("data");
+    var data = NKC.methods.getDataById("data");
     try{
       this.c = this.base64ToStr(data.c);
     } catch(err) {

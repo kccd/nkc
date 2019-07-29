@@ -1,12 +1,18 @@
+// 此模块在专栏页被引入了两次，复制链接时会出现两次弹窗
+// 暂时做一个去重判断
+// 模块待改：用的时候进行实例化
 var clipboard = new ClipboardJS('#shareLinkButton', {
   text: function(trigger) {
     return window.location.origin + window.location.pathname;
   }
 });
+if(!window.clipboardLoaded) {
+  clipboard.on('success', function() {
+    screenTopAlert("链接已复制到粘贴板");
+  });
+  window.clipboardLoaded = true;
+}
 
-clipboard.on('success', function() {
-  screenTopAlert("链接已复制到粘贴板");
-});
 function shareShowWeChat() {
   $(".weChat-image").toggle();
 }

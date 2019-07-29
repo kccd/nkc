@@ -41,6 +41,7 @@ editorRouter
       data.panelDatas = await db.ForumModel.getForumsNewTree(data.userRoles, data.userGrade, data.user);
 	    if(type === 'forum' && id) {
         const forum = await db.ForumModel.findOnly({fid: id});
+        data.forum = forum;
         data.forumType = forum.forumType;
         const childForumCount = await db.ForumModel.count({parentsId: id});
         if(!childForumCount) data.forum = forum;

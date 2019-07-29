@@ -48,7 +48,8 @@ router
 		const {c, t, fids, cids, cat, mid, columnCategoriesId} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(t === '') ctx.throw(400, '标题不能为空！');
-		if(fids.length == 0) ctx.throw(400, "请至少选择一个专业");
+		if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
+		if(fids.length  > 2) ctx.throw(400, "最多只能选择两个专业");
 		const forum = await ForumModel.findOnly({fid});
 		data.forum = forum;
 		let options = post;

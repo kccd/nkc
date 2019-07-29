@@ -1,6 +1,6 @@
 var app;
 $(function() {
-  var data = getDataById("data");
+  var data = NKC.methods.getDataById("data");
   for(var i = 0; i < data.warnings.length; i++) {
     data.warnings[i].modify = false;
   }

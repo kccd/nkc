@@ -7,7 +7,7 @@ var app = new Vue({
     info: ""
   },
   mounted: function() {
-    var data = getDataById("data");
+    var data = NKC.methods.getDataById("data");
     this.regSettings = data.regSettings;
     this.selectedForums = data.selectedForums;
     var this_ = this;

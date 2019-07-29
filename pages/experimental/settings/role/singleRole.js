@@ -34,7 +34,7 @@ var app = new Vue({
     },
     removeRole: function() {
       if(confirm('确认要删除“' + this.role.displayName + '”证书？') === false) return;
-      kcAPI('/e/settings/role/' + app.role._id, 'DELETE', {})
+      nkcAPI('/e/settings/role/' + app.role._id, 'DELETE', {})
         .then(function() {
           // window.location.href = '/e/settings/role';
           openToNewLocation('/e/settings/role');
@@ -70,7 +70,7 @@ var app = new Vue({
       var formData = new FormData();
       formData.append('file', file);
       input.value = '';
-      uploadFileAPI('/e/settings/role/' + role._id + '/icon', 'POST', formData)
+      uploadFilePromise('/e/settings/role/' + role._id + '/icon', formData)
         .then(function() {
           role.hasIcon = true;
           var img = app.$refs.img;
@@ -91,7 +91,7 @@ var app = new Vue({
     },
     save: function() {
       var role = this.role;
-      kcAPI('/e/settings/role/' + role._id, 'PATCH', {role: role})
+      nkcAPI('/e/settings/role/' + role._id, 'PATCH', {role: role})
         .then(function() {
           screenTopAlert('保存成功');
         })

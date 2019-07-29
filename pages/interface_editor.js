@@ -13,11 +13,11 @@ $(function() {
 
 });
 
-if($("#targetPost").length > 0) {
+/*if($("#targetPost").length > 0) {
   paperProto.init(JSON.parse($("#targetPost").text()));
 }else{
   paperProto.init();
-}
+}*/
 
 function dataURItoBlob (base64Data) {  
   var byteString;  

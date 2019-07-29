@@ -77,7 +77,7 @@ NKC.methods.selectImage = function(o) {
 
   this.selectedFile = function() {
     var files = $("#module_crop_input").prop('files');
-    fileToUrl(files[0])
+    NKC.methods.fileToUrl(files[0])
       .then(function(url) {
         this_.cropper.replace(url);
       })

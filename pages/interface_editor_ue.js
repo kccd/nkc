@@ -198,7 +198,6 @@ function onPost() {
   var fids = [];
   var cids = [];
   if(!queryType || queryType == "forum" || desType == "forum") {
-    var panelObj = $("#tabPanel").tagsinput("items");
     $("#newPanelForum").find(".chooseForum").each(function() {
       var fid = $(this).attr("fid");
       if(fid && fid !== "undefined") {
@@ -376,7 +375,6 @@ if(type == "thread"){
       document.getElementById("quoteContent").innerHTML = quoteHtml;
       geid('quoteCancel').style.display = "inline";
   }
-  window.localStorage.clear();
 }
 // 重新编辑
 if(type == "redit"){
@@ -417,7 +415,10 @@ function GetUrlParam(paraName) {
   }
 }
 
-//html解码
+/**
+ * html解码
+ * @param {String} text 被解码的html字符串 
+ */
 function htmlDecode(text){
   //1.首先动态创建一个容器标签元素，如DIV
   var temp = document.createElement("div");
@@ -448,19 +449,6 @@ function mediaInsertUE(srcStr, fileType, name) {
   ue.execCommand('inserthtml', codeResource);
 }
 
-/**
- * ue的公式渲染
- */
-// function mathfreshnew(){
-//   console.log(document.getElementsByTagName('body'))
-//   if(MathJax){
-//     MathJax.Hub.PreProcess(document.getElementsByTagName('body'),function(){MathJax.Hub.Process(document.getElementsByTagName('body'))})
-//   }
-//   if(hljs){
-//     ReHighlightEverything() //interface_common code highlight
-//   }
-// }
-
 // app相关编辑功能
 
 /**
@@ -478,8 +466,6 @@ function appUpdateVideo() {
     destinationType: 'url',
     allowEdit: false,
     quality: 100,
-    targetWidth: 480,
-    targetHeight: 800,
     saveToPhotoAlbum: false,
     videoQuality: "medium"
   }, function(ret, err) {
@@ -543,8 +529,6 @@ function appUpdateImage() {
     destinationType: 'url',
     allowEdit: false,
     quality: 100,
-    targetWidth: 480,
-    targetHeight: 800,
     saveToPhotoAlbum: false
   }, function(ret, err) {
       if (ret) {
@@ -606,10 +590,4 @@ function appAttachHideOrShow() {
     $("#showOrHideAttach").text("收起附件管理器")
     $("#attach").css("display", "block")
   }
-}
-
-function clickUploadButton() {
-  console.log("here")
-  // $("#fileList").;
-  document.getElementById("fileList").click();
 }

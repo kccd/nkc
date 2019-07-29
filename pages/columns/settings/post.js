@@ -1,4 +1,4 @@
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 data.categories.unshift({
   _id: "all",
   name: "全部",

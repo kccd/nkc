@@ -18,7 +18,7 @@ block content
             button.btn.btn-danger.btn-sm(onclick="submit()") 确认关闭
 block scripts
   script.
-    var columnId = getDataById("data").columnId;
+    var columnId = NKC.methods.getDataById("data").columnId;
     function submit() {
       var password = $("#password").val();
       nkcAPI("/m/" + columnId + "/settings/close", "POST", {

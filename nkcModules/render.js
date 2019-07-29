@@ -365,8 +365,8 @@ function cutContent(str,num) {
  * 换行转换
  */
 function LineFeedConversion(str) {
-	str = str.replace(new RegExp("\n", "gm"),'<br/>');
-  str = str.replace(new RegExp("\s", "gm"), "&nbsp;");
+	str = str.replace(new RegExp("\\n", "gm"),'<br/>');
+  str = str.replace(new RegExp("\\s", "gm"), "&nbsp;");
 	return str
 }
 
@@ -420,6 +420,7 @@ let pugRender = (template, data, state) => {
 	  applicationFormStatus,
 		ensureFundOperatorPermission,
 		startTime: global.NKC.startTime,
+    NODE_ENV: global.NKC.NODE_ENV,
 		getProvinceCity: getProvinceCity,
 		numToFloatTwo: numToFloatTwo,
 		calculateFreightPrice:calculateFreightPrice,

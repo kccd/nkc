@@ -27,7 +27,7 @@ block scripts
   script.
     var selectImage = new NKC.methods.selectImage();
     // moduleCrop.init(function (data) {
-    //   var user = getDataById("data").user;
+    //   var user = NKC.methods.getDataById("data").user;
     //   var formData = new FormData();
     //   formData.append("file", data);
     //   uploadFilePromise('/u/' + user.uid + "/banner", formData, function (e, percentage) {
@@ -50,7 +50,7 @@ block scripts
     // });
     function selectBanner() {
       selectImage.show(function(data){
-        var user = getDataById("data").user;
+        var user = NKC.methods.getDataById("data").user;
         var formData = new FormData();
         formData.append("file", data);
         uploadFilePromise('/u/' + user.uid + "/banner", formData, function (e, percentage) {

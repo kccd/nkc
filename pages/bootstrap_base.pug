@@ -9,25 +9,20 @@ block head
   if state.apptype
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
-  +includeCSS('/Draft.css')
-  +includeCSS('/katex.min.css')
+  //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
   +includeCSS('/font-awesome/css/font-awesome.css')
-  +includeCSS('/photoswipe/dist/photoswipe.css')
-  +includeCSS('/photoswipe/dist/default-skin/default-skin.css')
   +includeCSS('/nkc_styles.css')
   +includeCSS('/publicModules/public.css')
-  +includeCSS('/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css')
   block title
     meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
   
 block body
   block navbar
-    if !state.apptype || state.apptype !== "app"
-      div
+    div
+      if !state.apptype || state.apptype !== "app"
         include ./publicModules/navbar/navbar.pug
-    else 
-      div
+      else
         include ./publicModules/navbar/navLeftBar.pug
 
   block content
@@ -36,14 +31,11 @@ block body
     block footer
       include ./publicModules/footer/footer
   if data.user
-    //- 添加好友的窗口，原生js（待改）
-    include module_add_Friend.pug
     if data.user.generalSettings.lotterySettings.status
       include module_lottery
     -const {systemInfo, reminder, usersMessage} = data.user.generalSettings.messageSettings.beep;
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   +includeJS('/jquery/jquery-1.11.1.js')
-  +includeJS('/jquery-ui-1.10.4.custom.js')
   //-app使用的js
   if state.apptype
     +includeJS("/appAPi/app.js")
@@ -51,62 +43,32 @@ block body
   +includeJS('/twemoji/2/twemoji.min.js')
   +includeJS('/Promise/promise.min.js')
   +includeJS('/vue/dist/vue.js')
-  script.
-    Vue.config.productionTip = false;
-  +includeJS('/qrcode/build/qrcode.js')
+  if NODE_ENV === "production"
+    script.
+      Vue.config.productionTip = false;
+  //- 弹窗模块
   +includeJS("/sweetalert2/dist/sweetalert2.all.min.js")
-  +includeJS('/photoswipe/dist/photoswipe.js')
-  +includeJS('/photoswipe/dist/photoswipe-ui-default.js')
-  //- 旧版common.js兼容旧的页面
-  +includeJS('/interface_common.js')
-  +includeJS('/axios/axios.min.js')
-  +includeJS('/publicModules/config.js')
-  +includeJS('/moment/moment.js')
-  +includeJS('/moment/locale/zh-cn.js')
   //- 新版common.js
   +includeJS('/publicModules/common.js')
-  +includeJS("/publicModules/methods.js")
-  +includeJS('/ueditor/third-party/SyntaxHighlighter/shCore.js')
+  //- 旧版common.js兼容旧的页面
+  +includeJS('/interface_common.js')
   if data.user
-    script!=`NKC.config.hasLogged = true;`
+    script!=`NKC.configs.uid="${data.user.uid}";`
     //- 接入即时通信
     +includeJS('/socket.io-client/dist/socket.io.js')
     +includeJS('/message/socket.js')
 
+    //- 新增好评
     if data.user.newVoteUp > 0
-      script!=`screenTopAlert("您发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
+      script!=`sweetAlert("您发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
+    // 因精选而获得的科创币
     -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
     if kcb > 0
-      script!=`screenTopAlert("您发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
-
+      script!=`sweetAlert("您发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
   block scripts
-
-
-  :thru
-    <link rel="stylesheet" href="/external_pkgs/highlight/styles/tomorrow.css">
-    <script src="/external_pkgs/highlight/highlight.pack.js"></script>
+  //- 生成二维码 页脚
   include ./publicModules/qrcode/qrcode
-  script.
-    if(window.HighlightEverything){window.HighlightEverything()}
-    //- var qrcode = geid('androidQrcode');
-    var qrcode = document.getElementById('androidQrcode');
-    if (qrcode) {
-      var path = window.location.origin;
-      path = path + "/app?t=" + Date.now();
-      QRCode.toCanvas(qrcode, path, {
-        scale: 3,
-        margin: 1,
-        width: 114,
-        color: {dark: '#333333'}
-      }, function (err) {
-        if (err) {
-          screenTopWarning(err);
-        }
-      })
-    }
-  script.
-    SyntaxHighlighter.all();
   script.
     console.log('(c)2019 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')

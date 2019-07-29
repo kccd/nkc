@@ -5,7 +5,7 @@ var winWidth = $(window).width();
 var xss = window.filterXSS;
 
 var data = document.getElementById('data').innerText;
-var templates = getDataById("templatesData").templates;
+var templates = NKC.methods.getDataById("templatesData").templates;
 
 
 data = JSON.parse(data);
@@ -339,8 +339,8 @@ $(function() {
 
     methods: {
 
-      format: format,
-      fromNow: fromNow,
+      format: NKC.methods.format,
+      fromNow: NKC.methods.fromNow,
       secondToMinute: secondToMinute,
       startPlayAudio: startPlayAudio,
       stopPlayAudio: stopPlayAudio,
@@ -1863,4 +1863,41 @@ function stopPlayType(id) {
 function startPlayType(id) {
   app.messages[id].c.playType = true;
   Vue.set(app.messages, id, app.messages[id]);
+}
+
+function closeFrameOfAddFriend() {
+  var dom = $('#addFriend');
+  dom.hide();
+  dom.find('.input').hide();
+  dom.find('.success').hide();
+  dom.find('textarea').val('');
+}
+function openFrameOfAddFriend(user) {
+  var username = user.username;
+  var description = user.description;
+  var uid = user.uid;
+  var dom = $('#addFriend');
+  dom.attr('data-uid', uid);
+  dom.find('.avatar img').attr('src', '/avatar/' + uid);
+  dom.find('.content .username').text(username);
+  dom.find('.content .description').text(description);
+  dom.find('.input').show();
+  dom.find('.success').hide();
+  dom.show();
+}
+
+function addFriendByUid() {
+  var dom = $('#addFriend');
+  var uid = dom.attr('data-uid');
+  var description = dom.find('textarea').val();
+  nkcAPI('/u/' + uid + '/friends', 'POST', {
+    description: description
+  })
+    .then(function (data) {
+      dom.find('.input').hide();
+      dom.find('.success').show();
+    })
+    .catch(function (data) {
+      screenTopWarning(data.error || data);
+    })
 }

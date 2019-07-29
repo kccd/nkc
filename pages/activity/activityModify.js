@@ -1,6 +1,5 @@
 $(document).ready(function(){
   var replyCon = $("#replyxxx").html();
-  // $("#text-elem").html(replyCon)
   editor.txt.html(htmlDecode(replyCon));
 
   var html = "<html><head><meta charset='utf-8' /></head><body>" + document.getElementById("tabExc").outerHTML + "</body></html>";

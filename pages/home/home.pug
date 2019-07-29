@@ -6,7 +6,6 @@ block title
 
 block content
   -const canManagement = permission("superModerator");
-  //-div(style="width: 300px;height: 300px;background-color: red;position: fixed;top: 0;left: 0;")
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
@@ -30,19 +29,6 @@ block content
                           a(href=`/?t=subscribe&c=${tt._id}${d?`&d=${d}`:""}`)
                             .m-l-1=tt.name
               .m-b-1
-                //-.subscribe-lists
-                  .subscribe-list
-                    a(href=`/?t=subscribe${data.d ?`&d=${data.d}`:""}` class=!data.c?"active":"") 全部
-
-                  for t in data.subscribeTypes
-                    .subscribe-list
-                      a(href=`/?t=subscribe${data.d?`&d=${data.d}`:""}&c=${t._id}` class=Number(data.c)===t._id?"active":"")= t.name
-                      if t.childTypes && t.childTypes.length > 0
-                        .fa.fa-caret-down(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
-                        ul.dropdown-menu
-                          for ct in t.childTypes
-                            li
-                              a(href=`/?t=subscribe&c=${ct._id}`)= ct.name
                 .subscribe-lists
                   .subscribe-list
                     a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}`
@@ -154,8 +140,6 @@ block content
               -let sideThreadsHeader= "推荐文章"
               include ../publicModules/side_thread_list
           include ../publicModules/active_users
-          //-include ../publicModules/management/common
-        //-include ../publicModules/web_info_side.pug
         include ../module_scrollTo
 block footer
   include ../publicModules/footer/footer
@@ -169,5 +153,4 @@ block scripts
     include ../publicModules/moveThread/moveThread
     include ../publicModules/disabledPost/disabledPost
     +includeJS("/publicModules/thread_panel/management.js")
-  //- +includeJS("/socket/homeSocket.js")
 

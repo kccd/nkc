@@ -1,41 +1,9 @@
-var markdown = window.markdownit();
-
-var xss = window.filterXSS;
-var default_whitelist = xss.whiteList;
-default_whitelist.img = ['src','style'];
-
-var xssoptions = {
-	whiteList:default_whitelist,
-	onTagAttr: function(tag, name, value, isWhiteAttr) {
-		if(isWhiteAttr) {
-			if(tag === 'a' && name === 'href') {
-				var valueHandled = value.replace('javascript:', '');
-				return "href=" + valueHandled;
-			}
-		}
-	}
-};
-
-var custom_xss = new xss.FilterXSS(xssoptions);
-var custom_xss_process = function(str){
-	return custom_xss.process(str)
-};
-
-function mdToHtml(md) {
-  return markdown.render(md);
-}
-
 var data = $('#data').text();
-var hljs = {
-	highlightBlock: function(){}
-};
 data = JSON.parse(data);
 update();
 $('#title, #content, #reason, #solution, #QQ, #email').on('input', function() {
 	update();
-})/*.on('blur', function() {
-	submit(data.id, function(){screenTopAlert('自动保存成功')});
-});*/
+});
 
 function update() {
 	var title = $('#title').val();
@@ -43,9 +11,10 @@ function update() {
 	var QQ = $('#QQ').val();
 	var email = $('#email').val();
 	$('#titleH2').text(title);
-	$('#contentDiv').html(custom_xss_process(mdToHtml(content)));
+	$('#contentDiv').html(NKC.methods.mdToHtmlSafe(content));
 	$('pre code').each(function(i, block) {
-		hljs.highlightBlock(block);
+	  console.log(block);
+    NKC.methods.highlightBlock(block);
 	});
 	return {
 		t: title,

@@ -1,4 +1,4 @@
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 var bodyBackgroundColor = data.color;
 var CommonModal, SubscribeTypes;
 $(function() {
@@ -25,7 +25,7 @@ function saveSettings() {
   })
     .then(function() {
       screenTopAlert("保存成功");
-      toggleFastSettings();
+      showSetDom();
     })
     .catch(function(d) {
       screenTopWarning(d)
