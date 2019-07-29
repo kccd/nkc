@@ -375,7 +375,6 @@ if(type == "thread"){
       document.getElementById("quoteContent").innerHTML = quoteHtml;
       geid('quoteCancel').style.display = "inline";
   }
-  window.localStorage.clear();
 }
 // 重新编辑
 if(type == "redit"){
