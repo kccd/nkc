@@ -25,7 +25,7 @@ function saveSettings() {
   })
     .then(function() {
       screenTopAlert("保存成功");
-      toggleFastSettings();
+      showSetDom();
     })
     .catch(function(d) {
       screenTopWarning(d)

@@ -10,8 +10,8 @@ if !state.apptype
       img(src='/default/weibo.png')
     .share-icon(onclick="shareShowWeChat()" title="分享到微信")
       img(src='/default/weChat.png')
-    .share-icon(id="shareLinkButton" title="点击复制分享链接")
-      div
+    .share-icon(title="点击复制分享链接")
+      #shareLinkButton
         .fa.fa-link
     .weChat-image
       canvas.qrcode-canvas
