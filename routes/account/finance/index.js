@@ -30,6 +30,7 @@ router
     data.kcbsRecords = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
     data.paging = paging;
     data.t = t;
+    data.user.kcb = await db.UserModel.updateUserKcb(data.user.uid);
     ctx.template = 'account/finance/finance.pug';
     await next();
   })
