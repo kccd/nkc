@@ -467,8 +467,6 @@ function appUpdateVideo() {
     destinationType: 'url',
     allowEdit: false,
     quality: 100,
-    targetWidth: 480,
-    targetHeight: 800,
     saveToPhotoAlbum: false,
     videoQuality: "medium"
   }, function(ret, err) {
@@ -532,8 +530,6 @@ function appUpdateImage() {
     destinationType: 'url',
     allowEdit: false,
     quality: 100,
-    targetWidth: 480,
-    targetHeight: 800,
     saveToPhotoAlbum: false
   }, function(ret, err) {
       if (ret) {

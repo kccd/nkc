@@ -2,9 +2,6 @@ extends bootstrap_base.pug
 
 block title
   title 编辑器 - 科创论坛
-  
-  //- link(rel='stylesheet' href=`/tabPanel/tabPanel.css?v=${global.NKC.startTime}`)
-  //- link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
   link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
   link(href="/editor/editor.css" rel="stylesheet")
 block content
@@ -95,8 +92,6 @@ block content
   
   include debug_output.pug
 block scripts
-  //- +includeCSS("jquery-ui-1.10.4.custom.css")
-  //- +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
   +includeJS('/commonmark/dist/commonmark.js')
   +includeJS('/plain_escaper.js')
   +includeJS('/xbbcode-parser/xbbcode.js')
@@ -119,19 +114,6 @@ block scripts
         return "离开前保存草稿了吗？"
       }
     }
-    //- $("#tabPanel").tagsinput({
-    //-   maxChars: 15, // 单个标记最大字符数 
-    //-   maxTags: 2, // 最大标签数
-    //-   itemValue: 'id',
-    //-   itemText: 'name'
-    //- })
-    //- $(".bootstrap-tagsinput").children("input").attr("readonly", true)
-    //- $(".bootstrap-tagsinput").css("background-color", "#eee")
-    //- $(".bootstrap-tagsinput").click(function () {
-    //-   openPanel(this);
-    //- });
   if data.toColumn
     script.
       $("#postToColumn").show();
-  //- +includeJS(`/tabPanel/tabPanelJson.js`)
-  //- +includeJS(`/tabPanel/tabPanel.js`)
