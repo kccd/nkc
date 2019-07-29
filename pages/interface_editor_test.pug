@@ -57,11 +57,11 @@ block content
                   label.col-sm-12 专业分类(必选，最多可选两个)
                   .col-sm-12
                     div#newPanelForum.form-control.move-thread-selected-forums(onclick="testThOpen()" style="height:auto;min-height:34px")
-                      if data.type && data.type === "forum"
+                      if data.type && data.type === "forum" && data.forum
                         .move-thread-forum-name(style=`background-color:${data.forum.color} `)
                           span.chooseForum(fid=`${data.forum.fid}`)!=`${data.forum.displayName}`
-                            span.chooseCate(cid='')  
-
+                          span.chooseCate(cid='')
+                    //- input.form-control(type='text' autocomplete='off', readonly='true' onclick="testThOpen()")
             if !data.type || data.type === 'forum' || data.draftDelType === 'forum' || data.type === 'post' || data.type === 'thread'
               include ./editor/paper.pug
             .form
