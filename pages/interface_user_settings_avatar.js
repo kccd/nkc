@@ -2,7 +2,7 @@ var selectImage = new NKC.methods.selectImage();
 
 
 /*moduleCrop.init(function(data) {
-  var user = getDataById("data").user;
+  var user = NKC.methods.getDataById("data").user;
   var formData = new FormData();
   formData.append("file", data);
   uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {
@@ -28,7 +28,7 @@ var selectImage = new NKC.methods.selectImage();
 
 function selectAvatar() {
   selectImage.show(function(data) {
-    var user = getDataById("data").user;
+    var user = NKC.methods.getDataById("data").user;
     var formData = new FormData();
     formData.append("file", data);
     uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {

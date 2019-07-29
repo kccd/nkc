@@ -1,5 +1,5 @@
 var selectImage;
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 var reg = /^(http|https):\/\//i;
 for(var i = 0; i < data.column.links.length; i++) {
   var link = data.column.links[i];

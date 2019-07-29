@@ -11,7 +11,7 @@ var vue_user_panel_float = new Vue({
     timeout: ''
   },
   mounted: function() {
-    var data = strToObj(this.$el.getAttribute("data-sub-uid"));
+    var data = NKC.methods.strToObj(this.$el.getAttribute("data-sub-uid"));
     this.subUid = data.subUid;
   },
   methods: {
@@ -43,19 +43,12 @@ var vue_user_panel_float = new Vue({
 
     loadUser: function(userString) {
       clearTimeout(this.timeout);
-      var user = strToObj(userString);
+      var user = NKC.methods.strToObj(userString);
       var position = this.getMousePosition();
       var maxX = $(window).width();
       var maxY = $(window).height();
-
-      var top = position.y+40;
-      var left = position.x-20;
-      // console.log(maxX, maxY, top, left);
-
-      // if(maxX < left + 300) left = maxX - 320;
-      // if(maxY < top + 300) top = maxY - 320;
-      this.left = left;
-      this.top = top;
+      this.top = position.y + 20;
+      this.left = position.x-20;
       if(this.usersObj[user.uid]) {
         this.user = this.usersObj[user.uid];
         return vue_user_panel_float.show = true;

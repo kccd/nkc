@@ -1,5 +1,5 @@
 $(function() {
-  var userPostSummary = getDataById("userSummaryData").userPostSummary;
+  var userPostSummary = NKC.methods.getDataById("userSummaryData").userPostSummary;
   if(!userPostSummary) return;
   var forumsName = [], summaryData = [], colors = [];
 

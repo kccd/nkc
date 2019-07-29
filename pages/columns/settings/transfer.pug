@@ -50,7 +50,7 @@ block content
             button.btn.btn-primary.btn-sm(@click="transfer") 确认转让
 block scripts
   script.
-    var data = getDataById("data");
+    var data = NKC.methods.getDataById("data");
     var app = new Vue({
       el: "#app",
       data: {

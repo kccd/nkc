@@ -86,7 +86,7 @@ var app = new Vue({
   },
   mounted: function() {
     vueSelectForum.init({func: this.addForum, canChooseParentForum: true});
-    var data = getDataById("data");
+    var data = NKC.methods.getDataById("data");
     try{
       this.c = this.base64ToStr(data.c);
     } catch(err) {

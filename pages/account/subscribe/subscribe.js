@@ -1,5 +1,5 @@
 var SubscribeTypes;
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 var app = new Vue({
   el: "#subscribe",
   data: {

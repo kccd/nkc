@@ -1,4 +1,4 @@
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 if(!data.category) {
   data.category = {
     name: "",

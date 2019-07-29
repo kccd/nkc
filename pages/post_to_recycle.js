@@ -11,7 +11,7 @@ function clickMethod1(para){
 }
 
 
-function clickMethod2(para){
+function clickMethod2(para){post
   $(para).addClass("active1")
   $("#toDraft").removeClass("active1")
   document.getElementById("passMessage").style.display = "block"

@@ -31,6 +31,4 @@ block content
   
   include debug_output.pug
 block scripts
-  
-  script(src='/interface_common.js')
-  script(src='/interface_history.js')
+  +includeJS('/interface_post_history.js')
