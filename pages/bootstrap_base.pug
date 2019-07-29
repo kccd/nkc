@@ -9,11 +9,10 @@ block head
   if state.apptype
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
-  +includeCSS('/katex.min.css')
+  //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
   +includeCSS('/font-awesome/css/font-awesome.css')
   +includeCSS('/nkc_styles.css')
   +includeCSS('/publicModules/public.css')
-  +includeCSS('/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css')
   block title
     meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
@@ -47,13 +46,12 @@ block body
   if NODE_ENV === "production"
     script.
       Vue.config.productionTip = false;
-  +includeJS('/qrcode/build/qrcode.js')
+  //- 弹窗模块
   +includeJS("/sweetalert2/dist/sweetalert2.all.min.js")
   //- 新版common.js
   +includeJS('/publicModules/common.js')
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
-  +includeJS('/ueditor/third-party/SyntaxHighlighter/shCore.js')
   if data.user
     script!=`NKC.configs.uid="${data.user.uid}";`
     //- 接入即时通信
@@ -69,10 +67,8 @@ block body
       script!=`sweetAlert("您发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
   block scripts
+  //- 生成二维码 页脚
   include ./publicModules/qrcode/qrcode
-
-  script.
-    SyntaxHighlighter.all();
   script.
     console.log('(c)2019 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')
