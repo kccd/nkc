@@ -21,7 +21,6 @@ block title
   -const highlight = data.highlight;
   -const digestPost = data.userOperationsId.includes('digestPost') && data.isModerator;
   -const unDigestPost = data.userOperationsId.includes('unDigestPost')  && data.isModerator;
-  include ../MathJax.pug
 
   if (thread.firstPost&&thread.firstPost.c)
     -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
@@ -30,6 +29,7 @@ block title
     meta(name='keywords' content=`${thread.firstPost.t}`)
     link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
     link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+    +includeCSS("/jquery-ui-1.10.4.custom.css")
     +includeCSS("/external_pkgs/viewer/viewer.css")
     +includeCSS("/external_pkgs/viewer/main.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
@@ -599,7 +599,6 @@ block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   +includeJS("/module_dropdown.js")
   script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
-  link(href=`/jquery-ui-1.10.4.custom.css?v=${global.NKC.startTime}` rel="stylesheet")
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
   if !state.apptype
     script.
@@ -612,10 +611,13 @@ block scripts
   script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
+  include ../publicModules/highlight/highlight_editor
   include ../publicModules/complaint/complaint
   include ../publicModules/crop/crop
   include ../publicModules/moment
   include ../ueditor/ueditorBase
+  include ../MathJax.pug
+
   +includeJS("/thread/initPostInput.js")
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")

@@ -9,14 +9,10 @@ block head
   if state.apptype
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
-  //- 公式渲染模块
-  +includeCSS('/katex.min.css')
   //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
   +includeCSS('/font-awesome/css/font-awesome.css')
   +includeCSS('/nkc_styles.css')
   +includeCSS('/publicModules/public.css')
-  //- 代码高亮
-  +includeCSS('/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css')
   block title
     meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
@@ -56,8 +52,6 @@ block body
   +includeJS('/publicModules/common.js')
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
-  //- 代码高亮
-  +includeJS('/ueditor/third-party/SyntaxHighlighter/shCore.js')
   if data.user
     script!=`NKC.configs.uid="${data.user.uid}";`
     //- 接入即时通信
@@ -75,9 +69,6 @@ block body
   block scripts
   //- 生成二维码 页脚
   include ./publicModules/qrcode/qrcode
-  //- 代码高亮
-  script.
-    SyntaxHighlighter.all();
   script.
     console.log('(c)2019 成都科创科学文化研究院')
     console.log('Project Repository: https://github.com/kccd/nkc')
