@@ -18,6 +18,8 @@ router
 		if(!kcbSettings) ctx.throw(500, '科创币设置错误：未找到相关设置');
 		const sameUsernameUser = await db.UserModel.findOne({uid: {$ne: user.uid}, usernameLowerCase: newUsername.toLowerCase()});
 		if(sameUsernameUser) ctx.throw(400, '用户名已存在');
+		const sameNameColumn = await db.ColumnModel.findOne({uid: {$ne: user.uid}, nameLowerCase: newUsername.toLowerCase()});
+		if(sameNameColumn) ctx.throw(400, "用户名已存在");
 		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 		if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
 		const operation = await db.KcbsTypeModel.findOnly({_id: 'modifyUsername'});

@@ -93,9 +93,9 @@ router
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
       if(contentLength(name) > 60) ctx.throw(400, "专栏名不能超过60字符");
-      let sameName = await db.ColumnModel.findOne({_id: {$ne: column._id}, nameLowerCase: name.toLocaleString()});
+      let sameName = await db.ColumnModel.findOne({_id: {$ne: column._id}, nameLowerCase: name.toLowerCase()});
       if(sameName) ctx.throw(400, "专栏名已存在，请更换");
-      sameName = await db.UserModel.findOne({usernameLowerCase: name.toLocaleString()});
+      sameName = await db.UserModel.findOne({uid: {$ne: data.user.uid}, usernameLowerCase: name.toLowerCase()});
       if(sameName) ctx.throw(400, "专栏名与用户名冲突，请更换");
       if(!abbr) ctx.throw(400, "专栏名简介不能为空");
       if(contentLength(abbr) > 120) ctx.throw(400, "专栏简介不能超过120字符");
@@ -168,7 +168,7 @@ router
         navCategory,
         blocks,
         notice,
-        nameLowerCase: name.toLocaleString(),
+        nameLowerCase: name.toLowerCase(),
         description,
         abbr
       });
