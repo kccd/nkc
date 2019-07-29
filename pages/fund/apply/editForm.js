@@ -74,10 +74,10 @@ var app = new Vue({
         imageScaleEnabled: false, // 启用图片拉伸缩放
       });
       ue.ready(function() {
-        ue.setContent(app.form.project.c);
+        ue.setContent(app.form.project.c || "");
       });
 
-      paperProto.init(data.form.project);
+      paperProto.init(data.form.project || "");
 
     }
     vueSelectForum.init({
