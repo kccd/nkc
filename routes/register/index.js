@@ -143,6 +143,8 @@ registerRouter
 		if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！');
 		const targetUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
 		if(targetUser) ctx.throw(400, '用户名已被注册。');
+		const sameNameColumn = await db.ColumnModel.findOne({nameLowerCase: username.toLowerCase()});
+		if(sameNameColumn) ctx.throw(400, "用户名已存在");
 		if(!password) ctx.throw(400, '请输入密码。');
 		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位。');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者。');
