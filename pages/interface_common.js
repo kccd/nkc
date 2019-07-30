@@ -1904,7 +1904,7 @@ function openToNewLocation(url, target) {
   var apptype = localStorage.getItem("apptype");
   if(apptype && apptype === "app") {
     if(siteHostLink(url) || firstChar === "/") {
-      window.location.href = addApptypeToUrl(url)
+      appOpenUrl(url);
     } else {
       api.openWin({
         name: 'link',
