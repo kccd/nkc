@@ -70,6 +70,5 @@ block content
                 th {{record.verify?"是":"否"}}
           include ../../interface_navigation_paging
 block scripts
-  script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
-  script(src=`/moment/locale/zh-cn.js?v=${global.NKC.startTime}`)
+  include ../../publicModules/moment
   script(src=`/experimental/log/kcb.js?v=${global.NKC.startTime}`)
