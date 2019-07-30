@@ -9,19 +9,21 @@ userRouter
 	.get('/', async (ctx, next) => {
 		const {query, data, db} = ctx;
 		let {page = 0, searchType, content, t} = query;
-		if(['username', 'uid', "mobile"].includes(searchType)) {
+		if(['username', 'uid', "mobile", "email"].includes(searchType)) {
 			content = content.trim();
 			let targetUsers = [];
 			if(searchType === 'username') {
 				targetUsers = await db.UserModel.find({usernameLowerCase: content.toLowerCase()});
 			} else if(searchType === "uid") {
 				targetUsers = await db.UserModel.find({uid: content});
-			} else {
+			} else if(searchType === "mobile") {
 			  const targetUsersPersonal = await db.UsersPersonalModel.find({mobile: content});
 			  const uid = targetUsersPersonal.map(t => t.uid);
-			  if(targetUsersPersonal) {
-			    targetUsers = await db.UserModel.find({uid: {$in: uid}});
-        }
+        targetUsers = await db.UserModel.find({uid: {$in: uid}});
+      } else {
+			  const targetUserPersonal = await db.UsersPersonalModel.find({email: content});
+			  const uid = targetUserPersonal.map(t => t.uid);
+			  targetUsers = await db.UserModel.find({uid: {$in: uid}});
       }
 			if(targetUsers.length) {
 			  data.targetUsers = [];
@@ -66,10 +68,64 @@ userRouter
 		await targetUser.extend();
 		await targetUser.extendRoles();
 		data.targetUser = targetUser;
+		data.targetUsersPersonal = await db.UsersPersonalModel.findOnly({uid});
 		data.roles = await db.RoleModel.find({type: {$in: ['common', 'management']}}).sort({toc: 1});
 		await next();
 	})
-	.patch('/:uid', async (ctx, next) => {
+  .patch("/:uid", async (ctx, next) => {
+    const {params, db, body, nkcModules} = ctx;
+    const {
+      username = "", description = "", certs = [], email = "",
+      mobile = "", nationCode = "", password = ""
+    } = body;
+    const {uid} = params;
+    const targetUser = await db.UserModel.findOnly({uid});
+    const targetUsersPersonal = await db.UsersPersonalModel.findOnly({uid});
+    // 用户名重名检测
+    if(targetUser.username !== username) {
+      const sameNameUser = await db.UserModel.findOne({uid: {$ne: uid}, usernameLowerCase: username.toLowerCase()});
+      if(sameNameUser) ctx.throw(400, "用户名已存在，请更换");
+      const sameNameColumn = await db.ColumnModel.findOne({uid: {$ne: uid}, nameLowerCase: username.toLowerCase()});
+      if(sameNameColumn) ctx.throw(400, "用户名与专栏名冲突，请更换");
+    }
+    // 邮箱检测
+    if(targetUsersPersonal.email !== email) {
+      const sameEmailUser = await db.UsersPersonalModel.findOne({uid: {$ne: uid}, email: email.toLowerCase()});
+      if(sameEmailUser) ctx.throw(400, "邮箱已存在，请更换");
+    }
+    // 手机号码检测
+    if(targetUsersPersonal.mobile !== mobile || targetUsersPersonal.nationCode !== nationCode) {
+      const sameMobileUser = await db.UsersPersonalModel.findOne({uid: {$ne: uid}, nationCode, mobile});
+      if(sameMobileUser) ctx.throw(400, "手机号码已被其他用户绑定，请更换");
+    }
+    // 证书检测
+    let certsId = await db.RoleModel.find({_id: {$in: certs}, type: {$in: ["common", "management"]}});
+    certsId = certsId.map(cert => cert._id);
+    const userObj = {
+      username,
+      usernameLowerCase: username.toLowerCase(),
+      description,
+      certs: certsId
+    };
+    const userPersonalObj = {
+      mobile,
+      nationCode,
+      email: email.toLowerCase()
+    };
+
+    if(password) {
+      const {contentLength, checkPass} = ctx.tools.checkString;
+      if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位');
+      if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者');
+      const newPassword = nkcModules.apiFunction.newPasswordObject(password);
+      userPersonalObj.password = newPassword.password;
+      userPersonalObj.hashType = newPassword.hashType;
+    }
+    await targetUser.update(userObj);
+    await targetUsersPersonal.update(userPersonalObj);
+    await next();
+  });
+	/*.patch('/:uid', async (ctx, next) => {
 		const {params, db, body, nkcModules} = ctx;
 		const {operation} = body;
 		const {uid} = params;
@@ -145,5 +201,5 @@ userRouter
 			await nkcModules.elasticSearch.save("user", targetUser_);
 		}
 		await next();
-	});
+	});*/
 module.exports = userRouter;
