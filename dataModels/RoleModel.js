@@ -12,6 +12,10 @@ const roleSchema = new Schema({
     type: Boolean,
     default: false
   },
+  hidden: {
+    type: Boolean,
+    default: false
+  },
 	toc: {
 		type: Date,
 		default: Date.now,
@@ -167,6 +171,8 @@ roleSchema.methods.getUsers = async function(paging) {
 };
 roleSchema.statics.extendRole = async (_id) => {
   const role = {_id};
+  role.hidden = await redisClient.getAsync(`role:${_id}:hidden`);
+  role.hidden = (role.hidden === "true");
   role.displayName = await redisClient.getAsync(`role:${_id}:displayName`);
   role.operationsId = await redisClient.smembersAsync(`role:${_id}:operationsId`);
   role.modifyPostTimeLimit = await redisClient.getAsync(`role:${_id}:modifyPostTimeLimit`);
