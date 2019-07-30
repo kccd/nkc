@@ -1,4 +1,7 @@
-var testTh = new NKC.modules.MoveThread();
+var testTh;
+if(NKC.modules.MoveThread) {
+  testTh = new NKC.modules.MoveThread();
+}
 function testThOpen() {
   var selectedForumsId = [], selectedCategoriesId = [];
   $(".chooseForum").each(function() {

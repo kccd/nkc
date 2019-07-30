@@ -95,6 +95,7 @@ router
           return ctx.body = 'success';
         }
         orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+        const ordersInfo = await db.ShopOrdersModel.getOrdersInfo(orders);
         for(const order of orders) {
           const r = db.KcbsRecordModel({
             _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
@@ -103,7 +104,7 @@ router
             type: 'pay',
             ordersId: [order.orderId],
             num: order.orderPrice,
-            description: `${order.count}x${order.product.name}(${order.productParam.name.join('+')})`,
+            description: ordersInfo.description,
             ip: ctx.address,
             port: ctx.port,
             verify: true

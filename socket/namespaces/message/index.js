@@ -41,10 +41,10 @@ const message = async (i) => {
     }
     // 获取该用户的房间中的全部连接id
     const clients = await util.getRoomClientsId(io, `user/${user.uid}`);
-    // 每个用户最大连接数不能超过5
-    // 若连接数超过5，则断开之前的连接建立新连接，保证连接数不超过5。
-    if(clients.length > 4) {
-      let num = clients.length - 4;
+    // 每个用户最大连接数不能超过10
+    // 若连接数超过10，则断开之前的连接建立新连接，保证连接数不超过10。
+    if(clients.length >= 10) {
+      let num = clients.length - 9;
       for(let i = 0; i < num; i++) {
         if(io.connected[clients[i]]) {
           io.connected[clients[i]].disconnect(true);
