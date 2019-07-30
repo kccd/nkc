@@ -1295,6 +1295,7 @@ footer.footer ul li{
 .thread-panel-forum a{
   color: #7e8da0;
   font-weight: 700;
+  margin-right: 0.5rem;
 }
 .thread-panel-forum a:hover, .thread-panel-forum a:active, .thread-panel-forum a:visited,.thread-panel-forum a:link{
   text-decoration: none;

@@ -26,9 +26,9 @@ function submitOrders() {
   receiveAddress = receiveDom.next().find(".address").text();
   receiveName = receiveDom.next().find(".username").text();
   receiveMobile = receiveDom.next().find(".mobile").text();
-  if(!receiveAddress) return screenTopWarning("请选择收货地址")
-  if(!receiveName) return screenTopWarning("收件人不得为空，请完善信息后提交订单");
-  if(!receiveMobile) return screenTopWarning("联系方式不得为空, 请完善信息后提交订单");
+  if(!receiveAddress) return sweetWarning("请选择收货地址")
+  if(!receiveName) return sweetWarning("收件人不得为空，请完善信息后提交订单");
+  if(!receiveMobile) return sweetWarning("联系方式不得为空, 请完善信息后提交订单");
   var receInfo = {
     receiveAddress: receiveAddress,
     receiveName: receiveName,
@@ -37,7 +37,7 @@ function submitOrders() {
   var para = [];
   // 检查购买限制
   if($(".limitBuy").length > 0){
-    return screenTopWarning("有商品存在购买限制，请重新下单")
+    return sweetWarning("有商品存在购买限制，请重新下单")
   }
   // 获取账单信息
   var data = document.getElementById('data');
@@ -53,7 +53,7 @@ function submitOrders() {
     var paraId = $(this).attr("paid");
     if(needUploadCert === "true") {
       if(!paramCert[paraId]) {
-        screenTopWarning("请上传凭证");
+        sweetWarning("请上传凭证");
         throw "请上传凭证"
       }
     }
@@ -65,7 +65,8 @@ function submitOrders() {
     openToNewLocation('/shop/pay?ordersId=' + data.ordersId);
   })
   .catch(function(data) {
-    screenTopWarning(data || data.error);
+    sweetWarning(data || data.error)
+    // sweetWarning(data || data.error);
     $("#submitPay").attr('disabled',false);
   })
 }
@@ -101,7 +102,7 @@ function inputChange(a) {
       $(".cert-" + paramId + " button").removeClass("hidden");
     })
     .catch(function(data) {
-      screenTopWarning(data);
+      sweetWarning(data);
     });
 }
 function viewCert(id) {
@@ -149,7 +150,7 @@ function countAddOne(para) {
   })
   .catch(function(data) {
     $(para).removeAttr("disabled");
-    return screenTopWarning(data || data.error)
+    return sweetWarning(data || data.error)
   })
 }
 
@@ -162,7 +163,7 @@ function countPlusOne(para) {
   count--;
   if(count < 1) {
     $(para).removeAttr("disabled");
-    return screenTopWarning("至少购买一件商品");
+    return sweetWarning("至少购买一件商品");
   }
   var productParamId = $(para).attr("productParamId");
   var cartId = $(para).attr("cartId");
@@ -196,7 +197,7 @@ function countPlusOne(para) {
   })
   .catch(function(data) {
     $(para).removeAttr("disabled");
-    return screenTopWarning(data || data.error);
+    return sweetWarning(data || data.error);
   })
 }
 
