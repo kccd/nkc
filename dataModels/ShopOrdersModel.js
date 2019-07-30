@@ -251,7 +251,13 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
     }
   }
   return await Promise.all(orders.map(ord => {
-    const order = ord.toObject();
+    let order;
+    if(ord.toObject) {
+      order = ord.toObject();
+    } else {
+      order = ord;
+    }
+
     if(o.sellUser) order.sellUser = sellUserObj[ord.sellUid];
     if(o.buyUser) order.buyUser = buyUserObj[ord.buyUid];
     if(o.params) order.params = paramsObj[ord.orderId];
