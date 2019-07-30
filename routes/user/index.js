@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const subscribeRouter = require('./subscribe');
-const collectionsRouter = require('./collections');
 const billRouter = require('./bills');
 const productionRouter = require('./production');
 const bannedRouter = require('./banned');
@@ -414,7 +413,6 @@ userRouter
   .use('/:uid/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
 	.use('/:uid/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
-  .use('/:uid/collections', collectionsRouter.routes(), collectionsRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
 	.use('/:uid/auth', authRouter.routes(), authRouter.allowedMethods())
 	.use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())

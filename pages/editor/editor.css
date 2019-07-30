@@ -107,6 +107,8 @@
   background-color: #2b90d9;
 }
 
+
+
 @media (max-width: 600px) {
   .attachButton {
     display: block
