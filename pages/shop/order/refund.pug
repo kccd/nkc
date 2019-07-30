@@ -17,7 +17,7 @@ block content
         h5 订单状态：{{order.status}}
         h5 订单总价：
           strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
-          | 元 （商品总价：{{orderOriginPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
+          | 元 （邮费：{{order.orderFreightPrice/100}}元
           span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
           | ）
         h5 商品列表
@@ -25,7 +25,7 @@ block content
           img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
           div.display-i-b
             a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
-            h5 商品ID：{{p.costId}}，商品总价：
+            h5 商品ID：{{p.costId}}，商品价格：
               strong.text-danger {{p.productPrice/100}}
               | 元（{{p.count}}件）
               strong.text-danger(v-if="p.refundStatus==='success'") 【已退款{{p.refundMoney?p.refundMoney/100+"元":""}}】
@@ -59,7 +59,7 @@ block content
               h5 订单状态：{{order.status}}
               h5 订单总价：
                 strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
-                |元 （商品总价：{{orderOriginPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
+                |元 （邮费：{{order.orderFreightPrice/100}}元
                 span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
                 |）
               h5 商品列表
@@ -67,7 +67,7 @@ block content
                 img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                 div.display-i-b
                   a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
-                  h5 商品ID：{{p.costId}}，商品总价：
+                  h5 商品ID：{{p.costId}}，商品价格：
                     strong.text-danger {{p.productPrice/100}}
                     | 元（{{p.count}}件）
                     strong.text-danger(v-if="p.refundStatus==='success'") 【已退款{{p.refundMoney?p.refundMoney/100+"元":""}}】
@@ -82,7 +82,7 @@ block content
                   img.m-r-1(:src="'/rt/' + param.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                   div.display-i-b
                     a(:href="'/shop/product/'+param.product.productId" target='_blank' :title="param.product.abstract") {{param.product.name}} ({{param.productParam.name}})
-                    h5 商品总价：
+                    h5 商品价格：
                       strong.text-danger {{param.productPrice/100}}
                       | 元（{{param.count}}件）
                 div(v-else)
@@ -90,7 +90,7 @@ block content
                     img.m-r-1(:src="'/rt/' +p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
                     div.display-i-b
                       a(:href="'/shop/product/' + p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
-                      h5 商品总价：
+                      h5 商品价格：
                         strong.text-danger {{p.productPrice/100}}
                         | 元（{{p.count}}件）
                 h5 类型：{{refundType(refund.type)}}  
@@ -144,7 +144,7 @@ block content
                         div.display-i-b
                           a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
                           h5 商品总价：
-                            strong.text-danger {{p.productPrice/100}}
+                            strong.text-danger {{(p.productPrice*p.count)/100}}
                             | 元（{{p.count}}件）
                             strong.text-danger {{p.refundStatus==="success"?"【已退款】": ""}}
                   .form-group
