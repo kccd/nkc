@@ -110,13 +110,6 @@ module.exports = {
 				PATCH: 'modifyUserVerifyStatus'
 			}
 		},
-		collections: {
-			PARAMETER: {
-				GET: 'visitCollections',
-				PATCH: 'modifyCollectionsCategory',
-				DELETE: 'deleteCollection'
-			}
-		},
 		drafts: {
 			GET: 'visitDraftList',
 			POST: 'addDraft',
