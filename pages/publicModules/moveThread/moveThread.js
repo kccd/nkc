@@ -14,7 +14,7 @@ NKC.modules.MoveThread = function() {
       forumType: "topic", // discipline, topic
       forum: "",
       hideMoveType: false,
-
+      forumCountLimit: 20,
       submitting: false,
       showRecycle: false
     },
@@ -80,6 +80,7 @@ NKC.modules.MoveThread = function() {
       },
       selectForum: function(f) {
         if(this.selectedForumsId.indexOf(f.fid) !== -1) return;
+        if(this.selectedForums.length >= this.forumCountLimit) return sweetWarning("最多只能选择" + this.forumCountLimit + "个专业");
         this.selectedForums.push(f);
         this.forum = "";
       },
@@ -130,6 +131,7 @@ NKC.modules.MoveThread = function() {
         }
         this_.app.forums = data.forums;
         this_.app.loading = false;
+        this_.app.forumCountLimit = 20;
         if(options) {
           this_.app.showRecycle = options.showRecycle || false;
           if(options.selectedForumsId && options.selectedForumsId.length > 0) {
@@ -149,6 +151,7 @@ NKC.modules.MoveThread = function() {
           if(options.hideMoveType) {
             this_.app.hideMoveType = true;
           }
+          if(options.forumCountLimit) this_.app.forumCountLimit = options.forumCountLimit;
         }
       })
       .catch(function(data) {

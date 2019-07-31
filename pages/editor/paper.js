@@ -23,7 +23,8 @@ function testThOpen() {
   }, {
     "hideMoveType":true,
     selectedForumsId: selectedForumsId,
-    selectedCategoriesId: selectedCategoriesId
+    selectedCategoriesId: selectedCategoriesId,
+    forumCountLimit: 2
   });
 }
 /**
