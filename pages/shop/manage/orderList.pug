@@ -40,40 +40,41 @@ block name
               th 物流单号
               th 物流公司
           tbody
-            for order in orderLists   
-              for param,key in order.params
-                if key == 0
-                  tr  
-                    td(rowspan=`${order.params.length}`)=order.orderToc.toLocaleString()
-                    td(rowspan=`${order.params.length}`)=order.orderId
-                    td(rowspan=`${order.params.length}`)=order.status
-                    td(rowspan=`${order.params.length}`)=order.buyUid
-                    td(rowspan=`${order.params.length}`)=order.buyUser.username
-                    td=param.product.name
-                    td=param.productParam.name
-                    td=param.count
-                    td #{numToFloatTwo(param.productPrice)}
-                    td(rowspan=`${order.params.length}`) #{numToFloatTwo(order.orderPrice)}
-                    td(rowspan=`${order.params.length}`)=order.receiveName
-                    td(rowspan=`${order.params.length}`)=order.receiveAddress
-                    td(rowspan=`${order.params.length}`)=order.receiveMobile
-                    if !order.trackNumber || order.trackNumber == "no"
-                      td(rowspan=`${order.params.length}`) 自提或虚拟发货
-                      td(rowspan=`${order.params.length}`) null
-                      td(rowspan=`${order.params.length}`) null
-                    else
-                      td(rowspan=`${order.params.length}`) 物流
-                      td(rowspan=`${order.params.length}`)=order.trackNumber
-                      if order.trackName == "AUTO"
+            for order in orderLists 
+              if order.params
+                for param,key in order.params
+                  if key == 0
+                    tr  
+                      td(rowspan=`${order.params.length}`)=order.orderToc.toLocaleString()
+                      td(rowspan=`${order.params.length}`)=order.orderId
+                      td(rowspan=`${order.params.length}`)=order.status
+                      td(rowspan=`${order.params.length}`)=order.buyUid
+                      td(rowspan=`${order.params.length}`)=order.buyUser.username
+                      td=param.product.name
+                      td=param.productParam.name
+                      td=param.count
+                      td #{numToFloatTwo(param.productPrice)}
+                      td(rowspan=`${order.params.length}`) #{numToFloatTwo(order.orderPrice)}
+                      td(rowspan=`${order.params.length}`)=order.receiveName
+                      td(rowspan=`${order.params.length}`)=order.receiveAddress
+                      td(rowspan=`${order.params.length}`)=order.receiveMobile
+                      if !order.trackNumber || order.trackNumber == "no"
+                        td(rowspan=`${order.params.length}`) 自提或虚拟发货
+                        td(rowspan=`${order.params.length}`) null
                         td(rowspan=`${order.params.length}`) null
                       else
-                        td(rowspan=`${order.params.length}`)=order.trackName
-                else
-                  tr
-                    td=param.product.name
-                    td=param.productParam.name
-                    td=param.count
-                    td #{numToFloatTwo(param.productPrice)}
+                        td(rowspan=`${order.params.length}`) 物流
+                        td(rowspan=`${order.params.length}`)=order.trackNumber
+                        if order.trackName == "AUTO"
+                          td(rowspan=`${order.params.length}`) null
+                        else
+                          td(rowspan=`${order.params.length}`)=order.trackName
+                  else
+                    tr
+                      td=param.product.name
+                      td=param.productParam.name
+                      td=param.count
+                      td #{numToFloatTwo(param.productPrice)}
 block manageScripts
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")

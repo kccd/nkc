@@ -172,9 +172,9 @@ orderRouter
 		const {data, body, db, query} = ctx;
 		const {user} = data;
 		const {orderStartStamp, orderEndStamp} = query;
-		let searchMap = {};
+		let searchMap = {sellUid:user.uid};
 		if(orderStartStamp && orderEndStamp) {
-			searchMap = {orderToc: {$gt:orderStartStamp, $lt: orderEndStamp}}
+			searchMap = {orderToc: {$gt:orderStartStamp, $lt: orderEndStamp}, sellUid:user.uid}
 		}
 		// 订单数据查询
 		let orderLists = await db.ShopOrdersModel.find(searchMap);
