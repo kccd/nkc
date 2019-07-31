@@ -2,7 +2,6 @@
     a(href=`/u/${user.uid}`) 名片
     if user.column
       a(href=`/m/${user.column._id}`) 专栏
-    a(href=`/u/${user.uid}/collections/unclassified`) 收藏夹
     if !state.apptype
       a(href=`/message?uid=${user.uid}`) 发私信
 
