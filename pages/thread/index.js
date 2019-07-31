@@ -7,6 +7,7 @@ $(document).ready(function(){
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
 	//编辑器缩放
+  NKC.methods.markDom($("#highlight>.highlight"));
 	if($(".w-e-text-container").length === 0) return;
 	$(".w-e-text-container").resizable({
 		containment: '#body',
@@ -25,7 +26,6 @@ $(document).ready(function(){
 	if($(window).width()<433){
 		$('.ThreadTitle1').css('width','65%');
 	}
-
 	// var qrcode = geid('qrcode');
 	// if(qrcode) {
 	// 	var path = window.location.href;

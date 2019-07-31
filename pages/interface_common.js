@@ -811,7 +811,7 @@ $(function () {
     });
   }
 
-  markDiv(".highlight-dom");
+  // markDiv("#highlight");
 
   var forumBlock = $(".forum-block-children");
   if(forumBlock.length > 0) {
@@ -822,24 +822,25 @@ $(function () {
   }
 });
 
-function markDiv(klass) {
-  var highlightDom = $(klass);
-  highlightDom.css("background-color", "rgba(255, 251, 221, 1)");
+/*function markDiv(id) {
+  var highlightDom = $(id);
+  var highlightDomChild = $(id + " .highlight");
+  highlightDomChild.css("background-color", "rgba(255, 251, 221, 1)");
   var colorValue = 2;
 
   var colorTimeout = setInterval(function() {
     colorValue -= 0.1;
     if(colorValue < 0) clearInterval(colorTimeout);
-    highlightDom.css("background-color", "rgba(255, 251, 221, "+(colorValue<1?colorValue:1)+")");
+    highlightDomChild.css("background-color", "rgba(255, 251, 221, "+(colorValue<1?colorValue:1)+")");
   }, 1000);
 
-  if(highlightDom.length) {
+  /!*if(highlightDom.length) {
     var top = highlightDom.offset().top;
     setTimeout(function() {
       $("html,body").animate({scrollTop: top-300}, 500)
     }, 1000);
-  }
-}
+  }*!/
+}*/
 
 function openPostWarningDom(pid) {
   var dom = $("#module_post_warning");
