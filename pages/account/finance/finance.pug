@@ -10,9 +10,9 @@ block content
             strong.h4.text-danger= data.user.kcb/100
             |&nbsp;个
           .display-i-b.p-l-1 
-            a.btn.btn-success.btn-sm(href='/account/finance/recharge') 充值
+            a.btn.btn-success.btn-sm(onclick="NKC.methods.visitUrl('/account/finance/recharge')") 充值
             span &nbsp;
-            a.btn.btn-default.btn-sm(href='/account/finance/withdraw') 提现
+            a.btn.btn-default.btn-sm(onclick="NKC.methods.visitUrl('/account/finance/withdraw')") 提现
       .col-xs-12.col-md-12.m-b-1
         .ul.nav.nav-tabs  
           li(role='presentation' class=data.t==='all'?'active': '')

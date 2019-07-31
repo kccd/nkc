@@ -1,6 +1,37 @@
 /*
   @author Kris 2019/2/20
 */
+
+var testTh;
+if(NKC.modules.MoveThread) {
+  testTh = new NKC.modules.MoveThread();
+}
+function testThOpen() {
+  var selectedForumsId = [], selectedCategoriesId = [];
+  $(".chooseForum").each(function() {
+    var fid = $(this).attr("fid");
+    if(fid && fid !== "undefined") selectedForumsId.push(fid);
+  });
+  $(".chooseCate").each(function() {
+    var cid = $(this).attr("cid");
+    if(cid && cid !== "undefined") selectedCategoriesId.push(cid);
+  });
+  testTh.open(function(data) {
+    var shuchuDemo = "";
+    var forumsArr = data.forums;
+    for(var i=0;i < forumsArr.length;i++) {
+      shuchuDemo += '<div class="move-thread-forum-name" style="background-color:'+forumsArr[i].color+' "><span class="chooseForum" fid="'+forumsArr[i].fid+'">'+forumsArr[i].fName+' <span class="chooseCate" cid="'+forumsArr[i].cid+'"> '+forumsArr[i].cName+'</span></span></div>';
+    }
+    $("#newPanelForum").html(shuchuDemo);
+    testTh.close();
+  }, {
+    "hideMoveType":true,
+    selectedForumsId: selectedForumsId,
+    selectedCategoriesId: selectedCategoriesId,
+    forumCountLimit: 1
+  });
+}
+
 function initTime() {
 	if(!$('.time').length){
 		return;
@@ -338,11 +369,17 @@ function submitToShelf() {
   if(!shopForum){
     throw("商品分类为必选，请务必选一个");
   }
-  mainForumsId.push(shopForum);
-  var mergeForumId = getResultHaveForumId();
-  if(mergeForumId){
-    mainForumsId.push(mergeForumId)
-  }
+  $("#newPanelForum").find(".chooseForum").each(function() {
+    var fid = $(this).attr("fid");
+    if(fid && fid !== "undefined") {
+      mainForumsId.push(fid)
+    }
+  })
+  // mainForumsId.push(shopForum);
+  // var mergeForumId = getResultHaveForumId();
+  // if(mergeForumId){
+  //   mainForumsId.push(mergeForumId)
+  // }
   // 组装上传数据
   var post = {
     productName: productName,
@@ -521,41 +558,6 @@ function deleteImageInProduct(id) {
 }
 
 /**
- * 收起附件模块
- */
-function hideAttachment() {
-  $("#attachmentDom").css("display", "none");
-  $("#hideButton").css("display", "none");
-  $("#showButton").css("display", "block");
-}
-
-/**
- * 展开附件模块
- */
-function showAttachment() {
-  $("#attachmentDom").css("display", "block");
-  $("#hideButton").css("display", "block");
-  $("#showButton").css("display", "none");
-}
-
-/*
-  字数统计，并放入显示
-  @param para {dom} 传入的dom
-  @param maxlength {number} 最大限制长度
-  @param outDomId {string} 统计字数输出dom的id
-  @return void
-*/
-// function wordCount(para, maxlength, outDomId) {
-//   var countLength;
-//   var inputWord = $(para).val();
-//   countLength = inputWord.length;
-//   if(countLength >= 200){
-//     countLength = 200;
-//   }
-//   $("#"+outDomId).text(countLength);
-// }
-
-/**
  * 新增一条自定义属性
  */
 function addNewParam() {
@@ -592,7 +594,6 @@ function getSingleParams() {
   var singleParams = [];
   // var isUseParams = $("#useparams").prop("checked");
   var isUseParams =  $("input[type=radio][name='useparams']:checked").val();
-  console.log(isUseParams)
   if(isUseParams == "yes") {
     $("#singleParams tbody tr").each(function(index, ele) {
       var obj = {};
@@ -1180,4 +1181,19 @@ function editProductShelf(uid, productId) {
     screenTopWarning(data.error || data);
     $("#resaveBtn").removeAttr("disabled");
   })
+}
+
+/**
+ * 附件模块的隐藏与展开
+ */
+function appAttachHideOrShow() {
+  loadMediaRe();
+  var attactStatus = $("#attach").css("display");
+  if(attactStatus === "block") {
+    $("#showOrHideAttach").text("插入图片、媒体、文件")
+    $("#attach").css("display", "none")
+  }else{
+    $("#showOrHideAttach").text("收起附件管理器")
+    $("#attach").css("display", "block")
+  }
 }

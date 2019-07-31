@@ -28,7 +28,7 @@ block name
             for product in data.products
               tr(style="min-height:100px;background-color: #d3f2ff;border-top:2px solid black;")
                 td(style="display:flex")
-                  img(src=`/r/${product.imgMaster}` style="width:60px;height:60px;margin-right5px")
+                  img(src=`/r/${product.imgMaster}` style="width:60px;height:60px;")
                   a(href=`/shop/product/${product.productId}` style="font-size:12px")!=`(商品ID：${product.productId})&nbsp;${product.name}`
                   //- span(style="font-size:12px")=product.name
                 td=product.toc.toLocaleString()
