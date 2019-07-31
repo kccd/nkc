@@ -1013,13 +1013,18 @@ function removedraft(uid,did){
   var alertInfo = "已舍弃草稿";
   nkcAPI(url, method, {})
     .then(function(){
-      screenTopAlert(alertInfo);
-      setTimeout(function(){
-        window.location.reload();
-      }, 1000);
+      sweetSuccess(alertInfo);
+      if(did === "all") {
+        $("#draftList").fadeOut("slow");
+      }else{
+        $("#draft"+did).fadeOut("slow");
+      }
+      // setTimeout(function(){
+      //   window.location.reload();
+      // }, 1000);
     })
     .catch(function(data){
-      screenTopWarning(data.error)
+      sweetWarning(data.error)
     })
 }
 

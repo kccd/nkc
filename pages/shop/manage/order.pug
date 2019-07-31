@@ -49,11 +49,9 @@ block name
                       a(href=`/u/${order.buyUid}`)!=`${order.buyUser.username}`
               for para,key in order.params
                 tr(style="min-height:100px")
-                  td
-                    div(style="float:left;margin-right:5px")
-                      img(src=`/r/${para.product.imgMaster}` style="width:60px;height:60px;margin-right5px")
-                    div
-                      a(style="font-size:12px" href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
+                  td(style="display:flex")
+                    img(src=`/r/${para.product.imgMaster}` style="width:60px;height:60px;")
+                    a(style="font-size:12px" href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
                   td=para.productParam.name
                   td
                     p

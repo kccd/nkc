@@ -6,28 +6,28 @@ block name
   //-   small Nice tabs and panels
   .row
     .col-md-3.col-sm-12.col-xs-12
-      .panel.panel-primary.text-center.no-boder.bg-color-green
+      .panel.panel-default.text-center.no-boder.bg-color-green
         .panel-body
           i.fa.fa-bar-chart-o.fa-5x
           h3!=statistics.visitCount
         .panel-footer.back-footer-green
           | 访问总量
     .col-md-3.col-sm-12.col-xs-12
-      .panel.panel-primary.text-center.no-boder.bg-color-blue
+      .panel.panel-default.text-center.no-boder.bg-color-blue
         .panel-body
           i.fa.fa-shopping-cart.fa-5x
           h3!=statistics.sellCount
         .panel-footer.back-footer-blue
           | 已售数量
     .col-md-3.col-sm-12.col-xs-12
-      .panel.panel-primary.text-center.no-boder.bg-color-red
+      .panel.panel-default.text-center.no-boder.bg-color-red
         .panel-body
           i.fa.fa.fa-comments.fa-5x
           h3!=statistics.talkCount
         .panel-footer.back-footer-red
           | 商品讨论量
     .col-md-3.col-sm-12.col-xs-12
-      .panel.panel-primary.text-center.no-boder.bg-color-brown
+      .panel.panel-default.text-center.no-boder.bg-color-brown
         .panel-body
           i.fa.fa-users.fa-5x
           h3!=statistics.funsCount
@@ -36,9 +36,9 @@ block name
   .row
     .col-md-12
       // Kitchen Sink
-      .panel.panel-primary
+      .panel.panel-default
         .panel-heading
-          | 统计信息
+          span(style="font-weight:600") 统计信息
         .table-responsive
           table.table.table-striped.table-bordered.table-hover
             tbody
