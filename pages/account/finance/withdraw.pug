@@ -16,8 +16,8 @@ block content
               |个科创币，当前科创币剩余
               strong.text-danger &nbsp;{{user.kcb/100}}&nbsp;
               |个
-            a(href='/account/finance?t=payout').m-r-1 查看记录
-            a(href='/account/finance/withdraw') 再次提现
+            a(onclick="NKC.methods.visitUrl('/account/finance?t=payout')").m-r-1 查看记录
+            a(onclick="NKC.methods.visitUrl('/account/finance/withdraw')") 再次提现
           .row(v-else )
             .col-xs-12.col-xs-12
               include ./nav
@@ -61,7 +61,7 @@ block content
               .m-t-1
                 h4 选择支付宝账户
                 h5.text-danger(v-if="!alipayAccounts.length") 您未添加支付宝账号，
-                  a(href=`/u/${data.user.uid}/settings/alipay` target="_blank") 去添加
+                  a(onclick=`NKC.methods.visitUrl('/u/${data.user.uid}/settings/alipay')`) 去添加
                 .row(v-else)
                   .col-xs-12.col-md-4.m-b-1(v-for="alipay in alipayAccounts" @click="selectAccount(alipay)")
                     .payment-pannel(:class="{'active': selectedAccount.account === alipay.account}")
@@ -70,7 +70,7 @@ block content
                         .fa.fa-check
                       span {{alipay.account}} {{alipay.name}}
                   .col-xs-12.m-t-1
-                    a(href=`/u/${data.user.uid}/settings/alipay` target="_blank") 其他账号
+                    a(onclick=`NKC.methods.visitUrl('/u/${data.user.uid}/settings/alipay')`) 其他账号
               .m-t-1
                 h4 输入科创币提现金额&nbsp;
                   small 从您的账户最多可提现：
@@ -91,7 +91,7 @@ block content
                 h4 输入短信验证码
                 if data.user.authLevel < 1
                   h5.text-danger 您未绑定手机号，
-                    a(href=`/u/${data.user.uid}/settings/mobile` target="_blank") 去绑定
+                    a(onclick=`NKC.methods.visitUrl('/u/${data.user.uid}/settings/mobile')`) 去绑定
                 else
                   .row
                     .col-xs-12.col-md-2

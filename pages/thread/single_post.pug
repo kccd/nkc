@@ -1,5 +1,6 @@
 if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
-  div.single-post(class=post.pid===highlight?"highlight-dom":"")
+  //- class=post.pid===highlight?"highlight-dom":""
+  div.single-post(id=post.pid===highlight?"highlight":"")
     if previousPost
       // 获取前一条post当天日期零点的时间戳
       -let prepostTimeStamp = new Date(previousPost.toc)
@@ -16,7 +17,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
     if !previousPost || (post.toc - previousPost.toc) > 24*60*60*1000
       div.single-post-time
         div=post.toc.toLocaleString()
-    .post-body( style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
+    .post-body.highlight( style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
       if !post.reviewed
         -let reviewData = {reviewPid: post.pid, reviewType: "post"}
         include ../publicModules/module_review

@@ -21,9 +21,13 @@ block content
               h5.col-sm-7
                 strong= data.paper._id
             .form-group
-              label.col-sm-5.control-label 时间：
+              label.col-sm-5.control-label 发卷时间：
               h5.col-sm-7
                 strong= data.paper.toc.toLocaleString()
+            .form-group
+              label.col-sm-5.control-label 交卷时间：
+              h5.col-sm-7
+                strong= data.paper.tlm.toLocaleString()
             .form-group
               label.col-sm-5.control-label 用户：
               h5.col-sm-7

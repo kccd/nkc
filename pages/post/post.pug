@@ -166,4 +166,6 @@ block scripts
         toolbar: false,
       }
       new Viewer(document.getElementById('ThreadPostBody'), options);
+      NKC.methods.markDom($(".highlight-dom>.highlight"));
+      NKC.methods.scrollToDom($(".highlight-dom"));
     })

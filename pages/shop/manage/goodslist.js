@@ -11,13 +11,13 @@ function editProductParamInfo() {
 function shelfRightNow(uid, productId) {
   nkcAPI('/shop/manage/'+uid+'/goodslist/shelfRightNow', "PATCH", {productId:productId})
   .then(function() {
-    screenTopAlert("上架成功");
+    sweetAlert("上架成功");
     var targetUrl = '/shop/manage/'+uid+'/goodslist';
     // window.location.href = targetUrl;
     openToNewLocation(targetUrl)
   })
   .catch(function(data) {
-    screenTopWarning(data || data.error);
+    sweetWarning(data || data.error);
   })
 }
 
@@ -29,11 +29,11 @@ function stopSale(uid,productId) {
   if(sureStopSale){
     nkcAPI('/shop/manage/'+uid+'/goodslist/productStopSale', "PATCH", {productId: productId})
     .then(function(data) {
-      screenTopAlert("商品已停售");
+      sweetAlert("商品已停售");
       window.location.reload();
     })
     .catch(function(data) {
-      screenTopWarning(data.error || data)
+      sweetWarning(data.error || data)
     })
   }
 }
@@ -46,11 +46,11 @@ function goonSale(uid,productId) {
   if(sureGoonSale) {
     nkcAPI('/shop/manage/'+uid+'/goodslist/productGoonSale', "PATCH", {productId: productId})
     .then(function(data) {
-      screenTopAlert("商品已复售");
+      sweetAlert("商品已复售");
       window.location.reload();
     })
     .catch(function(data) {
-      screenTopWarning(data.error || data)
+      sweetWarning(data.error || data)
     })
   }
 }
@@ -77,16 +77,16 @@ function paramToEdit(uid,paraId) {
   var stocksSurplus = Number($("#stocksSurplus"+paraId).text());
   // var stocksSurplus = Number($("#stocksSurplus"+paraId).text());
   if(originPrice <= 0 || paramPrice <= 0 || stocksSurplus <= 0){
-    return screenTopWarning("数值必须为正数")
+    return sweetWarning("数值必须为正数")
   }
   if(isNaN(originPrice) || isNaN(paramPrice) || isNaN(stocksSurplus)){
-    return screenTopWarning("数值必须为正数");
+    return sweetWarning("数值必须为正数");
   }
   if(originPrice < paramPrice) {
-    return screenTopWarning("原始价格不得小于优惠价");
+    return sweetWarning("原始价格不得小于优惠价");
   }
   // if(stocksTotal < stocksSurplus) {
-  //   return screenTopWarning("原始库存不得小于当前库存");
+  //   return sweetWarning("原始库存不得小于当前库存");
   // }
 
   var obj = {
@@ -97,7 +97,7 @@ function paramToEdit(uid,paraId) {
   }
   nkcAPI('/shop/manage/'+uid+'/goodslist/editParam', "PATCH", {obj:obj})
   .then(function(data) {
-    screenTopAlert("修改成功");
+    sweetAlert("修改成功");
     $("#save"+paraId).css("display", "none");
     $("#edit"+paraId).css("display", "");
     $("#originPrice"+paraId).attr("contenteditable", "false")
@@ -106,6 +106,6 @@ function paramToEdit(uid,paraId) {
     // window.location.reload();
   })
   .catch(function(data) {
-    screenTopWarning(data || data.error)
+    sweetWarning(data || data.error)
   })
 }

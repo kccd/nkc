@@ -376,9 +376,9 @@ threadRouter
 			const {page, step} = await thread.getStep({pid, disabled});
 			ctx.status = 303;
 			if(ctx.state.apptype && ctx.state.apptype == "app") {
-				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}?apptype=app&page=${page}&highlight=${pid}#${pid}`));
+				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}?apptype=app&page=${page}&highlight=${pid}#highlight`));
 			}else{
-				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}?&page=${page}&highlight=${pid}#${pid}`));
+				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}?&page=${page}&highlight=${pid}#highlight`));
 			}
 		}
 		if(last_page) {
