@@ -621,15 +621,10 @@ footer.footer ul li{
   font-size: 1rem;
 }
 .nkc-drawer-message{
-  position: absolute;
-  right: 1rem;
-  top: 0;
-  bottom: 0;
-  margin: auto;
+  display: inline-block;
   height: 2rem;
   min-width: 4rem;
   padding: 0 0.5rem;
-  text-align: center;
   vertical-align: baseline;
   line-height: 3rem;
   font-size: 1rem;
@@ -642,7 +637,7 @@ footer.footer ul li{
   font-size: 1rem;
   height: 1.2rem;
   display: inline-block;
-  vertical-align: baseline;
+  vertical-align: text-bottom;
   line-height: 1.2rem;
   padding: 0 0.32rem;
   background-color: red;
@@ -719,7 +714,9 @@ footer.footer ul li{
 .message-switch.disabled{
   display: none!important;
 }
-
+.message-switch-div{
+  display: inline;
+}
 .message-switch-div.disabled{
   display: none;
 }

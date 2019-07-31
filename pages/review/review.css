@@ -41,6 +41,9 @@ body{
 .review-post-content{
   margin-top: 1rem;
 }
+.review-post-content img{
+  max-width: 100%;
+}
 .review-input-div{
   padding: 1rem 0;
 }

@@ -201,6 +201,7 @@ paperRouter
     const paper = await db.ExamsPaperModel.findOnly({_id: Number(_id), uid: user.uid});
     if(paper.timeOut) ctx.throw(403, '考试已结束');
     if(paper.submitted) ctx.throw(403, '考试已结束');
+    const time = Date.now();
     const category = await db.ExamsCategoryModel.findOnly({_id: paper.cid});
     if(category.disabled) {
       ctx.throw(403, `该科目下的考试已被屏蔽`);
@@ -241,7 +242,7 @@ paperRouter
     q.score = score;
     q.passed = paper.passScore <= q.score;
     q.submitted = true;
-    q.tlm = Date.now();
+    q.tlm = time;
     if(q.passed) {
       const userObj = {};
       userObj[`volume${category.volume}`] = true;
