@@ -33,6 +33,7 @@ operationRouter
       await collection.remove();
       await db.SubscribeTypeModel.updateCount(cid);
     }
+    await db.SubscribeModel.saveUserCollectionThreadsId(user.uid);
     data.targetUser = await thread.extendUser();
     await next();
   })

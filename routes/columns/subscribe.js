@@ -26,6 +26,7 @@ router
       cid = sub.cid;
       await sub.remove();
     }
+    await db.SubscribeModel.saveUserSubColumnsId(user.uid);
     data.subCount = await db.SubscribeModel.count({type: "column", columnId: column._id});
     await column.update({subCount: data.subCount});
     await db.SubscribeTypeModel.updateCount(cid);

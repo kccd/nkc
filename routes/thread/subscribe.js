@@ -26,6 +26,7 @@ router
       q.cid = cid;
       q._id = await db.SettingModel.operateSystemID("subscribes", 1);
       await db.SubscribeModel(q).save();
+      await db.SubscribeModel.saveUserSubThreadsId(user.uid);
     }
     await db.SubscribeTypeModel.updateCount(cid);
     await next();
@@ -44,6 +45,7 @@ router
       cid = sub.cid;
       await sub.remove();
       await db.SubscribeTypeModel.updateCount(cid);
+      await db.SubscribeModel.saveUserSubThreadsId(user.uid);
     }
     await next();
   });

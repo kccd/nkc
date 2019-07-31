@@ -1110,8 +1110,7 @@ forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
 forumSchema.statics.getUserSubForums = async (uid, fid) => {
   const SubscribeModel = mongoose.model("subscribes");
   const ForumModel= mongoose.model('forums');
-  const sub = await SubscribeModel.find({uid, type: "forum"}).sort({toc: 1});
-  let fids = sub.map(s => s.fid);
+  let fids = await SubscribeModel.getUserSubForumsId(uid);
   fids = fids.filter(f => fid.includes(f));
   const subForums = await ForumModel.find({
     fid: {

@@ -2,7 +2,8 @@ const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
 module.exports = async (ctx, next) => {
-	const {data, db} = ctx;
+
+  const {data, db} = ctx;
 	// cookie
 	let userInfo = ctx.cookies.get('userInfo', {signed: true});
 	if(!userInfo) {
@@ -83,7 +84,7 @@ module.exports = async (ctx, next) => {
       }
     });
     user.newVoteUp = newVoteUp>0?newVoteUp:0;
-		// 判断用户是否被封禁
+    // 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
       const role = await db.RoleModel.extendRole('banned');
         if(!role) return;
@@ -114,6 +115,7 @@ module.exports = async (ctx, next) => {
         }
       }));
 		}
+
   }
   // 根据用户语言设置加载语言对象
   ctx.state.language = languages[languageName];
@@ -125,6 +127,8 @@ module.exports = async (ctx, next) => {
 	data.userRoles = userRoles;
 	data.userGrade = userGrade;
   data.user = user;
+
+
 
   // 专业树状结构
   ctx.state.forumsTree = await db.ForumModel.getForumsTree(
@@ -142,11 +146,12 @@ module.exports = async (ctx, next) => {
 
     data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     ctx.state.subUsersId = data.user.subUid;
+    // 关注的专业对象 用在手机网页侧栏专业导航
     ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, visibleFid);
     ctx.state.subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
     ctx.state.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
     ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
     ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
   }
-	await next();
+  await next();
 };

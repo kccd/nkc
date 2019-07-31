@@ -3,6 +3,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const redisClient = require('../settings/redisClient');
 
 const schema = new Schema({
   _id: Number,
@@ -69,17 +70,39 @@ const schema = new Schema({
   collection: "subscribes"
 });
 /*
-* 获取用户专注的所有用户的ID
+* 获取用户关注的所有用户的ID
 * @param {String} uid 用户ID
+* @return {[String]} 用户ID数组
 * @author pengxiguaa 2019-4-28
+* @author pengxiguaa 2019-7-31
 * */
 schema.statics.getUserSubUsersId = async (uid) => {
+  let subscribeUsersId = await redisClient.smembersAsync(`user:${uid}:subscribeUsersId`);
+  if(!subscribeUsersId.length) {
+    const SubscribeModel = mongoose.model("subscribes");
+    subscribeUsersId = await SubscribeModel.saveUserSubUsersId(uid);
+  }
+  return subscribeUsersId;
+};
+/*
+* 将用户关注的所有用户ID存入redis
+* @param {String} uid 用户ID
+* @return {[String]} 用户ID数组
+* @author pengxiguaa 2019-7-31
+* */
+schema.statics.saveUserSubUsersId = async (uid) => {
   const SubscribeModel = mongoose.model("subscribes");
   const sub = await SubscribeModel.find({
-    type: 'user',
+    type: "user",
     uid
-  }, {tUid: 1});
-  return sub.map(s => s.tUid);
+  }, {tUid: 1}).sort({toc: -1});
+  const usersId = sub.map(s => s.tUid);
+  if(usersId.length) {
+    setTimeout(async () => {
+      await redisClient.saddAsync(`user:${uid}:subscribeUsersId`, usersId);
+    });
+  }
+  return usersId;
 };
 /*
 * 获取用户关注的专业ID
@@ -88,11 +111,30 @@ schema.statics.getUserSubUsersId = async (uid) => {
 * @return {[String]} 专业ID数组
 * */
 schema.statics.getUserSubForumsId = async (uid) => {
+  let forumsId = await redisClient.smembersAsync(`user:${uid}:subscribeForumsId`);
+  if(!forumsId.length) {
+    const SubscribeModel = mongoose.model("subscribes");
+    forumsId = await SubscribeModel.saveUserSubForumsId(uid);
+  }
+  return forumsId;
+};
+/*
+* 将用户关注的专业ID存入redis
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-7-31
+* */
+schema.statics.saveUserSubForumsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "forum",
     uid
+  }, {fid: 1}).sort({toc: -1});
+  const forumsId = subs.map(s => s.fid);
+  console.log(forumsId);
+  setTimeout(async () => {
+    await redisClient.saddAsync(`user:${uid}:subscribeForumsId`, forumsId);
+    console.log(`更新完成`);
   });
-  return subs.map(s => s.fid);
+  return forumsId;
 };
 /*
 * 获取用户关注的专栏ID
@@ -101,11 +143,29 @@ schema.statics.getUserSubForumsId = async (uid) => {
 * @return {[Number]} 专栏ID数组
 * */
 schema.statics.getUserSubColumnsId = async (uid) => {
+  let columnsId = await redisClient.smembersAsync(`user:${uid}:subscribeColumnsId`);
+  if(!columnsId.length) {
+    const SubscribeModel = mongoose.model("subscribes");
+    columnsId = await SubscribeModel.saveUserSubColumnsId(uid);
+  }
+  return columnsId;
+};
+/*
+* 将用户关注的专栏ID存入redis
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-7-31
+* @return {[Number]} 专栏ID数组
+* */
+schema.statics.saveUserSubColumnsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "column",
     uid
+  }, {columnId: 1}).sort({toc: -1});
+  const columnsId = subs.map(s => s.columnId);
+  setTimeout(async () => {
+    await redisClient.saddAsync(`user:${uid}:subscribeColumnsId`, columnsId);
   });
-  return subs.map(s => s.columnId);
+  return columnsId;
 };
 /*
 * 获取用户关注的文章ID
@@ -114,12 +174,31 @@ schema.statics.getUserSubColumnsId = async (uid) => {
 * @return {[String]} 文章ID数组
 * */
 schema.statics.getUserSubThreadsId = async (uid) => {
+  let threadsId = await redisClient.smembersAsync(`user:${uid}:subscribeThreadsId`);
+  if(!threadsId.length) {
+    threadsId = await mongoose.model("subscribes").saveUserSubThreadsId(uid);
+  }
+  return threadsId;
+};
+/*
+* 将用户关注的文章ID存入redis
+* @param {String} uid 用户ID
+* @return {[String]} 文章ID数组
+* @author pengxiguaa 2019-7-31
+* */
+
+schema.statics.saveUserSubThreadsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "thread",
     uid
-  }, {tid: 1});
-  return subs.map(s => s.tid);
+  }, {tid: 1}).sort({toc: -1});
+  const threadsId = subs.map(s => s.tid);
+  setTimeout(async () => {
+    await redisClient.saddAsync(`user:${uid}:subscribeThreadsId`, threadsId);
+  });
+  return threadsId;
 };
+
 /*
 * 获取用户收藏的文章ID
 * @param {String} uid 用户ID
@@ -127,13 +206,23 @@ schema.statics.getUserSubThreadsId = async (uid) => {
 * @return {[String]} 文章ID数组
 * */
 schema.statics.getUserCollectionThreadsId = async (uid) => {
+  let threadsId = await redisClient.smembersAsync(`user:${uid}:collectionThreadsId`);
+  if(!threadsId.length) {
+    threadsId = await mongoose.model("subscribes").saveUserCollectionThreadsId(uid);
+  }
+  return threadsId;
+};
+schema.statics.saveUserCollectionThreadsId = async (uid) => {
   const subs = await mongoose.model("subscribes").find({
     type: "collection",
     uid
+  }, {tid: 1}).sort({toc: -1});
+  const threadsId = subs.map(s => s.tid);
+  setTimeout(async () => {
+    await redisClient.saddAsync(`user:${uid}:collectionThreadsId`, threadsId);
   });
-  return subs.map(s => s.tid);
+  return threadsId;
 };
-
 /**
  * -------
  * 关注专业
@@ -294,4 +383,5 @@ schema.statics.insertSubscribe = async (type, uid, tid) => {
   await sub.save();
   await SubscribeTypeModel.updateCount([subType._id]);
 };
+
 module.exports = mongoose.model('subscribes', schema);

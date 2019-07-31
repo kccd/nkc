@@ -42,6 +42,7 @@ subscribeRouter
       fid
     });
     await sub.save();
+    await db.SubscribeModel.saveUserSubForumsId(user.uid);
     await db.SubscribeTypeModel.updateCount(cid);
 		await db.KcbsRecordModel.insertSystemRecord('subscribeForum', user, ctx);
 		await next();
@@ -61,6 +62,7 @@ subscribeRouter
 		if(!sub) ctx.throw(400, "您未关注过该专业，请刷新");
 		const {cid} = sub;
     await sub.remove();
+    await db.SubscribeModel.saveUserSubForumsId(user.uid);
     await db.SubscribeTypeModel.updateCount(cid);
     await db.KcbsRecordModel.insertSystemRecord('unSubscribeForum', user, ctx);
 		await next();
