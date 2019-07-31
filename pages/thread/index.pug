@@ -395,13 +395,15 @@ block content
                           div.thread-content.ThreadPostBody#thread-content
                             include ./fund/fund.pug
                         +postEditTime(post)
-                        +postCredits(data.posts[0])
+                        -const creditPost = data.posts[0];
+                        include ./postCredits
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
                           div.ThreadPostBody#thread-content!= experimental_render(post)
                           +postEditTime(post)
-                          +postCredits(data.posts[0])
+                          -const creditPost = data.posts[0];
+                          include ./postCredits
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
                       if post.disabled && disablePost

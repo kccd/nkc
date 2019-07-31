@@ -2,6 +2,9 @@
 a[onclick]{
   cursor: pointer;
 }
+table{
+  word-break: break-all;
+}
 /* margin-top */
 .m-t-0{
   margin-top: 0;

@@ -12,6 +12,7 @@ const schema = new Schema({
     type: String,
     default: ''
   },
+  // 试卷创建的时间
   toc: {
     type: Date,
     default: Date.now,
@@ -112,6 +113,7 @@ schema.statics.extendPapers = async (papers, options) => {
   });
   return papers.map(paper => {
     const p = {
+      uid: paper.uid,
       user: userObj[paper.uid],
       category: categoriesObj[paper.cid],
       _id: paper._id,
