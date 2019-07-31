@@ -149,7 +149,7 @@ if(vueDom) {
       error: ""
     },
     mounted: function() {
-      var data = getDataById("data");
+      var data = NKC.methods.getDataById("data");
       if(data.homeSettings.list.topic) {
         this.list.push("topic");
       }

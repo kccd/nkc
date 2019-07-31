@@ -6,8 +6,10 @@ function searchUser() {
 		searchType = 'username';
 	} else if(searchType === "UID") {
 		searchType = 'uid';
-	} else {
+	} else if(searchType === "手机号") {
 	  searchType = "mobile";
+  } else {
+    searchType = "email";
   }
 	nkcAPI('/e/settings/user?searchType='+searchType+'&content='+content, 'GET', {})
 		.then(function(data) {
@@ -79,7 +81,8 @@ function createElements(users) {
     var th4 = newElement('th', {}, {}).text(NKC.methods.format("YYYY-MM-DD HH:mm:ss", user.toc));
     var th5 = newElement('th', {}, {}).text(user.regIP + ' : ' + user.regPort);
     var th6 = newElement('th', {}, {});
-    a = newElement('a', {href:'/e/settings/user/'+user.uid}, {}).text('编辑');
+    a = newElement('button', {onclick: "editUserInfo('"+user.uid+"')"}, {}).text('编辑');
+    a.addClass("btn btn-default btn-sm");
     th6.append(a);
 
     tr.append(th1, th2, th3, th31, th32, th33, th4, th5, th6);
@@ -141,3 +144,13 @@ $("#searchInput").keydown(function (e) {//当按下按键时
 		searchUser();
 	}
 });
+var ModifyAccountInfo;
+$(function() {
+  ModifyAccountInfo = new NKC.modules.ModifyAccountInfo();
+});
+function editUserInfo(uid) {
+  ModifyAccountInfo.open({
+    uid: uid
+  });
+}
+

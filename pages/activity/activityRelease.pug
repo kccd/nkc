@@ -1,8 +1,6 @@
 extends ../bootstrap_base
 block title
-  link(rel='stylesheet', href='/fund.css')
   title 科创活动
-  link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
 
   -const mainContainer1400 = true
   link(href='../bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
@@ -172,22 +170,12 @@ block content
             .panel-body
               .form-horizontal
                 .form-group
-                  //- label.col-sm-2.control-label 活动详情：
-                  //- .col-sm-8
-                  //- div#ReplyContent
                   include ../ueditor/ueditor.pug   
                   .checkbox-inline(style="display:none")
                     label
                       input#ParseURL(type='checkbox' checked)
                       | 处理URL
                   .form-group
-                  //- .nkcpanel(id='file-uploading' target='/r')
-                  //-   //uploader section
-                  //-   include ../interface_attachment_uploader_uploader.pug
-
-                  //- .panel.panel-default
-                  //-   .panel-heading 我的附件（点击插入帖子）
-                  //-   .panel-body(id='list-container')
                   include ../media/media_index.pug       
 
                       
@@ -198,7 +186,6 @@ block content
             input#inputFile(type='file' accept="image/*").hidden
 
 block scripts
-  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src="/jquery-ui-1.10.4.custom.js")
   script(src='../interface_common.js')
   script(src="../bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
@@ -209,13 +196,7 @@ block scripts
   script(src='../commonmark/dist/commonmark.js')
   script(src='../xbbcode-parser/xbbcode.js')
   script(src='../xss/dist/xss.js')  
-  script(src='../external_pkgs/react/react.min.js')
-  script(src='../external_pkgs/react/JSXTransformer.js')
   script(src=`../nkc_render.js?v=${global.NKC.startTime}`)
-  script(src=`../interface_attachment_uploader.js?v=${global.NKC.startTime}`)
-  script(type='text/jsx;harmony=true' src=`../interface_attachment_list_display_test.js?v=${global.NKC.startTime}`)
-  script(type="text/javascript" src=`../wangEditor.js?v=${global.NKC.startTime}`)
-  script(type="text/javascript" src=`./activityNewEditor.js?v=${global.NKC.startTime}`)
   script(src=`./activityRelease.js?v=${global.NKC.startTime}` charset="UTF-8")
   script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
   include ../publicModules/crop/crop

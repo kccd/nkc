@@ -11,4 +11,4 @@ global.throwErr = (code, message) => {
   const err = new Error(message);
   if(code) err.status = code;
   throw err;
-}
+};

@@ -1,6 +1,4 @@
-.display-n{
-  display: none;
-}
+
 a[onclick]{
   cursor: pointer;
 }
@@ -25,14 +23,6 @@ a[onclick]{
 }
 .m-t-1{
   margin-top: 1rem;
-}
-@media (min-width: 768px) {
-  .m-t-md-2{
-    margin-top: 2rem;
-  }
-  .m-b-md-2{
-    margin-bottom: 2rem;
-  }
 }
 .m-t-2{
   margin-top: 2rem;
@@ -139,6 +129,9 @@ a[onclick]{
   padding-top: 6rem;
 }
 /* padding-bottom */
+.p-b-05{
+  padding-bottom: 0.5rem!important;
+}
 .p-b-1{
   padding-bottom: 1rem;
 }
@@ -285,6 +278,9 @@ a[onclick]{
 }
 .display-i {
   display: inline;
+}
+.display-n{
+  display: none;
 }
 .max-width-100{
   max-width: 100%;
@@ -436,84 +432,6 @@ a[onclick]{
   text-decoration: none;
   color: #555555;
 }
-.web-info-side ul{
-  margin: 0;
-  padding: 0;
-
-}
-.web-info-side li{
-  float: left;
-}
-.web-info-side li a{
-  text-decoration: none;
-  margin: 0 0.5rem 0.5rem 0;
-  float: left;
-  color: #555555;
-}
-.web-info-side li a:hover{
-  text-decoration: underline;
-}
-.web-info-side{
-  font-size: 1.2rem;
-  margin-top: 1rem;
-  padding: 1rem 0;
-}
-.web-info-side ul{
-  list-style: none;
-  display: block;
-  overflow: hidden;
-  margin: 0.5rem 0;
-}
-.web-info-side .info-link{
-
-}
-.web-info-side .friend-link{
-
-}
-.web-info-header{
-  height: 1.8rem;
-  position: relative;
-  color: #555555;
-}
-.web-info-header .line{
-  height: 1px;
-  position: absolute;
-  background-color: #ddd;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 10rem;
-  margin: auto;
-}
-.web-info-header .content{
-  display: inline-block;
-  background-color: #fff;
-  position: absolute;
-  z-index: 10;
-  left: 10px;
-  height: 100%;
-  line-height: 1.8rem;
-  padding: 0 0.5rem;
-}
-.web-info-side .text{
-  color: #888888;
-  font-size: 1.1rem;
-  padding-bottom: 0.5rem;
-}
-.web-info-side .app>div{
-  max-width: 114px;
-}
-.web-info-side .app canvas{
-  width: 100%;
-}
-.web-info-side .app a{
-  text-align: center;
-  display: block;
-  text-decoration: none;
-}
-.web-info-side .info-link .fa{
-  font-size: 1.5rem;
-}
 .notice{
   border-radius: 5px;
 }
@@ -551,6 +469,7 @@ footer.footer ul li{
 }
 .footer-link a{
   color: #9baec8;
+  font-size: 1.2rem;
   padding-bottom: 0.3rem;
   display: inline-block;
   cursor: pointer;
@@ -634,6 +553,7 @@ footer.footer ul li{
   border-radius: 50%;
 }
 .nkc-drawer-count{
+  font-size: 1.2rem;
   height: 4.4rem;
   padding: 0.2rem 0;
   background-color: #f5f5f5;
@@ -1375,6 +1295,7 @@ footer.footer ul li{
 .thread-panel-forum a{
   color: #7e8da0;
   font-weight: 700;
+  margin-right: 0.5rem;
 }
 .thread-panel-forum a:hover, .thread-panel-forum a:active, .thread-panel-forum a:visited,.thread-panel-forum a:link{
   text-decoration: none;
@@ -1828,4 +1749,10 @@ span.thread-title-page{
 .small-forum-info{
   height: 3.8rem;
   padding-top: 0.8rem;
+}
+
+/*编辑器透明*/
+.edui-default .edui-editor-toolbarboxouter{
+  background-image:none!important;
+  background-color: rgba(255, 255, 255, 0.5)!important;
 }

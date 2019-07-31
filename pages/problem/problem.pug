@@ -71,8 +71,7 @@ block content
 
 
 block scripts
-  script(src=`/xss/dist/xss.js?v=${startTime}`)
+  include ../publicModules/highlight/highlight
+  include ../publicModules/mdToHtml
   script(src=`/icheck/icheck.js?v=${startTime}`)
-  script(src=`/interface_common.js?v=${startTime}`)
-  script(src=`/markdown-it/dist/markdown-it.js?v=${startTime}`)
   script(src=`/problem/problem.js?v=${startTime}`)

@@ -1,7 +1,7 @@
 
 var ue;
 var appButton;
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 var selectedMembers = [];
 
 for(var i = 0; i < data.form.members.length; i++) {
@@ -74,10 +74,10 @@ var app = new Vue({
         imageScaleEnabled: false, // 启用图片拉伸缩放
       });
       ue.ready(function() {
-        ue.setContent(app.form.project.c);
+        ue.setContent(app.form.project.c || "");
       });
 
-      paperProto.init(data.form.project);
+      paperProto.init(data.form.project || "");
 
     }
     vueSelectForum.init({

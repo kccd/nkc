@@ -14,7 +14,7 @@ const helmet = require('koa-helmet');
 const staticServe = path => {
   return require('koa-static')(path, {
     setHeaders: function(response, path, stats) {
-      response.setHeader('Cache-Control', `public, ${process.env.NODE_ENV==='production'?'max-age=604800': 'no-cache'}`)
+      response.setHeader('Cache-Control', `public, ${global.NKC.NODE_ENV==='production'?'max-age=604800': 'no-cache'}`)
     }
   });
 };

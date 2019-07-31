@@ -92,6 +92,7 @@ router
       // 检查库存
       for(let cart of post[bill].carts) {
         let cart1 = await db.ShopCartModel.find({_id:cart._id});
+        if(!cart1 || cart1.length === 0) ctx.throw(400, `您已下单，请前往我的订单进行支付`);
         let newCartArr = await db.ShopCartModel.extendCartsInfo(cart1);
         let newCart = newCartArr[0];
         if(Number(newCart.count) > Number(newCart.productParam.stocksSurplus)) ctx.throw(400, `${newCart.product.name}+${newCart.productParam.name}库存不足`);
@@ -158,7 +159,7 @@ router
         await db.ShopCartModel.remove({uid: user.uid, productParamId: newCart.productParamId});
         newCarts.push(cartObj);
         productPrice += cartObj.singlePrice * cartObj.count;
-        let newMaxFreightPrice = newCart.product.freightPrice.firstFreightPrice + (newCart.product.freightPrice.addFreightPrice * newCart.count-1)
+        let newMaxFreightPrice = newCart.product.freightPrice.firstFreightPrice + (newCart.product.freightPrice.addFreightPrice * (newCart.count-1))
         if(newMaxFreightPrice > maxFreightPrice) {
           maxFreightPrice = newMaxFreightPrice;
         }

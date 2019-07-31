@@ -12,7 +12,6 @@ router
   .get('/:uid', async (ctx, next) => {
     const {query, params, fs} = ctx;
     const {uid} = params;
-    let stat;
     const {t} = query;
     if(t === "sm") {
       ctx.filePath = `${avatarSmallPath}/${uid}.jpg`;
@@ -28,13 +27,9 @@ router
     }
 
     try {
-      stat = await fs.stat(ctx.filePath);
-      ctx.response.lastModified = stat.mtime.toUTCString();
-      ctx.set('Cache-Control', 'public, no-cache');
+      await fs.stat(ctx.filePath);
     } catch(e) {
       ctx.filePath = defaultAvatarPath;
-      ctx.response.lastModified = new Date(1999, 9, 9);
-      ctx.set('Cache-Control', 'public, no-cache');
     }
     ctx.type = 'jpg';
     await next()

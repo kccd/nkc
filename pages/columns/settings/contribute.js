@@ -1,4 +1,4 @@
-var data = getDataById("data");
+var data = NKC.methods.getDataById("data");
 for(var i = 0; i < data.contributes.length; i++) {
   var contribute = data.contributes[i];
   contribute.agree = "";

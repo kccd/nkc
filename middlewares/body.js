@@ -3,12 +3,22 @@ const {encodeRFC5987ValueChars} = apiFn;
 const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
+const freshOperations = [
+  "getUserAvatar", "getUserBanner", "column_single_avatar_get", "column_single_banner_get"
+];
 module.exports = async (ctx, next) => {
   const {filePath, fileName, resource, fs} = ctx;
   if(filePath && ctx.method === 'GET') {
-	  if(ctx.lastModified && ctx.fresh) {
+    const stats = fss.statSync(filePath);
+    const lastModified = (new Date(stats.mtime)).getTime();
+    ctx.set("ETag", lastModified);
+	  if(ctx.fresh) {
       ctx.status = 304;
       return
+    }
+	  // 资源缓存24小时，排除掉用户头像、背景、专栏头像和专栏背景
+	  if(!freshOperations.includes(ctx.data.operationId)) {
+      ctx.set('Cache-Control', 'public, max-age=86400');
     }
     const basename = path.basename(ctx.filePath);
     let ext = path.extname(ctx.filePath);
@@ -22,7 +32,6 @@ module.exports = async (ctx, next) => {
     } else {
       name = basename;
     }
-    let stats = fss.statSync(filePath);
     // 设置文件类型
     ctx.type = ext;
     if(ext === "mp4"){

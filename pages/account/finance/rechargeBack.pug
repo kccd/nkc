@@ -39,7 +39,7 @@ block scripts
       methods: {
         verify: function() {
           var this_ = this;
-          kcAPI('/account/finance/recharge?type=verify&rid='+this.kcbsRecordId, 'GET')
+          nkcAPI('/account/finance/recharge?type=verify&rid='+this.kcbsRecordId, 'GET')
             .then(function(data) {
               if(data.verify) {
                 this_.kcb = data.user.kcb;

@@ -33,7 +33,17 @@ block eContent
                   <input type="radio" value="management" v-model='role.type'> 管理类
                 </label>    
               else
-                h5 系统类  
+                h5 系统类
+          .form-group
+            label.col-sm-2.control-label 在名片显示
+            .col-sm-10
+              .radio
+                label.inline-block.m-r-1
+                  input(type="radio" v-model="role.hidden" :value="true")
+                  | 否
+                label.inline-block
+                  input(type="radio" v-model="role.hidden" :value="false")
+                  | 是
           .form-group
             label.col-sm-2.control-label 图标 
             .col-sm-10

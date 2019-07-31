@@ -11,7 +11,11 @@ homeRouter
 			forum.basicThreads.length === 0 &&
 			!forum.declare
 		) {
-			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest`));
+			if(ctx.query.token) {
+				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest?token=${ctx.query.token}`));
+			}else{
+				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest`));
+			}
 		}
 		await next();
 	});

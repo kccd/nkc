@@ -11039,28 +11039,28 @@ UE.plugins['autotypeset'] = function(){
  * ```
  */
 
-UE.plugin.register('autosubmit',function(){
-    return {
-        shortcutkey:{
-            "autosubmit":"ctrl+13" //手动提交
-        },
-        commands:{
-            'autosubmit':{
-                execCommand:function () {
-                    var me=this,
-                        form = domUtils.findParentByTagName(me.iframe,"form", false);
-                    if (form){
-                        if(me.fireEvent("beforesubmit")===false){
-                            return;
-                        }
-                        me.sync();
-                        form.submit();
-                    }
-                }
-            }
-        }
-    }
-});
+// UE.plugin.register('autosubmit',function(){
+//     return {
+//         shortcutkey:{
+//             "autosubmit":"ctrl+13" //手动提交
+//         },
+//         commands:{
+//             'autosubmit':{
+//                 execCommand:function () {
+//                     var me=this,
+//                         form = domUtils.findParentByTagName(me.iframe,"form", false);
+//                     if (form){
+//                         if(me.fireEvent("beforesubmit")===false){
+//                             return;
+//                         }
+//                         me.sync();
+//                         form.submit();
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// });
 
 // plugins/background.js
 /**
@@ -11068,108 +11068,108 @@ UE.plugin.register('autosubmit',function(){
  * @file
  * @since 1.2.6.1
  */
-UE.plugin.register('background', function () {
-    var me = this,
-        cssRuleId = 'editor_background',
-        isSetColored,
-        reg = new RegExp('body[\\s]*\\{(.+)\\}', 'i');
+// UE.plugin.register('background', function () {
+//     var me = this,
+//         cssRuleId = 'editor_background',
+//         isSetColored,
+//         reg = new RegExp('body[\\s]*\\{(.+)\\}', 'i');
 
-    function stringToObj(str) {
-        var obj = {}, styles = str.split(';');
-        utils.each(styles, function (v) {
-            var index = v.indexOf(':'),
-                key = utils.trim(v.substr(0, index)).toLowerCase();
-            key && (obj[key] = utils.trim(v.substr(index + 1) || ''));
-        });
-        return obj;
-    }
+//     function stringToObj(str) {
+//         var obj = {}, styles = str.split(';');
+//         utils.each(styles, function (v) {
+//             var index = v.indexOf(':'),
+//                 key = utils.trim(v.substr(0, index)).toLowerCase();
+//             key && (obj[key] = utils.trim(v.substr(index + 1) || ''));
+//         });
+//         return obj;
+//     }
 
-    function setBackground(obj) {
-        if (obj) {
-            var styles = [];
-            for (var name in obj) {
-                if (obj.hasOwnProperty(name)) {
-                    styles.push(name + ":" + obj[name] + '; ');
-                }
-            }
-            utils.cssRule(cssRuleId, styles.length ? ('body{' + styles.join("") + '}') : '', me.document);
-        } else {
-            utils.cssRule(cssRuleId, '', me.document)
-        }
-    }
-    //重写editor.hasContent方法
+//     function setBackground(obj) {
+//         if (obj) {
+//             var styles = [];
+//             for (var name in obj) {
+//                 if (obj.hasOwnProperty(name)) {
+//                     styles.push(name + ":" + obj[name] + '; ');
+//                 }
+//             }
+//             utils.cssRule(cssRuleId, styles.length ? ('body{' + styles.join("") + '}') : '', me.document);
+//         } else {
+//             utils.cssRule(cssRuleId, '', me.document)
+//         }
+//     }
+//     //重写editor.hasContent方法
 
-    var orgFn = me.hasContents;
-    me.hasContents = function(){
-        if(me.queryCommandValue('background')){
-            return true
-        }
-        return orgFn.apply(me,arguments);
-    };
-    return {
-        bindEvents: {
-            'getAllHtml': function (type, headHtml) {
-                var body = this.body,
-                    su = domUtils.getComputedStyle(body, "background-image"),
-                    url = "";
-                if (su.indexOf(me.options.imagePath) > 0) {
-                    url = su.substring(su.indexOf(me.options.imagePath), su.length - 1).replace(/"|\(|\)/ig, "");
-                } else {
-                    url = su != "none" ? su.replace(/url\("?|"?\)/ig, "") : "";
-                }
-                var html = '<style type="text/css">body{';
-                var bgObj = {
-                    "background-color": domUtils.getComputedStyle(body, "background-color") || "#ffffff",
-                    'background-image': url ? 'url(' + url + ')' : '',
-                    'background-repeat': domUtils.getComputedStyle(body, "background-repeat") || "",
-                    'background-position': browser.ie ? (domUtils.getComputedStyle(body, "background-position-x") + " " + domUtils.getComputedStyle(body, "background-position-y")) : domUtils.getComputedStyle(body, "background-position"),
-                    'height': domUtils.getComputedStyle(body, "height")
-                };
-                for (var name in bgObj) {
-                    if (bgObj.hasOwnProperty(name)) {
-                        html += name + ":" + bgObj[name] + "; ";
-                    }
-                }
-                html += '}</style> ';
-                headHtml.push(html);
-            },
-            'aftersetcontent': function () {
-                if(isSetColored == false) setBackground();
-            }
-        },
-        inputRule: function (root) {
-            isSetColored = false;
-            utils.each(root.getNodesByTagName('p'), function (p) {
-                var styles = p.getAttr('data-background');
-                if (styles) {
-                    isSetColored = true;
-                    setBackground(stringToObj(styles));
-                    p.parentNode.removeChild(p);
-                }
-            })
-        },
-        outputRule: function (root) {
-            var me = this,
-                styles = (utils.cssRule(cssRuleId, me.document) || '').replace(/[\n\r]+/g, '').match(reg);
-            if (styles) {
-                root.appendChild(UE.uNode.createElement('<p style="display:none;" data-background="' + utils.trim(styles[1].replace(/"/g, '').replace(/[\s]+/g, ' ')) + '"><br/></p>'));
-            }
-        },
-        commands: {
-            'background': {
-                execCommand: function (cmd, obj) {
-                    setBackground(obj);
-                },
-                queryCommandValue: function () {
-                    var me = this,
-                        styles = (utils.cssRule(cssRuleId, me.document) || '').replace(/[\n\r]+/g, '').match(reg);
-                    return styles ? stringToObj(styles[1]) : null;
-                },
-                notNeedUndo: true
-            }
-        }
-    }
-});
+//     var orgFn = me.hasContents;
+//     me.hasContents = function(){
+//         if(me.queryCommandValue('background')){
+//             return true
+//         }
+//         return orgFn.apply(me,arguments);
+//     };
+//     return {
+//         bindEvents: {
+//             'getAllHtml': function (type, headHtml) {
+//                 var body = this.body,
+//                     su = domUtils.getComputedStyle(body, "background-image"),
+//                     url = "";
+//                 if (su.indexOf(me.options.imagePath) > 0) {
+//                     url = su.substring(su.indexOf(me.options.imagePath), su.length - 1).replace(/"|\(|\)/ig, "");
+//                 } else {
+//                     url = su != "none" ? su.replace(/url\("?|"?\)/ig, "") : "";
+//                 }
+//                 var html = '<style type="text/css">body{';
+//                 var bgObj = {
+//                     "background-color": domUtils.getComputedStyle(body, "background-color") || "#ffffff",
+//                     'background-image': url ? 'url(' + url + ')' : '',
+//                     'background-repeat': domUtils.getComputedStyle(body, "background-repeat") || "",
+//                     'background-position': browser.ie ? (domUtils.getComputedStyle(body, "background-position-x") + " " + domUtils.getComputedStyle(body, "background-position-y")) : domUtils.getComputedStyle(body, "background-position"),
+//                     'height': domUtils.getComputedStyle(body, "height")
+//                 };
+//                 for (var name in bgObj) {
+//                     if (bgObj.hasOwnProperty(name)) {
+//                         html += name + ":" + bgObj[name] + "; ";
+//                     }
+//                 }
+//                 html += '}</style> ';
+//                 headHtml.push(html);
+//             },
+//             'aftersetcontent': function () {
+//                 if(isSetColored == false) setBackground();
+//             }
+//         },
+//         inputRule: function (root) {
+//             isSetColored = false;
+//             utils.each(root.getNodesByTagName('p'), function (p) {
+//                 var styles = p.getAttr('data-background');
+//                 if (styles) {
+//                     isSetColored = true;
+//                     setBackground(stringToObj(styles));
+//                     p.parentNode.removeChild(p);
+//                 }
+//             })
+//         },
+//         outputRule: function (root) {
+//             var me = this,
+//                 styles = (utils.cssRule(cssRuleId, me.document) || '').replace(/[\n\r]+/g, '').match(reg);
+//             if (styles) {
+//                 root.appendChild(UE.uNode.createElement('<p style="display:none;" data-background="' + utils.trim(styles[1].replace(/"/g, '').replace(/[\s]+/g, ' ')) + '"><br/></p>'));
+//             }
+//         },
+//         commands: {
+//             'background': {
+//                 execCommand: function (cmd, obj) {
+//                     setBackground(obj);
+//                 },
+//                 queryCommandValue: function () {
+//                     var me = this,
+//                         styles = (utils.cssRule(cssRuleId, me.document) || '').replace(/[\n\r]+/g, '').match(reg);
+//                     return styles ? stringToObj(styles[1]) : null;
+//                 },
+//                 notNeedUndo: true
+//             }
+//         }
+//     }
+// });
 
 // plugins/image.js
 /**
@@ -13998,89 +13998,89 @@ UE.commands['cleardoc'] = {
  * @file
  * @since 1.2.6.1
  */
-UE.plugin.register('anchor', function (){
+// UE.plugin.register('anchor', function (){
 
-    return {
-        bindEvents:{
-            'ready':function(){
-                utils.cssRule('anchor',
-                    '.anchorclass{background: url(\''
-                        + this.options.themePath
-                        + this.options.theme +'/images/anchor.gif\') no-repeat scroll left center transparent;cursor: auto;display: inline-block;height: 16px;width: 15px;}',
-                    this.document);
-                utils.cssRule('wordLink',
-                    'a{color: #428bca}',
-                    this.document);
-            }
-        },
-       outputRule: function(root){
-           utils.each(root.getNodesByTagName('img'),function(a){
-               var val;
-               if(val = a.getAttr('anchorname')){
-                   a.tagName = 'a';
-                   a.setAttr({
-                       anchorname : '',
-                       name : val,
-                       'class' : ''
-                   })
-               }
-           })
-       },
-       inputRule:function(root){
-           utils.each(root.getNodesByTagName('a'),function(a){
-               var val;
-               if((val = a.getAttr('name')) && !a.getAttr('href')){
-                   a.tagName = 'img';
-                   a.setAttr({
-                       anchorname :a.getAttr('name'),
-                       'class' : 'anchorclass'
-                   });
-                   a.setAttr('name')
+//     return {
+//         bindEvents:{
+//             'ready':function(){
+//                 utils.cssRule('anchor',
+//                     '.anchorclass{background: url(\''
+//                         + this.options.themePath
+//                         + this.options.theme +'/images/anchor.gif\') no-repeat scroll left center transparent;cursor: auto;display: inline-block;height: 16px;width: 15px;}',
+//                     this.document);
+//                 utils.cssRule('wordLink',
+//                     'a{color: #428bca}',
+//                     this.document);
+//             }
+//         },
+//        outputRule: function(root){
+//            utils.each(root.getNodesByTagName('img'),function(a){
+//                var val;
+//                if(val = a.getAttr('anchorname')){
+//                    a.tagName = 'a';
+//                    a.setAttr({
+//                        anchorname : '',
+//                        name : val,
+//                        'class' : ''
+//                    })
+//                }
+//            })
+//        },
+//        inputRule:function(root){
+//            utils.each(root.getNodesByTagName('a'),function(a){
+//                var val;
+//                if((val = a.getAttr('name')) && !a.getAttr('href')){
+//                    a.tagName = 'img';
+//                    a.setAttr({
+//                        anchorname :a.getAttr('name'),
+//                        'class' : 'anchorclass'
+//                    });
+//                    a.setAttr('name')
 
-               }
-           })
+//                }
+//            })
 
-       },
-       commands:{
-           /**
-            * 插入锚点
-            * @command anchor
-            * @method execCommand
-            * @param { String } cmd 命令字符串
-            * @param { String } name 锚点名称字符串
-            * @example
-            * ```javascript
-            * //editor 是编辑器实例
-            * editor.execCommand('anchor', 'anchor1');
-            * ```
-            */
-           'anchor':{
-               execCommand:function (cmd, name) {
-                   var range = this.selection.getRange(),img = range.getClosedNode();
-                   if (img && img.getAttribute('anchorname')) {
-                       if (name) {
-                           img.setAttribute('anchorname', name);
-                       } else {
-                           range.setStartBefore(img).setCursor();
-                           domUtils.remove(img);
-                       }
-                   } else {
-                       if (name) {
-                           //只在选区的开始插入
-                           var anchor = this.document.createElement('img');
-                           range.collapse(true);
-                           domUtils.setAttributes(anchor,{
-                               'anchorname':name,
-                               'class':'anchorclass'
-                           });
-                           range.insertNode(anchor).setStartAfter(anchor).setCursor(false,true);
-                       }
-                   }
-               }
-           }
-       }
-    }
-});
+//        },
+//        commands:{
+//            /**
+//             * 插入锚点
+//             * @command anchor
+//             * @method execCommand
+//             * @param { String } cmd 命令字符串
+//             * @param { String } name 锚点名称字符串
+//             * @example
+//             * ```javascript
+//             * //editor 是编辑器实例
+//             * editor.execCommand('anchor', 'anchor1');
+//             * ```
+//             */
+//            'anchor':{
+//                execCommand:function (cmd, name) {
+//                    var range = this.selection.getRange(),img = range.getClosedNode();
+//                    if (img && img.getAttribute('anchorname')) {
+//                        if (name) {
+//                            img.setAttribute('anchorname', name);
+//                        } else {
+//                            range.setStartBefore(img).setCursor();
+//                            domUtils.remove(img);
+//                        }
+//                    } else {
+//                        if (name) {
+//                            //只在选区的开始插入
+//                            var anchor = this.document.createElement('img');
+//                            range.collapse(true);
+//                            domUtils.setAttributes(anchor,{
+//                                'anchorname':name,
+//                                'class':'anchorclass'
+//                            });
+//                            range.insertNode(anchor).setStartAfter(anchor).setCursor(false,true);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//     }
+// });
 
 
 // plugins/wordcount.js
@@ -14288,53 +14288,53 @@ UE.plugins['pagebreak'] = function () {
 ///commandsTitle  本地图片引导上传
 ///commandsDialog  dialogs\wordimage
 
-UE.plugin.register('wordimage',function(){
-    var me = this,
-        images = [];
-    return {
-        commands : {
-            'wordimage':{
-                execCommand:function () {
-                    var images = domUtils.getElementsByTagName(me.body, "img");
-                    var urlList = [];
-                    for (var i = 0, ci; ci = images[i++];) {
-                        var url = ci.getAttribute("word_img");
-                        url && urlList.push(url);
-                    }
-                    return urlList;
-                },
-                queryCommandState:function () {
-                    images = domUtils.getElementsByTagName(me.body, "img");
-                    for (var i = 0, ci; ci = images[i++];) {
-                        if (ci.getAttribute("word_img")) {
-                            return 1;
-                        }
-                    }
-                    return -1;
-                },
-                notNeedUndo:true
-            }
-        },
-        inputRule : function (root) {
-            utils.each(root.getNodesByTagName('img'), function (img) {
-                var attrs = img.attrs,
-                    flag = parseInt(attrs.width) < 128 || parseInt(attrs.height) < 43,
-                    opt = me.options,
-                    src = opt.UEDITOR_HOME_URL + 'themes/default/images/spacer.gif';
-                if (attrs['src'] && /^(?:(file:\/+))/.test(attrs['src'])) {
-                    img.setAttr({
-                        width:attrs.width,
-                        height:attrs.height,
-                        alt:attrs.alt,
-                        word_img: attrs.src,
-                        src:src,
-                        'style':'background:url(' + ( flag ? opt.themePath + opt.theme + '/images/word.gif' : opt.langPath + opt.lang + '/images/localimage.png') + ') no-repeat center center;border:1px solid #ddd'
-                    })
-                }
-            })
-        }
-    }
-});
+// UE.plugin.register('wordimage',function(){
+//     var me = this,
+//         images = [];
+//     return {
+//         commands : {
+//             'wordimage':{
+//                 execCommand:function () {
+//                     var images = domUtils.getElementsByTagName(me.body, "img");
+//                     var urlList = [];
+//                     for (var i = 0, ci; ci = images[i++];) {
+//                         var url = ci.getAttribute("word_img");
+//                         url && urlList.push(url);
+//                     }
+//                     return urlList;
+//                 },
+//                 queryCommandState:function () {
+//                     images = domUtils.getElementsByTagName(me.body, "img");
+//                     for (var i = 0, ci; ci = images[i++];) {
+//                         if (ci.getAttribute("word_img")) {
+//                             return 1;
+//                         }
+//                     }
+//                     return -1;
+//                 },
+//                 notNeedUndo:true
+//             }
+//         },
+//         inputRule : function (root) {
+//             utils.each(root.getNodesByTagName('img'), function (img) {
+//                 var attrs = img.attrs,
+//                     flag = parseInt(attrs.width) < 128 || parseInt(attrs.height) < 43,
+//                     opt = me.options,
+//                     src = opt.UEDITOR_HOME_URL + 'themes/default/images/spacer.gif';
+//                 if (attrs['src'] && /^(?:(file:\/+))/.test(attrs['src'])) {
+//                     img.setAttr({
+//                         width:attrs.width,
+//                         height:attrs.height,
+//                         alt:attrs.alt,
+//                         word_img: attrs.src,
+//                         src:src,
+//                         'style':'background:url(' + ( flag ? opt.themePath + opt.theme + '/images/word.gif' : opt.langPath + opt.lang + '/images/localimage.png') + ') no-repeat center center;border:1px solid #ddd'
+//                     })
+//                 }
+//             })
+//         }
+//     }
+// });
 
 // plugins/dragdrop.js
 UE.plugins['dragdrop'] = function (){
@@ -23098,189 +23098,189 @@ UE.plugins['formatmatch'] = function(){
  * @author zhanyi
  */
 
-UE.plugin.register('searchreplace',function(){
-    var me = this;
+// UE.plugin.register('searchreplace',function(){
+//     var me = this;
 
-    var _blockElm = {'table':1,'tbody':1,'tr':1,'ol':1,'ul':1};
+//     var _blockElm = {'table':1,'tbody':1,'tr':1,'ol':1,'ul':1};
 
-    function findTextInString(textContent,opt,currentIndex){
-        var str = opt.searchStr;
-        if(opt.dir == -1){
-            textContent = textContent.split('').reverse().join('');
-            str = str.split('').reverse().join('');
-            currentIndex = textContent.length - currentIndex;
+//     function findTextInString(textContent,opt,currentIndex){
+//         var str = opt.searchStr;
+//         if(opt.dir == -1){
+//             textContent = textContent.split('').reverse().join('');
+//             str = str.split('').reverse().join('');
+//             currentIndex = textContent.length - currentIndex;
 
-        }
-        var reg = new RegExp(str,'g' + (opt.casesensitive ? '' : 'i')),match;
+//         }
+//         var reg = new RegExp(str,'g' + (opt.casesensitive ? '' : 'i')),match;
 
-        while(match = reg.exec(textContent)){
-            if(match.index >= currentIndex){
-                return opt.dir == -1 ? textContent.length - match.index - opt.searchStr.length : match.index;
-            }
-        }
-        return  -1
-    }
-    function findTextBlockElm(node,currentIndex,opt){
-        var textContent,index,methodName = opt.all || opt.dir == 1 ? 'getNextDomNode' : 'getPreDomNode';
-        if(domUtils.isBody(node)){
-            node = node.firstChild;
-        }
-        var first = 1;
-        while(node){
-            textContent = node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent'];
-            index = findTextInString(textContent,opt,currentIndex );
-            first = 0;
-            if(index!=-1){
-                return {
-                    'node':node,
-                    'index':index
-                }
-            }
-            node = domUtils[methodName](node);
-            while(node && _blockElm[node.nodeName.toLowerCase()]){
-                node = domUtils[methodName](node,true);
-            }
-            if(node){
-                currentIndex = opt.dir == -1 ? (node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent']).length : 0;
-            }
+//         while(match = reg.exec(textContent)){
+//             if(match.index >= currentIndex){
+//                 return opt.dir == -1 ? textContent.length - match.index - opt.searchStr.length : match.index;
+//             }
+//         }
+//         return  -1
+//     }
+//     function findTextBlockElm(node,currentIndex,opt){
+//         var textContent,index,methodName = opt.all || opt.dir == 1 ? 'getNextDomNode' : 'getPreDomNode';
+//         if(domUtils.isBody(node)){
+//             node = node.firstChild;
+//         }
+//         var first = 1;
+//         while(node){
+//             textContent = node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent'];
+//             index = findTextInString(textContent,opt,currentIndex );
+//             first = 0;
+//             if(index!=-1){
+//                 return {
+//                     'node':node,
+//                     'index':index
+//                 }
+//             }
+//             node = domUtils[methodName](node);
+//             while(node && _blockElm[node.nodeName.toLowerCase()]){
+//                 node = domUtils[methodName](node,true);
+//             }
+//             if(node){
+//                 currentIndex = opt.dir == -1 ? (node.nodeType == 3 ? node.nodeValue : node[browser.ie ? 'innerText' : 'textContent']).length : 0;
+//             }
 
-        }
-    }
-    function findNTextInBlockElm(node,index,str){
-        var currentIndex = 0,
-            currentNode = node.firstChild,
-            currentNodeLength = 0,
-            result;
-        while(currentNode){
-            if(currentNode.nodeType == 3){
-                currentNodeLength = currentNode.nodeValue.replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length;
-                currentIndex += currentNodeLength;
-                if(currentIndex >= index){
-                    return {
-                        'node':currentNode,
-                        'index': currentNodeLength - (currentIndex - index)
-                    }
-                }
-            }else if(!dtd.$empty[currentNode.tagName]){
-                currentNodeLength = currentNode[browser.ie ? 'innerText' : 'textContent'].replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length
-                currentIndex += currentNodeLength;
-                if(currentIndex >= index){
-                    result = findNTextInBlockElm(currentNode,currentNodeLength - (currentIndex - index),str);
-                    if(result){
-                        return result;
-                    }
-                }
-            }
-            currentNode = domUtils.getNextDomNode(currentNode);
+//         }
+//     }
+//     function findNTextInBlockElm(node,index,str){
+//         var currentIndex = 0,
+//             currentNode = node.firstChild,
+//             currentNodeLength = 0,
+//             result;
+//         while(currentNode){
+//             if(currentNode.nodeType == 3){
+//                 currentNodeLength = currentNode.nodeValue.replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length;
+//                 currentIndex += currentNodeLength;
+//                 if(currentIndex >= index){
+//                     return {
+//                         'node':currentNode,
+//                         'index': currentNodeLength - (currentIndex - index)
+//                     }
+//                 }
+//             }else if(!dtd.$empty[currentNode.tagName]){
+//                 currentNodeLength = currentNode[browser.ie ? 'innerText' : 'textContent'].replace(/(^[\t\r\n]+)|([\t\r\n]+$)/,'').length
+//                 currentIndex += currentNodeLength;
+//                 if(currentIndex >= index){
+//                     result = findNTextInBlockElm(currentNode,currentNodeLength - (currentIndex - index),str);
+//                     if(result){
+//                         return result;
+//                     }
+//                 }
+//             }
+//             currentNode = domUtils.getNextDomNode(currentNode);
 
-        }
-    }
+//         }
+//     }
 
-    function searchReplace(me,opt){
+//     function searchReplace(me,opt){
 
-        var rng = me.selection.getRange(),
-            startBlockNode,
-            searchStr = opt.searchStr,
-            span = me.document.createElement('span');
-        span.innerHTML = '$$ueditor_searchreplace_key$$';
+//         var rng = me.selection.getRange(),
+//             startBlockNode,
+//             searchStr = opt.searchStr,
+//             span = me.document.createElement('span');
+//         span.innerHTML = '$$ueditor_searchreplace_key$$';
 
-        rng.shrinkBoundary(true);
+//         rng.shrinkBoundary(true);
 
-        //判断是不是第一次选中
-        if(!rng.collapsed){
-            rng.select();
-            var rngText = me.selection.getText();
-            if(new RegExp('^' + opt.searchStr + '$',(opt.casesensitive ? '' : 'i')).test(rngText)){
-                if(opt.replaceStr != undefined){
-                    replaceText(rng,opt.replaceStr);
-                    rng.select();
-                    return true;
-                }else{
-                    rng.collapse(opt.dir == -1)
-                }
+//         //判断是不是第一次选中
+//         if(!rng.collapsed){
+//             rng.select();
+//             var rngText = me.selection.getText();
+//             if(new RegExp('^' + opt.searchStr + '$',(opt.casesensitive ? '' : 'i')).test(rngText)){
+//                 if(opt.replaceStr != undefined){
+//                     replaceText(rng,opt.replaceStr);
+//                     rng.select();
+//                     return true;
+//                 }else{
+//                     rng.collapse(opt.dir == -1)
+//                 }
 
-            }
-        }
+//             }
+//         }
 
 
-        rng.insertNode(span);
-        rng.enlargeToBlockElm(true);
-        startBlockNode = rng.startContainer;
-        var currentIndex = startBlockNode[browser.ie ? 'innerText' : 'textContent'].indexOf('$$ueditor_searchreplace_key$$');
-        rng.setStartBefore(span);
-        domUtils.remove(span);
-        var result = findTextBlockElm(startBlockNode,currentIndex,opt);
-        if(result){
-            var rngStart = findNTextInBlockElm(result.node,result.index,searchStr);
-            var rngEnd = findNTextInBlockElm(result.node,result.index + searchStr.length,searchStr);
-            rng.setStart(rngStart.node,rngStart.index).setEnd(rngEnd.node,rngEnd.index);
+//         rng.insertNode(span);
+//         rng.enlargeToBlockElm(true);
+//         startBlockNode = rng.startContainer;
+//         var currentIndex = startBlockNode[browser.ie ? 'innerText' : 'textContent'].indexOf('$$ueditor_searchreplace_key$$');
+//         rng.setStartBefore(span);
+//         domUtils.remove(span);
+//         var result = findTextBlockElm(startBlockNode,currentIndex,opt);
+//         if(result){
+//             var rngStart = findNTextInBlockElm(result.node,result.index,searchStr);
+//             var rngEnd = findNTextInBlockElm(result.node,result.index + searchStr.length,searchStr);
+//             rng.setStart(rngStart.node,rngStart.index).setEnd(rngEnd.node,rngEnd.index);
 
-            if(opt.replaceStr !== undefined){
-                replaceText(rng,opt.replaceStr)
-            }
-            rng.select();
-            return true;
-        }else{
-            rng.setCursor()
-        }
+//             if(opt.replaceStr !== undefined){
+//                 replaceText(rng,opt.replaceStr)
+//             }
+//             rng.select();
+//             return true;
+//         }else{
+//             rng.setCursor()
+//         }
 
-    }
-    function replaceText(rng,str){
+//     }
+//     function replaceText(rng,str){
 
-        str = me.document.createTextNode(str);
-        rng.deleteContents().insertNode(str);
+//         str = me.document.createTextNode(str);
+//         rng.deleteContents().insertNode(str);
 
-    }
-    return {
-        commands:{
-            'searchreplace':{
-                execCommand:function(cmdName,opt){
-                    utils.extend(opt,{
-                        all : false,
-                        casesensitive : false,
-                        dir : 1
-                    },true);
-                    var num = 0;
-                    if(opt.all){
+//     }
+//     return {
+//         commands:{
+//             'searchreplace':{
+//                 execCommand:function(cmdName,opt){
+//                     utils.extend(opt,{
+//                         all : false,
+//                         casesensitive : false,
+//                         dir : 1
+//                     },true);
+//                     var num = 0;
+//                     if(opt.all){
 
-                        var rng = me.selection.getRange(),
-                            first = me.body.firstChild;
-                        if(first && first.nodeType == 1){
-                            rng.setStart(first,0);
-                            rng.shrinkBoundary(true);
-                        }else if(first.nodeType == 3){
-                            rng.setStartBefore(first)
-                        }
-                        rng.collapse(true).select(true);
-                        if(opt.replaceStr !== undefined){
-                            me.fireEvent('saveScene');
-                        }
-                        while(searchReplace(this,opt)){
-                            num++;
-                        }
-                        if(num){
-                            me.fireEvent('saveScene');
-                        }
-                    }else{
-                        if(opt.replaceStr !== undefined){
-                            me.fireEvent('saveScene');
-                        }
-                        if(searchReplace(this,opt)){
-                            num++
-                        }
-                        if(num){
-                            me.fireEvent('saveScene');
-                        }
+//                         var rng = me.selection.getRange(),
+//                             first = me.body.firstChild;
+//                         if(first && first.nodeType == 1){
+//                             rng.setStart(first,0);
+//                             rng.shrinkBoundary(true);
+//                         }else if(first.nodeType == 3){
+//                             rng.setStartBefore(first)
+//                         }
+//                         rng.collapse(true).select(true);
+//                         if(opt.replaceStr !== undefined){
+//                             me.fireEvent('saveScene');
+//                         }
+//                         while(searchReplace(this,opt)){
+//                             num++;
+//                         }
+//                         if(num){
+//                             me.fireEvent('saveScene');
+//                         }
+//                     }else{
+//                         if(opt.replaceStr !== undefined){
+//                             me.fireEvent('saveScene');
+//                         }
+//                         if(searchReplace(this,opt)){
+//                             num++
+//                         }
+//                         if(num){
+//                             me.fireEvent('saveScene');
+//                         }
 
-                    }
+//                     }
 
-                    return num;
-                },
-                notNeedUndo:1
-            }
-        }
-    }
-});
+//                     return num;
+//                 },
+//                 notNeedUndo:1
+//             }
+//         }
+//     }
+// });
 
 // plugins/customstyle.js
 /**
@@ -23604,102 +23604,102 @@ UE.plugins['catchremoteimage'] = function () {
  * @file
  * @since 1.4.2
  */
-UE.plugin.register('snapscreen', function (){
+// UE.plugin.register('snapscreen', function (){
 
-    var me = this;
-    var snapplugin;
+//     var me = this;
+//     var snapplugin;
 
-    function getLocation(url){
-        var search,
-            a = document.createElement('a'),
-            params = utils.serializeParam(me.queryCommandValue('serverparam')) || '';
+//     function getLocation(url){
+//         var search,
+//             a = document.createElement('a'),
+//             params = utils.serializeParam(me.queryCommandValue('serverparam')) || '';
 
-        a.href = url;
-        if (browser.ie) {
-            a.href = a.href;
-        }
+//         a.href = url;
+//         if (browser.ie) {
+//             a.href = a.href;
+//         }
 
 
-        search = a.search;
-        if (params) {
-            search = search + (search.indexOf('?') == -1 ? '?':'&')+ params;
-            search = search.replace(/[&]+/ig, '&');
-        }
-        return {
-            'port': a.port,
-            'hostname': a.hostname,
-            'path': a.pathname + search ||  + a.hash
-        }
-    }
+//         search = a.search;
+//         if (params) {
+//             search = search + (search.indexOf('?') == -1 ? '?':'&')+ params;
+//             search = search.replace(/[&]+/ig, '&');
+//         }
+//         return {
+//             'port': a.port,
+//             'hostname': a.hostname,
+//             'path': a.pathname + search ||  + a.hash
+//         }
+//     }
 
-    return {
-        commands:{
-            /**
-             * 字体背景颜色
-             * @command snapscreen
-             * @method execCommand
-             * @param { String } cmd 命令字符串
-             * @example
-             * ```javascript
-             * editor.execCommand('snapscreen');
-             * ```
-             */
-            'snapscreen':{
-                execCommand:function (cmd) {
-                    var url, local, res;
-                    var lang = me.getLang("snapScreen_plugin");
+//     return {
+//         commands:{
+//             /**
+//              * 字体背景颜色
+//              * @command snapscreen
+//              * @method execCommand
+//              * @param { String } cmd 命令字符串
+//              * @example
+//              * ```javascript
+//              * editor.execCommand('snapscreen');
+//              * ```
+//              */
+//             'snapscreen':{
+//                 execCommand:function (cmd) {
+//                     var url, local, res;
+//                     var lang = me.getLang("snapScreen_plugin");
 
-                    if(!snapplugin){
-                        var container = me.container;
-                        var doc = me.container.ownerDocument || me.container.document;
-                        snapplugin = doc.createElement("object");
-                        try{snapplugin.type = "application/x-pluginbaidusnap";}catch(e){
-                            return;
-                        }
-                        snapplugin.style.cssText = "position:absolute;left:-9999px;width:0;height:0;";
-                        snapplugin.setAttribute("width","0");
-                        snapplugin.setAttribute("height","0");
-                        container.appendChild(snapplugin);
-                    }
+//                     if(!snapplugin){
+//                         var container = me.container;
+//                         var doc = me.container.ownerDocument || me.container.document;
+//                         snapplugin = doc.createElement("object");
+//                         try{snapplugin.type = "application/x-pluginbaidusnap";}catch(e){
+//                             return;
+//                         }
+//                         snapplugin.style.cssText = "position:absolute;left:-9999px;width:0;height:0;";
+//                         snapplugin.setAttribute("width","0");
+//                         snapplugin.setAttribute("height","0");
+//                         container.appendChild(snapplugin);
+//                     }
 
-                    function onSuccess(rs){
-                        try{
-                            rs = eval("("+ rs +")");
-                            if(rs.state == 'SUCCESS'){
-                                var opt = me.options;
-                                me.execCommand('insertimage', {
-                                    src: opt.snapscreenUrlPrefix + rs.url,
-                                    _src: opt.snapscreenUrlPrefix + rs.url,
-                                    alt: rs.title || '',
-                                    floatStyle: opt.snapscreenImgAlign
-                                });
-                            } else {
-                                alert(rs.state);
-                            }
-                        }catch(e){
-                            alert(lang.callBackErrorMsg);
-                        }
-                    }
-                    url = me.getActionUrl(me.getOpt('snapscreenActionName'));
-                    local = getLocation(url);
-                    setTimeout(function () {
-                        try{
-                            res =snapplugin.saveSnapshot(local.hostname, local.path, local.port);
-                        }catch(e){
-                            me.ui._dialogs['snapscreenDialog'].open();
-                            return;
-                        }
+//                     function onSuccess(rs){
+//                         try{
+//                             rs = eval("("+ rs +")");
+//                             if(rs.state == 'SUCCESS'){
+//                                 var opt = me.options;
+//                                 me.execCommand('insertimage', {
+//                                     src: opt.snapscreenUrlPrefix + rs.url,
+//                                     _src: opt.snapscreenUrlPrefix + rs.url,
+//                                     alt: rs.title || '',
+//                                     floatStyle: opt.snapscreenImgAlign
+//                                 });
+//                             } else {
+//                                 alert(rs.state);
+//                             }
+//                         }catch(e){
+//                             alert(lang.callBackErrorMsg);
+//                         }
+//                     }
+//                     url = me.getActionUrl(me.getOpt('snapscreenActionName'));
+//                     local = getLocation(url);
+//                     setTimeout(function () {
+//                         try{
+//                             res =snapplugin.saveSnapshot(local.hostname, local.path, local.port);
+//                         }catch(e){
+//                             me.ui._dialogs['snapscreenDialog'].open();
+//                             return;
+//                         }
 
-                        onSuccess(res);
-                    }, 50);
-                },
-                queryCommandState: function(){
-                    return (navigator.userAgent.indexOf("Windows",0) != -1) ? 0:-1;
-                }
-            }
-        }
-    }
-});
+//                         onSuccess(res);
+//                     }, 50);
+//                 },
+//                 queryCommandState: function(){
+//                     return (navigator.userAgent.indexOf("Windows",0) != -1) ? 0:-1;
+//                 }
+//             }
+//         }
+//     }
+// });
 
 
 // plugins/insertparagraph.js
@@ -23823,100 +23823,100 @@ UE.commands['insertparagraph'] = {
 //    };
 //};
 
-UE.plugin.register('webapp', function (){
-    var me = this;
-    function createInsertStr(obj,toEmbed){
-        return  !toEmbed ?
-            '<img title="'+obj.title+'" width="' + obj.width + '" height="' + obj.height + '"' +
-                ' src="' + me.options.UEDITOR_HOME_URL + 'themes/default/images/spacer.gif" _logo_url="'+obj.logo+'" style="background:url(' + obj.logo
-                +') no-repeat center center; border:1px solid gray;" class="edui-faked-webapp" _url="' + obj.url + '" ' +
-                (obj.align && !obj.cssfloat? 'align="' + obj.align + '"' : '') +
-                (obj.cssfloat ? 'style="float:' + obj.cssfloat + '"' : '') +
-                '/>'
-            :
-            '<iframe class="edui-faked-webapp" title="'+obj.title+'" ' +
-                (obj.align && !obj.cssfloat? 'align="' + obj.align + '"' : '') +
-                (obj.cssfloat ? 'style="float:' + obj.cssfloat + '"' : '') +
-                'width="' + obj.width + '" height="' + obj.height + '"  scrolling="no" frameborder="0" src="' + obj.url + '" logo_url = "'+obj.logo+'"></iframe>'
+// UE.plugin.register('webapp', function (){
+//     var me = this;
+//     function createInsertStr(obj,toEmbed){
+//         return  !toEmbed ?
+//             '<img title="'+obj.title+'" width="' + obj.width + '" height="' + obj.height + '"' +
+//                 ' src="' + me.options.UEDITOR_HOME_URL + 'themes/default/images/spacer.gif" _logo_url="'+obj.logo+'" style="background:url(' + obj.logo
+//                 +') no-repeat center center; border:1px solid gray;" class="edui-faked-webapp" _url="' + obj.url + '" ' +
+//                 (obj.align && !obj.cssfloat? 'align="' + obj.align + '"' : '') +
+//                 (obj.cssfloat ? 'style="float:' + obj.cssfloat + '"' : '') +
+//                 '/>'
+//             :
+//             '<iframe class="edui-faked-webapp" title="'+obj.title+'" ' +
+//                 (obj.align && !obj.cssfloat? 'align="' + obj.align + '"' : '') +
+//                 (obj.cssfloat ? 'style="float:' + obj.cssfloat + '"' : '') +
+//                 'width="' + obj.width + '" height="' + obj.height + '"  scrolling="no" frameborder="0" src="' + obj.url + '" logo_url = "'+obj.logo+'"></iframe>'
 
-    }
-    return {
-        outputRule: function(root){
-            utils.each(root.getNodesByTagName('img'),function(node){
-                var html;
-                if(node.getAttr('class') == 'edui-faked-webapp'){
-                    html =  createInsertStr({
-                        title:node.getAttr('title'),
-                        'width':node.getAttr('width'),
-                        'height':node.getAttr('height'),
-                        'align':node.getAttr('align'),
-                        'cssfloat':node.getStyle('float'),
-                        'url':node.getAttr("_url"),
-                        'logo':node.getAttr('_logo_url')
-                    },true);
-                    var embed = UE.uNode.createElement(html);
-                    node.parentNode.replaceChild(embed,node);
-                }
-            })
-        },
-        inputRule:function(root){
-            utils.each(root.getNodesByTagName('iframe'),function(node){
-                if(node.getAttr('class') == 'edui-faked-webapp'){
-                    var img = UE.uNode.createElement(createInsertStr({
-                        title:node.getAttr('title'),
-                        'width':node.getAttr('width'),
-                        'height':node.getAttr('height'),
-                        'align':node.getAttr('align'),
-                        'cssfloat':node.getStyle('float'),
-                        'url':node.getAttr("src"),
-                        'logo':node.getAttr('logo_url')
-                    }));
-                    node.parentNode.replaceChild(img,node);
-                }
-            })
+//     }
+//     return {
+//         outputRule: function(root){
+//             utils.each(root.getNodesByTagName('img'),function(node){
+//                 var html;
+//                 if(node.getAttr('class') == 'edui-faked-webapp'){
+//                     html =  createInsertStr({
+//                         title:node.getAttr('title'),
+//                         'width':node.getAttr('width'),
+//                         'height':node.getAttr('height'),
+//                         'align':node.getAttr('align'),
+//                         'cssfloat':node.getStyle('float'),
+//                         'url':node.getAttr("_url"),
+//                         'logo':node.getAttr('_logo_url')
+//                     },true);
+//                     var embed = UE.uNode.createElement(html);
+//                     node.parentNode.replaceChild(embed,node);
+//                 }
+//             })
+//         },
+//         inputRule:function(root){
+//             utils.each(root.getNodesByTagName('iframe'),function(node){
+//                 if(node.getAttr('class') == 'edui-faked-webapp'){
+//                     var img = UE.uNode.createElement(createInsertStr({
+//                         title:node.getAttr('title'),
+//                         'width':node.getAttr('width'),
+//                         'height':node.getAttr('height'),
+//                         'align':node.getAttr('align'),
+//                         'cssfloat':node.getStyle('float'),
+//                         'url':node.getAttr("src"),
+//                         'logo':node.getAttr('logo_url')
+//                     }));
+//                     node.parentNode.replaceChild(img,node);
+//                 }
+//             })
 
-        },
-        commands:{
-            /**
-             * 插入百度应用
-             * @command webapp
-             * @method execCommand
-             * @remind 需要百度APPKey
-             * @remind 百度应用主页： <a href="http://app.baidu.com/" target="_blank">http://app.baidu.com/</a>
-             * @param { Object } appOptions 应用所需的参数项， 支持的key有： title=>应用标题， width=>应用容器宽度，
-             * height=>应用容器高度，logo=>应用logo，url=>应用地址
-             * @example
-             * ```javascript
-             * //editor是编辑器实例
-             * //在编辑器里插入一个“植物大战僵尸”的APP
-             * editor.execCommand( 'webapp' , {
-             *     title: '植物大战僵尸',
-             *     width: 560,
-             *     height: 465,
-             *     logo: '应用展示的图片',
-             *     url: '百度应用的地址'
-             * } );
-             * ```
-             */
-            'webapp':{
-                execCommand:function (cmd, obj) {
+//         },
+//         commands:{
+//             /**
+//              * 插入百度应用
+//              * @command webapp
+//              * @method execCommand
+//              * @remind 需要百度APPKey
+//              * @remind 百度应用主页： <a href="http://app.baidu.com/" target="_blank">http://app.baidu.com/</a>
+//              * @param { Object } appOptions 应用所需的参数项， 支持的key有： title=>应用标题， width=>应用容器宽度，
+//              * height=>应用容器高度，logo=>应用logo，url=>应用地址
+//              * @example
+//              * ```javascript
+//              * //editor是编辑器实例
+//              * //在编辑器里插入一个“植物大战僵尸”的APP
+//              * editor.execCommand( 'webapp' , {
+//              *     title: '植物大战僵尸',
+//              *     width: 560,
+//              *     height: 465,
+//              *     logo: '应用展示的图片',
+//              *     url: '百度应用的地址'
+//              * } );
+//              * ```
+//              */
+//             'webapp':{
+//                 execCommand:function (cmd, obj) {
 
-                    var me = this,
-                        str = createInsertStr(utils.extend(obj,{
-                            align:'none'
-                        }), false);
-                    me.execCommand("inserthtml",str);
-                },
-                queryCommandState:function () {
-                    var me = this,
-                        img = me.selection.getRange().getClosedNode(),
-                        flag = img && (img.className == "edui-faked-webapp");
-                    return flag ? 1 : 0;
-                }
-            }
-        }
-    }
-});
+//                     var me = this,
+//                         str = createInsertStr(utils.extend(obj,{
+//                             align:'none'
+//                         }), false);
+//                     me.execCommand("inserthtml",str);
+//                 },
+//                 queryCommandState:function () {
+//                     var me = this,
+//                         img = me.selection.getRange().getClosedNode(),
+//                         flag = img && (img.className == "edui-faked-webapp");
+//                     return flag ? 1 : 0;
+//                 }
+//             }
+//         }
+//     }
+// });
 
 // plugins/template.js
 ///import core
@@ -23965,81 +23965,81 @@ UE.plugins['template'] = function () {
  * 插入音乐命令
  * @file
  */
-UE.plugin.register('music', function (){
-    var me = this;
-    function creatInsertStr(url,width,height,align,cssfloat,toEmbed){
-        return  !toEmbed ?
-                '<img ' +
-                    (align && !cssfloat? 'align="' + align + '"' : '') +
-                    (cssfloat ? 'style="float:' + cssfloat + '"' : '') +
-                    ' width="'+ width +'" height="' + height + '" _url="'+url+'" class="edui-faked-music"' +
-                    ' src="'+me.options.langPath+me.options.lang+'/images/music.png" />'
-            :
-            '<embed type="application/x-shockwave-flash" class="edui-faked-music" pluginspage="http://www.macromedia.com/go/getflashplayer"' +
-                ' src="' + url + '" width="' + width  + '" height="' + height  + '" '+ (align && !cssfloat? 'align="' + align + '"' : '') +
-                (cssfloat ? 'style="float:' + cssfloat + '"' : '') +
-                ' wmode="transparent" play="true" loop="false" menu="false" allowscriptaccess="never" allowfullscreen="true" >';
-    }
-    return {
-        outputRule: function(root){
-            utils.each(root.getNodesByTagName('img'),function(node){
-                var html;
-                if(node.getAttr('class') == 'edui-faked-music'){
-                    var cssfloat = node.getStyle('float');
-                    var align = node.getAttr('align');
-                    html =  creatInsertStr(node.getAttr("_url"), node.getAttr('width'), node.getAttr('height'), align, cssfloat, true);
-                    var embed = UE.uNode.createElement(html);
-                    node.parentNode.replaceChild(embed,node);
-                }
-            })
-        },
-        inputRule:function(root){
-            utils.each(root.getNodesByTagName('embed'),function(node){
-                if(node.getAttr('class') == 'edui-faked-music'){
-                    var cssfloat = node.getStyle('float');
-                    var align = node.getAttr('align');
-                    html =  creatInsertStr(node.getAttr("src"), node.getAttr('width'), node.getAttr('height'), align, cssfloat,false);
-                    var img = UE.uNode.createElement(html);
-                    node.parentNode.replaceChild(img,node);
-                }
-            })
+// UE.plugin.register('music', function (){
+//     var me = this;
+//     function creatInsertStr(url,width,height,align,cssfloat,toEmbed){
+//         return  !toEmbed ?
+//                 '<img ' +
+//                     (align && !cssfloat? 'align="' + align + '"' : '') +
+//                     (cssfloat ? 'style="float:' + cssfloat + '"' : '') +
+//                     ' width="'+ width +'" height="' + height + '" _url="'+url+'" class="edui-faked-music"' +
+//                     ' src="'+me.options.langPath+me.options.lang+'/images/music.png" />'
+//             :
+//             '<embed type="application/x-shockwave-flash" class="edui-faked-music" pluginspage="http://www.macromedia.com/go/getflashplayer"' +
+//                 ' src="' + url + '" width="' + width  + '" height="' + height  + '" '+ (align && !cssfloat? 'align="' + align + '"' : '') +
+//                 (cssfloat ? 'style="float:' + cssfloat + '"' : '') +
+//                 ' wmode="transparent" play="true" loop="false" menu="false" allowscriptaccess="never" allowfullscreen="true" >';
+//     }
+//     return {
+//         outputRule: function(root){
+//             utils.each(root.getNodesByTagName('img'),function(node){
+//                 var html;
+//                 if(node.getAttr('class') == 'edui-faked-music'){
+//                     var cssfloat = node.getStyle('float');
+//                     var align = node.getAttr('align');
+//                     html =  creatInsertStr(node.getAttr("_url"), node.getAttr('width'), node.getAttr('height'), align, cssfloat, true);
+//                     var embed = UE.uNode.createElement(html);
+//                     node.parentNode.replaceChild(embed,node);
+//                 }
+//             })
+//         },
+//         inputRule:function(root){
+//             utils.each(root.getNodesByTagName('embed'),function(node){
+//                 if(node.getAttr('class') == 'edui-faked-music'){
+//                     var cssfloat = node.getStyle('float');
+//                     var align = node.getAttr('align');
+//                     html =  creatInsertStr(node.getAttr("src"), node.getAttr('width'), node.getAttr('height'), align, cssfloat,false);
+//                     var img = UE.uNode.createElement(html);
+//                     node.parentNode.replaceChild(img,node);
+//                 }
+//             })
 
-        },
-        commands:{
-            /**
-             * 插入音乐
-             * @command music
-             * @method execCommand
-             * @param { Object } musicOptions 插入音乐的参数项， 支持的key有： url=>音乐地址；
-             * width=>音乐容器宽度；height=>音乐容器高度；align=>音乐文件的对齐方式， 可选值有: left, center, right, none
-             * @example
-             * ```javascript
-             * //editor是编辑器实例
-             * //在编辑器里插入一个“植物大战僵尸”的APP
-             * editor.execCommand( 'music' , {
-             *     width: 400,
-             *     height: 95,
-             *     align: "center",
-             *     url: "音乐地址"
-             * } );
-             * ```
-             */
-            'music':{
-                execCommand:function (cmd, musicObj) {
-                    var me = this,
-                        str = creatInsertStr(musicObj.url, musicObj.width || 400, musicObj.height || 95, "none", false);
-                    me.execCommand("inserthtml",str);
-                },
-                queryCommandState:function () {
-                    var me = this,
-                        img = me.selection.getRange().getClosedNode(),
-                        flag = img && (img.className == "edui-faked-music");
-                    return flag ? 1 : 0;
-                }
-            }
-        }
-    }
-});
+//         },
+//         commands:{
+//             /**
+//              * 插入音乐
+//              * @command music
+//              * @method execCommand
+//              * @param { Object } musicOptions 插入音乐的参数项， 支持的key有： url=>音乐地址；
+//              * width=>音乐容器宽度；height=>音乐容器高度；align=>音乐文件的对齐方式， 可选值有: left, center, right, none
+//              * @example
+//              * ```javascript
+//              * //editor是编辑器实例
+//              * //在编辑器里插入一个“植物大战僵尸”的APP
+//              * editor.execCommand( 'music' , {
+//              *     width: 400,
+//              *     height: 95,
+//              *     align: "center",
+//              *     url: "音乐地址"
+//              * } );
+//              * ```
+//              */
+//             'music':{
+//                 execCommand:function (cmd, musicObj) {
+//                     var me = this,
+//                         str = creatInsertStr(musicObj.url, musicObj.width || 400, musicObj.height || 95, "none", false);
+//                     me.execCommand("inserthtml",str);
+//                 },
+//                 queryCommandState:function () {
+//                     var me = this,
+//                         img = me.selection.getRange().getClosedNode(),
+//                         flag = img && (img.className == "edui-faked-music");
+//                     return flag ? 1 : 0;
+//                 }
+//             }
+//         }
+//     }
+// });
 
 // plugins/autoupload.js
 /**
@@ -24049,453 +24049,453 @@ UE.plugin.register('music', function (){
  * @author Jinqn
  * @date 2013-10-14
  */
-UE.plugin.register('autoupload', function (){
+// UE.plugin.register('autoupload', function (){
 
-    function sendAndInsertFile(file, editor) {
-        var me  = editor;
-        //模拟数据
-        var fieldName, urlPrefix, maxSize, allowFiles, actionUrl,
-            loadingHtml, errorHandler, successHandler,
-            filetype = /image\/\w+/i.test(file.type) ? 'image':'file',
-            loadingId = 'loading_' + (+new Date()).toString(36);
+//     function sendAndInsertFile(file, editor) {
+//         var me  = editor;
+//         //模拟数据
+//         var fieldName, urlPrefix, maxSize, allowFiles, actionUrl,
+//             loadingHtml, errorHandler, successHandler,
+//             filetype = /image\/\w+/i.test(file.type) ? 'image':'file',
+//             loadingId = 'loading_' + (+new Date()).toString(36);
 
-        fieldName = me.getOpt(filetype + 'FieldName');
-        urlPrefix = me.getOpt(filetype + 'UrlPrefix');
-        maxSize = me.getOpt(filetype + 'MaxSize');
-        allowFiles = me.getOpt(filetype + 'AllowFiles');
-        actionUrl = me.getActionUrl(me.getOpt(filetype + 'ActionName'));
-        errorHandler = function(title) {
-            var loader = me.document.getElementById(loadingId);
-            loader && domUtils.remove(loader);
-            me.fireEvent('showmessage', {
-                'id': loadingId,
-                'content': title,
-                'type': 'error',
-                'timeout': 4000
-            });
-        };
+//         fieldName = me.getOpt(filetype + 'FieldName');
+//         urlPrefix = me.getOpt(filetype + 'UrlPrefix');
+//         maxSize = me.getOpt(filetype + 'MaxSize');
+//         allowFiles = me.getOpt(filetype + 'AllowFiles');
+//         actionUrl = me.getActionUrl(me.getOpt(filetype + 'ActionName'));
+//         errorHandler = function(title) {
+//             var loader = me.document.getElementById(loadingId);
+//             loader && domUtils.remove(loader);
+//             me.fireEvent('showmessage', {
+//                 'id': loadingId,
+//                 'content': title,
+//                 'type': 'error',
+//                 'timeout': 4000
+//             });
+//         };
 
-        if (filetype == 'image') {
-            loadingHtml = '<img class="loadingclass" id="' + loadingId + '" src="' +
-                me.options.themePath + me.options.theme +
-                '/images/spacer.gif" title="' + (me.getLang('autoupload.loading') || '') + '" >';
-            successHandler = function(data) {
-                var link = urlPrefix + data.url,
-                    loader = me.document.getElementById(loadingId);
-                if (loader) {
-                    loader.setAttribute('src', link);
-                    loader.setAttribute('_src', link);
-                    loader.setAttribute('title', data.title || '');
-                    loader.setAttribute('alt', data.original || '');
-                    loader.removeAttribute('id');
-                    domUtils.removeClasses(loader, 'loadingclass');
-                }
-            };
-        } else {
-            loadingHtml = '<p>' +
-                '<img class="loadingclass" id="' + loadingId + '" src="' +
-                me.options.themePath + me.options.theme +
-                '/images/spacer.gif" title="' + (me.getLang('autoupload.loading') || '') + '" >' +
-                '</p>';
-            successHandler = function(data) {
-                var link = urlPrefix + data.url,
-                    loader = me.document.getElementById(loadingId);
+//         if (filetype == 'image') {
+//             loadingHtml = '<img class="loadingclass" id="' + loadingId + '" src="' +
+//                 me.options.themePath + me.options.theme +
+//                 '/images/spacer.gif" title="' + (me.getLang('autoupload.loading') || '') + '" >';
+//             successHandler = function(data) {
+//                 var link = urlPrefix + data.url,
+//                     loader = me.document.getElementById(loadingId);
+//                 if (loader) {
+//                     loader.setAttribute('src', link);
+//                     loader.setAttribute('_src', link);
+//                     loader.setAttribute('title', data.title || '');
+//                     loader.setAttribute('alt', data.original || '');
+//                     loader.removeAttribute('id');
+//                     domUtils.removeClasses(loader, 'loadingclass');
+//                 }
+//             };
+//         } else {
+//             loadingHtml = '<p>' +
+//                 '<img class="loadingclass" id="' + loadingId + '" src="' +
+//                 me.options.themePath + me.options.theme +
+//                 '/images/spacer.gif" title="' + (me.getLang('autoupload.loading') || '') + '" >' +
+//                 '</p>';
+//             successHandler = function(data) {
+//                 var link = urlPrefix + data.url,
+//                     loader = me.document.getElementById(loadingId);
 
-                var rng = me.selection.getRange(),
-                    bk = rng.createBookmark();
-                rng.selectNode(loader).select();
-                me.execCommand('insertfile', {'url': link});
-                rng.moveToBookmark(bk).select();
-            };
-        }
+//                 var rng = me.selection.getRange(),
+//                     bk = rng.createBookmark();
+//                 rng.selectNode(loader).select();
+//                 me.execCommand('insertfile', {'url': link});
+//                 rng.moveToBookmark(bk).select();
+//             };
+//         }
 
-        /* 插入loading的占位符 */
-        me.execCommand('inserthtml', loadingHtml);
+//         /* 插入loading的占位符 */
+//         me.execCommand('inserthtml', loadingHtml);
 
-        /* 判断后端配置是否没有加载成功 */
-        if (!me.getOpt(filetype + 'ActionName')) {
-            errorHandler(me.getLang('autoupload.errorLoadConfig'));
-            return;
-        }
-        /* 判断文件大小是否超出限制 */
-        if(file.size > maxSize) {
-            errorHandler(me.getLang('autoupload.exceedSizeError'));
-            return;
-        }
-        /* 判断文件格式是否超出允许 */
-        var fileext = file.name ? file.name.substr(file.name.lastIndexOf('.')):'';
-        if ((fileext && filetype != 'image') || (allowFiles && (allowFiles.join('') + '.').indexOf(fileext.toLowerCase() + '.') == -1)) {
-            errorHandler(me.getLang('autoupload.exceedTypeError'));
-            return;
-        }
+//         /* 判断后端配置是否没有加载成功 */
+//         if (!me.getOpt(filetype + 'ActionName')) {
+//             errorHandler(me.getLang('autoupload.errorLoadConfig'));
+//             return;
+//         }
+//         /* 判断文件大小是否超出限制 */
+//         if(file.size > maxSize) {
+//             errorHandler(me.getLang('autoupload.exceedSizeError'));
+//             return;
+//         }
+//         /* 判断文件格式是否超出允许 */
+//         var fileext = file.name ? file.name.substr(file.name.lastIndexOf('.')):'';
+//         if ((fileext && filetype != 'image') || (allowFiles && (allowFiles.join('') + '.').indexOf(fileext.toLowerCase() + '.') == -1)) {
+//             errorHandler(me.getLang('autoupload.exceedTypeError'));
+//             return;
+//         }
 
-        /* 创建Ajax并提交 */
-        var xhr = new XMLHttpRequest(),
-            fd = new FormData(),
-            params = utils.serializeParam(me.queryCommandValue('serverparam')) || '',
-            url = utils.formatUrl(actionUrl + (actionUrl.indexOf('?') == -1 ? '?':'&') + params);
+//         /* 创建Ajax并提交 */
+//         var xhr = new XMLHttpRequest(),
+//             fd = new FormData(),
+//             params = utils.serializeParam(me.queryCommandValue('serverparam')) || '',
+//             url = utils.formatUrl(actionUrl + (actionUrl.indexOf('?') == -1 ? '?':'&') + params);
 
-        fd.append(fieldName, file, file.name || ('blob.' + file.type.substr('image/'.length)));
-        fd.append('type', 'ajax');
-        xhr.open("post", url, true);
-        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        xhr.addEventListener('load', function (e) {
-            try{
-                var json = (new Function("return " + utils.trim(e.target.response)))();
-                if (json.state == 'SUCCESS' && json.url) {
-                    successHandler(json);
-                } else {
-                    errorHandler(json.state);
-                }
-            }catch(er){
-                errorHandler(me.getLang('autoupload.loadError'));
-            }
-        });
-        xhr.send(fd);
-    }
+//         fd.append(fieldName, file, file.name || ('blob.' + file.type.substr('image/'.length)));
+//         fd.append('type', 'ajax');
+//         xhr.open("post", url, true);
+//         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+//         xhr.addEventListener('load', function (e) {
+//             try{
+//                 var json = (new Function("return " + utils.trim(e.target.response)))();
+//                 if (json.state == 'SUCCESS' && json.url) {
+//                     successHandler(json);
+//                 } else {
+//                     errorHandler(json.state);
+//                 }
+//             }catch(er){
+//                 errorHandler(me.getLang('autoupload.loadError'));
+//             }
+//         });
+//         xhr.send(fd);
+//     }
 
-    function getPasteImage(e){
-        return e.clipboardData && e.clipboardData.items && e.clipboardData.items.length == 1 && /^image\//.test(e.clipboardData.items[0].type) ? e.clipboardData.items:null;
-    }
-    function getDropImage(e){
-        return  e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files:null;
-    }
+//     function getPasteImage(e){
+//         return e.clipboardData && e.clipboardData.items && e.clipboardData.items.length == 1 && /^image\//.test(e.clipboardData.items[0].type) ? e.clipboardData.items:null;
+//     }
+//     function getDropImage(e){
+//         return  e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files:null;
+//     }
 
-    return {
-        outputRule: function(root){
-            utils.each(root.getNodesByTagName('img'),function(n){
-                if (/\b(loaderrorclass)|(bloaderrorclass)\b/.test(n.getAttr('class'))) {
-                    n.parentNode.removeChild(n);
-                }
-            });
-            utils.each(root.getNodesByTagName('p'),function(n){
-                if (/\bloadpara\b/.test(n.getAttr('class'))) {
-                    n.parentNode.removeChild(n);
-                }
-            });
-        },
-        bindEvents:{
-            //插入粘贴板的图片，拖放插入图片
-            'ready':function(e){
-                var me = this;
-                if(window.FormData && window.FileReader) {
-                    domUtils.on(me.body, 'paste drop', function(e){
-                        var hasImg = false,
-                            items;
-                        //获取粘贴板文件列表或者拖放文件列表
-                        items = e.type == 'paste' ? getPasteImage(e):getDropImage(e);
-                        if(items){
-                            var len = items.length,
-                                file;
-                            while (len--){
-                                file = items[len];
-                                if(file.getAsFile) file = file.getAsFile();
-                                if(file && file.size > 0) {
-                                    sendAndInsertFile(file, me);
-                                    hasImg = true;
-                                }
-                            }
-                            hasImg && e.preventDefault();
-                        }
+//     return {
+//         outputRule: function(root){
+//             utils.each(root.getNodesByTagName('img'),function(n){
+//                 if (/\b(loaderrorclass)|(bloaderrorclass)\b/.test(n.getAttr('class'))) {
+//                     n.parentNode.removeChild(n);
+//                 }
+//             });
+//             utils.each(root.getNodesByTagName('p'),function(n){
+//                 if (/\bloadpara\b/.test(n.getAttr('class'))) {
+//                     n.parentNode.removeChild(n);
+//                 }
+//             });
+//         },
+//         bindEvents:{
+//             //插入粘贴板的图片，拖放插入图片
+//             'ready':function(e){
+//                 var me = this;
+//                 if(window.FormData && window.FileReader) {
+//                     domUtils.on(me.body, 'paste drop', function(e){
+//                         var hasImg = false,
+//                             items;
+//                         //获取粘贴板文件列表或者拖放文件列表
+//                         items = e.type == 'paste' ? getPasteImage(e):getDropImage(e);
+//                         if(items){
+//                             var len = items.length,
+//                                 file;
+//                             while (len--){
+//                                 file = items[len];
+//                                 if(file.getAsFile) file = file.getAsFile();
+//                                 if(file && file.size > 0) {
+//                                     sendAndInsertFile(file, me);
+//                                     hasImg = true;
+//                                 }
+//                             }
+//                             hasImg && e.preventDefault();
+//                         }
 
-                    });
-                    //取消拖放图片时出现的文字光标位置提示
-                    domUtils.on(me.body, 'dragover', function (e) {
-                        if(e.dataTransfer.types[0] == 'Files') {
-                            e.preventDefault();
-                        }
-                    });
+//                     });
+//                     //取消拖放图片时出现的文字光标位置提示
+//                     domUtils.on(me.body, 'dragover', function (e) {
+//                         if(e.dataTransfer.types[0] == 'Files') {
+//                             e.preventDefault();
+//                         }
+//                     });
 
-                    //设置loading的样式
-                    utils.cssRule('loading',
-                        '.loadingclass{display:inline-block;cursor:default;background: url(\''
-                            + this.options.themePath
-                            + this.options.theme +'/images/loading.gif\') no-repeat center center transparent;border:1px solid #cccccc;margin-left:1px;height: 22px;width: 22px;}\n' +
-                            '.loaderrorclass{display:inline-block;cursor:default;background: url(\''
-                            + this.options.themePath
-                            + this.options.theme +'/images/loaderror.png\') no-repeat center center transparent;border:1px solid #cccccc;margin-right:1px;height: 22px;width: 22px;' +
-                            '}',
-                        this.document);
-                }
-            }
-        }
-    }
-});
+//                     //设置loading的样式
+//                     utils.cssRule('loading',
+//                         '.loadingclass{display:inline-block;cursor:default;background: url(\''
+//                             + this.options.themePath
+//                             + this.options.theme +'/images/loading.gif\') no-repeat center center transparent;border:1px solid #cccccc;margin-left:1px;height: 22px;width: 22px;}\n' +
+//                             '.loaderrorclass{display:inline-block;cursor:default;background: url(\''
+//                             + this.options.themePath
+//                             + this.options.theme +'/images/loaderror.png\') no-repeat center center transparent;border:1px solid #cccccc;margin-right:1px;height: 22px;width: 22px;' +
+//                             '}',
+//                         this.document);
+//                 }
+//             }
+//         }
+//     }
+// });
 
 // plugins/autosave.js
-UE.plugin.register('autosave', function (){
+// UE.plugin.register('autosave', function (){
 
-    var me = this,
-        //无限循环保护
-        lastSaveTime = new Date(),
-        //最小保存间隔时间
-        MIN_TIME = 20,
-        //auto save key
-        saveKey = null;
+//     var me = this,
+//         //无限循环保护
+//         lastSaveTime = new Date(),
+//         //最小保存间隔时间
+//         MIN_TIME = 20,
+//         //auto save key
+//         saveKey = null;
 
-    function save ( editor ) {
+//     function save ( editor ) {
 
-        var saveData;
+//         var saveData;
 
-        if ( new Date() - lastSaveTime < MIN_TIME ) {
-            return;
-        }
+//         if ( new Date() - lastSaveTime < MIN_TIME ) {
+//             return;
+//         }
 
-        if ( !editor.hasContents() ) {
-            //这里不能调用命令来删除， 会造成事件死循环
-            saveKey && me.removePreferences( saveKey );
-            return;
-        }
+//         if ( !editor.hasContents() ) {
+//             //这里不能调用命令来删除， 会造成事件死循环
+//             saveKey && me.removePreferences( saveKey );
+//             return;
+//         }
 
-        lastSaveTime = new Date();
+//         lastSaveTime = new Date();
 
-        editor._saveFlag = null;
+//         editor._saveFlag = null;
 
-        saveData = me.body.innerHTML;
+//         saveData = me.body.innerHTML;
 
-        if ( editor.fireEvent( "beforeautosave", {
-            content: saveData
-        } ) === false ) {
-            return;
-        }
+//         if ( editor.fireEvent( "beforeautosave", {
+//             content: saveData
+//         } ) === false ) {
+//             return;
+//         }
 
-        me.setPreferences( saveKey, saveData );
+//         me.setPreferences( saveKey, saveData );
 
-        editor.fireEvent( "afterautosave", {
-            content: saveData
-        } );
+//         editor.fireEvent( "afterautosave", {
+//             content: saveData
+//         } );
 
-    }
+//     }
 
-    return {
-        defaultOptions: {
-            //默认间隔时间
-            saveInterval: 500
-        },
-        bindEvents:{
-            'ready':function(){
+//     return {
+//         defaultOptions: {
+//             //默认间隔时间
+//             saveInterval: 500
+//         },
+//         bindEvents:{
+//             'ready':function(){
 
-                var _suffix = "-drafts-data",
-                    key = null;
+//                 var _suffix = "-drafts-data",
+//                     key = null;
 
-                if ( me.key ) {
-                    key = me.key + _suffix;
-                } else {
-                    key = ( me.container.parentNode.id || 'ue-common' ) + _suffix;
-                }
+//                 if ( me.key ) {
+//                     key = me.key + _suffix;
+//                 } else {
+//                     key = ( me.container.parentNode.id || 'ue-common' ) + _suffix;
+//                 }
 
-                //页面地址+编辑器ID 保持唯一
-                saveKey = ( location.protocol + location.host + location.pathname ).replace( /[.:\/]/g, '_' ) + key;
+//                 //页面地址+编辑器ID 保持唯一
+//                 saveKey = ( location.protocol + location.host + location.pathname ).replace( /[.:\/]/g, '_' ) + key;
 
-            },
+//             },
 
-            'contentchange': function () {
+//             'contentchange': function () {
 
-                if ( !saveKey ) {
-                    return;
-                }
+//                 if ( !saveKey ) {
+//                     return;
+//                 }
 
-                if ( me._saveFlag ) {
-                    window.clearTimeout( me._saveFlag );
-                }
+//                 if ( me._saveFlag ) {
+//                     window.clearTimeout( me._saveFlag );
+//                 }
 
-                if ( me.options.saveInterval > 0 ) {
+//                 if ( me.options.saveInterval > 0 ) {
 
-                    me._saveFlag = window.setTimeout( function () {
+//                     me._saveFlag = window.setTimeout( function () {
 
-                        save( me );
+//                         save( me );
 
-                    }, me.options.saveInterval );
+//                     }, me.options.saveInterval );
 
-                } else {
+//                 } else {
 
-                    save(me);
+//                     save(me);
 
-                }
+//                 }
 
 
-            }
-        },
-        commands:{
-            'clearlocaldata':{
-                execCommand:function (cmd, name) {
-                    if ( saveKey && me.getPreferences( saveKey ) ) {
-                        me.removePreferences( saveKey )
-                    }
-                },
-                notNeedUndo: true,
-                ignoreContentChange:true
-            },
+//             }
+//         },
+//         commands:{
+//             'clearlocaldata':{
+//                 execCommand:function (cmd, name) {
+//                     if ( saveKey && me.getPreferences( saveKey ) ) {
+//                         me.removePreferences( saveKey )
+//                     }
+//                 },
+//                 notNeedUndo: true,
+//                 ignoreContentChange:true
+//             },
 
-            'getlocaldata':{
-                execCommand:function (cmd, name) {
-                    return saveKey ? me.getPreferences( saveKey ) || '' : '';
-                },
-                notNeedUndo: true,
-                ignoreContentChange:true
-            },
+//             'getlocaldata':{
+//                 execCommand:function (cmd, name) {
+//                     return saveKey ? me.getPreferences( saveKey ) || '' : '';
+//                 },
+//                 notNeedUndo: true,
+//                 ignoreContentChange:true
+//             },
 
-            'drafts':{
-                execCommand:function (cmd, name) {
-                    if ( saveKey ) {
-                        me.body.innerHTML = me.getPreferences( saveKey ) || '<p>'+domUtils.fillHtml+'</p>';
-                        me.focus(true);
-                    }
-                },
-                queryCommandState: function () {
-                    return saveKey ? ( me.getPreferences( saveKey ) === null ? -1 : 0 ) : -1;
-                },
-                notNeedUndo: true,
-                ignoreContentChange:true
-            }
-        }
-    }
+//             'drafts':{
+//                 execCommand:function (cmd, name) {
+//                     if ( saveKey ) {
+//                         me.body.innerHTML = me.getPreferences( saveKey ) || '<p>'+domUtils.fillHtml+'</p>';
+//                         me.focus(true);
+//                     }
+//                 },
+//                 queryCommandState: function () {
+//                     return saveKey ? ( me.getPreferences( saveKey ) === null ? -1 : 0 ) : -1;
+//                 },
+//                 notNeedUndo: true,
+//                 ignoreContentChange:true
+//             }
+//         }
+//     }
 
-});
+// });
 
 // plugins/charts.js
-UE.plugin.register('charts', function (){
+// UE.plugin.register('charts', function (){
 
-    var me = this;
+//     var me = this;
 
-    return {
-        bindEvents: {
-            'chartserror': function () {
-            }
-        },
-        commands:{
-            'charts': {
-                execCommand: function ( cmd, data ) {
+//     return {
+//         bindEvents: {
+//             'chartserror': function () {
+//             }
+//         },
+//         commands:{
+//             'charts': {
+//                 execCommand: function ( cmd, data ) {
 
-                    var tableNode = domUtils.findParentByTagName(this.selection.getRange().startContainer, 'table', true),
-                        flagText = [],
-                        config = {};
+//                     var tableNode = domUtils.findParentByTagName(this.selection.getRange().startContainer, 'table', true),
+//                         flagText = [],
+//                         config = {};
 
-                    if ( !tableNode ) {
-                        return false;
-                    }
+//                     if ( !tableNode ) {
+//                         return false;
+//                     }
 
-                    if ( !validData( tableNode ) ) {
-                        me.fireEvent( "chartserror" );
-                        return false;
-                    }
+//                     if ( !validData( tableNode ) ) {
+//                         me.fireEvent( "chartserror" );
+//                         return false;
+//                     }
 
-                    config.title = data.title || '';
-                    config.subTitle = data.subTitle || '';
-                    config.xTitle = data.xTitle || '';
-                    config.yTitle = data.yTitle || '';
-                    config.suffix = data.suffix || '';
-                    config.tip = data.tip || '';
-                    //数据对齐方式
-                    config.dataFormat = data.tableDataFormat || '';
-                    //图表类型
-                    config.chartType = data.chartType || 0;
+//                     config.title = data.title || '';
+//                     config.subTitle = data.subTitle || '';
+//                     config.xTitle = data.xTitle || '';
+//                     config.yTitle = data.yTitle || '';
+//                     config.suffix = data.suffix || '';
+//                     config.tip = data.tip || '';
+//                     //数据对齐方式
+//                     config.dataFormat = data.tableDataFormat || '';
+//                     //图表类型
+//                     config.chartType = data.chartType || 0;
 
-                    for ( var key in config ) {
+//                     for ( var key in config ) {
 
-                        if ( !config.hasOwnProperty( key ) ) {
-                            continue;
-                        }
+//                         if ( !config.hasOwnProperty( key ) ) {
+//                             continue;
+//                         }
 
-                        flagText.push( key+":"+config[ key ] );
+//                         flagText.push( key+":"+config[ key ] );
 
-                    }
+//                     }
 
-                    tableNode.setAttribute( "data-chart", flagText.join( ";" ) );
-                    domUtils.addClass( tableNode, "edui-charts-table" );
+//                     tableNode.setAttribute( "data-chart", flagText.join( ";" ) );
+//                     domUtils.addClass( tableNode, "edui-charts-table" );
 
 
 
-                },
-                queryCommandState: function ( cmd, name ) {
+//                 },
+//                 queryCommandState: function ( cmd, name ) {
 
-                    var tableNode = domUtils.findParentByTagName(this.selection.getRange().startContainer, 'table', true);
-                    return tableNode && validData( tableNode ) ? 0 : -1;
+//                     var tableNode = domUtils.findParentByTagName(this.selection.getRange().startContainer, 'table', true);
+//                     return tableNode && validData( tableNode ) ? 0 : -1;
 
-                }
-            }
-        },
-        inputRule:function(root){
-            utils.each(root.getNodesByTagName('table'),function( tableNode ){
+//                 }
+//             }
+//         },
+//         inputRule:function(root){
+//             utils.each(root.getNodesByTagName('table'),function( tableNode ){
 
-                if ( tableNode.getAttr("data-chart") !== undefined ) {
-                    tableNode.setAttr("style");
-                }
+//                 if ( tableNode.getAttr("data-chart") !== undefined ) {
+//                     tableNode.setAttr("style");
+//                 }
 
-            })
+//             })
 
-        },
-        outputRule:function(root){
-            utils.each(root.getNodesByTagName('table'),function( tableNode ){
+//         },
+//         outputRule:function(root){
+//             utils.each(root.getNodesByTagName('table'),function( tableNode ){
 
-                if ( tableNode.getAttr("data-chart") !== undefined ) {
-                    tableNode.setAttr("style", "display: none;");
-                }
+//                 if ( tableNode.getAttr("data-chart") !== undefined ) {
+//                     tableNode.setAttr("style", "display: none;");
+//                 }
 
-            })
+//             })
 
-        }
-    }
+//         }
+//     }
 
-    function validData ( table ) {
+//     function validData ( table ) {
 
-        var firstRows = null,
-            cellCount = 0;
+//         var firstRows = null,
+//             cellCount = 0;
 
-        //行数不够
-        if ( table.rows.length < 2 ) {
-            return false;
-        }
+//         //行数不够
+//         if ( table.rows.length < 2 ) {
+//             return false;
+//         }
 
-        //列数不够
-        if ( table.rows[0].cells.length < 2 ) {
-            return false;
-        }
+//         //列数不够
+//         if ( table.rows[0].cells.length < 2 ) {
+//             return false;
+//         }
 
-        //第一行所有cell必须是th
-        firstRows = table.rows[ 0 ].cells;
-        cellCount = firstRows.length;
+//         //第一行所有cell必须是th
+//         firstRows = table.rows[ 0 ].cells;
+//         cellCount = firstRows.length;
 
-        for ( var i = 0, cell; cell = firstRows[ i ]; i++ ) {
+//         for ( var i = 0, cell; cell = firstRows[ i ]; i++ ) {
 
-            if ( cell.tagName.toLowerCase() !== 'th' ) {
-                return false;
-            }
+//             if ( cell.tagName.toLowerCase() !== 'th' ) {
+//                 return false;
+//             }
 
-        }
+//         }
 
-        for ( var i = 1, row; row = table.rows[ i ]; i++ ) {
+//         for ( var i = 1, row; row = table.rows[ i ]; i++ ) {
 
-            //每行单元格数不匹配， 返回false
-            if ( row.cells.length != cellCount ) {
-                return false;
-            }
+//             //每行单元格数不匹配， 返回false
+//             if ( row.cells.length != cellCount ) {
+//                 return false;
+//             }
 
-            //第一列不是th也返回false
-            if ( row.cells[0].tagName.toLowerCase() !== 'th' ) {
-                return false;
-            }
+//             //第一列不是th也返回false
+//             if ( row.cells[0].tagName.toLowerCase() !== 'th' ) {
+//                 return false;
+//             }
 
-            for ( var j = 1, cell; cell = row.cells[ j ]; j++ ) {
+//             for ( var j = 1, cell; cell = row.cells[ j ]; j++ ) {
 
-                var value = utils.trim( ( cell.innerText || cell.textContent || '' ) );
+//                 var value = utils.trim( ( cell.innerText || cell.textContent || '' ) );
 
-                value = value.replace( new RegExp( UE.dom.domUtils.fillChar, 'g' ), '' ).replace( /^\s+|\s+$/g, '' );
+//                 value = value.replace( new RegExp( UE.dom.domUtils.fillChar, 'g' ), '' ).replace( /^\s+|\s+$/g, '' );
 
-                //必须是数字
-                if ( !/^\d*\.?\d+$/.test( value ) ) {
-                    return false;
-                }
+//                 //必须是数字
+//                 if ( !/^\d*\.?\d+$/.test( value ) ) {
+//                     return false;
+//                 }
 
-            }
+//             }
 
-        }
+//         }
 
-        return true;
+//         return true;
 
-    }
+//     }
 
-});
+// });
 
 // plugins/section.js
 /**
@@ -24503,270 +24503,270 @@ UE.plugin.register('charts', function (){
  * @file
  * @since 1.3.0
  */
-UE.plugin.register('section', function (){
-    /* 目录节点对象 */
-    function Section(option){
-        this.tag = '';
-        this.level = -1,
-            this.dom = null;
-        this.nextSection = null;
-        this.previousSection = null;
-        this.parentSection = null;
-        this.startAddress = [];
-        this.endAddress = [];
-        this.children = [];
-    }
-    function getSection(option) {
-        var section = new Section();
-        return utils.extend(section, option);
-    }
-    function getNodeFromAddress(startAddress, root) {
-        var current = root;
-        for(var i = 0;i < startAddress.length; i++) {
-            if(!current.childNodes) return null;
-            current = current.childNodes[startAddress[i]];
-        }
-        return current;
-    }
+// UE.plugin.register('section', function (){
+//     /* 目录节点对象 */
+//     function Section(option){
+//         this.tag = '';
+//         this.level = -1,
+//             this.dom = null;
+//         this.nextSection = null;
+//         this.previousSection = null;
+//         this.parentSection = null;
+//         this.startAddress = [];
+//         this.endAddress = [];
+//         this.children = [];
+//     }
+//     function getSection(option) {
+//         var section = new Section();
+//         return utils.extend(section, option);
+//     }
+//     function getNodeFromAddress(startAddress, root) {
+//         var current = root;
+//         for(var i = 0;i < startAddress.length; i++) {
+//             if(!current.childNodes) return null;
+//             current = current.childNodes[startAddress[i]];
+//         }
+//         return current;
+//     }
 
-    var me = this;
+//     var me = this;
 
-    return {
-        bindMultiEvents:{
-            type: 'aftersetcontent afterscencerestore',
-            handler: function(){
-                me.fireEvent('updateSections');
-            }
-        },
-        bindEvents:{
-            /* 初始化、拖拽、粘贴、执行setcontent之后 */
-            'ready': function (){
-                me.fireEvent('updateSections');
-                domUtils.on(me.body, 'drop paste', function(){
-                    me.fireEvent('updateSections');
-                });
-            },
-            /* 执行paragraph命令之后 */
-            'afterexeccommand': function (type, cmd) {
-                if(cmd == 'paragraph') {
-                    me.fireEvent('updateSections');
-                }
-            },
-            /* 部分键盘操作，触发updateSections事件 */
-            'keyup': function (type, e) {
-                var me = this,
-                    range = me.selection.getRange();
-                if(range.collapsed != true) {
-                    me.fireEvent('updateSections');
-                } else {
-                    var keyCode = e.keyCode || e.which;
-                    if(keyCode == 13 || keyCode == 8 || keyCode == 46) {
-                        me.fireEvent('updateSections');
-                    }
-                }
-            }
-        },
-        commands:{
-            'getsections': {
-                execCommand: function (cmd, levels) {
-                    var levelFn = levels || ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+//     return {
+//         bindMultiEvents:{
+//             type: 'aftersetcontent afterscencerestore',
+//             handler: function(){
+//                 me.fireEvent('updateSections');
+//             }
+//         },
+//         bindEvents:{
+//             /* 初始化、拖拽、粘贴、执行setcontent之后 */
+//             'ready': function (){
+//                 me.fireEvent('updateSections');
+//                 domUtils.on(me.body, 'drop paste', function(){
+//                     me.fireEvent('updateSections');
+//                 });
+//             },
+//             /* 执行paragraph命令之后 */
+//             'afterexeccommand': function (type, cmd) {
+//                 if(cmd == 'paragraph') {
+//                     me.fireEvent('updateSections');
+//                 }
+//             },
+//             /* 部分键盘操作，触发updateSections事件 */
+//             'keyup': function (type, e) {
+//                 var me = this,
+//                     range = me.selection.getRange();
+//                 if(range.collapsed != true) {
+//                     me.fireEvent('updateSections');
+//                 } else {
+//                     var keyCode = e.keyCode || e.which;
+//                     if(keyCode == 13 || keyCode == 8 || keyCode == 46) {
+//                         me.fireEvent('updateSections');
+//                     }
+//                 }
+//             }
+//         },
+//         commands:{
+//             'getsections': {
+//                 execCommand: function (cmd, levels) {
+//                     var levelFn = levels || ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 
-                    for (var i = 0; i < levelFn.length; i++) {
-                        if (typeof levelFn[i] == 'string') {
-                            levelFn[i] = function(fn){
-                                return function(node){
-                                    return node.tagName == fn.toUpperCase()
-                                };
-                            }(levelFn[i]);
-                        } else if (typeof levelFn[i] != 'function') {
-                            levelFn[i] = function (node) {
-                                return null;
-                            }
-                        }
-                    }
-                    function getSectionLevel(node) {
-                        for (var i = 0; i < levelFn.length; i++) {
-                            if (levelFn[i](node)) return i;
-                        }
-                        return -1;
-                    }
+//                     for (var i = 0; i < levelFn.length; i++) {
+//                         if (typeof levelFn[i] == 'string') {
+//                             levelFn[i] = function(fn){
+//                                 return function(node){
+//                                     return node.tagName == fn.toUpperCase()
+//                                 };
+//                             }(levelFn[i]);
+//                         } else if (typeof levelFn[i] != 'function') {
+//                             levelFn[i] = function (node) {
+//                                 return null;
+//                             }
+//                         }
+//                     }
+//                     function getSectionLevel(node) {
+//                         for (var i = 0; i < levelFn.length; i++) {
+//                             if (levelFn[i](node)) return i;
+//                         }
+//                         return -1;
+//                     }
 
-                    var me = this,
-                        Directory = getSection({'level':-1, 'title':'root'}),
-                        previous = Directory;
+//                     var me = this,
+//                         Directory = getSection({'level':-1, 'title':'root'}),
+//                         previous = Directory;
 
-                    function traversal(node, Directory) {
-                        var level,
-                            tmpSection = null,
-                            parent,
-                            child,
-                            children = node.childNodes;
-                        for (var i = 0, len = children.length; i < len; i++) {
-                            child = children[i];
-                            level = getSectionLevel(child);
-                            if (level >= 0) {
-                                var address = me.selection.getRange().selectNode(child).createAddress(true).startAddress,
-                                    current = getSection({
-                                        'tag': child.tagName,
-                                        'title': child.innerText || child.textContent || '',
-                                        'level': level,
-                                        'dom': child,
-                                        'startAddress': utils.clone(address, []),
-                                        'endAddress': utils.clone(address, []),
-                                        'children': []
-                                    });
-                                previous.nextSection = current;
-                                current.previousSection = previous;
-                                parent = previous;
-                                while(level <= parent.level){
-                                    parent = parent.parentSection;
-                                }
-                                current.parentSection = parent;
-                                parent.children.push(current);
-                                tmpSection = previous = current;
-                            } else {
-                                child.nodeType === 1 && traversal(child, Directory);
-                                tmpSection && tmpSection.endAddress[tmpSection.endAddress.length - 1] ++;
-                            }
-                        }
-                    }
-                    traversal(me.body, Directory);
-                    return Directory;
-                },
-                notNeedUndo: true
-            },
-            'movesection': {
-                execCommand: function (cmd, sourceSection, targetSection, isAfter) {
+//                     function traversal(node, Directory) {
+//                         var level,
+//                             tmpSection = null,
+//                             parent,
+//                             child,
+//                             children = node.childNodes;
+//                         for (var i = 0, len = children.length; i < len; i++) {
+//                             child = children[i];
+//                             level = getSectionLevel(child);
+//                             if (level >= 0) {
+//                                 var address = me.selection.getRange().selectNode(child).createAddress(true).startAddress,
+//                                     current = getSection({
+//                                         'tag': child.tagName,
+//                                         'title': child.innerText || child.textContent || '',
+//                                         'level': level,
+//                                         'dom': child,
+//                                         'startAddress': utils.clone(address, []),
+//                                         'endAddress': utils.clone(address, []),
+//                                         'children': []
+//                                     });
+//                                 previous.nextSection = current;
+//                                 current.previousSection = previous;
+//                                 parent = previous;
+//                                 while(level <= parent.level){
+//                                     parent = parent.parentSection;
+//                                 }
+//                                 current.parentSection = parent;
+//                                 parent.children.push(current);
+//                                 tmpSection = previous = current;
+//                             } else {
+//                                 child.nodeType === 1 && traversal(child, Directory);
+//                                 tmpSection && tmpSection.endAddress[tmpSection.endAddress.length - 1] ++;
+//                             }
+//                         }
+//                     }
+//                     traversal(me.body, Directory);
+//                     return Directory;
+//                 },
+//                 notNeedUndo: true
+//             },
+//             'movesection': {
+//                 execCommand: function (cmd, sourceSection, targetSection, isAfter) {
 
-                    var me = this,
-                        targetAddress,
-                        target;
+//                     var me = this,
+//                         targetAddress,
+//                         target;
 
-                    if(!sourceSection || !targetSection || targetSection.level == -1) return;
+//                     if(!sourceSection || !targetSection || targetSection.level == -1) return;
 
-                    targetAddress = isAfter ? targetSection.endAddress:targetSection.startAddress;
-                    target = getNodeFromAddress(targetAddress, me.body);
+//                     targetAddress = isAfter ? targetSection.endAddress:targetSection.startAddress;
+//                     target = getNodeFromAddress(targetAddress, me.body);
 
-                    /* 判断目标地址是否被源章节包含 */
-                    if(!targetAddress || !target || isContainsAddress(sourceSection.startAddress, sourceSection.endAddress, targetAddress)) return;
+//                     /* 判断目标地址是否被源章节包含 */
+//                     if(!targetAddress || !target || isContainsAddress(sourceSection.startAddress, sourceSection.endAddress, targetAddress)) return;
 
-                    var startNode = getNodeFromAddress(sourceSection.startAddress, me.body),
-                        endNode = getNodeFromAddress(sourceSection.endAddress, me.body),
-                        current,
-                        nextNode;
+//                     var startNode = getNodeFromAddress(sourceSection.startAddress, me.body),
+//                         endNode = getNodeFromAddress(sourceSection.endAddress, me.body),
+//                         current,
+//                         nextNode;
 
-                    if(isAfter) {
-                        current = endNode;
-                        while ( current && !(domUtils.getPosition( startNode, current ) & domUtils.POSITION_FOLLOWING) ) {
-                            nextNode = current.previousSibling;
-                            domUtils.insertAfter(target, current);
-                            if(current == startNode) break;
-                            current = nextNode;
-                        }
-                    } else {
-                        current = startNode;
-                        while ( current && !(domUtils.getPosition( current, endNode ) & domUtils.POSITION_FOLLOWING) ) {
-                            nextNode = current.nextSibling;
-                            target.parentNode.insertBefore(current, target);
-                            if(current == endNode) break;
-                            current = nextNode;
-                        }
-                    }
+//                     if(isAfter) {
+//                         current = endNode;
+//                         while ( current && !(domUtils.getPosition( startNode, current ) & domUtils.POSITION_FOLLOWING) ) {
+//                             nextNode = current.previousSibling;
+//                             domUtils.insertAfter(target, current);
+//                             if(current == startNode) break;
+//                             current = nextNode;
+//                         }
+//                     } else {
+//                         current = startNode;
+//                         while ( current && !(domUtils.getPosition( current, endNode ) & domUtils.POSITION_FOLLOWING) ) {
+//                             nextNode = current.nextSibling;
+//                             target.parentNode.insertBefore(current, target);
+//                             if(current == endNode) break;
+//                             current = nextNode;
+//                         }
+//                     }
 
-                    me.fireEvent('updateSections');
+//                     me.fireEvent('updateSections');
 
-                    /* 获取地址的包含关系 */
-                    function isContainsAddress(startAddress, endAddress, addressTarget){
-                        var isAfterStartAddress = false,
-                            isBeforeEndAddress = false;
-                        for(var i = 0; i< startAddress.length; i++){
-                            if(i >= addressTarget.length) break;
-                            if(addressTarget[i] > startAddress[i]) {
-                                isAfterStartAddress = true;
-                                break;
-                            } else if(addressTarget[i] < startAddress[i]) {
-                                break;
-                            }
-                        }
-                        for(var i = 0; i< endAddress.length; i++){
-                            if(i >= addressTarget.length) break;
-                            if(addressTarget[i] < startAddress[i]) {
-                                isBeforeEndAddress = true;
-                                break;
-                            } else if(addressTarget[i] > startAddress[i]) {
-                                break;
-                            }
-                        }
-                        return isAfterStartAddress && isBeforeEndAddress;
-                    }
-                }
-            },
-            'deletesection': {
-                execCommand: function (cmd, section, keepChildren) {
-                    var me = this;
+//                     /* 获取地址的包含关系 */
+//                     function isContainsAddress(startAddress, endAddress, addressTarget){
+//                         var isAfterStartAddress = false,
+//                             isBeforeEndAddress = false;
+//                         for(var i = 0; i< startAddress.length; i++){
+//                             if(i >= addressTarget.length) break;
+//                             if(addressTarget[i] > startAddress[i]) {
+//                                 isAfterStartAddress = true;
+//                                 break;
+//                             } else if(addressTarget[i] < startAddress[i]) {
+//                                 break;
+//                             }
+//                         }
+//                         for(var i = 0; i< endAddress.length; i++){
+//                             if(i >= addressTarget.length) break;
+//                             if(addressTarget[i] < startAddress[i]) {
+//                                 isBeforeEndAddress = true;
+//                                 break;
+//                             } else if(addressTarget[i] > startAddress[i]) {
+//                                 break;
+//                             }
+//                         }
+//                         return isAfterStartAddress && isBeforeEndAddress;
+//                     }
+//                 }
+//             },
+//             'deletesection': {
+//                 execCommand: function (cmd, section, keepChildren) {
+//                     var me = this;
 
-                    if(!section) return;
+//                     if(!section) return;
 
-                    function getNodeFromAddress(startAddress) {
-                        var current = me.body;
-                        for(var i = 0;i < startAddress.length; i++) {
-                            if(!current.childNodes) return null;
-                            current = current.childNodes[startAddress[i]];
-                        }
-                        return current;
-                    }
+//                     function getNodeFromAddress(startAddress) {
+//                         var current = me.body;
+//                         for(var i = 0;i < startAddress.length; i++) {
+//                             if(!current.childNodes) return null;
+//                             current = current.childNodes[startAddress[i]];
+//                         }
+//                         return current;
+//                     }
 
-                    var startNode = getNodeFromAddress(section.startAddress),
-                        endNode = getNodeFromAddress(section.endAddress),
-                        current = startNode,
-                        nextNode;
+//                     var startNode = getNodeFromAddress(section.startAddress),
+//                         endNode = getNodeFromAddress(section.endAddress),
+//                         current = startNode,
+//                         nextNode;
 
-                    if(!keepChildren) {
-                        while ( current && domUtils.inDoc(endNode, me.document) && !(domUtils.getPosition( current, endNode ) & domUtils.POSITION_FOLLOWING) ) {
-                            nextNode = current.nextSibling;
-                            domUtils.remove(current);
-                            current = nextNode;
-                        }
-                    } else {
-                        domUtils.remove(current);
-                    }
+//                     if(!keepChildren) {
+//                         while ( current && domUtils.inDoc(endNode, me.document) && !(domUtils.getPosition( current, endNode ) & domUtils.POSITION_FOLLOWING) ) {
+//                             nextNode = current.nextSibling;
+//                             domUtils.remove(current);
+//                             current = nextNode;
+//                         }
+//                     } else {
+//                         domUtils.remove(current);
+//                     }
 
-                    me.fireEvent('updateSections');
-                }
-            },
-            'selectsection': {
-                execCommand: function (cmd, section) {
-                    if(!section && !section.dom) return false;
-                    var me = this,
-                        range = me.selection.getRange(),
-                        address = {
-                            'startAddress':utils.clone(section.startAddress, []),
-                            'endAddress':utils.clone(section.endAddress, [])
-                        };
-                    address.endAddress[address.endAddress.length - 1]++;
-                    range.moveToAddress(address).select().scrollToView();
-                    return true;
-                },
-                notNeedUndo: true
-            },
-            'scrolltosection': {
-                execCommand: function (cmd, section) {
-                    if(!section && !section.dom) return false;
-                    var me = this,
-                        range = me.selection.getRange(),
-                        address = {
-                            'startAddress':section.startAddress,
-                            'endAddress':section.endAddress
-                        };
-                    address.endAddress[address.endAddress.length - 1]++;
-                    range.moveToAddress(address).scrollToView();
-                    return true;
-                },
-                notNeedUndo: true
-            }
-        }
-    }
-});
+//                     me.fireEvent('updateSections');
+//                 }
+//             },
+//             'selectsection': {
+//                 execCommand: function (cmd, section) {
+//                     if(!section && !section.dom) return false;
+//                     var me = this,
+//                         range = me.selection.getRange(),
+//                         address = {
+//                             'startAddress':utils.clone(section.startAddress, []),
+//                             'endAddress':utils.clone(section.endAddress, [])
+//                         };
+//                     address.endAddress[address.endAddress.length - 1]++;
+//                     range.moveToAddress(address).select().scrollToView();
+//                     return true;
+//                 },
+//                 notNeedUndo: true
+//             },
+//             'scrolltosection': {
+//                 execCommand: function (cmd, section) {
+//                     if(!section && !section.dom) return false;
+//                     var me = this,
+//                         range = me.selection.getRange(),
+//                         address = {
+//                             'startAddress':section.startAddress,
+//                             'endAddress':section.endAddress
+//                         };
+//                     address.endAddress[address.endAddress.length - 1]++;
+//                     range.moveToAddress(address).scrollToView();
+//                     return true;
+//                 },
+//                 notNeedUndo: true
+//             }
+//         }
+//     }
+// });
 
 // plugins/simpleupload.js
 /**
@@ -24775,172 +24775,172 @@ UE.plugin.register('section', function (){
  * @author Jinqn
  * @date 2014-03-31
  */
-UE.plugin.register('simpleupload', function (){
-    var me = this,
-        isLoaded = false,
-        containerBtn;
+// UE.plugin.register('simpleupload', function (){
+//     var me = this,
+//         isLoaded = false,
+//         containerBtn;
 
-    function initUploadBtn(){
-        var w = containerBtn.offsetWidth || 20,
-            h = containerBtn.offsetHeight || 20,
-            btnIframe = document.createElement('iframe'),
-            btnStyle = 'display:block;width:' + w + 'px;height:' + h + 'px;overflow:hidden;border:0;margin:0;padding:0;position:absolute;top:0;left:0;filter:alpha(opacity=0);-moz-opacity:0;-khtml-opacity: 0;opacity: 0;cursor:pointer;';
+//     function initUploadBtn(){
+//         var w = containerBtn.offsetWidth || 20,
+//             h = containerBtn.offsetHeight || 20,
+//             btnIframe = document.createElement('iframe'),
+//             btnStyle = 'display:block;width:' + w + 'px;height:' + h + 'px;overflow:hidden;border:0;margin:0;padding:0;position:absolute;top:0;left:0;filter:alpha(opacity=0);-moz-opacity:0;-khtml-opacity: 0;opacity: 0;cursor:pointer;';
 
-        domUtils.on(btnIframe, 'load', function(){
+//         domUtils.on(btnIframe, 'load', function(){
 
-            var timestrap = (+new Date()).toString(36),
-                wrapper,
-                btnIframeDoc,
-                btnIframeBody;
+//             var timestrap = (+new Date()).toString(36),
+//                 wrapper,
+//                 btnIframeDoc,
+//                 btnIframeBody;
 
-            btnIframeDoc = (btnIframe.contentDocument || btnIframe.contentWindow.document);
-            btnIframeBody = btnIframeDoc.body;
-            wrapper = btnIframeDoc.createElement('div');
+//             btnIframeDoc = (btnIframe.contentDocument || btnIframe.contentWindow.document);
+//             btnIframeBody = btnIframeDoc.body;
+//             wrapper = btnIframeDoc.createElement('div');
 
-            wrapper.innerHTML = '<form id="edui_form_' + timestrap + '" target="edui_iframe_' + timestrap + '" method="POST" enctype="multipart/form-data" action="' + me.getOpt('serverUrl') + '" ' +
-            'style="' + btnStyle + '">' +
-            '<input id="edui_input_' + timestrap + '" type="file" accept="image/*" name="' + me.options.imageFieldName + '" ' +
-            'style="' + btnStyle + '">' +
-            '</form>' +
-            '<iframe id="edui_iframe_' + timestrap + '" name="edui_iframe_' + timestrap + '" style="display:none;width:0;height:0;border:0;margin:0;padding:0;position:absolute;"></iframe>';
+//             wrapper.innerHTML = '<form id="edui_form_' + timestrap + '" target="edui_iframe_' + timestrap + '" method="POST" enctype="multipart/form-data" action="' + me.getOpt('serverUrl') + '" ' +
+//             'style="' + btnStyle + '">' +
+//             '<input id="edui_input_' + timestrap + '" type="file" accept="image/*" name="' + me.options.imageFieldName + '" ' +
+//             'style="' + btnStyle + '">' +
+//             '</form>' +
+//             '<iframe id="edui_iframe_' + timestrap + '" name="edui_iframe_' + timestrap + '" style="display:none;width:0;height:0;border:0;margin:0;padding:0;position:absolute;"></iframe>';
 
-            wrapper.className = 'edui-' + me.options.theme;
-            wrapper.id = me.ui.id + '_iframeupload';
-            btnIframeBody.style.cssText = btnStyle;
-            btnIframeBody.style.width = w + 'px';
-            btnIframeBody.style.height = h + 'px';
-            btnIframeBody.appendChild(wrapper);
+//             wrapper.className = 'edui-' + me.options.theme;
+//             wrapper.id = me.ui.id + '_iframeupload';
+//             btnIframeBody.style.cssText = btnStyle;
+//             btnIframeBody.style.width = w + 'px';
+//             btnIframeBody.style.height = h + 'px';
+//             btnIframeBody.appendChild(wrapper);
 
-            if (btnIframeBody.parentNode) {
-                btnIframeBody.parentNode.style.width = w + 'px';
-                btnIframeBody.parentNode.style.height = w + 'px';
-            }
+//             if (btnIframeBody.parentNode) {
+//                 btnIframeBody.parentNode.style.width = w + 'px';
+//                 btnIframeBody.parentNode.style.height = w + 'px';
+//             }
 
-            var form = btnIframeDoc.getElementById('edui_form_' + timestrap);
-            var input = btnIframeDoc.getElementById('edui_input_' + timestrap);
-            var iframe = btnIframeDoc.getElementById('edui_iframe_' + timestrap);
+//             var form = btnIframeDoc.getElementById('edui_form_' + timestrap);
+//             var input = btnIframeDoc.getElementById('edui_input_' + timestrap);
+//             var iframe = btnIframeDoc.getElementById('edui_iframe_' + timestrap);
 
-            domUtils.on(input, 'change', function(){
-                if(!input.value) return;
-                var loadingId = 'loading_' + (+new Date()).toString(36);
-                var params = utils.serializeParam(me.queryCommandValue('serverparam')) || '';
+//             domUtils.on(input, 'change', function(){
+//                 if(!input.value) return;
+//                 var loadingId = 'loading_' + (+new Date()).toString(36);
+//                 var params = utils.serializeParam(me.queryCommandValue('serverparam')) || '';
 
-                var imageActionUrl = me.getActionUrl(me.getOpt('imageActionName'));
-                var allowFiles = me.getOpt('imageAllowFiles');
+//                 var imageActionUrl = me.getActionUrl(me.getOpt('imageActionName'));
+//                 var allowFiles = me.getOpt('imageAllowFiles');
 
-                me.focus();
-                me.execCommand('inserthtml', '<img class="loadingclass" id="' + loadingId + '" src="' + me.options.themePath + me.options.theme +'/images/spacer.gif" title="' + (me.getLang('simpleupload.loading') || '') + '" >');
+//                 me.focus();
+//                 me.execCommand('inserthtml', '<img class="loadingclass" id="' + loadingId + '" src="' + me.options.themePath + me.options.theme +'/images/spacer.gif" title="' + (me.getLang('simpleupload.loading') || '') + '" >');
 
-                function callback(){
-                    try{
-                        var link, json, loader,
-                            body = (iframe.contentDocument || iframe.contentWindow.document).body,
-                            result = body.innerText || body.textContent || '';
-                        json = (new Function("return " + result))();
-                        link = me.options.imageUrlPrefix + json.url;
-                        if(json.state == 'SUCCESS' && json.url) {
-                            loader = me.document.getElementById(loadingId);
-                            loader.setAttribute('src', link);
-                            loader.setAttribute('_src', link);
-                            loader.setAttribute('title', json.title || '');
-                            loader.setAttribute('alt', json.original || '');
-                            loader.removeAttribute('id');
-                            domUtils.removeClasses(loader, 'loadingclass');
-                        } else {
-                            showErrorLoader && showErrorLoader(json.state);
-                        }
-                    }catch(er){
-                        showErrorLoader && showErrorLoader(me.getLang('simpleupload.loadError'));
-                    }
-                    form.reset();
-                    domUtils.un(iframe, 'load', callback);
-                }
-                function showErrorLoader(title){
-                    if(loadingId) {
-                        var loader = me.document.getElementById(loadingId);
-                        loader && domUtils.remove(loader);
-                        me.fireEvent('showmessage', {
-                            'id': loadingId,
-                            'content': title,
-                            'type': 'error',
-                            'timeout': 4000
-                        });
-                    }
-                }
+//                 function callback(){
+//                     try{
+//                         var link, json, loader,
+//                             body = (iframe.contentDocument || iframe.contentWindow.document).body,
+//                             result = body.innerText || body.textContent || '';
+//                         json = (new Function("return " + result))();
+//                         link = me.options.imageUrlPrefix + json.url;
+//                         if(json.state == 'SUCCESS' && json.url) {
+//                             loader = me.document.getElementById(loadingId);
+//                             loader.setAttribute('src', link);
+//                             loader.setAttribute('_src', link);
+//                             loader.setAttribute('title', json.title || '');
+//                             loader.setAttribute('alt', json.original || '');
+//                             loader.removeAttribute('id');
+//                             domUtils.removeClasses(loader, 'loadingclass');
+//                         } else {
+//                             showErrorLoader && showErrorLoader(json.state);
+//                         }
+//                     }catch(er){
+//                         showErrorLoader && showErrorLoader(me.getLang('simpleupload.loadError'));
+//                     }
+//                     form.reset();
+//                     domUtils.un(iframe, 'load', callback);
+//                 }
+//                 function showErrorLoader(title){
+//                     if(loadingId) {
+//                         var loader = me.document.getElementById(loadingId);
+//                         loader && domUtils.remove(loader);
+//                         me.fireEvent('showmessage', {
+//                             'id': loadingId,
+//                             'content': title,
+//                             'type': 'error',
+//                             'timeout': 4000
+//                         });
+//                     }
+//                 }
 
-                /* 判断后端配置是否没有加载成功 */
-                if (!me.getOpt('imageActionName')) {
-                    errorHandler(me.getLang('autoupload.errorLoadConfig'));
-                    return;
-                }
-                // 判断文件格式是否错误
-                var filename = input.value,
-                    fileext = filename ? filename.substr(filename.lastIndexOf('.')):'';
-                if (!fileext || (allowFiles && (allowFiles.join('') + '.').indexOf(fileext.toLowerCase() + '.') == -1)) {
-                    showErrorLoader(me.getLang('simpleupload.exceedTypeError'));
-                    return;
-                }
+//                 /* 判断后端配置是否没有加载成功 */
+//                 if (!me.getOpt('imageActionName')) {
+//                     errorHandler(me.getLang('autoupload.errorLoadConfig'));
+//                     return;
+//                 }
+//                 // 判断文件格式是否错误
+//                 var filename = input.value,
+//                     fileext = filename ? filename.substr(filename.lastIndexOf('.')):'';
+//                 if (!fileext || (allowFiles && (allowFiles.join('') + '.').indexOf(fileext.toLowerCase() + '.') == -1)) {
+//                     showErrorLoader(me.getLang('simpleupload.exceedTypeError'));
+//                     return;
+//                 }
 
-                domUtils.on(iframe, 'load', callback);
-                form.action = utils.formatUrl(imageActionUrl + (imageActionUrl.indexOf('?') == -1 ? '?':'&') + params);
-                form.submit();
-            });
+//                 domUtils.on(iframe, 'load', callback);
+//                 form.action = utils.formatUrl(imageActionUrl + (imageActionUrl.indexOf('?') == -1 ? '?':'&') + params);
+//                 form.submit();
+//             });
 
-            var stateTimer;
-            me.addListener('selectionchange', function () {
-                clearTimeout(stateTimer);
-                stateTimer = setTimeout(function() {
-                    var state = me.queryCommandState('simpleupload');
-                    if (state == -1) {
-                        input.disabled = 'disabled';
-                    } else {
-                        input.disabled = false;
-                    }
-                }, 400);
-            });
-            isLoaded = true;
-        });
+//             var stateTimer;
+//             me.addListener('selectionchange', function () {
+//                 clearTimeout(stateTimer);
+//                 stateTimer = setTimeout(function() {
+//                     var state = me.queryCommandState('simpleupload');
+//                     if (state == -1) {
+//                         input.disabled = 'disabled';
+//                     } else {
+//                         input.disabled = false;
+//                     }
+//                 }, 400);
+//             });
+//             isLoaded = true;
+//         });
 
-        btnIframe.style.cssText = btnStyle;
-        containerBtn.appendChild(btnIframe);
-    }
+//         btnIframe.style.cssText = btnStyle;
+//         containerBtn.appendChild(btnIframe);
+//     }
 
-    return {
-        bindEvents:{
-            'ready': function() {
-                //设置loading的样式
-                utils.cssRule('loading',
-                    '.loadingclass{display:inline-block;cursor:default;background: url(\''
-                    + this.options.themePath
-                    + this.options.theme +'/images/loading.gif\') no-repeat center center transparent;border:1px solid #cccccc;margin-right:1px;height: 22px;width: 22px;}\n' +
-                    '.loaderrorclass{display:inline-block;cursor:default;background: url(\''
-                    + this.options.themePath
-                    + this.options.theme +'/images/loaderror.png\') no-repeat center center transparent;border:1px solid #cccccc;margin-right:1px;height: 22px;width: 22px;' +
-                    '}',
-                    this.document);
-            },
-            /* 初始化简单上传按钮 */
-            'simpleuploadbtnready': function(type, container) {
-                containerBtn = container;
-                me.afterConfigReady(initUploadBtn);
-            }
-        },
-        outputRule: function(root){
-            utils.each(root.getNodesByTagName('img'),function(n){
-                if (/\b(loaderrorclass)|(bloaderrorclass)\b/.test(n.getAttr('class'))) {
-                    n.parentNode.removeChild(n);
-                }
-            });
-        },
-        commands: {
-            'simpleupload': {
-                queryCommandState: function () {
-                    return isLoaded ? 0:-1;
-                }
-            }
-        }
-    }
-});
+//     return {
+//         bindEvents:{
+//             'ready': function() {
+//                 //设置loading的样式
+//                 utils.cssRule('loading',
+//                     '.loadingclass{display:inline-block;cursor:default;background: url(\''
+//                     + this.options.themePath
+//                     + this.options.theme +'/images/loading.gif\') no-repeat center center transparent;border:1px solid #cccccc;margin-right:1px;height: 22px;width: 22px;}\n' +
+//                     '.loaderrorclass{display:inline-block;cursor:default;background: url(\''
+//                     + this.options.themePath
+//                     + this.options.theme +'/images/loaderror.png\') no-repeat center center transparent;border:1px solid #cccccc;margin-right:1px;height: 22px;width: 22px;' +
+//                     '}',
+//                     this.document);
+//             },
+//             /* 初始化简单上传按钮 */
+//             'simpleuploadbtnready': function(type, container) {
+//                 containerBtn = container;
+//                 me.afterConfigReady(initUploadBtn);
+//             }
+//         },
+//         outputRule: function(root){
+//             utils.each(root.getNodesByTagName('img'),function(n){
+//                 if (/\b(loaderrorclass)|(bloaderrorclass)\b/.test(n.getAttr('class'))) {
+//                     n.parentNode.removeChild(n);
+//                 }
+//             });
+//         },
+//         commands: {
+//             'simpleupload': {
+//                 queryCommandState: function () {
+//                     return isLoaded ? 0:-1;
+//                 }
+//             }
+//         }
+//     }
+// });
 
 // plugins/serverparam.js
 /**
@@ -25056,70 +25056,70 @@ UE.plugin.register('serverparam', function (){
 /**
  * 插入附件
  */
-UE.plugin.register('insertfile', function (){
+// UE.plugin.register('insertfile', function (){
 
-    var me = this;
+//     var me = this;
 
-    function getFileIcon(url){
-        var ext = url.substr(url.lastIndexOf('.') + 1).toLowerCase(),
-            maps = {
-                "rar":"icon_rar.gif",
-                "zip":"icon_rar.gif",
-                "tar":"icon_rar.gif",
-                "gz":"icon_rar.gif",
-                "bz2":"icon_rar.gif",
-                "doc":"icon_doc.gif",
-                "docx":"icon_doc.gif",
-                "pdf":"icon_pdf.gif",
-                "mp3":"icon_mp3.gif",
-                "xls":"icon_xls.gif",
-                "chm":"icon_chm.gif",
-                "ppt":"icon_ppt.gif",
-                "pptx":"icon_ppt.gif",
-                "avi":"icon_mv.gif",
-                "rmvb":"icon_mv.gif",
-                "wmv":"icon_mv.gif",
-                "flv":"icon_mv.gif",
-                "swf":"icon_mv.gif",
-                "rm":"icon_mv.gif",
-                "exe":"icon_exe.gif",
-                "psd":"icon_psd.gif",
-                "txt":"icon_txt.gif",
-                "jpg":"icon_jpg.gif",
-                "png":"icon_jpg.gif",
-                "jpeg":"icon_jpg.gif",
-                "gif":"icon_jpg.gif",
-                "ico":"icon_jpg.gif",
-                "bmp":"icon_jpg.gif"
-            };
-        return maps[ext] ? maps[ext]:maps['txt'];
-    }
+//     function getFileIcon(url){
+//         var ext = url.substr(url.lastIndexOf('.') + 1).toLowerCase(),
+//             maps = {
+//                 "rar":"icon_rar.gif",
+//                 "zip":"icon_rar.gif",
+//                 "tar":"icon_rar.gif",
+//                 "gz":"icon_rar.gif",
+//                 "bz2":"icon_rar.gif",
+//                 "doc":"icon_doc.gif",
+//                 "docx":"icon_doc.gif",
+//                 "pdf":"icon_pdf.gif",
+//                 "mp3":"icon_mp3.gif",
+//                 "xls":"icon_xls.gif",
+//                 "chm":"icon_chm.gif",
+//                 "ppt":"icon_ppt.gif",
+//                 "pptx":"icon_ppt.gif",
+//                 "avi":"icon_mv.gif",
+//                 "rmvb":"icon_mv.gif",
+//                 "wmv":"icon_mv.gif",
+//                 "flv":"icon_mv.gif",
+//                 "swf":"icon_mv.gif",
+//                 "rm":"icon_mv.gif",
+//                 "exe":"icon_exe.gif",
+//                 "psd":"icon_psd.gif",
+//                 "txt":"icon_txt.gif",
+//                 "jpg":"icon_jpg.gif",
+//                 "png":"icon_jpg.gif",
+//                 "jpeg":"icon_jpg.gif",
+//                 "gif":"icon_jpg.gif",
+//                 "ico":"icon_jpg.gif",
+//                 "bmp":"icon_jpg.gif"
+//             };
+//         return maps[ext] ? maps[ext]:maps['txt'];
+//     }
 
-    return {
-        commands:{
-            'insertfile': {
-                execCommand: function (command, filelist){
-                    filelist = utils.isArray(filelist) ? filelist : [filelist];
+//     return {
+//         commands:{
+//             'insertfile': {
+//                 execCommand: function (command, filelist){
+//                     filelist = utils.isArray(filelist) ? filelist : [filelist];
 
-                    var i, item, icon, title,
-                        html = '',
-                        URL = me.getOpt('UEDITOR_HOME_URL'),
-                        iconDir = URL + (URL.substr(URL.length - 1) == '/' ? '':'/') + 'dialogs/attachment/fileTypeImages/';
-                    for (i = 0; i < filelist.length; i++) {
-                        item = filelist[i];
-                        icon = iconDir + getFileIcon(item.url);
-                        title = item.title || item.url.substr(item.url.lastIndexOf('/') + 1);
-                        html += '<p style="line-height: 16px;">' +
-                            '<img style="vertical-align: middle; margin-right: 2px;" src="'+ icon + '" _src="' + icon + '" />' +
-                            '<a style="font-size:12px; color:#0066cc;" href="' + item.url +'" title="' + title + '">' + title + '</a>' +
-                            '</p>';
-                    }
-                    me.execCommand('insertHtml', html);
-                }
-            }
-        }
-    }
-});
+//                     var i, item, icon, title,
+//                         html = '',
+//                         URL = me.getOpt('UEDITOR_HOME_URL'),
+//                         iconDir = URL + (URL.substr(URL.length - 1) == '/' ? '':'/') + 'dialogs/attachment/fileTypeImages/';
+//                     for (i = 0; i < filelist.length; i++) {
+//                         item = filelist[i];
+//                         icon = iconDir + getFileIcon(item.url);
+//                         title = item.title || item.url.substr(item.url.lastIndexOf('/') + 1);
+//                         html += '<p style="line-height: 16px;">' +
+//                             '<img style="vertical-align: middle; margin-right: 2px;" src="'+ icon + '" _src="' + icon + '" />' +
+//                             '<a style="font-size:12px; color:#0066cc;" href="' + item.url +'" title="' + title + '">' + title + '</a>' +
+//                             '</p>';
+//                     }
+//                     me.execCommand('insertHtml', html);
+//                 }
+//             }
+//         }
+//     }
+// });
 
 
 
@@ -29883,25 +29883,25 @@ UE.registerUI('message', function(editor) {
 
 
 // adapter/autosave.js
-UE.registerUI('autosave', function(editor) {
-    var timer = null,uid = null;
-    editor.on('afterautosave',function(){
-        // 本地保存不需要提示，保存即可
-        // clearTimeout(timer);
+// UE.registerUI('autosave', function(editor) {
+//     var timer = null,uid = null;
+//     editor.on('afterautosave',function(){
+//         // 本地保存不需要提示，保存即可
+//         // clearTimeout(timer);
 
-        // timer = setTimeout(function(){
-        //     if(uid){
-        //         editor.trigger('hidemessage',uid);
-        //     }
-        //     uid = editor.trigger('showmessage',{
-        //         content : editor.getLang('autosave.success'),
-        //         timeout : 2000
-        //     });
+//         // timer = setTimeout(function(){
+//         //     if(uid){
+//         //         editor.trigger('hidemessage',uid);
+//         //     }
+//         //     uid = editor.trigger('showmessage',{
+//         //         content : editor.getLang('autosave.success'),
+//         //         timeout : 2000
+//         //     });
 
-        // },2000)
-    })
+//         // },2000)
+//     })
 
-});
+// });
 
 
 

@@ -38,7 +38,7 @@ function calculateFreightPrice(count) {
   @author pengxiguaa 2019/3/4
 */
 function addToCart(id, count) {
-  kcAPI('/shop/cart', 'POST', {productParamId: id, count: count})
+  nkcAPI('/shop/cart', 'POST', {productParamId: id, count: count})
     .then(function(data) {
       if(!data.user){
         // window.location.href="/login";

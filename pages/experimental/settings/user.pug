@@ -8,7 +8,6 @@ block title
   else 
     title 用户管理  
 block content
-
   .container-fluid.max-width
     .row
       include ../nav
@@ -76,6 +75,7 @@ block content
                     option 用户名
                     option UID
                     option 手机号
+                    option 邮箱
                 .form-group
                   input.form-control#searchInput(placeholder='请输入内容')
                 .form-group
@@ -140,11 +140,11 @@ block content
                       th= user.toc.toLocaleString()
                       th= `${user.regIP} : ${user.regPort}`
                       th
-                        a(href=`/e/settings/user/${user.uid}`) 编辑
+                        button.btn.btn-default.btn-sm(onclick=`editUserInfo('${user.uid}')`) 编辑
               include ../../interface_navigation_paging
 block scripts
   include ../../publicModules/moment
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  include ../../publicModules/modifyAccountInfo
   script(src=`/experimental/settings/user.js?v=${global.NKC.startTime}`)
 
 

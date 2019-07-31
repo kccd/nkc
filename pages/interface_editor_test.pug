@@ -2,11 +2,6 @@ extends bootstrap_base.pug
 
 block title
   title 编辑器 - 科创论坛
-  
-  //- include MathJax.pug
-  link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
-  link(rel='stylesheet' href=`/tabPanel/tabPanel.css?v=${global.NKC.startTime}`)
-  link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
   link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
   link(href="/editor/editor.css" rel="stylesheet")
 block content
@@ -38,7 +33,7 @@ block content
 
           .row
             .form-group
-                input#title.form-control.tabPanel(type='text' placeholder='请输入标题，50字以内，越详细越好' value=`${data.title || ''}`)
+                input#title.form-control(type='text' placeholder='请输入标题，50字以内，越详细越好' value=`${data.title || ''}`)
             input.hidden#lang(value=data.l)
             if data.delReason 
               .form-froup(style="border:1px solid red;font-zie:16px") 退修原因: #{data.delReason}
@@ -50,10 +45,7 @@ block content
             .form-group
               include ./ueditor/ueditor.pug
             .form-group
-              #transfer
-            //- else
-            //-   .form-group
-            //-     div#content_test   
+              #transfer 
             .form-group
               a.btn.btn-sm.btn-info(onclick="appAttachHideOrShow()" style="width:100%;color: #080808;border: 1px solid #ddd;background-color:#fff").attachButton
                 span#showOrHideAttach 插入图片、媒体、文件
@@ -65,14 +57,14 @@ block content
                   label.col-sm-12 专业分类(必选，最多可选两个)
                   .col-sm-12
                     div#newPanelForum.form-control.move-thread-selected-forums(onclick="testThOpen()" style="height:auto;min-height:34px")
+                      if data.type && data.type === "forum" && data.forum
+                        .move-thread-forum-name(style=`background-color:${data.forum.color} `)
+                          span.chooseForum(fid=`${data.forum.fid}`)!=`${data.forum.displayName}`
+                          span.chooseCate(cid='')
                     //- input.form-control(type='text' autocomplete='off', readonly='true' onclick="testThOpen()")
             if !data.type || data.type === 'forum' || data.draftDelType === 'forum' || data.type === 'post' || data.type === 'thread'
               include ./editor/paper.pug
-            //- if !data.type || data.type === 'forum' || data.draftDelType === 'forum'
-            //-   include ./forum/forum_choice.pug
-            //- .tool_area_wrp
-            //-   .form-inline(style="text-align:center;padding-bottom: 25px;padding-top: 25px;")
-            .form
+            .form(style="padding-bottom:20px")
               .form-group
                 label
                   input#parseURL(type='checkbox' checked)
@@ -87,8 +79,6 @@ block content
                     button#draft.btn.btn-primary(type='submit' onclick="saveToThreadWithCheck()") 保存草稿
                   else if data.targetUser.uid === data.user.uid
                     button#draft.btn.btn-primary(type='submit' onclick="saveToThreadWithCheck()") 保存草稿
-                  //- if (data.targetUser.uid && data.user.uid && data.targetUser.uid === data.user.uid)
-                    button#draft.btn.btn-primary(type='submit') 保存草稿
                   if data.user
                     a.btn.btn-default.m-l-05(href=`/u/${data.user.uid}/drafts` target='_blank') 草稿箱
             .form-group
@@ -102,28 +92,19 @@ block content
   
   include debug_output.pug
 block scripts
-  //- if data.ver == "ue"
-  link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
-  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-  //- script(src="/jquery-1.10.2.js")
-  //- script(src="/jquery-ui-1.10.4.custom.js")
-  +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
-  script(src='/commonmark/dist/commonmark.js')
-  script(src='/plain_escaper.js')
-  script(src='/xbbcode-parser/xbbcode.js')
-  script(src='/xss/dist/xss.js')
-  script(src='/external_pkgs/react/react.min.js')
-  script(src='/external_pkgs/react/JSXTransformer.js')
-  script(src=`/interface_common.js?v=${startTime}`)
-  script(src=`/nkc_render.js?v=${startTime}`)
+  +includeJS('/commonmark/dist/commonmark.js')
+  +includeJS('/plain_escaper.js')
+  +includeJS('/xbbcode-parser/xbbcode.js')
+  +includeJS('/xss/dist/xss.js')
+  +includeJS(`/interface_common.js`)
+  +includeJS(`/nkc_render.js`)
   include ./publicModules/moveThread/moveThread.pug
   +includeJS("/editor/paper.js")
-  script(src=`/interface_editor_ue.js?v=${startTime}`)
+  +includeJS(`/interface_editor_ue.js`)
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")
   include ./publicModules/crop/crop
-  script(src=`/media/media_index.js?v=${startTime}`)
-  //- script(src=`/forum/forum_choice.js?v=${startTime}`)
+  +includeJS(`/media/media_index.js`)
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')
   script.
@@ -133,60 +114,6 @@ block scripts
         return "离开前保存草稿了吗？"
       }
     }
-    $("#tabPanel").tagsinput({
-      maxChars: 15, // 单个标记最大字符数 
-      maxTags: 2, // 最大标签数
-      itemValue: 'id',
-      itemText: 'name'
-    })
-    $(".bootstrap-tagsinput").children("input").attr("readonly", true)
-    $(".bootstrap-tagsinput").css("background-color", "#eee")
-    $(".bootstrap-tagsinput").click(function () {
-      openPanel(this);
-    });
   if data.toColumn
     script.
       $("#postToColumn").show();
-  //- else
-  //-   link(href="jquery-ui-1.10.4.custom.css" rel="stylesheet")
-  //-   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-  //-   script(src="/jquery-1.10.2.js")
-  //-   script(src="/jquery-ui-1.10.4.custom.js")
-  //-   script(src='/commonmark/dist/commonmark.js')
-  //-   script(src='/plain_escaper.js')
-  //-   script(src='/xbbcode-parser/xbbcode.js')
-  //-   script(src='/xss/dist/xss.js')
-    
-  //-   script(src='/external_pkgs/react/react.min.js')
-  //-   script(src='/external_pkgs/react/JSXTransformer.js')
-  //-   script(src=`/interface_common.js?v=${startTime}`)
-  //-   script(src=`/nkc_render.js?v=${startTime}`)
-  //-   script(src=`/interface_editor.js?v=${startTime}`)
-  //-   script(type="text/javascript" src=`/wangEditor.js?v=${global.NKC.startTime}`)
-  //-   script(type="text/javascript" src=`/newEditor.js?v=${global.NKC.startTime}`)
-  //-   include ./publicModules/crop/crop
-  //-   script(src=`/media/media_index.js?v=${startTime}`)
-  //-   script(src=`/forum/forum_choice.js?v=${startTime}`)
-  //-   script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
-  //-   script(src=`/tabPanel/tabPanel.js?v=${startTime}`)
-  //-   +includeJS('/external_pkgs/citySet/agency.json.js')
-  //-   +includeJS('/external_pkgs/citySet/citySet.js')
-  //-   script.
-  //-     window.onbeforeunload = function() {
-  //-       if(document.getElementById("post").disabled === false){
-  //-         return "离开前保存草稿了吗？"
-  //-       }
-  //-     }
-  //-     $("#tabPanel").tagsinput({
-  //-       maxChars: 15, // 单个标记最大字符数 
-  //-       maxTags: 2, // 最大标签数
-  //-       itemValue: 'id',
-  //-       itemText: 'name'
-  //-     })
-  //-     $(".bootstrap-tagsinput").children("input").attr("readonly", true)
-  //-     $(".bootstrap-tagsinput").css("background-color", "#eee")
-  //-     $(".bootstrap-tagsinput").click(function () {
-  //-       openPanel(this);
-  //-     });
-  script(src=`/tabPanel/tabPanelJson.js?v=${startTime}`)
-  script(src=`/tabPanel/tabPanel.js?v=${startTime}`)

@@ -1,15 +1,11 @@
-//- script(src="/jquery-1.10.2.js")
-//- script(type='text/javascript', src='/jquery/jquery.minicolors.js')
-//- style( src='/jquery/jquery.minicolors.css')
 // 加载编辑器的容器
 script#container(name='content', type='text/plain')
 // 配置文件
-script(type='text/javascript', src='/ueditor/ueditor.config.js')
++includeJS('/ueditor/ueditor.config.js')
 // 编辑器源码文件
-script(type='text/javascript', src='/ueditor/ueditor.all.js')
++includeJS('/ueditor/ueditor.all.js')
 // 添加下拉框
-script(type='text/javascript', src='/ueditor/addMathFormulaDialog.js')
-//- script(type='text/javascript', src='/ueditor/ueditor.parse.js')
++includeJS('/ueditor/addMathFormulaDialog.js')
 // 实例化编辑器
 -if(state.apptype)
   script.

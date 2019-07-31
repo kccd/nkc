@@ -43,7 +43,8 @@ router
       hasIcon,
       operationsId,
       type,
-      modifyPostTimeLimit
+      modifyPostTimeLimit,
+      hidden
     } = role;
     if(!displayName) ctx.throw(400, '证书名称不能为空');
     if(contentLength(displayName) > 10) ctx.throw(400, '证书名称不能超过20字节');
@@ -60,7 +61,8 @@ router
       description,
       color,
       modifyPostTimeLimit,
-      type
+      type,
+      hidden: !!hidden
     };
     if(role._id !== 'dev') {
       const operations = await db.OperationModel.find({_id: {$in: operationsId}});

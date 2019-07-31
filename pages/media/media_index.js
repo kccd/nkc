@@ -17,15 +17,13 @@ const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["mp3", "wav"];
 var isPc;
-
 $(document).ready(function() {
   isPc = IsPC();
   media = new Vue({
     el: "#mediaList",
     data: {
       mediaType: 'all',
-      activeClass: 'mdui-color-theme-accent',
-      uploadButtonClass: 'mdui-color-grey-300',
+      uploadButtonClass: 'mediaButtonActive',
       uploadFileFail: 'uploadFileFail',
       mediaPictureLists: [],
       mediaVideoLists: [],

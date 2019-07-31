@@ -275,11 +275,13 @@ async function func() {
   for(const role of rolesDB) {
     let key = `role:${role._id}:displayName`;
     await client.setAsync(key, role.displayName);
+    key = `role:${role._id}:modifyPostTimeLimit`;
+    await client.setAsync(key, role.modifyPostTimeLimit);
+    key = `role:${role._id}:hidden`;
+    await client.setAsync(key, role.hidden?"true":"false");
     if(role.operationsId.length === 0) continue;
     key = `role:${role._id}:operationsId`;
     await client.saddAsync(key, role.operationsId);
-    key = `role:${role._id}:modifyPostTimeLimit`;
-    await client.setAsync(key, role.modifyPostTimeLimit);
   }
 
   console.log(`缓存更新完成`.green);

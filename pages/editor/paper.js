@@ -1,5 +1,17 @@
-var testTh = new NKC.modules.MoveThread();
+var testTh;
+if(NKC.modules.MoveThread) {
+  testTh = new NKC.modules.MoveThread();
+}
 function testThOpen() {
+  var selectedForumsId = [], selectedCategoriesId = [];
+  $(".chooseForum").each(function() {
+    var fid = $(this).attr("fid");
+    if(fid && fid !== "undefined") selectedForumsId.push(fid);
+  });
+  $(".chooseCate").each(function() {
+    var cid = $(this).attr("cid");
+    if(cid && cid !== "undefined") selectedCategoriesId.push(cid);
+  });
   testTh.open(function(data) {
     var shuchuDemo = "";
     var forumsArr = data.forums;
@@ -8,7 +20,11 @@ function testThOpen() {
     }
     $("#newPanelForum").html(shuchuDemo);
     testTh.close();
-  }, {"hideMoveType":true});
+  }, {
+    "hideMoveType":true,
+    selectedForumsId: selectedForumsId,
+    selectedCategoriesId: selectedCategoriesId
+  });
 }
 /**
  * 论文相关组件

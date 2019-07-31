@@ -35,7 +35,7 @@ var app = new Vue({
   },
   methods: {
     deleteCartData: function(c) {
-      kcAPI('/shop/cart/' + c._id, 'DELETE')
+      nkcAPI('/shop/cart/' + c._id, 'DELETE')
         .then(function() {
           window.location.reload();
         })
@@ -45,7 +45,7 @@ var app = new Vue({
     },
     reduceCount: function(c) {
       if(c.count === 1) return;
-      kcAPI('/shop/cart/' + c._id, 'PATCH', {
+      nkcAPI('/shop/cart/' + c._id, 'PATCH', {
         type: 'reduceCount'
       })
         .then(function(data) {
@@ -56,7 +56,7 @@ var app = new Vue({
         });
     },
     addCount: function(c) {
-      kcAPI('/shop/cart/' + c._id, 'PATCH', {
+      nkcAPI('/shop/cart/' + c._id, 'PATCH', {
         type: 'addCount'
       })
         .then(function(data) {
@@ -67,7 +67,7 @@ var app = new Vue({
         });
     },
     changeCount: function(c) {
-      kcAPI('/shop/cart/' + c._id, 'PATCH', {
+      nkcAPI('/shop/cart/' + c._id, 'PATCH', {
         type: 'changeCount',
         count: c.count
       })
