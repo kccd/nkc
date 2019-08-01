@@ -23476,11 +23476,11 @@ UE.plugins['catchremoteimage'] = function () {
         me.options.imgTotal = imgs.length;
         var isPc = IsPC();
         var imgWidth = {
-            style:'max-width: 100%'
+            style:'max-width: 50%'
         }
         if(!isPc) {
             imgWidth = {
-                style: "max-width: 100%"
+                style: "max-width: 50%"
             }   
         }
         for (var i = 0, ci; ci = imgs[i++];) {

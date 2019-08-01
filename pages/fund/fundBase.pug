@@ -2,6 +2,8 @@ extends ../bootstrap_base
 block title
   +includeCSS("/fund.css")
   +includeCSS("/fund/fund.css")
+  +includeCSS("/external_pkgs/viewer/viewer.css")
+  +includeCSS("/external_pkgs/viewer/main.css")
   block fundTitle
 block content
   .container-fluid.max-width.fund
@@ -9,4 +11,15 @@ block content
     block fundContent
 block scripts
   +includeJS("/fund/fund.js")
+  +includeJS("/external_pkgs/viewer/viewer.js")
+  script.
+    $(document).ready(function() {
+      var options = {
+        navbar: false,
+        title: false,
+        toolbar: false,
+      }
+      new Viewer(document.getElementById('applicationForm'), options);
+      new Viewer(document.getElementById('applicationForm-comments'), options);
+    })
   block fundScripts
