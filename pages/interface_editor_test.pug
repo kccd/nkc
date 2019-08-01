@@ -61,7 +61,6 @@ block content
                         .move-thread-forum-name(style=`background-color:${data.forum.color} `)
                           span.chooseForum(fid=`${data.forum.fid}`)!=`${data.forum.displayName}`
                           span.chooseCate(cid='')
-                    //- input.form-control(type='text' autocomplete='off', readonly='true' onclick="testThOpen()")
             if !data.type || data.type === 'forum' || data.draftDelType === 'forum' || data.type === 'post' || data.type === 'thread'
               include ./editor/paper.pug
             .form(style="padding-bottom:20px")

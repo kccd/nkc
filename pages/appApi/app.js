@@ -156,7 +156,7 @@ function appOpenUrl(urlStr) {
     windowFile = "widget://html/common/shareInfo.html"
   }
   // 判断是否为编辑页面
-  var editUrlArr = ["/edtior", "/shelf", "/release"];
+  var editUrlArr = ["/editor", "/shelf", "/release"];
   for(var e in editUrlArr) {
     if(urlStr.indexOf(editUrlArr[e]) > -1) {
       windowFile = "widget://html/common/editorInfo.html";

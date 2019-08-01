@@ -68,7 +68,8 @@ function submitPostComment(tid, pid, firstInput) {
         viewPostComments(tid, pid, 999999, function() {
           screenTopAlert("评论成功");
           if(!firstInput) closePostComment( pid);
-          markDiv("#post_comment_" + data.comment.pid);
+          NKC.methods.markDom($("#post_comment_" + data.comment.pid + ">.highlight"));
+          NKC.methods.scrollToDom($("#post_comment_" + data.comment.pid));
           editor[pid].execCommand('cleardoc');
         });
       } else {
@@ -84,7 +85,8 @@ function submitPostComment(tid, pid, firstInput) {
         postComments.append(html);
         screenTopAlert("评论成功");
         if(!firstInput) closePostComment( pid);
-        markDiv("#post_comment_" + data.comment.pid);
+        NKC.methods.markDom($("#post_comment_" + data.comment.pid + ">.highlight"));
+        NKC.methods.scrollToDom($("#post_comment_" + data.comment.pid));
         editor[pid].execCommand('cleardoc');
       }
     })

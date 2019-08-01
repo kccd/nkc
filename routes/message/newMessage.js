@@ -19,7 +19,7 @@ router
     }
     if(target === 'STU' && newReminderCount !== 0) {
       const remind = await db.MessageModel.find({ty: 'STU', r: user.uid, vd: false}).sort({tc: 1});
-      const newRemind = await db.MessageModel.extendReminder(remind);
+      const newRemind = await db.MessageModel.extendSTUMessages(remind);
       messages = messages.concat(newRemind);
     }
     if(target === 'UTU' && uid && newUsersMessagesCount !== 0) {

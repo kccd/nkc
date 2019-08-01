@@ -26,11 +26,11 @@ function sendGoods() {
   var trackName = $("#trackList").val();
   if(!orderId || !sellUid) {
     $("#sendGoodsModal").modal("show");
-    return screenTopWarning("请重新点击发货");
+    return sweetWarning("请重新点击发货");
   }
 
   var trackNumber = $("#newtracknumber").val().trim();
-  if(!trackNumber) return screenTopWarning("请填写快递单号");
+  if(!trackNumber) return sweetWarning("请填写快递单号");
   var para = {
     orderId: orderId,
     trackNumber: trackNumber,
@@ -38,12 +38,12 @@ function sendGoods() {
   }
   nkcAPI('/shop/manage/'+sellUid+'/order/sendGoods', "PATCH", {post: para})
   .then(function(data) {
-    screenTopAlert("订单发货成功");
+    sweetAlert("订单发货成功");
     $("#sendGoodsModal").modal("hide");
     window.location.reload();
   })
   .catch(function(data) {
-    screenTopWarning(data || data.error);
+    sweetWarning(data || data.error);
   }) 
 }
 
@@ -55,19 +55,19 @@ function sendGoodsNoLog() {
   var orderId = $("#neworderid").val();
   if(!orderId || !sellUid) {
     $("#sendGoodsModal").modal("show");
-    return screenTopWarning("请重新点击发货");
+    return sweetWarning("请重新点击发货");
   }
   var para = {
     orderId: orderId
   }
   nkcAPI('/shop/manage/'+sellUid+'/order/sendGoodsNoLog', "PATCH", {post: para})
   .then(function(data) {
-    screenTopAlert("订单发货成功");
+    sweetAlert("订单发货成功");
     $("#sendGoodsModal").modal("hide");
     window.location.reload();
   })
   .catch(function(data) {
-    screenTopWarning(data || data.error);
+    sweetWarning(data || data.error);
   }) 
 }
 
@@ -96,7 +96,7 @@ function editOrder() {
   // 获取修改后的商品总价和运费
   var productPrice = $("#eoPrice").val();
   var price = Number(productPrice);
-  if(!price || price <= 0 || isNaN(price)) return screenTopWarning("请填写正确的价格后再提交修改")
+  if(!price || price <= 0 || isNaN(price)) return sweetWarning("请填写正确的价格后再提交修改")
   price = price * 100;
   var para = {
     price: price,
@@ -105,12 +105,12 @@ function editOrder() {
   // 向服务器发起修改请求
   nkcAPI('/shop/manage/'+sellUid+'/order/editOrder', "PATCH", {post:para})
   .then(function(data) {
-    screenTopAlert("价格修改成功")
+    sweetAlert("价格修改成功")
     $("#editOrderModal").modal("hide");
     window.location.reload();
   })
   .catch(function(data) {
-    screenTopWarning(data || data.error);
+    sweetWarning(data || data.error);
   })
 }
 
@@ -157,13 +157,13 @@ function saveTrackNum(sellUid,orderId) {
   var trackNumber = $("#trackNumVal").val().trim();
   nkcAPI('/shop/manage/'+sellUid+'/order/editOrderTrackNumber', "PATCH", {orderId: orderId, trackNumber: trackNumber})
   .then(function(data) {
-    screenTopAlert("修改成功");
+    sweetAlert("修改成功");
     $("#saveTrackNum").css("display", "none");
     $("#editTrackNum").css("display", "inline-block");
     $("#trakcNumText").html(trackNumber);
   })
   .catch(function(data) {
-    screenTopWarning(data.error || data)
+    sweetWarning(data.error || data)
   })
 }
 
@@ -174,14 +174,14 @@ function saveTrackNum(sellUid,orderId) {
 function editSellMessage(uid,orderId) {
   var sellMessage = $("#sellMessage" + orderId).text().trim();
   if(sellMessage.length == 0) {
-    return screenTopWarning("不填写备注无需保存");
+    return sweetWarning("不填写备注无需保存");
   }
   nkcAPI('/shop/manage/'+uid+'/order/editSellMessage', "PATCH", {sellMessage: sellMessage, orderId: orderId})
   .then(function(data) {
-    screenTopAlert("备注修改成功");
+    sweetAlert("备注修改成功");
   })
   .catch(function(data) {
-    screenTopWarning(data.error || data);
+    sweetWarning(data.error || data);
   })
 }
 
@@ -252,10 +252,10 @@ function saveProductSinglePrice(sellUid, orderId, costId) {
   };
   nkcAPI('/shop/manage/'+sellUid+'/order/editCostRecord', "PATCH", postObj)
   .then(function(data) {
-    screenTopAlert("保存成功");
+    sweetAlert("保存成功");
   })
   .catch(function(data) {
-    screenTopWarning(data.error || data);
+    sweetWarning(data.error || data);
   })
 }
 
@@ -294,10 +294,10 @@ function saveOrderFreightPrice(sellUid, orderId) {
   }
   nkcAPI('/shop/manage/'+sellUid+'/order/editOrderPrice', "PATCH", postObj)
   .then(function(data) {
-    screenTopAlert("保存成功");
+    sweetAlert("保存成功");
   })
   .catch(function(data) {
-    screenTopWarning(data.error || data);
+    sweetWarning(data.error || data);
   })
 }
 
@@ -355,9 +355,9 @@ function saveOrderProductCount(sellUid, costId, orderId) {
   };
   nkcAPI('/shop/manage/'+sellUid+'/order/editCostRecord', "PATCH", postObj)
   .then(function(data) {
-    screenTopAlert("保存成功");
+    sweetAlert("保存成功");
   })
   .catch(function(data) {
-    screenTopWarning(data.error || data);
+    sweetWarning(data.error || data);
   })
 }

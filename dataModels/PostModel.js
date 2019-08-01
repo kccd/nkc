@@ -840,9 +840,9 @@ postSchema.statics.getUrl = async function(pid) {
     break;
   }
   if(!isComment) {
-    return `/t/${post.tid}?page=${page}&highlight=${post.pid}#${post.pid}`;
+    return `/t/${post.tid}?page=${page}&highlight=${post.pid}#highlight`;
   } else {
-    return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}`;
+    return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}#hightlight`;
   }
 };
 

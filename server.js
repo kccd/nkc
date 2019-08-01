@@ -9,7 +9,6 @@ require('./global');
 require('colors');
 const http = require('http'),
   app = require('./app'),
-  // searchInit = require('./searchInit'),
   elasticSearch = require("./nkcModules/elasticSearch"),
   settings = require('./settings'),
   serverConfig = require('./config/server'),

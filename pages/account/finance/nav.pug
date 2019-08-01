@@ -7,6 +7,6 @@
   .col-xs-12.col-xs-12
     .ul.nav.nav-tabs
       li(role='presentation' class=pageType==="recharge"?'active':"")
-        a(href=`/account/finance/recharge`) 充值
+        a(onclick="NKC.methods.visitUrl('/account/finance/recharge')") 充值
       li(role='presentation' class=pageType!=="recharge"?'active':"")
-        a(href=`/account/finance/withdraw`) 提现
+        a(onclick="NKC.methods.visitUrl('/account/finance/withdraw')") 提现

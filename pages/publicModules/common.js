@@ -125,3 +125,30 @@ NKC.methods.getDataById = function(id) {
     return {};
   }
 };
+/*
+* 滚动到指定元素
+* @param {Dom} dom jquery dom
+* @author pengxiguaa 2019-7-31
+* */
+NKC.methods.scrollToDom = function(dom) {
+  if(!dom.length) return;
+  var top = dom.offset().top;
+  setTimeout(function() {
+    $("html,body").animate({scrollTop: top-300}, 500);
+  });
+};
+/*
+* 给指定元素设置背景颜色 高亮
+* @param {Dom} dom jquery dom
+* @author pengxiguaa 2019-7-31
+* */
+NKC.methods.markDom = function(dom) {
+  if(!dom.length) return;
+  dom.css("background-color", "rgba(255, 251, 221, 1)");
+  var colorValue = 2;
+  var colorTimeout = setInterval(function() {
+    colorValue -= 0.1;
+    if(colorValue < 0) clearInterval(colorTimeout);
+    dom.css("background-color", "rgba(255, 251, 221, "+(colorValue<1?colorValue:1)+")");
+  }, 1000);
+};

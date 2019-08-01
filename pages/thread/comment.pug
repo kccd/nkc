@@ -9,7 +9,7 @@ if comment.disabled
 if data.highlight === comment.pid
   -klass.push("highlight-dom");
 .post-comment(class=klass id=`post_comment_${comment.pid}`)
-  .post-comment-body
+  .post-comment-body.highlight
     a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
       img(src=`/avatar/${comment.uid}?t=sm`)
       span=comment.user.username

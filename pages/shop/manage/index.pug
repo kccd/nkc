@@ -7,6 +7,10 @@ block title
   //- link(rel='stylesheet' href='/shop/manage/style.css')
   link(rel='stylesheet' href='/shop/manage/manage.css')
   link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
+  style.
+    .button {
+      margin-right: 5px
+    }
 block content
   .container-fluid.max-width
     .row
@@ -16,63 +20,13 @@ block content
         if data.isban
           p.text-danger(style="text-align:center") 提示：您已被禁止使用商品上架功能
       .col-xs-12.col-md-12(style='margin-bottom: 1rem;')
-        .e-nav
-          ul.nav.nav-pills(style='background-color:aliceblue')
-            //- li.active
-            //-   a(href='#') 店铺管理
-            li(style="background-color: aliceblue" class=data.active == "home"?"active":"")
-              a(href=`/shop/manage/${data.user.uid}/home?active=home`)
-                |                             运营数据
-            li(style="background-color: aliceblue" class=data.active == "shelf"?"active":"")
-              a(href=`/shop/manage/${data.user.uid}/shelf?active=shelf`)
-                |                             商品上架
-            li(style="background-color: aliceblue" class=data.active == "goodslist"?"active":"")
-              a(href=`/shop/manage/${data.user.uid}/goodslist?active=goodslist`)
-                |                             商品管理
-            li(style="background-color: aliceblue" class=data.active == "order"?"active":"")
-              a(href=`/shop/manage/${data.user.uid}/order?active=order`)
-                |                             订单管理
-            li(style="background-color: aliceblue" class=data.active == "info"?"active":"")
-              a(href=`/shop/manage/${data.user.uid}/info?active=info`)
-                |                             交易基础设置
-            //- li(style="background-color: aliceblue" class=data.active == "decoration"?"active":"")
-            //-   a(href=`/shop/manage/${data.user.uid}/decoration?active=decoration`)
-            //-     |                             店铺装修
-            //- li(style="background-color: aliceblue" class=data.active == "classify"?"active":"")
-            //-   a(href=`/shop/manage/${data.user.uid}/classify?active=classify`)
-            //-     |                             分类设置
-            //- li(style="background-color: aliceblue")
-            //-   a(href=`/shop/store/${data.user.uid}`)
-            //-     |                             进入我的店铺
+        .paging-button
+          a.button(href=`/shop/manage/${data.user.uid}/home?active=home` class=data.active == "home" ? "active" : "") 运营数据
+          a.button(href=`/shop/manage/${data.user.uid}/shelf?active=shelf` class=data.active == "shelf" ? "active" : "") 商品上架
+          a.button(href=`/shop/manage/${data.user.uid}/goodslist?active=goodslist` class=data.active == "goodlist" ? "active" : "") 商品管理
+          a.button(href=`/shop/manage/${data.user.uid}/order?active=order` class=data.active == "order" ? "active" : "") 订单管理 
+          a.button(href=`/shop/manage/${data.user.uid}/info?active=info` class=data.active == "info" ? "active" : "") 交易基础设置 
       .col-xs-12.col-md-12
-        //- .col-xs-2.col-md-2
-        //-   ul#main-nav.nav.nav-tabs.nav-stacked(style='')
-        //-     li.active
-        //-       a(href='#') 店铺管理
-        //-     li(style="background-color: aliceblue")
-        //-       a(href=`/shop/manage/${data.myStore.storeId}/home`)
-        //-         |                             店铺首页
-        //-     li(style="background-color: aliceblue")
-        //-       a(href=`/shop/manage/${data.myStore.storeId}/shelf`)
-        //-         |                             商品上架
-        //-     li(style="background-color: aliceblue")
-        //-       a(href=`/shop/manage/${data.myStore.storeId}/goodslist`)
-        //-         |                             商品管理
-        //-     li(style="background-color: aliceblue")
-        //-       a(href=`/shop/manage/${data.myStore.storeId}/order`)
-        //-         |                             订单管理
-        //-     li(style="background-color: aliceblue")
-        //-       a(href=`/shop/manage/${data.myStore.storeId}/info`)
-        //-         |                             店铺信息
-        //-     li(style="background-color: aliceblue")
-        //-       a(href=`/shop/manage/${data.myStore.storeId}/decoration`)
-        //-         |                             店铺装修
-        //-     li(style="background-color: aliceblue")
-        //-       a(href=`/shop/manage/${data.myStore.storeId}/classify`)
-        //-         |                             分类设置
-        //-     li(style="background-color: aliceblue")
-        //-       a(href=`/shop/store/${data.myStore.storeId}`)
-        //-         |                             进入我的店铺
         block name      
   #sendGoodsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
     .modal-dialog(role='document')
