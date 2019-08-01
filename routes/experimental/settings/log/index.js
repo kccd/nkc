@@ -28,10 +28,11 @@ logSettingRouter
         const {data, db, body} = ctx;
         const {logParams} = body;
         if(logParams){
-            let logSetting = await db.SettingModel.find({_id:"log"})
+            let logSetting = await db.SettingModel.find({_id:"log"});
             await logSetting[0].update({"c.operationsId":logParams})
             
         }
+        await db.SettingModel.saveSettingsToRedis("log");
         await next();
-    })
+    });
 module.exports = logSettingRouter;

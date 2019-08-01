@@ -21,6 +21,7 @@ router
         "c.experimentalTimeout": safeSettings.experimentalTimeout
       }
     });
+    await db.SettingModel.saveSettingsToRedis("safe");
     await next();
   });
 module.exports = router;

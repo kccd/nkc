@@ -21,6 +21,7 @@ settingsRouter
 		  c: settingsObj
     };
 		await fundSettings.update({$set: obj});
+		await db.SettingModel.saveSettingsToRedis("fund");
 		await next();
 	});
 module.exports = settingsRouter;

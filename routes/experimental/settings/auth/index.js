@@ -30,6 +30,7 @@ router
         "c.auditorCerts": certsId
       }
     });
+    await db.SettingModel.saveSettingsToRedis("auth");
     await next();
   });
 module.exports = router;

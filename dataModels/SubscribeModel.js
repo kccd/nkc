@@ -97,11 +97,13 @@ schema.statics.saveUserSubUsersId = async (uid) => {
     uid
   }, {tUid: 1}).sort({toc: -1});
   const usersId = sub.map(s => s.tUid);
-  if(usersId.length) {
-    setTimeout(async () => {
+  setTimeout(async () => {
+    await redisClient.delAsync(`user:${uid}:subscribeUsersId`);
+    if(usersId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeUsersId`, usersId);
-    });
-  }
+    }
+    await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
+  });
   return usersId;
 };
 /*
@@ -129,10 +131,12 @@ schema.statics.saveUserSubForumsId = async (uid) => {
     uid
   }, {fid: 1}).sort({toc: -1});
   const forumsId = subs.map(s => s.fid);
-  console.log(forumsId);
   setTimeout(async () => {
-    await redisClient.saddAsync(`user:${uid}:subscribeForumsId`, forumsId);
-    console.log(`更新完成`);
+    await redisClient.delAsync(`user:${uid}:subscribeForumsId`);
+    if(forumsId.length) {
+      await redisClient.saddAsync(`user:${uid}:subscribeForumsId`, forumsId);
+    }
+    await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return forumsId;
 };
@@ -163,7 +167,11 @@ schema.statics.saveUserSubColumnsId = async (uid) => {
   }, {columnId: 1}).sort({toc: -1});
   const columnsId = subs.map(s => s.columnId);
   setTimeout(async () => {
-    await redisClient.saddAsync(`user:${uid}:subscribeColumnsId`, columnsId);
+    await redisClient.delAsync(`user:${uid}:subscribeColumnsId`);
+    if(columnsId.length) {
+      await redisClient.saddAsync(`user:${uid}:subscribeColumnsId`, columnsId);
+    }
+    await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return columnsId;
 };
@@ -194,7 +202,11 @@ schema.statics.saveUserSubThreadsId = async (uid) => {
   }, {tid: 1}).sort({toc: -1});
   const threadsId = subs.map(s => s.tid);
   setTimeout(async () => {
-    await redisClient.saddAsync(`user:${uid}:subscribeThreadsId`, threadsId);
+    await redisClient.delAsync(`user:${uid}:subscribeThreadsId`);
+    if(threadsId.length) {
+      await redisClient.saddAsync(`user:${uid}:subscribeThreadsId`, threadsId);
+    }
+    await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return threadsId;
 };
@@ -219,10 +231,210 @@ schema.statics.saveUserCollectionThreadsId = async (uid) => {
   }, {tid: 1}).sort({toc: -1});
   const threadsId = subs.map(s => s.tid);
   setTimeout(async () => {
-    await redisClient.saddAsync(`user:${uid}:collectionThreadsId`, threadsId);
+    await redisClient.delAsync(`user:${uid}:collectionThreadsId`);
+    if(threadsId.length) {
+      await redisClient.saddAsync(`user:${uid}:collectionThreadsId`, threadsId);
+    }
+    await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return threadsId;
 };
+
+/*
+* 将用户的关注分类存入redis
+* @param {String} uid 用户ID
+* @return {Object} redis集合
+*   "user:uid:subscribeType:typeId:thread": [tid, tid, ...]
+* @author pengxiguaa 2019-8-1
+* */
+schema.statics.saveUserSubscribeTypesSingleSubTypeToRedis = async (uid, subType) => {
+  const tt = Date.now();
+  const SubscribeModel = mongoose.model("subscribes");
+  const types = await SubscribeModel.find({uid}, {_id: 1});
+  const typesId = types.map(t => t._id);
+  typesId.push("all");
+  typesId.push("other");
+  await Promise.all(typesId.map(async id => {
+    await SubscribeModel.saveUserSubscribeTypeToRedis(uid, id, subType);
+  }));
+  console.log(Date.now() - tt, "ms 更新缓存耗时");
+};
+schema.statics.saveUserSubscribeTypeToRedis = async (uid, typeId, subType) => {
+  const SubscribeTypeModel = mongoose.model("subscribeTypes");
+  const SubscribeModel = mongoose.model("subscribes");
+  const ForumModel = mongoose.model("forums");
+  const defaultTypes = ["thread", "topic", "discipline", "user", "column", "collection"];
+  if(!defaultTypes.includes(subType)) return [];
+  const match = {uid};
+  if(typeId === "all") {
+
+  } else if(typeId === "other") {
+    match.cid = [];
+  } else {
+    const subscribeType = await SubscribeTypeModel.findOne({typeId, uid});
+    if(!subscribeType) return [];
+    match.cid = typeId;
+  }
+  let subKey;
+  if(subType === "thread") {
+    match.type = "thread";
+    subKey = "tid";
+  } else if(subType === "user") {
+    match.type = "user";
+    subKey = "tUid";
+  } else if(subType === "column") {
+    match.type = "column";
+    subKey = "columnId";
+  } else if(subType === "topic") {
+    const topicsId = await ForumModel.getForumsIdFromRedis("topic");
+    match.type = "forum";
+    match.fid = {$in: topicsId};
+    subKey = "fid";
+  } else if(subType === "discipline") {
+    const disciplinesId = await ForumModel.getForumsIdFromRedis("discipline");
+    match.type = "forum";
+    match.fid = {$in: disciplinesId};
+    subKey = "fid";
+  } else if(subType === "collection") {
+    match.type = "collection";
+    subKey = "tid";
+  } else {
+    return [];
+  }
+
+  const subs = await SubscribeModel.find(match, {
+    tUid: 1,
+    fid: 1,
+    tid: 1,
+    columnId: 1
+  });
+  const ids = subs.map(s => s[subKey]);
+  const key = `user:${uid}:subscribeType:${typeId}:${subType}`;
+  setTimeout(async () => {
+    await redisClient.delAsync(key);
+    if(ids.length) {
+      await redisClient.saddAsync(key, ids);
+    }
+  });
+  return ids;
+};
+schema.statics.getUserSubscribeTypesResults = async (uid) => {
+  const SubscribeTypeModel = mongoose.model("subscribeTypes");
+  const SubscribeModel = mongoose.model("subscribes");
+  const ForumModel = mongoose.model("forums");
+  const defaultTypes = ["thread", "topic", "discipline", "user", "column", "collection"];
+  const subscribeTypes = await SubscribeTypeModel.find({uid}, {_id: 1});
+  const newSubscribeTypes = subscribeTypes.map(s => s._id);
+  newSubscribeTypes.push("all");
+  newSubscribeTypes.push("other");
+  const topicsId = await ForumModel.getForumsIdFromRedis("topic");
+  const disciplinesId = await ForumModel.getForumsIdFromRedis("discipline");
+  const results = {};
+  for(const defaultType of defaultTypes) {
+    for(const t of newSubscribeTypes) {
+      const match = {
+        uid
+      };
+      if(t === "all") {
+
+      } else if(t === "other") {
+        match.cid = [];
+      } else {
+        match.cid = t;
+      }
+      if(defaultType === "thread") {
+        match.type = "thread";
+      } else if(defaultType === "user") {
+        match.type = "user";
+      } else if(defaultType === "column") {
+        match.type = "column";
+      } else if(defaultType === "collection") {
+        match.type = "collection";
+      } else if(defaultType === "topic") {
+        match.type = "forum";
+        match.fid = {$in: topicsId};
+      } else if(defaultType === "discipline") {
+        match.type = "forum";
+        match.fid = {$in: disciplinesId};
+      }
+      const key = `user:${uid}:subscribeType:${t}:${defaultType}`;
+      const sub = await SubscribeModel.find(match, {
+        tid: 1,
+        uid: 1,
+        tUid: 1,
+        columnId: 1,
+        fid: 1,
+        cid: 1
+      }).sort({toc: -1});
+
+      if(defaultType === "thread") {
+        results[key] = sub.map(s => s.tid);
+      } else if(defaultType === "user") {
+        results[key] = sub.map(s => s.tUid);
+      } else if(defaultType === "collection") {
+        results[key] = sub.map(s => s.tid);
+      } else if(defaultType === "topic") {
+        results[key] = sub.map(s => s.fid);
+      } else if(defaultType === "discipline") {
+        results[key] = sub.map(s => s.fid);
+      } else if(defaultType === "column") {
+        results[key] = sub.map(s => s.columnId);
+      }
+    }
+  }
+  return {
+    results,
+    defaultTypes,
+    newSubscribeTypes
+  };
+};
+schema.statics.saveUserSubscribeTypesToRedis = async (uid, data) => {
+  setTimeout(async () => {
+    if(!data) {
+      data = await mongoose.model("subscribes").getUserSubscribeTypesResults(uid);
+    }
+    const {results, defaultTypes, newSubscribeTypes} = data;
+    const typeKey = `user:${uid}:subscribeTypesId`;
+    // 清除旧键
+    const oldSubscribeTypesId = await redisClient.smembersAsync(typeKey);
+    for(const key of oldSubscribeTypesId) {
+      for(const defaultType of defaultTypes) {
+        await redisClient.delAsync(`user:${uid}:subscribeType:${key}:${defaultType}`);
+      }
+    }
+    // 存入新键
+    await redisClient.saddAsync(typeKey, newSubscribeTypes);
+    for(const key in results) {
+      if(!results.hasOwnProperty(key)) continue;
+      if(results[key].length) {
+        await redisClient.saddAsync(key, results[key]);
+      }
+    }
+  });
+};
+/*
+* 从redis中读取用户关注分类，如1分类中的所有文章ID
+* @param {String} uid 用户ID
+* @param {String/Number} "all": 全部, "other": 未分类, number: 具体的自定义分类ID
+* @param {String} subType 关注类型 thread: 文章, user: 用户, topic: 话题, discipline: 学科, collection: 收藏, column: 专栏
+* @return {[String/Number]} 专栏ID类型为Number, 其余ID类型为String，返回的是一个用ID组成的数组。
+* @author pengxiguaa 2019-8-1
+* */
+schema.statics.getUserSubscribeTypeFromRedis = async (uid, typeId, subType) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const key = `user:${uid}:subscribeType:${typeId}:${subType}`;
+  let ids = await redisClient.smembersAsync(key);
+  if(!ids.length) {
+    const typesId = await redisClient.smembersAsync(`user:${uid}:subscribeTypesId`);
+    if(!typesId.includes(typeId)) {
+      const data = await SubscribeModel.getUserSubscribeTypesResults(uid);
+      ids = data.results[key];
+      await SubscribeModel.saveUserSubscribeTypesToRedis(uid, data);
+    }
+  }
+  return ids;
+};
+
 /**
  * -------
  * 关注专业

@@ -136,18 +136,17 @@ module.exports = async (ctx, next) => {
     data.userGrade,
     data.user
   );
-  // 获取用户关注的专业
+  // 获取用户的关注
   if(data.user) {
-    const visibleFid = await db.ForumModel.visibleFid(
+    data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+    ctx.state.subUsersId = data.user.subUid;
+    ctx.state.visibleFid = await db.ForumModel.visibleFid(
       data.userRoles,
       data.userGrade,
       data.user
     );
-
-    data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
-    ctx.state.subUsersId = data.user.subUid;
     // 关注的专业对象 用在手机网页侧栏专业导航
-    ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, visibleFid);
+    ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, ctx.state.visibleFid);
     ctx.state.subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
     ctx.state.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
     ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);

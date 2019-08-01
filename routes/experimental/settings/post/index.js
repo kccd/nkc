@@ -55,6 +55,7 @@ router
         }
       })
     }));
+    await db.SettingModel.saveSettingsToRedis("post");
     await next();
   });
 

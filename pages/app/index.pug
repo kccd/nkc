@@ -13,7 +13,7 @@ html(lang='zh-CN')
     mixin logo
       div.logo-bottom
         img(src='/favicon.ico')
-        span= data.serverSettings.websiteName
+        span= state.serverSettings.websiteName
     .container#app(v-cloak)
       .row(v-if='toBrowser')
         .col-xs-12.col-md-12
@@ -21,7 +21,7 @@ html(lang='zh-CN')
           +logo
       .row(v-else)
         .col-xs-12.col-md-12.text-center
-          //.logo(@click="toHome")= data.serverSettings.websiteName
+          //.logo(@click="toHome")= state.serverSettings.websiteName
           a.link(href='/appDownload/android/latest') 点击下载
           +logo
 

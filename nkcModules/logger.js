@@ -1,7 +1,6 @@
 const moment = require('moment');
 
 module.exports = async (ctx) => {
-  const {LogModel, OperationModel} = ctx.db;
   const processTime = ctx.processTime;
   const {address: ip, port} = ctx;
   const log = {
@@ -16,7 +15,6 @@ module.exports = async (ctx) => {
     processTime,
     uid: ctx.data.user? ctx.data.user.uid : 'visitor'
   };
-  // const operation = await OperationModel.findOne({_id: ctx.data.operationId});
   const {operationId} = ctx.data;
   const d = {
     url: log.path,
@@ -51,18 +49,4 @@ module.exports = async (ctx) => {
       global.NKC.io.of('/console').NKC.webMessage(d);
     }
   }
-  // const pathArr = log.path.split('/');
-	// const lastPath = pathArr[pathArr.length - 1];
-	// let needLog = true;
-	// for(let path of excludePath) {
-	// 	if(lastPath.includes(path)) {
-	// 		needLog = false;
-	// 	}
-	// }
-	// if(pathArr[1] && ['favicon.ico', 'avatar','avatar_small' , 'cover', 'pfa', 'pfb', 'photo', 'photo_small'].includes(pathArr[1])) {
-	// 	needLog = false;
-	// }
-  // if(ctx.status !== 304 && needLog) {
-	//   await new LogModel(log).save();
-  // }
 };

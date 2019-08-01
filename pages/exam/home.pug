@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title 
-  title=`${data.serverSettings.websiteName} | 考试系统`
+  title=`${state.serverSettings.websiteName} | 考试系统`
   -const {countOneDay, count, waitingTime} = data.examSettings;
   +includeCSS('/exam/exam.css')
 block content

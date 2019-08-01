@@ -33,6 +33,7 @@ router
 			}
 		}
 		await homeSettings.update({'c.noticeThreadsId': noticeThreadsId});
+		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	})
 	.del('/', async (ctx, next) => {
@@ -40,6 +41,7 @@ router
 		const {oc} = query;
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		await homeSettings.update({$pull: {'c.noticeThreadsId': oc}});
+		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	});
 module.exports = router;

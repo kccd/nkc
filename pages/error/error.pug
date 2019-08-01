@@ -23,7 +23,7 @@ block errorContent
                 p!=`path <code>${data.url}</code> does not exist | can not be listed | is not available.`
                 br
                 img(src='/resources/site_specific/owl_bath.jpg' style='max-width: 100%;')
-                p(style="color:#999;padding-top: 2rem;") #{data.serverSettings.websiteName}
+                p(style="color:#999;padding-top: 2rem;") #{state.serverSettings.websiteName}
             else if data.status === 500
               .col-xs-12.col-md-12
                 -const success = false, prompt = '服务器错误'

@@ -27,6 +27,7 @@ router
         "c.defaultSubscribeForumsId": defaultSubscribeForumsId
       }
     });
+    await db.SettingModel.saveSettingsToRedis("register");
     await next();
   });
 module.exports = router;

@@ -1,12 +1,12 @@
 .footer.footer-link
   .footer-header.p-b-05 关于
   ul.HomeFriendlyLink
-    for l in data.serverSettings.links.info
+    for l in state.serverSettings.links.info
       li
         a(href=l.url target="_blank")=l.name
   .footer-header.p-b-05.m-t-1 应用
   ul.HomeFriendlyLink
-    for l in data.serverSettings.links.app
+    for l in state.serverSettings.links.app
       li
         a(href=l.url target="_blank")=l.name
   .footer-header.p-b-05.m-t-1 其他
@@ -18,9 +18,9 @@
     li
       a
         span(style="font-size: 1.5rem;").fa.fa-phone-square
-        span(style="font-size: 1.2rem;")=` ${data.serverSettings.telephone}`
+        span(style="font-size: 1.2rem;")=` ${state.serverSettings.telephone}`
     li
-      a(href=data.serverSettings.github target="_blank")
+      a(href=state.serverSettings.github target="_blank")
         span(style="font-size: 1.5rem;").fa.fa-github
         span(style="font-size: 1.2rem;") &nbsp;Github
 

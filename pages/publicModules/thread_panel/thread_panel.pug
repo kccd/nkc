@@ -86,6 +86,8 @@
           span 好友
         else if thread.from === "subThread"
           span 关注的文章
+        else if thread.from === "collection"
+          span 收藏
     .thread-panel-reply
       a(href=`/u/${thread.lastPost.uid}` target="_blank"
         onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.lastPost.user)}')`

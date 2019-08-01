@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title=`搜索 - ${data.serverSettings.websiteName}`
+  title=`搜索 - ${state.serverSettings.websiteName}`
   +includeCSS("/search/search.css")
 block content
   #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums})

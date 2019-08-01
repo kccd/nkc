@@ -1,7 +1,7 @@
 extends ../bootstrap_base
 block title
   meta(name='description' content=`${data.forum.description}` || '暂无专业介绍')
-  title=`${data.forum.displayName} - ${data.serverSettings.websiteName}`
+  title=`${data.forum.displayName} - ${state.serverSettings.websiteName}`
   +includeCSS("/forum/forum.css")
 block content
   //- 判断用户是否有权限管理专业内的文章

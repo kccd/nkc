@@ -43,7 +43,7 @@ module.exports = {
     await next();
   },
   patch: async (ctx, next) => {
-    const {db, body} = ctx;
+    const {db, body, data} = ctx;
     const {type, subscribesId, typesId} = body;
     if(type === "modifyType") {
       let typesId_ = [];
@@ -62,6 +62,7 @@ module.exports = {
       }
       await db.SubscribeTypeModel.updateCount([...(new Set(typesId_))]);
     }
+    await db.SubscribeModel.saveUserSubscribeTypesToRedis(data.user.uid);
     await next();
   }
 };

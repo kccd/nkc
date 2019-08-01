@@ -27,6 +27,7 @@ router
         'c.recommend': recommend
       }
     });
+    await db.SettingModel.saveSettingsToRedis("home");
     await next();
   });
 module.exports = router;

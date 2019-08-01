@@ -34,6 +34,7 @@ router
 			if(!homeSettings.c.logos.includes(id)) ctx.throw(400, '图片无效');
 		}
 		await homeSettings.update({c: q});
+		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	})
 	.del('/', async (ctx, next) => {
@@ -43,6 +44,7 @@ router
 		if(homeSettings.c.logo === id || homeSettings.c.smallLogo === id) ctx.throw(400, '暂不能删除默认图片');
 		if(!homeSettings.c.logos.includes(id)) ctx.throw(400, '图片无效');
 		await homeSettings.update({$pull: {'c.logos': id}});
+		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	});
 module.exports = router;

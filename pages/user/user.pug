@@ -2,7 +2,7 @@ extends ../bootstrap_base
 block title
   -let description = data.targetUser.description || "暂无名片介绍";
   meta(name='description' content=`${description}`)
-  title=`${data.targetUser.username || data.targetUser.uid}的名片 - ${data.serverSettings.websiteName}`
+  title=`${data.targetUser.username || data.targetUser.uid}的名片 - ${state.serverSettings.websiteName}`
   +includeCSS("/user/user.css")
 block content
   .container-fluid.max-width

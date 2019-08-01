@@ -65,6 +65,7 @@ messageRouter
         })
       }));
     }
+    await db.SettingModel.saveSettingsToRedis("message");
     await next();
   });
 module.exports = messageRouter;

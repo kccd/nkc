@@ -36,6 +36,7 @@ router
         pay
       }
     }});
+    await db.SettingModel.saveSettingsToRedis("shop");
     await next();
   }); 
 module.exports = router;

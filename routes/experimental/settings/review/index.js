@@ -111,6 +111,7 @@ router
       });
     }
     data.reviewSettings = (await db.SettingModel.findById("review")).c;
+    await db.SettingModel.saveSettingsToRedis("review");
     await next();
   });
 module.exports = router;
