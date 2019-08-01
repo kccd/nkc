@@ -9,7 +9,9 @@ $(function() {
     bodyBackgroundColor = color;
   });
   CommonModal = new NKC.modules.CommonModal();
-  SubscribeTypes = new NKC.modules.SubscribeTypes();
+  if(NKC.modules.SubscribeTypes) {
+    SubscribeTypes = new NKC.modules.SubscribeTypes();
+  }
 });
 
 function showSetDom() {
