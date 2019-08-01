@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const redisClient = require("../../settings/redisClient");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
@@ -144,14 +145,29 @@ router
       if(!d) d = "all";
 
       if(d === "all") {
-        const subThreadsId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "thread");
-        collectionTid = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "collection");
+        const redisTypeCount = await redisClient.smembersAsync(`user:${user.uid}:subscribeTypesId`);
+        let subThreadsId = [];
+        if(!redisTypeCount.length) {
+          const redisData = await db.SubscribeModel.getUserSubscribeTypesResults(user.uid);
+          await db.SubscribeModel.saveUserSubscribeTypesToRedis(user.uid, redisData);
+          const {results} = redisData;
+          const baseKey = `user:${user.uid}:subscribeType:${c}:`;
+          subThreadsId = results[baseKey + `thread`] || [];
+          collectionTid = results[baseKey + `collection`] || [];
+          subTopicId = results[baseKey + `topic`] || [];
+          subDisciplineId = results[baseKey + `discipline`] || [];
+          subUid = results[baseKey + `user`] || [];
+          subColumnId = results[baseKey + `column`] || [];
+        } else {
+          subThreadsId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "thread");
+          collectionTid = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "collection");
+          subTopicId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "topic");
+          subDisciplineId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "discipline");
+          subUid = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "user");
+          subColumnId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "column");
+        }
         subTid = subThreadsId.concat(collectionTid);
-        subTopicId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "topic");
-        subDisciplineId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "discipline");
         subFid = subTopicId.concat(subDisciplineId);
-        subUid = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "user");
-        subColumnId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "column");
       } else {
         const ids = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, d);
         if(["thread", "collection"].includes(d)) {
