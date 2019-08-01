@@ -2,7 +2,7 @@ extends ../bootstrap_base
 block title
   -let description = data.targetUser.description || "暂无名片介绍";
   meta(name='description' content=`${description}`)
-  title=`${data.targetUser.username || data.targetUser.uid}的名片 - ${data.serverSettings.websiteName}`
+  title=`${data.targetUser.username || data.targetUser.uid}的名片 - ${state.serverSettings.websiteName}`
   +includeCSS("/user/user.css")
 block content
   .container-fluid.max-width
@@ -57,7 +57,6 @@ block content
                 a(href=`/login`) 私信
                 if data.targetUser.column
                   a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
-                a(href=`/login`) 私信
                 a(href=`/login`) 关注
           else if data.targetUser.column
             .user-button

@@ -9,7 +9,7 @@ block content
   .container-fluid.max-width
     .row
       include ../nav
-      #data.hidden=objToStr({serverSettings: data.serverSettings})
+      #data.hidden=objToStr({serverSettings: state.serverSettings})
       .col-xs-12.col-md-12#app(v-cloak v-if="serverSettings")
         .form-horizontal
           .form-group

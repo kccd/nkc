@@ -1356,8 +1356,8 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
     user = uid;
   }
   if(!user) return false;
-  const columnSettings = await mongoose.model("settings").findById("column");
-  const {xsfCount, digestCount, userGrade, threadCount} = columnSettings.c;
+  const columnSettings = await mongoose.model("settings").getSettings("column");
+  const {xsfCount, digestCount, userGrade, threadCount} = columnSettings;
   if(user.xsf < xsfCount) return false;
   if(!user.grade) await user.extendGrade();
   if(!userGrade.includes(user.grade._id)) return false;

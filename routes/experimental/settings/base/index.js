@@ -28,6 +28,7 @@ baseRouter
       }
     };
 		await serverSettings.update(obj);
+		await db.SettingModel.saveSettingsToRedis("server");
 		await next();
 	});
 module.exports = baseRouter;

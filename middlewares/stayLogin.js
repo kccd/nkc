@@ -2,7 +2,8 @@ const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
 module.exports = async (ctx, next) => {
-	const {data, db} = ctx;
+
+  const {data, db} = ctx;
 	// cookie
 	let userInfo = ctx.cookies.get('userInfo', {signed: true});
 	if(!userInfo) {
@@ -58,7 +59,6 @@ module.exports = async (ctx, next) => {
 		// 获取用户信息
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     await db.UserModel.extendUsersInfo([user]);
-
 		user.newMessage = await user.getNewMessagesCount();
 		user.authLevel = await userPersonal.getAuthLevel();
 		user.draftCount = await db.DraftModel.count({uid: user.uid});
@@ -84,7 +84,7 @@ module.exports = async (ctx, next) => {
       }
     });
     user.newVoteUp = newVoteUp>0?newVoteUp:0;
-		// 判断用户是否被封禁
+    // 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
       const role = await db.RoleModel.extendRole('banned');
         if(!role) return;
@@ -115,6 +115,7 @@ module.exports = async (ctx, next) => {
         }
       }));
 		}
+
   }
   // 根据用户语言设置加载语言对象
   ctx.state.language = languages[languageName];
@@ -127,27 +128,29 @@ module.exports = async (ctx, next) => {
 	data.userGrade = userGrade;
   data.user = user;
 
+
+
   // 专业树状结构
   ctx.state.forumsTree = await db.ForumModel.getForumsTree(
     data.userRoles,
     data.userGrade,
     data.user
   );
-  // 获取用户关注的专业
+  // 获取用户的关注
   if(data.user) {
-    const visibleFid = await db.ForumModel.visibleFid(
+    data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
+    ctx.state.subUsersId = data.user.subUid;
+    ctx.state.visibleFid = await db.ForumModel.visibleFid(
       data.userRoles,
       data.userGrade,
       data.user
     );
-
-    data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
-    ctx.state.subUsersId = data.user.subUid;
-    ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, visibleFid);
+    // 关注的专业对象 用在手机网页侧栏专业导航
+    ctx.state.subForums = await db.ForumModel.getUserSubForums(data.user.uid, ctx.state.visibleFid);
     ctx.state.subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
     ctx.state.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
     ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
     ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
   }
-	await next();
+  await next();
 };

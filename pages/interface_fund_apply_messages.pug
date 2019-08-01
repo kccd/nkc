@@ -1,4 +1,4 @@
-.applicationForm
+.applicationForm#applicationForm
   .row.m-b-4.m-t-1
     .col-xs-12.col-md-12
       .id.text-center
@@ -55,14 +55,14 @@
     else if applicationForm.applicant.lifePhotos.length === 1
       .col-xs-12.col-md-6
         p 申请人照片
-        a(href=`/photo/${applicationForm.applicant.lifePhotos[0]._id}` target='_blank')
-          img(src=`/photo_small/${applicationForm.applicant.lifePhotos[0]._id}`)
+        //- a(href=`/photo/${applicationForm.applicant.lifePhotos[0]._id}` target='_blank')
+        img(src=`/photo/${applicationForm.applicant.lifePhotos[0]._id}`)
     else
       .col-xs-12.col-md-12
         p 申请人照片
         -for (let p of applicationForm.applicant.lifePhotos)
-          a(href=`/photo/${p._id}` target='_blank')
-            img(src=`/photo_small/${p._id}` style='margin: 0.2rem;')
+          //- a(href=`/photo/${p._id}` target='_blank')
+          img(src=`/photo/${p._id}` style='margin: 0.2rem;')
     .col-xs-12.col-md-12
       if fund.thread.count > 0
         h5= `申请人曾经发表的相关文章：`

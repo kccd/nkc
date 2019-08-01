@@ -45,6 +45,7 @@ scoreRouter
 				await scoreSettings.update({$pull: {'c.operationsId': operation._id}});
 			}
 		}
+		await db.SettingModel.saveSettingsToRedis("score");
 		await next();
 	});
 module.exports = scoreRouter;

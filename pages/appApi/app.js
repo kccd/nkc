@@ -2,6 +2,7 @@ var realUrl = "";
 localStorage.setItem("apptype", "app");
 var allLinks = document.querySelectorAll("a");
 var allButtons = document.querySelectorAll("button");
+var imgDownTimeOut;
 // 禁止点击连接执行跳转
 Array.prototype.forEach.call(allLinks, function(link) {
   link.addEventListener("click", function(e) {
@@ -24,6 +25,19 @@ $(document).ready(function() {
 })
 
 apiready = function() {
+  // 为所有图片添加长按事件
+  var allImgs = document.querySelectorAll("img");
+  Array.prototype.forEach.call(allImgs, function(img) {
+    img.addEventListener("touchstart", function() {
+      imgDownTimeOut = setTimeout("imageToApiDownload('"+this.src+"')", 1000)
+    })
+    img.addEventListener("touchmove", function() {
+      clearTimeout(imgDownTimeOut);
+    })
+    img.addEventListener("touchend", function() {
+      clearTimeout(imgDownTimeOut)
+    })
+  })
   // 为所有的a标签添加点击事件
   // 监听全局a标签的点击事件
   // 并阻止链接点击跳转
@@ -295,4 +309,30 @@ function toAppLogin() {
     name: "root",
     script: "openGroupIndex(3)"
   })
+}
+
+// app图片本地保存
+function imageToApiDownload(url) {
+  api.openFrame({
+    name: 'imageSave',
+    url: 'widget://html/common/saveImageButton.html',
+    pageParam: {
+        name: 'imageSave',
+        url: url
+    },
+	  rect: {
+      x: 0,
+      y: 0,
+      w: 'auto',
+      h: 'auto',
+    },
+    bounces: false,
+    bgColor: 'rgba(0,0,0,0.5)',
+    vScrollBarEnabled: false,
+	  animation: {
+	    type: 'movein',
+	    subType: 'from_bottom',
+	    duration: 300
+	  }
+});
 }

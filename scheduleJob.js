@@ -12,6 +12,7 @@ require('colors');
 
 const {
   PostModel, ThreadModel, UserModel, ActiveUserModel,
+  SubscribeModel,
   ShopOrdersModel, ShopRefundModel, ShopGoodsModel,
   SettingModel, UsersGeneralModel, KcbsRecordModel
 } = require('./dataModels');
@@ -405,5 +406,21 @@ jobs.indexToES = cronStr => {
 };
 
 // jobs.checkKcbsRecords();
+const sleep = (t) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, t)
+  });
+};
+jobs.cacheUserSubscribes = () => {
+  setTimeout(async () => {
+    const users = await UserModel.find({}, {uid: 1}).sort({tlv: -1});
+    for(const user of users) {
+      await SubscribeModel.saveUserSubscribeTypesToRedis(user.uid);
+      await sleep(1000);
+    }
+  });
+};
 
 module.exports = jobs;

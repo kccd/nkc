@@ -965,17 +965,23 @@ threadSchema.statics.publishArticle = async (options) => {
 * @author pengxiguaa 2019-4-26
 * */
 threadSchema.statics.getAds = async (fid) => {
-  let homeSettings = await mongoose.model("settings").findById("home");
+  const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
-  const ads = [];
-  for(const tid of homeSettings.c.ads) {
-    const thread = await ThreadModel.findOne({tid, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
-    if(thread) ads.push(thread);
-  }
-  return await ThreadModel.extendThreads(ads, {
+  let threads = await ThreadModel.find({tid: {$in: homeSettings.ads}, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
+  threads = await ThreadModel.extendThreads(threads, {
     forum: false,
     lastPost: false
   });
+  const threadsObj = {};
+  threads.map(thread => {
+    threadsObj[thread.tid] = thread;
+  });
+  const ads = [];
+  for(const tid of homeSettings.ads) {
+    const thread = threadsObj[tid];
+    if(thread) ads.push(thread);
+  }
+  return ads;
 };
 /*
 * 加载网站公告
@@ -992,7 +998,14 @@ threadSchema.statics.getNotice = async (fid) => {
   }
   return await ThreadModel.extendThreads(notice, {
     forum: false,
-    lastPost: false
+    lastPost: false,
+    category: false,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    lastPostUser: false,
+    firstPostResource: false,
+    htmlToText: false,
   });
 };
 /*
@@ -1076,7 +1089,14 @@ threadSchema.statics.getLatestThreads = async (fid) => {
   const threads = await ThreadModel.find({mainForumsId: {$in: fid}, disabled: false, reviewed: true}).sort({toc: -1}).limit(10);
   return await ThreadModel.extendThreads(threads, {
     lastPost: false,
-    category: false
+    category: false,
+    forum: true,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    lastPostUser: false,
+    firstPostResource: false,
+    htmlToText: false
   });
 };
 /*
@@ -1086,8 +1106,8 @@ threadSchema.statics.getLatestThreads = async (fid) => {
 * */
 threadSchema.statics.getRecommendMatch = async (fid) => {
   const SettingModel = mongoose.model("settings");
-  const homeSettings = await SettingModel.findById('home');
-  const {featuredThreads, hotThreads, voteUpTotal, voteUpMax, encourageTotal} = homeSettings.c.recommend;
+  const homeSettings = await SettingModel.getSettings('home');
+  const {featuredThreads, hotThreads, voteUpTotal, voteUpMax, encourageTotal} = homeSettings.recommend;
 
   const match = {
     disabled: false,
@@ -1116,10 +1136,10 @@ threadSchema.statics.getRecommendMatch = async (fid) => {
   if(hotThreads) {
     match.$or.push({
       count: {
-        $gte: homeSettings.c.hotThreads.postCount+1
+        $gte: homeSettings.hotThreads.postCount+1
       },
       replyUserCount: {
-        $gte: homeSettings.c.hotThreads.postUserCount+1
+        $gte: homeSettings.hotThreads.postUserCount+1
       }
     });
   }
@@ -1219,8 +1239,15 @@ threadSchema.statics.getRecommendThreads = async (fid) => {
   const match = await ThreadModel.getRecommendMatch(fid);
   const threads = await ThreadModel.find(match).sort({tlm: -1}).limit(10);
   return await ThreadModel.extendThreads(threads, {
+    lastPost: false,
     category: false,
-    lastPost: false
+    forum: true,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    lastPostUser: false,
+    firstPostResource: false,
+    htmlToText: false
   });
 };
 

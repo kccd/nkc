@@ -27,6 +27,7 @@ emailRouter
     if(!user || !pass) ctx.throw(400, '账号或密码不能为空');
     const emailSettingsDB = await db.SettingModel.findOnly({_id: 'email'});
     await emailSettingsDB.update({c: emailSettings});
+    await db.SettingModel.saveSettingsToRedis("email");
     await next();
   })
   .post('/test', async (ctx, next) => {

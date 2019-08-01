@@ -1110,8 +1110,7 @@ forumSchema.statics.getForumsNewTree = async (userRoles, userGrade, user) => {
 forumSchema.statics.getUserSubForums = async (uid, fid) => {
   const SubscribeModel = mongoose.model("subscribes");
   const ForumModel= mongoose.model('forums');
-  const sub = await SubscribeModel.find({uid, type: "forum"}).sort({toc: 1});
-  let fids = sub.map(s => s.fid);
+  let fids = await SubscribeModel.getUserSubForumsId(uid);
   fids = fids.filter(f => fid.includes(f));
   const subForums = await ForumModel.find({
     fid: {
@@ -1209,4 +1208,37 @@ forumSchema.statics.createNewThread = async function(options) {
   await SubscribeModel.insertSubscribe("post", thread.uid, thread.tid);
   return _post;
 };
+/*
+* 将指定类型的专业ID存入redis
+* @param {String} forumType topic: 话题, discipline: 学科
+* @return [[String]] 话题ID数组
+* @author pengxiguaa 2019-8-1
+* */
+forumSchema.statics.saveForumsIdToRedis = async (forumType) => {
+  const ForumModel = mongoose.model("forums");
+  const forums = await ForumModel.find({forumType}, {fid: 1});
+  const forumsId = forums.map(t => t.fid);
+  setTimeout(async () => {
+    const key = `forums:${forumType}sId`;
+    await client.delAsync(key);
+    if(forumsId.length) {
+      await client.saddAsync(key, forumsId);
+    }
+  });
+  return forumsId
+};
+/*
+* 从redis获取指定类型的专业ID
+* @param {String} forumType topic: 话题, discipline: 学科
+* @return [[String]] 话题ID数组
+* @author pengxiguaa 2019-8-1
+* */
+forumSchema.statics.getForumsIdFromRedis = async (forumType) => {
+  let forumsId = await client.smembersAsync(`forums:${forumType}sId`);
+  if(!forumsId.length) {
+    forumsId = await mongoose.model("forums").saveForumsIdToRedis(forumType);
+  }
+  return forumsId;
+};
+
 module.exports = mongoose.model('forums', forumSchema);

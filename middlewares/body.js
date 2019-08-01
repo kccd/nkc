@@ -17,7 +17,7 @@ module.exports = async (ctx, next) => {
       return
     }
 	  // 资源缓存24小时，排除掉用户头像、背景、专栏头像和专栏背景
-	  if(!freshOperations.includes(ctx.data.operationId)) {
+	  if(global.NKC.NODE_ENV === "production" && !freshOperations.includes(ctx.data.operationId)) {
       ctx.set('Cache-Control', 'public, max-age=86400');
     }
     const basename = path.basename(ctx.filePath);

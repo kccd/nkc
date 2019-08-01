@@ -28,6 +28,7 @@ router
 		if(operation === 'modifyOrder') {
 			await homeSettings.update({'c.ads': ads});
 		}
+		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	});
 module.exports = router;

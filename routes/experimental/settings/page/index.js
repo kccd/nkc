@@ -43,6 +43,7 @@ router
         searchColumnList
       }
 		});
+		await db.SettingModel.saveSettingsToRedis("page");
 		await next();
 	});
 module.exports = router;

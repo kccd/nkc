@@ -18,6 +18,7 @@ router
 			if (isNaN(numberOfDays)) ctx.throw(400, '收费天数输入错误');
 			await downloadSettings.update({'c.numberOfDays': numberOfDays, 'c.numberOfKcb': numberOfKcb});
 		}
+		await db.SettingModel.saveSettingsToRedis("download");
 		await next();
 	});
 module.exports = router;

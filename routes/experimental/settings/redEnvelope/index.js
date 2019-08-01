@@ -39,6 +39,7 @@ redEnvelopeRouter
       if(s.kcb > s.maxKcb) ctx.throw(400, '分享奖励中的科创币不能大于奖励上限');
     }
     await db.SettingModel.update({_id: 'redEnvelope'}, {$set: {'c.random': random, 'c.draftFee': draftFee, 'c.share': share}});
+    await db.SettingModel.saveSettingsToRedis("redEnvelope");
     await next();
   });
 module.exports = redEnvelopeRouter;

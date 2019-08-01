@@ -50,6 +50,7 @@ router
         "c.adminCertsId": adminCertsId
       }
     });
+    await db.SettingModel.saveSettingsToRedis("column");
     await next();
   });
 module.exports = router;

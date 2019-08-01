@@ -70,6 +70,8 @@ categoryRouter
 			await threadType.update({name});
 		}
     await redis.cacheForums();
+		await db.ForumModel.saveForumsIdToRedis("topic");
+    await db.ForumModel.saveForumsIdToRedis("discipline");
 		await next();
 	})
 	.post('/', async (ctx, next) => {

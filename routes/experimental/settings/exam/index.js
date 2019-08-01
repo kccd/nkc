@@ -23,6 +23,7 @@ router
       countOneDay,
       waitingTime
     }}});
+    await db.SettingModel.saveSettingsToRedis("exam");
     await next();
   });
 module.exports = router;

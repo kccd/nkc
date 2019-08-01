@@ -62,6 +62,7 @@ router
       totalMoney: kcbSettingsDB.c.totalMoney
     };
     await db.SettingModel.update({_id: 'kcb'}, {$set: {c}});
+    await db.SettingModel.saveSettingsToRedis("kcb");
 		await next();
 	})
   .patch("/record", async (ctx, next) => {

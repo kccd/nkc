@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const redisClient = require("../../settings/redisClient");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
@@ -35,38 +36,36 @@ router
         await user.updateUserMessage();
       }
     }
-
-    const homeSettings = (await db.SettingModel.findById("home")).c;
-
+    const homeSettings = await db.SettingModel.getSettings("home");
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
       user
     );
 
+    const topicsId = await db.ForumModel.getForumsIdFromRedis("topic");
+    const disciplinesId = await db.ForumModel.getForumsIdFromRedis("discipline");
+
     // 排除话题下的文章
     if(!homeSettings.list || !homeSettings.list.topic) {
-      const topics = await db.ForumModel.find({forumType: 'topic'}, {fid: 1});
-      const fids = topics.map(t => t.fid);
-      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !fids.includes(fid));
+      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !topicsId.includes(fid));
     }
     // 排除学科下的文章
     if(!homeSettings.list || !homeSettings.list.discipline) {
-      const dis = await db.ForumModel.find({forumType: 'discipline'}, {fid: 1});
-      const fids = dis.map(t => t.fid);
-      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !fids.includes(fid));
+      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !disciplinesId.includes(fid));
     }
-
     data.homeSettings = homeSettings;
-
     // 置顶文章轮播图
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
     // 网站公告
+
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     // 一周活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsers();
+
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
+
     let q = {};
     let threadListType;
     if(t) {
@@ -98,10 +97,9 @@ router
 
     data.t = threadListType;
     data.navbar = {highlight: threadListType};
+    let subFid = [], subTid = [], subUid = [], subColumnId = [];
+    let collectionTid = [], subTopicId = [], subDisciplineId = [];
 
-    // 关注的专业ID，关注的用户ID，关注的文章ID
-    const subFid = [], subUid = [], subTid = [];
-    let subColumnsId = [];
     if(threadListType === "latest") {
       q = {
         mainForumsId: {
@@ -143,66 +141,50 @@ router
       let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
       accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
 
-      let subscribeMatch = {
-        uid: user.uid
-      };
-      let subscribeType;
-      if(c === "other") {
-        subscribeMatch.cid = [];
-      } else if(c) {
-        subscribeType = await db.SubscribeTypeModel.findOne({_id: c});
-        if(!subscribeType) delete data.c;
+      if(!c) c = "all";
+      if(!d) d = "all";
+
+      if(d === "all") {
+        const redisTypeCount = await redisClient.smembersAsync(`user:${user.uid}:subscribeTypesId`);
+        let subThreadsId = [];
+        if(!redisTypeCount.length) {
+          const redisData = await db.SubscribeModel.getUserSubscribeTypesResults(user.uid);
+          await db.SubscribeModel.saveUserSubscribeTypesToRedis(user.uid, redisData);
+          const {results} = redisData;
+          const baseKey = `user:${user.uid}:subscribeType:${c}:`;
+          subThreadsId = results[baseKey + `thread`] || [];
+          collectionTid = results[baseKey + `collection`] || [];
+          subTopicId = results[baseKey + `topic`] || [];
+          subDisciplineId = results[baseKey + `discipline`] || [];
+          subUid = results[baseKey + `user`] || [];
+          subColumnId = results[baseKey + `column`] || [];
+        } else {
+          subThreadsId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "thread");
+          collectionTid = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "collection");
+          subTopicId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "topic");
+          subDisciplineId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "discipline");
+          subUid = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "user");
+          subColumnId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "column");
+        }
+        subTid = subThreadsId.concat(collectionTid);
+        subFid = subTopicId.concat(subDisciplineId);
+      } else {
+        const ids = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, d);
+        if(["thread", "collection"].includes(d)) {
+          subTid = ids;
+        } else if(["topic", "discipline"].includes(d)) {
+          subFid = ids;
+        } else if(d === "column") {
+          subColumnId = ids;
+        } else if(d === "user") {
+          subUid = ids;
+        } else {
+          ctx.throw(400, "未知的关注分类");
+        }
       }
-      if(subscribeType) {
-        let childTypes = await db.SubscribeTypeModel.find({pid: subscribeType._id}, {_id: 1});
-        childTypes = childTypes.map(t => t._id);
-        childTypes.push(c);
-        subscribeMatch.cid = {$in: childTypes};
-      }
-      if(d === "topic") {
-        let topics = await db.ForumModel.find({forumType: "topic"}, {fid: 1});
-        topics = topics.map(f => f.fid);
-        subscribeMatch["$and"] = [
-          {
-            type: "forum",
-            fid: {$in: topics}
-          }
-        ]
-      } else if(d === "discipline") {
-        let disciplines = await db.ForumModel.find({forumType: "discipline"}, {fid: 1});
-        disciplines = disciplines.map(f => f.fid);
-        subscribeMatch["$and"] = [
-          {
-            type: "forum",
-            fid: {$in: disciplines}
-          }
-        ]
-      } else if(d === "user") {
-        subscribeMatch.type = "user";
-      } else if(d === "thread") {
-        subscribeMatch.type = "thread";
-      } else if(d === "column") {
-        subscribeMatch.type = "column";
-      } else if(d === "collection") {
-        subscribeMatch.type = "collection";
-      }
-      const subs = await db.SubscribeModel.find(subscribeMatch, {
-        fid: 1,
-        tid: 1,
-        tUid: 1,
-        columnId: 1,
-        type: 1
-      }).sort({toc: -1});
-      subs.map(s => {
-        if(s.type === "forum") return subFid.push(s.fid);
-        if(s.type === "collection") return subTid.push(s.tid);
-        if(s.type === "thread") return subTid.push(s.tid);
-        if(s.type === "user") return subUid.push(s.tUid);
-        if(s.type === "column") return subColumnsId.push(s.columnId);
-      });
-      if(subColumnsId.length) {
-        const columns = await db.ColumnModel.find({_id: {$in: subColumnsId}, disabled: false, closed: false}, {_id: 1});
-        subColumnsId = columns.map(c => c._id);
+      if(subColumnId.length) {
+        const columns = await db.ColumnModel.find({_id: {$in: subColumnId}, disabled: false, closed: false}, {_id: 1});
+        subColumnId = columns.map(c => c._id);
       }
       q = {
         mainForumsId: {
@@ -220,7 +202,7 @@ router
             }
           },
           {
-            columnsId: {$in: subColumnsId}
+            columnsId: {$in: subColumnId}
           },
           {
             uid: {
@@ -249,7 +231,6 @@ router
         inColumn: true
       }
     }
-
     data.threads = [];
     let paging;
 
@@ -270,7 +251,6 @@ router
     threads = await db.ThreadModel.extendThreads(threads, {
       htmlToText: true
     });
-
     const superModerator = ctx.permission("superModerator");
     let canManageFid = [];
     if(user) {
@@ -296,7 +276,9 @@ router
         }
       }
       if(threadListType === "subscribe") {
-        if(subTid.includes(thread.tid)) {
+        if(collectionTid.includes(thread.tid)) {
+          thread.from = "collection";
+        } else if(subTid.includes(thread.tid)) {
           thread.from = 'subThread';
         } else if(subUid.includes(thread.uid)) {
           thread.from = 'subFriend';
@@ -305,7 +287,7 @@ router
         } else {
           let from = "";
           for(const columnId of thread.columnsId) {
-            if(subColumnsId.includes(columnId)) {
+            if(subColumnId.includes(columnId)) {
               from = "subColumn";
               break;
             }
@@ -316,7 +298,6 @@ router
       }
       data.threads.push(thread);
     }
-
     if(threadListType !== "latest") {
       data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
     }
@@ -324,12 +305,7 @@ router
     if(threadListType !== "recommend") {
       data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     }
-
-    // data.threads = threads;
     data.paging = paging;
-
-    const activeUsers = await db.ActiveUserModel.find().sort({ vitality: -1 }).limit(12);
-    data.activeUsers = await db.ActiveUserModel.extendUsers(activeUsers);
     ctx.template = "home/home.pug";
     await next();
   });

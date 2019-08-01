@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const redisClient = require('../settings/redisClient');
 
 const settingSchema = new Schema({
   _id: String,
@@ -42,37 +43,6 @@ async function operateSystemID(type, op) {
     setting.c[type] += op;
   }
   return setting.c[type];
-  /* const SettingModel = mongoose.model('settings');
-  if(op !== 1 && op !== -1) throw 'invalid operation. a operation should be -1 or 1';
-  const setting = await SettingModel.findOne({_id: 'counters'});
-  if(!setting) throw 'counters settings not found';
-  if(!setting.c[type]) {
-    setting.c[type] = op;
-  } else {
-    setting.c[type] += op;
-  }
-  await setting.update({c: setting.c});
-  return setting.c[type]; */
-  /*if(op !== 1 && op !== -1)
-    throw 'invalid operation. a operation should be -1 or 1';
-  let setting;
-  const counterType = "c." + type;
-  const attrObj = {};
-  attrObj[counterType] = op;
-  try {
-    setting = await this.findOneAndUpdate({_id: 'counters'}, {$inc: attrObj});
-  } catch(e) {
-    throw 'invalid id type, a type should be one of these [resources, users, posts, threadTypes, threads].'
-  }
-  let number = setting.counters[type];
-  if(isNaN(number)) {
-		number = 0;
-		const settings = await this.findOnly({type: 'system'});
-		const {counters} = settings;
-		counters[type] = op;
-		await settings.update({counters});
-  }
-  return number + op;*/
 }
 
 settingSchema.statics.operateSystemID = operateSystemID;
@@ -117,8 +87,23 @@ settingSchema.statics.findById = async (_id) => {
 * @param {String} _id
 * */
 settingSchema.statics.getSettings = async (_id) => {
-  const settings  = await mongoose.model("settings").findById({_id});
+  let settings = await redisClient.getAsync(`settings:${_id}`);
+  if(!settings) {
+    settings = await mongoose.model("settings").saveSettingsToRedis(_id);
+  } else {
+    settings = JSON.parse(settings);
+  }
   return settings.c;
+};
+settingSchema.statics.saveSettingsToRedis = async (_id) => {
+  const SettingModel = mongoose.model("settings");
+  const settings = await SettingModel.findOne({_id});
+  if(settings) {
+    setTimeout(async () => {
+      await redisClient.setAsync(`settings:${_id}`, JSON.stringify(settings));
+    });
+  }
+  return settings;
 };
 
 module.exports = mongoose.model('settings', settingSchema);

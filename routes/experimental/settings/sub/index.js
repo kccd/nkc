@@ -25,6 +25,7 @@ router
         "c.subThreadCountLimit": subThreadCountLimit
       }
     });
+    await db.SettingModel.saveSettingsToRedis("subscribe");
     await next();
   });
 module.exports = router;

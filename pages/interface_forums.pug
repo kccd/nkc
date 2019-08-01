@@ -1,28 +1,10 @@
 extends bootstrap_base
 
 block title
-  meta(name='description' content='每天前进一小步 - 发展科技爱好，倡导科学理性, Since 2001.')
-  meta(name='keywords' content='科创论坛，专业创客，极客论坛，创客论坛，创客教育，电磁炮，高斯枪，特斯拉线圈，科技小制作，电子DIY')
-
-  //- meta(property='og:image' content='http://www.kechuang.org/resources/site_specific/umaru_chem_300x200.png')
-  //- meta(property='og:title' content='科创论坛')
-  //- meta(property='og:site_name' content='科创论坛')
-  //- meta(property='og:description' content='华语世界最优秀的极客和创客社群，我们的宗旨是：发展科技爱好，倡导科学理性。Since 2001.')
-
-  title #{data.site.name} - #{data.site.description}
-  -const mainContainer1400 = true
+  meta(name='description' content=state.serverSettings.description)
+  meta(name='keywords' content=state.serverSettings.keywords.join(","))
+  title=`${state.serverSettings.websiteName} - ${state.serverSettings.brief}`
 block content
-  //- mixin createForumsList(forums)
-  //-   for forum in forums
-  //-     include module_children_forum_single
-  //-     if forum.childrenForums && forum.childrenForums.length > 0
-  //-       .row
-  //-         .col-xs-12.col-md-12(style='padding-left: 4rem;')
-  //-           +createForumsList(forum.childrenForums)
-  //- .container-fluid.max-width
-  //-   .row
-  //-     .col-xs-12.col-md-8.col-md-offset-2
-  //-       +createForumsList(data.forums)
   mixin createForumsDisList(forums)
     for forum in forums
       include module_children_forum_single

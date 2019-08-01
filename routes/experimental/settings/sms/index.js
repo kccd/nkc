@@ -29,6 +29,7 @@ smsRouter
       }
     }
     await smsSettingsDB.update({c: smsSettings});
+    await db.SettingModel.saveSettingsToRedis("sms");
 		await next();
 	})
   .post('/test', async (ctx, next) => {

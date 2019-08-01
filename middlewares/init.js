@@ -1,7 +1,6 @@
 const tools = require('../tools');
 const settings = require('../settings');
 const nkcModules = require('../nkcModules');
-const es = settings.elastic;
 const db = require('../dataModels');
 const {logger} = nkcModules;
 const fs = require('fs');
@@ -48,39 +47,19 @@ module.exports = async (ctx, next) => {
 	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;
     ctx.redis = redis;
+    ctx.settings = settings;
+    ctx.fs = fsSync;
+
     ctx.state = {
       url: ctx.url.replace(/\?.*/ig, ""),
-      apptype: (ctx.query.apptype && ctx.query.apptype === "app")?"app":""
+      apptype: (ctx.query.apptype && ctx.query.apptype === "app")?"app":"",
+      twemoji: settings.editor.twemoji,
+
+      // - 初始化网站设置
+      pageSettings: await db.SettingModel.getSettings("page"),
+      postSettings: await db.SettingModel.getSettings("post"),
+      serverSettings: await db.SettingModel.getSettings("server")
     };
-    ctx.settings = settings;
-	  ctx.data.site = settings.site;
-	  ctx.data.twemoji = settings.editor.twemoji;
-		ctx.data.getcode = false;
-	  // - 初始化网站设置
-    const webSettings = await db.SettingModel.find({_id: {$in: ['server', 'page', 'post']}});
-    let serverSettings, pageSettings, postSettings;
-    for(const s of webSettings) {
-      if(s._id === "server") serverSettings = s.c;
-      if(s._id === "page") pageSettings = s.c;
-      if(s._id === "post") postSettings = s.c;
-    }
-    ctx.state.pageSettings = pageSettings;
-    ctx.state.postSettings = postSettings;
-	  ctx.data.serverSettings = {
-			websiteName: serverSettings.websiteName,
-		  github: serverSettings.github,
-		  copyright: serverSettings.copyright,
-		  record: serverSettings.record,
-		  description: serverSettings.description,
-		  keywords: serverSettings.keywords,
-		  brief: serverSettings.brief,
-		  telephone: serverSettings.telephone,
-      links: serverSettings.links
-	  };
-
-	  ctx.es = es;
-
-	  ctx.fs = fsSync;
 
 	  // 权限判断
     // @param {String} o 操作名
@@ -139,6 +118,7 @@ module.exports = async (ctx, next) => {
 
 	  //error handling
     await next();
+
 		if(ctx.data && ctx.data.user && ctx.data.user.toObject) {
 			ctx.data.user = ctx.data.user.toObject();
 		}

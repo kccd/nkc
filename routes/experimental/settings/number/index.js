@@ -16,6 +16,7 @@ router
 		}
 		const scoreSettings = await db.SettingModel.findOnly({_id: 'score'});
 		await scoreSettings.update({'c.coefficients': coefficients});
+		await db.SettingModel.saveSettingsToRedis("score");
 		await next();
 	});
 module.exports = router;

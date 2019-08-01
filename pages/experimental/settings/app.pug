@@ -19,7 +19,7 @@ block content
       .col-xs-12.col-md-10
         if data.type === 'upload'
           .row#content
-          -const {telephone, websiteName, github, copyright, record, description, keywords, brief} = data.serverSettings || {};
+          -const {telephone, websiteName, github, copyright, record, description, keywords, brief} = state.serverSettings || {};
           .form-horizontal
             .form-group
               label.col-sm-2.control-label 选择平台
