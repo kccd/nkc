@@ -15,15 +15,24 @@ activityRouter
 })
 .get('/', async (ctx, next) => {
   const {query, data, db} = ctx;
-  const page = query.page? parseInt(query.page): 0;
-  const q = {};
-  let activitys = await db.ActivityModel.find({"activityType":"release"}).sort({toc: -1});
-  let total = 0;
-  const count = activitys.length;
-  const paging = apiFn.paging(page, count);
-  data.paging = paging;
-  data.activitys = activitys;
+  // 获取近期和历史活动
+  let recentActivityArr = await db.ActivityModel.find({activityType: {$nin:["close"]}, holdEndTime: {$gt: Date.now()}}).sort({toc: -1});
+  let historyActivityArr = await db.ActivityModel.find({activityType: {$nin:["close"]}, holdEndTime: {$lt: Date.now()}}).sort({toc: -1}).limit(8);
+  data.recentActivityArr = recentActivityArr;
+  data.historyActivityArr = historyActivityArr;
   ctx.template = 'activity/activityIndex.pug';
+  await next();
+})
+.post('/block', async (ctx, next) => {
+  const {data, db, body} = ctx;
+  const {acid} = body;
+  await db.ActivityModel.update({acid: acid}, {$set: {isBlock: true}});
+  await next();
+})
+.post('/unblock', async (ctx, next) => {
+  const {data, db, body} = ctx;
+  const {acid} = body;
+  await db.ActivityModel.update({acid: acid}, {$set: {isBlock: false}});
   await next();
 })
 .use('/release', releaseRouter.routes(), releaseRouter.allowedMethods())

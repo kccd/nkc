@@ -22,8 +22,10 @@ const fsSync = {
 };
 
 module.exports = async (ctx, next) => {
-	try {
-    ctx.data = Object.create(null);
+  ctx.reqTime = new Date();
+  ctx.data = Object.create(null);
+  ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
+  try {
     Object.defineProperty(ctx, 'template', {
       get: function() {
         return './pages/' + this.__templateFile
@@ -42,7 +44,6 @@ module.exports = async (ctx, next) => {
 	  ctx.address = ip;
 	  ctx.port = port;
     ctx.body = ctx.request.body;
-	  ctx.reqTime = new Date();
 	  ctx.db = db;
 	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;

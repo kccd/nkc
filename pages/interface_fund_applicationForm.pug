@@ -361,7 +361,7 @@ block content
                   -for(let user of applicationForm.supporters)
                     .vote-user
                       a(href=`/u/${user.uid}`)
-                        img(src=`/avatar/${user.uid}`)
+                        img(src=`/avatar/${user.avatar}`)
                         span= `${user.username}`
                   br
                   br
@@ -370,7 +370,7 @@ block content
                   -for(let user of applicationForm.objectors)
                     .vote-user
                       a(href=`/u/${user.uid}`)
-                        img(src=`/avatar/${user.uid}`)
+                        img(src=`/avatar/${user.avatar}`)
                         span.redFontColor= `${user.username}`
           .panel.panel-default
             .panel-body.applicationForm

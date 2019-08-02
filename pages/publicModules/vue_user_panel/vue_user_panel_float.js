@@ -63,6 +63,8 @@ var vue_user_panel_float = new Vue({
         description: (targetUser.description ||"暂未填写个人简介").slice(0, 140),
         uid: targetUser.uid,
         kcb: targetUser.kcb,
+        avatar: targetUser.avatar,
+        banner: targetUser.banner,
         tlv: targetUser.tlv,
         column: targetUser.column,
         toc: targetUser.toc,

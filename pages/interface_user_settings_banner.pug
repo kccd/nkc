@@ -16,7 +16,7 @@ block content
               .col-xs-12.col-md-6
                 .row
                   .col-xs-12.col-md-12.user-settings-img-dev
-                    img#img(src=`/u/${data.user.uid}/banner` style='max-width: 100%;')
+                    img#img(src=`/banner/${data.user.banner}` style='max-width: 100%;')
                   .col-xs-12.col-md-12.text-center.m-t-1
                     button.btn.btn-primary(onclick='selectBanner()') 选择图片
                     h5.upload-info
@@ -53,7 +53,7 @@ block scripts
         var user = NKC.methods.getDataById("data").user;
         var formData = new FormData();
         formData.append("file", data);
-        uploadFilePromise('/u/' + user.uid + "/banner", formData, function (e, percentage) {
+        uploadFilePromise('/banner/' + user.uid, formData, function (e, percentage) {
           $(".upload-info").text('上传中...' + percentage);
           if (e.total === e.loaded) {
             $(".upload-info").text('上传完成！');
@@ -62,8 +62,8 @@ block scripts
             }, 2000);
           }
         }, "POST")
-          .then(function () {
-            $("#img").attr("src", "/u/" + user.uid + "/banner?time=" + Date.now());
+          .then(function (data) {
+            $("#img").attr("src", "/banner/" + data.user.banner + "?time=" + Date.now());
             selectImage.close();
           })
           .catch(function (data) {

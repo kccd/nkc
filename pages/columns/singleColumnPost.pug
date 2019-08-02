@@ -19,7 +19,7 @@
       .column-post-info
         if !data.column || data.column.uid !== post.uid
           a(href=`/u/${post.uid}` target="_blank").column-post-author
-            img(src=`/avatar/${post.uid}?t=sm`)
+            img(src=`/avatar/${post.user.avatar}?t=sm`)
             span=post.user.username
         .column-post-time
           span.m-r-05=fromNow(toc)

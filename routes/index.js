@@ -34,6 +34,8 @@ const searchRouter = routers.search;
 const protocolRouter = routers.protocol;
 const reviewRouter = routers.review;
 const threadsRouter = routers.threads;
+const userAvatarRouter = routers.userAvatar;
+const userBannerRouter = routers.userBanner;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
@@ -70,4 +72,6 @@ router.use("/column", columnRouter.routes(), columnRouter.allowedMethods());
 router.use('/imageEdit', imageEditRouter.routes(), imageEditRouter.allowedMethods());
 router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 router.use("/threads", threadsRouter.routes(), threadsRouter.allowedMethods());
+router.use("/avatar", userAvatarRouter.routes(), userAvatarRouter.allowedMethods());
+router.use("/banner", userBannerRouter.routes(), userBannerRouter.allowedMethods());
 module.exports = router;

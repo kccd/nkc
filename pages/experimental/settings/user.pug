@@ -119,7 +119,7 @@ block content
                   for user in data.users
                     tr
                       th
-                        img(src=`/avatar/${user.uid}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
+                        img(src=`/avatar/${user.avatar}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
                         a(href=`/u/${user.uid}` target='_blank')= user.username || user.uid
                       th= user.threadCount
                       th= user.postCount

@@ -21,6 +21,7 @@ const defaultVideoCoverPath = defaultPath + '/videoCover.jpg';
 const defaultForumBannerPath = defaultPath + "/forum_banner.jpg";
 const defaultColumnAvatarPath = defaultPath + "/column_avatar.jpg";
 const defaultColumnBannerPath = defaultPath + "/column_banner.jpg";
+const defaultPosterPath = defaultPath + "/default_poster.jpg";
 
 const staticPath = path.resolve('public/statics');
 const defaultRoleIconPath = staticPath + '/role_icon';
@@ -48,6 +49,8 @@ module.exports = {
   defaultVideoCoverPath,
 
   defaultColumnAvatarPath,
-  defaultColumnBannerPath
+  defaultColumnBannerPath,
+
+  defaultPosterPath
 
 };

@@ -3,7 +3,7 @@ if data.comments
     for post in data.comments
       .applicationForm-comment
         a(href=`/u/${post}.uid` target="_blank").form-user-info
-          img(src=`/avatar/${post.uid}?t=sm`)
+          img(src=`/avatar/${post.user.avatar}?t=sm`)
           span=post.user.username
         .form-time=fromNow(post.toc)
         -post.c = hideContentByUser(post.c, data.user, 'thread')

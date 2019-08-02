@@ -11,7 +11,7 @@ if data.highlight === comment.pid
 .post-comment(class=klass id=`post_comment_${comment.pid}`)
   .post-comment-body.highlight
     a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
-      img(src=`/avatar/${comment.uid}?t=sm`)
+      img(src=`/avatar/${comment.user.avatar}?t=sm`)
       span=comment.user.username
     //-if data.post.uid === comment.uid
       span (层主)

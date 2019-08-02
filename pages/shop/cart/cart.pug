@@ -10,7 +10,7 @@ block shopAccountContent
       .user-info
         .m-r-1.display-i-b
           button.btn.btn-xs.btn-default(@click='selectedAll(d)') 全选
-        img.avatar(:src="'/avatar/' + d.user.uid")
+        img.avatar(:src="'/avatar/' + d.user.avatar")
         .username {{d.user.username}}
       .product-panel(v-for='c in d.products' :class='{"selected": selectedId.indexOf(c._id) !== -1}')  
         .product-select.p-l-1

@@ -1,259 +1,183 @@
 extends ../bootstrap_base
 block title
   meta(name='description' content=`${data.activity.address}` || '暂无活动介绍')
-  link(rel='stylesheet', href='/fund.css')
-  title 科创活动
+  title!=`科创活动 - ${data.activity.activityTitle}`
 
-  -const mainContainer1400 = true
   link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
   link(rel="stylesheet", href="/external_pkgs/cropper/css/cropper.css")
+  +includeCSS("/fund.css")
+  style.
+    .description img {
+      max-width: 100%
+    }
 block content
   .container-fluid.max-width
       include activityNav.pug
       -if(!data.type)
         .row
-          .col-xs-12.col-md-12
-            .row
-              .col-xs-12.col-md-2
-                .text-center(style="width:100%")
-                  .row
-                    .col-xs-10.col-md-10.col-xs-offset-1.col-md-offset-1
-                      .col-xs-3.col-md-3(style="padding:0px")
-                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qq', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
-                          img(src="/default/QQ.png" style="")
-                      .col-xs-3.col-md-3(style="padding:0px")
-                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qzone', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
-                          img(src="/default/qzone.png" style="")
-                      .col-xs-3.col-md-3(style="padding:0px")
-                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'weibo', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
-                          img(src="/default/weibo.png" style="")
-                      .col-xs-3.col-md-3(style="padding:0px")
-                        a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'weChat', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
-                          img(src="/default/weChat.png" style="")
-                    .col-xs-12.col-md-12.m-t-1
-                      a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('activity', 'link', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`) 获取分享链接
-                    .col-xs-12.col-md-12(id=`copyArea${data.activity.acid}` style="display:none")
-                      input(type="text", id=`copyLink${data.activity.acid}`, name=`copyLink${data.activity.acid}` style="width:inherit")
-                      button(onclick=`copyLink('${data.activity.acid}')` id=`copyButton${data.activity.acid}`) 复制
-                    .col-xs-12.col-md-12.m-t-1
-                      canvas#activityQrcode(style="display:none")
-                  //- img(src=`${'/poster/'+data.activity.posterId}` style="width:100%")
-              .col-xs-12.col-md-8
-                .form-group
-                  .col-sm-6
-                    img(src=`${'/poster/'+data.activity.posterId}` style="width:100%")
-                  .col-sm-5
-                    .col-sm-12
-                      .form-group
-                        span(style='font-size:18px')=`${data.activity.activityTitle}`
-                    .col-sm-12
-                      .form-group
-                        span.fa.fa-calendar=` ${data.activity.holdStartTime} ~ ${data.activity.holdEndTime}`
-                    .col-sm-12
-                      .form-group
-                        span.fa.fa-location-arrow=` ${data.activity.address}`
-                    .col-sm-12
-                      .form-group
-                        -if(data.activity.limitNum == 0)
-                          span.fa.fa-users=` 不限人数(已报名${data.activity.signUser.length}人)`
-                        -else
-                          span.fa.fa-users=` 限制${data.activity.limitNum}人数(已报名${data.activity.signUser.length}人)`
-                    .col-sm-12
-                      .form-group
-                        span=`主办方: ${data.activity.sponsor}`
-                    .col-sm-12
-                      .form-group
-                        span=`联系电话: ${data.activity.contactNum}`
-                    .col-sm-12
-                      -if(data.user && data.activity.signUser.includes(data.user.uid))
-                        button.btn.btn-default(disabled) 已报名
-                        button.btn.btn-warning(onclick=`cancelApply(${data.activity.acid})`) 取消报名
-                      -else if(data.activity.limitNum !==0 && data.activity.signUser.length >= data.activity.limitNum && data.activity.continueTofull == false)
-                        button.btn.btn-default(disabled) 报名人数已达上限
-                      -else if(parseInt(new Date(data.activity.enrollStartTime).getTime()) > parseInt(new Date().getTime()))
-                        button.btn.btn-default(disabled) 报名尚未开始
-                      -else if(parseInt(new Date(data.activity.enrollEndTime).getTime()) < parseInt(new Date().getTime()))
-                        button.btn.btn-default(disabled) 报名已结束
-                      -else if(parseInt(new Date(data.activity.holdEndTime).getTime()) < parseInt(new Date().getTime()))
-                        button.btn.btn-default(disabled) 活动已结束
+          .col-xs-12.col-md-8.box-shadow-panel
+            div(style="padding:2rem")
+              .applicationForm
+                if data.activity.isBlock
+                  .row.m-b-4.m-t-1(style="text-align:center;background-color:#f39e59")
+                    span(style="font-weight:500px") 当前活动已被屏蔽
+                .row.m-b-4.m-t-1
+                  .col-xs-12.col-md-12
+                    .id.text-center!=`${data.activity.activityTitle}`
+                .row.m-b-4
+                  .col-xs-12.col-md-12
+                    .applicationForm-header 活动信息
+                    hr
+                  .col-xs-12.col-md-6
+                    h5 
+                      span 活动时间：
+                      span=` ${data.activity.holdStartTime.toLocaleString()} ~ ${data.activity.holdEndTime.toLocaleString()}`
+                    h5 
+                      span 报名时间：
+                      span=` ${data.activity.enrollStartTime.toLocaleString()} ~ ${data.activity.enrollEndTime.toLocaleString()}`
+                    h5
+                      span 举办地点：
+                      span=` ${data.activity.address}`
+                    h5
+                      span 报名人数：
+                      -if(data.activity.limitNum == 0)
+                        span=` 已报名${data.activity.signUser.length}人 (不限人数)`
                       -else
+                        span=` 已报名${data.activity.signUser.length}人 (限制${data.activity.limitNum}人数)`
+                    h5
+                      span 主办单位：
+                      span=` ${data.activity.sponsor}`
+                    h5
+                      span 联系电话：
+                      span=` ${data.activity.contactNum}`
+                  .col-xs-12.col-md-6
+                    p 活动海报
+                    img(src=`${'/poster/'+data.activity.posterId}` style="width:100%")
+                  .col-xs-12.col-md-12(style="margin-top: 5px")
+                    -if(data.user && data.activity.signUser.includes(data.user.uid))
+                      button.btn.btn-default(disabled) 已报名
+                      button.btn.btn-warning(onclick=`cancelApply(${data.activity.acid})`) 取消报名
+                    -else if(data.activity.limitNum !==0 && data.activity.signUser.length >= data.activity.limitNum && data.activity.continueTofull == false)
+                      button.btn.btn-default(disabled) 报名人数已达上限
+                    -else if(parseInt(new Date(data.activity.enrollStartTime).getTime()) > parseInt(new Date().getTime()))
+                      button.btn.btn-default(disabled) 报名尚未开始
+                    -else if(parseInt(new Date(data.activity.enrollEndTime).getTime()) < parseInt(new Date().getTime()))
+                      button.btn.btn-default(disabled) 报名已结束
+                    -else if(parseInt(new Date(data.activity.holdEndTime).getTime()) < parseInt(new Date().getTime()))
+                      button.btn.btn-default(disabled) 活动已结束
+                    -else
+                      if !data.activity.isBlock
                         -if(data.user)
-                          button.btn.btn-primary(onclick="changeToApply()") 我要报名
+                          button.btn.btn-primary(onclick="changeToApply(this)" id="applyButton" formShow="hide") 我要报名
                         -else
-                          button.btn.btn-primary(onclick="window.open('/login')") 我要报名
-                      //- .col-sm-6
-                      //-   button.btn.btn-primary 关注
-                  .col-sm-1
-              .col-xs-12.col-md-2
-                .list-group
-                  span
-                    b
-                      a.list-group-item.text-center(href=`/activity/single/${data.activity.acid}`) 当前版本
-                  .dropdown
-                    ul.dropdown-menu(aria-labelledby="dropdownMenu1")
-                    -for(var i in data.activity.historys)
-                      li
-                        a.list-group-item(href=`/activity/single/${data.activity.acid}?type=history&hid=${data.activity.historys[i]._id}`)!=data.activity.historys[i].toc.toLocaleString()
-      -else if(data.type && data.type == 'history')
-        .row
-          .col-xs-12.col-md-12
-            .row
-              .col-xs-12.col-md-2
-              .col-xs-12.col-md-8
-                .form-group
-                  .col-sm-6
-                    img(src=`${'/poster/'+data.history.posterId}` style="width:100%")
-                  .col-sm-5
-                    .col-sm-12
-                      .form-group
-                        span(style='font-size:18px')=`${data.history.activityTitle}`
-                    .col-sm-12
-                      .form-group
-                        span.fa.fa-calendar=` ${data.history.holdStartTime} ~ ${data.history.holdEndTime}`
-                    .col-sm-12
-                      .form-group
-                        span.fa.fa-location-arrow=` ${data.history.address}`
-                    .col-sm-12
-                      .form-group
-                        -if(data.history.limitNum == 0)
-                          span.fa.fa-users=` 不限人数`
-                        -else
-                          span.fa.fa-users=` 限制${data.history.limitNum}人数`
-                    .col-sm-12
-                      .form-group
-                        span=`主办方: ${data.history.sponsor}`
-                    .col-sm-12
-                      .form-group
-                        span=`联系电话: ${data.history.contactNum}`
-                  .col-sm-1
-              .col-xs-12.col-md-2
-                .list-group
-                  span
-                    b
-                      a.list-group-item.text-center(href=`/activity/single/${data.activity.acid}`) 当前版本
-                  .dropdown
-                    ul.dropdown-menu(aria-labelledby="dropdownMenu1")
-                    -for(var i in data.activity.historys)
-                      li
-                        a.list-group-item(href=`/activity/single/${data.activity.acid}?type=history&hid=${data.activity.historys[i]._id}`)!=data.activity.historys[i].toc.toLocaleString()
-
-      .row
-        .col-xs-12.col-md-12
-          .row
-            .col-xs-12.col-md-2
-            .col-xs-12.col-md-8#description(style="display:")
-              hr
-              .form-group
+                          button.btn.btn-primary(onclick="window.open('/login')" id="applyButton") 我要报名
+                .row.m-b-4.m-t-1#apply(style="display: none")
+                  .col-xs-12.col-md-12
+                    .applicationForm-header 报名表单
+                    hr
+                  .col-xs-12.col-md-12
+                    .form-horizontal
+                      -for(var i in data.activity.conditions)
+                        -if(data.activity.conditions[i].formType == "text")          
+                          -if(data.activity.conditions[i].infoName == "姓名")        
+                            .form-group
+                              label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
+                              .col-sm-10
+                                input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
+                                span#realNameErr(style='color:red')
+                          -else if(data.activity.conditions[i].infoName == "手机")        
+                            .form-group
+                              label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
+                              .col-sm-10
+                                input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.activity.userPersonal ? data.activity.userPersonal.mobile : '')
+                                span#realNameErr(style='color:red')
+                          -else if(data.activity.conditions[i].infoName == "昵称")        
+                            .form-group
+                              label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
+                              .col-sm-10
+                                input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.user ? data.user.username : '')
+                                span#realNameErr(style='color:red')
+                          -else      
+                            .form-group
+                              label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
+                              .col-sm-10
+                                input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
+                                span#realNameErr(style='color:red')
+                    .col-sm-2
+                    .col-sm-10
+                      input(type="checkbox" checked)#agreement
+                      sapn 我已阅读并同意
+                        a(href="/protocol") 《科创网及论坛统一服务协议》
+                      button.btn.btn-primary#onpost(onclick=`onpost(${data.activity.acid})`) 提交
+                .row.m-b-4.m-t-1
+                  .col-xs-12.col-md-12
+                    .applicationForm-header 活动详情
+                    hr
+                  .col-xs-12.col-md-12.description
+                    .form-group
+                      - let post = {c: data.activity.description,l: "html"}
+                      div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
                 -if(!data.type)
-                  div!= data.activity.description
-                -else
-                  div!= data.history.description
-            .col-xs-12.col-md-8#apply(style="display:none")
-              hr
-              .form-horizontal
-                -for(var i in data.activity.conditions)
-                  -if(data.activity.conditions[i].formType == "text")          
-                    -if(data.activity.conditions[i].infoName == "姓名")        
-                      .form-group
-                        label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                        .col-sm-10
-                          input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
-                          span#realNameErr(style='color:red')
-                    -else if(data.activity.conditions[i].infoName == "手机")        
-                      .form-group
-                        label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                        .col-sm-10
-                          input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.activity.userPersonal ? data.activity.userPersonal.mobile : '')
-                          span#realNameErr(style='color:red')
-                    -else if(data.activity.conditions[i].infoName == "昵称")        
-                      .form-group
-                        label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                        .col-sm-10
-                          input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.user ? data.user.username : '')
-                          span#realNameErr(style='color:red')
-                    -else      
-                      .form-group
-                        label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                        .col-sm-10
-                          input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
-                          span#realNameErr(style='color:red')
-              //-   .form-group
-              //-     label.col-sm-2.control-label!=('<span style="color:red">*</span>手机：')
-              //-     .col-sm-10
-              //-       input.form-control#mobile(placeholder='请输入手机号码' value=data.activity.userPersonal ? data.activity.userPersonal.mobile : '')
-              //-       span#mobileErr(style='color:red')
-              //-   .form-group
-              //-     label.col-sm-2.control-label!=('论坛昵称：')
-              //-     .col-sm-10
-              //-       input.form-control#kcName(placeholder='' value=data.activity.user ? data.activity.user.username : '')
-              //-       span#kcNameErr(style='color:red')
-              //-   .form-group
-              //-     label.col-sm-2.control-label!=('邮箱：')
-              //-     .col-sm-10
-              //-       input.form-control#email(placeholder='' value=data.activity.userPersonal ? data.activity.userPersonal.email : '')
-              //-       span#emailErr(style='color:red')
-              //- hr
-              //- .form-horizontal
-              //-   .form-group
-              //-     label.col-sm-2.control-label!=(data.activity.conditions.includes('wxn')?'<span style="color:red">*</span>微信：':'微信：')
-              //-     .col-sm-10
-              //-       input.form-control#wxNum(placeholder='请填写您的微信号')
-              //-       span#wxNumErr(style='color:red')
-              //-   .form-group
-              //-     label.col-sm-2.control-label!=(data.activity.conditions.includes('qqn')?'<span style="color:red">*</span>QQ：':'QQ：')
-              //-     .col-sm-10
-              //-       input.form-control#qqNum(placeholder='请填写您的QQ号')
-              //-       span#qqNumErr(style='color:red')
-              //-   .form-group
-              //-     label.col-sm-2.control-label!=(data.activity.conditions.includes('age')?'<span style="color:red">*</span>年龄：':'年龄：')
-              //-     .col-sm-10
-              //-       input.form-control#age(placeholder='请输入您的真实年龄')
-              //-       span#ageErr(style='color:red')
-              //-   .form-group
-              //-     label.col-sm-2.control-label!=(data.activity.conditions.includes('edu')?'<span style="color:red">*</span>学历：':'学历：')
-              //-     .col-sm-10
-              //-       input.form-control#education(placeholder='')
-              //-       span#educationErr(style='color:red')
-              //-   .form-group
-              //-     label.col-sm-2.control-label!=(data.activity.conditions.includes('wor')?'<span style="color:red">*</span>单位(院校)：':'单位(院校)：')
-              //-     .col-sm-10
-              //-       input.form-control#wordUnit(placeholder='')
-              //-       span#wordUnitErr(style='color:red')
-              .col-sm-2
-              .col-sm-10
-                input(type="checkbox" checked)#agreement
-                sapn 我已阅读并同意
-                  a(href="/") 《科创网及论坛统一服务协议》
-                button.btn.btn-primary#onpost(onclick=`onpost(${data.activity.acid})`) 提交
-                button.btn.btn-warning(onclick="changeToDescription()") 取消报名
-            .col-xs-12.col-md-2
-      -if(!data.type)
-        .row
-          .col-xs-12.col-md-12
-            .row
-              .col-xs-12.col-md-2
-              .col-xs-12.col-md-8
-                hr
-                h4 全部评论
-                -for(let post of data.activity.posts)
-                  hr(style="border:0.5px dashed;" color="#DDDDDD") 
-                  a(href=`/u/${post.uid}`)= post.user.username
-                  span!=` 发表于 ${post.toc.toLocaleString()}`
-                  div!=`${post.commentContent}`
-              .col-xs-12.col-md-2
-      -if(!data.type)
-        .row
-          .col-xs-12.col-md-12
-            .row
-              .col-xs-12.col-md-2
-              .col-xs-12.col-md-8
-                hr
-                h4 发表评论
-                textarea.form-control#commentContent(rows="8", placeholder="填写评论")
-                br
-                button.btn.btn-default(onclick=`submitComment(${data.activity.acid})`) 发表
-              .col-xs-12.col-md-2
+                  .row.m-b-4.m-t-1
+                    .col-xs-12.col-md-12
+                      .applicationForm-header 全部评论
+                      hr
+                    .col-xs-12.col-md-12
+                      -for(let post of data.activity.posts)
+                        hr(style="border:0.5px dashed;" color="#DDDDDD") 
+                        a(href=`/u/${post.uid}`)= post.user.username
+                        span!=` 发表于 ${post.toc.toLocaleString()}`
+                        div!=`${post.commentContent}`
+                  .row.m-b-4.m-t-1
+                    .col-xs-12.col-md-12
+                      .applicationForm-header 发表评论
+                      hr
+                    .col-xs-12.col-md-12
+                      textarea.form-control#commentContent(rows="8", placeholder="填写评论")
+                      br
+                      button.btn.btn-default(onclick=`submitComment(${data.activity.acid})`) 发表
+          .col-xs-12.col-md-3
+            .list-group
+              span
+                b
+                  a.list-group-item.text-center(href=`/activity/single/${data.activity.acid}`) 当前版本
+              .dropdown
+                ul.dropdown-menu(aria-labelledby="dropdownMenu1")
+                -for(var i in data.activity.historys)
+                  li
+                    a.list-group-item(href=`/activity/single/${data.activity.acid}?type=history&hid=${data.activity.historys[i]._id}`)!=data.activity.historys[i].toc.toLocaleString()
+            .text-center(style="width:100%")
+              .row
+                .col-xs-10.col-md-10.col-xs-offset-1.col-md-offset-1
+                  .col-xs-3.col-md-3(style="padding:0px")
+                    a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qq', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
+                      img(src="/default/QQ.png" style="")
+                  .col-xs-3.col-md-3(style="padding:0px")
+                    a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'qzone', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
+                      img(src="/default/qzone.png" style="")
+                  .col-xs-3.col-md-3(style="padding:0px")
+                    a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'weibo', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
+                      img(src="/default/weibo.png" style="")
+                  .col-xs-3.col-md-3(style="padding:0px")
+                    a.btn-block(style="" href="javascript:void(0);" onclick=`shareTo('activity', 'weChat', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`)
+                      img(src="/default/weChat.png" style="")
+                .col-xs-12.col-md-12.m-t-1
+                  a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('activity', 'link', window.location.origin+window.location.pathname, '活动：${data.activity.activityTitle}', '${data.activity.acid}')`) 获取分享链接
+                .col-xs-12.col-md-12(id=`copyArea${data.activity.acid}` style="display:none")
+                  input(type="text", id=`copyLink${data.activity.acid}`, name=`copyLink${data.activity.acid}` style="width:inherit")
+                  button(onclick=`copyLink('${data.activity.acid}')` id=`copyButton${data.activity.acid}`) 复制
+                .col-xs-12.col-md-12.m-t-1
+                  canvas#activityQrcode(style="display:none")
+            .row.m-b-4.m-t-1
+              .col-xs-12.col-md-12(style="text-align:center")
+                if permission('blockCurrentActivity')
+                  if !data.activity.isBlock
+                    button.btn.btn-danger.btn-sm(onclick=`blockCurrentActivity(${data.activity.acid})`) 屏蔽当前活动
+                  else
+                    button.btn.btn-warning.btn-sm(onclick=`unBlockCurrentActivity(${data.activity.acid})`) 解除活动屏蔽
+
+
 
 block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
@@ -261,20 +185,3 @@ block scripts
   script(src=`/qrcode/build/qrcode.js?v=${global.NKC.startTime}`)
   script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)
   script(src=`/activity/activitySingle.js?v=${global.NKC.startTime}`)
-  //- script.
-  //-   var qrcode = document.getElementById("activityQrcode");
-  //-   if (qrcode) {
-  //-     var path = window.location.href;
-  //-     //- var path = "https://www.kechuang.org";
-  //-     path = path + "?t=" + Date.now();
-  //-     QRCode.toCanvas(qrcode, path, {
-  //-       scale: 3,
-  //-       margin: 1,
-  //-       width: 114,
-  //-       color: {dark: '#333333'}
-  //-     }, function (err) {
-  //-       if (err) {
-  //-         screenTopWarning(err);
-  //-       }
-  //-     })
-  //-   }

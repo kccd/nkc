@@ -11,15 +11,6 @@ modifyRouter
     if(!user || activity.uid !== user.uid){
       ctx.throw(404, "你无权限修改活动")
     }
-    let c;
-    if(activity){
-      c = activity.description;
-    }
-    const post = {
-      c:c,
-      l:'html'
-    }
-    activity.description = ctx.nkcModules.nkc_render.experimental_render(post);
     // 拓展聊天
     activity.posts = await activity.extendPost();
     if(user){

@@ -168,7 +168,7 @@ block title
             span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
             span.TPCIA
               a(href=`${profile}` style='text-decoration: none;')
-                img.TPCIAI(src=`/avatar_small/${c.fromUser.uid}`)
+                img.TPCIAI(src=`/avatar/${c.fromUser.avatar}?t=sm`)
                 span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
             span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
             span.TPCReason #{c.description}
@@ -342,7 +342,7 @@ block content
                       if thread.type !== "fund"
                         .thread-info.text-center(style="margin-top:1.5rem")
                           a(href=`/u/${thread.uid}`)
-                            img(src=`/avatar_small/${thread.uid}` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                            img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                             span= ` ${thread.firstPost.user.username}`
                           span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
                           if thread.firstPost.originState && thread.firstPost.originState !== "0"

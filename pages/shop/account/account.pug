@@ -3,7 +3,7 @@ block shopAccountTitle
   title 基本信息
 block shopAccountContent
   .user-base-info
-    img.user-avatar(src=`/avatar/${data.user.uid}`)
+    img.user-avatar(src=`/avatar/${data.user.avatar}`)
     .user-base-info-name
       .username= data.user.username
       .info= `身份认证等级：${data.user.authLevel}`

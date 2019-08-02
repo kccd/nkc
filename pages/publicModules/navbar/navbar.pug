@@ -23,7 +23,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         .navbar-brand.userInfo-m
           .userInfo-m-point.message-switch(class=!messageSum?"disabled":"")=messageSum
           img(
-            src=`/avatar/${data.user.uid}`
+            src=`/avatar/${data.user.avatar}`
             onclick="toggleNKCDrawer('right')"
           )
       else
@@ -59,7 +59,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           - var user = data.user
           - var title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
           li.dropdown.userInfo
-            img(src=`/avatar/${user.uid}`)
+            img(src=`/avatar/${user.avatar}`)
             a.username(
               href="#"
               class="dropdown-toggle"
@@ -168,7 +168,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     if data.user
       .nkc-drawer-header
       .nkc-drawer-avatar
-        img(src=`/avatar/${data.user.uid}`)
+        img(src=`/avatar/${data.user.avatar}`)
       .nkc-drawer-username= data.user.username
       .nkc-drawer-certs= data.user.info.certsName
       .nkc-drawer-count

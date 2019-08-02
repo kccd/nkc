@@ -1878,7 +1878,7 @@ function openFrameOfAddFriend(user) {
   var uid = user.uid;
   var dom = $('#addFriend');
   dom.attr('data-uid', uid);
-  dom.find('.avatar img').attr('src', '/avatar/' + uid);
+  dom.find('.avatar img').attr('src', '/avatar/' + user.avatar);
   dom.find('.content .username').text(username);
   dom.find('.content .description').text(description);
   dom.find('.input').show();

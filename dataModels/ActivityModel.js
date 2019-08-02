@@ -12,19 +12,19 @@ const activitySchema = new Schema({
     default: null
   },
   enrollStartTime: {
-    type: String,
+    type: Date,
     default: null
   },
   enrollEndTime: {
-    type: String,
+    type: Date,
     default: null
   },
   holdStartTime: {
-    type: String,
+    type: Date,
     default: null
   },
   holdEndTime: {
-    type: String,
+    type: Date,
     default: null
   },
   toc: {
@@ -79,6 +79,11 @@ const activitySchema = new Schema({
   conditions: {
     type: [Schema.Types.Mixed],
     default: []
+  },
+  // 活动是否已被屏蔽
+  isBlock: {
+    type: Boolean,
+    default: false
   }
 },
 {

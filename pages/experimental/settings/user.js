@@ -34,7 +34,7 @@ function createElements(users) {
     var tr = newElement('tr', {}, {});
     var th1 = newElement('th', {}, {});
     var img = newElement('img', {
-      src: '/avatar/'+user.uid
+      src: '/avatar/'+user.avatar
     }, {
       width: '2rem',
       height: '2rem',

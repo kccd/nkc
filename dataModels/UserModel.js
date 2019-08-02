@@ -126,6 +126,16 @@ const userSchema = new Schema({
     type: String,
     default: '',
     index: 1
+  },
+  // 头像文件hash
+  avatar: {
+    type: String,
+    default: ""
+  },
+  // 背景文件名hash
+  banner: {
+    type: String,
+    default: ""
   }
 },
 {toObject: {

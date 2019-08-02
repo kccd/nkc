@@ -11,6 +11,12 @@ module.exports = {
 			POST: 'uploadUserAvatar'
 		}
 	},
+  banner: {
+    PARAMETER: {
+      POST: "modifyUserBanner",
+      GET: "getUserBanner"
+    }
+  },
 	shopLogo: {
 		PARAMETER: {
 			GET: 'getShopLogo',

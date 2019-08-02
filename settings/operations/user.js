@@ -128,10 +128,10 @@ module.exports = {
 		bills: {
 			GET: 'visitUserBills'
 		},
-		banner: {
+		/*banner: {
 			GET: 'getUserBanner',
 			POST: 'modifyUserBanner'
-		},
+		},*/
     friends: {
 		  POST: 'sendAnApplicationToAddAFriend',
       agree: {

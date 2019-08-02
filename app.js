@@ -70,24 +70,24 @@ app
     max: 300000,
     disableHeader: false,
   }))
-  // 请求头安全设置
-  .use(helmet())
   // gzip
   .use(koaCompress({threshold: 2048}))
-  .use(koaBody(settings.upload.koaBodySetting))
-  .use(init)
-  .use(stayLogin)
-  .use(urlRewrite)
-  // 视频段支持
-  .use(conditional())
-  .use(etag())
   .use(staticServe(path.resolve('./nkcModules')))
   .use(staticServe(path.resolve('./public')))
   .use(staticServe(path.resolve('./node_modules')))
   .use(staticServe(path.resolve('./pages')))
   .use(favicon(__dirname + '/resources/site_specific/favicon.ico'))
+  // 请求头安全设置
+  .use(helmet())
+  .use(koaBody(settings.upload.koaBodySetting))
+  // 视频段支持
+  .use(conditional())
+  .use(etag())
+  .use(urlRewrite)
+  .use(init)
+  .use(stayLogin)
+  .use(permission)
   .use(logger)
-	.use(permission)
   .use(mainRouter.routes())
   .use(mainRouter2.routes())
   .use(body);

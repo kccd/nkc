@@ -1,7 +1,7 @@
 div.thread-panel
   .thread-panel-info
     .mdui-chip
-      img(class="mdui-chip-icon" src=`/avatar/${thread.uid}`)
+      img(class="mdui-chip-icon" src=`/avatar/${thread.firstPost.user.avatar}`)
       span(class="mdui-chip-title")= thread.firstPost.user.username
     //-if thread.forum.parentForum
       a.thread-panel-forum-name(style={
@@ -30,7 +30,7 @@ div.thread-panel
   if thread.oc !== thread.lm
     .thread-panel-last-post
       .mdui-chip
-        img(class="mdui-chip-icon" src=`/avatar/${thread.lastPost.uid}`)
+        img(class="mdui-chip-icon" src=`/avatar/${thread.lastPost.user.avatar}`)
         span(class="mdui-chip-title")= thread.lastPost.user.username
       .thread-panel-last-post-content
         span.time= fromNow(thread.lastPost.toc)

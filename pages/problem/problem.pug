@@ -28,7 +28,7 @@ block content
         h4(style='color: #aaa;')
           if problem.user
             a(href=`/u/${problem.user.uid}` target='_blank')
-              img(src=`/avatar_small/${problem.user.uid}` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
+              img(src=`/avatar/${problem.user.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
               span= problem.user.username
           else
             span 匿名用户

@@ -77,7 +77,7 @@ block eContent
               button(@click="addUser('whitelist')") 添加
             div(v-if="whitelistUsers.length > 0")
               .review-user-span(v-for="user in whitelistUsers")
-                img(:src="'/avatar/' + user.uid + '?t=sm'")
+                img(:src="'/avatar/' + user.avatar + '?t=sm'")
                 a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
                 .fa.fa-remove(@click="removeUser(user.uid, 'whitelist')" title="点击移除")
             div(v-else) 暂无用户
@@ -86,7 +86,7 @@ block eContent
               button(@click="addUser('blacklist')") 添加
             div(v-if="blacklistUsers.length > 0")
               .review-user-span(v-for="user in blacklistUsers")
-                img(:src="'/avatar/' + user.uid + '?t=sm'")
+                img(:src="'/avatar/' + user.avatar + '?t=sm'")
                 a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
                 .fa.fa-remove(@click="removeUser(user.uid, 'blacklist')" title="点击移除")
             div(v-else) 暂无用户
