@@ -1,13 +1,12 @@
 extends ../bootstrap_base
 block title
   link(rel='stylesheet', href='/fund.css')
-  title 科创活动
-
-  -const mainContainer1400 = true
+  title 科创活动-我的发布
   -const nowTimeStamp = new Date().getTime()
-  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
-  link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
-  link(rel="stylesheet", href="/external_pkgs/cropper/css/cropper.css")
+  +includeCSS('/bootstrap/css/bootstrap-datetimepicker.min.css')
+  +includeCSS('/bootstrap/css/bootstrap-chinese-region.min.css')
+  +includeCSS('/external_pkgs/cropper/css/cropper.css')
+  +includeCSS('/fund.css')
 block content
   .container-fluid.max-width
       include activityNav.pug
@@ -30,8 +29,8 @@ block content
                       -for(let release of data.releases)
                         tr
                           th!=release.activityTitle
-                          th!=release.enrollEndTime
-                          th!=release.holdEndTime
+                          th!=release.enrollEndTime.toLocaleString()
+                          th!=release.holdEndTime.toLocaleString()
                           th!=release.signUser.length
                           -if(release.activityType == "close")
                             th 已关闭
@@ -45,5 +44,5 @@ block content
                             a(href=`/activity/modify/${release.acid}?modifyType=modify`) 修改  
                             a(href=`/activity/modify/${release.acid}?modifyType=manage`) 管理
 block scripts
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)
+  +includeJS('/interface_common.js')
+  +includeJS('/activity/activityCommon.js')

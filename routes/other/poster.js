@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
 const mime = require('mime');
-const {upload, statics} = require('../../settings');
+const {upload, statics, cache} = require('../../settings');
 const {posterPath} = upload;
 const {defaultPosterPath} = statics;
 router
@@ -13,18 +13,15 @@ router
     const {posterid} = ctx.params;
     const {fs} = ctx;
     let stat;
+    let url = `${posterPath}/${posterid}.jpg`;
     try {
-      const url = `${posterPath}/${posterid}.jpg`;
       stat = await fs.stat(url);
-      ctx.response.lastModified = stat.mtime.toUTCString();
-      ctx.set('Cache-Control', 'public, no-cache');
-      ctx.filePath = url;
     } catch(e) {
-      ctx.filePath = defaultPosterPath;
-      ctx.response.lastModified = new Date(1999, 9, 9);
-      ctx.set('Cache-Control', 'public, no-cache');
+      url = defaultPosterPath;
+    } finally {
+      ctx.set("Cache-control", `public, max-age=${cache.maxAge}`);
+      ctx.filePath = url;
     }
-    ctx.type = 'jpg';
     await next()
   })
   .post('/', async (ctx, next) => {

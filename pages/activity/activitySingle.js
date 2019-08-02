@@ -10,9 +10,17 @@ $("document").ready(function() {
 })
 
 // 切换至报名
-function changeToApply() {
-  $("#description").css("display", "none");
-  $("#apply").css("display", "");
+function changeToApply(para) {
+  var formShow = $(para).attr("formShow");
+  if(formShow === "hide") {
+    $("#applyButton").text("取消报名");
+    $("#apply").css("display", "");
+    $(para).attr("formShow", "show")
+  }else{
+    $("#applyButton").text("我要报名");
+    $("#apply").css("display", "none");
+    $(para).attr("formShow", "hide")
+  }
 }
 
 // 切换至详情
@@ -57,7 +65,7 @@ function onpost(acid) {
     if($(this).find("#enrollValue").attr("type") == "text"){
       enrolls.value = $(this).find("#enrollValue").val().trim();
       if(enrolls.value == ""){
-        screenTopWarning("请填写"+enrolls.key);
+        sweetWarning("请填写"+enrolls.key);
         isStop = true;
         return false;
       }
@@ -74,13 +82,13 @@ function onpost(acid) {
   console.log(post)
   nkcAPI("/activity/single/"+acid, "POST", {post:post})
   .then(function(data) {
-    screenTopAlert("报名成功！");
+    sweetAlert("报名成功！");
     setTimeout(function() {
       window.location.reload();
     }, 1500);
   })
   .catch(function(data) {
-    screenTopWarning(data.error);
+    sweetWarning(data.error);
   })
 }
 
@@ -88,7 +96,7 @@ function onpost(acid) {
 function submitComment(acid) {
   var commentContent = $("#commentContent").val().trim();
   if(commentContent == ""){
-    return screenTopWarning("请填写内容后再发表评论")
+    return sweetWarning("请填写内容后再发表评论")
   }
   var post = {
     commentContent: commentContent,
@@ -96,13 +104,13 @@ function submitComment(acid) {
   }
   nkcAPI("/activity/post/"+acid, "POST", {post:post})
   .then(function(data) {
-    screenTopAlert("发表成功！");
+    sweetAlert("发表成功！");
     setTimeout(function() {
       window.location.reload();
     }, 1500);
   })
   .catch(function(data) {
-    screenTopWarning(data.error);
+    sweetWarning(data.error);
   })
 }
 
@@ -114,12 +122,12 @@ function cancelApply(acid) {
   var alertInfo = "已取消报名";
   nkcAPI(url, method, {})
     .then(function(){
-      screenTopAlert(alertInfo);
+      sweetAlert(alertInfo);
       setTimeout(function(){
         window.location.reload();
       }, 1000);
     })
     .catch(function(data){
-      screenTopWarning(data.error)
+      sweetWarning(data.error)
     })
 }

@@ -1,15 +1,17 @@
 $(document).ready(function(){
-  var replyCon = $("#replyxxx").html();
-  editor.txt.html(htmlDecode(replyCon));
+  var replyCon = $("#replyxxx").text();
+  ue.ready(function() {
+    ue.setContent(replyCon);
+  })
 
-  var html = "<html><head><meta charset='utf-8' /></head><body>" + document.getElementById("tabExc").outerHTML + "</body></html>";
-  // 实例化一个Blob对象，其构造函数的第一个参数是包含文件内容的数组，第二个参数是包含文件类型属性的对象
-  var blob = new Blob([html], { type: "application/vnd.ms-excel" });
-  var a = document.getElementById("outExc");
-  // 利用URL.createObjectURL()方法为a元素生成blob URL
-  a.href = URL.createObjectURL(blob);
-  // 设置文件名
-  a.download = "活动报名表.xls";
+  // var html = "<html><head><meta charset='utf-8' /></head><body>" + document.getElementById("tabExc").outerHTML + "</body></html>";
+  // // 实例化一个Blob对象，其构造函数的第一个参数是包含文件内容的数组，第二个参数是包含文件类型属性的对象
+  // var blob = new Blob([html], { type: "application/vnd.ms-excel" });
+  // var a = document.getElementById("outExc");
+  // // 利用URL.createObjectURL()方法为a元素生成blob URL
+  // a.href = URL.createObjectURL(blob);
+  // // 设置文件名
+  // a.download = "活动报名表.xls";
 })
 
 //html解码
@@ -178,9 +180,9 @@ function submitredit(acid){
     })
   
     // 检查活动详情
-    var description = document.getElementById('text-elem').innerHTML;
+    var description = ue.getContent();
     description = common.URLifyHTML(description);
-
+    
     // 是否通知
     var isnotice = $("#isnotice").is(":checked");
     var noticeContent = "";
@@ -194,10 +196,10 @@ function submitredit(acid){
       acid: acid,
       activityTitle: titleDom,
       limitNum: activityPartNum,
-      enrollStartTime: enrollStartTime,
-      enrollEndTime: enrollEndTime,
-      holdStartTime: holdStartTime,
-      holdEndTime: holdEndTime,
+      enrollStartTime: new Date(enrollStartTime).toJSON(),
+      enrollEndTime: new Date(enrollEndTime).toJSON(),
+      holdStartTime: new Date(holdStartTime).toJSON(),
+      holdEndTime: new Date(holdEndTime).toJSON(),
       address: address,
       sponsor: sponsor,
       contactNum: contactNum,
