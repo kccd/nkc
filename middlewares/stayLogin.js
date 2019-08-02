@@ -156,7 +156,7 @@ module.exports = async (ctx, next) => {
   data.user = user;
 
   // 专业树状结构
-  if(!isResourcePost) {
+  if(ctx.data.operationId === "getResources" || !isResourcePost) {
     ctx.state.forumsTree = await db.ForumModel.getForumsTree(
       data.userRoles,
       data.userGrade,
