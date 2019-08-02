@@ -1,5 +1,11 @@
 module.exports = {
   GET: 'visitActivityIndex',
+  block: {
+    POST: "blockCurrentActivity"
+  },
+  unblock: {
+    POST: "unBlockCurrentActivity"
+  },
   release: {
     GET: 'activityReleaseIndex',
     POST: 'activityReleasePost'

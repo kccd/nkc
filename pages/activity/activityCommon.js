@@ -31,3 +31,37 @@ function errInfoTips(info, errDomId) {
 function clearErrTips(errDomId){
   $(errDomId).html("");
 }
+
+//屏蔽当前活动
+function blockCurrentActivity(acid) {
+	var post = {
+		acid: acid
+	}
+	nkcAPI("/activity/block", "POST", post)
+  .then(function(data) {
+    sweetAlert("已屏蔽当前活动！");
+    setTimeout(function() {
+      window.location.reload();
+    }, 1500);
+  })
+  .catch(function(data) {
+    sweetWarning(data.error);
+  })
+}
+
+// 解除屏蔽当前活动
+function unBlockCurrentActivity(acid) {
+	var post = {
+		acid: acid
+	}
+	nkcAPI("/activity/unblock", "POST", post)
+  .then(function(data) {
+    sweetAlert("已解除屏蔽当前活动！");
+    setTimeout(function() {
+      window.location.reload();
+    }, 1500);
+  })
+  .catch(function(data) {
+    sweetWarning(data.error);
+  })
+}

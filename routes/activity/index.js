@@ -23,6 +23,18 @@ activityRouter
   ctx.template = 'activity/activityIndex.pug';
   await next();
 })
+.post('/block', async (ctx, next) => {
+  const {data, db, body} = ctx;
+  const {acid} = body;
+  await db.ActivityModel.update({acid: acid}, {$set: {isBlock: true}});
+  await next();
+})
+.post('/unblock', async (ctx, next) => {
+  const {data, db, body} = ctx;
+  const {acid} = body;
+  await db.ActivityModel.update({acid: acid}, {$set: {isBlock: false}});
+  await next();
+})
 .use('/release', releaseRouter.routes(), releaseRouter.allowedMethods())
 .use('/list', listRouter.routes(), listRouter.allowedMethods())
 .use('/single', singleRouter.routes(), singleRouter.allowedMethods())

@@ -215,7 +215,7 @@ function submitredit(acid){
       screenTopAlert("修改成功！");
       setTimeout(function() {
         // window.location.href = "/activity/list";
-        openToNewLocation("/activity/list");
+        openToNewLocation("/activity/single/" + acid);
       }, 1500);
     })
     .catch(function(data){

@@ -19,6 +19,9 @@ block content
           .col-xs-12.col-md-8.box-shadow-panel
             div(style="padding:2rem")
               .applicationForm
+                if data.activity.isBlock
+                  .row.m-b-4.m-t-1(style="text-align:center;background-color:#f39e59")
+                    span(style="font-weight:500px") 当前活动已被屏蔽
                 .row.m-b-4.m-t-1
                   .col-xs-12.col-md-12
                     .id.text-center!=`${data.activity.activityTitle}`
@@ -64,10 +67,11 @@ block content
                     -else if(parseInt(new Date(data.activity.holdEndTime).getTime()) < parseInt(new Date().getTime()))
                       button.btn.btn-default(disabled) 活动已结束
                     -else
-                      -if(data.user)
-                        button.btn.btn-primary(onclick="changeToApply(this)" id="applyButton" formShow="hide") 我要报名
-                      -else
-                        button.btn.btn-primary(onclick="window.open('/login')" id="applyButton") 我要报名
+                      if !data.activity.isBlock
+                        -if(data.user)
+                          button.btn.btn-primary(onclick="changeToApply(this)" id="applyButton" formShow="hide") 我要报名
+                        -else
+                          button.btn.btn-primary(onclick="window.open('/login')" id="applyButton") 我要报名
                 .row.m-b-4.m-t-1#apply(style="display: none")
                   .col-xs-12.col-md-12
                     .applicationForm-header 报名表单
@@ -113,10 +117,7 @@ block content
                   .col-xs-12.col-md-12.description
                     .form-group
                       - let post = {c: data.activity.description,l: "html"}
-                      -if(!data.type)
-                        div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
-                      -else
-                        div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
+                      div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
                 -if(!data.type)
                   .row.m-b-4.m-t-1
                     .col-xs-12.col-md-12
@@ -168,6 +169,14 @@ block content
                   button(onclick=`copyLink('${data.activity.acid}')` id=`copyButton${data.activity.acid}`) 复制
                 .col-xs-12.col-md-12.m-t-1
                   canvas#activityQrcode(style="display:none")
+            .row.m-b-4.m-t-1
+              .col-xs-12.col-md-12(style="text-align:center")
+                if permission('blockCurrentActivity')
+                  if !data.activity.isBlock
+                    button.btn.btn-danger.btn-sm(onclick=`blockCurrentActivity(${data.activity.acid})`) 屏蔽当前活动
+                  else
+                    button.btn.btn-warning.btn-sm(onclick=`unBlockCurrentActivity(${data.activity.acid})`) 解除活动屏蔽
+
 
 
 block scripts

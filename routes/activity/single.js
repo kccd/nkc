@@ -32,19 +32,6 @@ singleRouter
     if(activity.activityType == "close"){
       return ctx.throw(403, "该活动已被活动发布者被关闭")
     }
-    let c;
-    if(activity){
-      c = activity.description;
-    }
-    const post = {
-      c:c,
-      l:'html'
-    }
-    if(ctx.reqType === "app"){
-      activity.description = ctx.nkcModules.APP_nkc_render.experimental_render(post);
-    }else{
-      activity.description = ctx.nkcModules.nkc_render.experimental_render(post);
-    }
     // 拓展聊天
     activity.posts = await activity.extendPost();
     if(user){

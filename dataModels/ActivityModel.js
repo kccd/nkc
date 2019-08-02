@@ -79,6 +79,11 @@ const activitySchema = new Schema({
   conditions: {
     type: [Schema.Types.Mixed],
     default: []
+  },
+  // 活动是否已被屏蔽
+  isBlock: {
+    type: Boolean,
+    default: false
   }
 },
 {
