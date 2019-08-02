@@ -79,7 +79,6 @@ function onpost(acid) {
     acid: acid,
     enrollInfo: enrollInfo
   }
-  console.log(post)
   nkcAPI("/activity/single/"+acid, "POST", {post:post})
   .then(function(data) {
     sweetAlert("报名成功！");

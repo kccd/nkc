@@ -26,18 +26,18 @@ $(document).ready(function() {
 
 apiready = function() {
   // 为所有图片添加长按事件
-  // var allImgs = document.querySelectorAll("img");
-  // Array.prototype.forEach.call(allImgs, function(img) {
-  //   img.addEventListener("touchstart", function() {
-  //     imgDownTimeOut = setTimeout("imageToApiDownload('"+this.src+"')", 1000)
-  //   })
-  //   img.addEventListener("touchmove", function() {
-  //     clearTimeout(imgDownTimeOut);
-  //   })
-  //   img.addEventListener("touchend", function() {
-  //     clearTimeout(imgDownTimeOut)
-  //   })
-  // })
+  var allImgs = document.querySelectorAll("img");
+  Array.prototype.forEach.call(allImgs, function(img) {
+    img.addEventListener("touchstart", function() {
+      imgDownTimeOut = setTimeout("imageToApiDownload('"+this.src+"')", 1000)
+    })
+    img.addEventListener("touchmove", function() {
+      clearTimeout(imgDownTimeOut);
+    })
+    img.addEventListener("touchend", function() {
+      clearTimeout(imgDownTimeOut)
+    })
+  })
   // 为所有的a标签添加点击事件
   // 监听全局a标签的点击事件
   // 并阻止链接点击跳转
