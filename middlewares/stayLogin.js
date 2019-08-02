@@ -22,7 +22,8 @@ const resourceOperations = [
   "getFundBanner",
   "getPhoto",
   "getSmallPhoto",
-  "visitForumBanner"
+  "visitForumBanner",
+  "getMessageFile"
 ];
 module.exports = async (ctx, next) => {
 
