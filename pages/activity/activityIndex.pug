@@ -1,49 +1,81 @@
 extends ../bootstrap_base
 block title
-  link(rel='stylesheet', href='/fund.css')
-  title 科创基金
+  title 科创活动
 
   -const mainContainer1400 = true
-  -const {activitys} = data;
-  link(href='../bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
-  link(href='../bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
-  link(rel="stylesheet", href="../external_pkgs/cropper/css/cropper.css")
+  -const {recentActivityArr, historyActivityArr} = data;
+  +includeCSS("/bootstrap/css/bootstrap-datetimepicker.min.css")
+  +includeCSS("/bootstrap/css/bootstrap-chinese-region.min.css")
+  +includeCSS("/external_pkgs/cropper/css/cropper.css")
+  +includeCSS("/fund.css")
+  style.
+    .form-group {
+      margin-bottom: 5px
+    }
+    .lighttext {
+      color: #333
+    }
+    .activityTitle {
+      color: #9baec8
+    }
+    .activityTitle:hover {
+      color: #333
+    }
 block content
   .container-fluid.max-width
       include activityNav.pug
       .row
-        -for(let a of activitys)
+        .col-xs-12.col-md-6(style="font-size: 2rem")
+          | 近期活动
+      br
+      .row
+        -for(let recent of recentActivityArr)
           .col-xs-12.col-md-3
-            .nkcpanel(style="padding:")
+            .nkcpanel(style="padding:5px 16px")
               .form-horizontal
-                a(href=`/activity/single/${a.acid}`)
+                a(href=`/activity/single/${recent.acid}`)
                   .form-group
-                    img(src=`/poster/${a.posterId}` style="width:100%")
+                    img(src=`/poster/${recent.posterId}` style="width:100%")
                   .form-group
                     .col-md-1
-                      span
+                      span(style="color:#9baec8")
                         i.fa.fa-clock-o
                     .col-md-10
-                      span.lighttext=`${a.holdStartTime}`
+                      span.lighttext=`${recent.holdStartTime.toLocaleString()}`
                   .form-group
                     .col-sm-12(style="height:44px")
-                      span=`${a.activityTitle}`
+                      span.activityTitle=`${recent.activityTitle}`
                   .form-group
                     .col-sm-1
-                      span
+                      span(style="color:#9baec8")
                         i.fa.fa-map-marker
                     .col-sm-10(style="height:44px")
-                      span.lighttext=`${a.address}`
-                  //- hr
-                  //- .form-group
-                  //-   .col-sm-12
-                  //-     span.lighttext(style="float:right")
-                  //-       i.fa.fa-eye 123
-
-block scripts
-  script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/bootstrap/js/bootstrap-datetimepicker.min.js?v=${global.NKC.startTime}` charset="UTF-8")
-  script(src=`/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js?v=${global.NKC.startTime}` charset="UTF-8")
-  script(src=`/bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
-  script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
+                      span.lighttext=`${cutContent(recent.address, 28)}`
+      hr
+      .row
+        .col-xs-12.col-md-3(style="font-size: 2rem")
+          | 历史活动
+      br
+      .row
+        -for(let history of historyActivityArr)
+          .col-xs-12.col-md-3
+            .nkcpanel(style="padding:5px 16px")
+              .form-horizontal
+                a(href=`/activity/single/${history.acid}`)
+                  .form-group
+                    img(src=`/poster/${history.posterId}` style="width:100%")
+                  .form-group
+                    .col-md-1
+                      span(style="color:#9baec8")
+                        i.fa.fa-clock-o
+                    .col-md-10
+                      span.lighttext=`${history.holdStartTime.toLocaleString()}`
+                  .form-group
+                    .col-sm-12(style="height:44px")
+                      span.activityTitle=`${history.activityTitle}`
+                  .form-group
+                    .col-sm-1
+                      span(style="color:#9baec8")
+                        i.fa.fa-map-marker
+                    .col-sm-10(style="height:44px")
+                      span.lighttext=`${cutContent(history.address, 28)}`
