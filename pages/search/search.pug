@@ -4,8 +4,8 @@ block title
   +includeCSS("/search/search.css")
 block content
   #data.hidden=objToStr({c: data.c, t: data.t, d: data.d, selectedForums: data.selectedForums})
-  .container-fluid.max-width#app(v-cloak)
-    .row
+  .container-fluid.max-width
+    .row#app(v-cloak)
       .col-xs-12.col-md-9
         .search-panel
           .search-form.form-inline
@@ -75,6 +75,7 @@ block content
           .form-group
             button.search-button.btn(@click="search")
               .fa.fa-search &nbsp;搜索
+    .row
       if data.c
         .col-xs-12.col-md-12.search-nav
           ul

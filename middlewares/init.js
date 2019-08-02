@@ -1,4 +1,5 @@
 const tools = require('../tools');
+const colors = require("colors");
 const settings = require('../settings');
 const nkcModules = require('../nkcModules');
 const db = require('../dataModels');
@@ -24,7 +25,16 @@ const fsSync = {
 module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
-  ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
+  try{
+    ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
+  } catch(err) {
+    if(err.status === 404) {
+      console.log(`未知来源的请求：${ctx.url}`.bgRed);
+    } else {
+      console.log(err);
+    }
+    return;
+  }
   try {
     Object.defineProperty(ctx, 'template', {
       get: function() {
