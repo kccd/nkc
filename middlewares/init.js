@@ -23,8 +23,9 @@ const fsSync = {
 
 module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
+  ctx.data = Object.create(null);
+  ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   try {
-    ctx.data = Object.create(null);
     Object.defineProperty(ctx, 'template', {
       get: function() {
         return './pages/' + this.__templateFile

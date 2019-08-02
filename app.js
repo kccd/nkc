@@ -83,11 +83,11 @@ app
   // 视频段支持
   .use(conditional())
   .use(etag())
+  .use(urlRewrite)
   .use(init)
   .use(stayLogin)
-  .use(urlRewrite)
+  .use(permission)
   .use(logger)
-	.use(permission)
   .use(mainRouter.routes())
   .use(mainRouter2.routes())
   .use(body);

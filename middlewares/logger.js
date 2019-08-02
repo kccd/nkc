@@ -5,8 +5,6 @@ const logger = async (ctx, next) => {
   const { db, address: ip, port, url, method} = ctx;
   const processTime = ctx.processTime;
   const {apiFunction} = nkcModules;
-  const { getOperationId } = nkcModules.permission;
-  ctx.data.operationId = getOperationId(ctx.url, ctx.method);
   const logSettings = await db.SettingModel.findOne({_id: "log"});
   const {operationsId} = logSettings.c;
   // 获取用户的个人基本信息
