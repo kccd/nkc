@@ -9,8 +9,7 @@ module.exports = async (ctx, next) => {
     const stats = fss.statSync(filePath);
     const lastModified = (new Date(stats.mtime)).getTime();
     ctx.set("ETag", lastModified);
-    // 资源缓存24小时，排除掉用户头像、背景、专栏头像和专栏背景
-    ctx.set('Cache-Control', 'public, max-age=86400');
+    ctx.set('Cache-Control', 'public, max-age=604800');
 	  if(ctx.fresh) {
       ctx.status = 304;
       return

@@ -113,10 +113,8 @@ block content
                   .col-xs-12.col-md-12.description
                     .form-group
                       - let post = {c: data.activity.description,l: "html"}
-                      -if(!data.type)
-                        div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
-                      -else
-                        div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
+                      div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
+
                 -if(!data.type)
                   .row.m-b-4.m-t-1
                     .col-xs-12.col-md-12
