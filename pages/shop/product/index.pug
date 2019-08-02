@@ -247,7 +247,7 @@ block content
                         .media
                           .media-left.media-middle
                             a(href='#')
-                              img.media-object(src=`/avatar/${post.uid}`, alt='...', style="width:64px")
+                              img.media-object(src=`/avatar/${post.user.avatar}`, alt='...', style="width:64px")
                           .media-body
                             a(href=`/u/${post.uid}` style="font-size:large").media-heading!=`${post.user.username}`
                             //- span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;

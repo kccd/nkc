@@ -5,9 +5,9 @@ const homeRouter = require('./home');
 const smsRouter = require('./sms');
 const otherRouter = new Router();
 const editorRouter = require('./editor');
-const avatar = require('./avatar');
+// const avatar = require('./avatar');
 const shopLogo = require('./shopLogo');
-const avatarSmall = require('./avatar_small');
+// const avatarSmall = require('./avatar_small');
 const resourcesRouter = require('./resources');
 const defaultRouter = require('./default');
 const attachIconRouter = require('./attachIcon');
@@ -59,9 +59,9 @@ otherRouter
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
   .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
-  .use('avatar', avatar.routes(), avatar.allowedMethods())
+  // .use('avatar', avatar.routes(), avatar.allowedMethods())
   .use('shopLogo', shopLogo.routes(), shopLogo.allowedMethods())
-  .use('avatar_small', avatarSmall.routes(), avatarSmall.allowedMethods())
+  // .use('avatar_small', avatarSmall.routes(), avatarSmall.allowedMethods())
   .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
   .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())

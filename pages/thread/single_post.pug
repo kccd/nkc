@@ -27,7 +27,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
       div
         .inline-block(style='margin-bottom: 0;')
           a(href=`/u/${post.uid}`)
-            img(src=`/avatar/${post.uid}` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
+            img(src=`/avatar/${post.user.avatar}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
             span= post.user.username
           -const targetUser = post.user;
           include ../user/module_user_grade_icon

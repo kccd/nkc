@@ -741,6 +741,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         uid: 1,
         toc: 1,
         tlv: 1,
+        avatar: 1,
+        banner: 1,
         username: 1,
         xsf: 1,
         kcb: 1,

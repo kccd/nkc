@@ -9,7 +9,7 @@
         onmouseleave="vue_user_panel_float.close()"
       )
         a(href=`/u/${u.uid}` target="_blank")
-          img(src=`/avatar/${u.uid}`)
+          img(src=`/avatar/${u.avatar}`)
 
     if sideUsers.length > 8
       a(href=sideUsersLink).user-card-user-link 查看更多

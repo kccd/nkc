@@ -35,9 +35,9 @@ block content
                       a(onclick=` clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
                 </ul>
             .user-banner-mask
-            a(href=`/avatar/${data.targetUser.uid}?t=lg` target="_blank").user-avatar
-              img(src=`/avatar/${data.targetUser.uid}`)
-            .user-banner(style=`background-image: url(/u/${data.targetUser.uid}/banner);`)
+            a(href=`/avatar/${data.targetUser.avatar}?t=lg` target="_blank").user-avatar
+              img(src=`/avatar/${data.targetUser.avatar}`)
+            .user-banner(style=`background-image: url(/banner/${data.targetUser.banner});`)
           .user-name=data.targetUser.username || data.targetUser.uid
           .user-grade
             -const targetUser = data.targetUser

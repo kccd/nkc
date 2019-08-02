@@ -187,20 +187,6 @@ router
     }
     await next();
   })
-  .get("/banner", async (ctx, next) => {
-    const {nkcModules, data, query} = ctx;
-    const {t} = query;
-    ctx.filePath = await nkcModules.file.getColumnBanner(data.column._id, t);
-    ctx.type = "jpg";
-    await next();
-  })
-  .get("/avatar", async (ctx, next) => {
-    const {nkcModules, data, query} = ctx;
-    const {t} = query;
-    ctx.filePath = await nkcModules.file.getColumnAvatar(data.column._id, t);
-    ctx.type = "jpg";
-    await next();
-  })
   .use("/category", categoryRouter.routes(), categoryRouter.allowedMethods())
   .use("/post", postRouter.routes(), postRouter.allowedMethods())
   .use("/subscribe", subscribeRouter.routes(), subscribeRouter.allowedMethods())

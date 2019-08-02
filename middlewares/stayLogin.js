@@ -1,8 +1,32 @@
 const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
+const resourceOperations = [
+  "getUserAvatar",
+  "getUserBanner",
+  "column_single_avatar_get",
+  "column_single_Banner_get",
+  "getHomeLogo",
+  "getActivityPoster",
+  "getForumAvatar",
+  "getResources",
+  "getThumbs",
+  "getMediums",
+  "getDefaultImage",
+  "getOrigins",
+  "getThreadCover",
+  "getVideoImg",
+  "getSiteSpecific",
+  "getAttachmentIcon",
+  "getFundLogo",
+  "getFundBanner",
+  "getPhoto",
+  "getSmallPhoto",
+  "visitForumBanner"
+];
 module.exports = async (ctx, next) => {
 
+  const isResourcePost = resourceOperations.includes(ctx.data.operationId);
   const {data, db} = ctx;
 	// cookie
 	let userInfo = ctx.cookies.get('userInfo', {signed: true});
@@ -57,33 +81,35 @@ module.exports = async (ctx, next) => {
 			}
 		}
 		// 获取用户信息
-    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    await db.UserModel.extendUsersInfo([user]);
-		user.newMessage = await user.getNewMessagesCount();
-		user.authLevel = await userPersonal.getAuthLevel();
-		user.draftCount = await db.DraftModel.count({uid: user.uid});
-    user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
-    languageName = user.generalSettings.language;
-    if(user.generalSettings.lotterySettings.status) {
-      const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
-      if(redEnvelopeSettings.c.random.close) {
-        user.generalSettings.lotterySettings.status = false;
+    if(!isResourcePost) {
+      const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+      await db.UserModel.extendUsersInfo([user]);
+      user.newMessage = await user.getNewMessagesCount();
+      user.authLevel = await userPersonal.getAuthLevel();
+      user.draftCount = await db.DraftModel.count({uid: user.uid});
+      user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
+      languageName = user.generalSettings.language;
+      if(user.generalSettings.lotterySettings.status) {
+        const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
+        if(redEnvelopeSettings.c.random.close) {
+          user.generalSettings.lotterySettings.status = false;
+        }
       }
-    }
-    if(user.generalSettings.draftFeeSettings.kcb !== 0) {
-      await user.generalSettings.update({'draftFeeSettings.kcb': 0});
-    }
-		// 获取新点赞数
-    const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}});
-    let newVoteUp = 0;
-    votes.map(v => {
-      if(v.type === 'up') {
-        newVoteUp += v.num;
-      } else if(v.type === 'down') {
-        newVoteUp -= v.num;
+      if(user.generalSettings.draftFeeSettings.kcb !== 0) {
+        await user.generalSettings.update({'draftFeeSettings.kcb': 0});
       }
-    });
-    user.newVoteUp = newVoteUp>0?newVoteUp:0;
+      // 获取新点赞数
+      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}});
+      let newVoteUp = 0;
+      votes.map(v => {
+        if(v.type === 'up') {
+          newVoteUp += v.num;
+        } else if(v.type === 'down') {
+          newVoteUp -= v.num;
+        }
+      });
+      user.newVoteUp = newVoteUp>0?newVoteUp:0;
+    }
     // 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
       const role = await db.RoleModel.extendRole('banned');
@@ -128,16 +154,16 @@ module.exports = async (ctx, next) => {
 	data.userGrade = userGrade;
   data.user = user;
 
-
-
   // 专业树状结构
-  ctx.state.forumsTree = await db.ForumModel.getForumsTree(
-    data.userRoles,
-    data.userGrade,
-    data.user
-  );
+  if(!isResourcePost) {
+    ctx.state.forumsTree = await db.ForumModel.getForumsTree(
+      data.userRoles,
+      data.userGrade,
+      data.user
+    );
+  }
   // 获取用户的关注
-  if(data.user) {
+  if(data.user && !isResourcePost) {
     data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
     ctx.state.subUsersId = data.user.subUid;
     ctx.state.visibleFid = await db.ForumModel.visibleFid(

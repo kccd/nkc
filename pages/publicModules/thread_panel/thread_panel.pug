@@ -18,7 +18,7 @@
           )
     .thread-panel-author
       a(href=`/u/${thread.uid}` target="_blank")
-        img(src=`/avatar/${thread.uid}?t=sm`)
+        img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
       a(
         href=`/u/${thread.uid}` target="_blank"
         onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.firstPost.user)}')`

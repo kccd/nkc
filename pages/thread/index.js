@@ -381,10 +381,10 @@ function submit(tid){
 		}else{
 			$(this).parent().remove()
 		}
-	})
+	});
 	// try{
-		var post = assemblePostObject()
-		if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
+		var post = assemblePostObject();
+		if(!post || post.c.replace(/<[^>]+>/g,"") === ''){screenTopWarning('请填写内容。');return;}
 	// }catch(err){
 	// 	return;
 	// }

@@ -18,7 +18,7 @@ block content
           hr
           h5= `${a.toc.toLocaleString()}`
           a(href=`/u/${a.applicant.uid}`)
-            img(src=`/avatar_small/${a.applicant.uid}` style='height: 2rem;width: 2rem;border-radius: 50%;margin-right: 4px;')
+            img(src=`/avatar/${a.applicant.user.avatar}?t=sm` style='height: 2rem;width: 2rem;border-radius: 50%;margin-right: 4px;')
             span= a.applicant.user.username
           span &nbsp;申请&nbsp;
           a(href=`/fund/list/${a.fundId}`)

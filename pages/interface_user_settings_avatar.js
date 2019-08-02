@@ -40,10 +40,10 @@ function selectAvatar() {
         }, 2000);
       }
     }, "POST")
-      .then(function() {
-        $("#img_l").attr("src", "/avatar/" + user.uid + '?t=lg' + "&time=" + Date.now());
-        $("#img_s").attr("src", "/avatar/" + user.uid + '?t=sm' + "&time=" + Date.now());
-        $("#img_m").attr("src", "/avatar/" + user.uid + '?time=' + Date.now());
+      .then(function(data) {
+        $("#img_l").attr("src", "/avatar/" + data.user.avatar + '?t=lg' + "&time=" + Date.now());
+        $("#img_s").attr("src", "/avatar/" + data.user.avatar + '?t=sm' + "&time=" + Date.now());
+        $("#img_m").attr("src", "/avatar/" + data.user.avatar + '?time=' + Date.now());
         selectImage.close();
       })
       .catch(function(data) {

@@ -24,7 +24,7 @@ block content
                 .avatar.center-block
                   if donationUser.money >= 5000
                     div(title='土豪') 豪
-                  img(src=`/avatar/${donationUser.uid}`)
+                  img(src=`/avatar/${donationUser.user.avatar}`)
                 .username(style='word-break:break-all;')= donationUser.user.username
                 -let description = donationUser.user.description || '暂无简介'
                 if description && description.length > 20

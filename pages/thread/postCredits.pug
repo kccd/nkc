@@ -8,7 +8,7 @@ if creditPost && creditPost.credits && creditPost.credits.length > 0
         span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
         span.TPCIA
           a(href=`/u/${c.fromUser.uid}` style='text-decoration: none;')
-            img.TPCIAI(src=`/avatar_small/${c.fromUser.uid}`)
+            img.TPCIAI(src=`/avatar/${c.fromUser.avatar}?t=sm`)
             span.TPCIssuer &nbsp;#{c.fromUser.username} &nbsp;&nbsp;
         span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
         span.TPCReason #{c.description}

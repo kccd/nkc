@@ -54,10 +54,10 @@ router
       name: "默认分类",
       description: "默认分类"
     });
-    await nkcModules.file.saveColumnAvatar(column._id, avatar);
-    await nkcModules.file.saveColumnBanner(column._id, banner);
     await column.save();
     await category.save();
+    await nkcModules.file.saveColumnAvatar(column._id, avatar);
+    await nkcModules.file.saveColumnBanner(column._id, banner);
     data.column = column;
     await db.ColumnModel.toSearch(column._id);
     await next();
@@ -78,6 +78,30 @@ router
       }
       return ctx.redirect(url);
     }
+    await next();
+  })
+  .get("/avatar/", async (ctx, next) => {
+    const {settings} = ctx;
+    ctx.filePath = settings.statics.defaultColumnAvatarPath;
+    await next();
+  })
+  .get("/avatar/:hash", async (ctx, next) => {
+    const {nkcModules, params, query} = ctx;
+    const {t} = query;
+    const {hash} = params;
+    ctx.filePath = await nkcModules.file.getColumnAvatar(hash, t);
+    await next();
+  })
+  .get("/banner/", async (ctx, next) => {
+    const {settings} = ctx;
+    ctx.filePath = settings.statics.defaultColumnBannerPath;
+    await next();
+  })
+  .get("/banner/:hash", async (ctx, next) => {
+    const {nkcModules, params, query} = ctx;
+    const {t} = query;
+    const {hash} = params;
+    ctx.filePath = await nkcModules.file.getColumnBanner(hash, t);
     await next();
   });
 module.exports = router;

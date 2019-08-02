@@ -52,7 +52,7 @@ block content
                   th
                     if log.user
                       a(href=`/u/${log.uid}` target="_blank")
-                        img(src=`/avatar/${log.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        img(src=`/avatar/${log.user.avatar}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
                         span= log.user.username
                     else
                       span
@@ -67,7 +67,7 @@ block content
                   th
                     if log.targetUser
                       a(href=`/u/${log.targetUid}` target="_blank")
-                        img(src=`/avatar/${log.targetUid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        img(src=`/avatar/${log.targetUser.avatar}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
                         span= log.targetUser.username
                     else
                       span
@@ -85,7 +85,7 @@ block content
                   th
                     if log.targetUser
                       a(href=`/u/${log.targetUid}` target="_blank")
-                        img(src=`/avatar/${log.targetUid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        img(src=`/avatar/${log.targetUser.avatar}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
                         span= log.targetUser.username
                     else
                       span
@@ -99,7 +99,7 @@ block content
                   th
                     if log.user
                       a(href=`/u/${log.uid}` target="_blank")
-                        img(src=`/avatar/${log.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        img(src=`/avatar/${log.user.avatar}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
                         span= log.user.username
                     else
                       span
@@ -111,7 +111,7 @@ block content
                   th
                     if log.user
                       a(href=`/u/${log.uid}` target="_blank")
-                        img(src=`/avatar/${log.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                        img(src=`/avatar/${log.user.avatar}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
                         span= log.user.username
                     else
                       span

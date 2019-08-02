@@ -74,7 +74,7 @@ var app = new Vue({
     });
   },
   methods: {
-    format: format,
+    format: NKC.methods.format,
     selectMessage: function(m) {
       this.message = m;
     }

@@ -47,7 +47,7 @@ block content
             .post-header
               .time
                 a(href=`/u/${post.uid}` target='_blank')
-                  img.user-avatar(src=`/avatar/${post.uid}`)
+                  img.user-avatar(src=`/avatar/${post.user.avatar}`)
                   .username= post.user.username
                 span= fromNow(post.toc)
               .options
@@ -96,7 +96,7 @@ block content
                   span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
                   span.TPCIA
                     a(href=`${profile}` style='text-decoration: none;')
-                      img.TPCIAI(src=`/avatar_small/${c.fromUser.uid}`)
+                      img.TPCIAI(src=`/avatar/${c.fromUser.avatar}?t=sm`)
                       span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
                   span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
                   span.TPCReason #{c.description}
@@ -141,7 +141,7 @@ block content
             for u, index in data.voteUpUsers
               if index < 30
                 a(href=`/u/${u.uid}` target='_blank' title=u.username)
-                  img(src=`/avatar/${u.uid}`)
+                  img(src=`/avatar/${u.avatar}`)
 block scripts
 
   include ../publicModules/complaint/complaint

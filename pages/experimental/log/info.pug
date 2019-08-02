@@ -33,7 +33,7 @@ block content
                 th
                   if behavior.user
                     a(href=`/u/${behavior.uid}` target="_blank")
-                      img(src=`/avatar/${behavior.uid}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
+                      img(src=`/avatar/${behavior.user.avatar}` style='width: 30px;height: 30px;border-radius:50%;margin-right: 0.5rem;')
                       span= behavior.user.username
                   else
                     span visitor

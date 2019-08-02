@@ -79,6 +79,7 @@ router
         applications.push({
           _id: f._id,
           username: targetUser.username,
+          avatar: targetUser.avatar,
           description: f.description,
           uid: targetUser.uid,
           toc: f.toc,

@@ -8,31 +8,9 @@ router
     const {type} = body;
     const time = Date.now();
     if(type === "avatar") {
-      try{
-        await ctx.fs.rename(
-          `${settings.upload.avatarPath}/${targetUser.uid}.jpg`,
-          `${settings.upload.avatarPath}/${targetUser.uid}_${time}.jpg`
-        );
-      } catch(err){}
-      try{
-        await ctx.fs.rename(
-          `${settings.upload.avatarSmallPath}/${targetUser.uid}.jpg`,
-          `${settings.upload.avatarSmallPath}/${targetUser.uid}_${time}.jpg`
-        );
-      } catch(err){}
-      try{
-        await ctx.fs.rename(
-          `${settings.upload.avatarLargePath}/${targetUser.uid}.jpg`,
-          `${settings.upload.avatarLargePath}/${targetUser.uid}_${time}.jpg`
-        );
-      } catch(err){}
+      await nkcModules.file.deleteUserAvatar(targetUser.uid);
     } else if(type === "banner") {
-      try{
-        await ctx.fs.rename(
-          `${settings.upload.userBannerPath}/${targetUser.uid}.jpg`,
-          `${settings.upload.userBannerPath}/${targetUser.uid}_${time}.jpg`,
-        );
-      } catch(err){}
+      await nkcModules.file.deleteUserBanner(targetUser.uid);
     } else if(type === "username") {
       await db.SecretBehaviorModel({
         operationId: "modifyUsername",
