@@ -7,7 +7,7 @@ const draftsRouter = require('./drafts');
 const settingRouter = require('./settings');
 const authRouter = require('./auth');
 const transactionRouter = require('./transaction');
-const bannerRouter = require('./banner');
+// const bannerRouter = require('./banner');
 const clearRouter = require("./clear");
 const friendsRouter = require('./friends');
 const kcbRouter = require('./kcb');
@@ -415,7 +415,7 @@ userRouter
   .use('/:uid/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/:uid/bills', billRouter.routes(), billRouter.allowedMethods())
 	.use('/:uid/auth', authRouter.routes(), authRouter.allowedMethods())
-	.use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())
+	// .use('/:uid/banner', bannerRouter.routes(), bannerRouter.allowedMethods())
 	.use('/:uid/banned', bannedRouter.routes(), bannedRouter.allowedMethods())
 	.use('/:uid/drafts', draftsRouter.routes(), draftsRouter.allowedMethods())
 	.use('/:uid/settings', settingRouter.routes(), settingRouter.allowedMethods())

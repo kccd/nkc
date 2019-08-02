@@ -18,7 +18,7 @@ block content
               if data.blackListUsers.length > 0
                 for u in data.blackListUsers
                   .black-user
-                    img(src=`/avatar/${u.uid}`)
+                    img(src=`/avatar/${u.avatar}`)
                     a(href=`/u/${u.uid}` target="_blank")=u.username
                     .fa.fa-remove(onclick=`removeFromBlackList("${u.uid}")`)
               else

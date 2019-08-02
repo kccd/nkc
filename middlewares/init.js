@@ -22,7 +22,8 @@ const fsSync = {
 };
 
 module.exports = async (ctx, next) => {
-	try {
+  ctx.reqTime = new Date();
+  try {
     ctx.data = Object.create(null);
     Object.defineProperty(ctx, 'template', {
       get: function() {
@@ -42,7 +43,6 @@ module.exports = async (ctx, next) => {
 	  ctx.address = ip;
 	  ctx.port = port;
     ctx.body = ctx.request.body;
-	  ctx.reqTime = new Date();
 	  ctx.db = db;
 	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;

@@ -9,6 +9,16 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 专栏logo
+  avatar: {
+    type: String,
+    default: ""
+  },
+  // 专栏banner
+  banner: {
+    type: String,
+    default: ""
+  },
   // 专栏主上任记录 {uid: String, time: Date}
   userLogs: {
     type: Schema.Types.Mixed,

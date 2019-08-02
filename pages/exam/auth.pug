@@ -15,7 +15,7 @@ block content
               li.media
                 .media-left
                   a(href=`/u/${question.uid}` target='_blank')
-                    img.media-object(src=`/avatar/${question.uid}` style='width: 3rem; height: 3rem;')
+                    img.media-object(src=`/avatar/${question.user.avatar}` style='width: 3rem; height: 3rem;')
                 .media-body
                   h5.media-heading=`${question.user.username} ${format('YYYY/MM/DD HH:mm:ss', question.toc)}`
                   div!=markdown(question.content)

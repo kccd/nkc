@@ -128,7 +128,7 @@ block content
                       label
                         input(type="checkbox" v-model="selectedSubId" :value="sub._id")
                     .small-forum-icon
-                      div(:style="'background-image: url(/avatar/' + sub.tUid+ ')'")
+                      div(:style="'background-image: url(/avatar/' + sub.targetUser.avatar+ ')'")
                     .small-forum-content
                       .small-forum-name
                         a.pointer(@click='appOpenUrl("/u/" + sub.tUid)' :title="sub.targetUser.username") {{sub.targetUser.username}}

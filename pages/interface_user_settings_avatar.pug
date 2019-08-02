@@ -16,20 +16,20 @@ block content
               .col-xs-12.col-md-6
                 .row
                   .col-xs-12.col-md-12.user-settings-img-dev
-                    img#img_l(src=`/avatar/${data.user.uid}?t=lg` style='width: 100%;')
+                    img#img_l(src=`/avatar/${data.user.avatar}?t=lg` style='width: 100%;')
                   .col-xs-12.col-md-12.text-center.m-t-1
                     button.btn.btn-primary(onclick='selectAvatar()') 选择图片
                     h5.upload-info
               .col-xs-12.col-md-3
                 .col-xs-12.col-md-12
                   div(style=`width: 192px;height: 192px;position: relative;overflow: hidden;`)
-                    img#img_m(src=`/avatar/${data.user.uid}`).user-settings-img
+                    img#img_m(src=`/avatar/${data.user.avatar}`).user-settings-img
                   h5 192x192
                 .col-xs-12.col-md-12
                   br
                 .col-xs-6.col-md-6
                   div(style=`width: 48px;height: 48px;position: relative;overflow: hidden;`)
-                    img#img_s(src=`/avatar/${data.user.uid}?t=sm`).user-settings-img
+                    img#img_s(src=`/avatar/${data.user.avatar}?t=sm`).user-settings-img
                   h5 48x48
       
 

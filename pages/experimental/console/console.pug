@@ -62,7 +62,7 @@ block content
           p(v-html="messageInfo")
 
 block scripts
-  script(src=`/moment/moment.js?v=${global.NKC.startTime}`)
+  include ../../publicModules/moment
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src=`/experimental/console/console.js?v=${global.NKC.startTime}`)

@@ -68,7 +68,6 @@ block content
         for paper in data.papers
           .m-t-1
             span=fromNow(paper.tlm)
-            //- img(src=`/avatar/${paper.user.uid}` target='_blank').user-list-avatar
             | &nbsp;
             a(href=`/u/${paper.user.uid}` target='_blank')= paper.user.username || `用户${paper.user.uid}`
             | &nbsp;
@@ -84,4 +83,4 @@ block content
         for li in data.usersList  
           a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
             - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`科创币 ${li.user.kcb/100}\n`+`${li.user.info.certsName}`;
-            img.user-list-avatar(src=`/avatar_small/${li.user.uid}`  title=title)
+            img.user-list-avatar(src=`/avatar/${li.user.avatar}?t=sm`  title=title)

@@ -4,7 +4,6 @@ const productRouter = require('./product');
 const manageRouter = require('./manage');
 const openStoreRouter = require('./openStore');
 const storeRouter = require('./store');
-const accountRouter = require('./account');
 const cartRouter = require('./cart');
 const billRouter = require('./bill');
 const orderRouter = require('./order');
@@ -53,7 +52,6 @@ shopRouter
 	.use('/manage', manageRouter.routes(), manageRouter.allowedMethods())
   .use('/openStore', openStoreRouter.routes(), openStoreRouter.allowedMethods())
   .use('/cart', cartRouter.routes(), cartRouter.allowedMethods())
-  .use('/account', accountRouter.routes(), accountRouter.allowedMethods())
   .use('/bill', billRouter.routes(), billRouter.allowedMethods())
   .use('/order', orderRouter.routes(), orderRouter.allowedMethods())
   .use('/pay', payRouter.routes(), payRouter.allowedMethods())
