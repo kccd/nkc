@@ -28,7 +28,7 @@ app.on('error', err => {
 });
 const favicon = require('koa-favicon');
 
-const {stayLogin, init, body, urlRewrite, permission, logger} = require('./middlewares');
+const {stayLogin, init, body, urlRewrite, permission, logger, cache} = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
 
@@ -86,6 +86,7 @@ app
   .use(urlRewrite)
   .use(init)
   .use(stayLogin)
+  .use(cache)
   .use(permission)
   .use(logger)
   .use(mainRouter.routes())

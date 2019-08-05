@@ -29,6 +29,7 @@ const registerRouter = require('./register');
 const authRouter = require("./auth");
 const columnRouter = require("./column");
 const safeRouter = require('./safe');
+const cacheRouter = require("./cache");
 const protocolRouter = require('./protocol');
 settingRouter
 	.get('/', async (ctx, next) => {
@@ -37,6 +38,7 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+  .use("/cache", cacheRouter.routes(), cacheRouter.allowedMethods())
   .use('/red-envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())
   .use('/xsf', xsfRouter.routes(), xsfRouter.allowedMethods())
 	.use('/post', postRouter.routes(), postRouter.allowedMethods())

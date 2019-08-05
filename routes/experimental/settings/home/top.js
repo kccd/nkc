@@ -29,6 +29,7 @@ router
 			await homeSettings.update({'c.ads': ads});
 		}
 		await db.SettingModel.saveSettingsToRedis("home");
+		await db.ThreadModel.cacheAds();
 		await next();
 	});
 module.exports = router;

@@ -8,6 +8,10 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+	  cache: {
+	    GET: "experimentalCacheSettings",
+      PATCH: "experimentalCacheSettings"
+    },
 		shop: {
 			GET: 'visitShopSettings',
 			refunds: {

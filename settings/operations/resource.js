@@ -29,11 +29,11 @@ module.exports = {
 		},
 		POST: 'uploadActivityPoster',
 	},
-	avatar_small: {// 用户头像
+	/*avatar_small: {// 用户头像
 		PARAMETER: {
 			GET: 'getUserAvatar',
 		}
-	},
+	},*/
 	forum_avatar: {// 专业logo
 		PARAMETER: {
 			POST: 'updateForumAvatar',
