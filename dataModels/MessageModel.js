@@ -210,6 +210,8 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const ShopOrdersModel = mongoose.model("shopOrders");
   const ColumnModel = mongoose.model("columns");
   const ShopRefundModel = mongoose.model("shopRefunds");
+  const ActivityModel = mongoose.model("activity");
+  const MessageModel = mongoose.model("messages");
   const apiFunction = require("../nkcModules/apiFunction");
   const results = [];
 
@@ -217,7 +219,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
 
   for(let r of arr) {
     r = r.toObject();
-    const {type, pid, targetPid, targetUid, tid, orderId, refundId, applicationFormId, columnId} = r.c;
+    const {type, pid, targetPid, targetUid, tid, orderId, refundId, applicationFormId, columnId, acid, messageId} = r.c;
     if(type === "at") {
       const post = await PostModel.findOne({pid: targetPid});
       if (!post) continue;
@@ -340,6 +342,10 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if(!thread) continue;
       r.c.post = post;
       r.c.thread = thread;
+    }else if(type === "activityChangeNotice"){
+      const activity = await ActivityModel.findOne({acid: acid});
+      if(!activity) continue;
+      r.c.activity = activity;
     } else if(["newReview", "passReview"].includes(type)) {
       const post = await PostModel.findOne({pid});
       if(!post) continue;

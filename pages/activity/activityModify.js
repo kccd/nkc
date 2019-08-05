@@ -188,9 +188,8 @@ function submitredit(acid){
     var noticeContent = "";
     if(isnotice)
     {
-      noticeContent = $("#noticeContent").text();
+      noticeContent = $("#noticeContent").val();
     }
-  
   
     var post = {
       acid: acid,

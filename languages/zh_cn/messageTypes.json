@@ -61,5 +61,6 @@
   "disabledColumnInfo": "【专栏】专栏信息被屏蔽",
   "disabledColumn": "【专栏】专栏被屏蔽",
   "columnContributeChange": "【专栏】投稿状态更新",
-  "columnContactAdmin": "【专栏】专栏信息已修改"
+  "columnContactAdmin": "【专栏】专栏信息已修改",
+  "activityChangeNotice": "【活动系统】活动变更通知"
 }

@@ -18,7 +18,7 @@ experimentalRouter
       const experimental = ctx.getCookie("experimental");
       if(!experimental) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, "/e/login"));
       const {uid, time} = experimental;
-      if(data.user.uid !== uid || Date.now() - time > experimentalTimeout*60*1000) return ctx.redirect("/e/login");
+      if(data.user.uid !== uid || Date.now() - time > experimentalTimeout*60*1000) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, "/e/login"));
       ctx.setCookie("experimental", {
         uid,
         time: Date.now()
