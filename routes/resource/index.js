@@ -34,7 +34,7 @@ resourceRouter
     // ctx.resource = resource;
     // ctx.type = ext;
     // await next()
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf', 'mp3'];
     const { rid } = ctx.params;
     const { data, db, fs, settings } = ctx;
     const { cache } = settings;
