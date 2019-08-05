@@ -187,7 +187,8 @@ function appOpenUrl(urlStr) {
     pageParam: {
       realUrl: paramStr,
       shareType: shareType
-    }
+    },
+    reload:true
   })
 }
 

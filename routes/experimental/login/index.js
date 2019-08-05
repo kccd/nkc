@@ -6,7 +6,7 @@ router
     await next();
   })
   .post("/", async (ctx, next) =>{
-    const {data, body, db} = ctx;
+    const {data, body, db, nkcModules} = ctx;
     const {password} = body;
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: data.user.uid});
     await userPersonal.ensurePassword(password);
