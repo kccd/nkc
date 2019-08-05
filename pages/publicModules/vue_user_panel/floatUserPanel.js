@@ -1,5 +1,5 @@
-var vue_user_panel_float = new Vue({
-  el: "#vue_user_panel_float",
+var floatUserPanel = new Vue({
+  el: "#floatUserPanel",
   data: {
     show: false,
     panelSwitch: false,
@@ -7,6 +7,7 @@ var vue_user_panel_float = new Vue({
     top: 0,
     left: 0,
     user: {},
+    uid: "",
     usersObj: {},
     timeout: ''
   },
@@ -17,10 +18,13 @@ var vue_user_panel_float = new Vue({
   methods: {
     fromNow: NKC.methods.fromNow,
     format: NKC.methods.format,
-    close: function() {
+    close: function(uid) {
+      var this_ = this;
+      clearTimeout(this.timeout);
       this.timeout = setTimeout(function() {
-        vue_user_panel_float.show = false;
-      }, 100);
+        if(uid !== this_.uid) return;
+        floatUserPanel.show = false;
+      }, 300);
     },
 
     onPanel: function() {
@@ -40,8 +44,44 @@ var vue_user_panel_float = new Vue({
       var scrollTop = $(document).scrollTop();
       return { 'x': x, 'y': y-scrollTop };
     },
-
-    loadUser: function(userString) {
+    open: function(dom, uid) {
+      var this_ = this;
+      this.uid = uid;
+      dom = $(dom);
+      dom.on("mouseleave", function() {
+        this_.close(uid);
+      });
+      var offset = dom.offset();
+      var scrollTop = $(document).scrollTop();
+      var documentWidth = $(document).width();
+      if((offset.left + 25*12) > documentWidth) {
+        this.left = documentWidth - 25*12;
+      } else {
+        this.left = parseInt(offset.left);
+      }
+      this.top = parseInt(offset.top) - scrollTop + dom.height() + 15;
+      var user = this.usersObj[uid];
+      var func;
+      if(user) {
+        func = Promise.resolve();
+      } else {
+        func = nkcAPI("/u/" + uid + "?from=panel", "GET");
+      }
+      func
+        .then(function(data) {
+          if(!user) {
+            if(this_.uid !== data.targetUser.uid) return;
+            user = data.targetUser;
+            this_.usersObj[user.uid] = user;
+          }
+          this_.user = user;
+          this_.show = true;
+        })
+        .catch(function(data) {
+          sweetError(data);
+        });
+    }
+    /*open: function(userString) {
       clearTimeout(this.timeout);
       var user = NKC.methods.strToObj(userString);
       var position = this.getMousePosition();
@@ -51,14 +91,14 @@ var vue_user_panel_float = new Vue({
       this.left = position.x-20;
       if(this.usersObj[user.uid]) {
         this.user = this.usersObj[user.uid];
-        return vue_user_panel_float.show = true;
+        return floatUserPanel.show = true;
       }
 
-      vue_user_panel_float.show = true;
+      floatUserPanel.show = true;
 
       var targetUser = user;
 
-      vue_user_panel_float.usersObj[targetUser.uid] = {
+      floatUserPanel.usersObj[targetUser.uid] = {
         username: targetUser.username,
         description: (targetUser.description ||"暂未填写个人简介").slice(0, 140),
         uid: targetUser.uid,
@@ -73,7 +113,7 @@ var vue_user_panel_float = new Vue({
         threadCount: targetUser.threadCount - targetUser.disabledThreadsCount,
         certsName: targetUser.info.certsName
       };
-      vue_user_panel_float.user = vue_user_panel_float.usersObj[targetUser.uid];
-    }
+      floatUserPanel.user = floatUserPanel.usersObj[targetUser.uid];
+    }*/
   }
 });

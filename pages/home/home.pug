@@ -103,7 +103,7 @@ block content
                   a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
                     'background-image': `url(/cover/${thread.tid})`
                   })
-                    .swiper-title= `${thread.firstPost.t}`
+                    .swiper-title= `${thread.title}`
               .swiper-pagination
               .swiper-button-next.swiper-button(style='background-image: none;')
                 .fa.fa-angle-right
@@ -148,7 +148,7 @@ block scripts
   +includeJS("/home/home.js")
   if data.user
     include ../publicModules/subscribeTypes/subscribeTypes
-  include ../publicModules/vue_user_panel/vue_user_panel_float
+  include ../publicModules/vue_user_panel/floatUserPanel
   if canManagement
     include ../publicModules/moveThread/moveThread
     include ../publicModules/disabledPost/disabledPost

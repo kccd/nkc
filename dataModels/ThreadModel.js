@@ -1,5 +1,6 @@
 const settings = require('../settings');
 const mongoose = settings.database;
+const redisClient = require("../settings/redisClient");
 const Schema = mongoose.Schema;
 const apiFunction = require('../nkcModules/apiFunction');
 const {getQueryObj, obtainPureText} = apiFunction;
@@ -972,7 +973,15 @@ threadSchema.statics.getAds = async (fid) => {
   let threads = await ThreadModel.find({tid: {$in: homeSettings.ads}, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
   threads = await ThreadModel.extendThreads(threads, {
     forum: false,
-    lastPost: false
+    lastPost: false,
+    category: false,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    lastPostUser: false,
+    firstPostResource: false,
+    htmlToText: false,
+    count: 200
   });
   const threadsObj = {};
   threads.map(thread => {
@@ -981,9 +990,37 @@ threadSchema.statics.getAds = async (fid) => {
   const ads = [];
   for(const tid of homeSettings.ads) {
     const thread = threadsObj[tid];
-    if(thread) ads.push(thread);
+    if(thread) ads.push({
+      tid: thread.tid,
+      title: thread.firstPost.t
+    });
   }
   return ads;
+};
+threadSchema.statics.getAdsFromCache = async () => {
+  let ads = await redisClient.getAsync(`visitor:ads`);
+  try {
+    ads = JSON.parse(ads);
+  } catch(err) {
+    if(global.NKC.NODE_ENV !== "production") {
+      console.log(err);
+    }
+    ads = [];
+  }
+  return ads || [];
+};
+threadSchema.statics.cacheAds = async () => {
+  const role = await mongoose.model("roles").extendRole("visitor");
+  const fid = await mongoose.model("forums").getAccessibleForumsId([role], {});
+  const ads = await mongoose.model("threads").getAds(fid);
+  const ads_ = [];
+  for(const thread of ads) {
+    ads_.push({
+      tid: thread.tid,
+      title: thread.title
+    });
+  }
+  await redisClient.setAsync(`visitor:ads`, JSON.stringify(ads_));
 };
 /*
 * 加载网站公告

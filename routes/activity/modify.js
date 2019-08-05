@@ -67,14 +67,19 @@ modifyRouter
     await activityHistory.save();
     // 发送通知
     // 获取该活动全部报名者
+    let obj = {
+      type: "activityChangeNotice",
+      content: noticeContent,
+      cTitle: "【活动系统】",
+      acid: acid
+    }
     if(isnotice == true){
       for(let uid of activity.signUser){
         const _id = await db.SettingModel.operateSystemID('messages', 1);
         const message = db.MessageModel({
           _id,
-          ty: 'UTU',
-          c: noticeContent,
-          s: user.uid,
+          ty: 'STU',
+          c: obj,
           r: uid,
           ip: ctx.address,
           port: ctx.port
@@ -82,27 +87,27 @@ modifyRouter
         await message.save();    
 
         // 判断是否已创建聊天
-        let targetChat = await db.CreatedChatModel.findOne({uid: uid, tUid: user.uid});
+        // let targetChat = await db.CreatedChatModel.findOne({uid: uid, tUid: user.uid});
 
-        if(!targetChat) {
-          targetChat = db.CreatedChatModel({
-            _id: await db.SettingModel.operateSystemID('createdChat', 1),
-            uid: uid,
-            tUid: user.uid,
-            lmId: message._id
-          });
-          await targetChat.save();
-        }
-        const total = await db.MessageModel.count({$or: [{s: user.uid, r: uid}, {r: user.uid, s: uid}]});
+        // if(!targetChat) {
+        //   targetChat = db.CreatedChatModel({
+        //     _id: await db.SettingModel.operateSystemID('createdChat', 1),
+        //     uid: uid,
+        //     tUid: user.uid,
+        //     lmId: message._id
+        //   });
+        //   await targetChat.save();
+        // }
+        // const total = await db.MessageModel.count({$or: [{s: user.uid, r: uid}, {r: user.uid, s: uid}]});
 
-        await targetChat.update({
-          tlm: message.tc,
-          lmId: message._id,
-          total,
-          unread: await db.MessageModel.count({s: user.uid, r: uid, vd: false})
-        });
-        const message_ = message.toObject();
-        await ctx.redis.pubMessage(message_);
+        // await targetChat.update({
+        //   tlm: message.tc,
+        //   lmId: message._id,
+        //   total,
+        //   unread: await db.MessageModel.count({s: user.uid, r: uid, vd: false})
+        // });
+        // const message_ = message.toObject();
+        await ctx.redis.pubMessage(message);
       }
     }
     await next();

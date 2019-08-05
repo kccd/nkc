@@ -597,6 +597,7 @@
   "billParamAddOne": "[CO]账单商品数量加一",
   "billParamPlusOne": "[CO]账单商品数量减一",
   "account_subscribe": "用户管理自己的关注",
+  "experimentalCacheSettings": "后台管理-缓存设置",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

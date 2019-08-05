@@ -10,17 +10,49 @@ const client = Redis.createClient({
 });
 module.exports = client;
 /*
-* 键名
-* user:[uid]:subscribeForumsId array
-* user:[uid]:subscribeUsersId array
-* user:[uid]:subscribeThreadsId array
-* user:[uid]:subscribeColumnsId array
-* user:[uid]:collectionThreadsId array
+* 键名 uid(用户ID)
+* user:uid:subscribeForumsId array
+* user:uid:subscribeUsersId array
+* user:uid:subscribeThreadsId array
+* user:uid:subscribeColumnsId array
+* user:uid:collectionThreadsId array
 *
-* forums:topicsId
-* forums:disciplinesId
+* forums:topicsId array 话题ID
+* forums:disciplinesId array 学科ID
 *
+* 关注分类
+* 全部
+* user:uid:subscribeTypesId array 所有自定义分类ID+all+other
+* user:uid:subscribeType:all:column array 专栏ID
+* user:uid:subscribeType:all:thread array 文章ID
+* user:uid:subscribeType:all:user array 用户ID
+* user:uid:subscribeType:all:topic array 话题ID
+* user:uid:subscribeType:all:discipline array 学科ID
+* 未分类
+* user:uid:subscribeType:other:column
+* user:uid:subscribeType:other:thread
+* user:uid:subscribeType:other:user
+* user:uid:subscribeType:other:topic
+* user:uid:subscribeType:other:discipline
+* 自定义分类 subscribeTypeId(自定义分类ID)
+* user:uid:subscribeType:subscribeTypeId:column
+* user:uid:subscribeType:subscribeTypeId:thread
+* user:uid:subscribeType:subscribeTypeId:user
+* user:uid:subscribeType:subscribeTypeId:topic
+* user:uid:subscribeType:subscribeTypeId:discipline
 *
+* 设置 settingsId(设置ID)
+* settings:settingsId json string
+*
+* 一周活跃用户
+* activeUsers array [{uid: 用户ID, avatar: 头像}, {}, ...]
+*
+* 轮播图
+* visitor:ads [{tid: 文章ID, title: 文章标题}, {}, ...]
+*
+* 针对游客的全局页面缓存 url: 网页链接
+* page:url:toc 缓存创建的时间
+* page:url:data html字符串
 *
 * 数据类型
 * 1. string字符创  setAsync, getAsync

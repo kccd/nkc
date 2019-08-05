@@ -164,6 +164,14 @@ const getDomByType = (t) => {
   } else if(t === "columnInfoType") {
     return "{'notice': '公告通知', 'otherLinks': '友情链接', 'blocks': '自定义内容', " +
       "'name': '专栏名', 'abbr': '专栏简介', 'logo': 'logo', 'banner': 'banner'}[item.c.columnInfoType]"
+  } else if(t === "activityUrl") {
+    return "'/activity/single/' + item.c.activity.acid"
+  } else if(t === "activityTitle") {
+    return "item.c.activity.activityTitle"
+  } else if(t === "noticeContent") {
+    return "item.c.content"
+  } else if(t === "cTitle") {
+    return "item.c.cTitle"
   }
 };
 // const getAppVueDom = (template) => {

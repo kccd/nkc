@@ -21,8 +21,7 @@
         img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
       a(
         href=`/u/${thread.uid}` target="_blank"
-        onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.firstPost.user)}')`
-        onmouseleave="vue_user_panel_float.close()"
+        onmouseover=`floatUserPanel.open(this, '${thread.uid}')`
       )= thread.firstPost.user.username
 
     .thread-panel-forum
@@ -90,8 +89,7 @@
           span 收藏
     .thread-panel-reply
       a(href=`/u/${thread.lastPost.uid}` target="_blank"
-        onmouseover=`vue_user_panel_float.loadUser('${objToStr(thread.lastPost.user)}')`
-        onmouseleave="vue_user_panel_float.close()"
+        onmouseover=`floatUserPanel.open(this, '${thread.lastPost.uid}')`
       )= thread.lastPost.user.username
       span=fromNow(thread.lastPost.toc)
 

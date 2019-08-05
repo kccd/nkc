@@ -69,7 +69,10 @@ module.exports = async (ctx, next) => {
       // - 初始化网站设置
       pageSettings: await db.SettingModel.getSettings("page"),
       postSettings: await db.SettingModel.getSettings("post"),
-      serverSettings: await db.SettingModel.getSettings("server")
+      serverSettings: await db.SettingModel.getSettings("server"),
+
+      // 缓存相关
+      cachePage: false
     };
 
 	  // 权限判断

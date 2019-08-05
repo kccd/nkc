@@ -132,6 +132,9 @@
           if permission("experimentalColumnSettings")
             li
               a(href=`/e/settings/column`) 专栏
+          if permission("experimentalCacheSettings")
+            li
+              a(href=`/e/settings/cache`) 缓存
 
           <li role="separator" class="divider"></li>    
           li

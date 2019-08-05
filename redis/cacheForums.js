@@ -1,5 +1,5 @@
 require('colors');
-const {ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
+const {ThreadModel, ActiveUserModel, ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
 const client = require('../settings/redisClient');
 
 async function func() {
@@ -284,8 +284,10 @@ async function func() {
     await client.saddAsync(key, role.operationsId);
   }
 
+  await ActiveUserModel.saveActiveUsersToCache();
+  await ThreadModel.cacheAds();
+
   console.log(`缓存更新完成`.green);
-  
 }
 
 module.exports = func;

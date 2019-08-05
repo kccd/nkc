@@ -57,12 +57,12 @@ router
     data.homeSettings = homeSettings;
     // 置顶文章轮播图
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
+
     // 网站公告
 
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     // 一周活跃用户
-    data.activeUsers = await db.ActiveUserModel.getActiveUsers();
-
+    data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
 
