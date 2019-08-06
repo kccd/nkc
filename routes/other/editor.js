@@ -41,7 +41,6 @@ editorRouter
       data.panelDatas = await db.ForumModel.getForumsNewTree(data.userRoles, data.userGrade, data.user);
 	    if(type === 'forum' && id) {
         const forum = await db.ForumModel.findOnly({fid: id});
-        data.forum = forum;
         data.forumType = forum.forumType;
         const childForumCount = await db.ForumModel.count({parentsId: id});
         if(!childForumCount) data.forum = forum;
@@ -56,6 +55,12 @@ editorRouter
       ctx.template = 'interface_editor_test.pug';
       const did = ctx.query.did;
       const singledraft = await db.DraftModel.findOnly({did:did});
+      singledraft.originState = singledraft.originState || "";
+      singledraft.keyWordsEn = singledraft.keyWordsEn || [];
+      singledraft.keyWordsCn = singledraft.keyWordsCn || [];
+      singledraft.authorInfos = singledraft.authorInfos || [];
+      singledraft.abstractCn = singledraft.abstractCn || "";
+      singledraft.abstractEn = singledraft.abstractEn || "";
       if(singledraft.uid !== user.uid) ctx.throw(403, '权限不足');
       data.title = singledraft.t;
       data.content = singledraft.c;

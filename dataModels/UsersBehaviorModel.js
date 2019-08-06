@@ -193,6 +193,8 @@ usersBehaviorSchema.methods.extendOperationName = async function(){
 	return this.operationData = operationData
 }
 
+
+
 const UsersBehaviorModel = database.model('usersBehaviors', usersBehaviorSchema, 'usersBehaviors');
 
 module.exports = UsersBehaviorModel;

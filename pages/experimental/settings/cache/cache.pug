@@ -8,17 +8,30 @@ block eContent
       .col-xs-12.col-md-12
         .form-horizontal
           .col-xs-12.col-md-12
+            h4 状态
+          .form-group
+            label.col-sm-2.control-label 已缓存页面
+            .col-sm-5
+              h5
+                b=data.cachePageCount
+          .col-xs-12.col-md-12
             h4 操作
           .form-group
             label.col-sm-2.control-label 清除缓存
             .col-sm-5
               button.btn.btn-default(@click="clearAll") 清除所有
           .col-xs-12.col-md-12.m-t-4
-            h4 页面缓存
+            h4 缓存设置
           .form-group
-            label.col-sm-2.control-label 缓存时间（秒）
+            label.col-sm-2.control-label 更新缓存时间（秒）
             .col-sm-5
+              h5.text-danger 若缓存创建超过{{cacheSettings.visitorPageCacheTime}}秒，则新的请求将会触发缓存更新
               input.form-control(type='text' v-model.number="cacheSettings.visitorPageCacheTime")
+          //-.form-group
+            label.col-sm-2.control-label 清除缓存时间（秒）
+            .col-sm-5
+              h5.text-danger 若缓存超过{{cacheSettings.visitorPageCacheTimeout}}秒未被使用，则该缓存将会被清除
+              input.form-control(type='text' v-model.number="cacheSettings.visitorPageCacheTimeout")
           .form-group
             label.col-sm-2.control-label
             .col-sm-5

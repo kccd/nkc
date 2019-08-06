@@ -15,12 +15,15 @@ module.exports = async (ctx, next) => {
   ) return await next();
   const {state, url, settings, db, path, data} = ctx;
   const {redisClient} = settings;
-  const toc = await redisClient.getAsync(`page:${url}:toc`);
+  const tocKey = `page:${url}:toc`;
+  const dataKey = `page:${url}:data`;
+  // 获取缓存生成的时间，判断是否过期
+  const toc = await redisClient.getAsync(tocKey);
   const cacheSettings = await db.SettingModel.getSettings("cache");
   if(!toc || (ctx.reqTime.getTime() - Number(toc)) > cacheSettings.visitorPageCacheTime*1000) {
     state.cachePage = true;
   } else {
-    const html = await redisClient.getAsync(`page:${url}:data`);
+    const html = await redisClient.getAsync(dataKey);
     if(!html) {
       state.cachePage = true;
     } else {
@@ -36,7 +39,23 @@ module.exports = async (ctx, next) => {
   if(!state.cachePage) return;
   const html = ctx.body.toString();
   setTimeout(async () => {
-    await redisClient.setAsync(`page:${url}:toc`, ctx.reqTime.getTime());
-    await redisClient.setAsync(`page:${url}:data`, html);
+    await redisClient.setAsync(tocKey, ctx.reqTime.getTime());
+    await redisClient.setAsync(dataKey, html);
+    // 生成缓存记录
+    let cache = await db.CacheModel.findOneAndUpdate({
+      key: url,
+      type: "visitorPage"
+    }, {
+      $set: {
+        toc: ctx.reqTime.getTime()
+      }
+    });
+    if(!cache) {
+      await db.CacheModel({
+        key: url,
+        toc: ctx.reqTime.getTime(),
+        type: "visitorPage"
+      }).save();
+    }
   });
 };
