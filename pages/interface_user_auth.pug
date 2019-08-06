@@ -8,7 +8,39 @@ block content
     .row
       .col-xs-12.col-md-12
         h4
-          a(href='/auth') <<返回申请列表
+          a.btn.btn-default.btn-sm(href='/auth') <<返回申请列表
+        .panel.panel-primary
+          .panel-heading
+            span 申请人信息
+          .panel-body
+            .row
+              .col-xs-12.col-md-8
+                .form-horizontal
+                  .form-group
+                    label.control-label.col-sm-2 头像
+                    h5.col-xs-10
+                      img(src=`/avatar/${data.targetUser.avatar}?t=sm`)
+
+                    label.control-label.col-sm-2 用户名
+                    h5.col-xs-10
+                      a(href=`/u/${data.targetUser.uid}` target="_blank")=data.targetUser.username
+
+                    label.control-label.col-sm-2 国际区号
+                    h5.col-xs-10="+" + data.nationCode || "无"
+
+                    label.control-label.col-sm-2 手机号
+                    h5.col-xs-10=data.mobile || "无"
+
+                    label.control-label.col-sm-2 邮箱
+                    h5.col-xs-10=data.email || "无"
+
+                    label.control-label.col-sm-2 注册时间
+                    h5.col-xs-10=format("YYYY-MM-DD HH:mm:ss", data.targetUser.toc)
+
+                    label.control-label.col-sm-2 最后活动
+                    h5.col-xs-10=format("YYYY-MM-DD HH:mm:ss", data.targetUser.tlv)
+                      | &nbsp;
+                      a(href=`/e/log/behavior?t=uid&c=${data.targetUser.uid}` target="_blank") 查看详情
         .panel.panel-primary
           .panel-heading
             span 身份认证2

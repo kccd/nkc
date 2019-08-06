@@ -1,5 +1,5 @@
 require('colors');
-const {ThreadModel, ActiveUserModel, ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
+const {CacheModel, ThreadModel, ActiveUserModel, ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
 const client = require('../settings/redisClient');
 
 async function func() {
@@ -117,7 +117,8 @@ async function func() {
 
   // 清空redis数据库
   await client.flushdbAsync();
-
+  // 清空缓存表
+  await CacheModel.remove();
   // 获取下级专业
   for(const forum of forums) {
 

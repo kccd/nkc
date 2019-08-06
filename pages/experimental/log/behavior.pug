@@ -6,7 +6,7 @@ block title
   link(href='/experimental/index.css' rel='stylesheet')
   title 操作设置
 block content
-
+  .hidden#data=objToStr({t: data.t, c: data.c})
   .container-fluid.max-width
     .row
       include ../nav
@@ -14,50 +14,80 @@ block content
         .row
           .col-xs-12.col-md-12
             .row
+              .col-xs-12.col-md-12#app(v-cloak)
+                .form-inline(style='margin-bottom: 1rem;')
+                  .form-group
+                    select.form-control(v-model='searchType')
+                      option(value='username') 用户名
+                      option(value='uid') UID
+                      option(value='ip') IP
+                  .form-group
+                    input.form-control(placeholder='请输入内容' v-model='searchText' @keyup.enter='searchUser')
+                  .form-group
+                    button.btn.btn-primary(type='submit' @click='searchUser') 搜索
+                    span &nbsp;
+                    a.btn.btn-default(type='submit' href='/e/log/kcb') 全部
+                  .text-danger= data.info
               .col-xs-12.col-md-12
-                //- ul.nav.nav-pills
-                //-   li(role='presentation' class=!data.type?'active':'')
-                //-     a(href=`/e/log/secret?type=email`) 邮箱修改
-                //-   li(role='presentation' class=data.type==='password'?'active':'')
-                //-     a(href=`/e/log/secret?type=password`) 密码修改
-                //-   li(role='presentation' class=data.type==='mobile'?'active':'')
-                //-     a(href=`/e/log/secret?type=mobile`) 手机修改
-                //-   li(role='presentation' class=data.type==='username'?'active':'')
-                //-     a(href=`/e/log/secret?type=username`) 用户名修改
-              .col-xs-12.col-md-12
-                -const type = data.type
-                include ../../interface_navigation_paging      
-                  .col-xs-12.col-md-12
-                    table.table.table-hover
-                      thead
+                include ../../publicModules/paging/paging
+                .table-responsive
+                  table.table.table-bordered
+                    thead
+                      tr
+                        th 时间
+                        th 用户
+                        th 操作名
+                        th 目标ID
+                        th IP
+                    tbody
+                      for behavior in data.results
                         tr
-                          th 操作名称
-                          th 操作者
-                          th 板块id
-                          th 帖子id
-                          th 时间
-                      tbody
-                        for behavior in data.result
-                          tr
-                            th= behavior.operationData ? behavior.operationData.description : behavior.operationId
-                            th
-                              if behavior.user
-                                a(href=`/u/${behavior.uid}` target="_blank")
-                                  span= behavior.user.username
-                            th= behavior.fid
-                            th
-                              a(href=`/t/${behavior.tid}` target="_blank")
-                                span=behavior.tid
-                            -let behTime = behavior.toc?behavior.toc.toLocaleString():'';
-                            -behTime = behavior.timeStamp?behavior.timeStamp.toLocaleString():behTime;
-                            th= behTime
-
+                          th= format("YYYY/MM/DD HH:mm:ss", behavior.timeStamp)
+                          th
+                            if behavior.user
+                              a(href=`/u/${behavior.user.uid}` target="_blank")=behavior.user.username
+                            else
+                              span 游客
+                          th= lang("operations", behavior.operationId)
+                          th
+                            if behavior.tid
+                              div
+                                |tid：
+                                a(href=`/t/${behavior.tid}` target="_blank")=behavior.tid
+                            if behavior.fid
+                              div
+                                | fid：
+                                a(href=`/f/${behavior.fid}` target="_blank")=behavior.fid
+                            if behavior.pid
+                              div
+                                | pid：
+                                a(href=`/p/${behavior.pid}` target="_blank")=behavior.pid
+                            if behavior.toUid
+                              div
+                                | uid：
+                                a(href=`/u/${behavior.toUid}` target="_blank")=behavior.toUid
+                          th
+                            a(href=ipUrl(behavior.ip))=`${behavior.ip}: ${behavior.port}`
+                .m-t-05
+                  include ../../publicModules/paging/paging_input
 
 block scripts
 
-  script(src='/icheck/icheck.js')
-  script(src='/interface_common.js')
-  script(src='/laydate/laydate.dev.js')
+  script.
+    var data = NKC.methods.getDataById("data");
+    var app = new Vue({
+      el: '#app',
+      data: {
+        searchType: data.t || "username",
+        searchText: data.c || ""
+      },
+      methods: {
+        searchUser: function () {
+          if (!this.searchText) return screenTopWarning('输入不能为空');
+          openToNewLocation('/e/log/behavior?t=' + this.searchType + '&c=' + this.searchText);
+        }
+      }
+    });
 
 
 

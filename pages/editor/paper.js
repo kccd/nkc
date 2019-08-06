@@ -85,8 +85,15 @@ var paperProto = {
         var abstractEnDom = paperProto.get("abstractEn");
         abstractEnDom.value = paperProto.config.abstractEn;
         // 初始化摘要字数
-        $("#abstractCnNum").text(paperProto.config.abstractCn.length)
-        $("#abstractEnNum").text(paperProto.config.abstractEn.length)
+        var abstractCnCount = 0, abstractEnCount = 0;
+        if(paperProto.config.abstractCn) {
+          abstractCnCount = paperProto.config.abstractCn.length;
+        }
+        if(paperProto.config.abstractEn) {
+          abstractEnCount = paperProto.config.abstractEn.length;
+        }
+        $("#abstractCnNum").text(abstractCnCount);
+        $("#abstractEnNum").text(abstractEnCount);
         // 监听摘要字数
         $("#abstractCn").on("input propertychange" ,function() {
           $("#abstractCnNum").text($("#abstractCn").val().length)

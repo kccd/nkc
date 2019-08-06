@@ -50,7 +50,7 @@ userRouter
     await targetUser.extendGrade();
     data.targetUser = targetUser;
     await db.UserModel.extendUsersInfo([targetUser]);
-    if(from && from === "panel") {
+    if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
       return await next();
     }
     const targetUserSubForums = await db.SubscribeModel.find({
