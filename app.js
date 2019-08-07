@@ -34,7 +34,7 @@ const cookieConfig = require("./config/cookie");
 
 app.keys = [cookieConfig.secret];
 app
-  // 限制单位时间相同ip（60s）请求数
+  /*// 限制单位时间相同ip（60s）请求数
   .use(rateLimit({
     db: new Redis(),
     duration: 60000,
@@ -69,7 +69,7 @@ app
     },
     max: 300000,
     disableHeader: false,
-  }))
+  }))*/
   // gzip
   .use(koaCompress({threshold: 2048}))
   .use(staticServe(path.resolve('./nkcModules')))
