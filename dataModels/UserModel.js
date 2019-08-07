@@ -1163,7 +1163,7 @@ userSchema.statics.getUsersFriendsId = async (uid) => {
 * @return {Boolean} 是否上传
 * */
 userSchema.statics.uploadedAvatar = async (avatar) => {
-  if(!avatar) throwErr(500, "userSchema.uploadedAvatar: avatar is required");
+  if(!avatar) return false;
   let {avatarPath} = require("../settings/upload");
   const {existsSync} = require("../tools/fsSync");
   avatarPath += `/${avatar}.jpg`;
