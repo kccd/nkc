@@ -238,7 +238,6 @@ router
     paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     let sort = {tlm: -1};
     if(s === "toc") sort = {toc: -1};
-
     let threads = await db.ThreadModel.find(q, {
       uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
       tlm: 1, fid: 1, hasCover: 1,
