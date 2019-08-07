@@ -96,13 +96,8 @@ router
           await record.update(updateObj);
           return ctx.body = 'success';
         }
-        console.log(1);
         orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
-        console.log(orders);
-        console.log(2);
         const ordersInfo = await db.ShopOrdersModel.getOrdersInfo(orders);
-        console.log(ordersInfo);
-        console.log(3);
         for(const order of orders) {
           const r = db.KcbsRecordModel({
             _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
@@ -116,7 +111,6 @@ router
             port: ctx.port,
             verify: true
           });
-          console.log(r._id);
           await r.save();
           // 更改订单状态为已付款，添加付款时间。
           await db.ShopOrdersModel.updateOne({orderId: order.orderId}, {$set: {
