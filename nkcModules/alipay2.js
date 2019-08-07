@@ -229,7 +229,8 @@ func.receipt = async (o) => {
   } else {
     notifyUrl = alipayConfig.notifyUrl || ""
   }
-
+  console.log(returnUrl);
+  console.log(notifyUrl);
   const obj = {
     service: "create_direct_pay_by_user",
     payment_type: "1",
