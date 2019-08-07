@@ -28,7 +28,7 @@ modifyRouter
 		const {ActivityModel, SettingModel, ActivityHistoryModel} = db;
 		const {user} = data;
 		const {post} = body;
-    const {acid, activityTitle, address, sponsor, limitNum, enrollStartTime, enrollEndTime, holdStartTime, holdEndTime, posterId, description, contactNum, continueTofull, isnotice, noticeContent} = post;
+    const {acid, activityTitle, address, sponsor, limitNum, enrollStartTime, enrollEndTime, holdStartTime, holdEndTime, posterId, description, contactNum, continueTofull, isnotice, noticeContent, conditions} = post;
     const activity = await ActivityModel.findOne({"acid":acid});
     if(activity.activityType == "close"){
       return ctx.throw(400,"该活动已被关闭，不可修改")
@@ -46,6 +46,7 @@ modifyRouter
       activity.limitNum = limitNum;
       activity.continueTofull = continueTofull;
       activity.description = description;
+      activity.conditions = conditions;
     }
     await activity.save();
     const activityHistory = new ActivityHistoryModel({
@@ -61,7 +62,8 @@ modifyRouter
 			holdStartTime,
 			holdEndTime,
 			contactNum,
-			continueTofull,
+      continueTofull,
+      conditions,
 			uid: user.uid
     })
     await activityHistory.save();
