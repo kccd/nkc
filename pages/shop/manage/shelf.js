@@ -108,13 +108,6 @@ $(document).ready(function() {
     // typeahead: {
     //   source: ['Amsterdam', 'Washington', 'Sydney', 'Beijing', 'Cairo']
     // }
-  })
-  //编辑器缩放
-  $(".w-e-text-container").resizable({
-    containment: '#body',
-    minHeight: 100,
-    minWidth: 100,
-    maxWidth: 1400
   });
   // 编辑器上传粘贴图片
   $("#ReplyContent").on("paste", function(){

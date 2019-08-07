@@ -32,6 +32,27 @@ module.exports = async (ctx, next) => {
       console.log(
         `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${"visitor".bgCyan} ${ctx.method.black.bgYellow} ${path.bgBlue} <${processTime.green}ms> ${"200".green} ${lang(data.operationId).grey}`
       );
+      const d = {
+        url: ctx.path,
+        method: "GET",
+        status: ctx.status,
+        uid: "visitor",
+        reqTime: ctx.reqTime,
+        resTime: processTime,
+        consoleType: 'web',
+        processId: global.NKC.processId,
+        from: ctx.req.headers.referer,
+        address: ctx.address,
+        error: ''
+      };
+      setTimeout(async () => {
+        const url_ = url.replace(/\?.*/, '');
+        const tid = url_.replace(/\/t\/(.*)/i, "$1");
+        if(tid !== url_) {
+          await db.ThreadModel.updateOne({tid}, {$inc: {hits: 1}});
+        }
+        global.NKC.io.of('/console').NKC.webMessage(d);
+      });
       return ctx.body = html;
     }
   }

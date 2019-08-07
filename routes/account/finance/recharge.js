@@ -87,7 +87,7 @@ router
             return ctx.body = 'success';
           }
           orders.push(order);
-          totalMoney += order.orderPrice;
+          totalMoney += (order.orderPrice + order.orderFreightPrice);
         }
         if(totalMoney !== totalAmount) {
           updateObj.error = '系统账单金额与支付宝账单金额不相等';
