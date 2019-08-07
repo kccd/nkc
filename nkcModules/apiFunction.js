@@ -546,6 +546,7 @@ fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
  * @param {*} url 
  */
 fn.generateAppLink = (state, url) => {
+  state.cachePage = false;
 	if(state.apptype && state.apptype === "app") {
 		let paramIndex = url.indexOf("?");
 		if(paramIndex > -1) {

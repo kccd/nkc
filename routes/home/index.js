@@ -57,12 +57,12 @@ router
     data.homeSettings = homeSettings;
     // 置顶文章轮播图
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
+
     // 网站公告
 
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     // 一周活跃用户
-    data.activeUsers = await db.ActiveUserModel.getActiveUsers();
-
+    data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
 
@@ -238,7 +238,6 @@ router
     paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     let sort = {tlm: -1};
     if(s === "toc") sort = {toc: -1};
-
     let threads = await db.ThreadModel.find(q, {
       uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
       tlm: 1, fid: 1, hasCover: 1,

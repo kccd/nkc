@@ -34,7 +34,7 @@ resourceRouter
     // ctx.resource = resource;
     // ctx.type = ext;
     // await next()
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf', 'mp3'];
     const { rid } = ctx.params;
     const { data, db, fs, settings } = ctx;
     const { cache } = settings;
@@ -44,7 +44,7 @@ resourceRouter
     const { path, ext } = resource;
     let filePath = selectDiskCharacterDown(resource);
     filePath = filePath + path;
-    if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
+    if (!extArr.includes(resource.ext.toLowerCase()) && !ctx.permission("getAttachments")) ctx.throw(403, '您当前账号等级无法下载附件，请发表优质内容提升等级。');
     if (extArr.includes(resource.ext.toLowerCase())) {
       try {
         await fs.access(filePath);

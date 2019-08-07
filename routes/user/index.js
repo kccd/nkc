@@ -43,11 +43,16 @@ userRouter
 
     data.complaintTypes = ctx.state.language.complaintTypes;
 
-    const {t, page=0} = query;
+    const {t, page=0, from} = query;
     data.t = t;
 
     const targetUser = await db.UserModel.findOnly({uid});
     await targetUser.extendGrade();
+    data.targetUser = targetUser;
+    await db.UserModel.extendUsersInfo([targetUser]);
+    if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
+      return await next();
+    }
     const targetUserSubForums = await db.SubscribeModel.find({
       uid: targetUser.uid,
       type: "forum"
@@ -57,7 +62,6 @@ userRouter
         $in: targetUserSubForums.map(f => f.fid)
       }
     });
-    await db.UserModel.extendUsersInfo([targetUser]);
     // 获取用户能够访问的专业ID
     const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
     if(user) {
@@ -401,7 +405,6 @@ userRouter
       }
     }
     data.paging = paging;
-    data.targetUser = targetUser;
     ctx.template = "/user/user.pug";
     await next();
   })

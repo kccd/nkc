@@ -1162,11 +1162,11 @@ userSchema.statics.getUsersFriendsId = async (uid) => {
 * @author pengxiguaa 2019-5-13
 * @return {Boolean} 是否上传
 * */
-userSchema.statics.uploadedAvatar = async (uid) => {
-  if(!uid) throwErr(500, "userSchema.uploadedAvatar: uid is required");
+userSchema.statics.uploadedAvatar = async (avatar) => {
+  if(!avatar) return false;
   let {avatarPath} = require("../settings/upload");
   const {existsSync} = require("../tools/fsSync");
-  avatarPath += `/${uid}.jpg`;
+  avatarPath += `/${avatar}.jpg`;
   return existsSync(avatarPath);
 };
 /*
@@ -1199,7 +1199,7 @@ userSchema.statics.checkUserBaseInfo = async function(uid) {
     user = uid;
   }
   const {username} = user;
-  const uploadedAvatar = await UserModel.uploadedAvatar(user.uid);
+  const uploadedAvatar = await UserModel.uploadedAvatar(user.avatar);
   /*const uploadedBanner = await UserModel.uploadedBanner(user.uid);
   return username && uploadedAvatar && uploadedBanner;*/
   return username && uploadedAvatar;

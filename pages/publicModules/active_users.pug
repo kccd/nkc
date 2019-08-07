@@ -2,9 +2,6 @@
   .side-thread-header 最近活跃用户
   .m-b-1
   for u in data.activeUsers
-    .active-user-avatar(
-      onmouseover=`vue_user_panel_float.loadUser('${objToStr(u)}')`
-      onmouseleave="vue_user_panel_float.close()"
-    )
+    .active-user-avatar(onmouseover=`floatUserPanel.open(this, '${u.uid}')`)
       a(href=`/u/${u.uid}` target="_blank")
         img(src=`/avatar/${u.avatar}`)

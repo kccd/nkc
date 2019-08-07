@@ -105,15 +105,16 @@ block content
                       a.btn-sm.forum-sub-btn.btn.success(href=`/f/${data.forum.fid}/settings`) 设置
                       -display = false;
                     if !data.forum.childrenForums || data.forum.childrenForums.length === 0
-                      if data.subscribed
-                        button.btn-sm.forum-sub-btn.btn(
-                          onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", false)`
-                        ) 已关注
-                      else
-                        button.btn-sm.forum-sub-btn.btn.success(
-                          onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", true)`
-                        ) 关注
-                      -display = false;
+                      if data.user
+                        if data.subscribed
+                          button.btn-sm.forum-sub-btn.btn(
+                            onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", false)`
+                          ) 已关注
+                        else
+                          button.btn-sm.forum-sub-btn.btn.success(
+                            onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", true)`
+                          ) 关注
+                        -display = false;
                     if display
                       div(style="height: 2rem;")
                   .clearfix
@@ -244,4 +245,4 @@ block scripts
   include ../publicModules/disabledPost/disabledPost
   +includeJS("/forum/forum.js")
   +includeJS("/publicModules/thread_panel/management.js")
-  include ../publicModules/vue_user_panel/vue_user_panel_float
+  include ../publicModules/vue_user_panel/floatUserPanel

@@ -159,7 +159,8 @@ statusRouter
 				} else {
 					data.onlineUsers.push({
 						uid: onlineUser.uid,
-						username: onlineUser.username
+						username: onlineUser.username,
+            avatar: onlineUser.avatar
 					});
 				}
 			}

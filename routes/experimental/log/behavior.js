@@ -3,15 +3,33 @@ const router = new Router();
 router
   .get('/', async(ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
-    const {page=0, type} = query;
-    const count = await db.UsersBehaviorModel.count({});
+    const {page = 0, t = "", c = ""} = query;
+    data.c = c;
+    data.t = t;
+    const q = {};
+    let uid = "";
+    if(t === "username") {
+      const targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
+      if(!targetUser) {
+        data.results = [];
+        return await next();
+      } else {
+        uid = targetUser.uid;
+      }
+    } else if(t === "uid") {
+      uid = c;
+    } else if(t === "ip") {
+      q.ip = c;
+    }
+    if(uid) {
+      q.uid = uid;
+    }
+    const count = await db.UsersBehaviorModel.count(q);
 		const paging = nkcModules.apiFunction.paging(page, count);
-    data.paging = paging
-    // data.result = await db.LogModel.find({}).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
-    const logs = await db.UsersBehaviorModel.find({}).sort({timeStamp:-1}).skip(paging.start).limit(paging.perpage);
-    data.result = await Promise.all(logs.map(async behavior => {
+    data.paging = paging;
+    const logs = await db.UsersBehaviorModel.find(q).sort({timeStamp:-1}).skip(paging.start).limit(paging.perpage);
+    data.results = await Promise.all(logs.map(async behavior => {
       await behavior.extendUser();
-      await behavior.extendOperationName();
 			return behavior;
 		}));
     ctx.template = 'experimental/log/behavior.pug';

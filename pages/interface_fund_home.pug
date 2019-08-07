@@ -60,7 +60,7 @@ block content
             if data.userOperationsId.includes('visitFundObjectSettings')
               a.btn.btn-info.btn-block(href=`/fund/list/${fund._id.toLowerCase()}/settings`)= `基金设置`
             a.btn.btn-info.btn-block(href=`/fund/list/${fund._id.toLowerCase()}/bills`)= `基金账单`
-            a.btn.btn-info.btn-block(href=`/fund/donation?fundId=${fund._id.toLowerCase()}`)= `捐助该基金`
+            a.btn.btn-info.btn-block(href=`/fund/donation?fundId=${fund._id.toLowerCase()}`)= `赞助该基金`
             br
             .panel.panel-default
               .panel-body.fund-preconditions

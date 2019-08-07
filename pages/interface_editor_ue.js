@@ -80,15 +80,17 @@ function saveDraft() {
     did: draftId,
     desType: queryType,
     desTypeId: queryId
-  }
-  if(queryType == "post" || queryType == "thread" || queryType == "forum") {
+  };
+  var paperObj = {};
+  if(["post", "thread", "forum", "redit"].indexOf(queryType) !== -1) {
     try{
-      var paperObj = paperProto.paperExport();
+      paperObj = paperProto.paperExport();
     }catch(e) {
       screenTopWarning(e);
       return;
     }
     for(var i in paperObj) {
+      if(!paperObj.hasOwnProperty(i)) continue;
       post[i] = paperObj[i]
     }
   }

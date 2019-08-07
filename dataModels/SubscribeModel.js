@@ -247,7 +247,7 @@ schema.statics.saveUserCollectionThreadsId = async (uid) => {
 *   "user:uid:subscribeType:typeId:thread": [tid, tid, ...]
 * @author pengxiguaa 2019-8-1
 * */
-schema.statics.saveUserSubscribeTypesSingleSubTypeToRedis = async (uid, subType) => {
+/*schema.statics.saveUserSubscribeTypesSingleSubTypeToRedis = async (uid, subType) => {
   const tt = Date.now();
   const SubscribeModel = mongoose.model("subscribes");
   const types = await SubscribeModel.find({uid}, {_id: 1});
@@ -317,7 +317,7 @@ schema.statics.saveUserSubscribeTypeToRedis = async (uid, typeId, subType) => {
     }
   });
   return ids;
-};
+};*/
 schema.statics.getUserSubscribeTypesResults = async (uid) => {
   const SubscribeTypeModel = mongoose.model("subscribeTypes");
   const SubscribeModel = mongoose.model("subscribes");

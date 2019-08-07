@@ -109,10 +109,13 @@ func.receipt1 = async (o) => {
   if(!title) throwErr('订单标题不能为空');
   if(!notes) throwErr('订单描述不能为空');
   if(!returnUrl) throwErr('跳转地址不能为空');
-  let notifyUrl = `https://soccos.cn/test`;
+  let notifyUrl;
   if(global.NKC.NODE_ENV === 'production') {
     notifyUrl = `${serverConfig.domain}/finance/recharge`;
+  } else {
+    notifyUrl = alipayConfig.notifyUrl || ""
   }
+  console.log(notifyUrl);
   goodsInfo = goodsInfo || [];
   const goods_detail = [];
   for(const g of goodsInfo) {
@@ -220,12 +223,12 @@ func.receipt = async (o) => {
   if(!title) throwErr('订单标题不能为空');
   if(!notes) throwErr('订单描述不能为空');
   const returnUrl = serverConfig.domain + '/account/finance/recharge?type=back';
-  let notifyUrl = serverConfig.domain + "/account/finance/recharge";
-
-  if(global.NKC.NODE_ENV !== "production") {
-    notifyUrl = "https://soccos.cn/test";
+  let notifyUrl;
+  if(global.NKC.NODE_ENV === 'production') {
+    notifyUrl = `${serverConfig.domain}/account/finance/recharge`;
+  } else {
+    notifyUrl = alipayConfig.notifyUrl || ""
   }
-
   const obj = {
     service: "create_direct_pay_by_user",
     payment_type: "1",

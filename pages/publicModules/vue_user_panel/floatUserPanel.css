@@ -1,4 +1,4 @@
-#vue_user_panel_float .content{
+#floatUserPanel .content{
   position: fixed;
   top: 100px;
   left: 100px;
@@ -10,11 +10,11 @@
   border-radius: 3px;
   background-size: cover;
 }
-#vue_user_panel_float .user_base{
+#floatUserPanel .user_base{
   height: 10rem;
   position: relative;
 }
-#vue_user_panel_float .user_banner{
+#floatUserPanel .user_banner{
   position: absolute;
   top: 0;
   left:0;
@@ -23,15 +23,15 @@
   background-size: cover;
   z-index: 10009;
 }
-#vue_user_panel_float .user_info{
+#floatUserPanel .user_info{
   padding: 0.5rem 0;
   font-size: 1rem;
   height: 5rem;
 }
-#vue_user_panel_float .user_info .col-xs-3{
+#floatUserPanel .user_info .col-xs-3{
   padding: 0;
 }
-#vue_user_panel_float .user_avatar{
+#floatUserPanel .user_avatar{
   height: 10rem;
   width: 10rem;
   position: absolute;
@@ -39,7 +39,7 @@
   vertical-align: top;
   z-index: 10020;
 }
-#vue_user_panel_float .user_mask{
+#floatUserPanel .user_mask{
   position: absolute;
   z-index: 10010;
   top: 0;
@@ -48,19 +48,19 @@
   width: 100%;
   background-color: rgba(0,0,0,0.5);
 }
-#vue_user_panel_float .user_avatar a{
+#floatUserPanel .user_avatar a{
   display: block;
   background-color: #d9e1e8;
   height: 8rem;
   border-radius: 3px;
 }
-#vue_user_panel_float .user_avatar img{
+#floatUserPanel .user_avatar img{
   height: 92px;
   border-radius: 3px;
   width: 92px;
   margin: 2px 0 0 2px;
 }
-#vue_user_panel_float .user_sub_btn{
+#floatUserPanel .user_sub_btn{
   font-size: 1rem;
   line-height: 15px;
   text-align: center;
@@ -68,17 +68,17 @@
   color: #fff;
   font-weight: 700;
 }
-#vue_user_panel_float .user_sub_btn.subscribed{
+#floatUserPanel .user_sub_btn.subscribed{
   background-color: #9baec8;
 }
-#vue_user_panel_float .user_avatar_div{
+#floatUserPanel .user_avatar_div{
   position: relative;
   width: 8rem;
   margin-left: 1rem;
   margin-top: -1rem;
 
 }
-#vue_user_panel_float .user_div{
+#floatUserPanel .user_div{
   position: absolute;
   display: inline-block;
   vertical-align: top;
@@ -89,7 +89,7 @@
   right: 0.5rem;
   top: 0;
 }
-#vue_user_panel_float .user_name{
+#floatUserPanel .user_name{
   height: 2.3rem;
   overflow: hidden;
   margin-right: 1rem;
@@ -102,10 +102,10 @@
   font-weight: 700;
   color: #fff;
 }
-#vue_user_panel_float .user_name:hover{
+#floatUserPanel .user_name:hover{
   text-decoration: none;
 }
-#vue_user_panel_float .user_description{
+#floatUserPanel .user_description{
   font-size: 1rem;
   max-height: 4rem;
   overflow: hidden;
@@ -115,7 +115,7 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
-#vue_user_panel_float .user_cert{
+#floatUserPanel .user_cert{
   font-size: 1rem;
   font-weight: 700;
   height: 1.4rem;
@@ -127,10 +127,10 @@
   -webkit-line-clamp: 1;
   color: #e85a71;
 }
-#vue_user_panel_float .user_sub{
+#floatUserPanel .user_sub{
   margin-top: 0;
 }
-#vue_user_panel_float .user_info_count{
+#floatUserPanel .user_info_count{
   font-weight: 700;
   font-size: 1.2rem;
   height: 2rem;
@@ -144,7 +144,7 @@
   word-break: break-all;
   -webkit-line-clamp: 1;
 }
-#vue_user_panel_float .user_info_title{
+#floatUserPanel .user_info_title{
   font-size: 1rem;
   height: 2rem;
   overflow: hidden;
@@ -152,14 +152,14 @@
   color: #777;
   text-align: center;
 }
-#vue_user_panel_float .user_id{
+#floatUserPanel .user_id{
   font-size: 1.2rem;
   padding-top: 0.5rem;
   text-align: center;
   font-weight: 700;
   color: #fff;
 }
-#vue_user_panel_float .user-button{
+#floatUserPanel .user-button{
   position:absolute;
   top: 0;
   right: 0;
@@ -172,7 +172,7 @@
   color: #fff;
   font-size: 1.4rem;
 }
-#vue_user_panel_float .user_register{
+#floatUserPanel .user_register{
   font-size: 1rem;
   color: #fff;
   /*font-weight: 700;*/

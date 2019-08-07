@@ -13,6 +13,10 @@ authRouter
 		data.submittedAuth = userPersonal.submittedAuth;
 		data.handheldIdCard = handheldIdCard;
 		data.authLevel = await userPersonal.getAuthLevel();
+		data.email = userPersonal.email;
+		data.nationCode = userPersonal.nationCode;
+		data.mobile = userPersonal.mobile;
+		data.behaviors = await db.UsersBehaviorModel.find({uid: targetUser.uid}).sort({timeStamp: -1});
 		ctx.template = 'interface_user_auth.pug';
 		await next();
 	})

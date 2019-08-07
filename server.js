@@ -35,6 +35,7 @@ const dataInit = async () => {
   await ForumModel.updateMany({}, {$addToSet: {rolesId: 'dev'}});
 };
 
+// 定时任务 每天固定时间执行
 const jobsInit = async () => {
   const jobs = require('./scheduleJob');
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
@@ -45,6 +46,13 @@ const jobsInit = async () => {
   jobs.moveRecycleMarkThreads();
 };
 
+// 定时任务 隔一段时间执行
+const timedTasksInit = async () => {
+ const timedTasks = require("./timedTasks");
+ await timedTasks.cacheActiveUsers();
+ await timedTasks.cacheAds();
+ await timedTasks.clearTimeoutPageCache();
+};
 
 const start = async () => {
   try {
@@ -52,7 +60,9 @@ const start = async () => {
       await dataInit();
       await jobsInit();
       await upload.initFolders();
+      // 这里会将缓存数据清空 1号
       await cacheForums();
+      await timedTasksInit();
     }
     await elasticSearch.init();
     console.log('ElasticSearch is ready...'.green);

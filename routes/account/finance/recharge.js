@@ -9,7 +9,9 @@ router
     if(type === 'get_url') {
       money = Number(money);
       money = money * 100;
-      if(money < 100) ctx.throw(400, "科创币充值数量不能小于1");
+      if(global.NKC.NODE_ENV === "production") {
+        if(money < 100) ctx.throw(400, "科创币充值数量不能小于1");
+      }
       if(money > 5000000) ctx.throw(400, "单笔充值金额不能超过50000");
       money = Number(money.toFixed(0));
       data.url = await db.KcbsRecordModel.getAlipayUrl({
@@ -87,7 +89,7 @@ router
             return ctx.body = 'success';
           }
           orders.push(order);
-          totalMoney += order.orderPrice;
+          totalMoney += (order.orderPrice + order.orderFreightPrice);
         }
         if(totalMoney !== totalAmount) {
           updateObj.error = '系统账单金额与支付宝账单金额不相等';
@@ -103,7 +105,7 @@ router
             to: record.from,
             type: 'pay',
             ordersId: [order.orderId],
-            num: order.orderPrice,
+            num: order.orderPrice + order.orderFreightPrice,
             description: ordersInfo.description,
             ip: ctx.address,
             port: ctx.port,
@@ -111,7 +113,7 @@ router
           });
           await r.save();
           // 更改订单状态为已付款，添加付款时间。
-          await db.ShopOrdersModel.update({orderId: order.orderId}, {$set: {
+          await db.ShopOrdersModel.updateOne({orderId: order.orderId}, {$set: {
             orderStatus: 'unShip',
             payToc: r.toc
           }});
