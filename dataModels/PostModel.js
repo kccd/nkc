@@ -183,6 +183,12 @@ const postSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+  // 受否匿名
+  anonymous: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {toObject: {
   getters: true,

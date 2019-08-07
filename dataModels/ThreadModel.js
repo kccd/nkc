@@ -673,7 +673,8 @@ const defaultOptions = {
   lastPostUser: true,
   firstPostResource: false,
   htmlToText: false,
-  count: 200
+  count: 200,
+  showAnonymousUser: false
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
   const o = Object.assign({}, defaultOptions);
@@ -715,6 +716,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
       pid: 1,
       t: 1,
+      anonymous: 1,
       c: 1,
       abstract: 1,
       uid: 1,
@@ -802,7 +804,18 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
       if(o.firstPostUser) {
-        firstPost.user = usersObj[firstPost.uid];
+        let user;
+        if(!o.showAnonymousUser && firstPost.anonymous) {
+          user = {
+            uid: "",
+            username: "匿名用户"
+          };
+          thread.uid = "";
+          firstPost.uid = "";
+        } else {
+          user = usersObj[firstPost.uid];
+        }
+        firstPost.user = user;
       }
       thread.firstPost = firstPost;
     }
@@ -812,7 +825,17 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       } else {
         const lastPost = postsObj[thread.lm];
         if(o.lastPostUser) {
-          lastPost.user = usersObj[lastPost.uid];
+          let user;
+          if(!o.showAnonymousUser && lastPost.anonymous) {
+            user = {
+              uid: "",
+              username: "匿名用户"
+            };
+            lastPost.uid = "";
+          } else {
+            user = usersObj[lastPost.uid];
+          }
+          lastPost.user = user;
         }
         thread.lastPost = lastPost;
       }

@@ -344,6 +344,22 @@ function objToStr(obj) {
   return encodeURIComponent(JSON.stringify(obj));
 }
 
+/*
+* 获取图片的链接
+* */
+function getUrl(type, id, size) {
+  var t = "";
+  if(size) t = `?t=${size}`;
+  switch(type) {
+    case "userAvatar": {
+      return `/avatar/${id}${t}`
+    }
+    case "userBanner": {
+      return `/banner/${id}${t}`
+    }
+  }
+}
+
 /**
  * 省略字数，超过则用省略号
  * @param num 字数

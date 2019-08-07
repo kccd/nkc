@@ -11,7 +11,8 @@ module.exports = {
           countLimit: 5,
           unlimited: true
         }
-      }
+      },
+      anonymous: false
     },
     postToThread: {
       authLevelMin: 0,
@@ -23,7 +24,8 @@ module.exports = {
           unlimited: true,
           countLimit: 5
         }
-      }
+      },
+      anonymous: false
     }
   }
 };

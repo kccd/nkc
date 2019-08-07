@@ -17,12 +17,16 @@
             data-thread-cids=(thread.categoriesId||[]).join("-")
           )
     .thread-panel-author
-      a(href=`/u/${thread.uid}` target="_blank")
+      if !thread.firstPost.anonymous
+        a(href=`/u/${thread.uid}` target="_blank")
+          img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
+        a(
+          href=`/u/${thread.uid}` target="_blank"
+          onmouseover=`floatUserPanel.open(this, '${thread.uid}')`
+        )= thread.firstPost.user.username
+      else
         img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
-      a(
-        href=`/u/${thread.uid}` target="_blank"
-        onmouseover=`floatUserPanel.open(this, '${thread.uid}')`
-      )= thread.firstPost.user.username
+        span.anonymous= thread.firstPost.user.username
 
     .thread-panel-forum
       if data.forum
@@ -88,9 +92,12 @@
         else if thread.from === "collection"
           span 收藏
     .thread-panel-reply
-      a(href=`/u/${thread.lastPost.uid}` target="_blank"
-        onmouseover=`floatUserPanel.open(this, '${thread.lastPost.uid}')`
-      )= thread.lastPost.user.username
+      if !thread.lastPost.anonymous
+        a(href=`/u/${thread.lastPost.uid}` target="_blank"
+          onmouseover=`floatUserPanel.open(this, '${thread.lastPost.uid}')`
+        )= thread.lastPost.user.username
+      else
+        span.anonymous=thread.lastPost.user.username
       span=fromNow(thread.lastPost.toc)
 
 
