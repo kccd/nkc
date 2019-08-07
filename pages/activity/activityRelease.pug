@@ -136,30 +136,7 @@ block content
             .panel-heading
               span 报名表单
             .panel-body
-              .form-horizontal
-                .col-sm-8.col-md-8#conditions.text-center
-                  .form-inline
-                    input.form-control(id="infoName" type="text" value="姓名" disabled)
-                    input.form-control(id="infoDesc" type="text" value="报名用户的真实姓名" disabled)
-                    button.btn.btn-default(onclick="delOneForm(this)")
-                      i.fa.fa-trash
-                  .form-inline
-                    input.form-control(id="infoName" type="text" value="手机" disabled)
-                    input.form-control(id="infoDesc" type="text" value="报名用户的手机号码" disabled)
-                    button.btn.btn-default(onclick="delOneForm(this)")
-                      i.fa.fa-trash
-                  .form-inline
-                    input.form-control(id="infoName" type="text" value="昵称" disabled)
-                    input.form-control(id="infoDesc" type="text" value="报名用户的在论坛的昵称" disabled) 
-                    button.btn.btn-default(onclick="delOneForm(this)")
-                      i.fa.fa-trash
-                .col-sm-4.col-md-4
-                  .form-inline
-                    .col-sm-4.col-md-4
-                    .col-sm-4.col-md-4
-                      span.btn.btn-default.btn-lg.btn-block(style="margin:5px" onclick="addOneForm()")
-                        i.fa.fa-plus
-                    .col-sm-4.col-md-4
+              include ../publicModules/customForm/customForm.pug
                     
                     
       .row
@@ -197,6 +174,7 @@ block scripts
   script(src='../xbbcode-parser/xbbcode.js')
   script(src='../xss/dist/xss.js')  
   script(src=`../nkc_render.js?v=${global.NKC.startTime}`)
+  +includeJS("/publicModules/customForm/customForm.js")
   script(src=`./activityRelease.js?v=${global.NKC.startTime}` charset="UTF-8")
   script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
   include ../publicModules/crop/crop

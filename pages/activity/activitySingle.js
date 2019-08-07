@@ -1,3 +1,8 @@
+var customForm;
+if(NKC.modules.customForm) {
+  customForm = new NKC.modules.customForm();
+}
+
 $("document").ready(function() {
   $("#agreement").change(function() {
     var isChecked = $("#agreement").is(":checked");
@@ -7,6 +12,8 @@ $("document").ready(function() {
       $("#onpost").attr("disabled",true)
     }
   })
+  var options = JSON.parse($("#contionJSON").text());
+  customForm.initResult(options);
 })
 
 // 切换至报名
@@ -31,48 +38,9 @@ function changeToDescription() {
 
 // 提交报名
 function onpost(acid) {
-  // var realName = $("#realName").val().trim();
-  // var mobile = $("#mobile").val().trim();
-  // var kcName = $("#kcName").val().trim() || "";
-  // var email = $("#email").val().trim() || "";
-  // var agreeService = $("#agreement").is(":checked");
-  // var mobileReg = /^[1][3,4,5,7,8][0-9]{9}$/;
-  // var emailReg = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
-  // clearErrTips("#realNameErr");
-  // clearErrTips("#mobileErr");
-  // clearErrTips("#emailErr");
-  // if(realName == ""){
-  //   return errInfoTips("请填写真实姓名","#realNameErr");
-  // }
-  // if(mobile == "" || !mobileReg.test(mobile)){
-  //   return errInfoTips("请填写11位手机号", "#mobileErr");
-  // }
-  // if(email){
-  //   if(email == "" || !emailReg.test(email)){
-  //     return errInfoTips("请填写正确的邮箱格式")
-  //   }
-  // }
-  // var wxNum = $("#wxNum").val().trim() || "";
-  // var qqNum = $("#qqNum").val().trim() || "";
-  // var age = $("#age").val().trim() || "";
-  // var education = $("#education").val().trim() || "";
-  // var wordUnit = $("#wordUnit").val().trim() || "";
-  var enrollInfo = [];
-  var isStop = false;
-  $("#apply").find(".form-group").each(function() {
-    var enrolls = {};
-    enrolls.key = $(this).find("#enrollKey").text().trim();
-    if($(this).find("#enrollValue").attr("type") == "text"){
-      enrolls.value = $(this).find("#enrollValue").val().trim();
-      if(enrolls.value == ""){
-        sweetWarning("请填写"+enrolls.key);
-        isStop = true;
-        return false;
-      }
-    }
-    enrollInfo.push(enrolls)
-  })
-  if(isStop){
+  var enrollInfo = customForm.outputResultJSON();
+  if(enrollInfo.length === 0){
+    sweetWarning("必填项不得为空");
     return;
   }
   var post = {
