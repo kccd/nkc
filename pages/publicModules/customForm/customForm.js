@@ -41,7 +41,7 @@ NKC.modules.customForm = function() {
       }
       var formType = $(this).attr("data-formType");
       var value;
-      if(["text", "textarea", "number"].includes(formType)) {
+      if(["text", "textarea", "number"].indexOf(formType) !== -1) {
         value = $(this).find(".custom-input").val() || "";
       }else if(formType === "radio"){
         value = $(this).find("input[type=radio][name='"+key+"']:checked").val() || "";
@@ -91,7 +91,7 @@ NKC.modules.customForm = function() {
     if(option) {
       var initFormDom = "";
       for(var i=0;i < option.length;i++) {
-        if(["姓名","手机","邮箱"].includes(option[i].infoName)) {
+        if(["姓名","手机","邮箱"].indexOf(option[i].infoName) !== -1) {
           continue;
         }else{
           initFormDom += this_.initSingle(option[i])
@@ -127,7 +127,7 @@ NKC.modules.customForm = function() {
       reDom = reDom.replace(/\[infoDesc\]/igm, "")      
     }
     // 根据表单类型，替换表单类型选项
-    if(["radio", "checkbox", "select"].includes(para.formType)) {
+    if(["radio", "checkbox", "select"].indexOf(para.formType) !== -1) {
       var paraOption = "";
       for(var i=0;i < para.infoPara.length;i++) {
         paraOption += "<div class='custom-form-sub-item'><input type='text' value='"+para.infoPara[i]+"' title='' class='custom-input custom-form-sub-input'> <span class='custom-icon-del fa fa-times' onclick='delOptionValue(this)'></span></div>";
@@ -424,7 +424,7 @@ function buildUpOneFormCond(para, info) {
     }
   }
 
-  if(["radio", "checkbox", "select"].includes(para.formType)) {
+  if(["radio", "checkbox", "select"].indexOf(para.formType) !== -1) {
     var paraOption = "";
     for(var i=0;i < para.infoPara.length;i++) {
       if(para.formType === "radio") {
@@ -536,7 +536,7 @@ function buildUpOneForm(para, info) {
     reDom = reDom.replace(/\[infoDesc\]/igm, "")
   }
   // 根据表单类型，替换表单类型选项
-  if(["radio", "checkbox", "select"].includes(para.formType)) {
+  if(["radio", "checkbox", "select"].indexOf(para.formType) !== -1) {
     var paraOption = "";
     for(var i=0;i < para.infoPara.length;i++) {
       if(para.formType === "radio") {
