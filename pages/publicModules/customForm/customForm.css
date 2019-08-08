@@ -28,9 +28,9 @@
 
 .custom-form-left {
   width: 60%;
-  padding: 6px 15px 20px 15px;
+  /* padding: 6px 15px 20px 15px; */
   flex-shrink: 0;
-  padding-left: 30px;
+  /* padding-left: 30px; */
   padding-right: 30px;
   padding-top: 6px;
   min-height: 578px;
@@ -120,7 +120,7 @@
 
 .custom-checkbox {
   display: flex;
-  margin-right: 20px;
+  margin-right: 5px;
   position: relative;
   align-self: flex-start;
   margin-top: 8.5px;
@@ -448,4 +448,11 @@
 .error-text {
   color: red;
   font-size: 10px;
+}
+
+.upButton{
+  margin-left: 5px;
+}
+.downButton {
+  /* margin-right: 5px; */
 }
