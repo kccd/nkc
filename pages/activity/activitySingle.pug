@@ -77,34 +77,36 @@ block content
                     .applicationForm-header 报名表单
                     hr
                   .col-xs-12.col-md-12
-                    .form-horizontal
-                      -for(var i in data.activity.conditions)
-                        -if(data.activity.conditions[i].formType == "text")          
-                          -if(data.activity.conditions[i].infoName == "姓名")        
-                            .form-group
-                              label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                              .col-sm-10
-                                input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
-                                span#realNameErr(style='color:red')
-                          -else if(data.activity.conditions[i].infoName == "手机")        
-                            .form-group
-                              label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                              .col-sm-10
-                                input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.activity.userPersonal ? data.activity.userPersonal.mobile : '')
-                                span#realNameErr(style='color:red')
-                          -else if(data.activity.conditions[i].infoName == "昵称")        
-                            .form-group
-                              label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                              .col-sm-10
-                                input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.user ? data.user.username : '')
-                                span#realNameErr(style='color:red')
-                          -else      
-                            .form-group
-                              label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                              .col-sm-10
-                                input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
-                                span#realNameErr(style='color:red')
-                    .col-sm-2
+                    .hidden#contionJSON= JSON.stringify(data.activity.conditions)
+                    include ../publicModules/customForm/customForm.pug
+
+                    //- .form-horizontal
+                    //-   -for(var i in data.activity.conditions)
+                    //-     -if(data.activity.conditions[i].formType == "text")          
+                    //-       -if(data.activity.conditions[i].infoName == "姓名")        
+                    //-         .form-group
+                    //-           label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
+                    //-           .col-sm-10
+                    //-             input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
+                    //-             span#realNameErr(style='color:red')
+                    //-       -else if(data.activity.conditions[i].infoName == "手机")        
+                    //-         .form-group
+                    //-           label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
+                    //-           .col-sm-10
+                    //-             input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.activity.userPersonal ? data.activity.userPersonal.mobile : '')
+                    //-             span#realNameErr(style='color:red')
+                    //-       -else if(data.activity.conditions[i].infoName == "昵称")        
+                    //-         .form-group
+                    //-           label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
+                    //-           .col-sm-10
+                    //-             input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.user ? data.user.username : '')
+                    //-             span#realNameErr(style='color:red')
+                    //-       -else      
+                    //-         .form-group
+                    //-           label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
+                    //-           .col-sm-10
+                    //-             input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
+                    //-             span#realNameErr(style='color:red')
                     .col-sm-10
                       input(type="checkbox" checked)#agreement
                       sapn 我已阅读并同意
@@ -183,5 +185,6 @@ block scripts
   script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   script(src=`/jquery/jquery-1.11.1.js?v=${global.NKC.startTime}`)
   script(src=`/qrcode/build/qrcode.js?v=${global.NKC.startTime}`)
+  +includeJS("/publicModules/customForm/customForm.js")
   script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)
   script(src=`/activity/activitySingle.js?v=${global.NKC.startTime}`)

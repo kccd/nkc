@@ -1,0 +1,76 @@
+//- +includeCSS("/publicModules/customForm/customFormDemo.css")
++includeCSS("/publicModules/customForm/customForm.css")
+.custom-form-wall
+  .custom-form-panel
+    .custom-form-module
+      .custom-form-init#formInit(style="display:none")
+        .custom-form-content
+          .custom-form-left
+            .custom-form-require
+              .create-form-custom-drag#stableFormArea
+                .custom-form-item(data-formtype="text")
+                  label.custom-checkbox
+                    input.custom-input-checkbox.must-input(type='checkbox', checked='checked', disabled='disabled')
+                    span.custom-checkbox-text 必填
+                  .custom-form-box
+                    .custom-form-box-line
+                      input.custom-input.custom-input-disabled(type='text', disabled='disabled', placeholder='标题', value='姓名' style="width:80px" id="infoName")
+                      input.custom-input.custom-input-disabled(type='text', value='报名用户的姓名或昵称', disabled='disabled' id="infoDesc")
+                .custom-form-item(data-formtype="text")
+                  label.custom-checkbox
+                    input.custom-input-checkbox.must-input(type='checkbox', checked='checked', disabled='disabled')
+                    span.custom-checkbox-text 必填
+                  .custom-form-box
+                    .custom-form-box-line
+                      input.custom-input.custom-input-disabled(type='text', disabled='disabled', placeholder='标题', value='手机' style="width:80px" id="infoName")
+                      input.custom-input.custom-input-disabled(type='text', value='报名用户的手机号码', disabled='disabled' id="infoDesc")
+                .custom-form-item(data-formtype="text")
+                  label.custom-checkbox
+                    input.custom-input-checkbox.must-input(type='checkbox', checked='checked', disabled='disabled')
+                    span.custom-checkbox-text 必填
+                  .custom-form-box
+                    .custom-form-box-line
+                      input.custom-input.custom-input-disabled(type='text', disabled='disabled', placeholder='标题', value='邮箱' style="width:80px" id="infoName")
+                      input.custom-input.custom-input-disabled(type='text', value='报名用户的电子邮箱', disabled='disabled' id="infoDesc")
+            //- .create-form-tips
+            //-   p.create-form-tips__title 更多信息
+            //-   p 未设置 可从右边选择
+            .create-form-custom
+              .create-form-custom-drag#customFormArea
+            .custom-form-btn-wrap
+              //- button.custom-btn.custom-btn-success(onclick="outputFormListJSON()") 输出JSON
+              a.custom-btn.custom-btn-default(onclick="reViewFormList()" style="cursor: pointer;") 预览表单
+          .custom-form-right
+            .custom-form-block.custom-form-block-common
+              h1.custom-form-block-title 常用项
+              .custom-form-block-list
+                .custom-form-block-item-co(data-name='公司单位' onclick="addCommonFormOption('company')") 公司单位
+                .custom-form-block-item-co(data-name='部门' onclick="addCommonFormOption('department')") 部门
+                //- .custom-form-block-item-co(data-name='职位' onclick="addCommonFormOption('position')") 职位
+                .custom-form-block-item-co(data-name='性别' onclick="addCommonFormOption('gender')") 性别
+                .custom-form-block-item-co(data-name='年龄' onclick="addCommonFormOption('age')") 年龄
+                .custom-form-block-item-co(data-name='学历' onclick="addCommonFormOption('education')") 学历
+                .custom-form-block-item-co(data-name='月收入' onclick="addCommonFormOption('income')") 月收入
+                //- .custom-form-block-item-co(data-name='其他' onclick="addCommonFormOption('')") 其他
+                //- .custom-form-block-item-co(data-name='附件' onclick="addCommonFormOption('')") 附件
+                //- .custom-form-block-item-co(data-name='出生年月' onclick="addCommonFormOption('')") 出生年月
+                //- .custom-form-block-item-co(data-name='所在城市' onclick="addCommonFormOption('city')") 所在城市
+                //- .custom-form-block-item-co(data-name='毕业学校' onclick="addCommonFormOption('')") 毕业学校
+            .custom-form-block.custom-form-block-custom
+              h1.custom-form-block-title 自定义项
+              .custom-form-block-list
+                .custom-form-block-item-cu(data-name='' onclick="addCustomFormOption('text')") 单行文本框
+                .custom-form-block-item-cu(data-name='' onclick="addCustomFormOption('number')") 数字输入框
+                //- .custom-form-block-item-cu(data-name='') 日期选择框
+                //- .custom-form-block-item-cu(data-name='') 邮箱输入框
+                .custom-form-block-item-cu(data-name='' onclick="addCustomFormOption('textarea')") 多行文本框
+                .custom-form-block-item-cu(data-name='' onclick="addCustomFormOption('radio')") 单选按钮框
+                .custom-form-block-item-cu(data-name='' onclick="addCustomFormOption('checkbox')") 多选按钮框
+                .custom-form-block-item-cu(data-name='' onclick="addCustomFormOption('select')") 下拉选择框
+        //- .custom-form-tool
+        //-   span
+        //-   span 收起表单
+      .custom-form-result#formResult(style="display:none")
+
+  include ./review.pug
+
