@@ -6,5 +6,8 @@
       if !sideThreadsHideInfo
         .side-thread-info
           a(href=`/f/${t.forums[0].fid}`)= t.forums[0].displayName
-          a(href=`/u/${t.uid}`)= t.firstPost.user.username
+          if !t.firstPost.anonymous
+            a(href=`/u/${t.uid}`)= t.firstPost.user.username
+          else
+            span=t.firstPost.user.username
           span=fromNow(t.toc)

@@ -790,7 +790,7 @@ threadRouter
 
     // 发表匿名内容
     if(
-      await db.UserModel.havePermissionToSendAnonymousPost("postToForum", user.uid) &&
+      await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid) &&
       sendAnonymousPost
     ) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {anonymous: true}});
