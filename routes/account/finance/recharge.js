@@ -126,6 +126,7 @@ router
         }
 
         await record.update(updateObj);
+        await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
         await db.UserModel.updateUserKcb(record.from);
 
       }
