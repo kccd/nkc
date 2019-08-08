@@ -6,6 +6,7 @@ block title
   link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
   link(rel="stylesheet", href="/external_pkgs/cropper/css/cropper.css")
+  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
   +includeCSS("/fund.css")
   style.
     .description img {
@@ -58,6 +59,7 @@ block content
                     -if(data.user && data.activity.signUser.includes(data.user.uid))
                       button.btn.btn-default(disabled) 已报名
                       button.btn.btn-warning(onclick=`cancelApply(${data.activity.acid})`) 取消报名
+                      button.btn.btn-info(onclick=`changeToEdit(this)` id="editButton" formShow="hide") 修改报名
                     -else if(data.activity.limitNum !==0 && data.activity.signUser.length >= data.activity.limitNum && data.activity.continueTofull == false)
                       button.btn.btn-default(disabled) 报名人数已达上限
                     -else if(parseInt(new Date(data.activity.enrollStartTime).getTime()) > parseInt(new Date().getTime()))
@@ -72,46 +74,38 @@ block content
                           button.btn.btn-primary(onclick="changeToApply(this)" id="applyButton" formShow="hide") 我要报名
                         -else
                           button.btn.btn-primary(onclick="window.open('/login')" id="applyButton") 我要报名
-                .row.m-b-4.m-t-1#apply(style="display: none")
-                  .col-xs-12.col-md-12
-                    .applicationForm-header 报名表单
-                    hr
-                  .col-xs-12.col-md-12
-                    .hidden#contionJSON= JSON.stringify(data.activity.conditions)
-                    include ../publicModules/customForm/customForm.pug
-
-                    //- .form-horizontal
-                    //-   -for(var i in data.activity.conditions)
-                    //-     -if(data.activity.conditions[i].formType == "text")          
-                    //-       -if(data.activity.conditions[i].infoName == "姓名")        
-                    //-         .form-group
-                    //-           label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                    //-           .col-sm-10
-                    //-             input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
-                    //-             span#realNameErr(style='color:red')
-                    //-       -else if(data.activity.conditions[i].infoName == "手机")        
-                    //-         .form-group
-                    //-           label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                    //-           .col-sm-10
-                    //-             input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.activity.userPersonal ? data.activity.userPersonal.mobile : '')
-                    //-             span#realNameErr(style='color:red')
-                    //-       -else if(data.activity.conditions[i].infoName == "昵称")        
-                    //-         .form-group
-                    //-           label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                    //-           .col-sm-10
-                    //-             input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}` value=data.user ? data.user.username : '')
-                    //-             span#realNameErr(style='color:red')
-                    //-       -else      
-                    //-         .form-group
-                    //-           label.col-sm-2.control-label#enrollKey!=data.activity.conditions[i].infoName
-                    //-           .col-sm-10
-                    //-             input.form-control#enrollValue(type="text" placeholder=`${data.activity.conditions[i].infoDesc}`)
-                    //-             span#realNameErr(style='color:red')
-                    .col-sm-10
-                      input(type="checkbox" checked)#agreement
-                      sapn 我已阅读并同意
-                        a(href="/protocol") 《科创网及论坛统一服务协议》
-                      button.btn.btn-primary#onpost(onclick=`onpost(${data.activity.acid})`) 提交
+                if data.user && data.activity.signUser.includes(data.user.uid)
+                  .row.m-b-4.m-t-1#edit(style="display: none")
+                    .col-xs-12.col-md-12
+                      .applicationForm-header 报名表单
+                      hr
+                    .col-xs-12.col-md-12
+                      if data.applyInfo
+                        .hidden#infoJSON= JSON.stringify(data.applyInfo.enrollInfo)
+                      .hidden#contionJSON= JSON.stringify(data.activity.conditions)
+                      include ../publicModules/customForm/customForm.pug
+                      .col-sm-10(style="margin-top: 5px;padding:unset")
+                        input(type="checkbox" checked)#agreement
+                        sapn 我已阅读并同意
+                          a(href="/protocol") 《科创网及论坛统一服务协议》
+                        button.btn.btn-primary#onedit(onclick=`onedit(${data.activity.acid})`) 提交
+                else
+                  .row.m-b-4.m-t-1#apply(style="display: none")
+                    .col-xs-12.col-md-12
+                      .applicationForm-header 报名表单
+                      hr
+                    .col-xs-12.col-md-12
+                      if data.user
+                        .hidden#userJSON= JSON.stringify({username: data.user.username, mobile:data.activity.userPersonal.mobile})
+                      else
+                        .hidden#userJSON= JSON.stringify({username: "", mobile:""})
+                      .hidden#contionJSON= JSON.stringify(data.activity.conditions)
+                      include ../publicModules/customForm/customForm.pug
+                      .col-sm-10(style="margin-top: 5px;padding:unset")
+                        input(type="checkbox" checked)#agreement
+                        sapn 我已阅读并同意
+                          a(href="/protocol") 《科创网及论坛统一服务协议》
+                        button.btn.btn-primary#onpost(onclick=`onpost(${data.activity.acid})`) 提交
                 .row.m-b-4.m-t-1
                   .col-xs-12.col-md-12
                     .applicationForm-header 活动详情
@@ -178,6 +172,55 @@ block content
                     button.btn.btn-danger.btn-sm(onclick=`blockCurrentActivity(${data.activity.acid})`) 屏蔽当前活动
                   else
                     button.btn.btn-warning.btn-sm(onclick=`unBlockCurrentActivity(${data.activity.acid})`) 解除活动屏蔽
+      -else
+        .row
+          .col-xs-12.col-md-8.box-shadow-panel
+            div(style="padding:2rem")
+              .applicationForm
+                .row.m-b-4.m-t-1
+                  .col-xs-12.col-md-12
+                    .id.text-center!=`${data.history.activityTitle}`
+                .row.m-b-4
+                  .col-xs-12.col-md-12
+                    .applicationForm-header 活动信息
+                    hr
+                  .col-xs-12.col-md-6
+                    h5 
+                      span 活动时间：
+                      span=` ${data.history.holdStartTime.toLocaleString()} ~ ${data.history.holdEndTime.toLocaleString()}`
+                    h5 
+                      span 报名时间：
+                      span=` ${data.history.enrollStartTime.toLocaleString()} ~ ${data.history.enrollEndTime.toLocaleString()}`
+                    h5
+                      span 举办地点：
+                      span=` ${data.history.address}`
+                    h5
+                      span 主办单位：
+                      span=` ${data.history.sponsor}`
+                    h5
+                      span 联系电话：
+                      span=` ${data.history.contactNum}`
+                  .col-xs-12.col-md-6
+                    p 活动海报
+                    img(src=`${'/poster/'+data.history.posterId}` style="width:100%")
+                .row.m-b-4.m-t-1
+                  .col-xs-12.col-md-12
+                    .applicationForm-header 活动详情
+                    hr
+                  .col-xs-12.col-md-12.description
+                    .form-group
+                      - let post = {c: data.history.description,l: "html"}
+                      div.thread-content.ThreadPostBody#ThreadPostBody!= experimental_render(post)
+          .col-xs-12.col-md-3
+            .list-group
+              span
+                b
+                  a.list-group-item.text-center(href=`/activity/single/${data.activity.acid}`) 当前版本
+              .dropdown
+                ul.dropdown-menu(aria-labelledby="dropdownMenu1")
+                -for(var i in data.activity.historys)
+                  li
+                    a.list-group-item(href=`/activity/single/${data.activity.acid}?type=history&hid=${data.activity.historys[i]._id}`)!=data.activity.historys[i].toc.toLocaleString()
 
 
 
@@ -188,3 +231,5 @@ block scripts
   +includeJS("/publicModules/customForm/customForm.js")
   script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}`)
   script(src=`/activity/activitySingle.js?v=${global.NKC.startTime}`)
+  +includeJS('/external_pkgs/citySet/agency.json.js')
+  +includeJS('/external_pkgs/citySet/citySet.js')

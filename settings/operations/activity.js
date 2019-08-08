@@ -17,7 +17,8 @@ module.exports = {
     PARAMETER: {
       GET: "visitActivitySingle",
       POST: "activityApplyPost",
-      DELETE: "cancelActivityApply"
+      DELETE: "cancelActivityApply",
+      PATCH: "activityEditPost"
     }
   },
   myApply: {

@@ -47,15 +47,15 @@ function submit() {
 	}
 	if(obj.money < 20) {
 		$('#submit').removeClass('disabled').attr('onclick', fn);
-		return screenTopWarning('单笔捐款金额不能少于20元。');
+		return screenTopWarning('单笔赞助金额不能少于20元。');
 	}
 	if(obj.money > 10000) {
 		$('#submit').removeClass('disabled').attr('onclick', fn);
-		return screenTopWarning('单笔捐款金额不能超过10000元，请分批次捐款。')
+		return screenTopWarning('单笔赞助金额不能超过10000元，请分批次赞助。')
 	}
 	if(!obj.anonymous && !login) {
 		$('#submit').removeClass('disabled').attr('onclick', fn);
-		return screenTopWarning('非匿名捐款要求用户必须登录，请登录后再试。');
+		return screenTopWarning('非匿名赞助要求用户必须登录，请登录后再试。');
 	}
 	var newWindow = window.open();
 	nkcAPI('/fund/donation', 'POST', obj)

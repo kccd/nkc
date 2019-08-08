@@ -182,8 +182,14 @@ exports.getUserAvatar = async (hash, type) => {
   let filePath;
   if(type === "sm") {
     filePath = upload.avatarSmallPath + "/" + hash + ".jpg";
+    if(!fsSync.existsSync(filePath)) {
+      filePath = upload.avatarPath + "/" + hash + ".jpg";
+    }
   } else if(type === "lg") {
     filePath = upload.avatarLargePath + "/" + hash + ".jpg";
+    if(!fsSync.existsSync(filePath)) {
+      filePath = upload.avatarPath + "/" + hash + ".jpg";
+    }
   } else {
     filePath = upload.avatarPath + "/" + hash + ".jpg";
   }

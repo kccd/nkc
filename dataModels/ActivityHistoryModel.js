@@ -11,19 +11,19 @@ const activityHistorySchema = new Schema({
     default: null
   },
   enrollStartTime: {
-    type: String,
+    type: Date,
     default: null
   },
   enrollEndTime: {
-    type: String,
+    type: Date,
     default: null
   },
   holdStartTime: {
-    type: String,
+    type: Date,
     default: null
   },
   holdEndTime: {
-    type: String,
+    type: Date,
     default: null
   },
   toc: {

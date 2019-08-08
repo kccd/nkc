@@ -61,7 +61,7 @@ module.exports = [
   },
   {
     _id: 'fundDonation',
-    description: '基金捐款',
+    description: '基金赞助',
     num: 10,
     count: 0
   },

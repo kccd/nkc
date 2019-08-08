@@ -516,9 +516,8 @@ block manageScripts
   include ../../publicModules/crop/crop
   +includeJS("/media/media_index.js")
   script.
-    window.onunload = function(){
-      return "你确定要离开吗？"
-    }
     window.onbeforeunload = function() {
-      return "你确定要离开吗？"
+      if(document.getElementById("saveProduct").disabled === false){
+        return "你确定要离开吗？"      
+      }
     }

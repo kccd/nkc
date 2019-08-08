@@ -79,25 +79,27 @@ block content
                        th 我的
                     tbody
                       -let allowed = true;
+                      -let userThreadCount = data.user.threadCount - data.user.disabledThreadsCount;
+                      -let userPostCount = data.user.postCount - data.user.disabledPostsCount;
                       -const toc =   Math.ceil((Date.now() - data.user.toc)/(1000*60*60*24));
-                      if threadCount > data.user.threadCount || postCount > data.user.postCount || timeToRegister > toc
+                      if threadCount > userThreadCount || postCount > userPostCount || timeToRegister > toc
                         -allowed = false;
                       if authLevel > userAuthLevel
                         -allowed = false;
                       tr
                         th 发帖量
                         th= threadCount
-                        th= data.user.threadCount
+                        th= userThreadCount
                           //if threadCount <= user.threadCount
                           //  span.glyphicon.glyphicon-ok
                       tr
                         th 回帖量
                         th= postCount
-                        th= data.user.postCount
+                        th= userPostCount
                       tr
                         th 账号等级
-                        th= 0
-                        th= data.user.grade?data.user.grade._id: 0
+                        th= userLevel
+                        th= data.user.grade?data.user.grade._id - 1: 0
                       tr
                         th 注册天数
                         th= timeToRegister

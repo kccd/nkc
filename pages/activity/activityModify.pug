@@ -164,17 +164,18 @@ block content
                     table.table.table-striped#tabExc(border="1")
                       thead
                         tr
+                          -let idArr = []
                           -for(var a=0;a < data.activity.conditions.length;a++)
                             th!=data.activity.conditions[a].infoName
-                          //- th 操作
+                            -idArr.push(data.activity.conditions[a].infoId)
                       tbody
                         -for(let apply of data.activityApplyList)
                           tr
-                            -for(var b=0;b < apply.enrollInfo.length;b++)
-                              th!=apply.enrollInfo[b].value
-                              //- th!="已报名"
-                            //- th 
-                            //-   button(onclick=`cancelApply(${data.activity.acid},${data.activity.uid})`) 取消报名
+                            -for(var b=0;b < idArr.length;b++)
+                              -if(apply.enrollInfo[b] && apply.enrollInfo[b].id === idArr[b])
+                                th!=apply.enrollInfo[b].value
+                              -else
+                                th
 block scripts
   script(src="/jquery-ui-1.10.4.custom.js")
   script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
