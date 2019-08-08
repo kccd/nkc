@@ -8,7 +8,6 @@
 	overflow: hidden;
   padding-bottom: 0;
   display: block;
-	border-radius: 12px;
 	background: #fff;
 	margin-top: 20px;
 }
@@ -37,6 +36,65 @@
   min-height: 578px;
 }
 
+@media only screen and (max-width : 480px) {
+  .custom-form-left {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+  .custom-form-right {
+    width: 100% !important;
+    padding: 5px 5px !important;
+  }
+  .custom-form-content{
+    display: block;
+  }
+  .custom-form-block-title {
+    margin: 5px !important;
+  }
+  .custom-form-block-item-co {
+    width: auto !important;
+    margin-right: 5px !important;
+    margin-top: 5px !important;
+    padding: 0px 5px !important;
+  }
+  .custom-form-block-item-cu {
+    width: auto !important;
+    margin-right: 5px !important;
+    margin-top: 5px !important;
+    padding: 0px 5px !important;
+  }
+  .custom-form-panel {
+    margin: 0 !important;
+  }
+  .custom-form-item {
+    margin-top: 5px !important;
+  }
+  .custom-checkbox {
+    margin-right: 5px !important;
+  }
+  .custom-input {
+    margin-right: 5px !important;
+  }
+  .custom-form-sub-input {
+    width: 100% !important;
+  }
+  .custom-form-sub {
+    margin-top: 5px !important;
+  }
+  .custom-form-sub-item {
+    margin-top: 5px !important;
+  }
+  .custom-form-left {
+    min-height: unset !important;
+  }
+  .custom-btn.custom-btn-default {
+    width: 100% !important;
+  }
+  .custom-form-btn-wrap {
+    margin-top: 10px !important;
+  }
+}
+
 .custom-form-right {
   padding: 10px 15px;
   padding-top: 0;
@@ -50,7 +108,7 @@
 }
 
 .custom-form-require {
-  padding-bottom: 30px;
+  padding-bottom: 0px;
   position: relative;
 }
 
@@ -363,4 +421,31 @@
 .m-rb-10 {
   margin-right: 10px;
   margin-bottom: 5px;
+}
+
+.custom-select {
+  width: 50%;
+  font-size: 12px;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  color: #201f25;
+  border: 1px solid #ddd;
+  box-shadow: none;
+  transition: all 0.2s ease-out;
+  box-sizing: border-box;
+  background: #f7f9fa;
+  outline: none;
+}
+
+.error-item {
+  border: 1px solid red;
+  padding: 5px;
+  box-shadow: 0 5px 5px rgba(253, 204, 204, 0.6);
+  border-radius: 5px;
+}
+
+.error-text {
+  color: red;
+  font-size: 10px;
 }

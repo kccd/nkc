@@ -6,6 +6,7 @@ block title
   link(href='../bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
   link(href='../bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
   link(rel="stylesheet", href="../external_pkgs/cropper/css/cropper.css")
+  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
 block content
   .container-fluid.max-width
       include activityNav.pug
@@ -84,7 +85,7 @@ block content
                 
                 .form-group
                   label.col-sm-2.control-label 活动海报：
-                  .col-sm-3
+                  .col-sm-3(style="padding:0")
                     .col-sm-6
                       button.btn.btn-primary#inputImage(onclick=`$("#inputFile").click();`) 选择海报
                     //- .col-sm-6
@@ -125,7 +126,7 @@ block content
                 .form-group
                   label.col-sm-2.control-label 活动人数：
                   .col-sm-4
-                    input.form-control.quantity-count#activityPartNum(placeholder='若人数无限制，请填写：0')
+                    input.form-control.quantity-count#activityPartNum(placeholder='若人数无限制，请填写：0' onclick='SetAgencyCity(this)')
                     span#activityPartNumErr(style='color:red')
                   .col-sm-4
                     input(type="checkbox")#continueTofull
@@ -179,3 +180,5 @@ block scripts
   script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
   include ../publicModules/crop/crop
   script(src=`../media/media_index.js?v=${startTime}`)
+  +includeJS('/external_pkgs/citySet/agency.json.js')
+  +includeJS('/external_pkgs/citySet/citySet.js')
