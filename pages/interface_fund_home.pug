@@ -10,7 +10,7 @@ block title
       if !data.user.certs.includes(cert) && !fund.censor.appointed.includes(data.user.uid)
         -isCensor = false;
   title= `科创基金 - ${fund.name}`
-  link(rel='stylesheet' href='/fund.css')
+  +includeCSS('/fund.css')
 block content
   -const mainContainer1400 = true
   -const {authLevel, threadCount, userLevel, timeToRegister, supportCount, postCount} = fund.applicant
