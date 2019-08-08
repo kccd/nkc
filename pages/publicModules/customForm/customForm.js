@@ -91,11 +91,7 @@ NKC.modules.customForm = function() {
     if(option) {
       var initFormDom = "";
       for(var i=0;i < option.length;i++) {
-        if(["姓名","手机","邮箱"].indexOf(option[i].infoName) !== -1) {
-          continue;
-        }else{
-          initFormDom += this_.initSingle(option[i])
-        }
+        initFormDom += this_.initSingle(option[i])
       }
       $("#customFormArea").html(initFormDom)
     }
