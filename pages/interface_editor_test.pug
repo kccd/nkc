@@ -65,9 +65,15 @@ block content
               include ./editor/paper.pug
             .form(style="padding-bottom:20px")
               .form-group
-                label
-                  input#parseURL(type='checkbox' checked)
-                  span &nbsp;处理URL&nbsp;
+                .checkbox-inline
+                  label
+                    input#parseURL(type='checkbox' checked)
+                    span 处理URL
+                if data.sendAnonymousPost
+                  .checkbox-inline
+                    label
+                      input#sendAnonymousPost(type='checkbox')
+                      span 匿名发表
                 if state.userColumn && !data.addedToColumn
                   -const column = state.userColumn
                   include ./publicModules/toColumn/selectCategories

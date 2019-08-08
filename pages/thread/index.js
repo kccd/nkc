@@ -398,6 +398,11 @@ function submit(tid){
     return screenTopWarning(err);
   }
 
+  var sendAnonymousPostDom = $("#sendAnonymousPost");
+  if(sendAnonymousPostDom.length) {
+    post.sendAnonymousPost = sendAnonymousPostDom.prop("checked");
+  }
+
 	return nkcAPI('/t/' + tid, 'POST', {
 		post:post,
 	})

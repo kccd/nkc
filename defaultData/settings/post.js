@@ -12,7 +12,12 @@ module.exports = {
           unlimited: true
         }
       },
-      anonymous: false
+      anonymous: {
+        status: false,
+        defaultCertGradesId: [],
+        rolesId: [],
+        uid: []
+      }
     },
     postToThread: {
       authLevelMin: 0,
@@ -25,7 +30,12 @@ module.exports = {
           countLimit: 5
         }
       },
-      anonymous: false
+      anonymous: {
+        status: false,
+        defaultCertGradesId: [],
+        rolesId: [],
+        uid: []
+      }
     }
   }
 };

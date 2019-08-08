@@ -1381,6 +1381,35 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
   const count = await mongoose.model("threads").count({uid: user.uid, digest: true, disabled: false, recycleMark: {$ne: true}, reviewed: true});
   return count >= digestCount;
 };
+/*
+* 验证用户是否有权限发表匿名内容
+* @param {String} uid 用户ID
+* @param {String} type thread: 发表文章, post: 发表回复
+* @return {Boolean} 是否有权
+* @author pengxiguaa 2019-8-8
+* */
+userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId) => {
+  if(!["postToForum", "postToThread"].includes(type)) return false;
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
+  const postSettings = await SettingModel.getSettings("post");
+  const {uid, status, defaultCertGradesId, rolesId} = postSettings[type].anonymous;
+  if(!status) return false;
+  const user = await UserModel.findOne({uid: userId});
+  if(!user) return false;
+  if(uid.includes(userId)) return true;
+  for(const certId of user.certs) {
+    if(certId !== "default" && rolesId.includes(certId)) {
+      return true;
+    }
+  }
+  if(rolesId.includes("default")) {
+    await user.extendGrade();
+    return defaultCertGradesId.includes(user.grade._id);
+  } else {
+    return false;
+  }
+};
 
 /*
 * 获取用户的专栏

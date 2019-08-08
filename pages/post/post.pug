@@ -46,9 +46,13 @@ block content
           .post-info
             .post-header
               .time
-                a(href=`/u/${post.uid}` target='_blank')
+                if !post.anonymous
+                  a(href=`/u/${post.uid}` target='_blank' onmouseover=`floatUserPanel.open(this, '${post.uid}')`)
+                    img.user-avatar(src=`/avatar/${post.user.avatar}`)
+                    .username= post.user.username
+                else
                   img.user-avatar(src=`/avatar/${post.user.avatar}`)
-                  .username= post.user.username
+                  .username.anonymous-name= post.user.username
                 span= fromNow(post.toc)
               .options
                 -var votePost = post;
@@ -76,7 +80,7 @@ block content
                       a.options-fa(href=`/p/${post.pid}/history`)
                         span.fa.fa-history &nbsp;历史
                   -const ipoc = post.iplm || post.ipoc;
-                  a.options-fa(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
+                  a.options-fa(href=ipUrl(ipoc.toString()) title=ipoc target='_blank')
                     span.fa.fa-map-marker(style='margin-left: 2px;') &nbsp;IP
             span 发表于《
             a(href=data.postUrl )= post.thread.firstPost.t
@@ -133,8 +137,9 @@ block content
               button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
             div(style='width: 100%; text-align: center; padding-top: 0.5rem;')
               canvas(id=`${post.pid}Qrcode` style='width: 0px; height: 0px; margin: auto;')
-        -var user = post.user
-        include ../interface_thread_userpatch.pug
+        if !post.anonymous
+          -var user = post.user
+          include ../interface_thread_userpatch.pug
         if data.voteUpUsers.length !== 0
           .nkcpanel.vote-user.fullwidthpanel
             h4 点赞的用户

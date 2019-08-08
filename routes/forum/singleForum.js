@@ -45,7 +45,7 @@ router
 		const {fid} = params;
 	  const {user} = data;
 	  const {post} = body;
-		const {c, t, fids, cids, cat, mid, columnCategoriesId} = post;
+		const {c, t, fids, cids, cat, mid, columnCategoriesId, sendAnonymousPost} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(t === '') ctx.throw(400, '标题不能为空！');
 		if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
@@ -67,6 +67,14 @@ router
     // 转发到专栏
     if(columnCategoriesId.length > 0 && state.userColumn) {
       await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [_post.pid]);
+    }
+
+    // 发表匿名内容
+    if(
+      await db.UserModel.havePermissionToSendAnonymousPost("postToForum", user.uid) &&
+      sendAnonymousPost
+    ) {
+      await db.PostModel.updateOne({pid: thread.oc}, {$set: {anonymous: true}});
     }
 
 		// 发帖数加一并生成记录

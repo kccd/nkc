@@ -139,9 +139,16 @@ editorRouter
       }
     	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
     }
-    
-    const allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
-    data.allForumList = allForumList;
+
+    data.allForumList = dbFunction.forumsListSort(data.forumList,data.forumsThreadTypes);
+
+    // 是否有权发表匿名内容
+    if(!type || type === "forum" || (type === "redit" && data.draftDelType === "thread")) {
+      data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToForum", data.user.uid);
+    }
+    if(type === "thread" || (type === "redit" && data.draftDelType === "post")) {
+      data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid);
+    }
 
     await next();
   });

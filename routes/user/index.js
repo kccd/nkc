@@ -46,7 +46,7 @@ userRouter
     const {t, page=0, from} = query;
     data.t = t;
 
-    const targetUser = await db.UserModel.findOnly({uid});
+    const targetUser = await db.UserModel.findById(uid);
     await targetUser.extendGrade();
     data.targetUser = targetUser;
     await db.UserModel.extendUsersInfo([targetUser]);

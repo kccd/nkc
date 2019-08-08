@@ -1285,6 +1285,9 @@ footer.footer ul li{
   color: #3494da;
   font-weight: 700;
 }
+.anonymous-name{
+  color: #b9b9b9;
+}
 .thread-panel-author .anonymous{
   color: #b9b9b9;
   display: inline;

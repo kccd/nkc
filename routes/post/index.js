@@ -19,8 +19,13 @@ router
     data.highlight = highlight;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
-    data.thread = thread;
     await thread.extendFirstPost();
+    data.thread = {
+      tid: thread.tid,
+      firstPost: {
+        t: thread.firstPost.t
+      }
+    };
 	  const forums = await thread.extendForums(['mainForums', 'minorForums']);
     const {user} = data;
     let isModerator = ctx.permission('superModerator');
@@ -107,13 +112,14 @@ router
     }
 
 
-    data.post.user = await db.UserModel.findOnly({uid: post.uid});
-    await db.UserModel.extendUsersInfo([data.post.user]);
-    await data.post.user.extendGrade();
+    if(!data.post.anonymous) {
+      data.post.user = await db.UserModel.findOnly({uid: post.uid});
+      await db.UserModel.extendUsersInfo([data.post.user]);
+      await data.post.user.extendGrade();
+    }
     data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
     data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
     data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
-    data.thread = thread;
     ctx.template = 'post/post.pug';
 
     if(data.user) data.complaintTypes = ctx.state.language.complaintTypes;
@@ -201,7 +207,8 @@ router
             user: data.post.user,
             pid: data.post.pid,
             uid: data.post.uid,
-            tid: data.post.tid
+            tid: data.post.tid,
+            anonymous: data.post.anonymous
           };
           topPosts.push(post);
           continue;
@@ -263,7 +270,7 @@ router
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
-    const {t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
+    const {sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {data, db, fs} = ctx;
@@ -343,6 +350,10 @@ router
     targetPost.abstractEn = abstractEn;
     targetPost.keyWordsCn = keyWordsCn;
     targetPost.keyWordsEn = keyWordsEn;
+    const postType = targetPost.pid === targetThread.oc? "postToForum": "postToThread";
+    if(await db.UserModel.havePermissionToSendAnonymousPost(postType, user.uid)) {
+      targetPost.sendAnonymousPost = !!sendAnonymousPost;
+    }
     let newAuthInfos = [];
     for(let a = 0;a < authorInfos.length;a++) {
       if(authorInfos[a].name.length > 0) {

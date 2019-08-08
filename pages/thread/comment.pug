@@ -10,16 +10,25 @@ if data.highlight === comment.pid
   -klass.push("highlight-dom");
 .post-comment(class=klass id=`post_comment_${comment.pid}`)
   .post-comment-body.highlight
-    a.post-comment-user(href=`/u/${comment.uid}` target="_blank")
-      img(src=`/avatar/${comment.user.avatar}?t=sm`)
-      span=comment.user.username
+    if !comment.anonymous
+      a.post-comment-user(href=`/u/${comment.uid}` target="_blank" onmouseover=`floatUserPanel.open(this, '${comment.uid}')`)
+        img(src=`/avatar/${comment.user.avatar}?t=sm`)
+        span=comment.user.username
+    else
+      .post-comment-user
+        img(src=`/avatar/${comment.user.avatar}?t=sm`)
+        span.anonymous-name=comment.user.username
     //-if data.post.uid === comment.uid
       span (层主)
     if comment.parentPost
       span.m-l-05.m-r-05 评论
-      a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank")
-        //-img(src=`/avatar/${comment.parentPost.user.uid}?t=sm`)
-        span=comment.parentPost.user.username
+      if !comment.parentPost.anonymous
+        a.display-i-b.post-comment-user(href=`/u/${comment.parentPost.user.uid}` target="_blank" onmouseover=`floatUserPanel.open(this, '${comment.parentPost.user.uid}')`)
+          //-img(src=`/avatar/${comment.parentPost.user.uid}?t=sm`)
+          span=comment.parentPost.user.username
+      else
+        .display-i-b.post-comment-user
+          span.anonymous-name=comment.parentPost.user.username
       //-if data.post.uid === comment.parentPost.uid
         span (层主)
     //-.post-comment-time=fromNow(comment.toc)

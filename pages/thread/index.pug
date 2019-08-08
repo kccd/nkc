@@ -341,9 +341,13 @@ block content
                               span(style="margin-right:10px")!=`${agad}`
                       if thread.type !== "fund"
                         .thread-info.text-center(style="margin-top:1.5rem")
-                          a(href=`/u/${thread.uid}`)
+                          if !thread.firstPost.anonymous
+                            a(href=`/u/${thread.uid}` onmouseover=`floatUserPanel.open(this, '${thread.uid}')`)
+                              img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                              span= ` ${thread.firstPost.user.username}`
+                          else
                             img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-                            span= ` ${thread.firstPost.user.username}`
+                            span.anonymous-name= ` ${thread.firstPost.user.username}`
                           span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
                           if thread.firstPost.originState && thread.firstPost.originState !== "0"
                             -var levelText = getOriginLevel(thread.firstPost.originState);
@@ -501,10 +505,11 @@ block content
                                 label
                                   input#ParseURL(type='checkbox' checked)
                                   | 处理URL
-                              .checkbox-inline
-                                label
-                                  input#anonymous(type='checkbox')
-                                  | 匿名发表
+                              if data.sendAnonymousPost
+                                .checkbox-inline
+                                  label
+                                    input#sendAnonymousPost(type='checkbox')
+                                    | 匿名发表
                               if state.userColumn && !data.addedToColumn
                                 -const column = state.userColumn
                                 include ../publicModules/toColumn/selectCategories
@@ -617,6 +622,7 @@ block scripts
   script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
+  include ../publicModules/vue_user_panel/floatUserPanel
   include ../publicModules/highlight/highlight_editor
   include ../publicModules/complaint/complaint
   include ../publicModules/crop/crop

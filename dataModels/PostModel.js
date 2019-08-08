@@ -597,7 +597,8 @@ const defaultOptions = {
   userGrade: true,
   resource: true,
   usersVote: true,
-  credit: true
+  credit: true,
+  showAnonymousUser: false
 };
 
 postSchema.statics.extendPosts = async (posts, options) => {
@@ -635,7 +636,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
   }
   if(o.user) {
-    const users = await UserModel.find({uid: {$in: [...uid]}});
+    let users = await UserModel.find({uid: {$in: [...uid]}});
     if(o.userGrade) {
       grades = await UsersGradeModel.find().sort({score: -1});
     }
@@ -670,7 +671,15 @@ postSchema.statics.extendPosts = async (posts, options) => {
   return posts.map(post => {
     post.credits = [];
     if(o.user) {
-      post.user = usersObj[post.uid];
+      if(!o.showAnonymousUser && post.anonymous) {
+        post.user = {
+          username: "匿名用户",
+          avatar: ""
+        };
+        post.uid = "";
+      } else {
+        post.user = usersObj[post.uid];
+      }
     }
     if(o.resource) {
       post.resources = resourcesObj[post.pid];

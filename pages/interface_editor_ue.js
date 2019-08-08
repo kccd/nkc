@@ -245,8 +245,8 @@ function onPost() {
     cat: queryCat,
     desType: desType,
     desTypeId: desTypeId
-  }
-  if(queryType == "post" || queryType == "thread" || queryType == "forum") {
+  };
+  if(queryType === "post" || queryType === "thread" || queryType === "forum") {
     try{
       var paperObj = paperProto.paperExport();
     }catch(e) {
@@ -259,6 +259,12 @@ function onPost() {
     } catch(err) {
       return screenTopWarning(err);
     }
+
+    var sendAnonymousPostDom = $("#sendAnonymousPost");
+    if(sendAnonymousPostDom.length) {
+      post.sendAnonymousPost = sendAnonymousPostDom.prop("checked");
+    }
+
     for(var i in paperObj) {
       post[i] = paperObj[i]
     }

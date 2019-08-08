@@ -26,11 +26,15 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${post.reason}`
       div
         .inline-block(style='margin-bottom: 0;')
-          a(href=`/u/${post.uid}`)
-            img(src=`/avatar/${post.user.avatar}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
-            span= post.user.username
-          -const targetUser = post.user;
-          include ../user/module_user_grade_icon
+          if !post.anonymous
+            a(href=`/u/${post.uid}` onmouseover=`floatUserPanel.open(this, '${post.uid}')`)
+              img(src=`/avatar/${post.user.avatar}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
+              span= post.user.username
+            -const targetUser = post.user;
+            include ../user/module_user_grade_icon
+          else
+            img(src=`/avatar/${post.user.uid}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
+            span.anonymous-name= post.user.username
           if post.digest
             span &nbsp;
             span.fa.fa-star(style='color: #ffbf16;' title='精选')

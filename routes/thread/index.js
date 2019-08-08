@@ -460,7 +460,18 @@ threadRouter
 		data.ads = homeSettings.c.ads;
 		ctx.template = 'thread/index.pug';
 		await thread.extendFirstPost().then(async p => {
-			await p.extendUser().then(u => u.extendGrade());
+		  /*if(p.anonymous) {
+		    p.uid = "";
+		    thread.uid = "";
+		    p.user = {
+		      uid: "",
+          avatar: "",
+          username: "匿名用户"
+        }
+      } else {
+        await p.extendUser().then(u => u.extendGrade());
+      }*/
+      await p.extendUser().then(u => u.extendGrade());
 			await p.extendResources();
 		});
 		if(thread.type == "product") {
@@ -603,7 +614,8 @@ threadRouter
     }
 
 
-    await db.UserModel.extendUsersInfo([data.thread.firstPost.user]);
+		if(data.thread.firstPost.user)
+      await db.UserModel.extendUsersInfo([data.thread.firstPost.user]);
 		await thread.extendLastPost();
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
@@ -626,6 +638,9 @@ threadRouter
         uid: data.user.uid
       });
 			if(sub) data.subscribed = true;
+
+			data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid);
+
 		}
 
 		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
@@ -750,7 +765,7 @@ threadRouter
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post, postType} = body;
-		const {columnCategoriesId = []} = post;
+		const {columnCategoriesId = [], sendAnonymousPost} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(postType === "comment" && post.c.length > 1000) {
       ctx.throw(400, "评论内容不能超过1000字符");
@@ -771,6 +786,14 @@ threadRouter
 		// 转发到专栏
     if(columnCategoriesId.length > 0 && state.userColumn) {
       await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [data.thread.oc]);
+    }
+
+    // 发表匿名内容
+    if(
+      await db.UserModel.havePermissionToSendAnonymousPost("postToForum", user.uid) &&
+      sendAnonymousPost
+    ) {
+      await db.PostModel.updateOne({pid: _post.pid}, {$set: {anonymous: true}});
     }
 
 		// 生成记录
