@@ -32,11 +32,14 @@ singleRouter
     if(activity.activityType == "close"){
       return ctx.throw(403, "该活动已被活动发布者被关闭")
     }
+    // 获取报名信息
     // 拓展聊天
     activity.posts = await activity.extendPost();
     if(user){
       activity.user = await activity.extendUser();
       activity.userPersonal = await activity.extendUserPersonal();
+      const applyInfo = await db.ActivityApplyModel.findOne({acid: acid, uid:user.uid});
+      data.applyInfo = applyInfo
     }
     // 拓展历史
     activity.historys = await activity.extendHistorys();
@@ -95,6 +98,36 @@ singleRouter
       const activityApply = new ActivityApplyModel(post);
       await activityApply.save();
     }
+    await next();
+  })
+  .patch('/:acid', async (ctx, next) => {
+    const {data, db, query, body, params} = ctx;
+    const {user} = data;
+    const {ActivityModel, ActivityApplyModel, UsersModel} = db;
+    const {post} = body;
+    const {acid} = post;
+    if(!user){
+      ctx.throw(400, "请前往注册");
+    }
+    
+    const apply = await db.ActivityApplyModel.findOne({"uid":user.uid,"acid":acid});
+    await apply.update({enrollInfo: post.enrollInfo})
+    // if(!activity.signUser.includes(user.uid)){
+    //   activity.signUser.push(user.uid);
+    //   await activity.save()
+    // }
+    // if(user){
+    //   post.uid = user.uid;
+    // }
+    // const apply = await db.ActivityApplyModel.findOne({"uid":user.uid,"acid":acid});
+    // if(apply){
+    //   apply.applyStatus = "success";
+    //   apply.enrollInfo = post.enrollInfo;
+    //   await apply.save();
+    // }else{
+    //   const activityApply = new ActivityApplyModel(post);
+    //   await activityApply.save();
+    // }
     await next();
   })
   .del('/:acid', async(ctx, next) => {
