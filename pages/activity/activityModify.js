@@ -1,3 +1,12 @@
+var customForm;
+if(NKC.modules.customForm) {
+  customForm = new NKC.modules.customForm();
+}
+$(document).ready(function() {
+  var options = JSON.parse($("#contionJSON").text());
+  customForm.init(options);
+})
+
 $(document).ready(function(){
   var replyCon = $("#replyxxx").text();
   ue.ready(function() {
@@ -172,12 +181,17 @@ function submitredit(acid){
     var continueTofull = $("#continueTofull").is(":checked");
   
     // 获取报名条件
-    var conditions = [];
-    $("#conditions").find("input").each(function(){
-      if($(this).is(":checked") == true){
-        conditions.push($(this).attr("id"))
+    var conditions = customForm.outputJSON();
+    for(var c in conditions) {
+      if(conditions[c].infoName.length === 0) {
+        return errInfoTips("表单名称不可为空！")
       }
-    })
+    }
+    // $("#conditions").find("input").each(function(){
+    //   if($(this).is(":checked") == true){
+    //     conditions.push($(this).attr("id"))
+    //   }
+    // })
   
     // 检查活动详情
     var description = ue.getContent();
@@ -206,7 +220,8 @@ function submitredit(acid){
       description: description,
       continueTofull: continueTofull,
       isnotice: isnotice,
-      noticeContent: noticeContent
+      noticeContent: noticeContent,
+      conditions: conditions
     }
   
     nkcAPI('/activity/modify/'+acid, "POST" ,{post:post})

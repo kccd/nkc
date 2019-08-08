@@ -225,11 +225,10 @@ func.receipt = async (o) => {
   const returnUrl = serverConfig.domain + '/account/finance/recharge?type=back';
   let notifyUrl;
   if(global.NKC.NODE_ENV === 'production') {
-    notifyUrl = `${serverConfig.domain}/finance/recharge`;
+    notifyUrl = `${serverConfig.domain}/account/finance/recharge`;
   } else {
     notifyUrl = alipayConfig.notifyUrl || ""
   }
-
   const obj = {
     service: "create_direct_pay_by_user",
     payment_type: "1",

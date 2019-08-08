@@ -89,7 +89,8 @@ singleRouter
     const apply = await db.ActivityApplyModel.findOne({"uid":user.uid,"acid":acid});
     if(apply){
       apply.applyStatus = "success";
-      apply.save();
+      apply.enrollInfo = post.enrollInfo;
+      await apply.save();
     }else{
       const activityApply = new ActivityApplyModel(post);
       await activityApply.save();
@@ -102,8 +103,8 @@ singleRouter
     const {acid} = params;
     const activity = await db.ActivityModel.findOne({"acid":acid});
     if(activity){
-      activity.signUser.remove(user.uid);
-      activity.save();
+      await activity.signUser.remove(user.uid);
+      await activity.save();
     }
     const activityApply = await db.ActivityApplyModel.findOne({"uid":user.uid,"acid":acid});
     if(activityApply){

@@ -24,6 +24,14 @@ $('#inputFile').on('change', function() {
 });
 
 
+var customForm;
+if(NKC.modules.customForm) {
+  customForm = new NKC.modules.customForm();
+}
+$(document).ready(function() {
+  customForm.init();
+})
+
 function insertToImage(url) {
   var imgDom = '<img id="poster" style="width:100%;" srcs="" src="'+url+'">';
   $("#exampleImg").html(imgDom);
@@ -104,17 +112,12 @@ function submitRelease() {
   var continueTofull = $("#continueTofull").is(":checked");
 
   // 获取报名条件
-  var conditions = [];
-  $("#conditions").find(".form-inline").each(function(){
-    var forminfo = {};
-    if($(this).find("#infoName").val().trim() !== ""){
-      forminfo.infoName = $(this).find("#infoName").val().trim();
-      forminfo.infoDesc = $(this).find("#infoDesc").val().trim();
-      forminfo.formType = "text";
-      forminfo.infoPara = [];
-      conditions.push(forminfo);
+  var conditions = customForm.outputJSON();
+  for(var c in conditions) {
+    if(conditions[c].infoName.length === 0) {
+      return errInfoTips("表单名称不可为空！")
     }
-  })
+  }
 
   // 检查活动详情
   var description = ue.getContent();
@@ -141,7 +144,7 @@ function submitRelease() {
   nkcAPI('/activity/release', "POST" ,{post:post})
   .then(function(data) {
     // window.location.href = "/activity/list";
-    openToNewLocation("/activity/list");
+    openToNewLocation("/activity");
   })
   .catch(function(data){
     

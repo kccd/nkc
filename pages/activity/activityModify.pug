@@ -18,7 +18,7 @@ block content
       .col-xs-12.col-md-10
         -if(!data.modifyType || data.modifyType == 'modify')
           .row
-            .col-xs-12.col-md-10
+            .col-xs-12.col-md-12
               .panel.panel-primary
                 .panel-heading
                   span 活动修改
@@ -27,19 +27,19 @@ block content
 
                     .form-group
                       label.col-sm-2.control-label 活动标题：
-                      .col-sm-8
+                      .col-sm-10
                         input.form-control#activityTitle(value=`${data.activity.activityTitle}`)
                         span#titleErr(style='color:red')
 
                     .form-group
                       label.col-sm-2.control-label 报名时间：
-                      .col-sm-4
+                      .col-sm-5
                         .input-group
                           input.form-control.time#enrollStartTime(readonly size="16" type="text" value=`${data.activity.enrollStartTime.toLocaleString()}`)
                           span.input-group-addon
                             i.fa.fa-calendar
                         span#enrollStartTimeErr(style='color:red')
-                      .col-sm-4
+                      .col-sm-5
                         .input-group
                           input.form-control.time#enrollEndTime(readonly size="16" type="text" value=`${data.activity.enrollEndTime.toLocaleString()}`)
                           span.input-group-addon
@@ -48,13 +48,13 @@ block content
 
                     .form-group
                       label.col-sm-2.control-label 举办时间：
-                      .col-sm-4
+                      .col-sm-5
                         .input-group
                           input.form-control.time#holdStartTime(readonly size="16" type="text" value=`${data.activity.holdStartTime.toLocaleString()}`)
                           span.input-group-addon
                             i.fa.fa-calendar
                         span#holdStartTimeErr(style='color:red')
-                      .col-sm-4
+                      .col-sm-5
                         .input-group
                           input.form-control.time#holdEndTime(readonly size="16" type="text" value=`${data.activity.holdEndTime.toLocaleString()}`)
                           span.input-group-addon
@@ -63,13 +63,13 @@ block content
 
                     .form-group
                       label.col-sm-2.control-label 详细地址：
-                      .col-sm-8
+                      .col-sm-10
                         input.form-control#address(value=`${data.activity.address}`)
                         span#addressErr(style='color:red')
                     
                     .form-group
                       label.col-sm-2.control-label 活动海报：
-                      .col-sm-3
+                      .col-sm-4
                         .col-sm-6
                           button.btn.btn-primary#inputImage(onclick=`$("#inputFile").click();`) 选择海报
                         //- .col-sm-6
@@ -83,7 +83,7 @@ block content
                           p 1、海报尺寸 1080*640，.jpg 或 .png格式，不超过 4M
                         .col-sm-12 
                           p 2、精美海报有助于吸引吃瓜群众围观，增加报名量！
-                      .col-sm-5
+                      .col-sm-6
                         .row
                           .col-xs-12.col-md-12.user-settings-img-dev#exampleImg
                             img.poster#poster(src=`/poster/${data.activity.posterId}` srcs=`${data.activity.posterId}` style='width: 100%;')
@@ -91,22 +91,22 @@ block content
 
                     .form-group
                       label.col-sm-2.control-label 主办方：
-                      .col-sm-8
+                      .col-sm-10
                         input.form-control.quantity-count#sponsor(value=`${data.activity.sponsor}`)
                         span#sponsorErr(style='color:red')
 
                     .form-group
                       label.col-sm-2.control-label 联系电话：
-                      .col-sm-8
+                      .col-sm-10
                         input.form-control.quantity-count#contactNum(value=`${data.activity.contactNum}`)
                         span#contactNumErr(style='color:red')
 
                     .form-group
                       label.col-sm-2.control-label 活动人数：
-                      .col-sm-4
+                      .col-sm-5
                         input.form-control.quantity-count#activityPartNum(value=`${data.activity.limitNum}`)
                         span#activityPartNumErr(style='color:red')
-                      .col-sm-4
+                      .col-sm-5
                         -if(data.activity.continueTofull == true)
                           input(type="checkbox" checked=true)#continueTofull
                           span 到达人数上限时是否允许继续报名
@@ -115,8 +115,14 @@ block content
                           span 到达人数上限时是否允许继续报名
 
                     .form-group
+                      label.col-sm-2.control-label 报名表单：
+                      .col-sm-10
+                        .hidden#contionJSON= JSON.stringify(data.activity.conditions)
+                        include ../publicModules/customForm/customForm.pug
+
+                    .form-group
                       label.col-sm-2.control-label 活动详情：
-                      .col-sm-8
+                      .col-sm-10
                         include ../ueditor/ueditor.pug   
                         div#replyxxx(style="display:none")=data.activity.description
                         .checkbox-inline(style="display:none")
@@ -124,28 +130,21 @@ block content
                             input#ParseURL(type='checkbox' checked)
                             | 处理URL
                         .form-group
-                        //- .nkcpanel(id='file-uploading' target='/r')
-                        //-   //uploader section
-                        //-   include ../interface_attachment_uploader_uploader.pug
-
-                        //- .panel.panel-default
-                        //-   .panel-heading 我的附件（点击插入帖子）
-                        //-   .panel-body(id='list-container')
                         include ../media/media_index.pug       
 
                     .form-group
                       label.col-sm-2.control-label 通知内容：
-                      .col-sm-8
+                      .col-sm-10
                         textarea.form-control#noticeContent(rows="8")=`因变更了。。。所以。。。`
                     .form-group
                       label.col-sm-2.control-label
-                      .col-sm-8
+                      .col-sm-10
                         input(type="checkbox" checked=false)#isnotice
                         span 活动变更后是否通知报名者
                     hr
 
                     .form-group
-                      label.col-sm-2.control-label
+                      label.col-sm-3.control-label
                       .col-sm-3
                         button.btn.btn-primary#save(onclick=`submitredit(${data.activity.acid})`) 保存修改
                       .col-sm-3
@@ -187,6 +186,7 @@ block scripts
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')  
   script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
+  +includeJS("/publicModules/customForm/customForm.js")
   script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
   include ../publicModules/crop/crop
   script(src=`/media/media_index.js?v=${startTime}`)

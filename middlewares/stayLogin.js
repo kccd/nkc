@@ -82,7 +82,7 @@ module.exports = async (ctx, next) => {
 			}
 		}
 		// 获取用户信息
-    if(!isResourcePost) {
+    if(ctx.data.operationId === "getResources" || !isResourcePost) {
       const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
       await db.UserModel.extendUsersInfo([user]);
       user.newMessage = await user.getNewMessagesCount();

@@ -278,7 +278,8 @@ function getShareTypeByUrl(sourceUrl) {
     "user": "/u/",
     "post": "/p/",
     "forum": "/f/",
-    "activity": "/activity/"
+    "activity": "/activity/",
+    "column": "/m/"
   }
   var shareType = "common";
   for(var i in typeObj) {
