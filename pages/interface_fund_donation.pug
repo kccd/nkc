@@ -1,7 +1,7 @@
 extends bootstrap_base
 block title
   link(rel='stylesheet', href='/fund.css')
-  title 科创基金 - 捐款
+  title 科创基金 - 赞助
 block content
   -var mainContainer1400 = true
   -const info = {login: false};
@@ -21,7 +21,7 @@ block content
         span.point
       h2.redFontColor#error
     else
-      h2(style='margin-top: 0;') 捐款对象
+      h2(style='margin-top: 0;') 赞助对象
       .row
         .col-xs-6.col-sm-4.col-md-3.fund-list
           a(href=`###` title='资金池' onclick=`selectFund()`)
@@ -42,12 +42,12 @@ block content
                 div(style='height: 8rem;')
                   .select(style=`${data.fundId===fund._id?'background-color:rgba(255,255,255,0.8);':''}color: #5bc0de;line-height: 8rem;font-size: 3rem;font-weight: 600;` fundid=fund._id)= data.fundId === fund._id?'已选择': ''
       br
-      h2 捐款金额
+      h2 赞助金额
       -const arr = [500,2000,10000];
       .row
         -for(let m of arr)
           .col-xs-6.col-sm-4.col-md-3.fund-list
-            a(href=`###` title=`捐款${m}元` onclick=`selectMoney(${m})`)
+            a(href=`###` title=`赞助${m}元` onclick=`selectMoney(${m})`)
               .fund-name(style=`padding-top: 0;background-color: #ffe8be;`)
                 span(style=`line-height: 12rem;color: #ff6666;font-size: 4rem;font-weight:600;`)= `${m}元`
               div(style='height: 8rem;')
@@ -59,7 +59,7 @@ block content
             div(style='height: 8rem;')
               .selectMoney(style='color: #c3e9f5;line-height: 8rem;font-size: 3rem;font-weight: 600;') 未选择
         .col-xs-12.col-md-12#money(style=`display:none;`)
-          h2 自定义捐款金额（20元 - 10000元）
+          h2 自定义赞助金额（20元 - 10000元）
           .form-inline
             .form-group
               input.form-control(type='number' placeholder='最小单位为元')
@@ -70,12 +70,12 @@ block content
           .choose-anonymous(anonymous="true")
             .anonymous
               div
-            span &nbsp;匿名捐款&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            span &nbsp;匿名赞助&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           .choose-anonymous.active()
             .anonymous
               div
-            span &nbsp;非匿名捐款
-      h2 捐款说明
+            span &nbsp;非匿名赞助
+      h2 赞助说明
       .col-xs-12.col-md-10.col-md-offset-1
         div!= markdown_safe(data.fundSettings.donationDescription)
       .col-xs-12.col-md-2.col-md-offset-5

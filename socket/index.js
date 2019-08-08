@@ -13,8 +13,6 @@ async function createSocketServer(server) {
     io.on("error", (err) => {
       throw err;
     });
-    // io.use(init);
-    // io.use(auth);
     // 多进程适配
     io.adapter(socketIoRedis({ host: redisConfig.address, port: redisConfig.port}));
     // 多个socket连接类型

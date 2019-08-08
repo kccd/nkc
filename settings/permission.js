@@ -322,7 +322,7 @@ const certificates ={
 			    [GET]: true
 		    },
 		    donation: {
-		    	[name]: '捐款',
+		    	[name]: '赞助',
 			    [GET]: true,
 			    [POST]: true,
 			    return: {

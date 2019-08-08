@@ -2,7 +2,7 @@ extends ../fundBase
 block fundTitle
   title 基金申请
   +includeCSS("/editor/editor.css")
-  +includeCSS("/mdui/css/mdui.min.css")
+  //+includeCSS("/mdui/css/mdui.min.css")
 block fundContent
   .hidden#data=objToStr({step: data.s, form: data.applicationForm, fund: data.fund, user: data.user, lifePhotos: data.lifePhotos})
   .hidden#targetPost
@@ -248,11 +248,25 @@ block fundContent
               h4.text-center 常见问题
 
 block fundScripts
+  if data.s === 5
+    +includeCSS("/external_pkgs/viewer/viewer.css")
+    +includeJS("/external_pkgs/viewer/viewer.js")
+    script.
+      $(document).ready(function () {
+        var options = {
+          navbar: false,
+          title: false,
+          toolbar: false,
+        }
+        new Viewer(document.getElementById('applicationForm'), options);
+        new Viewer(document.getElementById('applicationForm-comments'), options);
+      })
   include  ../../publicModules/selectForum/selectForum
   include ../../publicModules/strToHTML
   include ../../publicModules/moment
   +includeJS("/editor/paper.js")
   include ../../publicModules/crop/crop
-  +includeJS("/media/media_index.js")
+  if data.s === 3
+    +includeJS("/media/media_index.js")
   include ../../ueditor/ueditorBase
   +includeJS("/fund/apply/editForm.js")
