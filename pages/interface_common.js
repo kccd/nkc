@@ -174,6 +174,7 @@ function sweetSuccess(text) {
   Swal({
     type: "success",
     confirmButtonText: "关闭",
+    timer: 2000,
     text: text
   });
 }

@@ -12,6 +12,6 @@ module.exports = {
 		username: '',
 		closingTime: Date.now()
 	},
-	donationDescription: '捐款说明',
+	donationDescription: '赞助说明',
 	fundPoolDescription: '资金池介绍'
 };

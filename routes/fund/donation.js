@@ -14,7 +14,7 @@ donationRouter
 			data.fundId = query.fundId.toUpperCase();
 		}
 		data.funds  = await db.FundModel.find({disabled: false, history: false}).sort({toc: 1});
-		data.nav = '捐款';
+		data.nav = '赞助';
 		if(query.error) {
 			data.error = query.error;
 			ctx.template = 'interface_fund_donation_error.pug';
@@ -32,16 +32,16 @@ donationRouter
 			}
 			abstract = '退款';
 		} else {
-			abstract = '捐款';
+			abstract = '赞助';
 			if(money < 20) {
-				ctx.throw(400, '单笔捐款金额不能少于20元。');
+				ctx.throw(400, '单笔赞助金额不能少于20元。');
 			}
 			if(money > 10000) {
-				ctx.throw(400, '单笔捐款金额不能超过10000元，请分批次捐款。');
+				ctx.throw(400, '单笔赞助金额不能超过10000元，请分批次赞助。');
 			}
 		}
 		const {user} = data;
-		if(!anonymous && !user) ctx.throw(400, '非匿名捐款要求用户必须登录，请登录后再试。');
+		if(!anonymous && !user) ctx.throw(400, '非匿名赞助要求用户必须登录，请登录后再试。');
 		const id = Date.now();
 		const bill = await db.FundBillModel.findOne({_id: id});
 		if(bill) ctx.throw(500, '交易编号重复，请重新提交。');

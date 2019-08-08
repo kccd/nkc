@@ -1280,27 +1280,39 @@ span.applicationForm-report-icon.system{
   top: 0;
   right: 0;
   height: 2rem;
+  font-weight: 700;
   width: 2rem;
-  color: #dbb136;
-  background-color: #3e1b17;
+  color: #ffbe00;
+  background-color: #ba1300;
   border-radius: 50%;
   line-height: 2rem;
   text-align: center;
 }
 .donation-user-list .username{
   line-height: 4rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
   text-align: center;
   height: 4rem;
-  font-size: 2rem;
+  font-size: 1.6rem;
 
 }
 .donation-user-list .description{
-  height: 9rem;
+  height: 5rem;
+  overflow: hidden;
+  font-size: 1.2rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
   text-align: center;
   color: #999;
 }
 .donation-user-list .avatar img{
   width: 100%;
+  height: 100%;
   border-radius: 3.5rem 3.5rem 3.5rem 3.5rem;
 }
 .donation-btn a{

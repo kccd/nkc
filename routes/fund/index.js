@@ -140,11 +140,11 @@ fundRouter
 	    'from.type': 'user',
 	    'from.anonymous': false,
 	    'from.id': {$ne: ''},
-	    abstract: '捐款',
+	    abstract: '赞助',
 	    verify: true
     }).sort({toc: -1}).limit(12);
 
-    //查询捐款人 统计捐款总金额
+    //查询赞助人 统计赞助总金额
 		let donationUsers = [];
 		for(let b of donationBills) {
 			const uid = b.from.id;

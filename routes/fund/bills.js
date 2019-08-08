@@ -21,7 +21,7 @@ billsRouter
 				}
 			];
 		} else if(type === 'donation') {
-			q.abstract = '捐款';
+			q.abstract = '赞助';
 		}
 		let bills = await db.FundBillModel.find(q).sort({toc: 1});
 		let total = 0;
@@ -79,7 +79,7 @@ billsRouter
 		if(from.type === 'user' && !from.id && !from.anonymous) ctx.throw(400, '请输入用户UID。');
 
 		if(from.type === 'user') {
-			if(!['fundPool', 'fund'].includes(to.type)) ctx.throw(400, '用户可执行的操作有：捐款给基金项目、捐款给资金池、退还剩余款项。');
+			if(!['fundPool', 'fund'].includes(to.type)) ctx.throw(400, '用户可执行的操作有：赞助给基金项目、赞助给资金池、退还剩余款项。');
 			if(!from.anonymous && !from.id) ctx.throw(400, '请输入用户UID。');
 			if(from.id) {
 				const user = await db.UserModel.findOne({uid: from.id});
