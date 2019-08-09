@@ -120,6 +120,7 @@ router
     if(num%1 !== 0) ctx.throw(400, "科创币仅支持到小数点后两位");
 		const fromUser = user;
 		const post = await db.PostModel.findOnly({pid});
+		if(post.anonymous) ctx.throw(400, "无法鼓励匿名用户");
     const toUser = await db.UserModel.findOnly({uid: post.uid});
     if(fromUser.uid === toUser.uid) ctx.throw(400, '自己给自己鼓励不需要科创币');
     const thread = await db.ThreadModel.findOnly({tid: post.tid});

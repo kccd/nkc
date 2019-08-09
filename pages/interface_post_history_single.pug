@@ -1,6 +1,6 @@
 -var p = p
 .panel.panel-default
-  .panel-body
+  .panel-body(style="word-break: break-all;")
     if(formerPost)
       a(href=`/p/${formerPost.pid}/history/rollback/${formerPost._id}`) 回滚至此版本
     else

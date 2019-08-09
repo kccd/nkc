@@ -27,7 +27,7 @@ block title
     
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
-    link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
+    //link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
     link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
     +includeCSS("/jquery-ui-1.10.4.custom.css")
     +includeCSS("/external_pkgs/viewer/viewer.css")
@@ -66,11 +66,11 @@ block title
               a(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
                 span.fa.fa-comment-o &nbsp;
                 span 回复
-        if !thread.closed
+        if !thread.closed && !post.anonymous
           li
             a(onclick=`at('${post.user.username}')`)
               span.fa.fa-at= ` ${post.user.username}`
-        if targetThread && targetThread.oc === post.pid
+        if targetThread && targetThread.oc === post.pid && !targetThread.firstPost.anonymous
           li
             a(href=`/t/${thread.tid}?t=author`)
               .fa.fa-filter &nbsp;只看作者
@@ -346,8 +346,8 @@ block content
                               img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                               span= ` ${thread.firstPost.user.username}`
                           else
-                            img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
-                            span.anonymous-name= ` ${thread.firstPost.user.username}`
+                            img(src=anonymousInfo.avatar style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                            span.anonymous-name= ` ${anonymousInfo.username}`
                           span(style='color: #555555;margin-right:5px')= ` ${thread.toc.toLocaleDateString()}`
                           if thread.firstPost.originState && thread.firstPost.originState !== "0"
                             -var levelText = getOriginLevel(thread.firstPost.originState);
@@ -426,7 +426,7 @@ block content
                           - const votePost = thread.firstPost;
                           .inline-block(style="vertical-align: text-top;")
                             include ../module_vote
-                          if addKcb && data.user && thread.firstPost.uid !== data.user.uid
+                          if !thread.firstPost.anonymous && addKcb && data.user && thread.firstPost.uid !== data.user.uid
                             .inline-block(style='color: #aaa;')
                               .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
                           .highlight.fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: #aaa;") &nbsp;分享&nbsp;
@@ -471,11 +471,12 @@ block content
                   .row
                     .col-xs-12.col-md-12(style='margin-top: 1rem;')
                       include ../interface_navigation_paging
-                      ul.pagination.NavigationPaging
-                        li(class=data.t!=="author"?"active":"")
-                          a(href=`/t/${thread.tid}`) 全部
-                        li(class=data.t==="author"?"active":"")
-                          a(href=`/t/${thread.tid}?t=author`) 只看作者
+                      if !data.thread.firstPost.anonymous
+                        ul.pagination.NavigationPaging
+                          li(class=data.t!=="author"?"active":"")
+                            a(href=`/t/${thread.tid}`) 全部
+                          li(class=data.t==="author"?"active":"")
+                            a(href=`/t/${thread.tid}?t=author`) 只看作者
                     .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
                       for post, index in data.posts
                         if index !== 0 || data.paging.page !== 0
@@ -570,17 +571,17 @@ block content
             if data.thread.type === "fund"
               include ../fund/initData
               include ../fund/options
-            -var user = data.thread.firstPost.user
+            -var user = data.targetUser
             if user
               include ../interface_thread_userpatch.pug
-            if data.targetUserThreads && data.targetUserThreads.length !== 0
-              .fullwidthpanel.ThreadBox.nkcpanel.user-threads
-                .thread-aside-header 作者最新文章
-                for thread, index in data.targetUserThreads
-                  .thread-aside-title
-                    a(href=`/t/${thread.tid}`)
-                      span= index+1+'. '
-                      span= thread.firstPost.t
+              if data.targetUserThreads && data.targetUserThreads.length !== 0
+                .fullwidthpanel.ThreadBox.nkcpanel.user-threads
+                  .thread-aside-header 作者最新文章
+                  for thread, index in data.targetUserThreads
+                    .thread-aside-title
+                      a(href=`/t/${thread.tid}`)
+                        span= index+1+'. '
+                        span= thread.firstPost.t
             if data.sameThreads && data.sameThreads.length !== 0
               .fullwidthpanel.ThreadBox.nkcpanel.user-threads
                 .thread-aside-header 相似文章推荐
@@ -622,7 +623,7 @@ block scripts
   script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
-  include ../publicModules/vue_user_panel/floatUserPanel
+  include ../publicModules/floatUserPanel/floatUserPanel
   include ../publicModules/highlight/highlight_editor
   include ../publicModules/complaint/complaint
   include ../publicModules/crop/crop

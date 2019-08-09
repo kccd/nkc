@@ -5,7 +5,7 @@
       onmouseleave="floatUserPanel.close()"
     @author pengxiguaa 2019-5-6
 
-+includeCSS("/publicModules/vue_user_panel/floatUserPanel.css")
++includeCSS("/publicModules/floatUserPanel/floatUserPanel.css")
 //-@mouseenter="onPanel"
   @mouseleave="outPanel"
 #floatUserPanel(v-cloak
@@ -33,7 +33,7 @@
           .user_id ID：{{user.uid}}
         .user_div
           a(:href="'/u/' + user.uid" target="_blank").user_name {{user.username}}
-          .user_cert {{user.certsName}}
+          .user_cert {{user.info.certsName}}
           .user_description {{user.description}}
           .user_register {{format("YYYY/MM/DD", user.toc)}}注册，{{fromNow(user.tlv)}}活动
           if data.user
@@ -57,4 +57,4 @@
           .user_info_count {{user.kcb/100}}
           .user_info_title 科创币
 include ../moment
-+includeJS("/publicModules/vue_user_panel/floatUserPanel.js")
++includeJS("/publicModules/floatUserPanel/floatUserPanel.js")

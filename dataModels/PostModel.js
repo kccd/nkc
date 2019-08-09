@@ -598,7 +598,8 @@ const defaultOptions = {
   resource: true,
   usersVote: true,
   credit: true,
-  showAnonymousUser: false
+  showAnonymousUser: false,
+  excludeAnonymousPost: false
 };
 
 postSchema.statics.extendPosts = async (posts, options) => {
@@ -668,14 +669,13 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
   }
 
-  return posts.map(post => {
+  const results = [];
+  for(const post of posts) {
+    if(post.anonymous && o.excludeAnonymousPost) continue;
     post.credits = [];
     if(o.user) {
       if(!o.showAnonymousUser && post.anonymous) {
-        post.user = {
-          username: "匿名用户",
-          avatar: ""
-        };
+        post.user = "";
         post.uid = "";
       } else {
         post.user = usersObj[post.uid];
@@ -700,9 +700,9 @@ postSchema.statics.extendPosts = async (posts, options) => {
         }
       }
     }
-    return post.toObject();
-  });
-
+    results.push(post.toObject());
+  }
+  return results;
 };
 
 postSchema.methods.updatePostsVote = async function() {

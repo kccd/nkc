@@ -434,16 +434,22 @@ function quotePost(pid, number, page){
 	if(!ue) return screenTopAlert('权限不足');
 	nkcAPI('/p/'+pid+'/quote', 'GET',{})
 		.then(function(pc){
-			var strAuthor = "<a href='/u/"+pc.targetUser.uid+"'>"+pc.targetUser.username+"</a>&nbsp;" // 获取被引用的用户
-      strFlor = "&nbsp;<a href='"+pc.postUrl+"'>"+number+"</a>&nbsp;";
+      var post = pc.message;
+      var strAuthor;
+		  if(post.anonymous) {
+        strAuthor = "<span class='anonymous-name'>匿名用户</span>&nbsp;" // 获取被引用的用户
+      } else {
+        strAuthor = "<a href='/u/"+pc.targetUser.uid+"'>"+pc.targetUser.username+"</a>&nbsp;" // 获取被引用的用户
+      }
+
+      var strFlor = "&nbsp;<a href='"+pc.postUrl+"'>"+number+"</a>&nbsp;";
 			/*if(page > 0){
 				var strFlor = "<a href='/t/"+pc.message.tid+'?&page='+page+'#'+pc.message.pid+"'>"+number+"</a>&nbsp;"  // 获取被引用的楼层
 			}else{
 				var strFlor = "<a href='/t/"+pc.message.tid+'#'+pc.message.pid+"'>"+number+"</a>&nbsp;"  // 获取被引用的楼层
 			}*/
-			pc = pc.message;
-			length_limit = 50;
-			var content = pc.c;
+			var length_limit = 50;
+			var content = post.c;
 
 			// 去掉换行
 			content = content.replace(/\n/igm,'');
@@ -453,7 +459,7 @@ function quotePost(pid, number, page){
 				{reg: /<[^>]*>/gm, rep: ''},
 				{reg: /<\/[^>]*>/, rep: ' '},
 			];
-			if(pc.l === 'html') {
+			if(post.l === 'html') {
 				for(var i in replaceArr) {
 					var obj = replaceArr[i];
 					content = content.replace(obj.reg, obj.rep)
@@ -468,9 +474,9 @@ function quotePost(pid, number, page){
 			if(str.length>=length_limit){
 				str = str.substring(0,50) + '.....'
 			}
-			// str = '[quote='+pc.user.username+','+pc.pid+'][/quote]'
+			// str = '[quote='+post.user.username+','+post.pid+'][/quote]'
 			// geid('ReplyContent').value += str
-			str = '<blockquote cite='+pc.user.username+','+pc.pid+' display="none">'+'引用 '+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
+			str = '<blockquote cite='+post.user.username+','+post.pid+' display="none">'+'引用 '+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
 			geid('quoteContent').innerHTML = str
 			// geid('ReplyContent-elem').innerHTML = str
 			window.location.href='#container';

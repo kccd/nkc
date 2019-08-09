@@ -16,8 +16,8 @@ if data.highlight === comment.pid
         span=comment.user.username
     else
       .post-comment-user
-        img(src=`/avatar/${comment.user.avatar}?t=sm`)
-        span.anonymous-name=comment.user.username
+        img(src=anonymousInfo.avatar)
+        span.anonymous-name=anonymousInfo.username
     //-if data.post.uid === comment.uid
       span (层主)
     if comment.parentPost
@@ -28,7 +28,7 @@ if data.highlight === comment.pid
           span=comment.parentPost.user.username
       else
         .display-i-b.post-comment-user
-          span.anonymous-name=comment.parentPost.user.username
+          span.anonymous-name=anonymousInfo.username
       //-if data.post.uid === comment.parentPost.uid
         span (层主)
     //-.post-comment-time=fromNow(comment.toc)

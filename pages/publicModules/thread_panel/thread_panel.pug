@@ -16,17 +16,20 @@
             data-thread-fids=thread.mainForumsId.join("-")
             data-thread-cids=(thread.categoriesId||[]).join("-")
           )
-    .thread-panel-author
-      if !thread.firstPost.anonymous
+
+
+    if !thread.firstPost.anonymous
+      .thread-panel-author(onmouseover=`floatUserPanel.open(this, '${thread.uid}')`)
         a(href=`/u/${thread.uid}` target="_blank")
           img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
         a(
           href=`/u/${thread.uid}` target="_blank"
-          onmouseover=`floatUserPanel.open(this, '${thread.uid}')`
         )= thread.firstPost.user.username
-      else
+    else
+      .thread-panel-author
         img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
         span.anonymous= thread.firstPost.user.username
+
 
     .thread-panel-forum
       if data.forum

@@ -91,8 +91,8 @@ router
 		}
 	  // await post.ensurePermissionNew(options);
 		// 拓展其他信息
-    await post.extendUser();
-    await post.extendResources();
+    // await post.extendUser();
+    // await post.extendResources();
     let posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
     data.post = posts[0];
     data.postUrl = await db.PostModel.getUrl(data.post);
@@ -117,9 +117,9 @@ router
       await db.UserModel.extendUsersInfo([data.post.user]);
       await data.post.user.extendGrade();
     }
-    data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
-    data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
-    data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
+    data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
+    data.kcbSettings = await db.SettingModel.getSettings("kcb");
+    data.xsfSettings = await db.SettingModel.getSettings("xsf");
     ctx.template = 'post/post.pug';
 
     if(data.user) data.complaintTypes = ctx.state.language.complaintTypes;

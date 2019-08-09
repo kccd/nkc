@@ -398,7 +398,7 @@ function getOriginLevel(index) {
 		"4": "发表人参与原创(翻译)",
 		"5": "发表人是合作者之一",
 		"6": "发表人本人原创"
-	}
+	};
 	if(!index) {
 		return obj;
 	}else{
@@ -463,7 +463,11 @@ let pugRender = (template, data, state) => {
     },
     state,
     ipUrl,
-    objToStr
+    objToStr,
+    anonymousInfo: {
+      username: "匿名用户",
+      avatar: "/avatar/"
+    }
   };
   options.data = data;
   options.filters = filters;

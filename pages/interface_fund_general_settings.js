@@ -25,7 +25,7 @@ function submit() {
 		obj.terms = terms;
 	}
 	if(!donationDescription) {
-		return screenTopWarning('请输入科创基金捐款说明。');
+		return screenTopWarning('请输入科创基金赞助说明。');
 	} else {
 		obj.donationDescription = donationDescription;
 	}

@@ -117,8 +117,10 @@ function submitRelease() {
     if(conditions[c].infoName.length === 0) {
       return errInfoTips("表单名称不可为空！")
     }
+    if(conditions[c].errorInfo && conditions[c].errorInfo.length > 0) {
+      return errInfoTips(conditions[c].errorInfo)
+    }
   }
-
   // 检查活动详情
   var description = ue.getContent();
   description = common.URLifyHTML(description);

@@ -44,7 +44,13 @@ resourceRouter
     const { path, ext } = resource;
     let filePath = selectDiskCharacterDown(resource);
     filePath = filePath + path;
-    if (!extArr.includes(resource.ext.toLowerCase()) && !ctx.permission("getAttachments")) ctx.throw(403, '您当前账号等级无法下载附件，请发表优质内容提升等级。');
+    if (!extArr.includes(resource.ext.toLowerCase()) && !ctx.permission("getAttachments")) {
+      if(!data.user) {
+        ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
+      } else {
+        ctx.throw(403, '您当前账号等级无法下载附件，请发表优质内容提升等级。');
+      }
+    }
     if (extArr.includes(resource.ext.toLowerCase())) {
       try {
         await fs.access(filePath);
@@ -54,7 +60,7 @@ resourceRouter
       ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
     }
     // 在resource中添加点击次数
-    await resource.update({$inc:{hits:1}})
+    await resource.update({$inc:{hits:1}});
     ctx.filePath = filePath;
     ctx.resource = resource;
     ctx.type = ext;

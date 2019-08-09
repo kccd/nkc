@@ -65,22 +65,8 @@ userRouter
     // 获取用户能够访问的专业ID
     const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
     if(user) {
-      const subs = await db.SubscribeModel.find({
-        type: {
-          $in: ["user", "forum"]
-        },
-        uid: user.uid
-      }, {
-        tUid: 1,
-        fid: 1,
-        type: 1
-      });
-      data.userSubUid = [];
-      data.userSubFid = [];
-      subs.map(s => {
-        if(s.type === "user") data.userSubUid.push(s.tUid);
-        if(s.type === "forum") data.userSubFid.push(s.fid);
-      });
+      data.userSubUid = state.subUsersId;
+      data.userSubFid = state.subForumsId;
     }
 
     const targetUserDigestThreads = await db.ThreadModel.find({
@@ -150,6 +136,7 @@ userRouter
       }
       const q = {
         uid,
+        anonymous: false,
         // disabled: false,
         mainForumsId: {$in: accessibleFid}
       };
@@ -321,6 +308,7 @@ userRouter
         lastPostUser: false,
         firstPostResource: true,
         htmlToText: true,
+        excludeAnonymousPost: true
       });
       const results = [];
       for (const thread of threads) {

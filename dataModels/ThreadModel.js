@@ -674,7 +674,8 @@ const defaultOptions = {
   firstPostResource: false,
   htmlToText: false,
   count: 200,
-  showAnonymousUser: false
+  showAnonymousUser: false,
+  excludeAnonymousPost: false,
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
   const o = Object.assign({}, defaultOptions);
@@ -799,17 +800,15 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     }
   }
 
-  return await Promise.all(threads.map(async thread => {
+  const results = [];
+  for(const thread of threads) {
     thread.categories = [];
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
+      if(firstPost.anonymous && o.excludeAnonymousPost) continue;
       if(o.firstPostUser) {
         let user;
         if(!o.showAnonymousUser && firstPost.anonymous) {
-          user = {
-            uid: "",
-            username: "匿名用户"
-          };
           thread.uid = "";
           firstPost.uid = "";
         } else {
@@ -827,10 +826,6 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         if(o.lastPostUser) {
           let user;
           if(!o.showAnonymousUser && lastPost.anonymous) {
-            user = {
-              uid: "",
-              username: "匿名用户"
-            };
             lastPost.uid = "";
           } else {
             user = usersObj[lastPost.uid];
@@ -852,11 +847,12 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       if(thread.categoriesId && thread.categoriesId.length !== 0) {
         for(const cid of thread.categoriesId) {
           if(categoryObj[cid]) thread.categories.push(categoryObj[cid]);
-        }        
+        }
       }
     }
-    return thread.toObject?thread.toObject():thread;
-  }));
+    results.push(thread.toObject?thread.toObject():thread);
+  }
+  return results;
 };
 /* 
   通过tid查找文章

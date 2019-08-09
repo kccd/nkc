@@ -12,8 +12,17 @@ $("document").ready(function() {
       $("#onpost").attr("disabled",true)
     }
   })
-  var options = JSON.parse($("#contionJSON").text());
-  customForm.initResult(options);
+  if($("#contionJSON").length > 0) {
+    var options = JSON.parse($("#contionJSON").text());
+    if($("#userJSON").length > 0) {
+      var userInfo = JSON.parse($("#userJSON").text());
+      customForm.initResult(options, userInfo);
+    }
+    if($("#infoJSON").length > 0) {
+      var condInfo = JSON.parse($("#infoJSON").text());
+      customForm.initResultCond(options, condInfo);
+    }
+  }
 })
 
 // 切换至报名
@@ -30,10 +39,46 @@ function changeToApply(para) {
   }
 }
 
+// 切换至修改
+function changeToEdit(para) {
+  var formShow = $(para).attr("formShow");
+  if(formShow === "hide") {
+    $("#editButton").text("取消修改");
+    $("#edit").css("display", "");
+    $(para).attr("formShow", "show")
+  }else{
+    $("#editButton").text("修改报名");
+    $("#edit").css("display", "none");
+    $(para).attr("formShow", "hide")
+  }
+}
+
 // 切换至详情
 function changeToDescription() {
   $("#apply").css("display", "none");
   $("#description").css("display", "");
+}
+
+function onedit(acid) {
+  var enrollInfo = customForm.outputResultJSON();
+  if(enrollInfo.length === 0){
+    sweetWarning("必填项不得为空");
+    return;
+  }
+  var post = {
+    acid: acid,
+    enrollInfo: enrollInfo
+  }
+  nkcAPI("/activity/single/"+acid, "PATCH", {post:post})
+  .then(function(data) {
+    sweetAlert("修改成功！");
+    setTimeout(function() {
+      window.location.reload();
+    }, 1500);
+  })
+  .catch(function(data) {
+    sweetWarning(data.error);
+  })
 }
 
 // 提交报名
@@ -97,4 +142,9 @@ function cancelApply(acid) {
     .catch(function(data){
       sweetWarning(data.error)
     })
+}
+
+// 修改报名表单
+function editApply(acid) {
+
 }

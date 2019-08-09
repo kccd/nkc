@@ -179,12 +179,14 @@ function submitredit(acid){
   
     // 检查报名人数条件
     var continueTofull = $("#continueTofull").is(":checked");
-  
     // 获取报名条件
     var conditions = customForm.outputJSON();
     for(var c in conditions) {
       if(conditions[c].infoName.length === 0) {
         return errInfoTips("表单名称不可为空！")
+      }
+      if(conditions[c].errorInfo && conditions[c].errorInfo.length > 0) {
+        return errInfoTips(conditions[c].errorInfo)
       }
     }
     // $("#conditions").find("input").each(function(){

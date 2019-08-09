@@ -51,8 +51,8 @@ block content
                     img.user-avatar(src=`/avatar/${post.user.avatar}`)
                     .username= post.user.username
                 else
-                  img.user-avatar(src=`/avatar/${post.user.avatar}`)
-                  .username.anonymous-name= post.user.username
+                  img.user-avatar(src=anonymousInfo.avatar)
+                  .username.anonymous-name= anonymousInfo.username
                 span= fromNow(post.toc)
               .options
                 -var votePost = post;
