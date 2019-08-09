@@ -79,7 +79,7 @@
     a(href=`/m/${result.page.columnId}/page/${result.page._id}` target="_blank").clear-a-style.search-result-title!= result.t
     .search-result-info
       a.clear-a-style.search-result-author(href=`/m/${result.page.columnId}`)
-        img(src=`/column/avatar/${result.page.columnId}`)
+        img(src=`/column/avatar/${result.column.avatar}`)
         span=result.column.name
       span 专栏
       .search-result-time=fromNow(result.page.toc)
