@@ -25,7 +25,8 @@ block content
               tbody
                 -for(let apply of data.applys)
                   tr
-                    th!=apply.activity.activityTitle
+                    th
+                      a(href=`/activity/single/${apply.activity.acid}`)!=apply.activity.activityTitle
                     th!=apply.activity.enrollEndTime.toLocaleString()
                     th!=apply.activity.holdEndTime.toLocaleString()
                     th!=apply.activity.signUser.length
