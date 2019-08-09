@@ -60,10 +60,10 @@ const threadSchema = new Schema({
     default: '',
     index: 1
   },
-  mid: {
+  /*mid: {
     type: String,
     required: true
-  },
+  },*/
   hasCover: {
     type: Boolean,
     default: true
@@ -87,10 +87,10 @@ const threadSchema = new Schema({
     default: Date.now,
     index: 1
   },
-  toMid: {
+  /*toMid: {
     type: String,
     default: ''
-  },
+  },*/
   topped: {
     type: Boolean,
 	  index: 1,

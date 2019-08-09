@@ -1182,7 +1182,7 @@ forumSchema.statics.createNewThread = async function(options) {
     tid,
     categoriesId: options.cids,
     mainForumsId: options.fids,
-    mid: options.uid,
+    // mid: options.uid,
     uid: options.uid,
     type: options.type
   };

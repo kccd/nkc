@@ -27,8 +27,8 @@
         )= thread.firstPost.user.username
     else
       .thread-panel-author
-        img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
-        span.anonymous= thread.firstPost.user.username
+        img(src=anonymousInfo.avatar)
+        span.anonymous-name= anonymousInfo.username
 
 
     .thread-panel-forum
@@ -100,7 +100,7 @@
           onmouseover=`floatUserPanel.open(this, '${thread.lastPost.uid}')`
         )= thread.lastPost.user.username
       else
-        span.anonymous=thread.lastPost.user.username
+        span.anonymous-name=anonymousInfo.username
       span=fromNow(thread.lastPost.toc)
 
 
