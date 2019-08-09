@@ -72,7 +72,10 @@ block content
                 if data.sendAnonymousPost
                   .checkbox-inline
                     label
-                      input#sendAnonymousPost(type='checkbox')
+                      if data.targetPost && data.targetPost.anonymous
+                        input#sendAnonymousPost(type='checkbox' checked)
+                      else
+                        input#sendAnonymousPost(type='checkbox')
                       span 匿名发表
                 if state.userColumn && !data.addedToColumn
                   -const column = state.userColumn

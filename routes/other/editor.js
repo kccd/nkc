@@ -68,7 +68,7 @@ editorRouter
       data.draftDelType = singledraft.desType; // 草稿来源类型
       data.draftDelTypeId = singledraft.desTypeId; // 草稿来源类型id
       data.targetPost = singledraft;
-      return await next();
+      // return await next();
     }
     if(type === 'post') {
       ctx.template = 'interface_editor.pug';
@@ -106,7 +106,7 @@ editorRouter
       if(delPostLog.length > 0){
         data.delReason = delPostLog[0].reason
       }
-      return await next();
+      // return await next();
     } else if(type === 'application') {
       ctx.throw(403, "编辑器暂不支持编辑科创基金的内容");
       ctx.template = 'interface_editor_test.pug';
@@ -124,7 +124,7 @@ editorRouter
 	    } else if(cat === 'r') {
 
 	    }
-	    return await next();
+	    // return await next();
     } else if(type === 'forum_declare') {
     	const forum = await db.ForumModel.findOnly({fid: id});
     	data.content = forum.declare;
@@ -146,8 +146,9 @@ editorRouter
     if(!type || type === "forum" || (type === "redit" && data.draftDelType === "thread")) {
       data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToForum", data.user.uid);
     }
-    if(type === "thread" || (type === "redit" && data.draftDelType === "post")) {
+    if(type === "thread" || type === "post" || (type === "redit" && data.draftDelType === "post")) {
       data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid);
+      console.log(data.sendAnonymousPost );
     }
 
     await next();
