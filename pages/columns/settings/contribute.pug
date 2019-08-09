@@ -22,7 +22,8 @@ block settingsContent
         include ../../publicModules/paging/paging
         div
           .contribute-list-li(v-for="c in contributes")
-            a(:href="'/u/' + c.uid" target="_blank") {{c.user.username}}
+            span.anonymous-name(v-if="c.thread.firstPost.anonymous")=anonymousInfo.username
+            a(v-else :href="'/u/' + c.uid" target="_blank") {{c.user.username}}
             span &nbsp;&nbsp;{{fromNow(c.toc)}}&nbsp;&nbsp;投稿文章&nbsp;&nbsp;
             a(:href="'/t/' + c.tid" target="_blank") {{c.thread.firstPost.t}}
             .m-t-05(v-if="c.description")

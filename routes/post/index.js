@@ -352,7 +352,10 @@ router
     targetPost.keyWordsEn = keyWordsEn;
     const postType = targetPost.pid === targetThread.oc? "postToForum": "postToThread";
     if(await db.UserModel.havePermissionToSendAnonymousPost(postType, user.uid)) {
-      targetPost.anonymous = !!sendAnonymousPost;
+      if(!postType === "postToForum" || !["product", "fund"].includes(targetThread.type)) {
+        targetPost.anonymous = !!sendAnonymousPost;
+      }
+
     }
     let newAuthInfos = [];
     for(let a = 0;a < authorInfos.length;a++) {

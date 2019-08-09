@@ -8,8 +8,11 @@
     .column-post-abstract
       if type === "post"
         .column-post-content.post
-          a.column-thread-author(href=`/u/${post.uid}` target="_blank")
-            span=post.user.username
+          if !post.anonymous
+            a.column-thread-author(href=`/u/${post.uid}` target="_blank")
+              span=post.user.username
+          else
+            span.anonymous-name=anonymousInfo.username
           | ：
           span=post.c
       .column-post-title
@@ -18,9 +21,14 @@
         .column-post-content= post.c
       .column-post-info
         if !data.column || data.column.uid !== post.uid
-          a(href=`/u/${post.uid}` target="_blank").column-post-author
-            img(src=`/avatar/${post.user.avatar}?t=sm`)
-            span=post.user.username
+          if !thread.firstPost.anonymous
+            a(href=`/u/${thread.firstPost.uid}` target="_blank").column-post-author
+              img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
+              span=thread.firstPost.user.username
+          else
+            span.column-post-author
+              img(src=anonymousInfo.avatar)
+              span.anonymous-name=anonymousInfo.username
         .column-post-time
           span.m-r-05=fromNow(toc)
           if data.column && from === "contribute"

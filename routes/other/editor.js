@@ -148,7 +148,6 @@ editorRouter
     }
     if(type === "thread" || type === "post" || (type === "redit" && data.draftDelType === "post")) {
       data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid);
-      console.log(data.sendAnonymousPost );
     }
 
     await next();
