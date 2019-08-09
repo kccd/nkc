@@ -113,7 +113,7 @@ function submitRelease() {
 
   // 获取报名条件
   var conditions = customForm.outputJSON();
-  for(var c in conditions) {
+  for(var c =0;c<conditions.length;c++) {
     if(conditions[c].infoName.length === 0) {
       return errInfoTips("表单名称不可为空！")
     }
@@ -143,13 +143,15 @@ function submitRelease() {
     continueTofull: continueTofull
   }
 
+  geid('save').disabled = true;
   nkcAPI('/activity/release', "POST" ,{post:post})
   .then(function(data) {
     // window.location.href = "/activity/list";
     openToNewLocation("/activity");
   })
   .catch(function(data){
-    
+    screenTopWarning(data || data.error);
+    geid('save').disabled = false
   })
 }
 

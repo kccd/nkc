@@ -124,6 +124,9 @@ orderRouter
 		if(!order.trackNumber) ctx.throw(400, "暂无物流信息");
 		let trackNumber = order.trackNumber;
 		let trackName = order.trackName;
+		if(trackName == "SFEXPRESS" && order.receiveMobile) {
+			trackNumber = trackNumber + ":" + order.receiveMobile.substring(order.receiveMobile.length -2,order.receiveMobile.length)
+		}
 		const trackInfo = await nkcModules.apiFunction.getTrackInfo(trackNumber, trackName);
 		data.trackNumber = trackNumber;
 		data.trackInfo = trackInfo;

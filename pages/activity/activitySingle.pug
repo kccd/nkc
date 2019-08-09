@@ -95,10 +95,7 @@ block content
                       .applicationForm-header 报名表单
                       hr
                     .col-xs-12.col-md-12
-                      if data.user
-                        .hidden#userJSON= JSON.stringify({username: data.user.username, mobile:data.activity.userPersonal.mobile})
-                      else
-                        .hidden#userJSON= JSON.stringify({username: "", mobile:""})
+                      .hidden#userJSON= JSON.stringify(data.defaultInfo)
                       .hidden#contionJSON= JSON.stringify(data.activity.conditions)
                       include ../publicModules/customForm/customForm.pug
                       .col-sm-10(style="margin-top: 5px;padding:unset")
