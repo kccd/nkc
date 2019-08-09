@@ -6,6 +6,10 @@ const activityApplySchema = new Schema({
     type: String,
     required: true
   },
+  applyId: {
+    type: String,
+    index: 1
+  },
   toc: {
     type: Date,
     default: Date.now,

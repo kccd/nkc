@@ -235,19 +235,35 @@ schema.methods.returnMoney = async function () {
     }); 
     await record.save();
     await UserModel.updateUserKcb(record.to);
-    // 将运费打给卖家
-    const recordSeller = KcbsRecordModel({
-      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
-      from: "bank",
-      to: sellerId,
-      type: "refund",
-      toc: time,
-      num: orderFreightPrice,
-      description,
-      ordersId: [orderId]
-    })
-    await recordSeller.save();
-    await UserModel.updateUserKcb(recordSeller.to);
+    if(orderStatus === "unShip") {
+      // 将运费打给买家
+      const recordBuyer = KcbsRecordModel({
+        _id: await SettingModel.operateSystemID("kcbsRecords", 1),
+        from: "bank",
+        to: buyerId,
+        type: "refund",
+        toc: time,
+        num: orderFreightPrice,
+        description: description+"(运费)",
+        ordersId: [orderId]
+      })
+      await recordBuyer.save();
+      await UserModel.updateUserKcb(recordBuyer.to);
+    }else{
+      // 将运费打给卖家
+      const recordSeller = KcbsRecordModel({
+        _id: await SettingModel.operateSystemID("kcbsRecords", 1),
+        from: "bank",
+        to: sellerId,
+        type: "refund",
+        toc: time,
+        num: orderFreightPrice,
+        description: description+"(运费)",
+        ordersId: [orderId]
+      })
+      await recordSeller.save();
+      await UserModel.updateUserKcb(recordSeller.to);
+    }
   } else if(money < orderPrice) {
     // 情况1
     const diff = (orderPrice+orderFreightPrice) - money;

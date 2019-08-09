@@ -34,13 +34,27 @@ singleRouter
     }
     // 获取报名信息
     // 拓展聊天
+    let defaultInfo = {
+      username: "",
+      mobile:"",
+      city: ""
+    };
     activity.posts = await activity.extendPost();
     if(user){
       activity.user = await activity.extendUser();
       activity.userPersonal = await activity.extendUserPersonal();
+      let userPersonal = await db.UsersPersonalModel.findOne({uid: user.uid})
+      defaultInfo.username = user.username;
+      defaultInfo.mobile = userPersonal.mobile;
+      if(userPersonal.addresses && userPersonal.addresses.length > 0) {
+        if(userPersonal.addresses[0].location) defaultInfo.city += userPersonal.addresses[0].location;
+        defaultInfo.city += "";
+        if(userPersonal.addresses[0].address) defaultInfo.city += userPersonal.addresses[0].address;
+      }
       const applyInfo = await db.ActivityApplyModel.findOne({acid: acid, uid:user.uid});
       data.applyInfo = applyInfo
     }
+    data.defaultInfo = defaultInfo;
     // 拓展历史
     activity.historys = await activity.extendHistorys();
     if(data.type == 'history'){
@@ -60,9 +74,9 @@ singleRouter
       ctx.throw(400, "请前往注册");
     }
     const activity = await ActivityModel.findOne({acid});
-    if(parseInt(user.id) == parseInt(activity.uid)){
-      ctx.throw(400, "不可以报名自己发起的活动")
-    }
+    // if(parseInt(user.uid) == parseInt(activity.uid)){
+    //   ctx.throw(400, "不可以报名自己发起的活动")
+    // }
     if(activity && activity.limitNum !==0 && activity.signUser.length >= activity.limitNum && activity.continueTofull == false){
       ctx.throw(400, "活动报名人数已达上限");
     }
@@ -95,6 +109,8 @@ singleRouter
       apply.enrollInfo = post.enrollInfo;
       await apply.save();
     }else{
+      let applyId = await db.SettingModel.operateSystemID('applyId', 1)
+      post.applyId = await applyId;
       const activityApply = new ActivityApplyModel(post);
       await activityApply.save();
     }

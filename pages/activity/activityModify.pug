@@ -155,40 +155,56 @@ block content
 
         -if(data.modifyType == 'manage')
           .row
-            .col-xs-12.col-md-10
-              .panel.panel-default
-                .panel-body
-                  a.btn-primary#outExc 导出Excel
-                  hr
-                  .table-responsive
-                    table.table.table-striped#tabExc(border="1")
-                      thead
-                        tr
-                          -let idArr = []
-                          -for(var a=0;a < data.activity.conditions.length;a++)
-                            th!=data.activity.conditions[a].infoName
-                            -idArr.push(data.activity.conditions[a].infoId)
-                      tbody
-                        -for(let apply of data.activityApplyList)
-                          tr
-                            -for(var b=0;b < idArr.length;b++)
-                              -if(apply.enrollInfo[b] && apply.enrollInfo[b].id === idArr[b])
-                                th!=apply.enrollInfo[b].value
-                              -else
-                                th
+            .col-xs-12.col-md-12
+              a.btn-primary.btn.btn-sm#outExc 导出Excel
+              .paging-button
+                a(href=`/activity/modify/${data.activity.acid}?modifyType=manage` class=!data.status?"active":"").button 全部报名
+                a(href=`/activity/modify/${data.activity.acid}?modifyType=manage&status=success` class=data.status&&data.status==='success'?"active":"").button 报名成功
+                a(href=`/activity/modify/${data.activity.acid}?modifyType=manage&status=cancel` class=data.status&&data.status==='cancel'?"active":"").button 已取消
+              .table-responsive
+                table.table.table-striped#tabExc(border="1")
+                  thead
+                    tr
+                      th 报名者
+                      th 报名状态
+                      -let idArr = []
+                      -for(var a=0;a < data.activity.conditions.length;a++)
+                        th!=data.activity.conditions[a].infoName
+                        -idArr.push(data.activity.conditions[a].infoId)
+                  tbody
+                    -for(let apply of data.activityApplyList)
+                      tr
+                        th 
+                          a(href=`/u/${apply.user.uid}`)!=apply.user.username
+                        if apply.applyStatus === "success"
+                          th 成功
+                        else
+                          th 已取消
+                        -for(var b=0;b < idArr.length;b++)
+                          -let enValue;
+                          -for(var a=0;a < apply.enrollInfo.length; a++)
+                            -if(apply.enrollInfo[a] && apply.enrollInfo[a].id === idArr[b])
+                              -enValue = apply.enrollInfo[a].value
+                          -if(enValue)
+                            th!=enValue
+                          -else
+                            th
 block scripts
-  script(src="/jquery-ui-1.10.4.custom.js")
-  script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
-  script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
-  script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
-  script(src='/external_pkgs/cropper/js/cropper.js', charset="UTF-8")
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src='/commonmark/dist/commonmark.js')
-  script(src='/xbbcode-parser/xbbcode.js')
-  script(src='/xss/dist/xss.js')  
-  script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
-  +includeJS("/publicModules/customForm/customForm.js")
-  script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
-  include ../publicModules/crop/crop
-  script(src=`/media/media_index.js?v=${startTime}`)
-  script(src=`/activity/activityModify.js?v=${global.NKC.startTime}` charset="UTF-8")
+  -if(!data.modifyType || data.modifyType === 'modify')
+    script(src="/jquery-ui-1.10.4.custom.js")
+    script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
+    script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
+    script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
+    script(src='/external_pkgs/cropper/js/cropper.js', charset="UTF-8")
+    script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+    script(src='/commonmark/dist/commonmark.js')
+    script(src='/xbbcode-parser/xbbcode.js')
+    script(src='/xss/dist/xss.js')  
+    script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
+    +includeJS("/publicModules/customForm/customForm.js")
+    script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
+    include ../publicModules/crop/crop
+    script(src=`/media/media_index.js?v=${startTime}`)
+    script(src=`/activity/activityModify.js?v=${global.NKC.startTime}` charset="UTF-8")
+  if data.modifyType === "manage"
+    +includeJS("/activity/activityManage.js")
