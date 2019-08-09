@@ -91,11 +91,7 @@ NKC.modules.customForm = function() {
     if(option) {
       var initFormDom = "";
       for(var i=0;i < option.length;i++) {
-        if(["姓名","手机","邮箱"].indexOf(option[i].infoName) !== -1) {
-          continue;
-        }else{
-          initFormDom += this_.initSingle(option[i])
-        }
+        initFormDom += this_.initSingle(option[i])
       }
       $("#customFormArea").html(initFormDom)
     }
@@ -139,12 +135,12 @@ NKC.modules.customForm = function() {
     return reDom;
   },
   this_.initFormListObj = {
-    "text": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text' value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>",
-    "textarea": "<div class='custom-form-item' data-formType='textarea' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text'value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>",
-    "number": "<div class='custom-form-item' data-formType='number' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text' value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>",
-    "radio": "<div class='custom-form-item' data-formType='radio' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text' value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'>[infoPara]<div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>",
-    "checkbox": "<div class='custom-form-item' data-formType='checkbox' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text'value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'>[infoPara]<div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>",
-    "select": "<div class='custom-form-item' data-formType='select' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text' value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'>[infoPara]<div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>"
+    "text": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text' value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>",
+    "textarea": "<div class='custom-form-item' data-formType='textarea' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text'value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>",
+    "number": "<div class='custom-form-item' data-formType='number' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text' value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>",
+    "radio": "<div class='custom-form-item' data-formType='radio' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text' value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'>[infoPara]<div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>",
+    "checkbox": "<div class='custom-form-item' data-formType='checkbox' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text'value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'>[infoPara]<div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>",
+    "select": "<div class='custom-form-item' data-formType='select' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input' [isCheck]> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='[infoName]' title='' class='custom-input' id='infoName'> <input type='text' value='[infoDesc]' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'>[infoPara]<div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>"
   }
 }
 
@@ -159,27 +155,27 @@ function addCommonFormOption(formtype) {
 var commonFormListObj = {
   "kcname": {
     "name": "用户名",
-    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='用户名' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='用户名' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "mobile": {
     "name": "手机号码",
-    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='手机号码' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='手机号码' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "city": {
     "name": "城市",
-    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='城市' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='城市' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "company": {
     "name": "公司单位",
-    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='公司单位' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='公司单位' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "department": {
     "name": "部门",
-    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='部门' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='部门' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "position": {
     "name": "职位",
-    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='职位' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' value='职位' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "gender": {
     "name": "性别",
@@ -192,7 +188,7 @@ var commonFormListObj = {
             "   <div class='custom-form-box-line'>"+
             "     <input type='text' value='性别' title='' class='custom-input' id='infoName'>"+
             "     <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'>"+
-            "     <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span>"+
+            "     <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button>"+
             "   </div>"+
             "   <div class='custom-form-sub'>"+
             "     <h1 class='custom-form-sub-title'>选项列表</h1>"+
@@ -216,7 +212,7 @@ var commonFormListObj = {
             "   <div class='custom-form-box-line'>"+
             "     <input type='text' value='年龄' title='' class='custom-input' id='infoName'>"+
             "     <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'>"+
-            "     <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span>"+
+            "     <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button>"+
             "   </div>"+
             "   <div class='custom-form-sub'>"+
             "     <h1 class='custom-form-sub-title'>选项列表</h1>"+
@@ -244,7 +240,7 @@ var commonFormListObj = {
             "   <div class='custom-form-box-line'>"+
             "     <input type='text' value='学历' title='' class='custom-input' id='infoName'>"+
             "     <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'>"+
-            "     <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span>"+
+            "     <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button>"+
             "   </div>"+
             "   <div class='custom-form-sub'>"+
             "     <h1 class='custom-form-sub-title'>选项列表</h1>"+
@@ -272,7 +268,7 @@ var commonFormListObj = {
             "   <div class='custom-form-box-line'>"+
             "     <input type='text' value='月收入' title='' class='custom-input' id='infoName'>"+
             "     <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'>"+
-            "     <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span>"+
+            "     <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button>"+
             "   </div>"+
             "   <div class='custom-form-sub'>"+
             "     <h1 class='custom-form-sub-title'>选项列表</h1>"+
@@ -312,27 +308,27 @@ function addCodeToOption(dom) {
 var customFormListObj = {
   "text": {
     "name": "单行文本框",
-    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='单行文本框' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='text' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='单行文本框' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "textarea": {
     "name": "多行文本框",
-    "dom": "<div class='custom-form-item' data-formType='textarea' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='多行文本框' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='textarea' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='多行文本框' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "number": {
     "name": "数字输入框",
-    "dom": "<div class='custom-form-item' data-formType='number' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='数字输入框' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='number' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='数字输入框' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div></div></div>"
   },
   "radio": {
     "name": "单选按钮组",
-    "dom": "<div class='custom-form-item' data-formType='radio' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='单选按钮组' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'> <div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='radio' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='单选按钮组' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'> <div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>"
   },
   "checkbox": {
     "name": "多选按钮组",
-    "dom": "<div class='custom-form-item' data-formType='checkbox' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='多选按钮组' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'><div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='checkbox' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='多选按钮组' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'><div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>"
   },
   "select": {
     "name": "下拉选择框",
-    "dom": "<div class='custom-form-item' data-formType='select' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='下拉选择框' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'><div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>"
+    "dom": "<div class='custom-form-item' data-formType='select' data-id='[dataId]'> <label class='custom-checkbox'><input type='checkbox' class='custom-input-checkbox must-input'> <span class='custom-checkbox-text'>必填</span></label> <div class='custom-form-box'><div class='custom-form-box-line'><input type='text' placeholder='下拉选择框' title='' class='custom-input' id='infoName'> <input type='text' placeholder='提示信息在这里' class='custom-input' id='infoDesc'> <span class='custom-form-sub-button fa fa-trash-o' onclick='delCustomFormOption(this)'></span> <button onclick='upToForm(this)' class='upButton'>↑</button><button onclick='downToForm(this)' class='downButton'>↓</button></div> <div class='custom-form-sub'><h1 class='custom-form-sub-title'>选项列表</h1> <div class='custom-form-sub-list'><div class='custom-form-sub-add'><span class='custom-form-sub-button fa fa-plus-square' onclick='addOptionValue(this)'></span></div></div></div></div></div>"
   }
 };
 
@@ -695,4 +691,30 @@ function makeRandomCode() {
     ranstr += arr[pos]
   }
   return ranstr;
+}
+
+
+function upToForm(para) {
+  var parents = $(para).parents(".custom-form-item");
+  var prev = parents.prev();
+  var next = parents.next();
+  if(!prev.attr("class")) {
+    return screenTopWarning("已经到了最顶部");
+  }
+  parents.fadeOut("slow",function(){
+    prev.before(parents);
+  }).fadeIn();
+}
+
+function downToForm(para) {
+  var parents = $(para).parents(".custom-form-item");
+  var prev = parents.prev();
+  var next = parents.next();
+  var nextnext = parents.next().next();
+  if(!next.attr("class")) {
+    return screenTopWarning("已经到了最底部");
+  }
+  parents.fadeOut("slow",function(){
+    next.after(parents);
+  }).fadeIn();
 }
