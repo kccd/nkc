@@ -112,7 +112,7 @@ block content
                       label
                         input(type="checkbox" v-model="selectedSubId" :value="sub._id")
                     .small-forum-icon
-                      div(:style="'background-image: url(/m/' + sub.columnId + '/avatar)'")
+                      div(:style="'background-image: url(/column/avatar/' + sub.column.avatar+ ')'")
                     .small-forum-content
                       .small-forum-name
                         a.pointer(@click='appOpenUrl("/m/" + sub.columnId)' :title="sub.column.name") {{sub.column.name}}
