@@ -97,7 +97,6 @@ NKC.modules.customForm = function() {
     }
   },
   this_.initSingle = function(para) {
-    console.log(para)
     var reDom = this_.initFormListObj[para.formType];
     // 替换表单名称
     if(para.infoName && para.infoName.length > 0) {

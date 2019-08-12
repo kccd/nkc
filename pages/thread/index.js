@@ -403,7 +403,6 @@ function submit(tid){
 	})
 		.then(function(data){
 			// window.location.href = data.redirect;
-			console.log(data.redirect)
 			openToNewLocation(data.redirect);
 		})
 		.catch(function(data){
