@@ -17,11 +17,11 @@ function shareShowWeChat() {
   $(".weChat-image").toggle();
 }
 
-function shareToOther(shareType, type, title, pid, description){
+function shareToOther(shareType, type, title, pid, description, avatar){
   var origin = window.location.origin;
   var lk = origin +'/default/logo3.png';
   if(shareType === "column") {
-    lk = origin + "/m/" + pid + "/avatar"
+    lk = origin + "/column/avatar/" + avatar
   } else if(shareType === "user") {
     lk = origin + "/avatar/" + pid
   }
