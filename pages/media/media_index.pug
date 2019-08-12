@@ -132,7 +132,10 @@ style.
         .row#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
           .col-xs-4.col-sm-2.col-md-2.col-lg-2.col-xl-2.mediaListPadding(v-for = "(all, index) in mediaAllLists")
             .media-grid-tile(v-bind:title="all.oname" v-if="!all.dealStatus || all.dealStatus !== 'ing'")
-              img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              div(v-if="['mp4', '3gp', 'swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'].indexOf(all.ext) > -1")
+                img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              div(v-else)
+                img(v-bind:src="'/attachIcon/'+all.ext+'.png'" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
               .media-grid-tile-actions(style="max-height:30px;min-height:20px")
                 .media-grid-tile-text
                   .media-grid-tile-title(style="font-size:13px") {{all.oname}}
@@ -233,7 +236,10 @@ style.
         .row#allDom(v-bind:style="mediaType == 'all' ? 'display:block' : 'display:none'")
           .col-xs-3.col-sm-2.col-md-2.col-lg-2.col-xl-2.mediaListPadding(v-for = "(all, index) in mediaAllLists")
             .media-grid-tile(v-bind:title="all.oname" v-if="!all.dealStatus || all.dealStatus !== 'ing'")
-              img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:60px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              div(v-if="['mp4', '3gp', 'swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'].indexOf(all.ext) > -1")
+                img(v-bind:src="all.ext=='mp4' ? '/frameImg/'+all.rid : '/rt/'+all.rid" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
+              div(v-else)
+                img(v-bind:src="'/attachIcon/'+all.ext+'.png'" style="height:90px;cursor: pointer" @click="allInsert(all.rid, all.ext, all.oname)")
               .media-grid-tile-actions(style="max-height:30px;min-height:20px;padding:5px")
                 .media-grid-tile-text
                   .media-grid-tile-title(style="font-size:11px;overflow:unset") {{all.oname}}

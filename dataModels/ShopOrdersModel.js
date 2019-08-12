@@ -574,6 +574,13 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
   const ShopRefundModel = mongoose.model("shopRefunds");
   const SettingModel = mongoose.model("settings");
   const ShopOrdersModel = mongoose.model("shopOrders");
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
+  const ShopProductsParamsModel = mongoose.model("shopProductsParams");
+  const ShopGoodsModel = mongoose.model("shopGoods");
+  const shopCostRecord = await ShopCostRecordModel.findOne({orderId: this.orderId});
+  const productParam = await ShopProductsParamsModel.findOne({_id: shopCostRecord.productParamId});
+  const product = await ShopGoodsModel.findOne({productId: productParam.productId});
+  let refuCount = shopCostRecord.count;
   const time = Date.now();
   const refund = ShopRefundModel({
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
@@ -596,6 +603,10 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
     closeStatus: true,
     refundStatus: "success"
   }});
+  // 恢复库存(拍下减库存)
+  if(product.stockCostMethod === orderReduceStock) {
+    await productParam.update({$set: {stocksSurplus: productParam.stocksSurplus + refuCount}})
+  }
 };
 
 /*

@@ -5,7 +5,8 @@ modifyRouter
     const {data, db, params, query} = ctx;
 		const {user} = data;
     const {acid} = params;
-    const {modifyType} = query;
+    const {modifyType, status} = query;
+    if(status) data.status = status
     data.modifyType = modifyType;
     const activity = await db.ActivityModel.findOnly({acid:acid});
     if(!user || activity.uid !== user.uid){
@@ -18,7 +19,21 @@ modifyRouter
       activity.userPersonal = await activity.extendUserPersonal();
     }
     data.activity = activity;
-    const activityApplyList = await db.ActivityApplyModel.find({acid:acid})
+    let queryMap = {
+      acid: acid
+    }
+    if(status) {
+      if(status === "success") {
+        queryMap.applyStatus = "success"
+      }
+      if(status === "cancel") {
+        queryMap.applyStatus = "cancel"
+      }
+    }
+    let activityApplyList = await db.ActivityApplyModel.find(queryMap);
+    for(var i in activityApplyList) {
+      activityApplyList[i].user = await db.UserModel.findOne({uid: activityApplyList[i].uid})
+    }
     data.activityApplyList = activityApplyList;
 		ctx.template = 'activity/activityModify.pug';
 		await next();
