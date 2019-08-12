@@ -209,12 +209,20 @@ postSchema.pre('save' , function(next) {
 });
 
 postSchema.virtual('reason')
-	.get(function() {
-		return this._reason
-	})
-	.set(function(reason) {
-		this._reason = reason
-	});
+  .get(function() {
+    return this._reason
+  })
+  .set(function(reason) {
+    this._reason = reason
+  });
+
+postSchema.virtual('ownPost')
+  .get(function() {
+    return this._ownPost
+  })
+  .set(function(ownPost) {
+    this._ownPost = ownPost
+  });
 
 postSchema.virtual('user')
   .get(function() {
@@ -626,12 +634,14 @@ postSchema.statics.extendPosts = async (posts, options) => {
     await KcbsRecordModel.hideSecretInfo(kcbsRecords);
     for(const r of kcbsRecords) {
       uid.add(r.from);
+      r.to = "";
       if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];
       kcbsRecordsObj[r.pid].push(r);
     }
     const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false}).sort({toc: 1});
     for(const r of xsfsRecords) {
       uid.add(r.operatorId);
+      r.uid = "";
       if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
       xsfsRecordsObj[r.pid].push(r);
     }
@@ -656,6 +666,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   if(o.resource) {
     resources = await ResourceModel.find({references: {$in: [...pid]}});
     resources.map(resource => {
+      resource.uid = "";
       resource.references.map(id => {
         if(!resourcesObj[id]) resourcesObj[id] = [];
         resourcesObj[id].push(resource);
@@ -671,12 +682,14 @@ postSchema.statics.extendPosts = async (posts, options) => {
 
   const results = [];
   for(const post of posts) {
+    post.ownPost = post.uid === o.uid;
     if(post.anonymous && o.excludeAnonymousPost) continue;
     post.credits = [];
     if(o.user) {
       if(!o.showAnonymousUser && post.anonymous) {
         post.user = "";
         post.uid = "";
+        post.uidlm = "";
       } else {
         post.user = usersObj[post.uid];
       }

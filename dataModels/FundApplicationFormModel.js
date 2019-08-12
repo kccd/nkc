@@ -442,12 +442,26 @@ fundApplicationFormSchema.methods.extendThreads = async function() {
 	const threads = {};
 	threads.applying = await Promise.all(threadsId.applying.map(async tid => {
 		const thread = await ThreadModel.findOnly({tid});
-		await thread.extendFirstPost().then(p => p.extendUser());
+		const firstPost = await thread.extendFirstPost();
+		if(firstPost.anonymous) {
+		  thread.uid = "";
+		  firstPost.uid = "";
+		  firstPost.uidlm = "";
+    } else {
+		  await firstPost.extendUser();
+    }
 		return thread;
 	}));
 	threads.completed = await Promise.all(threadsId.completed.map(async tid => {
 		const thread = await ThreadModel.findOnly({tid});
-		await thread.extendFirstPost().then(p => p.extendUser());
+		const firstPost = await thread.extendFirstPost();
+		if(firstPost.anonymous) {
+		  thread.uid = "";
+		  firstPost.uid = "";
+		  firstPost.uidlm = "";
+    } else {
+		  await firstPost.extendUser();
+    }
 		return thread;
 	}));
 	return this.threads = threads;
@@ -494,7 +508,14 @@ fundApplicationFormSchema.methods.extendReportThreads = async function() {
 	}
 	const reportThreads = await Promise.all(threadsId.map(async tid => {
 		const thread = await ThreadModel.findOnly({tid});
-		await thread.extendFirstPost().then(p => p.extendUser());
+		const firstPost = await thread.extendFirstPost();
+		if(firstPost.anonymous) {
+		  thread.uid = "";
+		  firstPost.uid = "";
+		  firstPost.uidlm = "";
+    } else {
+		  await firstPost.extendUser();
+    }
 		return thread;
 	}));
 	return this.reportThreads = reportThreads;

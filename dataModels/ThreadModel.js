@@ -571,21 +571,19 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     tlm: Date.now()
   });
   if(quote && quote[2] !== this.oc) {
-    const username = quote[1];
     const quPid = quote[2];
-    const quUser = await UserModel.findOne({username});
     const quPost = await PostModel.findOne({pid: quPid});
-    if(quUser && quPost) {
+    if(quPost) {
       const reply = new ReplyModel({
         fromPid: pid,
         toPid: quPid,
-        toUid: quUser.uid
+        toUid: quPost.uid
       });
       await reply.save();
       const messageId = await SettingModel.operateSystemID('messages', 1);
       const message = MessageModel({
         _id: messageId,
-        r: quUser.uid,
+        r: quPost.uid,
         ty: 'STU',
         c: {
           type: 'replyPost',
@@ -811,6 +809,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
         if(!o.showAnonymousUser && firstPost.anonymous) {
           thread.uid = "";
           firstPost.uid = "";
+          firstPost.uidlm = "";
         } else {
           user = usersObj[firstPost.uid];
         }
@@ -827,6 +826,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
           let user;
           if(!o.showAnonymousUser && lastPost.anonymous) {
             lastPost.uid = "";
+            lastPost.uidlm = "";
           } else {
             user = usersObj[lastPost.uid];
           }
@@ -1516,21 +1516,19 @@ threadSchema.methods.createNewPost = async function(post) {
     tlm: Date.now()
   });
   if(quote && quote[2] !== this.oc) {
-    const username = quote[1];
     const quPid = quote[2];
-    const quUser = await UserModel.findOne({username});
     const quPost = await PostModel.findOne({pid: quPid});
-    if(quUser && quPost) {
+    if(quPost) {
       const reply = new ReplyModel({
         fromPid: pid,
         toPid: quPid,
-        toUid: quUser.uid
+        toUid: quPost.uid
       });
       await reply.save();
       const messageId = await SettingModel.operateSystemID('messages', 1);
       const message = MessageModel({
         _id: messageId,
-        r: quUser.uid,
+        r: quPost.uid,
         ty: 'STU',
         c: {
           type: 'replyPost',

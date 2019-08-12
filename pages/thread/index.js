@@ -476,7 +476,12 @@ function quotePost(pid, number, page){
 			}
 			// str = '[quote='+post.user.username+','+post.pid+'][/quote]'
 			// geid('ReplyContent').value += str
-			str = '<blockquote cite='+post.user.username+','+post.pid+' display="none">'+'引用 '+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
+      if(!post.anonymous) {
+        str = '<blockquote cite='+post.user.username+','+post.pid+' display="none">'+'引用 '+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
+      } else {
+        str = '<blockquote cite=anonymous,'+post.pid+' display="none">'+'引用 '+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
+      }
+
 			geid('quoteContent').innerHTML = str
 			// geid('ReplyContent-elem').innerHTML = str
 			window.location.href='#container';

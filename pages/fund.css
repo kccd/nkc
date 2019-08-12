@@ -148,9 +148,9 @@ a:focus{text-decoration: none}
   overflow: hidden;
   margin-bottom: 0.5rem;
 }
-input[type="radio"], input[type="checkbox"]{
+/*input[type="radio"], input[type="checkbox"]{
   margin-top: 0.9rem;
-}
+}*/
 .redFontColor{
   color: red;
   font-size: 1.4rem;
@@ -1147,6 +1147,9 @@ input[type="radio"], input[type="checkbox"]{
 }
 #projectContent{
   font-size: 1.6rem;
+}
+#projectContent img{
+  max-width: 100%;
 }
 #projectTitle{
   font-size: 2.4rem;

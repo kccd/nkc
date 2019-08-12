@@ -116,11 +116,11 @@ const getDomByType = (t) => {
   } else if(t === "reason") {
     return "item.c.rea"
   } else if(t === "userID") {
-    return "item.c.user.uid"
+    return "item.c.user?item.c.user.uid:''"
   } else if(t === "userURL") {
-    return "'/u/' + item.c.user.uid"
+    return "item.c.user?'/u/' + item.c.user.uid: ''"
   } else if(t === "username") {
-    return "item.c.user.username"
+    return "item.c.user?item.c.user.username:'匿名用户'"
   } else if(t === "editPostURL") {
     return "'/editor?type=post&id=' + item.c.post.pid"
   } else if(t === "editThreadURL") {
