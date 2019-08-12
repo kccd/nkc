@@ -646,7 +646,7 @@ threadRouter
       });
 			if(sub) data.subscribed = true;
 
-			data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid);
+			data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid, thread.mainForumsId);
 
 		}
 

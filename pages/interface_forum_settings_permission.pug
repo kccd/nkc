@@ -106,6 +106,17 @@ block content
                       input(type='radio' name='subType' checked=forum.subType==="unSub")
                       span.m-l-1 不可关注（不可关注，已关注的可取消关注）
               .form-group
+                label.col-sm-3.control-label 发表匿名内容
+                .col-sm-5
+                  h5
+                    .radiobox(style='display: inline-block;margin-right: 1rem;')
+                      span 允许
+                      input(type='radio' name='sendAnonymousPost' checked=forum.sendAnonymousPost)
+                    .radiobox(style='display: inline-block;margin-right: 1rem;')
+                      span 禁止
+                      input(type='radio' name='sendAnonymousPost'  checked=!forum.sendAnonymousPost)
+
+              .form-group
                 .col-sm-5.col-sm-offset-3
                   button.btn.btn-default(onclick=`submit("${forum.fid}")`) 保存
 block scripts

@@ -196,6 +196,11 @@ const forumSchema = new Schema({
     type: String,
     default: "free",
     index: 1
+  },
+  // 是否允许发表匿名内容
+  sendAnonymousPost: {
+    type: Boolean,
+    default: false
   }
 }, {toObject: {
 		getters: true,

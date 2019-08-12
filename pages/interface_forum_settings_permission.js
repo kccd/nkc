@@ -1,4 +1,4 @@
-$('input[name="selectRole"], input[name="selectGrade"], input[name="selectRelation"], input[name="subType"]').iCheck({
+$('input[name="selectRole"],input[name="sendAnonymousPost"], input[name="selectGrade"], input[name="selectRelation"], input[name="subType"]').iCheck({
 	checkboxClass: 'icheckbox_minimal-red',
 	radioClass: 'iradio_minimal-red',
 });
@@ -37,6 +37,8 @@ function submit(fid) {
 	  subType = "unSub"
   }
 	if(!subType) return screenTopWarning("请选择关注类型");
+	var sendAnonymousPost = $("input[name='sendAnonymousPost']");
+  sendAnonymousPost = sendAnonymousPost.eq(0).prop("checked");
 	var obj = {
 		klass: $('#contentClass').val(),
 		accessible: switchStatus('accessible'),
@@ -49,7 +51,8 @@ function submit(fid) {
     shareLimitCount: $('#shareLimitCount').val(),
     shareLimitTime: $('#shareLimitTime').val(),
     moderators: $('#moderators').val(),
-    subType: subType
+    subType: subType,
+    sendAnonymousPost: sendAnonymousPost
 	};
 	nkcAPI('/f/'+fid+'/settings/permission', 'PATCH', obj)
 		.then(function() {

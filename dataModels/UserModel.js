@@ -1385,16 +1385,22 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
 * 验证用户是否有权限发表匿名内容
 * @param {String} uid 用户ID
 * @param {String} type thread: 发表文章, post: 发表回复
+* @param {[String]} forumsId 专业ID组成的数组, 若不传该参数则默认全部专业都允许发表匿名内容
 * @return {Boolean} 是否有权
 * @author pengxiguaa 2019-8-8
 * */
-userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId) => {
+userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId, forumsId) => {
   if(!["postToForum", "postToThread"].includes(type)) return false;
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model("settings");
+  const ForumModel = mongoose.model("forums");
   const postSettings = await SettingModel.getSettings("post");
   const {uid, status, defaultCertGradesId, rolesId} = postSettings[type].anonymous;
   if(!status) return false;
+  if(forumsId) {
+    const forumCount = await ForumModel.count({fid: {$in: forumsId}, sendAnonymousPost: true});
+    if(forumCount !== forumsId.length) return false;
+  }
   const user = await UserModel.findOne({uid: userId});
   if(!user) return false;
   if(uid.includes(userId)) return true;
