@@ -9,6 +9,7 @@ const voteRouter = require('./vote');
 const warningRouter = require("./warning");
 const postRouter = require("./post");
 const Path = require("path");
+const authorRouter = require("./author");
 const router = new Router();
 
 router
@@ -427,6 +428,7 @@ router
   .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())
   .use('/:pid/vote', voteRouter.routes(), voteRouter.allowedMethods())
   .use('/:pid/warning', warningRouter.routes(), warningRouter.allowedMethods())
+  .use("/:pid/author", authorRouter.routes(), authorRouter.allowedMethods())
   .use('/:pid/quote', quote.routes(), quote.allowedMethods())
   .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods());
 module.exports = router;

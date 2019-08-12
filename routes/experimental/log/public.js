@@ -3,41 +3,37 @@ const router = new Router();
 router
   .get('/', async(ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
-    const {page=0, type} = query;
-    let searchMap = {}
-    if(type === "searchLog"){
-      const sTime = query.sTime !== ""?new Date(query.sTime) : "";
-      const eTime = query.eTime !== ""?new Date(query.eTime) : "";
-      const ip = query.ip !== ""?query.ip : "";
-      const uid = query.uid !== ""?query.uid : "";
-      let searchLogMap = [{reqTime: {$gte: sTime, $lt: eTime}}]
-      if(ip !== ""){
-        searchLogMap.push({"ip": ip})
-      }
-      if(uid !== ""){
-        searchLogMap.push({"uid": uid})
-      }
-      searchMap = {
-        "$and":searchLogMap
-      }
-      data.type = "searchLog";
+    let {page=0, c} = query;
+    data.c = c;
+    if(c) {
+      c = JSON.parse(decodeURIComponent(Buffer.from(c, "base64").toString()));
+    } else {
+      c = {};
+    }
+    const searchMap = {};
+    if(c.sTime || c.eTime) {
+      searchMap.reqTime = {};
+      if(c.sTime) searchMap.reqTime.$gte = c.sTime;
+      if(c.eTime) searchMap.reqTime.$lt = c.eTime;
+    }
+    if(c.ip) {
+      searchMap.ip = c.ip;
+    }
+    if(c.uid) {
+      searchMap.uid = c.uid;
+    }
+    if(c.operationId) {
+      searchMap.operationId = c.operationId;
     }
     const count = await db.LogModel.count(searchMap);
-		const paging = nkcModules.apiFunction.paging(page, count);
-    data.paging = paging
-    // data.result = await db.LogModel.find({}).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
+		const paging = nkcModules.apiFunction.paging(page, count, 60);
     const logs = await db.LogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
     data.result = await Promise.all(logs.map(async behavior => {
       await behavior.extendUser();
-      await behavior.extendOperationName();
 			return behavior;
     }));
-    data.searchMap = {
-      sTime: query.sTime?query.sTime:"",
-      eTime: query.eTime?query.eTime:"",
-      uid: query.uid?query.uid:"",
-      ip: query.ip?query.ip:""
-    };
+    data.searchMap = c;
+    data.paging = paging;
     ctx.template = 'experimental/log/public.pug';
     await next()
   })

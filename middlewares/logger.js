@@ -51,20 +51,6 @@ const logger = async (ctx, next) => {
     // -----------------------------------------------------------------------------------------
 
     // -------------------------------------构建数据---------------------------------------------
-    // 定义存入logs的数据
-    let log = {
-      operationId: ctx.data.operationId,
-      error: ctx.error,
-      method: ctx.method,
-      path: ctx.path,
-      query: ctx.query,
-      status: ctx.status,
-      ip,
-      port,
-      processTime,
-      reqTime: ctx.reqTime,
-      uid: ctx.data.user ? ctx.data.user.uid : 'visitor'
-    };
     // 定义存入四分类的数据(必存数据)
     let behavior = {
       type: classType,
@@ -142,61 +128,28 @@ const logger = async (ctx, next) => {
         }
         await new db.SecretBehaviorModel(behavior).save()
       }
-      // if (typeId === 2) {
-      //   await new db.ManageBehaviorModel(behavior).save()
-      // }
-      // if (typeId === 3) {
-      //   await new db.UsersBehaviorModel(behavior).save()
-      // }
-      // if (typeId === 4) {
-      //   await new db.InfoBehaviorModel(behavior).save()
-      // }
-      // if (typeId === 5) {
-      //   // const behavior = Object.assign(para, {port, ip});
-      //   if(ctx.data.operationId === "modifyPassword"){
-      //     behavior.oldHashType = userPersonal.hashType;
-      //     behavior.oldHash = userPersonal.password.hash;
-      //     behavior.oldSalt = userPersonal.password.salt;
-      //     behavior.newHashType = newPasswordObj.hashType;
-      //     behavior.newHash = newPasswordObj.password.hash;
-      //     behavior.newSalt = newPasswordObj.password.salt;
-      //   }
-      //   if(ctx.data.operationId === "modifyUsername"){
-      //     behavior.newUsername = newChangeUsername;
-      //     behavior.newUsernameLowerCase = newChangeUsername.toLowerCase();
-      //     behavior.oldUsername = oldChangeUsername;
-      //     behavior.oldUsernameLowerCase = oldChangeUsername.toLowerCase();
-      //   }
-      //   if(ctx.data.operationId === "bindEmail"){
-      //     behavior.email = newBindEmail
-      //   }
-      //   if(ctx.data.operationId === "changeEmail"){
-      //     behavior.oldEmail = userPersonal.email;
-      //     behavior.newEmail = newChangeEmail;
-      //   }
-      //   if(ctx.data.operationId === "bindMobile"){
-      //     behavior.mobile = newBindMobile;
-      //     behavior.nationCode = newBindNationCode;
-      //   }
-      //   if(ctx.data.operationId === "modifyMobile"){
-      //     behavior.oldMobile = userPersonal.mobile;
-      //     behavior.oldNationCode = userPersonal.nationCode;
-      //     behavior.newMobile = newModifyMobile;
-      //     behavior.newNationCode = newModifyNationCode;
-      //   }
-      //   await new db.SecretBehaviorModel(behavior).save()
-    //   }
     }
     // ---------------------------------------存入大分类结束-----------------------------------------
 
     // -----------------------------------------存入logs--------------------------------------------
     // 取出日志白名单，并在logs中记录日志
-    let needLog = false;
     if (operationsId && operationsId.includes(ctx.data.operationId)) {
-      needLog = true;
-    }
-    if (ctx.status !== 304 && needLog) {
-      await new db.LogModel(log).save();
+      const log = {
+        operationId: ctx.data.operationId,
+        error: ctx.error,
+        method: ctx.method,
+        path: ctx.path,
+        query: ctx.query,
+        status: ctx.status,
+        ip,
+        port,
+        processTime,
+        reqTime: ctx.reqTime,
+        uid: ctx.data.user ? ctx.data.user.uid : 'visitor',
+        referer: ctx.get("referer"),
+        userAgent: ctx.get("User-Agent")
+      };
+      await db.LogModel(log).save();
       const excludeUrl = ["/login", "/register", "/register/mobile", "/logout"];
       if(ctx.data.user) excludeUrl.push(`/u/${ctx.data.user.uid}/subscribe/register`);
       if(
@@ -211,57 +164,9 @@ const logger = async (ctx, next) => {
         urls.unshift(url);
         ctx.setCookie("visitedUrls", urls);
       }
-
     }
-
-  }else{
-    await next()
+  } else {
+    await next();
   }
-  // --------------------------------------存入logs结束-------------------------------------------
-  // await next()
 };
 module.exports = logger;
-// module.exports = async (ctx) => {
-//   const {LogModel} = ctx.db;
-//   const processTime = ctx.processTime;
-//   const {address: ip, port} = ctx;
-//   const log = {
-//     error: ctx.error,
-//     method: ctx.method,
-//     path: ctx.path,
-//     query: ctx.query,
-//     status: ctx.status,
-//     ip,
-//     port,
-//     reqTime: ctx.reqTime,
-//     processTime,
-//     uid: ctx.data.user? ctx.data.user.uid : 'visitor'
-//   };
-//   if(ctx.logIt) {
-//     if (ctx.error) {
-//       console.error(
-//         ' Error '.bgRed + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${(ctx.data.operation || '404').bgGreen} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red}`
-//       );
-//       if (global.NKC.NODE_ENV !== 'production')
-//         console.error(log.error);
-//     } else {
-//       console.log(
-//         ' Info '.bgGreen + ` ${log.reqTime.toLocaleTimeString().grey} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${(ctx.data.operation || '404').bgGreen} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green}`
-//       );
-//     }
-//   }
-//   const pathArr = log.path.split('/');
-// 	const lastPath = pathArr[pathArr.length - 1];
-// 	let needLog = true;
-// 	for(let path of excludePath) {
-// 		if(lastPath.includes(path)) {
-// 			needLog = false;
-// 		}
-// 	}
-// 	if(pathArr[1] && ['favicon.ico', 'avatar','avatar_small' , 'cover', 'pfa', 'pfb', 'photo', 'photo_small'].includes(pathArr[1])) {
-// 		needLog = false;
-// 	}
-//   if(ctx.status !== 304 && needLog) {
-// 	  await new LogModel(log).save();
-//   }
-// };

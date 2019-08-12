@@ -55,6 +55,11 @@ block title
           a(href=`/p/${post.pid}`)
             span.fa.fa-newspaper-o &nbsp;
             span 详情
+        if permission("getPostAuthor") && post.anonymous
+          li
+            a(onclick=`NKC.methods.getPostAuthor('${post.pid}')`)
+              span.fa.fa-user-secret &nbsp;
+              span 作者
         if postTo && !thread.closed
           if targetThread
             li

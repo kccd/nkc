@@ -70,6 +70,8 @@ block content
                 if testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc)
                   if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
                     .options-fa.fa.fa-edit(onclick=`openToNewLocation("/editor?type=post&id=${post.pid}")`) &nbsp;编辑
+                if permission("getPostAuthor") && post.anonymous
+                  .options-fa.fa.fa-user-secret(onclick=`NKC.methods.getPostAuthor('${post.pid}')`) &nbsp;作者
                 if disablePost
                   if data.thread.oc !== post.pid
                     .options-fa.fa.fa-eye-slash(onclick=`disablePostClick('${post.pid}', "post")` data-toggle="modal" data-target="#threadRecycleModal" data-whatever="@mdo") &nbsp;屏蔽
