@@ -144,6 +144,9 @@ resourceRouter
           await ffmpeg.videoAviTransAvi(targetPath, targetPath);
           await ffmpeg.videoAVITransMP4(targetPath, targetVideoPath);
         }
+        // 视频封面图路径
+        var videoImgPath = messageFilePath + generateFolderName(messageVideoBrowser) + _id + "-frame.jpg";
+        await ffmpeg.videoFirstThumbTaker(targetVideoPath, videoImgPath);
       }
       await messageFile.save();
       await message.save();
