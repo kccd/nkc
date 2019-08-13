@@ -47,7 +47,7 @@ NKC.modules.MoveThread = function() {
               arr.push(forum);
               continue;
             }
-            for(var ii = 0; i < forum.allChildForums.length; i++) {
+            for(var ii = 0; ii < forum.allChildForums.length; ii++) {
               var ff = forum.allChildForums[ii];
               if(ff.allowedAnonymousPost) {
                 arr.push(forum);

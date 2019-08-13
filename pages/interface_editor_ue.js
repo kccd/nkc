@@ -162,11 +162,11 @@ function verifyAnonymousPermission(targetForumsId) {
   ) return false;
   for(var i = 0; i < targetForumsId.length; i++) {
     var fid = targetForumsId[i];
-    if(anonymousData.allowedAnonymousForumsId.indexOf(fid) === -1) {
-      return false;
+    if(anonymousData.allowedAnonymousForumsId.indexOf(fid) !== -1) {
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 function getSelectedColumnCategoriesId() {

@@ -1397,7 +1397,7 @@ userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId, foru
   if(!status) return false;
   if(forumsId) {
     const forumCount = await ForumModel.count({fid: {$in: forumsId}, allowedAnonymousPost: true});
-    if(forumCount !== forumsId.length) return false;
+    if(forumCount === 0) return false;
   }
   const user = await UserModel.findOne({uid: userId});
   if(!user) return false;
