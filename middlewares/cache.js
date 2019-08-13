@@ -45,7 +45,7 @@ module.exports = async (ctx, next) => {
       ctx.set("Content-Type", "text/html");
       const processTime = (Date.now() - ctx.reqTime).toString();
       console.log(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${"visitor".bgCyan} ${ctx.method.blue} ${path.bgBlue} <${processTime.green}ms> ${"200".green} ${lang(data.operationId).grey}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${"visitor".bgCyan} ${ctx.method.green} ${path.bgBlue} <${processTime.green}ms> ${"200".green} ${lang(data.operationId).grey}`
       );
       const d = {
         url: ctx.path,

@@ -77,8 +77,8 @@ block content
                         input#sendAnonymousPost(type='checkbox' checked)
                       else
                         input#sendAnonymousPost(type='checkbox')
-                      span 匿名发表（勾选即同意遵守
-                        a(href=`/protocol?type=original` target="_blank") 《匿名发表协议》
+                      span 匿名发表（勾选即代表同意遵守
+                        a(href=`/protocol?type=anonymous` target="_blank") 《匿名发表协议》
                         |）
                 if state.userColumn && !data.addedToColumn
                   -const column = state.userColumn

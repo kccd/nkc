@@ -79,8 +79,8 @@ editorRouter
       // return await next();
     } else if(type === 'post') {
       const targetPost = await db.PostModel.findOnly({pid: id});  //根据pid查询post表
-      if(targetPost.l === "html"){
-        ctx.template = 'interface_editor_test.pug';
+      if(targetPost.l !== "html"){
+        ctx.template = 'interface_editor.pug';
       }
       const targetThread = await db.ThreadModel.findOnly({tid: targetPost.tid});  //根据tid查询thread表
       if(targetPost.pid === targetThread.oc) {
