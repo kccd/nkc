@@ -53,6 +53,16 @@ orderRouter
     });
 		await next();
 	})
+	// 修改物流信息
+	.patch('/editGoods', async(ctx, next) => {
+		const {data, db, params, query, body} = ctx;
+		const {orderId, trackNumber, trackName} = body.post;
+		if(!orderId || !trackNumber) ctx.throw(400, "请填写快递单号");
+		const order = await db.ShopOrdersModel.findOne({orderId});
+		if(!order) ctx.throw(400, "订单无效");
+		await order.update({$set:{trackName:trackName, trackNumber:trackNumber}})
+		await next();
+	})
 	// 无物流发货
 	.patch('/sendGoodsNoLog', async(ctx, next) => {
 		const {data, db, params, query, body} = ctx;
