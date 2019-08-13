@@ -298,9 +298,11 @@ threadRouter
       }
 		};
 		// 只看作者
-		if(t === "author" && !data.anonymous) {
+		if(t === "author") {
 		  data.t = t;
-		  match.uid = thread.uid
+      match.anonymous = !!data.anonymous;
+      match.uid = thread.uid
+
     }
 		const $and = [];
 		// 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
