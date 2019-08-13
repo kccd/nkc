@@ -395,7 +395,17 @@ threadRouter
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
-    thread.firstPost = data.posts[0];
+    await thread.extendFirstPost();
+    await thread.firstPost.extendResources();
+    if(thread.firstPost.anonymous) {
+      thread.uid = "";
+      thread.firstPost.uid = "";
+      thread.firstPost.uidlm = "";
+    } else {
+      await thread.firstPost.extendUser();
+      await db.UserModel.extendUsersInfo([thread.firstPost.user]);
+      await thread.firstPost.user.extendGrade();
+    }
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid}, {postId: 1, reason: 1});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
@@ -701,7 +711,7 @@ threadRouter
 			}
 		}
 		// data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
-		data.thread = data.thread.toObject();
+		// data.thread = data.thread.toObject();
 		data.pid = pid;
 		data.step = step;
 		await next();
