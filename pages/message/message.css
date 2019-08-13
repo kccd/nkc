@@ -563,6 +563,14 @@ body, html{
 .ms-right-input-button div .fa:hover{
   color: #337ab7;
 }
+
+.ms-single-content-video {
+  height: 17rem;
+  overflow: hidden;
+  position: relative;
+  max-width: 25rem;
+}
+
 .ms-single-content-image{
   height: 15rem;
   overflow: hidden;

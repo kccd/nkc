@@ -16,7 +16,7 @@ block content
         #content
           .list-group
             for protocol in data.protocols
-              a.list-group-item(title=protocol.protocolName href=`/e/settings/protocol/${protocol.protocolTypeId}` type="button" class=protocol.protocolTypeId === data.type ? 'active' : '')!=`${protocol.protocolTypeName}`
+              a.list-group-item(title=protocol.protocolName href=`/e/settings/protocol/${protocol.protocolTypeId}` type="button" class=protocol.protocolTypeId === data.type ? 'active' : '')!=`${protocol.protocolTypeName}(ID: ${protocol.protocolTypeId})`
           .list-group
             a.btn.btn-default.btn-block(href='/e/settings/protocol') 新增协议
             if data.type && data.type !== "add"
@@ -25,8 +25,6 @@ block content
       if data.visitType && data.visitType == "update"
         .col-xs-12.col-md-9
           .row
-            //- .col-xs-12.col-md-12
-            //-   button.btn.btn-primary.btn-sm 新增
             .col-xs-12.col-md-12
               .form-horizontal
                 .form-group
@@ -48,15 +46,14 @@ block content
                   .hidden#protocolHide= data.protocol.protocolContent
                   label.col-sm-2.control-label 协议内容
                   .col-sm-10
-                    div#content_test
+                    // 加载编辑器的容器
+                    script#container(name='content', type='text/plain')
             .col-xs-12.col-md-12(style="text-align:end")
-              button.btn.btn-warning.btn-sm(onclick=`updateProtocol('${data.protocol.protocolTypeId}')`) 保存修改
+              button#updateEdit.btn.btn-warning.btn-sm(onclick=`updateProtocol('${data.protocol.protocolTypeId}')`) 保存修改
       else
         if !data.type || data.type == "add"
           .col-xs-12.col-md-9
             .row
-              //- .col-xs-12.col-md-12
-              //-   button.btn.btn-primary.btn-sm 新增
               .col-xs-12.col-md-12
                 .form-horizontal
                   .form-group
@@ -77,9 +74,10 @@ block content
                   .form-group
                     label.col-sm-2.control-label 协议内容
                     .col-sm-10
-                      div#content_test
+                      // 加载编辑器的容器
+                      script#container(name='content', type='text/plain')
               .col-xs-12.col-md-12(style="text-align:end")
-                button.btn.btn-primary.btn-sm(onclick="addProtocol()") 保存
+                button#updateAdd.btn.btn-primary.btn-sm(onclick="addProtocol()") 保存
         else
           .col-xs-12.col-md-9
             .row
@@ -102,7 +100,30 @@ block scripts
   +includeJS("/xss/dist/xss.js")
   +includeJS("/interface_common.js")
   +includeJS("/nkc_render.js")
+  include ../../ueditor/ueditorEasy.pug
+  script.
+    // 获取header高度
+    var ue = UE.getEditor('container', {
+      toolbars: [
+        [
+          'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', 'horizontal', '|', 'fontsize', 'forecolor', 'backcolor',  '|', 'indent',  'justifyleft', 'justifycenter', 'justifyright'
+        ]
+      ],
+      maximumWords: 100000, // 最大字符数
+      initialFrameHeight: 300, // 编辑器高度
+      autoHeightEnabled:false, // 编辑器是否随着行数增加而自动长高
+      scaleEnabled: true, // 是否允许拉长
+      topOffset: 50, // toolbar工具栏在滚动时的固定位置
+      //- imagePopup: false, // 是否开启图片调整浮层
+      //- enableContextMenu: false, // 是否开启右键菜单
+      enableAutoSave: false, // 是否启动自动保存
+      elementPathEnabled: false, // 是否显示元素路径
+      imageScaleEnabled: false, // 启用图片拉伸缩放
+      enableContextMenu: false,
+      contextMenu: [],
+      imgTotal: 0, 
+      imgCount: 0,
+      zIndex : 499
+    });
   +includeJS("/experimental/settings/protocol.js")
-
-
 

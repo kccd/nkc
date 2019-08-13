@@ -1,13 +1,10 @@
-$("document").ready(function() {
-  $(".w-e-text-container").css("height", "450px")
-  //编辑器缩放
-	if($(".w-e-text-container").length === 0) return;
-  $(".w-e-text-container").resizable({
-    containment: '#body',
-    minHeight: 100,
-    minWidth: 100,
-    maxWidth: 1400
-  });
+$("document").ready(function() {  
+  if($("#protocolHide").length > 0) {
+    var protocolHide = $("#protocolHide").text();
+    ue.ready(function(){ 
+      ue.setContent(protocolHide);
+    })
+  }
 })
 
 function test() {
@@ -22,14 +19,15 @@ function addProtocol() {
   }catch(err) {
     return screenTopWarning(err)
   }
+  document.getElementById("updateAdd").disabled = true;
   nkcAPI("/e/settings/protocol", "POST", post)
   .then(function(data) {
     screenTopAlert("保存成功");
-    // window.location.href = '/e/settings/protocol/' + data.protocolTypeId;
     openToNewLocation('/e/settings/protocol/' + data.protocolTypeId);
   })
   .catch(function(data) {
-    screenTopWarning(data || data.error)
+    screenTopWarning(data || data.error);
+    document.getElementById("updateAdd").disabled = false;
   })
 }
 
@@ -47,6 +45,7 @@ function updateProtocol(id) {
     return screenTopWarning(err)
   }
   post.id = id;
+  document.getElementById("updateEdit").disabled = true;
   nkcAPI("/e/settings/protocol/"+id, "PATCH", post)
   .then(function(data) {
     screenTopAlert("保存成功");
@@ -54,7 +53,8 @@ function updateProtocol(id) {
     // window.location.href = '/e/settings/protocol/' + data.protocolTypeId;
   })
   .catch(function(data) {
-    screenTopWarning(data || data.error)
+    screenTopWarning(data || data.error);
+    document.getElementById("updateEdit").disabled = false;
   })
 }
 
@@ -66,7 +66,7 @@ function deleteProtocol(id) {
     nkcAPI("/e/settings/protocol/"+id, "POST", post)
     .then(function(data) {
       screenTopAlert("该协议已删除");
-      openToNewLocation(/e/settings/protocol);
+      openToNewLocation("/e/settings/protocol");
       // window.location.href = "/e/settings/protocol"
     })
     .catch(function(data) {
@@ -81,9 +81,12 @@ function getProtocol() {
   if(!protocolName) throw("请填写协议名称");
   var protocolTypeId = $("#protocolTypeId").val();
   if(!protocolTypeId) throw("请使用小写英文填写协议类型ID");
+  var existEn = /.*[\u4e00-\u9fa5]+.*$/.test(protocolTypeId);
+  if(existEn) throw("协议类型ID不可包含中文字符");
+  protocolTypeId = protocolTypeId.toLocaleLowerCase();
   var protocolTypeName = $("#protocolTypeName").val();
   if(!protocolTypeName) throw("请使用中文填写协议类型名称");
-  var protocolContent = document.getElementById("text-elem").innerHTML;
+  var protocolContent = ue.getContent();
   protocolContent = common.URLifyHTML(protocolContent);
   var post = {
     protocolName: protocolName,
