@@ -150,22 +150,27 @@ const logger = async (ctx, next) => {
         userAgent: ctx.get("User-Agent")
       };
       await db.LogModel(log).save();
-      const excludeUrl = ["/login", "/register", "/register/mobile", "/logout"];
-      if(ctx.data.user) excludeUrl.push(`/u/${ctx.data.user.uid}/subscribe/register`);
-      if(
-        method === "GET" &&
-        !excludeUrl.includes(url)
-      ) {
-        // 将最近十次访问的url，写入cookie
-        const urls = ctx.getCookie("visitedUrls") || [];
-        if(urls.length >= 10) {
-          urls.splice(urls.length-1, 1);
-        }
-        urls.unshift(url);
-        ctx.setCookie("visitedUrls", urls);
-      }
     }
   } else {
+    if(operationsId && operationsId.includes(ctx.data.operationId)) {
+      const log = {
+        operationId: ctx.data.operationId,
+        error: ctx.error,
+        method: ctx.method,
+        path: ctx.path,
+        query: ctx.query,
+        status: ctx.status,
+        ip,
+        port,
+        processTime,
+        reqTime: ctx.reqTime,
+        referer: ctx.get("referer"),
+        userAgent: ctx.get("User-Agent")
+      };
+      setTimeout(async () => {
+        await db.VisitorLogModel(log).save();
+      });
+    }
     await next();
   }
 };

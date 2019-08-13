@@ -41,6 +41,8 @@ function searchLogs(){
   var operationId = $("#operationId").val().trim();
   var st = (new Date(sTime)).getTime();
   var et = (new Date(eTime)).getTime();
+  var t = $("#dataT").attr("data-t");
+  t = t || "";
   if(st && et && st > et){
     return sweetError("结束时间不能早于开始时间");
   }
@@ -52,5 +54,8 @@ function searchLogs(){
     ip: ip
   };
   var url = '/e/log/public?c=' + NKC.methods.strToBase64(JSON.stringify(c));
+  if(t) {
+    url += '&t='+ t;
+  }
   NKC.methods.visitUrl(url);
 }

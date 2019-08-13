@@ -3,8 +3,9 @@ const router = new Router();
 router
   .get('/', async(ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
-    let {page=0, c} = query;
+    let {page=0, c, t} = query;
     data.c = c;
+    data.t = t;
     if(c) {
       c = JSON.parse(decodeURIComponent(Buffer.from(c, "base64").toString()));
     } else {
@@ -25,13 +26,20 @@ router
     if(c.operationId) {
       searchMap.operationId = c.operationId;
     }
-    const count = await db.LogModel.count(searchMap);
-		const paging = nkcModules.apiFunction.paging(page, count, 60);
-    const logs = await db.LogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
-    data.result = await Promise.all(logs.map(async behavior => {
-      await behavior.extendUser();
-			return behavior;
-    }));
+    let paging;
+    if(!t) {
+      const count = await db.LogModel.count(searchMap);
+      paging = nkcModules.apiFunction.paging(page, count, 60);
+      const logs = await db.LogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
+      data.result = await Promise.all(logs.map(async behavior => {
+        await behavior.extendUser();
+        return behavior;
+      }));
+    } else {
+      const count = await db.VisitorLogModel.count(searchMap);
+      paging = nkcModules.apiFunction.paging(page, count, 60);
+      data.result = await db.VisitorLogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
+    }
     data.searchMap = c;
     data.paging = paging;
     ctx.template = 'experimental/log/public.pug';

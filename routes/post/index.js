@@ -352,11 +352,18 @@ router
     targetPost.keyWordsCn = keyWordsCn;
     targetPost.keyWordsEn = keyWordsEn;
     const postType = targetPost.pid === targetThread.oc? "postToForum": "postToThread";
-    if(await db.UserModel.havePermissionToSendAnonymousPost(postType, user.uid)) {
-      if(postType !== "postToForum" || !["product", "fund"].includes(targetThread.type)) {
-        targetPost.anonymous = !!sendAnonymousPost;
+    if(sendAnonymousPost) {
+      if(await db.UserModel.havePermissionToSendAnonymousPost(postType, user.uid, targetPost.mainForumsId)) {
+        if(postType !== "postToForum" || !["product", "fund"].includes(targetThread.type)) {
+          targetPost.anonymous = true;
+        } else {
+          ctx.throw(400, "基金类文章和商品类文章不允许匿名发表");
+        }
+      } else {
+        ctx.throw(400, "您没有权限或专业不予许发表匿名内容");
       }
-
+    } else {
+      targetPost.anonymous = false;
     }
     let newAuthInfos = [];
     for(let a = 0;a < authorInfos.length;a++) {

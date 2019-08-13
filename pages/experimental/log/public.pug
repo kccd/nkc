@@ -10,8 +10,10 @@ block title
       overflow: hidden;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 1;
+      cursor: pointer;
     }
     .referer{
+      cursor: pointer;
       max-height: 4rem;
       display: -webkit-box;
       overflow: hidden;
@@ -25,6 +27,12 @@ block content
       include ../nav
       .col-xs-12.col-md-12
         .row
+          .col-xs-12.col-md-12
+            ul.nav.nav-tabs.m-b-2#dataT(data-t=data.t)
+              li(class=!data.t?"active":"")
+                a(href=`/e/log/public`) 用户
+              li(class=data.t === "visitor"?"active":"")
+                a(href=`/e/log/public?t=visitor`) 游客
           .col-xs-12.col-md-12
             .form.form-inline
               .form-group

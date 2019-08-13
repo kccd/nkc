@@ -26,6 +26,7 @@ const emailRouter = require('./email');
 const subRouter = require('./sub');
 const shopRouter = require('./shop');
 const registerRouter = require('./register');
+const loginRouter = require("./login");
 const authRouter = require("./auth");
 const columnRouter = require("./column");
 const safeRouter = require('./safe');
@@ -68,5 +69,6 @@ settingRouter
   .use('/shop', shopRouter.routes(), shopRouter.allowedMethods())
   .use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
   .use("/column", columnRouter.routes(), columnRouter.allowedMethods())
+  .use("/login", loginRouter.routes(), loginRouter.allowedMethods())
   .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = settingRouter;

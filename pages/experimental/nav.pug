@@ -135,6 +135,9 @@
           if permission("experimentalCacheSettings")
             li
               a(href=`/e/settings/cache`) 缓存
+          if permission("experimentalLoginSettings")
+            li
+              a(href=`/e/settings/login`) 登录
 
           <li role="separator" class="divider"></li>    
           li

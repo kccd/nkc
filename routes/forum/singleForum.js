@@ -58,6 +58,14 @@ router
 		options.content = post.c;
 		options.type = "article";
 		options.ip = ip;
+		let anonymousPost = false;
+    if(sendAnonymousPost) {
+      if(await db.UserModel.havePermissionToSendAnonymousPost("postToForum", user.uid, fids)) {
+        anonymousPost = true;
+      } else {
+        ctx.throw(400, "您没有权限或已选专业不允许发表匿名文章");
+      }
+    }
 		const _post = await db.ThreadModel.postNewThread(options);
 		
 		// 根据thread生成封面图
@@ -70,10 +78,8 @@ router
     }
 
     // 发表匿名内容
-    if(
-      await db.UserModel.havePermissionToSendAnonymousPost("postToForum", user.uid) &&
-      sendAnonymousPost
-    ) {
+
+    if(anonymousPost) {
       await db.PostModel.updateOne({pid: thread.oc}, {$set: {anonymous: true}});
     }
 

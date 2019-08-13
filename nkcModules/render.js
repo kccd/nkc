@@ -466,7 +466,7 @@ let pugRender = (template, data, state) => {
     objToStr,
     anonymousInfo: {
       username: "匿名用户",
-      avatar: "/avatar/"
+      avatar: "/default/default_anonymous_user_avatar.jpg"
     }
   };
   options.data = data;

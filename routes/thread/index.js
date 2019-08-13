@@ -763,6 +763,16 @@ threadRouter
 		if(postType === "comment" && post.c.length > 1000) {
       ctx.throw(400, "评论内容不能超过1000字符");
     }
+
+		let anonymousPost = false;
+		if(sendAnonymousPost) {
+		  if(await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid, thread.mainForumsId)) {
+        anonymousPost = true;
+      } else {
+		    ctx.throw(400, "您没有权限或文章所在专业不允许发表匿名内容");
+      }
+    }
+
 		const _post = await thread.newPost(post, user, ctx.address);
 
     // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
@@ -782,10 +792,7 @@ threadRouter
     }
 
     // 发表匿名内容
-    if(
-      await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid) &&
-      sendAnonymousPost
-    ) {
+    if(anonymousPost) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {anonymous: true}});
     }
 

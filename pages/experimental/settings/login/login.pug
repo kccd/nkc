@@ -1,0 +1,43 @@
+extends ../../experimental
+block eTitle
+  title 登录设置
+block eContent
+  .container-fluid.max-width
+    #data.hidden=objToStr({loginSettings: data.loginSettings, operations: data.operations})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        .form.form-horizontal
+          .form-group
+            label.col-sm-2.control-label 最大尝试登录次数
+            .col-sm-5
+              input.form-control(type="text" v-model.number="loginSettings.maxLoginCountOneHour")
+              span.text-danger 若一小时内尝试登录的次数超过{{loginSettings.maxLoginCountOneHour}}，则需等待一小时后才能再次尝试登录。
+          .form-group
+            label.col-sm-2.control-label 登录跳转
+            .col-sm-10
+              table.table.table-bordered
+                .thead
+                  tr
+                    th #
+                    th 操作ID
+                    th 操作名
+                    th
+                .tbody
+                  tr(v-for="operation, index of operations")
+                    th {{index + 1}}
+                    th {{operation._id}}
+                    th {{operation.name}}
+                    th
+                      input(type="checkbox" :value="operation._id" v-model="loginSettings.redirectOperationsId")
+              span.text-danger 游客访问以上被勾选操作多对应的页面时，cookie将会记录此页面。在用户登录成功后，浏览器将会跳转到cookie记录中最新的那个页面。
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-10
+              button.btn.btn-primary(@click="save") 保存
+
+
+
+
+block scripts
+  +includeJS("/experimental/settings/login/login.js")
+
