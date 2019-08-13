@@ -130,7 +130,7 @@ loginRouter
 
 			let {
 				tries=1,
-				lastTry = Date.now(),
+				lastTry = 0,
 				hashType
 			} = userPersonal;
 
@@ -138,12 +138,15 @@ loginRouter
 
 			const {hash, salt} = userPersonal.password;
 
-			if(tries > 10 && Date.now() - userPersonal.lastTry < 3600000) {
-				ctx.throw(400, '密码错误次数过多, 请在一小时后再试');
-			}
-			if(/brucezz|zzy2|3131986|1986313|19.+wjs|wjs.+86/.test(password)) {
-				ctx.throw(400, '注册码已过期, 请重新考试');
-			}
+			const loginSettings = await db.SettingModel.getSettings("login");
+
+			if(Date.now() - lastTry < 3600000) {
+        if(tries >= loginSettings.maxLoginCountOneHour) {
+          ctx.throw(400, '密码错误次数过多, 请在一小时后再试');
+        }
+      } else {
+			  tries = 0;
+      }
 			switch(hashType) {
 				case 'pw9':
 					if(encryptInMD5WithSalt(password, salt) !== hash) {

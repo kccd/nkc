@@ -67,17 +67,6 @@ registerRouter
 		  introduction: 'put the cookie in req-header when using for api',
 		  user
 	  };
-	  let forumSettings = await db.SettingModel.findOnly({_id: 'forum'});
-	  forumSettings = forumSettings.c;
-	  const {defaultForumsId=[]} = forumSettings;
-	  if(defaultForumsId.length !== 0) {
-		  for(const fid of defaultForumsId) {
-			  const forum = await db.ForumModel.findOne({fid});
-			  if(!forum) continue;
-			  await forum.update({$addToSet: {followersId: user.uid}});
-		  }
-	  }
-	  await db.UsersSubscribeModel.update({uid: user.uid}, {$set: {subscribeForums: defaultForumsId}});
 	  /*const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);*/
 	  const shareToken = ctx.cookies.get('share-token', {signed: true});

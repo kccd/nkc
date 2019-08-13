@@ -25,14 +25,17 @@ block content
               .review-info 用户：
               .review-user
                 //-img(src=`/avatar/${r.user.uid}`).review-user-avatar
-                a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
+                if r.post.anonymous
+                  span=anonymousInfo.username
+                else
+                  a(href=`/u/${r.user.uid}` target="_blank")=r.user.username
               if r.type === "post"
                 .review-info 类型：
                 .review-time 回复
                 .review-info 标题：
                 .review-thread-title
                   a(href=`/t/${r.thread.tid}` target="_blank")=r.thread.firstPost.t
-                .review-infpubMessageo 专业：
+                .review-info 专业：
                 .review-thread-title
                   for f, index in r.thread.forums
                     if index > 0

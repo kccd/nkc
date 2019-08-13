@@ -24,7 +24,8 @@ function testThOpen() {
     "hideMoveType":true,
     selectedForumsId: selectedForumsId,
     selectedCategoriesId: selectedCategoriesId,
-    forumCountLimit: 2
+    forumCountLimit: 2,
+    showAnonymousCheckbox: true
   });
 }
 /**

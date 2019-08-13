@@ -196,6 +196,11 @@ const forumSchema = new Schema({
     type: String,
     default: "free",
     index: 1
+  },
+  // 是否允许发表匿名内容
+  allowedAnonymousPost: {
+    type: Boolean,
+    default: false
   }
 }, {toObject: {
 		getters: true,
@@ -924,6 +929,7 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
     fid: 1,
     displayName: 1,
     forumType: 1,
+    allowedAnonymousPost: 1,
     color: 1,
     parentsId: 1,
     iconFileName: 1,
@@ -1182,7 +1188,7 @@ forumSchema.statics.createNewThread = async function(options) {
     tid,
     categoriesId: options.cids,
     mainForumsId: options.fids,
-    mid: options.uid,
+    // mid: options.uid,
     uid: options.uid,
     type: options.type
   };

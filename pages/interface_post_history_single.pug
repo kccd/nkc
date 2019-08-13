@@ -7,8 +7,11 @@
       //a(href=`/p/${p.pid}/history/rollback/${p.pid}`) 回滚至此版本
     p.reddish #{dateTimeString(p.tlm)}
     p 作者(修改者)：
-      -var uid = p.uidlm||p.uid
-        a(href=`/m/${uid}`) #{uid}
+      if !data.post.anonymous
+        -var uid = p.uidlm||p.uid
+          a(href=`/m/${uid}`) #{uid}
+      else
+        span=anonymousInfo.username
 
     p 语言：#{p.l}
     if data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')

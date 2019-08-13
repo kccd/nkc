@@ -47,8 +47,15 @@ router
     for(const post of posts) {
       const thread = threadsObj[post.tid];
       if(!thread) continue;
-      const user = usersObj[post.uid];
-      if(!user) continue;
+      let user;
+      if(post.anonymous) {
+        thread.uid = "";
+        post.uid = "";
+        post.uidlm = "";
+      } else {
+        user = usersObj[post.uid];
+        if(!user) continue;
+      }
       let type, link;
       if(thread.oc === post.pid) {
         type = "thread";

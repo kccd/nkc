@@ -26,15 +26,19 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         p.text-center(style='border-bottom: 1px solid #ff5a0b; padding-bottom: 1rem;color: #ff5a0b;')= `退修原因：${post.reason}`
       div
         .inline-block(style='margin-bottom: 0;')
-          a(href=`/u/${post.uid}`)
-            img(src=`/avatar/${post.user.avatar}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
-            span= post.user.username
-          -const targetUser = post.user;
-          include ../user/module_user_grade_icon
+          if !post.anonymous
+            a(href=`/u/${post.uid}` onmouseover=`floatUserPanel.open(this, '${post.uid}')`)
+              img(src=`/avatar/${post.user.avatar}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
+              span= post.user.username
+            -const targetUser = post.user;
+            include ../user/module_user_grade_icon
+          else
+            img(src=anonymousInfo.avatar style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
+            span.anonymous-name= anonymousInfo.username
           if post.digest
             span &nbsp;
             span.fa.fa-star(style='color: #ffbf16;' title='精选')
-          if thread.uid === post.uid
+          if !thread.firstPost.anonymous && thread.uid === post.uid
             span(style='color: #888888;')=`（作者）`
         .inline-block(style='float: right;')
           -var floornumber = data.paging.start+index
@@ -66,7 +70,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
             span.pointer.m-r-05(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`
             -const votePost = post;
             include ../module_vote
-            if addKcb && post.uid !== data.user.uid
+            if !post.anonymous && addKcb && post.uid !== data.user.uid
               .inline-block.post-qrcode
                 .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`)
             .inline-block.post-qrcode

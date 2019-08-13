@@ -17,6 +17,7 @@ const defaultAdPath = siteSpecificPath + '/ad_default.jpg';
 const defaultImageResourcePath = defaultPath + '/default_resource_image.jpg';
 const defaultUserBannerPath = defaultPath + '/default_user_banner.jpg';
 const defaultMessageFilePath = defaultPath + '/default_resource_image.jpg';
+const defaultMessageVideoFramePath = defaultPath + '/default_message_video_frame.jpg';
 const defaultVideoCoverPath = defaultPath + '/videoCover.jpg';
 const defaultForumBannerPath = defaultPath + "/forum_banner.jpg";
 const defaultColumnAvatarPath = defaultPath + "/column_avatar.jpg";
@@ -44,6 +45,7 @@ module.exports = {
   attachIconPath,
   defaultAdPath,
   defaultImageResourcePath,
+  defaultMessageVideoFramePath,
   defaultMessageFilePath,
   defaultForumBannerPath,
   defaultVideoCoverPath,

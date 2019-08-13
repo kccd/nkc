@@ -361,3 +361,73 @@ function saveOrderProductCount(sellUid, costId, orderId) {
     sweetWarning(data.error || data);
   })
 }
+
+/**
+ * 修改物流信息
+ * 已发货，未签收状态下
+ * unSign
+ */
+function openLogositicEdit(uid, orderId) {
+  $("#editGoodsModal").modal("show");
+  // 取出订单物流信息
+  $("#newstoreidEdit").val(uid);
+  $("#neworderidEdit").val(orderId);
+  $("#newtracknumberEdit").val($("#trackNumber"+orderId).text());
+  $("#trackListEdit").val($("#trackName"+orderId).text());
+}
+
+/**
+ * 确认修改物流信息
+ */
+function editGoods() {
+  var orderId = $("#neworderidEdit").val();
+  var sellUid = $("#newstoreidEdit").val();
+  var trackName = $("#trackListEdit").val();
+  if(!orderId || !sellUid) {
+    $("#sendGoodsModal").modal("show");
+    return sweetWarning("请重新点击发货");
+  }
+
+  var trackNumber = $("#newtracknumberEdit").val().trim();
+  if(!trackNumber) return sweetWarning("请填写快递单号");
+  var para = {
+    orderId: orderId,
+    trackNumber: trackNumber,
+    trackName: trackName
+  }
+  nkcAPI('/shop/manage/'+sellUid+'/order/editGoods', "PATCH", {post: para})
+  .then(function(data) {
+    sweetAlert("物流信息修改成功");
+    $("#sendGoodsModal").modal("hide");
+    window.location.reload();
+  })
+  .catch(function(data) {
+    sweetWarning(data || data.error);
+  }) 
+}
+
+/**
+ * 修改为无物流发货
+ */
+function editNotGoods() {
+  var orderId = $("#neworderidEdit").val();
+  var sellUid = $("#newstoreidEdit").val();
+  if(!orderId || !sellUid) {
+    $("#sendGoodsModal").modal("show");
+    return sweetWarning("请重新点击发货");
+  }
+  var para = {
+    orderId: orderId,
+    trackNumber: "no",
+    trackName: ""
+  }
+  nkcAPI('/shop/manage/'+sellUid+'/order/editGoods', "PATCH", {post: para})
+  .then(function(data) {
+    sweetAlert("物流信息修改成功");
+    $("#sendGoodsModal").modal("hide");
+    window.location.reload();
+  })
+  .catch(function(data) {
+    sweetWarning(data || data.error);
+  }) 
+}

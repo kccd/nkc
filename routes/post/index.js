@@ -9,6 +9,7 @@ const voteRouter = require('./vote');
 const warningRouter = require("./warning");
 const postRouter = require("./post");
 const Path = require("path");
+const authorRouter = require("./author");
 const router = new Router();
 
 router
@@ -19,8 +20,13 @@ router
     data.highlight = highlight;
     const post = await db.PostModel.findOnly({pid});
     const thread = await post.extendThread();
-    data.thread = thread;
     await thread.extendFirstPost();
+    data.thread = {
+      tid: thread.tid,
+      firstPost: {
+        t: thread.firstPost.t
+      }
+    };
 	  const forums = await thread.extendForums(['mainForums', 'minorForums']);
     const {user} = data;
     let isModerator = ctx.permission('superModerator');
@@ -67,7 +73,7 @@ router
       
       let shareLimitTime;
       for(const f of forums) {
-        const timeLimit = Number(f.shareLimitTime)
+        const timeLimit = Number(f.shareLimitTime);
         if(shareLimitTime === undefined || shareLimitTime > timeLimit) {
           shareLimitTime = timeLimit;
         }
@@ -82,12 +88,12 @@ router
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
         await post.ensurePermission(options);
 			}
-			if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
+			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
 		}
 	  // await post.ensurePermissionNew(options);
 		// 拓展其他信息
-    await post.extendUser();
-    await post.extendResources();
+    // await post.extendUser();
+    // await post.extendResources();
     let posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
     data.post = posts[0];
     data.postUrl = await db.PostModel.getUrl(data.post);
@@ -107,13 +113,14 @@ router
     }
 
 
-    data.post.user = await db.UserModel.findOnly({uid: post.uid});
-    await db.UserModel.extendUsersInfo([data.post.user]);
-    await data.post.user.extendGrade();
-    data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
-    data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
-    data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
-    data.thread = thread;
+    if(!data.post.anonymous) {
+      data.post.user = await db.UserModel.findOnly({uid: post.uid});
+      await db.UserModel.extendUsersInfo([data.post.user]);
+      await data.post.user.extendGrade();
+    }
+    data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
+    data.kcbSettings = await db.SettingModel.getSettings("kcb");
+    data.xsfSettings = await db.SettingModel.getSettings("xsf");
     ctx.template = 'post/post.pug';
 
     if(data.user) data.complaintTypes = ctx.state.language.complaintTypes;
@@ -201,7 +208,8 @@ router
             user: data.post.user,
             pid: data.post.pid,
             uid: data.post.uid,
-            tid: data.post.tid
+            tid: data.post.tid,
+            anonymous: data.post.anonymous
           };
           topPosts.push(post);
           continue;
@@ -263,7 +271,7 @@ router
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
-    const {t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
+    const {sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {data, db, fs} = ctx;
@@ -343,6 +351,20 @@ router
     targetPost.abstractEn = abstractEn;
     targetPost.keyWordsCn = keyWordsCn;
     targetPost.keyWordsEn = keyWordsEn;
+    const postType = targetPost.pid === targetThread.oc? "postToForum": "postToThread";
+    if(sendAnonymousPost) {
+      if(await db.UserModel.havePermissionToSendAnonymousPost(postType, user.uid, targetPost.mainForumsId)) {
+        if(postType !== "postToForum" || !["product", "fund"].includes(targetThread.type)) {
+          targetPost.anonymous = true;
+        } else {
+          ctx.throw(400, "基金类文章和商品类文章不允许匿名发表");
+        }
+      } else {
+        ctx.throw(400, "您没有权限或专业不予许发表匿名内容");
+      }
+    } else {
+      targetPost.anonymous = false;
+    }
     let newAuthInfos = [];
     for(let a = 0;a < authorInfos.length;a++) {
       if(authorInfos[a].name.length > 0) {
@@ -413,6 +435,7 @@ router
   .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())
   .use('/:pid/vote', voteRouter.routes(), voteRouter.allowedMethods())
   .use('/:pid/warning', warningRouter.routes(), warningRouter.allowedMethods())
+  .use("/:pid/author", authorRouter.routes(), authorRouter.allowedMethods())
   .use('/:pid/quote', quote.routes(), quote.allowedMethods())
   .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods());
 module.exports = router;

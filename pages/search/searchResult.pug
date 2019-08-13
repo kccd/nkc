@@ -2,9 +2,14 @@
   if ["thread", "post"].includes(result.docType)
     a(href=result.link target="_blank").clear-a-style.search-result-title!= result.title
     .search-result-info
-      a.clear-a-style.search-result-author(href=`/u/${result.postUser.uid}`)
-        img(src=`/avatar/${result.postUser.uid}?t=sm`)
-        span=result.postUser.username
+      if !result.anonymous
+        a.clear-a-style.search-result-author(href=`/u/${result.postUser.uid}`)
+          img(src=`/avatar/${result.postUser.uid}?t=sm`)
+          span=result.postUser.username
+      else
+        span.clear-a-style.search-result-author
+          img(src=anonymousInfo.avatar)
+          span.anonymous-name=anonymousInfo.username
       .search-result-time=fromNow(result.postTime)
       span=result.docType==="thread"?"发表于":"回复于"
       for forum in result.forums

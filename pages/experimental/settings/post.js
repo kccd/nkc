@@ -4,9 +4,40 @@ var app = new Vue({
     postSettings: '',
     roles: [],
     grades: [],
+    uid: "",
+    users: [],
     type: 'postToForum'
   },
   methods: {
+    addUser: function() {
+      var uid = this.uid;
+      var this_ = this;
+      nkcAPI("/u/" + uid + "?from=panel", "GET")
+        .then(function(data) {
+          var targetUser = data.targetUser;
+          if(targetUser) {
+            this_.users.push(targetUser);
+            var uidArr = this_.postSettings[this_.type].anonymous.uid;
+            if(uidArr.indexOf(targetUser.uid) === -1) {
+              uidArr.push(targetUser.uid);
+            }
+
+          }
+        })
+        .catch(function(err) {
+          sweetError(err);
+        })
+    },
+    getUserById: function(uid) {
+      var users = this.users;
+      for(var i = 0; i < users.length; i++) {
+        var user = users[i];
+        if(user.uid === uid) return user;
+      }
+    },
+    removeUser: function(index) {
+      this.postSettings[this.type].anonymous.uid.splice(index, 1);
+    },
     extendVolume: function() {
       var exam = this.postSettings[this.type].exam;
       if(exam.indexOf('notPass') !== -1) {
@@ -48,6 +79,16 @@ var app = new Vue({
   computed: {
     displayNotPassCountLimit: function() {
       return this.postSettings[this.type].exam.indexOf('notPass') !== -1;
+    },
+    selectedUsers: function() {
+      var uid = this.postSettings[this.type].anonymous.uid;
+      var users = [];
+      for(var i = 0; i < uid.length; i++) {
+        var id = uid[i];
+        var user = this.getUserById(id);
+        if(user) users.push(user);
+      }
+      return users;
     }
   },
   mounted: function() {
@@ -55,6 +96,7 @@ var app = new Vue({
       .then(function(data) {
         app.roles = data.roles;
         app.grades = data.grades;
+        app.users = data.users;
         var examArr = [];
         var exam = data.postSettings.c.postToForum.exam;
         if(exam.volumeA) {

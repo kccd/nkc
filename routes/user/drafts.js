@@ -49,6 +49,10 @@ draftsRouter
                 ctx.throw(403, "草稿箱已满！")
             }
             let newId = await db.SettingModel.operateSystemID('drafts', 1);
+            if(!body.desType || body.desType === "redit") {
+              body.desType = "forum";
+              body.desTypeId = "";
+            }
             let newDraft = db.DraftModel({
               l: body.l,
               t: body.t,

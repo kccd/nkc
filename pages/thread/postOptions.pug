@@ -7,7 +7,11 @@
         a(href=comment.url)
           span.fa.fa-newspaper-o &nbsp;
           span 详情
-
+    if permission("getPostAuthor") && comment.anonymous
+      li
+        a(onclick=`NKC.methods.getPostAuthor('${comment.pid}')`)
+          span.fa.fa-user-secret &nbsp;
+          span 作者
     if data.userOperationsId.includes('creditXsf') && data.isModerator
       li
         a(onclick=`credit('${comment.pid}', 'xsf')`)
@@ -22,7 +26,7 @@
         li
           a(onclick=`unDigestPost("${comment.pid}")`)
             span.fa.fa-star &nbsp;取消精选
-    if data.user && permission('creditKcb') && comment.uid !== data.user.uid
+    if !comment.anonymous && data.user && permission('creditKcb') && comment.uid !== data.user.uid
       li
         a(onclick=` credit("${comment.pid}", 'kcb', ${data.user.kcb})`)
           span.fa.fa-cny &nbsp;

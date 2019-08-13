@@ -38,17 +38,24 @@ function searchLogs(){
   var eTime = $("#endTime").val().trim();
   var uid = $("#userId").val().trim();
   var ip = $("#ipAdress").val().trim();
-  if(sTime === "" ||eTime === ""){
-    screenTopWarning("请输入完整的时间区间")
-    return
+  var operationId = $("#operationId").val().trim();
+  var st = (new Date(sTime)).getTime();
+  var et = (new Date(eTime)).getTime();
+  var t = $("#dataT").attr("data-t");
+  t = t || "";
+  if(st && et && st > et){
+    return sweetError("结束时间不能早于开始时间");
   }
-  var st = new Date(sTime)
-  var et = new Date(eTime)
-  if(st.getTime() > et.getTime()){
-    screenTopWarning("结束时间不能早于开始时间")
-    return
+  var c = {
+    sTime: sTime,
+    eTime: eTime,
+    uid: uid,
+    operationId: operationId,
+    ip: ip
+  };
+  var url = '/e/log/public?c=' + NKC.methods.strToBase64(JSON.stringify(c));
+  if(t) {
+    url += '&t='+ t;
   }
-  var url = '/e/log/public?' + "type=searchLog&" + "sTime="+sTime+"&" + "eTime="+eTime+"&" + "uid="+uid+"&" + "ip="+ip;
-  // window.location.href = url;
-  openToNewLocation(url);
+  NKC.methods.visitUrl(url);
 }

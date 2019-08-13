@@ -12,8 +12,12 @@ router
     await targetThread.ensurePermission(data.userRoles, data.userGrade, data.user);
     if(targetPost.disabled) ctx.throw(403, '无法引用已经被禁用的回复');
     if(!targetPost.reviewed) ctx.throw(403, "回复未通过审核，暂无法引用");
-    await targetPost.extendUser();
-    data.targetUser = targetPost.user;
+    if(!targetPost.anonymous) {
+      await targetPost.extendUser();
+      data.targetUser = targetPost.user;
+    } else {
+      targetPost.uid = "";
+    }
     targetPost = targetPost.toObject();
     data.message = xsflimit(targetPost);
     data.postUrl = await db.PostModel.getUrl(targetPost);

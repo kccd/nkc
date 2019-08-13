@@ -236,7 +236,10 @@ if applicationForm.reportThreads.length > 0
             .col-xs-10.col-md-10
               span 文号：
               span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-              a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+              if firstPost.anonymous
+                span=anonymousInfo.username
+              else
+                a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
               span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
               br
               a(href=`/t/${thread.tid}` target="_blank")= firstPost.t
@@ -254,7 +257,10 @@ if applicationForm.threadsId.completed && applicationForm.threadsId.completed.le
             .col-xs-10.col-md-10
               span 文号：
               span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-              a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
+              if firstPost.anonymous
+                span=anonymousInfo.username
+              else
+                a(href=`/m/${firstPost.uid}` target="_blank")= firstPost.user.username
               span!= `&nbsp;发表于 ${firstPost.toc.toLocaleString()}`
               br
               a(href=`/t/${thread.tid}` target="_blank")= firstPost.t

@@ -46,6 +46,9 @@ module.exports = {
     warning: {
 		  POST: "postWarningPost",
       PATCH: "postWarningPatch"
+    },
+    author: {
+		  GET: "getPostAuthor"
     }
 	}
 };

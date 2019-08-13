@@ -46,33 +46,28 @@ function saveDraft() {
   var queryType = query.type;
   var queryId = query.id;
   var draftId = $("#draftId").html();
-  // 文章内容相关
+  // 获取引用内容
   var quoteContent = document.getElementById("quoteContent")?document.getElementById("quoteContent").innerHTML: ''; // 引用
+  // 获取文章内容
   var draftContent;
   try{
     draftContent = ue.getContent();
   }catch(e){
     draftContent = "";
   }
-  var content = quoteContent + draftContent; // 文章主体内容
-  if(content.length < 1) {
-    return screenTopWarning("请填写内容")
-  }
+  var content = quoteContent + draftContent;
+  if(content.length < 1) return sweetWarning("请填写内容");
   if(geid('parseURL').checked) {
     content = common.URLifyHTML(content);
   }
-  var title = geid('title').value.trim(); // 文章标题
-  if (queryType !== 'redit' && queryType !== 'thread' && queryType !== 'post' && queryType !== 'application' && title === '' && queryType !== 'forum_declare') {
-    return screenTopWarning('请填写标题');
-  }
-  if(title.length > 50) {
-    return screenTopWarning("文章标题50字以内");
-  }
-
+  // 获取标题
+  var title = geid('title').value.trim();
+  if(title === '') return sweetWarning('请填写标题');
+  if(title.length > 50) return sweetWarning("请将文章标题控制在50字以内");
+  // 路由为/editor时，queryType为空
   if(!queryType || queryType === "forum") {
     queryType = 'forum';
   }
-
   var post = {
     t: title,
     c: content,
@@ -101,7 +96,6 @@ function saveDraft() {
   return nkcAPI(url, method, data)
   .then(function (result) {
     if(result.status == "success"){
-      // console.log(result.did)
       $("#draftId").html(result.did)
       screenTopAlert("保存成功！");
     }
@@ -116,10 +110,64 @@ function saveDraft() {
 * 转发到专栏
 * */
 var ColumnCategoriesDom;
+var anonymousData;
 $(function() {
-  if(!NKC.modules.SelectColumnCategories) return;
-  ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+  if(NKC.modules.SelectColumnCategories) {
+    ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+  }
+  var anonymousDom = $("#sendAnonymousDom");
+  if(anonymousDom.length) {
+    anonymousData = NKC.methods.getDataById("anonymousData");
+    anonymousData.targetForumsId = anonymousData.targetForumsId || [];
+    toggleAnonymousDom(verifyAnonymousPermission(anonymousData.targetForumsId));
+    setInterval(function() {
+      var dom = $("#newPanelForum");
+      if(dom.length) {
+        var fids = [];
+        dom.find(".chooseForum").each(function() {
+          var fid = $(this).attr("fid");
+          if(fid && fid !== "undefined") {
+            fids.push(fid)
+          }
+        });
+        toggleAnonymousDom(verifyAnonymousPermission(fids));
+      }
+
+    }, 1000);
+  }
 });
+// 根据权限设置勾选框 是否禁止勾选
+// 若有权限则勾选框可勾选
+// 若没有权限则勾选框不可勾选，且取消已勾选
+function toggleAnonymousDom(havePermission) {
+  var anonymousDom = $("#sendAnonymousDom");
+  var checkbox = $("#sendAnonymousDom input");
+  if(!anonymousDom.length || !checkbox.length) return;
+  if(havePermission) {
+    checkbox.attr("disabled", false);
+    checkbox.attr("title", "");
+  } else {
+    checkbox.prop("checked", false);
+    checkbox.attr("disabled", true);
+    checkbox.attr("title", "未选择专业或已选专业中至少有一个专业不允许发表匿名内容");
+  }
+}
+// 判断已选专业是否都允许发表匿名内容
+function verifyAnonymousPermission(targetForumsId) {
+  if(
+    !anonymousData ||
+    !anonymousData.allowedAnonymousForumsId ||
+    anonymousData.allowedAnonymousForumsId.length === 0 ||
+    targetForumsId.length === 0
+  ) return false;
+  for(var i = 0; i < targetForumsId.length; i++) {
+    var fid = targetForumsId[i];
+    if(anonymousData.allowedAnonymousForumsId.indexOf(fid) === -1) {
+      return false;
+    }
+  }
+  return true;
+}
 
 function getSelectedColumnCategoriesId() {
   if(!window.ColumnCategoriesDom) return [];
@@ -215,21 +263,6 @@ function onPost() {
     if(fids.length === 0) {
       return screenTopWarning("请选择专业");
     }
-    // if(panelObj.length == 0) {
-    //   return screenTopWarning("请选择专业");
-    // }else{
-    //   for(var po=0;po<panelObj.length;po++) {
-    //     if(fids.indexOf(panelObj[po].fid) == -1) {
-    //       fids.push(panelObj[po].fid)
-    //     }
-    //     if(panelObj[po].cid !== "") {
-    //       var dealCid = panelObj[po].cid.substr(1);
-    //       if(cids.indexOf(dealCid) == -1) {
-    //         cids.push(dealCid)
-    //       }
-    //     }
-    //   }
-    // }
     queryId = fids[0];
     queryType = 'forum';
     queryCat = cids[0];
@@ -245,8 +278,8 @@ function onPost() {
     cat: queryCat,
     desType: desType,
     desTypeId: desTypeId
-  }
-  if(queryType == "post" || queryType == "thread" || queryType == "forum") {
+  };
+  if(queryType === "post" || queryType === "thread" || queryType === "forum") {
     try{
       var paperObj = paperProto.paperExport();
     }catch(e) {
@@ -259,6 +292,12 @@ function onPost() {
     } catch(err) {
       return screenTopWarning(err);
     }
+
+    var sendAnonymousPostDom = $("#sendAnonymousPost");
+    if(sendAnonymousPostDom.length) {
+      post.sendAnonymousPost = sendAnonymousPostDom.prop("checked");
+    }
+
     for(var i in paperObj) {
       post[i] = paperObj[i]
     }

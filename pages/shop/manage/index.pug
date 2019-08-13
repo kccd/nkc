@@ -46,8 +46,8 @@ block content
               label.col-sm-2.control-label 快递列表
               .col-sm-8
                 select.form-control#trackList(name="")
-          input#newstoreid(type="text" style="display:none")
-          input#neworderid(type="text" style="display:none")
+          input#newstoreidEdit(type="text" style="display:none")
+          input#neworderidEdit(type="text" style="display:none")
         .modal-footer(style="text-align:left")
           button.btn.btn-info.btn-sm(type="button",onclick=`sendGoodsNoLog()` ) 无物流发货
           button.btn.btn-primary.btn-sm(type='button', onclick=`sendGoods()`) 发货

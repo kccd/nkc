@@ -6,5 +6,8 @@
         a(href=`/t/${t.tid}`).user-card-thread-title= t.firstPost.t
         .user-card-thread-info
           a(href=`/f/${t.forums[0].fid}`)= t.forums[0].displayName
-          a(href=`/u/${t.uid}`)= t.firstPost.user.username
+          if !t.firstPost.anonymous
+            a(href=`/u/${t.uid}` onmouseover=`floatUserPanel.open(this, '${t.firstPost.user.uid}')`)= t.firstPost.user.username
+          else
+            span=anonymousInfo.username
           span=fromNow(t.toc)

@@ -154,6 +154,44 @@ block content
                           | 限制
                           </label>
                           input(class="table-input" v-model.number='grade[type].timeLimit.num')
+                hr
+            .row
+              .col-sm-2.text-right
+                h4 匿名发表
+              .col-sm-10
+                div 状态：
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" :value="true" v-model='postSettings[type].anonymous.status'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 开启
+                  </label>
+                  <label class="mdui-radio mdui-m-r-2">
+                  <input type="radio" :value="false" v-model='postSettings[type].anonymous.status'/>
+                  <i class="mdui-radio-icon"></i>
+                  | 关闭
+                  </label>
+                div 证书限制：
+                  <label class="mdui-checkbox mdui-m-r-2" v-for="role, index in roles">
+                    <input type="checkbox" :value="role._id" v-model='postSettings[type].anonymous.rolesId'/>
+                    <i class="mdui-checkbox-icon"></i>
+                    | {{role.displayName}}
+                  </label>
+                div(v-if="postSettings[type].anonymous.rolesId.indexOf('default') !== -1") 会员等级限制：
+                  <label class="mdui-checkbox mdui-m-r-2" v-for="grade, index in grades">
+                    <input type="checkbox" :value="grade._id" v-model='postSettings[type].anonymous.defaultCertGradesId'/>
+                    <i class="mdui-checkbox-icon"></i>
+                    | {{grade.displayName}}
+                  </label>
+                div 指定用户：
+                  input(type="text"  v-model.trim="uid" @keyup.enter="addUser" placeholder="请输入用户ID")
+                  button(@click="addUser") 添加
+                  div(v-if="selectedUsers.length > 0")
+                    .review-user-span(v-for="user, index in selectedUsers")
+                      img(:src="'/avatar/' + user.avatar + '?t=sm'")
+                      a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
+                      .fa.fa-remove(@click="removeUser(index)" title="点击移除")
+
+
             .row
               .col-sm-10.col-sm-offset-2.mdui-m-t-3.text-right
                 button.mdui-btn.mdui-color-theme.mdui-btn-block(@click='save') 保存

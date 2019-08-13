@@ -13,7 +13,16 @@ router
     if(targetPost.hideHistories && !data.userOperationsId.includes('displayPostHideHistories')) ctx.throw(403,'权限不足');
     data.post = targetPost;
     data.histories = await db.HistoriesModel.find({pid}).sort({tlm: -1});
-    data.targetUser = await targetPost.extendUser();
+    if(targetPost.anonymous) {
+      data.post.uid = "";
+      data.post.uidlm = "";
+      for(const h of data.histories) {
+        h.uid = "";
+        h.uidlm = "";
+      }
+    } else {
+      data.targetUser = await targetPost.extendUser();
+    }
     ctx.template = 'interface_post_history.pug';
     await next();
   })

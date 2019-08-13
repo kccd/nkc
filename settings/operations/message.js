@@ -24,6 +24,11 @@ module.exports = {
       GET: 'getMessageFile'
     }
   },
+  frame: {
+    PARAMETER: {
+      GET: 'getMessageVideoFrame'
+    }
+  },
   settings: {
     PATCH: 'modifyMessageSettings',
     PARAMETER: {

@@ -1,10 +1,25 @@
 extends ../../bootstrap_base
 
 block title
-  -const mainContainer1400 = true;
-  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
-  link(href='/experimental/index.css' rel='stylesheet')
+  +includeCSS('/experimental/index.css')
   title 操作设置
+  style.
+    .user-agent{
+      max-height: 2rem;
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      cursor: pointer;
+    }
+    .referer{
+      cursor: pointer;
+      max-height: 4rem;
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+    }
 block content
 
   .container-fluid.max-width
@@ -12,59 +27,77 @@ block content
       include ../nav
       .col-xs-12.col-md-12
         .row
-          .col-xs-12.col-md-3
-            .form
+          .col-xs-12.col-md-12
+            ul.nav.nav-tabs.m-b-2#dataT(data-t=data.t)
+              li(class=!data.t?"active":"")
+                a(href=`/e/log/public`) 用户
+              li(class=data.t === "visitor"?"active":"")
+                a(href=`/e/log/public?t=visitor`) 游客
+          .col-xs-12.col-md-12
+            .form.form-inline
               .form-group
                 label 开始时间
-                input.form-control#startTime(req="true" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" value=`${data.searchMap.sTime}`)
+                input.form-control#startTime(req="true" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" value=`${data.searchMap.sTime||""}`)
               .form-group
                 label 结束时间  
-                input.form-control#endTime(req="true" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" value=`${data.searchMap.eTime}`)
+                input.form-control#endTime(req="true" onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" value=`${data.searchMap.eTime||""}`)
+            .form.form-inline.m-t-1
               .form-group
-                label 用户uid  
-                input.form-control#userId(value=`${data.searchMap.uid}`)
+                label 用户ID
+                input.form-control#userId(value=`${data.searchMap.uid||''}`)
               .form-group
-                label IP地址
-                input.form-control#ipAdress(value=`${data.searchMap.ip}`)
+                label IP
+                input.form-control#ipAdress(value=`${data.searchMap.ip||''}`)
+            .form.form-inline.m-t-1.m-b-2
+              .form-group
+                label 操作ID
+                input.form-control#operationId(value=`${data.searchMap.operationId || ""}`)
               .form-group
                 button.btn.btn-primary.btn-block(onclick='searchLogs()') 查询
-                //- button.btn.btn-primary.btn-block(onclick='delLogs()') 删除
-          .col-xs-12.col-md-9
-            - const type = data.type
-            - var sTime = data.searchMap.sTime
-            - var eTime = data.searchMap.eTime
-            - var uid = data.searchMap.uid
-            - var ip = data.searchMap.ip
-            include ../../interface_navigation_paging      
-              .col-xs-12.col-md-12
-                table.table.table-hover
-                  thead
+          .col-xs-12.col-md-12
+            include ../../publicModules/paging/paging
+            .table-responsive
+              table.table.table-bordered
+                thead
+                  tr
+                    th 时间
+                    th 用户
+                    th 操作名（操作ID）
+                    th URL
+                    th 方法
+                    th 状态
+                    th IP
+                    th 来源
+                    th 客户端（点击查看详情）
+                tbody
+                  for log, index in data.result
                     tr
-                      th 类型
-                      th 用户id
-                      th 用户名称
-                      th 时间
-                      th 请求方法
-                      th ip
-                  tbody
-                    for log in data.result
-                      tr
-                        th= log.operationData ? log.operationData.description : log.operationId
-                        th= log.uid
-                        -const username = log.user?log.user.username : ''
-                        th= username
-                        th= fromNow(log.reqTime)
-                        th= log.method
-                        th= log.ip
+                      th= format("YYYY/MM/DD HH:mm:ss", log.reqTime)
+                      th
+                        if log.user
+                          a(href=`/u/${log.uid}` target="_blank")=log.user.username
+                        else
+                          |游客
+                      th= `${lang("operations", log.operationId)}（${log.operationId}）`
+                      th= log.path
+                      th= log.method
+                      th= log.status
+                      th
+                        a(href=ipUrl(log.ip) target="_blank")=log.ip
+                      th
+                        .referer
+                          a(href=log.referer target="_blank")=log.referer
+                      th
+                        .user-agent(onclick=`sweetAlert('${log.userAgent}')`)=log.userAgent
+            include ../../publicModules/paging/paging_input
 
 
 block scripts
 
-  script(src='/icheck/icheck.js')
-  script(src='/interface_common.js')
-  script(src='/experimental/settings/operation.js')
-  script(src='/experimental/log/public.js')
-  script(src='/laydate/laydate.dev.js')
+  +includeJS('/interface_common.js')
+  +includeJS('/experimental/settings/operation.js')
+  +includeJS('/experimental/log/public.js')
+  +includeJS('/laydate/laydate.dev.js')
 
 
 

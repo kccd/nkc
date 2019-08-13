@@ -17,7 +17,7 @@ permission.getOperationsId = () => {
 	};
 	const operations = operationObj.defaultOperations.concat([]);
 	fn(operationObj.operationTree, operations);
-	return operations;
+	return [...new Set(operations)];
 };
 
 permission.getOperationId = (url, method) => {

@@ -1200,8 +1200,6 @@ userSchema.statics.checkUserBaseInfo = async function(uid) {
   }
   const {username} = user;
   const uploadedAvatar = await UserModel.uploadedAvatar(user.avatar);
-  /*const uploadedBanner = await UserModel.uploadedBanner(user.uid);
-  return username && uploadedAvatar && uploadedBanner;*/
   return username && uploadedAvatar;
 };
 
@@ -1380,6 +1378,41 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
   if(userThreadCount < threadCount) return false;
   const count = await mongoose.model("threads").count({uid: user.uid, digest: true, disabled: false, recycleMark: {$ne: true}, reviewed: true});
   return count >= digestCount;
+};
+/*
+* 验证用户是否有权限发表匿名内容
+* @param {String} uid 用户ID
+* @param {String} type thread: 发表文章, post: 发表回复
+* @param {[String]} forumsId 专业ID组成的数组, 若不传该参数则默认全部专业都允许发表匿名内容
+* @return {Boolean} 是否有权
+* @author pengxiguaa 2019-8-8
+* */
+userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId, forumsId) => {
+  if(!["postToForum", "postToThread"].includes(type)) return false;
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
+  const ForumModel = mongoose.model("forums");
+  const postSettings = await SettingModel.getSettings("post");
+  const {uid, status, defaultCertGradesId, rolesId} = postSettings[type].anonymous;
+  if(!status) return false;
+  if(forumsId) {
+    const forumCount = await ForumModel.count({fid: {$in: forumsId}, allowedAnonymousPost: true});
+    if(forumCount !== forumsId.length) return false;
+  }
+  const user = await UserModel.findOne({uid: userId});
+  if(!user) return false;
+  if(uid.includes(userId)) return true;
+  for(const certId of user.certs) {
+    if(certId !== "default" && rolesId.includes(certId)) {
+      return true;
+    }
+  }
+  if(rolesId.includes("default")) {
+    await user.extendGrade();
+    return defaultCertGradesId.includes(user.grade._id);
+  } else {
+    return false;
+  }
 };
 
 /*

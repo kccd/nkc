@@ -112,11 +112,18 @@ block name
                         p
                           a(href=`/shop/manage/${data.user.uid}/order/refund?orderId=${order.orderId}`) 退款详情
                       if order.orderStatus == "unSign" || order.orderStatus == "finish"
+                        p
+                          span 物流单号：
+                          span(id=`trackNumber${order.orderId}`)=order.trackNumber?order.trackNumber: "no"
+                        p(style="display:none") 
+                          span(id=`trackName${order.orderId}`)=order.trackName
                         if !order.trackNumber || order.trackNumber == "no"
                           p 该订单无物流
                         else
                           p
                             a(href=`/shop/manage/${data.user.uid}/order/logositics?orderId=${order.orderId}`) 查看物流
+                      if order.orderStatus == "unSign" && order.closeStatus !== true
+                        button(onclick=`openLogositicEdit(${data.user.uid}, ${order.orderId})`) 修改物流信息
                       if order.orderStatus == "unShip" && order.closeStatus !== true
                         p
                           button(onclick=`openSendGoodsModal(${data.user.uid}, ${order.orderId})`) 发货
@@ -132,8 +139,38 @@ block name
                   button(onclick=`editSellMessage(${order.sellUid},${order.orderId})`) 保存备注
     .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
       include ../../interface_navigation_paging            
-
+  #editGoodsModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='myModalLabel')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+          h4#myModalLabel.modal-title 修改运单
+        .modal-body
+          .form-horizontal
+            .form-group 
+              label.col-sm-2.control-label 快递单号
+              .col-sm-8
+                input.form-control#newtracknumberEdit(type='text')
+            .form-group
+              label.col-sm-2.control-label 快递列表
+              .col-sm-8
+                select.form-control#trackListEdit(name="")
+          input#newstoreid(type="text" style="display:none")
+          input#neworderid(type="text" style="display:none")
+        .modal-footer(style="text-align:left")
+          button.btn.btn-primary.btn-sm(type='button', onclick=`editGoods()`) 确认
+          button.btn.btn-info.btn-sm(type="button",onclick=`editNotGoods()` ) 无物流发货
+          button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消        
 block manageScripts
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
   +includeJS("/shop/manage/order.js")
+  script.
+    var trackListEditDom = "";
+    $.getJSON('/track.json',function(data){
+      for(var i in data){
+        trackListEditDom += "<option value='"+data[i]+"'>"+i+"</option>";
+      }
+      $("#trackListEdit").html(trackListEditDom)
+    });
