@@ -348,6 +348,18 @@ $(function() {
       stopOrStartPlay: stopOrStartPlay,
       stopPlayType: stopPlayType,
 
+      // 播放视频
+      openVideo: function(videoId) {
+        document.getElementById("btn"+videoId).style.display = "none";
+        document.getElementById(videoId).play();
+      },
+
+      // 暂停播放
+      stopVideo: function(videoId) {
+        document.getElementById("btn"+videoId).style.display = "inline-block";
+        document.getElementById(videoId).pause();
+      },
+      
       // 初始化手机页面
       initMobile: function(type) {
         app.showMobileNavbar = true;
