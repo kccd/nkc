@@ -479,6 +479,7 @@
   "confirmOrderReceipt": "[CO]确认收货",
   "sendGoods": "[CO]发货",
   "sendGoodsNoLog": "[CO]无物流发货",
+  "editGoodsLogositics": "[CO]修改物流信息",
   "editOrder": "[CO]修改订单",
   "visitSingleOrderDetail": "[CO]用户查看订单详情",
   "visitStoreOrderDetail": "[CO]商家查看订单详情",
