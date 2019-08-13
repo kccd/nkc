@@ -115,8 +115,7 @@ module.exports = async (ctx, next) => {
       try {
         let valueStr = ctx.cookies.get(key, options);
         valueStr = Buffer.from(valueStr, "base64").toString();
-        value = JSON.parse(valueStr);
-        return value;
+        return JSON.parse(valueStr);
       } catch(err) {
         if(global.NKC.NODE_ENV !== "production") {
           console.log(err);

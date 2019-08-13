@@ -162,7 +162,7 @@ NKC.methods.getPostAuthor = function(pid) {
   nkcAPI("/p/" + pid + "/author", "GET")
     .then(function(data) {
       var author = data.author;
-      NKC.methods.visitUrl(`/u/` + author.uid, true);
+      NKC.methods.visitUrl("/u/" + author.uid, true);
     })
     .catch(function(data) {
       sweetError(data);
