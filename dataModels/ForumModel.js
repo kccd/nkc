@@ -198,7 +198,7 @@ const forumSchema = new Schema({
     index: 1
   },
   // 是否允许发表匿名内容
-  sendAnonymousPost: {
+  allowedAnonymousPost: {
     type: Boolean,
     default: false
   }
@@ -929,6 +929,7 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
     fid: 1,
     displayName: 1,
     forumType: 1,
+    allowedAnonymousPost: 1,
     color: 1,
     parentsId: 1,
     iconFileName: 1,

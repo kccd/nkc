@@ -1200,8 +1200,6 @@ userSchema.statics.checkUserBaseInfo = async function(uid) {
   }
   const {username} = user;
   const uploadedAvatar = await UserModel.uploadedAvatar(user.avatar);
-  /*const uploadedBanner = await UserModel.uploadedBanner(user.uid);
-  return username && uploadedAvatar && uploadedBanner;*/
   return username && uploadedAvatar;
 };
 
@@ -1398,7 +1396,7 @@ userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId, foru
   const {uid, status, defaultCertGradesId, rolesId} = postSettings[type].anonymous;
   if(!status) return false;
   if(forumsId) {
-    const forumCount = await ForumModel.count({fid: {$in: forumsId}, sendAnonymousPost: true});
+    const forumCount = await ForumModel.count({fid: {$in: forumsId}, allowedAnonymousPost: true});
     if(forumCount !== forumsId.length) return false;
   }
   const user = await UserModel.findOne({uid: userId});

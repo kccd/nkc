@@ -514,7 +514,9 @@ block content
                                 .checkbox-inline
                                   label
                                     input#sendAnonymousPost(type='checkbox')
-                                    | 匿名发表
+                                    span 匿名发表（勾选即同意遵守
+                                      a(href=`/protocol?type=original` target="_blank") 《匿名发表协议》
+                                      | ）
                               if state.userColumn && !data.addedToColumn
                                 -const column = state.userColumn
                                 include ../publicModules/toColumn/selectCategories

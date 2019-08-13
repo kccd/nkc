@@ -73,7 +73,7 @@ router
       
       let shareLimitTime;
       for(const f of forums) {
-        const timeLimit = Number(f.shareLimitTime)
+        const timeLimit = Number(f.shareLimitTime);
         if(shareLimitTime === undefined || shareLimitTime > timeLimit) {
           shareLimitTime = timeLimit;
         }
@@ -88,7 +88,7 @@ router
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
         await post.ensurePermission(options);
 			}
-			if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
+			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
 		}
 	  // await post.ensurePermissionNew(options);
 		// 拓展其他信息
