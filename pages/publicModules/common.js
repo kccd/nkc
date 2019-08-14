@@ -186,3 +186,12 @@ NKC.methods.strToBase64 = function(str) {
 NKC.methods.base64ToStr = function(base64) {
   return decodeURIComponent(window.atob(base64))
 };
+/*
+* 返回查询IP信息的url
+* @param {String} ip 需要查询的IP地址
+* @return {String} 查询地址url
+* @author pengxiguaa 2019-8-14
+* */
+NKC.methods.ipUrl = function(ip) {
+  return "http://www.ip138.com/ips138.asp?ip="+ip+"&action=2";
+};

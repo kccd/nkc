@@ -88,6 +88,7 @@ userRouter
       lastPostUser: false,
       firstPostResource: false,
       htmlToText: false,
+      excludeAnonymousPost: true
     });
 
     data.recommendThreads = await db.ThreadModel.getRecommendThreads(accessibleFid);
@@ -136,10 +137,14 @@ userRouter
       }
       const q = {
         uid,
-        anonymous: false,
-        // disabled: false,
         mainForumsId: {$in: accessibleFid}
       };
+      if(
+        (!user || user.uid !== targetUser.uid) &&
+        (!ctx.permission("getPostAuthor"))
+      ) {
+        q.anonymous = false;
+      }
       // 如果是已登录用户
       if(user) {
         // 不具有特殊专家权限的用户
@@ -237,6 +242,7 @@ userRouter
           hasCover: thread.hasCover,
           time: post.toc,
           pid: post.pid,
+          anonymous: post.anonymous,
           abstract: post.abstract,
           content: post.c,
           title: firstPost.t,
@@ -307,11 +313,15 @@ userRouter
         lastPost: false,
         lastPostUser: false,
         firstPostResource: true,
-        htmlToText: true,
-        excludeAnonymousPost: true
+        htmlToText: true
       });
       const results = [];
       for (const thread of threads) {
+        if(
+          !ctx.permission("getPostAuthor") &&
+          (!user || user.uid !== targetUser.uid) &&
+          thread.firstPost.anonymous
+        ) continue;
         if(thread.disabled || thread.recycleMark) {
           // 根据权限过滤掉 屏蔽、退休的内容
           if(user) {
@@ -340,6 +350,7 @@ userRouter
           abstract: thread.firstPost.abstract,
           title: thread.firstPost.t,
           content: thread.firstPost.c,
+          anonymous: thread.firstPost.anonymous,
           link: `/t/${thread.tid}`,
           reviewed: thread.reviewed
         };

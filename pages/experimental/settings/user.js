@@ -57,13 +57,13 @@ function createElements(users) {
     klass = 'text-danger';
     if(user.volumeB) {
       klass = 'text-success';
-      if(user.sheetB) {
+      if(user.paperB) {
         th33a = newElement('a', {
-          'href': '/q/'+ user.sheetB.category,
+          'href': '/exam/categories/editor?cid='+ user.paperB._id,
           'target': '_blank',
           'class': klass
         });
-        th331 = newElement('span', {}, {}).text('通过 - '+user.sheetB.category);
+        th331 = newElement('span', {}, {}).text('通过 - '+user.paperB.name);
         th33a.append(th331);
       } else {
         th331 = newElement('span', {}, {}).text('通过 - 试卷丢失');

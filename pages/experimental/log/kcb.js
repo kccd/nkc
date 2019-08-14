@@ -8,6 +8,7 @@ var app = new Vue({
   methods: {
     fromNow: NKC.methods.fromNow,
     format: NKC.methods.format,
+    ipUrl: NKC.methods.ipUrl,
     searchUser: function() {
       if(!this.searchText) return screenTopWarning('输入不能为空');
       // window.location.href = '/e/log/kcb?t=' + this.searchType + '&content=' + this.searchText;
