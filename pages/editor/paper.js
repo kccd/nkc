@@ -25,7 +25,7 @@ function testThOpen() {
     selectedForumsId: selectedForumsId,
     selectedCategoriesId: selectedCategoriesId,
     forumCountLimit: 2,
-    showAnonymousCheckbox: true
+    showAnonymousCheckbox: false
   });
 }
 /**

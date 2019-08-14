@@ -397,6 +397,7 @@ threadRouter
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
     await thread.extendFirstPost();
     await thread.firstPost.extendResources();
+    const ownPost = data.user && data.user.uid === thread.uid;
     if(thread.firstPost.anonymous) {
       thread.uid = "";
       thread.firstPost.uid = "";
@@ -406,6 +407,8 @@ threadRouter
       await db.UserModel.extendUsersInfo([thread.firstPost.user]);
       await thread.firstPost.user.extendGrade();
     }
+    thread.firstPost = thread.firstPost.toObject();
+    thread.firstPost.ownPost = ownPost;
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid}, {postId: 1, reason: 1});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);

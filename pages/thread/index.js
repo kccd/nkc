@@ -305,7 +305,7 @@ function assemblePostObject(){  //bbcode , markdown
 		c: replyContent,
 		l:"html",
 	}
-	if(geid('ParseURL').checked){
+	/*if(geid('ParseURL').checked){
 		if(post.l=='markdown'){
 			post.c = common.URLifyMarkdown(post.c)
 		}
@@ -315,7 +315,7 @@ function assemblePostObject(){  //bbcode , markdown
 		if(post.l=='html'){
 			post.c = common.URLifyHTML(post.c)
 		}
-	}
+	}*/
 	//  return console.log(post.c)
 	post.c = post.c.replace(/\[\/quote] *\n+/gi,'[/quote]')
 
@@ -936,8 +936,14 @@ function turnSearch(text) {
 
 var ColumnCategoriesDom;
 $(function() {
-  if(!NKC.modules.SelectColumnCategories) return;
-  ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+  if(NKC.modules.SelectColumnCategories) {
+    ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+  }
+  var proDom = $("#protocolCheckbox");
+  proDom.on("change", function() {
+    disabledPostButtonByProtocol(proDom.prop("checked"));
+  });
+  disabledPostButtonByProtocol(proDom.prop("checked"));
 });
 
 
@@ -953,4 +959,15 @@ function getSelectedColumnCategoriesId() {
   }
   return status.selectedCategoriesId;
 
+}
+
+/*
+* 检测是否勾选同意协议。勾选：禁止发表按钮
+* */
+function disabledPostButtonByProtocol(allowed) {
+  if(allowed) {
+    $("#ButtonReply").attr("disabled", false);
+  } else {
+    $("#ButtonReply").attr("disabled", true);
+  }
 }
