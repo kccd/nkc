@@ -298,7 +298,7 @@
   var EVENT_TRANSITION_END = 'transitionend';
   var EVENT_VIEW = 'view';
   var EVENT_VIEWED = 'viewed';
-  var EVENT_WHEEL = 'wheel';
+  var EVENT_WHEEL = 'wheel mousewheel DOMMouseScroll';
   var EVENT_ZOOM = 'zoom';
   var EVENT_ZOOMED = 'zoomed'; // Data keys
 

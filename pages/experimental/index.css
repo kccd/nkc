@@ -161,3 +161,19 @@ tbody tr th {
   max-width: 12rem;
   font-size: 1rem;
 }
+.user-agent{
+  max-height: 2rem;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  cursor: pointer;
+}
+.referer{
+  cursor: pointer;
+  max-height: 4rem;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}

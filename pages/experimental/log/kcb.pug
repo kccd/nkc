@@ -27,6 +27,7 @@ block content
                 option(value='username') 用户名
                 option(value='uid') UID
                 option(value='ip') IP
+                option(value="operation") 操作ID
             .form-group
               input.form-control(placeholder='请输入内容' v-model='searchText' @keyup.enter='searchUser')
             .form-group
@@ -41,7 +42,7 @@ block content
               tr
                 th 时间
                 th 账单ID
-                th 操作名
+                th 操作名/操作ID
                 th 支出者
                 th 收入者
                 th 数目
@@ -53,7 +54,7 @@ block content
               tr(v-for='(record, index) of kcbsRecords' :style="!record.verify?'background-color: #aaa;': ''")
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
                 th {{record._id}}
-                th {{record.typeInfo}}
+                th {{record.typeInfo}}（{{record.type}}）
 
                 th
                   span(v-if='record.from === "bank"') 科创人民很行
@@ -66,7 +67,8 @@ block content
                   span.text-danger {{record.hideDescription?"【已屏蔽】":""}}
                 th
                   a(v-if="record.pid" :href="record.post.url") {{record.pid}}
-                th {{record.ip}}:{{record.port}}
+                th
+                  a(:href="ipUrl(record.ip)" target="_blank") {{record.ip}}:{{record.port}}
                 th {{record.verify?"是":"否"}}
           include ../../interface_navigation_paging
 block scripts

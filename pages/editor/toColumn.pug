@@ -1,0 +1,14 @@
+label(style="font-size:16px") 专栏
+// columnPermission
+if !state.userColumn
+  if state.columnPermission
+    h5 你还未开设专栏。
+      a(href=`/column/apply` target="_blank") 立即开设
+  else
+    h5 目前还不能开设专栏，通常是因为你参与讨论较少或没有文章被列入精选。
+else
+  if !data.addedToColumn
+    -const column = state.userColumn
+    include ../publicModules/toColumn/selectCategories
+  else
+    h5 本文已经发表到专栏，如需从专栏撤稿，请到专栏管理界面操作。

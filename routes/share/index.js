@@ -9,15 +9,34 @@ shareRouter
     const share = await db.ShareModel.findOne({token});
     if(!share) ctx.throw(403, '无效的token');
     const {kcbTotal, uid, tokenType} = share;
+    // 这里可以取到uid,id,toc,machine,ip, port,shareType,code,originUrl,type
+    // kcd先默认为0，如果有kcb奖励则在下方update
+    // 写入操作日志
+    const shareLogs = db.ShareLogsModel({
+      id: await db.SettingModel.operateSystemID('shareLogs', 1),
+      uid: user ? user.uid : "visit",
+      machine: ctx.header["user-agent"],
+      referer: ctx.get("referer"),
+      ip: ctx.ip,
+      port: ctx.port,
+      shareType: tokenType,
+      code: token,
+      originUrl: share.shareUrl,
+      type: "cli"
+    });
+    await shareLogs.save();
+
     let shareUrl;
     if(share.shareUrl.includes("?")) {
       shareUrl = share.shareUrl + '&token=' + token;
     } else {
       shareUrl = share.shareUrl + '?token=' + token;
     }
+    const lock = await nkcModules.redLock.lock(`share:${token}`, 6000);
     await share.update({$inc: {hits: 1}});
     let shareAccessLog = await db.SharesAccessLogModel.findOne({token, ip: ctx.address});
     if(shareAccessLog) {
+      await lock.unlock();
       return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
     } else {
       shareAccessLog = db.SharesAccessLogModel({
@@ -29,15 +48,22 @@ shareRouter
       await shareAccessLog.save();
     }
     // 若分享者是游客
-    if(['', 'visitor'].includes(uid)) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    if(['', 'visitor'].includes(uid)) {
+      await lock.unlock();
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    }
     const targetUser = await db.UserModel.findOnly({uid});
     // 若该ip已经访问过则不给予分享着奖励
     // 不属于站外的用户（已经登录的用户）访问时不给予分享者奖励
-    if(user) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    if(user) {
+      await lock.unlock();
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    }
     try{
       // 判断token是否有效
       await db.ShareModel.ensureEffective(token);
     } catch(err) {
+      await lock.unlock();
       return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
     }
     // 若share有效则写入cookie
@@ -45,11 +71,20 @@ shareRouter
       httpOnly: true,
       signed: true
     });
-    if(!share.shareReward) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));// 若share分享奖励无效则不给予分享着奖励
+    if(!share.shareReward) {
+      await lock.unlock();
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    }// 若share分享奖励无效则不给予分享着奖励
     const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
     const shareSettings = redEnvelopeSettings.c.share[share.tokenType];
-    if(!shareSettings.status) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl)); // 已关闭
-    if(shareSettings.maxKcb <= kcbTotal) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl)); // 若分享者获得的奖励大于等于奖励设置的最大值则不再给予新的奖励
+    if(!shareSettings.status) {
+      await lock.unlock();
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    } // 已关闭
+    if(shareSettings.maxKcb <= kcbTotal) {
+      await lock.unlock();
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    } // 若分享者获得的奖励大于等于奖励设置的最大值则不再给予新的奖励
     const {kcb, maxKcb} = shareSettings;
     let addKcb; // 奖励的kcb值
     if(kcb + kcbTotal > maxKcb) {
@@ -57,7 +92,10 @@ shareRouter
     } else {
       addKcb = kcb;
     }
-    if(addKcb <= 0) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl)); // 获得的奖励已经超过最大值
+    if(addKcb <= 0) {
+      await lock.unlock();
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    } // 获得的奖励已经超过最大值
     // 判断分享的是什么类容
     const shareLimit = await db.ShareLimitModel.findOnly({shareType: tokenType});
     // 写入kcb交易记录
@@ -88,7 +126,8 @@ shareRouter
     });
     // 将分享者获得的kcb写入当前用户访问的记录上
     await shareAccessLog.update({kcb: addKcb});
-
+    await shareLogs.update({$set:{kcb: addKcb}});
+    await lock.unlock();
     return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
 
   })
@@ -104,13 +143,14 @@ shareRouter
     uid = "visitor";
   }
   // 生成token：4位随机码+自增shareId
-  const token = apiFn.makeRandomCode(8);
-  let toKenFromDB, n = 100;
+  let token, n = 0;
   do{
-    n--;
-    if(n < 0) ctx.throw(500, '获取token出错');
-    toKenFromDB = await db.ShareModel.findOne({token});
-  } while(toKenFromDB && toKenFromDB.token === token);
+    n++;
+    if(n > 100) ctx.throw(500, '获取token出错');
+    token = apiFn.getRandomString("a0", 8);
+    const toKenFromDB = await db.ShareModel.findOne({token});
+    if(!toKenFromDB) break;
+  } while(1);
   const today = nkcModules.apiFunction.today();
   const shareCount = await db.ShareModel.count({toc: {$gte: today}});
   const shareCountByType = await db.ShareModel.count({toc: {$gte: today}, tokenType: type});
@@ -138,6 +178,21 @@ shareRouter
     uid
   });
   await sharesAccessLog.save();
+
+  const shareLogs = db.ShareLogsModel({
+    id: await db.SettingModel.operateSystemID('shareLogs', 1),
+    uid: user ? user.uid : "visit",
+    machine: ctx.header["user-agent"],
+    referer: ctx.get("referer"),
+    ip: ctx.ip,
+    port: ctx.port,
+    shareType: type,
+    code: token,
+    originUrl: str,
+    type: "spo"
+  });
+  await shareLogs.save();
+
   data.newUrl = "/s/" + token;
   await next();
 });

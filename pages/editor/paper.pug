@@ -52,9 +52,4 @@ if data.targetPost
       .col-sm-12.col-md-3
         select.form-control#originStateText
           for level,index in originLevel  
-            option(value=`${index}`)!=level 
-      .col-sm-12.col-md-8
-        input#agreeOrigin(type="checkbox", name="", checked)
-        span 
-          | 我已阅读并同意遵守
-          a(href="/protocol?type=original" target="_blank") 《科创原创声明及相关功能使用协议》
+            option(value=`${index}`)!=level
