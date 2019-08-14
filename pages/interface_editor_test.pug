@@ -65,7 +65,7 @@ block content
               include ./editor/paper.pug
             .form(style="padding-bottom:20px")
               .form-group
-                .checkbox-inline
+                //-.checkbox-inline
                   label
                     input#parseURL(type='checkbox' checked)
                     span 处理URL
@@ -77,12 +77,18 @@ block content
                         input#sendAnonymousPost(type='checkbox' checked)
                       else
                         input#sendAnonymousPost(type='checkbox')
-                      span 匿名发表（勾选即代表同意遵守
-                        a(href=`/protocol?type=anonymous` target="_blank") 《匿名发表协议》
-                        |）
+                        span 匿名发表
                 if state.userColumn && !data.addedToColumn
                   -const column = state.userColumn
                   include ./publicModules/toColumn/selectCategories
+                div
+                  .checkbox
+                    label
+                      input(type="checkbox")
+                      span 我已阅读并同意遵守
+                        a(href=`/protocol?type=anonymous` target="_blank") 《匿名发表协议》，
+                        //input#agreeOrigin(type="checkbox", name="", checked)
+                        a(href="/protocol?type=original" target="_blank") 《科创原创声明及相关功能使用协议》
               .form-group
                 button#post.btn.btn-primary(type='submit' onclick="postToThreadWithCheck()") 发表
                 if !['forum_declare'].includes(data.type)

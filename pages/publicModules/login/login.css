@@ -1,0 +1,41 @@
+@media (min-width: 768px){
+  #moduleLogin .modal-dialog{
+    width: 420px;
+  }
+}
+#moduleLogin .modal-content{
+  border-radius: 3px;
+}
+#moduleLogin .modal-header{
+  border-bottom: none;
+}
+#moduleLogin .login-types{
+  text-align: center;
+}
+#moduleLogin .login-type{
+  width: 7rem;
+  text-align: center;
+  display: inline-block;
+}
+#moduleLogin .login-type-info{
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #888;
+}
+#moduleLogin .login-type-icon{
+  margin: auto;
+  height: 4rem;
+  width: 4rem;
+  line-height: 4rem;
+  text-align: center;
+  font-size: 2rem;
+  border-radius: 50%;
+  background-color: #fb5c62;
+  color: #fff;
+}
+
+#moduleLogin .login-form{
+  margin: auto;
+  width: 25rem;
+  max-width: 100%;
+}

@@ -14,7 +14,8 @@ module.exports = async (ctx, next) => {
     ctx.data.user ||
     ctx.get("FROM") === "nkcAPI" ||
     ctx.filePath ||
-    ctx.request.accepts('json', 'html') !== "html"
+    ctx.request.accepts('json', 'html') !== "html" ||
+    global.NKC.NODE_ENV !== "production"
   ) return await next();
 
   // 记录游客最近浏览的10个页面URL，当游客登录后跳转到最新的那个页面。

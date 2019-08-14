@@ -1,0 +1,55 @@
++includeCSS("/publicModules/login/login.css")
+.modal.fade#moduleLogin(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog(role="document")#moduleLoginApp
+    .modal-content
+      .modal-header
+        button.close(data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        //h4.modal-title 图片选择
+      .modal-body.p-t-0
+        .row
+          .col-xs-12.col-md-12
+            div.site-name 科创
+            p.site-description=state.serverSettings.brief
+          .col-xs-12.col-md-12
+            .login-types
+              .login-type
+                .login-type-icon
+                  .fa.fa-user
+                .login-type-info 用户名+密码
+              .login-type
+                .login-type-icon
+                  .fa.fa-mobile
+                .login-type-info 手机号+密码
+              .login-type
+                .login-type-icon
+                  .fa.fa-commenting
+                .login-type-info 手机号+验证码
+          .col-xs-12.col-md-12
+            .login-form
+              .form
+                .form-group
+                  input.form-control(type="text" placeholder="用户名")
+                .form-group
+                  input.form-control(type="text" placeholder="用户名")
+                .form-group
+                  button.btn.btn-primary.btn-block 提交
+script.
+  NKC.modules.Login = function() {
+    var self = this;
+    self.dom = $("#moduleLogin");
+    self.dom.modal({
+      show: false
+    });
+    self.open = function() {
+      self.dom.modal("show");
+    };
+    self.close = function() {
+      self.dom.modal("hide");
+    }
+  };
+
+  var Login = new NKC.modules.Login();
+  setTimeout(function() {
+    Login.open();
+  }, 1000)

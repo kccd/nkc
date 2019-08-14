@@ -28,9 +28,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           )
       else
         .navbar-brand.userInfo-m
-          a(href='/login' title='还记得密码吗？') 登录
+          a(onclick="Login.open()" title='还记得密码吗？') 登录
           span &nbsp
-          a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+          a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
 
 
 
@@ -125,9 +125,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                   span.fa.fa-sign-out &nbsp;退出
         else
           li.userInfo
-            a(href='/login' title='还记得密码吗？') 登录
+            a(onclick="Login.open()" title='还记得密码吗？') 登录
           li.userInfo
-            a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+            a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
       form.navbar-md.navbar-search.hidden-xs.inline-block.form-inline(action='/search' method='GET')
         input.inline-block.form-control(type='text' name='c' placeholder='关键词 文号 用户')
         button.btn.btn-default(type='submit')
@@ -150,7 +150,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           a(href='/?t=subscribe') 关注
       else
         .col-xs-6
-          a(href='/login') 关注
+          a(onclick="Login.open()") 关注
       //.col-xs-4
         a(href='/?t=recommend') 推荐
       .col-xs-6
@@ -190,9 +190,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         .col-xs-12
           .fa.fa-user-circle
         .col-xs-4.col-xs-offset-2
-          a(href="/login") 登录
+          a(onclick="Login.open()") 登录
         .col-xs-4
-          a(href="/register") 注册
+          a(onlick="Login.open('register')") 注册
     ul.nkc-drawer-list
     if data.user
       ul.nkc-drawer-list
