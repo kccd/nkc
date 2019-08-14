@@ -213,7 +213,6 @@ threadRouter
 	})
 	.get('/:tid', async (ctx, next) => {
 		const {data, params, db, query, nkcModules, body, state} = ctx;
-		const ip = ctx.address;
 		let {token, paraId} = query;
 		let {page = 0, pid, last_page, highlight, step, t} = query;
 		const {tid} = params;
@@ -256,6 +255,8 @@ threadRouter
 			}
 			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
     }
+    // 加载用户的帖子
+    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
     const mainForums = forums.filter(forum => thread.mainForumsId.includes(forum.fid));
     let isModerator = ctx.permission('superModerator');
     if(!isModerator) {
@@ -286,6 +287,9 @@ threadRouter
 			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft","modifyType":false});
 			thread.reason = threadLogOne.reason || '';
 		}
+		const firstPost = await db.PostModel.findOne({pid: thread.oc}, {anonymous: 1});
+		if(!firstPost) ctx.throw(500, `未找到id为${thread.oc}的post`);
+    data.anonymous = firstPost.anonymous;
 		// 构建查询条件
 		const match = {
 			tid,
@@ -296,7 +300,9 @@ threadRouter
 		// 只看作者
 		if(t === "author") {
 		  data.t = t;
-		  match.uid = thread.uid
+      match.anonymous = !!data.anonymous;
+      match.uid = thread.uid
+
     }
 		const $and = [];
 		// 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
@@ -389,6 +395,17 @@ threadRouter
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
+    await thread.extendFirstPost();
+    await thread.firstPost.extendResources();
+    if(thread.firstPost.anonymous) {
+      thread.uid = "";
+      thread.firstPost.uid = "";
+      thread.firstPost.uidlm = "";
+    } else {
+      await thread.firstPost.extendUser();
+      await db.UserModel.extendUsersInfo([thread.firstPost.user]);
+      await thread.firstPost.user.extendGrade();
+    }
 		// 添加给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid}, {postId: 1, reason: 1});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
@@ -410,7 +427,7 @@ threadRouter
 		data.cat = thread.cid;
 		// 若不是游客访问，加载用户的最新发表的文章
 		if(data.user) {
-			data.usersThreads = await data.user.getUsersThreads();
+		  data.usersThreads = await data.user.getUsersThreads();
 			if(state.userColumn) {
 			  data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
       }
@@ -434,7 +451,8 @@ threadRouter
 		}
 		// data.ads = (await db.SettingModel.findOnly({type: 'system'})).ads;
 		// 判断是否显示在专栏加精、置顶...按钮
-		const {mid, toMid} = thread;
+    // 旧专栏
+		/*const {mid, toMid} = thread;
 		let myForum, othersForum;
 		if(mid !== '') {
 			myForum = await db.PersonalForumModel.findOne({uid: mid});
@@ -444,12 +462,31 @@ threadRouter
 		if(toMid !== '') {
 			othersForum = await db.PersonalForumModel.findOne({uid: toMid});
 			data.othersForum = othersForum
-		}
-    data.targetUser = await thread.extendUser();
-    await db.UserModel.extendUsersInfo([data.targetUser]);
-    data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
-    if(data.targetColumn) {
-      data.columnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type: "thread", pid: thread.oc});
+		}*/
+		// 判断文章是否匿名
+		if(!data.anonymous) {
+      data.targetUser = await thread.extendUser();
+      await data.targetUser.extendGrade();
+      await db.UserModel.extendUsersInfo([data.targetUser]);
+      data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
+      if(data.targetColumn) {
+        data.columnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type: "thread", pid: thread.oc});
+      }
+      const q = {
+        uid: data.targetUser.uid,
+        reviewed: true,
+        mainForumsId: {$in: fidOfCanGetThreads},
+        recycleMark: {$ne: true}
+      };
+      let targetUserThreads = await db.ThreadModel.find(q).sort({toc: -1}).limit(10);
+      data.targetUserThreads = await db.ThreadModel.extendThreads(targetUserThreads, {
+        forum: false,
+        firstPostUser: false,
+        lastPost: false,
+        excludeAnonymousPost: true
+      });
+    } else {
+      thread.uid = "";
     }
 		// 文章访问量加1
 		await thread.update({$inc: {hits: 1}});
@@ -459,11 +496,7 @@ threadRouter
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		data.ads = homeSettings.c.ads;
 		ctx.template = 'thread/index.pug';
-		await thread.extendFirstPost().then(async p => {
-			await p.extendUser().then(u => u.extendGrade());
-			await p.extendResources();
-		});
-		if(thread.type == "product") {
+		if(thread.type === "product") {
 			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
 			let productArr = await db.ShopGoodsModel.extendProductsInfo(products);
 			data.product = productArr[0];
@@ -498,7 +531,7 @@ threadRouter
 		}
 		// 获取用户地址信息
 		let userAddress = "";
-		if(data.user && thread.type == "product"){
+		if(data.user && thread.type === "product"){
 			let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
 			const {status, province, city} = ipInfo;
 			if(status && status == "1"){
@@ -602,15 +635,13 @@ threadRouter
       }
     }
 
-
-    await db.UserModel.extendUsersInfo([data.thread.firstPost.user]);
-		await thread.extendLastPost();
+		// await thread.extendLastPost();
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
       thread.firstPost.usersVote = vote?vote.type: '';
-      data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
-      data.xsfSettings = (await db.SettingModel.findOnly({_id: 'xsf'})).c;
-      data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
+      data.kcbSettings = await db.SettingModel.getSettings("kcb");
+      data.xsfSettings = await db.SettingModel.getSettings("xsf");
+      data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
     }
 		// 加载收藏
 		data.collected = false;
@@ -626,6 +657,9 @@ threadRouter
         uid: data.user.uid
       });
 			if(sub) data.subscribed = true;
+
+			data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid, thread.mainForumsId);
+
 		}
 
 		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
@@ -634,20 +668,7 @@ threadRouter
 			data.subscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
 		}
 
-		// 加载用户的帖子
-		const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
-		const q = {
-			uid: data.targetUser.uid,
-      reviewed: true,
-			mainForumsId: {$in: fidOfCanGetThreads},
-			recycleMark: {$ne: true}
-		};
-		const targetUserThreads = await db.ThreadModel.find(q).sort({toc: -1}).limit(10);
-		data.targetUserThreads = await db.ThreadModel.extendThreads(targetUserThreads, {
-		  forum: false,
-      firstPostUser: false,
-      lastPost: false
-    });
+
 
 
 		// 相似文章
@@ -679,19 +700,18 @@ threadRouter
 
 		// 关注的用户
 		if(data.user) {
-			data.userSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
 			if(!data.user.volumeA) {
 				// 加载考试设置
 				// data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
-				data.postSettings = (await db.SettingModel.findOnly({_id: 'post'})).c;
+				data.postSettings = await db.SettingModel.getSettings('post');
 				const today = nkcModules.apiFunction.today();
         const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: data.user.uid});
         let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: data.user.uid});
         data.userPostCountToday = todayPostCount - todayThreadCount;
 			}
 		}
-		data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
-		data.thread = data.thread.toObject();
+		// data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
+		// data.thread = data.thread.toObject();
 		data.pid = pid;
 		data.step = step;
 		await next();
@@ -750,11 +770,21 @@ threadRouter
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post, postType} = body;
-		const {columnCategoriesId = []} = post;
+		const {columnCategoriesId = [], sendAnonymousPost} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(postType === "comment" && post.c.length > 1000) {
       ctx.throw(400, "评论内容不能超过1000字符");
     }
+
+		let anonymousPost = false;
+		if(sendAnonymousPost) {
+		  if(await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid, thread.mainForumsId)) {
+        anonymousPost = true;
+      } else {
+		    ctx.throw(400, "您没有权限或文章所在专业不允许发表匿名内容");
+      }
+    }
+
 		const _post = await thread.newPost(post, user, ctx.address);
 
     // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
@@ -771,6 +801,11 @@ threadRouter
 		// 转发到专栏
     if(columnCategoriesId.length > 0 && state.userColumn) {
       await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [data.thread.oc]);
+    }
+
+    // 发表匿名内容
+    if(anonymousPost) {
+      await db.PostModel.updateOne({pid: _post.pid}, {$set: {anonymous: true}});
     }
 
 		// 生成记录

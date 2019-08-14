@@ -225,10 +225,16 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if (!post) continue;
       const thread = await ThreadModel.findOne({tid: post.tid});
       if (!thread) continue;
-      const user = await UserModel.findOne({uid: targetUid});
-      if (!user) continue;
+      if(post.anonymous) {
+        post.uid = "";
+        post.uidlm = "";
+        thread.uid = "";
+      } else {
+        const user = await UserModel.findOne({uid: targetUid});
+        if (!user) continue;
+        r.c.user = user;
+      }
       r.c.post = post;
-      r.c.user = user;
       r.c.thread = thread;
     } else if(type === "xsf") {
       const post = await PostModel.findOne({pid});
@@ -273,27 +279,43 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if(!post) continue;
       const thread = await ThreadModel.findOne({tid: post.tid});
       if(!thread) continue;
-      const user = await UserModel.findOne({uid: post.uid});
-      if(!user) continue;
-      r.c.user = user;
+      if(post.anonymous) {
+        post.uid = "";
+        post.uidlm = "";
+        thread.uid = "";
+      } else {
+        const user = await UserModel.findOne({uid: post.uid});
+        if(!user) continue;
+        r.c.user = user;
+      }
       r.c.thread = thread;
       r.c.post = post;
     } else if(type === "replyThread") {
       const post = await PostModel.findOne({pid: targetPid});
       if (!post) continue;
+      if(post.anonymous) {
+        post.uid = "";
+        post.uidlm = "";
+      } else {
+        const user = await UserModel.findOne({uid: post.uid});
+        if (!user) continue;
+        r.c.user = user;
+      }
       const thread = await ThreadModel.findOne({tid: post.tid});
       if (!thread) continue;
-      const user = await UserModel.findOne({uid: post.uid});
-      if (!user) continue;
-      r.c.user = user;
       r.c.thread = thread;
       r.c.post = post;
     } else if(type === "comment") {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
-      const user = await UserModel.findOne({uid: post.uid});
-      if(!user) continue;
-      r.c.user = user;
+      if(post.anonymous) {
+        post.uid = "";
+        post.uidlm = "";
+      } else {
+        const user = await UserModel.findOne({uid: post.uid});
+        if(!user) continue;
+        r.c.user = user;
+      }
       r.c.post = post;
     } else if(type === "userAuthApply") {
       const user = await UserModel.findOne({uid: targetUid});

@@ -6,6 +6,9 @@ const lang = (operationId) => {
   return languages[languageName]['operations'][operationId] || operationId;
 };
 module.exports = async (ctx, next) => {
+  const {state, url, settings, db, path, data, method} = ctx;
+  const {operationId} = data;
+
   if(
     ctx.method !== "GET" ||
     ctx.data.user ||
@@ -13,7 +16,19 @@ module.exports = async (ctx, next) => {
     ctx.filePath ||
     ctx.request.accepts('json', 'html') !== "html"
   ) return await next();
-  const {state, url, settings, db, path, data} = ctx;
+
+  // 记录游客最近浏览的10个页面URL，当游客登录后跳转到最新的那个页面。
+  const loginSettings = await db.SettingModel.getSettings("login");
+  if(method === "GET" && loginSettings.redirectOperationsId && loginSettings.redirectOperationsId.includes(operationId)) {
+    // 将最近十次访问的url，写入cookie
+    const urls = ctx.getCookie("visitedUrls") || [];
+    if(urls.length >= 10) {
+      urls.splice(urls.length-1, 1);
+    }
+    urls.unshift(url);
+    ctx.setCookie("visitedUrls", urls);
+  }
+
   const {redisClient} = settings;
   const tocKey = `page:${url}:toc`;
   const dataKey = `page:${url}:data`;
@@ -30,7 +45,7 @@ module.exports = async (ctx, next) => {
       ctx.set("Content-Type", "text/html");
       const processTime = (Date.now() - ctx.reqTime).toString();
       console.log(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${"visitor".bgCyan} ${ctx.method.black.bgYellow} ${path.bgBlue} <${processTime.green}ms> ${"200".green} ${lang(data.operationId).grey}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${"visitor".bgCyan} ${ctx.method.green} ${path.bgBlue} <${processTime.green}ms> ${"200".green} ${lang(data.operationId).grey}`
       );
       const d = {
         url: ctx.path,
@@ -45,12 +60,26 @@ module.exports = async (ctx, next) => {
         address: ctx.address,
         error: ''
       };
+      const visitorLog = db.VisitorLogModel({
+        path: ctx.path,
+        query: ctx.query,
+        status: ctx.status,
+        method: ctx.method,
+        ip: ctx.address,
+        port: ctx.port,
+        operationId: operationId,
+        reqTime: ctx.reqTime,
+        processTime: processTime,
+        referer: ctx.get("referer"),
+        userAgent: ctx.get("User-Agent")
+      });
       setTimeout(async () => {
         const url_ = url.replace(/\?.*/, '');
         const tid = url_.replace(/\/t\/(.*)/i, "$1");
         if(tid !== url_) {
           await db.ThreadModel.updateOne({tid}, {$inc: {hits: 1}});
         }
+        await visitorLog.save();
         global.NKC.io.of('/console').NKC.webMessage(d);
       });
       return ctx.body = html;

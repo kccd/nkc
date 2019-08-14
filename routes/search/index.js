@@ -282,16 +282,15 @@ router
             threadTime: thread.toc,
             postTime: post.toc,
             tid: thread.tid,
-            threadUser: {
-              uid: thread.firstPost.user.uid,
-              username: thread.firstPost.user.username
-            },
-            postUser: {
-              uid: postUser.uid,
-              username: postUser.username
-            },
+            anonymous: post.anonymous,
             forums
           };
+          if(!post.anonymous) {
+            r.postUser = {
+              uid: postUser.uid,
+              username: postUser.username
+            }
+          }
         } else if(docType === "user") {
           if(targetUser && targetUser.uid === uid) {
             if(existUser) continue;

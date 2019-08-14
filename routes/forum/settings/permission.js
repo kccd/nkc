@@ -19,6 +19,7 @@ permissionRouter
       rolesId, relation,
       shareLimitCount,
       shareLimitTime,
+      allowedAnonymousPost,
       moderators,
       subType
 		} = body;
@@ -71,7 +72,8 @@ permissionRouter
         shareLimitCount,
         shareLimitTime,
         moderators: moderators_,
-        subType
+        subType,
+        allowedAnonymousPost: !!allowedAnonymousPost
 		  }
 		);
 		await redis.cacheForums();

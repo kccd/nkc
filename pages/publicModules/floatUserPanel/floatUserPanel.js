@@ -24,7 +24,7 @@ var floatUserPanel = new Vue({
       this.timeout = setTimeout(function() {
         if(uid !== this_.uid) return;
         floatUserPanel.show = false;
-      }, 300);
+      }, 100);
     },
 
     onPanel: function() {

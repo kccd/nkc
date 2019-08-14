@@ -60,10 +60,10 @@ const threadSchema = new Schema({
     default: '',
     index: 1
   },
-  mid: {
+  /*mid: {
     type: String,
     required: true
-  },
+  },*/
   hasCover: {
     type: Boolean,
     default: true
@@ -87,10 +87,10 @@ const threadSchema = new Schema({
     default: Date.now,
     index: 1
   },
-  toMid: {
+  /*toMid: {
     type: String,
     default: ''
-  },
+  },*/
   topped: {
     type: Boolean,
 	  index: 1,
@@ -571,21 +571,19 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     tlm: Date.now()
   });
   if(quote && quote[2] !== this.oc) {
-    const username = quote[1];
     const quPid = quote[2];
-    const quUser = await UserModel.findOne({username});
     const quPost = await PostModel.findOne({pid: quPid});
-    if(quUser && quPost) {
+    if(quPost) {
       const reply = new ReplyModel({
         fromPid: pid,
         toPid: quPid,
-        toUid: quUser.uid
+        toUid: quPost.uid
       });
       await reply.save();
       const messageId = await SettingModel.operateSystemID('messages', 1);
       const message = MessageModel({
         _id: messageId,
-        r: quUser.uid,
+        r: quPost.uid,
         ty: 'STU',
         c: {
           type: 'replyPost',
@@ -673,7 +671,9 @@ const defaultOptions = {
   lastPostUser: true,
   firstPostResource: false,
   htmlToText: false,
-  count: 200
+  count: 200,
+  showAnonymousUser: false,
+  excludeAnonymousPost: false,
 };
 threadSchema.statics.extendThreads = async (threads, options) => {
   const o = Object.assign({}, defaultOptions);
@@ -715,6 +715,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     const posts = await PostModel.find({pid: {$in: [...postsId]}}, {
       pid: 1,
       t: 1,
+      anonymous: 1,
       c: 1,
       abstract: 1,
       uid: 1,
@@ -797,12 +798,22 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     }
   }
 
-  return await Promise.all(threads.map(async thread => {
+  const results = [];
+  for(const thread of threads) {
     thread.categories = [];
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
+      if(firstPost.anonymous && o.excludeAnonymousPost) continue;
       if(o.firstPostUser) {
-        firstPost.user = usersObj[firstPost.uid];
+        let user;
+        if(!o.showAnonymousUser && firstPost.anonymous) {
+          thread.uid = "";
+          firstPost.uid = "";
+          firstPost.uidlm = "";
+        } else {
+          user = usersObj[firstPost.uid];
+        }
+        firstPost.user = user;
       }
       thread.firstPost = firstPost;
     }
@@ -812,7 +823,14 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       } else {
         const lastPost = postsObj[thread.lm];
         if(o.lastPostUser) {
-          lastPost.user = usersObj[lastPost.uid];
+          let user;
+          if(!o.showAnonymousUser && lastPost.anonymous) {
+            lastPost.uid = "";
+            lastPost.uidlm = "";
+          } else {
+            user = usersObj[lastPost.uid];
+          }
+          lastPost.user = user;
         }
         thread.lastPost = lastPost;
       }
@@ -829,11 +847,12 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       if(thread.categoriesId && thread.categoriesId.length !== 0) {
         for(const cid of thread.categoriesId) {
           if(categoryObj[cid]) thread.categories.push(categoryObj[cid]);
-        }        
+        }
       }
     }
-    return thread.toObject?thread.toObject():thread;
-  }));
+    results.push(thread.toObject?thread.toObject():thread);
+  }
+  return results;
 };
 /* 
   通过tid查找文章
@@ -1497,21 +1516,19 @@ threadSchema.methods.createNewPost = async function(post) {
     tlm: Date.now()
   });
   if(quote && quote[2] !== this.oc) {
-    const username = quote[1];
     const quPid = quote[2];
-    const quUser = await UserModel.findOne({username});
     const quPost = await PostModel.findOne({pid: quPid});
-    if(quUser && quPost) {
+    if(quPost) {
       const reply = new ReplyModel({
         fromPid: pid,
         toPid: quPid,
-        toUid: quUser.uid
+        toUid: quPost.uid
       });
       await reply.save();
       const messageId = await SettingModel.operateSystemID('messages', 1);
       const message = MessageModel({
         _id: messageId,
-        r: quUser.uid,
+        r: quPost.uid,
         ty: 'STU',
         c: {
           type: 'replyPost',

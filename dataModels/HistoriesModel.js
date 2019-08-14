@@ -99,6 +99,10 @@ let HistoriesSchema = new Schema({
     type: String,
     index: 1
   },
+  anonymous: {
+    type: Boolean,
+    default: false
+  },
 	digest: Boolean,
 	hideHistories: Boolean,
 	hasImage: Boolean,

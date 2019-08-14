@@ -80,14 +80,17 @@
             -for(let i = 0; i < applicationForm.threads.applying.length; i++)
               -const thread = applicationForm.threads.applying[i];
               -const firstPost = thread.firstPost;
-              -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
+              -let postString = {tid: firstPost.tid, uid: firstPost.uid, username: firstPost.user?firstPost.user.username:anonymousInfo.username, t: firstPost.t, toc: firstPost.toc.toLocaleString(), pid: firstPost.pid};
               -postString = JSON.stringify(postString);
               .threadList
                 .col-xs-10.col-md-10
                   .displayNone.postString= postString
                   span 文号：
                   span.threadNumber!= `${firstPost.pid}&nbsp;&nbsp;`
-                  a(href=`/u/${firstPost.uid}` target="_blank")= firstPost.user.username
+                  if firstPost.anonymous
+                    span=anonymousInfo.username
+                  else
+                    a(href=`/u/${firstPost.uid}` target="_blank")= firstPost.user.username
                   if notModifiedUsers.includes(thread.uid)
                     span(style='color: #aaa;') （未处理邀请）
                   if disagreeUsers.includes(thread.uid)

@@ -183,6 +183,12 @@ const postSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+  // 受否匿名
+  anonymous: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {toObject: {
   getters: true,
@@ -203,12 +209,20 @@ postSchema.pre('save' , function(next) {
 });
 
 postSchema.virtual('reason')
-	.get(function() {
-		return this._reason
-	})
-	.set(function(reason) {
-		this._reason = reason
-	});
+  .get(function() {
+    return this._reason
+  })
+  .set(function(reason) {
+    this._reason = reason
+  });
+
+postSchema.virtual('ownPost')
+  .get(function() {
+    return this._ownPost
+  })
+  .set(function(ownPost) {
+    this._ownPost = ownPost
+  });
 
 postSchema.virtual('user')
   .get(function() {
@@ -591,7 +605,9 @@ const defaultOptions = {
   userGrade: true,
   resource: true,
   usersVote: true,
-  credit: true
+  credit: true,
+  showAnonymousUser: false,
+  excludeAnonymousPost: false
 };
 
 postSchema.statics.extendPosts = async (posts, options) => {
@@ -618,18 +634,20 @@ postSchema.statics.extendPosts = async (posts, options) => {
     await KcbsRecordModel.hideSecretInfo(kcbsRecords);
     for(const r of kcbsRecords) {
       uid.add(r.from);
+      r.to = "";
       if(!kcbsRecordsObj[r.pid]) kcbsRecordsObj[r.pid] = [];
       kcbsRecordsObj[r.pid].push(r);
     }
     const xsfsRecords = await XsfsRecordModel.find({pid: {$in: [...pid]}, canceled: false}).sort({toc: 1});
     for(const r of xsfsRecords) {
       uid.add(r.operatorId);
+      r.uid = "";
       if(!xsfsRecordsObj[r.pid]) xsfsRecordsObj[r.pid] = [];
       xsfsRecordsObj[r.pid].push(r);
     }
   }
   if(o.user) {
-    const users = await UserModel.find({uid: {$in: [...uid]}});
+    let users = await UserModel.find({uid: {$in: [...uid]}});
     if(o.userGrade) {
       grades = await UsersGradeModel.find().sort({score: -1});
     }
@@ -648,6 +666,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   if(o.resource) {
     resources = await ResourceModel.find({references: {$in: [...pid]}});
     resources.map(resource => {
+      resource.uid = "";
       resource.references.map(id => {
         if(!resourcesObj[id]) resourcesObj[id] = [];
         resourcesObj[id].push(resource);
@@ -661,10 +680,19 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
   }
 
-  return posts.map(post => {
+  const results = [];
+  for(const post of posts) {
+    post.ownPost = post.uid === o.uid;
+    if(post.anonymous && o.excludeAnonymousPost) continue;
     post.credits = [];
     if(o.user) {
-      post.user = usersObj[post.uid];
+      if(!o.showAnonymousUser && post.anonymous) {
+        post.user = "";
+        post.uid = "";
+        post.uidlm = "";
+      } else {
+        post.user = usersObj[post.uid];
+      }
     }
     if(o.resource) {
       post.resources = resourcesObj[post.pid];
@@ -685,9 +713,9 @@ postSchema.statics.extendPosts = async (posts, options) => {
         }
       }
     }
-    return post.toObject();
-  });
-
+    results.push(post.toObject());
+  }
+  return results;
 };
 
 postSchema.methods.updatePostsVote = async function() {

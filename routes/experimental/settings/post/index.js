@@ -10,7 +10,9 @@ router
       return await next();
     }
     data.postSettings = await db.SettingModel.findOnly({_id: 'post'});
-    data.roles = await db.RoleModel.find().sort({toc: 1});
+    const uids = data.postSettings.c.postToForum.anonymous.uid.concat(data.postSettings.c.postToThread.anonymous.uid);
+    data.users = await db.UserModel.find({uid: {$in: uids}});
+    data.roles = await db.RoleModel.find({_id: {$ne: "visitor"}}).sort({toc: 1});
     data.grades = await db.UsersGradeModel.find().sort({toc: 1});
     await next();
   })

@@ -8,6 +8,10 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+	  login: {
+	    GET: "experimentalLoginSettings",
+      PATCH: "experimentalLoginSettings"
+    },
 	  cache: {
 	    GET: "experimentalCacheSettings",
       PATCH: "experimentalCacheSettings"
@@ -84,10 +88,6 @@ module.exports = {
 				POST: "deleteProtocolType"
 			}
 		},
-	  login: {
-	    GET:'visitLoginSettings',
-      PATCH: 'modifyLoginSettings'
-    },
 		sms: {
 			GET: 'visitSmsSettings',
 			PATCH: 'modifySmsSettings',

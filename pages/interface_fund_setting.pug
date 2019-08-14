@@ -43,10 +43,10 @@ block content
                   .col-xs-12.col-md-12
                     label.radio-inline
                       input(type='radio' name='moneyFixed' checked=fund ? (fund.money.fixed) : true)
-                      h5 定额
+                      span 定额
                     label.radio-inline
                       input(type='radio' name='moneyFixed' checked=fund ? (!fund.money.fixed) : false)
-                      h5 不定额
+                      span 不定额
                   .col-xs-12.col-md-4
                     -let text = '固定金额（人民币元，不能有小数点）';
                     if fund && !fund.money.fixed
@@ -109,50 +109,50 @@ block content
               .col-xs-12.col-md-2
                 label.radio-inline
                   input(type='radio' name='auditType' checked=fund ? (fund.auditType === 'person') : false)
-                  h5 人工
+                  span 人工
                 label.radio-inline
                   input(type='radio' name='auditType' checked=fund ? (fund.auditType === 'system') : true)
-                  h5 系统
+                  span 系统
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 显示入口
               .col-xs-12.col-md-5
                 label.radio-inline
                   input(type='radio' name='display' checked=fund?(fund.display): true)
-                  h5 是
+                  span 是
                 label.radio-inline
                   input(type='radio' name='display' checked=fund?(!fund.display):false)
-                  h5 否
+                  span 否
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 接受新申请
               .col-xs-12.col-md-5
                 label.radio-inline
                   input(type='radio' name='canApply' checked=fund ? (fund.canApply) : true)
-                  h5 是
+                  span 是
                 label.radio-inline
                   input(type='radio' name='canApply' checked=fund ? (!fund.canApply) : false)
-                  h5 否
+                  span 否
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 设为历史基金
               .col-xs-12.col-md-5
                 label.radio-inline
                   input(type='radio' name='history' checked=fund ? (fund.history) : false)
-                  h5 是
+                  span 是
                 label.radio-inline
                   input(type='radio' name='history' checked=fund ? (!fund.history) : true)
-                  h5 否
+                  span 否
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 完全屏蔽
               .col-xs-12.col-md-5
                 label.radio-inline
                   input(type='radio' name='disabled' checked=fund ? (fund.disabled) : false)
-                  h5 是
+                  span 是
                 label.radio-inline
                   input(type='radio' name='disabled' checked=fund ? (!fund.disabled) : true)
-                  h5 否
+                  span 否
             hr
             h4 相关人员权限设置
             hr
@@ -166,11 +166,11 @@ block content
                       if fund && fund.expert.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='expertCert' cert=certObj._id checked=fund.expert.certs.includes(certObj._id))
-                          h5= certObj.displayName
+                          span= certObj.displayName
                       else
                         label.checkbox-inline
                           input(type='checkbox' name='expertCert' cert=certObj._id)
-                          h5= certObj.displayName
+                          span= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
                     input.form-control#expertUid(placeholder="填入uid" value=fund && fund.expert.appointed.length !== 0? fund.expert.appointed.join(','): '')
@@ -185,11 +185,11 @@ block content
                       if fund && fund.financialStaff.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='financialStaffCert' cert=certObj._id checked=fund.financialStaff.certs.includes(certObj._id))
-                          h5= certObj.displayName
+                          span= certObj.displayName
                       else
                         label.checkbox-inline
                           input(type='checkbox' name='financialStaffCert' cert=certObj._id)
-                          h5= certObj.displayName
+                          span= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
                     input.form-control#financialStaffUid(placeholder="填入uid" value=fund && fund.financialStaff.appointed.length !== 0? fund.financialStaff.appointed.join(','): '')
@@ -204,11 +204,11 @@ block content
                       if fund && fund.censor.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='censorCert' cert=certObj._id checked=fund.censor.certs.includes(certObj._id))
-                          h5= certObj.displayName
+                          span= certObj.displayName
                       else
                         label.checkbox-inline
                           input(type='checkbox' name='censorCert' cert=certObj._id)
-                          h5= certObj.displayName
+                          span= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
                     input.form-control#censorUid(placeholder="填入uid" value=fund && fund.censor.appointed.length !== 0? fund.censor.appointed.join(','): '')
@@ -223,11 +223,11 @@ block content
                       if fund && fund.admin.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='adminCert' cert=certObj._id checked=fund.admin.certs.includes(certObj._id))
-                          h5= certObj.displayName
+                          span= certObj.displayName
                       else
                         label.checkbox-inline
                           input(type='checkbox' name='adminCert' cert=certObj._id)
-                          h5= certObj.displayName
+                          span= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
                     input.form-control#adminUid(placeholder="填入uid" value=fund && fund.admin.appointed.length !== 0? fund.admin.appointed.join(','): '')
@@ -242,11 +242,11 @@ block content
                       if fund && fund.commentator.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='commentatorCert' cert=certObj._id checked=fund.commentator.certs.includes(certObj._id))
-                          h5= certObj.displayName
+                          span= certObj.displayName
                       else
                         label.checkbox-inline
                           input(type='checkbox' name='commentatorCert' cert=certObj._id)
-                          h5= certObj.displayName
+                          span= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
                     input.form-control#commentatorUid(placeholder="填入uid" value=fund && fund.commentator.appointed.length !== 0? fund.commentator.appointed.join(','): '')
@@ -261,11 +261,11 @@ block content
                       if fund && fund.voter.certs.length !== 0
                         label.checkbox-inline
                           input(type='checkbox' name='voterCert' cert=certObj._id checked=fund.voter.certs.includes(certObj._id))
-                          h5= certObj.displayName
+                          span= certObj.displayName
                       else
                         label.checkbox-inline
                           input(type='checkbox' name='voterCert' cert=certObj._id)
-                          h5= certObj.displayName
+                          span= certObj.displayName
                   .col-xs-12.col-md-5
                     h5 指定用户UID，以英文逗号分隔
                     input.form-control#voterUid(placeholder="填入uid" value=fund && fund.voter.appointed.length !== 0? fund.voter.appointed.join(','): '')
@@ -321,20 +321,20 @@ block content
               .col-xs-12.col-md-10
                 label.radio-inline
                   input(type='radio' name='detailedProject' checked=fund ? fund.detailedProject : true)
-                  h5 详细
+                  span 详细
                 label.radio-inline
                   input(type='radio' name='detailedProject' checked=fund ? !fund.detailedProject : false)
-                  h5 简单
+                  span 简单
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 申请方式
               .col-xs-12.col-md-10
                 label.checkbox-inline
                   input(type='checkbox' name='applicationMethod' checked=fund? fund.applicationMethod.personal: false)
-                  h5 个人申请
+                  span 个人申请
                 label.checkbox-inline
                   input(type='checkbox' name='applicationMethod' checked=fund? fund.applicationMethod.team: false)
-                  h5 团队申请
+                  span 团队申请
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 附带文章数目
@@ -349,10 +349,10 @@ block content
                 span 是否已通过审核&nbsp;&nbsp;
                 label.radio-inline
                   input#passed(type='radio' name='passed' checked=fund ? fund.paper.passed : true)
-                  h5 是
+                  span 是
                 label.radio-inline
                   input(type='radio' name='passed' checked=fund ? !fund.paper.passed : false)
-                  h5 否
+                  span 否
             .fund-setting-list
               .col-xs-12.col-md-2
                 h5 允许退修次数
@@ -379,10 +379,10 @@ block content
               .col-xs-12.col-md-10
                 label.checkbox-inline
                   input(type='checkbox' name='conflict' checked=fund ? fund.conflict.self : false)
-                  h5 与自己互斥
+                  span 与自己互斥
                 label.checkbox-inline
                   input(type='checkbox' name='conflict' checked=fund ? fund.conflict.other : false)
-                  h5 与相同设置的基金互斥
+                  span 与相同设置的基金互斥
             hr
             h4 温馨提示：
             hr

@@ -11,6 +11,12 @@ module.exports = {
           countLimit: 5,
           unlimited: true
         }
+      },
+      anonymous: {
+        status: false,
+        defaultCertGradesId: [],
+        rolesId: [],
+        uid: []
       }
     },
     postToThread: {
@@ -23,6 +29,12 @@ module.exports = {
           unlimited: true,
           countLimit: 5
         }
+      },
+      anonymous: {
+        status: false,
+        defaultCertGradesId: [],
+        rolesId: [],
+        uid: []
       }
     }
   }

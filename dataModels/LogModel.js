@@ -41,6 +41,14 @@ const logSchema = new Schema({
     type: String,
     required: true,
 	  index: 1
+  },
+  referer: {
+    type: String,
+    default: ""
+  },
+  userAgent: {
+    type: String,
+    default: ""
   }
 });
 

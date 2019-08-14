@@ -14,6 +14,8 @@ NKC.modules.MoveThread = function() {
       forumType: "topic", // discipline, topic
       forum: "",
       hideMoveType: false,
+      showAnonymousCheckbox: false,
+      onlyAnonymous: false,
       forumCountLimit: 20,
       submitting: false,
       showRecycle: false
@@ -41,7 +43,17 @@ NKC.modules.MoveThread = function() {
         for(var i = 0 ; i < this.forums.length; i++) {
           var forum = this.forums[i];
           if(forum.forumType === this.forumType) {
-            arr.push(forum);
+            if(!this.onlyAnonymous) {
+              arr.push(forum);
+              continue;
+            }
+            for(var ii = 0; ii < forum.allChildForums.length; ii++) {
+              var ff = forum.allChildForums[ii];
+              if(ff.allowedAnonymousPost) {
+                arr.push(forum);
+                break;
+              }
+            }
           }
         }
         return arr;
@@ -151,6 +163,7 @@ NKC.modules.MoveThread = function() {
           if(options.hideMoveType) {
             this_.app.hideMoveType = true;
           }
+          this_.app.showAnonymousCheckbox = options.showAnonymousCheckbox || false;
           if(options.forumCountLimit) this_.app.forumCountLimit = options.forumCountLimit;
         }
       })
@@ -162,6 +175,8 @@ NKC.modules.MoveThread = function() {
     this_.dom.modal("hide");
     this_.app.selectedForums = [];
     this_.app.moveType = "replace";
+    this_.app.showAnonymousCheckbox = false;
+    this_.app.onlyAnonymous = false;
     this_.app.forumType = "topic";
     this_.unlock();
   };

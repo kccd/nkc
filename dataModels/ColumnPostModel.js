@@ -147,13 +147,22 @@ schema.statics.extendColumnPosts = async (columnPosts, fidOfCanGetThread) => {
     p.thread = threadsObj[p.tid];
     if(!p.thread) continue;
     if(p.type === "thread") {
+      if(p.thread.firstPost.anonymous) {
+        p.thread.uid = "";
+        p.thread.firstPost.uid = "";
+        p.thread.firstPost.user = "";
+      }
       p.post = p.thread.firstPost;
     } else {
       p.post = postsObj[p.pid];
       if(!p.post) continue;
+      if(p.post.anonymous) {
+        p.post.uid = "";
+      } else {
+        p.post.user = usersObj[p.post.uid];
+      }
       p.post = p.post.toObject();
       p.post.c = obtainPureText(p.post.c, true, 200);
-      p.post.user = usersObj[p.post.uid];
     }
     p.post.url = await PostModel.getUrl(p.pid);
     p.categories = [];

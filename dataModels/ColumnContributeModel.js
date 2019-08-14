@@ -75,8 +75,15 @@ schema.statics.extendContributes = async (contributes) => {
   const results = [];
   for(let c of contributes) {
     c = c.toObject();
-    c.user = usersObj[c.uid];
     c.thread = threadsObj[c.tid];
+    if(c.thread.firstPost.anonymous) {
+      c.thread.uid = "";
+      c.thread.firstPost.uid = "";
+      c.thread.firstPost.user = "";
+    } else {
+      c.user = c.thread.firstPost.user;
+    }
+
     results.push(c);
   }
   return results;

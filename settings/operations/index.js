@@ -41,7 +41,6 @@ const problem = require('./problem');
 const register = require('./register');
 const search = require('./search');
 const sendMessage = require('./sendMessage');
-const sms = require('./sms');
 const t = require('./thread');
 const u = require('./user');
 const page = require('./page');
@@ -158,8 +157,6 @@ operationObj.operationTree = {
 		search,// 搜索
 
 		sendMessage,// 短信
-
-		sms,// 发信息
 
 		t,// 文章
 

@@ -36,7 +36,7 @@ module.exports = async (ctx) => {
     }
     if (ctx.error) {
       console.error(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Error '.bgRed} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${operationName.grey}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Error '.bgRed} ${log.uid.bgCyan} ${log.method.green} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${operationName.grey}`
       );
       d.error = ctx.error;
       global.NKC.io.of('/console').NKC.webMessage(d);
@@ -44,7 +44,7 @@ module.exports = async (ctx) => {
         console.error(log.error);
     } else {
       console.log(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${log.uid.bgCyan} ${log.method.black.bgYellow} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${operationName.grey}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${log.uid.bgCyan} ${log.method.green} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${operationName.grey}`
       );
       global.NKC.io.of('/console').NKC.webMessage(d);
     }

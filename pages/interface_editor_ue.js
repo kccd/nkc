@@ -110,10 +110,64 @@ function saveDraft() {
 * 转发到专栏
 * */
 var ColumnCategoriesDom;
+var anonymousData;
 $(function() {
-  if(!NKC.modules.SelectColumnCategories) return;
-  ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+  if(NKC.modules.SelectColumnCategories) {
+    ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+  }
+  var anonymousDom = $("#sendAnonymousDom");
+  if(anonymousDom.length) {
+    anonymousData = NKC.methods.getDataById("anonymousData");
+    anonymousData.targetForumsId = anonymousData.targetForumsId || [];
+    toggleAnonymousDom(verifyAnonymousPermission(anonymousData.targetForumsId));
+    setInterval(function() {
+      var dom = $("#newPanelForum");
+      if(dom.length) {
+        var fids = [];
+        dom.find(".chooseForum").each(function() {
+          var fid = $(this).attr("fid");
+          if(fid && fid !== "undefined") {
+            fids.push(fid)
+          }
+        });
+        toggleAnonymousDom(verifyAnonymousPermission(fids));
+      }
+
+    }, 1000);
+  }
 });
+// 根据权限设置勾选框 是否禁止勾选
+// 若有权限则勾选框可勾选
+// 若没有权限则勾选框不可勾选，且取消已勾选
+function toggleAnonymousDom(havePermission) {
+  var anonymousDom = $("#sendAnonymousDom");
+  var checkbox = $("#sendAnonymousDom input");
+  if(!anonymousDom.length || !checkbox.length) return;
+  if(havePermission) {
+    checkbox.attr("disabled", false);
+    checkbox.attr("title", "");
+  } else {
+    checkbox.prop("checked", false);
+    checkbox.attr("disabled", true);
+    checkbox.attr("title", "未选择专业或已选专业中至少有一个专业不允许发表匿名内容");
+  }
+}
+// 判断已选专业是否都允许发表匿名内容
+function verifyAnonymousPermission(targetForumsId) {
+  if(
+    !anonymousData ||
+    !anonymousData.allowedAnonymousForumsId ||
+    anonymousData.allowedAnonymousForumsId.length === 0 ||
+    targetForumsId.length === 0
+  ) return false;
+  for(var i = 0; i < targetForumsId.length; i++) {
+    var fid = targetForumsId[i];
+    if(anonymousData.allowedAnonymousForumsId.indexOf(fid) !== -1) {
+      return true;
+    }
+  }
+  return false;
+}
 
 function getSelectedColumnCategoriesId() {
   if(!window.ColumnCategoriesDom) return [];
@@ -224,8 +278,8 @@ function onPost() {
     cat: queryCat,
     desType: desType,
     desTypeId: desTypeId
-  }
-  if(queryType == "post" || queryType == "thread" || queryType == "forum") {
+  };
+  if(queryType === "post" || queryType === "thread" || queryType === "forum") {
     try{
       var paperObj = paperProto.paperExport();
     }catch(e) {
@@ -238,6 +292,12 @@ function onPost() {
     } catch(err) {
       return screenTopWarning(err);
     }
+
+    var sendAnonymousPostDom = $("#sendAnonymousPost");
+    if(sendAnonymousPostDom.length) {
+      post.sendAnonymousPost = sendAnonymousPostDom.prop("checked");
+    }
+
     for(var i in paperObj) {
       post[i] = paperObj[i]
     }

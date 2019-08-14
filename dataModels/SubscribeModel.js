@@ -463,7 +463,7 @@ schema.statics.autoAttentionForum = async function(options) {
         uid: uid,
         type: "forum",
         fid: scr
-      })
+      });
       await newSubscribeForum.save();
     }
   }

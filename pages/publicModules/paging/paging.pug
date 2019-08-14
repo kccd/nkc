@@ -1,5 +1,6 @@
--var page = data.paging.page || 0;
--var pageCount = data.paging.pageCount || 1;
+-var paging = data.paging || {};
+-var page = paging.page || 0;
+-var pageCount = paging.pageCount || 1;
 -var min, max;
 -var query = '';
 if data.t
