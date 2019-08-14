@@ -30,6 +30,8 @@ block content
             th 分享码
             th 原始Url
             th 科创币记录
+            th 来源
+            th 设备信息
         tbody
           for log in data.result
             tr
@@ -45,13 +47,20 @@ block content
                     a(href=`/u/${log.uid}`)=log.user.username
                   span!=`(UID: ${log.uid})`
               th
-                span!=`${log.ip}:${log.port}`
+                a(href=ipUrl(log.ip) target="_blank")=`${log.ip}:${log.port}`
               th
                 span=log.code
               th
                 a(href=`${log.originUrl}`)=log.originUrl
               th
-                span 0
+                span=log.kcb/100
+              th
+                .referer
+                  a(href=log.referer target="_blank")=log.referer
+              th
+                .user-agent(onclick=`sweetAlert('${log.machine}')`)=log.machine
+
+
       include ../../interface_navigation_paging
 block scripts
   +includeJS('/experimental/log/share.js')

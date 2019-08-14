@@ -31,6 +31,13 @@ const shareLogsSchema = new Schema({
     type: String,
     default: ''
   },
+  /*
+  * 上一个页面的URL
+  * */
+  referer: {
+    type: String,
+    default: ""
+  },
   /**
    * 操作人ip
    * 取不到ip则记录为0.0.0.0
