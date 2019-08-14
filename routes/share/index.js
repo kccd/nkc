@@ -9,6 +9,22 @@ shareRouter
     const share = await db.ShareModel.findOne({token});
     if(!share) ctx.throw(403, '无效的token');
     const {kcbTotal, uid, tokenType} = share;
+    // 这里可以取到uid,id,toc,machine,ip, port,shareType,code,originUrl,type
+    // kcd先默认为0，如果有kcb奖励则在下方update
+    // 写入操作日志
+    const shareLogs = db.ShareLogsModel({
+      id: await db.SettingModel.operateSystemID('shareLogs', 1),
+      uid: user ? user.uid : "visit",
+      machine: ctx.header["user-agent"],
+      ip: ctx.ip,
+      port: ctx.port,
+      shareType: tokenType,
+      code: token,
+      originUrl: share.shareUrl,
+      type: "cli"
+    });
+    await shareLogs.save();
+
     let shareUrl;
     if(share.shareUrl.includes("?")) {
       shareUrl = share.shareUrl + '&token=' + token;
@@ -109,6 +125,7 @@ shareRouter
     });
     // 将分享者获得的kcb写入当前用户访问的记录上
     await shareAccessLog.update({kcb: addKcb});
+    await shareLogs.update({$set:{kcb: addKcb}});
     await lock.unlock();
     return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
 
@@ -160,6 +177,20 @@ shareRouter
     uid
   });
   await sharesAccessLog.save();
+
+  const shareLogs = db.ShareLogsModel({
+    id: await db.SettingModel.operateSystemID('shareLogs', 1),
+    uid: user ? user.uid : "visit",
+    machine: ctx.header["user-agent"],
+    ip: ctx.ip,
+    port: ctx.port,
+    shareType: type,
+    code: token,
+    originUrl: str,
+    type: "spo"
+  });
+  await shareLogs.save();
+
   data.newUrl = "/s/" + token;
   await next();
 });

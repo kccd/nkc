@@ -14,6 +14,7 @@ const examRouter = require("./exam");
 const recycleRouter = require("./recycle");
 const reviewRouter = require("./review");
 const warningRouter = require("./warning");
+const shareRouter = require("./share");
 logRouter
   .get('/', async (ctx, next) => {
     const {nkcModules} =ctx;
@@ -32,5 +33,6 @@ logRouter
   .use("/warning", warningRouter.routes(), warningRouter.allowedMethods())
   .use('/behavior', behaviorRouter.routes(), behaviorRouter.allowedMethods())
   .use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
+  .use('/share', shareRouter.routes(), shareRouter.allowedMethods())
   .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods());
 module.exports = logRouter;
