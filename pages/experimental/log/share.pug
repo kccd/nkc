@@ -1,0 +1,57 @@
+extends ../../bootstrap_base
+
+block title
+  -const mainContainer1400 = true;
+  +includeCSS('/experimental/index.css')
+  title 分享操作日志
+block content
+
+  .container-fluid.max-width
+    .row
+      include ../nav
+    .col-xs-12.col-md-12
+      .form-inline(style='margin-bottom: 1rem;')
+        .form-group
+          input.form-control#codeInp(placeholder='请输入分享码')
+        .form-group
+          button.btn.btn-primary(type='submit' onClick='searchCode()') 搜索分享码
+          span &nbsp;
+          a.btn.btn-default(href='/e/log/share') 全部
+    .col-xs-12.col-md-12.table-responsive
+      -const type = data.type
+      include ../../interface_navigation_paging
+      table.table.table-bordered(style='font-size: 1rem;')
+        thead
+          tr
+            th 类型
+            th 时间
+            th 用户
+            th ip
+            th 分享码
+            th 原始Url
+            th 科创币记录
+        tbody
+          for log in data.result
+            tr
+              th 
+                span=log.type==="cli"?"点击":"发起"
+              th
+                span=log.toc.toLocaleString()
+              th 
+                if log.uid === "visit"
+                  span 游客
+                else
+                  span
+                    a(href=`/u/${log.uid}`)=log.user.username
+                  span!=`(UID: ${log.uid})`
+              th
+                span!=`${log.ip}:${log.port}`
+              th
+                span=log.code
+              th
+                a(href=`${log.originUrl}`)=log.originUrl
+              th
+                span 0
+      include ../../interface_navigation_paging
+block scripts
+  +includeJS('/experimental/log/share.js')
