@@ -57,7 +57,7 @@ block title
             span 详情
         if permission("getPostAuthor") && post.anonymous
           li
-            a(onclick=`NKC.methods.getPostAuthor('${post.pid}')`)
+            a(onclick=`getPostAuthor('${post.pid}')`)
               span.fa.fa-user-secret &nbsp;
               span 作者
         if postTo && !thread.closed
@@ -652,6 +652,8 @@ block scripts
   if data.user
     script(src=`/media/media_index.js?v=${startTime}`)
     include ../publicModules/subscribeTypes/subscribeTypes
+  if permission("getPostAuthor")
+    include ../publicModules/floatUserPanel/userInfo
   +includeJS("/external_pkgs/viewer/viewer.js")
   script.
     $(document).ready(function() {
