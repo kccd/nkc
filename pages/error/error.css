@@ -12,6 +12,7 @@ body{
 }
 .error-code{
   padding: 0.5rem 0;
+  font-size: 1.2rem;
 }
 .error-list{
   padding: 1.2rem 1rem;
@@ -51,6 +52,7 @@ body{
 }
 .error-info{
   color: #282c37;
+  font-size: 1.2rem;
 }
 .error-info a{
   color: #2b90d9;
@@ -60,4 +62,16 @@ body{
 .error-info a:hover{
   text-decoration: none;
   color: #282c37;
+}
+.error-button{
+  text-align: center;
+  font-size: 1.4rem;
+  margin-top: 1rem;
+}
+.error-button a{
+  color: #2b90d9;
+  text-decoration: none;
+}
+.error-button a:hover, .error-button a:focus{
+  text-decoration: none;
 }
