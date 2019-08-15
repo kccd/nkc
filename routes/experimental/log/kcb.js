@@ -30,6 +30,8 @@ kcbRouter
       ];
     } else if(t === 'ip') {
       q.ip = content;
+    } else if(t === "operation") {
+      q.type = content;
     }
     const count = await db.KcbsRecordModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
