@@ -152,22 +152,6 @@ NKC.methods.markDom = function(dom) {
     dom.css("background-color", "rgba(255, 251, 221, "+(colorValue<1?colorValue:1)+")");
   }, 1000);
 };
-
-/*
-* 访问匿名用户的个人名片
-* @param {String} pid 匿名内容ID
-* @author pengxiguaa 2019-8-12
-* */
-NKC.methods.getPostAuthor = function(pid) {
-  nkcAPI("/p/" + pid + "/author", "GET")
-    .then(function(data) {
-      var author = data.author;
-      NKC.methods.visitUrl("/u/" + author.uid, true);
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
-};
 /*
 * 字符串转base64
 * @param {String} str 字符串

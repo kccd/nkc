@@ -1,4 +1,4 @@
-var SubscribeTypes;
+var SubscribeTypes, UserInfo;
 $(document).ready(function(){
   if(window.moduleToColumn) {
     moduleToColumn.init();
@@ -6,6 +6,10 @@ $(document).ready(function(){
   if(NKC.modules.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
+  if(NKC.modules.UserInfo) {
+    UserInfo = new NKC.modules.UserInfo();
+  }
+
 	//编辑器缩放
   NKC.methods.markDom($("#highlight>.highlight"));
 	if($(".w-e-text-container").length === 0) return;
@@ -970,4 +974,11 @@ function disabledPostButtonByProtocol(allowed) {
   } else {
     $("#ButtonReply").attr("disabled", true);
   }
+}
+
+function getPostAuthor(pid) {
+  UserInfo.open({
+    type: "showUserByPid",
+    pid: pid
+  });
 }
