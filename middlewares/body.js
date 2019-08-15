@@ -44,9 +44,9 @@ module.exports = async (ctx, next) => {
           // stream.pipe(ctx.response);
         }else{
           if(ctx.response) {
-            ctx.response.removeHeader("Content-Length");
+            // ctx.response.removeHeader("Content-Length");
             ctx.status = 416;
-            ctx.response.end();
+            // ctx.response.end();
           }
         }
       }else{
