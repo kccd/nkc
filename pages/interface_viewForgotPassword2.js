@@ -153,7 +153,7 @@ function getMcode(){
   }*/
   /*if(icode == ''){
     getFocus("#icode")
-    return error_report('请填写图片验证码！')
+    return error_report('请填写图形验证码！')
   }*/
 
   else{
@@ -191,7 +191,7 @@ function getMcode(){
     })
 }*/
 
-//点击刷新图片验证码
+//点击刷新图形验证码
 /*
 $(document).ready(function() {
 	 $("#icodeImg").click(//refreshICode3)

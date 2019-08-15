@@ -121,7 +121,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                   span.fa.fa-shopping-cart &nbsp;购物车
               li.divider
               li
-                a(href=`/logout` title='不，不要走！')
+                a(onclick="NKC.methods.logout()" title='不，不要走！')
                   span.fa.fa-sign-out &nbsp;退出
         else
           li.userInfo
@@ -254,4 +254,4 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span.pull-right.fa.fa-angle-right
 
 
-      a(href="/logout").nkc-drawer-exit 退出登录
+      a(onclick="NKC.methods.logout()").nkc-drawer-exit 退出登录

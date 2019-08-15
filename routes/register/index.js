@@ -168,7 +168,7 @@ registerRouter
 	.get('/code', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
-		if(user) ctx.throw(400, '您已注册，无法获取图片验证码。');
+		if(user) ctx.throw(400, '您已注册，无法获取图形验证码。');
 		const codeData = captcha.createRegisterCode();
 		const imgCode = db.ImgCodeModel({
 			token: codeData.text

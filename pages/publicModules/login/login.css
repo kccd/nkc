@@ -1,10 +1,14 @@
 @media (min-width: 768px){
   #moduleLogin .modal-dialog{
-    width: 420px;
+    width: 370px;
   }
+}
+#moduleLoginApp{
+  position: relative;
 }
 #moduleLogin .modal-content{
   border-radius: 3px;
+  box-shadow: none;
 }
 #moduleLogin .modal-header{
   border-bottom: none;
@@ -13,9 +17,15 @@
   text-align: center;
 }
 #moduleLogin .login-type{
+  cursor: pointer;
   width: 7rem;
+  padding: 0.5rem 0;
   text-align: center;
   display: inline-block;
+}
+#moduleLogin .login-type.active{
+  background-color: #f6f6f6;
+  border-radius: 10px;
 }
 #moduleLogin .login-type-info{
   font-size: 1rem;
@@ -33,9 +43,70 @@
   background-color: #fb5c62;
   color: #fff;
 }
-
-#moduleLogin .login-form{
-  margin: auto;
+#moduleLogin .login-form .form{
+  margin: 2rem auto 4rem auto;
   width: 25rem;
   max-width: 100%;
+}
+#moduleLogin .login-form{
+  /*background-color: #f6f6f6;*/
+  border-radius: 5px;
+}
+#moduleLogin .login-form .input{
+  border-radius: 1.6rem;
+  padding: 6px 20px;
+  height: 3.2rem;
+}
+#moduleLogin .login-form .post-button{
+  height: 3rem;
+  border: 1px solid #fb5c62;
+  color: #fff;
+  background-color: #fb5c62;
+  width: 8rem;
+  border-radius: 1.5rem;
+}
+
+#moduleLogin .login-form .pull-left.link{
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #555;
+}
+#moduleLogin .login-form .pull-left.link a{
+  color: #7f90a7;
+}
+#moduleLogin .login-form .pull-left.link a:hover, #moduleLogin .login-form .pull-left.link a:focus{
+  text-decoration: none;
+}
+#moduleLogin .svg-data{
+  height: 3.2rem;
+  cursor: pointer;
+}
+#moduleLogin .svg-data svg{
+  height: 100%;
+}
+#moduleLogin .send-mobile-code{
+  height: 3.2rem;
+  line-height: 3.2rem;
+  padding-right: 1rem;
+  cursor: pointer;
+}
+#moduleLogin .send-mobile-code.disabled{
+ color: #aaa;
+}
+#moduleLogin .text-danger .fa{
+  font-size: 1.3rem;
+  color: #fb5c62;
+  margin-right: 0.3rem;
+}
+#moduleLogin .text-danger span{
+  color: #fb5c62;
+}
+#moduleLogin .button-icon{
+  font-size: 1.4rem;
+}
+#moduleLogin .button-icon.succeed{
+  font-size: 1.2rem;
 }

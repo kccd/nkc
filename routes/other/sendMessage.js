@@ -61,7 +61,7 @@ sendMessageRouter
 		if(!mobile) ctx.throw(400, '请输入手机号码。');
 		const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
 		if(otherPersonal) ctx.throw(400, `手机号码已被其他账号注册。`);
-		if(!imgCode) ctx.throw(400, '请输入图片验证码。');
+		if(!imgCode) ctx.throw(400, '请输入图形验证码。');
 		const id = ctx.cookies.get('imgCodeId');
 		await db.ImgCodeModel.ensureCode(id, imgCode);
 		const type = 'register';

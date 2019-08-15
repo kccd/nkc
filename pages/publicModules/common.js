@@ -186,3 +186,15 @@ NKC.methods.strToBase64 = function(str) {
 NKC.methods.base64ToStr = function(base64) {
   return decodeURIComponent(window.atob(base64))
 };
+/*
+* 退出登录
+* */
+NKC.methods.logout = function() {
+  nkcAPI("/logout?t=" + Date.now(), "GET")
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      sweetError(data);
+    })
+};
