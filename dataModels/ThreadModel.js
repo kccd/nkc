@@ -1508,7 +1508,8 @@ threadSchema.methods.createNewPost = async function(post) {
     uid: post.uid,
     uidlm: post.uid,
     rpid
-  });
+  }); 
+  if(!this.oc) await this.update({oc: pid});
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
   _post = _post.toObject();
