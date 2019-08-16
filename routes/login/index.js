@@ -173,28 +173,15 @@ loginRouter
 
 		await user.extendGrade();
 
-		//sign the cookie
-		const cookieStr = encodeURI(JSON.stringify({
-			uid: user.uid,
-			username: user.username,
-			lastLogin: Date.now()
-		}));
-		ctx.cookies.set('userInfo', cookieStr, {
-			signed: true,
-			maxAge: ctx.settings.cookie.life,
-			httpOnly: true
-		});
+		ctx.setCookie("userInfo", {
+      uid: user.uid,
+      username: user.username,
+      lastLogin: Date.now()
+    });
+
 		ctx.data = {
-			// cookie: ctx.req.headers.cookie,
 			user
 		};
-
-		const urls = ctx.getCookie("visitedUrls") || [];
-		if(urls.length === 0) {
-		  ctx.data.redirect = '/';
-    } else {
-		  ctx.data.redirect = urls[0];
-    }
 
 		await next();
 	});

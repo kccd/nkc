@@ -30,7 +30,8 @@ module.exports = async (ctx, next) => {
   const isResourcePost = resourceOperations.includes(ctx.data.operationId);
   const {data, db} = ctx;
 	// cookie
-	let userInfo = ctx.cookies.get('userInfo', {signed: true});
+  let userInfo = ctx.getCookie("userInfo");
+	// let userInfo = ctx.cookies.get('userInfo', {signed: true});
 	if(!userInfo) {
 	  // 为了兼容app中的部分请求无法附带cookie，故将cookie放到了url中
 		try{
@@ -50,14 +51,14 @@ module.exports = async (ctx, next) => {
 	}
 	let userOperationsId = [], userRoles = [], userGrade = {}, user;
 	if(userInfo) {
-		const {username, uid} = JSON.parse(decodeURI(userInfo));
-		user = await db.UserModel.findOne({uid});
-		if(!user || user.username !== username) {
-			ctx.cookies.set('userInfo', '');
-			ctx.status = 401;
-			ctx.error = new Error('缓存验证失败');
-      user = undefined;
-		}
+	  try {
+	    const {uid} = userInfo;
+      user = await db.UserModel.findOne({uid});
+      if(!user) ctx.setCookie('userInfo', '');
+    } catch(err) {
+      ctx.setCookie('userInfo', '');
+    }
+
 	}
   let languageName = 'zh_cn';
 	if(!user) {
