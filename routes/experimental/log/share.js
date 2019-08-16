@@ -18,9 +18,10 @@ router
 		data.type = 'shareLogs';
     data.result = await Promise.all(shareLogs.map(async log => {
       await log.extendUser();
+      await log.extendShareUser();
 			return log;
 		}));
     ctx.template = 'experimental/log/share.pug';
     await next()
-  })
+  });
 module.exports = router;
