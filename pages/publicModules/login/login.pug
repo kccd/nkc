@@ -65,6 +65,9 @@
                 .form-group
                   select.form-control.input(v-model="nationCode" @change="throwError('')" @keyup.enter="submit")
                     option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
+                  h5.text-danger(v-if="nationCode !== '86' && nationCode !== 86" style="font-size: 1rem")
+                    | 【海外用户】请注册后立即绑定邮箱，否则无密保功能。
+                    div(style="margin-top: 0.5rem;") 【海外用户】发表的内容可能需要经过人工审核才显示。
                 .form-group
                   input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @change="throwError('')" @keyup.enter="submit")
                 .row
@@ -85,6 +88,8 @@
                   .text-danger(v-if="error")
                     .fa.fa-exclamation-circle
                     span {{error}}
+                .text-left.m-b-1(style="font-size:1rem" v-if="type === 'register'") 注册即代表同意
+                  a(href=`/protocol?type=register` target="_blank") 《科创统一服务协议（注册协议）》
                 .text-right
                   .pull-left.link(v-if="type === 'login'")
                     a(@click="selectType('register')") 注册

@@ -90,7 +90,10 @@
 #moduleLogin .send-mobile-code{
   height: 3.2rem;
   line-height: 3.2rem;
-  padding-right: 1rem;
+  display: inline-block;
+  padding: 0 1rem;
+  border: 1px solid #eee;
+  border-radius: 5px;
   cursor: pointer;
 }
 #moduleLogin .send-mobile-code.disabled{

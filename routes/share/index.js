@@ -67,10 +67,7 @@ shareRouter
       return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
     }
     // 若share有效则写入cookie
-    ctx.cookies.set('share-token', token, {
-      httpOnly: true,
-      signed: true
-    });
+    ctx.setCookie("share-token", token);
     if(!share.shareReward) {
       await lock.unlock();
       return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));

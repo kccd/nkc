@@ -667,12 +667,6 @@ threadRouter
 
 		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
 
-		if(data.user) {
-			data.subscribe = await db.UsersSubscribeModel.findOnly({uid: data.user.uid});
-		}
-
-
-
 
 		// 相似文章
     data.sameThreads = [];

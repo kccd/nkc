@@ -27,10 +27,7 @@ registerRouter
 
     const imgCodeObj = await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
 
-    ctx.cookies.set('imgCodeId', '', {
-      httpOnly: true,
-      signed: true
-    });
+    ctx.setCookie("imgCodeId", "");
 
     await imgCodeObj.update({used: true});
 
@@ -52,23 +49,16 @@ registerRouter
 
     await imgCodeObj.update({uid: user.uid});
 
-	  const cookieStr = encodeURI(JSON.stringify({
-		  uid: user.uid,
-		  username: user.username,
-		  lastLogin: Date.now()
-	  }));
-	  ctx.cookies.set('userInfo', cookieStr, {
-		  signed: true,
-		  maxAge: ctx.settings.cookie.life,
-		  httpOnly: true
-	  });
+    ctx.setCookie("userInfo", {
+      uid: user.uid,
+      username: user.username,
+      lastLogin: Date.now()
+    });
+
 	  ctx.data = {
-		  cookie: ctx.cookies.get('userInfo'),
-		  introduction: 'put the cookie in req-header when using for api',
 		  user
 	  };
-	  /*const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);*/
+
 	  const shareToken = ctx.cookies.get('share-token', {signed: true});
 	  try{
 	    await db.ShareModel.ensureEffective(shareToken);
