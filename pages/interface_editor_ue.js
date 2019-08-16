@@ -55,15 +55,16 @@ function saveDraft() {
   }catch(e){
     draftContent = "";
   }
-  var content = quoteContent + draftContent;
-  if(content.length < 1) return sweetWarning("请填写内容");
-  if(geid('parseURL').checked) {
+  var content = (quoteContent + draftContent) || "";
+  content = common.URLifyHTML(content);
+  // if(content.length < 1) return sweetWarning("请填写内容");
+  /*if(geid('parseURL').checked) {
     content = common.URLifyHTML(content);
-  }
+  }*/
   // 获取标题
   var title = geid('title').value.trim();
-  if(title === '') return sweetWarning('请填写标题');
-  if(title.length > 50) return sweetWarning("请将文章标题控制在50字以内");
+  // if(title === '') return sweetWarning('请填写标题');
+  // if(title.length > 50) return sweetWarning("请将文章标题控制在50字以内");
   // 路由为/editor时，queryType为空
   if(!queryType || queryType === "forum") {
     queryType = 'forum';
@@ -81,7 +82,7 @@ function saveDraft() {
     try{
       paperObj = paperProto.paperExport();
     }catch(e) {
-      screenTopWarning(e);
+      sweetError(e);
       return;
     }
     for(var i in paperObj) {
@@ -101,7 +102,7 @@ function saveDraft() {
     }
   })
   .catch(function (data) {
-    screenTopWarning(data || data.error);
+    sweetError(data || data.error);
     geid('post').disabled = false
   })
 }
