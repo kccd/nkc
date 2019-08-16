@@ -37,10 +37,6 @@ const shareSchema = new Schema({
     type: String,
     default: null
   },
-  ips: {
-    type: [String],
-    default: []
-  },
   targetId: {
     type: String,
     index: 1,
@@ -56,11 +52,11 @@ const shareSchema = new Schema({
   },
   shareReward: {
     type: Boolean,
-    default: false
+    default: true
   },
   registerReward: {
     type: Boolean,
-    default: false
+    default: true
   }
 },
 {
@@ -176,6 +172,103 @@ shareSchema.statics.ensureEffective = async function(token, id) {
   if(difference > 1000*60*60*shareLimitTime) { // token过期
     await share.update({tokenLife: 'invalid'});
     throwErr('token无效');
+  }
+};
+/*
+* 计算分享奖励，生成科创币账单，设置分享奖励状态
+* @author pengxiguaa 2019--8-16
+* */
+shareSchema.methods.computeReword = async function(type, ip, port) {
+  const SettingModel = mongoose.model("settings");
+  const ShareLimitModel = mongoose.model("shareLimit");
+  const {share} = await SettingModel.getSettings("redEnvelope");
+  let {today} = require("../nkcModules/apiFunction");
+  today = today();
+  const {
+    token, uid, tokenLife, tokenType, targetId, kcbTotal,
+    registerKcbTotal, shareReward, registerReward
+  } = this;
+  let clickReward = true, createUserReward = true;
+  if(!uid || uid === "visitor") {
+    clickReward = false;
+    createUserReward = false;
+  }
+  const typeSettings = share[tokenType];
+  const registerSettings = share.register;
+  if(!typeSettings.status) clickReward = false;
+  if(!registerSettings.status) createUserReward = false;
+  if(!shareReward) clickReward = false;
+  if(!registerReward) createUserReward = false;
+  if(tokenLife !== "effective") {
+    clickReward = false;
+    createUserReward = false;
+  }
+  if(kcbTotal >= typeSettings.maxKcb) clickReward = false;
+  if(registerKcbTotal >= registerSettings.maxKcb) createUserReward = false;
+  const shares = await mongoose.model("share").find({toc: {$gte: today}, uid});
+  let total = 0;
+  for(const s of shares) {
+    total += s.registerKcbTotal || 0;
+  }
+  // 针对注册，count字段表示的是"每天获得注册奖励的上限"
+  if(total >= registerSettings.count*100) createUserReward = false;
+  const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const shareLimit = await ShareLimitModel.findOnly({shareType: tokenType});
+  const updateObj = {
+    shareReward: !!clickReward,
+    registerReward: !!createUserReward
+  };
+  let status = false;
+  let num = 0;
+  if(clickReward && type === "visit") {
+    const record = await KcbsRecordModel({
+      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
+      from: "bank",
+      to: uid,
+      type: "share",
+      num: typeSettings.kcb,
+      c: {
+        type: tokenType,
+        token: token,
+        targetId: targetId
+      },
+      ip,
+      port,
+      description: `分享${shareLimit.shareName}`
+    });
+    await record.save();
+    if(!updateObj.$inc) updateObj.$inc = {};
+    updateObj.$inc.kcbTotal = typeSettings.kcb;
+    status = true;
+    num = typeSettings.kcb;
+  }
+  if(createUserReward && type === "register") {
+    const record = await KcbsRecordModel({
+      _id: await SettingModel.operateSystemID("kcbsRecords", 1),
+      from: "bank",
+      to: uid,
+      type: "share",
+      num: registerSettings.kcb,
+      c: {
+        type: tokenType,
+        token: token,
+        targetId: targetId
+      },
+      ip,
+      port,
+      description: `分享${shareLimit.shareName}，完成注册`
+    });
+    await record.save();
+    if(!updateObj.$inc) updateObj.$inc = {};
+    updateObj.$inc.registerKcbTotal = registerSettings.kcb;
+    status = true;
+    num = typeSettings.kcb;
+  }
+  await this.update(updateObj);
+  await mongoose.model("users").updateUserKcb(uid);
+  return {
+    status,
+    num
   }
 };
 

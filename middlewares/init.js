@@ -1,5 +1,6 @@
 const tools = require('../tools');
 const colors = require("colors");
+const body = require('./body');
 const settings = require('../settings');
 const nkcModules = require('../nkcModules');
 const db = require('../dataModels');
@@ -25,25 +26,31 @@ const fsSync = {
 module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
+  ctx.nkcModules = nkcModules;
+  Object.defineProperty(ctx, 'template', {
+    get: function() {
+      return './pages/' + this.__templateFile
+    },
+    set: function(fileName) {
+      this.__templateFile = fileName
+    }
+  });
   try{
     ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   } catch(err) {
     if(err.status === 404) {
       console.log(`未知来源的请求：${ctx.url}`.bgRed);
+      ctx.template = "error/error.pug";
+      ctx.status = 404;
+      ctx.data.status = 404;
+      ctx.data.url = ctx.url;
+      await body(ctx, () => {});
     } else {
       console.log(err);
     }
     return;
   }
   try {
-    Object.defineProperty(ctx, 'template', {
-      get: function() {
-        return './pages/' + this.__templateFile
-      },
-      set: function(fileName) {
-        this.__templateFile = fileName
-      }
-    });
 	  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
     let XFF = ctx.get('X-Forwarded-For');
 	  if(XFF !== '') {
@@ -55,7 +62,6 @@ module.exports = async (ctx, next) => {
 	  ctx.port = port;
     ctx.body = ctx.request.body;
 	  ctx.db = db;
-	  ctx.nkcModules = nkcModules;
 	  ctx.tools = tools;
     ctx.redis = redis;
     ctx.settings = settings;
@@ -137,7 +143,6 @@ module.exports = async (ctx, next) => {
 			ctx.data.targetUser = ctx.data.targetUser.toObject();
 		}
   } catch(err) {
-    const body = require('./body');
 	  ctx.status = err.statusCode || err.status || 500;
 	  ctx.error = err.stack || err;
 	  let error;
@@ -161,6 +166,7 @@ module.exports = async (ctx, next) => {
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;
 		ctx.type = ctx.type || 'application/json';
+		if(ctx.filePath) ctx.filePath = "";
 	  await body(ctx, () => {});
   }
   finally {

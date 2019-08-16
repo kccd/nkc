@@ -9,7 +9,7 @@
           span 详情
     if permission("getPostAuthor") && comment.anonymous
       li
-        a(onclick=`NKC.methods.getPostAuthor('${comment.pid}')`)
+        a(onclick=`getPostAuthor('${comment.pid}')`)
           span.fa.fa-user-secret &nbsp;
           span 作者
     if data.userOperationsId.includes('creditXsf') && data.isModerator

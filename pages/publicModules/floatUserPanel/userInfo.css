@@ -1,0 +1,53 @@
+#moduleUserInfo .module-user-info-avatar{
+  text-align: center;
+}
+#moduleUserInfo .module-user-info-info{
+  text-align: center;
+}
+#moduleUserInfo .module-user-info-name{
+  display: block;
+  text-align: center;
+  color: #282c37;
+  margin-top: 0.5rem;
+  font-size: 1.4rem;
+}
+#moduleUserInfo .module-user-info-name:hover, #moduleUserInfo .module-user-info-name:active{
+  color: #282c37;
+  text-decoration: none;
+}
+#moduleUserInfo .module-user-info-avatar img{
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+}
+#moduleUserInfo .modal-header{
+  border-bottom: none;
+}
+#moduleUserInfo .module-user-info-grade img{
+  height: 1rem;
+  width: 1rem;
+}
+#moduleUserInfo .module-user-info-grade span{
+  font-size: 1rem;
+  color: #aaa;
+  margin-right: 0.2rem;
+}
+#moduleUserInfo .module-user-info-certs{
+  font-size: 1rem;
+  color: #e85a71;
+}
+#moduleUserInfo .module-user-info-description {
+  font-size: 1rem;
+  color: #282c37;
+}
+#moduleUserInfo .module-user-info-posts .col-xs-3{
+  padding: 0;
+}
+#moduleUserInfo .module-user-info-posts .title{
+  font-size: 1rem;
+  color: #aaa;
+}
+#moduleUserInfo .module-user-info-posts .count{
+  font-size: 1rem;
+  font-weight: 700;
+}

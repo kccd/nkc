@@ -6,7 +6,12 @@ const utils = require('./utils');
 module.exports = async (ctx, next) => {
   const {filePath, fileName, resource, fs} = ctx;
   if(filePath && ctx.method === 'GET') {
-    const stats = fss.statSync(filePath);
+    let stats;
+    try{
+      stats = fss.statSync(filePath);
+    } catch(err) {
+      ctx.throw(404, err);
+    }
     const lastModified = (new Date(stats.mtime)).getTime();
     ctx.set("ETag", lastModified);
     ctx.set('Cache-Control', 'public, max-age=604800');

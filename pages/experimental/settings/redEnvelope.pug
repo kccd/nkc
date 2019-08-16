@@ -79,13 +79,38 @@ block content
           table.table.table-bordered
             thead
               tr
-                th 分享类型
-                th 科创币
-                th 奖励上限
-                th 每天有效分享次数上限(分享次数超过该值后不再奖励)
+                th 类型
+                th 单次点击奖励（科创币）
+                th 同一分享奖励上限（科创币）
+                th 每天分享次数上限（超过后不给予奖励）
                 th 状态
             tbody
-              tr(v-for='s in share')
+              tr(v-for='s in share' v-if="s.name !== '注册'")
+                th {{s.name}}
+                th
+                  input(v-model.number='s.kcb')
+                th
+                  input(v-model.number='s.maxKcb')
+                th
+                  input(v-model.number='s.count')
+                th
+                  div(v-if='s.status')
+                    span 已开启
+                    button(@click='s.status = false') 关闭
+                  div(v-else)
+                    span 已关闭
+                    button(@click='s.status = true') 打开
+          h5.text-danger 当游客点击分享链接并且发生注册行为后，系统将根据以下设置给予分享者科创币奖励。
+          table.table.table-bordered
+            thead
+              tr
+                th 类型
+                th 单次注册奖励（科创币）
+                th 同一分享获得注册奖励上限（科创币）
+                th 每天获得注册奖励上限（科创币）
+                th 状态
+            tbody
+              tr(v-for='s in share' v-if="s.name === '注册'")
                 th {{s.name}}
                 th
                   input(v-model.number='s.kcb')

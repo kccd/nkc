@@ -1,11 +1,21 @@
-extends ../bootstrap_base
-block title
+extends ../scratch.pug
+block head
+  meta(charset='UTF-8')
+  meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
+  meta(name="viewport" content="width=device-width, initial-scale=1")
+  meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
+  +includeCSS('/bootstrap/css/bootstrap.css')
+  link(rel='shortcut icon' href='/favicon.ico')
   title= data.status
+  +includeCSS("/publicModules/public.css")
+  +includeCSS("/nkc_styles.css")
   +includeCSS("/error/error.css")
-block content
+
+block body
   .container-fluid.max-width
     .error-content
       block errorContent
-block scripts
-  +includeJS("/error/error.js")
-  block errorScripts
+      .error-button
+        a(href="/") 网站首页
+        | &nbsp;&nbsp;&nbsp;
+        a(onclick="history.back(-1)") 返回上一页
