@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const registerRouter = new Router();
 const captcha = require("../../nkcModules/captcha");
+const cookieConfig = require("../../config/cookie");
 registerRouter
   .get(['/','/mobile'], async (ctx, next) => {
   	const {data, query} = ctx;
@@ -59,7 +60,7 @@ registerRouter
 	  }));
 	  ctx.cookies.set('userInfo', cookieStr, {
 		  signed: true,
-		  maxAge: ctx.settings.cookie.life,
+		  maxAge: cookieConfig.maxAge,
 		  httpOnly: true
 	  });
 	  ctx.data = {
@@ -69,7 +70,8 @@ registerRouter
 	  };
 	  /*const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);*/
-	  const shareToken = ctx.getCookie('share-token');
+	  let shareToken = ctx.getCookie('share-token');
+	  if(shareToken) shareToken = shareToken.token;
 	  try{
 	    await db.ShareModel.ensureEffective(shareToken);
     } catch(err) {
