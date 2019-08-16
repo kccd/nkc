@@ -803,6 +803,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     thread.categories = [];
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
+      if(!firstPost) continue;	    
       if(firstPost.anonymous && o.excludeAnonymousPost) continue;
       if(o.firstPostUser) {
         let user;
