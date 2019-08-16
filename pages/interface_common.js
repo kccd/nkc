@@ -1349,7 +1349,8 @@ function initPhotoSwipe(url) {
 
 function shareTo(shareType, type, str, title, pid){
   var host = window.location.host;
-  var lk = 'http://'+host+'/default/logo3.png'
+  var lk = 'http://'+host+'/default/logo3.png';
+  var origin = window.location.origin;
   if(type !== "weChat" && type !== "link"){
     var newLink = window.open();
   }
@@ -1361,7 +1362,7 @@ function shareTo(shareType, type, str, title, pid){
     }
     nkcAPI('/s', "POST", para)
     .then(function(data) {
-      var newUrl = 'https://' + host + data.newUrl;
+      var newUrl = origin + data.newUrl;
       if(type == "link") {
         var copyAreaId = "copyArea"+pid;
         var copyLinkId = "copyLink"+pid;
