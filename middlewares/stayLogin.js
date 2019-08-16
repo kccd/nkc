@@ -50,14 +50,14 @@ module.exports = async (ctx, next) => {
 	}
 	let userOperationsId = [], userRoles = [], userGrade = {}, user;
 	if(userInfo) {
-		const {username, uid} = JSON.parse(decodeURI(userInfo));
-		user = await db.UserModel.findOne({uid});
-		if(!user || user.username !== username) {
-			ctx.cookies.set('userInfo', '');
-			ctx.status = 401;
-			ctx.error = new Error('缓存验证失败');
-      user = undefined;
-		}
+	  try {
+      const {username, uid} = JSON.parse(decodeURI(userInfo));
+      user = await db.UserModel.findOne({uid});
+      if(!user) ctx.cookies.set('userInfo', '');
+    } catch(err) {
+      ctx.cookies.set('userInfo', '');
+    }
+
 	}
   let languageName = 'zh_cn';
 	if(!user) {

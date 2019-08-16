@@ -68,7 +68,7 @@ shareRouter
       return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
     }
     // 若share有效则写入cookie
-    ctx.setCookie(`share-token`, token);
+    ctx.setCookie(`share-token`, {token});
     // 给予奖励
     const {status, num} = await share.computeReword("visit", ctx.address, ctx.port);
     // 计算分享者的kcb
