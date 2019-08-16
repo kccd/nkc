@@ -184,20 +184,20 @@ userSchema.virtual('registerType')
 		this._registerType = registerType;
 	});
 
-userSchema.virtual('sheetA')
+userSchema.virtual('paperA')
 	.get(function() {
-		return this._sheetA;
+		return this._paperA;
 	})
-	.set(function(sheetA) {
-		this._sheetA = sheetA;
+	.set(function(paperA) {
+		this._paperA = paperA;
 	});
 
-userSchema.virtual('sheetB')
+userSchema.virtual('paperB')
 	.get(function() {
-		return this._sheetB;
+		return this._paperB;
 	})
-	.set(function(sheetB) {
-		this._sheetB = sheetB;
+	.set(function(paperB) {
+		this._paperB = paperB;
 	});
 
 

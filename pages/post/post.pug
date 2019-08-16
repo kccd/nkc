@@ -71,7 +71,7 @@ block content
                   if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
                     .options-fa.fa.fa-edit(onclick=`openToNewLocation("/editor?type=post&id=${post.pid}")`) &nbsp;编辑
                 if permission("getPostAuthor") && post.anonymous
-                  .options-fa.fa.fa-user-secret(onclick=`NKC.methods.getPostAuthor('${post.pid}')`) &nbsp;作者
+                  .options-fa.fa.fa-user-secret(onclick=`getPostAuthor('${post.pid}')`) &nbsp;作者
                 if disablePost
                   if data.thread.oc !== post.pid
                     .options-fa.fa.fa-eye-slash(onclick=`disablePostClick('${post.pid}', "post")` data-toggle="modal" data-target="#threadRecycleModal" data-whatever="@mdo") &nbsp;屏蔽
@@ -150,7 +150,6 @@ block content
                 a(href=`/u/${u.uid}` target='_blank' title=u.username)
                   img(src=`/avatar/${u.avatar}`)
 block scripts
-
   include ../publicModules/complaint/complaint
   +includeJS(`/module_dropdown.js`)
   +includeJS(`/post_to_recycle.js`)
@@ -159,6 +158,8 @@ block scripts
   include ../ueditor/ueditorBase
   +includeJS(`/thread/comments.js`)
   +includeJS("/external_pkgs/viewer/viewer.js")
+  if permission("getPostAuthor")
+    include ../publicModules/floatUserPanel/userInfo
   script.
     $(".dropdown-menu.stop-propagation").on("click",function (e) {
       e.stopPropagation();
@@ -166,7 +167,9 @@ block scripts
     //- var preview = new Preview({
     //-     imgWrap: 'wrap' // 指定该容器里的图片点击预览
     //- })
+    var UserInfo;
     $(document).ready(function() {
+      if(NKC.modules.UserInfo) UserInfo = new NKC.modules.UserInfo();
       var options = {
         navbar: false,
         title: false,
@@ -176,3 +179,10 @@ block scripts
       NKC.methods.markDom($(".highlight-dom>.highlight"));
       NKC.methods.scrollToDom($(".highlight-dom"));
     })
+
+    function getPostAuthor(pid) {
+      UserInfo.open({
+        type: "showUserByPid",
+        pid: pid
+      });
+    }

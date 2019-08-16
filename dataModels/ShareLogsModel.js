@@ -13,7 +13,16 @@ const shareLogsSchema = new Schema({
    */
   uid: {
     type: String,
-    default: "visit"
+    index: 1,
+    default: "visitor"
+  },
+  /**
+   * 分享者id
+   */
+  shareUid: {
+    type: String,
+    index: 1,
+    default: ""
   },
   /**
    * 日志记录时间
@@ -31,12 +40,20 @@ const shareLogsSchema = new Schema({
     type: String,
     default: ''
   },
+  /*
+  * 上一个页面的URL
+  * */
+  referer: {
+    type: String,
+    default: ""
+  },
   /**
    * 操作人ip
    * 取不到ip则记录为0.0.0.0
    */
   ip: {
     type: String,
+    index: 1,
     default: '0.0.0.0'
   },
   /**
@@ -51,6 +68,7 @@ const shareLogsSchema = new Schema({
    * post 回复；thread 文章；activity 活动；cloumn 专栏；user 用户名片；forum 专业；and so on
    */
 	shareType: {
+    index: 1,
 		type: String,
 		default: 'all'
   },
@@ -59,6 +77,7 @@ const shareLogsSchema = new Schema({
    */
   code: {
     type: String,
+    index: 1,
     default: ''
   },
   /**
@@ -66,6 +85,7 @@ const shareLogsSchema = new Schema({
    */
   originUrl: {
     type: String,
+    index: 1,
     default: ''
   },
   /**
@@ -83,6 +103,7 @@ const shareLogsSchema = new Schema({
    */
   type: {
     type: String,
+    index: 1,
     default: ""
   }
 }, {
@@ -94,13 +115,13 @@ const shareLogsSchema = new Schema({
 });
 
 shareLogsSchema.virtual('user')
-	.get(function() {
-		return this._user;
-	})
-	.set(function(user) {
-		this._user = user;
+  .get(function() {
+    return this._user;
+  })
+  .set(function(user) {
+    this._user = user;
   });
-  
+
 shareLogsSchema.methods.extendUser = async function() {
   const UserModel = mongoose.model('users');
   let user;
@@ -111,6 +132,26 @@ shareLogsSchema.methods.extendUser = async function() {
     }
   }
   return this.user = user;
+};
+
+shareLogsSchema.virtual('shareUser')
+  .get(function() {
+    return this._shareUser;
+  })
+  .set(function(shareUser) {
+    this._shareUser = shareUser;
+  });
+
+shareLogsSchema.methods.extendShareUser = async function() {
+  const UserModel = mongoose.model('users');
+  let user;
+  if(this.shareUid) {
+    const u = await UserModel.findOne({uid: this.shareUid});
+    if(u) {
+      user = u;
+    }
+  }
+  return this.shareUser = user;
 };
 
 const ShareLogsModel = mongoose.model('shareLogs', shareLogsSchema);

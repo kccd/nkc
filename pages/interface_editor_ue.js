@@ -55,15 +55,16 @@ function saveDraft() {
   }catch(e){
     draftContent = "";
   }
-  var content = quoteContent + draftContent;
-  if(content.length < 1) return sweetWarning("请填写内容");
-  if(geid('parseURL').checked) {
+  var content = (quoteContent + draftContent) || "";
+  content = common.URLifyHTML(content);
+  // if(content.length < 1) return sweetWarning("请填写内容");
+  /*if(geid('parseURL').checked) {
     content = common.URLifyHTML(content);
-  }
+  }*/
   // 获取标题
   var title = geid('title').value.trim();
-  if(title === '') return sweetWarning('请填写标题');
-  if(title.length > 50) return sweetWarning("请将文章标题控制在50字以内");
+  // if(title === '') return sweetWarning('请填写标题');
+  // if(title.length > 50) return sweetWarning("请将文章标题控制在50字以内");
   // 路由为/editor时，queryType为空
   if(!queryType || queryType === "forum") {
     queryType = 'forum';
@@ -81,7 +82,7 @@ function saveDraft() {
     try{
       paperObj = paperProto.paperExport();
     }catch(e) {
-      screenTopWarning(e);
+      sweetError(e);
       return;
     }
     for(var i in paperObj) {
@@ -101,7 +102,7 @@ function saveDraft() {
     }
   })
   .catch(function (data) {
-    screenTopWarning(data || data.error);
+    sweetError(data || data.error);
     geid('post').disabled = false
   })
 }
@@ -115,6 +116,11 @@ $(function() {
   if(NKC.modules.SelectColumnCategories) {
     ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
   }
+  var proDom = $("#protocolCheckbox");
+  proDom.on("change", function() {
+    disabledPostButtonByProtocol(proDom.prop("checked"));
+  });
+  disabledPostButtonByProtocol(proDom.prop("checked"));
   var anonymousDom = $("#sendAnonymousDom");
   if(anonymousDom.length) {
     anonymousData = NKC.methods.getDataById("anonymousData");
@@ -136,20 +142,32 @@ $(function() {
     }, 1000);
   }
 });
+/*
+* 检测是否勾选同意协议。勾选：禁止发表按钮
+* */
+function disabledPostButtonByProtocol(allowed) {
+  if(allowed) {
+    $("#post").attr("disabled", false);
+  } else {
+    $("#post").attr("disabled", true);
+  }
+}
 // 根据权限设置勾选框 是否禁止勾选
 // 若有权限则勾选框可勾选
 // 若没有权限则勾选框不可勾选，且取消已勾选
 function toggleAnonymousDom(havePermission) {
   var anonymousDom = $("#sendAnonymousDom");
   var checkbox = $("#sendAnonymousDom input");
+  var infoDom = $("#sendAnonymousPostInfo");
   if(!anonymousDom.length || !checkbox.length) return;
   if(havePermission) {
     checkbox.attr("disabled", false);
     checkbox.attr("title", "");
+    infoDom.text("");
   } else {
     checkbox.prop("checked", false);
     checkbox.attr("disabled", true);
-    checkbox.attr("title", "未选择专业或已选专业中至少有一个专业不允许发表匿名内容");
+    infoDom.text("（所选专业分类不支持匿名发表）");
   }
 }
 // 判断已选专业是否都允许发表匿名内容
@@ -230,9 +248,9 @@ function onPost() {
   if(content.length < 1) {
     return screenTopWarning("请填写内容")
   }
-  if(geid('parseURL').checked) {
+  /*if(geid('parseURL').checked) {
     content = common.URLifyHTML(content);
-  }
+  }*/
   var title = geid('title').value.trim(); // 文章标题
   if (queryType !== 'redit' && queryType !== 'thread' && queryType !== 'post' && queryType !== 'application' && title === '' && queryType !== 'forum_declare') {
     return screenTopWarning('请填写标题');

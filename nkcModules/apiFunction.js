@@ -1,6 +1,7 @@
 const paging = require('../settings/paging');
 const moment = require('moment');
 const http = require("http");
+const randomatic = require('randomatic');
 const aliAppCode = require("../config/aliAppCode");
 const {appCode} = aliAppCode;
 moment.locale('zh-cn');
@@ -637,5 +638,20 @@ fn.getPagingButton = (paging) => {
   }
   return arr;
 };
-
+/*
+* 获取随机字符串
+* @param {String} pattern
+      a: Lowercase alpha characters (abcdefghijklmnopqrstuvwxyz')
+      A: Uppercase alpha characters (ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+      0: Numeric characters (0123456789')
+      !: Special characters (~!@#$%^&()_+-={}[];\',.)
+      *: All characters (all of the above combined)
+      ?: Custom characters (pass a string of custom characters to the options)
+* @param {Number} length 字符串长度
+* @return {String}
+* @author pengxiguaa 2019-8-14
+* */
+fn.getRandomString = (pattern, length) => {
+  return randomatic(pattern, length);
+};
 module.exports = fn;

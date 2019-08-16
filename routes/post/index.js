@@ -271,10 +271,10 @@ router
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
-    const {sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
+    const {columnCategoriesId, sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
-    const {data, db, fs} = ctx;
+    const {state, data, db, fs} = ctx;
     const {user} = data;
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     const authLevel = await userPersonal.getAuthLevel();
@@ -403,6 +403,10 @@ router
 	  if(!isModerator && !data.userOperationsId.includes('displayDisabledPosts')) {
 	  	q.disabled = false;
 	  }
+    // 转发到专栏
+    if(columnCategoriesId.length > 0 && state.userColumn) {
+      await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [targetThread.oc]);
+    }
     let {page} = await targetThread.getStep({pid, disabled: q.disabled});
     let postId = `#${pid}`;
     page = `?page=${page}`;

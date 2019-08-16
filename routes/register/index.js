@@ -69,55 +69,15 @@ registerRouter
 	  };
 	  /*const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);*/
-	  const shareToken = ctx.cookies.get('share-token', {signed: true});
+	  const shareToken = ctx.getCookie('share-token');
 	  try{
 	    await db.ShareModel.ensureEffective(shareToken);
     } catch(err) {
       return await next();
     }
     const share = await db.ShareModel.findOnly({token: shareToken});
-	  if(['', 'visitor'].includes(share.uid)) return await next();
-    if(!share.registerReward) return await next();
-    let redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
-    redEnvelopeSettings = redEnvelopeSettings.c;
-    const shareSettings = redEnvelopeSettings.share.register;
-    if(!shareSettings.status) return await next();
-    const {kcb, maxKcb} = shareSettings;
-    const {registerKcbTotal} = share;
-    let addKcb;
-    if(kcb + registerKcbTotal > maxKcb) {
-      addKcb = maxKcb - registerKcbTotal;
-    } else {
-      addKcb = kcb;
-    }
-    if(addKcb <= 0) return await next();
-    const targetUser = await db.UserModel.findOnly({uid: share.uid});
-    const record = db.KcbsRecordModel({
-      _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
-      from: 'bank',
-      to: targetUser.uid,
-      type: 'shareRegister',
-      description: '用户通过你分享的链接成功注册账号',
-      shareToken: shareToken,
-      c: {
-        token: shareToken
-      },
-      ip: ctx.address,
-      port: ctx.port,
-      num: addKcb
-    });
-    await record.save();
-    // 更新分享者以获得的kcb总数
-    await share.update({
-      $inc: {
-        registerKcbTotal: addKcb
-      }
-    });
-    targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
-    ctx.cookies.set('share-token', '', {
-      httpOnly: true,
-      signed: true
-    });
+    await share.computeReword("register", ctx.address, ctx.port);
+    ctx.setCookie('share-token', '');
 	  await next();
   })
 	.post('/information', async (ctx, next) => {
