@@ -6,6 +6,7 @@ const decorationRouter = require('./decoration');
 const classifyRouter = require('./classify');
 const orderRouter = require('./order');
 const goodslistRouter = require('./goodslist');
+const templateRouter = require('./template');
 const manageRouter = new Router();
 manageRouter
   .get('/', async (ctx, next) => {
@@ -56,4 +57,5 @@ manageRouter
   .use('/:uid/classify', classifyRouter.routes(), classifyRouter.allowedMethods())
   .use('/:uid/order', orderRouter.routes(), orderRouter.allowedMethods())
   .use('/:uid/goodslist', goodslistRouter.routes(), goodslistRouter.allowedMethods())
+  .use('/:uid/template', templateRouter.routes(), templateRouter.allowedMethods())
 module.exports = manageRouter;

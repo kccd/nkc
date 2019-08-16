@@ -341,22 +341,32 @@ function submitToShelf() {
   var productParams = obtainProductPrice();
   var singleParams = getSingleParams();
   // 获取物流价格
-  var isFreePost = true; // 是否免邮
+  var freightTemplates = [];
+  var isFreePost = true; 
   var freightPrice = {
     firstFreightPrice: null,
     addFreightPrice: null
-  }; // 运费模板
+  }; 
   var freightMethod = $("input[name='freightMethod']:checked").val();
-  var firstFreightPrice = Number($("#firstFreightPrice").val())*100;
-  var addFreightPrice = Number($("#addFreightPrice").val())*100;
   if(freightMethod !== "freePost") {
     isFreePost = false;
-    if(isNaN(firstFreightPrice) || firstFreightPrice <= 0 || isNaN(addFreightPrice) || addFreightPrice < 0) {
-      throw("请正确设置运费模板");
+    $("#templateTable").find("tbody tr").each(function() {
+      if($(this).find(".tempCheck").prop("checked")) {
+        var option = {
+          name: $(this).find(".tempName").text(),
+          firstPrice: Number($(this).find(".firstFreightPrice").val())*100,
+          addPrice: Number($(this).find(".addFreightPrice").val())*100
+        };
+        freightTemplates.push(option)
+      }
+    });
+    if(freightTemplates.length === 0) {
+      throw("不免邮费时请至少选择一个运费模板");
     }
-    freightPrice.firstFreightPrice = firstFreightPrice;
-    freightPrice.addFreightPrice = addFreightPrice;
+    freightPrice.firstFreightPrice = freightTemplates[0].firstPrice;
+    freightPrice.addFreightPrice = freightTemplates[0].addPrice;;
   }
+
   var mainForumsId = []
   var shopForum = getShopForum();
   if(!shopForum){
@@ -385,6 +395,7 @@ function submitToShelf() {
     stockCostMethod: stockCostMethod,
     isFreePost: isFreePost,
     freightPrice: freightPrice,
+    freightTemplates: freightTemplates,
     productStatus: productStatus,
     shelfTime: shelfTime,
     params: params,
@@ -1116,22 +1127,30 @@ function editProductShelf(uid, productId) {
     uploadCertDescription = $("#uploadCertDescription").val();
   }
   // 获取物流价格
-  var isFreePost = true; // 是否免邮
+  var freightTemplates = [];
+  var isFreePost = true; 
   var freightPrice = {
     firstFreightPrice: null,
     addFreightPrice: null
-  }; // 运费模板
+  }; 
   var freightMethod = $("input[name='freightMethod']:checked").val();
-  var firstFreightPrice = Number($("#firstFreightPrice").val())*100;
-  var addFreightPrice = Number($("#addFreightPrice").val())*100;
   if(freightMethod !== "freePost") {
     isFreePost = false;
-    if(isNaN(firstFreightPrice) || firstFreightPrice <= 0 || isNaN(addFreightPrice) || addFreightPrice < 0) {
-      return screenTopWarning("请正确设置运费模板");
-      $("#resaveBtn").removeAttr("disabled");
+    $("#templateTable").find("tbody tr").each(function() {
+      if($(this).find(".tempCheck").prop("checked")) {
+        var option = {
+          name: $(this).find(".tempName").text(),
+          firstPrice: Number($(this).find(".firstFreightPrice").val())*100,
+          addPrice: Number($(this).find(".addFreightPrice").val())*100
+        };
+        freightTemplates.push(option)
+      }
+    });
+    if(freightTemplates.length === 0) {
+      throw("不免邮费时请至少选择一个运费模板");
     }
-    freightPrice.firstFreightPrice = firstFreightPrice;
-    freightPrice.addFreightPrice = addFreightPrice;
+    freightPrice.firstFreightPrice = freightTemplates[0].firstPrice;
+    freightPrice.addFreightPrice = freightTemplates[0].addPrice;;
   }
   // 获取全部商品图的id，存入一个数组
   var imgIntroductions = [];
@@ -1154,6 +1173,7 @@ function editProductShelf(uid, productId) {
     uploadCertDescription: uploadCertDescription,
     isFreePost: isFreePost,
     freightPrice: freightPrice,
+    freightTemplates: freightTemplates,
     productId:productId,
     params: params,
     productParams: productParams,

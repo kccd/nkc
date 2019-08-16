@@ -45,7 +45,7 @@ router
   .post('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
-    const {productParamId, count} = body;
+    const {productParamId, count, freightId} = body;
     if(!productParamId) ctx.throw(400, '规格id不能为空');
     if(count < 1) ctx.throw(400, '添加到购物城的商品数量不能小于1');
     const productParam = await db.ShopProductsParamModel.findById(productParamId);
@@ -65,6 +65,7 @@ router
           uid: user.uid,
           productParamId,
           productId,
+          freightId,
           count
         });
         await cart.save();

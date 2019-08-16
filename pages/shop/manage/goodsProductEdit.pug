@@ -1,6 +1,7 @@
 extends ./index.pug
 block title
   -const product = data.product
+  -const dealInfo = data.dealInfo
 block name
   .hidden#data= JSON.stringify({product: data.product})
   link(href='/bootstrap/css/bootstrap-tagsinput.css' media="screen" rel='stylesheet')
@@ -27,6 +28,11 @@ block name
       max-width: 100%;
       line-height: 22px;
       cursor: text;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none !important;
+        margin: 0;
     }
   .row    
     .col-xs-12.col-md-12
@@ -226,32 +232,60 @@ block name
           .panel-body
             .form-horizontal
               .form-group
-                label.col-sm-2.control-label 运费承担
+                label.col-sm-1.control-label 运费承担
                 .col-sm-8
                   label.radio-inline
-                    input#freightMethod1(type='radio', name='freightMethod', value='freePost' checked=product.isFreePost?true:false)
+                    input#freightMethod1(type='radio', name='freightMethod', value='freePost' checked)
                     |  免邮费
                   label.radio-inline
-                    input#freightMethod2(type='radio', name='freightMethod', value='payPost' checked=product.isFreePost?false:true)
+                    input#freightMethod2(type='radio', name='freightMethod', value='payPost')
                     |  买家承担邮费
-              //- .form-group
-              //-   label.col-sm-2.control-label 首重价格
-              //-   .col-sm-5
-              //-     .input-group
-              //-       input.form-control#freightPrice(type='number', placeholder="总运费=单件运费价格*商品数量", aria-describedby='stockQuantity')
-              //-       span.input-group-addon 元
-              .form-group#freightPriceDom(style=product.isFreePost?"display:none":"")
-                label.col-sm-2.control-label 
+              .form-group#freightPriceDom(style="display:none")
+                label.col-sm-1.control-label 
                 .col-sm-8
-                  span 首件商品运费 
-                  span 
-                    input#firstFreightPrice(type="text", name="", style="width:30px" value=product.isFreePost?"":numToFloatTwo(product.freightPrice.firstFreightPrice))
-                  span  元，
-                  span 每增加 1 件商品，增加运费 
-                  span 
-                    input#addFreightPrice(type="text", name="", style="width:30px" value=product.isFreePost?"":numToFloatTwo(product.freightPrice.addFreightPrice))
-                  span  元
-                  //- p(style="color:red;font-size:11px") 注意:首重运费与增加运费应大于0
+                  .table-responsive
+                    table.table-bordered.table-condensed#templateTable
+                      thead
+                        tr 
+                          th 
+                          th 模板
+                          th 运费价格
+                      tbody
+                        tr 
+                          td(colspan=3) 当前商品运费
+                        for proTemp in product.freightTemplates
+                          tr
+                            td
+                              input.tempCheck(type="checkbox" checked="checked")
+                            td
+                              span.tempName!=`${proTemp.name}`
+                            td
+                              span 首件商品运费 
+                              span 
+                                input.firstFreightPrice(type="number", name="", style="width:30px", value=numToFloatTwo(proTemp.firstPrice))
+                              span  元，
+                              span 每增加 1 件商品，增加运费 
+                              span 
+                                input.addFreightPrice(type="number", name="", style="width:30px", value=numToFloatTwo(proTemp.addPrice))
+                              span  元 
+                        tr
+                          td(colspan=3) 运费模板
+                        for dealTemp in dealInfo.templates
+                          tr
+                            td
+                              input.tempCheck(type="checkbox")
+                            td
+                              span.tempName!=`${dealTemp.name}`
+                            td
+                              span 首件商品运费 
+                              span 
+                                input.firstFreightPrice(type="number", name="", style="width:30px", value=`${dealTemp.firstPrice}`)
+                              span  元，
+                              span 每增加 1 件商品，增加运费 
+                              span 
+                                input.addFreightPrice(type="number", name="", style="width:30px", value=`${dealTemp.addPrice}`)
+                              span  元 
+                  p.text-danger 注意： 运费模板提供便捷的运费选择，与当前商品运费互不冲突，可存在相同模板名称，请自行区别。
         .panel.panel-info
           .panel-heading
             | 图文描述

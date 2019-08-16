@@ -7,16 +7,29 @@ $(document).ready(function() {
   if(isFreePost == "freePost") {
 
   }else{
-    firstFreightPrice = $("#freightPrice").text();
-    addFreightPrice = $("#addFreightPrice").text();
-    firstFreightPrice = Number(firstFreightPrice);
-    addFreightPrice = Number(addFreightPrice)
+    // firstFreightPrice = $("#freightPrice").text();
+    // addFreightPrice = $("#addFreightPrice").text();
+    firstFreightPrice = $("#freightTemplates option:selected").attr("datafirstprice");
+    addFreightPrice = $("#freightTemplates option:selected").attr("dataaddPrice");
+    firstFreightPrice = numToNumberTwo(Number(firstFreightPrice));
+    addFreightPrice = numToNumberTwo(Number(addFreightPrice))
     $("#buyCount").bind("input propertychange", function() {
       var productCount = $(this).val();
       productCount = Number(productCount);
       calculateFreightPrice(productCount);
     })
   }
+
+  $("#freightTemplates").change(function() {
+    firstFreightPrice = $("#freightTemplates option:selected").attr("datafirstprice");
+    addFreightPrice = $("#freightTemplates option:selected").attr("dataaddPrice");
+    firstFreightPrice = numToNumberTwo(Number(firstFreightPrice));
+    addFreightPrice = numToNumberTwo(Number(addFreightPrice))
+    $("#freightPrice").text(firstFreightPrice)
+    $("#addFreightPrice").text(addFreightPrice)
+    var buyCount = Number($("#buyCount").val());
+    calculateFreightPrice(buyCount)
+  })
 })
 /**
  * 计算总运费
@@ -38,7 +51,8 @@ function calculateFreightPrice(count) {
   @author pengxiguaa 2019/3/4
 */
 function addToCart(id, count) {
-  nkcAPI('/shop/cart', 'POST', {productParamId: id, count: count})
+  var freightId = $("#freightTemplates option:selected").val();
+  nkcAPI('/shop/cart', 'POST', {productParamId: id, count: count, freightId: freightId})
     .then(function(data) {
       if(!data.user){
         // window.location.href="/login";
@@ -122,10 +136,16 @@ function submitProductToBill() {
   if(productCount > stockCount) {
     return screenTopWarning("库存不足");
   }
+  // 获取运费模板
+  var freightId = $("#freightTemplates option:selected").val();
   // 获取规格
   var paraId = $("#paraId").text();
   // window.location.href = "/shop/bill?paraId="+paraId+"&productCount="+productCount;
-  openToNewLocation("/shop/bill?paraId="+paraId+"&productCount="+productCount);
+  if(freightId) {
+    openToNewLocation("/shop/bill?paraId="+paraId+"&productCount="+productCount+"&freightId="+freightId);
+  }else{
+    openToNewLocation("/shop/bill?paraId="+paraId+"&productCount="+productCount);
+  }
 }
 
 /**
@@ -181,6 +201,10 @@ function numToFloatTwo(str) {
 	str = (str/100).toFixed(2);
 	return str;
 } 
+function numToNumberTwo(str) {
+  str = Number((str/100).toFixed(2));
+	return str;
+}
 
 /**
  * 管理员禁售商品

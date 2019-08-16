@@ -69,7 +69,7 @@ router
   .post('/', async (ctx, next) => {
     const {data, db, query, body, nkcModules} = ctx;
     const {user} = data;
-    let {post, receInfo, paramCert} = body;
+    let {post, receInfo, paramCert, tempArr} = body;
     const {receiveAddress, receiveName, receiveMobile} = receInfo;
   
 
@@ -101,6 +101,7 @@ router
       let newCarts = [];
       let maxFreightPrice = 0;
       let productPrice = 0;
+      let currentFreight = 0;
       // 添加购买记录
       for(let cart of post[bill].carts) {
         let cart1 = await db.ShopCartModel.find({_id:cart._id});
@@ -122,6 +123,12 @@ router
           newCart.vipDiscount = true;
         }
         newCart.vipNum = vipNum
+        // 获取邮费
+        for(var i in tempArr) {
+          if(Number(tempArr[i].cartId) === cart._id) {
+            currentFreight = tempArr[i].freight
+          }
+        }
         let cartObj = {
           costId,
           orderId,
@@ -130,8 +137,8 @@ router
           productParam: newProductParam,
           count: newCart.count,
           uid: newCart.uid,
-          freightPrice: cart.freightPrice,
-          productPrice: cart.productPrice,
+          freightPrice: currentFreight,
+          productPrice: (newCart.productParam.price * (vipNum/100))*newCart.count,
           singlePrice: newCart.productParam.price * (vipNum/100)
         };
         let shopCost = db.ShopCostRecordModel(cartObj);
@@ -168,7 +175,7 @@ router
 
       // 获取账单的运费和商品价格
       let order = db.ShopOrdersModel({
-        orderFreightPrice: maxFreightPrice,
+        orderFreightPrice: currentFreight,
         orderId: orderId,
         receiveAddress: receiveAddress,
         receiveName: receiveName,

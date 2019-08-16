@@ -30,6 +30,11 @@ const shopDealInfoSchema = new Schema({
     type: String,
     default: "",
   },
+  // 运费模板
+  templates: {
+    type: Array,
+    default: []
+  },
   /**
    * 店铺资料是否完善
    * @如果店铺资料未完善，必须先完善店铺资料

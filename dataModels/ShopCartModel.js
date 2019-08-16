@@ -23,6 +23,10 @@ const schema = new Schema({
     index: 1,
     required: true
   },
+  freightId: {
+    type: Number,
+    default: 0
+  },
   count: {
     type: Number,
     default: 1

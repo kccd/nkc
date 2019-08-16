@@ -144,7 +144,7 @@ block content
                         div.display-i-b
                           a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}}
                           h5 商品总价：
-                            strong.text-danger {{(p.productPrice*p.count)/100}}
+                            strong.text-danger {{(p.productPrice)/100}}
                             | 元（{{p.count}}件）
                             strong.text-danger {{p.refundStatus==="success"?"【已退款】": ""}}
                   .form-group

@@ -104,7 +104,7 @@ block content
                     td(style="border-right:1px solid #f2f7ff")
                       button(class="productCountBtn" onclick="countAddOne(this)" productParamId=`${cart.productParamId}` cartId=`${cart._id}`)
                         span.fa.fa-arrow-up
-                      span(style="margin:0 10px")#productSingleCount=cart.count
+                      span(style="margin:0 10px" id=`cartCount${cart._id}`)=cart.count
                       button(class="productCountBtn" onclick="countPlusOne(this)" productParamId=`${cart.productParamId}` cartId=`${cart._id}`)
                         span.fa.fa-arrow-down
                     td.order(paid=`${cart.productParam._id}` data-upload-cert=cart.product.uploadCert?"true": "false") 
@@ -119,25 +119,51 @@ block content
                   if cart.canBuy == false
                     tr
                       td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" limit="yes" colspan="7")!=`该商品剩余购买数量为${cart.remainBuyCount}件`
+                  tr(style="background-color:#f2fff3")
+                    th(colspan="3" isFreePost=`${cart.product.isFreePost}` id=`isFreePost${cart._id}`)
+                    td(style="font-weight: bold;") 运费
+                    if cart.product.isFreePost
+                      td 
+                        span 卖家承担
+                      td(style="text-align:right") 
+                        span(style="color: #ffad11;font-weight:bold") 0.00
+                    else
+                      -let freightId = 0
+                      if cart.freightId
+                        -freightId = cart.freightId
+                      //- -let realFirstPrice
+                      td
+                        select(onchange="changeFreightTemplate(this)" id=`tempArr${cart._id}` dataid=`${cart._id}` datauid=`${bill.user.uid}` class="tempArr")
+                          for freight,index in cart.product.freightTemplates
+                            if freightId === index
+                              //- -realFirstPrice = freight.firstPrice
+                              option(value=`${index}` selected dataafp=`${freight.addPrice}` dataffp=`${freight.firstPrice}` cartid=`${cart._id}`)!=`${freight.name}`
+                            else
+                              option(value=`${index}` dataafp=`${freight.addPrice}` dataffp=`${freight.firstPrice}` cartid=`${cart._id}`)!=`${freight.name}`
+                      td(style="text-align:right")
+                        span(style="color: #ffad11;font-weight:bold" id=`freightSingle${cart._id}`) #{numToFloatTwo(cart.freightPrice)}
+
                 tr(style="background-color:#f2f7ff;" id=`freight${bill.user.uid}`)
-                  td(colspan="3" rowspan="2" style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff ") 
+                  td(colspan="3"  style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff ") 
                     div(style="font-weight:bold;float:left") 给卖家留言：
                     div 
                       textarea(id=`message${bill.user.uid}`, cols="20", rows="2" placeholder="选填，请先与卖家协商一致")
-                  td(style="font-weight: bold;") 运费
-                  if bill.maxFreightPrice == 0
-                    td
-                      span 卖家承担
-                    td(style="text-align:right")
-                      span(style="color:#ffad11;font-weight:bold;")#freightPrices 0.00
-                  else
-                    td
-                      span 不包邮
-                    td(style="text-align:right")
-                      span(style="color:#ffad11;font-weight:bold;")#freightPrices #{numToFloatTwo(bill.maxFreightPrice)}
-                tr(style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff " id=`heji${bill.user.uid}`)
-                  td(colspan="2" style="font-weight:bold;") 商品合计(含运费)
-                  td.subtotal(style="color:red;font-weight:bold;text-align:right" class="hejiPrices") #{numToFloatTwo(bill.maxFreightPrice + bill.productPrice)}
+                  td(colspan="2"  style="font-weight:bold;") 商品合计(含运费)
+                  td.subtotal(style="color:red;font-weight:bold;text-align:right" class="hejiPrices"  id=`billTotalPrice${bill.user.uid}`) #{numToFloatTwo(bill.totalLittleFreight + bill.productPrice)}
+                  //- td(style="font-weight: bold;") 运费
+                  //- if bill.maxFreightPrice == 0
+                  //-   td
+                  //-     span 卖家承担
+                  //-   td(style="text-align:right")
+                  //-     span(style="color:#ffad11;font-weight:bold;")#freightPrices 0.00
+                  //- else
+                  //-   td
+                  //-     span 不包邮
+                  //-   td(style="text-align:right")
+                  //-     span(style="color:#ffad11;font-weight:bold;")#freightPrices #{numToFloatTwo(bill.maxFreightPrice)}
+                //- tr(style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff " id=`heji${bill.user.uid}`)
+                //-   td(colspan="2" style="font-weight:bold;") 商品合计(含运费)
+                //-   td.subtotal(style="color:red;font-weight:bold;text-align:right" class="hejiPrices") #{numToFloatTwo(bill.maxFreightPrice + bill.productPrice)}
             //- tbody
             //-   mixin orderCert(bill) 
             //-     if bill.product.uploadCert

@@ -26,7 +26,7 @@ goodslistRouter
     const count = await db.ShopGoodsModel.count(searchMap);
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
-    const products = await db.ShopGoodsModel.find(searchMap).sort({toc: -1}).skip(paging.start).limit(paging.perpage);;
+    const products = await db.ShopGoodsModel.find(searchMap).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.products = await db.ShopGoodsModel.extendProductsInfo(products);
 		data.productStatus = productStatus;
 		ctx.template = 'shop/manage/goodslist.pug';
@@ -65,6 +65,8 @@ goodslistRouter
     let product = await db.ShopGoodsModel.findOne({productId});
     if(!product) ctx.throw(400, "商品不存在");
     product = await db.ShopGoodsModel.extendProductsInfo([product]);
+    const dealInfo = await db.ShopDealInfoModel.findOne({uid: data.user.uid});
+    data.dealInfo = dealInfo;
     data.product = product[0];
     ctx.template = "shop/manage/goodsProductEdit.pug"
     await next();
@@ -81,6 +83,7 @@ goodslistRouter
       isFreePost,
       freightPrice,
       productId,
+      freightTemplates,
       params,
       productParams,
       singleParams,
@@ -130,7 +133,7 @@ goodslistRouter
       await sd.save();
     }
     // 修改产品属性列表
-    await product.update({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice, params, paraIdArr, singleParaIdArr,vipDiscount,vipDisGroup,productSettings,imgIntroductions,imgMaster}});
+    await product.update({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice, params, paraIdArr, singleParaIdArr,vipDiscount,vipDisGroup,productSettings,imgIntroductions,imgMaster, freightTemplates}});
     await next();
   })
   // 立即上架
