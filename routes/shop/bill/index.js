@@ -4,7 +4,7 @@ router
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
-    let {cartsId, paraId, productCount} = query;
+    let {cartsId, paraId, productCount, freightId} = query;
     let billType;
     paraId = Number(paraId);
     if(!cartsId){
@@ -17,6 +17,7 @@ router
         productParamId: paraId,
         productId: billProducts.productId,
         count: productCount,
+        freightId: freightId,
         uid: user.uid
       })
       await newCart.save();
@@ -47,7 +48,16 @@ router
       if(cart.product.isFreePost){
         freightPrice = 0;
       }else{
-        freightPrice = cart.product.freightPrice.firstFreightPrice + (cart.product.freightPrice.addFreightPrice * (cart.count-1));
+        let ffp, afp;
+        for(var i in cart.product.freightTemplates) {
+          if(Number(i) === cart.freightId) {
+            ffp = cart.product.freightTemplates[Number(i)].firstPrice;
+            afp = cart.product.freightTemplates[Number(i)].addPrice;
+          }
+        }
+        if(!ffp && ffp !== 0) ffp = cart.product.freightTemplates[0].firstPrice;
+        if(!afp && afp !== 0) afp = cart.product.freightTemplates[0].addPrice;
+        freightPrice = ffp + (afp * (cart.count-1));
       }
       cart.freightPrice = freightPrice;
       // 取出会员折扣
@@ -71,6 +81,7 @@ router
           user: cart.product.user,
           carts: [cart],
           maxFreightPrice: freightPrice,
+          totalLittleFreight: freightPrice,
           productPrice: productPrice
         }
       } else {
@@ -79,6 +90,7 @@ router
           newCartData[newCartDataUid].maxFreightPrice = freightPrice;
         }
         newCartData[newCartDataUid].productPrice += productPrice;
+        newCartData[newCartDataUid].totalLittleFreight += freightPrice;
       }
     }
     // 检测限购
@@ -112,7 +124,7 @@ router
     let productParam = await db.ShopProductsParamModel.findOne({_id: productParamId});
     let paramCount = productParam.stocksSurplus;
     if(count > paramCount) {
-      ctx.throw(400, "商品数量不得超当前库存");
+      ctx.throw(400, "购买商品不得超当前库存");
     }
     // 检测限购
     const product = await db.ShopGoodsModel.findOne({productId: productParam.productId});

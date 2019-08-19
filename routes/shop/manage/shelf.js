@@ -36,6 +36,9 @@ shelfRouter
     // 取出全部vip等级
     const grades = await db.UsersGradeModel.find({});
     data.grades = grades;
+    // 
+    const dealInfo = await db.ShopDealInfoModel.findOne({uid: user.uid});
+    data.dealInfo = dealInfo;
 		ctx.template = 'shop/manage/shelf.pug';
 		await next();
 	})
@@ -52,6 +55,7 @@ shelfRouter
       imgMaster,
       isFreePost,
       freightPrice,     
+      freightTemplates,
       stockCostMethod,
       productStatus,
       shelfTime,
@@ -156,6 +160,7 @@ shelfRouter
       shelfTime,
       isFreePost,
       freightPrice,     
+      freightTemplates,
       params: paramsInfo,
       uid: user.uid,
       threadInfo: options,

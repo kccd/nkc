@@ -137,6 +137,11 @@ const shopGoodsSchema = new Schema({
       addFreightPrice: null
     }
   },
+  // 运费模板
+  freightTemplates: {
+    type: Array,
+    default: []
+  },
   stockCostMethod: {
     type: String,
     default: "payReduceStock"

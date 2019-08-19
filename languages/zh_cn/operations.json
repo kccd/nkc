@@ -438,6 +438,8 @@
   "visitShopPay": "访问商城付款页面",
   "getAlipayUrl": "获取支付宝付款链接",
   "kcbPay": "科创币付款",
+  "visitFreightTemplate": "查看运费模板设置",
+  "saveFreightTemplate": "保存运费模板设置",
   "getShopLogo": "[CO]获取店铺LOGO",
   "uploadShopLogo": "[CO]上传店铺LOGO",
   "visitShopSettings": "[SY]访问商城总后台设置",

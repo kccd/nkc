@@ -26,6 +26,10 @@ module.exports = {
         GET: 'visitStoreInfoIndex',
         POST: 'modifyStoreInfo'
       },
+      template: {
+        GET: 'visitFreightTemplate',
+        PATCH: 'saveFreightTemplate'
+      },
       decoration: {
         sign: {
           POST: 'modifyStoreDecorationSign'

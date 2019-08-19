@@ -58,8 +58,18 @@ function submitOrders() {
       }
     }
   })
+  var tempArr = [];
+  // 获取账单中全部商品的快递方式
+  $(".tempArr").each(function() {
+    var cartId = $(this).find("option:selected").attr("cartid");
+    var option = {
+      cartId: cartId,
+      freight: Number($("#freightSingle"+cartId).text())*100
+    }
+    tempArr.push(option)
+  })
   $("#submitPay").attr('disabled',true);
-  nkcAPI('/shop/order', "POST", {post: data, receInfo: receInfo, paramCert: paramCert})
+  nkcAPI('/shop/order', "POST", {post: data, receInfo: receInfo, paramCert: paramCert, tempArr: tempArr})
   .then(function(data) {
     // window.location.href = '/shop/pay?ordersId=' + data.ordersId;
     openToNewLocation('/shop/pay?ordersId=' + data.ordersId);
@@ -128,29 +138,38 @@ function countAddOne(para) {
   .then(function(data) {
     $(para).removeAttr("disabled");
     $(para).next().text(count+"");
+    // 获取商品差值
+    var singlePricesPlus = data.singlePrices - Number($(para).parents("tr").find("#singlePrices").text())*100;
     $(para).parents("tr").find("#singlePrices").text(numToFloatTwo(data.singlePrices));
-    var freightTrId = '#freight' + data.sellUid;
-    $(para).parents("tbody").find(freightTrId).find("#freightPrices").text(numToFloatTwo(data.freightPrices));
 
-    // 店铺商品合计(包含邮费)
-    var productPrices = 0;
-    $(para).parents("tbody").find(".param"+data.sellUid).each(function(){
-      productPrices = productPrices + ($(this).find("#singlePrices").text()*100);
-    })
-    productPrices = productPrices + ($("#freight"+data.sellUid).find("#freightPrices").text() * 100);
-    $("#heji"+data.sellUid).find(".hejiPrices").text(numToFloatTwo(productPrices))
+    // 当前商品新总价
+    var singlePrices = data.singlePrices;
+    // 重新计算当前商品总邮费
+    // 1.获取当前邮费规则
+    var isFreePost = $("#isFreePost"+cartId).attr("isFreePost");
+    var freightAddPrice = 0;
+    var freightFirstPrice = 0;
+    if(isFreePost && isFreePost==="false") {
+      freightFirstPrice = Number($("#tempArr"+cartId).find("option:selected").attr("dataffp"));
+      freightAddPrice = Number($("#tempArr"+cartId).find("option:selected").attr("dataafp"));
+    }
+    // 2.计算邮费
+    var currentSingleFreight = freightFirstPrice + (freightAddPrice*(count-1));
+    // 3.获取邮费差值
+    var currentSingleFreightPlus = currentSingleFreight - Number($("#freightSingle"+cartId).text())*100;
+    // 4.显示结果
+    $("#freightSingle"+cartId).text(numToNumberTwo(currentSingleFreight));
 
-    // 计算账单总计
-    var productTotalPrices = 0;
-    $(para).parents("tbody").find(".hejiPrices").each(function() {
-      productTotalPrices = productTotalPrices + ($(this).text() *100)
-    })
-    $("#totalPrice").text(numToFloatTwo(productTotalPrices))
-
+    // 计算总差值
+    var totalPricePlus = singlePricesPlus + currentSingleFreightPlus;
+    // console.log();
+    //根据总差值， 修改商品总计和全订单总计
+    $("#billTotalPrice"+data.sellUid).text(numToNumberTwo(totalPricePlus + Number($("#billTotalPrice"+data.sellUid).text())*100));
+    $("#totalPrice").text(numToNumberTwo(totalPricePlus + Number($("#totalPrice").text())*100));
   })
   .catch(function(data) {
     $(para).removeAttr("disabled");
-    return sweetWarning(data || data.error)
+    return sweetWarning(data.error || data)
   })
 }
 
@@ -176,28 +195,38 @@ function countPlusOne(para) {
   .then(function(data) {
     $(para).removeAttr("disabled");
     $(para).prev().text(count+"");
+    // 获取商品差值
+    var singlePricesPlus = data.singlePrices - Number($(para).parents("tr").find("#singlePrices").text())*100;
     $(para).parents("tr").find("#singlePrices").text(numToFloatTwo(data.singlePrices));
-    var freightTrId = '#freight' + data.sellUid;
-    $(para).parents("tbody").find(freightTrId).find("#freightPrices").text(numToFloatTwo(data.freightPrices));
 
-    // 店铺商品合计(包含邮费)
-    var productPrices = 0;
-    $(para).parents("tbody").find(".param"+data.sellUid).each(function(){
-      productPrices = productPrices + ($(this).find("#singlePrices").text()*100);
-    })
-    productPrices = productPrices + ($("#freight"+data.sellUid).find("#freightPrices").text() * 100);
-    $("#heji"+data.sellUid).find(".hejiPrices").text(numToFloatTwo(productPrices))
+    // 当前商品新总价
+    var singlePrices = data.singlePrices;
+    // 重新计算当前商品总邮费
+    // 1.获取当前邮费规则
+    var isFreePost = $("#isFreePost"+cartId).attr("isFreePost");
+    var freightAddPrice = 0;
+    var freightFirstPrice = 0;
+    if(isFreePost && isFreePost === "false") {
+      freightFirstPrice = Number($("#tempArr"+cartId).find("option:selected").attr("dataffp"));
+      freightAddPrice = Number($("#tempArr"+cartId).find("option:selected").attr("dataafp"));
+    }
+    // 2.计算邮费
+    var currentSingleFreight = freightFirstPrice + (freightAddPrice*(count-1));
+    // 3.获取邮费差值
+    var currentSingleFreightPlus = currentSingleFreight - Number($("#freightSingle"+cartId).text())*100;
+    // 4.显示结果
+    $("#freightSingle"+cartId).text(numToNumberTwo(currentSingleFreight));
 
-    // 计算账单总计
-    var productTotalPrices = 0;
-    $(para).parents("tbody").find(".hejiPrices").each(function() {
-      productTotalPrices = productTotalPrices + ($(this).text() *100)
-    })
-    $("#totalPrice").text(numToFloatTwo(productTotalPrices))
+    // 计算总差值
+    var totalPricePlus = singlePricesPlus + currentSingleFreightPlus;
+    // console.log();
+    //根据总差值， 修改商品总计和全订单总计
+    $("#billTotalPrice"+data.sellUid).text(numToNumberTwo(totalPricePlus + Number($("#billTotalPrice"+data.sellUid).text())*100));
+    $("#totalPrice").text(numToNumberTwo(totalPricePlus + Number($("#totalPrice").text())*100));
   })
   .catch(function(data) {
     $(para).removeAttr("disabled");
-    return sweetWarning(data || data.error);
+    return sweetWarning(data.error || data);
   })
 }
 
@@ -216,3 +245,32 @@ function numToFloatTwo(str) {
 	str = (str/100).toFixed(2);
 	return str;
 } 
+
+/**
+ * 修改运送方式，并修改当前小项价格
+ */
+function changeFreightTemplate(para) {
+  // 获取被修改的cart所在billID
+  var billId = $(para).attr("datauid");
+  // 获取被修改的cartId
+  const cartId = $(para).attr("dataid");
+  // 获取当前选中的模板id
+  var freightId = $(para).val();
+  // 获取新模板的首价格与后续价格
+  var newFirstPrice = Number($(para).find("option:selected").attr("dataffp"));
+  var newAddPrice = Number($(para).find("option:selected").attr("dataafp"));
+  // 获取当前cart运费总价
+  var currentSingleFreight = Number($("#freightSingle"+cartId).text())*100;
+  // 获取当前商品数量
+  var cartCount = $("#cartCount"+cartId).text();
+
+  // 计算新的当前cart运费
+  var newCartFreightPrice = newFirstPrice + (newAddPrice * (cartCount - 1));
+  // 计算与当前cart运费的差值
+  var freightSinglePlus = newCartFreightPrice - currentSingleFreight;
+
+  // 将计算好的数值放到cart，小计，总计中
+  $("#freightSingle"+cartId).text(numToNumberTwo(newCartFreightPrice));
+  $("#billTotalPrice"+billId).text(numToNumberTwo(freightSinglePlus + Number($("#billTotalPrice"+billId).text())*100));
+  $("#totalPrice").text(numToNumberTwo(freightSinglePlus + Number($("#totalPrice").text())*100));
+}
