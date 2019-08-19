@@ -90,15 +90,12 @@ loginRouter
 				type: 'login'
 			};
 
-      const imgCodeId = ctx.cookies.get('imgCodeId', {signed: true});
-
+			let imgCodeId = ctx.getCookie("imgCodeId") || "";
+			if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
 
       const imgCodeObj = await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
 
-      ctx.cookies.set('imgCodeId', '', {
-        httpOnly: true,
-        signed: true
-      });
+      ctx.setCookie("imgCodeId", "");
 
       await imgCodeObj.update({used: true});
 

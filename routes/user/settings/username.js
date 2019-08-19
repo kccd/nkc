@@ -50,19 +50,10 @@ router
 		// 同步到elasticSearch搜索数据库
     await nkcModules.elasticSearch.save("user", user);
 
-		const userInfo = ctx.cookies.get('userInfo');
-		const {lastLogin} = JSON.parse(decodeURI(userInfo));
-		const cookieStr = encodeURI(JSON.stringify({
-			uid: user.uid,
-			username: user.username,
-			lastLogin
-		}));
-		ctx.cookies.set('userInfo', cookieStr, {
-			signed: true,
-			maxAge: ctx.settings.cookie.life,
-			httpOnly: true
-		});
-		data.cookie = ctx.cookies.get('userInfo');
+    ctx.getCookie("userInfo", {
+      uid: user.uid,
+      username: user.username,
+    });
 		await next();
 	});
 module.exports = router;

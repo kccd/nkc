@@ -24,7 +24,8 @@ registerRouter
     if(!imgCode) ctx.throw(400, '请输入图形验证码');
 	  if(!code) ctx.throw(400, '请输入短信验证码');
 
-    const imgCodeId = ctx.cookies.get('imgCodeId', {signed: true});
+    let imgCodeId = ctx.getCookie("imgCodeId") || "";
+    if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
 
     const imgCodeObj = await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
 
@@ -94,26 +95,11 @@ registerRouter
 		user.username = username;
 		user.usernameLowerCase = username.toLowerCase();
 		await user.save();
-		// await user.update({username, usernameLowerCase: username.toLowerCase()});
 		await userPersonal.update({hashType: passwordObj.hashType, password: passwordObj.password});
-		await db.PersonalForumModel.update({uid: user.uid}, {$set: {
-			abbr: username.slice(0.6),
-			displayName: username + '的专栏',
-			descriptionOfForum: username + '的专栏'
-		}});
-		const userInfo = ctx.cookies.get('userInfo');
-		const {lastLogin} = JSON.parse(decodeURI(userInfo));
-		const cookieStr = encodeURI(JSON.stringify({
-			uid: user.uid,
-			username: user.username,
-			lastLogin
-		}));
-		ctx.cookies.set('userInfo', cookieStr, {
-			signed: true,
-			maxAge: ctx.settings.cookie.life,
-			httpOnly: true
-		});
-		data.cookie = ctx.cookies.get('userInfo');
+		ctx.setCookie("userInfo", {
+      uid: user.uid,
+      username: user.username,
+    });
 		await next();
 	})
 	.get('/code', async (ctx, next) => {
@@ -125,11 +111,7 @@ registerRouter
 			token: codeData.text
 		});
 		await imgCode.save();
-		ctx.cookies.set('imgCodeId', imgCode._id, {
-			signed: true,
-			maxAge: ctx.settings.cookie.life,
-			httpOnly: true
-		});
+		ctx.setCookie("imgCodeId", {imgCodeId: imgCode._id});
 		ctx.logIt = true;
     data.svgData = codeData.data;
 		await next();

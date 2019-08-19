@@ -88,23 +88,12 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                 a(href=`/message`)
                   span.fa.fa-envelope-o &nbsp;消息
               li
-                a(href=`/account/subscribes?c=collection`)
-                  span.fa.fa-folder-o &nbsp;收藏
-              li
-                //a(href=`/account/subscribes`)
-                //a(href=`/u/${data.user.uid}/sub/t`)
-                a(href=`/account/subscribes`)
-                  span.fa.fa-bookmark-o &nbsp;我的关注
-              li
                 a(href=`/u/${data.user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
                   span.messageNumber.draftMessage= data.user.draftCount || ''
               li
                 a(href=`/account/finance?t=all`)
                   span.fa.fa-file-text-o &nbsp;账单
-              li
-                a(href=`/activity`)
-                  span.fa.fa-trophy &nbsp;活动
               li.divider
               li
                 a(href=`/u/${data.user.uid}/settings`)
@@ -217,12 +206,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                 span.message-switch(class=!messageSum ? "disabled": "")=messageSum
             span.pull-right.fa.fa-angle-right
         li
-          a(href=`/account/subscribes?c=collection`)
-            span.fa.fa-folder-o &nbsp;收藏
-            span.pull-right.fa.fa-angle-right
-        li
-
-          //a(href=`/u/${data.user.uid}/sub/t`)
           a(href=`/account/subscribes`)
             span.fa.fa-bookmark-o &nbsp;我的关注
             span.pull-right.fa.fa-angle-right

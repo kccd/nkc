@@ -43,6 +43,11 @@ module.exports = async (ctx, next) => {
             keys: [cookieConfig.secret]
           });
           userInfo = cookies.get('userInfo', {signed: true});
+          if(userInfo) {
+            userInfo = Buffer.from(userInfo, "base64").toString();
+            userInfo = JSON.parse(userInfo);
+          }
+          console.log(userInfo);
         }
       }
 		} catch(err) {
