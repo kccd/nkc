@@ -3589,6 +3589,15 @@ ul.nav.navbar-nav.navbar-md>li>a{
   max-height:300px
 }
 
+.user-settings-img-avatar{
+  width: 10rem;
+  max-width: 100%;
+}
+.user-settings-img-banner{
+  width: 30rem;
+  max-width: 100%;
+}
+
 @media only screen and (max-width : 480px) {
   .moSlide {
     display: block

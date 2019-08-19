@@ -42,3 +42,61 @@ function getFocus(a){
     $(a).css('border-color','')
   })
 }
+var selectImage;
+$(function() {
+  if(NKC.methods.selectImage) {
+    selectImage = new NKC.methods.selectImage
+  }
+});
+
+function selectAvatar() {
+  selectImage.show(function(data) {
+    var user = NKC.methods.getDataById("data").user;
+    var formData = new FormData();
+    formData.append("file", data);
+    uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {
+      $(".upload-info").text('上传中...' + percentage);
+      if(e.total === e.loaded) {
+        $(".upload-info").text('上传完成！');
+        setTimeout(function() {
+          $(".upload-info").text('');
+        }, 2000);
+      }
+    }, "POST")
+      .then(function(data) {
+        $("#userAvatar").attr("src", "/avatar/" + data.user.avatar + '?time=' + Date.now());
+        selectImage.close();
+      })
+      .catch(function(data) {
+        screenTopWarning(data);
+      });
+  }, {
+    aspectRatio: 1
+  });
+}
+
+function selectBanner() {
+  selectImage.show(function(data){
+    var user = NKC.methods.getDataById("data").user;
+    var formData = new FormData();
+    formData.append("file", data);
+    uploadFilePromise('/banner/' + user.uid, formData, function (e, percentage) {
+      $(".upload-info-banner").text('上传中...' + percentage);
+      if (e.total === e.loaded) {
+        $(".upload-info-banner").text('上传完成！');
+        setTimeout(function () {
+          $(".upload-info-banner").text('');
+        }, 2000);
+      }
+    }, "POST")
+      .then(function (data) {
+        $("#userBanner").attr("src", "/banner/" + data.user.banner + "?time=" + Date.now());
+        selectImage.close();
+      })
+      .catch(function (data) {
+        screenTopWarning(data);
+      });
+  }, {
+    aspectRatio: 2
+  });
+}

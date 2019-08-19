@@ -1,0 +1,23 @@
+extends bootstrap_base
+block title
+  title 账号安全
+block content
+  #data.hidden=objToStr({user: data.user})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-default
+          .panel-heading
+            span 修改密码
+          .panel-body
+        .panel.panel-default
+          .panel-heading
+            span 绑定手机
+          .panel-body
+        .panel.panel-default
+          .panel-heading
+            span 绑定邮箱
+          .panel-body
+

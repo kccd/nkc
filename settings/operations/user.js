@@ -19,20 +19,22 @@ module.exports = {
       }
     },
 		settings: {
-			GET: 'visitUserAvatarSettings',
-      avatar: {
-        GET: 'visitUserAvatarSettings',
-      },
-      banner: {
-        GET: 'visitUserBannerSettings',
-      },
+			GET: 'visitUserInfoSettings',
 			username: {
 				PATCH: 'modifyUsername'
 			},
-			info: {
-				GET: 'visitUserInfoSettings',
-				PATCH: 'modifyUserInfo'
-			},
+      info: {
+        GET: 'visitUserInfoSettings',
+        PATCH: 'modifyUserInfo'
+      },
+      security: {
+			  GET: "visitUserInfoSettings",
+        PATCH: "modifyUserInfo"
+      },
+      apps: {
+        GET: 'visitUserInfoSettings',
+        PATCH: 'modifyUserInfo'
+      },
 			resume: {
 				GET: 'visitUserResumeSettings',
 				PATCH: 'modifyUserResume'
@@ -90,11 +92,9 @@ module.exports = {
         PATCH: 'userDisplaySettings'
       },
       alipay: {
-			  GET: "userBindAlipayAccounts",
         POST: "userBindAlipayAccounts"
       },
       bank: {
-			  GET: 'userBindBankAccounts',
         POST: 'userBindBankAccounts'
       },
       message: {

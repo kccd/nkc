@@ -5,6 +5,8 @@ transactionRouter
 		const {data, db, params} = ctx;
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
+    data.alipayAccounts = userPersonal.alipayAccounts;
+    data.bankAccounts = userPersonal.bankAccounts;
 		data.targetUser = await db.UserModel.findOnly({uid});
 		data.addresses = userPersonal.addresses;
 		ctx.template = 'interface_user_settings_transaction.pug';

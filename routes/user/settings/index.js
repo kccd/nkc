@@ -13,7 +13,9 @@ const socialRouter = require('./social');
 const messageRouter = require("./message");
 const usernameRouter = require('./username');
 const waterRouter = require('./water');
+const appsRouter = require("./apps");
 const alipayRouter = require("./alipay");
+const securityRouter = require("./security");
 const bankRouter = require("./bank");
 const displayRouter = require("./display");
 const redEnvelopeRouter = require('./redEnvelope');
@@ -28,14 +30,15 @@ settingRouter
 		data.authLevel = await userPersonal.getAuthLevel();
 		await next();
 	})
-  .get(['/', '/avatar'], async (ctx, next) => {
-    ctx.template = 'interface_user_settings_avatar.pug';
+  .get(['/', '/info'], async (ctx, next) => {
+    const {data, db} = ctx;
+    data.KCBSettings = (await db.SettingModel.findOne({_id: 'kcb'})).c;
+    data.user.kcb = await db.UserModel.updateUserKcb(data.user.uid);
+    data.modifyUsernameOperation = await db.KcbsTypeModel.findOnly({_id: 'modifyUsername'});
+    ctx.template = 'interface_user_settings_info.pug';
     await next();
   })
-  .get('/banner', async (ctx, next) => {
-    ctx.template = 'interface_user_settings_banner.pug';
-    await next();
-  })
+  .use("/apps", appsRouter.routes(), appsRouter.allowedMethods())
   .use("/alipay", alipayRouter.routes(), alipayRouter.allowedMethods())
   .use('/red_envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())
 	.use('/transaction', transactionRouter.routes(), transactionRouter.allowedMethods())
@@ -48,9 +51,10 @@ settingRouter
 	.use('/email', emailRouter.routes(), emailRouter.allowedMethods())
 	.use('/cert', certRouter.routes(), certRouter.allowedMethods())
 	.use('/photo', photoRouter.routes(), photoRouter.allowedMethods())
-	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+	.use('/', infoRouter.routes(), infoRouter.allowedMethods())
   .use("/display", displayRouter.routes(), displayRouter.allowedMethods())
   .use("/bank", bankRouter.routes(), bankRouter.allowedMethods())
   .use("/message", messageRouter.routes(), messageRouter.allowedMethods())
+  .use("/security", securityRouter.routes(), securityRouter.allowedMethods())
 	.use('/water', waterRouter.routes(), waterRouter.allowedMethods());
 module.exports = settingRouter;
