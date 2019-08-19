@@ -83,13 +83,19 @@ shareRouter
 .post('/', async (ctx, next) => {
   const {data, body, db, nkcModules} = ctx;
   const {ShareModel} = db;
-  const {str, type, targetId} = body;
+  let {str, type, targetId} = body;
   const {user} = data;
   let uid;
   if(user){
     uid = user.uid
   }else{
     uid = "visitor";
+  }
+  // 如果targetId不存在，则从url中获取
+  if(!targetId && (type === "thread" || type === "post" || type === "forum")) {
+    let delParamUrl = str.replace("?", "");
+    let routerArr = delParamUrl.split("/");
+    targetId = routerArr[routerArr.length-1]
   }
   // 若分享的是forum、thread或post则需验证权限
   if(type === "thread") {
