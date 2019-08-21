@@ -44,11 +44,10 @@ var app = new Vue({
         .then(function(data) {
           app.users = data.users;
           app.subUsersId = data.subUsersId;
+          app.loading = false;
         })
         .catch(function(data) {
           sweetError(data);
-        })
-        .finally(function() {
           app.loading = false;
         })
     },
