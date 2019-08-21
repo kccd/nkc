@@ -563,7 +563,6 @@ postSchema.post('save', async function(doc, next) {
 
   try {
     const redis = require('../redis');
-    const InviteModel = mongoose.model('invites');
     const MessageModel = mongoose.model('messages');
     const SettingModel = mongoose.model('settings');
 
@@ -572,13 +571,6 @@ postSchema.post('save', async function(doc, next) {
     const notInformedUsers = atUsers
       .filter(at => !oldAtUsers // map the user not in oldAtUsers
         .find(oldAt => oldAt.uid === at.uid));
-    await Promise.all(notInformedUsers
-      .map(at => new InviteModel({
-        invitee: at.uid,
-        inviter: doc.uid,
-        pid: doc.pid
-      }).save())
-    );
     await Promise.all(notInformedUsers.map(async at => {
       const messageId = await SettingModel.operateSystemID('messages', 1);
       const message = MessageModel({

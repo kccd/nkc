@@ -60,17 +60,5 @@ replySchema.methods.view = async function() {
   return await this.update({viewed: true});
 };
 
-replySchema.post('save', async function(doc, next) {
-  try {
-    const UsersPersonalModel = mongoose.model('usersPersonal');
-
-    const uid = doc.toUid;
-    const toUser = await UsersPersonalModel.findOnly({uid});
-    await toUser.increasePsnl('replies', 1);
-    return next()
-  } catch(e) {
-    return next(e)
-  }
-});
 
 module.exports = mongoose.model('replies', replySchema);

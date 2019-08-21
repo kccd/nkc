@@ -7,6 +7,10 @@ resumeRouter
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
 		data.personalInfo = userPersonal.personalInfo;
+    data.accounts = userPersonal.accounts;
+    data.lifePhotos = await userPersonal.extendLifePhotos();
+    data.privacy = userPersonal.privacy;
+    data.certsPhotos = await userPersonal.extendCertsPhotos();
 		data.education = userPersonal.education;
 		data.industries = userPersonal.industries;
 		for(let e of data.education) {

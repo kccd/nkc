@@ -2,32 +2,6 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
-const educationSchema = new Schema({
-  school: {
-    type: String,
-    maxlength: [30, '学校长度应小于30'],
-    required: true
-  },
-  major: {
-    type: String,
-    maxlength: [30, '专业长度应小于30'],
-    required: true
-  },
-  degree: {
-    type: String,
-    maxlength: [15, '学历长度应小于15'],
-    required: true
-  },
-  graduationDate: {
-    type: Date,
-    required: true
-  },
-  id: {
-    type: Number,
-    required: true
-  }
-});
-
 const usersPersonalSchema = new Schema({
   uid: {
     type: String,
@@ -51,6 +25,7 @@ const usersPersonalSchema = new Schema({
   },
   hashType: {
     type: String,
+    default: ""
     // required: true
   },
   lastTry: {
@@ -60,29 +35,13 @@ const usersPersonalSchema = new Schema({
   password: {
     salt: {
       type: String,
+      default: ""
       // required: true
     },
     hash: {
       type: String,
+      default: ""
       // required: true
-    }
-  },
-  newMessage: {
-    replies: {
-      type: Number,
-      default: 0
-    },
-    message: {
-      type: Number,
-      default: 0
-    },
-    system: {
-      type: Number,
-      default: 0
-    },
-    at: {
-      type: Number,
-      default: 0
     }
   },
   regIP: {
@@ -358,19 +317,7 @@ usersPersonalSchema.methods.extendCertsPhotos = async function() {
 	const certsPhotos = await PhotoModel.find({uid: this.uid, type: 'cert', status: {$ne: 'deleted'}}).sort({toc: -1});
 	return this.certsPhotos = certsPhotos;
 };
-
-usersPersonalSchema.methods.increasePsnl = async function(type, number) {
-  const counterType = "newMessage." + type;
-  if(number === undefined) {
-    const attrObj = {};
-    attrObj[counterType] = 0;
-    return await this.update(attrObj);
-  }
-  const attrObj = {};
-  attrObj[counterType] = number;
-  return await this.update({$inc: attrObj});
-};
-/* 
+/*
   通过uid找查询用户的隐私信息
   @author pengxiguaa 2019/3/7
 */

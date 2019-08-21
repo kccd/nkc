@@ -25,6 +25,7 @@ style.
           .form-group
             label 国际区号
             select.form-control(v-model="usersPersonal.nationCode")
+              option(value="") 无
               option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
           .form-group
             label 手机号

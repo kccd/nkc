@@ -30,7 +30,8 @@ module.exports = async (ctx, next) => {
   const isResourcePost = resourceOperations.includes(ctx.data.operationId);
   const {data, db} = ctx;
 	// cookie
-	let userInfo = ctx.cookies.get('userInfo', {signed: true});
+  let userInfo = ctx.getCookie("userInfo");
+	// let userInfo = ctx.cookies.get('userInfo', {signed: true});
 	if(!userInfo) {
 	  // 为了兼容app中的部分请求无法附带cookie，故将cookie放到了url中
 		try{
@@ -42,6 +43,10 @@ module.exports = async (ctx, next) => {
             keys: [cookieConfig.secret]
           });
           userInfo = cookies.get('userInfo', {signed: true});
+          if(userInfo) {
+            userInfo = Buffer.from(userInfo, "base64").toString();
+            userInfo = JSON.parse(userInfo);
+          }
         }
       }
 		} catch(err) {
@@ -51,11 +56,11 @@ module.exports = async (ctx, next) => {
 	let userOperationsId = [], userRoles = [], userGrade = {}, user;
 	if(userInfo) {
 	  try {
-      const {username, uid} = JSON.parse(decodeURI(userInfo));
+	    const {uid} = userInfo;
       user = await db.UserModel.findOne({uid});
-      if(!user) ctx.cookies.set('userInfo', '');
+      if(!user) ctx.setCookie('userInfo', '');
     } catch(err) {
-      ctx.cookies.set('userInfo', '');
+      ctx.setCookie('userInfo', '');
     }
 
 	}
@@ -87,6 +92,9 @@ module.exports = async (ctx, next) => {
       await db.UserModel.extendUsersInfo([user]);
       user.newMessage = await user.getNewMessagesCount();
       user.authLevel = await userPersonal.getAuthLevel();
+      user.setPassword = userPersonal.password.salt && userPersonal.password.hash;
+      user.boundMobile = userPersonal.nationCode && userPersonal.mobile;
+      user.boundEmail = userPersonal.email;
       user.draftCount = await db.DraftModel.count({uid: user.uid});
       user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
       languageName = user.generalSettings.language;

@@ -108,11 +108,6 @@ router
       para.delPostTitle = postFirst.t;
       const delLog = new db.DelPostLogModel(para);
       await delLog.save();
-      if(para.noticeType === true){
-        let uid = targetPost.uid;
-        const toUser = await db.UsersPersonalModel.findOnly({uid});
-        await toUser.increasePsnl('system', 1);
-      }
     }
     await next();
   });

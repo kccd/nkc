@@ -44,8 +44,10 @@ var app = new Vue({
       for(var i = 0; i < selectedForums.length; i++) {
         fid.push(selectedForums[i].fid);
       }
+      app.info = "";
       nkcAPI("/e/settings/register", "PATCH", {
-        defaultSubscribeForumsId: fid
+        defaultSubscribeForumsId: fid,
+        recommendUsers: this.regSettings.recommendUsers
       })
         .then(function() {
           app.info = "保存成功";

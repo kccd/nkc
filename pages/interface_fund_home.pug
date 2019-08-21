@@ -112,7 +112,7 @@ block content
                   if !allowed
                     p 您的账号未达到最低要求，无法申请该基金。
                     if authLevel > userAuthLevel
-                      a.btn.btn-info.btn-block(href=`/u/${data.user.uid}/settings/verify/1` target='_blank') 去身份认证
+                      a.btn.btn-info.btn-block(href=`/u/${data.user.uid}/settings/verify` target='_blank') 去身份认证
                     -btnDisabled = true;
                     -link = '###';
                   if data.message

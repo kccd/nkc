@@ -18,10 +18,11 @@ block content
       .col-xs-12.col-md-2
         include module_user_settings
       .col-xs-12.col-md-10
-        .panel.panel-primary
+        .panel.panel-default
           .panel-heading
-            span 简历设置
+            span 基本信息
           .panel-body
+            #data.hidden= JSON.stringify({accounts: data.accounts, education: data.education, industries: data.industries, forumsObj: data.forumsObj})
             .form-horizontal
 
               .form-group
@@ -79,7 +80,75 @@ block content
                   input.form-control#address(placeholder='详细地址' value=data.personalInfo.address)
                 .col-sm-2
                   +displaySelect('address')
+        .panel.panel-default
+          .panel-heading
+            span 我的照片
+          .panel-body
+            input.hidden#life(type='file' multiple="multiple" accept='image/*')
+            .form-inline
+              +displaySelect('lifePhoto')
+              button.btn.btn-primary(onclick=`submitPhoto(${data.user.uid})`) 保存
+            .row
+              for photo in data.lifePhotos
+                .col-xs-6.col-sm-3.col-md-3(style='margin-top: 1.5rem;')
+                  .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${photo._id})`)
+                  a(href=`/photo/${photo._id}` target='_blank')
+                    img(src=`/photo_small/${photo._id}` style='width: 100%;')
+            .form-inline(style='margin-top: 0.5rem;')
+              h5.text-danger 照片大小不超过20M，并且只能为.jpg、.jpeg、.png格式。
+              button.btn.btn-primary(onclick='$("#life").click();') 上传照片
+              span &nbsp;&nbsp;
+              span#photoInfo
+        .panel.panel-default
+          .panel-heading
+            span 我的证件
+          .panel-body
+            input.hidden#cert(multiple='multiple' type='file' accept='image/*')
+            .form-inline
+              +displaySelect('certPhoto')
+              button.btn.btn-primary(onclick=`submitCert(${data.user.uid})`) 保存
+            .row
+              for photo in data.certsPhotos
+                .col-xs-6.col-sm-3.col-md-3(style='margin-top: 1.5rem;')
+                  .settings-img-remove.glyphicon.glyphicon-remove(onclick=`removePhoto(${photo._id})`)
+                  a(href=`/photo/${photo._id}` target='_blank')
+                    img(src=`/photo_small/${photo._id}` style='width: 100%;')
+            .form-inline(style='margin-top: 0.5rem;')
+              h5.text-danger 照片大小不超过20M，并且只能为.jpg、.jpeg、.png格式。
+              button.btn.btn-primary(onclick='$("#cert").click();') 上传证件照片
+              span &nbsp;&nbsp;
+              span#certPhotoInfo
+        .panel.panel-default
+          .panel-heading
+            span 社交账号
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 微信：
+                .col-sm-4
+                  input.form-control#wechat(type='text' placeholder='请输入微信账号')
+              .form-group
+                label.col-sm-2.control-label QQ：
+                .col-sm-4
+                  input.form-control#QQ(type='text' placeholder='请输入QQ账号')
+              .form-group
+                label.col-sm-2.control-label Google：
+                .col-sm-4
+                  input.form-control#google(type='text' placeholder='请输入Google账号')
+              .form-group
+                label.col-sm-2.control-label 其他：
+                .col-sm-10
+                  .row#account-div
+                  button.btn.btn-primary(onclick='addAccount()') 添加
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(onclick=`submitSocial(${data.user.uid})`) 保存
 
+        .panel.panel-default
+          .panel-heading
+            span 简历
+          .panel-body
+            .form-horizontal
               .form-group
                 label.col-sm-2.control-label 教育背景：
                 .col-sm-10(style='margin-bottom: 0.5rem;')
@@ -107,9 +176,8 @@ block content
                 label.col-sm-2.control-label
                 .col-sm-5
                   button.btn.btn-primary#save(onclick=`submit(${data.user.uid})`) 保存
-              #data.hidden= JSON.stringify({education: data.education, industries: data.industries, forumsObj: data.forumsObj})
+
 block scripts
-  script(src='/interface_common.js')
   script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
   script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
   script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")

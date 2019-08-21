@@ -1,14 +1,6 @@
 const Router = require("koa-router");
 const router = new Router();
 router
-  .get("/", async (ctx, next) => {
-    const {data, db} = ctx;
-    const {user} = data;
-    const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
-    data.alipayAccounts = usersPersonal.alipayAccounts;
-    ctx.template = "interface_user_settings_alipay.pug";
-    await next();
-  })
   .post("/", async (ctx, next) => {
     const {data, db, body, tools} = ctx;
     const {type, account, accounts} = body;

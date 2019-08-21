@@ -11,23 +11,23 @@ block content
       .col-xs-12.col-md-2
         include module_user_settings
       .col-xs-12.col-md-10
-        .panel.panel-primary
+        .panel.panel-default
           .panel-heading
-            span 交易信息设置
+            span 收货地址
           .panel-body
-            button.btn.btn-primary(onclick='addAddress()') 添加交易信息
             #addressDiv
+            button.btn.btn-primary.btn-sm(onclick='addAddress()') 添加
             .template.hidden
               .form-horizontal(style='margin: 2rem 0;')
                 .form-group
                   label.col-sm-2.control-label
                   .col-sm-10
-                    h4 交易信息&nbsp;
+                    h4 收货地址&nbsp;
                       span.addressNumber 1
                 .form-group
                   label.col-sm-2.control-label 收货地址：
                   .col-sm-6
-                    input.location.form-control(name='', type='text', placeholder='请选择省、市、区', autocomplete='off', readonly='true', value=`${data.dealInfo?data.dealInfo.location:""}`)
+                    input.location.form-control(name='', type='text', placeholder='请选择省、市、区', autocomplete='off', readonly='true', value=`${data.dealInfo ? data.dealInfo.location : ""}`)
                     input.form-control.address(type='text' placeholder="填写详细地址")
                 .form-group
                   label.col-sm-2.control-label 联系电话：
@@ -40,25 +40,100 @@ block content
                 .form-group
                   label.col-sm-2.control-label
                   .col-sm-6
-                    button.btn.btn-primary(onclick=`submit(${data.targetUser.uid})`) 保存
-                    button.btn.btn-danger 删除
-            //.form-horizontal
-              .form-group
-                label.col-sm-2.control-label 收货地址：
-                .col-sm-10
-                  .row#address-div
-                  button.btn.btn-primary(onclick='addAddress()') 添加
-              .form-group
-                .col-sm-4.col-sm-offset-2
-                  button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
-  #data.hidden= JSON.stringify({addresses: data.addresses, uid: data.targetUser.uid})
+                    button.btn.btn-primary.btn-sm(onclick=`submit(${data.targetUser.uid})`) 保存
+                    button.btn.btn-danger.btn-sm 删除
+        #app(v-cloak)
+          .panel.panel-default
+            .panel-heading
+              span 支付宝账号
+            .panel-body
+              h5.text-danger 最多可添加5个支付宝账号
+              //- 已绑定的支付宝账号信息
+              .bound.m-t-3
+                //-h4 编辑绑定
+                .table-responsive
+                  table.table
+                    thead
+                      tr
+                        th
+                        th 支付宝账号
+                        th 真实姓名
+                        //-th 绑定日期
+                        th 其他
+                    tbody
+                      tr(v-for="alipay in alipayAccounts")
+                        th.h5
+                          strong.text-success(v-if="alipay.default") 默认
+                        th
+                          input.form-control(v-if="account === alipay" type="text" v-model="alipay.account")
+                          span(v-else) {{alipay.account}}
+                        th
+                          input.form-control(v-if="account === alipay" type="text" v-model="alipay.name")
+                          span(v-else) {{alipay.name}}
+                        th
+                          span(v-if="account === alipay" )
+                            button.btn-xs.btn.btn-success(@click="saveAccounts") 保存
+                            button.btn-xs.btn.btn-default(@click="cancelAccounts(alipay)") 取消
+                          span(v-else)
+                            button.btn-xs.btn.btn-primary(@click="modifyAccount(alipay)") 修改
+                            button.btn-xs.btn.btn-danger(@click="deleteAccount(alipay)") 删除
+                            button.btn.btn-xs.btn-default(v-if="!alipay.default" @click="setDefault(alipay)") 设为默认
+                .m-t-1
+                  button.btn.btn-primary.btn-sm(@click="addAccount") 添加
+          .panel.panel-default
+            .panel-heading
+              span 银行卡
+            .panel-body
+              h5.text-danger 最多可添加5张银行卡
+              //- 已添加的支付宝账号信息
+              .bound.m-t-3
+                .table-responsive
+                  //-h4 编辑添加
+                  table.table
+                    thead
+                      tr
+                        th
+                        th 银行名称
+                        th 银行卡账号
+                        th 开户姓名
+                        th 开户手机号
+                        th 其他
+                    tbody
+                      tr(v-for="bank in bankAccounts")
+                        th.h5
+                          strong.text-success(v-if="bank.default") 默认
+                        th
+                          input.form-control(v-if="accountBank === bank" type="text" v-model="bank.bankName")
+                          span(v-else) {{bank.bankName}}
+                        th
+                          input.form-control(v-if="accountBank === bank" type="text" v-model="bank.account")
+                          span(v-else) {{bank.account}}
+                        th
+                          input.form-control(v-if="accountBank === bank" type="text" v-model="bank.name")
+                          span(v-else) {{bank.name}}
+                        th
+                          input.form-control(v-if="accountBank === bank" type="text" v-model="bank.mobile")
+                          span(v-else) {{bank.mobile}}
+                        //-th
+                          span(v-if="alipay.time") {{format("YYYY-MM-DD HH:mm:ss", alipay.time)}}
+                        th
+                          span(v-if="accountBank === bank" )
+                            button.btn-xs.btn.btn-success(@click="saveBankAccounts") 保存
+                            button.btn-xs.btn.btn-default(@click="cancelBankAccounts(bank)") 取消
+                          span(v-else)
+                            button.btn-xs.btn.btn-primary(@click="modifyBankAccount(bank)") 修改
+                            button.btn-xs.btn.btn-danger(@click="deleteBankAccount(bank)") 删除
+                            button.btn.btn-xs.btn-default(v-if="!bank.default" @click="setDefaultBank(bank)") 设为默认
+                .m-t-1
+                  button.btn.btn-primary.btn-sm(@click="addAccountBank") 添加
+  #data.hidden= JSON.stringify({bankAccounts: data.bankAccounts, addresses: data.addresses, user: data.targetUser, alipayAccounts: data.alipayAccounts})
 
 block scripts
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  include ./publicModules/moment
   script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
-  script(src=`/interface_user_settings_transaction.js?v=${global.NKC.startTime}`)
+  +includeJS(`/interface_user_settings_transaction.js`)
   +includeJS('/external_pkgs/citySet/city.json.js')
-  +includeJS('/external_pkgs/citySet/citySet.js')  
+  +includeJS('/external_pkgs/citySet/citySet.js')
   script.
     $(".location").click(function (e) {
       SelCity(this,e);

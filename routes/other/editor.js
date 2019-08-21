@@ -7,9 +7,7 @@ editorRouter
     const {user} = data;
     data.ver = query.ver;
     // 判断用户是否已完善账号基本信息（username, avatar）
-    if(!await db.UserModel.checkUserBaseInfo(user)) {
-      nkcModules.throwError(403, "未完善账号基本信息", "userBaseInfo");
-    }
+    await db.UserModel.checkUserBaseInfo(user);
     const {type, id, cat, title, content, toColumn} = query;
     data.toColumn = !!toColumn;
     //发新帖，回复等使用新编辑器

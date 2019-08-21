@@ -82,7 +82,8 @@ userRouter
     const targetUser = await db.UserModel.findOnly({uid});
     const targetUsersPersonal = await db.UsersPersonalModel.findOnly({uid});
     // 用户名重名检测
-    if(targetUser.username !== username) {
+    if(username && targetUser.username !== username) {
+      await db.UserModel.checkUsername(username);
       const sameNameUser = await db.UserModel.findOne({uid: {$ne: uid}, usernameLowerCase: username.toLowerCase()});
       if(sameNameUser) ctx.throw(400, "用户名已存在，请更换");
       const sameNameColumn = await db.ColumnModel.findOne({uid: {$ne: uid}, nameLowerCase: username.toLowerCase()});
@@ -94,7 +95,7 @@ userRouter
       if(sameEmailUser) ctx.throw(400, "邮箱已存在，请更换");
     }
     // 手机号码检测
-    if(targetUsersPersonal.mobile !== mobile || targetUsersPersonal.nationCode !== nationCode) {
+    if(mobile && nationCode && (targetUsersPersonal.mobile !== mobile || targetUsersPersonal.nationCode !== nationCode)) {
       const sameMobileUser = await db.UsersPersonalModel.findOne({uid: {$ne: uid}, nationCode, mobile});
       if(sameMobileUser) ctx.throw(400, "手机号码已被其他用户绑定，请更换");
     }

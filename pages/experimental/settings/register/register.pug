@@ -9,7 +9,7 @@ block eTitle
       padding: 0 1rem;
       font-size: 1.2rem;
       color: #fff;
-      margin-right: 1rem;
+      margin: 0 1rem 0.5rem 0;
       cursor: pointer;
     }
     .forum-span .fa{
@@ -21,15 +21,37 @@ block eContent
     .row
       .hidden#data= objToStr({regSettings: data.regSettings, selectedForums: data.selectedForums})
       .col-xs-12.col-md-12#app(v-cloak)
-        h4 注册设置
-        h5 注册用户默认关注的栏目
+        h4 一、注册用户默认关注的栏目
         .m-t-1
           .forum-span(v-for="forum in selectedForums" :style="'background-color: ' + forum.color" @click="remove(forum)")
             span {{forum.displayName}}
             span.fa.fa-remove
-          .forum-span(@click="select").btn-success
-            span 添加
-            span.fa.fa-plus
+          .m-t-05
+            .forum-span(@click="select").btn-success
+              span 添加
+              span.fa.fa-plus
+        h4 二、热门用户
+        .row
+          .col-xs-12.col-md-4
+            .form
+              .form-group
+                label 用户数量
+                input.form-control(type="text" v-model.number="regSettings.recommendUsers.usersCount")
+              .form-group
+                label 最后活动时间最多{{regSettings.recommendUsers.lastVisitTime}}天
+                input.form-control(type="text" v-model.number="regSettings.recommendUsers.lastVisitTime")
+              .form-group
+                label 加精文章数至少{{regSettings.recommendUsers.digestThreadsCount}}篇
+                input.form-control(type="text" v-model.number="regSettings.recommendUsers.digestThreadsCount")
+              .form-group
+                label 总文章数至少{{regSettings.recommendUsers.threadCount}}篇
+                input.form-control(type="text" v-model.number="regSettings.recommendUsers.threadCount")
+              .form-group
+                label 总回复数至少{{regSettings.recommendUsers.postCount}}篇
+                input.form-control(type="text" v-model.number="regSettings.recommendUsers.postCount")
+              .form-group
+                label 学术分至少{{regSettings.recommendUsers.xsf}}分
+                input.form-control(type="text" v-model.number="regSettings.recommendUsers.xsf")
         .m-t-2
           h5.text-danger(v-if="error") {{error}}
           h5.text-success(v-if="info") {{info}}

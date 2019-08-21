@@ -49,7 +49,6 @@ router.use('/p', postRouter.routes(), postRouter.allowedMethods());
 router.use('/f', forumRouter.routes(), forumRouter.allowedMethods());
 router.use('/e', experimentalRouter.routes(), experimentalRouter.allowedMethods());
 router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
-// router.use('/m', personalForumRouter.routes(), personalForumRouter.allowedMethods());
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());
 router.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods());
@@ -60,7 +59,6 @@ router.use('/activity', activityRouter.routes(),activityRouter.allowedMethods())
 router.use('/friend', friendRouter.routes(), friendRouter.allowedMethods());
 router.use('/friend_category', friendCategoryRouter.routes(), friendCategoryRouter.allowedMethods());
 router.use("/complaint" ,complaintRouter.routes(), complaintRouter.allowedMethods());
-//router.use('/share', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/exam', examRouter.routes(), examRouter.allowedMethods());
 router.use('/s', shareRouter.routes(), shareRouter.allowedMethods());
 router.use('/forgotPassword', forgotPasswordRouter.routes(), forgotPasswordRouter.allowedMethods());

@@ -129,8 +129,6 @@ router
       await usersGeneralSettings.update({$inc: {'draftFeeSettings.kcb': num}});
     }
     await ctx.redis.pubMessage(message);
-    const userPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
-		await userPersonal.increasePsnl('system', 1);
     data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
 		await next();
 	})

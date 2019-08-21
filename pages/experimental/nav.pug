@@ -23,7 +23,6 @@
         li
           a(href='/problem/list')=lang('ex', 'problems')
 
-
       // li.dropdown(role='presentation')
         a.dropdown-toggle(data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
           span 特殊专业&nbsp;
@@ -140,6 +139,9 @@
           if permission("experimentalLoginSettings")
             li
               a(href=`/e/settings/login`) 登录
+          if permission("experimentalUsernameSettings")
+            li
+              a(href=`/e/settings/username`) 用户名
 
           <li role="separator" class="divider"></li>    
           li

@@ -171,7 +171,18 @@ NKC.methods.base64ToStr = function(base64) {
   return decodeURIComponent(window.atob(base64))
 };
 /*
-* 返回查询IP信息的url
+* 退出登录
+* */
+NKC.methods.logout = function() {
+  nkcAPI("/logout?t=" + Date.now(), "GET")
+    .then(function () {
+      window.location.reload();
+    })
+    .catch(function (data) {
+      sweetError(data);
+    })
+};
+/* 返回查询IP信息的url
 * @param {String} ip 需要查询的IP地址
 * @return {String} 查询地址url
 * @author pengxiguaa 2019-8-14

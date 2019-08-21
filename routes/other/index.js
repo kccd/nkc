@@ -1,7 +1,6 @@
 const Router = require('koa-router');
 const logoutRouter = require('./logout');
 const sendMessageRouter = require('./sendMessage');
-const smsRouter = require('./sms');
 const otherRouter = new Router();
 const editorRouter = require('./editor');
 const shopLogo = require('./shopLogo');
@@ -55,7 +54,6 @@ otherRouter
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
-  .use('sms', smsRouter.routes(), smsRouter.allowedMethods())
   .use('shopLogo', shopLogo.routes(), shopLogo.allowedMethods())
   .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
