@@ -35,7 +35,7 @@ if data.user
           .checkbox.m-t-0.m-b-05.text-left
             label
               input(type="checkbox" :value="true" v-model="selectTypesWhenSubscribe")
-              span 下次不再弹出（可在应用设置中开启）
+              span(style="font-size: 1rem;") 下次不再弹出（可在设置-偏好设置中开启）
           button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 取消
           button(type="button" class="btn btn-sm btn-primary" @click="complete") 确定
 

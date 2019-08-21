@@ -172,14 +172,19 @@ NKC.methods.base64ToStr = function(base64) {
 };
 /*
 * 退出登录
+* 若游客有权限访问当前页面则退出后刷新当前页面，否则跳转到首页
 * */
 NKC.methods.logout = function() {
+  var href = window.location.href;
   nkcAPI("/logout?t=" + Date.now(), "GET")
     .then(function () {
+      return nkcAPI(href, "GET");
+    })
+    .then(function() {
       window.location.reload();
     })
     .catch(function (data) {
-      sweetError(data);
+      window.location.href = "/";
     })
 };
 /* 返回查询IP信息的url

@@ -1,6 +1,6 @@
 extends bootstrap_base
 block title
-  title 应用设置
+  title 偏好设置
 block content
   #data.hidden=objToStr({user: data.user})
   .container-fluid.max-width
@@ -42,7 +42,7 @@ block content
                     label
                       input(type='radio' name='selectTypes' checked=!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
                       span 关闭
-                  h5.text-info 关闭后，新关注的内容在未分类中。
+                  h5.text-info 开启后，每次关注弹出自定义分类选项；关闭后，新关注的内容在未分类中。
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-9
@@ -62,7 +62,7 @@ block content
                     label
                       input(type='radio' name='envelope' checked=data.user.generalSettings.lotterySettings.close)
                       span 不显示
-                  h5.text-info 每天第一次发表可能获得拆红包机会
+                  h5.text-info 每天第一次发表可能获得拆红包机会，选择不显示，则放弃拆红包机会。
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-9

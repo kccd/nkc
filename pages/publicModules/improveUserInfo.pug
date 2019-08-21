@@ -1,7 +1,15 @@
 if data.user
-  if !data.user.setPassword || !data.user.boundEmail || !data.user.boundMobile || !data.user.avatar || !data.user.banner || !data.user.description
+  -let reg = /^u-/ig;
+  -const unsetUsername = reg.test(data.user.username);
+  if unsetUsername || !data.user.setPassword || !data.user.boundEmail || !data.user.boundMobile || !data.user.avatar || !data.user.banner || !data.user.description
     .improve
-      p 由于你的账号还未完善以下资料，你可能无法使用网站的全部功能！
+      p 由于你还未完善以下资料，可能无法使用网站的全部功能。
+      if unsetUsername
+        .improve-info
+          .fa.fa-exclamation-circle
+          span 未修改默认用户名
+          .pull-right
+            a(href=`/u/${data.user.uid}/settings` target="_blank") 去修改
       if !data.user.setPassword
         .improve-info
           .fa.fa-exclamation-circle
@@ -17,7 +25,7 @@ if data.user
       if !data.user.banner
         .improve-info
           .fa.fa-exclamation-circle
-          span 未上传背景
+          span 未上传个人名片背景图
           .pull-right
             a(href=`/u/${data.user.uid}/settings` target="_blank") 去上传
       if !data.user.description

@@ -22,8 +22,8 @@ mixin userSettings
         span.fa.fa-usd &nbsp;&nbsp;
         span 交易信息
       a.list-group-item(href=`/u/${data.user.uid}/settings/message`)
-        span.fa.fa-envelope-o &nbsp;&nbsp;
-        span 消息设置
+        span.fa.fa-minus-circle &nbsp;&nbsp;
+        span 黑名单
       a.list-group-item(href=`/u/${data.user.uid}/settings/security`)
         span.fa.fa-shield &nbsp;&nbsp;
         span 账号安全
@@ -32,7 +32,7 @@ mixin userSettings
         span 身份认证
       a.list-group-item(href=`/u/${data.user.uid}/settings/apps`)
         span.fa.fa-cubes &nbsp;&nbsp;
-        span 应用设置
+        span 偏好设置
 .hidden-md.hidden-lg
   button.m-b-1.btn.btn-default(role="button" data-toggle="collapse" href="#collapseBase" aria-expanded="false" aria-controls="collapseBase")
     .fa.fa-bars
