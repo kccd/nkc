@@ -17,6 +17,11 @@ block body
     .error-content
       block errorContent
       .error-button
-        a(href="/") 网站首页
-        | &nbsp;&nbsp;&nbsp;
-        a(onclick="history.back(-1)") 返回上一页
+        if !state.apptype
+          a(href="/") 网站首页
+          | &nbsp;&nbsp;&nbsp;
+          a(onclick="history.back(-1)") 返回上一页
+
+  if state.apptype
+    +includeJS('/jquery/jquery-1.11.1.js')
+    +includeJS("/appAPi/app.js")

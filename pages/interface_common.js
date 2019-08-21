@@ -1924,7 +1924,7 @@ function openToNewLocation(url, target) {
       });
     }
   } else {
-    if(target === "_blank") {
+    if(target && target === "_blank") {
       window.open(url);
     } else {
       window.location.href = url
