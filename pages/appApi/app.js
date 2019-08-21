@@ -25,17 +25,22 @@ $(document).ready(function() {
 })
 
 apiready = function() {
-  // 为所有图片添加长按事件
+  // 为所有图片添加点击事件
   var allImgs = document.querySelectorAll("img");
   Array.prototype.forEach.call(allImgs, function(img) {
-    img.addEventListener("touchstart", function() {
-      imgDownTimeOut = setTimeout("imageToApiDownload('"+this.src+"')", 1000)
-    })
-    img.addEventListener("touchmove", function() {
-      clearTimeout(imgDownTimeOut);
-    })
-    img.addEventListener("touchend", function() {
-      clearTimeout(imgDownTimeOut)
+    // img.addEventListener("touchstart", function() {
+    //   imgDownTimeOut = setTimeout("imageToApiDownload('"+this.src+"')", 1000)
+    // })
+    // img.addEventListener("touchmove", function() {
+    //   clearTimeout(imgDownTimeOut);
+    // })
+    // img.addEventListener("touchend", function() {
+    //   clearTimeout(imgDownTimeOut)
+    // })
+    img.addEventListener("click", function() {
+      if(this.getAttribute("dataimg") && this.getAttribute("dataimg") == "content") {
+        imageOpenInApp(this.src);
+      }
     })
   })
   // 为所有的a标签添加点击事件
@@ -44,7 +49,10 @@ apiready = function() {
   var allLinks = document.querySelectorAll("a");
   Array.prototype.forEach.call(allLinks, function(link) {
     link.addEventListener("click", function() {
-      if(this.href) {
+      if(this.href.indexOf("/r/") > -1) {
+        var linkUrl = this.href;
+        attachDownInApp(linkUrl);
+      }else if(this.href) {
         var isHostUrl = siteHostLink(this.href);
         // 如果是本站链接则打开app内页，否则使用外站浏览页打开
         if(isHostUrl) {
@@ -119,14 +127,13 @@ apiready = function() {
           buttons: ['确定', '取消']
       }, function(ret, err){
           if( ret ){
-                if(ret.buttonIndex == 1){
-                  api.closeWin();
-                }
+            if(ret.buttonIndex == 1){
+              api.closeWin();
+            }
           }else{
-                api.closeWin();
+            api.closeWin();
           }
       });
-
     });
   }
   // 清除编辑器标识
@@ -187,8 +194,7 @@ function appOpenUrl(urlStr) {
     pageParam: {
       realUrl: paramStr,
       shareType: shareType
-    },
-    reload:true
+    }
   })
 }
 
@@ -336,5 +342,21 @@ function imageToApiDownload(url) {
 	    subType: 'from_bottom',
 	    duration: 300
 	  }
-});
+  });
+}
+
+// app图片在新的window中打开
+function imageOpenInApp(sid) {
+  api.execScript({
+    name: "root",
+    script: "openImage(['"+sid+"'])"
+  })
+}
+
+// 文件下载
+function attachDownInApp(linkUrl) {
+  api.execScript({
+    name: api.winName,
+    script: "attachDown('"+linkUrl+"')"
+  })
 }

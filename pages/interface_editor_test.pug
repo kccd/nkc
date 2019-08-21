@@ -81,13 +81,13 @@ block content
                         input#sendAnonymousPost(type='checkbox')
                       span 匿名发表&nbsp;
                         span.text-danger#sendAnonymousPostInfo
-                  .checkbox
-                    label
-                      input#protocolCheckbox(type="checkbox" checked=true)
-                      span
-                        | 我已阅读并同意遵守与本次发表相关的全部协议。
-                        a(href=`/protocol` target="_blank") 查看协议
-                        //input#agreeOrigin(type="checkbox", name="", checked)
+                .checkbox
+                  label
+                    input#protocolCheckbox(type="checkbox" checked=true)
+                    span
+                      | 我已阅读并同意遵守与本次发表相关的全部协议。
+                      a(href=`/protocol` target="_blank") 查看协议
+                      //input#agreeOrigin(type="checkbox", name="", checked)
               .form-group
                 button#post.btn.btn-primary(type='submit' onclick="postToThreadWithCheck()") 发表
                 if !['forum_declare'].includes(data.type)

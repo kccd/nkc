@@ -371,7 +371,7 @@
 		,outputXssFilter: true
 		// xss过滤白名单 名单来源: https://raw.githubusercontent.com/leizongmin/js-xss/master/lib/default.js
 		,whitList: {
-			a:      ['target', 'href', 'title', 'class', 'style'],
+			a:      ['target', 'href', 'title', 'class', 'style', 'datatype'],
 			abbr:   ['title', 'class', 'style'],
 			address: ['class', 'style'],
 			area:   ['shape', 'coords', 'href', 'alt'],

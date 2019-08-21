@@ -49,7 +49,8 @@ registerRouter
 	  option.regIP = ctx.address;
 	  option.regPort = ctx.port;
 	  delete option.type;
-	  user = await db.UserModel.createUser(option);
+		user = await db.UserModel.createUser(option);
+		await user.extendGrade();
 
     await imgCodeObj.update({uid: user.uid});
 

@@ -655,21 +655,22 @@ block scripts
   if permission("getPostAuthor")
     include ../publicModules/floatUserPanel/userInfo
   +includeJS("/external_pkgs/viewer/viewer.js")
-  script.
-    $(document).ready(function() {
-      var options = {
-        navbar: false,
-        title: false,
-        toolbar: false,
-      }
-      new Viewer(document.getElementById('ThreadPostBody'), options);
-      if($("#productImageDom").length === 0) {
-        new Viewer(document.getElementById('thread-content'), options);
-      }else{
-        new Viewer(document.getElementById('productImageDom'), options);
-        new Viewer(document.getElementById('pikeImpor'), options);
-        new Viewer(document.getElementById('productIntroDom'), options);
-        new Viewer(document.getElementById('productInfoContent'), options);
-      }
-      //- new Viewer(document.getElementById('pikeLook'), options);
-    })
+  if !state.apptype
+    script.
+      $(document).ready(function() {
+        var options = {
+          navbar: false,
+          title: false,
+          toolbar: false,
+        }
+        new Viewer(document.getElementById('ThreadPostBody'), options);
+        if($("#productImageDom").length === 0) {
+          new Viewer(document.getElementById('thread-content'), options);
+        }else{
+          new Viewer(document.getElementById('productImageDom'), options);
+          new Viewer(document.getElementById('pikeImpor'), options);
+          new Viewer(document.getElementById('productIntroDom'), options);
+          new Viewer(document.getElementById('productInfoContent'), options);
+        }
+        //- new Viewer(document.getElementById('pikeLook'), options);
+      })
