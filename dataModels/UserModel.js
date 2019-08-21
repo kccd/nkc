@@ -174,6 +174,40 @@ userSchema.virtual('operations')
     this._operations = operations;
   });
 
+userSchema.virtual('setPassword')
+  .get(function() {
+    return this._setPassword;
+  })
+  .set(function(setPassword) {
+    this._setPassword = setPassword;
+  });
+
+userSchema.virtual('boundMobile')
+  .get(function() {
+    return this._boundMobile;
+  })
+  .set(function(boundMobile) {
+    this._boundMobile = boundMobile;
+  });
+
+userSchema.virtual('boundEmail')
+  .get(function() {
+    return this._boundEmail;
+  })
+  .set(function(boundEmail) {
+    this._boundEmail = boundEmail;
+  });
+
+
+
+userSchema.virtual('')
+  .get(function() {
+    return this._havePassword;
+  })
+  .set(function(havePassword) {
+    this._havePassword = havePassword;
+  });
+
 userSchema.virtual('subUid')
   .get(function() {
     return this._subUid;
@@ -1070,22 +1104,43 @@ userSchema.statics.uploadedAvatar = async (avatar) => {
 * @author pengxiguaa 2019-5-13
 * @return {Boolean} 是否上传
 * */
-userSchema.statics.uploadedBanner = async (uid) => {
-  if(!uid) throwErr(500, "userModel.uploadedBanner: uid is required");
+userSchema.statics.uploadedBanner = async (banner) => {
+  if(!banner) throwErr(500, "userModel.uploadedBanner: banner is required");
   let {userBannerPath} = require("../settings/upload");
   const {existsSync} = require("../tools/fsSync");
-  userBannerPath += `/${uid}.jpg`;
+  userBannerPath += `/${banner}.jpg`;
   return existsSync(userBannerPath);
 };
 
 /*
 * 验证用户是否已完善基本信息
-* 信息种类：用户名、头像、背景
+* 信息种类：用户名、头像、绑定手机号
 * @param {String/Object} uid 用户id/用户对象
-* @return {Boolean} 是否已完善
 * @author pengxiguaa 2019-5-13
 * */
-userSchema.statics.checkUserBaseInfo = async function(uid) {
+userSchema.statics.checkUserBaseInfo = async (uid, singleError) => {
+  const UserModel = mongoose.model("users");
+  const baseInfoStatus = await UserModel.getUserBaseInfoStatus(uid);
+  if(!baseInfoStatus.status) {
+    if(singleError) {
+      let errorInfo = "";
+      if(!baseInfoStatus.avatar) errorInfo = "未上传头像";
+      if(!baseInfoStatus.username) errorInfo = "未设置用户名";
+      if(!baseInfoStatus.mobile) errorInfo = "未绑定手机号";
+      throwErr(403, errorInfo);
+    } else {
+      const TE = require("../nkcModules/throwError");
+      TE(403, baseInfoStatus, "userBaseInfo");
+    }
+  }
+};
+/*
+* 检测用户基本信息的完善状态
+* @param {String/Object} uid 用户id/用户对象
+* @return {Object} 各种信息的状态
+* @author pengxiguaa 2019-8-21
+* */
+userSchema.statics.getUserBaseInfoStatus = async (uid) => {
   let user;
   const UserModel = mongoose.model("users");
   if(uid instanceof String) {
@@ -1093,9 +1148,18 @@ userSchema.statics.checkUserBaseInfo = async function(uid) {
   } else {
     user = uid;
   }
-  const {username} = user;
-  const uploadedAvatar = await UserModel.uploadedAvatar(user.avatar);
-  return username && uploadedAvatar;
+  const userPersonal = await mongoose.model("usersPersonal").findOnly({uid: user.uid});
+  const result = {
+    username: !!user.username,
+    // description: !!user.description,
+    avatar: await UserModel.uploadedAvatar(user.avatar),
+    // banner: await UserModel.uploadedBanner(user.banner),
+    mobile: !!(userPersonal.mobile && userPersonal.nationCode),
+    // email: !!userPersonal.email,
+    // password: !!(userPersonal.password.hash && userPersonal.password.salt)
+  };
+  result.status = result.username && result.avatar && result.mobile;
+  return result
 };
 
 /*
@@ -1326,12 +1390,38 @@ userSchema.statics.getUserColumn = async (uid) => {
 * @author pengxiguaa 2019-8-16
 * */
 userSchema.statics.checkUsername = async (username = "") => {
-  const contentLength = require("../tools/checkString");
+  const {contentLength} = require("../tools/checkString");
   const length = contentLength(username);
   if (!length) throwErr(400, "用户名不能为空");
+  let reg = /\s/;
+  if(reg.test(username)) ctx.throw(400, '用户名不允许有空格');
   if (length > 30) throwErr(400, "用户名不能超过30字节");
-  const reg = /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/;
+  reg = /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/;
   if (!reg.test(username))
-    throwErr(400, "用户名只能由汉字、英文、阿拉伯数字或下划线组成");
+    throwErr(400, "用户名只能由汉字、英文、阿拉伯数字和下划线组成，且不能以下划线开始");
+};
+/*
+* 判断用户是否有足够的科创币修改用户名
+* @param {String} uid 用户ID
+* @return {Number} 花费的科创币
+* @author pengxiguaa 2019-8-21
+* */
+userSchema.statics.checkModifyUsername = async (uid) => {
+  const user = await mongoose.model("users").findOnly({uid});
+  user.kcb = await mongoose.model("users").updateUserKcb(uid);
+  const usersGeneral = await mongoose.model("usersGeneral").findOnly({uid});
+  const usernameSettings = await mongoose.model("settings").getSettings("username");
+  if(usernameSettings.free) return 0;
+  const reduce = usersGeneral.modifyUsernameCount + 1 - usernameSettings.freeCount;
+  if(reduce <= 0) return 0;
+  let kcb;
+  if(reduce*usernameSettings.onceKcb < usernameSettings.maxKcb) {
+    kcb = reduce*usernameSettings.onceKcb;
+  } else {
+    kcb = usernameSettings.maxKcb;
+  }
+  if(user.kcb < kcb)
+    throwErr(400, "科创币不足");
+  return kcb;
 };
 module.exports = mongoose.model('users', userSchema);

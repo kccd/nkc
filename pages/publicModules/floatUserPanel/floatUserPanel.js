@@ -14,6 +14,8 @@ var floatUserPanel = new Vue({
   mounted: function() {
     var data = NKC.methods.strToObj(this.$el.getAttribute("data-sub-uid"));
     this.subUid = data.subUid;
+    $("#floatUserPanel").on("mouseover", this.onPanel)
+      .on("mouseleave", this.outPanel);
   },
   methods: {
     fromNow: NKC.methods.fromNow,
@@ -51,6 +53,7 @@ var floatUserPanel = new Vue({
       dom.on("mouseleave", function() {
         this_.close(uid);
       });
+      this_.show = true;
       var offset = dom.offset();
       var scrollTop = $(document).scrollTop();
       var documentWidth = $(document).width();
@@ -75,7 +78,6 @@ var floatUserPanel = new Vue({
             this_.usersObj[user.uid] = user;
           }
           this_.user = user;
-          this_.show = true;
         })
         .catch(function(data) {
           sweetError(data);

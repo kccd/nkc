@@ -88,6 +88,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                 a(href=`/message`)
                   span.fa.fa-envelope-o &nbsp;消息
               li
+                a(href=`/account/subscribes`)
+                  span.fa.fa-bookmark-o &nbsp;关注管理
+              li
                 a(href=`/u/${data.user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
                   span.messageNumber.draftMessage= data.user.draftCount || ''
@@ -97,7 +100,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
               li.divider
               li
                 a(href=`/u/${data.user.uid}/settings`)
-                  span.fa.fa-edit &nbsp;编辑资料
+                  span.fa.fa-cog &nbsp;设置
               li.divider
               li
                 a(href=`/shop/order`)
@@ -207,7 +210,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span.pull-right.fa.fa-angle-right
         li
           a(href=`/account/subscribes`)
-            span.fa.fa-bookmark-o &nbsp;我的关注
+            span.fa.fa-bookmark-o &nbsp;关注管理
             span.pull-right.fa.fa-angle-right
         li
           a(href=`/u/${data.user.uid}/drafts`)
@@ -220,7 +223,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       ul.nkc-drawer-list
         li
           a(href=`/u/${data.user.uid}/settings`)
-            span.fa.fa-cog &nbsp;资料设置
+            span.fa.fa-cog &nbsp;设置
             span.pull-right.fa.fa-angle-right
       ul.nkc-drawer-list
         li

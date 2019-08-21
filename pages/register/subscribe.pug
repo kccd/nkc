@@ -1,0 +1,64 @@
+extends ../bootstrap_base
+block title
+  title 注册成功
+  style.
+    .register-btn{
+      background-color: #2b90d9;
+      height: 3rem;
+      line-height: 3rem;
+      text-decoration: none;
+      border-radius: 3px;
+      padding: 0 0.6rem;
+      color: #fff;
+      display: inline-block;
+      border: none;
+    }
+    .register-btn:hover,.register-btn:focus{
+      color: #fff;
+      text-decoration: none;
+      background-color: #2579b6;
+    }
+    .change-users{
+      font-size: 1rem;
+      background-color: #2b90d9;
+      color: #fff;
+      border: none;
+      height: 2rem;
+      border-radius: 3px;
+    }
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3.p-t-3.p-b-2
+        .text-center
+          include ../publicModules/icon-success
+          h3.text-success 注册成功
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        h4 热门用户
+          button.change-users(v-if="!loading" @click="getUsers")
+            .fa.fa-refresh &nbsp;换一批
+          button.change-users(v-else)
+            .fa.fa-refresh.fa-spin
+            span &nbsp;加载中...
+        .row
+          .col-xs-12.col-md-3(v-for="u in users")
+            .module-user-panel-md
+              .avatar
+                img(:src="'/avatar/' + u.avatar")
+              .info
+                a.pointer(@click="visitUrl('/u/' + u.uid)").name {{u.username}}
+                .button(v-if="subUsersId.indexOf(u.uid) !== -1" @click="subscribeUser(u.uid, false)") 取关
+                .button(v-else @click="subscribeUser(u.uid, true)") 关注
+                .cert {{u.grade.displayName}}
+                  img.grade-icon(:src="'/default/v' + u.grade._id + 'l.png'" :title="u.grade.displayName")
+                .description {{u.description || "暂未填写个人简介"}}
+      //-.col-xs-12.col-md-12
+        h4 热门专栏
+        .col-xs-12.col-md-12
+          h4 热门专业
+      .col-xs-12.col-md-12.text-center.m-t-4
+        a.register-btn(href=`/`) 开启科创之旅
+block scripts
+  include ../publicModules/subscribeTypes/subscribeTypes
+  +includeJS("/register/subscribe.js")

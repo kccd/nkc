@@ -10,7 +10,7 @@
       if data.user.authLevel < authLevelMin
         h5.text-danger 身份认证等级未达要求，
           |点击
-          a(href=`/u/${data.user.uid}/settings/verify/${authLevelMin}`) 这里
+          a(href=`/u/${data.user.uid}/settings/verify`) 这里
           |完成相应身份认证。
       else
         if !data.user.volumeA && !data.user.volumeB

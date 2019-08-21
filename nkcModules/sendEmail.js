@@ -2,6 +2,9 @@ const nm = require('nodemailer');
 const mongoose = require('mongoose');
 
 const sendEmail = async (options) => {
+  if(global.NKC.NODE_ENV !== "production") {
+    return console.log(options);
+  }
   const {email, type, code} = options;
   const SettingModel = mongoose.model('settings');
   const emailSettings = await SettingModel.findOnly({_id: 'email'});

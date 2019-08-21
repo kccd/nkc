@@ -5,52 +5,46 @@ router
 		const {data, db, body, nkcModules} = ctx;
 		const {user} = data;
 		const {newUsername} = body;
-		const reg = /\s/;
-		if(reg.test(newUsername)) ctx.throw(400, '用户名不允许有空格');
-		const {contentLength} = ctx.tools.checkString;
-		if(contentLength(newUsername) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
-		const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
-		if(pattern.test(newUsername)) ctx.throw(400, '用户名含有非法字符！');
+		// 验证用户名字符串
+    await db.UserModel.checkUsername(newUsername);
+    // 验证用户的kcb
+    const needKcb = await db.UserModel.checkModifyUsername(user.uid);
 		if(user.username === newUsername) {
 			ctx.throw(400, '新用户名不能与旧用户名相同');
 		}
-		const kcbSettings = await db.SettingModel.findOne({_id: 'kcb'});
-		if(!kcbSettings) ctx.throw(500, '科创币设置错误：未找到相关设置');
-		const sameUsernameUser = await db.UserModel.findOne({uid: {$ne: user.uid}, usernameLowerCase: newUsername.toLowerCase()});
+		const usernameLowerCase = newUsername.toLowerCase();
+		const sameUsernameUser = await db.UserModel.findOne({uid: {$ne: user.uid}, usernameLowerCase: usernameLowerCase});
 		if(sameUsernameUser) ctx.throw(400, '用户名已存在');
-		const sameNameColumn = await db.ColumnModel.findOne({uid: {$ne: user.uid}, nameLowerCase: newUsername.toLowerCase()});
+		const sameNameColumn = await db.ColumnModel.findOne({uid: {$ne: user.uid}, nameLowerCase: usernameLowerCase});
 		if(sameNameColumn) ctx.throw(400, "用户名已存在");
-		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: newUsername.toLowerCase(), toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
+		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: usernameLowerCase, toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 		if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
-		const operation = await db.KcbsTypeModel.findOnly({_id: 'modifyUsername'});
-		const modifyUsernameCount = await db.KcbsRecordModel.count({
-			from: user.uid,
-      to: "bank",
-			type: 'modifyUsername',
-			toc: {$gt: nkcModules.apiFunction.today()}
-		});
-		if(operation.count !== 0) {
-			if(operation.count !== -1 && operation.count <= modifyUsernameCount) {
-				ctx.throw(400, `每天仅有${operation.count}次机会修改用户名，请明天再试`);
-			}
-			user.kcb = await db.UserModel.updateUserKcb(user.uid);
-			if(user.kcb + operation.num < 0) ctx.throw(400, `科创币不足，修改用户名需花费${-1*operation.num/100}个科创币`);
-			/*const defaultUser = await db.UserModel.findOne({uid: defaultUid});
-			if(!defaultUser) ctx.throw(500, '科创币设置错误：未找到默认账户');*/
-			// 生成科创币交易记录
-      await db.KcbsRecordModel.insertSystemRecord('modifyUsername', data.user, ctx);
-		}
-		const newUsernameLowerCase = newUsername.toLowerCase();
+
+		if(needKcb && needKcb > 0) {
+		  await db.KcbsRecordModel({
+        _id: await db.SettingModel.operateSystemID("kcbsRecords", 1),
+        type: "modifyUsername",
+        from: user.uid,
+        to: "bank",
+        num: needKcb,
+        ip: ctx.address,
+        port: ctx.port
+      }).save();
+    }
 
 		user.username = newUsername;
-		user.usernameLowerCase = newUsernameLowerCase;
+		user.usernameLowerCase = usernameLowerCase;
 
 		await user.save();
-
+    await db.UsersGeneralModel.updateOne({uid: user.uid}, {
+      $inc: {
+        modifyUsernameCount: 1
+      }
+    });
 		// 同步到elasticSearch搜索数据库
     await nkcModules.elasticSearch.save("user", user);
 
-    ctx.getCookie("userInfo", {
+    ctx.setCookie("userInfo", {
       uid: user.uid,
       username: user.username,
     });

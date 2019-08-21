@@ -79,6 +79,7 @@ module.exports = {
 				}
 			},
 			verify: {
+			  GET: "visitVerifySettings",
 				PARAMETER: {
 					GET: 'visitVerifySettings',
 				}

@@ -72,7 +72,7 @@ registerRouter
     ctx.setCookie('share-token', '');
 	  await next();
   })
-	.post('/information', async (ctx, next) => {
+	/*.post('/information', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user} = data;
 		const {username, password} = body;
@@ -101,7 +101,7 @@ registerRouter
       username: user.username,
     });
 		await next();
-	})
+	})*/
 	.get('/code', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
@@ -115,5 +115,43 @@ registerRouter
 		ctx.logIt = true;
     data.svgData = codeData.data;
 		await next();
-	});
+	})
+  .get("/subscribe", async (ctx, next) => {
+    const {state, query, db, data} = ctx;
+    const {t} = query;
+    if(!t) {
+      ctx.template = "register/subscribe.pug";
+    } else if(t === "user") {
+      const registerSettings = await db.SettingModel.getSettings("register");
+      const {recommendUsers} = registerSettings;
+      data.subUsersId = state.subUsersId;
+      let users = await db.UserModel.aggregate([
+        {
+          $match: {
+            certs: {$ne: "band"},
+            tlv: {$gte: new Date(Date.now() - recommendUsers.lastVisitTime*24*60*60*1000)},
+            xsf: {$gte: recommendUsers.xsf},
+            digestThreadsCount: {$gte: recommendUsers.digestThreadsCount},
+            threadCount: {$gte: recommendUsers.threadCount},
+            postCount: {$gte: recommendUsers.postCount},
+          }
+        },
+        {
+          $project: {
+            uid: 1
+          }
+        },
+        {
+          $sample: {
+            size: recommendUsers.usersCount
+          }
+        }
+      ]);
+      const usersId = users.map(u => u.uid);
+      users = await db.UserModel.find({uid: {$in: usersId}});
+      users.map(u => u.extendGrade());
+      data.users = await db.UserModel.extendUsersInfo(users);
+    }
+    await next();
+  });
 module.exports = registerRouter;

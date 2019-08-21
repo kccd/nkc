@@ -9,7 +9,7 @@ NKC.modules.SubscribeTypes = function() {
       uid: this_.dom.attr("data-uid"),
       loaded: false,
       types: [],
-
+      selectTypesWhenSubscribe: [],
       selectedTypesId: [],
 
       type: {
@@ -60,6 +60,16 @@ NKC.modules.SubscribeTypes = function() {
       },
       complete: function() {
         var selectedTypesId = this.selectedTypesId;
+        if(this.selectTypesWhenSubscribe && this.selectTypesWhenSubscribe.length > 0) {
+          var uid = NKC.configs.uid;
+          nkcAPI("/u/" + uid + "/settings/apps", "PATCH", {selectTypesWhenSubscribe: false})
+            .then(function() {
+              NKC.configs.selectTypesWhenSubscribe = false;
+            })
+            .catch(function(data) {
+              screenTopWarning(data);
+            })
+        }
         this_.callback(selectedTypesId);
       },
       closeForm: function() {
@@ -106,6 +116,10 @@ NKC.modules.SubscribeTypes = function() {
   });
   this_.open = function(callback, options) {
     options = options || {};
+    if(options.selectTypesWhenSubscribe === undefined) {
+      options.selectTypesWhenSubscribe = !!NKC.configs.selectTypesWhenSubscribe;
+    }
+    if(!options.selectTypesWhenSubscribe) return callback([]);
     this_.app.edit = !!options.edit;
     this_.app.selectedTypesId = [];
     this_.callback = callback;

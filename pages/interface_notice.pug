@@ -12,7 +12,7 @@ block content
           .col-xs-12.col-md-12
             if data.user.authLevel < 1
               h3.text-center 您暂未绑定手机号码，
-                a(href=`/u/${data.user.uid}/settings/mobile` target='_blank') 去绑定
+                a(href=`/u/${data.user.uid}/settings/security` target='_blank') 去绑定
             if !data.user.volumeA
               h3.text-center 您暂未通过A卷考试，
                 a(href='/exam' target='_blank') 去考试

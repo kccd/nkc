@@ -24,47 +24,15 @@ mixin userSettings
       a.list-group-item(href=`/u/${data.user.uid}/settings/message`)
         span.fa.fa-envelope-o &nbsp;&nbsp;
         span 消息设置
-      a.list-group-item(href=`/u/${data.user.uid}/settings/apps`)
-        span.fa.fa-cubes &nbsp;&nbsp;
-        span 应用设置
       a.list-group-item(href=`/u/${data.user.uid}/settings/security`)
         span.fa.fa-shield &nbsp;&nbsp;
         span 账号安全
-    .panel-heading
-      span.panel-titlePanel 密码安全
-    .list-group
-      a.list-group-item(href=`/u/${data.user.uid}/settings/password`)
-        span.fa.fa-eye-slash &nbsp;&nbsp;
-        span 密码修改
-      a.list-group-item(href=`/u/${data.user.uid}/settings/mobile`)
-        span.fa.fa-mobile-phone(style='font-size: 2rem;') &nbsp;&nbsp;
-        span 绑定手机号
-      a.list-group-item(href=`/u/${data.user.uid}/settings/email`)
-        span.fa.fa-envelope-o &nbsp;&nbsp;
-        span 绑定邮箱
-    .panel-heading
-      span.panel-titlePanel 身份认证
-    .list-group
-      a.list-group-item(href=`/u/${data.user.uid}/settings/verify/1`)
-        span.fa.fa-mobile(style='font-size: 2rem;') &nbsp;&nbsp;
-        span 身份认证1
-      if data.authLevel >= 1
-        a.list-group-item(href=`/u/${data.user.uid}/settings/verify/2`)
-          span.fa.fa-address-card-o &nbsp;&nbsp;
-          span 身份认证2
-      else
-        a.list-group-item.disabled
-          span.fa.fa-address-card-o &nbsp;&nbsp;
-            span 身份认证2
-
-      if data.authLevel >= 2
-        a.list-group-item(href=`/u/${data.user.uid}/settings/verify/3`)
-          span.fa.fa-id-card &nbsp;&nbsp;
-          span 身份认证3
-      else
-        a.list-group-item.disabled
-          span.fa.fa-id-card &nbsp;&nbsp;
-            span 身份认证3
+      a.list-group-item(href=`/u/${data.user.uid}/settings/verify`)
+        span.fa.fa-id-card &nbsp;&nbsp;
+        span 身份认证
+      a.list-group-item(href=`/u/${data.user.uid}/settings/apps`)
+        span.fa.fa-cubes &nbsp;&nbsp;
+        span 应用设置
 .hidden-md.hidden-lg
   button.m-b-1.btn.btn-default(role="button" data-toggle="collapse" href="#collapseBase" aria-expanded="false" aria-controls="collapseBase")
     .fa.fa-bars

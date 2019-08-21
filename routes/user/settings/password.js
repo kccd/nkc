@@ -8,14 +8,17 @@ passwordRouter
 	.patch('/', async (ctx, next) => {
 		const {data, db, body, tools} = ctx;
 		const {oldPassword, password} = body;
-		if(!oldPassword) ctx.throw(400, '旧密码不能为空');
-		if(!password) ctx.throw(400, '新密码不能为空');
 		const {apiFunction} = ctx.nkcModules;
 		const {user} = data;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		if(!apiFunction.testPassword(oldPassword, userPersonal.hashType, userPersonal.password)) {
-			ctx.throw(400, '旧密码错误');
-		}
+    if(!password) ctx.throw(400, '新密码不能为空');
+		// 如果之前设置过密码，当再次修改密码时需验证旧密码
+		if(userPersonal.password.hash || userPersonal.password.salt) {
+      if(!oldPassword) ctx.throw(400, '旧密码不能为空');
+      if(!apiFunction.testPassword(oldPassword, userPersonal.hashType, userPersonal.password)) {
+        ctx.throw(400, '旧密码错误');
+      }
+    }
 		const {contentLength, checkPass} = ctx.tools.checkString;
 		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者');

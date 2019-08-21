@@ -5,7 +5,7 @@ block title
   link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
 
 block content
-  #data.hidden=objToStr({user: data.user})
+  #data.hidden=objToStr({user: data.user, usernameSettings: data.usernameSettings, modifyUsernameCount: data.modifyUsernameCount})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -40,24 +40,21 @@ block content
                   h4= data.user.username
                     |&nbsp;
                     .btn.btn-default.btn-xs(onclick='changeUsername()') 修改
-                  #usernameInput(style='display: none;')
-                    .form
-                      .col-xs-12.col-md-12
-                        if data.modifyUsernameOperation.count === 0
-                          .form-group
-                            input.form-control#username(placeholder='请输入新的用户名')
-                          .form-group
-                            button.btn.btn-primary.btn-sm(onclick=`saveNewUsername("${data.user.uid}")`) 保存
-                        else
-                          if data.user.kcb < -1*data.modifyUsernameOperation.num
-                            .form-group
-                              span.text-danger=`修改一次用户名将花费${-1*data.modifyUsernameOperation.num/100}个科创币，您当前的科创币不足。`
-                          else
-                            .form-group
-                              span.text-danger=`*修改一次用户名将花费${-1*data.modifyUsernameOperation.num/100}个科创币`
-                              input.form-control#username(placeholder='请输入新的用户名')
-                            .form-group
-                              button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存
+                  #app(style="display: none")
+                    div(v-if="!usernameSettings.free")
+                      p.text-info 只能免费修改{{usernameSettings.freeCount}}次，超过后每修改一次用户名将多花费{{usernameSettings.onceKcb/100}}个科创币。最多不会超过{{usernameSettings.maxKcb/100}}个科创币。
+                      p.text-info 你已经修改过{{modifyUsernameCount}}次用户名，当前修改需要花费{{needKcb/100}}个科创币。
+                      p.text-danger(v-if="user.kcb < needKcb") 你当前的科创币不足，点击&nbsp;
+                        b
+                          a(href=`/account/finance/recharge` target="_blank") 这里
+                        | &nbsp;充值。
+                    .col-xs-12(v-if="usernameSettings.free || user.kcb >= needKcb")
+                      .form
+                        .form-group
+                          label 请输入新用户名
+                          input.form-control(type="text" v-model.trim="newUsername")
+                        .form-group
+                          button.btn.btn-primary.btn-sm(@click="saveNewUsername") 保存
 
               .form-group
                 label.col-sm-2.control-label 个人简介：

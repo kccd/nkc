@@ -719,8 +719,10 @@ threadRouter
 		} = ctx;
 		const {user} = data;
 
-		if(!await db.UserModel.checkUserBaseInfo(user)) {
-      ctx.throw(400, `因为缺少必要的账户信息，无法完成该操作。包括下面一项或者几项：未设置用户名，未设置头像，未绑定手机号。`);
+		try{
+      await db.UserModel.checkUserBaseInfo(user, true);
+    } catch(err) {
+      ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
 
     // 根据发表设置，判断用户是否有权限发表文章

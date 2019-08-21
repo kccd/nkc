@@ -31,16 +31,23 @@ router
   })
   .patch("/", async (ctx, next) => {
     const {db, body, data} = ctx;
-    const {homeThreadList, showEnvelope} = body;
-    if(!["latest", "subscribe"].includes(homeThreadList)) ctx.throw(400, `首页内容设置错误，未知类型：${homeThreadList}`);
-    const q = {
-      "displaySettings.homeThreadList": homeThreadList,
-      "lotterySettings.close": !showEnvelope
-    };
-    if(!showEnvelope) {
-      q["lotterySettings.status"] = false;
+    const {
+      homeThreadList, showEnvelope, selectTypesWhenSubscribe
+    } = body;
+    const q = {};
+    if(homeThreadList !== undefined) {
+      if(!["latest", "subscribe"].includes(homeThreadList)) ctx.throw(400, `首页内容设置错误，未知类型：${homeThreadList}`);
+      q[`displaySettings.homeThreadList`] = homeThreadList;
     }
-    console.log(q);
+    if(showEnvelope !== undefined) {
+      q[`lotterySettings.close`] = !showEnvelope;
+      if(!showEnvelope) {
+        q["lotterySettings.status"] = false;
+      }
+    }
+    if(selectTypesWhenSubscribe !== undefined) {
+      q[`subscribeSettings.selectTypesWhenSubscribe`] = !!selectTypesWhenSubscribe;
+    }
     await db.UsersGeneralModel.updateOne({uid: data.user.uid}, {
       $set: q
     });

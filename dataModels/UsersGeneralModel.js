@@ -9,6 +9,11 @@ const usersGeneralSchema = new Schema({
 	  type: String,
     default: 'zh_cn'
   },
+  // 用户名的修改次数
+  modifyUsernameCount: {
+	  type: Number,
+    default: 0,
+  },
   waterSetting:{
     waterAdd: {
       type: Boolean,
@@ -174,6 +179,14 @@ const usersGeneralSchema = new Schema({
 	  homeThreadList: {// subscribe, latest
       type: String,
       default: "latest"
+    }
+  },
+  // 用户个人关注设置
+  subscribeSettings: {
+	  // 关注时是否弹出关注分类选择弹窗
+	  selectTypesWhenSubscribe: {
+      type: Boolean,
+      default: true
     }
   }
 }, {

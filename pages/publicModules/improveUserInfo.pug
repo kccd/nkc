@@ -1,0 +1,42 @@
+if data.user
+  if !data.user.setPassword || !data.user.boundEmail || !data.user.boundMobile || !data.user.avatar || !data.user.banner || !data.user.description
+    .improve
+      p 由于你的账号还未完善以下资料，你可能无法使用网站的全部功能！
+      if !data.user.setPassword
+        .improve-info
+          .fa.fa-exclamation-circle
+          span 未设置密码
+          .pull-right
+            a(href=`/u/${data.user.uid}/settings/security` target="_blank") 去设置
+      if !data.user.avatar
+        .improve-info
+          .fa.fa-exclamation-circle
+          span 未上传头像
+          .pull-right
+            a(href=`/u/${data.user.uid}/settings` target="_blank") 去上传
+      if !data.user.banner
+        .improve-info
+          .fa.fa-exclamation-circle
+          span 未上传背景
+          .pull-right
+            a(href=`/u/${data.user.uid}/settings` target="_blank") 去上传
+      if !data.user.description
+        .improve-info
+          .fa.fa-exclamation-circle
+          span 未填写个人简介
+          .pull-right
+            a(href=`/u/${data.user.uid}/settings` target="_blank") 去填写
+      if !data.user.boundMobile
+        .improve-info
+          .fa.fa-exclamation-circle
+          span 未绑定手机号
+          .pull-right
+            a(href=`/u/${data.user.uid}/settings/security` target="_blank") 去绑定
+      if !data.user.boundEmail
+        .improve-info
+          .fa.fa-exclamation-circle
+          span 未绑定邮箱
+          .pull-right
+            a(href=`/u/${data.user.uid}/settings/security` target="_blank") 去绑定
+
+

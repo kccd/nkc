@@ -10,6 +10,7 @@ const downloadRouter = require('./download');
 const gradeRouter = require('./grade');
 const kcbRouter = require('./kcb');
 const logRouter = require('./log');
+const usernameRouter = require("./username");
 const numberRouter = require('./number');
 const homeRouter = require('./home');
 const appRouter = require('./app');
@@ -70,5 +71,6 @@ settingRouter
   .use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
   .use("/column", columnRouter.routes(), columnRouter.allowedMethods())
   .use("/login", loginRouter.routes(), loginRouter.allowedMethods())
+  .use("/username", usernameRouter.routes(), usernameRouter.allowedMethods())
   .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = settingRouter;

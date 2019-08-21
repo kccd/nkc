@@ -15,25 +15,9 @@ function submit(id) {
 }
 
 function changeUsername() {
-	$('#usernameInput').show();
+	$('#app').toggle();
 }
 
-function saveNewUsername(id) {
-	var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
-	var username = $('#username').val();
-	if(pattern.test(username)){
-		getFocus("#username")
-		// throw('用户名含有非法字符')
-		return screenTopWarning('用户名含有非法字符！')
-	}
-	return nkcAPI('/u/'+id+'/settings/username', 'PATCH', {newUsername: username})
-		.then(function() {
-			screenTopAlert('修改成功');
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error);
-		})
-}
 
 function getFocus(a){
   $(a).css('border-color','#f88')
@@ -100,3 +84,37 @@ function selectBanner() {
     aspectRatio: 2
   });
 }
+
+var data = NKC.methods.getDataById("data");
+var app = new Vue({
+  el: "#app",
+  data: {
+    usernameSettings: data.usernameSettings,
+    user: data.user,
+    modifyUsernameCount: data.modifyUsernameCount,
+    newUsername: ""
+  },
+  computed: {
+    needKcb: function () {
+      if (this.usernameSettings.free) return 0;
+      if (this.modifyUsernameCount < this.usernameSettings.freeCount) return 0;
+      var reduce = this.modifyUsernameCount + 1 - this.usernameSettings.freeCount;
+      if (reduce * this.usernameSettings.onceKcb < this.usernameSettings.maxKcb) {
+        return reduce * this.usernameSettings.onceKcb;
+      } else {
+        return this.usernameSettings.maxKcb
+      }
+    }
+  },
+  methods: {
+    saveNewUsername: function() {
+      nkcAPI("/u/" + this.user.uid + "/settings/username", "PATCH", {newUsername: this.newUsername})
+        .then(function() {
+          sweetSuccess("修改成功");
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }
+  }
+});

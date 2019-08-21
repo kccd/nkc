@@ -29,6 +29,26 @@ block content
                   button.btn.btn-primary.btn-sm(onclick="saveAppInfo()") 保存
         .panel.panel-default
           .panel-heading
+            span 关注设置
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 关注时选择分类：
+                .col-sm-10
+                  .radio
+                    label
+                      input(type="radio" name='selectTypes' checked=data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
+                      span.m-r-1 开启
+                    label
+                      input(type='radio' name='selectTypes' checked=!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
+                      span 关闭
+                  h5.text-info 关闭后，新关注的内容在未分类中。
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-9
+                  button.btn.btn-primary.btn-sm(onclick="saveAppInfo()") 保存
+        .panel.panel-default
+          .panel-heading
             span 奖励设置
           .panel-body
             .form-horizontal

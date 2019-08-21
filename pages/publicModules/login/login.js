@@ -106,8 +106,9 @@ NKC.modules.Login = function() {
             imgCode: imgCode
           })
             .then(function() {
-              window.location.reload();
+              // window.location.reload();
               this_.succeed = true;
+              window.location.href = "/register/subscribe";
             })
             .catch(function(data) {
               throwError(data);

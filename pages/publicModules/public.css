@@ -1772,3 +1772,26 @@ span.thread-title-page{
   filter: alpha(opacity=30);
   opacity: .3;
 }
+.improve{
+  box-shadow: 0 0 3px 0 #aaa;
+  padding: 0.5rem;
+  border-radius: 3px;
+}
+.improve .fa{
+  margin-right: 0.3rem;
+  color: #e85a71;
+  font-size: 15px;
+}
+.improve span{
+  color: #6e7f95;
+}
+.improve p{
+  color: #6e7f95;
+}
+.improve a{
+  font-size: 1.2rem;
+  color: #2b90d9;
+}
+.improve .improve-info{
+  margin: 0.3rem 0;
+}

@@ -32,9 +32,9 @@ settingRouter
 	})
   .get(['/', '/info'], async (ctx, next) => {
     const {data, db} = ctx;
-    data.KCBSettings = (await db.SettingModel.findOne({_id: 'kcb'})).c;
+    data.usernameSettings = await db.SettingModel.getSettings("username");
+    data.modifyUsernameCount = data.user.generalSettings.modifyUsernameCount;
     data.user.kcb = await db.UserModel.updateUserKcb(data.user.uid);
-    data.modifyUsernameOperation = await db.KcbsTypeModel.findOnly({_id: 'modifyUsername'});
     ctx.template = 'interface_user_settings_info.pug';
     await next();
   })

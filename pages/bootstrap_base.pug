@@ -54,6 +54,7 @@ block body
   +includeJS('/interface_common.js')
   if data.user
     script!=`NKC.configs.uid="${data.user.uid}";`
+    script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
     if !state.apptype || state.apptype !== "app"
       //- 接入即时通信
       +includeJS('/socket.io-client/dist/socket.io.js')

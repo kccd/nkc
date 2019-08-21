@@ -126,9 +126,12 @@ function saveAppInfo() {
   }
   var showEnvelope = $("input[name='envelope']");
   showEnvelope = showEnvelope.eq(0).prop("checked");
+  var selectTypesWhenSubscribe = $("input[name='selectTypes']");
+  selectTypesWhenSubscribe = selectTypesWhenSubscribe.eq(0).prop("checked");
   nkcAPI("/u/" + data.user.uid + "/settings/apps", "PATCH", {
     homeThreadList: homeThreadList,
-    showEnvelope: showEnvelope
+    showEnvelope: showEnvelope,
+    selectTypesWhenSubscribe: selectTypesWhenSubscribe
   })
     .then(function() {
       sweetSuccess("保存成功");

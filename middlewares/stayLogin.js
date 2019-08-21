@@ -47,7 +47,6 @@ module.exports = async (ctx, next) => {
             userInfo = Buffer.from(userInfo, "base64").toString();
             userInfo = JSON.parse(userInfo);
           }
-          console.log(userInfo);
         }
       }
 		} catch(err) {
@@ -93,6 +92,9 @@ module.exports = async (ctx, next) => {
       await db.UserModel.extendUsersInfo([user]);
       user.newMessage = await user.getNewMessagesCount();
       user.authLevel = await userPersonal.getAuthLevel();
+      user.setPassword = userPersonal.password.salt && userPersonal.password.hash;
+      user.boundMobile = userPersonal.nationCode && userPersonal.mobile;
+      user.boundEmail = userPersonal.email;
       user.draftCount = await db.DraftModel.count({uid: user.uid});
       user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
       languageName = user.generalSettings.language;
