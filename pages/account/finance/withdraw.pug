@@ -91,7 +91,7 @@ block content
                 h4 输入短信验证码
                 if data.user.authLevel < 1
                   h5.text-danger 您未绑定手机号，
-                    a(onclick=`NKC.methods.visitUrl('/u/${data.user.uid}/settings/mobile')`) 去绑定
+                    a(onclick=`NKC.methods.visitUrl('/u/${data.user.uid}/settings/security')`) 去绑定
                 else
                   .row
                     .col-xs-12.col-md-2

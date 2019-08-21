@@ -1,0 +1,132 @@
+extends bootstrap_base
+block title
+  title 偏好设置
+block content
+  #data.hidden=objToStr({user: data.user})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include module_user_settings
+      .col-xs-12.col-md-10
+        .panel.panel-default
+          .panel-heading
+            span 首页默认内容
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 首页内容：
+                .col-sm-10
+                  .radio
+                    label
+                      input(type="radio" name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList==="subscribe")
+                      span.m-r-1 我关注的
+                    label
+                      input(type='radio' name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList==="latest")
+                      span 最新
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-9
+                  button.btn.btn-primary.btn-sm(onclick="saveAppInfo()") 保存
+        .panel.panel-default
+          .panel-heading
+            span 关注设置
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 关注时选择分类：
+                .col-sm-10
+                  .radio
+                    label
+                      input(type="radio" name='selectTypes' checked=data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
+                      span.m-r-1 开启
+                    label
+                      input(type='radio' name='selectTypes' checked=!data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe)
+                      span 关闭
+                  h5.text-info 开启后，每次关注弹出自定义分类选项；关闭后，新关注的内容在未分类中。
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-9
+                  button.btn.btn-primary.btn-sm(onclick="saveAppInfo()") 保存
+        .panel.panel-default
+          .panel-heading
+            span 奖励设置
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 随机红包：
+                .col-sm-10
+                  .radio
+                    label
+                      input(type="radio" name='envelope' checked=!data.user.generalSettings.lotterySettings.close)
+                      span.m-r-1 显示
+                    label
+                      input(type='radio' name='envelope' checked=data.user.generalSettings.lotterySettings.close)
+                      span 不显示
+                  h5.text-info 每天第一次发表可能获得拆红包机会，选择不显示，则放弃拆红包机会。
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-9
+                  button.btn.btn-primary.btn-sm(onclick="saveAppInfo()") 保存
+        .panel.panel-default
+          .panel-heading
+            span 水印风格
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 图片水印：
+                .col-sm-9
+                  label.radio-inline
+                    input(type='radio' name='isWater' id='radio1' value="yes" checked=data.waterSetting.waterAdd === true)
+                    span 为图片添加水印
+                  label.radio-inline#isPay(data=`${data.waterSetting.waterPayInfo}`)
+                    input(type='radio' name='isWater' id='radio2' value="no" checked=data.waterSetting.waterAdd === false onClick=`isAlreadyPay(${data.waterSetting.waterPayInfo})`)
+                    span 不添加水印
+              .form-group#payForWater(style="display:none")
+                label.col-sm-2.control-label
+                .col-sm-9
+                  h5.text-danger=`隐藏水印功能需要花费${data.kcbPayForWater/100}科创币，是否继续?`
+                .col-sm-2
+                .col-sm-9
+                  button.btn.btn-primary.btn-sm#save(onclick=`yesPayForWater(${data.user.uid})`) 继续
+                  button.btn.btn-default.btn-sm#save(onclick=`hideButton()`) 取消
+              .form-group
+                label.col-sm-2.control-label 水印类型：
+                .col-sm-9(style='margin-bottom: 0.5rem;')
+                  .row
+                    .col-sm-4
+                      select.form-control#waterStyle(onChange=`turnImg()`)
+                        option(selected=(data.waterSetting.waterStyle === "siteLogo") data="siteLogo" value="siteLogo") 网站LOGO
+                        option(selected=(data.waterSetting.waterStyle === "singleLogo") data="singleLogo" value="singleLogo") LOGO(小)
+                        option(selected=(data.waterSetting.waterStyle === "userLogo") data="userLogo" value="userLogo") LOGO(小)+用户名
+                        if data.hasColumn
+                          option(selected=(data.waterSetting.waterStyle === "coluLogo") data="coluLogo" value="coluLogo") LOGO(小)+专栏名
+              .form-group
+                label.col-sm-2.control-label 水印位置：
+                .col-sm-9(style='margin-bottom: 0.5rem;')
+                  .row
+                    .col-sm-4
+                      select.form-control#waterGravity(onChange="turnImg()")
+                        option(selected=(data.waterSetting.waterGravity === "southeast") data="southeast" value="southeast") Southeast(右下角)
+                        option(selected=(data.waterSetting.waterGravity === "northeast") data="northeast" value="northeast") Northeast(右上角)
+                        option(selected=(data.waterSetting.waterGravity === "southwest") data="southwest" value="southwest") Southwest(左下角)
+                        option(selected=(data.waterSetting.waterGravity === "northwest") data="northwest" value="northwest") Northwest(左上角)
+                        option(selected=(data.waterSetting.waterGravity === "center") data="center" value="center") Center(正中间)
+              .form-group
+                label.col-sm-2.control-label 参考：
+                .col-sm-9.col-md-5
+                  .row
+                    .col-xs-12.col-md-12.user-settings-img-dev#exampleImg
+                      -var sty = data.waterSetting.waterStyle?data.waterSetting.waterStyle:"siteLogo";
+                      -var gra = data.waterSetting.waterGravity?data.waterSetting.waterGravity:"southeast";
+                      -var imageName = sty + gra;
+                      img#newImg(src=`/default/${imageName}.jpg` style='width: 100%;')
+                  h5.text-info 宽度小于600px或高度小于200px的图片不会添加水印
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-5
+                  button.btn.btn-primary.btn-sm#save(onclick=`submit(${data.user.uid})`) 保存
+
+
+
+block scripts
+  +includeJS('/interface_user_settings_apps.js')

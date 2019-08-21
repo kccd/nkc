@@ -1,6 +1,6 @@
 extends ../../../bootstrap_base
 block title
-  title 消息设置
+  title 黑名单
   +includeCSS("/user/settings/message/message.css")
 block content
   .container-fluid.max-width
@@ -8,12 +8,10 @@ block content
       .col-xs-12.col-md-2
         include ../../../module_user_settings
       .col-xs-12.col-md-10
-        .panel.panel-primary
+        .panel.panel-default
           .panel-heading
-            span 消息设置
+            span 黑名单
           .panel-body
-            h4 黑名单列表
-            hr
             div.m-t-1
               if data.blackListUsers.length > 0
                 for u in data.blackListUsers

@@ -54,6 +54,7 @@ block body
   +includeJS('/interface_common.js')
   if data.user
     script!=`NKC.configs.uid="${data.user.uid}";`
+    script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
     if !state.apptype || state.apptype !== "app"
       //- 接入即时通信
       +includeJS('/socket.io-client/dist/socket.io.js')
@@ -69,6 +70,8 @@ block body
 
   block scripts
   //- 生成二维码 页脚
+  if state.apptype !== "app" && !data.user
+    include ./publicModules/login/login
   include ./publicModules/qrcode/qrcode
   script.
     console.log('(c)2019 成都科创科学文化研究院')

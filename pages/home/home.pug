@@ -33,9 +33,9 @@ block content
               .m-b-1
                 .subscribe-lists
                   .subscribe-list
-                    a(href=`/?t=subscribe${data.c?`&c=${data.c}`:""}`
-                      class=!data.d?"active": ""
-                    ) 全部
+                    a(href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
+                      class=data.d === "user" ? "active" : ""
+                    ) 用户
                   .subscribe-list
                     a(href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
                         class=data.d==="column"? "active" : ""
@@ -49,10 +49,6 @@ block content
                       class=data.d==="discipline"?"active": ""
                     ) 学科
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=user${data.c ?`&c=${data.c}`:""}`
-                      class=data.d==="user"?"active": ""
-                    ) 用户
-                  .subscribe-list
                     a(href=`/?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
                       class=data.d==="thread"?"active": ""
                     ) 文章
@@ -60,6 +56,10 @@ block content
                     a(href=`/?t=subscribe&d=collection${data.c ?`&c=${data.c}`:""}`
                       class=data.d === "collection" ? "active" : ""
                     ) 收藏
+                  .subscribe-list
+                    a(href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
+                      class=data.d === 'all' ? "active" : ""
+                    ) 全部
             if !data.threads.length
               .p-t-5.p-b-5.text-center
                 h4
@@ -99,6 +99,7 @@ block content
         .hidden-xs.hidden-sm#rightDom
           .hidden-xs.hidden-sm
             include ../publicModules/canvas_logo
+            include ../publicModules/improveUserInfo
             .swiper-container.swiper-home
               .swiper-wrapper
                 for thread in data.ads

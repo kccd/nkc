@@ -171,7 +171,23 @@ NKC.methods.base64ToStr = function(base64) {
   return decodeURIComponent(window.atob(base64))
 };
 /*
-* 返回查询IP信息的url
+* 退出登录
+* 若游客有权限访问当前页面则退出后刷新当前页面，否则跳转到首页
+* */
+NKC.methods.logout = function() {
+  var href = window.location.href;
+  nkcAPI("/logout?t=" + Date.now(), "GET")
+    .then(function () {
+      return nkcAPI(href, "GET");
+    })
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function (data) {
+      window.location.href = "/";
+    })
+};
+/* 返回查询IP信息的url
 * @param {String} ip 需要查询的IP地址
 * @return {String} 查询地址url
 * @author pengxiguaa 2019-8-14

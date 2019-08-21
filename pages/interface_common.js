@@ -1158,7 +1158,7 @@ function removeProgressBar() {
 }
 
 
-if($('input[data-control="hue"]').length !== 0) {
+if($('input[data-control="hue"]').length !== 0 && $('input[data-control="hue"]').minicolors) {
 	$('input[data-control="hue"]').minicolors({
 
 		control: $(this).attr('data-control') || 'hue',
@@ -1924,7 +1924,7 @@ function openToNewLocation(url, target) {
       });
     }
   } else {
-    if(target === "_blank") {
+    if(target && target === "_blank") {
       window.open(url);
     } else {
       window.location.href = url

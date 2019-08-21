@@ -175,6 +175,8 @@ var app = new Vue({
           .catch(function(data) {
             sweetError(data);
           });
+      }, {
+        selectTypesWhenSubscribe: true
       });
 
     },
@@ -262,7 +264,8 @@ var app = new Vue({
             sweetError(data);
           })
       }, {
-        selectedTypesId: selectedTypesId
+        selectedTypesId: selectedTypesId,
+        selectTypesWhenSubscribe: true
       });
     },
     getSubById: function(_id) {

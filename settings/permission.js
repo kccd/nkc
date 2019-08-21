@@ -182,7 +182,7 @@ const certificates ={
           [POST]: true
         },
 	      code: {
-        	[name]: '图片验证码',
+        	[name]: '图形验证码',
 		      [GET]: true
 	      }
       },

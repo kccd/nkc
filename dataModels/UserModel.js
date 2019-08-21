@@ -101,8 +101,14 @@ const userSchema = new Schema({
     required: true,
   },
   cart: [String],
-  description: String,
-  color: String,
+  description: {
+    type: String,
+    default: ""
+  },
+  color: {
+    type: String,
+    default: ""
+  },
   certs: {
     type: [String],
     default: [],
@@ -166,6 +172,40 @@ userSchema.virtual('operations')
   })
   .set(function(operations) {
     this._operations = operations;
+  });
+
+userSchema.virtual('setPassword')
+  .get(function() {
+    return this._setPassword;
+  })
+  .set(function(setPassword) {
+    this._setPassword = setPassword;
+  });
+
+userSchema.virtual('boundMobile')
+  .get(function() {
+    return this._boundMobile;
+  })
+  .set(function(boundMobile) {
+    this._boundMobile = boundMobile;
+  });
+
+userSchema.virtual('boundEmail')
+  .get(function() {
+    return this._boundEmail;
+  })
+  .set(function(boundEmail) {
+    this._boundEmail = boundEmail;
+  });
+
+
+
+userSchema.virtual('')
+  .get(function() {
+    return this._havePassword;
+  })
+  .set(function(havePassword) {
+    this._havePassword = havePassword;
   });
 
 userSchema.virtual('subUid')
@@ -526,49 +566,13 @@ userSchema.methods.calculateScore = async function() {
 	await this.update({score});
 };
 
-/* 
-旧的获取证书名称的方法
-userSchema.virtual('navbarDesc').get(function() {
-  const {certs, username, xsf = 0, kcb = 0} = this;
-  let cs = [];
-  if(!certs.includes('default')) {
-  	certs.unshift('default');
-  }
-  if(xsf > 0 && !certs.includes('scholar')) {
-  	certs.push('scholar');
-  }
-  for(const cert of certs) {
-  	if(cert && certificates[cert] && certificates[cert].displayName)
-      cs.push(certificates[cert].displayName);
-  }
-  cs = cs.join(' ');
-  if(certs.includes('banned')){
-    cs = '开除学籍';
-  }
-  return {
-    username: username,
-    xsf: xsf,
-    kcb: kcb,
-    cs: cs
-  }
-}); */
-
-
+/*
+* 保存用户时向搜索数据库存入用户数据
+* @author pengxiguaa 2019-8-16
+* */
 userSchema.pre('save', async function(next) {
   const elasticSearch = require("../nkcModules/elasticSearch");
-  // handle the ElasticSearch index
   try {
-    /*const {_initial_state_: initialState} = this;
-    if (!initialState) { //this is a new user
-      await indexUser(this);
-      return next()
-    } else if (initialState.description !== this.description || initialState.username !== this.username) {
-      // description has changed , update it in the es
-      await updateUser(this);
-      return next()
-    } else {
-      return next()
-    }*/
     await elasticSearch.save("user", this);
     await next();
   } catch(e) {
@@ -577,17 +581,20 @@ userSchema.pre('save', async function(next) {
 });
 
 
-// 创建用户（新）
+
+/*
+* 创建用户
+* @param {Object} option 三张表（users, usersPersonal, usersGenera）的属性
+* @return {Object} user对象
+* @author pengxiguaa 2019-8-16
+* */
 userSchema.statics.createUser = async (option) => {
 	const UserModel = mongoose.model('users');
 	const UsersPersonalModel = mongoose.model('usersPersonal');
-	const UsersSubscribeModel = mongoose.model('usersSubscribe');
-	const PersonalForumModel = mongoose.model('personalForums');
 	const SubscribeModel = mongoose.model("subscribes");
 	const SettingModel = mongoose.model('settings');
 	const UsersGeneraModel = mongoose.model('usersGeneral');
 	const MessageModel = mongoose.model('messages');
-	const SmsModel = mongoose.model('sms');
 	const SubscribeTypeModel = mongoose.model("subscribeTypes");
 	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
 
@@ -600,53 +607,27 @@ userSchema.statics.createUser = async (option) => {
 	userObj.toc = toc;
 	userObj.tlv = toc;
 	userObj.tlm = toc;
-	userObj.moderators = [uid];
 	userObj.certs = [];
-
-	if(userObj.mobile) userObj.certs.push('mobile');
-
-	userObj.newMessage = {
-		messages: 0,
-		at: 0,
-		replies: 0,
-		system: 0
-	};
-
-	const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
-	await Promise.all(systemInfo.map( async s => {
-		const log = SystemInfoLogModel({
-			mid: s._id,
-			uid
-		});
-		await log.save();
-	}));
-
-	userObj.abbr = `用户${uid}`;
-	userObj.displayName = userObj.abbr + '的专栏';
-	userObj.descriptionOfForum = userObj.abbr + '的专栏';
+	// 生成默认用户名，符号"-"和uid保证此用户名全局唯一
+	if(!userObj.username) {
+	  userObj.username = `u-${uid}`;
+    userObj.usernameLowerCase = userObj.username;
+  }
 
 	const user = UserModel(userObj);
 	const userPersonal = UsersPersonalModel(userObj);
-	const userSubscribe = UsersSubscribeModel(userObj);
-	const personalForum = PersonalForumModel(userObj);
 	const userGeneral = UsersGeneraModel({uid});
 
 	// 生成关注专业记录
-  const regSettings = await SettingModel.findById("register");
-  const {defaultSubscribeForumsId} = regSettings.c;
+  const {defaultSubscribeForumsId} = await SettingModel.getSettings("register");
 	try {
 		await user.save();
 		await userPersonal.save();
-		await userSubscribe.save();
-		await personalForum.save();
 		await userGeneral.save();
-		const allSystemMessages = await SmsModel.find({fromSystem: true});
-		for(let sms of allSystemMessages) {
-			const viewedUsers = sms.viewedUsers;
-			viewedUsers.push(uid);
-			await sms.update({viewedUsers});
-		}
-
+		// 创建默认关注分类
+    await SubscribeModel.createDefaultType("post", uid);
+    await SubscribeModel.createDefaultType("replay", uid);
+    // 创建默认数据 关注专业
 		for(const fid of defaultSubscribeForumsId) {
 		  const sub = SubscribeModel({
         _id: await SettingModel.operateSystemID("subscribes", 1),
@@ -656,14 +637,18 @@ userSchema.statics.createUser = async (option) => {
       });
 		  await sub.save();
     }
-		await SubscribeModel.createDefaultType("post", uid);
-    await SubscribeModel.createDefaultType("replay", uid);
-
+		// 创建默认数据 查看系统通知的记录
+    const systemInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
+		for(const s of systemInfo) {
+      const log = SystemInfoLogModel({
+        mid: s._id,
+        uid
+      });
+      await log.save();
+    }
 	} catch (error) {
 		await UserModel.remove({uid});
 		await UsersPersonalModel.remove({uid});
-		await UsersSubscribeModel.remove({uid});
-		await PersonalForumModel.remove({uid});
 		await UsersGeneraModel.remove({uid});
 		await SystemInfoLogModel.remove({uid});
 		await SubscribeModel.remove({
@@ -672,72 +657,11 @@ userSchema.statics.createUser = async (option) => {
       fid: {$in: defaultSubscribeForumsId}
     });
 		await SubscribeTypeModel.remove({uid});
-		const err = new Error(`创建用户出错: ${error}`);
-		err.status = 500;
-		throw err;
+		throwErr(500, `创建用户出错:${error.message || error}`);
 	}
 	return user;
 };
 
-// 创建用户（旧）
-userSchema.statics.createUserOld = async (userObj) => {
-	const SettingModel = mongoose.model('settings');
-	const toc = Date.now();
-	const uid = await SettingModel.operateSystemID('users', 1);
-	userObj.uid = uid;
-	userObj.toc = toc;
-	userObj.tlv = toc;
-	userObj.tlm = toc;
-	userObj.moderators = [uid];
-	userObj.certs = [];
-	if(userObj.mobile) userObj.certs.push('mobile');
-	if(userObj.email) userObj.certs.push('email');
-	if(typeof(userObj.password) === 'string') {
-		const {newPasswordObject} = require('../nkcModules/apiFunction');
-		const passwordObj = newPasswordObject(userObj.password);
-		userObj.password = passwordObj.password;
-		userObj.hashType = passwordObj.hashType;
-	}
-	userObj.newMessage = {
-		messages: 0,
-		at: 0,
-		replies: 0,
-		system: 0
-	};
-	userObj.abbr = userObj.username.slice(0,6);
-	userObj.displayName = userObj.username + '的专栏';
-	userObj.descriptionOfForum = userObj.username + '的专栏';
-	const UserModel = mongoose.model('users');
-	const UsersPersonalModel = mongoose.model('usersPersonal');
-	const UsersSubscribeModel = mongoose.model('usersSubscribe');
-	const PersonalForumModel = mongoose.model('personalForums');
-	const SmsModel = mongoose.model('sms');
-	const user = UserModel(userObj);
-	const userPersonal = UsersPersonalModel(userObj);
-	const userSubscribe = UsersSubscribeModel(userObj);
-	const personalForum = PersonalForumModel(userObj);
-	try {
-		await user.save();
-		await userPersonal.save();
-		await userSubscribe.save();
-		await personalForum.save();
-		const allSystemMessages = await SmsModel.find({fromSystem: true});
-		for(let sms of allSystemMessages) {
-			const viewedUsers = sms.viewedUsers;
-			viewedUsers.push(uid);
-			await sms.update({viewedUsers});
-		}
-	} catch (error) {
-		await UserModel.remove({uid});
-		await UsersPersonalModel.remove({uid});
-		await UsersSubscribeModel.remove({uid});
-		await PersonalForumModel.remove({uid});
-		const err = new Error(`新建用户出错: ${error}`);
-		err.status = 500;
-		throw err;
-	}
-	return user;
-};
 
 userSchema.methods.extendGrade = async function() {
 	const UsersGradeModel = mongoose.model('usersGrades');
@@ -946,6 +870,11 @@ userSchema.statics.extendUserInfo = async function(user) {
   return users[0];
 };
 
+/*
+* 拓展并返回用户的身份认证等级
+* @return {Number} 身份认证等级
+* @author pengxiguaa 2019-8-16
+* */
 userSchema.methods.extendAuthLevel = async function() {
   const userPersonal = await mongoose.model('usersPersonal').findUsersPersonalById(this.uid);
   return this.authLevel = await userPersonal.getAuthLevel();
@@ -1175,22 +1104,43 @@ userSchema.statics.uploadedAvatar = async (avatar) => {
 * @author pengxiguaa 2019-5-13
 * @return {Boolean} 是否上传
 * */
-userSchema.statics.uploadedBanner = async (uid) => {
-  if(!uid) throwErr(500, "userModel.uploadedBanner: uid is required");
+userSchema.statics.uploadedBanner = async (banner) => {
+  if(!banner) throwErr(500, "userModel.uploadedBanner: banner is required");
   let {userBannerPath} = require("../settings/upload");
   const {existsSync} = require("../tools/fsSync");
-  userBannerPath += `/${uid}.jpg`;
+  userBannerPath += `/${banner}.jpg`;
   return existsSync(userBannerPath);
 };
 
 /*
 * 验证用户是否已完善基本信息
-* 信息种类：用户名、头像、背景
+* 信息种类：用户名、头像、绑定手机号
 * @param {String/Object} uid 用户id/用户对象
-* @return {Boolean} 是否已完善
 * @author pengxiguaa 2019-5-13
 * */
-userSchema.statics.checkUserBaseInfo = async function(uid) {
+userSchema.statics.checkUserBaseInfo = async (uid, singleError) => {
+  const UserModel = mongoose.model("users");
+  const baseInfoStatus = await UserModel.getUserBaseInfoStatus(uid);
+  if(!baseInfoStatus.status) {
+    if(singleError) {
+      let errorInfo = "";
+      if(!baseInfoStatus.avatar) errorInfo = "未上传头像";
+      if(!baseInfoStatus.username) errorInfo = "未设置用户名";
+      if(!baseInfoStatus.mobile) errorInfo = "未绑定手机号";
+      throwErr(403, errorInfo);
+    } else {
+      const TE = require("../nkcModules/throwError");
+      TE(403, baseInfoStatus, "userBaseInfo");
+    }
+  }
+};
+/*
+* 检测用户基本信息的完善状态
+* @param {String/Object} uid 用户id/用户对象
+* @return {Object} 各种信息的状态
+* @author pengxiguaa 2019-8-21
+* */
+userSchema.statics.getUserBaseInfoStatus = async (uid) => {
   let user;
   const UserModel = mongoose.model("users");
   if(uid instanceof String) {
@@ -1198,9 +1148,18 @@ userSchema.statics.checkUserBaseInfo = async function(uid) {
   } else {
     user = uid;
   }
-  const {username} = user;
-  const uploadedAvatar = await UserModel.uploadedAvatar(user.avatar);
-  return username && uploadedAvatar;
+  const userPersonal = await mongoose.model("usersPersonal").findOnly({uid: user.uid});
+  const result = {
+    username: !!user.username,
+    // description: !!user.description,
+    avatar: await UserModel.uploadedAvatar(user.avatar),
+    // banner: await UserModel.uploadedBanner(user.banner),
+    mobile: !!(userPersonal.mobile && userPersonal.nationCode),
+    // email: !!userPersonal.email,
+    // password: !!(userPersonal.password.hash && userPersonal.password.salt)
+  };
+  result.status = result.username && result.avatar && result.mobile;
+  return result
 };
 
 /*
@@ -1424,4 +1383,45 @@ userSchema.statics.getUserColumn = async (uid) => {
   return await mongoose.model("columns").findOne({uid, closed: false});
 };
 
+/*
+* 检查用户名
+* @param {String} username 待检测用户名
+* @return {Boolean} 是否复核规范
+* @author pengxiguaa 2019-8-16
+* */
+userSchema.statics.checkUsername = async (username = "") => {
+  const {contentLength} = require("../tools/checkString");
+  const length = contentLength(username);
+  if (!length) throwErr(400, "用户名不能为空");
+  let reg = /\s/;
+  if(reg.test(username)) ctx.throw(400, '用户名不允许有空格');
+  if (length > 30) throwErr(400, "用户名不能超过30字节");
+  reg = /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/;
+  if (!reg.test(username))
+    throwErr(400, "用户名只能由汉字、英文、阿拉伯数字和下划线组成，且不能以下划线开始");
+};
+/*
+* 判断用户是否有足够的科创币修改用户名
+* @param {String} uid 用户ID
+* @return {Number} 花费的科创币
+* @author pengxiguaa 2019-8-21
+* */
+userSchema.statics.checkModifyUsername = async (uid) => {
+  const user = await mongoose.model("users").findOnly({uid});
+  user.kcb = await mongoose.model("users").updateUserKcb(uid);
+  const usersGeneral = await mongoose.model("usersGeneral").findOnly({uid});
+  const usernameSettings = await mongoose.model("settings").getSettings("username");
+  if(usernameSettings.free) return 0;
+  const reduce = usersGeneral.modifyUsernameCount + 1 - usernameSettings.freeCount;
+  if(reduce <= 0) return 0;
+  let kcb;
+  if(reduce*usernameSettings.onceKcb < usernameSettings.maxKcb) {
+    kcb = reduce*usernameSettings.onceKcb;
+  } else {
+    kcb = usernameSettings.maxKcb;
+  }
+  if(user.kcb < kcb)
+    throwErr(400, "科创币不足");
+  return kcb;
+};
 module.exports = mongoose.model('users', userSchema);

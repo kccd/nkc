@@ -6,6 +6,18 @@ verifyRouter
 		data.level = params.level;
 		await next();
 	})
+  .get("/", async (ctx, next) => {
+    const {db, data} = ctx;
+    const {user} = data;
+    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+    const {idCardA, idCardB, handheldIdCard} = await userPersonal.extendIdPhotos();
+    data.submittedAuth = userPersonal.submittedAuth;
+    data.idCardA = idCardA;
+    data.idCardB = idCardB;
+    data.handheldIdCard = handheldIdCard;
+    ctx.template = "interface_user_settings_verify.pug";
+    await next();
+  })
 	.get('/1', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;

@@ -367,6 +367,11 @@ function onPost() {
   } else {
     return screenTopWarning('未知的请求类型：'+queryType);
   }
+  try{
+    removeLocalContent();
+  }catch(err) {
+
+  }
   return nkcAPI(url, method, data)
   .then(function (result) {
     if(result.redirect) {
@@ -454,6 +459,10 @@ if(["application", "forum_declare"].indexOf(type) !== -1){
   ue.ready(function() {
     ue.setContent(disnoneplayHtml);
   })
+}
+// 发表新文章, 注意区分app还是web端
+if(!type) {
+  setLocalContentToUE();
 }
 // 根据参数名称找到对应的参数值
 function GetUrlParam(paraName) {
@@ -649,4 +658,41 @@ function appAttachHideOrShow() {
     $("#showOrHideAttach").text("收起附件管理器")
     $("#attach").css("display", "block")
   }
+}
+
+
+/**
+ * 将编辑器中的内容存入至localStorage中
+ */
+function saveUEContentToLocal() {
+  var content = ue.getContent();
+  api.setPrefs({
+    key: "ueContent",
+    value: content
+  });
+}
+
+/**
+ * 将localStorage中的内容放入编辑其中
+ */
+
+function setLocalContentToUE() {
+  apiready = function() {  
+    var content = api.getPrefs({
+      key: "ueContent",
+      sync: true
+    })
+    ue.ready(function() {
+      ue.setContent(content);
+    })
+  }
+}
+
+/**
+ * 清空localStorage中的内容
+ */
+function removeLocalContent() {
+  api.removePrefs({
+    key: 'ueContent'
+  });
 }

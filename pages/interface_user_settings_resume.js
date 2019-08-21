@@ -68,6 +68,7 @@ var data = JSON.parse($('#data').text());
 var education = data.education;
 var industries= data.industries;
 var indName = data.forumsObj;
+var accounts = data.accounts;
 function educationRender(arr) {
 	var div = $('<div></div>');
 	for(var i = 0; i < arr.length; i++) {
@@ -340,13 +341,10 @@ function submit(uid) {
 	}
 	nkcAPI('/u/'+uid+'/settings/resume', 'PATCH', obj)
 		.then(function() {
-			screenTopAlert('保存成功');
-			setTimeout(function() {
-				window.location.reload();
-			}, 1500);
+			sweetSuccess('保存成功');
 		})
 		.catch(function(data) {
-			screenTopWarning(data.error || data);
+			sweetError(data.error || data);
 		})
 }
 
@@ -373,4 +371,211 @@ function loadDisplayResume(id) {
 			break;
 		}
 	}
+}
+
+function addAccountElement(obj, i) {
+  var accountList = $('<div class="account-list"></div>');
+  var sm2 = $('<div class="col-sm-2"></div>');
+  var inputType = $('<input class="form-control" id="type'+i+'" type="text" placeholder="账号平台" value="'+obj.type+'">');
+  sm2.append(inputType);
+  var sm4 = $('<div class="col-sm-4"></div>');
+  var inputNumber = $('<input class="form-control" id="number'+i+'" type="text" placeholder="请输入账号" value="'+obj.number+'">');
+  sm4.append(inputNumber);
+  var sm5 = $('<div class="col-sm-5"></div>');
+  var deleteBtn = $('<button class="btn btn-danger" onclick="deleteAccount('+i+')">删除</button>');
+  sm5.append(deleteBtn);
+  accountList.append(sm2);
+  accountList.append(sm4);
+  accountList.append(sm5);
+  return accountList;
+}
+
+function displayAccount() {
+  var accountDiv = $('#account-div');
+  accountDiv.html('');
+  for(var i = 0; i < accounts.length; i++) {
+    var account = accounts[i];
+    if(account.type === 'wechat') {
+      $('#wechat').val(account.number);
+    } else if(account.type === 'QQ') {
+      $('#QQ').val(account.number);
+    } else if(account.type === 'google') {
+      $('#google').val(account.number);
+    } else {
+      accountDiv.append(addAccountElement(account, i));
+    }
+  }
+}
+
+function addAccount() {
+  loadAccounts();
+  var obj = {
+    type: '',
+    number: ''
+  };
+  accounts.push(obj);
+  displayAccount();
+}
+
+function deleteAccount(i) {
+  loadAccounts();
+  accounts.splice(i, 1);
+  displayAccount();
+}
+
+function loadAccounts() {
+  var hasQQ, hasWechat, hasGoogle;
+  for(var i = 0; i < accounts.length; i++) {
+    var account = accounts[i];
+    if(account.type === 'QQ') {
+      accounts[i].number = $('#QQ').val();
+      hasQQ = true;
+    } else if(account.type === 'wechat') {
+      accounts[i].number = $('#wechat').val();
+      hasWechat = true;
+    } else if(account.type === 'google') {
+      hasGoogle = true;
+      accounts[i].number = $('#google').val();
+    } else {
+      accounts[i].type = $('#type'+i).val();
+      accounts[i].number = $('#number'+i).val();
+    }
+  }
+  if(!hasQQ) {
+    accounts.push({
+      type: 'QQ',
+      number: $('#QQ').val()
+    })
+  }
+  if(!hasWechat) {
+    accounts.push({
+      type: 'wechat',
+      number: $('#wechat').val()
+    })
+  }
+  if(!hasGoogle) {
+    accounts.push({
+      type: 'google',
+      number: $('#google').val()
+    })
+  }
+}
+
+$(function() {
+  displayAccount();
+});
+
+function submitSocial(uid) {
+  loadAccounts();
+  var obj = {
+    accounts: accounts
+  };
+  nkcAPI('/u/'+uid+'/settings/social', 'PATCH', obj)
+    .then(function() {
+      sweetSuccess('保存成功');
+    })
+    .catch(function(data) {
+      sweetError(data.error || data);
+    })
+}
+
+
+$(function() {
+  initEvent('life');
+  initEvent('cert');
+});
+var displayResume = {};
+function initEvent(elementId) {
+  $('#'+elementId).on('change', function() {
+    var files = $('#'+elementId)[0].files;
+    uploadLifePhotos(files, 0, elementId);
+  });
+}
+
+function removePhoto(id) {
+  nkcAPI('/photo/'+id, 'DELETE', {})
+    .then(function(data) {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      sweetError(data.error);
+    });
+}
+
+function uploadLifePhotos(files, i, elementId) {
+  if(elementId === "cert") {
+    $('#certPhotoInfo').text((i+1) + '/' + files.length);
+  } else {
+    $('#photoInfo').text((i+1) + '/' + files.length);
+  }
+  var file = files[i];
+  var formData = new FormData();
+  formData.append('file', file);
+  formData.append('photoType', elementId);
+  nkcUploadFile("/photo", "POST", formData, function(e, percentage) {
+    console.log(percentage);
+  })
+    .then(function() {
+      i++;
+      if(i <= (files.length-1)) {
+        uploadLifePhotos(files, i, elementId);
+      } else {
+        window.location.reload();
+      }
+    })
+    .catch(function(data) {
+      sweetError(data);
+    })
+}
+
+function submitPhoto(uid) {
+  var optionArr = [];
+  var displayPhoto = 0;
+  var arr = $('#lifePhotoSelect option');
+  for(var i = 0; i < arr.length; i++) {
+    optionArr.push({
+      data: arr.eq(i).attr('data'),
+      text: arr.eq(i).text()
+    });
+  }
+  var select = $('#lifePhotoSelect');
+  for(var i = 0; i < optionArr.length; i++) {
+    if(select.val() === optionArr[i].text) {
+      displayPhoto = optionArr[i].data;
+      break;
+    }
+  }
+  nkcAPI('/u/'+uid+'/settings/photo', 'PATCH', {displayPhoto: displayPhoto})
+    .then(function(){
+      sweetSuccess('保存成功');
+    })
+    .catch(function(data) {
+      sweetError(data.error || data);
+    })
+}
+
+function submitCert(uid) {
+  var optionArr = [];
+  var displayPhoto = 0;
+  var arr = $('#certPhotoSelect option');
+  for(var i = 0; i < arr.length; i++) {
+    optionArr.push({
+      data: arr.eq(i).attr('data'),
+      text: arr.eq(i).text()
+    });
+  }
+  var select = $('#certPhotoSelect');
+  for(var i = 0; i < optionArr.length; i++) {
+    if(select.val() === optionArr[i].text) {
+      displayPhoto = optionArr[i].data;
+      break;
+    }
+  }
+  nkcAPI('/u/'+uid+'/settings/cert', 'PATCH', {displayPhoto: displayPhoto})
+    .then(function(){
+      sweetSuccess('保存成功');
+    })
+    .catch(function(data) {
+      sweetError(data.error || data);
+    })
 }

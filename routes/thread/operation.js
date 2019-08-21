@@ -136,10 +136,6 @@ operationRouter
     const delLog = new db.DelPostLogModel(para);
 		await delLog.save();
 		if(para.noticeType === true){
-			let uid = thread.uid;
-			const toUser = await db.UsersPersonalModel.findOnly({uid});
-			await toUser.increasePsnl('system', 1);
-
       const mId = await db.SettingModel.operateSystemID('messages', 1);
       const message = db.MessageModel({
         _id: mId,
@@ -304,11 +300,6 @@ operationRouter
 
       if(!targetThread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, para.reason);
     }
-		if(para && para.noticeType === true){
-			let uid = targetThread.uid;
-			const toUser = await db.UsersPersonalModel.findOnly({uid});
-			await toUser.increasePsnl('system', 1);
-		}
 		await next();
   })
   .patch('/forum', async (ctx, next) => {

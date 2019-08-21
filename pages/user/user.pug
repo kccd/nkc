@@ -54,10 +54,10 @@ block content
                 else
                   a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", true)`) 关注
               else
-                a(href=`/login`) 私信
+                a(onclick="Login.open()") 私信
                 if data.targetUser.column
                   a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
-                a(href=`/login`) 关注
+                a(onclick="Login.open()") 关注
           else if data.targetUser.column
             .user-button
               a.user-button-column.only-one(href=`/m/${data.targetUser.column._id}`) 专栏

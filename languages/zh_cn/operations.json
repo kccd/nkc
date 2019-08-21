@@ -134,7 +134,7 @@
   "submitExamPaper": "提交考试试卷",
   "visitMobileRegister": "手机注册页面",
   "submitRegister": "提交注册信息",
-  "getRegisterCode": "获取注册图片验证码",
+  "getRegisterCode": "获取注册图形验证码",
   "visitLogin": "登录页面",
   "submitLogin": "提交登录信息",
   "logout": "退出登录",
@@ -607,6 +607,8 @@
   "getAttachments": "下载附件",
   "getPostAuthor": "查看匿名文章/匿名回复的作者",
   "experimentalLoginSettings": "后台管理-登录设置",
+  "registerSubscribe": "新用户注册后的关注",
+  "experimentalUsernameSettings": "后台管理-用户名设置",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

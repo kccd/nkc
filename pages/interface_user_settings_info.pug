@@ -5,41 +5,56 @@ block title
   link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
 
 block content
+  #data.hidden=objToStr({user: data.user, usernameSettings: data.usernameSettings, modifyUsernameCount: data.modifyUsernameCount})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include module_user_settings
       .col-xs-12.col-md-10
-        .panel.panel-primary
+        .panel.panel-default
           .panel-heading
-            span 基本资料设置（完全公开）
+            span 基本资料（完全公开）
           .panel-body
             .form-horizontal
-
+              .form-group
+                label.col-sm-2.control-label 头像：
+                .col-sm-10
+                  .user-settings-img-avatar
+                    a(href=`/avatar/${data.user.avatar}?t=lg` target="_blank")
+                      img#userAvatar(src=`/avatar/${data.user.avatar}` style='width: 100%;')
+                    .text-center.m-t-1
+                      button.btn.btn-default.btn-sm(onclick='selectAvatar()') 选择图片
+                      h5.upload-info
+              .form-group
+                label.col-sm-2.control-label 背景：
+                .col-sm-10
+                  .user-settings-img-banner
+                    a(href=`/banner/${data.user.banner}?t=lg` target="_blank")
+                      img#userBanner(src=`/banner/${data.user.banner}` style='width: 100%;')
+                    .text-center.m-t-1
+                      button.btn.btn-default.btn-sm(onclick='selectBanner()') 选择图片
+                      h5.upload-info-banner
               .form-group
                 label.col-sm-2.control-label 用户名：
                 .col-sm-5
                   h4= data.user.username
-                    span &nbsp;&nbsp;
-                    button.btn.btn-primary.btn-sm(onclick='changeUsername()') 修改
-                  #usernameInput(style='display: none;')
-                    .form
-                      .col-xs-12.col-md-12
-                        if data.modifyUsernameOperation.count === 0
-                          .form-group
-                            input.form-control#username(placeholder='请输入新的用户名')
-                          .form-group
-                            button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存
-                        else
-                          if data.user.kcb < -1*data.modifyUsernameOperation.num
-                            .form-group
-                              span.text-danger=`修改一次用户名将花费${-1*data.modifyUsernameOperation.num/100}个科创币，您当前的科创币不足。`
-                          else
-                            .form-group
-                              span.text-danger=`*修改一次用户名将花费${-1*data.modifyUsernameOperation.num/100}个科创币`
-                              input.form-control#username(placeholder='请输入新的用户名')
-                            .form-group
-                              button.btn.btn-primary(onclick=`saveNewUsername("${data.user.uid}")`) 保存
+                    |&nbsp;
+                    .btn.btn-default.btn-xs(onclick='changeUsername()') 修改
+                  #app(style="display: none")
+                    div(v-if="!usernameSettings.free")
+                      p.text-info 为了避免频繁修改影响网友辨识，只能免费修改{{usernameSettings.freeCount}}次，超过后每修改一次用户名将多花费{{usernameSettings.onceKcb/100}}个科创币。最多不会超过{{usernameSettings.maxKcb/100}}个科创币。
+                      p.text-info 你已经修改过{{modifyUsernameCount}}次用户名，当前修改需要花费{{needKcb/100}}个科创币。
+                      p.text-danger(v-if="user.kcb < needKcb") 你当前的科创币不足，点击&nbsp;
+                        b
+                          a(href=`/account/finance/recharge` target="_blank") 这里
+                        | &nbsp;充值。
+                    .col-xs-12(v-if="usernameSettings.free || user.kcb >= needKcb")
+                      .form
+                        .form-group
+                          label 请输入新用户名
+                          input.form-control(type="text" v-model.trim="newUsername")
+                        .form-group
+                          button.btn.btn-primary.btn-sm(@click="saveNewUsername") 保存
 
               .form-group
                 label.col-sm-2.control-label 个人简介：
@@ -47,9 +62,11 @@ block content
                   textarea.form-control#description(rows=8 placeholder='请输入个人简介')= data.user.description
 
               .form-group
-                label.col-sm-2.control-label 文章签名：
+                label.col-sm-2.control-label 文章公告：
                 .col-sm-5
-                  textarea.form-control#postSign(rows=8 placeholder='请输入文章签名')= data.user.postSign
+                  h5.text-info 在我发表的每篇文章的下方显示（尚未开放）
+                  textarea.form-control#postSign(rows=8 placeholder='请输入文章公告')= data.user.postSign
+
 
               .form-group
                 label.col-sm-2.control-label 文章背景颜色：
@@ -60,6 +77,7 @@ block content
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
 block scripts
-  script(src='/jquery/jquery.minicolors.js')
-  script(src='/interface_common.js')
-  script(src='/interface_user_settings_info.js')
+  include ./publicModules/crop/crop_new
+  +includeJS('/jquery/jquery.minicolors.js')
+  +includeJS("/interface_common.js")
+  +includeJS('/interface_user_settings_info.js')

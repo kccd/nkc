@@ -36,7 +36,7 @@ imgCodeSchema.pre('save', function(next) {
 imgCodeSchema.statics.ensureCode = async (_id, token) => {
 
 	if(!_id) {
-    const error = new Error('图片验证码无效。');
+    const error = new Error('图形验证码无效。');
     error.status = 400;
     throw error;
 	}
@@ -45,17 +45,17 @@ imgCodeSchema.statics.ensureCode = async (_id, token) => {
 	const ImgCodeModel = mongoose.model('imgCodes');
 	const imgCode = await ImgCodeModel.findOne({_id: mongoose.Types.ObjectId(_id)});
 	if(!imgCode) {
-		const error = new Error('图片验证码无效。');
+		const error = new Error('图形验证码无效。');
 		error.status = 400;
 		throw error;
 	}
 	if(Date.now() - effectiveTime > imgCode.toc || imgCode.used) {
-		const error = new Error('图片验证码已失效。');
+		const error = new Error('图形验证码已失效。');
 		error.status = 400;
 		throw error;
 	}
 	if(imgCode.token.toLowerCase() !== token.toLowerCase()) {
-		const error = new Error('图片验证码错误。');
+		const error = new Error('图形验证码错误。');
 		error.status = 400;
 		throw error;
 	}

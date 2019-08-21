@@ -8,12 +8,14 @@ const func = async (socket, next) => {
   const cookies = new Cookies(handshake.headers.cookie, {
     keys: [cookieConfig.secret]
   });
-  const userInfo = cookies.get('userInfo', {
+  let userInfo = cookies.get('userInfo', {
     signed: true
   });
   if(userInfo) {
     try{
-      const {username, uid} = JSON.parse(decodeURI(userInfo));
+      userInfo = Buffer.from(userInfo, "base64").toString();
+      userInfo = JSON.parse(userInfo);
+      const {username, uid} = userInfo;
       user = await db.UserModel.findOnly({username, uid});
     } catch(err) {}
   }

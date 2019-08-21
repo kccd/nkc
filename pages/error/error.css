@@ -75,3 +75,12 @@ body{
 .error-button a:hover, .error-button a:focus{
   text-decoration: none;
 }
+.error-list .status{
+  color: #e85a71;
+  margin-right: 0.5rem;
+  vertical-align: text-bottom;
+  font-size: 17px;
+}
+.error-list .status-true{
+  color: green;
+}

@@ -24,14 +24,12 @@ registerRouter
     if(!imgCode) ctx.throw(400, '请输入图形验证码');
 	  if(!code) ctx.throw(400, '请输入短信验证码');
 
-    const imgCodeId = ctx.cookies.get('imgCodeId', {signed: true});
+    let imgCodeId = ctx.getCookie("imgCodeId") || "";
+    if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
 
     const imgCodeObj = await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
 
-    ctx.cookies.set('imgCodeId', '', {
-      httpOnly: true,
-      signed: true
-    });
+    ctx.setCookie("imgCodeId", "");
 
     await imgCodeObj.update({used: true});
 
@@ -49,32 +47,25 @@ registerRouter
 	  option.regIP = ctx.address;
 	  option.regPort = ctx.port;
 	  delete option.type;
-	  user = await db.UserModel.createUser(option);
+		user = await db.UserModel.createUser(option);
+		await user.extendGrade();
 
     await imgCodeObj.update({uid: user.uid});
 
-	  const cookieStr = encodeURI(JSON.stringify({
-		  uid: user.uid,
-		  username: user.username,
-		  lastLogin: Date.now()
-	  }));
-	  ctx.cookies.set('userInfo', cookieStr, {
-		  signed: true,
-		  maxAge: cookieConfig.maxAge,
-		  httpOnly: true
-	  });
+    ctx.setCookie("userInfo", {
+      uid: user.uid,
+      username: user.username,
+      lastLogin: Date.now()
+    });
 	  ctx.data = {
-		  cookie: ctx.cookies.get('userInfo'),
-		  introduction: 'put the cookie in req-header when using for api',
 		  user
 	  };
-	  /*const personal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-	  data.loginKey = await tools.encryption.aesEncode(user.uid, personal.password.hash);*/
 	  let shareToken = ctx.getCookie('share-token');
 	  if(shareToken) shareToken = shareToken.token;
 	  try{
 	    await db.ShareModel.ensureEffective(shareToken);
     } catch(err) {
+      ctx.setCookie('share-token', '');
       return await next();
     }
     const share = await db.ShareModel.findOnly({token: shareToken});
@@ -82,7 +73,7 @@ registerRouter
     ctx.setCookie('share-token', '');
 	  await next();
   })
-	.post('/information', async (ctx, next) => {
+	/*.post('/information', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user} = data;
 		const {username, password} = body;
@@ -105,44 +96,63 @@ registerRouter
 		user.username = username;
 		user.usernameLowerCase = username.toLowerCase();
 		await user.save();
-		// await user.update({username, usernameLowerCase: username.toLowerCase()});
 		await userPersonal.update({hashType: passwordObj.hashType, password: passwordObj.password});
-		await db.PersonalForumModel.update({uid: user.uid}, {$set: {
-			abbr: username.slice(0.6),
-			displayName: username + '的专栏',
-			descriptionOfForum: username + '的专栏'
-		}});
-		const userInfo = ctx.cookies.get('userInfo');
-		const {lastLogin} = JSON.parse(decodeURI(userInfo));
-		const cookieStr = encodeURI(JSON.stringify({
-			uid: user.uid,
-			username: user.username,
-			lastLogin
-		}));
-		ctx.cookies.set('userInfo', cookieStr, {
-			signed: true,
-			maxAge: ctx.settings.cookie.life,
-			httpOnly: true
-		});
-		data.cookie = ctx.cookies.get('userInfo');
+		ctx.setCookie("userInfo", {
+      uid: user.uid,
+      username: user.username,
+    });
 		await next();
-	})
+	})*/
 	.get('/code', async (ctx, next) => {
 		const {data, db} = ctx;
 		const {user} = data;
-		if(user) ctx.throw(400, '您已注册，无法获取图片验证码。');
+		if(user) ctx.throw(400, '您已注册，无法获取图形验证码。');
 		const codeData = captcha.createRegisterCode();
 		const imgCode = db.ImgCodeModel({
 			token: codeData.text
 		});
 		await imgCode.save();
-		ctx.cookies.set('imgCodeId', imgCode._id, {
-			signed: true,
-			maxAge: ctx.settings.cookie.life,
-			httpOnly: true
-		});
+		ctx.setCookie("imgCodeId", {imgCodeId: imgCode._id});
 		ctx.logIt = true;
     data.svgData = codeData.data;
 		await next();
-	});
+	})
+  .get("/subscribe", async (ctx, next) => {
+    const {state, query, db, data} = ctx;
+    const {t} = query;
+    if(!t) {
+      ctx.template = "register/subscribe.pug";
+    } else if(t === "user") {
+      const registerSettings = await db.SettingModel.getSettings("register");
+      const {recommendUsers} = registerSettings;
+      data.subUsersId = state.subUsersId;
+      let users = await db.UserModel.aggregate([
+        {
+          $match: {
+            certs: {$ne: "band"},
+            tlv: {$gte: new Date(Date.now() - recommendUsers.lastVisitTime*24*60*60*1000)},
+            xsf: {$gte: recommendUsers.xsf},
+            digestThreadsCount: {$gte: recommendUsers.digestThreadsCount},
+            threadCount: {$gte: recommendUsers.threadCount},
+            postCount: {$gte: recommendUsers.postCount},
+          }
+        },
+        {
+          $project: {
+            uid: 1
+          }
+        },
+        {
+          $sample: {
+            size: recommendUsers.usersCount
+          }
+        }
+      ]);
+      const usersId = users.map(u => u.uid);
+      users = await db.UserModel.find({uid: {$in: usersId}});
+      users.map(u => u.extendGrade());
+      data.users = await db.UserModel.extendUsersInfo(users);
+    }
+    await next();
+  });
 module.exports = registerRouter;

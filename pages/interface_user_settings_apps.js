@@ -58,13 +58,13 @@ function submit(uid) {
     waterStyle: waterStyleValue,
     waterGravity: waterGravityValue
   }
-	nkcAPI('/u/'+uid+'/settings/water', 'PATCH', optionArr)
-		.then(function(){
-      screenTopAlert('修改成功');
-		})
-		.catch(function(data) {
-			screenTopWarning(data.error || data);
-		})
+  nkcAPI('/u/'+uid+'/settings/water', 'PATCH', optionArr)
+    .then(function(){
+      sweetSuccess('修改成功');
+    })
+    .catch(function(data) {
+      sweetError(data);
+    })
 }
 
 // 检测是否已经购买过不打水印的服务
@@ -88,18 +88,17 @@ function hideButton(){
 
 // 付费提示
 function yesPayForWater(uid){
-  optionArr = {
+  nkcAPI('/u/'+uid+'/settings/water', 'PATCH', {
     type: "pay"
-  }
-	nkcAPI('/u/'+uid+'/settings/water', 'PATCH', optionArr)
-		.then(function(){
-			screenTopAlert('修改成功');
+  })
+    .then(function(){
+      sweetSuccess('修改成功');
       window.location.reload();
-		})
-		.catch(function(data) {
-      screenTopWarning(data.error || data);
+    })
+    .catch(function(data) {
+      sweetError(data);
       hideButton();
-		})
+    })
 }
 
 //不买
@@ -114,4 +113,30 @@ function turnImg(){
   // var newImg = "< img src='/default/"+$("#waterGravity").val()+".jpg' style='width: 100%;'>"
   // $("#exampleImg").html(newImg)
   $("#newImg").attr("src","/default/"+$("#waterStyle").val()+$("#waterGravity").val()+".jpg");
+}
+
+var data = NKC.methods.getDataById("data");
+
+function saveAppInfo() {
+  var homeThreadList = $("input[name='homeThreadList']");
+  if(homeThreadList.eq(0).prop("checked")) {
+    homeThreadList = "subscribe";
+  } else {
+    homeThreadList = "latest";
+  }
+  var showEnvelope = $("input[name='envelope']");
+  showEnvelope = showEnvelope.eq(0).prop("checked");
+  var selectTypesWhenSubscribe = $("input[name='selectTypes']");
+  selectTypesWhenSubscribe = selectTypesWhenSubscribe.eq(0).prop("checked");
+  nkcAPI("/u/" + data.user.uid + "/settings/apps", "PATCH", {
+    homeThreadList: homeThreadList,
+    showEnvelope: showEnvelope,
+    selectTypesWhenSubscribe: selectTypesWhenSubscribe
+  })
+    .then(function() {
+      sweetSuccess("保存成功");
+    })
+    .catch(function(data) {
+      sweetError(data);
+    })
 }

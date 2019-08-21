@@ -28,9 +28,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           )
       else
         .navbar-brand.userInfo-m
-          a(href='/login' title='还记得密码吗？') 登录
+          a(onclick="Login.open()" title='还记得密码吗？') 登录
           span &nbsp
-          a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+          a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
 
 
 
@@ -88,13 +88,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                 a(href=`/message`)
                   span.fa.fa-envelope-o &nbsp;消息
               li
-                a(href=`/account/subscribes?c=collection`)
-                  span.fa.fa-folder-o &nbsp;收藏
-              li
-                //a(href=`/account/subscribes`)
-                //a(href=`/u/${data.user.uid}/sub/t`)
                 a(href=`/account/subscribes`)
-                  span.fa.fa-bookmark-o &nbsp;我的关注
+                  span.fa.fa-bookmark-o &nbsp;关注管理
               li
                 a(href=`/u/${data.user.uid}/drafts`)
                   span.fa.fa-inbox &nbsp;草稿箱
@@ -102,13 +97,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
               li
                 a(href=`/account/finance?t=all`)
                   span.fa.fa-file-text-o &nbsp;账单
-              li
-                a(href=`/activity`)
-                  span.fa.fa-trophy &nbsp;活动
               li.divider
               li
                 a(href=`/u/${data.user.uid}/settings`)
-                  span.fa.fa-edit &nbsp;编辑资料
+                  span.fa.fa-cog &nbsp;设置
               li.divider
               li
                 a(href=`/shop/order`)
@@ -121,13 +113,13 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                   span.fa.fa-shopping-cart &nbsp;购物车
               li.divider
               li
-                a(href=`/logout` title='不，不要走！')
+                a(onclick="NKC.methods.logout()" title='不，不要走！')
                   span.fa.fa-sign-out &nbsp;退出
         else
           li.userInfo
-            a(href='/login' title='还记得密码吗？') 登录
+            a(onclick="Login.open()" title='还记得密码吗？') 登录
           li.userInfo
-            a(href='/register/mobile' title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
+            a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
       form.navbar-md.navbar-search.hidden-xs.inline-block.form-inline(action='/search' method='GET')
         input.inline-block.form-control(type='text' name='c' placeholder='关键词 文号 用户')
         button.btn.btn-default(type='submit')
@@ -150,7 +142,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           a(href='/?t=subscribe') 关注
       else
         .col-xs-6
-          a(href='/login') 关注
+          a(onclick="Login.open()") 关注
       //.col-xs-4
         a(href='/?t=recommend') 推荐
       .col-xs-6
@@ -190,9 +182,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         .col-xs-12
           .fa.fa-user-circle
         .col-xs-4.col-xs-offset-2
-          a(href="/login") 登录
+          a(onclick="Login.open()") 登录
         .col-xs-4
-          a(href="/register") 注册
+          a(onlick="Login.open('register')") 注册
     ul.nkc-drawer-list
     if data.user
       ul.nkc-drawer-list
@@ -217,14 +209,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                 span.message-switch(class=!messageSum ? "disabled": "")=messageSum
             span.pull-right.fa.fa-angle-right
         li
-          a(href=`/account/subscribes?c=collection`)
-            span.fa.fa-folder-o &nbsp;收藏
-            span.pull-right.fa.fa-angle-right
-        li
-
-          //a(href=`/u/${data.user.uid}/sub/t`)
           a(href=`/account/subscribes`)
-            span.fa.fa-bookmark-o &nbsp;我的关注
+            span.fa.fa-bookmark-o &nbsp;关注管理
             span.pull-right.fa.fa-angle-right
         li
           a(href=`/u/${data.user.uid}/drafts`)
@@ -237,7 +223,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       ul.nkc-drawer-list
         li
           a(href=`/u/${data.user.uid}/settings`)
-            span.fa.fa-cog &nbsp;资料设置
+            span.fa.fa-cog &nbsp;设置
             span.pull-right.fa.fa-angle-right
       ul.nkc-drawer-list
         li
@@ -254,4 +240,4 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span.pull-right.fa.fa-angle-right
 
 
-      a(href="/logout").nkc-drawer-exit 退出登录
+      a(onclick="NKC.methods.logout()").nkc-drawer-exit 退出登录
