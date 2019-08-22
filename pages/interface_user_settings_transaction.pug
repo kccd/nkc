@@ -1,48 +1,43 @@
 extends bootstrap_base
 block title
-  link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
   title 交易信息设置
-  -const mainContainer1400 = true
-  link(href='/bootstrap/css/bootstrap-chinese-region.min.css' media="screen" rel='stylesheet')
-
 block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
         include module_user_settings
       .col-xs-12.col-md-10
-        .panel.panel-default
-          .panel-heading
-            span 收货地址
-          .panel-body
-            #addressDiv
-            button.btn.btn-primary.btn-sm(onclick='addAddress()') 添加
-            .template.hidden
-              .form-horizontal(style='margin: 2rem 0;')
+        #app(v-cloak)
+          .panel.panel-default
+            .panel-heading
+              span 收货地址
+            .panel-body
+              .form-horizontal(style='margin: 2rem 0;' v-for="a, index in addresses")
                 .form-group
                   label.col-sm-2.control-label
                   .col-sm-10
                     h4 收货地址&nbsp;
-                      span.addressNumber 1
+                      span.addressNumber {{index+1}}
                 .form-group
                   label.col-sm-2.control-label 收货地址：
                   .col-sm-6
-                    input.location.form-control(name='', type='text', placeholder='请选择省、市、区', autocomplete='off', readonly='true', value=`${data.dealInfo ? data.dealInfo.location : ""}`)
-                    input.form-control.address(type='text' placeholder="填写详细地址")
+                    input.form-control.m-b-05(name='', type='text', placeholder='请选择地区', autocomplete='off', readonly='true', v-model="a.location" @click="selectAddress(a)")
+                    input.form-control(type='text' placeholder="请填写详细地址" v-model="a.address")
                 .form-group
                   label.col-sm-2.control-label 联系电话：
                   .col-sm-6
-                    input.form-control.mobile(type='text')
+                    input.form-control.mobile(type='text' v-model="a.mobile")
                 .form-group
                   label.col-sm-2.control-label 收件人：
                   .col-sm-6
-                    input.form-control.username(type='text')
+                    input.form-control.username(type='text' v-model="a.username")
                 .form-group
                   label.col-sm-2.control-label
                   .col-sm-6
-                    button.btn.btn-primary.btn-sm(onclick=`submit(${data.targetUser.uid})`) 保存
-                    button.btn.btn-danger.btn-sm 删除
-        #app(v-cloak)
+                    button.btn.btn-primary.btn-sm(@click=`save`) 保存
+                    button.btn.btn-danger.btn-sm(@click="remove(index)") 删除
+              button.btn.btn-primary.btn-sm(@click='addAddress') 添加
+
           .panel.panel-default
             .panel-heading
               span 支付宝账号
@@ -130,11 +125,6 @@ block content
 
 block scripts
   include ./publicModules/moment
+  include ./publicModules/selectAddress/selectAddress
   script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
   +includeJS(`/interface_user_settings_transaction.js`)
-  +includeJS('/external_pkgs/citySet/city.json.js')
-  +includeJS('/external_pkgs/citySet/citySet.js')
-  script.
-    $(".location").click(function (e) {
-      SelCity(this,e);
-    });

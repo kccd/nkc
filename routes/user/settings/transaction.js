@@ -3,6 +3,7 @@ const transactionRouter = new Router();
 transactionRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, params} = ctx;
+		data.selected = "transaction";
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
     data.alipayAccounts = userPersonal.alipayAccounts;
@@ -16,22 +17,16 @@ transactionRouter
 		const {db, params, body} = ctx;
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
-		let {addresses, operation, number} = body;
-		if(operation === 'deleteAddress') {
-			number = parseInt(number);
-			userPersonal.addresses.splice(number, 1);
-			await userPersonal.update({addresses: userPersonal.addresses});
-		} else {
-			reg = /^[0-9]*$/;
-			for(let a of addresses) {
-				if(a.mobile) {
-					if(!reg.test(a.mobile)) {
-						ctx.throw(400, '电话号码格式不正确');
-					}
-				}
-			}
-			await userPersonal.update({addresses});
-		}
+		let {addresses} = body;
+    const reg = /^[0-9]*$/;
+    for(let a of addresses) {
+      if(a.mobile) {
+        if(!reg.test(a.mobile)) {
+          ctx.throw(400, '电话号码格式不正确');
+        }
+      }
+    }
+    await userPersonal.update({addresses});
 		await next();
 	});
 module.exports = transactionRouter;

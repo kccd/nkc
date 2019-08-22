@@ -15,8 +15,8 @@ const func = async (socket, next) => {
     try{
       userInfo = Buffer.from(userInfo, "base64").toString();
       userInfo = JSON.parse(userInfo);
-      const {username, uid} = userInfo;
-      user = await db.UserModel.findOnly({username, uid});
+      const {uid} = userInfo;
+      user = await db.UserModel.findOnly({uid});
     } catch(err) {}
   }
 

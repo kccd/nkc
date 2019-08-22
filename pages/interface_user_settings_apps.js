@@ -117,6 +117,8 @@ function turnImg(){
 
 var data = NKC.methods.getDataById("data");
 
+NKC.methods.initSelectColor();
+
 function saveAppInfo() {
   var homeThreadList = $("input[name='homeThreadList']");
   if(homeThreadList.eq(0).prop("checked")) {
@@ -128,8 +130,11 @@ function saveAppInfo() {
   showEnvelope = showEnvelope.eq(0).prop("checked");
   var selectTypesWhenSubscribe = $("input[name='selectTypes']");
   selectTypesWhenSubscribe = selectTypesWhenSubscribe.eq(0).prop("checked");
+  var color = $("input[data-control='selectColor']");
+  color = color.val();
   nkcAPI("/u/" + data.user.uid + "/settings/apps", "PATCH", {
     homeThreadList: homeThreadList,
+    color: color,
     showEnvelope: showEnvelope,
     selectTypesWhenSubscribe: selectTypesWhenSubscribe
   })

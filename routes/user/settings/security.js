@@ -3,6 +3,7 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {db, data, params} = ctx;
+    data.selected = "security";
     const {uid} = params;
     const userPersonal = await db.UsersPersonalModel.findOnly({uid});
     data.havePassword = true;

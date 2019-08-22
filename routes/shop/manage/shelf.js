@@ -78,10 +78,11 @@ shelfRouter
       attention = []
     }else{
       attention = attention.split(",")
-    };
+    }
     if(!productDetails) ctx.throw(400, '商品详细介绍不能为空');
     if(contentLength(productDetails) > 50000) ctx.throw(400, '商品详细介绍不能超过50000字节');
     const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
+    if(!mainForumsId.length) ctx.throw(400, "至少选择一个商品分类");
     await Promise.all(mainForumsId.map(async fid => {
       const forum = await db.ForumModel.findOne({fid});
       if(!forum) ctx.throw(404, `不存在ID为【${fid}】的专业，请重新选择`);

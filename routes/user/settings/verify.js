@@ -8,6 +8,7 @@ verifyRouter
 	})
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
+    data.selected = "verify";
     const {user} = data;
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     const {idCardA, idCardB, handheldIdCard} = await userPersonal.extendIdPhotos();

@@ -9,6 +9,7 @@
   display: inline-block;
   color: #282c37;
   font-weight: 700;
+  text-align: center;
 }
 .module-app:hover, .module-app:focus{
   text-decoration: none;

@@ -27,8 +27,8 @@ const fn = async (i) => {
       try{
         userInfo = Buffer.from(userInfo, "base64").toString();
         userInfo = JSON.parse(userInfo);
-        const {username, uid} = userInfo;
-        user = await db.UserModel.findOne({username, uid});
+        const {uid} = userInfo;
+        user = await db.UserModel.findOne({uid});
       } catch(err) {
         console.log(`socket用户信息验证失败`);
       }

@@ -31,8 +31,7 @@ homeRouter
 		const productTalkCount = await db.PostModel.count({pid:{$in:threadIds}});
 		statistics.talkCount = productTalkCount;
 		// 统计粉丝数量
-		const userSubscribe = await db.UsersSubscribeModel.findOne({uid:user.uid});
-		statistics.funsCount = userSubscribe.subscribers.length;
+		statistics.funsCount = await db.SubscribeModel.count({type: "user", tUid: user.uid});
 		// 统计商品信息
 		let productInsaleCount = 0;
 		let productNosaleCount = 0;
