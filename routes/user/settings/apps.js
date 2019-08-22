@@ -4,6 +4,7 @@ router
   .get("/", async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
+    data.selected = "apps";
     data.waterSetting = {
       waterAdd: true,
       waterStyle: "siteLogo",
@@ -32,7 +33,8 @@ router
   .patch("/", async (ctx, next) => {
     const {db, body, data} = ctx;
     const {
-      homeThreadList, showEnvelope, selectTypesWhenSubscribe
+      homeThreadList, showEnvelope, selectTypesWhenSubscribe,
+      color
     } = body;
     const q = {};
     if(homeThreadList !== undefined) {
@@ -51,6 +53,9 @@ router
     await db.UsersGeneralModel.updateOne({uid: data.user.uid}, {
       $set: q
     });
+    if(color){
+      await db.UserModel.updateOne({uid: data.user.uid}, {$set: {color}});
+    }
     await next();
   });
 module.exports = router;

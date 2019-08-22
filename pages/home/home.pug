@@ -10,6 +10,12 @@ block content
   -const canManagement = permission("superModerator");
   .container-fluid.max-width
     .row
+      if data.user && (/^kc-/.test(data.user.username) || !data.user.username)
+        .col-xs-12(style="font-size: 1.3rem;height: 3rem;line-height:3rem;").m-b-1
+          .col-xs-12.bg-warning 你还未修改默认用户名，点击&nbsp;
+            b
+              a(href=`/u/${data.user.uid}/settings` target="_blank") 这里
+            | &nbsp;去修改。
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
         include ../publicModules/post_button
         include ../publicModules/management/management

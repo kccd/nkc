@@ -4,6 +4,7 @@ const moment = require('moment');
 resumeRouter
 	.get('/', async  (ctx, next) => {
 		const {data, db, params} = ctx;
+    data.selected = "resume";
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
 		data.personalInfo = userPersonal.personalInfo;

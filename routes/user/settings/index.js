@@ -32,6 +32,7 @@ settingRouter
 	})
   .get(['/', '/info'], async (ctx, next) => {
     const {data, db} = ctx;
+    data.selected = "info";
     data.usernameSettings = await db.SettingModel.getSettings("username");
     data.modifyUsernameCount = data.user.generalSettings.modifyUsernameCount;
     data.user.kcb = await db.UserModel.updateUserKcb(data.user.uid);

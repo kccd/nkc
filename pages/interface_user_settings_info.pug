@@ -67,12 +67,6 @@ block content
                   h5.text-info 在我发表的每篇文章的下方显示（尚未开放）
                   textarea.form-control#postSign(rows=8 placeholder='请输入文章公告')= data.user.postSign
 
-
-              .form-group
-                label.col-sm-2.control-label 文章背景颜色：
-                .col-sm-5
-                  input.form-control#color(type='text' placeholder='默认：#e4e4e4' value=data.user.color || '' data-control='hue')
-
               .form-group
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存

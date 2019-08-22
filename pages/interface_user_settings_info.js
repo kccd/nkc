@@ -2,7 +2,6 @@ function submit(id) {
 	var obj = {
 		description: $('#description').val(),
 		postSign: $('#postSign').val(),
-		color: $('#color').val()
 	};
 
 	nkcAPI('/u/'+id+'/settings/info', 'PATCH', obj)

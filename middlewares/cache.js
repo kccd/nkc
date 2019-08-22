@@ -87,7 +87,7 @@ module.exports = async (ctx, next) => {
     }
   }
   await next();
-  if(ctx.filePath || !state.cachePage) return;
+  if(ctx.filePath ||!state.cachePage) return;
   const html = ctx.body.toString();
   setTimeout(async () => {
     await redisClient.setAsync(tocKey, ctx.reqTime.getTime());
