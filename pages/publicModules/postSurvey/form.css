@@ -15,3 +15,7 @@
 #modulePostSurveyEdit .survey-type .fa-circle-o{
   color: #555;
 }
+#modulePostSurveyEdit .add-option-button{
+  cursor: pointer;
+  padding-top: 0.8rem;
+}

@@ -9,9 +9,18 @@ NKC.modules.PostSurveyEdit = function() {
     el: "#modulePostSurveyEditApp",
     data: {
       canClickButton: false,
-      ps: ""
+      ps: "",
+      options: [],
     },
     methods: {
+      addOption: function() {
+        this.options.push({
+          title: "",
+          description: "",
+          links: [],
+          resourcesId: []
+        });
+      },
       newSurvey: function() {
         this.ps = JSON.parse(JSON.stringify({
           type: "vote",  // vote, survey, score
@@ -32,6 +41,7 @@ NKC.modules.PostSurveyEdit = function() {
       nkcAPI("/survey/" + options.psId, "GET")
         .then(function(data) {
           self.app.ps = data.survey;
+          self.options = data.options;
         })
         .catch(function(data) {
           sweetError(data);

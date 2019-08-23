@@ -31,7 +31,13 @@
             label.col-sm-2.control-label 选项
             .col-sm-9
               .survey-options
-                .fa.fa-plus-square &nbsp;选项
+                .fa.fa-plus-square.add-option-button(@click="addOption") &nbsp;添加选项
+                .survey-option(v-for="o in options")
+                  .form
+                    .form-group
+                      input.form-control(type="text" v-model="o.title" placeholder="选项标题")
+                    .form-group
+                      textarea.form-control(type="text" v-model="o.description" placeholder="选项说明")
         .survey-types
 
       .modal-footer

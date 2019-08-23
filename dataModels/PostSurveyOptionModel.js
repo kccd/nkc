@@ -14,7 +14,26 @@ const schema = new Schema({
     required: true,
     index: 1
   },
-
+  // 选项标题
+  title: {
+    type: String,
+    required: true
+  },
+  // 选项介绍
+  description: {
+    type: String,
+    default: ""
+  },
+  // 选项图片
+  resourcesId: {
+    type: String,
+    default: []
+  },
+  // 选项链接
+  links: {
+    type: String,
+    default: []
+  }
 }, {
   collection: "postSurveys"
 });
