@@ -9,13 +9,17 @@ NKC.modules.PostSurveyEdit = function() {
     el: "#modulePostSurveyEditApp",
     data: {
       canClickButton: false,
-
-      type: "", // vote, survey, score
-
+      ps: ""
     },
     methods: {
+      newSurvey: function() {
+        this.ps = JSON.parse(JSON.stringify({
+          type: "vote",  // vote, survey, score
+          description: ""
+        }));
+      },
       selectType: function(type) {
-        this.type = type;
+        this.ps.type = type;
       },
       complete: function() {
 
@@ -23,6 +27,18 @@ NKC.modules.PostSurveyEdit = function() {
     }
   });
   self.open = function(callback, options) {
+    options = options || {};
+    if(options.psId) {
+      nkcAPI("/survey/" + options.psId, "GET")
+        .then(function(data) {
+          self.app.ps = data.survey;
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    } else {
+      self.app.newSurvey();
+    }
     self.dom.modal("show");
   };
   self.close = function() {

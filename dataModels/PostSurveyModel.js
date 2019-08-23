@@ -101,4 +101,4 @@ const schema = new Schema({
 }, {
   collection: "postSurveys"
 });
-module.exports = mognoose.model("postSurveys", schema);
+module.exports = mongoose.model("postSurveys", schema);

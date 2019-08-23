@@ -12,18 +12,26 @@
             label.col-sm-2.control-label 类别
             .col-sm-10
               .survey-type(@click="selectType('vote')")
-                .fa.fa-check-circle(v-if="type === 'vote'")
+                .fa.fa-check-circle(v-if="ps.type === 'vote'")
                 .fa.fa-circle-o(v-else)
                 span 选择
               .survey-type(@click="selectType('survey')")
-                .fa.fa-check-circle(v-if="type === 'survey'")
+                .fa.fa-check-circle(v-if="ps.type === 'survey'")
                 .fa.fa-circle-o(v-else)
                 span 问卷
               .survey-type(@click="selectType('score')")
-                .fa.fa-check-circle(v-if="type === 'score'")
+                .fa.fa-check-circle(v-if="ps.type === 'score'")
                 .fa.fa-circle-o(v-else)
                 span 评分
-
+          .form-group
+            label.col-sm-2.control-label 说明
+            .col-sm-9
+              textarea.form-control(v-model="ps.description" rows=4 placeholder="请输入投票说明")
+          .form-group
+            label.col-sm-2.control-label 选项
+            .col-sm-9
+              .survey-options
+                .fa.fa-plus-square &nbsp;选项
         .survey-types
 
       .modal-footer
