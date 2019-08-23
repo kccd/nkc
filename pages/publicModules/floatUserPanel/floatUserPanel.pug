@@ -41,10 +41,10 @@
                 button.user_sub_btn.btn.btn-xs.btn-default(v-else :onclick="'SubscribeTypes.subscribeUser(\"'+user.uid+'\", false)'") 取关
       .user_info
         a.clear-a-style(:href="'/u/' + user.uid + '?t=thread'").col-xs-3
-          .user_info_count {{user.threadCount}}
+          .user_info_count {{user.threadCount - user.disabledThreadsCount}}
           .user_info_title 文章
         a.clear-a-style(:href="'/u/' + user.uid").col-xs-3
-          .user_info_count {{user.postCount}}
+          .user_info_count {{user.postCount - user.disabledPostsCount}}
           .user_info_title 回复
         .col-xs-3
           .user_info_count {{user.xsf}}
