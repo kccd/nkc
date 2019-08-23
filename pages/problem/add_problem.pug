@@ -33,5 +33,5 @@ block content
         .form-group
           h4=`科创论坛值班室：${state.serverSettings.telephone}`
 block scripts
-  script(src=`/interface_common.js?v=${startTime}`)
-  script(src=`/problem/add_problem.js?v=${startTime}`)
+  include ../publicModules/postSurvey/edit
+  +includeJS("/problem/add_problem.js")

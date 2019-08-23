@@ -27,9 +27,14 @@ function addProblem() {
 		})
 }
 
-
 $(function() {
 	$('#submit').on('click', function() {
 		addProblem();
 	});
+});
+
+
+var PostSurveyEdit = new NKC.modules.PostSurveyEdit();
+PostSurveyEdit.open(function() {
+
 });

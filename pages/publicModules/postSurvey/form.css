@@ -1,0 +1,17 @@
+#modulePostSurveyEdit .survey-type{
+  display: inline-block;
+  margin-right: 1rem;
+  cursor: pointer;
+  padding-top: 7px;
+}
+#modulePostSurveyEdit .survey-type span{
+  font-weight: 700;
+}
+#modulePostSurveyEdit .survey-type .fa{
+  margin-right: 0.3rem;
+  font-size: 15px;
+  color: green;
+}
+#modulePostSurveyEdit .survey-type .fa-circle-o{
+  color: #555;
+}

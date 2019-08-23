@@ -1,0 +1,33 @@
++includeCSS("/publicModules/postSurvey/form.css")
+.modal.fade#modulePostSurveyEdit(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog(role="document")#modulePostSurveyEditApp
+    .modal-content
+      .modal-header
+        button.close(data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        h5.text-center.modal-title 编辑投票内容
+      .modal-body
+        .form.form-horizontal
+          .form-group
+            label.col-sm-2.control-label 类别
+            .col-sm-10
+              .survey-type(@click="selectType('vote')")
+                .fa.fa-check-circle(v-if="type === 'vote'")
+                .fa.fa-circle-o(v-else)
+                span 选择
+              .survey-type(@click="selectType('survey')")
+                .fa.fa-check-circle(v-if="type === 'survey'")
+                .fa.fa-circle-o(v-else)
+                span 问卷
+              .survey-type(@click="selectType('score')")
+                .fa.fa-check-circle(v-if="type === 'score'")
+                .fa.fa-circle-o(v-else)
+                span 评分
+
+        .survey-types
+
+      .modal-footer
+        button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
+        button(type="button" class="btn btn-primary btn-sm"  v-if="canClickButton" @click="complete") 确定
+        button(type="button" class="btn btn-primary btn-sm" disabled v-else) 确定
++includeJS("/publicModules/postSurvey/edit.js")
