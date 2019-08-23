@@ -235,12 +235,12 @@ block name
                 label.col-sm-1.control-label 运费承担
                 .col-sm-8
                   label.radio-inline
-                    input#freightMethod1(type='radio', name='freightMethod', value='freePost' checked)
+                    input#freightMethod1(type='radio', name='freightMethod', value='freePost' checked=product.isFreePost?true:false)
                     |  免邮费
                   label.radio-inline
-                    input#freightMethod2(type='radio', name='freightMethod', value='payPost')
+                    input#freightMethod2(type='radio', name='freightMethod', value='payPost' checked=product.isFreePost?false:true)
                     |  买家承担邮费
-              .form-group#freightPriceDom(style="display:none")
+              .form-group#freightPriceDom(style=product.isFreePost?"display:none":"")
                 label.col-sm-1.control-label 
                 .col-sm-8
                   .table-responsive

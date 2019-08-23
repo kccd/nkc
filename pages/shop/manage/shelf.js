@@ -372,17 +372,13 @@ function submitToShelf() {
   if(!shopForum){
     throw("商品分类为必选，请务必选一个");
   }
+  mainForumsId.push(shopForum)
   $("#newPanelForum").find(".chooseForum").each(function() {
     var fid = $(this).attr("fid");
     if(fid && fid !== "undefined") {
       mainForumsId.push(fid)
     }
   })
-  // mainForumsId.push(shopForum);
-  // var mergeForumId = getResultHaveForumId();
-  // if(mergeForumId){
-  //   mainForumsId.push(mergeForumId)
-  // }
   // 组装上传数据
   var post = {
     productName: productName,
