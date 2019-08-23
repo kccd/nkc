@@ -372,7 +372,7 @@ function submitToShelf() {
   if(!shopForum){
     throw("商品分类为必选，请务必选一个");
   }
-  mainForumsId.push(shopForum)
+  mainForumsId.push(shopForum);
   $("#newPanelForum").find(".chooseForum").each(function() {
     var fid = $(this).attr("fid");
     if(fid && fid !== "undefined") {

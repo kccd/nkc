@@ -11,7 +11,7 @@ NKC.modules.SubscribeTypes = function() {
       types: [],
       selectTypesWhenSubscribe: [],
       selectedTypesId: [],
-
+      hideInfo: false,
       type: {
         name: "",
         pid: null
@@ -60,7 +60,7 @@ NKC.modules.SubscribeTypes = function() {
       },
       complete: function() {
         var selectedTypesId = this.selectedTypesId;
-        if(this.selectTypesWhenSubscribe && this.selectTypesWhenSubscribe.length > 0) {
+        if(!this.hideInfo && this.selectTypesWhenSubscribe && this.selectTypesWhenSubscribe.length > 0) {
           var uid = NKC.configs.uid;
           nkcAPI("/u/" + uid + "/settings/apps", "PATCH", {selectTypesWhenSubscribe: false})
             .then(function() {
@@ -120,6 +120,7 @@ NKC.modules.SubscribeTypes = function() {
       options.selectTypesWhenSubscribe = !!NKC.configs.selectTypesWhenSubscribe;
     }
     if(!options.selectTypesWhenSubscribe) return callback([]);
+    this_.app.hideInfo = options.hideInfo || false;
     this_.app.edit = !!options.edit;
     this_.app.selectedTypesId = [];
     this_.callback = callback;

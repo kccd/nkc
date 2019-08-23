@@ -36,8 +36,8 @@ const message = async (i) => {
     try{
       userInfo = Buffer.from(userInfo, "base64").toString();
       userInfo = JSON.parse(userInfo);
-      const {username, uid} = userInfo;
-      user = await db.UserModel.findOnly({username, uid});
+      const {uid} = userInfo;
+      user = await db.UserModel.findOnly({uid});
     } catch(err) {
       return next(new Error('用户信息验证失败'));
     }

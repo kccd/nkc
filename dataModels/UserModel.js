@@ -610,7 +610,7 @@ userSchema.statics.createUser = async (option) => {
 	userObj.certs = [];
 	// 生成默认用户名，符号"-"和uid保证此用户名全局唯一
 	if(!userObj.username) {
-	  userObj.username = `u-${uid}`;
+	  userObj.username = `kc-${uid}`;
     userObj.usernameLowerCase = userObj.username;
   }
 

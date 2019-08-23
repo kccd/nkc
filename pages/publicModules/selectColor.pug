@@ -26,8 +26,8 @@ script.
           if( !hex ) return;
 
           if( opacity ) hex += ', ' + opacity;
+          if(callback) callback(hex);
 
-          callback(hex);
 
         },
 

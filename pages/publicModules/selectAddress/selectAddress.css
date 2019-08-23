@@ -1,0 +1,59 @@
+@media (min-width: 768px){
+  #moduleSelectAddress .modal-dialog{
+    width: 400px;
+  }
+}
+#moduleSelectAddress .modal-header{
+  border-bottom: none;
+}
+#moduleSelectAddress .modal-body{
+  padding-top: 0;
+  padding-bottom: 0;
+}
+#moduleSelectAddress .modal-footer{
+  border-top: none;
+}
+#moduleSelectAddress .selected-locations{
+  padding-bottom: 0;
+  /*height: 3rem;
+  line-height: 3rem;*/
+}
+#moduleSelectAddress .selected-location{
+  display: inline-block;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  margin-right: 0.5rem;
+}
+#moduleSelectAddress .selected-location.active{
+  border-bottom: 2px solid #e85a71;
+}
+#moduleSelectAddress .location{
+  display: block;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+#moduleSelectAddress .location.active{
+  border: 2px solid #b0d2b0;
+  border-radius: 3px;
+}
+#moduleSelectAddress .location .fa{
+  color: green;
+  font-size: 16px;
+}
+#moduleSelectAddress .location:hover{
+  background-color: #f4f4f4;
+}
+/*#moduleSelectAddress .location:first-child{
+  margin-top: 1rem;
+}
+#moduleSelectAddress .location:last-child{
+  margin-bottom: 1rem;
+}*/
+#moduleSelectAddress .locations{
+  padding: 1rem 0;
+  max-height: 30rem;
+  overflow-y: scroll;
+}

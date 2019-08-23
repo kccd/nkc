@@ -3,6 +3,7 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
+    data.selected = "message";
     const {user} = data;
     const blackList = await db.MessageBlackListModel.find({
       uid: user.uid

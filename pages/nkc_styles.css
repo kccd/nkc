@@ -3597,7 +3597,9 @@ ul.nav.navbar-nav.navbar-md>li>a{
   width: 30rem;
   max-width: 100%;
 }
-
+.user-serttings-list .selected{
+  background-color: #dff0ff;
+}
 @media only screen and (max-width : 480px) {
   .moSlide {
     display: block

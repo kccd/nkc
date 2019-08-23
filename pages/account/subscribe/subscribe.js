@@ -265,6 +265,7 @@ var app = new Vue({
           })
       }, {
         selectedTypesId: selectedTypesId,
+        hideInfo: true,
         selectTypesWhenSubscribe: true
       });
     },

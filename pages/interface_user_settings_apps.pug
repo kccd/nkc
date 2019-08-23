@@ -49,6 +49,19 @@ block content
                   button.btn.btn-primary.btn-sm(onclick="saveAppInfo()") 保存
         .panel.panel-default
           .panel-heading
+            span 阅读文章
+          .panel-body
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 文章背景颜色
+                .col-sm-4
+                  input.form-control(data-control="selectColor" value=data.user.color)
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-9
+                  button.btn.btn-primary.btn-sm(onclick="saveAppInfo()") 保存
+        .panel.panel-default
+          .panel-heading
             span 奖励设置
           .panel-body
             .form-horizontal
@@ -129,4 +142,5 @@ block content
 
 
 block scripts
+  include ./publicModules/selectColor
   +includeJS('/interface_user_settings_apps.js')
