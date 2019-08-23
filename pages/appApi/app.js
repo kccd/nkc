@@ -39,7 +39,9 @@ apiready = function() {
     // })
     img.addEventListener("click", function() {
       if(this.getAttribute("dataimg") && this.getAttribute("dataimg") == "content") {
-        imageOpenInApp(this.src);
+        if(this.src && this.src.indexOf("/r/") > -1) {
+          imageOpenInApp(this.src);
+        }
       }
     })
   })
