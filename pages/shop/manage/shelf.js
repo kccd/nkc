@@ -379,11 +379,6 @@ function submitToShelf() {
       mainForumsId.push(fid)
     }
   })
-  // mainForumsId.push(shopForum);
-  // var mergeForumId = getResultHaveForumId();
-  // if(mergeForumId){
-  //   mainForumsId.push(mergeForumId)
-  // }
   // 组装上传数据
   var post = {
     productName: productName,
