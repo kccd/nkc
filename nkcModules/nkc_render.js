@@ -538,7 +538,7 @@ function nkc_render(options){
     html = html.replace(/\<img(.*?)\>/img,'<img $1 dataimg="content"/>');
     // html = html.replace(/\<img class=".*?" src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     return html
-  }
+  };
 
   var markdown_experimental = function(post){
     var content = post.c;

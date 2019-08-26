@@ -102,6 +102,10 @@ userRouter
     // 证书检测
     let certsId = await db.RoleModel.find({_id: {$in: certs}, type: {$in: ["common", "management"]}});
     certsId = certsId.map(cert => cert._id);
+    // 保留原有的系统类证书
+    let oldCertsId = await db.RoleModel.find({_id: {$in: targetUser.certs}, type: "system"});
+    oldCertsId = oldCertsId.map(cert => cert._id);
+    certsId = [...new Set(oldCertsId.concat(certsId))];
     const userObj = {
       username,
       usernameLowerCase: username.toLowerCase(),

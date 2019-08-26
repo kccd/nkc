@@ -39,12 +39,12 @@ apiready = function() {
     // })
     img.addEventListener("click", function() {
       if(this.getAttribute("dataimg") && this.getAttribute("dataimg") == "content") {
-        if(this.src.indexOf("/r/") > -1) {
+        if(this.src && this.src.indexOf("/r/") > -1) {
           imageOpenInApp(this.src);
         }
       }
     })
-  })
+  });
   // 为所有的a标签添加点击事件
   // 监听全局a标签的点击事件
   // 并阻止链接点击跳转
