@@ -150,7 +150,11 @@ module.exports = async (ctx, next) => {
         }
       }));
 		}
-
+		// 重置cookie的过期时间，让有活动的用户保持登录
+    ctx.setCookie("userInfo", {
+      uid: user.uid,
+      username: user.username
+    });
   }
   // 根据用户语言设置加载语言对象
   ctx.state.language = languages[languageName];

@@ -152,6 +152,26 @@ function nkc_render(options){
   //xbbcode------------------------
 
   XBBCODE.addTags({
+    url: {
+      openTag: function(params,content) {
+
+        var myUrl;
+
+        if (!params) {
+            myUrl = content.replace(/<.*?>/g,"");
+        } else {
+            myUrl = params.substr(1);
+        }
+        if(myUrl.indexOf("http") == -1) {
+          myUrl = "http://"+myUrl
+        }
+
+        return '<a href="' + myUrl + '">';
+      },
+      closeTag: function(params,content) {
+          return '</a>';
+      }
+    },
     align:{
       openTag:function(params,content){
         var alignment = params.slice(1)
