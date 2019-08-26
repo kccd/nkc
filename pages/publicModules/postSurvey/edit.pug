@@ -1,47 +1,63 @@
 +includeCSS("/publicModules/postSurvey/form.css")
-.modal.fade#modulePostSurveyEdit(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-  .modal-dialog(role="document")#modulePostSurveyEditApp
-    .modal-content
-      .modal-header
-        button.close(data-dismiss="modal" aria-label="Close")
-          span(aria-hidden="true") &times;
-        h5.text-center.modal-title 编辑投票内容
-      .modal-body
-        .form.form-horizontal
-          .form-group
-            label.col-sm-2.control-label 类别
-            .col-sm-10
-              .survey-type(@click="selectType('vote')")
-                .fa.fa-check-circle(v-if="ps.type === 'vote'")
-                .fa.fa-circle-o(v-else)
-                span 选择
-              .survey-type(@click="selectType('survey')")
-                .fa.fa-check-circle(v-if="ps.type === 'survey'")
-                .fa.fa-circle-o(v-else)
-                span 问卷
-              .survey-type(@click="selectType('score')")
-                .fa.fa-check-circle(v-if="ps.type === 'score'")
-                .fa.fa-circle-o(v-else)
-                span 评分
-          .form-group
-            label.col-sm-2.control-label 说明
-            .col-sm-9
-              textarea.form-control(v-model="ps.description" rows=4 placeholder="请输入投票说明")
-          .form-group
-            label.col-sm-2.control-label 选项
-            .col-sm-9
-              .survey-options
-                .fa.fa-plus-square.add-option-button(@click="addOption") &nbsp;添加选项
-                .survey-option(v-for="o in options")
-                  .form
-                    .form-group
-                      input.form-control(type="text" v-model="o.title" placeholder="选项标题")
-                    .form-group
-                      textarea.form-control(type="text" v-model="o.description" placeholder="选项说明")
-        .survey-types
+#modulePostSurveyEdit(v-cloak)
+  .post-survey-edit-header 发起投票
+  .post-survey-edit-body
+    .form.form-horizontal
+      .form-group
+        label.col-sm-2.control-label 类别
+        .col-sm-10
+          .survey-type(@click="selectType('vote')")
+            .fa.fa-check-circle(v-if="ps.type === 'vote'")
+            .fa.fa-circle-o(v-else)
+            span 选择
+          .survey-type(@click="selectType('survey')")
+            .fa.fa-check-circle(v-if="ps.type === 'survey'")
+            .fa.fa-circle-o(v-else)
+            span 问卷
+          .survey-type(@click="selectType('score')")
+            .fa.fa-check-circle(v-if="ps.type === 'score'")
+            .fa.fa-circle-o(v-else)
+            span 评分
+      .form-group
+        label.col-sm-2.control-label 说明
+        .col-sm-9
+          textarea.form-control(v-model="ps.description" rows=4 placeholder="请输入投票说明")
+      .form-group
+        label.col-sm-2.control-label 选项
+        .col-sm-9
+          .survey-options.m-b-05
+            .survey-option(v-for="o, index in options")
+              .option-index 选项{{index+1}}
+                .pull-right
+                  button.btn.btn-xs.btn-default(@click="moveOption('up', o)") 上移
+                  button.btn.btn-xs.btn-default(@click="moveOption('down', o)") 下移
+                  button.btn.btn-xs.btn-default(@click="removeOption(index)") 删除
+                  button.btn.btn-xs.btn-default(@click="removeOption(index)") 删除
+              input.m-b-05.form-control(type="text" v-model="o.title" placeholder="选项标题")
+              textarea.m-b-05.form-control(v-model="o.description" placeholder="选项说明")
+              .row.option-links
+                .option-link.m-b-05(v-for="link, index in o.links")
+                  .col-xs-12.col-md-8
+                    input.form-control(type="text" v-model="link.link" placeholder="选项链接" @change="checkHttp(link)")
+                  .col-xs-12.col-md-4
+                    button.btn.btn-default(@click="removeLink(o, index)") 删除
+              .option-resources
+                .option-resource(v-for="r, index in o.resourcesId")
+                  .option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
+                  .fa.fa-remove(@click="removeResourceId(o, index)")
+              .survey-option-buttons.m-t-05
+                button.btn.btn-default.btn-xs(@click="addLink(o)") 添加链接
+                button.btn.btn-default.btn-xs(@click="addResource(o)") 添加图片
+          button.btn.btn-default.btn-sm(@click="addOption")
+            .fa.fa-plus.add-option-button &nbsp;添加选项
+      .form-group
+        label.col-sm-2.control-label 投票
+        .col-sm-9(v-if="ps.type === 'vote'")
+          h5 最大选择数量
+          input.form-control(type="text" v-model.number="ps.voteCount")
+        .col-sm-9(v-else-if="ps.type === 'survey'")
+          h5 设置答案
+          button.btn.btn-default.btn-sm(@click="addOptionAnswer")
+            .fa.fa-plus.add-option-button &nbsp;添加答案
 
-      .modal-footer
-        button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
-        button(type="button" class="btn btn-primary btn-sm"  v-if="canClickButton" @click="complete") 确定
-        button(type="button" class="btn btn-primary btn-sm" disabled v-else) 确定
-+includeJS("/publicModules/postSurvey/edit.js")
+    .survey-types

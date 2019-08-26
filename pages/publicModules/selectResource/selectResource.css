@@ -1,0 +1,106 @@
+#moduleSelectResource .modal-header{
+  text-align: center;
+  border-bottom: none;
+}
+#moduleSelectResource .modal-body{
+  padding: 0;
+}
+#moduleSelectResource .selected-resources{
+  padding: 0 0.8rem;
+}
+#moduleSelectResource .resource-type{
+  height: 2.2rem;
+  font-size: 1rem;
+  line-height: 2.2rem;
+  padding: 0 0.6rem;
+  border-radius: 3px;
+  display: inline-block;
+  cursor: pointer;
+  transition: background-color 100ms, color 100ms;
+}
+#moduleSelectResource  .modal-footer{
+  border-top: none;
+}
+#moduleSelectResource .resource-type:hover, #moduleSelectResource .resource-type.active{
+  background-color: #2b90d9;
+  color: #fff;
+}
+#moduleSelectResource  .resource-picture{
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+}
+#moduleSelectResource  .resource-picture.icon{
+  background-size: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#moduleSelectResource  .resources{
+  font-size: 0;
+}
+#moduleSelectResource  .resource{
+  height: 5rem;
+  position: relative;
+  margin: 0 0.5rem 0.5rem 0;
+  width: 7.3rem;
+  font-size: 0;
+  cursor: pointer;
+  display: inline-block;
+}
+#moduleSelectResource  .selected-resource-header{
+  margin-bottom: 0.5rem;
+}
+#moduleSelectResource  .resource.active{
+  /*border: 2px solid green;*/
+}
+#moduleSelectResource  .resource>div{
+}
+#moduleSelectResource .resources-body{
+  margin-top: 0.5rem;
+  padding: 0 0.8rem;
+}
+#moduleSelectResource  .resource-name{
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  height: 1.6rem;
+  color: #fff;
+  line-height: 1.6rem;
+  text-align: center;
+  font-size: 1rem;
+  background-color: rgba(0,0,0,0.2);
+}
+#moduleSelectResource  .resource-mask{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  font-size: 1.4rem;
+  padding-right: 0.4rem;
+  color: #fff;
+  text-align: right;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.1);
+}
+#moduleSelectResource  .resource-mask.active{
+  background-color: rgba(0,0,0,0.6);
+}
+#moduleSelectResource  .resource-mask.active .fa{
+  color: #00ff04;
+}
+#moduleSelectResource .resource-link{
+  height: 100%;
+  width: 100%;
+}
+#moduleSelectResource .resource-info{
+  font-size: 1.2rem;
+  padding: 1.9rem 0;
+  font-weight: 700;
+  text-align: center;
+}

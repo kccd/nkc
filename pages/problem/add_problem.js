@@ -35,6 +35,7 @@ $(function() {
 
 
 var PostSurveyEdit = new NKC.modules.PostSurveyEdit();
-PostSurveyEdit.open(function() {
+var SelectResource = new NKC.modules.SelectResource();
+PostSurveyEdit.init(function() {
 
 });

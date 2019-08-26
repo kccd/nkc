@@ -17,5 +17,63 @@
 }
 #modulePostSurveyEdit .add-option-button{
   cursor: pointer;
-  padding-top: 0.8rem;
+  font-weight: 700;
+  /*color: #2b90d9;*/
+}
+#modulePostSurveyEdit .survey-option{
+  padding: 0.5rem;
+}
+#modulePostSurveyEdit .survey-option:first-child{
+  border-top: none;
+}
+#modulePostSurveyEdit .survey-options{
+  margin-top: 0.5rem;
+  background-color: #f4f4f4;
+  border-radius: 3px;
+}
+#modulePostSurveyEdit .option-index{
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom:0.5rem;
+}
+#modulePostSurveyEdit .option-resources{
+  margin-top: 0.5rem;
+  font-size: 0;
+}
+#modulePostSurveyEdit .option-resource {
+  height: 5rem;
+  display: inline-block;
+  width: 7rem;
+  margin: 0 0.5rem 0.5rem 0;
+}
+#modulePostSurveyEdit .option-resource-img{
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+}
+#modulePostSurveyEdit .option-resource{
+  font-size: 0;
+  cursor: pointer;
+  position: relative;
+}
+#modulePostSurveyEdit .option-resource .fa{
+  position: absolute;
+  display: none;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 2rem;
+  width: 2rem;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+}
+#modulePostSurveyEdit .option-resource:hover .fa{
+  display: block;
+}
+@media (max-width: 991px) {
+  #modulePostSurveyEdit .option-resource .fa{
+    display: block;
+  }
 }

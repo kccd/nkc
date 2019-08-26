@@ -4,7 +4,7 @@ const pathModule = require('path');
 const util = require("util");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
-const audioExts = ["wav", "amr"];
+const audioExts = ["wav", "amr", "mp3"];
 resourceRouter
   .get('/', async (ctx, next) => {
     ctx.throw(501, 'a resource ID is required.');

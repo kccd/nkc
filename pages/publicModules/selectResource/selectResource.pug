@@ -1,0 +1,65 @@
++includeCSS("/publicModules/selectResource/selectResource.css")
+.modal.fade#moduleSelectResource(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog(role="document")#moduleSelectResourceApp
+    .modal-content
+      .modal-header
+        button.close(data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        .modal-title 附件
+      .modal-body(v-if="loading").text-center
+        .m-t-4.m-b-4
+          b 加载中...
+      .modal-body(v-else)
+        .selected-resources
+          //.selected-resource-header 已选择：
+          //.resource(v-for="r, index in selectedResources" @click="removeSelectedResource(index)")
+            .resource-picture(v-if="r.fileType === 'picture'" :style="'background-image:url(/rt/' + r.rid + ')'")
+            .resource-name {{r.oname}}
+          .resource-types
+            .resource-type(v-if="show.all" :class="{'active':resourceType === 'all'}" @click="selectResourceType('all')") 全部
+            .resource-type(v-if="show.picture" :class="{'active':resourceType === 'picture'}" @click="selectResourceType('picture')") 图片
+            .resource-type(v-if="show.video" :class="{'active':resourceType === 'video'}" @click="selectResourceType('video')") 视频
+            .resource-type(v-if="show.audio" :class="{'active':resourceType === 'audio'}" @click="selectResourceType('audio')") 音频
+            .resource-type(v-if="show.attachment" :class="{'active':resourceType === 'attachment'}" @click="selectResourceType('attachment')") 附件
+        .resources.resources-body
+          mixin resourcePaging
+            .resource-paging(v-if="paging")
+              .paging-button
+                span(v-for="b, index in paging.buttonValue")
+                  span(v-if="b.type === 'active'")
+                    a.button.active(@click="getResources(b.num)"
+                      :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+                    ) {{b.num+1}}
+                  span(v-else-if="b.type === 'common'")
+                    a.button(@click="getResources(b.num)"
+                      :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+                    ) {{b.num+1}}
+                  span(v-else) ...
+              .paging-button(v-if="paging.buttonValue.length")
+                span(style="font-size: 1rem;") 跳转到&nbsp;
+                input.input.radius-left(type="text" v-model.number="pageNumber")
+                a.button.radius-right(@click="fastSelectPage") 确定
+          .resource-info(v-if="!resources.length") 空空如也~
+          .resource(v-else v-for="r in resources" :class="{'active':selectedResourcesId.indexOf(r.rid) !== -1}"
+            @click="selectResource(r)"
+            :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname"
+          )
+            .resource-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(/rt/' + r.rid + ')'")
+            .resource-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(/frameImg/' + r.rid + ')'")
+            .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
+            .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
+            .resource-name
+              span(v-if="r.mediaType === 'mediaVideo'") (视频)
+              span {{r.oname}}
+            .resource-mask.active(v-if="selectedResourcesId.indexOf(r.rid) !== -1")
+              .fa.fa-check-square-o
+            .resource-mask(v-else)
+              .fa.fa-square-o
+          +resourcePaging
+      .modal-footer(v-if="!loading")
+        .pull-left
+          button.btn.btn-default.btn-sm(@click="crash") 刷新
+          //button.btn.btn-default.btn-sm 上传
+        button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
+        button(type="button" class="btn btn-primary btn-sm" @click="done") 确定
++includeJS("/publicModules/selectResource/selectResource.js")

@@ -108,7 +108,7 @@ meRouter
   })
   .get('/media', async (ctx, next) => {
     const {user} = ctx.data;
-    const {db} = ctx;
+    const {db, data, nkcModules} = ctx;
     let {quota, skip, type} = ctx.query;
     quota = parseInt(quota);
     skip = parseInt(skip);
@@ -126,6 +126,7 @@ meRouter
     }
     let newSkip = quota * skip;
     let mediaCount = await db.ResourceModel.find(queryMap).count();
+    data.paging = nkcModules.apiFunction.paging(skip, mediaCount, quota);
     let maxSkip = Math.ceil(mediaCount / quota);
     if(maxSkip < 1) maxSkip = 1;
     if(skip >= maxSkip){

@@ -322,6 +322,18 @@ table{
   margin-bottom: 0.5rem;
 
 }
+.paging-button .input{
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 1px solid #9baec8;
+  width: 4rem;
+  font-size: 1.2rem;
+  vertical-align: top;
+}
+.input.radius-left{
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
 .paging-button a{
   -moz-user-select:none; /*火狐*/
   -webkit-user-select:none; /*webkit浏览器*/

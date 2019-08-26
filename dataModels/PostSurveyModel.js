@@ -12,6 +12,19 @@ const schema = new Schema({
     type: String,
     default: 1
   },
+  // 针对问答类型，投票者可选择的答案
+  answer: [
+    {
+      content: {
+        type: String,
+        default: ""
+      },
+      description: {
+        type: String,
+        default: ""
+      }
+    }
+  ],
   // 问卷调查的发起人，post.uid
   uid: {
     type: String,
