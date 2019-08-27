@@ -7,8 +7,15 @@ NKC.modules.PostSurveyEdit = function() {
       canClickButton: false,
       ps: "",
       options: [],
+      answers: []
     },
     methods: {
+      addAnswer: function() {
+        this.answers.push({
+          content: "",
+          description: ""
+        });
+      },
       removeResourceId: function(o, index) {
         o.resourcesId.splice(index, 1)
       },
@@ -78,16 +85,24 @@ NKC.modules.PostSurveyEdit = function() {
         Vue.set(options, otherIndex, o);
       },
       addOptionAnswer: function() {
-        var answer = {
+        this.answers.push({
           content: "",
           description: ""
-        };
+        });
 
+      },
+      removeAnswer: function(index) {
+        this.answers.splice(index, 1);
       },
       newSurvey: function() {
         this.ps = JSON.parse(JSON.stringify({
           type: "survey",  // vote, survey, score
-          description: ""
+          description: "",
+          reward: {
+            status: false,
+            onceKcb: 0,
+            rewardCount: 0
+          }
         }));
       },
       selectType: function(type) {
@@ -114,6 +129,7 @@ NKC.modules.PostSurveyEdit = function() {
             option.links = links_;
           }
           self.options = data.options;
+          self.answers = data.answers;
         })
         .catch(function(data) {
           sweetError(data);

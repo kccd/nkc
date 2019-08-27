@@ -15,6 +15,7 @@ const schema = new Schema({
   // 针对问答类型，投票者可选择的答案
   answer: [
     {
+      _id: Number, // postSurveyAnswerId
       content: {
         type: String,
         default: ""
@@ -22,6 +23,52 @@ const schema = new Schema({
       description: {
         type: String,
         default: ""
+      }
+    }
+  ],
+  // 针对打分类型，投票者投票的范围
+  scoreMin: {
+    type: Number,
+    default: null,
+  },
+  scoreMax: {
+    type: Number,
+    default: null
+  },
+  options: [
+    {
+      _id: Number, // postSurveyOptionId
+      // postSurveyId
+      psId: {
+        type: Number,
+        required:true,
+        index: 1
+      },
+      // postSurveyType
+      type: {
+        type: String,
+        required: true,
+        index: 1
+      },
+      // 选项标题
+      title: {
+        type: String,
+        required: true
+      },
+      // 选项介绍
+      description: {
+        type: String,
+        default: ""
+      },
+      // 选项图片
+      resourcesId: {
+        type: String,
+        default: []
+      },
+      // 选项链接
+      links: {
+        type: String,
+        default: []
       }
     }
   ],

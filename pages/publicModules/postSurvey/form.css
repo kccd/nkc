@@ -77,3 +77,11 @@
     display: block;
   }
 }
+#modulePostSurveyEdit .survey-answers{
+  background-color: #f4f4f4;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+#modulePostSurveyEdit .survey-answer{
+  margin-bottom: 0.5rem;
+}

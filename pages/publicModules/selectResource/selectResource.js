@@ -9,6 +9,7 @@ NKC.modules.SelectResource = function() {
     data: {
       uid: "",
       user: "",
+      pageType: "list", // list: 资源列表, uploader: 上传
       resourceType: "", // all, picture, video, audio, attachment
       quota: 30,
       paging: {},
@@ -17,7 +18,10 @@ NKC.modules.SelectResource = function() {
       allowedExt: [],
       selectedResources: [],
       loading: true,
-      pictureExt: ['swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp']
+      pictureExt: ['swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'],
+
+
+      files: [],
     },
     computed: {
       show: function() {
@@ -56,6 +60,58 @@ NKC.modules.SelectResource = function() {
       }
     },
     methods: {
+      removeFile: function(index) {
+        this.files.splice(index, 1);
+      },
+      startUpload: function(f) {
+        if(f.status === "uploading") return sweetWarning("文件正在上传...");
+        if(f.status === "uploaded") return sweetWarning("文件已上传成功！");
+        var formData = new FormData();
+        formData.append("file", f.data);
+        f.status = "uploading";
+        f.error = "";
+        nkcUploadFile("/r", "POST", formData, function(e, progress) {
+          f.progress = progress;
+        })
+          .then(function() {
+            f.status = "uploaded";
+          })
+          .catch(function(data) {
+            f.status = "unUpload";
+            f.progress = "0%";
+            f.error = data.error || data;
+          })
+        // 上传文件
+      },
+      newFile: function(file) {
+        return {
+          name: file.name,
+          ext: file.type.slice(0, 5) === "image"?"picture": "file",
+          size: NKC.methods.getSize(file.size),
+          data: file,
+          error: "",
+          progress: 0,
+          status: "unUpload"
+        }
+      },
+      // 用户已选择待上传的文件
+      selectedFiles: function() {
+        var input = document.getElementById("moduleSelectResourceInput");
+        if(!input) return;
+        var files = input.files;
+        if(files.length <= 0) return;
+        for(var i = 0; i < files.length; i++) {
+          var f = files[i];
+          this.files.unshift(this.newFile(f));
+        }
+        input.value = "";
+      },
+      changePageType: function(pageType) {
+        if(pageType === "list") {
+          this.crash();
+        }
+        this.pageType = pageType;
+      },
       crash: function() {
         var paging = this.paging;
         this.getResources(paging.page);
@@ -137,6 +193,7 @@ NKC.modules.SelectResource = function() {
     options = options || {};
     self.app.allowedExt = options.allowedExt || ["all", "audio", "video", "attachment", "picture"];
     self.app.resourceType = self.app.allowedExt[0];
+    self.app.pageType = options.pageType || "list";
     self.dom.modal("show");
     self.app.getResources(0);
   };

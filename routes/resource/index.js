@@ -348,15 +348,17 @@ resourceRouter
     } 
     // 音频转为mp3
     if(audioExts.indexOf(extension.toLowerCase()) > -1) {
-      var timeStr = new Date().getTime();
+      const timeStr = Date.now() + "_" + file.hash;
       //输出音频路径
-      var newpath = pathModule.resolve();
-      var outputVideoPath = newpath + "/tmp/" + timeStr + ".mp3";
+      const newpath = pathModule.resolve();
+      const outputVideoPath = newpath + "/tmp/" + timeStr + ".mp3";
       try{
         if(['wav'].indexOf(extension.toLowerCase()) > -1) {
           await ffmpeg.audioWAVTransMP3(path, outputVideoPath);
         }else if(['amr'].indexOf(extension.toLowerCase()) > -1) {
           await ffmpeg.audioAMRTransMP3(path, outputVideoPath);
+        } else {
+          await fs.rename(path, outputVideoPath);
         }
       }catch(e) {
         mediaRealPath = selectDiskCharacterUp("mediaAttachment");
