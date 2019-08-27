@@ -12,7 +12,7 @@ router
     if(s) data.s = s;
     if(user) {
       // 日常登陆
-      const lock = await nkcModules.redLock.lock(`dailyLogin:${user.uid}`, 2000);
+      const lock = await nkcModules.redLock.lock(`dailyLogin:${user.uid}`, 10000);
       await ctx.db.KcbsRecordModel.insertSystemRecord('dailyLogin', ctx.data.user, ctx);
       const {today} = nkcModules.apiFunction;
       const time = today();
@@ -36,7 +36,11 @@ router
         });
         await user.updateUserMessage();
       }
-      await lock.unlock();
+      try{
+        await lock.unlock();  
+      } catch(err) {
+        console.log(err.message.red);
+      }
     }
     const homeSettings = await db.SettingModel.getSettings("home");
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
