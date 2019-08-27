@@ -15,7 +15,19 @@ block head
 block body
   .container-fluid.max-width
     .error-content
-      block errorContent
+      if !data.user && data.status === 403
+        .error-icon=`403 Forbidden`
+        .error-list.b-s-10
+          .error-header 你暂未登录，无法确定是否有权浏览。
+          h4.text-center
+            button.btn.btn-default.btn-sm(onclick="Login.open('login')") 登录
+            | &nbsp;或
+            button.btn.btn-default.btn-sm(onclick="Login.open('register')") 注册
+          .error-code
+            span message：
+            code= data.error
+      else
+        block errorContent
       .error-button
         if !state.apptype
           a(href="/") 网站首页
@@ -28,7 +40,5 @@ block body
     +includeJS("/appAPi/app.js")
   +includeJS("/interface_common.js")
   +includeJS("/publicModules/common.js")
-  //-if !data.user && data.status === 403
+  if !data.user && data.status === 403
     include ../publicModules/login/login
-    script.
-      Login.open("login");
