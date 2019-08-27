@@ -68,10 +68,10 @@ block body
     if kcb > 0
       script!=`sweetAlert("您发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
-  block scripts
-  //- 生成二维码 页脚
   if state.apptype !== "app" && !data.user
     include ./publicModules/login/login
+  block scripts
+  //- 生成二维码 页脚
   include ./publicModules/qrcode/qrcode
   script.
     console.log('(c)2019 成都科创科学文化研究院')
