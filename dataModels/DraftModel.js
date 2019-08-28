@@ -77,6 +77,18 @@ const draftSchema = new Schema({
   originState: {
     type: String,
     default: "0"
+  },
+  anonymous: {
+    type: Boolean,
+    default: false,
+  },
+  mainForumsId: {
+    type: [String],
+    default: []
+  },
+  categoriesId: {
+    type: [String],
+    default: []
   }
 });
 

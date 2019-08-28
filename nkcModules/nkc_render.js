@@ -531,7 +531,7 @@ function nkc_render(options){
         }
       }
     }
-    html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\/\>/img,'<img src="/r/$1" />');
+    html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\>/img,'<img src="/r/$1" />');
     // 如果是默认图片则跳过
     // html = html.replace(/\<img.*?src="\/default\/picdefault.png".+?\>/img, '');
     // html = html.replace(/\<img.*?src="\/r\/(.+?)".+?\>/img,'<img src="/r/$1" dataimg="content"/>');
