@@ -10,6 +10,10 @@ router
     const {password} = body;
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: data.user.uid});
     await userPersonal.ensurePassword(password);
+    ctx.setCookie("experimental", {
+      uid: data.user.uid,
+      time: Date.now()
+    });
     data.redirect = "/e/status";
     // const urls = ctx.getCookie("visitedUrls");
     // ctx.setCookie("experimental", {
