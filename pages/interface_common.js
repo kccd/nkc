@@ -1863,10 +1863,27 @@ function closeDrawer() {
 // 点击按钮播放视频
 function openVideo(para, vid) {
   vid = "#" + vid;
-  $(para).next().trigger("play");
-  $(para).next().attr("controls", "controls")
-  // 去除当前元素
-  $(para).remove();
+  // play() 方法返回了一个promise， 使用.catch()可以输出错误信息
+  // 错误信息为：The play() request was interrupted by a call to pause()
+  // var videoDom = document.getElementById(vid);
+  // var promise = videoDom.play();
+  // if(promise) {
+  //   promise
+  //   .then(function(){
+  //     videoDom.pause()
+  //   })
+  //   .catch(function(err) {
+  //     console.log(err.code, err.name, err.message)
+  //   })
+  // }
+  try{
+    $(para).next().attr("controls", "controls")
+    $(para).next().trigger("play");
+    // 去除当前元素
+    $(para).remove();
+  }catch(err) {
+    console.log(err)
+  }
 }  
 
 /*
@@ -1937,6 +1954,11 @@ function openToNewLocation(url, target) {
  * @param {*} urlStr 
  */
 function addApptypeToUrl(url) {
+  // 去掉hash值
+  var hashIndex = url.indexOf("#");
+  if(hashIndex > 0) {
+    url = url.substring(0, hashIndex)
+  }
   var resultUrl = url.split("?")[0];
   var paramStr = "";
   var paramsArr;
