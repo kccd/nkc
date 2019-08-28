@@ -271,7 +271,7 @@ router
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
-    const {columnCategoriesId, sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
+    const {columnCategoriesId=[], sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {state, data, db, fs} = ctx;

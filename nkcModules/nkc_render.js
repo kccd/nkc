@@ -152,6 +152,26 @@ function nkc_render(options){
   //xbbcode------------------------
 
   XBBCODE.addTags({
+    url: {
+      openTag: function(params,content) {
+
+        var myUrl;
+
+        if (!params) {
+            myUrl = content.replace(/<.*?>/g,"");
+        } else {
+            myUrl = params.substr(1);
+        }
+        if(myUrl.indexOf("http") == -1) {
+          myUrl = "http://"+myUrl
+        }
+
+        return '<a href="' + myUrl + '">';
+      },
+      closeTag: function(params,content) {
+          return '</a>';
+      }
+    },
     align:{
       openTag:function(params,content){
         var alignment = params.slice(1)
@@ -514,10 +534,11 @@ function nkc_render(options){
     html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\/\>/img,'<img src="/r/$1" />');
     // 如果是默认图片则跳过
     // html = html.replace(/\<img.*?src="\/default\/picdefault.png".+?\>/img, '');
-    html = html.replace(/\<img.*?src="\/r\/(.+?)".+?\>/img,'<img src="/r/$1" dataimg="content"/>');
+    // html = html.replace(/\<img.*?src="\/r\/(.+?)".+?\>/img,'<img src="/r/$1" dataimg="content"/>');
+    html = html.replace(/\<img(.*?)\>/img,'<img $1 dataimg="content"/>');
     // html = html.replace(/\<img class=".*?" src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     return html
-  }
+  };
 
   var markdown_experimental = function(post){
     var content = post.c;

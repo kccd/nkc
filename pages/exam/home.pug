@@ -22,7 +22,7 @@ block content
         .row.m-t-2 
           .col-xs-12.col-md-12
                 
-        .row.m-t-2
+        .row.m-t-2.exam-link
           .col-xs-12.col-md-6
             +listHeader('A卷（基础级）')
             for category in data.examsCategories
@@ -84,3 +84,8 @@ block content
           a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
             - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`科创币 ${li.user.kcb/100}\n`+`${li.user.info.certsName}`;
             img.user-list-avatar(src=`/avatar/${li.user.avatar}?t=sm`  title=title)
+block scripts
+  script.
+    $(function() {
+      $(".exam-link a").removeAttr("href").attr("onclick", "Login.open('login')").addClass("pointer");
+    })
