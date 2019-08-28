@@ -25,6 +25,11 @@
           .resources.resources-body
             mixin resourcePaging
               .resource-paging(v-if="paging")
+                .paging-button(v-if="paging.buttonValue.length > 1")
+                  a.button.radius-left(title="上一页" @click="changePage('last')")
+                    .fa.fa-angle-left
+                  a.button.radius-right(title="下一页" @click="changePage('next')")
+                    .fa.fa-angle-right
                 .paging-button
                   span(v-for="b, index in paging.buttonValue")
                     span(v-if="b.type === 'active'")
@@ -66,7 +71,7 @@
       div(v-else)
         .modal-body
           input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
-          button.btn.btn-default.btn-sm(onclick="$('#moduleSelectResourceInput').click()") 选择本地文件
+          button.btn.btn-default.btn-sm(@click="clickInput") 选择本地文件
           div(v-if="!files.length").p-t-3.p-b-3.text-center
             b 空空如也~
           .file-lists(v-else)
@@ -83,10 +88,10 @@
                   .fa.fa-circle-o-notch.fa-spin.fa-fw
                   span 处理中...
                 .fa.fa-check.upload-success(v-else-if="f.status === 'uploaded'" @click="removeFile(index)")
-              .text-danger.file-error(v-if="f.error") 上传失败：{{f.error}}
+              .text-danger.file-error(v-if="f.error") error：{{f.error}}
         .modal-footer
           .pull-left
-            button.btn.btn-default.btn-sm(@click="changePageType('list')") 已上传
+            button.btn.btn-default.btn-sm(@click="changePageType('list')") 返回列表
           button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
 
 +includeJS("/publicModules/selectResource/selectResource.js")

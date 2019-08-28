@@ -60,16 +60,29 @@ NKC.modules.SelectResource = function() {
       }
     },
     methods: {
+      changePage: function(type) {
+        var paging = this.paging;
+        if(paging.buttonValue.length <= 1) return;
+        if(type === "last" && paging.page === 0) return;
+        if(type === "next" && paging.page + 1 === paging.pageCount) return;
+        var count = type === "last"? -1: 1;
+        this.getResources(paging.page + count);
+      },
+      clickInput: function() {
+        var input = document.getElementById("moduleSelectResourceInput");
+        if(input) input.click();
+      },
       removeFile: function(index) {
         this.files.splice(index, 1);
       },
       startUpload: function(f) {
+        f.error = "";
+        if(f.data.size>200*1024*1024) return f.error = "文件大小不能超过200MB";
         if(f.status === "uploading") return sweetWarning("文件正在上传...");
         if(f.status === "uploaded") return sweetWarning("文件已上传成功！");
         var formData = new FormData();
         formData.append("file", f.data);
         f.status = "uploading";
-        f.error = "";
         nkcUploadFile("/r", "POST", formData, function(e, progress) {
           f.progress = progress;
         })
@@ -89,7 +102,7 @@ NKC.modules.SelectResource = function() {
           ext: file.type.slice(0, 5) === "image"?"picture": "file",
           size: NKC.methods.getSize(file.size),
           data: file,
-          error: "",
+          error: file.size >  200*1024*1024?"文件大小不能超过200MB":"",
           progress: 0,
           status: "unUpload"
         }
@@ -102,15 +115,24 @@ NKC.modules.SelectResource = function() {
         if(files.length <= 0) return;
         for(var i = 0; i < files.length; i++) {
           var f = files[i];
-          this.files.unshift(this.newFile(f));
+          f = this.newFile(f);
+          this.files.unshift(f);
+          this.startUpload(f);
         }
         input.value = "";
       },
       changePageType: function(pageType) {
+        var self = this;
+        this.pageType = pageType;
         if(pageType === "list") {
           this.crash();
+        } else {
+          if(!this.files.length) {
+            setTimeout(function() {
+              self.clickInput();
+            }, 50);
+          }
         }
-        this.pageType = pageType;
       },
       crash: function() {
         var paging = this.paging;

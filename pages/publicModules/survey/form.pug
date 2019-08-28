@@ -1,0 +1,8 @@
+.survey-form#moduleSurveyForm(v-cloak)
+  .text-center.m-t-3.m-b-3(v-if="loading")
+    b 加载中...
+  div(v-else)
+    .survey-form-header {{formName}}
+    .survey-form-description {{survey.description}}
+    .survey-form-options
+

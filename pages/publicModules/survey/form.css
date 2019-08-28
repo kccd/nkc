@@ -1,62 +1,62 @@
-#modulePostSurveyEdit .survey-type{
+#moduleSurveyEdit .survey-type{
   display: inline-block;
   margin-right: 1rem;
   cursor: pointer;
   padding-top: 7px;
 }
-#modulePostSurveyEdit .survey-type span{
+#moduleSurveyEdit .survey-type span{
   font-weight: 700;
 }
-#modulePostSurveyEdit .survey-type .fa{
+#moduleSurveyEdit .survey-type .fa{
   margin-right: 0.3rem;
   font-size: 15px;
   color: green;
 }
-#modulePostSurveyEdit .survey-type .fa-circle-o{
+#moduleSurveyEdit .survey-type .fa-circle-o{
   color: #555;
 }
-#modulePostSurveyEdit .add-option-button{
+#moduleSurveyEdit .add-option-button{
   cursor: pointer;
   font-weight: 700;
   /*color: #2b90d9;*/
 }
-#modulePostSurveyEdit .survey-option{
+#moduleSurveyEdit .survey-option{
   padding: 0.5rem;
 }
-#modulePostSurveyEdit .survey-option:first-child{
+#moduleSurveyEdit .survey-option:first-child{
   border-top: none;
 }
-#modulePostSurveyEdit .survey-options{
+#moduleSurveyEdit .survey-options{
   margin-top: 0.5rem;
   background-color: #f4f4f4;
   border-radius: 3px;
 }
-#modulePostSurveyEdit .option-index{
+#moduleSurveyEdit .option-index{
   font-weight: 700;
   font-size: 1rem;
   margin-bottom:0.5rem;
 }
-#modulePostSurveyEdit .option-resources{
+#moduleSurveyEdit .option-resources{
   margin-top: 0.5rem;
   font-size: 0;
 }
-#modulePostSurveyEdit .option-resource {
+#moduleSurveyEdit .option-resource {
   height: 5rem;
   display: inline-block;
   width: 7rem;
   margin: 0 0.5rem 0.5rem 0;
 }
-#modulePostSurveyEdit .option-resource-img{
+#moduleSurveyEdit .option-resource-img{
   height: 100%;
   width: 100%;
   background-size: cover;
 }
-#modulePostSurveyEdit .option-resource{
+#moduleSurveyEdit .option-resource{
   font-size: 0;
   cursor: pointer;
   position: relative;
 }
-#modulePostSurveyEdit .option-resource .fa{
+#moduleSurveyEdit .option-resource .fa{
   position: absolute;
   display: none;
   top: 0;
@@ -69,19 +69,22 @@
   background: rgba(0,0,0,0.5);
   color: #fff;
 }
-#modulePostSurveyEdit .option-resource:hover .fa{
+#moduleSurveyEdit .option-resource:hover .fa{
   display: block;
 }
 @media (max-width: 991px) {
-  #modulePostSurveyEdit .option-resource .fa{
+  #moduleSurveyEdit .option-resource .fa{
     display: block;
   }
 }
-#modulePostSurveyEdit .survey-answers{
+#moduleSurveyEdit .survey-answers{
   background-color: #f4f4f4;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
 }
-#modulePostSurveyEdit .survey-answer{
+#moduleSurveyEdit .survey-answer{
   margin-bottom: 0.5rem;
+}
+#moduleSurveyEdit .survey-scores input{
+  max-width: 3rem;
 }

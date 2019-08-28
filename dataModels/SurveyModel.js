@@ -4,7 +4,7 @@ const schema = new Schema({
   _id: Number,
   type: { // vote: 简单选择, survey: 问卷调查, score: 打分
     type: String,
-    required: true,
+    default: "vote",
     index: 1
   },
   // 针对选择类型，可选择的数量。1: 单项选择, >1: 多项选择
@@ -12,46 +12,11 @@ const schema = new Schema({
     type: String,
     default: 1
   },
-  // 针对问答类型，投票者可选择的答案
-  answer: [
-    {
-      _id: Number, // postSurveyAnswerId
-      content: {
-        type: String,
-        default: ""
-      },
-      description: {
-        type: String,
-        default: ""
-      }
-    }
-  ],
-  // 针对打分类型，投票者投票的范围
-  scoreMin: {
-    type: Number,
-    default: null,
-  },
-  scoreMax: {
-    type: Number,
-    default: null
-  },
   options: [
     {
-      _id: Number, // postSurveyOptionId
-      // postSurveyId
-      psId: {
-        type: Number,
-        required:true,
-        index: 1
-      },
-      // postSurveyType
-      type: {
-        type: String,
-        required: true,
-        index: 1
-      },
+      _id: Number, // surveyOptionId
       // 选项标题
-      title: {
+      content: {
         type: String,
         required: true
       },
@@ -62,13 +27,40 @@ const schema = new Schema({
       },
       // 选项图片
       resourcesId: {
-        type: String,
+        type: [String],
         default: []
       },
       // 选项链接
       links: {
         type: String,
         default: []
+      },
+      // 针对问答类型，投票者可选择的答案
+      answers: [
+        {
+          _id: Number, // surveyAnswerId
+          content: {
+            type: String,
+            default: ""
+          },
+          links: {
+            type: [String],
+            default: []
+          },
+          resourcesId: {
+            type: [String],
+            default: []
+          }
+        }
+      ],
+      // 针对打分类型，投票者投票的范围
+      minScore: {
+        type: Number,
+        default: null,
+      },
+      maxScore: {
+        type: Number,
+        default: null
       }
     }
   ],
@@ -81,7 +73,7 @@ const schema = new Schema({
   // post.pid
   pid: {
     type: String,
-    required: true,
+    default: "",
     index: 1
   },
   // 修改前为post.uid， 修改后为当前修改者的ID
@@ -111,25 +103,43 @@ const schema = new Schema({
   // 问卷说明，html
   description: {
     type: String,
-    required: true
+    default: ""
   },
-  // 投票者的权限组合
-  permissions: [
-    {
-      relation: { // or, and
-        type: String,
-        required: true,
-      },
-      certsId: { // 证书ID
-        type: [String],
-        default: []
-      },
-      gradesId: { // 等级ID
-        type: [Number],
-        default: []
-      }
+  // 投票者的权限
+  permission: {
+    certsId: { // 证书ID
+      type: [String],
+      default: ["default"]
+    },
+    minGradeId: { // 等级ID
+      type: Number,
+      default: 1
+    },
+    registerTime: {
+      type: Number,
+      default: 0
+    },
+    // 注册时间 不小于30天
+    digestThreadCount: {
+      type: Number,
+      default: 0
+    },
+    // 精选文章数
+    threadCount: {
+      type: Number,
+      default: 0
+    },
+    // 文章数
+    postCount: {
+      type: Number,
+      default: 0
+    },
+    // 支持数
+    voteUpCount: {
+      type: Number,
+      default: 0
     }
-  ],
+  },
   // 奖励
   reward: {
     status: {
@@ -159,6 +169,6 @@ const schema = new Schema({
     index: 1
   }
 }, {
-  collection: "postSurveys"
+  collection: "surveys"
 });
-module.exports = mongoose.model("postSurveys", schema);
+module.exports = mongoose.model("surveys", schema);

@@ -33,8 +33,5 @@ $(function() {
 	});
 });
 
-
-var PostSurveyEdit = new NKC.modules.PostSurveyEdit();
-PostSurveyEdit.init(function() {
-
-});
+var SurveyForm = new NKC.modules.SurveyForm();
+SurveyForm.init({surveyId: 6})

@@ -34,6 +34,7 @@ const searchRouter = routers.search;
 const protocolRouter = routers.protocol;
 const reviewRouter = routers.review;
 const threadsRouter = routers.threads;
+const surveyRouter = routers.survey;
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
 
@@ -71,5 +72,6 @@ router.use('/imageEdit', imageEditRouter.routes(), imageEditRouter.allowedMethod
 router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 router.use("/threads", threadsRouter.routes(), threadsRouter.allowedMethods());
 router.use("/avatar", userAvatarRouter.routes(), userAvatarRouter.allowedMethods());
+router.use("/survey", surveyRouter.routes(), surveyRouter.allowedMethods());
 router.use("/banner", userBannerRouter.routes(), userBannerRouter.allowedMethods());
 module.exports = router;
