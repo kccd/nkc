@@ -1954,6 +1954,11 @@ function openToNewLocation(url, target) {
  * @param {*} urlStr 
  */
 function addApptypeToUrl(url) {
+  // 去掉hash值
+  var hashIndex = url.indexOf("#");
+  if(hashIndex > 0) {
+    url = url.substring(0, hashIndex)
+  }
   var resultUrl = url.split("?")[0];
   var paramStr = "";
   var paramsArr;
