@@ -6,6 +6,9 @@ table{
   word-break: break-all;
 }
 /* margin-top */
+.m-l-0{
+  margin-left: 0!important;
+}
 .m-t-0{
   margin-top: 0;
 }
