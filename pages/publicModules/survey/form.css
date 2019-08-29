@@ -88,3 +88,81 @@
 #moduleSurveyEdit .survey-scores input{
   max-width: 3rem;
 }
+.module-survey-form .option-resource{
+  display: table-cell;
+  /*width: 4rem;*/
+}
+.module-survey-form .option-content{
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.module-survey-form .survey-form-description{
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.module-survey-form .option-resource>div{
+  height: 3rem;
+  display: inline-block;
+  width: 3rem;
+  margin-right: 0.5rem;
+  border-radius: 3px;
+  vertical-align: top;
+  cursor: pointer;
+  background-size: cover;
+}
+.module-survey-form .survey-form-option{
+  margin: 1rem 0;
+}
+.module-survey-form .option-links{
+  display: table-cell;
+  vertical-align: top;
+}
+.module-survey-form .option-link{
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  word-break: break-all;
+  height: 1.5rem;
+}
+.module-survey-form .option-content{
+  position: relative;
+  padding-right: 6rem;
+}
+.module-survey-form .option-content.option-survey{
+  padding-right: 0;
+}
+.module-survey-form .option-button{
+  width: 6rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.module-survey-form .option-button select{
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+.module-survey-form .option-button span.score{
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+.module-survey-form .option-button .fa.fa-square-o{
+  color: #888;
+}
+.module-survey-form .option-button .fa.fa-check-square-o{
+  color: #2b90d9;
+}
+.module-survey-form .form-warning{
+  color: #808080;
+  margin-bottom: 0.5rem;
+}
+.module-survey-form .option-answer span.active{
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2b90d9;
+}

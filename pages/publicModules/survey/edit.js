@@ -207,7 +207,8 @@ NKC.modules.SurveyEdit = function() {
         this.survey.type = type;
       },
       te: function(err) {
-        this.error = err.error || err;
+        // this.error = err.error || err;
+        sweetError(err);
       },
       submit: function() {
         this.error = "";
@@ -247,13 +248,14 @@ NKC.modules.SurveyEdit = function() {
         );
         survey.st = st;
         survey.et = et;
-        nkcAPI("/survey", "POST", {survey: survey})
+        return survey;
+        /*nkcAPI("/survey", "POST", {survey: survey})
           .then(function(data) {
             sweetSuccess("提交成功");
           })
           .catch(function(data) {
             sweetError(data);
-          })
+          })*/
       }
     }
   });
@@ -288,5 +290,8 @@ NKC.modules.SurveyEdit = function() {
       ps: self.app.ps,
       options: self.app.ps
     };
+  };
+  self.getSurvey = function() {
+    return self.app.submit();
   }
 };

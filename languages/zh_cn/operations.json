@@ -611,6 +611,7 @@
   "experimentalUsernameSettings": "后台管理-用户名设置",
   "survey_get": "获取投票表单的基本信息",
   "survey_single_get": "查看投票表单",
+  "survey_single_post": "提交投票结果",
   "survey_post": "提交投票表单",
 
   "APPgetUserInfo": "app获取用户信息",

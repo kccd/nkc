@@ -65,6 +65,9 @@ block content
               include ./editor/paper.pug
             div.m-b-1
               include ./editor/toColumn
+            div.m-b-1
+              h4 特殊功能
+              include ./publicModules/survey/edit
             .form(style="padding-bottom:20px")
               .form-group
                 //-.checkbox-inline
@@ -108,6 +111,7 @@ block content
   
   include debug_output.pug
 block scripts
+  +includeJS('/publicModules/survey/edit.js')
   +includeJS('/commonmark/dist/commonmark.js')
   +includeJS('/plain_escaper.js')
   +includeJS('/xbbcode-parser/xbbcode.js')

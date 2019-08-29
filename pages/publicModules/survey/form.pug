@@ -1,8 +1,65 @@
-.survey-form#moduleSurveyForm(v-cloak)
++includeCSS("/publicModules/survey/form.css")
+.survey-form.module-survey-form(v-cloak id=surveyFormId || "moduleSurveyForm" data-survey-id=surveyId || "")
   .text-center.m-t-3.m-b-3(v-if="loading")
     b 加载中...
   div(v-else)
-    .survey-form-header {{formName}}
+    //.survey-form-header {{formName}}
     .survey-form-description {{survey.description}}
-    .survey-form-options
-
+    .survey-form-options(v-if="survey.type === 'vote'")
+      .survey-form-option(v-for="o, index in survey.options")
+        .option-content {{index + 1}}. {{o.content}}
+          .option-button(@click="selectOption(index)")
+            .fa.fa-check-square-o(v-if="options.indexOf(o._id) !== -1")
+            .fa.fa-square-o(v-else)
+        .option-info
+          .option-resources(v-if="o.resourcesId && o.resourcesId.length")
+            .option-resource
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+            //p {{o.description}}
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+    .survey-form-options(v-else-if="survey.type === 'score'")
+      .survey-form-option(v-for="o, index in survey.options")
+        .option-content {{index + 1}}. {{o.content}}
+          .option-button
+            select(v-model="options[index].score" v-if="!posted")
+              option(v-for="s in o.scores" :value="s") {{s}}
+            span.score(v-else)
+              |打分：
+              b {{options[index].score}}
+        .option-info
+          .option-resources(v-if="o.resourcesId && o.resourcesId.length")
+            .option-resource
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+            //p {{o.description}}
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+    .survey-form-options(v-else)
+      .survey-form-option(v-for="o, index in survey.options")
+        .option-content.option-survey {{index + 1}}. {{o.content}}
+          //-.option-button
+            select()
+              option(v-for="s in o.scores" :value="s") {{s}}
+        .option-info
+          .option-resources(v-if="o.resourcesId && o.resourcesId.length")
+            .option-resource
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+            //p {{o.description}}
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-answers(v-if="o.answers && o.answers.length")
+          .option-answer(v-for="a,index_ in o.answers")
+            .radio
+              label
+                input(type="radio" v-model="options[index].answer" :value="a._id" v-if="!posted")
+                span(:class="{'active': posted && options[index].answer === a._id}") {{getIndex(index_)}}. {{a.content}}
+                //span(v-if="posted && options[index].answer === a._id") 【已选】
+    .survey-form-button
+      .form-warning
+        p(v-if="status === 'unStart'") 调查将于 {{startTime}} 开始，{{endTime}} 结束
+        p(v-else-if="status === 'beginning'") 调查将于 {{endTime}} 结束
+        p(v-if="postTime") 你已于 {{postTime}} 提交调查结果。
+        p(v-if="!posted && !havePermission") 作者限定了参与投票的人员范围，您的账号不在参与范围之内。
+      .form-button(v-if="!posted")
+        button.btn.btn-primary.btn-sm(disabled v-if="!havePermission || status !== 'beginning'")  提交
+        button.btn.btn-primary.btn-sm(@click="submit" v-else)  提交

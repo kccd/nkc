@@ -50,7 +50,7 @@ router
     } catch(err) {
       ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
-		const {c, t, fids, cids, cat, mid, columnCategoriesId, sendAnonymousPost} = post;
+		const {c, t, fids, cids, cat, mid, columnCategoriesId, sendAnonymousPost, survey} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(t === '') ctx.throw(400, '标题不能为空！');
 		if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
@@ -70,8 +70,14 @@ router
         ctx.throw(400, "您没有权限或已选专业不允许发表匿名文章");
       }
     }
+    let surveyDB;
+    if(survey) {
+      survey.uid = data.user.uid;
+      surveyDB = await db.SurveyModel.createSurvey(survey);
+      options.surveyId = surveyDB._id;
+    }
 		const _post = await db.ThreadModel.postNewThread(options);
-		
+    if(surveyDB) await surveyDB.update({pid: _post.pid});
 		// 根据thread生成封面图
 		const thread = await db.ThreadModel.findOne({tid: _post.tid});
 		await ThreadModel.autoCoverImage(ctx, thread, _post);

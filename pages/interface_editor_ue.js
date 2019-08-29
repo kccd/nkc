@@ -112,9 +112,14 @@ function saveDraft() {
 * */
 var ColumnCategoriesDom;
 var anonymousData;
+var SurveyEdit;
 $(function() {
   if(NKC.modules.SelectColumnCategories) {
     ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+  }
+  if(NKC.modules.SurveyEdit) {
+    SurveyEdit = new NKC.modules.SurveyEdit();
+    SurveyEdit.init();
   }
   var proDom = $("#protocolCheckbox");
   proDom.on("change", function() {
@@ -265,12 +270,15 @@ function onPost() {
   // 获取专业与分类
   var fids = [];
   var cids = [];
+  var survey;
   if(!queryType || queryType == "forum" || desType == "forum") {
     $("#newPanelForum").find(".chooseForum").each(function() {
       var fid = $(this).attr("fid");
       if(fid && fid !== "undefined") {
         fids.push(fid)
       }
+      // 发表文章，投票功能数据
+      survey = getSurveyData();
     })
     $("#newPanelForum").find(".chooseCate").each(function() {
       var cid = $(this).attr("cid");
@@ -297,6 +305,7 @@ function onPost() {
     desType: desType,
     desTypeId: desTypeId
   };
+  if(survey) post.survey = survey;
   if(queryType === "post" || queryType === "thread" || queryType === "forum") {
     try{
       var paperObj = paperProto.paperExport();
@@ -695,4 +704,14 @@ function removeLocalContent() {
   api.removePrefs({
     key: 'ueContent'
   });
+}
+/*
+* 获取survey表单
+* */
+function getSurveyData() {
+  if(window.SurveyEdit && window.SurveyEdit.getSurvey) {
+    return window.SurveyEdit.getSurvey();
+  } else {
+    return "";
+  }
 }
