@@ -15,6 +15,12 @@
 #moduleSurveyEdit .survey-type .fa-circle-o{
   color: #555;
 }
+#moduleSurveyEdit .option-answers{
+  padding: 0.5rem;
+  padding-left: 2rem;
+  /*background-color: #eee;*/
+
+}
 #moduleSurveyEdit .add-option-button{
   cursor: pointer;
   font-weight: 700;
@@ -22,18 +28,27 @@
 }
 #moduleSurveyEdit .survey-option{
   padding: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: #f4f4f4;
+  border-radius: 3px;
 }
 #moduleSurveyEdit .survey-option:first-child{
   border-top: none;
 }
+#moduleSurveyEdit .survey-option .fa{
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #888;
+  display: inline-block;
+  width: 1.5rem;
+  text-align: center;
+}
 #moduleSurveyEdit .survey-options{
   margin-top: 0.5rem;
-  background-color: #f4f4f4;
-  border-radius: 3px;
 }
 #moduleSurveyEdit .option-index{
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.3rem;
   margin-bottom:0.5rem;
 }
 #moduleSurveyEdit .option-resources{
@@ -94,7 +109,7 @@
 }
 .module-survey-form .option-content{
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  /*margin-bottom: 0.5rem;*/
 }
 .module-survey-form .survey-form-description{
   font-size: 1.4rem;
@@ -165,4 +180,32 @@
   font-size: 1.2rem;
   font-weight: 700;
   color: #2b90d9;
+}
+.module-survey-form .option-answers{
+  padding-left: 1rem;
+}
+.module-survey-form .option-answer{
+  background-color: #f4f4f4;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  padding: 0.5rem;
+}
+.module-survey-form .option-content{
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 1.25rem;
+  /*background-color: #f4f4f4;*/
+}
+.module-survey-form .answer-content{
+  background-color: #f4f4f4;
+  font-weight: normal;
+  font-size: 1.2rem;
+  margin-bottom: 0;
+}
+.module-survey-form .survey-score-input{
+  max-width: 2rem;
+  font-size: 1.2rem;
+}
+.module-survey-form .survey-score-score{
+  font-size: 1rem;
 }

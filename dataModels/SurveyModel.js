@@ -7,10 +7,10 @@ const schema = new Schema({
     default: "vote",
     index: 1
   },
-  // 针对选择类型，可选择的数量。1: 单项选择, >1: 多项选择
-  voteCount: {
-    type: Number,
-    default: 1
+  // 结果的展示 all: 所有人可见, posted: 已投票用户可见, self: 仅自己和管理员可见
+  showResult: {
+    type: String,
+    default: "all"
   },
   options: {
     type: Schema.Types.Mixed,
@@ -20,11 +20,6 @@ const schema = new Schema({
     content: {
       type: String,
       required: true
-    },
-    // 选项介绍
-    description: {
-      type: String,
-      default: ""
     },
     // 选项图片
     resourcesId: {
@@ -43,6 +38,14 @@ const schema = new Schema({
         type: String,
         default: ""
       },
+      minScore: {
+        type: Number,
+        default: 0
+      },
+      maxScore: {
+        type: Number,
+        default: 0
+      },
       links: {
         type: [String],
         default: []
@@ -52,15 +55,11 @@ const schema = new Schema({
         default: []
       }
     },
-    // 针对打分类型，投票者投票的范围
-    minScore: {
+    voteCount: {
       type: Number,
-      default: null,
-    },
-    maxScore: {
-      type: Number,
-      default: null
-    }*/
+      default: 1
+    }
+     */
   },
   // 问卷调查的发起人，post.uid
   uid: {
@@ -176,27 +175,28 @@ schema.statics.createSurvey = async (survey) => {
   const {
     options, reward, permission, type
   } = survey;
-  if(!survey.description) throwErr(400, "说名不能为空");
+  if(type !== "vote" && !survey.description) throwErr(400, "调查说明不能为空");
   if(!options || !options.length) throwErr(400, "请至少添加一个选择");
-  for(const option of options) {
-    if(!option.content) throwErr(400, "选项内容不能为空");
-    if(type === "survey" && !option.answers.length) throwErr(400, "请为每个选项至少添加一个答案");
-    option.minScore = parseInt(option.minScore);
-    option.maxScore = parseInt(option.maxScore);
-    if(type === "score") {
-      if(option.minScore < 1) throwErr(400, "最小分值不能小于1");
-      if(option.maxScore <= option.minScore) throwErr(400, "最大分值必须大于最小分值");
-    }
+  for(let i = 0; i < options.length; i++) {
+    const option = options[i];
+    if(!option.content) throwErr(400, `调查内容${i+1}不能为空`);
+    if(!option.answers || !option.answers.length) throwErr(400, "请为每个调查内容至少添加一个选项");
     for(const answer of option.answers) {
-      if(!answer.content) throwErr(400, "选项答案内容不能为空");
+      if(!answer.content) throwErr(400, `调查内容${i+1}的选项内容不能为空`);
+      answer.minScore = parseInt(answer.minScore);
+      answer.maxScore = parseInt(answer.maxScore);
+      if(type === "score") {
+        if(answer.minScore < 1) throwErr(400, `调查内容${i+1}的选项最小分值不能小于1`);
+        if(answer.maxScore <= answer.minScore) throwErr(400, `调查内容${i+1}的选项最大分值必须大于最小分值`);
+      }
       answer._id = await SettingModel.operateSystemID("surveyOptionAnswers", 1);
     }
+    option.voteCount = parseInt(option.voteCount);
+    if(type !== "score") {
+      if(!option.voteCount) throwErr(400, `调查内容${i+1}的最大选择数量不能小于1`);
+      if(option.voteCount > option.answers.length) throwErr(400, `调查内容${i+1}的最大选择数量不能大于选项数量`);
+    }
     option._id = await SettingModel.operateSystemID("surveyOptions", 1);
-  }
-  survey.voteCount = parseInt(survey.voteCount);
-  if(type === "vote") {
-    if(!survey.voteCount) throwErr(400, "请设置最大可选择选项的数目");
-    if(!survey.voteCount > options.length) throwErr(400, "最大可选择数目不能超过选项数目");
   }
   const now = Date.now();
   if((new Date(survey.st)).getTime() >= (new Date(survey.et)).getTime()) throwErr(400, "结束时间必须大于开始时间");
@@ -206,11 +206,23 @@ schema.statics.createSurvey = async (survey) => {
     minGradeId, certsId
   } = permission;
   permission.registerTime = parseInt(registerTime);
+  if(permission.registerTime < 0) throwErr(400, "注册时间不能小于0");
   permission.digestThreadCount = parseInt(digestThreadCount);
+  if(permission.digestThreadCount < 0) throwErr(400, "加精文章数目不能小于0");
   permission.threadCount = parseInt(threadCount);
+  if(permission.threadCount < 0) throwErr(400, "文章总数不能小于0");
   permission.postCount = parseInt(postCount);
+  if(permission.postCount < 0) throwErr(400, "回复总数不能小于0");
   permission.voteUpCount = parseInt(voteUpCount);
+  if(permission.voteUpCount < 0) throwErr(400, "点赞数不能小于0");
+  permission.minGradeId = parseInt(minGradeId);
+  const grades = await mongoose.model("usersGrades").find().sort({_id: 1});
+  if(permission.minGradeId < grades[0]._id || permission.minGradeId > grades[grades.length - 1]._id) {
+    throwErr(400, "最小用户等级设置错误，请重新选择");
+  }
   if(!certsId.length) throwErr(400, "请至少勾选一个证书");
+  const certsCount = await mongoose.model("roles").count({_id: {$in: certsId}});
+  if(certsCount !== certsId.length) throwErr(400, "证书勾选错误，请重新勾选");
   if(!survey.mid) survey.mid = survey.uid;
   survey._id = await SettingModel.operateSystemID("surveys", 1);
   const s = SurveyModel(survey);
@@ -225,8 +237,6 @@ schema.statics.createSurvey = async (survey) => {
 schema.methods.checkUserPermission = async function(uid) {
   const UserModel = mongoose.model("users");
   const user = await UserModel.findOnly({uid});
-  const surveyPost = await mongoose.model("surveyPosts").findOne({uid, surveyId: this._id});
-  if(surveyPost) throwErr(403, "你已经提交过了");
   const {
     registerTime, digestThreadCount, threadCount, postCount, voteUpCount, certsId, minGradeId
   } = this.permission;
@@ -247,6 +257,8 @@ schema.methods.checkUserPermission = async function(uid) {
 };
 schema.methods.ensurePostPermission = async function(uid) {
   await this.checkUserPermission(uid);
+  const surveyPost = await mongoose.model("surveyPosts").findOne({uid, surveyId: this._id});
+  if(surveyPost) throwErr(403, "你已经提交过了");
   if(this.disabled) throwErr(403, "该调查已屏蔽");
   const now = Date.now();
   if(now < new Date(this.st).getTime()) throwErr(403, "调查暂未开始");

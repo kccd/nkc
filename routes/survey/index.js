@@ -30,6 +30,7 @@ router
     const {survey} = body;
     survey.uid = user.uid;
     survey.mid = user.mid;
+    console.log(survey);
     await db.SurveyModel.createSurvey(survey);
     console.log(s);
     await next();

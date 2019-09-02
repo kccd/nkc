@@ -20,40 +20,53 @@ router
       try{
         await survey.checkUserPermission(data.user.uid);
         data.havePermission = true;
-      } catch(err) {}
+      } catch(err) {
+        console.log(err);
+      }
     }
     await next();
   })
   .post("/", async (ctx, next) => {
     const {db, data, body} = ctx;
     const {survey, user} = data;
-    const {options} = body;
+    let {options} = body;
     await survey.ensurePostPermission(user.uid);
-    const optionsId = survey.options.map(o => o._id);
-    if(survey.type === "vote") { // 投票
-      if(!options.length) ctx.throw(400, "请至少勾选一项");
-      for(const id of options) {
-        if(!optionsId.includes(id)) ctx.throw(400, "未知的选项ID");
-      }
-      if(options.length > survey.voteCount) ctx.throw(400, `最多只能勾选${survey.voteCount}个选项`);
-    } else if(survey.type === "score") { // 打分
-      if(!options.length || survey.options.length !== options.length) ctx.throw(400, "数据存在问题，提交的选项数不正确");
-      for(let i = 0; i < survey.options.length; i++) {
-        const option = survey.options[i];
-        if(options[i].score < option.minScore || options[i] > option.maxScore) ctx.throw(400, "分值不在规定的范围内，请检查");
-        options[i] = {
-          score: options[i].score
+    if(survey.type === "vote") {
+      options = [options[0]];
+      survey.options = [survey.options[0]];
+    }
+    if(!options.length || options.length !== survey.options.length) ctx.throw(400, "数据异常，请刷新后重试");
+    for(let i = 0; i < survey.options.length; i++) {
+      const sOption = survey.options[i];
+      const option = options[i];
+      if(sOption._id !== option._id) ctx.throw(400, "数据异常，可能是调查的发布者修改了数据。请刷新后重试。");
+      let voteCount = 0;
+      for(let j = 0; j < sOption.answers.length; j++) {
+        const sAnswer = sOption.answers[j];
+        const answer = option.answers[j];
+        if(sAnswer._id !== answer._id) ctx.throw(400, "数据异常，可能是调查的发布者修改了数据。请刷新后重试。");
+        if(answer.selected) voteCount++;
+        if(survey.type === "score") {
+          const minScore = sAnswer.minScore;
+          const maxScore = sAnswer.maxScore;
+          let score = answer.score;
+          score = Number(score.toFixed(2));
+          if(score < minScore || score > maxScore) {
+            ctx.throw(400, "打分分值不在要求的范围内");
+          }
+        }
+        option.answers[j] = {
+          _id: answer._id,
+          score: answer.score,
+          selected: answer.selected
         }
       }
-    } else { // 问卷调查
-      if(!options.length || survey.options.length !== options.length) ctx.throw(400, "数据存在问题，提交的选项数不正确");
-      for(let i = 0; i < survey.options.length; i++) {
-        const option = survey.options[i];
-        const answersId = option.answers.map(a => a._id);
-        if(!answersId.includes(options[i].answer)) ctx.throw(400, "还有未选择的题目，请检查");
-        options[i] = {
-          answer: options[i].answer
-        };
+      options[i] = {
+        _id: option._id,
+        answers: option.answers
+      };
+      if(survey.type !== "score") {
+        if(!voteCount) ctx.throw(400, "针对每个调查，请至少勾选一个选项");
       }
     }
     const surveyPost = db.SurveyPostModel({

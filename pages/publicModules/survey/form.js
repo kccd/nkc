@@ -14,6 +14,12 @@ NKC.modules.SurveyForm = function(id) {
       surveyPost: ""
     },
     computed: {
+      timeInfo: function() {
+        var status = this.status;
+        if(status === "unStart") return "调查将于 " + this.startTime + " 开始，"+this.endTime+" 结束。";
+        else if(status === "beginning") return "调查将于 "+this.endTime+" 结束。";
+        else return "调查已结束。";
+      },
       formName: function() {
         return {
           vote: "投票",
@@ -32,6 +38,41 @@ NKC.modules.SurveyForm = function(id) {
       postTime: function() {
         if(!this.posted || !this.surveyPost || !this.surveyPost.toc) return "";
         return this.format("YYYY/MM/DD HH:mm:ss", this.surveyPost.toc);
+      },
+      answerScore: function() {
+        var survey = this.survey;
+        var postOption = this.options;
+        if(survey.type !== "score") return;
+        var score = 0, count = 0, postScore = 0;
+        for(var i = 0; i < survey.options.length; i++) {
+          var option = survey.options[i];
+          for(var j = 0; j < option.answers.length; j++) {
+            var answer = option.answers[j];
+            score += answer.maxScore;
+            postScore += postOption[i].answers[j].score;
+            count++;
+          }
+        }
+        return {
+          score: score,
+          postScore: postScore,
+          count: count
+        };
+      },
+      totalScore: function() {
+        var score = this.answerScore;
+        if(score === undefined) return;
+        return score.score;
+      },
+      answerCount: function() {
+        var count = this.answerScore;
+        if(count === undefined) return;
+        return count.count;
+      },
+      postScore: function() {
+        var postScore = this.answerScore;
+        if(postScore === undefined) return;
+        return postScore.postScore;
       }
     },
     methods: {
@@ -70,31 +111,38 @@ NKC.modules.SurveyForm = function(id) {
           .then(function(data) {
             this_.surveyPost = data.surveyPost;
             this_.posted = true;
+            sweetSuccess("提交成功");
           })
           .catch(function(data) {
             sweetError(data);
           });
       },
       // 针对投票，选择选项
-      selectOption: function(index) {
+      selectOption: function(index, aIndex) {
         if(!this.havePermission) return;
         if(this.status !== "beginning" || this.posted) return;
         var options = this.options;
         var survey = this.survey;
-        var o = survey.options[index];
-        var i = options.indexOf(o._id);
-        if(i !== -1) {
-          options.splice(i, 1);
+        var a = survey.options[index].answers[aIndex];
+        var selected = options[index].answers[aIndex].selected;
+        if(selected) {
+          options[index].answers[aIndex].selected = false;
         } else {
-          if(options.length >= survey.voteCount) {
+          var selectedCount = 0;
+          for(var i = 0; i < options[index].answers.length; i++) {
+            if(options[index].answers[i].selected) selectedCount ++;
+          }
+          if(selectedCount >= survey.options[index].voteCount) {
             // 如果是单选，则勾选其他时取消已选
-            if(survey.voteCount === 1) {
-              options.splice(0, 9999999);
+            if(survey.options[index].voteCount === 1) {
+              for(var i = 0; i < options[index].length; i++) {
+                options[index].answers[i].selected = false;
+              }
             } else {
               return;
             }
           }
-          options.push(o._id);
+          options[index].answers[aIndex].selected = true;
         }
       },
       visitUrl: function(url){
@@ -110,22 +158,25 @@ NKC.modules.SurveyForm = function(id) {
               options = data.surveyPost.options;
               app.posted = true;
             } else {
-              var type = data.survey.type;
               for(var i = 0; i < data.survey.options.length; i++) {
                 var o = data.survey.options[i];
-                o.scores = [];
-                for(var j = o.minScore; j <= o.maxScore; j++) {
-                  o.scores.push(j);
-                }
-                if(type === "score") {
-                  options.push({
-                    score: 0
+                var answers_ = [];
+                for(var j = 0; j < o.answers.length; j++) {
+                  var answer = o.answers[j];
+                  answer.scores = [];
+                  for(var n = answer.minScore ||0; n <= answer.maxScore||0; n++) {
+                    answer.scores.push(n);
+                  }
+                  answers_.push({
+                    _id: answer._id,
+                    score: 0,
+                    selected: false
                   });
-                } else if(type === "survey") {
-                  options.push({
-                    answer: ""
-                  });
                 }
+                options.push({
+                  _id: o._id,
+                  answers: answers_
+                });
               }
             }
             app.havePermission = data.havePermission;
