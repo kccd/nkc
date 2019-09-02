@@ -8,6 +8,7 @@ statusRouter
 		data.type = 'status';
 		const {type} = query;
 		const x = [];
+    const today = nkcModules.apiFunction.today();
 		const usersData = [];
 		const postsData = [];
 		const threadsData = [];
@@ -27,6 +28,13 @@ statusRouter
 				postsData.push(postsCount - threadsCount);
 				threadsData.push(threadsCount);
 			}
+      data.results = {
+        usersData,
+        postsData,
+        threadsData,
+        x,
+        title
+      };
 		} else if(type === 'month') {
 			title = '本月';
 			const time = new Date();
@@ -53,6 +61,13 @@ statusRouter
 				postsData.push(postsCount - threadsCount);
 				threadsData.push(threadsCount);
 			}
+      data.results = {
+        usersData,
+        postsData,
+        threadsData,
+        x,
+        title
+      };
 		} else if(type === 'year') {
 			title = '今年';
 			const time = new Date();
@@ -70,6 +85,13 @@ statusRouter
 				postsData.push(postsCount - threadsCount);
 				threadsData.push(threadsCount);
 			}
+      data.results = {
+        usersData,
+        postsData,
+        threadsData,
+        x,
+        title
+      };
 		} else if(type === 'all') {
 			title = '全部';
 			const firstUser = await db.UserModel.findOne().sort({toc: 1});
@@ -121,7 +143,13 @@ statusRouter
 				postsData.push(postsCount - threadsCount);
 				threadsData.push(threadsCount);
 			}
-
+      data.results = {
+        usersData,
+        postsData,
+        threadsData,
+        x,
+        title
+      };
 		} else if(type === 'custom') {
 			let {time1,time2} = query;
 			if(!time1 || !time2) ctx.throw(400, '时间区间有误');
@@ -139,32 +167,47 @@ statusRouter
 				threadsData.push(threadsCount);
 				firstTime += oneDay;
 			}
-		}
-		data.results = {
-			usersData,
-			postsData,
-			threadsData,
-			x,
-			title
-		};
-
-		if(!type) {
-			data.onlineUsers = [];
+      data.results = {
+        usersData,
+        postsData,
+        threadsData,
+        x,
+        title
+      };
+		} else if(type === "logs") {
+      // const loggedIP = await db.LogModel.aggregate([
+      //   {
+      //     $match: {
+      //       reqTime: {$gte: new Date(today.getTime() - 24*60*60*1000)}
+      //     }
+      //   },
+      //   {
+      //     $group: {
+      //       _id: "$ip"
+      //     }
+      //   }
+      // ]);
+      // const loggedPV = await db.LogModel.count({
+      //   reqTime: {$gte: today}
+      // });
+      // console.log(loggedIP, loggedPV);
+    } else {
+      data.onlineUsers = [];
       data.onlineUsersCount = await db.UserModel.count({online: true});
-			const onlineUsers = await db.UserModel.find({online: true}).sort({tlv: -1}).limit(5000);
-			for(const onlineUser of onlineUsers) {
-				const targetSocket = await db.SocketModel.find({uid: onlineUser.uid});
-				if(!targetSocket) {
-					await onlineUser.update({online: false});
-				} else {
-					data.onlineUsers.push({
-						uid: onlineUser.uid,
-						username: onlineUser.username,
+      const onlineUsers = await db.UserModel.find({online: true}).sort({tlv: -1}).limit(5000);
+      for(const onlineUser of onlineUsers) {
+        const targetSocket = await db.SocketModel.find({uid: onlineUser.uid});
+        if(!targetSocket) {
+          await onlineUser.update({online: false});
+        } else {
+          data.onlineUsers.push({
+            uid: onlineUser.uid,
+            username: onlineUser.username,
             avatar: onlineUser.avatar
-					});
-				}
-			}
-		}
+          });
+        }
+      }
+    }
 		await next();
 	});
 module.exports = statusRouter;

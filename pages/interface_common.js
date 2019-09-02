@@ -1472,7 +1472,7 @@ function obtainPureText(content, reduce, count) {
 }
 
 function postsVote(pid, type) {
-  if(type === 'login') return window.location.href = '/login';
+  if(type === 'login') return Login.open('login');
   var url = '/p/' + pid + '/vote/down';
   if(type === 'up') {
     url = '/p/' + pid + '/vote/up';

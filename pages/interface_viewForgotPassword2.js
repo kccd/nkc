@@ -119,9 +119,9 @@ function submit2(){
     return nkcAPI('/forgotPassword/mobile', 'PATCH',{mobile:mobile, mcode:mcode, password:password, nationCode: nationCode})
   })
   .then(function(res){
-    info_report2('修改密码成功！5s后跳转到登录页面')
+    info_report2('修改密码成功！')
     setTimeout(function(){
-      window.location = '/login'
+      window.location = '/'
     },5000)
   })
   .catch(function(data){

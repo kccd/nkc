@@ -570,8 +570,12 @@ block content
                     else
                       if !state.apptype
                         .col-xs-12.col-md-12
-                          :markdown
-                            想参与大家的讨论？现在就 [登录](/login) 或者 [注册](/register)。
+                          p 想参与大家的讨论？现在就&nbsp;
+                            a.pointer(onclick="Login.open('login')") 登录
+                            | &nbsp;或者&nbsp;
+                            a.pointer(onclick="Login.open('register')") 注册
+                            | 。
+
                       else
                         .col-xs-12.col-md-12
                           p 

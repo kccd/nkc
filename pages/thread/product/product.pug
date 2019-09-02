@@ -133,7 +133,7 @@ style.
         if !product.productSettings.priceShowToVisit && !data.user
           p
             span.title 价格
-            a(style="color:orangered" href="/login") 登陆可见
+            a.pointer(style="color:orangered" onclick="Login.open('login')") 登陆可见
         else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
           p
             span.title 价格
@@ -160,7 +160,7 @@ style.
       if !product.productSettings.priceShowToVisit && !data.user
         p
           span.title 运费
-          a(style="color:orangered" href="/login") 登陆可见
+          a.pointer(style="color:orangered" onclick="Login.open('login')") 登陆可见
       else if !product.productSettings.priceShowToVisit && product.productStatus == "stopsale"
         p
           span.title 价格

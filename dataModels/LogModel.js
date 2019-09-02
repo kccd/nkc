@@ -75,7 +75,7 @@ logSchema.methods.extendOperationName = async function(){
 		}
 	}
 	return this.operationData = operationData
-}
+};
 
 const LogModel = mongoose.model('logs', logSchema);
 module.exports = LogModel;

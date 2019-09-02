@@ -54,10 +54,10 @@ var app = new Vue({
         code: this.code,
       })
         .then(function() {
-          screenTopAlert('修改成功，正在前往登录页面');
+          screenTopAlert('修改成功');
           setTimeout(function() {
             // window.location.href = '/login';
-            openToNewLocation("/login");
+            openToNewLocation("/");
           }, 1000)
         })
         .catch(function(data) {
