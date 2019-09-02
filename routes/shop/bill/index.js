@@ -64,7 +64,7 @@ router
       let vipNum = 100;
 			if(cart.product.vipDiscount) {
 				for(let v=0;v<cart.product.vipDisGroup.length;v++) {
-					if(data.user && data.user.authLevel == cart.product.vipDisGroup[v].vipLevel) {
+					if(data.user && data.user.grade._id === (cart.product.vipDisGroup[v].vipLevel + 1)) {
 						vipNum = cart.product.vipDisGroup[v].vipNum;
 					}
         }
