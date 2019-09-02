@@ -4,9 +4,11 @@ const captcha = require("../../nkcModules/captcha");
 const cookieConfig = require("../../config/cookie");
 registerRouter
   .get(['/','/mobile'], async (ctx, next) => {
-  	const {data, query} = ctx;
+  	const {data, query, nkcModules} = ctx;
   	const {user} = data;
-  	if(user && user.username) ctx.throw(403, '您已注册成功并且设置过用户名和密码');
+  	if(user) {
+      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/'));
+    }
 		const {code} = query;
 		if(code) {
 			data.regCode = code;

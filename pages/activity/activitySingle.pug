@@ -73,7 +73,7 @@ block content
                         -if(data.user)
                           button.btn.btn-primary(onclick="changeToApply(this)" id="applyButton" formShow="hide") 我要报名
                         -else
-                          button.btn.btn-primary(onclick="window.open('/login')" id="applyButton") 我要报名
+                          button.btn.btn-primary(onclick="Login.open('login')" id="applyButton") 我要报名
                 if data.user && data.activity.signUser.includes(data.user.uid)
                   .row.m-b-4.m-t-1#edit(style="display: none")
                     .col-xs-12.col-md-12

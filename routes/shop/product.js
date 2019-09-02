@@ -49,9 +49,21 @@ productRouter
   .patch('/:productId/changePara', async (ctx, next) => {
     const {data, body, db, params} = ctx;
     const {paraId} = body;
+    const {productId} = params;
     const productParams = await db.ShopProductsParamModel.findOne({_id:paraId});
     if(!productParams) ctx.throw(400, "规格查询失败");
+    const product = await db.ShopGoodsModel.findOnly({productId});
     data.productParams = productParams;
+    if(product.vipDiscount && data.user) {
+      const gradeId = data.user.grade._id;
+      let vipNum = 100;
+      for(const v of product.vipDisGroup) {
+        if((v.vipLevel + 1) === gradeId) {
+          vipNum = v.vipNum;
+        }
+      }
+      data.productParams.price = data.productParams.price * (vipNum/100);
+    }
     await next();
   })
   // 商品禁售,权限分配给管理员
@@ -63,5 +75,5 @@ productRouter
 			await product.update({$set: {adminBan:true}});
 		}
 		await next();
-  })
+  });
 module.exports = productRouter;

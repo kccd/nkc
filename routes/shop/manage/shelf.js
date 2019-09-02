@@ -108,7 +108,7 @@ shelfRouter
     if(productStatus === "insale") {
       shelfTime = Date.now();
     }  
-    if(productParams.length === 0) ctx.throw(400, '规格信息不能为空'); 
+    if(productParams.length === 0) ctx.throw(400, '规格信息不能为空');
     if(paramsInfo.length !== 0) {
       let count = paramsInfo[0].values.length;
       for(let i = 1; i < paramsInfo.length; i++) {
@@ -186,6 +186,7 @@ shelfRouter
     let singleParaIdArr = [];
     for(const s of singleParams) {
       if(s.originPrice < 0) s.originPrice = 0;
+      if(!s.useDiscount) s.price = s.originPrice;
       s.productId = productId;
       s.uid = user.uid;
       s.type = "single";

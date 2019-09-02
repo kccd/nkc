@@ -145,7 +145,7 @@ block name
                   .checkbox
                     label
                       input#vipDiscount(type='checkbox' checked=product.vipDiscount?true:false)
-                      |  是否使用会员折扣
+                      |  是否使用会员折扣（与优惠价格叠加）
               .form-group#vipDisDom(style=checked=product.vipDiscount?"":"display:none")
                 label.col-sm-2.control-label 折扣详情
                 .col-sm-5.col-sm-10

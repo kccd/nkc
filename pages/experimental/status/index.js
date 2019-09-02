@@ -110,3 +110,12 @@ function display(results) {
   myChart.setOption(option);
 }
 
+function getLogs() {
+  nkcAPI("/e/status?type=logs", "GET")
+    .then(function(data) {
+      console.log(data);
+    })
+    .catch(function(data) {
+      sweetError(data);
+    })
+}
