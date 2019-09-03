@@ -69,13 +69,12 @@
               div(v-else)
                 .option-status-info.survey-score(:title="'范围：' + a.minScore + '-' + a.maxScore + '，平均打分' + a.average") 平均打分：{{a.average}}
     .survey-form-button
-      .form-post-users
-        .form-post-user(v-for="user in users")
-          a(onclick="visitUrl('/u/' + user.uid)")
-            img(:src="'/avatar/' + user.avatar")
       .form-warning
         //- 显示投票结果
         p(v-if="showResult") {{postResult}}
+        .form-post-users
+          a(onclick="visitUrl('/u/' + user.uid)" :onmouseover="'floatUserPanel.open(this, \"' + user.uid + '\")'" v-for="user in users")
+            img(:src="'/avatar/' + user.avatar")
         //- 时间限制
         p(v-if="timeInfo") {{timeInfo}}
         //- 提交时间

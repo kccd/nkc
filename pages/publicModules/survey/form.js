@@ -19,7 +19,7 @@ NKC.modules.SurveyForm = function(id) {
       // 投票结果总结
       postResult: function() {
         if(!this.showResult) return;
-        var survey = qthis.survey;
+        var survey = this.survey;
         if(survey.type !== 'score') {
           return "参与人数：" + survey.postCount;
         } else {

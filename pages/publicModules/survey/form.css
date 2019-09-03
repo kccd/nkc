@@ -257,3 +257,13 @@
 .module-survey-form .option-status-info.survey-score{
   width: 12rem;
 }
+.module-survey-form .form-post-users a{
+  display: inline-block;
+  margin-right: -1rem;
+}
+.module-survey-form .form-post-users a img{
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #f4f4f4;
+  border-radius: 50%;
+}
