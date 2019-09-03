@@ -11,7 +11,7 @@ router
     }
     data.postSettings = await db.SettingModel.findOnly({_id: 'post'});
     let uids = data.postSettings.c.postToForum.anonymous.uid.concat(data.postSettings.c.postToThread.anonymous.uid);
-    uids = uids.concat(data.postSetting.c.postToForum.survey.uid, data.postSettings.c.postToThread.survey.uid);
+    uids = uids.concat(data.postSettings.c.postToForum.survey.uid, data.postSettings.c.postToThread.survey.uid);
     data.users = await db.UserModel.find({uid: {$in: uids}});
     data.roles = await db.RoleModel.find({_id: {$ne: "visitor"}}).sort({toc: 1});
     data.grades = await db.UsersGradeModel.find().sort({toc: 1});

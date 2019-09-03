@@ -9,7 +9,7 @@ var app = new Vue({
     type: 'postToForum'
   },
   methods: {
-    addUser: function() {
+    addUser: function(type) {
       var uid = this.uid;
       var this_ = this;
       nkcAPI("/u/" + uid + "?from=panel", "GET")
@@ -17,7 +17,7 @@ var app = new Vue({
           var targetUser = data.targetUser;
           if(targetUser) {
             this_.users.push(targetUser);
-            var uidArr = this_.postSettings[this_.type].anonymous.uid;
+            var uidArr = this_.postSettings[this_.type][type].uid;
             if(uidArr.indexOf(targetUser.uid) === -1) {
               uidArr.push(targetUser.uid);
             }
@@ -35,8 +35,8 @@ var app = new Vue({
         if(user.uid === uid) return user;
       }
     },
-    removeUser: function(index) {
-      this.postSettings[this.type].anonymous.uid.splice(index, 1);
+    removeUser: function(index, type) {
+      this.postSettings[this.type][type].uid.splice(index, 1);
     },
     extendVolume: function() {
       var exam = this.postSettings[this.type].exam;
@@ -82,6 +82,16 @@ var app = new Vue({
     },
     selectedUsers: function() {
       var uid = this.postSettings[this.type].anonymous.uid;
+      var users = [];
+      for(var i = 0; i < uid.length; i++) {
+        var id = uid[i];
+        var user = this.getUserById(id);
+        if(user) users.push(user);
+      }
+      return users;
+    },
+    selectedUsersSurvey: function() {
+      var uid = this.postSettings[this.type].survey.uid;
       var users = [];
       for(var i = 0; i < uid.length; i++) {
         var id = uid[i];

@@ -183,13 +183,13 @@ block content
                     | {{grade.displayName}}
                   </label>
                 div 指定用户：
-                  input(type="text"  v-model.trim="uid" @keyup.enter="addUser" placeholder="请输入用户ID")
-                  button(@click="addUser") 添加
+                  input(type="text"  v-model.trim="uid" @keyup.enter="addUser('anonymous')" placeholder="请输入用户ID")
+                  button(@click="addUser('anonymous')") 添加
                   div(v-if="selectedUsers.length > 0")
                     .review-user-span(v-for="user, index in selectedUsers")
                       img(:src="'/avatar/' + user.avatar + '?t=sm'")
                       a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
-                      .fa.fa-remove(@click="removeUser(index)" title="点击移除")
+                      .fa.fa-remove(@click="removeUser(index, 'anonymous')" title="点击移除")
                 hr
             .row
               .col-sm-2.text-right
@@ -219,13 +219,13 @@ block content
                   | {{grade.displayName}}
                   </label>
                 div 指定用户：
-                  input(type="text"  v-model.trim="uid" @keyup.enter="addUser" placeholder="请输入用户ID")
-                  button(@click="addUser") 添加
-                  div(v-if="selectedUsers.length > 0")
-                    .review-user-span(v-for="user, index in selectedUsers")
+                  input(type="text"  v-model.trim="uid" @keyup.enter="addUser('survey')" placeholder="请输入用户ID")
+                  button(@click="addUser('survey')") 添加
+                  div(v-if="selectedUsersSurvey.length > 0")
+                    .review-user-span(v-for="user, index in selectedUsersSurvey")
                       img(:src="'/avatar/' + user.avatar + '?t=sm'")
                       a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
-                      .fa.fa-remove(@click="removeUser(index)" title="点击移除")
+                      .fa.fa-remove(@click="removeUser(index, 'survey')" title="点击移除")
 
             .row
               .col-sm-10.col-sm-offset-2.mdui-m-t-3.text-right

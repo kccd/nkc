@@ -300,6 +300,33 @@ schema.methods.checkUserPermission = async function(uid) {
   throwErr(403, "证书不符合要求");
 };
 /*
+* 验证用户是否有权限发起调查
+* @param {String} uid 用户ID
+* @param {String} type 发表内容的类型。 post: 发表回复, thread: 发表文章
+* @author pengxiguaa 2019-9-3
+* */
+schema.statics.ensureCreatePermission = async (type, userId) => {
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
+  const postSettings = await SettingModel.getSettings("post");
+  const {defaultCertGradesId, rolesId, uid, status} = postSettings[type].survey;
+  if(!status) return false;
+  const user = await UserModel.findOne({uid: userId});
+  if(!user) return false;
+  if(uid.includes(userId)) return true;
+  for(const certId of user.certs) {
+    if(certId !== "default" && rolesId.includes(certId)) {
+      return true;
+    }
+  }
+  if(rolesId.includes("default")) {
+    await user.extendGrade();
+    return defaultCertGradesId.includes(user.grade._id);
+  } else {
+    return false;
+  }
+};
+/*
 * 验证用户是否能够投票
 * @param {String} uid 用户ID
 * @author pengxiguaa 2019-9-2
