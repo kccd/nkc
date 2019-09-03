@@ -604,7 +604,7 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
     refundStatus: "success"
   }});
   // 恢复库存(拍下减库存)
-  if(product.stockCostMethod === orderReduceStock) {
+  if(product.stockCostMethod === "orderReduceStock") {
     await productParam.update({$set: {stocksSurplus: productParam.stocksSurplus + refuCount}})
   }
 };
