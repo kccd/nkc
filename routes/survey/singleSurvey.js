@@ -23,6 +23,14 @@ router
       } catch(err) {
         console.log(err);
       }
+    } else {
+      data.surveyPost = await db.SurveyPostModel.findOne({surveyId: survey._id, ip: ctx.address});
+      try{
+        await survey.checkUserPermission("", ctx.address);
+        data.havePermission = true;
+      } catch(err) {
+        console.log(err);
+      }
     }
     // 获取投票结果
     if(
@@ -38,7 +46,7 @@ router
     const {db, data, body} = ctx;
     const {survey, user} = data;
     let {options} = body;
-    await survey.ensurePostPermission(user.uid);
+    await survey.ensurePostPermission(user?user.uid:"", ctx.address);
     if(survey.type === "vote") {
       options = [options[0]];
       survey.options = [survey.options[0]];
@@ -83,7 +91,7 @@ router
       ip: ctx.address,
       port: ctx.port,
       surveyType: survey.type,
-      uid: user.uid,
+      uid: user?user.uid:"",
       options
     });
     await surveyPost.save();

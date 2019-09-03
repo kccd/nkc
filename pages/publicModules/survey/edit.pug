@@ -118,38 +118,50 @@
         .col-sm-9.m-t-05.survey-scores
           .form.col-sm-12
             .form-group
-              label 注册天数：
-              input(type="text" v-model.number="survey.permission.registerTime" @change="toInt")
-          .form.col-sm-12
-            .form-group
-              label 精选文章数：
-              input(type="text" v-model.number="survey.permission.digestThreadCount" @change="toInt")
-          .form.col-sm-12
-            .form-group
-              label 文章总数：
-              input(type="text" v-model.number="survey.permission.threadCount" @change="toInt")
-          .form.col-sm-12
-            .form-group
-              label 回复总数：
-              input(type="text" v-model.number="survey.permission.postCount" @change="toInt")
-          .form.col-sm-12
-            .form-group
-              label 点赞数：
-              input(type="text" v-model.number="survey.permission.voteUpCount" @change="toInt")
-          .form.col-sm-12
-            .form-group
-              label 最小用户等级：
-              .radio
-                label.m-r-1(v-for="g in grades")
-                  input(type="radio" v-model="survey.permission.minGradeId" :value="g._id")
-                  span {{g.displayName}}
-          .form.col-sm-12
-            .form-group
-              label 用户证书
-              .checkbox
-                label.m-r-1(v-for="r in roles")
-                  input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
-                  span {{r.displayName}}
+              label 允许游客参与：
+              .radio-inline.m-r-05.p-t-0
+                label
+                  input(type="radio" v-model="survey.permission.visitor" :value="false")
+                  | 否
+              .radio-inline.p-t-0
+                label
+                  input(type="radio" v-model="survey.permission.visitor" :value="true")
+                  | 是
+          div(v-if="!survey.permission.visitor")
+            .form.col-sm-12
+              .form-group
+                label 注册天数：
+                input(type="text" v-model.number="survey.permission.registerTime" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 精选文章数：
+                input(type="text" v-model.number="survey.permission.digestThreadCount" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 文章总数：
+                input(type="text" v-model.number="survey.permission.threadCount" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 回复总数：
+                input(type="text" v-model.number="survey.permission.postCount" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 点赞数：
+                input(type="text" v-model.number="survey.permission.voteUpCount" @change="toInt")
+            .form.col-sm-12
+              .form-group
+                label 最小用户等级：
+                .radio
+                  label.m-r-1(v-for="g in grades")
+                    input(type="radio" v-model="survey.permission.minGradeId" :value="g._id")
+                    span {{g.displayName}}
+            .form.col-sm-12
+              .form-group
+                label 用户证书
+                .checkbox
+                  label.m-r-1(v-for="r in roles")
+                    input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
+                    span {{r.displayName}}
       .form-group
         label.col-sm-2.control-label 时间
         .col-sm-9.m-t-05

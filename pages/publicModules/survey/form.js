@@ -201,11 +201,25 @@ NKC.modules.SurveyForm = function(id) {
             if(app.showResult) {
               for(var i = 0; i < data.survey.options.length; i++) {
                 var option = data.survey.options[i];
+                var maxProgress;
                 for(var j = 0; j < option.answers.length; j++) {
                   var answer = option.answers[j];
                   answer.color = app.getColor();
                   answer.progress = data.survey.postCount === 0? 0: ((answer.postCount || 0)*100/(data.survey.postCount || 0)).toFixed(1);
+                  if(answer.progress && (!maxProgress || maxProgress < parseFloat(answer.progress))) maxProgress = answer.progress;
                   answer.average = data.survey.postCount === 0? 0: ((answer.postScore || 0)/(data.survey.postCount||0)).toFixed(2);
+                }
+                for(var j = 0; j < option.answers.length; j++) {
+                  var answer = option.answers[j];
+                  if(maxProgress) {
+                    if(maxProgress === parseFloat(answer.progress)) {
+                      answer.domProgress = 100;
+                    } else {
+                      answer.domProgress = 100 * parseFloat(answer.progress) / maxProgress;
+                    }
+                  } else {
+                    answer.domProgress = answer.progress;
+                  }
                 }
               }
             }

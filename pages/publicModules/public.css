@@ -120,7 +120,7 @@ table{
   padding: 0!important;
 }
 .p-t-0{
-  padding-top: 0;
+  padding-top: 0!important;
 }
 .p-t-1{
   padding-top: 1rem;

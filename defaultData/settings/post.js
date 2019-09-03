@@ -17,6 +17,12 @@ module.exports = {
         defaultCertGradesId: [],
         rolesId: [],
         uid: []
+      },
+      survey: {
+        status: false,
+        defaultCertGradesId: [],
+        rolesId: [],
+        uid: []
       }
     },
     postToThread: {
@@ -31,6 +37,12 @@ module.exports = {
         }
       },
       anonymous: {
+        status: false,
+        defaultCertGradesId: [],
+        rolesId: [],
+        uid: []
+      },
+      survey: {
         status: false,
         defaultCertGradesId: [],
         rolesId: [],

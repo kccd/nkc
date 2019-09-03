@@ -57,7 +57,9 @@ NKC.modules.SurveyEdit = function() {
         disabled: false,
         reward: { rewardedCount: 0, rewardCount: 0, onceKcb: 0, status: false },
         permission:
-        { voteUpCount: 0,
+        {
+          visitor: false,
+          voteUpCount: 0,
           postCount: 0,
           threadCount: 0,
           digestThreadCount: 0,

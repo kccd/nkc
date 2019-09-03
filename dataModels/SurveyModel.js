@@ -119,6 +119,10 @@ const schema = new Schema({
   },
   // 投票者的权限
   permission: {
+    visitor: {
+      type: Boolean,
+      default: false
+    },
     certsId: { // 证书ID
       type: [String],
       default: ["default"]
@@ -237,26 +241,29 @@ schema.statics.createSurvey = async (survey) => {
   if((new Date(survey.et)).getTime() <= now) throwErr(400, "结束时间必须大于当前时间");
   const {
     registerTime, digestThreadCount, threadCount, postCount, voteUpCount,
-    minGradeId, certsId
+    minGradeId, certsId, visitor
   } = permission;
-  permission.registerTime = parseInt(registerTime);
-  if(permission.registerTime < 0) throwErr(400, "注册时间不能小于0");
-  permission.digestThreadCount = parseInt(digestThreadCount);
-  if(permission.digestThreadCount < 0) throwErr(400, "加精文章数目不能小于0");
-  permission.threadCount = parseInt(threadCount);
-  if(permission.threadCount < 0) throwErr(400, "文章总数不能小于0");
-  permission.postCount = parseInt(postCount);
-  if(permission.postCount < 0) throwErr(400, "回复总数不能小于0");
-  permission.voteUpCount = parseInt(voteUpCount);
-  if(permission.voteUpCount < 0) throwErr(400, "点赞数不能小于0");
-  permission.minGradeId = parseInt(minGradeId);
-  const grades = await mongoose.model("usersGrades").find().sort({_id: 1});
-  if(permission.minGradeId < grades[0]._id || permission.minGradeId > grades[grades.length - 1]._id) {
-    throwErr(400, "最小用户等级设置错误，请重新选择");
+  // 如果允许游客参与，则默认允许所有用户参与。
+  if(!visitor) {
+    permission.registerTime = parseInt(registerTime);
+    if(permission.registerTime < 0) throwErr(400, "注册时间不能小于0");
+    permission.digestThreadCount = parseInt(digestThreadCount);
+    if(permission.digestThreadCount < 0) throwErr(400, "加精文章数目不能小于0");
+    permission.threadCount = parseInt(threadCount);
+    if(permission.threadCount < 0) throwErr(400, "文章总数不能小于0");
+    permission.postCount = parseInt(postCount);
+    if(permission.postCount < 0) throwErr(400, "回复总数不能小于0");
+    permission.voteUpCount = parseInt(voteUpCount);
+    if(permission.voteUpCount < 0) throwErr(400, "点赞数不能小于0");
+    permission.minGradeId = parseInt(minGradeId);
+    const grades = await mongoose.model("usersGrades").find().sort({_id: 1});
+    if(permission.minGradeId < grades[0]._id || permission.minGradeId > grades[grades.length - 1]._id) {
+      throwErr(400, "最小用户等级设置错误，请重新选择");
+    }
+    if(!certsId.length) throwErr(400, "请至少勾选一个证书");
+    const certsCount = await mongoose.model("roles").count({_id: {$in: certsId}});
+    if(certsCount !== certsId.length) throwErr(400, "证书勾选错误，请重新勾选");
   }
-  if(!certsId.length) throwErr(400, "请至少勾选一个证书");
-  const certsCount = await mongoose.model("roles").count({_id: {$in: certsId}});
-  if(certsCount !== certsId.length) throwErr(400, "证书勾选错误，请重新勾选");
   if(!survey.mid) survey.mid = survey.uid;
   survey._id = await SettingModel.operateSystemID("surveys", 1);
   const s = SurveyModel(survey);
@@ -269,11 +276,14 @@ schema.statics.createSurvey = async (survey) => {
 * @author pengxiguaa 2019-8-29
 * */
 schema.methods.checkUserPermission = async function(uid) {
+  const {
+    registerTime, digestThreadCount, threadCount, postCount, voteUpCount, certsId, minGradeId,
+    visitor
+  } = this.permission;
+  if(visitor) return;
+  if(!uid) throwErr(403, "作者设定了未登录用户无法参与");
   const UserModel = mongoose.model("users");
   const user = await UserModel.findOnly({uid});
-  const {
-    registerTime, digestThreadCount, threadCount, postCount, voteUpCount, certsId, minGradeId
-  } = this.permission;
   const now = Date.now();
   if(now - new Date(user.toc) < registerTime*24*60*60*1000) throwErr(403, "你的账号注册时间太短，无法参与本次调查");
   if(user.digestThreadsCount < digestThreadCount) throwErr(403, "你的精华文章太少，无法参与本次调查");
@@ -294,9 +304,14 @@ schema.methods.checkUserPermission = async function(uid) {
 * @param {String} uid 用户ID
 * @author pengxiguaa 2019-9-2
 * */
-schema.methods.ensurePostPermission = async function(uid) {
+schema.methods.ensurePostPermission = async function(uid, ip) {
   await this.checkUserPermission(uid);
-  const surveyPost = await mongoose.model("surveyPosts").findOne({uid, surveyId: this._id});
+  let surveyPost;
+  if(uid) {
+    surveyPost = await mongoose.model("surveyPosts").findOne({uid, surveyId: this._id});
+  } else {
+    surveyPost = await mongoose.model("surveyPosts").findOne({ip, surveyId: this._id});
+  }
   if(surveyPost) throwErr(403, "你已经提交过了");
   if(this.disabled) throwErr(403, "该调查已屏蔽");
   const now = Date.now();
@@ -350,7 +365,7 @@ schema.methods.computePostCount = async function() {
 * @author pengxiguaa 2019-9-3
 * */
 schema.methods.getPostUsers = async function() {
-  const posts = await mongoose.model("surveyPosts").find({surveyId: this._id}, {uid: 1});
+  const posts = await mongoose.model("surveyPosts").find({surveyId: this._id, uid: {$ne: ""}}, {uid: 1});
   const uid = posts.map(p => p.uid);
   return await mongoose.model("users").find({uid: {$in: uid}}, {uid: 1, avatar: 1});
 };
