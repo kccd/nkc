@@ -213,3 +213,15 @@ NKC.methods.getSize = function(size, digits) {
   }
   return size;
 };
+/*
+* 获取随机颜色
+* */
+NKC.methods.getRandomColor = function() {
+  var str = "0123456789abcdef";
+  var color = "#";
+  for(var i = 0; i < 6; i++) {
+    var index = Math.round(Math.random()*15);
+    color += str.slice(index, index + 1);
+  }
+  return color;
+};

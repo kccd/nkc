@@ -14,15 +14,23 @@ router
     const {db, data} = ctx;
     const {survey} = data;
     data.havePermission = false;
+    data.users = await survey.getPostUsers();
     if(data.user) {
       data.surveyPost = await db.SurveyPostModel.findOne({uid: data.user.uid, surveyId: survey._id});
-      console.log(data.surveyPost);
       try{
         await survey.checkUserPermission(data.user.uid);
         data.havePermission = true;
       } catch(err) {
         console.log(err);
       }
+    }
+    // 获取投票结果
+    if(
+      survey.showResult === "all" ||
+      (survey.showResult === "self" && data.user && data.user.uid === survey.uid) ||
+      survey.showResult === "posted" && data.surveyPost
+    ) {
+      data.showResult = true;
     }
     await next();
   })
@@ -52,7 +60,7 @@ router
           let score = answer.score;
           score = Number(score.toFixed(2));
           if(score < minScore || score > maxScore) {
-            ctx.throw(400, "打分分值不在要求的范围内");
+            ctx.throw(400, "分值不在要求的范围内");
           }
         }
         option.answers[j] = {
@@ -72,11 +80,14 @@ router
     const surveyPost = db.SurveyPostModel({
       _id: await db.SettingModel.operateSystemID("surveyPosts", 1),
       surveyId: survey._id,
+      ip: ctx.address,
+      port: ctx.port,
       surveyType: survey.type,
       uid: user.uid,
       options
     });
     await surveyPost.save();
+    await survey.computePostCount();
     data.surveyPost = surveyPost;
     await next();
   });

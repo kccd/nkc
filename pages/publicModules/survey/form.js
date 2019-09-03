@@ -7,18 +7,31 @@ NKC.modules.SurveyForm = function(id) {
     data: {
       loading: true,
       survey: "",
+      showResult: false,
       havePermission: false,
       posted: false,
       options: [], // vote: optionsId, score: {score: 2}, survey: {answer: id}
       status: "", // unStart, beginning, end;
-      surveyPost: ""
+      surveyPost: "",
+      users: []
     },
     computed: {
+      // 投票结果总结
+      postResult: function() {
+        if(!this.showResult) return;
+        var survey = qthis.survey;
+        if(survey.type !== 'score') {
+          return "参与人数：" + survey.postCount;
+        } else {
+          return "参与人数：" + survey.postCount;
+        }
+      },
       timeInfo: function() {
         var status = this.status;
         if(status === "unStart") return "调查将于 " + this.startTime + " 开始，"+this.endTime+" 结束。";
         else if(status === "beginning") return "调查将于 "+this.endTime+" 结束。";
-        else return "调查已结束。";
+        else if(status === "end") return "调查已结束。";
+        else return ""
       },
       formName: function() {
         return {
@@ -77,6 +90,7 @@ NKC.modules.SurveyForm = function(id) {
     },
     methods: {
       format: NKC.methods.format,
+      getColor: NKC.methods.getRandomColor,
       checkTime: function() {
         var survey = this.survey;
         var this_ = this;
@@ -112,6 +126,7 @@ NKC.modules.SurveyForm = function(id) {
             this_.surveyPost = data.surveyPost;
             this_.posted = true;
             sweetSuccess("提交成功");
+            this_.getSurveyById(survey._id);
           })
           .catch(function(data) {
             sweetError(data);
@@ -153,6 +168,8 @@ NKC.modules.SurveyForm = function(id) {
         nkcAPI("/survey/" + id, "GET")
           .then(function(data) {
             var options = [];
+            app.showResult = data.showResult;
+            app.users = data.users;
             if(data.surveyPost) {
               app.surveyPost = data.surveyPost;
               options = data.surveyPost.options;
@@ -181,6 +198,17 @@ NKC.modules.SurveyForm = function(id) {
             }
             app.havePermission = data.havePermission;
             app.options = options;
+            if(app.showResult) {
+              for(var i = 0; i < data.survey.options.length; i++) {
+                var option = data.survey.options[i];
+                for(var j = 0; j < option.answers.length; j++) {
+                  var answer = option.answers[j];
+                  answer.color = app.getColor();
+                  answer.progress = data.survey.postCount === 0? 0: ((answer.postCount || 0)*100/(data.survey.postCount || 0)).toFixed(1);
+                  answer.average = data.survey.postCount === 0? 0: ((answer.postScore || 0)/(data.survey.postCount||0)).toFixed(2);
+                }
+              }
+            }
             app.survey = data.survey;
             app.loading = false;
           })

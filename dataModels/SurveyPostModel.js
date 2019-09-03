@@ -25,6 +25,15 @@ const schema = new Schema({
     type: Date,
     default: Date.now,
     index: 1
+  },
+  ip: {
+    type: String,
+    default: '',
+    index: 1
+  },
+  port: {
+    type: String,
+    default: ""
   }
 }, {
   collection: "surveyPosts"

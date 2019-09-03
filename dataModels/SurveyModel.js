@@ -12,6 +12,11 @@ const schema = new Schema({
     type: String,
     default: "all"
   },
+  // 总投票人数
+  postCount: {
+    type: Number,
+    default: 0
+  },
   options: {
     type: Schema.Types.Mixed,
     default: []
@@ -53,6 +58,16 @@ const schema = new Schema({
       resourcesId: {
         type: [String],
         default: []
+      },
+      // 选择该选项的总人数
+      postCount: {
+        type: Number,
+        default: 0
+      },
+      // 该选项的总得分
+      postScore: {
+        type: Number,
+        default: 0
       }
     },
     voteCount: {
@@ -181,7 +196,8 @@ schema.statics.createSurvey = async (survey) => {
     const option = options[i];
     if(!option.content) throwErr(400, `调查内容${i+1}不能为空`);
     if(!option.answers || !option.answers.length) throwErr(400, "请为每个调查内容至少添加一个选项");
-    for(const answer of option.answers) {
+    for(let j = 0; j < option.answers.length; j++) {
+      const answer = option.answers[j];
       if(!answer.content) throwErr(400, `调查内容${i+1}的选项内容不能为空`);
       answer.minScore = parseInt(answer.minScore);
       answer.maxScore = parseInt(answer.maxScore);
@@ -190,6 +206,16 @@ schema.statics.createSurvey = async (survey) => {
         if(answer.maxScore <= answer.minScore) throwErr(400, `调查内容${i+1}的选项最大分值必须大于最小分值`);
       }
       answer._id = await SettingModel.operateSystemID("surveyOptionAnswers", 1);
+      option.answers[j] = {
+        content: answer.content,
+        resourcesId: answer.resourcesId,
+        links: answer.links,
+        minScore: answer.minScore,
+        maxScore: answer.maxScore,
+        _id: answer._id,
+        postCount: answer.postCount || 0,
+        postScore: answer.postScore || 0
+      }
     }
     option.voteCount = parseInt(option.voteCount);
     if(type !== "score") {
@@ -197,6 +223,14 @@ schema.statics.createSurvey = async (survey) => {
       if(option.voteCount > option.answers.length) throwErr(400, `调查内容${i+1}的最大选择数量不能大于选项数量`);
     }
     option._id = await SettingModel.operateSystemID("surveyOptions", 1);
+    options[i] = {
+      content: option.content,
+      resourcesId: option.resourcesId,
+      links: option.links,
+      _id: option._id,
+      answers: option.answers,
+      voteCount: option.voteCount || 0
+    }
   }
   const now = Date.now();
   if((new Date(survey.st)).getTime() >= (new Date(survey.et)).getTime()) throwErr(400, "结束时间必须大于开始时间");
@@ -255,6 +289,11 @@ schema.methods.checkUserPermission = async function(uid) {
   }
   throwErr(403, "证书不符合要求");
 };
+/*
+* 验证用户是否能够投票
+* @param {String} uid 用户ID
+* @author pengxiguaa 2019-9-2
+* */
 schema.methods.ensurePostPermission = async function(uid) {
   await this.checkUserPermission(uid);
   const surveyPost = await mongoose.model("surveyPosts").findOne({uid, surveyId: this._id});
@@ -264,5 +303,55 @@ schema.methods.ensurePostPermission = async function(uid) {
   if(now < new Date(this.st).getTime()) throwErr(403, "调查暂未开始");
   if(now > new Date(this.et).getTime()) throwErr(403, "调查已结束");
 };
-
+/*
+* 计算投票人数以及每个选项的投票人数和总得分
+* @author pengxiguaa 2019-9-3
+* */
+schema.methods.computePostCount = async function() {
+  const SurveyPostModel = mongoose.model("surveyPosts");
+  const posts = await SurveyPostModel.find({surveyId: this._id});
+  const count = posts.length;
+  const {options} = this;
+  const optionsObj = {};
+  for(const option of options) {
+    option.answersObj = {};
+    for(const answer of option.answers) {
+      answer.postCount = 0;
+      answer.postScore = 0;
+      option.answersObj[answer._id] = answer;
+    }
+    optionsObj[option._id] = option;
+  }
+  for(const post of posts) {
+    for(const o of post.options) {
+      const option = optionsObj[o._id];
+      if(!option) continue;
+      for(const a of o.answers) {
+        const answer = option.answersObj[a._id];
+        if(!answer) continue;
+        if(this.type === "score") {
+          answer.postScore += a.score || 0;
+        } else {
+          if(!a.selected) continue;
+          answer.postCount ++;
+        }
+      }
+    }
+  }
+  for(const o of options) {
+    delete o.answersObj;
+  }
+  await this.update({postCount: count, options});
+  return count;
+};
+/*
+* 获取已投票的用户
+* @return {[Object]} 用户对象组成的数组
+* @author pengxiguaa 2019-9-3
+* */
+schema.methods.getPostUsers = async function() {
+  const posts = await mongoose.model("surveyPosts").find({surveyId: this._id}, {uid: 1});
+  const uid = posts.map(p => p.uid);
+  return await mongoose.model("users").find({uid: {$in: uid}}, {uid: 1, avatar: 1});
+};
 module.exports = mongoose.model("surveys", schema);

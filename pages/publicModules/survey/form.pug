@@ -9,9 +9,9 @@
     .survey-form-options(v-if="survey.type === 'vote'")
       .survey-form-option.option-answer(v-for="o, index in survey.options[0].answers")
         .option-content {{index + 1}}. {{o.content}}
-          .option-button(@click="selectOption(0, index)")
+          .option-button(@click="selectOption(0, index)" v-if="havePermission")
             .fa.fa-check-square-o(v-if="options[0].answers[index].selected")
-            .fa.fa-square-o(v-else)
+            .fa.fa-square-o(v-else-if="!posted")
         .option-info
           .option-resources(v-if="o.resourcesId && o.resourcesId.length")
             .option-resource
@@ -19,6 +19,12 @@
             //p {{o.description}}
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-status(v-if="showResult")
+          .option-status-container
+            .number-background
+            .number(:style="'width: ' + o.progress + '%;background-color:' + o.color")
+          .option-status-info(:title="o.progress + '% ' + o.postCount + '票'") {{o.progress}}% {{o.postCount}}票
+
     .survey-form-options(v-else)
       .survey-form-option(v-for="o, index in survey.options")
         .option-content.option-survey {{index + 1}}. {{o.content}}
@@ -26,8 +32,8 @@
             select()
               option(v-for="s in o.scores" :value="s") {{s}}
         .option-info
-          .option-resources(v-if="o.resourcesId && o.resourcesId.length")
-            .option-resource
+          .option-resources
+            .option-resource(v-if="o.resourcesId && o.resourcesId.length")
               div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
             //p {{o.description}}
             .option-links(v-if="o.links && o.links.length")
@@ -36,16 +42,17 @@
           .option-answer(v-for="a,index_ in o.answers")
             .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
               .option-button(v-if="survey.type === 'score'")
-                span.survey-score-score ({{a.minScore}}-{{a.maxScore}})
+                span.survey-score-score(v-if="!posted") 范围:{{a.minScore}}-{{a.maxScore}}
                 input.survey-score-input(type="text" v-model.number="options[index].answers[index_].score" v-if="!posted")
                 //-select(v-model="options[index][index_].score" v-if="!posted")
                   option(v-for="s in a.scores" :value="s") {{s}}
-                span.score(v-else)
+                span.score(v-else :title="'范围：' + a.minScore + '-' + a.maxScore + '，已打分：' + options[index].answers[index_].score")
                   //| 打分：
-                  b {{options[index].answers[index_].score}}分
-              .option-button(@click="selectOption(index, index_)" v-if="survey.type === 'survey'")
+                  span 已打分：
+                    b {{options[index].answers[index_].score}}
+              .option-button(@click="selectOption(index, index_)" v-if="survey.type === 'survey' && havePermission")
                 .fa.fa-check-square-o(v-if="options[index].answers[index_].selected")
-                .fa.fa-square-o(v-else)
+                .fa.fa-square-o(v-else-if="!posted")
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
@@ -53,12 +60,29 @@
                 //p {{o.description}}
                 .option-links(v-if="a.links && a.links.length")
                   a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
+            .option-status(v-if="showResult")
+              div(v-if="survey.type === 'survey'")
+                .option-status-container
+                  .number-background
+                  .number(:style="'width: ' + a.progress + '%;background-color:' + a.color")
+                .option-status-info(:title="a.progress + '% ' + a.postCount + '票'") {{a.progress}}% {{a.postCount}}票
+              div(v-else)
+                .option-status-info.survey-score(:title="'范围：' + a.minScore + '-' + a.maxScore + '，平均打分' + a.average") 平均打分：{{a.average}}
     .survey-form-button
+      .form-post-users
+        .form-post-user(v-for="user in users")
+          a(onclick="visitUrl('/u/' + user.uid)")
+            img(:src="'/avatar/' + user.avatar")
       .form-warning
+        //- 显示投票结果
+        p(v-if="showResult") {{postResult}}
+        //- 时间限制
         p(v-if="timeInfo") {{timeInfo}}
+        //- 提交时间
         p(v-if="postTime") 你已于 {{postTime}} 提交调查结果。
+        //- 权限提示
         p(v-if="!havePermission") 作者限定了参与投票的人员范围，您的账号不在参与范围之内。
-        p(v-else-if="totalScore") 总分{{totalScore}}，总打分{{postScore}}，平均打分{{(postScore/answerCount).toFixed(2)}}。
+        //p(v-else-if="totalScore") 总分{{totalScore}}，总打分{{postScore}}，平均打分{{(postScore/answerCount).toFixed(2)}}。
       .form-button(v-if="!posted")
         button.btn.btn-primary.btn-sm(disabled v-if="!havePermission || status !== 'beginning'")  提交
         button.btn.btn-primary.btn-sm(@click="submit" v-else)  提交
