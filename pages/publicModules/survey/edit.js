@@ -100,13 +100,22 @@ NKC.modules.SurveyEdit = function() {
           links: [],
           links_: [],
           resourcesId: [],
-          voteCount: 1
+          maxVoteCount: 1,
+          minVoteCount: 1
         }
       },
       getVoteCount: function(o) {
         var count = (o.answers || []).length;
         var arr = [];
         for(var i = 1; i <= count; i++) {
+          arr.push(i);
+        }
+        return arr;
+      },
+      getMinVoteCount: function(o) {
+        var count = (o.answers || []).length;
+        var arr = [];
+        for(var i = 0; i <= count; i++) {
           arr.push(i);
         }
         return arr;
@@ -184,7 +193,6 @@ NKC.modules.SurveyEdit = function() {
         }
       },
       addLink: function(o) {
-        console.log(o)
         o.links_.push({
           index: o.links_.length,
           link: "http://"
@@ -254,7 +262,7 @@ NKC.modules.SurveyEdit = function() {
       },
       te: function(err) {
         // this.error = err.error || err;
-        sweetError(err);
+        throw err;
       },
       submit: function() {
         this.error = "";
@@ -277,8 +285,10 @@ NKC.modules.SurveyEdit = function() {
             }
             answer.links = this_.modifyLinks(answer.links_, "str");
           }
-          if(!option.voteCount) return te("最大选择数量不能小于1");
-          if(option.voteCount > option.answers.length) return te("最大选择数量不能超过选项数量");
+          if(!option.maxVoteCount) return te("最大选择数量不能小于1");
+          if(option.minVoteCount < 0) return te("最小选择数量不能小于0");
+          if(option.maxVoteCount > option.answers.length) return te("最大选择数量不能超过选项数量");
+          if(option.minVoteCount > option.maxVoteCount) return te("最小选择数量不能超过最大选择数量");
         }
         var timeEnd = this.timeEnd;
         var timeStart = this.timeStart;
@@ -320,8 +330,8 @@ NKC.modules.SurveyEdit = function() {
               }
             }
           }
-          self.setTime(new Date(self.app.survey.st), new Date(self.app.survey.et));
           self.app.survey = data.survey;
+          self.app.setTime(new Date(self.app.survey.st), new Date(self.app.survey.et));
         })
         .catch(function(data) {
           sweetError(data);

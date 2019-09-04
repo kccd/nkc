@@ -107,6 +107,13 @@ editorRouter
 	    data.l = targetPost.l;
       data.targetUser = await targetPost.extendUser();  //回复对象
       data.targetForumsId = data.targetPost.mainForumsId;
+      // 附带调查信息
+      /*if(data.targetPost.surveyId) {
+        const survey = await db.SurveyModel.findOne({_id: data.targetPost.pid});
+        if(survey) {
+
+        }
+      }*/
       // 在屏蔽日志中查找该帖子是否处于正在退修中
       // 如果是正在退修，取出原因，并显示在编辑器中
       let delPostLog = await db.DelPostLogModel.find({"postId":id,"delType":"toDraft","modifyType":false}).sort({toc:-1})
@@ -136,6 +143,12 @@ editorRouter
       const allowedAnonymousForums = await db.ForumModel.find({allowedAnonymousPost: true}, {fid: 1});
       data.allowedAnonymousForumsId = allowedAnonymousForums.map(f => f.fid);
     }
+
+
+    if(!type || type === "forum") {
+      data.createSurveyPermission = await db.SurveyModel.ensureCreatePermission("postToForum", data.user.uid);
+    }
+
     await next();
   });
 

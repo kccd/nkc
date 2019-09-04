@@ -187,9 +187,12 @@ const schema = new Schema({
 }, {
   collection: "surveys"
 });
-
-schema.statics.createSurvey = async (survey) => {
-  const SurveyModel = mongoose.model("surveys");
+/*
+* 检查调查表数据
+* @param {Object} survey 调查表数据
+* @author pengxiguaa 2019-9-4
+* */
+schema.statics.checkSurveyData = async (survey) => {
   const SettingModel = mongoose.model("settings");
   const {
     options, reward, permission, type
@@ -209,7 +212,7 @@ schema.statics.createSurvey = async (survey) => {
         if(answer.minScore < 1) throwErr(400, `调查内容${i+1}的选项最小分值不能小于1`);
         if(answer.maxScore <= answer.minScore) throwErr(400, `调查内容${i+1}的选项最大分值必须大于最小分值`);
       }
-      answer._id = await SettingModel.operateSystemID("surveyOptionAnswers", 1);
+      if(!answer._id) answer._id = await SettingModel.operateSystemID("surveyOptionAnswers", 1);
       option.answers[j] = {
         content: answer.content,
         resourcesId: answer.resourcesId,
@@ -218,22 +221,29 @@ schema.statics.createSurvey = async (survey) => {
         maxScore: answer.maxScore,
         _id: answer._id,
         postCount: answer.postCount || 0,
-        postScore: answer.postScore || 0
+        postScore: answer.postScore || 0,
+        postMaxScore: answer.postMaxScore || 0,
+        postMinScore: answer.postMinScore || 0
       }
     }
-    option.voteCount = parseInt(option.voteCount);
+    option.maxVoteCount = parseInt(option.maxVoteCount);
+    option.minVoteCount = parseInt(option.minVoteCount);
     if(type !== "score") {
-      if(!option.voteCount) throwErr(400, `调查内容${i+1}的最大选择数量不能小于1`);
-      if(option.voteCount > option.answers.length) throwErr(400, `调查内容${i+1}的最大选择数量不能大于选项数量`);
+      if(!option.maxVoteCount) throwErr(400, `调查内容${i+1}的最大选择数量不能小于1`);
+      if(option.minVoteCount < 0) throwErr(400, `调查内容${i+1}的最小选择数量不能小于0`);
+      if(option.maxVoteCount > option.answers.length) throwErr(400, `调查内容${i+1}的最大选择数量不能大于选项数量`);
+      if(option.minVoteCount > option.maxVoteCount) throwErr(400, `调查内容${i+1}的最小选择数量不能大于最大选择数量`);
     }
-    option._id = await SettingModel.operateSystemID("surveyOptions", 1);
+    if(!option._id) option._id = await SettingModel.operateSystemID("surveyOptions", 1);
     options[i] = {
       content: option.content,
       resourcesId: option.resourcesId,
       links: option.links,
       _id: option._id,
       answers: option.answers,
-      voteCount: option.voteCount || 0
+      postCount: option.postCount || 0,
+      maxVoteCount: option.maxVoteCount || 0,
+      minVoteCount: option.minVoteCount || 0,
     }
   }
   const now = Date.now();
@@ -264,11 +274,49 @@ schema.statics.createSurvey = async (survey) => {
     const certsCount = await mongoose.model("roles").count({_id: {$in: certsId}});
     if(certsCount !== certsId.length) throwErr(400, "证书勾选错误，请重新勾选");
   }
+};
+/*
+* 创建调查表
+* @param {Object} survey 调查表数据
+* @author pengxiguaa 2019-9-4
+* */
+schema.statics.createSurvey = async (survey) => {
+  await mongoose.model("surveys").checkSurveyData(survey);
+  const SettingModel = mongoose.model("settings");
+  const SurveyModel = mongoose.model("surveys");
   if(!survey.mid) survey.mid = survey.uid;
   survey._id = await SettingModel.operateSystemID("surveys", 1);
   const s = SurveyModel(survey);
   await s.save();
   return s;
+};
+/*
+* 修改调查表
+* @param {Object} survey 调查表数据
+* @author pengxiguaa 2019-9-4
+* */
+schema.statics.modifySurvey = async (survey) => {
+  await mongoose.model("surveys").checkSurveyData(survey);
+  const SurveyModel = mongoose.model("surveys");
+  const {
+    st, et,
+    reward, permission, description, options, showResult
+  } = survey;
+  const surveyDB = await SurveyModel.findOnly({_id: survey._id});
+  await SurveyModel.updateOne({
+    _id: survey._id
+  }, {
+    $set: {
+      st,
+      et,
+      reward,
+      permission,
+      description,
+      options,
+      showResult
+    }
+  });
+  await surveyDB.computePostCount();
 };
 /*
 * 验证用户是否有权限参与投票
@@ -331,19 +379,44 @@ schema.statics.ensureCreatePermission = async (type, userId) => {
 * @param {String} uid 用户ID
 * @author pengxiguaa 2019-9-2
 * */
-schema.methods.ensurePostPermission = async function(uid, ip) {
+schema.methods.ensurePostPermission = async function (uid, ip) {
   await this.checkUserPermission(uid);
   let surveyPost;
-  if(uid) {
+  if (uid) {
     surveyPost = await mongoose.model("surveyPosts").findOne({uid, surveyId: this._id});
   } else {
     surveyPost = await mongoose.model("surveyPosts").findOne({ip, surveyId: this._id});
   }
-  if(surveyPost) throwErr(403, "你已经提交过了");
-  if(this.disabled) throwErr(403, "该调查已屏蔽");
+  if (surveyPost) throwErr(403, "你已经提交过了");
+  if (this.disabled) throwErr(403, "该调查已屏蔽");
   const now = Date.now();
-  if(now < new Date(this.st).getTime()) throwErr(403, "调查暂未开始");
-  if(now > new Date(this.et).getTime()) throwErr(403, "调查已结束");
+  if (now < new Date(this.st).getTime()) throwErr(403, "调查暂未开始");
+  if (now > new Date(this.et).getTime()) throwErr(403, "调查已结束");
+};
+/*
+* 通过内容ID和选项ID获取选项信息
+* @param {Number} optionId 内容ID
+* @param {Number} answerId 选项ID
+* @author pengxiguaa 2019-9-4
+* */
+schema.methods.getAnswerById = function(optionId, answerId) {
+  for(const option of this.options) {
+    if(option._id === optionId) {
+      for(const answer of option.answers) {
+        if(answer._id === answerId) return answer;
+      }
+    }
+  }
+};
+/*
+* 通过内容ID获取内容信息
+* @param {Number} optionId 内容ID
+* @author pengxiguaa 2019-9-4
+* */
+schema.methods.getOptionById = function(optionId) {
+  for(const option of this.options) {
+    if(optionId === option._id) return option;
+  }
 };
 /*
 * 计算投票人数以及每个选项的投票人数和总得分
@@ -351,32 +424,40 @@ schema.methods.ensurePostPermission = async function(uid, ip) {
 * */
 schema.methods.computePostCount = async function() {
   const SurveyPostModel = mongoose.model("surveyPosts");
-  const posts = await SurveyPostModel.find({surveyId: this._id});
+  const survey = await mongoose.model("surveys").findOne({_id: this._id});
+  const posts = await SurveyPostModel.find({surveyId: survey._id});
   const count = posts.length;
-  const {options} = this;
+  const {options} = survey;
   const optionsObj = {};
   for(const option of options) {
     option.answersObj = {};
+    option.postCount = 0;
     for(const answer of option.answers) {
       answer.postCount = 0;
       answer.postScore = 0;
+      answer.postMaxScore = 0;
+      answer.postMinScore = 0;
       option.answersObj[answer._id] = answer;
     }
     optionsObj[option._id] = option;
   }
   for(const post of posts) {
+    const optionPostCount = {};
     for(const o of post.options) {
-      const option = optionsObj[o._id];
-      if(!option) continue;
-      for(const a of o.answers) {
-        const answer = option.answersObj[a._id];
-        if(!answer) continue;
-        if(this.type === "score") {
-          answer.postScore += a.score || 0;
-        } else {
-          if(!a.selected) continue;
-          answer.postCount ++;
-        }
+      const answer = survey.getAnswerById(o.optionId, o.answerId);
+      const option = survey.getOptionById(o.optionId);
+      if(!answer || !option) continue;
+      if(!optionPostCount[option._id]) {
+        optionPostCount[option._id] = true;
+        option.postCount ++;
+      }
+      if(this.type === "score") {
+        answer.postScore += o.score || 0;
+        if(answer.postMinScore > o.score) answer.postMinScore = o.score;
+        if(answer.postMaxScore < o.score) answer.postMaxScore = o.score;
+      } else {
+        if(!o.selected) continue;
+        answer.postCount ++;
       }
     }
   }

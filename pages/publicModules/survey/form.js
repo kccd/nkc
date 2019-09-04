@@ -16,6 +16,18 @@ NKC.modules.SurveyForm = function(id) {
       users: []
     },
     computed: {
+      // 已选结果
+      optionsObj: function() {
+        var obj = {};
+        var options = this.options;
+        for(var i = 0; i < options.length; i++) {
+          var option = options[i];
+          if(option && option.answerId && option.optionId) {
+            obj[option.optionId + "-" + option.answerId] = option
+          }
+        }
+        return obj;
+      },
       // 投票结果总结
       postResult: function() {
         if(!this.showResult) return;
@@ -91,6 +103,26 @@ NKC.modules.SurveyForm = function(id) {
     methods: {
       format: NKC.methods.format,
       getColor: NKC.methods.getRandomColor,
+      resetSelectedAnswerById: function(optionId) {
+        for(var i = 0; i < this.options.length; i++) {
+          var option = this.options[i];
+          if(option.optionId === optionId) option.selected = false;
+        }
+      },
+      getSelectedAnswerCountById: function(optionId) {
+        var count = 0;
+        for(var i = 0; i < this.options.length; i++) {
+          var option = this.options[i];
+          if(option.optionId === optionId && option.selected) count++;
+        }
+        return count;
+      },
+      getOptionById: function(optionId, answerId) {
+        for(var i = 0; i < this.options.length; i++) {
+          var option = this.options[i];
+          if(option.optionId === optionId && option.answerId === answerId) return option;
+        }
+      },
       checkTime: function() {
         var survey = this.survey;
         var this_ = this;
@@ -117,7 +149,6 @@ NKC.modules.SurveyForm = function(id) {
         var this_ = this;
         var survey = this.survey;
         var options = this.options;
-        var type = survey.type;
         // 投票
         nkcAPI("/survey/" + survey._id, "POST", {
           options: options
@@ -138,26 +169,32 @@ NKC.modules.SurveyForm = function(id) {
         if(this.status !== "beginning" || this.posted) return;
         var options = this.options;
         var survey = this.survey;
-        var a = survey.options[index].answers[aIndex];
-        var selected = options[index].answers[aIndex].selected;
+        var option = survey.options[index];
+        var answer = option.answers[aIndex];
+        var selectedOption = this.getOptionById(option._id, answer._id);
+        var selected = selectedOption && selectedOption.selected;
         if(selected) {
-          options[index].answers[aIndex].selected = false;
+          selectedOption.selected = false;
         } else {
-          var selectedCount = 0;
-          for(var i = 0; i < options[index].answers.length; i++) {
-            if(options[index].answers[i].selected) selectedCount ++;
-          }
-          if(selectedCount >= survey.options[index].voteCount) {
+          var selectedCount = this.getSelectedAnswerCountById(option._id);
+          if(selectedCount >= survey.options[index].maxVoteCount) {
             // 如果是单选，则勾选其他时取消已选
-            if(survey.options[index].voteCount === 1) {
-              for(var i = 0; i < options[index].length; i++) {
-                options[index].answers[i].selected = false;
-              }
+            if(survey.options[index].maxVoteCount === 1) {
+              this.resetSelectedAnswerById(option._id);
             } else {
               return;
             }
           }
-          options[index].answers[aIndex].selected = true;
+          if(selectedOption) {
+            selectedOption.selected = true;
+          } else {
+            options.push({
+              score: "",
+              selected: true,
+              optionId: option._id,
+              answerId: answer._id
+            });
+          }
         }
       },
       visitUrl: function(url){
@@ -177,23 +214,15 @@ NKC.modules.SurveyForm = function(id) {
             } else {
               for(var i = 0; i < data.survey.options.length; i++) {
                 var o = data.survey.options[i];
-                var answers_ = [];
                 for(var j = 0; j < o.answers.length; j++) {
                   var answer = o.answers[j];
-                  answer.scores = [];
-                  for(var n = answer.minScore ||0; n <= answer.maxScore||0; n++) {
-                    answer.scores.push(n);
-                  }
-                  answers_.push({
-                    _id: answer._id,
-                    score: 0,
-                    selected: false
+                  options.push({
+                    optionId: o._id,
+                    answerId: answer._id,
+                    selected: false,
+                    score: ""
                   });
                 }
-                options.push({
-                  _id: o._id,
-                  answers: answers_
-                });
               }
             }
             app.havePermission = data.havePermission;

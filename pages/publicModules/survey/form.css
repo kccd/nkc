@@ -200,7 +200,7 @@
 .module-survey-form .answer-content{
   background-color: #f6f6f6;
   font-weight: normal;
-  padding-right: 10rem;
+  padding-right: 0;
   font-size: 1.2rem;
   margin-bottom: 0;
 }
@@ -255,7 +255,10 @@
   right: 0;
 }
 .module-survey-form .option-status-info.survey-score{
-  width: 12rem;
+  width: 100%;
+  position: relative;
+  padding-top: 0.3rem;
+  text-align: right;
 }
 .module-survey-form .form-post-users a{
   display: inline-block;
@@ -266,4 +269,17 @@
   width: 3rem;
   border: 2px solid #f4f4f4;
   border-radius: 50%;
+}
+.module-survey-form .option-score-input{
+  display: inline-block;
+  color: #888;
+}
+.module-survey-form .option-score-input .score{
+  font-size: 1.2rem;
+  font-weight: 700;
+  /*color: #9baec8;*/
+  display: inline;
+}
+.module-survey-form .option-score-limit{
+  display: inline-block;
 }

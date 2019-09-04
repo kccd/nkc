@@ -3,14 +3,16 @@
   .text-center.m-t-3.m-b-3(v-if="loading")
     b 加载中...
   div(v-else)
-    //.survey-form-header {{formName}}
+    //- 表单介绍，当类型为"vote"时，内容从option[0].content中取
     .survey-form-description(v-if="survey.type !== 'vote'") {{survey.description}}
     .survey-form-description(v-else) {{survey.options[0].content}}
+
+    // 投票
     .survey-form-options(v-if="survey.type === 'vote'")
       .survey-form-option.option-answer(v-for="o, index in survey.options[0].answers")
         .option-content {{index + 1}}. {{o.content}}
           .option-button(@click="selectOption(0, index)" v-if="havePermission")
-            .fa.fa-check-square-o(v-if="options[0].answers[index].selected")
+            .fa.fa-check-square-o(v-if="optionsObj[survey.options[0]._id + '-' + o._id] && optionsObj[survey.options[0]._id + '-' + o._id].selected")
             .fa.fa-square-o(v-else-if="!posted")
         .option-info
           .option-resources(v-if="o.resourcesId && o.resourcesId.length")
@@ -24,13 +26,10 @@
             .number-background
             .number(:style="'width: ' + o.domProgress + '%;background-color:' + o.color")
           .option-status-info(:title="o.progress + '% ' + o.postCount + '票'") {{o.progress}}% {{o.postCount}}票
-
-    .survey-form-options(v-else)
+    // 问卷调查
+    .survey-form-options(v-else-if="survey.type === 'survey'")
       .survey-form-option(v-for="o, index in survey.options")
         .option-content.option-survey {{index + 1}}. {{o.content}}
-          //-.option-button
-            select()
-              option(v-for="s in o.scores" :value="s") {{s}}
         .option-info
           .option-resources
             .option-resource(v-if="o.resourcesId && o.resourcesId.length")
@@ -41,18 +40,34 @@
         .option-answers(v-if="o.answers && o.answers.length")
           .option-answer(v-for="a,index_ in o.answers")
             .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
-              .option-button(v-if="survey.type === 'score'")
-                span.survey-score-score(v-if="!posted") 范围:{{a.minScore}}-{{a.maxScore}}
-                input.survey-score-input(type="text" v-model.number="options[index].answers[index_].score" v-if="!posted")
-                //-select(v-model="options[index][index_].score" v-if="!posted")
-                  option(v-for="s in a.scores" :value="s") {{s}}
-                span.score(v-else :title="'范围：' + a.minScore + '-' + a.maxScore + '，已打分：' + options[index].answers[index_].score")
-                  //| 打分：
-                  span 已打分：
-                    b {{options[index].answers[index_].score}}
-              .option-button(@click="selectOption(index, index_)" v-if="survey.type === 'survey' && havePermission")
-                .fa.fa-check-square-o(v-if="options[index].answers[index_].selected")
+              .option-button(@click="selectOption(index, index_)" v-if="havePermission")
+                .fa.fa-check-square-o(v-if="optionsObj[o._id + '-' + a._id] && optionsObj[o._id + '-' + a._id].selected")
                 .fa.fa-square-o(v-else-if="!posted")
+            .option-info
+              .option-resources
+                .option-resource(v-if="a.resourcesId && a.resourcesId.length")
+                  div(v-for="r in a.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+                .option-links(v-if="a.links && a.links.length")
+                  a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
+            .option-status(v-if="showResult")
+              .option-status-container
+                .number-background
+                .number(:style="'width: ' + a.progress + '%;background-color:' + a.color")
+              .option-status-info(:title="a.progress + '% ' + a.postCount + '票'") {{a.progress}}% {{a.postCount}}票
+
+    // 打分
+    .survey-form-options(v-else)
+      .survey-form-option(v-for="o, index in survey.options")
+        .option-content.option-survey {{index + 1}}. {{o.content}}
+        .option-info
+          .option-resources
+            .option-resource(v-if="o.resourcesId && o.resourcesId.length")
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-answers(v-if="o.answers && o.answers.length")
+          .option-answer(v-for="a,index_ in o.answers")
+            .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
@@ -60,14 +75,12 @@
                 //p {{o.description}}
                 .option-links(v-if="a.links && a.links.length")
                   a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
-            .option-status(v-if="showResult")
-              div(v-if="survey.type === 'survey'")
-                .option-status-container
-                  .number-background
-                  .number(:style="'width: ' + a.progress + '%;background-color:' + a.color")
-                .option-status-info(:title="a.progress + '% ' + a.postCount + '票'") {{a.progress}}% {{a.postCount}}票
-              div(v-else)
-                .option-status-info.survey-score(:title="'范围：' + a.minScore + '-' + a.maxScore + '，平均打分' + a.average") 平均打分：{{a.average}}
+            .option-score-input(v-if="havePermission || posted") 得分：
+              input(type="text" v-model.number="optionsObj[o._id + '-' + a._id].score" v-if="!posted")
+              .score(v-else-if="optionsObj[o._id + '-' + a._id]") {{optionsObj[o._id + '-' + a._id].score}}
+              .score(v-else) 未打分
+              | （范围：{{a.minScore}} - {{a.maxScore}}，精确到 0.01）
+            .option-status-info.survey-score(v-if="showResult") 平均打分：{{a.average}}，最高分：{{a.postMaxScore.toFixed(2)}}，最低分：{{a.postMinScore.toFixed(2)}}
     .survey-form-button
       .form-warning
         //- 显示投票结果

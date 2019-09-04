@@ -65,9 +65,10 @@ block content
               include ./editor/paper.pug
             div.m-b-1
               include ./editor/toColumn
-            div.m-b-1
-              h4 特殊功能
-              include ./publicModules/survey/edit
+            if (data.createSurveyPermission && (!data.type || data.type ==='forum')) || (data.targetPost && data.targetPost.surveyId)
+              div.m-b-1
+                label(style="font-size:16px") 调查
+                include ./publicModules/survey/edit
             .form(style="padding-bottom:20px")
               .form-group
                 //-.checkbox-inline
@@ -108,6 +109,7 @@ block content
                 div#draftDelType(style='display:none')=`${data.draftDelType || ''}`
                 div#draftDelTypeId(style='display:none')=`${data.draftDelTypeId || ''}`
                 div#singleDarft(style='display:none')= JSON.stringify(data.singleDarft)
+                #postData.hidden=objToStr({targetPost: data.targetPost})
   
   include debug_output.pug
 block scripts

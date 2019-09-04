@@ -1,10 +1,10 @@
 +includeCSS("/publicModules/survey/form.css")
 #moduleSurveyEdit(v-cloak)
-  .survey-edit-header {{formName}}
+  //.survey-edit-header {{formName}}
   .survey-edit-body(v-if="survey && roles.length")
     .form.form-horizontal
-      .form-group
-        label.col-sm-2.control-label 类别
+      .form-group(v-if="!survey._id")
+        label.col-sm-1.control-label 类别
         .col-sm-10
           .survey-type(@click="selectType('vote')")
             .fa.fa-check-circle(v-if="survey.type === 'vote'")
@@ -19,11 +19,11 @@
             .fa.fa-circle-o(v-else)
             span 问卷调查
       .form-group(v-if="survey.type !== 'vote'")
-        label.col-sm-2.control-label 调查说明
+        label.col-sm-1.control-label 调查说明
         .col-sm-9
           textarea.form-control(v-model="survey.description" rows=4 placeholder="请输入调查说明")
       .form-group
-        label.col-sm-2.control-label 内容
+        label.col-sm-1.control-label 内容
         .col-sm-9
           .survey-options.m-b-05
             .survey-option(v-for="o, index in survey.options" v-if="survey.type !== 'vote' || index === 0")
@@ -74,16 +74,20 @@
                       | 最小
                       input(type="text" v-model.number="a.minScore" @change="toInt")
                       | &nbsp;最大
-                      input(type="text" v-model.number="a.maxScore" @change="toInt")
+                      input(type="text" v-modecl.number="a.maxScore" @change="toInt")
               .survey-option-buttons.m-t-05
                 button.btn.btn-default.btn-xs(@click="addAnswer(o)") 添加选项
-              h5(v-if="survey.type !== 'score'") 最大选择数量
-                select(v-model="o.voteCount")
+              h5(v-if="survey.type !== 'score'") 可选选项数量限制：
+                | 最小
+                select(v-model="o.minVoteCount")
+                  option(v-for="i in getMinVoteCount(o)" :value="i") {{i}}
+                | &nbsp;最大
+                select(v-model="o.maxVoteCount")
                   option(v-for="i in getVoteCount(o)" :value="i") {{i}}
           button.btn.btn-default.btn-sm(@click="addOption" v-if="survey.type !== 'vote'")
             .fa.fa-plus.add-option-button &nbsp;添加调查
       .form-group
-        label.col-sm-2.control-label 结果展示
+        label.col-sm-1.control-label 结果展示
         .col-sm-9
           .radio
             label.m-r-1
@@ -97,7 +101,7 @@
               | 仅自己可见
 
       .form-group
-        label.col-sm-2.control-label 奖励
+        label.col-sm-1.control-label 奖励
         .col-sm-9
           .radio
             label.m-r-1
@@ -114,7 +118,7 @@
               | 总奖励次数
               input(type="text" v-model.number="survey.reward.rewardCount" @change="toInt")
       .form-group
-        label.col-sm-2.control-label 权限
+        label.col-sm-1.control-label 权限
         .col-sm-9.m-t-05.survey-scores
           .form.col-sm-12
             .form-group
@@ -163,7 +167,7 @@
                     input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
                     span {{r.displayName}}
       .form-group
-        label.col-sm-2.control-label 时间
+        label.col-sm-1.control-label 时间
         .col-sm-9.m-t-05
           .col-sm-12.form
             .form-group
@@ -210,7 +214,7 @@
                   option(value=i)=i
               | &nbsp;分
       //-.form-group
-        label.col-sm-2.control-label
+        label.col-sm-1.control-label
         .col-sm-9
           h5.text-danger(v-if="error") {{error}}
           button.btn.btn-primary(@click="submit") 提交

@@ -110,6 +110,8 @@ function saveDraft() {
 /*
 * 转发到专栏
 * */
+var postData = NKC.methods.getDataById("postData");
+var targetPost = postData.targetPost;
 var ColumnCategoriesDom;
 var anonymousData;
 var SurveyEdit;
@@ -119,7 +121,9 @@ $(function() {
   }
   if(NKC.modules.SurveyEdit) {
     SurveyEdit = new NKC.modules.SurveyEdit();
-    SurveyEdit.init();
+    SurveyEdit.init({
+      surveyId: targetPost?targetPost.surveyId: ""
+    });
   }
   var proDom = $("#protocolCheckbox");
   proDom.on("change", function() {
@@ -270,15 +274,12 @@ function onPost() {
   // 获取专业与分类
   var fids = [];
   var cids = [];
-  var survey;
   if(!queryType || queryType == "forum" || desType == "forum") {
     $("#newPanelForum").find(".chooseForum").each(function() {
       var fid = $(this).attr("fid");
       if(fid && fid !== "undefined") {
         fids.push(fid)
       }
-      // 发表文章，投票功能数据
-      survey = getSurveyData();
     })
     $("#newPanelForum").find(".chooseCate").each(function() {
       var cid = $(this).attr("cid");
@@ -293,6 +294,8 @@ function onPost() {
     queryType = 'forum';
     queryCat = cids[0];
   }
+  // 发表文章，投票功能数据
+  var survey = getSurveyData();
   // 组装上传数据，如果是特殊类型，则将关键词摘要等放入post
   var post = {
     t: title,

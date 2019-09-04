@@ -47,44 +47,81 @@ router
     const {survey, user} = data;
     let {options} = body;
     await survey.ensurePostPermission(user?user.uid:"", ctx.address);
+
+    const errorInfo = "数据异常，可能是发布者修改了选项信息。请刷新后重试。";
+
     if(survey.type === "vote") {
-      options = [options[0]];
       survey.options = [survey.options[0]];
     }
-    if(!options.length || options.length !== survey.options.length) ctx.throw(400, "数据异常，请刷新后重试");
-    for(let i = 0; i < survey.options.length; i++) {
-      const sOption = survey.options[i];
-      const option = options[i];
-      if(sOption._id !== option._id) ctx.throw(400, "数据异常，可能是调查的发布者修改了数据。请刷新后重试。");
-      let voteCount = 0;
-      for(let j = 0; j < sOption.answers.length; j++) {
-        const sAnswer = sOption.answers[j];
-        const answer = option.answers[j];
-        if(sAnswer._id !== answer._id) ctx.throw(400, "数据异常，可能是调查的发布者修改了数据。请刷新后重试。");
-        if(answer.selected) voteCount++;
-        if(survey.type === "score") {
-          const minScore = sAnswer.minScore;
-          const maxScore = sAnswer.maxScore;
-          let score = answer.score;
-          score = Number(score.toFixed(2));
-          if(score < minScore || score > maxScore) {
-            ctx.throw(400, "分值不在要求的范围内");
+
+
+    const checkOption = (o) => {
+      const {optionId, answerId} = o;
+      for(const option of survey.options) {
+        if(option._id !== optionId) continue;
+        for(const answer of option.answers) {
+          if(answer._id === answerId) {
+            return;
           }
         }
-        option.answers[j] = {
-          _id: answer._id,
-          score: answer.score,
-          selected: answer.selected
+        ctx.throw(400, errorInfo);
+      }
+      ctx.throw(400, errorInfo);
+    };
+
+    let answerCount = 0;
+    for(const option of survey.options) {
+      answerCount += option.answers.length;
+    }
+    // 提交的选项数与调查表的选线数不相等，
+    // 以后可能允许选填
+    // 目前为必填
+    // if(!options.length || options.length !== answerCount) ctx.throw(400, errorInfo);
+
+    // 每个调查内容最大选择数和实际选择数
+    const selectedCount = {};
+    for(const option of survey.options) {
+      selectedCount[option._id] = {
+        voteCount: option.voteCount,
+        selectedCount: 0
+      };
+    }
+
+    for(let i = 0; i < options.length; i++) {
+      const option = options[i];
+      checkOption(option);
+      const answer = survey.getAnswerById(option.optionId, option.answerId);
+      if(survey.type === "score") {
+        let score = option.score;
+        score = Number(score.toFixed(2));
+        if(score < answer.minScore || score > answer.maxScore) {
+          ctx.throw(400, "分值不再要求的范围内");
+        }
+        option[i] = {
+          optionId: option.optionId,
+          answerId: option.answerId,
+          score,
+          selected: false
+        }
+      } else {
+        // 检测多选是否超出设置
+        if(!!option.selected) {
+          const sc = selectedCount[option.optionId];
+          if(sc.selectedCount >= sc.voteCount) {
+            ctx.throw(400, "勾选的选项超过限制，请检查");
+          } else {
+            sc.selectedCount ++;
+          }
+        }
+        option[i] = {
+          optionId: option.optionId,
+          answerId: option.answerId,
+          score: "",
+          selected: !!option.selected
         }
       }
-      options[i] = {
-        _id: option._id,
-        answers: option.answers
-      };
-      if(survey.type !== "score") {
-        if(!voteCount) ctx.throw(400, "针对每个调查，请至少勾选一个选项");
-      }
     }
+
     const surveyPost = db.SurveyPostModel({
       _id: await db.SettingModel.operateSystemID("surveyPosts", 1),
       surveyId: survey._id,
