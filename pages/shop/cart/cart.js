@@ -21,9 +21,9 @@ var app = new Vue({
       var total = 0;
       for(var i = 0; i < selectedId.length; i++) {
         var cart = this.carts[selectedId[i]];
-        total += cart.count * cart.productParam.price/100;
+        total += cart.count * cart.productParam.price;
       }
-      return total;
+      return (total/100).toFixed(2);
     }
   },
   mounted: function() {
