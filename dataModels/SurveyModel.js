@@ -213,8 +213,8 @@ schema.statics.checkSurveyData = async (survey) => {
     for(let j = 0; j < option.answers.length; j++) {
       const answer = option.answers[j];
       if(!answer.content) throwErr(400, `调查内容${i+1}的选项内容不能为空`);
-      answer.minScore = parseInt(answer.minScore);
-      answer.maxScore = parseInt(answer.maxScore);
+      answer.minScore = Number(answer.minScore.toFixed(2));
+      answer.maxScore = Number(answer.maxScore.toFixed(2));
       if(type === "score") {
         if(answer.minScore < -150) throwErr(400, `调查内容${i+1}的选项最小分值不能小于-150`);
         if(answer.maxScore > 150) throwErr(400, `调查内容${i+1}的选项最大分值不能大于150`);
@@ -308,7 +308,8 @@ schema.statics.modifySurvey = async (survey) => {
   const SurveyModel = mongoose.model("surveys");
   const {
     st, et,
-    reward, permission, description, options, showResult
+    reward, permission, description, options, showResult,
+    mid
   } = survey;
   const surveyDB = await SurveyModel.findOnly({_id: survey._id});
   // originId
@@ -317,6 +318,7 @@ schema.statics.modifySurvey = async (survey) => {
   }, {
     $set: {
       st,
+      mid,
       et,
       reward,
       permission,
@@ -328,6 +330,7 @@ schema.statics.modifySurvey = async (survey) => {
   const oldSurvey = surveyDB.toObject();
   delete oldSurvey._id;
   delete oldSurvey.__v;
+  oldSurvey.toc = Date.now();
   oldSurvey._id = await mongoose.model("settings").operateSystemID("surveys", 1);
   oldSurvey.originId = surveyDB._id;
   await mongoose.model("surveys")(oldSurvey).save();

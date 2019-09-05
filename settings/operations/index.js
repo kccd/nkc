@@ -85,6 +85,7 @@ operationObj.defaultOperations = [
   "getAnyBodyShopCert", // 可查看任何人的商城凭证
   "viewUserAllFansAndFollowers", // 可查看用户的所有关注的人和粉丝
   "getAttachments", // 获取附件
+  "showSecretSurvey", // 查看隐藏的调查结果
 ];
 
 

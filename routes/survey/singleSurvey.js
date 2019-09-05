@@ -36,10 +36,21 @@ router
     // 获取投票结果
     if(
       survey.showResult === "all" ||
-      (survey.showResult === "self" && data.user && data.user.uid === survey.uid) ||
+      data.user && data.user.uid === survey.uid ||
+      ctx.permission("showSecretSurvey") ||
       survey.showResult === "posted" && data.surveyPost
     ) {
       data.showResult = true;
+    } else {
+      for(const option of survey.options) {
+        delete option.postCount;
+        for(const answer of option.answers) {
+          delete answer.postScore;
+          delete answer.postCount;
+          delete answer.postMinScore;
+          delete answer.postMaxScore;
+        }
+      }
     }
     await next();
   })

@@ -81,7 +81,7 @@
               input(type="text" v-model.number="optionsObj[o._id + '-' + a._id].score" v-if="!posted")
               .score(v-else-if="optionsObj[o._id + '-' + a._id]") {{optionsObj[o._id + '-' + a._id].score}}
               .score(v-else) 未打分
-              | （范围：{{a.minScore}} - {{a.maxScore}}，精确到 0.01）
+              | （范围{{a.minScore}}到{{a.maxScore}}，精确到 0.01）
             .option-status-info.survey-score(v-if="showResult") 平均打分：{{a.average}}，最高分：{{a.postMaxScore.toFixed(2)}}，最低分：{{a.postMinScore.toFixed(2)}}
     .survey-form-button
       .form-warning
