@@ -64,7 +64,7 @@ router
       let vipNum = 100;
 			if(cart.product.vipDiscount) {
 				for(let v=0;v<cart.product.vipDisGroup.length;v++) {
-					if(data.user && data.user.authLevel == cart.product.vipDisGroup[v].vipLevel) {
+					if(data.user && data.user.grade._id === (cart.product.vipDisGroup[v].vipLevel + 1)) {
 						vipNum = cart.product.vipDisGroup[v].vipNum;
 					}
         }
@@ -72,9 +72,10 @@ router
       }else{
         cart.vipDiscount = true;
       }
-      cart.vipNum = vipNum
+      cart.vipNum = vipNum;
       // 计算商品价格合计(含运费)
-      let productPrice = cart.count * (cart.productParam.price * (vipNum / 100))
+      if(!cart.productParam) ctx.throw(400, "商品规格信息已更新，请重新选择");
+      let productPrice = cart.count * (cart.productParam.price * (vipNum / 100));
       cart.productPrice = productPrice;
       if(!newCartData[newCartDataUid]) {
         newCartData[newCartDataUid] = {

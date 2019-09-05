@@ -87,5 +87,7 @@ block content
 block scripts
   script.
     $(function() {
-      $(".exam-link a").removeAttr("href").attr("onclick", "Login.open('login')").addClass("pointer");
-    })
+      if (!NKC.configs.uid) {
+        $(".exam-link a").removeAttr("href").attr("onclick", "Login.open('login')").addClass("pointer");
+      }
+    });

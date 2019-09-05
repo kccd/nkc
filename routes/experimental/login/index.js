@@ -10,18 +10,23 @@ router
     const {password} = body;
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: data.user.uid});
     await userPersonal.ensurePassword(password);
-    const urls = ctx.getCookie("visitedUrls");
     ctx.setCookie("experimental", {
       uid: data.user.uid,
       time: Date.now()
     });
-    if(!urls || urls.length === 0) {
-      data.redirect = "/e";
-    } else if(urls[0].indexOf("/e") === -1){
-      data.redirect = "/e";
-    } else {
-      data.redirect = urls[0];
-    }
+    data.redirect = "/e/status";
+    // const urls = ctx.getCookie("visitedUrls");
+    // ctx.setCookie("experimental", {
+    //   uid: data.user.uid,
+    //   time: Date.now()
+    // });
+    // if(!urls || urls.length === 0) {
+    //   data.redirect = "/e";
+    // } else if(urls[0].indexOf("/e") === -1){
+    //   data.redirect = "/e";
+    // } else {
+    //   data.redirect = urls[0];
+    // }
     await next();
   });
 module.exports = router;

@@ -56,15 +56,19 @@
     .column-button
       .column-sub-button.active
         if !data.user || data.user.uid !== data.column.uid
-          a(href=data.user ? `/m/${data.column._id}/contribute`: "/login" target="_blank")
-            button 投稿
+          if data.user
+            a(href=`/m/${data.column._id}/contribute` target="_blank")
+              button 投稿
+          else
+            a.pointer(onclick="Login.open('login')")
+              button 投稿
         else
           a(href="/editor?toColumn=true" target="_blank")
             button 发表
       .column-sub-button
         //(onclick=`subscribeColumn(${data.column._id}, true, this)`)
         if !data.user
-          a(href="/login" target="_blank")
+          a.pointer(onclick="Login.open('login')" target="_blank")
             button + 关注
         else
           if state.subColumnsId.includes(data.column._id)

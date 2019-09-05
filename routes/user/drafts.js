@@ -59,6 +59,7 @@ draftsRouter
               c: body.c,
               uid: ctx.data.user.uid,
               did: newId,
+              anonymous: body.anonymous,
               desType: body.desType,
               desTypeId: body.desTypeId,
               abstractCn: body.abstractCn,

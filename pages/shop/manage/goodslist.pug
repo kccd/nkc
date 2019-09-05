@@ -47,7 +47,7 @@ block name
                   p
                     if !product.productStatus || product.productStatus == "insale" || product.productStatus == "stopsale"
                       a.btn.btn-warning.btn-sm(href=`/editor?type=post&id=${product.oc}` target="_blank") 编辑详情
-                      a(style="margin-left:5px").btn.btn-warning.btn-sm(href=`/shop/manage/${data.user.uid}/goodslist/editProduct?productId=${product.productId}`) 编辑细节
+                      a.btn.btn-warning.btn-sm(style="margin-left:5px" href=`/shop/manage/${data.user.uid}/goodslist/editProduct?productId=${product.productId}`) 编辑细节
                     else
                       a.btn.btn-warning.btn-sm(onclick=`shelfRightNow(${data.user.uid},${product.productId})`) 立即上架
                   p

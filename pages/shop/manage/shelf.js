@@ -593,8 +593,10 @@ function delSingleParam(para) {
 function getSingleParams() {
   var singleParams = [];
   // var isUseParams = $("#useparams").prop("checked");
-  var isUseParams =  $("input[type=radio][name='useparams']:checked").val();
-  if(isUseParams == "yes") {
+  var isUseParams = $("#useparams").prop("checked");
+  // var isUseParams =  $("input[type=radio][name='useparams']:checked").val();
+  // if(isUseParams == "yes") {
+  if(isUseParams) {
     $("#singleParams tbody tr").each(function(index, ele) {
       var obj = {};
       var singleName = $(ele).find(".singleName").val();
@@ -604,9 +606,10 @@ function getSingleParams() {
       var singleCount = Number($(ele).find(".singleCount").val());
       if(!singleCount || isNaN(singleCount)) singleCount = 0;
       var singlePrice = Number($(ele).find(".singlePrice").val());
-      if(!singlePrice || isNaN(singlePrice)) throw("独立规格优惠价格有误")
-      if(singlePrice > singleOriginPrice) throw("独立规格中优惠价格不得大于原价格");
       var singleUseDiscount = $(ele).find(".singleUseDiscount").prop("checked");
+      if(singlePrice < 0 || isNaN(singlePrice)) throw("独立规格优惠价格有误");
+      if(singleUseDiscount && singlePrice <= 0) throw("独立规格优惠价格有误");
+      if(singlePrice > singleOriginPrice) throw("独立规格中优惠价格不得大于原价格");
       obj.name = singleName;
       obj.originPrice = singleOriginPrice*100;
       obj.stocksSurplus = singleCount;

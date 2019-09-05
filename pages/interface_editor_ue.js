@@ -77,6 +77,10 @@ function saveDraft() {
     desType: queryType,
     desTypeId: queryId
   };
+  var sendAnonymousPostDom = $("#sendAnonymousPost");
+  if(sendAnonymousPostDom.length) {
+    post.anonymous = sendAnonymousPostDom.prop("checked");
+  }
   var paperObj = {};
   if(["post", "thread", "forum", "redit"].indexOf(queryType) !== -1) {
     try{
@@ -90,6 +94,20 @@ function saveDraft() {
       post[i] = paperObj[i]
     }
   }
+  post.mainForumsId = [];
+  post.categoriesId = [];
+  $("#newPanelForum").find(".chooseForum").each(function() {
+    var fid = $(this).attr("fid");
+    if(fid && fid !== "undefined") {
+      post.mainForumsId.push(fid)
+    }
+  })
+  $("#newPanelForum").find(".chooseCate").each(function() {
+    var cid = $(this).attr("cid");
+    if(cid && cid !== "undefined") {
+      post.categoriesId.push(cid)
+    }
+  });
   var userId = $("#userNowId").html()
   var method = "POST";
   var url = "/u/"+userId+"/drafts";
@@ -323,14 +341,13 @@ function onPost() {
       return screenTopWarning(err);
     }
 
-    var sendAnonymousPostDom = $("#sendAnonymousPost");
-    if(sendAnonymousPostDom.length) {
-      post.sendAnonymousPost = sendAnonymousPostDom.prop("checked");
-    }
-
     for(var i in paperObj) {
       post[i] = paperObj[i]
     }
+  }
+  var sendAnonymousPostDom = $("#sendAnonymousPost");
+  if(sendAnonymousPostDom.length) {
+    post.sendAnonymousPost = sendAnonymousPostDom.prop("checked");
   }
   // 将组装好的数据发送至目标路由
   geid('post').disabled = true;

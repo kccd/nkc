@@ -113,6 +113,7 @@ goodslistRouter
       if(p.originPrice < 0) p.originPrice = 0;
       p.productId = productId;
       p.uid = user.uid;
+      if(!p.useDiscount) p.price = p.originPrice;
       p.stocksSurplus = p.stocksTotal;
       p._id = await db.SettingModel.operateSystemID('shopProductsParams', 1);
       paraIdArr.push(p._id);
@@ -124,6 +125,7 @@ goodslistRouter
     for(const s of singleParams) {
       if(s.originPrice < 0) s.originPrice = 0;
       s.productId = productId;
+      if(!s.useDiscount) s.price = s.originPrice;
       s.uid = user.uid;
       s.type = "single";
       s.stocksSurplus = s.stocksTotal;

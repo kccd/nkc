@@ -73,8 +73,12 @@ const videoAviTransAvi = async(inputPath, outputPath) => {
 
 // MP4转码为H264
 const videoMP4TransH264 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-movflags', 'faststart', '-y', outputPath]);
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-movflags', 'faststart', '-y', outputPath]);
 }
+// MP4转码为H264
+// const videoMP4TransH264 = async (inputPath, outputPath) => {
+//   return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-movflags', 'faststart', '-y', outputPath]);
+// }
 
 // MOV转码为MP4
 const videoMOVTransMP4 = async (inputPath, outputPath) => {

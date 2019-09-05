@@ -32,6 +32,8 @@ block content
               button.btn.btn-danger(onclick='reset()') 重置
           div(style='margin-top: 2rem;')
             div#main(style="width: 100%;height: 45rem;")
+      //.col-xs-12.col-md-12.m-b-1
+        button.btn.btn-default(onclick="getLogs()") 测试
       if data.onlineUsers && data.onlineUsersCount > 0
         .col-xs-12.col-md-12(style='margin-bottom: 2rem;')
           .e-panel

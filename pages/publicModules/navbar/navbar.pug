@@ -50,7 +50,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             a(href=`/message` title='消息') 消息
         else
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
-            a(href='/login') 关注
+            a.pointer(onclick="Login.open('login')") 关注
           li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
             a(href='/?t=latest') 最新
 
