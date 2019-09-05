@@ -60,7 +60,7 @@ editorRouter
       data.did = singledraft.did;
       data.draftDelType = singledraft.desType; // 草稿来源类型
       data.draftDelTypeId = singledraft.desTypeId; // 草稿来源类型id
-      data.targetPost = singledraft;
+      data.targetPost = singledraft.toObject();
       if(data.draftDelType === "thread") {
         contentType = "postToForum";
         const thread = await db.ThreadModel.findOne({tid: data.draftDelTypeId});
@@ -71,6 +71,7 @@ editorRouter
         const post = await db.PostModel.findOne({pid: data.draftDelTypeId});
         if(post) {
           data.targetForumsId = post.mainForumsId;
+          if(post.surveyId) data.targetPost.surveyId = post.surveyId;
         }
         contentType = "postToThread";
       }
@@ -145,7 +146,7 @@ editorRouter
     }
 
 
-    if(!type || type === "forum") {
+    if(!type || type === "forum" || type === "redit") {
       data.createSurveyPermission = await db.SurveyModel.ensureCreatePermission("postToForum", data.user.uid);
     }
 

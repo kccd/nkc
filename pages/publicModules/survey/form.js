@@ -7,6 +7,7 @@ NKC.modules.SurveyForm = function(id) {
     data: {
       loading: true,
       survey: "",
+      targetUser: "",
       showResult: false,
       havePermission: false,
       posted: false,
@@ -16,6 +17,15 @@ NKC.modules.SurveyForm = function(id) {
       users: []
     },
     computed: {
+      // 奖励状态
+      rewardInfo: function() {
+        var reward = this.survey.reward;
+        var kcb = this.targetUser.kcb;
+        if(!reward.status) return;
+        if(reward.rewardedCount >= reward.rewardCount) return;
+        if(kcb/100 < reward.onceKcb) return;
+        return "作者设定每次提交奖励"+reward.onceKcb/100+"个科创币，数量有限，发完即止。";
+      },
       // 已选结果
       optionsObj: function() {
         var obj = {};
@@ -103,6 +113,15 @@ NKC.modules.SurveyForm = function(id) {
     methods: {
       format: NKC.methods.format,
       getColor: NKC.methods.getRandomColor,
+      selectCount: function(o) {
+        var minVoteCount = o.minVoteCount;
+        var maxVoteCount = o.maxVoteCount;
+        if(minVoteCount === maxVoteCount) {
+          return (minVoteCount === 1)? "单项选择": "必选数量：" + minVoteCount;
+        } else {
+          return "勾选数量必须>=" + minVoteCount + "且<=" + maxVoteCount;
+        }
+      },
       resetSelectedAnswerById: function(optionId) {
         for(var i = 0; i < this.options.length; i++) {
           var option = this.options[i];
@@ -156,7 +175,11 @@ NKC.modules.SurveyForm = function(id) {
           .then(function(data) {
             this_.surveyPost = data.surveyPost;
             this_.posted = true;
-            sweetSuccess("提交成功");
+            if(data.rewardNum !== undefined) {
+              sweetSuccess("提交成功！获得" + data.rewardNum/100 + "个科创币。", {autoHide: false});
+            } else {
+              sweetSuccess("提交成功");
+            }
             this_.getSurveyById(survey._id);
           })
           .catch(function(data) {
@@ -207,6 +230,7 @@ NKC.modules.SurveyForm = function(id) {
             var options = [];
             app.showResult = data.showResult;
             app.users = data.users;
+            app.targetUser = data.targetUser;
             if(data.surveyPost) {
               app.surveyPost = data.surveyPost;
               options = data.surveyPost.options;

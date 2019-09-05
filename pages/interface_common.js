@@ -173,14 +173,26 @@ function sweetAlert(text) {
   });
 }
 
-function sweetSuccess(text) {
+function sweetSuccess(text, options) {
+  options = options || {
+    autoHide: true,
+    timer: 2000
+  };
   text = text + "";
-  Swal({
-    type: "success",
-    confirmButtonText: "关闭",
-    timer: 2000,
-    text: text
-  });
+  if(options.autoHide) {
+    Swal({
+      type: "success",
+      confirmButtonText: "关闭",
+      timer: options.timer,
+      text: text
+    });
+  } else {
+    Swal({
+      type: "success",
+      confirmButtonText: "关闭",
+      text: text
+    });
+  }
 }
 function sweetError(text) {
   text = text.error || text;

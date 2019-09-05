@@ -26,6 +26,7 @@
             .number-background
             .number(:style="'width: ' + o.domProgress + '%;background-color:' + o.color")
           .option-status-info(:title="o.progress + '% ' + o.postCount + '票'") {{o.progress}}% {{o.postCount}}票
+      .option-select-count {{selectCount(survey.options[0])}}
     // 问卷调查
     .survey-form-options(v-else-if="survey.type === 'survey'")
       .survey-form-option(v-for="o, index in survey.options")
@@ -54,7 +55,8 @@
                 .number-background
                 .number(:style="'width: ' + a.progress + '%;background-color:' + a.color")
               .option-status-info(:title="a.progress + '% ' + a.postCount + '票'") {{a.progress}}% {{a.postCount}}票
-
+        //- 勾选数量限制
+        .option-select-count {{selectCount(o)}}
     // 打分
     .survey-form-options(v-else)
       .survey-form-option(v-for="o, index in survey.options")
@@ -84,12 +86,15 @@
     .survey-form-button
       .form-warning
         //- 显示投票结果
-        p(v-if="showResult") {{postResult}}
-        .form-post-users
-          a(onclick="visitUrl('/u/' + user.uid)" :onmouseover="'floatUserPanel.open(this, \"' + user.uid + '\")'" v-for="user in users")
-            img(:src="'/avatar/' + user.avatar")
+        div(v-if="showResult")
+          p {{postResult}}
+          .form-post-users
+            a(onclick="visitUrl('/u/' + user.uid)" :onmouseover="'floatUserPanel.open(this, \"' + user.uid + '\")'" v-for="user in users")
+              img(:src="'/avatar/' + user.avatar")
         //- 时间限制
         p(v-if="timeInfo") {{timeInfo}}
+        //- 奖励
+        p(v-if="rewardInfo") {{rewardInfo}}
         //- 结果展示
         p(v-if="survey.showResult === 'self'") 调查结果不公开。
         p(v-else-if="survey.showResult === 'posted'") 调查结果只向投过票的用户展示。

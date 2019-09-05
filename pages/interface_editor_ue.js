@@ -142,6 +142,9 @@ $(function() {
     SurveyEdit.init({
       surveyId: targetPost?targetPost.surveyId: ""
     });
+    if(!targetPost || !targetPost.surveyId) {
+      $("#disabledSurveyButton").show();
+    }
   }
   var proDom = $("#protocolCheckbox");
   proDom.on("change", function() {
@@ -313,7 +316,12 @@ function onPost() {
     queryCat = cids[0];
   }
   // 发表文章，投票功能数据
-  var survey = getSurveyData();
+  var survey;
+  try{
+    survey = getSurveyData();
+  } catch(err) {
+    return screenTopWarning(err);
+  }
   // 组装上传数据，如果是特殊类型，则将关键词摘要等放入post
   var post = {
     t: title,
@@ -733,5 +741,18 @@ function getSurveyData() {
     return window.SurveyEdit.getSurvey();
   } else {
     return "";
+  }
+}
+function disabledSurveyForm(e) {
+  var dom = $(e);
+  if(!window.SurveyEdit) return;
+  if(SurveyEdit.app.disabled) {
+    SurveyEdit.app.disabled = false;
+    dom.text("取消");
+    dom.removeClass("btn-success").addClass("btn-danger");
+  } else {
+    SurveyEdit.app.disabled = true;
+    dom.text("创建");
+    dom.removeClass("btn-danger").addClass("btn-success");
   }
 }

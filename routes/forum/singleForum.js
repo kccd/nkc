@@ -72,6 +72,8 @@ router
     }
     let surveyDB;
     if(survey) {
+      const havePermission = await db.SurveyModel.ensureCreatePermission("postToForum", user.uid);
+      if(!havePermission) ctx.throw(403, "你没有权限发起调查，请刷新");
       survey.uid = data.user.uid;
       surveyDB = await db.SurveyModel.createSurvey(survey);
       options.surveyId = surveyDB._id;

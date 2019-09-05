@@ -3,7 +3,7 @@ extends bootstrap_base.pug
 block title
   title 编辑器 - 科创论坛
   link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
-  link(href="/editor/editor.css" rel="stylesheet")
+  +includeCSS("/editor/editor.css")
 block content
   style.
     .tool_area_wrp {
@@ -67,7 +67,12 @@ block content
               include ./editor/toColumn
             if (data.createSurveyPermission && (!data.type || data.type ==='forum')) || (data.targetPost && data.targetPost.surveyId)
               div.m-b-1
-                label(style="font-size:16px") 调查
+                div
+                  label(style="font-size:16px") 调查
+                  button.btn.btn-success.btn-xs(style="vertical-align: top;"
+                    onclick="disabledSurveyForm(this)"
+                    id="disabledSurveyButton"
+                  ) 创建
                 include ./publicModules/survey/edit
             .form(style="padding-bottom:20px")
               .form-group

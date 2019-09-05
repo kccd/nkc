@@ -19,6 +19,9 @@
   font-weight: bold;
   margin-bottom: 10px;
 }
+#disabledSurveyButton{
+  display: none;
+}
 
 .keyWordsPanelClose {
   color: #2b90d9;

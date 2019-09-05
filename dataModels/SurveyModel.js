@@ -2,6 +2,11 @@ const mongoose = require("../settings/database");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
+  originId: {
+    type: Number,
+    default: null,
+    index: 1
+  },
   type: { // vote: 简单选择, survey: 问卷调查, score: 打分
     type: String,
     default: "vote",
@@ -199,17 +204,20 @@ schema.statics.checkSurveyData = async (survey) => {
   } = survey;
   if(type !== "vote" && !survey.description) throwErr(400, "调查说明不能为空");
   if(!options || !options.length) throwErr(400, "请至少添加一个选择");
+  if(options.length > 99) ctx.throw(400, "调查内容数量超出限制（99）");
   for(let i = 0; i < options.length; i++) {
     const option = options[i];
     if(!option.content) throwErr(400, `调查内容${i+1}不能为空`);
     if(!option.answers || !option.answers.length) throwErr(400, "请为每个调查内容至少添加一个选项");
+    if(option.answers.length > 99) ctx.throw(400, "调查内容选项的数量超出限制（99）");
     for(let j = 0; j < option.answers.length; j++) {
       const answer = option.answers[j];
       if(!answer.content) throwErr(400, `调查内容${i+1}的选项内容不能为空`);
       answer.minScore = parseInt(answer.minScore);
       answer.maxScore = parseInt(answer.maxScore);
       if(type === "score") {
-        if(answer.minScore < 1) throwErr(400, `调查内容${i+1}的选项最小分值不能小于1`);
+        if(answer.minScore < -150) throwErr(400, `调查内容${i+1}的选项最小分值不能小于-150`);
+        if(answer.maxScore > 150) throwErr(400, `调查内容${i+1}的选项最大分值不能大于150`);
         if(answer.maxScore <= answer.minScore) throwErr(400, `调查内容${i+1}的选项最大分值必须大于最小分值`);
       }
       if(!answer._id) answer._id = await SettingModel.operateSystemID("surveyOptionAnswers", 1);
@@ -303,6 +311,7 @@ schema.statics.modifySurvey = async (survey) => {
     reward, permission, description, options, showResult
   } = survey;
   const surveyDB = await SurveyModel.findOnly({_id: survey._id});
+  // originId
   await SurveyModel.updateOne({
     _id: survey._id
   }, {
@@ -316,6 +325,12 @@ schema.statics.modifySurvey = async (survey) => {
       showResult
     }
   });
+  const oldSurvey = surveyDB.toObject();
+  delete oldSurvey._id;
+  delete oldSurvey.__v;
+  oldSurvey._id = await mongoose.model("settings").operateSystemID("surveys", 1);
+  oldSurvey.originId = surveyDB._id;
+  await mongoose.model("surveys")(oldSurvey).save();
   await surveyDB.computePostCount();
 };
 /*
@@ -453,7 +468,7 @@ schema.methods.computePostCount = async function() {
       }
       if(this.type === "score") {
         answer.postScore += o.score || 0;
-        if(answer.postMinScore > o.score) answer.postMinScore = o.score;
+        if(answer.postMinScore === 0 || answer.postMinScore > o.score) answer.postMinScore = o.score;
         if(answer.postMaxScore < o.score) answer.postMaxScore = o.score;
       } else {
         if(!o.selected) continue;

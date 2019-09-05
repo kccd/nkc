@@ -284,3 +284,9 @@
 .module-survey-form .option-score-limit{
   display: inline-block;
 }
+
+.module-survey-form .option-select-count{
+  text-align: right;
+  font-size: 1rem;
+  color: #9baec8;
+}

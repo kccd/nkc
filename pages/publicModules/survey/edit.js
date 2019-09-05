@@ -4,7 +4,8 @@ NKC.modules.SurveyEdit = function() {
   self.app = new Vue({
     el: "#moduleSurveyEdit",
     data: {
-      user: "",
+      disabled: true,
+      targetUser: "",
       survey: "",
       newSurvey: "",
       grades: [],
@@ -77,7 +78,7 @@ NKC.modules.SurveyEdit = function() {
         .then(function(data) {
           this_.grades = data.grades;
           this_.roles = data.roles;
-          this_.user = data.user;
+          this_.targetUser = data.user;
         })
     },
     methods: {
@@ -120,7 +121,7 @@ NKC.modules.SurveyEdit = function() {
         }
         return arr;
       },
-      format: NKC.methods.format,
+      // format: NKC.methods.format,
       toInt: function() {
         var survey = this.survey;
         survey.permission.registerTime = parseInt(survey.permission.registerTime);
@@ -265,6 +266,7 @@ NKC.modules.SurveyEdit = function() {
         throw err;
       },
       submit: function() {
+        if(this.disabled) return;
         this.error = "";
         var te = this.te;
         var survey = this.survey;
@@ -273,14 +275,15 @@ NKC.modules.SurveyEdit = function() {
         if(!survey.options || !survey.options.length) return te("请至少添加一个选项");
         for(var i = 0; i < survey.options.length; i++) {
           var option = survey.options[i];
-          if(!option.content) return te("请输入选项内容");
+          if(!option.content) return te("请输入调查内容");
           option.links = this_.modifyLinks(option.links_, "str");
           if(!option.answers || !option.answers.length) return te("请为每个调查至少添加一个选项");
           for(var j = 0; j < option.answers.length; j++) {
             var answer = option.answers[j];
             if(!answer.content) return te("请输入选项内容");
             if(survey.type === "score") {
-              if(answer.minScore < 1) return te("最小分值不能小于1");
+              if(answer.minScore < -150) return te("最小分值不能小于-150");
+              if(answer.maxScore > 150) return te("最大分值不能大于150");
               if(answer.maxScore <= answer.minScore) return te("最大分值必须大于最小分值");
             }
             answer.links = this_.modifyLinks(answer.links_, "str");
@@ -302,7 +305,7 @@ NKC.modules.SurveyEdit = function() {
         );
         survey.st = st;
         survey.et = et;
-        console.log(survey);
+        survey.reward.onceKcb = survey.reward.onceKcb*100;
         return survey;
         /*nkcAPI("/survey", "POST", {survey: survey})
           .then(function(data) {
@@ -330,7 +333,10 @@ NKC.modules.SurveyEdit = function() {
               }
             }
           }
+          data.survey.reward.onceKcb = data.survey.reward.onceKcb/100;
           self.app.survey = data.survey;
+          self.app.disabled = false;
+          self.app.targetUser = data.targetUser;
           self.app.setTime(new Date(self.app.survey.st), new Date(self.app.survey.et));
         })
         .catch(function(data) {

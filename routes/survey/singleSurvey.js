@@ -15,6 +15,7 @@ router
     const {survey} = data;
     data.havePermission = false;
     data.users = await survey.getPostUsers();
+    data.targetUser = await db.UserModel.findOnly({uid: survey.uid});
     if(data.user) {
       data.surveyPost = await db.SurveyPostModel.findOne({uid: data.user.uid, surveyId: survey._id});
       try{
@@ -43,7 +44,7 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {db, data, body} = ctx;
+    const {db, data, body, nkcModules} = ctx;
     const {survey, user} = data;
     let {options} = body;
     await survey.ensurePostPermission(user?user.uid:"", ctx.address);
@@ -82,7 +83,8 @@ router
     const selectedCount = {};
     for(const option of survey.options) {
       selectedCount[option._id] = {
-        voteCount: option.voteCount,
+        maxVoteCount: option.maxVoteCount,
+        minVoteCount: option.minVoteCount,
         selectedCount: 0
       };
     }
@@ -93,6 +95,7 @@ router
       const answer = survey.getAnswerById(option.optionId, option.answerId);
       if(survey.type === "score") {
         let score = option.score;
+        if(score === "") ctx.throw(400, "还有未打分的选项，请检查");
         score = Number(score.toFixed(2));
         if(score < answer.minScore || score > answer.maxScore) {
           ctx.throw(400, "分值不再要求的范围内");
@@ -107,8 +110,8 @@ router
         // 检测多选是否超出设置
         if(!!option.selected) {
           const sc = selectedCount[option.optionId];
-          if(sc.selectedCount >= sc.voteCount) {
-            ctx.throw(400, "勾选的选项超过限制，请检查");
+          if(sc.selectedCount >= sc.maxVoteCount) {
+            ctx.throw(400, "勾选选项的数目超过限制，请检查");
           } else {
             sc.selectedCount ++;
           }
@@ -119,6 +122,15 @@ router
           score: "",
           selected: !!option.selected
         }
+      }
+    }
+
+    // 检测多选是否超出设置
+    if(survey.type !== "score") {
+      for(const key in selectedCount) {
+        if(!selectedCount.hasOwnProperty(key)) continue;
+        const sc = selectedCount[key];
+        if(sc.selectedCount < sc.minVoteCount) ctx.throw(400, "勾选选项的数目未达最低要求，请检查");
       }
     }
 
@@ -133,6 +145,21 @@ router
     });
     await surveyPost.save();
     await survey.computePostCount();
+
+    // 给予奖励
+    if(data.user) {
+      const lock = await nkcModules.redLock.lock(`surveyPost:${survey._id}`, 10000);
+      const record = await db.SurveyPostModel.rewardPost( {
+        surveyId: survey._id,
+        uid: data.user.uid,
+        ip: ctx.address,
+        port: ctx.port
+      });
+      if(record && record.num !== undefined) data.rewardNum = record.num;
+      try{
+        await lock.unlock();
+      } catch(err) {console.log(err.message || err)}
+    }
     data.surveyPost = surveyPost;
     await next();
   });
