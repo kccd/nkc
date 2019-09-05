@@ -222,6 +222,7 @@
 }
 .module-survey-form .option-status .number{
   position: absolute;
+  transition: width 2s;
   top: 0;
   left: 0;
   height: 8px;
