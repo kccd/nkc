@@ -120,7 +120,7 @@ table{
   padding: 0!important;
 }
 .p-t-0{
-  padding-top: 0;
+  padding-top: 0!important;
 }
 .p-t-1{
   padding-top: 1rem;
@@ -330,6 +330,18 @@ table{
   padding-right: 1rem;
   margin-bottom: 0.5rem;
 
+}
+.paging-button .input{
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 1px solid #9baec8;
+  width: 4rem;
+  font-size: 1.2rem;
+  vertical-align: top;
+}
+.input.radius-left{
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
 }
 .paging-button a{
   -moz-user-select:none; /*火狐*/

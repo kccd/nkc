@@ -142,6 +142,18 @@ const userSchema = new Schema({
   banner: {
     type: String,
     default: ""
+  },
+  // 支持数
+  voteUpCount: {
+    type: Number,
+    default: 0,
+    index: 1
+  },
+  // 反对数
+  voteDownCount: {
+    type: Number,
+    default: 0,
+    index: 1
   }
 },
 {toObject: {
@@ -463,6 +475,7 @@ userSchema.methods.extendRoles = async function() {
 userSchema.methods.updateUserMessage = async function() {
   const PostModel = mongoose.model('posts');
   const ThreadModel = mongoose.model('threads');
+  const PostsVoteModel = mongoose.model("postsVotes");
   const UsersScoreLogModel = mongoose.model('usersScoreLogs');
 
   const {uid} = this;
@@ -521,6 +534,47 @@ userSchema.methods.updateUserMessage = async function() {
 		operationId: 'violation'
 	});
 
+  let voteUpCount = await PostsVoteModel.aggregate([
+    {
+      $match: {
+        tUid: this.uid,
+        type: "up"
+      }
+    },
+    {
+      $group: {
+        _id: "$uid",
+        count: {$sum: "$num"}
+      }
+    }
+  ]);
+
+  let voteDownCount = await PostsVoteModel.aggregate([
+    {
+      $match: {
+        tUid: this.uid,
+        type: "down"
+      }
+    },
+    {
+      $group: {
+        _id: "$uid",
+        count: {$sum: "$num"}
+      }
+    }
+  ]);
+
+  if(!voteUpCount.length) {
+    voteUpCount = 0;
+  } else {
+    voteUpCount = voteUpCount[0].count || 0;
+  }
+  if(!voteDownCount.length) {
+    voteDownCount = 0;
+  } else {
+    voteDownCount = voteDownCount[0].count || 0;
+  }
+
 	const updateObj = {
 		threadCount,
 		postCount,
@@ -531,7 +585,9 @@ userSchema.methods.updateUserMessage = async function() {
 		toppedThreadsCount,
 		recCount,
 		dailyLoginCount,
-		violationCount
+		violationCount,
+    voteUpCount,
+    voteDownCount
 	};
 
   await this.update(updateObj);

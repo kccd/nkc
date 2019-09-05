@@ -1507,6 +1507,7 @@ threadSchema.methods.createNewPost = async function(post) {
     tid: this.tid,
     uid: post.uid,
     uidlm: post.uid,
+    surveyId: post.surveyId || null,
     rpid
   }); 
   if(!this.oc) await this.update({oc: pid});

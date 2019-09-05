@@ -1,0 +1,109 @@
++includeCSS("/publicModules/survey/form.css")
+.survey-form.module-survey-form(v-cloak id=surveyFormId || "moduleSurveyForm" data-survey-id=surveyId || "")
+  .text-center.m-t-3.m-b-3(v-if="loading")
+    b 加载中...
+  div(v-else)
+    //- 表单介绍，当类型为"vote"时，内容从option[0].content中取
+    .survey-form-description(v-if="survey.type !== 'vote'") {{survey.description}}
+    .survey-form-description(v-else) {{survey.options[0].content}}
+
+    // 投票
+    .survey-form-options(v-if="survey.type === 'vote'")
+      .survey-form-option.option-answer(v-for="o, index in survey.options[0].answers")
+        .option-content {{index + 1}}. {{o.content}}
+          .option-button(@click="selectOption(0, index)" v-if="havePermission")
+            .fa.fa-check-square-o(v-if="optionsObj[survey.options[0]._id + '-' + o._id] && optionsObj[survey.options[0]._id + '-' + o._id].selected")
+            .fa.fa-square-o(v-else-if="!posted")
+        .option-info
+          .option-resources(v-if="o.resourcesId && o.resourcesId.length")
+            .option-resource
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+            //p {{o.description}}
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-status(v-if="showResult")
+          .option-status-container
+            .number-background
+            .number(:style="'width: ' + o.domProgress + '%;background-color:' + o.color")
+          .option-status-info(:title="o.progress + '% ' + o.postCount + '票'") {{o.progress}}% {{o.postCount}}票
+      .option-select-count {{selectCount(survey.options[0])}}
+    // 问卷调查
+    .survey-form-options(v-else-if="survey.type === 'survey'")
+      .survey-form-option(v-for="o, index in survey.options")
+        .option-content.option-survey {{index + 1}}. {{o.content}}
+        .option-info
+          .option-resources
+            .option-resource(v-if="o.resourcesId && o.resourcesId.length")
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+            //p {{o.description}}
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-answers(v-if="o.answers && o.answers.length")
+          .option-answer(v-for="a,index_ in o.answers")
+            .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
+              .option-button(@click="selectOption(index, index_)" v-if="havePermission")
+                .fa.fa-check-square-o(v-if="optionsObj[o._id + '-' + a._id] && optionsObj[o._id + '-' + a._id].selected")
+                .fa.fa-square-o(v-else-if="!posted")
+            .option-info
+              .option-resources
+                .option-resource(v-if="a.resourcesId && a.resourcesId.length")
+                  div(v-for="r in a.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+                .option-links(v-if="a.links && a.links.length")
+                  a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
+            .option-status(v-if="showResult")
+              .option-status-container
+                .number-background
+                .number(:style="'width: ' + a.progress + '%;background-color:' + a.color")
+              .option-status-info(:title="a.progress + '% ' + a.postCount + '票'") {{a.progress}}% {{a.postCount}}票
+        //- 勾选数量限制
+        .option-select-count {{selectCount(o)}}
+    // 打分
+    .survey-form-options(v-else)
+      .survey-form-option(v-for="o, index in survey.options")
+        .option-content.option-survey {{index + 1}}. {{o.content}}
+        .option-info
+          .option-resources
+            .option-resource(v-if="o.resourcesId && o.resourcesId.length")
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+            .option-links(v-if="o.links && o.links.length")
+              a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
+        .option-answers(v-if="o.answers && o.answers.length")
+          .option-answer(v-for="a,index_ in o.answers")
+            .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
+            .option-info
+              .option-resources
+                .option-resource(v-if="a.resourcesId && a.resourcesId.length")
+                  div(v-for="r in a.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+                //p {{o.description}}
+                .option-links(v-if="a.links && a.links.length")
+                  a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
+            .option-score-input(v-if="havePermission || posted") 得分：
+              input(type="text" v-model.number="optionsObj[o._id + '-' + a._id].score" v-if="!posted")
+              .score(v-else-if="optionsObj[o._id + '-' + a._id]") {{optionsObj[o._id + '-' + a._id].score}}
+              .score(v-else) 未打分
+              | （范围{{a.minScore}}到{{a.maxScore}}，精确到 0.01）
+            .option-status-info.survey-score(v-if="showResult") 平均打分：{{a.average}}，最高分：{{a.postMaxScore.toFixed(2)}}，最低分：{{a.postMinScore.toFixed(2)}}
+    .survey-form-button
+      .form-warning
+        //- 显示投票结果
+        div(v-if="showResult")
+          p {{postResult}}
+          .form-post-users
+            a(onclick="visitUrl('/u/' + user.uid)" :onmouseover="'floatUserPanel.open(this, \"' + user.uid + '\")'" v-for="user in users")
+              img(:src="'/avatar/' + user.avatar")
+        //- 时间限制
+        p(v-if="timeInfo") {{timeInfo}}
+        //- 奖励
+        p(v-if="rewardInfo") {{rewardInfo}}
+        //- 结果展示
+        p(v-if="survey.showResult === 'self'") 调查结果不公开。
+        p(v-else-if="survey.showResult === 'posted'") 调查结果只向投过票的用户展示。
+        //- 提交时间
+        p(v-if="postTime") 你已于 {{postTime}} 提交调查结果。
+        //- 权限提示
+        p(v-if="!havePermission") 作者限定了参与投票的人员范围，你的账号不在参与范围之内。
+
+        //p(v-else-if="totalScore") 总分{{totalScore}}，总打分{{postScore}}，平均打分{{(postScore/answerCount).toFixed(2)}}。
+      .form-button(v-if="!posted")
+        button.btn.btn-primary.btn-sm(disabled v-if="!havePermission || status !== 'beginning'")  提交
+        button.btn.btn-primary.btn-sm(@click="submit" v-else)  提交

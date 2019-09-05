@@ -468,6 +468,11 @@ block content
                                       canvas#threadQrcode.inline-block(style="display:none")
                           if data.user
                             +postOptions(thread.firstPost, thread, 0)
+          if data.thread.firstPost.surveyId
+            .fullwidthpanel.ThreadBox.nkcpanel.p-t-2
+              -const surveyFormId = `surveyForm${data.thread.firstPost.pid}`;
+              -const surveyId = data.thread.firstPost.surveyId;
+              include ../publicModules/survey/form
           .fullwidthpanel.ThreadBox.nkcpanel
             .row
               .thread-div
@@ -640,6 +645,7 @@ block scripts
   script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
+  +includeJS("/publicModules/survey/form.js")
   include ../publicModules/floatUserPanel/floatUserPanel
   include ../publicModules/highlight/highlight_editor
   include ../publicModules/complaint/complaint

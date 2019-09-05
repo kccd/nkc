@@ -60,7 +60,7 @@ editorRouter
       data.did = singledraft.did;
       data.draftDelType = singledraft.desType; // 草稿来源类型
       data.draftDelTypeId = singledraft.desTypeId; // 草稿来源类型id
-      data.targetPost = singledraft;
+      data.targetPost = singledraft.toObject();
       if(data.draftDelType === "thread") {
         contentType = "postToForum";
         const thread = await db.ThreadModel.findOne({tid: data.draftDelTypeId});
@@ -71,6 +71,7 @@ editorRouter
         const post = await db.PostModel.findOne({pid: data.draftDelTypeId});
         if(post) {
           data.targetForumsId = post.mainForumsId;
+          if(post.surveyId) data.targetPost.surveyId = post.surveyId;
         }
         contentType = "postToThread";
       }
@@ -107,6 +108,13 @@ editorRouter
 	    data.l = targetPost.l;
       data.targetUser = await targetPost.extendUser();  //回复对象
       data.targetForumsId = data.targetPost.mainForumsId;
+      // 附带调查信息
+      /*if(data.targetPost.surveyId) {
+        const survey = await db.SurveyModel.findOne({_id: data.targetPost.pid});
+        if(survey) {
+
+        }
+      }*/
       // 在屏蔽日志中查找该帖子是否处于正在退修中
       // 如果是正在退修，取出原因，并显示在编辑器中
       let delPostLog = await db.DelPostLogModel.find({"postId":id,"delType":"toDraft","modifyType":false}).sort({toc:-1})
@@ -136,6 +144,12 @@ editorRouter
       const allowedAnonymousForums = await db.ForumModel.find({allowedAnonymousPost: true}, {fid: 1});
       data.allowedAnonymousForumsId = allowedAnonymousForums.map(f => f.fid);
     }
+
+
+    if(!type || type === "forum" || type === "redit") {
+      data.createSurveyPermission = await db.SurveyModel.ensureCreatePermission("postToForum", data.user.uid);
+    }
+
     await next();
   });
 

@@ -4,34 +4,41 @@ block title
   -const mainContainer1400 = true;
 block content
   .container-fluid(style='max-width: 1400px')
-    .col-xs-12.col-md-6.col-md-offset-3
-      if data.userOperationsId.includes('visitProblemList')
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3
+        if data.userOperationsId.includes('visitProblemList')
+          .form
+            .form-group
+              a.btn.btn-default(href='/problem/list') 问题列表
+            if data.problemsType
+              h4(id='cid' data-cid=data.problemsType._id)=`添加记录到分类：`
+                a(href=`/problem/list?cid=${data.problemsType._id}`)= data.problemsType.name
         .form
           .form-group
-            a.btn.btn-default(href='/problem/list') 问题列表
-          if data.problemsType
-            h4(id='cid' data-cid=data.problemsType._id)=`添加记录到分类：`
-              a(href=`/problem/list?cid=${data.problemsType._id}`)= data.problemsType.name
-      .form
-        .form-group
-          lable 标题
-          input.form-control#title(type='text' placeholder='请一句话概括您所遇到的问题')
-        .form-group
-          lable 具体内容
-            span.text-danger
-          textarea.form-control#content(placeholder='请详细描述您所遇到问题，如果能附上问题页面的链接那就更好了。' rows=10)= data.c || ''
-        .form-group
-          h5.text-danger 请留下您的联系方式，当问题被修复后我们将会第一时间通知您。
-        .form-group
-          lable 邮箱
-          input.form-control#email
-        .form-group
-          lable QQ
-          input.form-control#QQ
-        .form-group
-          button.btn.btn-primary.btn-block#submit 提交
-        .form-group
-          h4=`科创论坛值班室：${state.serverSettings.telephone}`
+            lable 标题
+            input.form-control#title(type='text' placeholder='请一句话概括您所遇到的问题')
+          .form-group
+            lable 具体内容
+              span.text-danger
+            textarea.form-control#content(placeholder='请详细描述您所遇到问题，如果能附上问题页面的链接那就更好了。' rows=10)= data.c || ''
+          .form-group
+            h5.text-danger 请留下您的联系方式，当问题被修复后我们将会第一时间通知您。
+          .form-group
+            lable 邮箱
+            input.form-control#email
+          .form-group
+            lable QQ
+            input.form-control#QQ
+          .form-group
+            button.btn.btn-primary.btn-block#submit 提交
+          .form-group
+            h4=`科创论坛值班室：${state.serverSettings.telephone}`
+        div
+          include ../publicModules/survey/form
+        .m-t-4
+          include ../publicModules/survey/edit
 block scripts
-  script(src=`/interface_common.js?v=${startTime}`)
-  script(src=`/problem/add_problem.js?v=${startTime}`)
+  include ../publicModules/selectResource/selectResource
+  +includeJS("/publicModules/survey/edit.js")
+  +includeJS("/publicModules/survey/form.js")
+  +includeJS("/problem/add_problem.js")

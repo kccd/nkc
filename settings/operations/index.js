@@ -30,6 +30,7 @@ const editor = require('./editor');
 const exam = require('./exam');
 const e = require('./experimental');
 const f = require('./forum');
+const survey = require("./survey");
 const fund = require('./fund');
 const login = require('./login');
 const logout = require('./logout');
@@ -84,6 +85,7 @@ operationObj.defaultOperations = [
   "getAnyBodyShopCert", // 可查看任何人的商城凭证
   "viewUserAllFansAndFollowers", // 可查看用户的所有关注的人和粉丝
   "getAttachments", // 获取附件
+  "showSecretSurvey", // 查看隐藏的调查结果
 ];
 
 
@@ -200,6 +202,8 @@ operationObj.operationTree = {
     column, // 专栏申请
 
     threads, // 文章批量管理
+
+    survey, // 投票、调查问卷、打分
 	}
 };
 module.exports = operationObj;

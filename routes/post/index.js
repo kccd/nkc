@@ -271,7 +271,10 @@ router
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
-    const {columnCategoriesId=[], sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = ctx.body.post;
+    const {
+      columnCategoriesId=[], sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
+      survey
+    } = ctx.body.post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
     const {state, data, db, fs} = ctx;
@@ -364,6 +367,11 @@ router
       }
     } else {
       targetPost.anonymous = false;
+    }
+    // 修改调查表
+    if(survey && targetPost.surveyId) {
+      survey.mid = data.user.uid;
+      await db.SurveyModel.modifySurvey(survey);
     }
     let newAuthInfos = [];
     for(let a = 0;a < authorInfos.length;a++) {

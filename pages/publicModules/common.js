@@ -195,3 +195,33 @@ NKC.methods.logout = function() {
 NKC.methods.ipUrl = function(ip) {
   return "http://www.ip138.com/ips138.asp?ip="+ip+"&action=2";
 };
+/*
+* 文件大小转换
+* @param {Number} size 文件大小b
+* @param {Number} digits 保留小数点后的位数
+* @return {String} 转换后的值
+* @author pengxiguaa 2019-8-27
+* */
+NKC.methods.getSize = function(size, digits) {
+  if(digits === undefined) digits = 2;
+  if(size < 1024*1024) {
+    size = (size/1024).toFixed(digits) + "KB";
+  } else if(size < 1024*1024*1024) {
+    size = (size/(1024*1024)).toFixed(digits) + "MB";
+  } else {
+    size = (size/(1024*1024*1024)).toFixed(digits) + "GB";
+  }
+  return size;
+};
+/*
+* 获取随机颜色
+* */
+NKC.methods.getRandomColor = function() {
+  var str = "0123456789abcdef";
+  var color = "#";
+  for(var i = 0; i < 6; i++) {
+    var index = Math.round(Math.random()*15);
+    color += str.slice(index, index + 1);
+  }
+  return color;
+};

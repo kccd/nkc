@@ -1,0 +1,193 @@
+#moduleSelectResource .modal-header{
+  text-align: center;
+  border-bottom: none;
+}
+#moduleSelectResource .modal-body{
+  /*padding: 0;*/
+  padding-top: 0;
+  padding-bottom: 0;
+}
+#moduleSelectResource .selected-resources{
+  /*padding: 0 0.8rem;*/
+}
+#moduleSelectResource .resource-type{
+  height: 2.2rem;
+  font-size: 1rem;
+  line-height: 2.2rem;
+  padding: 0 0.6rem;
+  border-radius: 3px;
+  display: inline-block;
+  cursor: pointer;
+  transition: background-color 100ms, color 100ms;
+}
+#moduleSelectResource  .modal-footer{
+  border-top: none;
+}
+#moduleSelectResource .resource-type:hover, #moduleSelectResource .resource-type.active{
+  background-color: #2b90d9;
+  color: #fff;
+}
+#moduleSelectResource  .resource-picture{
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+}
+#moduleSelectResource  .resource-picture.icon{
+  background-size: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+#moduleSelectResource  .resources{
+  font-size: 0;
+}
+#moduleSelectResource  .resource{
+  height: 5rem;
+  position: relative;
+  margin: 0 0.5rem 0.5rem 0;
+  width: 7.3rem;
+  font-size: 0;
+  cursor: pointer;
+  display: inline-block;
+}
+#moduleSelectResource  .selected-resource-header{
+  margin-bottom: 0.5rem;
+}
+#moduleSelectResource  .resource.active{
+  /*border: 2px solid green;*/
+}
+#moduleSelectResource  .resource>div{
+}
+#moduleSelectResource .resources-body{
+  margin-top: 0.5rem;
+  /*padding: 0 0.8rem;*/
+}
+#moduleSelectResource  .resource-name{
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  height: 1.6rem;
+  color: #fff;
+  line-height: 1.6rem;
+  text-align: center;
+  font-size: 1rem;
+  background-color: rgba(0,0,0,0.2);
+}
+#moduleSelectResource  .resource-mask{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  font-size: 1.4rem;
+  padding-right: 0.4rem;
+  color: #fff;
+  text-align: right;
+  top: 0;
+  left: 0;
+  background-color: rgba(0,0,0,0.1);
+}
+#moduleSelectResource  .resource-mask.active{
+  background-color: rgba(0,0,0,0.6);
+}
+#moduleSelectResource  .resource-mask.active .fa{
+  color: #00ff04;
+}
+#moduleSelectResource .resource-link{
+  height: 100%;
+  width: 100%;
+}
+#moduleSelectResource .resource-info{
+  font-size: 1.2rem;
+  display: table-cell;
+  vertical-align: top;
+  padding: 1.9rem 0;
+  font-weight: 700;
+  text-align: center;
+}
+#moduleSelectResource .file-lists{
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+#moduleSelectResource .file-li{
+  position: relative;
+  margin-bottom: 0.5rem;
+  word-break: break-all;
+  min-height: 4rem;
+  color: #fff;
+  border-radius: 3px;
+  background-color: #575757;
+}
+#moduleSelectResource .file-li.active{
+  background-color: #47c449;
+}
+#moduleSelectResource .file-name{
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-top: 0.6rem;
+}
+#moduleSelectResource .file-size{
+  font-size: 1rem;
+}
+#moduleSelectResource .file-btn{
+  height: 4rem;
+  top: 0;
+  right: 0;
+  vertical-align: top;
+  font-size: 1rem;
+  width: 7rem;
+  line-height: 4rem;
+  text-align: center;
+  position: absolute;
+}
+#moduleSelectResource .file-info{
+  overflow: hidden;
+  margin-right: 7rem;
+  padding-left: 1rem;
+}
+#moduleSelectResource .file-hidden{
+  /*width: 10000px;*/
+}
+#moduleSelectResource .file-btn>.fa{
+  cursor: pointer;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid #777;
+  color: #eee;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 2.4rem;
+  margin-right: 0.5rem;
+}
+#moduleSelectResource .file-btn .fa.fa-remove:hover{
+  border-color: #aaa;
+}
+#moduleSelectResource .file-btn .fa.fa-arrow-up:hover{
+  border-color: #aaa;
+}
+#moduleSelectResource .file-btn .fa.upload-progress{
+  border:none;
+  width: 6.5rem;
+}
+#moduleSelectResource .file-progress{
+  position: absolute;
+  height: 3px;
+  width: 0;
+  transition: width 200ms;
+  bottom: 0;
+  background-color: #57cd59;
+  border-radius: 2px;
+}
+#moduleSelectResource .upload-success{
+  border-color: #e6e6e6!important;
+}
+#moduleSelectResource .file-error {
+  color: #ff6c6a;
+  margin-left: 1rem;
+  font-size: 1rem;
+}

@@ -1,0 +1,292 @@
+#moduleSurveyEdit .survey-type{
+  display: inline-block;
+  margin-right: 1rem;
+  cursor: pointer;
+  padding-top: 7px;
+}
+#moduleSurveyEdit .survey-type span{
+  font-weight: 700;
+}
+#moduleSurveyEdit .survey-type .fa{
+  margin-right: 0.3rem;
+  font-size: 15px;
+  color: green;
+}
+#moduleSurveyEdit .survey-type .fa-circle-o{
+  color: #555;
+}
+#moduleSurveyEdit .option-answers{
+  padding: 0.5rem;
+  padding-left: 2rem;
+  /*background-color: #eee;*/
+
+}
+#moduleSurveyEdit .add-option-button{
+  cursor: pointer;
+  font-weight: 700;
+  /*color: #2b90d9;*/
+}
+#moduleSurveyEdit .survey-option{
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: #f4f4f4;
+  border-radius: 3px;
+}
+#moduleSurveyEdit .survey-option:first-child{
+  border-top: none;
+}
+#moduleSurveyEdit .survey-option .fa{
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #888;
+  display: inline-block;
+  width: 1.5rem;
+  text-align: center;
+}
+#moduleSurveyEdit .survey-options{
+  margin-top: 0.5rem;
+}
+#moduleSurveyEdit .option-index{
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-bottom:0.5rem;
+}
+#moduleSurveyEdit .option-resources{
+  margin-top: 0.5rem;
+  font-size: 0;
+}
+#moduleSurveyEdit .option-resource {
+  height: 5rem;
+  display: inline-block;
+  width: 7rem;
+  margin: 0 0.5rem 0.5rem 0;
+}
+#moduleSurveyEdit .option-resource-img{
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+}
+#moduleSurveyEdit .option-resource{
+  font-size: 0;
+  cursor: pointer;
+  position: relative;
+}
+#moduleSurveyEdit .option-resource .fa{
+  position: absolute;
+  display: none;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 2rem;
+  width: 2rem;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+}
+#moduleSurveyEdit .option-resource:hover .fa{
+  display: block;
+}
+@media (max-width: 991px) {
+  #moduleSurveyEdit .option-resource .fa{
+    display: block;
+  }
+}
+#moduleSurveyEdit .survey-answers{
+  background-color: #f4f4f4;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+#moduleSurveyEdit .survey-answer{
+  margin-bottom: 0.5rem;
+}
+#moduleSurveyEdit .survey-scores input{
+  max-width: 3rem;
+}
+.module-survey-form .option-resource{
+  display: table-cell;
+  /*width: 4rem;*/
+}
+.module-survey-form .option-content{
+  font-weight: 700;
+  /*margin-bottom: 0.5rem;*/
+}
+.module-survey-form .survey-form-description{
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.module-survey-form .option-resource>div{
+  height: 3rem;
+  display: inline-block;
+  width: 3rem;
+  margin-right: 0.5rem;
+  border-radius: 3px;
+  vertical-align: top;
+  cursor: pointer;
+  background-size: cover;
+}
+.module-survey-form .survey-form-option{
+  margin: 1rem 0;
+}
+.module-survey-form .option-links{
+  display: table-cell;
+  vertical-align: top;
+}
+.module-survey-form .option-link{
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  word-break: break-all;
+  height: 1.5rem;
+}
+.module-survey-form .option-content{
+  position: relative;
+  padding-right: 6rem;
+}
+.module-survey-form .option-content.option-survey{
+  padding-right: 0;
+}
+.module-survey-form .option-button{
+  width: 6rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.module-survey-form .option-button select{
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+.module-survey-form .option-button span.score{
+  font-size: 1.2rem;
+  font-weight: normal;
+  color: #667282;
+}
+.module-survey-form .option-button .fa.fa-square-o{
+  color: #888;
+}
+.module-survey-form .option-button .fa.fa-check-square-o{
+  color: #2b90d9;
+}
+.module-survey-form .form-warning{
+  color: #808080;
+  margin-bottom: 0.5rem;
+}
+.module-survey-form .option-answer span.active{
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2b90d9;
+}
+.module-survey-form .option-answers{
+  padding-left: 1rem;
+}
+.module-survey-form .option-answer{
+  background-color: #f6f6f6;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  padding: 0.5rem;
+}
+.module-survey-form .option-content{
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 1.25rem;
+  /*background-color: #f4f4f4;*/
+}
+.module-survey-form .answer-content{
+  background-color: #f6f6f6;
+  font-weight: normal;
+  padding-right: 0;
+  font-size: 1.2rem;
+  margin-bottom: 0;
+}
+.module-survey-form .answer-content .option-button{
+  width: 10rem;
+}
+.module-survey-form .survey-score-input{
+  max-width: 2rem;
+  font-size: 1.2rem;
+}
+.module-survey-form .survey-score-score{
+  font-size: 1rem;
+}
+.module-survey-form .option-status{
+  position: relative;
+  overflow: hidden;
+  height: 2rem;
+  line-height: 2rem;
+}
+.module-survey-form .option-status .number{
+  position: absolute;
+  transition: width 2s;
+  top: 0;
+  left: 0;
+  height: 8px;
+  border-radius: 4px;
+}
+.module-survey-form .number-background{
+  position: absolute;
+  border-radius: 4px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background-color: rgba(0,0,0,0.05);
+}
+.module-survey-form .option-status-container{
+  position: relative;
+  margin-right: 8rem;
+  margin-top: 0.6rem;
+}
+.module-survey-form .option-status-info{
+  position: absolute;
+  top: 0;
+  width: 8rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  text-align: right;
+  word-break: break-all;
+  color: #9baec8;
+  right: 0;
+}
+.module-survey-form .option-status-info.survey-score{
+  width: 100%;
+  position: relative;
+  padding-top: 0.3rem;
+  text-align: right;
+}
+.module-survey-form .form-post-users a{
+  display: inline-block;
+  margin-right: -1rem;
+}
+.module-survey-form .form-post-users a img{
+  height: 3rem;
+  width: 3rem;
+  border: 2px solid #f4f4f4;
+  border-radius: 50%;
+}
+.module-survey-form .option-score-input{
+  display: inline-block;
+  color: #888;
+}
+.module-survey-form .option-score-input .score{
+  font-size: 1.2rem;
+  font-weight: 700;
+  /*color: #9baec8;*/
+  display: inline;
+}
+.module-survey-form .option-score-limit{
+  display: inline-block;
+}
+
+.module-survey-form .option-select-count{
+  text-align: right;
+  font-size: 1rem;
+  color: #9baec8;
+}

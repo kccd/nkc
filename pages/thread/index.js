@@ -1,4 +1,4 @@
-var SubscribeTypes, UserInfo;
+var SubscribeTypes, UserInfo, surveyForms = [];
 $(document).ready(function(){
   if(window.moduleToColumn) {
     moduleToColumn.init();
@@ -9,6 +9,15 @@ $(document).ready(function(){
   if(NKC.modules.UserInfo) {
     UserInfo = new NKC.modules.UserInfo();
   }
+  var surveyFormsDom = $(".module-survey-form");
+  for(var i = 0; i < surveyFormsDom.length; i++) {
+    var dom = surveyFormsDom.eq(i);
+    var id = dom.attr("id");
+    var form = new NKC.modules.SurveyForm("#" + id);
+    form.init();
+    surveyForms.push(form);
+  }
+
 
 	//编辑器缩放
   NKC.methods.markDom($("#highlight>.highlight"));

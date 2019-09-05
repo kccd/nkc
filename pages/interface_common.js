@@ -20,14 +20,15 @@ function display(id){geid(id).style = 'display:inherit;'}
 * */
 function generalRequest(type, url, method, data, progress) {
   return new Promise(function(resolve, reject) {
+    var e_;
     var xhr = new XMLHttpRequest();
     if(type === "upload" && progress) {
       xhr.upload.onprogress = function(e) {
+        e_ = e;
         var num = (e.loaded/e.total)*100;
         if(num >= 100) num = 100;
         var percentage = (num).toFixed(1);
-        percentage = percentage + "%";
-        progress(e, percentage);
+        progress(e, Number(percentage));
       };
     }
     xhr.onreadystatechange = function(){
@@ -43,6 +44,9 @@ function generalRequest(type, url, method, data, progress) {
         } else if(xhr.status >= 400 || res.error || res instanceof Error) {
           reject(res);
         } else {
+          if(progress && type === "upload" && e_) {
+            progress(e_, "100%");
+          }
           resolve(res);
         }
       }
@@ -169,14 +173,26 @@ function sweetAlert(text) {
   });
 }
 
-function sweetSuccess(text) {
+function sweetSuccess(text, options) {
+  options = options || {
+    autoHide: true,
+    timer: 2000
+  };
   text = text + "";
-  Swal({
-    type: "success",
-    confirmButtonText: "关闭",
-    timer: 2000,
-    text: text
-  });
+  if(options.autoHide) {
+    Swal({
+      type: "success",
+      confirmButtonText: "关闭",
+      timer: options.timer,
+      text: text
+    });
+  } else {
+    Swal({
+      type: "success",
+      confirmButtonText: "关闭",
+      text: text
+    });
+  }
 }
 function sweetError(text) {
   text = text.error || text;

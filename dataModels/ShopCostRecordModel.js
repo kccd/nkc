@@ -50,7 +50,7 @@ const shopCostRecordSchema = new Schema({
   freightPrice: {
     type: Number
   },
-  // 商品总价
+  // 商品总价 不包含运费
   productPrice: {
     type: Number
   },

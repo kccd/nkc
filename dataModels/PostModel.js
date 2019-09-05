@@ -184,10 +184,16 @@ const postSchema = new Schema({
     default: false,
     index: 1
   },
-  // 受否匿名
+  // 是否匿名
   anonymous: {
     type: Boolean,
     default: false,
+    index: 1
+  },
+  // 投票功能表单的ID
+  surveyId: {
+    type: Number,
+    default: null,
     index: 1
   }
 }, {toObject: {

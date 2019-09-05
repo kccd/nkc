@@ -129,7 +129,7 @@ const shopGoodsSchema = new Schema({
     type: Boolean,
     default: true
   },
-  // 运费价格
+  // 运费价格 暂时无用
   freightPrice: {
     type: Schema.Types.Mixed,
     default: {
