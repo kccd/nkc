@@ -29,26 +29,26 @@ var CheckData = function () {
   *   fractionDigits: 小数位数
   * @author pengxiguaa 2019-9-6
   * */
-  this.checkNumber = (data, options) => {
+  this.checkNumber = function(data, options) {
     options = options || {};
     var min = options.min;
     var max = options.max;
     var fractionDigits = options.fractionDigits || 0;
     var name = options.name || "";
     if(typeof(data) !== "number" || isNaN(data)) {
-      self.te(400, `${name}数据类型错误`);
+      self.te(400, name + "数据类型错误");
     }
     if(min !== undefined) {
-      if(data < min) self.te(400, `${name}数值不能小于${min}`);
+      if(data < min) self.te(400, name + "数值不能小于" + min);
     }
     if(max !== undefined) {
-      if(data > max) self.te(400, `${name}数值不能大于${max}`);
+      if(data > max) self.te(400, name + "数值不能大于" + max);
     }
     var dataArr = data.toString().split(".")[1];
     var length = (dataArr || "").length;
     if(length > fractionDigits) {
-      if(fractionDigits === 0) self.te(400, `${name}数值必须为整数`);
-      self.te(400, `${name}小数点位数不符合规定`);
+      if(fractionDigits === 0) self.te(400, name + "数值必须为整数");
+      self.te(400, name + "小数点位数不符合规定");
     }
   };
   /*
@@ -60,19 +60,19 @@ var CheckData = function () {
   *   maxLength: 最大字节长度
   * @author pengxiguaa 2019-9-6
   * */
-  this.checkString = (data, options) => {
+  this.checkString = function(data, options) {
     options = options || {};
     var name = options.name || "";
     var minLength = options.minLength === undefined? 1: options.minLength;
     var maxLength = options.maxLength === undefined? 5000: options.maxLength;
     if(typeof(data) !== "string") {
-      self.te(400, `${name}数据类型错误`);
+      self.te(400, name + "数据类型错误");
     }
     if(self.getLength(data) < minLength) {
-      self.te(400, `${name}长度不能小于${minLength}字节`);
+      self.te(400, name + "长度不能小于" + minLength + "字节");
     }
     if(self.getLength(data) > maxLength) {
-      self.te(400, `${name}长度不能大于${maxLength}字节`);
+      self.te(400, name + "长度不能大于" + maxLength + "字节");
     }
   };
 };

@@ -217,7 +217,7 @@ schema.statics.checkSurveyData = async (survey) => {
       name: "调查说明"
     });
   }
-  if(!options || !options.length) throwErr(400, "请至少添加一个选择");
+  if(!options || !options.length) throwErr(400, "请至少添加一个问题");
   if(options.length > 99) ctx.throw(400, "问题数量不能超过99");
   for(let i = 0; i < options.length; i++) {
     const option = options[i];
