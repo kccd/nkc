@@ -83,7 +83,7 @@
               .score(v-else) 未打分
               | （范围{{a.minScore}}到{{a.maxScore}}，精确到 0.01）
             .option-status-info.survey-score(v-if="showResult") 平均：{{a.average}}，最高：{{a.postMaxScore.toFixed(2)}}，最低：{{a.postMinScore.toFixed(2)}}
-        .option-select-count(v-if="showResult") 平均：{{o.postScore?(o.postScore/(o.answers.length*survey.postCount)).toFixed(2):0}}
+        .option-select-count(v-if="showResult") 总平均分：{{o.postScore?(o.postScore/(survey.postCount)).toFixed(2):0}}
     .survey-form-button
       .form-warning
         //- 显示投票结果
