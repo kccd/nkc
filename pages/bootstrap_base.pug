@@ -50,6 +50,8 @@ block body
   +includeJS("/sweetalert2/dist/sweetalert2.all.min.js")
   //- 新版common.js
   +includeJS('/publicModules/common.js')
+  // 前后端公用 数据类型检查
+  +includeJS("/checkData.js")
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
   if data.user

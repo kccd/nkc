@@ -27,17 +27,17 @@
         .col-sm-9
           textarea.form-control(v-model="survey.description" rows=4 placeholder="请输入调查说明")
       .form-group
-        label.col-sm-1.control-label 内容
+        label.col-sm-1.control-label 问题
         .col-sm-9
           .survey-options.m-b-05
             .survey-option(v-for="o, index in survey.options" v-if="survey.type !== 'vote' || index === 0")
-              .option-index 调查内容{{index+1}}
+              .option-index 问题{{index+1}}
                 .pull-right
                   span(v-if="survey.type !== 'vote'")
                     .fa.fa-chevron-circle-up(title="上移" @click="moveOption('up', o)")
                     .fa.fa-chevron-circle-down(title="下移" @click="moveOption('down', o)")
                   .fa.fa-trash(title="移除" @click="removeOption(index)")
-              textarea.form-control(v-model="o.content" placeholder="调查内容")
+              textarea.form-control(v-model="o.content" placeholder="请输入问题内容")
               .row.option-links.m-t-05(v-if="o.links_ && o.links_.length")
                 .option-link.m-b-05(v-for="link, index in o.links_")
                   .col-xs-12.col-md-8
@@ -55,11 +55,12 @@
                 .survey-answer(v-for="a, index in o.answers")
                   .m-b-05.option-index 选项{{index+1}}
                     .pull-right
+                      .fa.fa-files-o(title="复制并添加选项" @click="copy(o.answers, a)")
                       .fa.fa-chevron-circle-up(title="上移" @click="moveOption('up', o, a)")
                       .fa.fa-chevron-circle-down(title="下移" @click="moveOption('down', o, a)")
                       .fa.fa-trash(title="移除" @click="removeAnswer(o, index)")
 
-                  textarea.form-control.m-b-05(placeholder="选项内容" v-model="a.content")
+                  textarea.form-control.m-b-05(placeholder="请输入选项内容" v-model="a.content")
                   .row.option-links.m-t-05(v-if="a.links_ && a.links_.length")
                     .option-link.m-b-05(v-for="link, index in a.links_")
                       .col-xs-12.col-md-8
@@ -84,12 +85,14 @@
               h5(v-if="survey.type !== 'score'") 可选选项数量限制：
                 | 最小
                 select(v-model="o.minVoteCount")
-                  option(v-for="i in getMinVoteCount(o)" :value="i") {{i}}
+                  option(v-for="i in getVoteCount(o)" :value="i") {{i}}
                 | &nbsp;最大
                 select(v-model="o.maxVoteCount")
                   option(v-for="i in getVoteCount(o)" :value="i") {{i}}
           button.btn.btn-default.btn-sm(@click="addOption" v-if="survey.type !== 'vote'")
-            .fa.fa-plus.add-option-button &nbsp;添加调查
+            .fa.fa-plus.add-option-button &nbsp;添加问题
+          button.btn.btn-default.btn-sm(@click="copy(survey.options)" v-if="survey.type !== 'vote' && survey.options.length")
+            .fa.fa-files-o &nbsp;复制问题
       .form-group
         label.col-sm-1.control-label 结果展示
         .col-sm-9
@@ -116,11 +119,11 @@
               span 开启
           .survey-scores(v-if="survey.reward.status")
             h5.text-info 你当前拥有{{targetUser.kcb/100}}个科创币。
-            h5.text-info(v-if="survey.reward.onceKcb && survey.reward.rewardCount") 每次提交奖励{{survey.reward.onceKcb}}个科创币，总共奖励{{survey.reward.rewardCount}}次，共计{{survey.reward.onceKcb*survey.reward.rewardCount}}个科创币。
-            h5.text-danger(v-if="targetUser.kcb/100 < survey.reward.onceKcb*survey.reward.rewardCount") 你的科创币不足，透支后将不再奖励。
+            h5.text-info(v-if="rewardKcbTotal") 每次提交奖励 {{survey.reward.onceKcb}} 个科创币，总共奖励 {{survey.reward.rewardCount}} 次，共计 {{rewardKcbTotal}} 个科创币。
+            h5.text-danger(v-if="rewardWarning") {{rewardWarning}}
             h5 单次奖励
               input(type="text" v-model.number="survey.reward.onceKcb" @change="toInt")
-              | &nbsp;科创币，
+              | &nbsp;科创币（精确到0.01），
               | 总奖励次数
               input(type="text" v-model.number="survey.reward.rewardCount" @change="toInt")
       .form-group
@@ -160,18 +163,30 @@
                 input(type="text" v-model.number="survey.permission.voteUpCount" @change="toInt")
             .form.col-sm-12
               .form-group
-                label 最小用户等级：
-                .radio
-                  label.m-r-1(v-for="g in grades")
-                    input(type="radio" v-model="survey.permission.minGradeId" :value="g._id")
-                    span {{g.displayName}}
-            .form.col-sm-12
-              .form-group
-                label 用户证书
+                label 用户等级：
                 .checkbox
-                  label.m-r-1(v-for="r in roles")
-                    input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
-                    span {{r.displayName}}
+                  label.m-r-1(v-for="g in grades")
+                    input(type="checkbox" v-model="survey.permission.gradesId" :value="g._id")
+                    span {{g.displayName}}
+            if permission("showSurveyCertLimit")
+              .form.col-sm-12
+                .form-group
+                  label 用户证书
+                  .checkbox
+                    label.m-r-1(v-for="r in roles")
+                      input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
+                      span {{r.displayName}}
+              .form.col-sm-12
+                .form-group
+                  label 指定用户：
+                  .selected-users(v-if="selectedUsers.length")
+                    .selected-user(v-for="u in selectedUsers")
+                      .selected-user-avatar
+                        img(:src="'/avatar/' + u.avatar + '?t=sm'")
+                      .selected-user-name {{u.username}}
+                        .fa.fa-remove(@click="removeUser(index)")
+
+                  button.btn.btn-xs.btn-default(@click="selectUser") 选择用户
       .form-group
         label.col-sm-1.control-label 时间
         .col-sm-9.m-t-05

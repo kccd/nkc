@@ -82,7 +82,8 @@
               .score(v-else-if="optionsObj[o._id + '-' + a._id]") {{optionsObj[o._id + '-' + a._id].score}}
               .score(v-else) 未打分
               | （范围{{a.minScore}}到{{a.maxScore}}，精确到 0.01）
-            .option-status-info.survey-score(v-if="showResult") 平均打分：{{a.average}}，最高分：{{a.postMaxScore.toFixed(2)}}，最低分：{{a.postMinScore.toFixed(2)}}
+            .option-status-info.survey-score(v-if="showResult") 平均：{{a.average}}，最高：{{a.postMaxScore.toFixed(2)}}，最低：{{a.postMinScore.toFixed(2)}}
+        .option-select-count(v-if="showResult") 平均：{{o.postScore?(o.postScore/(o.answers.length*survey.postCount)).toFixed(2):0}}
     .survey-form-button
       .form-warning
         //- 显示投票结果
@@ -96,12 +97,28 @@
         //- 奖励
         p(v-if="rewardInfo") {{rewardInfo}}
         //- 结果展示
-        p(v-if="survey.showResult === 'self'") 调查结果不公开。
-        p(v-else-if="survey.showResult === 'posted'") 调查结果只向投过票的用户展示。
+        p(v-if="survey.showResult === 'self'") 结果不公开。
+        p(v-else-if="survey.showResult === 'posted'") 结果只向投过票的用户展示。
         //- 提交时间
-        p(v-if="postTime") 你已于 {{postTime}} 提交调查结果。
+        p(v-if="postTime")
+          if data.user
+            | 你已于 {{postTime}} 提交结果。
+          else
+            | 你的IP已于 {{postTime}} 提交结果。若你没有提交过，请&nbsp;
+            a(onclick="Login.open('login')") 登录
+            | &nbsp;或&nbsp;
+            a(onclick="Login.open('register')") 注册
+            | 。
         //- 权限提示
-        p(v-if="!havePermission") 作者限定了参与投票的人员范围，你的账号不在参与范围之内。
+        p(v-if="!havePermission")
+          if data.user
+            | 作者限定了参与人员的范围，你的账号不在参与范围之内。
+          else
+            | 作者限定了参与人员的范围，请先&nbsp;
+            a(onclick="Login.open('login')") 登录
+            | &nbsp;或&nbsp;
+            a(onclick="Login.open('register')") 注册
+            | 。
 
         //p(v-else-if="totalScore") 总分{{totalScore}}，总打分{{postScore}}，平均打分{{(postScore/answerCount).toFixed(2)}}。
       .form-button(v-if="!posted")

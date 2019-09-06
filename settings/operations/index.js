@@ -86,6 +86,7 @@ operationObj.defaultOperations = [
   "viewUserAllFansAndFollowers", // 可查看用户的所有关注的人和粉丝
   "getAttachments", // 获取附件
   "showSecretSurvey", // 查看隐藏的调查结果
+  "showSurveyCertLimit", // 发起调查时可更具证书限制参与的用户
 ];
 
 

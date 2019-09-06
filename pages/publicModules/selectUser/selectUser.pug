@@ -1,0 +1,45 @@
++includeCSS("/publicModules/selectUser/selectUser.css")
+.modal.fade#moduleSelectUser(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog(role="document" v-cloak)#moduleSelectUserApp
+    .modal-content
+      .modal-header
+        button.close(data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        .modal-title.text-center 选择用户
+      .modal-body
+        .selected-users
+          h5 已选择用户：
+            span(v-if="!selectedUsers.length") 无
+          .selected-user(v-for="u, index in selectedUsers")
+            .selected-user-avatar
+              img(:src="'/avatar/' + u.avatar + '?t=sm'")
+            .selected-user-name {{u.username}}
+              .fa.fa-remove(@click="removeUser(index)")
+        .input-group
+          .input-group-btn
+            button.btn.btn-default.dropdown-toggle(data-toggle="dropdown" aria-haspopup="true" aria-expanded=false)
+              | {{getTypeName(type)}}&nbsp;
+              span.caret
+            ul.dropdown-menu
+              li.pointer
+                a(@click="selectType('username')") {{getTypeName("username")}}
+              li.pointer
+                a(@click="selectType('uid')") {{getTypeName("uid")}}
+          input.form-control.search-input(type="text" v-model.trim="keyword" @keyup.enter="search")
+          button.search-button(@click="search")
+            .fa.fa-search
+        .search-results
+          h5.text-danger(v-if="searchInfo") {{searchInfo}}
+          .search-user(v-for="u in searchUsers" @click="selectUser(u)")
+            .search-user-avatar
+              img(:src="'/avatar/' + u.avatar + '?t=sm'")
+            .search-user-info
+              .search-user-name {{u.username}}
+                //.button.fa.fa-plus-circle(@click="selectUser(u)")
+              .search-user-description {{u.description}}
+      .modal-footer
+        button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
+        button(type="button" class="btn btn-primary btn-sm" disabled=true v-if="!selectedUsersId.length") 确定
+        button(type="button" class="btn btn-primary btn-sm" @click="done" v-else) 确定
+
++includeJS("/publicModules/selectUser/selectUser.js")

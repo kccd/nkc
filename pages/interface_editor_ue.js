@@ -133,9 +133,13 @@ var targetPost = postData.targetPost;
 var ColumnCategoriesDom;
 var anonymousData;
 var SurveyEdit;
+var SelectUser;
 $(function() {
   if(NKC.modules.SelectColumnCategories) {
     ColumnCategoriesDom = new NKC.modules.SelectColumnCategories();
+  }
+  if(NKC.modules.SelectUser) {
+    SelectUser = new NKC.modules.SelectUser();
   }
   if(NKC.modules.SurveyEdit) {
     SurveyEdit = new NKC.modules.SurveyEdit();

@@ -15,6 +15,7 @@ router
     const {survey} = data;
     data.havePermission = false;
     data.users = await survey.getPostUsers();
+    data.allowedUsers = await db.UserModel.find({uid: {$in: survey.permission.uid}});
     data.targetUser = await db.UserModel.findOnly({uid: survey.uid});
     if(data.user) {
       data.surveyPost = await db.SurveyPostModel.findOne({uid: data.user.uid, surveyId: survey._id});
@@ -56,6 +57,7 @@ router
   })
   .post("/", async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
+    const {checkString, checkNumber} = nkcModules.checkData;
     const {survey, user} = data;
     let {options} = body;
     await survey.ensurePostPermission(user?user.uid:"", ctx.address);
@@ -107,9 +109,16 @@ router
       if(survey.type === "score") {
         let score = option.score;
         if(score === "") ctx.throw(400, "还有未打分的选项，请检查");
-        score = Number(score.toFixed(2));
-        if(score < answer.minScore || score > answer.maxScore) {
-          ctx.throw(400, "分值不再要求的范围内");
+        try{
+          checkNumber(score, {
+            name: `打分`,
+            min: answer.minScore,
+            max: answer.maxScore,
+            fractionDigits: 2
+          });
+        } catch(err) {
+          console.log(err)
+          ctx.throw(400, "打分分值不在规定的范围内，请检查");
         }
         option[i] = {
           optionId: option.optionId,

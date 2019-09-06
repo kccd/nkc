@@ -152,7 +152,7 @@ schema.statics.getUserSubColumnsId = async (uid) => {
     const SubscribeModel = mongoose.model("subscribes");
     columnsId = await SubscribeModel.saveUserSubColumnsId(uid);
   }
-  return columnsId;
+  return columnsId.map(id => Number(id));
 };
 /*
 * 将用户关注的专栏ID存入redis

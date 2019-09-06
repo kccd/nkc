@@ -132,10 +132,14 @@ const schema = new Schema({
       type: [String],
       default: ["default"]
     },
-    minGradeId: { // 等级ID
+    gradesId: {
+      type: [Number],
+      default: [1]
+    },
+    /*minGradeId: { // 等级ID
       type: Number,
       default: 1
-    },
+    },*/
     registerTime: {
       type: Number,
       default: 0
@@ -159,6 +163,11 @@ const schema = new Schema({
     voteUpCount: {
       type: Number,
       default: 0
+    },
+    // 指定用户ID
+    uid: {
+      type: [String],
+      default: []
     }
   },
   // 奖励
@@ -198,27 +207,44 @@ const schema = new Schema({
 * @author pengxiguaa 2019-9-4
 * */
 schema.statics.checkSurveyData = async (survey) => {
+  const {checkString, checkNumber} = require("../nkcModules/checkData");
   const SettingModel = mongoose.model("settings");
   const {
     options, reward, permission, type
   } = survey;
-  if(type !== "vote" && !survey.description) throwErr(400, "调查说明不能为空");
+  if(type !== "vote") {
+    checkString(survey.description, {
+      name: "调查说明"
+    });
+  }
   if(!options || !options.length) throwErr(400, "请至少添加一个选择");
-  if(options.length > 99) ctx.throw(400, "调查内容数量超出限制（99）");
+  if(options.length > 99) ctx.throw(400, "问题数量不能超过99");
   for(let i = 0; i < options.length; i++) {
     const option = options[i];
-    if(!option.content) throwErr(400, `调查内容${i+1}不能为空`);
-    if(!option.answers || !option.answers.length) throwErr(400, "请为每个调查内容至少添加一个选项");
-    if(option.answers.length > 99) ctx.throw(400, "调查内容选项的数量超出限制（99）");
+    checkString(option.content, {name: `问题${i+1}的内容`});
+    if(!option.answers || !option.answers.length) throwErr(400, "请为每个问题至少添加一个选项");
+    if(option.answers.length > 99) ctx.throw(400, "问题选项的数量不能超过99");
+    if(option.links.length > 10) ctx.throw(400, "每个问题最多仅能添加10个链接");
+    if(option.resourcesId.length > 10) ctx.throw(400, "每个问题最多仅能添加10张图片");
     for(let j = 0; j < option.answers.length; j++) {
       const answer = option.answers[j];
-      if(!answer.content) throwErr(400, `调查内容${i+1}的选项内容不能为空`);
-      answer.minScore = Number(answer.minScore.toFixed(2));
-      answer.maxScore = Number(answer.maxScore.toFixed(2));
+      checkString(answer.content, {name: `问题${i+1}的选项内容`});
+      if(answer.links.length > 10) ctx.throw(400, `问题选项最多仅能添加10个链接`);
+      if(answer.resourcesId.length > 10) ctx.throw(400, `问题选项最多仅能添加10张图片`);
       if(type === "score") {
-        if(answer.minScore < -150) throwErr(400, `调查内容${i+1}的选项最小分值不能小于-150`);
-        if(answer.maxScore > 150) throwErr(400, `调查内容${i+1}的选项最大分值不能大于150`);
-        if(answer.maxScore <= answer.minScore) throwErr(400, `调查内容${i+1}的选项最大分值必须大于最小分值`);
+        checkNumber(answer.minScore, {
+          name: `问题${i+1}的选项最小分值`,
+          min: -150,
+          max: 150,
+          fractionDigits: 2
+        });
+        checkNumber(answer.maxScore, {
+          name: `问题${i+1}的选项最大分值`,
+          min: -150,
+          max: 150,
+          fractionDigits: 2
+        });
+        if(answer.maxScore <= answer.minScore) throwErr(400, `问题${i+1}的选项最大分值必须大于最小分值`);
       }
       if(!answer._id) answer._id = await SettingModel.operateSystemID("surveyOptionAnswers", 1);
       option.answers[j] = {
@@ -234,13 +260,18 @@ schema.statics.checkSurveyData = async (survey) => {
         postMinScore: answer.postMinScore || 0
       }
     }
-    option.maxVoteCount = parseInt(option.maxVoteCount);
-    option.minVoteCount = parseInt(option.minVoteCount);
     if(type !== "score") {
-      if(!option.maxVoteCount) throwErr(400, `调查内容${i+1}的最大选择数量不能小于1`);
-      if(option.minVoteCount < 0) throwErr(400, `调查内容${i+1}的最小选择数量不能小于0`);
-      if(option.maxVoteCount > option.answers.length) throwErr(400, `调查内容${i+1}的最大选择数量不能大于选项数量`);
-      if(option.minVoteCount > option.maxVoteCount) throwErr(400, `调查内容${i+1}的最小选择数量不能大于最大选择数量`);
+      checkNumber(option.minVoteCount, {
+        name: `问题${i+1}的最小选择数量`,
+        min: 1,
+        max: option.answers.length
+      });
+      checkNumber(option.maxVoteCount, {
+        name: `问题${i+1}的最大选择数量`,
+        min: 1,
+        max: option.answers.length
+      });
+      if(option.minVoteCount > option.maxVoteCount) throwErr(400, `问题${i+1}的最小选择数量不能大于最大选择数量`);
     }
     if(!option._id) option._id = await SettingModel.operateSystemID("surveyOptions", 1);
     options[i] = {
@@ -254,33 +285,60 @@ schema.statics.checkSurveyData = async (survey) => {
       minVoteCount: option.minVoteCount || 0,
     }
   }
+  if(survey.reward.status) {
+    const kcb = survey.reward.onceKcb/100;
+    checkNumber(kcb, {
+      name: "单次奖励科创币",
+      min: 0.01,
+      max: 100,
+      fractionDigits: 2
+    });
+    checkNumber(survey.reward.rewardCount, {
+      name: "总奖励次数",
+      min: 1
+    });
+  }
   const now = Date.now();
   if((new Date(survey.st)).getTime() >= (new Date(survey.et)).getTime()) throwErr(400, "结束时间必须大于开始时间");
   if((new Date(survey.et)).getTime() <= now) throwErr(400, "结束时间必须大于当前时间");
   const {
     registerTime, digestThreadCount, threadCount, postCount, voteUpCount,
-    minGradeId, certsId, visitor
+    certsId, visitor, gradesId
   } = permission;
   // 如果允许游客参与，则默认允许所有用户参与。
   if(!visitor) {
-    permission.registerTime = parseInt(registerTime);
-    if(permission.registerTime < 0) throwErr(400, "注册时间不能小于0");
-    permission.digestThreadCount = parseInt(digestThreadCount);
-    if(permission.digestThreadCount < 0) throwErr(400, "加精文章数目不能小于0");
-    permission.threadCount = parseInt(threadCount);
-    if(permission.threadCount < 0) throwErr(400, "文章总数不能小于0");
-    permission.postCount = parseInt(postCount);
-    if(permission.postCount < 0) throwErr(400, "回复总数不能小于0");
-    permission.voteUpCount = parseInt(voteUpCount);
-    if(permission.voteUpCount < 0) throwErr(400, "点赞数不能小于0");
-    permission.minGradeId = parseInt(minGradeId);
-    const grades = await mongoose.model("usersGrades").find().sort({_id: 1});
-    if(permission.minGradeId < grades[0]._id || permission.minGradeId > grades[grades.length - 1]._id) {
-      throwErr(400, "最小用户等级设置错误，请重新选择");
-    }
-    if(!certsId.length) throwErr(400, "请至少勾选一个证书");
+    checkNumber(registerTime, {
+      name: "注册天数",
+      min: 0
+    });
+    checkNumber(digestThreadCount, {
+      name: "加精文章数",
+      min: 0
+    });
+    checkNumber(threadCount, {
+      name: "文章总数",
+      min: 0
+    });
+    checkNumber(postCount, {
+      name: "回复总数",
+      min: 0
+    });
+    checkNumber(voteUpCount, {
+      name: "点赞数",
+      min: 0
+    });
+    const gradesCount = await mongoose.model("usersGrades").count({_id: {$in: gradesId}});
+    if(gradesCount !== gradesId.length) throwErr(400, "用户等级数据错误，请刷新后重试");
     const certsCount = await mongoose.model("roles").count({_id: {$in: certsId}});
-    if(certsCount !== certsId.length) throwErr(400, "证书勾选错误，请重新勾选");
+    if(certsCount !== certsId.length) throwErr(400, "证书数据错误，请刷新后重试");
+
+    const uidArr = [];
+    const UserModel = mongoose.model("users");
+    for(const id of permission.uid) {
+      const u = await UserModel.findOne({uid: id});
+      if(u) uidArr.push(id);
+    }
+    permission.uid = uidArr;
   }
 };
 /*
@@ -343,13 +401,14 @@ schema.statics.modifySurvey = async (survey) => {
 * */
 schema.methods.checkUserPermission = async function(uid) {
   const {
-    registerTime, digestThreadCount, threadCount, postCount, voteUpCount, certsId, minGradeId,
+    registerTime, digestThreadCount, threadCount, postCount, voteUpCount, certsId, gradesId,
     visitor
   } = this.permission;
   if(visitor) return;
   if(!uid) throwErr(403, "作者设定了未登录用户无法参与");
   const UserModel = mongoose.model("users");
   const user = await UserModel.findOnly({uid});
+  if(this.permission.uid.includes(user.uid)) return;
   const now = Date.now();
   if(now - new Date(user.toc) < registerTime*24*60*60*1000) throwErr(403, "你的账号注册时间太短，无法参与本次调查");
   if(user.digestThreadsCount < digestThreadCount) throwErr(403, "你的精华文章太少，无法参与本次调查");
@@ -357,13 +416,13 @@ schema.methods.checkUserPermission = async function(uid) {
   if(user.postCount - user.disabledPostsCount < postCount) throwErr(403, "你发表的回复太少，无法参与本次调查");
   if(user.voteUpCount < voteUpCount) throwErr(403, "你收到的点赞太少，无法参与本次调查");
   await user.extendGrade();
-  if(user.grade._id < minGradeId) throwErr(403, "账号等级过低");
+  if(!gradesId.includes(user.grade._id)) throwErr(403, "账号等级不在设定的范围内");
   if(!user.certs.includes("default")) user.certs.push("default");
   if(!user.certs.includes("scholar") && user.xsf > 0) user.certs.push("scholar");
   for(const certId of user.certs) {
     if(certsId.includes(certId)) return;
   }
-  throwErr(403, "证书不符合要求");
+  throwErr(403, "证书不不在设定的范围内");
 };
 /*
 * 验证用户是否有权限发起调查
