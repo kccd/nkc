@@ -104,7 +104,7 @@
   max-width: 3rem;
 }
 .module-survey-form .option-resource{
-  display: table-cell;
+  /*display: table-cell;*/
   /*width: 4rem;*/
 }
 .module-survey-form .option-content{
@@ -116,9 +116,9 @@
   font-weight: 700;
 }
 .module-survey-form .option-resource>div{
-  height: 3rem;
+  height: 6rem;
   display: inline-block;
-  width: 3rem;
+  width: 9rem;
   margin-right: 0.5rem;
   border-radius: 3px;
   vertical-align: top;
@@ -275,6 +275,9 @@
   display: inline-block;
   color: #888;
 }
+.module-survey-form .option-score-input input{
+  width: 4rem;
+}
 .module-survey-form .option-score-input .score{
   font-size: 1.2rem;
   font-weight: 700;
@@ -287,6 +290,39 @@
 
 .module-survey-form .option-select-count{
   text-align: right;
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: #9baec8;
+}
+
+#moduleSurveyEdit .selected-users{
+  padding: 0.5rem 0;
+}
+#moduleSurveyEdit .selected-user{
+  font-size: 0;
+  display: inline-block;
+  margin: 0 0.5rem 0.5rem 0;
+  vertical-align: top;
+}
+#moduleSurveyEdit .selected-user-avatar img{
+  height: 2rem;
+  width: 2rem;
+  border-radius: 3px 0 0 3px;
+}
+#moduleSurveyEdit .selected-user-avatar{
+  display: inline-block;
+  vertical-align: top;
+}
+#moduleSurveyEdit .selected-user-name{
+  vertical-align: top;
+  display: inline-block;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+  border-radius: 0 3px 3px 0;
+  font-size: 1.2rem;
+  background-color: #999;
+  color: #fff;
+}
+#moduleSurveyEdit .selected-user-name .fa{
+  cursor: pointer;
 }

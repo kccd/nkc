@@ -57,6 +57,7 @@ schema.statics.rewardPost = async (options) => {
   const targetUser = await UserModel.findOne({uid: survey.uid});
   const {reward} = survey;
   if(!reward.status) return;
+  if(reward.onceKcb <= 0) return;
   if(reward.rewardCount <= reward.rewardedCount) return;
   if(reward.onceKcb > targetUser.kcb) return;
   const KcbsRecordModel = mongoose.model("kcbsRecords");

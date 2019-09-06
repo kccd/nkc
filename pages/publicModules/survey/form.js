@@ -50,9 +50,9 @@ NKC.modules.SurveyForm = function(id) {
       },
       timeInfo: function() {
         var status = this.status;
-        if(status === "unStart") return "调查将于 " + this.startTime + " 开始，"+this.endTime+" 结束。";
-        else if(status === "beginning") return "调查将于 "+this.endTime+" 结束。";
-        else if(status === "end") return "调查已结束。";
+        if(status === "unStart") return "开始时间：" + this.startTime + " ，结束时间："+this.endTime;
+        else if(status === "beginning") return "结束时间："+this.endTime;
+        else if(status === "end") return "已结束。";
         else return ""
       },
       formName: function() {
@@ -254,14 +254,17 @@ NKC.modules.SurveyForm = function(id) {
             if(app.showResult) {
               for(var i = 0; i < data.survey.options.length; i++) {
                 var option = data.survey.options[i];
+                var postScore = 0;
                 var maxProgress;
                 for(var j = 0; j < option.answers.length; j++) {
                   var answer = option.answers[j];
+                  postScore += answer.postScore || 0;
                   answer.color = app.getColor();
                   answer.progress = data.survey.postCount === 0? 0: ((answer.postCount || 0)*100/(data.survey.postCount || 0)).toFixed(1);
                   if(answer.progress && (!maxProgress || maxProgress < parseFloat(answer.progress))) maxProgress = answer.progress;
                   answer.average = data.survey.postCount === 0? 0: ((answer.postScore || 0)/(data.survey.postCount||0)).toFixed(2);
                 }
+                option.postScore = postScore;
                 for(var j = 0; j < option.answers.length; j++) {
                   var answer = option.answers[j];
                   if(maxProgress) {

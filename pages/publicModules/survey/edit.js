@@ -10,6 +10,7 @@ NKC.modules.SurveyEdit = function() {
       newSurvey: "",
       grades: [],
       roles: [],
+      users: [],
       timeEnd: {
         year: "",
         month: "",
@@ -27,6 +28,28 @@ NKC.modules.SurveyEdit = function() {
       error: ""
     },
     computed: {
+      selectedUsers: function() {
+        var uid = this.survey.permission.uid || [];
+        var arr = [];
+        for(var i = 0; i < uid.length; i++) {
+          var u = this.getUserById(uid[i]);
+          if(u) arr.push(u);
+        }
+        return arr;
+      },
+      rewardKcbTotal: function() {
+        var survey = this.survey;
+        if(survey.reward.onceKcb && survey.reward.rewardCount) {
+          return (survey.reward.onceKcb*survey.reward.rewardCount).toFixed(2);
+        }
+      },
+      rewardWarning: function() {
+        var targetUser = this.targetUser;
+        var survey = this.survey;
+        if(targetUser.kcb/100 < survey.reward.onceKcb*survey.reward.rewardCount) {
+          return "你的科创币不足，透支后将不再奖励。"
+        }
+      },
       timeStartDay: function() {
         return NKC.methods.getDayCountByYearMonth(this.timeStart.year, this.timeStart.month);
       },
@@ -65,8 +88,9 @@ NKC.modules.SurveyEdit = function() {
           threadCount: 0,
           digestThreadCount: 0,
           registerTime: 0,
-          minGradeId: 1,
-          certsId: [ 'default' ]
+          gradesId: [1],
+          certsId: [ 'default' ],
+          uid: []
         },
         description: '',
         options: [
@@ -82,6 +106,18 @@ NKC.modules.SurveyEdit = function() {
         })
     },
     methods: {
+      checkNumber: NKC.methods.checkData.checkNumber,
+      checkString: NKC.methods.checkData.checkString,
+      removeUser: function(index) {
+        this.survey.permission.uid.splice(index, 1);
+      },
+      getUserById: function(id) {
+        var users = this.users;
+        for(var i = 0; i < users.length; i++) {
+          var u = users[i];
+          if(u.uid === id) return u;
+        }
+      },
       newAnswer: function() {
         return {
           content: "",
@@ -131,10 +167,13 @@ NKC.modules.SurveyEdit = function() {
         survey.permission.voteCount = parseInt(survey.permission.voteCount);
         for(var i = 0; i < survey.options.length; i++) {
           var option = survey.options[i];
-          option.maxScore = parseInt(option.maxScore);
-          option.minScore = parseInt(option.minScore);
+          for(var j = 0; j < option.answers.length; j++) {
+            var answer = option.answers[j];
+            answer.maxScore = parseFloat(answer.maxScore.toFixed(2));
+            answer.minScore = parseFloat(answer.minScore.toFixed(2));
+          }
         }
-        survey.reward.onceKcb = parseInt(survey.reward.onceKcb);
+        survey.reward.onceKcb = parseFloat(survey.reward.onceKcb.toFixed(2));
         survey.reward.rewardCount = parseInt(survey.reward.rewardCount);
       },
       modifyLinks: function(links, type) {
@@ -180,7 +219,7 @@ NKC.modules.SurveyEdit = function() {
         NKC.methods.visitUrl(url, true);
       },
       removeOption: function(index) {
-        sweetQuestion("确定要删除该调查？")
+        sweetQuestion("确定要删除该问题？")
           .then(function() {
             self.app.survey.options.splice(index, 1);
           })
@@ -199,12 +238,37 @@ NKC.modules.SurveyEdit = function() {
           link: "http://"
         });
       },
+      selectUser: function() {
+        if(!window.SelectUser) {
+          if(NKC.modules.SelectUser) {
+            window.SelectUser = new NKC.modules.SelectUser();
+          } else {
+            return sweetError("未引入选择用户模块");
+          }
+        }
+        var app = this;
+        SelectUser.open(function(data) {
+          var usersId = data.usersId;
+          var users = data.users;
+          app.users = app.users.concat(users);
+          var permissionUid = app.survey.permission.uid;
+          for(var i = 0; i < usersId.length; i++) {
+            var uid = usersId[i];
+            if(permissionUid.indexOf(uid) === -1) {
+              permissionUid.push(uid);
+            }
+          }
+        }, {
+          userCount: 999,
+          selectedUsersId: this.survey.permission.uid || []
+        });
+      },
       addResource: function(o) {
         if(!window.SelectResource) {
           if(NKC.modules.SelectResource) {
             window.SelectResource = new NKC.modules.SelectResource();
           } else {
-            return sweetError("未引入资源附件模块");
+            return sweetError("未引入选择资源附件模块");
           }
         }
         SelectResource.open(function(data) {
@@ -219,6 +283,14 @@ NKC.modules.SurveyEdit = function() {
       },
       addOption: function() {
         this.survey.options.push(this.newOption());
+      },
+      // 复制问题或选项
+      copy: function(arr, o) {
+        if(o) {
+          arr.push(JSON.parse(JSON.stringify(o)));
+        } else {
+          arr.push(JSON.parse(JSON.stringify(arr[arr.length - 1])));
+        }
       },
       moveOption: function(type, o, answer) {
         var options, index;
@@ -269,29 +341,61 @@ NKC.modules.SurveyEdit = function() {
         if(this.disabled) return;
         this.error = "";
         var te = this.te;
-        var survey = this.survey;
+        var survey = JSON.parse(JSON.stringify(this.survey));
         var this_ = this;
-        if(survey.type !== "vote" && !survey.description) return te("请输入调查说明");
-        if(!survey.options || !survey.options.length) return te("请至少添加一个选项");
+        if(survey.type !== "vote") {
+          this.checkString(survey.description, {
+            name: "调查说明",
+            min: 1
+          });
+        }
+        if(!survey.options || !survey.options.length) return te("请至少添加一个问题");
         for(var i = 0; i < survey.options.length; i++) {
           var option = survey.options[i];
-          if(!option.content) return te("请输入调查内容");
+          this.checkString(option.content, {
+            name: "问题" + (i+1) + "的内容",
+            min: 1
+          });
           option.links = this_.modifyLinks(option.links_, "str");
-          if(!option.answers || !option.answers.length) return te("请为每个调查至少添加一个选项");
+          if(!option.answers || !option.answers.length) return te("请为每个问题至少添加一个选项");
           for(var j = 0; j < option.answers.length; j++) {
             var answer = option.answers[j];
-            if(!answer.content) return te("请输入选项内容");
+            this.checkString(answer.content, {
+              name: "问题" + (i+1) + "的选项内容",
+              min: 1
+            });
             if(survey.type === "score") {
-              if(answer.minScore < -150) return te("最小分值不能小于-150");
-              if(answer.maxScore > 150) return te("最大分值不能大于150");
+              answer.maxScore = parseFloat(answer.maxScore.toFixed(2));
+              answer.minScore = parseFloat(answer.minScore.toFixed(2));
+              this.checkNumber(answer.minScore, {
+                name: "问题" + (i+1) + "选项的最小分值",
+                min: -150,
+                max: 150,
+                fractionDigits: 2
+              });
+              this.checkNumber(answer.maxScore, {
+                name: "问题" + (i+1) + "选项的最大分值",
+                min: -150,
+                max: 150,
+                fractionDigits: 2
+              });
               if(answer.maxScore <= answer.minScore) return te("最大分值必须大于最小分值");
             }
             answer.links = this_.modifyLinks(answer.links_, "str");
           }
-          if(!option.maxVoteCount) return te("最大选择数量不能小于1");
-          if(option.minVoteCount < 0) return te("最小选择数量不能小于0");
-          if(option.maxVoteCount > option.answers.length) return te("最大选择数量不能超过选项数量");
-          if(option.minVoteCount > option.maxVoteCount) return te("最小选择数量不能超过最大选择数量");
+          if(survey.type !== "score") {
+            this.checkNumber(option.minVoteCount, {
+              name: "问题" + (i+1) + "的最小选择数量",
+              min: 1,
+              max: option.answers.length
+            });
+            this.checkNumber(option.maxVoteCount, {
+              name: "问题" + (i+1) + "的最大选择数量",
+              min: 1,
+              max: option.answers.length
+            });
+            if(option.minVoteCount > option.maxVoteCount) return te("最小选择数量不能超过最大选择数量");
+          }
         }
         var timeEnd = this.timeEnd;
         var timeStart = this.timeStart;
@@ -305,15 +409,22 @@ NKC.modules.SurveyEdit = function() {
         );
         survey.st = st;
         survey.et = et;
+        survey.reward.onceKcb = parseFloat(survey.reward.onceKcb);
+        survey.reward.rewardCount = parseInt(survey.reward.rewardCount);
+        if(survey.reward.status) {
+          this.checkNumber(survey.reward.onceKcb, {
+            name: "单次奖励的科创币",
+            min: 0.01,
+            max: 100,
+            fractionDigits: 2
+          });
+          this.checkNumber(survey.reward.rewardCount, {
+            name: "总奖励次数",
+            min: 1
+          });
+        }
         survey.reward.onceKcb = survey.reward.onceKcb*100;
         return survey;
-        /*nkcAPI("/survey", "POST", {survey: survey})
-          .then(function(data) {
-            sweetSuccess("提交成功");
-          })
-          .catch(function(data) {
-            sweetError(data);
-          })*/
       }
     }
   });
@@ -336,6 +447,7 @@ NKC.modules.SurveyEdit = function() {
           data.survey.reward.onceKcb = data.survey.reward.onceKcb/100;
           self.app.survey = data.survey;
           self.app.disabled = false;
+          self.app.users = data.allowedUsers;
           self.app.targetUser = data.targetUser;
           self.app.setTime(new Date(self.app.survey.st), new Date(self.app.survey.et));
         })
