@@ -33,12 +33,5 @@ block content
             button.btn.btn-primary.btn-block#submit 提交
           .form-group
             h4=`科创论坛值班室：${state.serverSettings.telephone}`
-        div
-          include ../publicModules/survey/form
-        .m-t-4
-          include ../publicModules/survey/edit
 block scripts
-  include ../publicModules/selectResource/selectResource
-  +includeJS("/publicModules/survey/edit.js")
-  +includeJS("/publicModules/survey/form.js")
   +includeJS("/problem/add_problem.js")
