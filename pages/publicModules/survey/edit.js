@@ -101,6 +101,11 @@ NKC.modules.SurveyEdit = function() {
       nkcAPI("/survey", "GET")
         .then(function(data) {
           this_.grades = data.grades;
+          var arr = [];
+          for(var i = 0; i < data.grades.length; i++) {
+            arr.push(data.grades[i]._id);
+          }
+          this_.newSurvey.permission.gradesId = arr;
           this_.roles = data.roles;
           this_.targetUser = data.user;
         })

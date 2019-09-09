@@ -12,6 +12,11 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  originId: {
+    type: Number,
+    default: null,
+    index: 1
+  },
   uid: {
     type: String,
     default: "",

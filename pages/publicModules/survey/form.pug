@@ -68,7 +68,7 @@
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
         .option-answers(v-if="o.answers && o.answers.length")
-          .option-answer(v-for="a,index_ in o.answers")
+          .option-answer(v-for="a,index_ in o.answers" :class="{'error': !!errorInfo[o._id + '_' + a._id]}" :id="o._id + '_' + a._id")
             .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
             .option-info
               .option-resources
@@ -103,6 +103,7 @@
         p(v-if="postTime")
           if data.user
             | 你已于 {{postTime}} 提交结果。
+            a.pointer(@click='modifyPost' v-if="status === 'beginning'") 修改
           else
             | 你的IP已于 {{postTime}} 提交结果。若你没有提交过，请&nbsp;
             a(onclick="Login.open('login')") 登录

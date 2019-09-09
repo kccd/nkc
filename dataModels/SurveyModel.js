@@ -375,6 +375,7 @@ schema.statics.modifySurvey = async (survey) => {
     _id: survey._id
   }, {
     $set: {
+      toc: Date.now(),
       st,
       mid,
       et,
@@ -388,7 +389,6 @@ schema.statics.modifySurvey = async (survey) => {
   const oldSurvey = surveyDB.toObject();
   delete oldSurvey._id;
   delete oldSurvey.__v;
-  oldSurvey.toc = Date.now();
   oldSurvey._id = await mongoose.model("settings").operateSystemID("surveys", 1);
   oldSurvey.originId = surveyDB._id;
   await mongoose.model("surveys")(oldSurvey).save();
@@ -454,6 +454,7 @@ schema.statics.ensureCreatePermission = async (type, userId) => {
 /*
 * 验证用户是否能够投票
 * @param {String} uid 用户ID
+* @param {String} ip
 * @author pengxiguaa 2019-9-2
 * */
 schema.methods.ensurePostPermission = async function (uid, ip) {
@@ -469,6 +470,27 @@ schema.methods.ensurePostPermission = async function (uid, ip) {
   const now = Date.now();
   if (now < new Date(this.st).getTime()) throwErr(403, "调查暂未开始");
   if (now > new Date(this.et).getTime()) throwErr(403, "调查已结束");
+};
+/*
+* 验证用户是否有权限修改投票
+* @param {String} uid 用户ID
+* @param {String} ip
+* @author pengxiguaa 2019-9-9
+* */
+schema.methods.ensureModifyPostPermission = async function(uid, ip) {
+  await this.checkUserPermission(uid);
+  let surveyPost;
+  if (uid) {
+    surveyPost = await mongoose.model("surveyPosts").findOne({uid, surveyId: this._id});
+  } else {
+    surveyPost = await mongoose.model("surveyPosts").findOne({ip, surveyId: this._id});
+  }
+  if(!surveyPost) throwErr(400, "你暂未提交过调查结果，请刷新");
+  if (this.disabled) throwErr(403, "该调查已屏蔽");
+  const now = Date.now();
+  if (now < new Date(this.st).getTime()) throwErr(403, "调查暂未开始");
+  if (now > new Date(this.et).getTime()) throwErr(403, "调查已结束，不允许修改结果");
+  return surveyPost;
 };
 /*
 * 通过内容ID和选项ID获取选项信息
@@ -502,7 +524,7 @@ schema.methods.getOptionById = function(optionId) {
 schema.methods.computePostCount = async function() {
   const SurveyPostModel = mongoose.model("surveyPosts");
   const survey = await mongoose.model("surveys").findOne({_id: this._id});
-  const posts = await SurveyPostModel.find({surveyId: survey._id});
+  const posts = await SurveyPostModel.find({surveyId: survey._id, originId: null});
   const count = posts.length;
   const {options} = survey;
   const optionsObj = {};
@@ -542,7 +564,7 @@ schema.methods.computePostCount = async function() {
     delete o.answersObj;
   }
   await this.update({postCount: count, options});
-  return count;
+  return await mongoose.model("surveys").findOne({_id: this._id});
 };
 /*
 * 获取已投票的用户
@@ -550,7 +572,7 @@ schema.methods.computePostCount = async function() {
 * @author pengxiguaa 2019-9-3
 * */
 schema.methods.getPostUsers = async function() {
-  const posts = await mongoose.model("surveyPosts").find({surveyId: this._id, uid: {$ne: ""}}, {uid: 1});
+  const posts = await mongoose.model("surveyPosts").find({surveyId: this._id, uid: {$ne: ""}, originId: null}, {uid: 1});
   const uid = posts.map(p => p.uid);
   return await mongoose.model("users").find({uid: {$in: uid}}, {uid: 1, avatar: 1});
 };

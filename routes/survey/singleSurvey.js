@@ -59,8 +59,13 @@ router
     const {db, data, body, nkcModules} = ctx;
     const {checkString, checkNumber} = nkcModules.checkData;
     const {survey, user} = data;
-    let {options} = body;
-    await survey.ensurePostPermission(user?user.uid:"", ctx.address);
+    let {options, type} = body;
+    let surveyPost;
+    if(type === "newPost") {
+      await survey.ensurePostPermission(user?user.uid:"", ctx.address);
+    } else {
+      surveyPost = await survey.ensureModifyPostPermission(user?user.uid:"", ctx.address);
+    }
 
     const errorInfo = "数据异常，可能是发布者修改了选项信息。请刷新后重试。";
 
@@ -117,7 +122,7 @@ router
             fractionDigits: 2
           });
         } catch(err) {
-          console.log(err)
+          console.log(err);
           ctx.throw(400, "打分分值不在规定的范围内，请检查");
         }
         option[i] = {
@@ -154,32 +159,44 @@ router
       }
     }
 
-    const surveyPost = db.SurveyPostModel({
-      _id: await db.SettingModel.operateSystemID("surveyPosts", 1),
-      surveyId: survey._id,
-      ip: ctx.address,
-      port: ctx.port,
-      surveyType: survey.type,
-      uid: user?user.uid:"",
-      options
-    });
-    await surveyPost.save();
-    await survey.computePostCount();
-
-    // 给予奖励
-    if(data.user) {
-      const lock = await nkcModules.redLock.lock(`surveyPost:${survey._id}`, 10000);
-      const record = await db.SurveyPostModel.rewardPost( {
+    if(type === "newPost") {
+      surveyPost = db.SurveyPostModel({
+        _id: await db.SettingModel.operateSystemID("surveyPosts", 1),
         surveyId: survey._id,
-        uid: data.user.uid,
         ip: ctx.address,
-        port: ctx.port
+        port: ctx.port,
+        surveyType: survey.type,
+        uid: user?user.uid:"",
+        options
       });
-      if(record && record.num !== undefined) data.rewardNum = record.num;
-      try{
-        await lock.unlock();
-      } catch(err) {console.log(err.message || err)}
+      await surveyPost.save();
+      // 给予奖励
+      if(data.user) {
+        const lock = await nkcModules.redLock.lock(`surveyPost:${survey._id}`, 10000);
+        const record = await db.SurveyPostModel.rewardPost( {
+          surveyId: survey._id,
+          uid: data.user.uid,
+          ip: ctx.address,
+          port: ctx.port
+        });
+        if(record && record.num !== undefined) data.rewardNum = record.num;
+        try{
+          await lock.unlock();
+        } catch(err) {console.log(err.message || err)}
+      }
+    } else {
+      const surveyPostDB = surveyPost.toObject();
+      await surveyPost.update({
+        options,
+        toc: Date.now()
+      });
+      delete surveyPostDB.__v;
+      surveyPostDB._id = await db.SettingModel.operateSystemID("surveyPosts", 1);
+      surveyPostDB.originId = surveyPost._id;
+      await db.SurveyPostModel(surveyPostDB).save();
+      surveyPost = await db.SurveyPostModel.findOne({_id: surveyPost._id});
     }
+    data.survey = await survey.computePostCount();
     data.surveyPost = surveyPost;
     await next();
   });

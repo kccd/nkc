@@ -14,6 +14,7 @@ NKC.modules.SurveyForm = function(id) {
       options: [], // vote: optionsId, score: {score: 2}, survey: {answer: id}
       status: "", // unStart, beginning, end;
       surveyPost: "",
+      errorInfo: {},
       users: []
     },
     computed: {
@@ -113,6 +114,11 @@ NKC.modules.SurveyForm = function(id) {
     methods: {
       format: NKC.methods.format,
       getColor: NKC.methods.getRandomColor,
+      // 修改投票结果
+      modifyPost: function() {
+        if(this.status === "end") return;
+        this.posted = false;
+      },
       selectCount: function(o) {
         var minVoteCount = o.minVoteCount;
         var maxVoteCount = o.maxVoteCount;
@@ -168,13 +174,35 @@ NKC.modules.SurveyForm = function(id) {
         var this_ = this;
         var survey = this.survey;
         var options = this.options;
+        this.errorInfo = {};
+        // 检测打分范围是否符合要求
+        if(survey.type === "score") {
+          for(var i = 0; i < survey.options.length; i++) {
+            var o = survey.options[i];
+            for(var j = 0; j < o.answers.length; j ++) {
+              var a = o.answers[j];
+              var so = this.getOptionById(o._id, a._id);
+              var maxScore = a.maxScore;
+              var minScore = a.minScore;
+              if(
+                so.score === "" ||
+                so.score < minScore ||
+                so.score > maxScore
+              ) {
+                this.errorInfo[o._id + "_" + a._id] = true;
+                window.location.href = "#" + o._id + "_" + a._id;
+                return sweetError("打分分值不在规定的范围内，请检查");
+              }
+            }
+          }
+        }
+
         // 投票
         nkcAPI("/survey/" + survey._id, "POST", {
-          options: options
+          options: options,
+          type: this.surveyPost? "modifyPost": "newPost"
         })
           .then(function(data) {
-            this_.surveyPost = data.surveyPost;
-            this_.posted = true;
             if(data.rewardNum !== undefined) {
               sweetSuccess("提交成功！获得" + data.rewardNum/100 + "个科创币。", {autoHide: false});
             } else {

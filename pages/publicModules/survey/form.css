@@ -185,6 +185,9 @@
 .module-survey-form .option-answers{
   padding-left: 1rem;
 }
+.module-survey-form .option-answer.error{
+  border: 3px solid #ff5200;
+}
 .module-survey-form .option-answer{
   background-color: #f6f6f6;
   margin: 0.5rem 0;
