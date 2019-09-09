@@ -168,6 +168,7 @@
                   label.m-r-1(v-for="g in grades")
                     input(type="checkbox" v-model="survey.permission.gradesId" :value="g._id")
                     span {{g.displayName}}
+                h5.text-danger 只允许已勾选等级的用户参与。
             if permission("showSurveyCertLimit")
               .form.col-sm-12
                 .form-group
@@ -187,6 +188,7 @@
                         .fa.fa-remove(@click="removeUser(index)")
 
                   button.btn.btn-xs.btn-default(@click="selectUser") 选择用户
+                  h5.text-danger 指定的用户无需满足以上条件即可参与。
       .form-group
         label.col-sm-1.control-label 时间
         .col-sm-9.m-t-05

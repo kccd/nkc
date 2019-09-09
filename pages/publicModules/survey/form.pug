@@ -103,6 +103,7 @@
         p(v-if="postTime")
           if data.user
             | 你已于 {{postTime}} 提交结果。
+            a.pointer(@click='modifyPost' v-if="status === 'beginning'") 修改
           else
             | 你的IP已于 {{postTime}} 提交结果。若你没有提交过，请&nbsp;
             a(onclick="Login.open('login')") 登录

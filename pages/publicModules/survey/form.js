@@ -114,6 +114,11 @@ NKC.modules.SurveyForm = function(id) {
     methods: {
       format: NKC.methods.format,
       getColor: NKC.methods.getRandomColor,
+      // 修改投票结果
+      modifyPost: function() {
+        if(this.status === "end") return;
+        this.posted = false;
+      },
       selectCount: function(o) {
         var minVoteCount = o.minVoteCount;
         var maxVoteCount = o.maxVoteCount;
@@ -194,11 +199,10 @@ NKC.modules.SurveyForm = function(id) {
 
         // 投票
         nkcAPI("/survey/" + survey._id, "POST", {
-          options: options
+          options: options,
+          type: this.surveyPost? "modifyPost": "newPost"
         })
           .then(function(data) {
-            this_.surveyPost = data.surveyPost;
-            this_.posted = true;
             if(data.rewardNum !== undefined) {
               sweetSuccess("提交成功！获得" + data.rewardNum/100 + "个科创币。", {autoHide: false});
             } else {
