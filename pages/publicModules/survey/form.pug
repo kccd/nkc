@@ -68,7 +68,7 @@
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
         .option-answers(v-if="o.answers && o.answers.length")
-          .option-answer(v-for="a,index_ in o.answers")
+          .option-answer(v-for="a,index_ in o.answers" :class="{'error': !!errorInfo[o._id + '_' + a._id]}" :id="o._id + '_' + a._id")
             .option-content.answer-content {{index+1}}-{{index_+1}}. {{a.content}}
             .option-info
               .option-resources
