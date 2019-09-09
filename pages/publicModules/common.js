@@ -1,7 +1,11 @@
 var NKC = {
   methods: {},
   modules: {},
-  configs: {}
+  configs: {
+    imageExt: ["jpg", "jpeg", "png", "svg", "gif"],
+    audioExt: ["mp3"],
+    videoExt: ["mp4"]
+  }
 };
 /*
 * 打开链接 兼容APP
@@ -224,4 +228,23 @@ NKC.methods.getRandomColor = function() {
     color += str.slice(index, index + 1);
   }
   return color;
+};
+/*
+* 资源对象转html
+* */
+NKC.methods.resourceToHtml = function(resource) {
+  var name = resource.oname;
+  var rid = resource.rid;
+  var ext = resource.ext.toLowerCase();
+  var html = "";
+  if(NKC.configs.imageExt.indexOf(ext) !== -1) {
+    html = "<p><img src=" + "/r/" + rid + " style='max-width:50%'></p>";
+  } else if(NKC.configs.audioExt.indexOf(ext) !== -1) {
+    htmk = "<audio src=" + "/r/" + rid + " controls>Your browser does not support the audio element</audio>";
+  } else if(NKC.configs.videoExt.indexOf(ext) !== -1) {
+    html = "<p><br></p><p><video src=" + "/r/" + rid + " controls style=width:50%;>video</video></p>";
+  } else {
+    html = "<p><a href=" + "/r/" + rid + "><img src=" + "/default/default_thumbnail.png" + ">" + name + "</a></p>";
+  }
+  return html;
 };

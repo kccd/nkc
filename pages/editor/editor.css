@@ -1,131 +1,77 @@
-.keyWordsPanelWall {
-  width: 300px;
-  display: inline-block;
-  border: 1px solid #eee;
-  padding: 5px 15px;
-  position: relative;
-  background-color: #fff;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+body{
+  background-color: #f0f0f0;
 }
-
-.keyWordsPanelHeader {
-  width: 95%;
-  height: 28px;
-  line-height: 28px;
-  display: inline-block;
-  border-bottom: 2px solid #2b90d9;
-  padding: 0px 5px;
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 10px;
+.box-shadow-panel>div{
+  border: 1px solid #dbdbdb;
 }
-#disabledSurveyButton{
-  display: none;
+.edui-default .edui-toolbar .edui-button .edui-icon, .edui-default .edui-toolbar .edui-menubutton .edui-icon, .edui-default .edui-toolbar .edui-splitbutton .edui-icon{
+  background-size: cover;
 }
-
-.keyWordsPanelClose {
-  color: #2b90d9;
-  height: 15px;
-  width: 15px;
-  line-height: 15px;
-  text-align: center;
-  border-radius: 3px;
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  border: 1px solid #2b90d9;
+.editor .edui-default .edui-toolbar .edui-button, .edui-default .edui-toolbar .edui-splitbutton, .edui-default .edui-toolbar .edui-menubutton, .edui-default .edui-toolbar .edui-combox{
+  margin: 1px 2px!important;
   cursor: pointer;
 }
-
-.keyWordsPanelSureBtn {
-  padding:0 10px;
-  background-color: #9baec8;
-  border-color: #9baec8;
-  text-decoration: none;
-  cursor: pointer;
+.edui-default .edui-toolbar .edui-button .edui-state-checked .edui-button-wrap{
+  /*border-color: #aaa!important;*/
+  /*background-color: #f4f4f4!important;*/
 }
 
-.keyWordsPanelSureBtn:hover {
-  color: #FFF;
-  background-color: #2b90d9;
+.editor .edui-default .edui-editor{
+  border: none;
 }
-
-.keyTags{
-  margin-bottom: 5px;
-  margin-right:10px;
-  font-size: 13px;
-  padding: 5px 5px;
-  line-height: 1;
+.editor .edui-default .edui-editor-toolbarbox{
+  position: fixed!important;
+  width: 100%;
+  z-index: 1030;
+  left: 0;
+  top: 45px;
+  background-color: rgba(250, 250, 250, 0.95) !important;
+  box-shadow: 0 0 3px rgba(0,0,0,0.1);
+  border: none;
+  border-bottom: 1px solid #dbdbdb;
+  padding: 0.5rem 0;
+}
+.editor .edui-default .edui-editor-toolbarboxouter{
+  width: 1300px;
+  max-width: 100%;
+  background-color: rgba(250, 250, 250, 0)!important;
+  margin: auto;
+  box-shadow: none!important;
+  border: none;
+}
+.editor .edui-default .edui-editor-bottomContainer td{
+  border-top: none;
+}
+.editor-title{
+  width: 100%;
+  height: 4rem;
+  border: none;
+  border-bottom: 1px solid #e4e4e4;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 0.5rem;
+}
+.editor-title:focus{
+  outline: none;
+}
+.editor-main-forum{
+  display: inline-block;
+  height: 2.5rem;
+  padding: 0 0.5rem;
   color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: .25em;
-  background-color: #2b90d9;
-  display: inline-block;
-}
-
-.originBtn {
-  color: #2b90d9;
-  border-color: #2b90d9;
-  background-color: #fff;
-  display: inline-block;
-  overflow: visible;
-  padding: 0 22px;
-  height: 30px;
-  line-height: 30px;
-  vertical-align: middle;
-  text-align: center;
-  text-decoration: none;
+  vertical-align: top;
+  line-height: 2.5rem;
   border-radius: 3px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  font-size: 14px;
-  border-width: 1px;
-  border-style: solid;
-  cursor: pointer;
+  font-size: 1.2rem;
+  margin: 0 0.5rem 0.5rem 0;
 }
-
-.originBtn:hover {
-  color: #9baec8;
-  border-color: #9baec8;
-  text-decoration: none;
+.editor-abstract textarea:focus{
+  outline: none;
 }
-
-.originBtnActive {
-  background-color: #2b90d9;
-  color: #FFF;
-}
-
-.editorBtn {
-  padding:0 10px;
-  background-color: #9baec8;
-  border-color: #9baec8;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.editorBtn:hover {
-  color: #FFF;
-  background-color: #2b90d9;
-}
-
-
-
-@media (max-width: 600px) {
-  .attachButton {
-    display: block
-  }
-  .attachBody {
-    display: none
-  }
-}
-
-@media (min-width: 600px) {
-  .attachButton {
-    display: none
-  }
-  .attachBody {
-    display: block
-  }
+.editor-abstract textarea{
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  resize:none;
+  padding: 0.5rem;
 }

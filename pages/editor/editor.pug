@@ -1,0 +1,48 @@
+extends ../bootstrap_base
+block title
+  title 编辑器
+  +includeCSS("/editor/editor.css")
+  style.
+    .nkcshade{
+      box-shadow: none;
+    }
+    body{
+      padding-top: 120px;
+    }
+
+block content
+  .container-fluid.max-width.editor
+    .row
+      .col-xs-12.col-md-9.box-shadow-panel
+        div
+          .m-b-2.m-t-1.m-l-05.m-r-05
+            input.editor-title(placeholder="标题")
+          div(id="content")
+          .m-t-1#postInfo
+            hr
+            .m-b-2
+              h4 文章摘要(选填)
+              .row.editor-abstract
+                .col-xs-12.col-md-6
+                  textarea(placeholder="中文摘要，最多可输入1000字符" rows=6)
+                .col-xs-12.col-md-6
+                  textarea(placeholder="英文摘要，最多可输入1000字符" rows=6)
+            .m-b-2
+              h4 专业分类(必选，最多可选两个)
+              .editor-main-forums
+                .editor-main-forum(v-for="f, index in selectedForums" :style="'background-color: ' + f.color + ';'")
+                  span {{f.fName}}
+                  span(v-if="f.cName") ：{{f.cName}}
+                  .fa.fa-remove.p-l-05.pointer(@click="removeSelectedForums(index)")
+                button.btn.btn-default.btn-sm(@click="selectForums") 选择
+            .m-b-2
+              h4 关键词
+              .editor-keywords
+                button.btn.btn-default.btn-sm(@click="addKeyword") 添加
+      .col-xs-12.col-md-3.box-shadow-panel
+        div Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto beatae cupiditate deserunt dolore dolorum, ea eaque eligendi est explicabo facere fuga laboriosam nihil odio officiis pariatur perferendis ullam ut vel.
+block scripts
+  include ../ueditor/ueditorBase
+  include ../publicModules/selectResource/selectResource
+  include ../publicModules/moveThread/moveThread
+  +includeJS("/editor/editor.js")

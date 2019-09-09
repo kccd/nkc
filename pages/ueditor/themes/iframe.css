@@ -6,6 +6,9 @@ blockquote {
   overflow-x: hidden;
   padding: 7px 10px;
   background-color: #f8f8ee;
-  margin: 10px 0px;
+  margin: 10px 0;
   border-left: 5px solid #ddd;
 }
+/*body{*/
+/*  margin: 0;*/
+/*}*/

@@ -662,11 +662,26 @@ div.edui-box {
 }
 
 .edui-default  .edui-for-mathformula .edui-icon {
-    /* background-position: -480px 0; */
-    background-repeat: no-repeat;
-    background-image: url(../images/icon/sigma.png) !important;
-    width: 20px !important;
-    height: 20px !important;
+  /* background-position: -480px 0; */
+  background-repeat: no-repeat;
+  background-image: url(../images/icon/sigma.png) !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.edui-default  .edui-for-image-selector .edui-icon {
+  /* background-position: -480px 0; */
+  background-repeat: no-repeat;
+  background-image: url(../images/icon/image.png) !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+.edui-default  .edui-for-resource-selector .edui-icon {
+  /* background-position: -480px 0; */
+  background-repeat: no-repeat;
+  background-image: url(../images/icon/resource.png) !important;
+  width: 20px !important;
+  height: 20px !important;
 }
 
 .edui-default  .edui-for-justifyjustify .edui-icon {

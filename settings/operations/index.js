@@ -27,6 +27,7 @@ const {
 
 const auth = require('./auth');
 const editor = require('./editor');
+const edit = require('./edit');
 const exam = require('./exam');
 const e = require('./experimental');
 const f = require('./forum');
@@ -134,6 +135,7 @@ operationObj.operationTree = {
 		auth,// 身份认证审核
 
 		editor,// 编辑器
+    edit,
 
 		exam,// 考试
 
