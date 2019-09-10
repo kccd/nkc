@@ -22,6 +22,7 @@ function initVueApp() {
       type: "newThread",
 
       thread: "",
+      post: "",
 
       forums: [],
       selectedForums: [], // 已选择的专业
@@ -43,6 +44,7 @@ function initVueApp() {
     mounted: function() {
       this.selectedForums = data.mainForums || [];
       this.thread = data.thread;
+      this.post = data.post;
       this.type = data.type;
       this.initPost(data.post);
     },
@@ -87,7 +89,9 @@ function initVueApp() {
       initPost: function(post) {
         if(!post) return;
         this.title = post.t;
+        this.setTitle();
         this.content = post.c;
+        this.setContent();
         this.abstractCn = post.abstractCn;
         this.abstractEn = post.abstractEn;
         this.keyWordsCn = post.keyWordsCn;
@@ -356,17 +360,29 @@ function initVueApp() {
               self.checkAuthorInfos();
               return nkcAPI("/f/" + post.fids[0], "POST", {post: post})
             } else if(type === "newPost") { // 发表回复：从文章页点"去编辑器"、草稿箱
+              self.checkString(self.title, {
+                name: "标题",
+                minLength: 0,
+                maxLength: 200
+              });
               self.checkContent();
+              return nkcAPI("/t/" + self.thread.tid, "POST", {post: post})
             } else if(type === "modifyPost") { // 修改post：编辑post，草稿箱
+              self.checkString(self.title, {
+                name: "标题",
+                minLength: 0,
+                maxLength: 200
+              });
               self.checkContent();
+              return nkcAPI("/p/" + self.post.pid, "PATCH", {post: post})
             } else if(type === "forumDeclare") { // 修改专业详情：专业设置
               self.checkContent();
             }
           })
-          .then(function() {
-            sweetSuccess("发表成功");
+          .then(function(data) {
+            self.visitUrl(data.redirect || "/");
             // 解锁发表按钮
-            PostButton.disabledSubmit = false;
+            // PostButton.disabledSubmit = false;
           })
           .catch(function(data) {
             // 解锁发表按钮

@@ -505,7 +505,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState, parentPostId} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn = [], keyWordsEn = [], authorInfos=[], originState, parentPostId} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {

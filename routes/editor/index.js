@@ -26,20 +26,29 @@ router
       data.type = "newPost";
       const {id} = query;
       // 回复的文章
-      let thread = await db.ThreadModel.findOnly({tid: id});
+      const thread = await db.ThreadModel.findOnly({tid: id});
       // 验证用户是否有权限查看文章
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       const firstPost = await thread.extendFirstPost();
       data.thread = {
+        tid: thread.tid,
         title: firstPost.t,
         url: `/t/${thread.tid}`
       }
     } else if(type === "post") {
+      data.type = "modifyPost";
       const {id} = query;
       data.post = await db.PostModel.findOnly({pid: id});
-      data.thread = await db.ThreadModel.findOnly({tid: data.post.tid});
+      const thread = await db.ThreadModel.findOnly({tid: data.post.tid});
+      await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+      data.postType = (thread.oc === data.post.pid)? "thread": "post";
+      const firstPost = await thread.extendFirstPost();
+      data.thread = {
+        tid: thread.tid,
+        title: firstPost.t,
+        url: `/t/${thread.tid}`
+      }
     }
-
     // 拓展专业信息
     data.mainForums = [];
     if(selectedForumsId.length) {

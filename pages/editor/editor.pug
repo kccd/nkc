@@ -15,10 +15,26 @@ block content
     .row
       .col-xs-12.col-md-9.box-shadow-panel.m-b-2
         div
-          .m-b-2.m-t-1.m-l-05.m-r-05
+          .m-b-1.m-t-1.m-l-05.m-r-05
             if data.type === "newPost"
-              h4.m-b-1 回复文章&nbsp;
-                a(href=data.thread.url target="_blank")=`《${data.thread.title}》`
+              .editor-type-info
+                .fa.fa-lightbulb-o
+                |正在回复文章《
+                a(href=data.thread.url target="_blank")=`${data.thread.title}`
+                |》
+            else if data.type === "modifyPost"
+              if data.postType === "thread"
+                .editor-type-info
+                  .fa.fa-lightbulb-o
+                  |正在编辑文章《
+                  a(href=data.thread.url target="_blank")=`${data.thread.title}`
+                  |》
+              else
+                .editor-type-info
+                  .fa.fa-lightbulb-o
+                  |正在编辑文章《
+                  a(href=data.thread.url target="_blank")=`${data.thread.title}`
+                  | 》下的回复
             input.editor-title(placeholder="请输入标题..." id="title" onchange="PostInfo.getTitle(this)")
           div(id="content")
           .m-t-1#postInfo(v-cloak)
@@ -106,7 +122,7 @@ block content
                               input.author-name(type="text" v-model.trim="a.contractObj.contractCode" placeholder="选填")
                   button.btn.btn-default.btn-sm(@click="addAuthor") 添加
               .m-b-2
-                .editor-header 原创声明
+                .editor-header 原创
                 .editor-origin-state.form-inline
                   select.form-control(v-model="originState")
                     for text, index in getOriginLevel()

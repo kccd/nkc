@@ -141,3 +141,11 @@ body{
 .editor .warning{
   color: #ff6262;
 }
+.editor-type-info{
+  font-size: 1.2rem;
+  color: #888;
+  margin-bottom: 2rem;
+}
+.editor-type-info .fa{
+  margin-right: 0.3rem;
+}

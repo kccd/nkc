@@ -41,7 +41,6 @@ const postSchema = new Schema({
   l: {
     type: String,
     default: "html",
-    required: true
   },
   recUsers: {
     type: [String],
