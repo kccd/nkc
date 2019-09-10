@@ -141,7 +141,7 @@ $(function() {
   if(NKC.modules.SelectUser) {
     SelectUser = new NKC.modules.SelectUser();
   }
-  if(NKC.modules.SurveyEdit) {
+  if(NKC.modules.SurveyEdit && $("#moduleSurveyEdit").length) {
     SurveyEdit = new NKC.modules.SurveyEdit();
     SurveyEdit.init({
       surveyId: targetPost?targetPost.surveyId: ""
