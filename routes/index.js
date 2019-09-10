@@ -40,7 +40,7 @@ const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
-router.use("/edit", editorRouter.routes(), editorRouter.allowedMethods());
+router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());
 router.use('/', otherRouter.routes(), otherRouter.allowedMethods());

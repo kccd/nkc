@@ -53,7 +53,7 @@ otherRouter
 	.use('logo', logoRouter.routes(), logoRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
-  .use('editor', editorRouter.routes(), editorRouter.allowedMethods())
+  .use('edit', editorRouter.routes(), editorRouter.allowedMethods())
   .use('shopLogo', shopLogo.routes(), shopLogo.allowedMethods())
   .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())

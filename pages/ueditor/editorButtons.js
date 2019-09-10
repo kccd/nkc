@@ -43,6 +43,7 @@ UE.registerUI('resourceSelector',function(editor,uiName){
           for(var i = 0; i < data.resources.length; i++) {
             var r = data.resources[i];
             var dom = NKC.methods.resourceToHtml(r);
+            console.log(dom);
             editor.execCommand('inserthtml', dom);
           }
         });

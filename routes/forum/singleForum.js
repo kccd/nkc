@@ -50,7 +50,7 @@ router
     } catch(err) {
       ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
-		const {c, t, fids, cids, cat, mid, columnCategoriesId, sendAnonymousPost, survey} = post;
+		const {c, t, fids, cids, cat, mid, columnCategoriesId = [], sendAnonymousPost, survey} = post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(t === '') ctx.throw(400, '标题不能为空！');
 		if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");

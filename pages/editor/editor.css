@@ -72,6 +72,72 @@ body{
   width: 100%;
   border: 1px solid #ccc;
   border-radius: 3px;
-  resize:none;
+  resize: none;
   padding: 0.5rem;
+}
+.editor-abstract-info{
+  text-align: right;
+  font-size: 1.2rem;
+  color: #9baec8;
+}
+.editor-keyword{
+  display: inline-block;
+  height: 2.5rem;
+  border-radius: 3px;
+  padding: 0 0.5rem;
+  background-color: #2b90d9;
+  color: #fff;
+  margin: 0 0.5rem 0.5rem 0;
+  line-height: 2.5rem;
+}
+.editor-keyword .fa{
+  cursor: pointer;
+}
+.editor-header{
+  font-size: 1.25rem;
+  margin: 0.3rem 0;
+  color: #555;
+  font-weight: 700;
+}
+.editor-header small{
+  color: #88919d;
+}
+.editor-author input:focus{
+  outline: none;
+}
+.editor-author input{
+  height: 2.5rem;
+  padding: 0.5rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 3px;
+}
+.editor-author .author-name{
+  width: 6rem;
+}
+.editor-author .author-id{
+  width: 6rem;
+}
+.editor-authors thead{
+  color: #88919d;
+}
+.contract-info{
+  background-color: #f4f4f4;
+}
+.editor-author .fa:hover{
+  color: #8c8c8c;
+}
+.editor-author .fa{
+  font-size: 1.3rem;
+  height: 2rem;
+  width: 2rem;
+  line-height: 2rem;
+  cursor: pointer;
+  color: #adadad;
+  text-align: center;
+}
+.contract-info h5{
+  color: #9baec8;
+}
+.editor .warning{
+  color: #ff6262;
 }

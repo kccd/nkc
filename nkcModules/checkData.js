@@ -69,12 +69,23 @@ var CheckData = function () {
       self.te(400, name + "数据类型错误");
     }
     if(self.getLength(data) < minLength) {
-      self.te(400, name + "长度不能小于" + minLength + "字节");
+      self.te(400, name + "长度不能小于" + minLength + "个字节");
     }
     if(self.getLength(data) > maxLength) {
-      self.te(400, name + "长度不能大于" + maxLength + "字节");
+      self.te(400, name + "长度不能大于" + maxLength + "个字节");
     }
   };
+
+  /*
+  * 检测邮箱格式
+  * */
+  this.checkEmail = function(data) {
+    var path = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    if(!data.search(path)) {
+      self.te(400, "邮箱格式不符合要求");
+    }
+  };
+
 };
 if(inBrowser) {
   NKC.methods.checkData = new CheckData();
