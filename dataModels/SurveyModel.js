@@ -346,8 +346,8 @@ schema.statics.checkSurveyData = async (survey) => {
 * @param {Object} survey 调查表数据
 * @author pengxiguaa 2019-9-4
 * */
-schema.statics.createSurvey = async (survey) => {
-  await mongoose.model("surveys").checkSurveyData(survey);
+schema.statics.createSurvey = async (survey, checkData = true) => {
+  if(checkData) await mongoose.model("surveys").checkSurveyData(survey);
   const SettingModel = mongoose.model("settings");
   const SurveyModel = mongoose.model("surveys");
   if(!survey.mid) survey.mid = survey.uid;
@@ -361,8 +361,8 @@ schema.statics.createSurvey = async (survey) => {
 * @param {Object} survey 调查表数据
 * @author pengxiguaa 2019-9-4
 * */
-schema.statics.modifySurvey = async (survey) => {
-  await mongoose.model("surveys").checkSurveyData(survey);
+schema.statics.modifySurvey = async (survey, checkData = true) => {
+  if(checkData) await mongoose.model("surveys").checkSurveyData(survey);
   const SurveyModel = mongoose.model("surveys");
   const {
     st, et,

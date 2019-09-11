@@ -35,18 +35,76 @@ router
         title: firstPost.t,
         url: `/t/${thread.tid}`
       }
-    } else if(type === "post") {
-      data.type = "modifyPost";
+    } else if(type === "post") { // 修改文章或者修改回复
       const {id} = query;
       data.post = await db.PostModel.findOnly({pid: id});
       const thread = await db.ThreadModel.findOnly({tid: data.post.tid});
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-      data.postType = (thread.oc === data.post.pid)? "thread": "post";
+      data.type = (thread.oc === data.post.pid)? "modifyThread": "modifyPost";
       const firstPost = await thread.extendFirstPost();
       data.thread = {
         tid: thread.tid,
         title: firstPost.t,
         url: `/t/${thread.tid}`
+      }
+    } else if(type === "forum_declare") { // 修改专业说明
+      data.type = "modifyForumDeclare";
+      const {id} = query;
+      const forum = await db.ForumModel.findOnly({fid: id});
+      if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业说明");
+      data.post = {
+        c: forum.declare
+      };
+      data.forum = {
+        fid: forum.fid,
+        title: forum.displayName,
+        url: `/f/${forum.fid}`
+      };
+    } else if(type === "redit") { // 从草稿箱来
+      const {id} = query;
+      let draft = await db.DraftModel.findOne({did: id, uid: user.uid});
+      if(!draft) ctx.throw(400, "草稿不存在或已被删除");
+      draft = draft.toObject();
+      data.draftId = draft.did;
+      const {
+        mainForumsId, categoriesId, desType, desTypeId
+      } = draft;
+      selectedForumsId = mainForumsId;
+      selectedCategoriesId = categoriesId;
+      data.post = draft;
+      if(desType === "forum") { // 发表新帖
+        data.type = "newThread";
+      } else if(desType === "thread") { // 发表新回复
+        data.type = "newPost";
+        const thread = await db.ThreadModel.findOnly({tid: desTypeId});
+        // 验证用户是否有权限查看文章
+        const firstPost = await thread.extendFirstPost();
+        data.thread = {
+          tid: thread.tid,
+          title: firstPost.t,
+          url: `/t/${thread.tid}`
+        }
+      } else if(desType === "post") { // 编辑文章或编辑回复
+        const post = await db.PostModel.findOnly({pid: desTypeId});
+        const thread = await db.ThreadModel.findOnly({tid: post.tid});
+        data.type = post.pid === thread.oc? "modifyThread": "modifyPost";
+        const firstPost = await thread.extendFirstPost();
+        data.post.pid = post.pid;
+        data.thread = {
+          tid: thread.tid,
+          title: firstPost.t,
+          url: `/t/${thread.tid}`
+        }
+      } else if(desType === "forumDeclare") { // 专业说明
+        data.type = "modifyForumDeclare";
+        const forum = await db.ForumModel.findOnly({fid: desTypeId});
+        data.forum = {
+          fid: forum.fid,
+          title: forum.displayName,
+          url: `/f/${forum.fid}`
+        };
+      } else {
+        ctx.throw(400, `未知的草稿类型：${desType}`);
       }
     }
     // 拓展专业信息
@@ -68,6 +126,35 @@ router
           cName: category? category.name: ""
         });
       }
+    }
+
+    // 根据类型加载最新的草稿
+    if(type !== "redit") {
+      let obj = {};
+      if(data.type === "newThread") {
+        obj = {desType: "forum"};
+      } else if(data.type === "newPost") {
+        obj = {
+          desType: "thread",
+          desTypeId: data.thread.tid
+        };
+      } else if(["modifyPost", "modifyThread"].includes(data.type)) {
+        obj = {
+          desType: "post",
+          desTypeId: data.post.pid
+        };
+      } else {
+        obj = {
+          desType: "forumDeclare",
+          desTypeId: data.forum.fid
+        };
+      }
+      obj.uid = user.uid;
+      const d = await db.DraftModel.findOne(obj).sort({toc: -1});
+      if(d) data.oldDraft = {
+        did: d.did,
+        tlm: d.tlm || d.toc
+      };
     }
     ctx.template = "editor/editor.pug";
     await next();

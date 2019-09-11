@@ -47,7 +47,7 @@
                   a.button.radius-right(@click="fastSelectPage") 确定
             +resourcePaging
             .resource-info(v-if="!resources.length") 空空如也~
-            .resource(v-else v-for="r in resources" :class="{'active':selectedResourcesId.indexOf(r.rid) !== -1}"
+            .resource(v-else v-for="r, index in resources" :class="{'active':selectedResourcesId.indexOf(r.rid) !== -1}"
               @click="selectResource(r)"
               :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname"
             )
@@ -62,6 +62,7 @@
                 .fa.fa-check-square-o
               .resource-mask(v-else)
                 .fa.fa-square-o
+              .resource-index(v-if="selectedResourcesId.indexOf(r.rid) !== -1") {{selectedResourcesId.indexOf(r.rid) + 1}}
         .modal-footer(v-if="!loading")
           .pull-left
             button.btn.btn-default.btn-sm(@click="changePageType('uploader')") 去上传

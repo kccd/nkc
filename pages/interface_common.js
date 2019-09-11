@@ -251,6 +251,8 @@ function sweetQuestion(text) {
       .then(function(result) {
         if(result.value === true) {
           resolve();
+        } else {
+          reject();
         }
       })
   });

@@ -1408,7 +1408,6 @@ threadSchema.statics.postNewThread = async (options) => {
   const ThreadModel = mongoose.model("threads");
   const PostModel = mongoose.model("posts");
   const MessageModel = mongoose.model("messages");
-  const SubscribeModel = mongoose.model("subscribes");
   const DraftModel = mongoose.model("draft");
   // 1.检测发表权限
   await ThreadModel.ensurePublishPermission(options);
@@ -1428,7 +1427,7 @@ threadSchema.statics.postNewThread = async (options) => {
   // await SubscribeModel.autoAttentionForum(options);
   // 发表文章删除草稿
   if(options.did) {
-    await DraftModel.remove({"did": options.did})
+    await DraftModel.remove({"did": options.did, uid: options.uid});
   }
   return _post;
 };

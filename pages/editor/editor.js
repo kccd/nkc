@@ -18,11 +18,13 @@ function initVueApp() {
   PostInfo = new Vue({
     el: "#postInfo",
     data: {
-
       type: "newThread",
 
       thread: "",
       post: "",
+      forum: "",
+      draftId: "",
+      oldDraftId: "",
 
       forums: [],
       selectedForums: [], // 已选择的专业
@@ -45,8 +47,24 @@ function initVueApp() {
       this.selectedForums = data.mainForums || [];
       this.thread = data.thread;
       this.post = data.post;
+      this.forum = data.forum;
       this.type = data.type;
+      this.draftId = data.draftId;
+      this.oldDraft = data.oldDraft;
       this.initPost(data.post);
+      var self = this;
+      if(self.oldDraft) {
+        var info = "是否加载 " + self.format("YYYY/MM/DD HH:ss:mm", self.oldDraft.tlm) + " 编辑但未提交的内容？";
+        sweetQuestion(info)
+          .then(function() {
+            self.visitUrl("/editor?type=redit&id=" + self.oldDraft.did);
+          })
+          .catch(function() {
+            self.autoSaveToDraft();
+          })
+      } else {
+        self.autoSaveToDraft();
+      }
     },
     computed: {
       // 关键词字数
@@ -86,6 +104,32 @@ function initVueApp() {
       checkString: NKC.methods.checkData.checkString,
       checkEmail: NKC.methods.checkData.checkEmail,
       visitUrl: NKC.methods.visitUrl,
+      fromNow: NKC.methods.fromNow,
+      format: NKC.methods.format,
+      autoSaveToDraft: function() {
+        var self = this;
+        setTimeout(function() {
+          self.saveToDraftBase()
+            .then(function() {
+              PostButton.saveToDraftSuccess();
+              self.autoSaveToDraft();
+            })
+            .catch(function(data) {
+              sweetError("草稿保存失败：" + (data.error || data));
+            });
+        }, 30000);
+      },
+      saveToDraft: function() {
+        var self = this;
+        self.saveToDraftBase()
+          .then(function() {
+            PostButton.saveToDraftSuccess();
+            sweetSuccess("草稿保存成功");
+          })
+          .catch(function(data) {
+            sweetError("草稿保存失败：" + (data.error || data));
+          })
+      },
       initPost: function(post) {
         if(!post) return;
         this.title = post.t;
@@ -94,6 +138,7 @@ function initVueApp() {
         this.setContent();
         this.abstractCn = post.abstractCn;
         this.abstractEn = post.abstractEn;
+        this.originState = post.originState;
         this.keyWordsCn = post.keyWordsCn;
         this.keyWordsEn = post.keyWordsEn;
         this.authorInfos = post.authorInfos;
@@ -330,6 +375,24 @@ function initVueApp() {
       checkKeywords: function() {
         if(this.keywordsLength > 50) throw "关键词数量超出限制"
       },
+      getPost: function() {
+        var post = {};
+        var self = this;
+        self.getTitle();
+        self.getContent();
+        post.abstractCn = self.abstractCn;
+        post.abstractEn = self.abstractEn;
+        post.keyWordsEn = self.keyWordsEn;
+        post.keyWordsCn = self.keyWordsCn;
+        post.t = self.title;
+        post.fids = self.selectedForumsId;
+        post.cids = self.selectedCategoriesId;
+        post.c = self.content;
+        post.authorInfos = self.authorInfos;
+        post.originState = self.originState;
+        post.did = self.draftId;
+        return post;
+      },
       // 提交内容
       submit: function() {
         var self = this;
@@ -338,17 +401,8 @@ function initVueApp() {
           .then(function() {
             // 锁住发表按钮
             PostButton.disabledSubmit = true;
-            self.getTitle();
-            self.getContent();
             type = self.type;
-            post.abstractCn = self.abstractCn;
-            post.abstractEn = self.abstractEn;
-            post.t = self.title;
-            post.fids = self.selectedForumsId;
-            post.cids = self.selectedCategoriesId;
-            post.c = self.content;
-            post.authorInfos = self.authorInfos;
-            post.originState = self.originState;
+            post = self.getPost();
           })
           .then(function() {
             if(type === "newThread") { // 发新帖：从专业点发表、首页点发表、草稿箱
@@ -367,7 +421,7 @@ function initVueApp() {
               });
               self.checkContent();
               return nkcAPI("/t/" + self.thread.tid, "POST", {post: post})
-            } else if(type === "modifyPost") { // 修改post：编辑post，草稿箱
+            } else if(type === "modifyPost") { // 修改post
               self.checkString(self.title, {
                 name: "标题",
                 minLength: 0,
@@ -375,8 +429,20 @@ function initVueApp() {
               });
               self.checkContent();
               return nkcAPI("/p/" + self.post.pid, "PATCH", {post: post})
-            } else if(type === "forumDeclare") { // 修改专业详情：专业设置
+            } else if(type === "modifyThread") { // 修改thread
+              self.checkTitle();
               self.checkContent();
+              self.checkAbstract();
+              self.checkKeywords();
+              self.checkAuthorInfos();
+              return nkcAPI("/p/" + self.post.pid, "PATCH", {post: post})
+            } else if(type === "modifyForumDeclare") { // 修改专业详情
+              self.checkContent();
+              return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PATCH", {
+                declare: post.c,
+                did: self.draftId,
+                operation: "updateDeclare"
+              });
             }
           })
           .then(function(data) {
@@ -390,7 +456,43 @@ function initVueApp() {
             console.log(data);
             sweetError(data);
           })
-      }
+      },
+      saveToDraftBase: function() {
+        var self = this;
+        return Promise.resolve()
+          .then(function() {
+            var post = self.getPost();
+            var desType, desTypeId;
+            var type = self.type;
+            if(type === "newThread") {
+              desType = "forum";
+            } else if(type === "newPost") {
+              desType = "thread";
+              desTypeId = self.thread.tid;
+            } else if(type === "modifyPost") {
+              desType = "post";
+              desTypeId = self.post.pid;
+            } else if(type === "modifyThread") {
+              desType = "post";
+              desTypeId = self.post.pid;
+            } else if(type === "modifyForumDeclare") {
+              desType = "forumDeclare";
+              desTypeId = self.forum.fid;
+            } else {
+              throw "未知的草稿类型";
+            }
+            return nkcAPI("/u/" + NKC.configs.uid + "/drafts", "POST", {
+              post: post,
+              draftId: self.draftId,
+              desType: desType,
+              desTypeId: desTypeId
+            });
+          })
+          .then(function(data) {
+            self.draftId = data.draftId;
+            return Promise.resolve();
+          });
+      },
     }
   });
   PostButton = new Vue({
@@ -398,11 +500,22 @@ function initVueApp() {
     data: {
       disabledSubmit: false, // 锁定提交按钮
       checkProtocol: true, // 是否勾选协议
+      autoSaveInfo: ""
+    },
+    mounted: function() {
+
     },
     methods: {
+      format: NKC.methods.format,
+      saveToDraftSuccess: function() {
+        var time = new Date();
+        this.autoSaveInfo = "草稿已保存 " + this.format("HH:mm:ss", time);
+      },
+      autoSaveToDraft: PostInfo.autoSaveToDraft,
+      saveToDraft: PostInfo.saveToDraft,
       submit: function() {
         PostInfo.submit();
-      }
+      },
     }
   })
 }

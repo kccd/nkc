@@ -9,10 +9,13 @@ infoRouter
 	.patch('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {forum} = data;
-		let {operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId} = body;
+		let {did, operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId} = body;
 		if(operation && operation === 'updateDeclare') {
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
+			if(did) {
+			  await db.DraftModel.remove({did, uid: data.user.uid});
+      }
 			data.redirect = `/f/${forum.fid}/home`;
 		} else {
 			if(brief.length > 15) ctx.throw(400, "专业简介不能超过15个字");

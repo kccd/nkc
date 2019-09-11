@@ -661,7 +661,7 @@ width: 100%;
 .forum-digest-thread a{
   color: #d48900;
 }
-.forum-home .forum-declare img{
+.forum-declare img{
   max-width: 100%;
 }
 
@@ -669,7 +669,7 @@ width: 100%;
   color: #505c65;
 }
 .ForumThreadTitle{
-  margin-top: 0px;
+  margin-top: 0;
   font-size: 17px;
   display: block;
 }

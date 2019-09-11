@@ -769,7 +769,7 @@ threadRouter
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post, postType} = body;
-		const {columnCategoriesId = [], sendAnonymousPost} = post;
+		const {columnCategoriesId = [], sendAnonymousPost, did} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(postType === "comment" && post.c.length > 1000) {
       ctx.throw(400, "评论内容不能超过1000字符");
@@ -879,8 +879,10 @@ threadRouter
 			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}`))
 		}
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
-		//帖子曾经在草稿箱中，发表时，删除草稿
-		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
+		// 如果是编辑的草稿，则删除草稿
+    if(did) {
+      await db.DraftModel.remove({did, uid: data.user.uid});
+    }
 
 		// 回复自动关注文章
     const subQuery = {

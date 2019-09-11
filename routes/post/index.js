@@ -272,8 +272,8 @@ router
   })
   .patch('/:pid', async (ctx, next) => {
     const {
-      columnCategoriesId=[], sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
-      survey
+      columnCategoriesId=[], sendAnonymousPost, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
+      survey, did
     } = ctx.body.post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
     const {pid} = ctx.params;
@@ -433,7 +433,9 @@ router
     let singlePost = await db.PostModel.findOnly({pid})
     await singlePost.update({disabled:false})
     // 帖子曾经在草稿箱中，发表时，删除草稿
-    await db.DraftModel.remove({"desType":desType,"desTypeId":desTypeId})
+    if(did) {
+      await db.DraftModel.remove({did, uid: data.user.uid})
+    }
     await targetUser.updateUserMessage();
     if(!singlePost.reviewed) {
       await db.MessageModel.sendReviewMessage(singlePost.pid);

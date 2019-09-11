@@ -2,43 +2,40 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const draftSchema = new Schema({
+  // 编辑器内的内容
   c: {
     type: String,
     default: ''
   },
+  // 内容格式
   l: {
     type: String,
     default: ''
   },
+  // 标题
   t: {
     type: String,
     default: ''
   },
-  destination: {
-    type: {
-      type: String,
-      default: ''
-    },
-    typeid: {
-      type: String,
-      default: ''
-    }
-  },
+  // 草稿类型
   desType: {
     type: String,
     default: 'forum',
     index: 1
   },
+  // 草稿对应类型的ID， tid,pid等
   desTypeId: {
     type: String,
     default: '',
     index: 1
   },
+  // 草稿拥有者
   uid: {
     type: String,
-    default: '',
+    required: true,
     index: 1
   },
+  // 草稿ID
   did: {
     type: String,
     default: 0,
@@ -78,17 +75,25 @@ const draftSchema = new Schema({
     type: String,
     default: "0"
   },
+  // 是否匿名
   anonymous: {
     type: Boolean,
     default: false,
   },
+  // 专业分类
   mainForumsId: {
     type: [String],
     default: []
   },
+  // 文章分类
   categoriesId: {
     type: [String],
     default: []
+  },
+  // 调查ID
+  surveyId: {
+    type: Number,
+    default: null
   }
 });
 

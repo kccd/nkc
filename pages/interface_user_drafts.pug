@@ -26,7 +26,7 @@ block content
             span 修改于&nbsp;
             span.time= fromNow(i.tlm)
             span &nbsp;~~
-            a(href=`/editor?type=redit&did=${i.did}`).link 继续创作
+            a(href=`/editor?type=redit&id=${i.did}`).link 继续创作
             a(style='float:right;' onclick=`removedraft("${i.uid}","${i.did}")`) 舍弃
         include interface_navigation_paging
 block scripts

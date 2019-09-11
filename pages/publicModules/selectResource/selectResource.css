@@ -96,14 +96,22 @@
 #moduleSelectResource  .resource-mask.active .fa{
   color: #00ff04;
 }
+#moduleSelectResource  .resource-index{
+  position: absolute;
+  margin: auto;
+  color: #fff;
+  z-index: 1000;
+  font-size: 1.25rem;
+  top: 0;
+  font-weight: 700;
+  left: 0.3rem;
+}
 #moduleSelectResource .resource-link{
   height: 100%;
   width: 100%;
 }
 #moduleSelectResource .resource-info{
   font-size: 1.2rem;
-  display: table-cell;
-  vertical-align: top;
   padding: 1.9rem 0;
   font-weight: 700;
   text-align: center;

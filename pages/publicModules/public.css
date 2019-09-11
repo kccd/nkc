@@ -242,6 +242,24 @@ table{
 .pointer{
   cursor: pointer;
 }
+/*自定义按钮*/
+/*主色按钮*/
+.btn-theme{
+  color: #fff;
+  background-color: #2b90d9;
+  border-color: #2b90d9;
+}
+.btn-theme:hover{
+  color: #fff;
+  background-color: #438abe;
+  border-color: #438abe;
+}
+.btn-theme:focus{
+  color: #fff;
+  background-color: #438abe;
+  border-color: #438abe;
+}
+
 
 .list-header{
   height: 2rem;

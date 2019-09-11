@@ -175,7 +175,7 @@ const postSchema = new Schema({
   // 原创声明
   originState: {
     type: String,
-    default: ""
+    default: "0"
   },
   // 是否已经审核
   reviewed: {
