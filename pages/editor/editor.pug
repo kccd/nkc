@@ -135,6 +135,11 @@ block content
                     option(:value=index)=text
           #postButton(v-cloak)
             hr
+            .checkbox(v-if="havePermissionToSendAnonymousPost")
+              label
+                input(type="checkbox" v-model="anonymous" :value="true")
+                span
+                  | 匿名发表
             .checkbox
               label
                 input(type="checkbox" v-model="checkProtocol" :value="true")
@@ -157,7 +162,7 @@ block content
         div
           h5.text-danger 温馨提示：
           p 1. 每隔30秒编辑器会自动将已输入的内容保存到草稿箱，相应的草稿会在内容发表后被清除。而未清除的草稿可以在下一次从相同入口进入编辑器时选择加载。
-  .hidden#data=objToStr({post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft})
+  .hidden#data=objToStr({allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft})
 block scripts
   include ../ueditor/ueditorBase
   include ../publicModules/moment

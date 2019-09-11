@@ -227,7 +227,7 @@ NKC.modules.SurveyEdit = function() {
         sweetQuestion("确定要删除该问题？")
           .then(function() {
             self.app.survey.options.splice(index, 1);
-          })
+          }).catch(function(){})
       },
       removeLink: function(o, index) {
         o.links_.splice(index, 1);
@@ -329,7 +329,7 @@ NKC.modules.SurveyEdit = function() {
         sweetQuestion("确定要移除该选项？")
           .then(function() {
             o.answers.splice(index, 1);
-          })
+          }).catch(function(){})
 
       },
       selectType: function(type) {

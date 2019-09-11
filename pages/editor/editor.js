@@ -1,3 +1,19 @@
+/* 编辑器 2019-9-11
+
+* 对于编辑器而言，编辑类型总共只有以下5中情况：
+*   newThread: 发表新文章
+*   newPost: 发表新回复
+*   modifyThread: 修改文章内容
+*   modifyPost: 修改回复内容
+*   modifyForumDeclare: 编辑专业说明
+*
+* 保存草稿的类型如下：
+*   forum: 发表新文章的草稿
+*   thread: 发表新回复的草稿
+*   post: 编辑回复或文章的草稿
+*   forumDeclare: 编辑专业说明的草稿
+*
+* */
 var editor;
 var CommonModal;
 var PostInfo, PostButton;
@@ -8,6 +24,9 @@ $(function() {
   data = NKC.methods.getDataById("data");
   editor = UE.getEditor("content", NKC.configs.editor.defaultOptions);
   editor.addListener( 'ready', function( editor ) {
+    // 编辑器准备就绪
+    // 计算工具栏上边距
+    // 开始初始化vue
     resetBodyPaddingTop();
     EditorReady = true;
     initVueApp();
@@ -15,19 +34,35 @@ $(function() {
 });
 
 function initVueApp() {
+  // 内容相关的vue实例
+  // 下边的PostButton是按钮及提示相关的vue实例
+  // 分开写是因为在这两部分中间可能插入其他通过vue实现的模块
   PostInfo = new Vue({
     el: "#postInfo",
     data: {
       type: "newThread",
-
+      // 当前内容相关的文章
+      // @param {String} title 文章标题
+      // @param {String} tid 文章ID
+      // @param {String} url 文章链接
       thread: "",
+      // 当前内容，可能来自草稿箱
       post: "",
+      // 当前内容相关的专业信息
+      // @param {String} title 专业标题
+      // @param {String} tid 专业ID
+      // @param {String} url 专业链接
       forum: "",
+      // 当前内容所对应的草稿ID
       draftId: "",
-      oldDraftId: "",
+      // 检测到草稿箱存有未被发表的草稿
+      oldDraft: "",
 
       forums: [],
+
       selectedForums: [], // 已选择的专业
+
+      anonymous: false,
 
       abstractCn: "", // 中文摘要
       abstractEn: "", // 英文摘要
@@ -53,6 +88,8 @@ function initVueApp() {
       this.oldDraft = data.oldDraft;
       this.initPost(data.post);
       var self = this;
+      // 判断草稿箱里是否存在该类型且未被删掉的草稿。
+      // 若存在则此内容未发表。
       if(self.oldDraft) {
         var info = "是否加载 " + self.format("YYYY/MM/DD HH:ss:mm", self.oldDraft.tlm) + " 编辑但未提交的内容？";
         sweetQuestion(info)
@@ -106,6 +143,7 @@ function initVueApp() {
       visitUrl: NKC.methods.visitUrl,
       fromNow: NKC.methods.fromNow,
       format: NKC.methods.format,
+      // 自动保存草稿
       autoSaveToDraft: function() {
         var self = this;
         setTimeout(function() {
@@ -116,9 +154,11 @@ function initVueApp() {
             })
             .catch(function(data) {
               sweetError("草稿保存失败：" + (data.error || data));
+              self.autoSaveToDraft();
             });
         }, 30000);
       },
+      // 手动保存草稿，相比自动保存草稿多了一个成功提示框。
       saveToDraft: function() {
         var self = this;
         self.saveToDraftBase()
@@ -130,6 +170,7 @@ function initVueApp() {
             sweetError("草稿保存失败：" + (data.error || data));
           })
       },
+      // 设置post相关的数据
       initPost: function(post) {
         if(!post) return;
         this.title = post.t;
@@ -143,12 +184,15 @@ function initVueApp() {
         this.keyWordsEn = post.keyWordsEn;
         this.authorInfos = post.authorInfos;
       },
+      // 获取标题输入框的内容
       getTitle: function() {
         this.title = $("#title").val();
       },
+      // 设置标题输入框的内容
       setTitle: function() {
         $("#title").val(this.title);
       },
+      // 获取编辑器中的内容
       getContent: function() {
         if(!EditorReady) {
           return sweetError("编辑器尚未初始化");
@@ -156,6 +200,7 @@ function initVueApp() {
           this.content = editor.getContent();
         }
       },
+      // 设置编辑器中的内容
       setContent: function() {
         if(!EditorReady) {
           return sweetError("编辑器尚未初始化");
@@ -202,8 +247,8 @@ function initVueApp() {
         sweetQuestion("确定要删除该条作者信息？")
           .then(function() {
             arr.splice(index, 1);
-          });
-
+          })
+          .catch(function(){})
       },
       // 移除关键词
       removeKeyword: function(index, arr) {
@@ -375,6 +420,7 @@ function initVueApp() {
       checkKeywords: function() {
         if(this.keywordsLength > 50) throw "关键词数量超出限制"
       },
+      // 根据用户已输入的信息组成post对象
       getPost: function() {
         var post = {};
         var self = this;
@@ -391,6 +437,7 @@ function initVueApp() {
         post.authorInfos = self.authorInfos;
         post.originState = self.originState;
         post.did = self.draftId;
+        post.anonymous = !!PostButton.anonymous;
         return post;
       },
       // 提交内容
@@ -500,10 +547,12 @@ function initVueApp() {
     data: {
       disabledSubmit: false, // 锁定提交按钮
       checkProtocol: true, // 是否勾选协议
+      // 当前用户是否有权限发表匿名内容
+      havePermissionToSendAnonymousPost: data.allowedAnonymousForumsId || false,
+      // 允许发表匿名内容的专业ID
+      allowedAnonymousForumsId: data.allowedAnonymousForumsId || [],
+      anonymous: data.anonymous || false,
       autoSaveInfo: ""
-    },
-    mounted: function() {
-
     },
     methods: {
       format: NKC.methods.format,

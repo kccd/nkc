@@ -156,6 +156,18 @@ router
         tlm: d.tlm || d.toc
       };
     }
+    // 判断用户是否能够发表匿名内容
+    if(["newThread", "modifyThread"].includes(type)) {
+      data.havePermissionToSendAnonymousPost =
+        await db.UserModel.havePermissionToSendAnonymousPost("postToForum", data.user.uid);
+    } else if(["newPost", "modifyPost"]) {
+      data.havePermissionToSendAnonymousPost =
+        await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid);
+    } else {
+      data.havePermissionToSendAnonymousPost = false;
+    }
+    const allowedAnonymousForums = await db.ForumModel.find({allowedAnonymousPost: true}, {fid: 1});
+    data.allowedAnonymousForumsId = allowedAnonymousForums.map(f => f.fid);
     ctx.template = "editor/editor.pug";
     await next();
   });
