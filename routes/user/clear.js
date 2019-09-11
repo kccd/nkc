@@ -12,6 +12,8 @@ router
     } else if(type === "banner") {
       await nkcModules.file.deleteUserBanner(targetUser.uid);
     } else if(type === "username") {
+      const newUsername = `kc-${targetUser.uid}`;
+      const newUsernameLowerCase = newUsername.toLowerCase();
       await db.SecretBehaviorModel({
         operationId: "modifyUsername",
         type: "modifyUsername",
@@ -20,17 +22,17 @@ router
         port: ctx.port,
         oldUsername: targetUser.username,
         oldUsernameLowerCase: targetUser.usernameLowerCase,
-        newUsername: "",
-        newUsernameLowerCase: ""
+        newUsername: newUsername,
+        newUsernameLowerCase: newUsernameLowerCase
       }).save();
       await db.UserModel.updateOne({uid}, {
         $set: {
-          username: "",
-          usernameLowerCase: ""
+          username: newUsername,
+          usernameLowerCase: newUsernameLowerCase
         }
       });
-      targetUser.username = "";
-      targetUser.usernameLowerCase = "";
+      targetUser.username = newUsername;
+      targetUser.usernameLowerCase = newUsernameLowerCase;
       await nkcModules.elasticSearch.save("user", targetUser);
     } else if(type === "description") {
       await db.UserModel.updateOne({uid}, {
