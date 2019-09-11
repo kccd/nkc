@@ -2,15 +2,16 @@ const Router = require('koa-router');
 const draftsRouter = new Router();
 draftsRouter
   .get('/', async(ctx, next) => {
-    const {data, db, query} = ctx;
+    const {data, db, query, nkcModules} = ctx;
     const {user} = data;
-    const {uid} = user;
-    const page = query.page?parseInt(query.page): 0;
-    const count = await db.DraftModel.count({uid});
-    const {apiFunction} = ctx.nkcModules;
-    const paging = apiFunction.paging(page, count);
-    data.drafts = await db.DraftModel.find({uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const {page = 0} = query;
+    const count = await db.DraftModel.count({uid: user.uid});
+    const paging = nkcModules.apiFunction.paging(page, count);
+    const drafts = await db.DraftModel.find({uid: user.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
+    for(const draft of drafts) {
+      
+    }
     ctx.template = 'interface_user_drafts.pug';
     await next()
   })
