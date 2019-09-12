@@ -226,7 +226,8 @@ function getSelectedColumnCategoriesId() {
   var status = ColumnCategoriesDom.getStatus();
   if(status.checkbox) {
     if(status.selectedCategoriesId.length === 0) {
-      geid('ButtonReply').disabled=false;
+      var dom = geid('ButtonReply');
+      if(dom) dom.disabled=false;
       throw("请选择专栏文章分类");
     }
   }
@@ -406,6 +407,7 @@ function onPost() {
     url = '/f/' + queryId + '/settings/info';
     data = {declare: post.c, operation: 'updateDeclare'}
   } else {
+    geid('post').disabled = false;
     return screenTopWarning('未知的请求类型：'+queryType);
   }
   try{

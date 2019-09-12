@@ -60,6 +60,11 @@ block title
             a(onclick=`getPostAuthor('${post.pid}')`)
               span.fa.fa-user-secret &nbsp;
               span 作者
+        if permission("anonymousPost")
+          li
+            a(onclick=`anonymousPost('${post.pid}', ${!!!post.anonymous})`)
+              span.fa.fa-user-secret &nbsp;
+              span=post.anonymous? "取消匿名": "设为匿名"
         if postTo && !thread.closed
           if targetThread
             li
@@ -520,7 +525,10 @@ block content
                               if data.sendAnonymousPost
                                 .checkbox
                                   label
-                                    input#sendAnonymousPost(type='checkbox')
+                                    if data.user && data.thread && data.thread.firstPost && data.thread.firstPost.ownPost && data.thread.firstPost.anonymous
+                                      input#sendAnonymousPost(type='checkbox' checked=true)
+                                    else
+                                      input#sendAnonymousPost(type='checkbox')
                                     span 匿名发表
                               //-
                                 if state.userColumn && !data.addedToColumn
