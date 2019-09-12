@@ -39,7 +39,8 @@ router
       survey.showResult === "all" ||
       data.user && data.user.uid === survey.uid ||
       ctx.permission("showSecretSurvey") ||
-      survey.showResult === "posted" && data.surveyPost
+      survey.showResult === "posted" && data.surveyPost ||
+      survey.showResult === "end" && Date.now() >= (new Date(survey.et)).getTime()
     ) {
       data.showResult = true;
     } else {

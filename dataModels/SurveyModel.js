@@ -12,7 +12,7 @@ const schema = new Schema({
     default: "vote",
     index: 1
   },
-  // 结果的展示 all: 所有人可见, posted: 已投票用户可见, self: 仅自己和管理员可见
+  // 结果的展示 all: 所有人可见, posted: 已投票用户可见, self: 仅自己和管理员可见, end: 结束后可见
   showResult: {
     type: String,
     default: "all"
@@ -298,9 +298,9 @@ schema.statics.checkSurveyData = async (survey) => {
       min: 1
     });
   }
-  const now = Date.now();
+  // const now = Date.now();
   if((new Date(survey.st)).getTime() >= (new Date(survey.et)).getTime()) throwErr(400, "结束时间必须大于开始时间");
-  if((new Date(survey.et)).getTime() <= now) throwErr(400, "结束时间必须大于当前时间");
+  // if((new Date(survey.et)).getTime() <= now) throwErr(400, "结束时间必须大于当前时间");
   const {
     registerTime, digestThreadCount, threadCount, postCount, voteUpCount,
     certsId, visitor, gradesId
