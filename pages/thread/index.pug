@@ -522,10 +522,14 @@ block content
                                   | 处理URL
                               include ../editor/toColumn
 
+                              -console.log(data.thread.firstPost.ownPost)
                               if data.sendAnonymousPost
                                 .checkbox
                                   label
-                                    input#sendAnonymousPost(type='checkbox')
+                                    if data.user && data.thread && data.thread.firstPost && data.thread.firstPost.ownPost && data.thread.firstPost.anonymous
+                                      input#sendAnonymousPost(type='checkbox' checked=true)
+                                    else
+                                      input#sendAnonymousPost(type='checkbox')
                                     span 匿名发表
                               //-
                                 if state.userColumn && !data.addedToColumn
