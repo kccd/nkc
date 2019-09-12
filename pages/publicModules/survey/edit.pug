@@ -4,11 +4,11 @@
   .survey-edit-body(v-if="survey && roles.length")
     .form.form-horizontal
       .form-group
-        label.col-sm-1.control-label 注意事项
+        label.col-sm-2.control-label 注意事项
         .col-sm-9
           h4.text-danger 以下填写的内容暂不支持保存到草稿箱，请谨慎操作。
       .form-group(v-if="!survey._id")
-        label.col-sm-1.control-label 类别
+        label.col-sm-2.control-label 类别
         .col-sm-10
           .survey-type(@click="selectType('vote')")
             .fa.fa-check-circle(v-if="survey.type === 'vote'")
@@ -23,11 +23,11 @@
             .fa.fa-circle-o(v-else)
             span 问卷调查
       .form-group(v-if="survey.type !== 'vote'")
-        label.col-sm-1.control-label 调查说明
+        label.col-sm-2.control-label 调查说明
         .col-sm-9
           textarea.form-control(v-model="survey.description" rows=4 placeholder="请输入调查说明")
       .form-group
-        label.col-sm-1.control-label 问题
+        label.col-sm-2.control-label 问题
         .col-sm-9
           .survey-options.m-b-05
             .survey-option(v-for="o, index in survey.options" v-if="survey.type !== 'vote' || index === 0")
@@ -94,7 +94,7 @@
           button.btn.btn-default.btn-sm(@click="copy(survey.options)" v-if="survey.type !== 'vote' && survey.options.length")
             .fa.fa-files-o &nbsp;复制问题
       .form-group
-        label.col-sm-1.control-label 结果展示
+        label.col-sm-2.control-label 结果展示
         .col-sm-9
           .radio
             label.m-r-1
@@ -108,7 +108,7 @@
               | 仅自己可见
 
       .form-group
-        label.col-sm-1.control-label 奖励
+        label.col-sm-2.control-label 奖励
         .col-sm-9
           .radio
             label.m-r-1
@@ -127,7 +127,7 @@
               | 总奖励次数
               input(type="text" v-model.number="survey.reward.rewardCount" @change="toInt")
       .form-group
-        label.col-sm-1.control-label 权限
+        label.col-sm-2.control-label 权限
         .col-sm-9.m-t-05.survey-scores
           .form.col-sm-12
             .form-group
@@ -190,7 +190,7 @@
                   button.btn.btn-xs.btn-default(@click="selectUser") 选择用户
                   h5.text-danger 指定的用户无需满足以上条件即可参与。
       .form-group
-        label.col-sm-1.control-label 时间
+        label.col-sm-2.control-label 时间
         .col-sm-9.m-t-05
           .col-sm-12.form
             .form-group
@@ -237,7 +237,7 @@
                   option(value=i)=i
               | &nbsp;分
       //-.form-group
-        label.col-sm-1.control-label
+        label.col-sm-2.control-label
         .col-sm-9
           h5.text-danger(v-if="error") {{error}}
           button.btn.btn-primary(@click="submit") 提交

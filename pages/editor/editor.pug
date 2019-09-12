@@ -133,6 +133,18 @@ block content
                 select.form-control(v-model="originState")
                   for text, index in getOriginLevel()
                     option(:value=index)=text
+          .m-b-2
+            .editor-header 专栏
+            include ../editor/toColumn
+          if data.createSurveyPermission
+            if data.type === "newThread" || (data.type === "modifyThread" && data.post.surveyId)
+              .m-b-2
+                .editor-header 调查
+                  button.btn.btn-success.btn-xs(style="vertical-align: top;"
+                    onclick="disabledSurveyForm()"
+                    id="disabledSurveyButton"
+                  ) 创建
+                include ../publicModules/survey/edit
           #postButton(v-cloak)
             hr
             .checkbox(v-if="havePermissionToSendAnonymousPost")
@@ -175,4 +187,7 @@ block scripts
   include ../publicModules/commonModal/commonModal
   include ../publicModules/selectResource/selectResource
   include ../publicModules/moveThread/moveThread
+  if state.userColumn && !data.addedToColumn
+    +includeJS("/publicModules/toColumn/selectCategories.js")
+  +includeJS('/publicModules/survey/edit.js')
   +includeJS("/editor/editor.js")

@@ -16,7 +16,7 @@
 * */
 var editor;
 var CommonModal;
-var PostInfo, PostButton;
+var PostInfo, PostButton, PostToColumn, PostSurvey;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
 var data;
@@ -31,6 +31,20 @@ $(function() {
     EditorReady = true;
     initVueApp();
   });
+  // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
+  // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
+  if(NKC.modules.SelectColumnCategories) {
+    PostToColumn = new NKC.modules.SelectColumnCategories();
+  }
+  // 实例化投票模块
+  // 获取数据时需判断实例是否存在
+  if(NKC.modules.SurveyEdit) {
+    PostSurvey = new NKC.modules.SurveyEdit();
+    PostSurvey.init({surveyId: data.post? data.post.surveyId: ""});
+    if(data.post && data.post.surveyId) {
+      disabledSurveyForm();
+    }
+  }
 });
 
 function initVueApp() {
@@ -76,6 +90,8 @@ function initVueApp() {
       authorInfos: [], // 作者信息
 
       originState: 0, // 原创声明
+
+      surveyId: ""
 
     },
     mounted: function() {
@@ -190,6 +206,7 @@ function initVueApp() {
         this.keyWordsCn = post.keyWordsCn;
         this.keyWordsEn = post.keyWordsEn;
         this.authorInfos = post.authorInfos;
+        this.surveyId = post.surveyId;
       },
       // 获取标题输入框的内容
       getTitle: function() {
@@ -444,9 +461,22 @@ function initVueApp() {
         post.authorInfos = self.authorInfos;
         post.originState = self.originState;
         post.did = self.draftId;
+        post.surveyId = self.surveyId;
         // 仅当用户有权发表匿名内容且当前专业允许发表匿名内容时，才将匿名标志提交到服务器。
         if(PostButton.havePermissionToSendAnonymousPost && PostButton.allowedAnonymous) {
           post.anonymous = !!PostButton.anonymous;
+        }
+        // 判断用户有没有勾选"同时转发到专栏，勾选则获取专业分类"
+        if(PostToColumn && PostToColumn.getStatus) {
+          var status = PostToColumn.getStatus();
+          if(status.checkbox) {
+            post.columnCategoriesId = status.selectedCategoriesId || [];
+          }
+        }
+        // 调查表单数据
+        if(PostSurvey) {
+          var survey = PostSurvey.getSurvey();
+          if(survey) post.survey = survey;
         }
         return post;
       },
@@ -605,6 +635,17 @@ function resetBodyPaddingTop() {
   var tools = $(".edui-editor-toolbarbox.edui-default");
   var height = header.height() + tools.height();
   $("body").css("padding-top", height + 40);
+}
+
+function disabledSurveyForm() {
+  if(!PostSurvey) return;
+  var button = $("#disabledSurveyButton");
+  if(PostSurvey.app.disabled) {
+    button.text("取消").removeClass("btn-success").addClass("btn-danger");
+  } else {
+    button.text("创建").removeClass("btn-danger").addClass("btn-success");
+  }
+  PostSurvey.app.disabled = !PostSurvey.app.disabled;
 }
 
 window.onresize=function(){

@@ -2,7 +2,7 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    const {db, data, query} = ctx;
+    const {db, data, query, state} = ctx;
     const {type} = query;
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
@@ -175,6 +175,15 @@ router
     }
     const allowedAnonymousForums = await db.ForumModel.find({allowedAnonymousPost: true}, {fid: 1});
     data.allowedAnonymousForumsId = allowedAnonymousForums.map(f => f.fid);
+
+    // 判断用户是否已经将文章转发到专栏
+    if(["modifyPost", "modifyThread", "newPost"].includes(data.type) && state.userColumn) {
+      data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: data.thread.tid})) > 0;
+    }
+    // 判断用户是否有权限发起调查
+    if(["modifyThread", "newThread"].includes(data.type)) {
+      data.createSurveyPermission = await db.SurveyModel.ensureCreatePermission("postToForum", data.user.uid);
+    }
     ctx.template = "editor/editor.pug";
     await next();
   });
