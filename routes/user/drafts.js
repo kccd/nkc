@@ -10,7 +10,7 @@ draftsRouter
     const drafts = await db.DraftModel.find({uid: user.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
     for(const draft of drafts) {
-      
+
     }
     ctx.template = 'interface_user_drafts.pug';
     await next()
