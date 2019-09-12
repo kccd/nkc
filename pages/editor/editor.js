@@ -103,6 +103,13 @@ function initVueApp() {
         self.autoSaveToDraft();
       }
     },
+    watch: {
+      selectedForums: function() {
+        if(PostButton) {
+          PostButton.checkAnonymous();
+        }
+      }
+    },
     computed: {
       // 关键词字数
       keywordsLength: function() {
@@ -164,7 +171,7 @@ function initVueApp() {
         self.saveToDraftBase()
           .then(function() {
             PostButton.saveToDraftSuccess();
-            sweetSuccess("草稿保存成功");
+            sweetSuccess("草稿已保存");
           })
           .catch(function(data) {
             sweetError("草稿保存失败：" + (data.error || data));
@@ -437,7 +444,10 @@ function initVueApp() {
         post.authorInfos = self.authorInfos;
         post.originState = self.originState;
         post.did = self.draftId;
-        post.anonymous = !!PostButton.anonymous;
+        // 仅当用户有权发表匿名内容且当前专业允许发表匿名内容时，才将匿名标志提交到服务器。
+        if(PostButton.havePermissionToSendAnonymousPost && PostButton.allowedAnonymous) {
+          post.anonymous = !!PostButton.anonymous;
+        }
         return post;
       },
       // 提交内容
@@ -548,13 +558,33 @@ function initVueApp() {
       disabledSubmit: false, // 锁定提交按钮
       checkProtocol: true, // 是否勾选协议
       // 当前用户是否有权限发表匿名内容
-      havePermissionToSendAnonymousPost: data.allowedAnonymousForumsId || false,
+      havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost || false,
       // 允许发表匿名内容的专业ID
       allowedAnonymousForumsId: data.allowedAnonymousForumsId || [],
-      anonymous: data.anonymous || false,
+      // 根据当前所选专业判断用户是否有权限勾选匿名，若无权则此处无需将匿名标志提交到服务器。（新发表时不匿名，修改时无法需改匿名标志）
+      allowedAnonymous: false,
+      // 是否匿名
+      anonymous: data.post?data.post.anonymous: false,
       autoSaveInfo: ""
     },
     methods: {
+      checkAnonymous: function() {
+        var selectedForumsId = PostInfo.selectedForumsId;
+        var havePermission = false;
+        for(var i = 0; i < selectedForumsId.length; i++) {
+          var fid = selectedForumsId[i];
+          if(this.allowedAnonymousForumsId.indexOf(fid) !== -1) {
+            havePermission = true;
+            break;
+          }
+        }
+        if(!havePermission) {
+          this.anonymous = false;
+          this.allowedAnonymous = false;
+        } else {
+          this.allowedAnonymous = true;
+        }
+      },
       format: NKC.methods.format,
       saveToDraftSuccess: function() {
         var time = new Date();

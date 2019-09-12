@@ -413,7 +413,7 @@ function submit(tid){
 
   var sendAnonymousPostDom = $("#sendAnonymousPost");
   if(sendAnonymousPostDom.length) {
-    post.sendAnonymousPost = sendAnonymousPostDom.prop("checked");
+    post.anonymous = sendAnonymousPostDom.prop("checked");
   }
 
 	return nkcAPI('/t/' + tid, 'POST', {

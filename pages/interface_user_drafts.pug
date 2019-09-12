@@ -4,6 +4,9 @@ block title
 block content
   .container-fluid.max-width
     .row
+      .col-xs-12.col-md-12
+
+    //
       .col-xs-12.col-md-9
         .paging-button 
           a.button(style="cursor:pointer" onclick=`removedraft("${data.user.uid}","all")`) 舍弃全部草稿
@@ -30,4 +33,3 @@ block content
             a(style='float:right;' onclick=`removedraft("${i.uid}","${i.did}")`) 舍弃
         include interface_navigation_paging
 block scripts
-  script(src='/interface_common.js')

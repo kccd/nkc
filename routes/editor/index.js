@@ -34,7 +34,8 @@ router
         tid: thread.tid,
         title: firstPost.t,
         url: `/t/${thread.tid}`
-      }
+      };
+      selectedForumsId = thread.mainForumsId || [];
     } else if(type === "post") { // 修改文章或者修改回复
       const {id} = query;
       data.post = await db.PostModel.findOnly({pid: id});
@@ -46,7 +47,8 @@ router
         tid: thread.tid,
         title: firstPost.t,
         url: `/t/${thread.tid}`
-      }
+      };
+      selectedForumsId = thread.mainForumsId || [];
     } else if(type === "forum_declare") { // 修改专业说明
       data.type = "modifyForumDeclare";
       const {id} = query;
@@ -83,7 +85,8 @@ router
           tid: thread.tid,
           title: firstPost.t,
           url: `/t/${thread.tid}`
-        }
+        };
+        selectedForumsId = thread.mainForumsId;
       } else if(desType === "post") { // 编辑文章或编辑回复
         const post = await db.PostModel.findOnly({pid: desTypeId});
         const thread = await db.ThreadModel.findOnly({tid: post.tid});
@@ -94,7 +97,8 @@ router
           tid: thread.tid,
           title: firstPost.t,
           url: `/t/${thread.tid}`
-        }
+        };
+        selectedForumsId = thread.mainForumsId;
       } else if(desType === "forumDeclare") { // 专业说明
         data.type = "modifyForumDeclare";
         const forum = await db.ForumModel.findOnly({fid: desTypeId});
@@ -157,12 +161,15 @@ router
       };
     }
     // 判断用户是否能够发表匿名内容
-    if(["newThread", "modifyThread"].includes(type)) {
+    if(data.type === "newThread") {
       data.havePermissionToSendAnonymousPost =
         await db.UserModel.havePermissionToSendAnonymousPost("postToForum", data.user.uid);
-    } else if(["newPost", "modifyPost"]) {
+    } else if(data.type === "modifyThread") {
       data.havePermissionToSendAnonymousPost =
-        await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid);
+        await db.UserModel.havePermissionToSendAnonymousPost("postToForum", data.user.uid, selectedForumsId);
+    } else if(["newPost", "modifyPost"].includes(data.type)) {
+      data.havePermissionToSendAnonymousPost =
+        await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid, selectedForumsId);
     } else {
       data.havePermissionToSendAnonymousPost = false;
     }

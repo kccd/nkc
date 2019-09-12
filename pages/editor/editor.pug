@@ -136,10 +136,15 @@ block content
           #postButton(v-cloak)
             hr
             .checkbox(v-if="havePermissionToSendAnonymousPost")
-              label
+              label(v-if="allowedAnonymous")
                 input(type="checkbox" v-model="anonymous" :value="true")
                 span
                   | 匿名发表
+              label(v-else)
+                input(type="checkbox" v-model="anonymous" :value="true" disabled)
+                span
+                  | 匿名发表
+                  span.text-danger （所选专业分类不支持匿名发表）
             .checkbox
               label
                 input(type="checkbox" v-model="checkProtocol" :value="true")

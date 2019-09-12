@@ -272,7 +272,7 @@ router
   })
   .patch('/:pid', async (ctx, next) => {
     const {
-      columnCategoriesId=[], sendAnonymousPost, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
+      columnCategoriesId=[], anonymous, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
       survey, did
     } = ctx.body.post;
     if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
@@ -355,7 +355,7 @@ router
     targetPost.keyWordsCn = keyWordsCn;
     targetPost.keyWordsEn = keyWordsEn;
     const postType = targetPost.pid === targetThread.oc? "postToForum": "postToThread";
-    if(sendAnonymousPost) {
+    if(anonymous !== undefined && anonymous) {
       if(await db.UserModel.havePermissionToSendAnonymousPost(postType, user.uid, targetPost.mainForumsId)) {
         if(postType !== "postToForum" || !["product", "fund"].includes(targetThread.type)) {
           targetPost.anonymous = true;
