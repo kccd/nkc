@@ -7,6 +7,7 @@ const recommend = require('./recommend');
 const digestRouter = require('./digest');
 const voteRouter = require('./vote');
 const warningRouter = require("./warning");
+const anonymousRouter =require("./anonymous");
 const postRouter = require("./post");
 const Path = require("path");
 const authorRouter = require("./author");
@@ -449,5 +450,6 @@ router
   .use('/:pid/warning', warningRouter.routes(), warningRouter.allowedMethods())
   .use("/:pid/author", authorRouter.routes(), authorRouter.allowedMethods())
   .use('/:pid/quote', quote.routes(), quote.allowedMethods())
+  .use("/:pid/anonymous", anonymousRouter.routes(), anonymousRouter.allowedMethods())
   .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods());
 module.exports = router;

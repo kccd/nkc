@@ -60,6 +60,11 @@ block title
             a(onclick=`getPostAuthor('${post.pid}')`)
               span.fa.fa-user-secret &nbsp;
               span 作者
+        if permission("anonymousPost")
+          li
+            a(onclick=`anonymousPost('${post.pid}', ${!!!post.anonymous})`)
+              span.fa.fa-user-secret &nbsp;
+              span=post.anonymous? "取消匿名": "设为匿名"
         if postTo && !thread.closed
           if targetThread
             li

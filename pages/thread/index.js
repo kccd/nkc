@@ -991,3 +991,16 @@ function getPostAuthor(pid) {
     pid: pid
   });
 }
+
+
+function anonymousPost(pid, anonymous) {
+  nkcAPI("/p/" + pid + "/anonymous", "POST", {
+    anonymous: !!anonymous
+  })
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      sweetError(data);
+    })
+}
