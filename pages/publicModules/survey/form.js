@@ -279,11 +279,12 @@ NKC.modules.SurveyForm = function(id) {
             }
             app.havePermission = data.havePermission;
             app.options = options;
+            // 计算结果，百分比统计优化，最大值撑满进度条。
             if(app.showResult) {
               for(var i = 0; i < data.survey.options.length; i++) {
                 var option = data.survey.options[i];
                 var postScore = 0;
-                var maxProgress;
+                var maxProgress = undefined;
                 for(var j = 0; j < option.answers.length; j++) {
                   var answer = option.answers[j];
                   postScore += answer.postScore || 0;

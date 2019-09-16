@@ -53,7 +53,7 @@
             .option-status(v-if="showResult")
               .option-status-container
                 .number-background
-                .number(:style="'width: ' + a.progress + '%;background-color:' + a.color")
+                .number(:style="'width: ' + a.domProgress + '%;background-color:' + a.color")
               .option-status-info(:title="a.progress + '% ' + a.postCount + '票'") {{a.progress}}% {{a.postCount}}票
         //- 勾选数量限制
         .option-select-count {{selectCount(o)}}
@@ -98,7 +98,11 @@
         p(v-if="rewardInfo") {{rewardInfo}}
         //- 结果展示
         p(v-if="survey.showResult === 'self'") 结果不公开。
-        p(v-else-if="survey.showResult === 'posted'") 结果只向投过票的用户展示。
+        p(v-else-if="survey.showResult === 'posted'")
+          span(v-if="survey.showResultAfterTheEnd") 参与的用户在结束后可查看结果。
+          span(v-else) 结果只向参与的用户展示。
+        p(v-else-if="survey.showResult === 'all'")
+          span(v-if="survey.showResultAfterTheEnd") 结束后可查看结果。
         //- 提交时间
         p(v-if="postTime")
           if data.user
