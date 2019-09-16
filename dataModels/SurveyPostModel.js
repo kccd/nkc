@@ -31,6 +31,11 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
+  // 奖励rewardNum
+  rewardNum: {
+    type: Number,
+    default: 0
+  },
   ip: {
     type: String,
     default: '',
@@ -78,6 +83,11 @@ schema.statics.rewardPost = async (options) => {
     port
   });
   await record.save();
+  await survey.update({
+    $inc: {
+      "reward.rewardedCount": 1
+    }
+  });
   setTimeout(async () => {
     await UserModel.updateUserKcb(targetUser.uid);
     await UserModel.updateUserKcb(user.uid);

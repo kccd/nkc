@@ -17,6 +17,11 @@ const schema = new Schema({
     type: String,
     default: "all"
   },
+  // 结束后展示结果
+  showResultAfterTheEnd: {
+    type: Boolean,
+    default: false
+  },
   // 总投票人数
   postCount: {
     type: Number,
@@ -367,7 +372,7 @@ schema.statics.modifySurvey = async (survey) => {
   const {
     st, et,
     reward, permission, description, options, showResult,
-    mid
+    mid, showResultAfterTheEnd
   } = survey;
   const surveyDB = await SurveyModel.findOnly({_id: survey._id});
   // originId
@@ -376,6 +381,7 @@ schema.statics.modifySurvey = async (survey) => {
   }, {
     $set: {
       toc: Date.now(),
+      showResultAfterTheEnd,
       st,
       mid,
       et,

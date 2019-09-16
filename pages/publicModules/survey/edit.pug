@@ -102,14 +102,16 @@
               | 所有人可见
             label.m-r-1
               input(type="radio" v-model="survey.showResult" value="posted")
-              | 投票后可见
-            label.m-r-1
-              input(type="radio" v-model="survey.showResult" value="end")
-              | 结束后可见
+              | 参与者可见
             label.m-r-1
               input(type="radio" v-model="survey.showResult" value="self")
               | 仅自己可见
-
+          div(v-if="survey.showResult !== 'self'")
+            hr.m-t-05.m-b-05
+            .checkbox
+              label
+                input(type="checkbox" v-model="survey.showResultAfterTheEnd" :value="true")
+                span 结束后展示结果
       .form-group
         label.col-sm-1.control-label 奖励
         .col-sm-9
