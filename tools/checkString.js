@@ -20,7 +20,7 @@ module.exports = {
     return (ls >= 2);
   },
 	checkEmailFormat: (email) => {
-		let path = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+		let path = /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
 		return email.search(path);
 	},
   replaceChineseToCharRef: content => {
