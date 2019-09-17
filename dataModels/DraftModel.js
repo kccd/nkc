@@ -97,5 +97,21 @@ const draftSchema = new Schema({
   }
 });
 
+/*
+* 通过草稿ID删除草稿，若草稿上有调查表ID则删除调查表
+* @param {String} id 草稿ID
+* @param {String} uid 草稿的创建人
+* @author pengxiguaa 2019-9-17
+* */
+draftSchema.statics.removeDraftById = async (id, uid) => {
+  const DraftModel = mongoose.model("draft");
+  const SurveyModel = mongoose.model("surveys");
+  const draft = await DraftModel.findOne({did: id, uid});
+  if(!draft) throwErr(500, `未找到ID为${id}的草稿`);
+  await draft.remove();
+  if(draft.surveyId) {
+    await SurveyModel.remove({uid, _id: draft.surveyId});
+  }
+};
 
 module.exports = mongoose.model('draft', draftSchema);

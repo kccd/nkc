@@ -3,10 +3,6 @@
   //.survey-edit-header {{formName}}
   .survey-edit-body(v-if="survey && roles.length")
     .form.form-horizontal
-      .form-group
-        label.col-sm-2.control-label 注意事项
-        .col-sm-9
-          h4.text-danger 以下填写的内容暂不支持保存到草稿箱，请谨慎操作。
       .form-group(v-if="!survey._id")
         label.col-sm-2.control-label 类别
         .col-sm-10

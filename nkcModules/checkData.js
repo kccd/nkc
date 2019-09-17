@@ -80,7 +80,7 @@ var CheckData = function () {
   * 检测邮箱格式
   * */
   this.checkEmail = function(data) {
-    var path = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    var path = /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
     if(!data.search(path)) {
       self.te(400, "邮箱格式不符合要求");
     }

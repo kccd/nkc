@@ -342,7 +342,43 @@ NKC.modules.SurveyEdit = function() {
         // this.error = err.error || err;
         throw err;
       },
+      // 为了兼容草稿保存，取消了前端提交前的数据检测。
       submit: function() {
+        if(this.disabled) return;
+        this.error = "";
+        var survey = JSON.parse(JSON.stringify(this.survey));
+        var this_ = this;
+        for(var i = 0; i < survey.options.length; i++) {
+          var option = survey.options[i];
+          option.links = this_.modifyLinks(option.links_, "str");
+          for(var j = 0; j < option.answers.length; j++) {
+            var answer = option.answers[j];
+            if(survey.type === "score") {
+              answer.maxScore = parseFloat(answer.maxScore.toFixed(2));
+              answer.minScore = parseFloat(answer.minScore.toFixed(2));
+            }
+            answer.links = this_.modifyLinks(answer.links_, "str");
+          }
+        }
+        var timeEnd = this.timeEnd;
+        var timeStart = this.timeStart;
+        var st = new Date(
+          timeStart.year + "-" + timeStart.month + "-" + timeStart.day +
+          " " + timeStart.hour + ":" + timeStart.minute
+        );
+        var et = new Date(
+          timeEnd.year + "-" + timeEnd.month + "-" + timeEnd.day +
+          " " + timeEnd.hour + ":" + timeEnd.minute
+        );
+        survey.st = st;
+        survey.et = et;
+        survey.reward.onceKcb = parseFloat(survey.reward.onceKcb || 0);
+        survey.reward.rewardCount = parseInt(survey.reward.rewardCount || 0);
+        survey.reward.onceKcb = survey.reward.onceKcb*100;
+        return survey;
+      },
+      // 旧
+      submit_: function() {
         if(this.disabled) return;
         this.error = "";
         var te = this.te;

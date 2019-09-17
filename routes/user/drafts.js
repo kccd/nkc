@@ -63,12 +63,15 @@ draftsRouter
     const {db, data, params} = ctx;
     const {user} = data;
     const {did} = params;
+    let drafts = [];
     if(did === "all") {
-      await db.DraftModel.remove({uid: user.uid});
+      drafts = await db.DraftModel.find({uid: user.uid});
     } else {
       const draft = await db.DraftModel.findOne({uid: user.uid, did});
-      if(!draft) ctx.throw(400, "草稿不存在，请刷新");
-      await draft.remove();
+      if(draft) drafts = [draft];
+    }
+    for(const d of drafts) {
+      await db.DraftModel.removeDraftById(d.did, user.uid);
     }
     await next();
   })
@@ -79,12 +82,12 @@ draftsRouter
       desType, // 草稿类型
       desTypeId, // 草稿类型对应的ID
       draftId, // 草稿ID
-      survey, // 调查表
     } = body;
     let {
       t = "", c = "", l = "html", abstractEn = "", abstractCn = "",
       keyWordsEn = [], keyWordsCn = [], fids = [], cids = [],
-      authorInfos = [], originState = 0, anonymous = false, surveyId = null
+      authorInfos = [], originState = 0, anonymous = false, surveyId = null,
+      survey
     } = post;
     const {user} = data;
     const draftCount = await db.DraftModel.count({uid: user.uid});
@@ -97,11 +100,24 @@ draftsRouter
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
       mainForumsId: fids,
       categoriesId: cids,
-      authorInfos, originState, anonymous, surveyId
+      authorInfos, originState, anonymous
     };
-    if(draft) {
+    if(draft) { // 存在草稿
       draftObj.tlm = Date.now();
       await draft.update(draftObj);
+      if(survey) { // 调查表数据
+        if(draft.surveyId) { // 若草稿上已有调查表ID，则只需更新调查表数据。
+          survey._id = draft.surveyId;
+          await db.SurveyModel.modifySurvey(survey, false);
+        } else { // 若草稿上没有调查表数据，则创建调查表。
+          survey.uid = user.uid;
+          const surveyDB = await db.SurveyModel.createSurvey(survey, false);
+          await draft.update({surveyId: surveyDB._id});
+        }
+      } else if(desType === "forum" && draft.surveyId) { // 只有在发表新帖的时候可以取消创建调查表，其他情况不允许取消。
+        await draft.update({surveyId: null});
+        await db.SurveyModel.remove({uid: user.uid, _id: draft.surveyId});
+      }
     } else {
       if(!["forum", "thread", "post", "forumDeclare"].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
       if(desType === "thread") {
@@ -117,18 +133,13 @@ draftsRouter
       draftObj.did = await db.SettingModel.operateSystemID("drafts", 1);
       draft = db.DraftModel(draftObj);
       await draft.save();
+      if(survey) {
+        survey.uid = user.uid;
+        const surveyDB = await db.SurveyModel.createSurvey(survey, false);
+        await draft.update({surveyId: surveyDB._id});
+      }
     }
     data.draftId = draft.did;
-    let surveyDB;
-    if(survey) {
-      if(survey._id) {
-        surveyDB = survey;
-        await db.SurveyModel.modifySurvey(survey);
-      } else {
-        surveyDB = await db.SurveyModel.createSurvey(survey);
-      }
-      await draft.update({surveyId: surveyDB._id});
-    }
     await next();
   });
   /*.post('/', async(ctx, next) => {

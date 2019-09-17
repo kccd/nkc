@@ -1427,7 +1427,7 @@ threadSchema.statics.postNewThread = async (options) => {
   // await SubscribeModel.autoAttentionForum(options);
   // 发表文章删除草稿
   if(options.did) {
-    await DraftModel.remove({"did": options.did, uid: options.uid});
+    await DraftModel.removeDraftById(options.did, options.uid);
   }
   return _post;
 };

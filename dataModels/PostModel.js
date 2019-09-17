@@ -194,7 +194,12 @@ const postSchema = new Schema({
     type: Number,
     default: null,
     index: 1
-  }
+  },
+  // 封面图图片hash
+  covers: {
+    type: [String],
+    default: []
+  },
 }, {toObject: {
   getters: true,
   virtuals: true

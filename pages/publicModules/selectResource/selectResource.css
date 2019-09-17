@@ -39,12 +39,13 @@
 }
 #moduleSelectResource  .resources{
   font-size: 0;
+  position: relative;
 }
 #moduleSelectResource  .resource{
+  width: 20%;
   height: 5rem;
-  position: relative;
   margin: 0 0.5rem 0.5rem 0;
-  width: 7.3rem;
+  position: relative;
   font-size: 0;
   cursor: pointer;
   display: inline-block;
@@ -198,4 +199,53 @@
   color: #ff6c6a;
   margin-left: 1rem;
   font-size: 1rem;
+}
+
+.fixed-modal{
+  position: fixed;
+  border-radius: 3px;
+  z-index: 5000;
+  top: 6rem;
+  right: 0;
+  margin: auto;
+  width: 49rem;
+  max-width: 100%;
+  background-color: #fff;
+  border: 1px solid #eee;
+  box-shadow: 0 0 10px rgba(0,0,0,0.07);
+  display: none;
+}
+.fixed-modal .fixed-header{
+  line-height: 3rem;
+  color: #fff;
+  font-weight: 700;
+  height: 3rem;
+  position: relative;
+  cursor: grab;
+  background-color: #9baec8;
+  border-radius: 3px 3px 0 0;
+}
+.fixed-modal .fixed-title{
+  padding: 0 1rem;
+}
+.fixed-modal .fixed-header .fa{
+  color: #fff;
+  height: 3rem;
+  width: 3rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: center;
+  line-height: 3rem;
+  cursor: pointer;
+  display: inline-block;
+}
+.fixed-modal .fixed-header .fa:hover{
+  background-color: rgba(0,0,0,0.2);
+}
+.fixed-modal .fixed-body{
+  padding: 1rem;
+}
+.fixed-modal .fixed-footer{
+  padding: 1rem;
 }

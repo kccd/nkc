@@ -41,6 +41,9 @@ $(function() {
   if(NKC.modules.SurveyEdit) {
     PostSurvey = new NKC.modules.SurveyEdit();
     PostSurvey.init({surveyId: data.post? data.post.surveyId: ""});
+    if(data.type !== "newThread") {
+      hideButton();
+    }
     if(data.post && data.post.surveyId) {
       disabledSurveyForm();
     }
@@ -461,7 +464,6 @@ function initVueApp() {
         post.authorInfos = self.authorInfos;
         post.originState = self.originState;
         post.did = self.draftId;
-        post.surveyId = self.surveyId;
         // 仅当用户有权发表匿名内容且当前专业允许发表匿名内容时，才将匿名标志提交到服务器。
         if(PostButton.havePermissionToSendAnonymousPost && PostButton.allowedAnonymous) {
           post.anonymous = !!PostButton.anonymous;
@@ -637,6 +639,7 @@ function resetBodyPaddingTop() {
   $("body").css("padding-top", height + 40);
 }
 
+// 若存在调查表则自动展开
 function disabledSurveyForm() {
   if(!PostSurvey) return;
   var button = $("#disabledSurveyButton");
@@ -646,6 +649,11 @@ function disabledSurveyForm() {
     button.text("创建").removeClass("btn-danger").addClass("btn-success");
   }
   PostSurvey.app.disabled = !PostSurvey.app.disabled;
+}
+
+// 若为编辑文章，则隐藏 取消/创建 按钮
+function hideButton() {
+  $("#disabledSurveyButton").hide();
 }
 
 window.onresize=function(){

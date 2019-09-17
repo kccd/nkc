@@ -377,7 +377,7 @@ schema.statics.modifySurvey = async (survey, checkData = true) => {
     $set: {
       toc: Date.now(),
       st,
-      mid,
+      mid: mid? mid: surveyDB.uid,
       et,
       reward,
       permission,

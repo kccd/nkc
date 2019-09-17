@@ -10,14 +10,12 @@ UE.registerUI('imageSelector',function(editor,uiName){
     className: 'edui-default edui-for-image-selector edui-icon',
     onclick:function () {
       if(window.SelectResource) {
-        window.SelectResource.open(function(data) {
-          for(var i = 0; i < data.resources.length; i++) {
-            var r = data.resources[i];
-            var dom = NKC.methods.resourceToHtml(r);
-            editor.execCommand('inserthtml', dom);
-          }
+        window.SelectResource.open(function(r) {
+          var dom = NKC.methods.resourceToHtml(r);
+          editor.execCommand('inserthtml', dom);
         }, {
-          allowedExt: ["picture"]
+          allowedExt: ["picture"],
+          fastSelect: true
         });
       } else {
         return sweetError("未初始化资源选择模块");
@@ -39,13 +37,11 @@ UE.registerUI('resourceSelector',function(editor,uiName){
     className: 'edui-default edui-for-resource-selector edui-icon',
     onclick:function () {
       if(window.SelectResource) {
-        window.SelectResource.open(function(data) {
-          for(var i = 0; i < data.resources.length; i++) {
-            var r = data.resources[i];
-            var dom = NKC.methods.resourceToHtml(r);
-            console.log(dom);
-            editor.execCommand('inserthtml', dom);
-          }
+        window.SelectResource.open(function(r) {
+          var dom = NKC.methods.resourceToHtml(r);
+          editor.execCommand('inserthtml', dom);
+        }, {
+          fastSelect: true
         });
       } else {
         return sweetError("未初始化资源选择模块");

@@ -434,7 +434,7 @@ router
     await singlePost.update({disabled:false})
     // 帖子曾经在草稿箱中，发表时，删除草稿
     if(did) {
-      await db.DraftModel.remove({did, uid: data.user.uid})
+      await db.DraftModel.removeDraftById(did, data.user.uid);
     }
     await targetUser.updateUserMessage();
     if(!singlePost.reviewed) {

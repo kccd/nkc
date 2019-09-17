@@ -63,6 +63,7 @@ const imageEdit = require('./imageEdit');
 const protocol = require('./protocol');
 const review = require("./review");
 const threads = require("./threads");
+const newResource = require("./newResource");
 const operationObj = {};
 
 
@@ -207,6 +208,8 @@ operationObj.operationTree = {
     threads, // 文章批量管理
 
     survey, // 投票、调查问卷、打分
+
+    nr: newResource, // 新的资源路由
 	}
 };
 module.exports = operationObj;

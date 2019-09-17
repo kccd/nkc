@@ -615,6 +615,7 @@
   "survey_post": "创建调查表单",
   "showSecretSurvey": "查看隐藏的调查结果",
   "showSurveyCertLimit": "新建调查时显示证书限制",
+  "getPostCover": "获取文章封面图",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

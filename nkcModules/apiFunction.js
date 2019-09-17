@@ -134,7 +134,7 @@ fn.getEmailToken = () => {
 
 // 检查邮箱格式
 fn.checkEmailFormat = (email) => {
-  let path = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+  let path = /^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
   return path.test(email);
 };
 

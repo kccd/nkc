@@ -14,7 +14,7 @@ infoRouter
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
 			if(did) {
-			  await db.DraftModel.remove({did, uid: data.user.uid});
+			  await db.DraftModel.removeDraftById(did, data.user.uid);
       }
 			data.redirect = `/f/${forum.fid}/home`;
 		} else {

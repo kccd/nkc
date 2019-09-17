@@ -38,8 +38,10 @@ const surveyRouter = routers.survey;
 const editorRouter = routers.editor;
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
+const newResourceRouter = routers.newResource;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
+router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());

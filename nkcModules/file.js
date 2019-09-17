@@ -259,3 +259,61 @@ exports.deleteUserBanner = async (uid) =>{
   const user = await db.UserModel.findOnly({uid});
   await user.update({banner: ""});
 };
+
+/*
+* 获取文章封面
+* @param {String} hash 图片hash
+* @author pengxiguaa 2019-9-17
+* */
+exports.getPostCover = async (hash) => {
+  let filePath = upload.coverPath + "/" + hash + ".jpg";
+  if(!hash || !fsSync.existsSync(filePath)) {
+    filePath = statics.defaultPostCoverPath;
+  }
+  return filePath;
+};
+
+/*
+* 修改post的封面图
+* @param {String} pid postID
+* @param {[Object]} covers 封面图数据
+*   {
+*     type: String, // hash: 已保存的封面图，file: 新的封面图
+*     data: String/file hash值/文件对象
+*   }
+* @author pengxiguaa 2019-9-17
+* */
+exports.modifyPostCovers = async (pid, covers) => {
+  const post = await db.PostModel.findOnly({pid});
+  let coversHash = [], files = [];
+  for(const c of covers) {
+    const {type, data} = c;
+    if(type === "hash") {
+      coversHash.push(data);
+    } else if(type === "file") {
+      files.push(data);
+      coversHash.push(data.hash);
+    }
+  }
+  // 删掉旧的封面图
+  for(const c of post.covers) {
+    if(!coversHash.includes(c)) { // 修改后，删除了原有的封面图
+      const filePath = upload.coverPath + "/" + c + ".jpg";
+      if(fsSync.existsSync(filePath)) {
+        await fsSync.unlink(filePath);
+      }
+    }
+  }
+  for(const file of files) {
+    const {path, hash} = file;
+    const filePath = upload.coverPath + "/" + hash + ".jpg";
+    await ei.resize({
+      src: path,
+      dst: filePath,
+      height: 400,
+      width: 800,
+      quality: 90
+    });
+  }
+  await post.update({covers: coversHash});
+};

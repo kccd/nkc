@@ -875,7 +875,7 @@ threadRouter
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
 		// 如果是编辑的草稿，则删除草稿
     if(did) {
-      await db.DraftModel.remove({did, uid: data.user.uid});
+      await db.DraftModel.removeDraftById(did, data.user.uid);
     }
 
 		// 回复自动关注文章
