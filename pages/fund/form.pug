@@ -163,7 +163,7 @@ if data.reports && data.reports.length && data.reports.length > 0
       .timer-shaft
         for r in data.reports
           div.time
-            if r.type !== "report"
+            if !["completedReport", "report"].includes(r.type)
               span.applicationForm-report-icon.system 系统
             else
               span.applicationForm-report-icon
@@ -217,7 +217,10 @@ if data.reports && data.reports.length && data.reports.length > 0
             else if r.support === true
               .text-success!= experimental_render(r)
             else
-              div!= experimental_render(r)
+              if r.type === "system"
+                .text-success!=experimental_render(r)
+              else
+                div!= experimental_render(r)
 
         if status.completed
           div.time

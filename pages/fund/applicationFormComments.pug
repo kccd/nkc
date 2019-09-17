@@ -7,7 +7,7 @@ if data.comments
             img(src=anonymousInfo.avatar)
             span=anonymousInfo.username
         else
-          a(href=`/u/${post}.uid` target="_blank").form-user-info
+          a(href=`/u/${post.uid}` target="_blank").form-user-info
             img(src=`/avatar/${post.user.avatar}?t=sm`)
             span=post.user.username
         .form-time=fromNow(post.toc)

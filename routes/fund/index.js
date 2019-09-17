@@ -125,7 +125,7 @@ fundRouter
 			  return a;
 		  }
 	  }));
-	  const completed = await db.FundApplicationFormModel.find(queryOfCompleted).sort({toc:1});
+	  const completed = await db.FundApplicationFormModel.find(queryOfCompleted).sort({timeOfCompleted: -1});
 	  data.completed = await Promise.all(completed.map(async a => {
 		  await a.extendFund();
 		  if(a.fund) {
