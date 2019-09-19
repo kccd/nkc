@@ -365,16 +365,8 @@ exports.modifyPostCovers = async (pid, covers) => {
 exports.createPostCoverByPostId = async (pid) => {
   const post = await db.PostModel.findOne({pid});
   if(!post) return;
-  await post.extendResources();
-  let cover;
-  let ext = ["jpg", "jpeg", "bmp", "png", "mp4"];
-  for(const r of post.resources) {
-    r.ext = r.ext.toLowerCase();
-    if(ext.includes(r.ext)) {
-      cover = r;
-      break;
-    }
-  }
+  const ext = ["jpg", "jpeg", "bmp", "png", "mp4"];
+  const cover = await db.ResourceModel.findOne({ext: {$in: ext}, references: pid});
   if(cover) {
     let filePath;
     if(cover.ext === "mp4") {

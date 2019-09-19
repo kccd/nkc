@@ -446,12 +446,12 @@ block name
                 .col-sm-8
                   p.text-danger 提示：请先在下方编辑器的附件模块上传商品图
               .form-group
-                a.btn.btn-sm.btn-info(onclick="appAttachHideOrShow()" style="width:100%;color: #080808;border: 1px solid #ddd;background-color:#fff").attachButton
-                  span#showOrHideAttach 插入图片、媒体、文件
+                .col-xs-12
+                  a.btn.btn-sm.btn-info(onclick="appAttachHideOrShow()" style="width:100%;color: #080808;border: 1px solid #ddd;background-color:#fff").attachButton
+                    span#showOrHideAttach 插入图片、媒体、文件
               .form-group#attach.attachBody
-                .col-sm-1
-                .col-sm-10
-                include ../../media/media_index.pug  
+                .col-sm-12
+                  include ../../media/media_index.pug
               .form-group
                 label.col-sm-1.control-label
                 .col-sm-8

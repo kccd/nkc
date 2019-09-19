@@ -57,6 +57,8 @@ function initVueApp() {
   PostInfo = new Vue({
     el: "#postInfo",
     data: {
+      // 自动保存草稿
+      saveDraftTimeout: 30000,
       type: "newThread",
       // 当前内容相关的文章
       // @param {String} title 文章标题
@@ -104,6 +106,8 @@ function initVueApp() {
 
       quoteHtml: "",
 
+      showCloseInfo: false,
+
     },
     mounted: function() {
       this.selectedForums = data.mainForums || [];
@@ -117,22 +121,24 @@ function initVueApp() {
       var self = this;
       // 判断草稿箱里是否存在该类型且未被删掉的草稿。
       // 若存在则此内容未发表。
-      if(self.oldDraft) {
+      if(self.oldDraft) { // 存在未提交的草稿，提示用户是否加载草稿
         var info = "是否加载 " + self.format("YYYY/MM/DD HH:ss:mm", self.oldDraft.tlm) + " 编辑但未提交的内容？";
         sweetQuestion(info)
-          .then(function() {
+          .then(function() { // 用户选择了加载，则跳转到相应的草稿页面
             self.visitUrl("/editor?type=redit&id=" + self.oldDraft.did);
           })
-          .catch(function() {
+          .catch(function() { // 用户选择了取消加载，则启动自动保存草稿且开启关闭页面的警告
             self.autoSaveToDraft();
+            self.showCloseInfo = true;
           })
-      } else {
+      } else { // 没有未提交的相应草稿，启动自动保存草稿且开启关闭页面的警告
         self.autoSaveToDraft();
+        self.showCloseInfo = true;
       }
     },
     watch: {
       selectedForums: function() {
-        if(PostButton) {
+        if(PostButton) { // 检测是否可以勾选匿名
           PostButton.checkAnonymous();
         }
       }
@@ -215,7 +221,7 @@ function initVueApp() {
               sweetError("草稿保存失败：" + (data.error || data));
               self.autoSaveToDraft();
             });
-        }, 30000);
+        }, self.saveDraftTimeout);
       },
       // 手动保存草稿，相比自动保存草稿多了一个成功提示框。
       saveToDraft: function() {
@@ -590,6 +596,7 @@ function initVueApp() {
             }
           })
           .then(function(data) {
+            self.showCloseInfo = false;
             self.visitUrl(data.redirect || "/");
             // 解锁发表按钮
             // PostButton.disabledSubmit = false;
@@ -726,8 +733,35 @@ function hideButton() {
   $("#disabledSurveyButton").hide();
 }
 
+// 适配APP快捷插入图片、资源等
+function mediaInsertUE(rid, fileType, name) {
+  var resource = {
+    rid: rid,
+    ext: fileType,
+    oname: name
+  };
+  var html = NKC.methods.resourceToHtml(resource);
+  try{
+    editor.execCommand("inserthtml", html);
+  } catch(err) {
+    console.log(err);
+    sweetError("编辑器未准备就绪");
+  }
+}
+
+// 监听页面变化，调整工具栏位置
 window.onresize=function(){
   resetBodyPaddingTop();
 };
-
-//KaiGenGothicSC-Regular","PINGFANG HEAVY_0","icomoon-fbba22e56",  "Microsoft Yahei", Arial, sans-serif
+// 监听页面关闭，提示保存草稿
+window.onbeforeunload = function() {
+  if(PostInfo.showCloseInfo){
+    // 离开前保存草稿
+    try{
+      PostInfo.saveToDraftBase();
+    } catch(err) {
+      console.log(err);
+    }
+    return "离开前保存草稿了吗？"
+  }
+};

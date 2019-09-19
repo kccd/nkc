@@ -3285,6 +3285,9 @@ img.emoji {
   /*text-indent:28px;*/
   padding-left: 2rem;
 }
+.post-comment-content img{
+  max-width: 100%;
+}
 .post-comment>div:hover>.comment-btn{
   color: #428bca;
 }
