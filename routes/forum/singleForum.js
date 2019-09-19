@@ -40,19 +40,29 @@ router
 		}
 	})
 	.post('/', async (ctx, next) => {
-		const {data, params, db, body, address: ip, fs, query, nkcModules, state} = ctx;
+		const {data, params, db, address: ip, fs, query, nkcModules, state} = ctx;
 		const {ForumModel, ThreadModel, SubscribeModel} = db;
 		const {fid} = params;
 	  const {user} = data;
-	  const {post} = body;
+    const body = JSON.parse(ctx.body.fields.body);
+    const {post} = body;
+    const files = ctx.body.files;
     try{
       await db.UserModel.checkUserBaseInfo(user, true);
     } catch(err) {
       ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
 		const {c, t, fids, cids, cat, mid, columnCategoriesId = [], anonymous = false, survey} = post;
-    if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		if(t === '') ctx.throw(400, '标题不能为空！');
+    nkcModules.checkData.checkString(t, {
+      name: "标题",
+      minLength: 6,
+      maxLength: 200
+    });
+    nkcModules.checkData.checkString(c, {
+      name: "内容",
+      minLength: 6,
+      maxLength: 100000
+    });
 		if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
 		if(fids.length  > 2) ctx.throw(400, "最多只能选择两个专业");
     data.forum = await ForumModel.findOnly({fid});
@@ -75,9 +85,14 @@ router
     }
 		const _post = await db.ThreadModel.postNewThread(options);
     if(surveyDB) await surveyDB.update({pid: _post.pid});
+
 		// 根据thread生成封面图
-		const thread = await db.ThreadModel.findOne({tid: _post.tid});
-		await ThreadModel.autoCoverImage(ctx, thread, _post);
+    const thread = await db.ThreadModel.findOne({tid: _post.tid});
+    if(files.postCover) {
+      await nkcModules.file.savePostCover(_post.pid, files.postCover);
+    } else if(!_post.cover) {
+      await nkcModules.file.createPostCoverByPostId(_post.pid);
+    }
 
     // 转发到专栏
     if(columnCategoriesId.length > 0 && state.userColumn) {

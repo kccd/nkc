@@ -10,12 +10,19 @@ UE.registerUI('imageSelector',function(editor,uiName){
     className: 'edui-default edui-for-image-selector edui-icon',
     onclick:function () {
       if(window.SelectResource) {
-        window.SelectResource.open(function(r) {
-          var dom = NKC.methods.resourceToHtml(r);
-          editor.execCommand('inserthtml', dom);
+        window.SelectResource.open(function(data) {
+          if(data.resources) {
+            data = data.resources;
+          } else {
+            data = [data];
+          }
+          for(var i = 0; i < data.length; i++) {
+            var dom = NKC.methods.resourceToHtml(data[i]);
+            editor.execCommand('inserthtml', dom);
+          }
         }, {
           allowedExt: ["picture"],
-          fastSelect: true
+          fastSelect: false
         });
       } else {
         return sweetError("未初始化资源选择模块");
@@ -37,11 +44,18 @@ UE.registerUI('resourceSelector',function(editor,uiName){
     className: 'edui-default edui-for-resource-selector edui-icon',
     onclick:function () {
       if(window.SelectResource) {
-        window.SelectResource.open(function(r) {
-          var dom = NKC.methods.resourceToHtml(r);
-          editor.execCommand('inserthtml', dom);
+        window.SelectResource.open(function(data) {
+          if(data.resources) {
+            data = data.resources;
+          } else {
+            data = [data];
+          }
+          for(var i = 0; i < data.length; i++) {
+            var dom = NKC.methods.resourceToHtml(data[i]);
+            editor.execCommand('inserthtml', dom);
+          }
         }, {
-          fastSelect: true
+          fastSelect: false
         });
       } else {
         return sweetError("未初始化资源选择模块");

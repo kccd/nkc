@@ -486,7 +486,7 @@ var common=(function(){
       return mapWithPromise(arr,func,k+1)
     })
     .catch(function(err){
-      console.error(err);
+      console.log(err);
       return err
     })
   }

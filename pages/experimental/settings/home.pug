@@ -32,7 +32,7 @@ block content
                     h5(style='height: 1em;overflow:hidden;')
                       a(href=`/t/${thread.tid}` target='_blank' title=thread.firstPost.t)= thread.firstPost.t
                   .col-xs-12.col-xs-12
-                    img(src=`/cover/${thread.tid}` style=`width:100%;`)
+                    img(src=`${tools.getUrl('postCover', thread.firstPost.cover)}` style=`width:100%;`)
                   .col-xs-12.col-md-12
                     span 序号
                     input(style='display:inline-block;width: 5rem;margin: 0.5rem 0;padding-left: 0.8rem;' value=n data-tid=thread.tid name='threadOrder' type='number')

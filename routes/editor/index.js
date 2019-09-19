@@ -11,7 +11,7 @@ router
       ctx.template = 'interface_notice.pug';
       return await next();
     }
-
+    ctx.template = "editor/editor.pug";
     // 需要预制的专业和文章分类
     let selectedForumsId = [];
     let selectedCategoriesId = [];
@@ -43,6 +43,14 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.type = (thread.oc === data.post.pid)? "modifyThread": "modifyPost";
       const firstPost = await thread.extendFirstPost();
+
+      if(data.post.l !== "html") {
+        ctx.template = "interface_editor.pug";
+        data.content = data.post.c;
+        data.l = data.post.l;
+        data.title = data.post.t;
+      }
+
       data.thread = {
         tid: thread.tid,
         title: firstPost.t,
@@ -184,7 +192,6 @@ router
     if(["modifyThread", "newThread"].includes(data.type)) {
       data.createSurveyPermission = await db.SurveyModel.ensureCreatePermission("postToForum", data.user.uid);
     }
-    ctx.template = "editor/editor.pug";
     await next();
   });
 module.exports = router;

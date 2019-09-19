@@ -61,11 +61,11 @@ module.exports = {
 			GET: 'getOrigins'
 		}
 	},
-	cover: {// 文章封面图
+	/*cover: {// 文章封面图
 		PARAMETER: {
 			GET: 'getThreadCover'
 		}
-	},
+	},*/
 	frameImg: {// 视频封面图
 		PARAMETER: {
 			GET: 'getVideoImg'

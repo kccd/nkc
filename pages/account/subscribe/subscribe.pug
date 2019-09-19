@@ -143,8 +143,8 @@ block content
                     .small-forum-checkbox(v-if="management")
                       label
                         input(type="checkbox" v-model="selectedSubId" :value="sub._id")
-                    .small-forum-icon(v-if="sub.thread.hasCover")
-                      div(:style="'background-image: url(/cover/' + sub.tid + ')'")
+                    .small-forum-icon(v-if="sub.thread.firstPost.cover")
+                      div(:style="'background-image: url(' + getUrl('postCover', sub.thread.firstPost.cover) + ')'")
                     .small-forum-content
                       .small-forum-name
                         a.pointer(@click='appOpenUrl("/t/" + sub.tid)' :title="sub.thread.firstPost.t") {{sub.thread.firstPost.t}}
@@ -161,8 +161,8 @@ block content
                     .small-forum-checkbox(v-if="management")
                       label
                         input(type="checkbox" v-model="selectedSubId" :value="sub._id")
-                    .small-forum-icon(v-if="sub.thread.hasCover")
-                      div(:style="'background-image: url(/cover/' + sub.tid + ')'")
+                    .small-forum-icon(v-if="sub.thread.firstPost.cover")
+                      div(:style="'background-image: url(' + getUrl('postCover', sub.thread.firstPost.cover) + ')'")
                     .small-forum-content
                       .small-forum-name
                         a.pointer(@click='appOpenUrl("/t/" + sub.tid)' :title="sub.thread.firstPost.t") {{sub.thread.firstPost.t}}
@@ -179,4 +179,5 @@ block content
               +paging
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes
+  +includeJS("/tools.js")
   +includeJS("/account/subscribe/subscribe.js")

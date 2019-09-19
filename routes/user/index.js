@@ -239,7 +239,7 @@ userRouter
           postType: thread.oc === post.pid?'postToForum': 'postToThread',
           parentPostId: post.parentPostId,
           tid: thread.tid,
-          hasCover: thread.hasCover,
+          cover: firstPost.cover,
           time: post.toc,
           pid: post.pid,
           anonymous: post.anonymous,
@@ -344,7 +344,7 @@ userRouter
         const result = {
           postType: "postToForum",
           tid: thread.tid,
-          hasCover: thread.hasCover,
+          cover: thread.firstPost.cover,
           time: thread.toc,
           pid: thread.oc,
           abstract: thread.firstPost.abstract,

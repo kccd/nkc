@@ -56,6 +56,19 @@ block content
                   .fa.fa-remove.p-l-05.pointer(@click="removeSelectedForums(index)")
                 button.btn.btn-default.btn-sm(@click="selectForums") 添加
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
+              .editor-header 封面图
+                small （非必须，默认从内容中选取）
+              .editor-cover
+                .editor-cover-default(v-if="!cover && !coverUrl" @click="selectCover")
+                  .fa.fa-plus
+                div(v-else)
+                  .editor-cover-img
+                    img(:src="coverUrl" v-if="coverUrl")
+                    img(:src="getUrl('postCover', cover)" v-else-if="cover")
+                  .m-t-05
+                    button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
+                    button.btn.btn-default.btn-sm(@click="removeCover") 删除
+            .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 摘要
                 small （选填）
               .row.editor-abstract
@@ -185,9 +198,11 @@ block scripts
   include ../publicModules/moment
   include ../editor/modules/selectAuthorInfo
   include ../publicModules/commonModal/commonModal
+  include ../publicModules/crop/crop_new
   include ../publicModules/selectUser/selectUser
-  include ../publicModules/selectResource/selectResource2
+  include ../publicModules/selectResource/selectResource
   include ../publicModules/moveThread/moveThread
+  +includeJS('/tools.js')
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")
   +includeJS('/publicModules/survey/edit.js')

@@ -196,9 +196,9 @@ const postSchema = new Schema({
     index: 1
   },
   // 封面图图片hash
-  covers: {
-    type: [String],
-    default: []
+  cover: {
+    type: String,
+    default: ""
   },
 }, {toObject: {
   getters: true,
@@ -874,15 +874,6 @@ postSchema.statics.getUrl = async function(pid) {
   } else {
     return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}#hightlight`;
   }
-};
-
-
-/*
-* 发表回复，包含楼中楼
-*
-* */
-postSchema.statics.publishPost = async (options) => {
-
 };
 
 module.exports = mongoose.model('posts', postSchema);

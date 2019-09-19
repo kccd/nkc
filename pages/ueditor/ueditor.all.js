@@ -23536,7 +23536,7 @@ UE.plugins['catchremoteimage'] = function () {
                         //     }
                         // }
                     }
-                    window.loadMediaRe()
+                    if(window.loadMediaRe) window.loadMediaRe();
                     me.fireEvent('catchremotesuccess')
                 },
                 //回调失败，本次请求超时

@@ -8,13 +8,24 @@ var NKC = {
   }
 };
 /*
+* 判断运行环境
+* */
+NKC.methods.getRunType = function() {
+  if(localStorage.getItem("apptype") === "app") {
+    return "app"
+  } else {
+    return "web"
+  }
+};
+
+/*
 * 打开链接 兼容APP
 * @param {String} url 链接
 * @param {Boolean} blank 是否在后台打开
 * @author pengxiguaa 2019-7-26
 * */
 NKC.methods.visitUrl = function(url, blank) {
-  if(localStorage.getItem("apptype") === "app") {
+  if(NKC.methods.getRunType() === "app") {
     if(window.appOpenUrl) {
       window.appOpenUrl(url);
     }

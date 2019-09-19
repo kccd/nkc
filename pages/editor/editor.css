@@ -153,3 +153,20 @@ body{
   padding: 0.5rem 0;
   color: #9baec8;
 }
+.editor-cover-default .fa{
+  height: 12rem;
+  cursor: pointer;
+  width: 18rem;
+  line-height: 12rem;
+  text-align: center;
+  color: #aaa;
+  font-size: 1.5rem;
+  background-color: #eee;
+}
+.editor-cover-img{
+  height: 12rem;
+  width: 18rem;
+}
+.editor-cover-img img{
+  height: 100%;
+}

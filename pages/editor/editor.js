@@ -38,7 +38,7 @@ $(function() {
   }
   // 实例化投票模块
   // 获取数据时需判断实例是否存在
-  if(NKC.modules.SurveyEdit) {
+  if(NKC.modules.SurveyEdit && $("#moduleSurveyEdit").length) {
     PostSurvey = new NKC.modules.SurveyEdit();
     PostSurvey.init({surveyId: data.post? data.post.surveyId: ""});
     if(data.type !== "newThread") {
@@ -87,6 +87,12 @@ function initVueApp() {
       title: "", // 文章标题
       content: "", // 文章内容
 
+      cover: "",
+      // 新选择的封面图的本地路径
+      coverUrl: "",
+
+      coverData: "",
+
       keyWordsCn: [], // 中文关键词
       keyWordsEn: [], // 英文关键词
 
@@ -94,7 +100,9 @@ function initVueApp() {
 
       originState: 0, // 原创声明
 
-      surveyId: ""
+      surveyId: "",
+
+      quoteHtml: "",
 
     },
     mounted: function() {
@@ -169,6 +177,31 @@ function initVueApp() {
       visitUrl: NKC.methods.visitUrl,
       fromNow: NKC.methods.fromNow,
       format: NKC.methods.format,
+      getUrl: NKC.methods.tools.getUrl,
+      removeCover: function() {
+        this.cover = "";
+        this.coverData = "";
+        this.coverUrl = "";
+      },
+      selectCover: function() {
+        var self = this;
+        if(!NKC.methods.selectImage) {
+          return sweetError("未引入图片裁剪模块");
+        }
+        if(!window.SelectImage) {
+          window.SelectImage = new NKC.methods.selectImage();
+        }
+        SelectImage.show(function(data) {
+          self.coverData = data;
+          NKC.methods.fileToUrl(NKC.methods.blobToFile(data))
+            .then(function(data) {
+              self.coverUrl = data;
+              SelectImage.close();
+            })
+        }, {
+          aspectRatio: 3/2
+        });
+      },
       // 自动保存草稿
       autoSaveToDraft: function() {
         var self = this;
@@ -201,8 +234,14 @@ function initVueApp() {
         if(!post) return;
         this.title = post.t;
         this.setTitle();
-        this.content = post.c;
+        var reg = /<blockquote cite.+?blockquote>/;
+        var quoteHtml = post.c.match(reg);
+        if(quoteHtml && quoteHtml[0]) {
+          this.quoteHtml = quoteHtml[0];
+        }
+        this.content = post.c.replace(reg, "");
         this.setContent();
+        this.cover = post.cover;
         this.abstractCn = post.abstractCn;
         this.abstractEn = post.abstractEn;
         this.originState = post.originState;
@@ -457,10 +496,11 @@ function initVueApp() {
         post.abstractEn = self.abstractEn;
         post.keyWordsEn = self.keyWordsEn;
         post.keyWordsCn = self.keyWordsCn;
+        post.cover = self.cover;
         post.t = self.title;
         post.fids = self.selectedForumsId;
         post.cids = self.selectedCategoriesId;
-        post.c = self.content;
+        post.c = (self.quoteHtml||"") + self.content;
         post.authorInfos = self.authorInfos;
         post.originState = self.originState;
         post.did = self.draftId;
@@ -501,7 +541,12 @@ function initVueApp() {
               self.checkForums();
               self.checkKeywords();
               self.checkAuthorInfos();
-              return nkcAPI("/f/" + post.fids[0], "POST", {post: post})
+              var formData = new FormData();
+              formData.append("body", JSON.stringify({post: post}));
+              if(self.coverData) {
+                formData.append("postCover", NKC.methods.blobToFile(self.coverData));
+              }
+              return nkcUploadFile("/f/" + post.fids[0], "POST", formData)
             } else if(type === "newPost") { // 发表回复：从文章页点"去编辑器"、草稿箱
               self.checkString(self.title, {
                 name: "标题",
@@ -517,14 +562,24 @@ function initVueApp() {
                 maxLength: 200
               });
               self.checkContent();
-              return nkcAPI("/p/" + self.post.pid, "PATCH", {post: post})
+              var formData = new FormData();
+              formData.append("body", JSON.stringify({post: post}));
+              if(self.coverData) {
+                formData.append("postCover", NKC.methods.blobToFile(self.coverData));
+              }
+              return nkcUploadFile("/p/" + self.post.pid, "PATCH", formData);
             } else if(type === "modifyThread") { // 修改thread
               self.checkTitle();
               self.checkContent();
               self.checkAbstract();
               self.checkKeywords();
               self.checkAuthorInfos();
-              return nkcAPI("/p/" + self.post.pid, "PATCH", {post: post})
+              var formData = new FormData();
+              formData.append("body", JSON.stringify({post: post}));
+              if(self.coverData) {
+                formData.append("postCover", NKC.methods.blobToFile(self.coverData));
+              }
+              return nkcUploadFile("/p/" + self.post.pid, "PATCH", formData);
             } else if(type === "modifyForumDeclare") { // 修改专业详情
               self.checkContent();
               return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PATCH", {
@@ -570,15 +625,25 @@ function initVueApp() {
             } else {
               throw "未知的草稿类型";
             }
-            return nkcAPI("/u/" + NKC.configs.uid + "/drafts", "POST", {
+            var formData = new FormData();
+            formData.append("body", JSON.stringify({
               post: post,
               draftId: self.draftId,
               desType: desType,
               desTypeId: desTypeId
-            });
+            }));
+            if(self.coverData) {
+              formData.append("postCover", NKC.methods.blobToFile(self.coverData));
+            }
+            return nkcUploadFile("/u/" + NKC.configs.uid + "/drafts", "POST", formData);
           })
           .then(function(data) {
-            self.draftId = data.draftId;
+            self.draftId = data.draft.did;
+            if(data.draft.cover) {
+              self.coverData = "";
+              self.coverUrl = "";
+              self.cover = data.draft.cover;
+            }
             return Promise.resolve();
           });
       },
@@ -633,10 +698,15 @@ function initVueApp() {
 
 // 根据导航栏和工具栏的高度重置body的padding-top
 function resetBodyPaddingTop() {
-  var header = $(".navbar.navbar-default.navbar-fixed-top.nkcshade");
-  var tools = $(".edui-editor-toolbarbox.edui-default");
-  var height = header.height() + tools.height();
-  $("body").css("padding-top", height + 40);
+  var tools = $(".editor .edui-editor-toolbarbox.edui-default");
+  if(NKC.methods.getRunType() === "app") {
+    tools.css("top", 0);
+    $("body").css("padding-top", tools.height() + 40);
+  } else {
+    var header = $(".navbar.navbar-default.navbar-fixed-top.nkcshade");
+    var height = header.height() + tools.height();
+    $("body").css("padding-top", height + 40);
+  }
 }
 
 // 若存在调查表则自动展开
@@ -660,3 +730,4 @@ window.onresize=function(){
   resetBodyPaddingTop();
 };
 
+//KaiGenGothicSC-Regular","PINGFANG HEAVY_0","icomoon-fbba22e56",  "Microsoft Yahei", Arial, sans-serif

@@ -1,7 +1,7 @@
 NKC.modules.SelectResource = function() {
   var self = this;
   self.dom = $("#moduleSelectResource");
-  if(self.dom.hasClass("fixed-modal")) {
+  /*if(self.dom.hasClass("fixed-modal")) {
     self.dom.draggable({
       scroll: false,
       handle: ".fixed-title",
@@ -16,10 +16,13 @@ NKC.modules.SelectResource = function() {
       }
     });
   } else {
-    /*self.dom.modal({
+    self.dom.modal({
       show: false
-    });*/
-  }
+    });
+  }*/
+  self.dom.modal({
+    show: false
+  });
   self.app = new Vue({
     el: "#moduleSelectResourceApp",
     data: {
@@ -75,7 +78,7 @@ NKC.modules.SelectResource = function() {
     },
     methods: {
       close: function() {
-        self.dom.hide();
+        self.dom.modal("hide");
         setTimeout(function() {
           self.app.selectedResources = [];
           self.app.resourceType = "all";
@@ -242,7 +245,7 @@ NKC.modules.SelectResource = function() {
     self.app.resourceType = self.app.allowedExt[0];
     self.app.pageType = options.pageType || "list";
     self.app.fastSelect = options.fastSelect || false;
-    self.dom.show();
+    self.dom.modal("show");
     self.app.getResources(0);
   };
   self.close = function() {

@@ -7,8 +7,10 @@ homeTopRouter
 		const thread = await db.ThreadModel.findOnly({tid});
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		if(homeSettings.c.ads.includes(thread.tid)) ctx.throw(400, '文章已被置顶');
-		if(!thread.hasCover) ctx.throw(400, '文章没有封面图，暂不能在首页置顶显示');
+		const post = await thread.extendFirstPost();
+		if(!post.cover) ctx.throw(400, '文章没有封面图，暂不能在首页置顶显示');
 		await homeSettings.update({$addToSet: {'c.ads': thread.tid}});
+		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	})
 	.del('/', async (ctx, next) => {

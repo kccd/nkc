@@ -1,7 +1,7 @@
 module.exports = {
   cover: {
     PARAMETER: {
-      GET: "getPostCover"
+      GET: "getThreadCover"
     }
   }
 };

@@ -21,12 +21,12 @@
           | 评论
         else
           | 回复
-  if post.postType === "postToThread" || !post.hasCover
+  if post.postType === "postToThread" || !post.cover
     a(href=post.link).single-post-content=post.abstract || post.content
   else
     .post-content-body
       .post-cover
-        .post-cover-img(style=`background-image:url(/cover/${post.tid})`)
+        .post-cover-img(style=`background-image:url(${tools.getUrl('postCover', post.cover)})`)
       .post-content
         a(href=post.link).single-post-content=post.abstract || post.content
 

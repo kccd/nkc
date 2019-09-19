@@ -94,6 +94,11 @@ const draftSchema = new Schema({
   surveyId: {
     type: Number,
     default: null
+  },
+  // 封面图
+  cover: {
+    type: String,
+    default: ""
   }
 });
 

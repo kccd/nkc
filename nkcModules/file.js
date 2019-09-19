@@ -1,6 +1,7 @@
 const ei = require("easyimage");
-const {upload, statics} = require("../settings");
+const {upload, statics, mediaPath} = require("../settings");
 const fsSync = require("../nkcModules/fsSync");
+const fs = require("fs");
 const db = require("../dataModels");
 const mime = require('mime');
 
@@ -276,6 +277,48 @@ exports.getPostCover = async (hash) => {
 /*
 * 修改post的封面图
 * @param {String} pid postID
+* @param {File} 图片数据
+* @author pengxiguaa 2019-9-17
+* */
+exports.savePostCover = async (pid, file) => {
+  const post = await db.PostModel.findOnly({pid});
+  const {hash, path} = file;
+  const filePath = upload.coverPath + "/" + hash + ".jpg";
+  await ei.resize({
+    src: path,
+    dst: filePath,
+    height: 400,
+    width: 800,
+    quality: 90
+  });
+  await post.update({cover: hash});
+  await fsSync.unlink(path);
+};
+
+/*
+* 修改draft的封面图
+* @param {String} did draftID
+* @param {File} 图片数据
+* @author pengxiguaa 2019-9-17
+* */
+exports.saveDraftCover = async (did, file) => {
+  const draft = await db.DraftModel.findOnly({did});
+  const {hash, path} = file;
+  const filePath = upload.coverPath + "/" + hash + ".jpg";
+  await ei.resize({
+    src: path,
+    dst: filePath,
+    height: 400,
+    width: 800,
+    quality: 90
+  });
+  await draft.update({cover: hash});
+  await fsSync.unlink(path);
+};
+
+/*
+* 修改post的封面图
+* @param {String} pid postID
 * @param {[Object]} covers 封面图数据
 *   {
 *     type: String, // hash: 已保存的封面图，file: 新的封面图
@@ -316,4 +359,38 @@ exports.modifyPostCovers = async (pid, covers) => {
     });
   }
   await post.update({covers: coversHash});
+};
+
+
+exports.createPostCoverByPostId = async (pid) => {
+  const post = await db.PostModel.findOne({pid});
+  if(!post) return;
+  await post.extendResources();
+  let cover;
+  let ext = ["jpg", "jpeg", "bmp", "png", "mp4"];
+  for(const r of post.resources) {
+    r.ext = r.ext.toLowerCase();
+    if(ext.includes(r.ext)) {
+      cover = r;
+      break;
+    }
+  }
+  if(cover) {
+    let filePath;
+    if(cover.ext === "mp4") {
+      filePath = upload.frameImgPath + "/" + cover.rid + ".jpg";
+    } else {
+      filePath = mediaPath.selectDiskCharacterDown(cover) + "/" + cover.path;
+    }
+    if(!fsSync.existsSync(filePath)) return;
+    const targetPath = upload.coverPath + "/" + pid + ".jpg";
+    await ei.resize({
+      src: filePath,
+      dst: targetPath,
+      height: 400,
+      width: 800,
+      quality: 90
+    });
+    await post.update({cover: pid});
+  }
 };

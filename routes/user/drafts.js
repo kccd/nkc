@@ -76,7 +76,9 @@ draftsRouter
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {data, db, body} = ctx;
+    const {data, db, nkcModules} = ctx;
+    const body = JSON.parse(ctx.body.fields.body);
+    const files = ctx.body.files;
     const {
       post, // 草稿内容
       desType, // 草稿类型
@@ -86,7 +88,7 @@ draftsRouter
     let {
       t = "", c = "", l = "html", abstractEn = "", abstractCn = "",
       keyWordsEn = [], keyWordsCn = [], fids = [], cids = [],
-      authorInfos = [], originState = 0, anonymous = false, surveyId = null,
+      authorInfos = [], originState = 0, anonymous = false, cover = "",
       survey
     } = post;
     const {user} = data;
@@ -100,6 +102,7 @@ draftsRouter
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
       mainForumsId: fids,
       categoriesId: cids,
+      cover,
       authorInfos, originState, anonymous
     };
     if(draft) { // 存在草稿
@@ -139,7 +142,10 @@ draftsRouter
         await draft.update({surveyId: surveyDB._id});
       }
     }
-    data.draftId = draft.did;
+    if(files.postCover) {
+      await nkcModules.file.saveDraftCover(draft.did, files.postCover);
+    }
+    data.draft = await db.DraftModel.findOne({did: draft.did});
     await next();
   });
   /*.post('/', async(ctx, next) => {
