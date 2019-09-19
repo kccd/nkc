@@ -35,6 +35,7 @@ NKC.modules.SelectResource = function() {
       pageNumber: "",
       resources: [],
       allowedExt: [],
+      countLimit: 10,
       selectedResources: [],
       loading: true,
       pictureExt: ['swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'],
@@ -203,6 +204,7 @@ NKC.modules.SelectResource = function() {
           if(index !== -1) {
             this.selectedResources.splice(index, 1);
           } else {
+            if(this.selectedResources.length >= this.countLimit) return;
             this.selectedResources.push(r);
           }
         }
@@ -241,6 +243,7 @@ NKC.modules.SelectResource = function() {
   self.open = function(callback, options) {
     self.callback = callback;
     options = options || {};
+    self.app.countLimit = options.countLimit || 10;
     self.app.allowedExt = options.allowedExt || ["all", "audio", "video", "attachment", "picture"];
     self.app.resourceType = self.app.allowedExt[0];
     self.app.pageType = options.pageType || "list";

@@ -58,7 +58,7 @@ function initVueApp() {
     el: "#postInfo",
     data: {
       // 自动保存草稿
-      saveDraftTimeout: 30000,
+      saveDraftTimeout: 60000,
       type: "newThread",
       // 当前内容相关的文章
       // @param {String} title 文章标题
@@ -191,21 +191,41 @@ function initVueApp() {
       },
       selectCover: function() {
         var self = this;
+        if(!NKC.modules.SelectResource) {
+          return sweetError("未引入资源选择模块");
+        }
         if(!NKC.methods.selectImage) {
           return sweetError("未引入图片裁剪模块");
+        }
+        if(!window.SelectResource) {
+          window.SelectResource = new NKC.modules.SelectResource();
         }
         if(!window.SelectImage) {
           window.SelectImage = new NKC.methods.selectImage();
         }
-        SelectImage.show(function(data) {
-          self.coverData = data;
-          NKC.methods.fileToUrl(NKC.methods.blobToFile(data))
-            .then(function(data) {
-              self.coverUrl = data;
-              SelectImage.close();
-            })
+        SelectResource.open(function(data) {
+          var r = data.resources[0];
+          var url;
+          if(r.originId) {
+            url = "/ro/" + r.originId;
+          } else {
+            url = "/r/" + r.rid;
+          }
+
+          SelectImage.show(function(data) {
+            self.coverData = data;
+            NKC.methods.fileToUrl(NKC.methods.blobToFile(data))
+              .then(function(data) {
+                self.coverUrl = data;
+                SelectImage.close();
+              })
+          }, {
+            aspectRatio: 3/2,
+            url: url
+          });
         }, {
-          aspectRatio: 3/2
+          allowedExt: ["picture"],
+          countLimit: 1
         });
       },
       // 自动保存草稿
@@ -749,6 +769,29 @@ function mediaInsertUE(rid, fileType, name) {
   }
 }
 
+// 适配app，将编辑器内容存在app本地
+function saveUEContentToLocal() {
+  alert(1);
+  var content = editor.getContent();
+  api.setPrefs({
+    key: "ueContent",
+    value: content
+  });
+}
+
+// 适配app，将编辑器内容存在app本地
+function setLocalContentToUE() {
+  alert(2);
+  apiready = function() {
+    var content = api.getPrefs({
+      key: "ueContent",
+      sync: true
+    });
+    editor.setContent(content);
+  }
+}
+
+
 // 监听页面变化，调整工具栏位置
 window.onresize=function(){
   resetBodyPaddingTop();
@@ -757,11 +800,11 @@ window.onresize=function(){
 window.onbeforeunload = function() {
   if(PostInfo.showCloseInfo){
     // 离开前保存草稿
-    try{
+    /*try{
       PostInfo.saveToDraftBase();
     } catch(err) {
       console.log(err);
-    }
+    }*/
     return "离开前保存草稿了吗？"
   }
 };

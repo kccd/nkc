@@ -70,6 +70,11 @@ NKC.methods.selectImage = function(o) {
       if(o.aspectRatio) {
         this_.cropper.setAspectRatio(o.aspectRatio);
       }
+      if(o.url) {
+        setTimeout(function() {
+          this_.cropper.replace(o.url);
+        }, 200);
+      }
     }
     this_.callback = callback;
     $('#moduleCrop').modal("show");
