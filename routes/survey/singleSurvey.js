@@ -34,12 +34,48 @@ router
         console.log(err);
       }
     }
+
     // 获取投票结果
-    if(
+    data.showResult = false;
+    if(data.user && data.user.uid === survey.uid) { // 发起人永远可见
+      data.showResult = true;
+    } else if(ctx.permission("showSecretSurvey")) { // 管理员永远可见
+      data.showResult = true;
+    } else if(survey.showResultAfterTheEnd) { // 发起人设定结束后可见
+      if(Date.now() >= (new Date(survey.et)).getTime()) { // 已结束
+        if(survey.showResult === "posted" && data.surveyPost) { // 提交后可见且已提交
+          data.showResult = true;
+        } else if(survey.showResult === "all") { // 所有人可见
+          data.showResult = true;
+        }
+      }
+    } else { // 未设置结束可见，所以无需判断当前是否已结束
+      if(survey.showResult === "posted" && data.surveyPost) { // 提交后可见且已提交
+        data.showResult = true;
+      } else if(survey.showResult === "all") { // 所有人可见
+        data.showResult = true;
+      }
+    }
+
+    // 如果无法查看结果，则去掉有关统计的字段
+    if(!data.showResult) {
+      for(const option of survey.options) {
+        delete option.postCount;
+        for(const answer of option.answers) {
+          delete answer.postScore;
+          delete answer.postCount;
+          delete answer.postMinScore;
+          delete answer.postMaxScore;
+        }
+      }
+    }
+
+    /*if(
       survey.showResult === "all" ||
       data.user && data.user.uid === survey.uid ||
       ctx.permission("showSecretSurvey") ||
-      survey.showResult === "posted" && data.surveyPost
+      survey.showResult === "posted" && data.surveyPost ||
+      survey.showResult === "end" && Date.now() >= (new Date(survey.et)).getTime()
     ) {
       data.showResult = true;
     } else {
@@ -52,7 +88,8 @@ router
           delete answer.postMaxScore;
         }
       }
-    }
+    }*/
+
     await next();
   })
   .post("/", async (ctx, next) => {
@@ -179,7 +216,12 @@ router
           ip: ctx.address,
           port: ctx.port
         });
-        if(record && record.num !== undefined) data.rewardNum = record.num;
+        if(record && record.num !== undefined) {
+          data.rewardNum = record.num;
+          await surveyPost.update({
+            rewardNum: record.num
+          });
+        }
         try{
           await lock.unlock();
         } catch(err) {console.log(err.message || err)}

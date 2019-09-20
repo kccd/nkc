@@ -12,10 +12,15 @@ const schema = new Schema({
     default: "vote",
     index: 1
   },
-  // 结果的展示 all: 所有人可见, posted: 已投票用户可见, self: 仅自己和管理员可见
+  // 结果的展示 all: 所有人可见, posted: 已投票用户可见, self: 仅自己和管理员可见, end: 结束后可见
   showResult: {
     type: String,
     default: "all"
+  },
+  // 结束后展示结果
+  showResultAfterTheEnd: {
+    type: Boolean,
+    default: false
   },
   // 总投票人数
   postCount: {
@@ -298,9 +303,9 @@ schema.statics.checkSurveyData = async (survey) => {
       min: 1
     });
   }
-  const now = Date.now();
+  // const now = Date.now();
   if((new Date(survey.st)).getTime() >= (new Date(survey.et)).getTime()) throwErr(400, "结束时间必须大于开始时间");
-  if((new Date(survey.et)).getTime() <= now) throwErr(400, "结束时间必须大于当前时间");
+  // if((new Date(survey.et)).getTime() <= now) throwErr(400, "结束时间必须大于当前时间");
   const {
     registerTime, digestThreadCount, threadCount, postCount, voteUpCount,
     certsId, visitor, gradesId
@@ -367,7 +372,7 @@ schema.statics.modifySurvey = async (survey, checkData = true) => {
   const {
     st, et,
     reward, permission, description, options, showResult,
-    mid
+    mid, showResultAfterTheEnd
   } = survey;
   const surveyDB = await SurveyModel.findOnly({_id: survey._id});
   // originId
@@ -376,6 +381,7 @@ schema.statics.modifySurvey = async (survey, checkData = true) => {
   }, {
     $set: {
       toc: Date.now(),
+      showResultAfterTheEnd,
       st,
       mid: mid? mid: surveyDB.uid,
       et,

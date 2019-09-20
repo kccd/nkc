@@ -74,7 +74,7 @@ userRouter
 	})
   .patch("/:uid", async (ctx, next) => {
     const {params, db, body, nkcModules} = ctx;
-    const {
+    let {
       username = "", description = "", certs = [], email = "",
       mobile = "", nationCode = "", password = ""
     } = body;
@@ -82,12 +82,16 @@ userRouter
     const targetUser = await db.UserModel.findOnly({uid});
     const targetUsersPersonal = await db.UsersPersonalModel.findOnly({uid});
     // 用户名重名检测
-    if(username && targetUser.username !== username) {
-      await db.UserModel.checkUsername(username);
-      const sameNameUser = await db.UserModel.findOne({uid: {$ne: uid}, usernameLowerCase: username.toLowerCase()});
-      if(sameNameUser) ctx.throw(400, "用户名已存在，请更换");
-      const sameNameColumn = await db.ColumnModel.findOne({uid: {$ne: uid}, nameLowerCase: username.toLowerCase()});
-      if(sameNameColumn) ctx.throw(400, "用户名与专栏名冲突，请更换");
+    if(username) {
+      if(targetUser.username !== username) {
+        await db.UserModel.checkUsername(username);
+        const sameNameUser = await db.UserModel.findOne({uid: {$ne: uid}, usernameLowerCase: username.toLowerCase()});
+        if(sameNameUser) ctx.throw(400, "用户名已存在，请更换");
+        const sameNameColumn = await db.ColumnModel.findOne({uid: {$ne: uid}, nameLowerCase: username.toLowerCase()});
+        if(sameNameColumn) ctx.throw(400, "用户名与专栏名冲突，请更换");
+      }
+    } else {
+      username = `kc-${targetUser.uid}`;
     }
     // 邮箱检测
     if(targetUsersPersonal.email !== email) {

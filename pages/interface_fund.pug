@@ -52,6 +52,7 @@ block content
             if data.completed.length !== 0
               h2.text-center 已完成
               -applicationForms = data.completed;
+              -const listType = {name: "结题时间", key: "timeOfCompleted"}
               include interface_fund_applicationList
           //.col-xs-12.col-md-4
           //  .panel.panel-default

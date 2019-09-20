@@ -49,6 +49,9 @@ module.exports = {
     },
     author: {
 		  GET: "getPostAuthor"
+    },
+    anonymous: {
+		  POST: "anonymousPost"
     }
 	}
 };

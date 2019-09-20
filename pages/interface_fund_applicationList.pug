@@ -8,7 +8,10 @@ else
         tr
           th ID
           th 状态
-          th 申请时间
+          if listType
+            th=listType.name
+          else
+            th 申请时间
           th 基金类型
           th 用户ID
           th 申请金额
@@ -67,7 +70,10 @@ else
              tr
                th= applicationForm.code || '暂无'
                th= applicationFormStatus(applicationForm).str
-               th= timeToSubmit.toLocaleString()
+               if listType
+                 th=(applicationForm[listType.key] || new Date()).toLocaleString()
+               else
+                th= timeToSubmit.toLocaleString()
                th= fund?fund.name: data.fund.name
                th
                  a(href=`/u/${applicant.user.uid}`)= applicant.user.username
