@@ -27,6 +27,7 @@ const {
 
 const auth = require('./auth');
 const editor = require('./editor');
+const edit = require('./edit');
 const exam = require('./exam');
 const e = require('./experimental');
 const f = require('./forum');
@@ -62,6 +63,7 @@ const imageEdit = require('./imageEdit');
 const protocol = require('./protocol');
 const review = require("./review");
 const threads = require("./threads");
+const newResource = require("./newResource");
 const operationObj = {};
 
 
@@ -87,6 +89,7 @@ operationObj.defaultOperations = [
   "getAttachments", // 获取附件
   "showSecretSurvey", // 查看隐藏的调查结果
   "showSurveyCertLimit", // 发起调查时可更具证书限制参与的用户
+  "getAllMessagesResources", // 查看所有的短消息资源
 ];
 
 
@@ -134,6 +137,7 @@ operationObj.operationTree = {
 		auth,// 身份认证审核
 
 		editor,// 编辑器
+    edit,
 
 		exam,// 考试
 
@@ -205,6 +209,8 @@ operationObj.operationTree = {
     threads, // 文章批量管理
 
     survey, // 投票、调查问卷、打分
+
+    nr: newResource, // 新的资源路由
 	}
 };
 module.exports = operationObj;

@@ -4,5 +4,6 @@ const {promisify} = util;
 
 module.exports = {
   unlink: promisify(fs.unlink),
+  readFile: promisify(fs.readFile),
   existsSync: fs.existsSync
 };

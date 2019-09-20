@@ -171,12 +171,13 @@ var app = new Vue({
   methods: {
     format: NKC.methods.format,
     strToHTML: NKC.methods.strToHTML,
+    visitUrl: NKC.methods.visitUrl,
     selectForum: function(forum) {
       this.selectedForum = forum;
     },
     toUploadPhoto: function() {
       if(!confirm("页面跳转将可能导致当前页面输入的内容丢失，请注意保存！")) return;
-      window.open("/u/"+this.user.uid+"/settings/photo");
+      this.visitUrl("/u/"+this.user.uid+"/settings/resume", true);
     },
     floatToInt: function(b) {
       b.money = parseInt(b.money);

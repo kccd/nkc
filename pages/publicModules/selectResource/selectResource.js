@@ -1,6 +1,25 @@
 NKC.modules.SelectResource = function() {
   var self = this;
   self.dom = $("#moduleSelectResource");
+  /*if(self.dom.hasClass("fixed-modal")) {
+    self.dom.draggable({
+      scroll: false,
+      handle: ".fixed-title",
+      drag: function(event, ui) {
+        if(ui.position.top < 0) ui.position.top = 0;
+        var height = $(window).height();
+        if(ui.position.top > height - 30) ui.position.top = height - 30;
+        var width = $(".fixed-modal").width();
+        if(ui.position.left < 100 - width) ui.position.left = 100 - width;
+        var winWidth = $(window).width();
+        if(ui.position.left > winWidth - 100) ui.position.left = winWidth - 100;
+      }
+    });
+  } else {
+    self.dom.modal({
+      show: false
+    });
+  }*/
   self.dom.modal({
     show: false
   });
@@ -11,16 +30,15 @@ NKC.modules.SelectResource = function() {
       user: "",
       pageType: "list", // list: 资源列表, uploader: 上传
       resourceType: "", // all, picture, video, audio, attachment
-      quota: 30,
+      quota: 20,
       paging: {},
       pageNumber: "",
       resources: [],
       allowedExt: [],
+      countLimit: 10,
       selectedResources: [],
       loading: true,
       pictureExt: ['swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'],
-
-
       files: [],
     },
     computed: {
@@ -60,6 +78,13 @@ NKC.modules.SelectResource = function() {
       }
     },
     methods: {
+      close: function() {
+        self.dom.modal("hide");
+        setTimeout(function() {
+          self.app.selectedResources = [];
+          self.app.resourceType = "all";
+        }, 500);
+      },
       changePage: function(type) {
         var paging = this.paging;
         if(paging.buttonValue.length <= 1) return;
@@ -172,11 +197,16 @@ NKC.modules.SelectResource = function() {
         this.selectedResources.splice(index, 1);
       },
       selectResource: function(r) {
-        var index = this.getIndex(this.selectedResources, r);
-        if(index !== -1) {
-          this.selectedResources.splice(index, 1);
+        if(this.fastSelect) {
+          self.callback(r);
         } else {
-          this.selectedResources.push(r);
+          var index = this.getIndex(this.selectedResources, r);
+          if(index !== -1) {
+            this.selectedResources.splice(index, 1);
+          } else {
+            if(this.selectedResources.length >= this.countLimit) return;
+            this.selectedResources.push(r);
+          }
         }
       },
       selectResourceType: function(t) {
@@ -213,17 +243,15 @@ NKC.modules.SelectResource = function() {
   self.open = function(callback, options) {
     self.callback = callback;
     options = options || {};
+    self.app.countLimit = options.countLimit || 10;
     self.app.allowedExt = options.allowedExt || ["all", "audio", "video", "attachment", "picture"];
     self.app.resourceType = self.app.allowedExt[0];
     self.app.pageType = options.pageType || "list";
+    self.app.fastSelect = options.fastSelect || false;
     self.dom.modal("show");
     self.app.getResources(0);
   };
   self.close = function() {
-    self.dom.modal("hide");
-    setTimeout(function() {
-      self.app.selectedResources = [];
-      self.app.resourceType = "all";
-    }, 500);
+    self.app.close();
   }
 };

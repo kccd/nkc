@@ -505,7 +505,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState, parentPostId} = post;
+  const {c, t, l, abstractCn, abstractEn, keyWordsCn = [], keyWordsEn = [], authorInfos=[], originState, parentPostId} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
@@ -726,7 +726,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       mainForumsId: 1,
       voteUp: 1,
       reviewed: 1,
-      voteDown: 1
+      voteDown: 1,
+      cover: 1
     });
     posts.map(post => {
       if(o.htmlToText) {
@@ -1012,6 +1013,7 @@ threadSchema.statics.getAds = async (fid) => {
     const thread = threadsObj[tid];
     if(thread) ads.push({
       tid: thread.tid,
+      cover: thread.firstPost.cover,
       title: thread.firstPost.t
     });
   }
@@ -1381,7 +1383,7 @@ threadSchema.statics.autoCoverImage = async (ctx, thread, post) => {
       });
     }
   }
-}
+};
 
 /**
  * -------
@@ -1408,7 +1410,6 @@ threadSchema.statics.postNewThread = async (options) => {
   const ThreadModel = mongoose.model("threads");
   const PostModel = mongoose.model("posts");
   const MessageModel = mongoose.model("messages");
-  const SubscribeModel = mongoose.model("subscribes");
   const DraftModel = mongoose.model("draft");
   // 1.检测发表权限
   await ThreadModel.ensurePublishPermission(options);
@@ -1428,7 +1429,7 @@ threadSchema.statics.postNewThread = async (options) => {
   // await SubscribeModel.autoAttentionForum(options);
   // 发表文章删除草稿
   if(options.did) {
-    await DraftModel.remove({"did": options.did})
+    await DraftModel.removeDraftById(options.did, options.uid);
   }
   return _post;
 };
@@ -1461,7 +1462,7 @@ threadSchema.methods.createNewPost = async function(post) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  const {cover = "", c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
@@ -1490,6 +1491,7 @@ threadSchema.methods.createNewPost = async function(post) {
     rpid.push(quote[2]);
   }
   let _post = await new PostModel({
+    cover,
     pid,
     c,
     t,

@@ -520,6 +520,7 @@ block content
                                 label
                                   input#ParseURL(type='checkbox' checked)
                                   | 处理URL
+                              label(style="font-size:16px") 专栏
                               include ../editor/toColumn
 
                               if data.sendAnonymousPost
@@ -654,6 +655,7 @@ block scripts
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
   +includeJS("/publicModules/survey/form.js")
+  include ../publicModules/selectResource/selectResource
   include ../publicModules/floatUserPanel/floatUserPanel
   include ../publicModules/highlight/highlight_editor
   include ../publicModules/complaint/complaint

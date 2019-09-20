@@ -1,0 +1,52 @@
+extends ../../bootstrap_base
+block title
+  title 草稿箱
+  +includeCSS("/user/drafts/drafts.css")
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12
+        include ../../publicModules/paging/paging
+      .col-xs-12.col-md-8.box-shadow-panel
+        if !data.drafts.length
+          .p-t-5.p-b-5.text-center
+            b 空空如也~
+        for d in data.drafts
+          .draft
+            .draft-header
+              .draft-toc=format('YYYY/MM/DD HH:mm:ss', d.tlm || d.toc)
+              .draft-type
+                if d.type === "newThread"
+                  span 发表文章
+                else if d.type === "newPost"
+                  span 在文章《
+                    a(href=d.thread.url target="_blank")=d.thread.title
+                    | 》下发表回复
+                else if d.type === "modifyPost"
+                  span 修改文章《
+                    a(href=d.thread.url target="_blank")=d.thread.title
+                    | 》下的回复
+                else if d.type === "modifyThread"
+                  span 修改文章《
+                    a(href=d.thread.url target="_blank")=d.thread.title
+                    |》
+                else
+                  span 修改
+                    a(href=d.forum.url target="_blank")=d.forum.title
+                    | 的专业说明
+            .draft-content=d.c || "未填写内容"
+            .draft-button
+              a.btn.btn-theme.btn-xs(href=`/editor?type=redit&id=${d.did}`)
+                .fa.fa-edit
+                | &nbsp;继续创作
+              button.btn.btn-danger.btn-xs(onclick=`removeDraft('${d.did}')`)
+                .fa.fa-trash-o
+                | &nbsp;删除
+      if data.drafts.length
+        .col-xs-12.m-t-05
+          button.btn.btn-danger.btn-xs(onclick="removeAll()")
+            .fa.fa-trash-o
+            |&nbsp;清空草稿箱
+block scripts
+  include ../../publicModules/moment
+  +includeJS("/user/drafts/drafts.js")

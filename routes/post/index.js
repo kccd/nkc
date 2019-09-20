@@ -272,11 +272,18 @@ router
     await next();
   })
   .patch('/:pid', async (ctx, next) => {
+    let body, files = {};
+    if(ctx.body.fields) {
+      body = JSON.parse(ctx.body.fields.body);
+      files = ctx.body.files;
+    } else {
+      body = ctx.body;
+    }
+    const post = body.post;
     const {
-      columnCategoriesId=[], sendAnonymousPost, t, c, desType, desTypeId, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
-      survey
-    } = ctx.body.post;
-    if(c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
+      columnCategoriesId=[], anonymous, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
+      survey, did, cover = ""
+    } = post;
     const {pid} = ctx.params;
     const {state, data, db, fs} = ctx;
     const {user} = data;
@@ -288,6 +295,18 @@ router
     const targetPost = await db.PostModel.findOnly({pid});
     if(targetPost.parentPostId && c.length > 1000) ctx.throw(400, "评论内容不能超过1000字节");
     const targetThread = await targetPost.extendThread();
+    if(targetThread.oc === pid) {
+      ctx.nkcModules.checkData.checkString(t, {
+        name: "标题",
+        minLength: 6,
+        maxLength: 200
+      });
+    }
+    ctx.nkcModules.checkData.checkString(c, {
+      name: "内容",
+      minLength: 6,
+      maxLength: 100000
+    });
     const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
     for(let targetForum of targetForums){
@@ -351,12 +370,13 @@ router
     targetPost.iplm = ctx.address;
     targetPost.t = t;
     targetPost.c = c;
+    targetPost.cover = cover;
     targetPost.abstractCn = abstractCn;
     targetPost.abstractEn = abstractEn;
     targetPost.keyWordsCn = keyWordsCn;
     targetPost.keyWordsEn = keyWordsEn;
     const postType = targetPost.pid === targetThread.oc? "postToForum": "postToThread";
-    if(sendAnonymousPost) {
+    if(anonymous !== undefined && anonymous) {
       if(await db.UserModel.havePermissionToSendAnonymousPost(postType, user.uid, targetPost.mainForumsId)) {
         if(postType !== "postToForum" || !["product", "fund"].includes(targetThread.type)) {
           targetPost.anonymous = true;
@@ -390,25 +410,17 @@ router
     targetPost.originState = originState;
     targetPost.tlm = Date.now();
 	  if(targetThread.oc === pid) {
-			await targetThread.update({hasCover: true});
-			const {coverPath} = ctx.settings.upload;
-			if(targetThread.tid) {
-				const path = coverPath + '/' + targetThread.tid + '.jpg';
-				try {
-					await fs.access(path);
-					await fs.unlink(path);
-				} catch(e) {
-					// 之前不存在封面图
-				}
-
-			}
-
+      targetPost.cover = cover;
 	  }
     // targetPost.rpid = rpid;
     const q = {
       tid: targetThread.tid
     };
 	  await targetPost.save();
+
+    if(targetThread.oc === pid && files && files.postCover) {
+      await ctx.nkcModules.file.savePostCover(pid, files.postCover);
+    }
 	  if(!isModerator && !data.userOperationsId.includes('displayDisabledPosts')) {
 	  	q.disabled = false;
 	  }
@@ -434,7 +446,9 @@ router
     let singlePost = await db.PostModel.findOnly({pid})
     await singlePost.update({disabled:false})
     // 帖子曾经在草稿箱中，发表时，删除草稿
-    await db.DraftModel.remove({"desType":desType,"desTypeId":desTypeId})
+    if(did) {
+      await db.DraftModel.removeDraftById(did, data.user.uid);
+    }
     await targetUser.updateUserMessage();
     if(!singlePost.reviewed) {
       await db.MessageModel.sendReviewMessage(singlePost.pid);

@@ -22,7 +22,7 @@ table{
   margin-left: 0.5rem;
 }
 .m-b-05{
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem!important;
 }
 .m-r-05{
   margin-right: 0.5rem;
@@ -113,6 +113,15 @@ table{
 }
 
 /* padding-top */
+.p-r-05{
+  padding-left: 0.5rem;
+}
+.p-r-05{
+  padding-right: 0.5rem;
+}
+.p-t-05{
+  padding-top: 0.5rem;
+}
 .p-a-1{
   padding: 1rem;
 }
@@ -233,6 +242,24 @@ table{
 .pointer{
   cursor: pointer;
 }
+/*自定义按钮*/
+/*主色按钮*/
+.btn-theme{
+  color: #fff;
+  background-color: #2b90d9;
+  border-color: #2b90d9;
+}
+.btn-theme:hover{
+  color: #fff;
+  background-color: #438abe;
+  border-color: #438abe;
+}
+.btn-theme:focus{
+  color: #fff;
+  background-color: #438abe;
+  border-color: #438abe;
+}
+
 
 .list-header{
   height: 2rem;
@@ -1816,3 +1843,5 @@ span.thread-title-page{
 .improve .improve-info{
   margin: 0.3rem 0;
 }
+
+

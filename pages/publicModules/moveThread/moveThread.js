@@ -64,7 +64,7 @@ NKC.modules.MoveThread = function() {
         var threadTypes = forum.threadTypes;
         for(var i = 0; i < threadTypes.length; i++) {
           var threadType = threadTypes[i];
-          if(categoriesId.indexOf(threadType.cid + "") !== -1) {
+          if(categoriesId.indexOf(threadType.cid + "") !== -1 || categoriesId.indexOf(threadType.cid) !== -1) {
             return threadType;
           }
         }

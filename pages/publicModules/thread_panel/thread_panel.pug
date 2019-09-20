@@ -62,14 +62,14 @@
       span.thread-title-page ...
       -ellipsis = true;
   .thread-panel-abstract
-    if thread.hasCover
+    if thread.firstPost.cover
       .thread-panel-abstract-cover
         .thread-panel-abstract-cover-image(
-          style=`background-image: url(/cover/${thread.tid})`
+          style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
         )
     .thread-panel-abstract-content
-      if thread.firstPost.abstract
-        a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.abstract.slice(0, 200)
+      if thread.firstPost.abstractCn
+        a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.abstractCn.slice(0, 200)
       else
         a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
       a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`).thread-panel-abstract-reply=thread.lastPost.c.slice(0, 200)

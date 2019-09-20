@@ -38,6 +38,7 @@ var app = new Vue({
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
     appOpenUrl: function(url) {
       // appOpenUrl(url);
       NKC.methods.visitUrl(url);

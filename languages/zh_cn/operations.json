@@ -615,6 +615,8 @@
   "survey_post": "创建调查表单",
   "showSecretSurvey": "查看隐藏的调查结果",
   "showSurveyCertLimit": "新建调查时显示证书限制",
+  "visitMessageLogs": "查看短消息日志",
+  "getAllMessagesResources": "查看任何人的短消息资源",
   "anonymousPost": "快捷设置匿名/取消匿名",
 
   "APPgetUserInfo": "app获取用户信息",

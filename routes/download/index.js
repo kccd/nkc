@@ -73,7 +73,7 @@ downloadRouter
                     });
                 });
 
-            }).on('err', (err) => {
+            }).on('error', (err) => {
                 reject(err);
             })
         })

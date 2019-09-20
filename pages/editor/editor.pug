@@ -1,0 +1,209 @@
+extends ../bootstrap_base
+block title
+  title 编辑器
+  +includeCSS("/editor/editor.css")
+  style.
+    .nkcshade{
+      box-shadow: none;
+    }
+    body{
+      padding-top: 120px;
+    }
+
+block content
+  .container-fluid.max-width.editor
+    .row
+      .col-xs-12.col-md-9.box-shadow-panel.m-b-2
+        div
+          .m-b-1.m-t-1.m-l-05.m-r-05
+            if data.type === "newPost"
+              .editor-type-info
+                .fa.fa-lightbulb-o
+                |正在回复文章《
+                a(href=data.thread.url target="_blank")=`${data.thread.title}`
+                |》
+            else if data.type === "modifyThread"
+              .editor-type-info
+                .fa.fa-lightbulb-o
+                |正在编辑文章《
+                a(href=data.thread.url target="_blank")=`${data.thread.title}`
+                |》
+            else if data.type === "modifyPost"
+              .editor-type-info
+                .fa.fa-lightbulb-o
+                |正在编辑文章《
+                a(href=data.thread.url target="_blank")=`${data.thread.title}`
+                | 》下的回复
+            else if data.type === "modifyForumDeclare"
+              .editor-type-info
+                .fa.fa-lightbulb-o
+                | 正在编辑&nbsp;
+                a(href=data.forum.url target="_blank")=`${data.forum.title}`
+                | &nbsp;的专业说明
+            if data.type !== "modifyForumDeclare"
+              input.editor-title(placeholder="请输入标题..." id="title" onchange="PostInfo.getTitle(this)")
+            hr
+          div(id="content")
+          #postInfo(v-cloak)
+            hr
+            .m-b-2(v-if="['newThread'].indexOf(type) !== -1")
+              .editor-header 专业分类
+                small （必选，最多可选两个）
+              .editor-main-forums
+                .editor-main-forum(v-for="f, index in selectedForums" :style="'background-color: ' + f.color + ';'")
+                  span {{f.fName}}
+                  span(v-if="f.cName") ：{{f.cName}}
+                  .fa.fa-remove.p-l-05.pointer(@click="removeSelectedForums(index)")
+                button.btn.btn-default.btn-sm(@click="selectForums") 添加
+            .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
+              .editor-header 封面图
+                small （如未指定，默认从内容中选取）
+              .editor-cover
+                .editor-cover-default(v-if="!cover && !coverUrl" @click="selectCover")
+                  .fa.fa-plus
+                div(v-else)
+                  .editor-cover-img
+                    img(:src="coverUrl" v-if="coverUrl")
+                    img(:src="getUrl('postCover', cover)" v-else-if="cover")
+                  .m-t-05
+                    button.btn.btn-default.btn-sm(@click="selectCover") 重新选择
+                    button.btn.btn-default.btn-sm(@click="removeCover") 删除
+            .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
+              .editor-header 摘要
+                small （选填）
+              .row.editor-abstract
+                .col-xs-12.col-md-6
+                  textarea(placeholder="中文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractCn")
+                  .editor-abstract-info(:class="{'warning': abstractCnLength > 1000}") {{abstractCnLength}} / 1000
+                .col-xs-12.col-md-6
+                  textarea(placeholder="英文摘要，最多可输入1000字符" rows=7 v-model.trim="abstractEn")
+                  .editor-abstract-info(:class="{'warning': abstractEnLength > 1000}") {{abstractEnLength}} / 1000
+            .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
+              .editor-header 关键词
+                small （选填，最多可添加50个，当前已添加
+                  span(v-if="keywordsLength <= 50") {{keywordsLength}}
+                  b.warning(v-else) {{keywordsLength}}
+                  |个）
+              .editor-keywords
+                .editor-keyword(v-for="k, index in keyWordsCn")
+                  span {{k}}
+                  .fa.fa-remove.p-l-05(@click="removeKeyword(index, keyWordsCn)")
+                .editor-keyword(v-for="k, index in keyWordsEn")
+                  span {{k}}
+                  .fa.fa-remove.p-l-05(@click="removeKeyword(index, keyWordsEn)")
+                button.btn.btn-default.btn-sm(@click="addKeyword") 添加
+            .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
+              .editor-header 作者信息
+                small （选填，信息将公开显示）
+              .editor-authors
+                .table-responsive(v-if="authorInfos.length")
+                  table.table-condensed.table
+                    thead
+                      tr
+                        th
+                        th 姓名
+                        th KCID(选填)
+                        th 机构名称(选填)
+                        th 机构地址(选填)
+                        th 通信作者
+                    tbody.editor-author(v-for="a, index in authorInfos")
+                      tr
+                        th
+                          .fa.fa-trash(@click="removeAuthor(index, authorInfos)" title="删除")
+                          .fa.fa-chevron-up(@click="moveAuthor(index, 'up', authorInfos)" title="上移")
+                          .fa.fa-chevron-down(@click="moveAuthor(index, 'down', authorInfos)" title="下移")
+                        th
+                          input.author-name(type="text" v-model.trim="a.name")
+                        th
+                          input.author-id(type="text" v-model.trim="a.kcid")
+                        th
+                          input(type="text" v-model.tirm="a.agency")
+                        th
+                          input(type="text" v-model.trim="a.agencyAdd")
+                        th
+                          .checkbox
+                            label
+                              input(type="checkbox" :value="true" v-model="a.isContract")
+                      tr(v-if="a.isContract").contract-info
+                        th(colspan="6")
+                          h5 以下信息仅登录用户可见
+                          .display-i-b.m-b-05
+                            span 邮箱
+                            input(type="text" v-model.trim="a.contractObj.contractEmail" placeholder="必填")
+                          .display-i-b.m-b-05
+                            span &nbsp;电话
+                            input(type="text" v-model.trim="a.contractObj.contractTel" placeholder="选填")
+                          .display-i-b.m-b-05
+                            span &nbsp;地址
+                            input(type="text" v-model.trim="a.contractObj.contractAdd" placeholder="选填")
+                          .display-i-b.m-b-05
+                            span &nbsp;邮政编码
+                            input.author-name(type="text" v-model.trim="a.contractObj.contractCode" placeholder="选填")
+                button.btn.btn-default.btn-sm(@click="addAuthor") 添加
+            .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
+              .editor-header 原创
+              .editor-origin-state.form-inline
+                select.form-control(v-model="originState")
+                  for text, index in getOriginLevel()
+                    option(:value=index)=text
+          .m-b-2
+            .editor-header 专栏
+            include ../editor/toColumn
+          if data.createSurveyPermission
+            if data.type === "newThread" || (data.type === "modifyThread" && data.post.surveyId)
+              .m-b-2
+                .editor-header 调查
+                  button.btn.btn-success.btn-xs(style="vertical-align: top;"
+                    onclick="disabledSurveyForm()"
+                    id="disabledSurveyButton"
+                  ) 创建
+                include ../publicModules/survey/edit
+          #postButton(v-cloak)
+            hr
+            .checkbox(v-if="havePermissionToSendAnonymousPost")
+              label(v-if="allowedAnonymous")
+                input(type="checkbox" v-model="anonymous" :value="true")
+                span
+                  | 匿名发表
+              label(v-else)
+                input(type="checkbox" v-model="anonymous" :value="true" disabled)
+                span
+                  | 匿名发表
+                  span.text-danger （所选专业分类不支持匿名发表）
+            .checkbox
+              label
+                input(type="checkbox" v-model="checkProtocol" :value="true")
+                span
+                  | 我已阅读并同意遵守与本次发表相关的全部协议。
+                  a(href=`/protocol` target="_blank") 查看协议
+            .checkbox
+              .editor-auto-save(v-if="autoSaveInfo")
+                .fa.fa-check-circle &nbsp;{{autoSaveInfo}}
+            button.btn.btn-theme(@click="submit" v-if="checkProtocol && !disabledSubmit") 提交
+            button.btn.btn-theme(v-else disabled)
+              span(v-if="disabledSubmit")
+                span 提交中...&nbsp;
+                .fa.fa-spinner.fa-spin
+              span(v-else) 提交
+            button.btn.btn-default(@click="saveToDraft") 存草稿
+
+
+      .col-xs-12.col-md-3.box-shadow-panel
+        div
+          h5.text-danger 温馨提示：
+          p 1. 每隔60秒编辑器会自动将已输入的内容保存到草稿箱，相应的草稿会在内容发表后被清除。而未清除的草稿可以在下一次从相同入口进入编辑器时选择加载。
+  .hidden#data=objToStr({allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft})
+block scripts
+  include ../ueditor/ueditorBase
+  include ../publicModules/moment
+  include ../editor/modules/selectAuthorInfo
+  include ../publicModules/commonModal/commonModal
+  include ../publicModules/crop/crop_new
+  include ../publicModules/selectUser/selectUser
+  include ../publicModules/selectResource/selectResource
+  include ../publicModules/moveThread/moveThread
+  +includeJS('/tools.js')
+  if state.userColumn && !data.addedToColumn
+    +includeJS("/publicModules/toColumn/selectCategories.js")
+  +includeJS('/publicModules/survey/edit.js')
+  +includeJS("/editor/editor.js")

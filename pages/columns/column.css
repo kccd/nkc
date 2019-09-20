@@ -803,7 +803,9 @@ img.apply-column-banner{
 }
 .column-page-content img{
   border-radius: 7px;
+  max-width: 100%;
 }
+
 @media (max-width: 767px) {
   .column-avatar{
     height: 6rem;

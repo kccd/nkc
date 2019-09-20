@@ -769,19 +769,15 @@ threadRouter
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		const {post, postType} = body;
-		const {columnCategoriesId = [], sendAnonymousPost} = post;
+		const {columnCategoriesId = [], anonymous = false, did} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(postType === "comment" && post.c.length > 1000) {
       ctx.throw(400, "评论内容不能超过1000字符");
     }
 
-		let anonymousPost = false;
-		if(sendAnonymousPost) {
-		  if(await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid, thread.mainForumsId)) {
-        anonymousPost = true;
-      } else {
-		    ctx.throw(400, "您没有权限或文章所在专业不允许发表匿名内容");
-      }
+		// 判断前台有没有提交匿名标志，未提交则默认false
+    if(anonymous && !await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid, thread.mainForumsId)) {
+      ctx.throw(400, "您没有权限或文章所在专业不允许发表匿名内容");
     }
 
 		const _post = await thread.newPost(post, user, ctx.address);
@@ -803,9 +799,7 @@ threadRouter
     }
 
     // 发表匿名内容
-    if(anonymousPost) {
-      await db.PostModel.updateOne({pid: _post.pid}, {$set: {anonymous: true}});
-    }
+    await db.PostModel.updateOne({pid: _post.pid}, {$set: {anonymous}});
 
 		// 生成记录
 		const obj = {
@@ -879,8 +873,10 @@ threadRouter
 			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}`))
 		}
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
-		//帖子曾经在草稿箱中，发表时，删除草稿
-		await db.DraftModel.remove({"desType":post.desType,"desTypeId":post.desTypeId});
+		// 如果是编辑的草稿，则删除草稿
+    if(did) {
+      await db.DraftModel.removeDraftById(did, data.user.uid);
+    }
 
 		// 回复自动关注文章
     const subQuery = {

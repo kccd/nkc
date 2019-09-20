@@ -41,7 +41,6 @@ const postSchema = new Schema({
   l: {
     type: String,
     default: "html",
-    required: true
   },
   recUsers: {
     type: [String],
@@ -176,7 +175,7 @@ const postSchema = new Schema({
   // 原创声明
   originState: {
     type: String,
-    default: ""
+    default: "0"
   },
   // 是否已经审核
   reviewed: {
@@ -195,7 +194,12 @@ const postSchema = new Schema({
     type: Number,
     default: null,
     index: 1
-  }
+  },
+  // 封面图图片hash
+  cover: {
+    type: String,
+    default: ""
+  },
 }, {toObject: {
   getters: true,
   virtuals: true
@@ -870,15 +874,6 @@ postSchema.statics.getUrl = async function(pid) {
   } else {
     return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}#hightlight`;
   }
-};
-
-
-/*
-* 发表回复，包含楼中楼
-*
-* */
-postSchema.statics.publishPost = async (options) => {
-
 };
 
 module.exports = mongoose.model('posts', postSchema);

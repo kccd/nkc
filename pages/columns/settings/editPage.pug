@@ -1,7 +1,7 @@
 extends ./base
 block columnTitle
   title=data.page?"编辑自定义页": "新建自定义页"
-  +includeCSS("/editor/editor.css")
+  +includeCSS("/editor/editor_old.css")
   +includeCSS("/mdui/css/mdui.min.css")
 block settingsContent
   .row
@@ -21,5 +21,6 @@ block settingsContent
 block scripts
   include ../../ueditor/ueditorBase
   include ../../publicModules/crop/crop
+  include ../../publicModules/selectResource/selectResource
   +includeJS("/media/media_index.js")
   +includeJS("/columns/settings/editPage.js")

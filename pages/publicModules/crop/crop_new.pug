@@ -11,9 +11,9 @@
       .modal-body
         input(type="file" accept="image/png, image/jpeg" id="module_crop_input")
         .m-t-1(style="max-height: 50rem;")
-          img(id="module_crop_image" style="max-width: 100%;")
+          img(id="module_crop_image" style="max-width: 100%;max-height: 30rem;")
       .modal-footer
-        #module_crop_info.display-i-b
+        #module_crop_info.display-i-b(style="font-size: 1rem;")
         button(type="button" class="btn btn-default btn-sm" id="module_crop_rotate_left") 左旋
         button(type="button" class="btn btn-default btn-sm" id="module_crop_rotate_right") 右旋
         button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭

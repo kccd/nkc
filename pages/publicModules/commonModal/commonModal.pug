@@ -9,8 +9,8 @@
         .form
           .form-group(v-for="d in data")
             label(v-if="d.label") {{d.label}}
-            input.form-control(v-if="d.dom === 'input'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''")
-            textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4")
+            input.form-control(v-if="d.dom === 'input'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit")
+            textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4" @keyup.enter="submit")
       .modal-footer
         h5(v-if="info") {{info}}
         button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭

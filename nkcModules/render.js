@@ -5,6 +5,7 @@ const jsdiff = require('diff');
 const settings = require('../settings');
 moment.locale('zh-cn');
 const languages = require('../languages');
+const tools = require("./tools");
 
 const xss = require('xss');
 
@@ -344,21 +345,6 @@ function objToStr(obj) {
   return encodeURIComponent(JSON.stringify(obj));
 }
 
-/*
-* 获取图片的链接
-* */
-function getUrl(type, id, size) {
-  var t = "";
-  if(size) t = `?t=${size}`;
-  switch(type) {
-    case "userAvatar": {
-      return `/avatar/${id}${t}`
-    }
-    case "userBanner": {
-      return `/banner/${id}${t}`
-    }
-  }
-}
 
 /**
  * 省略字数，超过则用省略号
@@ -467,7 +453,8 @@ let pugRender = (template, data, state) => {
     anonymousInfo: {
       username: "匿名用户",
       avatar: "/default/default_anonymous_user_avatar.jpg"
-    }
+    },
+    tools
   };
   options.data = data;
   options.filters = filters;

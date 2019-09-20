@@ -24,9 +24,9 @@ block settingsContent
             a.column-thread-url(href=`/t/${thread.tid}` target="_blank")
               .fa.fa-external-link
             .column-thread-info(data-info-tid=thread.tid)
-              if thread.hasCover
+              if thread.firstPost.cover
                 .column-thread-cover
-                  img(src=`/cover/${thread.tid}`)
+                  img(src=`${tools.getUrl('postCover', thread.firstPost.cover)}`)
               .column-thread-content
                 .column-thread-abstract=thread.firstPost.c
                 .column-thread-forums.m-t-05

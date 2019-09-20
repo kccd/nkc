@@ -1,7 +1,7 @@
 extends ../fundBase
 block fundTitle
   title 基金申请
-  +includeCSS("/editor/editor.css")
+  +includeCSS("/editor/editor_old.css")
   //+includeCSS("/mdui/css/mdui.min.css")
 block fundContent
   .hidden#data=objToStr({step: data.s, form: data.applicationForm, fund: data.fund, user: data.user, lifePhotos: data.lifePhotos})
@@ -262,6 +262,7 @@ block fundScripts
         new Viewer(document.getElementById('applicationForm-comments'), options);
       })
   include  ../../publicModules/selectForum/selectForum
+  include  ../../publicModules/selectResource/selectResource
   include ../../publicModules/strToHTML
   include ../../publicModules/moment
   +includeJS("/editor/paper.js")

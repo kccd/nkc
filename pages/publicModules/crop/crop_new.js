@@ -15,13 +15,11 @@ if (!HTMLCanvasElement.prototype.toBlob) {
     }
   });
 }
-
-$('#moduleCrop').modal({
-  show: false,
-  backdrop: "static"
-});
 NKC.methods.selectImage = function(o) {
-
+  $('#moduleCrop').modal({
+    show: false,
+    backdrop: "static"
+  });
   var options = {
     viewMode:0,
     aspectRatio: 1,
@@ -69,6 +67,11 @@ NKC.methods.selectImage = function(o) {
     if(o) {
       if(o.aspectRatio) {
         this_.cropper.setAspectRatio(o.aspectRatio);
+      }
+      if(o.url) {
+        setTimeout(function() {
+          this_.cropper.replace(o.url);
+        }, 200);
       }
     }
     this_.callback = callback;

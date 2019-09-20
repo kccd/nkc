@@ -1,0 +1,27 @@
+.draft-toc{
+  display: inline-block;
+  font-weight: 700;
+}
+.draft-type{
+  display: inline-block;
+}
+.drafts{
+  min-height: 30rem;
+}
+body{
+  background-color: #f4f4f4;
+}
+.draft{
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+.draft-content{
+  margin-top: 0.5rem;
+  color: #798089;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+.draft-button{
+  margin-top: 0.5rem;
+  text-align: right;
+}

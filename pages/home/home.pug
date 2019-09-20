@@ -110,7 +110,7 @@ block content
               .swiper-wrapper
                 for thread in data.ads
                   a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                    'background-image': `url(/cover/${thread.tid})`
+                    'background-image': `url(${tools.getUrl('postCover', thread.cover)})`
                   })
                     .swiper-title= `${thread.title}`
               .swiper-pagination

@@ -33,6 +33,7 @@ var app = new Vue({
     }
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
     reset: function() {
       this.pid = "";
       this.getThreads();

@@ -720,7 +720,7 @@ function saveUEContentToLocal() {
  */
 
 function setLocalContentToUE() {
-  apiready = function() {  
+  apiready = function() {
     var content = api.getPrefs({
       key: "ueContent",
       sync: true
