@@ -77,8 +77,13 @@ draftsRouter
   })
   .post("/", async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
-    const body = JSON.parse(ctx.body.fields.body);
-    const files = ctx.body.files;
+    let body, files;
+    if(ctx.body.fields) {
+      body = JSON.parse(ctx.body.fields.body);
+      files = ctx.body.files;
+    } else {
+      body = ctx.body;
+    }
     const {
       post, // 草稿内容
       desType, // 草稿类型
@@ -96,7 +101,7 @@ draftsRouter
     if(draftCount >= 100) ctx.throw(400, "草稿箱已满，保存草稿失败");
     let draft;
     if(draftId) {
-      draft = await db.DraftModel.findOne({did: draftId});
+      draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});
     }
     const draftObj = {
       t, c, l, abstractEn, abstractCn, keyWordsEn, keyWordsCn,
@@ -142,7 +147,7 @@ draftsRouter
         await draft.update({surveyId: surveyDB._id});
       }
     }
-    if(files.postCover) {
+    if(files && files.postCover) {
       await nkcModules.file.saveDraftCover(draft.did, files.postCover);
     }
     data.draft = await db.DraftModel.findOne({did: draft.did});

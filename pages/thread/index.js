@@ -1,4 +1,4 @@
-var SubscribeTypes, UserInfo, surveyForms = [];
+var SubscribeTypes, UserInfo, surveyForms = [], draftId = "";
 $(document).ready(function(){
   if(window.moduleToColumn) {
     moduleToColumn.init();
@@ -353,29 +353,25 @@ function saveDraft(threadId,userId){
 		}
 	})
 	var post = assemblePostObject();
-	var quoteContent = document.getElementById("quoteContent").innerHTML;
-	post.c = quoteContent + post.c
+	// var quoteContent = document.getElementById("quoteContent").innerHTML;
+	// post.c = post.c
 	if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
 	post.t = '';
-	post.desType = 'thread';
-	post.desTypeId = threadId;
 	var method = "POST";
 	var url = "/u/"+userId+"/drafts";
-	var data = {post:post};
+	var data = {
+	  post: post,
+    draftId: draftId,
+    desType: "thread",
+    desTypeId: threadId
+	};
 	return nkcAPI(url, method, data)
-		.then(function (result) {
-			if(result.status == "success"){
-				// console.log(result.did)
-				$("#draftId").html(result.did)
-				jalert("保存成功！");
-			}
-			if(result.redirect) {
-				redirect(result.redirect)
-			}
+		.then(function (data) {
+      draftId = data.draft.did;
+		  sweetSuccess("保存成功");
 		})
 		.catch(function (data) {
-			// console.log(data)
-			jwarning(data.error);
+      sweetError(data);
 		})
 }
 
