@@ -50,7 +50,7 @@ const paths = {
 const pathsObj = {};
 for(const key in paths) {
   if(!paths.hasOwnProperty(key)) continue;
-  pathsObj[key] = path.resolve(paths[key]);
+  pathsObj[key] = path.resolve(__dirname, "../" + paths[key]);
 }
 
 function extGetPath(ext) {
