@@ -30,7 +30,7 @@ NKC.modules.SelectResource = function() {
       user: "",
       pageType: "list", // list: 资源列表, uploader: 上传
       resourceType: "", // all, picture, video, audio, attachment
-      quota: 30,
+      quota: 20,
       paging: {},
       pageNumber: "",
       resources: [],

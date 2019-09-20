@@ -10,7 +10,7 @@ resourceRouter
     const {user} = data;
     const {type, channel} = query;
     const messageFile = await db.MessageFileModel.findOnly({_id});
-    if(messageFile.targetUid !== user.uid && messageFile.uid !== user.uid) ctx.throw(403, '权限不足');
+    if(messageFile.targetUid !== user.uid && messageFile.uid !== user.uid && !ctx.permission("getAllMessagesResources")) ctx.throw(403, '权限不足');
     let {path, ext} = messageFile;
     let filePath = PATH.join(settings.upload.messageFilePath, path);
     if(channel && channel === "mp3") {

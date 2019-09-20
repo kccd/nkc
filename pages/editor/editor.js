@@ -130,10 +130,12 @@ function initVueApp() {
           .catch(function() { // 用户选择了取消加载，则启动自动保存草稿且开启关闭页面的警告
             self.autoSaveToDraft();
             self.showCloseInfo = true;
+            self.getContentFromLocal();
           })
       } else { // 没有未提交的相应草稿，启动自动保存草稿且开启关闭页面的警告
         self.autoSaveToDraft();
         self.showCloseInfo = true;
+        self.getContentFromLocal();
       }
     },
     watch: {
@@ -184,6 +186,13 @@ function initVueApp() {
       fromNow: NKC.methods.fromNow,
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
+      // app判断本地存储
+      getContentFromLocal: function() {
+        // 当且仅当发表新文章时才去判断
+        if(NKC.methods.getRunType() === "app" && data.type === "newThread" && (!data.post || !data.post.c)) {
+          setLocalContentToUE();
+        }
+      },
       removeCover: function() {
         this.cover = "";
         this.coverData = "";
@@ -372,7 +381,9 @@ function initVueApp() {
           self.keyWordsCn = [];
           var keywordCn = data[0].value;
           var keywordEn = data[1].value;
-          var cnArr = keywordCn.split("，");
+          keywordCn = keywordCn.replace(/，/ig, ",");
+          keywordEn = keywordEn.replace(/，/ig, ",");
+          var cnArr = keywordCn.split(",");
           var enArr = keywordEn.split(",");
           for(var i = 0; i < cnArr.length; i++) {
             var cn = cnArr[i];
@@ -393,12 +404,12 @@ function initVueApp() {
         }, {
           data: [
             {
-              label: "中文，添加多个请以中文逗号分隔",
+              label: "中文，添加多个请以逗号分隔",
               dom: "textarea",
               value: this.keyWordsCn.join("，")
             },
             {
-              label: "英文，添加多个请以英文逗号分隔",
+              label: "英文，添加多个请以逗号分隔",
               dom: "textarea",
               value: this.keyWordsEn.join(",")
             }
@@ -771,7 +782,6 @@ function mediaInsertUE(rid, fileType, name) {
 
 // 适配app，将编辑器内容存在app本地
 function saveUEContentToLocal() {
-  alert(1);
   var content = editor.getContent();
   api.setPrefs({
     key: "ueContent",
@@ -781,16 +791,140 @@ function saveUEContentToLocal() {
 
 // 适配app，将编辑器内容存在app本地
 function setLocalContentToUE() {
-  alert(2);
-  apiready = function() {
-    var content = api.getPrefs({
-      key: "ueContent",
-      sync: true
-    });
-    editor.setContent(content);
-  }
+  var content = api.getPrefs({
+    key: "ueContent",
+    sync: true
+  });
+  editor.setContent(content);
 }
 
+// app相关编辑功能
+
+/**
+ * app视频拍摄、上传、及插入
+ */
+function appUpdateVideo() {
+  var protocol = window.location.protocol;
+  var host = window.location.host;
+  var url = protocol + "//" + host + "/r";
+  $("#attach").css("display", "none");
+  api.getPicture({
+    sourceType: 'camera',
+    encodingType: 'jpg',
+    mediaValue: 'video',
+    destinationType: 'url',
+    allowEdit: false,
+    quality: 100,
+    saveToPhotoAlbum: false,
+    videoQuality: "medium"
+  }, function(ret, err) {
+    if (ret) {
+      api.toast({
+        msg: "视频正在处理，请稍后...",
+        duration: 3000,
+        location: "bottom"
+      })
+      api.ajax({
+        url: url,
+        method: "post",
+        timeout: 15,
+        headers: {
+          "FROM":"nkcAPI"
+        },
+        data:{
+          values: {},
+          files: {
+            file: ret.data
+          }
+        }
+      },function(ret, err) {
+        if(ret) {
+          mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname);
+          api.toast({
+            msg: "视频处理完毕",
+            duration: 1000,
+            location: "bottom"
+          })
+        }else{
+          api.toast({
+            msg: "视频处理失败，请检查当前网络环境...",
+            duration: 1000,
+            location: "bottom"
+          })
+        }
+      })
+    } else {
+      api.toast({
+        msg: "已取消视频处理",
+        duration: 1000,
+        location: "bottom"
+      })
+    }
+  });
+}
+
+/**
+ * app图片拍摄、上传、及插入
+ */
+function appUpdateImage() {
+  var protocol = window.location.protocol;
+  var host = window.location.host;
+  var url = protocol + "//" + host + "/r";
+  $("#attach").css("display", "none");
+  api.getPicture({
+    sourceType: 'camera',
+    encodingType: 'jpg',
+    mediaValue: 'pic',
+    destinationType: 'url',
+    allowEdit: false,
+    quality: 100,
+    saveToPhotoAlbum: false
+  }, function(ret, err) {
+    if (ret) {
+      api.toast({
+        msg: "图片正在处理，请稍后...",
+        duration: 2000,
+        location: "bottom"
+      })
+      api.ajax({
+        url: url,
+        method: "post",
+        timeout: 15,
+        headers: {
+          "FROM":"nkcAPI",
+        },
+        data: {
+          values: {},
+          files:{
+            file: ret.data
+          }
+        }
+      }, function(ret ,err) {
+        if(ret) {
+          mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname);
+          api.toast({
+            msg: "图片已处理",
+            duration: 1000,
+            location: "bottom"
+          })
+        }else{
+          api.toast({
+            msg: "已取消图片处理",
+            duration: 1000,
+            location: "bottom"
+          })
+          console.log(JSON.stringify(err))
+        }
+      })
+    } else {
+      api.toast({
+        msg: "已取消图片处理",
+        duration: 1000,
+        location: "bottom"
+      })
+    }
+  });
+}
 
 // 监听页面变化，调整工具栏位置
 window.onresize=function(){

@@ -22,7 +22,7 @@ table{
   margin-left: 0.5rem;
 }
 .m-b-05{
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem!important;
 }
 .m-r-05{
   margin-right: 0.5rem;

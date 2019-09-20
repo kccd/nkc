@@ -89,6 +89,7 @@ operationObj.defaultOperations = [
   "getAttachments", // 获取附件
   "showSecretSurvey", // 查看隐藏的调查结果
   "showSurveyCertLimit", // 发起调查时可更具证书限制参与的用户
+  "getAllMessagesResources", // 查看所有的短消息资源
 ];
 
 

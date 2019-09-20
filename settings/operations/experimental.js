@@ -267,6 +267,9 @@ module.exports = {
 		secret: {
 			GET: 'visitSecretLogs'
 		},
+    message: {
+		  GET: "visitMessageLogs"
+    },
 		share: {
 			GET: 'visitShareLogs'
 		},

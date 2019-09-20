@@ -53,6 +53,9 @@
           span=`${lang('ex', 'viewRecord')} `
           span.fa.fa-caret-down
         ul.dropdown-menu
+          if permission("visitMessageLogs")
+            li
+              a(href='/e/log/message') 短消息
           li
             a(href='/e/log/withdraw') 提现
           li

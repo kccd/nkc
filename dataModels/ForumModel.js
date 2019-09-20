@@ -342,7 +342,10 @@ forumSchema.methods.extendBasicThreads = async function() {
     var index = basicThreadsId.indexOf(thread.oc);
     threads[index] = thread;
   });
-	return this.basicThreads = await ThreadModel.extendThreads(threads);
+	return this.basicThreads = await ThreadModel.extendThreads(threads, {
+    htmlToText: true,
+    count: 200,
+  });
 };
 // 值得阅读
 forumSchema.methods.extendValuableThreads = async function() {
@@ -354,7 +357,10 @@ forumSchema.methods.extendValuableThreads = async function() {
     var index = valuableThreadsId.indexOf(thread.oc);
     threads[index] = thread;
   });
-	return this.valuableThreads = await ThreadModel.extendThreads(threads);
+	return this.valuableThreads = await ThreadModel.extendThreads(threads, {
+    htmlToText: true,
+    count: 200,
+  });
 };
 
 // 公告
@@ -367,7 +373,10 @@ forumSchema.methods.extendNoticeThreads = async function() {
     var index = noticeThreadsId.indexOf(thread.oc);
     threads[index] = thread;
   });
-	return this.noticeThreads = await ThreadModel.extendThreads(threads);
+	return this.noticeThreads = await ThreadModel.extendThreads(threads, {
+    htmlToText: true,
+    count: 200,
+  });
 };
 /*
 * 更新多个专业的数据

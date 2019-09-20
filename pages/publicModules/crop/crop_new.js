@@ -15,13 +15,11 @@ if (!HTMLCanvasElement.prototype.toBlob) {
     }
   });
 }
-
-$('#moduleCrop').modal({
-  show: false,
-  backdrop: "static"
-});
 NKC.methods.selectImage = function(o) {
-
+  $('#moduleCrop').modal({
+    show: false,
+    backdrop: "static"
+  });
   var options = {
     viewMode:0,
     aspectRatio: 1,
