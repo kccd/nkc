@@ -706,7 +706,6 @@ function appAttachHideOrShow() {
  * 将编辑器中的内容存入至localStorage中
  */
 function saveUEContentToLocal() {
-  alert(1);
   var content = ue.getContent();
   api.setPrefs({
     key: "ueContent",
@@ -719,8 +718,7 @@ function saveUEContentToLocal() {
  */
 
 function setLocalContentToUE() {
-  alert(2);
-  apiready = function() {  
+  apiready = function() {
     var content = api.getPrefs({
       key: "ueContent",
       sync: true
