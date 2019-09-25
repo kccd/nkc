@@ -109,7 +109,8 @@ meRouter
   .get('/media', async (ctx, next) => {
     const {user} = ctx.data;
     const {db, data, nkcModules} = ctx;
-    let {quota, skip, type} = ctx.query;
+    let {quota, skip, type, c} = ctx.query;
+    if(!c) c = "all";
     quota = parseInt(quota);
     skip = parseInt(skip);
     let queryMap;
@@ -123,6 +124,11 @@ meRouter
       queryMap = {"uid": user.uid, "mediaType": "mediaAudio"};
     }else{
       queryMap = {"uid": user.uid, "mediaType": "mediaAttachment"};
+    }
+    if(c === "unused") {
+      queryMap["references.0"] = {$exists: false};
+    } else if(c === "used") {
+      queryMap["references.0"] = {$exists: true};
     }
     let newSkip = quota * skip;
     let mediaCount = await db.ResourceModel.find(queryMap).count();

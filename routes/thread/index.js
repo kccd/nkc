@@ -696,11 +696,11 @@ threadRouter
     }
 
 		// 关注的用户
+    data.postSettings = await db.SettingModel.getSettings('post');
 		if(data.user) {
 			if(!data.user.volumeA) {
 				// 加载考试设置
 				// data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
-				data.postSettings = await db.SettingModel.getSettings('post');
 				const today = nkcModules.apiFunction.today();
         const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: data.user.uid});
         let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: data.user.uid});

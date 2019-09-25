@@ -176,7 +176,7 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   const messageSettings = (await mongoose.model("settings").findById("message")).c;
   const {customizeLimitInfo} = messageSettings;
   const userGeneral = await UsersGeneralModel.findOnly({uid: targetUser.uid});
-  const {status, timeLimit, digestLimit, xsfLimit, gradeLimit} = userGeneral.messageSettings.limit;
+  const {status, timeLimit, digestLimit, xsfLimit, gradeLimit, volumeA, volumeB} = userGeneral.messageSettings.limit;
   const throwLimitError = () => {
     throwErr(403, customizeLimitInfo);
   };
@@ -194,6 +194,12 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     }
     // 有学术分
     if(xsfLimit && user.xsf <= 0) throwLimitError();
+    // 是否通过相应考试。通过B卷默认通过A卷。
+    if(volumeB) {
+      if(!user.volumeB) throwLimitError();
+    } else if(volumeA) {
+      if(!user.volumeA) throwLimitError();
+    }
     if(!user.grade) await user.extendGrade();
     // 达到一定等级
     if(Number(gradeLimit) > Number(user.grade._id)) throwLimitError();

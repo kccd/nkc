@@ -51,8 +51,6 @@ var app = new Vue({
       var results = this.postSettings[this.type];
       var results_ = JSON.parse(JSON.stringify(results));
       var exam = results_.exam;
-      results_.authLevel = Number(results_.authLevel);
-      if(results_.authLevel < 0 || results_.authLevel > 3) return screenTopWarning('认证等级设置错误: ' + results_.authLevel);
       results_.exam = {
         volumeA: exam.indexOf('volumeA') !== -1,
         volumeB: exam.indexOf('volumeB') !== -1,
@@ -66,6 +64,8 @@ var app = new Vue({
         roles: app.roles,
         grades: app.grades
       };
+      delete results_.examCountLimit;
+      delete results_.authLevel;
       obj[this.type] = results_;
       nkcAPI('/e/settings/post', 'PATCH', obj)
         .then(function() {

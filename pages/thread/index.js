@@ -309,8 +309,8 @@ function cancelTopped(tid) {
 function assemblePostObject(){  //bbcode , markdown
 	var quoteHtml = document.getElementById('quoteContent').innerHTML;
 	var replyHtml = ue.getContent();
-	if(replyHtml.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
-	var replyContent = quoteHtml + replyHtml
+	// if(replyHtml.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
+	var replyContent = quoteHtml + replyHtml;
 	var post = {
 		//t:gv('title').trim(),
 
@@ -335,47 +335,103 @@ function assemblePostObject(){  //bbcode , markdown
 	return post
 }
 
+// 公式处理
+function modifyMathJax() {
+  $("#ReplyContent").find(".MathJax_Preview").each(function(){
+    if($(this).next().next().length !== 0){
+      var mathfur;
+      if($(this).next().next().attr("type").length > 15){
+        mathfur = "$$" + $(this).next().next().html() + "$$";
+      }else{
+        mathfur = "$" + $(this).next().next().html() + "$";
+      }
+      $(this).next().next().replaceWith(mathfur);
+      $(this).next().replaceWith("");
+      $(this).replaceWith("")
+    }else{
+      $(this).parent().remove()
+    }
+  });
+}
+// 构建post数据
+function getPost() {
+  var post = assemblePostObject();
+  if(!post || post.c.replace(/<[^>]+>/g,"") === ''){
+    throw "请填写回复内容"
+  }
+  // 专栏文章分类
+  post.columnCategoriesId = getSelectedColumnCategoriesId();
+  var sendAnonymousPostDom = $("#sendAnonymousPost");
+  if(sendAnonymousPostDom.length) {
+    post.anonymous = sendAnonymousPostDom.prop("checked");
+  }
+  return post;
+}
 
 // 保存草稿
 function saveDraft(threadId,userId){
-	$("#ReplyContent").find(".MathJax_Preview").each(function(){
-		if($(this).next().next().length !== 0){
-			if($(this).next().next().attr("type").length > 15){
-				var mathfur = "$$" + $(this).next().next().html() + "$$";
-			}else{
-				var mathfur = "$" + $(this).next().next().html() + "$";
-			}
-			$(this).next().next().replaceWith(mathfur);
-			$(this).next().replaceWith("");
-			$(this).replaceWith("")
-		}else{
-			$(this).parent().remove()
-		}
-	})
-	var post = assemblePostObject();
-	// var quoteContent = document.getElementById("quoteContent").innerHTML;
-	// post.c = post.c
-	if(post.c.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
-	post.t = '';
-	var method = "POST";
-	var url = "/u/"+userId+"/drafts";
-	var data = {
-	  post: post,
-    draftId: draftId,
-    desType: "thread",
-    desTypeId: threadId
-	};
-	return nkcAPI(url, method, data)
-		.then(function (data) {
+  Promise.resolve()
+    .then(function() {
+      modifyMathJax();
+      // 获取回复的内容
+      var post = getPost();
+      post.t = '';
+      var method = "POST";
+      var url = "/u/"+userId+"/drafts";
+      var data = {
+        post: post,
+        draftId: draftId,
+        desType: "thread",
+        desTypeId: threadId
+      };
+      return nkcAPI(url, method, data)
+    })
+    .then(function(data) {
       draftId = data.draft.did;
-		  sweetSuccess("保存成功");
-		})
-		.catch(function (data) {
+      sweetSuccess("保存成功");
+    })
+    .catch(function(data) {
       sweetError(data);
-		})
+    });
+}
+// 设置回复提交按钮的样式
+function setSubmitButton(submitting) {
+  // 正在提交
+  var button = $("#ButtonReply");
+  if(submitting) {
+    button.attr("disabled", "disabled");
+    button.html("回复中... <span class='fa fa-spinner fa-spin'>");
+  } else { // 未提交
+    button.removeAttr("disabled");
+    button.html("回复");
+  }
+}
+// 发表回复
+function submit(tid) {
+  Promise.resolve()
+    .then(function() {
+      // 屏蔽发表按钮
+      setSubmitButton(true);
+      modifyMathJax();
+      // 获取回复的内容
+      var post = getPost();
+      if(draftId) {
+        post.did = draftId;
+      }
+      return nkcAPI('/t/' + tid, 'POST', {
+        post: post,
+      })
+    })
+    .then(function(data) {
+      openToNewLocation(data.redirect);
+    })
+    .catch(function(data) {
+      sweetError(data);
+      setSubmitButton(false);
+    })
 }
 
-// 发表回复
+/*// 发表回复
 function submit(tid){
 	$("#ReplyContent").find(".MathJax_Preview").each(function(){
 		if($(this).next().next().length !== 0){
@@ -423,7 +479,7 @@ function submit(tid){
 			screenTopWarning(data || data.error);
 			geid('ButtonReply').disabled=false;
 		})
-}
+}*/
 
 // 取消引用
 function cancelQuote(){
@@ -962,7 +1018,6 @@ function getSelectedColumnCategoriesId() {
   var status = ColumnCategoriesDom.getStatus();
   if(status.checkbox) {
     if(status.selectedCategoriesId.length === 0) {
-      geid('ButtonReply').disabled=false;
       throw("请选择专栏文章分类");
     }
   }

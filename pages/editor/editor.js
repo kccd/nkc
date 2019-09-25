@@ -22,7 +22,7 @@ var EditorReady = false;
 var data;
 $(function() {
   data = NKC.methods.getDataById("data");
-  editor = UE.getEditor("content", NKC.configs.editor.defaultOptions);
+  editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.addListener( 'ready', function( editor ) {
     // 编辑器准备就绪
     // 计算工具栏上边距
@@ -131,11 +131,13 @@ function initVueApp() {
             self.autoSaveToDraft();
             self.showCloseInfo = true;
             self.getContentFromLocal();
+            self.alertPermissionInfo();
           })
       } else { // 没有未提交的相应草稿，启动自动保存草稿且开启关闭页面的警告
         self.autoSaveToDraft();
         self.showCloseInfo = true;
         self.getContentFromLocal();
+        self.alertPermissionInfo();
       }
     },
     watch: {
@@ -186,6 +188,11 @@ function initVueApp() {
       fromNow: NKC.methods.fromNow,
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
+      alertPermissionInfo: function() {
+        if(data.permissionInfo) {
+          sweetInfo("你暂无法发表内容，因为" + data.permissionInfo + "。");
+        }
+      },
       // app判断本地存储
       getContentFromLocal: function() {
         // 当且仅当发表新文章时才去判断

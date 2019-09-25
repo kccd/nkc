@@ -64,7 +64,27 @@ var floatUserPanel = new Vue({
       }
       this.top = parseInt(offset.top) - scrollTop + dom.height() + 15;
       var user = this.usersObj[uid];
-      var func;
+      Promise.resolve()
+        .then(function() {
+          if(!user) {
+            return nkcAPI("/u/" + uid + "?from=panel", "GET")
+          }
+        })
+        .then(function(data) {
+          if(!user) {
+            if(this_.uid !== data.targetUser.uid) return;
+            user = data.targetUser;
+            this_.usersObj[user.uid] = user;
+          }
+          this_.user = user;
+        })
+        .catch(function(data) {
+          // 临时解决办法。已知遨游浏览器在页面跳转时，向服务器再发送请求将触发此错误。
+          if(data !== "发起请求失败，请检查网络连接") {
+            sweetError(data);
+          }
+        });
+      /*var func;
       if(user) {
         func = Promise.resolve();
       } else {
@@ -80,8 +100,11 @@ var floatUserPanel = new Vue({
           this_.user = user;
         })
         .catch(function(data) {
-          sweetError(data);
-        });
+          // 临时解决办法。已知遨游浏览器在页面跳转时，向服务器再发送请求将触发此错误。
+          if(data !== "发起请求失败，请检查网络连接") {
+            sweetError(data);
+          }
+        });*/
     }
     /*open: function(userString) {
       clearTimeout(this.timeout);

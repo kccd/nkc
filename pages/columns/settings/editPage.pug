@@ -14,7 +14,7 @@ block settingsContent
         .form-group
           label 页面内容（必填）
           #pageContent
-        .form-group
+        //-.form-group
           include ../../media/media_index
         .form-group
           button.btn.btn-primary(onclick="save()") 保存
@@ -22,5 +22,5 @@ block scripts
   include ../../ueditor/ueditorBase
   include ../../publicModules/crop/crop
   include ../../publicModules/selectResource/selectResource
-  +includeJS("/media/media_index.js")
+  //+includeJS("/media/media_index.js")
   +includeJS("/columns/settings/editPage.js")

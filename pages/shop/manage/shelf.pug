@@ -388,7 +388,8 @@ block name
               .form-group
                 label.col-sm-1.control-label 详细描述
                 .col-sm-10
-                  include ../../ueditor/ueditor.pug    
+                  // 加载编辑器的容器
+                  script#container(name='content', type='text/plain')
                   .checkbox-inline(style="display:none")
                     label
                       input#ParseURL(type='checkbox' checked)
@@ -525,6 +526,8 @@ block name
           button.btn.btn-default.btn-sm(type='button', data-dismiss='modal' style="margin-right:10px") 取消
 
 block manageScripts
+  include ../../publicModules/selectResource/selectResource
+  include ../../ueditor/ueditor
   +includeJS("/mdui/js/mdui.min.js")
   link(href="/jquery-ui-1.10.4.custom.css" rel="stylesheet")
   +includeJS("/jquery-ui-1.10.4.custom.js")
@@ -532,15 +535,14 @@ block manageScripts
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
   +includeJS("/bootstrap/js/bootstrap-tagsinput.js")
   //- +includeJS("/module_forum_settings.js")
-  +includeJS("/interface_common.js")
   //- +includeJS("/module_dropdown.js")
   +includeJS("/commonmark/dist/commonmark.js")
   +includeJS("/xbbcode-parser/xbbcode.js")
   +includeJS("/xss/dist/xss.js")
   +includeJS("/nkc_render.js")
   include ../../publicModules/moveThread/moveThread.pug
-  +includeJS("/shop/manage/shelf.js")
   include ../../publicModules/crop/crop
+  +includeJS("/shop/manage/shelf.js")
   +includeJS("/media/media_index.js")
   script.
     window.onbeforeunload = function() {

@@ -22,22 +22,22 @@ block content
                 h4 最小认证等级
               .col-sm-10
                 <label class="mdui-radio mdui-m-r-2">
-                <input type="radio" value='0' v-model='postSettings[type].authLevelMin' />
+                <input type="radio" :value='0' v-model='postSettings[type].authLevelMin' />
                 <i class="mdui-radio-icon"></i>
                 | 等级0（已注册）
                 </label>
                 <label class="mdui-radio mdui-m-r-2">
-                <input type="radio" value='1' v-model='postSettings[type].authLevelMin' />
+                <input type="radio" :value='1' v-model='postSettings[type].authLevelMin' />
                 <i class="mdui-radio-icon"></i>
                 | 等级1（绑定手机号码）
                 </label>
                 <label class="mdui-radio">
-                <input type="radio" value='2' v-model='postSettings[type].authLevelMin'/>
+                <input type="radio" :value='2' v-model='postSettings[type].authLevelMin'/>
                 <i class="mdui-radio-icon"></i>
                 | 等级2（身份证正反面照）
                 </label>
                 <label class="mdui-radio">
-                <input type="radio" value='3' v-model='postSettings[type].authLevelMin'/>
+                <input type="radio" :value='3' v-model='postSettings[type].authLevelMin'/>
                 <i class="mdui-radio-icon"></i>
                 | 等级3（手持省份证照）
                 </label>

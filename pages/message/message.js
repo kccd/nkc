@@ -190,7 +190,9 @@ $(function() {
           (targetUserSendLimit.timeLimit && new Date(this.user.toc).getTime() > Date.now() - 30*24*60*60*1000) ||
           (targetUserSendLimit.digestLimit && this.userDigestThreadCount === 0) ||
           (targetUserSendLimit.xsfLimit && this.user.xsf <= 0) ||
-          (targetUserSendLimit.gradeLimit > this.user.grade._id)
+          (targetUserSendLimit.gradeLimit > this.user.grade._id) ||
+          (targetUserSendLimit.volumeB && !this.user.volumeB) ||
+          (!targetUserSendLimit.volumeB && targetUserSendLimit.volumeA && !this.user.volumeA)
         ) return true;
       },
       showSystemLimitInfo: function() {
@@ -924,6 +926,8 @@ $(function() {
           !messageLimit.timeLimit &&
           !messageLimit.digestLimit &&
           !messageLimit.xsfLimit &&
+          !messageLimit.volumeA &&
+          !messageLimit.volumeB &&
           Number(messageLimit.gradeLimit) < 2
         ) {
           return screenTopWarning("请至少勾选一项防骚扰设置");

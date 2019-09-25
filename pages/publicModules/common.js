@@ -230,6 +230,8 @@ NKC.methods.getSize = function(size, digits) {
 };
 /*
 * 获取随机颜色
+* @return {String} 颜色16进制带#
+* @author pengxiguaa 2019-29-25
 * */
 NKC.methods.getRandomColor = function() {
   var str = "0123456789abcdef";
@@ -242,6 +244,9 @@ NKC.methods.getRandomColor = function() {
 };
 /*
 * 资源对象转html
+* @param {Object} resource 资源对象
+* @return {String} html字符串
+* @author pengxiguaa 2019-9-25
 * */
 NKC.methods.resourceToHtml = function(resource) {
   var name = resource.oname;
@@ -258,4 +263,20 @@ NKC.methods.resourceToHtml = function(resource) {
     html = "<p><a href=" + "/r/" + rid + "><img src=" + "/default/default_thumbnail.png" + ">" + name + "</a></p>";
   }
   return html;
+};
+
+/*toAppLogin
+* 跳转到登录/注册。手机端打开登录window，网页端打开登录弹窗。
+* @param {String} type register: 打开注册页, login: 打开登录页。仅针对网页端，app无效。
+* @author pengxiguaa 2019-9-25
+* */
+NKC.methods.toLogin = function(type) {
+  var runType = NKC.methods.getRunType();
+  if(runType === "app") {
+    if(window.toAppLogin) {
+      toAppLogin();
+    }
+  } else {
+    Login.open(type === "register"? "register": "login");
+  }
 };

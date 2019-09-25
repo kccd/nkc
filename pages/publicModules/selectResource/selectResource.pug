@@ -1,78 +1,77 @@
-+includeCSS("/publicModules/selectResource/selectResource.css")
-.modal.fade#moduleSelectResource(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-  .modal-dialog(role="document" v-cloak)#moduleSelectResourceApp
-    .modal-content
-      .modal-header
-        button.close(data-dismiss="modal" aria-label="Close")
-          span(aria-hidden="true") &times;
-        .modal-title {{pageType==="list"?"附件列表":"附件上传"}}
-      div(v-if="pageType === 'list'")
-        .modal-body(v-if="loading").text-center
-          .m-t-4.m-b-4
-            b 加载中...
-        .modal-body(v-else)
-          .selected-resources
-            .resource-types
-              .resource-type(v-if="show.all" :class="{'active':resourceType === 'all'}" @click="selectResourceType('all')") 全部
-              .resource-type(v-if="show.picture" :class="{'active':resourceType === 'picture'}" @click="selectResourceType('picture')") 图片
-              .resource-type(v-if="show.video" :class="{'active':resourceType === 'video'}" @click="selectResourceType('video')") 视频
-              .resource-type(v-if="show.audio" :class="{'active':resourceType === 'audio'}" @click="selectResourceType('audio')") 音频
-              .resource-type(v-if="show.attachment" :class="{'active':resourceType === 'attachment'}" @click="selectResourceType('attachment')") 附件
-          .resources
-            mixin resourcePaging
-              .resource-paging(v-if="paging").m-t-05
-                .paging-button(v-if="paging.buttonValue.length > 1")
-                  a.button.radius-left(title="上一页" @click="changePage('last')")
-                    .fa.fa-angle-left
-                  a.button.radius-right(title="下一页" @click="changePage('next')")
-                    .fa.fa-angle-right
-                .paging-button
-                  span(v-for="b, index in paging.buttonValue")
-                    span(v-if="b.type === 'active'")
-                      a.button.active(@click="getResources(b.num)"
-                        :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
-                      ) {{b.num+1}}
-                    span(v-else-if="b.type === 'common'")
-                      a.button(@click="getResources(b.num)"
-                        :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
-                      ) {{b.num+1}}
-                    span(v-else)
-                      a.button ...
-                .paging-button(v-if="paging.buttonValue.length")
-                  span(style="font-size: 1rem;") 跳转到&nbsp;
-                  input.input.radius-left(type="text" v-model.number="pageNumber")
-                  a.button.radius-right(@click="fastSelectPage") 确定
-            +resourcePaging
-            .resources-body
-              .resource-info(v-if="!resources.length") 空空如也~
-              .resource(v-else v-for="r, index in resources" :class="{'active':selectedResourcesId.indexOf(r.rid) !== -1}"
-                @click="selectResource(r)"
-                :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname"
-              )
-                .resource-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(/rt/' + r.rid + ')'")
-                .resource-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(/frameImg/' + r.rid + ')'")
-                .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
-                .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
-                .resource-name
-                  span(v-if="r.mediaType === 'mediaVideo'") (视频)
-                  span {{r.oname}}
-                div(v-if="!fastSelect")
-                  .resource-mask.active(v-if="selectedResourcesId.indexOf(r.rid) !== -1")
-                    .fa.fa-check-square-o
-                  .resource-mask(v-else)
-                    .fa.fa-square-o
-                  .resource-index(v-if="selectedResourcesId.indexOf(r.rid) !== -1") {{selectedResourcesId.indexOf(r.rid) + 1}}
-        .modal-footer(v-if="!loading")
++includeCSS("/publicModules/selectResource/selectResource.1.0.css")
+#moduleSelectResource
+  mixin resourcePaging
+    .resource-paging(v-if="paging && paging.buttonValue").m-t-05
+      .paging-button(v-if="paging.buttonValue.length > 1")
+        a.button.radius-left(title="上一页" @click="changePage('last')")
+          .fa.fa-angle-left
+        a.button.radius-right(title="下一页" @click="changePage('next')")
+          .fa.fa-angle-right
+      .paging-button(v-if="screenType !== 'sm'")
+        span(v-for="b, index in paging.buttonValue")
+          span(v-if="b.type === 'active'")
+            a.button.active(@click="getResources(b.num)"
+              :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+            ) {{b.num+1}}
+          span(v-else-if="b.type === 'common'")
+            a.button(@click="getResources(b.num)"
+              :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+            ) {{b.num+1}}
+          span(v-else)
+            a.button ...
+      .paging-button(v-if="paging.buttonValue.length")
+        span(style="font-size: 1rem;") 跳转到&nbsp;
+        input.input.radius-left(type="text" v-model.number="pageNumber")
+        a.button.radius-right(@click="fastSelectPage") 确定
+  #moduleSelectResourceApp(v-cloak)
+    .module-sr-body
+      .module-sr-header
+        .module-sr-title 资源管理
+        .fa.fa-remove(@click="close")
+      .module-sr-content(v-if="pageType === 'list'")
+        .selected-resources
+          .resource-types.m-b-05(v-if="allowedExt && allowedExt.length > 1")
+            .resource-type(v-if="show.all" :class="{'active':resourceType === 'all'}" @click="selectResourceType('all')") 全部
+            .resource-type(v-if="show.picture" :class="{'active':resourceType === 'picture'}" @click="selectResourceType('picture')") 图片
+            .resource-type(v-if="show.video" :class="{'active':resourceType === 'video'}" @click="selectResourceType('video')") 视频
+            .resource-type(v-if="show.audio" :class="{'active':resourceType === 'audio'}" @click="selectResourceType('audio')") 音频
+            .resource-type(v-if="show.attachment" :class="{'active':resourceType === 'attachment'}" @click="selectResourceType('attachment')") 附件
+          .resource-types
+            .resource-type(:class="{'active':category === 'all'}" @click="selectCategory('all')") 全部
+            .resource-type(:class="{'active':category === 'unused'}" @click="selectCategory('unused')") 未使用
+            .resource-type(:class="{'active':category === 'used'}" @click="selectCategory('used')") 已使用
+        .resources-paging
+          +resourcePaging
+        .resources-body
+          .resource-info(v-if="!resources.length") 空空如也~
+          .resource(v-else v-for="r, index in resources" :class="{'active':selectedResourcesId.indexOf(r.rid) !== -1}"
+            @click="selectResource(r)"
+            :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname"
+            )
+            .resource-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(/rt/' + r.rid + ')'")
+            .resource-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(/frameImg/' + r.rid + ')'")
+            .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
+            .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
+            .resource-name
+              span(v-if="r.mediaType === 'mediaVideo'") (视频)
+              span {{r.oname}}
+            div(v-if="!fastSelect")
+              .resource-mask.active(v-if="selectedResourcesId.indexOf(r.rid) !== -1")
+                .fa.fa-check-square-o
+              .resource-mask(v-else)
+                .fa.fa-square-o
+              .resource-index(v-if="selectedResourcesId.indexOf(r.rid) !== -1") {{selectedResourcesId.indexOf(r.rid) + 1}}
+        .module-sr-footer
           .pull-left
             button.btn.btn-default.btn-sm(@click="changePageType('uploader')") 去上传
             button.btn.btn-default.btn-sm(@click="crash") 刷新
-          button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
+          button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
           button(type="button" class="btn btn-primary btn-sm" @click="done" v-if="!fastSelect") 确定
-      div(v-else)
-        .modal-body
+      .module-sr-content(v-else)
+        div
           input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
           button.btn.btn-default.btn-sm(@click="clickInput") 选择本地文件
-          .resources-body.upload-list
+          .upload-list(:style="screenType === 'sm'? 'max-height:' + windowHeight*0.6 + 'px;':'max-height: 22rem;'")
             div(v-if="!files.length").p-t-3.p-b-3.text-center
               b 空空如也~
             .file-lists(v-else)
@@ -90,9 +89,8 @@
                     span 处理中...
                   .fa.fa-check.upload-success(v-else-if="f.status === 'uploaded'" @click="removeFile(index)")
                 .text-danger.file-error(v-if="f.error") error：{{f.error}}
-        .modal-footer
+        .module-sr-footer
           .pull-left
             button.btn.btn-default.btn-sm(@click="changePageType('list')") 返回列表
-          button(type="button" class="btn btn-default btn-sm" data-dismiss="modal") 关闭
-
-+includeJS("/publicModules/selectResource/selectResource.js")
+          button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
++includeJS("/publicModules/selectResource/selectResource.1.0.js")

@@ -1,12 +1,6 @@
-// 根据不同页面传递不同参数
-var pathName = window.location.pathname;
-var initialFrameHeight = 200;
-var topOffset = 0;
-if(pathName.indexOf("editor") > -1) {
-  initialFrameHeight = 500
-  topOffset = 50;
-}
-// 获取header高度
+var ue = UE.getEditor('container', NKC.configs.ueditor.postConfigs);
+
+/*
 var ue = UE.getEditor('container', {
   toolbars: [
     [
@@ -24,4 +18,4 @@ var ue = UE.getEditor('container', {
   elementPathEnabled: false, // 是否显示元素路径
   imageScaleEnabled: false, // 启用图片拉伸缩放
   zIndex : 499
-});
+});*/
