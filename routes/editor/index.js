@@ -192,6 +192,15 @@ router
     if(["modifyThread", "newThread"].includes(data.type)) {
       data.createSurveyPermission = await db.SurveyModel.ensureCreatePermission("postToForum", data.user.uid);
     }
+
+    if(data.type === "newThread") {
+      try{
+        await db.UserModel.ensurePostThreadPermission(user.uid);
+      } catch(err) {
+        data.permissionInfo = err.message;
+      }
+    }
+
     await next();
   });
 module.exports = router;

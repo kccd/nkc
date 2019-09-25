@@ -6,11 +6,11 @@ block errorContent
     ul
       li
         .num 1
-        | 必须通过至少一个专业的B卷考试
+        | 通过至少一个专业的B卷考试，且符合有关要求（包括但不限于精选文章数、账号等级、学术分）。
 
     .error-code
       span message：
       code= data.error
-    .error-info 立即
+    .error-info 如果尚未通过B卷考试，请
       a(href=`/exam`) 参加考试
-      | 获取专业证书。
+      |。

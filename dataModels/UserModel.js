@@ -1480,4 +1480,57 @@ userSchema.statics.checkModifyUsername = async (uid) => {
     throwErr(400, "科创币不足");
   return kcb;
 };
+
+/*
+* 验证发表文章权限，编辑器提示。
+* */
+userSchema.statics.ensurePostThreadPermission = async (uid) => {
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
+  const ThreadModel = mongoose.model("threads");
+  const apiFunction = require("../nkcModules/apiFunction");
+  const user = await UserModel.findOne({uid});
+  if(!user) return throwErr(500, `未找到ID为${uid}的用户信息`);
+  await user.extendAuthLevel();
+  const postSettings = await SettingModel.getSettings("post");
+  const {authLevelMin, exam} = postSettings.postToForum;
+  const {volumeA, volumeB, notPass} = exam;
+  const {status, countLimit, unlimited} = notPass;
+  const today = apiFunction.today();
+  const todayCount = await ThreadModel.count({toc: {$gt: today}, uid: user.uid});
+  if(authLevelMin > user.authLevel) {
+    if(authLevelMin === 1) throwErr(403, "你还未绑定手机号");
+    if(authLevelMin === 2) throwErr(403, "你还未完成身份认证2");
+    if(authLevelMin === 3) throwErr(403, "你还未完成身份认证3");
+  }
+  if(user.volumeB) {
+    if(!volumeB) throwErr(403, "发表文章功能已关闭");
+  } else if(user.volumeA) {
+    if(!volumeA) {
+      if(!volumeB) {
+        throwErr(403, "发表文章功能已关闭");
+      } else {
+        throwErr(403, "你还未通过B卷考试");
+      }
+    }
+  } else {
+    if(!status) {
+      if(volumeA) {
+        throwErr(403, "你还未通过A卷考试");
+      } else if(volumeB) {
+        throwErr(403, "你还未通过B卷考试");
+      } else {
+        throwErr(403, "发表文章功能已关闭");
+      }
+    } else if(!unlimited) {
+      if(todayCount >= countLimit) throwErr(403, "你今日发表文章次数已达上限");
+    }
+  }
+  // 发表回复时间、条数限制
+  const {
+    postToForumCountLimit
+  } = await user.getPostLimit();
+  if(todayCount >= postToForumCountLimit) throwErr(403, `你当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章`);
+};
+
 module.exports = mongoose.model('users', userSchema);

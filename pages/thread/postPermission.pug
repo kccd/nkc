@@ -56,5 +56,5 @@ else
     h5.text-danger=`你还未参加考试，每天仅能发表${countLimit}条回复/评论。今日已发表${data.userPostCountToday}条回复/评论。`
       a(href="/exam" target="_blank") 点击这里参加考试
       | ，通过后将获得更多发言权限。
-    if data.user.postCount >= countLimit
+    if data.userPostCountToday >= countLimit
       -showEditor = false;
