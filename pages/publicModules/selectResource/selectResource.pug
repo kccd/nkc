@@ -71,7 +71,7 @@
         div
           input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
           button.btn.btn-default.btn-sm(@click="clickInput") 选择本地文件
-          .upload-list(:style="screenType === 'sm'? 'max-height:' + windowHeight*0.6 + 'px;overflow-y:scroll;':''")
+          .upload-list(:style="screenType === 'sm'? 'max-height:' + windowHeight*0.6 + 'px;':'max-height: 22rem;'")
             div(v-if="!files.length").p-t-3.p-b-3.text-center
               b 空空如也~
             .file-lists(v-else)

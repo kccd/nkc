@@ -16,6 +16,8 @@ settingsRouter
         !limit.timeLimit &&
         !limit.digestLimit &&
         !limit.xsfLimit &&
+        !limit.volumeA &&
+        !limit.volumeB &&
         Number(limit.gradeLimit) < 2
       ) ctx.throw(400, "请至少勾选一项防骚扰设置");
       await usersGeneral.update({

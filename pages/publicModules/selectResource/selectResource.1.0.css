@@ -78,6 +78,7 @@
   margin-top: 0.5rem;
 }*/
 #moduleSelectResource .upload-list{
+  overflow-y: scroll;
   margin: 0.5rem 0;
 }
 #moduleSelectResource  .resource{

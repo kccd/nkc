@@ -127,6 +127,16 @@ const usersGeneralSchema = new Schema({
       gradeLimit: {
         type: Number,
         default: 1
+      },
+      // 是否通过A卷
+      volumeA: {
+        type: Boolean,
+        default: false
+      },
+      // 是否通过B卷
+      volumeB: {
+        type: Boolean,
+        default: false
       }
     }
   },
