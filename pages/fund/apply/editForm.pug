@@ -228,7 +228,7 @@ block fundContent
                 .edit-fund-body(v-if="step === 5")
                   include ./step5
 
-              if data.s === 3
+              //if data.s === 3
                 include ../../media/media_index
 
               #app_button(v-cloak)
@@ -256,7 +256,7 @@ block fundScripts
         var options = {
           navbar: false,
           title: false,
-          toolbar: false,
+          toolbar: false
         }
         new Viewer(document.getElementById('applicationForm'), options);
         new Viewer(document.getElementById('applicationForm-comments'), options);
@@ -267,7 +267,7 @@ block fundScripts
   include ../../publicModules/moment
   +includeJS("/editor/paper.js")
   include ../../publicModules/crop/crop
-  if data.s === 3
+  //if data.s === 3
     +includeJS("/media/media_index.js")
   include ../../ueditor/ueditorBase
   +includeJS("/fund/apply/editForm.js")

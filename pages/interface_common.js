@@ -40,7 +40,7 @@ function generalRequest(type, url, method, data, progress) {
           res = xhr.responseText
         }
         if(xhr.status === 0) {
-          // reject('发起请求失败，请检查网络连接');
+          reject('发起请求失败，请检查网络连接');
         } else if(xhr.status >= 400 || res.error || res instanceof Error) {
           reject(res);
         } else {

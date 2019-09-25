@@ -37,6 +37,7 @@ const login = require('./login');
 const logout = require('./logout');
 const me = require('./me');
 const column = require('./column');
+const test = require("./test");
 const m = require('./columns');
 const p = require('./post');
 const problem = require('./problem');
@@ -211,6 +212,8 @@ operationObj.operationTree = {
     survey, // 投票、调查问卷、打分
 
     nr: newResource, // 新的资源路由
+
+    test, // 测试
 	}
 };
 module.exports = operationObj;

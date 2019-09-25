@@ -22,7 +22,7 @@ UE.registerUI('imageSelector',function(editor,uiName){
           }
         }, {
           allowedExt: ["picture"],
-          fastSelect: false
+          fastSelect: true
         });
       } else {
         return sweetError("未初始化资源选择模块");
@@ -55,7 +55,7 @@ UE.registerUI('resourceSelector',function(editor,uiName){
             editor.execCommand('inserthtml', dom);
           }
         }, {
-          fastSelect: false
+          fastSelect: true
         });
       } else {
         return sweetError("未初始化资源选择模块");

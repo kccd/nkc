@@ -22,7 +22,7 @@ var EditorReady = false;
 var data;
 $(function() {
   data = NKC.methods.getDataById("data");
-  editor = UE.getEditor("content", NKC.configs.editor.defaultOptions);
+  editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.addListener( 'ready', function( editor ) {
     // 编辑器准备就绪
     // 计算工具栏上边距

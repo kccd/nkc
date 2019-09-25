@@ -1,0 +1,11 @@
+extends ../bootstrap_base
+block title
+  title 测试
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+
+block scripts
+  include ../publicModules/selectResource/selectResource.1.0.pug
+  +includeJS("/test/test.js")

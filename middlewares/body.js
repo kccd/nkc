@@ -68,7 +68,7 @@ module.exports = async (ctx, next) => {
         ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
       }
       ctx.body = fs.createReadStream(filePath);
-      ctx.set('Content-Length', (await fs.stat(filePath)).size);
+      ctx.set('Content-Length', stats.size);
     }
     await next();
   } else {

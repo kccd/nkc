@@ -1,0 +1,60 @@
+//- 发表权限判断
+-const {authLevelMin, exam} = data.postSettings.postToThread;
+-const {volumeA, volumeB, notPass} = exam;
+-const {status, unlimited, countLimit} = notPass;
+-const {authLevel} = data.user;
+-const userVolumeA = data.user.volumeA;
+-const userVolumeB = data.user.volumeB;
+-let showEditor = true;
+if authLevel < authLevelMin
+  -showEditor = false;
+  //- 用户认证等级未达要求
+  if authLevelMin === 1
+    h5.text-danger 你还未绑定手机号，暂不能回复和评论。
+      a(href=`/u/${data.user.uid}/settings/security` target="_blank") 去绑定
+  else if authLevelMin === 2
+    h5.text-danger 你还未完成身份认证2，暂不能发表回复和评论。
+      a(href=`/u/${data.user.uid}/settings/verify` target="_blank") 去认证
+  else if authLevelMin === 3
+    h5.text-danger 你还未完成身份认证3，暂不能发表回复和评论。
+      a(href=`/u/${data.user.uid}/settings/verify` target="_blank") 去认证
+
+
+if userVolumeB
+  //- 通过B卷
+  if !volumeB
+    -showEditor = false;
+    //- 通过B卷也不能发表
+    h5.text-danger 回复和评论功能已关闭。
+else if userVolumeA
+  //- 通过A卷
+  if !volumeA
+    -showEditor = false;
+    //- 通过A卷也不能发表
+    if !volumeB
+      // -通过B卷也不能发表
+      h5.text-danger 回复和评论功能已关闭。
+    else
+      //- 仅当通过B卷才能发表
+      h5.text-danger 你暂未通过B卷考试，暂不能发表回复和评论。
+        a(href=`/exam` target="_blank") 去考试
+else
+  //- 未参加考试
+  if !status
+    //- 未考试，且不允许未考试用户发表
+    -showEditor = false;
+    if volumeA
+      //- 通过A卷即可发表
+      h5.text-danger 你暂未通过A卷考试，暂不能发表回复和评论。
+        a(href=`/exam` target="_blank") 去考试
+    else if volumeB
+      h5.text-danger 你暂未通过B卷考试，暂不能发表回复和评论。
+        a(href=`/exam` target="_blank") 去考试
+    else
+      h5.text-danger 回复和评论功能已关闭。
+  else if !unlimited
+    h5.text-danger=`你还未参加考试，每天仅能发表${countLimit}条回复/评论。今日已发表${data.userPostCountToday}条回复/评论。`
+      a(href="/exam" target="_blank") 点击这里参加考试
+      | ，通过后将获得更多发言权限。
+    if data.user.postCount >= countLimit
+      -showEditor = false;

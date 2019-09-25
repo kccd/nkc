@@ -2,6 +2,7 @@
   @author Kris 2019/2/20
 */
 
+var ue = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
 var testTh;
 if(NKC.modules.MoveThread) {
   testTh = new NKC.modules.MoveThread();
