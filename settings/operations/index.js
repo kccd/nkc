@@ -214,7 +214,7 @@ operationObj.operationTree = {
 
     nr: newResource, // 新的资源路由
 
-    test, // 测试
+    // test, // 测试
 	}
 };
 module.exports = operationObj;
