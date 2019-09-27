@@ -8,6 +8,10 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+	  topping: {
+      GET: "experimentalToppingSettings",
+      PATCH: "experimentalToppingSettings"
+    },
 	  username: {
 	    GET: "experimentalUsernameSettings",
       PATCH: "experimentalUsernameSettings"

@@ -62,13 +62,14 @@ draftsRouter
   .del('/:did', async(ctx, next) => {
     const {db, data, params} = ctx;
     const {user} = data;
-    const {did} = params;
+    let {did} = params;
     let drafts = [];
     if(did === "all") {
       drafts = await db.DraftModel.find({uid: user.uid});
     } else {
-      const draft = await db.DraftModel.findOne({uid: user.uid, did});
-      if(draft) drafts = [draft];
+      did = did.split("-");
+      did = did.filter(d => !!d);
+      drafts = await db.DraftModel.find({did: {$in: did}, uid: user.uid});
     }
     for(const d of drafts) {
       await db.DraftModel.removeDraftById(d.did, user.uid);

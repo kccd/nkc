@@ -1055,3 +1055,12 @@ function anonymousPost(pid, anonymous) {
       sweetError(data);
     })
 }
+function topPost(pid, topped) {
+  nkcAPI("/p/" + pid + "/topped", "POST", {topped: !!topped})
+    .then(function() {
+      sweetSuccess("操作成功");
+    })
+    .catch(function(data) {
+      sweetError(data);
+    });
+}

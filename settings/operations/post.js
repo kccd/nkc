@@ -52,6 +52,9 @@ module.exports = {
     },
     anonymous: {
 		  POST: "anonymousPost"
+    },
+    topped: {
+		  POST: "topPost"
     }
 	}
 };

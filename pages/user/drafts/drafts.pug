@@ -6,6 +6,12 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12
+        if data.drafts.length
+          .paging-button
+            a.button.radius-left(onclick="selectAll()") 全选
+            a.button.radius-right(onclick="removeSelectedDrafts()") 删除已选
+          .paging-button
+            a.button.radius-left.radius-right(onclick="removeAll()") 清空草稿箱
         include ../../publicModules/paging/paging
       .col-xs-12.col-md-8.box-shadow-panel
         if !data.drafts.length
@@ -14,6 +20,9 @@ block content
         for d in data.drafts
           .draft
             .draft-header
+              .checkbox-inline.draft-checkbox
+                label
+                  input(type="checkbox" data-did=d.did)
               .draft-toc=format('YYYY/MM/DD HH:mm:ss', d.tlm || d.toc)
               .draft-type
                 if d.type === "newThread"
@@ -42,11 +51,6 @@ block content
               button.btn.btn-danger.btn-xs(onclick=`removeDraft('${d.did}')`)
                 .fa.fa-trash-o
                 | &nbsp;删除
-      if data.drafts.length
-        .col-xs-12.m-t-05
-          button.btn.btn-danger.btn-xs(onclick="removeAll()")
-            .fa.fa-trash-o
-            |&nbsp;清空草稿箱
 block scripts
   include ../../publicModules/moment
   +includeJS("/user/drafts/drafts.js")

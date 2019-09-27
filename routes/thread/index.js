@@ -390,11 +390,35 @@ threadRouter
 		if(last_page) {
 			page = pageCount -1;
 		}
+
+    // 是否有权限置顶文章
+    if(
+      ctx.permission("topAllPost") ||
+      (data.user && data.user.uid === thread.uid && await db.PostModel.ensureToppingPermission(data.user.uid))
+    ) {
+      data.topPost = true;
+    }
+
 		// 查询该文章下的所有post
 		const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		data.paging = paging;
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
+    // 筛选出置顶的文章
+    if(paging.page === 0 && thread.toppedPostsId && thread.toppedPostsId.length) {
+      match.pid = {$in: thread.toppedPostsId};
+      let toppedPosts = await db.PostModel.find(match);
+      toppedPosts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+      const toppedPostsObj = {};
+      toppedPosts.map(p => {
+        toppedPostsObj[p.pid] = p;
+      });
+      data.toppedPosts = [];
+      for(const toppedPostId of thread.toppedPostsId) {
+        const p = toppedPostsObj[toppedPostId];
+        if(p) data.toppedPosts.push(p);
+      }
+    }
     await thread.extendFirstPost();
     await thread.firstPost.extendResources();
     const ownPost = data.user && data.user.uid === thread.uid;
@@ -709,6 +733,8 @@ threadRouter
 		}
 		// data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
 		// data.thread = data.thread.toObject();
+
+
 		data.pid = pid;
 		data.step = step;
 		await next();

@@ -129,7 +129,7 @@ NKC.modules.SelectResource = function() {
         this.resetDomPosition();
         self.callback = callback;
         options = options || {};
-        self.app.countLimit = options.countLimit || 10;
+        self.app.countLimit = options.countLimit || 50;
         self.app.allowedExt = options.allowedExt || ["all", "audio", "video", "attachment", "picture"];
         self.app.resourceType = self.app.allowedExt[0];
         self.app.pageType = options.pageType || "list";
@@ -279,17 +279,20 @@ NKC.modules.SelectResource = function() {
       removeSelectedResource: function(index) {
         this.selectedResources.splice(index, 1);
       },
-      selectResource: function(r) {
+      fastSelectResource: function(r) {
         if(this.fastSelect) {
           self.callback(r);
         } else {
-          var index = this.getIndex(this.selectedResources, r);
-          if(index !== -1) {
-            this.selectedResources.splice(index, 1);
-          } else {
-            if(this.selectedResources.length >= this.countLimit) return;
-            this.selectedResources.push(r);
-          }
+          this.selectResource(r);
+        }
+      },
+      selectResource: function(r) {
+        var index = this.getIndex(this.selectedResources, r);
+        if(index !== -1) {
+          this.selectedResources.splice(index, 1);
+        } else {
+          if(this.selectedResources.length >= this.countLimit) return;
+          this.selectedResources.push(r);
         }
       },
       selectResourceType: function(t) {

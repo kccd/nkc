@@ -205,6 +205,11 @@ const threadSchema = new Schema({
     type: [Number],
     index: 1,
     default: []
+  },
+  // 置顶的PostId
+  toppedPostsId: {
+    type: [String],
+    default: []
   }
 
 }, {toObject: {

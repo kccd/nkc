@@ -129,9 +129,10 @@ block shopAccountContent
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 订单已完成
             li.orderPrompt
-              span 交易成功，请前往参与
-              span
-                a.orderStatusTextLink(href=`/t/${order.product.tid}`) 讨论
+              span 交易成功
+              if order.params && order.params.length && order.params[0].product && order.params[0].product.tid
+                span ，请前往参与
+                a.orderStatusTextLink(href=`/t/${order.params[0].product.tid}`) 讨论
             li.orderPrompt 
               span 如果没有收到货，或收到货后出现问题，您可以
               span 
