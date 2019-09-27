@@ -1,11 +1,12 @@
 //- 发表权限判断
--const {authLevelMin, exam} = data.postSettings.postToThread;
+-let {authLevelMin, exam} = data.postSettings.postToThread;
 -const {volumeA, volumeB, notPass} = exam;
 -const {status, unlimited, countLimit} = notPass;
 -const {authLevel} = data.user;
 -const userVolumeA = data.user.volumeA;
 -const userVolumeB = data.user.volumeB;
 -let showEditor = true;
+-authLevelMin = Number(authLevelMin);
 if authLevel < authLevelMin
   -showEditor = false;
   //- 用户认证等级未达要求
@@ -18,7 +19,6 @@ if authLevel < authLevelMin
   else if authLevelMin === 3
     h5.text-danger 你还未完成身份认证3，暂不能发表回复和评论。
       a(href=`/u/${data.user.uid}/settings/verify` target="_blank") 去认证
-
 
 if userVolumeB
   //- 通过B卷

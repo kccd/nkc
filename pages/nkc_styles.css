@@ -3603,6 +3603,14 @@ ul.nav.navbar-nav.navbar-md>li>a{
 .user-serttings-list .selected{
   background-color: #dff0ff;
 }
+
+.topped-post{
+  padding-left: 1rem;
+  color: #e85a71;
+}
+.topped-post .fa{
+  /*color: #2b90d9;*/
+}
 @media only screen and (max-width : 480px) {
   .moSlide {
     display: block

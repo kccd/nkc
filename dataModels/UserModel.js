@@ -1493,7 +1493,8 @@ userSchema.statics.ensurePostThreadPermission = async (uid) => {
   if(!user) return throwErr(500, `未找到ID为${uid}的用户信息`);
   await user.extendAuthLevel();
   const postSettings = await SettingModel.getSettings("post");
-  const {authLevelMin, exam} = postSettings.postToForum;
+  let {authLevelMin, exam} = postSettings.postToForum;
+  authLevelMin = Number(authLevelMin);
   const {volumeA, volumeB, notPass} = exam;
   const {status, countLimit, unlimited} = notPass;
   const today = apiFunction.today();

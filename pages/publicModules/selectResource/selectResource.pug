@@ -18,7 +18,7 @@
               :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
             ) {{b.num+1}}
           span(v-else)
-            a.button ...
+            a.button ..
       .paging-button(v-if="paging.buttonValue.length")
         span(style="font-size: 1rem;") 跳转到&nbsp;
         input.input.radius-left(type="text" v-model.number="pageNumber")
@@ -45,7 +45,7 @@
         .resources-body
           .resource-info(v-if="!resources.length") 空空如也~
           .resource(v-else v-for="r, index in resources" :class="{'active':selectedResourcesId.indexOf(r.rid) !== -1}"
-            @click="selectResource(r)"
+
             :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname"
             )
             .resource-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(/rt/' + r.rid + ')'")
@@ -55,18 +55,20 @@
             .resource-name
               span(v-if="r.mediaType === 'mediaVideo'") (视频)
               span {{r.oname}}
-            div(v-if="!fastSelect")
-              .resource-mask.active(v-if="selectedResourcesId.indexOf(r.rid) !== -1")
-                .fa.fa-check-square-o
-              .resource-mask(v-else)
-                .fa.fa-square-o
-              .resource-index(v-if="selectedResourcesId.indexOf(r.rid) !== -1") {{selectedResourcesId.indexOf(r.rid) + 1}}
+            .resource-options(v-if="selectedResourcesId.indexOf(r.rid) !== -1" )
+              .resource-mask.active(@click="fastSelectResource(r)")
+              .fa.fa-check-square-o.active(@click="selectResource(r)")
+              .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
+            .resource-options(v-else)
+              .resource-mask(@click="fastSelectResource(r)")
+              .fa.fa-square-o(@click="selectResource(r)")
         .module-sr-footer
           .pull-left
             button.btn.btn-default.btn-sm(@click="changePageType('uploader')") 去上传
             button.btn.btn-default.btn-sm(@click="crash") 刷新
           button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
-          button(type="button" class="btn btn-primary btn-sm" @click="done" v-if="!fastSelect") 确定
+          button(type="button" class="btn btn-primary btn-sm" v-if="!selectedResourcesId.length" disabled) 确定
+          button(type="button" class="btn btn-primary btn-sm" @click="done" v-else) 确定
       .module-sr-content(v-else)
         div
           input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")

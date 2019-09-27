@@ -120,6 +120,9 @@
           if permission('experimentalRegisterSettings')
             li
               a(href='/e/settings/register')=lang('ex', 'registerSettings')
+          if permission('experimentalToppingSettings')
+            li
+              a(href='/e/settings/topping') 置顶
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')    
             li

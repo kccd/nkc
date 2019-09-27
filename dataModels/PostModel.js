@@ -199,7 +199,7 @@ const postSchema = new Schema({
   cover: {
     type: String,
     default: ""
-  },
+  }
 }, {toObject: {
   getters: true,
   virtuals: true
@@ -224,6 +224,14 @@ postSchema.virtual('reason')
   })
   .set(function(reason) {
     this._reason = reason
+  });
+
+postSchema.virtual('url')
+  .get(function() {
+    return this._url
+  })
+  .set(function(url) {
+    this._url = url
   });
 
 postSchema.virtual('ownPost')
@@ -609,7 +617,8 @@ const defaultOptions = {
   usersVote: true,
   credit: true,
   showAnonymousUser: false,
-  excludeAnonymousPost: false
+  excludeAnonymousPost: false,
+  url: false
 };
 
 postSchema.statics.extendPosts = async (posts, options) => {
@@ -617,6 +626,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const UserModel = mongoose.model('users');
   const UsersGradeModel = mongoose.model('usersGrades');
   const PostsVoteModel = mongoose.model('postsVotes');
+  const PostModel = mongoose.model("posts");
   const ResourceModel = mongoose.model('resources');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const XsfsRecordModel = mongoose.model('xsfsRecords');
@@ -714,6 +724,9 @@ postSchema.statics.extendPosts = async (posts, options) => {
           r.type = 'xsf';
         }
       }
+    }
+    if(o.url) {
+      post.url = await PostModel.getUrl(post.pid);
     }
     results.push(post.toObject());
   }
@@ -873,6 +886,29 @@ postSchema.statics.getUrl = async function(pid) {
     return `/t/${post.tid}?page=${page}&highlight=${post.pid}#highlight`;
   } else {
     return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}#hightlight`;
+  }
+};
+
+/*
+* 验证作者是否有权限置顶回复
+* @param {String} uid 用户ID
+* @return {Boolean} 是否有权限
+* @author pengxiguaa 2019-9-26
+* */
+postSchema.statics.ensureToppingPermission = async function(uid) {
+  const user = await mongoose.mode("users").findOne({uid});
+  if(!user) return false;
+  const topSettings = await mongoose.model("settings").getSettings("topping");
+  const {rolesId, defaultRoleGradesId} = topSettings;
+  await user.extendRoles();
+  for(const r of user.roles) {
+    if(rolesId.includes(r._id) && r._id !== "default") return true;
+  }
+  if(rolesId.includes("default")) {
+    await user.extendGrade();
+    return defaultRoleGradesId.includes(user.grade._id);
+  } else {
+    return false;
   }
 };
 

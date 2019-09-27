@@ -1,3 +1,6 @@
+.draft-checkbox{
+  /*display: none;*/
+}
 .draft-toc{
   display: inline-block;
   font-weight: 700;
@@ -24,4 +27,13 @@ body{
 .draft-button{
   margin-top: 0.5rem;
   text-align: right;
+}
+.draft-checkbox{
+  vertical-align: top;
+}
+.draft-checkbox label{
+  vertical-align: top;
+}
+.draft-checkbox input{
+  cursor: pointer;
 }

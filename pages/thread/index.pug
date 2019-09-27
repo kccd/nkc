@@ -101,6 +101,14 @@ block title
             else
               a(onclick=`SubscribeTypes.subscribeThread('${thread.tid}', true)`)
                 span.fa.fa-bookmark-o &nbsp;关注
+        if data.thread.oc !== post.pid && data.topPost
+          li
+            if data.thread.toppedPostsId.includes(post.pid)
+              a(onclick=`topPost('${post.pid}', false)`)
+               .fa.fa-thumb-tack &nbsp;取消置顶
+            else
+              a(onclick=`topPost('${post.pid}', true)`)
+               .fa.fa-thumb-tack &nbsp;置顶
         if addCredit
           li
             a(onclick=`credit('${post.pid}', 'xsf')`)
@@ -480,6 +488,20 @@ block content
               -const surveyFormId = `surveyForm${data.thread.firstPost.pid}`;
               -const surveyId = data.thread.firstPost.surveyId;
               include ../publicModules/survey/form
+          if data.toppedPosts && data.toppedPosts.length
+            .fullwidthpanel.ThreadBox.nkcpanel
+              .row
+                .thread-div
+                  .topped-post
+                    .fa.fa-thumb-tack &nbsp;
+                    | 置顶回复
+                  .col-xs-12.col-md-12(style='margin-top: 1rem;')
+                    -const hidePostOptions = true;
+                    -const hidePostStep = true;
+                    -const showPostUrl = true;
+                    -const disabledHighlight = true;
+                    for post, index in data.toppedPosts
+                      include single_post
           .fullwidthpanel.ThreadBox.nkcpanel
             .row
               .thread-div
@@ -644,7 +666,7 @@ block scripts
     +includeJS("/publicModules/toColumn/selectCategories.js")
   +includeJS("/thread/comments.js")
   if data.user
-    script(src=`/media/media_index.js?v=${startTime}`)
+    //script(src=`/media/media_index.js?v=${startTime}`)
     include ../publicModules/subscribeTypes/subscribeTypes
   if permission("getPostAuthor")
     include ../publicModules/floatUserPanel/userInfo

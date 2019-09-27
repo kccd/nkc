@@ -33,6 +33,7 @@ const columnRouter = require("./column");
 const safeRouter = require('./safe');
 const cacheRouter = require("./cache");
 const protocolRouter = require('./protocol');
+const toppingRouter = require("./topping");
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -40,6 +41,7 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+  .use("/topping", toppingRouter.routes(), toppingRouter.allowedMethods())
   .use("/cache", cacheRouter.routes(), cacheRouter.allowedMethods())
   .use('/red-envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())
   .use('/xsf', xsfRouter.routes(), xsfRouter.allowedMethods())

@@ -7,7 +7,7 @@ const {appCode} = aliAppCode;
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 let fn = {};
-fn.paging = (page = 0, count, perpage) => {
+fn.paging = (page = 0, count, perpage, buttonCount = 5) => {
   if(!perpage) perpage = defaultPerpage;
   page = parseInt(page);
   const pageCount = Math.ceil(count/perpage);
@@ -15,7 +15,7 @@ fn.paging = (page = 0, count, perpage) => {
     if(pageCount > 0) page = pageCount - 1;
     else page = 0;
   }*/
-  const buttonValue = fn.getPagingButton({page, pageCount});
+  const buttonValue = fn.getPagingButton(page, pageCount, buttonCount);
 
   return {
     page,
@@ -566,7 +566,7 @@ fn.generateAppLink = (state, url) => {
 * @return {[Number]} 分页按钮数值，空元素表示省略
 * @author pengxiguaa 2019-6-12
 * */
-fn.getPagingButton = (paging) => {
+fn.getPagingButton_ = (paging) => {
   const {page = 0, pageCount = 1} = paging;
   const arr = [];
   // 总页数不超过1 无需分页
@@ -638,6 +638,67 @@ fn.getPagingButton = (paging) => {
   }
   return arr;
 };
+
+/*
+* 分页按钮计算
+* @param {Number} page 当前所在页
+* @param {Number} pageCount 总页数
+* @param {Number} 显示的按钮个数，仅支持奇数
+* @author pengxiguaa 2019-9-26
+* */
+fn.getPagingButton = (page = 0, pageCount = 0, buttonCount = 5) => {
+  const arr = [];
+  if(pageCount <= 1) return arr;
+  const leftCount = (buttonCount - 1) / 2;
+  // 计算左侧按钮
+  for(let i = page - leftCount; i < page; i++) {
+    if(i < 0) continue;
+    arr.push({
+      type: "common",
+      num: i
+    });
+  }
+  // 当前页按钮
+  arr.push({
+    type: "active",
+    num: page
+  });
+  // 计算右侧按钮
+  for(let i = page + 1; i < pageCount; i++) {
+    if(arr.length >= buttonCount) break;
+    arr.push({
+      type: "common",
+      num: i
+    });
+  }
+  // 添加首尾
+  const firstPage = arr[0];
+  const lastPage = arr[arr.length - 1];
+  if(firstPage.num > 0) {
+    if(firstPage.num > 1) {
+      arr.unshift({
+        type: "null"
+      });
+    }
+    arr.unshift({
+      type: "common",
+      num: 0
+    });
+  }
+  if(lastPage.num < (pageCount - 1)) {
+    if(lastPage.num < (pageCount - 2)) {
+      arr.push({
+        type: "null"
+      });
+    }
+    arr.push({
+      type: "common",
+      num: pageCount - 1
+    });
+  }
+  return arr;
+};
+
 /*
 * 获取随机字符串
 * @param {String} pattern

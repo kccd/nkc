@@ -2,7 +2,7 @@
   display: none;
   position: fixed;
   padding-bottom: 3rem;
-  width: 50rem;
+  width: 46rem;
   max-width: 100%;
   top: 100px;
   right: 0;
@@ -82,12 +82,12 @@
   margin: 0.5rem 0;
 }
 #moduleSelectResource  .resource{
-  width: 19%;
+  width: 24%;
   height: 5rem;
   margin: 0 1% 1% 0;
   position: relative;
   font-size: 0;
-  cursor: pointer;
+  /*cursor: pointer;*/
   display: inline-block;
 }
 #moduleSelectResource  .selected-resource-header{
@@ -119,6 +119,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
+  cursor: pointer;
   font-size: 1.4rem;
   padding-right: 0.4rem;
   color: #fff;
@@ -235,4 +236,22 @@
   color: #ff6c6a;
   margin-left: 1rem;
   font-size: 1rem;
+}
+#moduleSelectResource  .resource-options{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+#moduleSelectResource  .resource-options .fa{
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.4rem;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+#moduleSelectResource  .resource-options .fa.active{
+ color: #00ff04;
 }

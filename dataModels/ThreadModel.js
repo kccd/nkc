@@ -205,6 +205,11 @@ const threadSchema = new Schema({
     type: [Number],
     index: 1,
     default: []
+  },
+  // 置顶的PostId
+  toppedPostsId: {
+    type: [String],
+    default: []
   }
 
 }, {toObject: {
@@ -918,7 +923,8 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
   await user.ensureUserInfo();
   if(!user.authLevel) await user.extendAuthLevel();
   const postSettings = await SettingModel.findOnly({_id: 'post'});
-  const {authLevelMin, exam} = postSettings.c.postToForum;
+  let {authLevelMin, exam} = postSettings.c.postToForum;
+  authLevelMin = Number(authLevelMin);
   const {volumeA, volumeB, notPass} = exam;
   const {status, countLimit, unlimited} = notPass;
   const today = apiFunction.today();
