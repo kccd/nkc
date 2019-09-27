@@ -496,6 +496,10 @@ block content
                     .fa.fa-thumb-tack &nbsp;
                     | 置顶回复
                   .col-xs-12.col-md-12(style='margin-top: 1rem;')
+                    -const hidePostOptions = true;
+                    -const hidePostStep = true;
+                    -const showPostUrl = true;
+                    -const disabledHighlight = true;
                     for post, index in data.toppedPosts
                       include single_post
           .fullwidthpanel.ThreadBox.nkcpanel

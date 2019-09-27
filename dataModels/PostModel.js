@@ -226,6 +226,14 @@ postSchema.virtual('reason')
     this._reason = reason
   });
 
+postSchema.virtual('url')
+  .get(function() {
+    return this._url
+  })
+  .set(function(url) {
+    this._url = url
+  });
+
 postSchema.virtual('ownPost')
   .get(function() {
     return this._ownPost
@@ -609,7 +617,8 @@ const defaultOptions = {
   usersVote: true,
   credit: true,
   showAnonymousUser: false,
-  excludeAnonymousPost: false
+  excludeAnonymousPost: false,
+  url: false
 };
 
 postSchema.statics.extendPosts = async (posts, options) => {
@@ -617,6 +626,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const UserModel = mongoose.model('users');
   const UsersGradeModel = mongoose.model('usersGrades');
   const PostsVoteModel = mongoose.model('postsVotes');
+  const PostModel = mongoose.model("posts");
   const ResourceModel = mongoose.model('resources');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const XsfsRecordModel = mongoose.model('xsfsRecords');
@@ -714,6 +724,9 @@ postSchema.statics.extendPosts = async (posts, options) => {
           r.type = 'xsf';
         }
       }
+    }
+    if(o.url) {
+      post.url = await PostModel.getUrl(post.pid);
     }
     results.push(post.toObject());
   }

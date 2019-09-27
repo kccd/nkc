@@ -408,7 +408,10 @@ threadRouter
     if(paging.page === 0 && thread.toppedPostsId && thread.toppedPostsId.length) {
       match.pid = {$in: thread.toppedPostsId};
       let toppedPosts = await db.PostModel.find(match);
-      toppedPosts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+      toppedPosts = await db.PostModel.extendPosts(posts, {
+        uid: data.user? data.user.uid: "",
+        url: true
+      });
       const toppedPostsObj = {};
       toppedPosts.map(p => {
         toppedPostsObj[p.pid] = p;
