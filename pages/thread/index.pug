@@ -537,7 +537,7 @@ block content
                               button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
                           .form-group(style="background-color:#fff;")
                             script#container(name='content', type='text/plain')
-                          include ../media/media_index.pug
+                          //include ../media/media_index.pug
                           .row
                             .col-xs-12
                               label(style="font-size:16px") 专栏
@@ -666,7 +666,7 @@ block scripts
     +includeJS("/publicModules/toColumn/selectCategories.js")
   +includeJS("/thread/comments.js")
   if data.user
-    script(src=`/media/media_index.js?v=${startTime}`)
+    //script(src=`/media/media_index.js?v=${startTime}`)
     include ../publicModules/subscribeTypes/subscribeTypes
   if permission("getPostAuthor")
     include ../publicModules/floatUserPanel/userInfo
