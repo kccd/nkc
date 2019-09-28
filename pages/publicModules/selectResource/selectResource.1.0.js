@@ -83,6 +83,30 @@ NKC.modules.SelectResource = function() {
       }
     },
     methods: {
+      readyPaste: function() {
+        var self = this;
+        var dom = $("#pasteContent");
+        dom.off("paste");
+        dom.one("paste", function(e) {
+          var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
+          var files = clipboardData.items || [];
+          var toUploader = false;
+          for(var i = 0; i < files.length; i ++) {
+            var file = files[i].getAsFile();
+            if(!file) continue;
+            toUploader = true;
+            var f = self.newFile(file);
+            self.files.unshift(f);
+            self.startUpload(f);
+          }
+          if(toUploader) {
+            self.changePageType("uploader", true);
+          }
+        });
+      },
+      pasteContent: function() {
+        alert(this);
+      },
       initModule: function() {
         self.dom.draggable({
           scroll: false,
@@ -229,13 +253,13 @@ NKC.modules.SelectResource = function() {
         }
         input.value = "";
       },
-      changePageType: function(pageType) {
+      changePageType: function(pageType, disabledAutoOpen) {
         var self = this;
         this.pageType = pageType;
         if(pageType === "list") {
           this.crash();
         } else {
-          if(!this.files.length) {
+          if(!this.files.length && !disabledAutoOpen) {
             setTimeout(function() {
               self.clickInput();
             }, 50);

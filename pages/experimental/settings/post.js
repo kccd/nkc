@@ -77,6 +77,12 @@ var app = new Vue({
     }
   },
   computed: {
+    defaultRole: function() {
+      var roles = this.roles;
+      for(var i = 0; i < roles.length; i++) {
+        if(roles[i]._id === "default") return roles[i];
+      }
+    },
     displayNotPassCountLimit: function() {
       return this.postSettings[this.type].exam.indexOf('notPass') !== -1;
     },

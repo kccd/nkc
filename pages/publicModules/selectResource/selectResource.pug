@@ -63,6 +63,7 @@
               .resource-mask(@click="fastSelectResource(r)")
               .fa.fa-square-o(@click="selectResource(r)")
         .module-sr-footer
+          #pasteContent.text-left(@click="readyPaste") 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。
           .pull-left
             button.btn.btn-default.btn-sm(@click="changePageType('uploader')") 去上传
             button.btn.btn-default.btn-sm(@click="crash") 刷新

@@ -807,17 +807,23 @@ userSchema.methods.getMessageLimit = async function() {
 		messageCountLimit
 	}
 };
-/* 
-  获取用户发表文章、发表回复的时间和次数限制
-  @author pengxiguaa 2019/2/27
-*/
+/*
+* 根据用户等级以及拥有的证书获取用户每天发表内容的最大条数和发表的最小间隔时间。
+* @author pengxiguaa 2019-9-27
+* */
 userSchema.methods.getPostLimit = async function() {
 
 	const grade = await this.extendGrade();
 	const roles = await this.extendRoles();
+	let arr = [];
 
-	const arr = [grade].concat(roles);
-
+  for(const role of roles) {
+    if(role._id === "default") {
+      arr = arr.concat(grade);
+    } else {
+      arr.push(role);
+    }
+  }
 	let postToForumCountLimit = 0, postToForumTimeLimit = 9999999999,
     postToThreadCountLimit = 0, postToThreadTimeLimit = 9999999999;
 

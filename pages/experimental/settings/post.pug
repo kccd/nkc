@@ -79,17 +79,21 @@ block content
                 hr
             .row
               .col-sm-2.text-right
-                h4 角色限制
+                h4 证书限制
               .col-sm-10
+                .text-danger
+                  h5 通过证书限制用户每天发表内容的条数以及最小间隔时间。
+                  h5 若用户拥有“会员”证书，则需要考虑用户等级。
+                  h5 “每天最大条数”取最大，“最小间隔时间”取最小。
                 .mdui-table-fluid
                   table.mdui-table
                     thead
                       tr
-                        th 角色名
+                        th 证书
                         th 每天最大条数
                         th 最小间隔时间(分钟)
                     tbody
-                      tr(v-for='role, index in roles')
+                      tr(v-for='role, index in roles' v-if="role._id !== 'default'")
                         th {{role.displayName}}
                         th
                           <label class="mdui-radio mdui-m-r-2">
@@ -115,16 +119,11 @@ block content
                           | 限制
                           </label>
                           input(class="table-input" v-model.number='role[type].timeLimit.num')
-                hr
-            .row
-              .col-sm-2.text-right
-                h4 等级限制
-              .col-sm-10
                 .mdui-table-fluid
                   table.mdui-table
                     thead
                       tr
-                        th 等级名
+                        th 等级限制（普通会员）
                         th 每天最大条数
                         th 最小间隔时间(分钟)
                     tbody
