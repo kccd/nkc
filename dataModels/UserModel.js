@@ -819,7 +819,7 @@ userSchema.methods.getPostLimit = async function() {
 
   for(const role of roles) {
     if(role._id === "default") {
-      arr = arr.concat(grade);
+      arr.push(grade);
     } else {
       arr.push(role);
     }
