@@ -9,6 +9,8 @@ var app = new Vue({
     c: "",
     filter: {
       uid: "",
+      uidType: "username",
+      tUidType: "username",
       tUid: "",
       ip: "",
       st: "",

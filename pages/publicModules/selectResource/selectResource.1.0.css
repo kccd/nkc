@@ -256,8 +256,16 @@
  color: #00ff04;
 }
 #moduleSelectResource  #pasteContent{
+  display: inline-block;
+  width: 20rem;
+  height: 2.5rem;
+  line-height: 2.3rem;
+  margin-left: 1rem;
+  text-align: center;
+  border: 2px dotted #9baec8;
+  background-color: #d9e1e8;
+  vertical-align: top;
   font-size: 1rem;
   cursor: pointer;
-  color: #e85a71;
   margin-bottom: 0.2rem;
 }

@@ -7,12 +7,27 @@ router
     ctx.template = "experimental/log/message.pug";
     if(c && t) {
       c = JSON.parse(decodeURIComponent(Buffer.from(c, "base64").toString()));
-      const {tUid = "", uid = "", ip = "", et = "", st = "", keyword = ""} = c;
+      let {uidType = "username", tUidType = "username", tUid = "", uid = "", ip = "", et = "", st = "", keyword = ""} = c;
       if(t === "messages") {
         const q = {
           ty: "UTU"
         };
+        const getUidByType = async (type, data) => {
+          if(!data) return;
+          if(type === "uid") return data;
+          if(type === "username") {
+            const tUser = await db.UserModel.findOne({usernameLowerCase: data.toLowerCase()});
+            if(!tUser) {
+              // 返回一个错误的用户ID，为了让搜索结果为空。
+              return "null"
+            } else {
+              return tUser.uid;
+            }
+          }
+        };
         // uid筛选
+        uid = await getUidByType(uidType, uid);
+        tUid = await getUidByType(tUidType, tUid);
         if(uid && tUid) {
           q.$or = [
             {
