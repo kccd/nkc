@@ -175,7 +175,6 @@ $(function() {
         var targetUser = this.targetUser;
         var targetUserSendLimit = this.targetUserSendLimit;
         var targetUserGrade = this.targetUserGrade;
-
         if(!targetUser || !targetUserGrade) return;
         var isFriend = false;
         for(var i = 0; i < this.friends.length; i++) {
@@ -186,6 +185,7 @@ $(function() {
         }
         if(isFriend) return;
         if(!targetUserSendLimit.status) return;
+        console.log(new Date(this.user.toc).getTime(), Date.now() - 30*24*60*60*1000)
         if(
           (targetUserSendLimit.timeLimit && new Date(this.user.toc).getTime() > Date.now() - 30*24*60*60*1000) ||
           (targetUserSendLimit.digestLimit && this.userDigestThreadCount === 0) ||
@@ -762,14 +762,14 @@ $(function() {
         return nkcAPI(url, 'GET', {})
           .then(function(data) {
             if(app.target !== target) return;
+            app.targetUserSendLimit = data.targetUserSendLimit;
+            app.targetUserGrade = data.targetUserGrade;
             if(data.messages.length === 0) {
               app.info = '没有了~';
               return Promise.reject();
             }
             app.info = '';
             app.messages = data.messages.concat(app.messages);
-            app.targetUserSendLimit = data.targetUserSendLimit;
-            app.targetUserGrade = data.targetUserGrade;
             app.canGetMessage = true;
 
             var contentBody = app.$refs.content;
