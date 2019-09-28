@@ -255,3 +255,9 @@
 #moduleSelectResource  .resource-options .fa.active{
  color: #00ff04;
 }
+#moduleSelectResource  #pasteContent{
+  font-size: 1rem;
+  cursor: pointer;
+  color: #e85a71;
+  margin-bottom: 0.2rem;
+}

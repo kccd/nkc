@@ -896,7 +896,7 @@ postSchema.statics.getUrl = async function(pid) {
 * @author pengxiguaa 2019-9-26
 * */
 postSchema.statics.ensureToppingPermission = async function(uid) {
-  const user = await mongoose.mode("users").findOne({uid});
+  const user = await mongoose.model("users").findOne({uid});
   if(!user) return false;
   const topSettings = await mongoose.model("settings").getSettings("topping");
   const {rolesId, defaultRoleGradesId} = topSettings;
