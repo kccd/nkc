@@ -19,10 +19,13 @@ var app = new Vue({
     c: data.c || ""
   },
   methods: {
+    reset: function() {
+      NKC.methods.visitUrl("/e/log/secret", false);
+    },
     search: function() {
       var t = this.t;
       var c = this.c;
-      var url = "/e/logs/secret?t=" + t + "&c=" + c;
+      var url = "/e/log/secret?t=" + t + "&c=" + c;
       NKC.methods.visitUrl(url, false);
     }
   }
