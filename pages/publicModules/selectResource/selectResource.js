@@ -108,6 +108,13 @@ NKC.modules.SelectResource = function() {
         alert(this);
       },
       initModule: function() {
+        var height = "41rem";
+        if(this.allowedExt.length !== 1) {
+          height = "43.5rem";
+        }
+        self.dom.css({
+          height: height
+        });
         self.dom.draggable({
           scroll: false,
           handle: ".module-sr-title",
@@ -172,19 +179,6 @@ NKC.modules.SelectResource = function() {
           .then(function(data) {
             self.app.paging = data.paging;
             self.app.pageNumber = self.app.paging.page + 1;
-            for(var i = 0; i < data.resources.length; i++) {
-              var resource = data.resources[i];
-              var ext = resource.ext;
-              if(ext === "mp4") {
-                resource.fileType = "video";
-              } else if(ext === "mp3") {
-                resource.fileType = "audio";
-              } else if(self.app.pictureExt.indexOf(ext) !== -1) {
-                resource.fileType = "picture";
-              } else {
-                resource.fileType = "attachment";
-              }
-            }
             self.app.resources = data.resources;
             self.app.loading = false;
           })

@@ -1,7 +1,6 @@
 #moduleSelectResource{
   display: none;
   position: fixed;
-  padding-bottom: 3rem;
   width: 46rem;
   max-width: 100%;
   top: 100px;
@@ -42,21 +41,32 @@
   color: #777;
 }
 .module-sr-content{
-  padding: 1rem 1rem 0 1rem;
+  padding: 1rem;
+}
+#moduleSelectResource .selected-resources{
+  max-height: 4.8rem;
+  overflow: hidden;
+}
+#moduleSelectResource .resources-paging{
+  height: 3rem;
+  overflow: hidden;
+  padding-top: 0.5rem;
 }
 #moduleSelectResource .resource-type{
   height: 2rem;
-  font-size: 1rem;
+  font-size: 1.2rem;
   line-height: 2rem;
-  padding: 0 0.6rem;
+  padding: 0 1rem 0 0;
   border-radius: 3px;
   display: inline-block;
   cursor: pointer;
+  font-weight: 700;
+  color: #555;
   transition: background-color 100ms, color 100ms;
 }
 #moduleSelectResource .resource-type:hover, #moduleSelectResource .resource-type.active{
-  background-color: #2b90d9;
-  color: #fff;
+  /*background-color: #2b90d9;*/
+  color: #2b90d9;
 }
 #moduleSelectResource  .resource-picture{
   height: 100%;
@@ -71,6 +81,7 @@
 #moduleSelectResource  .resources-body{
   font-size: 0;
   position: relative;
+  height: 28rem;
 }
 /*#moduleSelectResource .resources-body{
   height: 22rem;
@@ -82,8 +93,8 @@
   margin: 0.5rem 0;
 }
 #moduleSelectResource  .resource{
-  width: 24%;
-  height: 5rem;
+  width: 23.5%;
+  height: 5.2rem;
   margin: 0 1% 1% 0;
   position: relative;
   font-size: 0;
@@ -92,9 +103,6 @@
 }
 #moduleSelectResource  .selected-resource-header{
   margin-bottom: 0.5rem;
-}
-#moduleSelectResource  .resource.active{
-  /*border: 2px solid green;*/
 }
 #moduleSelectResource  .resource>div{
 }
@@ -150,7 +158,8 @@
 }
 #moduleSelectResource .resource-info{
   font-size: 1.2rem;
-  padding: 1.9rem 0;
+  height: 15rem;
+  line-height: 15rem;
   font-weight: 700;
   text-align: center;
 }

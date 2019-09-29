@@ -110,6 +110,11 @@ function initVueApp() {
 
     },
     mounted: function() {
+
+      // 调试资源选择器
+      SelectResource.open()
+
+
       this.selectedForums = data.mainForums || [];
       this.thread = data.thread;
       this.post = data.post;
