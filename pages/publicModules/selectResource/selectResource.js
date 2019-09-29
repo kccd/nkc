@@ -108,7 +108,7 @@ NKC.modules.SelectResource = function() {
         alert(this);
       },
       initModule: function() {
-        var height = "41rem";
+        var height = "41.5rem";
         if(this.allowedExt.length !== 1) {
           height = "43.5rem";
         }
@@ -154,6 +154,7 @@ NKC.modules.SelectResource = function() {
         setTimeout(function() {
           self.app.selectedResources = [];
           self.app.resourceType = "all";
+          self.app.category = "all";
         }, 500);
       },
       open: function(callback, options) {
@@ -162,7 +163,11 @@ NKC.modules.SelectResource = function() {
         options = options || {};
         self.app.countLimit = options.countLimit || 50;
         self.app.allowedExt = options.allowedExt || ["all", "audio", "video", "attachment", "picture"];
-        self.app.resourceType = self.app.allowedExt[0];
+        if(options.resourceType) {
+          self.app.resourceType = options.resourceType;
+        } else {
+          self.app.resourceType = self.app.allowedExt[0];
+        }
         self.app.pageType = options.pageType || "list";
         self.app.fastSelect = options.fastSelect || false;
         self.app.getResources(0);

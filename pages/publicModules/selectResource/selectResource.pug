@@ -46,9 +46,9 @@
           .resource-info(v-if="!resources.length") 空空如也~
           //- 资源显示
           .resource(v-else v-for="r, index in resources"
-
             :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname"
             )
+            .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
             .resource-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(/rt/' + r.rid + ')'")
             .resource-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(/frameImg/' + r.rid + ')'")
             .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")

@@ -21,7 +21,6 @@ UE.registerUI('imageSelector',function(editor,uiName){
             editor.execCommand('inserthtml', dom);
           }
         }, {
-          allowedExt: ["picture"],
           fastSelect: true
         });
       } else {
@@ -55,7 +54,8 @@ UE.registerUI('resourceSelector',function(editor,uiName){
             editor.execCommand('inserthtml', dom);
           }
         }, {
-          fastSelect: true
+          fastSelect: true,
+          resourceType: "attachment"
         });
       } else {
         return sweetError("未初始化资源选择模块");
