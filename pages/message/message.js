@@ -185,7 +185,6 @@ $(function() {
         }
         if(isFriend) return;
         if(!targetUserSendLimit.status) return;
-        console.log(new Date(this.user.toc).getTime(), Date.now() - 30*24*60*60*1000)
         if(
           (targetUserSendLimit.timeLimit && new Date(this.user.toc).getTime() > Date.now() - 30*24*60*60*1000) ||
           (targetUserSendLimit.digestLimit && this.userDigestThreadCount === 0) ||
