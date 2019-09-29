@@ -10,7 +10,7 @@ router
     const {hash, salt} = userPersonal.password;
     if(!hash || !salt) data.havePassword = false;
     let {mobile, nationCode, email} = userPersonal;
-    if(mobile) mobile = mobile.slice(0, 3) + "****" + mobile.slice(7, 11);
+    if(mobile) mobile = mobile.slice(0, 3) + "****" + mobile.slice(7);
     if(email) email = email.replace(/.{4}@/ig, "****@");
     data.mobile = mobile;
     data.userEmail = email;

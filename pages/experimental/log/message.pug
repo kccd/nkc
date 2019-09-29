@@ -30,9 +30,15 @@ block eContent
         .form.form-inline
           .form-group.m-b-05
             label 用户1：
+            select.form-control(v-model="filter.uidType")
+              option(value="username") 用户名
+              option(value="uid") 用户ID
             input.form-control(v-model.trim="filter.uid" @keyup.enter="filterContent")
           .form-group.m-b-05
             label 用户2：
+            select.form-control(v-model="filter.tUidType")
+              option(value="username") 用户名
+              option(value="uid") 用户ID
             input.form-control(v-model.trim="filter.tUid" @keyup.enter="filterContent")
           .form-group.m-b-05
             label IP：

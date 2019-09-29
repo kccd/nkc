@@ -1,22 +1,29 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
+block eTitle
   title 等待修改的文章
-  +includeCSS('/experimental/index.css')
   style.
     tbody tr th {
       max-width: 12rem;
       font-size: 1rem;
     }
-block content
+block eContent
 
   .container-fluid.max-width
     .row
-      include ../nav
-      .hidden#data=objToStr({logs: data.logs})
+      .hidden#data=objToStr({logs: data.logs, t: data.t, c: data.c})
       .col-xs-12.col-md-12#app(v-cloak)
         h5.text-danger 若退修的内容在规定时间内未作修改，则状态会自动变为 已屏蔽
-        .m-b-1
+        .form-inline
+          .form-group
+            select.form-control(v-model="t")
+              option(value="username") 用户名
+              option(value="uid") 用户ID
+            input.form-control(type="text" v-model="c" @keyup.enter="search")
+          .form-group
+            button.btn.btn-primary(@click="search") 搜索
+            button.btn.btn-default(@click="reset") 重置
+        .m-t-1
           include ../../publicModules/paging/paging
         table.table
           thead
@@ -56,20 +63,30 @@ block content
 block scripts
   include ../../publicModules/moment
   script.
+    var data = NKC.methods.getDataById("data");
+    for (var i = 0; i < data.logs.length; i++) {
+      data.logs[i].modify = false;
+    }
     var app = new Vue({
       el: "#app",
       data: {
-        logs: []
+        logs: data.logs,
+        c: data.c || "",
+        t: data.t || "username"
       },
       mounted: function() {
-        var data = NKC.methods.getDataById("data");
-        for(var i = 0; i < data.logs.length; i++) {
-          data.logs[i].modify = false;
-        }
-        this.logs = data.logs;
       },
       methods: {
         format: NKC.methods.format,
+        search: function() {
+          var t = this.t;
+          var c = this.c;
+          var url = "/e/log/recycle?t=" + t + "&c=" + c;
+          NKC.methods.visitUrl(url, false);
+        },
+        reset: function() {
+          NKC.methods.visitUrl("/e/log/recycle", false);
+        },
         save: function(log) {
           nkcAPI("/t/" + log.thread.tid + "/moveDraft/reason", "PATCH", {
             log: log

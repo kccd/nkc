@@ -48,7 +48,10 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
             span.lighttext= floornumber + '楼'
         //- 显示post链接
         if showPostUrl
-          .inline-block(style='float: right;')
+          .inline-block(style='float: right; font-size: 1rem;')
+            if data.thread.oc !== post.pid && data.topPost
+              a(onclick=`topPost('${post.pid}', false)` style="color: #aaa;") 取消置顶
+              | &nbsp;&nbsp;
             a(href=post.url style="color: #aaa;") 详情
         .clearfix
         if(post.t && post.t !== '' && index !== 0)

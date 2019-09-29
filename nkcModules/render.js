@@ -396,6 +396,7 @@ function getOriginLevel(index) {
 	}
 }
 
+
 let pugRender = (template, data, state) => {
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {

@@ -276,10 +276,10 @@ module.exports = {
     },
 		share: {
 			GET: 'visitShareLogs'
-		},
+		},/*
 		info: {
 			GET: 'visitInfoLogs'
-		},
+		},*/
 		experimental: {
 			GET: 'visitExperimentalLogs'
 		},

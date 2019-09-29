@@ -14,6 +14,9 @@ var Tools = function() {
         return "/nr/cover/" + id + t
       }
     }
+  };
+  self.floatUserInfo = function(uid) {
+    return "floatUserPanel.open(this, '" + uid + "')";
   }
 };
 

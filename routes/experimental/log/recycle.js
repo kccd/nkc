@@ -3,10 +3,23 @@ const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query} = ctx;
-    const {page = 0} = query;
-    const count = await db.DelPostLogModel.count();
+    const {page = 0, t, c = ""} = query;
+    const q = {};
+    data.t = t;
+    data.c = c;
+    if(t === "username") {
+      const tUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
+      if(!tUser) {
+        q.delUserId = "null";
+      } else {
+        q.delUserId = tUser.uid;
+      }
+    } else if(t === "uid") {
+      q.delUserId = c;
+    }
+    const count = await db.DelPostLogModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const delLogs = await db.DelPostLogModel.find().sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const delLogs = await db.DelPostLogModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.logs = [];
     for(let log of delLogs) {
       log = log.toObject();
