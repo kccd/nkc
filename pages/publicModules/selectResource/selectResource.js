@@ -20,7 +20,7 @@ NKC.modules.SelectResource = function() {
       uid: "",
       user: "",
       pageType: "list", // list: 资源列表, uploader: 上传
-      category: "all", // all: 全部，unused: 未使用, used: 已使用
+      category: "all", // all: 全部，unused: 未使用, used: 已使用, upload: 正在上传的文件
       resourceType: "", // all, picture, video, audio, attachment
       quota: 20,
       paging: {},
@@ -33,6 +33,7 @@ NKC.modules.SelectResource = function() {
       fastSelect: false,
       pictureExt: ['swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'],
       files: [],
+      croppingPicture: false,
     },
     mounted: function() {
 
@@ -83,6 +84,60 @@ NKC.modules.SelectResource = function() {
       }
     },
     methods: {
+      cancelCropPicture: function() {
+        this.resetCropper();
+        this.changePageType("list");
+      },
+      rotate: function(type) {
+        if(type === "left") {
+          self.cropper.rotate(-90);
+        } else {
+          self.cropper.rotate(90);
+        }
+      },
+      resetCropper: function() {
+        if(self.cropper && self.cropper.destroy) {
+          self.cropper.destroy();
+        }
+      },
+      editImage: function(r) {
+        this.croppingPicture = false;
+        this.changePageType("editPicture");
+        setTimeout(function(){
+          self.app.resetCropper();
+          var $image = $('#moduleSelectResourceEdit');
+
+          $image.cropper({
+            viewMode: 1
+          });
+
+          self.cropper = $image.data('cropper');
+          var src = "";
+          if(r.originId) {
+            src = "/ro/" + r.originId;
+          } else {
+            src ="/r/" + r.rid;
+          }
+          self.cropper.replace(src);
+        }, 10);
+      },
+      cropPicture: function() {
+        self.app.croppingPicture = true;
+        setTimeout(function() {
+          try{
+            self.cropper.getCroppedCanvas().toBlob(function(blob) {
+              var file = NKC.methods.blobToFile(blob, Date.now() + ".png");
+              self.app.uploadSelectFile(file);
+              self.app.changePageType("list");
+              self.app.resetCropper();
+            });
+          } catch(err) {
+            console.log(err);
+            self.app.croppingPicture = false;
+            sweetError(err);
+          }
+        }, 10);
+      },
       readyPaste: function() {
         var self = this;
         var dom = $("#pasteContent");
@@ -99,15 +154,22 @@ NKC.modules.SelectResource = function() {
             self.files.unshift(f);
             self.startUpload(f);
           }
-          if(toUploader) {
-            self.changePageType("uploader", true);
-          }
+          // /*if(toUploader) {
+          //   self.changePageType("uploader", true);
+          // }*/
         });
       },
       pasteContent: function() {
-        alert(this);
+        // alert(this);
       },
       initModule: function() {
+        var height = "41.5rem";
+        if(this.allowedExt.length !== 1) {
+          height = "43.5rem";
+        }
+        self.dom.css({
+          height: height
+        });
         self.dom.draggable({
           scroll: false,
           handle: ".module-sr-title",
@@ -144,9 +206,11 @@ NKC.modules.SelectResource = function() {
       close: function() {
         self.dom.hide();
         this.destroyModule();
+        this.resetCropper();
         setTimeout(function() {
           self.app.selectedResources = [];
           self.app.resourceType = "all";
+          self.app.category = "all";
         }, 500);
       },
       open: function(callback, options) {
@@ -155,7 +219,11 @@ NKC.modules.SelectResource = function() {
         options = options || {};
         self.app.countLimit = options.countLimit || 50;
         self.app.allowedExt = options.allowedExt || ["all", "audio", "video", "attachment", "picture"];
-        self.app.resourceType = self.app.allowedExt[0];
+        if(options.resourceType) {
+          self.app.resourceType = options.resourceType;
+        } else {
+          self.app.resourceType = self.app.allowedExt[0];
+        }
         self.app.pageType = options.pageType || "list";
         self.app.fastSelect = options.fastSelect || false;
         self.app.getResources(0);
@@ -167,24 +235,11 @@ NKC.modules.SelectResource = function() {
         this.getResources(0);
       },
       getResources: function(skip) {
-        var url = "/me/media?quota="+this.quota+"&skip="+skip+"&type=" + this.resourceType + "&c=" + this.category;
+        var url = "/me/media?quota="+this.quota+"&skip="+skip+"&type=" + this.resourceType + "&c=" + this.category + "&t=" + Date.now();
         nkcAPI(url, "GET")
           .then(function(data) {
             self.app.paging = data.paging;
             self.app.pageNumber = self.app.paging.page + 1;
-            for(var i = 0; i < data.resources.length; i++) {
-              var resource = data.resources[i];
-              var ext = resource.ext;
-              if(ext === "mp4") {
-                resource.fileType = "video";
-              } else if(ext === "mp3") {
-                resource.fileType = "audio";
-              } else if(self.app.pictureExt.indexOf(ext) !== -1) {
-                resource.fileType = "picture";
-              } else {
-                resource.fileType = "attachment";
-              }
-            }
             self.app.resources = data.resources;
             self.app.loading = false;
           })
@@ -201,6 +256,7 @@ NKC.modules.SelectResource = function() {
         this.getResources(paging.page + count);
       },
       clickInput: function() {
+        if(this.files.length >= 20) sweetInfo("最多仅允许20个文件同时上传，请稍后再试。");
         var input = document.getElementById("moduleSelectResourceInput");
         if(input) input.click();
       },
@@ -209,22 +265,36 @@ NKC.modules.SelectResource = function() {
       },
       startUpload: function(f) {
         f.error = "";
-        if(f.data.size>200*1024*1024) return f.error = "文件大小不能超过200MB";
-        if(f.status === "uploading") return sweetWarning("文件正在上传...");
-        if(f.status === "uploaded") return sweetWarning("文件已上传成功！");
-        var formData = new FormData();
-        formData.append("file", f.data);
-        f.status = "uploading";
-        nkcUploadFile("/r", "POST", formData, function(e, progress) {
-          f.progress = progress;
-        })
+        this.selectCategory("upload");
+        Promise.resolve()
+          .then(function() {
+            if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
+            if(f.status === "uploading") throw "文件正在上传...";
+            if(f.status === "uploaded") throw "文件已上传成功！";
+            var formData = new FormData();
+            formData.append("file", f.data);
+            if(f.data.constructor === Blob) {
+              formData.append("fileName", Date.now() + ".png");
+            }
+            f.status = "uploading";
+            return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+              f.progress = progress;
+            });
+          })
           .then(function() {
             f.status = "uploaded";
+            var index = self.app.files.indexOf(f);
+            self.app.files.splice(index, 1);
+            if(self.app.category === "upload" && !self.app.files.length) {
+              self.app.category = "all";
+              self.app.getResources(0);
+            }
           })
           .catch(function(data) {
             f.status = "unUpload";
-            f.progress = "0%";
+            f.progress = 0;
             f.error = data.error || data;
+            screenTopWarning(data.error || data);
           })
         // 上传文件
       },
@@ -239,6 +309,12 @@ NKC.modules.SelectResource = function() {
           status: "unUpload"
         }
       },
+      uploadSelectFile: function(f) {
+        f = this.newFile(f);
+        this.files.unshift(f);
+        this.startUpload(f);
+        this.selectCategory("upload");
+      },
       // 用户已选择待上传的文件
       selectedFiles: function() {
         var input = document.getElementById("moduleSelectResourceInput");
@@ -246,24 +322,17 @@ NKC.modules.SelectResource = function() {
         var files = input.files;
         if(files.length <= 0) return;
         for(var i = 0; i < files.length; i++) {
+          if(this.files.length >= 20) continue;
           var f = files[i];
-          f = this.newFile(f);
-          this.files.unshift(f);
-          this.startUpload(f);
+          this.uploadSelectFile(f);
         }
         input.value = "";
       },
-      changePageType: function(pageType, disabledAutoOpen) {
+      changePageType: function(pageType) {
         var self = this;
         this.pageType = pageType;
         if(pageType === "list") {
           this.crash();
-        } else {
-          if(!this.files.length && !disabledAutoOpen) {
-            setTimeout(function() {
-              self.clickInput();
-            }, 50);
-          }
         }
       },
       crash: function() {

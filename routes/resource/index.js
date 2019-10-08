@@ -76,10 +76,12 @@ resourceRouter
     
     let mediaRealPath;
     const file = ctx.body.files.file;
+    const fields = ctx.body.fields;
     if(!file) {
       ctx.throw(400, 'no file uploaded');
     }
     let { name, size, path } = file;
+    if(name === "blob" && fields.fileName) name = fields.fileName;
     // 获取文件格式 extension
     const extensionE = pathModule.extname(name).replace('.', '');
     let extension = extensionE.toLowerCase();

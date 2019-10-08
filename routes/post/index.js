@@ -429,29 +429,42 @@ router
     if(columnCategoriesId.length > 0 && state.userColumn) {
       await db.ColumnPostModel.addColumnPosts(state.userColumn, columnCategoriesId, [targetThread.oc]);
     }
-    let {page} = await targetThread.getStep({pid, disabled: q.disabled});
-    let postId = `#${pid}`;
-    page = `?page=${page}`;
-    const redirectUrl = await db.PostModel.getUrl(pid);
-    // data.redirect = `/t/${targetThread.tid}?&pid=${targetPost.pid}`;
-    data.redirect = redirectUrl;
+    data.redirect = await db.PostModel.getUrl(pid);
     data.targetUser = targetUser;
     // 帖子再重新发表时，解除退回的封禁
     // 删除日志中modifyType改为true
-    let delPostLog = await db.DelPostLogModel.find({"postId":pid,"modifyType":false})
-    for(var i in delPostLog){
-      await delPostLog[i].update({"modifyType":true})
+    const delPostLog = await db.DelPostLogModel.find({"postId":pid,"modifyType":false});
+    for(const log of delPostLog) {
+      await log.update({"modifyType":true});
     }
-    await targetThread.update({"recycleMark":false})
+    // 若post被退修则清除退修标记并标记为未审核
+    if(targetThread.oc === targetPost.pid) {
+      if(targetThread.recycleMark) {
+        await targetThread.update({
+          recycleMark:false,
+          reviewed: false
+        });
+        await targetPost.update({
+          reviewed: false
+        });
+      }
+    }
     // 在post中找到这一条数据，并解除屏蔽
-    let singlePost = await db.PostModel.findOnly({pid})
-    await singlePost.update({disabled:false})
+    const singlePost = await db.PostModel.findOnly({pid});
+    let postReviewed = singlePost.reviewed;
+    if(singlePost.disabled && singlePost.toDraft) {
+      await singlePost.update({
+        disabled: false,
+        reviewed: false
+      });
+      postReviewed = false;
+    }
     // 帖子曾经在草稿箱中，发表时，删除草稿
     if(did) {
       await db.DraftModel.removeDraftById(did, data.user.uid);
     }
     await targetUser.updateUserMessage();
-    if(!singlePost.reviewed) {
+    if(!postReviewed) {
       await db.MessageModel.sendReviewMessage(singlePost.pid);
     }
     await next();

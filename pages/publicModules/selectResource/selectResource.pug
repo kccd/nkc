@@ -1,7 +1,7 @@
-+includeCSS("/publicModules/selectResource/selectResource.1.0.css")
++includeCSS("/publicModules/selectResource/selectResource.css")
 #moduleSelectResource
   mixin resourcePaging
-    .resource-paging(v-if="paging && paging.buttonValue").m-t-05
+    .resource-paging(v-if="paging && paging.buttonValue")
       .paging-button(v-if="paging.buttonValue.length > 1")
         a.button.radius-left(title="上一页" @click="changePage('last')")
           .fa.fa-angle-left
@@ -26,11 +26,11 @@
   #moduleSelectResourceApp(v-cloak)
     .module-sr-body
       .module-sr-header
-        .module-sr-title 资源管理
+        .module-sr-title 插入资源
         .fa.fa-remove(@click="close")
       .module-sr-content(v-if="pageType === 'list'")
         .selected-resources
-          .resource-types.m-b-05(v-if="allowedExt && allowedExt.length > 1")
+          .resource-types(v-if="allowedExt && allowedExt.length > 1")
             .resource-type(v-if="show.all" :class="{'active':resourceType === 'all'}" @click="selectResourceType('all')") 全部
             .resource-type(v-if="show.picture" :class="{'active':resourceType === 'picture'}" @click="selectResourceType('picture')") 图片
             .resource-type(v-if="show.video" :class="{'active':resourceType === 'video'}" @click="selectResourceType('video')") 视频
@@ -40,14 +40,33 @@
             .resource-type(:class="{'active':category === 'all'}" @click="selectCategory('all')") 全部
             .resource-type(:class="{'active':category === 'unused'}" @click="selectCategory('unused')") 未使用
             .resource-type(:class="{'active':category === 'used'}" @click="selectCategory('used')") 已使用
+            .resource-type(v-if="files.length" :class="{'active':category === 'upload'}" @click="selectCategory('upload')") 正在上传
         .resources-paging
           +resourcePaging
-        .resources-body
+        .resources-body(v-if="category === 'upload'")
+          .resource-info(v-if="!files.length") 空空如也~
+          .resource(v-else v-for="f, index in files")
+            .resource-upload-body(v-if="f.status === 'uploading'")
+              .resource-picture.upload(v-if="f.progress !== 100")
+                span 上传中..{{f.progress}}%
+                .fa.fa-spinner.fa-spin.fa-fw
+              .resource-picture.upload(v-else)
+                span 处理中..
+                .fa.fa-spinner.fa-spin.fa-fw
+            .resource-upload-body(v-if="f.status === 'unUpload'")
+              .resource-picture.upload(v-if="f.error")
+                .remove-file
+                  .fa.fa-remove(@click="removeFile(index)")
+                span.pointer(@click="startUpload(f)") 上传失败，点击重试
+            .resource-name
+              span {{f.name}}
+        .resources-body(v-else)
           .resource-info(v-if="!resources.length") 空空如也~
-          .resource(v-else v-for="r, index in resources" :class="{'active':selectedResourcesId.indexOf(r.rid) !== -1}"
-
+          //- 资源显示
+          .resource(v-else v-for="r, index in resources"
             :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname"
             )
+            .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
             .resource-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(/rt/' + r.rid + ')'")
             .resource-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(/frameImg/' + r.rid + ')'")
             .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
@@ -61,18 +80,30 @@
               .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
             .resource-options(v-else)
               .resource-mask(@click="fastSelectResource(r)")
+              .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
               .fa.fa-square-o(@click="selectResource(r)")
         .module-sr-footer
           .pull-left
-            button.btn.btn-default.btn-sm(@click="changePageType('uploader')") 去上传
+            input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
+            button.btn.btn-default.btn-sm(@click="clickInput") 上传
             button.btn.btn-default.btn-sm(@click="crash") 刷新
             #pasteContent.text-left.hidden-xs.hidden-sm(@click="readyPaste") 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。
-          button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
-          button(type="button" class="btn btn-primary btn-sm" v-if="!selectedResourcesId.length" disabled) 确定
+          //button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
+          button(type="button" class="btn btn-primary btn-sm" v-if="!selectedResourcesId.length" disabled title="请先勾选图片") 确定
           button(type="button" class="btn btn-primary btn-sm" @click="done" v-else) 确定
-      .module-sr-content(v-else)
+      .edit-picture-body(v-else-if="pageType === 'editPicture'")
+        img#moduleSelectResourceEdit(style="max-width: 100%;height: 30rem;")
+        .module-sr-footer.m-t-1
+          .pull-left
+            button.btn.btn-default.btn-sm(@click="rotate('left')") 左旋
+            button.btn.btn-default.btn-sm(@click="rotate('right')") 右旋
+          button(type="button" class="btn btn-default btn-sm" @click="cancelCropPicture") 取消
+          button(type="button" class="btn btn-primary btn-sm" disabled v-if="croppingPicture") 裁剪中..
+            .fa.fa-spinner.fa-spin.fa-fw
+          button(type="button" class="btn btn-primary btn-sm" @click="cropPicture" v-else) 确定
+      //-.module-sr-content(v-else)
         div
-          input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
+          //input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
           button.btn.btn-default.btn-sm(@click="clickInput") 选择本地文件
           .upload-list(:style="screenType === 'sm'? 'max-height:' + windowHeight*0.6 + 'px;':'max-height: 22rem;'")
             div(v-if="!files.length").p-t-3.p-b-3.text-center
@@ -96,4 +127,6 @@
           .pull-left
             button.btn.btn-default.btn-sm(@click="changePageType('list')") 返回列表
           button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
-+includeJS("/publicModules/selectResource/selectResource.1.0.js")
++includeJS("/publicModules/crop/dist/cropper.js")
++includeJS("/publicModules/crop/dist/jquery-cropper.js")
++includeJS("/publicModules/selectResource/selectResource.js")

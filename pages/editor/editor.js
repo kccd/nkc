@@ -110,6 +110,7 @@ function initVueApp() {
 
     },
     mounted: function() {
+
       this.selectedForums = data.mainForums || [];
       this.thread = data.thread;
       this.post = data.post;

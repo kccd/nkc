@@ -6,6 +6,24 @@ function ga(id,attr){return geid(id).getAttribute(attr);}
 function hset(id,content){geid(id).innerHTML=content;}
 function display(id){geid(id).style = 'display:inherit;'}
 
+// 兼容代码，部分浏览器canvas对象没有toBlob方法
+if (!HTMLCanvasElement.prototype.toBlob) {
+  Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+    value: function (callback, type, quality) {
+
+      var binStr = atob( this.toDataURL(type, quality).split(',')[1] ),
+        len = binStr.length,
+        arr = new Uint8Array(len);
+
+      for (var i=0; i<len; i++ ) {
+        arr[i] = binStr.charCodeAt(i);
+      }
+
+      callback( new Blob( [arr], {type: type || 'image/png'} ) );
+    }
+  });
+}
+
 /*
 * 发起请求/上传文件
 * @param {String} type 普通请求："post", 上传文件："upload"
@@ -45,7 +63,7 @@ function generalRequest(type, url, method, data, progress) {
           reject(res);
         } else {
           if(progress && type === "upload" && e_) {
-            progress(e_, "100%");
+            progress(e_, 100);
           }
           resolve(res);
         }
