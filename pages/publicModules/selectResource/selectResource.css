@@ -78,16 +78,35 @@
   background-position: center;
   background-repeat: no-repeat;
 }
+#moduleSelectResource .resource-picture.upload{
+  background-color: #eee;
+  font-size: 1rem;
+  position: relative;
+  overflow: hidden;
+  padding-top: 1.5rem;
+  text-align: center;
+}
+#moduleSelectResource .resource-picture.upload .remove-file{
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #aaa;
+  text-align: center;
+}
 #moduleSelectResource  .resources-body{
   font-size: 0;
   position: relative;
   height: 28rem;
 }
-/*#moduleSelectResource .resources-body{
-  height: 22rem;
-  overflow: hidden;
-  margin-top: 0.5rem;
-}*/
+#moduleSelectResource .resource-upload-body{
+  height: 100%;
+  width: 100%;
+}
 #moduleSelectResource .upload-list{
   overflow-y: scroll;
   margin: 0.5rem 0;
@@ -260,6 +279,12 @@
   position: absolute;
   top: 5px;
   right: 5px;
+}
+#moduleSelectResource  .resource-options .fa.fa-edit{
+  right: 24px;
+}
+#moduleSelectResource .edit-picture-body{
+  margin: 1rem;
 }
 #moduleSelectResource  .resource-options .fa.active{
  color: #00ff04;

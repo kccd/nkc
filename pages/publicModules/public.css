@@ -25,31 +25,31 @@ table{
   margin-bottom: 0.5rem!important;
 }
 .m-r-05{
-  margin-right: 0.5rem;
+  margin-right: 0.5rem!important;
 }
 .m-a-1{
-  margin: 1rem;
+  margin: 1rem!important;
 }
 .m-t-05{
-  margin-top: 0.5rem;
+  margin-top: 0.5rem!important;
 }
 .m-t-1{
-  margin-top: 1rem;
+  margin-top: 1rem!important;
 }
 .m-t-2{
-  margin-top: 2rem;
+  margin-top: 2rem!important;
 }
 .m-t-3{
-  margin-top: 3rem;
+  margin-top: 3rem!important;
 }
 .m-t-4{
-  margin-top: 4rem;
+  margin-top: 4rem!important;
 }
 .m-t-5{
-  margin-top: 5rem;
+  margin-top: 5rem!important;
 }
 .m-t-6{
-  margin-top: 6rem;
+  margin-top: 6rem!important;
 }
 /* margin-bottom */
 .m-b-0{

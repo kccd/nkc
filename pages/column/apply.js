@@ -74,7 +74,7 @@ var app = new Vue({
       formData.append("abbr", column.abbr);
       formData.append("description", column.description);
       uploadFilePromise("/column", formData, function(e, a) {
-        app.info = "提交中..." + a;
+        app.info = "提交中..." + a + "%";
       })
         .then(function(data) {
           openToNewLocation("/m/" + data.column._id);

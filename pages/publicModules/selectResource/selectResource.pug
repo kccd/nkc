@@ -40,9 +40,27 @@
             .resource-type(:class="{'active':category === 'all'}" @click="selectCategory('all')") 全部
             .resource-type(:class="{'active':category === 'unused'}" @click="selectCategory('unused')") 未使用
             .resource-type(:class="{'active':category === 'used'}" @click="selectCategory('used')") 已使用
+            .resource-type(v-if="files.length" :class="{'active':category === 'upload'}" @click="selectCategory('upload')") 正在上传
         .resources-paging
           +resourcePaging
-        .resources-body
+        .resources-body(v-if="category === 'upload'")
+          .resource-info(v-if="!files.length") 空空如也~
+          .resource(v-else v-for="f, index in files")
+            .resource-upload-body(v-if="f.status === 'uploading'")
+              .resource-picture.upload(v-if="f.progress !== 100")
+                span 上传中..{{f.progress}}%
+                .fa.fa-spinner.fa-spin.fa-fw
+              .resource-picture.upload(v-else)
+                span 处理中..
+                .fa.fa-spinner.fa-spin.fa-fw
+            .resource-upload-body(v-if="f.status === 'unUpload'")
+              .resource-picture.upload(v-if="f.error")
+                .remove-file
+                  .fa.fa-remove(@click="removeFile(index)")
+                span.pointer(@click="startUpload(f)") 上传失败，点击重试
+            .resource-name
+              span {{f.name}}
+        .resources-body(v-else)
           .resource-info(v-if="!resources.length") 空空如也~
           //- 资源显示
           .resource(v-else v-for="r, index in resources"
@@ -62,6 +80,7 @@
               .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
             .resource-options(v-else)
               .resource-mask(@click="fastSelectResource(r)")
+              .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
               .fa.fa-square-o(@click="selectResource(r)")
         .module-sr-footer
           .pull-left
@@ -72,6 +91,16 @@
           //button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
           button(type="button" class="btn btn-primary btn-sm" v-if="!selectedResourcesId.length" disabled title="请先勾选图片") 确定
           button(type="button" class="btn btn-primary btn-sm" @click="done" v-else) 确定
+      .edit-picture-body(v-else-if="pageType === 'editPicture'")
+        img#moduleSelectResourceEdit(style="max-width: 100%;height: 30rem;")
+        .module-sr-footer.m-t-1
+          .pull-left
+            button.btn.btn-default.btn-sm(@click="rotate('left')") 左旋
+            button.btn.btn-default.btn-sm(@click="rotate('right')") 右旋
+          button(type="button" class="btn btn-default btn-sm" @click="cancelCropPicture") 取消
+          button(type="button" class="btn btn-primary btn-sm" disabled v-if="croppingPicture") 裁剪中..
+            .fa.fa-spinner.fa-spin.fa-fw
+          button(type="button" class="btn btn-primary btn-sm" @click="cropPicture" v-else) 确定
       //-.module-sr-content(v-else)
         div
           //input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
@@ -98,4 +127,6 @@
           .pull-left
             button.btn.btn-default.btn-sm(@click="changePageType('list')") 返回列表
           button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
++includeJS("/publicModules/crop/dist/cropper.js")
++includeJS("/publicModules/crop/dist/jquery-cropper.js")
 +includeJS("/publicModules/selectResource/selectResource.js")
