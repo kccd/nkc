@@ -122,19 +122,21 @@ NKC.modules.SelectResource = function() {
         }, 10);
       },
       cropPicture: function() {
-        try{
-          self.app.croppingPicture = true;
-          self.cropper.getCroppedCanvas().toBlob(function(blob) {
-            var file = NKC.methods.blobToFile(blob, Date.now() + ".png");
-            self.app.uploadSelectFile(file);
-            self.app.changePageType("list");
-            self.app.resetCropper();
-          });
-        } catch(err) {
-          console.log(err);
-          self.app.croppingPicture = false;
-          sweetError(err);
-        }
+        self.app.croppingPicture = true;
+        setTimeout(function() {
+          try{
+            self.cropper.getCroppedCanvas().toBlob(function(blob) {
+              var file = NKC.methods.blobToFile(blob, Date.now() + ".png");
+              self.app.uploadSelectFile(file);
+              self.app.changePageType("list");
+              self.app.resetCropper();
+            });
+          } catch(err) {
+            console.log(err);
+            self.app.croppingPicture = false;
+            sweetError(err);
+          }
+        }, 10);
       },
       readyPaste: function() {
         var self = this;
