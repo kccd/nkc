@@ -1,7 +1,9 @@
 var SubscribeTypes, UserInfo, surveyForms = [], draftId = "";
 var hidePostMaxHeight;
+var hidePostFloat;
 $(document).ready(function(){
   var DW = $(document).width();
+  hidePostFloat = NKC.configs.postHeight.float;
   if(DW < 768) {
     hidePostMaxHeight = NKC.configs.postHeight.xs;
   } else if(DW < 992) {
@@ -1103,9 +1105,9 @@ function hidePost(pid) {
   var mask = dom.find(".thread-post-mask");
   dom.addClass("active");
   mask.css({
-    "max-height": hidePostMaxHeight + "px"
+    "max-height": hidePostMaxHeight * hidePostFloat + "px"
   });
-  span.text("展开");
+  span.text("加载全文");
   fa.removeClass("fa-angle-up").addClass("fa-angle-down");
 }
 
@@ -1118,7 +1120,7 @@ function showPost(pid) {
   mask.css({
     "max-height": "none"
   });
-  span.text("折叠");
+  span.text("收起");
   fa.removeClass("fa-angle-down").addClass("fa-angle-up");
 }
 

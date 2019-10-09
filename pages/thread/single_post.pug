@@ -81,7 +81,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                   button(onclick=`switchPost('${post.pid}')`)
                     .fa.fa-angle-down
                     |&nbsp;
-                    span 展开
+                    span 加载全文
               if permission("quotePost") && !data.thread.close
                 span.pointer.m-r-05(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
                   span.fa.fa-comment-o &nbsp;
