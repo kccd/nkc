@@ -1,5 +1,4 @@
 var data = NKC.methods.getDataById("data");
-var CommonModal = new NKC.modules.CommonModal();
 var app = new Vue({
   el: "#app",
   data: {
