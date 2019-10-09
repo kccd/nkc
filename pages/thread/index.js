@@ -14,7 +14,7 @@ $(document).ready(function(){
     var d = hidePostDom.eq(i);
     var contentDom = d.find(".thread-post-mask");
     var pid = d.attr("data-pid");
-    if(contentDom.height() > 120) {
+    if(contentDom.height() > hidePostMaxHeight) {
       hidePost(pid);
       $(".hide-post-button[data-pid='"+pid+"']").css({
         "display": "inline-block"
