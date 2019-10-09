@@ -1540,4 +1540,28 @@ userSchema.statics.ensurePostThreadPermission = async (uid) => {
   if(todayCount >= postToForumCountLimit) throwErr(403, `你当前的账号等级每天最多只能发表${postToForumCountLimit}篇文章`);
 };
 
+/*
+* 判断用户所发表的回复是否会折叠
+* return {Boolean} true: 会折叠, false: 不会折叠
+* @author pengxiguaa 2019-10-9
+* */
+userSchema.methods.ensureHidePostPermission = async function() {
+  const hidePostSettings = await mongoose.model("settings").getSettings("hidePost");
+  const {rolesId, defaultRoleGradesId} = hidePostSettings;
+  if(!this.roles) {
+    await this.extendRoles();
+  }
+  for(const r of this.roles) {
+    if(rolesId.includes(r._id) && r._id !== "default") return false;
+  }
+  if(rolesId.includes("default")) {
+    if(!this.grade) {
+      await this.extendGrade();
+    }
+    return !defaultRoleGradesId.includes(this.grade._id);
+  } else {
+    return true;
+  }
+};
+
 module.exports = mongoose.model('users', userSchema);

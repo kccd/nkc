@@ -121,6 +121,9 @@
           if permission('experimentalToppingSettings')
             li
               a(href='/e/settings/topping') 置顶
+          if permission('experimentalHidePostSettings')
+            li
+              a(href='/e/settings/hidePost') 回复折叠
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')    
             li

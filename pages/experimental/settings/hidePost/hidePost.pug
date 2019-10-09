@@ -1,0 +1,47 @@
+extends ../../experimental
+block eTitle
+  title 回复折叠设置
+block eContent
+  .container-fluid.max-width
+    .row
+      .hidden#data=objToStr({hidePostSettings: data.hidePostSettings, roles: data.roles, grades: data.grades})
+      .col-xs-12.col-md-12#app(v-cloak)
+        .form-horizontal
+          h4 折叠白名单
+            | &nbsp;
+            small 满足以下条件的用户所发表的回复不会被折叠
+          .form-group
+            label.col-sm-2.control-label 证书限制
+            .col-sm-10
+              .checkbox
+                label.m-r-1(v-for="role in roles")
+                  input(type="checkbox" :value="role._id" v-model="hidePostSettings.rolesId")
+                  | {{role.displayName}}
+          .form-group(v-if="hidePostSettings.rolesId.indexOf('default') !== -1")
+            label.col-sm-2.control-label 会员等级限制
+            .col-sm-10
+              .checkbox
+                label.m-r-1(v-for="grade in grades")
+                  input(type="checkbox" :value="grade._id" v-model="hidePostSettings.defaultRoleGradesId")
+                  | {{grade.displayName}}
+          h4 折叠高度
+            | &nbsp;
+            small 折叠内容超过以下高度的回复
+          .form-group
+            label.col-sm-2.control-label 小屏（<768px）
+            .col-sm-2
+              input.form-control(type="number" v-model.number="hidePostSettings.postHeight.xs")
+          .form-group
+            label.col-sm-2.control-label 中屏（<992px）
+            .col-sm-2
+              input.form-control(type="number" v-model.number="hidePostSettings.postHeight.sm")
+          .form-group
+            label.col-sm-2.control-label 大屏（>992px）
+            .col-sm-2
+              input.form-control(type="number" v-model.number="hidePostSettings.postHeight.md")
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-10
+              button.btn.btn-primary.btn-sm(@click="submit") 保存
+block scripts
+  +includeJS("/experimental/settings/hidePost/hidePost.js")

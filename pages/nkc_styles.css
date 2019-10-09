@@ -2790,6 +2790,45 @@ img.emoji {
   margin: 0;
   border-top: 1px solid #eeeeee;
 }
+.post-body .hide-post.part.active .hide-post-mask{
+  display: inline-block;
+}
+.post-body .hide-post.part .thread-post-mask{
+  /*max-height: 10rem;*/
+  overflow: hidden;
+}
+.post-body .hide-post.part{
+  position: relative;
+  /*margin-bottom: 0.5rem;*/
+}
+.post-body .hide-post.part .hide-post-mask{
+  display: none;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  height: 3rem;
+  background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+}
+.hide-post-button{
+  /*position: absolute;*/
+  /*left: 0;*/
+  /*bottom: 0;*/
+  display: none;
+  height: 2rem;
+  font-size: 1rem;
+  text-align: center;
+}
+.hide-post-button button:focus{
+  outline: none;
+}
+.hide-post-button button{
+  background-color: rgba(255, 255, 255, 0);
+  /*border: 1px solid #9baec8;*/
+  border-radius: 3px;
+  border: none;
+  /*color: #9baec8;*/
+}
 .post-body .media-body{
   overflow: visible;
 }

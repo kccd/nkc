@@ -18,7 +18,9 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
     if !previousPost || (post.toc - previousPost.toc) > 24*60*60*1000
       div.single-post-time
         div=post.toc.toLocaleString()
-    .post-body.highlight( style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
+    .post-body.highlight(
+      style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`
+    )
       if !post.reviewed
         -let reviewData = {reviewPid: post.pid, reviewType: "post"}
         include ../publicModules/module_review
@@ -52,17 +54,21 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
             if data.thread.oc !== post.pid && data.topPost
               a(onclick=`topPost('${post.pid}', false)` style="color: #aaa;") 取消置顶
               | &nbsp;&nbsp;
-            a(href=post.url style="color: #aaa;") 详情
+            a(href=post.url style="color: #aaa;") 上下文
         .clearfix
         if(post.t && post.t !== '' && index !== 0)
           div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
         -post.c = hideContentByUser(post.c, data.user, 'thread')
-        div.ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
-        if post.toc.toLocaleString() !== post.tlm.toLocaleString()
-          p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-        //+postCredits(post)
-        -let creditPost = post;
-        include ./postCredits
+        div(class=!disabledHidePost?"hide-post part":"" data-pid=post.pid)
+          .thread-post-mask
+            .ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
+            if post.toc.toLocaleString() !== post.tlm.toLocaleString()
+              p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
+            //+postCredits(post)
+            -let creditPost = post;
+            include ./postCredits
+          if !disabledHidePost
+            .hide-post-mask
         if post.disabled && disablePost
           a(onclick=`enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
         //- 隐藏post的操作菜单
@@ -70,6 +76,12 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
           div
             //- 评论输入框 暂且只有作者能够首先发起评论，之后该条回复的用户才能接着评论
             .single-post-options.text-right
+              if !disabledHidePost
+                .hide-post-button(data-pid=post.pid)
+                  button(onclick=`switchPost('${post.pid}')`)
+                    .fa.fa-angle-down
+                    |&nbsp;
+                    span 展开
               if permission("quotePost") && !data.thread.close
                 span.pointer.m-r-05(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
                   span.fa.fa-comment-o &nbsp;
