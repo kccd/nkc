@@ -226,6 +226,14 @@ postSchema.virtual('reason')
     this._reason = reason
   });
 
+postSchema.virtual('hide')
+  .get(function() {
+    return this._hide
+  })
+  .set(function(hide) {
+    this._hide = hide
+  });
+
 postSchema.virtual('url')
   .get(function() {
     return this._url
@@ -698,12 +706,16 @@ postSchema.statics.extendPosts = async (posts, options) => {
     if(post.anonymous && o.excludeAnonymousPost) continue;
     post.credits = [];
     if(o.user) {
+      const postUser = usersObj[post.uid];
+      if(postUser) {
+        post.hide = await postUser.ensureHidePostPermission();
+      }
       if(!o.showAnonymousUser && post.anonymous) {
         post.user = "";
         post.uid = "";
         post.uidlm = "";
       } else {
-        post.user = usersObj[post.uid];
+        post.user = postUser;
       }
     }
     if(o.resource) {
@@ -732,6 +744,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   }
   return results;
 };
+
 
 postSchema.methods.updatePostsVote = async function() {
   const PostsVoteModel = mongoose.model('postsVotes');

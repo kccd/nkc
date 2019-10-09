@@ -109,6 +109,7 @@ block title
             else
               a(onclick=`topPost('${post.pid}', true)`)
                .fa.fa-thumb-tack &nbsp;置顶
+
         if addCredit
           li
             a(onclick=`credit('${post.pid}', 'xsf')`)
@@ -498,6 +499,7 @@ block content
                   .col-xs-12.col-md-12(style='margin-top: 1rem;')
                     -const hidePostOptions = true;
                     -const hidePostStep = true;
+                    -const disabledHidePost = true;
                     -const showPostUrl = true;
                     -const disabledHighlight = true;
                     for post, index in data.toppedPosts
@@ -518,6 +520,7 @@ block content
                     .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
                       for post, index in data.posts
                         if index !== 0 || data.paging.page !== 0
+                          -const disabledHidePost = !post.hide;
                           -let previousPost;
                           if index !== 1
                             -previousPost = data.posts[index-1];
@@ -630,6 +633,11 @@ block content
       include ../publicModules/toColumn/toColumn
 
 block scripts
+  script.
+    NKC.configs.postHeight = {};
+  script=`NKC.configs.postHeight.xs=${data.postHeight.xs}`
+  script=`NKC.configs.postHeight.sm=${data.postHeight.sm}`
+  script=`NKC.configs.postHeight.md=${data.postHeight.md}`
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')

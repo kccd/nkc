@@ -18,6 +18,7 @@ const pageRouter = require('./page');
 const examRouter = require('./exam');
 const messageRouter = require('./message');
 const reviewRouter = require("./review");
+const hidePostRouter = require("./hidePost");
 const shareRouter = require('./share');
 const smsRouter = require('./sms');
 const postRouter = require('./post');
@@ -41,6 +42,7 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+  .use("/hidePost", hidePostRouter.routes(), hidePostRouter.allowedMethods())
   .use("/topping", toppingRouter.routes(), toppingRouter.allowedMethods())
   .use("/cache", cacheRouter.routes(), cacheRouter.allowedMethods())
   .use('/red-envelope', redEnvelopeRouter.routes(), redEnvelopeRouter.allowedMethods())

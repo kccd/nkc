@@ -8,6 +8,10 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+	  hidePost: {
+      GET: "experimentalHidePostSettings",
+      POST: "experimentalHidePostSettings"
+    },
 	  topping: {
       GET: "experimentalToppingSettings",
       PATCH: "experimentalToppingSettings"

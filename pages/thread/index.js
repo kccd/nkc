@@ -1,5 +1,26 @@
 var SubscribeTypes, UserInfo, surveyForms = [], draftId = "";
+var hidePostMaxHeight;
 $(document).ready(function(){
+  var DW = $(document).width();
+  if(DW < 768) {
+    hidePostMaxHeight = NKC.configs.postHeight.xs;
+  } else if(DW < 992) {
+    hidePostMaxHeight = NKC.configs.postHeight.sm;
+  } else {
+    hidePostMaxHeight = NKC.configs.postHeight.md;
+  }
+  var hidePostDom = $(".hide-post.part");
+  for(var i = 0; i < hidePostDom.length; i++) {
+    var d = hidePostDom.eq(i);
+    var contentDom = d.find(".thread-post-mask");
+    var pid = d.attr("data-pid");
+    if(contentDom.height() > 120) {
+      hidePost(pid);
+      $(".hide-post-button[data-pid='"+pid+"']").css({
+        "display": "inline-block"
+      });
+    }
+  }
   if(window.moduleToColumn) {
     moduleToColumn.init();
   }
@@ -1063,4 +1084,49 @@ function topPost(pid, topped) {
     .catch(function(data) {
       sweetError(data);
     });
+}
+
+/*function hidePost(pid, type) {
+  nkcAPI("/p/" + pid + "/hide", "POST", {type: type})
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(function(data) {
+      sweetError(data);
+    })
+}*/
+
+function hidePost(pid) {
+  var dom = $(".hide-post[data-pid='"+pid+"']");
+  var span = $(".hide-post-button[data-pid='"+pid+"']>button>span");
+  var fa = $(".hide-post-button[data-pid='"+pid+"']>button>.fa");
+  var mask = dom.find(".thread-post-mask");
+  dom.addClass("active");
+  mask.css({
+    "max-height": hidePostMaxHeight + "px"
+  });
+  span.text("展开");
+  fa.removeClass("fa-angle-up").addClass("fa-angle-down");
+}
+
+function showPost(pid) {
+  var dom = $(".hide-post[data-pid='"+pid+"']");
+  var span = $(".hide-post-button[data-pid='"+pid+"']>button>span");
+  var fa = $(".hide-post-button[data-pid='"+pid+"']>button>.fa");
+  dom.removeClass("active");
+  var mask = dom.find(".thread-post-mask");
+  mask.css({
+    "max-height": "none"
+  });
+  span.text("折叠");
+  fa.removeClass("fa-angle-down").addClass("fa-angle-up");
+}
+
+function switchPost(pid) {
+  var dom = $(".hide-post[data-pid='"+pid+"']");
+  if(dom.hasClass("active")) {
+    showPost(pid);
+  } else {
+    hidePost(pid);
+  }
 }

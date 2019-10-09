@@ -8,6 +8,7 @@ const digestRouter = require('./digest');
 const voteRouter = require('./vote');
 const warningRouter = require("./warning");
 const anonymousRouter = require("./anonymous");
+const hideRouter = require("./hide");
 const postRouter = require("./post");
 const Path = require("path");
 const toppedRouter = require("./topped");
@@ -469,6 +470,7 @@ router
     }
     await next();
   })
+  .use("/:pid/hide", hideRouter.routes(), hideRouter.allowedMethods())
   .use('/:pid/history', history.routes(), history.allowedMethods())
 	.use('/:pid/digest', digestRouter.routes(), digestRouter.allowedMethods())
   .use('/:pid/recommend', recommend.routes(), recommend.allowedMethods())

@@ -22,6 +22,7 @@ NKC.modules.CommonModal = function() {
     this_.callback = callback;
     this_.app.data = options.data;
     this_.app.title = options.title;
+    this_.app.info = options.info || "";
     this_.dom.modal("show");
   };
   this_.close = function() {

@@ -736,8 +736,8 @@ threadRouter
 		}
 		// data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
 		// data.thread = data.thread.toObject();
-
-
+    const hidePostSettings = await db.SettingModel.getSettings("hidePost");
+    data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;
 		data.step = step;
 		await next();
