@@ -1,4 +1,7 @@
 var data = NKC.methods.getDataById("data");
+if(data.hidePostSettings.postHeight.float === undefined) {
+  data.hidePostSettings.postHeight.float = 0.5;
+}
 var app = new Vue({
   el: "#app",
   data: {

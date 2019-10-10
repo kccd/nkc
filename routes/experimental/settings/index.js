@@ -35,6 +35,7 @@ const safeRouter = require('./safe');
 const cacheRouter = require("./cache");
 const protocolRouter = require('./protocol');
 const toppingRouter = require("./topping");
+const transferRouter = require("./transfer");
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -42,6 +43,7 @@ settingRouter
 	.post('/', async (ctx, next) => {
 		await next();
 	})
+  .use("/transfer", transferRouter.routes(), transferRouter.allowedMethods())
   .use("/hidePost", hidePostRouter.routes(), hidePostRouter.allowedMethods())
   .use("/topping", toppingRouter.routes(), toppingRouter.allowedMethods())
   .use("/cache", cacheRouter.routes(), cacheRouter.allowedMethods())

@@ -39,6 +39,13 @@ block eContent
             label.col-sm-2.control-label 大屏（>992px）
             .col-sm-2
               input.form-control(type="number" v-model.number="hidePostSettings.postHeight.md")
+          h4 折叠系数
+            | &nbsp;
+            small 折叠后的内容高度为：折叠高度 x 折叠系数
+          .form-group
+            label.col-sm-2.control-label 系数
+            .col-sm-2
+              input.form-control(type="number" v-model.number="hidePostSettings.postHeight.float")
           .form-group
             label.col-sm-2.control-label
             .col-sm-10

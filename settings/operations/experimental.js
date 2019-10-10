@@ -8,6 +8,10 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+    transfer: {
+      GET: "experimentalTransferKCB",
+      POST: "experimentalTransferKCB"
+    },
 	  hidePost: {
       GET: "experimentalHidePostSettings",
       POST: "experimentalHidePostSettings"

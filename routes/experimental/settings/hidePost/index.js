@@ -13,8 +13,13 @@ router
     const {db, data, body, nkcModules} = ctx;
     const {hidePostSettings} = body;
     let {rolesId, defaultRoleGradesId, postHeight} = hidePostSettings;
-    let {xs, md, sm} = postHeight;
+    let {xs, md, sm, float = 0.5} = postHeight;
+    postHeight.float = float;
     const {checkNumber} = nkcModules.checkData;
+    checkNumber(float, {
+      min: 0.1,
+      fractionDigits: 2
+    });
     checkNumber(xs, {
       min: 1
     });

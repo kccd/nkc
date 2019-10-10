@@ -5,6 +5,7 @@ module.exports = {
       xs: 300,
       sm: 250,
       md: 200,
+      float: 0.5
     },
     rolesId: [],
     defaultRoleGradesId: []

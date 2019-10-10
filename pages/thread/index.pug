@@ -638,6 +638,7 @@ block scripts
   script=`NKC.configs.postHeight.xs=${data.postHeight.xs}`
   script=`NKC.configs.postHeight.sm=${data.postHeight.sm}`
   script=`NKC.configs.postHeight.md=${data.postHeight.md}`
+  script=`NKC.configs.postHeight.float=${data.postHeight.float || 0.5}`
   script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
