@@ -121,6 +121,9 @@
           if permission('experimentalToppingSettings')
             li
               a(href='/e/settings/topping') 置顶
+          if permission('experimentalTransferKCB')
+            li
+              a(href='/e/settings/transfer') kcb转账
           if permission('experimentalHidePostSettings')
             li
               a(href='/e/settings/hidePost') 回复折叠

@@ -5,5 +5,11 @@ module.exports = [
     data: {
       secret: randomBytes(128).toString('hex').toString()
     }
+  },
+  {
+    name: "transferKCB",
+    data: {
+      operatorId: []
+    }
   }
 ];
