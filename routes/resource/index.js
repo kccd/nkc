@@ -265,7 +265,8 @@ resourceRouter
       //   await imageMagick.imageNarrow(path)
       // }
       // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
-      if(width > 600 && height > 200 && waterAdd === true){
+      const homeSettings = await ctx.db.SettingModel.getSettings("home");
+      if(width >= homeSettings.waterLimit.minWidth && height >= homeSettings.waterLimit.minHeight && waterAdd === true){
         if(waterStyle === "siteLogo"){
           await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path)
         }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
@@ -331,7 +332,7 @@ resourceRouter
           mediaType: "mediaAttachment"
         });
         ctx.data.r = await r.save();
-        ctx.throw(400, "视频转码失败，已被放至附件")
+        ctx.throw(400, "视频转码失败，已被放至附件");
         return await next()
       }
 

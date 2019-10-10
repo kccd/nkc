@@ -131,12 +131,21 @@ block content
               hr
               .row
                 .col-xs-12.col-md-4
-                  h4 水印透明度
-                    small &nbsp;取值范围：[ 0, 255 ]
-                  .form-inline
+                  .form
                     .form-group
+                      label 水印透明度
+                        small &nbsp;取值范围：[ 0, 255 ]
                       input.form-control#watermarkTransparency(type='number' value=data.homeSettings.watermarkTransparency)
+                    .form-group
+                      h5.text-info 仅给尺寸满足以下条件的图片添加水印
+                      label 图片最小宽度（px）
+                      input.form-control#waterLimitMinWidth(type="number" value=data.homeSettings.waterLimit.minWidth)
+                    .form-group
+                      label 图片最小高度（px）
+                      input.form-control#waterLimitMinHeight(type="number" value=data.homeSettings.waterLimit.minHeight)
+                    .form-group
                       button.btn.btn-primary(onclick='saveWaterMarkSettings()') 保存
+
             .col-xs-12.col-md-12
               hr
               input#inputFile(type='file' accept="image/*").hidden
