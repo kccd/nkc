@@ -46,6 +46,8 @@ messageRouter
         min: 0
       });
 
+      const roles = await db.RoleModel.find({_id: {$in: messageSettings.adminRolesId}});
+      const rolesId = roles.map(r => r._id);
 
       await db.SettingModel.updateOne({
         _id: "message"
@@ -56,6 +58,7 @@ messageRouter
           "c.mandatoryLimitInfo": messageSettings.mandatoryLimitInfo,
           "c.mandatoryLimit": messageSettings.mandatoryLimit,
           "c.systemLimitInfo": messageSettings.systemLimitInfo,
+          "c.adminRolesId": rolesId,
           "c.customizeLimitInfo": messageSettings.customizeLimitInfo,
         }
       });

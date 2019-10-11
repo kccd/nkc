@@ -767,6 +767,7 @@ $(function() {
           .then(function(data) {
             if(app.target !== target) return;
             app.targetUserSendLimit = data.targetUserSendLimit;
+            app.showMandatoryLimitInfo = data.showMandatoryLimitInfo;
             app.targetUserGrade = data.targetUserGrade;
             if(data.messages.length === 0) {
               app.info = '没有了~';
@@ -866,7 +867,6 @@ $(function() {
           nkcAPI('/message?t=' + Date.now(), 'GET', {})
             .then(function(data) {
               app.userList = data.userList;
-              app.showMandatoryLimitInfo = data.showMandatoryLimitInfo;
               app.friends = data.usersFriends;
               app.blackListUid = data.blackListUid;
               // 拓展好友

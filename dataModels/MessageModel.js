@@ -100,15 +100,22 @@ const messageSchema = new Schema({
 });
 /*
 * 根据用户的文章和回复的数量判断用户是否能够发送短消息
-* @param {String} uid 用户ID
+* @param {String} uid 发送者ID
+* @param {String} tUid 接受者ID
 * @author pengxiguaa 2019-10-11
 * */
-messageSchema.statics.ensureSystemLimitPermission = async (uid) => {
+messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
   const SettingModel = mongoose.model("settings");
   const ThreadModel = mongoose.model("threads");
+  const UserModel = mongoose.model("users");
   const PostModel = mongoose.model("posts");
+  const targetUser = await UserModel.findOne({uid: tUid});
+  if(!targetUser) throwErr(500, `user not found, uid: ${tUid}`);
   const messageSettings = await SettingModel.getSettings("message");
-  const {mandatoryLimitInfo, mandatoryLimit} = messageSettings;
+  const {mandatoryLimitInfo, mandatoryLimit, adminRolesId} = messageSettings;
+  for(const cert of targetUser.certs) {
+    if(adminRolesId.includes(cert)) return;
+  }
   const {threadCount, postCount} = mandatoryLimit;
   const userThreadCount = await ThreadModel.count({
     uid,
@@ -170,11 +177,11 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     },
     {
       $group: {
-        _id: '$r',
+        _id: '$r'
       }
     }
   ]);
-  todayUid = todayUid.map(o => o.uid);
+  todayUid = todayUid.map(o => o._id);
   if(!todayUid.includes(toUid)) {
     if(todayUid.length >= messagePersonCountLimit) {
       throwErr(403, `根据您的证书和等级，您每天最多只能给${messagePersonCountLimit}个用户发送信息`);
