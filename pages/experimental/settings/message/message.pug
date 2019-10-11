@@ -68,12 +68,20 @@ block eContent
               .form-group
                 label 通过审核且未被屏蔽的回复数量
                 input.form-control(type="text" v-model.number="messageSettings.mandatoryLimit.postCount")
-              .form-group 管理员证书
-                span.text-danger &nbsp;受限后可向拥有管理员证书的用户发送短消息
+              .form-group
+                label 管理员证书
+                  span.text-danger &nbsp;受限后可向拥有管理员证书的用户发送短消息
                 .checkbox
                   label.m-r-1(v-for="r in roles")
                     input(type="checkbox" :value="r._id" v-model="messageSettings.adminRolesId")
                     span {{r.displayName}}
+              .form-group
+                label 白名单
+                  span.text-danger &nbsp;已勾选等级的用户不会受到限制
+                .checkbox
+                  label.m-r-1(v-for="g in grades")
+                    input(type="checkbox" :value="g._id" v-model="messageSettings.mandatoryLimitGradeProtect")
+                    span {{g.displayName}}
 
             h5
               b 受限时提示(80个汉字以内)
