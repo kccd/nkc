@@ -107,8 +107,12 @@ function removeNotice(oc) {
 
 function saveWaterMarkSettings() {
 	var watermarkTransparency = $('#watermarkTransparency').val();
+	var waterLimitMinWidth = $("#waterLimitMinWidth").val();
+  var waterLimitMinHeight = $("#waterLimitMinHeight").val();
 	nkcAPI('/e/settings/home/logo', 'PATCH', {
 		watermarkTransparency: watermarkTransparency,
+    waterLimitMinWidth: parseInt(waterLimitMinWidth),
+    waterLimitMinHeight: parseInt(waterLimitMinHeight),
 		operation: 'saveWaterMarkSettings'
 	})
 		.then(function() {

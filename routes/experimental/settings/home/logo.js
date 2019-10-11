@@ -9,18 +9,28 @@ router
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {body, db} = ctx;
+		const {body, db, nkcModules} = ctx;
 		const {id, type, operation} = body;
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		const q = Object.assign({}, homeSettings.c);
 		if(operation === 'saveWaterMarkSettings') {
-			let {watermarkTransparency} = body;
+			let {watermarkTransparency, waterLimitMinHeight, waterLimitMinWidth} = body;
+      nkcModules.checkData.checkNumber(waterLimitMinWidth, {
+        min: 200,
+        name: "图片最小宽度"
+      });
+      nkcModules.checkData.checkNumber(waterLimitMinHeight, {
+        min: 200,
+        name: "图片最小高度"
+      });
 			watermarkTransparency = parseInt(watermarkTransparency);
 			if(watermarkTransparency >= 0 && watermarkTransparency <= 255) {
 				q.watermarkTransparency =  watermarkTransparency;
 			} else {
 				ctx.throw(400, '水印透明度取值范围为：[ 1, 255 ]');
 			}
+			q.waterLimit.minHeight = waterLimitMinHeight;
+			q.waterLimit.minWidth = waterLimitMinWidth;
 		} else if(operation === 'saveLogo') {
 			if(type === 'smallLogo') {
 				if(homeSettings.c.smallLogo === id) ctx.throw(400, '图片已被设置为默认小图了');

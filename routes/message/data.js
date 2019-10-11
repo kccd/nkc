@@ -35,6 +35,13 @@ router
       // 判断是否已创建聊天
       await db.CreatedChatModel.createChat(user.uid, uid);
       data.targetUserSendLimit = (await db.UsersGeneralModel.findOnly({uid: targetUser.uid})).messageSettings.limit;
+      // 用户是否能够发送短消息
+      data.showMandatoryLimitInfo = false;
+      try{
+        await db.MessageModel.ensureSystemLimitPermission(user.uid, targetUser.uid);
+      } catch(err) {
+        data.showMandatoryLimitInfo = true;
+      }
     } else if(type === "STE") {
       const q = {
         ty: 'STE'

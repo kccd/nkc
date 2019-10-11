@@ -10,6 +10,11 @@ module.exports = {
       topic: true,
       discipline: true
     },
+    watermarkTransparency: 30,
+    waterLimit: {
+      minWidth: 799,
+      minHeight: 479
+    },
     // 游客默认显示 推荐、最新
     visitorThreadList: "recommend",
     // 人们文章 条件
