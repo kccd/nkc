@@ -1330,7 +1330,8 @@ footer.footer ul li{
 }
 .thread-panel-author-info{
   width: 100%;
-  padding-bottom: 0.7rem;
+  padding-bottom: 0.2rem;
+  font-size: 1.2rem;
 }
 .thread-panel-author a{
   color: #3494da;
@@ -1384,7 +1385,7 @@ footer.footer ul li{
 .thread-panel-abstract{
   margin-top: 0.4rem;
   /*max-height: 7rem;*/
-  overflow: hidden;
+  /*overflow: hidden;*/
   font-size: 1.2rem;
 }
 .thread-panel-abstract:hover, .thread-panel-abstract:link, .thread-panel-abstract:active, .thread-panel-abstract:visited{
@@ -1440,8 +1441,8 @@ footer.footer ul li{
   right: 0;
   width: 2rem;
   height: 2rem;
-  background-color: #aaa;
-  border: 0.1rem solid #aaa;
+  background-color: #ccc;
+  border: 0.1rem solid #ccc;
   border-radius: 50%;
   overflow: hidden;
 }
