@@ -49,6 +49,9 @@ messageRouter
       const roles = await db.RoleModel.find({_id: {$in: messageSettings.adminRolesId}});
       const rolesId = roles.map(r => r._id);
 
+      const grades = await db.UsersGradeModel.find({_id: {$in: messageSettings.mandatoryLimitGradeProtect}});
+      const gradesId = grades.map(g => g._id);
+
       await db.SettingModel.updateOne({
         _id: "message"
       }, {
@@ -59,6 +62,7 @@ messageRouter
           "c.mandatoryLimit": messageSettings.mandatoryLimit,
           "c.systemLimitInfo": messageSettings.systemLimitInfo,
           "c.adminRolesId": rolesId,
+          "c.mandatoryLimitGradeProtect": gradesId,
           "c.customizeLimitInfo": messageSettings.customizeLimitInfo,
         }
       });
