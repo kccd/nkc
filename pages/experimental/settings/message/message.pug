@@ -50,7 +50,7 @@ block eContent
                 input(type="checkbox" :value="grade._id" v-model="messageSettings.gradeLimit")
                 span {{grade.displayName}}&nbsp;&nbsp;&nbsp;
             h5
-              b 保护接受方：
+              b 保护接收方：
               span(v-for="grade in grades")
                 input(type="checkbox" :value="grade._id" v-model="messageSettings.gradeProtect")
                 span {{grade.displayName}}&nbsp;&nbsp;&nbsp;
@@ -76,8 +76,8 @@ block eContent
                     input(type="checkbox" :value="r._id" v-model="messageSettings.adminRolesId")
                     span {{r.displayName}}
               .form-group
-                label 白名单
-                  span.text-danger &nbsp;已勾选等级的用户不会受到限制
+                label 黑名单
+                  span.text-danger &nbsp;已勾选等级的接收方不会受到保护
                 .checkbox
                   label.m-r-1(v-for="g in grades")
                     input(type="checkbox" :value="g._id" v-model="messageSettings.mandatoryLimitGradeProtect")

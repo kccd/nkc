@@ -109,14 +109,12 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
   const ThreadModel = mongoose.model("threads");
   const UserModel = mongoose.model("users");
   const PostModel = mongoose.model("posts");
-  const user = await UserModel.findOne({uid});
-  if(!user) throwErr(500, `user not found, uid: ${uid}`);
   const targetUser = await UserModel.findOne({uid: tUid});
   if(!targetUser) throwErr(500, `user not found, uid: ${tUid}`);
+  await targetUser.extendGrade();
   const messageSettings = await SettingModel.getSettings("message");
   const {mandatoryLimitInfo, mandatoryLimit, adminRolesId, mandatoryLimitGradeProtect} = messageSettings;
-  await user.extendGrade();
-  if(mandatoryLimitGradeProtect.includes(user.grade._id)) return;
+  if(mandatoryLimitGradeProtect.includes(targetUser.grade._id)) return;
   for(const cert of targetUser.certs) {
     if(adminRolesId.includes(cert)) return;
   }
