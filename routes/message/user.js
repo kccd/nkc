@@ -41,6 +41,7 @@ userRouter
     const targetUser = await db.UserModel.findOnly({uid});
     const {user} = data;
     // 判断是否有权限发送信息
+    await db.MessageModel.ensureSystemLimitPermission(user.uid);
     await db.MessageModel.ensurePermission(user.uid, uid, data.userOperationsId.includes('canSendToEveryOne'));
     const {content, socketId} = body;
     if(content === '') ctx.throw(400, '内容不能为空');

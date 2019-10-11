@@ -96,7 +96,10 @@ $(function() {
         digestLimit: false,
         gradeLimit: 0
       },
-      grades: grades
+      grades: grades,
+
+      // 系统强制限制 若未满足要求则无法给当前用户发送短消息
+      showMandatoryLimitInfo: false
 
     },
     beforeCreate: function() {
@@ -170,6 +173,7 @@ $(function() {
       }
     },
     computed: {
+      // 用户防骚扰限制 若未满足要求则无法给当前用户发送短消息
       showCustomizeLimitInfo: function() {
         if(this.systemInfoViewed) return;
         var targetUser = this.targetUser;
@@ -194,6 +198,7 @@ $(function() {
           (!targetUserSendLimit.volumeB && targetUserSendLimit.volumeA && !this.user.volumeA)
         ) return true;
       },
+      // 系统提醒 若未满足要求则显示系统提醒，但任然可以给当前用户发送短消息
       showSystemLimitInfo: function() {
         if(this.systemInfoViewed) return;
         var targetUser = this.targetUser;
@@ -861,6 +866,7 @@ $(function() {
           nkcAPI('/message?t=' + Date.now(), 'GET', {})
             .then(function(data) {
               app.userList = data.userList;
+              app.showMandatoryLimitInfo = data.showMandatoryLimitInfo;
               app.friends = data.usersFriends;
               app.blackListUid = data.blackListUid;
               // 拓展好友

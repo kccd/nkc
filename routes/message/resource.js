@@ -60,6 +60,7 @@ resourceRouter
     const targetUser = await db.UserModel.findOnly({uid: targetUid});
     data.targetUser = targetUser;
     // 判断是否有权限发送信息
+    await db.MessageModel.ensureSystemLimitPermission(user.uid);
     await db.MessageModel.ensurePermission(user.uid, targetUid, data.userOperationsId.includes('canSendToEveryOne'));
 
     let files = [];

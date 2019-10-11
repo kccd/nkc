@@ -191,6 +191,13 @@ messageRouter
 
     // 分组信息
     data.categories = await db.FriendsCategoryModel.find({uid: user.uid}).sort({toc: -1});
+    // 用户是否能够发送短消息
+    data.showMandatoryLimitInfo = false;
+    try{
+      await db.MessageModel.ensureSystemLimitPermission(user.uid);
+    } catch(err) {
+      data.showMandatoryLimitInfo = true;
+    }
     await next();
   })
   .use('/friendsApplication', friendsApplicationRouter.routes(), friendsApplicationRouter.allowedMethods())
