@@ -37,7 +37,7 @@ module.exports = async (ctx, next) => {
 		try{
       let {cookie} = ctx.query || {};
       if(cookie) {
-        cookie = new Buffer(cookie, 'base64').toString();
+        cookie = Buffer.from(cookie, 'base64').toString();
         if(cookie) {
           const cookies = new Cookies(cookie, {
             keys: [cookieConfig.secret]

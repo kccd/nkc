@@ -19,7 +19,6 @@ loginRouter
 		const {
 			encryptInMD5WithSalt,
 			encryptInSHA256HMACWithSalt,
-			aesEncode
 		} = tools.encryption;
 
 		let user;

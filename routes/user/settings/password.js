@@ -6,7 +6,7 @@ passwordRouter
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, db, body, tools} = ctx;
+		const {data, db, body} = ctx;
 		const {oldPassword, password} = body;
 		const {apiFunction} = ctx.nkcModules;
 		const {user} = data;
@@ -23,9 +23,9 @@ passwordRouter
 		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者');
 		const newPassword = apiFunction.newPasswordObject(password);
-		const loginKey = await tools.encryption.aesEncode(user.uid, newPassword.password.hash);
 		await userPersonal.update({password: newPassword.password, hashType: newPassword.hashType});
-		data.loginKey = loginKey;
+		// 兼容app，修改app时去掉
+		data.loginKey = "";
 		await next();
 	});
 module.exports = passwordRouter;
