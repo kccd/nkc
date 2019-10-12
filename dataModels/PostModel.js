@@ -476,70 +476,39 @@ postSchema.pre('save', async function(next) {
   // correct reference to the post
   try {
     const ResourceModel = mongoose.model('resources');
-
-    const {_initial_state_: initialState} = this;
-    const oldContent = initialState ? initialState.c : '';
-    let hasImage = initialState ? initialState.hasImage : false;
-    const hasImageWhenInitialized = hasImage;
-
 	  const {c, pid, l} = this;
-	  let oldResources = [], newResources = [];
+	  let newResources = [];
 	  if(l !== 'html') {
-		  oldResources = (oldContent.match(/{r=[0-9]{1,20}}/g) || [])
-		    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
 		  newResources = (c.match(/{r=[0-9]{1,20}}/g) || [])
 		    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
 	  } else {
-		  oldResources = (oldContent.match(/\/r\/[0-9]{1,20}/g) || [])
-			  .map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
 		  newResources = (c.match(/\/r\/[0-9]{1,20}/g) || [])
 			  .map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
 	  }
+	  let oldResources = await ResourceModel.find({references: pid}, {rid: 1});
+	  oldResources = oldResources.map(r => r.rid);
 
-    const additional = newResources.filter(e => oldResources.indexOf(e) === -1);
-    const removed = oldResources.filter(e => newResources.indexOf(e) === -1);
-
-    // handle the hasImage property when deleting a resource.
-    await Promise.all(removed.map(async rid => {
+	  // 未清除旧的资源对象上的pid，为了回滚历史时使用
+    /*// 从旧的资源对象中移除pid
+    for(const rid of oldResources) {
+      if(newResources.includes(rid)) continue;
+      await ResourceModel.updateOne({rid}, {
+        $pull: {
+          references: pid
+        }
+      });
+    }*/
+    // 将pid写到新的资源对象中
+    for(const rid of newResources) {
+      if(oldResources.includes(rid)) continue;
       const resource = await ResourceModel.findOne({rid});
-      if (resource) {
-        const index = resource.references.findIndex(e => e === pid);
-        if (index) {
-          // resource.references.splice(index, 1);
-          if (['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'].indexOf(resource.ext.toLowerCase()) > -1) {
-            hasImage = false
-          }
-          // await resource.save()
+      if(!resource) continue;
+      await resource.update({
+        $addToSet: {
+          references: pid
         }
-      }
-    }));
-    // handle additional
-    await Promise.all(additional.map(async rid => {
-      const resource = await ResourceModel.findOne({rid});
-      if (resource) {
-        if (!resource.references.includes(pid)) {
-          resource.references.push(pid);
-          await resource.save()
-        }
-        // post.hasImage depends on whether the resources has a img extension
-        if (['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'].indexOf(resource.ext.toLowerCase()) > -1) {
-          hasImage = true
-        }
-      }
-    }));
-
-    if (hasImageWhenInitialized && !hasImage) {
-      // this case means the request is updating a post and it used to have a image,
-      // but after the above codes, it may not have any img, so check it
-      const resources = await this.extendResources();
-      if (resources.length) {
-        const img = resources.find(e => ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'].indexOf(e.ext.toLowerCase()) > -1)
-        if (img)
-          hasImage = true
-      }
+      });
     }
-
-    this.hasImage = hasImage;
     return next()
   } catch(e) {
     return next(e)
