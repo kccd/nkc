@@ -488,7 +488,8 @@ postSchema.pre('save', async function(next) {
 	  let oldResources = await ResourceModel.find({references: pid}, {rid: 1});
 	  oldResources = oldResources.map(r => r.rid);
 
-    // 从旧的资源对象中移除pid
+	  // 未清除旧的资源对象上的pid，为了回滚历史时使用
+    /*// 从旧的资源对象中移除pid
     for(const rid of oldResources) {
       if(newResources.includes(rid)) continue;
       await ResourceModel.updateOne({rid}, {
@@ -496,7 +497,7 @@ postSchema.pre('save', async function(next) {
           references: pid
         }
       });
-    }
+    }*/
     // 将pid写到新的资源对象中
     for(const rid of newResources) {
       if(oldResources.includes(rid)) continue;
