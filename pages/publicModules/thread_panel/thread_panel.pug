@@ -5,15 +5,15 @@
     include ../module_disabled
   if thread.recycleMark
     include ../module_toDraft
-
-  .thread-panel-abstract
+  .thread-panel-body
+    //- 文章封面，pc端
     if thread.firstPost.cover
-      .thread-panel-abstract-cover
-        .thread-panel-abstract-cover-image(
+      .thread-panel-cover-big.hidden-xs.hidden-sm
+        .thread-panel-image(
           style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
         )
-    .thread-panel-abstract-content
-
+    .thread-panel-content
+      //- 作者信息 专业信息 时间
       .thread-panel-author-info
         if canManagement
           .checkbox.thread-checkbox
@@ -61,52 +61,53 @@
 
         .thread-panel-time=fromNow(thread.toc)
 
-      a(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "").thread-panel-title= thread.firstPost.t
-      -const pageCount = thread.count / state.pageSettings.threadPostList
-      -let ellipsis = false;
-      -for(let i = 1; i < pageCount; i++)
-        if i < 4 || i > pageCount - 3
-          a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
-        else if !ellipsis
-          span.thread-title-page ...
-          -ellipsis = true;
+        .thread-panel-button
+          if thread.firstPost.voteUp
+            .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
+          if thread.hits
+            .fa.fa-eye=` ${thread.hits}`
+          if thread.count - 1
+            .fa.fa-comment=` ${thread.count - 1}`
+        if thread.from
+          .thread-panel-from
+            if thread.from === 'own'
+              span 自己的文章
+            else if thread.from === 'subForum'
+              span 关注的专业
+            else if thread.from === 'subFriend'
+              span 好友
+            else if thread.from === "subThread"
+              span 关注的文章
+            else if thread.from === "collection"
+                span 收藏
 
-      if thread.firstPost.abstractCn
-        a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.abstractCn.slice(0, 200)
-      else
-        a(href=`/t/${thread.tid}`).thread-panel-abstract-content-div=thread.firstPost.c.slice(0, 200)
-      a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`).thread-panel-abstract-reply=thread.lastPost.c.slice(0, 200)
-        .thread-panel-reply-user(onmouseover=tools.floatUserInfo(thread.lastPost.uid))
-          img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar))
-
-  //.thread-panel-info
-    .thread-panel-button
-      if thread.firstPost.voteUp
-        .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
-      if thread.hits
-        .fa.fa-eye=` ${thread.hits}`
-      if thread.count - 1
-        .fa.fa-comment=` ${thread.count - 1}`
-    if thread.from
-      .thread-panel-from
-        if thread.from === 'own'
-          span 自己的文章
-        else if thread.from === 'subForum'
-          span 关注的专业
-        else if thread.from === 'subFriend'
-          span 好友
-        else if thread.from === "subThread"
-          span 关注的文章
-        else if thread.from === "collection"
-          span 收藏
-    .thread-panel-reply
-      if !thread.lastPost.anonymous
-        a(href=`/u/${thread.lastPost.uid}` target="_blank"
-          onmouseover=`floatUserPanel.open(this, '${thread.lastPost.uid}')`
-        )= thread.lastPost.user.username
-      else
-        span.anonymous-name=anonymousInfo.username
-      span=fromNow(thread.lastPost.toc)
-
-
-
+      //- 文章标题
+      .thread-panel-title
+        a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t)= thread.firstPost.t
+        -const pageCount = thread.count / state.pageSettings.threadPostList
+        -let ellipsis = false;
+        -for(let i = 1; i < pageCount; i++)
+          if i < 4 || i > pageCount - 3
+            a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
+          else if !ellipsis
+            span.thread-title-page ...
+            -ellipsis = true;
+      .thread-panel-abstract
+        if thread.firstPost.cover
+          .thread-panel-cover.hidden-md.hidden-lg
+            .thread-panel-image(
+              style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
+            )
+        .thread-panel-abstract-content
+          if thread.firstPost.abstractCn
+            a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
+          else
+            a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.c.slice(0, 200)
+          .thread-panel-reply
+            a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
+            if !thread.lastPost.anonymous
+              a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` onmouseover=tools.floatUserInfo(thread.lastPost.uid))
+                img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar))
+            else
+              .thread-panel-reply-user
+                img(src=tools.getUrl("anonymousUserAvatar"))

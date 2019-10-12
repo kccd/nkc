@@ -13,6 +13,9 @@ var Tools = function() {
       case "postCover": {
         return "/nr/cover/" + id + t
       }
+      case "anonymousUserAvatar": {
+        return "/default/default_anonymous_user_avatar.jpg";
+      }
     }
   };
   self.floatUserInfo = function(uid) {
