@@ -175,6 +175,9 @@ table{
   padding-bottom: 0;
 }
 /* padding-left */
+.p-l-0{
+  padding-left: 0!important;
+}
 .p-l-1{
   padding-left: 1rem;
 }

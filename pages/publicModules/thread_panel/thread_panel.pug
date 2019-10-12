@@ -106,7 +106,7 @@
           .thread-panel-reply
             a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
             if !thread.lastPost.anonymous
-              a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` onmouseover=tools.floatUserInfo(thread.lastPost.uid))
+              a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" onmouseover=tools.floatUserInfo(thread.lastPost.uid))
                 img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar))
             else
               .thread-panel-reply-user
