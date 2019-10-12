@@ -163,10 +163,11 @@ NKC.modules.SelectResource = function() {
         // alert(this);
       },
       initModule: function() {
-        var height = "41.5rem";
+        var height = "43.5rem";
+        /*var height = "41.5rem";
         if(this.allowedExt.length !== 1) {
           height = "43.5rem";
-        }
+        }*/
         self.dom.css({
           height: height
         });
@@ -215,6 +216,7 @@ NKC.modules.SelectResource = function() {
       },
       open: function(callback, options) {
         this.resetDomPosition();
+        this.resetCropper();
         self.callback = callback;
         options = options || {};
         self.app.countLimit = options.countLimit || 50;

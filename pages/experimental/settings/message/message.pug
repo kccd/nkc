@@ -42,14 +42,15 @@ block eContent
       .col-xs-12.col-md-8.col-md-offset-2(v-else-if="type === 'limit'")
         .row
           .col-xs-12.col-md-12(v-if="messageSettings")
-            h4 系统级防骚扰
+            h4 防骚扰提示&nbsp;
+              small 不限制发送短消息
             h5
               b 受限发送方：
               span(v-for="grade in grades")
                 input(type="checkbox" :value="grade._id" v-model="messageSettings.gradeLimit")
                 span {{grade.displayName}}&nbsp;&nbsp;&nbsp;
             h5
-              b 保护接受方：
+              b 保护接收方：
               span(v-for="grade in grades")
                 input(type="checkbox" :value="grade._id" v-model="messageSettings.gradeProtect")
                 span {{grade.displayName}}&nbsp;&nbsp;&nbsp;
@@ -57,7 +58,37 @@ block eContent
               b 受限时提示(80个汉字以内)
 
             textarea.form-control(rows=4 v-model="messageSettings.systemLimitInfo")
-            h4.m-t-3 用户自定义防骚扰
+
+            h4.m-t-3 防骚扰-系统限制&nbsp;
+              small 未满足以下条件的用户无法发送短消息
+            .form
+              .form-group
+                label 通过审核且未被屏蔽的文章数量
+                input.form-control(type="text" v-model.number="messageSettings.mandatoryLimit.threadCount")
+              .form-group
+                label 通过审核且未被屏蔽的回复数量
+                input.form-control(type="text" v-model.number="messageSettings.mandatoryLimit.postCount")
+              .form-group
+                label 管理员证书
+                  span.text-danger &nbsp;受限后可向拥有管理员证书的用户发送短消息
+                .checkbox
+                  label.m-r-1(v-for="r in roles")
+                    input(type="checkbox" :value="r._id" v-model="messageSettings.adminRolesId")
+                    span {{r.displayName}}
+              .form-group
+                label 黑名单
+                  span.text-danger &nbsp;已勾选等级的接收方不会受到保护
+                .checkbox
+                  label.m-r-1(v-for="g in grades")
+                    input(type="checkbox" :value="g._id" v-model="messageSettings.mandatoryLimitGradeProtect")
+                    span {{g.displayName}}
+
+            h5
+              b 受限时提示(80个汉字以内)
+            textarea.form-control(rows=4 v-model="messageSettings.mandatoryLimitInfo")
+
+            h4.m-t-3 防骚扰-用户自定义限制&nbsp;
+              small 限制发送短消息
             h5
               b 受限时提示(80个汉字以内)
             textarea.form-control(rows=4 v-model="messageSettings.customizeLimitInfo")

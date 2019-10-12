@@ -30,7 +30,8 @@
         .fa.fa-remove(@click="close")
       .module-sr-content(v-if="pageType === 'list'")
         .selected-resources
-          .resource-types(v-if="allowedExt && allowedExt.length > 1")
+          .resource-types
+            //- (v-if="allowedExt && allowedExt.length > 1")
             .resource-type(v-if="show.all" :class="{'active':resourceType === 'all'}" @click="selectResourceType('all')") 全部
             .resource-type(v-if="show.picture" :class="{'active':resourceType === 'picture'}" @click="selectResourceType('picture')") 图片
             .resource-type(v-if="show.video" :class="{'active':resourceType === 'video'}" @click="selectResourceType('video')") 视频

@@ -44,7 +44,7 @@ var app = new Vue({
         type: "modifySendLimit"
       };
       obj.messageSettings = this.messageSettings;
-      if(!obj.messageSettings.systemLimitInfo ||!obj.messageSettings.customizeLimitInfo) return screenTopWarning("请输入受限提示");
+      if(!obj.messageSettings.systemLimitInfo ||!obj.messageSettings.customizeLimitInfo || !obj.messageSettings.mandatoryLimitInfo) return screenTopWarning("请输入受限提示");
       nkcAPI('/e/settings/message', 'PATCH', obj)
         .then(function() {
           screenTopAlert('保存成功');

@@ -12,7 +12,7 @@ messageRouter
     await next();
   })
   .patch('/', async (ctx, next) => {
-    const {body, db} = ctx;
+    const {body, db, nkcModules} = ctx;
     const {roles, grades, type, messageType, messageSettings} = body;
     if(type === "modifyMessageType") {
       const {templates, _id, name, description} = messageType;
@@ -33,9 +33,24 @@ messageRouter
         });
       }
     } else if(type === "modifySendLimit") {
-      if(!messageSettings.systemLimitInfo || !messageSettings.customizeLimitInfo) {
+      if(!messageSettings.systemLimitInfo || !messageSettings.customizeLimitInfo || !messageSettings.mandatoryLimitInfo) {
         ctx.throw(400, "受限提示不能为空");
       }
+
+      nkcModules.checkData.checkNumber(messageSettings.mandatoryLimit.threadCount, {
+        name: "文章数量",
+        min: 0
+      });
+      nkcModules.checkData.checkNumber(messageSettings.mandatoryLimit.postCount, {
+        name: "回复数量",
+        min: 0
+      });
+
+      const roles = await db.RoleModel.find({_id: {$in: messageSettings.adminRolesId}});
+      const rolesId = roles.map(r => r._id);
+
+      const grades = await db.UsersGradeModel.find({_id: {$in: messageSettings.mandatoryLimitGradeProtect}});
+      const gradesId = grades.map(g => g._id);
 
       await db.SettingModel.updateOne({
         _id: "message"
@@ -43,7 +58,11 @@ messageRouter
         $set: {
           "c.gradeLimit": messageSettings.gradeLimit || [],
           "c.gradeProtect": messageSettings.gradeProtect || [],
+          "c.mandatoryLimitInfo": messageSettings.mandatoryLimitInfo,
+          "c.mandatoryLimit": messageSettings.mandatoryLimit,
           "c.systemLimitInfo": messageSettings.systemLimitInfo,
+          "c.adminRolesId": rolesId,
+          "c.mandatoryLimitGradeProtect": gradesId,
           "c.customizeLimitInfo": messageSettings.customizeLimitInfo,
         }
       });

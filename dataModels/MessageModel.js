@@ -99,6 +99,46 @@ const messageSchema = new Schema({
   }
 });
 /*
+* 根据用户的文章和回复的数量判断用户是否能够发送短消息
+* @param {String} uid 发送者ID
+* @param {String} tUid 接受者ID
+* @author pengxiguaa 2019-10-11
+* */
+messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
+  const SettingModel = mongoose.model("settings");
+  const ThreadModel = mongoose.model("threads");
+  const UserModel = mongoose.model("users");
+  const PostModel = mongoose.model("posts");
+  const targetUser = await UserModel.findOne({uid: tUid});
+  if(!targetUser) throwErr(500, `user not found, uid: ${tUid}`);
+  await targetUser.extendGrade();
+  const messageSettings = await SettingModel.getSettings("message");
+  const {mandatoryLimitInfo, mandatoryLimit, adminRolesId, mandatoryLimitGradeProtect} = messageSettings;
+  if(mandatoryLimitGradeProtect.includes(targetUser.grade._id)) return;
+  for(const cert of targetUser.certs) {
+    if(adminRolesId.includes(cert)) return;
+  }
+  const {threadCount, postCount} = mandatoryLimit;
+  const userThreadCount = await ThreadModel.count({
+    uid,
+    reviewed: true,
+    disabled: false,
+    recycleMark: false,
+    mainForumsId: {$ne: "recycle"}
+  });
+  if(userThreadCount < threadCount) throwErr(403, mandatoryLimitInfo);
+  const userPostCount = await PostModel.count({
+    uid,
+    reviewed: true,
+    disabled: false,
+    toDraft: {$ne: true},
+    mainForumsId: {$ne: "recycle"}
+  });
+  if(userPostCount < postCount) throwErr(403, mandatoryLimitInfo);
+};
+
+
+/*
   判断用户是否有权限发送信息
   @param fromUid 当前用户ID
   @param toUid 对方用户ID
@@ -139,11 +179,11 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     },
     {
       $group: {
-        _id: '$r',
+        _id: '$r'
       }
     }
   ]);
-  todayUid = todayUid.map(o => o.uid);
+  todayUid = todayUid.map(o => o._id);
   if(!todayUid.includes(toUid)) {
     if(todayUid.length >= messagePersonCountLimit) {
       throwErr(403, `根据您的证书和等级，您每天最多只能给${messagePersonCountLimit}个用户发送信息`);
