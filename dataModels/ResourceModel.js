@@ -51,8 +51,15 @@ const resourceSchema = new Schema({
     index: 1,
     default: ''
   },
+  // pid, 表示哪些post引入了该资源
   references: {
 	  type: [String],
+    index: 1,
+    default: []
+  },
+  // librariesId, 表示哪些library引入了该资源
+  librariesId: {
+    type: [Number],
     index: 1,
     default: []
   }

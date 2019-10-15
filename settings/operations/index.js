@@ -65,6 +65,7 @@ const protocol = require('./protocol');
 const review = require("./review");
 const threads = require("./threads");
 const newResource = require("./newResource");
+const library = require("./library");
 const operationObj = {};
 
 
@@ -214,6 +215,7 @@ operationObj.operationTree = {
 
     nr: newResource, // 新的资源路由
 
+    lib: library,
     // test, // 测试
 	}
 };

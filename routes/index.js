@@ -36,12 +36,18 @@ const reviewRouter = routers.review;
 const threadsRouter = routers.threads;
 const surveyRouter = routers.survey;
 const editorRouter = routers.editor;
+// 访问文库相关
+const libRouter = routers.library;
+// 文库上传相关
+const libraryRouter = require("./library/library");
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
 const newResourceRouter = routers.newResource;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
+router.use("/lib", libRouter.routes(), libRouter.allowedMethods());
+router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());

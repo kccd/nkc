@@ -47,6 +47,10 @@ async function operateSystemID(type, op) {
 
 settingSchema.statics.operateSystemID = operateSystemID;
 
+settingSchema.statics.newObjectId = () => {
+  return mongoose.Types.ObjectId();
+};
+
 settingSchema.methods.extend = async function() {
   const ThreadModel = require('./ThreadModel');
   const PostModel = require('./PostModel');

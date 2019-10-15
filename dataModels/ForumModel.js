@@ -201,6 +201,12 @@ const forumSchema = new Schema({
   allowedAnonymousPost: {
     type: Boolean,
     default: false
+  },
+  // 文库ID
+  libraryId: {
+    type: Number,
+    index: 1,
+    default: null
   }
 }, {toObject: {
 		getters: true,
@@ -315,7 +321,14 @@ forumSchema.virtual('childForumsId')
   });
 
 /*-----------------------*/
-
+// 保存时检测是否存在文库，若不存在则创建文库
+forumSchema.pre("save", async function(next) {
+  if(!this.libraryId) {
+    const library = await mongoose.model("libraries").newLibrary();
+    this.libraryId = library._id;
+  }
+  await next();
+});
 
 
 // 加载版主

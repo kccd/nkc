@@ -58,6 +58,9 @@ block content
             .col-xs-6
               .forum-count-number= data.forum.countPostsToday
               .forum-count-title 今日更新
+            if data.forum.libraryId
+              .col-xs-12
+                a(href=`/lib/${data.forum.libraryId}` target="_blank") 专业文库（3823）
             .col-xs-12.m-t-1
               .row
                 .forum-description-content=data.forum.description
