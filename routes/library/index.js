@@ -1,4 +1,5 @@
 const router = require("koa-router")();
+const uploadRouter = require("./upload");
 router
   .use("/:_id", async (ctx, next) => {
     const {data, db, params} = ctx;
@@ -17,12 +18,34 @@ router
     }
   })
   .get("/:_id", async (ctx, next) => {
-    const {data, db} = ctx;
-    data.paging = {
-      page: 21,
-      pageCount: 438
+    const {data, db, query, nkcModules} = ctx;
+    const {t = "all", page = 0} = query;
+    const {library} = data;
+    data.t = t;
+    const q = {
+      librariesId: library._id
     };
+    if(t !== "all") {
+      q.category = t;
+    }
+    const count = await db.ResourceModel.count(q);
+    const paging = nkcModules.apiFunction.paging(page, count);
+    const resources = await db.ResourceModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const usersId = resources.map(r => r.uid);
+    const users = await db.UserModel.find({uid: {$in: usersId}});
+    const usersObj = {};
+    users.map(u => {
+      usersObj[u.uid] = u;
+    });
+    data.resources = [];
+    for(const r of resources) {
+      const resource = r.toObject();
+      resource.user = usersObj[r.uid];
+      data.resources.push(resource);
+    }
+    data.paging = paging;
     ctx.template = "library/library.pug";
     await next();
-  });
+  })
+  .use("/:_id/upload", uploadRouter.routes(), uploadRouter.allowedMethods());
 module.exports = router;

@@ -2,6 +2,14 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const schema = new mongoose.Schema({
   _id: Number,
+  cover: {
+    type: String,
+    default: ""
+  },
+  name: {
+    type: String,
+    required: true
+  },
   description: {
     type: String,
     default: ""

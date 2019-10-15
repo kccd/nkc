@@ -1,0 +1,74 @@
+body{
+  background-color: #f4f4f4;
+}
+.lib-r{
+  width: 100%;
+  /*border: 1px solid red;*/
+}
+.lib-r-c{
+  display: table-cell;
+  vertical-align: top;
+}
+.lib-r-c>div{
+  width: 10rem;
+  height: 10rem;
+  position: relative;
+  border: 1px solid #ddd;
+  margin-right: 1rem;
+}
+.lib-r-c>div>img{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-height: 100%;
+  max-width: 100%;
+}
+.lib-r-info{
+  display: table-cell;
+  vertical-align: top;
+}
+.lib-r-n{
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-block;
+  border-bottom: 1px solid rgba(0,0,0,0);
+  transition: border 100ms;
+}
+.lib-r-n:hover{
+  border-bottom: 1px solid;
+}
+.lib-r-t{
+  display: inline-block;
+}
+.lib-r-s{
+  display: inline-block;
+  color: #e85a71;
+}
+.lib-r-u{
+  display: inline-block;
+}
+.lib-r-u img{
+  height: 1.6rem;
+  width: 1.6rem;
+  border-radius: 50%;
+  margin-top: -1px;
+  margin-right: 2px;
+}
+.lib-r-de{
+  padding-top: 0.3rem;
+}
+.lib-r-ds{
+  padding-top: 0.5rem;
+  max-height: 6rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.lib-r-h{
+  display: inline-block;
+}

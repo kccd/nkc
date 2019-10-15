@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const resourceRouter = new Router();
 const pathModule = require('path');
 const util = require("util");
+const infoRouter = require("./info");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["wav", "amr", "mp3"];
@@ -410,4 +411,5 @@ resourceRouter
     ctx.data.r = await r.save();
     await next()
   })
+  .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods());
 module.exports = resourceRouter;

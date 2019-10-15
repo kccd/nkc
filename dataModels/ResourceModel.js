@@ -62,6 +62,22 @@ const resourceSchema = new Schema({
     type: [Number],
     index: 1,
     default: []
+  },
+  name: {
+	  type: String,
+    default: ""
+  },
+  description: {
+	  type: String,
+    default: ""
+  },
+  cover: {
+	  type: String,
+    default: ''
+  },
+  category: {
+	  type: String, // book, paper, program, media
+    default: ""
   }
 });
 

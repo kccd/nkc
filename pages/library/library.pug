@@ -1,35 +1,52 @@
 extends ../bootstrap_base
 block title
   title 文库
-  style.
-    body{
-      background-color: #f4f4f4;
-    }
+  +includeCSS("/library/library.css")
 block content
-  -const docTypes = ["图书", "论文", "程序", "媒体"];
+  -const docTypes = [{t: "all",n: "全部"}, {t: "book", n: "图书"}, {t: "paper", n: "论文"}, {t: "program", n: "程序"}, {t: "media", n: "媒体"}];
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12.box-shadow-panel
-        .p-b-5.p-t-5
-          if data.belongTo === "forum"
-            h4 专业的文库
-            p 专业信息占位...
+        include ./libraryInfo
       .col-xs-12.col-md-9.box-shadow-panel.m-t-2
         div
           .row
             .doc-types.col-xs-12.col-md-6
               ul.nav.nav-pills
                 for t in docTypes
-                  li
-                    a(href="#")=t
+                  li(class=data.t===t.t?"active":"")
+                    a(href=`/lib/${data.library._id}?t=${t.t}`)=t.n
             .doc-filter.col-xs-12.col-md-6.text-right
               .form-inline
                 .form-group
-                  //input.form-control
                   button.btn.btn-default 筛选
         div
           include ../publicModules/paging/paging
+          .lib-rs
+            for r, index in data.resources
+              if index
+                hr
+              .lib-r
+                .lib-r-c
+                  if r.cover
+                    div
+                      img(src=`/r/${r.cover}`)
+                  else
+                    div
+                .lib-r-info
+                  .lib-r-n=r.name
+                  .lib-r-de
+                    .lib-r-u(onmouseover=tools.floatUserInfo(r.uid))
+                      img(src=`/avatar/${r.user.avatar}?t=sm`)
+                      a(href=`/u/${r.uid}` target="_blank")=r.user.username
+                    .lib-r-t=format("YYYY/MM/DD", r.toc)
+                    .lib-r-s=tools.getSize(r.size)
+                    .lib-r-h
+                      span=`${r.hits}次下载`
+                  .lib-r-ds=r.description
       .col-xs-12.col-md-3.box-shadow-panel.m-t-2
         div
-          button.btn.btn-block.btn-lg.btn-success 文档上传
+          a(href=`/lib/${data.library._id}/upload` target="_blank").btn.btn-block.btn-lg.btn-success 文档上传
         div Lorem ipsum dolor sit amet, consectetur adipisicing elit. A aliquid assumenda at commodi consequuntur excepturi ipsa itaque laudantium provident, quis veniam vitae voluptates voluptatum? Dolores eos necessitatibus quam repellat similique.
+block scripts
+  include ../publicModules/floatUserPanel/floatUserPanel

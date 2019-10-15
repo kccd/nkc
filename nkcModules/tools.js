@@ -20,7 +20,18 @@ var Tools = function() {
   };
   self.floatUserInfo = function(uid) {
     return "floatUserPanel.open(this, '" + uid + "')";
-  }
+  };
+  self.getSize = function(size, digits) {
+    if(digits === undefined) digits = 2;
+    if(size < 1024*1024) {
+      size = (size/1024).toFixed(digits) + "KB";
+    } else if(size < 1024*1024*1024) {
+      size = (size/(1024*1024)).toFixed(digits) + "MB";
+    } else {
+      size = (size/(1024*1024*1024)).toFixed(digits) + "GB";
+    }
+    return size;
+  };
 };
 
 if(typeof window === "undefined") {

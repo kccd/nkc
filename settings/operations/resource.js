@@ -43,7 +43,11 @@ module.exports = {
 	r: {// 资源
 		POST: 'uploadResources',
 		PARAMETER: {
-			GET: 'getResources'
+			GET: 'getResources',
+      info: {
+			  GET: "getResourceInfo",
+        PATCH: "patchResourceInfo"
+      }
 		},
 	},
 	rt: {

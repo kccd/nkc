@@ -624,6 +624,10 @@
   "experimentalHidePostSettings": "后台管理-回复折叠设置",
   "experimentalTransferKCB": "后台管理-科创币转账",
   "visitLibrary": "浏览文库",
+  "libraryUpload": "上传附件到文库",
+  "getResourceInfo": "查看附件的详细信息",
+  "patchResourceInfo": "上传附件到文库",
+  "modifyAllResource": "修改文库中附件的信息",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

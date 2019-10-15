@@ -1,0 +1,48 @@
+body{
+  background-color: #f4f4f4;
+}
+.library-r-name{
+  font-weight: 700;
+  font-size: 1.3rem;
+  padding-top: 0.6rem;
+}
+.library-r-time{
+  color: #e85a71;
+  margin-right: 0.5rem;
+}
+.library-r-size{
+  color: #e85a71;
+  margin-right: 0.5rem;
+}
+.library-r-info{
+  font-size: 1rem;
+}
+.library-r-cover{
+  width: 10rem;
+}
+.library-r-cover img{
+  max-width: 100%;
+  border: 1px solid #eee;
+}
+.library-f{
+  display: inline-block;
+  height: 2.8rem;
+  padding: 0 1rem;
+  line-height: 2.8rem;
+  text-align: center;
+  color: #e85a71;
+  border: 1px solid #ddd;
+  margin-right: 2.8rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+.library-f .fa{
+  position: absolute;
+  right: -2.8rem;
+  color: #aaa;
+  top: 0;
+  cursor: pointer;
+  height: 2.8rem;
+  width: 2.8rem;
+  line-height: 2.8rem;
+}
