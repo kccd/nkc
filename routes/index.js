@@ -44,7 +44,7 @@ const newResourceRouter = routers.newResource;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
-router.use("/lib", libraryRouter.routes(), libraryRouter.allowedMethods());
+router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());

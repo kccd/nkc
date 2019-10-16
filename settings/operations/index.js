@@ -216,7 +216,7 @@ operationObj.operationTree = {
 
     nr: newResource, // 新的资源路由
 
-    lib: library, // 文库
+    library, // 文库
 	}
 };
 module.exports = operationObj;

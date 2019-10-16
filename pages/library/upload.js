@@ -1,5 +1,6 @@
 var SelectResource;
 var data = NKC.methods.getDataById("data");
+var forum = data.forum;
 var app = new Vue({
   el: "#app",
   data: {
@@ -9,7 +10,7 @@ var app = new Vue({
     description: "",
     category: "",
     labels: [],
-    libraries: [data.library],
+    forums: data.forum? [data.forum]: [],
     submitting: false
   },
   mounted: function() {
@@ -18,7 +19,7 @@ var app = new Vue({
   methods: {
     getSize: NKC.methods.tools.getSize,
     format: NKC.methods.format,
-    removeLibrary: function(r) {
+    removeForum: function(r) {
 
     },
     // 选择文件
@@ -41,15 +42,15 @@ var app = new Vue({
       });
     },
     // 选择文库
-    sl: function() {
+    sf: function() {
 
     },
-    inLibraries: function(library) {
-      var libraries = this.libraries;
+    inForums: function(forum) {
+      var forums = this.forums;
       var flag = false;
-      for(var i = 0; i < libraries.length; i++) {
-        var l = libraries[i];
-        if(l._id === library._id) {
+      for(var i = 0; i < forums.length; i++) {
+        var f = forums[i];
+        if(f.fid === forum.fid) {
           flag = true;
           break;
         }
@@ -63,10 +64,10 @@ var app = new Vue({
           self.resource = res.resource;
           self.cover = res.cover;
           self.category = res.resource.category;
-          self.libraries = [data.library];
-          for(var i = 0; i < res.libraries.length; i++) {
-            var l = res.libraries[i];
-            if(!self.inLibraries(l)) self.libraries.push(l);
+          self.forums = data.forum? [data.forum]:[];
+          for(var i = 0; i < res.forums.length; i++) {
+            var f = res.forums[i];
+            if(!self.inForums(f)) self.forums.push(f);
           }
           self.name = self.resource.name || self.resource.oname;
           self.description = self.resource.description;
@@ -86,13 +87,13 @@ var app = new Vue({
           if(!self.category) throw "请选择文件类型";
           if(!self.name) throw "请输入文件名称";
           if(!self.description) throw "请输入文件说明";
-          if(!self.libraries.length) throw "请选择文库";
+          if(!self.forums.length) throw "请选择文库";
           body.name = self.name;
           body.category = self.category;
           body.description = self.description;
-          body.librariesId = [];
-          for(var i = 0; i < self.libraries.length; i++) {
-            body.librariesId.push(self.libraries[i]._id);
+          body.forumsId = [];
+          for(var i = 0; i < self.forums.length; i++) {
+            body.forumsId.push(self.forums[i].fid);
           }
           if(self.cover) {
             body.cover = self.cover.rid;

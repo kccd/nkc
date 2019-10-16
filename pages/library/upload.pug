@@ -3,7 +3,7 @@ block title
   title 上传
   +includeCSS("/library/upload.css")
 block content
-  #data.hidden=objToStr({library: data.library})
+  #data.hidden=objToStr({forum: data.forum})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12.box-shadow-panel
@@ -35,6 +35,7 @@ block content
                       option(value="paper") 论文
                       option(value="program") 程序
                       option(value="media") 媒体
+                      option(value="other") 其他
                 .form-group
                   label.col-sm-2.control-label 文件名称
                     span.text-danger *
@@ -50,11 +51,11 @@ block content
                     span.text-danger *
                   .col-sm-10.p-t-05
                     .library-fs
-                      .library-f(v-for="lib in libraries")
-                        .library-f-name {{lib.name}}
-                        .fa.fa-remove(@click="removeLibrary")
+                      .library-f(v-for="forum in forums" :style="'background-color:' + forum.color + ';'")
+                        .library-f-name {{forum.displayName}}
+                        .fa.fa-remove(@click="removeForum")
                     div
-                      button.btn.btn-default.btn-sm(@click="sl") 选择文库
+                      button.btn.btn-default.btn-sm(@click="sf") 选择文库
                 .form-group
                   label.col-sm-2.control-label 文件封面
                     span.text-danger &nbsp;

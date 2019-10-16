@@ -57,9 +57,8 @@ const resourceSchema = new Schema({
     index: 1,
     default: []
   },
-  // librariesId, 表示哪些library引入了该资源
-  librariesId: {
-    type: [Number],
+  forumsId: {
+    type: [String],
     index: 1,
     default: []
   },
@@ -77,8 +76,12 @@ const resourceSchema = new Schema({
   },
   category: {
 	  type: String, // book, paper, program, media
+    index: 1,
     default: ""
   }
 });
+
+
+
 
 module.exports = mongoose.model('resources', resourceSchema);

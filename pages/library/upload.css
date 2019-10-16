@@ -30,9 +30,9 @@ body{
   padding: 0 1rem;
   line-height: 2.8rem;
   text-align: center;
-  color: #e85a71;
-  border: 1px solid #ddd;
+  color: #fff;
   margin-right: 2.8rem;
+  border-radius: 3px;
   margin-bottom: 0.5rem;
   position: relative;
 }

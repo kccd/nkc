@@ -1,13 +1,14 @@
 const router = require("koa-router")();
-const uploadRouter = require("./upload");
 router
   .get("/", async (ctx, next) => {
-    const {data, db, query, nkcModules} = ctx;
-    const {fid, t = "all", page = 0} = query;
+    const {data, db, query, nkcModules, params} = ctx;
+    const {fid} = params;
+    const forum = await db.ForumModel.findOnly({fid});
+    await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+    const {t = "all", page = 0} = query;
     data.t = t;
-    data.fid = fid;
     const q = {
-      forumsId: fid
+      forumsId: forum.fid
     };
     if(t !== "all") {
       q.category = t;
@@ -27,9 +28,9 @@ router
       resource.user = usersObj[r.uid];
       data.resources.push(resource);
     }
+    data.forum = forum;
     data.paging = paging;
     ctx.template = "library/library.pug";
     await next();
-  })
-  .use("/upload", uploadRouter.routes(), uploadRouter.allowedMethods());
+  });
 module.exports = router;

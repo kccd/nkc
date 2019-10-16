@@ -6,6 +6,7 @@ const latestRouter = require('./latest');
 const followerRouter = require('./follower');
 const bannerRouter = require('./banner');
 const visitorRouter = require('./visitor');
+const libraryRouter = require("./library");
 const Router = require('koa-router');
 const path = require('path');
 const router = new Router();
@@ -329,7 +330,8 @@ router
 	.use('/visitors', visitorRouter.routes(), visitorRouter.allowedMethods())
 	.use('/followers', followerRouter.routes(), followerRouter.allowedMethods())
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
-  .use("/banner", bannerRouter.routes(), bannerRouter.allowedMethods());
+  .use("/banner", bannerRouter.routes(), bannerRouter.allowedMethods())
+  .use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 module.exports = router;
 
 

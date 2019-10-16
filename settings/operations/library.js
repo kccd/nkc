@@ -1,9 +1,7 @@
 module.exports = {
-  PARAMETER: {
-    GET: "visitLibrary",
-    upload: {
-      GET: "libraryUpload",
-      POST: "libraryUpload"
-    }
+  GET: "visitLibrary",
+  upload: {
+    GET: "libraryUpload",
+    POST: "libraryUpload"
   }
 };
