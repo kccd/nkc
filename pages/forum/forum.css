@@ -1,3 +1,6 @@
+body{
+  background-color: #fff!important;
+}
 .forum-info-panel{
   width: 100%;
   height: 8rem;
@@ -207,4 +210,28 @@
 }
 .forum-panel-body .other-forum-count{
   font-size: 1rem;
+}
+.forum-library{
+  text-decoration: none;
+  color: #282c37;
+  background-color: rgba(0,0,0,0);
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+.forum-library:hover, .forum-library:focus{
+  text-decoration: none;
+}
+.upload-resource{
+  margin-top: -0.25rem;
+}
+.upload-resource a{
+  background-color: #2b90d9;
+  border: 1px solid #2b90d9;
+  color: #fff;
+}
+.upload-resource a:hover, .upload-resource a:focus{
+  color: #fff;
+  background-color: #217fc4;
 }

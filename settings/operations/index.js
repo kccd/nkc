@@ -65,6 +65,7 @@ const protocol = require('./protocol');
 const review = require("./review");
 const threads = require("./threads");
 const newResource = require("./newResource");
+const library = require("./library");
 const operationObj = {};
 
 
@@ -92,6 +93,7 @@ operationObj.defaultOperations = [
   "showSurveyCertLimit", // 发起调查时可更具证书限制参与的用户
   "getAllMessagesResources", // 查看所有的短消息资源
   "topAllPost", // 置顶任何人的回复
+  "modifyAllResource", // 可修改任何人的附件
 ];
 
 
@@ -214,7 +216,7 @@ operationObj.operationTree = {
 
     nr: newResource, // 新的资源路由
 
-    // test, // 测试
+    library, // 文库
 	}
 };
 module.exports = operationObj;

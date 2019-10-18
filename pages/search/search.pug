@@ -28,7 +28,7 @@ block content
                 .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'" @click="removeForum(forum)") {{forum.displayName}}
                   .fa.fa-remove
                 button.btn.btn-default.btn-sm(@click="selectForum") 添加
-          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
+          .search-form.form-inline(v-if="['post', 'thread', ''].indexOf(t) !== -1")
             .form-group
               label 精选：
               span.h5 全部文章
@@ -89,6 +89,8 @@ block content
               a(class=data.t === "column" ? "active" : "" onclick="app.clickNav('column')") 专栏
             li
               a(class=data.t==="user"?"active":"" onclick="app.clickNav('user')") 用户
+            li
+              a(class=data.t==="resource"?"active":"" onclick="app.clickNav('resource')") 文件
         .col-xs-12.col-md-7.search-results
           if data.total > 0
             h5=`约找到 ${data.total} 条结果，耗时 ${data.time/1000} 秒`
@@ -108,6 +110,7 @@ block content
     //      button.btn.btn-default(type='submit') 搜索
 block scripts
   include ../publicModules/selectForum/selectForum
+  include ../publicModules/resourceInfo/resourceInfo
   if data.user
     include ../publicModules/subscribeTypes/subscribeTypes
   +includeJS("/search/search.js")

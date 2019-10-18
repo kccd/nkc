@@ -74,6 +74,7 @@ var app = new Vue({
       if(type === "thread") t = "&t=thread";
       if(type === "post") t = "&t=post";
       if(type === "column") t = "&t=column";
+      if(type === "resource") t= "&t=resource";
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
       openToNewLocation("/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options)
     },
@@ -94,7 +95,7 @@ var app = new Vue({
       this.c = data.c;
     }
 
-    this.t = data.t;
+    this.t = data.t || "";
     this.selectedForums = data.selectedForums || [];
     var options = data.d;
     if(options) {
@@ -115,3 +116,13 @@ var app = new Vue({
     }
   }
 });
+
+var ResourceInfo;
+
+$(function() {
+  ResourceInfo = new NKC.modules.ResourceInfo();
+});
+
+function showResource(rid) {
+  ResourceInfo.open({rid: rid})
+}

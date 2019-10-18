@@ -289,12 +289,33 @@ exports.savePostCover = async (pid, file) => {
     dst: filePath,
     height: 400,
     width: 800,
+    background: "#ffffff",
     quality: 90
   });
   await post.update({cover: hash});
   await fsSync.unlink(path);
 };
-
+/*
+* 修改resource的封面
+* @param {String} resource id
+* @param {File} 图像数据
+* @author pengxiguaa 2019-10-16
+* */
+exports.saveResourceCover = async (rid, file) => {
+  const resource = await db.ResourceModel.findOnly({rid});
+  const {hash, path} = file;
+  const filePath = upload.coverPath + "/" + hash + ".jpg";
+  await ei.resize({
+    src: path,
+    dst: filePath,
+    height: 400,
+    width: 400,
+    background: "#ffffff",
+    quality: 90
+  });
+  await resource.update({cover: hash});
+  await fsSync.unlink(path);
+};
 /*
 * 修改draft的封面图
 * @param {String} did draftID
@@ -310,6 +331,7 @@ exports.saveDraftCover = async (did, file) => {
     dst: filePath,
     height: 400,
     width: 800,
+    background: "#ffffff",
     quality: 90
   });
   await draft.update({cover: hash});
@@ -355,6 +377,7 @@ exports.modifyPostCovers = async (pid, covers) => {
       dst: filePath,
       height: 400,
       width: 800,
+      background: "#ffffff",
       quality: 90
     });
   }
@@ -380,6 +403,7 @@ exports.createPostCoverByPostId = async (pid) => {
       src: filePath,
       dst: targetPath,
       height: 400,
+      background: "#ffffff",
       width: 800,
       quality: 90
     });

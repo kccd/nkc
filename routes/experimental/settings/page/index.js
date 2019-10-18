@@ -13,7 +13,7 @@ router
     let {
       homeThreadList, searchPostList, searchAllList, userCardThreadList, threadPostList, forumThreadList,
       userCardUserList, forumUserList, searchThreadList, searchUserList, threadPostCommentList,
-      searchColumnList
+      searchColumnList, searchResourceList
     } = pageSettings;
     threadPostCommentList = parseInt(threadPostCommentList);
     homeThreadList = parseInt(homeThreadList);
@@ -27,6 +27,7 @@ router
     forumThreadList = parseInt(forumThreadList);
     forumUserList = parseInt(forumUserList);
     searchColumnList = parseInt(searchColumnList);
+    searchResourceList = parseInt(searchResourceList);
 		await db.SettingModel.updateOne({_id: "page"}, {
       c: {
         homeThreadList,
@@ -35,6 +36,7 @@ router
         threadPostCommentList,
         searchThreadList,
         searchPostList,
+        searchResourceList,
         searchAllList,
         searchUserList,
         forumThreadList,

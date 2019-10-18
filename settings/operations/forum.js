@@ -54,6 +54,9 @@ module.exports = {
 		subscribe: {
 			DELETE: 'unSubscribeForum', // 用户取消关注专业
 			POST: 'subscribeForum' // 用户关注专业
-		}
+		},
+    library: {
+		  GET: "visitForumLibrary"
+    }
 	}
 };

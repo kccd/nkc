@@ -36,12 +36,15 @@ const reviewRouter = routers.review;
 const threadsRouter = routers.threads;
 const surveyRouter = routers.survey;
 const editorRouter = routers.editor;
+// 访问文库相关
+const libraryRouter = routers.library;
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
 const newResourceRouter = routers.newResource;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
+router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());

@@ -1,0 +1,49 @@
+body{
+  background-color: #f4f4f4;
+}
+.library-r-name{
+  font-weight: 700;
+  font-size: 1.3rem;
+  word-break: break-all;
+  padding-top: 0.6rem;
+}
+.library-r-time{
+  color: #e85a71;
+  margin-right: 0.5rem;
+}
+.library-r-size{
+  color: #e85a71;
+  margin-right: 0.5rem;
+}
+.library-r-info{
+  font-size: 1rem;
+}
+.library-r-cover{
+  width: 10rem;
+}
+.library-r-cover img{
+  max-width: 100%;
+  border: 1px solid #eee;
+}
+.library-f{
+  display: inline-block;
+  height: 2.4rem;
+  padding: 0 0 0 1rem;
+  line-height: 2.4rem;
+  text-align: center;
+  color: #fff;
+  margin-right: 0.5rem;
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+}
+.library-f .fa{
+  color: #fff;
+  padding: 0 1rem 0 0.5rem;
+  cursor: pointer;
+}
+.remove-r{
+  text-align: right;
+  font-size: 1rem;
+  color: #555;
+  cursor: pointer;
+}

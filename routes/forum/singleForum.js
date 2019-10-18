@@ -6,6 +6,7 @@ const latestRouter = require('./latest');
 const followerRouter = require('./follower');
 const bannerRouter = require('./banner');
 const visitorRouter = require('./visitor');
+const libraryRouter = require("./library");
 const Router = require('koa-router');
 const path = require('path');
 const router = new Router();
@@ -155,7 +156,7 @@ router
   })
 	.use('/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
-	.use(['/home', '/latest', '/followers', '/visitors'], async (ctx, next) => {
+	.use(['/home', '/latest', '/followers', '/visitors', "/library"], async (ctx, next) => {
 		const {data, db, params, query} = ctx;
 		const {fid} = params;
 		const {token} = query;
@@ -322,6 +323,8 @@ router
     data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
     data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
 
+    data.bookCount = await db.ResourceModel.count({forumsId: data.forum.fid});
+
 		ctx.template = 'forum/forum.pug';
 		await next();
 	})
@@ -329,7 +332,8 @@ router
 	.use('/visitors', visitorRouter.routes(), visitorRouter.allowedMethods())
 	.use('/followers', followerRouter.routes(), followerRouter.allowedMethods())
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
-  .use("/banner", bannerRouter.routes(), bannerRouter.allowedMethods());
+  .use("/banner", bannerRouter.routes(), bannerRouter.allowedMethods())
+  .use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 module.exports = router;
 
 

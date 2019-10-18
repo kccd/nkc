@@ -1383,7 +1383,6 @@ footer.footer ul li{
   }
 }
 .thread-panel-title a.title-content:hover, .thread-panel-title a.title-content:focus{
-  color: #282c37;
   text-decoration: none;
   border-bottom: solid 1px;
 }

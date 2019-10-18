@@ -1,0 +1,98 @@
+body{
+  background-color: #f4f4f4;
+}
+.lib-r{
+  width: 100%;
+  /*border: 1px solid red;*/
+}
+.lib-r-c{
+  display: table-cell;
+  vertical-align: top;
+}
+.lib-r-c>div{
+  width: 6rem;
+  height: 6rem;
+  position: relative;
+  border: 1px solid #ddd;
+  margin-right: 1rem;
+}
+.lib-r-c>div>img{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-height: 100%;
+  max-width: 100%;
+}
+.lib-r-info{
+  display: table-cell;
+  width: 100%;
+  vertical-align: top;
+}
+.lib-r-n{
+  font-size: 1.3rem;
+  font-weight: 700;
+  height: 2rem;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(0,0,0,0);
+  transition: border 100ms;
+}
+.lib-r-t{
+  display: inline-block;
+}
+.lib-r-s{
+  display: inline-block;
+  color: #e85a71;
+}
+.lib-r-u{
+  display: inline-block;
+}
+.lib-r-u img{
+  height: 1.6rem;
+  width: 1.6rem;
+  border-radius: 50%;
+  margin-top: -1px;
+  margin-right: 2px;
+}
+.lib-r-de>*{
+  margin-top: 0.3rem;
+}
+.lib-r-ds{
+  padding-top: 0.5rem;
+  max-height: 2rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  vertical-align: top;
+}
+.lib-r-h{
+  display: inline-block;
+  height: 1.6rem;
+  margin-top: 0.3rem;
+  padding: 0 0.5rem;
+  line-height: 1.6rem;
+  text-align: center;
+  font-size: 1rem;
+  border-radius: 3px;
+  text-decoration: none;
+  background-color: #5cb85c;
+  color: #fff;
+  margin-right: 0.5rem;
+}
+.lib-r-h:hover, .lib-r-h:focus{
+  text-decoration: none;
+  color: #fff;
+}
+.lib-r-e{
+  background-color: #337ab7;
+}
+.lib-r-r{
+  background-color: #e85a71;
+}

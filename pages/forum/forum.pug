@@ -190,6 +190,66 @@ block content
                     include ../publicModules/user_panel/user_panel_md
               .m-t-1
                 include ../publicModules/paging/paging
+          else if data.type === "library"
+            +includeCSS("/library/library.css")
+            -const docTypes = [{t: "all",n: "全部"}, {t: "book", n: "图书"}, {t: "paper", n: "论文"}, {t: "program", n: "程序"}, {t: "media", n: "媒体"}, {t: "other", n: "其他"}];
+            mixin link(r)
+              if (data.user && data.user.uid === r.rid) || permission("modifyAllResource")
+                a.lib-r-h.lib-r-e(href=`/library/upload?rid=${r.rid}` target="_blank")
+                  .fa.fa-edit &nbsp;编辑
+                a.lib-r-h.lib-r-r(onclick=`removeResourceFromLibrary('${r.rid}')`)
+                  .fa.fa-trash &nbsp;删除
+              a.lib-r-h(href=`/r/${r.rid}` target="_blank")
+                .fa.fa-cloud-download
+                | &nbsp;点击下载
+                if r.hits
+                  span=` ${r.hits}`
+            .col-xs-12.col-md-12.m-t-1
+              include ../publicModules/paging/forum_nav
+              .pull-right.upload-resource
+                a.btn.btn-sm(href=`/library/upload?fid=${data.forum.fid}` target="_blank")
+                  .fa.fa-cloud-upload &nbsp;
+                  | 上传文件
+              .m-b-05
+                .paging-button
+                  for t, index in docTypes
+                    -let klass = data.t === t.t? "active": "";
+                    if !index
+                      -klass += " radius-left"
+                    else if index + 1 === docTypes.length
+                      -klass += " radius-right"
+                    a.button(class=klass href=`/f/${data.forum.fid}/library?t=${t.t}`)=t.n
+                include ../publicModules/paging/paging
+              .lib-rs
+                if !data.resources.length
+                  .p-t-5.m-t-5.p-b-5.m-b-5.text-center 空空如也~
+                else
+                  for r, index in data.resources
+                    if index
+                      hr.m-t-1.m-b-1
+                    .lib-r
+                      .lib-r-c
+                        div
+                          if r.cover
+                            img(src=tools.getUrl("cover", r.cover))
+                          else
+                            img(src=tools.getUrl("fileCover", r.ext))
+                      .lib-r-info
+                        .lib-r-n(onclick=`showResource('${r.rid}')`)=r.name
+                        .lib-r-de
+                          .lib-r-u(onmouseover=tools.floatUserInfo(r.uid))
+                            img(src=`/avatar/${r.user.avatar}?t=sm`)
+                            a(href=`/u/${r.uid}` target="_blank")=r.user.username
+                          .lib-r-t=format("YYYY/MM/DD", r.tlm || r.toc)
+                          .lib-r-s=(r.ext || "未知").toUpperCase()
+                          .lib-r-s=tools.getSize(r.size)
+                          .display-i-b.hidden-sm.hidden-xs.pull-right(style="margin-top: -0.1rem;")
+                            +link(r)
+                        .lib-r-ds=r.description
+                        .hidden-lg.hidden-md.m-t-05
+                          +link(r)
+              .m-t-1
+                include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
         if data.user
           -const userPanel = data.user;
@@ -243,6 +303,9 @@ block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
+  include ../publicModules/ResourceInfo/ResourceInfo
   +includeJS("/forum/forum.js")
+  +includeJS("/library/common.js")
+  +includeJS("/library/library.js")
   +includeJS("/publicModules/thread_panel/management.js")
   include ../publicModules/floatUserPanel/floatUserPanel
