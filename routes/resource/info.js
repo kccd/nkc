@@ -10,13 +10,15 @@ router
   })
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
-    const resource = data.resource;
+    let resource = data.resource.toObject();
     const {forumsId, cover} = resource;
     data.forums = await db.ForumModel.find({fid: {$in: forumsId}});
     if(cover) {
       data.cover = await db.ResourceModel.findOne({rid: cover});
     }
+    resource.user = await db.UserModel.findOne({uid: resource.uid});
     data.resource = resource;
+    data.modifyAllResource = ctx.permission("modifyAllResource");
     await next();
   })
   .patch("/", async (ctx, next) => {

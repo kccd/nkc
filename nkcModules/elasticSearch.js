@@ -108,7 +108,7 @@ func.init = async () => {
 func.save = async (docType, document) => {
   const apiFunction = require("../nkcModules/apiFunction");
 
-  if(!["user", "post", "thread", "column", "columnPage"].includes(docType)) throwErr(500, "docType error");
+  if(!["user", "post", "thread", "column", "columnPage", "resource"].includes(docType)) throwErr(500, "docType error");
 
   const {
 
@@ -137,6 +137,8 @@ func.save = async (docType, document) => {
     id = `column_${tid}`;
   } else if(docType === "columnPage") {
     id = `columnPage_${tid}`;
+  } else if(docType === "resource") {
+    id = `resource_${tid}`;
   }
 
   return await client.index({
@@ -193,7 +195,7 @@ func.search = async (t, c, options) => {
 
   const {
     searchThreadList, searchPostList, searchAllList, searchUserList,
-    searchColumnList
+    searchColumnList, searchResourceList
   } = (await SettingModel.findById("page")).c;
 
   let size;
@@ -205,11 +207,13 @@ func.search = async (t, c, options) => {
     size = searchThreadList;
   } else if(t === "column") {
     size = searchColumnList;
+  } else if(t === "searchResourceList") {
+    size = searchResourceList;
   } else {
     size = searchAllList;
   }
   const body = {
-    from: page*searchThreadList,
+    from: page*size,
     size,
     min_score: 1,
     sort: [],
@@ -342,6 +346,25 @@ func.search = async (t, c, options) => {
                     }
                   ]
                 }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        docType: "resource"
+                      }
+                    },
+                    {
+                      bool: {
+                        should: [
+                          createMatch("title", c, 5, relation),
+                          createMatch("content", c, 2, relation),
+                        ]
+                      }
+                    }
+                  ]
+                }
               }
             ]
           }
@@ -384,6 +407,12 @@ func.search = async (t, c, options) => {
         ]
       }
     });
+  } else if(t === "resource") {
+    body.query.bool.must.push({
+      match: {
+        docType: "resource"
+      }
+    });
   }
 
   if(!["user", "column"].includes(t)) {
@@ -401,6 +430,7 @@ func.search = async (t, c, options) => {
       };
       body.query.bool.must[0].bool.should[0].bool.must.push(fidMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(fidMatch);
+      body.query.bool.must[0].bool.should[5].bool.must.push(fidMatch);
     }
 
     if(author) {
@@ -414,6 +444,7 @@ func.search = async (t, c, options) => {
       };
       body.query.bool.must[0].bool.should[0].bool.must.push(authorMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(authorMatch);
+      body.query.bool.must[0].bool.should[5].bool.must.push(authorMatch);
     }
 
     if(digest) {
@@ -469,6 +500,14 @@ func.search = async (t, c, options) => {
   });
 };
 
+func.delete = async (docType, id) => {
+  id = docType + "_" + id;
+  return await client.delete({
+    index: indexName,
+    type: "documents",
+    id
+  });
+};
 
 module.exports = func;
 

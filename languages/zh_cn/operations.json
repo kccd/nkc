@@ -627,7 +627,7 @@
   "libraryUpload": "上传附件到文库",
   "getResourceInfo": "查看附件的详细信息",
   "patchResourceInfo": "上传附件到文库",
-  "modifyAllResource": "修改文库中附件的信息",
+  "modifyAllResource": "修改其他人的附件信息",
   "visitForumLibrary": "访问专业文库",
 
   "APPgetUserInfo": "app获取用户信息",

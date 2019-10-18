@@ -4,6 +4,7 @@ body{
 .library-r-name{
   font-weight: 700;
   font-size: 1.3rem;
+  word-break: break-all;
   padding-top: 0.6rem;
 }
 .library-r-time{
@@ -26,23 +27,23 @@ body{
 }
 .library-f{
   display: inline-block;
-  height: 2.8rem;
-  padding: 0 1rem;
-  line-height: 2.8rem;
+  height: 2.4rem;
+  padding: 0 0 0 1rem;
+  line-height: 2.4rem;
   text-align: center;
   color: #fff;
-  margin-right: 2.8rem;
+  margin-right: 0.5rem;
   border-radius: 3px;
   margin-bottom: 0.5rem;
-  position: relative;
 }
 .library-f .fa{
-  position: absolute;
-  right: -2.8rem;
-  color: #aaa;
-  top: 0;
+  color: #fff;
+  padding: 0 1rem 0 0.5rem;
   cursor: pointer;
-  height: 2.8rem;
-  width: 2.8rem;
-  line-height: 2.8rem;
+}
+.remove-r{
+  text-align: right;
+  font-size: 1rem;
+  color: #555;
+  cursor: pointer;
 }

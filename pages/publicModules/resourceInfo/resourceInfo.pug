@@ -1,0 +1,48 @@
++includeCSS("/publicModules/resourceInfo/resourceInfo.css")
+.modal.fade#moduleResourceInfo(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog(role="document" v-cloak)#moduleResourceInfoApp
+    .modal-content
+      .modal-header
+        button.close(data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        h4.modal-title 文件详情
+      .modal-body(v-if="loading").text-center
+        .m-t-5.m-b-5 加载中...
+      .modal-body(v-else)
+        .r-info-top
+          .r-info-cover
+            div
+              img(:src="getUrl('cover', resource.cover)" v-if="resource.cover")
+              img(:src="getUrl('fileCover', resource.ext)" v-else)
+          .r-info-content
+            .r-info-title {{resource.name || resource.oname}}
+            .r-info-author
+              img(:src="getUrl('userAvatar', resource.user.avatar, 'sm')")
+              a.pointer(@click="visitUrl('/u/' + resource.uid, true)") {{resource.user.username}}
+              span &nbsp;上传于 {{format('YYYY/MM/DD HH:mm:ss', resource.tlm || resource.toc)}}
+            .r-info-size
+              | 格式：
+              span.m-r-1 {{(resource.ext || "无格式").toUpperCase()}}
+              |大小：
+              span {{getSize(resource.size)}}
+            .r-info-size
+              | 专业：
+              .display-i-b(v-for="f, index in forums")
+                a.pointer.m-r-05(@click="visitUrl('/f/' + f.fid, true)") {{f.displayName}}
+          .r-info-d {{resource.description}}
+          .r-info-bottom.text-right
+            a.m-r-05.pointer.btn.btn-success.btn-sm(@click="visitUrl('/r/' + resource.rid, true)")
+              .fa.fa-cloud-download &nbsp;
+              | 点击下载
+              span(v-if="resource.hits") &nbsp;{{resource.hits}}
+            .display-i-b(v-if="modifyAllResource || uid === resource.uid")
+              a.m-r-05.pointer.btn.btn-primary.btn-sm(@click="visitUrl('/library/upload?rid=' + resource.rid, true)")
+                .fa.fa-edit &nbsp;
+                |编辑
+              a.m-r-05.pointer.btn.btn-danger.btn-sm(@click="removeResourceFromLibrary(resource.rid)")
+                .fa.fa-trash &nbsp;
+                |删除
+include ../moment
++includeJS("/tools.js")
++includeJS("/library/common.js")
++includeJS("/publicModules/resourceInfo/resourceInfo.js")

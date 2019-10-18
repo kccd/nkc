@@ -1,7 +1,6 @@
 module.exports = {
-  GET: "visitLibrary",
+  POST: "libraryUpload",
   upload: {
-    GET: "libraryUpload",
-    POST: "libraryUpload"
+    GET: "libraryUpload"
   }
 };

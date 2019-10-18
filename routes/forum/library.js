@@ -15,7 +15,7 @@ router
     }
     const count = await db.ResourceModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
-    const resources = await db.ResourceModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    const resources = await db.ResourceModel.find(q).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
     const usersId = resources.map(r => r.uid);
     const users = await db.UserModel.find({uid: {$in: usersId}});
     const usersObj = {};

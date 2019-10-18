@@ -1186,7 +1186,7 @@ forumSchema.statics.publishPermission = async (data, fids) => {
  */
 forumSchema.statics.createNewThread = async function(options) {
   if(!options.uid) throwErr(400, "uid不可为空");
-  if(!options.fids || options.fids.length == 0) throwErr(400, "目标专业fids不可为空");
+  if(!options.fids || options.fids.length === 0) throwErr(400, "目标专业fids不可为空");
   const SettingModel = mongoose.model('settings');
   const SubscribeModel = mongoose.model("subscribes");
   const ThreadModel = mongoose.model('threads');

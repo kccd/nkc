@@ -4,8 +4,8 @@ NKC.methods.selectImage = function(o) {
     backdrop: "static"
   });
   var options = {
-    viewMode:0,
-    aspectRatio: 1,
+    viewMode: 1,
+    // aspectRatio: 1,
     checkCrossOrigin: false,
     movable: false,
     canSelectNewImage: true,

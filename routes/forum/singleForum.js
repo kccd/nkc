@@ -323,6 +323,8 @@ router
     data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
     data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
 
+    data.bookCount = await db.ResourceModel.count({forumsId: data.forum.fid});
+
 		ctx.template = 'forum/forum.pug';
 		await next();
 	})

@@ -45,8 +45,7 @@ module.exports = {
 		PARAMETER: {
 			GET: 'getResources',
       info: {
-			  GET: "getResourceInfo",
-        PATCH: "patchResourceInfo"
+			  GET: "getResourceInfo"
       }
 		},
 	},

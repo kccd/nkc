@@ -208,3 +208,15 @@
 .forum-panel-body .other-forum-count{
   font-size: 1rem;
 }
+.forum-library{
+  text-decoration: none;
+  color: #282c37;
+  background-color: rgba(0,0,0,0);
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+.forum-library:hover, .forum-library:focus{
+  text-decoration: none;
+}

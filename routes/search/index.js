@@ -70,7 +70,7 @@ router
 
     // 加载分页设置
     const {searchThreadList, searchAllList, searchPostList, searchUserList,
-      searchColumnList
+      searchColumnList, searchResourceList
     } = (await db.SettingModel.findById("page")).c;
 
     // 用户输入了搜索的关键词，进入高级搜索。
@@ -96,6 +96,8 @@ router
         perpage = searchThreadList;
       } else if(t === "column") {
         perpage = searchColumnList;
+      } else if(t === "resource") {
+        perpage = searchResourceList;
       } else {
         perpage = searchAllList;
         targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
@@ -125,6 +127,7 @@ router
       const uids = new Set();
       const columnId = new Set();
       const columnPageId = new Set();
+      const resourceId = new Set();
       const highlightObj = {};
       results.map(r => {
         pids.add(r.pid);
@@ -133,6 +136,8 @@ router
           columnId.add(r.tid);
         } else if(r.docType === "columnPage") {
           columnPageId.add(r.tid);
+        } else if(r.docType === "resource") {
+          resourceId.add(r.tid);
         }
 
         if(r.highlight) {
@@ -174,6 +179,13 @@ router
               highlightObj[r.tid+ "_abbr"] = r.highlight.description;
             }
           } else if(r.docType === "columnPage") {
+            if(r.highlight.title) {
+              highlightObj[r.tid + "_t"] = r.highlight.title;
+            }
+            if(r.highlight.content) {
+              highlightObj[r.tid+ "_c"] = r.highlight.content;
+            }
+          } else if(r.docType === "resource") {
             if(r.highlight.title) {
               highlightObj[r.tid + "_t"] = r.highlight.title;
             }
@@ -230,6 +242,11 @@ router
       const pageColumnObj = {};
       pageColumns.map(pc => {
         pageColumnObj[pc._id] = pc;
+      });
+      const resources = await db.ResourceModel.find({rid: {$in: [...resourceId]}});
+      const resourcesObj = {};
+      resources.map(r => {
+        resourcesObj[r.rid] = r;
       });
       // 根据文档类型，拓展数据
       loop1:
@@ -334,6 +351,21 @@ router
             column,
             page
           }
+        } else if(docType === "resource") {
+          let resource = resourcesObj[tid];
+          if(!resource) continue;
+          resource = resource.toObject();
+          resource.user = userObj[resource.uid];
+          resource.forums = await db.ForumModel.find({fid: {$in: resource.forumsId}}, {
+            fid: 1,
+            displayName: 1
+          });
+          r = {
+            docType,
+            t: highlightObj[`${tid}_t`] || resource.name,
+            c: highlightObj[`${tid}_c`] || resource.description,
+            resource
+          };
         }
         data.results.push(r);
       }

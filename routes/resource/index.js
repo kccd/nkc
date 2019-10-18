@@ -12,35 +12,11 @@ resourceRouter
     await next()
   })
   .get('/:rid', async (ctx, next) => {
-    // const { rid } = ctx.params;
-    // const { data, db, fs, settings } = ctx;
-    // const { cache } = settings;
-    // const resource = await db.ResourceModel.findOnly({ rid });
-    // const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf'];
-    // if (!extArr.includes(resource.ext.toLowerCase()) && !data.user) ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
-    // // if (extArr.includes(resource.ext.toLowerCase()) && resource.references.length == 0 && (!data.user || data.user && data.user.uid !== resource.uid)) ctx.throw(403, '图片未发表在文章中，不可查看');
-    // const { path, ext } = resource;
-    // let filePath = pathModule.join(ctx.settings.upload.uploadPath, path);
-    // if (extArr.includes(resource.ext.toLowerCase())) {
-    //   try {
-    //     await fs.access(filePath);
-    //   } catch (e) {
-    //     filePath = ctx.settings.statics.defaultImageResourcePath;
-    //   }
-    //   ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
-    // }
-    // // 在resource中添加点击次数
-    // await resource.update({$inc:{hits:1}})
-    // ctx.filePath = filePath;
-    // ctx.resource = resource;
-    // ctx.type = ext;
-    // await next()
     const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf', 'mp3'];
     const { rid } = ctx.params;
     const { data, db, fs, settings } = ctx;
     const { cache } = settings;
-    const {mediaPath} = settings.upload;
-    const {mediaPicturePath, mediaVideoPath, mediaAudioPath, mediaAttachmentPath, selectDiskCharacterUp, selectDiskCharacterDown} = settings.mediaPath;
+    const {selectDiskCharacterDown} = settings.mediaPath;
     const resource = await db.ResourceModel.findOnly({ rid });
     const { path, ext } = resource;
     let filePath = selectDiskCharacterDown(resource);
