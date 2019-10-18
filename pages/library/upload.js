@@ -57,7 +57,7 @@ var app = new Vue({
           })
       }, {
         countLimit: 1,
-        allowedExt: ["video", "audio", "attachment"]
+        allowedExt: ["attachment", "video", "audio"]
       });
     },
     // 选择封面
@@ -118,6 +118,7 @@ var app = new Vue({
         size: file.size,
         toc: file.lastModified
       };
+      if(!this.name) this.name = this.resource.oname;
       this.file = file;
     },
     inForums: function(forum) {
@@ -211,6 +212,11 @@ var app = new Vue({
           // 上传成功
           self.submitting = false;
           sweetSuccess("提交成功");
+          if(data.forum) {
+            setTimeout(function() {
+              NKC.methods.visitUrl("/f/" + data.forum.fid + "/library");
+            }, 2000);
+          }
         })
         .catch(function(data) {
           self.submitting = false;

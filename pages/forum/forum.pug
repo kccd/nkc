@@ -206,10 +206,16 @@ block content
                   span=` ${r.hits}`
             .col-xs-12.col-md-12.m-t-1
               include ../publicModules/paging/forum_nav
-              .pull-right.upload-resource
-                a.btn.btn-sm(href=`/library/upload?fid=${data.forum.fid}` target="_blank")
-                  .fa.fa-cloud-upload &nbsp;
-                  | 上传文件
+              if data.user
+                .pull-right.upload-resource
+                  if !data.uploadErrorInfo
+                    a.btn.btn-sm(href=`/library/upload?fid=${data.forum.fid}`)
+                      .fa.fa-cloud-upload &nbsp;
+                      | 上传文件
+                  else
+                    a.btn.btn-sm(disabled title=data.uploadErrorInfo)
+                      .fa.fa-cloud-upload &nbsp;
+                      | 上传文件
               .m-b-05
                 .paging-button
                   for t, index in docTypes

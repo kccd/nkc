@@ -41,6 +41,7 @@ router
       body = ctx.body;
     }
     const {user} = data;
+    await db.UserModel.ensurePostLibraryPermission(user.uid);
     let {cover, name, description, forumsId = [], rid, category, operation} = body;
     const resource = await db.ResourceModel.findOne({rid});
     if(!resource) ctx.throw(400, `resource not found, rid: ${rid}`);

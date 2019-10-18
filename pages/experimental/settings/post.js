@@ -6,7 +6,7 @@ var app = new Vue({
     grades: [],
     uid: "",
     users: [],
-    type: 'postToForum'
+    type: 'postToForum', // postToForum, postToThread, postResource, postLibrary
   },
   methods: {
     addUser: function(type) {
@@ -140,6 +140,20 @@ var app = new Vue({
         }
         data.postSettings.c.postToThread.examCountLimit = exam.notPass;
         data.postSettings.c.postToThread.exam = examArr;
+
+        examArr = [];
+        exam = data.postSettings.c.postLibrary.exam;
+        if(exam.volumeA) {
+          examArr.push('volumeA');
+        }
+        if(exam.volumeB) {
+          examArr.push('volumeB');
+        }
+        if(exam.notPass.status) {
+          examArr.push('notPass');
+        }
+        data.postSettings.c.postLibrary.examCountLimit = exam.notPass;
+        data.postSettings.c.postLibrary.exam = examArr;
 
         app.postSettings = data.postSettings.c;
       })
