@@ -305,6 +305,7 @@ router
           if(!post.anonymous) {
             r.postUser = {
               uid: postUser.uid,
+              avatar: postUser.avatar,
               username: postUser.username
             }
           }
