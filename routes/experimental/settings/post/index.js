@@ -10,6 +10,8 @@ router
       return await next();
     }
     data.postSettings = await db.SettingModel.findOnly({_id: 'post'});
+    data.librarySettings = await db.SettingModel.getSettings("library");
+    data.postSettings.c.postLibrary = data.librarySettings;
     let uids = data.postSettings.c.postToForum.anonymous.uid.concat(data.postSettings.c.postToThread.anonymous.uid);
     uids = uids.concat(data.postSettings.c.postToForum.survey.uid, data.postSettings.c.postToThread.survey.uid);
     data.users = await db.UserModel.find({uid: {$in: uids}});
@@ -19,46 +21,59 @@ router
   })
   .patch('/', async (ctx, next) => {
     const {body, db} = ctx;
-    const {roles, grades, postToThread, postToForum} = body;
+    const {roles, grades, postToThread, postToForum, postLibrary} = body;
     const q = {};
-    if(postToForum) {
-      const {exam} = postToForum;
+    if(postToForum || postToThread) {
+      if(postToForum) {
+        const {exam} = postToForum;
+        if(exam.notPass.status) {
+          exam.volumeA = true;
+          exam.volumeB = true;
+        } else if(exam.volumeA) {
+          exam.volumeB = true;
+        }
+        q['c.postToForum'] = postToForum;
+      }
+      if(postToThread) {
+        const {exam} = postToThread;
+        if(exam.notPass.status) {
+          exam.volumeA = true;
+          exam.volumeB = true;
+        } else if(exam.volumeA) {
+          exam.volumeB = true;
+        }
+        q['c.postToThread'] = postToThread;
+      }
+      await db.SettingModel.updateOne({_id: 'post'}, {$set: q});
+      await Promise.all(roles.map(async role => {
+        await db.RoleModel.update({_id: role._id}, {
+          $set: {
+            postToForum: role.postToForum,
+            postToThread: role.postToThread,
+          }
+        })
+      }));
+      await Promise.all(grades.map(async grade => {
+        await db.UsersGradeModel.update({_id: grade._id}, {
+          $set: {
+            postToForum: grade.postToForum,
+            postToThread: grade.postToThread,
+          }
+        })
+      }));
+      await db.SettingModel.saveSettingsToRedis("post");
+    } else if(postLibrary) {
+      const {exam} = postLibrary;
       if(exam.notPass.status) {
         exam.volumeA = true;
         exam.volumeB = true;
       } else if(exam.volumeA) {
         exam.volumeB = true;
       }
-      q['c.postToForum'] = postToForum;
+      q.c = postLibrary;
+      await db.SettingModel.updateOne({_id: 'library'}, {$set: q});
+      await db.SettingModel.saveSettingsToRedis("library");
     }
-    if(postToThread) {
-      const {exam} = postToThread;
-      if(exam.notPass.status) {
-        exam.volumeA = true;
-        exam.volumeB = true;
-      } else if(exam.volumeA) {
-        exam.volumeB = true;
-      }
-      q['c.postToThread'] = postToThread;
-    }
-    await db.SettingModel.updateOne({_id: 'post'}, {$set: q});
-    await Promise.all(roles.map(async role => {
-      await db.RoleModel.update({_id: role._id}, {
-        $set: {
-          postToForum: role.postToForum,
-          postToThread: role.postToThread,
-        }
-      })
-    }));
-    await Promise.all(grades.map(async grade => {
-      await db.UsersGradeModel.update({_id: grade._id}, {
-        $set: {
-          postToForum: grade.postToForum,
-          postToThread: grade.postToThread,
-        }
-      })
-    }));
-    await db.SettingModel.saveSettingsToRedis("post");
     await next();
   });
 

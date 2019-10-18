@@ -18,6 +18,8 @@ block content
               .col-sm-12.mdui-m-a-1
                 button.mdui-btn(:class='{"mdui-color-theme": type === "postToForum"}' @click='type = "postToForum"') 发表文章
                 button.mdui-btn(:class='{"mdui-color-theme": type === "postToThread"}' @click='type = "postToThread"') 发表回复
+                button.mdui-btn(:class='{"mdui-color-theme": type === "postLibrary"}' @click='type = "postLibrary"') 发表文库
+                //button.mdui-btn(:class='{"mdui-color-theme": type === "postResource"}' @click='type = "postResource"') 上传资源
               .col-sm-2.text-right
                 h4 最小认证等级
               .col-sm-10
@@ -77,7 +79,7 @@ block content
                     input(class="table-input" v-model='postSettings[type].examCountLimit.countLimit')
                     | &nbsp;条/每天
                 hr
-            .row
+            .row(v-if="['postToForum', 'postToThread'].indexOf(type) !== -1")
               .col-sm-2.text-right
                 h4 证书限制
               .col-sm-10
@@ -154,7 +156,7 @@ block content
                           </label>
                           input(class="table-input" v-model.number='grade[type].timeLimit.num')
                 hr
-            .row
+            .row(v-if="['postToForum', 'postToThread'].indexOf(type) !== -1")
               .col-sm-2.text-right
                 h4 匿名发表
               .col-sm-10
@@ -190,7 +192,7 @@ block content
                       a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
                       .fa.fa-remove(@click="removeUser(index, 'anonymous')" title="点击移除")
                 hr
-            .row
+            .row(v-if="['postToForum', 'postToThread'].indexOf(type) !== -1")
               .col-sm-2.text-right
                 h4 发起调查
               .col-sm-10

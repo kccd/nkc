@@ -114,6 +114,4 @@ resourceSchema.statics.removeFromES = async (rid) => {
   const elasticSearch = require("../nkcModules/elasticSearch");
   await elasticSearch.delete("resource", rid);
 };
-
-
 module.exports = mongoose.model('resources', resourceSchema);

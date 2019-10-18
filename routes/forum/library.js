@@ -14,6 +14,13 @@ router
     }
     const count = await db.ResourceModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
+    if(data.user) {
+      try{
+        await db.UserModel.ensurePostLibraryPermission(data.user.uid);
+      } catch(err) {
+        data.uploadErrorInfo = err.message;
+      }
+    }
     const resources = await db.ResourceModel.find(q).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
     const usersId = resources.map(r => r.uid);
     const users = await db.UserModel.find({uid: {$in: usersId}});
