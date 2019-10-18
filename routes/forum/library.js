@@ -1,12 +1,11 @@
 const router = require("koa-router")();
 router
   .get("/", async (ctx, next) => {
-    const {data, db, query, nkcModules, params} = ctx;
-    const {fid} = params;
-    const forum = await db.ForumModel.findOnly({fid});
-    await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+    const {data, db, query, nkcModules} = ctx;
+    const forum = data.forum;
     const {t = "all", page = 0} = query;
     data.t = t;
+    data.type = "library";
     const q = {
       forumsId: forum.fid
     };
@@ -28,9 +27,8 @@ router
       resource.user = usersObj[r.uid];
       data.resources.push(resource);
     }
-    data.forum = forum;
     data.paging = paging;
-    ctx.template = "library/library.pug";
+    // ctx.template = "library/library.pug";
     await next();
   });
 module.exports = router;

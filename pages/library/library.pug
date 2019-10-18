@@ -19,6 +19,10 @@ block content
     .row
       .col-xs-12.col-md-9.box-shadow-panel
         div
+          | 专业 /&nbsp;
+          a(href=`/f/${data.forum.fid}`)=data.forum.displayName
+          | &nbsp;/ 文库
+        div
           .row
             .doc-types.col-xs-12.col-md-6
               ul.nav.nav-pills
@@ -48,7 +52,7 @@ block content
                         img(src=`/avatar/${r.user.avatar}?t=sm`)
                         a(href=`/u/${r.uid}` target="_blank")=r.user.username
                       .lib-r-t=format("YYYY/MM/DD", r.tlm || r.toc)
-                      .lib-r-s=(r.ext || "无格式").toUpperCase()
+                      .lib-r-s=(r.ext || "未知").toUpperCase()
                       .lib-r-s=tools.getSize(r.size)
                       .display-i-b.hidden-sm.hidden-xs
                         +link(r)
@@ -60,7 +64,7 @@ block content
               include ../publicModules/paging/paging
       .col-xs-12.col-md-3.box-shadow-panel
         .text-center
-          a(href=`/library/upload?fid=${data.forum.fid}` target="_blank").btn.btn-block.btn-lg.btn-success 文件上传
+          a(href=`/library/upload?fid=${data.forum.fid}`).btn.btn-block.btn-lg.btn-success 文件上传
           h5.text-success.m-t-2 分享知识，共创...
 
 block scripts

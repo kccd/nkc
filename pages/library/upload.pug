@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title 上传文件到专业文库
+  title 上传文件到文库
   +includeCSS("/library/upload.css")
 block content
   #data.hidden=objToStr({forum: data.forum, rid: data.rid})
@@ -77,8 +77,8 @@ block content
             div
               h4.text-danger  注意事项：
               p 1. 文件大小不能超过200MB。
-              p 2. 文件的编辑、删除操作将会在所有已选专业文库中同步。
-              p 3. 选择已上传文件时，输入框的内容将会被线上文件信息覆盖，请注意保存已输入的内容。
+              p 2. 文件的编辑和删除操作将会在所有已选专业文库中同步。
+              p 3. 从已上传中选择文件时，输入框的内容将会被线上文件的信息覆盖掉，请注意保存已输入的内容。
 
 block scripts
   include ../publicModules/moveThread/moveThread

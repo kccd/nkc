@@ -22,7 +22,7 @@
               span &nbsp;上传于 {{format('YYYY/MM/DD HH:mm:ss', resource.tlm || resource.toc)}}
             .r-info-size
               | 格式：
-              span.m-r-1 {{(resource.ext || "无格式").toUpperCase()}}
+              span.m-r-1 {{(resource.ext || "未知").toUpperCase()}}
               |大小：
               span {{getSize(resource.size)}}
             .r-info-size

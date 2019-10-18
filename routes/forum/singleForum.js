@@ -156,7 +156,7 @@ router
   })
 	.use('/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
-	.use(['/home', '/latest', '/followers', '/visitors'], async (ctx, next) => {
+	.use(['/home', '/latest', '/followers', '/visitors', "/library"], async (ctx, next) => {
 		const {data, db, params, query} = ctx;
 		const {fid} = params;
 		const {token} = query;

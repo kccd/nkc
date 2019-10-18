@@ -28,6 +28,7 @@ body{
 }
 .lib-r-info{
   display: table-cell;
+  width: 100%;
   vertical-align: top;
 }
 .lib-r-n{

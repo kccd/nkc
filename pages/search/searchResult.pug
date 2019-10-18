@@ -109,4 +109,4 @@
         | 立即下载&nbsp;
         if result.resource.hits
           span=result.resource.hits
-      div=`${(result.resource.ext || "无格式").toUpperCase()} ${tools.getSize(result.resource.size)}`
+      div=`${(result.resource.ext || "未知").toUpperCase()} ${tools.getSize(result.resource.size)}`

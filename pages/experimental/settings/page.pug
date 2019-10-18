@@ -59,6 +59,10 @@ block content
               .col-sm-3
                 input.form-control(type='text' v-model.number="pageSettings.searchColumnList")
             .form-group
+              label.col-sm-3.control-label 搜索页文件列表
+              .col-sm-3
+                input.form-control(type='text' v-model.number="pageSettings.searchResourceList")
+            .form-group
               label.col-sm-3.control-label 文章页/回复详细页的评论列表
               .col-sm-3
                 input.form-control(type='text' v-model.number="pageSettings.threadPostCommentList")
