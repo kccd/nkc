@@ -6,6 +6,11 @@ if(!fs.existsSync('./install/install.lock')) {
 
 require('./global');
 
+// 启动测试环境相关工具
+if(global.NKC.NODE_ENV !== "production") {
+  require('./watch.js');
+}
+
 require('colors');
 const http = require('http'),
   app = require('./app'),
@@ -74,6 +79,7 @@ const start = async () => {
       await socket(server);
       console.log(`nkc ${global.NKC.NODE_ENV} server listening on ${port}`.green);
     });
+
   } catch(err) {
     console.error(`error occured when initialize the server.\n${err.stack}`.red);
     process.exit(-1)

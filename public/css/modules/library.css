@@ -1,0 +1,94 @@
+/* 默认颜色 */
+/* 默认阴影 */
+/* 默认设置 */
+div,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li {
+  word-break: break-all;
+}
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 加粗 */
+.bold {
+  font-weight: 700;
+}
+/* 文本超出隐藏并显示省略号 */
+#moduleLibrary .lib-list-li {
+  cursor: pointer;
+  height: 5rem;
+  margin: 1px 0;
+}
+#moduleLibrary .lib-list-li .list-cover {
+  display: table-cell;
+  border: 1px solid #eee;
+  position: relative;
+  height: 5rem;
+  width: 5rem;
+  margin-right: 0.5rem;
+}
+#moduleLibrary .lib-list-li .list-cover img {
+  height: 4.5rem;
+  width: 4.5rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+#moduleLibrary .lib-list-li .list-body {
+  display: table-cell;
+  vertical-align: top;
+}
+#moduleLibrary .lib-list-li .list-body .list-name {
+  color: #282c37;
+  font-size: 1.35rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+}
+#moduleLibrary .lib-list-li .list-body .list-description {
+  margin-top: 0.2rem;
+  height: 1.7rem;
+  color: #9baec8;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+#moduleLibrary .lib-list-li .list-body.file .list-name {
+  color: #282c37;
+  font-size: 1.3rem;
+  height: 2rem;
+  line-height: 2rem;
+}
+#moduleLibrary .lib-list-li:hover {
+  background-color: #f6f6f6;
+}
+#moduleLibrary .lib-nav {
+  margin-bottom: 1rem;
+}
+#moduleLibrary .lib-nav .lib-nav-li {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 1.5rem;
+  margin-right: 0.2rem;
+  color: #9baec8;
+  font-weight: 700;
+}
+#moduleLibrary .lib-nav .lib-nav-li:before {
+  content: "/";
+  margin-right: 0.5rem;
+}

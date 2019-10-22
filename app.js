@@ -1,5 +1,4 @@
 const mainRouter = require('./routes');
-const mainRouter2 = require("./routes2");
 const Koa = require('koa');
 require('colors');
 const path = require('path');
@@ -10,7 +9,6 @@ const rateLimit = require('koa-ratelimit');
 const Redis = require('ioredis');
 const fs = require('fs');
 const helmet = require('koa-helmet');
-
 const staticServe = path => {
   return require('koa-static')(path, {
     setHeaders: function(response, path, stats) {
@@ -90,6 +88,5 @@ app
   .use(permission)
   .use(logger)
   .use(mainRouter.routes())
-  .use(mainRouter2.routes())
   .use(body);
 module.exports = app.callback();

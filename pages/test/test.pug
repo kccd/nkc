@@ -4,8 +4,12 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-12
-
+      .col-xs-12.col-md-8
+        include ../publicModules/library.pug
+      .col-xs-12.col-md-4
+        p Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam explicabo cumque tempore, nesciunt id ex cum quidem. Dolorem aspernatur facere quam optio cum. Asperiores quisquam dolorem tempore facilis velit iste!
 block scripts
-  include ../publicModules/selectResource/selectResource.1.0.pug
+  include ../publicModules/commonModal/commonModal
+  include ../publicModules/resourceInfo/resourceInfo
+  +includeJS("/js/modules/library.js")
   +includeJS("/test/test.js")

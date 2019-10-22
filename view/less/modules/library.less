@@ -1,0 +1,68 @@
+@import "../base.less";
+#moduleLibrary {
+  @listHeight: 5rem;
+  .lib-list-li{
+    cursor: pointer;
+    height: @listHeight;
+    margin: 1px 0;
+    .list-cover{
+      display: table-cell;
+      border: 1px solid #eee;
+      position: relative;
+      height: @listHeight;
+      width: @listHeight;
+      margin-right: 0.5rem;
+      img{
+        height: @listHeight * 0.9;
+        width: @listHeight * 0.9;
+        .vc();
+      }
+    }
+    .list-body{
+      display: table-cell;
+      vertical-align: top;
+      @lineHeight: @listHeight / 2;
+      .list-name{
+        color: @dark;
+        font-size: 1.35rem;
+        height: @lineHeight;
+        line-height: @lineHeight;
+      }
+      .list-info{
+
+      }
+      .list-description{
+        margin-top: 0.2rem;
+        height: 1.7rem;
+        color: @darkGray;
+        .hideText(@line: 1)
+      }
+      &.file{
+        .list-name{
+          color: @dark;
+          font-size: 1.3rem;
+          height: 2rem;
+          line-height: 2rem;
+        } 
+      }
+    }
+  }
+  .lib-list-li:hover{
+    background-color: #f6f6f6;
+  }
+  .lib-nav{
+    margin-bottom: 1rem;
+    .lib-nav-li{
+      display: inline-block;
+      cursor: pointer;
+      font-size: 1.5rem;
+      margin-right: 0.2rem;
+      color: @darkGray;
+      .bold();
+      &:before{
+        content: "/";
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}

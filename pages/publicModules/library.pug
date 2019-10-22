@@ -1,0 +1,20 @@
++includeCSS("/css/modules/library.css")
+#moduleLibrary(v-cloak)
+  .lib-nav
+    .lib-nav-li(@click="selectFolder(selectedFolders[0])") {{forum.displayName}}
+    .lib-nav-li(v-for="s, index in selectedFolders" @click="selectFolder(s)" v-if="index !== 0") {{s.name}}
+  .lib-list
+    .lib-list-li(v-for="f in list.folders" @click="selectFolder(f)") 
+      .list-cover
+        img(:src="getUrl('fileCover', 'folder')")
+      .list-body  
+        .list-name {{f.name}}
+        .list-description {{f.description || "暂无简介"}}
+    .lib-list-li(v-for="r in list.resources" @click="selectFile(r)") 
+      .list-cover
+        img(:src="getUrl('fileCover', r.ext)")
+      .list-body.file    
+        .list-name {{r.name}}
+        .list-info 
+        .list-description {{r.description || "暂无简介"}}
+  button.btn.btn-xs.btn-default(@click="createFolder") 新建文件夹

@@ -511,7 +511,7 @@ block content
                   .row
                     .col-xs-12.col-md-12(style='margin-top: 1rem;')
                       include ../interface_navigation_paging
-                      //if- !data.thread.firstPost.anonymous
+                      //-if- !data.thread.firstPost.anonymous
                       ul.pagination.NavigationPaging
                         li(class=data.t!=="author"?"active":"")
                           a(href=`/t/${thread.tid}`) 全部
@@ -520,7 +520,12 @@ block content
                     .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
                       for post, index in data.posts
                         if index !== 0 || data.paging.page !== 0
-                          -const disabledHidePost = !post.hide;
+                          //- 文章作者的post无需折叠
+                          -let disabledHidePost;
+                          if data.thread.uid && post.uid && data.thread.uid === post.uid
+                            -disabledHidePost = true;
+                          else    
+                            -disabledHidePost = !post.hide;
                           -let previousPost;
                           if index !== 1
                             -previousPost = data.posts[index-1];
