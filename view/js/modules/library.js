@@ -287,7 +287,7 @@ NKC.modules.Library = class {
         },
         // 移动文件夹或文件
         moveFolder(libraryId) {
-          sweetQuestion("确定要执行移动操作？此操作将忽略与目标文件夹下同名的文件或文件夹。")
+          sweetQuestion("确定要执行移动操作？此操作不会保留原有目录结构，且不可恢复。")
             .then(() => {
               let foldersId;
               if(Array.isArray(libraryId)) {
@@ -306,7 +306,7 @@ NKC.modules.Library = class {
                 body.targetFolderId = data.folder._id;
                 nkcAPI(url, method, body)
                   .then((data) => {
-                    sweetSuccess(`执行成功${data.ignoreCount? `，忽略${data.ignoreCount}个项目`: ""}`);
+                    sweetSuccess(`执行成功${data.ignoreCount? `，共有${data.ignoreCount}个项目因存在冲突或不是你自己发布的而被忽略`: ""}`);
                     self.app.mark = false;
                     self.app.selectFolder(self.app.folder);
                   })
@@ -365,13 +365,13 @@ NKC.modules.Library = class {
           }
           if(!foldersId.length) return;
           foldersId = foldersId.join("-");
-          sweetQuestion(`确定要执行删除操作？该操作不会删除存有内容的文件夹。`)
+          sweetQuestion(`确定要执行删除操作？`)
             .then(function() {
               nkcAPI(`/library/${self.app.folder._id}/list?lid=${foldersId}`, "DELETE")
                 .then(function(data) {
                   self.app.mark = false;
                   self.app.selectFolder(self.app.folder);
-                  sweetSuccess(`执行成功${data.ignoreCount? `，忽略${data.ignoreCount}个项目`: ""}`);
+                  sweetSuccess(`执行成功${data.ignoreCount? `，共有${data.ignoreCount}个项目因不是你自己发布的而被忽略`: ""}`);
                 })
                 .catch(function(data) {
                   sweetError(data);

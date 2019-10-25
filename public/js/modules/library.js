@@ -345,7 +345,7 @@ function () {
         moveFolder: function moveFolder(libraryId) {
           var _this = this;
 
-          sweetQuestion("确定要执行移动操作？此操作将忽略与目标文件夹下同名的文件或文件夹。").then(function () {
+          sweetQuestion("确定要执行移动操作？此操作不会保留原有目录结构，且不可恢复。").then(function () {
             var foldersId;
 
             if (Array.isArray(libraryId)) {
@@ -361,7 +361,7 @@ function () {
             LibraryPath.open(function (data) {
               body.targetFolderId = data.folder._id;
               nkcAPI(url, method, body).then(function (data) {
-                sweetSuccess("\u6267\u884C\u6210\u529F".concat(data.ignoreCount ? "\uFF0C\u5FFD\u7565".concat(data.ignoreCount, "\u4E2A\u9879\u76EE") : ""));
+                sweetSuccess("\u6267\u884C\u6210\u529F".concat(data.ignoreCount ? "\uFF0C\u5171\u6709".concat(data.ignoreCount, "\u4E2A\u9879\u76EE\u56E0\u5B58\u5728\u51B2\u7A81\u6216\u4E0D\u662F\u4F60\u81EA\u5DF1\u53D1\u5E03\u7684\u800C\u88AB\u5FFD\u7565") : ""));
                 self.app.mark = false;
                 self.app.selectFolder(self.app.folder);
               })["catch"](function (data) {
@@ -416,11 +416,11 @@ function () {
 
           if (!foldersId.length) return;
           foldersId = foldersId.join("-");
-          sweetQuestion("\u786E\u5B9A\u8981\u6267\u884C\u5220\u9664\u64CD\u4F5C\uFF1F\u8BE5\u64CD\u4F5C\u4E0D\u4F1A\u5220\u9664\u5B58\u6709\u5185\u5BB9\u7684\u6587\u4EF6\u5939\u3002").then(function () {
+          sweetQuestion("\u786E\u5B9A\u8981\u6267\u884C\u5220\u9664\u64CD\u4F5C\uFF1F").then(function () {
             nkcAPI("/library/".concat(self.app.folder._id, "/list?lid=").concat(foldersId), "DELETE").then(function (data) {
               self.app.mark = false;
               self.app.selectFolder(self.app.folder);
-              sweetSuccess("\u6267\u884C\u6210\u529F".concat(data.ignoreCount ? "\uFF0C\u5FFD\u7565".concat(data.ignoreCount, "\u4E2A\u9879\u76EE") : ""));
+              sweetSuccess("\u6267\u884C\u6210\u529F".concat(data.ignoreCount ? "\uFF0C\u5171\u6709".concat(data.ignoreCount, "\u4E2A\u9879\u76EE\u56E0\u4E0D\u662F\u4F60\u81EA\u5DF1\u53D1\u5E03\u7684\u800C\u88AB\u5FFD\u7565") : ""));
             })["catch"](function (data) {
               sweetError(data);
             });
