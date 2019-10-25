@@ -10,6 +10,14 @@ module.exports = {
         countLimit: 5,
         unlimited: true
       }
+    },
+    permission: {
+      roles: [],
+      /* {
+        roleId: String,
+        operations: ["createFolder", ...]
+      } */
+      grades: []
     }
   }
 };

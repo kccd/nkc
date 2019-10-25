@@ -1,41 +1,25 @@
 const router = require("koa-router")();
 router
   .get("/", async (ctx, next) => {
-    const {data, db, query, nkcModules} = ctx;
-    const forum = data.forum;
-    const {t = "all", page = 0} = query;
-    data.t = t;
-    data.type = "library";
-    const q = {
-      forumsId: forum.fid
-    };
-    if(t !== "all") {
-      q.category = t;
+    ctx.data.type = "library";
+    await next();
+  })
+  .post("/", async (ctx, next) => {
+    const {data, db} = ctx;
+    const {forum, user} = data;
+    if(forum.lid) {
+      ctx.throw(400, "专业已开通文库");
     }
-    const count = await db.ResourceModel.count(q);
-    const paging = nkcModules.apiFunction.paging(page, count);
-    if(data.user) {
-      try{
-        await db.UserModel.ensurePostLibraryPermission(data.user.uid);
-      } catch(err) {
-        data.uploadErrorInfo = err.message;
-      }
-    }
-    const resources = await db.ResourceModel.find(q).sort({tlm: -1}).skip(paging.start).limit(paging.perpage);
-    const usersId = resources.map(r => r.uid);
-    const users = await db.UserModel.find({uid: {$in: usersId}});
-    const usersObj = {};
-    users.map(u => {
-      usersObj[u.uid] = u;
+
+    const library = await db.LibraryModel.newFolder({
+      name: forum.displayName,
+      description: forum.description,
+      uid: user.uid
     });
-    data.resources = [];
-    for(const r of resources) {
-      const resource = r.toObject();
-      resource.user = usersObj[r.uid];
-      data.resources.push(resource);
-    }
-    data.paging = paging;
-    // ctx.template = "library/library.pug";
+
+    await forum.update({lid: library._id});
+    data.library = library;
+    
     await next();
   });
 module.exports = router;

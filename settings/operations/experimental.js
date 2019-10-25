@@ -257,6 +257,10 @@ module.exports = {
 		  GET: "experimentalColumnSettings",
       PATCH: "experimentalColumnSettings"
     },
+    library: {
+      GET: "experimentalLibrarySettings",
+      PATCH: "experimentalLibrarySettings"
+    },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'

@@ -1,0 +1,81 @@
+extends ../../experimental
+block eTitle
+  title 文库设置
+block eContent
+  .container-fluid.max-width
+    .row
+      .hidden#data=objToStr({librarySettings: data.librarySettings, roles: data.roles, grades: data.grades})
+      .col-xs-12.col-md-12#app(v-cloak)
+        table.table
+          thead
+            tr
+              th 证书
+              th 创建文件夹
+              th 修改文件夹
+              th 移动文件夹
+              th 删除文件夹
+              th 创建文件
+              th 修改文件
+              th 移动文件
+              th 删除文件
+              th 
+          tbody
+            tr(v-for="r in roles")    
+              th {{getNameById("role", r._id)}}
+              th
+                input(type="checkbox" value="createFolder" v-model="r.operations")
+              th
+                input(type="checkbox" value="modifyFolder" v-model="r.operations")
+              th
+                input(type="checkbox" value="moveFolder" v-model="r.operations")
+              th
+                input(type="checkbox" value="deleteFolder" v-model="r.operations")
+              th
+                input(type="checkbox" value="createFile" v-model="r.operations")
+              th
+                input(type="checkbox" value="modifyFile" v-model="r.operations")
+              th
+                input(type="checkbox" value="moveFile" v-model="r.operations")
+              th
+                input(type="checkbox" value="deleteFile" v-model="r.operations")  
+              th 
+                button.btn.btn-sm.btn-default(@click="selectAll(r)") 全选
+        h4 等级限制（普通会员）
+        table.table
+          thead
+            tr
+              th 证书
+              th 创建文件夹
+              th 修改文件夹
+              th 移动文件夹
+              th 删除文件夹
+              th 创建文件
+              th 修改文件
+              th 移动文件
+              th 删除文件
+              th 
+          tbody
+            tr(v-for="r in grades")    
+              th {{getNameById("grade", r._id)}}
+              th
+                input(type="checkbox" value="createFolder" v-model="r.operations")
+              th
+                input(type="checkbox" value="modifyFolder" v-model="r.operations")
+              th
+                input(type="checkbox" value="moveFolder" v-model="r.operations")
+              th
+                input(type="checkbox" value="deleteFolder" v-model="r.operations")
+              th
+                input(type="checkbox" value="createFile" v-model="r.operations")
+              th
+                input(type="checkbox" value="modifyFile" v-model="r.operations")
+              th
+                input(type="checkbox" value="moveFile" v-model="r.operations")
+              th
+                input(type="checkbox" value="deleteFile" v-model="r.operations")          
+              th  
+                button.btn.btn-sm.btn-default(@click="selectAll(r)") 全选  
+        .m-t-1
+          button.btn.btn-primary(@click="submit") 提交          
+block scripts
+  +includeJS("/experimental/settings/library/library.js")      

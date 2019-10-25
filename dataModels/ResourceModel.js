@@ -63,8 +63,8 @@ const resourceSchema = new Schema({
     default: []
   },
   lid: {
-    type: Number,
-    default: null,
+    type: [Number],
+    default: [],
     index: 1
   },
   name: {

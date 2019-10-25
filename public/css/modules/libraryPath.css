@@ -1,0 +1,119 @@
+#moduleLibraryPath {
+  /* 弹窗皮肤 */
+  /* 弹窗模块可引入该文件用于默认的弹窗样式 */
+  /* 默认颜色 */
+  /* 垂直居中 */
+  /* 文本超出隐藏并显示省略号 */
+}
+#moduleLibraryPath .vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+#moduleLibraryPath .modal-dialog .modal-content {
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+#moduleLibraryPath .modal-dialog .modal-content .modal-header {
+  text-align: center;
+  position: relative;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+#moduleLibraryPath .modal-dialog .modal-content .modal-header .modal-title {
+  height: 5rem;
+  color: #282c37;
+  font-weight: 700;
+  line-height: 5rem;
+  font-size: 1.3rem;
+}
+#moduleLibraryPath .modal-dialog .modal-content .modal-header .fa {
+  cursor: pointer;
+  color: #aaa;
+  font-size: 1.2rem;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+}
+#moduleLibraryPath .modal-dialog .modal-content .modal-header .fa:hover {
+  background-color: #eee;
+}
+#moduleLibraryPath .modal-dialog .modal-content .modal-body {
+  padding: 0 1rem;
+  overflow: hidden;
+}
+#moduleLibraryPath .modal-dialog .modal-content .modal-footer {
+  border: none;
+  padding: 0 1rem 1rem 1rem;
+}
+#moduleLibraryPath .modal-dialog .modal-content .modal-footer .options-button {
+  padding-right: 0;
+}
+#moduleLibraryPath .modal-dialog .modal-content .modal-footer .options-button > a:last-child {
+  margin-right: 0;
+}
+#moduleLibraryPath .modal-backdrop.in {
+  filter: alpha(opacity=20);
+  opacity: 0.2;
+}
+@media (min-width: 768px) {
+  #moduleLibraryPath .modal-sm {
+    width: 380px;
+  }
+}
+#moduleLibraryPath .modal-body {
+  user-select: none;
+  height: 30rem;
+  overflow-y: scroll!important;
+  margin-bottom: 1rem;
+}
+#moduleLibraryPath .folders {
+  padding-left: 0.8rem;
+}
+#moduleLibraryPath .folders.loaded {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+}
+#moduleLibraryPath .folders .folder {
+  position: relative;
+}
+#moduleLibraryPath .folders .folder .folder-body.active {
+  background-color: #bbd5e8;
+  border-radius: 2px;
+}
+#moduleLibraryPath .folders .folder .fa {
+  position: absolute;
+  font-size: 1.35rem;
+  line-height: 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  height: 2.5rem;
+  width: 2.5rem;
+}
+#moduleLibraryPath .folders .folder .folder-name {
+  cursor: pointer;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  padding-left: 2.5rem;
+  word-break: break-all;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+#moduleLibraryPath .folders .folder .folder-name img {
+  height: 1.3rem;
+  width: 1.3rem;
+  margin-top: -2px;
+  margin-right: 0.4rem;
+}

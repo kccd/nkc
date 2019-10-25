@@ -29,10 +29,8 @@ const http = require('http'),
 let server;
 
 const dataInit = async () => {
-  if(global.NKC.NODE_ENV !== 'production') {
-    const defaultData = require('./defaultData');
-    await defaultData.init();
-  }
+  const defaultData = require('./defaultData');
+  await defaultData.init();
   // 运维包含所有的操作权限
   const operations = await OperationModel.find({}, {_id: 1});
   const operationsId = operations.map(o => o._id);

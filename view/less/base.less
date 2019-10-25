@@ -5,15 +5,6 @@
 @darkGray: #9baec8;
 @dark: #282c37;
 
-
-/* 默认阴影 */
-@shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
-/* 默认设置 */
-div, p, h1, h2, h3, h4, h5, h6, li{
-  word-break: break-all;
-}
-
 /* 垂直居中 */
 .vc{
   position: absolute;
@@ -24,16 +15,9 @@ div, p, h1, h2, h3, h4, h5, h6, li{
   margin: auto;
 }
 
-/* 加粗 */
-.fontWeight(@num:400) {
-  font-weight: @num;
-}
-.bold{
-  .fontWeight(@num:700)
-}
-
 /* 文本超出隐藏并显示省略号 */
 .hideText(@line: 1) {
+  word-break: break-all;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;

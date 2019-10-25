@@ -6,6 +6,7 @@ NKC.modules.ResourceInfo = function() {
   self.app = new Vue({
     el: "#moduleResourceInfoApp",
     data: {
+      type: "",
       loading: true,
       forums: [],
       resource: "",
@@ -19,6 +20,7 @@ NKC.modules.ResourceInfo = function() {
       getSize: NKC.methods.tools.getSize,
       removeResourceFromLibrary: removeResourceFromLibrary,
       getResource: function(rid) {
+        self.app.type = "resource";
         nkcAPI("/r/" + rid + "/info", "GET")
           .then(function(data) {
             self.app.loading = false;
@@ -30,10 +32,26 @@ NKC.modules.ResourceInfo = function() {
             sweetError(data);
           });
       },
+      getLibrary: function(lid) {
+        self.app.type = "library";
+        nkcAPI("/library/" + lid + "?info=true", "GET")
+          .then(function(data) {
+            self.app.loading = false;
+            self.app.resource = data.library;
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      },
       open: function(options) {
         options = options || {};
         self.dom.modal("show");
-        this.getResource(options.rid);
+        if(options.lid) {
+          this.getLibrary(options.lid);
+        } else if(options.rid) {
+          this.getResource(options.rid);  
+        }
+        
       },
       close: function() {
         self.dom.modal("hide");

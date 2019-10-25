@@ -15,7 +15,7 @@ const jsDest = `public/js`;
 gulp.task("buildJS", () => {
   return gulp.src(jsPath)
     .pipe(babel({
-      presets: ['@babel/preset-env']
+      presets: ['@babel/preset-env'],
     }))
     .pipe(gulp.dest(jsDest));
 });

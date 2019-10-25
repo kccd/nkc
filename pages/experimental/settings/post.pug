@@ -18,7 +18,7 @@ block content
               .col-sm-12.mdui-m-a-1
                 button.mdui-btn(:class='{"mdui-color-theme": type === "postToForum"}' @click='type = "postToForum"') 发表文章
                 button.mdui-btn(:class='{"mdui-color-theme": type === "postToThread"}' @click='type = "postToThread"') 发表回复
-                button.mdui-btn(:class='{"mdui-color-theme": type === "postLibrary"}' @click='type = "postLibrary"') 发表文库
+                button.mdui-btn(:class='{"mdui-color-theme": type === "postLibrary"}' @click='type = "postLibrary"') 文库操作
                 //button.mdui-btn(:class='{"mdui-color-theme": type === "postResource"}' @click='type = "postResource"') 上传资源
               .col-sm-2.text-right
                 h4 最小认证等级
@@ -63,7 +63,7 @@ block content
                 <i class="mdui-checkbox-icon"></i>
                 | B卷
                 </label>
-                div(v-if="displayNotPassCountLimit")
+                div(v-if="displayNotPassCountLimit && ['postToForum', 'postToThread'].indexOf(type) !== -1")
                   h5 未考试用户发表数目限制
                   <label class="mdui-radio mdui-m-r-2">
                   <input type="radio" value='true' v-model='postSettings[type].examCountLimit.unlimited' name='notPassExamCount'/>
