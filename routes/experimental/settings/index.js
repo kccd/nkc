@@ -36,6 +36,7 @@ const cacheRouter = require("./cache");
 const protocolRouter = require('./protocol');
 const toppingRouter = require("./topping");
 const transferRouter = require("./transfer");
+const libraryRouter = require("./library");
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -78,5 +79,6 @@ settingRouter
   .use("/column", columnRouter.routes(), columnRouter.allowedMethods())
   .use("/login", loginRouter.routes(), loginRouter.allowedMethods())
   .use("/username", usernameRouter.routes(), usernameRouter.allowedMethods())
+  .use("/library", libraryRouter.routes(), libraryRouter.allowedMethods())
   .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = settingRouter;

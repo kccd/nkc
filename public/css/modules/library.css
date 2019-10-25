@@ -1,0 +1,265 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+#moduleLibrary .lib-list {
+  user-select: none;
+}
+#moduleLibrary .lib-list .null {
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+}
+#moduleLibrary .lib-list-li {
+  transition: background-color 200ms;
+  border-radius: 3px;
+  cursor: pointer;
+  margin: 5px 0;
+  padding: 2px;
+}
+#moduleLibrary .lib-list-li:hover {
+  background-color: #f4f4f4;
+}
+#moduleLibrary .lib-list-li .list-checkbox {
+  display: table-cell;
+  vertical-align: top;
+}
+#moduleLibrary .lib-list-li .list-cover {
+  display: table-cell;
+  border: 1px solid #eee;
+  position: relative;
+}
+#moduleLibrary .lib-list-li .list-cover > div {
+  height: 5.4rem;
+  width: 5.4rem;
+}
+#moduleLibrary .lib-list-li .list-cover > div img {
+  height: 4.86rem;
+  width: 4.86rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+#moduleLibrary .lib-list-li .list-body {
+  display: table-cell;
+  vertical-align: top;
+  position: relative;
+  padding-left: 0.6rem;
+  padding-right: 4rem;
+  width: 100%;
+}
+#moduleLibrary .lib-list-li .list-body .list-name {
+  color: #282c37;
+  font-size: 1.35rem;
+  word-break: break-all;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  height: 1.8rem;
+  line-height: 1.8rem;
+}
+#moduleLibrary .lib-list-li .list-body .list-info {
+  height: 1.8rem;
+  line-height: 1.8rem;
+}
+#moduleLibrary .lib-list-li .list-body .list-info .user {
+  display: inline-block;
+}
+#moduleLibrary .lib-list-li .list-body .list-info .user img {
+  height: 1.4rem;
+  width: 1.4rem;
+  border-radius: 2px;
+  margin-top: -1px;
+  margin-right: 2px;
+}
+#moduleLibrary .lib-list-li .list-body .list-info .user a {
+  color: #9baec8;
+}
+#moduleLibrary .lib-list-li .list-body .list-info .time {
+  display: inline-block;
+  color: #9baec8;
+}
+#moduleLibrary .lib-list-li .list-body .list-info .size {
+  display: inline-block;
+  color: #e85a71;
+}
+#moduleLibrary .lib-list-li .list-body .list-description {
+  height: 1.8rem;
+  line-height: 1.8rem;
+  color: #9baec8;
+  word-break: break-all;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+#moduleLibrary .lib-list-li .list-body .list-options {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 5rem;
+  width: 2rem;
+  line-height: 5rem;
+  text-align: center;
+  font-size: 1.4rem;
+  color: #999;
+}
+#moduleLibrary .lib-list-li .list-body .list-options .file-info {
+  font-size: 1.7rem;
+  position: relative;
+}
+#moduleLibrary .lib-list-li .list-body .list-options:hover .folder-info ul {
+  display: block;
+}
+#moduleLibrary .lib-list-li .list-body .list-options .folder-info {
+  position: relative;
+}
+#moduleLibrary .lib-list-li .list-body .list-options .folder-info ul {
+  display: none;
+  z-index: 500;
+  position: absolute;
+  right: 14px;
+  top: 0;
+  width: 6rem;
+  padding: 0.5rem 0;
+  margin: 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border: 1px solid #eee;
+}
+#moduleLibrary .lib-list-li .list-body .list-options .folder-info ul li {
+  list-style: none;
+  width: 100%;
+  text-align: left;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.5rem;
+}
+#moduleLibrary .lib-list-li .list-body .list-options .folder-info ul li:hover {
+  color: #282c37;
+}
+#moduleLibrary .lib-list-li .list-body.file .list-name {
+  color: #282c37;
+  font-size: 1.3rem;
+  height: 2rem;
+  line-height: 2rem;
+}
+#moduleLibrary .lib-tools {
+  user-select: none;
+  margin-bottom: 0.5rem;
+}
+#moduleLibrary .lib-tools .lib-nav .lib-nav-body .lib-nav-li {
+  display: inline-block;
+  cursor: pointer;
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 1.2rem;
+  margin-right: 0.2rem;
+  color: #282c37;
+}
+#moduleLibrary .lib-tools .lib-nav .lib-nav-body .lib-nav-li > img {
+  height: 1.4rem;
+  width: 1.4rem;
+  margin-top: -3px;
+  margin-right: 0.2rem;
+}
+#moduleLibrary .lib-tools .lib-nav .lib-nav-body .lib-nav-li:before {
+  content: "/";
+  margin-right: 0.5rem;
+  font-size: 1.4rem;
+}
+#moduleLibrary .lib-tools .lib-nav .lib-nav-description {
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
+  color: #9baec8;
+}
+#moduleLibrary .lib-files .null {
+  height: 10rem;
+  line-height: 10rem;
+  text-align: center;
+}
+#moduleLibrary .lib-files .lib-file {
+  position: relative;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+#moduleLibrary .lib-files .lib-file.disabled {
+  background-color: #d1d1d1;
+}
+#moduleLibrary .lib-files .lib-file.error {
+  border-color: red;
+}
+#moduleLibrary .lib-files .lib-file.success {
+  border-color: #009300;
+}
+#moduleLibrary .lib-files .lib-file .file-path {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e85a71;
+}
+#moduleLibrary .lib-files .lib-file .lib-file-size {
+  display: inline-block;
+  color: #e85a71;
+}
+#moduleLibrary .lib-files .lib-file .lib-file-time {
+  display: inline-block;
+}
+#moduleLibrary .lib-files .lib-file .lib-file-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 3rem;
+  width: 3rem;
+  color: #666;
+  font-size: 1.3rem;
+  line-height: 3rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 200ms;
+}
+#moduleLibrary .lib-files .lib-file .lib-file-close:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+#moduleLibrary .lib-files .lib-file .lib-file-name {
+  font-size: 1.4rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  font-weight: 700;
+}
+#moduleLibrary .lib-files .lib-file .lib-file-index {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2rem;
+  width: 2rem;
+  margin-right: 1rem;
+  background-color: #e85a71;
+  color: #fff;
+  line-height: 2rem;
+  text-align: center;
+}
+#moduleLibrary .lib-files .lib-file .lib-file-upload .lib-file-error {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e85a71;
+}
+#moduleLibrary .lib-files .lib-file .lib-file-upload .lib-file-success {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #009300;
+}

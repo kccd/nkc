@@ -43,6 +43,7 @@ block body
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/twemoji/2/twemoji.min.js')
   +includeJS('/Promise/promise.min.js')
+  +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js')
   +includeJS('/vue/dist/vue.js')
   if NODE_ENV === "production"
     script.
@@ -51,6 +52,7 @@ block body
   +includeJS("/sweetalert2/dist/sweetalert2.all.min.js")
   //- 新版common.js
   +includeJS('/publicModules/common.js')
+  +includeJS('/tools.js')
   // 前后端公用 数据类型检查
   +includeJS("/checkData.js")
   //- 旧版common.js兼容旧的页面

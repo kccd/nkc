@@ -1,0 +1,53 @@
+#moduleLibraryPath{
+  @import "./skin.less";
+  @media (min-width: 768px){
+    .modal-sm{
+      width: 380px;
+    }
+  }
+  
+  .modal-body{
+    user-select: none;
+    height: 30rem;
+    overflow-y: scroll!important;
+    margin-bottom: 1rem;
+  }
+  .folders{
+    &.loaded{
+      text-align: center;
+      font-size: 1.2rem;
+      color: #888;
+    }
+    padding-left: 0.8rem;
+    .folder{
+      .folder-body.active{
+        background-color: #bbd5e8;
+        border-radius: 2px;
+      }
+      position: relative;
+      @folderHeight: 2.5rem;
+      .fa{
+        position: absolute;
+        font-size: 1.35rem;
+        line-height: @folderHeight;
+        text-align: center;
+        cursor: pointer;
+        height: @folderHeight;
+        width: @folderHeight;
+      }
+      .folder-name{
+        cursor: pointer;
+        height: @folderHeight;
+        line-height: @folderHeight;
+        padding-left: @folderHeight;
+        .hideText(@line:1);
+        img{
+          height: 1.3rem;
+          width: 1.3rem;
+          margin-top: -2px;
+          margin-right: 0.4rem;
+        }
+      }
+    }
+  }
+}

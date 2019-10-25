@@ -6,6 +6,11 @@ if(!fs.existsSync('./install/install.lock')) {
 
 require('./global');
 
+// 启动测试环境相关工具
+if(global.NKC.NODE_ENV !== "production") {
+  require('./watch.js');
+}
+
 require('colors');
 const http = require('http'),
   app = require('./app'),
@@ -24,10 +29,8 @@ const http = require('http'),
 let server;
 
 const dataInit = async () => {
-  if(global.NKC.NODE_ENV !== 'production') {
-    const defaultData = require('./defaultData');
-    await defaultData.init();
-  }
+  const defaultData = require('./defaultData');
+  await defaultData.init();
   // 运维包含所有的操作权限
   const operations = await OperationModel.find({}, {_id: 1});
   const operationsId = operations.map(o => o._id);
@@ -74,6 +77,7 @@ const start = async () => {
       await socket(server);
       console.log(`nkc ${global.NKC.NODE_ENV} server listening on ${port}`.green);
     });
+
   } catch(err) {
     console.error(`error occured when initialize the server.\n${err.stack}`.red);
     process.exit(-1)

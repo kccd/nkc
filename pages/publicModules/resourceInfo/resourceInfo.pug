@@ -25,17 +25,17 @@
               span.m-r-1 {{(resource.ext || "未知").toUpperCase()}}
               |大小：
               span {{getSize(resource.size)}}
-            .r-info-size
+            .r-info-size(v-if="forums.length")
               | 专业：
               .display-i-b(v-for="f, index in forums")
                 a.pointer.m-r-05(@click="visitUrl('/f/' + f.fid, true)") {{f.displayName}}
-          .r-info-d {{resource.description}}
+          .r-info-d {{resource.description || "暂无简介"}}
           .r-info-bottom.text-right
             a.m-r-05.pointer.btn.btn-success.btn-sm(@click="visitUrl('/r/' + resource.rid, true)")
               .fa.fa-cloud-download &nbsp;
               | 点击下载
               span(v-if="resource.hits") &nbsp;{{resource.hits}}
-            .display-i-b(v-if="modifyAllResource || uid === resource.uid")
+            .display-i-b(v-if="(modifyAllResource || uid === resource.uid) && type === 'resource'")
               a.m-r-05.pointer.btn.btn-primary.btn-sm(@click="visitUrl('/library/upload?rid=' + resource.rid, true)")
                 .fa.fa-edit &nbsp;
                 |编辑

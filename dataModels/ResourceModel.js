@@ -57,28 +57,6 @@ const resourceSchema = new Schema({
     index: 1,
     default: []
   },
-  forumsId: {
-    type: [String],
-    index: 1,
-    default: []
-  },
-  name: {
-	  type: String,
-    default: ""
-  },
-  description: {
-	  type: String,
-    default: ""
-  },
-  cover: {
-	  type: String,
-    default: ''
-  },
-  category: {
-	  type: String, // book, paper, program, media
-    index: 1,
-    default: ""
-  },
   tlm: {
     type: Date,
     default: null,

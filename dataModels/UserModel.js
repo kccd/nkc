@@ -1541,13 +1541,11 @@ userSchema.statics.ensurePostThreadPermission = async (uid) => {
 };
 
 /*
-* 验证用户是否有权限上传附件到文库
+* 验证用户是否有权限操作文库
 * */
 userSchema.statics.ensurePostLibraryPermission = async (uid) => {
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model("settings");
-  const ResourceModel = mongoose.model("resources");
-  const apiFunction = require("../nkcModules/apiFunction");
   const user = await UserModel.findOne({uid});
   if(!user) return throwErr(500, `未找到ID为${uid}的用户信息`);
   await user.extendAuthLevel();
@@ -1555,20 +1553,18 @@ userSchema.statics.ensurePostLibraryPermission = async (uid) => {
   let {authLevelMin, exam} = librarySettings;
   authLevelMin = Number(authLevelMin);
   const {volumeA, volumeB, notPass} = exam;
-  const {status, countLimit, unlimited} = notPass;
-  const today = apiFunction.today();
-  const todayCount = await ResourceModel.count({tlm: {$gt: today}, uid: user.uid});
+  const {status} = notPass;
   if(authLevelMin > user.authLevel) {
     if(authLevelMin === 1) throwErr(403, "你还未绑定手机号");
     if(authLevelMin === 2) throwErr(403, "你还未完成身份认证2");
     if(authLevelMin === 3) throwErr(403, "你还未完成身份认证3");
   }
   if(user.volumeB) {
-    if(!volumeB) throwErr(403, "文库上传功能已关闭");
+    if(!volumeB) throwErr(403, "文库处于只读模式");
   } else if(user.volumeA) {
     if(!volumeA) {
       if(!volumeB) {
-        throwErr(403, "文库上传功能已关闭");
+        throwErr(403, "文库处于只读模式");
       } else {
         throwErr(403, "你还未通过B卷考试");
       }
@@ -1580,11 +1576,8 @@ userSchema.statics.ensurePostLibraryPermission = async (uid) => {
       } else if(volumeB) {
         throwErr(403, "你还未通过B卷考试");
       } else {
-        throwErr(403, "文库上传功能已关闭");
+        throwErr(403, "文库处于只读模式");
       }
-    } else if(!unlimited) {
-      console.log(todayCount, countLimit)
-      if(todayCount >= countLimit) throwErr(403, "你今日上传到文库的文件数量已达上限");
     }
   }
 };

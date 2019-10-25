@@ -1,5 +1,7 @@
-module.exports = {
-  get: async (ctx, next) => {
+const router = require("koa-router")();
+const threadRouter = require("./thread");
+router
+  .get("/", async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
     const {count} = query;
@@ -23,8 +25,8 @@ module.exports = {
     }
     data.types = await db.SubscribeTypeModel.getTypesList(user.uid);
     await next();
-  },
-  post: async (ctx, next) => {
+  })
+  .post("/", async (ctx, next) => {
     const {tools, data, db, body} = ctx;
     const {contentLength} = tools.checkString;
     const {user} = data;
@@ -49,5 +51,6 @@ module.exports = {
     await type.save();
     data.type = type;
     await next();
-  }
-};
+  })
+  .use("/:tid", threadRouter.routes(), threadRouter.allowedMethods());
+module.exports = router;

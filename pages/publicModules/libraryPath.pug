@@ -1,0 +1,36 @@
++includeCSS("/css/modules/libraryPath.css")
+.modal.fade#moduleLibraryPath(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog.modal-sm(role="document")#moduleLibraryPathApp
+    .modal-content
+      .modal-header
+        .fa.fa-remove(data-dismiss="modal" aria-label="Close")
+        .modal-title 位置选择
+      .modal-body
+        //- 未实现递归 
+        //- 通过pug渲染出了指定层数的dom 
+        //- 这里的层数n必须大于文库中允许建立文件夹的最大层数 否则超出层数n的文件夹不会显示
+        mixin folderList(n)
+          if n > 0
+            -n = n - 1;
+            .folder-body(:class="{'active': selectedFolderId === f._id}")
+              .fa
+                span(v-if="f.folderCount > 0")
+                  .fa-angle-right(v-if="f.close" @click="switchFolder(f)")
+                  .fa-angle-down(v-else @click="switchFolder(f)")
+              .folder-name(@click="selectFolder(f)" @dblclick="switchFolder(f)") 
+                img(src=tools.getUrl('fileCover', "folder"))
+                | {{f.name}}
+            .folders.loaded(v-if="!f.loaded && !f.close")  加载中...
+            .folders(v-if="f.folders && f.folders.length && !f.close")
+              .folder(v-for="f in f.folders")
+                +folderList(n)
+        .folders
+          .folder(v-for="f in folders")
+            +folderList(15)
+            
+      .modal-footer
+        .options-button
+          a(data-dismiss="modal") 关闭
+          a.active(@click="submit" :class="{'disabled': !folder}") 确定
+
++includeJS("/js/modules/libraryPath.js")

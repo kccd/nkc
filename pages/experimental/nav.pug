@@ -152,6 +152,9 @@
           if permission("experimentalUsernameSettings")
             li
               a(href=`/e/settings/username`) 用户名
+          if permission("experimentalLibrarySettings")
+            li
+              a(href=`/e/settings/library`) 文库
 
           <li role="separator" class="divider"></li>    
           li

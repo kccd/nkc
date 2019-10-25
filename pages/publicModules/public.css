@@ -197,6 +197,9 @@ table{
   padding-left: 6rem;
 }
 /* padding-right */
+.p-r-0{
+  padding-right: 0rem!important;
+}
 .p-r-1{
   padding-right: 1rem;
 }
@@ -406,6 +409,47 @@ table{
 }
 .paging-button a.active{
   background-color: #2b90d9;
+}
+/* 操作按钮样式 */
+.options-button{
+  display: inline-block;
+  padding-right: 1rem;
+}
+.options-button a{
+  -moz-user-select:none; /*火狐*/
+  -webkit-user-select:none; /*webkit浏览器*/
+  -ms-user-select:none; /*IE10*/
+  -khtml-user-select:none; /*早期浏览器*/
+  user-select:none;
+  display: inline-block;
+  height: 2rem;
+  cursor: pointer;
+  color: #777;
+  line-height: 2rem;
+  text-align: center;
+  min-width: 2rem;
+  margin-right: 0.3rem;
+  padding: 0 0.8rem;
+  font-size: 1.2rem;
+  background-color: #f4f4f4;
+  border-radius: 3px;
+  transition: background-color 200ms, color 200ms;
+  margin-bottom: 0.5rem;
+}
+.options-button a:hover, .options-button a:focus{
+  text-decoration: none;
+}
+.options-button a:hover, .options-button a.active{
+  background-color: #2b90d9;
+  color: #fff;
+}
+.options-button a.active:hover{
+  background-color: #267ebd;
+}
+.options-button a.disabled, .options-button a.disabled:hover, .options-button a.disabled:focus{
+  background-color: #f7f7f7;
+  color: #ccc;
+  cursor: not-allowed;
 }
 .paging-nav{
   display: inline-block;

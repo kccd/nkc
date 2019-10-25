@@ -1,6 +1,13 @@
 module.exports = {
-  POST: "libraryUpload",
-  upload: {
-    GET: "libraryUpload"
+  GET: "getLibraryInfo",
+  PARAMETER: {
+    PATCH: "modifyLibraryFolder",
+    POST: "libraryUpload",
+    GET: "getLibraryInfo",
+    list: {
+      POST: "createLibraryFolder",
+      PATCH: "moveLibraryFolder",
+      DELETE: "deleteLibraryFolder"
+    },
   }
 };

@@ -201,6 +201,12 @@ const forumSchema = new Schema({
   allowedAnonymousPost: {
     type: Boolean,
     default: false
+  },
+  // 文库ID
+  lid: {
+    type: Number,
+    default: null,
+    index: 1
   }
 }, {toObject: {
 		getters: true,
@@ -313,6 +319,7 @@ forumSchema.virtual('childForumsId')
   .set(function(childForumsId) {
     this._childForumsId = childForumsId;
   });
+
 
 /*-----------------------*/
 
@@ -1254,5 +1261,22 @@ forumSchema.statics.getForumsIdFromRedis = async (forumType) => {
   }
   return forumsId;
 };
+/* 
+  创建文库
+  @param {String} uid 创建者ID
+  @return {Object} 文库对象
+  @author pengxiguaa 2019-10-21
+*/
+forumSchema.methods.createLibrary = async function(uid) {
+  const {displayName, description} = this;
+  const library = await mongoose.model("libraries").newLibrary({
+    name: displayName,
+    description,
+    uid
+  });
+  await this.update({lid: library._id});
+  return library;
+};
+
 
 module.exports = mongoose.model('forums', forumSchema);

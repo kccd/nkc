@@ -1,5 +1,6 @@
-module.exports = {
-  use: async (ctx, next) => {
+const router = require("koa-router")();
+router
+  .use("/", async (ctx, next) => {
     const {data, db, params} = ctx;
     const {user} = data;
     const {tid} = params;
@@ -8,8 +9,8 @@ module.exports = {
     if(type.type) ctx.throw(400, `默认分类无法更改`);
     data.subscribeType = type;
     await next();
-  },
-  patch: async (ctx, next) => {
+  })
+  .patch("/", async (ctx, next) => {
     const {db, data, body, tools} = ctx;
     const {contentLength} = tools.checkString;
     const {subscribeType, user} = data;
@@ -63,8 +64,8 @@ module.exports = {
       }
     }
     await next();
-  },
-  del: async (ctx, next) => {
+  })
+  .del("/", async (ctx, next) => {
     const {data, db} = ctx;
     const {subscribeType, user} = data;
     const childTypesCount = await db.SubscribeTypeModel.count({uid: user.uid, pid: subscribeType._id});
@@ -73,5 +74,5 @@ module.exports = {
     if(subCount) ctx.throw(400, "分类下存在关注的内容，无法删除");
     await subscribeType.remove();
     await next();
-  }
-};
+  });
+module.exports = router;

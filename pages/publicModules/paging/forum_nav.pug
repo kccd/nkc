@@ -10,4 +10,5 @@
   if data.forum && data.forum.childrenForums.length === 0
     a.button(href=`/f/${data.forum.fid}/followers` class=data.type==="followers"?"active": "") 关注的人
   a.button(href=`/f/${data.forum.fid}/visitors` class=data.type==="visitors"?"active": "") 今日来访
-  a.button.radius-right(href=`/f/${data.forum.fid}/library` class=data.type==="library"?"active": "") 文库
+  if data.forum.lid
+    a.button.radius-right(href=`/f/${data.forum.fid}/library` class=data.type==="library"?"active": "") 文库

@@ -56,7 +56,8 @@ module.exports = {
 			POST: 'subscribeForum' // 用户关注专业
 		},
     library: {
-		  GET: "visitForumLibrary"
+      GET: "visitForumLibrary",
+      POST: "createForumLibrary"
     }
 	}
 };

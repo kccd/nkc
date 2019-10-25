@@ -677,6 +677,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
     if(o.user) {
       const postUser = usersObj[post.uid];
       if(postUser) {
+        // 判断post是否需要折叠
         post.hide = await postUser.ensureHidePostPermission();
       }
       if(!o.showAnonymousUser && post.anonymous) {

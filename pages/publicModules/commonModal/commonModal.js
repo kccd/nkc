@@ -26,7 +26,9 @@ NKC.modules.CommonModal = function() {
     this_.dom.modal("show");
   };
   this_.close = function() {
-    this_.app.data = {};
     this_.dom.modal("hide");
+    setTimeout(function() {
+      this_.app.data = {};
+    }, 500);
   };
 };

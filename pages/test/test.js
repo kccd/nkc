@@ -1,9 +1,2 @@
-var sr;
-$(function() {
-  sr = new NKC.modules.SelectResource();
-  sr.open(function() {
+var Library = new NKC.modules.Library("121");
 
-  }, {
-    type: "fixed"
-  });
-});

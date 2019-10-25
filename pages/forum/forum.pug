@@ -58,6 +58,9 @@ block content
             .col-xs-6
               .forum-count-number= data.forum.countPostsToday
               .forum-count-title 今日更新
+            if !data.forum.lid && permission("createForumLibrary") 
+              .col-xs-12.m-t-1
+                button.btn.btn-sm.btn-default(onclick=`createLibrary('${data.forum.fid}')`) 开设文库 
             .col-xs-12.m-t-1
               .row
                 .forum-description-content=data.forum.description
@@ -191,6 +194,11 @@ block content
               .m-t-1
                 include ../publicModules/paging/paging
           else if data.type === "library"
+            .col-xs-12.col-md-12.m-t-1
+              include ../publicModules/paging/forum_nav
+            .col-xs-12.col-md-12.m-t-05  
+              include ../publicModules/library      
+          //-else if data.type === "library"
             +includeCSS("/library/library.css")
             -const docTypes = [{t: "all",n: "全部"}, {t: "book", n: "图书"}, {t: "paper", n: "论文"}, {t: "program", n: "程序"}, {t: "media", n: "媒体"}, {t: "other", n: "其他"}];
             mixin link(r)
@@ -309,9 +317,14 @@ block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
-  include ../publicModules/ResourceInfo/ResourceInfo
+  include ../publicModules/resourceInfo/resourceInfo
+  if data.type === "library"
+    include ../publicModules/commonModal/commonModal
+    include ../publicModules/moment
+    include ../publicModules/selectResource/selectResource
+    include ../publicModules/libraryPath
+    +includeJS("/js/modules/library.js")
+    script=`NKC.configs.lid = ${data.forum.lid}`
   +includeJS("/forum/forum.js")
-  +includeJS("/library/common.js")
-  +includeJS("/library/library.js")
   +includeJS("/publicModules/thread_panel/management.js")
   include ../publicModules/floatUserPanel/floatUserPanel

@@ -1,5 +1,6 @@
-module.exports = {
-  get: async (ctx, next) => {
+const router = require("koa-router")();
+router
+  .get("/", async (ctx, next) => {
     const {state, data, query, db, nkcModules} = ctx;
     const {user} = data;
     const {t, page, c} = query;
@@ -41,8 +42,8 @@ module.exports = {
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(user.uid);
     data.paging = paging;
     await next();
-  },
-  patch: async (ctx, next) => {
+  })
+  .patch("/", async (ctx, next) => {
     const {db, body, data} = ctx;
     const {type, subscribesId, typesId} = body;
     if(type === "modifyType") {
@@ -64,5 +65,5 @@ module.exports = {
     }
     await db.SubscribeModel.saveUserSubscribeTypesToRedis(data.user.uid);
     await next();
-  }
-};
+  });
+module.exports = router;
