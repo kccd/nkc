@@ -32,17 +32,17 @@ function () {
       mounted: function mounted() {
         var libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
         var childFolderId = libraryVisitFolderLogs[this.lid];
-        var self = this;
+        var this_ = this;
 
         if (childFolderId !== undefined && childFolderId !== this.lid) {
           // 如果浏览器本地存有访问记录，则先确定该记录中的文件夹是否存在，存在则访问，不存在则打开顶层文件夹。
           this.getList(childFolderId).then(function () {
-            self.app.addHistory(id);
-          })["catch"](function () {
-            self.getListInfo(self.lid);
+            this_.addHistory(this_.lid);
+          })["catch"](function (err) {
+            this_.getListInfo(this_.lid);
           });
         } else {
-          this.getListInfo(this.lid);
+          this.getListInfo(this_.lid);
         }
 
         if (!window.CommonModal) {

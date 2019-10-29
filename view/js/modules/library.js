@@ -23,18 +23,18 @@ NKC.modules.Library = class {
       mounted() {
         const libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
         const childFolderId = libraryVisitFolderLogs[this.lid];
-        const self = this;
+        const this_ = this;
         if(childFolderId !== undefined && childFolderId !== this.lid) {
           // 如果浏览器本地存有访问记录，则先确定该记录中的文件夹是否存在，存在则访问，不存在则打开顶层文件夹。
           this.getList(childFolderId)
             .then(() => {
-              self.app.addHistory(id);
+              this_.addHistory(this_.lid);
             })
-            .catch (() => {
-              self.getListInfo(self.lid);
+            .catch ((err) => {
+              this_.getListInfo(this_.lid);
             });
         } else {
-          this.getListInfo(this.lid);
+          this.getListInfo(this_.lid);
         }
 
         if(!window.CommonModal) {
