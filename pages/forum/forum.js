@@ -15,12 +15,14 @@ function showSameForums() {
   $(".sameForums").slideToggle();
 }
 
-function createLibrary(fid) {
-  nkcAPI("/f/" + fid + "/library", "POST", {})
-    .then(function() {
-      sweetSuccess("文库已开通");
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
+function libraryOperation(fid, type) {
+  nkcAPI("/f/" + fid + "/library", "POST", {
+    type: type
+  })
+  .then(function() {
+    sweetSuccess("执行成功");
+  })
+  .catch(function(data) {
+    sweetError(data);
+  })
 }

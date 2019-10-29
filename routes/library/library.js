@@ -5,8 +5,9 @@ router
   .use("/", async (ctx, next) => {
     const {db, params, data} = ctx;
     const {lid} = params;
-    const library = await db.LibraryModel.findOne({_id: lid});
+    const library = await db.LibraryModel.findOne({_id: lid, deleted: false});
     if(!library) ctx.throw(404, `library not found. lid: ${lid}`);
+    if(library.closed) ctx.throw(400, `文库已关闭，暂无法访问。`);
     data.nav = await library.getNav();
     const topFolder = data.nav[0];
     const forum = await db.ForumModel.findOne({lid: topFolder._id});
@@ -27,15 +28,20 @@ router
     if(path) {
       if(!data.nav) data.nav = await library.getNav();
       const name = data.nav.map(n => n.name);
-      data.path = "/" + name.join("/");
+      data.path = "/ " + name.join(" / ");
     }
     if(info) {
       data.library = await library.extend();
     }
     if(permission) {
-      data.permission = await db.LibraryModel.getPermission(data.user);
       if(ctx.permission("modifyAllResource")) {
+        data.permission = [
+          "createFile", "modifyFile", "deleteFile", "moveFile",
+          "createFolder", "modifyFolder", "deleteFolder", "moveFolder",
+        ];
         data.permission.push("modifyOtherLibrary");
+      } else {
+        data.permission = await db.LibraryModel.getPermission(data.user);
       }
     }
     await next();
@@ -59,14 +65,14 @@ router
     const resource = await db.ResourceModel.findOne({rid});
     if(!resource) ctx.throw(400, `rid异常，数据库中无对应的resource数据。rid: ${rid}`);
     
-    await db.LibraryModel.newFile({
+    const file = await db.LibraryModel.newFile({
       lid: library._id,
       resource,
       name,
       category,
       description
     });
-    
+    await db.LibraryModel.saveToES(file._id);
     await next();
   })
   .patch("/", async (ctx, next) => {
@@ -90,6 +96,9 @@ router
       name,
       description
     });
+    if(library.type === "file") {
+      await db.LibraryModel.saveToES(library._id);
+    }
     await next();
   })
   .use("/list", listRouter.routes(), listRouter.allowedMethods());

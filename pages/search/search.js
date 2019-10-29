@@ -123,6 +123,6 @@ $(function() {
   ResourceInfo = new NKC.modules.ResourceInfo();
 });
 
-function showResource(rid) {
-  ResourceInfo.open({rid: rid})
+function showResource(lid) {
+  ResourceInfo.open({lid: lid})
 }

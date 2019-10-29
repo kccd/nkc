@@ -10,31 +10,93 @@ NKC.modules.LibraryPath = class {
       el: "#moduleLibraryPathApp",
       data: {
         folders: [],
-        folder: ""
+        warning: "",
+        folder: "",
+        originFolders: []
       },
       computed: {
+        originFoldersId() {
+          return this.originFolders.map(f => f._id);
+        },
         selectedFolderId() {
           if(this.folder) return this.folder._id;
+        },
+        // 计算高亮横排的行数
+        activeLine() {
+          const {folders, folder} = this;
+          let line = 0;
+          const func = (arr) => {
+            for(let i = 0; i < arr.length; i++) {
+              const a = arr[i];
+              line ++;
+              if(a._id === folder._id) {
+                return;
+              } else if(a.folders && a.folders.length) {
+                return func(a.folders);
+              }
+            }
+          };
+          func(folders);
+          return line;
+        },
+        nav() {
+          if(!this.folder) return;
+          return this.getFolderNav(this.folder);
+        },
+        path() {
+          if(!this.nav) return;
+          return "/" + this.nav.map(n => n.name).join("/");
         }
       },
-      mounted() {
-        
-      },
       methods: {
+        getFolderNav(folder) {
+          const {originFolders} = this;
+          let lid = folder.lid;
+          const nav = [folder];
+          while(lid) {
+            for(const f of originFolders) {
+              if(f._id !== lid) continue;
+              nav.unshift(f);
+              lid = f.lid;
+            }
+          }
+          return nav;
+        },
+        // 存入源文件夹数组
+        saveToOrigin(folders) {
+          const {originFoldersId, originFolders} = self.app;
+          for(const folder of folders) {
+            if(!originFoldersId.includes(folder._id)) originFolders.push(folder);
+            const {folders = []} = folder;
+            self.app.saveToOrigin(folders);
+          }
+        },
+        // 滚动到高亮处
+        scrollToActive() {
+          setTimeout(() => {
+            let line = this.activeLine;
+            line -= 3;
+            line = line>0?line: 0;
+            const height = 30*line; // 每一横排占30px(与css设置有关，若css改动则此处也需要做相应调整。)
+            const listBody = this.$refs.listBody;
+            NKC.methods.scrollTo({
+              dom: listBody,
+              top: height,
+              behavior: "smooth"
+            })
+          }, 100)
+        },
+        // 点击确定
         submit() {
           if(!this.folder) return;
-          nkcAPI(`/library/${this.folder._id}?path=true&t=${Date.now()}`, "GET")
-            .then(data => {
-              self.callback({
-                folder: this.folder,
-                folderPath: data.path
-              });
-              this.close();
-            })
-            .catch(data => {
-              sweetError(data);
-            })
+          self.callback({
+            folder: this.folder,
+            nav: this.nav,
+            path: this.path
+          });
+          this.close();
         },
+        // 展开文件夹
         switchFolder(f) {
           this.selectFolder(f);
           if(f.close) {
@@ -47,15 +109,23 @@ NKC.modules.LibraryPath = class {
             f.close = true;
           }
         },
+        // 选择文件夹
         selectFolder(f) {
           this.folder = f;
         },
+        // 加载文件夹列表
+        // 默认只加载顶层文件夹
+        // 可通过lid加载指定的文件夹，并自动定位、展开上级目录
         initFolders(lid) {
           const url = `/library?type=init&lid=${lid}`;
           nkcAPI(url, "GET")
             .then(data => {
               self.app.folders = data.folders;
               self.app.folder = data.folder;
+              self.app.saveToOrigin(data.folders);
+              if(lid) {
+                self.app.scrollToActive();
+              }
             })
             .catch(data => {
               sweetError(data);
@@ -84,6 +154,7 @@ NKC.modules.LibraryPath = class {
               } else {
                 self.app.folders = data.folders;
               }
+              self.app.saveToOrigin(data.folders);
             })
             .catch((data) => {
               if(folder) folder.close = true;
@@ -91,7 +162,8 @@ NKC.modules.LibraryPath = class {
             })
         },
         open(options = {}) {
-          const {lid} = options;
+          const {lid, warning = ""} = options;
+          this.warning = warning;
           if(lid) {
             this.folder = "";
             this.initFolders(lid);

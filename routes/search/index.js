@@ -243,10 +243,10 @@ router
       pageColumns.map(pc => {
         pageColumnObj[pc._id] = pc;
       });
-      const resources = await db.ResourceModel.find({rid: {$in: [...resourceId]}});
+      const resources = await db.LibraryModel.find({_id: {$in: [...resourceId]}});
       const resourcesObj = {};
       resources.map(r => {
-        resourcesObj[r.rid] = r;
+        resourcesObj[r._id] = r;
       });
       // 根据文档类型，拓展数据
       loop1:
@@ -357,10 +357,6 @@ router
           if(!resource) continue;
           resource = resource.toObject();
           resource.user = userObj[resource.uid];
-          resource.forums = await db.ForumModel.find({fid: {$in: resource.forumsId}}, {
-            fid: 1,
-            displayName: 1
-          });
           r = {
             docType,
             t: highlightObj[`${tid}_t`] || resource.name,

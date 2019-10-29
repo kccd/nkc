@@ -53,17 +53,18 @@ userRouter
     if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
       return await next();
     }
+    // 获取用户能够访问的专业ID
+    const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
     const targetUserSubForums = await db.SubscribeModel.find({
       uid: targetUser.uid,
       type: "forum"
     }, {fid: 1});
+    const subForumsId = targetUserSubForums.map(f => f.fid).filter(fid => accessibleFid.includes(fid));
     data.targetUserSubForums = await db.ForumModel.find({
       fid: {
-        $in: targetUserSubForums.map(f => f.fid)
+        $in: subForumsId
       }
     });
-    // 获取用户能够访问的专业ID
-    const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
     if(user) {
       data.userSubUid = state.subUsersId;
       data.userSubFid = state.subForumsId;

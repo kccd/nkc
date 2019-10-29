@@ -25,6 +25,7 @@
               span.m-r-1 {{(resource.ext || "未知").toUpperCase()}}
               |大小：
               span {{getSize(resource.size)}}
+            .r-info-size(v-if="path") 目录：{{path}}
             .r-info-size(v-if="forums.length")
               | 专业：
               .display-i-b(v-for="f, index in forums")

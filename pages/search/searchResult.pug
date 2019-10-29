@@ -93,20 +93,15 @@
           b 阅读原文
     .search-result-abstract!= result.c
   else if result.docType === "resource"
-    a(onclick=`showResource('${result.resource.rid}')`).pointer.clear-a-style.search-result-title!= result.t
+    a(onclick=`showResource('${result.resource._id}')`).pointer.clear-a-style.search-result-title!= result.t
     .search-result-info
       a.clear-a-style.search-result-author(href=`/u/${result.resource.uid}`)
         img(src=tools.getUrl("userAvatar", result.resource.user.avatar, "sm"))
         span=result.resource.user.username
       .search-result-time=fromNow(result.resource.tlm || result.resource.toc)
-      span 上传于
-      for forum in result.resource.forums
-        a.clear-a-style.search-result-forum(href=`/f/${forum.fid}`)=forum.displayName
-    .search-result-abstract!= "文件：" + result.c
+    .search-result-abstract= "文件：" + (result.c || "暂无简介") 
     .search-result-info.resource
       a(href=`/r/${result.resource.rid}` target="_blank")
         .fa.fa-cloud-download &nbsp;
         | 立即下载&nbsp;
-        if result.resource.hits
-          span=result.resource.hits
       div=`${(result.resource.ext || "未知").toUpperCase()} ${tools.getSize(result.resource.size)}`

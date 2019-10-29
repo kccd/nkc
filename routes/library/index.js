@@ -15,7 +15,7 @@ router
       // 根据提供的lid预加载所有上层文件夹中的子文件夹
       // 根据提供的lid找到已被选择的文件夹
       // 再加载此文件夹的路径
-      const library = await db.LibraryModel.findOne({_id: Number(lid), type: "folder"});
+      const library = await db.LibraryModel.findOne({_id: Number(lid), type: "folder", deleted: false});
       if(!library) ctx.throw(400, `文件夹ID异常，lid: ${lid}`);
       let nav = await library.getNav();
       nav = nav.map(n => n.toObject());
@@ -34,7 +34,8 @@ router
         n.loaded = false;
         const q = {
           lid: n._id,
-          type: "folder"
+          type: "folder",
+          deleted: false
         };
         if(n._id === null) {
           // 根据专业权限 获取顶层文件夹
@@ -46,6 +47,7 @@ router
           const forums = await db.ForumModel.find({fid: {$in: accessibleForumsId}, lid: {$ne: null}}, {lid: 1});
           librariesId = forums.map(f => f.lid);
           q._id = {$in: librariesId};
+          q.closed = false;
         }
         let folders = await db.LibraryModel.find(q);
         folders = folders.map(f => {
@@ -86,6 +88,7 @@ router
       // 若lid为null则加载顶层文件夹
       const q = {
         type: "folder",
+        deleted: false,
         lid
       };
       const folders = await db.LibraryModel.find(q);

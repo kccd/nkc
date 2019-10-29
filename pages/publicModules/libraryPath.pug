@@ -5,7 +5,8 @@
       .modal-header
         .fa.fa-remove(data-dismiss="modal" aria-label="Close")
         .modal-title 位置选择
-      .modal-body
+      .warning(v-if="warning") {{warning}}  
+      .modal-body(ref="listBody")
         //- 未实现递归 
         //- 通过pug渲染出了指定层数的dom 
         //- 这里的层数n必须大于文库中允许建立文件夹的最大层数 否则超出层数n的文件夹不会显示
@@ -24,11 +25,11 @@
             .folders(v-if="f.folders && f.folders.length && !f.close")
               .folder(v-for="f in f.folders")
                 +folderList(n)
-        .folders
+        .folders.p-l-0
           .folder(v-for="f in folders")
             +folderList(15)
-            
       .modal-footer
+        //- .nav-info(v-if="path") {{path}}
         .options-button
           a(data-dismiss="modal") 关闭
           a.active(@click="submit" :class="{'disabled': !folder}") 确定

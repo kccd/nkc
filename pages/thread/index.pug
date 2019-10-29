@@ -386,7 +386,7 @@ block content
                                 span ,&nbsp;
                               a(href=`/f/${forum.fid}`)=forum.displayName
                         if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
-                          .abstract(style="margin-top:1rem;")
+                          .abstract(style="margin-top:1rem; word-break: break-all;")
                             if post.abstractCn.length !== 0
                               .panel.panel-default(style="border:0;margin-bottom:0")
                                 .panel-heading.paperHeader 中文摘要

@@ -16,10 +16,27 @@ NKC.modules.Library = class {
         selectedFiles: [],
         mark: false,
         selectedLibrariesId: [],
-        permission: []
+        permission: [],
+        lastHistoryLid: "",
+        selectedCategory: "book"
       },
       mounted() {
-        this.getList(this.lid);
+        const libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
+        const childFolderId = libraryVisitFolderLogs[this.lid];
+        const this_ = this;
+        if(childFolderId !== undefined && childFolderId !== this.lid) {
+          // 如果浏览器本地存有访问记录，则先确定该记录中的文件夹是否存在，存在则访问，不存在则打开顶层文件夹。
+          this.getList(childFolderId)
+            .then(() => {
+              this_.addHistory(this_.lid);
+            })
+            .catch ((err) => {
+              this_.getListInfo(this_.lid);
+            });
+        } else {
+          this.getListInfo(this_.lid);
+        }
+
         if(!window.CommonModal) {
           if(!NKC.modules.CommonModal) {
             sweetError("未引入通用弹框");
@@ -48,6 +65,7 @@ NKC.modules.Library = class {
             window.LibraryPath = new NKC.modules.LibraryPath();
           }
         }
+        window.onpopstate = this.onpopstate;
       },
       computed: {
         lastFolder() {
@@ -66,7 +84,8 @@ NKC.modules.Library = class {
         },
         folderList() {
           return this.folders.concat(this.files);
-        }
+        },
+        
       },
       methods: {
         getUrl: NKC.methods.tools.getUrl,
@@ -74,6 +93,34 @@ NKC.modules.Library = class {
         format: NKC.methods.format,
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
+        scrollTo: NKC.methods.scrollTo,
+        markCategory() {
+          const {selectedCategory, selectedFiles} = this;
+          if(!selectedCategory) return;
+          sweetQuestion("该操作将覆盖本页所有设置，请再次确认。")
+            .then(() => {
+              selectedFiles.map(f => f.category = selectedCategory);
+            })
+            .catch(err => {})
+        },
+        onpopstate(e) {
+          const {state} = e;
+          let lid = this.nav[0]._id;
+          if(state && state.lid) lid = state.lid;
+          this.getList(lid)
+            .catch(err => {
+              sweetError(err);
+            })
+        },
+        getListInfo(id, scrollToTop) {
+          this.getList(id, scrollToTop)
+            .then(() => {
+              self.app.addHistory(id);
+            })
+            .catch(err => {
+              sweetError(err)
+            })
+        },
         per(operation) {
           return this.permission.includes(operation);
         },
@@ -101,9 +148,9 @@ NKC.modules.Library = class {
         // 根据本地文件或者resource对象构建用于上传的文件对象
         selectPath(r) {
           LibraryPath.open((data) => {
-            const {folder, folderPath} = data;
+            const {folder, path} = data;
             r.folder = folder;
-            r.folderPath = folderPath;
+            r.folderPath = path;
           }, {
             lid: r.folder?r.folder._id: ""
           });
@@ -130,11 +177,9 @@ NKC.modules.Library = class {
             progress: 0,
             error: "", // 错误信息
           };
-          if(type === "folder") {
-            
-          }
+          file.name = file.name.replace(/\..*?$/ig, "");
           if(file.type === "localFile") {
-            if(type.includes("image")) {
+            if(r.type.includes("image")) {
               file.ext = "mediaPicture";
             } else {
               file.ext = "mediaAttachment";
@@ -171,7 +216,7 @@ NKC.modules.Library = class {
             .then(() => {
               if(!file) throw "文件异常";
               self.app.checkString(file.name, {
-                minLengh: 1,
+                minLength: 1,
                 maxLength: 500,
                 name: "文件名称"
               });
@@ -198,10 +243,14 @@ NKC.modules.Library = class {
               if(file.type === "localFile") {
                 const resource = data.r;
                 file.data = resource;
-                file.ext = resource.ext;
+                file.ext = resource.mediaType;
                 file.rid = resource.rid;
                 file.toc = resource.toc;
                 file.type = "onlineFile";
+                if(file.ext === "mediaPicture") {
+                  file.disabled = true;
+                  throw(new Error("暂不允许上传图片到文库"));
+                }
               }
             })
             .then(() => {
@@ -244,21 +293,41 @@ NKC.modules.Library = class {
           this.selectFolder(this.folder);
           this.pageType = "list";
         },
+        // 文件夹访问记录存到浏览器本地
+        saveToLocalStorage(id) {
+          const libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
+          libraryVisitFolderLogs[this.nav[0]._id] = id;
+          NKC.methods.saveToLocalStorage("libraryVisitFolderLogs", libraryVisitFolderLogs);
+        },
+        // 添加一条浏览器历史记录
+        addHistory(lid) {
+          // 判断是否为相同页，相同则不创建浏览器历史记录。
+          if(this.lastHistoryLid && this.lastHistoryLid === lid) return;
+          let {href} = window.location;
+          if(href.includes("#")) {
+            href = href.replace(/#.*/ig, "");
+          }
+          window.history.pushState({lid}, 'page', href + '#' + lid);
+          this.lastHistoryLid = lid;
+        },
         // 获取文件列表
-        getList(id) {
+        getList(id, scrollToTop) {
           const url = `/library/${id}?file=true&nav=true&folder=true&permission=true&t=${Date.now()}`;
-          nkcAPI(url, "GET")
+          return nkcAPI(url, "GET")
             .then(function(data) {
               self.app.nav = data.nav;
               self.app.folders = data.folders;
               self.app.files = data.files;
               self.app.permission = data.permission;
-            })
-            .catch(function(data) {
-              sweetError(data);
+              self.app.saveToLocalStorage(id);
+              if(scrollToTop) {
+                self.app.scrollTo({
+                  top: 0
+                });
+              }
             })
         },
-        selecteOnlineFiles() {
+        selectOnlineFiles() {
           SelectResource.open((data) => {
             const {resources} = data;
             resources.map(r => {
@@ -270,54 +339,51 @@ NKC.modules.Library = class {
           })
         },
         // 选择完本地文件
-        seletedFiles() {
+        selectedLocalFiles() {
           const {files = []} = document.getElementById("moduleLibraryInput");
           for(const file of files) {
             this.selectedFiles.push(this.createFile("localFile", file));
           }
         },
         // 选择文件夹
-        selectFolder(folder) {
+        selectFolder(folder, scrollToTop) {
           if(this.mark) return;
           if(folder.type === "folder") {
-            this.getList(folder._id);
+            this.getListInfo(folder._id, scrollToTop);
           } else {
             this.selectFile(folder);
           }
         },
         // 移动文件夹或文件
         moveFolder(libraryId) {
-          sweetQuestion("确定要执行移动操作？此操作不会保留原有目录结构，且不可恢复。")
-            .then(() => {
-              let foldersId;
-              if(Array.isArray(libraryId)) {
-                foldersId = libraryId;
-              } else {
-                foldersId = [libraryId];
-              }
+          let foldersId;
+          if(Array.isArray(libraryId)) {
+            foldersId = libraryId;
+          } else {
+            foldersId = [libraryId];
+          }
 
-              const body = {};
-              body.foldersId = foldersId;
+          const body = {};
+          body.foldersId = foldersId;
 
-              const url = `/library/${this.folder._id}/list`;
-              const method = "PATCH";
-              
-              LibraryPath.open((data) => {
-                body.targetFolderId = data.folder._id;
-                nkcAPI(url, method, body)
-                  .then((data) => {
-                    sweetSuccess(`执行成功${data.ignoreCount? `，共有${data.ignoreCount}个项目因存在冲突或不是你自己发布的而被忽略`: ""}`);
-                    self.app.mark = false;
-                    self.app.selectFolder(self.app.folder);
-                  })
-                  .catch(data => {
-                    sweetError(data);
-                  })
-              }, {
-                lid: self.app.folder._id
+          const url = `/library/${this.folder._id}/list`;
+          const method = "PATCH";
+          
+          LibraryPath.open((data) => {
+            body.targetFolderId = data.folder._id;
+            nkcAPI(url, method, body)
+              .then((data) => {
+                sweetSuccess(`执行成功${data.ignoreCount? `，共有${data.ignoreCount}个项目因存在冲突或不是你自己发布的而被忽略`: ""}`);
+                self.app.mark = false;
+                self.app.selectFolder(self.app.folder);
               })
-            })
-            .catch(() => {})
+              .catch(data => {
+                sweetError(data);
+              })
+          }, {
+            lid: self.app.folder._id,
+            warning: "此操作不会保留原有目录结构，且不可恢复。"
+          })
         },
         // 编辑文件夹
         editFolder(folder) {

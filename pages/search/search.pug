@@ -22,7 +22,7 @@ block content
             .form-group(v-if="t !== 'user'")
               label 作者筛选：
               input.form-control(type='text' name='c' placeholder='请输入用户名' v-model="author" @keyup.enter="search")
-            .form-group
+            .form-group(v-if="t !== 'resource'")
               label 专业筛选：
               .search-forum-div
                 .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'" @click="removeForum(forum)") {{forum.displayName}}

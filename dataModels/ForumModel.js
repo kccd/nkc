@@ -1278,5 +1278,19 @@ forumSchema.methods.createLibrary = async function(uid) {
   return library;
 };
 
+/* 
+  创建专业文库
+*/
+forumSchema.methods.createLibrary = async function(uid) {
+  if(this.lid) throwErr(500, "专业文库已存在，fid: ${this.fid}, lid: ${this.lid}");
+  const childForumsCount = await mongoose.model("forums").count({parentsId: this.fid});
+  if(childForumsCount > 0) return;
+  const library = await mongoose.model("libraries").newFolder({
+    name: this.displayName,
+    description: this.description,
+    uid
+  });
+  await this.update({lid: library._id});
+}
 
 module.exports = mongoose.model('forums', forumSchema);
