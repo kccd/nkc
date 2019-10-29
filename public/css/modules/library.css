@@ -18,14 +18,14 @@
   text-align: center;
 }
 #moduleLibrary .lib-list-li {
-  transition: background-color 200ms;
+  transition: background-color 100ms;
   border-radius: 3px;
   cursor: pointer;
   margin: 5px 0;
   padding: 2px;
 }
 #moduleLibrary .lib-list-li:hover {
-  background-color: #f4f4f4;
+  background-color: #d7e5f0;
 }
 #moduleLibrary .lib-list-li .list-checkbox {
   display: table-cell;
@@ -37,12 +37,12 @@
   position: relative;
 }
 #moduleLibrary .lib-list-li .list-cover > div {
-  height: 5.4rem;
-  width: 5.4rem;
+  height: 3.2rem;
+  width: 3.2rem;
 }
 #moduleLibrary .lib-list-li .list-cover > div img {
-  height: 4.86rem;
-  width: 4.86rem;
+  height: 2.88rem;
+  width: 2.88rem;
   position: absolute;
   top: 0;
   left: 0;
@@ -55,23 +55,24 @@
   vertical-align: top;
   position: relative;
   padding-left: 0.6rem;
-  padding-right: 4rem;
+  padding-right: 8rem;
   width: 100%;
 }
 #moduleLibrary .lib-list-li .list-body .list-name {
   color: #282c37;
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   word-break: break-all;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-  height: 1.8rem;
-  line-height: 1.8rem;
+  height: 1.6rem;
+  line-height: 1.6rem;
 }
 #moduleLibrary .lib-list-li .list-body .list-info {
-  height: 1.8rem;
-  line-height: 1.8rem;
+  max-height: 1.6rem;
+  margin-top: 4px;
+  font-size: 1rem;
 }
 #moduleLibrary .lib-list-li .list-body .list-info .user {
   display: inline-block;
@@ -79,8 +80,8 @@
 #moduleLibrary .lib-list-li .list-body .list-info .user img {
   height: 1.4rem;
   width: 1.4rem;
-  border-radius: 2px;
-  margin-top: -1px;
+  border-radius: 50%;
+  margin-top: -2px;
   margin-right: 2px;
 }
 #moduleLibrary .lib-list-li .list-body .list-info .user a {
@@ -95,8 +96,9 @@
   color: #e85a71;
 }
 #moduleLibrary .lib-list-li .list-body .list-description {
-  height: 1.8rem;
-  line-height: 1.8rem;
+  height: 1.6rem;
+  line-height: 1.6rem;
+  font-size: 1.25rem;
   color: #9baec8;
   word-break: break-all;
   display: -webkit-box;
@@ -108,16 +110,24 @@
   position: absolute;
   top: 0;
   right: 0;
-  height: 5rem;
-  width: 2rem;
-  line-height: 5rem;
+  height: 3.2rem;
+  width: 8rem;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
+  text-align: right;
   color: #999;
 }
 #moduleLibrary .lib-list-li .list-body .list-options .file-info {
   font-size: 1.7rem;
   position: relative;
+}
+#moduleLibrary .lib-list-li .list-body .list-options > span {
+  font-size: 0;
+}
+#moduleLibrary .lib-list-li .list-body .list-options .list-options-link {
+  display: inline-block;
+  font-size: 1.25rem;
+  margin-right: 0.5rem;
 }
 #moduleLibrary .lib-list-li .list-body .list-options:hover .folder-info ul {
   display: block;
@@ -262,4 +272,8 @@
   font-size: 1.2rem;
   font-weight: 700;
   color: #009300;
+}
+#moduleLibrary .mark-category select {
+  height: 2rem;
+  font-size: 1rem;
 }

@@ -415,7 +415,7 @@ func.search = async (t, c, options) => {
     });
   }
 
-  if(!["user", "column"].includes(t)) {
+  if(!["user", "column", "resource"].includes(t)) {
     if(fid && fid.length > 0) {
       const fidMatch = {
         bool: {

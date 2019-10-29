@@ -314,6 +314,18 @@ router
 
     }
 
+    if(ctx.permission("createForumLibrary")) {
+      if(data.forum.lid) {
+        const library = await db.LibraryModel.findOne({_id: data.forum.lid});
+        if(!library) {
+          data.forum.lid = "";
+        } else {
+          data.libraryClosed = library.closed;
+        }
+        
+      }
+    }
+
 		// 推荐的文章
     data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
 

@@ -61,6 +61,10 @@ const resourceSchema = new Schema({
     type: Date,
     default: null,
     index: 1
+  },
+  category: {
+    type: String,
+    default: ""
   }
 });
 /*

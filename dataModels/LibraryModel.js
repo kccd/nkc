@@ -91,6 +91,18 @@ const schema = new mongoose.Schema({
   ext: {
     type: String,
     default: ''
+  },
+  // 标记为删除
+  deleted: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
+  // 已关闭 针对顶层文件夹
+  closed: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {
   collection: "libraries"
@@ -130,7 +142,7 @@ schema.statics.newFolder = async (options = {}) => {
     uid
   });
   await library.save();
-  if(pl) await pl.computCount();
+  if(pl) await pl.computeCount();
   return library;
 };
 /* 
@@ -171,7 +183,7 @@ schema.statics.newFile = async (options = {}) => {
     category
   });
   await library.save();
-  await pl.computCount();
+  await pl.computeCount();
   return library;
 };
 /* 
@@ -196,6 +208,7 @@ schema.statics.checkLibraryInfo = async (type, options) => {
   const q = {
     type,
     name,
+    deleted: false,
     lid
   };
 
@@ -235,7 +248,7 @@ schema.methods.getFolders = async function() {
   const {_id} = this;
   const LibraryModel = mongoose.model("libraries");
   const pinyin = require("../nkcModules/pinyin.js");
-  let folders = await LibraryModel.find({lid: _id, type: "folder"});
+  let folders = await LibraryModel.find({lid: _id, type: "folder", deleted: false});
   folders = await LibraryModel.extendLibraries(folders);
   return pinyin.sortByFirstLetter("object", folders, "name");
 };
@@ -244,7 +257,7 @@ schema.methods.getFiles = async function() {
   const {_id} = this;
   const LibraryModel = mongoose.model("libraries");
   const pinyin = require("../nkcModules/pinyin.js");
-  let files = await LibraryModel.find({lid: _id, type: "file"});
+  let files = await LibraryModel.find({lid: _id, type: "file", deleted: false});
   files = await LibraryModel.extendLibraries(files);
   return pinyin.sortByFirstLetter("object", files, "name");
 };
@@ -270,14 +283,14 @@ schema.methods.getNav = async function() {
 /* 
   计算当前文件夹以及上层所有文件夹中文件的数量
 */
-schema.methods.computCount = async function() {
+schema.methods.computeCount = async function() {
   const LibraryModel = mongoose.model("libraries");
   // 获取当前文件夹与上边每一层文件夹所组成的数组
   const nav = await this.getNav();
   nav.reverse();
   for(const n of nav) {
-    const folders = await LibraryModel.find({lid: n._id, type: "folder"}, {fileCount: 1, folderCount: 1});
-    let fileCount = await LibraryModel.count({lid: n._id, type: "file"});
+    const folders = await LibraryModel.find({lid: n._id, type: "folder", deleted: false}, {fileCount: 1, folderCount: 1});
+    let fileCount = await LibraryModel.count({lid: n._id, type: "file", deleted: false});
     let folderCount = folders.length;
     folders.map(f => {
       folderCount += (f.folderCount || 0);
@@ -326,8 +339,35 @@ schema.methods.ensurePermission = async function(user, operation, modifyOtherLib
   } else {
     throwErr(403, "权限不足");
   }
-  
 };
-
+/* 
+  同步文库文件记录到搜索数据库
+  @param {Number} lid 文件记录ID
+  @author pengxiguaa 2019-10-29
+*/
+schema.statics.saveToES = async (lid) => {
+  const LibraryModel = mongoose.model("libraries");
+  const library = await LibraryModel.findOne({_id: lid, type: "file"});
+  if(!library) throwErr(500, `文件不存在，lid: ${lid}`)
+  if(library.deleted) throwErr(500, `文件已被标记为删除，无法同步到搜索数据库。`);
+  const elasticSearch = require("../nkcModules/elasticSearch");
+  const resourceData = {
+    tid: lid,
+    t: library.name,
+    c: library.description,
+    toc: library.tlm || library.toc,
+    uid: library.uid
+  };
+  await elasticSearch.save("resource", resourceData);
+}
+/* 
+  从搜索数据库中删除文库文件记录
+  @param {Number} lid 文件记录ID
+  @author pengxiguaa 2019-10-29
+*/
+schema.statics.removeFromES = async (lid) => {
+  const elasticSearch = require("../nkcModules/elasticSearch");
+  await elasticSearch.delete("resource", lid);
+};
 module.exports = mongoose.model("libraries", schema);
 

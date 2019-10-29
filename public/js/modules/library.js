@@ -25,10 +25,25 @@ function () {
         selectedFiles: [],
         mark: false,
         selectedLibrariesId: [],
-        permission: []
+        permission: [],
+        lastHistoryLid: "",
+        selectedCategory: "book"
       },
       mounted: function mounted() {
-        this.getList(this.lid);
+        var libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
+        var childFolderId = libraryVisitFolderLogs[this.lid];
+        var self = this;
+
+        if (childFolderId !== undefined && childFolderId !== this.lid) {
+          // 如果浏览器本地存有访问记录，则先确定该记录中的文件夹是否存在，存在则访问，不存在则打开顶层文件夹。
+          this.getList(childFolderId).then(function () {
+            self.app.addHistory(id);
+          })["catch"](function () {
+            self.getListInfo(self.lid);
+          });
+        } else {
+          this.getListInfo(this.lid);
+        }
 
         if (!window.CommonModal) {
           if (!NKC.modules.CommonModal) {
@@ -61,6 +76,8 @@ function () {
             window.LibraryPath = new NKC.modules.LibraryPath();
           }
         }
+
+        window.onpopstate = this.onpopstate;
       },
       computed: {
         lastFolder: function lastFolder() {
@@ -89,6 +106,32 @@ function () {
         format: NKC.methods.format,
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
+        scrollTo: NKC.methods.scrollTo,
+        markCategory: function markCategory() {
+          var selectedCategory = this.selectedCategory,
+              selectedFiles = this.selectedFiles;
+          if (!selectedCategory) return;
+          sweetQuestion("该操作将覆盖本页所有设置，请再次确认。").then(function () {
+            selectedFiles.map(function (f) {
+              return f.category = selectedCategory;
+            });
+          })["catch"](function (err) {});
+        },
+        onpopstate: function onpopstate(e) {
+          var state = e.state;
+          var lid = this.nav[0]._id;
+          if (state && state.lid) lid = state.lid;
+          this.getList(lid)["catch"](function (err) {
+            sweetError(err);
+          });
+        },
+        getListInfo: function getListInfo(id, scrollToTop) {
+          this.getList(id, scrollToTop).then(function () {
+            self.app.addHistory(id);
+          })["catch"](function (err) {
+            sweetError(err);
+          });
+        },
         per: function per(operation) {
           return this.permission.includes(operation);
         },
@@ -119,9 +162,9 @@ function () {
         selectPath: function selectPath(r) {
           LibraryPath.open(function (data) {
             var folder = data.folder,
-                folderPath = data.folderPath;
+                path = data.path;
             r.folder = folder;
-            r.folderPath = folderPath;
+            r.folderPath = path;
           }, {
             lid: r.folder ? r.folder._id : ""
           });
@@ -163,11 +206,10 @@ function () {
             error: "" // 错误信息
 
           };
-
-          if (type === "folder") {}
+          file.name = file.name.replace(/\..*?$/ig, "");
 
           if (file.type === "localFile") {
-            if (type.includes("image")) {
+            if (r.type.includes("image")) {
               file.ext = "mediaPicture";
             } else {
               file.ext = "mediaAttachment";
@@ -206,7 +248,7 @@ function () {
           Promise.resolve().then(function () {
             if (!file) throw "文件异常";
             self.app.checkString(file.name, {
-              minLengh: 1,
+              minLength: 1,
               maxLength: 500,
               name: "文件名称"
             });
@@ -234,10 +276,15 @@ function () {
             if (file.type === "localFile") {
               var resource = data.r;
               file.data = resource;
-              file.ext = resource.ext;
+              file.ext = resource.mediaType;
               file.rid = resource.rid;
               file.toc = resource.toc;
               file.type = "onlineFile";
+
+              if (file.ext === "mediaPicture") {
+                file.disabled = true;
+                throw new Error("暂不允许上传图片到文库");
+              }
             }
           }).then(function () {
             // 将线上文件提交到文库
@@ -278,19 +325,45 @@ function () {
           this.selectFolder(this.folder);
           this.pageType = "list";
         },
+        // 文件夹访问记录存到浏览器本地
+        saveToLocalStorage: function saveToLocalStorage(id) {
+          var libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
+          libraryVisitFolderLogs[this.nav[0]._id] = id;
+          NKC.methods.saveToLocalStorage("libraryVisitFolderLogs", libraryVisitFolderLogs);
+        },
+        // 添加一条浏览器历史记录
+        addHistory: function addHistory(lid) {
+          // 判断是否为相同页，相同则不创建浏览器历史记录。
+          if (this.lastHistoryLid && this.lastHistoryLid === lid) return;
+          var href = window.location.href;
+
+          if (href.includes("#")) {
+            href = href.replace(/#.*/ig, "");
+          }
+
+          window.history.pushState({
+            lid: lid
+          }, 'page', href + '#' + lid);
+          this.lastHistoryLid = lid;
+        },
         // 获取文件列表
-        getList: function getList(id) {
+        getList: function getList(id, scrollToTop) {
           var url = "/library/".concat(id, "?file=true&nav=true&folder=true&permission=true&t=").concat(Date.now());
-          nkcAPI(url, "GET").then(function (data) {
+          return nkcAPI(url, "GET").then(function (data) {
             self.app.nav = data.nav;
             self.app.folders = data.folders;
             self.app.files = data.files;
             self.app.permission = data.permission;
-          })["catch"](function (data) {
-            sweetError(data);
+            self.app.saveToLocalStorage(id);
+
+            if (scrollToTop) {
+              self.app.scrollTo({
+                top: 0
+              });
+            }
           });
         },
-        selecteOnlineFiles: function selecteOnlineFiles() {
+        selectOnlineFiles: function selectOnlineFiles() {
           SelectResource.open(function (data) {
             var resources = data.resources;
             resources.map(function (r) {
@@ -302,7 +375,7 @@ function () {
           });
         },
         // 选择完本地文件
-        seletedFiles: function seletedFiles() {
+        selectedLocalFiles: function selectedLocalFiles() {
           var _document$getElementB = document.getElementById("moduleLibraryInput"),
               _document$getElementB2 = _document$getElementB.files,
               files = _document$getElementB2 === void 0 ? [] : _document$getElementB2;
@@ -332,45 +405,42 @@ function () {
           }
         },
         // 选择文件夹
-        selectFolder: function selectFolder(folder) {
+        selectFolder: function selectFolder(folder, scrollToTop) {
           if (this.mark) return;
 
           if (folder.type === "folder") {
-            this.getList(folder._id);
+            this.getListInfo(folder._id, scrollToTop);
           } else {
             this.selectFile(folder);
           }
         },
         // 移动文件夹或文件
         moveFolder: function moveFolder(libraryId) {
-          var _this = this;
+          var foldersId;
 
-          sweetQuestion("确定要执行移动操作？此操作不会保留原有目录结构，且不可恢复。").then(function () {
-            var foldersId;
+          if (Array.isArray(libraryId)) {
+            foldersId = libraryId;
+          } else {
+            foldersId = [libraryId];
+          }
 
-            if (Array.isArray(libraryId)) {
-              foldersId = libraryId;
-            } else {
-              foldersId = [libraryId];
-            }
-
-            var body = {};
-            body.foldersId = foldersId;
-            var url = "/library/".concat(_this.folder._id, "/list");
-            var method = "PATCH";
-            LibraryPath.open(function (data) {
-              body.targetFolderId = data.folder._id;
-              nkcAPI(url, method, body).then(function (data) {
-                sweetSuccess("\u6267\u884C\u6210\u529F".concat(data.ignoreCount ? "\uFF0C\u5171\u6709".concat(data.ignoreCount, "\u4E2A\u9879\u76EE\u56E0\u5B58\u5728\u51B2\u7A81\u6216\u4E0D\u662F\u4F60\u81EA\u5DF1\u53D1\u5E03\u7684\u800C\u88AB\u5FFD\u7565") : ""));
-                self.app.mark = false;
-                self.app.selectFolder(self.app.folder);
-              })["catch"](function (data) {
-                sweetError(data);
-              });
-            }, {
-              lid: self.app.folder._id
+          var body = {};
+          body.foldersId = foldersId;
+          var url = "/library/".concat(this.folder._id, "/list");
+          var method = "PATCH";
+          LibraryPath.open(function (data) {
+            body.targetFolderId = data.folder._id;
+            nkcAPI(url, method, body).then(function (data) {
+              sweetSuccess("\u6267\u884C\u6210\u529F".concat(data.ignoreCount ? "\uFF0C\u5171\u6709".concat(data.ignoreCount, "\u4E2A\u9879\u76EE\u56E0\u5B58\u5728\u51B2\u7A81\u6216\u4E0D\u662F\u4F60\u81EA\u5DF1\u53D1\u5E03\u7684\u800C\u88AB\u5FFD\u7565") : ""));
+              self.app.mark = false;
+              self.app.selectFolder(self.app.folder);
+            })["catch"](function (data) {
+              sweetError(data);
             });
-          })["catch"](function () {});
+          }, {
+            lid: self.app.folder._id,
+            warning: "此操作不会保留原有目录结构，且不可恢复。"
+          });
         },
         // 编辑文件夹
         editFolder: function editFolder(folder) {

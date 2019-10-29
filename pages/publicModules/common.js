@@ -280,3 +280,41 @@ NKC.methods.toLogin = function(type) {
     Login.open(type === "register"? "register": "login");
   }
 };
+
+
+/* 
+  滚动页面
+  @param {Object} optons
+    @param {Number} top
+    @param {Number} left 
+    @param {Dom} 设置滚动的dom元素, 默认window
+    @param {String} behavior smooth: 平滑滚动, instant: 瞬间滚动（默认）
+  @author pengxiguaa 2019-10-28  
+*/
+NKC.methods.scrollTo = function(options) {
+  if(options.dom) {
+    options.dom.scrollTo(options);  
+  } else {
+    window.scrollTo(options);
+  }
+}
+/* 
+  本地存储
+  @param {String} name 键名
+  @param {Object} data 数据
+  @author pengxiguaa 2019-10-29
+*/
+NKC.methods.saveToLocalStorage = function(name, data) {
+  window.localStorage.setItem(name, JSON.stringify(data));
+};
+/* 
+  从本地存储中读取
+  @param {String} name 键名
+  @return {Object} 数据
+  @author pengxiguaa 2019-10-29
+*/
+NKC.methods.getFromLocalStorage = function(name) {
+  var data = window.localStorage.getItem(name);
+  if(!data) return {};
+  return JSON.parse(data);
+};

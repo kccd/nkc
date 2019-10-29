@@ -235,3 +235,17 @@ body{
   color: #fff;
   background-color: #217fc4;
 }
+.library-button button{
+  background-color: rgba(0,0,0,0);
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 1.2rem;
+  color: #777;
+  height: 2.4rem;
+  padding: 0 0.5rem;
+}
+.library-button button:hover, .library-button button:focus{
+  color: #333;
+  border-color: #999;
+  outline: none;
+}

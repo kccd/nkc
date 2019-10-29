@@ -1,14 +1,17 @@
 +includeCSS("/css/modules/library.css")
 #moduleLibrary(v-cloak)
-  div(v-if="pageType === 'list'")
-    .lib-tools
-      .lib-nav
-        .lib-nav-body  
-          .lib-nav-li(v-for="s, index in nav" @click="selectFolder(s)") 
-            img(:src="getUrl('fileCover', 'folder')")
-            | {{s.name}}
-            .fa.fa-pencil(v-if="index !== 0 && index + 1 === nav.length" @click.stop="editFolder(s)")
-        .lib-nav-description {{folder.description || "暂无简介"}}    
+  .lib-tools
+    .lib-nav
+      .lib-nav-body  
+        .lib-nav-li(v-for="s, index in nav" @click="selectFolder(s)") 
+          img(:src="getUrl('fileCover', 'folder')")
+          | {{s.name}}
+          .fa.fa-pencil(
+            v-if="index !== 0 && index + 1 === nav.length && (per('modifyOtherLibrary') || (uid && uid === s.uid))" 
+            @click.stop="editFolder(s)"
+          )
+      .lib-nav-description {{folder.description || "暂无简介"}}    
+    div(v-if="pageType === 'list'")  
       .options-button
         a(@click="back" :class="{'disabled': !lastFolder || mark}") 
           .fa.fa-arrow-left &nbsp;
@@ -16,80 +19,116 @@
         a(@click="createFolder" :class="{'disabled': mark}" v-if="per('modifyOtherLibrary') || per('createFolder')")
           .fa.fa-plus &nbsp;
           | 新建文件夹
-        a(@click="markLibrary") 
-          .fa.fa-dot-circle-o &nbsp;
-            span(v-if="!mark") 多选
-            span(v-else) 取消
-        span(v-if="mark")  
-          a(@click="markAll") 
-            .fa.fa-square &nbsp;
-            | 全选  
-          span(v-if="selectedLibrariesId.length")  
-            a(@click="moveFolders" v-if="per('modifyOtherLibrary') || per('moveFolder') || per('moveFile')") 
-              .fa.fa-arrows &nbsp;
-              | 移动
-            a(@click="deleteFolders" v-if="per('modifyOtherLibrary') || per('deleteFolder') || per('deleteFile')") 
-              .fa.fa-trash &nbsp;
-              | 删除  
+        .display-i-b(v-if="per('modifyOtherLibrary')")
+          a(@click="markLibrary") 
+            .fa.fa-dot-circle-o &nbsp;
+              span(v-if="!mark") 多选
+              span(v-else) 取消
+          span(v-if="mark")  
+            a(@click="markAll") 
+              .fa.fa-square &nbsp;
+              | 全选  
+            span(v-if="selectedLibrariesId.length")  
+              a(@click="moveFolders") 
+                .fa.fa-arrows &nbsp;
+                | 移动
+              a(@click="deleteFolders") 
+                .fa.fa-trash &nbsp;
+                | 删除  
       .options-button(v-if="per('modifyOtherLibrary') || per('createFile')")
         a(@click="toUpload" :class="{'disabled': mark}").active
           .fa.fa-cloud-upload &nbsp;
           | 上传文件     
-    .lib-list
-      .null(v-if="!folders.length && !files.length") 空空如也~
-      .lib-list-li(v-for="f in folderList") 
-        .list-checkbox(v-if="mark")
-          .checkbox
-            label
-              input(type="checkbox" v-model="selectedLibrariesId" :value="f._id")
-        .list-cover(@click="selectFolder(f)")
-          div(v-if="f.type === 'folder'")
-            img(:src="getUrl('fileCover', 'folder')")
-          div(v-else)
-            img(:src="getUrl('fileCover', f.ext)" v-if="!f.cover")
-            img(:src="getUrl('cover', f.cover)" v-else)    
-        .list-body(:class="{'file': f.type === 'file'}" @click="selectFolder(f)")  
-          .list-name {{f.name}}
-          .list-info(v-if="f.type === 'folder'")
-            .time {{format('YYYY/MM/DD', f.tlm)}}  
-            .time {{f.fileCount}}个文件
-          .list-info(v-else)
-            .user.hidden-xs.hidden-sm
-              img(:src="getUrl('userAvatar', f.user.avatar)")
-              a(@click.stop="visitUrl('/u/' + f.uid, true)") {{f.user.username}}
-            .time {{format('YYYY/MM/DD', f.tlm)}}
-            .size {{(f.ext||"未知").toUpperCase()}} {{getSize(f.size)}}  
-          .list-description {{f.description || "暂无简介"}}
-          .list-options(@click.stop)
-            .folder-info.fa.fa-ellipsis-v
-              ul
-                li(@click.stop="visitUrl('/r/' + f.rid, true)" v-if="f.type === 'file'")  
-                  .fa.fa-cloud-download
-                  | &nbsp;下载
-                span(v-if="per('modifyOtherLibrary') || (uid && f.uid === uid)")  
-                  li(@click.stop="editFolder(f)" v-if="per('modifyOtherLibrary') || (f.type === 'file' && per('modifyFile')) || (f.type === 'folder' && per('modifyFolder'))") 
-                    .fa.fa-edit
-                    | &nbsp;编辑
-                  li(@click.stop="moveFolder(f._id)" v-if="per('modifyOtherLibrary') || (f.type === 'file' && per('moveFile')) || (f.type === 'folder' && per('moveFolder'))")
-                    .fa.fa-arrows
-                    | &nbsp;移动
-                  li(@click.stop="deleteFolder(f._id)" v-if="per('modifyOtherLibrary') || (f.type === 'file' && per('deleteFile')) || (f.type === 'folder' && per('deleteFolder'))")
-                    .fa.fa-trash(style="padding-left: 2px;")
-                    | &nbsp;删除
+  .lib-list(v-if="pageType === 'list'")
+    .null(v-if="!folders.length && !files.length") 空空如也~
+    .lib-list-li(v-for="f in folderList") 
+      .list-checkbox(v-if="mark")
+        .checkbox
+          label
+            input(type="checkbox" v-model="selectedLibrariesId" :value="f._id")
+      .list-cover(@click="selectFolder(f, true)")
+        div(v-if="f.type === 'folder'")
+          img(:src="getUrl('fileCover', 'folder')")
+        div(v-else)
+          img(:src="getUrl('fileCover', f.ext)" v-if="!f.cover")
+          img(:src="getUrl('cover', f.cover)" v-else)    
+      .list-body(@click="selectFolder(f, true)")  
+        .list-name {{f.name}}
+        .list-info(v-if="f.type === 'folder'")
+          .time {{format('YYYY/MM/DD', f.tlm)}}  
+          .time {{f.fileCount}}个文件
+        .list-info(v-else)
+          .user.hidden-xs.hidden-sm
+            img(:src="getUrl('userAvatar', f.user.avatar)")
+            a(@click.stop="visitUrl('/u/' + f.uid, true)") {{f.user.username}}
+          .time {{format('YYYY/MM/DD', f.tlm)}}
+          .size {{(f.ext||"未知").toUpperCase()}} {{getSize(f.size)}}  
+        //-.list-description {{f.description || "暂无简介"}}
+        .list-options(@click.stop)
+          span(v-if="per('modifyOtherLibrary') || (uid && f.uid === uid)")  
+            .list-options-link(
+              v-if="(per('deleteFile') && f.type === 'file') || (per('deleteFolder') && f.type === 'folder')" 
+              title="删除"
+              @click="deleteFolder(f._id)"
+            )  
+              .fa.fa-trash
+            .list-options-link(
+              v-if="(per('moveFile') && f.type === 'file') || (per('moveFolder') && f.type === 'folder')" 
+              title="移动"
+              @click="moveFolder(f._id)"
+            )  
+              .fa.fa-arrows  
+            .list-options-link(
+              v-if="(per('modifyFile') && f.type === 'file') || (per('modifyFolder') && f.type === 'folder')" 
+              title="编辑"
+              @click="editFolder(f)"
+            )  
+              .fa.fa-edit
+          .list-options-link(v-if="f.type === 'file'" @click="visitUrl('/r/' + f.rid, true)" title="点击下载")
+            .fa.fa-cloud-download    
+            
+          //-.folder-info.fa.fa-ellipsis-v
+            ul
+              li(@click.stop="visitUrl('/r/' + f.rid, true)" v-if="f.type === 'file'")  
+                .fa.fa-cloud-download
+                | &nbsp;下载
+              span(v-if="per('modifyOtherLibrary') || (uid && f.uid === uid)")  
+                li(@click.stop="editFolder(f)" v-if="per('modifyOtherLibrary') || (f.type === 'file' && per('modifyFile')) || (f.type === 'folder' && per('modifyFolder'))") 
+                  .fa.fa-edit
+                  | &nbsp;编辑
+                li(@click.stop="moveFolder(f._id)" v-if="per('modifyOtherLibrary') || (f.type === 'file' && per('moveFile')) || (f.type === 'folder' && per('moveFolder'))")
+                  .fa.fa-arrows
+                  | &nbsp;移动
+                li(@click.stop="deleteFolder(f._id)" v-if="per('modifyOtherLibrary') || (f.type === 'file' && per('deleteFile')) || (f.type === 'folder' && per('deleteFolder'))")
+                  .fa.fa-trash(style="padding-left: 2px;")
+                  | &nbsp;删除
   div(v-else)
     .lib-uploader
       .options-button
         a(@click="toList")
           .fa.fa-arrow-left &nbsp; 返回文件列表
-        input.hidden#moduleLibraryInput(type="file" multiple="multiple" @change="seletedFiles")
+        a(@click="createFolder" :class="{'disabled': mark}" v-if="per('modifyOtherLibrary') || per('createFolder')")
+          .fa.fa-plus &nbsp;
+          | 新建文件夹  
+        input.hidden#moduleLibraryInput(type="file" multiple="multiple" @change="selectedLocalFiles")
         a.active(onclick="$('#moduleLibraryInput').click();") 
           .fa.fa-save &nbsp;选择本地文件    
-        a.active(@click="selecteOnlineFiles")
+        a.active(@click="selectOnlineFiles")
           .fa.fa-cloud &nbsp;选择已上传文件
+      .mark-category(v-if="selectedFiles.length")
+        span 将本页所有文件设置为
+        select(v-model="selectedCategory")
+          option(value="book") 图书
+          option(value="paper") 论文
+          option(value="program") 程序
+          option(value="media") 媒体
+          option(value="other") 其他
+        .options-button  
+          a.active(@click="markCategory") 执行  
       .lib-files(v-if="!selectedFiles.length")    
         .null 空空如也~
       .lib-files(v-else)
-        .lib-file(v-for="f, index in selectedFiles" :class="{'disabled': f.disabled, 'error': f.error, 'success': f.status === 'uploaded'}")
+        .lib-file(v-for="f, index in selectedFiles" :class="{'disabled': f.disabled, 'error': f.error || !f.category, 'success': f.status === 'uploaded'}")
           .lib-file-index {{index + 1}}
           .lib-file-close.fa.fa-remove(@click="removeFile(index)")
           .lib-file-name {{f.name}}
@@ -99,7 +138,9 @@
             .form-group
               .row
                 .col-xs-12.col-md-6
-                  h5 文件分类
+                  h5 文件分类(
+                    span.text-danger 必选
+                    |)
                   .radio
                     label.m-r-1
                       input(type="radio" value="book" v-model="f.category") 
@@ -123,7 +164,9 @@
                   .file-path(v-if="f.folderPath") {{f.folderPath}}
                     
             .form-group
-              h5 文件名称(必填)
+              h5 文件名称(
+                span.text-danger 必填
+                |)
               input.form-control(type="text" v-model.trim="f.name")
             .form-group
               h5 文件说明
@@ -132,6 +175,7 @@
               
           .lib-file-upload   
             .lib-file-error(v-if="f.error") {{f.error}}
+            .lib-file-error(v-else-if="!f.category") 未选择文件分类
             .lib-file-success(v-if="f.status === 'uploaded'") 文件已成功上传至目录：{{f.folderPath}}
             .lib-file-progress(v-if="f.status === 'uploading'")
               span(v-if="f.progress === 100") 处理中...

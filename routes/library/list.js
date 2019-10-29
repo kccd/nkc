@@ -19,22 +19,22 @@ router
     const {db, body, data} = ctx;
     const {foldersId, targetFolderId} = body;
     const {library} = data;
-    const targetFolder = await db.LibraryModel.findOne({_id: targetFolderId, type: "folder"});
+    const targetFolder = await db.LibraryModel.findOne({_id: targetFolderId, type: "folder", deleted: false});
     if(!targetFolderId) ctx.throw(400, `目标目录不正确`);
     const nav = await targetFolder.getNav();
     const navId = nav.map(n => n._id);
     let ignoreCount = 0;
     for(const _id of foldersId) {
-      const folder = await db.LibraryModel.findOne({lid: library._id, _id});
+      const folder = await db.LibraryModel.findOne({lid: library._id, _id, deleted: false});
       if(!folder) {
         ignoreCount++;
         continue;
       }
       try{
         if(folder.type === "file") {
-          await library.ensurePermission(data.user, "moveFile", ctx.permission("modifyAllResource"));
+          await folder.ensurePermission(data.user, "moveFile", ctx.permission("modifyAllResource"));
         } else {
-          await library.ensurePermission(data.user, "moveFolder", ctx.permission("modifyAllResource"));
+          await folder.ensurePermission(data.user, "moveFolder", ctx.permission("modifyAllResource"));
         }
       } catch(err) {
         ignoreCount ++;
@@ -46,7 +46,8 @@ router
         ignoreCount++;
         continue;
       }
-      const sameName = await db.LibraryModel.count({lid: targetFolderId, type: folder.type, name: folder.name});
+
+      const sameName = await db.LibraryModel.count({lid: targetFolderId, type: folder.type, name: folder.name, deleted: false});
       if(sameName) {
         ignoreCount++;
         continue;
@@ -54,8 +55,8 @@ router
       await folder.update({lid: targetFolderId});
     }
     // 重新计算源文件夹及目标文件夹的文件和文件夹数量
-    await targetFolder.computCount();
-    await library.computCount();
+    await targetFolder.computeCount();
+    await library.computeCount();
     data.ignoreCount = ignoreCount;
     await next();
   })
@@ -87,9 +88,16 @@ router
         ignoreCount ++;
         continue;
       }
-      await db.LibraryModel.remove({_id: id});
+      await db.LibraryModel.update({_id: id}, {
+        $set: {
+          deleted: true
+        }
+      });
+      if(folder.type === "file") {
+        await db.LibraryModel.removeFromES(id);
+      }
     }
-    await library.computCount();
+    await library.computeCount();
     data.ignoreCount = ignoreCount;
     await next();
   });

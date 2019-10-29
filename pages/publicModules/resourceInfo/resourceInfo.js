@@ -10,6 +10,7 @@ NKC.modules.ResourceInfo = function() {
       loading: true,
       forums: [],
       resource: "",
+      path: "",
       uid: NKC.configs.uid || "",
       modifyAllResource: false
     },
@@ -34,9 +35,10 @@ NKC.modules.ResourceInfo = function() {
       },
       getLibrary: function(lid) {
         self.app.type = "library";
-        nkcAPI("/library/" + lid + "?info=true", "GET")
+        nkcAPI("/library/" + lid + "?info=true&path=true", "GET")
           .then(function(data) {
             self.app.loading = false;
+            self.app.path = data.path;
             self.app.resource = data.library;
           })
           .catch(function(data) {
