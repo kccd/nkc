@@ -62,3 +62,14 @@ function submit(fid) {
 			screenTopWarning(data.error || data);
 		})
 }
+function libraryOperation(fid, type) {
+  nkcAPI("/f/" + fid + "/library", "POST", {
+    type: type
+  })
+  .then(function() {
+    sweetSuccess("执行成功");
+  })
+  .catch(function(data) {
+    sweetError(data);
+  })
+}

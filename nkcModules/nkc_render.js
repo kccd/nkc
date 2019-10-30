@@ -514,8 +514,13 @@ function nkc_render(options){
         if(extArray.indexOf(r.ext) > -1){
           continue;
         }
-        var reg = new RegExp(r.oname + "</a>", 'gm');
-        html = html.replace(reg,r.oname+'<span class="PostResourceFileSize">'+fileSizeString+'</span><span class="PostResourceCounter">'+r.hits+'次下载</span></a>')
+        // 临时的解决办法，下载次数及文件大小的显示机制需要调整
+        var oname = r.oname.replace(/\(/ig, "\\(");
+        oname = oname.replace(/\)/ig, "\\)");
+        oname = oname.replace(/\./ig, "\\.");
+
+        var reg = new RegExp(oname + "</a>", 'gm');
+        html = html.replace(reg, r.oname+'<span class="PostResourceFileSize">'+fileSizeString+'</span><span class="PostResourceCounter">'+r.hits+'次下载</span></a>')
       }
     }
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');

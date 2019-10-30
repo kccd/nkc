@@ -7,8 +7,10 @@ router
     const {lid} = params;
     const library = await db.LibraryModel.findOne({_id: lid, deleted: false});
     if(!library) ctx.throw(404, `library not found. lid: ${lid}`);
-    if(library.closed) ctx.throw(400, `文库已关闭，暂无法访问。`);
     data.nav = await library.getNav();
+    data.nav.map(l => {
+      if(l.closed) ctx.throw(400, `文库已关闭，暂无法访问。`);
+    });
     const topFolder = data.nav[0];
     const forum = await db.ForumModel.findOne({lid: topFolder._id});
     if(!forum) ctx.throw(400, `当前文件夹的顶层文件夹不属于任何专业，lid: ${topFolder._id}`);

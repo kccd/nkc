@@ -35,7 +35,7 @@
             a.m-r-05.pointer.btn.btn-success.btn-sm(@click="visitUrl('/r/' + resource.rid, true)")
               .fa.fa-cloud-download &nbsp;
               | 点击下载
-              span(v-if="resource.hits") &nbsp;{{resource.hits}}
+              span(v-if="resource.hits ||resource.resource.hits") &nbsp;{{resource.hits ||resource.resource.hits}}
             .display-i-b(v-if="(modifyAllResource || uid === resource.uid) && type === 'resource'")
               a.m-r-05.pointer.btn.btn-primary.btn-sm(@click="visitUrl('/library/upload?rid=' + resource.rid, true)")
                 .fa.fa-edit &nbsp;

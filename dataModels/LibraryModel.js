@@ -224,15 +224,25 @@ schema.statics.checkLibraryInfo = async (type, options) => {
 */
 schema.statics.extendLibraries = async (libraries) => {
   const UserModel = mongoose.model("users");
-  const usersId = libraries.map(l => l.uid);
+  const ResourceModel = mongoose.model("resources");
+  const usersId = [], resourcesId = [];
+  libraries.map(library => {
+    usersId.push(library.uid);
+    if(library.rid) resourcesId.push(library.rid);
+  });
   const users = await UserModel.find({uid: {$in: usersId}});
-  const usersObj = [];
+  const resources = await ResourceModel.find({rid: {$in: resourcesId}});
+  const usersObj = [], resourcesObj = [];
   users.map(u => {
     usersObj[u.uid] = u;
+  });
+  resources.map(resource => {
+    resourcesObj[resource.rid] = resource;
   });
   libraries = libraries.map(l => {
     l = l.toObject();
     l.user = usersObj[l.uid];
+    if(l.rid) l.resource = resourcesObj[l.rid];
     return l;
   });
   return libraries;

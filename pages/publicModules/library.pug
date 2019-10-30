@@ -84,7 +84,7 @@
               @click="editFolder(f)"
             )  
               .fa.fa-edit
-          .list-options-link(v-if="f.type === 'file'" @click="visitUrl('/r/' + f.rid, true)" title="点击下载")
+          .list-options-link(v-if="f.type === 'file'" @click="visitUrl('/r/' + f.rid, true)" :title="'点击下载（共被下载' + f.resource.hits + '次）'")
             .fa.fa-cloud-download    
             
           //-.folder-info.fa.fa-ellipsis-v
@@ -110,6 +110,9 @@
         a(@click="createFolder" :class="{'disabled': mark}" v-if="per('modifyOtherLibrary') || per('createFolder')")
           .fa.fa-plus &nbsp;
           | 新建文件夹  
+        a(@click="clearUploaded" v-if="uploadedCount")
+          .fa.fa-trash-o &nbsp;
+          | 移除已上传的记录  
         input.hidden#moduleLibraryInput(type="file" multiple="multiple" @change="selectedLocalFiles")
         a.active(onclick="$('#moduleLibraryInput').click();") 
           .fa.fa-save &nbsp;选择本地文件    

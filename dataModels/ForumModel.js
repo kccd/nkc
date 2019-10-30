@@ -1268,29 +1268,14 @@ forumSchema.statics.getForumsIdFromRedis = async (forumType) => {
   @author pengxiguaa 2019-10-21
 */
 forumSchema.methods.createLibrary = async function(uid) {
-  const {displayName, description} = this;
-  const library = await mongoose.model("libraries").newLibrary({
-    name: displayName,
-    description,
-    uid
-  });
-  await this.update({lid: library._id});
-  return library;
-};
-
-/* 
-  创建专业文库
-*/
-forumSchema.methods.createLibrary = async function(uid) {
   if(this.lid) throwErr(500, "专业文库已存在，fid: ${this.fid}, lid: ${this.lid}");
-  const childForumsCount = await mongoose.model("forums").count({parentsId: this.fid});
-  if(childForumsCount > 0) return;
   const library = await mongoose.model("libraries").newFolder({
     name: this.displayName,
     description: this.description,
     uid
   });
   await this.update({lid: library._id});
+  return library;
 }
 
 module.exports = mongoose.model('forums', forumSchema);

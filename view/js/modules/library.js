@@ -85,6 +85,13 @@ NKC.modules.Library = class {
         folderList() {
           return this.folders.concat(this.files);
         },
+        uploadedCount() {
+          let count = 0; 
+          this.selectedFiles.map(f => {
+            if(f.status === "uploaded") count ++;
+          });
+          return count;
+        }
         
       },
       methods: {
@@ -94,6 +101,11 @@ NKC.modules.Library = class {
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
         scrollTo: NKC.methods.scrollTo,
+        // 清空已成功上传的文件记录
+        clearUploaded() {
+          this.selectedFiles = this.selectedFiles.filter(f => f.status !== "uploaded");
+        },
+        // 批量设置文件的分类
         markCategory() {
           const {selectedCategory, selectedFiles} = this;
           if(!selectedCategory) return;
@@ -103,6 +115,7 @@ NKC.modules.Library = class {
             })
             .catch(err => {})
         },
+        // 网页切换事件
         onpopstate(e) {
           const {state} = e;
           let lid = this.nav[0]._id;
@@ -112,6 +125,7 @@ NKC.modules.Library = class {
               sweetError(err);
             })
         },
+        // 加载文件夹信息，包含错误处理
         getListInfo(id, scrollToTop) {
           this.getList(id, scrollToTop)
             .then(() => {
@@ -121,6 +135,7 @@ NKC.modules.Library = class {
               sweetError(err)
             })
         },
+        // 比对权限permission
         per(operation) {
           return this.permission.includes(operation);
         },

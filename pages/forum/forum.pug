@@ -58,14 +58,6 @@ block content
             .col-xs-6
               .forum-count-number= data.forum.countPostsToday
               .forum-count-title 今日更新
-            if permission("createForumLibrary") 
-              .col-xs-12.m-t-1.library-button
-                if !data.forum.lid
-                  button(onclick=`libraryOperation('${data.forum.fid}', 'create')`) 开设文库 
-                else if data.libraryClosed
-                  button(onclick=`libraryOperation('${data.forum.fid}', 'open')`) 开放文库  
-                else   
-                  button(onclick=`libraryOperation('${data.forum.fid}', 'close')`) 关闭文库  
             .col-xs-12.m-t-1
               .row
                 .forum-description-content=data.forum.description

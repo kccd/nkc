@@ -36,6 +36,7 @@
 }
 #moduleResourceInfo .r-info-title{
   font-size: 1.3rem;
+  word-break: break-all;
   font-weight: 700;
 }
 #moduleResourceInfo .r-info-d{

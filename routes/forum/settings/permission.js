@@ -5,6 +5,17 @@ permissionRouter
     const {data, db} = ctx;
     data.roles = await db.RoleModel.find().sort({toc: 1});
     data.grades = await db.UsersGradeModel.find().sort({score: 1});
+    if(ctx.permission("createForumLibrary")) {
+      if(data.forum.lid) {
+        const library = await db.LibraryModel.findOne({_id: data.forum.lid});
+        if(!library) {
+          data.forum.lid = "";
+        } else {
+          data.libraryClosed = library.closed;
+        }
+        
+      }
+    }
     // ctx.template = 'forum/settings/permission.pug';
     ctx.template = 'interface_forum_settings_permission.pug'
 		await next();
