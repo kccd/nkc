@@ -4,7 +4,7 @@ const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
 module.exports = async (ctx, next) => {
-  const {filePath, fileName, resource, fs} = ctx;
+  const {filePath, fileName, resource, fs, tg} = ctx;
   if(filePath && ctx.method === 'GET') {
     let stats;
     try{
@@ -67,7 +67,11 @@ module.exports = async (ctx, next) => {
       } else {
         ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
       }
-      ctx.body = fs.createReadStream(filePath);
+      if(tg) {
+        ctx.body = fss.createReadStream(filePath).pipe(tg.throttle());
+      } else {
+        ctx.body = fss.createReadStream(filePath);
+      }
       ctx.set('Content-Length', stats.size);
     }
     await next();

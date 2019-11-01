@@ -27,9 +27,32 @@ function () {
         selectedLibrariesId: [],
         permission: [],
         lastHistoryLid: "",
-        selectedCategory: "book"
+        selectedCategory: "book",
+        listCategories: ["book", "paper", "program", "media", "other"],
+        categories: [{
+          id: "book",
+          name: "图书"
+        }, {
+          id: "paper",
+          name: "论文"
+        }, {
+          id: "program",
+          name: "程序"
+        }, {
+          id: "media",
+          name: "媒体"
+        }, {
+          id: "other",
+          name: "其他"
+        }]
+      },
+      watch: {
+        listCategories: function listCategories() {
+          this.saveCategoriesToLocalStorage();
+        }
       },
       mounted: function mounted() {
+        this.getCategoriesFromLocalStorage();
         var libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
         var childFolderId = libraryVisitFolderLogs[this.lid];
         var this_ = this;
@@ -97,7 +120,22 @@ function () {
           }
         },
         folderList: function folderList() {
-          return this.folders.concat(this.files);
+          var listCategories = this.listCategories,
+              files = this.files,
+              folders = this.folders,
+              uid = this.uid;
+          var files_ = files;
+
+          if (listCategories.includes("own") && uid) {
+            files_ = files.filter(function (f) {
+              return f.uid === uid;
+            });
+          }
+
+          files_ = files_.filter(function (f) {
+            return listCategories.includes(f.category);
+          });
+          return folders.concat(files_);
         },
         uploadedCount: function uploadedCount() {
           var count = 0;
@@ -279,17 +317,32 @@ function () {
               throw "未选择文件分类";
             }
 
-            if (!file.folder) throw "未选择目录"; // 上传本地文件
+            if (!file.folder) throw "未选择目录";
 
             if (file.type === "localFile") {
+              return NKC.methods.getFileMD5(file.data);
+            }
+          }).then(function (data) {
+            // 上传本地文件
+            if (file.type === "localFile") {
+              var formData = new FormData();
+              formData.append("fileName", file.data.name);
+              formData.append("type", "checkMD5");
+              formData.append("md5", data);
+              return nkcUploadFile("/r", "POST", formData);
+            }
+          }).then(function (data) {
+            if (data && !data.uploaded && file.type === "localFile") {
               var formData = new FormData();
               formData.append("file", file.data);
               return nkcUploadFile("/r", "POST", formData, function (e, p) {
                 file.progress = p;
               });
+            } else {
+              return data;
             }
           }).then(function (data) {
-            // 替换本地文件信息 同一为线上文件模式
+            // 替换本地文件信息 统一为线上文件模式
             if (file.type === "localFile") {
               var resource = data.r;
               file.data = resource;
@@ -304,21 +357,35 @@ function () {
               }
             }
           }).then(function () {
-            // 将线上文件提交到文库
-            var name = file.name,
-                description = file.description,
-                category = file.category,
-                rid = file.rid,
-                folder = file.folder;
-            var body = {
-              rid: rid,
-              name: name,
-              description: description,
-              category: category
-            };
-            var formData = new FormData();
-            formData.append("body", JSON.stringify(body));
-            return nkcAPI("/library/".concat(folder._id), "POST", body);
+            if (file.type === "modify") {
+              // 批量修改
+              var _id = file._id,
+                  name = file.name,
+                  description = file.description,
+                  category = file.category;
+              var body = {
+                name: name,
+                description: description,
+                category: category
+              };
+              return nkcAPI("/library/".concat(_id), "PATCH", body);
+            } else {
+              // 将线上文件提交到文库
+              var _name = file.name,
+                  _description = file.description,
+                  _category = file.category,
+                  rid = file.rid,
+                  folder = file.folder;
+              var _body = {
+                rid: rid,
+                name: _name,
+                description: _description,
+                category: _category
+              };
+              var formData = new FormData();
+              formData.append("body", JSON.stringify(_body));
+              return nkcAPI("/library/".concat(folder._id), "POST", _body);
+            }
           }).then(function () {
             file.status = "uploaded";
           })["catch"](function (data) {
@@ -341,6 +408,22 @@ function () {
         toList: function toList() {
           this.selectFolder(this.folder);
           this.pageType = "list";
+        },
+        // 将用户已选择的筛选分类存到本地
+        saveCategoriesToLocalStorage: function saveCategoriesToLocalStorage() {
+          var listCategories = this.listCategories;
+          var libraryListCategories = NKC.methods.getFromLocalStorage("libraryListCategories");
+          libraryListCategories[this.lid] = listCategories;
+          NKC.methods.saveToLocalStorage("libraryListCategories", libraryListCategories);
+        },
+        // 读取本地存储的筛选分类
+        getCategoriesFromLocalStorage: function getCategoriesFromLocalStorage() {
+          var libraryListCategories = NKC.methods.getFromLocalStorage("libraryListCategories");
+          var listCategories = libraryListCategories[this.lid];
+
+          if (listCategories) {
+            this.listCategories = listCategories;
+          }
         },
         // 文件夹访问记录存到浏览器本地
         saveToLocalStorage: function saveToLocalStorage(id) {
@@ -420,6 +503,8 @@ function () {
               }
             }
           }
+
+          document.getElementById("moduleLibraryInput").value = "";
         },
         // 选择文件夹
         selectFolder: function selectFolder(folder, scrollToTop) {
@@ -463,18 +548,56 @@ function () {
         editFolder: function editFolder(folder) {
           if (this.mark) return;
           var typeStr = "文件夹";
+          var modalData = [{
+            dom: "input",
+            type: "text",
+            label: "".concat(typeStr, "\u540D\u79F0"),
+            value: folder.name
+          }, {
+            dom: "textarea",
+            label: "".concat(typeStr, "\u7B80\u4ECB"),
+            value: folder.description
+          }];
 
           if (folder.type === "file") {
             typeStr = "文件";
+            modalData.push({
+              dom: "radio",
+              label: "文件分类",
+              radios: [{
+                name: "图书",
+                value: "book"
+              }, {
+                name: "论文",
+                value: "paper"
+              }, {
+                name: "程序",
+                value: "program"
+              }, {
+                name: "媒体",
+                value: "media"
+              }, {
+                name: "其他",
+                value: "other"
+              }],
+              value: folder.category
+            });
           }
 
           CommonModal.open(function (res) {
             var name = res[0].value;
             var description = res[1].value;
+            var category = "";
+
+            if (folder.type === "file") {
+              category = res[2].value;
+            }
+
             if (!name) return sweetError("名称不能为空");
             nkcAPI("/library/" + folder._id, "PATCH", {
               name: name,
-              description: description
+              description: description,
+              category: category
             }).then(function () {
               self.app.selectFolder(self.app.folder);
               window.CommonModal.close();
@@ -483,16 +606,7 @@ function () {
             });
           }, {
             title: "\u7F16\u8F91".concat(typeStr),
-            data: [{
-              dom: "input",
-              type: "text",
-              label: "".concat(typeStr, "\u540D\u79F0"),
-              value: folder.name
-            }, {
-              dom: "textarea",
-              label: "".concat(typeStr, "\u7B80\u4ECB"),
-              value: folder.description
-            }]
+            data: modalData
           });
         },
         // 删除文件夹

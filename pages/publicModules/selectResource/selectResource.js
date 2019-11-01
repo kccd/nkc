@@ -145,18 +145,13 @@ NKC.modules.SelectResource = function() {
         dom.one("paste", function(e) {
           var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
           var files = clipboardData.items || [];
-          var toUploader = false;
           for(var i = 0; i < files.length; i ++) {
             var file = files[i].getAsFile();
             if(!file) continue;
-            toUploader = true;
             var f = self.newFile(file);
             self.files.unshift(f);
             self.startUpload(f);
           }
-          // /*if(toUploader) {
-          //   self.changePageType("uploader", true);
-          // }*/
         });
       },
       pasteContent: function() {
@@ -273,15 +268,30 @@ NKC.modules.SelectResource = function() {
             if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
             if(f.status === "uploading") throw "文件正在上传...";
             if(f.status === "uploaded") throw "文件已上传成功！";
-            var formData = new FormData();
-            formData.append("file", f.data);
-            if(f.data.constructor === Blob) {
-              formData.append("fileName", Date.now() + ".png");
-            }
             f.status = "uploading";
-            return nkcUploadFile("/r", "POST", formData, function(e, progress) {
-              f.progress = progress;
-            });
+            // 获取文件md5
+            return NKC.methods.getFileMD5(f.data)
+          })
+          .then(function(md5) {
+            // 将md5发送到后端检测文件是否已上传
+            var formData = new FormData();
+            formData.append("type", "checkMD5");
+            formData.append("fileName", f.name);
+            formData.append("md5", md5);
+            return nkcUploadFile("/r", "POST", formData);
+          })
+          .then(function(data) {
+            if(!data.uploaded) {
+              // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
+              var formData = new FormData();
+              formData.append("file", f.data);
+              if(f.data.constructor === Blob) {
+                formData.append("fileName", Date.now() + ".png");
+              }
+              return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+                f.progress = progress;
+              });
+            }
           })
           .then(function() {
             f.status = "uploaded";

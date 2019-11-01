@@ -18,9 +18,38 @@ NKC.modules.Library = class {
         selectedLibrariesId: [],
         permission: [],
         lastHistoryLid: "",
-        selectedCategory: "book"
+        selectedCategory: "book",
+        listCategories: ["book", "paper", "program", "media", "other"],
+        categories: [
+          {
+            id: "book",
+            name: "图书"
+          },
+          {
+            id: "paper",
+            name: "论文"
+          },
+          {
+            id: "program",
+            name: "程序"
+          },
+          {
+            id: "media",
+            name: "媒体"
+          },
+          {
+            id: "other",
+            name: "其他"
+          }
+        ]
+      },
+      watch:{
+        listCategories() {
+          this.saveCategoriesToLocalStorage();
+        }
       },
       mounted() {
+        this.getCategoriesFromLocalStorage();
         const libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
         const childFolderId = libraryVisitFolderLogs[this.lid];
         const this_ = this;
@@ -83,7 +112,13 @@ NKC.modules.Library = class {
           }
         },
         folderList() {
-          return this.folders.concat(this.files);
+          const {listCategories, files, folders, uid} = this;
+          let files_ = files;
+          if(listCategories.includes("own") && uid) {
+            files_ = files.filter(f => f.uid === uid);
+          }
+          files_ = files_.filter(f => listCategories.includes(f.category));
+          return folders.concat(files_);
         },
         uploadedCount() {
           let count = 0; 
@@ -244,17 +279,33 @@ NKC.modules.Library = class {
                 throw "未选择文件分类";
               }
               if(!file.folder) throw "未选择目录";
+              if(file.type === "localFile") {
+                return NKC.methods.getFileMD5(file.data);
+              }
+            })
+            .then(data => {
               // 上传本地文件
               if(file.type === "localFile") {
+                const formData = new FormData();
+                formData.append("fileName", file.data.name);
+                formData.append("type", "checkMD5");
+                formData.append("md5", data);
+                return nkcUploadFile("/r", "POST", formData);
+              }
+            })
+            .then(data => {
+              if(data && !data.uploaded && file.type === "localFile") {
                 const formData = new FormData();
                 formData.append("file", file.data);
                 return nkcUploadFile("/r", "POST", formData, (e, p) => {
                   file.progress = p;
                 });
+              } else {
+                return data;
               }
             })
             .then(data => {
-              // 替换本地文件信息 同一为线上文件模式
+              // 替换本地文件信息 统一为线上文件模式
               if(file.type === "localFile") {
                 const resource = data.r;
                 file.data = resource;
@@ -269,19 +320,31 @@ NKC.modules.Library = class {
               }
             })
             .then(() => {
-              // 将线上文件提交到文库
-              const {
-                name, description, category, rid, folder
-              } = file;
-              const body = {
-                rid,
-                name,
-                description,
-                category
-              };
-              const formData = new FormData();
-              formData.append("body", JSON.stringify(body));
-              return nkcAPI(`/library/${folder._id}`, "POST", body);
+              if(file.type === "modify") {
+                // 批量修改
+                const {_id, name, description, category} = file;
+                const body = {
+                  name,
+                  description,
+                  category
+                };
+                return nkcAPI(`/library/${_id}`, "PATCH", body);
+
+              } else {
+                // 将线上文件提交到文库
+                const {
+                  name, description, category, rid, folder
+                } = file;
+                const body = {
+                  rid,
+                  name,
+                  description,
+                  category
+                };
+                const formData = new FormData();
+                formData.append("body", JSON.stringify(body));
+                return nkcAPI(`/library/${folder._id}`, "POST", body);
+              }
             })
             .then(() => {
               file.status = "uploaded";
@@ -307,6 +370,21 @@ NKC.modules.Library = class {
         toList() {
           this.selectFolder(this.folder);
           this.pageType = "list";
+        },
+        // 将用户已选择的筛选分类存到本地
+        saveCategoriesToLocalStorage() {
+          const {listCategories} = this;
+          const libraryListCategories = NKC.methods.getFromLocalStorage("libraryListCategories");
+          libraryListCategories[this.lid] = listCategories;
+          NKC.methods.saveToLocalStorage("libraryListCategories", libraryListCategories);
+        },
+        // 读取本地存储的筛选分类
+        getCategoriesFromLocalStorage() {
+          const libraryListCategories = NKC.methods.getFromLocalStorage("libraryListCategories");
+          const listCategories = libraryListCategories[this.lid];
+          if(listCategories) {
+            this.listCategories = listCategories; 
+          }
         },
         // 文件夹访问记录存到浏览器本地
         saveToLocalStorage(id) {
@@ -359,6 +437,7 @@ NKC.modules.Library = class {
           for(const file of files) {
             this.selectedFiles.push(this.createFile("localFile", file));
           }
+          document.getElementById("moduleLibraryInput").value = "";
         },
         // 选择文件夹
         selectFolder(folder, scrollToTop) {
@@ -404,16 +483,61 @@ NKC.modules.Library = class {
         editFolder(folder) {
           if(this.mark) return;
           let typeStr = "文件夹";
+          let modalData = [
+            {
+              dom: "input",
+              type: "text",
+              label: `${typeStr}名称`,
+              value: folder.name
+            },
+            {
+              dom: "textarea",
+              label: `${typeStr}简介`,
+              value: folder.description
+            }
+          ];
           if(folder.type === "file") {
             typeStr = "文件";
+            modalData.push({
+              dom: "radio",
+              label: "文件分类",
+              radios: [
+                {
+                  name: "图书",
+                  value: "book"
+                },
+                {
+                  name: "论文",
+                  value: "paper"
+                },
+                {
+                  name: "程序",
+                  value: "program"
+                },
+                {
+                  name: "媒体",
+                  value: "media"
+                },
+                {
+                  name: "其他",
+                  value: "other"
+                }
+              ],
+              value: folder.category
+            })
           }
           CommonModal.open(function(res) {
             const name = res[0].value;
             const description = res[1].value;
+            let category = "";
+            if(folder.type === "file") {
+              category = res[2].value;
+            }
             if(!name) return sweetError("名称不能为空");
             nkcAPI("/library/" + folder._id, "PATCH", {
               name,
-              description
+              description,
+              category
             })
               .then(function() {
                 self.app.selectFolder(self.app.folder);
@@ -424,19 +548,7 @@ NKC.modules.Library = class {
               })
           }, {
             title: `编辑${typeStr}`,
-            data: [
-              {
-                dom: "input",
-                type: "text",
-                label: `${typeStr}名称`,
-                value: folder.name
-              },
-              {
-                dom: "textarea",
-                label: `${typeStr}简介`,
-                value: folder.description
-              }
-            ]
+            data: modalData
           });
         },
         // 删除文件夹

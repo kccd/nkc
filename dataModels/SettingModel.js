@@ -109,5 +109,90 @@ settingSchema.statics.saveSettingsToRedis = async (_id) => {
   }
   return settings;
 };
+/* 
+  根据用户的证书以及等级 获取用户与下载相关的设置
+  @param {Schema Object} user 用户对象
+*/
+settingSchema.statics.getDownloadSettingsByUser = async (user) => {
+  const SettingModel = mongoose.model("settings");
+  const {options} = await SettingModel.getSettings("download");
+  let fileCountOneDay = 0, speed = 1;
+  const optionsObj = {};
+  for(const o of options) {
+    optionsObj[`${o.type}_${o.id}`] = o;
+  }
+  if(!user) {
+    const option = optionsObj[`role_visitor`];
+    fileCountOneDay = option.fileCountOneDay;
+    speed = option.speed;
+  } else {
+    if(!user.roles) {
+      await user.extendRoles();
+    }
+    if(!user.grade) {
+      await user.extendGrade();
+    }
+    for(const role of user.roles) {
+      const option = optionsObj[`role_${role._id}`];
+      if(!option) continue;
+      if(fileCountOneDay < option.fileCountOneDay) {
+        fileCountOneDay = option.fileCountOneDay;
+      }
+      if(speed < option.speed) {
+        speed = option.speed;
+      }
+    }
+    const gradeOption = optionsObj[`grade_${user.grade._id}`];
+    if(gradeOption) {
+      if(fileCountOneDay < gradeOption.fileCountOneDay) {
+        fileCountOneDay = gradeOption.fileCountOneDay;
+      }
+      if(speed < gradeOption.speed) {
+        speed = gradeOption.speed;
+      }
+    }
+  }
+  return {
+    speed,
+    fileCountOneDay
+  }
+};
+
+/* 
+  根据用户的证书以及等级 获取用户与上传相关的设置
+  @param {Schema Object} user 用户对象
+*/
+settingSchema.statics.getUploadSettingsByUser = async (user) => {
+  if(!user) throwErr(500, "user is required");
+  const uploadSettings = await mongoose.model("settings").getSettings("upload");
+  const {options} = uploadSettings;
+  const optionsObj = {};
+  options.map(o => {
+    const {type, id} = o;
+    optionsObj[`${type}_${id}`] = o;
+  });
+  if(!user.grade) await user.extendGrade();
+  if(!user.roles) await user.extendRoles();
+  let fileCountOneDay = 0, extensions = [];
+  const gradeOption = optionsObj[`grade_${user.grade._id}`];
+  const userOptions = gradeOption? [gradeOption]: [];
+  for(const role of user.roles) {
+    const option = optionsObj[`role_${role._id}`];
+    if(option) userOptions.push(option);
+  }
+  for(let i = 0; i < userOptions.length; i++) {
+    const option = userOptions[i];
+    if(fileCountOneDay < option.fileCountOneDay) fileCountOneDay = option.fileCountOneDay;
+    if(i === 0) {
+      extensions = option.blackExtensions;
+    } else {
+      extensions = extensions.filter(e => option.blackExtensions.includes(e));
+    }
+  }
+  return {
+    fileCountOneDay,
+    blackExtensions: extensions
+  }
+};
 
 module.exports = mongoose.model('settings', settingSchema);

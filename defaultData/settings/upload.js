@@ -1,12 +1,13 @@
 module.exports = {
-  _id: 'download',
+  _id: "upload",
   c: {
     options: [
       /* {
         id: 1,
         type: "role",
-        fileCountOneDay: 3,
-        speed: 1024, // KB
+        blackExtensions: [],
+        fileCountOneDay: 0,
+        diskSize: 0
       } */
     ]
   }

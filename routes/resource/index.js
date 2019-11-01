@@ -1,34 +1,89 @@
 const Router = require('koa-router');
 const resourceRouter = new Router();
 const pathModule = require('path');
-const util = require("util");
 const infoRouter = require("./info");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["wav", "amr", "mp3"];
+
+const {ThrottleGroup} = require("stream-throttle");
+
+// 存放用户设置
+const downloadGroups = {};
+
+/* 
+{
+  tg: Object, // 限速
+  rate: 2345, // 速度 b
+} 
+*/
+
 resourceRouter
   .get('/', async (ctx, next) => {
-    ctx.throw(501, 'a resource ID is required.');
-    await next()
+    const {db, data} = ctx;
+    const {user} = data;
+    if(!user) ctx.throw(400, "权限不足");
+    const uploadSettings = await db.SettingModel.getUploadSettingsByUser(user);
+    data.extensions = uploadSettings.extensions; 
+    data.fileCount = uploadSettings.fileCountOneDay;
+    await next();
   })
   .get('/:rid', async (ctx, next) => {
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'mp4', '3gp', 'swf', 'mp3'];
-    const { rid } = ctx.params;
-    const { data, db, fs, settings } = ctx;
-    const { cache } = settings;
-    const {selectDiskCharacterDown} = settings.mediaPath;
-    const resource = await db.ResourceModel.findOnly({ rid });
-    const { path, ext } = resource;
-    let filePath = selectDiskCharacterDown(resource);
-    filePath = filePath + path;
-    if (!extArr.includes(resource.ext.toLowerCase()) && !ctx.permission("getAttachments")) {
+    const {params, data, db, fs, settings, nkcModules} = ctx;
+    const {rid} = params;
+    const {cache} = settings;
+    const resource = await db.ResourceModel.findOnly({rid});
+    const {mediaType, ext} = resource;
+    let filePath = await resource.getFilePath();
+    let speed;
+    if(mediaType === "mediaAttachment") {
+      const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
+      const {fileCountOneDay} = downloadOptions;
+      speed = downloadOptions.speed;
+      if(fileCountOneDay === 0) {
+        if(!data.user) {
+          ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
+        } else {
+          ctx.throw(403, '您当前账号等级无法下载附件，请发表优质内容提升等级。');
+        }
+      }
+      let downloadToday;
+      const match = {
+        toc: {
+          $gte: nkcModules.apiFunction.today()
+        }  
+      };
       if(!data.user) {
-        ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
+        // 游客
+        match.ip = ctx.address;
+        match.uid = "";
       } else {
-        ctx.throw(403, '您当前账号等级无法下载附件，请发表优质内容提升等级。');
+        // 已登录用户
+        match.uid = data.user.uid;
+      }
+      const logs = await db.DownloadLogModel.aggregate([
+        {
+          $match: match
+        },
+        {
+          $group: {
+            _id: "$rid",
+            count: {
+              $sum: 1
+            }
+          }
+        }
+      ]);
+      downloadToday = logs?logs.map(l => l._id): [];
+      if(!downloadToday.includes(resource.rid) && downloadToday.length >= fileCountOneDay) {
+        if(data.user) {
+          ctx.throw(403, "今日下载的附件数量已达上限，请明天再试。");
+        } else {
+          ctx.throw(403, `未登录用户每天只能下载${fileCountOneDay}个附件，请登录或注册后重试。`);
+        }
       }
     }
-    if (extArr.includes(resource.ext.toLowerCase())) {
+    if (mediaType === "mediaPicture") {
       try {
         await fs.access(filePath);
       } catch (e) {
@@ -38,30 +93,100 @@ resourceRouter
     }
     // 在resource中添加点击次数
     await resource.update({$inc:{hits:1}});
+    
     ctx.filePath = filePath;
     ctx.resource = resource;
     ctx.type = ext;
+
+    // 限速
+    if(resource.mediaType === "mediaAttachment") {
+      let key;
+      if(data.user) {
+        key = `user_${data.user.uid}`;
+      } else {
+        key = `ip_${ctx.address}`;
+      }
+      let speedObj = downloadGroups[key];
+      if(!speedObj || speedObj.speed !== speed) {
+        speedObj = {
+          tg: new ThrottleGroup({rate: speed*1024}),
+          speed
+        };
+        downloadGroups[key] = speedObj;
+      }
+      ctx.tg = speedObj.tg;
+      // 写入下载记录
+      const downloadLog = db.DownloadLogModel({
+        uid: data.user? data.user.uid: "",
+        ip: ctx.address,
+        port: ctx.port,
+        rid: resource.rid
+      });
+      await downloadLog.save();
+    }
     await next()
   })
   .post('/', async (ctx, next) => {
-    const { fs } = ctx;
-    const { imageMagick, ffmpeg } = ctx.tools;
-    const settings = ctx.settings;
-    const { largeImage, upload } = settings.upload.sizeLimit;
-    const { mediaPath, uploadPath, generateFolderName,extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = settings.upload;
-    const {selectDiskCharacterUp} = settings.mediaPath;
+    const {fs, tools, settings, db, data, nkcModules} = ctx;
+    const { imageMagick, ffmpeg } = tools;
+    const {upload, mediaPath} = settings;
+    const {generateFolderName, extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = upload;
+    const {selectDiskCharacterUp} = mediaPath;
+    const {user} = data;
     
     let mediaRealPath;
-    const file = ctx.body.files.file;
-    const fields = ctx.body.fields;
+    const {files, fields} = ctx.body;
+    const {file} = files;
+    const {type, fileName, md5} = fields;
+
+
+    const {fileCountOneDay, blackExtensions} = await db.SettingModel.getUploadSettingsByUser(data.user);
+    const fileCount = await db.ResourceModel.count({uid: data.user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
+    if(fileCount >= fileCountOneDay) ctx.throw(403, "今日上传文件数量已达上限");
+
+    if(type === "checkMD5") {
+      // 前端提交待上传文件的md5，用于查找resources里是否与此md5匹配的resource
+      // 若不匹配，则返回“未匹配”给前端，前端收到请求后会再次向服务器发起请求，并将待上传的文件上传到服务器。
+      // 若匹配，则读取目标resource上的相关信息，并写入到新的resource中。封面图、
+      if(!md5) ctx.throw(400, "md5不能为空");
+      if(!fileName) ctx.throw(400, "文件名不能为空");
+      resource = await db.ResourceModel.findOne({hash: md5, mediaType: "mediaAttachment"});
+      if(!resource) {
+        data.uploaded = false;
+        return await next();
+      }
+      if(blackExtensions.includes(resource.ext)) ctx.throw(403, "文件格式不被允许");
+      // 在此处复制原resource的信息
+      const newResource = resource.toObject();
+      delete newResource.__v;
+      delete newResource._id;
+      delete newResource.references;
+      delete newResource.tlm;
+      delete newResource.originId;
+      delete newResource.toc;
+
+      newResource.rid = await db.SettingModel.operateSystemID("resources", 1);
+      newResource.uid = user.uid;
+      newResource.hash = md5;
+      newResource.oname = fileName;
+
+      const r = db.ResourceModel(newResource);
+      await r.save();
+      data.r = r;
+      data.uploaded = true;
+      return await next();
+    }
+
     if(!file) {
       ctx.throw(400, 'no file uploaded');
     }
-    let { name, size, path } = file;
-    if(name === "blob" && fields.fileName) name = fields.fileName;
+    let { name, size, path, hash} = file;
+
+    if(name === "blob" && fileName) name = fileName;
     // 获取文件格式 extension
     const extensionE = pathModule.extname(name).replace('.', '');
     let extension = extensionE.toLowerCase();
+    if(blackExtensions.includes(extension)) ctx.throw(403, "文件格式不被允许");
     // 图片最大尺寸
     // const { largeImage } = settings.upload.sizeLimit;
     // 根据自增id定义文件新名称 saveName
@@ -89,6 +214,7 @@ resourceRouter
       mediaRealPath = selectDiskCharacterUp("mediaAttachment");
       mediaType = "mediaAttachment";
     }
+
     // 带有年份月份的文件储存路径 /2018/04/
     // const middlePath = generateFolderName(uploadPath);
     let middlePath = generateFolderName(mediaRealPath);
@@ -96,7 +222,7 @@ resourceRouter
     let mediaFilePath = mediaRealPath + middlePath + saveName;
 
     // 图片裁剪水印
-    if (['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'].indexOf(extension.toLowerCase()) > -1) {
+    if (pictureExts.indexOf(extension.toLowerCase()) > -1) {
       // 如果格式满足则生成缩略图
       const descPathOfThumbnail = generateFolderName(thumbnailPath); // 略缩图存放路径
       const descPathOfMedium = generateFolderName(mediumPath); // 中号图存放路径
@@ -125,6 +251,7 @@ resourceRouter
           tpath: middlePath + saveName,
           ext: extension,
           size,
+          hash,
           uid: ctx.data.user.uid,
           toc: Date.now(),
           mediaType: "mediaAttachment"
@@ -304,6 +431,7 @@ resourceRouter
           tpath: middlePath + saveName,
           ext: extension,
           size,
+          hash,
           uid: ctx.data.user.uid,
           toc: Date.now(),
           mediaType: "mediaAttachment"
@@ -353,6 +481,7 @@ resourceRouter
           tpath: middlePath + saveName,
           ext: extension,
           size,
+          hash,
           uid: ctx.data.user.uid,
           toc: Date.now(),
           mediaType: "mediaAttachment"
@@ -379,6 +508,7 @@ resourceRouter
       tpath: middlePath + saveName,
       ext: extension,
       size,
+      hash,
       originId,
       uid: ctx.data.user.uid,
       toc: Date.now(),

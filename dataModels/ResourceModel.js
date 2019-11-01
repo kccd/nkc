@@ -12,6 +12,12 @@ const resourceSchema = new Schema({
     type: String,
     default: ""
   },
+  // md5
+  hash: {
+    type: String,
+    default: "",
+    index: 1
+  },
   ext: {
     type: String,
     default: ''
@@ -61,39 +67,19 @@ const resourceSchema = new Schema({
     type: Date,
     default: null,
     index: 1
-  },
-  category: {
-    type: String,
-    default: ""
   }
 });
-/*
-* 将资源数据推送到搜索数据库
-* @param {Object} resource 资源对象
-* @author pengxiguaa 2019-10-18
-* */
-resourceSchema.statics.saveResourceToES = async (rid) => {
-  const resource = await mongoose.model("resources").findOne({rid});
-  if(!resource) throwErr(500, `resource not found, rid: ${rid}`);
-  const elasticSearch = require("../nkcModules/elasticSearch");
-  const resourceData = {
-    tid: resource.rid,
-    t: resource.name || resource.oname,
-    c: resource.description,
-    toc: resource.tlm || resource.toc,
-    mainForumsId: resource.forumsId,
-    uid: resource.uid
-  };
-  await elasticSearch.save("resource", resourceData);
+/* 
+  获取文件路径
+*/
+resourceSchema.methods.getFilePath = async function() {
+  const {selectDiskCharacterDown} = require("../settings/mediaPath");
+  const {path} = this;
+  let filePath = selectDiskCharacterDown(this);
+  filePath += path;
+  return filePath;
 };
 
-/*
-* 从搜索数据库中删掉该资源数据
-* @param {String} rid 资源ID
-* @author pengxiguaa 2019-10-18
-* */
-resourceSchema.statics.removeFromES = async (rid) => {
-  const elasticSearch = require("../nkcModules/elasticSearch");
-  await elasticSearch.delete("resource", rid);
-};
+
+
 module.exports = mongoose.model('resources', resourceSchema);

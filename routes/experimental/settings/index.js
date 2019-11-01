@@ -7,6 +7,7 @@ const userRouter = require('./user');
 const scoreRouter = require('./score');
 const operationRouter = require('./operation');
 const downloadRouter = require('./download');
+const uploadRouter = require('./upload');
 const gradeRouter = require('./grade');
 const kcbRouter = require('./kcb');
 const logRouter = require('./log');
@@ -61,7 +62,8 @@ settingRouter
 	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
 	.use('/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
 	.use('/grade', gradeRouter.routes(), gradeRouter.allowedMethods())
-	.use('/download', downloadRouter.routes(), downloadRouter.allowedMethods())
+  .use('/download', downloadRouter.routes(), downloadRouter.allowedMethods())
+  .use('/upload', uploadRouter.routes(), uploadRouter.allowedMethods())
 	.use('/role', roleRouter.routes(), roleRouter.allowedMethods())
 	.use('/base', baseRouter.routes(), baseRouter.allowedMethods())
   .use('/operation', operationRouter.routes(), operationRouter.allowedMethods())
