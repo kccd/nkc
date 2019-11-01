@@ -188,7 +188,7 @@ function () {
         // 默认只加载顶层文件夹
         // 可通过lid加载指定的文件夹，并自动定位、展开上级目录
         initFolders: function initFolders(lid) {
-          var url = "/library?type=init&lid=".concat(lid);
+          var url = "/library?type=init&lid=".concat(lid, "&t=").concat(Date.now());
           nkcAPI(url, "GET").then(function (data) {
             self.app.folders = data.folders;
             self.app.folder = data.folder;
@@ -205,9 +205,9 @@ function () {
           var url;
 
           if (folder) {
-            url = "/library?type=getFolders&lid=".concat(folder._id);
+            url = "/library?type=getFolders&lid=".concat(folder._id, "&t=").concat(Date.now());
           } else {
-            url = "/library?type=getFolders";
+            url = "/library?type=getFolders&t=".concat(Date.now());
           }
 
           nkcAPI(url, "GET").then(function (data) {

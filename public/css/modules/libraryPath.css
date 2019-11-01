@@ -134,6 +134,11 @@
   width: 100%;
 }
 #moduleLibraryPath .warning {
-  padding: 0 1rem 1rem 1rem;
+  padding: 0 1rem 0.5rem 1rem;
   color: #e85a71;
+}
+#moduleLibraryPath .list-info {
+  font-size: 1rem;
+  color: #9baec8;
+  padding: 0 1rem 0.5rem 1rem;
 }

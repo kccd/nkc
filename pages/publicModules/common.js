@@ -293,7 +293,12 @@ NKC.methods.toLogin = function(type) {
 */
 NKC.methods.scrollTo = function(options) {
   if(options.dom) {
-    options.dom.scrollTo(options);  
+    if(typeof options.dom.scrollTo === "undefined") {
+      var dom = $(options.dom);
+      dom.scrollTop(options.top);
+    } else {
+      options.dom.scrollTo(options);  
+    }
   } else {
     window.scrollTo(options);
   }
