@@ -172,7 +172,7 @@ function () {
         // 网页切换事件
         onpopstate: function onpopstate(e) {
           var state = e.state;
-          var lid = this.nav[0]._id;
+          var lid = this.lid;
           if (state && state.lid) lid = state.lid;
           this.getList(lid)["catch"](function (err) {
             sweetError(err);
@@ -515,6 +515,14 @@ function () {
           } else {
             this.selectFile(folder);
           }
+        },
+        // 点击文件夹目录时
+        selectNavFolder: function selectNavFolder(f) {
+          if (this.pageType !== "list") {
+            this.pageType = "list";
+          }
+
+          this.selectFolder(f);
         },
         // 移动文件夹或文件
         moveFolder: function moveFolder(libraryId) {

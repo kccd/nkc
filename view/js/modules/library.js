@@ -153,7 +153,7 @@ NKC.modules.Library = class {
         // 网页切换事件
         onpopstate(e) {
           const {state} = e;
-          let lid = this.nav[0]._id;
+          let lid = this.lid;
           if(state && state.lid) lid = state.lid;
           this.getList(lid)
             .catch(err => {
@@ -447,6 +447,13 @@ NKC.modules.Library = class {
           } else {
             this.selectFile(folder);
           }
+        },
+        // 点击文件夹目录时
+        selectNavFolder(f) {
+          if(this.pageType !== "list") {
+            this.pageType = "list";
+          }
+          this.selectFolder(f);
         },
         // 移动文件夹或文件
         moveFolder(libraryId) {

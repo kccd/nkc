@@ -3,7 +3,7 @@
   .lib-tools
     .lib-nav
       .lib-nav-body  
-        .lib-nav-li(v-for="s, index in nav" @click="selectFolder(s)") 
+        .lib-nav-li(v-for="s, index in nav" @click="selectNavFolder(s)") 
           img(:src="getUrl('fileCover', 'folder')")
           | {{s.name}}
           .fa.fa-pencil(

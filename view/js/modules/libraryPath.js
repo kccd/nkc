@@ -117,7 +117,7 @@ NKC.modules.LibraryPath = class {
         // 默认只加载顶层文件夹
         // 可通过lid加载指定的文件夹，并自动定位、展开上级目录
         initFolders(lid) {
-          const url = `/library?type=init&lid=${lid}`;
+          const url = `/library?type=init&lid=${lid}&t=${Date.now()}`;
           nkcAPI(url, "GET")
             .then(data => {
               self.app.folders = data.folders;
@@ -134,9 +134,9 @@ NKC.modules.LibraryPath = class {
         getFolders(folder) {
           let url;
           if(folder) {
-            url = `/library?type=getFolders&lid=${folder._id}`;
+            url = `/library?type=getFolders&lid=${folder._id}&t=${Date.now()}`;
           } else {
-            url = `/library?type=getFolders`;
+            url = `/library?type=getFolders&t=${Date.now()}`;
           }
           nkcAPI(url, "GET")
             .then((data) => {
