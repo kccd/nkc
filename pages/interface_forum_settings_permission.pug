@@ -115,7 +115,16 @@ block content
                     .radiobox(style='display: inline-block;margin-right: 1rem;')
                       span 禁止
                       input(type='radio' name='allowedAnonymousPost'  checked=!forum.allowedAnonymousPost)
-
+              if permission("createForumLibrary")         
+                .form-group        
+                  label.col-sm-3.control-label 专业文库
+                  .col-sm-5.p-t-05
+                    if !data.forum.lid
+                      button.btn.btn-sm.btn-default(onclick=`libraryOperation('${data.forum.fid}', 'create')`) 开设文库 
+                    else if data.libraryClosed
+                      button.btn.btn-sm.btn-default(onclick=`libraryOperation('${data.forum.fid}', 'open')`) 开启文库  
+                    else   
+                      button.btn.btn-sm.btn-default(onclick=`libraryOperation('${data.forum.fid}', 'close')`) 关闭文库  
               .form-group
                 .col-sm-5.col-sm-offset-3
                   button.btn.btn-default(onclick=`submit("${forum.fid}")`) 保存

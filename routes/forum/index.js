@@ -63,7 +63,7 @@ forumRouter
 
     await newForum.save();
 
-    await newForum.createLibrary(data.user.uid);
+    // await newForum.createLibrary(data.user.uid);
     
     await redis.cacheForums();
 		data.forum = newForum;

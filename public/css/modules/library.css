@@ -113,6 +113,7 @@
   height: 3.2rem;
   width: 8rem;
   text-align: center;
+  line-height: 3.4rem;
   font-size: 1.3rem;
   text-align: right;
   color: #999;
@@ -123,6 +124,11 @@
 }
 #moduleLibrary .lib-list-li .list-body .list-options > span {
   font-size: 0;
+}
+#moduleLibrary .lib-list-li .list-body .list-options .fa-cloud-download {
+  vertical-align: middle;
+  color: #5cb85c;
+  font-size: 1.8rem;
 }
 #moduleLibrary .lib-list-li .list-body .list-options .list-options-link {
   display: inline-block;

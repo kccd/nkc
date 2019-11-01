@@ -11,6 +11,10 @@
             h5(v-if="d.label") {{d.label}}
             input.form-control(v-if="d.dom === 'input'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
             textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4" @keyup.enter="submit" )
+            .radio(v-if="d.dom === 'radio'")
+              label.m-r-05(v-for="r in d.radios")
+                input(type="radio" :value="r.value" v-model="d.value")
+                span {{r.name}}
       .modal-footer
         .options-button
           a(data-dismiss="modal") 关闭

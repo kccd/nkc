@@ -155,6 +155,12 @@
           if permission("experimentalLibrarySettings")
             li
               a(href=`/e/settings/library`) 文库
+          if permission("experimentalDownloadSettings")
+            li
+              a(href=`/e/settings/upload`) 上传   
+          if permission("experimentalUploadSettings")
+            li
+              a(href=`/e/settings/download`) 下载        
 
           <li role="separator" class="divider"></li>    
           li

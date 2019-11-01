@@ -41,7 +41,8 @@ module.exports = {
 		}
 	},
 	r: {// 资源
-		POST: 'uploadResources',
+    POST: 'uploadResources',
+    // GET: "getUploadSettings",
 		PARAMETER: {
 			GET: 'getResources',
       info: {

@@ -634,6 +634,9 @@
   "moveLibraryFolder": "移动文库目录或文件",
   "getLibraryInfo": "获取文件夹信息",
   "experimentalLibrarySettings": "后台管理-文库设置",
+  "experimentalDownloadSettings": "后台管理-下载设置",
+  "experimentalUploadSettings": "后台管理-上传设置",
+  "getUploadSettings": "获取允许上传附件的格式",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

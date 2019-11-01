@@ -261,6 +261,14 @@ module.exports = {
       GET: "experimentalLibrarySettings",
       PATCH: "experimentalLibrarySettings"
     },
+    download: {
+      GET: "experimentalDownloadSettings",
+      PATCH: "experimentalDownloadSettings"
+    },
+    upload: {
+      GET: "experimentalUploadSettings",
+      PATCH: "experimentalUploadSettings"
+    },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'

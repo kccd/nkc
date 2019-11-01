@@ -1,6 +1,6 @@
-extends ../experimental
+extends ../../experimental
 block eTitle
-  title 下载设置
+  title 上传设置
 block eContent
   .container-fluid.max-width
     #data.hidden=objToStr({roleOptions: data.roleOptions, gradeOptions: data.gradeOptions})
@@ -10,33 +10,30 @@ block eContent
           thead
             tr
               th 证书
-              th 每天下载附件个数
-              th 下载速度限制
+              th 每天上传文件个数
+              th 禁止的文件格式（英文逗号分隔）
           tbody 
             tr(v-for="o in roleOptions")
               th {{o.name}}
               th 
                 input(type="text" v-model.number="o.fileCountOneDay")
               th
-                input(type="text" v-model.number="o.speed")
-                span &nbsp;KB
+                input.form-control(v-model.number="o.blackExtensions" type="text")
         h4 用户等级（普通会员）        
         table.table.table-striped
           thead
             tr
               th 证书
-              th 每天下载附件个数
-              th 下载速度限制
+              th 每天上传文件个数
+              th 禁止的文件格式（英文逗号分隔）
           tbody 
             tr(v-for="o in gradeOptions")
               th {{o.name}}
               th 
                 input(type="text" v-model.number="o.fileCountOneDay")
               th
-                input(type="text" v-model.number="o.speed")
-                span &nbsp;KB   
+                input.form-control(v-model.number="o.blackExtensions" type="text")
         .m-t-1
           button.btn.btn-primary(@click="submit") 保存
-
 block scripts
-  +includeJS("/experimental/settings/download.js")    
+  +includeJS("/experimental/settings/upload/upload.js")        

@@ -38,9 +38,17 @@
       .options-button(v-if="per('modifyOtherLibrary') || per('createFile')")
         a(@click="toUpload" :class="{'disabled': mark}").active
           .fa.fa-cloud-upload &nbsp;
-          | 上传文件     
+          | 上传文件 
+      .options-button
+        .checkbox
+          label.m-r-05(v-for="c in categories")
+            input(type="checkbox" :value="c.id" v-model="listCategories" :disabled="!!mark")
+            span {{c.name}}
+          label(v-if="uid")
+            input(type="checkbox" value="own" v-model="listCategories" :disabled="!!mark")
+            span 我发布的 
   .lib-list(v-if="pageType === 'list'")
-    .null(v-if="!folders.length && !files.length") 空空如也~
+    .null(v-if="!folderList.length") 空空如也~
     .lib-list-li(v-for="f in folderList") 
       .list-checkbox(v-if="mark")
         .checkbox
@@ -84,7 +92,7 @@
               @click="editFolder(f)"
             )  
               .fa.fa-edit
-          .list-options-link(v-if="f.type === 'file'" @click="visitUrl('/r/' + f.rid, true)" title="点击下载")
+          .list-options-link(v-if="f.type === 'file'" @click="visitUrl('/r/' + f.rid, true)" :title="'点击下载（共被下载' + f.resource.hits + '次）'")
             .fa.fa-cloud-download    
             
           //-.folder-info.fa.fa-ellipsis-v
@@ -110,6 +118,9 @@
         a(@click="createFolder" :class="{'disabled': mark}" v-if="per('modifyOtherLibrary') || per('createFolder')")
           .fa.fa-plus &nbsp;
           | 新建文件夹  
+        a(@click="clearUploaded" v-if="uploadedCount")
+          .fa.fa-trash-o &nbsp;
+          | 移除已上传的记录  
         input.hidden#moduleLibraryInput(type="file" multiple="multiple" @change="selectedLocalFiles")
         a.active(onclick="$('#moduleLibraryInput').click();") 
           .fa.fa-save &nbsp;选择本地文件    
@@ -157,7 +168,7 @@
                     label.m-r-1
                       input(type="radio" value="other" v-model="f.category") 
                       span 其他  
-                .col-xs-12.col-md-6
+                .col-xs-12.col-md-6(v-if="f.type !== 'modify'")
                   .options-button
                     a.active(@click="selectPath(f)") 选择目录
                     span(v-if="f.folderPath") 上传到目录： 

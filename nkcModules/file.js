@@ -384,7 +384,9 @@ exports.modifyPostCovers = async (pid, covers) => {
   await post.update({covers: coversHash});
 };
 
-
+/* 
+  根据postID生成封面图
+*/
 exports.createPostCoverByPostId = async (pid) => {
   const post = await db.PostModel.findOne({pid});
   if(!post) return;
