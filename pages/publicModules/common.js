@@ -291,16 +291,16 @@ NKC.methods.toLogin = function(type) {
     @param {String} behavior smooth: 平滑滚动, instant: 瞬间滚动（默认）
   @author pengxiguaa 2019-10-28  
 */
-NKC.methods.scrollTo = function(options) {
-  if(options.dom) {
-    if(typeof options.dom.scrollTo === "undefined") {
-      var dom = $(options.dom);
-      dom.scrollTop(options.top);
+NKC.methods.scrollTop = function(dom, distance) {
+  if(dom) {
+    if(typeof dom.scrollTo === "undefined") {
+      var dom = $(dom);
+      dom.scrollTop(distance);
     } else {
-      options.dom.scrollTo(options);  
+      dom.scrollTo(0, distance);  
     }
   } else {
-    window.scrollTo(options);
+    window.scrollTo(0, distance);
   }
 }
 /* 

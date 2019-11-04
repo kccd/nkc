@@ -151,7 +151,7 @@ function () {
         format: NKC.methods.format,
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
-        scrollTo: NKC.methods.scrollTo,
+        scrollTo: NKC.methods.scrollTop,
         // 清空已成功上传的文件记录
         clearUploaded: function clearUploaded() {
           this.selectedFiles = this.selectedFiles.filter(function (f) {
@@ -457,9 +457,7 @@ function () {
             self.app.saveToLocalStorage(id);
 
             if (scrollToTop) {
-              self.app.scrollTo({
-                top: 0
-              });
+              self.app.scrollTo(null, 0);
             }
           });
         },

@@ -6,7 +6,7 @@ const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 
 downloadRouter
 .post('/', async (ctx, next) => {
-    const {fs} = ctx;
+    const {fs, nkcModules} = ctx;
     const settings = ctx.settings;
     const {imageMagick} = ctx.tools;
     const timeStr = new Date().getTime();
@@ -265,10 +265,12 @@ downloadRouter
     // //     }
     // // }
     await fs.copyFile(path, mediaFilePath);
+    const hash = await nkcModules.hash.getFileMD5(path);
     await fs.unlink(path);
     // await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,
+      hash,
       oname: name,
       path: middlePath + saveName,
       tpath: middlePath + saveName,

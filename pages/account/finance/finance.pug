@@ -43,7 +43,7 @@ block content
               tbody
                 for record in data.kcbsRecords
                   tr
-                    th= record.toc.toLocaleString()
+                    th= format("YYYY-MM-DD HH:mm:ss", record.toc)
                     th= record._id
                     th= lang('kcbsTypes', record.type)
                     th= record.description
@@ -82,12 +82,12 @@ block content
               tbody
                 for record in data.kcbsRecords
                   tr
-                    th= record.toc.toLocaleString()
+                    th= format("YYYY-MM-DD HH:mm:ss", record.toc)
                     th= record._id
                     th= lang('kcbsTypes', record.type)
                     th= record.description
                     th  
-                      if record.to === user.uid
+                      if record.to === data.user.uid
                         if !record.fromUser
                           span 科创人民很行
                         else 
@@ -98,10 +98,10 @@ block content
                         else 
                           a(href=`/u/${record.to}` target="_blank")= record.toUser.username
                     th
-                      if record.to === user.uid
+                      if record.to === data.user.uid
                         span= record.num/100
                     th
-                      if record.from === user.uid    
+                      if record.from === data.user.uid    
                         span= record.num/100
                     th
                       if record.post
