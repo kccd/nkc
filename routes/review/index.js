@@ -27,7 +27,7 @@ router
       tid.add(post.tid);
       uid.add(post.uid);
     }
-    let threads = await db.ThreadModel.find({tid: {$in: [...tid]}, disabled: false, recycleMark: false});
+    let threads = await db.ThreadModel.find({tid: {$in: [...tid]}, disabled: false});
     threads = await db.ThreadModel.extendThreads(threads, {
       lastPost: false,
       lastPostUser: false,

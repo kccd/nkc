@@ -22,7 +22,8 @@ module.exports = async (ctx, next) => {
     const basename = path.basename(ctx.filePath);
     let ext = path.extname(ctx.filePath);
     ext = ext.replace('.', '');
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif'];
+    ext = ext.toLowerCase();
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'pdf'];
     let name;
     if(resource) {
       name = resource.oname;

@@ -11,7 +11,15 @@ const options = {
   poolSize: 50,
   keepAlive: 120,
   useMongoClient: true
+
+  // 新属性
+  // useNewUrlParser: true,
+  // useUnifiedTopology: true
 };
+
+// 新属性
+// mongoose.set("useCreateIndex", true);
+
 mongoose.Promise = Promise;
 mongoose.connect(`mongodb://${account}${address}:${port}/${database}`, options)
   .then(() => {

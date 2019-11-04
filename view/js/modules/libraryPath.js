@@ -79,11 +79,7 @@ NKC.modules.LibraryPath = class {
             line = line>0?line: 0;
             const height = 30*line; // 每一横排占30px(与css设置有关，若css改动则此处也需要做相应调整。)
             const listBody = this.$refs.listBody;
-            NKC.methods.scrollTo({
-              dom: listBody,
-              top: height,
-              behavior: "smooth"
-            })
+            NKC.methods.scrollTop(listBody, height);
           }, 100)
         },
         // 点击确定

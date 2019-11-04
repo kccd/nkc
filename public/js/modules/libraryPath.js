@@ -149,11 +149,7 @@ function () {
             var height = 30 * line; // 每一横排占30px(与css设置有关，若css改动则此处也需要做相应调整。)
 
             var listBody = _this.$refs.listBody;
-            NKC.methods.scrollTo({
-              dom: listBody,
-              top: height,
-              behavior: "smooth"
-            });
+            NKC.methods.scrollTop(listBody, height);
           }, 100);
         },
         // 点击确定

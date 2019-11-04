@@ -186,6 +186,9 @@ resourceRouter
     // 获取文件格式 extension
     const extensionE = pathModule.extname(name).replace('.', '');
     let extension = extensionE.toLowerCase();
+    if(extension === "") {
+      ctx.throw(400, "未知的文件格式");
+    }
     if(blackExtensions.includes(extension)) {
       await fs.unlink(path);
       ctx.throw(403, "文件格式不被允许");
