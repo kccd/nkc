@@ -226,8 +226,6 @@ resourceRouter
     let middlePath = generateFolderName(mediaRealPath);
     // 路径 d:\nkc\resources\video/2018/04/256647.mp4
     let mediaFilePath = mediaRealPath + middlePath + saveName;
-    console.log(rid);
-    console.log(mediaFilePath);
 
     // 图片裁剪水印
     if (pictureExts.indexOf(extension.toLowerCase()) > -1) {
@@ -506,9 +504,6 @@ resourceRouter
       saveName = rid + "." + extension;
       mediaFilePath = mediaFilePath.replace(nameReg, "mp3");
     }
-    console.log(rid);
-    console.log(mediaFilePath);
-    console.log(middlePath + saveName)
     // await fs.rename(path, mediaFilePath);
     await fs.copyFile(path, mediaFilePath);
     await fs.unlink(path);
