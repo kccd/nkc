@@ -10,6 +10,8 @@ router
       lid: library._id,
       name,
       description,
+      ip: ctx.address,
+      port: ctx.port,
       uid: data.user.uid
     });
     await next();
@@ -83,7 +85,7 @@ router
         ignoreCount ++;
         continue;
       }
-      const foldersCount = await db.LibraryModel.count({lid: id});
+      const foldersCount = await db.LibraryModel.count({lid: id, deleted: false});
       if(foldersCount > 0) {
         ignoreCount ++;
         continue;

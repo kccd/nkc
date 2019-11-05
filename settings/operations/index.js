@@ -66,6 +66,7 @@ const review = require("./review");
 const threads = require("./threads");
 const newResource = require("./newResource");
 const library = require("./library");
+const libraries = require("./libraries");
 const operationObj = {};
 
 
@@ -216,6 +217,7 @@ operationObj.operationTree = {
     nr: newResource, // 新的资源路由
 
     library, // 文库
+    libraries, // 文库
 
     test,
 	}

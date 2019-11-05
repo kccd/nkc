@@ -1,7 +1,20 @@
 const router = require("koa-router")();
 router
   .get("/", async (ctx, next) => {
-    ctx.data.type = "library";
+    const {data, db, query} = ctx;
+    data.type = "library";
+    const lid = query.lid;
+    if(lid) {
+      const library = await db.LibraryModel.findOne({_id: lid});
+      if(library) {
+        data.folderId = library.lid || "";
+        data.tLid = library._id;
+      } 
+    }
+    if(data.forum.lid) {
+      const forumLibrary = await db.LibraryModel.findOne({_id: data.forum.lid});
+      if(forumLibrary && forumLibrary.closed) data.libraryClosed = true;
+    }
     await next();
   })
   .post("/", async (ctx, next) => {

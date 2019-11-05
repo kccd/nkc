@@ -1,5 +1,6 @@
 NKC.modules.Library = class {
-  constructor(lid) {
+  constructor(options) {
+    const {lid, folderId, tLid} = options;
     const self = this;
     self.app = new Vue({
       el: "#moduleLibrary",
@@ -10,6 +11,7 @@ NKC.modules.Library = class {
         folders: [],
         files: [],
         lid,
+        tLid,
         sort: "time",
         histories: [],
         index: 0,
@@ -41,7 +43,8 @@ NKC.modules.Library = class {
             id: "other",
             name: "其他"
           }
-        ]
+        ],
+        protocol: false, // 是否同意协议
       },
       watch:{
         listCategories() {
@@ -49,6 +52,9 @@ NKC.modules.Library = class {
         }
       },
       mounted() {
+        if(folderId) {
+          this.saveToLocalStorage(folderId);
+        }
         this.getCategoriesFromLocalStorage();
         const libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
         const childFolderId = libraryVisitFolderLogs[this.lid];
@@ -97,6 +103,11 @@ NKC.modules.Library = class {
         window.onpopstate = this.onpopstate;
       },
       computed: {
+        uploading() {
+          for(const f of this.selectedFiles) {
+            if(f.status === "uploading") return true;
+          }
+        },
         lastFolder() {
           var length = this.nav.length;
           if(length > 1) {
@@ -126,6 +137,13 @@ NKC.modules.Library = class {
             if(f.status === "uploaded") count ++;
           });
           return count;
+        },
+        unUploadedCount() {
+          let count = 0;
+          this.selectedFiles.map(f => {
+            if(f.status === "notUploaded") count ++;
+          })
+          return count;
         }
         
       },
@@ -136,6 +154,23 @@ NKC.modules.Library = class {
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
         scrollTo: NKC.methods.scrollTop,
+        // 清空未上传的记录
+        clearUnUploaded() {
+          this.selectedFiles = this.selectedFiles.filter(f => f.status !== "notUploaded");
+        },
+        // 批量设置文件目录
+        selectFilesFolder() {
+          LibraryPath.open((data) => {
+            const {folder, path} = data;
+            for(const f of self.app.selectedFiles) {
+              f.folder = folder;
+              f.folderPath = path;
+            }
+          }, {
+            lid: this.lid,
+            warning: "该操作将覆盖本页所有设置，请谨慎操作。"
+          });
+        },
         // 清空已成功上传的文件记录
         clearUploaded() {
           this.selectedFiles = this.selectedFiles.filter(f => f.status !== "uploaded");
@@ -389,7 +424,7 @@ NKC.modules.Library = class {
         // 文件夹访问记录存到浏览器本地
         saveToLocalStorage(id) {
           const libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
-          libraryVisitFolderLogs[this.nav[0]._id] = id;
+          libraryVisitFolderLogs[this.lid] = id;
           NKC.methods.saveToLocalStorage("libraryVisitFolderLogs", libraryVisitFolderLogs);
         },
         // 添加一条浏览器历史记录

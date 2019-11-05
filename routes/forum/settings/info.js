@@ -52,7 +52,8 @@ infoRouter
       
       if(forum.lid) {
         await db.LibraryModel.updateOne({_id: forum.lid}, {$set: {
-          name: displayName
+          name: displayName,
+          description
         }});
       }
 

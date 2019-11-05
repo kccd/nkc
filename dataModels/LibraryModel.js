@@ -12,6 +12,14 @@ const schema = new mongoose.Schema({
     required: true,
     index: 1
   },
+  ip: {
+    type: String,
+    default: ""
+  },
+  port: {
+    type: String,
+    default: ""
+  },
   // 名称。
   name: {
     type: String,
@@ -118,7 +126,7 @@ const schema = new mongoose.Schema({
   @author pengxiguaa 2019-10-21
 */
 schema.statics.newFolder = async (options = {}) => {
-  const {name, lid = null, uid, description} = options;
+  const {name, lid = null, uid, description, ip, port} = options;
   const LibraryModel = mongoose.model("libraries");
   const SettingModel = mongoose.model("settings");
   const type = "folder";
@@ -137,6 +145,8 @@ schema.statics.newFolder = async (options = {}) => {
     _id: await SettingModel.operateSystemID("libraries", 1),
     name,
     type,
+    ip,
+    port,
     description,
     lid,
     uid
@@ -157,7 +167,7 @@ schema.statics.newFolder = async (options = {}) => {
   @author pengxiguaa 2019-10-21
 */
 schema.statics.newFile = async (options = {}) => {
-  const {name, description, category, lid, resource} = options;
+  const {name, description, category, lid, resource, ip, port} = options;
   const LibraryModel = mongoose.model("libraries");
   const SettingModel = mongoose.model("settings");
   const type = "file";
@@ -176,6 +186,8 @@ schema.statics.newFile = async (options = {}) => {
     lid,
     uid,
     name,
+    ip,
+    port,
     description,
     size,
     ext,
@@ -290,6 +302,16 @@ schema.methods.getNav = async function() {
   await getParent(this);
   return arr;
 };  
+
+/* 
+  获取当前文件夹或文件夹的目录结构
+  @return {String} 
+*/
+schema.methods.getPath = async function() {
+  const nav = await this.getNav();
+  return "/ " + nav.map(n => n.name).join(" / ");
+}
+
 /* 
   计算当前文件夹以及上层所有文件夹中文件的数量
 */

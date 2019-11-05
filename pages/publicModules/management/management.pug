@@ -18,3 +18,7 @@ if permissionsOr(["visitExperimentalStatus", "complaintGet", "review", "visitPro
       a.module-management(href="/problem/list")
         .fa.fa-exclamation-circle
         span &nbsp;问题列表
+    if permission("getLibraryLogs")
+      a.module-management(href="/libraries/logs")
+        .fa.fa-book
+        span &nbsp;文库记录

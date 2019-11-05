@@ -207,7 +207,7 @@ func.search = async (t, c, options) => {
     size = searchThreadList;
   } else if(t === "column") {
     size = searchColumnList;
-  } else if(t === "searchResourceList") {
+  } else if(t === "resource") {
     size = searchResourceList;
   } else {
     size = searchAllList;
@@ -415,7 +415,7 @@ func.search = async (t, c, options) => {
     });
   }
 
-  if(!["user", "column", "resource"].includes(t)) {
+  if(!["user", "column"].includes(t)) {
     if(fid && fid.length > 0) {
       const fidMatch = {
         bool: {
@@ -430,7 +430,6 @@ func.search = async (t, c, options) => {
       };
       body.query.bool.must[0].bool.should[0].bool.must.push(fidMatch);
       body.query.bool.must[0].bool.should[1].bool.must.push(fidMatch);
-      body.query.bool.must[0].bool.should[5].bool.must.push(fidMatch);
     }
 
     if(author) {

@@ -5,7 +5,8 @@
       .modal-header
         button.close(data-dismiss="modal" aria-label="Close")
           span(aria-hidden="true") &times;
-        h4.modal-title 文件详情
+        h4.modal-title(v-if="!resource.type || resource.type === 'file'") 文件详情
+        h4.modal-title(v-else) 文件夹详情
       .modal-body(v-if="loading").text-center
         .m-t-5.m-b-5 加载中...
       .modal-body(v-else)
@@ -13,14 +14,15 @@
           .r-info-cover
             div
               img(:src="getUrl('cover', resource.cover)" v-if="resource.cover")
+              img(:src="getUrl('fileCover', 'folder')" v-else-if="resource.type === 'folder'")
               img(:src="getUrl('fileCover', resource.ext)" v-else)
           .r-info-content
             .r-info-title {{resource.name || resource.oname}}
             .r-info-author
               img(:src="getUrl('userAvatar', resource.user.avatar, 'sm')")
               a.pointer(@click="visitUrl('/u/' + resource.uid, true)") {{resource.user.username}}
-              span &nbsp;上传于 {{format('YYYY/MM/DD HH:mm:ss', resource.tlm || resource.toc)}}
-            .r-info-size
+              span &nbsp;{{resource.type==='folder'?"创建": "上传"}}于 {{format('YYYY/MM/DD HH:mm:ss', resource.tlm || resource.toc)}}
+            .r-info-size(v-if="resource.type !== 'folder'")
               | 格式：
               span.m-r-1 {{(resource.ext || "未知").toUpperCase()}}
               |大小：
@@ -31,11 +33,11 @@
               .display-i-b(v-for="f, index in forums")
                 a.pointer.m-r-05(@click="visitUrl('/f/' + f.fid, true)") {{f.displayName}}
           .r-info-d {{resource.description || "暂无简介"}}
-          .r-info-bottom.text-right
+          .r-info-bottom.text-right(v-if="resource.type !== 'folder'")
             a.m-r-05.pointer.btn.btn-success.btn-sm(@click="visitUrl('/r/' + resource.rid, true)")
               .fa.fa-cloud-download &nbsp;
-              | 点击下载
-              span(v-if="resource.hits ||resource.resource.hits") &nbsp;{{resource.hits ||resource.resource.hits}}
+              | 点击下载 
+              span(v-if="resource.hits || (resource.resource && resource.resource.hits)") &nbsp;{{resource.hits ||resource.resource.hits}}
             .display-i-b(v-if="(modifyAllResource || uid === resource.uid) && type === 'resource'")
               a.m-r-05.pointer.btn.btn-primary.btn-sm(@click="visitUrl('/library/upload?rid=' + resource.rid, true)")
                 .fa.fa-edit &nbsp;
