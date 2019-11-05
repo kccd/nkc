@@ -19,6 +19,20 @@ block title
 block content
   .container-fluid.max-width
     .row
+      .hidden#data=objToStr({t: data.t, c: data.c})
+      .col-xs-12.col-md-12#app(v-cloak)
+        h4 按条件查询记录
+        .form-inline.m-b-1
+          .form-group
+            select.form-control(v-model='t')
+              option(value='username') 用户名
+              option(value='uid') UID
+          .form-group
+            input.form-control(placeholder='请输入内容' v-model='c' @keyup.enter='search')
+          .form-group
+            button.btn.btn-primary(type='submit' @click='search') 搜索
+            span &nbsp;
+            a.btn.btn-default(type='submit' href='/libraries/logs') 全部
       .col-xs-12.col-md-12
         include ../publicModules/paging/paging_input
         .table-responsive
@@ -85,3 +99,18 @@ block scripts
         .catch(function(err) {})
       
     }
+
+    var data = NKC.methods.getDataById("data");
+    var app = new Vue({
+      el: "#app",
+      data: {
+        t: data.t || "username", // username, uid, ip
+        c: data.c || ""
+      },
+      methods: {
+        search: function() {
+          if(!this.c) return sweetError("请输入筛选内容");
+          NKC.methods.visitUrl("/libraries/logs?t=" + this.t + "&c=" + this.c);
+        }
+      }
+    });

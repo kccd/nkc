@@ -74,6 +74,8 @@ router
       lid: library._id,
       resource,
       name,
+      ip: ctx.address,
+      port: ctx.port,
       category,
       description
     });

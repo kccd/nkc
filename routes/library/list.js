@@ -10,6 +10,8 @@ router
       lid: library._id,
       name,
       description,
+      ip: ctx.address,
+      port: ctx.port,
       uid: data.user.uid
     });
     await next();
