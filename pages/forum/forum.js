@@ -7,7 +7,12 @@ $(function() {
   var leftDom = $("#leftDom");
   dom.html(leftDom.html());
   if(NKC.configs.lid) {
-    window.Library = new NKC.modules.Library(NKC.configs.lid);
+    window.Library = new NKC.modules.Library({
+      lid: NKC.configs.lid,
+      folderId: NKC.configs.folderId,
+      tLid: NKC.configs.tLid,
+      closed: NKC.configs.closed
+    });
   }
 });
 

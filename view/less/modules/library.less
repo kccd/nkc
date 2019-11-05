@@ -15,6 +15,9 @@
     &:hover{
       background-color: #d7e5f0;
     }
+    &.mark{
+      border: 2px solid @primary;
+    }
     cursor: pointer;
     // height: @listHeight;
     margin: 5px 0;
@@ -26,6 +29,7 @@
     .list-cover{
       display: table-cell;
       border: 1px solid #eee;
+      background-color: #fff;
       position: relative;
       &>div{
         height: @listHeight;
@@ -285,5 +289,9 @@
       height: 2rem;
       font-size: 1rem;
     }
+  }
+  .uploading-status{
+    color: #888;
+    font-weight: 700;
   }
 }

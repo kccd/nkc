@@ -5,9 +5,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 NKC.modules.Library =
 /*#__PURE__*/
 function () {
-  function _class(lid) {
+  function _class(options) {
     _classCallCheck(this, _class);
 
+    var lid = options.lid,
+        folderId = options.folderId,
+        tLid = options.tLid;
     var self = this;
     self.app = new Vue({
       el: "#moduleLibrary",
@@ -19,6 +22,7 @@ function () {
         folders: [],
         files: [],
         lid: lid,
+        tLid: tLid,
         sort: "time",
         histories: [],
         index: 0,
@@ -44,7 +48,9 @@ function () {
         }, {
           id: "other",
           name: "其他"
-        }]
+        }],
+        protocol: false // 是否同意协议
+
       },
       watch: {
         listCategories: function listCategories() {
@@ -52,6 +58,10 @@ function () {
         }
       },
       mounted: function mounted() {
+        if (folderId) {
+          this.saveToLocalStorage(folderId);
+        }
+
         this.getCategoriesFromLocalStorage();
         var libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
         var childFolderId = libraryVisitFolderLogs[this.lid];
@@ -103,6 +113,31 @@ function () {
         window.onpopstate = this.onpopstate;
       },
       computed: {
+        uploading: function uploading() {
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = this.selectedFiles[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var f = _step.value;
+              if (f.status === "uploading") return true;
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+                _iterator["return"]();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+        },
         lastFolder: function lastFolder() {
           var length = this.nav.length;
 
@@ -143,6 +178,13 @@ function () {
             if (f.status === "uploaded") count++;
           });
           return count;
+        },
+        unUploadedCount: function unUploadedCount() {
+          var count = 0;
+          this.selectedFiles.map(function (f) {
+            if (f.status === "notUploaded") count++;
+          });
+          return count;
         }
       },
       methods: {
@@ -152,6 +194,46 @@ function () {
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
         scrollTo: NKC.methods.scrollTop,
+        // 清空未上传的记录
+        clearUnUploaded: function clearUnUploaded() {
+          this.selectedFiles = this.selectedFiles.filter(function (f) {
+            return f.status !== "notUploaded";
+          });
+        },
+        // 批量设置文件目录
+        selectFilesFolder: function selectFilesFolder() {
+          LibraryPath.open(function (data) {
+            var folder = data.folder,
+                path = data.path;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
+
+            try {
+              for (var _iterator2 = self.app.selectedFiles[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                var f = _step2.value;
+                f.folder = folder;
+                f.folderPath = path;
+              }
+            } catch (err) {
+              _didIteratorError2 = true;
+              _iteratorError2 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+                  _iterator2["return"]();
+                }
+              } finally {
+                if (_didIteratorError2) {
+                  throw _iteratorError2;
+                }
+              }
+            }
+          }, {
+            lid: this.lid,
+            warning: "该操作将覆盖本页所有设置，请谨慎操作。"
+          });
+        },
         // 清空已成功上传的文件记录
         clearUploaded: function clearUploaded() {
           this.selectedFiles = this.selectedFiles.filter(function (f) {
@@ -428,7 +510,7 @@ function () {
         // 文件夹访问记录存到浏览器本地
         saveToLocalStorage: function saveToLocalStorage(id) {
           var libraryVisitFolderLogs = NKC.methods.getFromLocalStorage("libraryVisitFolderLogs");
-          libraryVisitFolderLogs[this.nav[0]._id] = id;
+          libraryVisitFolderLogs[this.lid] = id;
           NKC.methods.saveToLocalStorage("libraryVisitFolderLogs", libraryVisitFolderLogs);
         },
         // 添加一条浏览器历史记录
@@ -478,26 +560,26 @@ function () {
               _document$getElementB2 = _document$getElementB.files,
               files = _document$getElementB2 === void 0 ? [] : _document$getElementB2;
 
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
 
           try {
-            for (var _iterator = files[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var file = _step.value;
+            for (var _iterator3 = files[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              var file = _step3.value;
               this.selectedFiles.push(this.createFile("localFile", file));
             }
           } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-                _iterator["return"]();
+              if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
+                _iterator3["return"]();
               }
             } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
+              if (_didIteratorError3) {
+                throw _iteratorError3;
               }
             }
           }

@@ -41,10 +41,12 @@ const libraryRouter = routers.library;
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
 const newResourceRouter = routers.newResource;
+const librariesRouter = routers.libraries;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
+router.use("/libraries", librariesRouter.routes(), librariesRouter.allowedMethods());
 router.use("/editor", editorRouter.routes(), editorRouter.allowedMethods());
 router.use('/lottery', lotteryRouter.routes(), lotteryRouter.allowedMethods());
 router.use('/app', appRouter.routes(), appRouter.allowedMethods());

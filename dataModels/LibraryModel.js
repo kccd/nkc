@@ -290,6 +290,16 @@ schema.methods.getNav = async function() {
   await getParent(this);
   return arr;
 };  
+
+/* 
+  获取当前文件夹或文件夹的目录结构
+  @return {String} 
+*/
+schema.methods.getPath = async function() {
+  const nav = await this.getNav();
+  return "/ " + nav.map(n => n.name).join(" / ");
+}
+
 /* 
   计算当前文件夹以及上层所有文件夹中文件的数量
 */

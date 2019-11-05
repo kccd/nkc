@@ -248,6 +248,26 @@ table{
 .pointer{
   cursor: pointer;
 }
+
+
+.warning-panel{
+  background-color:#ffd0d7;
+  padding: 0.5rem;
+  color: #4b4b4b;
+  border-radius: 2px;
+  margin-bottom: 0.5rem;
+}
+.warning-panel .fa{
+  height: 1.6rem;
+  font-size: 1.2rem;
+  width: 1.6rem;
+  line-height: 1.6rem;
+  background-color: #ff3636;
+  text-align: center;
+  color: #fff;
+  border-radius: 50%;
+}
+
 /*自定义按钮*/
 /*主色按钮*/
 .btn-theme{

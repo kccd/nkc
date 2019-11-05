@@ -27,6 +27,9 @@
 #moduleLibrary .lib-list-li:hover {
   background-color: #d7e5f0;
 }
+#moduleLibrary .lib-list-li.mark {
+  border: 2px solid #2b90d9;
+}
 #moduleLibrary .lib-list-li .list-checkbox {
   display: table-cell;
   vertical-align: top;
@@ -34,6 +37,7 @@
 #moduleLibrary .lib-list-li .list-cover {
   display: table-cell;
   border: 1px solid #eee;
+  background-color: #fff;
   position: relative;
 }
 #moduleLibrary .lib-list-li .list-cover > div {
@@ -282,4 +286,8 @@
 #moduleLibrary .mark-category select {
   height: 2rem;
   font-size: 1rem;
+}
+#moduleLibrary .uploading-status {
+  color: #888;
+  font-weight: 700;
 }

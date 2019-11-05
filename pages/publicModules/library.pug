@@ -1,6 +1,6 @@
 +includeCSS("/css/modules/library.css")
 #moduleLibrary(v-cloak)
-  .lib-tools
+  .lib-tools(v-if="!closed") 
     .lib-nav
       .lib-nav-body  
         .lib-nav-li(v-for="s, index in nav" @click="selectNavFolder(s)") 
@@ -49,7 +49,7 @@
             span 我发布的 
   .lib-list(v-if="pageType === 'list'")
     .null(v-if="!folderList.length") 空空如也~
-    .lib-list-li(v-for="f in folderList") 
+    .lib-list-li(v-for="f in folderList" :class="{'mark': !!tLid && tLid === f._id}") 
       .list-checkbox(v-if="mark")
         .checkbox
           label
@@ -120,14 +120,17 @@
           | 新建文件夹  
         a(@click="clearUploaded" v-if="uploadedCount")
           .fa.fa-trash-o &nbsp;
-          | 移除已上传的记录  
+          | 清空已上传
+        a(@click="clearUnUploaded" v-if="unUploadedCount")
+          .fa.fa-trash-o &nbsp;
+          | 清空未上传  
         input.hidden#moduleLibraryInput(type="file" multiple="multiple" @change="selectedLocalFiles")
         a.active(onclick="$('#moduleLibraryInput').click();") 
           .fa.fa-save &nbsp;选择本地文件    
         a.active(@click="selectOnlineFiles")
           .fa.fa-cloud &nbsp;选择已上传文件
       .mark-category(v-if="selectedFiles.length")
-        span 将本页所有文件设置为
+        span 批量设置：文件类型
         select(v-model="selectedCategory")
           option(value="book") 图书
           option(value="paper") 论文
@@ -136,6 +139,9 @@
           option(value="other") 其他
         .options-button  
           a.active(@click="markCategory") 执行  
+        span 文件目录  
+        .options-button  
+          a.active(@click="selectFilesFolder") 选择目录
       .lib-files(v-if="!selectedFiles.length")    
         .null 空空如也~
       .lib-files(v-else)
@@ -191,6 +197,13 @@
             .lib-file-progress(v-if="f.status === 'uploading'")
               span(v-if="f.progress === 100") 处理中...
               span(v-else) 上传中...{{f.progress}}%
-        .m-t-1(v-if="selectedFiles.length").text-right
+        .m-t-1(v-if="selectedFiles.length")
+          .checkbox
+            label
+              input(type="checkbox" :value="true" v-model="protocol")
+              span 我已阅读并同意遵守与本次上传相关的全部协议。
+              a(href="/protocol" target="_blank") 查看协议
           .options-button.p-r-0
-            a.active(@click="startUpload") 立即上传
+            a.active.m-r-05(@click="startUpload" :class="{'disabled': !protocol}") 立即上传
+            span.uploading-status(v-if="uploading") 文件上传中...
+              .fa.fa-spinner.fa-spin

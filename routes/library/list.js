@@ -83,7 +83,7 @@ router
         ignoreCount ++;
         continue;
       }
-      const foldersCount = await db.LibraryModel.count({lid: id});
+      const foldersCount = await db.LibraryModel.count({lid: id, deleted: false});
       if(foldersCount > 0) {
         ignoreCount ++;
         continue;

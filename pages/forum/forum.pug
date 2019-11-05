@@ -194,7 +194,13 @@ block content
             .col-xs-12.col-md-12.m-t-1
               include ../publicModules/paging/forum_nav
             .col-xs-12.col-md-12.m-t-05  
-              include ../publicModules/library      
+              if data.forum.lid
+                if data.libraryClosed
+                  .warning-panel
+                    .fa.fa-exclamation
+                    span &nbsp;当前文库已被关闭。  
+                if !data.libraryClosed || permission("modifyAllResource")
+                  include ../publicModules/library          
           //-else if data.type === "library"
             +includeCSS("/library/library.css")
             -const docTypes = [{t: "all",n: "全部"}, {t: "book", n: "图书"}, {t: "paper", n: "论文"}, {t: "program", n: "程序"}, {t: "media", n: "媒体"}, {t: "other", n: "其他"}];
@@ -316,13 +322,19 @@ block scripts
   include ../publicModules/md5
   include ../publicModules/disabledPost/disabledPost
   include ../publicModules/resourceInfo/resourceInfo
-  if data.type === "library"
+  if data.type === "library" && data.forum.lid && (!data.libraryClosed || permission("modifyAllResource"))
     include ../publicModules/commonModal/commonModal
     include ../publicModules/moment
     include ../publicModules/selectResource/selectResource
     include ../publicModules/libraryPath
     +includeJS("/js/modules/library.js")
-    script=`NKC.configs.lid = ${data.forum.lid}`
+    script=`NKC.configs.lid = ${data.forum.lid};`
+    if data.folderId
+      script=`NKC.configs.folderId = ${data.folderId};`
+    if data.tLid
+      script=`NKC.configs.tLid = ${data.tLid};`  
+    if data.libraryClosed
+      script=`NKC.configs.closed = ${!!data.libraryClosed};`    
   +includeJS("/forum/forum.js")
   +includeJS("/publicModules/thread_panel/management.js")
   include ../publicModules/floatUserPanel/floatUserPanel

@@ -1,4 +1,11 @@
 {
+
+  "book": "图书",
+  "paper": "论文",
+  "program": "程序",
+  "media": "媒体",
+  "other": "其他",
+
   "createFolder": "创建文件夹",
   "deleteFolder": "删除文件夹",
   "moveFolder": "移动文件夹",
