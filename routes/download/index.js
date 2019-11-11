@@ -267,10 +267,13 @@ downloadRouter
     await fs.copyFile(path, mediaFilePath);
     const hash = await nkcModules.hash.getFileMD5(path);
     await fs.unlink(path);
+    const pictureInfo = await imageMagick.info(mediaFilePath);
     // await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,
       hash,
+      height: pictureInfo.height,
+      width: pictureInfo.width,
       oname: name,
       path: middlePath + saveName,
       tpath: middlePath + saveName,

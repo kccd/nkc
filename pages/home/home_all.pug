@@ -1,0 +1,107 @@
+extend ../bootstrap_base
+block title
+  title 首页
+  +includeCSS("/css/home_all.css")
+block content  
+  mixin forumList(f)
+    .home-forums-body
+      .home-forum-parent
+        .home-forum-panel
+          if f.iconFileName
+            img.home-forum-panel-icon(src=`/forum_avatar/${f.fid}`)
+          else
+            .home-forum-panel-icon(style=`background-color: ${f.color}`)
+          .home-forum-panel-name
+            div
+              span=f.displayName
+      .home-forum-child
+        for cf in f.childrenForums || []
+          .home-forum-panel
+            if cf.iconFileName
+              img.home-forum-panel-icon(src=`/forum_avatar/${cf.fid}`)
+            else
+              .home-forum-panel-icon(style=`background-color: ${cf.color}`)
+            .home-forum-panel-name
+              div
+                span=cf.displayName
+  mixin hotForumList(f)                
+    .home-hot-forum
+      .home-hot-forum-cover
+        if f.iconFileName
+          img.home-hot-forum-icon(src=`/forum_avatar/${f.fid}`)
+        else
+          .home-hot-forum-icon(style=`background-color: ${f.color}`)
+      .home-hot-forum-content
+        .home-hot-forum-name=f.displayName
+        .home-hot-forum-info
+          |文章：
+          span=234
+          |，回复：
+          span=5492
+          |，关注：
+          span=482
+        .home-hot-forum-description=f.description
+
+  .container-fluid.max-width
+    .row
+      //- 专业地图
+      .col-xs-12.col-md-12.home-forums
+        .row
+          .col-xs-12.col-md-8.box-shadow-panel
+            .home-forums-list
+              .home-header 
+                .fa.fa-tags
+                .header-name 话题
+                .header-description 关注最新话题，足不出户便能游遍世界~
+              for f in state.forumsTree
+                if f.forumType === "topic"
+                  +forumList(f)
+
+                
+          .col-xs-12.col-md-4.box-shadow-panel
+            .home-forums-other 
+              .home-header 
+                .fa.fa-fire
+                .header-name 热门话题
+                .header-description 关注最新话题，足不出户便能游遍世界~
+              .home-hot-forums
+                +hotForumList(state.forumsTree[0])  
+      .col-xs-12.col-md-12.home-forums      
+        .row
+          .col-xs-12.col-md-8.box-shadow-panel
+            .home-forums-list
+              .home-header 
+                .fa.fa-flask
+                .header-name 学科
+                .header-description 关注最新学科，足不出户便能游遍世界~
+              for f in state.forumsTree
+                if f.forumType === "discipline"
+                  +forumList(f)
+
+                
+          .col-xs-12.col-md-4.box-shadow-panel
+            .home-forums-other  
+              .home-header 
+                .fa.fa-fire
+                .header-name 热门学科
+                .header-description 关注最新话题，足不出户便能游遍世界~
+        
+      //- 只有封面图的文章入口 轮播
+      .col-xs-12.col-md-12.home-covers
+        .row
+          .col-xs-12.col-md-6.home-covers-md
+            img(src="/r/304958")
+          .col-xs-12.col-md-6.home-covers-sm
+            .row
+              .col-xs-6.col-md-4
+                img(src="/r/304975")
+              .col-xs-6.col-md-4
+                img(src="/r/304975")
+              .col-xs-6.col-md-4
+                img(src="/r/304975")
+              .col-xs-6.col-md-4
+                img(src="/r/304975")
+              .col-xs-6.col-md-4
+                img(src="/r/304975")
+              .col-xs-6.col-md-4
+                img(src="/r/304975")          

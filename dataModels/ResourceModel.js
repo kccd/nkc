@@ -67,6 +67,18 @@ const resourceSchema = new Schema({
     type: Date,
     default: null,
     index: 1
+  },
+  // 为图片时 图片高度
+  height: {
+    type: Number,
+    index: 1,
+    default: null
+  },
+  // 为图片时 图片宽度
+  width: {
+    type: Number,
+    index: 1,
+    default: null
   }
 });
 /* 

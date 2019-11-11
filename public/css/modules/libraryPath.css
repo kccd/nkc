@@ -87,6 +87,17 @@
 #moduleLibraryPath .folders .folder {
   position: relative;
 }
+#moduleLibraryPath .folders .folder .folder-form {
+  padding: 1rem;
+  background-color: #bbd5e8;
+  border-radius: 2px;
+  padding-bottom: 0;
+  overflow: hidden;
+  padding-top: 0.5rem;
+}
+#moduleLibraryPath .folders .folder .folder-form .form-group {
+  margin-bottom: 0.5rem;
+}
 #moduleLibraryPath .folders .folder .folder-body.active {
   background-color: #bbd5e8;
   border-radius: 2px;
@@ -94,6 +105,7 @@
 #moduleLibraryPath .folders .folder .fa {
   position: absolute;
   font-size: 1.35rem;
+  z-index: 100;
   line-height: 2.5rem;
   text-align: center;
   cursor: pointer;
@@ -102,7 +114,9 @@
 }
 #moduleLibraryPath .folders .folder .folder-name {
   cursor: pointer;
+  position: relative;
   height: 2.5rem;
+  padding-right: 4.5rem;
   line-height: 2.5rem;
   padding-left: 2.5rem;
   word-break: break-all;
@@ -116,6 +130,26 @@
   width: 1.3rem;
   margin-top: -2px;
   margin-right: 0.4rem;
+}
+#moduleLibraryPath .folders .folder .folder-name .folder-option {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  text-align: right;
+  font-size: 1.2rem;
+  color: #9baec8;
+}
+#moduleLibraryPath .folders .folder .folder-name .folder-option .fa {
+  position: relative;
+  height: 2.5rem;
+  width: 1.75rem;
+  text-align: center;
+  transition: color 100ms;
+  display: inline-block;
+}
+#moduleLibraryPath .folders .folder .folder-name .folder-option .fa:hover {
+  color: #282c37;
 }
 #moduleLibraryPath .modal-footer {
   position: relative;

@@ -1,0 +1,24 @@
++includeJS("/external_pkgs/plyr/plyr.polyfilled.min.js")
++includeJS("/external_pkgs/plyr/plyr.min.js")
+
+script.
+  NKC.methods.initVideo = function() {
+    var videoDom = $(".plyr-dom");
+    for (var i = 0; i < videoDom.length; i++) {
+      var dom = videoDom.eq(i);
+      var title = dom.attr("data-plyr-title");
+      var player = new Plyr(videoDom.eq(i), {
+        ratio: '4:3',
+        title: title,
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'download', 'captions', 'pip', 'airplay', 'fullscreen'],
+        settings: ['speed'],
+        i18n: {
+          speed: "播放速度",
+          normal: "正常"
+        },
+        blankVideo: "/external_pkgs/plyr/blank.mp4",
+        autopause: true,
+      });
+    }
+  };
+  NKC.methods.initVideo();

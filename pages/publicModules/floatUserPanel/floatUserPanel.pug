@@ -20,7 +20,7 @@
           .fa.fa-remove(@click="outPanel")
         .user_avatar
           .user_avatar_div
-            a(:href="'/avatar/' + user.avatar + '?t=lg'" target="_blank")
+            a(:href="'/u/' + user.uid" target="_blank")
               img(:src="'/avatar/' + user.avatar")
             //-if data.user
               span(v-if=`${data.user?"true":"false"} && user.uid !== '${data.user.uid}'`)

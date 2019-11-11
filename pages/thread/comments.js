@@ -104,6 +104,12 @@ function viewPostComments(tid, pid, page, callback) {
         e.stopPropagation();
       });
       if(callback) callback();
+      if(NKC.methods.initVideo) {
+        setTimeout(function() {
+          NKC.methods.initVideo();
+        }, 300);
+        
+      }
     })
     .catch(function(data) {
       screenTopWarning(data);

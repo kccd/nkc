@@ -9,10 +9,18 @@ NKC.modules.LibraryPath = class {
     self.app = new Vue({
       el: "#moduleLibraryPathApp",
       data: {
+        uid: NKC.configs.uid,
         folders: [],
         warning: "",
         folder: "",
-        originFolders: []
+        originFolders: [],
+        permission: [],
+        form: {
+          type: "",
+          folder: "",
+          name: "",
+          description: ""
+        }
       },
       computed: {
         originFoldersId() {
@@ -49,6 +57,53 @@ NKC.modules.LibraryPath = class {
         }
       },
       methods: {
+        per(name) {
+          return this.permission.includes(name);
+        },
+        submitForm() {
+          const form = this.form;
+          const {type, folder, name, description} = form;
+
+          let method, url;
+          if(type === "create") {
+            method = "POST";
+            url = `/library/${folder._id}/list`;
+          } else {
+            method = "PATCH";
+            url = `/library/${folder._id}`;
+          }
+          nkcAPI(url, method, {
+            name,
+            description
+          })
+            .then(() => {
+              self.app.form.folder = "";
+              if(type === "create") {
+                folder.close = true;
+                folder.loaded = false;  
+                folder.folderCount = (folder.folderCount || 0) + 1;
+                self.app.switchFolder(folder);
+              } else {
+                folder.name = name;
+                folder.description = description;
+              }
+              
+            })
+            .catch(err => {
+              sweetError(err);
+            })
+        },
+        toForm(type, folder) {
+          this.form.type = type;
+          if(type === "modify") {
+            this.form.name = folder.name;
+            this.form.description = folder.description;
+          } else {
+            this.form.name = "";
+            this.form.description = "";
+          }
+          this.form.folder = folder;
+        },
         getFolderNav(folder) {
           const {originFolders} = this;
           let lid = folder.lid;
@@ -118,6 +173,7 @@ NKC.modules.LibraryPath = class {
             .then(data => {
               self.app.folders = data.folders;
               self.app.folder = data.folder;
+              self.app.permission = data.permission;
               self.app.saveToOrigin(data.folders);
               if(lid) {
                 self.app.scrollToActive();
@@ -136,6 +192,7 @@ NKC.modules.LibraryPath = class {
           }
           nkcAPI(url, "GET")
             .then((data) => {
+              self.app.permission = data.permission;
               if(folder) folder.loaded = true;
               data.folders.map(f => {
                 f.close = true;

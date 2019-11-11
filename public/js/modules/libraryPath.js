@@ -21,10 +21,18 @@ function () {
     self.app = new Vue({
       el: "#moduleLibraryPathApp",
       data: {
+        uid: NKC.configs.uid,
         folders: [],
         warning: "",
         folder: "",
-        originFolders: []
+        originFolders: [],
+        permission: [],
+        form: {
+          type: "",
+          folder: "",
+          name: "",
+          description: ""
+        }
       },
       computed: {
         originFoldersId: function originFoldersId() {
@@ -69,6 +77,57 @@ function () {
         }
       },
       methods: {
+        per: function per(name) {
+          return this.permission.includes(name);
+        },
+        submitForm: function submitForm() {
+          var form = this.form;
+          var type = form.type,
+              folder = form.folder,
+              name = form.name,
+              description = form.description;
+          var method, url;
+
+          if (type === "create") {
+            method = "POST";
+            url = "/library/".concat(folder._id, "/list");
+          } else {
+            method = "PATCH";
+            url = "/library/".concat(folder._id);
+          }
+
+          nkcAPI(url, method, {
+            name: name,
+            description: description
+          }).then(function () {
+            self.app.form.folder = "";
+
+            if (type === "create") {
+              folder.close = true;
+              folder.loaded = false;
+              folder.folderCount = (folder.folderCount || 0) + 1;
+              self.app.switchFolder(folder);
+            } else {
+              folder.name = name;
+              folder.description = description;
+            }
+          })["catch"](function (err) {
+            sweetError(err);
+          });
+        },
+        toForm: function toForm(type, folder) {
+          this.form.type = type;
+
+          if (type === "modify") {
+            this.form.name = folder.name;
+            this.form.description = folder.description;
+          } else {
+            this.form.name = "";
+            this.form.description = "";
+          }
+
+          this.form.folder = folder;
+        },
         getFolderNav: function getFolderNav(folder) {
           var originFolders = this.originFolders;
           var lid = folder.lid;
@@ -188,6 +247,7 @@ function () {
           nkcAPI(url, "GET").then(function (data) {
             self.app.folders = data.folders;
             self.app.folder = data.folder;
+            self.app.permission = data.permission;
             self.app.saveToOrigin(data.folders);
 
             if (lid) {
@@ -207,6 +267,7 @@ function () {
           }
 
           nkcAPI(url, "GET").then(function (data) {
+            self.app.permission = data.permission;
             if (folder) folder.loaded = true;
             data.folders.map(function (f) {
               f.close = true;

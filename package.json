@@ -38,6 +38,7 @@
     "font-awesome": "^4.7.0",
     "fs-extra": "^7.0.1",
     "icheck": "^1.0.2",
+    "image-size": "^0.8.3",
     "immutable": "^3.8.2",
     "ioredis": "^4.0.0",
     "jquery-pjax": "^2.0.1",

@@ -254,13 +254,13 @@ NKC.methods.resourceToHtml = function(resource) {
   var ext = resource.ext.toLowerCase();
   var html = "";
   if(NKC.configs.imageExt.indexOf(ext) !== -1) {
-    html = "<p><img src=" + "/r/" + rid + " style='max-width:50%'></p>";
+    html = '<p><img src="' + '/r/' + rid + '" style="max-width:50%;"></p>';
   } else if(NKC.configs.audioExt.indexOf(ext) !== -1) {
-    html = "<audio src=" + "/r/" + rid + " controls>Your browser does not support the audio element</audio>";
+    html = '<audio src="' + '/r/' + rid + '" controls>Your browser does not support the audio element</audio>';
   } else if(NKC.configs.videoExt.indexOf(ext) !== -1) {
-    html = "<p><br></p><p><video src=" + "/r/" + rid + " controls style=width:50%;>video</video></p>";
+    html = '<p><br></p><p><video src="' + '/r/' + rid + '" controls style="width: 50%;">video</video></p>';
   } else {
-    html = "<p><a href=" + "/r/" + rid + "><img src=" + "/default/default_thumbnail.png" + ">" + name + "</a></p>";
+    html = '<p><a href="' + '/r/' + rid + '"><img src=' + '/default/default_thumbnail.png' + '>' + name + '</a></p>';
   }
   return html;
 };

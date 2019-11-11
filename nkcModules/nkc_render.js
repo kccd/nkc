@@ -8,6 +8,7 @@ function nkc_render(options){
   var XBBCODE;
   var xss;
   var twemoji;
+  var tools;
   if(in_browser){
     //browser mode
     //inclusion here done by <script>
@@ -16,12 +17,14 @@ function nkc_render(options){
     XBBCODE = window.XBBCODE;
     xss = window.filterXSS;
     twemoji = window.twemoji;
+    tools = NKC.methods.tools;
   }else{
     commonmark = require('commonmark');
     plain_escape = require('../pages/plain_escaper');
     XBBCODE = require('xbbcode-parser');
     xss = require('xss');
     twemoji = require('twemoji');
+    tools = require("./tools");
   }
 
   //xss-----------------
@@ -95,7 +98,7 @@ function nkc_render(options){
       if(isWhiteAttr) {
         if(tag === 'a' && name === 'href') {
           var valueHandled = value.replace('javascript:', '');
-          return "href=" + valueHandled;
+          return 'href="' + valueHandled + '"';
         }
       }
     }
@@ -361,19 +364,8 @@ function nkc_render(options){
     })
   }
 
-  var getHTMLForResource = function(r,allthumbnail){
+  var getHTMLForResource = function(r, allthumbnail){
     var rid = r.rid
-    var oname_safe = plain_escape(r.oname)
-    var filesize = r.size
-
-    var k = function(number){
-
-      return (number || 0).toPrecision(3)
-    }
-
-    var hits = r.hits?r.hits.toString()+'次':'';
-
-    var fileSizeString = (filesize>1024)?((filesize>1048576)?k(filesize/1048576)+'M':k(filesize/1024)+'k'):k(filesize)+'b'
 
     var extension = r.ext.toLowerCase();
 
@@ -389,43 +381,32 @@ function nkc_render(options){
       case 'bmp': //for S.D.P's post
       // if(!allthumbnail)replaced =
       // '<a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a><br/>';
-      if(!allthumbnail)replaced =
-      '<a data-magnify="gallery" data-group="g1" data-src="/r/'+rid+'" data-caption="'+rid+'"><img class="img-responsive" alt="'+rid+'" src="/r/'+rid+'" /></a><br/>';
-
-      if(allthumbnail){
-        replaced =
-        '<div class="PostResourceDownload" style="width:100%;display:block;word-break:break-all;word-wrap:break-word;">'
-        +'<a class="PostResourceDownloadLink" href="/r/'+rid+'" >'
-        +'<img class="PostResourceDownloadThumbnail" src="/rt/'+rid+'"/>'+oname_safe+'</a>'
-        +'<span class="PostResourceFileSize">'+fileSizeString+'</span>'
-        +'</div>'
-      }
-
+      replaced = '<img src="/r/'+rid+'" />';
       break;
+
       //audio section
       case 'mp3':
       case 'mid':
       case 'wma':
       case 'ogg':
-      replaced =
-      '<a href="/r/'+rid+'" >'+oname_safe+'</a><br><audio src="/r/'+rid+'" controls preload="none">你的浏览器可能不支持audio标签播放音乐。升级吧。</audio>'
-
+      replaced = '<audio src="/r/'+rid+'"></audio>';
       break;
 
       case 'mp4'://these are standards
       case 'webm':
       case 'ogg':
-      replaced =
-      '<a href="/r/'+rid+'" >'+oname_safe+'</a><br><video src="/r/'+rid+'" controls preload="none">你的浏览器可能不支持video标签播放视频。升级吧。</video>'
+      replaced = '<video src="/r/'+rid+'"></video>';
 
       break;
 
-      default: replaced =
+      default: replaced = '<a src="/r/'+rid+'"></a>';
+
+      /* default: replaced =
       '<div class="PostResourceDownload" style="width:100%;display:block;word-break:break-all;word-wrap:break-word;">'
       +'<a class="PostResourceDownloadLink" href="/r/'+rid+'" >'
       +'<img class="PostResourceDownloadThumbnail" src="/default/default_thumbnail.png"/>'+oname_safe+'</a>'
       +'<span class="PostResourceFileSize">'+fileSizeString+'</span>' + '<span class="PostResourceCounter">'+hits+'</span>'
-      +'</div>';
+      +'</div>'; */
     }
     return replaced
   }
@@ -434,12 +415,11 @@ function nkc_render(options){
 
   //replace attachment tags in text to their appropriate HTML representation
   var attachment_filter = function(stringToFilter,post){
-    //console.log(stringToFilter);
     return stringToFilter.replace(render.resource_extractor,function(match,p1,offset,string){
       var rid = p1;
       for(var i in post.resources){
         var r = post.resources[i]
-        if(r.rid===rid){
+        if(r.rid === rid){
           r._used = true;
           return getHTMLForResource(r)
         }
@@ -448,12 +428,12 @@ function nkc_render(options){
     })
   }
 
-  var pwbb_experimental = function(post,isHTML){
-    var content = post.c||''
-
-    var html = ''
-
+  var pwbb_experimental = function(post, isHTML){
+    var content = post.c || "";
+    var html = "";
+    
     if(!isHTML){  //bbcode
+      // 公式渲染
       html = chemFormulaReplacer(content)
       html =
       XBBCODE.process({
@@ -473,37 +453,19 @@ function nkc_render(options){
       .replace(/\[(\/?)strike]/g,'<$1s>')
       .replace(/  /g,'&nbsp&nbsp')
       .replace(/\[url.*?](.+.*?)\[\/url]/gi, '<a href="$1">$1</a>')
-      html = attachment_filter(html,post)
-      // now post.r are marked with _used:true
-    }
-    else{
+      // 渲染为html
+      html = attachment_filter(html, post)
+    } else {
       //在这里做了style的过滤
       html = custom_xss_process(content)
     }
     html = render.hiddenReplaceHTML(html)
     // fix for older posts where they forgot to inject attachments.
-    var count = 0
-    // 注释掉下面代码，用来防止附件的生成
-    // for(var i in post.resources){
-    //   var r = post.resources[i]
-    //   if(!r._used){
-    //     var allthumbnail = true
-    //     if(count==0){
-    //       html+='<hr class="HrPostContentUnusedAttachment"/>'
-    //       count++;
-    //     }
 
-    //     if(count>=50)throw '[nkc_render]too much attachment included! refuse to process.'
-    //     html+=getHTMLForResource(r,allthumbnail)
-    //   }
-    // }
-
-    // 添加查看大图
-    // <a href="/r/'+rid+'" target="_blank" title="'+oname_safe+'"><img class="PostContentImage" alt="'+rid+'" src="/r/'+rid+'" /></a>
-    
-    // 添加附件下载次数
-    if(post.l === "html"){
-      var extArray = ['jpg','jpeg','gif','png','svg','bmp','mp3','mp4','wma','mid','ogg','webm']
+    // 旧的处理方法 仅作参考
+    // 添加附件下载次数 
+    if(0 && post.l === "html"){
+      var extArray = ['jpg','jpeg','gif','png','svg','bmp','mp3','mp4','wma','mid','ogg','webm'];
       for(var i in post.resources){
         var r = post.resources[i];
         var filesize = r.size;
@@ -525,9 +487,9 @@ function nkc_render(options){
     }
     // html = html.replace(/<img src="\/r(.+?)">/img,'<a href="/r$1" target="_blank" title="pic"><img class="PostContentImage" alt="pic" src="/r$1" /></a>');
     // 如果是外站图片，在渲染时需要将图片替换成本站默认图
-    var imgsArray = html.match(/\<img.*?\>/igm);
+    var imgsArray = html.match(/<img.*?>/igm);
     if(imgsArray) {
-      for(var im = 0;im < imgsArray.length; im++) {
+      for(var im = 0; im < imgsArray.length; im++) {
         if(/http/igm.test(imgsArray[im])) {
           if(!/kechuang/igm.test(imgsArray[im])) {
             var newStr = '<img src="/default/picdefault.png" />';
@@ -536,11 +498,40 @@ function nkc_render(options){
         }
       }
     }
-    html = html.replace(/\<img src="https\:\/\/www\.kechuang\.org\/r\/(.+?)".*?\>/img,'<img src="/r/$1" />');
+    html = html.replace(/<img\ssrc="https:\/\/www\.kechuang\.org\/r\/(.+?)".*?>/img,'<img src="/r/$1" />');
     // 如果是默认图片则跳过
     // html = html.replace(/\<img.*?src="\/default\/picdefault.png".+?\>/img, '');
     // html = html.replace(/\<img.*?src="\/r\/(.+?)".+?\>/img,'<img src="/r/$1" dataimg="content"/>');
-    html = html.replace(/\<img(.*?)\>/img,'<img $1 dataimg="content"/>');
+    // html = html.replace(/\<img(.*?)\/>/img,'<img $1 dataimg="content"/>');
+    
+    // 精简图片dom
+    // html = html.replace(/\<img\s+?src=['"]\/r\/([0-9]+?)['"].*?>/img, '<img src="/r/$1" />');
+    html = html.replace(/<img\s.*?>/img, function(content) {
+      return content.replace(/<img\s.*?src=['"]\/r\/([0-9]+?)['"].*?>/img, function(c, v1) {
+        return '<img src="/r/'+v1+'" />';
+      });
+    });
+    // 精简视频dom
+    // html = html.replace(/\<video\s+?src=['"]\/r\/([0-9]+?)['"].*?>.*?\<\/video>/img, '<video src="/r/$1"></video>');
+    html = html.replace(/<video\s.*?>.*?<\/video>/img, function(content) {
+      return content.replace(/<video\s.*?src=['"]\/r\/([0-9]+?)['"].*?>.*?<\/video>/img, function(c, v1) {
+        return '<video src="/r/'+v1+'"></video>';
+      });
+    });
+    // 精简音频
+    // html = html.replace(/\<audio\s+?src=['"]\/r\/([0-9]+?)['"].*?>.*?\<\/audio>/img, '<audio src="/r/$1"></audio>');
+    html = html.replace(/<audio\s.*?>.*?<\/audio>/img, function(content) {
+      return content.replace(/<audio\s.*?src=['"]\/r\/([0-9]+?)['"].*?>.*?<\/audio>/img, function(c, v1) {
+        return '<audio src="/r/'+v1+'"></audio>';
+      });
+    });
+    // 附件精简
+    // html = html.replace(/\<a\s+?href=['"]\/r\/([0-9]+?)['"].*?>.*?\<\/a>/img, '<a href="/r/$1"></a>');
+    html = html.replace(/<a\s.*?>.*?<\/a>/img, function(content) {
+      return content.replace(/<a\s.*?href=['"]\/r\/([0-9]+?)['"].*?>.*?<\/a>/img, function(c, v1) {
+        return '<a href="/r/'+v1+'"></a>';
+      });
+    });
     // html = html.replace(/\<img class=".*?" src="\/r\/(.+?)".+?\>/img,'<a class="wrap" data-magnify="gallery" data-group="g1" data-src="/r/$1"><img class="img-responsive" alt="pic" src="/r/$1" /></a>');
     return html
   };
@@ -548,46 +539,149 @@ function nkc_render(options){
   var markdown_experimental = function(post){
     var content = post.c;
     var parsed = commonreader.parse(content);
-    var rendered = commonwriter.render(parsed)
-    rendered = attachment_filter(rendered,post)
+    var rendered = commonwriter.render(parsed);
+    rendered = attachment_filter(rendered, post);
 
     rendered= custom_xss_process(rendered);
 
     rendered = render.hiddenReplaceHTML(rendered);
     return rendered;
-  }
+  };
+
+  // 渲染html中的资源文件dom
+  // 这里只针对html，其他格式的数据应先渲染成html再经此函数处理
+  // 函数通过标准媒体标签加url里的/r/或www.kechuang.org/r/识别
+  // 图片 <img src="/r/rid" />
+  // 视频 <video src="/r/rid"></video>
+  // 音频 <audio src="/r/rid"></video>
+  // 附件 <a href="/r/rid"></a>
+  // @param {String} html 
+  // @param {[Object]} resources 资源文件对象所组成的数组
+  var renderResourceDom = function(html, resources) {
+    var k = function(number){
+      return (number || 0).toPrecision(3)
+    };
+    var getSize = function(filesize) {
+      return (filesize>1024)?((filesize>1048576)?k(filesize/1048576)+'M':k(filesize/1024)+'k'):k(filesize)+'b'
+    };
+    return html
+      // 图片处理
+      .replace(/<img\ssrc="\/r\/([0-9]+?)" \/>/img, function(content, v1) {
+        var resource = resources[v1];
+        if(!resource) {
+          resource = {
+            width: 1920,
+            height: 1080,
+            oname: "图片已丢失"
+          }
+        }
+        var lazyImgStr = '<img data-src="/r/' + v1 + '" class="lazyload" dataimg="content" alt="'+resource.oname+'"/>';
+        var imgStr = '<img src="/r/' + v1 + '" dataimg="content" alt="'+resource.oname+'"/>';
+        if(!resource.width || !resource.height) {
+          return '<div class="article-img-body">'+imgStr+'</div>';
+        }
+        return '<div class="article-img-body" style="width: '+resource.width+'px;"><div class="article-img-content" style="padding-top: '+ 
+        resource.height*100/resource.width +
+        '%;">'+lazyImgStr+'</div></div>';
+      })
+      // 视频处理
+      .replace(/<video\ssrc="\/r\/([0-9]+?)"><\/video>/igm, function(content, v1) {
+        var resource = resources[v1];
+        if(!resource) {
+          return "（视频：" + plain_escape(v1) + "）";
+        }
+        // return '<div class="article-video-body">' + '</div>';
+        return '<div class="article-video-body"><div>' +
+        '<video class="plyr-dom" preload="none" controls poster="/frameImg/'+v1+
+        '" data-plyr-title="'+resource.oname+'"' +
+        '><source src="/r/'+v1+
+        '" type="video/mp4"></source>你的浏览器不支持video标签，请升级。</video>' + 
+        '</div></div>'
+      })
+      // 音频处理
+      .replace(/<audio\ssrc="\/r\/([0-9]+?)"><\/audio>/igm, function(content, v1) {
+        var resource = resources[v1];
+        if(!resource) {
+          return "（音频：" + plain_escape(v1) + "）";
+        }
+
+        return '<div class="article-audio">'+
+          /* '<div class="article-audio-name">' + plain_escape(resource.oname) + 
+            '<div class="article-audio-size">' + getSize(resource.size) + '</div>' +
+          '</div>'+ */
+          '<audio class="plyr-dom" preload="none" controls>'+
+            '<source src="/r/'+v1+'" type="audio/mp3" />'+
+            '你的浏览器不支持audio标签，请升级。'+
+          '</audio>'+
+        '</div>';
+      })
+      // 附件处理
+      .replace(/<a\shref="\/r\/([0-9]+?)"><\/a>/img, function(content, v1) {
+        var resource = resources[v1];
+        if(!resource) {
+          return "（附件：" + plain_escape(v1) + "）";
+        }
+
+        return '<div class="article-attachment">' +
+          '<div class="article-attachment-icon">' +
+            '<img src="'+ tools.getUrl("fileCover", resource.ext) +'" />'+
+          '</div>' + 
+          '<div class="article-attachment-content">' +
+            '<a class="article-attachment-name" href="/r/'+resource.rid+'" title="'+plain_escape(resource.oname)+'">' +
+              plain_escape(resource.oname) + 
+            '</a>' +
+            '<div class="article-attachment-info">' +
+              '<div class="article-attachment-size">'+getSize(resource.size)+'</div>' +
+              '<div class="article-attachment-ext">'+(resource.ext||"").toUpperCase()+'</div>' +
+              '<div class="article-attachment-hits">'+(resource.hits || 0)+'次下载</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      });
+  };
+
 
   render.experimental_render = function(post){
-    var content = post.c||''
-    var lang = post.l||''
-    var renderedHTML = ''
+    var content = post.c || '';
+    var lang = post.l || '';
+    var renderedHTML = '';
     switch (lang) {
       case 'html':
-      renderedHTML = pwbb_experimental(post,true) //straight thru html
-
-      break;
+        renderedHTML = pwbb_experimental(post,true); //straight thru html
+        break;
 
       case 'pwbb':
-        renderedHTML = pwbb_experimental(post,false)
+        renderedHTML = pwbb_experimental(post,false);
         break;
 
       case 'bbcode':
-      renderedHTML = pwbb_experimental(post,false)
-      break;
+        renderedHTML = pwbb_experimental(post,false);
+        break;
 
       case 'markdown':
-      renderedHTML = markdown_experimental(post)
-      break;0
+        renderedHTML = markdown_experimental(post);
+        break;
 
       default:
-      renderedHTML = plain_escape(content)
+        renderedHTML = plain_escape(content)
     }
+  
+    var resources = {};
+    post.resources = post.resources || [];
+    for(var i = 0; i < post.resources.length; i++) {
+      var r = post.resources[i];
+      resources[r.rid] = r;
+    }
+
+    
+    // 处理媒体文件dom
+    renderedHTML = renderResourceDom(renderedHTML, resources);
+
     renderedHTML = twemoji.parse(renderedHTML, {
       folder: '/2/svg',
       base: '/twemoji',
       ext: '.svg'
     });
-    // console.log(renderedHTML)
     // 渲染at
     // 取出帖子引用部分，帖子引用部分的at不被渲染
     var blockDomArray = renderedHTML.match(/<blockquote cite.*?blockquote>/im);
@@ -605,28 +699,9 @@ function nkc_render(options){
       }
     }
     renderedHTML = blockDomHtml + renderedHTML;
-    // console.log(renderedHTML)
-    renderedHTML = linkAlienate(renderedHTML) //please check linkAlienate()
-    // 将视频替换成视频封面图
-    // renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r(.*?)".*?>(.*?)<\/video>/igm,'<div style="position:relative"><div class="mediaImage" style="background:url(/frameImg$2) center center no-repeat; background-color:black;background-size: contain"></div><span class="play-btn" onclick="openVideo(this,\'/r$2\')"></span></div>');
-    renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r\/(.*?)".*?>(.*?)<\/video>/igm,'<div style="display:inline-block;position:relative"><span class="play-btn" onclick="openVideo(this,\'$2\')"></span><video class="mediaVideo" id="$2" src="/r/$2" poster="/frameImg/$2" preload="none" >您的浏览器不支持video标签，请升级</video></div>');
-    // renderedHTML = renderedHTML.replace(/<video(.*?)src=".*?\/r\/(.*?)".*?>(.*?)<\/video>/igm,'<div><span class="play-btn" onclick="openVideo(this,\'$2\')"></span><video class="mediaVideo" id="$2" src="/r/$2" poster="/frameImg/$2" preload="none">您的浏览器不支持video标签，请升级</video></div>');
-    // 下面是旧版的渲染，暂时先不用
-    // var atUsers = post.atUsers;
-    // if(atUsers && atUsers.length > 0) {
-    //   for(var i = 0; i < atUsers.length; i++) {
-    //     var user = atUsers[i];
-    //     var matchSpace = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + ' ';
-    //     //双空格会产生奇怪转义
-    //     var matchSpecial = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + '&#xA0;';
-    //     var matchEnter = '@' + user.username.replace(/[^\u0000-\u00FF]/g,function(a){return escape(a).replace(/(%u)(\w{4})/gi,"&#x$2;")}) + '<br>';
-    //     renderedHTML = renderedHTML.replace(matchSpace, '<a href="/m/' + user.uid + '">' + matchSpace + '</a>');
-    //     renderedHTML = renderedHTML.replace(matchSpecial, '<a href="/m/' + user.uid + '">' + matchSpecial + '</a>')
-    //     renderedHTML = renderedHTML.replace(matchEnter, '<a href="/m/' + user.uid + '">' + matchEnter + '</a>')
-    //   }
-    // }
+    renderedHTML = linkAlienate(renderedHTML); //please check linkAlienate()
     return renderedHTML
-  }
+  };
 
   return render;
 }
