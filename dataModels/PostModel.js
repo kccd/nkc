@@ -689,7 +689,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
       }
     }
     if(o.resource) {
-      post.resources = resourcesObj[post.pid];
+      post.resources = resourcesObj[post.pid] || [];
     }
     if(o.usersVote) {
       post.usersVote = voteObj[post.pid];

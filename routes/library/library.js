@@ -71,6 +71,7 @@ router
     if(!resource) ctx.throw(400, `rid异常，数据库中无对应的resource数据。rid: ${rid}`);
     
     const file = await db.LibraryModel.newFile({
+      user: data.user,
       lid: library._id,
       resource,
       name,

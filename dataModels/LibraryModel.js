@@ -69,10 +69,16 @@ const schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  // 文件夹的创建人
+  // 文库的上传人
   uid: {
     type: String,
     required: true,
+    index: 1
+  },
+  // 附件的上传人
+  rUid: {
+    type: String,
+    default: "",
     index: 1
   },
   // 封面图
@@ -167,7 +173,7 @@ schema.statics.newFolder = async (options = {}) => {
   @author pengxiguaa 2019-10-21
 */
 schema.statics.newFile = async (options = {}) => {
-  const {name, description, category, lid, resource, ip, port} = options;
+  const {name, description, category, lid, resource, ip, port, user} = options;
   const LibraryModel = mongoose.model("libraries");
   const SettingModel = mongoose.model("settings");
   const type = "file";
@@ -184,7 +190,8 @@ schema.statics.newFile = async (options = {}) => {
     _id: await SettingModel.operateSystemID("libraries", 1),
     type,
     lid,
-    uid,
+    uid: user.uid,
+    rUid: uid,
     name,
     ip,
     port,

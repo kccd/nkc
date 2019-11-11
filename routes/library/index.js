@@ -17,6 +17,7 @@ router
       // 再加载此文件夹的路径
       const library = await db.LibraryModel.findOne({_id: Number(lid), type: "folder", deleted: false});
       if(!library) ctx.throw(400, `文件夹ID异常，lid: ${lid}`);
+      
       let nav = await library.getNav();
       nav = nav.map(n => n.toObject());
       
@@ -91,8 +92,19 @@ router
         deleted: false,
         lid
       };
+      const library = await db.LibraryModel.findOne({_id: lid, deleted: false, type: "folder"});
+      if(!library) ctx.throw(400, `文件夹ID异常，lid: ${lid}`);
       const folders = await db.LibraryModel.find(q);
       data.folders = nkcModules.pinyin.sortByFirstLetter("object", folders, "name");
+    }
+    if(ctx.permission("modifyAllResource")) {
+      data.permission = [
+        "createFile", "modifyFile", "deleteFile", "moveFile",
+        "createFolder", "modifyFolder", "deleteFolder", "moveFolder",
+      ];
+      data.permission.push("modifyOtherLibrary");
+    } else {
+      data.permission = await db.LibraryModel.getPermission(data.user);
     }
     await next();
   })

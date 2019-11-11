@@ -507,9 +507,20 @@ resourceRouter
     // await fs.rename(path, mediaFilePath);
     await fs.copyFile(path, mediaFilePath);
     await fs.unlink(path);
+
+    // 判断图片的宽高
+    let height, width;
+    if(mediaType === "mediaPicture") {
+      const pictureInfo = await tools.imageMagick.info(mediaFilePath);
+      height = pictureInfo.height;
+      width = pictureInfo.width;
+    }
+
     const r = new ctx.db.ResourceModel({
       rid,
       oname: name,
+      height,
+      width,
       path: middlePath + saveName,
       tpath: middlePath + saveName,
       ext: extension,

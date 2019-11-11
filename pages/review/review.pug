@@ -2,6 +2,7 @@ extends ../bootstrap_base
 block title
   title 内容审核
   +includeCSS("/review/review.css")
+  include ../publicModules/plyr/plyr.css.pug
 block content
   .container-fluid.max-width
     #data.hidden=objToStr({results: data.results})
@@ -94,5 +95,7 @@ block content
 
 
 block scripts
+  include ../publicModules/lazySizes
   include ../publicModules/moment
   +includeJS("/review/review.js")
+  include ../publicModules/plyr/plyr.js.pug

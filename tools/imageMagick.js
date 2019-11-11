@@ -1,4 +1,5 @@
 const {spawn, exec} = require('child_process');
+const imageSize = require("image-size");
 const settings = require('../settings');
 const {banner, watermark, fontTtf} = settings.statics;
 const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize, webLogoSize, webSmallLogoSize, userBannerSize} = settings.upload;
@@ -103,17 +104,37 @@ const pictureRotate = async path => {
   return spawnProcess('magick', ['convert', path, '-rotate', '90', path]);
 }
 
-const info = async path => {
+/* const info = async path => {
   let back;
   if(linux) {
     back = await spawnProcess('identify', ['-format', '%wx%h', path]);
   } else {
     back = await spawnProcess('magick', ['identify', '-format', '%wx%h', path]);
   }
+  console.log(back)
   back = back.replace('\n', '');
   const sizeInfo = back.split('x');
   const [width, height] = sizeInfo;
   return {width, height}
+}; */
+
+/*const info = async path => {
+  let back;
+  if(linux) {
+    back = await spawnProcess('convert', [path, '-print', '%wx%h', path]);
+  } else {
+    back = await spawnProcess('magick', ['convert', path, '-print', '%wx%h', path]);
+  }
+  back = back.replace('\n', '');
+  back = back.split("x");
+  const [width, height] = back;
+  return {
+    width: parseInt(width),
+    height: parseInt(height)
+  }
+};*/
+const info = async path => {
+  return imageSize(path);
 };
 
 // 获取水印图片尺寸
@@ -429,7 +450,7 @@ module.exports = {
 	lifePhotoify,
   forumAvatarify,
   imageNarrow,
-	userBannerify,
+  userBannerify,
   messageImageSMify,
   friendImageify,
   avatarLargeify,

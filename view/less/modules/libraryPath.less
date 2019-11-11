@@ -19,6 +19,17 @@
     }
     padding-left: 0.8rem;
     .folder{
+      .folder-form{
+        padding: 1rem;
+        background-color: #bbd5e8;
+        border-radius: 2px;
+        padding-bottom: 0;
+        overflow: hidden;
+        padding-top: 0.5rem;
+        .form-group{
+          margin-bottom: 0.5rem;
+        }
+      }
       .folder-body.active{
         background-color: #bbd5e8;
         border-radius: 2px;
@@ -28,6 +39,7 @@
       .fa{
         position: absolute;
         font-size: 1.35rem;
+        z-index: 100;
         line-height: @folderHeight;
         text-align: center;
         cursor: pointer;
@@ -36,7 +48,9 @@
       }
       .folder-name{
         cursor: pointer;
+        position: relative;
         height: @folderHeight;
+        padding-right: 1.8 * @folderHeight;
         line-height: @folderHeight;
         padding-left: @folderHeight;
         .hideText(@line:1);
@@ -45,6 +59,27 @@
           width: 1.3rem;
           margin-top: -2px;
           margin-right: 0.4rem;
+        }
+        .folder-option{
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 100%;
+          text-align: right;
+          font-size: 1.2rem;
+          color: @darkGray;
+          // width: 3rem;
+          .fa{
+            position: relative;
+            height: @folderHeight;
+            width: @folderHeight * 0.7;
+            text-align: center;
+            transition: color 100ms;
+            &:hover{
+              color: @dark;
+            }
+            display: inline-block;
+          }
         }
       }
     }

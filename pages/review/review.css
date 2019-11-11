@@ -41,7 +41,7 @@ body{
 .review-post-content{
   margin-top: 1rem;
 }
-.review-post-content img{
+.review-post-content img, .review-post-content audio, .review-post-content video{
   max-width: 100%;
 }
 .review-input-div{

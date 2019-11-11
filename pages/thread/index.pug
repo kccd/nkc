@@ -27,12 +27,12 @@ block title
     
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
-    //link(rel='stylesheet' href=`/mdui/css/mdui.css?v=${global.NKC.startTime}`)
     link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
     +includeCSS("/jquery-ui-1.10.4.custom.css")
     +includeCSS("/external_pkgs/viewer/viewer.css")
     +includeCSS("/external_pkgs/viewer/main.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
+    include ../publicModules/plyr/plyr.css.pug
 
   mixin postOptions(post, targetThread, index, dropType)
     -dropType = dropType || "dropdown";
@@ -638,6 +638,7 @@ block content
       include ../publicModules/toColumn/toColumn
 
 block scripts
+  include ../publicModules/plyr/plyr.js.pug
   script.
     NKC.configs.postHeight = {};
   script=`NKC.configs.postHeight.xs=${data.postHeight.xs}`
@@ -649,7 +650,7 @@ block scripts
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  //- script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   +includeJS("/module_dropdown.js")
   script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
   script(src=`/thread/index.js?v=${global.NKC.startTime}`)
@@ -660,7 +661,7 @@ block scripts
   script(src='/external_pkgs/react/react.min.js')
   script(src='/external_pkgs/react/JSXTransformer.js')
   script(src=`/thread/socket.js?v=${startTime}`)
-  script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
+  //- script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
   script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
@@ -671,6 +672,7 @@ block scripts
   include ../publicModules/complaint/complaint
   include ../publicModules/crop/crop
   include ../publicModules/moment
+  include ../publicModules/lazySizes
   if data.user
     include ../ueditor/ueditorBase
   include ../MathJax.pug

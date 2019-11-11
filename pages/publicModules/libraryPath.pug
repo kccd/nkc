@@ -22,6 +22,17 @@
               .folder-name(@click="selectFolder(f)" @dblclick="switchFolder(f)") 
                 img(src=tools.getUrl('fileCover', "folder"))
                 | {{f.name}}
+                .folder-option
+                  .fa.fa-plus-square-o(v-if="per('createFolder')" @click="toForm('create', f)" title="新建文件夹")
+                  .fa.fa-edit(v-if="f.lid && per('modifyOtherLibrary') || (per('modifyFolder') && uid && uid === 'f.uid')" @click="toForm('modify',f)" title="编辑文件夹")
+            .folder-form(v-if="form.folder && f._id === form.folder._id")
+              .form-group
+                input.form-control(v-model="form.name" placeholder="名称")
+              .form-group  
+                textarea.form-control(v-model="form.description" placeholder="简介") 
+              .form-group.text-right
+                button.btn.btn-sm.btn-primary(@click="submitForm") 确定
+                button.btn.btn-sm.btn-default(@click="form.folder = ''") 取消
             .folders.loaded(v-if="!f.loaded && !f.close")  加载中...
             .folders(v-if="f.folders && f.folders.length && !f.close")
               .folder(v-for="f in f.folders")

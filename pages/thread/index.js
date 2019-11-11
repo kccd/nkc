@@ -113,6 +113,7 @@ $(document).ready(function(){
 	  quotePost(s.pid, s.step, s.page);
   }
 
+
 });
 function addToColumn(pid, columnId) {
   moduleToColumn.show(function(data) {
