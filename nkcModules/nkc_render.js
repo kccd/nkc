@@ -592,7 +592,7 @@ function nkc_render(options){
         }
         // return '<div class="article-video-body">' + '</div>';
         return '<div class="article-video-body"><div>' +
-        '<video class="plyr-dom" preload="none" controls poster="/frameImg/'+v1+
+        '<video class="plyr-dom" preload="none" controls poster="/frameImg/'+v1+ '" data-rid="' + v1 +
         '" data-plyr-title="'+resource.oname+'"' +
         '><source src="/r/'+v1+
         '" type="video/mp4"></source>你的浏览器不支持video标签，请升级。</video>' + 
@@ -609,7 +609,7 @@ function nkc_render(options){
           /* '<div class="article-audio-name">' + plain_escape(resource.oname) + 
             '<div class="article-audio-size">' + getSize(resource.size) + '</div>' +
           '</div>'+ */
-          '<audio class="plyr-dom" preload="none" controls>'+
+          '<audio class="plyr-dom" preload="none" controls data-rid="'+v1+'">' +
             '<source src="/r/'+v1+'" type="audio/mp3" />'+
             '你的浏览器不支持audio标签，请升级。'+
           '</audio>'+

@@ -32,6 +32,11 @@ function () {
         permission: [],
         lastHistoryLid: "",
         selectedCategory: "book",
+        // 批量修改文件类型
+        selectedFolder: "",
+        // 批量修改文件目录 目录ID
+        selectedFolderPath: "",
+        // 批量修改文件目录 目录路径
         listCategories: ["book", "paper", "program", "media", "other"],
         categories: [{
           id: "book",
@@ -49,7 +54,7 @@ function () {
           id: "other",
           name: "其他"
         }],
-        protocol: false // 是否同意协议
+        protocol: true // 是否同意协议
 
       },
       watch: {
@@ -202,33 +207,12 @@ function () {
         },
         // 批量设置文件目录
         selectFilesFolder: function selectFilesFolder() {
+          var this_ = this;
           LibraryPath.open(function (data) {
             var folder = data.folder,
                 path = data.path;
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-              for (var _iterator2 = self.app.selectedFiles[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                var f = _step2.value;
-                f.folder = folder;
-                f.folderPath = path;
-              }
-            } catch (err) {
-              _didIteratorError2 = true;
-              _iteratorError2 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-                  _iterator2["return"]();
-                }
-              } finally {
-                if (_didIteratorError2) {
-                  throw _iteratorError2;
-                }
-              }
-            }
+            this_.selectedFolder = folder;
+            this_.selectedFolderPath = path;
           }, {
             lid: this.lid,
             warning: "该操作将覆盖本页所有设置，请谨慎操作。"
@@ -249,6 +233,22 @@ function () {
             selectedFiles.map(function (f) {
               return f.category = selectedCategory;
             });
+          })["catch"](function (err) {});
+        },
+        // 批量设置文件目录
+        markFolder: function markFolder() {
+          var selectedFolder = this.selectedFolder,
+              selectedFolderPath = this.selectedFolderPath,
+              selectedFiles = this.selectedFiles;
+          if (!selectedFolder) return;
+          var this_ = this;
+          sweetQuestion("\u8BE5\u64CD\u4F5C\u5C06\u8986\u76D6\u672C\u9875\u6240\u6709\u8BBE\u7F6E\uFF0C\u8BF7\u518D\u6B21\u786E\u8BA4\u3002").then(function () {
+            selectedFiles.map(function (f) {
+              f.folder = selectedFolder;
+              f.folderPath = selectedFolderPath;
+            });
+            this_.selectedFolder = "";
+            this_.selectedFolderPath = "";
           })["catch"](function (err) {});
         },
         // 网页切换事件
@@ -560,26 +560,26 @@ function () {
               _document$getElementB2 = _document$getElementB.files,
               files = _document$getElementB2 === void 0 ? [] : _document$getElementB2;
 
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
+          var _iteratorNormalCompletion2 = true;
+          var _didIteratorError2 = false;
+          var _iteratorError2 = undefined;
 
           try {
-            for (var _iterator3 = files[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              var file = _step3.value;
+            for (var _iterator2 = files[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              var file = _step2.value;
               this.selectedFiles.push(this.createFile("localFile", file));
             }
           } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
+            _didIteratorError2 = true;
+            _iteratorError2 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
-                _iterator3["return"]();
+              if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+                _iterator2["return"]();
               }
             } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
+              if (_didIteratorError2) {
+                throw _iteratorError2;
               }
             }
           }

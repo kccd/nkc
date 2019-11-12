@@ -20,7 +20,9 @@ NKC.modules.Library = class {
         selectedLibrariesId: [],
         permission: [],
         lastHistoryLid: "",
-        selectedCategory: "book",
+        selectedCategory: "book", // 批量修改文件类型
+        selectedFolder: "", // 批量修改文件目录 目录ID
+        selectedFolderPath: "", // 批量修改文件目录 目录路径
         listCategories: ["book", "paper", "program", "media", "other"],
         categories: [
           {
@@ -44,7 +46,7 @@ NKC.modules.Library = class {
             name: "其他"
           }
         ],
-        protocol: false, // 是否同意协议
+        protocol: true, // 是否同意协议
       },
       watch:{
         listCategories() {
@@ -142,7 +144,7 @@ NKC.modules.Library = class {
           let count = 0;
           this.selectedFiles.map(f => {
             if(f.status === "notUploaded") count ++;
-          })
+          });
           return count;
         }
         
@@ -160,12 +162,11 @@ NKC.modules.Library = class {
         },
         // 批量设置文件目录
         selectFilesFolder() {
+          const this_ = this;
           LibraryPath.open((data) => {
             const {folder, path} = data;
-            for(const f of self.app.selectedFiles) {
-              f.folder = folder;
-              f.folderPath = path;
-            }
+            this_.selectedFolder = folder;
+            this_.selectedFolderPath = path;
           }, {
             lid: this.lid,
             warning: "该操作将覆盖本页所有设置，请谨慎操作。"
@@ -182,6 +183,22 @@ NKC.modules.Library = class {
           sweetQuestion("该操作将覆盖本页所有设置，请再次确认。")
             .then(() => {
               selectedFiles.map(f => f.category = selectedCategory);
+            })
+            .catch(err => {})
+        },
+        // 批量设置文件目录
+        markFolder() {
+          const {selectedFolder, selectedFolderPath, selectedFiles} = this;
+          if(!selectedFolder) return;
+          const this_ = this;
+          sweetQuestion(`该操作将覆盖本页所有设置，请再次确认。`)
+            .then(() => {
+              selectedFiles.map(f => {
+                f.folder = selectedFolder;
+                f.folderPath = selectedFolderPath;
+              });
+              this_.selectedFolder = "";
+              this_.selectedFolderPath = "";
             })
             .catch(err => {})
         },

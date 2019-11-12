@@ -110,6 +110,7 @@
                 li(@click.stop="deleteFolder(f._id)" v-if="per('modifyOtherLibrary') || (f.type === 'file' && per('deleteFile')) || (f.type === 'folder' && per('deleteFolder'))")
                   .fa.fa-trash(style="padding-left: 2px;")
                   | &nbsp;删除
+
   div(v-else)
     .lib-uploader
       .options-button
@@ -139,9 +140,11 @@
           option(value="other") 其他
         .options-button  
           a.active(@click="markCategory") 执行  
-        span 文件目录  
+        span 文件目录
+        .mark-folder(v-if="selectedFolder") {{selectedFolderPath}}
         .options-button  
           a.active(@click="selectFilesFolder") 选择目录
+          a.active(@click="markFolder" v-if="selectedFolderPath") 执行
       .lib-files(v-if="!selectedFiles.length")    
         .null 空空如也~
       .lib-files(v-else)

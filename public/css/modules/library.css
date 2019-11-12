@@ -287,6 +287,11 @@
   height: 2rem;
   font-size: 1rem;
 }
+#moduleLibrary .mark-folder {
+  display: inline-block;
+  color: #e85a71;
+  font-weight: 700;
+}
 #moduleLibrary .uploading-status {
   color: #888;
   font-weight: 700;
