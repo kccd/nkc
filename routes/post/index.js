@@ -13,6 +13,7 @@ const postRouter = require("./post");
 const Path = require("path");
 const toppedRouter = require("./topped");
 const authorRouter = require("./author");
+const resourcesRouter = require("./resources");
 const router = new Router();
 
 router
@@ -482,5 +483,6 @@ router
   .use('/:pid/quote', quote.routes(), quote.allowedMethods())
   .use("/:pid/topped", toppedRouter.routes(), toppedRouter.allowedMethods())
   .use("/:pid/anonymous", anonymousRouter.routes(), anonymousRouter.allowedMethods())
+  .use("/:pid/resources", resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods());
 module.exports = router;

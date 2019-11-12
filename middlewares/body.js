@@ -4,7 +4,7 @@ const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
 module.exports = async (ctx, next) => {
-  const {filePath, fileName, resource, fs, tg} = ctx;
+  const {filePath, fileType, fileName, resource, fs, tg} = ctx;
   if(filePath && ctx.method === 'GET') {
     let stats;
     try{
@@ -34,7 +34,7 @@ module.exports = async (ctx, next) => {
     }
     // 设置文件类型
     ctx.type = ext;
-    if(ext === "mp4"){
+    if(fileType !== "attachment" && ext === "mp4"){
       if(ctx.request.headers['range']){
         var range = utils.parseRange(ctx.request.headers["range"], stats.size);
         if(range){
@@ -63,7 +63,7 @@ module.exports = async (ctx, next) => {
         // stream.pipe(ctx.response);
       }
     }else{
-      if(extArr.includes(ext)) {
+      if(fileType !== "attachment" && extArr.includes(ext)) {
         ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
       } else {
         ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)

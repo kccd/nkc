@@ -1,3 +1,6 @@
 module.exports = {
-  GET: "test"
+  GET: "test",
+  PARAMETER: {
+    GET: "test",
+  }
 };

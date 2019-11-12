@@ -32,11 +32,10 @@ router
     if(type === "modifyContent") {
       const {title, content} = body;
       if(!content) ctx.throw(400, "页面内容不能为空");
-      await page.update({
-        t: title,
-        c: content,
-        tlm: Date.now()
-      });
+      page.t = title;
+      page.c = content;
+      page.tlm = Date.now();
+      await page.save();
       await db.ColumnPageModel.toSearch(page._id);
     } else if(type === "hide") {
       let {hidden} = body;
@@ -86,6 +85,7 @@ router
     if(!page) ctx.throw(404, `未找到ID为${pageId}的自定义页面`);
     if(page.hidden && (!user || column.uid !== user.uid)) ctx.throw(403, "该页面已被专栏主关闭");
     data.page = page;
+    page.resources = await db.ResourceModel.find({references: `column-${pageId}`});
     data.pageContent = nkcModules.apiFunction.obtainPureText(page.c, true, 150);
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);

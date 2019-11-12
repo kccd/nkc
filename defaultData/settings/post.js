@@ -23,7 +23,9 @@ module.exports = {
         defaultCertGradesId: [],
         rolesId: [],
         uid: []
-      }
+      },
+      // 原创申明 字数最小值
+      originalWordLimit: 500
     },
     postToThread: {
       authLevelMin: 0,

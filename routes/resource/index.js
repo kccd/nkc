@@ -29,8 +29,9 @@ resourceRouter
     await next();
   })
   .get('/:rid', async (ctx, next) => {
-    const {params, data, db, fs, settings, nkcModules} = ctx;
+    const {query, params, data, db, fs, settings, nkcModules} = ctx;
     const {rid} = params;
+    const {t} = query;
     const {cache} = settings;
     const resource = await db.ResourceModel.findOnly({rid});
     const {mediaType, ext} = resource;
@@ -95,6 +96,10 @@ resourceRouter
     await resource.update({$inc:{hits:1}});
     
     ctx.filePath = filePath;
+    // 表明客户端希望以附件的形式加载资源
+    if(t === "attachment") {
+      ctx.fileType = "attachment";
+    }
     ctx.resource = resource;
     ctx.type = ext;
 

@@ -7,6 +7,7 @@ script.
     for (var i = 0; i < videoDom.length; i++) {
       var dom = videoDom.eq(i);
       var title = dom.attr("data-plyr-title");
+      var rid = dom.attr("data-rid");
       var player = new Plyr(videoDom.eq(i), {
         ratio: '4:3',
         title: title,
@@ -17,8 +18,13 @@ script.
           normal: "正常"
         },
         blankVideo: "/external_pkgs/plyr/blank.mp4",
-        autopause: true,
+        autopause: true
       });
+      var url = "/r/" + rid + "?t=attachment";
+      if(NKC.methods.getRunType() === "app") {
+        url += "&apptype=app";
+      }
+      player.download = url;
     }
   };
   NKC.methods.initVideo();

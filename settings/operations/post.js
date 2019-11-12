@@ -55,6 +55,9 @@ module.exports = {
     },
     topped: {
 		  POST: "topPost"
-    }
+    },
+		resources: {
+			GET: "getPostResources"
+		}
 	}
 };

@@ -20,18 +20,23 @@ router
     await next();
   })
   .patch('/', async (ctx, next) => {
-    const {body, db} = ctx;
+    const {body, db, nkcModules} = ctx;
     const {roles, grades, postToThread, postToForum, postLibrary} = body;
     const q = {};
+    const {checkNumber} = nkcModules.checkData;
     if(postToForum || postToThread) {
       if(postToForum) {
-        const {exam} = postToForum;
+        const {exam, originalWordLimit} = postToForum;
         if(exam.notPass.status) {
           exam.volumeA = true;
           exam.volumeB = true;
         } else if(exam.volumeA) {
           exam.volumeB = true;
         }
+        checkNumber(originalWordLimit, {
+          name: "原创声明内容最小字数",
+          min: 0
+        });
         q['c.postToForum'] = postToForum;
       }
       if(postToThread) {

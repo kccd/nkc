@@ -3,6 +3,8 @@ block title
   meta(name='description' content=`${data.forum.description}` || '暂无专业介绍')
   title=`${data.forum.displayName} - ${state.serverSettings.websiteName}`
   +includeCSS("/forum/forum.css")
+  if data.type === "home"
+    include ../publicModules/plyr/plyr.css.pug
 block content
   //- 判断用户是否有权限管理专业内的文章
   -let canManagement = false;
@@ -200,7 +202,7 @@ block content
                     .fa.fa-exclamation
                     span &nbsp;当前文库已被关闭。  
                 if !data.libraryClosed || permission("modifyAllResource")
-                  include ../publicModules/library          
+                  include ../publicModules/library/library
           //-else if data.type === "library"
             +includeCSS("/library/library.css")
             -const docTypes = [{t: "all",n: "全部"}, {t: "book", n: "图书"}, {t: "paper", n: "论文"}, {t: "program", n: "程序"}, {t: "media", n: "媒体"}, {t: "other", n: "其他"}];
@@ -317,6 +319,9 @@ block content
         include ../module_scrollTo
 
 block scripts
+  if data.type === "home"
+    include ../publicModules/plyr/plyr.js.pug
+    include ../publicModules/lazySizes
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/md5
@@ -326,8 +331,8 @@ block scripts
     include ../publicModules/commonModal/commonModal
     include ../publicModules/moment
     include ../publicModules/selectResource/selectResource
-    include ../publicModules/libraryPath
-    +includeJS("/js/modules/library.js")
+    include ../publicModules/library/libraryPath
+    include ../publicModules/library/library.js.pug
     script=`NKC.configs.lid = ${data.forum.lid};`
     if data.folderId
       script=`NKC.configs.folderId = ${data.folderId};`

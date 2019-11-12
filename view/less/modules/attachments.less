@@ -1,0 +1,74 @@
+@import "../base.less";
+#moduleAttachments{
+  .attachment-header{
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    color: @dark;
+  }
+  .attachment-body{
+    .attachment:last-child{
+      .attachment-info{
+        border: none;
+        padding-bottom: 0;
+      }
+    }
+  }
+  .attachment{
+    padding: 0 0.5rem;
+    .attachment-cover{
+      @coverWidth: 3.5rem;
+      @coverMarginRight: 0.5rem;
+      img{
+        height: @coverWidth;
+        width: @coverWidth;
+        margin-right: @coverMarginRight;
+      }
+      display: table-cell;
+      width: @coverWidth + @coverMarginRight;
+      margin-right: 1rem;
+      vertical-align: top;
+    }
+    .attachment-content{
+      display: table-cell;
+      width: 100%;
+      vertical-align: top;
+      .attachment-name{
+        font-size: 1.4rem;
+        color: @primary;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .attachment-info{
+        font-size: 1rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+        .attachment-user{
+          vertical-align: top;
+          cursor: pointer;
+          img{
+            height: 1.4rem;
+            margin-top: -1px;
+            margin-right: 0.3rem;
+            width: 1.4rem;
+            border-radius: 50%;
+          }
+        }
+        .attachment-time{
+          display: inline-block;
+          color: @darkGray;
+        }
+        .attachment-size{
+          display: inline-block;
+          color: @accent;
+        }
+        .attachment-ext{
+          color: @accent;
+          font-weight: 700;
+          display: inline-block;
+        }
+      }
+    }
+  }
+}

@@ -4,15 +4,11 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-8
-        .article-attachment
-          .article-attachment-icon
-            img(src=tools.getUrl("fileCover", "folder"))
-          .article-attachment-content
-            .article-attachment-name
-            .article-attachment-info
-            .article-attachment-button
-      .col-xs-12.col-md-4
+      .col-xs-12.col-md-9
+        .fullwidthpanel.ThreadBox.nkcpanel
+          include ../publicModules/attachments/attachments
+      .col-xs-12.col-md-3
         p Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam explicabo cumque tempore, nesciunt id ex cum quidem. Dolorem aspernatur facere quam optio cum. Asperiores quisquam dolorem tempore facilis velit iste!
 block scripts
-  
+  include ../publicModules/attachments/attachments_js
+  +includeJS("/test/test.js")
