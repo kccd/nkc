@@ -801,7 +801,7 @@ img.apply-column-banner{
   font-size: 16px;
   overflow: hidden;
 }
-.column-page-content img{
+.column-page-content img, .column-page-content video{
   border-radius: 7px;
   max-width: 100%;
 }

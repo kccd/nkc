@@ -1,2 +1,3 @@
-var Library = new NKC.modules.Library("239");
-
+var attachments = new NKC.modules.Attachments({
+  pid: "865780"
+});

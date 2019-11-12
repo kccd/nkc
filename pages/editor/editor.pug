@@ -142,8 +142,9 @@ block content
                 button.btn.btn-default.btn-sm(@click="addAuthor") 添加
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 原创
+                small （字数小于{{originalWordLimit}}的文章无法申明原创）
               .editor-origin-state.form-inline
-                select.form-control(v-model="originState")
+                select.form-control(v-model="originState" :disabled="!allowedOriginal" :title="!allowedOriginal?'字数小于'+originalWordLimit+'的文章不可申明原创': ''")
                   for text, index in getOriginLevel()
                     option(:value=index)=text
           .m-b-2
@@ -192,7 +193,7 @@ block content
         div
           h5.text-danger 温馨提示：
           p 1. 每隔60秒编辑器会自动将已输入的内容保存到草稿箱，相应的草稿会在内容发表后被清除。而未清除的草稿可以在下一次从相同入口进入编辑器时选择加载。
-  .hidden#data=objToStr({permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft})
+  .hidden#data=objToStr({originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft})
 block scripts
   include ../ueditor/ueditorBase
   include ../publicModules/moment

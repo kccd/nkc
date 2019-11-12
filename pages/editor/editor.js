@@ -59,6 +59,8 @@ function initVueApp() {
     data: {
       // 自动保存草稿
       saveDraftTimeout: 60000,
+      // 原创申明最小字数限制
+      originalWordLimit: data.originalWordLimit || 0,
       type: "newThread",
       // 当前内容相关的文章
       // @param {String} title 文章标题
@@ -88,6 +90,7 @@ function initVueApp() {
 
       title: "", // 文章标题
       content: "", // 文章内容
+      contentLength: "", // 文章内容字数
 
       cover: "",
       // 新选择的封面图的本地路径
@@ -110,7 +113,10 @@ function initVueApp() {
 
     },
     mounted: function() {
-
+      var this_ = this;
+      editor.addListener("contentChange", function() {
+        this_.watchContentChange();
+      });
       this.selectedForums = data.mainForums || [];
       this.thread = data.thread;
       this.post = data.post;
@@ -149,6 +155,12 @@ function initVueApp() {
       }
     },
     computed: {
+      // 是否能够申明原创
+      allowedOriginal: function() {
+        var allowed = this.contentLength >= this.originalWordLimit;
+        if(!allowed) this.originState = 0;
+        return allowed;
+      },
       // 关键词字数
       keywordsLength: function() {
         return this.keyWordsEn.length + this.keyWordsCn.length;
@@ -189,6 +201,12 @@ function initVueApp() {
       fromNow: NKC.methods.fromNow,
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
+      // 监听内容输入
+      watchContentChange: function() {
+        var content = editor.getContentTxt();
+        this.contentLength = content.length;
+      },
+      // 判断发表权限
       alertPermissionInfo: function() {
         if(data.permissionInfo) {
           sweetInfo("你暂无法发表内容，因为" + data.permissionInfo + "。");

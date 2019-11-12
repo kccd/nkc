@@ -188,9 +188,12 @@ router
     if(["modifyPost", "modifyThread", "newPost"].includes(data.type) && state.userColumn) {
       data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: data.thread.tid})) > 0;
     }
-    // 判断用户是否有权限发起调查
     if(["modifyThread", "newThread"].includes(data.type)) {
+      // 判断用户是否有权限发起调查
       data.createSurveyPermission = await db.SurveyModel.ensureCreatePermission("postToForum", data.user.uid);
+      // 获取发表设置中原创申明文章内容最小字数限制
+      const postSettings = await db.SettingModel.getSettings("post");
+      data.originalWordLimit = postSettings.postToForum.originalWordLimit;
     }
 
     if(data.type === "newThread") {

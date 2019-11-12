@@ -2,10 +2,6 @@ const Router = require('koa-router');
 const redisClient = require("../../settings/redisClient");
 const router = new Router();
 router
-  .get("/a", async (ctx, next) => {
-    ctx.template = "home/home_all.pug";
-    await next();
-  })
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query, state} = ctx;
     const {pageSettings} = state;

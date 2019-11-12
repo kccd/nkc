@@ -227,7 +227,13 @@ block content
                       img(:src="'/avatar/' + user.avatar + '?t=sm'")
                       a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
                       .fa.fa-remove(@click="removeUser(index, 'survey')" title="点击移除")
-
+                hr
+            .row(v-if="type === 'postToForum'")
+              .col-sm-2.text-right
+                h4 原创申明
+              .col-sm-10
+                .m-t-05 文章内容最小字数：
+                  input(type="text" v-model.number="postSettings[type].originalWordLimit")
             .row
               .col-sm-10.col-sm-offset-2.mdui-m-t-3.text-right
                 button.mdui-btn.mdui-color-theme.mdui-btn-block(@click='save') 保存
