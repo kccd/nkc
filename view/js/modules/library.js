@@ -1,11 +1,12 @@
 NKC.modules.Library = class {
   constructor(options) {
-    const {lid, folderId, tLid} = options;
+    const {lid, folderId, tLid, uploadResourcesId} = options;
     const self = this;
     self.app = new Vue({
       el: "#moduleLibrary",
       data: {
         uid: NKC.configs.uid,
+        uploadResourcesId,
         pageType: "list", // list: 文件列表, uploader: 文件上传
         nav: [],
         folders: [],
@@ -66,6 +67,7 @@ NKC.modules.Library = class {
           this.getList(childFolderId)
             .then(() => {
               this_.addHistory(this_.lid);
+              this_.addFileByRid();
             })
             .catch ((err) => {
               this_.getListInfo(this_.lid);
@@ -156,6 +158,20 @@ NKC.modules.Library = class {
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
         scrollTo: NKC.methods.scrollTop,
+        addFileByRid() {
+          const {uploadResourcesId} = this;
+          if(!uploadResourcesId || uploadResourcesId.length <= 0) return;
+          const rid = uploadResourcesId.join("-");
+          nkcAPI(`/rs?rid=${rid}`, "GET")
+            .then(data => {
+              data.resources.map(r => {
+                self.app.selectedFiles.push(self.app.createFile("onlineFile", r));
+              });
+              self.app.pageType = "uploader";
+              self.app.uploadResourcesId = [];
+            })
+            .catch(sweetError)
+        },
         // 清空未上传的记录
         clearUnUploaded() {
           this.selectedFiles = this.selectedFiles.filter(f => f.status !== "notUploaded");
@@ -217,6 +233,7 @@ NKC.modules.Library = class {
           this.getList(id, scrollToTop)
             .then(() => {
               self.app.addHistory(id);
+              self.app.addFileByRid();
             })
             .catch(err => {
               sweetError(err)

@@ -10,12 +10,14 @@ function () {
 
     var lid = options.lid,
         folderId = options.folderId,
-        tLid = options.tLid;
+        tLid = options.tLid,
+        uploadResourcesId = options.uploadResourcesId;
     var self = this;
     self.app = new Vue({
       el: "#moduleLibrary",
       data: {
         uid: NKC.configs.uid,
+        uploadResourcesId: uploadResourcesId,
         pageType: "list",
         // list: 文件列表, uploader: 文件上传
         nav: [],
@@ -76,6 +78,7 @@ function () {
           // 如果浏览器本地存有访问记录，则先确定该记录中的文件夹是否存在，存在则访问，不存在则打开顶层文件夹。
           this.getList(childFolderId).then(function () {
             this_.addHistory(this_.lid);
+            this_.addFileByRid();
           })["catch"](function (err) {
             this_.getListInfo(this_.lid);
           });
@@ -199,6 +202,18 @@ function () {
         getSize: NKC.methods.tools.getSize,
         checkString: NKC.methods.checkData.checkString,
         scrollTo: NKC.methods.scrollTop,
+        addFileByRid: function addFileByRid() {
+          var uploadResourcesId = this.uploadResourcesId;
+          if (!uploadResourcesId || uploadResourcesId.length <= 0) return;
+          var rid = uploadResourcesId.join("-");
+          nkcAPI("/rs?rid=".concat(rid), "GET").then(function (data) {
+            data.resources.map(function (r) {
+              self.app.selectedFiles.push(self.app.createFile("onlineFile", r));
+            });
+            self.app.pageType = "uploader";
+            self.app.uploadResourcesId = [];
+          })["catch"](sweetError);
+        },
         // 清空未上传的记录
         clearUnUploaded: function clearUnUploaded() {
           this.selectedFiles = this.selectedFiles.filter(function (f) {
@@ -264,6 +279,7 @@ function () {
         getListInfo: function getListInfo(id, scrollToTop) {
           this.getList(id, scrollToTop).then(function () {
             self.app.addHistory(id);
+            self.app.addFileByRid();
           })["catch"](function (err) {
             sweetError(err);
           });

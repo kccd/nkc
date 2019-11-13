@@ -142,7 +142,7 @@ block content
                 button.btn.btn-default.btn-sm(@click="addAuthor") 添加
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 原创
-                small （字数小于{{originalWordLimit}}的文章无法申明原创）
+                small （字数小于{{originalWordLimit}}的文章无法声明原创）
               .editor-origin-state.form-inline
                 select.form-control(v-model="originState" :disabled="!allowedOriginal" :title="!allowedOriginal?'字数小于'+originalWordLimit+'的文章不可申明原创': ''")
                   for text, index in getOriginLevel()

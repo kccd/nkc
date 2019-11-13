@@ -8,6 +8,10 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+		thread: {
+			GET: "experimentalThreadSettings",
+			PATCH: "experimentalThreadSettings"
+		},
     transfer: {
       GET: "experimentalTransferKCB",
       POST: "experimentalTransferKCB"

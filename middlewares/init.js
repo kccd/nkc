@@ -39,7 +39,7 @@ module.exports = async (ctx, next) => {
     ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   } catch(err) {
     if(err.status === 404) {
-      console.log(`未知来源的请求：${ctx.url}`.bgRed);
+      console.log(`未知来源的请求：${ctx.method} ${ctx.url}`.bgRed);
       ctx.template = "error/error.pug";
       ctx.status = 404;
       ctx.data.status = 404;

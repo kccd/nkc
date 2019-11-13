@@ -14,4 +14,4 @@ watch.stderr.pipe(process.stderr);
 
 watch.on("close", (code) => {
   console.log(`自动编译已停止 CODE: ${code}`.red);
-})
+});

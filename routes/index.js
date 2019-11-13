@@ -9,6 +9,7 @@ const forumRouter = routers.forum;
 const otherRouter = routers.other;
 const experimentalRouter = routers.experimental;
 const resourceRouter = routers.resource;
+const resourcesRouter = routers.resources;
 const fundRouter = routers.fund;
 const registerRouter = routers.register;
 const downloadRouter = routers.download;
@@ -82,5 +83,6 @@ router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods()
 router.use("/threads", threadsRouter.routes(), threadsRouter.allowedMethods());
 router.use("/avatar", userAvatarRouter.routes(), userAvatarRouter.allowedMethods());
 router.use("/survey", surveyRouter.routes(), surveyRouter.allowedMethods());
+router.use("/rs", resourcesRouter.routes(), resourcesRouter.allowedMethods());
 router.use("/banner", userBannerRouter.routes(), userBannerRouter.allowedMethods());
 module.exports = router;

@@ -736,6 +736,16 @@ threadRouter
 		}
 		// data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
 		// data.thread = data.thread.toObject();
+    
+    // 加载附件数目
+    if(
+      ctx.permission("getPostResources") &&
+      await db.PostModel.ensureAttachmentPermission(data.user?data.user.uid: "")
+    ) {
+      const allPosts = await db.PostModel.find({tid: data.thread.tid}, {pid: 1});
+      const pid = allPosts.map(p => p.pid);
+      data.attachmentsCount = await db.ResourceModel.count({mediaType: "mediaAttachment", references: {$in: pid}});
+    }
     const hidePostSettings = await db.SettingModel.getSettings("hidePost");
     data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;

@@ -1568,7 +1568,17 @@ margin-left: 5px;
   font-size: 1.6em;
 
 }
-
+.thread-attachment>.text-center>div{
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #615553;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0 1rem;
+  user-select: none;
+  font-weight: 700;
+  vertical-align: middle;
+}
 .collapse.navbar-collapse ul.nav.navbar-nav>li>a{
   /*padding-top: 12px;*/
 }

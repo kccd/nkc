@@ -3,14 +3,21 @@ router
   .get("/", async (ctx, next) => {
     const {data, db, query} = ctx;
     data.type = "library";
-    const lid = query.lid;
-    if(lid) {
-      const library = await db.LibraryModel.findOne({_id: lid});
-      if(library) {
-        data.folderId = library.lid || "";
-        data.tLid = library._id;
-      } 
+    const {t, id} = query;
+    if(t && id) {
+      if(t === "nav") {
+        const library = await db.LibraryModel.findOne({_id: id});
+        if(library) {
+          data.folderId = library.lid || "";
+          data.tLid = library._id;
+        }
+      } else if(t === "upload") {
+        let rid = id.split("-");
+        const resources = await db.ResourceModel.find({rid: {$in: rid}}, {rid: 1});
+        data.uploadResourcesId = resources.map(r => r.rid);
+      }
     }
+    
     if(data.forum.lid) {
       const forumLibrary = await db.LibraryModel.findOne({_id: data.forum.lid});
       if(forumLibrary && forumLibrary.closed) data.libraryClosed = true;

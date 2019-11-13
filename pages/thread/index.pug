@@ -446,6 +446,11 @@ block content
                           - const votePost = thread.firstPost;
                           .inline-block(style="vertical-align: text-top;")
                             include ../module_vote
+                          //- 展开附件
+                          if data.attachmentsCount > 0
+                            .pointer.inline-block(style="color: #aaa;margin-right: 2px;" onclick="showAttachments()")
+                              .fa.fa-file-o
+                              span &nbsp;查看附件
                           if !thread.firstPost.anonymous && addKcb && data.user && thread.firstPost.uid !== data.user.uid
                             .inline-block(style='color: #aaa;')
                               .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
@@ -484,6 +489,9 @@ block content
                                       canvas#threadQrcode.inline-block(style="display:none")
                           if data.user
                             +postOptions(thread.firstPost, thread, 0)
+                      if data.attachmentsCount > 0
+                        .thread-attachment.m-t-1
+                          include ../publicModules/attachments/attachments
           if data.thread.firstPost.surveyId
             .fullwidthpanel.ThreadBox.nkcpanel.p-t-2
               -const surveyFormId = `surveyForm${data.thread.firstPost.pid}`;
@@ -645,25 +653,24 @@ block scripts
   script=`NKC.configs.postHeight.sm=${data.postHeight.sm}`
   script=`NKC.configs.postHeight.md=${data.postHeight.md}`
   script=`NKC.configs.postHeight.float=${data.postHeight.float || 0.5}`
-  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-  script(src='/commonmark/dist/commonmark.js')
-  script(src='/plain_escaper.js')
-  script(src='/xbbcode-parser/xbbcode.js')
-  script(src='/xss/dist/xss.js')
+  //script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
+  //script(src='/commonmark/dist/commonmark.js')
+  //script(src='/plain_escaper.js')
+  //script(src='/xbbcode-parser/xbbcode.js')
+  //script(src='/xss/dist/xss.js')
   //- script(src=`/interface_common.js?v=${global.NKC.startTime}`)
   +includeJS("/module_dropdown.js")
-  script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
-  script(src=`/thread/index.js?v=${global.NKC.startTime}`)
+  //script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
   if !state.apptype
     script.
       common.backcolorChange("#{(data.user?data.user.color:null)||'#e4e4e4'}");
   
-  script(src='/external_pkgs/react/react.min.js')
-  script(src='/external_pkgs/react/JSXTransformer.js')
-  script(src=`/thread/socket.js?v=${startTime}`)
+  //script(src='/external_pkgs/react/react.min.js')
+  //script(src='/external_pkgs/react/JSXTransformer.js')
+  //script(src=`/thread/socket.js?v=${startTime}`)
   //- script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
-  script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
-  +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
+  //script(src=`/interface_editor_reply.js?v=${global.NKC.startTime}`)
+  //+includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
   +includeJS("/publicModules/survey/form.js")
   include ../publicModules/selectResource/selectResource
@@ -673,6 +680,15 @@ block scripts
   include ../publicModules/crop/crop
   include ../publicModules/moment
   include ../publicModules/lazySizes
+  if data.attachmentsCount > 0
+    include ../publicModules/attachments/attachments_js
+    script=`NKC.configs.pid = ${data.thread.oc};`
+    -let fid;
+    for f in data.thread.forums
+      if f.lid
+        -fid = f.fid;
+    if fid
+      script=`NKC.configs.fid = ${fid};`
   if data.user
     include ../ueditor/ueditorBase
   include ../MathJax.pug
@@ -706,3 +722,4 @@ block scripts
         }
         //- new Viewer(document.getElementById('pikeLook'), options);
       })
+  +includeJS("/thread/index.js")
