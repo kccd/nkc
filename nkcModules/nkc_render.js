@@ -399,7 +399,7 @@ function nkc_render(options){
 
       break;
 
-      default: replaced = '<a src="/r/'+rid+'"></a>';
+      default: replaced = '<a href="/r/'+rid+'"></a>';
 
       /* default: replaced =
       '<div class="PostResourceDownload" style="width:100%;display:block;word-break:break-all;word-wrap:break-word;">'
