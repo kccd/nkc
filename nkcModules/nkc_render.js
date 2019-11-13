@@ -389,17 +389,17 @@ function nkc_render(options){
       case 'mid':
       case 'wma':
       case 'ogg':
-      replaced = '<audio src="/r/'+rid+'"></audio>';
+      replaced = '<br><audio src="/r/'+rid+'"></audio>';
       break;
 
       case 'mp4'://these are standards
       case 'webm':
       case 'ogg':
-      replaced = '<video src="/r/'+rid+'"></video>';
+      replaced = '<br><video src="/r/'+rid+'"></video>';
 
       break;
 
-      default: replaced = '<a src="/r/'+rid+'"></a>';
+      default: replaced = '<br><a href="/r/'+rid+'"></a>';
 
       /* default: replaced =
       '<div class="PostResourceDownload" style="width:100%;display:block;word-break:break-all;word-wrap:break-word;">'
