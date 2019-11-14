@@ -67,7 +67,8 @@ body {
 .home-forums .home-forums-list .home-forum-parent .home-forum-panel .home-forum-panel-icon {
   height: 2.5rem;
   width: 2.5rem;
-  border-radius: 2px;
+  border-radius: 5px;
+  overflow: hidden;
 }
 .home-forums .home-forums-list .home-forum-parent .home-forum-panel .home-forum-panel-name {
   font-weight: 700;
@@ -102,6 +103,8 @@ body {
   height: 2rem;
   width: 2rem;
   vertical-align: top;
+  box-sizing: border-box;
+  border: 2px solid #eee;
   border-radius: 50%;
 }
 .home-forums .home-forum-panel .home-forum-panel-name {

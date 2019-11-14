@@ -1550,7 +1550,7 @@ margin-left: 5px;
 }
 
 .nkcshade{
-  box-shadow: rgba(0, 0, 0, 0.14) 0px 1px 10px;
+  box-shadow: rgba(0, 0, 0, 0.14) 0 1px 6px;
   background-color:#f6f6f6;
   line-height: 0;
   background-color: rgba(250, 250, 250, 0.95);
@@ -2542,6 +2542,8 @@ img.emoji {
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid #ddd;
   display:inline-block;
   margin-left: 0.5rem;
 }
