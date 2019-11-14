@@ -1,0 +1,32 @@
+extends ../../experimental
+block eTitle
+  title 文章
+block eContent
+  .hidden#data=objToStr({threadSettings: data.threadSettings, grades: data.grades, roles: data.roles})
+  .container-fluid.max-width
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        .form.form-horizontal
+          h4 文章附件列表的显示
+            small &nbsp;拥有已勾选证书或等级的用户可见附件列表
+          .form-group
+            label.col-sm-2.control-label 证书限制：
+            .col-sm-10
+              .checkbox
+                label.m-r-1(v-for="r in roles")
+                  input(type="checkbox" v-model="settings.displayPostAttachments.rolesId" :value="r._id")
+                  span {{r.displayName}}
+          .form-group
+            label.col-sm-2.control-label 普通会员等级限制：
+            .col-sm-10
+              .checkbox
+                label.m-r-1(v-for="g in grades")
+                  input(type="checkbox" v-model="settings.displayPostAttachments.gradesId" :value="g._id")
+                  span {{g.displayName}}
+          .form-group
+            label.col-sm-2.control-label
+            .col-sm-10
+              button.btn.btn-sm.btn-primary(@click="save") 保存
+
+block scripts
+  +includeJS("/experimental/settings/thread/thread.js")

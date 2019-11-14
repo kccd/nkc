@@ -317,7 +317,7 @@ schema.methods.getNav = async function() {
 schema.methods.getPath = async function() {
   const nav = await this.getNav();
   return "/ " + nav.map(n => n.name).join(" / ");
-}
+};
 
 /* 
   计算当前文件夹以及上层所有文件夹中文件的数量

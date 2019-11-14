@@ -463,6 +463,10 @@ table{
   background-color: #2b90d9;
   color: #fff;
 }
+.options-button a.warning{
+  background-color: #e85a71;
+  color: #fff;
+}
 .options-button a.active:hover{
   background-color: #267ebd;
 }

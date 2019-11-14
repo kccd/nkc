@@ -61,6 +61,7 @@ const shop = require('./shop');
 const account = require('./account');
 const complaint = require("./complaint");
 const imageEdit = require('./imageEdit');
+const rs = require("./resources");
 const protocol = require('./protocol');
 const review = require("./review");
 const threads = require("./threads");
@@ -112,6 +113,7 @@ operationObj.operationTree = {
 		forum_avatar,// 专业logo
 
 		r,// 资源
+		rs,
 		rt, // 小号图 150
 		rm, // 中号图 640
 		ro, // 原图 3840

@@ -61,7 +61,7 @@ block content
                     span=library.name
                   th.min-w-text=library.description || "暂无简介"
                   th.min-w-text
-                    a(href=`/f/${library.forum.fid}/library?lid=${library._id}` target="_blank")=library.path
+                    a(href=`/f/${library.forum.fid}/library?t=nav&id=${library._id}` target="_blank")=library.path
                   th.min-w-name
                     if library.type === "file"
                       span.m-r-05=lang("library", library.category)

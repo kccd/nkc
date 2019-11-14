@@ -339,7 +339,9 @@ block scripts
     if data.tLid
       script=`NKC.configs.tLid = ${data.tLid};`  
     if data.libraryClosed
-      script=`NKC.configs.closed = ${!!data.libraryClosed};`    
+      script=`NKC.configs.closed = ${!!data.libraryClosed};`
+    if data.uploadResourcesId
+      script=`NKC.configs.uploadResourcesId = '${data.uploadResourcesId.join("-")}';`
   +includeJS("/forum/forum.js")
   +includeJS("/publicModules/thread_panel/management.js")
   include ../publicModules/floatUserPanel/floatUserPanel

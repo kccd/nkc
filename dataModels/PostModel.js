@@ -894,5 +894,24 @@ postSchema.statics.ensureToppingPermission = async function(uid) {
     return false;
   }
 };
+/*
+* 验证用户是否具有查看文章附件列表的权限
+* @param {String} uid 用户ID
+* @return {Boolean} 是否有权限
+* @author pengxiguaa 2019-9-26
+* */
+postSchema.statics.ensureAttachmentPermission = async function(uid) {
+  const threadSettings = await mongoose.model("settings").getSettings("thread");
+  const {rolesId, gradesId} = threadSettings.displayPostAttachments;
+  if(!uid) return rolesId.includes("visitor");
+  const user = await mongoose.model("users").findOne({uid});
+  if(!user) return rolesId.includes("visitor");
+  await user.extendRoles();
+  for(const r of user.roles) {
+    if(rolesId.includes(r._id) && r._id !== "default") return true;
+  }
+  await user.extendGrade();
+  return gradesId.includes(user.grade._id);
+};
 
 module.exports = mongoose.model('posts', postSchema);

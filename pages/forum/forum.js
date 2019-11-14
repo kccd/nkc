@@ -11,7 +11,8 @@ $(function() {
       lid: NKC.configs.lid,
       folderId: NKC.configs.folderId,
       tLid: NKC.configs.tLid,
-      closed: NKC.configs.closed
+      closed: NKC.configs.closed,
+      uploadResourcesId: NKC.configs.uploadResourcesId.split("-")
     });
   }
 });

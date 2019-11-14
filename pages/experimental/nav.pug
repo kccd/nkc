@@ -127,6 +127,9 @@
           if permission('experimentalHidePostSettings')
             li
               a(href='/e/settings/hidePost') 回复折叠
+          if permission('experimentalThreadSettings')
+            li
+              a(href='/e/settings/thread') 文章
           <li role="separator" class="divider"></li>
           if permission('visitRoleSettings')    
             li

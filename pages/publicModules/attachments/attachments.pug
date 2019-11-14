@@ -1,16 +1,41 @@
 +includeCSS("/css/modules/attachments.css")
-#moduleAttachments(v-cloak v-if="loaded && attachments.length")
-  .attachment-header 文章附件列表
-  .attachment-body
-    .attachment(v-for="a in attachments")
-      .attachment-cover
-        img(:src="getUrl('fileCover', a.ext)")
-      .attachment-content
-        a.attachment-name(@click="visitUrl('/r/' + a.rid, true)") {{a.oname}}
-        .attachment-info
-          a.attachment-user(@click="visitUrl('/u/' +  a.user.uid, true)")
-            img(:src="'/avatar/' + a.user.avatar")
-            span {{a.user.username}}
-          .attachment-time {{format('YYYY/MM/DD', a.toc)}}
-          .attachment-ext {{(a.ext || "").toUpperCase()}}
-          .attachment-size {{getSize(a.size)}}
+#moduleAttachments(v-cloak v-if="!hidden")
+  .attachment-warning(v-if="!loaded") 加载中...
+  .attachment-warning(v-else-if="!attachments.length") 空空如也~
+  div(v-else)
+    .attachment-header 文章附件列表
+      .options-button(v-if="!!fid && createFilePermission")
+        a(v-if="!mark" @click="markAttachment(true)")
+          .fa.fa-dot-circle-o &nbsp;选择附件
+        span(v-if="!!mark")
+          a.warning(@click="markAttachment(false)")
+            .fa.fa-dot-circle-o &nbsp;取消
+          a.active(@click="markAll")
+            .fa.fa-square &nbsp;全选
+        a(@click="postToLibrary"
+          title="将已选附件推送到文库"
+          :class="{'active': selectedAttachmentCount > 0, 'disabled': selectedAttachmentCount <= 0}"
+        )
+          .fa.fa-cloud-upload &nbsp;推送到文库
+
+    .attachment-body
+      .attachment(v-for="a in attachments")
+        .attachment-checkbox(v-if="mark")
+          .chackbox
+            label
+              input(type="checkbox" :value="true" v-model="a.mark")
+        .attachment-cover
+          img(:src="getUrl('fileCover', a.ext)")
+        .attachment-content
+          .attachment-download
+            .fa.fa-cloud-download(@click="visitUrl('/r/' + a.rid, true)" title="点击下载")
+            .attachment-hits {{a.hits}}
+          .attachment-name(@click="displayResourceInfo(a)") {{a.oname}}
+          .attachment-info
+            a.attachment-user(@click="visitUrl('/u/' +  a.user.uid, true)")
+              img(:src="'/avatar/' + a.user.avatar")
+              span {{a.user.username}}
+            .attachment-time {{format('YYYY/MM/DD', a.toc)}}
+            .attachment-ext {{(a.ext || "").toUpperCase()}}
+            .attachment-size {{getSize(a.size)}}
+

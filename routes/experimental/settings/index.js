@@ -11,6 +11,7 @@ const uploadRouter = require('./upload');
 const gradeRouter = require('./grade');
 const kcbRouter = require('./kcb');
 const logRouter = require('./log');
+const threadRouter = require("./thread");
 const usernameRouter = require("./username");
 const numberRouter = require('./number');
 const homeRouter = require('./home');
@@ -82,5 +83,6 @@ settingRouter
   .use("/login", loginRouter.routes(), loginRouter.allowedMethods())
   .use("/username", usernameRouter.routes(), usernameRouter.allowedMethods())
   .use("/library", libraryRouter.routes(), libraryRouter.allowedMethods())
+	.use("/thread", threadRouter.routes(), threadRouter.allowedMethods())
   .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = settingRouter;

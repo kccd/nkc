@@ -1550,7 +1550,7 @@ margin-left: 5px;
 }
 
 .nkcshade{
-  box-shadow: rgba(0, 0, 0, 0.14) 0px 1px 10px;
+  box-shadow: rgba(0, 0, 0, 0.14) 0 1px 6px;
   background-color:#f6f6f6;
   line-height: 0;
   background-color: rgba(250, 250, 250, 0.95);
@@ -1568,7 +1568,17 @@ margin-left: 5px;
   font-size: 1.6em;
 
 }
-
+.thread-attachment>.text-center>div{
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #615553;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0 1rem;
+  user-select: none;
+  font-weight: 700;
+  vertical-align: middle;
+}
 .collapse.navbar-collapse ul.nav.navbar-nav>li>a{
   /*padding-top: 12px;*/
 }
@@ -2529,9 +2539,11 @@ img.emoji {
 
 .userInfo img{
   margin-top: -2px;
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid #ddd;
   display:inline-block;
   margin-left: 0.5rem;
 }
@@ -2565,9 +2577,11 @@ img.emoji {
 }
 .userInfo-m img{
   float: right;
-  width: 2.5rem;
+  width: 2.7rem;
   margin-top: 7px;
-  height: 2.5rem;
+  height: 2.7rem;
+  box-sizing: border-box;
+  border: 2px solid #ddd;
   border-radius: 50%;
   display:inline-block;
   margin-left: 0.5rem;

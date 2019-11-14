@@ -15,10 +15,13 @@
     }
   }
   .attachment{
-    padding: 0 0.5rem;
+    @coverWidth: 3.5rem;
+    @coverMarginRight: 0.5rem;
+    .attachment-checkbox{
+      display: table-cell;
+      padding-right: 1rem;
+    }
     .attachment-cover{
-      @coverWidth: 3.5rem;
-      @coverMarginRight: 0.5rem;
       img{
         height: @coverWidth;
         width: @coverWidth;
@@ -33,17 +36,46 @@
       display: table-cell;
       width: 100%;
       vertical-align: top;
+      padding-right: 5rem;
+      position: relative;
+      .attachment-download{
+        position: absolute;
+        top: 0.6rem;
+        right: 0;
+        height: @coverWidth;
+        width: @coverWidth * 1.4;
+        font-size: 0;
+        .fa{
+          width: 100%;
+          font-size: 1.8rem;
+          cursor: pointer;
+          color: @primary;
+          //height: @coverWidth *2 / 3;
+          text-align: center;
+          //line-height: @coverWidth * 2 / 3;
+        }
+        .attachment-hits{
+          font-size: 1rem;
+          color: @darkGray;
+          width: 100%;
+          //height: @coverWidth / 3;
+          text-align: center;
+          //line-height: @coverWidth / 3;
+        }
+      }
       .attachment-name{
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         color: @primary;
         font-weight: 700;
         cursor: pointer;
+        .hideText(@line: 1);
       }
       .attachment-info{
         font-size: 1rem;
         border-bottom: 1px solid #eee;
         padding-bottom: 0.5rem;
         margin-bottom: 0.5rem;
+        margin-top: 0.3rem;
         .attachment-user{
           vertical-align: top;
           cursor: pointer;

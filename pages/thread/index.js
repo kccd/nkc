@@ -1,6 +1,7 @@
 var SubscribeTypes, UserInfo, surveyForms = [], draftId = "";
 var hidePostMaxHeight;
 var hidePostFloat;
+var Attachments;
 $(document).ready(function(){
   var DW = $(document).width();
   hidePostFloat = NKC.configs.postHeight.float;
@@ -1132,4 +1133,35 @@ function switchPost(pid) {
   } else {
     hidePost(pid);
   }
+}
+
+/*function showAttachments(dom) {
+	dom = $(dom);
+	var fa = dom.find(".icon");
+	if(fa.hasClass("fa-angle-double-down")) {
+		if(!window.Attachments) {
+			Attachments = new NKC.modules.Attachments({
+				pid: NKC.configs.pid,
+				fid: NKC.configs.fid
+			});
+		}
+		Attachments.show();
+		fa.removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+	} else {
+		Attachments.hidden();
+		fa.removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+	}
+}*/
+function showAttachments() {
+	if(!window.Attachments) {
+		Attachments = new NKC.modules.Attachments({
+			pid: NKC.configs.pid,
+			fid: NKC.configs.fid
+		});
+	}
+	if(Attachments.app.loaded && !Attachments.app.hidden) {
+		Attachments.hide();
+	} else {
+		Attachments.show();
+	}
 }

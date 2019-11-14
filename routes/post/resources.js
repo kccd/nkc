@@ -4,6 +4,8 @@ router
     const {db, data, query, params} = ctx;
     const {pid} = params;
     const {t} = query;
+    if(!await db.PostModel.ensureAttachmentPermission(data.user?data.user.uid: ""))
+      ctx.throw(400, "权限不足");
     const q = {};
     switch(t) {
       case "attachment":
@@ -40,6 +42,14 @@ router
       const resource = r.toObject();
       resource.user = usersObj[resource.uid];
       data.resources.push(resource);
+    }
+    if(data.user) {
+      if(ctx.permission("modifyAllResource")) {
+        data.createFilePermission = true;
+      } else {
+        const permissions = await db.LibraryModel.getPermission(data.user);
+        data.createFilePermission = permissions.includes("createFile");
+      }
     }
     await next();
   });
