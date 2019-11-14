@@ -2539,8 +2539,8 @@ img.emoji {
 
 .userInfo img{
   margin-top: -2px;
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
   box-sizing: border-box;
   border: 2px solid #ddd;
@@ -2577,9 +2577,11 @@ img.emoji {
 }
 .userInfo-m img{
   float: right;
-  width: 2.5rem;
+  width: 2.7rem;
   margin-top: 7px;
-  height: 2.5rem;
+  height: 2.7rem;
+  box-sizing: border-box;
+  border: 2px solid #ddd;
   border-radius: 50%;
   display:inline-block;
   margin-left: 0.5rem;
