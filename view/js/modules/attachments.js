@@ -16,6 +16,13 @@ NKC.modules.Attachments = class {
       },
       mounted() {
         this.getAttachments();
+        if(!window.ResourceInfo) {
+          if(!NKC.modules.ResourceInfo) {
+            sweetError("未引入资源信息模块");
+          } else {
+            window.ResourceInfo = new NKC.modules.ResourceInfo();
+          }
+        }
       },
       computed: {
         selectedAttachmentCount() {
@@ -31,6 +38,9 @@ NKC.modules.Attachments = class {
         getSize: NKC.methods.tools.getSize,
         visitUrl: NKC.methods.visitUrl,
         format: NKC.methods.format,
+        displayResourceInfo(r) {
+          ResourceInfo.open({rid: r.rid});
+        },
         postToLibrary() {
           const {attachments} = this;
           let rid = [];

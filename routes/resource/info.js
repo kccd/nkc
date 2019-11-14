@@ -11,14 +11,13 @@ router
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
     let resource = data.resource.toObject();
-    const {forumsId, cover} = resource;
-    data.forums = await db.ForumModel.find({fid: {$in: forumsId}});
-    if(cover) {
-      data.cover = await db.ResourceModel.findOne({rid: cover});
-    }
     resource.user = await db.UserModel.findOne({uid: resource.uid});
     data.resource = resource;
-    data.modifyAllResource = ctx.permission("modifyAllResource");
+    const libraries = await db.LibraryModel.find({rid: resource.rid, closed: false, deleted: false});
+    data.path = [];
+    for(let l of libraries) {
+      data.path.push(await l.getPath());
+    }
     await next();
   });
 module.exports = router;

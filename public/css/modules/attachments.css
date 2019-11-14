@@ -64,6 +64,9 @@
 }
 #moduleAttachments .attachment .attachment-content .attachment-name {
   font-size: 1.3rem;
+  color: #2b90d9;
+  font-weight: 700;
+  cursor: pointer;
   word-break: break-all;
   display: -webkit-box;
   overflow: hidden;

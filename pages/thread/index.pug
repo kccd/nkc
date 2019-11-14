@@ -681,14 +681,15 @@ block scripts
   include ../publicModules/moment
   include ../publicModules/lazySizes
   if data.attachmentsCount > 0
+    include ../publicModules/resourceInfo/resourceInfo
     include ../publicModules/attachments/attachments_js
-    script=`NKC.configs.pid = ${data.thread.oc};`
+    script=`NKC.configs.pid = '${data.thread.oc}';`
     -let fid;
     for f in data.thread.forums
       if f.lid
         -fid = f.fid;
     if fid
-      script=`NKC.configs.fid = ${fid};`
+      script=`NKC.configs.fid = '${fid}';`
   if data.user
     include ../ueditor/ueditorBase
   include ../MathJax.pug

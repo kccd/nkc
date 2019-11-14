@@ -30,7 +30,7 @@
           .attachment-download
             .fa.fa-cloud-download(@click="visitUrl('/r/' + a.rid, true)" title="点击下载")
             .attachment-hits {{a.hits}}
-          .attachment-name {{a.oname}}
+          .attachment-name(@click="displayResourceInfo(a)") {{a.oname}}
           .attachment-info
             a.attachment-user(@click="visitUrl('/u/' +  a.user.uid, true)")
               img(:src="'/avatar/' + a.user.avatar")

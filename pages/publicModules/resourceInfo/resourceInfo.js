@@ -27,6 +27,7 @@ NKC.modules.ResourceInfo = function() {
             self.app.loading = false;
             self.app.resource = data.resource;
             self.app.forums = data.forums;
+            self.app.path = data.path;
             self.app.modifyAllResource = !!data.modifyAllResource;
           })
           .catch(function(data) {

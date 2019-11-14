@@ -27,11 +27,12 @@
               span.m-r-1 {{(resource.ext || "未知").toUpperCase()}}
               |大小：
               span {{getSize(resource.size)}}
-            .r-info-size(v-if="path") 目录：{{path}}
-            .r-info-size(v-if="forums.length")
-              | 专业：
-              .display-i-b(v-for="f, index in forums")
-                a.pointer.m-r-05(@click="visitUrl('/f/' + f.fid, true)") {{f.displayName}}
+            .r-info-size(v-if="path")
+              div(v-if="typeof path === 'string'") 目录：
+                span {{path}}
+              div(v-else)
+                div(v-for="p, i in path") 文库目录{{i+1}}：
+                  span {{p}}
           .r-info-d {{resource.description || "暂无简介"}}
           .r-info-bottom.text-right(v-if="resource.type !== 'folder'")
             a.m-r-05.pointer.btn.btn-success.btn-sm(@click="visitUrl('/r/' + resource.rid, true)")
@@ -46,6 +47,5 @@
                 .fa.fa-trash &nbsp;
                 |删除
 include ../moment
-+includeJS("/tools.js")
 +includeJS("/library/common.js")
 +includeJS("/publicModules/resourceInfo/resourceInfo.js")
