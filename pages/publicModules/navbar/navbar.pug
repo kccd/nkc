@@ -56,23 +56,69 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if data.user
-          - var user = data.user
-          - var title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
-          li.dropdown.userInfo
-            img(src=`/avatar/${user.avatar}`)
-            a.username(
+          - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`科创币 ${data.user.kcb/100}\n`+`${data.user.info.certsName}`;
+          li.userInfo
+            a(href="/editer") 发表文章
+          li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
+            .nav-user-content
+              div
+                .nav-user-banner
+                  img(src=`/banner/${data.user.banner}`)
+                .nav-user-other
+                  .nav-user-info
+                    .nav-user-avatar
+                      img(src=`/avatar/${data.user.avatar}`)
+                    .nav-user-name=data.user.username
+                    .nav-user-level
+                      span.user-grade(style=`color: ${data.user.grade.color};`)
+                        span= data.user.grade.displayName
+                        img.grade-icon(src=`/default/v${data.user.grade._id}l.png` title=data.user.grade.displayName)
+                    .nav-user-certs=data.user.info.certsName
+                    .nav-user-count
+                      .nav-user-count-span(title=`科创币：${data.user.kcb/100}`)
+                        img(src="/statics/kcb.png")
+                        span=data.user.kcb / 100
+                      .nav-user-count-span(title=`学术分：${data.user.xsf}`)
+                        img(src="/statics/xsf.png")
+                        span=data.user.xsf
+                  .nav-user-links
+                    a(href=`/account`).col-xs-6.nav-user-link
+                      .fa.fa-user-circle
+                      | 个人中心
+                    if state.userColumn
+                      a(href=`/m/${state.userColumn._id}`).col-xs-6.nav-user-link
+                        .fa.fa-columns
+                        | 我的专栏
+                    else
+                      a(href=`/column/apply`).col-xs-6.nav-user-link
+                        .fa.fa-columns
+                        | 开设专栏
+                    a(href="/message").col-xs-6.nav-user-link
+                      .fa.fa-comments
+                      | 消息中心
+                    a(href=`/u/${data.user.uid}/drafts`).col-xs-6.nav-user-link
+                      .fa.fa-inbox
+                      | 我的草稿
+                    a(href=`/account/settings`).col-xs-6.nav-user-link
+                      .fa.fa-cog
+                      | 账号设置
+                    a(onclick="NKC.methods.logout()" title='不，不要走！').col-xs-6.nav-user-link
+                      .fa.fa-sign-out
+                      | 残忍退出
+            img.nav-user-avatar-sm(src=`/avatar/${data.user.avatar}`)
+            //a.username(
               href="#"
               class="dropdown-toggle"
               data-toggle="dropdown"
               role="button"
               aria-haspopup="true"
               aria-expanded="false"
-            )
+              )
               span(title=title)= user.username || `用户${user.uid}`
               span.caret
 
             //- 用户名下拉列表
-            ul.dropdown-menu
+            //ul.dropdown-menu
               li
                 a(href=`/u/${user.uid}`)
                   span.fa.fa-user-o &nbsp;个人名片

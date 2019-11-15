@@ -1,0 +1,145 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+body {
+  background-color: #f6f6f6;
+}
+.account-nav {
+  padding: 0!important;
+}
+.account-nav .account-user-banner img {
+  width: 100%;
+}
+.account-nav .account-user-avatar {
+  margin-top: -5rem;
+  text-align: center;
+}
+.account-nav .account-user-avatar img {
+  height: 8rem;
+  width: 8rem;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 3px solid #fff;
+}
+.account-nav .account-user-name {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+.account-nav .account-user-level {
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 0.4rem;
+}
+.account-nav .account-user-certs {
+  text-align: center;
+  margin-top: 0.4rem;
+  font-size: 1rem;
+  color: #e85a71;
+}
+.account-nav .account-user-kcb {
+  overflow: hidden;
+  margin: 0.5rem 0 1rem 0;
+}
+.account-nav .account-user-kcb > div {
+  padding: 0;
+  text-align: center;
+}
+.account-nav .account-user-kcb img {
+  height: 1.4rem;
+  width: 1.4rem;
+  margin-right: 0.4rem;
+  margin-top: -2px;
+}
+.account-nav .account-user-links {
+  overflow: hidden;
+}
+.account-nav .account-user-links .account-user-links {
+  border-top: 1px solid #eee;
+  padding: 1rem;
+}
+.account-nav .account-user-links .account-user-link {
+  text-decoration: none;
+  color: #282c37;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 100ms;
+}
+.account-nav .account-user-links .account-user-link:hover {
+  background-color: #f4f4f4;
+  /*box-shadow: 1px 1px 5px rgba(0,  0, 0, 0.2);*/
+}
+.account-nav .account-user-links .account-user-link .fa {
+  margin-right: 0.3rem;
+  color: #555;
+}
+.account-nav .account-user-links .account-user-link:hover,
+.account-nav .account-user-links .account-user-link:focus {
+  color: #282c37;
+  text-decoration: none;
+}
+.account-nav .account-ul {
+  border-top: 1px solid #eee;
+  position: relative;
+  padding: 0.5rem 0;
+  transition: box-shadow 300ms;
+}
+.account-nav .account-ul .account-lis .account-li:first-child .name {
+  border-top: none;
+}
+.account-nav .account-ul .account-name {
+  height: 1.4rem;
+  line-height: 1.4rem;
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  border-radius: 0.7rem;
+}
+.account-nav .account-ul:hover {
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+}
+.account-nav .account-ul .account-li {
+  display: block;
+  height: 4rem;
+  line-height: 4rem;
+  padding: 0 4rem 0 2rem;
+  font-size: 1.2rem;
+  color: #555;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+}
+.account-nav .account-ul .account-li .name {
+  border-top: 1px solid #eee;
+}
+.account-nav .account-ul .account-li span {
+  margin-left: 1rem;
+}
+.account-nav .account-ul .account-li:hover,
+.account-nav .account-ul .account-li.active {
+  text-decoration: none;
+  color: #2b90d9;
+}
+.account-nav .account-ul .account-li .fa {
+  position: absolute;
+  height: 4rem;
+  line-height: 4rem;
+  font-size: 1.6rem;
+  top: 0;
+  width: 4rem;
+  text-align: center;
+  right: 0;
+}

@@ -109,14 +109,20 @@ schema.statics.saveUserSubUsersId = async (uid) => {
 /*
 * 获取用户关注的专业ID
 * @param {String} uid 用户ID
+* @param {String} type 专业类型，为空时返回全部专业，topic: 仅返回话题，discipline: 仅返回学科
 * @author pengxiguaa 2019-7-19
 * @return {[String]} 专业ID数组
 * */
-schema.statics.getUserSubForumsId = async (uid) => {
+schema.statics.getUserSubForumsId = async (uid, type) => {
   let forumsId = await redisClient.smembersAsync(`user:${uid}:subscribeForumsId`);
   if(!forumsId.length) {
     const SubscribeModel = mongoose.model("subscribes");
     forumsId = await SubscribeModel.saveUserSubForumsId(uid);
+  }
+  if(["topic", "discipline"].includes(type)) {
+    const forums = await mongoose.model("forums").find({forumType: type}, {fid: 1});
+    const forumsIdFilter = forums.map(f => f.fid);
+    forumsId = forumsId.filter(fid => forumsIdFilter.includes(fid));
   }
   return forumsId;
 };

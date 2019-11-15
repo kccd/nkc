@@ -1,7 +1,61 @@
 extends ../bootstrap_base
 block title
   title 个人中心
+  +includeCSS("/css/account.css")
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-12
+      .col-xs-12.col-md-3.box-shadow-panel
+        .account-nav
+          .account-user-banner
+            a(href=`/banner/${data.user.banner}?t=lg` target="_blank")
+              img(src=`/banner/${data.user.banner}`)
+          .account-user-avatar
+            a(href=`/avatar/${data.user.avatar}?t=lg` target="_blank")
+              img(src=`/avatar/${data.user.avatar}`)
+          .account-user-name=data.user.username
+          .account-user-level
+            span.user-grade(style=`color: ${data.user.grade.color};`)
+              span= data.user.grade.displayName
+              img.grade-icon(src=`/default/v${data.user.grade._id}l.png` title=data.user.grade.displayName)
+          .account-user-certs=data.user.info.certsName
+          .account-user-kcb
+            .col-xs-6
+              img(src="/statics/kcb.png")
+              span=data.user.kcb/100
+            .col-xs-6
+              img(src="/statics/xsf.png")
+              span=data.user.xsf
+          .account-user-links
+            .account-user-links
+              a(href=`/u/${data.user.uid}`).col-xs-6.account-user-link
+                .fa.fa-user-circle-o
+                | 个人名片
+              if state.userColumn
+                a(href=`/m/${state.userColumn._id}`).col-xs-6.account-user-link
+                  .fa.fa-columns
+                  | 我的专栏
+              else
+                a(href=`/column/apply`).col-xs-6.account-user-link
+                  .fa.fa-columns
+                  | 开设专栏
+              a(href="/message").col-xs-6.account-user-link
+                .fa.fa-comments
+                | 消息中心
+              a(href=`/u/${data.user.uid}/settings`).col-xs-6.account-user-link
+                .fa.fa-cog
+                | 账号设置
+          for navLink in data.navLinks
+            .account-ul
+              .account-name=navLink.name
+              .account-lis
+                for link in navLink.links
+                  a.account-li(href=`/account?t=${link.type}` class=link.type===data.t?"active":"")
+                    .name=link.name
+                      span=link.count || ""
+                    .fa.fa-angle-right
+      .col-xs-12.col-md-6
+      .col-xs-12.col-md-3
+
+block scripts
+  +includeJS("/js/account.js")
