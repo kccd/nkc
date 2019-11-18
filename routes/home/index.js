@@ -310,6 +310,27 @@ router
     if(threadListType !== "recommend") {
       data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     }
+    if(ctx.permission("complaintGet")) {
+      data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});
+    }
+    if(ctx.permission("visitProblemList")) {
+      data.unResolvedProblemCount = await db.ProblemModel.count({resolved: false});
+    }
+    if(ctx.permission("review")) {
+      const q = {
+        reviewed: false,
+        disabled: false,
+        mainForumsId: {$ne: "recycle"}
+      };
+      if(!ctx.permission("superModerator")) {
+        const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
+        const fid = forums.map(f => f.fid);
+        q.mainForumsId = {
+          $in: fid
+        }
+      }
+      data.unReviewedCount = await db.PostModel.count(q);
+    }
     data.paging = paging;
     ctx.template = "home/home.pug";
     await next();

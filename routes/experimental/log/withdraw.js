@@ -32,6 +32,7 @@ router
     ctx.template = "experimental/log/withdraw.pug";
     data.t = t;
     data.content = content;
+    data.paging = paging;
     await next();
   });
 module.exports = router;

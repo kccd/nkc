@@ -31,6 +31,7 @@ router
     data.records = await db.KcbsRecordModel.extendKcbsRecords(records);
     ctx.template = "experimental/log/recharge.pug";
     data.t = t;
+    data.paging = paging;
     data.content = content;
     await next();
   });

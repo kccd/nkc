@@ -4,8 +4,22 @@
   font-weight: 700;
   margin-bottom: 0.5rem;
   color: #7e8da0;
+  position: relative;
 }
 .module-management:hover, .module-management:focus{
   text-decoration: none;
   color: #282c37;
+}
+.module-management .management-count{
+  display: inline-block;
+  position: absolute;
+  top: -0.5rem;
+  right: -1rem;
+  height: 1.3rem;
+  line-height: 1.4rem;
+  padding: 0 0.4rem;
+  font-size: 1rem;
+  border-radius: 0.65rem;
+  background-color: rgba(255, 0, 0, 0.6);
+  color: #fff;
 }
