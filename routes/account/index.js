@@ -19,6 +19,7 @@ router
     data.subDisciplinesId = await db.SubscribeModel.getUserSubForumsId(user.uid, "discipline");
     data.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(user.uid);
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(user.uid);
+    data.fansId = await db.SubscribeModel.getUserFansId(user.uid);
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(user.uid);
     data.navLinks = [
       {
@@ -94,9 +95,9 @@ router
             })
           },
           {
-            type: "collection",
+            type: "fans",
             name: "我的粉丝",
-            count: await db.SubscribeModel.count({type: "user", tUid: user.uid})
+            count: data.fansId.length
           }
         ]
       }
@@ -106,6 +107,16 @@ router
   .get("/", async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
+    // 最新粉丝
+    data.fansId = data.fansId.splice(0, 10);
+    const users = await db.UserModel.find({uid: {$in: data.fansId}});
+    const usersObj = {};
+    users.map(u => usersObj[u.uid] = u);
+    data.fans = [];
+    data.fansId.map(id => {
+      const u = usersObj[id];
+      if(u) data.fans.push(u);
+    });
     data.userPostSummary = await db.UserModel.getUserPostSummary(user.uid);
     ctx.template = "account/account.pug";
     await next();

@@ -107,6 +107,42 @@ schema.statics.saveUserSubUsersId = async (uid) => {
   return usersId;
 };
 /*
+* 获取用户的粉丝ID
+* @param {String} uid 用户ID
+* @return {[String]} 用户ID数组
+* @author pengxiguaa 2019-11-18
+* */
+schema.statics.getUserFansId = async (uid) => {
+  let subscribeUsersId = await redisClient.smembersAsync(`user:${uid}:fansId`);
+  if(!subscribeUsersId.length) {
+    const SubscribeModel = mongoose.model("subscribes");
+    subscribeUsersId = await SubscribeModel.saveUserFansId(uid);
+  }
+  return subscribeUsersId;
+};
+/*
+* 将用户的粉丝ID存入redis
+* @param {String} uid 用户ID
+* @return {[String]} 用户ID数组
+* @author pengxiguaa 2019-11-18
+*/
+schema.statics.saveUserFansId = async (uid) => {
+  const SubscribeModel = mongoose.model("subscribes");
+  const sub = await SubscribeModel.find({
+    type: "user",
+    tUid: uid
+  }, {uid: 1}).sort({toc: -1});
+  const usersId = sub.map(s => s.uid);
+  setTimeout(async () => {
+    await redisClient.delAsync(`user:${uid}:fansId`);
+    if(usersId.length) {
+      await redisClient.saddAsync(`user:${uid}:fansId`, usersId);
+    }
+    await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
+  });
+  return usersId;
+};
+/*
 * 获取用户关注的专业ID
 * @param {String} uid 用户ID
 * @param {String} type 专业类型，为空时返回全部专业，topic: 仅返回话题，discipline: 仅返回学科

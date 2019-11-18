@@ -80,6 +80,25 @@ block content
           include ../user/summary/calendar
         .account-summary
           include ../user/summary/pie
+        .account-fans-body
+          .account-header 最新粉丝
+          .account-description 最新关注你的用户
+          .account-fans
+            for u in data.fans
+              p=u.username
+          //-.table-responsive
+            table.table
+              thead
+                tr
+                  th 时间
+                  th IP
+                  th PORT
+              tbody
+                tr
+                  th 2019-01-32 27:26
+                  th 103.290.42.293
+                  th 45653
+
       .col-xs-12.col-md-2.box-shadow-panel
         div
           p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam animi assumenda at, consequuntur distinctio, dolorem dolores eligendi ex labore laborum neque, nulla officia perferendis porro quas quod soluta tempora vero?

@@ -99,7 +99,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(href=`/u/${data.user.uid}/drafts`).col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
-                    a(href=`/account/settings`).col-xs-6.nav-user-link
+                    a(href=`/u/${data.user.uid}/settings`).col-xs-6.nav-user-link
                       .fa.fa-cog
                       | 账号设置
                     a(onclick="NKC.methods.logout()" title='不，不要走！').col-xs-6.nav-user-link
