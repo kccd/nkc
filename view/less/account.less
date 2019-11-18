@@ -38,6 +38,11 @@ body{
     font-size: 1rem;
     color: @accent;
   }
+  .account-user-description{
+    margin: 0.5rem 1rem;
+    font-size: 1.1rem;
+    color: #555;
+  }
   .account-user-kcb{
     @iconHeight: 1.4rem;
     overflow: hidden;
@@ -134,6 +139,32 @@ body{
         text-align: center;
         right: 0;
       }
+    }
+  }
+}
+.account-info{
+  a{
+    display: block;
+    height: 100%;
+    width: 100%;
+    padding: 1rem 0;
+    border-radius: 5px;
+    transition: background-color 200ms;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+    &:hover{
+      background-color: #f4f4f4;
+    }
+    text-align: center;
+    .account-info-name{
+      font-size: 1rem;
+      color: #777;
+    }
+    .account-info-value{
+      font-size: 2rem;
+      color: #2b2b2b;
+      font-weight: 700;
     }
   }
 }

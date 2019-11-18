@@ -19,6 +19,7 @@ block content
               span= data.user.grade.displayName
               img.grade-icon(src=`/default/v${data.user.grade._id}l.png` title=data.user.grade.displayName)
           .account-user-certs=data.user.info.certsName
+          .account-user-description!=markdown_safe(data.user.description)
           .account-user-kcb
             .col-xs-6
               img(src="/statics/kcb.png")
@@ -54,8 +55,37 @@ block content
                     .name=link.name
                       span=link.count || ""
                     .fa.fa-angle-right
-      .col-xs-12.col-md-6
-      .col-xs-12.col-md-3
+      .col-xs-12.col-md-7.box-shadow-panel
+        .account-info
+          .row
+            .col-xs-6.col-md-3
+              a(href=`/account?t=thread` title="点击查看全部文章")
+                .account-info-value=data.user.threadCount
+                .account-info-name 文章
+            .col-xs-6.col-md-3
+              a(href=`/account?t=post` title="点击查看回复")
+                .account-info-value=data.user.threadCount
+                .account-info-name 回复
+            .col-xs-6.col-md-3
+              a(href=`/account?t=finance` title="点击查看账单")
+                .account-info-value=data.user.kcb/100
+                .account-info-name 科创币
+            .col-xs-6.col-md-3
+              a
+                .account-info-value=data.user.xsf
+                .account-info-name 学术分
+            .col-xs-12.col-md-12
+
+        .account-summary
+          include ../user/summary/calendar
+        .account-summary
+          include ../user/summary/pie
+      .col-xs-12.col-md-2.box-shadow-panel
+        div
+          p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam animi assumenda at, consequuntur distinctio, dolorem dolores eligendi ex labore laborum neque, nulla officia perferendis porro quas quod soluta tempora vero?
 
 block scripts
+  include ../user/summary/summary
+  +includeJS("../user/summary/calendar.js")
+  +includeJS("../user/summary/pie.js")
   +includeJS("/js/account.js")

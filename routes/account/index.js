@@ -104,6 +104,9 @@ router
     await next();
   })
   .get("/", async (ctx, next) => {
+    const {data, db} = ctx;
+    const {user} = data;
+    data.userPostSummary = await db.UserModel.getUserPostSummary(user.uid);
     ctx.template = "account/account.pug";
     await next();
   })

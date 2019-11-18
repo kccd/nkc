@@ -1,18 +1,27 @@
 $(function() {
-  var userPostSummary = NKC.methods.getDataById("userSummaryData").userPostSummary;
-  if(!userPostSummary) return;
   var forumsName = [], summaryData = [], colors = [];
-
-  for(var i = 0; i < userPostSummary.length; i++) {
-    var forum = userPostSummary[i];
-    forumsName.push(forum.forumName);
-    colors.push(forum.color);
+  var data = [
+    {
+      color: "#f1d300",
+      value: 234,
+      forumName: "23",
+    },
+    {
+      color: "#987812",
+      value: 45,
+      forumName: "30"
+    }
+  ];
+  for(var i = 0; i < data.length; i++) {
+    var f = data[i];
+    forumsName.push(f.name);
+    colors.push(f.color);
     summaryData.push({
-      value: forum.count,
-      name: forum.forumName + "("+forum.count+"条)"
+      value: f.value,
+      name: f.forumName + "("+f.value+"条)"
     });
   }
-  var myChart = echarts.init(document.getElementById('user_summary'));
+  var myChart = echarts.init(document.getElementById("summaryPie"));
 
 // 指定图表的配置项和数据
   var option = {
@@ -63,9 +72,6 @@ $(function() {
       }
     ]
   };
-
-
 // 使用刚指定的配置项和数据显示图表。
   myChart.setOption(option);
 });
-
