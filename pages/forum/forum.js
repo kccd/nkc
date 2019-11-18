@@ -12,7 +12,7 @@ $(function() {
       folderId: NKC.configs.folderId,
       tLid: NKC.configs.tLid,
       closed: NKC.configs.closed,
-      uploadResourcesId: NKC.configs.uploadResourcesId.split("-")
+      uploadResourcesId: NKC.configs.uploadResourcesId?NKC.configs.uploadResourcesId.split("-"):[]
     });
   }
 });

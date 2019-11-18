@@ -1,4 +1,4 @@
-var SubscribeTypes, UserInfo, surveyForms = [], draftId = "";
+var SubscribeTypes, UserInfo, surveyForms = [], draftId = "", author = {};
 var hidePostMaxHeight;
 var hidePostFloat;
 var Attachments;
@@ -43,6 +43,19 @@ $(document).ready(function(){
   }
 
 
+  author.dom = $("#moduleAuthor");
+  author.app = new Vue({
+	  el: "#moduleAuthorApp",
+	  data: {
+		  contract: ""
+	  }
+  });
+  
+  $("#moduleAuthor").modal({
+	  show: false
+  });
+  
+  
 	//编辑器缩放
   NKC.methods.markDom($("#highlight>.highlight"));
 	if($(".w-e-text-container").length === 0) return;
@@ -1164,4 +1177,10 @@ function showAttachments() {
 	} else {
 		Attachments.show();
 	}
+}
+
+function displayAuthor(contractStr) {
+	var contract = NKC.methods.strToObj(contractStr);
+	author.dom.modal("show");
+	author.app.contract = contract;
 }
