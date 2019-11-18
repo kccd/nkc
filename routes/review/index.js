@@ -59,6 +59,9 @@ router
       }
       let type, link;
       if(thread.oc === post.pid) {
+        if(thread.recycleMark) {
+          continue;
+        }
         type = "thread";
         link = `/t/${thread.tid}`;
       } else {

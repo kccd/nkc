@@ -662,7 +662,7 @@ block content
 
     //- 作者信息
     .modal.fade#moduleAuthor(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-      .modal-dialog.modal-sm(role="document" v-cloak)#moduleAuthorApp(v-if="contract")
+      .modal-dialog.modal-sm(role="document" v-cloak v-if="contract")#moduleAuthorApp
         .modal-content
           .modal-header
             button.close(data-dismiss="modal" aria-label="Close")
