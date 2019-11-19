@@ -183,3 +183,95 @@ body {
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
+.account-thread {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+.account-thread .account-thread-avatar {
+  display: table-cell;
+  vertical-align: top;
+}
+.account-thread .account-thread-avatar > div {
+  width: 12rem;
+  height: 8rem;
+  margin-right: 1rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+}
+.account-thread .account-thread-avatar > div img {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.account-thread .account-thread-content {
+  display: table-cell;
+  vertical-align: top;
+  overflow: hidden;
+  width: 100%;
+}
+.account-thread .account-thread-content .account-thread-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #282c37;
+  word-break: break-all;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.account-thread .account-thread-content .account-thread-title a {
+  color: #282c37;
+  transition: border-bottom-color 200ms;
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  padding-bottom: 0.2rem;
+}
+.account-thread .account-thread-content .account-thread-title a:hover,
+.account-thread .account-thread-content .account-thread-title a:focus {
+  text-decoration: none;
+  color: #282c37;
+}
+.account-thread .account-thread-content .account-thread-title a:hover {
+  border-color: inherit;
+}
+.account-thread .account-thread-content .account-thread-abstract {
+  margin: 0.6rem 0;
+  max-height: 3.5rem;
+  word-break: break-all;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.account-thread .account-thread-content .account-thread-info {
+  position: relative;
+  height: 1.6rem;
+  display: block;
+  width: 100%;
+  padding-right: 7rem;
+  word-break: break-all;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.account-thread .account-thread-content .account-thread-info > div {
+  display: inline;
+  margin-right: 0.3rem;
+}
+.account-thread .account-thread-content .account-thread-info .thread-time {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.account-thread .account-thread-content .account-thread-info .fa {
+  color: #aaa;
+  margin-right: 0.3rem;
+}
+.account-thread .account-thread-content .account-thread-info span {
+  color: #888;
+}

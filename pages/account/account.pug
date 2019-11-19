@@ -51,54 +51,65 @@ block content
               .account-name=navLink.name
               .account-lis
                 for link in navLink.links
-                  a.account-li(href=`/account?t=${link.type}` class=link.type===data.t?"active":"")
+                  a.account-li(href=link.url class=link.type===data.t?"active":"")
                     .name=link.name
                       span=link.count || ""
                     .fa.fa-angle-right
       .col-xs-12.col-md-7.box-shadow-panel
-        .account-info
-          .row
-            .col-xs-6.col-md-3
-              a(href=`/account?t=thread` title="点击查看全部文章")
-                .account-info-value=data.user.threadCount
-                .account-info-name 文章
-            .col-xs-6.col-md-3
-              a(href=`/account?t=post` title="点击查看回复")
-                .account-info-value=data.user.threadCount
-                .account-info-name 回复
-            .col-xs-6.col-md-3
-              a(href=`/account?t=finance` title="点击查看账单")
-                .account-info-value=data.user.kcb/100
-                .account-info-name 科创币
-            .col-xs-6.col-md-3
-              a
-                .account-info-value=data.user.xsf
-                .account-info-name 学术分
-            .col-xs-12.col-md-12
-
-        .account-summary
-          include ../user/summary/calendar
-        .account-summary
-          include ../user/summary/pie
-        .account-fans-body
-          .account-header 最新粉丝
-          .account-description 最新关注你的用户
-          .account-fans
-            for u in data.fans
-              p=u.username
-          //-.table-responsive
-            table.table
-              thead
-                tr
-                  th 时间
-                  th IP
-                  th PORT
-              tbody
-                tr
-                  th 2019-01-32 27:26
-                  th 103.290.42.293
-                  th 45653
-
+        if !data.t
+          .account-info
+            .row
+              .col-xs-6.col-md-3
+                a(href=`/account/thread` title="点击查看全部文章")
+                  .account-info-value=data.user.threadCount
+                  .account-info-name 文章
+              .col-xs-6.col-md-3
+                a(href=`/account/post` title="点击查看回复")
+                  .account-info-value=data.user.threadCount
+                  .account-info-name 回复
+              .col-xs-6.col-md-3
+                a(href=`/account/finance` title="点击查看账单")
+                  .account-info-value=data.user.kcb/100
+                  .account-info-name 科创币
+              .col-xs-6.col-md-3
+                a
+                  .account-info-value=data.user.xsf
+                  .account-info-name 学术分
+              .col-xs-12.col-md-12
+          .account-summary
+            include ../user/summary/calendar
+          .account-summary
+            include ../user/summary/pie
+        else if data.t === "thread"
+          .account-threads
+            include ../publicModules/paging/paging
+            for thread in data.threads
+              .account-thread
+                .account-thread-avatar
+                  if thread.firstPost.cover
+                    div
+                      img(src=tools.getUrl("postCover", thread.firstPost.cover))
+                .account-thread-content
+                  .account-thread-title
+                    a(href=`/t/${thread.tid}`)=thread.firstPost.t
+                  .account-thread-abstract=thread.firstPost.abstractCN || thread.firstPost.c
+                  .account-thread-info
+                    //-.thread-time=format("YYYY/MM/DD HH:mm:ss", thread.toc)
+                    .thread-time=`${fromNow(thread.toc)}`
+                    if thread.firstPost.voteUp
+                      .thread-thumbup
+                        .fa.fa-thumbs-up
+                        span=thread.firstPost.voteUp
+                    if thread.hits
+                      .thread-hits
+                        .fa.fa-eye
+                        span=thread.hits
+                    if thread.count - 1
+                      .thread-comment
+                        .fa.fa-comment
+                        span=thread.count - 1
+            .m-t-05
+              include ../publicModules/paging/paging_input
       .col-xs-12.col-md-2.box-shadow-panel
         div
           p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquam animi assumenda at, consequuntur distinctio, dolorem dolores eligendi ex labore laborum neque, nulla officia perferendis porro quas quod soluta tempora vero?

@@ -178,3 +178,83 @@ body{
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
+.account-thread{
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  .account-thread-avatar{
+    display: table-cell;
+    vertical-align: top;
+    &>div{
+      width: 12rem;
+      height: 8rem;
+      margin-right: 1rem;
+      position: relative;
+      overflow: hidden;
+      border-radius: 3px;
+      img{
+        position: absolute;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+      }
+    }
+  }
+  .account-thread-content{
+    display: table-cell;
+    vertical-align: top;
+    overflow: hidden;
+    width: 100%;
+    .account-thread-title{
+      font-size: 1.3rem;
+      display: -webkit-box;
+      font-weight: 700;
+      color: @dark;
+      .hideText(@line: 1);
+      a{
+        color: @dark;
+        transition: border-bottom-color 200ms;
+        border-bottom: 1px solid rgba(0, 0, 0, 0);
+        padding-bottom: 0.2rem;
+        &:hover, &:focus{
+          text-decoration: none;
+          color: @dark;
+        }
+        &:hover{
+          border-color: inherit;
+        }
+      }
+    }
+    .account-thread-abstract{
+      margin: 0.6rem 0;
+      max-height: 3.5rem;
+      .hideText(@line: 2);
+    }
+    .account-thread-info{
+      position: relative;
+      height: 1.6rem;
+      display: block;
+      width: 100%;
+      padding-right: 7rem;
+      .hideText(@line: 1);
+      &>div{
+        display: inline;
+        margin-right: 0.3rem;
+      }
+      .thread-time{
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+      .fa{
+        color: #aaa;
+        margin-right: 0.3rem;
+      }
+      span{
+        color: #888;
+      }
+    }
+  }
+}
