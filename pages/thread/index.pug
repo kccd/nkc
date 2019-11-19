@@ -311,8 +311,9 @@ block content
                                   if auth.agencyIndex && agencyAddArray.length > 1
                                     sup!=`${auth.agencyIndex}`
                                 if auth.isContract
-                                  span(class="dropdown")
-                                    a(id="dropdown-up" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")
+                                  span.fa.fa-envelope-open-o(style="color:#000" onclick="displayAuthor('"+objToStr(auth.contractObj)+"')")
+                                  //-span(class="dropdown")
+                                    a(id="dropdown-up" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle" )
                                       span.fa.fa-envelope-open-o(style="color:#000")
                                     ul.list-group.dropdown-menu(aria-labelledby='dropdown-up' style="padding:0")
                                       li.list-group-item(style="padding:3px")
@@ -335,7 +336,29 @@ block content
                                 else
                                   span!=`${auth.name}`
                                 if auth.isContract
-                                  span(class="dropdown")
+                                  span.fa.fa-envelope-open-o(style="color:#000" onclick="displayAuthor('"+objToStr(auth.contractObj)+"')")
+                                  //- 作者信息
+                                  //-.modal.fade.moduleAuthor(data-index=index tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+                                    .modal-dialog.modal-sm(role="document")#moduleCommonModalApp
+                                      .modal-content
+                                        .modal-header
+                                          .fa.fa-remove(data-dismiss="modal" aria-label="Close")
+                                          .modal-title 通信作者
+                                        .modal-body
+                                          ul
+                                            li.list-group-item(style="padding:3px")
+                                              div 通信邮箱：
+                                              div!=`${auth.contractObj.contractEmail}`
+                                            li.list-group-item(style="padding:3px")
+                                              div 电话号码：
+                                              div!=`${auth.contractObj.contractTel}`
+                                            li.list-group-item(style="padding:3px")
+                                              div 通信地址：
+                                              div!=`${auth.contractObj.contractAdd}`
+                                            li.list-group-item(style="padding:3px")
+                                              div 邮政编码：
+                                              div!=`${auth.contractObj.contractCode}`
+                                  //-span(class="dropdown")
                                     a(id="dropdown-up" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle")
                                       span.fa.fa-envelope-open-o(style="color:#000")
                                     ul.list-group.dropdown-menu(aria-labelledby='dropdown-up' style="padding:0")
@@ -636,6 +659,29 @@ block content
             .fullwidthpanel.ThreadBox.nkcpanel.hidden-sm.hidden-xs
               include ../publicModules/footer/footer_sm
           include ../module_scrollTo
+
+    //- 作者信息
+    .modal.fade#moduleAuthor(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+      .modal-dialog.modal-sm(role="document" v-cloak v-if="contract")#moduleAuthorApp
+        .modal-content
+          .modal-header
+            button.close(data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+            h4.modal-title 通信作者
+          .modal-body
+            .form
+              .form-group(v-if="contract.contractEmail")
+                h5 通信邮箱：
+                strong {{contract.contractEmail}}
+              .form-group(v-if="contract.contractTel")
+                h5 电话号码：
+                strong {{contract.contractTel}}
+              .form-group(v-if="contract.contractAdd")
+                h5 通信地址：
+                strong {{contract.contractAdd}}
+              .form-group(v-if="contract.contractCode")
+                h5 邮政编码：
+                strong {{contract.contractCode}}
 
     include ../debug_output.pug
     include ../thread_to_recycle.pug

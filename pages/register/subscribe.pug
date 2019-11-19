@@ -51,7 +51,7 @@ block content
                 .button(v-if="subUsersId.indexOf(u.uid) !== -1" @click="subscribeUser(u.uid, false)") 取关
                 .button(v-else @click="subscribeUser(u.uid, true)") 关注
                 .cert {{u.grade.displayName}}
-                  img.grade-icon(:src="'/default/v' + u.grade._id + 'l.png'" :title="u.grade.displayName")
+                  img.grade-icon(:src="'/statics/grade_icon/v' + u.grade._id + 'l.png'" :title="u.grade.displayName")
                 .description {{u.description || "暂未填写个人简介"}}
       //-.col-xs-12.col-md-12
         h4 热门专栏

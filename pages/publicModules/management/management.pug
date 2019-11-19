@@ -6,18 +6,24 @@ if permissionsOr(["visitExperimentalStatus", "complaintGet", "review", "visitPro
       a.module-management(href="/e")
         .fa.fa-cogs
         span &nbsp;后台管理
-    if permission("complaintGet")
+    if permission("review")
       a.module-management(href="/review")
         .fa.fa-shield
         span &nbsp;审核内容
-    if permission("review")
+        if data.unReviewedCount
+          .management-count=data.unReviewedCount
+    if permission("complaintGet")
       a.module-management(href="/complaint")
         .fa.fa-minus-circle
         span &nbsp;投诉列表
+        if data.unResolvedComplaintCount
+          .management-count=data.unResolvedComplaintCount
     if permission("visitProblemList")
       a.module-management(href="/problem/list")
         .fa.fa-exclamation-circle
         span &nbsp;问题列表
+        if data.unResolvedProblemCount
+          .management-count=data.unResolvedProblemCount
     if permission("getLibraryLogs")
       a.module-management(href="/libraries/logs")
         .fa.fa-book
