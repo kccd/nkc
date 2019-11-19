@@ -70,7 +70,6 @@ router
 			names.push(displayName);
 			scores.push(score);
 		});
-		const gradeCount = grades.length;
 		const grades_ = [];
 		grades.map(g => {
 			if(grades_.length === 0) {
