@@ -96,7 +96,7 @@ router
 			grade = db.UsersGradeModel(grade);
 			await grade.save();
 		}
-		
+		await redis.cacheForums();
 		await next();
 	})
 	.get('/:_id', async (ctx, next) => {
