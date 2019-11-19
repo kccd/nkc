@@ -329,7 +329,18 @@ router
           $in: fid
         }
       }
-      data.unReviewedCount = await db.PostModel.count(q);
+      const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
+      const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
+      const threadsObj = {};
+      threads.map(thread => threadsObj[thread.tid] = thread);
+      let count = 0;
+      posts.map(post => {
+        const thread = threadsObj[post.tid];
+        if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
+          count++;
+        }
+      });
+      data.unReviewedCount = count;
     }
     data.paging = paging;
     ctx.template = "home/home.pug";

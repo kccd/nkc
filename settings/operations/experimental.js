@@ -191,12 +191,12 @@ module.exports = {
 		grade: {
 			GET: 'visitUsersGradeSettings',
 			PATCH: 'modifyUsersGradeSettings',
-			POST: 'addUsersGrade',
-			PARAMETER: {
+			// POST: 'addUsersGrade',
+			/*PARAMETER: {
 				GET: 'visitUsersGradeSettings',
 				PATCH: 'modifyUsersGradeSettings',
 				DELETE: 'deleteUsersGrade'
-			}
+			}*/
 		},
 		number: {
 			GET: 'visitNumberSettings',

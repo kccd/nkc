@@ -2,13 +2,9 @@ const Router = require('koa-router');
 const router = new Router();
 router
 	.get('/', async (ctx, next) => {
-		const {data, db, nkcModules} = ctx;
-		const grade = await db.UsersGradeModel.findOne().sort({score: 1});
-		if(grade) {
-			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/e/settings/grade/${grade._id}`));
-		}
-		data.grades = await db.UsersGradeModel.find().sort({score: 1});
-		ctx.template = 'experimental/settings/grade.pug';
+		const {data, db} = ctx;
+		data.grades = await db.UsersGradeModel.find({}).sort({_id: 1});
+		ctx.template = "experimental/settings/grade/grade.pug";
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -49,6 +45,59 @@ router
     await redis.cacheForums();
 		await next();
 	})
+	.patch("/", async (ctx, next) => {
+		const {db, body, nkcModules, redis} = ctx;
+		const {grades} = body;
+		const {checkString, checkNumber} = nkcModules.checkData;
+		const names = [], scores = [];
+		grades.map(g => {
+			const {displayName, score} = g;
+			checkString(displayName, {
+				name: "等级名称",
+				minLength: 1,
+				maxLength: 20
+			});
+			checkNumber(score, {
+				name: "积分值",
+				min: 0
+			});
+			if(names.includes(displayName)) {
+				ctx.throw(400, "等级名称重复");
+			}
+			if(scores.includes(score)) {
+				ctx.throw(400, "积分值重复");
+			}
+			names.push(displayName);
+			scores.push(score);
+		});
+		const grades_ = [];
+		grades.map(g => {
+			if(grades_.length === 0) {
+				grades_.push(g);
+			} else {
+				let insert = false;
+				for(let j = 0; j < grades_.length; j++) {
+					const g_ = grades_[j];
+					if(g.score < g_.score) {
+						grades_.splice(j, 0, g);
+						insert = true;
+						break;
+					}
+				}
+				if(!insert) grades_.push(g);
+			}
+		});
+		await db.UsersGradeModel.remove({});
+		for(let i = 0; i < grades_.length; i++) {
+			let grade = grades_[i];
+			grade._id = i;
+			delete grade.__v;
+			grade = db.UsersGradeModel(grade);
+			await grade.save();
+		}
+		await redis.cacheForums();
+		await next();
+	})
 	.get('/:_id', async (ctx, next) => {
 		const {data, db, params, query} = ctx;
 		const {t} = query;
@@ -59,7 +108,7 @@ router
 		if(t === 'permissions') {
 			data.operations = await db.OperationModel.find().sort({toc: 1});
 		}
-		ctx.template = 'experimental/settings/grade.pug';
+		ctx.template = 'experimental/settings/grade/grade.pug';
 		await next();
 	})
 	.patch('/:_id', async (ctx, next) => {

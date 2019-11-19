@@ -31,7 +31,6 @@ async function func() {
       rolesAndGrades[`role-grade:${role._id}-${grade._id}`] = [];
     });
   });
-
   for(const forum of forums) {
     
     const {

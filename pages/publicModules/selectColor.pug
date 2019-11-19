@@ -6,8 +6,9 @@
 +includeJS('/jquery/jquery.minicolors.js')
 script.
   NKC.methods.initSelectColor = function(callback) {
-    if($('input[data-control="selectColor"]').length !== 0) {
-      $('input[data-control="selectColor"]').minicolors({
+    var dom = $('input[data-control="selectColor"]');
+    if(dom.length !== 0) {
+      dom.minicolors({
 
         control: $(this).attr('data-control') || 'selectColor',
 

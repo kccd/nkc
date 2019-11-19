@@ -1,3 +1,45 @@
+var data = NKC.methods.getDataById("data");
+var app = new Vue({
+	el: "#app",
+	data: {
+		grades: data.grades
+	},
+	mounted: function() {
+		var self = this;
+		NKC.methods.initSelectColor();
+	},
+	methods: {
+		checkNumber: NKC.methods.checkData.checkNumber,
+		checkString: NKC.methods.checkData.checkString,
+		save: function() {
+			var colors = $("input.color");
+			for(var i = 0; i < colors.length; i++) {
+				var color = colors.eq(i);
+				var index = color.attr("data-index");
+				app.grades[index].color = color.val();
+			}
+			nkcAPI("/e/settings/grade", "PATCH", {grades: this.grades})
+				.then(function() {
+					sweetSuccess("保存成功");
+				})
+				.catch(sweetError)
+		},
+		removeGrade: function(index) {
+			this.grades.splice(index, 1);
+		},
+		addGrade: function() {
+			this.grades.push({
+				_id: "",
+				displayName: "新建等级",
+				score: 0,
+				color: "#aaaaaa",
+				description: ""
+			});
+		}
+	}
+});
+
+/*
 $('input[name="selectOperation"]').iCheck({
 	checkboxClass: 'icheckbox_minimal-red',
 });
@@ -78,4 +120,4 @@ function deleteGrade(id) {
 		.catch(function(data) {
 			screenTopWarning(data.error || data);
 		})
-}
+}*/

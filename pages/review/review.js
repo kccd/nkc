@@ -52,7 +52,7 @@ var app = new Vue({
               fid: "recycle",
               para: data
             };
-            url = "/t/" + data.threadId + "/moveThread";
+            url = "/t/" + data.threadId + "/disabled";
           } else {
             d = {
               para: data
