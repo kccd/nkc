@@ -46,7 +46,7 @@ router
 		await next();
 	})
 	.patch("/", async (ctx, next) => {
-		const {db, body, nkcModules} = ctx;
+		const {db, body, nkcModules, redis} = ctx;
 		const {grades} = body;
 		const {checkString, checkNumber} = nkcModules.checkData;
 		const names = [], scores = [];
