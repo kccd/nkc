@@ -14,7 +14,7 @@
           a.module-user-info-name(:href="'/u/' + user.uid" target="_blank") {{user.username}}
           .module-user-info-grade
             span {{user.grade.displayName}}
-            img(:src="'/default/v' + user.grade._id + 'l.png'")
+            img(:src="'/statics/grade_icon/v' + user.grade._id + 'l.png'")
           .module-user-info-certs {{user.info.certsName}}
           .module-user-info-description {{user.description}}
           .module-user-info-posts.m-t-1
