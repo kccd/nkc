@@ -923,7 +923,7 @@ threadRouter
       tid,
       uid: data.user.uid
     };
-    await db.SubscribeModel.insertSubscribe("replay", data.user.uid, tid);
+    // await db.SubscribeModel.insertSubscribe("replay", data.user.uid, tid);
     //-global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })

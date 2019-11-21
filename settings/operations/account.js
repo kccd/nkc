@@ -1,14 +1,4 @@
 module.exports = {
-  GET: 'visitAccount',
-  thread: {
-    GET: "visitAccount"
-  },
-  post: {
-    GET: "visitAccount"
-  },
-  draft: {
-    GET: "visitAccount"
-  },
   finance: {
     GET: 'visitUserKcb',
     recharge: {

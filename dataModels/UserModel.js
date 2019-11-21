@@ -480,16 +480,19 @@ userSchema.methods.updateUserMessage = async function() {
 
   const {uid} = this;
 	// 发帖回帖统计
-  const threads = await ThreadModel.find({uid}, {oc: 1, _id: 0});
-  const threadsOc = threads.map(t => t.oc);
-  const threadCount = threads.length;
+  const threadCount = await ThreadModel.count({uid});
+  // const threads = await ThreadModel.find({uid}, {oc: 1, _id: 0});
+  // const threadsOc = threads.map(t => t.oc);
+  // const threadCount = threads.length;
   const disabledThreadsCount = await ThreadModel.count({uid, disabled: true});
   const digestThreadsCount = await ThreadModel.count({uid, digest: true});
   const toppedThreadsCount = await ThreadModel.count({uid, topped: true});
 	const allDigestPostsCount = await PostModel.count({uid, digest: true});
 	const digestPostsCount = allDigestPostsCount - digestThreadsCount;
-  const postCount = await PostModel.count({pid: {$nin: threadsOc}, uid});
-  const disabledPostsCount = await PostModel.count({pid: {$nin: threadsOc}, uid, disabled: true});
+	const postCount = await PostModel.count({uid, type: "post"});
+	const disabledPostsCount = await PostModel.count({uid, type: "post", disabled: true});
+  // const postCount = await PostModel.count({pid: {$nin: threadsOc}, uid});
+  // const disabledPostsCount = await PostModel.count({pid: {$nin: threadsOc}, uid, disabled: true});
 	// 日常登录统计
   const dailyLoginCount = await UsersScoreLogModel.count({
 	  uid,
@@ -680,9 +683,12 @@ userSchema.statics.createUser = async (option) => {
 		await user.save();
 		await userPersonal.save();
 		await userGeneral.save();
+		
 		// 创建默认关注分类
-    await SubscribeModel.createDefaultType("post", uid);
-    await SubscribeModel.createDefaultType("replay", uid);
+    // 2019/11/21 创建“个人中心”时移除
+    // await SubscribeModel.createDefaultType("post", uid);
+    // await SubscribeModel.createDefaultType("replay", uid);
+    
     // 创建默认数据 关注专业
 		for(const fid of defaultSubscribeForumsId) {
 		  const sub = SubscribeModel({
@@ -718,6 +724,9 @@ userSchema.statics.createUser = async (option) => {
 	return user;
 };
 
+userSchema.methods.extendDraftCount = async function() {
+  return this.draftCount = await mongoose.model("draft").count({uid: this.uid});
+};
 
 userSchema.methods.extendGrade = async function() {
 	const UsersGradeModel = mongoose.model('usersGrades');
@@ -921,6 +930,9 @@ userSchema.statics.extendUsersInfo = async (users) => {
     }
     info.certsName = info.certsName.join(' ');
     user.info = info;
+    if(!user.grade && user.extendGrade) {
+      await user.extendGrade();
+    }
     users_.push(user.toObject());
   }
   return users_;

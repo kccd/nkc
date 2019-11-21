@@ -65,7 +65,7 @@
 #moduleLibrary .lib-list-li .list-body .list-name {
   color: #282c37;
   font-size: 1.3rem;
-  word-break: break-all;
+  word-break: break-word;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
@@ -104,7 +104,7 @@
   line-height: 1.6rem;
   font-size: 1.25rem;
   color: #9baec8;
-  word-break: break-all;
+  word-break: break-word;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;

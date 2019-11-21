@@ -49,6 +49,7 @@ body {
 .account-nav .account-user-description {
   margin: 0.5rem 1rem;
   font-size: 1.1rem;
+  text-align: center;
   color: #555;
 }
 .account-nav .account-user-kcb {
@@ -187,6 +188,60 @@ body {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
 }
+.account-thread .account-post-thread-user img {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  margin-left: 0.3rem;
+  margin-top: -2px;
+  margin-right: 0.2rem;
+}
+.account-thread .account-post-thread-user a {
+  color: #2b90d9;
+}
+.account-thread .account-post-thread {
+  padding: 1rem;
+  background-color: #f6f2ee;
+  border-radius: 3px;
+}
+.account-thread .account-post-content {
+  margin: 0.4rem 0 0.6rem 0;
+  text-decoration: none;
+  color: #282c37;
+  max-height: 5rem;
+  word-break: break-all;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.account-thread.draft {
+  background-color: rgba(255, 255, 0, 0.2);
+}
+.account-thread.draft .account-reason {
+  text-align: center;
+  color: #e85a71;
+  padding: 0.5rem;
+  font-weight: 700;
+}
+.account-thread.disabled {
+  background-color: rgba(0, 0, 0, 0.07);
+}
+.account-thread.disabled .account-reason {
+  text-align: center;
+  color: #e85a71;
+  padding: 0.5rem;
+  font-weight: 700;
+}
+.account-thread.review {
+  background-color: rgba(255, 0, 0, 0.07);
+}
+.account-thread.review .account-reason {
+  text-align: center;
+  color: #e85a71;
+  padding: 0.5rem;
+  font-weight: 700;
+}
 .account-thread .account-thread-avatar {
   display: table-cell;
   vertical-align: top;
@@ -217,6 +272,7 @@ body {
 .account-thread .account-thread-content .account-thread-title {
   font-size: 1.3rem;
   font-weight: 700;
+  height: 1.8rem;
   color: #282c37;
   word-break: break-all;
   display: -webkit-box;
@@ -224,11 +280,21 @@ body {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
+.account-thread .account-thread-content .account-thread-title.digest a {
+  color: #e85a71;
+}
+.account-thread .account-thread-content .account-thread-title.digest a:hover,
+.account-thread .account-thread-content .account-thread-title.digest a:focus {
+  color: #e85a71;
+}
+.account-thread .account-thread-content .account-thread-title.digest a:hover {
+  border-color: #e85a71;
+}
 .account-thread .account-thread-content .account-thread-title a {
   color: #282c37;
   transition: border-bottom-color 200ms;
   border-bottom: 1px solid rgba(0, 0, 0, 0);
-  padding-bottom: 0.2rem;
+  padding-bottom: 0.1rem;
 }
 .account-thread .account-thread-content .account-thread-title a:hover,
 .account-thread .account-thread-content .account-thread-title a:focus {
@@ -236,7 +302,7 @@ body {
   color: #282c37;
 }
 .account-thread .account-thread-content .account-thread-title a:hover {
-  border-color: inherit;
+  border-color: #282c37;
 }
 .account-thread .account-thread-content .account-thread-abstract {
   margin: 0.6rem 0;

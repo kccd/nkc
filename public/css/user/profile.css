@@ -1,0 +1,568 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+body {
+  background-color: #f6f6f6;
+}
+.account-nav {
+  padding: 0!important;
+}
+.account-nav .account-user-banner img {
+  width: 100%;
+}
+.account-nav .account-user-avatar {
+  margin-top: -5rem;
+  text-align: center;
+}
+.account-nav .account-user-avatar img {
+  height: 8rem;
+  width: 8rem;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 3px solid #fff;
+}
+.account-nav .account-user-name {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+}
+.account-nav .account-user-level {
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 0.4rem;
+}
+.account-nav .account-user-certs {
+  text-align: center;
+  margin-top: 0.4rem;
+  font-size: 1rem;
+  color: #e85a71;
+}
+.account-nav .account-user-description {
+  margin: 0.5rem 1rem;
+  font-size: 1.1rem;
+  text-align: center;
+  color: #555;
+}
+.account-nav .account-user-kcb {
+  overflow: hidden;
+  margin: 0.5rem 0 1rem 0;
+}
+.account-nav .account-user-kcb > div {
+  padding: 0;
+  text-align: center;
+}
+.account-nav .account-user-kcb img {
+  height: 1.4rem;
+  width: 1.4rem;
+  margin-right: 0.4rem;
+  margin-top: -2px;
+}
+.account-nav .account-user-links {
+  overflow: hidden;
+}
+.account-nav .account-user-links .account-user-links {
+  border-top: 1px solid #eee;
+  padding: 1rem;
+}
+.account-nav .account-user-links .account-user-link {
+  text-decoration: none;
+  color: #282c37;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 100ms;
+}
+.account-nav .account-user-links .account-user-link:hover {
+  background-color: #f4f4f4;
+  /*box-shadow: 1px 1px 5px rgba(0,  0, 0, 0.2);*/
+}
+.account-nav .account-user-links .account-user-link .fa {
+  margin-right: 0.3rem;
+  color: #555;
+}
+.account-nav .account-user-links .account-user-link:hover,
+.account-nav .account-user-links .account-user-link:focus {
+  color: #282c37;
+  text-decoration: none;
+}
+.account-nav .account-ul {
+  border-top: 1px solid #eee;
+  position: relative;
+  padding: 0.5rem 0;
+  transition: box-shadow 300ms;
+}
+.account-nav .account-ul .account-lis .account-li:first-child .name {
+  border-top: none;
+}
+.account-nav .account-ul .account-name {
+  height: 1.4rem;
+  line-height: 1.4rem;
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  border-radius: 0.7rem;
+}
+.account-nav .account-ul:hover {
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+}
+.account-nav .account-ul .account-li {
+  display: block;
+  height: 4rem;
+  line-height: 4rem;
+  padding: 0 4rem 0 2rem;
+  font-size: 1.2rem;
+  color: #555;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+}
+.account-nav .account-ul .account-li .name {
+  border-top: 1px solid #eee;
+}
+.account-nav .account-ul .account-li span {
+  margin-left: 1rem;
+}
+.account-nav .account-ul .account-li:hover,
+.account-nav .account-ul .account-li.active {
+  text-decoration: none;
+  color: #2b90d9;
+}
+.account-nav .account-ul .account-li .fa {
+  position: absolute;
+  height: 4rem;
+  line-height: 4rem;
+  font-size: 1.6rem;
+  top: 0;
+  width: 4rem;
+  text-align: center;
+  right: 0;
+}
+.account-info a {
+  display: block;
+  height: 100%;
+  width: 100%;
+  padding: 1rem 0;
+  border-radius: 5px;
+  transition: background-color 200ms;
+  text-align: center;
+}
+.account-info a:hover,
+.account-info a:focus {
+  text-decoration: none;
+}
+.account-info a:hover {
+  background-color: #f4f4f4;
+}
+.account-info a .account-info-name {
+  font-size: 1rem;
+  color: #777;
+}
+.account-info a .account-info-value {
+  font-size: 2rem;
+  color: #2b2b2b;
+  font-weight: 700;
+}
+.account-header {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.account-description {
+  font-size: 1rem;
+  color: #aaa;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+.account-threads .null {
+  padding-top: 10rem;
+  padding-bottom: 10rem;
+  text-align: center;
+}
+.account-threads .account-thread:last-child {
+  margin-bottom: 0;
+}
+.account-thread {
+  margin-bottom: 1.5rem;
+}
+.account-thread.draft-list .checkbox {
+  display: inline;
+  cursor: pointer;
+}
+.account-thread.draft-list .checkbox label {
+  padding: 4px 0 0 20px;
+}
+.account-thread.draft-list .draft-button a {
+  color: #2b90d9;
+}
+.account-thread.draft-list .draft-button button {
+  background-color: rgba(0, 0, 0, 0);
+  color: #e85a71;
+  margin-right: 0.3rem;
+  border: none;
+}
+.account-thread.draft-list .draft-button button:focus {
+  outline: none;
+}
+.account-thread .account-post-thread-user .time {
+  color: #e85a71;
+  display: inline;
+  margin-right: 0.3rem;
+}
+.account-thread .account-post-thread-user img {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  margin-left: 0.3rem;
+  margin-top: -2px;
+  margin-right: 0.2rem;
+}
+.account-thread .account-post-thread-user a {
+  color: #2b90d9;
+}
+.account-thread .account-post-thread {
+  padding: 1rem;
+  background-color: #f6f2ee;
+  border-radius: 3px;
+}
+.account-thread .account-post-thread .account-post-thread-warning {
+  text-align: center;
+  color: #bbab9c;
+}
+.account-thread .account-post-thread .account-post-thread-warning .fa {
+  margin-right: 0.3rem;
+}
+.account-thread .account-post-content {
+  margin: 0.4rem 0 0.6rem 0;
+  text-decoration: none;
+  color: #282c37;
+  max-height: 5rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.account-thread.draft {
+  background-color: rgba(255, 255, 0, 0.2);
+}
+.account-thread.draft .account-reason {
+  text-align: center;
+  color: #e85a71;
+  padding: 0.5rem;
+  font-weight: 700;
+}
+.account-thread.disabled {
+  background-color: rgba(0, 0, 0, 0.07);
+}
+.account-thread.disabled .account-reason {
+  text-align: center;
+  color: #e85a71;
+  padding: 0.5rem;
+  font-weight: 700;
+}
+.account-thread.review {
+  background-color: rgba(255, 0, 0, 0.07);
+}
+.account-thread.review .account-reason {
+  text-align: center;
+  color: #e85a71;
+  padding: 0.5rem;
+  font-weight: 700;
+}
+.account-thread .account-thread-avatar {
+  display: table-cell;
+  vertical-align: top;
+}
+.account-thread .account-thread-avatar > div {
+  width: 12rem;
+  height: 8rem;
+  margin-right: 1rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+}
+.account-thread .account-thread-avatar > div img {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.account-thread .account-thread-content {
+  display: table-cell;
+  vertical-align: top;
+  overflow: hidden;
+  width: 100%;
+}
+.account-thread .account-thread-content .account-thread-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  height: 1.8rem;
+  color: #282c37;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.account-thread .account-thread-content .account-thread-title.digest a {
+  color: #e85a71;
+}
+.account-thread .account-thread-content .account-thread-title.digest a:hover,
+.account-thread .account-thread-content .account-thread-title.digest a:focus {
+  color: #e85a71;
+}
+.account-thread .account-thread-content .account-thread-title.digest a:hover {
+  border-color: #e85a71;
+}
+.account-thread .account-thread-content .account-thread-title a {
+  color: #282c37;
+  transition: border-bottom-color 200ms;
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  padding-bottom: 0.1rem;
+}
+.account-thread .account-thread-content .account-thread-title a:hover,
+.account-thread .account-thread-content .account-thread-title a:focus {
+  text-decoration: none;
+  color: #282c37;
+}
+.account-thread .account-thread-content .account-thread-title a:hover {
+  border-color: #282c37;
+}
+.account-thread .account-thread-content .account-thread-abstract {
+  margin: 0.6rem 0;
+  max-height: 3.5rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.account-thread .account-thread-content .account-thread-info {
+  position: relative;
+  height: 1.6rem;
+  display: block;
+  width: 100%;
+  padding-right: 7rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.account-thread .account-thread-content .account-thread-info > div {
+  display: inline;
+  margin-right: 0.3rem;
+}
+.account-thread .account-thread-content .account-thread-info .thread-time {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.account-thread .account-thread-content .account-thread-info .fa {
+  color: #aaa;
+  margin-right: 0.3rem;
+}
+.account-thread .account-thread-content .account-thread-info span {
+  color: #888;
+}
+.account-followers {
+  margin-top: 0.5rem;
+}
+.account-forums .account-follower-info {
+  color: #777;
+  font-size: 1rem;
+  margin-top: 0.3rem;
+}
+.account-forums .account-follower-info span {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  color: #e85a71;
+}
+.account-follower {
+  margin-bottom: 1.5rem;
+}
+.account-follower .account-follower-avatar {
+  display: table-cell;
+  vertical-align: top;
+}
+.account-follower .account-follower-avatar .img {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid #eee;
+  margin-right: 1.3rem;
+}
+.account-follower .account-follower-content {
+  display: table-cell;
+  vertical-align: top;
+  width: 100%;
+  position: relative;
+}
+.account-follower .account-follower-content .account-follower-name {
+  height: 2.1rem;
+  box-sizing: border-box;
+  padding-right: 9rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.account-follower .account-follower-content .account-follower-name a {
+  font-size: 1.4rem;
+  color: #2b90d9;
+  transition: border-bottom-color 200ms;
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+}
+.account-follower .account-follower-content .account-follower-name a:hover,
+.account-follower .account-follower-content .account-follower-name a:focus {
+  text-decoration: none;
+  color: #2b90d9;
+}
+.account-follower .account-follower-content .account-follower-name a:hover {
+  border-color: #2b90d9;
+}
+.account-follower .account-follower-content .account-follower-level {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+}
+.account-follower .account-follower-content .account-follower-level > div {
+  display: inline-block;
+}
+.account-follower .account-follower-content .account-follower-level .account-follower-grade {
+  margin-right: 0.5rem;
+}
+.account-follower .account-follower-content .account-follower-level .account-follower-certs {
+  color: #e85a71;
+}
+.account-follower .account-follower-content .account-follower-description {
+  margin-top: 0.5rem;
+  height: 1.5rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  color: #777;
+  font-size: 1.15rem;
+}
+.subscribe-types {
+  position: relative;
+  padding-right: 6rem;
+}
+.subscribe-types .subscribe-type-edit {
+  position: absolute;
+  top: 0.4rem;
+  cursor: pointer;
+  color: #2b90d9;
+  right: 0;
+}
+.subscribe-types .subscribe-type {
+  display: inline-block;
+  height: 2.2rem;
+  padding: 0 0.5rem;
+  background-color: #fff;
+  color: #282c37;
+  margin-bottom: 0.4rem;
+  margin-right: 0.5rem;
+  line-height: 2.2rem;
+  border-radius: 2px;
+  border: 1px solid #d4d4d4;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+.subscribe-types .subscribe-type:hover,
+.subscribe-types .subscribe-type:focus {
+  text-decoration: none;
+}
+.subscribe-types .subscribe-type:hover {
+  background-color: #f4f4f4;
+}
+.subscribe-types .subscribe-type.active {
+  background-color: #2b90d9;
+  border: 1px solid #2b90d9;
+  color: #fff;
+}
+.subscribe-thread .account-thread-title {
+  padding-right: 9rem;
+  position: relative;
+  padding-top: 0.1rem;
+  height: 2.1rem !important;
+  box-sizing: border-box;
+}
+.account-follower-buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 1rem;
+}
+.account-follower-buttons button {
+  height: 2rem;
+  width: 4rem;
+  border-radius: 2px;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+}
+.account-follower-buttons button:focus {
+  outline: none;
+}
+.account-follower-buttons .category {
+  background-color: #fff;
+  display: none;
+  color: #282c37;
+  border: 1px solid #ccc;
+}
+.account-follower-buttons .category:hover {
+  background-color: #eee;
+}
+.account-follower-buttons .subscribe {
+  background-color: #2b90d9;
+  border: 1px solid #2b90d9;
+  color: #fff;
+}
+.account-follower-buttons .subscribe:after {
+  content: "关注";
+}
+.account-follower-buttons .subscribe.collection-button:after {
+  content: "收藏";
+}
+.account-follower-buttons .subscribe:hover {
+  background-color: #2777b1;
+}
+.account-follower-buttons.active .subscribe {
+  background-color: #e85a71;
+  border: 1px solid #e85a71;
+}
+.account-follower-buttons.active .subscribe:hover {
+  background-color: #cb4c61;
+}
+.account-follower-buttons.active .subscribe:after {
+  content: "取关";
+}
+.account-follower-buttons.active .subscribe.collection-button:after {
+  content: "取藏";
+}
+.account-follower-buttons.active .category {
+  display: inline-block;
+}
+@media (max-width: 768px) {
+  .account-thread-avatar > div {
+    width: 9rem!important;
+    height: 6rem!important;
+  }
+}

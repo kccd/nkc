@@ -22,6 +22,15 @@ var Tools = function() {
       case "fileCover": {
         return "/attachIcon/" + (id||"").toLowerCase() + ".png";
       }
+      case "gradeIcon": {
+        return "/statics/grade_icon/v" + id + "l.png";
+      }
+      case "forumAvatar": {
+        return "/forum_avatar/" + id;
+      }
+      case "columnAvatar": {
+        return "/column/avatar/" + id + t
+      }
     }
   };
   self.floatUserInfo = function(uid) {

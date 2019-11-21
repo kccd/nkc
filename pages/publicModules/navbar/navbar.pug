@@ -58,7 +58,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         if data.user
           - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`科创币 ${data.user.kcb/100}\n`+`${data.user.info.certsName}`;
           li.userInfo
-            a(href="/editer") 发表文章
+            a(href="/editor") 发表文章
           li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
             .nav-user-content
               div
@@ -82,7 +82,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                         img(src="/statics/xsf.png")
                         span=data.user.xsf
                   .nav-user-links
-                    a(href=`/account`).col-xs-6.nav-user-link
+                    a(href=`/u/${data.user.uid}/profile`).col-xs-6.nav-user-link
                       .fa.fa-user-circle
                       | 个人中心
                     if state.userColumn
@@ -96,7 +96,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(href="/message").col-xs-6.nav-user-link
                       .fa.fa-comments
                       | 消息中心
-                    a(href=`/u/${data.user.uid}/drafts`).col-xs-6.nav-user-link
+                    a(href=`/u/${data.user.uid}/profile/draft`).col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
                     a(href=`/u/${data.user.uid}/settings`).col-xs-6.nav-user-link
@@ -259,7 +259,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span.fa.fa-bookmark-o &nbsp;关注管理
             span.pull-right.fa.fa-angle-right
         li
-          a(href=`/u/${data.user.uid}/drafts`)
+          a(href=`/u/${data.user.uid}/profile/draft`)
             span.fa.fa-inbox &nbsp;草稿箱
             span.pull-right.fa.fa-angle-right
         li

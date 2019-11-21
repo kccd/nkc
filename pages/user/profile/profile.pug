@@ -1,0 +1,121 @@
+extends ../../bootstrap_base
+block title
+  if !data.name
+    title 个人中心
+  else
+    title=`个人中心 - ${data.name}`
+  +includeCSS("/css/user/profile.css")
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-3.box-shadow-panel
+        .account-nav
+          .account-user-banner
+            a(href=`/banner/${data.targetUser.banner}?t=lg` target="_blank")
+              img(src=`/banner/${data.targetUser.banner}`)
+          .account-user-avatar
+            a(href=`/avatar/${data.targetUser.avatar}?t=lg` target="_blank")
+              img(src=`/avatar/${data.targetUser.avatar}`)
+          .account-user-name=data.targetUser.username
+          .account-user-level
+            span.user-grade(style=`color: ${data.targetUser.grade.color};`)
+              span= data.targetUser.grade.displayName
+              img.grade-icon(src=`/statics/grade_icon/v${data.targetUser.grade._id}l.png` title=data.targetUser.grade.displayName)
+          .account-user-certs=data.targetUser.info.certsName
+          .account-user-description!=markdown_safe(data.targetUser.description)
+          .account-user-kcb
+            .col-xs-6
+              img(src="/statics/kcb.png")
+              span=data.targetUser.kcb/100
+            .col-xs-6
+              img(src="/statics/xsf.png")
+              span=data.targetUser.xsf
+          .account-user-links
+            .account-user-links
+              a(href=`/u/${data.targetUser.uid}`).col-xs-6.account-user-link
+                .fa.fa-user-circle-o
+                | 个人名片
+              if state.userColumn
+                a(href=`/m/${state.userColumn._id}`).col-xs-6.account-user-link
+                  .fa.fa-columns
+                  | 我的专栏
+              else
+                a(href=`/column/apply`).col-xs-6.account-user-link
+                  .fa.fa-columns
+                  | 开设专栏
+              a(href="/message").col-xs-6.account-user-link
+                .fa.fa-comments
+                | 消息中心
+              a(href=`/u/${data.targetUser.uid}/settings`).col-xs-6.account-user-link
+                .fa.fa-cog
+                | 账号设置
+          for navLink in data.navLinks
+            .account-ul
+              if navLink.name
+                .account-name=navLink.name
+              .account-lis
+                for link in navLink.links
+                  a.account-li(href=link.url class=link.type===data.type?"active":"")
+                    .name=link.name
+                      span=link.count || ""
+                    .fa.fa-angle-right
+      .col-xs-12.col-md-7.box-shadow-panel
+        if !data.type
+          .account-info
+            .row
+              .col-xs-6.col-md-3
+                a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
+                  .account-info-value=data.targetUser.threadCount
+                  .account-info-name 文章
+              .col-xs-6.col-md-3
+                a(href=`/u/${data.targetUser.uid}/profile/post` title="点击查看回复")
+                  .account-info-value=data.targetUser.postCount
+                  .account-info-name 回复
+              .col-xs-6.col-md-3
+                a(href=`/u/${data.targetUser.uid}/profile/finance` title="点击查看账单")
+                  .account-info-value=data.targetUser.kcb/100
+                  .account-info-name 科创币
+              .col-xs-6.col-md-3
+                a
+                  .account-info-value=data.targetUser.xsf
+                  .account-info-name 学术分
+              .col-xs-12.col-md-12
+          .account-summary
+            include ../summary/calendar
+          .account-summary
+            include ../summary/pie
+        else if data.type === "thread"
+          include ./thread
+        else if data.type === "post"
+          include ./post
+        else if data.type === "draft"
+          include ./draft
+        else if data.type === "finance"
+          include ./finance
+        else if data.type === "follower"
+          include ./follower
+        else if data.type === "subscribe/user"
+          include ./subscribe/user
+        else if data.type === "subscribe/topic"
+          include ./subscribe/topic
+        else if data.type === "subscribe/discipline"
+          include ./subscribe/discipline
+        else if data.type === "subscribe/column"
+          include ./subscribe/column
+        else if data.type === "subscribe/thread"
+          include ./subscribe/thread
+        else if data.type === "subscribe/collection"
+          include ./subscribe/collection
+      .col-xs-12.col-md-2.box-shadow-panel
+        //div
+
+  .hidden#subUsersId=objToStr({subThreadsId: data.subThreadsId, collectionThreadsId: data.collectionThreadsId, subUsersId: data.subUsersId, subForumsId: data.subForumsId, subColumnsId: data.subColumnsId, subscribes: data.subscribesObj})
+block scripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  if !data.type
+    include ../summary/summary
+    +includeJS("/user/summary/calendar.js")
+    +includeJS("/user/summary/pie.js")
+  +includeJS("/js/user/profile.js")
+  include ../../publicModules/floatUserPanel/floatUserPanel
+  +includeJS("/js/account.js")

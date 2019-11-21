@@ -223,10 +223,14 @@ schema.statics.saveUserSubColumnsId = async (uid) => {
 * @author pengxiguaa 2019-7-19
 * @return {[String]} 文章ID数组
 * */
-schema.statics.getUserSubThreadsId = async (uid) => {
-  let threadsId = await redisClient.smembersAsync(`user:${uid}:subscribeThreadsId`);
+schema.statics.getUserSubThreadsId = async (uid, detail) => {
+  let key = `user:${uid}:subscribeThreadsId`;
+  if(["sub", "reply"].includes(detail)) {
+    key += `:${detail}`;
+  }
+  let threadsId = await redisClient.smembersAsync(key);
   if(!threadsId.length) {
-    threadsId = await mongoose.model("subscribes").saveUserSubThreadsId(uid);
+    threadsId = await mongoose.model("subscribes").saveUserSubThreadsId(uid, detail);
   }
   return threadsId;
 };
@@ -237,20 +241,45 @@ schema.statics.getUserSubThreadsId = async (uid) => {
 * @author pengxiguaa 2019-7-31
 * */
 
-schema.statics.saveUserSubThreadsId = async (uid) => {
+schema.statics.saveUserSubThreadsId = async (uid, detail) => {
+  const total = [], reply = [], sub = [];
   const subs = await mongoose.model("subscribes").find({
     type: "thread",
     uid
-  }, {tid: 1}).sort({toc: -1});
-  const threadsId = subs.map(s => s.tid);
+  }, {tid: 1, detail: 1}).sort({toc: -1});
+  subs.map(s => {
+    total.push(s.tid);
+    if(s.detail === "reply") {
+      reply.push(s.tid);
+    } else if(s.detail === "sub") {
+      sub.push(s.tid);
+    }
+  });
   setTimeout(async () => {
-    await redisClient.delAsync(`user:${uid}:subscribeThreadsId`);
-    if(threadsId.length) {
-      await redisClient.saddAsync(`user:${uid}:subscribeThreadsId`, threadsId);
+    let key = `user:${uid}:subscribeThreadsId`;
+    await redisClient.delAsync(key);
+    if(total.length) {
+      await redisClient.saddAsync(key, total);
+    }
+    key = `user:${uid}:subscribeThreadsId:reply`;
+    await redisClient.delAsync(key);
+    if(reply.length) {
+      await redisClient.saddAsync(key, reply);
+    }
+    key = `user:${uid}:subscribeThreadsId:sub`;
+    await redisClient.delAsync(key);
+    if(sub.length) {
+      await redisClient.saddAsync(key, sub);
     }
     await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
-  return threadsId;
+  if(detail === "reply") {
+    return reply;
+  } else if(detail === "sub") {
+    return sub;
+  } else {
+    return total;
+  }
 };
 
 /*
@@ -532,7 +561,8 @@ schema.statics.extendSubscribes = async (subscribes) => {
       tid.add(s.tid)
     }
   });
-  const users = await UserModel.find({uid: {$in: [...uid]}});
+  let users = await UserModel.find({uid: {$in: [...uid]}});
+  users = await UserModel.extendUsersInfo(users);
   const usersObj = {};
   users.map(u => {
     usersObj[u.uid] = u;

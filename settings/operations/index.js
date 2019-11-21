@@ -95,6 +95,7 @@ operationObj.defaultOperations = [
   "getAllMessagesResources", // 查看所有的短消息资源
   "topAllPost", // 置顶任何人的回复
   "modifyAllResource", // 可修改任何人的附件
+	"visitAllUserProfile", // 可查看任何人的个人中心
 ];
 
 

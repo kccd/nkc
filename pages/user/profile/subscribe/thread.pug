@@ -1,0 +1,52 @@
+include ./nav
+div
+  include ../../../publicModules/paging/paging
+  .account-threads.subscribe-thread
+    if !data.subscribes.length
+      .null 空空如也~
+    for subscribe in data.subscribes
+      -let thread = subscribe.thread
+      -let klass = "";
+      if thread.disabled
+        -klass += "disabled";
+      else if thread.recycleMark
+        -klass += "draft";
+      else if !thread.reviewed
+        -klass += "review";
+      .account-thread(class=klass)
+        if thread.disabled
+          .account-reason 已屏蔽，仅自己可见。
+        else if thread.recycleMark
+          .account-reason 退修中，仅自己可见，修改后对所有人可见。
+        else if !thread.reviewed
+          .account-reason 审核中，仅自己可见，通过后对所有人可见。
+        .account-thread-avatar
+          if thread.firstPost.cover
+            div
+              img(src=tools.getUrl("postCover", thread.firstPost.cover))
+        .account-thread-content(style=!thread.firstPost.cover?"display: block":"")
+          .account-thread-title(class=thread.digest?"digest":"")
+            .account-follower-buttons(data-thread=subscribe.tid class=data.subThreadsId.includes(subscribe.tid) ? "active" : "")
+              button.category(onclick=`user.moveSub("${subscribe.tid}")`) 分类
+              button.subscribe(onclick=`user.subscribe("${subscribe.tid}", "thread")`)
+            a(href=`/t/${thread.tid}` title=thread.firstPost.t)=thread.firstPost.t
+          .account-thread-abstract=thread.firstPost.abstractCN || thread.firstPost.c
+          .account-thread-info
+            //-.thread-time=format("YYYY/MM/DD HH:mm:ss", thread.toc)
+            .thread-time=`${fromNow(thread.toc)}`
+            if thread.firstPost.voteUp
+              .thread-thumbup
+                .fa.fa-thumbs-up
+                span=thread.firstPost.voteUp
+            if thread.hits
+              .thread-hits
+                .fa.fa-eye
+                span=thread.hits
+            if thread.count - 1
+              .thread-comment
+                .fa.fa-comment
+                span=thread.count - 1
+            if thread.firstPost.anonymous
+              span 匿名
+  .m-t-05
+    include ../../../publicModules/paging/paging_input

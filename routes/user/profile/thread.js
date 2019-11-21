@@ -1,12 +1,13 @@
 module.exports = async (ctx, next) => {
-  const {db, data, query, nkcModules} = ctx;
-  const {user} = data;
+  const {db, data, query, nkcModules, state} = ctx;
+  const {targetUser} = data;
+  const {pageSettings} = state;
   const {page = 0} = query;
   const q = {
-    uid: user.uid
+    uid: targetUser.uid
   };
   const count = await db.ThreadModel.count(q);
-  const paging = nkcModules.apiFunction.paging(page, count);
+  const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
   let threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   data.paging = paging;
   threads = await db.ThreadModel.extendThreads(threads, {
@@ -24,9 +25,5 @@ module.exports = async (ctx, next) => {
     excludeAnonymousPost: false,
   });
   data.threads = threads;
-  data.paging = {
-    pageCount: 23,
-    page: 3
-  };
   await next();
 };

@@ -1,0 +1,24 @@
+.type-li{
+  position: relative;
+  padding-right: 5.5rem;
+  height: 2rem;
+  line-height: 2rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.type-buttons{
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.type-buttons .fa{
+  color: #888;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.type-buttons .fa:hover{
+  color: #282c37;
+}
