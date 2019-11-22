@@ -1,7 +1,7 @@
-include ./nav
+//- include ./nav
 div
   include ../../../publicModules/paging/paging
-  .account-threads.account-forums
+  .account-followers.account-forums
     if !data.subscribes.length
       .null 空空如也~
     for subscribe in data.subscribes
@@ -14,7 +14,7 @@ div
         .account-follower-content
           .account-follower-name
             .account-follower-buttons(data-forum=subscribe.forum.fid class=data.subForumsId.includes(subscribe.forum.fid)?"active":"")
-              button.category(onclick=`user.moveSub("${subscribe.forum.fid}")`) 分类
+              //- button.category(onclick=`user.moveSub("${subscribe.forum.fid}")`) 分类
               button.subscribe(onclick=`user.subscribe("${subscribe.forum.fid}", "forum")`)
             a(href=`/f/${subscribe.forum.fid}`)=subscribe.forum.displayName
           .account-follower-info

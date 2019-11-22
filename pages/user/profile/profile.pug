@@ -1,9 +1,9 @@
 extends ../../bootstrap_base
 block title
   if !data.name
-    title 个人中心
+    title 主页
   else
-    title=`个人中心 - ${data.name}`
+    title=`主页 - ${data.name}`
   +includeCSS("/css/user/profile.css")
 block content
   .container-fluid.max-width
@@ -34,7 +34,7 @@ block content
             .account-user-links
               a(href=`/u/${data.targetUser.uid}`).col-xs-6.account-user-link
                 .fa.fa-user-circle-o
-                | 个人名片
+                | 访客视角
               if state.userColumn
                 a(href=`/m/${state.userColumn._id}`).col-xs-6.account-user-link
                   .fa.fa-columns
@@ -79,11 +79,22 @@ block content
                 a
                   .account-info-value=data.targetUser.xsf
                   .account-info-name 学术分
-              .col-xs-12.col-md-12
+              .col-xs-12.col-md-6
+                a
+                  .account-info-value=format("YYYY-MM-DD", data.targetUser.toc)
+                  .account-info-name 注册时间
+              .col-xs-12.col-md-6
+                a
+                  .account-info-value=parseInt((Date.now() - new Date(data.targetUser.toc).getTime())/(1000*60*60*24))
+                  .account-info-name 注册天数
+
           .account-summary
-            include ../summary/calendar
+            .account-header 2019年发表统计
+            .account-description
+            .summary-calendar(data-uid=data.targetUser.uid)
           .account-summary
-            include ../summary/pie
+            .summary-pie(data-uid=data.targetUser.uid)
+
         else if data.type === "thread"
           include ./thread
         else if data.type === "post"
@@ -107,15 +118,14 @@ block content
         else if data.type === "subscribe/collection"
           include ./subscribe/collection
       .col-xs-12.col-md-2.box-shadow-panel
-        //div
+        div Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus at doloremque eligendi eum minus quam quia, quis repellendus vitae? Architecto fugiat minima officiis. Ad beatae enim quae sunt totam. Error!
 
   .hidden#subUsersId=objToStr({subThreadsId: data.subThreadsId, collectionThreadsId: data.collectionThreadsId, subUsersId: data.subUsersId, subForumsId: data.subForumsId, subColumnsId: data.subColumnsId, subscribes: data.subscribesObj})
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes
   if !data.type
-    include ../summary/summary
-    +includeJS("/user/summary/calendar.js")
-    +includeJS("/user/summary/pie.js")
+    include ../../user/summary/calendar
+    include ../../user/summary/pie
   +includeJS("/js/user/profile.js")
   include ../../publicModules/floatUserPanel/floatUserPanel
-  +includeJS("/js/account.js")
+  include ../../publicModules/moment

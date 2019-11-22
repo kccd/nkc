@@ -147,6 +147,14 @@ module.exports = {
     },
 		profile: {
 			GET: 'userProfile',
+			summary: {
+				pie: {
+					GET: "userProfile"
+				},
+				calendar: {
+					GET: "userProfile"
+				}
+			},
 			thread: {
 				GET: "userProfile"
 			},

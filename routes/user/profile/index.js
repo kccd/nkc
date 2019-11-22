@@ -11,6 +11,8 @@ const subscribeDiscipline = require("./subscribe/discipline");
 const subscribeColumn = require("./subscribe/column");
 const subscribeThread = require("./subscribe/thread");
 const subscribeCollection = require("./subscribe/collection");
+const summaryPie = require("./summary/pie");
+const summaryCalendar = require("./summary/calendar");
 router
   .use("/", async (ctx, next) => {
     const {db, data, params} = ctx;
@@ -197,6 +199,8 @@ router
     }
     await next();
   })
+  .get("/summary/pie", summaryPie)
+  .get("/summary/calendar", summaryCalendar)
   .get("/subscribe/user", subscribeUser)
   .get("/subscribe/topic", subscribeTopic)
   .get("/subscribe/discipline", subscribeDiscipline)

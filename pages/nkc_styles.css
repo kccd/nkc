@@ -2602,7 +2602,7 @@ img.emoji {
 }
 .nav-user:hover .nav-user-content>div{
   width: 22rem;
-  height: 29rem;
+  height: 34.5rem;
 }
 .nav-user-content{
   padding-top: 1.2rem;
@@ -2614,7 +2614,7 @@ img.emoji {
 .nav-user-content>div{
   height: 0;
   width: 0;
-  /*height: 29rem;
+  /*height: 34.5rem;
   width: 22rem;*/
   overflow: hidden;
   transition: width 200ms, height 200ms;
@@ -2734,6 +2734,9 @@ img.emoji {
 .nav-user-content .nav-user-link .fa{
   margin-right: 0.3rem;
   color: #555;
+}
+.nav-user-content .nav-user-link.col-xs-12{
+  background-color: #f4f4f4;
 }
 .nav-user-content .nav-user-link:hover, .nav-user-content .nav-user-link:focus{
   color: #282c37;

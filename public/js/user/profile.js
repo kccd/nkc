@@ -176,41 +176,83 @@ function () {
       }
 
       var sub = !subId.includes(id);
-
-      if (sub) {
-        SubscribeTypes.open(function (cid) {
-          func(id, sub, cid).then(function () {
-            SubscribeTypes.close();
-
-            if (type === "collection") {
-              sweetSuccess("收藏成功");
-            } else {
-              sweetSuccess("关注成功");
-            }
-
-            buttonsDom.addClass("active");
-            var index = subId.indexOf(id);
-            if (index === -1) subId.push(id);
-          })["catch"](function (data) {
-            sweetError(data);
+      new Promise(function (resolve, reject) {
+        if (!["user", "collection", "thread"].includes(type) || !sub) {
+          resolve();
+        } else {
+          SubscribeTypes.open(function (cid) {
+            resolve(cid);
           });
-        });
-      } else {
-        func(id, sub).then(function () {
-          buttonsDom.removeClass("active");
+        }
+      }).then(function (cid) {
+        if (cid) {
+          return func(id, sub, cid);
+        } else {
+          return func(id, sub);
+        }
+      }).then(function () {
+        SubscribeTypes.close();
 
+        if (sub) {
+          if (type === "collection") {
+            sweetSuccess("收藏成功");
+          } else {
+            sweetSuccess("关注成功");
+          }
+
+          buttonsDom.addClass("active");
+          var index = subId.indexOf(id);
+          if (index === -1) subId.push(id);
+        } else {
           if (type === "collection") {
             sweetSuccess("收藏已取消");
           } else {
             sweetSuccess("关注已取消");
           }
 
-          var index = subId.indexOf(id);
-          if (index !== -1) subId.splice(index, 1);
-        })["catch"](function (data) {
-          sweetError(data);
+          buttonsDom.removeClass("active");
+
+          var _index = subId.indexOf(id);
+
+          if (_index !== -1) subId.splice(_index, 1);
+        }
+      })["catch"](sweetError);
+      /*if(sub) {
+        SubscribeTypes.open(function(cid) {
+          func(id, sub, cid)
+            .then(function() {
+              SubscribeTypes.close();
+              if(type === "collection") {
+                sweetSuccess("收藏成功");
+              } else {
+                sweetSuccess("关注成功");
+              }
+              buttonsDom.addClass("active");
+              const index = subId.indexOf(id);
+              if(index === -1) subId.push(id);
+            })
+            .catch(function(data) {
+              sweetError(data);
+            })
         });
-      }
+        
+      } else {
+        
+        func(id, sub)
+          .then(function() {
+            buttonsDom.removeClass("active");
+            if(type === "collection") {
+              sweetSuccess("收藏已取消");
+            } else {
+              sweetSuccess("关注已取消");
+            }
+            const index = subId.indexOf(id);
+            if(index !== -1) subId.splice(index, 1);
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      }*/
     }
   }, {
     key: "editType",
@@ -223,3 +265,7 @@ function () {
 
   return _class2;
 }())();
+/*
+var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
+var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
+*/

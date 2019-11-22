@@ -203,7 +203,18 @@ NKC.modules.SubscribeTypes = function() {
   };
   // 执行成功后刷新页面
   this_.subscribeForum = function(id, sub) {
-    if(sub) {
+    this_.subscribeForumPromise(id, sub)
+      .then(function() {
+        this_.close();
+        if(!!sub) {
+          sweetSuccess("关注成功");
+        } else {
+          sweetSuccess("关注已取消");
+        }
+      })
+      .catch(sweetError);
+    // 关注的专业暂不使用关注自定义分类功能 2019/11/22
+    /*if(sub) {
       this_.open(function(cid) {
         this_.subscribeForumPromise(id, sub, cid)
           .then(function() {
@@ -222,7 +233,7 @@ NKC.modules.SubscribeTypes = function() {
         .catch(function(data) {
           sweetError(data);
         })
-    }
+    }*/
   };
   /*
   * 关注专栏
@@ -239,7 +250,18 @@ NKC.modules.SubscribeTypes = function() {
   };
   // 执行成功后刷新页面
   this_.subscribeColumn = function(id, sub) {
-    if(sub) {
+    this_.subscribeColumnPromise(id, sub)
+      .then(function() {
+        this_.close();
+        if(sub) {
+          sweetSuccess("关注成功");
+        } else {
+          sweetSuccess("关注已取消");
+        }
+      })
+      .catch(sweetError);
+    // 关注专栏不再分类 2019/11/22
+    /*if(sub) {
       this_.open(function(cid) {
         this_.subscribeColumnPromise(id, sub, cid)
           .then(function() {
@@ -258,7 +280,7 @@ NKC.modules.SubscribeTypes = function() {
         .catch(function(data) {
           sweetError(data);
         })
-    }
+    }*/
   };
   /*
   * 关注用户

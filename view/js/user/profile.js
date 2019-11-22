@@ -143,7 +143,48 @@ const user = new (class {
     
     const sub = !subId.includes(id);
     
-    if(sub) {
+    new Promise((resolve, reject) => {
+      if(!["user", "collection", "thread"].includes(type) || !sub) {
+        resolve();
+      } else {
+        SubscribeTypes.open((cid) => {
+          resolve(cid);
+        });
+      }
+    })
+      .then(cid => {
+        if(cid) {
+          return func(id, sub, cid);
+        } else {
+          return func(id, sub);
+        }
+      })
+      .then(() => {
+        SubscribeTypes.close();
+        if(sub) {
+          if(type === "collection") {
+            sweetSuccess("收藏成功");
+          } else {
+            sweetSuccess("关注成功");
+          }
+          buttonsDom.addClass("active");
+          const index = subId.indexOf(id);
+          if(index === -1) subId.push(id);
+        } else {
+          if(type === "collection") {
+            sweetSuccess("收藏已取消");
+          } else {
+            sweetSuccess("关注已取消");
+          }
+          buttonsDom.removeClass("active");
+          const index = subId.indexOf(id);
+          if(index !== -1) subId.splice(index, 1);
+        }
+      })
+      .catch(sweetError);
+    
+    
+    /*if(sub) {
       SubscribeTypes.open(function(cid) {
         func(id, sub, cid)
           .then(function() {
@@ -178,7 +219,7 @@ const user = new (class {
         .catch(function(data) {
           sweetError(data);
         })
-    }
+    }*/
   }
   editType() {
     SubscribeTypes.open(function() {
@@ -188,3 +229,8 @@ const user = new (class {
     })
   }
 })();
+
+/*
+var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
+var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
+*/

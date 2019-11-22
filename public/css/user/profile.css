@@ -184,12 +184,14 @@ body {
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
-.account-threads .null {
+.account-threads .null,
+.account-followers .null {
   padding-top: 10rem;
   padding-bottom: 10rem;
   text-align: center;
 }
-.account-threads .account-thread:last-child {
+.account-threads .account-thread:last-child,
+.account-followers .account-thread:last-child {
   margin-bottom: 0;
 }
 .account-thread {
@@ -381,6 +383,9 @@ body {
 }
 .account-followers {
   margin-top: 0.5rem;
+}
+.account-followers .account-follower:last-child {
+  margin-bottom: 0;
 }
 .account-forums .account-follower-info {
   color: #777;
