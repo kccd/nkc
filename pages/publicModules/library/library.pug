@@ -67,8 +67,8 @@
           .time {{f.fileCount}}个文件
         .list-info(v-else)
           .user.hidden-xs.hidden-sm
-            img(:src="getUrl('userAvatar', f.user.avatar)")
-            a(@click.stop="visitUrl('/u/' + f.uid, true)") {{f.user.username}}
+            img(:src="getUrl('userAvatar', f.resourceUser.avatar)")
+            a(@click.stop="visitUrl('/u/' + f.rUid, true)") {{f.resourceUser.username}}
           .time {{format('YYYY/MM/DD', f.tlm)}}
           .size {{(f.ext||"未知").toUpperCase()}} {{getSize(f.size)}}  
         //-.list-description {{f.description || "暂无简介"}}

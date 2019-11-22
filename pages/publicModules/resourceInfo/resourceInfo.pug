@@ -19,8 +19,8 @@
           .r-info-content
             .r-info-title {{resource.name || resource.oname}}
             .r-info-author
-              img(:src="getUrl('userAvatar', resource.user.avatar, 'sm')")
-              a.pointer(@click="visitUrl('/u/' + resource.uid, true)") {{resource.user.username}}
+              img(:src="getUrl('userAvatar', resource.resourceUser?resource.resourceUser.avatar: resource.user.avatar, 'sm')")
+              a.pointer(@click="visitUrl('/u/' + (resource.rUid || resource.uid), true)") {{resource.resourceUser?resource.resourceUser.username: resource.user.username}}
               span &nbsp;{{resource.type==='folder'?"创建": "上传"}}于 {{format('YYYY/MM/DD HH:mm:ss', resource.tlm || resource.toc)}}
             .r-info-size(v-if="resource.type !== 'folder'")
               | 格式：

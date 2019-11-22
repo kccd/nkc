@@ -51,7 +51,10 @@ block content
                 tr
                   th.min-w-name=format(`YYYY/MM/DD HH:mm:ss`, library.toc)
                   th.min-w-name
-                    a(href=`/u/${library.uid}` target="_blank" onmouseover=tools.floatUserInfo(library.uid))=library.user.username
+                    if library.type === "file"
+                      a(href=`/u/${library.uid}` target="_blank" onmouseover=tools.floatUserInfo(library.uid))=library.resourceUser.username
+                    else
+                      a(href=`/u/${library.uid}` target="_blank" onmouseover=tools.floatUserInfo(library.uid))=library.user.username
                   //- th={"folder": "文件夹", "file": "文件"}[library.type]
                   th.min-w-text.pointer(onclick=`showResource('${library._id}')`)
                     if library.type === "folder"

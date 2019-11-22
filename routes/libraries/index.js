@@ -26,8 +26,8 @@ router
       const nav = await library.getNav();
       library = library.toObject();
       library.user = await db.UserModel.findOne({uid: library.uid}, {uid: 1, avatar: 1, username: 1});
-      const forum = await db.ForumModel.findOne({lid: nav[0]._id}, {displayName: 1, fid: 1, lid: 1});
-      library.forum = forum;
+      library.resourceUser = await db.UserModel.findOne({uid: library.rUid}, {uid: 1, avatar: 1, username: 1});
+      library.forum = await db.ForumModel.findOne({lid: nav[0]._id}, {displayName: 1, fid: 1, lid: 1});
       library.path = "/ " + nav.slice(0, -1).map(n => n.name).join(" / ");
       data.libraries.push(library);
     }
