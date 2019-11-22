@@ -46,11 +46,11 @@ messageRouter
         min: 0
       });
 
-      const roles = await db.RoleModel.find({_id: {$in: messageSettings.adminRolesId}});
-      const rolesId = roles.map(r => r._id);
+      const roles_ = await db.RoleModel.find({_id: {$in: messageSettings.adminRolesId}});
+      const rolesId = roles_.map(r => r._id);
 
-      const grades = await db.UsersGradeModel.find({_id: {$in: messageSettings.mandatoryLimitGradeProtect}});
-      const gradesId = grades.map(g => g._id);
+      const grades_ = await db.UsersGradeModel.find({_id: {$in: messageSettings.mandatoryLimitGradeProtect}});
+      const gradesId = grades_.map(g => g._id);
 
       await db.SettingModel.updateOne({
         _id: "message"
@@ -68,7 +68,7 @@ messageRouter
       });
 
       await Promise.all(roles.map(async role => {
-        await db.RoleModel.update({_id: role._id}, {
+        await db.RoleModel.updateOne({_id: role._id}, {
           $set: {
             messagePersonCountLimit: role.messagePersonCountLimit,
             messageCountLimit: role.messageCountLimit
@@ -76,7 +76,7 @@ messageRouter
         })
       }));
       await Promise.all(grades.map(async grade => {
-        await db.UsersGradeModel.update({_id: grade._id}, {
+        await db.UsersGradeModel.updateOne({_id: grade._id}, {
           $set: {
             messagePersonCountLimit: grade.messagePersonCountLimit,
             messageCountLimit: grade.messageCountLimit

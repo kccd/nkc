@@ -247,6 +247,7 @@ schema.statics.extendLibraries = async (libraries) => {
   const usersId = [], resourcesId = [];
   libraries.map(library => {
     usersId.push(library.uid);
+    usersId.push(library.rUid);
     if(library.rid) resourcesId.push(library.rid);
   });
   const users = await UserModel.find({uid: {$in: usersId}});
@@ -261,6 +262,7 @@ schema.statics.extendLibraries = async (libraries) => {
   libraries = libraries.map(l => {
     l = l.toObject();
     l.user = usersObj[l.uid];
+    l.resourceUser = usersObj[l.rUid];
     if(l.rid) l.resource = resourcesObj[l.rid];
     return l;
   });
