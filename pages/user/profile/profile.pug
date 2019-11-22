@@ -35,20 +35,9 @@ block content
               a(href=`/u/${data.targetUser.uid}`).col-xs-6.account-user-link
                 .fa.fa-user-circle-o
                 | 访客视角
-              if state.userColumn
-                a(href=`/m/${state.userColumn._id}`).col-xs-6.account-user-link
-                  .fa.fa-columns
-                  | 我的专栏
-              else
-                a(href=`/column/apply`).col-xs-6.account-user-link
-                  .fa.fa-columns
-                  | 开设专栏
               a(href="/message").col-xs-6.account-user-link
                 .fa.fa-comments
                 | 消息中心
-              a(href=`/u/${data.targetUser.uid}/settings`).col-xs-6.account-user-link
-                .fa.fa-cog
-                | 账号设置
           for navLink in data.navLinks
             .account-ul
               if navLink.name
@@ -89,8 +78,6 @@ block content
                   .account-info-name 注册天数
 
           .account-summary
-            .account-header 2019年发表统计
-            .account-description
             .summary-calendar(data-uid=data.targetUser.uid)
           .account-summary
             .summary-pie(data-uid=data.targetUser.uid)
@@ -126,6 +113,9 @@ block scripts
   if !data.type
     include ../../user/summary/calendar
     include ../../user/summary/pie
+    script.
+      var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
+      var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
   +includeJS("/js/user/profile.js")
   include ../../publicModules/floatUserPanel/floatUserPanel
   include ../../publicModules/moment

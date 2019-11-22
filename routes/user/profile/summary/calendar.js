@@ -3,7 +3,7 @@ module.exports = async (ctx, next) => {
   const {db, data, query} = ctx;
   const {targetUser} = data;
   const {year = new Date().getFullYear()} = query;
-  data.posts = await db.PostModel.find({
+  const posts = await db.PostModel.find({
     uid: targetUser.uid,
     toc: {
       $gte: new Date(`${year}-1-1 00:00:00`),
@@ -12,5 +12,6 @@ module.exports = async (ctx, next) => {
   }, {
     toc: 1
   });
+  data.posts = posts.map(p => p.toc);
   await next();
 };

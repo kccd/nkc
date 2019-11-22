@@ -265,7 +265,3 @@ function () {
 
   return _class2;
 }())();
-/*
-var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
-var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
-*/

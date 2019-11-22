@@ -117,17 +117,6 @@ router
         ]
       },
       {
-        name: "？？？",
-        links: [
-          {
-            type: "collection",
-            url: `/u/${targetUser.uid}/profile/collection`,
-            name: "回复过的文章",
-            count: data.collectionThreadsId.length
-          }
-        ]
-      },
-      {
         name: "其他",
         links: [
           {

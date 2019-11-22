@@ -2,20 +2,24 @@ NKC.modules.SummaryCalender = function(dom, year) {
   var self = this;
   self.dom = $(dom);
   self.uid = self.dom.attr("data-uid");
-  self.initSelect = false;
   self.createYearList = function(toc) {
-    if(self.initSelect) return;
     var registerYear = new Date(toc).getFullYear();
     var nowYear = new Date().getFullYear();
-    var select = $("<select onchange='console.log(this)'></select>");
-    for(var i = registerYear; i <= nowYear; i++) {
-      var option = $("<option value='"+i+"'>"+i+"</option>");
+    var select = $("<select onchange='SummaryCalendar.setYear(this.value)'></select>");
+    for(var i = nowYear; i >= registerYear; i--) {
+      var option;
+      if(i === self.year) {
+        option = $("<option value='"+i+"' selected='true'>"+i+"</option>");
+      } else {
+        option = $("<option value='"+i+"'>"+i+"</option>");
+      }
+      
       select.append(option);
     }
     self.dom.append(select);
-    self.initSelect = true;
   };
   self.setYear = function(year) {
+    if(year) year = parseInt(year);
     self.year = year || new Date().getFullYear();
     self.begin = (new Date(self.year + "-1-1 00:00:00")).getTime();
     self.end = (new Date((self.year + 1) + "-1-1 00:00:00")).getTime();
@@ -25,17 +29,20 @@ NKC.modules.SummaryCalender = function(dom, year) {
     nkcAPI("/u/" + self.uid + "/profile/summary/calendar?year=" + self.year, "GET")
       .then(function(data) {
         self.initEcharts(data.posts);
-        self.createYearList(data.user.toc);
+        self.createYearList(data.targetUser.toc);
       })
       .catch(sweetError);
   };
   self.initEcharts = function(data) {
+    if(self.myChart && self.myChart.dispose) {
+      self.myChart.dispose();
+    }
     var times = {};
     for(var i = self.begin; i < self.end ; i = i + 24*60*60*1000) {
       times[NKC.methods.format("YYYY-MM-DD", i)] = 0;
     }
     for(var i = 0; i < data.length; i++) {
-      var t = data[i].toc;
+      var t = data[i];
       times[NKC.methods.format("YYYY-MM-DD", t)] ++;
     }
     data = [];
@@ -47,7 +54,28 @@ NKC.modules.SummaryCalender = function(dom, year) {
         i, times[i]
       ]);
     }
-    var maxMap = Math.ceil((max - 1)/5) * 5 + 1;
+    var start = 1, pieceMax = 10000;
+    var defaultPieces = [];
+    for(var i = start; i < pieceMax; i = i * 2) {
+      defaultPieces.push({
+        min: i,
+        max: i * 2 - 1
+      });
+    }
+    
+    var pieces = [];
+    for(var i = 0; i < defaultPieces.length; i++) {
+      var p = defaultPieces[i];
+      if(max >= p.min) {
+        pieces.push(p);
+      }
+    }
+    if(!pieces.length) {
+      pieces.push({
+        min: 1,
+        max: 1
+      })
+    }
     var option = {
       title: {
         left: 'left',
@@ -58,24 +86,10 @@ NKC.modules.SummaryCalender = function(dom, year) {
       visualMap: [
         {
           type: "piecewise",
-          pieces: [
-            {
-              min: 1,
-              max: 1
-            },
-            {
-              min: 2,
-              max: 3
-            },
-            {
-              min: 4,
-              max: 6
-            },
-            {
-              min: 7,
-              max: 10
-            },
-          ]
+          left: 'center',
+          orient: 'horizontal',
+          top: 65,
+          pieces: pieces
         }
       ],
       /*visualMap: {
@@ -115,7 +129,7 @@ NKC.modules.SummaryCalender = function(dom, year) {
         },
         splitLine: {
           lineStyle: {
-            color: "#bbb",
+            color: "#666",
             width: 2
           }
         },
@@ -132,8 +146,8 @@ NKC.modules.SummaryCalender = function(dom, year) {
         data: data
       }
     };
-    var myChart = echarts.init(self.dom[0]);
-    myChart.setOption(option);
+    self.myChart = echarts.init(self.dom[0]);
+    self.myChart.setOption(option);
   };
   self.setYear(year);
 };

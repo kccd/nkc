@@ -2736,7 +2736,7 @@ img.emoji {
   color: #555;
 }
 .nav-user-content .nav-user-link.col-xs-12{
-  background-color: #f4f4f4;
+  /*background-color: #f4f4f4;*/
 }
 .nav-user-content .nav-user-link:hover, .nav-user-content .nav-user-link:focus{
   color: #282c37;

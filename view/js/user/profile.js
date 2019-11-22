@@ -229,8 +229,3 @@ const user = new (class {
     })
   }
 })();
-
-/*
-var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
-var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
-*/

@@ -1,3 +1,14 @@
-.summary-pie, .summary-calendar{
-  height: 30rem;
+.summary-pie{
+  min-height: 30rem;
+  position: relative;
+}
+.summary-calendar{
+  min-height: 23rem;
+  position: relative;
+}
+.summary-calendar select{
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 1px solid #eee;
 }
