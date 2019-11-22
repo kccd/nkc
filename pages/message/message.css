@@ -4,7 +4,7 @@ body, html{
   background-color: #737373;
 }
 .ms{
-  width: 100rem;
+  width: 90rem;
   height: 70rem;
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.14) 0 1px 10px;
@@ -226,7 +226,7 @@ body, html{
 }
 
 .ms .ms-right{
-  width: 75rem;
+  width: 65rem;
   height: 70rem;
   right: 0;
   top: 0;
@@ -278,7 +278,7 @@ body, html{
 .ms-single-content-div{
   display: inline-block;
   vertical-align: top;
-  padding-right: 20rem;
+  padding-right: 10rem;
   padding-left: 0.5rem;
   padding-top: 0.6rem;
   max-width: 80%;
@@ -326,7 +326,7 @@ body, html{
   width: 2rem;
 }
 .ms-single-right .ms-single-content-div{
-  padding-left: 20rem;
+  padding-left: 10rem;
   padding-right: 0.5rem;
   text-align: left;
 }
