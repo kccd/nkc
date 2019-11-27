@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    const {data, db} = ctx;
+    const {nkcModules, data, db} = ctx;
     const {user} = data;
+    const today = nkcModules.apiFunction.today();
     let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
@@ -56,6 +57,22 @@ router
       post: true,
       thread: false
     });
+    // 专业导航
+    data.forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
+    // 浏览过的专业
+    const visitedForumLogs = await db.UsersBehaviorModel.find({timeStamp: {$gte: Date.now() - 7 * 24 * 60 * 60 * 1000},
+      operationId: "visitForumLatest"});
+    let visitedForumsId = visitedForumLogs.map(l => l.fid);
+    visitedForumsId = [...new Set(visitedForumsId)].slice(0, 10);
+    const visitedForums = await db.ForumModel.find({fid: {$in: visitedForumsId}});
+    const visitedForumsObj = {};
+    visitedForums.map(forum => visitedForumsObj[forum.fid] = forum);
+    data.visitedForums = [];
+    for(const fid of visitedForumsId) {
+      const forum = visitedForumsObj[fid];
+      if(forum) data.visitedForums.push(forum);
+    }
+    
     // 管理操作
     if(ctx.permission("complaintGet")) {
       data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});
