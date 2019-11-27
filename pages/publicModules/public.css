@@ -529,7 +529,6 @@ table{
 .canvas-logo{
   padding: 1rem;
   border-radius: 3px;
-  box-shadow: 0 0 3px 0 #aaa;
 }
 .canvas-logo img{
   width: 100%;

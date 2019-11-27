@@ -42,9 +42,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       ul.nav.navbar-nav.navbar-md
         if data.user
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
-            a(href='/?t=subscribe') 关注
+            a(href='/subscribe') 关注
           li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
-            a(href='/?t=latest') 最新
+            a(href='/latest') 最新
           li(class=[(navbar_highlight === 'message' ? 'active' : ''), 'message-nav'])
             .nav-message-num.message-switch(class=!messageSum ? 'disabled':'')= messageSum
             a(href=`/message` title='消息') 消息
@@ -97,11 +97,13 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     else
                       -showColumnLink = false;
                     a(href="/message").col-xs-6.nav-user-link
-                      .fa.fa-comments
+                      .fa.fa-envelope-o
                       | 消息中心
+                      .count(class=messageSum?"":"hidden")=messageSum?messageSum:""
                     a(href=`/u/${data.user.uid}/profile/draft`).col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
+                      .count(class=data.user.draftCount?"":"hidden")=data.user.draftCount
                     a(href=`/u/${data.user.uid}/settings`).col-xs-6.nav-user-link
                       .fa.fa-cog
                       | 资料设置
@@ -250,8 +252,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     if data.user
       ul.nkc-drawer-list
         li
-          a(href=`/u/${data.user.uid}`)
-            span.fa.fa-user-circle-o &nbsp;个人名片
+          a(href=`/u/${data.user.uid}/profile`)
+            span.fa.fa-user-circle-o &nbsp;个人主页
             span.pull-right.fa.fa-angle-right
         if state.userColumn
           li
@@ -265,21 +267,21 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
               span.pull-right.fa.fa-angle-right
         li
           a(href=`/message`)
-            span.fa.fa-envelope-o &nbsp;短消息
+            span.fa.fa-envelope-o &nbsp;消息中心
               span.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum ? "disabled": "" href='/message')
                 span.message-switch(class=!messageSum ? "disabled": "")=messageSum
             span.pull-right.fa.fa-angle-right
-        li
+        //- li
           a(href=`/account/subscribes`)
             span.fa.fa-bookmark-o &nbsp;关注管理
             span.pull-right.fa.fa-angle-right
         li
           a(href=`/u/${data.user.uid}/profile/draft`)
-            span.fa.fa-inbox &nbsp;草稿箱
+            span.fa.fa-inbox &nbsp;我的草稿
             span.pull-right.fa.fa-angle-right
         li
-          a(href=`/account/finance`)
-            span.fa.fa-file-text-o &nbsp;账单
+          a(href=`/u/${data.user.uid}/profile/finance`)
+            span.fa.fa-file-text-o &nbsp;我的账单
             span.pull-right.fa.fa-angle-right
       ul.nkc-drawer-list
         li

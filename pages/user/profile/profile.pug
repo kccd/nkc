@@ -81,6 +81,41 @@ block content
             .summary-calendar(data-uid=data.targetUser.uid)
           .account-summary
             .summary-pie(data-uid=data.targetUser.uid)
+          .account-logs
+            .account-header 最近阅读
+            .account-description
+            div
+              for vt in data.visitThreadLogs
+                .account-logs-thread
+                  span=fromNow(vt.timeStamp)
+                  a(href=`/t/${vt.tid}`)=vt.thread.firstPost.t
+          .account-logs
+            .account-header 看过的用户
+            .account-description
+            div
+              if !data.visitUserLogs.length
+                .null 空空如也~
+              for log in data.visitUserLogs
+                .account-logs-user
+                  .account-logs-user-avatar
+                    img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") onmouseover=tools.floatUserInfo(log.toUid))
+                  .account-logs-user-info
+                    a(href=`/u/${log.toUid}`).account-logs-user-name=log.targetUser.username
+                    .account-logs-user-time=fromNow(log.timeStamp)
+
+          .account-logs
+            .account-header 看过我的用户
+            .account-description
+            div
+              if !data.visitSelfLogs.length
+                .null 空空如也~
+              for log in data.visitSelfLogs
+                .account-logs-user
+                  .account-logs-user-avatar
+                    img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") onmouseover=tools.floatUserInfo(log.uid))
+                  .account-logs-user-info
+                    a(href=`/u/${log.uid}`).account-logs-user-name=log.user.username
+                    .account-logs-user-time=fromNow(log.timeStamp)
 
         else if data.type === "thread"
           include ./thread
@@ -105,7 +140,19 @@ block content
         else if data.type === "subscribe/collection"
           include ./subscribe/collection
       .col-xs-12.col-md-2.box-shadow-panel
-        div Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus at doloremque eligendi eum minus quam quia, quis repellendus vitae? Architecto fugiat minima officiis. Ad beatae enim quae sunt totam. Error!
+        .account-nav
+          .account-user-links
+            .account-user-links
+              a(href=`/shop/order`).col-xs-12.account-user-link
+                .fa.fa-file-text-o
+                | 我的订单
+              a(href=`/shop/manage`).col-xs-12.account-user-link
+                .fa.fa-archive
+                | 我出售的
+              a(href=`/shop/cart`).col-xs-12.account-user-link
+                .fa.fa-shopping-cart
+                | 购物车
+
 
   .hidden#subUsersId=objToStr({subThreadsId: data.subThreadsId, collectionThreadsId: data.collectionThreadsId, subUsersId: data.subUsersId, subForumsId: data.subForumsId, subColumnsId: data.subColumnsId, subscribes: data.subscribesObj})
 block scripts

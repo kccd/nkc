@@ -30,8 +30,8 @@
 .swiper-button{
   color: rgba(255,255,255,0);
   text-align: center;
-  height: 3rem;
-  width: 3rem;
+  height: 3rem!important;
+  width: 3rem!important;
   line-height: 3rem;
   border-radius: 50%;
   font-size: 2em;

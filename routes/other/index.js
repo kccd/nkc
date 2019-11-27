@@ -28,10 +28,6 @@ const logoRouter = require('./logo');
 const appDownloadRouter = require('./appDownload');
 const testRouter = require('./test');
 otherRouter
-  .get('/latest', async (ctx, next) => {
-
-    await next();
-  })
 	.get('index.php', async (ctx, next) => {
     const {nkcModules} = ctx;
 		const {fid} = ctx.query;

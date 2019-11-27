@@ -3,6 +3,11 @@ body{
   background-color: #f6f6f6;
 }
 
+.null{
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  text-align: center;
+}
 .account-nav {
   padding: 0!important;
   .account-user-banner{
@@ -181,11 +186,6 @@ body{
   margin-bottom: 1rem;
 }
 .account-threads, .account-followers{
-  .null{
-    padding-top: 10rem;
-    padding-bottom: 10rem;
-    text-align: center;
-  }
   .account-thread:last-child{
     margin-bottom: 0;
   }
@@ -563,6 +563,54 @@ body{
   }
 }
 
+.account-logs{
+  .account-logs-thread{
+    height: 2rem;
+    line-height: 2rem;
+    .hideText(@line: 1);
+    span{
+      color: @accent;
+      margin-right: 0.5rem;
+    }
+    a{
+      font-size: 1.25rem;
+      color: @primary;
+    }
+  }
+  .account-logs-user{
+    display: inline-block;
+    @userHeight: 3rem;
+    width: 10rem;
+    margin: 0 0.5rem 0.5rem 0;
+    .account-logs-user-avatar{
+      display: table-cell;
+      vertical-align: top;
+      img{
+        height: @userHeight;
+        width: @userHeight;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+      }
+    }
+    .account-logs-user-info{
+      width: 7rem;
+      display: table-cell;
+      vertical-align: top;
+      height: @userHeight;
+      .account-logs-user-name{
+        height: 1.5rem;
+        color: @primary;
+        font-weight: 700;
+        .hideText(@line: 1);
+      }
+      .account-logs-user-time{
+        font-size: 1rem;
+        margin-top: 0.2rem;
+        color: #aaa;
+      }
+    }
+  }
+}
 
 
 @media (max-width: 768px) {

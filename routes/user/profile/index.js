@@ -153,6 +153,66 @@ router
     await next();
   })
   .get("/", async (ctx, next) => {
+    const {data, db} = ctx;
+    const {targetUser} = data;
+    // 看过的文章
+    const logs = await db.UsersBehaviorModel.find({uid: targetUser.uid, operationId: "visitThread"}).sort({timeStamp: -1}).limit(25);
+    const threadsId = logs.map(l => l.tid);
+    let threads = await db.ThreadModel.find({tid: {$in: threadsId}});
+    threads = await db.ThreadModel.extendThreads(threads, {
+      forum: false,
+      category: false,
+      firstPost: true,
+      firstPostUser: false,
+      userInfo: false,
+      lastPost: false,
+      lastPostUser: false,
+      firstPostResource: false,
+      htmlToText: false,
+      count: 200,
+      showAnonymousUser: false,
+      excludeAnonymousPost: false,
+    });
+    const threadsObj = {};
+    threads.map(t => threadsObj[t.tid] = t);
+    const inserted = [];
+    data.visitThreadLogs = [];
+    for(let log of logs) {
+      const thread = threadsObj[log.tid];
+      if(thread && !inserted.includes(thread.tid)) {
+        inserted.push(thread.tid);
+        log = log.toObject();
+        log.thread = thread;
+        data.visitThreadLogs.push(log);
+      }
+    }
+    // 看过的用户
+    const visitUserlogs = await db.UsersBehaviorModel.find({uid: targetUser.uid, operationId: "visitUserCard", toUid: {$ne: targetUser.uid}}).sort({timeStamp: -1}).limit(25);
+    // 看过我的用户
+    const visitSelfLogs = await db.UsersBehaviorModel.find({uid: {$nin: ["", targetUser.uid]}, operationId: "visitUserCard", toUid: targetUser.uid}).sort({timeStamp: -1}).limit(25);
+    let usersId = visitUserlogs.map(u => u.toUid);
+    usersId = usersId.concat(visitSelfLogs.map(u => u.uid));
+    const users = await db.UserModel.find({uid: {$in: usersId}});
+    const usersObj = {};
+    users.map(u => usersObj[u.uid] = u);
+    data.visitUserLogs = [];
+    data.visitSelfLogs = [];
+    for(let log of visitUserlogs) {
+      const user = usersObj[log.toUid];
+      if(user) {
+        log = log.toObject();
+        log.targetUser = user;
+        data.visitUserLogs.push(log);
+      }
+    }
+    for(let log of visitSelfLogs) {
+      const user = usersObj[log.uid];
+      if(user) {
+        log = log.toObject();
+        log.user = user;
+        data.visitSelfLogs.push(log);
+      }
+    }
     await next();
   })
   .use("/subscribe", async (ctx, next) => {

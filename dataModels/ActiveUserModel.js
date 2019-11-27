@@ -75,7 +75,8 @@ activeUserSchema.statics.saveActiveUsersToCache = async () => {
   for(const u of activeUsers) {
     activeUsers_.push({
       uid: u.uid,
-      avatar: u.avatar
+      avatar: u.avatar,
+      username: u.username
     });
   }
   await redisClient.setAsync("activeUsers", JSON.stringify(activeUsers_));

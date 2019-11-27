@@ -2725,6 +2725,7 @@ img.emoji {
   padding: 0;
   border-radius: 4px;
   cursor: pointer;
+  position: relative;
   transition: background-color 100ms;
 }
 .nav-user-content .nav-user-link:hover{
@@ -2741,6 +2742,19 @@ img.emoji {
 .nav-user-content .nav-user-link:hover, .nav-user-content .nav-user-link:focus{
   color: #282c37;
   text-decoration: none;
+}
+.nav-user-content .nav-user-link .count{
+  position: absolute;
+  height: 1.4rem;
+  padding: 0 0.45rem;
+  line-height: 1.4rem;
+  text-align: center;
+  background-color: rgba(255, 0, 0, 0.5);
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  color: #fff;
+  top: 0.2rem;
+  right: 0.5rem;
 }
   /*首页*/
 
@@ -2780,6 +2794,7 @@ img.emoji {
   text-align: center;
   font-size: 18px;
   background: #fff;
+  background-size: cover;
   /* Center slide text vertically */
   display: -webkit-box;
   display: -ms-flexbox;
@@ -2794,13 +2809,20 @@ img.emoji {
   -webkit-align-items: center;
   align-items: center;
 }
+.swiper-home:hover .swiper-button{
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,0.8);
+}
 .swiper-button{
   color: rgba(255,255,255,0);
   text-align: center;
-  line-height: 44px;
-  font-size: 3em;
+  height: 4rem!important;
+  width: 2.5rem!important;
+  line-height: 4rem;
+  border-radius: 2px;
+  font-size: 2em;
   background-color: rgba(0,0,0,0);
-  /*transition: background-color 0.3s;*/
+  transition: background-color 0.2s, color 0.2s;
 }
 .swiper-pagination{
   color: #ffffff;

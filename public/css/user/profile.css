@@ -12,6 +12,11 @@
 body {
   background-color: #f6f6f6;
 }
+.null {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  text-align: center;
+}
 .account-nav {
   padding: 0!important;
 }
@@ -183,12 +188,6 @@ body {
   color: #aaa;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
-}
-.account-threads .null,
-.account-followers .null {
-  padding-top: 10rem;
-  padding-bottom: 10rem;
-  text-align: center;
 }
 .account-threads .account-thread:last-child,
 .account-followers .account-thread:last-child {
@@ -564,6 +563,59 @@ body {
 }
 .account-follower-buttons.active .category {
   display: inline-block;
+}
+.account-logs .account-logs-thread {
+  height: 2rem;
+  line-height: 2rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.account-logs .account-logs-thread span {
+  color: #e85a71;
+  margin-right: 0.5rem;
+}
+.account-logs .account-logs-thread a {
+  font-size: 1.25rem;
+  color: #2b90d9;
+}
+.account-logs .account-logs-user {
+  display: inline-block;
+  width: 10rem;
+  margin: 0 0.5rem 0.5rem 0;
+}
+.account-logs .account-logs-user .account-logs-user-avatar {
+  display: table-cell;
+  vertical-align: top;
+}
+.account-logs .account-logs-user .account-logs-user-avatar img {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+.account-logs .account-logs-user .account-logs-user-info {
+  width: 7rem;
+  display: table-cell;
+  vertical-align: top;
+  height: 3rem;
+}
+.account-logs .account-logs-user .account-logs-user-info .account-logs-user-name {
+  height: 1.5rem;
+  color: #2b90d9;
+  font-weight: 700;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.account-logs .account-logs-user .account-logs-user-info .account-logs-user-time {
+  font-size: 1rem;
+  margin-top: 0.2rem;
+  color: #aaa;
 }
 @media (max-width: 768px) {
   .account-thread-avatar > div {

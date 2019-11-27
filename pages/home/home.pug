@@ -1,8 +1,6 @@
 extends ../bootstrap_base
 block title
-  title=`${state.serverSettings.websiteName} - ${state.serverSettings.brief}`
-  meta(name='description' content=`${state.serverSettings.description || ""}`)
-  meta(name='keywords' content=`${(state.serverSettings.keywords || []).join(",")}`)
+  include ../publicModules/web_header
   +includeCSS("/swiper/dist/css/swiper.css")
   +includeCSS("/home/home.css")
 
@@ -104,7 +102,8 @@ block content
       .col-xs-12.col-md-3
         .hidden-xs.hidden-sm#rightDom
           .hidden-xs.hidden-sm
-            include ../publicModules/canvas_logo
+            div(style="box-shadow: 0 0 3px 0 #aaa;border-radius: 3px;")
+              include ../publicModules/canvas_logo
             include ../publicModules/improveUserInfo
             .swiper-container.swiper-home
               .swiper-wrapper

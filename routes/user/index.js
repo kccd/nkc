@@ -415,6 +415,14 @@ userRouter
         }
       }
     }
+    const behavior = {
+      operationId: data.operationId,
+      uid: data.user? data.user.uid: "",
+      toUid: data.targetUser.uid,
+      ip: ctx.address,
+      port: ctx.port
+    };
+    await db.UsersBehaviorModel(behavior).save();
     data.paging = paging;
     ctx.template = "/user/user.pug";
     await next();
