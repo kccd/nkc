@@ -1468,7 +1468,7 @@ threadSchema.methods.createNewPost = async function(post) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {cover = "", c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  const {cover = (post.type === "product"? this.tid: ""), c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
