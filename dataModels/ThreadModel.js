@@ -732,7 +732,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       voteUp: 1,
       reviewed: 1,
       voteDown: 1,
-      cover: 1
+      cover: 1,
+      abstractCn: 1
     });
     posts.map(post => {
       if(o.htmlToText) {
@@ -1468,7 +1469,7 @@ threadSchema.methods.createNewPost = async function(post) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {postType, cover = "", c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  const {postType, cover = (post.type === "product"? this.tid: ""), c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {

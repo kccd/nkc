@@ -313,7 +313,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
       if(post) {
         product.name = post.t;
         product.description = post.c;
-        product.abstract = post.abstract;
+        product.abstract = post.abstractCn || post.abstract;
         product.keywords = post.keywords;
       } else if(product.threadInfo) {
         product.name = product.threadInfo.title;

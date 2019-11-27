@@ -48,26 +48,14 @@ router
     // 一周活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 热销商品
-    const goods = await db.ShopGoodsModel.find({disabled: false}).limit(7);
-    const threadsId = goods.map(g => g.tid);
-    let goodsThreads = await db.ThreadModel.find({tid: {$in: threadsId}});
-    goodsThreads = await db.ThreadModel.extendThreads(goodsThreads, {
-      forum: false,
-      lastPost: false,
-      lastPostUser: false,
-      category: false
+    data.goodsForums = await db.ForumModel.find({kindName: "shop"});
+    const goods = await db.ShopGoodsModel.find({disabled: false}).limit(7).sort({toc: -1});
+    data.goods = await db.ShopGoodsModel.extendProductsInfo(goods, {
+      user: true,
+      dealInfo: false,
+      post: true,
+      thread: false
     });
-    const goodsThreadsObj = {};
-    goodsThreads.map(t => goodsThreadsObj[t.tid] = t);
-    data.goods = [];
-    for(let g of goods) {
-      const thread = goodsThreadsObj[g.tid];
-      if(thread) {
-        g = g.toObject();
-        g.thread = thread;
-        data.goods.push(g);
-      }
-    }
     // 管理操作
     if(ctx.permission("complaintGet")) {
       data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});

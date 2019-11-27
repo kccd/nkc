@@ -92,6 +92,9 @@ block content
       .col-xs-12.col-md-8.home-forums.box-shadow-panel
         .home-forums-list.m-b-1
           .home-header
+            .header-name 最近访问
+        .home-forums-list.m-b-1
+          .home-header
             //-.fa.fa-tags
             .header-name 话题
             .header-description 关注最新话题，足不出户便能游遍世界~
@@ -120,14 +123,34 @@ block content
         .home-forum-list.m-b-1
           .home-header
             .header-name 热销商品
+          if data.goodsForums.length
+            .home-goods-forums 交易区：
+              for f in data.goodsForums
+                a(href=`/f/${f.fid}`)
+                  if f.iconFileName
+                    img.home-goods-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                  else
+                    .home-goods-forum-icon(style=`background-color: ${f.color}`)
+                  span=f.displayName
           .home-goods
             for goods in data.goods
               .home-goods-content
                 .home-goods-avatar
-                  img(src=`/r/${goods.imgMaster}`)
+                  div(style=`background-image: url(/r/${goods.imgMaster})`)
                 .home-goods-info
-                  .home-goods-name=goods.thread.firstPost.t
-                  .home-goods-description=goods.thread.firstPost.abstractCN
+                  a(href=`/t/${goods.tid}` title=goods.name).home-goods-name=goods.name
+                  .home-goods-description=goods.abstract
+                  .home-goods-other
+                    a.home-goods-user(href=`/u/${goods.user.uid}`)
+                      img(src=tools.getUrl("userAvatar", goods.user.avatar) onmouseover=tools.floatUserInfo(goods.user.uid))
+                      span=goods.user.username
+                    .home-goods-price
+                    .home-goods-price=`￥ ${goods.productParams[0].originPrice/100}`
+
+
+        .home-forums-list.m-b-1
+          .home-header
+            .header-name 科创基金
 
         .home-forums-list.m-b-1
           .home-header
