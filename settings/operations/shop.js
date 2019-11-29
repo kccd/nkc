@@ -3,6 +3,10 @@ module.exports = {
   product: {
     PARAMETER: {
       GET: 'visitProductSingle',
+      top: {
+        POST: "pushProductToHome",
+        DELETE: "pushGoodsToHome"
+      },
       changePara: {
         PATCH: 'changeProductParams'
       },

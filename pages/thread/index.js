@@ -1184,3 +1184,12 @@ function displayAuthor(contractStr) {
 	author.dom.modal("show");
 	author.app.contract = contract;
 }
+
+function pushGoodsToHome(productId, type) {
+	var method = type === 'push'? "POST": "DELETE";
+	nkcAPI("/shop/product/" + productId + "/top", method)
+		.then(function() {
+			window.location.reload();
+		})
+		.catch(sweetError);
+}

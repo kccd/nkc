@@ -69,6 +69,7 @@ const newResource = require("./newResource");
 const library = require("./library");
 const latest = require("./latest");
 const libraries = require("./libraries");
+const nkc = require("./nkc");
 const operationObj = {};
 
 
@@ -151,7 +152,9 @@ operationObj.operationTree = {
 
 		exam,// 考试
 
-		e,// 管理
+		e,// 后台管理
+		
+		nkc, // 前台管理
 
 		f,//专业
 

@@ -558,6 +558,7 @@ threadRouter
           cartProductCount: await db.ShopCartModel.getProductCount(data.user)
         }
       }
+      
 		}
 		// 获取用户地址信息
 		let userAddress = "";
@@ -693,6 +694,11 @@ threadRouter
 		}
 
 		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
+		const ads = data.homeSettings.ads.fixed.concat(data.homeSettings.ads.movable);
+		data.homeTopped = ads.map(a => a.tid).includes(tid);
+		if(thread.type === "product" && ctx.permission("pushGoodsToHome")) {
+		  data.goodsHomeTopped = data.homeSettings.shopGoodsId.includes(data.product.productId);
+    }
 
 
 		// 相似文章

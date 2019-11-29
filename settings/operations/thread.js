@@ -24,6 +24,7 @@ module.exports = {
 			DELETE: 'unToppedThread'
 		},
 		hometop: {
+			GET: "homeTop",
 			POST: 'homeTop',
 			DELETE: 'unHomeTop'
 		},

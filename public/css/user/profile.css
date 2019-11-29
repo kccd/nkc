@@ -373,6 +373,9 @@ body {
   right: 0;
   top: 0;
 }
+.account-thread .account-thread-content .account-thread-info .thread-user {
+  margin-right: 0.3rem;
+}
 .account-thread .account-thread-content .account-thread-info .thread-user:hover,
 .account-thread .account-thread-content .account-thread-info .thread-user:focus {
   color: #555;

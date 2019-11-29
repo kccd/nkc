@@ -12,6 +12,9 @@ router
     );
     // 置顶文章轮播图
     data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
+    data.ads.fixed = data.ads.fixed.slice(0, 6);
+    // 推荐专业
+    data.recommendForums = await db.ForumModel.getRecommendForums(fidOfCanGetThreads);
     // 获取与用户有关的数据
     if(user) {
       const subForumsId = await db.SubscribeModel.getUserSubForumsId(user.uid);
@@ -45,18 +48,16 @@ router
       count: 200,
     });
     // 推荐专栏
-    data.columns = await db.ColumnModel.find({closed: false, disabled: false}).sort({subCount:-1}).limit(7);
+    data.columns = await db.ColumnModel.getToppedColumns();
     // 一周活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 热销商品
     data.goodsForums = await db.ForumModel.find({kindName: "shop"});
-    const goods = await db.ShopGoodsModel.find({disabled: false}).limit(7).sort({toc: -1});
-    data.goods = await db.ShopGoodsModel.extendProductsInfo(goods, {
-      user: true,
-      dealInfo: false,
-      post: true,
-      thread: false
-    });
+    data.goods = await db.ShopGoodsModel.getHomeGoods();
+    // 基金
+    // 推荐 精选文章
+    // data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
+    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
     // 专业导航
     data.forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
     // 浏览过的专业

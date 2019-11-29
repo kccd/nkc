@@ -2,8 +2,9 @@ const Router = require('koa-router');
 const router = new Router();
 router
 	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
-		data.type = 'top';
+		ctx.data.type = 'top';
+		/*const {data, db} = ctx;
+		
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		data.ads = [];
 		for(const tid of homeSettings.c.ads) {
@@ -17,7 +18,7 @@ router
 				}
 				data.ads.push(thread);
 			}
-		}
+		}*/
 		ctx.template = 'experimental/settings/home.pug';
 		await next();
 	})
@@ -29,7 +30,6 @@ router
 			await homeSettings.update({'c.ads': ads});
 		}
 		await db.SettingModel.saveSettingsToRedis("home");
-		await db.ThreadModel.cacheAds();
 		await next();
 	});
 module.exports = router;

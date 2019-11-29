@@ -175,11 +175,15 @@ body{
       .swiper-container{
         height: 100%;
         border-radius: 2px;
+        box-sizing: border-box;
+        border: 3px solid #eee;
       }
       .swiper-wrapper{
         height: 100%;
         a.swiper-slide{
           height: 100%;
+          border-radius: 2px;
+          overflow: hidden;
           position: relative;
         }
       }
@@ -190,12 +194,16 @@ body{
       display: block;
       overflow: hidden;
       border-radius: 2px;
+      border: 3px solid #eee;
+      box-sizing: border-box;
       &>div{
         height: 100%;
+        border-radius: 2px;
         background-size: cover;
       }
       .home-covers-sm-title{
         background-color: rgba(0,0,0,0.4);
+        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 40%);
         color: #fff;
         position: absolute;
         bottom: 0;
@@ -213,7 +221,8 @@ body{
 
 .home-subscribe-forum{
   display: inline-block;
-  width: 7rem;
+  width: 6.7rem;
+  margin-bottom: 1rem;
   text-align: center;
   vertical-align: top;
   color: @dark;
@@ -236,7 +245,7 @@ body{
     }
   }
   .home-subscribe-forum-info{
-    font-size: 1.1rem;
+    font-size: 1rem;
     height: 1.4rem;
     .hideText(@line: 1);
     margin-top: 0.5rem;
@@ -458,6 +467,11 @@ footer.footer{
           vertical-align: top;
           display: inline-block;
           height: 100%;
+          color: #777;
+          &:hover, &:focus{
+            text-decoration: none;
+            color: @accent;
+          }
           img{
             height: 1.6rem;
             width: 1.6rem;
@@ -467,7 +481,6 @@ footer.footer{
           }
           span{
             font-size: 1.1rem;
-            color: #777;
           }
         }
         .home-goods-price{
@@ -541,6 +554,79 @@ footer.footer{
     }
     span{
       font-size: 1.25rem;
+    }
+  }
+}
+.home-threads{
+  .home-thread:last-child{
+    margin-bottom: 0;
+  }
+  .home-thread{
+    margin-bottom: 1.5rem;
+    .home-thread-title{
+      font-size: 1.3rem;
+      color: #3a3a3a;
+      transition: color 100ms;
+      &:hover, &:focus{
+        text-decoration: none;
+        color: @accent;
+      }
+    }
+    .home-thread-cover{
+      display: table-cell;
+      vertical-align: top;
+      padding-top: 0.3rem;
+      img{
+        width: 8rem;
+        height: 5rem;
+        border-radius: 2px;
+        margin-right: 0.7rem;
+        box-sizing: border-box;
+        //border: 2px solid #eee;
+      }
+    }
+    .home-thread-content{
+      display: table-cell;
+      width: 100%;
+      padding-top: 0.4rem;
+      vertical-align: top;
+      .home-thread-abstract{
+        height: 3rem;
+        font-size: 1.1rem;
+        overflow: hidden;
+        color: #777;
+        .hideText(@line: 2);
+      }
+    }
+    .home-thread-info{
+      margin-top: 0.2rem;
+      position: relative;
+      .home-thread-user{
+        color: #aaa;
+        &:hover, &:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+        img{
+          height: 1.4rem;
+          width: 1.4rem;
+          border-radius: 50%;
+          margin-right: 0.3rem;
+          margin-top: -3px;
+        }
+        span{
+        }
+      }
+      .home-thread-forum{
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #777;
+        &:hover,&:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+      }
     }
   }
 }

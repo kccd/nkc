@@ -37,6 +37,7 @@ const reviewRouter = routers.review;
 const threadsRouter = routers.threads;
 const surveyRouter = routers.survey;
 const editorRouter = routers.editor;
+const nkcRouter = routers.nkc;
 const latestRouter = require("./latest");
 
 // 访问文库相关
@@ -61,6 +62,7 @@ router.use('/t', threadRouter.routes(), threadRouter.allowedMethods());
 router.use('/p', postRouter.routes(), postRouter.allowedMethods());
 router.use('/f', forumRouter.routes(), forumRouter.allowedMethods());
 router.use('/e', experimentalRouter.routes(), experimentalRouter.allowedMethods());
+router.use("/nkc", nkcRouter.routes(), nkcRouter.allowedMethods());
 router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());

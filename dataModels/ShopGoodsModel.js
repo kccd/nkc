@@ -421,5 +421,27 @@ shopGoodsSchema.methods.onshelf = async function() {
   }
 };
 
+/*
+* 获取首页热销商品
+* */
+shopGoodsSchema.statics.getHomeGoods = async () => {
+  const homeSettings = await mongoose.model("settings").getSettings("home");
+  let goods = await mongoose.model("shopGoods").find({productId: {$in: homeSettings.shopGoodsId}});
+  goods = await mongoose.model("shopGoods").extendProductsInfo(goods, {
+    user: true,
+    dealInfo: false,
+    post: true,
+    thread: false
+  });
+  const goodsObj = {};
+  goods.map(g => goodsObj[g.productId] = g);
+  const results = [];
+  for(const productId of homeSettings.shopGoodsId) {
+    const g = goodsObj[productId];
+    if(g) results.push(g);
+  }
+  return results;
+};
+
 const ShopGoodsModel = mongoose.model('shopGoods', shopGoodsSchema);
 module.exports = ShopGoodsModel;

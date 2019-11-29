@@ -642,6 +642,10 @@
   "experimentalThreadSettings": "后台管理-文章设置",
   "visitAllUserProfile": "可访问任何人的个人中心",
   "userProfile": "用户个人中心",
+  "nkcManagement": "前台管理",
+  "nkcManagementHome": "前台管理 - 首页管理",
+  "pushColumnToHome": "推送专栏到首页",
+  "pushGoodsToHome": "推送商品到首页",
 
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",

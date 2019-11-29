@@ -285,7 +285,6 @@ async function func() {
   }
 
   await ActiveUserModel.saveActiveUsersToCache();
-  await ThreadModel.cacheAds();
 
   console.log(`缓存更新完成`.green);
 }

@@ -246,4 +246,21 @@ schema.statics.toSearch = async (columnId) => {
   await es.save("column", data);
 };
 
+
+/*
+* 获取置顶专栏
+* */
+schema.statics.getToppedColumns = async () => {
+  const homeSettings = await mongoose.model("settings").getSettings("home");
+  const columns = await mongoose.model("columns").find({_id: {$in: homeSettings.columnsId}});
+  const columnsObj = {};
+  columns.map(column => columnsObj[column._id] = column);
+  const results = [];
+  homeSettings.columnsId.map(cid => {
+    const column = columnsObj[cid];
+    if(column) results.push(column);
+  });
+  return results;
+};
+
 module.exports = mongoose.model("columns", schema);

@@ -8,6 +8,7 @@ const statusRouter = require("./status");
 const contributeRouter = require("./contribute");
 const disabledRouter = require("./disabled");
 const contactRouter = require("./contact");
+const topRouter = require("./top");
 const pageRouter = require("./page");
 router
   .use("/", async (ctx, next) => {
@@ -76,6 +77,11 @@ router
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     data.timeline = await db.ColumnModel.getTimeline(column._id);
+    if(ctx.permission("pushColumnToHome")) {
+      const homeSettings = await db.SettingModel.getSettings("home");
+      data.topped = homeSettings.columnsId.includes(data.column._id);
+    }
+    
     await next();
   })
   .patch("/", async (ctx, next) => {
@@ -195,5 +201,6 @@ router
   .use("/disabled", disabledRouter.routes(), disabledRouter.allowedMethods())
   .use("/contact", contactRouter.routes(), contactRouter.allowedMethods())
   .use("/page", pageRouter.routes(), pageRouter.allowedMethods())
+  .use("/top", topRouter.routes(), topRouter.allowedMethods())
   .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods());
 module.exports = router;

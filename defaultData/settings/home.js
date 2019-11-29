@@ -1,7 +1,11 @@
 module.exports = {
   _id: 'home',
   c: {
-    ads: [],
+    ads: {
+      movable: [],
+      fixed: []
+    },
+    recommendForumsId: [],
     logos: [],
     logo: "",
     smallLogo: "",

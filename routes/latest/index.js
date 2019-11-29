@@ -60,7 +60,7 @@ router
     }
     data.homeSettings = homeSettings;
     // 置顶文章轮播图
-    data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
+    data.ads = (await db.ThreadModel.getAds(fidOfCanGetThreads)).movable;
   
     // 网站公告
   

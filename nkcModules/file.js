@@ -412,3 +412,22 @@ exports.createPostCoverByPostId = async (pid) => {
     await post.update({cover: pid});
   }
 };
+/*
+* 首页指定文章封面图
+* */
+exports.saveHomeAdCover = async (file, type) => {
+  const {hash, path} = file;
+  const filePath = upload.coverPath + "/" + hash + ".jpg";
+  let height = 253, width = 400;
+  if(type === "movable") {
+    height = 336;
+    width = 800;
+  }
+  await ei.resize({
+    src: path,
+    dst: filePath,
+    height,
+    width,
+    quality: 90
+  });
+};

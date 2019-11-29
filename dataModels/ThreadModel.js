@@ -993,36 +993,32 @@ threadSchema.statics.publishArticle = async (options) => {
 /*
 * 加载首页轮播图
 * @param {[String]} fid 能够从中读取文章的专业ID
+* @param
 * @author pengxiguaa 2019-4-26
 * */
 threadSchema.statics.getAds = async (fid) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
-  let threads = await ThreadModel.find({tid: {$in: homeSettings.ads}, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
-  threads = await ThreadModel.extendThreads(threads, {
-    forum: false,
-    lastPost: false,
-    category: false,
-    firstPost: true,
-    firstPostUser: true,
-    userInfo: false,
-    lastPostUser: false,
-    firstPostResource: false,
-    htmlToText: false,
-    count: 200
-  });
+  const homeAds = homeSettings.ads.fixed.concat(homeSettings.ads.movable);
+  const threadsId = homeAds.map(a => a.tid);
+  let threads = await ThreadModel.find({
+    tid: {$in: threadsId}, mainForumsId: {$in: fid}, disabled: false, reviewed: true, recycleMark: {$ne: true}
+  }, {tid: 1});
   const threadsObj = {};
   threads.map(thread => {
     threadsObj[thread.tid] = thread;
   });
-  const ads = [];
-  for(const tid of homeSettings.ads) {
-    const thread = threadsObj[tid];
-    if(thread) ads.push({
-      tid: thread.tid,
-      cover: thread.firstPost.cover,
-      title: thread.firstPost.t
-    });
+  const ads = {
+    movable: [],
+    fixed: []
+  };
+  for(const ad of homeSettings.ads.movable) {
+    const thread = threadsObj[ad.tid];
+    if(thread) ads.movable.push(ad);
+  }
+  for(const ad of homeSettings.ads.fixed) {
+    const thread = threadsObj[ad.tid];
+    if(thread) ads.fixed.push(ad);
   }
   return ads;
 };
@@ -1037,19 +1033,6 @@ threadSchema.statics.getAdsFromCache = async () => {
     ads = [];
   }
   return ads || [];
-};
-threadSchema.statics.cacheAds = async () => {
-  const role = await mongoose.model("roles").extendRole("visitor");
-  const fid = await mongoose.model("forums").getAccessibleForumsId([role], {});
-  const ads = await mongoose.model("threads").getAds(fid);
-  const ads_ = [];
-  for(const thread of ads) {
-    ads_.push({
-      tid: thread.tid,
-      title: thread.title
-    });
-  }
-  await redisClient.setAsync(`visitor:ads`, JSON.stringify(ads_));
 };
 /*
 * 加载网站公告
@@ -1144,7 +1127,8 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
   ]);
   return await ThreadModel.extendThreads(threads.concat(threads_), {
     lastPost: false,
-    category: false
+    category: false,
+    htmlToText: true
   })
 };
 /*
@@ -1315,7 +1299,7 @@ threadSchema.statics.getRecommendThreads = async (fid) => {
     userInfo: false,
     lastPostUser: false,
     firstPostResource: false,
-    htmlToText: false
+    htmlToText: true
   });
 };
 

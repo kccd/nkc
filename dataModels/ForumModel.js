@@ -1277,6 +1277,28 @@ forumSchema.methods.createLibrary = async function(uid) {
   });
   await this.update({lid: library._id});
   return library;
-}
+};
+
+
+/*
+* 获取首页推荐专业
+* @param {[String]} fid 可以访问的专业ID组成的数组
+* @return {[Object]} 专业对象组成的数组
+* @author pengxiguaa 2019-11-29
+* */
+forumSchema.statics.getRecommendForums = async (fid) => {
+  const homeSettings = await mongoose.model("settings").getSettings("home");
+  const {recommendForumsId} = homeSettings;
+  const forums = await mongoose.model("forums").find({fid: {$in: recommendForumsId}});
+  const forumsObj = {};
+  forums.map(forum => forumsObj[forum.fid] = forum);
+  const results = [];
+  for(const fid of recommendForumsId) {
+    const forum = forumsObj[fid];
+    if(forum) results.push(forum);
+  }
+  return results;
+  
+};
 
 module.exports = mongoose.model('forums', forumSchema);

@@ -173,12 +173,16 @@ body {
 .home-top .home-covers .home-covers-md .swiper-container {
   height: 100%;
   border-radius: 2px;
+  box-sizing: border-box;
+  border: 3px solid #eee;
 }
 .home-top .home-covers .home-covers-md .swiper-wrapper {
   height: 100%;
 }
 .home-top .home-covers .home-covers-md .swiper-wrapper a.swiper-slide {
   height: 100%;
+  border-radius: 2px;
+  overflow: hidden;
   position: relative;
 }
 .home-top .home-covers .home-covers-sm {
@@ -187,13 +191,17 @@ body {
   display: block;
   overflow: hidden;
   border-radius: 2px;
+  border: 3px solid #eee;
+  box-sizing: border-box;
 }
 .home-top .home-covers .home-covers-sm > div {
   height: 100%;
+  border-radius: 2px;
   background-size: cover;
 }
 .home-top .home-covers .home-covers-sm .home-covers-sm-title {
   background-color: rgba(0, 0, 0, 0.4);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 40%);
   color: #fff;
   position: absolute;
   bottom: 0;
@@ -211,7 +219,8 @@ body {
 }
 .home-subscribe-forum {
   display: inline-block;
-  width: 7rem;
+  width: 6.7rem;
+  margin-bottom: 1rem;
   text-align: center;
   vertical-align: top;
   color: #282c37;
@@ -236,7 +245,7 @@ body {
   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
 }
 .home-subscribe-forum .home-subscribe-forum-info {
-  font-size: 1.1rem;
+  font-size: 1rem;
   height: 1.4rem;
   word-break: break-word;
   display: -webkit-box;
@@ -477,6 +486,12 @@ footer.footer {
   vertical-align: top;
   display: inline-block;
   height: 100%;
+  color: #777;
+}
+.home-goods .home-goods-content .home-goods-info .home-goods-other .home-goods-user:hover,
+.home-goods .home-goods-content .home-goods-info .home-goods-other .home-goods-user:focus {
+  text-decoration: none;
+  color: #e85a71;
 }
 .home-goods .home-goods-content .home-goods-info .home-goods-other .home-goods-user img {
   height: 1.6rem;
@@ -487,7 +502,6 @@ footer.footer {
 }
 .home-goods .home-goods-content .home-goods-info .home-goods-other .home-goods-user span {
   font-size: 1.1rem;
-  color: #777;
 }
 .home-goods .home-goods-content .home-goods-info .home-goods-other .home-goods-price {
   position: absolute;
@@ -548,4 +562,78 @@ footer.footer {
 }
 .home-visited-forums .home-visited-forum span {
   font-size: 1.25rem;
+}
+.home-threads .home-thread:last-child {
+  margin-bottom: 0;
+}
+.home-threads .home-thread {
+  margin-bottom: 1.5rem;
+}
+.home-threads .home-thread .home-thread-title {
+  font-size: 1.3rem;
+  color: #3a3a3a;
+  transition: color 100ms;
+}
+.home-threads .home-thread .home-thread-title:hover,
+.home-threads .home-thread .home-thread-title:focus {
+  text-decoration: none;
+  color: #e85a71;
+}
+.home-threads .home-thread .home-thread-cover {
+  display: table-cell;
+  vertical-align: top;
+  padding-top: 0.3rem;
+}
+.home-threads .home-thread .home-thread-cover img {
+  width: 8rem;
+  height: 5rem;
+  border-radius: 2px;
+  margin-right: 0.7rem;
+  box-sizing: border-box;
+}
+.home-threads .home-thread .home-thread-content {
+  display: table-cell;
+  width: 100%;
+  padding-top: 0.4rem;
+  vertical-align: top;
+}
+.home-threads .home-thread .home-thread-content .home-thread-abstract {
+  height: 3rem;
+  font-size: 1.1rem;
+  color: #777;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.home-threads .home-thread .home-thread-info {
+  margin-top: 0.2rem;
+  position: relative;
+}
+.home-threads .home-thread .home-thread-info .home-thread-user {
+  color: #aaa;
+}
+.home-threads .home-thread .home-thread-info .home-thread-user:hover,
+.home-threads .home-thread .home-thread-info .home-thread-user:focus {
+  text-decoration: none;
+  color: #e85a71;
+}
+.home-threads .home-thread .home-thread-info .home-thread-user img {
+  height: 1.4rem;
+  width: 1.4rem;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+  margin-top: -3px;
+}
+.home-threads .home-thread .home-thread-info .home-thread-forum {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #777;
+}
+.home-threads .home-thread .home-thread-info .home-thread-forum:hover,
+.home-threads .home-thread .home-thread-info .home-thread-forum:focus {
+  text-decoration: none;
+  color: #e85a71;
 }

@@ -1,0 +1,18 @@
+extends ../bootstrap_base
+block title
+  +includeCSS("/css/nkc/nkc.css")
+  block nkcTitle
+block content
+  .container-fluid.max-width.management
+    .row
+      .box-shadow-panel.m-b-2
+        .nav
+          ul
+            li(class=!data.nav? "active" : "")
+              a(href=`/nkc`) 总览
+            li(class=data.nav==='home'?"active":"")
+              a(href=`/nkc/home`) 首页
+    block nkcContent
+block scripts
+  block nkcScripts
+

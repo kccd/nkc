@@ -18,20 +18,6 @@ func.cacheActiveUsers = async () => {
   }, 120000);
 };
 
-func.cacheAds = async () => {
-  setTimeout(async () => {
-    try{
-      await db.ThreadModel.cacheAds();
-    } catch(err) {
-      if(global.NKC.NODE_ENV !== "production") {
-        console.log(err);
-      }
-    } finally {
-      await func.cacheAds();
-    }
-  }, 120000);
-};
-
 func.clearTimeoutPageCache = async () => {
   setTimeout(async () => {
     try{
