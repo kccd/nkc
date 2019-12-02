@@ -259,6 +259,23 @@ block content
                       img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(thread.firstPost.uid))
                       span=thread.firstPost.user.username
                     a(href=`/f/${thread.forums[0].fid}`).home-thread-forum=thread.forums[0].displayName
+        .home-forums-other.m-b-1
+          .home-header
+            .header-name 最新文章
+          .home-threads
+            for thread in data.latestThreads
+              .home-thread
+                a(href=`/t/${thread.tid}`).home-thread-title=thread.firstPost.t
+                if thread.firstPost.cover
+                  .home-thread-cover
+                    img(src=tools.getUrl("postCover", thread.firstPost.cover))
+                .home-thread-content
+                  .home-thread-abstract=thread.firstPost.abstractCn || thread.firstPost.c
+                  .home-thread-info
+                    a(href=`/u/${thread.firstPost.uid}`).home-thread-user
+                      img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(thread.firstPost.uid))
+                      span=thread.firstPost.user.username
+                    a(href=`/f/${thread.forums[0].fid}`).home-thread-forum=thread.forums[0].displayName
         //-.home-forums-other.m-b-1
           .home-header
             .header-name 最近活跃用户

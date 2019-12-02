@@ -5,14 +5,14 @@ block title
 block content
   .container-fluid.max-width.management
     .row
-      .box-shadow-panel.m-b-2
+      .col-xs-12.col-md-12.box-shadow-panel.m-b-1
         .nav
           ul
             li(class=!data.nav? "active" : "")
               a(href=`/nkc`) 总览
             li(class=data.nav==='home'?"active":"")
               a(href=`/nkc/home`) 首页
-    block nkcContent
+      block nkcContent
 block scripts
   block nkcScripts
 

@@ -28,40 +28,40 @@ block content
                 ul.dropdown-menu
                   for type in data.subscribeTypes
                     li
-                      a(href=`/?t=subscribe&c=${type._id}${d?`&d=${d}`:""}`)=type.name
+                      a(href=`/latest?t=subscribe&c=${type._id}${d?`&d=${d}`:""}`)=type.name
                     if type.childTypes && type.childTypes.length
                       for tt in type.childTypes
                         li
-                          a(href=`/?t=subscribe&c=${tt._id}${d?`&d=${d}`:""}`)
+                          a(href=`/latest?t=subscribe&c=${tt._id}${d?`&d=${d}`:""}`)
                             .m-l-1=tt.name
               .m-b-1
                 .subscribe-lists
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
+                    a(href=`/latest?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
                       class=data.d === "user" ? "active" : ""
                     ) 用户
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
+                    a(href=`/latest?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
                         class=data.d==="column"? "active" : ""
                     ) 专栏
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=topic${data.c ?`&c=${data.c}`:""}`
+                    a(href=`/latest?t=subscribe&d=topic${data.c ?`&c=${data.c}`:""}`
                       class=data.d==="topic"?"active": ""
                     ) 话题
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=discipline${data.c ?`&c=${data.c}`:""} `
+                    a(href=`/latest?t=subscribe&d=discipline${data.c ?`&c=${data.c}`:""} `
                       class=data.d==="discipline"?"active": ""
                     ) 学科
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
+                    a(href=`/latest?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
                       class=data.d==="thread"?"active": ""
                     ) 文章
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=collection${data.c ?`&c=${data.c}`:""}`
+                    a(href=`/latest?t=subscribe&d=collection${data.c ?`&c=${data.c}`:""}`
                       class=data.d === "collection" ? "active" : ""
                     ) 收藏
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
+                    a(href=`/latest?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
                       class=data.d === 'all' ? "active" : ""
                     ) 全部
             if !data.threads.length
@@ -82,9 +82,9 @@ block content
                     a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
                 if data.t === "latest" || data.t === "column" || data.t === "recommend"
                   .paging-button
-                    a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 全部
-                    a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
-                    a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
+                    a.radius-left.button(href=`/latest?t=latest` class=data.t === "latest" ? "active" : "") 全部
+                    a.button(href=`/latest?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
+                    a.radius-right.button(href=`/latest?t=column` class=data.t === "column" ? "active" : "") 专栏
 
                 include ../publicModules/paging/paging
               for thread in data.threads

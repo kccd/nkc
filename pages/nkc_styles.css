@@ -2743,6 +2743,19 @@ img.emoji {
   color: #282c37;
   text-decoration: none;
 }
+.nav-user-avatar-count{
+  position: absolute;
+  height: 1.4rem;
+  padding: 0 0.45rem;
+  line-height: 1.4rem;
+  text-align: center;
+  background-color: rgba(255, 0, 0, 0.6);
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  color: #fff;
+  top: 1px;
+  right: -3px;
+}
 .nav-user-content .nav-user-link .count{
   position: absolute;
   height: 1.4rem;
@@ -2755,6 +2768,25 @@ img.emoji {
   color: #fff;
   top: 0.2rem;
   right: 0.5rem;
+}
+.new-thread{
+  box-sizing: border-box;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  background-color: #e85a71;
+  color: #fff!important;
+  height: 3rem!important;
+  border-radius: 1.5rem;
+  line-height: 3rem!important;
+  padding-top: 0!important;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: block;
+  margin-top: 0.3rem;
+  border: 1px solid #d97283;
+  transition: background-color 100ms;
+}
+.new-thread:hover, .new-thread:focus{
+  background-color: #cf5468!important;
 }
   /*首页*/
 

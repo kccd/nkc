@@ -1092,7 +1092,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 6
+        size: 5
       }
     }
   ]);
@@ -1138,7 +1138,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
 * */
 threadSchema.statics.getLatestThreads = async (fid) => {
   const ThreadModel = mongoose.model("threads");
-  const threads = await ThreadModel.find({mainForumsId: {$in: fid}, disabled: false, reviewed: true}).sort({toc: -1}).limit(10);
+  const threads = await ThreadModel.find({mainForumsId: {$in: fid}, disabled: false, reviewed: true}).sort({toc: -1}).limit(9);
   return await ThreadModel.extendThreads(threads, {
     lastPost: false,
     category: false,
@@ -1148,7 +1148,7 @@ threadSchema.statics.getLatestThreads = async (fid) => {
     userInfo: false,
     lastPostUser: false,
     firstPostResource: false,
-    htmlToText: false
+    htmlToText: true
   });
 };
 /*

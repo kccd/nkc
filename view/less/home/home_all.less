@@ -324,7 +324,7 @@ body{
 .home-columns{
   .home-column{
     display: inline-block;
-    width: 9rem;
+    width: 8.5rem;
     vertical-align: top;
     text-align: center;
     margin: 0 0.5rem 1rem 0;
@@ -377,7 +377,7 @@ body{
 }
 .home-users{
   .home-user{
-    width: 9rem;
+    width: 8.5rem;
     display: inline-block;
     text-align: center;
     margin: 0 0.5rem 1rem 0;
@@ -628,5 +628,28 @@ footer.footer{
         }
       }
     }
+  }
+}
+
+@media (max-width: 500px) {
+  .home-goods .home-goods-content .home-goods-avatar > div{
+    width: 10rem;
+    height: 7rem;
+  }
+  .home-top .home-covers .home-covers-md{
+    height: 12rem;
+  }
+  .home-forums .home-forums-list .home-forum-parent{
+    display: block;
+  }
+  .home-forums .home-forums-list .home-forum-child{
+    display: block;
+    padding: 1rem 0 1rem 1rem;
+  }
+  .home-forums .home-forum-panel .home-forum-panel-name{
+    width: inherit;
+  }
+  .home-forums .home-forum-panel{
+    width: inherit;
   }
 }

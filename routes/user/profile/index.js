@@ -163,7 +163,7 @@ router
       forum: false,
       category: false,
       firstPost: true,
-      firstPostUser: false,
+      firstPostUser: true,
       userInfo: false,
       lastPost: false,
       lastPostUser: false,

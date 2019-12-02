@@ -47,17 +47,18 @@ router
       htmlToText: true,
       count: 200,
     });
-    // 推荐专栏
+    // 热门专栏
     data.columns = await db.ColumnModel.getToppedColumns();
     // 一周活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 热销商品
     data.goodsForums = await db.ForumModel.find({kindName: "shop"});
     data.goods = await db.ShopGoodsModel.getHomeGoods();
-    // 基金
     // 推荐 精选文章
     // data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
+    // 最新文章
+    data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
     // 专业导航
     data.forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
     // 浏览过的专业

@@ -42,7 +42,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       ul.nav.navbar-nav.navbar-md
         if data.user
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
-            a(href='/subscribe') 关注
+            a(href='/latest?t=subscribe') 关注
           li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
             a(href='/latest') 最新
           li(class=[(navbar_highlight === 'message' ? 'active' : ''), 'message-nav'])
@@ -58,8 +58,11 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         if data.user
           - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`科创币 ${data.user.kcb/100}\n`+`${data.user.info.certsName}`;
           li.userInfo
-            a(href="/editor") 发表文章
+            a.new-thread(href="/editor")
+              .fa.fa-pencil-square-o &nbsp;
+              | 发表文章
           li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
+            .nav-user-avatar-count.message-switch(class=messageSum?"":"hidden")=messageSum?messageSum:""
             .nav-user-content
               div
                 .nav-user-banner
@@ -99,11 +102,11 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(href="/message").col-xs-6.nav-user-link
                       .fa.fa-envelope-o
                       | 消息中心
-                      .count(class=messageSum?"":"hidden")=messageSum?messageSum:""
+                      .count.message-switch(class=messageSum?"":"hidden")=messageSum?messageSum:""
                     a(href=`/u/${data.user.uid}/profile/draft`).col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
-                      .count(class=data.user.draftCount?"":"hidden")=data.user.draftCount
+                      //-.count(class=data.user.draftCount?"":"hidden")=data.user.draftCount
                     a(href=`/u/${data.user.uid}/settings`).col-xs-6.nav-user-link
                       .fa.fa-cog
                       | 资料设置

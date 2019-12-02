@@ -24,13 +24,13 @@ socket.on('disconnect', function() {
 
 var getNewMessageNumber = function() {
   var messageSwitch = $('.message-switch');
-  number = messageSwitch.html();
+  var number = messageSwitch.html();
   number = Number(number);
   return number;
 };
 var setNewMessageNumber = function(number) {
   var messageSwitch = $('.message-switch');
-  messageSwitch.removeClass("disabled");
+  messageSwitch.removeClass("disabled").removeClass("hidden");
   $(".message-switch-div").removeClass("disabled");
   messageSwitch.html(number);
 };

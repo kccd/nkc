@@ -1,6 +1,6 @@
 extends ../../bootstrap_base
 block title
-  if !data.name
+  if !data.type
     title 主页
   else
     title=`主页 - ${data.name}`
@@ -9,7 +9,9 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-3.box-shadow-panel
-        .account-nav
+        if data.type
+          .account-nav-xs.hidden-md.hidden-lg=data.name
+        .account-nav(class=data.type?"hidden-sm hidden-xs":"")
           .account-user-banner
             a(href=`/banner/${data.targetUser.banner}?t=lg` target="_blank")
               img(src=`/banner/${data.targetUser.banner}`)
@@ -87,7 +89,7 @@ block content
             div
               for vt in data.visitThreadLogs
                 .account-logs-thread
-                  span=fromNow(vt.timeStamp)
+                  span=fromNow(vt.timeStamp) + "看过"
                   a(href=`/t/${vt.tid}`)=vt.thread.firstPost.t
           .account-logs
             .account-header 看过的用户
@@ -139,7 +141,7 @@ block content
           include ./subscribe/thread
         else if data.type === "subscribe/collection"
           include ./subscribe/collection
-      .col-xs-12.col-md-2.box-shadow-panel
+      .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs
         .account-nav
           .account-user-links
             .account-user-links

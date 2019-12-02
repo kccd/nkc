@@ -1,4 +1,5 @@
 const router = require("koa-router")();
+const redisClient = require("../../settings/redisClient");
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query, state} = ctx;

@@ -1784,7 +1784,7 @@ span.thread-title-page{
   border-right: none;
 }
 .navbar-search{
-  width: 12rem;
+  width: 11rem;
   position: relative;
   padding-top: 6px;
 }
@@ -1812,7 +1812,7 @@ span.thread-title-page{
 }
 @media (max-width: 346px) {
   .navbar-search{
-    width: 9rem;
+    width: 8.8rem;
     /*padding-top:8px;*/
   }
   .navbar-search input{
