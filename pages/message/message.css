@@ -483,6 +483,7 @@ body, html{
 .ms-notice-content{
   padding: 1rem;
   font-size: 1.2rem;
+  word-break: break-all;
   background-color: #dfdfdf;
   border-radius: 7px;
 }

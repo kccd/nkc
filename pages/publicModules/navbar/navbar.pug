@@ -41,80 +41,95 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       ul.nav.navbar-nav.navbar-md
         if data.user
+          li(class=navbar_highlight === 'home' ? 'active' : '')
+            a(href='/?t=home') 主页
+          li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
+            a(href='/?t=latest') 最新
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
             a(href='/?t=subscribe') 关注
+        else
+          li(class=navbar_highlight === 'home' ? 'active' : '')
+            a(href='/?t=home') 主页
           li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
             a(href='/?t=latest') 最新
-          li(class=[(navbar_highlight === 'message' ? 'active' : ''), 'message-nav'])
-            .nav-message-num.message-switch(class=!messageSum ? 'disabled':'')= messageSum
-            a(href=`/message` title='消息') 消息
-        else
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
             a.pointer(onclick="Login.open('login')") 关注
-          li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
-            a(href='/?t=latest') 最新
 
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if data.user
-          - var user = data.user
-          - var title = `${user.username}\n`+`学术分 ${user.xsf}\n`+`科创币 ${user.kcb/100}\n`+`${user.info.certsName}`;
-          li.dropdown.userInfo
-            img(src=`/avatar/${user.avatar}`)
-            a.username(
-              href="#"
-              class="dropdown-toggle"
-              data-toggle="dropdown"
-              role="button"
-              aria-haspopup="true"
-              aria-expanded="false"
-            )
-              span(title=title)= user.username || `用户${user.uid}`
-              span.caret
-
-            //- 用户名下拉列表
-            ul.dropdown-menu
-              li
-                a(href=`/u/${user.uid}`)
-                  span.fa.fa-user-o &nbsp;个人名片
-              if state.userColumn
-                li
-                  a(href=`/m/${state.userColumn._id}`)
-                    span.fa.fa-columns &nbsp;专栏
-              else if data.user && state.columnPermission
-                li
-                  a(href=`/column/apply`)
-                    span.fa.fa-columns &nbsp;开设专栏
-              li
-                a(href=`/message`)
-                  span.fa.fa-envelope-o &nbsp;消息
-              li
-                a(href=`/account/subscribes`)
-                  span.fa.fa-bookmark-o &nbsp;关注管理
-              li
-                a(href=`/u/${data.user.uid}/drafts`)
-                  span.fa.fa-inbox &nbsp;草稿箱
-                  span.messageNumber.draftMessage= data.user.draftCount || ''
-              li
-                a(href=`/account/finance?t=all`)
-                  span.fa.fa-file-text-o &nbsp;账单
-              li.divider
-              li
-                a(href=`/u/${data.user.uid}/settings`)
-                  span.fa.fa-cog &nbsp;设置
-              li.divider
-              li
-                a(href=`/shop/order`)
-                  span.fa.fa-file-text-o &nbsp;我的订单
-              li
-                a(href=`/shop/manage`)
-                  span.fa.fa-archive &nbsp;我出售的
-              li
-                a(href=`/shop/cart`)
-                  span.fa.fa-shopping-cart &nbsp;购物车
-              li.divider
-              li
-                a(onclick="NKC.methods.logout()" title='不，不要走！')
-                  span.fa.fa-sign-out &nbsp;退出
+          - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`科创币 ${data.user.kcb/100}\n`+`${data.user.info.certsName}`;
+          li.userInfo
+            -let editorHref = "/editor";
+            if data.forum
+              -editorHref = `/editor?&type=forum&id=${data.forum.fid}`;
+            a.new-thread(href=editorHref)
+              .fa.fa-pencil-square-o &nbsp;
+              | 发表文章
+          li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
+            .nav-user-avatar-count.message-switch(class=messageSum?"":"hidden")=messageSum?messageSum:""
+            .nav-user-content
+              div
+                .nav-user-banner
+                  img(src=`/banner/${data.user.banner}`)
+                .nav-user-other
+                  .nav-user-info
+                    .nav-user-avatar
+                      img(src=`/avatar/${data.user.avatar}`)
+                    .nav-user-name=data.user.username
+                    .nav-user-level
+                      span.user-grade(style=`color: ${data.user.grade.color};`)
+                        span= data.user.grade.displayName
+                        img.grade-icon(src=tools.getUrl("gradeIcon", data.user.grade._id) title=data.user.grade.displayName)
+                    .nav-user-certs=data.user.info.certsName
+                    .nav-user-count
+                      .nav-user-count-span(title=`科创币：${data.user.kcb/100}`)
+                        img(src="/statics/kcb.png")
+                        span=data.user.kcb / 100
+                      .nav-user-count-span(title=`学术分：${data.user.xsf}`)
+                        img(src="/statics/xsf.png")
+                        span=data.user.xsf
+                  .nav-user-links
+                    a(href=`/u/${data.user.uid}/profile`).col-xs-6.nav-user-link
+                      .fa.fa-user-circle
+                      | 我的主页
+                    -let showColumnLink = true;
+                    if state.userColumn
+                      a(href=`/m/${state.userColumn._id}`).col-xs-6.nav-user-link
+                        .fa.fa-columns
+                        | 我的专栏
+                    else if data.user && state.columnPermission
+                      a(href=`/column/apply`).col-xs-6.nav-user-link
+                        .fa.fa-columns
+                        | 开设专栏
+                    else
+                      -showColumnLink = false;
+                    a(href="/message").col-xs-6.nav-user-link
+                      .fa.fa-envelope-o
+                      | 消息中心
+                      .count.message-switch(class=messageSum?"":"hidden")=messageSum?messageSum:""
+                    a(href=`/u/${data.user.uid}/profile/draft`).col-xs-6.nav-user-link
+                      .fa.fa-inbox
+                      | 我的草稿
+                      //-.count(class=data.user.draftCount?"":"hidden")=data.user.draftCount
+                    a(href=`/u/${data.user.uid}/settings`).col-xs-6.nav-user-link
+                      .fa.fa-cog
+                      | 资料设置
+                    a(href=`/u/${data.user.uid}/profile/finance`).col-xs-6.nav-user-link
+                      .fa.fa-file-text-o
+                      | 我的账单
+                    a(href=`/shop/order`).col-xs-6.nav-user-link
+                      .fa.fa-file-text-o
+                      | 我的订单
+                    a(href=`/shop/manage/${data.user.uid}/home`).col-xs-6.nav-user-link
+                      .fa.fa-archive
+                      | 我出售的
+                    a(href=`/shop/cart`).col-xs-6.nav-user-link
+                      .fa.fa-shopping-cart
+                      | 购物车
+                    a(onclick="NKC.methods.logout()" title='不，不要走！' class=showColumnLink?"col-xs-6":"col-xs-12").nav-user-link
+                      .fa.fa-sign-out
+                      | 退出登录
+            img.nav-user-avatar-sm(src=`/avatar/${data.user.avatar}`)
         else
           li.userInfo
             a(onclick="Login.open()" title='还记得密码吗？') 登录
@@ -124,10 +139,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         input.inline-block.form-control(type='text' name='c' placeholder='关键词 文号 用户')
         button.btn.btn-default(type='submit')
           .fa.fa-search
-      //-form.navbar-form.navbar-left(action='/search' method='GET')
-        .form-group
-          input.form-control(type='text' name='c' placeholder='关键词 文号 用户')
-        button.btn.btn-default(type='submit') 搜索
 
 //- 侧滑抽屉
 .nkc-drawer-left
@@ -137,21 +148,20 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       include ../post_button
 
     .navbar-link
-      if data.user
-        .col-xs-6
-          a(href='/?t=subscribe') 关注
-      else
-        .col-xs-6
-          a(onclick="Login.open()") 关注
-      //.col-xs-4
-        a(href='/?t=recommend') 推荐
-      .col-xs-6
+      .col-xs-4
+        a(href='/?t=home') 主页
+      .col-xs-4
         a(href='/?t=latest') 最新
+      .col-xs-4
+        if data.user
+          a(href='/?t=subscribe') 关注
+        else
+          a(onclick="Login.open()") 关注
     .m-a-1#navbar_custom_dom
 
     .m-a-1
       include ../management/management
-      include ../subscribeTypes/subscribeTypesPanel
+      //-include ../subscribeTypes/subscribeTypesPanel
       include ../apps/apps
       include ../forums_nav/forums_tree
 .nkc-drawer-right
@@ -189,8 +199,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     if data.user
       ul.nkc-drawer-list
         li
-          a(href=`/u/${data.user.uid}`)
-            span.fa.fa-user-circle-o &nbsp;个人名片
+          a(href=`/u/${data.user.uid}/profile`)
+            span.fa.fa-user-circle-o &nbsp;个人主页
             span.pull-right.fa.fa-angle-right
         if state.userColumn
           li
@@ -204,21 +214,21 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
               span.pull-right.fa.fa-angle-right
         li
           a(href=`/message`)
-            span.fa.fa-envelope-o &nbsp;短消息
+            span.fa.fa-envelope-o &nbsp;消息中心
               span.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum ? "disabled": "" href='/message')
                 span.message-switch(class=!messageSum ? "disabled": "")=messageSum
             span.pull-right.fa.fa-angle-right
-        li
+        //- li
           a(href=`/account/subscribes`)
             span.fa.fa-bookmark-o &nbsp;关注管理
             span.pull-right.fa.fa-angle-right
         li
-          a(href=`/u/${data.user.uid}/drafts`)
-            span.fa.fa-inbox &nbsp;草稿箱
+          a(href=`/u/${data.user.uid}/profile/draft`)
+            span.fa.fa-inbox &nbsp;我的草稿
             span.pull-right.fa.fa-angle-right
         li
-          a(href=`/account/finance`)
-            span.fa.fa-file-text-o &nbsp;账单
+          a(href=`/u/${data.user.uid}/profile/finance`)
+            span.fa.fa-file-text-o &nbsp;我的账单
             span.pull-right.fa.fa-angle-right
       ul.nkc-drawer-list
         li

@@ -116,7 +116,8 @@ NKC.modules.MoveThread = function() {
         this_.callback({
           forumsId: this.selectedForumsId,
           forums: forums,
-          moveType: this.moveType
+          moveType: this.moveType,
+          originForums: this.selectedForums
         });
       },
       showThreadType: function(forum) {

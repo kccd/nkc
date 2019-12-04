@@ -68,6 +68,7 @@ const threads = require("./threads");
 const newResource = require("./newResource");
 const library = require("./library");
 const libraries = require("./libraries");
+const nkc = require("./nkc");
 const operationObj = {};
 
 
@@ -95,13 +96,14 @@ operationObj.defaultOperations = [
   "getAllMessagesResources", // 查看所有的短消息资源
   "topAllPost", // 置顶任何人的回复
   "modifyAllResource", // 可修改任何人的附件
+	"visitAllUserProfile", // 可查看任何人的个人中心
 ];
 
 
 operationObj.operationTree = {
 	home: {
 		GET: 'visitHome',// 首页
-
+		
 		logo, // 网站logo
 
 		poster, //活动海报
@@ -147,7 +149,9 @@ operationObj.operationTree = {
 
 		exam,// 考试
 
-		e,// 管理
+		e,// 后台管理
+		
+		nkc, // 前台管理
 
 		f,//专业
 

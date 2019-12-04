@@ -732,7 +732,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       voteUp: 1,
       reviewed: 1,
       voteDown: 1,
-      cover: 1
+      cover: 1,
+      abstractCn: 1
     });
     posts.map(post => {
       if(o.htmlToText) {
@@ -990,38 +991,91 @@ threadSchema.statics.publishArticle = async (options) => {
   return await ThreadModel.findThreadById(thread.tid);
 };
 /*
+* 获取首页置顶文章
+* */
+threadSchema.statics.getHomeToppedThreads = async (fid) => {
+  const homeSettings = await mongoose.model("settings").getSettings("home");
+  const ThreadModel = mongoose.model("threads");
+  const {toppedThreadsId} = homeSettings;
+  let threads = await ThreadModel.find({
+    tid: {$in: toppedThreadsId},
+    disabled: false,
+    recycleMark: {$ne: true},
+    reviewed: true
+  });
+  threads = await ThreadModel.extendThreads(threads, {
+    forum: true,
+    category: false,
+    lastPost: true,
+    lastPostUser: true,
+    htmlToText: true
+  });
+  const threadsObj = {};
+  threads.map(thread => threadsObj[thread.tid] = thread);
+  const results = [];
+  toppedThreadsId.map(tid => {
+    const thread = threadsObj[tid];
+    if(thread) results.push(thread);
+  });
+  return results;
+};
+/*
 * 加载首页轮播图
 * @param {[String]} fid 能够从中读取文章的专业ID
+* @param
 * @author pengxiguaa 2019-4-26
 * */
 threadSchema.statics.getAds = async (fid) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
-  let threads = await ThreadModel.find({tid: {$in: homeSettings.ads}, mainForumsId: {$in: fid}, disabled: false, reviewed: true});
-  threads = await ThreadModel.extendThreads(threads, {
-    forum: false,
-    lastPost: false,
-    category: false,
-    firstPost: true,
-    firstPostUser: true,
-    userInfo: false,
-    lastPostUser: false,
-    firstPostResource: false,
-    htmlToText: false,
-    count: 200
-  });
+  const apiFunction = require("../nkcModules/apiFunction");
+  const {fixed, movable, fixedOrder, movableOrder} = homeSettings.ads;
+  const homeAds = fixed.concat(movable);
+  const threadsId = homeAds.map(a => a.tid);
+  let threads = await ThreadModel.find({
+    tid: {$in: threadsId}, mainForumsId: {$in: fid}, disabled: false, reviewed: true, recycleMark: {$ne: true}
+  }, {tid: 1});
   const threadsObj = {};
   threads.map(thread => {
     threadsObj[thread.tid] = thread;
   });
-  const ads = [];
-  for(const tid of homeSettings.ads) {
-    const thread = threadsObj[tid];
-    if(thread) ads.push({
-      tid: thread.tid,
-      cover: thread.firstPost.cover,
-      title: thread.firstPost.t
+  const ads = {
+    movable: [],
+    fixed: []
+  };
+  for(const ad of homeSettings.ads.movable) {
+    const thread = threadsObj[ad.tid];
+    if(thread) ads.movable.push(ad);
+  }
+  for(const ad of homeSettings.ads.fixed) {
+    const thread = threadsObj[ad.tid];
+    if(thread) ads.fixed.push(ad);
+  }
+  if(fixedOrder === "random") {
+    const fixedIndex = apiFunction.getRandomNumber({
+      count: ads.fixed.length < 6? ads.fixed.length: 6,
+      min: 0,
+      max: ads.fixed.length - 1>0?ads.fixed.length - 1:0,
+      repeat: false
     });
+    const fixedThread = [];
+    fixedIndex.map(i => {
+      fixedThread.push(ads.fixed[i])
+    });
+    ads.fixed = fixedThread;
+  }
+  if(movableOrder === "random") {
+    const movableIndex = apiFunction.getRandomNumber({
+      count: ads.movable.length,
+      min: 0,
+      max: ads.movable.length - 1,
+      repeat: false
+    });
+    const movableThread = [];
+    movableIndex.map(i => {
+      movableThread.push(ads.movable[i])
+    });
+    ads.movable = movableThread;
   }
   return ads;
 };
@@ -1036,19 +1090,6 @@ threadSchema.statics.getAdsFromCache = async () => {
     ads = [];
   }
   return ads || [];
-};
-threadSchema.statics.cacheAds = async () => {
-  const role = await mongoose.model("roles").extendRole("visitor");
-  const fid = await mongoose.model("forums").getAccessibleForumsId([role], {});
-  const ads = await mongoose.model("threads").getAds(fid);
-  const ads_ = [];
-  for(const thread of ads) {
-    ads_.push({
-      tid: thread.tid,
-      title: thread.title
-    });
-  }
-  await redisClient.setAsync(`visitor:ads`, JSON.stringify(ads_));
 };
 /*
 * 加载网站公告
@@ -1108,7 +1149,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 6
+        size: 5
       }
     }
   ]);
@@ -1143,7 +1184,8 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
   ]);
   return await ThreadModel.extendThreads(threads.concat(threads_), {
     lastPost: false,
-    category: false
+    category: false,
+    htmlToText: true
   })
 };
 /*
@@ -1153,7 +1195,19 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
 * */
 threadSchema.statics.getLatestThreads = async (fid) => {
   const ThreadModel = mongoose.model("threads");
-  const threads = await ThreadModel.find({mainForumsId: {$in: fid}, disabled: false, reviewed: true}).sort({toc: -1}).limit(10);
+  const PostModel = mongoose.model("posts");
+  const posts = await PostModel.find({
+    mainForumsId: {$in: fid},
+    disabled: false,
+    reviewed: true,
+    toDraft: {$ne: true},
+    type: "thread",
+    originState: {$nin: ["0", ""]}
+  }).sort({toc: -1}).limit(9);
+  const threads = await ThreadModel.find({
+    tid: {$in: posts.map(p => p.tid)},
+    mainForumsId: {$in: fid}, disabled: false, reviewed: true
+  }).sort({toc: -1});
   return await ThreadModel.extendThreads(threads, {
     lastPost: false,
     category: false,
@@ -1163,7 +1217,7 @@ threadSchema.statics.getLatestThreads = async (fid) => {
     userInfo: false,
     lastPostUser: false,
     firstPostResource: false,
-    htmlToText: false
+    htmlToText: true
   });
 };
 /*
@@ -1314,7 +1368,7 @@ threadSchema.statics.getRecommendThreads = async (fid) => {
     userInfo: false,
     lastPostUser: false,
     firstPostResource: false,
-    htmlToText: false
+    htmlToText: true
   });
 };
 
@@ -1468,7 +1522,7 @@ threadSchema.methods.createNewPost = async function(post) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {cover = (post.type === "product"? this.tid: ""), c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  const {postType, cover = (post.type === "product"? this.tid: ""), c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
@@ -1516,6 +1570,7 @@ threadSchema.methods.createNewPost = async function(post) {
     uid: post.uid,
     uidlm: post.uid,
     surveyId: post.surveyId || null,
+    type: postType,
     rpid
   }); 
   if(!this.oc) await this.update({oc: pid});

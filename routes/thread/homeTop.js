@@ -4,22 +4,30 @@ homeTopRouter
 	.post('/', async (ctx, next) => {
 		const {params, db} = ctx;
 		const {tid} = params;
-		const thread = await db.ThreadModel.findOnly({tid});
-		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
-		if(homeSettings.c.ads.includes(thread.tid)) ctx.throw(400, '文章已被置顶');
-		const post = await thread.extendFirstPost();
-		if(!post.cover) ctx.throw(400, '文章没有封面图，暂不能在首页置顶显示');
-		await homeSettings.update({$addToSet: {'c.ads': thread.tid}});
+		const homeSettings = await db.SettingModel.getSettings("home");
+		const {toppedThreadsId} = homeSettings;
+		if(toppedThreadsId.includes(tid)) ctx.throw(400, "文章已经被推送到首页了");
+		toppedThreadsId.unshift(tid);
+		await db.SettingModel.updateOne({_id: "home"}, {
+			$set: {
+				"c.toppedThreadsId": toppedThreadsId
+			}
+		});
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	})
 	.del('/', async (ctx, next) => {
 		const {params, db} = ctx;
 		const {tid} = params;
-		const thread = await db.ThreadModel.findOnly({tid});
-		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
-		if(!homeSettings.c.ads.includes(thread.tid)) ctx.throw(400, '文章未被置顶');
-		await homeSettings.update({$pull: {'c.ads': thread.tid}});
+		const homeSettings = await db.SettingModel.getSettings("home");
+		const {toppedThreadsId} = homeSettings;
+		if(!toppedThreadsId.includes(tid)) ctx.throw(400, "文章未被推送到首页");
+		await db.SettingModel.updateOne({_id: "home"}, {
+			$pull: {
+				"c.toppedThreadsId": tid
+			}
+		});
+		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	});
 module.exports = homeTopRouter;

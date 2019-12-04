@@ -3,6 +3,10 @@ module.exports = {
   PARAMETER: {
     GET: 'column_single_get',
     PATCH: "column_single_settings",
+    top: {
+      POST: "pushColumnToHome",
+      DELETE: "pushColumnToHome"
+    },
     category: {
       GET: "column_single_settings_post",
       POST: "column_single_settings_post",

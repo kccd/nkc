@@ -237,6 +237,7 @@ fn.obtainPureText = (content, reduce, count) => {
   // 过滤bbcode引用
   content = content.replace(/\[quote.*?][\s\S]*?\[\/quote]/ig, "");
   content = content.replace(/<[^>]+>/g,"");
+  content = content.replace(/#{r=[0-9]+?}/g,"[资源]");
   count = parseInt(count);
   if(reduce === true){
     if(content.length > count){

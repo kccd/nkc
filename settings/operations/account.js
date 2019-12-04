@@ -1,5 +1,4 @@
 module.exports = {
-  GET: 'visitAccount',
   finance: {
     GET: 'visitUserKcb',
     recharge: {
@@ -26,4 +25,4 @@ module.exports = {
       PATCH: "account_subscribe"
     }
   }
-};
+}

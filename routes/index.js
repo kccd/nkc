@@ -37,13 +37,14 @@ const reviewRouter = routers.review;
 const threadsRouter = routers.threads;
 const surveyRouter = routers.survey;
 const editorRouter = routers.editor;
+const nkcRouter = routers.nkc;
+
 // 访问文库相关
 const libraryRouter = routers.library;
 const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
 const newResourceRouter = routers.newResource;
 const librariesRouter = routers.libraries;
-
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
@@ -59,6 +60,7 @@ router.use('/t', threadRouter.routes(), threadRouter.allowedMethods());
 router.use('/p', postRouter.routes(), postRouter.allowedMethods());
 router.use('/f', forumRouter.routes(), forumRouter.allowedMethods());
 router.use('/e', experimentalRouter.routes(), experimentalRouter.allowedMethods());
+router.use("/nkc", nkcRouter.routes(), nkcRouter.allowedMethods());
 router.use('/r', resourceRouter.routes(), resourceRouter.allowedMethods());
 router.use('/fund', fundRouter.routes(), fundRouter.allowedMethods());
 router.use('/register', registerRouter.routes(), registerRouter.allowedMethods());

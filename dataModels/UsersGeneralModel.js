@@ -188,7 +188,7 @@ const usersGeneralSchema = new Schema({
   displaySettings: {
 	  homeThreadList: {// subscribe, latest
       type: String,
-      default: "latest"
+      default: "home"
     }
   },
   // 用户个人关注设置
@@ -198,6 +198,11 @@ const usersGeneralSchema = new Schema({
       type: Boolean,
       default: true
     }
+  },
+  // 访问专业的记录，用于主页展示最近访问过的专业
+  visitedForumsId: {
+	  type: [String],
+    default: []
   }
 }, {
 	collection: 'usersGeneral'

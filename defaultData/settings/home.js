@@ -1,7 +1,16 @@
 module.exports = {
   _id: 'home',
   c: {
-    ads: [],
+    ads: {
+      movable: [],
+      fixed: [],
+      fixedOrder: "random",
+      movableOrder: "random"
+    },
+    toppedThreadsId: [],
+    recommendForumsId: [],
+    shopGoodsId: [],
+    columnsId: [],
     logos: [],
     logo: "",
     smallLogo: "",

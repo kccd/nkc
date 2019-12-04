@@ -1,12 +1,13 @@
 extend ../bootstrap_base
 block title
-  title 首页
-  +includeCSS("/css/home_all.css")
+  include ../publicModules/web_header
+  +includeCSS("/css/home/home_all.css")
+  +includeCSS("/swiper/dist/css/swiper.css")
 block content  
   mixin forumList(f)
     .home-forums-body
       .home-forum-parent
-        .home-forum-panel
+        a(href=`/f/${f.fid}`).home-forum-panel
           if f.iconFileName
             img.home-forum-panel-icon(src=`/forum_avatar/${f.fid}`)
           else
@@ -16,7 +17,7 @@ block content
               span=f.displayName
       .home-forum-child
         for cf in f.childrenForums || []
-          .home-forum-panel
+          a(href=`/f/${cf.fid}`).home-forum-panel
             if cf.iconFileName
               img.home-forum-panel-icon(src=`/forum_avatar/${cf.fid}`)
             else
@@ -24,84 +25,314 @@ block content
             .home-forum-panel-name
               div
                 span=cf.displayName
-  mixin hotForumList(f)                
-    .home-hot-forum
-      .home-hot-forum-cover
-        if f.iconFileName
-          img.home-hot-forum-icon(src=`/forum_avatar/${f.fid}`)
-        else
-          .home-hot-forum-icon(style=`background-color: ${f.color}`)
-      .home-hot-forum-content
-        .home-hot-forum-name=f.displayName
-        .home-hot-forum-info
-          |文章：
-          span=234
-          |，回复：
-          span=5492
-          |，关注：
-          span=482
-        .home-hot-forum-description=f.description
+
+  .home-top
+    .container-fluid.max-width
+      //- 只有封面图的文章入口 轮播
+      .col-xs-12.col-md-12.home-covers
+        .row.m-t-05.m-b-05
+          .col-xs-12.col-md-6.home-covers-md
+            .swiper-container.swiper-home
+              .swiper-wrapper
+                for thread in data.ads.movable
+                  a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                    'background-image': `url(${tools.getUrl('postCover', thread.cover)})`
+                  })
+                    .swiper-title= `${thread.title}`
+              .swiper-pagination
+              .swiper-button-next.swiper-button(style='background-image: none;')
+                .fa.fa-angle-right
+              .swiper-button-prev.swiper-button(style='background-image: none;')
+                .fa.fa-angle-left
+          .col-xs-12.col-md-6.hidden-xs.hidden-sm
+            .row.home-covers-sm
+              for thread in data.ads.fixed
+                .home-cover-sm
+                  a(href=`/t/${thread.tid}` target="_blank" title=thread.title)
+                    .home-covers-sm-img(style=`background-image:url(${tools.getUrl('postCover', thread.cover)})`)
+                    .home-covers-sm-title=thread.title
+        .hidden-md.hidden-lg.hidden-sm.home-buttons
+          .col-xs-4
+            a(href=`/?t=latest`) 最新
+          .col-xs-4
+            if data.user
+              a(href=`/?t=subscribe`) 关注
+            else
+              a(onclick=`Login.open()`) 关注
+          .col-xs-4
+            if data.user
+              a(href=`/u/${data.user.uid}/profile`) 我的
+            else
+              a(onclick=`Login.open()`) 我的
+        .row
+          if data.user && data.visitedForums.length
+            .col-xs-12.col-md-8
+              .home-forums-list.m-b-1
+                .home-header
+                  .header-name 最近访问
+                .home-visited-forums
+                  for f in data.visitedForums
+                    a.home-visited-forum(href=`/f/${f.fid}`)
+                      if f.iconFileName
+                        img.home-visited-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                      else
+                        .home-visited-forum-icon(style=`background-color: ${f.color}`)
+                      span=f.displayName
+          if data.recommendForums.length
+            .col-xs-12(class=data.user && data.visitedForums.length?"col-md-4":"col-md-12")
+              .home-forums-list
+                .home-header
+                  //.fa.fa-tags
+                  .header-name 推荐专业
+                  //.header-description 热门专业推荐
+                .home-subscribes.recommend
+                  for forum, index in data.recommendForums
+                    if data.user && data.visitedForums.length && index > 4
+                      -break;
+                    a(href=`/f/${forum.fid}` title=forum.displayName + "：" + forum.description).home-subscribe-forum
+                      .home-subscribe-forum-avatar
+                        if forum.iconFileName
+                          img(src=tools.getUrl("forumAvatar", forum.fid))
+                        else
+                          div(style=`background-color: ${forum.color}`)
+                      .home-subscribe-forum-info=forum.displayName
 
   .container-fluid.max-width
     .row
       //- 专业地图
-      .col-xs-12.col-md-12.home-forums
-        .row
-          .col-xs-12.col-md-8.box-shadow-panel
-            .home-forums-list
-              .home-header 
-                .fa.fa-tags
-                .header-name 话题
-                .header-description 关注最新话题，足不出户便能游遍世界~
-              for f in state.forumsTree
-                if f.forumType === "topic"
-                  +forumList(f)
+      .col-xs-12.col-md-8.home-forums.box-shadow-panel
+        if data.user && data.subForums.length
+          .home-forums-list.m-b-1
+            .home-header
+              //.fa.fa-tags
+              .header-name 关注的专业
+              //.header-description 关注最新话题，足不出户便能游遍世界~
+            .home-subscribes
+              for forum in data.subForums
+                a(href=`/f/${forum.fid}`).home-subscribe-forum
+                  .home-subscribe-forum-avatar(title=forum.displayName + "：" + forum.description)
+                    if forum.iconFileName
+                      img(src=tools.getUrl("forumAvatar", forum.fid))
+                    else
+                      div(style=`background-color: ${forum.color}`)
+                  .home-subscribe-forum-info(title=forum.displayName)=forum.displayName
+        //-if data.user
+          .home-forums-list.m-b-1
+            .home-header
+              .header-name 最近访问
+            .home-visited-forums
+              for f in data.visitedForums
+                a.home-visited-forum(href=`/f/${f.fid}`)
+                  if f.iconFileName
+                    img.home-visited-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                  else
+                    .home-visited-forum-icon(style=`background-color: ${f.color}`)
+                  span=f.displayName
+        if data.toppedThreads.length
+          .home-forums-list.m-b-1
+            .home-header
+              //-.fa.fa-tags
+              .header-name 首页置顶
+            .home-threads.p-t-05
+              for thread in data.toppedThreads
+                include ../publicModules/thread_panel/thread_panel
+        .home-forums-list.m-b-1
+          .home-header
+            //-.fa.fa-tags
+            .header-name 话题
+          for f in data.forumsTree
+            if f.forumType === "topic"
+              +forumList(f)
+        .home-forums-list.m-b-1
+          .home-header
+            //- fa.fa-flask
+            .header-name 学科
+          for f in data.forumsTree
+            if f.forumType === "discipline"
+              +forumList(f)
+        if data.columns.length
+          .home-forums-list.m-b-1
+            .home-header
+              //- fa.fa-flask
+              .header-name 热门专栏
+              //.header-description 关注最新学科，足不出户便能游遍世界~
+            .home-columns
+              for column in data.columns
+                a(href=`/m/${column._id}`).home-column
+                  .home-column-avatar
+                    img(src=tools.getUrl("columnAvatar", column.avatar))
+                  .home-column-name=column.name
+            if !state.userColumn && data.user && state.columnPermission
+              .home-columns-link
+                a(href=`/column/apply`) 开设专栏
+                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
+        if data.goodsForums.length
+          .home-forum-list.m-b-1
+            .home-header
+              .header-name 热销商品
+            .home-goods
+              for goods in data.goods
+                .home-goods-content
+                  .home-goods-avatar
+                    div(style=`background-image: url(/r/${goods.imgMaster})`)
+                  .home-goods-info
+                    a(href=`/t/${goods.tid}` title=goods.name).home-goods-name=goods.name
+                    .home-goods-description=goods.abstract
+                    .home-goods-other
+                      a.home-goods-user(href=`/u/${goods.user.uid}`)
+                        img(src=tools.getUrl("userAvatar", goods.user.avatar) onmouseover=tools.floatUserInfo(goods.user.uid))
+                        span=goods.user.username
+                      .home-goods-price
+                      if !goods.productSettings.priceShowToVisit && !data.user
+                        .home-goods-price 登录可见
+                      else
+                        .home-goods-price=`￥ ${goods.productParams[0].originPrice/100}`
+            .home-goods-forums 更多请访问：
+              for f in data.goodsForums
+                a(href=`/f/${f.fid}`)
+                  if f.iconFileName
+                    img.home-goods-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                  else
+                    .home-goods-forum-icon(style=`background-color: ${f.color}`)
+                  span=f.displayName
+
+        .home-forums-list.m-b-1
+          .home-header
+            //- fa.fa-flask
+            .header-name 活跃用户
+            //.header-description 关注最新学科，足不出户便能游遍世界~
+          .home-users
+            for u in data.activeUsers
+              a(href=`/u/${u.uid}` onmouseover=tools.floatUserInfo(u.uid)).home-user
+                .home-user-avatar
+                  img(src=tools.getUrl("userAvatar", u.avatar))
+                .home-user-name=u.username
 
                 
-          .col-xs-12.col-md-4.box-shadow-panel
-            .home-forums-other 
-              .home-header 
-                .fa.fa-fire
-                .header-name 热门话题
-                .header-description 关注最新话题，足不出户便能游遍世界~
-              .home-hot-forums
-                +hotForumList(state.forumsTree[0])  
-      .col-xs-12.col-md-12.home-forums      
-        .row
-          .col-xs-12.col-md-8.box-shadow-panel
-            .home-forums-list
-              .home-header 
-                .fa.fa-flask
-                .header-name 学科
-                .header-description 关注最新学科，足不出户便能游遍世界~
-              for f in state.forumsTree
-                if f.forumType === "discipline"
-                  +forumList(f)
+      .col-xs-12.col-md-4.box-shadow-panel.p-l-0
+        .m-b-1
+          include ../publicModules/canvas_logo
+        include ../publicModules/improveUserInfo
+        .home-forums-other.m-b-1
+          .home-header
+            .header-name 公告通知
+          .home-notices
+            for thread in data.notices
+              .home-notice
+                a(href=`/t/${thread.tid}`)= thread.firstPost.t
+        if permissionsOr(["visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs", "nkcManagement"])
+          .home-forums-other.m-b-1
+            .home-header
+              .header-name 网站管理
+            .home-managements
+              if permission("nkcManagement")
+                a.home-management(href="/nkc")
+                  .fa.fa-cogs
+                  span &nbsp;前台管理
+              if permission("visitExperimentalStatus")
+                a.home-management(href="/e")
+                  .fa.fa-cogs
+                  span &nbsp;后台管理
+              if permission("review")
+                a.home-management(href="/review")
+                  .fa.fa-shield
+                  span &nbsp;审核内容
+                  if data.unReviewedCount
+                    .count=data.unReviewedCount
+              if permission("complaintGet")
+                a.home-management(href="/complaint")
+                  .fa.fa-minus-circle
+                  span &nbsp;投诉列表
+                  if data.unResolvedComplaintCount
+                    .count=data.unResolvedComplaintCount
+              if permission("visitProblemList")
+                a.home-management(href="/problem/list")
+                  .fa.fa-exclamation-circle
+                  span &nbsp;问题列表
+                  if data.unResolvedProblemCount
+                    .count=data.unResolvedProblemCount
+              if permission("getLibraryLogs")
+                a.home-management(href="/libraries/logs")
+                  .fa.fa-book
+                  span &nbsp;文库记录
+        .home-forums-other.m-b-1.m-t-1
+          .home-header
+            .header-name 应用
+          .home-apps
+            a.home-app(href=`/fund`)
+              .home-app-img
+                img(src=`/statics/apps/fund.png`)
+              .home-app-name 科创基金
+            a.home-app(href=`/exam`)
+              .home-app-img
+                img(src=`/statics/apps/exam.png`)
+              .home-app-name 考试系统
+            a.home-app(href=`/activity`)
+              .home-app-img
+                img(src=`/statics/apps/activity.png`)
+              .home-app-name 活动
+            a.home-app(href=`/tools`)
+              .home-app-img
+                img(src=`/statics/apps/tools.png`)
+              .home-app-name 计算工具
+        .home-forums-other.m-b-1
+          .home-header
+            .header-name 最新基金申请
+          .home-funds
+            for form in data.fundApplicationForms
+              .home-fund
+                a.home-fund-name(href=`/fund/a/${form._id}`)=form.project.t
+                .home-fund-info
+                  .home-fund-code=form.code
+                  a(href=`/fund/list/${form.fund._id}`).home-fund-link.fund-name=form.fund.name
+                  a(href=`/u/${form.uid}`).home-fund-user
+                    img(src=tools.getUrl("userAvatar", form.applicant.user.avatar) onmouseover=tools.floatUserInfo(form.uid))
+                    span=form.applicant.user.username
 
-                
-          .col-xs-12.col-md-4.box-shadow-panel
-            .home-forums-other  
-              .home-header 
-                .fa.fa-fire
-                .header-name 热门学科
-                .header-description 关注最新话题，足不出户便能游遍世界~
-        
-      //- 只有封面图的文章入口 轮播
-      .col-xs-12.col-md-12.home-covers
-        .row
-          .col-xs-12.col-md-6.home-covers-md
-            img(src="/r/304958")
-          .col-xs-12.col-md-6.home-covers-sm
-            .row
-              .col-xs-6.col-md-4
-                img(src="/r/304975")
-              .col-xs-6.col-md-4
-                img(src="/r/304975")
-              .col-xs-6.col-md-4
-                img(src="/r/304975")
-              .col-xs-6.col-md-4
-                img(src="/r/304975")
-              .col-xs-6.col-md-4
-                img(src="/r/304975")
-              .col-xs-6.col-md-4
-                img(src="/r/304975")          
+            a.home-fund-donation(href=`/fund/donation`) 赞助科创基金
+        .home-forums-other.m-b-1
+          .home-header
+            .header-name 推荐阅读
+          .home-threads
+            for thread in data.featuredThreads
+              .home-thread
+                a(href=`/t/${thread.tid}`).home-thread-title=thread.firstPost.t
+                if thread.firstPost.cover
+                  .home-thread-cover
+                    img(src=tools.getUrl("postCover", thread.firstPost.cover))
+                .home-thread-content
+                  .home-thread-abstract=thread.firstPost.abstractCn || thread.firstPost.c
+                  .home-thread-info
+                    a(href=`/u/${thread.firstPost.uid}`).home-thread-user
+                      img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(thread.firstPost.uid))
+                      span=thread.firstPost.user.username
+                    a(href=`/f/${thread.forums[0].fid}`).home-thread-forum=thread.forums[0].displayName
+        .home-forums-other.m-b-1
+          .home-header
+            .header-name 最新原创
+          .home-threads
+            for thread in data.latestThreads
+              .home-thread
+                a(href=`/t/${thread.tid}`).home-thread-title=thread.firstPost.t
+                if thread.firstPost.cover
+                  .home-thread-cover
+                    img(src=tools.getUrl("postCover", thread.firstPost.cover))
+                .home-thread-content
+                  .home-thread-abstract=thread.firstPost.abstractCn || thread.firstPost.c
+                  .home-thread-info
+                    a(href=`/u/${thread.firstPost.uid}`).home-thread-user
+                      img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(thread.firstPost.uid))
+                      span=thread.firstPost.user.username
+                    a(href=`/f/${thread.forums[0].fid}`).home-thread-forum=thread.forums[0].displayName
+        //-.home-forums-other.m-b-1
+          .home-header
+            .header-name 最近活跃用户
+          .home-active-users
+            for u in data.activeUsers
+              a(href=`/u/${u.uid}` target="_blank" onmouseover=`floatUserPanel.open(this, '${u.uid}')`).home-active-user
+                img(src=`/avatar/${u.avatar}`)
+
+block scripts
+  include ../publicModules/floatUserPanel/floatUserPanel
+  +includeJS("/swiper/dist/js/swiper.js")
+  +includeJS("/js/home/home_all.js")

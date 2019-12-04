@@ -119,7 +119,7 @@
   padding-right: 4.5rem;
   line-height: 2.5rem;
   padding-left: 2.5rem;
-  word-break: break-all;
+  word-break: break-word;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;

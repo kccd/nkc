@@ -11,6 +11,7 @@ const usersBehaviorSchema = new Schema({
   },
   uid: {
     type: String,
+    default: "",
     // required: true,
     index: 1,
   },
@@ -20,6 +21,7 @@ const usersBehaviorSchema = new Schema({
 	},
   toUid: {
     type: String,
+    default: "",
     // required: true,
     index: 1
   },

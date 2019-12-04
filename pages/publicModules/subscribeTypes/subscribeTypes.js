@@ -5,6 +5,7 @@ NKC.modules.SubscribeTypes = function() {
     el: "#moduleSubscribeTypesApp",
     data: {
       edit: false,
+      editType: false, // 无法选择分类，仅仅只能编辑分类
       fastAdd: false,
       uid: this_.dom.attr("data-uid"),
       loaded: false,
@@ -77,12 +78,45 @@ NKC.modules.SubscribeTypes = function() {
           this.edit = false;
           this.fastAdd = false;
         } else {
-          this_.callback();
+          this.edit = false;
+          this.type = "";
         }
         this.type = {
           name: "",
           pid: null
         }
+      },
+      modifyType: function(index) {
+        this.type = this.types[index];
+        this.edit = true;
+      },
+      moveType: function(index, d) {
+        var type = this.types[index];
+        var this_ = this;
+        nkcAPI("/account/subscribe_types/" + type._id, "PATCH", {
+          type: "order",
+          direction: d
+        })
+          .then(function() {
+            this_.getTypes();
+          })
+          .catch(function(data) {
+            sweetError(data);
+          })
+      },
+      removeType: function(index) {
+        var type = this.types[index];
+        var this_ = this;
+        sweetConfirm("确定要删除分类“"+type.name+"”吗？")
+          .then(function() {
+            nkcAPI("/account/subscribe_types/" + type._id, "DELETE")
+              .then(function() {
+                this_.getTypes();
+              })
+              .catch(function(data) {
+                sweetError(data);
+              })
+          })
       },
       save: function() {
         var name = this.type.name;
@@ -120,6 +154,7 @@ NKC.modules.SubscribeTypes = function() {
       options.selectTypesWhenSubscribe = !!NKC.configs.selectTypesWhenSubscribe;
     }
     if(!options.selectTypesWhenSubscribe) return callback([]);
+    this_.app.editType = options.editType || false;
     this_.app.hideInfo = options.hideInfo || false;
     this_.app.edit = !!options.edit;
     this_.app.selectedTypesId = [];
@@ -168,7 +203,18 @@ NKC.modules.SubscribeTypes = function() {
   };
   // 执行成功后刷新页面
   this_.subscribeForum = function(id, sub) {
-    if(sub) {
+    this_.subscribeForumPromise(id, sub)
+      .then(function() {
+        this_.close();
+        if(!!sub) {
+          sweetSuccess("关注成功");
+        } else {
+          sweetSuccess("关注已取消");
+        }
+      })
+      .catch(sweetError);
+    // 关注的专业暂不使用关注自定义分类功能 2019/11/22
+    /*if(sub) {
       this_.open(function(cid) {
         this_.subscribeForumPromise(id, sub, cid)
           .then(function() {
@@ -187,7 +233,7 @@ NKC.modules.SubscribeTypes = function() {
         .catch(function(data) {
           sweetError(data);
         })
-    }
+    }*/
   };
   /*
   * 关注专栏
@@ -204,7 +250,18 @@ NKC.modules.SubscribeTypes = function() {
   };
   // 执行成功后刷新页面
   this_.subscribeColumn = function(id, sub) {
-    if(sub) {
+    this_.subscribeColumnPromise(id, sub)
+      .then(function() {
+        this_.close();
+        if(sub) {
+          sweetSuccess("关注成功");
+        } else {
+          sweetSuccess("关注已取消");
+        }
+      })
+      .catch(sweetError);
+    // 关注专栏不再分类 2019/11/22
+    /*if(sub) {
       this_.open(function(cid) {
         this_.subscribeColumnPromise(id, sub, cid)
           .then(function() {
@@ -223,7 +280,7 @@ NKC.modules.SubscribeTypes = function() {
         .catch(function(data) {
           sweetError(data);
         })
-    }
+    }*/
   };
   /*
   * 关注用户

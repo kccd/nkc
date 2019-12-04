@@ -1,8 +1,6 @@
 extends ../bootstrap_base
 block title
-  title=`${state.serverSettings.websiteName} - ${state.serverSettings.brief}`
-  meta(name='description' content=`${state.serverSettings.description || ""}`)
-  meta(name='keywords' content=`${(state.serverSettings.keywords || []).join(",")}`)
+  include ../publicModules/web_header
   +includeCSS("/swiper/dist/css/swiper.css")
   +includeCSS("/home/home.css")
 
@@ -19,14 +17,14 @@ block content
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
         include ../publicModules/post_button
         include ../publicModules/management/management
-        include ../publicModules/subscribeTypes/subscribeTypesPanel
+        //-include ../publicModules/subscribeTypes/subscribeTypesPanel
         include ../publicModules/apps/apps
         include ../publicModules/forums_nav/forums_tree
       .col-xs-12.col-md-7
         .row
           .col-xs-12.col-md-12(style="overflow:hidden;")
             if data.t === "subscribe"
-              mixin subscribeTypes(d)
+              //-mixin subscribeTypes(d)
                 ul.dropdown-menu
                   for type in data.subscribeTypes
                     li
@@ -39,6 +37,10 @@ block content
               .m-b-1
                 .subscribe-lists
                   .subscribe-list
+                    a(href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
+                      class=!data.d || data.d === 'all' ? "active" : ""
+                    ) 全部
+                  .subscribe-list
                     a(href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
                       class=data.d === "user" ? "active" : ""
                     ) 用户
@@ -47,25 +49,18 @@ block content
                         class=data.d==="column"? "active" : ""
                     ) 专栏
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=topic${data.c ?`&c=${data.c}`:""}`
-                      class=data.d==="topic"?"active": ""
-                    ) 话题
-                  .subscribe-list
-                    a(href=`/?t=subscribe&d=discipline${data.c ?`&c=${data.c}`:""} `
-                      class=data.d==="discipline"?"active": ""
-                    ) 学科
-                  .subscribe-list
                     a(href=`/?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
                       class=data.d==="thread"?"active": ""
-                    ) 文章
+                    ) 关注的文章
+                  //-.subscribe-list
+                    a(href=`/?t=subscribe&d=own${data.c ? `&c=${data.c}` : ""}`
+                      class=data.d === "own" ? "active" : ""
+                    ) 我的文章
                   .subscribe-list
-                    a(href=`/?t=subscribe&d=collection${data.c ?`&c=${data.c}`:""}`
-                      class=data.d === "collection" ? "active" : ""
-                    ) 收藏
-                  .subscribe-list
-                    a(href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
-                      class=data.d === 'all' ? "active" : ""
-                    ) 全部
+                    a(href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
+                      class=data.d === "reply" ? "active" : ""
+                    ) 参与过的文章
+
             if !data.threads.length
               .p-t-5.p-b-5.text-center
                 h4
@@ -89,6 +84,12 @@ block content
                     a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
 
                 include ../publicModules/paging/paging
+              if data.t === "latest" && data.paging && data.paging.page === 0 && data.toppedThreads && data.toppedThreads.length
+                .m-b-1
+                  for thread in data.toppedThreads
+                    include ../publicModules/thread_panel/thread_panel
+                  div.topped-thread-header - 以上是置顶 -
+
               for thread in data.threads
                 include ../publicModules/thread_panel/thread_panel
               -showPagingSortButton = false;
@@ -104,7 +105,8 @@ block content
       .col-xs-12.col-md-3
         .hidden-xs.hidden-sm#rightDom
           .hidden-xs.hidden-sm
-            include ../publicModules/canvas_logo
+            div(style="box-shadow: 0 0 3px 0 #aaa;border-radius: 3px;")
+              include ../publicModules/canvas_logo
             include ../publicModules/improveUserInfo
             .swiper-container.swiper-home
               .swiper-wrapper

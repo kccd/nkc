@@ -1,0 +1,345 @@
+@import "../base";
+body{
+  background-color: #f6f6f6;
+}
+.management{
+  .nav{
+    padding: 0;
+    ul{
+      padding: 0;
+      margin: 0;
+      @liHeight: 3rem;
+      & li:first-child a{
+        border-radius: 2px 2px 0 0;
+      }
+      & li:last-child a{
+        border-radius: 0 0 2px 2px ;
+      }
+      li{
+        list-style: none;
+        display: inline-block;
+        a{
+          display: inline-block;
+          height: @liHeight;
+          padding: 0 1rem;
+          line-height: @liHeight;
+          font-size: 1.2rem;
+          position: relative;
+          color: @dark;
+          cursor: pointer;
+          transition: background-color 100ms, color 100ms;
+
+          &:hover, &:focus{
+            text-decoration: none;
+            background-color: #f6f6f6;
+          }
+        }
+
+        &.active{
+          a{
+            background-color: @primary;
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}
+.management-header{
+  font-size: 1.6rem;
+  font-weight: 700;
+  background-color: #f6f6f6;
+  margin-bottom: 0.5rem;
+  border-radius: 3px;
+  padding: 0 1rem;
+  height: 4rem;
+  line-height: 4rem;
+}
+.management-button{
+  height: 3rem;
+  padding: 0 2rem;
+  border: @primary;
+  background-color: @primary;
+  color: #fff;
+  border-radius: 3px;
+  transition: background-color 100ms;
+  &:hover{
+    background-color: #2477b3;
+  }
+}
+.management-home{
+  .home-top-threads{
+    .home-top-thread{
+      //margin-bottom: 2rem;
+      .home-top-thread-cover{
+        font-size: 0;
+        box-sizing: border-box;
+        border: 3px solid #eee;
+        width: 100%;
+        position: relative;
+        img{
+          width: 100%;
+        }
+        .home-top-thread-title{
+          position: absolute;
+          padding: 0 0.5rem;
+          border: none;
+          width: 100%;
+          color: #fff;
+          top: 0;
+          height: 3rem;
+          padding-right: 3rem;
+          line-height: 3rem;
+          .hideText(@line: 1);
+          font-size: 1.25rem;
+          background-color: rgba(0, 0, 0, 0.4);
+          left: 0;
+        }
+        .home-top-thread-index{
+          position: absolute;
+          display: inline-block;
+          padding: 0 0.5rem;
+          color: #fff;
+          text-align: center;
+          height: 3rem;
+          width: 3rem;
+          border: none;
+          font-weight: 700;
+          line-height: 3rem;
+          font-size: 1.25rem;
+          background-color: @accent;
+          left: 0;
+          top: 0;
+        }
+        .home-top-thread-button{
+          font-size: 1.6rem;
+          position: absolute;
+          right: 1rem;
+          bottom: 1rem;
+          height: 3rem;
+          text-align: center;
+          border-radius: 50%;
+          box-shadow: 1px  1px 5px rgba(0, 0, 0, 0.2);
+          line-height: 3rem;
+          width: 3rem;
+          background-color: @primary;
+          color: #fff;
+          cursor: pointer;
+          transition: background-color 100ms;
+          &:hover{
+            background-color: #0b5ba2;
+          }
+        }
+        .home-top-thread-buttons{
+          font-size: 1.3rem;
+          position: absolute;
+          left: 1rem;
+          bottom: 1rem;
+          background-color: @accent;
+          border-radius: 3px;
+          user-select: none;
+          &>div{
+            height: 2rem;
+            width: 2rem;
+            color: #fff;
+            display: inline-block;
+            text-align: center;
+            line-height: 2rem;
+          }
+          .fa{
+            cursor: pointer;
+            transition: background-color 100ms;
+            border-radius: 3px;
+            &:hover{
+              background-color: #af4355;
+            }
+          }
+        }
+        .home-top-thread-remove{
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 3rem;
+          height: 3rem;
+          text-align: center;
+          line-height: 3rem;
+          font-size: 1.4rem;
+          cursor: pointer;
+          transition: background-color 100ms;
+          &:hover{
+            background-color: #af4355;
+          }
+          z-index: 100;
+          background-color: @accent;
+          color: #fff;
+        }
+      }
+    }
+  }
+  .home-top-forums{
+    .home-top-forum{
+      margin: 0 1rem 1rem 0;
+      background-color: #f6f6f6;
+      display: inline-block;
+      padding: 0.5rem;
+      min-width: 12rem;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+      .home-top-forum-buttons{
+        text-align: center;
+        div{
+          height: 2rem;
+          width: 2rem;
+          line-height: 2rem;
+          margin-right: 0.5rem;
+          text-align: center;
+          cursor: pointer;
+          &.fa:hover{
+            background-color: #eee;
+          }
+        }
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.5rem;
+      }
+      .home-top-forum-info{
+        vertical-align: top;
+        margin-top: 0.5rem;
+        height: 2rem;
+        line-height: 2rem;
+        .home-top-forum-icon{
+          vertical-align: top;
+          height: 2rem;
+          width: 2rem;
+          display: inline-block;
+          border-radius: 50%;
+          margin-right: 0.3rem;
+          box-sizing: border-box;
+          border: 2px solid #eee;
+        }
+        .home-top-forum-name{
+          vertical-align: top;
+          font-weight: 700;
+          display: inline-block;
+          color: @dark;
+          &:hover, &:focus{
+            text-decoration: none;
+            color: @dark;
+          }
+        }
+      }
+
+    }
+  }
+}
+.home-goods-buttons{
+  text-align: right;
+  background-color: #eee;
+  padding: 0 0.5rem;
+  .fa{
+    height: 3rem;
+    width: 3rem;
+    line-height: 3rem;
+    margin-right: 1rem;
+    text-align: center;
+    cursor: pointer;
+    font-size: 1.4rem;
+    &:hover{
+      background-color: #ddd;
+    }
+  }
+}
+.home-goods-content{
+  padding-top: 0.6rem;
+  display: block;
+  background-color: #eee;
+  margin-bottom: 0.5rem;
+  &:hover, &:focus{
+    text-decoration: none;
+  }
+  .home-goods-avatar{
+    display: table-cell;
+    &>div{
+      height: 10rem;
+      width: 16rem;
+      border-radius: 5px;
+      box-sizing: border-box;
+      border: 2px solid #eee;
+      background-size: cover;
+      margin-right: 1rem;
+    }
+  }
+  .home-goods-info{
+    vertical-align: top;
+    display: table-cell;
+    width: 100%;
+
+    padding-top: 0;
+    .home-goods-name{
+      font-size: 1.6rem;
+      height: 2.2rem;
+      color: #3a3a3a;
+      &:hover{
+        color: #cf8425;
+      }
+      .hideText(@line: 1);
+      //font-weight: 700;
+      //color: #ee8b42;
+    }
+    .home-goods-description{
+      font-size: 1.2rem;
+      height: 3.6rem;
+      margin-top: 0.8rem;
+      color: #777;
+      .hideText(@line: 2)
+    }
+    .home-goods-other{
+      position: relative;
+      margin-top: 1rem;
+      height: 2.2rem;
+      line-height: 2.2rem;
+      text-align: left;
+      .home-goods-user{
+        vertical-align: top;
+        display: inline-block;
+        height: 100%;
+        color: #777;
+        &:hover, &:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+        img{
+          height: 1.6rem;
+          width: 1.6rem;
+          margin-right: 0.3rem;
+          margin-top: -2px;
+          border-radius: 50%;
+        }
+        span{
+          font-size: 1.1rem;
+        }
+      }
+      .home-goods-price{
+        position: absolute;
+        right: 1rem;
+        top: 0;
+        font-size: 1.6rem;
+        //display: inline-block;
+        //background-color: #ff4400;
+        color: #ff4400;
+        //border-radius: 2px;
+        //line-height: 2.4rem;
+        //color: #fff;
+        font-weight: 700;
+
+        font-style: italic;
+        //padding: 0 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .home-goods-content .home-goods-avatar > div{
+    width: 10rem;
+    height: 7rem;
+  }
+}

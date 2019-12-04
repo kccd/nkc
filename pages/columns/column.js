@@ -44,3 +44,11 @@ function openNewWindow(url) {
   }
 
 }
+function pushToHome(id, type) {
+  var method = type === "push"? "POST": "DELETE";
+  nkcAPI("/m/" + id + "/top", method)
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(sweetError);
+}

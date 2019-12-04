@@ -144,6 +144,52 @@ module.exports = {
     },
     kcb: {
 		  GET: 'visitUserKcb'
-    }
+    },
+		profile: {
+			GET: 'userProfile',
+			summary: {
+				pie: {
+					GET: "userProfile"
+				},
+				calendar: {
+					GET: "userProfile"
+				}
+			},
+			thread: {
+				GET: "userProfile"
+			},
+			post: {
+				GET: "userProfile"
+			},
+			draft: {
+				GET: "userProfile"
+			},
+			finance: {
+				GET: "userProfile"
+			},
+			follower: {
+				GET: "userProfile"
+			},
+			subscribe: {
+				user: {
+					GET: "userProfile"
+				},
+				topic: {
+					GET: "userProfile"
+				},
+				discipline: {
+					GET: "userProfile"
+				},
+				column: {
+					GET: "userProfile"
+				},
+				thread: {
+					GET: "userProfile"
+				},
+				collection: {
+					GET: "userProfile"
+				}
+			}
+		}
 	}
 };

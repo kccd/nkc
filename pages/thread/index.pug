@@ -236,9 +236,24 @@ block content
                               button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
                             if data.isModerator && data.userOperationsId.includes('unToppedThread') && thread.topped
                               button.btn.btn-default.btn-sm#threadTop(onclick=`cancelTopped('${data.thread.tid}')`) 取消专业置顶
-                            if data.userOperationsId.includes('homeTop') && !data.ads.includes(data.thread.tid)
+                            if data.userOperationsId.includes("homeAd")
+                              if data.homeAd
+                                button.btn.btn-default.btn-sm(onclick=`unHomeAd('${data.thread.tid}')`) 取消首页推荐
+                              else
+                                a.btn.btn-default.btn-sm(href=`/t/${data.thread.tid}/ad`).m-l-05 首页推荐
+                            if data.userOperationsId.includes("homeTop")
+                              if data.homeTopped
+                                button.btn.btn-default.btn-sm(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
+                              else
+                                button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
+                            if data.userOperationsId.includes("pushGoodsToHome") && data.product
+                              if data.goodsHomeTopped
+                                button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'unPush')`) 取消热销
+                              else
+                                button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'push')`) 设为热销
+                            //-if data.userOperationsId.includes('homeTop') && !data.ads.movable.includes(data.thread.tid) && !data.ads.fixed.includes(data.thread.tid)
                               button.btn.btn-default.btn-sm#threadTop(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
-                            if data.userOperationsId.includes('unHomeTop') && data.ads.includes(data.thread.tid)
+                            //-if data.userOperationsId.includes('unHomeTop') && (data.ads.movable.includes(data.thread.tid) || data.ads.fixed.includes(data.thread.tid))
                               button.btn.btn-default.btn-sm#threadTop(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
                             if data.userOperationsId.includes('closeThread') && !thread.closed
                               button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题

@@ -48,7 +48,7 @@ block content
                               a(href=`/u/${behavior.user.uid}` target="_blank")=behavior.user.username
                             else
                               span 游客
-                          th= lang("operations", behavior.operationId)
+                          th= lang("operations", behavior.operationId || behavior.operation)
                           th
                             if behavior.tid
                               div

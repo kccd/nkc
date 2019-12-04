@@ -75,5 +75,35 @@ productRouter
 			await product.update({$set: {adminBan:true}});
 		}
 		await next();
+  })
+  .post("/:productId/top", async(ctx, next) => {
+    const {params, db} = ctx;
+    const {productId} = params;
+    const product = await db.ShopGoodsModel.findOnly({productId});
+    const homeSettings = await db.SettingModel.getSettings("home");
+    if(homeSettings.shopGoodsId.includes(product.productId)) ctx.throw(400, "商品已经被推动到首页了");
+    homeSettings.shopGoodsId.unshift(productId);
+    await db.SettingModel.updateOne({_id: "home"}, {
+      $set: {
+        "c.shopGoodsId": homeSettings.shopGoodsId
+      }
+    });
+    await db.SettingModel.saveSettingsToRedis("home");
+    await next();
+  })
+  .del("/:productId/top", async (ctx, next) => {
+    const {params, db} = ctx;
+    const {productId} = params;
+    const product = await db.ShopGoodsModel.findOnly({productId});
+    const homeSettings = await db.SettingModel.getSettings("home");
+    if(!homeSettings.shopGoodsId.includes(product.productId)) ctx.throw(400, "商品未被推动到首页");
+    homeSettings.shopGoodsId.unshift(productId);
+    await db.SettingModel.updateOne({_id: "home"}, {
+      $pull: {
+        "c.shopGoodsId": productId
+      }
+    });
+    await db.SettingModel.saveSettingsToRedis("home");
+    await next();
   });
 module.exports = productRouter;

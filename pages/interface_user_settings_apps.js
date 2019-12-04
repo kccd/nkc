@@ -122,9 +122,11 @@ NKC.methods.initSelectColor();
 function saveAppInfo() {
   var homeThreadList = $("input[name='homeThreadList']");
   if(homeThreadList.eq(0).prop("checked")) {
-    homeThreadList = "subscribe";
-  } else {
+    homeThreadList = "home";
+  } else if(homeThreadList.eq(1).prop("checked")) {
     homeThreadList = "latest";
+  } else {
+    homeThreadList = "subscribe";
   }
   var showEnvelope = $("input[name='envelope']");
   showEnvelope = showEnvelope.eq(0).prop("checked");

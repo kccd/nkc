@@ -2537,13 +2537,14 @@ img.emoji {
   color: #ffffff;
 }
 
-.userInfo img{
-  margin-top: -2px;
-  width: 2.4rem;
-  height: 2.4rem;
+.userInfo img.nav-user-avatar-sm{
+  /*margin-top: -2px;*/
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
   box-sizing: border-box;
-  border: 2px solid #ddd;
+  cursor: pointer;
+  border: 2px solid rgba(0, 0, 0, 0.1);
   display:inline-block;
   margin-left: 0.5rem;
 }
@@ -2581,7 +2582,7 @@ img.emoji {
   margin-top: 7px;
   height: 2.7rem;
   box-sizing: border-box;
-  border: 2px solid #ddd;
+  border: 2px solid rgba(0, 0, 0, 0.1);
   border-radius: 50%;
   display:inline-block;
   margin-left: 0.5rem;
@@ -2596,8 +2597,198 @@ img.emoji {
   color: #282c37;
   text-decoration: none;
 }
-
-/*首页*/
+.nav-user{
+  position: relative;
+}
+.nav-user:hover .nav-user-content>div{
+  width: 22rem;
+  height: 34.5rem;
+}
+.nav-user-content{
+  padding-top: 1.2rem;
+  position: absolute;
+  z-index: 100;
+  top: 3rem;
+  right: 0;
+}
+.nav-user-content>div{
+  height: 0;
+  width: 0;
+  /*height: 34.5rem;
+  width: 22rem;*/
+  overflow: hidden;
+  transition: width 200ms, height 200ms;
+  background-color: rgba(255,255,255,1);
+  border-radius: 5px;
+  box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+.nav-user-content .nav-user-banner{
+  height: 11rem;
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+  z-index: 100;
+  left: 0;
+  top: 0;
+}
+.nav-user-content .nav-user-banner img{
+  width: 100%;
+}
+.nav-user-content .nav-user-other{
+  position: absolute;
+  z-index: 110;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.nav-user-content .nav-user-info{
+  /*height: 6rem;*/
+  background-color: #fff;
+  padding-top: 2rem;
+  position: relative;
+  margin-top: 7rem;
+  border-radius:5px;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.nav-user-content .nav-user-avatar{
+  position: absolute;
+  left: 0;
+  top: -4rem;
+  width: 100%;
+}
+.nav-user-content .nav-user-avatar img{
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 3px solid #fff;
+  /*border: 2px solid rgba(200, 200, 200, 0.9);*/
+}
+.nav-user-content .nav-user-name{
+  color: #282c37;
+  font-weight: 700;
+  font-size: 1.4rem;
+  height: 2rem;
+  line-height: 2.5rem;
+  overflow: hidden;
+  padding: 0 1rem;
+  display: -webkit-box;
+  word-break: break-all;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.nav-user-content .nav-user-level{
+  height: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 1rem;
+}
+.nav-user-content .nav-user-certs{
+  height: 1.5rem;
+  line-height: 1.5rem;
+  color: #e85a71;
+  font-size: 1rem;
+}
+.nav-user-content .nav-user-count{
+  height: 1.6rem;
+  line-height: 1.6rem;
+  text-align: left;
+  margin-top: 1rem;
+  padding: 0 1rem;
+  overflow: hidden;
+}
+.nav-user-content .nav-user-count-span{
+  width: 49%;
+  display: inline-block;
+  text-align: center;
+}
+.nav-user-content .nav-user-count-span img{
+  height: 1.4rem;
+  margin-top: -2px;
+  width: 1.4rem;
+  margin-right: 4px;
+}
+.nav-user-content .nav-user-count-span span{
+  font-size: 1rem;
+}
+.nav-user-content .nav-user-links{
+  border-top: 1px solid #eee;
+  padding: 1rem;
+}
+.nav-user-content .nav-user-link{
+  text-decoration: none;
+  color: #282c37;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 100ms;
+}
+.nav-user-content .nav-user-link:hover{
+  background-color: #f4f4f4;
+  /*box-shadow: 1px 1px 5px rgba(0,  0, 0, 0.2);*/
+}
+.nav-user-content .nav-user-link .fa{
+  margin-right: 0.3rem;
+  color: #555;
+}
+.nav-user-content .nav-user-link.col-xs-12{
+  /*background-color: #f4f4f4;*/
+}
+.nav-user-content .nav-user-link:hover, .nav-user-content .nav-user-link:focus{
+  color: #282c37;
+  text-decoration: none;
+}
+.nav-user-avatar-count{
+  position: absolute;
+  height: 1.4rem;
+  padding: 0 0.45rem;
+  line-height: 1.4rem;
+  text-align: center;
+  background-color: rgba(255, 0, 0, 0.6);
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  color: #fff;
+  top: 1px;
+  right: -3px;
+}
+.nav-user-content .nav-user-link .count{
+  position: absolute;
+  height: 1.4rem;
+  padding: 0 0.45rem;
+  line-height: 1.4rem;
+  text-align: center;
+  background-color: rgba(255, 0, 0, 0.5);
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  color: #fff;
+  top: 0.2rem;
+  right: 0.5rem;
+}
+.new-thread{
+  box-sizing: border-box;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  background-color: #e85a71;
+  color: #fff!important;
+  height: 3rem!important;
+  border-radius: 1.5rem;
+  line-height: 3rem!important;
+  padding-top: 0!important;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: block;
+  margin-top: 0.3rem;
+  border: 1px solid #d97283;
+  transition: background-color 100ms;
+}
+.new-thread:hover, .new-thread:focus{
+  background-color: #cf5468!important;
+}
+  /*首页*/
 
 .popover {
   position: absolute;
@@ -2635,6 +2826,7 @@ img.emoji {
   text-align: center;
   font-size: 18px;
   background: #fff;
+  background-size: cover;
   /* Center slide text vertically */
   display: -webkit-box;
   display: -ms-flexbox;
@@ -2649,13 +2841,20 @@ img.emoji {
   -webkit-align-items: center;
   align-items: center;
 }
+.swiper-home:hover .swiper-button{
+  background-color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,0.8);
+}
 .swiper-button{
   color: rgba(255,255,255,0);
   text-align: center;
-  line-height: 44px;
-  font-size: 3em;
+  height: 4rem!important;
+  width: 2.5rem!important;
+  line-height: 4rem;
+  border-radius: 2px;
+  font-size: 2em;
   background-color: rgba(0,0,0,0);
-  /*transition: background-color 0.3s;*/
+  transition: background-color 0.2s, color 0.2s;
 }
 .swiper-pagination{
   color: #ffffff;
@@ -2665,10 +2864,19 @@ img.emoji {
   position: absolute;
   width: 100%;
   top: 0;
-  padding: 0.5rem;
+  left: 0;
+  padding: 0 0.8rem;
   text-align: left;
   background-color: rgba(0,0,0,0.4);
-  font-size: 0.8em;
+  background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 80%);
+  font-size: 1.2rem;
+  overflow: hidden;
+  height: 3rem;
+  line-height: 3rem;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 }
 
 /* .home-forum-list-li{
@@ -3615,6 +3823,8 @@ ul.nav.navbar-nav.navbar-md>li>a{
 }
 .navbar-md .userInfo{
   height: 45px;
+  line-height: 45px;
+  margin-right: 15px;
 }
 .navbar button.navbar-toggle:hover{
   background-color: rgba(0, 0, 0, 0);

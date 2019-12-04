@@ -199,6 +199,12 @@ const postSchema = new Schema({
   cover: {
     type: String,
     default: ""
+  },
+  // post类型 thread: 文章内容，post: 回复内容
+  type: {
+    type: String,
+    default: "post",
+    index: 1
   }
 }, {toObject: {
   getters: true,

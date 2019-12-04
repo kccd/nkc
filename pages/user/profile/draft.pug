@@ -1,0 +1,43 @@
+div
+  include ../../publicModules/paging/paging
+  if data.drafts.length
+    .paging-button
+      a.button.radius-left(onclick="draft.selectAll()") 全选
+      a.button.radius-right(onclick="draft.removeSelectedDrafts()") 删除已选
+    .paging-button
+      a.button.radius-left.radius-right(onclick="draft.removeAll()") 清空草稿箱
+  .account-threads
+    if !data.drafts.length
+      .null 空空如也~
+    for draft in data.drafts
+      .account-thread.draft-list
+        .account-post-thread-user
+          .checkbox.draft-checkbox
+            label
+              input(type="checkbox" data-did=draft.did)
+          .time(title=format("YYYY/MM/DD HH:mm:ss", draft.tlm || draft.toc))=`${fromNow(draft.tlm || draft.toc)}`
+          if draft.type === "newThread"
+            span 发表文章
+          else if draft.type === "newPost"
+            span 在文章《
+              a(href=draft.thread.url target="_blank")=draft.thread.title
+              | 》下发表回复
+          else if draft.type === "modifyPost"
+            span 修改文章《
+              a(href=draft.thread.url target="_blank")=draft.thread.title
+              | 》下的回复
+          else if draft.type === "modifyThread"
+            span 修改文章《
+              a(href=draft.thread.url target="_blank")=draft.thread.title
+              | 》
+          else
+            span 修改
+              a(href=draft.forum.url target="_blank")=draft.forum.title
+              | 的专业说明
+        a.account-post-content=draft.c || "未填写内容"
+        .text-right.m-t-05.draft-button
+          button(onclick=`draft.removeDraftSingle('${draft.did}')`) 删除
+          a(href=`/editor?type=redit&id=${draft.did}`) 继续创作
+  if data.paging.pageCount > 1
+    .m-t-05
+      include ../../publicModules/paging/paging_input

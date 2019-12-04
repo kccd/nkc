@@ -294,7 +294,7 @@ NKC.methods.toLogin = function(type) {
 NKC.methods.scrollTop = function(dom, distance) {
   if(dom) {
     if(typeof dom.scrollTo === "undefined") {
-      var dom = $(dom);
+      dom = $(dom);
       dom.scrollTop(distance);
     } else {
       dom.scrollTo(0, distance);  
@@ -302,7 +302,7 @@ NKC.methods.scrollTop = function(dom, distance) {
   } else {
     window.scrollTo(0, distance);
   }
-}
+};
 /* 
   本地存储
   @param {String} name 键名

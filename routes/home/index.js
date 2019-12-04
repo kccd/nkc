@@ -1,6 +1,6 @@
-const Router = require('koa-router');
+const router = require("koa-router")();
+const home = require("./home");
 const redisClient = require("../../settings/redisClient");
-const router = new Router();
 router
   .get("/", async (ctx, next) => {
     const {data, nkcModules, db, query, state} = ctx;
@@ -37,7 +37,7 @@ router
         await user.updateUserMessage();
       }
       try{
-        await lock.unlock();  
+        await lock.unlock();
       } catch(err) {
         console.log(err.message.red);
       }
@@ -48,34 +48,12 @@ router
       data.userGrade,
       user
     );
-
-    const topicsId = await db.ForumModel.getForumsIdFromRedis("topic");
-    const disciplinesId = await db.ForumModel.getForumsIdFromRedis("discipline");
-
-    // 排除话题下的文章
-    if(!homeSettings.list || !homeSettings.list.topic) {
-      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !topicsId.includes(fid));
-    }
-    // 排除学科下的文章
-    if(!homeSettings.list || !homeSettings.list.discipline) {
-      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !disciplinesId.includes(fid));
-    }
-    data.homeSettings = homeSettings;
-    // 置顶文章轮播图
-    data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
-
-    // 网站公告
-
-    data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
-    // 一周活跃用户
-    data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
-    // 全站精选
-    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
-
+  
+  
     let q = {};
     let threadListType;
     if(t) {
-      if(!["latest", "recommend", "subscribe", "column"].includes(t)) t = '';
+      if(!["latest", "recommend", "subscribe", "column", "home"].includes(t)) t = '';
       if(t === "subscribe" && !user) t = '';
       threadListType =  t;
     }
@@ -86,6 +64,8 @@ router
           threadListType = "latest"
         } else if(visitorThreadList === "recommend") {
           threadListType = "recommend"
+        } else if(visitorThreadList === "home"){
+          threadListType = "home";
         } else {
           threadListType = "column";
         }
@@ -95,17 +75,50 @@ router
           threadListType = "latest";
         } else if(homeThreadList === "subscribe") {
           threadListType = "subscribe";
+        } else if(homeThreadList === "home") {
+          threadListType = "home";
         } else {
           threadListType = "column";
         }
       }
     }
-
+  
     data.t = threadListType;
     data.navbar = {highlight: threadListType};
-    let subFid = [], subTid = [], subUid = [], subColumnId = [];
-    let collectionTid = [], subTopicId = [], subDisciplineId = [];
+    
+    if(threadListType === "home") {
+      await home({
+        ctx, fidOfCanGetThreads
+      });
+      return await next();
+    }
+  
+    const topicsId = await db.ForumModel.getForumsIdFromRedis("topic");
+    const disciplinesId = await db.ForumModel.getForumsIdFromRedis("discipline");
+  
+    // 排除话题下的文章
+    if(!homeSettings.list || !homeSettings.list.topic) {
+      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !topicsId.includes(fid));
+    }
+    // 排除学科下的文章
+    if(!homeSettings.list || !homeSettings.list.discipline) {
+      fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !disciplinesId.includes(fid));
+    }
+    data.homeSettings = homeSettings;
+    // 置顶文章轮播图
+    data.ads = (await db.ThreadModel.getAds(fidOfCanGetThreads)).movable;
+  
+    // 网站公告
+  
+    data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
+    // 一周活跃用户
+    data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
+    // 全站精选
+    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
+    
 
+    let subTid = [], subUid = [], subColumnId = [];
+  
     if(threadListType === "latest") {
       q = {
         mainForumsId: {
@@ -138,15 +151,17 @@ router
       } else {
         q.reviewed = true;
       }
+      // 首页置顶
+      data.toppedThreads = await db.ThreadModel.getHomeToppedThreads(fidOfCanGetThreads);
     } else if(threadListType === "subscribe") {
-      data.subscribeTypes = await db.SubscribeTypeModel.getTypesList(user.uid);
+      /*data.subscribeTypes = await db.SubscribeTypeModel.getTypesList(user.uid);
       data.subscribeCounts = {
         total: await db.SubscribeModel.count({uid: user.uid}),
         other: await db.SubscribeModel.count({uid: user.uid, cid: []})
       };
       let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
       accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
-
+    
       if(!c) c = "all";
       if(!d) d = "user";
       data.d = d;
@@ -187,14 +202,32 @@ router
         } else {
           ctx.throw(400, "未知的关注分类");
         }
+      }*/
+      if(!d) d = "all";
+      if(d === "all" || d === "column") {
+        subColumnId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
+        if(subColumnId.length) {
+          const columns = await db.ColumnModel.find({_id: {$in: subColumnId}, disabled: false, closed: false}, {_id: 1});
+          subColumnId = columns.map(c => c._id);
+        }
       }
-      if(subColumnId.length) {
-        const columns = await db.ColumnModel.find({_id: {$in: subColumnId}, disabled: false, closed: false}, {_id: 1});
-        subColumnId = columns.map(c => c._id);
+      if(d === "all" || d === "user") {
+        subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
       }
+      if(d === "all" || d === "thread") {
+        subTid = await db.SubscribeModel.getUserSubThreadsId(data.user.uid, "sub");
+      }
+      if(d === "all" || d === "own") {
+        subUid = subUid.concat(data.user.uid);
+      }
+      if(d === "all" || d === "reply") {
+        const subTid_ = await db.SubscribeModel.getUserSubThreadsId(data.user.uid, "replay");
+        subTid = subTid.concat(subTid_);
+      }
+      
       q = {
         mainForumsId: {
-          $in: accessibleForumsId
+          $in: fidOfCanGetThreads
         },
         recycleMark: {
           $ne: true
@@ -202,11 +235,6 @@ router
         disabled: false,
         reviewed: true,
         $or: [
-          {
-            mainForumsId: {
-              $in: subFid
-            }
-          },
           {
             columnsId: {$in: subColumnId}
           },
@@ -239,7 +267,7 @@ router
     }
     data.threads = [];
     let paging;
-
+  
     const count = await db.ThreadModel.count(q);
     paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     let sort = {tlm: -1};
@@ -281,24 +309,14 @@ router
         }
       }
       if(threadListType === "subscribe") {
-        if(collectionTid.includes(thread.tid)) {
-          thread.from = "collection";
+        if(data.user.uid === thread.tid) {
+          thread.from = "own";
         } else if(subTid.includes(thread.tid)) {
           thread.from = 'subThread';
         } else if(subUid.includes(thread.uid)) {
           thread.from = 'subFriend';
-        } else if(thread.uid === user.uid) {
-          thread.from = 'own';
         } else {
-          let from = "";
-          for(const columnId of thread.columnsId) {
-            if(subColumnId.includes(columnId)) {
-              from = "subColumn";
-              break;
-            }
-          }
-          if(!from) from = "subForum";
-          thread.from = from;
+          thread.from = "subColumn";
         }
       }
       data.threads.push(thread);
@@ -306,7 +324,7 @@ router
     if(threadListType !== "latest") {
       data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
     }
-
+  
     if(threadListType !== "recommend") {
       data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     }

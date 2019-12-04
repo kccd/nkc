@@ -1248,6 +1248,14 @@ function unHomeTop(tid) {
 			screenTopWarning(data.error||data);
 		})
 }
+// 首页推荐
+function unHomeAd(tid) {
+  nkcAPI("/t/" + tid + "/ad", "DELETE")
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(sweetError);
+}
 // 打开主题
 function openThread(tid) {
 	nkcAPI('/t/'+tid+'/close', 'DELETE', {})

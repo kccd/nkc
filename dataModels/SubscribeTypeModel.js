@@ -91,19 +91,11 @@ schema.statics.getTypesList = async (uid) => {
   for(const type of types) {
     const childTypes = type.childTypes || [];
     delete type.childTypes;
-    if(type.type === "post") {
-      postType = type;
-    } else if(type.type === "replay") {
-      replayType = type;
-    } else {
-      results.push(type);
-      for(const t of childTypes) {
-        results.push(t);
-      }
+    results.push(type);
+    for(const t of childTypes) {
+      results.push(t);
     }
   }
-  if(replayType) results.unshift(replayType);
-  if(postType) results.unshift(postType);
   return results;
 };
 module.exports = mongoose.model("subscribeTypes", schema);

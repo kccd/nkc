@@ -1,0 +1,112 @@
+extends ../../bootstrap_base
+block title
+  title 推送到首页
+  style.
+    body{
+      background-color: #f6f6f6;
+    }
+    .top{
+      font-size: 0;
+    }
+    .top-cover{
+      height: 22rem;
+      box-sizing: border-box;
+      border: 2px solid #eee;
+      position: relative;
+      overflow: hidden;
+      background-size: cover;
+
+    }
+    .fixed .top-cover{
+      height: 10rem;
+      width: 15rem;
+    }
+    .top-title{
+      height: 2.5rem;
+      padding: 0 0.5rem;
+      line-height: 2.5rem;
+      position: absolute;
+      font-size: 1.25rem;
+      background-color: rgba(0, 0, 0, 0.4);
+      width: 100%;
+      color: #fff;
+      top: 0;
+      left: 0;
+    }
+    .fixed .top-title{
+      top: auto;
+      bottom: 0;
+      height: 2rem;
+      line-height: 2rem;
+      font-size: 1rem;
+      word-break: break-word;
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp:1;
+    }
+    .thread-resource{
+      display: inline-block;
+      overflow: hidden;
+      margin: 0 1rem 1rem 0;
+
+    }
+    .thread-resource .image-body{
+      width: 15rem;
+      height: 10rem;
+      border: 1px solid #eee;
+      position: relative;
+    }
+    .thread-resource .image-body img{
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      margin: auto;
+      position: absolute;
+      max-width: 100%;
+      max-height: 100%;
+    }
+block content
+  .container-fluid.max-width
+    #data.hidden=objToStr({thread: data.thread})
+    .row#app(v-cloak)
+      .col-xs-12.col-md-6.box-shadow-panel
+        .top(:class="{'fixed': topType === 'fixed'}")
+          .top-cover(:style="'background-image: url('+coverData+')'")
+            .top-title {{title}}
+          .m-t-1
+            button.btn-block.btn.btn-primary(@click="submit") 确认推送
+      .col-xs-12.col-md-6.box-shadow-panel
+        .form
+          .form-group
+            label 标题
+            input.form-control(type="text" v-model="title")
+          .form-group
+            label 置顶类型
+            .radio
+              label.m-r-1
+                input(type="radio" value="movable" v-model="topType")
+                span 轮播
+              label
+                input(type="radio" value="fixed" v-model="topType")
+                span 固定
+          .form-group
+            label 指定封面
+            .thread-resources
+              .m-b-05
+                button.btn.btn-sm.btn-default(@click="selectFile") 选择本地图片
+              .thread-resource(v-if="firstPostCover")
+                .image-body
+                  img(:src="getUrl('postCover', firstPostCover)")
+                .text-center.m-t-05
+                  button.btn.btn-default.btn-xs(@click="selectFile('cover', firstPostCover)") 选择
+              .thread-resource(v-for="rid in resourcesId")
+                .image-body
+                  img(:src="'/r/' + rid")
+                .text-center.m-t-05
+                  button.btn.btn-default.btn-xs(@click="selectFile('online', rid)") 选择
+
+block scripts
+  include ../../publicModules/crop/crop_new
+  +includeJS("/thread/ad/script.js")

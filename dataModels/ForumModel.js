@@ -1218,6 +1218,7 @@ forumSchema.statics.createNewThread = async function(options) {
   // }
   // --------
   const thread = await new ThreadModel(t).save();
+  options.postType = "thread";
   const _post = await thread.createNewPost(options);
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
   await ForumModel.updateMany({fid: {$in: options.fids}}, {$inc: {
@@ -1226,7 +1227,7 @@ forumSchema.statics.createNewThread = async function(options) {
     'countThreads': 1
   }});
   // 生成关注记录 我发表的
-  await SubscribeModel.insertSubscribe("post", thread.uid, thread.tid);
+  // await SubscribeModel.insertSubscribe("post", thread.uid, thread.tid);
   return _post;
 };
 /*
@@ -1276,6 +1277,29 @@ forumSchema.methods.createLibrary = async function(uid) {
   });
   await this.update({lid: library._id});
   return library;
-}
+};
+
+
+/*
+* 获取首页推荐专业
+* @param {[String]} fid 可以访问的专业ID组成的数组
+* @return {[Object]} 专业对象组成的数组
+* @author pengxiguaa 2019-11-29
+* */
+forumSchema.statics.getRecommendForums = async (fid) => {
+  const homeSettings = await mongoose.model("settings").getSettings("home");
+  const {recommendForumsId} = homeSettings;
+  const forums = await mongoose.model("forums").find({fid: {$in: recommendForumsId}});
+  const forumsIndex = require("../nkcModules/apiFunction").getRandomNumber({
+    count: forums.length,
+    min: 0,
+    max: forums.length - 1>0?forums.length - 1:0,
+    repeat: false
+  });
+  return forumsIndex.map(index => {
+    return forums[index];
+  });
+  
+};
 
 module.exports = mongoose.model('forums', forumSchema);

@@ -14,32 +14,32 @@ block content
       include ../nav
       .col-xs-12.col-md-2
         .list-group
-          a.list-group-item(class=data.type==='top'?'active': '' href=`/e/settings/home/top`) 置顶
           a.list-group-item(class=data.type==='logo'?'active': '' href=`/e/settings/home/logo`) LOGO
           a.list-group-item(class=data.type==='notice'?'active': '' href=`/e/settings/home/notice`) 网站公告
           a.list-group-item(class=data.type==='list'?'active': '' href=`/e/settings/home/list`) 首页文章列表
       .col-xs-12.col-md-10
         if data.type === 'top'
-          if data.ads.length === 0
-            h4 暂无首页置顶文章
-          .row
-            -let n = 0;
-            for thread in data.ads
-              -n++;
-              .col-xs-6.col-sm-4.col-md-3
-                .row
-                  .col-xs-12.col-xs-12
-                    h5(style='height: 1em;overflow:hidden;')
-                      a(href=`/t/${thread.tid}` target='_blank' title=thread.firstPost.t)= thread.firstPost.t
-                  .col-xs-12.col-xs-12
-                    img(src=`${tools.getUrl('postCover', thread.firstPost.cover)}` style=`width:100%;`)
-                  .col-xs-12.col-md-12
-                    span 序号
-                    input(style='display:inline-block;width: 5rem;margin: 0.5rem 0;padding-left: 0.8rem;' value=n data-tid=thread.tid name='threadOrder' type='number')
-                    if data.userOperationsId.includes('unHomeTop')
-                      button.btn.btn-default.btn-sm(onclick=`unHomeTop("${thread.tid}")`) 移除
-            .col-xs-12.col-sm-12.col-md-12(style='margin-top: 1rem;')
-              button.btn.btn-primary(onclick='saveAdsOrder()') 保存
+          //
+            if data.ads.length === 0
+              h4 暂无首页置顶文章
+            .row
+              -let n = 0;
+              for thread in data.ads
+                -n++;
+                .col-xs-6.col-sm-4.col-md-3
+                  .row
+                    .col-xs-12.col-xs-12
+                      h5(style='height: 1em;overflow:hidden;')
+                        a(href=`/t/${thread.tid}` target='_blank' title=thread.firstPost.t)= thread.firstPost.t
+                    .col-xs-12.col-xs-12
+                      img(src=`${tools.getUrl('postCover', thread.firstPost.cover)}` style=`width:100%;`)
+                    .col-xs-12.col-md-12
+                      span 序号
+                      input(style='display:inline-block;width: 5rem;margin: 0.5rem 0;padding-left: 0.8rem;' value=n data-tid=thread.tid name='threadOrder' type='number')
+                      if data.userOperationsId.includes('unHomeTop')
+                        button.btn.btn-default.btn-sm(onclick=`unHomeTop("${thread.tid}")`) 移除
+              .col-xs-12.col-sm-12.col-md-12(style='margin-top: 1rem;')
+                button.btn.btn-primary(onclick='saveAdsOrder()') 保存
         else if data.type === 'notice'
           h4 网站公告
           for thread, index in data.noticeThreads
@@ -69,14 +69,14 @@ block content
                     label
                       input(type='checkbox' value="discipline" v-model="list")
                 .form-group
-                  h4 二、游客首页文章列表文章来源
+                  h4 二、游客首页
                   .radioBox
                     span 最新
                     label
                       input(type='radio' value="latest" v-model="homeSettings.visitorThreadList")
-                    span.m-l-1 推荐
+                    span.m-l-1 主页
                     label
-                      input(type='radio' value="recommend" v-model="homeSettings.visitorThreadList")
+                      input(type='radio' value="home" v-model="homeSettings.visitorThreadList")
                 .form-group.form-inline
                   h4 三、热门文章
                   h5 回复数不低于：
