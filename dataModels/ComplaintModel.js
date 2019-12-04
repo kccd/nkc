@@ -17,7 +17,7 @@ const schema = new Schema({
   // 投诉时间
   toc: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
     index: 1
   },
   // 投诉对象类型 文章、用户、回复
