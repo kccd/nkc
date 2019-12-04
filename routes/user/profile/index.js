@@ -196,10 +196,13 @@ router
     const usersObj = {};
     users.map(u => usersObj[u.uid] = u);
     data.visitUserLogs = [];
+    const visitUsersId = [];
+    const visitSelfUsersId = [];
     data.visitSelfLogs = [];
     for(let log of visitUserlogs) {
       const user = usersObj[log.toUid];
-      if(user) {
+      if(user && !visitUsersId.includes(user.uid)) {
+        visitUsersId.push(user.uid);
         log = log.toObject();
         log.targetUser = user;
         data.visitUserLogs.push(log);
@@ -207,7 +210,8 @@ router
     }
     for(let log of visitSelfLogs) {
       const user = usersObj[log.uid];
-      if(user) {
+      if(user && !visitSelfUsersId.includes(user.uid)) {
+        visitSelfUsersId.push(user.uid);
         log = log.toObject();
         log.user = user;
         data.visitSelfLogs.push(log);

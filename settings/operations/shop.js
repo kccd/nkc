@@ -4,7 +4,7 @@ module.exports = {
     PARAMETER: {
       GET: 'visitProductSingle',
       top: {
-        POST: "pushProductToHome",
+        POST: "pushGoodsToHome",
         DELETE: "pushGoodsToHome"
       },
       changePara: {

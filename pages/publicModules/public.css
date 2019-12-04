@@ -1457,6 +1457,7 @@ footer.footer ul li{
   color: #e85a71;
 }
 .thread-panel-abstract{
+  word-break: break-word;
   font-size: 1.2rem;
 }
 .thread-panel-abstract:hover, .thread-panel-abstract:link, .thread-panel-abstract:active, .thread-panel-abstract:visited{
@@ -1477,6 +1478,7 @@ footer.footer ul li{
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   -webkit-flex-grow: 1;
+  word-break: break-word;
   color: #555;
 }
 .thread-panel-reply:hover, .thread-panel-reply:link, .thread-panel-reply:visited, .thread-panel-reply:active{
@@ -1959,3 +1961,15 @@ span.thread-title-page{
 }
 
 
+
+.topped-thread-header{
+  height: 2rem;
+  line-height: 2rem;
+  background-color: #d9e1e8;
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  text-align: center;
+  color: #666;
+  font-weight: 700;
+}

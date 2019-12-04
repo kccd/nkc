@@ -2,14 +2,22 @@ extends ./nkc
 block nkcTitle
   title 前台管理 - 首页管理
 block nkcContent
-  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, goods: data.goods})
+  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, goods: data.goods, toppedThreads: data.toppedThreads})
   .col-xs-12.col-md-12.box-shadow-panel.management-home#app(v-cloak)
     div
-      .management-header 首页置顶
+      .management-header 首页推荐
       .home-top-threads
         .row
           .col-xs-12.col-md-12
-            h5 滚动
+            h4 轮播图
+            .radio
+              span 显示顺序：
+              label.m-r-1
+                input(type="radio" value="random" v-model="ads.movableOrder")
+                span 随机
+              label.m-r-1
+                input(type="radio" value="fixed" v-model="ads.movableOrder")
+                span 正序
           .col-xs-12.col-md-6(v-for="ad, index in ads.movable").m-b-1
             .home-top-thread
               .home-top-thread-cover
@@ -26,7 +34,15 @@ block nkcContent
                   .fa.fa-angle-right(@click="move(ad, 'right')" title="右移")
         .row.m-t-2
           .col-xs-12.col-md-12
-            h5 固定，只显示前面6篇文章
+            h4 固定图，只显示6篇
+            .radio
+              span 显示顺序：
+              label.m-r-1
+                input(type="radio" value="random" v-model="ads.fixedOrder")
+                span 随机
+              label.m-r-1
+                input(type="radio" value="fixed" v-model="ads.fixedOrder")
+                span 正序
           .col-xs-12.col-md-3(v-for="ad, index in ads.fixed").m-b-1
             .home-top-thread.fixed
               .home-top-thread-cover
@@ -97,7 +113,27 @@ block nkcContent
                 .home-goods-price ￥ {{g.productParams[0].originPrice / 100}}
         .m-t-1
           button.management-button(@click="saveGoods") 保存
-
+    div.m-t-2
+      .management-header 全站置顶
+      .home-top-goods
+        .home-top-goods-body(v-for="thread, index in toppedThreads")
+          .home-goods-buttons
+            .fa.fa-angle-up(title="上移" @click="moveForum(toppedThreads, thread, 'left')")
+            .fa.fa-angle-down(title="下移" @click="moveForum(toppedThreads, thread, 'right')")
+            .fa.fa-trash(title="删除" @click="removeForum(toppedThreads, index)")
+          .home-goods-content
+            .home-goods-avatar(v-if="thread.firstPost.cover")
+              div(:style="'background-image: url('+getUrl('postCover', thread.firstPost.cover)+')'")
+            .home-goods-info
+              a.pointer(@click="visitUrl('/t/' + thread.tid)" :title="thread.firstPost.t").home-goods-name {{thread.firstPost.t}}
+              .home-goods-description {{thread.firstPost.abstract || thread.firstPost.c}}
+              .home-goods-other
+                a.home-goods-user(v-if="thread.firstPost.anonymous") 匿名
+                a.pointer.home-goods-user(@click="visitUrl('/u/' + thread.firstPost.user.uid)" v-else)
+                  img(:src="getUrl('userAvatar', thread.firstPost.user.avatar)" :onmouseover="floatUserInfo(thread.uid)")
+                  span {{thread.firstPost.user.username}}
+        .m-t-1
+          button.management-button(@click="saveToppedThreads") 保存
 
 block nkcScripts
   include ../publicModules/crop/crop_new

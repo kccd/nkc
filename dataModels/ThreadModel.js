@@ -991,6 +991,35 @@ threadSchema.statics.publishArticle = async (options) => {
   return await ThreadModel.findThreadById(thread.tid);
 };
 /*
+* 获取首页置顶文章
+* */
+threadSchema.statics.getHomeToppedThreads = async (fid) => {
+  const homeSettings = await mongoose.model("settings").getSettings("home");
+  const ThreadModel = mongoose.model("threads");
+  const {toppedThreadsId} = homeSettings;
+  let threads = await ThreadModel.find({
+    tid: {$in: toppedThreadsId},
+    disabled: false,
+    recycleMark: {$ne: true},
+    reviewed: true
+  });
+  threads = await ThreadModel.extendThreads(threads, {
+    forum: true,
+    category: false,
+    lastPost: true,
+    lastPostUser: true,
+    htmlToText: true
+  });
+  const threadsObj = {};
+  threads.map(thread => threadsObj[thread.tid] = thread);
+  const results = [];
+  toppedThreadsId.map(tid => {
+    const thread = threadsObj[tid];
+    if(thread) results.push(thread);
+  });
+  return results;
+};
+/*
 * 加载首页轮播图
 * @param {[String]} fid 能够从中读取文章的专业ID
 * @param
@@ -999,7 +1028,9 @@ threadSchema.statics.publishArticle = async (options) => {
 threadSchema.statics.getAds = async (fid) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
-  const homeAds = homeSettings.ads.fixed.concat(homeSettings.ads.movable);
+  const apiFunction = require("../nkcModules/apiFunction");
+  const {fixed, movable, fixedOrder, movableOrder} = homeSettings.ads;
+  const homeAds = fixed.concat(movable);
   const threadsId = homeAds.map(a => a.tid);
   let threads = await ThreadModel.find({
     tid: {$in: threadsId}, mainForumsId: {$in: fid}, disabled: false, reviewed: true, recycleMark: {$ne: true}
@@ -1019,6 +1050,32 @@ threadSchema.statics.getAds = async (fid) => {
   for(const ad of homeSettings.ads.fixed) {
     const thread = threadsObj[ad.tid];
     if(thread) ads.fixed.push(ad);
+  }
+  if(fixedOrder === "random") {
+    const fixedIndex = apiFunction.getRandomNumber({
+      count: ads.fixed.length < 6? ads.fixed.length: 6,
+      min: 0,
+      max: ads.fixed.length - 1>0?ads.fixed.length - 1:0,
+      repeat: false
+    });
+    const fixedThread = [];
+    fixedIndex.map(i => {
+      fixedThread.push(ads.fixed[i])
+    });
+    ads.fixed = fixedThread;
+  }
+  if(movableOrder === "random") {
+    const movableIndex = apiFunction.getRandomNumber({
+      count: ads.movable.length,
+      min: 0,
+      max: ads.movable.length - 1,
+      repeat: false
+    });
+    const movableThread = [];
+    movableIndex.map(i => {
+      movableThread.push(ads.movable[i])
+    });
+    ads.movable = movableThread;
   }
   return ads;
 };
@@ -1138,7 +1195,19 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
 * */
 threadSchema.statics.getLatestThreads = async (fid) => {
   const ThreadModel = mongoose.model("threads");
-  const threads = await ThreadModel.find({mainForumsId: {$in: fid}, disabled: false, reviewed: true}).sort({toc: -1}).limit(9);
+  const PostModel = mongoose.model("posts");
+  const posts = await PostModel.find({
+    mainForumsId: {$in: fid},
+    disabled: false,
+    reviewed: true,
+    toDraft: {$ne: true},
+    type: "thread",
+    originState: {$nin: ["0", ""]}
+  }).sort({toc: -1}).limit(9);
+  const threads = await ThreadModel.find({
+    tid: {$in: posts.map(p => p.tid)},
+    mainForumsId: {$in: fid}, disabled: false, reviewed: true
+  }).sort({toc: -1});
   return await ThreadModel.extendThreads(threads, {
     lastPost: false,
     category: false,

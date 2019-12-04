@@ -83,7 +83,7 @@ var app = new Vue({
           formData.append("cover", self.cover);
           formData.append("title", self.title);
           formData.append("topType", self.topType);
-          return nkcUploadFile("/t/" + self.tid + "/hometop", "POST", formData)
+          return nkcUploadFile("/t/" + self.tid + "/ad", "POST", formData)
         })
         .then(function() {
           sweetSuccess("文章已推送到首页");

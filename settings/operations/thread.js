@@ -26,7 +26,12 @@ module.exports = {
 		hometop: {
 			GET: "homeTop",
 			POST: 'homeTop',
-			DELETE: 'unHomeTop'
+			DELETE: 'homeTop'
+		},
+		ad: {
+			GET: "homeAd",
+			POST: 'homeAd',
+			DELETE: 'homeAd'
 		},
 		/*switchInPersonalForum: {
 			PATCH: 'switchInPersonalForum'

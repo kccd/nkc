@@ -22,7 +22,8 @@ var app = new Vue({
     ads: data.ads,
     recommendForums: data.recommendForums,
     columns: data.columns,
-    goods: data.goods
+    goods: data.goods,
+    toppedThreads: data.toppedThreads
   },
   mounted: function mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -87,7 +88,9 @@ var app = new Vue({
     saveAds: function saveAds() {
       var _this$ads = this.ads,
           movable = _this$ads.movable,
-          fixed = _this$ads.fixed;
+          fixed = _this$ads.fixed,
+          movableOrder = _this$ads.movableOrder,
+          fixedOrder = _this$ads.fixedOrder;
       var self = this;
       Promise.resolve().then(function () {
         movable.concat(fixed).map(function (ad) {
@@ -102,7 +105,9 @@ var app = new Vue({
         return nkcAPI("/nkc/home", "PATCH", {
           operation: "saveAds",
           movable: movable,
-          fixed: fixed
+          fixed: fixed,
+          movableOrder: movableOrder,
+          fixedOrder: fixedOrder
         });
       }).then(function () {
         sweetSuccess("保存成功");
@@ -177,6 +182,17 @@ var app = new Vue({
       nkcAPI("/nkc/home", "PATCH", {
         operation: "saveGoods",
         goodsId: goodsId
+      }).then(function () {
+        sweetSuccess("保存成功");
+      })["catch"](sweetError);
+    },
+    saveToppedThreads: function saveToppedThreads() {
+      var toppedThreadsId = this.toppedThreads.map(function (t) {
+        return t.tid;
+      });
+      nkcAPI("/nkc/home", "PATCH", {
+        operation: "saveToppedThreads",
+        toppedThreadsId: toppedThreadsId
       }).then(function () {
         sweetSuccess("保存成功");
       })["catch"](sweetError);

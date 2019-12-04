@@ -18,11 +18,14 @@ block content
                 .col-sm-10
                   .radio
                     label
+                      input(type="radio" name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList === "home")
+                      span.m-r-1 主页
+                    label
+                      input(type='radio' name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList === "latest")
+                      span.m-r-1 最新
+                    label
                       input(type="radio" name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList==="subscribe")
                       span.m-r-1 我关注的
-                    label
-                      input(type='radio' name='homeThreadList' checked=data.user.generalSettings.displaySettings.homeThreadList==="latest")
-                      span 最新
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-9

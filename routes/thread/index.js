@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const operationRouter = require('./operation');
 const threadRouter = new Router();
 const homeTopRouter = require('./homeTop');
+const adRouter = require("./ad");
 const toppedRouter = require('./topped');
 const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
@@ -693,9 +694,10 @@ threadRouter
 
 		}
 
-		data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
+		data.homeSettings = await db.SettingModel.getSettings("home");
 		const ads = data.homeSettings.ads.fixed.concat(data.homeSettings.ads.movable);
-		data.homeTopped = ads.map(a => a.tid).includes(tid);
+		data.homeAd = ads.map(a => a.tid).includes(tid);
+		data.homeTopped = data.homeSettings.toppedThreadsId.includes(tid);
 		if(thread.type === "product" && ctx.permission("pushGoodsToHome")) {
 		  data.goodsHomeTopped = data.homeSettings.shopGoodsId.includes(data.product.productId);
     }
@@ -929,11 +931,12 @@ threadRouter
       tid,
       uid: data.user.uid
     };
-    // await db.SubscribeModel.insertSubscribe("replay", data.user.uid, tid);
+    await db.SubscribeModel.insertSubscribe("replay", data.user.uid, tid);
     //-global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
+  .use('/:tid/ad', adRouter.routes(), adRouter.allowedMethods())
 	.use('/:tid/hometop', homeTopRouter.routes(), homeTopRouter.allowedMethods())
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())

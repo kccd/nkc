@@ -102,7 +102,9 @@ fundRouter
     data.applying = await Promise.all(applying.map(async a => {
 			await a.extendFund();
 			if(a.fund) {
-				await a.extendApplicant();
+				await a.extendApplicant({
+					extendSecretInfo: false
+				});
 				await a.extendProject();
 				return a;
 			}
@@ -111,7 +113,9 @@ fundRouter
 	  data.funding = await Promise.all(funding.map(async a => {
 		  await a.extendFund();
 		  if(a.fund) {
-			  await a.extendApplicant();
+			  await a.extendApplicant({
+				  extendSecretInfo: false
+			  });
 			  await a.extendProject();
 			  return a;
 		  }
@@ -120,7 +124,9 @@ fundRouter
 	  data.excellent = await Promise.all(excellent.map(async a => {
 		  await a.extendFund();
 		  if(a.fund) {
-			  await a.extendApplicant();
+			  await a.extendApplicant({
+				  extendSecretInfo: false
+			  });
 			  await a.extendProject();
 			  return a;
 		  }
@@ -129,7 +135,9 @@ fundRouter
 	  data.completed = await Promise.all(completed.map(async a => {
 		  await a.extendFund();
 		  if(a.fund) {
-			  await a.extendApplicant();
+			  await a.extendApplicant({
+				  extendSecretInfo: false
+			  });
 			  await a.extendProject();
 			  return a;
 		  }

@@ -323,6 +323,21 @@ router
     data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
     data.threadTypesId = data.threadTypes.map(threadType => threadType.cid);
 
+    // 记录专业访问记录
+		if(data.user) {
+			const {visitedForumsId = []} = data.user.generalSettings;
+			const index = visitedForumsId.indexOf(fid);
+			if(index !== -1) {
+				visitedForumsId.splice(index, 1);
+			}
+			visitedForumsId.unshift(fid);
+			await db.UsersGeneralModel.updateOne({uid: data.user.uid}, {
+				$set: {
+					"visitedForumsId": visitedForumsId
+				}
+			});
+		}
+    
 		ctx.template = 'forum/forum.pug';
 		await next();
 	})

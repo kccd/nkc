@@ -67,7 +67,6 @@ const review = require("./review");
 const threads = require("./threads");
 const newResource = require("./newResource");
 const library = require("./library");
-const latest = require("./latest");
 const libraries = require("./libraries");
 const nkc = require("./nkc");
 const operationObj = {};
@@ -104,8 +103,6 @@ operationObj.defaultOperations = [
 operationObj.operationTree = {
 	home: {
 		GET: 'visitHome',// 首页
-		
-		latest,
 		
 		logo, // 网站logo
 

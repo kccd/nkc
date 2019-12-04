@@ -37,9 +37,23 @@ router
       color
     } = body;
     const q = {};
+    const oldHomeThreadList = data.user.generalSettings.displaySettings.homeThreadList;
     if(homeThreadList !== undefined) {
-      if(!["latest", "subscribe"].includes(homeThreadList)) ctx.throw(400, `首页内容设置错误，未知类型：${homeThreadList}`);
+      if(!["home", "latest", "subscribe"].includes(homeThreadList)) ctx.throw(400, `首页内容设置错误，未知类型：${homeThreadList}`);
       q[`displaySettings.homeThreadList`] = homeThreadList;
+      if(homeThreadList !== oldHomeThreadList) {
+        const func = (string) => {
+          return string.slice(0,1).toUpperCase() + string.slice(1);
+        };
+        const operationId = `userSettings${func(oldHomeThreadList)}To${func(homeThreadList)}`;
+        const log = db.UsersBehaviorModel({
+          uid: data.user.uid,
+          ip: ctx.address,
+          port: ctx.port,
+          operationId,
+        });
+        await log.save();
+      }
     }
     if(showEnvelope !== undefined) {
       q[`lotterySettings.close`] = !showEnvelope;

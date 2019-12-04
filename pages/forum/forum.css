@@ -98,17 +98,6 @@ body{
   background-color: #2b90d9;
   border-color: #2b90d9;
 }
-.topped-thread-header{
-  height: 2rem;
-  line-height: 2rem;
-  background-color: #d9e1e8;
-  margin-top: -1rem;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-  text-align: center;
-  color: #666;
-  font-weight: 700;
-}
 .forum-category{
   padding: 0;
   background-color: #d9e1e8;

@@ -36,6 +36,23 @@ router
       const product = goodsObj[productId];
       if(product) data.goods.push(product);
     });
+    let threads = await db.ThreadModel.find({tid: {$in: homeSettings.toppedThreadsId}});
+    threads = await db.ThreadModel.extendThreads(threads, {
+      forum: false,
+      category: false,
+      lastPost: false,
+      lastPostUser: false,
+      firstPost: true,
+      firstPostUser: true,
+      htmlToText: true
+    });
+    const threadsObj = {};
+    threads.map(thread => threadsObj[thread.tid] = thread);
+    data.toppedThreads = [];
+    homeSettings.toppedThreadsId.map(tid => {
+      const thread = threadsObj[tid];
+      if(thread) data.toppedThreads.push(thread);
+    });
     ctx.template = "nkc/home.pug";
     await next();
   })
@@ -51,7 +68,9 @@ router
     const {nkcModules, body, db, data} = ctx;
     const {operation} = body;
     if(operation === "saveAds") {
-      const {movable, fixed} = body;
+      let {movable, fixed, movableOrder, fixedOrder} = body;
+      movableOrder = movableOrder === "random"? "random": "fixed";
+      fixedOrder = fixedOrder === "random"? "random": "fixed";
       movable.concat(fixed).map(ad => {
         nkcModules.checkData.checkString(ad.title, {
           name: "标题",
@@ -64,7 +83,9 @@ router
       await db.SettingModel.updateOne({_id: "home"}, {
         $set: {
           "c.ads.movable": movable,
-          "c.ads.fixed": fixed
+          "c.ads.fixed": fixed,
+          "c.ads.fixedOrder": fixedOrder,
+          "c.ads.movableOrder": movableOrder
         }
       });
     } else if(operation === "saveRecommendForums") {
@@ -98,6 +119,17 @@ router
       await db.SettingModel.updateOne({_id: "home"}, {
         $set: {
           "c.shopGoodsId": goodsId
+        }
+      });
+    } else if(operation === "saveToppedThreads") {
+      const {toppedThreadsId} = body;
+      for(const tid of toppedThreadsId) {
+        const thread = await db.ThreadModel.findOne({tid});
+        if(!thread) ctx.throw(400, `未找到ID为${tid}的文章`);
+      }
+      await db.SettingModel.updateOne({_id: "home"}, {
+        $set: {
+          "c.toppedThreadsId": toppedThreadsId
         }
       });
     }

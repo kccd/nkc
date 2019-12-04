@@ -57,7 +57,7 @@ waterRouter
       const waterPayType = await db.KcbsTypeModel.findOnly({_id: 'waterPay'});
       user.kcb = await db.UserModel.updateUserKcb(user.uid);
       if(waterPayType && user.kcb < parseInt(waterPayType.num*-1)){
-        ctx.throw(400,"您的科创币不足"+parseInt(waterPayType.num*-1))
+        ctx.throw(400,"您的科创币不足"+(parseInt(waterPayType.num*-1)/100));
       }
       // 消耗科创币，并生成记录
       // const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description} = options;

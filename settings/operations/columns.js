@@ -4,7 +4,7 @@ module.exports = {
     GET: 'column_single_get',
     PATCH: "column_single_settings",
     top: {
-      POST: "pushColumnToHom",
+      POST: "pushColumnToHome",
       DELETE: "pushColumnToHome"
     },
     category: {

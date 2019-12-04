@@ -225,7 +225,7 @@ schema.statics.saveUserSubColumnsId = async (uid) => {
 * */
 schema.statics.getUserSubThreadsId = async (uid, detail) => {
   let key = `user:${uid}:subscribeThreadsId`;
-  if(["sub", "reply"].includes(detail)) {
+  if(["sub", "replay"].includes(detail)) {
     key += `:${detail}`;
   }
   let threadsId = await redisClient.smembersAsync(key);
@@ -249,7 +249,7 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
   }, {tid: 1, detail: 1}).sort({toc: -1});
   subs.map(s => {
     total.push(s.tid);
-    if(s.detail === "reply") {
+    if(s.detail === "replay") {
       reply.push(s.tid);
     } else if(s.detail === "sub") {
       sub.push(s.tid);
@@ -261,7 +261,7 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
     if(total.length) {
       await redisClient.saddAsync(key, total);
     }
-    key = `user:${uid}:subscribeThreadsId:reply`;
+    key = `user:${uid}:subscribeThreadsId:replay`;
     await redisClient.delAsync(key);
     if(reply.length) {
       await redisClient.saddAsync(key, reply);
@@ -273,7 +273,7 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
     }
     await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
-  if(detail === "reply") {
+  if(detail === "replay") {
     return reply;
   } else if(detail === "sub") {
     return sub;
@@ -627,6 +627,7 @@ schema.statics.extendSubscribes = async (subscribes) => {
 * @author pengxiguaa 2019-7-25
 * */
 schema.statics.createDefaultType = async (type, uid) => {
+  return;
   const SubscribeTypeModel = mongoose.model("subscribeTypes");
   let sub = await SubscribeTypeModel.findOne({uid, type});
   if(!sub) {
@@ -651,21 +652,16 @@ schema.statics.createDefaultType = async (type, uid) => {
 * */
 schema.statics.insertSubscribe = async (type, uid, tid) => {
   const SubscribeModel = mongoose.model("subscribes");
-  const SubscribeTypeModel = mongoose.model("subscribeTypes");
-  let subType = await SubscribeTypeModel.findOne({uid, type});
-  if(!subType) subType = await SubscribeModel.createDefaultType(type, uid);
-  let sub = await SubscribeModel.findOne({uid, tid, type: "thread"});
+  let sub = await SubscribeModel.findOne({uid, tid, type: "thread", detail: type});
   if(sub) return;
   sub = SubscribeModel({
     _id: await mongoose.model("settings").operateSystemID("subscribes", 1),
     type: "thread",
     detail: type,
     uid,
-    tid,
-    cid: [subType._id]
+    tid
   });
   await sub.save();
-  await SubscribeTypeModel.updateCount([subType._id]);
 };
 
 module.exports = mongoose.model('subscribes', schema);

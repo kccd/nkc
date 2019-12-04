@@ -396,10 +396,17 @@ fundApplicationFormSchema.pre('save', async function(next) {
 });
 
 
-fundApplicationFormSchema.methods.extendApplicant = async function() {
+fundApplicationFormSchema.methods.extendApplicant = async function(options={}) {
+	const {extendSecretInfo = true} = options;
 	const FundApplicationUserModel = require('./FundApplicationUserModel');
 	const applicant= await FundApplicationUserModel.findOne({applicationFormId: this._id, uid: this.uid});
-	if(applicant) await applicant.extendUser();
+	if(applicant) {
+		await applicant.extendUser();
+		if(!extendSecretInfo) {
+			applicant.mobile = null;
+			applicant.idCardNumber = null;
+		}
+	}
 	return this.applicant = applicant;
 };
 

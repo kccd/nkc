@@ -41,24 +41,28 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     .collapse.navbar-collapse#bs-example-navbar-collapse-1
       ul.nav.navbar-nav.navbar-md
         if data.user
-          li(class=navbar_highlight === 'subscribe' ? 'active' : '')
-            a(href='/latest?t=subscribe') 关注
-          li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
-            a(href='/latest') 最新
-          li(class=[(navbar_highlight === 'message' ? 'active' : ''), 'message-nav'])
-            .nav-message-num.message-switch(class=!messageSum ? 'disabled':'')= messageSum
-            a(href=`/message` title='消息') 消息
-        else
-          li(class=navbar_highlight === 'subscribe' ? 'active' : '')
-            a.pointer(onclick="Login.open('login')") 关注
+          li(class=navbar_highlight === 'home' ? 'active' : '')
+            a(href='/?t=home') 主页
           li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
             a(href='/?t=latest') 最新
+          li(class=navbar_highlight === 'subscribe' ? 'active' : '')
+            a(href='/?t=subscribe') 关注
+        else
+          li(class=navbar_highlight === 'home' ? 'active' : '')
+            a(href='/?t=home') 主页
+          li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
+            a(href='/?t=latest') 最新
+          li(class=navbar_highlight === 'subscribe' ? 'active' : '')
+            a.pointer(onclick="Login.open('login')") 关注
 
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if data.user
           - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`科创币 ${data.user.kcb/100}\n`+`${data.user.info.certsName}`;
           li.userInfo
-            a.new-thread(href="/editor")
+            -let editorHref = "/editor";
+            if data.forum
+              -editorHref = `/editor?&type=forum&id=${data.forum.fid}`;
+            a.new-thread(href=editorHref)
               .fa.fa-pencil-square-o &nbsp;
               | 发表文章
           li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
@@ -126,61 +130,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                       .fa.fa-sign-out
                       | 退出登录
             img.nav-user-avatar-sm(src=`/avatar/${data.user.avatar}`)
-            //a.username(
-              href="#"
-              class="dropdown-toggle"
-              data-toggle="dropdown"
-              role="button"
-              aria-haspopup="true"
-              aria-expanded="false"
-              )
-              span(title=title)= user.username || `用户${user.uid}`
-              span.caret
-
-            //- 用户名下拉列表
-            //ul.dropdown-menu
-              li
-                a(href=`/u/${user.uid}`)
-                  span.fa.fa-user-o &nbsp;个人名片
-              if state.userColumn
-                li
-                  a(href=`/m/${state.userColumn._id}`)
-                    span.fa.fa-columns &nbsp;专栏
-              else if data.user && state.columnPermission
-                li
-                  a(href=`/column/apply`)
-                    span.fa.fa-columns &nbsp;开设专栏
-              li
-                a(href=`/message`)
-                  span.fa.fa-envelope-o &nbsp;消息
-              li
-                a(href=`/account/subscribes`)
-                  span.fa.fa-bookmark-o &nbsp;关注管理
-              li
-                a(href=`/u/${data.user.uid}/drafts`)
-                  span.fa.fa-inbox &nbsp;草稿箱
-                  span.messageNumber.draftMessage= data.user.draftCount || ''
-              li
-                a(href=`/account/finance?t=all`)
-                  span.fa.fa-file-text-o &nbsp;账单
-              li.divider
-              li
-                a(href=`/u/${data.user.uid}/settings`)
-                  span.fa.fa-cog &nbsp;设置
-              li.divider
-              li
-                a(href=`/shop/order`)
-                  span.fa.fa-file-text-o &nbsp;我的订单
-              li
-                a(href=`/shop/manage`)
-                  span.fa.fa-archive &nbsp;我出售的
-              li
-                a(href=`/shop/cart`)
-                  span.fa.fa-shopping-cart &nbsp;购物车
-              li.divider
-              li
-                a(onclick="NKC.methods.logout()" title='不，不要走！')
-                  span.fa.fa-sign-out &nbsp;退出
         else
           li.userInfo
             a(onclick="Login.open()" title='还记得密码吗？') 登录
@@ -190,10 +139,6 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         input.inline-block.form-control(type='text' name='c' placeholder='关键词 文号 用户')
         button.btn.btn-default(type='submit')
           .fa.fa-search
-      //-form.navbar-form.navbar-left(action='/search' method='GET')
-        .form-group
-          input.form-control(type='text' name='c' placeholder='关键词 文号 用户')
-        button.btn.btn-default(type='submit') 搜索
 
 //- 侧滑抽屉
 .nkc-drawer-left
@@ -203,21 +148,20 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       include ../post_button
 
     .navbar-link
-      if data.user
-        .col-xs-6
-          a(href='/?t=subscribe') 关注
-      else
-        .col-xs-6
-          a(onclick="Login.open()") 关注
-      //.col-xs-4
-        a(href='/?t=recommend') 推荐
-      .col-xs-6
+      .col-xs-4
+        a(href='/?t=home') 主页
+      .col-xs-4
         a(href='/?t=latest') 最新
+      .col-xs-4
+        if data.user
+          a(href='/?t=subscribe') 关注
+        else
+          a(onclick="Login.open()") 关注
     .m-a-1#navbar_custom_dom
 
     .m-a-1
       include ../management/management
-      include ../subscribeTypes/subscribeTypesPanel
+      //-include ../subscribeTypes/subscribeTypesPanel
       include ../apps/apps
       include ../forums_nav/forums_tree
 .nkc-drawer-right

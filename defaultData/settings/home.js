@@ -3,9 +3,14 @@ module.exports = {
   c: {
     ads: {
       movable: [],
-      fixed: []
+      fixed: [],
+      fixedOrder: "random",
+      movableOrder: "random"
     },
+    toppedThreadsId: [],
     recommendForumsId: [],
+    shopGoodsId: [],
+    columnsId: [],
     logos: [],
     logo: "",
     smallLogo: "",

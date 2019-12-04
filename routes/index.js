@@ -38,7 +38,6 @@ const threadsRouter = routers.threads;
 const surveyRouter = routers.survey;
 const editorRouter = routers.editor;
 const nkcRouter = routers.nkc;
-const latestRouter = require("./latest");
 
 // 访问文库相关
 const libraryRouter = routers.library;
@@ -47,7 +46,6 @@ const userBannerRouter = routers.userBanner;
 const newResourceRouter = routers.newResource;
 const librariesRouter = routers.libraries;
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
-router.use("/latest", latestRouter.routes(), latestRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
 router.use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 router.use("/libraries", librariesRouter.routes(), librariesRouter.allowedMethods());

@@ -11,7 +11,7 @@ router
   .patch('/', async (ctx, next) => {
     const {db, body} = ctx;
     const {topic, discipline, visitorThreadList, hotThreads, recommend} = body;
-    if(!["recommend", "latest"].includes(visitorThreadList)) ctx.throw(400, `参数visitorThreadList错误：${visitorThreadList}`);
+    if(!["home", "latest"].includes(visitorThreadList)) ctx.throw(400, `参数visitorThreadList错误：${visitorThreadList}`);
     const {postCount, postUserCount} = hotThreads;
     if(postCount < 0) ctx.throw(400, "热门文章最小回复数不能小于0");
     if(postUserCount < 0) ctx.throw(400, "热门文章最小回复用户总数不能小于0");

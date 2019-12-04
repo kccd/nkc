@@ -8,12 +8,14 @@
   background-repeat:no-repeat;
   background-size: cover;
 }
-.swiper-title{
+/*.swiper-title{
   left: 0;
   position: absolute;
   top: 0;
-  min-height: 4rem;
-  padding: 0 1rem;
+  height: 2rem;
+  line-height: 2rem;
+  overflow: hidden;
+  padding: 0 0.5rem;
   text-decoration: none;
   color: #fff;
   width: 100%;
@@ -22,7 +24,7 @@
   background-color: rgba(0,0,0,0.3);
   background: -prefix-linear-zgradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 20%);
   background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 40%);
-}
+}*/
 .swiper-home:hover .swiper-button{
   background-color: rgba(0,0,0,0.2);
   color: rgba(255,255,255,0.8);

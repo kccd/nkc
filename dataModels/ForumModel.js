@@ -1290,14 +1290,15 @@ forumSchema.statics.getRecommendForums = async (fid) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const {recommendForumsId} = homeSettings;
   const forums = await mongoose.model("forums").find({fid: {$in: recommendForumsId}});
-  const forumsObj = {};
-  forums.map(forum => forumsObj[forum.fid] = forum);
-  const results = [];
-  for(const fid of recommendForumsId) {
-    const forum = forumsObj[fid];
-    if(forum) results.push(forum);
-  }
-  return results;
+  const forumsIndex = require("../nkcModules/apiFunction").getRandomNumber({
+    count: forums.length,
+    min: 0,
+    max: forums.length - 1>0?forums.length - 1:0,
+    repeat: false
+  });
+  return forumsIndex.map(index => {
+    return forums[index];
+  });
   
 };
 

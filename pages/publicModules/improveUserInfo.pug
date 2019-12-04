@@ -2,7 +2,7 @@ if data.user
   -let reg = /^kc-/;
   -const unsetUsername = reg.test(data.user.username) || !data.user.username;
   if unsetUsername || !data.user.setPassword || !data.user.boundEmail || !data.user.boundMobile || !data.user.avatar || !data.user.banner || !data.user.description
-    .improve
+    .improve.m-t-1
       p 由于你还未完善以下资料，可能无法使用网站的全部功能。
       if unsetUsername
         .improve-info
