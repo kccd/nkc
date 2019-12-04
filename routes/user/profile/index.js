@@ -156,7 +156,7 @@ router
     const {data, db} = ctx;
     const {targetUser} = data;
     // 看过的文章
-    const logs = await db.UsersBehaviorModel.find({uid: targetUser.uid, operationId: "visitThread"}).sort({timeStamp: -1}).limit(25);
+    const logs = await db.UsersBehaviorModel.find({uid: targetUser.uid, operationId: "visitThread"}, {tid: 1, timeStamp: 1}).sort({timeStamp: -1}).limit(25);
     const threadsId = logs.map(l => l.tid);
     let threads = await db.ThreadModel.find({tid: {$in: threadsId}});
     threads = await db.ThreadModel.extendThreads(threads, {
@@ -187,9 +187,9 @@ router
       }
     }
     // 看过的用户
-    const visitUserlogs = await db.UsersBehaviorModel.find({uid: targetUser.uid, operationId: "visitUserCard", toUid: {$ne: targetUser.uid}}).sort({timeStamp: -1}).limit(25);
+    const visitUserlogs = await db.UsersBehaviorModel.find({uid: targetUser.uid, operationId: "visitUserCard", toUid: {$ne: targetUser.uid}}, {uid: 1, tUid: 1}).sort({timeStamp: -1}).limit(25);
     // 看过我的用户
-    const visitSelfLogs = await db.UsersBehaviorModel.find({uid: {$nin: ["", targetUser.uid]}, operationId: "visitUserCard", toUid: targetUser.uid}).sort({timeStamp: -1}).limit(25);
+    const visitSelfLogs = await db.UsersBehaviorModel.find({uid: {$nin: ["", targetUser.uid]}, operationId: "visitUserCard", toUid: targetUser.uid}, {uid: 1, tUid: 1}).sort({timeStamp: -1}).limit(25);
     let usersId = visitUserlogs.map(u => u.toUid);
     usersId = usersId.concat(visitSelfLogs.map(u => u.uid));
     const users = await db.UserModel.find({uid: {$in: usersId}});

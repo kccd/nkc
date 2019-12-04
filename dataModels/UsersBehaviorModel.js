@@ -21,6 +21,7 @@ const usersBehaviorSchema = new Schema({
 	},
   toUid: {
     type: String,
+    default: "",
     // required: true,
     index: 1
   },
