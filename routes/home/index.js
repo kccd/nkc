@@ -151,8 +151,6 @@ router
       } else {
         q.reviewed = true;
       }
-      // 首页置顶
-      data.toppedThreads = await db.ThreadModel.getHomeToppedThreads(fidOfCanGetThreads);
     } else if(threadListType === "subscribe") {
       /*data.subscribeTypes = await db.SubscribeTypeModel.getTypesList(user.uid);
       data.subscribeCounts = {
