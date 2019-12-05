@@ -51,6 +51,8 @@ module.exports = async (options) => {
   data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
   // 最新文章
   data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
+  // 含有最新回复的文章
+  data.latestPostThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads, "tlm");
   // 专业导航
   data.forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
   // 公告通知

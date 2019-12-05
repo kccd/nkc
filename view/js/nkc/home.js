@@ -104,11 +104,12 @@ const app = new Vue({
         .catch(sweetError);
     },
     remove(ads, index){
-      sweetQuestion("确定要执行删除操作？")
+      ads.splice(index, 1)
+      /*sweetQuestion("确定要执行删除操作？")
         .then(() => {
           ads.splice(index, 1)
         })
-        .catch(() => {})
+        .catch(() => {})*/
       
     },
     addForum() {
@@ -139,12 +140,13 @@ const app = new Vue({
       arr.splice(newIndex, 1, f);
     },
     removeForum(arr, index) {
-      const self = this;
+      arr.splice(index, 1);
+      /*const self = this;
       sweetQuestion("确定要执行删除操作？")
         .then(() => {
           arr.splice(index, 1);
         })
-        .catch(() => {})
+        .catch(() => {})*/
     },
     saveRecommendForums() {
       const forumsId = this.recommendForums.map(forum => forum.fid);

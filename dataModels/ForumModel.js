@@ -1286,10 +1286,10 @@ forumSchema.methods.createLibrary = async function(uid) {
 * @return {[Object]} 专业对象组成的数组
 * @author pengxiguaa 2019-11-29
 * */
-forumSchema.statics.getRecommendForums = async (fid) => {
+forumSchema.statics.getRecommendForums = async (fid = []) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const {recommendForumsId} = homeSettings;
-  const forums = await mongoose.model("forums").find({fid: {$in: recommendForumsId}});
+  const forums = await mongoose.model("forums").find({fid: {$in: recommendForumsId.filter(f => fid.includes(f))}});
   const forumsIndex = require("../nkcModules/apiFunction").getRandomNumber({
     count: forums.length,
     min: 0,

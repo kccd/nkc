@@ -1191,9 +1191,10 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
 /*
 * 获取全站最新文章
 * @param {[String]} fid 能够从中读取文章的专业ID
+* @param {[String]} sort 排序，toc: 文章的发表时间，tlm: 文章最后被回复的时间
 * @author pengxiguaa 2019-4-26
 * */
-threadSchema.statics.getLatestThreads = async (fid) => {
+threadSchema.statics.getLatestThreads = async (fid, sort = "toc") => {
   const ThreadModel = mongoose.model("threads");
   const PostModel = mongoose.model("posts");
   const posts = await PostModel.find({
@@ -1204,18 +1205,20 @@ threadSchema.statics.getLatestThreads = async (fid) => {
     type: "thread",
     originState: {$nin: ["0", ""]}
   }).sort({toc: -1}).limit(9);
+  const sortObj = {};
+  sortObj[sort] = -1;
   const threads = await ThreadModel.find({
     tid: {$in: posts.map(p => p.tid)},
     mainForumsId: {$in: fid}, disabled: false, reviewed: true
-  }).sort({toc: -1});
+  }).sort(sortObj);
   return await ThreadModel.extendThreads(threads, {
-    lastPost: false,
-    category: false,
+    lastPost: true,
+    lastPostUser: true,
+    category: true,
     forum: true,
     firstPost: true,
     firstPostUser: true,
     userInfo: false,
-    lastPostUser: false,
     firstPostResource: false,
     htmlToText: true
   });

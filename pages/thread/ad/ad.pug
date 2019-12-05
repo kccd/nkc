@@ -97,15 +97,26 @@ block content
               .m-b-05
                 button.btn.btn-sm.btn-default(@click="selectFile") 选择本地图片
               .thread-resource(v-if="firstPostCover")
+                h5 文章封面
                 .image-body
                   img(:src="getUrl('postCover', firstPostCover)")
                 .text-center.m-t-05
                   button.btn.btn-default.btn-xs(@click="selectFile('cover', firstPostCover)") 选择
-              .thread-resource(v-for="rid in resourcesId")
-                .image-body
-                  img(:src="'/r/' + rid")
-                .text-center.m-t-05
-                  button.btn.btn-default.btn-xs(@click="selectFile('online', rid)") 选择
+              div(v-if="resourcesId.length")
+                h5 文章中的图片
+                .thread-resource(v-for="rid in resourcesId")
+                  .image-body
+                    img(:src="'/r/' + rid")
+                  .text-center.m-t-05
+                    button.btn.btn-default.btn-xs(@click="selectFile('online', rid)") 选择
+              div(v-if="postsResourcesId.length")
+                h5 所有回复中的图片
+                .thread-resource(v-for="rid in postsResourcesId")
+                  .image-body
+                    img(:src="'/r/' + rid")
+                  .text-center.m-t-05
+                    button.btn.btn-default.btn-xs(@click="selectFile('online', rid)") 选择
+
 
 block scripts
   include ../../publicModules/crop/crop_new
