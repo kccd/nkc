@@ -292,18 +292,9 @@ body {
   width: 12rem;
   height: 8rem;
   margin-right: 1rem;
-  position: relative;
   overflow: hidden;
   border-radius: 3px;
-}
-.account-thread .account-thread-avatar > div img {
-  position: absolute;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
+  background-size: cover;
 }
 .account-thread .account-thread-content {
   display: table-cell;

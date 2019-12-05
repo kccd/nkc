@@ -698,6 +698,20 @@ footer.footer{
   }
 }
 .home-threads{
+  .home-threads-more-link{
+    height: 2.5rem;
+    line-height: 2.5rem;
+    text-align: center;
+    background-color: #f4f4f4;
+    display: block;
+    color: #aaa;
+    transition: color 100ms;
+    &:hover, &:focus{
+      text-decoration: none;
+      color: #555;
+    }
+  }
+
   .home-thread:last-child{
     margin-bottom: 0;
   }
@@ -766,6 +780,50 @@ footer.footer{
           text-decoration: none;
           color: @accent;
         }
+      }
+    }
+  }
+}
+.home-posts{
+  .home-post{
+    margin-bottom: 1rem;
+    &>span{
+      margin: 0 0.2rem;
+    }
+    .home-post-time{
+      display: inline-block;
+      color:#555;
+      margin-right: 0.2rem;
+    }
+    .home-post-user{
+      color: @primary;
+      img{
+        height: 2rem;
+        width: 2rem;
+        border-radius: 50%;
+        box-sizing: border-box;
+        border: 2px solid #eee;
+        margin-top: -1px;
+      }
+      span{
+        font-size: 1.2rem;
+      }
+    }
+    .home-post-content {
+      display: block;
+      margin-top: 0.3rem;
+      background-color: #f4f4f4;
+      padding: 0.5rem;
+      color: #777;
+      cursor: pointer;
+      border-radius: 2px;
+      &:hover, &:focus{
+        text-decoration: none;
+      }
+      div{
+        max-height: 3.2rem;
+        font-size: 1.15rem;
+        .hideText(@line: 2);
       }
     }
   }

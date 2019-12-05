@@ -84,7 +84,7 @@ block content
                     a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
 
                 include ../publicModules/paging/paging
-              if data.t === "latest" && data.paging && data.paging.page === 0 && data.toppedThreads && data.toppedThreads.length
+              //-if data.t === "latest" && data.paging && data.paging.page === 0 && data.toppedThreads && data.toppedThreads.length
                 .m-b-1
                   for thread in data.toppedThreads
                     include ../publicModules/thread_panel/thread_panel

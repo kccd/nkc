@@ -9,10 +9,14 @@ homeTopRouter
     if(adsId.includes(tid)) ctx.throw(400, "文章已经被推送到首页了");
     const thread = await db.ThreadModel.findOnly({tid});
     const firstPost = await db.PostModel.findOnly({pid: thread.oc});
-    const resources = await db.ResourceModel.find({references: firstPost.pid, mediaType: "mediaPicture"});
+    const posts = await db.PostModel.find({tid, pid: {$ne: thread.oc}}, {pid: 1});
+    const postsId = posts.map(post => post.pid);
+    const resources = await db.ResourceModel.find({references: firstPost.pid, mediaType: "mediaPicture"}, {rid: 1});
+    const postsResources = await db.ResourceModel.find({references: {$in: postsId}, mediaType: "mediaPicture"}, {rid: 1});
     data.thread = {
       title: firstPost.t,
       resourcesId: resources.map(r => r.rid),
+      postsResourcesId: postsResources.map(r => r.rid),
       firstPostCover: firstPost.cover,
       tid: thread.tid
     };

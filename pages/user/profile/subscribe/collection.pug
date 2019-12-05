@@ -22,8 +22,7 @@ div
           .account-reason 审核中，仅自己可见，通过后对所有人可见。
         .account-thread-avatar
           if thread.firstPost.cover
-            div
-              img(src=tools.getUrl("postCover", thread.firstPost.cover))
+            div(style=`background-image: url(${tools.getUrl("postCover", thread.firstPost.cover)})`)
         .account-thread-content(style=!thread.firstPost.cover?"display: block":"")
           .account-thread-title(class=thread.digest?"digest":"")
             .account-follower-buttons(data-collection=subscribe.tid class=data.collectionThreadsId.includes(subscribe.tid) ? "active" : "")
