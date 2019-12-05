@@ -44,7 +44,7 @@ shopRouter
     if(query.t === 'old') {
       ctx.template = 'shop/index.pug';
     } else {
-      ctx.template = "shop/shop.pug";
+      ctx.template = "shop/home.pug";
     }
     await next();
   })

@@ -1,3 +1,41 @@
+@import "../base";
 body{
   background-color: #f6f6f6;
+}
+
+.shop-navs{
+  @navHeight: 3rem;
+  .shop-nav{
+    display: block;
+    position: relative;
+    height: @navHeight;
+    line-height: @navHeight;
+    padding: 0 @navHeight 0 0;
+    color: #555;
+    font-size: 1.25rem;
+    &:hover, &:focus, &.active{
+      text-decoration: none;
+      color: @primary;
+    }
+    .fa{
+      height: @navHeight;
+      width: @navHeight;
+      line-height: @navHeight;
+      text-align: center;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+}
+.order-navs{
+  .order-nav{
+    display: inline-block;
+    font-weight: 700;
+    color: #777;
+    font-size: 1.2rem;
+    height: 3rem;
+    line-height: 3rem;
+    padding: 0 1rem;
+  }
 }
