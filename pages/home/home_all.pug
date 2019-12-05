@@ -136,6 +136,15 @@ block content
             .home-threads.p-t-05
               for thread in data.toppedThreads
                 include ../publicModules/thread_panel/thread_panel
+        if data.latestThreads.length
+          .home-forums-list.m-b-1
+            .home-header
+              //-.fa.fa-tags
+              .header-name 最新文章
+            .home-threads.p-t-05
+              for thread in data.latestThreads
+                include ../publicModules/thread_panel/thread_panel
+              a.home-threads-more-link(href=`/?t=latest`) 查看更多
         .home-forums-list.m-b-1
           .home-header
             //-.fa.fa-tags
@@ -212,15 +221,6 @@ block content
                 .home-user-avatar
                   img(src=tools.getUrl("userAvatar", u.avatar))
                 .home-user-name=u.username
-        if data.latestThreads.length
-          .home-forums-list.m-b-1
-            .home-header
-              //-.fa.fa-tags
-              .header-name 最新文章
-            .home-threads.p-t-05
-              for thread in data.latestThreads
-                include ../publicModules/thread_panel/thread_panel
-              a.home-threads-more-link(href=`/?t=latest`) 查看更多
 
       .col-xs-12.col-md-4.box-shadow-panel.p-l-0
         .m-b-1
@@ -303,28 +303,31 @@ block content
                     span=form.applicant.user.username
 
             a.home-fund-donation(href=`/fund/donation`) 赞助科创基金
+        //- 最新回复
+        .home-forums-other.m-b-1
+          .home-header
+            .header-name 最新回复
+          .home-posts
+            for post in data.latestPosts
+              .home-post
+                .home-post-time=fromNow(post.toc)
+                a.home-post-user(href=`/u/${post.uid}`)
+                  img(src=tools.getUrl("userAvatar", post.user.avatar) onmouseover=tools.floatUserInfo(post.uid))
+                  span=post.user.username
+                span 回复
+                a.home-post-user(href=`/u/${post.thread.lastPost.uid}`)
+                  img(src=tools.getUrl("userAvatar", post.thread.lastPost.user.avatar) onmouseover=tools.floatUserInfo(post.thread.uid))
+                  span=post.thread.lastPost.user.username
+                span ：
+                a.home-post-content(href=post.url)
+                  div=post.c
+
+        //- 推荐阅读
         .home-forums-other.m-b-1
           .home-header
             .header-name 推荐阅读
           .home-threads
             for thread in data.featuredThreads
-              .home-thread
-                a(href=`/t/${thread.tid}`).home-thread-title=thread.firstPost.t
-                if thread.firstPost.cover
-                  .home-thread-cover
-                    img(src=tools.getUrl("postCover", thread.firstPost.cover))
-                .home-thread-content
-                  .home-thread-abstract=thread.firstPost.abstractCn || thread.firstPost.c
-                  .home-thread-info
-                    a(href=`/u/${thread.firstPost.uid}`).home-thread-user
-                      img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(thread.firstPost.uid))
-                      span=thread.firstPost.user.username
-                    a(href=`/f/${thread.forums[0].fid}`).home-thread-forum=thread.forums[0].displayName
-        .home-forums-other.m-b-1
-          .home-header
-            .header-name 最新回复
-          .home-threads
-            for thread in data.latestPostThreads
               .home-thread
                 a(href=`/t/${thread.tid}`).home-thread-title=thread.firstPost.t
                 if thread.firstPost.cover

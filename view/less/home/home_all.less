@@ -784,6 +784,50 @@ footer.footer{
     }
   }
 }
+.home-posts{
+  .home-post{
+    margin-bottom: 1rem;
+    &>span{
+      margin: 0 0.2rem;
+    }
+    .home-post-time{
+      display: inline-block;
+      color:#555;
+      margin-right: 0.2rem;
+    }
+    .home-post-user{
+      color: @primary;
+      img{
+        height: 2rem;
+        width: 2rem;
+        border-radius: 50%;
+        box-sizing: border-box;
+        border: 2px solid #eee;
+        margin-top: -1px;
+      }
+      span{
+        font-size: 1.2rem;
+      }
+    }
+    .home-post-content {
+      display: block;
+      margin-top: 0.3rem;
+      background-color: #f4f4f4;
+      padding: 0.5rem;
+      color: #777;
+      cursor: pointer;
+      border-radius: 2px;
+      &:hover, &:focus{
+        text-decoration: none;
+      }
+      div{
+        max-height: 3.2rem;
+        font-size: 1.15rem;
+        .hideText(@line: 2);
+      }
+    }
+  }
+}
 
 @media (max-width: 500px) {
   .home-goods .home-goods-content .home-goods-avatar > div{

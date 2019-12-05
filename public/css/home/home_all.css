@@ -792,6 +792,53 @@ footer.footer {
   text-decoration: none;
   color: #e85a71;
 }
+.home-posts .home-post {
+  margin-bottom: 1rem;
+}
+.home-posts .home-post > span {
+  margin: 0 0.2rem;
+}
+.home-posts .home-post .home-post-time {
+  display: inline-block;
+  color: #555;
+  margin-right: 0.2rem;
+}
+.home-posts .home-post .home-post-user {
+  color: #2b90d9;
+}
+.home-posts .home-post .home-post-user img {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid #eee;
+  margin-top: -1px;
+}
+.home-posts .home-post .home-post-user span {
+  font-size: 1.2rem;
+}
+.home-posts .home-post .home-post-content {
+  display: block;
+  margin-top: 0.3rem;
+  background-color: #f4f4f4;
+  padding: 0.5rem;
+  color: #777;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.home-posts .home-post .home-post-content:hover,
+.home-posts .home-post .home-post-content:focus {
+  text-decoration: none;
+}
+.home-posts .home-post .home-post-content div {
+  max-height: 3.2rem;
+  font-size: 1.15rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
 @media (max-width: 500px) {
   .home-goods .home-goods-content .home-goods-avatar > div {
     width: 10rem;
