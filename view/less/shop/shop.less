@@ -9,10 +9,11 @@ body{
     display: block;
     position: relative;
     height: @navHeight;
+    font-weight: 700;
     line-height: @navHeight;
     padding: 0 @navHeight 0 0;
     color: #555;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     &:hover, &:focus, &.active{
       text-decoration: none;
       color: @primary;
@@ -34,8 +35,36 @@ body{
     font-weight: 700;
     color: #777;
     font-size: 1.2rem;
-    height: 3rem;
-    line-height: 3rem;
+    height: 2.8rem;
+    line-height: 2.8rem;
     padding: 0 1rem;
+    margin-right: 0.5rem;
+    &:hover, &:focus{
+      text-decoration: none;
+      color: @primary;
+    }
+    &.active{
+      background-color: @primary;
+      color: #fff;
+      border-radius: 2px;
+    }
+  }
+}
+.order-infos{
+  height: 3rem;
+  background-color: #eee;
+}
+.order-info{
+  display: inline-block;
+  margin-right: 0.5rem;
+  .name{
+    display: inline-block;
+    font-size: 1.2rem;
+    color: #555;
+  }
+  .value{
+    display: inline-block;
+    font-weight: 700;
+    color: #555;
   }
 }

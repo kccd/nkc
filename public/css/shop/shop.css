@@ -16,10 +16,11 @@ body {
   display: block;
   position: relative;
   height: 3rem;
+  font-weight: 700;
   line-height: 3rem;
   padding: 0 3rem 0 0;
   color: #555;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 .shop-navs .shop-nav:hover,
 .shop-navs .shop-nav:focus,
@@ -41,7 +42,36 @@ body {
   font-weight: 700;
   color: #777;
   font-size: 1.2rem;
-  height: 3rem;
-  line-height: 3rem;
+  height: 2.8rem;
+  line-height: 2.8rem;
   padding: 0 1rem;
+  margin-right: 0.5rem;
+}
+.order-navs .order-nav:hover,
+.order-navs .order-nav:focus {
+  text-decoration: none;
+  color: #2b90d9;
+}
+.order-navs .order-nav.active {
+  background-color: #2b90d9;
+  color: #fff;
+  border-radius: 2px;
+}
+.order-infos {
+  height: 3rem;
+  background-color: #eee;
+}
+.order-info {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+.order-info .name {
+  display: inline-block;
+  font-size: 1.2rem;
+  color: #555;
+}
+.order-info .value {
+  display: inline-block;
+  font-weight: 700;
+  color: #555;
 }

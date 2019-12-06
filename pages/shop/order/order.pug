@@ -4,12 +4,49 @@ block shopTitle
 block shopContent
   div
     .order-navs
-      a(href=`/shop/order`).order-nav 全部
+      a(href=`/shop/order`).order-nav.active 全部
       a(href=`/shop/order`).order-nav 待付款
       a(href=`/shop/order`).order-nav 代发货
       a(href=`/shop/order`).order-nav 待收货
       a(href=`/shop/order`).order-nav 已完成
       a(href=`/shop/order`).order-nav 已关闭
       a(href=`/shop/order`).order-nav 正在退款
+  div
+    .table-responsive
+      table.table
+        thead
+          tr
+            th 商品名称
+            th 规格
+            th 商品单价
+            th 数量
+            th 实际付款
+            th 交易状态
+            th 交易操作
+        tbody
+          for order in data.orders
+            tr
+              td(colspan="11").order-infos
+                .order-info
+                  .value.time=format("YYYY/MM/DD HH:mm:ss", order.orderToc)
+                .order-info
+                  .name 订单号：
+                  .value=order.orderId
 
+                .order-info
+                  .name 卖家：
+                  a.value(href=`/u/${order.sellUid}` onmouseover=tools.floatUserInfo(order.sellUid))=order.sellUser.username
+            for param,key in order.params
+              tr
+                td
+                  div.order-name
+                    img(src=`/r/${param.product.imgMaster}` style="width:60px;height:60px")
+                    a(href=`/shop/product/${param.product.productId}` target="_blank")=param.product.name
+                td
+                  div.order-param=param.productParam.name
+                td
+                  div.order-price=`￥${numToFloatTwo(param.singlePrice)}`
+                td
+                  div.order-count=param.count
 block shopScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel
