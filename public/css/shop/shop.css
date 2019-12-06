@@ -12,7 +12,10 @@
 body {
   background-color: #f6f6f6;
 }
-.shop-navs .shop-nav {
+.shop-navs .shop-nav-body .shop-nav-body {
+  padding-left: 1rem;
+}
+.shop-navs .shop-nav-body .shop-nav {
   display: block;
   position: relative;
   height: 3rem;
@@ -22,13 +25,13 @@ body {
   color: #555;
   font-size: 1.2rem;
 }
-.shop-navs .shop-nav:hover,
-.shop-navs .shop-nav:focus,
-.shop-navs .shop-nav.active {
+.shop-navs .shop-nav-body .shop-nav:hover,
+.shop-navs .shop-nav-body .shop-nav:focus,
+.shop-navs .shop-nav-body .shop-nav.active {
   text-decoration: none;
   color: #2b90d9;
 }
-.shop-navs .shop-nav .fa {
+.shop-navs .shop-nav-body .shop-nav .fa {
   height: 3rem;
   width: 3rem;
   line-height: 3rem;
@@ -42,8 +45,8 @@ body {
   font-weight: 700;
   color: #777;
   font-size: 1.2rem;
-  height: 2.8rem;
-  line-height: 2.8rem;
+  height: 2.6rem;
+  line-height: 2.6rem;
   padding: 0 1rem;
   margin-right: 0.5rem;
 }
@@ -74,4 +77,193 @@ body {
   display: inline-block;
   font-weight: 700;
   color: #555;
+}
+.order-info .value .fa {
+  margin-left: 0.5rem;
+  font-size: 1.5rem;
+  color: #888;
+}
+.order-info .value .fa.active {
+  color: #49dd4f;
+}
+.order-price {
+  text-align: center;
+}
+.order-price .number {
+  color: #e85a71;
+  font-style: oblique;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+.order-price .number.sm {
+  font-weight: normal;
+  font-size: 1.2rem;
+}
+.order-count {
+  text-align: center;
+}
+.order-price-total {
+  text-align: center;
+}
+.order-status {
+  font-weight: 700;
+  text-align: center;
+  color: #282c37;
+}
+.order-name-info {
+  width: 33rem;
+  display: block;
+}
+.order-name-info .order-cover {
+  height: 7rem;
+  width: 7rem;
+  line-height: 7rem;
+  text-align: center;
+  border: 1px solid #eee;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+.order-name-info .order-cover img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.order-name-info .order-name {
+  vertical-align: top;
+  display: inline-block;
+  width: 25rem;
+  padding-top: 0.5rem;
+}
+.order-name-info .order-name a {
+  max-height: 3.8rem;
+  margin-bottom: 1rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  vertical-align: top;
+  font-size: 1.25rem;
+  color: #777;
+}
+.order-name-info .order-name a:hover,
+.order-name-info .order-name afont {
+  color: #e85a71;
+}
+.order-name-info .order-param {
+  height: 1.8rem;
+  color: #444;
+  font-size: 1.1rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.order-button {
+  border: 1px solid #aaa;
+  background-color: #f4f4f4;
+  border-radius: 2px;
+}
+.order-button:hover {
+  background-color: #ddd;
+}
+.order-button:focus {
+  outline: none;
+}
+.order-message {
+  background-color: #fff8dc;
+  text-align: left;
+}
+.order-message .name {
+  display: inline-block;
+  color: #555;
+}
+.order-message span {
+  color: #e85a71;
+  font-size: 1.1rem;
+}
+.order-links {
+  text-align: center;
+}
+.order-links a {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+  color: #666;
+}
+.order-links a:hover,
+.order-links a:focus {
+  text-decoration: none;
+}
+.order-links a:hover[href],
+.order-links a:focus[href] {
+  color: #e85a71;
+}
+.order-links button {
+  border: 1px solid #2b90d9;
+  background-color: #2b90d9;
+  color: #fff;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 2px;
+  transition: background-color 100ms;
+}
+.order-links button:hover {
+  background-color: #2476b2;
+}
+.order-links button:focus {
+  outline: none;
+}
+.null {
+  height: 15rem;
+  line-height: 15rem;
+  text-align: center;
+}
+.shop-header {
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1.25rem;
+  border-left: 3px solid #e85a71;
+  padding-left: 1rem;
+  background-color: #fff4f3;
+  font-weight: 700;
+  color: #777;
+}
+.shop-btn {
+  height: 2.6rem;
+  padding: 0 1rem;
+  border-radius: 2px;
+  transition: background-color 100ms;
+}
+.shop-btn:focus {
+  outline: none;
+}
+.shop-btn.primary {
+  border: 1px solid #2b90d9;
+  background-color: #2b90d9;
+  color: #fff;
+}
+.shop-btn.primary:hover {
+  background-color: #257cbb;
+}
+.shop-add-template {
+  text-align: center;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+.shop-remove-template {
+  color: #e85a71;
+  font-size: 1.45rem;
+  cursor: pointer;
+}
+.shop-warning {
+  font-size: 1.25rem;
+  height: 2.6rem;
+  line-height: 2.6rem;
+  color: #e85a71;
+}
+.shop-warning .fa {
+  font-size: 1.6rem;
+  margin-right: 0.5rem;
+  vertical-align: text-top;
 }

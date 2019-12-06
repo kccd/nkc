@@ -5,29 +5,35 @@ body{
 
 .shop-navs{
   @navHeight: 3rem;
-  .shop-nav{
-    display: block;
-    position: relative;
-    height: @navHeight;
-    font-weight: 700;
-    line-height: @navHeight;
-    padding: 0 @navHeight 0 0;
-    color: #555;
-    font-size: 1.2rem;
-    &:hover, &:focus, &.active{
-      text-decoration: none;
-      color: @primary;
+  .shop-nav-body{
+    .shop-nav-body{
+      padding-left: 1rem;
     }
-    .fa{
+    .shop-nav{
+      display: block;
+      position: relative;
       height: @navHeight;
-      width: @navHeight;
+      font-weight: 700;
       line-height: @navHeight;
-      text-align: center;
-      position: absolute;
-      top: 0;
-      right: 0;
+      padding: 0 @navHeight 0 0;
+      color: #555;
+      font-size: 1.2rem;
+      &:hover, &:focus, &.active{
+        text-decoration: none;
+        color: @primary;
+      }
+      .fa{
+        height: @navHeight;
+        width: @navHeight;
+        line-height: @navHeight;
+        text-align: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
     }
   }
+
 }
 .order-navs{
   .order-nav{
@@ -35,8 +41,8 @@ body{
     font-weight: 700;
     color: #777;
     font-size: 1.2rem;
-    height: 2.8rem;
-    line-height: 2.8rem;
+    height: 2.6rem;
+    line-height: 2.6rem;
     padding: 0 1rem;
     margin-right: 0.5rem;
     &:hover, &:focus{
@@ -66,5 +72,184 @@ body{
     display: inline-block;
     font-weight: 700;
     color: #555;
+    .fa{
+      margin-left: 0.5rem;
+      font-size: 1.5rem;
+      color: #888;
+      &.active{
+        color: #49dd4f;
+      }
+    }
+  }
+}
+.order-price{
+  text-align: center;
+  .number{
+    color: @accent;
+    font-style: oblique;
+    font-weight: 700;
+    font-size: 1.3rem;
+    &.sm{
+      font-weight: normal;
+      font-size: 1.2rem;
+    }
+  }
+}
+.order-count{
+  text-align: center;
+}
+.order-price-total{
+  text-align: center;
+}
+.order-status{
+  font-weight: 700;
+  text-align: center;
+  color: @dark;
+}
+.order-name-info{
+  width: 33rem;
+  display: block;
+  .order-cover{
+    height: 7rem;
+    width: 7rem;
+    line-height: 7rem;
+    text-align: center;
+    border: 1px solid #eee;
+    display: inline-block;
+    margin-right: 0.5rem;
+    img{
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+  .order-name{
+    vertical-align: top;
+    display: inline-block;
+    width: 25rem;
+    padding-top: 0.5rem;
+    a{
+      max-height: 3.8rem;
+      margin-bottom: 1rem;
+      .hideText(@line: 2);
+      vertical-align: top;
+      font-size: 1.25rem;
+      color: #777;
+      &:hover, &font{
+        color: @accent;
+      }
+    }
+  }
+  .order-param{
+    height: 1.8rem;
+    color: #444;
+    font-size: 1.1rem;
+    .hideText(@line: 1);
+  }
+}
+.order-button{
+  border: 1px solid #aaa;
+  background-color: #f4f4f4;
+  border-radius: 2px;
+  &:hover{
+    background-color: #ddd;
+  }
+  &:focus{
+    outline: none;
+  }
+}
+.order-message{
+  background-color: #fff8dc;
+  text-align: left;
+  .name{
+    display: inline-block;
+    color: #555;
+  }
+  span{
+    color: @accent;
+    font-size: 1.1rem;
+  }
+}
+.order-links{
+  text-align: center;
+  a{
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+    color: #666;
+    &:hover, &:focus{
+      text-decoration: none;
+      &[href]{
+        color: @accent;
+      }
+    }
+  }
+  button{
+    border: 1px solid @primary;
+    background-color: @primary;
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 2px;
+    transition: background-color 100ms;
+    &:hover{
+      background-color: #2476b2;
+    }
+    &:focus{
+      outline: none;
+    }
+  }
+}
+.null{
+  height: 15rem;
+  line-height: 15rem;
+  text-align: center;
+}
+.shop-header{
+  height: 3rem;
+  line-height: 3rem;
+  font-size: 1.25rem;
+  border-left: 3px solid @accent;
+  padding-left: 1rem;
+  background-color: #fff4f3;
+  font-weight: 700;
+  color: #777;
+}
+.shop-btn{
+  &:focus{
+    outline: none;
+  }
+  height: 2.6rem;
+  padding: 0 1rem;
+  border-radius: 2px;
+  transition: background-color 100ms;
+  &.primary{
+    border: 1px solid @primary;
+    background-color: @primary;
+    color: #fff;
+    &:hover{
+      background-color: #257cbb;
+    }
+  }
+}
+
+.shop-add-template{
+  text-align: center;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+.shop-remove-template{
+  color: @accent;
+  font-size: 1.45rem;
+  cursor: pointer;
+}
+.shop-warning{
+  font-size: 1.25rem;
+  height: 2.6rem;
+  line-height: 2.6rem;
+  color: @accent;
+  .fa{
+    font-size: 1.6rem;
+    margin-right: 0.5rem;
+    vertical-align: text-top;
   }
 }

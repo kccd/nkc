@@ -5,15 +5,39 @@ router
   .use('/', async (ctx, next) => {
     const {data, nkcModules} = ctx;
     const {user} = data;
+    data.navType = "order";
     if(!user) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/login'));
     await next();
   })
-  /* .use('/', async (ctx, next) => {
-    // 处理超过30分钟未付款的订单
-    await ctx.db.ShopOrdersModel.clearTimeoutOrders(ctx.data.user.uid);
+  .get("/", async (ctx, next) => {
+    const {data, db, query, nkcModules} = ctx;
+    const {user} = data;
+    const {t, page = 0} = query;
+    const q = {
+      buyUid: user.uid
+    };
+    if(t === "refunding") {
+      q.closeStatus = false;
+      q.refundStatus = "ing";
+    } else if(t && t !== "all" && t !== "close") {
+      q.orderStatus = t;
+      q.closeStatus = false;
+    } else if(t === "close") {
+      q.closeStatus = true;
+    }
+    const count = await db.ShopOrdersModel.count(q);
+    const paging = nkcModules.apiFunction.paging(page, count);
+    let orders = await db.ShopOrdersModel.find(q).sort({orderToc: -1}).skip(paging.start).limit(paging.perpage);
+    orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
+    orders = await db.ShopOrdersModel.translateOrderStatus(orders);
+    orders = await db.ShopOrdersModel.checkRefundCanBeAll(orders);
+    data.orders = orders;
+    data.paging = paging;
+    data.t = t;
+    ctx.template = '/shop/order/order.pug';
     await next();
-  }) */
-  .get('/', async (ctx, next) => {
+  })
+  /*.get('/', async (ctx, next) => {
     const {data, db, query, params, nkcModules} = ctx;
     let {page = 0, orderStatus} = query;
     const {user} = data;
@@ -41,7 +65,7 @@ router
     data.orderStatus = orderStatus;
     ctx.template = '/shop/order/order.pug';
     await next();
-  })
+  })*/
   // 查看订单详情
   .get('/detail', async (ctx, next) => {
     const {data, db, params, query, nkcModules} = ctx;

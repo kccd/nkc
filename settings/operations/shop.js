@@ -17,6 +17,14 @@ module.exports = {
   },
   manage: {
     GET: "visitManageRouter",
+    // 订单管理
+    order: {
+      GET: "visitShopOrderIndex"
+    },
+    settings: {
+      GET: "modifyStoreInfo",
+      PATCH: "modifyStoreInfo"
+    },
     PARAMETER: {
       GET: 'visitManageIndex',
       home: {

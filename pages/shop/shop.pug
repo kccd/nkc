@@ -8,14 +8,25 @@ block content
     .row
       .col-xs-12.col-md-2.box-shadow-panel
         .shop-navs
-          a.shop-nav(href=`/shop`) 总览
-            .fa.fa-angle-right
-          a.shop-nav(href=`/shop/order`) 我的订单
-            .fa.fa-angle-right
-          a.shop-nav(href=`/shop/manage`) 我出售的
-            .fa.fa-angle-right
-          a.shop-nav(href=`/shop/cart`) 购物车
-            .fa.fa-angle-right
+          .shop-nav-body
+            a.shop-nav(href=`/shop`) 总览
+              .fa.fa-angle-right
+          .shop-nav-body
+            a.shop-nav(href=`/shop/cart`) 购物车
+              .fa.fa-angle-right
+          .shop-nav-body
+            a.shop-nav(href=`/shop/order` class=data.navType==="order"?"active":"") 我的订单
+              .fa.fa-angle-right
+          .shop-nav-body
+            a.shop-nav(href=`/shop/manage`) 我出售的
+              .fa.fa-angle-right
+            .shop-nav-body
+              a.shop-nav(href=`/shop/manage/goods`) 商品管理
+                .fa.fa-angle-right
+              a.shop-nav(href=`/shop/manage/order` class=data.navType === "manageOrder"?"active":"") 订单管理
+                .fa.fa-angle-right
+              a.shop-nav(href=`/shop/manage/settings` class=data.navType==="settings"?"active":"") 交易设置
+                .fa.fa-angle-right
       .col-xs-12.col-md-10.box-shadow-panel
         block shopContent
 block scripts
