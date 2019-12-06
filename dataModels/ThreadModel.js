@@ -1204,7 +1204,7 @@ threadSchema.statics.getLatestThreads = async (fid, sort = "toc", limit = 9) => 
     reviewed: true,
     toDraft: {$ne: true},
     type: "thread",
-    originState: {$nin: ["0", ""]}
+    originState: {$nin: ["0", "", "1", "2"]}
   }).sort({toc: -1}).limit(limit);
   const sortObj = {};
   sortObj[sort] = -1;
