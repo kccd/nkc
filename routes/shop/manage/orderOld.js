@@ -154,7 +154,44 @@ orderRouter
 		await next();
 	})
 	// 修改购买记录中的价格
-	.patch('/editCostRecord', async (ctx, next) => {
+	.patch("/editCostRecord", async (ctx, next) => {
+		const {nkcModules, data, body, db} = ctx;
+		const {type, costId, orderId, costObj, freightPrice} = body;
+		const {user} = data;
+		const order = await db.ShopOrdersModel.findOne({orderId, sellUid: user.uid});
+		if(!order) ctx.throw(404, `订单不存在，orderId: ${orderId}`);
+		
+		const {checkNumber} = nkcModules.checkData;
+		let orderPrice = order.orderPrice;
+		if(type === "modifyParam") {
+			const {singlePrice, count} = costObj;
+			const costRecord = await db.ShopCostRecordModel.findOne({costId, orderId: order.orderId});
+			checkNumber(singlePrice, {
+				name: "商品单价",
+				min: 1
+			});
+			checkNumber(count, {
+				name: "商品数量",
+				min: 1
+			});
+			checkNumber(freightPrice, {
+				name: "订单运费",
+				min: 0,
+			});
+			costRecord.singlePrice = singlePrice;
+			costRecord.count = count;
+			await costRecord.save();
+			const costs = await db.ShopCostRecordModel.find({orderId: order.orderId});
+			orderPrice = 0;
+			costs.map(cost => {
+				const {count, singlePrice} = cost;
+				orderPrice += count * singlePrice;
+			});
+		}
+		await order.update({orderPrice, orderFreightPrice: freightPrice});
+		await next();
+	})
+	/*.patch('/editCostRecord', async (ctx, next) => {
 		const {data, body, query, db} = ctx;
 		const {costId, orderId, costObj, orderObj} = body;
 		// 找出购买记录并修改
@@ -168,7 +205,7 @@ orderRouter
 		const {orderFreightPrice, orderPrice} = orderObj;
 		await order.update({$set: {orderFreightPrice, orderPrice}});
 		await next();
-	})
+	})*/
 	// 修改购买订单中的价格
 	.patch('/editOrderPrice', async (ctx, next) => {
 		const {data, body, query, db} = ctx;

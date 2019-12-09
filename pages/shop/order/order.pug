@@ -24,7 +24,7 @@ block shopContent
               //th 规格
               th.text-center 商品单价
               th.text-center 数量
-              th.text-center 实际付款
+              th.text-left 实际付款
               th.text-center 交易状态
               th.text-center 其他
           tbody
@@ -56,13 +56,30 @@ block shopContent
                   td
                     div.order-price
                       .number=`￥${numToFloatTwo(param.singlePrice)}`
+                      if param.refundStatus === "success"
+
+                        span 已退款
                   td
                     div.order-count=param.count
                   if !key
                     -const paramsCount = order.params.length;
-                    td(rowspan=paramsCount).order-price-total
-                      .order-price
-                        .number=`￥${numToFloatTwo(order.orderPrice + order.orderFreightPrice)}`
+                    td(rowspan=paramsCount)
+                      .order-price(style="text-align: left;")
+                        div
+                          span 商品总价：
+                          span.number.sm.data-params-price=`￥${numToFloatTwo(order.orderPrice)}`
+                        div
+                          span 运费总计：
+
+                          //- 运费总计
+                          span.number.sm.data-params-freight=`￥${numToFloatTwo(order.orderFreightPrice)}`
+
+                        div
+                          strong 订单总计：
+
+                          //- 订单总计
+                          span.number.data-order-price=`￥${numToFloatTwo(order.orderPrice + order.orderFreightPrice)}`
+
                     td.order-status(rowspan=paramsCount)= order.status
                     td(rowspan=paramsCount).order-links
                       a(href=`/shop/order/${order.orderId}/detail`) 订单详情

@@ -253,3 +253,50 @@ body{
     vertical-align: text-top;
   }
 }
+.data-param-count-button{
+  .fa{
+    height: 1.8rem;
+    width: 1.8rem;
+    line-height: 1.8rem;
+    border-radius: 50%;
+    background-color: #eee;
+    color: #aaa;
+    cursor: pointer;
+    transition: background-color 100ms, color 100ms;
+    &:hover, &:focus{
+      background-color: @primary;
+      color: #fff;
+    }
+  }
+}
+.cart-total-price{
+  text-align: right;
+  display: none;
+  height: 5rem;
+  button{
+    height: 3rem;
+    vertical-align: text-bottom;
+    width: 6rem;
+    border-radius: 3px;
+    background-color: @accent;
+    color: #fff;
+    border: none;
+    display: inline-block;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    &:focus{
+      outline: none;
+    }
+    &:hover{
+      background-color: #cb4e63;
+    }
+  }
+  .cart-price-number{
+    display: inline-block;
+    line-height: 5rem;
+    color: @accent;
+    font-size: 2.4rem;
+    font-weight: 700;
+    font-style: oblique;
+    margin-right: 1rem;
+  }
+}

@@ -323,3 +323,26 @@ NKC.methods.getFromLocalStorage = function(name) {
   if(!data) return {};
   return JSON.parse(data);
 };
+
+
+/*
+* 复制文本到粘贴板
+* @params {String} 待复制的文本
+* @author pengxiguaa 2019-12-9
+* */
+var inp
+NKC.methods.copyToClipboard = function(text) {
+  inp =document.createElement('input');
+  inp.style.position = "fixed";
+  inp.style.top = "0px";
+  inp.style.left = "0px";
+  inp.style.zIndex = 10000;
+  document.body.appendChild(inp);
+  inp.value = text;
+  setTimeout(function() {
+    inp.select();
+    // document.execCommand('copy',false);
+    screenTopAlert("文本已复制到粘贴板");
+  }, 1000);
+  // inp.remove();
+};

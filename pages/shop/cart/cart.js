@@ -1,4 +1,4 @@
-var app = new Vue({
+/*var app = new Vue({
   el: '#app',
   data: {
     cartData: [],
@@ -34,6 +34,8 @@ var app = new Vue({
     }
   },
   methods: {
+    visitUrl: NKC.methods.visitUrl,
+    floatUserInfo: NKC.methods.tools.floatUserInfo,
     deleteCartData: function(c) {
       nkcAPI('/shop/cart/' + c._id, 'DELETE')
         .then(function() {
@@ -106,4 +108,100 @@ var app = new Vue({
       }
     }
   }
-});
+});*/
+
+// 同一卖家 选择全部
+function selectAll(cartId) {
+  var dom = $("input[data-index='"+cartId+"']");
+  var inputCount = dom.length;
+  var selectedCount = 0;
+  for (var i = 0 ; i < inputCount; i++) {
+    var d = dom.eq(i);
+    if(d.prop("checked")) selectedCount ++;
+  }
+  if(selectedCount !== inputCount) {
+    dom.prop("checked", true);
+  } else {
+    dom.prop("checked", false);
+  }
+  showButton()
+}
+function getNumber(str, fractionDigits = 0) {
+  str = str + "";
+  str = str.replace("￥", "");
+  str = parseFloat(str);
+  str = str.toFixed(fractionDigits);
+  return parseFloat(str);
+}
+// 改数量
+function changeCount(type, productId) {
+  var dom = $(".data-param-count[data-product-id='"+productId+"']");
+  if(type === "up") {
+    type = "addCount"
+  } else {
+    type = "reduceCount";
+  }
+  nkcAPI('/shop/cart/' + productId, 'PATCH', {
+    type: type
+  })
+    .then(function(data) {
+      dom.text(data.count);
+      computePrice();
+    })
+    .catch(sweetError);
+}
+
+
+function computePrice() {
+  var productsDom = $(".cart-product");
+  var selectedPrice = 0;
+  for(var i = 0; i < productsDom.length; i++) {
+    var dom = productsDom.eq(i);
+    var price = getNumber(dom.find(".fact-price").text(), 2);
+    var count = getNumber(dom.find(".data-param-count").text());
+    var total = price * count;
+    if(dom.find("label input").prop("checked")) {
+      selectedPrice += total;
+    }
+    dom.find(".data-param-prices").text("￥"+total.toFixed(2));
+  }
+  var buttonDom = $(".cart-total-price");
+  buttonDom.find(".cart-price-number").text("￥" + selectedPrice.toFixed(2));
+}
+
+function deleteCart(productId) {
+  nkcAPI('/shop/cart/' + productId, 'DELETE')
+    .then(function() {
+      window.location.reload();
+    })
+    .catch(sweetError)
+}
+
+//  显示结算总价
+function showButton() {
+  var dom = $(".cart-product input");
+  var buttonDom = $(".cart-total-price");
+  var inputCount = dom.length;
+  var selectedCount = 0;
+  for (var i = 0 ; i < inputCount; i++) {
+    var d = dom.eq(i);
+    if(d.prop("checked")) selectedCount ++;
+  }
+  if(selectedCount > 0) {
+    buttonDom.show();
+  } else {
+    buttonDom.hide();
+  }
+  computePrice();
+}
+// 下一步 去结算
+function next() {
+  var dom = $(".cart-product input");
+  var arr = [];
+  for (var i = 0 ; i < dom.length; i++) {
+    var d = dom.eq(i);
+    if(d.prop("checked")) arr.push(d.attr("data-product-id"))
+  }
+  NKC.methods.visitUrl('/shop/bill?cartsId=' + arr.join('-'));
+}
+

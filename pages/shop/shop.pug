@@ -1,6 +1,5 @@
 extends ../bootstrap_base
 block title
-  title 交易中心
   +includeCSS("/css/shop/shop.css")
   block shopTitle
 block content
@@ -12,7 +11,7 @@ block content
             a.shop-nav(href=`/shop`) 总览
               .fa.fa-angle-right
           .shop-nav-body
-            a.shop-nav(href=`/shop/cart`) 购物车
+            a.shop-nav(href=`/shop/cart` class=data.navType==="cart"?"active":"") 购物车
               .fa.fa-angle-right
           .shop-nav-body
             a.shop-nav(href=`/shop/order` class=data.navType==="order"?"active":"") 我的订单

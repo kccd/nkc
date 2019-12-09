@@ -5,6 +5,7 @@ router
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
+    data.navType = "cart";
     let carts = await db.ShopCartModel.find({
       uid: user.uid
     }).sort({toc: -1});

@@ -85,7 +85,7 @@ schema.statics.extendCartsInfo = async (arr) => {
 schema.statics.findById = async (_id) => {
   const ShopCartModel = mongoose.model('shopCarts');
   const cart = await ShopCartModel.findOne({_id});
-  if(!cart) throwErr(404, '未找到ID为【${_id}】的购物车收藏记录');
+  if(!cart) throwErr(404, `未找到ID为【${_id}】的购物车收藏记录`);
   return cart;
 };
 

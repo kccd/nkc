@@ -41,8 +41,6 @@ block shopContent
                     a.value(href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})` target="_blank")
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
                 for param,key in order.params
-                  if !key
-                    -console.log(param)
                   tr(data-order-id=order.orderId data-order-param-id=param.costId)
                     td
                       div.order-name-info
@@ -53,32 +51,50 @@ block shopContent
                           .order-param(title=param.productParam.name)=`规格：${param.productParam.name}`
                     td
                       div.order-price
+
+                        //- 商品的单价
                         .number.data-param-price=`￥${numToFloatTwo(param.singlePrice)}`
+                        if param.refundStatus === "success"
+
+                          span 已退款
+
                         //- 修改单价
                         if order.orderStatus === "unCost" && !order.closeStatus
-                          button.order-button(onclick=`modifyParamPrice("${order.orderId}", "${param.costId}")`) 修改
+                          button.order-button(onclick=`modifyParamPrice("${order.sellUid}", "${order.orderId}", "${param.costId}")`) 修改
                     td
                       div.order-count
+
+                        //- 商品的数量
                         .number.data-param-count=param.count
+
+
                         //- 修改数量
                         if order.orderStatus === "unCost" && !order.closeStatus
-                          button.order-button 修改
+                          button.order-button(onclick=`modifyParamCount("${order.sellUid}", "${order.orderId}", "${param.costId}")`) 修改
                     if !key
                       -const paramsCount = order.params.length;
                       td(rowspan=paramsCount)
                         div.order-price(style="text-align: left;")
                           div
                             span 商品总价：
-                            span.number.sm.data-params-count=`￥${numToFloatTwo(order.orderPrice)}`
+                            span.number.sm.data-params-price=`￥${numToFloatTwo(order.orderPrice)}`
                           div
                             span 运费总计：
+
+                            //- 运费总计
                             span.number.sm.data-params-freight=`￥${numToFloatTwo(order.orderFreightPrice)}`
+
+
                             //- 修改运费
                             if order.orderStatus === "unCost" && !order.closeStatus
-                              button.order-button 修改
+                              button.order-button(onclick=`modifyFreight("${order.sellUid}", "${order.orderId}")`) 修改
                           div
                             strong 订单总计：
+
+                            //- 订单总计
                             span.number.data-order-price=`￥${numToFloatTwo(order.orderPrice + order.orderFreightPrice)}`
+
+
                       td.order-status(rowspan=paramsCount)=order.status
                       td.order-links(rowspan=paramsCount)
                         a(href=`/shop/manage/${data.user.uid}/order/detail?orderId=${order.orderId}`) 订单详情
@@ -95,9 +111,9 @@ block shopContent
                           else
                             a(href=`/shop/manage/${data.user.uid}/order/logositics?orderId=${order.orderId}`) 查看物流
                         if order.orderStatus === "unSign" && !order.closeStatus
-                          button(onclick=`openLogositicEdit(${data.user.uid}, ${order.orderId})`) 修改物流信息
+                          button(onclick=`ship(${order.orderId})`) 修改物流信息
                         if order.orderStatus === "unShip" && !order.closeStatus
-                          button(onclick=`openSendGoodsModal(${data.user.uid}, ${order.orderId})`) 发货
+                          button(onclick=`ship(${order.orderId})`) 发货
                 if order.buyMessage
                   tr
                     td(colspan="6").order-message
@@ -112,4 +128,5 @@ block shopContent
 block shopScripts
   include ../../../publicModules/floatUserPanel/floatUserPanel
   include ../../../publicModules/commonModal/commonModal
+  include ../../../publicModules/shop/ship
   +includeJS("/js/shop/manageOrder.js")
