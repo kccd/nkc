@@ -945,6 +945,7 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
     uid: 1,
     pid: 1,
     toc: 1,
+    anonymous: 1,
     tid: 1
   }).sort({toc: -1}).limit(limit);
   const usersId = [], threadsId = [];
@@ -967,7 +968,7 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
     const thread = threadsObj[post.tid];
     if(!user || !thread) return;
     post.c = obtainPureText(post.c, true, 200);
-    post.user = user;
+    if(!post.anonymous) post.user = user;
     post.thread = thread;
     post.url = await PostModel.getUrl(post.pid);
     results.push(post);

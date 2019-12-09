@@ -311,13 +311,19 @@ block content
             for post in data.latestPosts
               .home-post
                 .home-post-time=fromNow(post.toc)
-                a.home-post-user(href=`/u/${post.uid}`)
-                  img(src=tools.getUrl("userAvatar", post.user.avatar) onmouseover=tools.floatUserInfo(post.uid))
-                  span=post.user.username
+                if post.anonymous
+                  span 匿名用户
+                else
+                  a.home-post-user(href=`/u/${post.uid}`)
+                    img(src=tools.getUrl("userAvatar", post.user.avatar) onmouseover=tools.floatUserInfo(post.uid))
+                    span=post.user.username
                 span 回复
-                a.home-post-user(href=`/u/${post.thread.lastPost.uid}`)
-                  img(src=tools.getUrl("userAvatar", post.thread.lastPost.user.avatar) onmouseover=tools.floatUserInfo(post.thread.uid))
-                  span=post.thread.lastPost.user.username
+                if post.thread.firstPost.anonymous
+                  span 匿名用户
+                else
+                  a.home-post-user(href=`/u/${post.thread.firstPost.uid}`)
+                    img(src=tools.getUrl("userAvatar", post.thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(post.thread.uid))
+                    span=post.thread.firstPost.user.username
                 span ：
                 a.home-post-content(href=post.url)
                   div=post.c
@@ -336,9 +342,14 @@ block content
                 .home-thread-content
                   .home-thread-abstract=thread.firstPost.abstractCn || thread.firstPost.c
                   .home-thread-info
-                    a(href=`/u/${thread.firstPost.uid}`).home-thread-user
-                      img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(thread.firstPost.uid))
-                      span=thread.firstPost.user.username
+                    if thread.firstPost.anonymous
+                      a.home-thread-user
+                        img(src=anonymousInfo.avatar)
+                        span=anonymousInfo.username
+                    else
+                      a(href=`/u/${thread.firstPost.uid}`).home-thread-user
+                        img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(thread.firstPost.uid))
+                        span=thread.firstPost.user.username
                     a(href=`/f/${thread.forums[0].fid}`).home-thread-forum=thread.forums[0].displayName
         //-.home-forums-other.m-b-1
           .home-header
