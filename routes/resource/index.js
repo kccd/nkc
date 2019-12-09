@@ -274,7 +274,7 @@ resourceRouter
       // 获取图片尺寸
       const { width, height } = await imageMagick.info(path);
       // 生成无水印原图
-      if(width > 3840 || size > 5242880) {
+      if(width > 3840 || (size > 5242880 && extension !== "gif")) {
         await imageMagick.originify(path, originFilePath)
       }else{
         await fs.copyFile(path, originFilePath);
@@ -289,13 +289,13 @@ resourceRouter
       });
       ctx.data.ro = await ro.save();
       // 生成略缩图
-      if(width > 150 || size > 51200) {
+      if(width > 150 || (size > 51200 && extension !== "gif")) {
         await imageMagick.thumbnailify(path, thumbnailFilePath);
       }else{
         await fs.copyFile(path, thumbnailFilePath);
       }
       // 生成中号图
-      if(width > 640 || size > 102400) {
+      if(width > 640 || (size > 102400 && extension !== "gif")) {
         await imageMagick.mediumify(path, mediumFilePath);
       }else{
         await fs.copyFile(path, mediumFilePath)
