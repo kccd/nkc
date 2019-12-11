@@ -21,18 +21,20 @@ module.exports = {
     order: {
       GET: "visitShopOrderIndex"
     },
+    // 作为卖家编辑交易设置，包含全局公告、运费模板
     settings: {
       GET: "modifyStoreInfo",
       PATCH: "modifyStoreInfo"
+    },
+    // 上架相关
+    shelf: {
+      GET: 'visitShelfIndex',
+      POST: 'productToShelf'
     },
     PARAMETER: {
       GET: 'visitManageIndex',
       home: {
         GET:'visitManageHome',
-      },
-      shelf: {
-        GET: 'visitShelfIndex',
-        POST: 'productToShelf'
       },
       info: {
         GET: 'visitStoreInfoIndex',
@@ -41,6 +43,11 @@ module.exports = {
       template: {
         GET: 'visitFreightTemplate',
         PATCH: 'saveFreightTemplate'
+      },
+      // 上架相关
+      shelf: {
+        GET: 'visitShelfIndex',
+        POST: 'productToShelf'
       },
       decoration: {
         sign: {

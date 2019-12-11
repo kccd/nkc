@@ -45,13 +45,15 @@ function computeOrderPrice(orderId) {
 
   for (var i = 0; i < paramPriceDom.length; i++) {
     var dom = paramPriceDom.eq(i);
-    prices.push(getNumber(dom.text()), 2);
+    prices.push(getNumber(dom.text(), 2));
   }
+
+  console.log(prices);
 
   for (var _i = 0; _i < countDom.length; _i++) {
     var _dom = countDom.eq(_i);
 
-    counts.push(getNumber(_dom.text()), 0);
+    counts.push(getNumber(_dom.text(), 0));
   }
 
   if (prices.length !== counts.length) return sweetError("订单页面错误，请刷新页面");
@@ -69,12 +71,6 @@ function computeOrderPrice(orderId) {
     freightPrice: freight,
     orderPrice: totalPrice + freight
   };
-} // 渲染商品总价
-
-
-function setOrderPrice(orderId, price) {
-  var dom = $("tr[data-order-id='".concat(orderId, "'] .data-params-price"));
-  dom.text("\uFFE5".concat(price));
 } // 修改商品单价
 
 

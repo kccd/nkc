@@ -1,15 +1,20 @@
 const Router = require('koa-router');
 const homeRouter = require('./home');
-const shelfRouter = require('./shelf');
 const infoRouter = require('./info');
 const decorationRouter = require('./decoration');
 const classifyRouter = require('./classify');
 const orderOldRouter = require('./orderOld');
-const orderRouter = require('./order');
-const goodslistRouter = require('./goodslist');
+const goodsListRouter = require('./goodsList');
 const templateRouter = require('./template');
 
+// 订单管理
+const orderRouter = require('./order');
+// 交易设置
 const settingsRouter = require("./settings");
+// 商品管理
+const goodsRouter = require("./goods");
+// 上架商品
+const shelfRouter = require('./shelf');
 
 const manageRouter = new Router();
 manageRouter
@@ -39,7 +44,7 @@ manageRouter
     await next();
   })
   
-  .use(["/order", "/goods"], async (ctx, next) => {
+  .use(["/order", "/goods", "/shelf"], async (ctx, next) => {
     if(!ctx.data.dealInfo) return ctx.redirect(ctx.nkcModules.apiFunction.generateAppLink(ctx.state, `/shop/manage/settings`));
     await next();
   })
@@ -48,12 +53,15 @@ manageRouter
   
   
   .use("/settings", settingsRouter.routes(), settingsRouter.allowedMethods())
+  .use("/goods", goodsRouter.routes(), goodsRouter.allowedMethods())
+  .use("/shelf", shelfRouter.routes(), shelfRouter.allowedMethods())
+  // .use("/:uid/shelf", shelfRouter.routes(), shelfRouter.allowedMethods())
+
   .use('/:uid/home', homeRouter.routes(), homeRouter.allowedMethods())
-  .use('/:uid/shelf', shelfRouter.routes(), shelfRouter.allowedMethods())
   .use('/:uid/info', infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:uid/decoration', decorationRouter.routes(), decorationRouter.allowedMethods())
   .use('/:uid/classify', classifyRouter.routes(), classifyRouter.allowedMethods())
   .use('/:uid/order', orderOldRouter.routes(), orderOldRouter.allowedMethods())
-  .use('/:uid/goodslist', goodslistRouter.routes(), goodslistRouter.allowedMethods())
+  .use('/:uid/goodslist', goodsListRouter.routes(), goodsListRouter.allowedMethods())
   .use('/:uid/template', templateRouter.routes(), templateRouter.allowedMethods())
 module.exports = manageRouter;

@@ -117,7 +117,9 @@ router
       for(let cart of post[bill].carts) {
         let cart1 = await db.ShopCartModel.find({_id:cart._id});
         if(!cart1 || cart1.length === 0) ctx.throw(400, `您已下单，请前往我的订单进行支付`);
-        let newCartArr = await db.ShopCartModel.extendCartsInfo(cart1);
+        let newCartArr = await db.ShopCartModel.extendCartsInfo(cart1, {
+          userGradeId: data.user.grade._id
+        });
         let newCart = newCartArr[0];
         if(Number(newCart.count) > Number(newCart.productParam.stocksSurplus)) ctx.throw(400, `${newCart.product.name}+${newCart.productParam.name}库存不足`);
       }
@@ -129,7 +131,9 @@ router
       // 添加购买记录
       for(let cart of post[bill].carts) {
         let cart1 = await db.ShopCartModel.find({_id:cart._id});
-        let newCartArr = await db.ShopCartModel.extendCartsInfo(cart1);
+        let newCartArr = await db.ShopCartModel.extendCartsInfo(cart1, {
+          userGradeId: data.user.grade._id
+        });
         let newCart = newCartArr[0];
         let costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
         let newProductParam = await db.ShopProductsParamModel.findOne({_id:newCart.productParamId});

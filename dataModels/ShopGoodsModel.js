@@ -119,11 +119,7 @@ const shopGoodsSchema = new Schema({
   //   type: String,
   //   required: true
   // },
-  /**
-   * 库存计数方式
-   * @payReduceStock 付款减库存
-   * @orderReduceStock 下单减库存
-   */
+  
   // 是否免邮
   isFreePost: {
     type: Boolean,
@@ -142,6 +138,11 @@ const shopGoodsSchema = new Schema({
     type: Array,
     default: []
   },
+  /**
+   * 库存计数方式
+   * @payReduceStock 付款减库存
+   * @orderReduceStock 下单减库存
+   */
   stockCostMethod: {
     type: String,
     default: "payReduceStock"

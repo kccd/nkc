@@ -20,7 +20,9 @@ block content
             a.shop-nav(href=`/shop/manage`) 我出售的
               .fa.fa-angle-right
             .shop-nav-body
-              a.shop-nav(href=`/shop/manage/goods`) 商品管理
+              a.shop-nav(href=`/shop/manage/shelf` class=data.navType ==="shelf"?"active":"") 上架商品
+                .fa.fa-angle-right
+              a.shop-nav(href=`/shop/manage/goods` class=data.navType ==="goods"?"active":"") 商品管理
                 .fa.fa-angle-right
               a.shop-nav(href=`/shop/manage/order` class=data.navType === "manageOrder"?"active":"") 订单管理
                 .fa.fa-angle-right

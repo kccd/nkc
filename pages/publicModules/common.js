@@ -324,25 +324,60 @@ NKC.methods.getFromLocalStorage = function(name) {
   return JSON.parse(data);
 };
 
-
-/*
-* 复制文本到粘贴板
-* @params {String} 待复制的文本
-* @author pengxiguaa 2019-12-9
-* */
-var inp
-NKC.methods.copyToClipboard = function(text) {
-  inp =document.createElement('input');
-  inp.style.position = "fixed";
-  inp.style.top = "0px";
-  inp.style.left = "0px";
-  inp.style.zIndex = 10000;
-  document.body.appendChild(inp);
-  inp.value = text;
-  setTimeout(function() {
-    inp.select();
-    // document.execCommand('copy',false);
-    screenTopAlert("文本已复制到粘贴板");
-  }, 1000);
-  // inp.remove();
-};
+/* 
+  从多个数组中取值，组成与原数组长度相同的不重复的新数组
+  @param arr 原数组：
+  [
+    ['a', 'b', 'c'],
+    [1, 2, 3],
+    ['A', 'B', 'C'],
+    ...
+  ]
+  @return 新数组：
+  [
+    ['a', 1, 'A'],
+    ['a', 1, 'B'],
+    ['a', 1, 'C'],
+    ['a', 2, 'A'],
+    ['a', 2, 'B'],
+    ['a', 2, 'C'],
+    ...
+  ]
+  @author https://www.cnblogs.com/liugang-vip/p/5985210.html
+*/
+NKC.methods.doExchange = function(arr) {
+  const len = arr.length;
+  // 当数组大于等于2个的时候
+  if(len >= 2){
+    // 第一个数组的长度
+    const len1 = arr[0].length;
+    // 第二个数组的长度
+    const len2 = arr[1].length;
+    // 2个数组产生的组合数
+    const lenBoth = len1 * len2;
+    //  申明一个新数组
+    const items = new Array(lenBoth);
+    // 申明新数组的索引
+    let index = 0;
+    for(let i = 0; i < len1; i++) {
+      for(let j = 0; j < len2; j++) {
+        if(arr[0][i] instanceof Array){
+          items[index] = arr[0][i].concat(arr[1][j]);
+        } else {
+          items[index] = [arr[0][i]].concat(arr[1][j]);
+        }
+        index++;
+      }
+    }
+    const newArr = new Array(len -1);
+    for(let i = 2; i < arr.length; i++) {
+      newArr[i-1] = arr[i];
+    }
+    newArr[0] = items;
+    return NKC.methods.doExchange(newArr);
+  }else if(len === 1) {
+    return arr[0];
+  } else {
+    return arr;
+  }
+}

@@ -22,7 +22,9 @@ router
       })
       await newCart.save();
       const cartsData = [newCart];
-      data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData);
+      data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData, {
+        userGradeId: data.user.grade._id
+      });
       // const billProducts = await db.ShopProductsParamModel.findOne({_id: paraId});
       // const product = await db.ShopGoodsModel.findOne({productId: billProducts[0].productId});
       // if(product.productStatus == "stopsale") ctx.throw(400, "商品停售中，不可购买")
@@ -35,7 +37,9 @@ router
       billType = "cart";
       cartsId = cartsId.split('-');
       const cartsData = await db.ShopCartModel.find({_id: {$in: cartsId}}); 
-      data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData);
+      data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData, {
+        userGradeId: data.user.grade._id
+      });
     }
     data.billType = billType;
 

@@ -86,7 +86,7 @@ NKC.configs.ueditor = {
         'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'emotion', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
       ]
     ],
-    maximumWords: 200, // 最大字符数
+    maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
     autoHeightEnabled: true, // 编辑器是否随着行数增加而自动长高
     scaleEnabled: false, // 是否允许拉长
@@ -112,7 +112,7 @@ NKC.configs.ueditor = {
         'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'emotion', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
       ]
     ],
-    maximumWords: 200, // 最大字符数
+    maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
     autoHeightEnabled: true, // 编辑器是否随着行数增加而自动长高
     scaleEnabled: false, // 是否允许拉长
@@ -138,7 +138,7 @@ NKC.configs.ueditor = {
         'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'emotion', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
       ]
     ],
-    maximumWords: 200, // 最大字符数
+    maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
     autoHeightEnabled: true, // 编辑器是否随着行数增加而自动长高
     scaleEnabled: false, // 是否允许拉长
@@ -162,7 +162,7 @@ NKC.configs.ueditor = {
         'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'emotion', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
       ]
     ],
-    maximumWords: 200, // 最大字符数
+    maximumWords: 100000, // 最大字符数
     initialFrameHeight: 500, // 编辑器高度
     autoHeightEnabled: true, // 编辑器是否随着行数增加而自动长高
     scaleEnabled: false, // 是否允许拉长
