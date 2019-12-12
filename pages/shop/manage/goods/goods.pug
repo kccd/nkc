@@ -7,6 +7,29 @@ block shopContent
     a(class=data.t === "unSale" ? "active" : "" href=`/shop/manage/order?t=unSale`).order-nav 未上架
     a(class=data.t === "stopped" ? "active" : "" href=`/shop/manage/order?t=stopped`).order-nav 已下架
   .goods
+    for product in data.products
+      .row.product
+        .col-xs-12.col-md-6
+          .goods-cover
+            div
+              img(src=`/r/${product.imgMaster}`)
+          .goods-content-info
+            a.goods-title(href=`/t/${product.post.tid}`)=product.post.t
+            .goods-abstract=product.post.abstractCn
+            .goods-hits
+              div
+                .fa.fa-eye
+                span=product.thread.hits
+              div
+                .fa.fa-thumbs-up
+                span=product.post.voteUp
+              div
+                .fa.fa-comment
+                span=product.thread.count - 1
+
+
+        .col-xs-12.col-md-6
+        .col-xs-12.col-md-12
     .table-responsive
       table.table.table-bordered
         thead
@@ -14,6 +37,7 @@ block shopContent
             th 商品信息
             th 已售统计
             th 限购
+            th 运费
             th 商品状态
             th 其他
         tbody
@@ -36,6 +60,11 @@ block shopContent
                   div 不限购
                 else
                   div=`每人限购${product.purchaseLimitCount}件`
+              th 
+                if product.isFreePost
+                  div 包邮
+                else 
+                  div 不包邮
               th
                 if product.productStatus === "insale"
                   div 已上架
@@ -44,7 +73,15 @@ block shopContent
                 else 
                   div 待上架  
               th.order-links
-                a(href=`/editor?type=post&id=${product.oc}` target="_blank") 编辑商品信息
-                a(href=`/shop/manage/shelf?productId=${product.productId}`) 编辑出售信息    
-
+                a(href=`/editor?type=post&id=${product.oc}` target="_blank") 修改商品信息
+                a(href=`/shop/manage/shelf?productId=${product.productId}`) 修改出售信息    
+            tr
+              th(colspan=12) 
+                h5 规格信息
+                p Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio eos cupiditate quas voluptatibus tempora repellat eius delectus doloremque pariatur possimus, vero placeat? Quidem, ullam! Autem maiores repudiandae culpa dicta delectus!
+            tr     
+              th(colspan=12) 
+                h5 运费模板
+                p Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio eos cupiditate quas voluptatibus tempora repellat eius delectus doloremque pariatur possimus, vero placeat? Quidem, ullam! Autem maiores repudiandae culpa dicta delectus!  
+                
 block shopScripts    

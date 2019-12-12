@@ -1,5 +1,5 @@
 const data = NKC.methods.getDataById("data");
-console.log(data);
+
 const {grades, dealInfo, product} = data;
 
 const vipDisGroupObj = {};
@@ -17,6 +17,15 @@ if(product) {
     purchaseLimit.status = true;
     purchaseLimit.count = product.purchaseLimitCount;
   }
+  product.imgIntroductions.length = 5;
+  product.productParams.map(p => {
+    p.price = p.price / 100;
+    p.originPrice = p.originPrice / 100;
+  });
+  product.freightTemplates.map(t => {
+    t.firstPrice = t.firstPrice / 100;
+    t.addPrice = t.addPrice / 100;
+  })
 }
 
 const vipDisGroup = grades.map(g => {
@@ -194,10 +203,7 @@ const app = new Vue({
           body.imgIntroductions = picturesId;
           // 判断商品规格
           let productParams = [];
-          productParams = productParams.concat(self.selectedParams);
-          if(self.type === "modify") {
-            productParams = productParams.concat(self.createdParams);
-          }
+          productParams = self.selectedParams;
           if(!productParams.length) throw "请至少添加一个商品规格";
           productParams.map(param => {
             const {
@@ -216,13 +222,13 @@ const app = new Vue({
             }),
             checkNumber(originPrice, {
               name: "规格价格",
-              min: 1,
+              min: 0.01,
               fractionDigits: 2
             });
             if(useDiscount) {
               checkNumber(price, {
                 name: "规格优惠价",
-                min: 1,
+                min: 0.01,
                 fractionDigits: 2
               });
               if(price >= originPrice) throw "规格优惠价必须小于原价";  

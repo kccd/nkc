@@ -427,3 +427,61 @@ body {
 .shop-shelf .pictures .picture .buttons .fa:hover {
   background-color: rgba(0, 0, 0, 0.5);
 }
+.goods .product {
+  margin-bottom: 2rem;
+}
+.goods .product .goods-cover {
+  display: table-cell;
+  vertical-align: top;
+}
+.goods .product .goods-cover div {
+  height: 8rem;
+  width: 8rem;
+  line-height: 8rem;
+  border: 1px solid #ccc;
+  margin-right: 0.5rem;
+}
+.goods .product .goods-cover div img {
+  max-width: 100%;
+  max-height: 100%;
+  text-align: center;
+}
+.goods .product .goods-content-info {
+  display: table-cell;
+  vertical-align: top;
+}
+.goods .product .goods-content-info .goods-title {
+  max-height: 1.8rem;
+  color: #282c37;
+  font-size: 1.25rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.goods .product .goods-content-info .goods-title:hover {
+  color: #e85a71;
+}
+.goods .product .goods-content-info .goods-abstract {
+  max-height: 3.2rem;
+  color: #777;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.goods .product .goods-content-info .goods-hits div {
+  display: inline-block;
+}
+.goods .product .goods-content-info .goods-hits div span {
+  color: #888;
+}
+.goods .product .goods-content-info .goods-hits div .fa {
+  color: #aaa;
+  margin-right: 0.3rem;
+  font-size: 1rem;
+}

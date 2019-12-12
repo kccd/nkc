@@ -17,16 +17,16 @@ shelfRouter
     data.shopForumTypes = await db.ForumModel.getAllShopForums(data.userRoles, data.userGrade, data.user);
     // 取出全部vip等级
     data.grades = await db.UsersGradeModel.find({}).sort({_id: 1});
-    const {t, productId} = query;
-    const product = await db.ShopGoodsModel.findOne({productId});
-    if(!product) ctx.throw(400, `商品不存在，productId: ${productId}`);
-    data.product = (await db.ShopGoodsModel.extendProductsInfo([product]))[0];
-    if(query.t === "old") {
-      ctx.template = 'shop/manage/shelf.pug';
+    const {productId} = query;
+    if(productId) {
+      const product = await db.ShopGoodsModel.findOne({productId});
+      if(!product) ctx.throw(400, `商品不存在，productId: ${productId}`);
+      data.product = (await db.ShopGoodsModel.extendProductsInfo([product]))[0];
+      data.navType = "goods";
     } else {
       data.navType = "shelf";
-      ctx.template = 'shop/manage/shelf/shelf.pug';
     }
+    ctx.template = 'shop/manage/shelf/shelf.pug';
 		await next();
   })
 	.post('/', async (ctx, next) => {
@@ -96,7 +96,8 @@ shelfRouter
       }
     }
     // 验证商品图
-    const resourcesId = imgIntroductions.filter(i => !!i);
+    let resourcesId = imgIntroductions.filter(i => !!i);
+    resourcesId = [...new Set(resourcesId)];
     if(!resourcesId.length) ctx.throw(400, "请至少选择一张商品图");
     const resourceCount = await db.ResourceModel.count({rid: {$in: resourcesId}, mediaType: "mediaPicture", ext: {$in: ["jpg", "jpeg", "png"]}});
     if(resourcesId.length !== resourceCount) ctx.throw(400, "商品图错误，请重新选择");
@@ -110,9 +111,12 @@ shelfRouter
         originPrice,
         price,
         useDiscount,
+        isEnable,
         stocksTotal
       } = param;
-      const p = {};
+      const p = {
+        isEnable: !!isEnable
+      };
       checkString(name, {
         name: "规格名称",
         minLength: 1,
@@ -126,7 +130,7 @@ shelfRouter
       p.stocksTotal = stocksTotal;
       checkNumber(originPrice, {
         name: "规格价格",
-        min: 1,
+        min: 0.01,
         fractionDigits: 2
       });
       p.originPrice = originPrice * 100;
@@ -134,7 +138,7 @@ shelfRouter
         if(price >= originPrice) ctx.throw(400, "规格优惠价必须小于原价");
         checkNumber(price, {
           name: "规格优惠价",
-          min: 1,
+          min: 0.01,
           fractionDigits: 2
         });
         p.price = price * 100;  
@@ -266,7 +270,7 @@ shelfRouter
       };
       await db.ThreadModel.ensurePublishPermission(options);
       const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
-      const product = db.ShopGoodsModel({
+      product = db.ShopGoodsModel({
         productId,
         purchaseLimitCount,
         ip: ctx.address,
@@ -300,27 +304,49 @@ shelfRouter
       }
     } else {
       // 修改已上架的商品
-      const params = product.productParams;
-      const oldParams = {};
-      const newParams = [];
-      productParams.map(p => {
+      await product.update({
+        purchaseLimitCount,
+        imgIntroductions,
+        imgMaster,
+        stockCostMethod,
+        uploadCert,
+        uploadCertDescription,
+        isFreePost,
+        freightTemplates,
+        vipDiscount,
+        vipDisGroup,
+        productSettings
+      });
+      for(const param of productParams) {
         const {
           _id,
           name,
           originPrice,
           price,
+          isEnable,
           useDiscount,
           stocksTotal
-        } = p;
-        if(!_id) {
-          newParams.push(p);
+        } = param;
+        if(_id) {
+          // 修改已有规格
+          await db.ShopProductsParamModel.updateOne({_id, uid: user.uid, productId: product.productId}, {
+            $set: {
+              name,
+              originPrice,
+              price,
+              isEnable: !!isEnable,
+              useDiscount: !!useDiscount,
+              stocksTotal
+            }
+          });
         } else {
-          oldParams[_id] = p;
+          param.productId = product.productId; // 规格所属商品的ID
+          param.uid = user.uid; // 商品拥有者
+          param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
+          param._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
+          await db.ShopProductsParamModel(param).save();
         }
-      });
-      params.map(p => {
-        
-      });
+      }
     }
     return await next();
     /*
