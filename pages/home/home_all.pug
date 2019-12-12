@@ -140,11 +140,11 @@ block content
           .home-forums-list.m-b-1
             .home-header
               //-.fa.fa-tags
-              .header-name 最新文章
+              .header-name 最新原创
             .home-threads.p-t-05
               for thread in data.latestThreads
                 include ../publicModules/thread_panel/thread_panel
-              a.home-threads-more-link(href=`/?t=latest`) 查看更多
+              a.home-threads-more-link(href=`/?t=latest`) 查看全部新讨论
         .home-forums-list.m-b-1
           .home-header
             //-.fa.fa-tags
