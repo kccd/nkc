@@ -17,6 +17,10 @@ shelfRouter
     data.shopForumTypes = await db.ForumModel.getAllShopForums(data.userRoles, data.userGrade, data.user);
     // 取出全部vip等级
     data.grades = await db.UsersGradeModel.find({}).sort({_id: 1});
+    const {t, productId} = query;
+    const product = await db.ShopGoodsModel.findOne({productId});
+    if(!product) ctx.throw(400, `商品不存在，productId: ${productId}`);
+    data.product = (await db.ShopGoodsModel.extendProductsInfo([product]))[0];
     if(query.t === "old") {
       ctx.template = 'shop/manage/shelf.pug';
     } else {
@@ -24,33 +28,302 @@ shelfRouter
       ctx.template = 'shop/manage/shelf/shelf.pug';
     }
 		await next();
-	})
+  })
 	.post('/', async (ctx, next) => {
-		const {data, db, body, tools, settings} = ctx;
+    const {data, db, body, tools, nkcModules} = ctx;
+    const {
+      checkNumber,
+      checkString
+    } = nkcModules.checkData;
     const {user} = data;
     let {
-      productName,
-      attention,
-      productDescription,
-      productDetails,
-      mainForumsId,
-      imgIntroductions,
-      imgMaster,
-      isFreePost,
-      freightPrice,     
-      freightTemplates,
-      stockCostMethod,
-      productStatus,
-      shelfTime,
-      purchaseLimitCount,
-      productParams,
-      singleParams,
-      uploadCert,
-      uploadCertDescription,
-      vipDiscount,
-      vipDisGroup,
-      productSettings,
+      productName, // 商品标题
+      attention, // 关键词
+      productDescription, // 商品简介
+      productDetails, // 图文描述
+      mainForumsId, // 专业分类，商品分类和辅助分类
+      imgIntroductions, // 商品图
+      isFreePost, // 是否免邮
+      freightTemplates, // 运费模板
+      stockCostMethod, // 减库存方式
+      productStatus, // 上架相关
+      shelfTime, // 定时上架的时间
+      purchaseLimitCount, // 购买数量，-1为不限制，>1 数字为具体的限购数量
+      productParams, // 规格信息，如果存在ID则为修改，否则为新增
+      // singleParams, // 独立规格
+      uploadCert, // 购买是否需要上传凭证
+      uploadCertDescription, // 购买凭证说明
+      vipDiscount, // 是否启用会员打折
+      vipDisGroup, // 会员打折的具体数值
+      productSettings, // 价格的可见性 游客可见、停售可见
+
+      productId, // 商品ID 就在编辑商品信息时有值
+
     } = body.post;
+
+    let product;
+
+    if(productId) {
+      product = await db.ShopGoodsModel.findOne({productId});
+      if(!product) ctx.throw(400, `商品ID错误，productId: ${productId}`);
+    }
+
+    if(!product) {
+      // 验证商品文字信息
+      checkString(productName, {
+        name: "商品标题",
+        minLength: 6,
+        maxLength: 200
+      }); 
+      // 验证商品简介
+      checkString(productDescription, {
+        name: "商品简介",
+        minLength: 6, 
+        maxLength: 1000
+      });
+      // 验证图文描述
+      checkString(productDetails, {
+        name: "图文描述",
+        minLength: 1,
+        maxLength: 100000
+      });
+      // 专业权限判断
+      const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
+      for(const fid of mainForumsId) {
+        const forum = await db.ForumModel.findOne({fid});
+        if(!forum) ctx.throw(400, `专业ID错误, fid: ${fid}`);
+        if(!accessibleForumsId.includes(fid)) ctx.throw(400, `你无权在专业“${forum.displayName}”下发表内容`)
+      }
+    }
+    // 验证商品图
+    const resourcesId = imgIntroductions.filter(i => !!i);
+    if(!resourcesId.length) ctx.throw(400, "请至少选择一张商品图");
+    const resourceCount = await db.ResourceModel.count({rid: {$in: resourcesId}, mediaType: "mediaPicture", ext: {$in: ["jpg", "jpeg", "png"]}});
+    if(resourcesId.length !== resourceCount) ctx.throw(400, "商品图错误，请重新选择");
+    const imgMaster = resourcesId[0];
+    // 验证商品规格
+    if(!productParams.length) ctx.throw(400, "请至少添加一个商品规格");
+    productParams = productParams.map(param => {
+      const {
+        _id,
+        name,
+        originPrice,
+        price,
+        useDiscount,
+        stocksTotal
+      } = param;
+      const p = {};
+      checkString(name, {
+        name: "规格名称",
+        minLength: 1,
+        maxLength: 100
+      });
+      p.name = name;
+      checkNumber(stocksTotal, {
+        name: "规格数量",
+        min: 0
+      }),
+      p.stocksTotal = stocksTotal;
+      checkNumber(originPrice, {
+        name: "规格价格",
+        min: 1,
+        fractionDigits: 2
+      });
+      p.originPrice = originPrice * 100;
+      if(useDiscount) {
+        if(price >= originPrice) ctx.throw(400, "规格优惠价必须小于原价");
+        checkNumber(price, {
+          name: "规格优惠价",
+          min: 1,
+          fractionDigits: 2
+        });
+        p.price = price * 100;  
+      } else {
+        p.price = p.originPrice;
+      }
+      p._id = _id;
+      p.useDiscount = !!useDiscount;      
+      return p;
+    });
+    const grades = await db.UsersGradeModel.find().sort({_id: 1});
+    vipDiscount = !!vipDiscount;
+    if(vipDiscount) {
+      const vipDisGroupObj = {};
+      vipDisGroup.map(v => {
+        const {vipNum, vipLevel} = v;
+        checkNumber(vipLevel, {
+          name: "会员等级",
+          min: 0
+        });
+        checkNumber(vipNum, {
+          name: "会员折扣等级",
+          min: 0,
+          max: 100
+        });
+        vipDisGroupObj[v.vipLevel] = v
+      });
+      vipDisGroup = grades.map(g => {
+        const {_id} = g;
+        const vipGrade = vipDisGroup[_id];
+        const group = {
+          vipLevel: _id,
+          vipNum: 100
+        };
+        if(vipGrade) {
+          group.vipNum = vipGrade.vipNum;
+        }
+        return group;
+      });
+    } else {
+      vipDisGroup = grades.map(grade => {
+        return {
+          vipNum: 100,
+          vipLevel: grade._id
+        };
+      });
+    }
+    isFreePost = !!isFreePost;
+    if(!isFreePost) {
+      freightTemplates = freightTemplates.map(f => {
+        const {name, firstPrice, addPrice} = f;
+        checkString(name, {
+          name: "物流名称",
+          minLength: 1,
+          maxLength: 100
+        });
+        checkNumber(firstPrice, {
+          name: "物流首件价格",
+          min: 0,
+          fractionDigits: 2
+        });
+        checkNumber(addPrice, {
+          name: "物流每增加一件的价格",
+          min: 0,
+          fractionDigits: 2
+        });
+        return {
+          name,
+          firstPrice: firstPrice * 100,
+          addPrice: addPrice  * 100
+        };
+      });
+    } else {
+      freightTemplates = [];
+    }
+    // 价格的显示
+    const {priceShowToVisit, priceShowAfterStop} = productSettings;
+    productSettings = {
+      priceShowAfterStop: !!priceShowAfterStop,
+      priceShowToVisit: !!priceShowToVisit
+    };
+    // 减库存的方式
+    stockCostMethod = stockCostMethod === "orderReduceStock"? "orderReduceStock": "payReduceStock";
+    // 购买限制
+    if(purchaseLimitCount !== -1) {
+      checkNumber(purchaseLimitCount, {
+        name: "购买限制",
+        min: 1
+      });
+    }
+    if(uploadCert) {
+      checkString(uploadCertDescription, {
+        name: "凭证说明",
+        minLength: 1,
+        maxLength: 1000
+      });
+    } else {
+      uploadCertDescription = "";
+    }
+
+
+    if(!product) {
+      // 新上架
+      if(!["notonshelf", "insale"].includes(productStatus)) {
+        ctx.throw(400, "未知的上架类型");
+      }
+      const now = Date.now();
+      if(shelfTime) {
+        checkNumber(shelfTime, {
+          name: "上架时间"
+        });
+        if(shelfTime <= now) {
+          ctx.throw(400, "定时上架的时间必须大于当前时间");
+        }
+      }
+      if(productStatus === "insale") {
+        shelfTime = Date.now();
+      }
+      const options = {
+        title: productName,
+        abstractCn: productDescription,
+        keyWordsCn: attention,
+        content: productDetails,
+        uid: user.uid,
+        fids: mainForumsId,
+        cids: [],
+        ip: ctx.address,
+        type: "product"
+      };
+      await db.ThreadModel.ensurePublishPermission(options);
+      const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
+      const product = db.ShopGoodsModel({
+        productId,
+        purchaseLimitCount,
+        ip: ctx.address,
+        mainForumsId,
+        imgIntroductions,
+        imgMaster,
+        stockCostMethod,
+        productStatus: "notonshelf",
+        uploadCert,
+        uploadCertDescription,
+        shelfTime,
+        isFreePost,
+        freightTemplates,
+        uid: user.uid,
+        threadInfo: options,
+        vipDiscount,
+        vipDisGroup,
+        productSettings
+      });
+      // 生成规格信息
+      for(const param of productParams) {
+        param.productId = productId; // 规格所属商品的ID
+        param.uid = user.uid; // 商品拥有者
+        param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
+        param._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
+        await db.ShopProductsParamModel(param).save();
+      }
+      await product.save();
+      if(productStatus === "insale") {
+        await product.onshelf();
+      }
+    } else {
+      // 修改已上架的商品
+      const params = product.productParams;
+      const oldParams = {};
+      const newParams = [];
+      productParams.map(p => {
+        const {
+          _id,
+          name,
+          originPrice,
+          price,
+          useDiscount,
+          stocksTotal
+        } = p;
+        if(!_id) {
+          newParams.push(p);
+        } else {
+          oldParams[_id] = p;
+        }
+      });
+      params.map(p => {
+        
+      });
+    }
+    return await next();
+    /*
     const paramsInfo = body.post.params;
     const {contentLength} = tools.checkString;
     if(!productName) ctx.throw(400, '商品名不能为空');
@@ -189,6 +462,7 @@ shelfRouter
     }
 
     data.product = product;
-		await next();
+    await next();
+    */
 	});
 module.exports = shelfRouter;

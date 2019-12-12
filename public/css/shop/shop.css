@@ -246,6 +246,15 @@ body {
 .shop-btn.primary:hover {
   background-color: #257cbb;
 }
+.shop-btn.disabled {
+  border: 1px solid #ccc;
+  background-color: #ccc;
+  color: #fff;
+  cursor: not-allowed;
+}
+.shop-btn.disabled:hover {
+  background-color: #ccc;
+}
 .shop-add-template {
   text-align: center;
   background-color: #f4f4f4;
@@ -399,14 +408,22 @@ body {
   color: #888;
   font-size: 1.2rem;
 }
-.shop-shelf .pictures .picture .remove {
-  font-size: 1.2rem;
-  position: absolute;
-  top: 0;
-  right: 0;
+.shop-shelf .pictures .picture .buttons {
   height: 2rem;
-  width: 2rem;
   line-height: 2rem;
-  background-color: rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
   color: #fff;
+  position: absolute;
+}
+.shop-shelf .pictures .picture .buttons .fa {
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 1.2rem;
+  width: 3rem;
+}
+.shop-shelf .pictures .picture .buttons .fa:hover {
+  background-color: rgba(0, 0, 0, 0.5);
 }

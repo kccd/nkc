@@ -175,8 +175,10 @@ style.
             select(style="font-size:12px;margin-right:5px")#freightTemplates
               for temp,index in product.freightTemplates
                 option(value=`${index}` dataaddprice=`${temp.addPrice}` datafirstprice=`${temp.firstPrice}`)!=`${temp.name}`
-            span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
-            span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
+            span#freightPrice #{numToFloatTwo(product.freightTemplates[0].firstPrice)}
+            span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightTemplates[0].addPrice)}    
+            //- span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
+            //- span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
             input#isFreePost(type="text" value="payPost" style="display:none")
     div.item
       p

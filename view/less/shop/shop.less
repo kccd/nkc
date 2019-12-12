@@ -230,6 +230,15 @@ body{
       background-color: #257cbb;
     }
   }
+  &.disabled{
+    border: 1px solid #ccc;
+    background-color: #ccc;
+    color: #fff;
+    cursor: not-allowed;
+    &:hover{
+      background-color: #ccc;
+    }
+  }
 }
 
 .shop-add-template{
@@ -388,17 +397,28 @@ body{
         color: #888;
         font-size: 1.2rem;
       }
-      .remove{
-        font-size: 1.2rem;
-        position: absolute;
-        top: 0;
-        right: 0;
+      .buttons{
         height: 2rem;
-        width: 2rem;
         line-height: 2rem;
-        background-color: rgba(0, 0, 0, 0.5);
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.2);
         color: #fff;
+        position: absolute;
+        .fa{
+          height: 2rem;
+          line-height: 2rem;
+          font-size: 1.2rem;
+          width: 3rem;
+          &:hover{
+            background-color: rgba(0, 0, 0, 0.5);
+          }
+        }
       }
     }
   }
+}
+.goods{
+  
 }

@@ -2,5 +2,49 @@ extends ../../shop
 block shopTitle
   title 商品管理
 block shopContent
-  div Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit, accusamus? Consequatur, beatae laboriosam! Cum sit dolore pariatur aspernatur veritatis rem quia quae nisi eaque voluptatum ea, earum fuga doloremque fugit.
+  .order-navs
+    a(class=!data.t || data.t === "onSale" ? "active" : "" href=`/shop/manage/order`).order-nav 已上架
+    a(class=data.t === "unSale" ? "active" : "" href=`/shop/manage/order?t=unSale`).order-nav 未上架
+    a(class=data.t === "stopped" ? "active" : "" href=`/shop/manage/order?t=stopped`).order-nav 已下架
+  .goods
+    .table-responsive
+      table.table.table-bordered
+        thead
+          tr
+            th 商品信息
+            th 已售统计
+            th 限购
+            th 商品状态
+            th 其他
+        tbody
+          for product in data.products
+            tr
+              th 
+                div.order-name-info
+                  .order-cover
+                    img(src=`/r/${product.imgMaster}`)
+                  .order-name
+                    a(href=`/shop/product/${product.productId}` title=product.name)=product.name
+                    .order-param=`上架时间：${format("YYYY/MM/DD HH:mm:ss", product.toc)}`
+              th
+                -let count = 0;
+                for param in product.productParams
+                  -count += (param.stocksTotal - param.stocksSurplus);
+                div=count
+              th 
+                if product.purchaseLimitCount === -1
+                  div 不限购
+                else
+                  div=`每人限购${product.purchaseLimitCount}件`
+              th
+                if product.productStatus === "insale"
+                  div 已上架
+                else if product.productStatus === "stopsale"
+                  div 已下架
+                else 
+                  div 待上架  
+              th.order-links
+                a(href=`/editor?type=post&id=${product.oc}` target="_blank") 编辑商品信息
+                a(href=`/shop/manage/shelf?productId=${product.productId}`) 编辑出售信息    
+
 block shopScripts    

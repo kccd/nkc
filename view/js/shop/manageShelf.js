@@ -2,19 +2,40 @@ const data = NKC.methods.getDataById("data");
 console.log(data);
 const {grades, dealInfo, product} = data;
 
+const vipDisGroupObj = {};
+
+const purchaseLimit = {
+  status: false,
+  count: 2
+};
+
+if(product) {
+  product.vipDisGroup.map(v => vipDisGroupObj[v.vipLevel] = v);
+  if(product.purchaseLimitCount == -1) {
+    purchaseLimit.status = false;
+  } else {
+    purchaseLimit.status = true;
+    purchaseLimit.count = product.purchaseLimitCount;
+  }
+}
+
 const vipDisGroup = grades.map(g => {
+  const group = vipDisGroupObj[g._id];
   return {
     vipLevel: g._id,
     grade: g,
-    vipNum: 100
+    vipNum: group? group.vipNum: 100
   };
 });
+
 
 const app = new Vue({
   el: "#app",
   data: {
 
     type: product? "modify": "create", // 新上架：create, 编辑：modify
+
+    submitting: false,
 
     // 提供选择的交易板块
     shopForums: data.shopForumTypes,
@@ -27,17 +48,14 @@ const app = new Vue({
     content: "",
     keywords: [],
     // 商品介绍图
-    // imgIntroductions: ["305674", "305673", "305667", "305671"],
-    imgIntroductions: ["", "", "", "", ""],
+    imgIntroductions: product? product.imgIntroductions: ["", "", "", "", ""],
 
     // 添加多个规格
     paramForum: false,
 
     // 规格信息
-    // 编辑时 已经存在的规格分类
-    createdParams: [],
     // 已勾选 新的规格分类  独立规格直接新建此数组内
-    selectedParams: [],
+    selectedParams: product?product.productParams:[],
     // 规格名 
     /* 
     {
@@ -52,44 +70,47 @@ const app = new Vue({
     params: [],
     // 会员折扣
     vipDisGroup,
-    vipDiscount: false,
+    vipDiscount: product?!!product.vipDiscount: false,
     // 减库存
-    stockCostMethod: "orderReduceStock", // 下单减库存：orderReduceStock，付款减库存：payReduceStock
+    stockCostMethod: product? product.stockCostMethod: "orderReduceStock", // 下单减库存：orderReduceStock，付款减库存：payReduceStock
     // 限购相关
-    purchaseLimit: {
-      status: false,
-      count: ""
-    },
+    purchaseLimit,
     // 购买时是否需要上传凭证、凭证说明
-    uploadCert: false,
-    uploadCertDescription: "",
+    uploadCert: product? !!product.uploadCert: false,
+    uploadCertDescription: product? product.uploadCertDescription: "",
 
     // 价格显示相关 
-    productSettings: {
+    productSettings: product? product.productSettings: {
       // 游客是否可见
-      priceShowToVisit: false,
+      priceShowToVisit: true,
       // 停售后是否可见
-      priceShowAfterStop: false
+      priceShowAfterStop: true
     },
 
     // 是否免邮费
-    isFreePost: true,
+    isFreePost: product? !!product.isFreePost: true,
     // 运费模板
     defaultTemplates: dealInfo.templates,
-    freightTemplates: [],
+    freightTemplates: product? product.freightTemplates: [],
     // 上架时间
     shelfType: "immediately", // 立即上架：immediately，timing: 定时上架，save: 暂存不发布
     shelfTime: ""
 
   },
+  watch: {
+    shelfType() {
+      this.initTime();
+    }
+  },
   mounted() {
     // 编辑商品 预制内容
     if(product) {
-
+      
     } else {
       window.CommonModal = new NKC.modules.CommonModal();
       window.SelectForums = new NKC.modules.MoveThread();
       window.editor = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
+      this.initTime();
       this.addParam();
     }
 
@@ -130,7 +151,183 @@ const app = new Vue({
   },
   methods: {
     save() {
+      const self = this;
+      const {checkNumber, checkString} = NKC.methods.checkData;
+      const body = {};
+      Promise.resolve()
+        .then(() => {
+          if(self.type === "create") {
+            self.content = editor.getContent();
+            if(!self.selectedShopForumId) throw "请选择商品分类";
+            if(!self.mainForums.length) throw "请选择商品辅助分类";
+            body.mainForumsId = [self.selectedShopForumId].concat(self.mainForums.map(forum => forum.fid));
+            checkString(self.title, {
+              name: "商品标题",
+              minLength: 6,
+              maxLength: 200
+            });
+            body.productName = self.title;
+            checkString(self.abstract, {
+              name: "商品简介",
+              minLength: 6,
+              maxLength: 1000,
+            });
+            body.productDescription = self.abstract;
+            self.keywords.map(k => {
+              checkString(k, {
+                name: "关键词",
+                minLength: 1,
+                maxLength: 20
+              });
+            });
+            body.attention = self.keywords;
+            checkString(self.content, {
+              name: "图文描述",
+              minLength: 1,
+              maxLength: 100000
+            });
+            body.productDetails = self.content;
+          }
+          // 判断商品图
+          const picturesId = self.imgIntroductions.filter(i => !!i);
+          if(!picturesId.length) throw "请至少选择一张商品图";
+          body.imgIntroductions = picturesId;
+          // 判断商品规格
+          let productParams = [];
+          productParams = productParams.concat(self.selectedParams);
+          if(self.type === "modify") {
+            productParams = productParams.concat(self.createdParams);
+          }
+          if(!productParams.length) throw "请至少添加一个商品规格";
+          productParams.map(param => {
+            const {
+              name, originPrice,
+              price, useDiscount,
+              stocksTotal
+            } = param;
+            checkString(name, {
+              name: "规格名称",
+              minLength: 1,
+              maxLength: 100
+            });
+            checkNumber(stocksTotal, {
+              name: "规格数量",
+              min: 0
+            }),
+            checkNumber(originPrice, {
+              name: "规格价格",
+              min: 1,
+              fractionDigits: 2
+            });
+            if(useDiscount) {
+              checkNumber(price, {
+                name: "规格优惠价",
+                min: 1,
+                fractionDigits: 2
+              });
+              if(price >= originPrice) throw "规格优惠价必须小于原价";  
+            }
+          });
+          body.productParams = productParams;
+          body.vipDisGroup = [];
+          // 会员折扣
+          if(self.vipDiscount) {
+            self.vipDisGroup.map(v => {
+              const {vipNum} = v;
+              checkNumber(vipNum, {
+                name: "折扣率",
+                min: 1,
+                max: 100
+              });
+            });
+            body.vipDisGroup = self.vipDisGroup;
+          }
+          body.vipDiscount = self.vipDiscount;
+          // 运费
+          if(!self.isFreePost) {
+            if(!self.freightTemplates.length) throw "请至少添加一条运费信息";
+            self.freightTemplates.map(f => {
+              const {name, firstPrice, addPrice} = f;
+              checkString(name, {
+                name: "物流名称",
+                minLength: 1,
+                maxLength: 100
+              });
+              checkNumber(firstPrice, {
+                name: "物流首件价格",
+                min: 0,
+                fractionDigits: 2
+              });
+              checkNumber(addPrice, {
+                name: "物流每增加一件的价格",
+                min: 0,
+                fractionDigits: 2
+              });
+            });
+            body.freightTemplates = self.freightTemplates;
+          }
+          body.isFreePost = !!self.isFreePost;
+          // 价格显示
+          body.productSettings = self.productSettings;
+          // 库存
+          body.stockCostMethod = self.stockCostMethod;
+          // 购买限制
+          if(self.purchaseLimit.status) {
+            checkNumber(self.purchaseLimit.count, {
+              name: "限购数量",
+              min: 1
+            });
+            body.purchaseLimitCount = self.purchaseLimit.count;
+          } else {
+            body.purchaseLimitCount = -1;
+          }
+          // 购买凭证
+          if(self.uploadCert) {
+            checkString(self.uploadCertDescription, {
+              name: "凭证说明",
+              minLength: 1,
+              maxLength: 1000
+            });
+            body.uploadCertDescription = self.uploadCertDescription;
+          }
+          body.uploadCert = self.uploadCert;
+          if(self.type === "create") {
+            // 上架时间
+            if(self.shelfType === "immediately") {
+              body.productStatus = "insale";
+            } else if(self.shelfType === "save") {
+              body.productStatus = "notonshelf";
+            } else {
+              body.productStatus = "notonshelf";
+              const dom = $("#shelfTime");
+              let shelfTime = new Date(dom.val()).getTime();
+              body.shelfTime = shelfTime;
+            }
 
+          } else {
+            body.productId = product.productId;
+          }
+          return nkcAPI("/shop/manage/shelf", "POST", {post:  body});
+        })
+        .then(data => {
+          sweetSuccess("提交成功");
+        })
+        .catch(sweetError);
+    },
+    disabledSelectParam(param) {
+      if(!param._id) return;
+      param.isEnable = !param.isEnable;
+    },
+    initTime() {
+      $('.time').datetimepicker({
+        language:  'zh-CN',
+        format: 'yyyy-mm-dd hh:ii',
+        autoclose: true,
+        todayHighlight: 1,
+        startView: 2,
+        minView: 0,
+        forceParse: 0
+      });
     },
     selectPictures(index) {
       const self = this;
@@ -138,14 +335,35 @@ const app = new Vue({
         window.SelectResource = new NKC.modules.SelectResource();
       }
       SelectResource.open(data => {
+        if(!["png", "jpg", "jpeg"].includes(data.resources[0].ext)) return sweetInfo("仅支持png、jpg和jpeg格式的图片");
         Vue.set(self.imgIntroductions, index, data.resourcesId[0]);
       }, {
         allowedExt: ["picture"],
         countLimit: 1
       })
     },
+    changeArrIndex(arr, index, t) {
+      const i = arr[index];
+      const length = arr.length;
+      let otherIndex;
+      if(t === "left") {
+        if(index === 0) return;
+        otherIndex = index - 1;
+      } else {
+        if(index + 1 === length) return;
+        otherIndex = index + 1;
+      }
+      const other = arr[otherIndex];
+      Vue.set(arr, index, other);
+      Vue.set(arr, otherIndex, i);
+    },
     removePicture(index) {
-      Vue.set(this.imgIntroductions, index, "");
+      sweetQuestion("确定要删除当前商品图片？")
+        .then(() => {
+          Vue.set(this.imgIntroductions, index, "");
+        })
+        .catch(err => {})
+      
     },
     reloadTemplate() {
       const self = this;
@@ -159,8 +377,8 @@ const app = new Vue({
     addTemplate() {
       this.freightTemplates.push({
         name: "新建模板",
-        firstPrice: 10,
-        addPrice: 2
+        firstPrice: "",
+        addPrice: ""
       });
     },
     removeFromArr(arr, index) {
@@ -216,6 +434,9 @@ const app = new Vue({
       this.params = [
         {
           value: ""
+        },
+        {
+          value: ""
         }
       ]
     },
@@ -226,7 +447,14 @@ const app = new Vue({
       param = param && param.name? param : this.newParam();
       this.selectedParams.push(param);
     },
-    newParam(name = "新建规格") {
+    newParam(name) {
+      if(!name) {
+        if(!this.selectedParams.length) {
+          name = "默认";
+        } else {
+          name = "新建规格";
+        }
+      }
       return {
         name,
         originPrice: "",

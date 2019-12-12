@@ -85,7 +85,7 @@ var CheckData = function () {
       self.te(400, "邮箱格式不符合要求");
     }
   };
-
+  
 };
 if(inBrowser) {
   NKC.methods.checkData = new CheckData();
