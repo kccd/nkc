@@ -1,4 +1,5 @@
 -const product = data.product
+-product.productParams = product.productParams.filter(p => p.isEnable);
 -let paraId = data.paraId;
 -if(!paraId) paraId = product.productParams[0]._id+""
 -const paId = data.paId;

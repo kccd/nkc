@@ -112,9 +112,11 @@ body{
   .order-cover{
     height: 7rem;
     width: 7rem;
-    line-height: 7rem;
+    line-height: 6.5rem;
+    overflow: hidden;
     text-align: center;
-    border: 1px solid #eee;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
     display: inline-block;
     margin-right: 0.5rem;
     img{
@@ -421,56 +423,196 @@ body{
 }
 .goods{
   .product{
-    margin-bottom: 2rem;
-    .goods-cover{
-      display: table-cell;
-      vertical-align: top;
-      div {
-        @imgHeight: 8rem;
-        height: @imgHeight;
-        width: @imgHeight;
-        line-height: @imgHeight;
-        border: 1px solid #ccc;
-        margin-right: 0.5rem;
-        img{
-          max-width: 100%;
-          max-height: 100%;
+    background-color: #ebf0f4;    
+    th{
+      font-weight: 500;
+      text-align: center;
+    }
+    th.product-name{
+      text-align: left;
+    }
+  }
+  .product-header{
+    th{
+      text-align: center;
+    }
+  }
+  .param{
+    th{
+      font-weight: 500;
+      text-align: center;
+    }
+    &.disabled{
+      background-color: #ccc;
+    }
+  }
+  .param-header{
+    th{
+      text-align: center;
+    }
+    .product-name{
+      text-align: left;
+    }
+  }
+}
+
+.shop-bill{
+  .null{
+    font-size: 1.3rem;
+    height: 6rem;
+    line-height: 6rem;
+  }
+  .shop-addresses{
+    padding-top: 0.5rem;
+    .shop-address{
+      margin-bottom: 1rem;
+      user-select: none;
+      padding: 1rem 0.5rem;
+      box-sizing: border-box;
+      border: 2px solid #eee;
+      cursor: pointer;
+      .fa{
+        display: none;
+      }
+      position: relative;
+      transition: border-color 100ms;
+      &:hover, &.active{
+        border-color: @accent;
+      }
+      &.active{
+        .fa{
+          display: block;
+          position: absolute;
+          top: 0;
+          right: 0;
+          background-color: @accent;
+          color: #fff;
+          height: 2rem;
+          font-size: 1.3rem;
+          width: 2rem;
+          line-height: 2rem;
           text-align: center;
         }
       }
-    }
-    .goods-content-info{
-      display: table-cell;
-      vertical-align: top;
-      .goods-title{
-        max-height: 1.8rem;
-        color: @dark;
-        font-size: 1.25rem;
-        .hideText(@line: 1);
-        &:hover{
+      .address-user-info{
+        .address-user-name{
+          display: inline-block;
+          font-size: 1.4rem;
           color: @accent;
+          font-weight: 700;
+          font-style: oblique;
+          margin-right: 1rem;
+        }
+        .address-user-mobile{
+          display: inline-block;
+          font-size: 1.3rem;
+          color: @dark;
+          font-weight: 700;
         }
       }
-      .goods-abstract{
-        max-height: 3.2rem;
-        color: #777;
-        margin-top: 0.5rem;
-        font-size: 1rem;
-        .hideText(@line: 2)
+      .address-content{
+        margin-top: 0.3rem;
       }
-      .goods-hits{
-        div{
-          display: inline-block;
-          span{
-            color: #888;
-          }
-          .fa{
-            color : #aaa;
-            margin-right: 0.3rem;
-            font-size: 1rem;
-          }
+    }
+  }
+  .shop-product{
+    margin: 0.5rem 0;
+    .product-user{
+      padding: 0.5rem;
+      background-color: #eee;
+      .user-avatar{
+        display: inline-block;
+        img{
+          height: 2rem;
+          width: 2rem;
+          border-radius: 50%;
+          margin-right: 0.3rem;
+          box-sizing: border-box;
+          margin-top: -2px;
+          border: 2px solid #eee;
+        }
+      }
+      
+      a.username{
+        color: #777;
+        margin-right: 0.5rem;
+        &:hover, &:focus{
+          text-decoration: none;
+        }
+      }
+      .icon{
+        font-size: 1.4rem;
+        color: #777;
+        .fa.active{
+          color: #49dd4f;
         }
       }
     }
   }
+  .product-freight{
+    text-align: right;
+    .info{
+      color: #777;
+    }
+  }
+  .product-price{
+    text-align: right;
+    margin-bottom: 0.5rem;
+    .number{
+      color: @accent;
+      font-style: oblique;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+  }
+  .shop-total{
+    text-align: right;
+    font-size: 1.3rem;
+    .number{
+      display: inline-block;
+      color: @accent;
+      font-style: oblique;
+      font-size: 1.3rem;
+      font-weight: 700;
+      &.total{
+        font-size: 2rem;
+      }
+    }
+    button{
+      border: 0;
+      background-color: @accent;
+      color: #fff;
+      height: 3.4rem;
+      padding: 0 1rem;
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+      transition: background-color 100ms;
+      &:hover{
+        background-color: #bc495b;
+      }
+      &:focus{
+        outline: none;
+      }
+    }
+  }
+  .product-cert{
+    text-align: right;
+    margin-bottom: 0.5rem;
+    .cert-content{
+      display: inline-block;
+      height: 6rem;
+      width: 6rem;
+      line-height: 5.6rem;
+      text-align: center;
+      border: 1px solid #ccc;
+      color: #aaa;
+      cursor: pointer;
+
+      img{
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
+  }
+  
 }

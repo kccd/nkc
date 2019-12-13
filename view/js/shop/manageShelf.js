@@ -46,6 +46,8 @@ const app = new Vue({
 
     submitting: false,
 
+    showCloseInfo: true,
+
     // 提供选择的交易板块
     shopForums: data.shopForumTypes,
     selectedShopForumId: "",
@@ -165,6 +167,7 @@ const app = new Vue({
       const body = {};
       Promise.resolve()
         .then(() => {
+          self.submitting = true;
           if(self.type === "create") {
             self.content = editor.getContent();
             if(!self.selectedShopForumId) throw "请选择商品分类";
@@ -217,7 +220,7 @@ const app = new Vue({
               maxLength: 100
             });
             checkNumber(stocksTotal, {
-              name: "规格数量",
+              name: "规格库存",
               min: 0
             }),
             checkNumber(originPrice, {
@@ -317,8 +320,14 @@ const app = new Vue({
         })
         .then(data => {
           sweetSuccess("提交成功");
+          self.submitting = false;
+          self.showCloseInfo = false;
+          NKC.methods.visitUrl("/shop/manage/goods");
         })
-        .catch(sweetError);
+        .catch(err => {
+          self.submitting = false;
+          sweetError(err);
+        });
     },
     disabledSelectParam(param) {
       if(!param._id) return;
@@ -465,6 +474,7 @@ const app = new Vue({
         name,
         originPrice: "",
         price: "",
+        isEnable: true,
         useDiscount: false,
         stocksTotal: ""
       }
@@ -489,3 +499,10 @@ const app = new Vue({
     }
   }
 });
+
+// 监听页面关闭，提示保存草稿
+window.onbeforeunload = function() {
+  if(app.showCloseInfo){
+    return "关闭页面后，已填写的内容将会丢失。确定要关闭当前页面？"
+  }
+};

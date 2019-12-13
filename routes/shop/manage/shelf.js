@@ -64,7 +64,7 @@ shelfRouter
     let product;
 
     if(productId) {
-      product = await db.ShopGoodsModel.findOne({productId});
+      product = await db.ShopGoodsModel.findOne({productId, uid: user.uid});
       if(!product) ctx.throw(400, `商品ID错误，productId: ${productId}`);
     }
 
@@ -124,7 +124,7 @@ shelfRouter
       });
       p.name = name;
       checkNumber(stocksTotal, {
-        name: "规格数量",
+        name: "规格库存",
         min: 0
       }),
       p.stocksTotal = stocksTotal;
@@ -294,6 +294,7 @@ shelfRouter
       for(const param of productParams) {
         param.productId = productId; // 规格所属商品的ID
         param.uid = user.uid; // 商品拥有者
+        param.isEnable = true;
         param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
         param._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
         await db.ShopProductsParamModel(param).save();
@@ -343,6 +344,7 @@ shelfRouter
           param.productId = product.productId; // 规格所属商品的ID
           param.uid = user.uid; // 商品拥有者
           param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
+          param.isEnable = true;
           param._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
           await db.ShopProductsParamModel(param).save();
         }

@@ -96,9 +96,9 @@ block shopAccountContent
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 等待买家付款
             li.orderPrompt 
-              button(onclick=`payNow(${order.orderId})`) 立即付款
+              a.btn.btn-default.btn-sm(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
             li.orderPrompt 
-              button(onclick=`cancelOrder(${order.orderId})`) 取消订单
+              a.btn.btn-default.btn-sm(href=`/shop/order/${order.orderId}/refund`) 取消订单
           if order.orderStatus == "unShip"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark

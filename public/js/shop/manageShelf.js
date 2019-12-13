@@ -47,6 +47,7 @@ var app = new Vue({
     type: product ? "modify" : "create",
     // 新上架：create, 编辑：modify
     submitting: false,
+    showCloseInfo: true,
     // 提供选择的交易板块
     shopForums: data.shopForumTypes,
     selectedShopForumId: "",
@@ -172,6 +173,8 @@ var app = new Vue({
           checkString = _NKC$methods$checkDat.checkString;
       var body = {};
       Promise.resolve().then(function () {
+        self.submitting = true;
+
         if (self.type === "create") {
           self.content = editor.getContent();
           if (!self.selectedShopForumId) throw "请选择商品分类";
@@ -229,7 +232,7 @@ var app = new Vue({
             maxLength: 100
           });
           checkNumber(stocksTotal, {
-            name: "规格数量",
+            name: "规格库存",
             min: 0
           }), checkNumber(originPrice, {
             name: "规格价格",
@@ -337,7 +340,13 @@ var app = new Vue({
         });
       }).then(function (data) {
         sweetSuccess("提交成功");
-      })["catch"](sweetError);
+        self.submitting = false;
+        self.showCloseInfo = false;
+        NKC.methods.visitUrl("/shop/manage/goods");
+      })["catch"](function (err) {
+        self.submitting = false;
+        sweetError(err);
+      });
     },
     disabledSelectParam: function disabledSelectParam(param) {
       if (!param._id) return;
@@ -484,6 +493,7 @@ var app = new Vue({
         name: name,
         originPrice: "",
         price: "",
+        isEnable: true,
         useDiscount: false,
         stocksTotal: ""
       };
@@ -507,4 +517,10 @@ var app = new Vue({
       this.paramForum = false;
     }
   }
-});
+}); // 监听页面关闭，提示保存草稿
+
+window.onbeforeunload = function () {
+  if (app.showCloseInfo) {
+    return "关闭页面后，已填写的内容将会丢失。确定要关闭当前页面？";
+  }
+};
