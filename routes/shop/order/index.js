@@ -118,7 +118,7 @@ router
     });
     const {user} = data;
     const gradeId = user.grade._id;
-    const orderArr = [];
+    const orderArr = []; 
     // 不同卖家 生成多个订单
     for(const p of params) {
       const {uid, products, buyMessage} = p;
@@ -126,7 +126,7 @@ router
       const productUser = await db.UserModel.findOne({uid});
       if(!productUser) ctx.throw(404, `卖家ID不正确，uid:${uid}`);
       const orderId = await db.SettingModel.operateSystemID("shopOrders", 1);
-      const cartArr = [], costArr = [];
+      const cartArr = [], costArr = [], certArr = [];
       let orderFreightPrice = 0, orderPrice = 0;
       // 同一买家 生成一个订单
       checkString(buyMessage, {
@@ -148,6 +148,7 @@ router
           if(!certId) ctx.throw(400, "请上传凭证");
           const cert = await db.ShopCertModel.findOne({_id: Number(certId), uid: user.uid, type: "shopping"});
           if(!cert) ctx.throw(400, "凭证ID错误，请重新上传");
+          certArr.push(cert);
         }
         let countTotal_ = 0, priceTotal_ = 0;
         // 同一商品不同规格 统一计算邮费
@@ -178,8 +179,7 @@ router
           countTotal_ += count;
           priceTotal_ += count * price;
           const costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
-          // 生成订单中的已购买商品的记录
-          const cost = db.ShopCostRecordModel({
+          costArr.push({
             costId,
             orderId,
             productId,
@@ -190,8 +190,6 @@ router
             productPrice: price * count,
             singlePrice: price
           });
-          await cost.save();
-          costArr.push(cost);
         }
         let freightTotal_ = 0;
         if(!product.isFreePost) {
@@ -210,27 +208,45 @@ router
         orderPrice += priceTotal_;
       }
 
-      // 生成订单信息
-      const order = db.ShopOrdersModel({
-        orderId,
-        snapshot: costArr,
-        buyUid: user.uid,
-        sellUid: productUser.uid,
-        orderFreightPrice,
-        orderPrice,
-        receiveAddress: `${location} ${address}`,
-        receiveName: username,
-        receiveMobile: mobile,
-        buyMessage
+      orderArr.push({
+        orderObj: {
+          orderId,
+          snapshot: [],
+          buyUid: user.uid,
+          sellUid: productUser.uid,
+          orderFreightPrice,
+          orderPrice,
+          receiveAddress: `${location} ${address}`,
+          receiveName: username,
+          receiveMobile: mobile,
+          buyMessage
+        },
+        costArr,
+        cartArr,
+        certArr
       });
+    }
+
+    const ordersId = [];
+    for(const obj of orderArr) {
+      const {orderObj, cartArr, certArr, costArr} = obj;
+      for(const c of costArr) {
+        // 生成订单中的已购买商品的记录
+        const cost = db.ShopCostRecordModel(c);
+        await cost.save();
+        orderObj.snapshot.push(cost);
+      }
+      const order = db.ShopOrdersModel(orderObj);
       await order.save();
-      orderArr.push(order);
-      // 减库存
+      ordersId.push(order.orderId);
       const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
       await db.ShopProductsParamModel.productParamReduceStock(orders,'orderReduceStock');
       // 删除购物车记录
       for(const c of cartArr) {
         await c.remove();
+      }
+      for(const cert of certArr) {
+        await cert.update({orderId: order.orderId});
       }
       // 通知卖家有新的订单
       const message = db.MessageModel({
@@ -247,7 +263,8 @@ router
       await message.save();
       await ctx.redis.pubMessage(message);
     }
-    data.ordersId = orderArr.map(order => order.orderId);
+
+    data.ordersId = ordersId;
     await next();
   })
   .post('/old', async (ctx, next) => {
