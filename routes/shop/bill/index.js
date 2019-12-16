@@ -4,9 +4,12 @@ router
   .get('/', async (ctx, next) => {
     const {data, db, query} = ctx;
     const {user} = data;
-    let {cartsId, paraId, productCount, freightId} = query;
+    let {
+      cartsId, paraId, productCount, freightId
+    } = query;
     let billType;
     paraId = Number(paraId);
+    // 整理购物车数据
     if(!cartsId){
       billType = "product";
       if(!productCount) ctx.throw(400, "请选择商品数量");
@@ -22,23 +25,68 @@ router
       })
       await newCart.save();
       const cartsData = [newCart];
-      data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData);
-      // const billProducts = await db.ShopProductsParamModel.findOne({_id: paraId});
-      // const product = await db.ShopGoodsModel.findOne({productId: billProducts[0].productId});
-      // if(product.productStatus == "stopsale") ctx.throw(400, "商品停售中，不可购买")
-      // data.cartsData = await db.ShopProductsParamModel.extendParamsInfo(billProducts);
-      // data.cartsData[0].count = Number(productCount);
-      // data.cartsData[0].productParamId = Number(paraId);
-      // data.cartsData[0].productParam = await db.ShopProductsParamModel.extendParamsInfo(billProducts[0]);
-      // data.cartsData  = billProducts;
-    }else{
+      data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData, {
+        userGradeId: data.user.grade._id
+      });
+    } else {
       billType = "cart";
       cartsId = cartsId.split('-');
       const cartsData = await db.ShopCartModel.find({_id: {$in: cartsId}}); 
-      data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData);
+      data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData, {
+        userGradeId: data.user.grade._id
+      });
     }
     data.billType = billType;
 
+    // 将商品按店家分类，将规格按商品分类
+    const usersObj = {}, productsObj = {}, paramsObj  = {};
+    for(const cart of data.cartsData) {
+      const {product, productParam, count, _id} = cart;
+      usersObj[product.uid] = {
+        user: product.user,
+        products: []
+      };
+      productsObj[product.productId] = {
+        product,
+        freight: product.isFreePost? "": product.freightTemplates[0],
+        params: []
+      };
+      paramsObj[productParam._id] = {
+        productParam,
+        cartId: _id,
+        price: productParam.useDiscount? productParam.price: productParam.originPrice,
+        count
+      }; 
+    }
+    for(const paramId in paramsObj) {
+      if(!paramsObj.hasOwnProperty(paramId)) continue;
+      const param = paramsObj[paramId];
+      const product = productsObj[param.productParam.productId];
+      let vipNum = 100;
+      // 会员折扣
+      if(product.product.vipDiscount) {
+        const gradeId = user.grade._id;
+        for(const v of product.product.vipDisGroup) {
+          if((v.vipLevel + "") === (gradeId + "")) {
+            vipNum = v.vipNum;
+            break;
+          }
+        }
+      }
+      param.price =  parseInt(param.productParam.price * vipNum / 100);
+      product.params.push(param);
+    }
+    for(const productId in productsObj) {
+      if(!productsObj.hasOwnProperty(productId)) continue;
+      const product = productsObj[productId];
+      const user = usersObj[product.product.uid];
+      user.products.push(product);
+    }
+    data.results = [];
+    for(const userId in usersObj) {
+      if(!usersObj.hasOwnProperty(userId)) continue;
+      data.results.push(usersObj[userId]);
+    }
     // 将账单按卖家进行分类
     let newCartData = {}; 
     for(const cart of data.cartsData) {

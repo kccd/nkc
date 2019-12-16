@@ -58,7 +58,7 @@ productRouter
       const gradeId = data.user.grade._id;
       let vipNum = 100;
       for(const v of product.vipDisGroup) {
-        if((v.vipLevel + 1) === gradeId) {
+        if((v.vipLevel) === gradeId) {
           vipNum = v.vipNum;
         }
       }

@@ -37,13 +37,15 @@ NKC.modules.SummaryCalender = function(dom, year) {
     if(self.myChart && self.myChart.dispose) {
       self.myChart.dispose();
     }
-    var times = {};
-    for(var i = self.begin; i < self.end ; i = i + 24*60*60*1000) {
-      times[NKC.methods.format("YYYY-MM-DD", i)] = 0;
-    }
+    var timeObj = {};
     for(var i = 0; i < data.length; i++) {
       var t = data[i];
-      times[NKC.methods.format("YYYY-MM-DD", t)] ++;
+      timeObj[t._id] = t.count;
+    }
+    var times = {};
+    for(var i = self.begin; i < self.end ; i = i + 24*60*60*1000) {
+      var timeName = NKC.methods.format("YYYY-MM-DD", i);
+      times[NKC.methods.format("YYYY-MM-DD", i)] = timeObj[timeName] || 0;
     }
     data = [];
     var max = 0;

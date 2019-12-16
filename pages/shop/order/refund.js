@@ -75,7 +75,7 @@ var app = new Vue({
     refundMoneyMax: function() {
       var maxMoney = 0;
       if(this.param) {
-        return this.param.productPrice;
+        return this.param.singlePrice * this.param.count;
       } else {
         return this.order.orderPrice
       }

@@ -83,7 +83,7 @@ router
     }
     user.kcb = await db.UserModel.updateUserKcb(user.uid);
     if(user.kcb < totalMoney) ctx.throw(400, "您的科创币不足，请先充值或选择其他付款方式支付");
-    if(totalMoney !== Number(totalPrice)*100) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
+    if(totalMoney !== parseInt(Number(totalPrice)*100)) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
 
     for(let order of orders) {
       const r = db.KcbsRecordModel({

@@ -77,7 +77,7 @@ block name
                         a(onclick=`editOrderProductCount(${order.sellUid}, ${para.costId}, ${order.orderId})` id=`editCountBtn${para.costId}` style="cursor:pointer") 修改
                         a(onclick=`saveOrderProductCount(${order.sellUid}, ${para.costId}, ${order.orderId})` id=`saveCountBtn${para.costId}` style="display:none;cursor:pointer") 保存
                   if key == 0
-                    td(rowspan=`${order.params.length}`)  
+                    td(rowspan=`${order.params.length}`)
                       p 
                         span 商品总价：
                         span(id=`productTotalPrice${order.orderId}`) #{numToFloatTwo(order.orderPrice)}

@@ -5,10 +5,13 @@ router
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
     const {user} = data;
+    data.navType = "cart";
     let carts = await db.ShopCartModel.find({
       uid: user.uid
     }).sort({toc: -1});
-    carts = await db.ShopCartModel.extendCartsInfo(carts);
+    carts = await db.ShopCartModel.extendCartsInfo(carts, {
+      userGradeId: user.grade._id // 为了计算会员折扣
+    });
     let newCarts = [];
     for(const c of carts) {
       if(!c.productParam) {

@@ -50,7 +50,7 @@ const shopOrdersSchema = new Schema({
   // orderOriginPrice: {
   //   type: Number
   // },
-  // 订单运费 暂时无用
+  // 订单运费
   orderFreightPrice: {
     type: Number,
     default: 0

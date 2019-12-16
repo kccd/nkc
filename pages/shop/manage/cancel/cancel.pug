@@ -11,7 +11,7 @@ block content
         h5 订单状态：{{order.status}}
         h5 订单总价：
           strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
-          | 元 （商品总价：{{orderOriginPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
+          | 元 （商品总价：{{order.orderPrice/100}}元，运费：{{order.orderFreightPrice/100}}元
           span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
           | ）
         h5 商品列表
@@ -19,9 +19,11 @@ block content
           img.m-r-1(:src="'/rt/' + p.product.imgMaster" style='height: 4rem;width: 4rem;vertical-align:top;')
           div.display-i-b
             a(:href="'/shop/product/'+p.product.productId" target='_blank' :title="p.product.abstract") {{p.product.name}} ({{p.productParam.name}})
-            h5 商品ID：{{p.costId}}，商品总价：
-              strong.text-danger {{p.productPrice/100}}
-              | 元（{{p.count}}件）
+            h5 商品ID：{{p.costId}}，
+              | 单价：
+              strong.text-danger {{p.singlePrice/100}}
+              | 元，数量：
+              strong.text-danger {{p.count}}
               strong.text-danger(v-if="p.refundStatus==='success'") 【已退款{{p.refundMoney?p.refundMoney/100+"元":""}}】
 
         a.m-r-1(:href="'/shop/manage/'+user.uid+'/order/detail?orderId=' + order.orderId" target="_blank") 订单详情

@@ -9,10 +9,10 @@ router
     const {user} = data;
     const cert = await db.ShopCertModel.findOne({_id, deleted: false});
     if(!cert) ctx.throw(404, `未找到ID为【${_id}】的凭证资源`);
-    const order = await db.ShopOrdersModel.findOne({orderId: cert.orderId});
-    if(!order) ctx.throw(404, `未找到ID为【${orderId}】的订单`);
+    /* const order = await db.ShopOrdersModel.findOne({orderId: cert.orderId});
+    if(!order) ctx.throw(404, `未找到ID为【${cert.orderId}】的订单`);
     const product = await db.ShopGoodsModel.findOne({productId: order.productId});
-    if(!order) ctx.throw(404, `未找到ID为【${orderId}】的商品`);
+    if(!order) ctx.throw(404, `未找到ID为【${cert.orderId}】的商品`); */
 
     if(!ctx.permission("getAnyBodyShopCert")) {
       if(cert.uid !== user.uid) {

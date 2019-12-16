@@ -399,8 +399,10 @@ fn.doExchange = (arr) => {
     }
     newArr[0] = items;
     return fn.doExchange(newArr);
-  }else{
+  }else if(len === 1) {
     return arr[0];
+  } else {
+    return arr;
   }
 }
 

@@ -1,46 +1,76 @@
-extends ../account/shopAccountBase
-block shopAccountTitle
-  title=`我的购物车 | 科创商城`
-  +includeCSS('/shop/cart/cart.css')
-block shopAccountContent
-  .hidden#data= JSON.stringify({cartData: data.cartData})
-  #app(v-cloak)
-    .h4 全部商品
-    div(v-for='d in cartData')  
-      .user-info
-        .m-r-1.display-i-b
-          button.btn.btn-xs.btn-default(@click='selectedAll(d)') 全选
-        img.avatar(:src="'/avatar/' + d.user.avatar")
-        .username {{d.user.username}}
-      .product-panel(v-for='c in d.products' :class='{"selected": selectedId.indexOf(c._id) !== -1}')  
-        .product-select.p-l-1
-          input(type='checkbox' :value='c._id' v-model='selectedId')
-        .product-img
-          img(:src="'/rt/' + c.product.imgMaster")
-        .product-name 
-          a(:href="'/shop/product/' + c.product.productId" target='_blank').name {{c.product.name}}
-          .param-name {{c.productParam.name}}
-        .product-price(v-if='c.productParam.useDiscount')
-          .origin-price 原价 
-            span(style='text-decoration: line-through') ￥{{c.productParam.originPrice/100}}
-          .price 优惠价 ￥{{c.productParam.price/100}}
-        .product-price(v-else)  
-          .price ￥{{c.productParam.price/100}}
-        .product-count 
-          button(@click='reduceCount(c)') -
-          input(v-model.number='c.count' style='width: 2rem;' @change='changeCount(c)')
-          button(@click='addCount(c)') +
-        .product-price
-          .price.text-center 总计
-          h4 ￥{{c.productParam.price * c.count/100}}
-        .product-btn
-          button(@click='deleteCartData(c)') 删除 
-    .text-right.m-t-1.to-create-bill
-      span.m-r-2  合计：￥{{total}}
-      a.btn(v-if='selectedId.length' :href="'/shop/bill?cartsId=' + selectedId.join('-')") 去结算
-      a.btn.disabled(v-else) 去结算
-     
+extends ../shop
+block shopTitle
+  title 购物车
+  +includeCSS("/shop/cart/cart.css")
+block shopContent
+  if !data.cartData.length
+    .null 空空如也~
+  else
+    .table-responsive
+      table.table.table-bordered
+        thead
+          tr
+            th
+            th 商品名称
+            th 商品单价
+            th 数量
+            th 合计
+            th 其他
+        tbody
+          for d, index in data.cartData
+            tr
+              td(colspan="11").order-infos
+                .order-info
+                  button.m-r-05.order-button(onclick=`selectAll(${index})`) 全选
+                  .name 卖家：
+                    a.value(href=`/u/${d.user.uid}` onmouseover=tools.floatUserInfo(d.user.uid))=d.user.username
+                    a.value(href=`/message?uid=${d.user.uid}` title=`联系买家(${d.user.online ? "在线" : "离线"})` target="_blank")
+                      .fa.fa-commenting-o(class=d.user.online ? "active" : "")
+            for c, key in d.products
+              tr.cart-product(data-product-id=c._id data-index=index)
+                td
+                  .checkbox
+                    label
+                      input(type="checkbox" data-product-id=c._id data-index=index onchange="showButton()")
+                td
+                  div.order-name-info
+                    .order-cover
+                      img(src=`/r/${c.product.imgMaster}`)
+                    .order-name
+                      a(href=`/shop/product/${c.product.productId}` title=c.product.name)=c.product.name
+                      .order-param(title=c.productParam.name)=`规格：${c.productParam.name}`
+                td
+                  div.order-price(style="text-align: left;")
+                    //- 商品的单价
+                    if c.productParam.useDiscount
+                      span 原价：
+                      span.number.sm.data-param-price=`￥${numToFloatTwo(c.productParam.originPrice)}`
+                      br
+                      span 优惠价：
+                      span.number.sm.data-param-price.fact-price=`￥${numToFloatTwo(c.finalPrice)}`
+                    else
+                      .number.sm.data-param-price.fact-price=`￥${numToFloatTwo(c.finalPrice)}`
+                td
+                  div.order-count
+
+                    //- 商品的数量
+                    .data-param-count-button
+                      .fa.fa-caret-up(onclick=`changeCount('up', ${c._id})`)
+                    .number.data-param-count(data-product-id=c._id)=c.count
+                    .data-param-count-button
+                      .fa.fa-caret-down(onclick=`changeCount('down', ${c._id})`)
+                td.order-price
+                  div.order-count(style="text-align: left;")
+                    .number.data-param-prices=`￥${numToFloatTwo(c.finalPrice * c.count)}`
+                td
+                  button.order-button(onclick=`deleteCart(${c._id})`) 删除
+
+      .cart-total-price.m-t-05
+        .cart-price-number
+        button.cart-price-button(onclick="next()") 去结算
+
 
 
 block shopScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel
   +includeJS('/shop/cart/cart.js')

@@ -37,7 +37,7 @@ var app = new Vue({
     post: function(arr, index) {
       var data = arr[index];
       if(!data) return;
-      var d, url;
+      var d, url, method = "PATCH";
       if(data.pass) {
         // 通过
         d = {
@@ -52,6 +52,7 @@ var app = new Vue({
               fid: "recycle",
               para: data
             };
+            method = "POST";
             url = "/t/" + data.threadId + "/disabled";
           } else {
             d = {
@@ -68,7 +69,7 @@ var app = new Vue({
         }
       }
 
-      nkcAPI(url, "PATCH", d)
+      nkcAPI(url, method, d)
         .then(function() {
           screenTopAlert("PID: " + data.postId + " 处理成功!");
           app.post(arr, index+1);

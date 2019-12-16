@@ -46,15 +46,52 @@ goodslistRouter
   })
   // 提交规格修改信息
   .patch('/editParam', async (ctx, next) => {
-    const {data, params, db, nkcModules, body} = ctx;
-    const {paraId, originPrice, price, stocksSurplus} = body.obj;
-    const productParam = await db.ShopProductsParamModel.findOne({_id:paraId});
+    const {data, db, nkcModules, body} = ctx;
+    const {user} = data;
+    let {paramId, productId, originPrice, price, stocksSurplus, useDiscount, name, isEnable} = body.paramData;
+    const productParam = await db.ShopProductsParamModel.findOne({
+      _id: paramId, 
+      uid: user.uid,
+      productId
+    });
     if(!productParam) ctx.throw(400, "找不到该商品规格");
-    // 取出剩余库存，并重新计算
-    // let {stocksSurplus} = productParam;
-    // let oldStocksTotal = productParam.stocksTotal;
-    // stocksSurplus += Number(stocksTotal-oldStocksTotal);
-    await productParam.update({$set:{originPrice, price, stocksSurplus}})
+    const {checkString, checkNumber} = nkcModules.checkData;
+    checkString(name, {
+      name: "规格名称",
+      minLength: 1,
+      maxLength: 100
+    });
+    checkNumber(stocksSurplus, {
+      name: "规格库存",
+      min: 0
+    }),
+    checkNumber(originPrice, {
+      name: "价格",
+      min: 0.01,
+      fractionDigits: 2
+    });
+    originPrice = originPrice * 100;
+    useDiscount = !!useDiscount;
+    isEnable = !!isEnable;
+    if(useDiscount) {
+      if(price >= originPrice) throw "规格优惠价必须小于原价";
+      checkNumber(price, {
+        name: "优惠价",
+        min: 0.01,
+        fractionDigits: 2
+      });
+      price = price * 100;
+    } else {
+      price = originPrice;
+    }
+    await productParam.update({
+      name,
+      stocksSurplus,
+      originPrice,
+      isEnable,
+      useDiscount,
+      price
+    });
     await next();
   })
   // 访问商品重新编辑页面
