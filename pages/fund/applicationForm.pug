@@ -2,6 +2,7 @@ extends ./fundBase
 block fundTitle
   meta(name='description' content=`科创基金 - ${data.fund.name} ${data.applicationForm.code?'- ' + data.applicationForm.code: '暂无详细介绍'}`)
   title=`科创基金 - ${data.fund.name}${data.applicationForm?" - " + data.applicationForm.code:""}`
+  include ../publicModules/plyr/plyr.css.pug
 block fundContent
   include ./initData
   .row
@@ -97,3 +98,5 @@ block fundContent
               //-   img(src="/default/weibo.png" style="width:100%")
 
 block fundScripts
+  include ../publicModules/plyr/plyr.js.pug
+  include ../publicModules/lazySizes
