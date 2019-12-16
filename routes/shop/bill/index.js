@@ -156,9 +156,6 @@ router
     }
     data.addresses = addresses;
     ctx.template = 'shop/bill/bill.pug';
-    if(query.t === "old") {
-      ctx.template = 'shop/bill/bill_old.pug';
-    }
     await next();
   })
   .post('/', async (ctx, next) => {
