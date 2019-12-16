@@ -4,6 +4,7 @@ var data = NKC.methods.getDataById("data");
 console.log(data); // 默认选择第一个运费模板
 
 data.results.map(function (r) {
+  r.buyMessage = "";
   r.products.map(function (p) {
     var product = p.product;
 
@@ -135,7 +136,7 @@ var app = new Vue({
       })["catch"](sweetError);
     },
     // 用户选择了凭证文件
-    selectedFile: function selectedFile(p) {
+    selectedFile: function selectedFile(r, p) {
       var product = p.product;
       var dom = $("input.hidden.input-".concat(product.productId));
       dom = dom[0];
@@ -145,6 +146,7 @@ var app = new Vue({
       formData.append("file", file);
       nkcUploadFile("/shop/cert", "POST", formData).then(function (data) {
         p.certId = data.cert._id;
+        Vue.set(r.products, r.products.indexOf(p), p);
         sweetSuccess("上传成功");
       })["catch"](sweetError);
     },
@@ -153,16 +155,21 @@ var app = new Vue({
       NKC.methods.visitUrl("/shop/cert/".concat(certId), true);
     },
     submit: function submit() {
-      var results = this.results;
+      var results = this.results,
+          selectedAddress = this.selectedAddress;
       var body = {
-        params: []
+        params: [],
+        address: selectedAddress
       };
       Promise.resolve().then(function () {
+        if (!body.address) throw "请选择收货地址";
         results.map(function (userObj) {
           var products = userObj.products,
-              user = userObj.user;
+              user = userObj.user,
+              buyMessage = userObj.buyMessage;
           var r = {
             uid: user.uid,
+            buyMessage: buyMessage,
             products: []
           };
           products.map(function (productObj) {
@@ -170,21 +177,26 @@ var app = new Vue({
                 params = productObj.params,
                 priceTotal = productObj.priceTotal,
                 freightTotal = productObj.freightTotal,
-                certId = productObj.certId;
+                certId = productObj.certId,
+                freightName = productObj.freightName;
             if (product.uploadCert && !certId) throw "请上传凭证";
+            if (!product.isFreePost && !freightName) throw "请选择物流";
             var p = {
               productId: product.productId,
               priceTotal: priceTotal,
               freightTotal: freightTotal,
               certId: certId,
+              freightName: freightName,
               productParams: []
             };
             params.map(function (paramObj) {
               var productParam = paramObj.productParam,
                   count = paramObj.count,
-                  price = paramObj.price;
+                  price = paramObj.price,
+                  cartId = paramObj.cartId;
               p.productParams.push({
                 _id: productParam._id,
+                cartId: cartId,
                 count: count,
                 price: price
               });
@@ -194,6 +206,10 @@ var app = new Vue({
           body.params.push(r);
         });
         console.log(body);
+        return nkcAPI("/shop/order", "POST", body);
+      }).then(function (data) {
+        openToNewLocation('/shop/pay?ordersId=' + data.ordersId.join("-"));
+        sweetSuccess("提交成功，正在前往付款页面");
       })["catch"](sweetError);
     }
   }

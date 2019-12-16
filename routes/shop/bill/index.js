@@ -41,7 +41,7 @@ router
     // 将商品按店家分类，将规格按商品分类
     const usersObj = {}, productsObj = {}, paramsObj  = {};
     for(const cart of data.cartsData) {
-      const {product, productParam, count} = cart;
+      const {product, productParam, count, _id} = cart;
       usersObj[product.uid] = {
         user: product.user,
         products: []
@@ -53,6 +53,7 @@ router
       };
       paramsObj[productParam._id] = {
         productParam,
+        cartId: _id,
         price: productParam.useDiscount? productParam.price: productParam.originPrice,
         count
       }; 

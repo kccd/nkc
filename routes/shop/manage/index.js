@@ -44,7 +44,7 @@ manageRouter
     await next();
   })
   
-  .use(["/order", "/goods", "/shelf"], async (ctx, next) => {
+  .use(["/home", "/order", "/goods", "/shelf"], async (ctx, next) => {
     if(!ctx.data.dealInfo) return ctx.redirect(ctx.nkcModules.apiFunction.generateAppLink(ctx.state, `/shop/manage/settings`));
     await next();
   })
@@ -57,7 +57,7 @@ manageRouter
   .use("/shelf", shelfRouter.routes(), shelfRouter.allowedMethods())
   // .use("/:uid/shelf", shelfRouter.routes(), shelfRouter.allowedMethods())
 
-  .use('/:uid/home', homeRouter.routes(), homeRouter.allowedMethods())
+  .use('/home', homeRouter.routes(), homeRouter.allowedMethods())
   .use('/:uid/info', infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:uid/decoration', decorationRouter.routes(), decorationRouter.allowedMethods())
   .use('/:uid/classify', classifyRouter.routes(), classifyRouter.allowedMethods())

@@ -608,3 +608,11 @@ body {
   max-width: 100%;
   max-height: 100%;
 }
+.shop-bill .buy-message label {
+  vertical-align: top;
+}
+.shop-bill .buy-message textarea {
+  width: 30rem;
+  max-width: 100%;
+  display: inline-block;
+}

@@ -190,9 +190,9 @@ function setParam(productId, paramId, param) {
       paramDom.originPrice.text(`￥${originPrice.toFixed(2)}`);
       paramDom.stocksSurplus.text(stocksSurplus);
       if(useDiscount) {
-        paramDom.price.text(`￥${price.toFixed(2)}`).addClass(".number");
+        paramDom.price.text(`￥${price.toFixed(2)}`).addClass("number");
       } else {
-        paramDom.price.text(`无`).removeClass(".number");
+        paramDom.price.text(`无`).removeClass("number");
       }
       const productDom = $(`.product[data-product-id='${productId}'] .stocks-surplus`);
       const stocksDoms = $(`.param[data-product-id='${productId}'] .stocks-surplus`);

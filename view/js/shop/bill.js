@@ -3,6 +3,7 @@ console.log(data);
 
 // 默认选择第一个运费模板
 data.results.map(r => {
+  r.buyMessage = "";
   r.products.map(p => {
     const product = p.product;
     if(!product.isFreePost) {
@@ -97,7 +98,7 @@ const app = new Vue({
         .catch(sweetError)
     },
     // 用户选择了凭证文件
-    selectedFile(p) {
+    selectedFile(r, p) {
       const {product} = p;
       let dom = $(`input.hidden.input-${product.productId}`);
       dom = dom[0];
@@ -108,6 +109,7 @@ const app = new Vue({
       nkcUploadFile("/shop/cert", "POST", formData)
         .then(data => {
           p.certId = data.cert._id;
+          Vue.set(r.products, r.products.indexOf(p), p);
           sweetSuccess("上传成功");
         })
         .catch(sweetError);
@@ -117,32 +119,39 @@ const app = new Vue({
       NKC.methods.visitUrl(`/shop/cert/${certId}`, true);
     },
     submit() {
-      const {results} = this;
+      const {results, selectedAddress} = this;
       const body = {
-        params: []
+        params: [],
+        address: selectedAddress
       };
+
       Promise.resolve()
         .then(() => {
+          if(!body.address) throw "请选择收货地址";
           results.map(userObj => {
-            const {products, user} = userObj;
+            const {products, user, buyMessage} = userObj;
             const r = {
               uid: user.uid,
+              buyMessage,
               products: []
             }
             products.map(productObj => {
-              const {product, params, priceTotal, freightTotal, certId} = productObj;
+              const {product, params, priceTotal, freightTotal, certId, freightName} = productObj;
               if(product.uploadCert && !certId) throw "请上传凭证";
+              if(!product.isFreePost && !freightName) throw "请选择物流";
               const p = {
                 productId: product.productId,
                 priceTotal,
                 freightTotal,
                 certId,
+                freightName,
                 productParams: []
               };
               params.map(paramObj => {
-                const {productParam, count, price} = paramObj;
+                const {productParam, count, price, cartId} = paramObj;
                 p.productParams.push({
                   _id: productParam._id,
+                  cartId,
                   count,
                   price
                 });
@@ -152,6 +161,11 @@ const app = new Vue({
             body.params.push(r);
           });
           console.log(body);
+          return nkcAPI("/shop/order", "POST", body);
+        })
+        .then(data => {
+          openToNewLocation('/shop/pay?ordersId=' + data.ordersId.join("-"));
+          sweetSuccess("提交成功，正在前往付款页面");
         })
         .catch(sweetError);
     }

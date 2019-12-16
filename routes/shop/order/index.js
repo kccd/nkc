@@ -90,7 +90,167 @@ router
     await next();
   })
   // 提交订单，并跳转到支付
-  .post('/', async (ctx, next) => {
+  .post("/", async (ctx, next) => {
+    const {data, db, body, nkcModules} = ctx;
+    const {params} = body;
+    if(!params.length) ctx.throw(400, "订单信息错误，请刷新页面");
+    const {checkNumber, checkString} = nkcModules.checkData;
+    const {location, address, username, mobile} = body.address;
+    checkString(location, {
+      name: "收货地址地区",
+      minLength: 1,
+      maxLength: 100
+    });
+    checkString(address, {
+      name: "收货详细地址",
+      minLength: 1,
+      maxLength: 100
+    });
+    checkString(username, {
+      name: "收件人",
+      minLength: 1,
+      maxLength: 100
+    });
+    checkString(mobile, {
+      name: "收件人手机号",
+      minLength: 1,
+      maxLength: 100
+    });
+    const {user} = data;
+    const gradeId = user.grade._id;
+    const orderArr = [];
+    // 不同卖家 生成多个订单
+    for(const p of params) {
+      const {uid, products, buyMessage} = p;
+      if(uid === user.uid) ctx.throw(400, "无法购买自己出售的商品");
+      const productUser = await db.UserModel.findOne({uid});
+      if(!productUser) ctx.throw(404, `卖家ID不正确，uid:${uid}`);
+      const orderId = await db.SettingModel.operateSystemID("shopOrders", 1);
+      const cartArr = [], costArr = [];
+      let orderFreightPrice = 0, orderPrice = 0;
+      // 同一买家 生成一个订单
+      checkString(buyMessage, {
+        name: "买家留言",
+        minLength: 0,
+        maxLength: 1000
+      });
+      for(const productObj of products) {
+        const {
+          productId, productParams,
+          certId, freightTotal, priceTotal, freightName
+        } = productObj;
+        const product = await db.ShopGoodsModel.findOne({productId});
+        if(!product) ctx.throw(404, `商品ID错误，productId: ${productId}`);
+        if(product.productStatus === "stopsale") {
+          ctx.throw(400, `提交的订单中存在停售的商品，请刷新`);
+        }
+        if(product.uploadCert) {
+          if(!certId) ctx.throw(400, "请上传凭证");
+          const cert = await db.ShopCertModel.findOne({_id: Number(certId), uid: user.uid, type: "shopping"});
+          if(!cert) ctx.throw(400, "凭证ID错误，请重新上传");
+        }
+        let countTotal_ = 0, priceTotal_ = 0;
+        // 同一商品不同规格 统一计算邮费
+        for(const productParamObj of productParams) {
+          const {count, price, _id, cartId} = productParamObj;
+          const cart = await db.ShopCartModel.findOne({_id: cartId});
+          if(!cart) ctx.throw(404, `购物车数据错误，请刷新`);
+          cartArr.push(cart);
+          checkNumber(count, {
+            name: "商品数量",
+            min: 1
+          });
+          const productParam = await db.ShopProductsParamModel.findOne({_id});
+          if(!productParam) ctx.throw(404, `规格ID不正确,paramId: ${_id}`);
+          if(!productParam.isEnable) ctx.throw(404, `提交的订单中存在禁售的商品规格，请刷新`);
+          if(productParam.stocksSurplus < count) ctx.throw(400, `提交的订单中存在库存不足的商品，请刷新页面`);
+          let price_ = productParam.price;
+          if(product.vipDiscount) {
+            let vipNum = 100;
+            product.vipDisGroup.map(v => {
+              if((v.vipLevel+"") === (gradeId + "")) {
+                vipNum = v.vipNum;
+              }
+            });
+            price_ = parseInt(productParam.price * vipNum / 100);
+          }
+          if(price_ !== price) ctx.throw(400, `商品价格已更改，请刷新页面`);
+          countTotal_ += count;
+          priceTotal_ += count * price;
+          const costId = await db.SettingModel.operateSystemID('shopCostRecord', 1);
+          // 生成订单中的已购买商品的记录
+          const cost = db.ShopCostRecordModel({
+            costId,
+            orderId,
+            productId,
+            productParamId: productParam._id,
+            productParam,
+            uid: user.uid,
+            count,
+            productPrice: price * count,
+            singlePrice: price
+          });
+          await cost.save();
+          costArr.push(cost);
+        }
+        let freightTotal_ = 0;
+        if(!product.isFreePost) {
+          if(!freightName) ctx.throw(400, `请选择物流`);
+          for(const f of product.freightTemplates) {
+            if(f.name === freightName) {
+              freightTotal_ = f.firstPrice + (countTotal_ - 1) * f.addPrice;
+              break;
+            }
+          }
+        }
+        if(freightTotal_ !== freightTotal) {
+          ctx.throw(400, `运费模板已变更，请刷新页面`);
+        }
+        orderFreightPrice += freightTotal_;
+        orderPrice += priceTotal_;
+      }
+
+      // 生成订单信息
+      const order = db.ShopOrdersModel({
+        orderId,
+        snapshot: costArr,
+        buyUid: user.uid,
+        sellUid: productUser.uid,
+        orderFreightPrice,
+        orderPrice,
+        receiveAddress: `${location} ${address}`,
+        receiveName: username,
+        receiveMobile: mobile,
+        buyMessage
+      });
+      await order.save();
+      orderArr.push(order);
+      // 减库存
+      const orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
+      await db.ShopProductsParamModel.productParamReduceStock(orders,'orderReduceStock');
+      // 删除购物车记录
+      for(const c of cartArr) {
+        await c.remove();
+      }
+      // 通知卖家有新的订单
+      const message = db.MessageModel({
+        _id: await db.SettingModel.operateSystemID("messages", 1),
+        r: order.sellUid,
+        ty: "STU",
+        c: {
+          type: "shopSellerNewOrder",
+          orderId: order.orderId,
+          sellerId: order.sellUid,
+          buyerId: order.buyUid
+        }
+      });
+      await message.save();
+      await ctx.redis.pubMessage(message);
+    }
+    data.ordersId = orderArr.map(order => order.orderId);
+    await next();
+  })
+  .post('/old', async (ctx, next) => {
     const {data, db, query, body, nkcModules} = ctx;
     const {user} = data;
     let {post, receInfo, paramCert, tempArr} = body;

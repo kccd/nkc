@@ -165,8 +165,8 @@ orderRouter
 		let orderPrice = order.orderPrice;
 		if(type === "modifyParam") {
 			const {singlePrice, count} = costObj;
-			const costRecord = await db.ShopCostRecordModel.findOne({costId, orderId: order.orderId});
-			checkNumber(singlePrice, {
+      const costRecord = await db.ShopCostRecordModel.findOne({costId, orderId: order.orderId});
+      checkNumber(singlePrice, {
 				name: "商品单价",
 				min: 1
 			});
@@ -178,9 +178,26 @@ orderRouter
 				name: "订单运费",
 				min: 0,
 			});
-			costRecord.singlePrice = singlePrice;
-			costRecord.count = count;
-			await costRecord.save();
+      costRecord.singlePrice = singlePrice;
+      const reduce = costRecord.count - count;
+      costRecord.count = count;
+      await costRecord.save();
+      // 修改库存
+      if(reduce !== 0) {
+        const product = await db.ShopGoodsModel.findOne({productId: costRecord.productId});
+        if(product.stockCostMethod === "orderReduceStock") {
+          const productParam = await db.ShopProductsParamModel.findOne({
+            _id: costRecord.productParamId, 
+            productId: costRecord.productId
+          });
+          await productParam.update({
+            $inc: {
+              sellCount: -1 * reduce,
+              stocksSurplus: reduce
+            }
+          });
+        }
+      }
 			const costs = await db.ShopCostRecordModel.find({orderId: order.orderId});
 			orderPrice = 0;
 			costs.map(cost => {

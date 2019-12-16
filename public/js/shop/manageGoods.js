@@ -178,9 +178,9 @@ function setParam(productId, paramId, param) {
     paramDom.stocksSurplus.text(stocksSurplus);
 
     if (useDiscount) {
-      paramDom.price.text("\uFFE5".concat(price.toFixed(2))).addClass(".number");
+      paramDom.price.text("\uFFE5".concat(price.toFixed(2))).addClass("number");
     } else {
-      paramDom.price.text("\u65E0").removeClass(".number");
+      paramDom.price.text("\u65E0").removeClass("number");
     }
 
     var productDom = $(".product[data-product-id='".concat(productId, "'] .stocks-surplus"));

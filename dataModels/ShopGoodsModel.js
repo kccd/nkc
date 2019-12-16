@@ -444,5 +444,35 @@ shopGoodsSchema.statics.getHomeGoods = async () => {
   return results;
 };
 
+/* 
+  重新计算剩余库存
+  @param {String} productId 商品ID
+*/
+
+shopGoodsSchema.statics.computeSellCount = async (productId) => {
+  const ShopGoodsModel = mongoose.model("shopGoods");
+  const ShopProductsParamsModel = mongoose.model("shopProductsParams");
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
+  const ShopOrdersModel = mongoose.model("shopOrdersModel");
+
+  const product = await ShopGoodsModel.findOne({productId});
+  if(!product) throwErr(500, `商品ID错误，productId: ${productId}`);
+  if(product.stockCostMethod === "orderReduceStock") {
+    // 下单减库存
+    
+  } else {
+    // 付款减库存
+  }
+  const productParams = await ShopProductsParamsModel.find({productId: product.productId});
+  const costs = await ShopCostRecordModel.find({
+    productId, 
+    refundStatus: {$ne: "success"}
+  });
+  const ordersId = costs.map(c => c.orderId);
+  for(const productParam of productParams) {
+    
+  }
+};
+
 const ShopGoodsModel = mongoose.model('shopGoods', shopGoodsSchema);
 module.exports = ShopGoodsModel;

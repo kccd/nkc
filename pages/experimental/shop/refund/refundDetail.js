@@ -66,10 +66,7 @@ var app = new Vue({
     }
   },
   methods: {
-    format: function(m, t) {
-      if(typeof moment === "undefined") throw 'moment is not loaded';
-      return moment(t).format(m);
-    },
+    format: NKC.methods.format,
     clearInfo: function() {
       this.error = "";
       this.info = "";

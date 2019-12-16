@@ -31,6 +31,9 @@ module.exports = {
       GET: 'visitShelfIndex',
       POST: 'productToShelf'
     },
+    home: {
+      GET: 'visitManageHome',
+    },
     PARAMETER: {
       GET: 'visitManageIndex',
       home: {
