@@ -3,6 +3,38 @@ block shopTitle
   title 我出售的
 block shopContent
   -const statistics = data.statistics;
+  //- h1.page-header
+  //-   | Tabs & Panels 
+  //-   small Nice tabs and panels
+  .row
+    .col-md-3.col-sm-12.col-xs-12
+      .panel.panel-default.text-center.no-boder.bg-color-green
+        .panel-body
+          i.fa.fa-bar-chart-o.fa-5x
+          h3!=statistics.visitCount
+        .panel-footer.back-footer-green
+          | 访问总量
+    .col-md-3.col-sm-12.col-xs-12
+      .panel.panel-default.text-center.no-boder.bg-color-blue
+        .panel-body
+          i.fa.fa-shopping-cart.fa-5x
+          h3!=statistics.sellCount
+        .panel-footer.back-footer-blue
+          | 已售数量
+    .col-md-3.col-sm-12.col-xs-12
+      .panel.panel-default.text-center.no-boder.bg-color-red
+        .panel-body
+          i.fa.fa.fa-comments.fa-5x
+          h3!=statistics.talkCount
+        .panel-footer.back-footer-red
+          | 商品讨论量
+    .col-md-3.col-sm-12.col-xs-12
+      .panel.panel-default.text-center.no-boder.bg-color-brown
+        .panel-body
+          i.fa.fa-users.fa-5x
+          h3!=statistics.funsCount
+        .panel-footer.back-footer-brown
+          | 粉丝数量
   .row
     .col-md-12
       // Kitchen Sink

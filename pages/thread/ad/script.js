@@ -6,6 +6,7 @@ var app = new Vue({
     title: data.thread.title,
     resourcesId: data.thread.resourcesId,
     tid: data.thread.tid,
+    postsResourcesId: data.thread.postsResourcesId,
     firstPostCover: data.thread.firstPostCover,
     topType: "movable",
     coverFixed: "",
@@ -87,7 +88,6 @@ var app = new Vue({
         })
         .then(function() {
           sweetSuccess("文章已推送到首页");
-          NKC.methods.visitUrl("/");
         })
         .catch(sweetError);
     }

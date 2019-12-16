@@ -53,7 +53,7 @@ router
         ]
       },
       {
-        name: "我的发表",
+        name: "我的作品",
         links: [
           {
             type: "thread",

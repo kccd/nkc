@@ -20,4 +20,5 @@ div
             .account-follower-certs=subscribe.user.info.certsName
           .account-follower-description=subscribe.user.description || "暂无简介"
   if data.paging.pageCount > 1
-    include ../../publicModules/paging/paging_input
+    .m-t-05
+      include ../../publicModules/paging/paging_input

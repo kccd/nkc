@@ -114,9 +114,12 @@ var app = new Vue({
       })["catch"](sweetError);
     },
     remove: function remove(ads, index) {
-      sweetQuestion("确定要执行删除操作？").then(function () {
-        ads.splice(index, 1);
-      })["catch"](function () {});
+      ads.splice(index, 1);
+      /*sweetQuestion("确定要执行删除操作？")
+        .then(() => {
+          ads.splice(index, 1)
+        })
+        .catch(() => {})*/
     },
     addForum: function addForum() {
       var self = this;
@@ -148,10 +151,13 @@ var app = new Vue({
       arr.splice(newIndex, 1, f);
     },
     removeForum: function removeForum(arr, index) {
-      var self = this;
-      sweetQuestion("确定要执行删除操作？").then(function () {
-        arr.splice(index, 1);
-      })["catch"](function () {});
+      arr.splice(index, 1);
+      /*const self = this;
+      sweetQuestion("确定要执行删除操作？")
+        .then(() => {
+          arr.splice(index, 1);
+        })
+        .catch(() => {})*/
     },
     saveRecommendForums: function saveRecommendForums() {
       var forumsId = this.recommendForums.map(function (forum) {

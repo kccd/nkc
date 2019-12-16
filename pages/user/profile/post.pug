@@ -40,8 +40,7 @@ div
           else
             .account-thread-avatar
               if post.thread.firstPost.cover
-                div
-                  img(src=tools.getUrl("postCover", post.thread.firstPost.cover))
+                div(style=`background-image: url(${tools.getUrl("postCover", post.thread.firstPost.cover)})`)
             .account-thread-content(style=!post.thread.firstPost.cover?"display: block":"")
               .account-thread-title(class=post.thread.digest?"digest":"")
                 a(href=`/t/${post.thread.tid}` title=post.thread.firstPost.t)=post.thread.firstPost.t

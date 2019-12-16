@@ -920,4 +920,60 @@ postSchema.statics.ensureAttachmentPermission = async function(uid) {
   return gradesId.includes(user.grade._id);
 };
 
+
+/*
+* 获取最新回复
+* @param {[String]} fid, 可以访问的专业ID所组成的数组
+* @param {Number} limit, 条数
+* @return {[Object]} post数组
+* @author pengxiguaa 2019-12-05
+* */
+postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
+  const {obtainPureText} = require("../nkcModules/apiFunction");
+  const PostModel = mongoose.model("posts");
+  const UserModel = mongoose.model("users");
+  const ThreadModel = mongoose.model("threads");
+  const posts = await PostModel.find({
+    type: "post",
+    mainForumsId: {$in: fid},
+    reviewed: true,
+    disabled: false,
+    toDraft: {$ne: true}
+  }, {
+    t: 1,
+    c: 1,
+    uid: 1,
+    pid: 1,
+    toc: 1,
+    anonymous: 1,
+    tid: 1
+  }).sort({toc: -1}).limit(limit);
+  const usersId = [], threadsId = [];
+  posts.map(post => {
+    usersId.push(post.uid);
+    threadsId.push(post.tid);
+  });
+  const users = await UserModel.find({uid: {$in: usersId}}, {avatar: 1, uid: 1, username: 1});
+  let threads = await ThreadModel.find({tid: {$in: threadsId}});
+  threads = await ThreadModel.extendThreads(threads, {
+    firstPost: 1,
+    firstPostUser: 1
+  });
+  const usersObj = {}, threadsObj = {};
+  users.map(user => usersObj[user.uid] = user);
+  threads.map(thread => threadsObj[thread.tid] = thread);
+  const results = [];
+  for(const post of posts) {
+    const user = usersObj[post.uid];
+    const thread = threadsObj[post.tid];
+    if(!user || !thread) return;
+    post.c = obtainPureText(post.c, true, 200);
+    if(!post.anonymous) post.user = user;
+    post.thread = thread;
+    post.url = await PostModel.getUrl(post.pid);
+    results.push(post);
+  }
+  return results;
+};
+
 module.exports = mongoose.model('posts', postSchema);

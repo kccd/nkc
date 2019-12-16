@@ -1,8 +1,12 @@
-if permissionsOr(["visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
+if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
   .m-b-2
     +includeCSS("/publicModules/management/management.css")
     +listHeader("管理")
     .module-managements
+      if permission("nkcManagement")
+        a.module-management(href="/nkc")
+          .fa.fa-cogs
+          span &nbsp;前台管理
       if permission("visitExperimentalStatus")
         a.module-management(href="/e")
           .fa.fa-cogs
