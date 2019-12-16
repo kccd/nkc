@@ -72,7 +72,8 @@ schema.statics.extendCartsInfo = async (arr, options = {}) => {
   productParams.map(p => {
     if(!paramObj[p._id]) paramObj[p._id] = p;
   });
-  return await Promise.all(arr.map(async a => {
+  const results = [];
+  for(const a of arr) {
     const result = a.toObject();
     result.user = userObj[a.uid];
     result.product = productObj[a.productId];
@@ -81,6 +82,7 @@ schema.statics.extendCartsInfo = async (arr, options = {}) => {
       store: false
     }))[0];
     result.productParam = paramObj[a.productParamId];
+    if(!result.productParam) continue;
     // 原价，折扣，会员打折  综合考虑后的结果
     const {vipDisGroup, vipDiscount} = result.product;
     result.finalPrice =  result.productParam.price;
@@ -94,8 +96,9 @@ schema.statics.extendCartsInfo = async (arr, options = {}) => {
         }
       }
     }
-    return result;
-  }));
+    results.push(result);
+  }
+  return results;
 };
 schema.statics.findById = async (_id) => {
   const ShopCartModel = mongoose.model('shopCarts');

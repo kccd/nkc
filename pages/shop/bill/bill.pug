@@ -11,7 +11,7 @@ block content
           .m-t-1
             .options-button
               a.active(@click="getAddresses") 刷新
-              a.active(href=`/u/${data.user.uid}/settings/transaction` target="_blank") 去编辑
+              a.active(href=`/u/${data.user.uid}/settings/transaction` target="_blank") 使用新地址
           .shop-addresses(v-if="!addresses.length")
             .null 你暂未添加收货地址，
               a(href=`/u/${data.user.uid}/settings/transaction` target="_blank") 去添加
