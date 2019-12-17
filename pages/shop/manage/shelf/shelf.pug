@@ -31,7 +31,7 @@ block shopContent
           label.col-sm-2.control-label 商品简介
           .col-sm-10
             textarea.form-control(rows=5 v-model="abstract")
-            small.text-info 不超过1000字节
+            small.text-info 不超过1000字节，建议300字节左右。
         .form-group
           label.col-sm-2.control-label 商品关键词
           .col-sm-10
@@ -83,6 +83,7 @@ block shopContent
             table.table.table-bordered 
               thead
                 tr
+                  th 排序
                   th 规格名称
                   th 库存（件）
                   th 价格（元）
@@ -91,18 +92,21 @@ block shopContent
                   th 其他
               tbody
                 tr(v-for="p, index in selectedParams" :style="p._id && !p.isEnable?'background-color: #ccc':''")    
+                  th
+                    button.btn.btn-default.btn-xs(@click="changeArrIndex(selectedParams, index, 'left')") 上移
+                    button.btn.btn-default.btn-xs(@click="changeArrIndex(selectedParams, index, 'right')") 下移
                   th 
-                    input.form-control(type="text" v-model="p.name")
+                    input.form-control(type="text" v-model="p.name" placeholder="请输入规格名称")
                   th.count
-                    input.form-control(type="text" v-model.number="p.stocksTotal")  
+                    input.form-control(type="text" v-model.number="p.stocksTotal" placeholder="请输入库存")  
                   th.count 
-                    input.form-control(type="text" v-model.number="p.originPrice")
+                    input.form-control(type="text" v-model.number="p.originPrice" placeholder="请输入价格")
                   th.text-center
                     .checkbox
                       label
                         input(type="checkbox" :value="true" v-model="p.useDiscount")
                   th.count 
-                    input.form-control(type="text" v-model.number="p.price" :disabled="!p.useDiscount")
+                    input.form-control(type="text" v-model.number="p.price" :disabled="!p.useDiscount" placeholder="请输入优惠价")
                   th 
                     button.btn.btn-danger.btn-xs(@click="disabledSelectParam(p)" v-if="p._id && p.isEnable") 屏蔽
                     button.btn.btn-success.btn-xs(@click="disabledSelectParam(p)" v-if="p._id && !p.isEnable") 解除屏蔽
@@ -146,7 +150,8 @@ block shopContent
             .col-xs-12.col-md-8    
               .table-responsive(v-if="!isFreePost").m-t-1.default-templates.table-condensed
                 h4 运费参考
-                  button.btn.btn-success.btn-xs(@click="reloadTemplate") 刷新
+                  button.m-r-05.btn.btn-success.btn-xs(@click="reloadTemplate") 刷新
+                  a.btn.btn-success.btn-xs(href=`/shop/manage/settings` target="_blank") 去管理
                 table.table.table-bordered 
                   thead
                     tr
@@ -173,11 +178,11 @@ block shopContent
               tbody    
                 tr(v-for="t, index in freightTemplates")
                   th
-                    input.form-control(type="text" v-model.number="t.name")
+                    input.form-control(type="text" v-model.number="t.name" placeholder="请输入物流名称")
                   th 
-                    input.form-control(type="text" v-model.number="t.firstPrice")
+                    input.form-control(type="text" v-model.number="t.firstPrice" placeholder="请输入首件价格")
                   th 
-                    input.form-control(type="text" v-model.number="t.addPrice")  
+                    input.form-control(type="text" v-model.number="t.addPrice" placeholder="请输入每增加一件的价格")  
                   th 
                     button.btn.btn-default.btn-sm(@click="removeFromArr(freightTemplates, index)") 删除  
                   tr
@@ -233,8 +238,10 @@ block shopContent
               input(type="radio" :value="false" v-model="uploadCert") 
               span 关闭
           div(v-if="uploadCert")    
-            h5 凭证说明    
+            h5 凭证说明，提醒买家应该上传什么类型的凭证。    
             textarea.form-control(rows=3 v-model="uploadCertDescription")             
+            small.text-info 不超过1000字节
+
       .form-group(v-if="type === 'create'")
         label.col-sm-2.control-label 上架时间
         .col-sm-10      

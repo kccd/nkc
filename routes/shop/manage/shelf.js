@@ -104,6 +104,7 @@ shelfRouter
     const imgMaster = resourcesId[0];
     // 验证商品规格
     if(!productParams.length) ctx.throw(400, "请至少添加一个商品规格");
+    let isEnableCount = 0;
     productParams = productParams.map(param => {
       const {
         _id,
@@ -117,6 +118,9 @@ shelfRouter
       const p = {
         isEnable: !!isEnable
       };
+
+      if(p.isEnable) isEnableCount ++;
+
       checkString(name, {
         name: "规格名称",
         minLength: 1,
@@ -149,6 +153,7 @@ shelfRouter
       p.useDiscount = !!useDiscount;      
       return p;
     });
+    if(isEnableCount === 0) ctx.throw(400, `不允许屏蔽所有规格`);
     const grades = await db.UsersGradeModel.find().sort({_id: 1});
     vipDiscount = !!vipDiscount;
     if(vipDiscount) {
@@ -291,10 +296,12 @@ shelfRouter
         productSettings
       });
       // 生成规格信息
-      for(const param of productParams) {
+      for(let i = 0; i < productParams.length; i++) {
+        const param = productParams[i];
         param.productId = productId; // 规格所属商品的ID
         param.uid = user.uid; // 商品拥有者
         param.isEnable = true;
+        param.order = i;
         param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
         param._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
         await db.ShopProductsParamModel(param).save();
@@ -318,7 +325,8 @@ shelfRouter
         vipDisGroup,
         productSettings
       });
-      for(const param of productParams) {
+      for(let i = 0; i < productParams.length; i++) {
+        const param = productParams[i];
         const {
           _id,
           name,
@@ -334,6 +342,7 @@ shelfRouter
             $set: {
               name,
               originPrice,
+              order: i,
               price,
               isEnable: !!isEnable,
               useDiscount: !!useDiscount,
@@ -345,6 +354,7 @@ shelfRouter
           param.uid = user.uid; // 商品拥有者
           param.stocksSurplus = param.stocksTotal; // 剩余库存=总库存
           param.isEnable = true;
+          param.order = i;
           param._id = await db.SettingModel.operateSystemID("shopProductsParams", 1);
           await db.ShopProductsParamModel(param).save();
         }

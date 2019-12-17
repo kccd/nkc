@@ -1,5 +1,6 @@
 const CommonModal = new NKC.modules.CommonModal();
 const Ship = new NKC.modules.ShopShip();
+const ModifyPrice = new NKC.modules.ShopModifyPrice();
 // 修改卖家备注
 function modifySellMessage(uid, orderId) {
   const dom = $(`tr[data-order-id='${orderId}'] .data-sell-message`);
@@ -42,7 +43,6 @@ function computeOrderPrice(orderId) {
     const dom = paramPriceDom.eq(i);
     prices.push(getNumber(dom.text(), 2));
   }
-  console.log(prices);
   for(let i = 0; i < countDom.length; i++) {
     const dom = countDom.eq(i);
     counts.push(getNumber(dom.text(), 0));
@@ -71,34 +71,34 @@ function modifyParamPrice(sellUid, orderId, costId) {
   const freightPrice = getNumber(freightDom.text(), 2);
   const price = getNumber(priceDom.text(), 2);
   const count = getNumber(countDom.text(), 0);
-  CommonModal.open((data) => {
-    const newPrice = getNumber(data[0].value, 2);
-    nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
-      type: "modifyParam",
-      costId,
-      orderId,
-      freightPrice: freightPrice * 100,
-      costObj: {
-        singlePrice: newPrice * 100,
-        count
-      }
-    })
+  return ModifyPrice.open(data => {
+    const newPrice = data;
+    const checkNumber = NKC.methods.checkData.checkNumber;
+    Promise.resolve()
+      .then(() => {
+        checkNumber(newPrice, {
+          name: "商品单价",
+          min: 0.01,
+          fractionDigits: 2
+        });
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
+          type: "modifyParam",
+          costId,
+          orderId,
+          freightPrice: freightPrice * 100,
+          costObj: {
+            singlePrice: newPrice * 100,
+            count
+          }
+        })
+      })
       .then(() => {
         priceDom.text(`￥${newPrice.toFixed(2)}`);
         computeOrderPrice(orderId);
         CommonModal.close();
       })
       .catch(sweetError);
-  }, {
-    title: "修改单价",
-    data: [
-      {
-        dom: "input",
-        label: "单位元，精确到小数点后两位",
-        value: price
-      }
-    ]
-  });
+  }, price)
 }
 
 // 修改商品数量
@@ -111,16 +111,24 @@ function modifyParamCount(sellUid, orderId, costId) {
   const count = getNumber(countDom.text(), 0);
   CommonModal.open((data) => {
     const newCount = getNumber(data[0].value, 2);
-    nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
-      type: "modifyParam",
-      costId,
-      orderId,
-      freightPrice: freightPrice * 100,
-      costObj: {
-        singlePrice: price * 100,
-        count: newCount
-      }
-    })
+    Promise.resolve()
+      .then(() => {
+        NKC.methods.checkData.checkNumber(newCount, {
+          name: "商品数量",
+          min: 1
+        });
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
+          type: "modifyParam",
+          costId,
+          orderId,
+          freightPrice: freightPrice * 100,
+          costObj: {
+            singlePrice: price * 100,
+            count: newCount
+          }
+        })
+      })
+    
       .then(() => {
         countDom.text(`${newCount}`);
         computeOrderPrice(orderId);
@@ -142,28 +150,28 @@ function modifyParamCount(sellUid, orderId, costId) {
 function modifyFreight(sellUid, orderId) {
   const freightDom = $(`tr[data-order-id='${orderId}'] .data-params-freight`);
   const freightPrice = getNumber(freightDom.text(), 2);
-  CommonModal.open((data) => {
-    const newFreightPrice = getNumber(data[0].value, 2);
-    nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
-      type: "modifyFreight",
-      orderId,
-      freightPrice: newFreightPrice * 100,
-    })
+  return ModifyPrice.open(data => {
+    const newFreightPrice = data;
+    Promise.resolve()
+      .then(() => {
+        NKC.methods.checkData.checkNumber(newFreightPrice, {
+          name: "运费",
+          min: 0,
+          fractionDigits: 2
+        });
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
+          type: "modifyFreight",
+          orderId,
+          freightPrice: newFreightPrice * 100,
+        });
+      })
       .then(() => {
         freightDom.text(`￥${newFreightPrice.toFixed(2)}`);
         computeOrderPrice(orderId);
         CommonModal.close();
       })
       .catch(sweetError);
-  }, {
-    title: "修改运费",
-    data: [
-      {
-        dom: "input",
-        value: freightPrice
-      }
-    ]
-  });
+  }, freightPrice);
 }
 // 发货/修改物流信息
 function ship(orderId) {

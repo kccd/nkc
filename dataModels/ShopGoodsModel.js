@@ -298,7 +298,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   }
   if(o.productParam) {
     for(const productParam of productId) {
-      productParams = await ShopProductsParamsModel.find({productId: productParam});
+      productParams = await ShopProductsParamsModel.find({productId: productParam}).sort({order: 1});
       productParams = await ShopProductsParamsModel.extendParamsInfo(productParams)
       productParamObj[productParam] = productParams;
     }

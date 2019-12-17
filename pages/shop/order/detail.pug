@@ -123,7 +123,7 @@ block shopAccountContent
               else
                 span 点击查看商品的
                 span 
-                  a(onclick=`visitLogisticsInfo(${order.orderId})` style="cursor:pointer;") 物流信息
+                  a(href=`/shop/order/${order.orderId}/logistics` ) 物流信息
           if order.orderStatus == "finish"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
@@ -221,4 +221,4 @@ block shopAccountContent
           span!=`)：`
           span#totalPrice(style='font:700 26px tahoma;color:red') #{numToFloatTwo(order.orderPrice+order.orderFreightPrice)}
 block shopScripts
-  +includeJS('/shop/order/order.js')
+  +includeJS("/js/shop/order.js")

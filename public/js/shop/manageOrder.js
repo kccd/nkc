@@ -1,7 +1,8 @@
 "use strict";
 
 var CommonModal = new NKC.modules.CommonModal();
-var Ship = new NKC.modules.ShopShip(); // 修改卖家备注
+var Ship = new NKC.modules.ShopShip();
+var ModifyPrice = new NKC.modules.ShopModifyPrice(); // 修改卖家备注
 
 function modifySellMessage(uid, orderId) {
   var dom = $("tr[data-order-id='".concat(orderId, "'] .data-sell-message"));
@@ -48,8 +49,6 @@ function computeOrderPrice(orderId) {
     prices.push(getNumber(dom.text(), 2));
   }
 
-  console.log(prices);
-
   for (var _i = 0; _i < countDom.length; _i++) {
     var _dom = countDom.eq(_i);
 
@@ -81,30 +80,31 @@ function modifyParamPrice(sellUid, orderId, costId) {
   var freightPrice = getNumber(freightDom.text(), 2);
   var price = getNumber(priceDom.text(), 2);
   var count = getNumber(countDom.text(), 0);
-  CommonModal.open(function (data) {
-    var newPrice = getNumber(data[0].value, 2);
-    nkcAPI("/shop/manage/".concat(sellUid, "/order/editCostRecord"), "PATCH", {
-      type: "modifyParam",
-      costId: costId,
-      orderId: orderId,
-      freightPrice: freightPrice * 100,
-      costObj: {
-        singlePrice: newPrice * 100,
-        count: count
-      }
+  return ModifyPrice.open(function (data) {
+    var newPrice = data;
+    var checkNumber = NKC.methods.checkData.checkNumber;
+    Promise.resolve().then(function () {
+      checkNumber(newPrice, {
+        name: "商品单价",
+        min: 0.01,
+        fractionDigits: 2
+      });
+      return nkcAPI("/shop/manage/".concat(sellUid, "/order/editCostRecord"), "PATCH", {
+        type: "modifyParam",
+        costId: costId,
+        orderId: orderId,
+        freightPrice: freightPrice * 100,
+        costObj: {
+          singlePrice: newPrice * 100,
+          count: count
+        }
+      });
     }).then(function () {
       priceDom.text("\uFFE5".concat(newPrice.toFixed(2)));
       computeOrderPrice(orderId);
       CommonModal.close();
     })["catch"](sweetError);
-  }, {
-    title: "修改单价",
-    data: [{
-      dom: "input",
-      label: "单位元，精确到小数点后两位",
-      value: price
-    }]
-  });
+  }, price);
 } // 修改商品数量
 
 
@@ -117,15 +117,21 @@ function modifyParamCount(sellUid, orderId, costId) {
   var count = getNumber(countDom.text(), 0);
   CommonModal.open(function (data) {
     var newCount = getNumber(data[0].value, 2);
-    nkcAPI("/shop/manage/".concat(sellUid, "/order/editCostRecord"), "PATCH", {
-      type: "modifyParam",
-      costId: costId,
-      orderId: orderId,
-      freightPrice: freightPrice * 100,
-      costObj: {
-        singlePrice: price * 100,
-        count: newCount
-      }
+    Promise.resolve().then(function () {
+      NKC.methods.checkData.checkNumber(newCount, {
+        name: "商品数量",
+        min: 1
+      });
+      return nkcAPI("/shop/manage/".concat(sellUid, "/order/editCostRecord"), "PATCH", {
+        type: "modifyParam",
+        costId: costId,
+        orderId: orderId,
+        freightPrice: freightPrice * 100,
+        costObj: {
+          singlePrice: price * 100,
+          count: newCount
+        }
+      });
     }).then(function () {
       countDom.text("".concat(newCount));
       computeOrderPrice(orderId);
@@ -144,24 +150,25 @@ function modifyParamCount(sellUid, orderId, costId) {
 function modifyFreight(sellUid, orderId) {
   var freightDom = $("tr[data-order-id='".concat(orderId, "'] .data-params-freight"));
   var freightPrice = getNumber(freightDom.text(), 2);
-  CommonModal.open(function (data) {
-    var newFreightPrice = getNumber(data[0].value, 2);
-    nkcAPI("/shop/manage/".concat(sellUid, "/order/editCostRecord"), "PATCH", {
-      type: "modifyFreight",
-      orderId: orderId,
-      freightPrice: newFreightPrice * 100
+  return ModifyPrice.open(function (data) {
+    var newFreightPrice = data;
+    Promise.resolve().then(function () {
+      NKC.methods.checkData.checkNumber(newFreightPrice, {
+        name: "运费",
+        min: 0,
+        fractionDigits: 2
+      });
+      return nkcAPI("/shop/manage/".concat(sellUid, "/order/editCostRecord"), "PATCH", {
+        type: "modifyFreight",
+        orderId: orderId,
+        freightPrice: newFreightPrice * 100
+      });
     }).then(function () {
       freightDom.text("\uFFE5".concat(newFreightPrice.toFixed(2)));
       computeOrderPrice(orderId);
       CommonModal.close();
     })["catch"](sweetError);
-  }, {
-    title: "修改运费",
-    data: [{
-      dom: "input",
-      value: freightPrice
-    }]
-  });
+  }, freightPrice);
 } // 发货/修改物流信息
 
 

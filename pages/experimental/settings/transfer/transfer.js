@@ -7,6 +7,7 @@ var app = new Vue({
     password: "",
     submitting: false,
     num: 1,
+    transferSettings: data.transferSettings,
     from: {
       type: "bank", // bank, user,
       user: ""

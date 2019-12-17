@@ -44,7 +44,7 @@ body{
     height: 2.6rem;
     line-height: 2.6rem;
     padding: 0 1rem;
-    margin-right: 0.5rem;
+    margin-right: 0.7rem;
     &:hover, &:focus{
       text-decoration: none;
       color: @primary;
@@ -53,6 +53,20 @@ body{
       background-color: @primary;
       color: #fff;
       border-radius: 2px;
+    }
+    position: relative;
+    .number{
+      position: absolute;
+      height: 1.4rem;
+      padding: 0 0.45rem;
+      line-height: 1.4rem;
+      text-align: center;
+      background-color: rgba(255, 0, 0, 0.6);
+      border-radius: 0.7rem;
+      font-size: 1rem;
+      color: #fff;
+      top: -3px;
+      right: -3px;
     }
   }
 }
@@ -500,7 +514,6 @@ body{
           font-size: 1.4rem;
           color: @accent;
           font-weight: 700;
-          font-style: oblique;
           margin-right: 1rem;
         }
         .address-user-mobile{
@@ -623,6 +636,15 @@ body{
       max-width: 100%;
       display: inline-block;
     }
+  }
+  .shop-address-form{
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid #eee;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
   }
   
 }
