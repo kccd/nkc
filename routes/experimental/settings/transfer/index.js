@@ -10,6 +10,8 @@ router
     await next();
   })
   .get("/", async (ctx, next) => {
+    const {data, db} = ctx;
+    data.transferSettings = await db.SettingModel.getSettings("transfer");
     ctx.template = "experimental/settings/transfer/transfer.pug";
     await next();
   })

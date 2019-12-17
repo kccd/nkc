@@ -79,6 +79,12 @@ const schema = new Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+  // 用于规格排序
+  order: {
+    type: Number,
+    default: 0,
+    index: 1
   }
 }, {
   collection: 'shopProductsParams'

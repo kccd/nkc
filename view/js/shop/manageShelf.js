@@ -9,6 +9,11 @@ const purchaseLimit = {
   count: 2
 };
 
+dealInfo.templates.map(t => {
+  t.firstPrice = parseFloat(t.firstPrice);
+  t.addPrice = parseFloat(t.addPrice);
+})
+
 if(product) {
   product.vipDisGroup.map(v => vipDisGroupObj[v.vipLevel] = v);
   if(product.purchaseLimitCount == -1) {
@@ -25,7 +30,7 @@ if(product) {
   product.freightTemplates.map(t => {
     t.firstPrice = t.firstPrice / 100;
     t.addPrice = t.addPrice / 100;
-  })
+  });
 }
 
 const vipDisGroup = grades.map(g => {
@@ -331,6 +336,14 @@ const app = new Vue({
     },
     disabledSelectParam(param) {
       if(!param._id) return;
+      if(param.isEnable) {
+        let total = 0;
+        this.selectedParams.map(p => {
+          if(p.isEnable) total ++;
+        });
+        if(total <= 1) return sweetError("不允许屏蔽所有规格");
+      }
+      
       param.isEnable = !param.isEnable;
     },
     initTime() {
@@ -391,7 +404,7 @@ const app = new Vue({
     },
     addTemplate() {
       this.freightTemplates.push({
-        name: "新建模板",
+        name: "",
         firstPrice: "",
         addPrice: ""
       });
@@ -464,11 +477,9 @@ const app = new Vue({
     },
     newParam(name) {
       if(!name) {
-        if(!this.selectedParams.length) {
-          name = "默认";
-        } else {
-          name = "新建规格";
-        }
+        if(!this.selectedParams.length) name = "默认";
+      } else {
+        name = "";
       }
       return {
         name,

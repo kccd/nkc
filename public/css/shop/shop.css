@@ -48,7 +48,8 @@ body {
   height: 2.6rem;
   line-height: 2.6rem;
   padding: 0 1rem;
-  margin-right: 0.5rem;
+  margin-right: 0.7rem;
+  position: relative;
 }
 .order-navs .order-nav:hover,
 .order-navs .order-nav:focus {
@@ -59,6 +60,19 @@ body {
   background-color: #2b90d9;
   color: #fff;
   border-radius: 2px;
+}
+.order-navs .order-nav .number {
+  position: absolute;
+  height: 1.4rem;
+  padding: 0 0.45rem;
+  line-height: 1.4rem;
+  text-align: center;
+  background-color: rgba(255, 0, 0, 0.6);
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  color: #fff;
+  top: -3px;
+  right: -3px;
 }
 .order-infos {
   height: 3rem;
@@ -498,7 +512,6 @@ body {
   font-size: 1.4rem;
   color: #e85a71;
   font-weight: 700;
-  font-style: oblique;
   margin-right: 1rem;
 }
 .shop-bill .shop-addresses .shop-address .address-user-info .address-user-mobile {
@@ -615,4 +628,13 @@ body {
   width: 30rem;
   max-width: 100%;
   display: inline-block;
+}
+.shop-bill .shop-address-form {
+  padding: 1rem;
+  background-color: #fff;
+  border: 1px solid #eee;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
 }

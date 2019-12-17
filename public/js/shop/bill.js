@@ -25,15 +25,77 @@ var app = new Vue({
     // 商品规格数据
     freightTotal: 0,
     // 运费总计
-    priceTotal: 0 // 商品总计
-
+    priceTotal: 0,
+    // 商品总计
+    showAddressForm: false,
+    addressForm: {
+      username: "",
+      address: "",
+      location: "",
+      mobile: ""
+    }
   },
   mounted: function mounted() {
     this.extendProduct();
+    window.SelectAddress = new NKC.modules.SelectAddress();
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     visitUrl: NKC.methods.visitUrl,
+    checkString: NKC.methods.checkData.checkString,
+    // 隐藏添加地址的输入框
+    switchAddressForm: function switchAddressForm() {
+      this.showAddressForm = !this.showAddressForm;
+    },
+    // 添加新地址
+    saveAddressForm: function saveAddressForm() {
+      var self = this;
+      var _this$addressForm = this.addressForm,
+          username = _this$addressForm.username,
+          address = _this$addressForm.address,
+          location = _this$addressForm.location,
+          mobile = _this$addressForm.mobile;
+      this.checkString(username, {
+        name: "收件人姓名",
+        minLength: 1,
+        maxLength: 50
+      });
+      this.checkString(location, {
+        name: "所在地区",
+        minLength: 1,
+        maxLength: 100
+      });
+      this.checkString(address, {
+        name: "详细地址",
+        minLength: 1,
+        maxLength: 500
+      });
+      this.checkString(mobile, {
+        name: "手机号",
+        minLength: 1,
+        maxLength: 100
+      });
+      nkcAPI("/u/".concat(NKC.configs.uid, "/settings/transaction"), "PATCH", {
+        operation: "add",
+        addresses: [this.addressForm]
+      }).then(function (data) {
+        self.addresses = data.addresses;
+
+        if (self.addresses.length) {
+          self.selectedAddress = self.addresses[self.addresses.length - 1];
+        } else {
+          self.selectedAddress = "";
+        }
+
+        self.switchAddressForm();
+      })["catch"](sweetError);
+    },
+    selectLocation: function selectLocation() {
+      var self = this;
+      SelectAddress.open(function (data) {
+        self.addressForm.location = data.join(" ");
+      });
+    },
     // 改变规格的数量
     changeCount: function changeCount(type, param) {
       if (type == "up") {

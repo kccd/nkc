@@ -9,6 +9,10 @@ var purchaseLimit = {
   status: false,
   count: 2
 };
+dealInfo.templates.map(function (t) {
+  t.firstPrice = parseFloat(t.firstPrice);
+  t.addPrice = parseFloat(t.addPrice);
+});
 
 if (product) {
   product.vipDisGroup.map(function (v) {
@@ -350,6 +354,15 @@ var app = new Vue({
     },
     disabledSelectParam: function disabledSelectParam(param) {
       if (!param._id) return;
+
+      if (param.isEnable) {
+        var total = 0;
+        this.selectedParams.map(function (p) {
+          if (p.isEnable) total++;
+        });
+        if (total <= 1) return sweetError("不允许屏蔽所有规格");
+      }
+
       param.isEnable = !param.isEnable;
     },
     initTime: function initTime() {
@@ -411,7 +424,7 @@ var app = new Vue({
     },
     addTemplate: function addTemplate() {
       this.freightTemplates.push({
-        name: "新建模板",
+        name: "",
         firstPrice: "",
         addPrice: ""
       });
@@ -482,11 +495,9 @@ var app = new Vue({
     },
     newParam: function newParam(name) {
       if (!name) {
-        if (!this.selectedParams.length) {
-          name = "默认";
-        } else {
-          name = "新建规格";
-        }
+        if (!this.selectedParams.length) name = "默认";
+      } else {
+        name = "";
       }
 
       return {

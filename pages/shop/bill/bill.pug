@@ -11,10 +11,29 @@ block content
           .m-t-1
             .options-button
               a.active(@click="getAddresses") 刷新
-              a.active(href=`/u/${data.user.uid}/settings/transaction` target="_blank") 使用新地址
+              a.active(@click="switchAddressForm") 添加收货地址
+          .row(v-if="showAddressForm")
+            .col-xs-12.col-md-4
+              .form.shop-address-form
+                .form-group.text-center
+                  h4 添加收货地址
+                .form-group
+                  label 收件人姓名
+                  input.form-control(type="text" v-model="addressForm.username")
+                .form-group
+                  label 手机号
+                  input.form-control(type="text" v-model="addressForm.mobile")  
+                .form-group
+                  label 所在地区
+                  input.form-control(type="text" readonly="true" v-model="addressForm.location" @focus="selectLocation" @click="selectLocation")
+                .form-group
+                  label 详细地址
+                  input.form-control(type="text" v-model="addressForm.address")      
+                .form-group.text-right
+                  button.btn.btn-default(@click="switchAddressForm") 取消
+                  button.btn.btn-primary(@click="saveAddressForm") 保存
           .shop-addresses(v-if="!addresses.length")
-            .null 你暂未添加收货地址，
-              a(href=`/u/${data.user.uid}/settings/transaction` target="_blank") 去添加
+            .null 你暂未添加收货地址
           .shop-addresses(v-else)
             .row
               .col-xs-12.col-md-6(v-for="address in addresses")  
@@ -103,4 +122,5 @@ block content
               button(@click="submit") 提交订单
   #data.hidden=objToStr({addresses: data.addresses, results: data.results})
 block scripts
+  include ../../publicModules/selectAddress/selectAddress
   +includeJS("/js/shop/bill.js")          

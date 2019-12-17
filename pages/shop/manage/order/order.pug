@@ -5,11 +5,19 @@ block shopContent
   .order-navs
     a(class=!data.t || data.t === "all" ? "active" : "" href=`/shop/manage/order`).order-nav 全部
     a(class=data.t === "unCost" ? "active" : "" href=`/shop/manage/order?t=unCost`).order-nav 待付款
+      if data.counter.unCost
+        .number=data.counter.unCost
     a(class=data.t === "unShip" ? "active" : "" href=`/shop/manage/order?t=unShip`).order-nav 待发货
+      if data.counter.unShip
+        .number=data.counter.unShip
     a(class=data.t === "unSign" ? "active" : "" href=`/shop/manage/order?t=unSign`).order-nav 待收货
+      if data.counter.unSign
+        .number=data.counter.unSign
     a(class=data.t === "finish" ? "active" : "" href=`/shop/manage/order?t=finish`).order-nav 已完成
     a(class=data.t === "close" ? "active" : "" href=`/shop/manage/order?t=close`).order-nav 已关闭
     a(class=data.t === "refunding" ? "active" : "" href=`/shop/manage/order?t=refunding`).order-nav 正在退款
+      if data.counter.refunding
+        .number=data.counter.refunding
   div
     include ../../../publicModules/paging/paging
     if !data.orders.length
@@ -128,5 +136,6 @@ block shopContent
 block shopScripts
   include ../../../publicModules/floatUserPanel/floatUserPanel
   include ../../../publicModules/commonModal/commonModal
+  include ../../../publicModules/shop/modifyPrice
   include ../../../publicModules/shop/ship
   +includeJS("/js/shop/manageOrder.js")

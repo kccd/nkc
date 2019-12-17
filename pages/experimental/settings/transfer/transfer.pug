@@ -20,8 +20,11 @@ block eTitle
     }
 block eContent
   .container-fluid.max-width
-    .hidden#data=objToStr({toppingSettings: data.toppingSettings, roles: data.roles, grades: data.grades})
+    .hidden#data=objToStr({transferSettings: data.transferSettings, toppingSettings: data.toppingSettings, roles: data.roles, grades: data.grades})
     .row#app(v-cloak)
+      .col-xs-12.col-md-12
+        h4 用户间转账设置
+
       .col-xs-12.col-md-6
         h4 支付方
         hr

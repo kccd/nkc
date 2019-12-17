@@ -3853,6 +3853,8 @@ ul.nav.navbar-nav.navbar-md>li>a{
 
 .article-img-body{
   position: relative;
+  display: inline-block;
+  vertical-align: text-bottom;
   max-width: 100%;
   font-size: 0;
 }
