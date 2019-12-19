@@ -7,6 +7,7 @@
         .modal-title 转账
       .modal-body
         .form
+          h5 仅限于小额退款等用途，资金将直接转到买家账户，不可追回，请谨慎操作。
           .form-group
             label 转账金额（不超过{{kcbOnce/100}}kcb，精确到0.01）
             input.form-control(type="number" v-model.number="number" placeholder="请输入转账金额")
