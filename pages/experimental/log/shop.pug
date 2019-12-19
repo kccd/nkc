@@ -13,19 +13,19 @@ block eContent
         .form.form-inline.m-b-1
           .form-group
             label 订单号
-            input.form-control(type="text" v-model="orderId")
+            input.form-control(type="text" v-model="orderId" @keyup.enter="submit")
           .form-group
             label 买家
             select.form-control(v-model="userType")
               option(value="username") 用户名
               option(value="uid") UID
-            input.form-control(type="text" v-model="userContent")
+            input.form-control(type="text" v-model="userContent" @keyup.enter="submit")
           .form-group
             label 卖家
             select.form-control(v-model="userType")
               option(value="username") 用户名
               option(value="uid") UID
-            input.form-control(type="text" v-model="tUserContent")    
+            input.form-control(type="text" v-model="tUserContent" @keyup.enter="submit")    
           .form-group
             button.btn.btn-primary(@click="submit") 筛选  
             button.btn.btn-default(@click="reset") 重置
@@ -87,8 +87,6 @@ block eContent
                       h4 商品列表
                       for param, index in order.params
                         -const {productParam, product} = param;
-                        if(index === 0)
-                          -console.log(param)
                         .product
                           .product-cover
                             div
