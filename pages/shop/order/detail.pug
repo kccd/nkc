@@ -76,6 +76,19 @@ block shopAccountTitle
       font-weight: bold;
       margin-right: 10px
     }
+    .order-cert{
+      height: 8rem;
+      width: 8rem;
+      display: inline-block;
+      border: 1px solid #aaa;
+      line-height: 7.5rem;
+      text-align: center;
+      margin: 0 0.5rem 0.5rem 0;
+    }
+    .order-cert img{
+      max-height: 100%;
+      max-width: 100%;
+    }
 block shopAccountContent
   .row
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px")
@@ -193,7 +206,6 @@ block shopAccountContent
               th 属性
               th 商品单价
               th 数量
-              th 购买凭证
           tbody
             for para in order.params
               tr
@@ -202,16 +214,15 @@ block shopAccountContent
                 td!=`${para.productParam.name}`
                 td #{numToFloatTwo(para.singlePrice)}
                 td!=`${para.count}`
-                td
-                  if para.product.uploadCert
-                    for cert in data.certs
-                      if cert.paramId == para.costId && cert.orderId == para.orderId
-                        span
-                          a(href=`/shop/cert/${cert.id}` target="blank")
-                            img(src=`/shop/cert/${cert.id}` style="width:40px;height:40px;margin-right:10px")
-                  else
-                    span 不需凭证
-
+    .col-sm-12.col-md-12.col-xs-12
+      h5 相关凭证：
+        if !order.certs || !order.certs.length
+          | 无
+      if order.certs && order.certs.length
+        .order-certs
+          for cert in order.certs
+            a(href=`/shop/cert/${cert._id}` target="_blank").order-cert
+              img(src=`/shop/cert/${cert._id}`)
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')
         p

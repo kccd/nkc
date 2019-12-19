@@ -16,7 +16,10 @@ router
 
     if(!ctx.permission("getAnyBodyShopCert")) {
       if(cert.uid !== user.uid) {
-        if(cert.type !== "shopping" || user.uid !== product.uid) {
+        if(
+          cert.type !== "shopping" || 
+          !await db.ShopOrdersModel.findOne({sellUid: user.uid, orderId: cert.orderId})
+        ) {
           ctx.throw(403, "您没有权限查看别人的凭证");
         }
       }

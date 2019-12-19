@@ -46,8 +46,10 @@ block shopContent
                   .order-info
                     .name 买家：
                     a.value(href=`/u/${order.buyUid}` onmouseover=tools.floatUserInfo(order.buyUid))=order.buyUser.username
-                    a.value(href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})` target="_blank")
+                    a.value.m-r-1(href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})` target="_blank")
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
+                    if order.orderStatus !== "unCost" && permission("transferKcbToUser") 
+                      button.order-button(onclick=`transfer('${order.buyUid}')`) 转账
                 for param,key in order.params
                   tr(data-order-id=order.orderId data-order-param-id=param.costId)
                     td
@@ -138,4 +140,5 @@ block shopScripts
   include ../../../publicModules/commonModal/commonModal
   include ../../../publicModules/shop/modifyPrice
   include ../../../publicModules/shop/ship
+  include ../../../publicModules/transfer/transfer
   +includeJS("/js/shop/manageOrder.js")

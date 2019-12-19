@@ -1,0 +1,23 @@
++includeCSS("/css/modules/transfer.css")
+.modal.fade#moduleTransfer(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog.modal-sm(role="document")#moduleTransferApp
+    .modal-content
+      .modal-header
+        .fa.fa-remove(data-dismiss="modal" aria-label="Close")
+        .modal-title 转账
+      .modal-body
+        .form
+          .form-group
+            label 转账金额（不超过{{kcbOnce/100}}kcb，精确到0.01）
+            input.form-control(type="number" v-model.number="number" placeholder="请输入转账金额")
+          .form-group
+            label 登录密码
+            input.form-control(type="password" v-model="password" placeholder="请输入登录密码")  
+          .form-group(v-if="error")    
+            .error {{error}}
+      .modal-footer
+        .options-button
+          a(data-dismiss="modal") 关闭
+          a.active(@click="submit") 确定
+
++includeJS("/js/modules/transfer.js")

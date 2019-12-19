@@ -114,13 +114,13 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(href=`/u/${data.user.uid}/settings`).col-xs-6.nav-user-link
                       .fa.fa-cog
                       | 资料设置
-                    a(href=`/u/${data.user.uid}/profile/finance`).col-xs-6.nav-user-link
+                    a(href=`/u/${data.user.uid}/profile/finance?t=all`).col-xs-6.nav-user-link
                       .fa.fa-file-text-o
                       | 我的账单
                     a(href=`/shop/order`).col-xs-6.nav-user-link
                       .fa.fa-file-text-o
                       | 我的订单
-                    a(href=`/shop/manage/goods`).col-xs-6.nav-user-link
+                    a(href=`/shop/manage/order`).col-xs-6.nav-user-link
                       .fa.fa-archive
                       | 我出售的
                     a(href=`/shop/cart`).col-xs-6.nav-user-link
@@ -227,7 +227,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span.fa.fa-inbox &nbsp;我的草稿
             span.pull-right.fa.fa-angle-right
         li
-          a(href=`/u/${data.user.uid}/profile/finance`)
+          a(href=`/u/${data.user.uid}/profile/finance?t=all`)
             span.fa.fa-file-text-o &nbsp;我的账单
             span.pull-right.fa.fa-angle-right
       ul.nkc-drawer-list
@@ -241,7 +241,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             span.fa.fa-file-text-o &nbsp;我的订单
             span.pull-right.fa.fa-angle-right
         li
-          a(href=`/shop/manage/goods`)
+          a(href=`/shop/manage/order`)
             span.fa.fa-archive &nbsp;我出售的
             span.pull-right.fa.fa-angle-right
         li

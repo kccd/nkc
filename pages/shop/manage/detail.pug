@@ -75,6 +75,19 @@ block title
       font-weight: bold;
       margin-right: 10px
     }
+    .order-cert{
+      height: 8rem;
+      width: 8rem;
+      display: inline-block;
+      border: 1px solid #aaa;
+      line-height: 7.5rem;
+      text-align: center;
+      margin: 0 0.5rem 0.5rem 0;
+    }
+    .order-cert img{
+      max-height: 100%;
+      max-width: 100%;
+    }
 block name
   .row
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px;margin-top:20px")
@@ -200,6 +213,15 @@ block name
                 td!=`${para.productParam.name}`
                 td #{numToFloatTwo(para.singlePrice)}
                 td!=`${para.count}`
+    .col-sm-12.col-md-12.col-xs-12
+      h5 相关凭证：
+        if !order.certs || !order.certs.length
+          | 无
+      if order.certs && order.certs.length
+        .order-certs
+          for cert in order.certs
+            a(href=`/shop/cert/${cert._id}` target="_blank").order-cert
+              img(src=`/shop/cert/${cert._id}`)
     .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')
         p

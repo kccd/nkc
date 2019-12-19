@@ -2,7 +2,13 @@
 
 var CommonModal = new NKC.modules.CommonModal();
 var Ship = new NKC.modules.ShopShip();
-var ModifyPrice = new NKC.modules.ShopModifyPrice(); // 修改卖家备注
+var ModifyPrice = new NKC.modules.ShopModifyPrice();
+var Transfer = new NKC.modules.Transfer();
+
+function transfer(tUid) {
+  Transfer.open(function () {}, tUid);
+} // 修改卖家备注
+
 
 function modifySellMessage(uid, orderId) {
   var dom = $("tr[data-order-id='".concat(orderId, "'] .data-sell-message"));
