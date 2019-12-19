@@ -46,7 +46,7 @@ var app = new Vue({
       var transferSettings = this.transferSettings;
 
       Promise.resolve()
-        .then(() => { 
+        .then(function() { 
           checkNumber(transferSettings.kcbOnce, {
             name: "单次转账KCB上限",
             min: 0,
@@ -64,7 +64,7 @@ var app = new Vue({
             transferSettings: transferSettings
           });
         })
-        .then(() => {
+        .then(function() {
           sweetSuccess("保存成功");
         })
         .catch(sweetError);
