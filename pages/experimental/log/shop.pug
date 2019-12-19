@@ -1,0 +1,117 @@
+extends ../experimental
+
+block eTitle
+
+  title 分享操作日志
+  +includeCSS("/experimental/log/shop.css")
+
+block eContent
+  #data.hidden=objToStr({c: data.c})
+  .container-fluid.max-width.orders
+    .row
+      .col-xs-12.col-md-12#app(v-cloak)
+        .form.form-inline.m-b-1
+          .form-group
+            label 订单号
+            input.form-control(type="text" v-model="orderId")
+          .form-group
+            label 买家
+            select.form-control(v-model="userType")
+              option(value="username") 用户名
+              option(value="uid") UID
+            input.form-control(type="text" v-model="userContent")
+          .form-group
+            label 卖家
+            select.form-control(v-model="userType")
+              option(value="username") 用户名
+              option(value="uid") UID
+            input.form-control(type="text" v-model="tUserContent")    
+          .form-group
+            button.btn.btn-primary(@click="submit") 筛选  
+            button.btn.btn-default(@click="reset") 重置
+      .col-xs-12.col-md-12
+        include ../../publicModules/paging/paging
+        table.table.table-bordered
+          thead
+            tr
+              th 时间
+              th 订单号
+              th 买家
+              th 卖家
+              th 订单状态
+              th 商品价格
+              th 运费
+              th 快递单号
+              th 其他
+          tbody
+            for order in data.orders
+              tr.order-info
+                th=format("YYYY/MM/DD HH:mm:ss", order.orderToc)
+                th=order.orderId
+                th
+                  .order-user
+                    img(src=tools.getUrl("userAvatar", order.buyUser.avatar) onmouseover=tools.floatUserInfo(order.buyUid))
+                    a(href=`/u/${order.buyUser.uid}` target="_blank")=order.buyUser.username  
+                th    
+                  .order-user     
+                    img(src=tools.getUrl("userAvatar", order.sellUser.avatar) onmouseover=tools.floatUserInfo(order.sellUid))
+                    a(href=`/u/${order.sellUser.uid}` target="_blank")=order.sellUser.username
+                th
+                  if order.closeStatus
+                    span 已关闭
+                  else if order.refundStatus === "ing"  
+                    span 退款中
+                  else if order.orderStatus === "unCost"  
+                    span 待付款
+                  else if order.orderStatus === "unShip"  
+                    span 待发货
+                  else if order.orderStatus === "unSign"  
+                    span 待收货
+                  else if order.orderStatus === "finish"  
+                    span 已完成
+                th
+                  span=`${order.orderPrice/100}元`
+                th  
+                  span=`${order.orderFreightPrice/100}元`
+                th 
+                  if order.trackNumber === "no"  
+                    span 无物流发货
+                  else 
+                    span=order.trackNumber  
+                th
+                  button(onclick=`showOrderInfo('${order.orderId}')`) 查看更多    
+              tr.product-info(data-order-id=order.orderId)
+                th(colspan=12)  
+                  .row
+                    .col-xs-6
+                      h4 商品列表
+                      for param, index in order.params
+                        -const {productParam, product} = param;
+                        if(index === 0)
+                          -console.log(param)
+                        .product
+                          .product-cover
+                            div
+                              img(src=`/r/${product.imgMaster}`)
+                          .product-content
+                            a.product-title(href=`/t/${product.post.tid}` target="_blank")= product.post.t
+                            .product-param=`规格：${productParam.name}`
+                            .product-price=`单价：${param.singlePrice/100}元，数量：${param.count}，总计：${param.productPrice/100}元`
+                            if param.refundStatus === "success"
+                              .product-param-info=`已退款，退款金额：${param.refundMoney/100}元`
+                    .col-xs-6  
+                      h4 其他信息
+                      div=`收件人姓名：${order.receiveName}`
+                      div=`手机号：${order.receiveMobile}`
+                      div=`地址：${order.receiveAddress}`
+                      div=`订单提交时间：${format('YYYY/MM/DD HH:mm:ss', order.orderToc)}`
+                      if order.payToc
+                        div=`买家付款时间：${format('YYYY/MM/DD HH:mm:ss', order.payToc)}`
+                      if order.shipToc
+                        div=`卖家发货时间：${format('YYYY/MM/DD HH:mm:ss', order.shipToc)}`
+                      if order.finishToc  
+                        div=`订单完成时间：${format('YYYY/MM/DD HH:mm:ss', order.finishToc)}`
+        include ../../publicModules/paging/paging_input                
+block scripts
+  include ../../publicModules/floatUserPanel/floatUserPanel
+  +includeJS("/experimental/log/shop.js")          

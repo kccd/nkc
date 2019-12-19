@@ -66,5 +66,37 @@ router
     }
 
     await next();
+  })
+  .patch("/", async (ctx, next) => {
+    const {db, body, nkcModules} = ctx;
+    const {transferSettings} = body;
+    const {checkNumber} = nkcModules.checkData;
+    const {
+      kcbOnce, countOneDay, countToUserOneDay
+    } = transferSettings;
+    checkNumber(kcbOnce, {
+      name: "单次转账KCB上限",
+      min: 0,
+      fractionDigits: 2
+    }); 
+    checkNumber(countOneDay, {
+      name: "每天转账总次数上限",
+      min: 0
+    });
+    checkNumber(countToUserOneDay, {
+      name: "对同一用户每天转账次数上限",
+      min: 0
+    }); 
+    await db.SettingModel.updateOne({_id: "transfer"}, {
+      $set: {
+        c: {
+          kcbOnce: parseInt(kcbOnce * 100),
+          countOneDay,
+          countToUserOneDay
+        }
+      }
+    });
+    await db.SettingModel.saveSettingsToRedis("transfer");
+    await next();
   });
 module.exports = router;

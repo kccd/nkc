@@ -14,7 +14,8 @@ module.exports = {
 		},
     transfer: {
       GET: "experimentalTransferKCB",
-      POST: "experimentalTransferKCB"
+      POST: "experimentalTransferKCB",
+      PATCH: "experimentalTransferKCB"
     },
 	  hidePost: {
       GET: "experimentalHidePostSettings",
@@ -284,7 +285,10 @@ module.exports = {
     PATCH: "modifySystemInfo"
 	},
 	log: {
-		GET: 'visitPublicLogs',
+    GET: 'visitPublicLogs',
+    shop: {
+      GET: "visitExperimentalShop"
+    },
     recycle: {
 		  GET: 'visitRecycleMarkThreads'
     },

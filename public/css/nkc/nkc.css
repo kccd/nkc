@@ -335,6 +335,15 @@ body {
   font-weight: 700;
   font-style: italic;
 }
+.order-user {
+  display: inline-block;
+}
+.order-user img {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+}
 @media (max-width: 500px) {
   .home-goods-content .home-goods-avatar > div {
     width: 10rem;

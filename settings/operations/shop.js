@@ -47,11 +47,11 @@ module.exports = {
         GET: 'visitFreightTemplate',
         PATCH: 'saveFreightTemplate'
       },
-      // 上架相关
+      /* // 上架相关
       shelf: {
         GET: 'visitShelfIndex',
         POST: 'productToShelf'
-      },
+      }, */
       decoration: {
         sign: {
           POST: 'modifyStoreDecorationSign'

@@ -14,6 +14,7 @@ const recycleRouter = require("./recycle");
 const reviewRouter = require("./review");
 const warningRouter = require("./warning");
 const shareRouter = require("./share");
+const shopRouter = require("./shop");
 const messageRouter = require("./message");
 logRouter
   .get('/', async (ctx, next) => {
@@ -33,6 +34,7 @@ logRouter
   .use('/behavior', behaviorRouter.routes(), behaviorRouter.allowedMethods())
   .use("/review", reviewRouter.routes(), reviewRouter.allowedMethods())
   .use('/share', shareRouter.routes(), shareRouter.allowedMethods())
+  .use("/shop", shopRouter.routes(), shopRouter.allowedMethods())
   .use("/message", messageRouter.routes(), messageRouter.allowedMethods())
   .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods());
 module.exports = logRouter;

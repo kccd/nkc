@@ -1,6 +1,12 @@
 const CommonModal = new NKC.modules.CommonModal();
 const Ship = new NKC.modules.ShopShip();
 const ModifyPrice = new NKC.modules.ShopModifyPrice();
+const Transfer = new NKC.modules.Transfer();
+function transfer(tUid) {
+  Transfer.open(function() {
+
+  }, tUid);
+}
 // 修改卖家备注
 function modifySellMessage(uid, orderId) {
   const dom = $(`tr[data-order-id='${orderId}'] .data-sell-message`);

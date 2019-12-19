@@ -65,7 +65,7 @@ var app = new Vue({
           app.info = "订单取消成功，正在前往订单列表...";
           setTimeout(function() {
             // window.location.href = "/shop/manage/" + app.order.sellUid + "/order";
-            openToNewLocation("/shop/manage/" + app.order.sellUid + "/order");
+            openToNewLocation("/shop/manage/order");
           }, 2000);
         })
         .catch(function(data) {
