@@ -2603,6 +2603,7 @@ img.emoji {
 .nav-user:hover .nav-user-content>div{
   width: 22rem;
   height: 34.5rem;
+  opacity: 1;
 }
 .nav-user-content{
   padding-top: 1.2rem;
@@ -2614,10 +2615,11 @@ img.emoji {
 .nav-user-content>div{
   height: 0;
   width: 0;
-  /*height: 34.5rem;
-  width: 22rem;*/
+  opacity: 0;
+  /* width: 22rem; */
+  /* height: 34.5rem; */
   overflow: hidden;
-  transition: width 200ms, height 200ms;
+  transition: width 200ms, height 200ms, opacity 200ms;
   background-color: rgba(255,255,255,1);
   border-radius: 5px;
   box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2);
@@ -2787,6 +2789,12 @@ img.emoji {
 }
 .new-thread:hover, .new-thread:focus{
   background-color: #cf5468!important;
+}
+.new-message{
+  position: relative;
+  height: 45px;
+  line-height: 45px;
+  margin-right: 10px;
 }
   /*首页*/
 
@@ -4060,5 +4068,11 @@ ul.nav.navbar-nav.navbar-md>li>a{
   .mediaVideo {
     max-width:100%;
     max-height:750px
+  }
+}
+
+@media only screen and (max-width: 800px) and (min-width: 768px){
+  .navbar-md.navbar-search{
+    width: 17rem;
   }
 }

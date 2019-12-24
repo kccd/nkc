@@ -45,7 +45,7 @@ block shopContent
 
                   .order-info
                     .name 买家：
-                    a.value(href=`/u/${order.buyUid}` onmouseover=tools.floatUserInfo(order.buyUid))=order.buyUser.username
+                    a.value(href=`/u/${order.buyUid}` data-float-uid=order.buyUid)=order.buyUser.username
                     a.value.m-r-1(href=`/message?uid=${order.buyUid}` title=`联系买家(${order.buyUser.online ? "在线" : "离线"})` target="_blank")
                       .fa.fa-commenting-o(class=order.buyUser.online ? "active" : "")
                     if order.orderStatus !== "unCost" && permission("transferKcbToUser") 
@@ -136,7 +136,8 @@ block shopContent
                     button.order-button(onclick=`modifySellMessage('${order.sellUid}', '${order.orderId}')`) 修改
     include ../../../publicModules/paging/paging_input
 block shopScripts
-  include ../../../publicModules/floatUserPanel/floatUserPanel
+  include ../../../publicModules/subscribeTypes/subscribeTypes
+  include ../../../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../../../publicModules/commonModal/commonModal
   include ../../../publicModules/shop/modifyPrice
   include ../../../publicModules/shop/ship

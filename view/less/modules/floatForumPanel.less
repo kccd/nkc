@@ -1,0 +1,101 @@
+#floatForumPanel{
+  @import "../base.less";
+  top: 0;
+  left: 0;
+  position: absolute;
+  z-index: 1000;
+  .float-forum{
+    background-size: cover;
+    // max-height: 9rem;
+    border: 1px solid #ccc;
+    min-height: 7.5rem;
+    padding-bottom: 0.8rem;
+    width:  24rem;
+    background-color: #fff;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border-radius: 3px;
+    .float-forum-cover{
+      height: 6rem;
+      width: 6rem;
+      position: absolute;
+      z-index: 100;
+      top: -1rem;
+      left: 0.5rem;
+      border-radius: 5px;
+      overflow: hidden;
+      box-sizing: border-box;
+      border: 3px solid #eee;
+      .float-forum-icon{
+        height: 100%;
+        width: 100%;
+      }
+    }
+    .float-forum-info{
+      padding-left: 7rem;
+      height: 5rem;
+      overflow: hidden;
+      position: relative;
+      .float-forum-name{
+        font-size: 1.3rem;
+        height: 2rem;
+        line-height: 2rem;
+        margin-top: 0.9rem;
+        display: block;
+        .hideText(@line: 1);
+        color: @dark;
+        &:hover, &:focus{
+          text-decoration: none;
+        }
+      }
+      button{
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+        border: none;
+        border-radius: 2px;
+        position: absolute;
+        top: 0.9rem;
+        right: 1rem;
+        font-size: 1rem;
+        box-sizing: border-box;
+        color: #fff;
+        line-height: 1.8rem;
+        height: 1.8rem;
+        background-color: #ccc;
+        &:focus{
+          outline: none;
+        }
+        &:hover{
+          background-color: #aaa;
+        }
+        &.active{
+          background-color: @primary;
+          &:hover{
+            background-color: #2378b5;
+          }
+        }
+
+      }
+      
+    }
+    .float-forum-description{
+      padding: 0 0.8rem;
+      margin-top: 0.45rem;
+      font-style: oblique;
+      font-size: 1rem;
+      color: #666;
+      max-height: 3rem;
+      .hideText(@line: 2);
+    }
+    .float-forum-count{
+      font-size: 1rem;
+      .number{
+        display: inline-block;
+        font-style: oblique;
+        font-size: 1.2rem;
+        margin-right: 0.2rem;
+        color: @accent;
+        font-weight: 700;
+      }
+    }
+  }
+}

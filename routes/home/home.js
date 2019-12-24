@@ -50,8 +50,11 @@ module.exports = async (options) => {
   // 推荐 精选文章
   data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
   // 最新文章
-  data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads, "toc", 3);
-  // 含有最新回复的文章
+  // data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads, "toc", 3);
+  // 最新原创文章
+  data.originalThreads = await db.ThreadModel.getOriginalThreads(fidOfCanGetThreads);
+    
+    // 含有最新回复的文章
   data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 10);
   // 专业导航
   data.forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);

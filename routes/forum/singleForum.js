@@ -7,6 +7,7 @@ const followerRouter = require('./follower');
 const bannerRouter = require('./banner');
 const visitorRouter = require('./visitor');
 const libraryRouter = require("./library");
+const cardRouter = require("./card");
 const Router = require('koa-router');
 const path = require('path');
 const router = new Router();
@@ -340,7 +341,8 @@ router
     
 		ctx.template = 'forum/forum.pug';
 		await next();
-	})
+  })
+  .use("/card", cardRouter.routes(), cardRouter.allowedMethods())
 	.use('/latest', latestRouter.routes(), latestRouter.allowedMethods())
 	.use('/visitors', visitorRouter.routes(), visitorRouter.allowedMethods())
 	.use('/followers', followerRouter.routes(), followerRouter.allowedMethods())

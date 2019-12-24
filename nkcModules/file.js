@@ -225,7 +225,7 @@ exports.saveUserBanner = async (uid, file) => {
     dst: upload.userBannerPath + "/" + file.hash + ".jpg",
     height: 400,
     width: 800,
-    quality: 90
+    quality: 95
   });
   await user.update({banner: file.hash});
   const log = await db.ImageLogModel({

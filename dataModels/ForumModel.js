@@ -1009,32 +1009,28 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     return forum;
   });
 
-  const insertChildForums = (parentsId, forum) => {
-    const parentForums = [];
-    for(const id of parentsId) {
-      const f = forumsObj[id];
-      if(f) parentForums.push(f);
-    }
-    for(const f of parentForums) {
-      if(f.parentsId.length === 0) {
-        f.childrenForums.push(forum);
-      } else {
-        insertChildForums(f.parentsId, forum);
+  const insetForums = (childrenForums, fid) => {
+    let arr = [];
+    for(const f of forums) {
+      if(f.parentsId.includes(fid)) {
+        childrenForums.push(f);
+        arr.push(f);
       }
+    }
+    for(const f of arr) {
+      insetForums(childrenForums, f.fid);
     }
   };
 
-  let tree = [];
-
-  for(const forum of forums) {
-    if(forum.parentsId.length === 0) {
-      tree.push(forum);
-    } else {
-      insertChildForums(forum.parentsId, forum);
+  const results = [];
+  for(const f of forums) {
+    if(!f.parentsId.length) {
+      results.push(f);
+      insetForums(f.childrenForums, f.fid);
     }
   }
-
-  return tree;
+  
+  return results; 
 };
 
 /**
@@ -1300,6 +1296,36 @@ forumSchema.statics.getRecommendForums = async (fid = []) => {
     return forums[index];
   });
   
+};
+
+/*
+* 获取某个专业的层级导航
+* @param {[String]} fids 当前用户能访问的专业ID所组成的数组
+* @param {String} fid 专业ID
+* */
+forumSchema.statics.getForumNav = async (fids = [], fid) => {
+  const ForumModel = mongoose.model("forums");
+  const forums = await ForumModel.find({fid: {$in: fids}}, {
+    fid: 1,
+    displayName: 1,
+    parentsId: 1,
+    description: 1,
+    iconFileName: 1,
+    color: 1
+  });
+  const forumsObj = {};
+  forums.map(f => forumsObj[f.fid] = f);
+  const results = [];
+  const func = (results, fid) => {
+    const forum = forumsObj[fid];
+    if(!forum) return;
+    results.unshift(forum);
+    if(forum.parentsId && forum.parentsId[0]) {
+      func(results, forum.parentsId[0]);
+    }
+  };
+  func(results, fid);
+  return results;
 };
 
 module.exports = mongoose.model('forums', forumSchema);

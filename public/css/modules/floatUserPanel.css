@@ -1,0 +1,227 @@
+#floatUserPanel {
+  /* 默认颜色 */
+  /* 垂直居中 */
+  /* 文本超出隐藏并显示省略号 */
+  top: 0;
+  left: 0;
+  position: absolute;
+  z-index: 1000;
+}
+#floatUserPanel .vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+#floatUserPanel .float-user {
+  border: 1px solid #ccc;
+  min-height: 7.5rem;
+  width: 26rem;
+  background-color: #fff;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  border-radius: 3px;
+}
+#floatUserPanel .float-user .float-user-top {
+  position: relative;
+  height: 9rem;
+}
+#floatUserPanel .float-user .float-user-top .float-user-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-size: cover;
+  height: 9rem;
+  width: 100%;
+  border-radius: 3px;
+  z-index: 100;
+}
+#floatUserPanel .float-user .float-user-top .float-user-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 110;
+  height: 9rem;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+#floatUserPanel .float-user .float-user-top .float-user-uid {
+  bottom: 0;
+  left: 0.5rem;
+  width: 8rem;
+  height: 2rem;
+  line-height: 2rem;
+  font-weight: 700;
+  position: absolute;
+  z-index: 130;
+  text-align: center;
+  font-size: 1.2rem;
+  font-style: oblique;
+  color: #fff;
+}
+#floatUserPanel .float-user .float-user-top .float-user-avatar {
+  z-index: 130;
+  height: 8rem;
+  width: 8rem;
+  position: absolute;
+  top: -1rem;
+  left: 0.5rem;
+  border-radius: 5px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 3px solid #eee;
+}
+#floatUserPanel .float-user .float-user-top .float-user-avatar img {
+  height: 100%;
+  width: 100%;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info {
+  position: absolute;
+  top: 0;
+  left: 8.5rem;
+  padding: 0 0.5rem;
+  width: 17.3rem;
+  z-index: 130;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info .float-user-name {
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  font-size: 1.3rem;
+  margin-top: 0.5rem;
+  color: #fff;
+  font-weight: 700;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info .float-user-name:hover,
+#floatUserPanel .float-user .float-user-top .float-user-info .float-user-name:focus {
+  text-decoration: none;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info .float-user-cert {
+  font-size: 1rem;
+  margin-top: 0.2rem;
+  color: #e85a71;
+  font-style: oblique;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  height: 1.4rem;
+  vertical-align: text-bottom;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info .float-user-grade {
+  display: inline-block;
+  height: 1rem;
+  padding: 0;
+  margin-top: -2px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  width: 1rem;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info .float-user-description {
+  font-size: 1rem;
+  color: #eee;
+  margin-top: 0.2rem;
+  max-height: 2.8rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info .float-user-time {
+  font-size: 1rem;
+  margin-top: 0.2rem;
+  font-style: oblique;
+  color: #eee;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info button {
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 2px;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+  color: #fff;
+  line-height: 1.8rem;
+  height: 1.8rem;
+  background-color: #ccc;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info button:focus {
+  outline: none;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info button:hover {
+  background-color: #aaa;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info button.active {
+  background-color: #2b90d9;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info button.active:hover {
+  background-color: #2378b5;
+}
+#floatUserPanel .float-user .float-user-top .float-user-info .float-user-count {
+  font-size: 1.2rem;
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number {
+  width: 100%;
+  font-size: 0;
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number .col {
+  vertical-align: top;
+  width: 25%;
+  font-size: 0;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  height: 4rem;
+  text-align: center;
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number .col.border-left {
+  box-sizing: border-box;
+  border-left: 1px solid #f4f4f4;
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number .col .number {
+  font-size: 1.25rem;
+  font-style: oblique;
+  height: 2rem;
+  line-height: 1.7rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number .col .title {
+  width: 100%;
+  text-align: center;
+  color: #666;
+  height: 2rem;
+  line-height: 2.4rem;
+  font-size: 1rem;
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number .col .link {
+  font-size: 1.2rem;
+  line-height: 4rem;
+  color: #282c37;
+  display: block;
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number .col .link:hover,
+#floatUserPanel .float-user .float-user-bottom .float-user-number .col .link:focus {
+  color: #282c37;
+  text-decoration: none;
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number .col .link:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+#floatUserPanel .float-user .float-user-bottom .float-user-number.column .col {
+  width: 20%;
+}

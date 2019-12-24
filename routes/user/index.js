@@ -63,6 +63,9 @@ userRouter
     data.targetUser = targetUser;
     await db.UserModel.extendUsersInfo([targetUser]);
     if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
+      if(data.user) {
+        data.subscribed = state.subUsersId.includes(uid);
+      }
       return await next();
     }
     // 获取用户能够访问的专业ID

@@ -36,7 +36,7 @@ function () {
           var orderId = options.orderId;
           self.dom.modal("show");
           Promise.resolve().then(function () {
-            return nkcAPI("/shop/manage/".concat(NKC.configs.uid, "/order/detail?orderId=").concat(orderId), "GET");
+            return nkcAPI("/shop/manage/".concat(NKC.configs.uid, "/order/detail?orderId=").concat(orderId, "&t=").concat(Date.now()), "GET");
           }).then(function (data) {
             self.app.loading = false;
             self.app.order = data.order;

@@ -2,6 +2,6 @@
   .side-thread-header 最近活跃用户
   .m-b-1
   for u in data.activeUsers
-    .active-user-avatar(onmouseover=`floatUserPanel.open(this, '${u.uid}')`)
+    .active-user-avatar(data-float-uid=u.uid)
       a(href=`/u/${u.uid}` target="_blank")
         img(src=`/avatar/${u.avatar}`)

@@ -118,7 +118,7 @@ orderRouter
       refund.description = ctx.state.lang("shopRefundStatus", refund.status) || refund.status;
     }
     data.refund = refund;
-		if(data.order.sellUid !== user.uid) ctx.throw(400, "您无权查看此订单详情");
+    if(data.order.sellUid !== user.uid) ctx.throw(400, "您无权查看此订单详情");
 		ctx.template = 'shop/manage/detail.pug';
 		await next();
 	})

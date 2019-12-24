@@ -5,7 +5,7 @@
       if index > 7
         -continue;
       .side-user(
-        onmouseover=`floatUserPanel.open(this, '${u.uid}')`
+        data-float-uid=u.uid
       )
         a(href=`/u/${u.uid}` target="_blank")
           img(src=`/avatar/${u.avatar}`)

@@ -1189,6 +1189,47 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
   })
 };
 /*
+* 获取最新原创文章，从最新的10篇里取3篇
+* @param {[String]} 有权访问的专业的ID所组成的数组
+* @return {[Object]} 文章对象组成的数组
+* @author pengxiguaa 2019-12-24
+* */
+threadSchema.statics.getOriginalThreads = async (fid) => {
+  const ThreadModel = mongoose.model("threads");
+  const PostModel = mongoose.model("posts");
+  const posts = await PostModel.find({
+    mainForumsId: {$in: fid},
+    disabled: false,
+    reviewed: true,
+    toDraft: {$ne: true},
+    type: "thread",
+    originState: {$nin: ["0", "", "1", "2"]}
+  }).sort({toc: -1}).limit(10);
+  const {getRandomNumber} = require("../nkcModules/apiFunction");
+  const numbers = getRandomNumber({
+    min: 0,
+    max: posts.length - 1,
+    count: 3,
+    repeat: false
+  });
+  const threadsId = numbers.map(n => posts[n].tid);
+  const threads = await ThreadModel.find({
+    tid: {$in: threadsId},
+    mainForumsId: {$in: fid}, disabled: false, reviewed: true, recycleMark: {$ne: true}
+  });
+  return await ThreadModel.extendThreads(threads, {
+    lastPost: true,
+    lastPostUser: true,
+    category: true,
+    forum: true,
+    firstPost: true,
+    firstPostUser: true,
+    userInfo: false,
+    firstPostResource: false,
+    htmlToText: true
+  });
+};
+/*
 * 获取全站最新文章
 * @param {[String]} fid 能够从中读取文章的专业ID
 * @param {String} sort 排序，toc: 文章的发表时间，tlm: 文章最后被回复的时间

@@ -23,7 +23,7 @@ block shopContent
                 .order-info
                   button.m-r-05.order-button(onclick=`selectAll(${index})`) 全选
                   .name 卖家：
-                    a.value(href=`/u/${d.user.uid}` onmouseover=tools.floatUserInfo(d.user.uid))=d.user.username
+                    a.value(href=`/u/${d.user.uid}` data-float-uid=d.user.uid)=d.user.username
                     a.value(href=`/message?uid=${d.user.uid}` title=`联系买家(${d.user.online ? "在线" : "离线"})` target="_blank")
                       .fa.fa-commenting-o(class=d.user.online ? "active" : "")
             for c, key in d.products
@@ -72,5 +72,6 @@ block shopContent
 
 
 block shopScripts
-  include ../../publicModules/floatUserPanel/floatUserPanel
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
   +includeJS('/shop/cart/cart.js')
