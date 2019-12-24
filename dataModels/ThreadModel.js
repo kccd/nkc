@@ -1528,7 +1528,7 @@ threadSchema.statics.postNewThread = async (options) => {
     await PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
     await ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});
   }else{
-    await MessageModel.sendReviewMessage(_post.pid);
+    // await MessageModel.sendReviewMessage(_post.pid);
   }
   // 发贴自动关注专业
   // await SubscribeModel.autoAttentionForum(options);

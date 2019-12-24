@@ -839,7 +839,7 @@ threadRouter
     if(!needReview) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
     } else {
-      await db.MessageModel.sendReviewMessage(_post.pid);
+      // await db.MessageModel.sendReviewMessage(_post.pid);
     }
 
     data.post = _post;
