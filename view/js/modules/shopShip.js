@@ -26,7 +26,7 @@ NKC.modules.ShopShip = class {
           self.dom.modal("show");
           Promise.resolve()
             .then(() => {
-              return nkcAPI(`/shop/manage/${NKC.configs.uid}/order/detail?orderId=${orderId}`, "GET");
+              return nkcAPI(`/shop/manage/${NKC.configs.uid}/order/detail?orderId=${orderId}&t=${Date.now()}`, "GET");
             })
             .then(data => {
               self.app.loading = false;

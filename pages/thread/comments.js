@@ -72,6 +72,7 @@ function submitPostComment(tid, pid, firstInput) {
         NKC.methods.markDom($("#post_comment_" + data.comment.pid + ">.highlight"));
         NKC.methods.scrollToDom($("#post_comment_" + data.comment.pid));
         editor[pid].execCommand('cleardoc');
+        initUserPanel();
       }
     })
     .catch(function(data) {
@@ -110,6 +111,7 @@ function viewPostComments(tid, pid, page, callback) {
         }, 300);
         
       }
+      initUserPanel();
     })
     .catch(function(data) {
       screenTopWarning(data);
@@ -147,4 +149,9 @@ function hidePostComments(pid) {
   closePostComment(pid);
   $("#post_comments_" + pid).hide();
 
+}
+// 新生成的dom，注册事件
+function initUserPanel() {
+  if(!window.floatUserPanel) return;
+  floatUserPanel.initPanel()
 }

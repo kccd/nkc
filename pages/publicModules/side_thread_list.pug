@@ -5,9 +5,9 @@
       a(href=`/t/${t.tid}`).side-thread-title= t.firstPost.t
       if !sideThreadsHideInfo
         .side-thread-info
-          a(href=`/f/${t.forums[0].fid}`)= t.forums[0].displayName
+          a(href=`/f/${t.forums[0].fid}` data-float-fid=t.forums[0].fid)= t.forums[0].displayName
           if !t.firstPost.anonymous
-            a(href=`/u/${t.uid}` onmouseover=`floatUserPanel.open(this, '${t.firstPost.user.uid}')`)= t.firstPost.user.username
+            a(href=`/u/${t.uid}` data-float-uid=t.firstPost.user.uid)= t.firstPost.user.username
           else
             span=anonymousInfo.username
           span=fromNow(t.toc)

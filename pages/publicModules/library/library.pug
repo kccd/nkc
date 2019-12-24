@@ -54,13 +54,13 @@
         .checkbox
           label
             input(type="checkbox" v-model="selectedLibrariesId" :value="f._id")
-      .list-cover(@click="selectFolder(f, true)")
+      .list-cover(@click="selectFolder(f, true)" :title="f.description")
         div(v-if="f.type === 'folder'")
           img(:src="getUrl('fileCover', 'folder')")
         div(v-else)
           img(:src="getUrl('fileCover', f.ext)" v-if="!f.cover")
           img(:src="getUrl('cover', f.cover)" v-else)    
-      .list-body(@click="selectFolder(f, true)")  
+      .list-body(@click="selectFolder(f, true)" :title="f.description")  
         .list-name {{f.name}}
         .list-info(v-if="f.type === 'folder'")
           .time {{format('YYYY/MM/DD', f.tlm)}}  

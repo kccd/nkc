@@ -21,7 +21,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       if data.user
         //- 已登录状态 显示头像
         .navbar-brand.userInfo-m
-          .userInfo-m-point.message-switch(class=!messageSum?"disabled":"")=messageSum
+          .userInfo-m-point.message-switch.message-count(class=!messageSum?"disabled":"")=messageSum
           img(
             src=`/avatar/${data.user.avatar}`
             onclick="toggleNKCDrawer('right')"
@@ -65,8 +65,14 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             a.new-thread(href=editorHref)
               .fa.fa-pencil-square-o &nbsp;
               | 发表文章
+          li.new-message.message-switch(class=messageSum?"":"hidden") 
+            a(href="/message") 消息  
+            .nav-user-avatar-count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
+              
+            //.message-switch(class=messageSum?"":"hidden")
+              | 消息
+              span=messageSum?messageSum:""  
           li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
-            .nav-user-avatar-count.message-switch(class=messageSum?"":"hidden")=messageSum?messageSum:""
             .nav-user-content
               div
                 .nav-user-banner
@@ -106,7 +112,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(href="/message").col-xs-6.nav-user-link
                       .fa.fa-envelope-o
                       | 消息中心
-                      .count.message-switch(class=messageSum?"":"hidden")=messageSum?messageSum:""
+                      .count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
                     a(href=`/u/${data.user.uid}/profile/draft`).col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
@@ -216,7 +222,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           a(href=`/message`)
             span.fa.fa-envelope-o &nbsp;消息中心
               span.nkc-drawer-message.nkc-drawer-link.message-switch-div(class=!messageSum ? "disabled": "" href='/message')
-                span.message-switch(class=!messageSum ? "disabled": "")=messageSum
+                span.message-switch.message-count(class=!messageSum ? "disabled": "")=messageSum
             span.pull-right.fa.fa-angle-right
         //- li
           a(href=`/account/subscribes`)

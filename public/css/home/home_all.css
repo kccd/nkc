@@ -756,11 +756,11 @@ footer.footer {
   height: 3rem;
   font-size: 1.1rem;
   color: #777;
-  word-break: break-word;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  word-break: break-word;
 }
 .home-threads .home-thread .home-thread-info {
   margin-top: 0.2rem;

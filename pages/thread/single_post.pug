@@ -30,7 +30,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
       div
         .inline-block(style='margin-bottom: 0;')
           if !post.anonymous
-            a(href=`/u/${post.uid}` onmouseover=`floatUserPanel.open(this, '${post.uid}')`)
+            a(href=`/u/${post.uid}` data-float-uid=post.uid)
               img(src=`/avatar/${post.user.avatar}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
               span= post.user.username
             -const targetUser = post.user;

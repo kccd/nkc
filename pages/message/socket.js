@@ -23,16 +23,16 @@ socket.on('disconnect', function() {
 
 
 var getNewMessageNumber = function() {
-  var messageSwitch = $('.message-switch');
-  var number = messageSwitch.html();
+  var messageCount = $('.message-count');
+  var number = messageCount.html();
   number = Number(number);
   return number;
 };
 var setNewMessageNumber = function(number) {
   var messageSwitch = $('.message-switch');
-  messageSwitch.removeClass("disabled").removeClass("hidden");
-  $(".message-switch-div").removeClass("disabled");
-  messageSwitch.html(number);
+  var messageCount = $(".message-count");
+  messageSwitch.removeClass("hidden");
+  messageCount.html(number);
 };
 
 socket.on('message', function(data) {

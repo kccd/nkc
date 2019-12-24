@@ -100,7 +100,7 @@ block content
               for log in data.visitUserLogs
                 .account-logs-user
                   .account-logs-user-avatar
-                    img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") onmouseover=tools.floatUserInfo(log.toUid))
+                    img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") data-float-uid=log.toUid)
                   .account-logs-user-info
                     a(href=`/u/${log.toUid}`).account-logs-user-name=log.targetUser.username
                     .account-logs-user-time=fromNow(log.timeStamp)
@@ -114,7 +114,7 @@ block content
               for log in data.visitSelfLogs
                 .account-logs-user
                   .account-logs-user-avatar
-                    img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") onmouseover=tools.floatUserInfo(log.uid))
+                    img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") data-float-uid=log.uid)
                   .account-logs-user-info
                     a(href=`/u/${log.uid}`).account-logs-user-name=log.user.username
                     .account-logs-user-time=fromNow(log.timeStamp)
@@ -166,5 +166,5 @@ block scripts
       var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
       var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
   +includeJS("/js/user/profile.js")
-  include ../../publicModules/floatUserPanel/floatUserPanel
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../../publicModules/moment

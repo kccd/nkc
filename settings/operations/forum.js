@@ -4,7 +4,10 @@ module.exports = {
 	PARAMETER: {
 		GET: 'visitForumHome', // 查看专业主页
 		POST: 'postToForum', // 在专业中发表文章
-		DELETE: 'deleteForum', // 删除专业
+    DELETE: 'deleteForum', // 删除专业
+    card: {
+      GET: "visitForumCard"
+    },
     banner: {
 		  GET: 'visitForumBanner',
       PATCH: "modifyForumBanner"
