@@ -2,6 +2,12 @@ module.exports = {
 	GET: 'searchUser',
 	PARAMETER: {
 		GET: 'visitUserCard',
+		myProblems: {
+			GET: "visitSelfProblems",
+			PARAMETER: {
+				GET: "visitSelfProblemDetails"
+			}
+		},
     clear: {
 		  POST: "clearUserInfo"
     },

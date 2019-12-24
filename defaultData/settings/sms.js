@@ -48,6 +48,12 @@ module.exports = {
         sameIpOneDay: 10,
         sameMobileOneDay: 5
       }
+    ],
+    restrictedNumber: [
+      {
+        code: 'ZH 86',
+        number: ['170']
+      }
     ]
   }
 };

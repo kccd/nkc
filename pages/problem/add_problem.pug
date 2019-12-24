@@ -2,14 +2,20 @@ extends ../bootstrap_base
 block title
   title 报告问题
   -const mainContainer1400 = true;
+  style.
+    body {
+      background: #f8f8f8;
+    }
 block content
-  .container-fluid(style='max-width: 1400px')
+  .container-fluid.max-width
     .row
-      .col-xs-12.col-md-6.col-md-offset-3
-        if data.userOperationsId.includes('visitProblemList')
-          .form
-            .form-group
-              a.btn.btn-default(href='/problem/list') 问题列表
+      .col-xs-12.col-md-6.col-md-offset-3.box-shadow-panel
+        if data.user
+          .form.m-b-1
+            .form-group.m-b-0
+              if data.userOperationsId.includes('visitProblemList')
+                a.btn.btn-default.m-r-1(href='/problem/list') 问题列表
+              a.btn.btn-default(href=`/u/${data.user.uid}/myProblems`) 我的问题
             if data.problemsType
               h4(id='cid' data-cid=data.problemsType._id)=`添加记录到分类：`
                 a(href=`/problem/list?cid=${data.problemsType._id}`)= data.problemsType.name

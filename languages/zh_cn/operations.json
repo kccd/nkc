@@ -646,6 +646,8 @@
   "nkcManagementHome": "前台管理 - 首页管理",
   "pushColumnToHome": "推送专栏到首页",
   "pushGoodsToHome": "推送商品到首页",
+  "visitSelfProblems": "查看自己的问题列表",
+  "visitSelfProblemDetails": "查看自己的问题详情",
 
   "userSettingsHomeToLatest": "首页调整：主页 > 最新",
   "userSettingsLatestToHome": "首页调整：最新 > 主页",

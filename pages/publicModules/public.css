@@ -12,6 +12,9 @@ table{
   word-break: break-all;
 }
 /* margin-top */
+.m-a-0{
+  margin: 0!important;
+}
 .m-l-0{
   margin-left: 0!important;
 }
@@ -1959,9 +1962,11 @@ span.thread-title-page{
 .improve .improve-info{
   margin: 0.3rem 0;
 }
-
-
-
+.text-ellipsis {
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .topped-thread-header{
   height: 2rem;
   line-height: 2rem;

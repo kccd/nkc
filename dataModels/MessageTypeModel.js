@@ -172,6 +172,14 @@ const getDomByType = (t) => {
     return "item.c.content"
   } else if(t === "cTitle") {
     return "item.c.cTitle"
+  } else if (t === "problemURL") {
+    return "'/u/' + item.c.problem.uid + '/myProblems/' + item.c.problem._id"
+  } else if (t === "problemTitle") {
+    return "item.c.problem.t"
+  } else if (t === "restorerURL") {
+    return "'/u/' + item.c.restorer.uid"
+  } else if (t === "restorerName") {
+    return "item.c.restorer.username"
   }
 };
 // const getAppVueDom = (template) => {

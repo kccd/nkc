@@ -1,0 +1,46 @@
+extends ../../bootstrap_base
+block title
+  -const problem = data.problem;
+  title= problem.t
+
+  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
+  style.
+    body {
+      background: #f9f9f9;
+    }
+block content
+  .container-fluid.max-width(style="min-height: calc(100vh - 345px)")
+    .row
+      .hidden#data= JSON.stringify({id: data.problem._id})
+      .col-xs-12.col-md-12.box-shadow-panel
+        h4(style='color: #aaa;')
+          a.btn.btn-default.btn-sm(href=`/u/${data.user.uid}/myProblems`) << 返回列表
+        .col-xs-12.col-md-12
+          .h2.text-center#title= problem.t
+          .text-center &nbsp;&nbsp;上报于&nbsp;&nbsp;
+            span=problem.toc.toLocaleString()
+            span &nbsp;&nbsp;
+            if problem.resolved
+              span= `于 ${problem.resolveTime.toLocaleString()} `
+              span 由&nbsp;&nbsp;
+              a(href=`/u/${problem.restorer.uid}` target='_blank')
+                img(src=`/avatar/${problem.restorer.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
+                span= problem.restorer.username
+              span.label.label-success 解决
+            else
+              span.label.label-danger 未解决
+          .m-t-2#content= problem.c
+          if problem.QQ
+            h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
+          if problem.email
+            h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
+
+
+
+block scripts
+  include ../../publicModules/highlight/highlight
+  //- Mackdown转html
+  include ../../publicModules/mdToHtml
+  //- 验证样式
+  script(src=`/icheck/icheck.js?v=${startTime}`)
+  //- script(src=`/user/problems/problemDetails.js?v=${startTime}`)

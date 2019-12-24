@@ -17,8 +17,10 @@ mobileRouter
 		if(!nationCode) ctx.throw(400, '新手机国际区号不能为空');
 		if(!mobile) ctx.throw(400, '新手机号码不能为空');
 		if(!code) ctx.throw(400, '新手机验证码不能为空');
+
 		mobile = mobile.trim();
 		code = code.trim();
+		await db.SettingModel.checkRestricted(nationCode, mobile);
 		const {user} = data;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		let smsCodeOld, smsCode;

@@ -6,9 +6,22 @@ block content
     .row
       .col-xs-12.col-md-9
         .fullwidthpanel.ThreadBox.nkcpanel
-          include ../publicModules/attachments/attachments
       .col-xs-12.col-md-3
         p Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam explicabo cumque tempore, nesciunt id ex cum quidem. Dolorem aspernatur facere quam optio cum. Asperiores quisquam dolorem tempore facilis velit iste!
+        .first(style='color: red;') 1
+        - var mydata = {num: 2, name: "<hr>未转义", flag: true}
+        // 注释
+        case mydata.num
+          when 0
+          when 1
+            p 1
+          when 2
+            p!= mydata.name
+          default
+            p #{mydata.num}
+        if mydata.flag
+          div= mydata.flag
+        else
+          div flag = false
 block scripts
-  include ../publicModules/attachments/attachments_js
   +includeJS("/test/test.js")
