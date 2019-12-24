@@ -54,7 +54,6 @@ router
     const {nkcModules, db, body} = ctx;
     const {out_trade_no, trade_status} = body;
     // 验证信息是否来自支付宝
-    console.log(body);
     await nkcModules.alipay2.verifySign(body);
     // 查询科创币充值记录
     const record = await db.KcbsRecordModel.findOne({_id: out_trade_no});
