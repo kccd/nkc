@@ -123,12 +123,10 @@ settingSchema.statics.checkRestricted = async (code, number) => {
       numbers = ele.number;
     }
   });
-  if(numbers) {
-    numbers.map(n => {
-      const index = number.indexOf(n);
-      if(index === 0) throwErr(403, "此号码受限制");
-    });
-  }
+  numbers.map(n => {
+    const index = number.indexOf(n);
+    if(index === 0) throwErr(403, "此号码受限制");
+  });
 }
 
 /* 

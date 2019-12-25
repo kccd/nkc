@@ -30,8 +30,8 @@ var app = new Vue({
       return chineseName
     },
     isDisabled (nationCode) {
-      for (res of this.smsSettings.restrictedNumber) {
-        if (nationCode === res.code) return true;
+      for (var i=0;  i < this.smsSettings.restrictedNumber.length; i++) {
+        if (nationCode === this.smsSettings.restrictedNumber[i].code) return true;
       }
       return false
     },
@@ -83,7 +83,7 @@ var app = new Vue({
       Promise.resolve()
         .then(function() {
           var checkString = NKC.methods.checkData.checkString;  
-          smsSettings.restrictedNumber.forEach((ele,index) => {
+          smsSettings.restrictedNumber.forEach(function (ele) {
             ele.number = ele.number.toString();
             checkString(ele.code, {
               name: "国际区号",
@@ -93,8 +93,8 @@ var app = new Vue({
               name: '受限号码',
               minLength: '1'
             })
-            ele.number = ele.number.trim().split(',').filter((n) => {
-              return n.trim()
+            ele.number = ele.number.trim().split(',').filter(function (n) {
+              return n.trim();
             })
           })
         }, function () {

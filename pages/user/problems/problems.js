@@ -1,11 +1,5 @@
 var app = new Vue({
   el: '#app',
-  data: {
-
-  },
-  mounted: function() {
-
-  },
   methods: {
     // deleteType: function(cid, name) {
     //   if(!confirm('确定要删除分类“'+name+'”?')) return;
