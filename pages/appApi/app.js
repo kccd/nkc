@@ -1,14 +1,15 @@
+
 var realUrl = "";
 localStorage.setItem("apptype", "app");
 var allLinks = document.querySelectorAll("a");
 var allButtons = document.querySelectorAll("button");
 var imgDownTimeOut;
 // 禁止点击连接执行跳转
-Array.prototype.forEach.call(allLinks, function(link) {
-  link.addEventListener("click", function(e) {
-    e.preventDefault();
-  })
-})
+// Array.prototype.forEach.call(allLinks, function(link) {
+//   link.addEventListener("click", function(e) {
+//     e.preventDefault();
+//   })
+// })
 // window.addEventListener("click", function(e) {
 //   console.log("禁止点击")
 //   e.preventDefault();
@@ -48,52 +49,102 @@ apiready = function() {
   // 为所有的a标签添加点击事件
   // 监听全局a标签的点击事件
   // 并阻止链接点击跳转
-  var allLinks = document.querySelectorAll("a");
-  Array.prototype.forEach.call(allLinks, function(link) {
-    link.addEventListener("click", function() {
-      if(this.href.indexOf("/r/") > -1) {
-        var linkUrl = this.href;
-        attachDownInApp(linkUrl);
-      }else if(this.href) {
-        var isHostUrl = siteHostLink(this.href);
-        // 如果是本站链接则打开app内页，否则使用外站浏览页打开
-        if(isHostUrl) {
-          var paramIndex = this.href.indexOf("?");
-          var newHref = "";
-          var equaiHref = false;
-          if(paramIndex > -1) {
-            newHref = (this.href).substring(0, paramIndex)
-          }else{
-            newHref = this.href;
-          }
-          if(newHref.length > 0) {
-            if(api.winName.indexOf(newHref) > -1) {
-              equaiHref = true;
+  // var allLinks = document.querySelectorAll("a");
+  var body = document.getElementsByTagName("body")[0];
+  body.addEventListener('click',function (e) {
+    // e.preventDefault();
+    if(e.target && e.target.nodeName.toLowerCase() == "a" && e.target.getAttribute('href')) {  // 检查事件源e.target是否为a
+      e.target.onclick = function (ae) {
+        ae.preventDefault();
+        if(e.target.href.indexOf("/r/") > -1) {
+          var linkUrl = e.target.href;
+          attachDownInApp(linkUrl);
+        }else if(e.target.href) {
+          var isHostUrl = siteHostLink(e.target.href);
+          // 如果是本站链接则打开app内页，否则使用外站浏览页打开
+          if(isHostUrl) {
+            var paramIndex = e.target.href.indexOf("?");
+            var newHref = "";
+            var equaiHref = false;
+            if(paramIndex > -1) {
+              newHref = (e.target.href).substring(0, paramIndex)
+            }else{
+              newHref = e.target.href;
             }
-          }
-          // 如果是在首页跳转到最新关注推荐等，不打开新页面
-          if(this.pathname === "/" && api.winName === "root") {
-            window.location.href = addApptypeToUrl(this.href)
-            return;
-          }
-          if(equaiHref) {
-            appFreshUrl(this.href);
-          }else{
-            appOpenUrl(this.href);
-          }
-        }else{
-          api.openWin({
-            name: 'link',
-            url: 'widget://html/link/link.html',
-            pageParam: {
-                name: 'link',
-                linkUrl: this.href
+            if(newHref.length > 0) {
+              if(api.winName.indexOf(newHref) > -1) {
+                equaiHref = true;
+              }
             }
-          });
+            // 如果是在首页跳转到最新关注推荐等，不打开新页面
+            if(e.target.pathname === "/" && api.winName === "root") {
+              window.location.href = addApptypeToUrl(e.target.href)
+              return;
+            }
+            if(equaiHref) {
+              appFreshUrl(e.target.href);
+            }else{
+              appOpenUrl(e.target.href);
+            }
+          }else{
+            api.openWin({
+              name: 'link',
+              url: 'widget://html/link/link.html',
+              pageParam: {
+                  name: 'link',
+                  linkUrl: e.target.href
+              }
+            });
+          }
         }
       }
-    })
-  })
+    }
+  }, true)
+  // Array.prototype.forEach.call(allLinks, function(link) {
+  //   link.addEventListener("click", function() {
+  //     if(this.href.indexOf("/r/") > -1) {
+  //       var linkUrl = this.href;
+  //       attachDownInApp(linkUrl);
+  //     }else if(this.href) {
+  //       var isHostUrl = siteHostLink(this.href);
+  //       // 如果是本站链接则打开app内页，否则使用外站浏览页打开
+  //       if(isHostUrl) {
+  //         var paramIndex = this.href.indexOf("?");
+  //         var newHref = "";
+  //         var equaiHref = false;
+  //         if(paramIndex > -1) {
+  //           newHref = (this.href).substring(0, paramIndex)
+  //         }else{
+  //           newHref = this.href;
+  //         }
+  //         if(newHref.length > 0) {
+  //           if(api.winName.indexOf(newHref) > -1) {
+  //             equaiHref = true;
+  //           }
+  //         }
+  //         // 如果是在首页跳转到最新关注推荐等，不打开新页面
+  //         if(this.pathname === "/" && api.winName === "root") {
+  //           window.location.href = addApptypeToUrl(this.href)
+  //           return;
+  //         }
+  //         if(equaiHref) {
+  //           appFreshUrl(this.href);
+  //         }else{
+  //           appOpenUrl(this.href);
+  //         }
+  //       }else{
+  //         api.openWin({
+  //           name: 'link',
+  //           url: 'widget://html/link/link.html',
+  //           pageParam: {
+  //               name: 'link',
+  //               linkUrl: this.href
+  //           }
+  //         });
+  //       }
+  //     }
+  //   })
+  // })
   // 将本页的title和description传入app中
   var locationUrl = window.location.href;
   var urlType = getShareTypeByUrl(locationUrl);

@@ -1,8 +1,11 @@
 //- 引入js
   @param url: js地址
   @author pengxiguaa 2019/2/15
-mixin includeJS(url)
-  script(src=`${url}?v=${startTime}`)
+mixin includeJS(url, defer)
+  if defer
+    script(defer='defer' src=`${url}?v=${startTime}`)
+  else  
+    script(src=`${url}?v=${startTime}`)
 //- 引入css
   @param url: css地址  
   @author pengxiguaa 2019/2/15
