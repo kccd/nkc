@@ -23,11 +23,6 @@ block content
                     span.label.label-danger 未解决
                   span &nbsp;&nbsp;
                   div(style='color: #aaa;display: inline')
-                    //- span
-                    //-   if problem.user
-                    //-     a(href=`/u/${problem.user.uid}`)= problem.user.username
-                    //-   else
-                    //-     span 匿名用户
                     span &nbsp;&nbsp;上报于&nbsp;&nbsp;
                       span= `${fromNow(problem.toc)}`
                     a(href=`/u/${data.user.uid}/myProblems/${problem._id}` style='text-decoration: none;')
