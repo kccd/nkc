@@ -39,7 +39,7 @@ block shopSettings
               h5 订单状态：{{order.status}}
               h5 订单总价：
                 strong.text-danger {{order.orderPrice/100 + order.orderFreightPrice/100}}
-                | 元 （商品总价：{{orderOriginPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
+                | 元 （商品总价：{{order.orderPrice/100}}元，邮费：{{order.orderFreightPrice/100}}元
                 span(v-if="order.refundMoney > 0") ，已退款：{{order.refundMoney/100}}元
                 | ）
               h5 商品列表
@@ -112,5 +112,5 @@ block shopSettings
                     button.btn.btn-primary.btn-block(@click="submit") 提交
 
 block shopSettingScripts
-  //- +includeJS("/experimental/shop/applys.js")
+  include ../../../publicModules/moment
   +includeJS("/experimental/shop/refund/refundDetail.js")

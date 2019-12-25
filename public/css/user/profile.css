@@ -12,6 +12,15 @@
 body {
   background-color: #f6f6f6;
 }
+.table-content {
+  max-width: 8rem;
+  max-height: 9rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+}
 .null {
   padding-top: 5rem;
   padding-bottom: 5rem;

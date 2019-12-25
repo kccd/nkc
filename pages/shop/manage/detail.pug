@@ -75,6 +75,19 @@ block title
       font-weight: bold;
       margin-right: 10px
     }
+    .order-cert{
+      height: 8rem;
+      width: 8rem;
+      display: inline-block;
+      border: 1px solid #aaa;
+      line-height: 7.5rem;
+      text-align: center;
+      margin: 0 0.5rem 0.5rem 0;
+    }
+    .order-cert img{
+      max-height: 100%;
+      max-width: 100%;
+    }
 block name
   .row
     .col-sm-12.col-md-12.col-xs-12(style="margin-bottom:20px;margin-top:20px")
@@ -96,14 +109,14 @@ block name
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 等待买家付款
             li.orderPrompt 
-              button(onclick=`cancelOrder(${order.orderId})`) 取消订单
+              a(href=`/shop/manage/${data.user.uid}/order/cancel?orderId=${order.orderId}`) 取消订单
           if order.orderStatus == "unShip"
             li.orderStatusLi
               span.fa.fa-exclamation-circle.orderStatusMark
               span.orderStatusText 已付款，等待商家发货
             li.orderPrompt 
               span 
-                button(onclick=`openSendGoodsModal(${order.buyUid}, ${order.orderId})`) 发货
+                button(onclick=`ship(${order.orderId})`) 发货
             li.orderPrompt 
               span 买家已付款，请尽快发货，否则买家有权申请退款
             li.orderPrompt
@@ -201,6 +214,15 @@ block name
                 td #{numToFloatTwo(para.singlePrice)}
                 td!=`${para.count}`
     .col-sm-12.col-md-12.col-xs-12
+      h5 相关凭证：
+        if !order.certs || !order.certs.length
+          | 无
+      if order.certs && order.certs.length
+        .order-certs
+          for cert in order.certs
+            a(href=`/shop/cert/${cert._id}` target="_blank").order-cert
+              img(src=`/shop/cert/${cert._id}`)
+    .col-sm-12.col-md-12.col-xs-12
       div(style='text-align:right')
         p
           span(style='font-weight: bold;') 实付款
@@ -209,4 +231,14 @@ block name
           span!=`)：`
           span#totalPrice(style='font:700 26px tahoma;color:red') #{numToFloatTwo(order.orderPrice+order.orderFreightPrice)}
 block manageScripts
+  include ../../publicModules/shop/ship
   +includeJS("/shop/manage/order.js")
+  script.
+    var Ship = new NKC.modules.ShopShip();
+    function ship(orderId) {
+      Ship.open(() => {
+      
+      }, {
+        orderId: orderId
+      })
+    }

@@ -119,11 +119,7 @@ const shopGoodsSchema = new Schema({
   //   type: String,
   //   required: true
   // },
-  /**
-   * 库存计数方式
-   * @payReduceStock 付款减库存
-   * @orderReduceStock 下单减库存
-   */
+  
   // 是否免邮
   isFreePost: {
     type: Boolean,
@@ -142,6 +138,11 @@ const shopGoodsSchema = new Schema({
     type: Array,
     default: []
   },
+  /**
+   * 库存计数方式
+   * @payReduceStock 付款减库存
+   * @orderReduceStock 下单减库存
+   */
   stockCostMethod: {
     type: String,
     default: "payReduceStock"
@@ -297,7 +298,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   }
   if(o.productParam) {
     for(const productParam of productId) {
-      productParams = await ShopProductsParamsModel.find({productId: productParam});
+      productParams = await ShopProductsParamsModel.find({productId: productParam}).sort({order: 1});
       productParams = await ShopProductsParamsModel.extendParamsInfo(productParams)
       productParamObj[productParam] = productParams;
     }
@@ -441,6 +442,36 @@ shopGoodsSchema.statics.getHomeGoods = async () => {
     if(g) results.push(g);
   }
   return results;
+};
+
+/* 
+  重新计算剩余库存
+  @param {String} productId 商品ID
+*/
+
+shopGoodsSchema.statics.computeSellCount = async (productId) => {
+  const ShopGoodsModel = mongoose.model("shopGoods");
+  const ShopProductsParamsModel = mongoose.model("shopProductsParams");
+  const ShopCostRecordModel = mongoose.model("shopCostRecord");
+  const ShopOrdersModel = mongoose.model("shopOrdersModel");
+
+  const product = await ShopGoodsModel.findOne({productId});
+  if(!product) throwErr(500, `商品ID错误，productId: ${productId}`);
+  if(product.stockCostMethod === "orderReduceStock") {
+    // 下单减库存
+    
+  } else {
+    // 付款减库存
+  }
+  const productParams = await ShopProductsParamsModel.find({productId: product.productId});
+  const costs = await ShopCostRecordModel.find({
+    productId, 
+    refundStatus: {$ne: "success"}
+  });
+  const ordersId = costs.map(c => c.orderId);
+  for(const productParam of productParams) {
+    
+  }
 };
 
 const ShopGoodsModel = mongoose.model('shopGoods', shopGoodsSchema);

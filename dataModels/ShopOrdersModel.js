@@ -50,7 +50,7 @@ const shopOrdersSchema = new Schema({
   // orderOriginPrice: {
   //   type: Number
   // },
-  // 订单运费 暂时无用
+  // 订单运费
   orderFreightPrice: {
     type: Number,
     default: 0
@@ -211,16 +211,19 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
     buyUser: true,
     product: true,
     productParam: true,
-    params: true
+    params: true,
+    certs: true
   };
   o = Object.assign(options, o);
   const UserModel = mongoose.model('users');
   const ShopCostRecord = mongoose.model("shopCostRecord");
   const ShopGoodsModel = mongoose.model('shopGoods');
+  const ShopCertModel = mongoose.model("shopCerts");
   const ShopProductsParamsModel = mongoose.model('shopProductsParams');
   const sellUid = new Set(), sellUserObj = {};
   const buyUid = new Set(), buyUserObj = {};
   const orderId = new Set(), paramsObj = {};
+  const certsObj = {};
   orders.map(ord =>{
     if(o.sellUser)
       sellUid.add(ord.sellUid);
@@ -242,6 +245,13 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
       buyUserObj[buyUser.uid] = buyUser;
     }
   }
+  if(o.certs) {
+    const certs = await ShopCertModel.find({orderId: {$in: [...orderId]}});
+    certs.map(cert => {
+      certsObj[cert.orderId] = certsObj[cert.orderId] || [];
+      certsObj[cert.orderId].push(cert);
+    });
+  }
   if(o.params) {
     params = await ShopCostRecord.find({orderId:{$in: [...orderId]}});
     params = await ShopCostRecord.orderExtendRecord(params);
@@ -261,6 +271,11 @@ shopOrdersSchema.statics.storeExtendOrdersInfo = async (orders, o) => {
     if(o.sellUser) order.sellUser = sellUserObj[ord.sellUid];
     if(o.buyUser) order.buyUser = buyUserObj[ord.buyUid];
     if(o.params) order.params = paramsObj[ord.orderId];
+
+    if(o.certs) {
+      order.certs = certsObj[order.orderId] || []
+    }
+
     return order
   }))
 };
@@ -280,11 +295,13 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
     product: false,
     sellUser: true,
     buyUser: true,
-    params: true
+    params: true,
+    certs: true
   };
   o = Object.assign(options, o);
   const ShopGoodsModel = mongoose.model("shopGoods");
   const ShopProductsParamsModel = mongoose.model("shopProductsParams");
+  const ShopCertModel = mongoose.model("shopCerts");
   const UserModel = mongoose.model("users");
   const ShopCostRecord = mongoose.model("shopCostRecord");
   const productId = new Set(), productObj = {};
@@ -292,6 +309,7 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
   const sellUid = new Set(), sellUserObj = {};
   const buyUid = new Set(), buyUserObj = {};
   const orderId = new Set(), paramsObj = {};
+  const certsObj = {};
   orders.map(ord => {
     if(o.product)
       productId.add(ord.productId);
@@ -339,6 +357,13 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
       paramsObj[param.orderId].push(param);
     }
   }
+  if(o.certs) {
+    const certs = await ShopCertModel.find({orderId: {$in: [...orderId]}});
+    certs.map(cert => {
+      certsObj[cert.orderId] = certsObj[cert.orderId] || [];
+      certsObj[cert.orderId].push(cert);
+    })
+  }
   return await Promise.all(orders.map(ord => {
     const order = ord.toObject();
     if(o.product) order.product = productObj[ord.productId];
@@ -346,6 +371,7 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
     if(o.sellUser) order.sellUser = sellUserObj[ord.sellUid];
     if(o.buyUser) order.buyUser = buyUserObj[ord.buyUid];
     if(o.params) order.params = paramsObj[ord.orderId];
+    if(o.certs) order.certs = certsObj[order.orderId] || [];
     return order
   }))
 };

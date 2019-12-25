@@ -28,7 +28,7 @@
 
 
         if !thread.firstPost.anonymous
-          .thread-panel-author(onmouseover=`floatUserPanel.open(this, '${thread.uid}')`)
+          .thread-panel-author(data-float-uid=thread.uid)
             a(href=`/u/${thread.uid}` target="_blank")
               img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
             a(
@@ -46,7 +46,7 @@
             for f in thread.forums
               if f.fid !== data.forum.fid
                 -displayForumNav = true;
-                a(href=`/f/${f.fid}` title=f.description)= f.displayName
+                a(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
             if !displayForumNav && thread.categories.length !== 0
               for category in thread.categories
                 if data.threadTypesId.includes(category.cid)
@@ -57,7 +57,7 @@
               -forum = f;
               if f.forumType === 'topic'
                 -break;
-            a(href=`/f/${forum.fid}` title=forum.description)= forum.displayName
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid)= forum.displayName
 
         .thread-panel-time=fromNow(thread.toc)
 
@@ -106,7 +106,7 @@
           .thread-panel-reply
             a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
             if !thread.lastPost.anonymous
-              a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" onmouseover=tools.floatUserInfo(thread.lastPost.uid))
+              a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)
                 img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
             else
               .thread-panel-reply-user

@@ -18,64 +18,90 @@ block eTitle
       font-size: 1.3rem;
       font-weight: 700;
     }
+    .transfer-form{
+      padding: 1rem;
+      background-color: #fff;
+      border: 1px solid #eee;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
 block eContent
   .container-fluid.max-width
-    .hidden#data=objToStr({toppingSettings: data.toppingSettings, roles: data.roles, grades: data.grades})
-    .row#app(v-cloak)
-      .col-xs-12.col-md-6
-        h4 支付方
-        hr
-        .radio
-          label.m-r-2
-            input(type="radio" value="bank" v-model="from.type")
-            span 科创人民很行
-          label
-            input(type="radio" value="user" v-model="from.type")
-            span 指定用户
-        div(v-if="from.type === 'user'").m-b-05
-          button.btn.btn-default.btn-sm(@click="getUser('from')") 选择用户
-        div(v-if="from.type === 'user' && from.user")
-          .transfer-user
-            img.transfer-user-avatar(:src="getUrl('userAvatar', from.user.avatar)")
-            .transfer-username
-              a.pointer(@click="visitUrl('/u/' + from.user.uid, true)") {{from.user.username}}
-            .description {{from.user.description}}
-            .info 当前KCB：
-              strong.text-danger {{from.user.kcb/100}}
-            .info 注册于{{format('YYYY/MM/DD HH:mm:ss', from.user.toc)}}
-            .info 最后活动 {{fromNow(from.user.tlv)}}
-      .col-xs-12.col-md-6
-        h4 收款方
-        hr
-        .radio
-          label.m-r-2
-            input(type="radio" value="bank" v-model="to.type")
-            span 科创人民很行
-          label
-            input(type="radio" value="user" v-model="to.type")
-            span 指定用户
-        div(v-if="to.type === 'user'").m-b-05
-          button.btn.btn-default.btn-sm(@click="getUser('to')") 选择用户
-        div(v-if="to.type === 'user' && to.user")
-          .transfer-user
-            img.transfer-user-avatar(:src="getUrl('userAvatar', to.user.avatar)")
-            .transfer-username
-              a.pointer(@click="visitUrl('/u/' + to.user.uid, true)") {{to.user.username}}
-            .description {{to.user.description}}
-            .info 当前KCB：
-              strong.text-danger {{to.user.kcb/100}}
-            .info 注册于{{format('YYYY/MM/DD HH:mm:ss', to.user.toc)}}
-            .info 最后活动 {{fromNow(to.user.tlv)}}
-      .col-xs-12.col-md-12.m-t-1
-        hr
-        h5 科创币数额（大于0，精确到0.01）
-        input.form-control(style="max-width: 20rem" v-model.number="num" type="text")
-        h5 请输入登录密码
-        input.form-control(style="max-width: 20rem" v-model="password" type="password")
-        h5.text-danger(v-if="warning || error") {{warning || error}}
-        .m-t-05
-          button.btn.btn-primary(v-if="submitting || warning" disabled) 提交
-          button.btn.btn-primary(v-else @click="submit") 提交
+    .hidden#data=objToStr({transferSettings: data.transferSettings, toppingSettings: data.toppingSettings, roles: data.roles, grades: data.grades})
+    #app(v-cloak)
+      .row.m-b-3
+        .col-xs-12.col-md-4
+          .transfer-form
+            h3 小额转账设置
+            .form
+              .form-group
+                label 单次转账KCB上限（精确到0.01）
+                input.form-control(type="text" v-model.number="transferSettings.kcbOnce")
+              .form-group
+                label 每天转账总次数上限
+                input.form-control(type="text" v-model.number="transferSettings.countOneDay")
+              .form-group
+                label 对同一用户每天转账次数上限
+                input.form-control(type="text" v-model.number="transferSettings.countToUserOneDay")
+              .form-group
+                button.btn.btn-primary(@click="saveTransferSettings") 保存  
+        .col-xs-12
+          hr        
+      .row        
+        .col-xs-12.col-md-6
+          h4 支付方
+          hr
+          .radio
+            label.m-r-2
+              input(type="radio" value="bank" v-model="from.type")
+              span 科创人民很行
+            label
+              input(type="radio" value="user" v-model="from.type")
+              span 指定用户
+          div(v-if="from.type === 'user'").m-b-05
+            button.btn.btn-default.btn-sm(@click="getUser('from')") 选择用户
+          div(v-if="from.type === 'user' && from.user")
+            .transfer-user
+              img.transfer-user-avatar(:src="getUrl('userAvatar', from.user.avatar)")
+              .transfer-username
+                a.pointer(@click="visitUrl('/u/' + from.user.uid, true)") {{from.user.username}}
+              .description {{from.user.description}}
+              .info 当前KCB：
+                strong.text-danger {{from.user.kcb/100}}
+              .info 注册于{{format('YYYY/MM/DD HH:mm:ss', from.user.toc)}}
+              .info 最后活动 {{fromNow(from.user.tlv)}}
+        .col-xs-12.col-md-6
+          h4 收款方
+          hr
+          .radio
+            label.m-r-2
+              input(type="radio" value="bank" v-model="to.type")
+              span 科创人民很行
+            label
+              input(type="radio" value="user" v-model="to.type")
+              span 指定用户
+          div(v-if="to.type === 'user'").m-b-05
+            button.btn.btn-default.btn-sm(@click="getUser('to')") 选择用户
+          div(v-if="to.type === 'user' && to.user")
+            .transfer-user
+              img.transfer-user-avatar(:src="getUrl('userAvatar', to.user.avatar)")
+              .transfer-username
+                a.pointer(@click="visitUrl('/u/' + to.user.uid, true)") {{to.user.username}}
+              .description {{to.user.description}}
+              .info 当前KCB：
+                strong.text-danger {{to.user.kcb/100}}
+              .info 注册于{{format('YYYY/MM/DD HH:mm:ss', to.user.toc)}}
+              .info 最后活动 {{fromNow(to.user.tlv)}}
+        .col-xs-12.col-md-12.m-t-1
+          hr
+          h5 科创币数额（大于0，精确到0.01）
+          input.form-control(style="max-width: 20rem" v-model.number="num" type="text")
+          h5 请输入登录密码
+          input.form-control(style="max-width: 20rem" v-model="password" type="password")
+          h5.text-danger(v-if="warning || error") {{warning || error}}
+          .m-t-05
+            button.btn.btn-primary(v-if="submitting || warning" disabled) 提交
+            button.btn.btn-primary(v-else @click="submit") 提交
 block scripts
   include ../../../publicModules/selectUser/selectUser
   include ../../../publicModules/moment

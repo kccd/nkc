@@ -467,7 +467,7 @@ router
     }
     await targetUser.updateUserMessage();
     if(!postReviewed) {
-      await db.MessageModel.sendReviewMessage(singlePost.pid);
+      // await db.MessageModel.sendReviewMessage(singlePost.pid);
     }
     await next();
   })

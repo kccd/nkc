@@ -1,5 +1,6 @@
 var data = NKC.methods.getDataById("data");
 var SelectUser = new NKC.modules.SelectUser();
+data.transferSettings.kcbOnce = data.transferSettings.kcbOnce / 100;
 var app = new Vue({
   el: "#app",
   data: {
@@ -7,6 +8,7 @@ var app = new Vue({
     password: "",
     submitting: false,
     num: 1,
+    transferSettings: data.transferSettings,
     from: {
       type: "bank", // bank, user,
       user: ""
@@ -38,6 +40,35 @@ var app = new Vue({
     format: NKC.methods.format,
     visitUrl: NKC.methods.visitUrl,
     getUrl: NKC.methods.tools.getUrl,
+    checkNumber: NKC.methods.checkData.checkNumber,
+    saveTransferSettings: function() {
+      var checkNumber = this.checkNumber;
+      var transferSettings = this.transferSettings;
+
+      Promise.resolve()
+        .then(function() { 
+          checkNumber(transferSettings.kcbOnce, {
+            name: "单次转账KCB上限",
+            min: 0,
+            fractionDigits: 2
+          }); 
+          checkNumber(transferSettings.countOneDay, {
+            name: "每天转账总次数上限",
+            min: 0
+          });
+          checkNumber(transferSettings.countToUserOneDay, {
+            name: "对同一用户每天转账次数上限",
+            min: 0
+          }); 
+          return nkcAPI("/e/settings/transfer", "PATCH", {
+            transferSettings: transferSettings
+          });
+        })
+        .then(function() {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError);
+    },
     getUser: function(t) {
       SelectUser.open(function(data) {
         app[t].user = data.users[0];

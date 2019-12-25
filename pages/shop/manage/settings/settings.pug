@@ -1,0 +1,60 @@
+extends ../../shop
+block shopTitle
+  title 交易设置
+block shopContent
+  #data.hidden=objToStr({dealInfo: data.dealInfo})
+  div#address(v-cloak)
+    if !data.dealInfo
+      .m-b-05
+        .shop-warning
+          .fa.fa-exclamation-circle
+          | 请先完善以下信息，否则无法使用商品管理、管理订单等功能。
+    .shop-header 基础信息
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        .from.m-t-2.m-b-2
+          .form-group
+            label 供货说明（选填，不超过500字节）
+            textarea.form-control(rows=5 v-model="dealDescription")
+          .form-group
+            label 全局公告（选填，不超过500字节）
+            textarea.form-control(rows=5 v-model="dealAnnouncement")
+          .form-group
+            label 退货地址（必填）
+            .m-b-05
+              span 区域：
+              strong {{location}}
+              button.m-l-05.btn.btn-default.btn-xs(@click="selectAddress") 选择区域
+            textarea.form-control(placeholder="详细地址" rows=3 v-model="address")
+
+    .shop-header 运费模板
+    .row
+      .col-xs-12.col-md-8.col-md-offset-2
+        .table-responsive
+          table.table
+            thead
+              tr
+                th 模板名称
+                th 首件价格
+                th 首件后每件价格
+                th
+            tbody
+              tr(v-for="t, index in templates")
+                th
+                  input.form-control(type="text" v-model.trim="t.name")
+                th
+                  input.form-control(type="text" v-model.number="t.firstPrice")
+                th
+                  input.form-control(type="text" v-model.number="t.addPrice")
+                th.shop-remove-template
+                  .fa.fa-trash(title="删除模板" @click="removeTemplate(index)")
+              tr
+                th(colspan=4 @click="addTemplate").shop-add-template
+                  .fa.fa-plus &nbsp;新建模板
+  .text-center
+    button.shop-btn.primary(onclick="app.save()").p-l-2.p-r-2 保存
+
+
+block shopScripts
+  include ../../../publicModules/selectAddress/selectAddress
+  +includeJS("/js/shop/manageSettings.js")

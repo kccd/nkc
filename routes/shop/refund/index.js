@@ -66,7 +66,7 @@ router
       refundMoney = Number(refundMoney.toFixed(2));
       if(refundMoney < 0) ctx.throw(400, "退款金额不能小于0");
       if(param) {
-        if(refundMoney > param.productPrice) ctx.throw(400, "退款金额不能超过要退款的商品的金额");
+        if(refundMoney > param.singlePrice * param.count) ctx.throw(400, "退款金额不能超过要退款的商品的金额");
       } else {
         if(refundMoney > order.orderPrice) ctx.throw(400, "退款金额不能超过全部商品的总金额");
       }

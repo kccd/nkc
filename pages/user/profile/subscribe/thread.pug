@@ -37,7 +37,7 @@ div
               span 匿名
             else
               a.thread-user(href=`/u/${thread.uid}`)
-                img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) onmouseover=tools.floatUserInfo(thread.uid))
+                img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) data-float-uid=thread.uid)
                 span=thread.firstPost.user.username
             if thread.firstPost.voteUp
               .thread-thumbup

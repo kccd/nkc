@@ -1,235 +1,126 @@
-extends ../shopBase
-block shopTitle
-  title 确认账单 | 科创商城
-  -const cartsData = data.cartsData
-  -const newCartData = data.newCartData
-  -const addresses = data.addresses
-
-  +includeCSS('/fund.css')
-  style.
-    .addressSelected {
-      border-color: #f40;
-      background-color: #fff0e8;
-      margin: 5px 0 7px;
-      line-height: 32px;
-      box-shadow: 5px 5px 0 #f3f3f3;
-    }
-    .paySelected {
-      border-color: #f40;
-      background-color: #fff0e8;
-      margin: 5px 0 7px;
-      line-height: 32px;
-      box-shadow: 5px 5px 0 #f3f3f3;
-    }
-    .table > tbody > tr > td {
-      border: 0
-    }
-    .productCountBtn {
-      color: #000;
-      background-color: #9baec8;
-      border: 1px solid #9baec8;
-      text-decoration: none;
-      cursor: pointer;
-    }
+extend ../../bootstrap_base
+block title
+  title 结算
+  +includeCSS("/css/shop/shop.css")
 block content
-  .hidden#data= JSON.stringify(data.newCartData)
   .container-fluid.max-width
-    .row
-      .col-xs-12.col-md-12
-        .order-address-wrap
-          h3(style="border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;")
-            span 确认收货地址
-            span.manage-address(style="float: right;font-size: 12px;font-weight: 400;")
-              a(href=`/u/${data.user.uid}/settings/transaction`, target='_blank', title='管理我的收货地址') 管理收货地址
-          ul.address-list(style="list-style: none;margin:0;padding:0")
-            for address,index in addresses
-              li.address-wrap
-                .addressBox
-                  label.addressInfo
-                    input(type='radio', name='address' value=`${index}`)
-                    span.user-address
-                      span.address=address.location+address.address
-                      span （
-                      span.username=address.username
-                      span  收）
-                      em.mobile=address.mobile
-          //- a.btn.btn-info.btn-sm(style="margin-left:40px" onclick="addAddress()") 新增收货地址
-      .col-xs-12.col-md-12
-        .order-address-wrap
-          h3(style="border-bottom: 2px solid #f1f1f1;margin-bottom: 20px;font-size: 20px;font-weight: 700;color: firebrick;")
-            span 确认账单
-        .table-responsive
-          table.table
-            thead
-              tr(style="background: burlywood;")
-                th 商品名称
-                th 属性
-                th 商品单价
-                th 数量
-                //- th 运费
-                th 凭证
-                th 小计
-            tbody
-              for bill in newCartData
-                tr(style="border-bottom:1px solid #80b2ff")
-                  td(colspan="7" style="height:5px;")
-                    p(style="background-color: antiquewhite;width: fit-content;")   
-                      span 卖家：
-                      span!=bill.user.username
-                      span(style="margin-left:20px;color:#000")
-                        a.btn(href=`/message?uid=${bill.user.uid}` target="_blank").fa.fa-commenting 联系卖家
-                for cart in bill.carts
-                  mixin orderCert(cart) 
-                    if cart.product.uploadCert
-                      input(type="file" id=`input_${cart.productParamId}` data-param-id=cart.productParamId
-                        onchange=`inputChange(this)`
-                      ).hidden
-                      div(class=`cert-${cart.productParamId}`)
-                        button(onclick=`uploadCert('${cart.productParamId}')`) 上传
-                        | &nbsp;
-                        button(onclick=`viewCert('${cart.productParamId}')`).hidden 查看
-                    else
-                      div 不需凭证
-                  tr(style="background-color:#fbfcff;border-bottom:1px solid #f2f7ff" class=`param${bill.user.uid}`)
-                    td(style="border-right:1px solid #f2f7ff;width:30%;")
-                        img(src=`/r/${cart.product.imgMaster}` style="width:60px;height:60px;margin-right:5px")
-                        a(href=`/shop/product/${cart.product.productId}` target="_blank")=`${cart.product.name } (商品ID:${cart.product.productId})`
-                    td(style="border-right:1px solid #f2f7ff")
-                      span=cart.productParam.name
-                    td(style="border-right:1px solid #f2f7ff")
-                      if cart.vipDiscount
-                        span #{numToFloatTwo(cart.productParam.price * (cart.vipNum / 100))} 
-                      else
-                        span #{numToFloatTwo(cart.productParam.price)} 
-                    td(style="border-right:1px solid #f2f7ff")
-                      button(class="productCountBtn" onclick="countAddOne(this)" productParamId=`${cart.productParamId}` cartId=`${cart._id}`)
-                        span.fa.fa-arrow-up
-                      span(style="margin:0 10px" id=`cartCount${cart._id}`)=cart.count
-                      button(class="productCountBtn" onclick="countPlusOne(this)" productParamId=`${cart.productParamId}` cartId=`${cart._id}`)
-                        span.fa.fa-arrow-down
-                    td.order(paid=`${cart.productParam._id}` data-upload-cert=cart.product.uploadCert?"true": "false") 
-                      +orderCert(cart)
-                    td(style="border-right:1px solid #f2f7ff;text-align:right")
-                      span(style="color:#ffad11;font-weight:bold;")#singlePrices #{numToFloatTwo((cart.productParam.price * (cart.vipNum / 100))*cart.count)}
-                  if cart.product.uploadCert
-                    tr 
-                      td(colspan="5" style="text-align:right;font-size:12px") 
-                        span 凭证说明：
-                        span.text-danger!=cart.product.uploadCertDescription
-                  if cart.canBuy == false
-                    tr
-                      td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" limit="yes" colspan="7")!=`该商品剩余购买数量为${cart.remainBuyCount}件`
-                  tr(style="background-color:#f2fff3")
-                    th(colspan="3" isFreePost=`${cart.product.isFreePost}` id=`isFreePost${cart._id}`)
-                    td(style="font-weight: bold;") 运费
-                    if cart.product.isFreePost
-                      td 
-                        span 卖家承担
-                      td(style="text-align:right") 
-                        span(style="color: #ffad11;font-weight:bold") 0.00
-                    else
-                      -let freightId = 0
-                      if cart.freightId
-                        -freightId = cart.freightId
-                      //- -let realFirstPrice
-                      td
-                        select(onchange="changeFreightTemplate(this)" id=`tempArr${cart._id}` dataid=`${cart._id}` datauid=`${bill.user.uid}` class="tempArr")
-                          for freight,index in cart.product.freightTemplates
-                            if freightId === index
-                              //- -realFirstPrice = freight.firstPrice
-                              option(value=`${index}` selected dataafp=`${freight.addPrice}` dataffp=`${freight.firstPrice}` cartid=`${cart._id}`)!=`${freight.name}`
-                            else
-                              option(value=`${index}` dataafp=`${freight.addPrice}` dataffp=`${freight.firstPrice}` cartid=`${cart._id}`)!=`${freight.name}`
-                      td(style="text-align:right")
-                        span(style="color: #ffad11;font-weight:bold" id=`freightSingle${cart._id}`) #{numToFloatTwo(cart.freightPrice)}
-
-                tr(style="background-color:#f2f7ff;" id=`freight${bill.user.uid}`)
-                  td(colspan="3"  style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff ") 
-                    div(style="font-weight:bold;float:left") 给卖家留言：
-                    div 
-                      textarea(id=`message${bill.user.uid}`, cols="20", rows="2" placeholder="选填，请先与卖家协商一致")
-                  td(colspan="2"  style="font-weight:bold;") 商品合计(含运费)
-                  td.subtotal(style="color:red;font-weight:bold;text-align:right" class="hejiPrices"  id=`billTotalPrice${bill.user.uid}`) #{numToFloatTwo(bill.totalLittleFreight + bill.productPrice)}
-                  //- td(style="font-weight: bold;") 运费
-                  //- if bill.maxFreightPrice == 0
-                  //-   td
-                  //-     span 卖家承担
-                  //-   td(style="text-align:right")
-                  //-     span(style="color:#ffad11;font-weight:bold;")#freightPrices 0.00
-                  //- else
-                  //-   td
-                  //-     span 不包邮
-                  //-   td(style="text-align:right")
-                  //-     span(style="color:#ffad11;font-weight:bold;")#freightPrices #{numToFloatTwo(bill.maxFreightPrice)}
-                //- tr(style="background-color:#f2f7ff;border-bottom:1px dotted #80b2ff " id=`heji${bill.user.uid}`)
-                //-   td(colspan="2" style="font-weight:bold;") 商品合计(含运费)
-                //-   td.subtotal(style="color:red;font-weight:bold;text-align:right" class="hejiPrices") #{numToFloatTwo(bill.maxFreightPrice + bill.productPrice)}
-            //- tbody
-            //-   mixin orderCert(bill) 
-            //-     if bill.product.uploadCert
-            //-       input(type="file" id=`input_${productParamId}` data-param-id=productParamId
-            //-         onchange=`inputChange(this)`
-            //-       ).hidden
-            //-       div(class=`cert-${productParamId}`)
-            //-         button(onclick=`uploadCert('${productParamId}')`) 上传
-            //-         | &nbsp;
-            //-         button(onclick=`viewCert('${productParamId}')`).hidden 查看
-            //-     else 
-            //-       span 不需要  
-            //-   if data.billType == "cart"
-            //-     for bill in cartsData
-            //-       tr 
-            //-         td
-            //-           a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name 
-            //-         td=bill.productParam.name 
-            //-         td #{numToFloatTwo(bill.productParam.price)} 
-            //-         td.order(paid=`${bill.productParam._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
-            //-         td #{numToFloatTwo(calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
-            //-         td.subtotal #{numToFloatTwo((bill.productParam.price)*bill.count + calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
-            //-         td  
-            //-           +orderCert(bill)
-            //-         if bill.canBuy == false
-            //-           td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
-            //-   else if data.billType == "product"
-            //-     for bill in cartsData
-            //-       tr
-            //-         td
-            //-           a(href=`/shop/product/${bill.product.productId}` target="_blank")=bill.product.name
-            //-         td=bill.name
-            //-         td #{numToFloatTwo(bill.price)} 
-            //-         td.order(paid=`${bill._id}` data-upload-cert=bill.product.uploadCert?"true": "false")=bill.count
-            //-         td #{numToFloatTwo(calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
-            //-         td.subtotal #{numToFloatTwo((bill.price)*bill.count + calculateFreightPrice(bill.product.freightPrice,bill.count,bill.product.isFreePost))}
-            //-         td  
-            //-           +orderCert(bill)
-            //-         if bill.canBuy == false
-            //-           td.limitBuy(style="font-size: 12px;background-color: cornsilk;color: tomato;" limit="yes")!=`该商品剩余购买数量为${bill.remainBuyCount}件`
-      .col-xs-12.col-md-12
-        div(style="text-align:right")
-          p 
-            span(style="font-weight: bold;") 合计:&nbsp;
-            span(style="font:700 26px tahoma;color:red")#totalPrice
-      .col-xs-12.col-md-12
-        .col-xs-8.col-md-8
-        .col-xs-4.col-md-4
-          div(style="text-align:right")
-            p 
-              span(style="font-weight: bold;") 配送至:&nbsp;
-              span#finalAddress(style="margin-right: 10px;margin-left: 10px;") 
-            p
-              span(style="font-weight: bold;") 收货人:&nbsp;
-              span#finalName(style="margin-right: 10px;margin-left: 10px;") 
-              span#finalMobile 
-            button#submitPay.btn.btn-danger.btn-lg(onclick="submitOrders()") 提交订单
-
-
-block shopScripts  
-  +includeJS("/shop/bill/bill.js")
-  script.
-    var totalPrice = 0;
-    $(document).ready(function() {
-      $(".subtotal").each(function(){
-        totalPrice += $(this).text()*100;
-      });
-      $("#totalPrice").text((totalPrice/100).toFixed(2))
-    })
+    .row.shop-bill
+      .col-xs-12.col-md-12.box-shadow-panel#app(v-cloak)
+        div
+          .shop-header 收货地址
+          .m-t-1
+            .options-button
+              a.active(@click="getAddresses") 刷新
+              a.active(@click="switchAddressForm") 添加收货地址
+          .row(v-if="showAddressForm")
+            .col-xs-12.col-md-4
+              .form.shop-address-form
+                .form-group.text-center
+                  h4 添加收货地址
+                .form-group
+                  label 收件人姓名
+                  input.form-control(type="text" v-model="addressForm.username")
+                .form-group
+                  label 手机号
+                  input.form-control(type="text" v-model="addressForm.mobile")  
+                .form-group
+                  label 所在地区
+                  input.form-control(type="text" readonly="true" v-model="addressForm.location" @focus="selectLocation" @click="selectLocation")
+                .form-group
+                  label 详细地址
+                  input.form-control(type="text" v-model="addressForm.address")      
+                .form-group.text-right
+                  button.btn.btn-default(@click="switchAddressForm") 取消
+                  button.btn.btn-primary(@click="saveAddressForm") 保存
+          .shop-addresses(v-if="!addresses.length")
+            .null 你暂未添加收货地址
+          .shop-addresses(v-else)
+            .row
+              .col-xs-12.col-md-6(v-for="address in addresses")  
+                .shop-address(@click="selectAddress(address)" :class="{'active': selectedAddress === address}")
+                  .fa.fa-check
+                  .address-user-info
+                    span 收件人：
+                    .address-user-name {{address.username}}
+                    span 手机号：
+                    .address-user-mobile {{address.mobile}}
+                  .address-content
+                    div 所在地区：{{address.location}}
+                    div 详细地址：{{address.address}}
+        div 
+          .shop-header 商品信息 
+          .shop-products
+            .shop-product(v-for="r in results")
+              .product-user
+                .user-avatar
+                  img(:src="getUrl('userAvatar', r.user.avatar, 'sm')")
+                a.username.pointer(@click="visitUrl('/u/' + r.user.uid,true)") {{r.user.username}}
+                a.icon.pointer(@click="'/message?uid='+r.user.uid" :title="'联系卖家(' + (r.user.online?'在线':'离线') + ')'" target="_blank")
+                  .fa.fa-commenting-o(:class="{'active': r.user.online}")
+              .product(v-for="product in r.products")    
+                .table-responsive
+                  table.table.table-bordered.m-b-05  
+                    thead
+                      tr
+                        th 商品信息
+                        th.text-center 库存剩余
+                        th.text-center 商品单价
+                        th.text-center 购买数量
+                        th.text-center 总价
+                    tbody
+                      tr(v-for="param in product.params")   
+                        th 
+                          div.order-name-info
+                            .order-cover
+                              img(:src="'/r/' + product.product.imgMaster")
+                            .order-name
+                              a.pointer(@click="visitUrl('/shop/product/' + product.product.productId, true)" :title="product.product.name") {{product.product.name}}
+                              .order-param(:title="param.productParam.name") 规格：{{param.productParam.name}} 
+                        th.text-center
+                          div {{param.productParam.stocksSurplus}}      
+                        th.order-price
+                          .number ￥{{(param.price / 100).toFixed(2)}}
+                        th.text-center
+                          .data-param-count-button
+                            .fa.fa-caret-up(@click="changeCount('up', param)")
+                          .number.data-param-count {{param.count}}
+                          .data-param-count-button
+                            .fa.fa-caret-down(@click="changeCount('down', param)")
+                        th.order-price
+                          .number ￥{{(param.price * param.count / 100).toFixed(2)}}    
+                .product-cert(v-if="product.product.uploadCert")
+                  span 上传凭证：
+                  .cert-content(:onclick="'$(\"input.hidden.input-' + product.product.productId + '\").click()'")
+                    .fa.fa-plus(v-if="!product.certId")
+                    img(v-else :src="'/shop/cert/' + product.certId" title="重新上传")  
+                  input.hidden(:class="'input-' + product.product.productId" type="file" accept="image/*" @change="selectedFile(r, product)")
+                .product-freight(v-if="!product.product.isFreePost && product.freight")
+                  | 选择物流：
+                  select(v-model="product.freightName" @change="setFreightByName(product)")
+                    option(v-for="t in product.product.freightTemplates" :value="t.name") {{t.name}}
+                  .info(v-if="product.freight.addPrice") 首件￥{{product.freight.firstPrice/100}}，每增加一件运费增加￥{{product.freight.addPrice/100}}  
+                  span.info(v-else) 运费￥{{product.freight.firstPrice/100}}
+                .product-price
+                  | 总运费：
+                  span.number ￥{{(product.freightTotal/100).toFixed(2)}}
+                  | ，商品总价格：
+                  span.number ￥{{(product.priceTotal/100).toFixed(2)}}
+                  | ，合计：
+                  span.number ￥{{((product.priceTotal + product.freightTotal)/100).toFixed(2)}}
+              .m-t-05.text-right.buy-message
+                label 备注：
+                textarea.form-control(v-model="r.buyMessage" rows=2 placeholder="1000字节限制")
+        div 
+          .shop-total
+            span.m-r-1 运费总计：
+              .number ￥{{(freightTotal/100).toFixed(2)}}
+            span ，商品总计：
+              .number ￥{{(priceTotal/100).toFixed(2)}}
+            div 订单总计：  
+              .number.total ￥{{((priceTotal + freightTotal)/100).toFixed(2)}}
+            div  
+              button(@click="submit") 提交订单
+  #data.hidden=objToStr({addresses: data.addresses, results: data.results})
+block scripts
+  include ../../publicModules/selectAddress/selectAddress
+  +includeJS("/js/shop/bill.js")          

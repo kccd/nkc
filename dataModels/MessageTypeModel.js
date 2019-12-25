@@ -130,7 +130,7 @@ const getDomByType = (t) => {
   } else if(t === "userAuthApplyURL") {
     return "'/u/' + item.c.user.uid + '/auth'";
   } else if(t === "sellerOrderListURL") {
-    return "'/shop/manage/' + item.c.user.uid + '/order'";
+    return "'/shop/manage/order'";
   } else if(t === "buyerOrderURL") {
     return "'/shop/order/' + item.c.order.orderId + '/detail'";
   } else if(t === "orderID") {

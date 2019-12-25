@@ -27,7 +27,7 @@ div
             img(src=anonymousInfo.avatar)
             span=anonymousInfo.username
           else
-            a(href=`/u/${post.thread.uid}` onmouseover=tools.floatUserInfo(post.thread.uid))
+            a(href=`/u/${post.thread.uid}` data-float-uid=post.thread.uid)
               img(src=tools.getUrl("userAvatar", post.thread.firstPost.user.avatar, "sm"))
               span=post.thread.firstPost.user.username
           span ：

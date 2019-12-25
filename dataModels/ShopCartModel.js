@@ -46,9 +46,11 @@ const schema = new Schema({
   @return 拓展后的购物车数据（数组对象，不再是mongoose的schema对象）
   @author pengxiguaa 2019/3/4
 */
-schema.statics.extendCartsInfo = async (arr) => {
+schema.statics.extendCartsInfo = async (arr, options = {}) => {
+  const {userGradeId} = options;
+  if(undefined === userGradeId) throwErr(500, `拓展购物车数据时未指定用户等级`);
   const UserModel = mongoose.model('users');
-  const ShopGoodsModdel = mongoose.model('shopGoods');
+  const ShopGoodsModel = mongoose.model('shopGoods');
   const ShopProductsParamModel = mongoose.model('shopProductsParams');
   const uid = new Set(), userObj = {}, productId = new Set(), productObj = {};
   const productParamId = new Set(), paramObj = {};
@@ -58,7 +60,7 @@ schema.statics.extendCartsInfo = async (arr) => {
     productParamId.add(a.productParamId);
   });
   const users = await UserModel.find({uid: {$in: [...uid]}});
-  const products = await ShopGoodsModdel.find({productId: {$in: [...productId]}});
+  const products = await ShopGoodsModel.find({productId: {$in: [...productId]}});
   let productParams = await ShopProductsParamModel.find({_id: {$in: [...productParamId]}});
   productParams = await ShopProductsParamModel.extendParamsInfo(productParams, {name: true});
   users.map(u => {
@@ -70,22 +72,38 @@ schema.statics.extendCartsInfo = async (arr) => {
   productParams.map(p => {
     if(!paramObj[p._id]) paramObj[p._id] = p;
   });
-  return await Promise.all(arr.map(async a => {
+  const results = [];
+  for(const a of arr) {
     const result = a.toObject();
     result.user = userObj[a.uid];
     result.product = productObj[a.productId];
-    result.product = (await ShopGoodsModdel.extendProductsInfo([result.product], {
+    result.product = (await ShopGoodsModel.extendProductsInfo([result.product], {
       thread: false,
       store: false
     }))[0];
     result.productParam = paramObj[a.productParamId];
-    return result;
-  }));
+    if(!result.productParam) continue;
+    // 原价，折扣，会员打折  综合考虑后的结果
+    const {vipDisGroup, vipDiscount} = result.product;
+    result.finalPrice =  result.productParam.price;
+    if(vipDiscount) {
+      for(const g of vipDisGroup) {
+        const {vipNum, vipLevel} = g;
+        if((vipLevel + "") === (userGradeId + "")) {
+          result.finalPrice = (vipNum/100) * result.finalPrice;
+          result.finalPrice = Number(result.finalPrice.toFixed(2));
+          break;
+        }
+      }
+    }
+    results.push(result);
+  }
+  return results;
 };
 schema.statics.findById = async (_id) => {
   const ShopCartModel = mongoose.model('shopCarts');
   const cart = await ShopCartModel.findOne({_id});
-  if(!cart) throwErr(404, '未找到ID为【${_id}】的购物车收藏记录');
+  if(!cart) throwErr(404, `未找到ID为【${_id}】的购物车收藏记录`);
   return cart;
 };
 

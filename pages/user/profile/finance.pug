@@ -40,7 +40,8 @@ div
                 th= format("YYYY-MM-DD HH:mm:ss", record.toc)
                 th= record._id
                 th= lang('kcbsTypes', record.type)
-                th= record.description
+                th
+                  .table-content(title=record.description)= record.description
                 th
                   -let targetUser;
                   if !data.t
@@ -79,7 +80,8 @@ div
                 th= format("YYYY-MM-DD HH:mm:ss", record.toc)
                 th= record._id
                 th= lang('kcbsTypes', record.type)
-                th= record.description
+                th
+                  .table-content(title=record.description)= record.description
                 th
                   if record.to === data.targetUser.uid
                     if !record.fromUser

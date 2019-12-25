@@ -35,7 +35,7 @@ include ../interface_fund_apply_messages
       if !applicationForm.status.submitted
         -let flag = false;
         -const membersId = applicationForm.members.map(m => m.uid) || [];
-        if membersId.includes(user.uid) && user.uid !== applicationForm._id
+        if membersId.includes(data.user.uid) && data.user.uid !== applicationForm._id
           duv.m-b-1.m-t-1
             h4.text-center=`来自`
             a(href=`/u/${applicationForm.uid}` target='_blank')= applicationForm.applicant.user.username

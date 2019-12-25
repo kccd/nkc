@@ -56,6 +56,9 @@
           if permission("visitMessageLogs")
             li
               a(href='/e/log/message') 短消息
+          if permission("visitExperimentalShop")    
+            li
+              a(href='/e/log/shop') 交易订单
           li
             a(href='/e/log/withdraw') 提现
           li

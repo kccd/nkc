@@ -14,6 +14,7 @@ const kcbRouter = require('./kcb');
 const subRouter = require("./sub");
 const profileRouter = require("./profile");
 const myProblemsRouter = require("./myProblems");
+const transferRouter = require("./transfer");
 const userRouter = new Router();
 
 
@@ -63,6 +64,9 @@ userRouter
     data.targetUser = targetUser;
     await db.UserModel.extendUsersInfo([targetUser]);
     if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
+      if(data.user) {
+        data.subscribed = state.subUsersId.includes(uid);
+      }
       return await next();
     }
     // 获取用户能够访问的专业ID
@@ -447,5 +451,7 @@ userRouter
   .use("/:uid/clear", clearRouter.routes(), clearRouter.allowedMethods())
 	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods())
   .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
-  .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods());
+  .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods())
+  .use("/:uid/transfer", transferRouter.routes(), transferRouter.allowedMethods())
+  .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods());
 module.exports = userRouter;

@@ -259,6 +259,11 @@ threadRouter
     // 加载用户的帖子
     const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
     const mainForums = forums.filter(forum => thread.mainForumsId.includes(forum.fid));
+    data.forumsNav = [];
+    for(const f of thread.mainForumsId) {
+      const nav = await db.ForumModel.getForumNav(fidOfCanGetThreads, f);
+      if(nav.length) data.forumsNav.push(nav);
+    }
     let isModerator = ctx.permission('superModerator');
     if(!isModerator) {
       // 若用户为某个父级专业的专家，则用户具有专家权限
@@ -834,7 +839,7 @@ threadRouter
     if(!needReview) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
     } else {
-      await db.MessageModel.sendReviewMessage(_post.pid);
+      // await db.MessageModel.sendReviewMessage(_post.pid);
     }
 
     data.post = _post;

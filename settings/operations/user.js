@@ -151,6 +151,10 @@ module.exports = {
     kcb: {
 		  GET: 'visitUserKcb'
     },
+    transfer: {
+      GET: "transferKcbToUser",
+      POST: "transferKcbToUser"
+    },
 		profile: {
 			GET: 'userProfile',
 			summary: {

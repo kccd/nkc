@@ -62,7 +62,8 @@ homeRouter
 		statistics.orderUnSignCount = orderUnSignCount;
 		statistics.orderFinishCount = orderFinishCount;
 		statistics.orderRefundCount = orderRefundCount;
-		data.statistics = statistics;
+    data.statistics = statistics;
+    data.navType = "manage";
 		ctx.template = 'shop/manage/home.pug';
 		await next();
 	})

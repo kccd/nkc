@@ -1,100 +1,116 @@
-extends ../account/shopAccountBase
-block shopAccountTitle
-  title=`我的订单`
-  style.
-    .button {
-      margin-right: 5px;
-    }
-block shopAccountContent
-  .row
-    //- .col-md-12.col-sm-12.col-xs-12
-    //-   button.btn.btn-primary(onclick=`addClassify()`) 添加分类
-    .col-md-12.col-sm-12.col-xs-12(style="margin-bottom:20px")
-      .paging-button
-        a.button(href=`/shop/order?orderStatus=all`, data-toggle='url', class=!data.orderStatus || data.orderStatus == "all"?"active":"") 全部订单
-        a.button(href=`/shop/order?orderStatus=unCost`, data-toggle='url', class=data.orderStatus == "unCost"?"active":"") 待付款
-        a.button(href=`/shop/order?orderStatus=unShip`, data-toggle='url', class=data.orderStatus == "unShip"?"active":"") 待发货
-        a.button(href=`/shop/order?orderStatus=unSign`, data-toggle='url', class=data.orderStatus == "unSign"?"active":"") 待收货
-        a.button(href=`/shop/order?orderStatus=finish`, data-toggle='url', class=data.orderStatus == "finish"?"active":"") 完成的订单
-        a.button(href=`/shop/order?orderStatus=close`, data-toggle='url', class=data.orderStatus == "close"?"active":"") 关闭的订单
-        a.button(href=`/shop/order?orderStatus=refunding`, data-toggle='url', class=data.orderStatus == "refunding"?"active":"") 退款中的订单
-    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
-      include ../../interface_navigation_paging
-    .col-md-12.col-sm-12.col-xs-12  
+extends ../shop
+block shopTitle
+  title 我的订单
+block shopContent
+  div
+    .order-navs
+      a(class=!data.t || data.orderStatus === "all"?"active":"" href=`/shop/order`).order-nav 全部
+      a(class=data.t === "unCost"?"active":"" href=`/shop/order?t=unCost`).order-nav 待付款
+      a(class=data.t === "unShip"?"active":"" href=`/shop/order?t=unShip`).order-nav 待发货
+      a(class=data.t === "unSign"?"active":"" href=`/shop/order?t=unSign`).order-nav 待收货
+      a(class=data.t === "finish"?"active":"" href=`/shop/order?t=finish`).order-nav 已完成
+      a(class=data.t === "close"?"active":"" href=`/shop/order?t=close`).order-nav 已关闭
+      a(class=data.t === "refunding"?"active":"" href=`/shop/order?t=refunding`).order-nav 正在退款
+  div
+    include ../../publicModules/paging/paging
+    if !data.orders.length
+      .null 空空如也~
+    else
       .table-responsive
         table.table.table-bordered
           thead
-            tr(style="background-color:silver")
-              th(style="width:200px") 商品名称
-              th 属性
-              th 商品单价
-              th 数量
-              th 实际付款
-              th 交易状态
-              th 交易操作
+            tr
+              th 商品名称
+              //th 规格
+              th.text-center 商品单价
+              th.text-center 数量
+              th.text-left 实际付款
+              th.text-center 交易状态
+              th.text-center 其他
           tbody
             for order in data.orders
-              tr(style="background-color: #d3f2ff;border-top:2px solid black;") 
-                td(colspan="11") 
-                  p
-                    span(style="font-weight:800") 订单号:&nbsp;
-                    span=order.orderId
-                    span(style="margin-left:20px;font-weight:800") 创建时间:&nbsp;
-                    span=order.orderToc.toLocaleString()
-                    span(style="margin-left:20px;font-weight:800") 卖家：&nbsp;
-                    span
-                      a(href=`/u/${order.sellUid}`)!=`${order.sellUser.username}`
-              for para,key in order.params
-                tr(style="min-height:100px")
-                  td(style="display:flex")
-                    img(src=`/r/${para.product.imgMaster}` style="width:60px;height:60px")
-                    a(href=`/shop/product/${para.product.productId}` target="_blank")=para.product.name
-                  td=para.productParam.name
-                  td #{numToFloatTwo(para.singlePrice)}
+              tr
+                td(colspan="11").order-infos
+                  .order-info
+                    .value.time=format("YYYY/MM/DD HH:mm:ss", order.orderToc)
+                  .order-info
+                    .name 订单号：
+                    .value=order.orderId
+
+                  .order-info
+                    .name 卖家：
+                    a.value(href=`/u/${order.sellUid}` data-float-uid=order.sellUid)=order.sellUser.username
+                    a.value(href=`/message?uid=${order.sellUid}` title=`联系卖家(${order.sellUser.online?"在线":"离线"})` target="_blank")
+                      .fa.fa-commenting-o(class=order.sellUser.online?"active":"")
+              for param,key in order.params
+                tr
                   td
-                    p!=para.count
-                    //- if order.mustAllRefund == false && order.orderStatus !== "finish" && order.orderStatus !== "unCost"
-                    //-   if para.refundStatus == "" 
-                    //-     p
-                    //-       a(href=`/shop/order/${order.orderId}/refund?id=${para.costId}`) 退款
-                    //-   else
-                    //-     p
-                    //-       a(href=`/shop/order/${order.orderId}/refund?id=${para.costId}`) 查看退款
-                  if key == 0
-                    td(rowspan=`${order.params.length}`) #{numToFloatTwo(order.orderPrice + order.orderFreightPrice)}
-                    td(rowspan=`${order.params.length}`)= order.status
-                      | &nbsp;  
-                      a(href=`/shop/order/${order.orderId}/detail` target="_blank") 订单详情
-                    //- td #{numToFloatTwo(calculateFreightPrice(order.product.freightPrice,order.count,order.product.isFreePost))}
-                    td(rowspan=`${order.params.length}`) 
-                      if order.orderStatus !== "finish" && order.closeStatus !== true
+                    div.order-name-info
+                      .order-cover
+                        img(src=`/r/${param.product.imgMaster}`)
+                      .order-name
+                        a(href=`/shop/product/${param.product.productId}` title=param.product.name)=param.product.name
+                        .order-param(title=param.productParam.name)=`规格：${param.productParam.name}`
+                  //-td
+                    div.order-param=param.productParam.name
+                  td
+                    div.order-price
+                      .number=`￥${numToFloatTwo(param.singlePrice)}`
+                      if param.refundStatus === "success"
+
+                        span 已退款
+                  td
+                    div.order-count=param.count
+                  if !key
+                    -const paramsCount = order.params.length;
+                    td(rowspan=paramsCount)
+                      .order-price(style="text-align: left;")
+                        div
+                          span 商品总价：
+                          span.number.sm.data-params-price=`￥${numToFloatTwo(order.orderPrice)}`
+                        div
+                          span 运费总计：
+
+                          //- 运费总计
+                          span.number.sm.data-params-freight=`￥${numToFloatTwo(order.orderFreightPrice)}`
+
+                        div
+                          strong 订单总计：
+
+                          //- 订单总计
+                          span.number.data-order-price=`￥${numToFloatTwo(order.orderPrice + order.orderFreightPrice)}`
+
+                    td.order-status(rowspan=paramsCount)= order.status
+                    td(rowspan=paramsCount).order-links
+                      a(href=`/shop/order/${order.orderId}/detail`) 订单详情
+                      if !order.closeStatus
+                        if order.orderStatus !== "finish"
+                          //- 订单未完成且未关闭
+                          if order.orderStatus === "unCost"
+                            //- 未付款 可取消订单
+                            a(href=`/shop/order/${order.orderId}/refund`) 取消订单
+                          else
+                            //- 已付款 只能申请退款
+                            a(href=`/shop/order/${order.orderId}/refund`) 申请退款
                         if order.orderStatus === "unCost"
-                          a(href=`/shop/order/${order.orderId}/refund`) 取消订单
-                        else 
-                          a(href=`/shop/order/${order.orderId}/refund`) 申请退款
-                      if order.orderStatus == "unCost"&& order.closeStatus !== true
-                        p
                           a(href=`/shop/pay?ordersId=${order.orderId}`) 立即付款
-                      if order.orderStatus == "unSign" || order.orderStatus == "finish"
-                        if !order.trackNumber || order.trackNumber == "no"
-                          p 该商品无需物流配送
+                      if order.orderStatus === "unSign" || order.orderStatus === "finish"
+                        //- 待收货或已完成的订单可查看物流
+                        if !order.trackNumber || order.trackNumber === "no"
+                          a 无物流配送
                         else
-                          p
-                            button(onclick=`visitLogisticsInfo(${order.orderId})`) 查看物流
-                      if order.refundStatus == "ing"
-                        p
-                          a(href=`/shop/order/${order.orderId}/refund`) 退款详情
-                      if order.orderStatus == "unSign" && order.closeStatus !== true
-                        p
-                          button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货
-                      if order.orderStatus == "finish"
-                        p
-                          //- button(onclick=`joinToDiscuss(${order.product.tid})`) 参与讨论
+                          a(href=`/shop/order/${order.orderId}/logistics`) 查看物流
+                      if order.refundStatus === "ing"
+                        a(href=`/shop/order/${order.orderId}/refund`) 退款详情
+                      if order.orderStatus === "unSign" && !order.closeStatus
+                        button(onclick=`comfirmReceipt(${order.orderId})`) 确认收货
               if order.buyMessage
                 tr
-                  td(style="font-size: 12px;background-color: cornsilk;color: tomato;text-align:right" colspan="7")!=`我的留言： ${order.buyMessage}`
-    .col-md-12.col-sm-12.col-xs-12(style="text-align:end")
-      include ../../interface_navigation_paging
+                  td(colspan="6").order-message
+                    .name 我的留言：
+                    span=`${order.buyMessage}`
+    include ../../publicModules/paging/paging_input
 block shopScripts
-  +includeJS('/shop/cart/cart.js')
-  +includeJS('/shop/order/order.js')
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS("/js/shop/order.js")
