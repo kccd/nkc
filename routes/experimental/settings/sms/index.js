@@ -31,7 +31,15 @@ smsRouter
     await smsSettingsDB.update({c: smsSettings});
     await db.SettingModel.saveSettingsToRedis("sms");
 		await next();
-	})
+  })
+  // .post('/restricted', async (ctx, next) => {
+  //   const {body, db} = ctx
+  //   const {code} = body
+  //   const smsSettingsDB = await db.SettingModel.findOnly({_id: 'sms'});
+  //   if (smsSettingsDB.c.restrictedNumber[code]) {
+  //     ctx
+  //   }
+  // })
   .post('/test', async (ctx, next) => {
     const {body, nkcModules} = ctx;
     const {name, nationCode, mobile} = body;

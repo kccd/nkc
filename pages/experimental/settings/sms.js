@@ -1,3 +1,4 @@
+
 var app = new Vue({
   el: '#app',
   data: {
@@ -19,6 +20,21 @@ var app = new Vue({
       })
   },
   methods: {
+    getChineseName (code) {
+      var chineseName = ''
+      this.nationCodes.forEach(function (ele) {
+        if (ele.code === code) {
+          chineseName = ele.chineseName
+        }
+      })
+      return chineseName
+    },
+    isDisabled (nationCode) {
+      for (res of this.smsSettings.restrictedNumber) {
+        if (nationCode === res.code) return true;
+      }
+      return false
+    },
     tran: function(name) {
       switch (name) {
         case 'register': return '注册';
@@ -63,13 +79,44 @@ var app = new Vue({
           if(template.sameMobileOneDay <= 0) return screenTopWarning(template.name + '的手机号码次数限制必须大于0');
         }
       }
-      nkcAPI('/e/settings/sms', 'PATCH', {smsSettings: smsSettings})
+      // 验证限制号码字符串 去掉无用数据 并转为数组
+      Promise.resolve()
+        .then(function() {
+          var checkString = NKC.methods.checkData.checkString;  
+          smsSettings.restrictedNumber.forEach((ele,index) => {
+            ele.number = ele.number.toString();
+            checkString(ele.code, {
+              name: "国际区号",
+              minLength: 1,
+            })
+            checkString(ele.number,{
+              name: '受限号码',
+              minLength: '1'
+            })
+            ele.number = ele.number.trim().split(',').filter((n) => {
+              return n.trim()
+            })
+          })
+        }, function () {
+          screenTopWarning(data.error || data);
+        })
+        .then(function () {
+          return nkcAPI('/e/settings/sms', 'PATCH', {smsSettings: smsSettings})
+        })
         .then(function() {
           screenTopAlert('保存成功');
         })
         .catch(function(data) {
           screenTopWarning(data.error || data);
         })
+      
+      // nkcAPI('/e/settings/sms', 'PATCH', {smsSettings: smsSettings})
+      //   .then(function() {
+      //     screenTopAlert('保存成功');
+      //   })
+      //   .catch(function(data) {
+      //     screenTopWarning(data.error || data);
+      //   })
     }
   }
 });

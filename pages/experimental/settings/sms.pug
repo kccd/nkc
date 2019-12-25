@@ -33,6 +33,28 @@ block content
         </div>
         p 目前仅支持腾讯短信平台，相关ID的申请方式请阅读&nbsp;
           a(href=`https://cloud.tencent.com/document/product/382` target="_blank") 腾讯文档
+    .row(v-if='smsSettings.restrictedNumber')
+      .col-xs-12.col-md-2.text-right
+        h4 受限制号码
+      .col-xs-12.col-md-10.m-t-05
+        button.btn.btn-default.btn-sm(@click="smsSettings.restrictedNumber.push({code: null,number: ''})") 添加限制
+        .mdui-table-fluid.m-t-05
+          table.mdui-table
+            thead
+              tr
+                th 国际前缀
+                th 受限制号码
+                th 操作
+            tbody    
+              tr(v-for='(res, index) in smsSettings.restrictedNumber' :key="index")
+                th
+                  select.m-t-05(style='display:inline-block;vertical-align: top' v-model='res.code')
+                    option(v-for='(nationCode, index) in nationCodes' :value='nationCode.abbr + " " + nationCode.code' :key='index' :disabled="isDisabled(nationCode.abbr + ' ' + nationCode.code)") +{{nationCode.code}} {{nationCode.chineseName}}
+                th
+                  textarea(style="width: 100%;height: 100%;vertical-align: middle" v-model='res.number')
+                th
+                  button.btn.btn-danger.btn-sm(@click="smsSettings.restrictedNumber.splice(index,1)") 删除
+              
     .row.mdui-m-t-5
       .col-xs-12.col-md-2.text-right
         h4 短信模板

@@ -1,0 +1,43 @@
+extends ../../bootstrap_base
+block title
+  title 问题列表
+  link(rel='stylesheet' href=`/mdui/css/mdui.min.css?v=${startTime}`)
+  link(rel='stylesheet' href=`/user/problems/problem.css?v=${startTime}`)
+  -const mainContainer1400 = true;
+block content
+  .container-fluid.max-width.box-shadow-panel#app(style="min-height: calc(100vh - 345px)")
+    
+    .mdui-col-xs-12.mdui-col-md-12
+      button(mdui-tooltip="{content: '新建记录'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`addProblem()` style= "position: absolute; top: 1rem; right: 1.4rem;z-index: 100;")
+        <i class="mdui-icon material-icons">&#xe145;</i>
+      .mdui-col-xs-12.mdui-col-md-12
+        include ../../publicModules/paging/paging.pug
+        if data.problems
+          for problem in data.problems
+            .mdui-col-xs-12.mdui-col-md-6.m-t-2
+              .media
+                .media-body
+                  if problem.resolved
+                    span.label.label-success 已解决
+                  else
+                    span.label.label-danger 未解决
+                  span &nbsp;&nbsp;
+                  div(style='color: #aaa;display: inline')
+                    //- span
+                    //-   if problem.user
+                    //-     a(href=`/u/${problem.user.uid}`)= problem.user.username
+                    //-   else
+                    //-     span 匿名用户
+                    span &nbsp;&nbsp;上报于&nbsp;&nbsp;
+                      span= `${fromNow(problem.toc)}`
+                    a(href=`/u/${data.user.uid}/myProblems/${problem._id}` style='text-decoration: none;')
+                      h4= problem.t
+        else 
+          h2(style="text-align: center;") 未上报过问题
+        br
+        include ../../publicModules/paging/paging.pug
+block scripts
+  script(src=`/mdui/js/mdui.min.js?v=${startTime}`)
+  script(src=`/vue/dist/vue.min.js?v=${startTime}`)
+  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
+  script(src=`/user/problems/problems.js?v=${global.NKC.startTime}`)
