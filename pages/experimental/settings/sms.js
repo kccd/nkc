@@ -33,6 +33,7 @@ var app = new Vue({
       for (res of this.smsSettings.restrictedNumber) {
         if (nationCode === res.code) return true;
       }
+      console.log('disabled')
       return false
     },
     tran: function(name) {
