@@ -1,6 +1,6 @@
 var SubscribeTypes;
 $(function() {
-  if(NKC.modules.SubscribeTypes) {
+  if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
   var dom = $("#navbar_custom_dom");

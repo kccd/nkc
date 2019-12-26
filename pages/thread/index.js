@@ -27,7 +27,7 @@ $(document).ready(function(){
   if(window.moduleToColumn) {
     moduleToColumn.init();
   }
-  if(NKC.modules.SubscribeTypes) {
+  if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
   if(NKC.modules.UserInfo) {
