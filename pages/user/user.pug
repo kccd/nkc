@@ -83,6 +83,11 @@ block content
               -const forumsItem = data.targetUserSubForums;
               .user-card-sub-div
                 include ../publicModules/forums_nav/forums_item
+          if permission("visitUserTransaction")
+            .user-card-panel.m-b-2
+              .user-card-panel-header 管理
+              .user-card-sub-div
+                a(href=`/u/${data.targetUser.uid}/transaction`).btn.btn-default.btn-sm 查看地址信息
           .m-b-1
             include ../publicModules/share/user-card
           if data.user &&  data.user.uid !== data.targetUser.uid
