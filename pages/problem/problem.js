@@ -1,17 +1,18 @@
 var data = $('#data').text();
 data = JSON.parse(data);
 update();
-$('#title, #content, #reason, #solution, #QQ, #email').on('input', function() {
+$('#title, #content, #reason, #solution, #QQ, #email, #log').on('input', function() {
 	update();
 });
 
 function update() {
-	var title = $('#title').val();
-	var content = $('#content').val();
+	var title = $('#title').text();
+	var content = $('#content').text();
+	var log = $('#log').val();
 	var QQ = $('#QQ').val();
 	var email = $('#email').val();
-	$('#titleH2').text(title);
-	$('#contentDiv').html(NKC.methods.mdToHtmlSafe(content));
+	// $('#titleH2').text(title);
+	$('#logDev').html(NKC.methods.mdToHtmlSafe(log));
 	$('pre code').each(function(i, block) {
 	  console.log(block);
     NKC.methods.highlightBlock(block);
@@ -21,6 +22,7 @@ function update() {
 		c: content,
 		QQ: QQ,
 		email: email,
+		restorLog: log
 	}
 }
 
@@ -60,13 +62,13 @@ function deleteProblem(_id) {
 			screenTopWarning(data.error || data);
 		})
 }
-setInterval(function() {
-	if(!$('input[name="select"]').prop('checked')) {
-		submit(data.id, function(){
-			screenTopAlert('自动保存成功');
-		})
-	}
-}, 30*1000);
+// setInterval(function() {
+// 	if(!$('input[name="select"]').prop('checked')) {
+// 		submit(data.id, function(){
+// 			screenTopAlert('自动保存成功');
+// 		})
+// 	}
+// }, 30*1000);
 
 function changeType(problemId) {
   submit(problemId);

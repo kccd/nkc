@@ -28,7 +28,7 @@
   "columnName": "专栏名",
   "columnURL": "专栏链接",
   "columnInfoType": "专栏信息类型",
-
+  "problemFixed": "【报告问题】问题已修复",
   "replyPost": "回复被引用",
   "replyThread": "文章被回复",
   "comment": "新的评论",

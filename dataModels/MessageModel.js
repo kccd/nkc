@@ -258,6 +258,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ActivityModel = mongoose.model("activity");
   const MessageModel = mongoose.model("messages");
+  const ProblemModel = mongoose.model("problems");
   const apiFunction = require("../nkcModules/apiFunction");
   const results = [];
 
@@ -377,6 +378,15 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const order = await ShopOrdersModel.findOne({orderId: r.c.orderId});
       if(!order) continue;
       r.c.order = order;
+    } else if (type === "problemFixed") {
+      const user = await UserModel.findOne({uid: r.r});
+      if(!user) continue;
+      const problem = await ProblemModel.findOne({_id: r.c.pid});
+      if(!problem) continue;
+      r.c.problem = problem;
+      const restorer = await UserModel.findOne({uid: problem.restorerId});
+      if(!restorer) continue;
+      r.c.restorer = restorer
     } else if(
       [
         "shopBuyerOrderChange",

@@ -57,6 +57,7 @@ listRouter
 		const {params, data, db} = ctx;
 		const {_id} = params;
 		data.problem = await db.ProblemModel.findOnly({_id});
+		data.problem.restorer = await db.UserModel.findOne({uid: data.problem.restorerId});;
 		await data.problem.extendUser();
 		await data.problem.extendRestorer();
 		await data.problem.update({viewed: true});
@@ -67,22 +68,40 @@ listRouter
 	})
 	.patch('/:_id', async (ctx, next) => {
 		const {params, data, db, body} = ctx;
-		const {_id} = params;
 		const {user} = data;
+		const {_id} = params;
 		const problem = await db.ProblemModel.findOnly({_id});
+		if (problem.resolved && user.uid != problem.restorerId) return await next();
 		const {t, c, resolved, name} = body;
 		const typeName = name.trim();
-		if(!t) ctx.throw(400, '标题不能为空');
-		if(!c) ctx.throw(400, '详细内容不能为空');
-    const problemsType = await db.ProblemsTypeModel.findOnly({name: typeName});
+		// if(!t) ctx.throw(400, '标题不能为空');
+		// if(!c) ctx.throw(400, '详细内容不能为空');
+		// if(!restorLog) ctx.throw(400, '详细内容不能为空');
+		const problemsType = await db.ProblemsTypeModel.findOnly({name: typeName});
+		body.typeId = problemsType._id;
 		body.resolveTime = Date.now();
-		if(user && resolved) {
+		
+		if(user) {
 			body.restorerId = user.uid;
 		} else {
 			body.restorerId = '';
 		}
-		body.typeId = problemsType._id;
+		body.resolved = problem.resolved ? problem.resolved : body.resolved
 		await problem.update(body);
+		// 更新数据库后 发送消息给问题提出者
+		if (resolved && !problem.resolved && problem.uid) {
+			const message = db.MessageModel({
+        _id: await db.SettingModel.operateSystemID("messages", 1),
+        r: problem.uid,
+        ty: "STU",
+        c: {
+          type: "problemFixed",
+          pid: problem._id
+        }
+      });
+      await message.save();
+      await ctx.redis.pubMessage(message);
+		}
 		await next();
 	})
 	.del('/:_id', async (ctx, next) => {

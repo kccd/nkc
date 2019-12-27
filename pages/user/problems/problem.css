@@ -1,0 +1,9 @@
+.mdui-container-fluid{
+  padding: 0;
+}
+body{
+  background-color: #f6f6f6;
+}
+.mdui-btn.active{
+  background-color: #ccc;
+}
