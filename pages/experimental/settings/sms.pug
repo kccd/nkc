@@ -42,8 +42,8 @@ block content
           table.mdui-table
             thead
               tr
-                th 国际前缀
-                th 受限制号码
+                th 国际区号
+                th 受限制号码(英文逗号分隔)
                 th 操作
             tbody    
               tr(v-for='(res, index) in smsSettings.restrictedNumber' :key="index")

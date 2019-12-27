@@ -35,6 +35,7 @@ sendMessageRouter
     let imgCodeId = ctx.getCookie("imgCodeId") || "";
     if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
     await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
+	  await db.SettingModel.checkRestricted(nationCode, mobile);
   	const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
   	if(otherPersonal) ctx.throw(400, '手机号已被其他用户注册');
   	const smsCodeObj = {
@@ -122,6 +123,7 @@ sendMessageRouter
 	  }
 	  if(!mobile) ctx.throw(400, '请输入要绑定的手机号码。');
   	if(!nationCode) ctx.throw(400, '请选择国际区号。');
+	  await db.SettingModel.checkRestricted(nationCode, mobile);
   	const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
   	if(otherPersonal) {
   		ctx.throw(400, `手机号码已被其他账号绑定。`);
@@ -164,6 +166,7 @@ sendMessageRouter
 		} else if(operation === 'verifyNewMobile') { //-- 验证新手机 --
 			const {nationCode, mobile} = body;
 			if(!mobile) ctx.throw(400, '新手机号不能为空');
+			await db.SettingModel.checkRestricted(nationCode, mobile);
 			if(userPersonal.mobile === mobile && userPersonal.nationCode === nationCode) ctx.throw(400, '您已绑定该手机号，请更换后重试');
 			const sameUserPersonal = await db.UsersPersonalModel.findOne({mobile, nationCode});
 			if(sameUserPersonal) ctx.throw(400, '该号码已被其他用户绑定，请更换后重试');

@@ -97,8 +97,6 @@ var app = new Vue({
               return n.trim();
             })
           })
-        }, function () {
-          screenTopWarning(data.error || data);
         })
         .then(function () {
           return nkcAPI('/e/settings/sms', 'PATCH', {smsSettings: smsSettings})
