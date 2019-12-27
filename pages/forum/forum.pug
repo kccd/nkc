@@ -38,7 +38,7 @@ block content
 
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-2.hidden-sm.hidden-xs#leftDom.box-shadow-panel.p-r-0
+      .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
 
         include ../publicModules/forums_nav/forums_tree
 
@@ -63,12 +63,13 @@ block content
                 .count-group
                   .count=data.forum.countPosts
                   .name 条回复
+                    if data.forum.countPostsToday
+                      | ，
                 //-.count-group
                   .name 关注
                   .count=data.subUsersCount
                 if data.forum.countPostsToday
                   .count-group.hidden-xs
-                    .name ，
                     .count=data.forum.countPostsToday
                     .name 条更新
             .forum-buttons

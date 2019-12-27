@@ -74,7 +74,7 @@ body{
   display: inline-block;
   border-radius: 3px;
   line-height: 2.5rem;
-  padding: 0 1rem;
+  padding: 0 0.7rem;
   box-sizing: border-box;
 }
 .subscribe-list>a:hover, .subscribe-list>a:focus{

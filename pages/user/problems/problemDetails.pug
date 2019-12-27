@@ -18,18 +18,19 @@ block content
         .col-xs-12.col-md-12
           .h2.text-center#title= problem.t
           .text-center &nbsp;&nbsp;上报于&nbsp;&nbsp;
-            span=problem.toc.toLocaleString()
+            span=format("YYYY/MM/DD HH:mm:ss", problem.toc)
             span &nbsp;&nbsp;
             if problem.resolved
-              span= `于 ${problem.resolveTime.toLocaleString()} `
-              span 由&nbsp;&nbsp;
-              a(href=`/u/${problem.restorer.uid}` target='_blank')
-                img(src=`/avatar/${problem.restorer.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
-                span= problem.restorer.username
-              span.label.label-success 解决
+              //-
+                span= `于 ${problem.resolveTime.toLocaleString()} `
+                span 由&nbsp;&nbsp;
+                a(href=`/u/${problem.restorer.uid}` target='_blank')
+                  img(src=`/avatar/${problem.restorer.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
+                  span= problem.restorer.username
+              span.label.label-success 已解决
             else
-              span.label.label-danger 未解决
-          .m-t-2#content= problem.c
+              span.label.label-danger 暂未解决
+          .m-t-2#content!= markdown_safe(problem.c)
           if problem.QQ
             h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
           if problem.email

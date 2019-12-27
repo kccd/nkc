@@ -383,7 +383,7 @@ table{
 }
 .paging-button{
   display: inline-block;
-  padding-right: 1rem;
+  padding-right: 0.5rem;
   margin-bottom: 0.5rem;
 
 }
@@ -413,7 +413,7 @@ table{
   text-align: center;
   min-width: 2rem;
   padding: 0 0.8rem;
-  font-size: 1.2rem;
+  font-size: 1rem;
   background-color: #9baec8;
 }
 .paging-button a.radius-left{
@@ -489,7 +489,7 @@ table{
 .paging-nav ul li{
   list-style: none;
   display: inline-block;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   margin-bottom: 0.3rem;
   color: #282c37;
@@ -1710,19 +1710,20 @@ span.thread-title-page{
   background-color: #fff;
   border-radius: 3px;
 }
-
-.box-shadow-panel>div>.panel-header{
+.panel-header{
   font-size: 1.25rem;
-  margin: -15px -15px 0 -15px;
-  padding: 0 1rem;
   height: 3rem;
   color: #777;
   font-weight: 700;
   box-sizing: border-box;
   line-height: 3rem;
-  border-bottom: 1px solid #f4f4f4;
-  margin-bottom: 1rem;
 }
+.box-shadow-panel>div>.panel-header{
+  margin: -15px -15px 1rem -15px;
+  border-bottom: 1px solid #f4f4f4;
+  padding: 0 1rem;
+}
+
 .forum-block{
   width: 100%;
   margin: 0.5rem 0;
@@ -1747,17 +1748,16 @@ span.thread-title-page{
   color: #282c37;
 }
 .forum-block-children{
-  display: none;
-  padding-left: 10px;
+  display: block;
+  padding-left: 1.2rem;
 }
 .forum-block-info{
   font-size: 0;
   line-height: 0;
 }
-.forum-block-name:hover, .forum-block-name:focus {
-  color: #282c37;
-  text-decoration: none;
-}
+/*.forum-block-info:hover{
+  background-color: #f4f4f4;
+}*/
 .forum-block-icon{
   height: 2rem;
   width: 2rem;
@@ -1774,6 +1774,20 @@ span.thread-title-page{
   line-height: 2rem;
   vertical-align: top;
   transition: color 100ms;
+}
+.forum-block-name.child{
+  font-size: 1.2rem;
+  font-style: normal;
+  color: #282c37;
+}
+.forum-block-name:hover, .forum-block-name:focus {
+  /*color: #282c37;*/
+  color: #2b90d9;
+  text-decoration: none;
+}
+.forum-block-name.parent{
+  font-size: 1.25rem;
+  font-style: oblique;
 }
 .forum-block-button{
 
@@ -1998,7 +2012,7 @@ span.thread-title-page{
 }
 .primary-buttons .primary-button{
   height: 2.5rem;
-  padding: 0 1rem;
+  padding: 0 0.7rem;
   font-size: 1.2rem;
   border-radius: 3px;
   line-height: 2.5rem;

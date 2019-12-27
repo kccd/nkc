@@ -39,6 +39,18 @@ block content
                   class=!data.d || data.d === 'all' ? "active" : ""
                 ) 全部
               .subscribe-list
+                a(href=`/?t=subscribe&d=own${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "own" ? "active" : ""
+                ) 我的文章
+              .subscribe-list
+                a(href=`/?t=subscribe&d=thread${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "thread" ? "active" : ""
+                ) 关注的文章
+              .subscribe-list
+                a(href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "reply" ? "active" : ""
+                ) 参与过的文章
+              .subscribe-list
                 a(href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "user" ? "active" : ""
                 ) 用户
@@ -46,14 +58,6 @@ block content
                 a(href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
                     class=data.d==="column"? "active" : ""
                 ) 专栏
-              .subscribe-list
-                a(href=`/?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
-                  class=data.d==="thread"?"active": ""
-                ) 关注的文章
-              .subscribe-list
-                a(href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
-                  class=data.d === "reply" ? "active" : ""
-                ) 参与过的文章
           if !data.threads.length
             .p-t-5.p-b-5.text-center
               h4

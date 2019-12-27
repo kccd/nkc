@@ -850,13 +850,13 @@ $(function () {
 
   // markDiv("#highlight");
 
-  var forumBlock = $(".forum-block-children");
+  /*var forumBlock = $(".forum-block-children");
   if(forumBlock.length > 0) {
     if($(body).width() < 992) {
       $(".forum-block-children").show();
       $(".forum-block>.fa.fa-angle-down").removeClass("fa-angle-down").addClass("fa-angle-up");
     }
-  }
+  }*/
 });
 
 /*function markDiv(id) {

@@ -1,6 +1,7 @@
 extends ../bootstrap_base.pug
 
 block title
+  -let showEditor = true;
   -const thread = data.thread;
   title= `${thread.firstPost.t} - 科创`
   meta#replytarget(value=`${data.replyTarget}`)
@@ -724,7 +725,8 @@ block scripts
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')
   //- script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  +includeJS("/module_dropdown.js")
+  if permission('addThreadForum')
+    +includeJS("/module_dropdown.js")
   //script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
   if !state.apptype
     script.
@@ -760,7 +762,7 @@ block scripts
   if data.user
     include ../ueditor/ueditorBase
   include ../MathJax.pug
-  if data.user
+  if data.user && showEditor
     +includeJS("/thread/initPostInput.js")
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")
