@@ -1216,7 +1216,7 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
   const threads = await ThreadModel.find({
     tid: {$in: threadsId},
     mainForumsId: {$in: fid}, disabled: false, reviewed: true, recycleMark: {$ne: true}
-  });
+  }).sort({toc: -1});
   return await ThreadModel.extendThreads(threads, {
     lastPost: true,
     lastPostUser: true,
