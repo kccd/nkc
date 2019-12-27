@@ -7,3 +7,28 @@ body{
 .mdui-btn.active{
   background-color: #ccc;
 }
+ul.top-label {
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  word-wrap:break-word;
+}
+ul.top-label .mdui-btn-block{
+  box-sizing: content-box;
+  width: auto;
+  padding: 0 1rem;
+  margin: 0.5rem 0;
+}
+.text-ellipsis {
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+@media screen and (max-width: 768px) {
+  ul.top-label {
+    padding: 0;
+    display: flex;
+    overflow: auto;
+    flex-wrap: nowrap;
+  }
+}

@@ -1,6 +1,23 @@
+body{
+  background-color: #f4f4f4;
+}
 .swiper-home{
-  margin-top: 1rem;
   border-radius: 3px;
+}
+.home-warning{
+  height: 3rem;
+  line-height: 3rem;
+  background-color: #f7d6d6;
+  border-radius: 3px;
+  padding: 0 1rem;
+  font-size: 1.25rem;
+}
+.home-warning .fa{
+  color: #e85a71;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  vertical-align: baseline;
 }
 .swiper-slide{
   min-height: 16rem;
@@ -8,23 +25,6 @@
   background-repeat:no-repeat;
   background-size: cover;
 }
-/*.swiper-title{
-  left: 0;
-  position: absolute;
-  top: 0;
-  height: 2rem;
-  line-height: 2rem;
-  overflow: hidden;
-  padding: 0 0.5rem;
-  text-decoration: none;
-  color: #fff;
-  width: 100%;
-  font-size: 1.2rem;
-  padding-top: 1rem;
-  background-color: rgba(0,0,0,0.3);
-  background: -prefix-linear-zgradient(bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 20%);
-  background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 40%);
-}*/
 .swiper-home:hover .swiper-button{
   background-color: rgba(0,0,0,0.2);
   color: rgba(255,255,255,0.8);
@@ -55,13 +55,11 @@
   /*background-color: #f4f4f4;*/
 }
 .subscribe-list{
-  padding: 0.3rem 0;
   display: inline-block;
   position: relative;
   border-radius: 3px;
   color: #282c37;
   font-weight: 700;
-  margin-right: 0.65rem;
 }
 .subscribe-list .fa{
   padding: 0.3rem;
@@ -69,15 +67,23 @@
   cursor: pointer;
 }
 .subscribe-list>a{
-  color: #7e8da0;
-  font-size: 1.25rem;
+  /*color: #7e8da0;*/
+  color: #282c37;
+  font-size: 1.2rem;
+  height: 2.5rem;
+  display: inline-block;
+  border-radius: 3px;
+  line-height: 2.5rem;
+  padding: 0 0.7rem;
+  box-sizing: border-box;
 }
 .subscribe-list>a:hover, .subscribe-list>a:focus{
-  color: #7e8da0;
   text-decoration: none;
-}
-.subscribe-list>a:hover, .subscribe-list>a.active{
   color: #2b90d9;
+}
+.subscribe-list>a.active{
+  background-color: #2b90d9;
+  color: #fff;
 }
 
 .subscribe-type{
@@ -108,4 +114,25 @@
 .management-sub-link:hover, .management-sub-link:focus{
   color: #2b90d9;
   text-decoration: none;
+}
+.visited-forums{
+  max-height: 4rem;
+  overflow: hidden;
+}
+.visited-forum{
+  display: inline-block;
+  margin: 0 0.5rem 0.5rem 0;
+}
+.visited-forum .visited-forum-icon{
+  height: 1.6rem;
+  width: 1.6rem;
+  display: inline-block;
+  border-radius: 3px;
+  vertical-align: top;
+  margin-right: 0.2rem;
+}
+.visited-forum .visited-forum-name{
+  vertical-align: top;
+  color: #555;
+  font-weight: 700;
 }

@@ -11,16 +11,11 @@ block content
   if data.isModerator
     -canManagement = true;
 
-  mixin forumPanel(header, forums, hidden)
-    .forum-panel
+  mixin forumPanel(header, forums)
+    .forum-panel.m-b-1
+      .panel-header=header
       .forums-nav-header
-        h5(class=hidden?"pointer":"" onclick=hidden?"showSameForums()":"")
-          if hidden
-            .fa.fa-angle-down(style="color:rgba(0,0,0,0)") &nbsp;
-          span=header
-          if hidden
-            .fa.fa-angle-down
-      .home-topic-item-div.text-left(class=hidden?"sameForums":"" style=hidden?"display:none":"")
+      .home-topic-item-div
         -const length = forums.length;
         for forumData, index in forums
           if index < 20
@@ -43,237 +38,174 @@ block content
 
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-2.hidden-sm.hidden-xs
-        #leftDom
-          .hidden-xs
-            include ../publicModules/post_button
-          .forum-description
-            .col-xs-6
-              .forum-count-number= data.forum.countThreads
-              .forum-count-title 文章
-            .col-xs-6
-              .forum-count-number= data.forum.countPosts
-              .forum-count-title 回复
-            .col-xs-6
-              .forum-count-number= data.subUsersCount
-              .forum-count-title 关注
-            .col-xs-6
-              .forum-count-number= data.forum.countPostsToday
-              .forum-count-title 今日更新
-            .col-xs-12.m-t-1
-              .row
-                .forum-description-content=data.forum.description
-            .col-xs-12
-              .row
-                if data.moderators && data.moderators.length > 0
-                  +moderator(data.moderators)
-            if data.threadTypes.length > 0
-              .col-xs-12
-                .row
-                  h5 文章分类
-                  .forum-category
-                    a(class=!data.cat?"active":"" href=`/f/${data.forum.fid}`) 全部
-                    for threadType in data.threadTypes
-                      a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}/latest?cat=${threadType.cid}`)= threadType.name
-            .col-xs-12
-              .row
-                if data.forum.parentForums && data.forum.parentForums.length > 0
-                  +forumPanel("上级专业", data.forum.parentForums)
-                if data.forum.childrenForums && data.forum.childrenForums.length > 0
-                  +forumPanel("细分专业", data.forum.childrenForums)
-                if data.sameLevelForums && data.sameLevelForums.length > 0
-                  +forumPanel("同级专业", data.sameLevelForums, true)
-        div
-          include ../publicModules/forums_nav/forums_tree
+      .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
 
-      .col-xs-12.col-md-7
-        .row
-          .col-xs-12.col-md-12
-            .forum-info-panel
-              .forum-banner
-                .forum-banner-cover
-                .forum-banner-img(style=`background-image: url(/f/${data.forum.fid}/banner)`)
-              .forum-info-body
-                .forum-avatar
-                  if data.forum.iconFileName
-                    img(src=`/forum_avatar/${data.forum.fid}`)
+        include ../publicModules/forums_nav/forums_tree
+
+      .col-xs-12.col-md-7.box-shadow-panel.p-r-0
+        .forum-info-panel.m-b-1
+          .forum-banner
+            .forum-banner-cover
+            .forum-banner-img(style=`background-image: url(/f/${data.forum.fid}/banner)`)
+          .forum-info-body
+            .forum-avatar
+              if data.forum.iconFileName
+                img.forum-avatar-icon(src=`/forum_avatar/${data.forum.fid}`)
+              else
+                .forum-avatar-icon(style=`background-color: ${data.forum.color}`)
+            .forum-info
+              .forum-name=data.forum.displayName
+              .forum-abbr=data.forum.brief || "暂无专业简介"
+              .forum-post-count
+                .count-group
+                  .count=data.forum.countThreads
+                  .name 篇文章，
+                .count-group
+                  .count=data.forum.countPosts
+                  .name 条回复
+                    if data.forum.countPostsToday
+                      | ，
+                //-.count-group
+                  .name 关注
+                  .count=data.subUsersCount
+                if data.forum.countPostsToday
+                  .count-group.hidden-xs
+                    .count=data.forum.countPostsToday
+                    .name 条更新
+            .forum-buttons
+              //-if permission('visitForumInfoSettings') && data.isModerator
+                a.btn-sm.forum-sub-btn.btn.success(href=`/f/${data.forum.fid}/settings`) 设置
+              if !data.forum.childrenForums || data.forum.childrenForums.length === 0
+                if data.user
+                  if data.subscribed
+                    button.btn-sm.forum-sub-btn.btn(
+                      onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", false)`
+                    ) 取关
                   else
-                    img(style=`background-color: ${data.forum.color}`)
-                .forum-info
-                  .forum-name=data.forum.displayName
-                  .pull-right.m-r-1
-                    -let display = true;
-                    if permission('visitForumInfoSettings') && data.isModerator
-                      a.btn-sm.forum-sub-btn.btn.success(href=`/f/${data.forum.fid}/settings`) 设置
-                      -display = false;
-                    if !data.forum.childrenForums || data.forum.childrenForums.length === 0
-                      if data.user
-                        if data.subscribed
-                          button.btn-sm.forum-sub-btn.btn(
-                            onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", false)`
-                          ) 已关注
-                        else
-                          button.btn-sm.forum-sub-btn.btn.success(
-                            onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", true)`
-                          ) 关注
-                        -display = false;
-                    if display
-                      div(style="height: 2rem;")
-                  .clearfix
-                  .forum-abbr=data.forum.brief
-          if data.type === "latest"
-            .col-xs-12.col-md-12.m-t-1
-              .m-b-1
-                //- 手机导航 其他文章链接
-                include ../publicModules/mobile_drawer/right_drawer
-                if canManagement
-                  .paging-button
-                    a.button.radius-left.radius-right(onclick="managementThreads()") 管理
-                  .paging-button.management-thread-panel
-                    a.button.radius-left(onclick="selectAll()") 全选
-                    a.button(onclick="moveSelectedThreads()") 移动
-                    a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-                include ../publicModules/paging/forum_nav
-                -let showPagingSortButton = true;
-                -let showPagingDigestButton = true;
-                include ../publicModules/paging/paging
-              if data.paging.page === 0 && data.toppedThreads.length > 0
-                for thread in data.toppedThreads
-                  include ../publicModules/thread_panel/thread_panel
-                div.topped-thread-header - 以上是置顶 -
-              for thread in data.threads
-                include ../publicModules/thread_panel/thread_panel
-              if canManagement
-                .paging-button
-                  a.button.radius-left.radius-right(onclick="managementThreads()") 管理
-                .paging-button.management-thread-panel
-                  a.button.radius-left(onclick="selectAll()") 全选
-                  a.button(onclick="moveSelectedThreads()") 移动
-                  a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-              -showPagingSortButton = false;
-              -showPagingDigestButton = false;
-              include ../publicModules/paging/paging_input
-          else if data.type === "home"
-            .col-xs-12.col-md-12.m-t-1
-              .m-b-1
-                include ../publicModules/paging/forum_nav
-              if data.forum.declare
-                -const declareObj = {l: 'html', c: data.forum.declare};
-                -declareObj.c = hideContentByUser(declareObj.c, data.user, 'list')
-                div.forum-declare!= experimental_render(declareObj)
-              if data.forum.basicThreads.length > 0
-                +listHeader("快速入门")
-                for thread in data.forum.basicThreads
-                  include ../publicModules/thread_panel/thread_panel
-              if data.forum.valuableThreads.length > 0
-                +listHeader("推荐阅读")
-                for thread in data.forum.valuableThreads
-                  include ../publicModules/thread_panel/thread_panel
-          else if data.type === "followers"
-            .col-xs-12.col-md-12.m-t-1
-              .m-b-1
-                include ../publicModules/paging/forum_nav
-                include ../publicModules/paging/paging
-              .row
-                for targetUser in data.followers
-                  .col-xs-12.col-md-6
-                    include ../publicModules/user_panel/user_panel_md
-              .m-t-1
-                include ../publicModules/paging/paging
-
-          else if data.type === "visitors"
-            .col-xs-12.col-md-12.m-t-1
-              .m-b-1
-                include ../publicModules/paging/forum_nav
-                include ../publicModules/paging/paging
-              .row
-                for targetUser in data.visitors
-                  .col-xs-12.col-md-6
-                    include ../publicModules/user_panel/user_panel_md
-              .m-t-1
-                include ../publicModules/paging/paging
-          else if data.type === "library"
-            .col-xs-12.col-md-12.m-t-1
+                    button.btn-sm.forum-sub-btn.btn.success(
+                      onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", true)`
+                    ) 关注
+        if data.type === "latest"
+          div
+            .m-b-1
+              //- 手机导航 其他文章链接
+              include ../publicModules/mobile_drawer/right_drawer
               include ../publicModules/paging/forum_nav
-            .col-xs-12.col-md-12.m-t-05  
+            if data.threadTypes.length
+              .forum-category
+                a(class=!data.cat ? "active" : "" href=`/f/${data.forum.fid}`) 全部
+                for threadType in data.threadTypes
+                  a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}/latest?cat=${threadType.cid}`)= threadType.name
+            -let showPagingSortButton = true;
+            -let showPagingDigestButton = true;
+            if canManagement
+              .paging-button
+                a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+              .paging-button.management-thread-panel
+                a.button.radius-left(onclick="selectAll()") 全选
+                a.button(onclick="moveSelectedThreads()") 移动
+                a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+            include ../publicModules/paging/paging
+            if data.paging.page === 0 && data.toppedThreads.length > 0
+              for thread in data.toppedThreads
+                include ../publicModules/thread_panel/thread_panel
+              div.topped-thread-header - 以上是置顶 -
+            for thread in data.threads
+              include ../publicModules/thread_panel/thread_panel
+            if canManagement
+              .paging-button
+                a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+              .paging-button.management-thread-panel
+                a.button.radius-left(onclick="selectAll()") 全选
+                a.button(onclick="moveSelectedThreads()") 移动
+                a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+            -showPagingSortButton = false;
+            -showPagingDigestButton = false;
+            include ../publicModules/paging/paging_input
+        else if data.type === "home"
+          div
+            .m-b-1
+              include ../publicModules/paging/forum_nav
+            if data.forum.declare
+              -const declareObj = {l: 'html', c: data.forum.declare};
+              -declareObj.c = hideContentByUser(declareObj.c, data.user, 'list')
+              div.forum-declare!= experimental_render(declareObj)
+            if data.forum.basicThreads.length > 0
+              +listHeader("快速入门")
+              for thread in data.forum.basicThreads
+                include ../publicModules/thread_panel/thread_panel
+            if data.forum.valuableThreads.length > 0
+              +listHeader("推荐阅读")
+              for thread in data.forum.valuableThreads
+                include ../publicModules/thread_panel/thread_panel
+        else if data.type === "followers"
+          div
+            .m-b-1
+              include ../publicModules/paging/forum_nav
+            .m-b-1
+              include ../publicModules/paging/paging
+            .row
+              for targetUser in data.followers
+                .col-xs-12.col-md-6
+                  include ../publicModules/user_panel/user_panel_md
+            .m-t-1
+              include ../publicModules/paging/paging
+
+        else if data.type === "visitors"
+          div
+            .m-b-1
+              include ../publicModules/paging/forum_nav
+            .m-b-1
+              include ../publicModules/paging/paging
+            .row
+              for targetUser in data.visitors
+                .col-xs-12.col-md-6
+                  include ../publicModules/user_panel/user_panel_md
+            .m-t-1
+              include ../publicModules/paging/paging
+        else if data.type === "library"
+          div
+            div
+              include ../publicModules/paging/forum_nav
+            .m-t-05
               if data.forum.lid
                 if data.libraryClosed
                   .warning-panel
                     .fa.fa-exclamation
-                    span &nbsp;当前文库已被关闭。  
+                    span &nbsp;当前文库已被关闭。
                 if !data.libraryClosed || permission("modifyAllResource")
                   include ../publicModules/library/library
-          //-else if data.type === "library"
-            +includeCSS("/library/library.css")
-            -const docTypes = [{t: "all",n: "全部"}, {t: "book", n: "图书"}, {t: "paper", n: "论文"}, {t: "program", n: "程序"}, {t: "media", n: "媒体"}, {t: "other", n: "其他"}];
-            mixin link(r)
-              if (data.user && data.user.uid === r.rid) || permission("modifyAllResource")
-                a.lib-r-h.lib-r-e(href=`/library/upload?rid=${r.rid}` target="_blank")
-                  .fa.fa-edit &nbsp;编辑
-                a.lib-r-h.lib-r-r(onclick=`removeResourceFromLibrary('${r.rid}')`)
-                  .fa.fa-trash &nbsp;删除
-              a.lib-r-h(href=`/r/${r.rid}` target="_blank")
-                .fa.fa-cloud-download
-                | &nbsp;点击下载
-                if r.hits
-                  span=` ${r.hits}`
-            .col-xs-12.col-md-12.m-t-1
-              include ../publicModules/paging/forum_nav
-              if data.user
-                .pull-right.upload-resource
-                  if !data.uploadErrorInfo
-                    a.btn.btn-sm(href=`/library/upload?fid=${data.forum.fid}`)
-                      .fa.fa-cloud-upload &nbsp;
-                      | 上传文件
-                  else
-                    a.btn.btn-sm(disabled title=data.uploadErrorInfo)
-                      .fa.fa-cloud-upload &nbsp;
-                      | 上传文件
-              .m-b-05
-                .paging-button
-                  for t, index in docTypes
-                    -let klass = data.t === t.t? "active": "";
-                    if !index
-                      -klass += " radius-left"
-                    else if index + 1 === docTypes.length
-                      -klass += " radius-right"
-                    a.button(class=klass href=`/f/${data.forum.fid}/library?t=${t.t}`)=t.n
-                include ../publicModules/paging/paging
-              .lib-rs
-                if !data.resources.length
-                  .p-t-5.m-t-5.p-b-5.m-b-5.text-center 空空如也~
-                else
-                  for r, index in data.resources
-                    if index
-                      hr.m-t-1.m-b-1
-                    .lib-r
-                      .lib-r-c
-                        div
-                          if r.cover
-                            img(src=tools.getUrl("cover", r.cover))
-                          else
-                            img(src=tools.getUrl("fileCover", r.ext))
-                      .lib-r-info
-                        .lib-r-n(onclick=`showResource('${r.rid}')`)=r.name
-                        .lib-r-de
-                          .lib-r-u(onmouseover=tools.floatUserInfo(r.uid))
-                            img(src=`/avatar/${r.user.avatar}?t=sm`)
-                            a(href=`/u/${r.uid}` target="_blank")=r.user.username
-                          .lib-r-t=format("YYYY/MM/DD", r.tlm || r.toc)
-                          .lib-r-s=(r.ext || "未知").toUpperCase()
-                          .lib-r-s=tools.getSize(r.size)
-                          .display-i-b.hidden-sm.hidden-xs.pull-right(style="margin-top: -0.1rem;")
-                            +link(r)
-                        .lib-r-ds=r.description
-                        .hidden-lg.hidden-md.m-t-05
-                          +link(r)
-              .m-t-1
-                include ../publicModules/paging/paging_input
-      .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
-        if data.user
-          -const userPanel = data.user;
-          .hidden-xs.hidden-sm
-            include ../publicModules/user_panel
+      .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom.box-shadow-panel
+        .m-b-1
+          .panel-header 专业介绍
+          .forum-description=data.forum.description || "暂无专业介绍"
+        if permission('visitForumInfoSettings') && data.isModerator
+          .m-b-1
+            .panel-header 专业设置
+            .forum-links
+              a.forum-link(href=`/f/${data.forum.fid}/settings/image`) 图标
+              a.forum-link(href=`/f/${data.forum.fid}/settings/info`) 基本信息
+              a.forum-link(href=`/f/${data.forum.fid}/settings/category`) 分类
+              if permission('visitForumPermissionSettings')
+                a.forum-link(href=`/f/${data.forum.fid}/settings/permission`) 权限
+        if data.moderators && data.moderators.length
+          .m-b-1
+            //- 关注人数 data.subUsersCount, 今日更新 data.forum.countPostsToday
+            .panel-header 主管专家
+            .forum-moderators
+              for u in data.moderators
+                a.forum-moderator(href=`/u/${u.uid}` target="_blank" data-float-uid=u.uid)
+                  .forum-moderator-avatar
+                    img(src=tools.getUrl("userAvatar", u.avatar))
+                  .forum-moderator-info
+                    .forum-moderator-name=u.username
+                    .forum-moderator-description=u.description || "暂无简介"
+        if data.forum.parentForums && data.forum.parentForums.length > 0
+          +forumPanel("上级专业", data.forum.parentForums)
+        if data.forum.childrenForums && data.forum.childrenForums.length > 0
+          +forumPanel("细分专业", data.forum.childrenForums)
+        if data.forum.parentsId.length && data.sameLevelForums && data.sameLevelForums.length > 0
+          +forumPanel("同级专业", data.sameLevelForums, true)
         if data.forum.noticeThreads.length > 0
           -let sideThreads = data.forum.noticeThreads;
           -let sideThreadsHeader = "专业公告"
@@ -281,47 +213,43 @@ block content
         -let sideThreads = data.featuredThreads;
         -let sideThreadsHeader = "精选文章"
         include ../publicModules/side_thread_list
-        .m-t-1
-          -sideThreads = data.latestThreads;
-          -sideThreadsHeader = "最新文章"
-          include ../publicModules/side_thread_list
+        -sideThreads = data.latestThreads;
+        -sideThreadsHeader = "最新文章"
+        include ../publicModules/side_thread_list
         if data.recommendThreads && data.recommendThreads.length > 0
-          .m-t-1
-            -let sideThreads = data.recommendThreads;
-            -let sideThreadsHeader = "推荐文章"
-            include ../publicModules/side_thread_list
+          -let sideThreads = data.recommendThreads;
+          -let sideThreadsHeader = "推荐文章"
+          include ../publicModules/side_thread_list
         if data.user
           if data.subThreads && data.subThreads.length > 0
-            .m-t-1
-              -let sideThreads = data.subThreads;
-              -let sideThreadsHeader = "关注的文章"
-              include ../publicModules/side_thread_list
+            -let sideThreads = data.subThreads;
+            -let sideThreadsHeader = "关注的文章"
+            include ../publicModules/side_thread_list
           if data.userThreads && data.userThreads.length > 0
-            .m-t-1
-              -let sideThreads = data.userThreads;
-              -let sideThreadsHeader = "我的文章"
-              include ../publicModules/side_thread_list
+            -let sideThreads = data.userThreads;
+            -let sideThreadsHeader = "我的文章"
+            include ../publicModules/side_thread_list
         if data.subUsers && data.subUsers.length > 0
           .m-t-1
+            .panel-header 关注者
             -let sideUsers = data.subUsers;
-            -let sideUsersHeader= "关注者";
             include ../publicModules/side_users_list
             if data.subUsers.length > 8
               a.side-link(href=`/f/${data.forum.fid}/followers`) 查看更多
         if data.users && data.users.length > 0
           .m-t-1
+            .panel-header 今日来访
             -let sideUsers = data.users;
-            -let sideUsersHeader= "今日来访";
             include ../publicModules/side_users_list
             if data.users.length > 8
               a.side-link(href=`/f/${data.forum.fid}/visitors`) 查看更多
 
-        include ../module_scrollTo
 
 block scripts
   if data.type === "home"
     include ../publicModules/plyr/plyr.js.pug
     include ../publicModules/lazySizes
+  include ../publicModules/toTop
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/md5

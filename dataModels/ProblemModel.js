@@ -49,6 +49,11 @@ const problemSchema = new Schema({
 		default: '',
 		index: 1
 	},
+	restorLog: {
+		type: String,
+		default: '',
+		maxlength: [2048, '内容不能超过10000个字']
+	},
 	resolveTime: {
 		type: Date,
 		index: 1

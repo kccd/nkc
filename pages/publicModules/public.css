@@ -12,6 +12,9 @@ table{
   word-break: break-all;
 }
 /* margin-top */
+.m-a-0{
+  margin: 0!important;
+}
 .m-l-0{
   margin-left: 0!important;
 }
@@ -380,7 +383,7 @@ table{
 }
 .paging-button{
   display: inline-block;
-  padding-right: 1rem;
+  padding-right: 0.5rem;
   margin-bottom: 0.5rem;
 
 }
@@ -410,7 +413,7 @@ table{
   text-align: center;
   min-width: 2rem;
   padding: 0 0.8rem;
-  font-size: 1.2rem;
+  font-size: 1rem;
   background-color: #9baec8;
 }
 .paging-button a.radius-left{
@@ -486,7 +489,7 @@ table{
 .paging-nav ul li{
   list-style: none;
   display: inline-block;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   margin-bottom: 0.3rem;
   color: #282c37;
@@ -527,7 +530,6 @@ table{
   border: 2px solid #2b90d9;
 }
 .canvas-logo{
-  padding: 1rem;
   border-radius: 3px;
 }
 .canvas-logo img{
@@ -549,7 +551,7 @@ table{
 }
 .active-user-avatar{
   display: inline-block;
-  padding: 0 0.9rem 1rem 0.9rem;
+  padding: 0 0.6rem 1rem 0.6rem;
   text-align: center;
 }
 .active-user-avatar a{
@@ -572,8 +574,8 @@ table{
 }
 
 footer.footer{
-  margin-top: 3rem;
-  background-color: #f9f9f9;
+  margin-top: 1rem;
+  background-color: #fff;
   border-top: 1px solid #eee;
   padding: 3rem 0 2rem 0;
   min-height: 28rem;
@@ -879,7 +881,7 @@ footer.footer ul li{
   width: 4rem;
   border-radius: 3px;
   overflow: hidden;
-  margin: 1rem 0.9rem 1rem 0.9rem;
+  margin: 0.3rem 0.5rem 0.3rem 0.5rem;
 }
 .side-user img{
   height: 100%;
@@ -895,12 +897,12 @@ footer.footer ul li{
 }
 .side-link:hover{
   text-decoration: none;
-  color: #282c37;
+  color: #666;
 }
 .side-thread-title{
   color: #646873;
   word-break: break-all;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 .side-thread-title:hover{
@@ -1505,6 +1507,7 @@ footer.footer ul li{
   margin-right: 1px;
   position: relative;
   transition: height 200ms;
+  word-break: break-word;
 }
 /*.thread-panel-abstract:hover{
   height: 4rem;
@@ -1707,6 +1710,20 @@ span.thread-title-page{
   background-color: #fff;
   border-radius: 3px;
 }
+.panel-header{
+  font-size: 1.25rem;
+  height: 3rem;
+  color: #777;
+  font-weight: 700;
+  box-sizing: border-box;
+  line-height: 3rem;
+}
+.box-shadow-panel>div>.panel-header{
+  margin: -15px -15px 1rem -15px;
+  border-bottom: 1px solid #f4f4f4;
+  padding: 0 1rem;
+}
+
 .forum-block{
   width: 100%;
   margin: 0.5rem 0;
@@ -1731,17 +1748,16 @@ span.thread-title-page{
   color: #282c37;
 }
 .forum-block-children{
-  display: none;
-  padding-left: 10px;
+  display: block;
+  padding-left: 1.2rem;
 }
 .forum-block-info{
   font-size: 0;
   line-height: 0;
 }
-.forum-block-name:hover, .forum-block-name:focus {
-  color: #282c37;
-  text-decoration: none;
-}
+/*.forum-block-info:hover{
+  background-color: #f4f4f4;
+}*/
 .forum-block-icon{
   height: 2rem;
   width: 2rem;
@@ -1758,6 +1774,20 @@ span.thread-title-page{
   line-height: 2rem;
   vertical-align: top;
   transition: color 100ms;
+}
+.forum-block-name.child{
+  font-size: 1.2rem;
+  font-style: normal;
+  color: #282c37;
+}
+.forum-block-name:hover, .forum-block-name:focus {
+  /*color: #282c37;*/
+  color: #2b90d9;
+  text-decoration: none;
+}
+.forum-block-name.parent{
+  font-size: 1.25rem;
+  font-style: oblique;
 }
 .forum-block-button{
 
@@ -1950,7 +1980,7 @@ span.thread-title-page{
   color: #6e7f95;
 }
 .improve p{
-  color: #6e7f95;
+  color: #f58585;
 }
 .improve a{
   font-size: 1.2rem;
@@ -1959,17 +1989,42 @@ span.thread-title-page{
 .improve .improve-info{
   margin: 0.3rem 0;
 }
-
-
-
+.text-ellipsis {
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .topped-thread-header{
   height: 2rem;
   line-height: 2rem;
   background-color: #d9e1e8;
+  border-radius: 2px;
   margin-top: -1rem;
   margin-bottom: 1rem;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   text-align: center;
   color: #666;
+}
+
+
+.primary-buttons{
+
+}
+.primary-buttons .primary-button{
+  height: 2.5rem;
+  padding: 0 0.7rem;
+  font-size: 1.2rem;
+  border-radius: 3px;
+  line-height: 2.5rem;
+  display: inline-block;
+  color:#282c37;
   font-weight: 700;
+}
+.primary-buttons .primary-button:hover, .primary-buttons .primary-button:focus{
+  text-decoration: none;
+  color: #2b90d9;
+}
+.primary-buttons .primary-button.active{
+  color: #fff;
+  background-color: #2b90d9;
 }

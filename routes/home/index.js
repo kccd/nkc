@@ -116,6 +116,11 @@ router
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
     
+    // 最近访问的专业
+    if(data.user) {
+      const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 20);
+      data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
+    }
 
     let subTid = [], subUid = [], subColumnId = [];
   
@@ -152,55 +157,6 @@ router
         q.reviewed = true;
       }
     } else if(threadListType === "subscribe") {
-      /*data.subscribeTypes = await db.SubscribeTypeModel.getTypesList(user.uid);
-      data.subscribeCounts = {
-        total: await db.SubscribeModel.count({uid: user.uid}),
-        other: await db.SubscribeModel.count({uid: user.uid, cid: []})
-      };
-      let accessibleForumsId = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, user);
-      accessibleForumsId = accessibleForumsId.filter(fid => fid !== "recycle");
-    
-      if(!c) c = "all";
-      if(!d) d = "user";
-      data.d = d;
-      if(d === "all") {
-        const redisTypeCount = await redisClient.smembersAsync(`user:${user.uid}:subscribeTypesId`);
-        let subThreadsId = [];
-        if(!redisTypeCount.length) {
-          const redisData = await db.SubscribeModel.getUserSubscribeTypesResults(user.uid);
-          await db.SubscribeModel.saveUserSubscribeTypesToRedis(user.uid, redisData);
-          const {results} = redisData;
-          const baseKey = `user:${user.uid}:subscribeType:${c}:`;
-          subThreadsId = results[baseKey + `thread`] || [];
-          collectionTid = results[baseKey + `collection`] || [];
-          subTopicId = results[baseKey + `topic`] || [];
-          subDisciplineId = results[baseKey + `discipline`] || [];
-          subUid = results[baseKey + `user`] || [];
-          subColumnId = results[baseKey + `column`] || [];
-        } else {
-          subThreadsId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "thread");
-          collectionTid = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "collection");
-          subTopicId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "topic");
-          subDisciplineId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "discipline");
-          subUid = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "user");
-          subColumnId = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, "column");
-        }
-        subTid = subThreadsId.concat(collectionTid);
-        subFid = subTopicId.concat(subDisciplineId);
-      } else {
-        const ids = await db.SubscribeModel.getUserSubscribeTypeFromRedis(user.uid, c, d);
-        if(["thread", "collection"].includes(d)) {
-          subTid = ids;
-        } else if(["topic", "discipline"].includes(d)) {
-          subFid = ids;
-        } else if(d === "column") {
-          subColumnId = ids;
-        } else if(d === "user") {
-          subUid = ids;
-        } else {
-          ctx.throw(400, "未知的关注分类");
-        }
-      }*/
       if(!d) d = "all";
       if(d === "all" || d === "column") {
         subColumnId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);

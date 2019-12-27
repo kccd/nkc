@@ -1327,5 +1327,21 @@ forumSchema.statics.getForumNav = async (fids = [], fid) => {
   func(results, fid);
   return results;
 };
-
+/*
+* 通过fid数组获取专业对象数组
+* @param {[String]} fid fid数组
+* @return {[Object]} 专业对象数组
+* */
+forumSchema.statics.getForumsByFid = async (fid) => {
+  const ForumModel = mongoose.model("forums");
+  const visitedForums = await ForumModel.find({fid: {$in: fid}});
+  const visitedForumsObj = {};
+  visitedForums.map(forum => visitedForumsObj[forum.fid] = forum);
+  const results = [];
+  for(const id of fid) {
+    const forum = visitedForumsObj[id];
+    if(forum) results.push(forum);
+  }
+  return results;
+};
 module.exports = mongoose.model('forums', forumSchema);

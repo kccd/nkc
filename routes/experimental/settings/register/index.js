@@ -4,6 +4,7 @@ router
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
     const regSettings= await db.SettingModel.findById("register");
+    // const regSettings = await db.SettingModel.getSettings("register");
     data.regSettings = regSettings.c;
     const {defaultSubscribeForumsId} = data.regSettings;
     data.selectedForums = await db.ForumModel.find({fid: {$in: defaultSubscribeForumsId}});

@@ -3,48 +3,75 @@ block title
   -const problem = data.problem;
   title= problem.t
   -const mainContainer1400 = true;
+  -let cantEdit = problem.resolved && data.user.uid != problem.restorerId;
+
   link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
   style.
+    body {
+      background: #f8f8f8;
+    } 
     pre{
       padding: 1rem;
       background-color: #fff;
     }
+    .title{
+      margin-top: 20px;
+      color: #fa2;
+      font-size: 1.2em;
+    }
+    .resolve-auther,.resolve-time{
+      padding-right: 1em;
+      font-size: 0.8em;
+    }
 block content
-  .container-fluid(style='max-width: 1400px')
+  .container-fluid.max-width
     .row
       .hidden#data= JSON.stringify({id: data.problem._id})
-      .col-xs-12.col-md-12.form-inline
-        a.btn.btn-default.btn-sm(href='/problem/list') << 返回列表
-        span &nbsp;&nbsp;&nbsp;移动到
-        select.form-control.btn-sm#typeId
-          for type in data.problemsTypes
-            if type._id === data.problem.typeId
-              option(selected=true)= type.name
+      .col-xs-12.col-md-12.m-b-1.form-inline.box-shadow-panel
+        div
+          a.btn.btn-default.btn-sm(href='/problem/list') << 返回列表
+          span &nbsp;&nbsp;&nbsp;移动到
+          select.form-control.btn-sm#typeId
+            for type in data.problemsTypes
+              if type._id === data.problem.typeId
+                option(selected=true)= type.name
+              else
+                option= type.name
+          button.btn.btn-default.btn-sm(onclick=`changeType(${problem._id})`) 移动
+          button.btn.btn-danger.btn-sm(onclick=`deleteProblem(${problem._id})`) 删除问题
+      .col-xs-12.col-md-7.box-shadow-panel
+        div
+          h4(style='color: #aaa;')
+            if problem.user
+              a(href=`/u/${problem.user.uid}` target='_blank')
+                img(src=`/avatar/${problem.user.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
+                span= problem.user.username
             else
-              option= type.name
-        button.btn.btn-default.btn-sm(onclick=`changeType(${problem._id})`) 移动
-        button.btn.btn-danger.btn-sm(onclick=`deleteProblem(${problem._id})`) 删除问题
-      .col-xs-12.col-md-7
-        h4(style='color: #aaa;')
-          if problem.user
-            a(href=`/u/${problem.user.uid}` target='_blank')
-              img(src=`/avatar/${problem.user.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
-              span= problem.user.username
+              span 匿名用户
+            span &nbsp;&nbsp;上报于&nbsp;&nbsp;
+            span=problem.toc.toLocaleString()
+            span &nbsp;&nbsp;
+            if problem.resolved
+              span.label.label-success 已完成
+            else
+              span.label.label-danger 未完成
+          .h2.text-center#title= problem.t
+          #content= problem.c
+          if problem.QQ
+            h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
+          if problem.email
+            h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
+          .title 修复详情：
+          if problem.restorerId.length
+            if problem.restorer
+              a(href=`/u/${problem.restorerId}` target='_blank').resolve-auther
+                img(src=`/avatar/${problem.restorer.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
+                span= problem.restorer.username
+              span.resolve-time= problem.resolveTime.toLocaleString()
           else
-            span 匿名用户
-          span &nbsp;&nbsp;上报于&nbsp;&nbsp;
-          span=problem.toc.toLocaleString()
-          span &nbsp;&nbsp;
-          if problem.resolved
-            span.label.label-success 已完成
-          else
-            span.label.label-danger 未完成
-        .h2.text-center#titleH2
-        #contentDiv
-        if problem.QQ
-          h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
-        if problem.email
-          h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
+            .resolve-auther 暂无修复记录
+          #logDev
+        
         //if problem.restorer && problem.resolveTime
           h4.text-right(style='color: #aaa;padding-top:2rem;')
             span(style='margin-right: 0.5rem;')= problem.resolveTime.toLocaleString()
@@ -53,25 +80,31 @@ block content
               span= problem.restorer.username
 
 
-      .col-xs-12.col-md-5
+      .col-xs-12.col-md-5.box-shadow-panel
         .form
+          //- .form-group
+          //-   label 标题
+          //-   input.form-control#title(type='text' value=problem.t)
+          //- .form-group
+          //-   label 详细内容
+          //-   textarea.form-control#content(rows=23)= problem.c
           .form-group
-            label 标题
-            input.form-control#title(type='text' value=problem.t)
-          .form-group
-            label 详细内容
-            textarea.form-control#content(rows=23)= problem.c
-          .form-group
-            .icheckbox
-              span 标记为已完成
-              input(type='checkbox' name='select' checked=problem.resolved)
+            label 修复详情
+            textarea.form-control#log(rows=23 disabled=cantEdit)= problem.restorLog
+          if !problem.resolved
+            .form-group
+              .icheckbox
+                span 标记为已完成
+                input(type='checkbox' name='select' checked=problem.resolved disabled=cantEdit)
 
-          button.btn.btn-primary.btn-block(onclick=`submit(${problem._id})`) 保存
+          button.btn.btn-primary.btn-block(onclick=`submit(${problem._id})`, disabled=cantEdit) 保存
 
 
 
 block scripts
   include ../publicModules/highlight/highlight
+  //- Mackdown转html
   include ../publicModules/mdToHtml
+  //- 验证样式
   script(src=`/icheck/icheck.js?v=${startTime}`)
   script(src=`/problem/problem.js?v=${startTime}`)

@@ -20,12 +20,12 @@ registerRouter
   .post('/', async (ctx, next) => { // 手机注册
 	  const {db, data, body, tools} = ctx;
 	  let user;
-	  const {mobile, nationCode, code, imgCode} = body;
+		const {mobile, nationCode, code, imgCode} = body;
 	  if(!nationCode) ctx.throw(400, '请选择国家区号');
 	  if(!mobile) ctx.throw(400, '请输入手机号');
     if(!imgCode) ctx.throw(400, '请输入图形验证码');
 	  if(!code) ctx.throw(400, '请输入短信验证码');
-
+		await db.SettingModel.checkRestricted(nationCode, mobile);
     let imgCodeId = ctx.getCookie("imgCodeId") || "";
     if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
 

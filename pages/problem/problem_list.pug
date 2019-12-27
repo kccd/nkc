@@ -5,19 +5,22 @@ block title
   link(rel='stylesheet' href=`/problem/problem.css?v=${startTime}`)
   -const mainContainer1400 = true;
 block content
-  .container-fluid(style='max-width: 1400px')#app
-    .mdui-container-fluid
-      .mdui-col-xs-12.mdui-col-md-2
-        ul.mdui-list
+  .container-fluid.max-width#app
+    .row
+      //- 分类栏
+      .col-xs-12.col-md-12
+        ul.top-label
           for type in data.problemsTypes
             -var cls = ['mdui-btn','mdui-btn-raised','mdui-ripple','mdui-btn-block'];
             if(data.cid === type._id)
               -cls.push('active');
             -var link = `openToNewLocation('/problem/list?cid=${type._id}')`
-            button.mdui-m-t-1(class=cls onclick=link)= `${type.name} ${type.count}`
-        <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-btn-block" @click='addType'>新建分类</button>
-      .mdui-col-xs-12.mdui-col-md-10
-        .mdui-col-xs-12.mdui-col-md-12
+            li.m-r-05(class=cls onclick=link)= `${type.name} ${type.count}`
+        <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-btn-block" @click='addType' style="background: #d9e1e8;color: #2b90d9">新建分类</button>
+      
+      .col-xs-12.col-md-12.box-shadow-panel
+        //- 工具栏
+        .col-xs-12.col-md-12
           h3= data.problemsType.name
             span &nbsp;&nbsp;&nbsp;
             button(mdui-tooltip="{content: '新建记录'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`addProblem(${data.problemsType._id}, "${data.problemsType.name}")`)
@@ -27,11 +30,13 @@ block content
             if data.problemsType._id !== 0
               button(mdui-tooltip="{content: '删除分类'}" class="mdui-btn mdui-btn-dense mdui-ripple mdui-btn-icon mdui-color-pink" @click=`deleteType(${data.problemsType._id}, "${data.problemsType.name}")`)
                 <i class="mdui-icon material-icons">&#xe872;</i>
-        .mdui-col-xs-12.mdui-col-md-12
-          include ../interface_navigation_paging
+        //- 问题列表
+        .col-xs-12.col-md-12
+          .col-xs-12.col-md-12
+            include ../publicModules/paging/paging.pug
           for problem in data.problems
-            hr(style='margin: 5px 0;')
-            .media
+            .media.col-xs-12.col-md-6
+              hr(style='margin: 5px 0;')
               .media-left
                 if problem.user
                   a(href=`/u/${problem.user.uid}`)
@@ -59,8 +64,10 @@ block content
                     span= `${fromNow(problem.toc)}`
                   a(href=`/problem/list/${problem._id}` style='text-decoration: none;')
                     h4= problem.t
-          br
-          include ../interface_navigation_paging
+          
+          .col-xs-12.col-md-12
+            hr(style='margin: 5px 0 15px 0;')
+            include ../publicModules/paging/paging.pug
 
     //.col-xs-12.col-md-6
       .row

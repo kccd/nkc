@@ -48,6 +48,7 @@ module.exports = {
         sameIpOneDay: 10,
         sameMobileOneDay: 5
       }
-    ]
+    ],
+    restrictedNumber: []
   }
 };

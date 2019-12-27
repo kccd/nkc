@@ -14,6 +14,7 @@ const kcbRouter = require('./kcb');
 const subRouter = require("./sub");
 const profileRouter = require("./profile");
 const transferRouter = require("./transfer");
+const myProblemsRouter = require("./myProblems");
 const userRouter = new Router();
 
 
@@ -448,7 +449,8 @@ userRouter
   .use('/:uid/friends', friendsRouter.routes(), friendsRouter.allowedMethods())
   .use("/:uid/sub", subRouter.routes(), subRouter.allowedMethods())
   .use("/:uid/clear", clearRouter.routes(), clearRouter.allowedMethods())
-  .use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods())
   .use("/:uid/transfer", transferRouter.routes(), transferRouter.allowedMethods())
-  .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods());
+	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods())
+  .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
+  .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods());
 module.exports = userRouter;
