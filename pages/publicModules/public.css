@@ -1755,9 +1755,13 @@ span.thread-title-page{
   font-size: 0;
   line-height: 0;
 }
-/*.forum-block-info:hover{
-  background-color: #f4f4f4;
-}*/
+.forum-block-info.active{
+  background-color: #2b90d9;
+  border-radius: 2px;
+}
+.forum-block-info.active a{
+  color: #fff;
+}
 .forum-block-icon{
   height: 2rem;
   width: 2rem;
@@ -2027,4 +2031,30 @@ span.thread-title-page{
 .primary-buttons .primary-button.active{
   color: #fff;
   background-color: #2b90d9;
+}
+#moduleScrollTo{
+  position: fixed;
+  top: 51.4%;
+  z-index: 100;
+  margin-left: -1.1rem;
+  border-radius: 2px;
+  background-color: #fff;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+#moduleScrollTo .fa{
+  width: 1rem;
+  text-align: center;
+  height: 3rem;
+  line-height: 3rem;
+  cursor: pointer;
+  display: block;
+}
+#moduleScrollTo .fa:hover{
+  background-color: #f4f4f4;
+}
+#moduleScrollTo .scroll-to-top{
+
+}
+#moduleScrollTo .scroll-to-bottom{
+
 }

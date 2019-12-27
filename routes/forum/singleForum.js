@@ -337,6 +337,8 @@ router
 					"visitedForumsId": visitedForumsId
 				}
 			});
+			// 最近访问的专业
+			data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId.slice(0, 10));
 		}
     
 		ctx.template = 'forum/forum.pug';
