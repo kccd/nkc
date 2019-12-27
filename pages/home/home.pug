@@ -9,91 +9,60 @@ block content
   .container-fluid.max-width
     .row
       if data.user && (/^kc-/.test(data.user.username) || !data.user.username)
-        .col-xs-12(style="font-size: 1.3rem;height: 3rem;line-height:3rem;").m-b-1
-          .col-xs-12.bg-warning 你还未修改默认用户名，点击&nbsp;
-            b
-              a(href=`/u/${data.user.uid}/settings` target="_blank") 这里
+        .col-xs-12.m-b-1
+          .home-warning
+            .fa.fa-exclamation-circle
+            | 你还未修改默认用户名，点击&nbsp;
+            a(href=`/u/${data.user.uid}/settings` target="_blank") 这里
             | &nbsp;去修改。
-      .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom
-        include ../publicModules/post_button
-        include ../publicModules/management/management
+      .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom.box-shadow-panel.p-r-0
+        //- include ../publicModules/post_button
         //-include ../publicModules/subscribeTypes/subscribeTypesPanel
-        include ../publicModules/apps/apps
         include ../publicModules/forums_nav/forums_tree
-      .col-xs-12.col-md-7
-        .row
-          .col-xs-12.col-md-12(style="overflow:hidden;")
-            if data.t === "subscribe"
-              //-mixin subscribeTypes(d)
-                ul.dropdown-menu
-                  for type in data.subscribeTypes
-                    li
-                      a(href=`/?t=subscribe&c=${type._id}${d?`&d=${d}`:""}`)=type.name
-                    if type.childTypes && type.childTypes.length
-                      for tt in type.childTypes
-                        li
-                          a(href=`/?t=subscribe&c=${tt._id}${d?`&d=${d}`:""}`)
-                            .m-l-1=tt.name
-              .m-b-1
-                .subscribe-lists
-                  .subscribe-list
-                    a(href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
-                      class=!data.d || data.d === 'all' ? "active" : ""
-                    ) 全部
-                  .subscribe-list
-                    a(href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
-                      class=data.d === "user" ? "active" : ""
-                    ) 用户
-                  .subscribe-list
-                    a(href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
-                        class=data.d==="column"? "active" : ""
-                    ) 专栏
-                  .subscribe-list
-                    a(href=`/?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
-                      class=data.d==="thread"?"active": ""
-                    ) 关注的文章
-                  //-.subscribe-list
-                    a(href=`/?t=subscribe&d=own${data.c ? `&c=${data.c}` : ""}`
-                      class=data.d === "own" ? "active" : ""
-                    ) 我的文章
-                  .subscribe-list
-                    a(href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
-                      class=data.d === "reply" ? "active" : ""
-                    ) 参与过的文章
+      .col-xs-12.col-md-7.box-shadow-panel.p-r-0
+        if data.user && data.visitedForums.length
+          .m-b-1
+            .panel-header 最近访问
+            .visited-forums
+              for f in data.visitedForums
+                .visited-forum(data-float-fid=f.fid)
+                  if f.iconFileName
+                    img.visited-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                  else
+                    .visited-forum-icon(style=`background-color: ${f.color}`)
+                  a(href=`/f/${f.fid}`).visited-forum-name= f.displayName
+        div
+          if data.t === "subscribe"
+            .subscribe-lists.m-b-1
+              .subscribe-list
+                a(href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
+                  class=!data.d || data.d === 'all' ? "active" : ""
+                ) 全部
+              .subscribe-list
+                a(href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "user" ? "active" : ""
+                ) 用户
+              .subscribe-list
+                a(href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
+                    class=data.d==="column"? "active" : ""
+                ) 专栏
+              .subscribe-list
+                a(href=`/?t=subscribe&d=thread${data.c ?`&c=${data.c}`:""}`
+                  class=data.d==="thread"?"active": ""
+                ) 关注的文章
+              .subscribe-list
+                a(href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "reply" ? "active" : ""
+                ) 参与过的文章
+          if !data.threads.length
+            .p-t-5.p-b-5.text-center
+              h4
+                b 空空如也~
+          else
+            .m-b-0
+              include ../publicModules/mobile_drawer/right_drawer
 
-            if !data.threads.length
-              .p-t-5.p-b-5.text-center
-                h4
-                  b 空空如也~
-            else
-              .m-b-0
-                include ../publicModules/mobile_drawer/right_drawer
-
-                -let showPagingSortButton = true;
-                if canManagement
-                  .paging-button
-                    a.button.radius-left.radius-right(onclick="managementThreads()") 管理
-                  .paging-button.management-thread-panel
-                    a.button.radius-left(onclick="selectAll()") 全选
-                    a.button(onclick="moveSelectedThreads()") 移动
-                    a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-                if data.t === "latest" || data.t === "column" || data.t === "recommend"
-                  .paging-button
-                    a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 全部
-                    a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
-                    a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
-
-                include ../publicModules/paging/paging
-              //-if data.t === "latest" && data.paging && data.paging.page === 0 && data.toppedThreads && data.toppedThreads.length
-                .m-b-1
-                  for thread in data.toppedThreads
-                    include ../publicModules/thread_panel/thread_panel
-                  div.topped-thread-header - 以上是置顶 -
-
-              for thread in data.threads
-                include ../publicModules/thread_panel/thread_panel
-              -showPagingSortButton = false;
-              -showHomeButton = false;
+              -let showPagingSortButton = true;
               if canManagement
                 .paging-button
                   a.button.radius-left.radius-right(onclick="managementThreads()") 管理
@@ -101,57 +70,60 @@ block content
                   a.button.radius-left(onclick="selectAll()") 全选
                   a.button(onclick="moveSelectedThreads()") 移动
                   a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-              include ../publicModules/paging/paging_input
+              if data.t === "latest" || data.t === "column" || data.t === "recommend"
+                .paging-button
+                  a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 全部
+                  a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
+                  a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
+
+              include ../publicModules/paging/paging
+
+            for thread in data.threads
+              include ../publicModules/thread_panel/thread_panel
+            -showPagingSortButton = false;
+            -showHomeButton = false;
+            if canManagement
+              .paging-button
+                a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+              .paging-button.management-thread-panel
+                a.button.radius-left(onclick="selectAll()") 全选
+                a.button(onclick="moveSelectedThreads()") 移动
+                a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+            include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
-        .hidden-xs.hidden-sm#rightDom
-          .hidden-xs.hidden-sm
-            div(style="box-shadow: 0 0 3px 0 #aaa;border-radius: 3px;")
-              include ../publicModules/canvas_logo
-            include ../publicModules/improveUserInfo
-            .swiper-container.swiper-home
-              .swiper-wrapper
-                for thread in data.ads
-                  a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                    'background-image': `url(${tools.getUrl('postCover', thread.cover)})`
-                  })
-                    .swiper-title= `${thread.title}`
-              .swiper-pagination
-              .swiper-button-next.swiper-button(style='background-image: none;')
-                .fa.fa-angle-right
-              .swiper-button-prev.swiper-button(style='background-image: none;')
-                .fa.fa-angle-left
+        .hidden-xs.hidden-sm#rightDom.box-shadow-panel
+          .hidden-xs.hidden-sm.m-b-1
+            include ../publicModules/canvas_logo
+          include ../publicModules/improveUserInfo
+          include ../publicModules/management/management
+          include ../publicModules/apps/apps
+
           if data.noticeThreads && data.noticeThreads.length > 0
-            .m-t-1
-              -let sideThreads = data.noticeThreads
-              -let sideThreadsHideInfo = true;
-              -let sideThreadsHeader= "公告通知"
-              include ../publicModules/side_thread_list
+            -let sideThreads = data.noticeThreads
+            -let sideThreadsHideInfo = true;
+            -let sideThreadsHeader= "公告通知"
+            include ../publicModules/side_thread_list
           if data.featuredThreads && data.featuredThreads.length > 0
-            .m-t-1
-              -let sideThreads = data.featuredThreads
-              -let sideThreadsHideInfo = false;
-              -let sideThreadsHeader= "精选文章"
-              include ../publicModules/side_thread_list
+            -let sideThreads = data.featuredThreads
+            -let sideThreadsHideInfo = false;
+            -let sideThreadsHeader= "精选文章"
+            include ../publicModules/side_thread_list
           if data.subscribeThreads && data.subscribeThreads.length > 0
-            .m-t-1
-              -let sideThreads = data.subscribeThreads
-              -let sideThreadsHideInfo = false;
-              -let sideThreadsHeader= "我关注的"
-              include ../publicModules/side_thread_list
+            -let sideThreads = data.subscribeThreads
+            -let sideThreadsHideInfo = false;
+            -let sideThreadsHeader= "我关注的"
+            include ../publicModules/side_thread_list
           if data.latestThreads && data.latestThreads.length > 0
-            .m-t-1
-              -let sideThreads = data.latestThreads
-              -let sideThreadsHideInfo = false;
-              -let sideThreadsHeader= "最新文章"
-              include ../publicModules/side_thread_list
+            -let sideThreads = data.latestThreads
+            -let sideThreadsHideInfo = false;
+            -let sideThreadsHeader= "最新文章"
+            include ../publicModules/side_thread_list
           if data.recommendThreads && data.recommendThreads.length > 0
-            .m-t-1
-              -let sideThreads = data.recommendThreads
-              -let sideThreadsHideInfo = false;
-              -let sideThreadsHeader= "推荐文章"
-              include ../publicModules/side_thread_list
+            -let sideThreads = data.recommendThreads
+            -let sideThreadsHideInfo = false;
+            -let sideThreadsHeader= "推荐文章"
+            include ../publicModules/side_thread_list
           include ../publicModules/active_users
-        include ../module_scrollTo
 block footer
   include ../publicModules/footer/footer
 block scripts
@@ -160,6 +132,7 @@ block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/toTop
   if canManagement
     include ../publicModules/moveThread/moveThread
     include ../publicModules/disabledPost/disabledPost
