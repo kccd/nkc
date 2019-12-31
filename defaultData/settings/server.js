@@ -8,6 +8,7 @@ module.exports = {
     copyright: '科创研究院 (c)2005-2018',
     record: '备案信息',
     description: '网站介绍',
+    statement: "网站声明",
     brief: '网站简介',
     keywords: ['科创论坛'],
     language: 'zh_CN',

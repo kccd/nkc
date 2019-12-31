@@ -280,3 +280,7 @@
   text-decoration: none;
   color: #fff;
 }
+
+.search-checkbox label, .search-buttons{
+  display: none;
+}

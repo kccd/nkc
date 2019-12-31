@@ -1,5 +1,9 @@
 .search-result
   if ["thread", "post"].includes(result.docType)
+    if result.docType === "thread"
+      .checkbox.thread-checkbox(style="display: inline;")
+        label
+          input(type="checkbox" data-thread-id=result.tid data-post-id=result.oc)
     a(href=result.link target="_blank").clear-a-style.search-result-title!= result.title
     .search-result-info
       if !result.anonymous
