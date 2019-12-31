@@ -27,7 +27,7 @@ footer.footer
               li
                 a(href="/problem/add")
                   span(style="font-size: 1.4rem;").fa.fa-bug
-                  span(style="font-size: 1.2rem;") &nbsp;上报问题
+                  span(style="font-size: 1.2rem;") &nbsp;报告问题/投诉
               li
                 a
                   span(style="font-size: 1.5rem;").fa.fa-phone-square
@@ -52,8 +52,9 @@ footer.footer
 
       .col-xs-12.col-md-12
         .website-name
-          h5=`${state.serverSettings.brief}`
-          h5=`${state.serverSettings.copyright}`
-          h5=`${state.serverSettings.record}`
+          h5=`${state.serverSettings.statement}`
+          h5
+            .display-i-b.m-b-05=`${state.serverSettings.copyright} `
+            .display-i-b.m-b-05=`${state.serverSettings.record}`
 
           //h5=`${state.serverSettings.websiteName}`

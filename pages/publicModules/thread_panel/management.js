@@ -14,11 +14,16 @@ function getSelectedThreadsId() {
     var d = dom.eq(i);
     if(d.prop("checked")) {
       threadsId.push(d.attr("data-thread-id"));
-      threads.push({
-        tid: d.attr("data-thread-id"),
-        cids: d.attr("data-thread-cids").split("-"),
-        fids: d.attr("data-thread-fids").split("-")
-      });
+      var r = {
+        tid: d.attr("data-thread-id")
+      };
+      var cids = d.attr("data-thread-cids");
+      var fids = d.attr("data-thread-fids");
+      if(cids) {
+        r.cids = cids;
+        r.fids = fids;
+      }
+      threads.push(r);
     }
   }
   return {

@@ -74,7 +74,7 @@ module.exports = async (ctx, next) => {
         referer: ctx.get("referer"),
         userAgent: ctx.get("User-Agent")
       });
-      setTimeout(async () => {
+      setImmediate(async () => {
         const url_ = url.replace(/\?.*/, '');
         const tid = url_.replace(/\/t\/(.*)/i, "$1");
         if(tid !== url_) {
@@ -89,7 +89,7 @@ module.exports = async (ctx, next) => {
   await next();
   if(ctx.filePath ||!state.cachePage) return;
   const html = ctx.body.toString();
-  setTimeout(async () => {
+  setImmediate(async () => {
     await redisClient.setAsync(tocKey, ctx.reqTime.getTime());
     await redisClient.setAsync(dataKey, html);
     // 生成缓存记录

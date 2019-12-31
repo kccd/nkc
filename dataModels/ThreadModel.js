@@ -671,7 +671,7 @@ const defaultOptions = {
   category: false,
   firstPost: true,
   firstPostUser: true,
-  userInfo: true,
+  userInfo: false,
   lastPost: true,
   lastPostUser: true,
   firstPostResource: false,

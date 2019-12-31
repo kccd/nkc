@@ -97,7 +97,7 @@ schema.statics.saveUserSubUsersId = async (uid) => {
     uid
   }, {tUid: 1}).sort({toc: -1});
   const usersId = sub.map(s => s.tUid);
-  setTimeout(async () => {
+  setImmediate(async () => {
     await redisClient.delAsync(`user:${uid}:subscribeUsersId`);
     if(usersId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeUsersId`, usersId);
@@ -133,7 +133,7 @@ schema.statics.saveUserFansId = async (uid) => {
     tUid: uid
   }, {uid: 1}).sort({toc: -1});
   const usersId = sub.map(s => s.uid);
-  setTimeout(async () => {
+  setImmediate(async () => {
     await redisClient.delAsync(`user:${uid}:fansId`);
     if(usersId.length) {
       await redisClient.saddAsync(`user:${uid}:fansId`, usersId);
@@ -173,7 +173,7 @@ schema.statics.saveUserSubForumsId = async (uid) => {
     uid
   }, {fid: 1}).sort({toc: -1});
   const forumsId = subs.map(s => s.fid);
-  setTimeout(async () => {
+  setImmediate(async () => {
     await redisClient.delAsync(`user:${uid}:subscribeForumsId`);
     if(forumsId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeForumsId`, forumsId);
@@ -208,7 +208,7 @@ schema.statics.saveUserSubColumnsId = async (uid) => {
     uid
   }, {columnId: 1}).sort({toc: -1});
   const columnsId = subs.map(s => s.columnId);
-  setTimeout(async () => {
+  setImmediate(async () => {
     await redisClient.delAsync(`user:${uid}:subscribeColumnsId`);
     if(columnsId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeColumnsId`, columnsId);
@@ -255,7 +255,7 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
       sub.push(s.tid);
     }
   });
-  setTimeout(async () => {
+  setImmediate(async () => {
     let key = `user:${uid}:subscribeThreadsId`;
     await redisClient.delAsync(key);
     if(total.length) {
@@ -301,7 +301,7 @@ schema.statics.saveUserCollectionThreadsId = async (uid) => {
     uid
   }, {tid: 1}).sort({toc: -1});
   const threadsId = subs.map(s => s.tid);
-  setTimeout(async () => {
+  setImmediate(async () => {
     await redisClient.delAsync(`user:${uid}:collectionThreadsId`);
     if(threadsId.length) {
       await redisClient.saddAsync(`user:${uid}:collectionThreadsId`, threadsId);
@@ -381,7 +381,7 @@ schema.statics.saveUserSubscribeTypeToRedis = async (uid, typeId, subType) => {
   });
   const ids = subs.map(s => s[subKey]);
   const key = `user:${uid}:subscribeType:${typeId}:${subType}`;
-  setTimeout(async () => {
+  setImmediate(async () => {
     await redisClient.delAsync(key);
     if(ids.length) {
       await redisClient.saddAsync(key, ids);
@@ -460,7 +460,7 @@ schema.statics.getUserSubscribeTypesResults = async (uid) => {
   };
 };
 schema.statics.saveUserSubscribeTypesToRedis = async (uid, data) => {
-  setTimeout(async () => {
+  setImmediate(async () => {
     if(!data) {
       data = await mongoose.model("subscribes").getUserSubscribeTypesResults(uid);
     }

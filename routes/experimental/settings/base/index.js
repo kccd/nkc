@@ -9,7 +9,7 @@ baseRouter
 	})
 	.patch('/', async (ctx, next) => {
 		const {db, body} = ctx;
-		let {links, websiteName, github, copyright, record, description, keywords, brief, telephone} = body;
+		let {links, websiteName, github, copyright, record, description, keywords, brief, telephone, statement} = body;
 		if(!websiteName) ctx.throw(400, '网站名不能为空');
 		websiteName = websiteName.trim();
 		const serverSettings = await db.SettingModel.findOnly({_id: 'server'});
@@ -20,6 +20,7 @@ baseRouter
         github,
         copyright,
         record,
+			  statement,
         description,
         keywords: keywordsArr,
         brief,

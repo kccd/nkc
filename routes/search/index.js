@@ -197,7 +197,6 @@ router
 
       });
       const posts = await db.PostModel.find({pid: {$in: [...pids]}, reviewed: true});
-
       posts.map(post => {
         tids.add(post.tid);
         post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
@@ -208,7 +207,7 @@ router
       users.map(user => {
         userObj[user.uid] = user;
       });
-
+      
       let threads = await db.ThreadModel.find({tid: {$in: [...tids]}, reviewed: true});
       threads = await db.ThreadModel.extendThreads(threads, {
         forum: true,
@@ -271,7 +270,7 @@ router
             if(!ctx.permission("displayDisabledPosts")) {
               m.disabled = false;
             }
-            const obj = await db.ThreadModel.getPostStep(thread.tid, m);
+            // const obj = await db.ThreadModel.getPostStep(thread.tid, m);
             // link = `/t/${thread.tid}?page=${obj.page}&highlight=${post.pid}#${post.pid}`;
             link = await db.PostModel.getUrl(post);
           }
@@ -286,6 +285,7 @@ router
           r = {
             docType,
             link,
+            oc: thread.oc,
             title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
             abstract:
               highlightObj[`${pid}_pid`] ||
