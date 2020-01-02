@@ -114,4 +114,5 @@ const getKcb = async (uid, latestRecordId) => {
     num += limit;
   }
   console.log(`所有用户科创币记录核对完成`);
+  process.exit(0);
 })();
