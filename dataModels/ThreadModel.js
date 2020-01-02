@@ -446,7 +446,27 @@ threadSchema.methods.updateThreadEncourage = async function() {
   const encourageTotal = await KcbsRecordModel.count({type: "creditKcb", pid: {$in: pid}});
   await this.update({encourageTotal});
 };
+// threadSchema.methods.addCount = async function () {
+//   const ThreadModel = mongoose.model("threads");
+//   const thread = await ThreadModel.findOne({tid: this.tid});
+//   let {count, countToday, countRemain} = thread
+//   const userCount = await PostModel.aggregate([
+//     {
+//       $match: {
+//         tid: thread.tid
+//       }
+//     },
+//     {
+//       $group: {
+//         _id: "$uid"
+//       }
+//     }
+//   ]);
+//   updateObj.replyUserCount = userCount.length - 1;
 
+// }
+
+// 更新文章 信息
 threadSchema.methods.updateThreadMessage = async function() {
   const ThreadModel = mongoose.model("threads");
   const thread = await ThreadModel.findOne({tid: this.tid});
@@ -476,7 +496,6 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.countToday = await PostModel.count({tid: thread.tid, toc: {$gt: time}, parentPostId: ""});
   updateObj.countRemain = await PostModel.count({tid: thread.tid, disabled: {$ne: true}, parentPostId: ""});
   updateObj.uid = oc.uid;
-
   const userCount = await PostModel.aggregate([
     {
       $match: {
@@ -490,14 +509,18 @@ threadSchema.methods.updateThreadMessage = async function() {
     }
   ]);
   updateObj.replyUserCount = userCount.length - 1;
-
-
+  // 更新文章 统计数据
   await thread.update(updateObj);
+  
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
-  const forums = await thread.extendForums(['mainForums']);
-  await Promise.all(forums.map(async forum => {
-    await forum.updateForumMessage();
-  }));
+  setImmediate(async () => {
+    const forums = await thread.extendForums(['mainForums']);
+    // 更新主专业和次专业 信息
+    await Promise.all(forums.map(async forum => {
+      await forum.updateForumMessage();
+    }));
+  });
+  
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {

@@ -21,6 +21,7 @@ block title
   -const highlight = data.highlight;
   -const digestPost = data.userOperationsId.includes('digestPost') && data.isModerator;
   -const unDigestPost = data.userOperationsId.includes('unDigestPost')  && data.isModerator;
+  -let showEditor = true;
 
   if (thread.firstPost&&thread.firstPost.c)
     -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
@@ -760,7 +761,7 @@ block scripts
   if data.user
     include ../ueditor/ueditorBase
   include ../MathJax.pug
-  if data.user
+  if data.user  && showEditor
     +includeJS("/thread/initPostInput.js")
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")

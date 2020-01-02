@@ -88,8 +88,16 @@
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
+    "babel-cli": "^6.26.0",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.0",
+    "glob": "7.1.6",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
-    "gulp-less": "^4.0.1"
+    "gulp-less": "^4.0.1",
+    "gulp-rename": "2.0.0",
+    "pdfjs-dist": "^2.2.228",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
   }
 }
