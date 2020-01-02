@@ -516,8 +516,8 @@ threadRouter
       };
       let targetUserThreads = await db.ThreadModel.find(q).sort({toc: -1}).limit(10);
       data.targetUserThreads = await db.ThreadModel.extendThreads(targetUserThreads, {
-        forum: false,
-        firstPostUser: false,
+        forum: true,
+        firstPostUser: true,
         lastPost: false,
         excludeAnonymousPost: true
       });
@@ -730,8 +730,8 @@ threadRouter
 			]);
 			data.sameThreads = await db.ThreadModel.extendThreads(sameThreads, {
 			  lastPost: false,
-        forum: false,
-        firstPostUser: false
+        forum: true,
+        firstPostUser: true
       });
     }
 
