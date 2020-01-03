@@ -50,6 +50,8 @@ router
           mainForumsId: newMainForumsId,
           categoriesId: newCategoriesId
         });
+        thread.mainForumsId = newMainForumsId;
+        thread.categoriesId = newCategoriesId;
       }
       // await db.ForumModel.updateForumsMessage([...forumsId]);
     } else {
@@ -62,6 +64,8 @@ router
           categoriesId: [...threadTypesId],
           disabled: false
         });
+        thread.mainForumsId = [...forumsId];
+        thread.categoriesId = [...threadTypesId];
       }
       oldForumsId = oldForumsId.concat([...forumsId]);
       // await db.ForumModel.updateForumsMessage([...new Set(oldForumsId)]);

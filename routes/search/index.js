@@ -161,6 +161,9 @@ router
             if(r.highlight.pid) {
               highlightObj[r.pid + "_pid"] = "文号：" + r.highlight.pid;
             }
+            if(r.highlight.aid) {
+              highlightObj[r.pid + "_aid"] = "基金编号：" + r.highlight.aid;
+            }
             if(r.highlight.authors) {
               highlightObj[r.pid + "_authors"] = "作者：" + r.highlight.authors;
             }
@@ -262,6 +265,7 @@ router
           for(const fid of thread.mainForumsId) {
             if(!fidOfCanGetThreads.includes(fid)) continue loop1;
           }
+  
           let link;
           if(thread.oc === post.pid) {
             link = `/t/${thread.tid}`
@@ -289,6 +293,7 @@ router
             title: highlightObj[`${pid}_title`] || post.t || thread.firstPost.t,
             abstract:
               highlightObj[`${pid}_pid`] ||
+              highlightObj[`${pid}_aid`] ||
               highlightObj[`${pid}_authors`] ||
               highlightObj[`${pid}_keywordsEN`] ||
               highlightObj[`${pid}_keywordsCN`] ||

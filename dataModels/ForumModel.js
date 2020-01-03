@@ -404,29 +404,36 @@ forumSchema.statics.updateForumsMessage = async (fids) => {
 * */
 forumSchema.statics.updateCount = async function (threads, isAdd) {
 	const ForumModel = mongoose.model('forums');
+	const today = require("../nkcModules/apiFunction").today();
   const updateParentForums = async (forum, tif) => {
-    const countThreads = isAdd ? (forum.countThreads += tif.length) : (forum.countThreads -= tif.length);
+    if(!forum) return;
+    const countThreads = isAdd ? (forum.countThreads + tif.length) : (forum.countThreads - tif.length);
     let countPosts = forum.countPosts;
     let countPostsToday = forum.countPostsToday;
     tif.forEach(ele => {
-      isAdd ? (countPosts += ele.countRemain) : (countPosts -= ele.countRemain);
-      isAdd ? (countPostsToday += (ele.countToday + tif.length)) : (countPostsToday -= (ele.countToday + tif.length));
-    })
+      if(isAdd) {
+        countPosts += ele.count;
+        countPostsToday += ele.countToday + (ele.toc > today? 1: 0)
+      } else {
+        countPosts -= ele.count;
+        countPostsToday -= ele.countToday + (ele.toc > today? 1: 0)
+      }
+    });
     await forum.update({countThreads, countPosts, countPostsToday});
     if(forum.parentsId.length === 0) return;
     await updateParentForums(await ForumModel.findOne({fid: forum.parentsId}), tif);
-  }
+  };
 
-  const forums = {}
+  const forums = {};
   threads.forEach((ele,index) => {
     ele.mainForumsId.forEach(fid => {
       forums[fid] ? forums[fid].push(ele) : forums[fid] = [ele];
     })
-  })
+  });
   for (let fid in forums) {
     await updateParentForums(await ForumModel.findOne({fid}), forums[fid]);
   }
-}
+};
 
 /* 
   更新当前专业信息，再更新上级所有专业的信息
