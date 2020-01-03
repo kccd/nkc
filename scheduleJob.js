@@ -108,7 +108,7 @@ jobs.backupDatabase = () => {
 };
 
 jobs.updateForums = cronStr => {
-	const {ForumModel} = require('./dataModels');
+	const {ForumModel, ThreadModel} = require('./dataModels');
 	scheduleJob(cronStr, async () => {
 		const t = Date.now();
 		console.log('now updating the forums ...'.blue);
@@ -116,6 +116,7 @@ jobs.updateForums = cronStr => {
 		for(let forum of forums) {
 			await forum.updateForumMessage();
 		}
+		await ThreadModel.updateMany({countToday: {$ne: 0}}, {$set: {countToday: 0}});
 		console.log('done', Date.now()-t+'ms');
 	})
 };

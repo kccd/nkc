@@ -26,6 +26,7 @@ const threadSchema = new Schema({
   },
   countToday: {
     type: Number,
+    index: 1,
     default: 0
   },
   digest: {
