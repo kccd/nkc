@@ -28,7 +28,6 @@ router
         thread
       });
     }
-
     let updateForumsId = [];
 
     for(const r of results) {
@@ -59,7 +58,7 @@ router
         // 重新计算相关专业的信息（文章数量等）
         // await db.ForumModel.updateForumsMessage(forumsId);
         // 更新文章信息
-        await thread.updateThreadMessage();
+        // await thread.updateThreadMessage();
         data.thread = thread;
         data.post = post;
         // 根据后台科创币设置扣除作者的科创币
@@ -119,7 +118,6 @@ router
       }
     }
     await db.ForumModel.updateForumsMessage([...new Set(updateForumsId)]);
-
     await next();
   });
 module.exports = router;
