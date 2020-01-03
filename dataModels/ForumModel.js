@@ -390,50 +390,47 @@ forumSchema.methods.extendNoticeThreads = async function() {
 * @author pengxiguaa 2019-6-20
 * */
 forumSchema.statics.updateForumsMessage = async (fids) => {
+  console.log(222);
   const forums = await mongoose.model("forums").find({fid: {$in: fids}});
   for(const forum of forums) {
     await forum.updateForumMessage();
   }
 };
 
-forumSchema.methods.addCount = async function (threads) {
-  const ThreadModel = mongoose.model('threads');
+forumSchema.statics.updateCount = async function (threads, isAdd) {
+  console.time('111');
 	const ForumModel = mongoose.model('forums');
-  const PostModel = mongoose.model('posts');
-  // const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
-  // childrenFid.push(this.fid);
+  const updateParentForums = async (forum, tif) => {
+    const countThreads = isAdd ? (forum.countThreads += tif.length) : (forum.countThreads -= tif.length);
+    let countPosts = forum.countPosts;
+    let countPostsToday = forum.countPostsToday;
+    tif.forEach(ele => {
+      isAdd ? (countPosts += ele.countRemain) : (countPosts -= ele.countRemain);
+      isAdd ? (countPostsToday += ele.countToday) : (countPostsToday -= ele.countToday);
+    })
+    await forum.update({countThreads, countPosts, countPostsToday});
+    if(forum.parentsId.length === 0) return;
+    await updateParentForums(await ForumModel.findOne({fid: forum.parentsId}), tif);
+  }
 
-
-
-  // const updateParentForumsMessage = async (forum, thread) => {
-  //   const countThreads = (forum.countThreads += 1);
-  //   const countPosts = (forum.countPosts += thread.countPosts);
-  //   if(forum.parentsId.length === 0) return;
-  //   await updateParentForumsMessage(ForumModel.findOne({fid: forum.parentsId}));
-  // }
-
-  // threads.forEach(function (ele,index) {
-  //   const forum = ForumModel.findOne({fid: ele.fid});
-  //   await updateParentForumsMessage(forum, ele);
-  // })
-
-
-  // const newCountThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
-  // let {countPosts, countThreads, countPostsToday} = this
-  // if (newCountThreads !== countThreads) {
-  //   countThreads = newCountThreads;
-  // } else {
-  //   countPosts += (newCountThreads - countThreads)
-  // }
-  // countPostsToday += (newCountThreads - countThreads)
-
-  // await this.update({countPosts, countThreads, countPostsToday});
+  const forums = {}
+  threads.forEach((ele,index) => {
+    ele.mainForumsId.forEach(fid => {
+      forums[fid] ? forums[fid].push(ele) : forums[fid] = [ele];
+    })
+  })
+  for (let fid in forums) {
+    await updateParentForums(await ForumModel.findOne({fid}), forums[fid]);
+  }
+  console.timeEnd('111');
 }
+
 /* 
   更新当前专业信息，再更新上级所有专业的信息
   @author pengxiguaa 2019/1/26
 */
 forumSchema.methods.updateForumMessage = async function() {
+  console.log(1111111111111)
 	const ThreadModel = mongoose.model('threads');
 	const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
@@ -500,11 +497,11 @@ forumSchema.methods.newPost = async function(post, user, ip, cids, toMid, fids) 
   const thread = await new ThreadModel(t).save();
   const _post = await thread.newPost(post, user, ip);
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
-  await ForumModel.updateMany({fid: {$in: fids}}, {$inc: {
-    'tCount.normal': 1,
-    'countPosts': 1,
-    'countThreads': 1
-  }});
+  // await ForumModel.updateMany({fid: {$in: fids}}, {$inc: {
+  //   'tCount.normal': 1,
+  //   'countPosts': 1, 
+  //   'countThreads': 1
+  // }});
   return _post;
 };
 
@@ -1253,11 +1250,12 @@ forumSchema.statics.createNewThread = async function(options) {
   options.postType = "thread";
   const _post = await thread.createNewPost(options);
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
-  await ForumModel.updateMany({fid: {$in: options.fids}}, {$inc: {
-    'tCount.normal': 1,
-    'countPosts': 1,
-    'countThreads': 1
-  }});
+  await ForumModel.updateCount([thread], true);
+  // await ForumModel.updateMany({fid: {$in: options.fids}}, {$inc: {
+  //   'tCount.normal': 1,
+  //   'countPosts': 1,
+  //   'countThreads': 1
+  // }});
   // 生成关注记录 我发表的
   // await SubscribeModel.insertSubscribe("post", thread.uid, thread.tid);
   return _post;

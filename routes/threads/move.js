@@ -26,12 +26,12 @@ router
     }
 
     const threads = await db.ThreadModel.find({tid: {$in: threadsId}});
-
     // 验证处理者权限
     for(const thread of threads) {
       let isModerator = ctx.permission("superModerator") || await thread.isModerator(user, "or");
       if(!isModerator) ctx.throw(403, `您没有权限处理ID为 ${thread.tid} 的文章`);
     }
+    await db.ForumModel.updateCount(threads, false);
     if(moveType === "add") {
       for(const thread of threads) {
         let {mainForumsId, categoriesId} = thread;
@@ -51,7 +51,7 @@ router
           categoriesId: newCategoriesId
         });
       }
-      await db.ForumModel.updateForumsMessage([...forumsId]);
+      // await db.ForumModel.updateForumsMessage([...forumsId]);
     } else {
       let oldForumsId = [];
       for(const thread of threads) {
@@ -63,8 +63,9 @@ router
         });
       }
       oldForumsId = oldForumsId.concat([...forumsId]);
-      await db.ForumModel.updateForumsMessage([...new Set(oldForumsId)]);
+      // await db.ForumModel.updateForumsMessage([...new Set(oldForumsId)]);
     }
+    await db.ForumModel.updateCount(threads, true);
     await next();
   });
 module.exports = router;

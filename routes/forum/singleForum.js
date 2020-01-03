@@ -119,6 +119,7 @@ router
 		obj.type = 'kcb';
 		await db.KcbsRecordModel.insertSystemRecord('postToForum', data.user, ctx);
 		await thread.updateThreadMessage();
+		
 		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {

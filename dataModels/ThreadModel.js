@@ -469,6 +469,7 @@ threadSchema.methods.updateThreadEncourage = async function() {
 // 更新文章 信息
 threadSchema.methods.updateThreadMessage = async function() {
   const ThreadModel = mongoose.model("threads");
+  const ForumModel = mongoose.model("forums");
   const thread = await ThreadModel.findOne({tid: this.tid});
   const PostModel = mongoose.model('posts');
   const timeToNow = new Date();
@@ -513,13 +514,14 @@ threadSchema.methods.updateThreadMessage = async function() {
   await thread.update(updateObj);
   
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
-  setImmediate(async () => {
-    const forums = await thread.extendForums(['mainForums']);
-    // 更新主专业和次专业 信息
-    await Promise.all(forums.map(async forum => {
-      await forum.updateForumMessage();
-    }));
-  });
+  // 更新主专业和次专业 信息
+  // setImmediate(async () => {
+  //   const forums = await thread.extendForums(['mainForums']);
+  //   
+  //   await Promise.all(forums.map(async forum => {
+  //     await forum.updateForumMessage();
+  //   }));
+  // });
   
 };
 

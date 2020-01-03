@@ -28,7 +28,8 @@ router
         thread
       });
     }
-
+    // 原专业 减少回复数，贴子数
+    await db.ForumModel.updateCount(results.thread, false);
     let updateForumsId = [];
 
     for(const r of results) {
@@ -59,7 +60,7 @@ router
         // 重新计算相关专业的信息（文章数量等）
         // await db.ForumModel.updateForumsMessage(forumsId);
         // 更新文章信息
-        await thread.updateThreadMessage();
+        // await thread.updateThreadMessage();
         data.thread = thread;
         data.post = post;
         // 根据后台科创币设置扣除作者的科创币
@@ -118,7 +119,9 @@ router
         // 批量屏蔽回复
       }
     }
-    await db.ForumModel.updateForumsMessage([...new Set(updateForumsId)]);
+    // await db.ForumModel.updateForumsMessage([...new Set(updateForumsId)]);
+    // 新专业增加回复数，帖子数
+    await db.ForumModel.updateCount(results.thread, true);
 
     await next();
   });

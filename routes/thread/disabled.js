@@ -31,6 +31,7 @@ router
       }
     });
     await Promise.all(forums.map(async forum => {
+      console.log(333);
       await forum.updateForumMessage();
     }));
     await targetThread.updateThreadMessage();
