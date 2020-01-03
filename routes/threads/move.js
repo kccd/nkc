@@ -59,7 +59,8 @@ router
         oldForumsId = oldForumsId.concat(mainForumsId);
         await thread.update({
           mainForumsId: [...forumsId],
-          categoriesId: [...threadTypesId]
+          categoriesId: [...threadTypesId],
+          disabled: false
         });
       }
       oldForumsId = oldForumsId.concat([...forumsId]);
