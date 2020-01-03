@@ -49,11 +49,6 @@ module.exports = {
         sameMobileOneDay: 5
       }
     ],
-    restrictedNumber: [
-      {
-        code: 'ZH 86',
-        number: ['170']
-      }
-    ]
+    restrictedNumber: []
   }
 };

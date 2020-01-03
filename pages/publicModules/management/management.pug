@@ -1,7 +1,7 @@
 if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
-  .m-b-2
+  .m-b-1
     +includeCSS("/publicModules/management/management.css")
-    +listHeader("管理")
+    .panel-header 管理
     .module-managements
       if permission("nkcManagement")
         a.module-management(href="/nkc")

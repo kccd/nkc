@@ -383,7 +383,7 @@ table{
 }
 .paging-button{
   display: inline-block;
-  padding-right: 1rem;
+  padding-right: 0.5rem;
   margin-bottom: 0.5rem;
 
 }
@@ -413,7 +413,7 @@ table{
   text-align: center;
   min-width: 2rem;
   padding: 0 0.8rem;
-  font-size: 1.2rem;
+  font-size: 1rem;
   background-color: #9baec8;
 }
 .paging-button a.radius-left{
@@ -489,7 +489,7 @@ table{
 .paging-nav ul li{
   list-style: none;
   display: inline-block;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   margin-bottom: 0.3rem;
   color: #282c37;
@@ -530,7 +530,6 @@ table{
   border: 2px solid #2b90d9;
 }
 .canvas-logo{
-  padding: 1rem;
   border-radius: 3px;
 }
 .canvas-logo img{
@@ -552,7 +551,7 @@ table{
 }
 .active-user-avatar{
   display: inline-block;
-  padding: 0 0.9rem 1rem 0.9rem;
+  padding: 0 0.6rem 1rem 0.6rem;
   text-align: center;
 }
 .active-user-avatar a{
@@ -575,8 +574,8 @@ table{
 }
 
 footer.footer{
-  margin-top: 3rem;
-  background-color: #f9f9f9;
+  margin-top: 1rem;
+  background-color: #fff;
   border-top: 1px solid #eee;
   padding: 3rem 0 2rem 0;
   min-height: 28rem;
@@ -882,7 +881,7 @@ footer.footer ul li{
   width: 4rem;
   border-radius: 3px;
   overflow: hidden;
-  margin: 1rem 0.9rem 1rem 0.9rem;
+  margin: 0.3rem 0.5rem 0.3rem 0.5rem;
 }
 .side-user img{
   height: 100%;
@@ -898,12 +897,12 @@ footer.footer ul li{
 }
 .side-link:hover{
   text-decoration: none;
-  color: #282c37;
+  color: #666;
 }
 .side-thread-title{
   color: #646873;
   word-break: break-all;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
 }
 .side-thread-title:hover{
@@ -1508,6 +1507,7 @@ footer.footer ul li{
   margin-right: 1px;
   position: relative;
   transition: height 200ms;
+  word-break: break-word;
 }
 /*.thread-panel-abstract:hover{
   height: 4rem;
@@ -1710,6 +1710,20 @@ span.thread-title-page{
   background-color: #fff;
   border-radius: 3px;
 }
+.panel-header{
+  font-size: 1.25rem;
+  height: 3rem;
+  color: #777;
+  font-weight: 700;
+  box-sizing: border-box;
+  line-height: 3rem;
+}
+.box-shadow-panel>div>.panel-header{
+  margin: -15px -15px 1rem -15px;
+  border-bottom: 1px solid #f4f4f4;
+  padding: 0 1rem;
+}
+
 .forum-block{
   width: 100%;
   margin: 0.5rem 0;
@@ -1734,16 +1748,19 @@ span.thread-title-page{
   color: #282c37;
 }
 .forum-block-children{
-  display: none;
-  padding-left: 10px;
+  display: block;
+  padding-left: 1.2rem;
 }
 .forum-block-info{
   font-size: 0;
   line-height: 0;
 }
-.forum-block-name:hover, .forum-block-name:focus {
-  color: #282c37;
-  text-decoration: none;
+.forum-block-info.active{
+  background-color: #2b90d9;
+  border-radius: 2px;
+}
+.forum-block-info.active a{
+  color: #fff;
 }
 .forum-block-icon{
   height: 2rem;
@@ -1761,6 +1778,20 @@ span.thread-title-page{
   line-height: 2rem;
   vertical-align: top;
   transition: color 100ms;
+}
+.forum-block-name.child{
+  font-size: 1.2rem;
+  font-style: normal;
+  color: #282c37;
+}
+.forum-block-name:hover, .forum-block-name:focus {
+  /*color: #282c37;*/
+  color: #2b90d9;
+  text-decoration: none;
+}
+.forum-block-name.parent{
+  font-size: 1.25rem;
+  font-style: oblique;
 }
 .forum-block-button{
 
@@ -1953,7 +1984,7 @@ span.thread-title-page{
   color: #6e7f95;
 }
 .improve p{
-  color: #6e7f95;
+  color: #f58585;
 }
 .improve a{
   font-size: 1.2rem;
@@ -1971,10 +2002,162 @@ span.thread-title-page{
   height: 2rem;
   line-height: 2rem;
   background-color: #d9e1e8;
+  border-radius: 2px;
   margin-top: -1rem;
   margin-bottom: 1rem;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   text-align: center;
   color: #666;
+}
+
+
+.primary-buttons{
+
+}
+.primary-buttons .primary-button{
+  height: 2.5rem;
+  padding: 0 0.7rem;
+  font-size: 1.2rem;
+  border-radius: 3px;
+  line-height: 2.5rem;
+  display: inline-block;
+  color:#282c37;
   font-weight: 700;
+}
+.primary-buttons .primary-button:hover, .primary-buttons .primary-button:focus{
+  text-decoration: none;
+  color: #2b90d9;
+}
+.primary-buttons .primary-button.active{
+  color: #fff;
+  background-color: #2b90d9;
+}
+#moduleScrollTo{
+  position: fixed;
+  top: 51.4%;
+  z-index: 100;
+  margin-left: -1.1rem;
+  border-radius: 2px;
+  background-color: #fff;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+#moduleScrollTo .fa{
+  width: 1rem;
+  text-align: center;
+  height: 3rem;
+  line-height: 3rem;
+  cursor: pointer;
+  display: block;
+}
+#moduleScrollTo .fa:hover{
+  background-color: #f4f4f4;
+}
+
+.thread-author-info{
+  position: relative;
+}
+.thread-author-info .thread-author-avatar{
+  display: table-cell;
+  vertical-align: top;
+}
+.thread-author-info .thread-author-name{
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #555;
+}
+.thread-author-info .thread-author-base{
+  /*position: relative;*/
+}
+.thread-author-info .thread-author-time{
+  font-size: 1rem;
+  color: #444;
+  font-style: oblique;
+}
+.thread-author-info .thread-author-cert img{
+  vertical-align: top;
+  height: 1rem;
+  width: 1rem;
+  margin-right: 0.5rem;
+}
+.thread-author-info .thread-author-cert{
+  font-size: 1rem;
+  margin-top: 0.2rem;
+  font-style: oblique;
+  vertical-align: top;
+  color: #e85a71;
+  height: 1.3rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.thread-author-info .thread-author-avatar img{
+  width: 6rem;
+  margin-right: 0.5rem;
+  height: 6rem;
+  box-sizing: border-box;
+  margin-top: 0.1rem;
+  border: 2px solid #eee;
+  border-radius: 5px;
+}
+.thread-author-info .thread-author-base{
+  display: table-cell;
+  vertical-align: top;
+}
+.thread-author-number{
+  font-size: 0;
+}
+.thread-author-number .group{
+  font-size: 0;
+  display: inline-block;
+  text-align: center;
+  margin-right: 0.2rem;
+}
+.thread-author-number .group .name{
+  font-size: 1rem;
+  display: inline-block;
+}
+.thread-author-number .group .number{
+  font-size: 1.2rem;
+  display: inline-block;
+  font-weight: 700;
+  color: #e85a71;
+  font-style: oblique;
+}
+.thread-author-links{
+  text-align: center;
+  margin-top: 0.5rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+.thread-author-description{
+  padding: 0.2rem 0;
+  margin-top: 0.5rem;
+}
+.thread-author-link{
+  display: inline-block;
+  margin: 0 0.7rem;
+  color: #666;
+}
+.thread-author-link:hover{
+  color: #444;
+  text-decoration: none;
+}
+button.thread-author-subscribe{
+  border: 1px solid #eee;
+  background-color: #aaa;
+  color: #fff;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 1.8rem;
+  line-height: 1.8rem;
+  font-size: 1rem;
+  border-radius: 3px;
+}
+button.thread-author-subscribe.active{
+  background-color: #2b90d9;
+}
+button.thread-author-subscribe:focus{
+  outline: none;
 }

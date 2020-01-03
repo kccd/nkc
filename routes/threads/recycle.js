@@ -28,8 +28,6 @@ router
         thread
       });
     }
-    // 原专业 减少回复数，贴子数
-    await db.ForumModel.updateCount(results.thread, false);
     let updateForumsId = [];
 
     for(const r of results) {
@@ -119,10 +117,7 @@ router
         // 批量屏蔽回复
       }
     }
-    // await db.ForumModel.updateForumsMessage([...new Set(updateForumsId)]);
-    // 新专业增加回复数，帖子数
-    await db.ForumModel.updateCount(results.thread, true);
-
+    await db.ForumModel.updateForumsMessage([...new Set(updateForumsId)]);
     await next();
   });
 module.exports = router;

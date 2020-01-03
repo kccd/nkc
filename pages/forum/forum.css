@@ -1,19 +1,18 @@
 body{
-  background-color: #fff!important;
+  background-color: #f4f4f4;
 }
 .forum-info-panel{
   width: 100%;
-  height: 8rem;
-  overflow: hidden;
+  height: 9.6rem;
   position: relative;
 }
 .forum-banner{
   width: 100%;
-  height: 100%;
+  height: 7rem;
   top: 0;
   left: 0;
   position: absolute;
-  border-radius: 3px;
+  border-radius: 3px 3px 0 0;
   overflow: hidden;
 }
 .forum-banner-img{
@@ -34,53 +33,63 @@ body{
 }
 .forum-info-body{
   width: 100%;
-  padding-top: 1.8rem;
   position: absolute;
-  top: 0;
+  top: 3rem;
   left: 0;
   color: #fff;
-  display: flex;
-  display: -webkit-flex;
 }
 .forum-avatar{
-  flex-grow: 0;
-  width: 7rem;
-  margin-left: 1rem;
-  -webkit-flex-grow: 0;
+  vertical-align: top;
+  padding-left: 1rem;
+  padding-right: 1rem;
   text-align: center;
+  display: table-cell;
 }
-.forum-avatar img{
-  height: 4rem;
-  width: 4rem;
-  padding: 2px;
-  border-radius: 50%;
+.forum-avatar .forum-avatar-icon{
+  width: 6rem;
+  height: 6rem;
+  border: 3px solid #fff;
+  box-sizing: border-box;
+  border-radius: 5px;
   background-color: #fff;
 }
 .forum-info{
-  flex-grow: 1;
+  display: table-cell;
+  vertical-align: top;
+  width: 100%;
   color: #282c37;
-  -webkit-flex-grow: 1;
   position: relative;
 }
-.forum-name{
+.forum-info-body .forum-name{
   font-size: 1.6rem;
-  position: absolute;
-  top: 0;
+  font-weight: 700;
   color: #fff;
-  left: 0;
-  z-index: 100;
-  font-weight: 500;
+  display: block;
+  height: 2rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  padding-right: 5rem;
 }
 .forum-abbr{
-  padding-top: 0.5rem;
+  padding-top: 0.25rem;
   font-size: 1.1rem;
+  height: 2rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
   color: #eee;
   width: 100%;
 }
 .forum-sub-btn{
   height: 2rem;
   margin-left: 1rem;
-  padding: 0 1rem;
+  border-radius: 3px;
+  padding: 0 0.7rem;
   line-height: 2rem;
   vertical-align: text-bottom;
   color: #fff;
@@ -99,30 +108,26 @@ body{
   border-color: #2b90d9;
 }
 .forum-category{
-  padding: 0;
-  background-color: #d9e1e8;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
   border-radius: 3px;
+  margin-bottom: 1rem;
   text-align: left;
 }
 .forum-category a.active{
-  color: #fff;
-  background-color: #9baec8;
+  color: #2b90d9;
 }
 .forum-category a{
-  display: inline-block;
-  height: 2rem;
-  line-height: 2rem;
-  padding: 0 0.2rem;
+  margin-right: 0.5rem;
   border-radius: 2px;
   text-decoration: none;
-  margin-right: 0.3rem;
   color: #656565;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 .forum-category a:hover{
-  background-color: #9baec8;
-  color: #fff;
+  color: #2b90d9;
 }
 .forum-count{
   text-align: center;
@@ -147,12 +152,8 @@ body{
   line-height: 2rem;
 }
 .forum-description{
-  margin-top: 1rem;
-  overflow: hidden;
-  border-radius: 3px;
-  background-color: #d9e1e8;
-  padding: 1rem 0.5rem 1rem 0.5rem;
-  text-align: center;
+  font-size: 1.2rem;
+  font-style: oblique;
 }
 .forum-description-header, .forum-panel-header, .forum-user-header{
   height: 3rem;
@@ -237,4 +238,89 @@ body{
   color: #333;
   border-color: #999;
   outline: none;
+}
+
+.forum-info-panel .forum-buttons{
+  position: absolute;
+  top: 0;
+  right: 1rem;
+}
+.forum-info-panel .forum-post-count{
+  margin-top: 0.25rem;
+}
+.forum-info-panel .forum-post-count .count-group{
+  display: inline-block;
+}
+.forum-info-panel .forum-post-count .name{
+  display: inline-block;
+  font-size: 1rem;
+  color:#555;
+}
+.forum-info-panel .forum-post-count .count{
+  display: inline-block;
+  font-size: 1.4rem;
+  color: #e85a71;
+  font-weight: 700;
+  font-style: oblique;
+}
+.forum-moderators .forum-moderator:last-child{
+  margin-bottom: 0;
+}
+.forum-moderator{
+  display: block;
+  margin-bottom: 0.6rem;
+}
+.forum-moderator:hover , .forum-moderator:focus{
+  text-decoration: none;
+}
+.forum-moderator .forum-moderator-avatar{
+  display: table-cell;
+  vertical-align: top;
+}
+.forum-moderator .forum-moderator-avatar img{
+  height: 4rem;
+  width: 4rem;
+  box-sizing: border-box;
+  margin-right: 0.5rem;
+  border: 2px solid #eee;
+  border-radius: 3px;
+}
+.forum-moderator .forum-moderator-info{
+  display: table-cell;
+  vertical-align: top;
+}
+.forum-moderator .forum-moderator-name{
+  color: #666;
+  height: 1.6rem;
+  font-size: 1.3rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  margin-top: 0.2rem;
+}
+.forum-moderator .forum-moderator-description{
+  height: 1.6rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  color: #999;
+  font-size: 1.15rem;
+  font-style: oblique;
+  margin-top: 0.3rem;
+}
+.forum-links{
+
+}
+.forum-links .forum-link{
+  color: #757d87;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+.forum-links .forum-link:hover, .forum-links .forum-link:focus{
+  text-decoration: none;
+  color: #333;
 }

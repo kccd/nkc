@@ -1,5 +1,5 @@
-.side-thread-list
-  .side-thread-header= sideThreadsHeader
+.side-thread-list.m-b-1
+  .panel-header=sideThreadsHeader
   for t in sideThreads
     .side-thread
       a(href=`/t/${t.tid}`).side-thread-title= t.firstPost.t

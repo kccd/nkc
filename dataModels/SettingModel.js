@@ -117,17 +117,15 @@ settingSchema.statics.saveSettingsToRedis = async (_id) => {
 * */
 settingSchema.statics.checkRestricted = async (code, number) => {
   const c = await mongoose.model("settings").getSettings('sms');
-  let numbers = [];
-  c.restrictedNumber.forEach(ele => {
+  for(const ele of c.restrictedNumber) {
     if (ele.code.split(' ')[1] === code) {
-      numbers = ele.number;
+      ele.number.map(n => {
+        const index = number.indexOf(n);
+        if(index === 0) throwErr(403, "此号码受限制");
+      });
     }
-  });
-  numbers.map(n => {
-    const index = number.indexOf(n);
-    if(index === 0) throwErr(403, "此号码受限制");
-  });
-}
+  }
+};
 
 /* 
   根据用户的证书以及等级 获取用户与下载相关的设置

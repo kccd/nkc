@@ -93,9 +93,20 @@ block content
               a(class=data.t==="resource"?"active":"" onclick="app.clickNav('resource')") 文件
         .col-xs-12.col-md-7.search-results
           if data.total > 0
+            mixin buttons
+              if permission("superModerator") && data.t === "thread"
+                .display-i-b(style="margin-bottom: -2rem;")
+                  .paging-button
+                    a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                  .paging-button.management-thread-panel
+                    a.button.radius-left(onclick="selectAll()") 全选
+                    a.button(onclick="moveSelectedThreads()") 移动
+                    a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
             h5=`约找到 ${data.total} 条结果，耗时 ${data.time/1000} 秒`
+            +buttons()
             for result in data.results
               include ./searchResult
+            +buttons()
             include ../publicModules/paging/paging_input
           else
             h5=`啥也没有找到(ಥ_ʖಥ)，白白浪费 ${data.time/1000} 秒的时间~`
@@ -111,6 +122,10 @@ block content
 block scripts
   include ../publicModules/selectForum/selectForum
   include ../publicModules/resourceInfo/resourceInfo
+  if permission("superModerator")
+    include ../publicModules/moveThread/moveThread
+    include ../publicModules/disabledPost/disabledPost
+    +includeJS("/publicModules/thread_panel/management.js")
   if data.user
     include ../publicModules/subscribeTypes/subscribeTypes
   +includeJS("/search/search.js")

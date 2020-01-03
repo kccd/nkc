@@ -82,14 +82,7 @@ module.exports = async (options) => {
   // 浏览过的专业
   if(data.user) {
     const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 20);
-    const visitedForums = await db.ForumModel.find({fid: {$in: visitedForumsId}});
-    const visitedForumsObj = {};
-    visitedForums.map(forum => visitedForumsObj[forum.fid] = forum);
-    data.visitedForums = [];
-    for(const fid of visitedForumsId) {
-      const forum = visitedForumsObj[fid];
-      if(forum) data.visitedForums.push(forum);
-    }
+    data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
   }
   // 管理操作
   if(ctx.permission("complaintGet")) {

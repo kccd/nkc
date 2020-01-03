@@ -8,8 +8,8 @@ block content
   .container-fluid.max-width
     include ../publicModules/mobile_drawer/mobile_drawer
     .row
-      .col-xs-12.col-md-2
-        .user-card-panel.m-b-2
+      .col-xs-12.col-md-2.box-shadow-panel.p-r-0
+        .p-a-0.m-b-1
           .user-image
             if permission("unBannedUser") || permission("bannedUser") || permission("clearUserInfo")
               .btn-ban
@@ -44,20 +44,21 @@ block content
             include ./module_user_grade
           .user-certs=data.targetUser.info.certsName
           if !data.user || data.user.uid !== data.targetUser.uid
-            .user-button
-              if data.user
-                a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
-                if data.targetUser.column
-                  a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
-                if data.userSubUid.includes(data.targetUser.uid)
-                  a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", false)`) 已关注
+            .user-card-panel
+              .user-button
+                if data.user
+                  a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
+                  if data.targetUser.column
+                    a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
+                  if data.userSubUid.includes(data.targetUser.uid)
+                    a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", false)`) 已关注
+                  else
+                    a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", true)`) 关注
                 else
-                  a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", true)`) 关注
-              else
-                a(onclick="Login.open()") 私信
-                if data.targetUser.column
-                  a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
-                a(onclick="Login.open()") 关注
+                  a(onclick="Login.open()") 私信
+                  if data.targetUser.column
+                    a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
+                  a(onclick="Login.open()") 关注
           else if data.targetUser.column
             .user-button
               a.user-button-column.only-one(href=`/m/${data.targetUser.column._id}`) 专栏
@@ -75,23 +76,28 @@ block content
               .number=data.targetUser.kcb/100
               .title 科创币
           .user-description!=markdown_safe(data.targetUser.description || "")
-          .user-register=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
+          .user-register.p-b-1=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
         #leftDom.hidden-sm.hidden-xs
           if data.targetUserSubForums && data.targetUserSubForums.length > 0
-            .user-card-panel.m-b-2
-              .user-card-panel-header 关注的领域
+            .panel-header 关注的领域
+            .m-b-2
               -const forumsItem = data.targetUserSubForums;
               .user-card-sub-div
                 include ../publicModules/forums_nav/forums_item
-          .m-b-1
+          if permission("visitUserTransaction")
+            .panel-header 管理
+            .m-b-2
+              .user-card-sub-div
+                a(href=`/u/${data.targetUser.uid}/transaction`).btn.btn-default.btn-sm 查看地址信息
+          .m-b-1.row
             include ../publicModules/share/user-card
           if data.user &&  data.user.uid !== data.targetUser.uid
             .m-b-1
               .user-card-complaint(
                 onclick=`moduleComplaint.open('user', '${data.targetUser.uid}')`
               ) 投诉
-      .col-xs-12.col-md-7
-        .post-panel.b-s-10.m-b-2
+      .col-xs-12.col-md-7.box-shadow-panel.p-r-0
+        .post-panel.b-s-10
           include ../publicModules/paging/user_card
           if data.user && data.user.uid === data.targetUser.uid && state.userColumn
             .paging-button
@@ -140,38 +146,37 @@ block content
                 a.pointer.button(onclick="selectAll()") 全选
                 a.pointer.button.radius-right(onclick="toColumn()") 推送到专栏
           include ../publicModules/paging/paging_input
-      .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom
-        include ../module_scrollTo
+      .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom.box-shadow-panel
         if data.targetUserDigestThreads && data.targetUserDigestThreads.length > 0
-          .m-b-2
+          .m-b-1
+            .panel-header 作者精选
             -let sideThreads = data.targetUserDigestThreads
-            -let sideThreadsHeader = "作者精选"
             include ./side_thread_list
         if data.featuredThreads && data.featuredThreads.length > 0
-          .m-b-2
+          .m-b-1
+            .panel-header 全站精选
             -let sideThreads = data.featuredThreads
-            -let sideThreadsHeader = "全站精选"
             include ./side_thread_list
         if data.recommendThreads && data.recommendThreads.length > 0
-          .m-b-2
+          .m-b-1
+            .panel-header 推荐文章
             -let sideThreads = data.recommendThreads
-            -let sideThreadsHeader = "推荐文章"
             include ./side_thread_list
         if data.targetUserFans && data.targetUserFans.length > 0
-          .m-b-2
+          .m-b-1
+            .panel-header 粉丝
             -let sideUsers = data.targetUserFans
-            -let sideUsersHeader = "粉丝"
-              
             -let sideUsersLink = `/u/${data.targetUser.uid}?t=fans`
             include ./side_user_list
         if data.targetUserFollowers && data.targetUserFollowers.length > 0
           .m-b-2
+            .panel-header 关注
             -let sideUsers = data.targetUserFollowers
-            -let sideUsersHeader = "关注"
             -let sideUsersLink = `/u/${data.targetUser.uid}?t=follow`
             include ./side_user_list
 
 block scripts
+  include ../publicModules/toTop
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug

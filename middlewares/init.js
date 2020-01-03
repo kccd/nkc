@@ -35,11 +35,18 @@ module.exports = async (ctx, next) => {
       this.__templateFile = fileName
     }
   });
+  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
+  let XFF = ctx.get('X-Forwarded-For');
+  if(XFF !== '') {
+    XFF = XFF.replace(/::ffff:/ig, '');
+    const [ip_] = XFF.split(':');
+    if(ip_) ip = ip_;
+  }
   try{
     ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   } catch(err) {
     if(err.status === 404) {
-      console.log(`未知来源的请求：${ctx.method} ${ctx.url}`.bgRed);
+      console.log(`未知请求：${ip} ${ctx.method} ${ctx.url}`.bgRed);
       ctx.template = "error/error.pug";
       ctx.status = 404;
       ctx.data.status = 404;
@@ -51,13 +58,6 @@ module.exports = async (ctx, next) => {
     return;
   }
   try {
-	  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
-    let XFF = ctx.get('X-Forwarded-For');
-	  if(XFF !== '') {
-	    XFF = XFF.replace(/::ffff:/ig, '');
-      [ip_] = XFF.split(':');
-      if(ip_) ip = ip_;
-    }
 	  ctx.address = ip;
 	  ctx.port = port;
     ctx.body = ctx.request.body;

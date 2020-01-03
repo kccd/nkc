@@ -19,6 +19,7 @@ router
     const forums = await targetThread.extendForums(["mainForums"]);
     const recycle = await db.ForumModel.findOnly({fid: 'recycle'});
     forums.push(recycle);
+    await db.ForumModel.updateCount([targetThread], false);
     await targetThread.update({
       mainForumsId: ["recycle"],
       categoriesId: [],
@@ -30,11 +31,12 @@ router
         reviewed: true
       }
     });
-    await Promise.all(forums.map(async forum => {
-      console.log(333);
-      await forum.updateForumMessage();
-    }));
+    // await Promise.all(forums.map(async forum => {
+    //   await forum.updateForumMessage();
+    // }));
     await targetThread.updateThreadMessage();
+    const newThread = await db.ThreadModel.findOnly({tid});
+    await db.ForumModel.updateCount([newThread], true);
 
     await db.KcbsRecordModel.insertSystemRecord('threadBlocked', data.targetUser, ctx);
     if(para && para.illegalType) {

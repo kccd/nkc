@@ -390,15 +390,19 @@ forumSchema.methods.extendNoticeThreads = async function() {
 * @author pengxiguaa 2019-6-20
 * */
 forumSchema.statics.updateForumsMessage = async (fids) => {
-  console.log(222);
   const forums = await mongoose.model("forums").find({fid: {$in: fids}});
   for(const forum of forums) {
     await forum.updateForumMessage();
   }
 };
 
+/*
+* 更新多个专业的统计数据
+* @param {[String]} threads 更改的文章
+* @param {[Boolean]} isAdd 是否为加操作
+* @author ll 2020-1-3
+* */
 forumSchema.statics.updateCount = async function (threads, isAdd) {
-  console.time('111');
 	const ForumModel = mongoose.model('forums');
   const updateParentForums = async (forum, tif) => {
     const countThreads = isAdd ? (forum.countThreads += tif.length) : (forum.countThreads -= tif.length);
@@ -406,7 +410,7 @@ forumSchema.statics.updateCount = async function (threads, isAdd) {
     let countPostsToday = forum.countPostsToday;
     tif.forEach(ele => {
       isAdd ? (countPosts += ele.countRemain) : (countPosts -= ele.countRemain);
-      isAdd ? (countPostsToday += ele.countToday) : (countPostsToday -= ele.countToday);
+      isAdd ? (countPostsToday += (ele.countToday + tif.length)) : (countPostsToday -= (ele.countToday + tif.length));
     })
     await forum.update({countThreads, countPosts, countPostsToday});
     if(forum.parentsId.length === 0) return;
@@ -422,7 +426,6 @@ forumSchema.statics.updateCount = async function (threads, isAdd) {
   for (let fid in forums) {
     await updateParentForums(await ForumModel.findOne({fid}), forums[fid]);
   }
-  console.timeEnd('111');
 }
 
 /* 
@@ -430,47 +433,46 @@ forumSchema.statics.updateCount = async function (threads, isAdd) {
   @author pengxiguaa 2019/1/26
 */
 forumSchema.methods.updateForumMessage = async function() {
-  console.log(1111111111111)
-	const ThreadModel = mongoose.model('threads');
-	const ForumModel = mongoose.model('forums');
-  const PostModel = mongoose.model('posts');
-  const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
-  childrenFid.push(this.fid);
-  const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
-  
-  let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}, parentPostId: ""});
-  
-  countPosts = countPosts - countThreads;
-	const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
-  const normal = countThreads - digest;
-	const tCount = {
-		digest,
-		normal
-	};
-	const {today} = require('../nkcModules/apiFunction');
-  const countPostsToday = await PostModel.count({mainForumsId: {$in: childrenFid}, toc: {$gt: today()}, parentPostId: ""});
-  await this.update({tCount, countPosts, countThreads, countPostsToday});
-  const updateParentForumsMessage = async (forum) => {
-    if(forum.parentsId.length === 0) return;
-    const parentsForums = await ForumModel.find({fid: {$in: forum.parentsId}});
-    await Promise.all(parentsForums.map(async parentForum => {
-      const childForums = await parentForum.extendChildrenForums();
-      let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
-      childForums.map(f => {
-        countThreads += f.countThreads;
-        countPosts += f.countPosts;
-        countPostsToday += f.countPostsToday;
-        digest += f.tCount.digest;
-      });
-      const tCount = {
-        digest,
-        normal: (countThreads - digest)
-      };
-      await parentForum.update({countThreads, countPosts, countPostsToday, tCount});
-      await updateParentForumsMessage(parentForum);
-    }));
-  }
-  await updateParentForumsMessage(this);
+  setImmediate(async () => {
+    const ThreadModel = mongoose.model('threads');
+    const ForumModel = mongoose.model('forums');
+    const PostModel = mongoose.model('posts');
+    const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
+    childrenFid.push(this.fid);
+    const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
+    let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}, parentPostId: ""});
+    countPosts = countPosts - countThreads;
+    const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
+    const normal = countThreads - digest;
+    const tCount = {
+      digest,
+      normal
+    };
+    const {today} = require('../nkcModules/apiFunction');
+    const countPostsToday = await PostModel.count({mainForumsId: {$in: childrenFid}, toc: {$gt: today()}, parentPostId: ""});
+    await this.update({tCount, countPosts, countThreads, countPostsToday});
+    const updateParentForumsMessage = async (forum) => {
+      if(forum.parentsId.length === 0) return;
+      const parentsForums = await ForumModel.find({fid: {$in: forum.parentsId}});
+      await Promise.all(parentsForums.map(async parentForum => {
+        const childForums = await parentForum.extendChildrenForums();
+        let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
+        childForums.map(f => {
+          countThreads += f.countThreads;
+          countPosts += f.countPosts;
+          countPostsToday += f.countPostsToday;
+          digest += f.tCount.digest;
+        });
+        const tCount = {
+          digest,
+          normal: (countThreads - digest)
+        };
+        await parentForum.update({countThreads, countPosts, countPostsToday, tCount});
+        await updateParentForumsMessage(parentForum);
+      }));
+    };
+    await updateParentForumsMessage(this);
+  });
 };
 
 
@@ -1361,5 +1363,21 @@ forumSchema.statics.getForumNav = async (fids = [], fid) => {
   func(results, fid);
   return results;
 };
-
+/*
+* 通过fid数组获取专业对象数组
+* @param {[String]} fid fid数组
+* @return {[Object]} 专业对象数组
+* */
+forumSchema.statics.getForumsByFid = async (fid) => {
+  const ForumModel = mongoose.model("forums");
+  const visitedForums = await ForumModel.find({fid: {$in: fid}});
+  const visitedForumsObj = {};
+  visitedForums.map(forum => visitedForumsObj[forum.fid] = forum);
+  const results = [];
+  for(const id of fid) {
+    const forum = visitedForumsObj[id];
+    if(forum) results.push(forum);
+  }
+  return results;
+};
 module.exports = mongoose.model('forums', forumSchema);

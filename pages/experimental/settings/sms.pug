@@ -7,7 +7,7 @@ block content
   -const mainContainer1400 = true;
   -const hiddenFooter = true;
   #data.hidden= JSON.stringify(data.smsSettings)
-  .container-fluid(style='max-width: 1400px;' v-cloak)#app
+  .container-fluid.max-width(v-cloak)#app
     .row
       include ../nav
     .row
@@ -42,8 +42,8 @@ block content
           table.mdui-table
             thead
               tr
-                th 国际前缀
-                th 受限制号码
+                th 国际区号
+                th 受限制号码(英文逗号分隔)
                 th 操作
             tbody    
               tr(v-for='(res, index) in smsSettings.restrictedNumber' :key="index")

@@ -493,9 +493,9 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.toc = oc.toc;
   updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
-  updateObj.count = await PostModel.count({tid: thread.tid, parentPostId: ""});
-  updateObj.countToday = await PostModel.count({tid: thread.tid, toc: {$gt: time}, parentPostId: ""});
-  updateObj.countRemain = await PostModel.count({tid: thread.tid, disabled: {$ne: true}, parentPostId: ""});
+  updateObj.count = await PostModel.count({tid: thread.tid, type: "post", parentPostId: ""});
+  updateObj.countToday = await PostModel.count({tid: thread.tid, type: "post", toc: {$gt: time}, parentPostId: ""});
+  updateObj.countRemain = await PostModel.count({tid: thread.tid, type: "post", disabled: {$ne: true}, parentPostId: ""});
   updateObj.uid = oc.uid;
   const userCount = await PostModel.aggregate([
     {
@@ -696,7 +696,7 @@ const defaultOptions = {
   category: false,
   firstPost: true,
   firstPostUser: true,
-  userInfo: true,
+  userInfo: false,
   lastPost: true,
   lastPostUser: true,
   firstPostResource: false,
@@ -1241,7 +1241,7 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
   const threads = await ThreadModel.find({
     tid: {$in: threadsId},
     mainForumsId: {$in: fid}, disabled: false, reviewed: true, recycleMark: {$ne: true}
-  });
+  }).sort({toc: -1});
   return await ThreadModel.extendThreads(threads, {
     lastPost: true,
     lastPostUser: true,
