@@ -86,8 +86,8 @@ apiready = function() {
             name: 'link',
             url: 'widget://html/link/link.html',
             pageParam: {
-                name: 'link',
-                linkUrl: this.href
+              name: 'link',
+              linkUrl: this.href
             }
           });
         }
@@ -124,17 +124,17 @@ apiready = function() {
       name: 'keyback'
     }, function(ret, err) {
       api.confirm({
-          title: '确定要退出吗？',
-          msg: '',
-          buttons: ['确定', '取消']
+        title: '确定要退出吗？',
+        msg: '',
+        buttons: ['确定', '取消']
       }, function(ret, err){
-          if( ret ){
-            if(ret.buttonIndex == 1){
-              api.closeWin();
-            }
-          }else{
+        if( ret ){
+          if(ret.buttonIndex == 1){
             api.closeWin();
           }
+        }else{
+          api.closeWin();
+        }
       });
     });
   }
@@ -144,7 +144,7 @@ apiready = function() {
 
 /**
  * 给url添加apptype参数
- * @param {*} urlStr 
+ * @param {*} urlStr
  */
 function addApptypeToUrl(url) {
   // 去掉hash值
@@ -169,7 +169,7 @@ function addApptypeToUrl(url) {
 
 /**
  * 使用api对象中的方法打开新连接
- * @param {} urlStr 
+ * @param {} urlStr
  */
 function appOpenUrl(urlStr) {
   var origin = window.location.origin;
@@ -207,7 +207,7 @@ function appOpenUrl(urlStr) {
 
 /**
  * 使用api对象中的方法刷新当前页面的的链接
- * @param {*} key 
+ * @param {*} key
  */
 function appFreshUrl(urlStr) {
   var paramStr = addApptypeToUrl(urlStr)
@@ -226,7 +226,7 @@ function appFreshUrl(urlStr) {
 
 /**
  * 获取url中的app参数
- * @param {*} key 
+ * @param {*} key
  */
 function getQueryVariable(key)
 {
@@ -281,10 +281,10 @@ function getSiteMeta() {
 
 
 /**
-* @description 根据url判断分享类型
-* @param {String} sourceUrl
-* @return shareType
-*/
+ * @description 根据url判断分享类型
+ * @param {String} sourceUrl
+ * @return shareType
+ */
 function getShareTypeByUrl(sourceUrl) {
   var typeObj = {
     "thread": "/t/",
@@ -314,7 +314,7 @@ function getShareTypeByUrl(sourceUrl) {
 function linkWithEditor() {
   var withE = false;
   return withE;
-} 
+}
 
 function toAppLogin() {
   api.closeToWin({
@@ -332,10 +332,10 @@ function imageToApiDownload(url) {
     name: 'imageSave',
     url: 'widget://html/common/saveImageButton.html',
     pageParam: {
-        name: 'imageSave',
-        url: url
+      name: 'imageSave',
+      url: url
     },
-	  rect: {
+    rect: {
       x: 0,
       y: 0,
       w: 'auto',
@@ -344,11 +344,11 @@ function imageToApiDownload(url) {
     bounces: false,
     bgColor: 'rgba(0,0,0,0.5)',
     vScrollBarEnabled: false,
-	  animation: {
-	    type: 'movein',
-	    subType: 'from_bottom',
-	    duration: 300
-	  }
+    animation: {
+      type: 'movein',
+      subType: 'from_bottom',
+      duration: 300
+    }
   });
 }
 

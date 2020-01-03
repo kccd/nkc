@@ -75,6 +75,9 @@ func.init = async () => {
               tid: {
                 type: "keyword"
               },
+              aid: {
+                type: "keyword"
+              },
               keywordsCN: {
                 type: "keyword"
               },
@@ -107,9 +110,10 @@ func.init = async () => {
 * */
 func.save = async (docType, document) => {
   const apiFunction = require("../nkcModules/apiFunction");
-
+  const FundApplicationFormModel = require("../dataModels/FundApplicationFormModel");
   if(!["user", "post", "thread", "column", "columnPage", "resource"].includes(docType)) throwErr(500, "docType error");
 
+  let aid = "";
   const {
 
     pid = "", toc = new Date(), tid = "", uid = "",
@@ -123,7 +127,12 @@ func.save = async (docType, document) => {
     username = ""
 
   } = document;
-
+  
+  if(docType === "thread") {
+    const fundForm = await FundApplicationFormModel.findOne({tid});
+    if(fundForm) aid = fundForm.code;
+  }
+  
   // 唯一ID，存在测更新body，不存在则新建数据。
   let id;
 
@@ -153,6 +162,7 @@ func.save = async (docType, document) => {
       username,
       uid,
       tid,
+      aid,
       digest,
       mainForumsId,
       title: t,
@@ -222,6 +232,7 @@ func.search = async (t, c, options) => {
       post_tags: ['</span>'],
       fields: {
         pid: {},
+        aid: {},
         title: {},
         content: {},
         username: {},
@@ -254,6 +265,7 @@ func.search = async (t, c, options) => {
                           createMatch("title", c, 5, relation),
                           createMatch("content", c, 2, relation),
                           createMatch("pid", c, 100, relation),
+                          createMatch("aid", c, 100, relation),
                           createMatch("authors", c, 80, relation),
                           createMatch("abstractEN", c, 50, relation),
                           createMatch("abstractCN", c, 50, relation),

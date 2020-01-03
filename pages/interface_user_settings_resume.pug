@@ -80,6 +80,10 @@ block content
                   input.form-control#address(placeholder='详细地址' value=data.personalInfo.address)
                 .col-sm-2
                   +displaySelect('address')
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-5
+                  button.btn.btn-primary(onclick=`submit(${data.user.uid})`) 保存
         .panel.panel-default
           .panel-heading
             span 我的照片

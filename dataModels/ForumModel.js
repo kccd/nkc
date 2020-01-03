@@ -395,6 +395,47 @@ forumSchema.statics.updateForumsMessage = async (fids) => {
     await forum.updateForumMessage();
   }
 };
+
+/*
+* 更新多个专业的统计数据
+* @param {[String]} threads 更改的文章
+* @param {[Boolean]} isAdd 是否为加操作
+* @author ll 2020-1-3
+* */
+forumSchema.statics.updateCount = async function (threads, isAdd) {
+	const ForumModel = mongoose.model('forums');
+	const today = require("../nkcModules/apiFunction").today();
+  const updateParentForums = async (forum, tif) => {
+    if(!forum) return;
+    const countThreads = isAdd ? (forum.countThreads + tif.length) : (forum.countThreads - tif.length);
+    let countPosts = forum.countPosts;
+    let countPostsToday = forum.countPostsToday;
+    tif.forEach(ele => {
+      if(isAdd) {
+        countPosts += ele.count;
+        countPostsToday += ele.countToday + (ele.toc > today? 1: 0)
+      } else {
+        countPosts -= ele.count;
+        countPostsToday -= ele.countToday + (ele.toc > today? 1: 0)
+      }
+    });
+    countPostsToday = countPostsToday>0?countPostsToday:0;
+    await forum.update({countThreads, countPosts, countPostsToday});
+    if(forum.parentsId.length === 0) return;
+    await updateParentForums(await ForumModel.findOne({fid: forum.parentsId}), tif);
+  };
+
+  const forums = {};
+  threads.forEach((ele,index) => {
+    ele.mainForumsId.forEach(fid => {
+      forums[fid] ? forums[fid].push(ele) : forums[fid] = [ele];
+    })
+  });
+  for (let fid in forums) {
+    await updateParentForums(await ForumModel.findOne({fid}), forums[fid]);
+  }
+};
+
 /* 
   更新当前专业信息，再更新上级所有专业的信息
   @author pengxiguaa 2019/1/26
@@ -466,11 +507,11 @@ forumSchema.methods.newPost = async function(post, user, ip, cids, toMid, fids) 
   const thread = await new ThreadModel(t).save();
   const _post = await thread.newPost(post, user, ip);
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
-  await ForumModel.updateMany({fid: {$in: fids}}, {$inc: {
-    'tCount.normal': 1,
-    'countPosts': 1,
-    'countThreads': 1
-  }});
+  // await ForumModel.updateMany({fid: {$in: fids}}, {$inc: {
+  //   'tCount.normal': 1,
+  //   'countPosts': 1, 
+  //   'countThreads': 1
+  // }});
   return _post;
 };
 
@@ -979,7 +1020,7 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
 };
 
 /*
-* 获取专业树状结构，第二层和超过两层的都显示在第二层
+* 获取专业树状结构，仅显示前两层
 * @param {[object]} userRoles 用户的证书对象所组成的数组
 * @param {object} userGrade 用户的等级对象
 * @param {object} user 用户对象
@@ -1002,7 +1043,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     iconFileName: 1,
     description: 1
   }).sort({order: 1});
-
+  
   const forumsObj = {};
   forums = forums.map(forum => {
     forum = forum.toObject();
@@ -1010,7 +1051,23 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     forumsObj[forum.fid] = forum;
     return forum;
   });
-
+  
+  const results = [];
+  
+  for(const f of forums) {
+    if(!f.parentsId.length) {
+      results.push(f);
+    } else {
+      f.parentsId.map(fid => {
+        const parentForum = forumsObj[fid];
+        if(!parentForum) return;
+        parentForum.childrenForums.push(f);
+      });
+    }
+  }
+  return results;
+  
+  /*
   const insetForums = (childrenForums, fid) => {
     let arr = [];
     for(const f of forums) {
@@ -1032,7 +1089,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     }
   }
   
-  return results; 
+  return results;*/
 };
 
 /**
@@ -1219,11 +1276,12 @@ forumSchema.statics.createNewThread = async function(options) {
   options.postType = "thread";
   const _post = await thread.createNewPost(options);
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
-  await ForumModel.updateMany({fid: {$in: options.fids}}, {$inc: {
-    'tCount.normal': 1,
-    'countPosts': 1,
-    'countThreads': 1
-  }});
+  await ForumModel.updateCount([thread], true);
+  // await ForumModel.updateMany({fid: {$in: options.fids}}, {$inc: {
+  //   'tCount.normal': 1,
+  //   'countPosts': 1,
+  //   'countThreads': 1
+  // }});
   // 生成关注记录 我发表的
   // await SubscribeModel.insertSubscribe("post", thread.uid, thread.tid);
   return _post;
