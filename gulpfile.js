@@ -7,6 +7,7 @@ const browserify = require("browserify"),
       stream = require("vinyl-source-stream"),
       buffer = require('vinyl-buffer');
 const glob = require('glob');
+const watch = require("gulp-watch");
 
 const lessPath = `pages/**/*.less`;
 const cssDest = `pages`;
@@ -39,10 +40,13 @@ const mjsPath = `pages/**/*.mjs`;
 // });
 
 gulp.task('browserify', function (done) {
+  console.time('111');
+  // var tasks = null;
   glob(mjsPath,function (err, files) {
+    console.log(files);
     if (err) return done(err)
 
-    var tasks = files.map(function (entry) {
+    files.map(function (entry) {
       return browserify({
         entries: [entry],
         debug: true
@@ -57,13 +61,14 @@ gulp.task('browserify', function (done) {
       .pipe(gulp.dest('pages/'));
     })
   })
+  console.timeEnd('111');
   // stream.merge(tasks).on('end', done);
 })
 
 gulp.task("watch", () => {
-  gulp.watch(lessPath, gulp.series("buildCSS"));
-  gulp.watch(jsPath, gulp.series("buildJS"));
+  watch(lessPath, gulp.series("buildCSS"));
+  watch(jsPath, gulp.series("buildJS"));
   // gulp.watch(mjsPath, gulp.series("buildMJS"));
-  gulp.watch(mjsPath, gulp.series("browserify"));
+  watch(mjsPath, gulp.series("browserify"));
 });
 
