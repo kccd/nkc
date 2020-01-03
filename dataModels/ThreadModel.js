@@ -26,6 +26,7 @@ const threadSchema = new Schema({
   },
   countToday: {
     type: Number,
+    index: 1,
     default: 0
   },
   digest: {
@@ -446,9 +447,30 @@ threadSchema.methods.updateThreadEncourage = async function() {
   const encourageTotal = await KcbsRecordModel.count({type: "creditKcb", pid: {$in: pid}});
   await this.update({encourageTotal});
 };
+// threadSchema.methods.addCount = async function () {
+//   const ThreadModel = mongoose.model("threads");
+//   const thread = await ThreadModel.findOne({tid: this.tid});
+//   let {count, countToday, countRemain} = thread
+//   const userCount = await PostModel.aggregate([
+//     {
+//       $match: {
+//         tid: thread.tid
+//       }
+//     },
+//     {
+//       $group: {
+//         _id: "$uid"
+//       }
+//     }
+//   ]);
+//   updateObj.replyUserCount = userCount.length - 1;
 
+// }
+
+// 更新文章 信息
 threadSchema.methods.updateThreadMessage = async function() {
   const ThreadModel = mongoose.model("threads");
+  const ForumModel = mongoose.model("forums");
   const thread = await ThreadModel.findOne({tid: this.tid});
   const PostModel = mongoose.model('posts');
   const timeToNow = new Date();
@@ -472,11 +494,10 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.toc = oc.toc;
   updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
-  updateObj.count = await PostModel.count({tid: thread.tid, parentPostId: ""});
-  updateObj.countToday = await PostModel.count({tid: thread.tid, toc: {$gt: time}, parentPostId: ""});
-  updateObj.countRemain = await PostModel.count({tid: thread.tid, disabled: {$ne: true}, parentPostId: ""});
+  updateObj.count = await PostModel.count({tid: thread.tid, type: "post", parentPostId: ""});
+  updateObj.countToday = await PostModel.count({tid: thread.tid, type: "post", toc: {$gt: time}, parentPostId: ""});
+  updateObj.countRemain = await PostModel.count({tid: thread.tid, type: "post", disabled: {$ne: true}, parentPostId: ""});
   updateObj.uid = oc.uid;
-
   const userCount = await PostModel.aggregate([
     {
       $match: {
@@ -490,14 +511,19 @@ threadSchema.methods.updateThreadMessage = async function() {
     }
   ]);
   updateObj.replyUserCount = userCount.length - 1;
-
-
+  // 更新文章 统计数据
   await thread.update(updateObj);
+  
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
-  const forums = await thread.extendForums(['mainForums']);
-  await Promise.all(forums.map(async forum => {
-    await forum.updateForumMessage();
-  }));
+  // 更新主专业和次专业 信息
+  // setImmediate(async () => {
+  //   const forums = await thread.extendForums(['mainForums']);
+  //   
+  //   await Promise.all(forums.map(async forum => {
+  //     await forum.updateForumMessage();
+  //   }));
+  // });
+  
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {

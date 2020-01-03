@@ -811,7 +811,9 @@ threadRouter
     if(latestPost) ctx.throw(400, `您当前的账号等级限定发表回复/评论间隔时间不能小于${postToThreadTimeLimit}分钟，请稍后再试。`);
 
 		const {tid} = params;
-		const thread = await db.ThreadModel.findOnly({tid});
+    const thread = await db.ThreadModel.findOnly({tid});
+    const updateCount = await db.ForumModel.updateCount;
+    await updateCount([thread], false);
 		await thread.extendFirstPost();
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复/评论');
 
@@ -887,8 +889,9 @@ threadRouter
 		}
 		await thread.update({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
-		await thread.updateThreadMessage();
-
+    await thread.updateThreadMessage();
+    const newThread = await db.ThreadModel.findOnly({tid});
+    await updateCount([newThread], true);
 		// 发表评论 组装评论dom 返回给前端实时显示
 		if(postType === "comment") {
       let comment = await db.PostModel.findOnly({pid: data.post.pid});

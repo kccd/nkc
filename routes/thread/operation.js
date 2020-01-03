@@ -340,6 +340,7 @@ operationRouter
     const {data, db, body, params} = ctx;
     const {tid} = params;
     const thread = await db.ThreadModel.findOnly({tid});
+    const forumModel = db.ForumModel;
     await thread.extendForums(['mainForums', 'minorForums']);
     await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     const {fid, cid} = body;
@@ -366,9 +367,11 @@ operationRouter
     await thread.update({$addToSet: obj, categoriesId: [...new Set(categoriesId)]});
     await db.PostModel.updateMany({tid}, {$addToSet: {mainForumsId: fid}});
     await db.InfoBehaviorModel.updateMany({tid}, {$addToSet: {mainForumsId: fid}});
-    await Promise.all(forums.map(async forum => {
-      await forum.updateForumMessage();
-    }));
+    const newThread = await db.ThreadModel.findOnly({tid});
+    await forumModel.updateCount([newThread], true);
+    // await Promise.all(forums.map(async forum => {
+    //   await forum.updateForumMessage();
+    // }));
     await next();
   })
   .del('/forum', async (ctx, next) => {
@@ -376,6 +379,7 @@ operationRouter
     const {tid} = params;
     const {fid} = query;
     const thread = await db.ThreadModel.findOnly({tid});
+    const forumModel = await db.ForumModel;
     await thread.extendForums(['mainForums', 'minorForums']);
     await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     if(!thread.mainForumsId.includes(fid)) ctx.throw(400, '当前文章不属于该专业，请刷新');
@@ -395,9 +399,11 @@ operationRouter
     await thread.update(updateObj);
     await db.PostModel.updateMany({tid}, {$pull: {mainForumsId: fid}});
     await db.InfoBehaviorModel.updateMany({tid}, {$pull: {mainForumsId: fid}});
-    await Promise.all(forums.map(async forum => {
-      await forum.updateForumMessage();
-    }));
+    const newThread = await db.ThreadModel.findOnly({tid});
+    await forumModel.updateCount([newThread], false);
+    // await Promise.all(forums.map(async forum => {
+    //   await forum.updateForumMessage();
+    // }));
     await next();
   });
 

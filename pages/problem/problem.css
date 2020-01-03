@@ -24,6 +24,10 @@ ul.top-label .mdui-btn-block{
   overflow:hidden;
   text-overflow:ellipsis;
 }
+#page_count {
+  width: 100%;
+  height: 1500px;
+}
 @media screen and (max-width: 768px) {
   ul.top-label {
     padding: 0;
