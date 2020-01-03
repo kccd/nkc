@@ -1662,7 +1662,7 @@ span.thread-title-page{
   margin-right: 3px;
   color: white;
   background-color: #b6c828;
-  display: inline;
+  display: inline-block;
   font-size: 13px;
   padding: 2px 5px;
   line-height: 1;
