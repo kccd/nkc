@@ -50,6 +50,7 @@ router
           mainForumsId: newMainForumsId,
           categoriesId: newCategoriesId
         });
+        await db.PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId}});
         thread.mainForumsId = newMainForumsId;
         thread.categoriesId = newCategoriesId;
       }
@@ -64,6 +65,7 @@ router
           categoriesId: [...threadTypesId],
           disabled: false
         });
+        await db.PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId}});
         thread.mainForumsId = [...forumsId];
         thread.categoriesId = [...threadTypesId];
       }

@@ -419,6 +419,7 @@ forumSchema.statics.updateCount = async function (threads, isAdd) {
         countPostsToday -= ele.countToday + (ele.toc > today? 1: 0)
       }
     });
+    countPostsToday = countPostsToday>0?countPostsToday:0;
     await forum.update({countThreads, countPosts, countPostsToday});
     if(forum.parentsId.length === 0) return;
     await updateParentForums(await ForumModel.findOne({fid: forum.parentsId}), tif);
