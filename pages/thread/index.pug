@@ -206,6 +206,7 @@ block content
   -const {exactPost} = data
     .container-fluid.max-width
       .hidden#threadId= data.thread.tid
+      .hidden#threadForumsId=objToStr({pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
@@ -262,7 +263,13 @@ block content
                               button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
                             if data.userOperationsId.includes('openThread') && thread.closed
                               button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
-                          if permission('addThreadForum') || permission("removeThreadForum") || permission('moveThread') || permission("moveDraft")
+                            if permission("moveThreads")
+                               button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
+                            if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
+                              button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
+                          if data.thread.type === "fund"
+                            h5.text-danger 科创基金类文章无法退修
+                          //-if permission('addThreadForum') || permission("removeThreadForum") || permission('moveThread') || permission("moveDraft")
                             div
                               if permission('addThreadForum') || permission("removeThreadForum")
                                 div(v-if='forums.length !== 0')
@@ -271,9 +278,7 @@ block content
                                     for forum in thread.forums
                                       span(style=`border-radius: 4px;display: inline-block;margin-right: 0.5rem;color: #fff;padding: 0.5rem 1rem;background-color: ${forum.color}`)=`${forum.forumType === 'topic'?'(话题)':'(学科)'}${forum.displayName}`
                                         .fa.fa-remove(style='cursor: pointer;' onclick=`removeForumsId("${data.thread.tid}", "${forum.fid}")`)
-                                div(style='margin-top:0.5rem;').form-inline    
-                                  include ../forumlist_dropdown.pug
-                                  button.btn.btn-default(onclick=`addForum("${data.thread.tid}")`) 添加  
+
                               if permission('moveThread') || permission("moveDraft")
                                 if data.thread.type === "fund"
                                   h5.text-danger 科创基金类文章无法退修
@@ -458,7 +463,7 @@ block content
                                     -var tpid = thread.firstPost.pid
                                     p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
                                     .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
-                                    p.lighttext.airnum3(style="text-align:center;") #{(thread.count-1)?(thread.count-1)+' 回复 /':''} #{thread.hits+1} 浏览
+                                    p.lighttext.airnum3(style="text-align:center;") #{(thread.count)?(thread.count)+' 回复 /':''} #{thread.hits} 浏览
                                   if !state.apptype
                                     div.changeDisNone.text-center(style='width: 100%;')
                                       .col-xs-12.col-md-12
@@ -665,22 +670,11 @@ block scripts
   script=`NKC.configs.postHeight.sm=${data.postHeight.sm}`
   script=`NKC.configs.postHeight.md=${data.postHeight.md}`
   script=`NKC.configs.postHeight.float=${data.postHeight.float || 0.5}`
-  //script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plain_escaper.js')
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')
-  //- script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  if permission('addThreadForum')
-    +includeJS("/module_dropdown.js")
-  //script(src=`/jquery-ui-1.10.4.custom.js?v=${global.NKC.startTime}`)
-  //-if !state.apptype
-    script.
-      common.backcolorChange("#{(data.user?data.user.color:'#f4f4f4')||'#f4f4f4'}");
-  
-  //script(src='/external_pkgs/react/react.min.js')
-  //script(src='/external_pkgs/react/JSXTransformer.js')
-  //script(src=`/thread/socket.js?v=${startTime}`)
+
   +includeJS("/nkc_render.js")
   +includeJS("/interface_editor_reply.js")
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
@@ -695,6 +689,8 @@ block scripts
   include ../publicModules/crop/crop
   include ../publicModules/moment
   include ../publicModules/lazySizes
+  include ../publicModules/moveThread/moveThread
+  include ../publicModules/disabledPost/disabledPost
   if data.attachmentsCount > 0
     include ../publicModules/resourceInfo/resourceInfo
     include ../publicModules/attachments/attachments_js

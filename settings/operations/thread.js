@@ -3,11 +3,7 @@ module.exports = {
 	PARAMETER: {
 		GET: 'visitThread',
 		POST: 'postToThread',
-		disabled: {
-			POST: 'moveThread'
-		},
 		moveDraft: {
-			PATCH: 'moveDraft',
       reason: {
         PATCH: "modifyReasonThreadReturn"
       }
@@ -39,11 +35,6 @@ module.exports = {
 		close: {
 			POST: 'closeThread',
 			DELETE: 'openThread'
-    },
-    forum: {
-      POST: 'addThreadForum',
-      DELETE: 'removeThreadForum',
-      // PATCH: 'patchThreadForum'
     },
     subscribe: {
 		  POST: "subThread",

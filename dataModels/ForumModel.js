@@ -448,8 +448,7 @@ forumSchema.methods.updateForumMessage = async function() {
     const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
     childrenFid.push(this.fid);
     const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
-    let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}, parentPostId: ""});
-    countPosts = countPosts - countThreads;
+    let countPosts = await PostModel.count({type: "post", mainForumsId: {$in: childrenFid}, parentPostId: ""});
     const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
     const normal = countThreads - digest;
     const tCount = {
@@ -480,6 +479,7 @@ forumSchema.methods.updateForumMessage = async function() {
       }));
     };
     await updateParentForumsMessage(this);
+    console.log(`专业${this.fid}文章回复条数计算完毕。`);
   });
 };
 
