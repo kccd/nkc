@@ -1020,7 +1020,7 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
 };
 
 /*
-* 获取专业树状结构，第二层和超过两层的都显示在第二层
+* 获取专业树状结构，仅显示前两层
 * @param {[object]} userRoles 用户的证书对象所组成的数组
 * @param {object} userGrade 用户的等级对象
 * @param {object} user 用户对象
@@ -1043,7 +1043,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     iconFileName: 1,
     description: 1
   }).sort({order: 1});
-
+  
   const forumsObj = {};
   forums = forums.map(forum => {
     forum = forum.toObject();
@@ -1051,7 +1051,23 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     forumsObj[forum.fid] = forum;
     return forum;
   });
-
+  
+  const results = [];
+  
+  for(const f of forums) {
+    if(!f.parentsId.length) {
+      results.push(f);
+    } else {
+      f.parentsId.map(fid => {
+        const parentForum = forumsObj[fid];
+        if(!parentForum) return;
+        parentForum.childrenForums.push(f);
+      });
+    }
+  }
+  return results;
+  
+  /*
   const insetForums = (childrenForums, fid) => {
     let arr = [];
     for(const f of forums) {
@@ -1073,7 +1089,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     }
   }
   
-  return results; 
+  return results;*/
 };
 
 /**
