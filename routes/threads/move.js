@@ -35,13 +35,9 @@ router
     if(moveType === "add") {
       for(const thread of threads) {
         let {mainForumsId, categoriesId} = thread;
+        if(mainForumsId.includes("recycle")) ctx.throw(403, `无法给回收站中的文章添加专业`);
         // 排除掉已选专业中未被选择的文章分类
         const forumsId_ = [...forumsId];
-        for(const forumId of forumsId_) {
-          const forum = forumsObj[forumId];
-          const {cids} = forum;
-          categoriesId = categoriesId.filter(cid => !cids.includes(cid));
-        }
         mainForumsId = mainForumsId.concat(forumsId_);
         categoriesId = categoriesId.concat([...threadTypesId]);
         const newMainForumsId = [...new Set(mainForumsId)];
@@ -50,7 +46,7 @@ router
           mainForumsId: newMainForumsId,
           categoriesId: newCategoriesId
         });
-        await db.PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId}});
+        await thread.updateThreadMessage();
         thread.mainForumsId = newMainForumsId;
         thread.categoriesId = newCategoriesId;
       }
@@ -65,7 +61,7 @@ router
           categoriesId: [...threadTypesId],
           disabled: false
         });
-        await db.PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId}});
+        await thread.updateThreadMessage();
         thread.mainForumsId = [...forumsId];
         thread.categoriesId = [...threadTypesId];
       }

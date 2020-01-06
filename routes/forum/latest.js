@@ -35,10 +35,13 @@ latestRouter
     }
     // 加载、拓展置顶文章
     const toppedThreads = await db.ThreadModel.find(toppedThreadMatch).sort({tlm: -1});
-
+    
     data.toppedThreads = await db.ThreadModel.extendThreads(toppedThreads, {
       htmlToText: true
     });
+    if(forum.fid === "recycle") {
+      data.toppedThreads.map(t => t.disabled = false);
+    }
 
     const topThreadsId = toppedThreads.map(t => t.tid);
 
