@@ -531,6 +531,7 @@ fundApplicationFormSchema.methods.extendReportThreads = async function() {
 fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const PhotoModel = require('./PhotoModel');
 	const ForumModel = mongoose.model("forums");
+	const elasticSearch = require("../nkcModules/elasticSearch");
 	const ThreadModel = mongoose.model("threads");
 	const PostModel = mongoose.model("posts");
 	const FundDocumentModel = require('./FundDocumentModel');
@@ -742,6 +743,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
       l: "html"
     });
     await FundApplicationForm.updateOne({_id: this._id}, {$set: {tid: formPost.tid}});
+    await elasticSearch.save("thread", formPost);
     await ThreadModel.updateOne({tid: formPost.tid}, {$set: {reviewed: true}});
     await PostModel.updateOne({pid: formPost.pid}, {$set: {reviewed: true}});
   } else {

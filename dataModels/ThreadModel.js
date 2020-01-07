@@ -26,6 +26,7 @@ const threadSchema = new Schema({
   },
   countToday: {
     type: Number,
+    index: 1,
     default: 0
   },
   digest: {
@@ -469,13 +470,16 @@ threadSchema.methods.updateThreadEncourage = async function() {
 // 更新文章 信息
 threadSchema.methods.updateThreadMessage = async function() {
   const ThreadModel = mongoose.model("threads");
-  const ForumModel = mongoose.model("forums");
   const thread = await ThreadModel.findOne({tid: this.tid});
   const PostModel = mongoose.model('posts');
   const timeToNow = new Date();
   const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
   const updateObj = {};
-  const oc = await PostModel.findOne({tid: thread.tid}).sort({toc: 1});
+  const oc = await PostModel.findOneAndUpdate({tid: thread.tid}, {
+    $set: {
+      reviewed: thread.reviewed
+    }
+  }).sort({toc: 1});
   const lm = await PostModel.findOne({
     tid: thread.tid, disabled: false,
     parentPostId: "",
@@ -496,7 +500,6 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.count = await PostModel.count({tid: thread.tid, type: "post", parentPostId: ""});
   updateObj.countToday = await PostModel.count({tid: thread.tid, type: "post", toc: {$gt: time}, parentPostId: ""});
   updateObj.countRemain = await PostModel.count({tid: thread.tid, type: "post", disabled: {$ne: true}, parentPostId: ""});
-  updateObj.uid = oc.uid;
   const userCount = await PostModel.aggregate([
     {
       $match: {
@@ -512,17 +515,7 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.replyUserCount = userCount.length - 1;
   // 更新文章 统计数据
   await thread.update(updateObj);
-  
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
-  // 更新主专业和次专业 信息
-  // setImmediate(async () => {
-  //   const forums = await thread.extendForums(['mainForums']);
-  //   
-  //   await Promise.all(forums.map(async forum => {
-  //     await forum.updateForumMessage();
-  //   }));
-  // });
-  
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
@@ -1443,38 +1436,63 @@ threadSchema.statics.getRecommendThreads = async (fid) => {
 };
 
 /*
-* 移动退修修改超时的文章到回收站
-* @author pengxiguaa 2019-4-29
+* 将退修超时的文章移动到回收站
+* @author pengxiguaa 2020-1-6
 * */
 threadSchema.statics.moveRecycleMarkThreads = async () => {
   const ThreadModel = mongoose.model("threads");
+  const ForumModel = mongoose.model("forums");
   const DelPostLogModel = mongoose.model("delPostLog");
   const UserModel = mongoose.model("users");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
-  const PostModel = mongoose.model("posts");
   const nkcModules = require("../nkcModules");
   // 删除退修超时的帖子
   // 取出全部被标记的帖子
-  const allMarkThreads = await ThreadModel.find({ "recycleMark": true, "mainForumsId": { "$nin": ["recycle"] } });
-  for (var i in allMarkThreads) {
-    const delThreadLog = await DelPostLogModel.findOne({ "postType": "thread", "threadId": allMarkThreads[i].tid, "toc": {$lt: Date.now() - 3*24*60*60*1000}})
-    if(delThreadLog){
-      await allMarkThreads[i].update({ "recycleMark": false, "mainForumsId": ["recycle"], disabled: true, reviewed: true, categoriesId: []});
-      await PostModel.updateMany({"tid":allMarkThreads[i].tid},{$set:{"mainForumsId":["recycle"]}})
-      await DelPostLogModel.updateMany({"postType": "thread", "threadId": allMarkThreads[i].tid},{$set:{"delType":"toRecycle"}})
-      const tUser = await UserModel.findOne({uid: delThreadLog.delUserId});
-      const thread = await ThreadModel.findOne({tid: delThreadLog.threadId});
-      if(tUser && thread) {
-        await KcbsRecordModel.insertSystemRecord('threadBlocked', tUser, {
-          data: {
-            user: {},
-            thread
-          },
-          nkcModules,
-          db: require("./index")
-        });
-      }
+  const allMarkThreads = await ThreadModel.find({ "recycleMark": true});
+  let forumsId = [];
+  for(const thread of allMarkThreads) {
+    // 被退休的文章在delPostLogs中会生成一条记录，根据此记录判断是否超时
+    const delThreadLog = await DelPostLogModel.findOne({
+      postType: "thread",
+      threadId: thread.tid,
+      toc: {$lt: Date.now() - 3 * 24 * 60 * 60 * 1000}
+    });
+    // 未超时则忽略
+    if(!delThreadLog) continue;
+    // 将文章移动到回收站
+    forumsId = forumsId.concat(thread.mainForumsId);
+    await thread.update({
+      recycleMark: false,
+      mainForumsId: ["recycle"],
+      disabled: true,
+      reviewed: true,
+      categoriesId: []
+    });
+    // 更新文章信息（将文章下所有post的mainForumsId改为["recycle"]）
+    await thread.updateThreadMessage();
+    // 标记为已移动到回收站
+    await delThreadLog.update({
+      delType: "toRecycle"
+    });
+    const tUser = await UserModel.findOne({uid: thread.uid});
+    
+    // 文章被删，触发科创币加减
+    if(tUser) {
+      await KcbsRecordModel.insertSystemRecord('threadBlocked', tUser, {
+        data: {
+          user: {},
+          thread
+        },
+        nkcModules,
+        db: require("./index")
+      });
     }
+  }
+  forumsId = new Set(forumsId);
+  if(forumsId.size !== 0) {
+    forumsId.add("recycle");
+    console.log(forumsId);
+    await ForumModel.updateForumsMessage([...forumsId]);
   }
 };
 

@@ -45,20 +45,10 @@ router
           mainForumsId: ["recycle"],
           categoriesId: [],
           disabled: true,
+          recycleMark: false,
           reviewed: true
         });
-        // 更新文章第一条回复的审核状态为已通过
-        await db.PostModel.updateOne({
-          pid: thread.oc
-        }, {
-          $set: {
-            reviewed: true
-          }
-        });
-        // 重新计算相关专业的信息（文章数量等）
-        // await db.ForumModel.updateForumsMessage(forumsId);
-        // 更新文章信息
-        // await thread.updateThreadMessage();
+        await thread.updateThreadMessage();
         data.thread = thread;
         data.post = post;
         // 根据后台科创币设置扣除作者的科创币

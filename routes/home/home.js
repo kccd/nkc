@@ -2,6 +2,7 @@ module.exports = async (options) => {
   const {ctx, fidOfCanGetThreads} = options;
   const {data, db} = ctx;
   const {user} = data;
+  
   // 获取与用户有关的数据
   if(user) {
     const subForumsId = await db.SubscribeModel.getUserSubForumsId(user.uid);

@@ -20,16 +20,16 @@ var app = new Vue({
       })
   },
   methods: {
-    getChineseName (code) {
-      var chineseName = ''
+    getChineseName: function(code) {
+      var chineseName = '';
       this.nationCodes.forEach(function (ele) {
         if (ele.code === code) {
           chineseName = ele.chineseName
         }
-      })
+      });
       return chineseName
     },
-    isDisabled (nationCode) {
+    isDisabled: function(nationCode) {
       for (var i=0;  i < this.smsSettings.restrictedNumber.length; i++) {
         if (nationCode === this.smsSettings.restrictedNumber[i].code) return true;
       }
@@ -88,11 +88,11 @@ var app = new Vue({
             checkString(ele.code, {
               name: "国际区号",
               minLength: 1,
-            })
+            });
             checkString(ele.number,{
               name: '受限号码',
               minLength: '1'
-            })
+            });
             ele.number = ele.number.trim().split(',').filter(function (n) {
               return n.trim();
             })

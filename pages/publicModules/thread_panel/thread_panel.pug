@@ -66,8 +66,8 @@
             .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
           if thread.hits
             .fa.fa-eye=` ${thread.hits}`
-          if thread.count - 1
-            .fa.fa-comment=` ${thread.count - 1}`
+          if thread.count
+            .fa.fa-comment=` ${thread.count}`
         if thread.from
           .thread-panel-from
             if thread.from === 'own'

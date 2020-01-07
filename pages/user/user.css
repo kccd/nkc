@@ -289,7 +289,7 @@ body{
   text-decoration: none;
   color: #282c37;
 }
-.user-card-panel:hover .btn-ban{
+.user-home-panel:hover .btn-ban{
   display: block;
 }
 .btn-ban{

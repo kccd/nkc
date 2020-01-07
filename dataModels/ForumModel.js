@@ -404,29 +404,37 @@ forumSchema.statics.updateForumsMessage = async (fids) => {
 * */
 forumSchema.statics.updateCount = async function (threads, isAdd) {
 	const ForumModel = mongoose.model('forums');
+	const today = require("../nkcModules/apiFunction").today();
   const updateParentForums = async (forum, tif) => {
-    const countThreads = isAdd ? (forum.countThreads += tif.length) : (forum.countThreads -= tif.length);
+    if(!forum) return;
+    const countThreads = isAdd ? (forum.countThreads + tif.length) : (forum.countThreads - tif.length);
     let countPosts = forum.countPosts;
     let countPostsToday = forum.countPostsToday;
     tif.forEach(ele => {
-      isAdd ? (countPosts += ele.countRemain) : (countPosts -= ele.countRemain);
-      isAdd ? (countPostsToday += (ele.countToday + tif.length)) : (countPostsToday -= (ele.countToday + tif.length));
-    })
+      if(isAdd) {
+        countPosts += ele.count;
+        countPostsToday += ele.countToday + (ele.toc > today? 1: 0)
+      } else {
+        countPosts -= ele.count;
+        countPostsToday -= ele.countToday + (ele.toc > today? 1: 0)
+      }
+    });
+    countPostsToday = countPostsToday>0?countPostsToday:0;
     await forum.update({countThreads, countPosts, countPostsToday});
     if(forum.parentsId.length === 0) return;
     await updateParentForums(await ForumModel.findOne({fid: forum.parentsId}), tif);
-  }
+  };
 
-  const forums = {}
+  const forums = {};
   threads.forEach((ele,index) => {
     ele.mainForumsId.forEach(fid => {
       forums[fid] ? forums[fid].push(ele) : forums[fid] = [ele];
     })
-  })
+  });
   for (let fid in forums) {
     await updateParentForums(await ForumModel.findOne({fid}), forums[fid]);
   }
-}
+};
 
 /* 
   更新当前专业信息，再更新上级所有专业的信息
@@ -440,8 +448,7 @@ forumSchema.methods.updateForumMessage = async function() {
     const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
     childrenFid.push(this.fid);
     const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
-    let countPosts = await PostModel.count({mainForumsId: {$in: childrenFid}, parentPostId: ""});
-    countPosts = countPosts - countThreads;
+    let countPosts = await PostModel.count({type: "post", mainForumsId: {$in: childrenFid}, parentPostId: ""});
     const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
     const normal = countThreads - digest;
     const tCount = {
@@ -472,6 +479,7 @@ forumSchema.methods.updateForumMessage = async function() {
       }));
     };
     await updateParentForumsMessage(this);
+    console.log(`专业${this.fid}文章回复条数计算完毕。`);
   });
 };
 
@@ -1012,7 +1020,7 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
 };
 
 /*
-* 获取专业树状结构，第二层和超过两层的都显示在第二层
+* 获取专业树状结构，仅显示前两层
 * @param {[object]} userRoles 用户的证书对象所组成的数组
 * @param {object} userGrade 用户的等级对象
 * @param {object} user 用户对象
@@ -1035,7 +1043,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     iconFileName: 1,
     description: 1
   }).sort({order: 1});
-
+  
   const forumsObj = {};
   forums = forums.map(forum => {
     forum = forum.toObject();
@@ -1043,7 +1051,23 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     forumsObj[forum.fid] = forum;
     return forum;
   });
-
+  
+  const results = [];
+  
+  for(const f of forums) {
+    if(!f.parentsId.length) {
+      results.push(f);
+    } else {
+      f.parentsId.map(fid => {
+        const parentForum = forumsObj[fid];
+        if(!parentForum) return;
+        parentForum.childrenForums.push(f);
+      });
+    }
+  }
+  return results;
+  
+  /*
   const insetForums = (childrenForums, fid) => {
     let arr = [];
     for(const f of forums) {
@@ -1065,7 +1089,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     }
   }
   
-  return results; 
+  return results;*/
 };
 
 /**

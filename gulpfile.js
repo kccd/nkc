@@ -1,8 +1,7 @@
 const gulp = require("gulp");
 const less = require("gulp-less");
 const babel = require("gulp-babel");
-const rename = require("gulp-rename");
-const babelify = require("babelify");
+require("babelify");
 const browserify = require("browserify"),
       stream = require("vinyl-source-stream"),
       buffer = require('vinyl-buffer');
@@ -40,11 +39,9 @@ const mjsPath = `pages/**/*.mjs`;
 // });
 
 gulp.task('browserify', function (done) {
-  console.time('111');
   // var tasks = null;
   glob(mjsPath,function (err, files) {
-    console.log(files);
-    if (err) return done(err)
+    if (err) return done(err);
 
     files.map(function (entry) {
       return browserify({
@@ -60,10 +57,9 @@ gulp.task('browserify', function (done) {
       .pipe(buffer())
       .pipe(gulp.dest('pages/'));
     })
-  })
-  console.timeEnd('111');
+  });
   // stream.merge(tasks).on('end', done);
-})
+});
 
 gulp.task("watch", () => {
   watch(lessPath, gulp.series("buildCSS"));

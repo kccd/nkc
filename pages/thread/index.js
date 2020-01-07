@@ -1193,3 +1193,68 @@ function pushGoodsToHome(productId, type) {
 		})
 		.catch(sweetError);
 }
+
+
+function moveThread() {
+	if(!window.MoveThread) {
+		window.MoveThread = new NKC.modules.MoveThread();
+	}
+	var threadData = NKC.methods.getDataById("threadForumsId");
+	window.MoveThread.open(function(data) {
+		var forums = data.forums;
+		var moveType = data.moveType;
+		MoveThread.lock();
+		nkcAPI("/threads/move", "POST", {
+			forums: forums,
+			moveType: moveType,
+			threadsId: [threadData.tid]
+		})
+			.then(function() {
+				screenTopAlert("操作成功");
+				MoveThread.close();
+			})
+			.catch(function(data) {
+				sweetError(data);
+				MoveThread.unlock();
+			})
+	}, {
+		selectedCategoriesId: threadData.categoriesId,
+		selectedForumsId: threadData.mainForumsId
+	})
+}
+
+function deleteThread() {
+	if(!window.DisabledPost) {
+		window.DisabledPost = new NKC.modules.DisabledPost();
+	}
+	var threadData = NKC.methods.getDataById("threadForumsId");
+	window.DisabledPost.open(function(data) {
+		var type = data.type;
+		var reason = data.reason;
+		var remindUser = data.remindUser;
+		var violation = data.violation;
+		var url, method = "POST";
+		var body = {
+			postsId: [threadData.pid],
+			reason: reason,
+			remindUser: remindUser,
+			violation: violation
+		};
+		if(type === "toDraft") {
+			url = "/threads/draft";
+		} else {
+			url = "/threads/recycle";
+		}
+		DisabledPost.lock();
+		nkcAPI(url, method, body)
+			.then(function() {
+				screenTopAlert("操作成功");
+				DisabledPost.close();
+				DisabledPost.unlock();
+			})
+			.catch(function(data) {
+				sweetError(data);
+				DisabledPost.unlock();
+			})
+	});
+}
