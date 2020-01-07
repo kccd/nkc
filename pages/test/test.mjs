@@ -4,10 +4,11 @@ PDFJS.GlobalWorkerOptions.workerSrc = '../external_pkgs/pdf/build/pdf.worker.js'
 import {TextLayerBuilder} from 'pdfjs-dist/web/pdf_viewer'
 // import 'pdfjs-dist/web/pdf_viewer.css'
 
-PDFJS.getDocument({ url: 'http://192.168.11.114:9000/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf', rangeChunkSize: 50 * 16 }).then(function (pdf) {
+PDFJS.getDocument({ url: 'http://a.test/r/305795', rangeChunkSize: 50 * 16 }).then(function (pdf) {
   // document.getElementById('page_count').textContent = pdfDoc.numPages;
   pdf.getPage(1).then(function (page) {
     var scale = 1;
+    
     var viewport = page.getViewport({ scale: scale, });
     var canvas = document.getElementById('page_count');
     var context = canvas.getContext('2d');

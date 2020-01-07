@@ -9,11 +9,11 @@ block content
     canvas(id="page_count")
     //- <iframe src="/external_pkgs/pdf/web/viewer.html?file=http://192.168.11.114:9000/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf" width="100%" height="800"></iframe>
 
-//- block scripts
+block scripts
 
   //- script(src=`/external_pkgs/pdf/build/pdf.js?v=${global.NKC.startTime}`)
   //- script(src=`/external_pkgs/pdf/build/pdf.worker.js?v=${global.NKC.startTime}`)
   //- script(src=`/external_pkgs/pdf/web/viewer.js?v=${global.NKC.startTime}`)
   //- script(src=`/external_pkgs/pdf/jquery.min.js?v=${global.NKC.startTime}`)
-  script(src=`/external_pkgs/pdf/jquery.media.js?v=${global.NKC.startTime}`)
-  +includeJS("/test/test.js")
+  //script(src=`/external_pkgs/pdf/jquery.media.js?v=${global.NKC.startTime}`)
+  +includeJS("/test/dist.min.js")

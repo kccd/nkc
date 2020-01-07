@@ -1491,7 +1491,6 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   forumsId = new Set(forumsId);
   if(forumsId.size !== 0) {
     forumsId.add("recycle");
-    console.log(forumsId);
     await ForumModel.updateForumsMessage([...forumsId]);
   }
 };
