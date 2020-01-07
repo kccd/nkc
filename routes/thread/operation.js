@@ -400,6 +400,7 @@ operationRouter
     await db.PostModel.updateMany({tid}, {$pull: {mainForumsId: fid}});
     await db.InfoBehaviorModel.updateMany({tid}, {$pull: {mainForumsId: fid}});
     const newThread = await db.ThreadModel.findOnly({tid});
+    newThread.mainForumsId = [fid];
     await forumModel.updateCount([newThread], false);
     // await Promise.all(forums.map(async forum => {
     //   await forum.updateForumMessage();

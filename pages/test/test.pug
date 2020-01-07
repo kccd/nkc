@@ -4,13 +4,16 @@ block title
   +includeCSS("/external_pkgs/pdf/web/viewer.css")
   +includeCSS("/test/test.css")
 block content
-  #pdf_page.container-fluid.max-width
-    div
-    canvas(id="page_count")
-    //- <iframe src="/external_pkgs/pdf/web/viewer.html?file=http://192.168.11.114:9000/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf" width="100%" height="800"></iframe>
-
-//- block scripts
-
+  .container-fluid.max-width
+    div 预览
+    .row
+      .col-xs-12
+        #pdf_page
+          canvas(id="page_count")
+        //- <iframe src="/external_pkgs/pdf/web/viewer.html?file=http://192.168.11.114:9000/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf" width="100%" height="800"></iframe>
+        
+        //- a.media(href="/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf")
+block scripts
   //- script(src=`/external_pkgs/pdf/build/pdf.js?v=${global.NKC.startTime}`)
   //- script(src=`/external_pkgs/pdf/build/pdf.worker.js?v=${global.NKC.startTime}`)
   //- script(src=`/external_pkgs/pdf/web/viewer.js?v=${global.NKC.startTime}`)
