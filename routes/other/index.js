@@ -25,7 +25,6 @@ const frameImgRouter = require('./frameImg');
 const posterRouter = require('./poster');
 const pageRouter = require('./page');
 const logoRouter = require('./logo');
-const appDownloadRouter = require('./appDownload');
 const testRouter = require('./test');
 otherRouter
 	.get('index.php', async (ctx, next) => {
@@ -71,6 +70,5 @@ otherRouter
   .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
   .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods())
   .use('poster', posterRouter.routes(), posterRouter.allowedMethods())
-  .use('test', testRouter.routes(), testRouter.allowedMethods())
-  .use('appDownload', appDownloadRouter.routes(), appDownloadRouter.allowedMethods());
+  .use('test', testRouter.routes(), testRouter.allowedMethods());
 module.exports = otherRouter;

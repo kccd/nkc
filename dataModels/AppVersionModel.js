@@ -36,6 +36,16 @@ const appVersionSchema = new Schema({
     type: Date,
     default: Date.now,
     index: 1
+  },
+  stable: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
+  canDown: {
+    type: Boolean,
+    default: true,
+    index: 1
   }
 });
 module.exports = mongoose.model('appVersion', appVersionSchema, 'appVersion');

@@ -26,6 +26,10 @@ router
     const {file} = body.files;
     const {name, size, path, hash} = file;
     const {appPlatform, appVersion, appDescription, appToc} = body.fields || {};
+    const repeatVersion = await db.AppVersionModel.count({appVersion});
+    if (repeatVersion) {
+      ctx.throw(400, "版本号重复！");
+    }
     let appFilePath, appPath;
 
     const appBasePath = settings.upload.androidSavePath.replace(/app([\/\\].*)/, () => 'app');
@@ -44,9 +48,9 @@ router
 
     // 根据平台和版本号创建文件夹
     if(appPlatform === 'android') {
-      appFilePath = settings.upload.androidSavePath + '/' + appVersion
+      appFilePath = settings.upload.androidSavePath + '/' + hash
     }else{
-      appFilePath = settings.upload.iosSavePath + '/' + appVersion
+      appFilePath = settings.upload.iosSavePath + '/' + hash
     }
 
     try{
@@ -57,11 +61,12 @@ router
 
     // 获取文件，修改文件名，将文件存入对应的文件夹
     let ext = PATH.extname(name);
-    if(!ext) ctx.throw(400, '不是安装包的格式');
+    if(ext !== '.apk') ctx.throw(400, '不是安装包的格式');
     ext = ext.toLowerCase();
     ext = ext.replace('.', '');
     if(['exe'].includes(ext)) ctx.throw(403, '暂不支持上传该类型的文件');
     appPath = appFilePath + "/" + name;
+    console.log(path, appPath);
     await fs.rename(path, appPath);
 
     // 添加上传记录
