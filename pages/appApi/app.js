@@ -177,7 +177,6 @@ function appOpenUrl(urlStr) {
     urlStr = origin + urlStr
   }
   var paramStr = addApptypeToUrl(urlStr)
-  alert(paramStr);
   // 如果是可以分享的类型则使用分享模板打开以便分享，否则使用其他模板打开
   var windowFile = "widget://html/common/commonInfo.html";
   var shareType = getShareTypeByUrl(paramStr);

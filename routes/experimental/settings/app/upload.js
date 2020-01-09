@@ -66,7 +66,6 @@ router
     ext = ext.replace('.', '');
     if(['exe'].includes(ext)) ctx.throw(403, '暂不支持上传该类型的文件');
     appPath = appFilePath + "/" + name;
-    console.log(path, appPath);
     await fs.rename(path, appPath);
 
     // 添加上传记录

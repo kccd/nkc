@@ -7,21 +7,17 @@ var app = new Vue({
     progress: 0,
     data
   },
-  mounted: function () {
-  },
   methods: {
     changeDownLoadState: function (item) {
       var newVersion = JSON.parse(JSON.stringify(item));
       newVersion.canDown = !newVersion.canDown;
       nkcAPI('/e/settings/app/histories', 'PATCH', { newVersion: newVersion, operating: 'changeState' })
         .then(function (res) {
-          console.log(res);
           item.canDown = !item.canDown;
           return sweetSuccess('修改成功！');
-          // location.reload();
         }).catch(function (err) {
           return sweetError(err);
-        })
+        });
     },
     setStable: function (item) {
       var that = this;
@@ -29,7 +25,6 @@ var app = new Vue({
       newVersion.stable = true;
       nkcAPI('/e/settings/app/histories', 'PATCH', { newVersion: newVersion, operating: 'setStable' })
         .then(function (res) {
-          console.log(res);
           that.data.histories.forEach(function (ele) {
             ele.stable = false;
           });
@@ -38,22 +33,22 @@ var app = new Vue({
           // location.reload();
         }).catch(function (err) {
           return sweetError(err);
-        })
+        });
     },
     updateVersion: function (item) {
       CommonModal.open(function (data) {
         if (!data[0].value) return screenTopAlert("请输入版本号！");
         if (!data[1].value) return screenTopAlert("请输入更新内容！");
         var newVersion = JSON.parse(JSON.stringify(item));
-        newVersion.appVersion = data[0].value
-        newVersion.appDescription = data[1].value
+        newVersion.appVersion = data[0].value;
+        newVersion.appDescription = data[1].value;
         nkcAPI('/e/settings/app/histories', 'PATCH', { newVersion: newVersion, operating: 'updateVersion' })
           .then(function (res) {
             return sweetSuccess('修改成功！');
             // location.reload();
           }).catch(function (err) {
             return sweetError(err);
-          })
+          });
       }, {
           title: "修改版本信息",
           data: [
@@ -68,11 +63,10 @@ var app = new Vue({
               value: item.appDescription
             }
           ]
-        })
+        });
     },
     submitApp: function () {
       var that = this;
-      
       geid('submitApp').disabled = true;
       var platform = $('#platform').val();
       var version = $('#version').val();
@@ -81,11 +75,11 @@ var app = new Vue({
       if (!version) {
         geid('submitApp').disabled = false;
         return sweetError("请输入版本号！");
-      }
+      };
       if (!description) {
         geid('submitApp').disabled = false;
         return sweetError("请输入更新内容！");
-      }
+      };
       var file = geid('appfile').files;
       if (file.length == 0) {
         geid("submitApp").disabled = false;
@@ -93,9 +87,9 @@ var app = new Vue({
       } else if (file[0].type !== 'application/vnd.android.package-archive') {
         geid("submitApp").disabled = false;
         return sweetError("文件格式必须为apk ！");
-      }
+      };
       var formData = new FormData();
-      formData.append("file", file[0])
+      formData.append("file", file[0]);
       formData.append("appPlatform", platform);
       formData.append("appVersion", version);
       formData.append("appDescription", description);
@@ -111,7 +105,7 @@ var app = new Vue({
           that.progress = 0;
           sweetError(data.error || data);
           geid('submitApp').disabled = false;
-        })
+        });
     }
   }
 });

@@ -654,7 +654,6 @@ function initVueApp() {
           })
           .then(function(data) {
             self.showCloseInfo = false;
-            alert(data.redirect);
             self.visitUrl(data.redirect || "/");
             // 解锁发表按钮
             // PostButton.disabledSubmit = false;
