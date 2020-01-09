@@ -3,16 +3,6 @@ localStorage.setItem("apptype", "app");
 var allLinks = document.querySelectorAll("a");
 var allButtons = document.querySelectorAll("button");
 var imgDownTimeOut;
-// 禁止点击连接执行跳转
-Array.prototype.forEach.call(allLinks, function(link) {
-  link.addEventListener("click", function(e) {
-    e.preventDefault();
-  })
-})
-// window.addEventListener("click", function(e) {
-//   console.log("禁止点击")
-//   e.preventDefault();
-// })
 $(document).ready(function() {
   // 获取url的apptype参数，要么为app，要么为false
   var apptype = getQueryVariable("apptype");
@@ -22,21 +12,12 @@ $(document).ready(function() {
       $("body").css("padding-top", "10px");
     }
   }
-})
+});
 
 apiready = function() {
   // 为所有图片添加点击事件
   var allImgs = document.querySelectorAll("img");
   Array.prototype.forEach.call(allImgs, function(img) {
-    // img.addEventListener("touchstart", function() {
-    //   imgDownTimeOut = setTimeout("imageToApiDownload('"+this.src+"')", 1000)
-    // })
-    // img.addEventListener("touchmove", function() {
-    //   clearTimeout(imgDownTimeOut);
-    // })
-    // img.addEventListener("touchend", function() {
-    //   clearTimeout(imgDownTimeOut)
-    // })
     img.addEventListener("click", function() {
       if(this.getAttribute("dataimg") && this.getAttribute("dataimg") == "content") {
         if(this.src && this.src.indexOf("/r/") > -1) {
@@ -48,52 +29,102 @@ apiready = function() {
   // 为所有的a标签添加点击事件
   // 监听全局a标签的点击事件
   // 并阻止链接点击跳转
-  var allLinks = document.querySelectorAll("a");
-  Array.prototype.forEach.call(allLinks, function(link) {
-    link.addEventListener("click", function() {
-      if(this.href.indexOf("/r/") > -1) {
-        var linkUrl = this.href;
-        attachDownInApp(linkUrl);
-      }else if(this.href) {
-        var isHostUrl = siteHostLink(this.href);
-        // 如果是本站链接则打开app内页，否则使用外站浏览页打开
-        if(isHostUrl) {
-          var paramIndex = this.href.indexOf("?");
-          var newHref = "";
-          var equaiHref = false;
-          if(paramIndex > -1) {
-            newHref = (this.href).substring(0, paramIndex)
-          }else{
-            newHref = this.href;
-          }
-          if(newHref.length > 0) {
-            if(api.winName.indexOf(newHref) > -1) {
-              equaiHref = true;
+  // var allLinks = document.querySelectorAll("a");
+  var body = document.getElementsByTagName("body")[0];
+  body.addEventListener('click',function (e) {
+    // e.preventDefault();
+    if(e.target && e.target.nodeName.toLowerCase() == "a" && e.target.getAttribute('href')) {  // 检查事件源e.target是否为a
+      e.target.onclick = function (ae) {
+        ae.preventDefault();
+        if(e.target.href.indexOf("/r/") > -1) {
+          var linkUrl = e.target.href;
+          attachDownInApp(linkUrl);
+        }else if(e.target.href) {
+          var isHostUrl = siteHostLink(e.target.href);
+          // 如果是本站链接则打开app内页，否则使用外站浏览页打开
+          if(isHostUrl) {
+            var paramIndex = e.target.href.indexOf("?");
+            var newHref = "";
+            var equaiHref = false;
+            if(paramIndex > -1) {
+              newHref = (e.target.href).substring(0, paramIndex)
+            }else{
+              newHref = e.target.href;
             }
-          }
-          // 如果是在首页跳转到最新关注推荐等，不打开新页面
-          if(this.pathname === "/" && api.winName === "root") {
-            window.location.href = addApptypeToUrl(this.href)
-            return;
-          }
-          if(equaiHref) {
-            appFreshUrl(this.href);
+            if(newHref.length > 0) {
+              if(api.winName.indexOf(newHref) > -1) {
+                equaiHref = true;
+              }
+            }
+            // 如果是在首页跳转到最新关注推荐等，不打开新页面
+            if(e.target.pathname === "/" && api.winName === "root") {
+              window.location.href = addApptypeToUrl(e.target.href)
+              return;
+            }
+            if(equaiHref) {
+              appFreshUrl(e.target.href);
+            }else{
+              appOpenUrl(e.target.href);
+            }
           }else{
-            appOpenUrl(this.href);
-          }
-        }else{
-          api.openWin({
-            name: 'link',
-            url: 'widget://html/link/link.html',
-            pageParam: {
+            api.openWin({
               name: 'link',
-              linkUrl: this.href
-            }
-          });
+              url: 'widget://html/link/link.html',
+              pageParam: {
+                  name: 'link',
+                  linkUrl: e.target.href
+              }
+            });
+          }
         }
       }
-    })
-  })
+    }
+  }, true)
+  // Array.prototype.forEach.call(allLinks, function(link) {
+  //   link.addEventListener("click", function() {
+  //     if(this.href.indexOf("/r/") > -1) {
+  //       var linkUrl = this.href;
+  //       attachDownInApp(linkUrl);
+  //     }else if(this.href) {
+  //       var isHostUrl = siteHostLink(this.href);
+  //       // 如果是本站链接则打开app内页，否则使用外站浏览页打开
+  //       if(isHostUrl) {
+  //         var paramIndex = this.href.indexOf("?");
+  //         var newHref = "";
+  //         var equaiHref = false;
+  //         if(paramIndex > -1) {
+  //           newHref = (this.href).substring(0, paramIndex)
+  //         }else{
+  //           newHref = this.href;
+  //         }
+  //         if(newHref.length > 0) {
+  //           if(api.winName.indexOf(newHref) > -1) {
+  //             equaiHref = true;
+  //           }
+  //         }
+  //         // 如果是在首页跳转到最新关注推荐等，不打开新页面
+  //         if(this.pathname === "/" && api.winName === "root") {
+  //           window.location.href = addApptypeToUrl(this.href)
+  //           return;
+  //         }
+  //         if(equaiHref) {
+  //           appFreshUrl(this.href);
+  //         }else{
+  //           appOpenUrl(this.href);
+  //         }
+  //       }else{
+  //         api.openWin({
+  //           name: 'link',
+  //           url: 'widget://html/link/link.html',
+  //           pageParam: {
+  //               name: 'link',
+  //               linkUrl: this.href
+  //           }
+  //         });
+  //       }
+  //     }
+  //   })
+  // })
   // 将本页的title和description传入app中
   var locationUrl = window.location.href;
   var urlType = getShareTypeByUrl(locationUrl);
@@ -124,17 +155,17 @@ apiready = function() {
       name: 'keyback'
     }, function(ret, err) {
       api.confirm({
-        title: '确定要退出吗？',
-        msg: '',
-        buttons: ['确定', '取消']
+          title: '确定要退出吗？',
+          msg: '',
+          buttons: ['确定', '取消']
       }, function(ret, err){
-        if( ret ){
-          if(ret.buttonIndex == 1){
+          if( ret ){
+            if(ret.buttonIndex == 1){
+              api.closeWin();
+            }
+          }else{
             api.closeWin();
           }
-        }else{
-          api.closeWin();
-        }
       });
     });
   }
@@ -144,7 +175,7 @@ apiready = function() {
 
 /**
  * 给url添加apptype参数
- * @param {*} urlStr
+ * @param {*} urlStr 
  */
 function addApptypeToUrl(url) {
   // 去掉hash值
@@ -169,7 +200,7 @@ function addApptypeToUrl(url) {
 
 /**
  * 使用api对象中的方法打开新连接
- * @param {} urlStr
+ * @param {} urlStr 
  */
 function appOpenUrl(urlStr) {
   var origin = window.location.origin;
@@ -207,7 +238,7 @@ function appOpenUrl(urlStr) {
 
 /**
  * 使用api对象中的方法刷新当前页面的的链接
- * @param {*} key
+ * @param {*} key 
  */
 function appFreshUrl(urlStr) {
   var paramStr = addApptypeToUrl(urlStr)
@@ -226,7 +257,7 @@ function appFreshUrl(urlStr) {
 
 /**
  * 获取url中的app参数
- * @param {*} key
+ * @param {*} key 
  */
 function getQueryVariable(key)
 {
@@ -281,10 +312,10 @@ function getSiteMeta() {
 
 
 /**
- * @description 根据url判断分享类型
- * @param {String} sourceUrl
- * @return shareType
- */
+* @description 根据url判断分享类型
+* @param {String} sourceUrl
+* @return shareType
+*/
 function getShareTypeByUrl(sourceUrl) {
   var typeObj = {
     "thread": "/t/",
@@ -314,7 +345,7 @@ function getShareTypeByUrl(sourceUrl) {
 function linkWithEditor() {
   var withE = false;
   return withE;
-}
+} 
 
 function toAppLogin() {
   api.closeToWin({
@@ -332,10 +363,10 @@ function imageToApiDownload(url) {
     name: 'imageSave',
     url: 'widget://html/common/saveImageButton.html',
     pageParam: {
-      name: 'imageSave',
-      url: url
+        name: 'imageSave',
+        url: url
     },
-    rect: {
+	  rect: {
       x: 0,
       y: 0,
       w: 'auto',
@@ -344,11 +375,11 @@ function imageToApiDownload(url) {
     bounces: false,
     bgColor: 'rgba(0,0,0,0.5)',
     vScrollBarEnabled: false,
-    animation: {
-      type: 'movein',
-      subType: 'from_bottom',
-      duration: 300
-    }
+	  animation: {
+	    type: 'movein',
+	    subType: 'from_bottom',
+	    duration: 300
+	  }
   });
 }
 

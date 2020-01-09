@@ -128,7 +128,7 @@ block content
             -let sideThreadsHeader= "推荐文章"
             include ../publicModules/side_thread_list
           include ../publicModules/active_users
-        //-include ../publicModules/scrollTo
+        include ../publicModules/scrollTo
 block footer
   include ../publicModules/footer/footer
 block scripts
@@ -137,7 +137,7 @@ block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
-  include ../publicModules/toTop
+  //-include ../publicModules/toTop
   if canManagement
     include ../publicModules/moveThread/moveThread
     include ../publicModules/disabledPost/disabledPost

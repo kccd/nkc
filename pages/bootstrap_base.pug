@@ -6,7 +6,7 @@ block head
   meta(name="viewport" content="width=device-width, initial-scale=1")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   link(rel='shortcut icon' href='/favicon.ico')
-  if state.apptype
+  if state.apptype === "app"
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
   //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
@@ -39,7 +39,7 @@ block body
   +includeJS('/jquery/jquery-ui.1.11.4.min.js')
   //-app使用的js
   if state.apptype
-    +includeJS("/appAPi/app.js", false)
+    +includeJS("/appAPi/app.js", true)
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/twemoji/2/twemoji.min.js')
   +includeJS('/Promise/promise.min.js')
@@ -60,24 +60,25 @@ block body
   if data.user
     script!=`NKC.configs.uid="${data.user.uid}";`
     script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
-    if !state.apptype || state.apptype !== "app"
+    if state.apptype !== "app"
       //- 接入即时通信
       +includeJS('/socket.io-client/dist/socket.io.js')
       +includeJS('/message/socket.js')
 
     //- 新增好评
     if data.user.newVoteUp > 0
-      script!=`sweetAlert("您发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
+      script!=`sweetAlert("你发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
     // 因精选而获得的科创币
     -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
     if kcb > 0
-      script!=`sweetAlert("您发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
+      script!=`sweetAlert("你发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
   if state.apptype !== "app" && !data.user
     include ./publicModules/login/login
   block scripts
-  //- 生成二维码 页脚
-  include ./publicModules/qrcode/qrcode
-  script.
-    console.log('(c)2019 成都科创科学文化研究院')
-    console.log('Project Repository: https://github.com/kccd/nkc')
+  if state.apptype !== "app"
+    //- 生成二维码 页脚
+    include ./publicModules/qrcode/qrcode
+    script.
+      console.log('(c)2019 成都科创科学文化研究院')
+      console.log('Project Repository: https://github.com/kccd/nkc')

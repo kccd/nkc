@@ -1275,15 +1275,8 @@ forumSchema.statics.createNewThread = async function(options) {
   const thread = await new ThreadModel(t).save();
   options.postType = "thread";
   const _post = await thread.createNewPost(options);
-  await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
+  await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 0, hits: 0}});
   await ForumModel.updateCount([thread], true);
-  // await ForumModel.updateMany({fid: {$in: options.fids}}, {$inc: {
-  //   'tCount.normal': 1,
-  //   'countPosts': 1,
-  //   'countThreads': 1
-  // }});
-  // 生成关注记录 我发表的
-  // await SubscribeModel.insertSubscribe("post", thread.uid, thread.tid);
   return _post;
 };
 /*
