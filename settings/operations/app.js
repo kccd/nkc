@@ -46,6 +46,16 @@ module.exports = {
 			GET: 'APPgetScoreChange'
 		}
 	},
+	android: {
+		PARAMETER: {
+			GET: 'getAndroidPackage'
+		}
+	},
+	ios: {
+		PARAMETER: {
+			GET: 'getIosPackage'
+		}
+	}
 	/*latest: {
 		GET: 'APPgetLatestThreads'
 	}*/

@@ -325,6 +325,7 @@
   "getAndroidPackage": "获取Android安装包",
   "visitAppDownload": "访问app下载页面",
   "visitAppUploadHistories": "查看app历史版本",
+  "editAppUploadHistories": "修改app历史版本",
   "sendAnApplicationToAddAFriend": "发送添加好友的申请",
   "getFriendsApplication": "获取好友申请信息",
   "agreeApplicationToAddAFriend": "同意好友的添加申请",

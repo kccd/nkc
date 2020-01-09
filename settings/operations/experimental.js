@@ -153,7 +153,8 @@ module.exports = {
 				POST: 'saveAppUploadInfo'
 			},
 			histories: {
-				GET: 'visitAppUploadHistories'
+				GET: 'visitAppUploadHistories',
+				PATCH: 'editAppUploadHistories'
 			}
 		},
 		role: {
