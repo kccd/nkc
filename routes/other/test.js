@@ -4,7 +4,6 @@ const testRouter = new Router();
 
 testRouter
   .get('/', async (ctx, next) => {
-    console.log(ctx);
     ctx.template = "test/test.pug";
       await next();
     })

@@ -34,7 +34,7 @@ module.exports = async (ctx, next) => {
     }
     // 设置文件类型
     ctx.type = ext;
-    if(fileType !== "attachment" && ext === "mp4"){
+    if(fileType !== "attachment" && ["mp4"].includes(ext)){
       if(ctx.request.headers['range']){
         var range = utils.parseRange(ctx.request.headers["range"], stats.size);
         if(range){

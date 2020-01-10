@@ -243,13 +243,13 @@ block content
             include ../publicModules/side_users_list
             if data.users.length > 8
               a.side-link(href=`/f/${data.forum.fid}/visitors`) 查看更多
-
+        include ../publicModules/scrollTo
 
 block scripts
   if data.type === "home"
     include ../publicModules/plyr/plyr.js.pug
     include ../publicModules/lazySizes
-  include ../publicModules/toTop
+  //-include ../publicModules/toTop
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/md5
