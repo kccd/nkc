@@ -79,52 +79,7 @@ apiready = function() {
         }
       }
     }
-  }, true)
-  // Array.prototype.forEach.call(allLinks, function(link) {
-  //   link.addEventListener("click", function() {
-  //     if(this.href.indexOf("/r/") > -1) {
-  //       var linkUrl = this.href;
-  //       attachDownInApp(linkUrl);
-  //     }else if(this.href) {
-  //       var isHostUrl = siteHostLink(this.href);
-  //       // 如果是本站链接则打开app内页，否则使用外站浏览页打开
-  //       if(isHostUrl) {
-  //         var paramIndex = this.href.indexOf("?");
-  //         var newHref = "";
-  //         var equaiHref = false;
-  //         if(paramIndex > -1) {
-  //           newHref = (this.href).substring(0, paramIndex)
-  //         }else{
-  //           newHref = this.href;
-  //         }
-  //         if(newHref.length > 0) {
-  //           if(api.winName.indexOf(newHref) > -1) {
-  //             equaiHref = true;
-  //           }
-  //         }
-  //         // 如果是在首页跳转到最新关注推荐等，不打开新页面
-  //         if(this.pathname === "/" && api.winName === "root") {
-  //           window.location.href = addApptypeToUrl(this.href)
-  //           return;
-  //         }
-  //         if(equaiHref) {
-  //           appFreshUrl(this.href);
-  //         }else{
-  //           appOpenUrl(this.href);
-  //         }
-  //       }else{
-  //         api.openWin({
-  //           name: 'link',
-  //           url: 'widget://html/link/link.html',
-  //           pageParam: {
-  //               name: 'link',
-  //               linkUrl: this.href
-  //           }
-  //         });
-  //       }
-  //     }
-  //   })
-  // })
+  }, true);
   // 将本页的title和description传入app中
   var locationUrl = window.location.href;
   var urlType = getShareTypeByUrl(locationUrl);
@@ -200,20 +155,24 @@ function addApptypeToUrl(url) {
 
 /**
  * 使用api对象中的方法打开新连接
- * @param {} urlStr 
+ * @param {String} urlStr
  */
 function appOpenUrl(urlStr) {
   var origin = window.location.origin;
   if(urlStr.indexOf("http") === -1) {
     urlStr = origin + urlStr
   }
-  var paramStr = addApptypeToUrl(urlStr)
+  var paramStr = addApptypeToUrl(urlStr);
   // 如果是可以分享的类型则使用分享模板打开以便分享，否则使用其他模板打开
   var windowFile = "widget://html/common/commonInfo.html";
   var shareType = getShareTypeByUrl(paramStr);
   if(shareType !== "common") {
     windowFile = "widget://html/common/shareInfo.html"
   }
+  
+  // 临时测试
+  windowFile = "widget://html/online/online.html";
+  
   // 判断是否为编辑页面
   var editUrlArr = ["/editor", "/shelf", "/release"];
   for(var e in editUrlArr) {
@@ -232,6 +191,11 @@ function appOpenUrl(urlStr) {
     pageParam: {
       realUrl: paramStr,
       shareType: shareType
+    },
+    animation: {
+      type: "movein",
+      subType: "from_right",
+      duration: 300
     }
   })
 }
@@ -304,10 +268,15 @@ function getSiteMeta() {
     description: description
   };
   var paraStr = JSON.stringify(para);
-  api.execScript({
+  /*api.execScript({
     name: realUrl,
     script: 'getAppMeta('+paraStr+');'
+  });*/
+  emitEvent("siteMetaReady", {
+    title: title,
+    description: description
   });
+  
 }
 
 
@@ -397,4 +366,32 @@ function attachDownInApp(linkUrl) {
     name: api.winName,
     script: "attachDown('"+linkUrl+"')"
   })
+}
+
+
+/*
+* 注册一个监听事件
+* @param {String} name 事件名称
+* @param {Function} 回调函数
+*   @param {*} 触发时传入的数据
+* @author pengxiguaa 2020-1-10
+* */
+function newEvent(name, func) {
+  return api.addEventListener({
+    name
+  }, (ret, err) => {
+    if(err) return bottomAlert(err);
+    func(ret.value)
+  });
+}
+/*
+* 触发一个事件
+* @param {String} name 事件名称
+* @param {*} 传递数据
+* */
+function emitEvent(name, data) {
+  api.sendEvent({
+    name: name,
+    extra: data || {}
+  });
 }
