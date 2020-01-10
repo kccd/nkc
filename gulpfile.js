@@ -62,9 +62,9 @@ gulp.task('browserify', function (done) {
 });
 
 gulp.task("watch", () => {
-  watch(lessPath, gulp.series("buildCSS"));
-  watch(jsPath, gulp.series("buildJS"));
+  watch(lessPath, { interval: 750 }, gulp.series("buildCSS"));
+  watch(jsPath, { interval: 750 }, gulp.series("buildJS"));
   // gulp.watch(mjsPath, gulp.series("buildMJS"));
-  watch(mjsPath, gulp.series("browserify"));
+  watch(mjsPath, { interval: 750 }, gulp.series("browserify"));
 });
 

@@ -13,16 +13,16 @@ const subscribeThread = require("./subscribe/thread");
 const subscribeCollection = require("./subscribe/collection");
 const summaryPie = require("./summary/pie");
 const summaryCalendar = require("./summary/calendar");
+const serverConfig = require("../../../config/server.json");
 router
   .use("/", async (ctx, next) => {
-    const {db, data, params} = ctx;
-    const {user, targetUser} = data;
-    
+    const { db, data, params, state } = ctx;
+    const { user, targetUser } = data;
     // 验证权限
-    if(user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
+    if (user.uid !== targetUser.uid && !ctx.permission("visitAllUserProfile")) {
       ctx.throw(403, "权限不足");
     }
-    
+
     const {
       threadCount,
       postCount,
@@ -32,6 +32,7 @@ router
     url = url.replace(/\?.*/ig, "");
     url = url.replace(/\/u\/[0-9]+?\/profile\/*/ig, "");
     data.type = url;
+    data.host = serverConfig.domain + ':' + serverConfig.port;
     data.subUsersId = await db.SubscribeModel.getUserSubUsersId(targetUser.uid);
     data.subTopicsId = await db.SubscribeModel.getUserSubForumsId(targetUser.uid, "topic");
     data.subDisciplinesId = await db.SubscribeModel.getUserSubForumsId(targetUser.uid, "discipline");
@@ -146,19 +147,23 @@ router
     data.name = "";
     data.navLinks.map(nav => {
       nav.links.map(link => {
-        if(data.type === link.type) data.name = link.name;
+        if (data.type === link.type) data.name = link.name;
       })
     });
-    ctx.template = "user/profile/profile.pug";
+    if (state.apptype === 'app') {
+      ctx.template = "user/profile/me.pug";
+    } else {
+      ctx.template = "user/profile/profile.pug";
+    }
     await next();
   })
   .get("/", async (ctx, next) => {
-    const {data, db} = ctx;
-    const {targetUser} = data;
+    const { data, db } = ctx;
+    const { targetUser } = data;
     // 看过的文章
-    const logs = await db.UsersBehaviorModel.find({uid: targetUser.uid, operationId: "visitThread"}, {tid: 1, timeStamp: 1}).sort({timeStamp: -1}).limit(25);
+    const logs = await db.UsersBehaviorModel.find({ uid: targetUser.uid, operationId: "visitThread" }, { tid: 1, timeStamp: 1 }).sort({ timeStamp: -1 }).limit(25);
     const threadsId = logs.map(l => l.tid);
-    let threads = await db.ThreadModel.find({tid: {$in: threadsId}});
+    let threads = await db.ThreadModel.find({ tid: { $in: threadsId } });
     threads = await db.ThreadModel.extendThreads(threads, {
       forum: false,
       category: false,
@@ -177,9 +182,9 @@ router
     threads.map(t => threadsObj[t.tid] = t);
     const inserted = [];
     data.visitThreadLogs = [];
-    for(let log of logs) {
+    for (let log of logs) {
       const thread = threadsObj[log.tid];
-      if(thread && !inserted.includes(thread.tid)) {
+      if (thread && !inserted.includes(thread.tid)) {
         inserted.push(thread.tid);
         log = log.toObject();
         log.thread = thread;
@@ -187,30 +192,30 @@ router
       }
     }
     // 看过的用户
-    const visitUserlogs = await db.UsersBehaviorModel.find({uid: targetUser.uid, operationId: "visitUserCard", toUid: {$ne: targetUser.uid}}, {uid: 1, toUid: 1, timeStamp: 1}).sort({timeStamp: -1}).limit(25);
+    const visitUserlogs = await db.UsersBehaviorModel.find({ uid: targetUser.uid, operationId: "visitUserCard", toUid: { $ne: targetUser.uid } }, { uid: 1, toUid: 1, timeStamp: 1 }).sort({ timeStamp: -1 }).limit(25);
     // 看过我的用户
-    const visitSelfLogs = await db.UsersBehaviorModel.find({uid: {$nin: ["", targetUser.uid]}, operationId: "visitUserCard", toUid: targetUser.uid}, {uid: 1, toUid: 1, timeStamp: 1}).sort({timeStamp: -1}).limit(25);
+    const visitSelfLogs = await db.UsersBehaviorModel.find({ uid: { $nin: ["", targetUser.uid] }, operationId: "visitUserCard", toUid: targetUser.uid }, { uid: 1, toUid: 1, timeStamp: 1 }).sort({ timeStamp: -1 }).limit(25);
     let usersId = visitUserlogs.map(u => u.toUid);
     usersId = usersId.concat(visitSelfLogs.map(u => u.uid));
-    const users = await db.UserModel.find({uid: {$in: usersId}});
+    const users = await db.UserModel.find({ uid: { $in: usersId } });
     const usersObj = {};
     users.map(u => usersObj[u.uid] = u);
     data.visitUserLogs = [];
     const visitUsersId = [];
     const visitSelfUsersId = [];
     data.visitSelfLogs = [];
-    for(let log of visitUserlogs) {
+    for (let log of visitUserlogs) {
       const user = usersObj[log.toUid];
-      if(user && !visitUsersId.includes(user.uid)) {
+      if (user && !visitUsersId.includes(user.uid)) {
         visitUsersId.push(user.uid);
         log = log.toObject();
         log.targetUser = user;
         data.visitUserLogs.push(log);
       }
     }
-    for(let log of visitSelfLogs) {
+    for (let log of visitSelfLogs) {
       const user = usersObj[log.uid];
-      if(user && !visitSelfUsersId.includes(user.uid)) {
+      if (user && !visitSelfUsersId.includes(user.uid)) {
         visitSelfUsersId.push(user.uid);
         log = log.toObject();
         log.user = user;
@@ -220,21 +225,21 @@ router
     await next();
   })
   .use("/subscribe", async (ctx, next) => {
-    const {query, data, db, state} = ctx;
-    let {t} = query;
-    const {targetUser} = data;
+    const { query, data, db, state } = ctx;
+    let { t } = query;
+    const { targetUser } = data;
     data.subscribeTypes = await db.SubscribeTypeModel.getTypesTree(targetUser.uid);
-    if(t) {
+    if (t) {
       data.t = Number(t);
       loop1:
-      for(const s of data.subscribeTypes) {
-        if(s._id === data.t) {
+      for (const s of data.subscribeTypes) {
+        if (s._id === data.t) {
           data.parentType = s;
           data.childType = undefined;
           break;
         }
-        for(const c of s.childTypes) {
-          if(c._id === data.t) {
+        for (const c of s.childTypes) {
+          if (c._id === data.t) {
             data.parentType = s;
             data.childType = c;
             break loop1;
@@ -243,12 +248,12 @@ router
       }
     }
     state.match = {};
-    if(data.childType) {
+    if (data.childType) {
       state.match.cid = data.childType._id;
-    } else if(data.parentType) {
+    } else if (data.parentType) {
       const childTypesId = data.parentType.childTypes.map(t => t._id);
       childTypesId.push(data.parentType._id);
-      state.match.cid = {$in: childTypesId};
+      state.match.cid = { $in: childTypesId };
     }
     await next();
   })
