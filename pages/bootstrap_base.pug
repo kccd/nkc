@@ -7,7 +7,7 @@ block head
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   link(rel='shortcut icon' href='/favicon.ico')
   if state.apptype === "app"
-    +includeJS("/appAPi/api_old.js")
+    +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
   //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
   +includeCSS('/font-awesome/css/font-awesome.css')
@@ -39,7 +39,7 @@ block body
   +includeJS('/jquery/jquery-ui.1.11.4.min.js')
   //-app使用的js
   if state.apptype
-    +includeJS("/appAPi/app.js", true)
+    +includeJS("/appAPi/app_old.js")
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/twemoji/2/twemoji.min.js')
   +includeJS('/Promise/promise.min.js')
