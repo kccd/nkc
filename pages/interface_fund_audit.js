@@ -116,7 +116,7 @@ function createList(count) {
 }
 
 
-function submitProjectAudit(id) {
+function submitProjectAudit(id, refuse) {
 	var userInfoAudit = $('input[name="userInfoAudit"]').eq(0).is(':checked');
 	var projectAudit = $('input[name="projectAudit"]').eq(0).is(':checked');
 	var moneyAudit = $('input[name="moneyAudit"]').eq(0).is(':checked');
@@ -156,7 +156,8 @@ function submitProjectAudit(id) {
 	var obj = {
 		comments: comments,
 		suggestMoney: suggestMoney,
-		type: 'project'
+		type: 'project',
+		refuse: refuse || false
 	};
 	nkcAPI('/fund/a/'+id+'/audit', 'POST', obj)
 		.then(function(data) {
@@ -199,8 +200,7 @@ function displayRemainder() {
 	}
 }
 
-
-function submitAdminAudit(id) {
+function submitAdminAudit(id, refuse) {
 	var arr = $('input[name="adminSupport"]:first');
 	var needThreads = $('input[name="needThreads"]:first');
 
@@ -218,7 +218,7 @@ function submitAdminAudit(id) {
 	if(!support && c === '') {
 		return screenTopWarning('请输入不合格的原因');
 	}
-	if(support) {
+	if(support && !refuse) {
 		var remittanceTotal = 0;
 		var factMoneyTotal = 0;
 		for(var i = 0; i < remittance.length; i++) {
@@ -241,6 +241,7 @@ function submitAdminAudit(id) {
 		support: support,
 		needThreads: needThreads,
 		c: c,
+		refuse: refuse || false,
 		type: 'admin'
 	};
 	nkcAPI('/fund/a/'+id+'/audit', 'POST', obj)

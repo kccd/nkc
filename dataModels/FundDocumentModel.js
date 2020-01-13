@@ -133,8 +133,22 @@ documentSchema.methods.extendResources = async function() {
 
 documentSchema.pre('save', async function(next) {
 	const ResourceModel = mongoose.model('resources');
-	try {
-		const FundDocumentModel = mongoose.model('fundDocuments');
+	const content = this.c || "";
+	const newResources = (content.match(/\/r\/[0-9]{1,20}/g) || [])
+		.map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
+	for(const rid of newResources) {
+		const resource = await ResourceModel.findOne({rid});
+		if(!resource) continue;
+		await resource.update({
+			$addToSet: {
+				references: `fund-${this._id}`
+			}
+		});
+	}
+	return next()
+	
+	/*try {
+		
 		const oldDocument = await FundDocumentModel.findOne({_id: this.id});
 		let oldResources = [];
 		if(oldDocument) {
@@ -173,7 +187,7 @@ documentSchema.pre('save', async function(next) {
 		return next();
 	} catch(err) {
 		return next(err);
-	}
+	}*/
 });
 
 

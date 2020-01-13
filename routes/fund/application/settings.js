@@ -26,6 +26,10 @@ settingsRouter
       data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
       data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		}
+		
+		if(s === 5) {
+			await data.applicationForm.project.extendResources();
+		}
 		if(s > 5) ctx.throw(404, 'not found');
 		data.s = s;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
