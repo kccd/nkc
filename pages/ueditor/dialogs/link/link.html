@@ -103,7 +103,8 @@
     dialog.onok = function() {
         if(text.getAttribute("disabled") !== "true") {
             if(!text.value) {
-                text.value = "未知";
+                var href =$G('href').value.replace(/^\s+|\s+$/g, '');
+                text.value = href;
             }
         }
         handleDialogOk();
