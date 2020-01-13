@@ -63,7 +63,7 @@ auditRouter
 		const {user, applicationForm} = data;
 		const {budgetMoney, fund, lock, fixedMoney} = applicationForm;
 		const {certs, appointed} = fund.censor;
-		const {type} = body;
+		const {type, refuse} = body;
 		lock.timeToClose = Date.now();
 		lock.auditing = false;
 		let support = true;
@@ -74,7 +74,7 @@ auditRouter
 			if(user.uid !== uid) {
 				ctx.throw(400, '抱歉！您的审核已经超时啦，该申请表正在被其他审查员审核。');
       }
-      if(applicationForm.status.projectPassed !== null) ctx.throw(400, '申请表暂不需要专家审核，请勿重复提交审核结果。')
+      if(applicationForm.status.projectPassed !== null) ctx.throw(400, '申请表暂不需要专家审核，请勿重复提交审核结果。');
       const {suggestMoney, comments} = body;
       const docArr = [];
 			for(let comment of comments) {
@@ -90,9 +90,10 @@ auditRouter
 				});
 				docArr.push(newDocument);
 			}
+			if(support && refuse) ctx.throw(400, "请输入彻底拒绝的原因");
 			applicationForm.status.projectPassed = support;
 			//添加项目审查员的预算建议
-			if(!fixedMoney) {
+			if(!fixedMoney && !refuse) {
 				if(budgetMoney.length !== suggestMoney.length) ctx.throw(400, '建议金额个数不匹配。');
 				let total = 0;
 				let suggest = 0;
@@ -107,6 +108,7 @@ auditRouter
 				}
 				await applicationForm.update({budgetMoney});
       }
+			
       for(const d of docArr) {
         await d.save();
       }
@@ -118,6 +120,7 @@ auditRouter
 				ctx.throw(400, '抱歉！您的审核已超时，该申请表正在被其他管理员复核。');
 			}
 			const {c, support, factMoney, remittance, needThreads} = body;
+			if(support && refuse) ctx.throw(400, "请输入彻底拒绝的原因");
 			if(support) {
 				applicationForm.timeToPassed = Date.now();
 				if(applicationForm.fixedMoney || remittance.length === 0) {
@@ -177,8 +180,31 @@ auditRouter
 		} else {
 			applicationForm.tlm = Date.now();
 		}
+		
+		// 彻底拒绝
+		if(refuse) {
+			let remittanceError = false;
+			for(let r of applicationForm.remittance) {
+				if(r.status === false) {
+					remittanceError = true;
+					break;
+				}
+			}
+			applicationForm.useless = 'refuse';
+			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
+			const newDocument = db.FundDocumentModel({
+				_id: newId,
+				uid: user.uid,
+				applicationFormId: applicationForm._id,
+				type: 'system',
+				c: '被彻底拒绝',
+				support: false
+			});
+			await newDocument.save();
+		}
+		
 		await applicationForm.save();
-
+		
 		if(type === "project") {
 		  if(support) {
 		    await db.MessageModel.sendFundMessage(applicationForm._id, "admin");

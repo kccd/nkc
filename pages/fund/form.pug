@@ -53,7 +53,7 @@ include ../interface_fund_apply_messages
                     a(onclick=` disagree(${applicationForm._id})`).btn.btn-danger.btn-block=`残忍拒绝`
       else
         //info
-        if projectPassed === false
+        if projectPassed === false && applicationForm.useless !== "refuse"
           .panel.panel-default
             .panel-body.applicationForm.text-danger
               if !data.user || data.user.uid !== applicationForm.uid
@@ -61,7 +61,7 @@ include ../interface_fund_apply_messages
               else
                 p.text-center=`专家审核不通过，`
                   a(href=`/fund/a/${applicationForm._id}/settings`) 去修改
-        if adminSupport === false
+        if adminSupport === false && applicationForm.useless !== "refuse"
           .panel.panel-default
             .panel-body.applicationForm.text-danger
               if !data.user || data.user.uid !== applicationForm.uid
