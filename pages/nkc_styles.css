@@ -3897,6 +3897,9 @@ ul.nav.navbar-nav.navbar-md>li>a{
   padding-top: 75%;
   position: relative;
 }
+.article-video-body video{
+  max-width: 100%;
+}
 .article-video-body>div{
   height: 100%;
   width: 100%;

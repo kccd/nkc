@@ -7,6 +7,7 @@ block title
   -const type = data.type;
   title= `科创基金-${fund.name}`
   link(rel='stylesheet' href='/fund.css')
+  include ./publicModules/plyr/plyr.css.pug
 block content
   .container-fluid.max-width
     include interface_fund_nav
@@ -179,7 +180,7 @@ block content
                 h5 不合格
             .col-xs-12.col-md-12.text-center
               button.btn.btn-info#submit(onclick=`submitProjectAudit(${applicationForm._id})`) 提交
-              button.btn.btn-danger(onclick=`refuse(${applicationForm._id})`) 彻底拒绝
+              button.btn.btn-danger(onclick=`submitProjectAudit(${applicationForm._id}, true)`) 彻底拒绝
 
       else
         .col-xs-12.col-md-12
@@ -351,8 +352,10 @@ block content
               h5 否
         .col-xs-12.col-md-12.text-center
           button.btn.btn-info#adminSubmit(onclick=`submitAdminAudit(${applicationForm._id})`) 提交
-          button.btn.btn-danger(onclick=`refuse(${applicationForm._id})`) 彻底拒绝
+          button.btn.btn-danger(onclick=`submitAdminAudit(${applicationForm._id}, true)`) 彻底拒绝
 
 block scripts
+  include ./publicModules/lazySizes
+  include ./publicModules/plyr/plyr.js.pug
   script(src='/interface_common.js')
   script(src='/interface_fund_audit.js')
