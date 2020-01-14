@@ -18,7 +18,8 @@ router
   })
   .post("/", async (ctx, next) => {
     const {data, db, body, nkcModules, tools, state} = ctx;
-    if(!state.columnPermission) ctx.throw(403, "您的账号暂未满足开设专栏的条件");
+    if(!state.columnPermission) ctx.throw(403, "你的账号暂未满足开设专栏的条件");
+    if(state.userColumn) ctx.throw(403, "你已开设专栏");
     const {contentLength} = tools.checkString;
     const {files, fields} = body;
     const {avatar, banner} = files;
