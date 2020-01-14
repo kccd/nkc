@@ -1,4 +1,4 @@
-if !state.apptype
+if !state.isApp
   -shareDescription = (shareDescription || "").replace(/\n/ig, " ");
   +includeCSS("/publicModules/share/share.css")
   .share

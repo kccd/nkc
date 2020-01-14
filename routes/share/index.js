@@ -38,7 +38,7 @@ shareRouter
     let shareAccessLog = await db.SharesAccessLogModel.findOne({token, ip: ctx.address});
     if(shareAccessLog) {
       await lock.unlock();
-      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+      return ctx.redirect(shareUrl);
     } else {
       shareAccessLog = db.SharesAccessLogModel({
         ip: ctx.address,
@@ -51,21 +51,21 @@ shareRouter
     // 若分享者是游客
     if(['', 'visitor'].includes(uid)) {
       await lock.unlock();
-      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+      return ctx.redirect(shareUrl);
     }
     const targetUser = await db.UserModel.findOnly({uid});
     // 若该ip已经访问过则不给予分享着奖励
     // 不属于站外的用户（已经登录的用户）访问时不给予分享者奖励
     if(user) {
       await lock.unlock();
-      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+      return ctx.redirect(shareUrl);
     }
     try{
       // 判断token是否有效
       await db.ShareModel.ensureEffective(token);
     } catch(err) {
       await lock.unlock();
-      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+      return ctx.redirect(shareUrl);
     }
     // 若share有效则写入cookie
     ctx.setCookie(`share-token`, {token});
@@ -78,7 +78,7 @@ shareRouter
       await shareLogs.update({kcb: num});
     }
     await lock.unlock();
-    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, shareUrl));
+    return ctx.redirect(shareUrl);
   })
 .post('/', async (ctx, next) => {
   const {data, body, db, nkcModules} = ctx;

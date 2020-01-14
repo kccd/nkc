@@ -12,7 +12,7 @@ module.exports = (ctx, next) => {
   if(res) {
     const redirectUrl = url.replace(res.map, res.to);
     ctx.status = 301;
-    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, redirectUrl));
+    return ctx.redirect(redirectUrl);
   }
   return next()
 };

@@ -749,7 +749,7 @@ block content
       .ms-mask(v-if="socketInfo" :class="{'hide': socketInfo.text==='已连接'}") {{socketInfo.text}}
       .mobile-settings(v-if="showMobileSettings")
         +settings
-      if !state.apptype
+      if !state.isApp
         .mobile-footer(v-if="showMobileNavbar")
           .col-xs-3(:class="{active: showMobileList}" @click="initMobile('showMobileList')")
             .fa.fa-list-ul

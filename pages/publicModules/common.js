@@ -271,11 +271,10 @@ NKC.methods.resourceToHtml = function(resource) {
 * @author pengxiguaa 2019-9-25
 * */
 NKC.methods.toLogin = function(type) {
-  var runType = NKC.methods.getRunType();
-  if(runType === "app") {
-    if(window.toAppLogin) {
-      toAppLogin();
-    }
+  if(NKC.configs.isApp) {
+    emitEvent("openLoginPage", {
+      type: type
+    });
   } else {
     Login.open(type === "register"? "register": "login");
   }

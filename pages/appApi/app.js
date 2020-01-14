@@ -1,36 +1,82 @@
-var realUrl = "";
 localStorage.setItem("apptype", "app");
-var allLinks = document.querySelectorAll("a");
-var allButtons = document.querySelectorAll("button");
-var imgDownTimeOut;
-$(document).ready(function() {
-  // 获取url的apptype参数，要么为app，要么为false
-  var apptype = getQueryVariable("apptype");
-  if(apptype === "app") {
-    // 去掉body的paddingTop
-    if(location.pathname === "/") {
-      $("body").css("padding-top", "10px");
-    }
-  }
-});
 
-apiready = function() {
-  // 为所有图片添加点击事件
-  var allImgs = document.querySelectorAll("img");
-  Array.prototype.forEach.call(allImgs, function(img) {
+$(function(){
+  var allLinks = document.querySelectorAll("a[href]");
+  var allImages = document.querySelectorAll("img[src]");
+  // 禁止点击连接执行跳转
+  Array.prototype.forEach.call(allLinks, function(link) {
+    link.addEventListener("click", function(e) {
+      e.preventDefault();
+    });
+  });
+  Array.prototype.forEach.call(allLinks, function(link) {
+    link.addEventListener("click", function() {
+      if(this.href.indexOf("/r/") > -1) {
+        emitEvent("download", {
+          url: this.href,
+          filename: this.innerText
+        });
+        // attachDownInApp(this.href);
+       } else {
+        var isHostUrl = siteHostLink(this.href);
+        // 如果是本站链接则打开app内页，否则使用外站浏览页打开
+        if(isHostUrl) {
+          var paramIndex = this.href.indexOf("?");
+          var newHref = "";
+          var equaiHref = false;
+          if(paramIndex > -1) {
+            newHref = (this.href).substring(0, paramIndex)
+          }else{
+            newHref = this.href;
+          }
+          if(newHref.length > 0) {
+            if(api.winName.indexOf(newHref) > -1) {
+              equaiHref = true;
+            }
+          }
+          // 如果是在首页跳转到最新关注推荐等，不打开新页面
+          if(this.pathname === "/" && api.winName === "root") {
+            window.location.href = addApptypeToUrl(this.href)
+            return;
+          }
+          if(equaiHref) {
+            appFreshUrl(this.href);
+          }else{
+            appOpenUrl(this.href);
+          }
+        }else{
+          api.openWin({
+            name: 'link',
+            url: 'widget://html/link/link.html',
+            pageParam: {
+              name: 'link',
+              linkUrl: this.href
+            }
+          });
+        }
+      }
+    })
+  })
+  Array.prototype.forEach.call(allImages, function(img) {
     img.addEventListener("click", function() {
-      if(this.getAttribute("dataimg") && this.getAttribute("dataimg") == "content") {
+      if(this.getAttribute("dataimg") && this.getAttribute("dataimg") === "content") {
         if(this.src && this.src.indexOf("/r/") > -1) {
-          imageOpenInApp(this.src);
+          emitEvent("openImage", {
+            url: this.src
+          });
         }
       }
     })
   });
+});
+
+apiready = function() {
+  
   // 为所有的a标签添加点击事件
   // 监听全局a标签的点击事件
   // 并阻止链接点击跳转
   // var allLinks = document.querySelectorAll("a");
-  var body = document.getElementsByTagName("body")[0];
+  /*var body = document.getElementsByTagName("body")[0];
   body.addEventListener('click',function (e) {
     // e.preventDefault();
     if(e.target && e.target.nodeName.toLowerCase() == "a" && e.target.getAttribute('href')) {  // 检查事件源e.target是否为a
@@ -79,7 +125,7 @@ apiready = function() {
         }
       }
     }
-  }, true);
+  }, true);*/
   // 将本页的title和description传入app中
   var locationUrl = window.location.href;
   var urlType = getShareTypeByUrl(locationUrl);
@@ -219,20 +265,6 @@ function appFreshUrl(urlStr) {
   })
 }
 
-/**
- * 获取url中的app参数
- * @param {*} key 
- */
-function getQueryVariable(key)
-{
-  var query = window.location.search.substring(1);
-  var vars = query.split("&");
-  for (var i=0;i<vars.length;i++) {
-    var pair = vars[i].split("=");
-    if(pair[0] == key){return pair[1];}
-  }
-  return(false);
-}
 
 /**
  * 判断url是否为本站链接
@@ -263,15 +295,7 @@ function getSiteMeta() {
   }catch(e) {
     description = "倡导科学理性，发展科技爱好";
   }
-  var para = {
-    title: title,
-    description: description
-  };
-  var paraStr = JSON.stringify(para);
-  /*api.execScript({
-    name: realUrl,
-    script: 'getAppMeta('+paraStr+');'
-  });*/
+  
   emitEvent("siteMetaReady", {
     title: title,
     description: description
@@ -293,7 +317,7 @@ function getShareTypeByUrl(sourceUrl) {
     "forum": "/f/",
     "activity": "/activity/",
     "column": "/m/"
-  }
+  };
   var shareType = "common";
   for(var i in typeObj) {
     if(sourceUrl.indexOf(typeObj[i]) > -1) {

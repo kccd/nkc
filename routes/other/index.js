@@ -32,18 +32,18 @@ otherRouter
 		const {fid} = ctx.query;
     ctx.status = 301;
 		if(fid) {
-			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${fid}`));
+			return ctx.redirect(`/f/${fid}`);
 		}
-		return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/`));
+		return ctx.redirect( `/`);
 	})
 	.get('read.php', async (ctx, next) => {
     const {nkcModules} = ctx;
 		const {tid} = ctx.query;
 		ctx.status = 301;
 		if(tid) {
-			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}`));
+			return ctx.redirect(`/t/${tid}`);
 		}
-		return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/`));
+		return ctx.redirect(`/`);
 	})
 	.use('logo', logoRouter.routes(), logoRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())

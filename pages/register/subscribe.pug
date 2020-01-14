@@ -57,7 +57,7 @@ block content
         h4 热门专栏
         .col-xs-12.col-md-12
           h4 热门专业
-      if state.apptype !== "app"
+      if !state.isApp
         .col-xs-12.col-md-12.text-center.m-t-4
           a.register-btn(href=`/`) 开启科创之旅
 block scripts

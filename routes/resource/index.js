@@ -129,7 +129,7 @@ resourceRouter
       });
       await downloadLog.save();
     }
-    await next()
+    await next();
   })
   .post('/', async (ctx, next) => {
     const {fs, tools, settings, db, data, nkcModules} = ctx;

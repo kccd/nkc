@@ -9,9 +9,6 @@ router
     const column = await db.ColumnModel.findOne({uid: user.uid});
     if(column && !column.closed) {
       let url = `/m/${column._id}`;
-      if(ctx.query.apptype === "app") {
-        url += "?apptype=app"
-      }
       return ctx.redirect(url);
     }
     await next();
@@ -70,9 +67,6 @@ router
     const column = await db.ColumnModel.findOne({uid: user.uid});
     if(column) {
       let url = `/m/${column._id}`;
-      if(ctx.query.apptype === "app") {
-        url += "?apptype=app"
-      }
       if(column.closed) {
         await column.update({closed: false});
       }

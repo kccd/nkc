@@ -19,7 +19,7 @@ const messageRouter = require("./message");
 logRouter
   .get('/', async (ctx, next) => {
     const {nkcModules} =ctx;
-    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/e/log/public`));
+    return ctx.redirect(`/e/log/public`);
   })
   .use("/exam", examRouter.routes(), examRouter.allowedMethods())
   .use("/withdraw", withdrawRouter.routes(), withdrawRouter.allowedMethods())

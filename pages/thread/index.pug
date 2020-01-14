@@ -34,7 +34,7 @@ block title
     +includeCSS("/external_pkgs/viewer/main.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
     include ../publicModules/plyr/plyr.css.pug
-  if !state.apptype
+  if !state.isApp
     style=`body{background-color: ${(data.user?data.user.color:null) || "#f4f4f4"}!important;`
 
   mixin postOptions(post, targetThread, index, dropType)
@@ -464,7 +464,7 @@ block content
                                     p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
                                     .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
                                     p.lighttext.airnum3(style="text-align:center;") #{(thread.count)?(thread.count)+' 回复 /':''} #{thread.hits} 浏览
-                                  if !state.apptype
+                                  if !state.isApp
                                     div.changeDisNone.text-center(style='width: 100%;')
                                       .col-xs-12.col-md-12
                                         .col-xs-3.col-md-3(style="padding:0px")
@@ -592,20 +592,12 @@ block content
                               +inputPanel
 
                       else
-                        if !state.apptype
-                          .col-xs-12.col-md-12
-                            p 想参与大家的讨论？现在就&nbsp;
-                              a.pointer(onclick="NKC.methods.toLogin('login')") 登录
-                              | &nbsp;或者&nbsp;
-                              a.pointer(onclick="NKC.methods.toLogin('register')") 注册
-                              | 。
-
-                        else
-                          .col-xs-12.col-md-12
-                            p
-                              span 想参与大家的讨论？现在就
-                              a(onclick="NKC.methods.toLogin()") [登录]
-                              span 。
+                        .col-xs-12.col-md-12
+                          p 想参与大家的讨论？现在就&nbsp;
+                            a.pointer(onclick="NKC.methods.toLogin('login')") 登录
+                            | &nbsp;或者&nbsp;
+                            a.pointer(onclick="NKC.methods.toLogin('register')") 注册
+                            | 。
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"
@@ -712,7 +704,7 @@ block scripts
   if permission("getPostAuthor")
     include ../publicModules/floatUserPanel/userInfo
   +includeJS("/external_pkgs/viewer/viewer.js")
-  if !state.apptype
+  if !state.isApp
     script.
       $(document).ready(function() {
         var options = {

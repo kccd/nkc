@@ -34,7 +34,7 @@ settingsRouter
 	.get('/', async (ctx) => {
 		const {nkcModules} = ctx;
 		const fid = ctx.params.fid;
-		return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${fid}/settings/info`));
+		return ctx.redirect(`/f/${fid}/settings/info`);
 	})
 	.use('/image', imageRouter.routes(), imageRouter.allowedMethods())
 	.use('/permission', permissionRouter.routes(), permissionRouter.allowedMethods())

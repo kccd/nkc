@@ -7,7 +7,7 @@ registerRouter
   	const {data, query, nkcModules} = ctx;
   	const {user} = data;
   	if(user) {
-      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/'));
+      return ctx.redirect('/');
     }
 		const {code} = query;
 		if(code) {

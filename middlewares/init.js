@@ -9,6 +9,7 @@ const fs = require('fs');
 const {promisify} = require('util');
 const redis = require('../redis');
 const cookieConfig = require("../config/cookie");
+
 const fsSync = {
   access: promisify(fs.access),
   unlink: promisify(fs.unlink),
@@ -66,21 +67,29 @@ module.exports = async (ctx, next) => {
     ctx.redis = redis;
     ctx.settings = settings;
     ctx.fs = fsSync;
-
+  
     ctx.state = {
       url: ctx.url.replace(/\?.*/ig, ""),
-      apptype: (ctx.query.apptype && ctx.query.apptype === "app")?"app":"",
+      isApp: false,
+      appOS: undefined,
       twemoji: settings.editor.twemoji,
-
       // - 初始化网站设置
       pageSettings: await db.SettingModel.getSettings("page"),
       postSettings: await db.SettingModel.getSettings("post"),
       serverSettings: await db.SettingModel.getSettings("server"),
-
+    
       // 缓存相关
       cachePage: false
     };
-
+    
+    // 判断是否为APP发起的请求
+    let userAgent = ctx.header["user-agent"];
+    userAgent = userAgent.match(/NKC\/APP\/([a-z]+)/ig);
+    if(userAgent !== null) {
+      ctx.state.isApp = true;
+      ctx.state.appOS = userAgent[0].includes("android")? "android": "ios"
+    }
+    console.log(ctx.state.isApp, ctx.state.appOS);
 	  // 权限判断
     // @param {String} o 操作名
 	  ctx.permission = (o) => {

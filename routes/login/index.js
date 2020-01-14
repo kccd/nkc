@@ -5,7 +5,7 @@ loginRouter
 		const {nkcModules} = ctx;
 		const {user} = ctx.data;
 		if(user) {
-			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/'));
+			return ctx.redirect('/');
 		}
 		await next();
 	})

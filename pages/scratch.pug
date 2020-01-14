@@ -3,9 +3,9 @@ include ./publicModules/mixin.pug
 html(lang='zh-CN')
   head
     block head
-  if !state.apptype || state.apptype === false
+  if !state.isApp
     body(id='body').mdui-theme-primary-blue-grey.mdui-theme-accent-pink
       block body
   else
-    body(id='body' style="padding-top:10px;background-color:#FFF").mdui-theme-primary-blue-grey.mdui-theme-accent-pink
+    body(id='body').mdui-theme-primary-blue-grey.mdui-theme-accent-pink
       block body

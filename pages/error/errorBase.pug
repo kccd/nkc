@@ -20,16 +20,16 @@ block body
         .error-list.b-s-10
           .error-header 你暂未登录，无法确定是否有权浏览。
           h4.text-center
-            button.btn.btn-default.btn-sm(onclick="Login.open('login')") 登录
+            button.btn.btn-default.btn-sm(onclick="NKC.methods.toLogin('login')") 登录
             | &nbsp;或
-            button.btn.btn-default.btn-sm(onclick="Login.open('register')") 注册
+            button.btn.btn-default.btn-sm(onclick="NKC.methods.toLogin('register')") 注册
           .error-code
             span message：
             code= data.error
       else
         block errorContent
       .error-button
-        if !state.apptype
+        if !state.isApp
           a(href="/") 网站首页
           | &nbsp;&nbsp;&nbsp;
           a(onclick="history.back(-1)") 返回上一页
@@ -37,9 +37,10 @@ block body
   +includeJS('/jquery/jquery-1.11.1.js')
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/vue/dist/vue.js')
-  if state.apptype
+  +includeJS("/publicModules/common.js")
+  if state.isApp
+    script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";`
     +includeJS("/appAPi/app.js")
   +includeJS("/interface_common.js")
-  +includeJS("/publicModules/common.js")
   if !data.user && data.status === 403
     include ../publicModules/login/login

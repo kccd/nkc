@@ -126,7 +126,7 @@ block content
                 h3 补充说明
                 hr
                 div!= markdown_safe(fund.description.detailed)
-          if !state.apptype
+          if !state.isApp
             .col-xs-12.col-md-12
               .panel.panel-default
                 .panel-body.fund-description
