@@ -150,8 +150,9 @@ router
         if (data.type === link.type) data.name = link.name;
       })
     });
+    state.isApp = false;
     if (state.isApp) {
-      ctx.template = "user/profile/me.pug";
+      ctx.template = "user/profile/appProfile.pug";
     } else {
       ctx.template = "user/profile/profile.pug";
     }

@@ -77,7 +77,7 @@ var app = new Vue({
         app.info = "提交中..." + a + "%";
       })
         .then(function(data) {
-          openToNewLocation("/m/" + data.column._id);
+          NKC.methods.visitUrl("/m/" + data.column._id);
         })
         .catch(function(data) {
           app.info = "";

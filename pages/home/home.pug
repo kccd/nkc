@@ -35,27 +35,27 @@ block content
           if data.t === "subscribe"
             .subscribe-lists.m-b-1
               .subscribe-list
-                a(href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
+                a(data-type="reload" href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
                   class=!data.d || data.d === 'all' ? "active" : ""
                 ) 全部
               .subscribe-list
-                a(href=`/?t=subscribe&d=own${data.c ? `&c=${data.c}` : ""}`
+                a(data-type="reload" href=`/?t=subscribe&d=own${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "own" ? "active" : ""
                 ) 我的文章
               .subscribe-list
-                a(href=`/?t=subscribe&d=thread${data.c ? `&c=${data.c}` : ""}`
+                a(data-type="reload" href=`/?t=subscribe&d=thread${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "thread" ? "active" : ""
                 ) 关注的文章
               .subscribe-list
-                a(href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
+                a(data-type="reload" href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "reply" ? "active" : ""
                 ) 参与过的文章
               .subscribe-list
-                a(href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
+                a(data-type="reload" href=`/?t=subscribe&d=user${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "user" ? "active" : ""
                 ) 用户
               .subscribe-list
-                a(href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
+                a(data-type="reload" href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
                     class=data.d==="column"? "active" : ""
                 ) 专栏
           if !data.threads.length
@@ -76,9 +76,9 @@ block content
                   a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
               if data.t === "latest" || data.t === "column" || data.t === "recommend"
                 .paging-button
-                  a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "") 全部
-                  a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "") 推荐
-                  a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "") 专栏
+                  a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "" data-type="reload") 全部
+                  a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 推荐
+                  a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
 
               include ../publicModules/paging/paging
 

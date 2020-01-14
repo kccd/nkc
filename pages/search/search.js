@@ -76,12 +76,12 @@ var app = new Vue({
       if(type === "column") t = "&t=column";
       if(type === "resource") t= "&t=resource";
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options;
-      openToNewLocation("/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options)
+      NKC.methods.visitUrl("/search?c=" + this.strToBase64(this.c || "") + t +"&d=" + this.options)
     },
     // 搜索
     search: function() {
       if(!this.c) return screenTopWarning("请输入关键词");
-      openToNewLocation("/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options)
+      NKC.methods.visitUrl("/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options)
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options;
     }
   },

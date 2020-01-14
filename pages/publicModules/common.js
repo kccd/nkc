@@ -11,7 +11,7 @@ var NKC = {
 * 判断运行环境
 * */
 NKC.methods.getRunType = function() {
-  if(localStorage.getItem("apptype") === "app") {
+  if(NKC.configs.isApp) {
     return "app"
   } else {
     return "web"
@@ -25,10 +25,8 @@ NKC.methods.getRunType = function() {
 * @author pengxiguaa 2019-7-26
 * */
 NKC.methods.visitUrl = function(url, blank) {
-  if(NKC.methods.getRunType() === "app") {
-    if(window.appOpenUrl) {
-      window.appOpenUrl(url);
-    }
+  if(NKC.configs.isApp) {
+    NKC.methods.openOnlinePage(url);
   } else {
     if(blank) {
       window.open(url);
@@ -36,6 +34,17 @@ NKC.methods.visitUrl = function(url, blank) {
       window.location.href = url;
     }
   }
+};
+/*
+* app打开在线网页
+* */
+NKC.methods.openOnlinePage = function(url) {
+  url = url.replace(/\/f\/([0-9]+)[?#]?.*/ig, function(c, v1) {
+    return "/f/" + v1 + "/latest";
+  });
+  emitEvent("openOnlinePage", {
+    url
+  });
 };
 
 /*

@@ -3,10 +3,10 @@
   if data.forum.valuableThreadsId.length === 0 && data.forum.basicThreadsId.length === 0 && !data.forum.declare
     -displayHome = false;
   if displayHome
-    a.primary-button(href=`/f/${data.forum.fid}/home` class=data.type==="home"?"active": "") 专业首页
-  a.primary-button(href=`/f/${data.forum.fid}/latest` class=data.type==="latest"?"active": "") 最新
+    a.primary-button(href=`/f/${data.forum.fid}/home` class=data.type==="home"?"active": "" data-type="reload") 专业首页
+  a.primary-button(href=`/f/${data.forum.fid}/latest` class=data.type==="latest"?"active": "" data-type="reload") 最新
   if data.forum && data.forum.childrenForums.length === 0
-    a.primary-button(href=`/f/${data.forum.fid}/followers` class=data.type==="followers"?"active": "") 关注的人
-  a.primary-button(href=`/f/${data.forum.fid}/visitors` class=data.type==="visitors"?"active": "") 今日来访
+    a.primary-button(href=`/f/${data.forum.fid}/followers` class=data.type==="followers"?"active": "" data-type="reload") 关注的人
+  a.primary-button(href=`/f/${data.forum.fid}/visitors` class=data.type==="visitors"?"active": "" data-type="reload") 今日来访
   if data.forum.lid 
-    a.primary-button(href=`/f/${data.forum.fid}/library` class=data.type==="library"?"active": "") 文库
+    a.primary-button(href=`/f/${data.forum.fid}/library` class=data.type==="library"?"active": "" data-type="reload") 文库

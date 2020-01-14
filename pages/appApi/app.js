@@ -1,24 +1,22 @@
 localStorage.setItem("apptype", "app");
 
-$(function(){
+(function(){
   var allLinks = document.querySelectorAll("a[href]");
   var allImages = document.querySelectorAll("img[src]");
-  // 禁止点击连接执行跳转
   Array.prototype.forEach.call(allLinks, function(link) {
     link.addEventListener("click", function(e) {
-      e.preventDefault();
-    });
-  });
-  Array.prototype.forEach.call(allLinks, function(link) {
-    link.addEventListener("click", function() {
+      // 打开资源链接进行下载
       if(this.href.indexOf("/r/") > -1) {
-        emitEvent("download", {
+        /*emitEvent("download", {
           url: this.href,
           filename: this.innerText
-        });
-        // attachDownInApp(this.href);
-       } else {
-        var isHostUrl = siteHostLink(this.href);
+        });*/
+      } else {
+        if(this.getAttribute("data-type") !== "reload") {
+          e.preventDefault();
+          NKC.methods.openOnlinePage(this.href);
+        }
+        /*var isHostUrl = siteHostLink(this.href);
         // 如果是本站链接则打开app内页，否则使用外站浏览页打开
         if(isHostUrl) {
           var paramIndex = this.href.indexOf("?");
@@ -36,8 +34,7 @@ $(function(){
           }
           // 如果是在首页跳转到最新关注推荐等，不打开新页面
           if(this.pathname === "/" && api.winName === "root") {
-            window.location.href = addApptypeToUrl(this.href)
-            return;
+            return window.location.href = this.href;
           }
           if(equaiHref) {
             appFreshUrl(this.href);
@@ -53,10 +50,10 @@ $(function(){
               linkUrl: this.href
             }
           });
-        }
+        }*/
       }
     })
-  })
+  });
   Array.prototype.forEach.call(allImages, function(img) {
     img.addEventListener("click", function() {
       if(this.getAttribute("dataimg") && this.getAttribute("dataimg") === "content") {
@@ -68,9 +65,28 @@ $(function(){
       }
     })
   });
-});
+})();
 
 apiready = function() {
+  
+  // 分享 页面信息
+  // 将本页的title和description传入app中
+  var title, description;
+  try{
+    title = document.getElementsByTagName("title")[0].text;
+  } catch(e){
+    title = "来自科创的分享";
+  }
+  try {
+    description = document.getElementsByName("description")[0].getAttribute("content");
+  } catch(e) {
+    description = "倡导科学理性，发展科技爱好";
+  }
+  emitEvent("siteMetaReady", {
+    title: title,
+    description: description,
+    url: window.location.href
+  });
   
   // 为所有的a标签添加点击事件
   // 监听全局a标签的点击事件
@@ -126,12 +142,6 @@ apiready = function() {
       }
     }
   }, true);*/
-  // 将本页的title和description传入app中
-  var locationUrl = window.location.href;
-  var urlType = getShareTypeByUrl(locationUrl);
-  if(urlType !== "common") {
-    getSiteMeta();
-  }
   // 获取编辑器标识
   var withE = window.localStorage.getItem("withE");
   // 下拉刷新当前页面
@@ -172,7 +182,7 @@ apiready = function() {
   }
   // 清除编辑器标识
   window.localStorage.removeItem("withE");
-}
+};
 
 /**
  * 给url添加apptype参数
@@ -272,35 +282,7 @@ function appFreshUrl(urlStr) {
  */
 function siteHostLink(urlStr) {
   var hostStr = window.location.host;
-  var hostIndex = urlStr.indexOf(hostStr);
-  if(hostIndex === -1) {
-    return false;
-  }else{
-    return true;
-  }
-}
-
-/**
- * 获取当前页面的meta中的title和description
- */
-function getSiteMeta() {
-  var title, description;
-  try{
-    title = document.getElementsByTagName("title")[0].text;
-  }catch(e){
-    title = "来自科创的分享";
-  }
-  try {
-    description = document.getElementsByName("description")[0].getAttribute("content");
-  }catch(e) {
-    description = "倡导科学理性，发展科技爱好";
-  }
-  
-  emitEvent("siteMetaReady", {
-    title: title,
-    description: description
-  });
-  
+  return urlStr.indexOf(hostStr) !== -1;
 }
 
 
@@ -383,15 +365,6 @@ function imageOpenInApp(sid) {
     script: "openImage(['"+sid+"'])"
   })
 }
-
-// 文件下载
-function attachDownInApp(linkUrl) {
-  api.execScript({
-    name: api.winName,
-    script: "attachDown('"+linkUrl+"')"
-  })
-}
-
 
 /*
 * 注册一个监听事件

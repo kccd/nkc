@@ -132,7 +132,12 @@ function initVueApp() {
         var info = "是否加载 " + self.format("YYYY/MM/DD HH:ss:mm", self.oldDraft.tlm) + " 编辑但未提交的内容？";
         sweetQuestion(info)
           .then(function() { // 用户选择了加载，则跳转到相应的草稿页面
-            self.visitUrl("/editor?type=redit&id=" + self.oldDraft.did);
+            if(NKC.configs.isApp) {
+              window.location.href = "/editor?type=redit&id=" + self.oldDraft.did;
+            } else {
+              self.visitUrl("/editor?type=redit&id=" + self.oldDraft.did);
+            }
+            
           })
           .catch(function() { // 用户选择了取消加载，则启动自动保存草稿且开启关闭页面的警告
             self.autoSaveToDraft();
@@ -143,7 +148,9 @@ function initVueApp() {
       } else { // 没有未提交的相应草稿，启动自动保存草稿且开启关闭页面的警告
         self.autoSaveToDraft();
         self.showCloseInfo = true;
-        self.getContentFromLocal();
+        setTimeout(function() {
+          self.getContentFromLocal();
+        }, 2000);
         self.alertPermissionInfo();
       }
     },
@@ -215,7 +222,7 @@ function initVueApp() {
       // app判断本地存储
       getContentFromLocal: function() {
         // 当且仅当发表新文章时才去判断
-        if(NKC.methods.getRunType() === "app" && data.type === "newThread" && (!data.post || !data.post.c)) {
+        if(NKC.configs.isApp && data.type === "newThread" && (!data.post || !data.post.c)) {
           setLocalContentToUE();
         }
       },
@@ -655,6 +662,11 @@ function initVueApp() {
           .then(function(data) {
             self.showCloseInfo = false;
             self.visitUrl(data.redirect || "/");
+            if(NKC.configs.isApp) {
+              setTimeout(function() {
+                api.closeWin();
+              }, 1000)
+            }
             // 解锁发表按钮
             // PostButton.disabledSubmit = false;
           })
