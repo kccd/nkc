@@ -1,0 +1,34 @@
+extends ../base
+block title
+  +includeCSS("/app/nav/nav.css")
+block content
+  .app-nav
+    .nav-header
+    .nav-user
+      .user-avatar
+        img(src=`/avatar/${data.user.avatar}`)
+      .user-info
+        .user-name=data.user.username
+        .user-certs
+          img(src=tools.getUrl("gradeIcon", data.user.grade._id))
+          span=data.user.info.certsName
+        .user-description=data.user.description
+    .nav-banner-mask
+    .nav-banner(style=`background-image: url(/banner/${data.user.banner})`)
+    .nav-links
+      a.nav-link(href=`/u/${data.user.uid}`)
+        .icon-left
+          .fa.fa-user
+        span 访客视角
+        .icon-right
+          .fa.fa-chevron-right
+      a.nav-link(href=`/u/${data.user.uid}`)
+        .icon-left
+          .fa.fa-user
+        span 访客视角
+        .icon-right
+          .fa.fa-chevron-right
+    .nav-logout(onclick="logout()") 退出登录
+    .nav-footer
+block scripts
+  +includeJS("/app/nav/nav.js")

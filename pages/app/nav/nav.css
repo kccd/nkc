@@ -1,0 +1,135 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+body {
+  background-color: #f4f4f4;
+}
+.app-nav {
+  min-height: 100%;
+}
+.app-nav .nav-banner-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  height: 16rem;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.app-nav .nav-user {
+  position: absolute;
+  padding: 6rem 1rem 1rem 1rem;
+  top: 0;
+  left: 0;
+  z-index: 110;
+  height: 16rem;
+  color: #fff;
+}
+.app-nav .nav-user .user-avatar {
+  display: table-cell;
+  vertical-align: top;
+}
+.app-nav .nav-user .user-avatar img {
+  height: 6rem;
+  width: 6rem;
+  border-radius: 50%;
+  border: 2px solid #eee;
+  box-sizing: border-box;
+  margin-right: 1rem;
+}
+.app-nav .nav-user .user-info {
+  display: table-cell;
+  vertical-align: top;
+}
+.app-nav .nav-user .user-info .user-name {
+  font-size: 2rem;
+}
+.app-nav .nav-user .user-info .user-certs {
+  font-size: 1.2rem;
+  color: #ff8498;
+  margin-top: 0.3rem;
+  font-style: oblique;
+}
+.app-nav .nav-user .user-info .user-certs img {
+  vertical-align: text-top;
+  height: 1.4rem;
+  width: 1.4rem;
+  margin-right: 0.5rem;
+}
+.app-nav .nav-user .user-info .user-description {
+  margin-top: 0.8rem;
+  max-height: 3rem;
+  font-size: 1.2rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.app-nav .nav-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 90;
+  height: 16rem;
+  background-size: cover;
+}
+.app-nav .nav-banner img {
+  width: 100%;
+}
+.app-nav .nav-links {
+  padding-top: 16rem;
+}
+.app-nav .nav-links .nav-link {
+  padding: 0 5rem;
+  display: block;
+  height: 5rem;
+  line-height: 5rem;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  background-color: #fff;
+  color: #282c37;
+  font-size: 1.5rem;
+}
+.app-nav .nav-links .nav-link:active,
+.app-nav .nav-links .nav-link:focus,
+.app-nav .nav-links .nav-link:hover {
+  text-decoration: none;
+}
+.app-nav .nav-links .nav-link:active {
+  background-color: #f6f6f6;
+}
+.app-nav .nav-links .nav-link .icon-left {
+  height: 100%;
+  width: 5rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: center;
+  color: #555;
+  font-size: 1.6rem;
+}
+.app-nav .nav-links .nav-link .icon-right {
+  height: 100%;
+  width: 5rem;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #aaa;
+}
+.app-nav .nav-logout {
+  height: 6rem;
+  text-align: center;
+  color: #aaa;
+  line-height: 6rem;
+}

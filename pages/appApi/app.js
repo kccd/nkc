@@ -152,7 +152,7 @@ apiready = function() {
       textColor: '#aaaaaa',
       textDown: '下拉刷新',
       textUp: '松开刷新',
-      textLoading: '刷新成功，正在加载资源...',
+      textLoading: '加载中，请稍候',
       showTime: false
     }, function(ret, err) {
       window.location.reload();
@@ -237,10 +237,6 @@ function appOpenUrl(urlStr) {
       break;
     }
   }
-  api.execScript({
-    name: "root",
-    script: "shareReadyBan()"
-  });
   api.openWin({
     name: paramStr,
     url: windowFile,

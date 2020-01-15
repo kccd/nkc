@@ -41,8 +41,6 @@ router
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(targetUser.uid, "sub");
     data.fansId = await db.SubscribeModel.getUserFansId(targetUser.uid);
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
-    state.isApp = true;
-  
     if(state.isApp) {
       data.appLinks = [
         {

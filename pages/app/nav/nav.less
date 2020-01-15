@@ -1,0 +1,123 @@
+@import "../../publicModules/base";
+body{
+  background-color: #f4f4f4;
+}
+.app-nav{
+  min-height: 100%;
+  .nav-banner-mask{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    height: 16rem;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.3)
+  }
+  .nav-user{
+    position: absolute;
+    padding: 6rem 1rem 1rem 1rem;
+    top: 0;
+    left: 0;
+    z-index: 110;
+    height: 16rem;
+    color: #fff;
+    .user-avatar{
+      display: table-cell;
+      vertical-align: top;
+      img{
+        height: 6rem;
+        width: 6rem;
+        border-radius: 50%;
+        border: 2px solid #eee;
+        box-sizing: border-box;
+        margin-right: 1rem;
+      }
+    }
+    .user-info{
+      display: table-cell;
+      vertical-align: top;
+      .user-name{
+        font-size: 2rem;
+      }
+      .user-certs{
+        font-size: 1.2rem;
+        color: #ff8498;
+        margin-top: 0.3rem;
+        font-style: oblique;
+        img{
+          vertical-align: text-top;
+          height: 1.4rem;
+          width: 1.4rem;
+          margin-right: 0.5rem;
+        }
+      }
+      .user-description{
+        margin-top: 0.8rem;
+        max-height: 3rem;
+        font-size: 1.2rem;
+        .hideText(@line: 2)
+      }
+    }
+
+  }
+  .nav-banner{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 90;
+    height: 16rem;
+    background-size: cover;
+    img{
+      width: 100%;
+    }
+  }
+  .nav-links{
+    padding-top: 16rem;
+    @linkHeight: 5rem;
+    .nav-link{
+      padding: 0 @linkHeight;
+      display: block;
+      height: @linkHeight;
+      line-height: @linkHeight;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      background-color: #fff;
+      color: @dark;
+      font-size: 1.5rem;
+      &:active, &:focus, &:hover{
+        text-decoration: none;
+      }
+      &:active{
+        background-color: #f6f6f6;
+      }
+
+      .icon-left{
+        height: 100%;
+        width: @linkHeight;
+        position: absolute;
+        top: 0;
+        left: 0;
+        text-align: center;
+        color: #555;
+        font-size: 1.6rem;
+      }
+      .icon-right{
+        height: 100%;
+        width: @linkHeight;
+        text-align: center;
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #aaa;
+      }
+    }
+  }
+  .nav-logout{
+    @logoutHeight: 6rem;
+    height: @logoutHeight;
+    text-align: center;
+    color: #aaa;
+    line-height: @logoutHeight;
+  }
+}
