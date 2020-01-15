@@ -357,5 +357,5 @@ block content
 block scripts
   include ./publicModules/lazySizes
   include ./publicModules/plyr/plyr.js.pug
-  script(src='/interface_common.js')
-  script(src='/interface_fund_audit.js')
+  +includeJS('/interface_common.js')
+  +includeJS('/interface_fund_audit.js')
