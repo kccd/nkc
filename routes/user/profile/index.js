@@ -41,121 +41,178 @@ router
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(targetUser.uid, "sub");
     data.fansId = await db.SubscribeModel.getUserFansId(targetUser.uid);
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
-    data.navLinks = [
-      {
-        name: "",
-        links: [
-          {
-            type: "",
-            url: `/u/${targetUser.uid}/profile`,
-            name: "总览",
-            count: 0
-          }
-        ]
-      },
-      {
-        name: "我的作品",
-        links: [
-          {
-            type: "thread",
-            url: `/u/${targetUser.uid}/profile/thread`,
-            name: "我的文章",
-            count: threadCount
-          },
-          {
-            type: "post",
-            url: `/u/${targetUser.uid}/profile/post`,
-            name: "我的回复",
-            count: postCount
-          },
-          {
-            type: "draft",
-            url: `/u/${targetUser.uid}/profile/draft`,
-            name: "我的草稿",
-            count: draftCount
-          }
-        ]
-      },
-      {
-        name: "我的关注",
-        links: [
-          {
-            type: "subscribe/user",
-            url: `/u/${targetUser.uid}/profile/subscribe/user`,
-            name: "关注的用户",
-            count: data.subUsersId.length
-          },
-          {
-            type: "subscribe/topic",
-            url: `/u/${targetUser.uid}/profile/subscribe/topic`,
-            name: "关注的话题",
-            count: data.subTopicsId.length
-          },
-          {
-            type: "subscribe/discipline",
-            url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
-            name: "关注的学科",
-            count: data.subDisciplinesId.length
-          },
-          {
-            type: "subscribe/column",
-            name: "关注的专栏",
-            url: `/u/${targetUser.uid}/profile/subscribe/column`,
-            count: data.subColumnsId.length
-          },
-          {
-            type: "subscribe/thread",
-            url: `/u/${targetUser.uid}/profile/subscribe/thread`,
-            name: "关注的文章",
-            count: data.subThreadsId.length
-          },
-          {
-            type: "subscribe/collection",
-            url: `/u/${targetUser.uid}/profile/subscribe/collection`,
-            name: "收藏的文章",
-            count: data.collectionThreadsId.length
-          }
-        ]
-      },
-      {
-        name: "其他",
-        links: [
-          {
-            type: "finance",
-            url: `/u/${targetUser.uid}/profile/finance?t=all`,
-            name: "我的账单",
-            count: await db.KcbsRecordModel.count({
-              $or: [
-                {
-                  from: targetUser.uid
-                },
-                {
-                  to: targetUser.uid
-                }
-              ]
-            })
-          },
-          {
-            type: "follower",
-            name: "我的粉丝",
-            url: `/u/${targetUser.uid}/profile/follower`,
-            count: data.fansId.length
-          }
-        ]
-      }
-    ];
-    data.name = "";
-    data.navLinks.map(nav => {
-      nav.links.map(link => {
-        if (data.type === link.type) data.name = link.name;
-      })
-    });
-    state.isApp = false;
-    if (state.isApp) {
-      ctx.template = "user/profile/appProfile.pug";
+    state.isApp = true;
+  
+    if(state.isApp) {
+      data.appLinks = [
+        {
+          type: "thread",
+          url: `/u/${targetUser.uid}/profile/thread`,
+          name: "我的文章",
+        },
+        {
+          type: "post",
+          url: `/u/${targetUser.uid}/profile/post`,
+          name: "我的回复",
+        },
+        {
+          type: "draft",
+          url: `/u/${targetUser.uid}/profile/draft`,
+          name: "我的草稿",
+        },
+        {
+          type: "subscribe/user",
+          url: `/u/${targetUser.uid}/profile/subscribe/user`,
+          name: "关注的用户",
+        },
+        {
+          type: "subscribe/topic",
+          url: `/u/${targetUser.uid}/profile/subscribe/topic`,
+          name: "关注的话题",
+        },
+        {
+          type: "subscribe/discipline",
+          url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
+          name: "关注的学科",
+        },
+        {
+          type: "subscribe/column",
+          name: "关注的专栏",
+          url: `/u/${targetUser.uid}/profile/subscribe/column`,
+        },
+        {
+          type: "subscribe/thread",
+          url: `/u/${targetUser.uid}/profile/subscribe/thread`,
+          name: "关注的文章",
+        },
+        {
+          type: "subscribe/collection",
+          url: `/u/${targetUser.uid}/profile/subscribe/collection`,
+          name: "收藏的文章",
+        },
+        {
+          type: "finance",
+          url: `/u/${targetUser.uid}/profile/finance?t=all`,
+          name: "我的账单",
+        },
+        {
+          type: "follower",
+          name: "我的粉丝",
+          url: `/u/${targetUser.uid}/profile/follower`,
+        }
+      ];
     } else {
-      ctx.template = "user/profile/profile.pug";
+      data.navLinks = [
+        {
+          name: "",
+          links: [
+            {
+              type: "",
+              url: `/u/${targetUser.uid}/profile`,
+              name: "总览",
+              count: 0
+            }
+          ]
+        },
+        {
+          name: "我的作品",
+          links: [
+            {
+              type: "thread",
+              url: `/u/${targetUser.uid}/profile/thread`,
+              name: "我的文章",
+              count: threadCount
+            },
+            {
+              type: "post",
+              url: `/u/${targetUser.uid}/profile/post`,
+              name: "我的回复",
+              count: postCount
+            },
+            {
+              type: "draft",
+              url: `/u/${targetUser.uid}/profile/draft`,
+              name: "我的草稿",
+              count: draftCount
+            }
+          ]
+        },
+        {
+          name: "我的关注",
+          links: [
+            {
+              type: "subscribe/user",
+              url: `/u/${targetUser.uid}/profile/subscribe/user`,
+              name: "关注的用户",
+              count: data.subUsersId.length
+            },
+            {
+              type: "subscribe/topic",
+              url: `/u/${targetUser.uid}/profile/subscribe/topic`,
+              name: "关注的话题",
+              count: data.subTopicsId.length
+            },
+            {
+              type: "subscribe/discipline",
+              url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
+              name: "关注的学科",
+              count: data.subDisciplinesId.length
+            },
+            {
+              type: "subscribe/column",
+              name: "关注的专栏",
+              url: `/u/${targetUser.uid}/profile/subscribe/column`,
+              count: data.subColumnsId.length
+            },
+            {
+              type: "subscribe/thread",
+              url: `/u/${targetUser.uid}/profile/subscribe/thread`,
+              name: "关注的文章",
+              count: data.subThreadsId.length
+            },
+            {
+              type: "subscribe/collection",
+              url: `/u/${targetUser.uid}/profile/subscribe/collection`,
+              name: "收藏的文章",
+              count: data.collectionThreadsId.length
+            }
+          ]
+        },
+        {
+          name: "其他",
+          links: [
+            {
+              type: "finance",
+              url: `/u/${targetUser.uid}/profile/finance?t=all`,
+              name: "我的账单",
+              count: await db.KcbsRecordModel.count({
+                $or: [
+                  {
+                    from: targetUser.uid
+                  },
+                  {
+                    to: targetUser.uid
+                  }
+                ]
+              })
+            },
+            {
+              type: "follower",
+              name: "我的粉丝",
+              url: `/u/${targetUser.uid}/profile/follower`,
+              count: data.fansId.length
+            }
+          ]
+        }
+      ];
+      data.name = "";
+      data.navLinks.map(nav => {
+        nav.links.map(link => {
+          if (data.type === link.type) data.name = link.name;
+        })
+      });
     }
+    ctx.template = "user/profile/profile.pug";
     await next();
   })
   .get("/", async (ctx, next) => {
