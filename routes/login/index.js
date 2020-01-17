@@ -14,7 +14,7 @@ loginRouter
 		await next();
 	})
 	.post('/', async (ctx, next) => {
-		const {data, db, body, tools} = ctx;
+		const {data, db, body, tools, state} = ctx;
 		const {loginType} = body;
 		const {
 			encryptInMD5WithSalt,

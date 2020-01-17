@@ -10,10 +10,9 @@ block content
     .row
       if state.isApp
         .col-xs-12.col-md-3.box-shadow-panel
-          div
-            .options-button
-              for link in data.appLinks
-                a(href=link.url class=link.type===data.type?"active":"" data-type="reload")=link.name
+          .app-navs
+            for link in data.appLinks
+              a.app-nav(href=link.url class=link.type===data.type?"active":"" data-type="reload")=link.name
 
       else
         .col-xs-12.col-md-3.box-shadow-panel

@@ -37,6 +37,7 @@ var Tools = function() {
     return "floatUserPanel.open(this, '" + uid + "')";
   };
   self.getSize = function(size, digits) {
+    size = Number(size);
     if(digits === undefined) digits = 2;
     if(size < 1024*1024) {
       size = (size/1024).toFixed(digits) + "KB";

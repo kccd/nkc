@@ -1,44 +1,45 @@
-mixin userSettings
-  .panel.panel-primary
-    #uploadInfo 文件已上传&nbsp;
-      span
-    .panel-heading
-      span.panel-titlePanel 设置
-    .list-group.user-serttings-list
-      //-
-        a.list-group-item(href=`/u/${data.user.uid}/settings/avatar`)
-          span.fa.fa-user-circle &nbsp;&nbsp;
-          span 头像设置
-        a.list-group-item(href=`/u/${data.user.uid}/settings/banner`)
-          span.fa.fa-picture-o &nbsp;&nbsp;
-          span 背景设置
-      a.list-group-item(href=`/u/${data.user.uid}/settings/info` class=!data.selected||data.selected==="info"?"selected":"")
-        span.fa.fa-list-alt &nbsp;&nbsp;
-        span 基本资料
-      a.list-group-item(href=`/u/${data.user.uid}/settings/resume` class=data.selected==="resume"?"selected":"")
-        span.fa.fa-id-card-o &nbsp;&nbsp;
-        span 详细资料
-      a.list-group-item(href=`/u/${data.user.uid}/settings/transaction` class=data.selected==="transaction"?"selected":"")
-        span.fa.fa-usd &nbsp;&nbsp;
-        span 交易信息
-      a.list-group-item(href=`/u/${data.user.uid}/settings/message` class=data.selected==="message"?"selected":"")
-        span.fa.fa-minus-circle &nbsp;&nbsp;
-        span 黑名单
-      a.list-group-item(href=`/u/${data.user.uid}/settings/security` class=data.selected==="security"?"selected":"")
-        span.fa.fa-shield &nbsp;&nbsp;
-        span 账号安全
-      a.list-group-item(href=`/u/${data.user.uid}/settings/verify` class=data.selected==="verify"?"selected":"")
-        span.fa.fa-id-card &nbsp;&nbsp;
-        span 身份认证
-      a.list-group-item(href=`/u/${data.user.uid}/settings/apps` class=data.selected==="apps"?"selected":"")
-        span.fa.fa-cubes &nbsp;&nbsp;
-        span 偏好设置
-.hidden-md.hidden-lg
-  button.m-b-1.btn.btn-default(role="button" data-toggle="collapse" href="#collapseBase" aria-expanded="false" aria-controls="collapseBase")
-    .fa.fa-bars
-    span &nbsp;菜单
-  .collapse#collapseBase
-    +userSettings
+if !state.isApp
+  mixin userSettings
+    .panel.panel-primary
+      #uploadInfo 文件已上传&nbsp;
+        span
+      .panel-heading
+        span.panel-titlePanel 设置
+      .list-group.user-serttings-list
+        //-
+          a.list-group-item(href=`/u/${data.user.uid}/settings/avatar`)
+            span.fa.fa-user-circle &nbsp;&nbsp;
+            span 头像设置
+          a.list-group-item(href=`/u/${data.user.uid}/settings/banner`)
+            span.fa.fa-picture-o &nbsp;&nbsp;
+            span 背景设置
+        a.list-group-item(href=`/u/${data.user.uid}/settings/info` class=!data.selected||data.selected==="info"?"selected":"")
+          span.fa.fa-list-alt &nbsp;&nbsp;
+          span 基本资料
+        a.list-group-item(href=`/u/${data.user.uid}/settings/resume` class=data.selected==="resume"?"selected":"")
+          span.fa.fa-id-card-o &nbsp;&nbsp;
+          span 详细资料
+        a.list-group-item(href=`/u/${data.user.uid}/settings/transaction` class=data.selected==="transaction"?"selected":"")
+          span.fa.fa-usd &nbsp;&nbsp;
+          span 交易信息
+        a.list-group-item(href=`/u/${data.user.uid}/settings/message` class=data.selected==="message"?"selected":"")
+          span.fa.fa-minus-circle &nbsp;&nbsp;
+          span 黑名单
+        a.list-group-item(href=`/u/${data.user.uid}/settings/security` class=data.selected==="security"?"selected":"")
+          span.fa.fa-shield &nbsp;&nbsp;
+          span 账号安全
+        a.list-group-item(href=`/u/${data.user.uid}/settings/verify` class=data.selected==="verify"?"selected":"")
+          span.fa.fa-id-card &nbsp;&nbsp;
+          span 身份认证
+        a.list-group-item(href=`/u/${data.user.uid}/settings/apps` class=data.selected==="apps"?"selected":"")
+          span.fa.fa-cubes &nbsp;&nbsp;
+          span 偏好设置
+  .hidden-md.hidden-lg
+    button.m-b-1.btn.btn-default(role="button" data-toggle="collapse" href="#collapseBase" aria-expanded="false" aria-controls="collapseBase")
+      .fa.fa-bars
+      span &nbsp;菜单
+    .collapse#collapseBase
+      +userSettings
 
-.hidden-xs.hidden-sm
-  +userSettings
+  .hidden-xs.hidden-sm
+    +userSettings

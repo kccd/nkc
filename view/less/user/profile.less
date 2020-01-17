@@ -16,6 +16,26 @@ body{
   font-size: 1.4rem;
   font-weight: 700;
 }
+.app-navs{
+  .app-nav{
+    width: 7.5rem;
+    display: inline-block;
+    height: 2.3rem;
+    line-height: 2.3rem;
+    color: #fff;
+    border-radius: 3px;
+    margin: 3px;
+    text-align: center;
+    background-color: #aaa;
+    &.active, &:active{
+      background-color: @primary;
+    }
+    &:hover, &:active, &focus{
+      text-decoration: none;
+    }
+  }
+}
+
 .account-nav {
   padding: 0!important;
   .account-user-banner{

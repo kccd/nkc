@@ -698,7 +698,7 @@ block scripts
   include ../MathJax.pug
   if data.user && showEditor
     +includeJS("/thread/initPostInput.js")
-  if state.userColumn && !data.addedToColumn
+  if state.userColumn && !data.addedToColumn && showEditor
     +includeJS("/publicModules/toColumn/selectCategories.js")
   +includeJS("/thread/comments.js")
   if permission("getPostAuthor")

@@ -720,4 +720,45 @@ fn.getPagingButton = (page = 0, pageCount = 0, buttonCount = 5) => {
 fn.getRandomString = (pattern, length) => {
   return randomatic(pattern, length);
 };
+
+/*
+* 获取管理相关的未处理条数 临时
+* */
+fn.extendManagementInfo = async (ctx) => {
+  // 管理操作
+  const {data, db} = ctx;
+  if(ctx.permission("complaintGet")) {
+    data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});
+  }
+  if(ctx.permission("visitProblemList")) {
+    data.unResolvedProblemCount = await db.ProblemModel.count({resolved: false});
+  }
+  if(ctx.permission("review")) {
+    const q = {
+      reviewed: false,
+      disabled: false,
+      mainForumsId: {$ne: "recycle"}
+    };
+    if(!ctx.permission("superModerator")) {
+      const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
+      const fid = forums.map(f => f.fid);
+      q.mainForumsId = {
+        $in: fid
+      }
+    }
+    const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
+    const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
+    const threadsObj = {};
+    threads.map(thread => threadsObj[thread.tid] = thread);
+    let count = 0;
+    posts.map(post => {
+      const thread = threadsObj[post.tid];
+      if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
+        count++;
+      }
+    });
+    data.unReviewedCount = count;
+  }
+};
+
 module.exports = fn;

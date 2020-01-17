@@ -1,78 +1,141 @@
-extends ../../bootstrap_base
-
-block title
-  -const mainContainer1400 = true;
-  link(href='/experimental/index.css' rel='stylesheet')
-  link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
-  link(rel='stylesheet' href='/jcrop/css/jquery.Jcrop.min.css')
-  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
-  title app发布页
-block content
-  #data.hidden=objToStr(data)
-  #app.container-fluid.max-width
-    .row
-      include ../nav
-      .col-xs-12.col-md-2
-        .list-group
-          a.list-group-item(class=data.type === 'upload' ? 'active' : '' href=`/e/settings/app/upload`) 上传
-          a.list-group-item(class=data.type === 'histories' ? 'active' : '' href=`/e/settings/app/histories`) 历史记录
-      .col-xs-12.col-md-10
-        if data.type === 'upload'
-          .row#content
-          -const {telephone, websiteName, github, copyright, record, description, keywords, brief} = state.serverSettings || {};
-          .form-horizontal
+extends ../experimental
+block eTitle
+  title nkc-app
+  style.
+    .disabled{
+      background-color: #b9b9b9;
+    }
+    .stable{
+      background-color: #cfffd2;
+    }
+block eContent
+  #data.hidden=objToStr({logs: data.histories})
+  .container-fluid.max-width
+    ul.nav.nav-tabs.m-b-1
+      li(class=!data.t || data.t === "android"?"active":"")
+        a(href=`/e/settings/app?t=android`) android
+      li(class=data.t === "ios" ? "active" : "")
+        a(href=`/e/settings/app?t=ios`) ios
+      li(class=data.t === "publish" ? "active" : "")
+        a(href=`/e/settings/app?t=publish`) 上传新版本
+    if data.t === "publish"
+      .row
+        .col-xs-6.col-xs-offset-3
+          .form#app(v-cloak)
             .form-group
-              label.col-sm-2.control-label 选择平台
-              .col-sm-8
-                select.form-control#platform
-                  option android
-                  option ios
+              label 平台
+              select.form-control(v-model="appPlatForm")
+                option(value="android") android
+                option(value="ios") ios
             .form-group
-              label.col-sm-2.control-label 版本号
-              .col-sm-8
-                input.form-control#version(type='text' value="")
+              label 版本号
+              input.form-control(type="text" v-model.trim="version")
             .form-group
-              label.col-sm-2.control-label 更新内容
-              .col-sm-8
-                textarea.form-control#description(rows=5)
+              label 更新说明
+              textarea.form-control(v-model.trim="description" rows=6)
             .form-group
-              label.col-sm-2.control-label 安装包
-              .col-sm-8
-                input(type='file' id='appfile')
-                .progress.m-t-05
-                  .progress-bar.progress-bar-striped.active(role="progressbar" style="min-width: 2em;" aria-valuemax="100" :style="`width: ${progress}%`") {{progress}}%
+              label 安装包
+              input(type="file" id="appInput")
             .form-group
-              label.col-sm-2.control-label
-              .col-sm-8
-                button.btn.btn-primary#submitApp(@click='submitApp') 保存
-        else if data.type === 'histories'
-          ul.nav.nav-pills
-            li(role='presentation' class=data.os === 'android' ? 'active' : '')
-              a(href='/e/settings/app/histories?os=android') android
-            li(role='presentation' class=data.os === 'ios' ? 'active' : '')
-              a(href='/e/settings/app/histories?os=ios') ios
-          .row
-            .col-md-12(style='margin-top: 1.5rem;')
-              //- for item in data.histories
-              .panel.panel-default(v-for="(item, index) in data.histories" :key="index")
-                .panel-heading
-                  span {{item.appVersion}}
-                  span(v-if="item.latest") (最新版本)
-                  span &nbsp;&nbsp;
-                  a(:href="`/app/${data.os}/${item.hash}`") 点击下载
-                  button.btn.btn-info.btn-sm(@click="updateVersion(item)") 修改版本信息
-                  button.btn.btn-info.btn-sm(v-show="!item.stable" @click="setStable(item)") 设为稳定版本
-                  button.btn.btn-danger.btn-sm(v-show="item.canDown" @click="changeDownLoadState(item)") 禁止下载
-                  button.btn.btn-info.btn-sm(v-show="!item.canDown" @click="changeDownLoadState(item)") 开启下载
-                .panel-body
-                  p
-                    span.text-info.p-r-1(v-show="item.stable") 稳定版本
-                    span.text-danger(v-show="!item.canDown") 已禁止下载
-                  p {{`上传时间：${new Date(item.toc).toLocaleString()}`}}
-                  p {{`安装包大小：${(item.appSize/(1024*1024)).toFixed(2)}MB`}}
-                  p 更新内容：
-                    p(style='padding: 0 1rem;') {{item.appDescription}}
-              include ../../interface_navigation_paging
+              button.btn.btn-block.btn-primary(v-if="submitting") 上传中... {{progress}}%
+              button.btn.btn-block.btn-primary(@click="submit" v-else) 立即上传
+    else
+      include ../../publicModules/paging/paging
+      .table-responsive
+        table.table.table-bordered
+          thead
+            tr
+              th 版本号
+              th 发布时间
+              th 大小
+              th 更新说明
+              th 下载连接
+              th 其他
+          tbody
+            for log in data.histories
+              tr(class=log.disabled?"disabled": (log.stable?"stable": ""))
+                th
+                  h4=log.appVersion
+                th=format("YYYY/MM/DD HH:mm:ss", log.toc)
+                th=tools.getSize(log.appSize)
+                th=log.appDescription
+                th
+                  a(href=`/app/${data.t}/${log.hash}` target="_blank") 点击下载
+                th
+                  button.btn.btn-sm.btn-default(onclick=`edit('${log.hash}')`) 编辑
+                  if log.stable
+                    button.btn.btn-sm.btn-danger(onclick=`setStable('${log.hash}', false)`) 取消稳定版
+                  else
+                    button.btn.btn-sm.btn-default(onclick=`setStable('${log.hash}', true)`) 设为稳定版
+                  if log.disabled
+                    button.btn.btn-sm.btn-danger(onclick=`setDisabled('${log.hash}', false)`) 解除屏蔽
+                  else
+                    button.btn.btn-sm.btn-default(onclick=`setDisabled('${log.hash}', true)`) 屏蔽
+      include ../../publicModules/paging/paging_input
+    //.container-fluid.max-width
+      #data.hidden=objToStr(data)
+      #app.container-fluid.max-width
+        .row
+          .col-xs-12.col-md-2
+            .list-group
+              a.list-group-item(class=data.type === 'upload' ? 'active' : '' href=`/e/settings/app/upload`) 上传
+              a.list-group-item(class=data.type === 'histories' ? 'active' : '' href=`/e/settings/app/histories`) 历史记录
+          .col-xs-12.col-md-10
+            if data.type === 'upload'
+              .row#content
+              .form-horizontal
+                .form-group
+                  label.col-sm-2.control-label 选择平台
+                  .col-sm-8
+                    select.form-control#platform
+                      option android
+                      option ios
+                .form-group
+                  label.col-sm-2.control-label 版本号
+                  .col-sm-8
+                    input.form-control#version(type='text' value="")
+                .form-group
+                  label.col-sm-2.control-label 更新内容
+                  .col-sm-8
+                    textarea.form-control#description(rows=5)
+                .form-group
+                  label.col-sm-2.control-label 安装包
+                  .col-sm-8
+                    input(type='file' id='appfile')
+                    .progress.m-t-05(v-if="progress && progress !== 100")
+                      .progress-bar.progress-bar-striped.active(role="progressbar" style="min-width: 2em;" aria-valuemax="100" :style="`width: ${progress}%`") {{progress}}%
+                .form-group
+                  label.col-sm-2.control-label
+                  .col-sm-8
+                    button.btn.btn-primary#submitApp(@click='submitApp') 保存
+            else if data.type === 'histories'
+              ul.nav.nav-pills
+                li(role='presentation' class=data.os === 'android' ? 'active' : '')
+                  a(href='/e/settings/app/histories?os=android') android
+                li(role='presentation' class=data.os === 'ios' ? 'active' : '')
+                  a(href='/e/settings/app/histories?os=ios') ios
+              .row
+                .col-md-12(style='margin-top: 1.5rem;')
+                  //- for item in data.histories
+                  .panel.panel-default(v-for="(item, index) in data.histories" :key="index")
+                    .panel-heading
+                      span {{item.appVersion}}
+                      span(v-if="item.latest") (最新版本)
+                      span &nbsp;&nbsp;
+                      a(:href="`/app/${data.os}/${item.hash}`") 点击下载
+                      button.btn.btn-info.btn-sm(@click="updateVersion(item)") 修改版本信息
+                      button.btn.btn-info.btn-sm(v-show="!item.stable" @click="setStable(item)") 设为稳定版本
+                      button.btn.btn-danger.btn-sm(v-show="item.canDown" @click="changeDownLoadState(item)") 禁止下载
+                      button.btn.btn-info.btn-sm(v-show="!item.canDown" @click="changeDownLoadState(item)") 开启下载
+                    .panel-body
+                      p
+                        span.text-info.p-r-1(v-show="item.stable") 稳定版本
+                        span.text-danger(v-show="!item.canDown") 已禁止下载
+                      p {{`上传时间：${new Date(item.toc).toLocaleString()}`}}
+                      p {{`安装包大小：${(item.appSize/(1024*1024)).toFixed(2)}MB`}}
+                      p 更新内容：
+                        p(style='padding: 0 1rem;') {{item.appDescription}}
+                  include ../../interface_navigation_paging
 
 
 
@@ -81,11 +144,6 @@ block content
 
 block scripts
   include ../../publicModules/commonModal/commonModal
-  +includeJS('/jcrop/js/jquery.Jcrop.min.js')
-  +includeJS('/jquery/jquery.minicolors.js')
-  +includeJS('/vue/dist/vue.min.js')
-  +includeJS('/icheck/icheck.js')
-  +includeJS('/interface_common.js')
   +includeJS('/experimental/settings/app.js')
 
 

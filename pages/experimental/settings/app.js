@@ -1,3 +1,121 @@
+var logs = NKC.methods.getDataById("data").logs;
+var CommonModal = new NKC.modules.CommonModal();
+function setStable(hash, type) {
+  sweetQuestion("确定要执行当前操作？")
+    .then(function() {
+      nkcAPI("/e/settings/app", "PATCH", {
+        operation: "modifyStable",
+        hash: hash,
+        stable: !!type
+      })
+        .then(function() {
+          sweetSuccess("修改成功");
+          window.location.reload();
+        })
+        .catch(sweetError)
+    })
+    .catch(function(){})
+}
+
+function setDisabled(hash, type) {
+  sweetQuestion("确定要执行当前操作？")
+    .then(function() {
+      nkcAPI("/e/settings/app", "PATCH", {
+        operation: "modifyDisabled",
+        hash: hash,
+        disabled: !!type
+      })
+        .then(function() {
+          sweetSuccess("修改成功");
+          window.location.reload();
+        })
+        .catch(sweetError)
+    })
+    .catch(function() {})
+}
+function edit(hash) {
+  var log;
+  for(var i = 0; i < logs.length; i++) {
+    if(logs[i].hash === hash) {
+      log = logs[i];
+      break;
+    }
+  }
+  if(!log) return;
+  CommonModal.open(function(data) {
+    nkcAPI("/e/settings/app", "PATCH", {
+      operation: "modifyVersion",
+      hash: hash,
+      version: data[0].value,
+      description: data[1].value
+    })
+      .then(function() {
+        CommonModal.close();
+        sweetSuccess("修改成功");
+        window.location.reload();
+      })
+      .catch(sweetError);
+  }, {
+    title: '修改版本信息',
+    data: [
+      {
+        dom: 'input',
+        label: "版本号",
+        value: log.appVersion
+      },
+      {
+        dom: "textarea",
+        label: "更新说明",
+        value: log.appDescription
+      }
+    ]
+  });
+}
+
+if($("#app").length) {
+  var app = new Vue({
+    el: "#app",
+    data: {
+      version: "",
+      description: "",
+      submitting: false,
+      progress: 0,
+      appPlatForm: "android",
+    },
+    methods: {
+      submit: function() {
+        var self = this;
+        Promise.resolve()
+          .then(function() {
+            if(!self.appPlatForm) throw "请选择平台";
+            if(!self.version) throw "请输入版本号";
+            if(!self.description) throw "请输入更新说明";
+            var appInput = document.getElementById("appInput");
+            if(!appInput.files.length) throw "请选择安装包";
+            var file = appInput.files[0];
+            var formData = new FormData();
+            formData.append("file", file);
+            formData.append("appPlatform", self.appPlatForm);
+            formData.append("appVersion", self.version);
+            formData.append("appDescription", self.description);
+            self.submitting = true;
+            return nkcUploadFile("/e/settings/app", "POST", formData, function(e, progress) {
+              self.progress = progress;
+            })
+          })
+          .then(function() {
+            self.submitting = false;
+            sweetSuccess("发布成功");
+          })
+          .catch(function(data) {
+            sweetError(data);
+            self.submitting = false;
+          })
+      }
+    }
+  })
+}
+/*
 
 var CommonModal = new NKC.modules.CommonModal();
 var data = NKC.methods.getDataById("data");
@@ -5,7 +123,7 @@ var app = new Vue({
   el: '#app',
   data: {
     progress: 0,
-    data
+    data: data
   },
   methods: {
     changeDownLoadState: function (item) {
@@ -75,19 +193,19 @@ var app = new Vue({
       if (!version) {
         geid('submitApp').disabled = false;
         return sweetError("请输入版本号！");
-      };
+      }
       if (!description) {
         geid('submitApp').disabled = false;
         return sweetError("请输入更新内容！");
-      };
+      }
       var file = geid('appfile').files;
-      if (file.length == 0) {
+      if (!file.length) {
         geid("submitApp").disabled = false;
         return sweetError("请选择一个安装包！");
       } else if (file[0].type !== 'application/vnd.android.package-archive') {
         geid("submitApp").disabled = false;
         return sweetError("文件格式必须为apk ！");
-      };
+      }
       var formData = new FormData();
       formData.append("file", file[0]);
       formData.append("appPlatform", platform);
@@ -109,3 +227,4 @@ var app = new Vue({
     }
   }
 });
+*/

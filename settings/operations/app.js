@@ -1,8 +1,5 @@
 module.exports = {
 	GET: 'visitAppDownload',
-	me: {
-		GET: 'APPgetLoginUserInfo',
-	},
 	check: {
 		GET: 'APPcheckout',
 	},
@@ -16,12 +13,12 @@ module.exports = {
 	},
 	android: {
 		PARAMETER: {
-			GET: 'getAndroidPackage'
+			GET: 'downloadApp'
 		}
 	},
 	ios: {
 		PARAMETER: {
-			GET: 'getIosPackage'
+			GET: 'downloadApp'
 		}
 	}
 };

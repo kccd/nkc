@@ -12,13 +12,13 @@ checkRouter
     var queryMap = {
       appPlatForm: systemType,
       stable: true,
-      canDown: true
+      disabled: false
     };
     if (systemType) {
       const latestVer = await db.AppVersionModel.findOne(queryMap);
       if (latestVer) {
         const newVersion = latestVer.toObject();
-        newVersion.url = config.domain + config.port + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash;
+        newVersion.url = config.domain + ":" + config.port + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash;
         data.newVersion = newVersion;
       }
     }

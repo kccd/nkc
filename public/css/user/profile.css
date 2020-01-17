@@ -30,6 +30,26 @@ body {
   font-size: 1.4rem;
   font-weight: 700;
 }
+.app-navs .app-nav {
+  width: 7.5rem;
+  display: inline-block;
+  height: 2.3rem;
+  line-height: 2.3rem;
+  color: #fff;
+  border-radius: 3px;
+  margin: 3px;
+  text-align: center;
+  background-color: #aaa;
+}
+.app-navs .app-nav.active,
+.app-navs .app-nav:active {
+  background-color: #2b90d9;
+}
+.app-navs .app-nav:hover,
+.app-navs .app-nav:active,
+.app-navs .app-navfocus {
+  text-decoration: none;
+}
 .account-nav {
   padding: 0!important;
 }

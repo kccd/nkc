@@ -48,6 +48,7 @@ function selectAvatar() {
     }, "POST")
       .then(function(data) {
         $("#userAvatar").attr("src", "/avatar/" + data.user.avatar + '?time=' + Date.now());
+        emitEventToUpdateLocalUser(data);
         selectImage.close();
       })
       .catch(function(data) {
@@ -74,6 +75,7 @@ function selectBanner() {
     }, "POST")
       .then(function (data) {
         $("#userBanner").attr("src", "/banner/" + data.user.banner + "?time=" + Date.now());
+        emitEventToUpdateLocalUser(data);
         selectImage.close();
       })
       .catch(function (data) {
@@ -108,8 +110,9 @@ var app = new Vue({
   methods: {
     saveNewUsername: function() {
       nkcAPI("/u/" + this.user.uid + "/settings/username", "PATCH", {newUsername: this.newUsername})
-        .then(function() {
+        .then(function(data) {
           sweetSuccess("修改成功");
+          emitEventToUpdateLocalUser(data);
         })
         .catch(function(data) {
           sweetError(data);
@@ -117,3 +120,8 @@ var app = new Vue({
     }
   }
 });
+
+
+function emitEventToUpdateLocalUser(data) {
+  if(NKC.configs.isApp) emitEvent("updateLocalUser", {user: data.user});
+}

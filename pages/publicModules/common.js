@@ -43,7 +43,7 @@ NKC.methods.openOnlinePage = function(url) {
     return "/f/" + v1 + "/latest";
   });
   emitEvent("openOnlinePage", {
-    url
+    url: url
   });
 };
 

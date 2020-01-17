@@ -18,7 +18,7 @@ registerRouter
 		await next();
   })
   .post('/', async (ctx, next) => { // 手机注册
-	  const {db, data, body, tools} = ctx;
+	  const {db, data, body, tools, state} = ctx;
 	  let user;
 		const {mobile, nationCode, code, imgCode} = body;
 	  if(!nationCode) ctx.throw(400, '请选择国家区号');
@@ -73,6 +73,7 @@ registerRouter
     const share = await db.ShareModel.findOnly({token: shareToken});
     await share.computeReword("register", ctx.address, ctx.port);
     ctx.setCookie('share-token', '');
+  
 	  await next();
   })
 	/*.post('/information', async (ctx, next) => {

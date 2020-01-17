@@ -4,31 +4,184 @@ block title
 block content
   .app-nav
     .nav-header
+      .nav-header-icon.nav-back
+        .fa.fa-arrow-left
     .nav-user
       .user-avatar
-        img(src=`/avatar/${data.user.avatar}`)
+        img(src=`/avatar/${data.user.avatar}` data-type="view" id="userAvatar")
       .user-info
-        .user-name=data.user.username
+        .user-name(id="username")=data.user.username
         .user-certs
           img(src=tools.getUrl("gradeIcon", data.user.grade._id))
           span=data.user.info.certsName
-        .user-description=data.user.description
+        .user-description(id="userDescription")=data.user.description || "未填写个人简介"
     .nav-banner-mask
-    .nav-banner(style=`background-image: url(/banner/${data.user.banner})`)
-    .nav-links
-      a.nav-link(href=`/u/${data.user.uid}`)
-        .icon-left
-          .fa.fa-user
-        span 访客视角
-        .icon-right
-          .fa.fa-chevron-right
-      a.nav-link(href=`/u/${data.user.uid}`)
-        .icon-left
-          .fa.fa-user
-        span 访客视角
-        .icon-right
-          .fa.fa-chevron-right
-    .nav-logout(onclick="logout()") 退出登录
+    .nav-banner(style=`background-image: url(/banner/${data.user.banner})` id="userBanner")
+    .nav-content
+      .nav-numbers
+        a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
+          .name 文章
+          .value(id="userThreadCount")=data.user.threadCount - data.user.disabledThreadsCount
+        a.nav-number(href=`/u/${data.user.uid}/profile/post`)
+          .name 回复
+          .value(id="userPostCount")=data.user.postCount - data.user.disabledPostsCount
+        a.nav-number
+          .name 学术分
+          .value(id="userXSF")=data.user.xsf
+        a.nav-number(href=`/u/${data.user.uid}/profile/finance?t=all`)
+          .name 科创币
+          .value(id="userKCB")=data.user.kcb/100
+      .nav-links
+        a.nav-link(href=`/u/${data.user.uid}`)
+          .icon-left
+            .fa.fa-user-circle
+          span 我的名片
+          .icon-right
+            .fa.fa-angle-right
+        if state.userColumn
+          a.nav-link(href=`/m/${state.userColumn._id}`)
+            .icon-left
+              .fa.fa-columns
+            span 我的专栏
+            .icon-right
+              .fa.fa-angle-right
+        else if data.user && state.columnPermission
+          a.nav-link(href=`/column/apply`)
+            .icon-left
+              .fa.fa-columns
+            span 开设专栏
+            .icon-right
+              .fa.fa-angle-right
+        .nav-link-header 应用
+        .nav-apps
+          a.nav-app(href=`/fund`)
+            img(src=`/statics/apps/fund.png`)
+            .name 科创基金
+          a.nav-app(href=`/exam`)
+            img(src=`/statics/apps/exam.png`)
+            .name 考试系统
+          a.nav-app(href=`/activity`)
+            img(src=`/statics/apps/activity.png`)
+            .name 活动
+          a.nav-app(href=`/tools/index.htm`)
+            img(src=`/statics/apps/tools.png`)
+            .name 计算工具
+        .nav-link-header 交易管理
+        a.nav-link(href=`/shop/cart`)
+          .icon-left
+            .fa.fa-shopping-cart
+          span 购物车
+          .icon-right
+            .fa.fa-angle-right
+        a.nav-link(href=`/shop/order`)
+          .icon-left
+            .fa.fa-file-text-o
+          span 我的订单
+          .icon-right
+            .fa.fa-angle-right
+        a.nav-link(href=`/shop/manage/order`)
+          .icon-left
+            .fa.fa-archive
+          span 我出售的
+          .icon-right
+            .fa.fa-angle-right
+        .nav-link-header 资料设置
+        a.nav-link(href=`/u/${data.user.uid}/settings/info`)
+          .icon-left
+            .fa.fa-list-alt
+          span 基本资料
+          .icon-right
+            .fa.fa-angle-right
+        a.nav-link(href=`/u/${data.user.uid}/settings/resume`)
+          .icon-left
+            .fa.fa-id-card-o
+          span 详细资料
+          .icon-right
+            .fa.fa-angle-right
+        a.nav-link(href=`/u/${data.user.uid}/settings/transaction`)
+          .icon-left
+            .fa.fa-usd
+          span 交易信息
+          .icon-right
+            .fa.fa-angle-right
+        a.nav-link(href=`/u/${data.user.uid}/settings/message`)
+          .icon-left
+            .fa.fa-minus-circle
+          span 黑名单
+          .icon-right
+            .fa.fa-angle-right
+        a.nav-link(href=`/u/${data.user.uid}/settings/security`)
+          .icon-left
+            .fa.fa-shield
+          span 账号安全
+          .icon-right
+            .fa.fa-angle-right
+        a.nav-link(href=`/u/${data.user.uid}/settings/verify`)
+          .icon-left
+            .fa.fa-id-card
+          span 身份认证
+          .icon-right
+            .fa.fa-angle-right
+        a.nav-link(href=`/u/${data.user.uid}/settings/apps`)
+          .icon-left
+            .fa.fa-cubes
+          span 偏好设置
+          .icon-right
+            .fa.fa-angle-right
+        if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
+          .nav-link-header 网站管理
+          if permission("nkcManagement")
+            a.nav-link(href=`/nkc`)
+              .icon-left
+                .fa.fa-cogs
+              span 前台管理
+              .icon-right
+                .fa.fa-angle-right
+          if permission("visitExperimentalStatus")
+            a.nav-link(href=`/e`)
+              .icon-left
+                .fa.fa-cogs
+              span 后台管理
+              .icon-right
+                .fa.fa-angle-right
+          if permission("review")
+            a.nav-link(href=`/review`)
+              .icon-left
+                .fa.fa-shield
+              span 审核内容
+              .icon-right
+                if data.unReviewedCount
+                  .icon-count=data.unReviewedCount
+                .fa.fa-angle-right
+          if permission("complaintGet")
+            a.nav-link(href=`/complaint`)
+              .icon-left
+                .fa.fa-minus-circle
+              span 投诉列表
+              .icon-right
+                if data.unResolvedComplaintCount
+                  .icon-count=data.unResolvedComplaintCount
+                .fa.fa-angle-right
+          if permission("visitProblemList")
+            a.nav-link(href=`/problem/list`)
+              .icon-left
+                .fa.fa-exclamation-circle
+              span 问题列表
+              .icon-right
+                if data.unResolvedProblemCount
+                  .icon-count=data.unResolvedProblemCount
+                .fa.fa-angle-right
+
+            if permission("getLibraryLogs")
+              a.nav-link(href=`/libraries/logs`)
+                .icon-left
+                  .fa.fa-book
+                span 文库记录
+                .icon-right
+                  .fa.fa-angle-right
+      .nav-logout
+        .fa.fa-sign-out &nbsp;
+        span 退出登录
     .nav-footer
 block scripts
   +includeJS("/app/nav/nav.js")

@@ -9,11 +9,18 @@ const glob = require('glob');
 const watch = require("gulp-watch");
 
 const lessPath = `pages/**/*.less`;
+const lessPath2 = `view/less/**/*.less`;
 const cssDest = `pages`;
+const cssDest2 = `public/css`;
 gulp.task("buildCSS", () => {
   return gulp.src(lessPath)
     .pipe(less())
     .pipe(gulp.dest(cssDest));
+});
+gulp.task("buildCSS2", () => {
+  return gulp.src(lessPath2)
+    .pipe(less())
+    .pipe(gulp.dest(cssDest2));
 });
 
 const jsPath = `view/js/**/*.js`;
@@ -63,6 +70,7 @@ gulp.task('browserify', function (done) {
 
 gulp.task("watch", () => {
   watch(lessPath, { interval: 750 }, gulp.series("buildCSS"));
+  watch(lessPath2, { interval: 750 }, gulp.series("buildCSS2"));
   watch(jsPath, { interval: 750 }, gulp.series("buildJS"));
   // gulp.watch(mjsPath, gulp.series("buildMJS"));
   watch(mjsPath, { interval: 750 }, gulp.series("browserify"));

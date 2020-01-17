@@ -1,6 +1,6 @@
 module.exports = async (options) => {
   const {ctx, fidOfCanGetThreads} = options;
-  const {data, db} = ctx;
+  const {data, db, nkcModules} = ctx;
   const {user} = data;
   
   // 获取与用户有关的数据
@@ -85,39 +85,7 @@ module.exports = async (options) => {
     const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 20);
     data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
   }
-  // 管理操作
-  if(ctx.permission("complaintGet")) {
-    data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});
-  }
-  if(ctx.permission("visitProblemList")) {
-    data.unResolvedProblemCount = await db.ProblemModel.count({resolved: false});
-  }
-  if(ctx.permission("review")) {
-    const q = {
-      reviewed: false,
-      disabled: false,
-      mainForumsId: {$ne: "recycle"}
-    };
-    if(!ctx.permission("superModerator")) {
-      const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
-      const fid = forums.map(f => f.fid);
-      q.mainForumsId = {
-        $in: fid
-      }
-    }
-    const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
-    const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
-    const threadsObj = {};
-    threads.map(thread => threadsObj[thread.tid] = thread);
-    let count = 0;
-    posts.map(post => {
-      const thread = threadsObj[post.tid];
-      if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
-        count++;
-      }
-    });
-    data.unReviewedCount = count;
-  }
+  await nkcModules.apiFunction.extendManagementInfo(ctx);
   
   ctx.template = "home/home_all.pug";
 };

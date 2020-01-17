@@ -229,3 +229,13 @@ const user = new (class {
     })
   }
 })();
+
+if(NKC.configs.isApp) {
+  window.ready()
+    .then(function() {
+      newEvent("userChanged", function(data) {
+        if(!data.user) return;
+        window.location.href = window.location.pathname.replace(/\/u\/([0-9]+\/)/ig, "/u/" + data.user.uid + "/");
+      });
+    })
+}

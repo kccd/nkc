@@ -89,7 +89,6 @@ module.exports = async (ctx, next) => {
       ctx.state.isApp = true;
       ctx.state.appOS = userAgent[0].includes("android")? "android": "ios"
     }
-    console.log(ctx.state.isApp, ctx.state.appOS);
 	  // 权限判断
     // @param {String} o 操作名
 	  ctx.permission = (o) => {

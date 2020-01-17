@@ -1,8 +1,28 @@
 localStorage.setItem("apptype", "app");
 
+var _appFunctions = [];
+var _apiReady = false;
+
+apiready = function() {
+  _apiReady = true;
+  for(var i = 0; i < _appFunctions.length; i++) {
+    _appFunctions[i]();
+  }
+};
+
+window.ready = function() {
+  return new Promise(function(resolve, reject) {
+    if(_apiReady) {
+      resolve();
+    } else {
+      _appFunctions.push(resolve);
+    }
+  });
+};
+
 (function(){
   var allLinks = document.querySelectorAll("a[href]");
-  var allImages = document.querySelectorAll("img[src]");
+  var allImages = document.querySelectorAll("img[data-type=view]");
   Array.prototype.forEach.call(allLinks, function(link) {
     link.addEventListener("click", function(e) {
       // 打开资源链接进行下载
@@ -16,160 +36,69 @@ localStorage.setItem("apptype", "app");
           e.preventDefault();
           NKC.methods.openOnlinePage(this.href);
         }
-        /*var isHostUrl = siteHostLink(this.href);
-        // 如果是本站链接则打开app内页，否则使用外站浏览页打开
-        if(isHostUrl) {
-          var paramIndex = this.href.indexOf("?");
-          var newHref = "";
-          var equaiHref = false;
-          if(paramIndex > -1) {
-            newHref = (this.href).substring(0, paramIndex)
-          }else{
-            newHref = this.href;
-          }
-          if(newHref.length > 0) {
-            if(api.winName.indexOf(newHref) > -1) {
-              equaiHref = true;
-            }
-          }
-          // 如果是在首页跳转到最新关注推荐等，不打开新页面
-          if(this.pathname === "/" && api.winName === "root") {
-            return window.location.href = this.href;
-          }
-          if(equaiHref) {
-            appFreshUrl(this.href);
-          }else{
-            appOpenUrl(this.href);
-          }
-        }else{
-          api.openWin({
-            name: 'link',
-            url: 'widget://html/link/link.html',
-            pageParam: {
-              name: 'link',
-              linkUrl: this.href
-            }
-          });
-        }*/
       }
     })
   });
   Array.prototype.forEach.call(allImages, function(img) {
     img.addEventListener("click", function() {
-      if(this.getAttribute("dataimg") && this.getAttribute("dataimg") === "content") {
-        if(this.src && this.src.indexOf("/r/") > -1) {
-          emitEvent("openImage", {
-            url: this.src
-          });
-        }
+      if(this.src) {
+        emitEvent("openImage", {
+          url: this.src
+        });
       }
     })
   });
 })();
 
-apiready = function() {
-  
-  // 分享 页面信息
-  // 将本页的title和description传入app中
-  var title, description;
-  try{
-    title = document.getElementsByTagName("title")[0].text;
-  } catch(e){
-    title = "来自科创的分享";
-  }
-  try {
-    description = document.getElementsByName("description")[0].getAttribute("content");
-  } catch(e) {
-    description = "倡导科学理性，发展科技爱好";
-  }
-  emitEvent("siteMetaReady", {
-    title: title,
-    description: description,
-    url: window.location.href
-  });
-  
-  // 为所有的a标签添加点击事件
-  // 监听全局a标签的点击事件
-  // 并阻止链接点击跳转
-  // var allLinks = document.querySelectorAll("a");
-  /*var body = document.getElementsByTagName("body")[0];
-  body.addEventListener('click',function (e) {
-    // e.preventDefault();
-    if(e.target && e.target.nodeName.toLowerCase() == "a" && e.target.getAttribute('href')) {  // 检查事件源e.target是否为a
-      e.target.onclick = function (ae) {
-        ae.preventDefault();
-        if(e.target.href.indexOf("/r/") > -1) {
-          var linkUrl = e.target.href;
-          attachDownInApp(linkUrl);
-        }else if(e.target.href) {
-          var isHostUrl = siteHostLink(e.target.href);
-          // 如果是本站链接则打开app内页，否则使用外站浏览页打开
-          if(isHostUrl) {
-            var paramIndex = e.target.href.indexOf("?");
-            var newHref = "";
-            var equaiHref = false;
-            if(paramIndex > -1) {
-              newHref = (e.target.href).substring(0, paramIndex)
-            }else{
-              newHref = e.target.href;
-            }
-            if(newHref.length > 0) {
-              if(api.winName.indexOf(newHref) > -1) {
-                equaiHref = true;
-              }
-            }
-            // 如果是在首页跳转到最新关注推荐等，不打开新页面
-            if(e.target.pathname === "/" && api.winName === "root") {
-              window.location.href = addApptypeToUrl(e.target.href)
-              return;
-            }
-            if(equaiHref) {
-              appFreshUrl(e.target.href);
-            }else{
-              appOpenUrl(e.target.href);
-            }
-          }else{
-            api.openWin({
-              name: 'link',
-              url: 'widget://html/link/link.html',
-              pageParam: {
-                  name: 'link',
-                  linkUrl: e.target.href
-              }
-            });
-          }
-        }
-      }
-    }
-  }, true);*/
-  // 获取编辑器标识
-  var withE = window.localStorage.getItem("withE");
-  // 下拉刷新当前页面
-  api.refreshHeaderLoadDone();
-  if(window.location.pathname !== "/editor") {
-    api.setRefreshHeaderInfo({
-      bgColor: '#eeeeee',
-      textColor: '#aaaaaa',
-      textDown: '下拉刷新',
-      textUp: '松开刷新',
-      textLoading: '加载中，请稍候',
-      showTime: false
-    }, function(ret, err) {
-      window.location.reload();
+window.ready()
+  .then(() => {
+    // 分享 页面信息
+    // 将本页的title和description传入app中
+    var title, description;
+    try{
+      title = document.getElementsByTagName("title")[0].text;
+    } catch(e){
+      title = "来自科创的分享";
+    }
+    try {
+      description = document.getElementsByName("description")[0].getAttribute("content");
+    } catch(e) {
+      description = "倡导科学理性，发展科技爱好";
+    }
+    emitEvent("siteMetaReady", {
+      title: title,
+      description: description,
+      url: window.location.href
     });
-  }
-  /**
-   * 编辑页面退出提示
-   */
-  if(withE) {
-    api.addEventListener({
-      name: 'keyback'
-    }, function(ret, err) {
-      api.confirm({
+  
+    // 获取编辑器标识
+    var withE = window.localStorage.getItem("withE");
+    // 下拉刷新当前页面
+    api.refreshHeaderLoadDone();
+    if(window.location.pathname !== "/editor") {
+      api.setRefreshHeaderInfo({
+        bgColor: '#eeeeee',
+        textColor: '#aaaaaa',
+        textDown: '下拉刷新',
+        textUp: '松开刷新',
+        textLoading: '加载中，请稍候',
+        showTime: false
+      }, function(ret, err) {
+        window.location.reload();
+      });
+    }
+    /**
+     * 编辑页面退出提示
+     */
+    if(withE) {
+      api.addEventListener({
+        name: 'keyback'
+      }, function(ret, err) {
+        api.confirm({
           title: '确定要退出吗？',
           msg: '',
           buttons: ['确定', '取消']
-      }, function(ret, err){
+        }, function(ret, err){
           if( ret ){
             if(ret.buttonIndex == 1){
               api.closeWin();
@@ -177,12 +106,12 @@ apiready = function() {
           }else{
             api.closeWin();
           }
+        });
       });
-    });
-  }
-  // 清除编辑器标识
-  window.localStorage.removeItem("withE");
-};
+    }
+    // 清除编辑器标识
+    window.localStorage.removeItem("withE");
+  });
 
 /**
  * 给url添加apptype参数

@@ -8,29 +8,29 @@ const appVersionSchema = new Schema({
   },
   appVersion: {
     type: String,
-    default: "0.0.1",
+    required: true,
     index: 1
   },
   appDescription: {
-    type: String
+    type: String,
+    default: ""
   },
   appSize: {
-    type: String
+    type: Number,
+    default: 0
   },
   hash:{
     type: String,
+    required: true,
+    index: 1
   },
   fileName:{
-    type: String
+    type: String,
+    default: ""
   },
   hits: {
     type: Number,
     default: 0
-  },
-  latest: {
-    type: Boolean,
-    default: true,
-    index: 1
   },
   toc: {
     type: Date,
@@ -42,9 +42,9 @@ const appVersionSchema = new Schema({
     default: false,
     index: 1
   },
-  canDown: {
+  disabled: {
     type: Boolean,
-    default: true,
+    default: false,
     index: 1
   }
 });

@@ -575,8 +575,8 @@ function nkc_render(options){
             oname: "图片已丢失"
           }
         }
-        var lazyImgStr = '<img data-src="/r/' + v1 + '" class="lazyload" dataimg="content" alt="'+resource.oname+'"/>';
-        var imgStr = '<img src="/r/' + v1 + '" dataimg="content" alt="'+resource.oname+'"/>';
+        var lazyImgStr = '<img data-src="/r/' + v1 + '" class="lazyload" dataimg="content" data-type="view" alt="'+resource.oname+'"/>';
+        var imgStr = '<img src="/r/' + v1 + '" dataimg="content" data-type="view" alt="'+resource.oname+'"/>';
         if(!resource.width || !resource.height) {
           return '<div class="article-img-body">'+imgStr+'</div>';
         }
