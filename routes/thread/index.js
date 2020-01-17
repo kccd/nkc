@@ -289,7 +289,7 @@ threadRouter
 				}
 			}
 			// 取出帖子被退回的原因
-			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft","modifyType":false});
+			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft","modifyType":false}).sort({toc: -1});
 			thread.reason = threadLogOne.reason || '';
 		}
 		const firstPost = await db.PostModel.findOne({pid: thread.oc}, {anonymous: 1});
