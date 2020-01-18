@@ -20,9 +20,9 @@ checkRouter
       if (latestVer) {
         const newVersion = latestVer.toObject();
         if(global.NKC.NODE_ENV === "production") {
-          newVersion.url = config.domain + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash;
+          newVersion.url = config.domain + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash + "?t=" + Date.now();
         } else {
-          newVersion.url = config.domain + ":" + config.port + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash;
+          newVersion.url = config.domain + ":" + config.port + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash + "?t=" + Date.now();
         }
         if(version && version !== newVersion.appVersion) {
           data.newVersion = newVersion;
