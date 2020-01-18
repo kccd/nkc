@@ -48,17 +48,32 @@ var app = new Vue({
         // 不通过
         if(data.postType === "thread") {
           if(data.delType === "toRecycle") {
-            d = {
+            /*d = {
               fid: "recycle",
               para: data
+            };*/
+            d = {
+              postsId: [data.postId],
+              reason: data.reason,
+              remindUser: data.noticeType,
+              violation: data.illegalType
             };
             method = "POST";
-            url = "/t/" + data.threadId + "/disabled";
+            // url = "/t/" + data.threadId + "/disabled";
+            url = "/threads/recycle";
           } else {
-            d = {
+            /*d = {
               para: data
+            };*/
+            d = {
+              postsId: [data.postId],
+              reason: data.reason,
+              remindUser: data.noticeType,
+              violation: data.illegalType
             };
-            url = "/t/" + data.threadId + "/moveDraft";
+            // url = "/t/" + data.threadId + "/moveDraft";
+            url = "/threads/draft";
+            method = "POST";
           }
         } else {
           d = {

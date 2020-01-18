@@ -1660,7 +1660,7 @@ function disablePostClick(pid, type){
   if(type === 'post') {
     $postRecycleModel.modal();
   } else if(type === 'thread'){
-    $recycleModal.modal();
+    deleteThread();
   }
   // console.log(window.localStorage)
 }
