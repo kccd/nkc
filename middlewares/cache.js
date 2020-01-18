@@ -36,7 +36,7 @@ module.exports = async (ctx, next) => {
   
   if(state.isApp) {
     tocKey = `app:page:${url}:toc`;
-    dataKey = `app:page:${url}:toc`;
+    dataKey = `app:page:${url}:data`;
   }
   // 获取缓存生成的时间，判断是否过期
   const toc = await redisClient.getAsync(tocKey);
