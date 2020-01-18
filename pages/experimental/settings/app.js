@@ -66,6 +66,7 @@ function edit(hash) {
       {
         dom: "textarea",
         label: "更新说明",
+        disabledKeyup: true,
         value: log.appDescription
       }
     ]

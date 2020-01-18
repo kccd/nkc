@@ -58,7 +58,8 @@ block eContent
                   h4=log.appVersion
                 th=format("YYYY/MM/DD HH:mm:ss", log.toc)
                 th=tools.getSize(log.appSize)
-                th=log.appDescription
+                th
+                  div!=experimental_render({c: log.appDescription})
                 th
                   a(href=`/app/${data.t}/${log.hash}` target="_blank") 点击下载
                 th

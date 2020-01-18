@@ -5,8 +5,9 @@ function submit(id) {
 	};
 
 	nkcAPI('/u/'+id+'/settings/info', 'PATCH', obj)
-		.then(function() {
+		.then(function(data) {
 			screenTopAlert('修改成功');
+      emitEventToUpdateLocalUser(data);
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error);

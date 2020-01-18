@@ -38,7 +38,7 @@ const floatForumPanel = new Vue({
         const dom = doms.eq(i);
         if(dom.attr("data-float-init") === "true") continue;
         this.initEvent(doms.eq(i));
-      };
+      }
     },
     reset() {
       this.show = false;
@@ -64,8 +64,8 @@ const floatForumPanel = new Vue({
         // 做一个延迟，过滤掉鼠标意外划过元素的情况。
         self.timeout(300)
           .then(() => {
-            if(count_ !== self.count) throw "事件已过时1";
-            if(!self.over) throw "事件已过时2";
+            if(count_ !== self.count) throw "timeout 1";
+            if(!self.over) throw "timeout 2";
             fid = dom.attr("data-float-fid");
             left = dom.offset().left;
             top = dom.offset().top;
@@ -75,8 +75,8 @@ const floatForumPanel = new Vue({
           })
           .then(forumObj => {
             const {forum, subscribed} = forumObj;
-            if(count_ !== self.count) throw "事件已过时3";
-            if(!self.over) throw "事件已过时4";
+            if(count_ !== self.count) throw "timeout 3";
+            if(!self.over) throw "timeout 4";
             self.forum = forum;
             self.subscribed = subscribed;
             const panel = $(self.$el);

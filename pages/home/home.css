@@ -5,11 +5,9 @@ body{
   border-radius: 3px;
 }
 .home-warning{
-  height: 3rem;
-  line-height: 3rem;
   background-color: #f7d6d6;
   border-radius: 3px;
-  padding: 0 1rem;
+  padding: 1rem 1rem;
   font-size: 1.25rem;
 }
 .home-warning .fa{

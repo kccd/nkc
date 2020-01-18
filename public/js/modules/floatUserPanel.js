@@ -82,8 +82,8 @@ var floatUserPanel = new Vue({
                   count_ = self.count;
                   // 做一个延迟，过滤掉鼠标意外划过元素的情况。
                   self.timeout(300).then(function () {
-                    if (count_ !== self.count) throw "事件已过时1";
-                    if (!self.over) throw "事件已过时2";
+                    if (count_ !== self.count) throw "timeout 1";
+                    if (!self.over) throw "timeout 2";
                     uid = dom.attr("data-float-uid");
                     left = dom.offset().left;
                     top = dom.offset().top;
@@ -93,8 +93,8 @@ var floatUserPanel = new Vue({
                   }).then(function (userObj) {
                     var user = userObj.user,
                         subscribed = userObj.subscribed;
-                    if (count_ !== self.count) throw "事件已过时3";
-                    if (!self.over) throw "事件已过时4";
+                    if (count_ !== self.count) throw "timeout 3";
+                    if (!self.over) throw "timeout 4";
                     self.user = user;
                     self.subscribed = subscribed;
                     var panel = $(self.$el);
