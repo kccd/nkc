@@ -19,7 +19,11 @@ checkRouter
       const latestVer = await db.AppVersionModel.findOne(queryMap);
       if (latestVer) {
         const newVersion = latestVer.toObject();
-        newVersion.url = config.domain + ":" + config.port + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash;
+        if(global.NKC.NODE_ENV === "production") {
+          newVersion.url = config.domain + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash;
+        } else {
+          newVersion.url = config.domain + ":" + config.port + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash;
+        }
         if(version && version !== newVersion.appVersion) {
           data.newVersion = newVersion;
         }
