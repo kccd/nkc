@@ -12,7 +12,6 @@ router
   })
   .get('/android/latest', async (ctx, next) => {
     const {fs, db, params} = ctx;
-    const {version} = params;
     const q = {
       appPlatForm: 'android',
       stable: true,

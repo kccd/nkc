@@ -91,7 +91,6 @@ shareRouter
   }else{
     uid = "visitor";
   }
-  console.log(targetId, type);
   // 如果targetId不存在，则从url中获取
   if(!targetId && (type === "thread" || type === "post" || type === "forum")) {
     str.replace(/\/[tfp]\/([0-9]+)/ig, (c, v1) => {
