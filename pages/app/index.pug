@@ -22,7 +22,10 @@ html(lang='zh-CN')
       .row(v-else)
         .col-xs-12.col-md-12.text-center
           //.logo(@click="toHome")= state.serverSettings.websiteName
-          a.link(href='/appDownload/android/latest') 点击下载
+          if data.stable
+            a.link(href=`/app/${data.stable.appPlatForm}/${data.stable.hash}`) 点击下载
+          else
+            span.link 下载通道已关闭
           +logo
 
     script(src='/jquery/jquery-1.11.1.js')

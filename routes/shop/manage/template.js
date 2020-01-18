@@ -6,7 +6,7 @@ templateRouter
     const {user} = data;
     const dealInfo = await db.ShopDealInfoModel.findOne({uid: user.uid});
     if(!data.dealInfo || !data.dealInfo.dataPerfect) {
-      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/shop/manage/${user.uid}/info`))
+      return ctx.redirect(`/shop/manage/${user.uid}/info`)
     }
     await next();
   })

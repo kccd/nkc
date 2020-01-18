@@ -29,8 +29,6 @@ messageRouter
     const {data, db, query, state} = ctx;
     const {user} = data;
 
-    data.twemoji = state.twemoji;
-
     if(ctx.reqType === "app") {
       data.templates = await db.MessageTypeModel.getTemplates("app");
     } else {

@@ -12,9 +12,10 @@ const draft = new (class {
       })
   }
   removeDraftSingle(did) {
+    const self = this;
     sweetQuestion("确定要删除当前草稿？删除后不可恢复。")
       .then(function() {
-        removeDraft(did);
+        self.removeDraft(did);
       })
       .catch(function() {})
   }
@@ -229,3 +230,13 @@ const user = new (class {
     })
   }
 })();
+
+if(NKC.configs.isApp) {
+  window.ready()
+    .then(function() {
+      newEvent("userChanged", function(data) {
+        if(!data.user) return;
+        window.location.href = window.location.pathname.replace(/\/u\/([0-9]+\/)/ig, "/u/" + data.user.uid + "/");
+      });
+    })
+}

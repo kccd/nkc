@@ -32,7 +32,7 @@ router
     	q.disabled = false;
     }
     const {page} = await targetThread.getStep(q);
-    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${originPost.tid}?page=${page}&highlight=${pid}#${pid}`));
+    return ctx.redirect(`/t/${originPost.tid}?page=${page}&highlight=${pid}#${pid}`);
   });
 
 module.exports = router;

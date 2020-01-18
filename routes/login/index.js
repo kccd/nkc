@@ -5,7 +5,7 @@ loginRouter
 		const {nkcModules} = ctx;
 		const {user} = ctx.data;
 		if(user) {
-			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/'));
+			return ctx.redirect('/');
 		}
 		await next();
 	})
@@ -14,7 +14,7 @@ loginRouter
 		await next();
 	})
 	.post('/', async (ctx, next) => {
-		const {data, db, body, tools} = ctx;
+		const {data, db, body, tools, state} = ctx;
 		const {loginType} = body;
 		const {
 			encryptInMD5WithSalt,

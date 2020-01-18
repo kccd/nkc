@@ -4,7 +4,11 @@ block title
   +includeCSS("/external_pkgs/pdfjs/pdf_viewer.css")
   +includeCSS("/test/test.css")
 block content
-  .container-fluid.max-width
+  #app.container-fluid.max-width
+    div(@click="") 预览
+      button.pre(@click="pre") 上一页
+      button.next(@click="next") 下一页
+      div.media(width="600" height="800" href="/test/output/prefix-1.pdf")
     .row
       .col-xs-12
         #container
@@ -13,6 +17,8 @@ block content
         //- <iframe src="/external_pkgs/pdf/web/viewer.html?file=http://192.168.11.114:9000/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf" width="100%" height="800"></iframe>
 
         //- a.media(href="/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf")
+
+        
 block scripts
   //- script(src=`/external_pkgs/pdf/build/pdf.js?v=${global.NKC.startTime}`)
   //- script(src=`/external_pkgs/pdf/build/pdf.worker.js?v=${global.NKC.startTime}`)
@@ -25,3 +31,6 @@ block scripts
   //+includeJS("/test/viewer_test.js")
   +includeJS("/test/test.js")
 
+  script(src=`/vue/dist/vue.min.js?v=${startTime}`)
+  script(src=`/external_pkgs/pdf/jquery.media.js?v=${global.NKC.startTime}`)
+  +includeJS("/test/test.js")

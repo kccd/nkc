@@ -210,6 +210,9 @@ block content
           -let sideThreads = data.forum.noticeThreads;
           -let sideThreadsHeader = "专业公告"
           include ../publicModules/side_thread_list
+        .m-b-1
+          .panel-header 分享
+          include ../publicModules/share/forum
         -let sideThreads = data.featuredThreads;
         -let sideThreadsHeader = "精选文章"
         include ../publicModules/side_thread_list

@@ -289,7 +289,7 @@ threadRouter
 				}
 			}
 			// 取出帖子被退回的原因
-			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft","modifyType":false});
+			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft","modifyType":false}).sort({toc: -1});
 			thread.reason = threadLogOne.reason || '';
 		}
 		const firstPost = await db.PostModel.findOne({pid: thread.oc}, {anonymous: 1});
@@ -386,11 +386,7 @@ threadRouter
 			const disabled = data.userOperationsId.includes('displayDisabledPosts');
 			const {page, step} = await thread.getStep({pid, disabled});
 			ctx.status = 303;
-			if(ctx.state.apptype && ctx.state.apptype == "app") {
-				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}?apptype=app&page=${page}&highlight=${pid}#highlight`));
-			}else{
-				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}?&page=${page}&highlight=${pid}#highlight`));
-			}
+      return ctx.redirect(`/t/${tid}?page=${page}&highlight=${pid}#highlight`);
 		}
 		if(last_page) {
 			page = pageCount -1;
@@ -924,7 +920,7 @@ threadRouter
 
 		if(type === 'html') {
 			ctx.status = 303;
-			return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/t/${tid}`))
+			return ctx.redirect(`/t/${tid}`)
 		}
 		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
 		// 如果是编辑的草稿，则删除草稿

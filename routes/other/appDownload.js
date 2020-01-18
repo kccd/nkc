@@ -10,28 +10,24 @@ router
     ctx.throw(501, 'a tid is required.');
     await next()
   })
-  .get('/android/:version', async (ctx, next) => {
-    const {tid} = ctx.params;
-    const {fs, db, tools, params} = ctx;
-    const {version} = params;
-    const q = {appPlatForm: 'android'};
-    if(version === 'latest') {
-      q.latest = true;
-    } else {
-      q.appVersion = version;
-    }
+  .get('/android/latest', async (ctx, next) => {
+    const {fs, db, params} = ctx;
+    const q = {
+      appPlatForm: 'android',
+      stable: true,
+      disabled: false
+    };
     // 获取最新的安装包
     const androidApk = await db.AppVersionModel.findOne(q);
-    if(!androidApk) ctx.throw(404, 'not found');
-    const {fileName, appVersion} = androidApk;
-    let stat;
-    let url = `${androidSavePath}/${appVersion}/${fileName}`;
+    if(!androidApk) ctx.throw(404, '数据不存在或暂未开放下载通道');
+    const {hash} = androidApk;
+    let url = `${androidSavePath}/${hash}.apk`;
     // let stat;
     // let url = `${androidSavePath}/${tid}.jpg`;
     try {
-      stat = await fs.stat(url);
+      await fs.stat(url);
     } catch(e) {
-      ctx.throw(401, "下载失败，请联系管理员！");
+      ctx.throw(401, "安装包不存在");
     } finally {
       ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
       ctx.type = 'apk';

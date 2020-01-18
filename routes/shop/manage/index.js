@@ -22,10 +22,10 @@ manageRouter
     const {data, db, params, nkcModules} = ctx;
     const {user} = data;
     if(!user) {
-      return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/login'));
+      return ctx.redirect('/login');
     }
     data.active = "home";
-    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/shop/manage/${user.uid}/home`))
+    return ctx.redirect(`/shop/manage/${user.uid}/home`)
   })
   .use("/", async (ctx, next) => {
     const {data, db, query} = ctx;
@@ -45,7 +45,7 @@ manageRouter
   })
   
   .use(["/home", "/order", "/goods", "/shelf"], async (ctx, next) => {
-    if(!ctx.data.dealInfo) return ctx.redirect(ctx.nkcModules.apiFunction.generateAppLink(ctx.state, `/shop/manage/settings`));
+    if(!ctx.data.dealInfo) return ctx.redirect(`/shop/manage/settings`);
     await next();
   })
   

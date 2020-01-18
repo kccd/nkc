@@ -1516,7 +1516,7 @@ function obtainPureText(content, reduce, count) {
 }
 
 function postsVote(pid, type) {
-  if(type === 'login') return Login.open('login');
+  if(type === 'login') return NKC.methods.toLogin('login');
   var url = '/p/' + pid + '/vote/down';
   if(type === 'up') {
     url = '/p/' + pid + '/vote/up';
@@ -1660,7 +1660,7 @@ function disablePostClick(pid, type){
   if(type === 'post') {
     $postRecycleModel.modal();
   } else if(type === 'thread'){
-    $recycleModal.modal();
+    deleteThread();
   }
   // console.log(window.localStorage)
 }
@@ -1968,7 +1968,8 @@ function reload() {
 
 
 function openToNewLocation(url, target) {
-  // 检测url是不是本站相对路径
+  return NKC.methods.visitUrl(url, target);
+ /* // 检测url是不是本站相对路径
   var firstChar = url.substr(0, 1);
   var apptype = localStorage.getItem("apptype");
   if(apptype && apptype === "app") {
@@ -1990,7 +1991,7 @@ function openToNewLocation(url, target) {
     } else {
       window.location.href = url
     }
-  }
+  }*/
 }
 
 /**

@@ -10,15 +10,3 @@ function removeFromBlackList(uid) {
       screenTopWarning(data);
     })
 }
-
-var app = new Vue({
-  el: "#app",
-  data: {
-
-  },
-  methods: {
-    saveLimit: function() {
-
-    }
-  }
-});

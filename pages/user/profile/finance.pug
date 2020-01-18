@@ -10,11 +10,11 @@ div
       a.btn.btn-default.btn-sm(href="/account/finance/withdraw") 提现
   .ul.nav.nav-tabs
     li(role='presentation' class=data.t === 'all' ? 'active' : '')
-      a(href=`/u/${data.targetUser.uid}/profile/finance?t=all`) 所有
+      a(href=`/u/${data.targetUser.uid}/profile/finance?t=all` data-type="reload") 所有
     li(role='presentation' class=!data.t ? 'active' : '')
-      a(href=`/u/${data.targetUser.uid}/profile/finance`) 收入
+      a(href=`/u/${data.targetUser.uid}/profile/finance` data-type="reload") 收入
     li(role='presentation' class=data.t === 'payout' ? 'active' : '')
-      a(href=`/u/${data.targetUser.uid}/profile/finance?t=payout`) 支出
+      a(href=`/u/${data.targetUser.uid}/profile/finance?t=payout` data-type="reload") 支出
   .m-t-1
     include ../../publicModules/paging/paging
   div(style='font-size: 1rem;')

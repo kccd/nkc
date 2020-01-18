@@ -22,7 +22,7 @@ router
     } catch(e) {
       return ctx.throw(400, e.message)
     }
-    return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/me'))
+    return ctx.redirect('/me')
   });
 
 module.exports = router;

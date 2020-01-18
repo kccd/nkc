@@ -54,7 +54,7 @@ block scripts
           })
             .then(function(data) {
               //- window.location.href = data.redirect;
-              openToNewLocation(data.redirect);
+              NKC.methods.visitUrl(data.redirect);
               // openToNewLocation("/e/status");
             })
             .catch(function(data) {

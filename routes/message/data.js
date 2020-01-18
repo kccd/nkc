@@ -2,9 +2,10 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    const {db, query, nkcModules, data} = ctx;
+    const {db, query, data, state} = ctx;
     const {user} = data;
     const {type, firstMessageId, uid} = query;
+    data.twemoji = state.twemoji;
     if(type === "UTU") {
       const targetUser = await db.UserModel.findOnly({uid});
       const q = {

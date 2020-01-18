@@ -1,164 +1,104 @@
-var realUrl = "";
 localStorage.setItem("apptype", "app");
-var allLinks = document.querySelectorAll("a");
-var allButtons = document.querySelectorAll("button");
-var imgDownTimeOut;
-$(document).ready(function() {
-  // 获取url的apptype参数，要么为app，要么为false
-  var apptype = getQueryVariable("apptype");
-  if(apptype === "app") {
-    // 去掉body的paddingTop
-    if(location.pathname === "/") {
-      $("body").css("padding-top", "10px");
-    }
-  }
-});
+
+var _appFunctions = [];
+var _apiReady = false;
 
 apiready = function() {
-  // 为所有图片添加点击事件
-  var allImgs = document.querySelectorAll("img");
-  Array.prototype.forEach.call(allImgs, function(img) {
-    img.addEventListener("click", function() {
-      if(this.getAttribute("dataimg") && this.getAttribute("dataimg") == "content") {
-        if(this.src && this.src.indexOf("/r/") > -1) {
-          imageOpenInApp(this.src);
+  _apiReady = true;
+  for(var i = 0; i < _appFunctions.length; i++) {
+    _appFunctions[i]();
+  }
+};
+
+window.ready = function() {
+  return new Promise(function(resolve, reject) {
+    if(_apiReady) {
+      resolve();
+    } else {
+      _appFunctions.push(resolve);
+    }
+  });
+};
+
+(function(){
+  var allLinks = document.querySelectorAll("a[href]");
+  var allImages = document.querySelectorAll("img[data-type=view]");
+  Array.prototype.forEach.call(allLinks, function(link) {
+    link.addEventListener("click", function(e) {
+      // 打开资源链接进行下载
+      if(this.href.indexOf("/r/") > -1) {
+        /*emitEvent("download", {
+          url: this.href,
+          filename: this.innerText
+        });*/
+      } else {
+        if(this.getAttribute("data-type") !== "reload") {
+          e.preventDefault();
+          NKC.methods.openOnlinePage(this.href);
         }
       }
     })
   });
-  // 为所有的a标签添加点击事件
-  // 监听全局a标签的点击事件
-  // 并阻止链接点击跳转
-  // var allLinks = document.querySelectorAll("a");
-  var body = document.getElementsByTagName("body")[0];
-  body.addEventListener('click',function (e) {
-    // e.preventDefault();
-    if(e.target && e.target.nodeName.toLowerCase() == "a" && e.target.getAttribute('href')) {  // 检查事件源e.target是否为a
-      e.target.onclick = function (ae) {
-        ae.preventDefault();
-        if(e.target.href.indexOf("/r/") > -1) {
-          var linkUrl = e.target.href;
-          attachDownInApp(linkUrl);
-        }else if(e.target.href) {
-          var isHostUrl = siteHostLink(e.target.href);
-          // 如果是本站链接则打开app内页，否则使用外站浏览页打开
-          if(isHostUrl) {
-            var paramIndex = e.target.href.indexOf("?");
-            var newHref = "";
-            var equaiHref = false;
-            if(paramIndex > -1) {
-              newHref = (e.target.href).substring(0, paramIndex)
-            }else{
-              newHref = e.target.href;
-            }
-            if(newHref.length > 0) {
-              if(api.winName.indexOf(newHref) > -1) {
-                equaiHref = true;
-              }
-            }
-            // 如果是在首页跳转到最新关注推荐等，不打开新页面
-            if(e.target.pathname === "/" && api.winName === "root") {
-              window.location.href = addApptypeToUrl(e.target.href)
-              return;
-            }
-            if(equaiHref) {
-              appFreshUrl(e.target.href);
-            }else{
-              appOpenUrl(e.target.href);
-            }
-          }else{
-            api.openWin({
-              name: 'link',
-              url: 'widget://html/link/link.html',
-              pageParam: {
-                  name: 'link',
-                  linkUrl: e.target.href
-              }
-            });
-          }
-        }
+  Array.prototype.forEach.call(allImages, function(img) {
+    img.addEventListener("click", function() {
+      if(this.src) {
+        emitEvent("openImage", {
+          url: this.src
+        });
       }
-    }
-  }, true)
-  // Array.prototype.forEach.call(allLinks, function(link) {
-  //   link.addEventListener("click", function() {
-  //     if(this.href.indexOf("/r/") > -1) {
-  //       var linkUrl = this.href;
-  //       attachDownInApp(linkUrl);
-  //     }else if(this.href) {
-  //       var isHostUrl = siteHostLink(this.href);
-  //       // 如果是本站链接则打开app内页，否则使用外站浏览页打开
-  //       if(isHostUrl) {
-  //         var paramIndex = this.href.indexOf("?");
-  //         var newHref = "";
-  //         var equaiHref = false;
-  //         if(paramIndex > -1) {
-  //           newHref = (this.href).substring(0, paramIndex)
-  //         }else{
-  //           newHref = this.href;
-  //         }
-  //         if(newHref.length > 0) {
-  //           if(api.winName.indexOf(newHref) > -1) {
-  //             equaiHref = true;
-  //           }
-  //         }
-  //         // 如果是在首页跳转到最新关注推荐等，不打开新页面
-  //         if(this.pathname === "/" && api.winName === "root") {
-  //           window.location.href = addApptypeToUrl(this.href)
-  //           return;
-  //         }
-  //         if(equaiHref) {
-  //           appFreshUrl(this.href);
-  //         }else{
-  //           appOpenUrl(this.href);
-  //         }
-  //       }else{
-  //         api.openWin({
-  //           name: 'link',
-  //           url: 'widget://html/link/link.html',
-  //           pageParam: {
-  //               name: 'link',
-  //               linkUrl: this.href
-  //           }
-  //         });
-  //       }
-  //     }
-  //   })
-  // })
-  // 将本页的title和description传入app中
-  var locationUrl = window.location.href;
-  var urlType = getShareTypeByUrl(locationUrl);
-  if(urlType !== "common") {
-    getSiteMeta();
-  }
-  // 获取编辑器标识
-  var withE = window.localStorage.getItem("withE");
-  // 下拉刷新当前页面
-  api.refreshHeaderLoadDone();
-  if(window.location.pathname !== "/editor") {
-    api.setRefreshHeaderInfo({
-      bgColor: '#eeeeee',
-      textColor: '#aaaaaa',
-      textDown: '下拉刷新',
-      textUp: '松开刷新',
-      textLoading: '刷新成功，正在加载资源...',
-      showTime: false
-    }, function(ret, err) {
-      window.location.reload();
+    })
+  });
+})();
+
+window.ready()
+  .then(() => {
+    // 分享 页面信息
+    // 将本页的title和description传入app中
+    var title, description;
+    try{
+      title = document.getElementsByTagName("title")[0].text;
+    } catch(e){
+      title = "来自科创的分享";
+    }
+    try {
+      description = document.getElementsByName("description")[0].getAttribute("content");
+    } catch(e) {
+      description = "倡导科学理性，发展科技爱好";
+    }
+    emitEvent("siteMetaReady", {
+      title: title,
+      description: description,
+      url: window.location.href
     });
-  }
-  /**
-   * 编辑页面退出提示
-   */
-  if(withE) {
-    api.addEventListener({
-      name: 'keyback'
-    }, function(ret, err) {
-      api.confirm({
+  
+    // 获取编辑器标识
+    var withE = window.localStorage.getItem("withE");
+    // 下拉刷新当前页面
+    api.refreshHeaderLoadDone();
+    if(window.location.pathname !== "/editor") {
+      api.setRefreshHeaderInfo({
+        bgColor: '#eeeeee',
+        textColor: '#aaaaaa',
+        textDown: '下拉刷新',
+        textUp: '松开刷新',
+        textLoading: '加载中，请稍候',
+        showTime: false
+      }, function(ret, err) {
+        window.location.reload();
+      });
+    }
+    /**
+     * 编辑页面退出提示
+     */
+    if(withE) {
+      api.addEventListener({
+        name: 'keyback'
+      }, function(ret, err) {
+        api.confirm({
           title: '确定要退出吗？',
           msg: '',
           buttons: ['确定', '取消']
-      }, function(ret, err){
+        }, function(ret, err){
           if( ret ){
             if(ret.buttonIndex == 1){
               api.closeWin();
@@ -166,12 +106,12 @@ apiready = function() {
           }else{
             api.closeWin();
           }
+        });
       });
-    });
-  }
-  // 清除编辑器标识
-  window.localStorage.removeItem("withE");
-}
+    }
+    // 清除编辑器标识
+    window.localStorage.removeItem("withE");
+  });
 
 /**
  * 给url添加apptype参数
@@ -200,20 +140,24 @@ function addApptypeToUrl(url) {
 
 /**
  * 使用api对象中的方法打开新连接
- * @param {} urlStr 
+ * @param {String} urlStr
  */
 function appOpenUrl(urlStr) {
   var origin = window.location.origin;
   if(urlStr.indexOf("http") === -1) {
     urlStr = origin + urlStr
   }
-  var paramStr = addApptypeToUrl(urlStr)
+  var paramStr = addApptypeToUrl(urlStr);
   // 如果是可以分享的类型则使用分享模板打开以便分享，否则使用其他模板打开
   var windowFile = "widget://html/common/commonInfo.html";
   var shareType = getShareTypeByUrl(paramStr);
   if(shareType !== "common") {
     windowFile = "widget://html/common/shareInfo.html"
   }
+  
+  // 临时测试
+  windowFile = "widget://html/online/online.html";
+  
   // 判断是否为编辑页面
   var editUrlArr = ["/editor", "/shelf", "/release"];
   for(var e in editUrlArr) {
@@ -222,16 +166,17 @@ function appOpenUrl(urlStr) {
       break;
     }
   }
-  api.execScript({
-    name: "root",
-    script: "shareReadyBan()"
-  });
   api.openWin({
     name: paramStr,
     url: windowFile,
     pageParam: {
       realUrl: paramStr,
       shareType: shareType
+    },
+    animation: {
+      type: "movein",
+      subType: "from_right",
+      duration: 300
     }
   })
 }
@@ -255,20 +200,6 @@ function appFreshUrl(urlStr) {
   })
 }
 
-/**
- * 获取url中的app参数
- * @param {*} key 
- */
-function getQueryVariable(key)
-{
-  var query = window.location.search.substring(1);
-  var vars = query.split("&");
-  for (var i=0;i<vars.length;i++) {
-    var pair = vars[i].split("=");
-    if(pair[0] == key){return pair[1];}
-  }
-  return(false);
-}
 
 /**
  * 判断url是否为本站链接
@@ -276,38 +207,7 @@ function getQueryVariable(key)
  */
 function siteHostLink(urlStr) {
   var hostStr = window.location.host;
-  var hostIndex = urlStr.indexOf(hostStr);
-  if(hostIndex === -1) {
-    return false;
-  }else{
-    return true;
-  }
-}
-
-/**
- * 获取当前页面的meta中的title和description
- */
-function getSiteMeta() {
-  var title, description;
-  try{
-    title = document.getElementsByTagName("title")[0].text;
-  }catch(e){
-    title = "来自科创的分享";
-  }
-  try {
-    description = document.getElementsByName("description")[0].getAttribute("content");
-  }catch(e) {
-    description = "倡导科学理性，发展科技爱好";
-  }
-  var para = {
-    title: title,
-    description: description
-  };
-  var paraStr = JSON.stringify(para);
-  api.execScript({
-    name: realUrl,
-    script: 'getAppMeta('+paraStr+');'
-  });
+  return urlStr.indexOf(hostStr) !== -1;
 }
 
 
@@ -324,7 +224,7 @@ function getShareTypeByUrl(sourceUrl) {
     "forum": "/f/",
     "activity": "/activity/",
     "column": "/m/"
-  }
+  };
   var shareType = "common";
   for(var i in typeObj) {
     if(sourceUrl.indexOf(typeObj[i]) > -1) {
@@ -391,10 +291,29 @@ function imageOpenInApp(sid) {
   })
 }
 
-// 文件下载
-function attachDownInApp(linkUrl) {
-  api.execScript({
-    name: api.winName,
-    script: "attachDown('"+linkUrl+"')"
-  })
+/*
+* 注册一个监听事件
+* @param {String} name 事件名称
+* @param {Function} 回调函数
+*   @param {*} 触发时传入的数据
+* @author pengxiguaa 2020-1-10
+* */
+function newEvent(name, func) {
+  return api.addEventListener({
+    name
+  }, (ret, err) => {
+    if(err) return bottomAlert(err);
+    func(ret.value)
+  });
+}
+/*
+* 触发一个事件
+* @param {String} name 事件名称
+* @param {*} 传递数据
+* */
+function emitEvent(name, data) {
+  api.sendEvent({
+    name: name,
+    extra: data || {}
+  });
 }

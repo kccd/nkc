@@ -12,9 +12,9 @@ homeRouter
 			!forum.declare
 		) {
 			if(ctx.query.token) {
-				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest?token=${ctx.query.token}`));
+				return ctx.redirect(`/f/${forum.fid}/latest?token=${ctx.query.token}`);
 			}else{
-				return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/f/${forum.fid}/latest`));
+				return ctx.redirect(`/f/${forum.fid}/latest`);
 			}
 		}
 		await next();

@@ -19,7 +19,7 @@ router
     if(!column) {
       const u = await db.UserModel.findOne({uid: _id});
       if(u) {
-        return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, `/u/${u.uid}`));
+        return ctx.redirect(`/u/${u.uid}`);
       }
       ctx.throw(404, `未找到ID为${_id}的专栏`);
     }

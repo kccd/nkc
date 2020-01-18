@@ -18,5 +18,12 @@ var SubscribeTypes;
 $(function() {
   if(!window.SubscribeTypes && NKC.modules.SubscribeTypes)
     SubscribeTypes = new NKC.modules.SubscribeTypes();
-  
+  if(NKC.configs.swipeLeft) {
+    window.ready()
+      .then(() => {
+        newEvent("swiperight", function() {
+          emitEvent("openLeftBar");
+        });
+      })
+  }
 });

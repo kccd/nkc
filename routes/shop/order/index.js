@@ -6,7 +6,7 @@ router
     const {data, nkcModules} = ctx;
     const {user} = data;
     data.navType = "order";
-    if(!user) return ctx.redirect(nkcModules.apiFunction.generateAppLink(ctx.state, '/login'));
+    if(!user) return ctx.redirect('/login');
     await next();
   })
   .get("/", async (ctx, next) => {

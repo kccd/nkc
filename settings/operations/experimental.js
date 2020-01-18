@@ -148,13 +148,9 @@ module.exports = {
       }
 		},
 		app:{
-			upload:{
-				GET: 'visitAppUploadIndex',
-				POST: 'saveAppUploadInfo'
-			},
-			histories: {
-				GET: 'visitAppUploadHistories'
-			}
+			GET: "experimentalAppSettings",
+			POST: "experimentalAppSettings",
+			PATCH: "experimentalAppSettings"
 		},
 		role: {
 			GET: 'visitRoleSettings',

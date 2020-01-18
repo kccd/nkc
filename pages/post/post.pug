@@ -127,7 +127,7 @@ block content
         .nkcpanel.post-share.fullwidthpanel
           .pid=`文号 / ${post.pid}`
           hr
-          if !state.apptype
+          if !state.isApp
             .share 分享到：
               img(src='/default/QQ.png' onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${data.thread.firstPost.t}', '${post.pid}')`)
               img(src='/default/qzone.png' onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
