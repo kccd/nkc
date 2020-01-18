@@ -8,7 +8,7 @@ checkRouter
       data.cookie = Buffer.from(ctx.req.headers.cookie).toString('base64');
     }
     // 获取最新版本
-    let { systemType, sysType} = query;
+    let { systemType, sysType, version} = query;
     if(!systemType) systemType = sysType;
     if (systemType) {
       const queryMap = {
@@ -20,7 +20,9 @@ checkRouter
       if (latestVer) {
         const newVersion = latestVer.toObject();
         newVersion.url = config.domain + ":" + config.port + '/app/' + newVersion.appPlatForm + '/' + newVersion.hash;
-        data.newVersion = newVersion;
+        if(version && version !== newVersion.appVersion) {
+          data.newVersion = newVersion;
+        }
         data.latestVer = newVersion; // 兼容旧版APP的下载链接 2020-1-18，APP更新多个版本后可移除
       }
     }
