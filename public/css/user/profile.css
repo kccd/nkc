@@ -35,16 +35,18 @@ body {
   display: inline-block;
   height: 2.3rem;
   line-height: 2.3rem;
-  color: #fff;
+  color: #555;
   border-radius: 3px;
   margin: 0.5%;
   text-align: center;
-  background-color: #aaa;
+  border: 1px solid #eee;
+  box-sizing: border-box;
   font-size: 1rem;
 }
 .app-navs .app-nav.active,
 .app-navs .app-nav:active {
   background-color: #2b90d9;
+  color: #fff;
 }
 .app-navs .app-nav:hover,
 .app-navs .app-nav:active,

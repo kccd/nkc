@@ -12,9 +12,10 @@ const draft = new (class {
       })
   }
   removeDraftSingle(did) {
+    const self = this;
     sweetQuestion("确定要删除当前草稿？删除后不可恢复。")
       .then(function() {
-        removeDraft(did);
+        self.removeDraft(did);
       })
       .catch(function() {})
   }
