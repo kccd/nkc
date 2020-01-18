@@ -31,8 +31,13 @@ module.exports = async (ctx, next) => {
   }
 
   const {redisClient} = settings;
-  const tocKey = `page:${url}:toc`;
-  const dataKey = `page:${url}:data`;
+  let tocKey = `page:${url}:toc`;
+  let dataKey = `page:${url}:data`;
+  
+  if(state.isApp) {
+    tocKey = `app:page:${url}:toc`;
+    dataKey = `app:page:${url}:data`;
+  }
   // 获取缓存生成的时间，判断是否过期
   const toc = await redisClient.getAsync(tocKey);
   const cacheSettings = await db.SettingModel.getSettings("cache");
