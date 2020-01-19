@@ -538,7 +538,7 @@ block content
                               -previousPost = data.posts[index-1];
                             include single_post
                       .col-xs-12.col-md-12
-                        include ../interface_navigation_paging
+                        include ../publicModules/paging/paging_input
                       if data.user
                         .col-xs-12.col-md-12
                           - var hasMobile = data.user.authLevel > 0;
