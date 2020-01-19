@@ -20,7 +20,7 @@ $(function() {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   if(NKC.configs.swipeLeft) {
     window.ready()
-      .then(() => {
+      .then(function() {
         newEvent("swiperight", function() {
           emitEvent("openLeftBar");
         });

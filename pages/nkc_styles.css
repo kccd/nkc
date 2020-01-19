@@ -4002,7 +4002,9 @@ ul.nav.navbar-nav.navbar-md>li>a{
 .user-serttings-list .selected{
   background-color: #dff0ff;
 }
-
+.thread-post-comment-active{
+ font-weight: 700;
+}
 .topped-post{
   padding-left: 1rem;
   color: #e85a71;

@@ -87,7 +87,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                   span.fa.fa-comment-o &nbsp;
                   span 回复
               if post.postCount > 0
-                span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论(${post.postCount})`
+                span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid} thread-post-comment-active`)=`评论(${post.postCount})`
               else if data.user
                 span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论`
               span.pointer.m-r-05(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`

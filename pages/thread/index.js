@@ -13,17 +13,33 @@ $(document).ready(function(){
     hidePostMaxHeight = NKC.configs.postHeight.md;
   }
   var hidePostDom = $(".hide-post.part");
-  for(var i = 0; i < hidePostDom.length; i++) {
-    var d = hidePostDom.eq(i);
-    var contentDom = d.find(".thread-post-mask");
-    var pid = d.attr("data-pid");
-    if(contentDom.height() > hidePostMaxHeight) {
-      hidePost(pid);
-      $(".hide-post-button[data-pid='"+pid+"']").css({
-        "display": "inline-block"
-      });
-    }
-  }
+  
+  new Promise(function(resolve, reject) {
+  	if(NKC.configs.isApp) {
+  		setTimeout(function() {
+  		  resolve();
+		  }, 500)
+	  } else {
+  		resolve();
+	  }
+  })
+	  .then(function() {
+		  for(var i = 0; i < hidePostDom.length; i++) {
+			  var d = hidePostDom.eq(i);
+			  var contentDom = d.find(".thread-post-mask");
+			  var pid = d.attr("data-pid");
+			  if(contentDom.height() > hidePostMaxHeight) {
+				  hidePost(pid);
+				  $(".hide-post-button[data-pid='"+pid+"']").css({
+					  "display": "inline-block"
+				  });
+			  }
+		  }
+	  })
+	  .catch(function(data) {
+	  	console.error(data);
+	  });
+  
   if(window.moduleToColumn) {
     moduleToColumn.init();
   }
