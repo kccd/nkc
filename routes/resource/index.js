@@ -155,7 +155,7 @@ resourceRouter
       // 若匹配，则读取目标resource上的相关信息，并写入到新的resource中。封面图、
       if(!md5) ctx.throw(400, "md5不能为空");
       if(!fileName) ctx.throw(400, "文件名不能为空");
-      resource = await db.ResourceModel.findOne({hash: md5, mediaType: "mediaAttachment"});
+      const resource = await db.ResourceModel.findOne({hash: md5, mediaType: "mediaAttachment"});
       if(!resource) {
         data.uploaded = false;
         return await next();
@@ -197,6 +197,9 @@ resourceRouter
     if(blackExtensions.includes(extension)) {
       await fs.unlink(path);
       ctx.throw(403, "文件格式不被允许");
+    }
+    if(extension === "gif" && size > 5 * 1024 * 1024) {
+      ctx.throw(400, "为了提高观看体验，请上传视频，GIF最大只支持5MB。");
     }
     // 图片最大尺寸
     // const { largeImage } = settings.upload.sizeLimit;
@@ -381,7 +384,7 @@ resourceRouter
       // }
       // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
       const homeSettings = await ctx.db.SettingModel.getSettings("home");
-      if(width >= homeSettings.waterLimit.minWidth && height >= homeSettings.waterLimit.minHeight && waterAdd === true){
+      if(extension !== "gif" && width >= homeSettings.waterLimit.minWidth && height >= homeSettings.waterLimit.minHeight && waterAdd === true){
         if(waterStyle === "siteLogo"){
           await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path)
         }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
