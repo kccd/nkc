@@ -41,7 +41,7 @@ block content
                   for f, index in r.thread.forums
                     if index > 0
                       span ,
-                    a(href=`/t/${f.fid}` target="_blank")=f.displayName
+                    a(href=`/f/${f.fid}` target="_blank")=f.displayName
 
                 .review-info ，
                 .review-thread-title
@@ -57,7 +57,7 @@ block content
                   for f, index in r.thread.forums
                     if index > 0
                       span ,
-                    a(href=`/t/${f.fid}` target="_blank")=f.displayName
+                    a(href=`/f/${f.fid}` target="_blank")=f.displayName
               .review-input-div(v-if=`selectedPid.indexOf('${r.post.pid}') !== -1`)
                 .m-b-1
                   input(type="radio" :value="true" v-model=`review['${r.post.pid}'].pass`)

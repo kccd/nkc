@@ -41,6 +41,7 @@ block eContent
               th 订单状态
               th 商品价格
               th 运费
+              th 退款
               th 快递单号
               th 其他
           tbody
@@ -73,6 +74,11 @@ block eContent
                   span=`${order.orderPrice/100}元`
                 th  
                   span=`${order.orderFreightPrice/100}元`
+                th
+                  if order.refundMoney
+                    span=`${order.refundMoney/100}元`
+                  else
+                    span 无
                 th 
                   if order.trackNumber === "no"  
                     span 无物流发货
@@ -96,7 +102,7 @@ block eContent
                             .product-param=`规格：${productParam.name}`
                             .product-price=`单价：${param.singlePrice/100}元，数量：${param.count}，总计：${param.productPrice/100}元`
                             if param.refundStatus === "success"
-                              .product-param-info=`已退款，退款金额：${param.refundMoney/100}元`
+                              .product-param-info=`已退款`
                     .col-xs-6  
                       h4 其他信息
                       div=`收件人姓名：${order.receiveName}`

@@ -2,8 +2,6 @@ const paging = require('../settings/paging');
 const moment = require('moment');
 const http = require("http");
 const randomatic = require('randomatic');
-const aliAppCode = require("../config/aliAppCode");
-const {appCode} = aliAppCode;
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 let fn = {};
@@ -416,6 +414,8 @@ fn.doExchange = (arr) => {
  * @author Kris 2019-3-14
  */
 fn.getIpAddress = async (ip) => {
+  const aliAppCode = require("../config/aliAppCode");
+  const {appCode} = aliAppCode;
   let options = {
     hostname: `iploc.market.alicloudapi.com`,    //接口域
     path: `/v3/ip?ip=${ip}`,    //请求地址
@@ -479,6 +479,8 @@ fn.getTrackInfo = async (trackNumber, trackName) => {
  * @author Kris 2019-3-18
  */
 fn.getTrackInfoData = (trackNumber, trackName) => {
+  const aliAppCode = require("../config/aliAppCode");
+  const {appCode} = aliAppCode;
   let options = {
     hostname: `wuliu.market.alicloudapi.com`,    //接口域
     headers: {    //请求头

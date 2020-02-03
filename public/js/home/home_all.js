@@ -16,7 +16,16 @@ $(function () {
       delay: 3000,
       disableOnInteraction: false
     }
-  }); // 监听页面滚动 更改header样式
+  });
+
+  swiper.el.onmouseover = function () {
+    swiper.autoplay.stop();
+  };
+
+  swiper.el.onmouseleave = function () {
+    swiper.autoplay.start();
+  }; // 监听页面滚动 更改header样式
+
 
   $(window).scroll(function (event) {
     var scrollTop = $(window).scrollTop();
