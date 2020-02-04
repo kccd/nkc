@@ -68,6 +68,7 @@ const newResource = require("./newResource");
 const library = require("./library");
 const libraries = require("./libraries");
 const nkc = require("./nkc");
+const reader = require("./reader");
 const appDownload = require("./appDownload");
 const operationObj = {};
 
@@ -224,6 +225,8 @@ operationObj.operationTree = {
     libraries, // 文库
 		
 		appDownload, // 为了兼容旧版APP下载 2020-1-18，APP更新多个版本之后可移除该路由
+		
+		reader, // 阅读器 pdf
 		
     test,
 	}

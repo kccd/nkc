@@ -23,7 +23,8 @@ module.exports = async (ctx, next) => {
     let ext = path.extname(ctx.filePath);
     ext = ext.replace('.', '');
     ext = ext.toLowerCase();
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif', 'pdf'];
+    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif'];
+    const rangeExt = ["pdf", "mp3", "mp4"];
     let name;
     if(resource) {
       name = resource.oname;
@@ -34,6 +35,44 @@ module.exports = async (ctx, next) => {
     }
     // 设置文件类型
     ctx.type = ext;
+    
+    if(fileType !== "attachment" && extArr.includes(ext)) { // 图片
+      ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
+      ctx.body = fs.createReadStream(filePath);
+      ctx.set('Content-Length', stats.size);
+    } else if(fileType !== "attachment" && rangeExt.includes(ext)) { // 音频、视频、pdf
+      ctx.set("Accept-Ranges", "bytes");
+      let createdStream = false;
+      if(ctx.request.headers['range']){
+        const range = utils.parseRange(ctx.request.headers["range"], stats.size);
+        if(range){
+          ctx.body = await fss.createReadStream(filePath, {
+            start: range.start,
+            end: range.end
+          });
+          ctx.set("Content-Range", "bytes " + range.start + "-" + range.end + "/" + stats.size);
+          ctx.set("Content-Length", (range.end - range.start + 1));
+          createdStream = true;
+          ctx.status = 206;
+        }
+      }
+      if(!createdStream) {
+        ctx.body = await fss.createReadStream(filePath);
+        ctx.set("Content-Length", stats.size);
+      }
+    } else { // 附件
+      ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
+      if(tg) {
+        ctx.body = fss.createReadStream(filePath).pipe(tg.throttle());
+      } else {
+        ctx.body = fss.createReadStream(filePath);
+      }
+      ctx.set('Content-Length', stats.size);
+    }
+    /*if(ext === "pdf") {
+      ctx.set("accept-ranges", "bytes");
+      console.log(1, ctx.request.headers['range'])
+    }
     if(fileType !== "attachment" && ["mp4"].includes(ext)){
       if(ctx.request.headers['range']){
         var range = utils.parseRange(ctx.request.headers["range"], stats.size);
@@ -74,7 +113,18 @@ module.exports = async (ctx, next) => {
         ctx.body = fss.createReadStream(filePath);
       }
       ctx.set('Content-Length', stats.size);
+    }*/
+    /*if(fileType !== "attachment" && extArr.includes(ext)) {
+      ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
+    } else {
+      ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
     }
+    if(tg) {
+      ctx.body = fss.createReadStream(filePath).pipe(tg.throttle());
+    } else {
+      ctx.body = fss.createReadStream(filePath);
+    }
+    ctx.set('Content-Length', stats.size);*/
     await next();
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;
