@@ -621,13 +621,16 @@ function nkc_render(options){
         if(!resource) {
           return "（附件：" + plain_escape(v1) + "）";
         }
-
+        var resourceUrl = "/r/" + resource.rid;
+        if(resource.ext === "pdf") {
+          resourceUrl = tools.getUrl("pdf", resource.rid);
+        }
         return '<div class="article-attachment">' +
           '<div class="article-attachment-icon">' +
             '<img src="'+ tools.getUrl("fileCover", resource.ext) +'" />'+
           '</div>' + 
           '<div class="article-attachment-content">' +
-            '<a class="article-attachment-name" href="/r/'+resource.rid+'" title="'+plain_escape(resource.oname)+'">' +
+            '<a class="article-attachment-name" target="_blank" href="'+resourceUrl+'" title="'+plain_escape(resource.oname)+'">' +
               plain_escape(resource.oname) + 
             '</a>' +
             '<div class="article-attachment-info">' +

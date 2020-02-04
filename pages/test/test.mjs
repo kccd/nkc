@@ -1,4 +1,4 @@
-const url = "http://a.test:9000/r/10";
+const url = "http://a.test:9000/r/22";
 
 var container, pageDiv, pdfDoc;
 
@@ -17,7 +17,9 @@ $("button.page").on("click", function() {
 function getPDF(url) {
   pdfjsLib.getDocument({
     url: url,
-    rangeChunkSize: 65536,
+    rangeChunkSize: 65536*20,
+    disableAutoFetch: true,
+    disableStream:true
   }).then((pdf) => {
     console.log(pdf);
     pdfDoc = pdf;
