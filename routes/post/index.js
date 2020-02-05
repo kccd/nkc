@@ -395,6 +395,11 @@ router
     // 修改调查表
     if(survey && targetPost.surveyId) {
       survey.mid = data.user.uid;
+      if(targetThread.oc === pid) {
+        survey.postType = "thread";
+      } else {
+        survey.postType = "post";
+      }
       await db.SurveyModel.modifySurvey(survey);
     }
     let newAuthInfos = [];

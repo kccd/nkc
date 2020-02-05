@@ -251,25 +251,8 @@ block fundContent
 
 block fundScripts
   if data.s === 5
-    +includeCSS("/external_pkgs/viewer/viewer.css")
-    +includeJS("/external_pkgs/viewer/viewer.js")
     include ../../publicModules/lazySizes
-    script.
-      $(document).ready(function () {
-        var options = {
-          navbar: false,
-          title: false,
-          toolbar: false
-        }
-        const applicationFormDom = document.getElementById("applicationForm");
-        const applicationFormCommentDom = document.getElementById('applicationForm-comments');
-        if(applicationFormDom) {
-          new Viewer(applicationFormDom, options);
-        }
-        if(applicationFormCommentDom) {
-          new Viewer(applicationFormCommentDom, options);
-        }
-      })
+    include ../../publicModules/imageViewer
   include  ../../publicModules/selectForum/selectForum
   include  ../../publicModules/selectResource/selectResource
   include ../../publicModules/strToHTML

@@ -621,9 +621,12 @@ function nkc_render(options){
         if(!resource) {
           return "（附件：" + plain_escape(v1) + "）";
         }
-        var resourceUrl = "/r/" + resource.rid;
+        var resourceUrl = "/r/" + resource.rid + "?t=attachment";
+        var readerLinkDom = "";
         if(resource.ext === "pdf") {
-          resourceUrl = tools.getUrl("pdf", resource.rid);
+          readerLinkDom = '<div class="article-attachment-reader"><a href="'+
+            tools.getUrl("pdf", resource.rid) +
+            '" target="_blank">预览</a></div>'
         }
         return '<div class="article-attachment">' +
           '<div class="article-attachment-icon">' +
@@ -637,6 +640,7 @@ function nkc_render(options){
               '<div class="article-attachment-size">'+getSize(resource.size)+'</div>' +
               '<div class="article-attachment-ext">'+(resource.ext||"").toUpperCase()+'</div>' +
               '<div class="article-attachment-hits">'+(resource.hits || 0)+'次下载</div>' +
+               readerLinkDom +
             '</div>' +
           '</div>' +
         '</div>'

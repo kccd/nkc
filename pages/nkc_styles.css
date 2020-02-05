@@ -3961,6 +3961,10 @@ ul.nav.navbar-nav.navbar-md>li>a{
   color: #e85a71;
   font-weight: 700;
 }
+.article-attachment-reader{
+  color: #2b90d9;
+  font-weight: 700;
+}
 .article-audio{
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
   border-radius: 2px;

@@ -5,6 +5,7 @@ NKC.modules.SurveyEdit = function() {
     el: "#moduleSurveyEdit",
     data: {
       disabled: true,
+      deadlineMax: "",
       targetUser: "",
       survey: "",
       newSurvey: "",
@@ -98,8 +99,9 @@ NKC.modules.SurveyEdit = function() {
         ],
         type: 'vote'
       };
-      nkcAPI("/survey", "GET")
+      nkcAPI("/survey?t=thread", "GET")
         .then(function(data) {
+          this_.deadlineMax = data.deadlineMax;
           this_.grades = data.grades;
           var arr = [];
           for(var i = 0; i < data.grades.length; i++) {

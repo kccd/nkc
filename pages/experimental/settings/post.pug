@@ -227,6 +227,19 @@ block content
                       img(:src="'/avatar/' + user.avatar + '?t=sm'")
                       a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
                       .fa.fa-remove(@click="removeUser(index, 'survey')" title="点击移除")
+                div.m-t-1 时间限制：
+                  div.m-l-2.m-t-05
+                    span 调查的最长时间不能超过
+                    input(type="text" v-model.number="postSettings[type].survey.deadlineMax")
+                    | 天
+                  div.m-l-2.m-t-05
+                    span 拥有以下已勾选证书的用户不受限制
+                    div
+                      <label class="mdui-checkbox mdui-m-r-2" v-for="role, index in roles">
+                      <input type="checkbox" :value="role._id" v-model='postSettings[type].survey.ignoredRolesId'/>
+                      <i class="mdui-checkbox-icon"></i>
+                      | {{role.displayName}}
+                      </label>
                 hr
             .row(v-if="type === 'postToForum'")
               .col-sm-2.text-right
