@@ -30,8 +30,6 @@ block title
     meta(name='keywords' content=`${thread.firstPost.t}`)
     link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
     +includeCSS("/jquery-ui-1.10.4.custom.css")
-    +includeCSS("/external_pkgs/viewer/viewer.css")
-    +includeCSS("/external_pkgs/viewer/main.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
     include ../publicModules/plyr/plyr.css.pug
   if !state.isApp
@@ -703,24 +701,5 @@ block scripts
   +includeJS("/thread/comments.js")
   if permission("getPostAuthor")
     include ../publicModules/floatUserPanel/userInfo
-  +includeJS("/external_pkgs/viewer/viewer.js")
-  if !state.isApp
-    script.
-      $(document).ready(function() {
-        var options = {
-          navbar: false,
-          title: false,
-          toolbar: false,
-        }
-        new Viewer(document.getElementById('ThreadPostBody'), options);
-        if($("#productImageDom").length === 0) {
-          new Viewer(document.getElementById('thread-content'), options);
-        }else{
-          new Viewer(document.getElementById('productImageDom'), options);
-          new Viewer(document.getElementById('pikeImpor'), options);
-          new Viewer(document.getElementById('productIntroDom'), options);
-          new Viewer(document.getElementById('productInfoContent'), options);
-        }
-        //- new Viewer(document.getElementById('pikeLook'), options);
-      })
+  include ../publicModules/imageViewer
   +includeJS("/thread/index.js")

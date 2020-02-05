@@ -21,6 +21,8 @@ module.exports = {
       survey: {
         status: false,
         defaultCertGradesId: [],
+        deadlineMax: 30,
+        ignoredRolesId: [],
         rolesId: [],
         uid: []
       },
@@ -48,6 +50,8 @@ module.exports = {
         status: false,
         defaultCertGradesId: [],
         rolesId: [],
+        deadlineMax: 30,
+        ignoredRolesId: [],
         uid: []
       }
     }

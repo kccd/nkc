@@ -9,6 +9,7 @@ var app = new Vue({
     type: 'postToForum', // postToForum, postToThread, postResource, postLibrary
   },
   methods: {
+    checkNumber: NKC.methods.checkData.checkNumber,
     addUser: function(type) {
       var uid = this.uid;
       var this_ = this;
@@ -50,24 +51,33 @@ var app = new Vue({
     save: function() {
       var results = this.postSettings[this.type];
       var results_ = JSON.parse(JSON.stringify(results));
-      var exam = results_.exam;
-      results_.exam = {
-        volumeA: exam.indexOf('volumeA') !== -1,
-        volumeB: exam.indexOf('volumeB') !== -1,
-        notPass: {
-          status: exam.indexOf('notPass') !== -1,
-          unlimited: [true, 'true'].indexOf(results_.examCountLimit.unlimited) !== -1,
-          countLimit: Number(results_.examCountLimit.countLimit)
-        }
-      };
-      var obj = {
-        roles: app.roles,
-        grades: app.grades
-      };
-      delete results_.examCountLimit;
-      delete results_.authLevel;
-      obj[this.type] = results_;
-      nkcAPI('/e/settings/post', 'PATCH', obj)
+      var self = this;
+      Promise.resolve()
+        .then(function() {
+          var exam = results_.exam;
+          results_.exam = {
+            volumeA: exam.indexOf('volumeA') !== -1,
+            volumeB: exam.indexOf('volumeB') !== -1,
+            notPass: {
+              status: exam.indexOf('notPass') !== -1,
+              unlimited: [true, 'true'].indexOf(results_.examCountLimit.unlimited) !== -1,
+              countLimit: Number(results_.examCountLimit.countLimit)
+            }
+          };
+          var obj = {
+            roles: app.roles,
+            grades: app.grades
+          };
+          self.checkNumber(results_.survey.deadlineMax, {
+            name: "调查的最长天数",
+            min: 0.1,
+            fractionDigits: 1
+          });
+          delete results_.examCountLimit;
+          delete results_.authLevel;
+          obj[self.type] = results_;
+          return nkcAPI('/e/settings/post', 'PATCH', obj);
+        })
         .then(function() {
           screenTopAlert('保存成功');
         })

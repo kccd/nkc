@@ -27,8 +27,6 @@ block title
   meta(name='keywords' content=`${thread.firstPost.t}`)
   link(rel='stylesheet' href=`/post/post.css?v=${global.NKC.startTime}`)
   link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
-  +includeCSS("/external_pkgs/viewer/viewer.css")
-  +includeCSS("/external_pkgs/viewer/main.css")
   +includeJS("/external_pkgs/imageToBig/preview.js")
   include ../publicModules/plyr/plyr.css.pug
 block content
@@ -162,7 +160,7 @@ block scripts
   include ../ueditor/ueditorBase
   include ../MathJax.pug
   +includeJS(`/thread/comments.js`)
-  +includeJS("/external_pkgs/viewer/viewer.js")
+  include ../publicModules/imageViewer
   if permission("getPostAuthor")
     include ../publicModules/floatUserPanel/userInfo
   script.
@@ -175,12 +173,6 @@ block scripts
     var UserInfo;
     $(document).ready(function() {
       if(NKC.modules.UserInfo) UserInfo = new NKC.modules.UserInfo();
-      var options = {
-        navbar: false,
-        title: false,
-        toolbar: false,
-      }
-      new Viewer(document.getElementById('ThreadPostBody'), options);
       NKC.methods.markDom($(".highlight-dom>.highlight"));
       NKC.methods.scrollToDom($(".highlight-dom"));
     })

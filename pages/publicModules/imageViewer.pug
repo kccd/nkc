@@ -1,0 +1,18 @@
+if !state.isApp
+  +includeCSS("/external_pkgs/viewer/viewer.css")
+  +includeCSS("/external_pkgs/viewer/main.css")
+  +includeJS("/external_pkgs/viewer/viewer.js")
+  +includeJS("/external_pkgs/viewer/jquery-viewer.js")
+  script.
+    $(document).ready(function() {
+      var options = {
+        navbar: false,
+        title: false,
+        toolbar: false,
+      }
+      $(".article-img-body").viewer(options);
+      $("#productImageDom").viewer(options);
+      $("#pikeImpor").viewer(options);
+      $("#applicationForm").viewer(options);
+      $("#applicationForm-comments").viewer(options);
+    })

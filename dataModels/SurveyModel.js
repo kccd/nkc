@@ -214,8 +214,9 @@ const schema = new Schema({
 schema.statics.checkSurveyData = async (survey) => {
   const {checkString, checkNumber} = require("../nkcModules/checkData");
   const SettingModel = mongoose.model("settings");
+  const SurveyModel = mongoose.model("surveys");
   const {
-    options, reward, permission, type
+    options, reward, permission, type, uid, postType
   } = survey;
   if(type !== "vote") {
     checkString(survey.description, {
@@ -304,8 +305,15 @@ schema.statics.checkSurveyData = async (survey) => {
     });
   }
   // const now = Date.now();
-  if((new Date(survey.st)).getTime() >= (new Date(survey.et)).getTime()) throwErr(400, "结束时间必须大于开始时间");
+  const reduce = (new Date(survey.et)).getTime() - (new Date(survey.st)).getTime();
+  if(reduce <= 0) throwErr(400, "结束时间必须大于开始时间");
   // if((new Date(survey.et)).getTime() <= now) throwErr(400, "结束时间必须大于当前时间");
+  const deadlineMax = await SurveyModel.getDeadlineMax(postType, uid);
+  if(deadlineMax) {
+    if(reduce > deadlineMax * 24 * 60 * 60 * 1000) {
+      throwErr(400, `调查时间不能超过${deadlineMax}天。`);
+    }
+  }
   const {
     registerTime, digestThreadCount, threadCount, postCount, voteUpCount,
     certsId, visitor, gradesId
@@ -581,5 +589,33 @@ schema.methods.getPostUsers = async function() {
   const posts = await mongoose.model("surveyPosts").find({surveyId: this._id, uid: {$ne: ""}, originId: null}, {uid: 1});
   const uid = posts.map(p => p.uid);
   return await mongoose.model("users").find({uid: {$in: uid}}, {uid: 1, avatar: 1});
+};
+
+/*
+* 获取用户发起的调查的时间上限
+* @param {String} type 类型 thread: 文章中的调查，post: 回复中的调查（未开发）
+* @param {String} uid 用户ID
+* @return {undefined或Number} undefined: 不限制，Number: 具体天数
+* author pengxiguaa 2020/2/5
+* */
+schema.statics.getDeadlineMax = async (type, uid) => {
+  const user = await mongoose.model("users").findOnly({uid});
+  await user.extendRoles();
+  const postSettings = await mongoose.model("settings").getSettings("post");
+  let surveySettings;
+  if(type === "thread") {
+    surveySettings = postSettings.postToForum.survey;
+  } else {
+    surveySettings = postSettings.postToThread.survey;
+  }
+  let ignored = false;
+  for(const role of user.roles) {
+    if(!surveySettings.ignoredRolesId.includes(role._id)) continue;
+    ignored = true;
+    break;
+  }
+  if(!ignored) {
+    return surveySettings.deadlineMax;
+  }
 };
 module.exports = mongoose.model("surveys", schema);

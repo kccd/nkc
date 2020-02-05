@@ -237,6 +237,7 @@
                 -for(var i = 0; i < 60; i++)
                   option(value=i)=i
               | &nbsp;分
+              h5.text-danger(v-if="deadlineMax") 调查时间不能超过{{deadlineMax}}天。
       //-.form-group
         label.col-sm-2.control-label
         .col-sm-9

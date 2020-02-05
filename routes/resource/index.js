@@ -93,7 +93,9 @@ resourceRouter
       ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`)
     }
     // 在resource中添加点击次数
-    await resource.update({$inc:{hits:1}});
+    if(!ctx.request.headers['range']){
+      await resource.update({$inc:{hits:1}});
+    }
     
     ctx.filePath = filePath;
     // 表明客户端希望以附件的形式加载资源
