@@ -41,6 +41,7 @@ module.exports = async (ctx, next) => {
       ctx.body = fs.createReadStream(filePath);
       ctx.set('Content-Length', stats.size);
     } else if(fileType !== "attachment" && rangeExt.includes(ext)) { // 音频、视频、pdf
+      ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
       ctx.set("Accept-Ranges", "bytes");
       let createdStream = false;
       if(ctx.request.headers['range']){
@@ -69,62 +70,6 @@ module.exports = async (ctx, next) => {
       }
       ctx.set('Content-Length', stats.size);
     }
-    /*if(ext === "pdf") {
-      ctx.set("accept-ranges", "bytes");
-      console.log(1, ctx.request.headers['range'])
-    }
-    if(fileType !== "attachment" && ["mp4"].includes(ext)){
-      if(ctx.request.headers['range']){
-        var range = utils.parseRange(ctx.request.headers["range"], stats.size);
-        if(range){
-          ctx.set("Content-Range", "bytes " + range.start + "-" + range.end + "/" + stats.size);
-          ctx.set("Content-Length", (range.end - range.start + 1));
-          var stream = await fss.createReadStream(filePath, {
-            "start": range.start,
-            "end": range.end
-          });
-          // ctx.response.writeHead('206', "Partial Content");
-          ctx.status = 206;
-          ctx.body = stream;
-          // stream.pipe(ctx.response);
-        }else{
-          if(ctx.response) {
-            // ctx.response.removeHeader("Content-Length");
-            ctx.status = 416;
-            // ctx.response.end();
-          }
-        }
-      }else{
-
-        // ctx.response.writeHead('200', "Partial Content");
-        ctx.status = 200;
-        ctx.body = fss.createReadStream(filePath);
-        // stream.pipe(ctx.response);
-      }
-    }else{
-      if(fileType !== "attachment" && extArr.includes(ext)) {
-        ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
-      } else {
-        ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
-      }
-      if(tg) {
-        ctx.body = fss.createReadStream(filePath).pipe(tg.throttle());
-      } else {
-        ctx.body = fss.createReadStream(filePath);
-      }
-      ctx.set('Content-Length', stats.size);
-    }*/
-    /*if(fileType !== "attachment" && extArr.includes(ext)) {
-      ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
-    } else {
-      ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
-    }
-    if(tg) {
-      ctx.body = fss.createReadStream(filePath).pipe(tg.throttle());
-    } else {
-      ctx.body = fss.createReadStream(filePath);
-    }
-    ctx.set('Content-Length', stats.size);*/
     await next();
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;
