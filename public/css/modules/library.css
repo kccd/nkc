@@ -59,7 +59,7 @@
   vertical-align: top;
   position: relative;
   padding-left: 0.6rem;
-  padding-right: 8rem;
+  padding-right: 10rem;
   width: 100%;
 }
 #moduleLibrary .lib-list-li .list-body .list-name {
@@ -115,7 +115,7 @@
   top: 0;
   right: 0;
   height: 3.2rem;
-  width: 8rem;
+  width: 10rem;
   text-align: center;
   line-height: 3.4rem;
   font-size: 1.3rem;
