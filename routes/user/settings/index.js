@@ -19,6 +19,7 @@ const securityRouter = require("./security");
 const bankRouter = require("./bank");
 const displayRouter = require("./display");
 const redEnvelopeRouter = require('./redEnvelope');
+const resourceRouter = require("./resource");
 settingRouter
 	.use('/', async (ctx, next) => {
 		const {data, params, db, nkcModules} = ctx;
@@ -57,5 +58,6 @@ settingRouter
   .use("/bank", bankRouter.routes(), bankRouter.allowedMethods())
   .use("/message", messageRouter.routes(), messageRouter.allowedMethods())
   .use("/security", securityRouter.routes(), securityRouter.allowedMethods())
+	.use('/resource', resourceRouter.routes(), resourceRouter.allowedMethods())
 	.use('/water', waterRouter.routes(), waterRouter.allowedMethods());
 module.exports = settingRouter;

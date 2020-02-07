@@ -273,7 +273,7 @@ resourceRouter
           mediaType: "mediaAttachment"
         });
         ctx.data.r = await r.save();
-        ctx.throw(400, "图片上传失败，已被放至附件")
+        ctx.throw(400, "图片上传失败，已被放至附件");
         return await next()
       }
       // 获取图片尺寸
@@ -341,7 +341,7 @@ resourceRouter
       // 图片水印尺寸
       let {siteLogoWidth, siteLogoHeigth} = await imageMagick.waterInfo(waterSmallPath);
       siteLogoWidth = parseInt(siteLogoWidth);
-      siteLogoHeigth = parseInt(siteLogoHeigth)
+      siteLogoHeigth = parseInt(siteLogoHeigth);
       // const siteLogoWidth = settings.upload.webSmallLogoSize;
       // const siteLogoHeigth = settings.upload.webSmallLogoSize;
       // 根据水印位置计算偏移量
@@ -381,9 +381,6 @@ resourceRouter
       }else if(width > 1920) {
         await imageMagick.imageNarrow(path);
       }
-      // if(width > 1920 && size > largeImage){
-      //   await imageMagick.imageNarrow(path)
-      // }
       // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
       const homeSettings = await ctx.db.SettingModel.getSettings("home");
       if(extension !== "gif" && width >= homeSettings.waterLimit.minWidth && height >= homeSettings.waterLimit.minHeight && waterAdd === true){
@@ -396,22 +393,6 @@ resourceRouter
           // await fs.copyFile(temporaryPath, path);
         }
       }
-      // console.log(width>1024)
-      // await imageMagick.imageTest(path);
-      // await imageMagick.watermarkify(path);
-      // console.log(largeImage)
-      // if (size > largeImage) {
-      //   await imageMagick.attachify(path);
-      // } else {
-      //   const { width, height } = await imageMagick.info(path);
-      //   if (height > 400 || width > 300) {
-      //     if(waterAdd === true){
-      //       console.log(path)
-      //       await imageMagick.watermarkify(path);
-      //       await imageMagick.watermarkifyFont(waterGravity,path);
-      //     }
-      //   }
-      // }
     }
     // 视频压缩转码
     if (videoExts.indexOf(extension.toLowerCase()) > -1) {
@@ -519,15 +500,19 @@ resourceRouter
     await fs.unlink(path);
 
     // 判断图片的宽高
-    let height, width;
+    let height, width, resourceType = "resource";
     if(mediaType === "mediaPicture") {
       const pictureInfo = await tools.imageMagick.info(mediaFilePath);
       height = pictureInfo.height;
       width = pictureInfo.width;
+      if(type === "sticker") {
+        resourceType = type;
+      }
     }
 
     const r = new ctx.db.ResourceModel({
       rid,
+      type: resourceType,
       oname: name,
       height,
       width,

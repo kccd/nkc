@@ -1,0 +1,15 @@
+extends ../bootstrap_base
+block title
+  title 表情中心
+  +includeCSS("/stickers/stickers.css")
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-9.box-shadow-panel
+        div
+
+      .col-xs-12.col-md-3.box-shadow-panel
+        div
+          a(href="/stickers/upload").btn.btn-block.btn-lg.btn-success 上传表情
+
+block scripts

@@ -67,7 +67,12 @@ const resourceSchema = new Schema({
     index: 1,
     default: ''
   },
-  //
+  // resource: 普通资源文件、sticker: 表情图片
+  type: {
+	  type: String,
+    index: 1,
+    default: "resource"
+  },
   // pid、"fund_" + applicationForumId, 表示哪些post引用了该资源
   references: {
 	  type: [String],

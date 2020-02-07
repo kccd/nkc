@@ -1,0 +1,81 @@
+@import "../publicModules/base";
+body{
+  background-color: #f4f4f4;
+}
+
+.sticker-upload{
+  .form{
+    .sticker{
+      @height: 5rem;
+      height: @height;
+      border: 1px solid #eee;
+      margin: 0 1rem 1rem 0;
+      position: relative;
+      overflow: hidden;
+      .sticker-image{
+        display: table-cell;
+        img{
+          height: @height;
+          width: @height;
+        }
+      }
+      .sticker-content{
+        display: table-cell;
+        width: 100%;
+        vertical-align: top;
+        padding-left: 1rem;
+        .file-name{
+          height: 1.7rem;
+          overflow: hidden;
+          padding-right: 3.5rem;
+          font-weight: 700;
+          .hideText(@line: 1);
+        }
+        .file-ext{
+          height: 1.4rem;
+          font-size: 1rem;
+          color: #828282;
+        }
+        .file-progress{
+          height: 1.9rem;
+          font-size: 1.2rem;
+          .uploaded{
+            color: green;
+          }
+          .unUploaded{
+            color: #555;
+          }
+          .uploading{
+            color: @primary
+          }
+          .upload-error{
+            color: @accent;
+          }
+        }
+        .file-button{
+          position: absolute;
+          top: 0;
+          right: 0;
+          .fa{
+            width: 1.7rem;
+            height: 1.7rem;
+            line-height: 1.7rem;
+            text-align: center;
+            color: #777;
+            &:hover{
+              background-color: rgba(0, 0, 0, 0.5);
+              color: #fff;
+              cursor: pointer;
+            }
+          }
+        }
+      }
+      &.add{
+        line-height: @height;
+        text-align: center;
+        background-color: #f4f4f4;
+        cursor: pointer;
+      }
+    }
+  }
+}

@@ -70,6 +70,7 @@ const libraries = require("./libraries");
 const nkc = require("./nkc");
 const reader = require("./reader");
 const appDownload = require("./appDownload");
+const stickers = require("./stickers");
 const operationObj = {};
 
 
@@ -227,6 +228,8 @@ operationObj.operationTree = {
 		appDownload, // 为了兼容旧版APP下载 2020-1-18，APP更新多个版本之后可移除该路由
 		
 		reader, // 阅读器 pdf
+		
+		stickers, // 表情中心
 		
     test,
 	}

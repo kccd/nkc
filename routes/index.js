@@ -39,6 +39,7 @@ const surveyRouter = routers.survey;
 const editorRouter = routers.editor;
 const nkcRouter = routers.nkc;
 const readerRouter = routers.reader;
+const stickersRouter = routers.stickers;
 
 // 访问文库相关
 const libraryRouter = routers.library;
@@ -89,4 +90,5 @@ router.use("/survey", surveyRouter.routes(), surveyRouter.allowedMethods());
 router.use("/rs", resourcesRouter.routes(), resourcesRouter.allowedMethods());
 router.use("/reader", readerRouter.routes(), readerRouter.allowedMethods());
 router.use("/banner", userBannerRouter.routes(), userBannerRouter.allowedMethods());
+router.use("/stickers", stickersRouter.routes(), stickersRouter.allowedMethods());
 module.exports = router;

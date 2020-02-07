@@ -644,6 +644,10 @@
   "experimentalAppSettings": "后台APP管理",
   "downloadApp": "下载app",
   "pdfReader": "pdf预览",
+  "userSettingsResource": "用户管理资源文件",
+  "stickerCenter": "表情中心",
+  "uploadSticker": "上传表情",
+  "getSticker": "查看表情图片",
 
   "userSettingsHomeToLatest": "首页调整：主页 > 最新",
   "userSettingsLatestToHome": "首页调整：最新 > 主页",
