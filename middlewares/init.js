@@ -84,7 +84,7 @@ module.exports = async (ctx, next) => {
     
     // 判断是否为APP发起的请求
     let userAgent = ctx.header["user-agent"];
-    userAgent = userAgent.match(/NKC\/APP\/([a-z]+)/ig);
+    userAgent = (userAgent || "").match(/NKC\/APP\/([a-z]+)/ig);
     if(userAgent !== null) {
       ctx.state.isApp = true;
       ctx.state.appOS = userAgent[0].includes("android")? "android": "ios"
