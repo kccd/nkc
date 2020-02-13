@@ -7,7 +7,7 @@ window.app = new Vue({
     description: "",
     cover: "",
     coverData: "",
-    share: true,
+    share: false,
     stickers: [],
     error: "",
     uploading: false

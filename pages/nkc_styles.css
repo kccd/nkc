@@ -3863,6 +3863,9 @@ ul.nav.navbar-nav.navbar-md>li>a{
   font-size: 0;
   vertical-align: text-bottom;
 }
+.article-sticker-body img{
+  vertical-align: text-bottom;
+}
 .article-img-body{
   position: relative;
   display: inline-block;
