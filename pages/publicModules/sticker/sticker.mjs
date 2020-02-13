@@ -39,7 +39,7 @@ class StickerViewer {
           nkcAPI("/sticker", "POST", body)
             .then(() => {
               self.app.close();
-              sweetSuccess("操作成功");
+              window.location.reload();
             })
             .catch(sweetError);
         },
@@ -67,7 +67,7 @@ class StickerViewer {
             })
             .then(() => {
               self.app.close();
-              sweetSuccess("操作成功");
+              window.location.reload();
             })
             .catch(sweetError);
         },

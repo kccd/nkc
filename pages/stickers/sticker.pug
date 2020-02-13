@@ -36,7 +36,7 @@ block content
               img(:src="getUrl('sticker', s.rid)" :data-sticker-rid="s.rid" data-sticker-management="true")
         .hot-stickers(v-if="hotStickers.length")
           h5 热门表情&nbsp;
-            a.hot-stickers-button(href="/stickers") 查看更多
+            a.hot-stickers-button(@click="visitUrl('/stickers')") 查看更多
           .hot-stickers-body
             .hot-sticker(v-for="s in hotStickers")
               img(:src="getUrl('sticker', s.rid)" :data-sticker-rid="s.rid")

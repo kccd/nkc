@@ -98,7 +98,7 @@ body{
     font-size: 0;
   }
   .sticker{
-    @height: 100px;
+    @height: 84px;
     user-select: none;
     height: @height;
     width: @height;
@@ -163,7 +163,7 @@ body{
     }
     .hot-stickers-body{
       .hot-sticker{
-        @height: 100px;
+        @height: 84px;
         user-select: none;
         height: @height;
         width: @height;
@@ -175,6 +175,10 @@ body{
         display: inline-block;
         margin: 0 1rem 1rem 0;
         font-size: 0;
+        img{
+          max-height: 95%;
+          max-width: 95%;
+        }
       }
     }
   }

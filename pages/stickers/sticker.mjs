@@ -19,6 +19,7 @@ const app = new Vue({
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    visitUrl: NKC.methods.visitUrl,
     switchManagement() {
       this.management = !this.management;
       this.changeStickersStatus(false);

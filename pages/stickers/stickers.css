@@ -104,10 +104,10 @@ body {
 }
 .stickers .sticker {
   user-select: none;
-  height: 100px;
-  width: 100px;
+  height: 84px;
+  width: 84px;
   text-align: center;
-  line-height: 100px;
+  line-height: 84px;
   border: 1px solid #aaa;
   position: relative;
   overflow: hidden;
@@ -164,16 +164,20 @@ body {
 }
 .stickers .hot-stickers .hot-stickers-body .hot-sticker {
   user-select: none;
-  height: 100px;
-  width: 100px;
+  height: 84px;
+  width: 84px;
   text-align: center;
-  line-height: 100px;
+  line-height: 84px;
   border: 1px solid #aaa;
   position: relative;
   overflow: hidden;
   display: inline-block;
   margin: 0 1rem 1rem 0;
   font-size: 0;
+}
+.stickers .hot-stickers .hot-stickers-body .hot-sticker img {
+  max-height: 95%;
+  max-width: 95%;
 }
 .stickers .using-warning {
   color: #555;

@@ -44,7 +44,7 @@ block content
               .fa.fa-columns
             span 我的专栏
             .icon-right
-              .fa.fa-angle-right
+              .fa.fa-angle-right     
         else if data.user && state.columnPermission
           a.nav-link(href=`/column/apply`)
             .icon-left
@@ -52,6 +52,12 @@ block content
             span 开设专栏
             .icon-right
               .fa.fa-angle-right
+        a.nav-link(href=`/sticker`)
+          .icon-left
+            .fa.fa-smile-o
+          span 个性表情
+          .icon-right
+            .fa.fa-angle-right       
         .nav-link-header 应用
         .nav-apps
           a.nav-app(href=`/fund`)
