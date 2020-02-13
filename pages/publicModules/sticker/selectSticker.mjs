@@ -8,7 +8,7 @@ NKC.modules.SelectSticker = function() {
       pageNumber: "",
       perpage: 20,
       emoji: [],
-      share: true,
+      share: false,
       localStickers: [],
       stickers: [],
       paging: {}
