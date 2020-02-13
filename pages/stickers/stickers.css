@@ -21,10 +21,18 @@ body {
 }
 .sticker-upload .form .sticker .sticker-image {
   display: table-cell;
+  text-align: center;
 }
-.sticker-upload .form .sticker .sticker-image img {
+.sticker-upload .form .sticker .sticker-image div {
   height: 5rem;
+  line-height: 5rem;
   width: 5rem;
+  border-right: 1px solid #eee;
+  overflow: hidden;
+}
+.sticker-upload .form .sticker .sticker-image div img {
+  max-height: 5rem;
+  max-width: 5rem;
 }
 .sticker-upload .form .sticker .sticker-content {
   display: table-cell;
@@ -85,4 +93,89 @@ body {
   text-align: center;
   background-color: #f4f4f4;
   cursor: pointer;
+}
+.stickers .null {
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+}
+.stickers .stickers-body {
+  font-size: 0;
+}
+.stickers .sticker {
+  user-select: none;
+  height: 100px;
+  width: 100px;
+  text-align: center;
+  line-height: 100px;
+  border: 1px solid #aaa;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  margin: 0 1rem 1rem 0;
+}
+.stickers .sticker img {
+  max-height: 95%;
+  max-width: 95%;
+}
+.stickers .sticker .selectbox {
+  position: absolute;
+  top: 0;
+  cursor: pointer;
+  right: 0;
+  height: 1.4rem;
+  width: 1.4rem;
+  line-height: 1.4rem;
+  text-align: center;
+  background-color: #fff;
+  z-index: 100;
+  font-size: 1.4rem;
+}
+.stickers .sticker .un-review {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #eee;
+  font-size: 1rem;
+}
+.stickers .sticker .un-passed {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #eee;
+  font-size: 1rem;
+}
+.stickers .sticker .un-passed .fa {
+  height: 1.2rem;
+  text-align: center;
+  border-radius: 50%;
+  line-height: 1.3rem;
+  font-size: 1rem;
+  width: 1.2rem;
+  background-color: #e85a71;
+  color: #fff;
+}
+.stickers .hot-stickers .hot-stickers-button {
+  font-size: 1.2rem;
+  color: #2b90d9;
+  font-weight: 700;
+}
+.stickers .hot-stickers .hot-stickers-body .hot-sticker {
+  user-select: none;
+  height: 100px;
+  width: 100px;
+  text-align: center;
+  line-height: 100px;
+  border: 1px solid #aaa;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  margin: 0 1rem 1rem 0;
+  font-size: 0;
+}
+.stickers .using-warning {
+  color: #555;
+  font-size: 1rem;
 }

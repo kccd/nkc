@@ -34,6 +34,15 @@ var Tools = function() {
       case "pdf": {
         return "/reader/pdf/web/viewer?file=%2fr%2f" + id
       }
+      case "sticker": {
+        return "/sticker/" + id;
+      }
+      case "emoji": {
+        return "/twemoji/2/svg/" + id + ".svg"
+      }
+      case "forumAvatar": {
+        return "/forum_avatar/" + id;
+      }
     }
   };
   self.floatUserInfo = function(uid) {

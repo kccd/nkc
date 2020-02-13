@@ -1,15 +1,18 @@
 const router = require("koa-router")();
-const uploadRouter = require("./upload");
 router
   .get("/", async (ctx, next) => {
-    const {query} = ctx;
-    const {t} = query;
-    if(t === "upload") {
-      ctx.template = "stickers/upload/upload.pug";
-    } else {
-      ctx.template = "stickers/stickers.pug";
-    }
+    const {nkcModules, query, db, data} = ctx;
+    const {page = 0} = query;
+    const q = {
+      disabled: false,
+      deleted: false,
+      shared: true
+    };
+    const count = await db.StickerModel.count(q);
+    const paging = nkcModules.apiFunction.paging(page, count, 110);
+    data.stickers = await db.StickerModel.find(q).sort({hits: -1}).skip(paging.start).limit(paging.perpage);
+    data.paging = paging;
+    ctx.template = "stickers/stickers.pug";
     await next();
-  })
-  .use("/upload", uploadRouter.routes(), uploadRouter.allowedMethods());
+  });
 module.exports = router;

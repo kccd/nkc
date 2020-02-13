@@ -25,5 +25,5 @@
             .number {{forum.countPosts}}
             | 条回复  
       .float-forum-bottom
-        .float-forum-description(:title="forum.description") {{forum.description}}      
+        .float-forum-description(:title="forum.description") {{forum.description || "暂无简介"}}      
 +includeJS("/js/modules/floatForumPanel.js")

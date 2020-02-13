@@ -37,9 +37,9 @@ module.exports = {
 			  GET: "visitUserInfoSettings",
         PATCH: "modifyUserInfo"
       },
-			resource: {
+			/* resource: {
 				GET: "userSettingsResource"
-			},
+			}, */
       apps: {
         GET: 'visitUserInfoSettings',
         PATCH: 'modifyUserInfo'

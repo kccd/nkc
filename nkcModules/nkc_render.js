@@ -509,7 +509,9 @@ function nkc_render(options){
     html = html.replace(/<img\s.*?>/img, function(content) {
       return content.replace(/<img\s.*?src=['"]\/r\/([0-9]+?)['"].*?>/img, function(c, v1) {
         return '<img src="/r/'+v1+'" />';
-      });
+      }).replace(/<img\s.*?src=['"]\/sticker\/([0-9]+?)['"].*?>/img, function(c, v1) {
+        return '<img src="/sticker/'+v1+'" />';
+      })
     });
     // 精简视频dom
     // html = html.replace(/\<video\s+?src=['"]\/r\/([0-9]+?)['"].*?>.*?\<\/video>/img, '<video src="/r/$1"></video>');
@@ -583,6 +585,10 @@ function nkc_render(options){
         return '<div class="article-img-body" style="width: '+resource.width+'px;"><div class="article-img-content" style="padding-top: '+ 
         resource.height*100/resource.width +
         '%;">'+lazyImgStr+'</div></div>';
+      })
+      // 表情处理
+      .replace(/<img\ssrc="\/sticker\/([0-9]+?)" \/>/img, function(content, v1) {
+        return '<span class="article-sticker-body" data-sticker-rid="'+v1+'"><img src="'+tools.getUrl('sticker', v1)+'"></span>'
       })
       // 视频处理
       .replace(/<video\ssrc="\/r\/([0-9]+?)"><\/video>/igm, function(content, v1) {

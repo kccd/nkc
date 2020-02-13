@@ -7,24 +7,8 @@ window.app = new Vue({
     description: "",
     cover: "",
     coverData: "",
-    stickers: [
-      /*{
-        url: "https://www.kechuang.org/avatar/74185",
-        file:{
-          name: 'asdfasdf.jpg',
-          type: "image/png",
-          size: 763948
-        }
-      },
-      {
-        url: "https://www.kechuang.org/avatar/10",
-        file: {
-          name: 'asdfasdfe.png',
-          type: "image/png",
-          size: 12354
-        }
-      }*/
-    ],
+    share: true,
+    stickers: [],
     error: "",
     uploading: false
   },
@@ -105,6 +89,9 @@ window.app = new Vue({
           formData.append("file", sticker.file);
           formData.append("type", "sticker");
           formData.append("fileName", sticker.name);
+          if(self.share) {
+            formData.append("share", "true");
+          }
           return nkcUploadFile("/r", "POST", formData, function(e, progress) {
             sticker.progress = progress;
           });

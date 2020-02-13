@@ -1,3 +1,25 @@
+UE.registerUI('stickerSelector',function(editor,uiName){
+  if(NKC.modules.SelectSticker && !window.SelectSticker) {
+    window.SelectSticker = new NKC.modules.SelectSticker();
+  }
+  return new UE.ui.Button({
+    name:'stickerSelector',
+    title:'插入表情',
+    // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
+    // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
+    className: 'edui-default edui-for-emotion edui-icon',
+    onclick:function () {
+      if(window.SelectSticker) {
+        window.SelectSticker.open(function(res) {
+          var dom = NKC.methods.resourceToHtml(res.data, res.type);
+          editor.execCommand('inserthtml', dom);
+        });
+      } else {
+        return sweetError("未初始化表情选择模块");
+      }
+    }
+  })
+});
 UE.registerUI('imageSelector',function(editor,uiName){
   if(NKC.modules.SelectResource && !window.SelectResource) {
     window.SelectResource = new NKC.modules.SelectResource();

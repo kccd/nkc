@@ -7,11 +7,13 @@ block content
     .row
       .col-md-offset-3.col-xs-12.col-md-6.box-shadow-panel
         .upload-info
-          h4 说明
-          p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio doloribus eaque est eveniet, excepturi expedita maiores mollitia natus numquam quas. Ad, illo incidunt iste modi necessitatibus officiis quae quidem quis.
+          h4 注意事项
+          div!=experimental_render({c: state.stickerSettings.notesAboutUploading})
         .form.m-t-1#app(v-cloak)
           .form-group
-            label 添加表情
+            a(href=`/sticker`) < 返回个性表情
+          .form-group
+            label 上传表情
             div
               input#uploadInput(@change="selectedLocalFile" type="file" accept="image/gif,image/png,image/jpeg" multiple="multiple").hidden
               //button.btn.btn-sm.btn-default(@click="selectLocalFile" ) 选择本地文件
@@ -21,7 +23,8 @@ block content
                   .fa.fa-crop(title="裁剪" @click="cropImage(s)" v-if="s.status !== 'uploaded'")
                   .fa.fa-remove(title="移除" @click="removeFormArr(stickers, index)")
                 .sticker-image
-                  img(:src="s.url")
+                  div
+                    img(:src="s.url")
                 .sticker-content
                   .file-name {{s.name}}
                   .file-ext {{getSize(s.file.size)}} {{s.file.type}}
@@ -40,13 +43,16 @@ block content
               .sticker.add(@click="selectLocalFile" )
                 .fa.fa-plus
                 span &nbsp;点击选择本地文件
-
+              .checkbox
+                label
+                  input(type="checkbox" :value="true" v-model="share" :disabled="uploading")
+                  span 分享
           .form-group.text-center
             button.btn.btn-primary.btn-block(v-if="disableButton" disabled=true) 上传
-            button.btn.btn-primary.btn-block(v-else @click="submit")
-              span(v-if="uploading") 上传中...
+            button.btn.btn-primary.btn-block(v-else-if="!uploading" @click="submit") 上传
+            button.btn.btn-primary.btn-block(v-else disabled=true)
+              span 上传中...
                 .fa.fa-spinner.fa-spin
-              span(v-else) 上传
 
 
 

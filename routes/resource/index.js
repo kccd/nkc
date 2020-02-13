@@ -33,7 +33,7 @@ resourceRouter
     const {rid} = params;
     const {t} = query;
     const {cache} = settings;
-    const resource = await db.ResourceModel.findOnly({rid});
+    const resource = await db.ResourceModel.findOnly({rid, type: "resource"});
     const {mediaType, ext} = resource;
     let filePath = await resource.getFilePath();
     let speed;
@@ -144,7 +144,7 @@ resourceRouter
     let mediaRealPath;
     const {files, fields} = ctx.body;
     const {file} = files;
-    const {type, fileName, md5} = fields;
+    const {type, fileName, md5, share} = fields;
 
 
     const {fileCountOneDay, blackExtensions} = await db.SettingModel.getUploadSettingsByUser(data.user);
@@ -239,160 +239,166 @@ resourceRouter
 
     // 图片裁剪水印
     if (pictureExts.indexOf(extension.toLowerCase()) > -1) {
-      // 如果格式满足则生成缩略图
-      const descPathOfThumbnail = generateFolderName(thumbnailPath); // 略缩图存放路径
-      const descPathOfMedium = generateFolderName(mediumPath); // 中号图存放路径
-      const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 略缩图路径+名称
-      const mediumFilePath = mediumPath + descPathOfThumbnail + saveName; // 中号图路径 + 名称
-      // 获取原图id
-      const descPathOfOrigin = generateFolderName(originPath); // 原图存放路径
-      originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
-      let originSaveName = originId + '.' + extension;
-      const originFilePath = originPath + descPathOfOrigin + originSaveName; // 原图存放路径
-
-
-      // 图片自动旋转
-      try{
-        await imageMagick.allInfo(path);
-      }catch(e){
-        mediaRealPath = selectDiskCharacterUp("mediaAttachment");
-        middlePath = generateFolderName(mediaRealPath);
-        mediaFilePath = mediaRealPath + middlePath + saveName;
-        await fs.copyFile(path, mediaFilePath);
-        await fs.unlink(path);
-        const r = new ctx.db.ResourceModel({
-          rid,
-          oname: name,
-          path: middlePath + saveName,
-          tpath: middlePath + saveName,
+      if(type === "sticker") { // 上传的表情图片
+        // const { width, height } = await imageMagick.info(path);
+        await imageMagick.stickerify(path);
+      } else {
+        // 如果格式满足则生成缩略图
+        const descPathOfThumbnail = generateFolderName(thumbnailPath); // 略缩图存放路径
+        const descPathOfMedium = generateFolderName(mediumPath); // 中号图存放路径
+        const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 略缩图路径+名称
+        const mediumFilePath = mediumPath + descPathOfThumbnail + saveName; // 中号图路径 + 名称
+        // 获取原图id
+        const descPathOfOrigin = generateFolderName(originPath); // 原图存放路径
+        originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
+        let originSaveName = originId + '.' + extension;
+        const originFilePath = originPath + descPathOfOrigin + originSaveName; // 原图存放路径
+  
+  
+        // 图片自动旋转
+        try{
+          await imageMagick.allInfo(path);
+        }catch(e){
+          mediaRealPath = selectDiskCharacterUp("mediaAttachment");
+          middlePath = generateFolderName(mediaRealPath);
+          mediaFilePath = mediaRealPath + middlePath + saveName;
+          await fs.copyFile(path, mediaFilePath);
+          await fs.unlink(path);
+          const r = new ctx.db.ResourceModel({
+            rid,
+            oname: name,
+            path: middlePath + saveName,
+            tpath: middlePath + saveName,
+            ext: extension,
+            size,
+            hash,
+            uid: ctx.data.user.uid,
+            toc: Date.now(),
+            mediaType: "mediaAttachment"
+          });
+          ctx.data.r = await r.save();
+          ctx.throw(400, "图片上传失败，已被放至附件");
+          return await next()
+        }
+        // 获取图片尺寸
+        const { width, height } = await imageMagick.info(path);
+        // 生成无水印原图
+        if(width > 3840 || (size > 5242880 && extension !== "gif")) {
+          await imageMagick.originify(path, originFilePath)
+        }else{
+          await fs.copyFile(path, originFilePath);
+        }
+        const ro = new ctx.db.OriginImageModel({
+          originId,
+          path: middlePath + originSaveName,
+          tpath: middlePath + originSaveName,
           ext: extension,
-          size,
-          hash,
           uid: ctx.data.user.uid,
-          toc: Date.now(),
-          mediaType: "mediaAttachment"
+          toc: Date.now()
         });
-        ctx.data.r = await r.save();
-        ctx.throw(400, "图片上传失败，已被放至附件");
-        return await next()
-      }
-      // 获取图片尺寸
-      const { width, height } = await imageMagick.info(path);
-      // 生成无水印原图
-      if(width > 3840 || (size > 5242880 && extension !== "gif")) {
-        await imageMagick.originify(path, originFilePath)
-      }else{
-        await fs.copyFile(path, originFilePath);
-      }
-      const ro = new ctx.db.OriginImageModel({
-        originId,
-        path: middlePath + originSaveName,
-        tpath: middlePath + originSaveName,
-        ext: extension,
-        uid: ctx.data.user.uid,
-        toc: Date.now()
-      });
-      ctx.data.ro = await ro.save();
-      // 生成略缩图
-      if(width > 150 || (size > 51200 && extension !== "gif")) {
-        await imageMagick.thumbnailify(path, thumbnailFilePath);
-      }else{
-        await fs.copyFile(path, thumbnailFilePath);
-      }
-      // 生成中号图
-      if(width > 640 || (size > 102400 && extension !== "gif")) {
-        await imageMagick.mediumify(path, mediumFilePath);
-      }else{
-        await fs.copyFile(path, mediumFilePath)
-      }
-      // 获取个人水印设置
-      const waterSetting = await ctx.db.UsersGeneralModel.findOne({uid: ctx.data.user.uid});
-      const waterAdd = waterSetting?waterSetting.waterSetting.waterAdd : true;
-      const waterStyle = waterSetting?waterSetting.waterSetting.waterStyle : "siteLogo";
-      const waterGravity = waterSetting?waterSetting.waterSetting.waterGravity : "southeast";
-      // 获取文字（用户名）水印的字符数、宽度、高度
-      let username;
-      if(waterStyle === "userLogo"){
-        username = ctx.data.user?ctx.data.user.username : "科创论坛";
-      }else if(waterStyle === "coluLogo"){
-        const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
-        username = column?column.name : ctx.data.user.name+"的专栏";
-      }else{
-        username = "";
-      }
-      // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
-      const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
-      const usernameWidth = usernameLength * 12;
-      const usernameHeight = 24;
-      // 获取文字（专栏名）水印的字符数、宽度、高度
-      // const column = await ctx.db.PersonalForumModel.findOne({uid: ctx.data.user.uid})
-      // const coluname = column?column.displayName : username+"的专栏";
-      // const colunameLength = coluname.replace(/[^\x00-\xff]/g,"01").length;
-      // const colunameWidth = colunameLength * 12;
-      // const coluHeight = 24;
-      // 获取水印图片路径
-      let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
-      waterSmall = waterSmall.c;
-      // const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
-      const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
-      const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";
-      // 获取透明度
-      const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
-      // 图片水印尺寸
-      let {siteLogoWidth, siteLogoHeigth} = await imageMagick.waterInfo(waterSmallPath);
-      siteLogoWidth = parseInt(siteLogoWidth);
-      siteLogoHeigth = parseInt(siteLogoHeigth);
-      // const siteLogoWidth = settings.upload.webSmallLogoSize;
-      // const siteLogoHeigth = settings.upload.webSmallLogoSize;
-      // 根据水印位置计算偏移量
-      let userCoor; // 文字水印偏移量
-      let userXcoor = 0; // 文字水印横向偏移量
-      let userYcoor = 0; // 文字水印纵向偏移量
-      let logoCoor; // Logo水印偏移量
-      let logoXcoor = 0; // Logo水印横向偏移量
-      let logoYcoor = 0; // Logo水印纵向偏移量
-      if(waterGravity === "center"){
-        // 正中间，Logo横向负偏移，文字不偏移
-        logoCoor = "-"+parseInt(usernameWidth/2+23)+"+0";
-        userCoor = "+0+0";
-      }else if(waterGravity === "southeast"){
-        // 右下角，Logo横向负偏移，文字不偏移
-        logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
-        userCoor = "+10+"+parseInt(parseInt(siteLogoHeigth-24)/2+10);
-      }else if(waterGravity === "southwest"){
-        // 左下角，Logo不偏移，文字横向正偏移
-        logoCoor = "+10+10";
-        userCoor = "+"+parseInt(siteLogoWidth+10)+"+"+parseInt(parseInt(siteLogoHeigth-24)/2+10)
-      }else if(waterGravity === "northeast"){
-        // 右上角，Logo横向负偏移，文字纵向正偏移
-        logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
-        userCoor = "+10+"+parseInt(parseInt(siteLogoHeigth-24)/2+10);
-      }else if(waterGravity === "northwest"){
-        // 左上角，Logo不偏移，文字横向正偏移+纵向正偏移
-        logoCoor = "+10+10";
-        userCoor = "+"+parseInt(siteLogoWidth+10)+"+"+parseInt(parseInt(siteLogoHeigth-24)/2+10)
-      }else{
-        logoCoor = "+0+0";
-        userCoor = "+0+0"
-      }
-      // 如果图片宽度大于1920，则将图片宽度缩为1920
-      if(size > 500000) {
-        await imageMagick.imageNarrow(path);
-      }else if(width > 1920) {
-        await imageMagick.imageNarrow(path);
-      }
-      // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
-      const homeSettings = await ctx.db.SettingModel.getSettings("home");
-      if(extension !== "gif" && width >= homeSettings.waterLimit.minWidth && height >= homeSettings.waterLimit.minHeight && waterAdd === true){
-        if(waterStyle === "siteLogo"){
-          await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path)
-        }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
-          await imageMagick.watermarkifyLogo(transparency, logoCoor, waterGravity, waterSmallPath, path);
-          var temporaryPath = extGetPath(extension);
-          await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path, temporaryPath);
-          // await fs.copyFile(temporaryPath, path);
+        ctx.data.ro = await ro.save();
+        // 生成略缩图
+        if(width > 150 || (size > 51200 && extension !== "gif")) {
+          await imageMagick.thumbnailify(path, thumbnailFilePath);
+        }else{
+          await fs.copyFile(path, thumbnailFilePath);
+        }
+        // 生成中号图
+        if(width > 640 || (size > 102400 && extension !== "gif")) {
+          await imageMagick.mediumify(path, mediumFilePath);
+        }else{
+          await fs.copyFile(path, mediumFilePath)
+        }
+        // 获取个人水印设置
+        const waterSetting = await ctx.db.UsersGeneralModel.findOne({uid: ctx.data.user.uid});
+        const waterAdd = waterSetting?waterSetting.waterSetting.waterAdd : true;
+        const waterStyle = waterSetting?waterSetting.waterSetting.waterStyle : "siteLogo";
+        const waterGravity = waterSetting?waterSetting.waterSetting.waterGravity : "southeast";
+        // 获取文字（用户名）水印的字符数、宽度、高度
+        let username;
+        if(waterStyle === "userLogo"){
+          username = ctx.data.user?ctx.data.user.username : "科创论坛";
+        }else if(waterStyle === "coluLogo"){
+          const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
+          username = column?column.name : ctx.data.user.name+"的专栏";
+        }else{
+          username = "";
+        }
+        // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
+        const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
+        const usernameWidth = usernameLength * 12;
+        const usernameHeight = 24;
+        // 获取文字（专栏名）水印的字符数、宽度、高度
+        // const column = await ctx.db.PersonalForumModel.findOne({uid: ctx.data.user.uid})
+        // const coluname = column?column.displayName : username+"的专栏";
+        // const colunameLength = coluname.replace(/[^\x00-\xff]/g,"01").length;
+        // const colunameWidth = colunameLength * 12;
+        // const coluHeight = 24;
+        // 获取水印图片路径
+        let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
+        waterSmall = waterSmall.c;
+        // const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
+        const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
+        const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";
+        // 获取透明度
+        const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
+        // 图片水印尺寸
+        let {siteLogoWidth, siteLogoHeigth} = await imageMagick.waterInfo(waterSmallPath);
+        siteLogoWidth = parseInt(siteLogoWidth);
+        siteLogoHeigth = parseInt(siteLogoHeigth);
+        // const siteLogoWidth = settings.upload.webSmallLogoSize;
+        // const siteLogoHeigth = settings.upload.webSmallLogoSize;
+        // 根据水印位置计算偏移量
+        let userCoor; // 文字水印偏移量
+        let userXcoor = 0; // 文字水印横向偏移量
+        let userYcoor = 0; // 文字水印纵向偏移量
+        let logoCoor; // Logo水印偏移量
+        let logoXcoor = 0; // Logo水印横向偏移量
+        let logoYcoor = 0; // Logo水印纵向偏移量
+        if(waterGravity === "center"){
+          // 正中间，Logo横向负偏移，文字不偏移
+          logoCoor = "-"+parseInt(usernameWidth/2+23)+"+0";
+          userCoor = "+0+0";
+        }else if(waterGravity === "southeast"){
+          // 右下角，Logo横向负偏移，文字不偏移
+          logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
+          userCoor = "+10+"+parseInt(parseInt(siteLogoHeigth-24)/2+10);
+        }else if(waterGravity === "southwest"){
+          // 左下角，Logo不偏移，文字横向正偏移
+          logoCoor = "+10+10";
+          userCoor = "+"+parseInt(siteLogoWidth+10)+"+"+parseInt(parseInt(siteLogoHeigth-24)/2+10)
+        }else if(waterGravity === "northeast"){
+          // 右上角，Logo横向负偏移，文字纵向正偏移
+          logoCoor = "+"+parseInt(usernameWidth+10)+"+10"
+          userCoor = "+10+"+parseInt(parseInt(siteLogoHeigth-24)/2+10);
+        }else if(waterGravity === "northwest"){
+          // 左上角，Logo不偏移，文字横向正偏移+纵向正偏移
+          logoCoor = "+10+10";
+          userCoor = "+"+parseInt(siteLogoWidth+10)+"+"+parseInt(parseInt(siteLogoHeigth-24)/2+10)
+        }else{
+          logoCoor = "+0+0";
+          userCoor = "+0+0"
+        }
+        // 如果图片宽度大于1920，则将图片宽度缩为1920
+        if(size > 500000) {
+          await imageMagick.imageNarrow(path);
+        }else if(width > 1920) {
+          await imageMagick.imageNarrow(path);
+        }
+        // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
+        const homeSettings = await ctx.db.SettingModel.getSettings("home");
+        if(extension !== "gif" && width >= homeSettings.waterLimit.minWidth && height >= homeSettings.waterLimit.minHeight && waterAdd === true){
+          if(waterStyle === "siteLogo"){
+            await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path)
+          }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
+            await imageMagick.watermarkifyLogo(transparency, logoCoor, waterGravity, waterSmallPath, path);
+            var temporaryPath = extGetPath(extension);
+            await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path, temporaryPath);
+            // await fs.copyFile(temporaryPath, path);
+          }
         }
       }
+      
     }
     // 视频压缩转码
     if (videoExts.indexOf(extension.toLowerCase()) > -1) {
@@ -526,6 +532,16 @@ resourceRouter
       toc: Date.now(),
       mediaType: mediaType
     });
+    
+    // 创建表情数据
+    if(type === "sticker") {
+      await db.StickerModel.uploadSticker({
+        rid,
+        uid: data.user.uid,
+        share: !!share
+      });
+    }
+    
     ctx.data.r = await r.save();
     await next()
   })

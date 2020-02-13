@@ -634,6 +634,7 @@
   "userProfile": "访问个人中心",
   "nkcManagement": "前台管理",
   "nkcManagementHome": "前台管理 - 首页管理",
+  "nkcManagementSticker": "前台管理 - 共享表情",
   "pushColumnToHome": "推送专栏到首页",
   "pushGoodsToHome": "推送商品到首页",
   "transferKcbToUser": "用户间小额转账",
@@ -645,9 +646,13 @@
   "downloadApp": "下载app",
   "pdfReader": "pdf预览",
   "userSettingsResource": "用户管理资源文件",
-  "stickerCenter": "表情中心",
-  "uploadSticker": "上传表情",
+  "stickerCenter": "查看个性表情",
   "getSticker": "查看表情图片",
+  "modifySticker": "用户管理自己的表情",
+  "getSharedStickers": "获取共享表情",
+  "experimentalStickerSettings": "后台管理 - 表情设置",
+  "experimentalEditorSettings": "后台管理 - 编辑器设置",
+
 
   "userSettingsHomeToLatest": "首页调整：主页 > 最新",
   "userSettingsLatestToHome": "首页调整：最新 > 主页",

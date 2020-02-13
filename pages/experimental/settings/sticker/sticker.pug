@@ -1,0 +1,28 @@
+extends ../../experimental
+block eTitle
+  title 表情设置
+  style.
+    small{
+      margin-left: 1rem;
+      color: #777;
+    }
+block eContent
+  #data.hidden=objToStr({stickerSettings: data.stickerSettings})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3#app(v-cloak)
+        .form
+          .form-group
+            h4 表情设置
+          .form-group
+            label 上传提示
+              small 上传时的注意事项
+            textarea.form-control(rows=5 v-model="stickerSettings.notesAboutUploading")
+          .form-group
+            label 使用提示
+              small 关于共享表情的声明，会在表情中心和表情弹窗中显示。
+            textarea.form-control(rows=5 v-model="stickerSettings.notesAboutUsing")
+          .form-group
+            button.btn.btn-primary.btn-sm(@click="submit") 保存  
+block scripts
+  +includeJS("/experimental/settings/sticker/sticker.js")            

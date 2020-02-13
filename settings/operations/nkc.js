@@ -4,5 +4,9 @@ module.exports = {
     GET: "nkcManagementHome",
     POST: "nkcManagementHome",
     PATCH: "nkcManagementHome"
+  },
+  sticker: {
+    GET: "nkcManagementSticker",
+    POST: "nkcManagementSticker"
   }
 };

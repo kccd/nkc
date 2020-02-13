@@ -14,9 +14,17 @@ body{
       overflow: hidden;
       .sticker-image{
         display: table-cell;
-        img{
+        text-align: center;
+        div{
           height: @height;
+          line-height: @height;
           width: @height;
+          border-right: 1px solid #eee;
+          overflow: hidden;
+          img{
+            max-height: @height;
+            max-width: @height;
+          }
         }
       }
       .sticker-content{
@@ -77,5 +85,101 @@ body{
         cursor: pointer;
       }
     }
+  }
+}
+
+.stickers{
+  .null{
+    height: 5rem;
+    line-height: 5rem;
+    text-align: center;
+  }
+  .stickers-body{
+    font-size: 0;
+  }
+  .sticker{
+    @height: 100px;
+    user-select: none;
+    height: @height;
+    width: @height;
+    text-align: center;
+    line-height: @height;
+    border: 1px solid #aaa;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    margin: 0 1rem 1rem 0;
+    img{
+      max-height: 95%;
+      max-width: 95%;
+    }
+    .selectbox{
+      position: absolute;
+      top: 0;
+      cursor: pointer;
+      right: 0;
+      @boxHeight: 1.4rem;
+      height: @boxHeight;
+      width: @boxHeight;
+      line-height: @boxHeight;
+      text-align: center;
+      background-color: #fff;
+      z-index: 100;
+      font-size: 1.4rem;
+    }
+    .un-review{
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #eee;
+      font-size: 1rem;
+    }
+    .un-passed{
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #eee;
+      font-size: 1rem;
+      .fa{
+        @iconHeight: 1.2rem;
+        height: @iconHeight;
+        text-align: center;
+        border-radius: 50%;
+        line-height: @iconHeight + 0.1rem;
+        font-size: 1rem;
+        width: @iconHeight;
+        background-color: @accent;
+        color: #fff;
+      }
+    }
+  }
+  .hot-stickers{
+    .hot-stickers-button{
+      font-size: 1.2rem;
+      color: @primary;
+      font-weight: 700;
+    }
+    .hot-stickers-body{
+      .hot-sticker{
+        @height: 100px;
+        user-select: none;
+        height: @height;
+        width: @height;
+        text-align: center;
+        line-height: @height;
+        border: 1px solid #aaa;
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        margin: 0 1rem 1rem 0;
+        font-size: 0;
+      }
+    }
+  }
+  .using-warning{
+    color: #555;
+    font-size: 1rem;
   }
 }

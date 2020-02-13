@@ -55,14 +55,44 @@ body{
 }
 .editor-main-forum{
   display: inline-block;
-  height: 2.5rem;
-  padding: 0 0.5rem;
-  color: #fff;
+  height: 2.4rem;
+  color: #666;
+  /* border: 1px solid #eee; */
+  font-weight: 700;
   vertical-align: top;
-  line-height: 2.5rem;
-  border-radius: 3px;
-  font-size: 1.2rem;
+  line-height: 2.4rem;
+  border-radius: 1.2rem;
+  vertical-align: top;
+  padding-right: 2.4rem;
+  position: relative;
+  background-color: #f6f6f6;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
   margin: 0 0.5rem 0.5rem 0;
+  font-size: 0;
+}
+.editor-main-forum-name{
+  display: inline-block;
+  font-size: 1rem;
+  padding-left: 0.5rem;
+  vertical-align: top;
+}
+.editor-main-forum .fa{
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2.4rem;
+  line-height: 2.4rem;
+  text-align: center;
+  width: 2.4rem;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+.editor-main-forum-avatar{
+  height: 2.3rem;
+  display: inline-block;
+  width: 2.3rem;
+  border-radius: 50%;
 }
 .editor-abstract textarea:focus{
   outline: none;

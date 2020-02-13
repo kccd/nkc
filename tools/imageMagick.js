@@ -422,7 +422,19 @@ const turnVideo = async(inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath])
 }
 
+const stickerify = async (path, ext) => {
+  const maxWidth = 100;
+  const {width, height} = await info(path);
+  if(width > maxWidth || height > maxWidth) {
+    if(linux) {
+      return spawnProcess('convert', [path, '-resize', `${maxWidth}x${maxWidth}`, path])
+    }
+    return spawnProcess('magick', ['convert', path, '-resize', `${maxWidth}x${maxWidth}`, path]);
+  }
+};
+
 module.exports = {
+  stickerify,
   imageExtTurn,
   avatarify,
   attachify,

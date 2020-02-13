@@ -941,7 +941,7 @@ font-size: 14pt;
 .ThreadPostBody img{
   /* max-height: 800px; */
   max-width: 100%;
-  border-radius: 5px;
+  /*border-radius: 5px;*/
   /* margin-right: 5px; */
   /* margin-left: 5px; */
 }
@@ -2945,7 +2945,7 @@ img.emoji {
   font-size: 16px;
   overflow: hidden;
 }
-.thread-content img{
+.thread-content img[data-type="view"]{
   border-radius: 7px;
 }
 .thread-div{
@@ -3858,7 +3858,11 @@ ul.nav.navbar-nav.navbar-md>li>a{
 .play-btn:hover{
   cursor: pointer;
 }
-
+.article-sticker-body{
+  display: inline;
+  font-size: 0;
+  vertical-align: text-bottom;
+}
 .article-img-body{
   position: relative;
   display: inline-block;
@@ -3876,6 +3880,7 @@ ul.nav.navbar-nav.navbar-md>li>a{
   top: 0;
   z-index: 0;
   left: 0;
+  border-radius: 7px;
   width: 100%;
   height: 100%;
 }

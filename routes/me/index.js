@@ -130,7 +130,7 @@ meRouter
     } else if(c === "used") {
       queryMap["references.0"] = {$exists: true};
     }
-    queryMap.type === "resource";
+    queryMap.type = "resource";
     let newSkip = quota * skip;
     let mediaCount = await db.ResourceModel.find(queryMap).count();
     data.paging = nkcModules.apiFunction.paging(skip, mediaCount, quota);
