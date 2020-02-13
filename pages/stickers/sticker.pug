@@ -1,0 +1,46 @@
+extends ../bootstrap_base
+block title
+  title 个性表情
+  +includeCSS("/stickers/stickers.css")
+block content
+  #data.hidden=objToStr({ownStickers: data.ownStickers, hotStickers: data.hotStickers})
+  .container-fluid.max-width.stickers#app(v-cloak)
+    .row
+      .col-xs-12.col-md-12.box-shadow-panel
+        .m-b-1
+          h5 个性表情&nbsp;
+          //-ul.nav.nav-tabs
+            li.active
+              a(href="/sticker") 个性表情
+          .m-t-1
+            .options-button
+              a(@click="switchManagement" v-if="!management") 管理
+              a(v-if="!management" href="/sticker?t=upload" target="_blank" key=1) 上传
+              a(@click="switchManagement" v-if="management" key=2) 取消
+              a(@click="selectAll" v-if="management") 全选
+              a(@click="moveSticker" v-if="management") 移到最前
+              span.m-r-1
+                a(@click="shareSticker" v-if="management") 设为共享
+              a.warning(@click="removeSticker" v-if="management") 删除
+            include ../publicModules/paging/paging
+          .m-t-05(v-if="!ownStickers.length")  
+            .null 空空如也~
+          .stickers-body.m-t-05(v-else)
+            .sticker(v-for="s in ownStickers")
+              .selectbox(@click="select(s)" v-if="management")
+                .fa.fa-square-o(v-if="!s.selected")
+                .fa.fa-check-square(v-else)
+              //-.un-review(v-if="s.reviewed === null") 审核中...
+              //-.un-passed(v-else-if="s.reviewed === false") 未通过
+                .fa.fa-question(:title="s.reason" @click=`showReason(s)`)
+              img(:src="getUrl('sticker', s.rid)" :data-sticker-rid="s.rid" data-sticker-management="true")
+        .hot-stickers(v-if="hotStickers.length")
+          h5 热门表情&nbsp;
+            a.hot-stickers-button(@click="visitUrl('/stickers')") 查看更多
+          .hot-stickers-body
+            .hot-sticker(v-for="s in hotStickers")
+              img(:src="getUrl('sticker', s.rid)" :data-sticker-rid="s.rid")
+
+block scripts
+  include ../publicModules/sticker/sticker
+  +includeJS("/stickers/sticker.js")

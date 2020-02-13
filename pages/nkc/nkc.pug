@@ -12,6 +12,8 @@ block content
               a(href=`/nkc`) 总览
             li(class=data.nav==='home'?"active":"")
               a(href=`/nkc/home`) 首页
+            li(class=data.nav === 'sticker' ? "active" : "")
+              a(href=`/nkc/sticker?t=unReviewed`) 共享表情
       block nkcContent
 block scripts
   block nkcScripts

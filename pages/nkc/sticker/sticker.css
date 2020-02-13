@@ -1,0 +1,24 @@
+.management-sticker .sticker-list.green {
+  background-color: #d2ffd2;
+}
+.management-sticker .sticker-list.red {
+  background-color: #ffd8d8;
+}
+.management-sticker .sticker-list.gray {
+  background-color: #d2d2d2;
+}
+.management-sticker .sticker-list .sticker-image {
+  height: 5rem;
+  width: 5rem;
+  border: 1px solid #aaa;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.management-sticker .user-avatar img {
+  border-radius: 50%;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+.management-sticker .user-avatar a {
+  cursor: pointer;
+}

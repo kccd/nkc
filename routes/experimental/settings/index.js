@@ -39,6 +39,8 @@ const protocolRouter = require('./protocol');
 const toppingRouter = require("./topping");
 const transferRouter = require("./transfer");
 const libraryRouter = require("./library");
+const stickerRouter = require("./sticker");
+const editorRouter = require("./editor");
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -84,5 +86,7 @@ settingRouter
   .use("/username", usernameRouter.routes(), usernameRouter.allowedMethods())
   .use("/library", libraryRouter.routes(), libraryRouter.allowedMethods())
 	.use("/thread", threadRouter.routes(), threadRouter.allowedMethods())
+	.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
+	.use("/editor", editorRouter.routes(), editorRouter.allowedMethods())
   .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 module.exports = settingRouter;

@@ -1,0 +1,62 @@
+extends ../../bootstrap_base
+block title
+  title 上传表情
+  +includeCSS("/stickers/stickers.css")
+block content
+  .container-fluid.max-width.sticker-upload
+    .row
+      .col-md-offset-3.col-xs-12.col-md-6.box-shadow-panel
+        .upload-info
+          h4 注意事项
+          div!=experimental_render({c: state.stickerSettings.notesAboutUploading})
+        .form.m-t-1#app(v-cloak)
+          .form-group
+            a(href=`/sticker`) < 返回个性表情
+          .form-group
+            label 上传表情
+            div
+              input#uploadInput(@change="selectedLocalFile" type="file" accept="image/gif,image/png,image/jpeg" multiple="multiple").hidden
+              //button.btn.btn-sm.btn-default(@click="selectLocalFile" ) 选择本地文件
+            .m-t-1
+              .sticker(v-for="s, index in stickers")
+                //.btn-close(v-if="!uploading")
+                  .fa.fa-crop(title="裁剪" @click="cropImage(s)" v-if="s.status !== 'uploaded'")
+                  .fa.fa-remove(title="移除" @click="removeFormArr(stickers, index)")
+                .sticker-image
+                  div
+                    img(:src="s.url")
+                .sticker-content
+                  .file-name {{s.name}}
+                  .file-ext {{getSize(s.file.size)}} {{s.file.type}}
+                  .file-progress
+                    span.upUploaded(v-if="s.status === 'unUploaded'")
+                      span(v-if="!s.error") 等待上传
+                      span.upload-error(v-else) {{s.error}}
+                    span.uploaded(v-else-if="s.status === 'uploaded'") 上传完成
+                    span.uploading(v-else) {{s.progress === 100?'处理中，请稍候': '上传中...' + s.progress + '%'}}
+                  .file-button
+                    .fa.fa-crop(title="裁剪" @click="cropImage(s)" v-if="s.status !== 'uploaded'")
+                    .fa.fa-remove(title="移除" @click="removeFormArr(stickers, index)")
+                .progress
+                  span(v-if="['uploading', 'unUploaded'].indexOf(s.status) !== -1") {{s.progress}}%
+                  span(v-else-if="s.status === 'uploaded'") 上传完成
+              .sticker.add(@click="selectLocalFile" )
+                .fa.fa-plus
+                span &nbsp;点击选择本地文件
+              .checkbox
+                label
+                  input(type="checkbox" :value="true" v-model="share" :disabled="uploading")
+                  span 分享
+          .form-group.text-center
+            button.btn.btn-primary.btn-block(v-if="disableButton" disabled=true) 上传
+            button.btn.btn-primary.btn-block(v-else-if="!uploading" @click="submit") 上传
+            button.btn.btn-primary.btn-block(v-else disabled=true)
+              span 上传中...
+                .fa.fa-spinner.fa-spin
+
+
+
+block scripts
+  include ../../publicModules/crop/crop_new
+    include ../../publicModules/md5
+  +includeJS("/stickers/upload/upload.js")

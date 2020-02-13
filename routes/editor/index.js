@@ -133,6 +133,8 @@ router
         data.mainForums.push({
           fid: forum.fid,
           cid: category? category.cid: "",
+          description: forum.description,
+          iconFileName: forum.iconFileName,
           color: forum.color,
           fName: forum.displayName,
           cName: category? category.name: ""
@@ -203,7 +205,7 @@ router
         data.permissionInfo = err.message;
       }
     }
-
+    state.editorSettings = await db.SettingModel.getSettings("editor");
     await next();
   });
 module.exports = router;

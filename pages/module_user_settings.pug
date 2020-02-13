@@ -31,9 +31,12 @@ if 1 || !state.isApp
         a.list-group-item(href=`/u/${data.user.uid}/settings/verify` class=data.selected==="verify"?"selected":"")
           span.fa.fa-id-card &nbsp;&nbsp;
           span 身份认证
-        a.list-group-item(href=`/u/${data.user.uid}/settings/apps` class=data.selected==="apps"?"selected":"")
+        a.list-group-item(href=`/u/${data.user.uid}/settings/apps` class=data.selected === "apps" ? "selected" : "")
           span.fa.fa-cubes &nbsp;&nbsp;
           span 偏好设置
+        //-a.list-group-item(href=`/u/${data.user.uid}/settings/resource` class=data.selected === "resource" ? "selected" : "")
+          span.fa.fa-cloud &nbsp;&nbsp;
+          span 资源文件
   .hidden-md.hidden-lg
     button.m-b-1.btn.btn-default(role="button" data-toggle="collapse" href="#collapseBase" aria-expanded="false" aria-controls="collapseBase")
       .fa.fa-bars

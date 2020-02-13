@@ -1,0 +1,78 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+#moduleStickerViewer .modal-dialog {
+  max-width: 25rem;
+}
+#moduleStickerViewer .modal-dialog .modal-content {
+  border-radius: 3px;
+  border: 1px solid #aaa;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-header {
+  height: 3rem;
+  text-align: right;
+  color: #777;
+  padding: 0;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-header .title {
+  float: left;
+  height: 3rem;
+  line-height: 3rem;
+  padding-left: 1rem;
+  color: #555;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-header .fa {
+  height: 3rem;
+  width: 3rem;
+  line-height: 3rem;
+  vertical-align: top;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-header .fa:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-body {
+  text-align: center;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-body .sticker-image {
+  display: inline-block;
+  width: 10rem;
+  height: 10rem;
+  text-align: center;
+  line-height: 10rem;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-body .sticker-image img {
+  max-height: 100%;
+  max-width: 100%;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-body .sticker-info {
+  font-size: 1.1rem;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-body .sticker-info .user-avatar {
+  height: 1.5rem;
+  width: 1.5rem;
+  vertical-align: top;
+  margin-right: 0.3rem;
+  border-radius: 50%;
+  margin-top: -1px;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-body .sticker-warning {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #777;
+  padding: 0.5rem;
+  background-color: #f4f4f4;
+}
+#moduleStickerViewer .modal-dialog .modal-content .modal-body .sticker-option {
+  margin-top: 0.5rem;
+}
