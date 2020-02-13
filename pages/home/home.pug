@@ -58,6 +58,10 @@ block content
                 a(data-type="reload" href=`/?t=subscribe&d=column${data.c ?`&c=${data.c}`:""}`
                     class=data.d==="column"? "active" : ""
                 ) 专栏
+              .subscribe-list
+                a(data-type="reload" href=`/?t=subscribe&d=forum${data.c ? `&c=${data.c}` : ""}`
+                  class=data.d === "forum" ? "active" : ""
+                ) 专业
           if !data.threads.length
             .p-t-5.p-b-5.text-center
               h4

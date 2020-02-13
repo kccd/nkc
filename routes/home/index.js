@@ -122,7 +122,7 @@ router
       data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
     }
 
-    let subTid = [], subUid = [], subColumnId = [];
+    let subTid = [], subUid = [], subColumnId = [], subForumsId = [];
   
     if(threadListType === "latest") {
       q = {
@@ -178,6 +178,9 @@ router
         const subTid_ = await db.SubscribeModel.getUserSubThreadsId(data.user.uid, "replay");
         subTid = subTid.concat(subTid_);
       }
+      if(d === "forum" || d === "all") {
+        subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
+      }
       
       q = {
         mainForumsId: {
@@ -200,6 +203,11 @@ router
           {
             tid: {
               $in: subTid
+            }
+          },
+          {
+            mainForumsId: {
+              $in: subForumsId
             }
           }
         ]

@@ -73,7 +73,14 @@
           .size {{(f.ext||"未知").toUpperCase()}} {{getSize(f.size)}}  
         //-.list-description {{f.description || "暂无简介"}}
         .list-options(@click.stop)
-          span(v-if="per('modifyOtherLibrary') || (uid && f.uid === uid)")  
+          span(v-if="per('modifyOtherLibrary') || (uid && f.uid === uid)")
+            //:href="getUrl('pdf', resource.rid)" v-if="resource.ext === 'pdf'" target="_blank"
+            .list-options-link(
+              v-if="f.ext === 'pdf'"
+              title="预览"
+              @click="visitUrl(getUrl('pdf', f.rid), true)"
+            )
+              .fa.fa-eye
             .list-options-link(
               v-if="(per('deleteFile') && f.type === 'file') || (per('deleteFolder') && f.type === 'folder')" 
               title="删除"
