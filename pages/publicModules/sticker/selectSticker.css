@@ -71,6 +71,13 @@
   font-size: 0;
   margin-top: 0.2rem;
 }
+#moduleSelectSticker .module-ss-body .module-ss-stickers .share-warning {
+  margin-top: 0.5rem;
+  color: #555;
+  padding: 0.5rem;
+  background-color: #f4f4f4;
+  font-size: 1rem;
+}
 #moduleSelectSticker .module-ss-body .module-ss-stickers .null {
   font-size: 1.2rem;
   height: 8rem;
@@ -109,8 +116,20 @@
   border: 1px solid #aaa;
 }
 #moduleSelectSticker .module-ss-body .module-ss-stickers .sticker img {
-  max-height: 100%;
-  max-width: 100%;
+  max-height: 95%;
+  max-width: 95%;
+}
+#moduleSelectSticker .module-ss-body .module-ss-stickers .sticker.share {
+  width: 15.6%;
+  height: 7rem;
+  line-height: 7rem;
+}
+@media (max-width: 700px) {
+  #moduleSelectSticker .module-ss-body .module-ss-stickers .sticker.share {
+    height: 4.25rem;
+    line-height: 4.25rem;
+    width: 24%;
+  }
 }
 @media (max-width: 700px) {
   #moduleSelectSticker .module-ss-body .module-ss-stickers .sticker {

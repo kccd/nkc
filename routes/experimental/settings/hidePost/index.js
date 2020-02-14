@@ -12,7 +12,10 @@ router
   .post("/", async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
     const {hidePostSettings} = body;
-    let {rolesId, defaultRoleGradesId, postHeight} = hidePostSettings;
+    let {
+      rolesId, defaultRoleGradesId, postHeight, hideDigestPost, voteUpCount,
+      allowedAuthor, allowedRolesId
+    } = hidePostSettings;
     let {xs, md, sm, float = 0.5} = postHeight;
     postHeight.float = float;
     const {checkNumber} = nkcModules.checkData;
@@ -29,6 +32,10 @@ router
     checkNumber(sm, {
       min: 1
     });
+    checkNumber(voteUpCount, {
+      name: "点赞数",
+      min: 1
+    });
     const roles = await db.RoleModel.find({_id: {$in: rolesId}});
     rolesId = roles.map(r => r._id);
     const grades = await db.UsersGradeModel.find({_id: {$in: defaultRoleGradesId}});
@@ -37,7 +44,11 @@ router
       $set: {
         "c.postHeight": postHeight,
         "c.rolesId": rolesId,
-        "c.defaultRoleGradesId": defaultRoleGradesId
+        "c.defaultRoleGradesId": defaultRoleGradesId,
+        "c.hideDigestPost": !!hideDigestPost,
+        "c.voteUpCount": voteUpCount,
+        "c.allowedAuthor": !!allowedAuthor,
+        "c.allowedRolesId": allowedRolesId
       }
     });
     await db.SettingModel.saveSettingsToRedis("hidePost");

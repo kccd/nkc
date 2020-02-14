@@ -1601,22 +1601,30 @@ userSchema.statics.ensurePostLibraryPermission = async (uid) => {
 * return {Boolean} true: 会折叠, false: 不会折叠
 * @author pengxiguaa 2019-10-9
 * */
-userSchema.methods.ensureHidePostPermission = async function() {
+userSchema.methods.ensureHidePostPermission = async function(post) {
+  const {voteUp, digest, hide} = post;
+  if(hide !== "null") return hide;
   const hidePostSettings = await mongoose.model("settings").getSettings("hidePost");
-  const {rolesId, defaultRoleGradesId} = hidePostSettings;
+  const {rolesId, defaultRoleGradesId, voteUpCount = 0, hideDigestPost} = hidePostSettings;
+  if(digest && !hideDigestPost) return "not";
+  if(voteUp >= voteUpCount) return "not";
   if(!this.roles) {
     await this.extendRoles();
   }
   for(const r of this.roles) {
-    if(rolesId.includes(r._id) && r._id !== "default") return false;
+    if(rolesId.includes(r._id) && r._id !== "default") return "not";
   }
   if(rolesId.includes("default")) {
     if(!this.grade) {
       await this.extendGrade();
     }
-    return !defaultRoleGradesId.includes(this.grade._id);
+    if(!defaultRoleGradesId.includes(this.grade._id)) {
+      return "not"
+    } else {
+      return "half"
+    }
   } else {
-    return true;
+    return "half"
   }
 };
 

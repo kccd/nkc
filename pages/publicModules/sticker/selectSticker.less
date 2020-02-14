@@ -59,6 +59,13 @@
     .module-ss-stickers{
       font-size: 0;
       margin-top: 0.2rem;
+      .share-warning{
+        margin-top: 0.5rem;
+        color: #555;
+        padding: 0.5rem;
+        background-color: #f4f4f4;
+        font-size: 1rem;
+      }
       .null{
         font-size: 1.2rem;
         height: 8rem;
@@ -97,8 +104,19 @@
         margin: 0 1% 0.5rem 0 ;
         border: 1px solid #aaa;
         img{
-          max-height: 100%;
-          max-width: 100%;
+          max-height: 95%;
+          max-width: 95%;
+        }
+        &.share{
+          width: 15.6%;
+          height: 7rem;
+          line-height: 7rem;
+          @media (max-width: 700px) {
+            @height: 4.25rem;
+            height: @height;
+            line-height: @height;
+            width: 24%;
+          }
         }
         @media (max-width: 700px) {
           @height: 5rem;
