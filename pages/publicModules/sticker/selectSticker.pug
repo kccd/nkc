@@ -65,8 +65,9 @@
                 img(:src="s.url")
         div.null(v-else-if="!stickers.length") 空空如也~
         div(v-else)
-          .sticker(v-for="s in stickers" @click="selectSticker(s)" :key="s._id")
+          .sticker(v-for="s in stickers" @click="selectSticker(s)" :key="s._id" :class="{'share': type === 'share'}")
             img(:src=`getUrl('sticker', s.rid)`)
+          .share-warning(v-if="type === 'share'")!=experimental_render({c: state.stickerSettings.notesAboutUsing})
 
 
 

@@ -7,6 +7,7 @@ NKC.modules.SelectSticker = function() {
       type: "own",
       pageNumber: "",
       perpage: 20,
+      sharePerpage: 24,
       emoji: [],
       share: false,
       localStickers: [],
@@ -72,7 +73,7 @@ NKC.modules.SelectSticker = function() {
         if(!["own", "share"].includes(type)) return;
         let url = `/sticker?page=${page}&c=own&reviewed=true&perpage=${this.perpage}`;
         if(type === "share") {
-          url = `/stickers?page=${page}&perpage=${this.perpage}`;
+          url = `/stickers?page=${page}&perpage=${this.sharePerpage}`;
         }        
         nkcAPI(url, "GET")
           .then(data => {
