@@ -58,6 +58,9 @@ module.exports = {
     },
 		resources: {
 			GET: "getPostResources"
+		},
+		hide: {
+			PATCH: "hidePost"
 		}
 	}
 };

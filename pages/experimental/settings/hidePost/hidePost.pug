@@ -9,9 +9,10 @@ block eContent
         .form-horizontal
           h4 折叠白名单
             | &nbsp;
-            small 满足以下条件的用户所发表的回复不会被折叠
+            small 满足以下任一条件的回复不会被折叠
           .form-group
-            label.col-sm-2.control-label 证书限制
+            .m-t-05
+            label.col-sm-2.control-label 作者的证书
             .col-sm-10
               .checkbox
                 label.m-r-1(v-for="role in roles")
@@ -23,7 +24,21 @@ block eContent
               .checkbox
                 label.m-r-1(v-for="grade in grades")
                   input(type="checkbox" :value="grade._id" v-model="hidePostSettings.defaultRoleGradesId")
-                  | {{grade.displayName}}
+                  | {{grade.displayName}}        
+          .form-group    
+            label.col-sm-2.control-label 点赞数不小于
+            .col-sm-3
+              input.form-control(type="text" v-model.number="hidePostSettings.voteUpCount")      
+          .form-group    
+            label.col-sm-2.control-label 精选不折叠
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type="radio" :value="false" v-model="hidePostSettings.hideDigestPost") 
+                  span 是
+                label 
+                  input(type="radio" :value="true" v-model="hidePostSettings.hideDigestPost") 
+                  span 否
           h4 折叠高度
             | &nbsp;
             small 折叠内容超过以下高度的回复
@@ -46,6 +61,24 @@ block eContent
             label.col-sm-2.control-label 系数
             .col-sm-2
               input.form-control(type="number" v-model.number="hidePostSettings.postHeight.float")
+          h4 强制折叠/不折叠
+          .form-group
+            label.col-sm-2.control-label 允许文章作者强制折叠/不折叠
+            .col-sm-10    
+              .radio
+                label.m-r-1
+                  input(type="radio" :value="true" v-model="hidePostSettings.allowedAuthor")
+                  span 允许
+                label
+                  input(type="radio" :value="false" v-model="hidePostSettings.allowedAuthor")
+                  span 不允许  
+          .form-group
+            label.col-sm-2.control-label 允许强制折叠的证书
+            .col-sm-10            
+              .checkbox
+                label.m-r-1(v-for="r in roles")
+                  input(type="checkbox" :value="r._id" v-model="hidePostSettings.allowedRolesId")
+                  span {{r.displayName}}
           .form-group
             label.col-sm-2.control-label
             .col-sm-10
