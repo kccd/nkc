@@ -166,7 +166,13 @@
               a(href=`/e/settings/upload`) 上传   
           if permission("experimentalUploadSettings")
             li
-              a(href=`/e/settings/download`) 下载        
+              a(href=`/e/settings/download`) 下载     
+          if permission("experimentalStickerSettings")       
+            li
+              a(href=`/e/settings/sticker`) 表情
+          if permission("experimentalEditorSettings")       
+            li
+              a(href=`/e/settings/editor`) 编辑器    
 
           <li role="separator" class="divider"></li>    
           li

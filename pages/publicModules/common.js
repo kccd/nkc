@@ -257,20 +257,27 @@ NKC.methods.getRandomColor = function() {
 * @return {String} html字符串
 * @author pengxiguaa 2019-9-25
 * */
-NKC.methods.resourceToHtml = function(resource) {
-  var name = resource.oname;
-  var rid = resource.rid;
-  var ext = resource.ext.toLowerCase();
+NKC.methods.resourceToHtml = function(resource, type) {
   var html = "";
-  if(NKC.configs.imageExt.indexOf(ext) !== -1) {
-    html = '<p><img src="' + '/r/' + rid + '" style="max-width:50%;"></p>';
-  } else if(NKC.configs.audioExt.indexOf(ext) !== -1) {
-    html = '<audio src="' + '/r/' + rid + '" controls>Your browser does not support the audio element</audio>';
-  } else if(NKC.configs.videoExt.indexOf(ext) !== -1) {
-    html = '<p><br></p><p><video src="' + '/r/' + rid + '" controls style="width: 50%;">video</video></p>';
+  if(type === "sticker") {
+    html = '<img src="' + NKC.methods.tools.getUrl('sticker', resource.rid) + '">';
+  } else if(type === "emoji") {
+    html = '<img src="' + NKC.methods.tools.getUrl('emoji', resource) + '">';
   } else {
-    html = '<p><a href="' + '/r/' + rid + '"><img src=' + '/default/default_thumbnail.png' + '>' + name + '</a></p>';
+    var name = resource.oname;
+    var rid = resource.rid;
+    var ext = resource.ext.toLowerCase();
+    if(NKC.configs.imageExt.indexOf(ext) !== -1) {
+      html = '<p><img src="' + '/r/' + rid + '" style="max-width:50%;"></p>';
+    } else if(NKC.configs.audioExt.indexOf(ext) !== -1) {
+      html = '<audio src="' + '/r/' + rid + '" controls>Your browser does not support the audio element</audio>';
+    } else if(NKC.configs.videoExt.indexOf(ext) !== -1) {
+      html = '<p><br></p><p><video src="' + '/r/' + rid + '" controls style="width: 50%;">video</video></p>';
+    } else {
+      html = '<p><a href="' + '/r/' + rid + '"><img src=' + '/default/default_thumbnail.png' + '>' + name + '</a></p>';
+    }
   }
+  
   return html;
 };
 

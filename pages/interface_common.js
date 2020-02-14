@@ -270,7 +270,7 @@ function sweetQuestion(text) {
         if(result.value === true) {
           resolve();
         } else {
-          reject();
+          // reject();
         }
       })
   });

@@ -1,0 +1,76 @@
++includeCSS("/publicModules/sticker/selectSticker.css")
++includeCSS("/publicModules/crop/dist/cropper.css")
++includeCSS("/publicModules/crop/crop.css")
+#moduleSelectSticker
+  mixin resourcePaging
+    .module-ss-paging(v-if="['own', 'share'].includes(type) && paging && paging.buttonValue && paging.buttonValue.length > 1" )
+      .paging-button
+        a.button.radius-left(title="上一页" @click="changePage('last')")
+          .fa.fa-angle-left
+        a.button.radius-right(title="下一页" @click="changePage('next')")
+          .fa.fa-angle-right
+      .paging-button
+        span(v-for="b, index in paging.buttonValue")
+          span(v-if="b.type === 'active'")
+            a.button.active(@click="getStickers(b.num)"
+              :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+            ) {{b.num+1}}
+          span(v-else-if="b.type === 'common'")
+            a.button(@click="getStickers(b.num)"
+              :class="{'radius-left': !index, 'radius-right': (index+1)===paging.buttonValue.length}"
+            ) {{b.num+1}}
+          span(v-else)
+            a.button ..
+      .paging-button(v-if="paging.buttonValue.length").hidden-xs
+        span(style="font-size: 1rem;") 跳转到&nbsp;
+        input.input.radius-left(type="text" v-model.number="pageNumber")
+        a.button.radius-right(@click="fastSelectPage") 确定
+  #moduleSelectStickerApp(v-cloak)
+    input#moduleSelectStickerInput.hidden(@change="selectedLocalFile" type="file" accept="image/gif,image/png,image/jpeg" multiple="multiple")
+    .module-ss-header
+      .module-ss-title 插入表情
+      .module-ss-close(@click="close")
+        .fa.fa-remove
+    .module-ss-body
+      .module-ss-types
+        .module-ss-type(:class="{'active': type==='own'}" @click="selectType('own')") 个性表情
+        .module-ss-type(:class="{'active': type==='share'}" @click="selectType('share')") 共享表情
+        .module-ss-type(:class="{'active': type==='emoji'}" @click="selectType('emoji')") Emoji
+        .module-ss-type.upload(:class="{'active': type==='upload'}" @click="selectType('upload')") 上传
+      +resourcePaging
+      .module-ss-stickers
+        div(v-if="type === 'emoji'")
+          .emoji(v-for="e in emoji" @click="selectEmoji(e)" :key="e")
+            img(:src=`getUrl('emoji', e)`)
+        div(v-else-if="type === 'upload'")
+          .upload-body
+            .upload-button
+              button.btn.btn-xs.btn-default(@click="selectLocalFile") 选择本地文件
+              .checkbox
+                label
+                  input(type="checkbox" :value="true" v-model="share")
+                  span 分享
+            .upload-content
+              .warning(v-if="!localStickers.length")
+                h5 注意事项
+                div!=experimental_render({c: state.stickerSettings.notesAboutUploading})
+              .upload-sticker(v-for="s in localStickers")
+                .mask
+                  span(v-if="s.error" @click="restartUpload(s)") 点击重试
+                  span(v-else-if="s.status === 'unUploaded'") 等待上传
+                  span(v-else-if="s.status === 'uploading'")
+                    span(v-if="s.progress !== 100") {{s.progress}}%
+                    span(v-else) 处理中...
+                  span(v-else-if="s.status === 'uploaded'") 已上传
+                img(:src="s.url")
+        div.null(v-else-if="!stickers.length") 空空如也~
+        div(v-else)
+          .sticker(v-for="s in stickers" @click="selectSticker(s)" :key="s._id" :class="{'share': type === 'share'}")
+            img(:src=`getUrl('sticker', s.rid)`)
+          .share-warning(v-if="type === 'share'")!=experimental_render({c: state.stickerSettings.notesAboutUsing})
+
+
+
++includeJS("/publicModules/crop/dist/cropper.js")
++includeJS("/publicModules/crop/dist/jquery-cropper.js")
++includeJS("/publicModules/sticker/selectSticker.js")

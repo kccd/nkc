@@ -50,10 +50,13 @@ block content
               .editor-header 专业分类
                 small （必选，最多可选两个）
               .editor-main-forums
-                .editor-main-forum(v-for="f, index in selectedForums" :style="'background-color: ' + f.color + ';'")
-                  span {{f.fName}}
-                  span(v-if="f.cName") ：{{f.cName}}
-                  .fa.fa-remove.p-l-05.pointer(@click="removeSelectedForums(index)")
+                .editor-main-forum(v-for="f, index in selectedForums")
+                  .editor-main-forum-avatar(:style="'background-color: ' + f.color" v-if="!f.iconFileName" :data-float-fid="f.fid")
+                  img.editor-main-forum-avatar(:src="getUrl('forumAvatar', f.fid)" v-else :data-float-fid="f.fid")
+                  .editor-main-forum-name(:data-float-fid="f.fid")
+                    span {{f.fName}}
+                    span(v-if="f.cName") ：{{f.cName}}
+                  .fa.fa-trash-o(@click="removeSelectedForums(index)" title="移除")
                 button.btn.btn-default.btn-sm(@click="selectForums") 添加
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 封面图
@@ -192,16 +195,19 @@ block content
       .col-xs-12.col-md-3.box-shadow-panel
         div
           h5.text-danger 温馨提示：
-          p 1. 每隔60秒编辑器会自动将已输入的内容保存到草稿箱，相应的草稿会在内容发表后被清除。而未清除的草稿可以在下一次从相同入口进入编辑器时选择加载。
+          div!=experimental_render({c: state.editorSettings.notes})
   .hidden#data=objToStr({originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft})
 block scripts
   include ../ueditor/ueditorBase
   include ../publicModules/moment
   include ../editor/modules/selectAuthorInfo
   include ../publicModules/commonModal/commonModal
+  include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/crop/crop_new
   include ../publicModules/selectUser/selectUser
   include ../publicModules/selectResource/selectResource
+  include ../publicModules/sticker/selectSticker
   include ../publicModules/moveThread/moveThread
   +includeJS('/tools.js')
   if state.userColumn && !data.addedToColumn

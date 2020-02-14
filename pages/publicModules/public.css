@@ -290,6 +290,7 @@ table{
 }
 
 
+
 .list-header{
   height: 2rem;
   line-height: 2rem;
@@ -480,6 +481,7 @@ table{
 }
 .paging-nav{
   display: inline-block;
+  vertical-align: top;
   margin-bottom: 0.5rem;
 }
 .paging-nav ul{
@@ -2130,6 +2132,7 @@ span.thread-title-page{
   border-top: 1px solid #eee;
   padding-top: 1rem;
 }
+
 .thread-author-description{
   padding: 0.2rem 0;
   margin-top: 0.5rem;
@@ -2160,4 +2163,7 @@ button.thread-author-subscribe.active{
 }
 button.thread-author-subscribe:focus{
   outline: none;
+}
+[data-sticker-rid]{
+  cursor: pointer;
 }

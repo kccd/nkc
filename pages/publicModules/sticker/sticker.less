@@ -1,0 +1,74 @@
+@import "../base";
+#moduleStickerViewer{
+  .modal-dialog{
+    max-width: 25rem;
+    .modal-content{
+      border-radius: 3px;
+      border: 1px solid #aaa;
+      .modal-header{
+        @headerHeight: 3rem;
+        height: @headerHeight;
+        text-align: right;
+        color: #777;
+        padding: 0;
+        .title{
+          float: left;
+          height: @headerHeight;
+          line-height: @headerHeight;
+          padding-left: @headerHeight/3;
+          color: #555;
+        }
+        .fa{
+          height: @headerHeight;
+          width: @headerHeight;
+          line-height: @headerHeight;
+          vertical-align: top;
+          cursor: pointer;
+          display: inline-block;
+          text-align: center;
+          &:hover{
+            background-color: rgba(0,  0, 0, 0.1);
+          }
+        }
+      }
+      .modal-body{
+        text-align: center;
+        .sticker-image{
+          display: inline-block;
+          @height: 10rem;
+          width: @height;
+          height: @height;
+          text-align: center;
+          line-height: @height;
+          //border: 1px solid #eee;
+          img{
+            max-height: 100%;
+            max-width: 100%;
+          }
+        }
+        .sticker-info{
+          font-size: 1.1rem;
+          .user-avatar{
+            height: 1.5rem;
+            width: 1.5rem;
+            vertical-align: top;
+            margin-right: 0.3rem;
+            border-radius: 50%;
+            margin-top: -1px;
+          }
+        }
+        .sticker-warning{
+          margin-top: 0.5rem;
+          font-size: 1rem;
+          color: #777;
+          padding: 0.5rem;
+          background-color: #f4f4f4;
+        }
+        .sticker-option{
+          margin-top: 0.5rem;
+        }
+      }
+    }
+  }
+
+}

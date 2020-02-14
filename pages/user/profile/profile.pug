@@ -47,6 +47,9 @@ block content
                 a(href="/message").col-xs-6.account-user-link
                   .fa.fa-comments
                   | 消息中心
+                a(href="/sticker").col-xs-6.account-user-link
+                  .fa.fa-smile-o
+                  | 个性表情
             for navLink in data.navLinks
               .account-ul
                 if navLink.name

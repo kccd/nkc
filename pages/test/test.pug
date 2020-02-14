@@ -4,25 +4,7 @@ block title
   +includeCSS("/external_pkgs/pdfjs/pdf_viewer.css")
   +includeCSS("/test/test.css")
 block content
-  #app.container-fluid.max-width
-    div(@click="") 预览
-      button.page(data-type="pre") 上一页
-      button.page(data-type="next") 下一页
-      div.media(width="600" height="800" href="/test/output/prefix-1.pdf")
-    .row
-      .col-xs-12
-        #container
-      .col-xs-12
-        button.btn.btn-default.page(data-type="next") 下一页
-        //- <iframe src="/external_pkgs/pdf/web/viewer.html?file=http://192.168.11.114:9000/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf" width="100%" height="800"></iframe>
-
-        //- a.media(href="/external_pkgs/pdf/web/compressed.tracemonkey-pldi-09.pdf")
-
-        
+  div Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus adipisci asperiores aut, consectetur consequuntur dolores doloribus dolorum eveniet facilis fugit illum inventore libero molestiae quidem quis quod suscipit vel? Libero?
 block scripts
-  +includeJS("/external_pkgs/pdfjs/pdf.min.js")
-  +includeJS("/external_pkgs/pdfjs/pdf.worker.min.js")
-  +includeJS("/external_pkgs/pdfjs/pdf_viewer.js")
-
-  script(src=`/vue/dist/vue.min.js?v=${startTime}`)
+  include ../publicModules/sticker/selectSticker
   +includeJS("/test/test.js")

@@ -156,6 +156,10 @@ function initVueApp() {
     },
     watch: {
       selectedForums: function() {
+        var self = this;
+        setTimeout(function() {
+          floatForumPanel.initPanel();
+        }, 100)
         if(PostButton) { // 检测是否可以勾选匿名
           PostButton.checkAnonymous();
         }

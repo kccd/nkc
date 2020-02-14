@@ -70,6 +70,8 @@ const libraries = require("./libraries");
 const nkc = require("./nkc");
 const reader = require("./reader");
 const appDownload = require("./appDownload");
+const sticker = require("./sticker");
+const stickers = require("./stickers");
 const operationObj = {};
 
 
@@ -228,6 +230,8 @@ operationObj.operationTree = {
 		
 		reader, // 阅读器 pdf
 		
+		sticker, // 表情中心
+		stickers, // 共享表情
     test,
 	}
 };

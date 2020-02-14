@@ -8,6 +8,14 @@ module.exports = {
 		GET: 'visitExperimentalStatus'
 	},
 	settings: {
+		editor: {
+			GET: "experimentalEditorSettings",
+			PATCH: "experimentalEditorSettings"
+		},
+		sticker: {
+			GET: "experimentalStickerSettings",
+			PATCH: "experimentalStickerSettings"
+		},
 		thread: {
 			GET: "experimentalThreadSettings",
 			PATCH: "experimentalThreadSettings"
