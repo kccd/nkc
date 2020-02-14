@@ -1,0 +1,28 @@
+.modal.fade#moduleHidePost(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+  .modal-dialog.modal-sm(role="document")#moduleHidePostApp
+    .modal-content
+      .modal-header
+        button.close(data-dismiss="modal" aria-label="Close")
+          span(aria-hidden="true") &times;
+        .modal-title 折叠回复
+      .modal-body
+        .form
+          .form-group
+            .radio    
+              label
+                input(type="radio" value="null" v-model="hide")
+                span 默认（根据高度自适应）
+            .radio
+              label
+                input(type="radio" value="half" v-model="hide")
+                span 强制折叠
+            .radio    
+              label
+                input(type="radio" value="not" v-model="hide")
+                span 强制不折叠  
+      .modal-footer
+        .options-button
+          a(data-dismiss="modal") 关闭
+          a.active(@click="submit") 确定
+
++includeJS("/publicModules/hidePost/hidePost.js")

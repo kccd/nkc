@@ -205,6 +205,11 @@ const postSchema = new Schema({
     type: String,
     default: "post",
     index: 1
+  },
+  // 折叠 not: 不折叠, half: 半折叠, all: 全折叠, null: 默认（具体是否折叠需要根据回复的情况判断）
+  hide: {
+    type: String,
+    default: "null"
   }
 }, {toObject: {
   getters: true,
@@ -232,14 +237,6 @@ postSchema.virtual('reason')
     this._reason = reason
   });
 
-postSchema.virtual('hide')
-  .get(function() {
-    return this._hide
-  })
-  .set(function(hide) {
-    this._hide = hide
-  });
-
 postSchema.virtual('url')
   .get(function() {
     return this._url
@@ -255,6 +252,14 @@ postSchema.virtual('ownPost')
   .set(function(ownPost) {
     this._ownPost = ownPost
   });
+
+postSchema.virtual('hidePost')
+  .get(function() {
+    return this._ownPost
+  })
+  .set(function(ownPost) {
+    this._ownPost = ownPost
+  });  
 
 postSchema.virtual('user')
   .get(function() {
@@ -684,7 +689,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
       const postUser = usersObj[post.uid];
       if(postUser) {
         // 判断post是否需要折叠
-        post.hide = await postUser.ensureHidePostPermission();
+        post.hidePost = await postUser.ensureHidePostPermission(post);
       }
       if(!o.showAnonymousUser && post.anonymous) {
         post.user = "";
@@ -974,6 +979,20 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
     results.push(post);
   }
   return results;
+};
+
+postSchema.statics.ensureHidePostPermission = async (thread, user) => {
+  if(!user) return false;
+  const hidePostSettings = await mongoose.model("settings").getSettings("hidePost");
+  const {allowedAuthor, allowedRolesId} = hidePostSettings;
+  if(allowedAuthor && thread.uid === user.uid) return true;
+  if(!user.roles) {
+    await user.extendRoles();
+  }
+  for(const role of user.roles) {
+    if(allowedRolesId.includes(role._id)) return true;
+  }
+  return false;
 };
 
 module.exports = mongoose.model('posts', postSchema);

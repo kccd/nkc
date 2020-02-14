@@ -740,7 +740,8 @@ threadRouter
         const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: data.user.uid});
         let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: data.user.uid});
         data.userPostCountToday = todayPostCount - todayThreadCount;
-			}
+      }
+      data.hasPermissionToHidePost = await db.PostModel.ensureHidePostPermission(data.thread, data.user)
 		}
 		// data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
 		// data.thread = data.thread.toObject();

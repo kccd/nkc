@@ -8,6 +8,10 @@ module.exports = {
       float: 0.5
     },
     rolesId: [],
-    defaultRoleGradesId: []
+    defaultRoleGradesId: [],
+    voteUpCount: 10,
+    hideDigestPost: false,
+    allowedAuthor: false,
+    allowedRolesId: []
   }
 };

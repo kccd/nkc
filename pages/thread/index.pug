@@ -102,6 +102,10 @@ block title
             else
               a(onclick=`SubscribeTypes.subscribeThread('${thread.tid}', true)`)
                 span.fa.fa-bookmark-o &nbsp;关注
+        if data.user && data.thread.oc !== post.pid && data.hasPermissionToHidePost
+          li
+            a(onclick=`openHidePostPanel('${post.pid}', '${post.hide}')`)
+              .fa.fa-compress &nbsp;折叠回复
         if data.thread.oc !== post.pid && data.topPost
           li
             if data.thread.toppedPostsId.includes(post.pid)
@@ -503,6 +507,7 @@ block content
                   .col-xs-12.col-md-12(style='margin-top: 1rem;')
                     -const hidePostOptions = true;
                     -const hidePostStep = true;
+                    //- 置顶的回复不折叠
                     -const disabledHidePost = true;
                     -const showPostUrl = true;
                     -const disabledHighlight = true;
@@ -528,9 +533,12 @@ block content
                             //- 文章作者的post无需折叠
                             -let disabledHidePost;
                             if data.thread.uid && post.uid && data.thread.uid === post.uid
+                              //- 作者的回复不折叠
                               -disabledHidePost = true;
                             else
-                              -disabledHidePost = !post.hide;
+                              //- 服务器根据证书判断的该用户的回复是否需要折叠
+                              -disabledHidePost = !['half', 'all'].includes(post.hidePost);
+                              //- -disabledHidePost = !post.hide;
                             -let previousPost;
                             if index !== 1
                               -previousPost = data.posts[index-1];
@@ -680,6 +688,7 @@ block scripts
   include ../publicModules/complaint/complaint
   include ../publicModules/crop/crop
   include ../publicModules/moment
+  include ../publicModules/hidePost/hidePost
   include ../publicModules/lazySizes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost

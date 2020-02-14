@@ -1273,4 +1273,16 @@ function deleteThread() {
 				DisabledPost.unlock();
 			})
 	});
+
+}
+function openHidePostPanel(pid, hide) {
+	if(!window.hidePostPanel) {
+		window.hidePostPanel = new NKC.modules.HidePost();
+	}
+	window.hidePostPanel.open(function() {
+		window.location.reload();
+	}, {
+		pid: pid,
+		hide: hide
+	});
 }
