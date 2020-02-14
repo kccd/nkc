@@ -55,9 +55,7 @@ NKC.modules.SelectSticker = function() {
       },
       selectType(type) {
         this.type = type;
-        if(type === "upload") {
-          // if(!this.localStickers.length) this.selectLocalFile();
-        } else {
+        if(["own", "share"].includes(type)) {
           this.getStickers();
         }
       },
@@ -71,13 +69,18 @@ NKC.modules.SelectSticker = function() {
       },
       getStickers(page = 0) {
         const {type} = this;
-        if(type !== "own") return;
+        if(!["own", "share"].includes(type)) return;
         let url = `/sticker?page=${page}&c=own&reviewed=true&perpage=${this.perpage}`;
+        if(type === "share") {
+          url = `/stickers?page=${page}&perpage=${this.perpage}`;
+        }        
         nkcAPI(url, "GET")
           .then(data => {
-            self.app.stickers = data.ownStickers;
+            self.app.stickers = data.stickers;
             self.app.paging = data.paging;
-            self.app.emoji = data.emoji;
+            if(data.emoji) {
+              self.app.emoji = data.emoji;
+            }
           })
           .catch(sweetError);
       },

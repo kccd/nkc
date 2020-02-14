@@ -26,8 +26,8 @@ router
         paging = nkcModules.apiFunction.paging(page, count, limit);
       }
       
-      data.ownStickers = await db.StickerModel.find(q).sort({order: -1}).skip(paging.start).limit(paging.perpage);
-      data.ownStickers.map(s => {
+      data.stickers = await db.StickerModel.find(q).sort({order: -1}).skip(paging.start).limit(paging.perpage);
+      data.stickers.map(s => {
         s.reason = s.reason.replace("\n", "");
       });
       data.hotStickers = await db.StickerModel.find({

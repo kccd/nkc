@@ -3,7 +3,7 @@ block title
   title 个性表情
   +includeCSS("/stickers/stickers.css")
 block content
-  #data.hidden=objToStr({ownStickers: data.ownStickers, hotStickers: data.hotStickers})
+  #data.hidden=objToStr({ownStickers: data.stickers, hotStickers: data.hotStickers})
   .container-fluid.max-width.stickers#app(v-cloak)
     .row
       .col-xs-12.col-md-12.box-shadow-panel

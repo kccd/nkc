@@ -3,7 +3,7 @@
 +includeCSS("/publicModules/crop/crop.css")
 #moduleSelectSticker
   mixin resourcePaging
-    .module-ss-paging(v-if="type === 'own' && paging && paging.buttonValue && paging.buttonValue.length > 1" )
+    .module-ss-paging(v-if="['own', 'share'].includes(type) && paging && paging.buttonValue && paging.buttonValue.length > 1" )
       .paging-button
         a.button.radius-left(title="上一页" @click="changePage('last')")
           .fa.fa-angle-left
@@ -34,6 +34,7 @@
     .module-ss-body
       .module-ss-types
         .module-ss-type(:class="{'active': type==='own'}" @click="selectType('own')") 个性表情
+        .module-ss-type(:class="{'active': type==='share'}" @click="selectType('share')") 共享表情
         .module-ss-type(:class="{'active': type==='emoji'}" @click="selectType('emoji')") Emoji
         .module-ss-type.upload(:class="{'active': type==='upload'}" @click="selectType('upload')") 上传
       +resourcePaging
