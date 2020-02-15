@@ -10,7 +10,6 @@ router
 		const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid});
 		data.addresses = targetUserPersonal.addresses;
 		data.personalInfo = targetUserPersonal.personalInfo;
-		data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
 		ctx.template = 'user/transaction.pug';
 		await next();
 	});
