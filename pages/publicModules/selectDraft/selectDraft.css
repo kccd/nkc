@@ -100,6 +100,9 @@
 #moduleSelectDraft .module-sd-body .module-content .module-drafts .module-draft .module-buttons div:last-child span:first-child {
   color: #e85a71;
 }
+#moduleSelectDraft .module-sd-body .module-content .module-drafts .module-draft .module-buttons div:last-child span:last-child {
+  font-weight: 700;
+}
 #moduleSelectDraft .module-sd-body .module-content .module-drafts .module-draft .module-buttons div:last-child span.disabled {
   color: #aaa;
   cursor: not-allowed;
