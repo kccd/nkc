@@ -21,7 +21,7 @@
   background-color: #f6f6f6;
 }
 .module-sr-title{
-  cursor: grab;
+  cursor: move;
   font-weight: 700;
   margin-left: 1rem;
 }

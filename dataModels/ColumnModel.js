@@ -167,6 +167,7 @@ schema.statics.extendColumns = async (columns) => {
 schema.statics.getTimeline = async (columnId) => {
   const ColumnPostModel = mongoose.model("columnPosts");
   const firstColumnPost = await ColumnPostModel.findOne({}, {top: 1}).sort({top: 1});
+  if(!firstColumnPost) return [];
   const beginTime = firstColumnPost.top;
   const endTime = new Date();
   const begin = {

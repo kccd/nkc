@@ -51,7 +51,7 @@ NKC.modules.SelectSticker = function() {
           });
         } else {
           // 宽屏
-          dom.css("left", (width - dom.width())*0.5);
+          dom.css("left", (width - dom.width())*0.5 -  40);
         }
       },
       selectType(type) {

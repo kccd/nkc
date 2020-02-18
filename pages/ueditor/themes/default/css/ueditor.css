@@ -1895,6 +1895,16 @@ div.edui-box {
     width: 20px !important;
     height: 20px !important;
 }
+
+/* 草稿箱图标 */
+.edui-default .edui-for-draft .edui-icon {
+    /* background-position: -60px -20px; */
+    background-repeat: no-repeat;
+    background-image: url(../images/icon/draft.png) !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+
 .edui-default .edui-for-emotion .edui-popup-content iframe
 {
     width: 250px;

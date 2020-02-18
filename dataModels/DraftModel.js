@@ -41,36 +41,44 @@ const draftSchema = new Schema({
     default: 0,
     index: 1
   },
+  // 创建的时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 最后修改时间
   tlm: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 中文摘要
   abstractCn: {
     type: String,
     default: "",
   },
+  // 英文摘要
   abstractEn: {
     type: String, 
     default: "",
   },
+  // 作者信息
   authorInfos: {
     type: Array,
     default: []
   },
+  // 中文关键词
   keyWordsCn: {
     type: Array,
     default: []
   },
+  // 英文关键词
   keyWordsEn: {
     type: Array,
     default: []
   },
+  // 申明原创
   originState: {
     type: String,
     default: "0"
@@ -97,6 +105,11 @@ const draftSchema = new Schema({
   },
   // 封面图
   cover: {
+    type: String,
+    default: ""
+  },
+  // 作为评论 上级postId
+  parentPostId: {
     type: String,
     default: ""
   }

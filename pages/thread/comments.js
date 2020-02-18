@@ -1,4 +1,68 @@
 var editor = {};
+var draftsId = {};
+var timeout = {};
+function closeSaveCommentDraft(pid) {
+  clearTimeout(timeout[pid]);
+}
+function autoSaveCommentDraft(tid, pid) {
+  timeout[pid] = setTimeout(function() {
+    Promise.resolve()
+      .then(function() {
+        var content = editor[pid].getContent();
+        if(!content) throw "请输入评论内容";
+        var draftId = draftsId[pid] || "";  
+        var method = "POST";
+        var url = "/u/"+NKC.configs.uid+"/drafts";
+        var data = {
+          post: {
+            c: content,
+            parentPostId: pid
+          },
+          draftId: draftId,
+          desType: "thread",
+          desTypeId: tid,
+        };
+        return nkcAPI(url, method, data)  
+      })
+      .then(function(data) {
+        draftsId[pid] = data.draft.did;
+        autoSaveCommentDraft(tid, pid);
+      })
+      .catch(function(err) {
+        console.log(err);
+        autoSaveCommentDraft(tid, pid);
+      })
+    
+  }, 60000);
+}
+
+function saveCommentDraft(tid, pid) {
+  var content = editor[pid].getContent();
+  var draftId = draftsId[pid] || "";
+  Promise.resolve()
+    .then(function() {
+      // 获取回复的内容
+      var method = "POST";
+      var url = "/u/"+NKC.configs.uid+"/drafts";
+      var data = {
+        post: {
+          c: content,
+          parentPostId: pid
+        },
+        draftId: draftId,
+        desType: "thread",
+        desTypeId: tid,
+      };
+      return nkcAPI(url, method, data)
+    })
+    .then(function(data) {
+      draftsId[pid] = data.draft.did;
+      sweetSuccess("保存成功");
+    })
+    .catch(function(data) {
+      sweetError(data);
+    });
+}
 
 function postComment(tid, pid, firstInput) {
   var postContainer = $(".edit_"+pid+"_container");
@@ -14,8 +78,10 @@ function postComment(tid, pid, firstInput) {
       return;
     }
   }
+  var draftBtn = $('<button class="btn btn-default btn-sm m-r-05" onclick="saveCommentDraft(\''+tid+'\', \''+pid+'\')">存草稿</button>');
   var subBtn = $('<button class="btn btn-primary btn-sm" onclick="submitPostComment(\''+tid+'\', \''+pid+'\', '+firstInput+')">提交</button>');
   var btnDiv = $("<div class='text-right m-t-05 m-b-1'></div>");
+  btnDiv.append(draftBtn);
   if(!firstInput) {
     var quitBtn = $('<button class="btn btn-default btn-sm m-r-05" onclick="closePostComment(\''+pid+'\')">取消</button>');
     btnDiv.append(quitBtn);
@@ -28,10 +94,12 @@ function postComment(tid, pid, firstInput) {
   }
   editor[pid] = UE.getEditor('edit_' + pid, NKC.configs.ueditor.commentConfigs);
   postContainer.show();
+  autoSaveCommentDraft(tid, pid);
 }
 
 function closePostComment(pid) {
   $(".edit_"+pid+"_container").hide();
+  closeSaveCommentDraft(pid);
 }
 
 function submitPostComment(tid, pid, firstInput) {
@@ -148,10 +216,9 @@ function hidePostComments(pid) {
   $(".hide_comments_button_" + pid).hide();
   closePostComment(pid);
   $("#post_comments_" + pid).hide();
-
 }
 // 新生成的dom，注册事件
 function initUserPanel() {
-  if(!window.floatUserPanel) return;
-  floatUserPanel.initPanel()
+  if(window.floatUserPanel) floatUserPanel.initPanel();
+  if(NKC.methods.initStickerViewer) NKC.methods.initStickerViewer();
 }

@@ -383,10 +383,12 @@ threadRouter
 		}
 		await db.DelPostLogModel.updateMany({delType: 'toDraft', postType: 'post', threadId: tid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}}, {$set: {delType: 'toRecycle'}});
 		if(pid && step === undefined) {
-			const disabled = data.userOperationsId.includes('displayDisabledPosts');
-			const {page, step} = await thread.getStep({pid, disabled});
+      const disabled = data.userOperationsId.includes('displayDisabledPosts');
+      const url = await db.PostModel.getUrl(pid);
+			// const {page, step} = await thread.getStep({pid, disabled});
 			ctx.status = 303;
-      return ctx.redirect(`/t/${tid}?page=${page}&highlight=${pid}#highlight`);
+      // return ctx.redirect(`/t/${tid}?page=${page}&highlight=${pid}#highlight`);
+      return ctx.redirect(url);
 		}
 		if(last_page) {
 			page = pageCount -1;
@@ -923,7 +925,7 @@ threadRouter
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}`)
 		}
-		data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
+    data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
 		// 如果是编辑的草稿，则删除草稿
     if(did) {
       await db.DraftModel.removeDraftById(did, data.user.uid);

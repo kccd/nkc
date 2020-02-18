@@ -21,11 +21,19 @@ div
           else if draft.type === "newPost"
             span 在文章《
               a(href=draft.thread.url target="_blank")=draft.thread.title
-              | 》下发表回复
+              | 》下发表
+              if draft.parentPostId
+                | 评论
+              else  
+                | 回复
           else if draft.type === "modifyPost"
             span 修改文章《
               a(href=draft.thread.url target="_blank")=draft.thread.title
-              | 》下的回复
+              | 》下的
+              if draft.parentPostId
+                | 评论
+              else  
+                | 回复
           else if draft.type === "modifyThread"
             span 修改文章《
               a(href=draft.thread.url target="_blank")=draft.thread.title

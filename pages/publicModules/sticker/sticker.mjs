@@ -79,6 +79,7 @@ class StickerViewer {
             d.on("click", function() {
               self.app.open($(this).attr("data-sticker-rid"), !!$(this).attr("data-sticker-management"));
             });
+            d.attr("data-sticker-init", "true");
           }
         },
         open(rid, management) {
@@ -97,6 +98,7 @@ class StickerViewer {
         }
       }
     });
+    self.initPanel = self.app.init;
   }
 }
 const stickerViewer = new StickerViewer();

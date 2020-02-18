@@ -19,8 +19,10 @@ block settingsContent
         .form-group
           button.btn.btn-primary(onclick="save()") 保存
 block scripts
-  include ../../ueditor/ueditorBase
   include ../../publicModules/crop/crop
   include ../../publicModules/selectResource/selectResource
+  include ../../publicModules/sticker/selectSticker
+  include ../../publicModules/selectDraft/selectDraft
+  include ../../ueditor/ueditorBase
   //+includeJS("/media/media_index.js")
   +includeJS("/columns/settings/editPage.js")

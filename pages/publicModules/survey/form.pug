@@ -90,7 +90,7 @@
         div(v-if="showResult")
           p {{postResult}}
           .form-post-users
-            a(onclick="visitUrl('/u/' + user.uid)" :onmouseover="'floatUserPanel.open(this, \"' + user.uid + '\")'" v-for="user in users")
+            a(onclick="visitUrl('/u/' + user.uid)" :data-float-uid="user.uid" v-for="user in users")
               img(:src="'/avatar/' + user.avatar")
         //- 时间限制
         p(v-if="timeInfo") {{timeInfo}}

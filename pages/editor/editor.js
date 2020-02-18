@@ -23,6 +23,7 @@ var data;
 $(function() {
   data = NKC.methods.getDataById("data");
   editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
+  editor.methods = {};
   editor.addListener( 'ready', function( editor ) {
     // 编辑器准备就绪
     // 计算工具栏上边距
@@ -85,6 +86,8 @@ function initVueApp() {
 
       anonymous: false,
 
+      parentPostId: "", // 评论的上级post
+
       abstractCn: "", // 中文摘要
       abstractEn: "", // 英文摘要
 
@@ -126,6 +129,9 @@ function initVueApp() {
       this.oldDraft = data.oldDraft;
       this.initPost(data.post);
       var self = this;
+      editor.methods.selectedDraft = function(draft) {
+        self.insertDraftInfo(draft);
+      };
       // 判断草稿箱里是否存在该类型且未被删掉的草稿。
       // 若存在则此内容未发表。
       if(self.oldDraft) { // 存在未提交的草稿，提示用户是否加载草稿
@@ -212,6 +218,29 @@ function initVueApp() {
       fromNow: NKC.methods.fromNow,
       format: NKC.methods.format,
       getUrl: NKC.methods.tools.getUrl,
+      insertDraftInfo: function(draft) {
+        // 从草稿箱插入草稿后的回调
+        /* console.log(draft);
+        var type = this.type;
+        if(type === "newThread") {
+          if(draft.mainForums && draft.mainForums.length) {
+            this.selectedForums = draft.mainForums;
+          }
+          this.title = draft.t || this.title;
+          this.setTitle();
+          this.cover = draft.cover || this.cover;
+          this.abstractCn = draft.abstractCn || this.cover;
+          this.abstractEn = draft.abstractEn || this.abstractEn;
+          this.originState = draft.originState || this.originState;
+          this.keyWordsCn = draft.keyWordsCn || this.keyWordsCn;
+          this.keyWordsEn = draft.keyWordsEn || this.keyWordsEn;
+          this.authorInfos = draft.authorInfos || this.authorInfos;
+          this.surveyId = draft.surveyId || this.surveyId;
+          if(draft.surveyId) {
+            PostSurvey.init({surveyId: draft.surveyId});
+          }
+        } */
+      },
       // 监听内容输入
       watchContentChange: function() {
         var content = editor.getContentTxt();
@@ -277,6 +306,27 @@ function initVueApp() {
       // 自动保存草稿
       autoSaveToDraft: function() {
         var self = this;
+        var type = this.type;
+        // 内容为空时不自动保存草稿
+        if(type === "newThread") {
+          if(
+            !self.title &&
+            !self.content &&
+            (!self.selectedForums || !self.selectedForums.length) &&
+            !self.cover &&
+            !self.abstractCn &&
+            !self.abstractEn &&
+            !self.keyWordsCn &&
+            !self.keyWordsEn &&
+            !self.authorInfos &&
+            !self.surveyId
+          ) return;
+        } else if(type === "newPost") {
+          if(
+            !self.title &&
+            !self.content
+          ) return;
+        }
         setTimeout(function() {
           self.saveToDraftBase()
             .then(function() {
@@ -314,6 +364,7 @@ function initVueApp() {
         this.content = post.c.replace(reg, "");
         this.setContent();
         this.cover = post.cover;
+        this.parentPostId = post.parentPostId;
         this.abstractCn = post.abstractCn;
         this.abstractEn = post.abstractEn;
         this.originState = post.originState;
@@ -568,6 +619,7 @@ function initVueApp() {
         self.getContent();
         post.abstractCn = self.abstractCn;
         post.abstractEn = self.abstractEn;
+        post.parentPostId = self.parentPostId;
         post.keyWordsEn = self.keyWordsEn;
         post.keyWordsCn = self.keyWordsCn;
         post.cover = self.cover;
@@ -984,3 +1036,6 @@ window.onbeforeunload = function() {
     return "离开前保存草稿了吗？"
   }
 };
+NKC.methods.selectedDraft = function(draft) {
+  PostInfo.insertDraft(draft);
+}
