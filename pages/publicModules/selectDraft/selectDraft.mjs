@@ -88,8 +88,8 @@ NKC.modules.SelectDraft = class {
         loadDraft(d) {
           sweetQuestion(`继续创作将会覆盖编辑器中全部内容，确定继续？`)
             .then(() => {
-              if(PostInfo && PostInfo.showCloseInfo) {
-                PostInfo.showCloseInfo = false;
+              if(window.PostInfo && window.PostInfo.showCloseInfo) {
+                window.PostInfo.showCloseInfo = false;
               }
               window.location.href = `/editor?type=redit&id=${d.did}`;
             })
