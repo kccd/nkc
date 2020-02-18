@@ -77,11 +77,12 @@ router
       draft = draft.toObject();
       data.draftId = draft.did;
       const {
-        mainForumsId, categoriesId, desType, desTypeId
+        mainForumsId, categoriesId, desType, desTypeId, parentPostId
       } = draft;
       selectedForumsId = mainForumsId;
       selectedCategoriesId = categoriesId;
       data.post = draft;
+
       if(desType === "forum") { // 发表新帖
         data.type = "newThread";
       } else if(desType === "thread") { // 发表新回复
@@ -89,10 +90,15 @@ router
         const thread = await db.ThreadModel.findOnly({tid: desTypeId});
         // 验证用户是否有权限查看文章
         const firstPost = await thread.extendFirstPost();
+        let parentPost;
+        if(parentPostId) {
+          parentPost = await db.PostModel.findOne({pid: parentPostId});
+        }
         data.thread = {
           tid: thread.tid,
           title: firstPost.t,
-          url: `/t/${thread.tid}`
+          url: `/t/${thread.tid}`,
+          comment: !!parentPost
         };
         selectedForumsId = thread.mainForumsId;
       } else if(desType === "post") { // 编辑文章或编辑回复
@@ -100,11 +106,16 @@ router
         const thread = await db.ThreadModel.findOnly({tid: post.tid});
         data.type = post.pid === thread.oc? "modifyThread": "modifyPost";
         const firstPost = await thread.extendFirstPost();
+        let parentPost;
+        if(parentPostId) {
+          parentPost = await db.PostModel.findOne({pid: parentPostId});
+        }
         data.post.pid = post.pid;
         data.thread = {
           tid: thread.tid,
           title: firstPost.t,
-          url: `/t/${thread.tid}`
+          url: `/t/${thread.tid}`,
+          comment: !!parentPost
         };
         selectedForumsId = thread.mainForumsId;
       } else if(desType === "forumDeclare") { // 专业说明
@@ -143,7 +154,7 @@ router
     }
 
     // 根据类型加载最新的草稿
-    if(type !== "redit") {
+    /* if(type !== "redit") {
       let obj = {};
       if(data.type === "newThread") {
         obj = {desType: "forum"};
@@ -169,7 +180,7 @@ router
         did: d.did,
         tlm: d.tlm || d.toc
       };
-    }
+    } */
     // 判断用户是否能够发表匿名内容
     if(data.type === "newThread") {
       data.havePermissionToSendAnonymousPost =

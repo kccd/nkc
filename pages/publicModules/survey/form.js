@@ -318,6 +318,9 @@ NKC.modules.SurveyForm = function(id) {
         this.getSurveyById(surveyId);
       }
       this.checkTime();
+      setTimeout(function() {
+        floatUserPanel.initPanel();
+      }, 300);
     }
   });
   self.init = function(options) {

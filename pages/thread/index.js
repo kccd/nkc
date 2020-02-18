@@ -48,7 +48,12 @@ $(document).ready(function(){
   }
   if(NKC.modules.UserInfo) {
     UserInfo = new NKC.modules.UserInfo();
-  }
+	}
+	
+	if($("#container").length) {
+		autoSaveDraft();
+	}
+
   var surveyFormsDom = $(".module-survey-form");
   for(var i = 0; i < surveyFormsDom.length; i++) {
     var dom = surveyFormsDom.eq(i);
@@ -129,6 +134,7 @@ $(document).ready(function(){
 
 
 	var editor = geid('ReplyContent');
+	
 	var proxy = geid('proxy');
 	if(proxy){
 		proxy.addEventListener('click', function(e) {
@@ -422,6 +428,33 @@ function getPost() {
   return post;
 }
 
+// 自动保存草稿
+function autoSaveDraft() {
+	setTimeout(function() {
+		Promise.resolve()
+			.then(function() {
+				var post = getPost();
+				post.t = '';
+				var method = "POST";
+				var url = "/u/"+NKC.configs.uid+"/drafts";
+				var data = {
+					post: post,
+					draftId: draftId,
+					desType: "thread",
+					desTypeId: $("#threadId").text()
+				};
+				return nkcAPI(url, method, data);
+			})
+			.then(function(data) {
+				draftId = data.draft.did;
+				autoSaveDraft();
+			})
+			.catch(function(err) {
+				console.log(err);
+				autoSaveDraft();
+			});
+	}, 60000);
+}
 // 保存草稿
 function saveDraft(threadId,userId){
   Promise.resolve()

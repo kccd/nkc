@@ -27,7 +27,7 @@
   position: relative;
 }
 #moduleSelectSticker .module-ss-header .module-ss-title {
-  cursor: grab;
+  cursor: move;
   height: 3rem;
   line-height: 3rem;
   color: #666;

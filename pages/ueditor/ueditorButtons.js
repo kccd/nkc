@@ -1,3 +1,25 @@
+UE.registerUI('draftSelector',function(editor,uiName){
+  if(NKC.modules.SelectDraft && !window.SelectDraft) {
+    window.SelectDraft = new NKC.modules.SelectDraft();
+  }
+  return new UE.ui.Button({
+    name:'draftSelector',
+    title:'草稿箱',
+    // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
+    // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
+    className: 'edui-default edui-for-draft edui-icon',
+    onclick:function () {
+      if(window.SelectDraft) {
+        window.SelectDraft.open(function(res) {
+          editor.execCommand('inserthtml', res.content || "");
+          // editor.methods.selectedDraft(res);
+        });
+      } else {
+        return sweetError("未初始化草稿选择模块");
+      }
+    }
+  });
+});
 UE.registerUI('stickerSelector',function(editor,uiName){
   if(NKC.modules.SelectSticker && !window.SelectSticker) {
     window.SelectSticker = new NKC.modules.SelectSticker();

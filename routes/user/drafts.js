@@ -95,7 +95,7 @@ draftsRouter
       t = "", c = "", l = "html", abstractEn = "", abstractCn = "",
       keyWordsEn = [], keyWordsCn = [], fids = [], cids = [],
       authorInfos = [], originState = 0, anonymous = false, cover = "",
-      survey
+      survey, parentPostId = ""
     } = post;
     const {user} = data;
     const draftCount = await db.DraftModel.count({uid: user.uid});
@@ -109,7 +109,8 @@ draftsRouter
       mainForumsId: fids,
       categoriesId: cids,
       cover,
-      authorInfos, originState, anonymous
+      authorInfos, originState, anonymous,
+      parentPostId
     };
     if(draft) { // 存在草稿
       draftObj.tlm = Date.now();

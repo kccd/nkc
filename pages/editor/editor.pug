@@ -19,9 +19,15 @@ block content
             if data.type === "newPost"
               .editor-type-info
                 .fa.fa-lightbulb-o
-                |正在回复文章《
+                if !data.thread.comment
+                  |正在回复文章《
+                else  
+                  |正在评论文章《
                 a(href=data.thread.url target="_blank")=`${data.thread.title}`
-                |》
+                if !data.thread.comment
+                  |》
+                else  
+                  |》下的回复
             else if data.type === "modifyThread"
               .editor-type-info
                 .fa.fa-lightbulb-o
@@ -33,7 +39,11 @@ block content
                 .fa.fa-lightbulb-o
                 |正在编辑文章《
                 a(href=data.thread.url target="_blank")=`${data.thread.title}`
-                | 》下的回复
+                | 》下的
+                if data.thread.comment
+                  | 评论
+                else 
+                  | 回复  
             else if data.type === "modifyForumDeclare"
               .editor-type-info
                 .fa.fa-lightbulb-o
@@ -207,6 +217,7 @@ block scripts
   include ../publicModules/crop/crop_new
   include ../publicModules/selectUser/selectUser
   include ../publicModules/selectResource/selectResource
+  include ../publicModules/selectDraft/selectDraft
   include ../publicModules/sticker/selectSticker
   include ../publicModules/moveThread/moveThread
   +includeJS('/tools.js')

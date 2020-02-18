@@ -62,23 +62,28 @@ jobs.backupDatabase = () => {
 			}
 		});
 		console.log(`\n\n${moment().format('YYYY-MM-DD HH:mm:ss')} 开始备份数据...\n`);
-		let data = '', error = '';
-		const process = spawn(
-			'mongodump.exe',
-			[
-				'--gzip',
-        '-u',
-        mongodb.username,
-        '-p',
-        mongodb.password,
-				'--host',
-				`${mongodb.address}:${mongodb.port}`,
-				'--db',
-				backup.database,
-				'--out',
-				`${backup.out}${moment().format('YYYYMMDD')}`,
-			]
-		);
+    let data = '', error = '';
+    const command = [
+      '--gzip',
+      '-u',
+      mongodb.username,
+      '-p',
+      mongodb.password,
+      '--host',
+      `${mongodb.address}:${mongodb.port}`,
+      '--db',
+      backup.database,
+      '--out',
+      `${backup.out}${moment().format('YYYYMMDD')}`,
+      `--excludeCollection`,
+      `visitorLogs`
+    ];
+    const day = Number(moment().format("DD"));
+    if(day % 3 === 0) {
+      command.push(`--excludeCollection`);
+      command.push(`logs`);
+    }
+		const process = spawn('mongodump.exe', command);
 		process.stdout.on('data', (d) => {
 			d = d.toString();
 			console.log(d);

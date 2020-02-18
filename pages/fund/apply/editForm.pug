@@ -255,6 +255,8 @@ block fundScripts
     include ../../publicModules/imageViewer
   include  ../../publicModules/selectForum/selectForum
   include  ../../publicModules/selectResource/selectResource
+  include  ../../publicModules/selectDraft/selectDraft
+  include  ../../publicModules/sticker/selectSticker
   include ../../publicModules/strToHTML
   include ../../publicModules/moment
   +includeJS("/editor/paper.js")
@@ -266,4 +268,5 @@ block fundScripts
 
   if data.s === 5
     include ../../publicModules/plyr/plyr.js.pug
+    include  ../../publicModules/sticker/sticker
 

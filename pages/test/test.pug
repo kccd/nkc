@@ -1,10 +1,15 @@
 extends ../bootstrap_base
 block title
   title 测试
-  +includeCSS("/external_pkgs/pdfjs/pdf_viewer.css")
-  +includeCSS("/test/test.css")
 block content
-  div Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus adipisci asperiores aut, consectetur consequuntur dolores doloribus dolorum eveniet facilis fugit illum inventore libero molestiae quidem quis quod suscipit vel? Libero?
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        div Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus adipisci asperiores aut, consectetur consequuntur dolores doloribus dolorum eveniet facilis fugit illum inventore libero molestiae quidem quis quod suscipit vel? Libero?
 block scripts
-  include ../publicModules/sticker/selectSticker
-  +includeJS("/test/test.js")
+  include ../publicModules/selectDraft/selectDraft
+  script.
+    const SelectDraft = new NKC.modules.SelectDraft();
+    SelectDraft.open(function(data) {
+      console.log(data);
+    });
