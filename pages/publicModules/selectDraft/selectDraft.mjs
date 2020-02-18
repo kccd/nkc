@@ -63,6 +63,16 @@ NKC.modules.SelectDraft = class {
         },
         insert(data) {
           self.callback(data);
+          data.delay = 3;
+          const func = () => {
+            setTimeout(() => {
+              data.delay --;
+              if(data.delay > 0) {
+                func();
+              }
+            }, 1000);
+          }
+          func();
         },
         removeDraft(draft) {
           sweetQuestion("确定要删除草稿吗？")
@@ -79,6 +89,9 @@ NKC.modules.SelectDraft = class {
         getDrafts(page = 0) {
           nkcAPI(`/u/${this.uid}/profile/draft?page=${page}&perpage=${this.perpage}`, "GET")
             .then(data => {
+              data.drafts.map(d => {
+                d.delay = 0;
+              });
               self.app.drafts = data.drafts;
               self.app.paging = data.paging;
               self.app.loading = false;
