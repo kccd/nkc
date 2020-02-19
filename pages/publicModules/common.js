@@ -396,3 +396,15 @@ NKC.methods.doExchange = function(arr) {
     return arr;
   }
 }
+
+// 页面折叠记录位置
+NKC.modules.PagePosition = function() {
+  var self = this;
+  self.fromTheBottom = $(document).height() - $(document).scrollTop();
+  self.restore = function() {
+    setTimeout(function() {
+      var distance = $(document).height() - self.fromTheBottom;
+      window.scrollTo(0, distance);
+    }, 100);
+  }
+};

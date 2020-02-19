@@ -1189,11 +1189,13 @@ function showPost(pid) {
 }
 
 function switchPost(pid) {
-  var dom = $(".hide-post[data-pid='"+pid+"']");
+	var dom = $(".hide-post[data-pid='"+pid+"']");
   if(dom.hasClass("active")) {
     showPost(pid);
   } else {
-    hidePost(pid);
+		var pagePosition = new NKC.modules.PagePosition();
+		hidePost(pid);
+		pagePosition.restore();
   }
 }
 

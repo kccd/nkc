@@ -21,7 +21,7 @@ router
         limit = Number(perpage);
       }
       if(!limit) {
-        paging = nkcModules.apiFunction.paging(page, count, 55);
+        paging = nkcModules.apiFunction.paging(page, count, 60);
       } else {
         paging = nkcModules.apiFunction.paging(page, count, limit);
       }
@@ -36,7 +36,7 @@ router
         disabled: false,
         deleted: false,
         // uid: {$ne: user.uid}
-      }).sort({hits: -1}).limit(22);
+      }).sort({hits: -1}).limit(24);
       data.paging = paging;
       data.emoji = state.twemoji;
       ctx.template = "stickers/sticker.pug";
@@ -87,7 +87,7 @@ router
     const {t} = query;
     let sticker = await db.StickerModel.findOnly({from: "upload", rid});
     if(!sticker) ctx.throw(404, "表情不存在");
-    if(sticker.disabled) ctx.throw(403, "表情已被屏蔽");
+    if(sticker.disabled && !ctx.permission("nkcManagementSticker")) ctx.throw(403, "表情已被屏蔽");
     
     if(t === "json") {
       sticker = sticker.toObject();

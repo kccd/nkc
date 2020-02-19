@@ -422,14 +422,14 @@ const turnVideo = async(inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-acodec', 'copy', '-b:v', '2000k', '-bufsize', '2000k', outputPath])
 }
 
-const stickerify = async (path, ext) => {
-  const maxWidth = 100;
+// 表情图片压缩
+const stickerify = async (path, size = 100) => {
   const {width, height} = await info(path);
-  if(width > maxWidth || height > maxWidth) {
+  if(width > size || height > size) {
     if(linux) {
-      return spawnProcess('convert', [path, '-resize', `${maxWidth}x${maxWidth}`, path])
+      return spawnProcess('convert', [path, '-resize', `${size}x${size}`, path])
     }
-    return spawnProcess('magick', ['convert', path, '-resize', `${maxWidth}x${maxWidth}`, path]);
+    return spawnProcess('magick', ['convert', path, '-resize', `${size}x${size}`, path]);
   }
 };
 

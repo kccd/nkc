@@ -35,7 +35,7 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {body, db, nkcModules} = ctx;
+    const {body, db, nkcModules, tools} = ctx;
     const {stickers, type, disabled} = body;
     if(type === "review") {
       for(const s of stickers) {
@@ -56,6 +56,13 @@ router
           reviewed: !!s.status,
           reason: s.reason
         });
+        const {rid} = sticker;
+        const {size} = s;
+        if(!["xs", "sm"].includes(size)) continue;
+        const resource = await db.ResourceModel.findOne({rid});
+        if(!resource) continue;
+        const stickerPath = await resource.getFilePath();
+        await tools.imageMagick.stickerify(stickerPath, size==="xs"?30:60);
       }
     } else if(type === "disable") {
       for(const s of stickers) {

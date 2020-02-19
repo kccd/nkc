@@ -135,5 +135,5 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
               -let comment = post;
               include ./postEdit
               //div(class=`edit_${post.pid}_container`)
-            .m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
+            .m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}', true)` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
               span.fa.fa-angle-up
