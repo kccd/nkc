@@ -10,11 +10,26 @@
       background-color: #d2d2d2;
     }
     .sticker-image{
-      height: 5rem;
-      width: 5rem;
+      @width: 100px;
+      height: @width;
+      width: @width;
       border: 1px solid #aaa;
       box-sizing: border-box;
       cursor: pointer;
+      text-align: center;
+      line-height: @width;
+      img{
+        max-height: 90px;
+        max-width: 90px;
+        &.sm{
+          max-height: 60px;
+          max-width: 60px;
+        }
+        &.xs{
+          max-height: 30px;
+          max-width: 30px;
+        }
+      }
     }
   }
   .user-avatar{

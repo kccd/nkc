@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title 个性表情
+  title 我的表情
   +includeCSS("/stickers/stickers.css")
 block content
   #data.hidden=objToStr({ownStickers: data.stickers, hotStickers: data.hotStickers})
@@ -8,7 +8,7 @@ block content
     .row
       .col-xs-12.col-md-12.box-shadow-panel
         .m-b-1
-          h5 个性表情&nbsp;
+          h5 我的表情&nbsp;
           //-ul.nav.nav-tabs
             li.active
               a(href="/sticker") 个性表情

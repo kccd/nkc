@@ -97,9 +97,14 @@ function postComment(tid, pid, firstInput) {
   autoSaveCommentDraft(tid, pid);
 }
 
-function closePostComment(pid) {
+function closePostComment(pid, restorePagePosition) {
+  var pagePosition;
+  if(restorePagePosition) {
+    pagePosition = new NKC.modules.PagePosition();
+  }
   $(".edit_"+pid+"_container").hide();
   closeSaveCommentDraft(pid);
+  if(pagePosition) pagePosition.restore();
 }
 
 function submitPostComment(tid, pid, firstInput) {
@@ -211,10 +216,10 @@ function createPageDom(buttonValue, tid, pid) {
   return dom;
 }
 
-function hidePostComments(pid) {
+function hidePostComments(pid, restorePagePosition) {
   $(".show_comments_button_" + pid).show();
   $(".hide_comments_button_" + pid).hide();
-  closePostComment(pid);
+  closePostComment(pid, restorePagePosition);
   $("#post_comments_" + pid).hide();
 }
 // 新生成的dom，注册事件

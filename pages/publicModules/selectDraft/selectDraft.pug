@@ -37,7 +37,7 @@
                 span 继续创作
               div
                 span(title="删除草稿" @click="removeDraft(d)").m-r-05 删除
-                span.disabled(title="请稍候..." v-if="d.delay !== 0") 插入
+                span.disabled(title="已插入" v-if="d.delay !== 0") 插入
                 span(title="插入内容" @click="insert(d)" v-else) 插入
         
 include ../moment

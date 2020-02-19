@@ -23,6 +23,9 @@ block nkcContent
         .options-button
           a.active(@click="setAll(true)") 全设为通过
           a.active(@click="setAll(false)") 全设为不通过
+          a.active(@click="modifySize('md')") 全设为大图
+          a.active(@click="modifySize('sm')") 全设为中图
+          a.active(@click="modifySize('xs')") 全设为小图
           a.active(@click="submitAll") 提交全部
       include ../../publicModules/paging/paging
       table.table.table-bordered
@@ -37,7 +40,8 @@ block nkcContent
         tbody
           tr.sticker-list(v-for="s in stickers" :class="{'gray': s.disabled}")
             th
-              img.sticker-image(:src="getUrl('sticker', s.rid)")
+              .sticker-image
+                img(:src="getUrl('sticker', s.rid)" :class="s.size")
             th {{format("YYYY/MM/DD HH:mm:ss", s.toc)}}
             th.user-avatar
               img(:src="getUrl('userAvatar', s.user.avatar)" :data-float-uid="s.uid")
@@ -68,6 +72,16 @@ block nkcContent
                     label
                       input(type="radio" :value="false" v-model="s.status")
                       span 不通过
+                  .radio
+                    label.m-r-1
+                      input(type="radio" value="md" v-model="s.size")    
+                      span 大
+                    label.m-r-1
+                      input(type="radio" value="sm" v-model="s.size")    
+                      span 中
+                    label.m-r-1
+                      input(type="radio" value="xs" v-model="s.size")    
+                      span 小    
                   div(v-if="!s.status")
                     textarea.form-control(rows=3 v-model="s.reason" placeholder="请输入原因")
                   .m-t-05

@@ -2,6 +2,7 @@ const data = NKC.methods.getDataById("data");
 data.stickers.map(s => {
   if(s.reviewed === null) {
     s.status = true;
+    s.size = "md";
   }
 });
 const app = new Vue({
@@ -32,7 +33,7 @@ const app = new Vue({
         .then(() => {
           const arr = [];
           for(const s of stickers) {
-            const {_id, status, reason} = s;
+            const {_id, status, reason, size} = s;
             if(!status) {
               self.checkString(reason, {
                 name: "原因",
@@ -41,8 +42,9 @@ const app = new Vue({
               });
             }
             arr.push({
-              _id: s._id,
+              _id,
               status,
+              size,
               reason
             });
           }
@@ -59,6 +61,9 @@ const app = new Vue({
     },
     submitAll() {
       this.submit(this.stickers);
+    },
+    modifySize(size) {
+      this.stickers.map(s => s.size = size);
     },
     disableSticker(s, d) {
       nkcAPI("/nkc/sticker", "POST", {
