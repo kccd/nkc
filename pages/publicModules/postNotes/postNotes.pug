@@ -1,0 +1,11 @@
++includeCSS("/publicModules/postNotes/postNotes.css")
+#modulePostNotes
+  div(v-for="n in notes" :class="{'active': !!n.active}") 
+    h5 ID: {{n.id}}
+    input(type="text" v-model="n.comment")
+    div(v-if="n.active")
+      button(@click="removeNode(n)") 删除
+    div(v-else)
+      button(@click="editNode(n)") 编辑
++includeJS("/web-highlighter/dist/web-highlighter.min.js")
++includeJS("/publicModules/postNotes/postNotes.js")    

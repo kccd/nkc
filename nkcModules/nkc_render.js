@@ -713,6 +713,7 @@ function nkc_render(options){
     }
     renderedHTML = blockDomHtml + renderedHTML;
     renderedHTML = linkAlienate(renderedHTML); //please check linkAlienate()
+    renderedHTML = "<div>"+renderedHTML+"</div>";
     return renderedHTML
   };
 

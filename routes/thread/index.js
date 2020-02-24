@@ -758,6 +758,7 @@ threadRouter
       data.attachmentsCount = await db.ResourceModel.count({mediaType: "mediaAttachment", references: {$in: pid}});
     }
     const hidePostSettings = await db.SettingModel.getSettings("hidePost");
+    data.notes = await db.NoteModel.getNotes("post", data.thread.oc);
     data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;
 		data.step = step;

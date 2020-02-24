@@ -1,0 +1,36 @@
++includeCSS("/publicModules/NKCHighlighter/NKCHighlighter.css")
++includeJS("/publicModules/NKCHighlighter/NKCHighlighter.js")
+script.
+  var hl = new NKCHighlighter({
+    rootElementId: "thread-content"
+  });
+  var data = NKC.methods.getDataById("threadForumsId");
+  hl
+    .on(hl.eventNames.select, function(data) {
+      hl.createSource(data.range, [{
+        uid: NKC.configs.uid,
+        c: "这是批注内容"
+      }]);
+    })
+    .on(hl.eventNames.create, function(source) {
+      hl.addClass(source, "post-node-mark");
+      nkcAPI("/note", "POST", {
+        pid: data.pid,
+        notes: source.notes,
+        nodes: source.nodes
+      })
+      .then(function() {
+        console.log("创建成功");
+      })
+      .catch(sweetError)
+    })
+    .on(hl.eventNames.click, function(source) {
+      console.log(source);
+    })
+    .on(hl.eventNames.hover, function(source) {
+      hl.addClass(source, "post-node-hover");
+    })
+    .on(hl.eventNames.hoverOut, function(source) {
+      hl.removeClass(source, "post-node-hover");
+    })
+  hl.restoreSources(data.notes);

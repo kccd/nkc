@@ -61,13 +61,13 @@ block content
             h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
           if problem.email
             h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
-          .title 修复详情：
+          .title 修复详情
           if problem.restorerId.length
             if problem.restorer
-              a(href=`/u/${problem.restorerId}` target='_blank').resolve-auther
+              //-a(href=`/u/${problem.restorerId}` target='_blank').resolve-auther
                 img(src=`/avatar/${problem.restorer.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
                 span= problem.restorer.username
-              span.resolve-time= problem.resolveTime.toLocaleString()
+              span.resolve-time= '提交时间：' + problem.resolveTime.toLocaleString()
           else
             .resolve-auther 暂无修复记录
           #logDev

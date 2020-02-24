@@ -30,11 +30,17 @@ block content
               span.label.label-success 已解决
             else
               span.label.label-danger 暂未解决
-          .m-t-2#content!= markdown_safe(problem.c)
+          h4.m-t-3
+            strong 问题详情    
+          .m-t-1#content!= markdown_safe(problem.c)
           if problem.QQ
             h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
           if problem.email
             h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
+          if problem.resolved
+            h4.m-t-3
+              strong 解决说明
+            .m-t-1!=markdown_safe(problem.restorLog)  
 
 block scripts
   include ../../publicModules/highlight/highlight
