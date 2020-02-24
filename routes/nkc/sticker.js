@@ -75,6 +75,25 @@ router
           disabled: !!disabled
         });
       }
+    } else if(type === "modifySize") {
+      for(const s of stickers) {
+        const {_id, size} = s;
+        const sticker = await db.StickerModel.findOne({
+          _id,
+          from: "upload",
+          reviewed: {$ne: null}
+        });
+        if(!sticker) continue;
+        if(!["md", "sm", "xs"].includes(size)) continue;
+        const resource = await db.ResourceModel.findOne({rid: sticker.rid});
+        if(!resource) continue;
+        const stickerPath = await resource.getFilePath();
+        await tools.imageMagick.stickerify(stickerPath, {
+          "md": 100,
+          "sm": 60,
+          "xs": 30
+        }[size]);
+      }
     }
     await next();
   });

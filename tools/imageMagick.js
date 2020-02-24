@@ -427,9 +427,9 @@ const stickerify = async (path, size = 100) => {
   const {width, height} = await info(path);
   if(width > size || height > size) {
     if(linux) {
-      return spawnProcess('convert', [path, '-resize', `${size}x${size}`, path])
+      return spawnProcess('convert', [path, '-coalesce', '-resize', `${size}x${size}`, path])
     }
-    return spawnProcess('magick', ['convert', path, '-resize', `${size}x${size}`, path]);
+    return spawnProcess('magick', ['convert', path, '-coalesce', '-resize', `${size}x${size}`, path]);
   }
 };
 
