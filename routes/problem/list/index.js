@@ -72,7 +72,7 @@ listRouter
 		const {_id} = params;
 		const problem = await db.ProblemModel.findOnly({_id});
 		if (problem.resolved && user.uid != problem.restorerId) return await next();
-		const {t, c, resolved, name} = body;
+		const {t, c, resolved, name, reminded} = body;
 		const typeName = name.trim();
 		// if(!t) ctx.throw(400, '标题不能为空');
 		// if(!c) ctx.throw(400, '详细内容不能为空');
@@ -89,7 +89,7 @@ listRouter
 		body.resolved = problem.resolved ? problem.resolved : body.resolved
 		await problem.update(body);
 		// 更新数据库后 发送消息给问题提出者
-		if (resolved && !problem.resolved && problem.uid) {
+		if (resolved && !problem.resolved && problem.uid && reminded) {
 			const message = db.MessageModel({
         _id: await db.SettingModel.operateSystemID("messages", 1),
         r: problem.uid,

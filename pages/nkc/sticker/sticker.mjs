@@ -3,6 +3,8 @@ data.stickers.map(s => {
   if(s.reviewed === null) {
     s.status = true;
     s.size = "md";
+  } else {
+    s.size = ""
   }
 });
 const app = new Vue({
@@ -60,7 +62,35 @@ const app = new Vue({
         .catch(sweetError)
     },
     submitAll() {
-      this.submit(this.stickers);
+      if(data.t === "unReviewed") {
+        this.submit(this.stickers);
+      } else if(data.t === "reviewed") {
+        this.submitSize(this.stickers);
+      }
+    },
+    submitSize(stickers) {
+      sweetQuestion("确定要执行此操作？")
+        .then(() => {
+          const arr = [];
+          for(const sticker of stickers) {
+            if(sticker.reviewed === null) continue;
+            const {_id, size} = sticker;
+            if(!["md", "sm", "xs"].includes(size)) throw "请选择表情大小";
+            arr.push({
+              _id,
+              size
+            });
+          }
+          screenTopAlert("后台处理中，请稍候");
+          return nkcAPI("/nkc/sticker", "POST", {
+            stickers: arr,
+            type: "modifySize"
+          });
+        })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch(sweetError);
     },
     modifySize(size) {
       this.stickers.map(s => s.size = size);

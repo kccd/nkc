@@ -4,8 +4,6 @@ block title
   title= problem.t
   -const mainContainer1400 = true;
   -let cantEdit = problem.resolved && data.user.uid != problem.restorerId;
-
-  link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
   style.
     body {
       background: #f8f8f8;
@@ -29,7 +27,7 @@ block content
       .hidden#data= JSON.stringify({id: data.problem._id})
       .col-xs-12.col-md-12.m-b-1.form-inline.box-shadow-panel
         div
-          a.btn.btn-default.btn-sm(href='/problem/list') << 返回列表
+          a.btn.btn-default.btn-sm(onclick="window.history.back(-1)") << 返回列表
           span &nbsp;&nbsp;&nbsp;移动到
           select.form-control.btn-sm#typeId
             for type in data.problemsTypes
@@ -61,13 +59,13 @@ block content
             h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
           if problem.email
             h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
-          .title 修复详情：
+          .title 修复详情
           if problem.restorerId.length
             if problem.restorer
-              a(href=`/u/${problem.restorerId}` target='_blank').resolve-auther
+              //-a(href=`/u/${problem.restorerId}` target='_blank').resolve-auther
                 img(src=`/avatar/${problem.restorer.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
                 span= problem.restorer.username
-              span.resolve-time= problem.resolveTime.toLocaleString()
+              .m-t-1.resolve-time= `时间：`+problem.resolveTime.toLocaleString()
           else
             .resolve-auther 暂无修复记录
           #logDev
@@ -93,10 +91,14 @@ block content
             textarea.form-control#log(rows=23 disabled=cantEdit)= problem.restorLog
           if !problem.resolved
             .form-group
-              .icheckbox
-                span 标记为已完成
-                input(type='checkbox' name='select' checked=problem.resolved disabled=cantEdit)
-
+              .checkbox
+                label
+                  input(type='checkbox' name='select' checked=problem.resolved disabled=cantEdit onclick="checkMark()")
+                  span.m-l-05 标记为已完成
+              .checkbox#remind(style="display: none")
+                label
+                  input(type='checkbox' name='remind')
+                  span.m-l-05 通知用户
           button.btn.btn-primary.btn-block(onclick=`submit(${problem._id})`, disabled=cantEdit) 保存
 
 
@@ -106,5 +108,4 @@ block scripts
   //- Mackdown转html
   include ../publicModules/mdToHtml
   //- 验证样式
-  script(src=`/icheck/icheck.js?v=${startTime}`)
   script(src=`/problem/problem.js?v=${startTime}`)

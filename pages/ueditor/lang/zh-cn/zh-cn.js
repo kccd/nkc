@@ -557,7 +557,9 @@ UE.I18N['zh-cn'] = {
             'lang_input_text':'文本内容：',
             'lang_input_url':'链接地址：',
             'lang_input_title':'标题：',
-            'lang_input_target':'是否在新窗口打开：'
+            'lang_input_target':'是否在新窗口打开：',
+            'lang_notice_link': '非本站内网址，禁止采用隐含链接。请明示URL地址。引用外部文献必须明示文献标题，或在文末列出REF。',
+            'lang_notice_http': '若链接中不包含http等协议名称，则默认添加http://。'
         },
         'validLink':'只支持选中一个链接时生效',
         'httpPrompt':'您输入的超链接中不包含http等协议名称，默认将为您添加http://前缀'

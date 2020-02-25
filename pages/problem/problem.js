@@ -14,7 +14,6 @@ function update() {
 	// $('#titleH2').text(title);
 	$('#logDev').html(NKC.methods.mdToHtmlSafe(log));
 	$('pre code').each(function(i, block) {
-	  console.log(block);
     NKC.methods.highlightBlock(block);
 	});
 	return {
@@ -26,16 +25,16 @@ function update() {
 	}
 }
 
-$('input[name="select"]').iCheck({
-	checkboxClass: 'icheckbox_minimal-red',
-});
-
 function submit(_id, callback) {
 	var obj = update();
 	obj.resolved = $('input[name="select"]').prop('checked');
   var dom = document.getElementById('typeId');
   if(!dom) throw 'selector error';
-  obj.name = dom.value;
+	obj.name = dom.value;
+	obj.remindUser = false;
+	if(obj.resolved) {
+		obj.reminded = $("input[name='remind']").prop("checked");
+	}
 	nkcAPI('/problem/list/'+_id, 'PATCH', obj)
 		.then(function() {
 			if(callback) {
@@ -73,3 +72,14 @@ function deleteProblem(_id) {
 function changeType(problemId) {
   submit(problemId);
 }
+function checkMark() {
+	var dom = $("input[name='select']");
+	var remind = $("#remind");
+	if(dom.prop("checked")) {
+		remind.show();
+	} else {
+		remind.hide();
+	}
+}
+
+checkMark();

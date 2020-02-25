@@ -215,7 +215,11 @@ threadRouter
 		const {data, params, db, query, nkcModules, body, state} = ctx;
 		let {token, paraId} = query;
 		let {page = 0, pid, last_page, highlight, step, t} = query;
-		const {tid} = params;
+    let {tid} = params;
+    try{
+      const arr = tid.match(/^[0-9]+/);
+      if(arr && arr.length) tid = arr[0];
+    } catch(err) {}
 		data.highlight = highlight;
 		data.complaintTypes = ctx.state.language.complaintTypes;
     const thread = await db.ThreadModel.findOnly({tid});
