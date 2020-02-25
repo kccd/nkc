@@ -24,6 +24,9 @@ script.
       })
       .catch(sweetError)
     })
+    .on(hl.eventNames.restore, function(source) {
+      hl.addClass(source, "post-node-mark");
+    })
     .on(hl.eventNames.click, function(source) {
       console.log(source);
     })

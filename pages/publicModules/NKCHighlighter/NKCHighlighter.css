@@ -10,11 +10,11 @@
 }
 /* 文本超出隐藏并显示省略号 */
 .post-node-mark {
-  background: #ffff99;
+  background: #ffffbb;
 }
 .post-node-hover,
 .post-node-hover > * {
-  background: #e85a71;
+  background: #ffff77;
 }
 #modulePostNoteButton {
   position: fixed;

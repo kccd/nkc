@@ -13,9 +13,11 @@ window.Source = class {
     this.notes = notes;
     this.nodes = nodes;
     this.doms = [];
-    let noteId = _id;
-    if(!noteId) noteId = Date.now();
-    this._id = `post-node-id-${noteId}`;
+    if(!_id) {
+      this._id = `nkc-hl-l-id-${Date.now()}`;
+    } else {
+      this._id = `nkc-hl-id-${_id}`;
+    }
     this.nodes.forEach(node => {
       const {tagName, index, offset, length} = node;
       const doms = self.hl.root.getElementsByTagName(tagName);
@@ -24,22 +26,23 @@ window.Source = class {
       targetNotes.map(targetNode => {
         const span = document.createElement("span");
         self.doms.push(span);
-        span.addEventListener("mouseenter", () => {
+        span.addEventListener("mouseover", () => {
           self.hl.emit(self.hl.eventNames.hover, self);
         });
-        span.addEventListener("mouseleave", () => {
+        span.addEventListener("mouseout", () => {
+          console.log("离开")
           self.hl.emit(self.hl.eventNames.hoverOut, self);
         });
         span.addEventListener("click", () => {
           self.hl.emit(self.hl.eventNames.click, self);
         })
-        span.setAttribute("class", `post-node ${self._id}`);
+        span.setAttribute("class", `nkc-hl ${self._id}`);
         span.appendChild(targetNode.cloneNode(false));
         targetNode.parentNode.replaceChild(span, targetNode);
       });
     });
     this.hl.sources.push(this);
-    this.hl.emit(this.hl.eventNames.create, this);
+    this.hl.emit(this.hl.eventNames[_id?"restore":"create"], this);
   }
   addClass(klass) {
     const {doms} = this;
@@ -53,6 +56,11 @@ window.Source = class {
       dom.classList.remove(klass);
     });
   }
+  destroy() {
+    this.doms.map(dom => {
+      dom.className = "";
+    });
+  }
   getSources() {
     return this.sources;
   }
@@ -62,77 +70,50 @@ window.Source = class {
     let node = null;
     let curLength = length;
     let nodes = [];
+    let started = false;
     while(node = nodeStack.pop()) {
       const children = node.childNodes;
-      for(let i = 0; i < children.length; i++) {
+      for(let i = children.length - 1; i >= 0; i--) {
         nodeStack.push(children[i]);
       }
-      if(node.nodeType === 3) {
+      if(node.nodeType === 3 && node.textContent.length) {
         curOffset += node.textContent.length;
-        console.log(1, node)
-        console.log(11, node)
-        console.log(Date.now(), node)
         if(curOffset > offset) {
-          console.log(Date.now(), node)
-          console.log(2, node)
           if(curLength <= 0) break;
-          console.log(3, node)
-          const startOffset = curOffset - offset;
-          console.log(4, node)
-          let nodeLength;
-          console.log(5, node)
-          if(curLength <= node.textContent.length) {
-            nodeLength = curLength;
+          let startOffset;
+          if(!started) {
+            startOffset = node.textContent.length - (curOffset - offset);
           } else {
-            nodeLength = node.textContent.length - startOffset;
-            curLength -= nodeLength;
+            startOffset = 0;
           }
-          const node = node.splitText(startOffset);
-          node.splitText(nodeLength);
-          nodes.push(node);
-        }
-      }
-    }
-    return nodes;
-  }
-  getNode_(parent, offset, length) {
-    const nodeStack = [parent];
-    let curNode = null;
-    let curOffset = 0;
-    let startOffset = 0;
-    let curLength = 0;
-    let start, end;
-    while (curNode = nodeStack.pop()) {
-      const children = curNode.childNodes;
-      for (let i = children.length - 1; i >= 0; i--) {
-        nodeStack.push(children[i]);
-      }
-      if (curNode.nodeType === 3) {
-        startOffset = offset - curOffset;
-        curOffset += curNode.textContent.length;
-        if (curOffset > offset) {
-          curLength += curNode.length - startOffset;
-          let endOffset;
-          if(length + startOffset > curNode.length) {
-            endOffset = curNode.length;
+          started = true;
+          let needLength;
+          if(curLength <= node.textContent.length - startOffset) {
+            needLength = curLength;
+            curLength = 0;
           } else {
-            endOffset = startOffset + length;
+            needLength = node.textContent.length - startOffset;
+            curLength -= needLength;
           }
-          start = {
-            node: curNode,
+          nodes.push({
+            node,
             startOffset,
-            endOffset
-          }
+            needLength
+          });
         }
       }
     }
-    /* if (!curNode) {
-      curNode = parent;
-    } */
-    console.log(curNode, startOffset);
-    const node = curNode.splitText(startOffset);
-    node.splitText(length);
-    return node;
+    nodes = nodes.map(obj => {
+      let {node, startOffset, needLength} = obj;
+      if(startOffset > 0) {
+        node = node.splitText(startOffset);
+      }
+      if(node.textContent.length !== needLength) {
+        node.splitText(needLength);  
+      }
+      return node;
+    });
+    return nodes;
   }
 }
 
@@ -154,7 +135,8 @@ window.NKCHighlighter = class {
       create: "create",
       hover: "hover",
       hoverOut: "hoverOut",
-      select: "select"
+      select: "select",
+      restore: "restore"
     }
 
     window.addEventListener("mouseup", function(e) {
@@ -183,7 +165,13 @@ window.NKCHighlighter = class {
     if(startOffset === endOffset) return;
     return range;
   }
-  restoreSources(sources) {
+  destroy(source) {
+    if(typeof source === "string") {
+      source = this.getSourceByID(source);
+    }
+    source.destroy();
+  }
+  restoreSources(sources = []) {
     for(const source of sources) {
       source.hl = this;
       new Source(source);  
@@ -196,18 +184,33 @@ window.NKCHighlighter = class {
     if(startContainer.nodeType !== 3 || startContainer.nodeType !== 3) return;
     if(startContainer === endContainer) { 
       // 相同节点
-      startNode = startContainer.splitText(startOffset);
-      startNode.splitText(endOffset - startOffset);
-      selectedNodes.push(startNode);
+      startNode = startContainer;
+      endNode = startNode;
+      selectedNodes.push({
+        node: startNode,
+        offset: startOffset,
+        length: endOffset - startOffset
+      }); 
     } else {
-      startNode = startContainer.splitText(startOffset);
-      selectedNodes.push(startNode);
-      endContainer.splitText(endOffset);
+      startNode = startContainer;
       endNode = endContainer;
-      selectedNodes.push(endNode);
+      selectedNodes.push({
+        node: startNode,
+        offset: startOffset,
+        length: startNode.textContent.length - startOffset
+      });
+      selectedNodes.push({
+        node: endNode,
+        offset: 0,
+        length: endOffset
+      });
       const nodes = this.findNodes(startNode, endNode);
       for(const node of nodes) {
-        selectedNodes.push(node);
+        selectedNodes.push({
+          node,
+          offset: 0,
+          length: node.textContent.length
+        });
       }
     }
     const parent = this.getSameParentNode(startNode, endNode);
@@ -222,13 +225,13 @@ window.NKCHighlighter = class {
     }
     if(index === -1) throw "获取父元素索引出错";
     const nodes = [];
-    for(const node of selectedNodes) {
-      const offset = this.getOffset(parent, node);
-      const length = node.textContent.length;
+    for(const obj of selectedNodes) {
+      const {node, offset, length} = obj;
+      const offset_ = this.getOffset(parent, node);
       nodes.push({
         tagName,
         index,
-        offset,
+        offset: offset_ + offset,
         length
       });
     }
