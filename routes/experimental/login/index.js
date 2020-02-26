@@ -14,7 +14,7 @@ router
       uid: data.user.uid,
       time: Date.now()
     });
-    data.redirect = "/e/status";
+    data.redirect = "/e/console";
     // const urls = ctx.getCookie("visitedUrls");
     // ctx.setCookie("experimental", {
     //   uid: data.user.uid,

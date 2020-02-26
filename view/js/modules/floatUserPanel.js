@@ -108,7 +108,7 @@ const floatUserPanel = new Vue({
             });
           })
           .catch(err => {
-            console.log(err);
+            // console.log(err);
           });
       });
       dom.attr("data-float-init", "true");

@@ -1,6 +1,5 @@
 const Router = require('koa-router');
 const settingRouter = require('./settings');
-const statusRouter = require('./status');
 const logRouter = require('./log');
 const sysInfoRouter = require('./systemInfo');
 const consoleRouter = require('./console');
@@ -28,11 +27,9 @@ experimentalRouter
     }
     await next();
   })
-  .get('/', async (ctx, next) => {
-    const {nkcModules} = ctx;
-  	return ctx.redirect("/e/status");
+  .get('/', async (ctx) => {
+  	return ctx.redirect("/e/console");
   })
-	.use('/status', statusRouter.routes(), statusRouter.allowedMethods())
   .use('/console', consoleRouter.routes(), consoleRouter.allowedMethods())
 	.use('/settings', settingRouter.routes(), settingRouter.allowedMethods())
   .use('/systemInfo', sysInfoRouter.routes(), sysInfoRouter.allowedMethods())

@@ -1,0 +1,41 @@
+extends ../nkc
+block nkcTitle
+  title 网站总览 - 前台管理
+  +includeCSS("/bootstrap/css/bootstrap-datetimepicker.min.css")
+block nkcContent
+  .col-xs-12.col-md-12.m-b-1
+    .e-panel
+      button.btn.btn-default(onclick="getResults({type: 'today'})") 今日
+      button.btn.btn-default(onclick="getResults({type: 'month'})") 本月
+      button.btn.btn-default(onclick="getResults({type: 'year'})") 今年
+      button.btn.btn-default(onclick="getResults({type: 'all'})") 全部
+      button.btn.btn-default(onclick="getResults({type: 'custom'})") 自定义
+      .form-inline(style='margin: 1rem 0rem;display:none;')#custom
+        .form-group
+          label 开始时间
+          input.form-control.time(readonly type='text' name='time1')
+        .form-group
+          label 结束时间
+          input.form-control.time(readonly type='text' name='time2')
+        .form-group
+          button.btn.btn-primary(onclick='getData("custom")') 提交
+          button.btn.btn-danger(onclick='reset()') 重置
+      div(style='margin-top: 2rem;')
+        div#main(style="width: 100%;height: 45rem;")
+  if data.onlineUsers && data.onlineUsersCount > 0
+    .col-xs-12.col-md-12(style='margin-bottom: 2rem;')
+      .e-panel
+        h5=`当前在线总人数：${data.onlineUsersCount}`
+        if data.onlineUsersCount > 5000
+          h5 最近活动的5000名在线用户
+        for targetUser in data.onlineUsers
+          a(href=`/u/${targetUser.uid}` target="_blank" style="display: inline-block;" onmouseover=tools.floatUserInfo(targetUser.uid)).text-center
+            div(style='height: 3rem;width: 3rem;display: inline-block;position: relative;margin: 0.5rem;')
+              div(style='position: absolute;height: 1rem;width: 1rem;right: 0;bottom: 0;background-color:#2bd62b;border-radius: 50%;')
+              img(src=`/avatar/${targetUser.avatar}` style="width: 3rem;height: 3rem;border-radius: 50%;")
+block nkcScripts
+  include ../../publicModules/floatUserPanel/floatUserPanel
+  +includeJS("/echarts/dist/echarts.min.js")
+  +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
+  +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
+  +includeJS("/nkc/status/status.js")
