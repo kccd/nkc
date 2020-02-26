@@ -72,7 +72,6 @@ NKC.methods.selectImage = function(o) {
     $("#module_crop_info").text("图片处理中，请稍候...");
     try{
       this_.cropper.getCroppedCanvas().toBlob(function(blob) {
-        console.log(blob);
         this_.callback(blob);
       });
     } catch(err) {
