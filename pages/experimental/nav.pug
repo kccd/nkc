@@ -3,9 +3,6 @@
     //span=`${lang('ex', 'management')}`
 
     ul.nav.nav-pills
-      if permission('visitExperimentalStatus')
-        li
-          a(href='/e')=lang('ex', 'status')
       if permission('visitExperimentalConsole')
         li
           a(href='/e/console')=lang('ex', 'console')

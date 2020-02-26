@@ -53,7 +53,7 @@ router
       const thread = threadsObj[tid];
       if(thread) data.toppedThreads.push(thread);
     });
-    ctx.template = "nkc/home.pug";
+    ctx.template = "nkc/home/home.pug";
     await next();
   })
   .post("/", async (ctx, next) => {

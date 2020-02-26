@@ -1,4 +1,4 @@
-@import "../base";
+@import "../publicModules/base";
 body{
   background-color: #f6f6f6;
 }
@@ -8,7 +8,7 @@ body{
     ul{
       padding: 0;
       margin: 0;
-      @liHeight: 3rem;
+      @liHeight: 3.2rem;
       & li:first-child a{
         border-radius: 2px 2px 0 0;
       }
@@ -17,18 +17,24 @@ body{
       }
       li{
         list-style: none;
-        display: inline-block;
+        display: block;
         a{
-          display: inline-block;
+          display: block;
           height: @liHeight;
-          padding: 0 1rem;
           line-height: @liHeight;
           font-size: 1.2rem;
+          padding: 0 0.5rem;
           position: relative;
           color: @dark;
           cursor: pointer;
           transition: background-color 100ms, color 100ms;
-
+          .fa{
+            display: inline-block;
+            width: 3rem;
+            color: #555;
+            text-align: center;
+            font-size: 1.2rem;
+          }
           &:hover, &:focus{
             text-decoration: none;
             background-color: #f6f6f6;
@@ -37,8 +43,7 @@ body{
 
         &.active{
           a{
-            background-color: @primary;
-            color: #fff;
+            color: @primary;
           }
         }
       }

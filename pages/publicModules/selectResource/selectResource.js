@@ -126,11 +126,11 @@ NKC.modules.SelectResource = function() {
         setTimeout(function() {
           try{
             self.cropper.getCroppedCanvas().toBlob(function(blob) {
-              var file = NKC.methods.blobToFile(blob, Date.now() + ".png");
+              var file = NKC.methods.blobToFile(blob, Date.now() + ".jpeg");
               self.app.uploadSelectFile(file);
               self.app.changePageType("list");
               self.app.resetCropper();
-            });
+            }, "image/jpeg");
           } catch(err) {
             console.log(err);
             self.app.croppingPicture = false;
@@ -286,7 +286,7 @@ NKC.modules.SelectResource = function() {
               var formData = new FormData();
               formData.append("file", f.data);
               if(f.data.constructor === Blob) {
-                formData.append("fileName", Date.now() + ".png");
+                formData.append("fileName", f.data.name || (Date.now() + ".png"));
               }
               return nkcUploadFile("/r", "POST", formData, function(e, progress) {
                 f.progress = progress;

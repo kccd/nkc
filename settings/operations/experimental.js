@@ -4,9 +4,6 @@ module.exports = {
 	  GET: "experimentalLogin",
     POST: "experimentalLogin"
   },
-	status: {
-		GET: 'visitExperimentalStatus'
-	},
 	settings: {
 		editor: {
 			GET: "experimentalEditorSettings",
