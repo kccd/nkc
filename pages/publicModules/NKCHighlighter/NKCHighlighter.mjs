@@ -30,12 +30,11 @@ window.Source = class {
           self.hl.emit(self.hl.eventNames.hover, self);
         });
         span.addEventListener("mouseout", () => {
-          console.log("离开")
           self.hl.emit(self.hl.eventNames.hoverOut, self);
         });
         span.addEventListener("click", () => {
           self.hl.emit(self.hl.eventNames.click, self);
-        })
+        });
         span.setAttribute("class", `nkc-hl ${self._id}`);
         span.appendChild(targetNode.cloneNode(false));
         targetNode.parentNode.replaceChild(span, targetNode);
