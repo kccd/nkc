@@ -1668,7 +1668,7 @@ function disablePostClick(pid, type){
 function disablePost(pid,para){
   nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true,para: para})
     .then(function(res){
-      screenTopAlert(pid+' 已屏蔽，请等待刷新')
+      screenTopAlert(pid+' 已屏蔽')
       //location.reload()
     })
     .catch(function(data) {
@@ -1679,7 +1679,7 @@ function disablePost(pid,para){
 function enablePost(pid){
   nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: false})
     .then(function(){
-      screenTopAlert(pid+' 已解除屏蔽，请手动刷新')
+      screenTopAlert(pid+' 已解除屏蔽')
       // location.reload()
     })
     .catch(function(data) {

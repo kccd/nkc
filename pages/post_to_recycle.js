@@ -51,11 +51,11 @@ function postMoveToRecycleBin(id){
   }
   if(method === "toRecycle"){
     disablePost(pid,parames)
-    setTimeout(function(){turnTest(id)},1800)
+    // setTimeout(function(){turnTest(id)},1800)
     // window.location.href = "/t/" + id;
   }else if(method === "toDraft"){
     disablePost(pid,parames)
-    setTimeout(function(){turnTest(id)},1800)
+    // setTimeout(function(){turnTest(id)},1800)
     // window.location.href = "/t/" + id;
   }
 }
