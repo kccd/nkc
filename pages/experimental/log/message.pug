@@ -86,6 +86,7 @@ block eContent
                 th 时间
                 th 发送者
                 th 接收者
+                th IP
                 th 内容
             tbody
               tr(v-for="m in messages" :class="{'withdrawn': !!m.withdrawn}")

@@ -608,13 +608,11 @@ $(function() {
       // 处理好友添加申请
       postApplication: function(agree, message) {
         var uid = message.uid;
-        var url;
-        if(agree) {
-          url = '/u/' + uid + '/friends/agree';
-        } else {
-          url = '/u/' + uid + '/friends/disagree';
-        }
-        nkcAPI(url, 'POST', {})
+        if(["true", "false", "ignored"].indexOf(agree) === -1) return screenTopWarning("处理好友添加申请类型错误：agree: "+agree);
+        var body = {
+          agree: agree
+        };
+        nkcAPI('/u/' + uid + '/friends/agree', 'POST', body)
           .then(function() {
             message.agree = agree;
           })
@@ -766,6 +764,7 @@ $(function() {
         return nkcAPI(url, 'GET', {})
           .then(function(data) {
             if(app.target !== target) return;
+            app.twemoji = data.twemoji;
             app.targetUserSendLimit = data.targetUserSendLimit;
             app.showMandatoryLimitInfo = data.showMandatoryLimitInfo;
             app.targetUserGrade = data.targetUserGrade;
@@ -877,7 +876,6 @@ $(function() {
               app.categories = data.categories;
 
               app.user = data.user;
-              app.twemoji = data.twemoji;
               var messageSettings = data.user.generalSettings.messageSettings;
               var beep = messageSettings.beep;
               app.onlyReceiveFromFriends = messageSettings.onlyReceiveFromFriends;

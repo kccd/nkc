@@ -754,6 +754,7 @@ userSchema.methods.ensureUserInfo = async function() {
 
 userSchema.methods.getNewMessagesCount = async function() {
 	const MessageModel = mongoose.model('messages');
+	const FriendsApplicationModel = mongoose.model("friendsApplications");
 	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
 	// 系统通知
   const allSystemInfoCount = await MessageModel.count({ty: 'STE'});
@@ -788,10 +789,15 @@ userSchema.methods.getNewMessagesCount = async function() {
   }
 	// 系统提醒
   const newReminderCount = await MessageModel.count({ty: 'STU', r: this.uid, vd: false});
+  const newApplicationsCount = await FriendsApplicationModel.count({
+    agree: "null",
+    respondentId: this.uid
+  });
 	// 用户信息
   const newUsersMessagesCount = await MessageModel.count({ty: 'UTU', s: {$ne: this.uid}, r: this.uid, vd: false});
 	return {
 		newSystemInfoCount,
+    newApplicationsCount,
 		newReminderCount,
 		newUsersMessagesCount
 	}

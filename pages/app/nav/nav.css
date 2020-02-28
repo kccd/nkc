@@ -58,6 +58,12 @@ body {
   color: #ff8498;
   margin-top: 0.3rem;
   font-style: oblique;
+  height: 1.6rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 }
 .app-nav .nav-user .user-info .user-certs img {
   vertical-align: text-top;
