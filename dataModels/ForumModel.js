@@ -120,6 +120,12 @@ const forumSchema = new Schema({
 		index: 1
 	},
 
+  // 关注的人数
+  followerCount: {
+    type: Number,
+    default: 0
+  },
+
 	// 用户角色限制
 	rolesId: {
 		type: [String],
@@ -445,10 +451,15 @@ forumSchema.methods.updateForumMessage = async function() {
     const ThreadModel = mongoose.model('threads');
     const ForumModel = mongoose.model('forums');
     const PostModel = mongoose.model('posts');
+    const SubscribeModel = mongoose.model("subscribes");
     const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
     childrenFid.push(this.fid);
     const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
     let countPosts = await PostModel.count({type: "post", mainForumsId: {$in: childrenFid}, parentPostId: ""});
+    /*const followerCount = await SubscribeModel.count({
+      type: "forum",
+      fid: this.fid
+    });*/
     const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
     const normal = countThreads - digest;
     const tCount = {
@@ -1397,4 +1408,6 @@ forumSchema.statics.getForumsByFid = async (fid) => {
   }
   return results;
 };
+
+
 module.exports = mongoose.model('forums', forumSchema);

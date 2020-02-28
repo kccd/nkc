@@ -29,10 +29,10 @@ const friendsApplicationSchema = new Schema({
     index: 1,
     default: null
   },
-  // 申请的状态 null：未处理, true: 已同意, false: 已拒绝
+  // 申请的状态 null：未处理, true: 已同意, false: 已拒绝, ignored: 忽略
   agree: {
-    type: Boolean,
-    default: null,
+    type: String,
+    default: "null",
     index: 1
   },
   // 添加好友附加的验证信息

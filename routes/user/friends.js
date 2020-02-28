@@ -29,15 +29,15 @@ friendsRouter
     let applicationLog = await db.FriendsApplicationModel.findOne({
       applicantId: user.uid,
       respondentId: uid,
-      agree: null
+      agree: "null"
     });
     let targetApplicationLog = await db.FriendsApplicationModel.findOne({
       applicantId: uid,
       respondentId: user.uid,
-      agree: null
+      agree: "null"
     });
 
-    await db.UsersGeneralModel.update({uid: uid}, {$set: {'messageSettings.chat.newFriends': true}});
+    await db.UsersGeneralModel.updateOne({uid: uid}, {$set: {'messageSettings.chat.newFriends': true}});
 
     // 若对方之前已发起添加好友请求，则直接通过验证并简历好友关系。
     if(targetApplicationLog) ctx.throw(400, '该好友已向你发送添加好友申请，请点击信息中的‘新朋友’查看');
@@ -61,84 +61,97 @@ friendsRouter
     await next();
   })
   .post('/agree', async (ctx, next) => {
-    const {data, db, params, redis} = ctx;
+    const {data, db, params, redis, body} = ctx;
     const {uid} = params;
     const {user} = data;
-    let application = await db.FriendsApplicationModel.findOnly({respondentId: user.uid, applicantId: uid, agree: null});
+
+    let application = await db.FriendsApplicationModel.findOnly({respondentId: user.uid, applicantId: uid, agree: "null"});
     const toc = Date.now();
 
-    // 创建好友关系
-    let friend = await db.FriendModel.findOne({
-      uid: user.uid,
-      tUid: uid
-    });
-    if(!friend) {
-      const newFriend1 = db.FriendModel({
-        _id: await db.SettingModel.operateSystemID('friends', 1),
+    const {agree} = body;
+    if(agree === "true") {
+      // 创建好友关系
+      let friend = await db.FriendModel.findOne({
         uid: user.uid,
-        tUid: uid,
-        toc
+        tUid: uid
       });
-      await newFriend1.save();
-    }
-    friend = await db.FriendModel.findOne({
-      tUid: user.uid,
-      uid: uid
-    });
-    if(!friend) {
-      const newFriend2 = db.FriendModel({
-        _id: await db.SettingModel.operateSystemID('friends', 1),
+      if(!friend) {
+        const newFriend1 = db.FriendModel({
+          _id: await db.SettingModel.operateSystemID('friends', 1),
+          uid: user.uid,
+          tUid: uid,
+          toc
+        });
+        await newFriend1.save();
+      }
+      friend = await db.FriendModel.findOne({
         tUid: user.uid,
-        uid: uid,
-        toc
+        uid: uid
       });
-      await newFriend2.save();
-    }
+      if(!friend) {
+        const newFriend2 = db.FriendModel({
+          _id: await db.SettingModel.operateSystemID('friends', 1),
+          tUid: user.uid,
+          uid: uid,
+          toc
+        });
+        await newFriend2.save();
+      }
 
-    // 创建聊天
-    const lastMessage = await db.MessageModel.findOne({ty: 'UTU', $or: [{s: user.uid, r: uid}, {s: uid, r: user.uid}]});
-    let lmId, tlm;
-    if(lastMessage) {
-      lmId = lastMessage._id;
-      tlm = lastMessage.tc;
-    }
-    let chat = await db.CreatedChatModel.findOne({
-      uid: user.uid,
-      tUid: uid
-    });
-    if(!chat) {
-      chat = db.CreatedChatModel({
-        _id: await db.SettingModel.operateSystemID('createdChat', 1),
+      // 创建聊天
+      const lastMessage = await db.MessageModel.findOne({ty: 'UTU', $or: [{s: user.uid, r: uid}, {s: uid, r: user.uid}]});
+      let lmId, tlm;
+      if(lastMessage) {
+        lmId = lastMessage._id;
+        tlm = lastMessage.tc;
+      }
+      let chat = await db.CreatedChatModel.findOne({
         uid: user.uid,
-        tUid: uid,
-        toc: toc,
-        tlm: tlm||toc,
-        lmId
+        tUid: uid
       });
-      await chat.save();
-    }
-    let targetChat = await db.CreatedChatModel.findOne({
-      uid: uid,
-      tUid: user.uid
-    });
-    if(!targetChat) {
-      targetChat = db.CreatedChatModel({
-        _id: await db.SettingModel.operateSystemID('createdChat', 1),
+      if(!chat) {
+        chat = db.CreatedChatModel({
+          _id: await db.SettingModel.operateSystemID('createdChat', 1),
+          uid: user.uid,
+          tUid: uid,
+          toc: toc,
+          tlm: tlm||toc,
+          lmId
+        });
+        await chat.save();
+      }
+      let targetChat = await db.CreatedChatModel.findOne({
         uid: uid,
-        tUid: user.uid,
-        toc: toc,
-        tlm: tlm||toc,
-        lmId
+        tUid: user.uid
       });
-      await targetChat.save();
+      if(!targetChat) {
+        targetChat = db.CreatedChatModel({
+          _id: await db.SettingModel.operateSystemID('createdChat', 1),
+          uid: uid,
+          tUid: user.uid,
+          toc: toc,
+          tlm: tlm||toc,
+          lmId
+        });
+        await targetChat.save();
+      }
+      application.agree = "true";
+    } else if(agree === "false") {
+      application.agree = "false";
+    } else {
+      application.agree = "ignored";
     }
-
     application.tlm = toc;
-    application.agree = true;
     await application.save();
     application = application.toObject();
     application.ty = 'friendsApplication';
-    application.c = 'agree';
+    if(agree === "true") {
+      application.c = 'agree';
+    } else if(agree === "false") {
+      application.c = 'disagree';
+    } else {
+      application.c = 'ignored';
+    }
     redis.pubMessage(application);
     await next();
   })
@@ -147,8 +160,8 @@ friendsRouter
     const {uid} = params;
     const {user} = data;
     const toc = Date.now();
-    let application = await db.FriendsApplicationModel.findOnly({respondentId: user.uid, applicantId: uid, agree: null});
-    application.agree = false;
+    let application = await db.FriendsApplicationModel.findOnly({respondentId: user.uid, applicantId: uid, agree: "null"});
+    application.agree = "false";
     application.tlm = toc;
     await application.save();
     application = application.toObject();

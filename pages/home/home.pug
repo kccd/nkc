@@ -20,7 +20,7 @@ block content
         //-include ../publicModules/subscribeTypes/subscribeTypesPanel
         include ../publicModules/forums_nav/forums_tree
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
-        if data.user && data.visitedForums.length
+        if !state.isApp && data.user && data.visitedForums.length
           .m-b-1
             .panel-header 最近访问
             .visited-forums

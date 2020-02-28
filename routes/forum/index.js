@@ -4,39 +4,69 @@ const forumRouter = new Router();
 
 forumRouter
   .get('/', async (ctx, next) => {
-    const {data, db, nkcModules} = ctx;
+    const {data, db, nkcModules, state, query} = ctx;
     const {user} = data;
     const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
-		let forums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
-		let disciplineForums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user, 'discipline');
-		let topicForums = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user, 'topic');
-		forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
-		disciplineForums = nkcModules.dbFunction.forumsListSort(disciplineForums, threadTypes);
-		topicForums = nkcModules.dbFunction.forumsListSort(topicForums, threadTypes);
-		data.forums = forums.map(forum => {
-      if(forum.toObject) {
-        forum.toObject();
-      }
-      return forum;
-    });
-		data.disciplineForums = disciplineForums.map(discipline => {
-      if(discipline.toObject) {
-        discipline.toObject();
-      }
-      return discipline;
-    });
-		data.topicForums = topicForums.map(topic => {
-      if(topic.toObject) {
-        topic.toObject();
-      }
-      return topic;
-    });
-		data.forumsJson = nkcModules.apiFunction.forumsToJson(data.forums);
-		data.disciplineJSON = nkcModules.apiFunction.disciplineToJSON(data.forums);
-		data.topicJSON = nkcModules.apiFunction.topicToJSON(data.forums);
-    ctx.template = 'interface_forums.pug';
+    let subFid = [];
+    if(user) {
+			subFid = await db.SubscribeModel.getUserSubForumsId(user.uid);
+		}
+		const forumsOrigin = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
+		data.recommendForums = await db.ForumModel.getRecommendForums(forumsOrigin.map(f => f.fid));
+		data.recommendForums = data.recommendForums.slice(0, 4);
+		const forumsObj = {}, forums = [];
+		let parentsId = [];
+		for(const f of forumsOrigin) {
+			const forum = f.toObject();
+			parentsId = parentsId.concat(forum.parentsId);
+			forum.subscribed = subFid.includes(forum.fid);
+			forumsObj[forum.fid] = forum;
+			forums.push(forum);
+		}
+
+		forums.map(f => {
+			f.canSubscribe = !parentsId.includes(f.fid);
+		});
+
+		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
+
+
+		data.disciplineForums = [];
+		data.topicForums = [];
+		data.forums.map(f => {
+			f.canSubscribe = !parentsId.includes(f.fid);
+			if(f.forumType === "topic") {
+				data.topicForums.push(f);
+			} else {
+				data.disciplineForums.push(f);
+			}
+		});
+
+		if(user) {
+			const subForums = [], visitedForums = [];
+			for(const fid of subFid) {
+				const f = forumsObj[fid];
+				if(!f) continue;
+				const cloneForum = Object.assign({}, f);
+				cloneForum.childrenForums = [];
+				subForums.push(f);
+			}
+			const visitedForumsId = user.generalSettings.visitedForumsId.slice(0, 5);
+			for(const fid of visitedForumsId) {
+				const f = forumsObj[fid];
+				if(!f) continue;
+				const cloneForum = Object.assign({}, f);
+				cloneForum.childrenForums = [];
+				visitedForums.push(cloneForum);
+			}
+			data.subForums = subForums;
+			data.visitedForums = visitedForums;
+		}
+		if(query.isApp) {
+			state.isApp = true;
+		}
+		ctx.template = "forums/forums.pug";
     data.uid = user? user.uid: undefined;
-		// data.navbar = {highlight: 'forums'};
     await next();
   })
 	.post('/', async (ctx, next) => {

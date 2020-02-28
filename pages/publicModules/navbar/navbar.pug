@@ -4,7 +4,7 @@
 if data.user
   //- 新信息条数
   -var newMessage = data.user.newMessage;
-  -var messageSum = (newMessage.newReminderCount || 0) + (newMessage.newSystemInfoCount || 0) + (newMessage.newUsersMessagesCount || 0);
+  -var messageSum = (newMessage.newReminderCount || 0) + (newMessage.newSystemInfoCount || 0) + (newMessage.newUsersMessagesCount || 0) + (newMessage.newApplicationsCount || 0);
 nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;margin-bottom: 15px;")
   .container-fluid.max-width
     .navbar-header
