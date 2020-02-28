@@ -21,3 +21,16 @@ function showSameForums() {
   $(".sameForums").slideToggle();
 }
 
+
+function openEditSite() {
+  var fid = NKC.methods.getDataById("forumInfo").fid;
+  var url = window.location.origin + "/editor?type=forum&id=" + fid;
+  api.openWin({
+    name: url,
+    url: 'widget://html/common/editorInfo.html',
+    pageParam: {
+      realUrl: url,
+      shareType: "common"
+    }
+  })
+}

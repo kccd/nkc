@@ -61,7 +61,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           li.userInfo
             -let editorHref = "/editor";
             if data.forum
-              -editorHref = `/editor?&type=forum&id=${data.forum.fid}`;
+              -editorHref = `/editor?type=forum&id=${data.forum.fid}`;
             a.new-thread(href=editorHref)
               .fa.fa-pencil-square-o &nbsp;
               | 发表文章

@@ -75,6 +75,14 @@ block content
             .forum-buttons
               //-if permission('visitForumInfoSettings') && data.isModerator
                 a.btn-sm.forum-sub-btn.btn.success(href=`/f/${data.forum.fid}/settings`) 设置
+              if state.isApp && data.user
+                .hidden#forumInfo=objToStr({fid: data.forum.fid})
+                button.btn-sm.forum-sub-btn.btn.success(
+                  onclick=`openEditSite()`
+                ) 发表
+                //a.btn-sm.forum-sub-btn.btn.success(
+                //  href=`/editor?type=forum&id=${data.forum.fid}`
+                //) 发表
               if !data.forum.childrenForums || data.forum.childrenForums.length === 0
                 if data.user
                   if data.subscribed

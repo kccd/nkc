@@ -4,7 +4,7 @@ const forumRouter = new Router();
 
 forumRouter
   .get('/', async (ctx, next) => {
-    const {data, db, nkcModules, state, query} = ctx;
+    const {data, db, nkcModules} = ctx;
     const {user} = data;
     const threadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
     let subFid = [];
@@ -61,9 +61,6 @@ forumRouter
 			}
 			data.subForums = subForums;
 			data.visitedForums = visitedForums;
-		}
-		if(query.isApp) {
-			state.isApp = true;
 		}
 		ctx.template = "forums/forums.pug";
     data.uid = user? user.uid: undefined;
