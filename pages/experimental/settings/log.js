@@ -1,35 +1,15 @@
-var data = $('#data').text();
-var types;
-if(data) {
-	data = JSON.parse(data);
-  types = data.types;
-}
-
-$('input[name="selectLogSettings"]').iCheck({
-	checkboxClass: 'icheckbox_minimal-red',
-});
-
-
 function saveLogSettings(){
-  // return console.log(getSelectedLogSettings())
-  var logParams = getSelectedLogSettings();
-  nkcAPI('/e/settings/log', 'POST', {logParams:logParams})
-  .then(function() {
-    window.location.reload();
-  })
-  .catch(function(data) {
-    screenTopAlert(data.error || data);
-  })
-}
-
-function getSelectedLogSettings() {
-	var arr = $('input[name="selectLogSettings"]');
-	var operations = [];
-	for(var i = 0; i < arr.length; i++) {
-		var e = arr.eq(i);
-		if(e.prop('checked')) {
-			operations.push(e.attr('data-operation'));
-		}
+	var dom = $("input[name='operation']");
+	var selectedOperationsId = [];
+	for(var i = 0; i < dom.length; i ++) {
+		var o = dom.eq(i);
+		if(o.prop("checked")) selectedOperationsId.push(o.attr("data-operation"));
 	}
-	return operations;
+	nkcAPI('/e/settings/log', 'POST', {
+		selectedOperationsId: selectedOperationsId
+	})
+		.then(function() {
+			sweetSuccess("保存成功");
+		})
+		.catch(sweetError)
 }
