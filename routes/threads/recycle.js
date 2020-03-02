@@ -6,6 +6,7 @@ router
     const {user} = data;
     const {postsId, reason, remindUser, violation} = body;
     const results = [];
+    const threads = [], threadsId = [];
     // 验证用户权限、验证内容是否存在
     for(const postId of postsId) {
       const post = await db.PostModel.findOne({pid: postId});
@@ -105,6 +106,63 @@ router
         if(!thread.reviewed) await db.ReviewModel.newReview("disabledThread", post, user, reason);
       } else {
         // 批量屏蔽回复
+        if(post.disabled) continue;
+        const targetUser = await db.UserModel.findOnly({uid: post.uid});
+        if(!threadsId.includes(thread.tid)) {
+          threads.push(thread);
+          threadsId.push(thread.tid);
+        }
+        await post.update({toDraft: false, reviewed: true, disabled: true});
+        await db.KcbsRecordModel.insertSystemRecord('postBlocked', targetUser, ctx);
+        const firstPost = await db.PostModel.findOnly({pid: thread.oc});
+        const delLog = db.DelPostLogModel({
+          delUserId: post.uid,
+          userId: user.uid,
+          delPostTitle: firstPost?firstPost.t: "",
+          reason,
+          postType: "post",
+          threadId: thread.tid,
+          postId: post.pid,
+          delType: "toRecycle",
+          noticeType: remindUser
+        });
+        await delLog.save();
+        if(remindUser) {
+          const mId = await db.SettingModel.operateSystemID("messages", 1);
+          const message = db.MessageModel({
+            _id: mId,
+            ty: "STU",
+            r: targetUser.uid,
+            c: {
+              type: "bannedPost",
+              pid: post.pid,
+              rea: reason
+            }
+          });
+          await message.save();
+          await ctx.redis.pubMessage(message);
+        }
+        if(violation) {
+          await db.KcbsRecordModel.insertSystemRecord('violation', targetUser, ctx);
+          await db.UsersScoreLogModel.insertLog({
+            user: targetUser,
+            type: 'score',
+            typeIdOfScoreChange: 'violation',
+            port: ctx.port,
+            ip: ctx.address,
+            key: 'violationCount',
+            tid: post.tid,
+            pid: post.pid,
+            description: reason || '屏蔽回复并标记为违规'
+          });
+        }
+        if(!post.reviewed) await db.ReviewModel.newReview("disabledPost", post, targetUser, reason);
+      }
+    }
+    // 屏蔽回复后，需要更新文章
+    if(threads.length) {
+      for(const thread of threads) {
+        await thread.updateThreadMessage();
       }
     }
     await db.ForumModel.updateForumsMessage([...new Set(updateForumsId)]);

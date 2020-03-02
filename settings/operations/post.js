@@ -19,9 +19,6 @@ module.exports = {
         }
 			}
 		},
-		disabled: {
-			PATCH: 'disabledPost'
-		},
 		history: {
 			GET: 'visitPostHistory',
 			PATCH: 'disableHistories',

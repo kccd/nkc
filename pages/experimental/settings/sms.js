@@ -7,7 +7,8 @@ var app = new Vue({
     test: {
       name: 'register',
       mobile: '',
-      nationCode: '86'
+      nationCode: '86',
+      content: ""
     }
   },
   mounted: function() {
@@ -47,18 +48,24 @@ var app = new Vue({
       }
     },
     testSendMessage: function() {
-      var name = this.test.name;
-      var mobile = this.test.mobile;
-      var nationCode = this.test.nationCode;
-      if(!name) return screenTopWarning('请选择测试类型');
-      if(!nationCode) return screenTopWarning('请选择测试手机国际区号');
-      if(!mobile) return screenTopWarning('请输入测试手机号码');
-      nkcAPI('/e/settings/sms/test', 'POST', {name: name, mobile: mobile, nationCode: nationCode})
+      var self = this;
+      sweetQuestion("确定要发送短消息？")
         .then(function() {
-          screenTopAlert('测试短信发送成功');
-        })
-        .catch(function(data) {
-          screenTopWarning(data.error || data);
+          var name = self.test.name;
+          var mobile = self.test.mobile;
+          var nationCode = self.test.nationCode;
+          var content = self.test.content;
+          if(!name) return screenTopWarning('请选择测试类型');
+          if(!nationCode) return screenTopWarning('请选择测试手机国际区号');
+          if(!mobile) return screenTopWarning('请输入测试手机号码');
+          if(!content) return screenTopWarning("请输入自定义验证码");
+          nkcAPI('/e/settings/sms/test', 'POST', {name: name, mobile: mobile, nationCode: nationCode, content: content})
+            .then(function() {
+              screenTopAlert('短信发送成功');
+            })
+            .catch(function(data) {
+              screenTopWarning(data.error || data);
+            })
         })
     },
     save: function() {

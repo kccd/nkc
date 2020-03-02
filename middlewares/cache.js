@@ -85,7 +85,10 @@ module.exports = async (ctx, next) => {
         if(tid !== url_) {
           await db.ThreadModel.updateOne({tid}, {$inc: {hits: 1}});
         }
-        await visitorLog.save();
+        const logSettings = state.logSettings;
+        if(logSettings.operationsId && logSettings.operationsId.includes(operationId)) {
+          await visitorLog.save();
+        }
         global.NKC.io.of('/console').NKC.webMessage(d);
       });
       return ctx.body = html;

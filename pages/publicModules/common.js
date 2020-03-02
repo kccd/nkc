@@ -395,7 +395,46 @@ NKC.methods.doExchange = function(arr) {
   } else {
     return arr;
   }
-}
+};
+
+/*
+* 批量 屏蔽或退修 回复或文章
+* @param {String/Array} pid postId或postId组成的数组
+* */
+NKC.methods.disabledPosts = function(pid) {
+  var postsId = pid;
+  if(typeof pid === "string"){
+    postsId = [pid]
+  }
+  if(!pid || !postsId.length) return;
+  if(!window.DisabledPost) {
+    window.DisabledPost = new NKC.modules.DisabledPost();
+  }
+  window.DisabledPost.open(function(data) {
+    var body = {
+      postsId: postsId,
+      reason: data.reason,
+      remindUser: data.remindUser,
+      violation: data.violation
+    };
+    var url;
+    if(data.type === "toDraft") {
+      url = "/threads/draft";
+    } else {
+      url = "/threads/recycle";
+    }
+    nkcAPI(url, "POST", body)
+      .then(function() {
+        screenTopAlert("操作成功");
+        DisabledPost.close();
+        DisabledPost.unlock();
+      })
+      .catch(function(data) {
+        sweetError(data);
+        DisabledPost.unlock();
+      })
+  });
+};
 
 // 页面折叠记录位置
 NKC.modules.PagePosition = function() {

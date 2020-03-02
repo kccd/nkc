@@ -2,7 +2,6 @@ const Router = require('koa-router');
 const quote = require('./quote');
 const history = require('./history');
 const credit = require('./credit');
-const disabled = require('./disabled');
 const recommend = require('./recommend');
 const digestRouter = require('./digest');
 const voteRouter = require('./vote');
@@ -481,7 +480,6 @@ router
 	.use('/:pid/digest', digestRouter.routes(), digestRouter.allowedMethods())
   .use('/:pid/recommend', recommend.routes(), recommend.allowedMethods())
   .use('/:pid/credit', credit.routes(), credit.allowedMethods())
-  .use('/:pid/disabled', disabled.routes(), disabled.allowedMethods())
   .use('/:pid/vote', voteRouter.routes(), voteRouter.allowedMethods())
   .use('/:pid/warning', warningRouter.routes(), warningRouter.allowedMethods())
   .use("/:pid/author", authorRouter.routes(), authorRouter.allowedMethods())
