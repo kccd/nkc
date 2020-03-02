@@ -7,5 +7,8 @@ module.exports = {
   },
   recycle: {
     POST: "movePostsToRecycle"
+  },
+  unblock: {
+    POST: "unblockPosts"
   }
 };

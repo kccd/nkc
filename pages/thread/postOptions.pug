@@ -1,3 +1,4 @@
+-const disablePost = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
 .inline-block.highlight.post-options(style='float: right;margin-right: 0.5rem;color: #aaaaaa;')
   .dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="line-height: 15px;")
     span.fa.fa-sliders
@@ -41,9 +42,9 @@
         li
           a(href=`/editor?ver=ue&type=post&id=${comment.pid}`)
             span.fa.fa-edit &nbsp;编辑
-    if permission("disabledPost")
+    if disablePost
       li
-        a(onclick=`disablePostClick('${comment.pid}', "post")`)
+        a(onclick=`disabledThreadPost('${comment.pid}')`)
           span.fa.fa-eye-slash &nbsp;退修或删除
     if !comment.hideHistories || permission('displayPostHideHistories')
       li
@@ -58,7 +59,7 @@
     li
       a
         span.fa.fa-clock-o= ` ${comment.toc.toLocaleString()}`
-    if permission("disabledPost")
+    if disablePost
       li
         -const ipoc = comment.iplm || comment.ipoc;
         a(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')

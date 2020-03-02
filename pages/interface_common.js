@@ -1677,7 +1677,9 @@ function disablePost(pid,para){
 }
 
 function enablePost(pid){
-  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: false})
+  nkcAPI("/threads/unblock", "POST", {
+    postsId: [pid]
+  })
     .then(function(){
       screenTopAlert(pid+' 已解除屏蔽')
       // location.reload()

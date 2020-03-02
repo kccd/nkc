@@ -1321,3 +1321,54 @@ function openHidePostPanel(pid, hide) {
 		hide: hide
 	});
 }
+
+function getPostsDom() {
+	return $(".single-post-checkbox input[type='checkbox']");
+}
+function resetCheckbox() {
+	getPostsDom().prop("checked", false);
+}
+function markAllPosts() {
+	var posts = getPostsDom();
+	if(posts.eq(0).css("display") !== "inline-block") return;
+	var length = posts.length;
+	var count = 0;
+	for(var i = 0; i < length; i++) {
+		var p = posts.eq(i);
+		if(p.prop("checked")) count ++;
+	}
+	if(length === count) {
+		posts.prop("checked", false);
+	} else {
+		posts.prop("checked", true);
+	}
+}
+function managePosts() {
+	resetCheckbox();
+	var posts = getPostsDom();
+	if(posts.eq(0).css("display") === "none") {
+		posts.css("display", "inline-block");
+	} else {
+		posts.css("display", "none");
+	}
+}
+function getMarkedPostsId() {
+	var postsId = [];
+	var posts = getPostsDom();
+	for(var i = 0; i < posts.length; i++) {
+		var post = posts.eq(i);
+		if(post.prop("checked")) {
+			postsId.push(post.attr("data-pid"));
+		}
+	}
+	return postsId;
+}
+
+function disabledThreadPost(pid) {
+	NKC.methods.disabledPosts(pid);
+}
+
+function disabledMarkedPosts() {
+	var postsId = getMarkedPostsId();
+	disabledThreadPost(postsId);
+}

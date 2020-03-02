@@ -3578,6 +3578,13 @@ img.emoji {
 .post-comments .post-comment-user span{
   /*margin-right: 0.3rem;*/
 }
+.single-post-checkbox{
+  vertical-align: middle;
+  display: inline-block;
+}
+.single-post-checkbox input{
+  display: none;
+}
 .single-post{
   position: relative;
   /*padding-top: 1rem;*/
