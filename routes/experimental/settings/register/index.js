@@ -4,7 +4,6 @@ router
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
     const regSettings= await db.SettingModel.findById("register");
-    // const regSettings = await db.SettingModel.getSettings("register");
     data.regSettings = regSettings.c;
     const {defaultSubscribeForumsId} = data.regSettings;
     data.selectedForums = await db.ForumModel.find({fid: {$in: defaultSubscribeForumsId}});
@@ -12,8 +11,14 @@ router
     await next();
   })
   .patch("/", async (ctx, next) => {
-    const {body, db} = ctx;
-    let {defaultSubscribeForumsId, recommendUsers} = body;
+    const {body, db, nkcModules} = ctx;
+    let {defaultSubscribeForumsId, regSettings} = body;
+    const {
+      recommendUsers, verifyMobile, verifyEmail, verifyPassword,
+      mobileCountLimit, emailCountLimit, timeout,
+      noticeForDestroy
+    } = regSettings;
+    const {checkNumber, checkString} = nkcModules.checkData;
     const forums = await db.ForumModel.find({fid: {$in: defaultSubscribeForumsId}});
     defaultSubscribeForumsId = [];
     let {
@@ -43,10 +48,34 @@ router
       }
       defaultSubscribeForumsId.push(f.fid);
     }));
+    checkNumber(mobileCountLimit, {
+      min: 1,
+      name: "手机号最大使用次数"
+    });
+    checkNumber(emailCountLimit, {
+      name: "邮箱最大使用次数",
+      min: 1
+    });
+    checkNumber(timeout, {
+      name: "操作时间",
+      min: 1
+    });
+    checkString(noticeForDestroy, {
+      name: "账号注销说明",
+      minLength: 1,
+      maxLength: 5000
+    });
     await db.SettingModel.updateOne({_id: 'register'}, {
       $set: {
         "c.defaultSubscribeForumsId": defaultSubscribeForumsId,
-        "c.recommendUsers": recommendUsers
+        "c.recommendUsers": recommendUsers,
+        "c.verifyMobile": !!verifyMobile,
+        "c.verifyEmail": !!verifyEmail,
+        "c.verifyPassword": !!verifyPassword,
+        "c.mobileCountLimit": mobileCountLimit,
+        "c.emailCountLimit": emailCountLimit,
+        "c.timeout": timeout,
+        "c.noticeForDestroy": noticeForDestroy
       }
     });
     await db.SettingModel.saveSettingsToRedis("register");

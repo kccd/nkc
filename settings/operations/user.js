@@ -203,6 +203,10 @@ module.exports = {
 					GET: "userProfile"
 				}
 			}
+		},
+		destroy: {
+    	GET: "destroyAccount",
+			POST: "destroyAccount"
 		}
 	}
 };

@@ -2,7 +2,6 @@ const Router = require('koa-router');
 const loginRouter = new Router();
 loginRouter
 	.use('/', async (ctx, next) => {
-		const {nkcModules} = ctx;
 		const {user} = ctx.data;
 		if(user) {
 			return ctx.redirect('/');

@@ -30,9 +30,44 @@ module.exports = async (ctx, next) => {
     tocKey = `app:page:${url}:toc`;
     dataKey = `app:page:${url}:data`;
   }
+  const cacheSettings = await db.SettingModel.getSettings("cache");
+
+  /* 缓存优化，存在多进程无法共享同一个Promise的问题，待解决，可能需要借助redis的发布/订阅。
+  const getCache = async (tocKey, dataKey) => {
+    let html;
+    const toc = await redisClient.getAsync(tocKey);
+    if(!toc || (ctx.reqTime.getTime() - Number(toc)) > cacheSettings.visitorPageCacheTime*1000) {
+      state.cachePage = true;
+    } else {
+      html = await redisClient.getAsync(dataKey);
+      if(!html) state.cachePage = true;
+    }
+    if(!state.cachePage) return Promise.resolve(html);
+    if(!_caches[dataKey]) {
+      _caches[dataKey] = new Promise((resolve, reject) => {
+        next()
+          .then(async () => {
+            html = ctx.body;
+            await redisClient.setAsync(tocKey, ctx.reqTime.getTime());
+            await redisClient.setAsync(dataKey, html);
+            resolve(html);
+          })
+          .catch(reject)
+          .finally(() => {
+            delete _caches[dataKey];
+          });
+      });
+    }
+    return _caches[dataKey];
+  };
+
+
+  const html_ = await getCache(tocKey, dataKey);
+  return ctx.body = html_;*/
+
+
   // 获取缓存生成的时间，判断是否过期
   const toc = await redisClient.getAsync(tocKey);
-  const cacheSettings = await db.SettingModel.getSettings("cache");
   if(!toc || (ctx.reqTime.getTime() - Number(toc)) > cacheSettings.visitorPageCacheTime*1000) {
     state.cachePage = true;
   } else {

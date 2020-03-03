@@ -1,0 +1,50 @@
+extends ../../bootstrap_base
+block title
+  title 注销账号
+  +includeCSS("/user/destroy/destroy.css")
+  if !state.isApp
+    style.
+      body{
+        background-color: #f6f6f6;
+      }
+block content
+  #data.hidden=objToStr({verifyMobile: data.verifyMobile, verifyEmail: data.verifyEmail, verifyPassword: data.verifyPassword})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3(class=state.isApp?"":"box-shadow-panel")
+        div
+          h4.text-danger
+            strong 注意事项
+          div!=experimental_render({c: data.regSettings.noticeForDestroy})
+          hr
+          .form#app(v-cloak)
+            .form-group(v-if="verifyPassword")
+              label 验证登录密码
+              input.form-control(type="password" v-model="password")
+            .form-group(v-if="verifyMobile")
+              label 验证手机
+              .row
+                .col-xs-12.col-md-4.m-t-05
+                  select.form-control(v-model="nationCode")
+                    option(v-for="n in nationCodes" :value="n.code") +{{n.code}} {{n.chineseName}}
+                .col-xs-12.col-md-8.m-t-05
+                  input.form-control(type="text" v-model.number="mobile" placeholder="请输入手机号")
+              .row
+                .col-xs-12.col-md-4.m-t-05
+                  input.form-control(type="text" v-model.number="mobileCode" placeholder="短信验证码")
+                .col-xs-12.col-md-8.m-t-05
+                  button.btn.btn-default 发送短信验证码
+            .form-group(v-if="verifyEmail")
+              label 验证邮箱
+              input.form-control(type="text" v-model="email" placeholder="请输入邮箱地址")
+              .row
+                .col-xs-12.col-md-4.m-t-05
+                  input.form-control(type="text" v-model="emailCode" placeholder="邮件验证码")
+                .col-xs-12.col-md-8.m-t-05
+                  button.btn.btn-default 发送邮件验证码
+            .form-group
+              button.btn.btn-primary(@click="verify" v-if="!passed") 提交
+              butotn.btn.btn-primary(v-else @click="submit") 确认注销
+block scripts
+  +includeJS("/nationCodes/nationCodes.js")
+  +includeJS("/user/destroy/destroy.js")

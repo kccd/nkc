@@ -47,7 +47,7 @@ var app = new Vue({
       app.info = "";
       nkcAPI("/e/settings/register", "PATCH", {
         defaultSubscribeForumsId: fid,
-        recommendUsers: this.regSettings.recommendUsers
+        regSettings: this.regSettings
       })
         .then(function() {
           app.info = "保存成功";

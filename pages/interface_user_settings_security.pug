@@ -143,5 +143,7 @@ block content
                     h5.text-info 更换绑定邮箱需要验证旧邮箱，请点击发送按钮发送验证邮件。
                     button.btn.btn-primary(@click="sendVerifyEmail") 发送验证邮件
 
+        a.text-danger(href=`/u/${data.user.uid}/destroy`) 账号注销
+
 block scripts
   +includeJS("/interface_user_settings_security.js")
