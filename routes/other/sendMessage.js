@@ -51,37 +51,6 @@ sendMessageRouter
   	await smsCode.save();
   	await sendMessage(smsCodeObj);
   	await next();
-
-
-  	/*const {db, body} = ctx;
-		const {nationCode, username, mobile, imgCode} = body;
-	  if(!username) ctx.throw(400, '请输入用户名。');
-	  const {contentLength} = ctx.tools.checkString;
-	  if(contentLength(username) > 30) ctx.throw(400, '用户名不能大于30字节(ASCII)。');
-	  const otherUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
-	  if(otherUser) ctx.throw(400, '用户名已被注册。');
-		if(!nationCode) ctx.throw(400, '请输入国际区号。');
-		if(!mobile) ctx.throw(400, '请输入手机号码。');
-		const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
-		if(otherPersonal) ctx.throw(400, `手机号码已被其他账号注册。`);
-		if(!imgCode) ctx.throw(400, '请输入图形验证码。');
-		const id = ctx.cookies.get('imgCodeId');
-		await db.ImgCodeModel.ensureCode(id, imgCode);
-		const type = 'register';
-		const ip = ctx.address;
-		const smsCodeObj = {
-			nationCode,
-			mobile,
-			type,
-			ip
-		};
-		await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
-		const {apiFunction, sendMessage} = ctx.nkcModules;
-	  smsCodeObj.code = apiFunction.random(6);
-		const smsCode = db.SmsCodeModel(smsCodeObj);
-	  await smsCode.save();
-		await sendMessage(smsCodeObj);
-		await next();*/
   })
   .post('/getback', async (ctx, next) => { // 找回密码
   	const {db, body} = ctx;
@@ -206,5 +175,24 @@ sendMessageRouter
     await smsCode.save();
     await nkcModules.sendMessage(smsCodeObj);
     await next();
-  });
+  })
+	.post("/destroy", async (ctx, next) => {
+		const {nkcModules, db, data} = ctx;
+		const {user} = data;
+		if(user.authLevel < 1) ctx.throw(400, "暂未绑定手机号");
+		const usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		const {nationCode, mobile} = usersPersonal;
+		const smsCodeObj = {
+			nationCode,
+			mobile,
+			type: "destroy",
+			ip: ctx.address
+		};
+		await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
+		smsCodeObj.code = nkcModules.apiFunction.random(6);
+		const smsCode = db.SmsCodeModel(smsCodeObj);
+		await smsCode.save();
+		await nkcModules.sendMessage(smsCodeObj);
+		await next();
+	});
 module.exports = sendMessageRouter;

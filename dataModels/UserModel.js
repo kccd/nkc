@@ -1,10 +1,14 @@
 const settings = require('../settings');
-const {certificates} = settings.permission;
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const {indexUser, updateUser} = settings.elastic;
 
 const userSchema = new Schema({
+  // 是否注销
+  destroyed: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   kcb: {
     type: Number,
     default: 0
@@ -81,15 +85,11 @@ const userSchema = new Schema({
     type: String,
 	  index: 1,
 	  default: '',
-    // unique: true,
-    // required: true,
-    // minlength: 1,
     maxlength: 30,
     trim: true
   },
   usernameLowerCase: {
     type: String,
-    // unique: true,
 	  index: 1,
 	  default: '',
     trim: true,
@@ -212,7 +212,7 @@ userSchema.virtual('boundEmail')
 
 
 
-userSchema.virtual('')
+userSchema.virtual('havePassword')
   .get(function() {
     return this._havePassword;
   })
@@ -742,7 +742,7 @@ userSchema.methods.extendGrade = async function() {
 */
 userSchema.methods.extendGeneralSettings = async function() {
   return this.generalSettings = await mongoose.model('usersGeneral').findOnly({uid: this.uid});
-}
+};
 /* 
   验证用户是否完善资料，包括：用户名、密码
   未完善则会抛出错误
@@ -1632,6 +1632,100 @@ userSchema.methods.ensureHidePostPermission = async function(post) {
   } else {
     return "half"
   }
+};
+
+/*
+* 账号注销
+* @param {String} uid 需要注销的用户ID
+* @author pengxiguaa 2020-3-4
+* */
+userSchema.statics.destroyAccount = async (options) => {
+  const {uid, ip, port} = options;
+  const UserModel = mongoose.model("users");
+  const UsersPersonalModel = mongoose.model("usersPersonal");
+  const SecretBehaviorModel = mongoose.model("secretBehaviors");
+  const user = await UserModel.findOnly({uid});
+  const usersPersonal = await UsersPersonalModel.findOnly({uid});
+  // 备份用户信息
+  // 请除用户信息
+  // 用户名修改为默认用户名
+  // 清除个人简介、文章签名
+  // 清除头像、背景
+  // 清除手机号、邮箱
+  // 清除密码
+  const oldUsername = user.username;
+  const oldDescription = user.description;
+  const oldPostSign = user.postSign;
+  const newUsername = `kc-${user.uid}`;
+  const newDescription = "";
+  const newPostSign = "";
+  const oldMobile = usersPersonal.mobile;
+  const newMobile = "";
+  const oldNationCode = usersPersonal.nationCode;
+  const newNationCode = "";
+  const oldEmail = usersPersonal.email;
+  const newEmail = "";
+  const oldHashType = usersPersonal.hashType;
+  const newHashType = "";
+  const oldHash = usersPersonal.password.hash;
+  const newHash = "";
+  const oldSalt = usersPersonal.password.salt;
+  const newSalt = "";
+  const oldAvatar = user.avatar;
+  const newAvatar = "";
+  const oldBanner = user.banner;
+  const newBanner = "";
+
+  const secret = SecretBehaviorModel({
+    type: "destroy",
+    uid,
+    ip,
+    port,
+    oldMobile,
+    oldNationCode,
+    newMobile,
+    newNationCode,
+    oldEmail,
+    newEmail,
+    oldUsername,
+    newUsername,
+    oldUsernameLowerCase: oldUsername.toLowerCase(),
+    newUsernameLowerCase: newUsername.toLowerCase(),
+    oldDescription,
+    newDescription,
+    oldPostSign,
+    newPostSign,
+    oldHashType,
+    newHashType,
+    oldHash,
+    newHash,
+    oldSalt,
+    newSalt,
+    oldAvatar,
+    newAvatar,
+    oldBanner,
+    newBanner
+  });
+  await secret.save();
+  await user.update({
+    avatar: newAvatar,
+    banner: newBanner,
+    username: newUsername,
+    usernameLowerCase: newUsername.toLowerCase(),
+    description:  newDescription,
+    postSign: newPostSign,
+    destroyed: true
+  });
+  await usersPersonal.update({
+    mobile: newMobile,
+    nationCode: newNationCode,
+    email: newEmail,
+    hashType: newHashType,
+    password: {
+      hash: newHash,
+      salt: newSalt
+    }
+  });
 };
 
 module.exports = mongoose.model('users', userSchema);

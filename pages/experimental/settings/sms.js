@@ -45,6 +45,7 @@ var app = new Vue({
         case 'changeMobile': return '更改手机号';
         case 'reset': return '绑定新手机号';
         case 'withdraw': return '提现';
+        case 'destroy': return '账号注销';
       }
     },
     testSendMessage: function() {

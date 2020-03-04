@@ -280,16 +280,12 @@ table{
 }
 .btn-theme:hover{
   color: #fff;
-  background-color: #438abe;
-  border-color: #438abe;
+  opacity: 0.9;
 }
 .btn-theme:focus{
   color: #fff;
-  background-color: #438abe;
-  border-color: #438abe;
+  opacity: 0.9;
 }
-
-
 
 .list-header{
   height: 2rem;

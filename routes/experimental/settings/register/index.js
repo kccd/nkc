@@ -15,19 +15,12 @@ router
     let {defaultSubscribeForumsId, regSettings} = body;
     const {
       recommendUsers, verifyMobile, verifyEmail, verifyPassword,
-      mobileCountLimit, emailCountLimit, timeout,
+      mobileCountLimit, emailCountLimit,
       noticeForDestroy
     } = regSettings;
     const {checkNumber, checkString} = nkcModules.checkData;
     const forums = await db.ForumModel.find({fid: {$in: defaultSubscribeForumsId}});
     defaultSubscribeForumsId = [];
-    let {
-      digestThreadsCount,
-      threadCount,
-      postCount,
-      xsf,
-      lastVisitTime
-    } = recommendUsers;
     recommendUsers.usersCount = parseInt(recommendUsers.usersCount);
     recommendUsers.digestThreadsCount = parseInt(recommendUsers.digestThreadsCount);
     recommendUsers.threadCount = parseInt(recommendUsers.threadCount);
@@ -56,10 +49,6 @@ router
       name: "邮箱最大使用次数",
       min: 1
     });
-    checkNumber(timeout, {
-      name: "操作时间",
-      min: 1
-    });
     checkString(noticeForDestroy, {
       name: "账号注销说明",
       minLength: 1,
@@ -74,7 +63,6 @@ router
         "c.verifyPassword": !!verifyPassword,
         "c.mobileCountLimit": mobileCountLimit,
         "c.emailCountLimit": emailCountLimit,
-        "c.timeout": timeout,
         "c.noticeForDestroy": noticeForDestroy
       }
     });

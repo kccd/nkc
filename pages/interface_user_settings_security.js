@@ -293,19 +293,3 @@ var app = new Vue({
     }
   }
 });
-
-var destroy = new Vue({
-  el: "#destroy",
-  data: {
-    show: false
-  },
-  methods: {
-    switchStatus: function() {
-      this.show = !this.show;
-    }
-  }
-});
-
-function switchStatus() {
-  destroy.switchStatus();
-}

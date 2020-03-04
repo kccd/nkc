@@ -299,6 +299,7 @@
   "visitExperimentalEmailSettings": "访问邮件设置",
   "modifyEmailSettings": "修改邮件设置",
   "sendLoginMessage": "发送登录短信验证码",
+  "sendDestroyMessage": "发送账号注销短信验证码",
 
   "visitMessagePage": "打开信息页面",
   "getSystemInfo": "获取系统通知",

@@ -436,7 +436,12 @@ NKC.methods.disabledPosts = function(pid) {
   });
 };
 
-// 页面折叠记录位置
+/*
+* 页面折叠记录位置
+* 创建实例的时候记录位置
+* 执行方法restore时跳转到之前记录的位置
+* @author pengxiguaa 2020-3-4
+* */
 NKC.modules.PagePosition = function() {
   var self = this;
   self.fromTheBottom = $(document).height() - $(document).scrollTop();
@@ -446,4 +451,26 @@ NKC.modules.PagePosition = function() {
       window.scrollTo(0, distance);
     }, 100);
   }
+};
+
+/*
+* 发送短信验证码
+* @param {String} type 验证码类型
+* @return {Promise}
+* @author pengxiguaa 2020-3-4
+* */
+
+NKC.methods.sendMobileCode = function(type) {
+  return nkcAPI("/sendMessage/" + type, "POST")
+};
+/*
+* 发送邮件验证码
+* @param {String} type 验证码类型
+* @return {Promise}
+* @author pengxiguaa 2020-3-4
+* */
+NKC.methods.sendEmailCode = function(type) {
+  return nkcAPI("/u/" + NKC.configs.uid + "/settings/email", "POST", {
+    operation: type
+  });
 };

@@ -20,7 +20,7 @@ block eContent
     include ../../../publicModules/selectForum/selectForum
     .row
       .hidden#data= objToStr({regSettings: data.regSettings, selectedForums: data.selectedForums})
-      .col-xs-12.col-md-12#app(v-cloak)
+      .col-xs-12.col-md-12#app(v-cloak v-if="regSettings")
         h4 一、注册用户默认关注的栏目
         .m-t-1
           .forum-span(v-for="forum in selectedForums" :style="'background-color: ' + forum.color" @click="remove(forum)")
@@ -57,7 +57,7 @@ block eContent
           .col-xs-12.col-md-4
             .form
               .form-group
-                label 验证账号所有者（如果已绑定）
+                label 验证账号所有者（如果已设置）
                 .checkbox
                   label.m-r-1
                     input(type="checkbox" :value="true" v-model="regSettings.verifyPassword")
@@ -74,9 +74,6 @@ block eContent
               .form-group
                 label 邮箱最大使用次数
                 input.form-control(type="text" v-model.number="regSettings.emailCountLimit")
-              .form-group
-                label 操作时间限制（验证通过到点击注销按钮，分钟）
-                input.form-control(type="text" v-model.number="regSettings.timeout")
               .form-group
                 label 注销说明（注销页面的注意事项）
                 textarea.form-control(v-model="regSettings.noticeForDestroy" rows=7)

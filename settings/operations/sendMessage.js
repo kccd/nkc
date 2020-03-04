@@ -16,5 +16,8 @@ module.exports = {
 	},
   withdraw: {
 	  POST: "sendWithdrawMessage"
-  }
+  },
+	destroy: {
+		POST: "sendDestroyMessage"
+	}
 };

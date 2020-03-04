@@ -17,34 +17,39 @@ block content
             strong 注意事项
           div!=experimental_render({c: data.regSettings.noticeForDestroy})
           hr
-          .form#app(v-cloak)
-            .form-group(v-if="verifyPassword")
-              label 验证登录密码
-              input.form-control(type="password" v-model="password")
-            .form-group(v-if="verifyMobile")
-              label 验证手机
-              .row
-                .col-xs-12.col-md-4.m-t-05
-                  select.form-control(v-model="nationCode")
-                    option(v-for="n in nationCodes" :value="n.code") +{{n.code}} {{n.chineseName}}
-                .col-xs-12.col-md-8.m-t-05
-                  input.form-control(type="text" v-model.number="mobile" placeholder="请输入手机号")
-              .row
-                .col-xs-12.col-md-4.m-t-05
-                  input.form-control(type="text" v-model.number="mobileCode" placeholder="短信验证码")
-                .col-xs-12.col-md-8.m-t-05
-                  button.btn.btn-default 发送短信验证码
-            .form-group(v-if="verifyEmail")
-              label 验证邮箱
-              input.form-control(type="text" v-model="email" placeholder="请输入邮箱地址")
-              .row
-                .col-xs-12.col-md-4.m-t-05
-                  input.form-control(type="text" v-model="emailCode" placeholder="邮件验证码")
-                .col-xs-12.col-md-8.m-t-05
-                  button.btn.btn-default 发送邮件验证码
-            .form-group
-              button.btn.btn-primary(@click="verify" v-if="!passed") 提交
-              butotn.btn.btn-primary(v-else @click="submit") 确认注销
+          div#app(v-cloak)
+            .form(v-if="!passed")
+              .form-group(v-if="verifyPassword")
+                label 验证登录密码
+                .row
+                  .col-xs-12.col-md-5
+                    input.form-control(type="password" v-model="password" placeholder="请输入登录密码")
+              .form-group(v-if="verifyMobile")
+                label 验证手机
+                h5=`已绑定手机 ${data.mobile}`
+                .row
+                  .col-xs-12.col-md-5.m-t-05
+                    input.form-control(type="text" v-model="mobileCode" placeholder="短信验证码")
+                  .col-xs-12.col-md-7.m-t-05
+                    button.btn.btn-default(v-if="mobileTime <= 0" @click="sendMobileCode") 发送验证码
+                    button.btn.btn-default(v-else disabled) 发送验证码({{mobileTime}})
+              .form-group(v-if="verifyEmail")
+                label 验证邮箱
+                h5=`已绑定邮箱 ${data.email}`
+                .row
+                  .col-xs-12.col-md-5.m-t-05
+                    input.form-control(type="text" v-model="emailCode" placeholder="邮件验证码")
+                  .col-xs-12.col-md-7.m-t-05
+                    button.btn.btn-default(v-if="emailTime <= 0" @click="sendEmailCode") 发送验证码
+                    button.btn.btn-default(v-else disabled) 发送验证码({{emailTime}})
+              .form-group
+                button.btn.btn-theme(v-if="disableVerifyButton") 提交
+                button.btn.btn-theme(@click="verify" v-else disabled) 提交
+            .m-t-3.m-b-2(v-else)
+              h4.text-center.text-success 验证通过，点击下方的按钮即可完成账号注销。
+              .text-center.m-t-2
+                button.btn.btn-theme(@click="submit") 确认注销
+
 block scripts
   +includeJS("/nationCodes/nationCodes.js")
   +includeJS("/user/destroy/destroy.js")

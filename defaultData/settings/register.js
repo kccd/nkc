@@ -13,7 +13,6 @@ module.exports = {
     verifyEmail: true,
     verifyMobile: true,
     verifyPassword: true,
-    timeout: 60, // 分钟
     mobileCountLimit: 3, // 手机号使用次数限制
     emailCountLimit: 3, // 邮箱使用次数限制
     //注销说明

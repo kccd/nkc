@@ -158,7 +158,8 @@ emailRouter
 			email = email.trim();
 			if(!apiFunction.checkEmailFormat(email)) ctx.throw(400, '邮箱格式不正确');
 			if(userPersonal.email) ctx.throw(400, '请勿重复绑定邮箱，如需更换请点击“更换邮箱”按钮');
-			if(userPersonal.email === email) ctx.throw(400, '您已绑定该邮箱，请更换');
+			const sameUserPersonal = await db.UsersPersonalModel.findOne({email});
+			if (sameUserPersonal) ctx.throw(400, '该邮箱已被其他账号绑定，请更换');
 			const type = 'bindEmail';
 			await db.EmailCodeModel.ensureSendPermission({
 				email,
@@ -188,7 +189,7 @@ emailRouter
 				html: text + link + h3
 			});*/
 		} else if(operation === 'verifyOldEmail') {
-			if(!userPersonal.email) ctx.throw(400, '您暂未绑定任何邮箱');
+			if(!userPersonal.email) ctx.throw(400, '你暂未绑定任何邮箱');
 			const type = 'verifyOldEmail';
 			await db.EmailCodeModel.ensureSendPermission({
 				email: userPersonal.email,
@@ -230,8 +231,8 @@ emailRouter
 				ctx.throw(400, `旧邮箱${err.message}`);
 			}
 			const sameUserPersonal = await db.UsersPersonalModel.findOne({email});
-			if(sameUserPersonal) ctx.throw(400, '该邮箱已被其他账号绑定，请更换');
-			if(email === userPersonal.email) {
+			if (sameUserPersonal) ctx.throw(400, '该邮箱已被其他账号绑定，请更换');
+			if (email === userPersonal.email) {
 				ctx.throw(400, '您已绑定该邮箱，请更换');
 			}
 			const type = 'bindEmail';
@@ -244,11 +245,30 @@ emailRouter
 			});
 			await emailCode.save();
 			await sendEmail({
-        type,
-        email,
-        code: token
-      })
-
+				type,
+				email,
+				code: token
+			})
+		} else if(operation === "destroy") {
+			const type = 'destroy';
+			if(!userPersonal.email) ctx.throw(400, "你未绑定任何邮箱");
+			await db.EmailCodeModel.ensureSendPermission({
+				email: userPersonal.email,
+				type
+			});
+			const token = apiFunction.getEmailToken();
+			const emailCode = db.EmailCodeModel({
+				email: userPersonal.email,
+				type,
+				token,
+				uid: user.uid
+			});
+			await emailCode.save();
+			await sendEmail({
+				email: userPersonal.email,
+				type,
+				code: token
+			});
 		} else {
 			ctx.throw(400, '未知的操作类型');
 		}

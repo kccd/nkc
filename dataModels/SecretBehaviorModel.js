@@ -95,11 +95,28 @@ const secretBehaviorSchema = new Schema({
 	newHash: String,
 	newSalt: String,
 
+	// 个人简介
+	oldDescription: String,
+	newDescription: String,
+
+	// 文章签名
+	oldPostSign: String,
+	newPostSign: String,
+
+	// 头像
+	oldAvatar: String,
+	newAvatar: String,
+
+	// 背景
+	oldBanner: String,
+	newBanner: String,
+
 	toc: {
 		type: Date,
 		default: Date.now,
 		index: 1
 	},
+
 	tlm: {
 		type: Date,
 		index: 1
@@ -142,7 +159,7 @@ secretBehaviorSchema.methods.extendOperationName = async function() {
 		}
 	}
 	return this.operationData = operationData
-}
+};
 
 const SecretBehaviorModel = mongoose.model('secretBehaviors', secretBehaviorSchema);
 module.exports = SecretBehaviorModel;
