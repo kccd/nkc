@@ -154,7 +154,7 @@ settingSchema.statics.checkMobile = async (nationCode, mobile, uid) => {
     ]
   }, {uid: 1});
   const usersId = new Set(secretBehaviors.map(s => s.uid));
-  if(!usersId.has(uid) && usersId.size >= mobileCountLimit) throwErr(403, `为了防止注册小号扰乱交流秩序，每个手机号只能使用${mobileCountLimit}次。`);
+  if(!usersId.has(uid) && usersId.size >= mobileCountLimit) throwErr(403, `为了净化网络生态，每个手机号只能使用${mobileCountLimit}次，使用次数已用尽。`);
 };
 /*
 * 检测邮箱是否已被绑定、使用次数是否超过限制
@@ -181,7 +181,7 @@ settingSchema.statics.checkEmail = async (email, uid) => {
     ]
   }, {uid: 1});
   const usersId = new Set(secretBehaviors.map(s => s.uid));
-  if(!usersId.has(uid) && usersId.size >= emailCountLimit) throwErr(403, `为了防止注册小号扰乱交流秩序，每个邮箱只能使用${emailCountLimit}次。`);
+  if(!usersId.has(uid) && usersId.size >= emailCountLimit) throwErr(403, `为了净化网络生态，每个邮箱只能使用${emailCountLimit}次，使用次数已用尽。`);
 };
 /*
   根据用户的证书以及等级 获取用户与下载相关的设置

@@ -76,7 +76,7 @@ const app = new Vue({
     },
     submit() {
       const {emailCode, mobileCode, password} = this;
-      sweetQuestion("确定即会注销，注销后不可以用相同用户名重新注册，你将不能再对该账号及其发表的内容进行任何处置，你想好了吗？")
+      sweetQuestion("确定即会注销，注销后短期内不能使用原有用户名重新注册，你将不能再对该账号、积分、发表的内容进行处置，你想好了吗？")
         .then(() => {
           return nkcAPI(`/u/${NKC.configs.uid}/destroy`, "POST", {
             type: "destroy",

@@ -19,12 +19,12 @@ router
     data.passed = passed;
     data.notices = [];
     const obj = {
-      "fund": "基金申请未完成",
-      "forum": "担任专家",
-      "activity": "活动未完成",
+      "fund": "存在科创基金申请尚未完成或尚未结题",
+      "forum": "尚未辞去主管专家职务或辞职申请尚未批准",
+      "activity": "发布的活动尚未完成",
       "column": "专栏未关闭",
-      "shopSeller": "商品未停售或订单未完成",
-      "shopBuyer": "购买商品未完成",
+      "shopSeller": "出售的商品尚未停售或销售订单尚未完成",
+      "shopBuyer": "购买商品尚未确认收货",
     };
     for(const key in status) {
       if(!status[key]) {
