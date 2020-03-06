@@ -1474,7 +1474,7 @@ userSchema.statics.checkUsername = async (username = "") => {
   const length = contentLength(username);
   if (!length) throwErr(400, "用户名不能为空");
   let reg = /\s/;
-  if(reg.test(username)) ctx.throw(400, '用户名不允许有空格');
+  if(reg.test(username)) throwErr(400, '用户名不允许有空格');
   if (length > 30) throwErr(400, "用户名不能超过30字节");
   reg = /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/;
   if (!reg.test(username))
@@ -1635,6 +1635,80 @@ userSchema.methods.ensureHidePostPermission = async function(post) {
 };
 
 /*
+* 检测账号是否符合注销条件，符合以下条件即可注销
+* 1. 账号下不存在正常开放的专栏
+* 2. 账号下不存在正在出售的商品且不存在未完成的出售订单
+* 3. 账号下不存在未完成的购买订单
+* 4. 账号下不存在未完成的基金申请
+* 5. 账号未担任任一专业的专家
+* 6. 账号下不存在正在进行的活动
+* */
+
+userSchema.statics.checkStatusForDestroyAccount = async (uid) => {
+  const status = {
+    column: true,
+    shopSeller: true,
+    shopBuyer: true,
+    fund: true,
+    forum: true,
+    activity: true
+  };
+  const UserModel = mongoose.model("users");
+  const ShopGoodsModel = mongoose.model("shopGoods");
+  const ShopOrdersModel = mongoose.model("shopOrders");
+  const ForumModel = mongoose.model("forums");
+  const ActivityModel = mongoose.model("activity");
+  const FundApplicationFormModel = mongoose.model("fundApplicationForms");
+  const user = await UserModel.findOnly({uid});
+  // 拓展用户信息 判断账号下是否有正常开发的专栏
+  await UserModel.extendUserInfo(user);
+  if(user.column) status.column = false;
+  // 判断用户出售的商品是否均停售，订单是否都已完成
+  const productCount = await ShopGoodsModel.count({uid, productStatus: "insale"});
+  if(productCount > 0) status.shopSeller = false;
+  const sellOrderCount = await ShopOrdersModel.count({
+    sellUid: uid,
+    closeStatus: {$ne: true},
+    orderStatus: {$ne: "finish"}
+  });
+  if(sellOrderCount > 0) status.shopSeller = false;
+  // 判断用户购买的商品是否都已完成
+  const buyOrderCount = await ShopOrdersModel.count({
+    buyUid: uid,
+    closeStatus: {$ne: true},
+    orderStatus: {$ne: "finish"}
+  });
+  if(buyOrderCount > 0) status.shopBuyer = false;
+  // 判断用户申请的基金是否都已完成
+  const fundApplicationCount = await FundApplicationFormModel.count({
+    uid,
+    useless: null,
+    disabled: false,
+    "status.completed": null
+  });
+  if(fundApplicationCount > 0) status.fund = false;
+  const forumCount = await ForumModel.count({moderators: uid});
+  if(forumCount > 0) status.forum = false;
+  // 判断用户发布的活动是否都已完成
+  const activityCount = await ActivityModel.count({
+    uid,
+    activityType: {$ne: "close"},
+    isBlock: {$ne: true},
+    holdEndTime: {$gte: Date.now()}
+  });
+  if(activityCount > 0) status.activity = false;
+  return {
+    passed: status.column &&
+      status.forum &&
+      status.activity &&
+      status.fund &&
+      status.shopBuyer &&
+      status.shopSeller,
+    status: status
+  };
+};
+
+/*
 * 账号注销
 * @param {String} uid 需要注销的用户ID
 * @author pengxiguaa 2020-3-4
@@ -1642,6 +1716,8 @@ userSchema.methods.ensureHidePostPermission = async function(post) {
 userSchema.statics.destroyAccount = async (options) => {
   const {uid, ip, port} = options;
   const UserModel = mongoose.model("users");
+  const {passed} = await UserModel.checkStatusForDestroyAccount(uid);
+  if(!passed) throwErr(403, "账号暂未满足注销要求");
   const UsersPersonalModel = mongoose.model("usersPersonal");
   const SecretBehaviorModel = mongoose.model("secretBehaviors");
   const user = await UserModel.findOnly({uid});
@@ -1656,7 +1732,7 @@ userSchema.statics.destroyAccount = async (options) => {
   const oldUsername = user.username;
   const oldDescription = user.description;
   const oldPostSign = user.postSign;
-  const newUsername = `kc-${user.uid}`;
+  const newUsername = `zx-${user.uid}`;
   const newDescription = "";
   const newPostSign = "";
   const oldMobile = usersPersonal.mobile;

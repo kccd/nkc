@@ -13,15 +13,16 @@
         .float-user-banner(:style="'background-image: url('+getUrl('userBanner', user.banner)+')'")
         a(:href="'/u/' + user.uid" target="_blank").float-user-avatar
           img(:src="getUrl('userAvatar', user.avatar)")
-        .float-user-uid ID: {{user.uid}}  
+        .float-user-uid ID: {{user.uid}}
         .float-user-info
           a(:href="'/u/' + user.uid" target="_blank" :style="uid?'padding-right: 3.5rem;':''" :title="user.username").float-user-name {{user.username}}
           button(v-if="uid && subscribed" @click.stop="subscribe") 取关
           button.active(v-if="uid && !subscribed" @click.stop="subscribe") 关注
           .float-user-cert
             img.float-user-grade(:src="getUrl('gradeIcon', user.grade._id)" :title="user.grade.displayName")
-            span(:title="user.info.certsName") {{user.info.certsName}}
-          .float-user-description(:title="user.description") {{user.description}}     
+            .float-user-destroy(v-if="user.destroyed") 用户已注销
+            span(:title="user.info.certsName" v-else) {{user.info.certsName}}
+          .float-user-description(:title="user.description") {{user.description}}
           .float-user-time {{format("YYYY/MM/DD", user.toc)}}注册，{{fromNow(user.tlv)}}活动
       .float-user-bottom
         .float-user-number(:class="{'column': !!user.column}")

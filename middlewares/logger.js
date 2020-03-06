@@ -94,6 +94,7 @@ const logger = async (ctx, next) => {
       }else if(type.type === 'timeLine'){
         await new db.InfoBehaviorModel(behavior).save()
       }else if(type.type === 'secret'){
+        behavior.type = behavior.operationId;
         if(ctx.data.operationId === "modifyPassword"){
           behavior.oldHashType = userPersonal.hashType;
           behavior.oldHash = userPersonal.password.hash;

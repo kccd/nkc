@@ -46,6 +46,7 @@ var app = new Vue({
         case 'reset': return '绑定新手机号';
         case 'withdraw': return '提现';
         case 'destroy': return '账号注销';
+        case "unbindMobile": return "解绑手机号"
       }
     },
     testSendMessage: function() {

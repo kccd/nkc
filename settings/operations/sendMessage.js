@@ -19,5 +19,8 @@ module.exports = {
   },
 	destroy: {
 		POST: "sendDestroyMessage"
+	},
+	unbindMobile: {
+		POST: "sendUnbindMobileMessage"
 	}
 };

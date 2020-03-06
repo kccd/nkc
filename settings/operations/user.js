@@ -75,6 +75,7 @@ module.exports = {
 			mobile: {
 				GET: 'visitMobileSettings',
 				PATCH: 'modifyMobile',
+				DELETE: "unbindMobile",
 				POST: 'bindMobile'
 			},
 			email: {
@@ -85,6 +86,9 @@ module.exports = {
 				},
 				verify: {
 					GET: 'changeEmail'
+				},
+				unbind: {
+					GET: 'unbindEmail'
 				}
 			},
 			verify: {

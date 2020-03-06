@@ -121,6 +121,9 @@ loginRouter
 			ctx.throw(400, `未知的登录方式：${loginType}`);
 		}
 
+		// 判断用户是否注销
+		if(user.destroyed) ctx.throw(400, "此账号已被注销");
+
 		if(loginType !== 'code') {
 
 			let {

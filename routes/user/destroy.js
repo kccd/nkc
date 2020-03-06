@@ -15,6 +15,22 @@ router
     if(data.verifyEmail) {
       data.email = userPersonal.email.replace(/.{4}@/ig, "****@");
     }
+    const {status, passed} = await db.UserModel.checkStatusForDestroyAccount(user.uid);
+    data.passed = passed;
+    data.notices = [];
+    const obj = {
+      "fund": "基金申请未完成",
+      "forum": "担任专家",
+      "activity": "活动未完成",
+      "column": "专栏未关闭",
+      "shopSeller": "商品未停售或订单未完成",
+      "shopBuyer": "购买商品未完成",
+    };
+    for(const key in status) {
+      if(!status[key]) {
+        data.notices.push(obj[key]);
+      }
+    }
     await next();
   })
   .get("/", async (ctx, next) => {

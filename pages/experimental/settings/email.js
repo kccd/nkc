@@ -15,6 +15,7 @@ var app = new Vue({
         case 'getback': return '找回密码';
         case 'changeEmail': return '更换邮箱';
         case "destroy": return "账号注销";
+        case "unbindEmail": return "解绑邮箱"
       }
     },
     testSendEmail: function() {

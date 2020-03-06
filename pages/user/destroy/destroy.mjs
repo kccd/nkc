@@ -89,7 +89,11 @@ const app = new Vue({
         })
         .then(() => {
           // 注销完成
-          window.location.href = "/";
+          if(NKC.configs.isApp) {
+            emitEvent("logout");
+          } else {
+            window.location.href = "/";
+          }
         })
         .catch(sweetError);
     }

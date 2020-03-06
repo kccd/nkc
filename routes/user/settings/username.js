@@ -17,7 +17,7 @@ router
 		if(sameUsernameUser) ctx.throw(400, '用户名已存在');
 		const sameNameColumn = await db.ColumnModel.findOne({uid: {$ne: user.uid}, nameLowerCase: usernameLowerCase});
 		if(sameNameColumn) ctx.throw(400, "用户名已存在");
-		const oldUsername = await db.SecretBehaviorModel.findOne({operationId: 'modifyUsername', oldUsernameLowerCase: usernameLowerCase, toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
+		const oldUsername = await db.SecretBehaviorModel.findOne({type: {$in: ['modifyUsername', "destroy"]}, oldUsernameLowerCase: usernameLowerCase, toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
 		if(oldUsername && oldUsername.uid !== user.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
 
 		if(needKcb && needKcb > 0) {

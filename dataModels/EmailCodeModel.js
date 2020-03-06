@@ -51,7 +51,7 @@ emailCodeSchema.statics.ensureEmailCode = async (obj) => {
 	const {emailCodeTime} = require('../settings/sendMessage');
 	const emailCode = await EmailCodeModel.findOne({email, token, type, toc: {$gt: (Date.now() - emailCodeTime)}, used: false});
 	if(!emailCode) {
-		const err = new Error('邮件已失效，请重新发送邮件。');
+		const err = new Error('验证码不正确或已失效，请检查或重新获取验证码。');
 		err.status = 400;
 		throw err;
 	} else {

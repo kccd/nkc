@@ -58,6 +58,11 @@ manageRouter
   // .use("/:uid/shelf", shelfRouter.routes(), shelfRouter.allowedMethods())
 
   .use('/home', homeRouter.routes(), homeRouter.allowedMethods())
+  .use("/:uid", async (ctx, next) => {
+    const {data, params} = ctx;
+    if(!["order", "settings", "goods", "shelf", "home"].includes(params.uid) && data.user.uid !== params.uid) ctx.throw(403, "权限不足");
+    await next();
+  })
   .use('/:uid/info', infoRouter.routes(), infoRouter.allowedMethods())
   .use('/:uid/decoration', decorationRouter.routes(), decorationRouter.allowedMethods())
   .use('/:uid/classify', classifyRouter.routes(), classifyRouter.allowedMethods())

@@ -298,7 +298,8 @@ module.exports = {
 			DELETE: 'deletePublicLogs'
 		},
 		secret: {
-			GET: 'visitSecretLogs'
+			GET: 'visitSecretLogs',
+			POST: 'visitSecretLogs'
 		},
     message: {
 		  GET: "visitMessageLogs"

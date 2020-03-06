@@ -24,6 +24,11 @@
   position: relative;
   border-radius: 3px;
 }
+#floatUserPanel .float-user .float-user-destroy {
+  display: inline-block;
+  font-size: 1rem;
+  color: #777;
+}
 #floatUserPanel .float-user .float-user-top {
   position: relative;
   height: 9rem;

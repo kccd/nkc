@@ -1,5 +1,8 @@
 var upLoadFile;
 
+// 初始化编辑器
+var ue = UE.getEditor("editor", NKC.configs.ueditor.activityConfigs);
+
 $.getJSON('../location.json',function(data){
 	for (var i = 0; i < data.length; i++) {
 		var area = {id:data[i].id,name:data[i].cname,level:data[i].level,parentId:data[i].upid};

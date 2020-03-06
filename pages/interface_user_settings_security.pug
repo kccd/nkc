@@ -2,7 +2,7 @@ extends bootstrap_base
 block title
   title 账号安全
 block content
-  #data.hidden=objToStr({user: data.user, email: data.userEmail})
+  #data.hidden=objToStr({user: data.user, email: data.userEmail, mobile: data.mobile})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -32,7 +32,7 @@ block content
               .form-group
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(onclick=`submitPassword(${data.user.uid})`) 提交
-        .panel.panel-default
+        //-.panel.panel-default
           .panel-heading
             span 绑定手机
           .panel-body
@@ -95,6 +95,80 @@ block content
                     button.btn.btn-primary(onclick=`submitBindMobile(${data.user.uid})`) 提交
         .panel.panel-default
           .panel-heading
+            span 绑定手机
+          .panel-body#mobileApp(v-cloak)
+            .form-horizontal(v-if="mobile")
+              .form-group
+                label.col-sm-2.control-label 已绑定手机号：
+                .col-sm-4
+                  h4=`+${data.nationCode} ${data.mobile}`
+              .form-group(v-if="!formType")
+                label.col-sm-2.control-label
+                .col-sm-4
+                  button.btn.btn-primary(@click="formType = 'changeMobile'") 更换手机
+                  button.btn.btn-default(@click="formType = 'unbindMobile'") 解绑
+            .form-horizontal(v-if="formType === 'bind'")
+              .form-group
+                label.col-sm-2.control-label 国际区号：
+                .col-sm-4
+                  select.form-control(v-model="newNationCode")
+                    option(v-for="n in nationCodes" :value="n.code") +{{n.code}} {{n.chineseName}}
+              .form-group
+                label.col-sm-2.control-label 手机号
+                .col-sm-4
+                  input.form-control(type='text' placeholder='请输入手机号码' v-model="newMobile")
+              .form-group
+                label.col-sm-2.control-label 手机验证码：
+                .col-sm-2
+                  input.form-control(type='text' placeholder='请输入验证码' v-model="newCode")
+                .col-sm-5
+                  button.btn.btn-primary(@click=`bindMobileMessage` v-if="newTime <= 0") 获取验证码
+                  button.btn.btn-primary(v-else disabled) 获取验证码({{newTime}})
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(@click=`submitBindMobile`) 提交
+            .form-horizontal(v-else-if="formType === 'changeMobile'")
+              .form-group
+                label.col-sm-2.control-label 旧手机验证码：
+                .col-sm-2
+                  input.form-control(type='text' placeholder='请输入验证码' v-model="oldCode")
+                .col-sm-5
+                  button.btn.btn-primary(@click=`sendMessage(false)` v-if="oldTime <= 0") 获取验证码
+                  button.btn.btn-primary(v-else disabled) 获取验证码({{oldTime}})
+              .form-group
+                label.col-sm-2.control-label 新手机国际区号：
+                .col-sm-4
+                  select.form-control(v-model="newNationCode")
+                    option(v-for="n in nationCodes" :value="n.code") +{{n.code}} {{n.chineseName}}
+              .form-group
+                label.col-sm-2.control-label 新手机号
+                .col-sm-4
+                  input.form-control(type='text' placeholder='请输入手机号码' v-model="newMobile")
+              .form-group
+                label.col-sm-2.control-label 新手机验证码：
+                .col-sm-2
+                  input.form-control(type='text' placeholder='请输入验证码' v-model="newCode")
+                .col-sm-5
+                  button.btn.btn-primary(@click=`sendMessage(true)` v-if="newTime <= 0") 获取验证码
+                  button.btn.btn-primary(v-else disabled) 获取验证码({{newTime}})
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(@click=`submitChangeMobile`) 提交
+                  button.btn.btn-default(@click=`formType = ''`) 取消
+            .form-horizontal(v-else-if="formType === 'unbindMobile'")
+              .form-group
+                label.col-sm-2.control-label 手机验证码：
+                .col-sm-2
+                  input.form-control(type='text' placeholder='请输入验证码' v-model="oldCode")
+                .col-sm-5
+                  button.btn.btn-primary(@click=`unbindMobileMessage` v-if="oldTime <= 0") 获取验证码
+                  button.btn.btn-primary(v-else disabled) 获取验证码({{oldTime}})
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(@click=`submitUnbindMobile`) 提交
+                  button.btn.btn-default(@click=`formType = ''`) 取消
+        .panel.panel-default
+          .panel-heading
             span 绑定邮箱
           .panel-body
             #app(v-cloak)
@@ -108,7 +182,8 @@ block content
                   .col-sm-2
                     input.form-control(type='text' placeholder='请输入验证码' v-model="newEmailCode")
                   .col-sm-5
-                    button.btn.btn-primary(@click=`getBindEmailCode`) 获取验证码
+                    button.btn.btn-primary(@click=`getBindEmailCode` v-if="newTime <= 0") 获取验证码
+                    button.btn.btn-primary(v-else disabled) 获取验证码({{newTime}})
                 .form-group
                   .col-sm-4.col-sm-offset-2
                     button.btn.btn-primary(@click=`submitBindEmail`) 提交
@@ -117,14 +192,16 @@ block content
                   label.col-sm-2.control-label 已绑定邮箱：
                   .col-sm-10
                     h4 {{email}}
-                    button.btn.btn-primary(v-if="!changeEmail" @click="changeEmail = !changeEmail") 更换邮箱
-                div(v-if="changeEmail")
+                    button.btn.btn-primary(v-if="!formType" @click="formType = 'changeEmail'") 更换邮箱
+                    button.btn.btn-default(v-if="!formType" @click="formType = 'unbindEmail'") 解绑
+                div(v-if="formType === 'changeEmail'")
                   .form-group
                     label.col-sm-2.control-label 旧邮箱验证码：
                     .col-sm-2
                       input.form-control(type='text' placeholder='请输入验证码' v-model="oldEmailCode")
                     .col-sm-5
-                      button.btn.btn-primary(@click=`getOldEmailCode`) 获取验证码
+                      button.btn.btn-primary(@click=`getOldEmailCode` v-if="oldTime <= 0") 获取验证码
+                      button.btn.btn-primary(v-else disabled) 获取验证码({{oldTime}})
                   .form-group
                     label.col-sm-2.control-label 新邮箱：
                     .col-sm-4
@@ -134,11 +211,24 @@ block content
                     .col-sm-2
                       input.form-control(type='text' placeholder='请输入验证码' v-model="newEmailCode")
                     .col-sm-5
-                      button.btn.btn-primary(@click=`getNewEmailCode`) 获取验证码
+                      button.btn.btn-primary(@click=`getNewEmailCode` v-if="newTime <= 0") 获取验证码
+                      button.btn.btn-primary(v-else disabled) 获取验证码({{newTime}})
                   .form-group
                     .col-sm-4.col-sm-offset-2
                       button.btn.btn-primary(@click=`submitChangeEmail`) 提交
-
+                      button.btn.btn-default(@click=`formType = ''`) 取消
+                div(v-else-if="formType === 'unbindEmail'")
+                  .form-group
+                    label.col-sm-2.control-label 邮箱验证码:
+                    .col-sm-2
+                      input.form-control(type="text" placeholder="请输入验证码" v-model="oldEmailCode")
+                    .col-sm-5
+                      button.btn.btn-primary(@click="getEmailCode('unbindEmail')" v-if="oldTime <= 0") 获取验证码
+                      button.btn.btn-primary(v-else disabled) 获取验证码({{oldTime}})
+                  .form-group
+                    .col-sm-4.col-sm-offset-2
+                      button.btn.btn-primary(@click=`submitUnbindEmail`) 提交
+                      button.btn.btn-default(@click=`formType = ''`) 取消
                   //
                     h5.text-info 更换绑定邮箱需要验证旧邮箱，请点击发送按钮发送验证邮件。
                     button.btn.btn-primary(@click="sendVerifyEmail") 发送验证邮件
@@ -146,4 +236,5 @@ block content
           a.text-danger(href=`/u/${data.user.uid}/destroy`) 账号注销
 
 block scripts
+  +includeJS("/nationCodes/nationCodes.js")
   +includeJS("/interface_user_settings_security.js")

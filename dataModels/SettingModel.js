@@ -126,8 +126,64 @@ settingSchema.statics.checkRestricted = async (code, number) => {
     }
   }
 };
-
-/* 
+/*
+* 检测手机号是否受限制、是否已被绑定、使用次数是否超过限制
+* @param {String} nationCode 国际区号
+* @param {String} mobile 手机号码
+* @author pengxiguaa 2020-3-6
+* */
+settingSchema.statics.checkMobile = async (nationCode, mobile, uid) => {
+  const SettingModel = mongoose.model("settings");
+  await SettingModel.checkRestricted(nationCode, mobile);
+  const regSettings = await SettingModel.getSettings("register");
+  const UsersPersonalModel = mongoose.model("usersPersonal");
+  const SecretBehaviorModel = mongoose.model("secretBehaviors");
+  const {mobileCountLimit} = regSettings;
+  const used = await UsersPersonalModel.count({nationCode, mobile});
+  if(used) throwErr(403, "此号码已被其他账号绑定");
+  const secretBehaviors = await SecretBehaviorModel.find({
+    $or: [
+      {
+        oldMobile: mobile,
+        oldNationCode: nationCode
+      },
+      {
+        newMobile: mobile,
+        newNationCode: nationCode
+      }
+    ]
+  }, {uid: 1});
+  const usersId = new Set(secretBehaviors.map(s => s.uid));
+  if(!usersId.has(uid) && usersId.size >= mobileCountLimit) throwErr(403, `为了防止注册小号扰乱交流秩序，每个手机号只能使用${mobileCountLimit}次。`);
+};
+/*
+* 检测邮箱是否已被绑定、使用次数是否超过限制
+* @param {String} email
+* @author pengxiguaa 2020-3-6
+* */
+settingSchema.statics.checkEmail = async (email, uid) => {
+  const {checkEmail} = require("../nkcModules/checkData");
+  checkEmail(email);
+  const UsersPersonalModel = mongoose.model("usersPersonal");
+  const SecretBehaviorModel= mongoose.model("secretBehaviors");
+  const SettingModel = mongoose.model("settings");
+  const {emailCountLimit} = await SettingModel.getSettings("register");
+  const used = await UsersPersonalModel.count({email});
+  if(used) throwErr(403, "此邮箱已被其他账号绑定");
+  const secretBehaviors = await SecretBehaviorModel.find({
+    $or: [
+      {
+        oldEmail: email
+      },
+      {
+        newEmail: email
+      }
+    ]
+  }, {uid: 1});
+  const usersId = new Set(secretBehaviors.map(s => s.uid));
+  if(!usersId.has(uid) && usersId.size >= emailCountLimit) throwErr(403, `为了防止注册小号扰乱交流秩序，每个邮箱只能使用${emailCountLimit}次。`);
+};
+/*
   根据用户的证书以及等级 获取用户与下载相关的设置
   @param {Schema Object} user 用户对象
 */
