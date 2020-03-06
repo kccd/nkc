@@ -20,8 +20,8 @@ mobileRouter
 
 		mobile = mobile.trim();
 		code = code.trim();
-		await db.SettingModel.checkRestricted(nationCode, mobile);
 		const {user} = data;
+		await db.SettingModel.checkMobile(nationCode, mobile, user.uid);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		let smsCodeOld, smsCode;
 		try {
@@ -46,19 +46,7 @@ mobileRouter
 		}
 		await smsCodeOld.update({used: true});
 		await smsCode.update({used: true});
-		/*const newSecretBehavior = db.SecretBehaviorModel({
-			uid: user.uid,
-			type: 'changeMobile',
-			ip: ctx.address,
-			port: ctx.port,
-			oldMobile: userPersonal.mobile,
-			oldNationCode: userPersonal.nationCode,
-			newMobile: mobile,
-			newNationCode: nationCode
-		});*/
 		await userPersonal.update({nationCode, mobile});
-		await user.update({$addToSet: {certs: 'mobile'}});
-		// await newSecretBehavior.save();
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -77,18 +65,38 @@ mobileRouter
 			type: 'bindMobile'
 		});
 		await smsCode.update({used: true});
+		await db.SettingModel.checkMobile(nationCode, mobile, user.uid);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		/*const newSecretBehavior = db.SecretBehaviorModel({
-			uid: user.uid,
-			type: 'bindMobile',
-			ip: ctx.address,
-			port: ctx.port,
-			mobile,
-			nationCode
-		});*/
 		await userPersonal.update({nationCode, mobile});
-		await user.update({$addToSet: {certs: 'mobile'}});
-		// await newSecretBehavior.save();
+		await next();
+	})
+	.del("/", async (ctx, next) => {
+		const {db, query} = ctx;
+		let {code} = query;
+		const {user} = ctx.data;
+		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+		if(!userPersonal.mobile) ctx.throw(400, "你未绑定手机号");
+		code = code.trim();
+		const {mobile, nationCode} = userPersonal;
+		const smsCode = await db.SmsCodeModel.ensureCode({
+			mobile,
+			code,
+			nationCode,
+			type: "unbindMobile"
+		});
+		const behavior = db.SecretBehaviorModel({
+			uid: user.uid,
+			type: "unbindMobile",
+			oldNationCode: nationCode,
+			newNationCode: "",
+			oldMobile: mobile,
+			newMobile: "",
+			ip: ctx.address,
+			port: ctx.port
+		});
+		await smsCode.update({used: true});
+		await behavior.save();
+		await userPersonal.update({nationCode: "", mobile: ""});
 		await next();
 	});
 module.exports = mobileRouter;

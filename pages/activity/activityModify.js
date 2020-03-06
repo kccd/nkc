@@ -6,12 +6,14 @@ $(document).ready(function() {
   var options = JSON.parse($("#contionJSON").text());
   customForm.init(options);
 })
-
+var ue;
 $(document).ready(function(){
+  // 初始化编辑器
   var replyCon = $("#replyxxx").text();
+  ue = UE.getEditor("editor", NKC.configs.ueditor.activityConfigs);
   ue.ready(function() {
     ue.setContent(replyCon);
-  })
+  });
 })
 
 //html解码

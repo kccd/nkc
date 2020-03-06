@@ -146,39 +146,27 @@ block content
             .panel-heading
               span 活动详情
             .panel-body
-              .form-horizontal
-                .form-group
-                  include ../ueditor/ueditor.pug   
-                  .checkbox-inline(style="display:none")
-                    label
-                      input#ParseURL(type='checkbox' checked)
-                      | 处理URL
-                  .form-group
-                  include ../media/media_index.pug       
-
-                      
-                .form-group
-                  label.col-sm-2.control-label
-                  .col-sm-5
-                    button.btn.btn-primary#save(onclick=`submitRelease()`) 发布
+              #editor
+              .m-t-2.text-center
+                button.btn.btn-primary#save(onclick=`submitRelease()`) 发布
             input#inputFile(type='file' accept="image/*").hidden
 
 block scripts
   script(src="/jquery-ui-1.10.4.custom.js")
-  script(src='../interface_common.js')
   script(src="../bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
   script(src="../bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
   script(src='../bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
   script(src='../external_pkgs/cropper/js/cropper.js', charset="UTF-8")
-  script(src=`../interface_common.js?v=${global.NKC.startTime}`)
   script(src='../commonmark/dist/commonmark.js')
   script(src='../xbbcode-parser/xbbcode.js')
   script(src='../xss/dist/xss.js')  
-  script(src=`../nkc_render.js?v=${global.NKC.startTime}`)
   +includeJS("/publicModules/customForm/customForm.js")
+  include ../publicModules/selectDraft/selectDraft
+  include ../publicModules/selectResource/selectResource
+  include ../publicModules/sticker/selectSticker
+  include ../ueditor/ueditorBase
   script(src=`./activityRelease.js?v=${global.NKC.startTime}` charset="UTF-8")
   script(src=`./activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
   include ../publicModules/crop/crop
-  script(src=`../media/media_index.js?v=${startTime}`)
   +includeJS('/external_pkgs/citySet/agency.json.js')
   +includeJS('/external_pkgs/citySet/citySet.js')

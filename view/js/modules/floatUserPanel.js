@@ -137,7 +137,7 @@ const floatUserPanel = new Vue({
               resolve(userObj);
             })
             .catch(err => {
-              console.log(err)
+              console.log(err);
               reject(err);
             });
         }    
@@ -148,4 +148,4 @@ const floatUserPanel = new Vue({
       SubscribeTypes.subscribeUser(user.uid, !subscribed);
     }
   }
-})
+});

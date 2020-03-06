@@ -20,7 +20,7 @@ block eContent
     include ../../../publicModules/selectForum/selectForum
     .row
       .hidden#data= objToStr({regSettings: data.regSettings, selectedForums: data.selectedForums})
-      .col-xs-12.col-md-12#app(v-cloak)
+      .col-xs-12.col-md-12#app(v-cloak v-if="regSettings")
         h4 一、注册用户默认关注的栏目
         .m-t-1
           .forum-span(v-for="forum in selectedForums" :style="'background-color: ' + forum.color" @click="remove(forum)")
@@ -52,6 +52,32 @@ block eContent
               .form-group
                 label 学术分至少{{regSettings.recommendUsers.xsf}}分
                 input.form-control(type="text" v-model.number="regSettings.recommendUsers.xsf")
+        h4 三、注销设置
+        .row
+          .col-xs-12.col-md-4
+            .form
+              .form-group
+                label 验证账号所有者（如果已设置）
+                .checkbox
+                  label.m-r-1
+                    input(type="checkbox" :value="true" v-model="regSettings.verifyPassword")
+                    span 密码
+                  label.m-r-1
+                    input(type="checkbox" :value="true" v-model="regSettings.verifyMobile")
+                    span 手机号
+                  label
+                    input(type="checkbox" :value="true" v-model="regSettings.verifyEmail")
+                    span 邮箱
+              .form-group
+                label 手机号最大使用次数
+                input.form-control(type="text" v-model.number="regSettings.mobileCountLimit")
+              .form-group
+                label 邮箱最大使用次数
+                input.form-control(type="text" v-model.number="regSettings.emailCountLimit")
+              .form-group
+                label 注销说明（注销页面的注意事项）
+                textarea.form-control(v-model="regSettings.noticeForDestroy" rows=7)
+
         .m-t-2
           h5.text-danger(v-if="error") {{error}}
           h5.text-success(v-if="info") {{info}}

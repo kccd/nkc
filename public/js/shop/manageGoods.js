@@ -195,3 +195,45 @@ function setParam(productId, paramId, param) {
     productDom.text(count);
   })["catch"](sweetError);
 }
+/*
+* 立即上架
+* */
+
+
+function shelfNow(productId) {
+  sweetQuestion("确认要上架该商品？").then(function () {
+    return nkcAPI("/shop/manage/".concat(NKC.configs.uid, "/goodslist/shelfRightNow"), "PATCH", {
+      productId: productId
+    });
+  }).then(function () {
+    sweetSuccess("商品已上架");
+  })["catch"](sweetError);
+}
+/**
+ * 商品停售
+ */
+
+
+function stopSale(productId) {
+  sweetQuestion("确认要停售该商品？").then(function () {
+    return nkcAPI("/shop/manage/".concat(NKC.configs.uid, "/goodslist/productStopSale"), "PATCH", {
+      productId: productId
+    });
+  }).then(function () {
+    sweetSuccess("商品已停售");
+  })["catch"](sweetError);
+}
+/**
+ * 商品复售
+ */
+
+
+function goonSale(productId) {
+  sweetQuestion("确认要复售该商品？").then(function () {
+    return nkcAPI("/shop/manage/".concat(NKC.configs.uid, "/goodslist/productGoonSale"), "PATCH", {
+      productId: productId
+    });
+  }).then(function () {
+    sweetSuccess("商品已复售");
+  })["catch"](sweetError);
+}

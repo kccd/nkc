@@ -257,7 +257,7 @@ block shopContent
               span 存仓库
           .from.form-inline.m-t-05(v-show="shelfType === 'timing'")
             h5 上架时间
-            input.form-control.time#shelfTime(readonly="readonly" type="text")    
+            input.form-control.time#shelfTime(readonly="readonly" type="text")
     .m-t-2.text-center
       hr
       button.shop-btn.primary(v-if="!submitting" @click="save") 提交        

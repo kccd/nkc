@@ -35,92 +35,6 @@ function changeNumber() {
   $('#inputDiv').show();
 }
 
-function sendMessage(type) {
-  var obj = {operation: 'verifyOldMobile'};
-
-  if(type) {
-    obj.operation = 'verifyNewMobile';
-    obj.nationCode = nationCode;
-    obj.mobile = $('#mobile').val();
-    if(mobile === '') {
-      return sweetError('请输入新手机号');
-    }
-  }
-
-  nkcAPI('/sendMessage/changeMobile', 'POST', obj)
-    .then(function() {
-      sweetSuccess('验证码发送成功');
-    })
-    .catch(function(data) {
-      sweetError(data.error);
-    })
-
-
-}
-
-function submitChangeMobile(uid) {
-  var obj = {
-    oldCode: $('#oldCode').val(),
-    code: $('#code').val(),
-    mobile: $('#mobile').val(),
-    nationCode: nationCode
-  };
-  if(obj.oldCode === '') {
-    return sweetError('请输入旧手机验证码');
-  }
-  if(obj.code === '') {
-    return sweetError('请输入新手机验证码');
-  }
-  if(obj.mobile === '') {
-    return sweetError('请输入新手机号码');
-  }
-  nkcAPI('/u/'+uid+'/settings/mobile', 'PATCH', obj)
-    .then(function() {
-      sweetSuccess('绑定成功');
-    })
-    .catch(function(data) {
-      sweetError(data.error);
-    })
-}
-
-function submitBindMobile(uid) {
-  var obj = {
-    code: $('#code').val(),
-    mobile: $('#mobile').val(),
-    nationCode: nationCode
-  };
-  if(obj.code === '') {
-    return sweetError('请输入手机验证码');
-  }
-  if(obj.mobile === '') {
-    return sweetError('请输入手机号码');
-  }
-  nkcAPI('/u/'+uid+'/settings/mobile', 'POST', obj)
-    .then(function() {
-      sweetSuccess('绑定成功');
-    })
-    .catch(function(data) {
-      sweetError(data.error);
-    })
-}
-
-function bindMobileMessage() {
-  var obj = {
-    mobile: $('#mobile').val(),
-    nationCode: nationCode
-  };
-  if(obj.mobile === '') {
-    return sweetError('请输入手机号码');
-  }
-  nkcAPI('/sendMessage/bindMobile', 'POST', obj)
-    .then(function() {
-      sweetSuccess('验证码发送成功');
-    })
-    .catch(function(data) {
-      sweetError(data.error);
-    })
-}
-
 
 
 var email={
@@ -223,28 +137,57 @@ var app = new Vue({
   data: {
     email: data.email,
     type: data.email?"showEmail":"bindEmail",
-    changeEmail: false,
+
+    formType: "", // changeEmail, unbindEmail
 
     oldEmailCode: "",
     newEmail: "",
-    newEmailCode: ''
+    newEmailCode: '',
+
+    newTime: 0,
+    oldTime: 0
   },
   methods: {
+    timeout: function(t) {
+      var self = this;
+      var time = self[t];
+      if(time <= 0) return;
+      setTimeout(function() {
+        self[t] --;
+        self.timeout(t);
+      }, 1000);
+    },
+    reduceTime: function(t) {
+      this[t] = 120;
+      this.timeout(t);
+    },
     selectBindEmail: function() {
       this.type = "verifyOldEmail";
     },
+    getEmailCode: function(type) {
+      var self = this;
+      NKC.methods.sendEmailCode(type)
+        .then(function() {
+          sweetSuccess("发送成功");
+          self.reduceTime("oldTime");
+        })
+        .catch(sweetError);
+    },
     getOldEmailCode: function() {
+      var self = this;
       nkcAPI('/u/'+data.user.uid+'/settings/email', 'POST', {
         operation: 'verifyOldEmail'
       })
         .then(function() {
           sweetSuccess("发送成功");
+          self.reduceTime("oldTime");
         })
         .catch(function(data) {
           sweetError(data);
         })
     },
     getNewEmailCode: function() {
+      var self = this;
       nkcAPI('/u/'+data.user.uid+'/settings/email', 'POST', {
         oldToken: this.oldEmailCode,
         email: this.newEmail,
@@ -252,18 +195,21 @@ var app = new Vue({
       })
         .then(function() {
           sweetSuccess("发送成功");
+          self.reduceTime("newTime");
         })
         .catch(function(data) {
           sweetError(data);
         })
     },
     getBindEmailCode: function() {
+      var self = this;
       nkcAPI('/u/'+data.user.uid+'/settings/email', 'POST', {
         email: this.newEmail,
         operation: 'bindEmail'
       })
         .then(function() {
           sweetSuccess("发送成功");
+          self.reduceTime("newTime");
         })
         .catch(function(data) {
           sweetError(data);
@@ -289,6 +235,165 @@ var app = new Vue({
         })
         .catch(function(data) {
           sweetError(data);
+        })
+    },
+    submitUnbindEmail: function() {
+      var query = "?token=" + this.oldEmailCode;
+      nkcAPI("/u/" + data.user.uid + "/settings/email/unbind" + query, "GET")
+        .then(function() {
+          sweetSuccess("解绑成功");
+          window.location.reload();
+        })
+        .catch(function(data) {
+          sweetError(data);
+        })
+    }
+  }
+});
+
+
+var mobileApp = new Vue({
+  el: "#mobileApp",
+  data: {
+    nationCodes: window.nationCodes,
+    mobile: data.mobile,
+    formType: !data.mobile? "bind": "",
+    newMobile: "",
+    newNationCode: "86",
+    newCode: "",
+    oldCode: "",
+
+    newTime: 0,
+    oldTime: 0
+  },
+  methods: {
+    timeout: function(t) {
+      var self = this;
+      var time = self[t];
+      if(time <= 0) return;
+      setTimeout(function() {
+        self[t] --;
+        self.timeout(t);
+      }, 1000);
+    },
+    reduceTime: function(t) {
+      this[t] = 120;
+      this.timeout(t);
+    },
+    bindMobileMessage: function() {
+      var obj = {
+        mobile: this.newMobile,
+        nationCode: this.newNationCode
+      };
+      if(obj.mobile === '') {
+        return sweetError('请输入手机号码');
+      }
+      var self = this;
+      nkcAPI('/sendMessage/bindMobile', 'POST', obj)
+        .then(function() {
+          sweetSuccess('验证码发送成功');
+          self.reduceTime("newTime");
+        })
+        .catch(function(data) {
+          sweetError(data.error);
+        })
+    },
+    submitBindMobile: function() {
+      var obj = {
+        code: this.newCode,
+        mobile: this.newMobile,
+        nationCode: this.newNationCode
+      };
+      if(obj.code === '') {
+        return sweetError('请输入手机验证码');
+      }
+      if(obj.mobile === '') {
+        return sweetError('请输入手机号码');
+      }
+      nkcAPI('/u/'+NKC.configs.uid+'/settings/mobile', 'POST', obj)
+        .then(function() {
+          sweetSuccess('绑定成功');
+          window.location.reload();
+        })
+        .catch(function(data) {
+          sweetError(data.error);
+        })
+    },
+    sendMessage: function(type) {
+      var self = this;
+      var obj = {operation: 'verifyOldMobile'};
+      if(type) {
+        obj.operation = 'verifyNewMobile';
+        obj.nationCode = this.newNationCode;
+        obj.mobile = this.newMobile;
+        if(obj.mobile === '') {
+          return sweetError('请输入新手机号');
+        }
+      }
+
+      nkcAPI('/sendMessage/changeMobile', 'POST', obj)
+        .then(function() {
+          sweetSuccess('验证码发送成功');
+          if(type) {
+            self.reduceTime("newTime");
+          } else {
+            self.reduceTime("oldTime");
+          }
+        })
+        .catch(function(data) {
+          sweetError(data.error);
+        })
+    },
+    submitChangeMobile: function() {
+      var obj = {
+        oldCode: this.oldCode,
+        code: this.newCode,
+        mobile: this.newMobile,
+        nationCode: this.newNationCode
+      };
+      if(obj.oldCode === '') {
+        return sweetError('请输入旧手机验证码');
+      }
+      if(obj.code === '') {
+        return sweetError('请输入新手机验证码');
+      }
+      if(obj.mobile === '') {
+        return sweetError('请输入新手机号码');
+      }
+      nkcAPI('/u/'+NKC.configs.uid+'/settings/mobile', 'PATCH', obj)
+        .then(function() {
+          sweetSuccess('更改绑定成功');
+          window.location.reload();
+        })
+        .catch(function(data) {
+          sweetError(data.error);
+        })
+    },
+    unbindMobileMessage: function() {
+      var self = this;
+      nkcAPI('/sendMessage/unbindMobile', 'POST', {})
+        .then(function() {
+          sweetSuccess('验证码发送成功');
+          self.reduceTime("oldTime");
+        })
+        .catch(function(data) {
+          sweetError(data.error);
+        })
+    },
+    submitUnbindMobile: function() {
+      var obj = {
+        code: this.oldCode
+      };
+      if(obj.code === '') {
+        return sweetError('请输入手机验证码');
+      }
+      nkcAPI('/u/'+NKC.configs.uid+'/settings/mobile' + "?code=" + obj.code, 'DELETE')
+        .then(function() {
+          sweetSuccess('解绑成功');
+          window.location.reload();
+        })
+        .catch(function(data) {
+          sweetError(data.error);
         })
     }
   }

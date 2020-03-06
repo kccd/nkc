@@ -9,38 +9,65 @@ module.exports = async (ctx, next) => {
   const {state, url, settings, db, path, data, method} = ctx;
   const {operationId} = data;
 
+  // 仅仅只针对游客建立缓存
   if(
     ctx.method !== "GET" ||
     ctx.data.user ||
-    ctx.get("FROM") === "nkcAPI" ||
-    ctx.filePath ||
-    ctx.request.accepts('json', 'html') !== "html" ||
-    global.NKC.NODE_ENV !== "production"
+    ctx.get("FROM") === "nkcAPI" || // 排除nkcAPI的请求
+    ctx.filePath || // 排除资源文件
+    ctx.request.accepts('json', 'html') !== "html" || // 排除非html
+    global.NKC.NODE_ENV !== "production" // 排除开发环境
   ) return await next();
 
-  // 记录游客最近浏览的10个页面URL，当游客登录后跳转到最新的那个页面。
-  const loginSettings = await db.SettingModel.getSettings("login");
-  if(method === "GET" && loginSettings.redirectOperationsId && loginSettings.redirectOperationsId.includes(operationId)) {
-    // 将最近十次访问的url，写入cookie
-    const urls = ctx.getCookie("visitedUrls") || [];
-    if(urls.length >= 10) {
-      urls.splice(urls.length-1, 1);
-    }
-    urls.unshift(url);
-    ctx.setCookie("visitedUrls", urls);
-  }
-
   const {redisClient} = settings;
+  // 缓存时间的键名
   let tocKey = `page:${url}:toc`;
+  // 缓存内容的键名
   let dataKey = `page:${url}:data`;
-  
+
+  // 同上，但由于APP需要排除页面头尾，所以缓存和web端不公用。
   if(state.isApp) {
     tocKey = `app:page:${url}:toc`;
     dataKey = `app:page:${url}:data`;
   }
+  const cacheSettings = await db.SettingModel.getSettings("cache");
+
+  /* 缓存优化，存在多进程无法共享同一个Promise的问题，待解决，可能需要借助redis的发布/订阅。
+  const getCache = async (tocKey, dataKey) => {
+    let html;
+    const toc = await redisClient.getAsync(tocKey);
+    if(!toc || (ctx.reqTime.getTime() - Number(toc)) > cacheSettings.visitorPageCacheTime*1000) {
+      state.cachePage = true;
+    } else {
+      html = await redisClient.getAsync(dataKey);
+      if(!html) state.cachePage = true;
+    }
+    if(!state.cachePage) return Promise.resolve(html);
+    if(!_caches[dataKey]) {
+      _caches[dataKey] = new Promise((resolve, reject) => {
+        next()
+          .then(async () => {
+            html = ctx.body;
+            await redisClient.setAsync(tocKey, ctx.reqTime.getTime());
+            await redisClient.setAsync(dataKey, html);
+            resolve(html);
+          })
+          .catch(reject)
+          .finally(() => {
+            delete _caches[dataKey];
+          });
+      });
+    }
+    return _caches[dataKey];
+  };
+
+
+  const html_ = await getCache(tocKey, dataKey);
+  return ctx.body = html_;*/
+
+
   // 获取缓存生成的时间，判断是否过期
   const toc = await redisClient.getAsync(tocKey);
-  const cacheSettings = await db.SettingModel.getSettings("cache");
   if(!toc || (ctx.reqTime.getTime() - Number(toc)) > cacheSettings.visitorPageCacheTime*1000) {
     state.cachePage = true;
   } else {

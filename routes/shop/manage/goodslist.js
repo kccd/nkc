@@ -189,7 +189,7 @@ goodslistRouter
     const {productId} = body;
     const product = await db.ShopGoodsModel.findOne({productId});
     if(!product) ctx.throw(400, "商品不存在");
-    if(product.productStatus == "stopsale") ctx.throw(400, "该商品已处于停售状态");
+    if(product.productStatus === "stopsale") ctx.throw(400, "该商品已处于停售状态");
     await product.update({$set:{productStatus: "stopsale"}})
     await next();
   })
@@ -199,7 +199,7 @@ goodslistRouter
     const {productId} = body;
     const product = await db.ShopGoodsModel.findOne({productId});
     if(!product) ctx.throw(400, "商品不存在");
-    if(product.productStatus == "insale") ctx.throw(400, "商品已处于售卖状态");
+    if(product.productStatus === "insale") ctx.throw(400, "商品已处于售卖状态");
     await product.update({$set:{productStatus: "insale"}});
     await next();
   })
