@@ -2,9 +2,10 @@ if creditPost && creditPost.credits && creditPost.credits.length > 0
   .nkcpanel.ThreadPostCredits
     for c,index in creditPost.credits
       .ThreadPostCreditItem
+        -let number = c.num;
         if c.type === "creditKcb"
-          -c.num = c.num/100;
-        span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
+          -number = number/100;
+        span.TPCQ!= `${(number > 0 ? '+' : '')}${number} &nbsp;`
         span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
         span.TPCIA
           a(href=`/u/${c.fromUser.uid}` style='text-decoration: none;')
