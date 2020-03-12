@@ -1,3 +1,4 @@
+/*
 import Highlighter from 'web-highlighter';
 
 window.noteApp = new Vue({
@@ -49,7 +50,7 @@ window.noteApp = new Vue({
       btn.on("click", function() {
         
       });
-      /* this.resetPanel();
+      /!* this.resetPanel();
       data.sources.map(node => {
         const {id} = node;
         self.notes.push({
@@ -59,7 +60,7 @@ window.noteApp = new Vue({
           comment: ""
         });
       });
-      console.log(self.notes); */
+      console.log(self.notes); *!/
     },
     removeNode(n) {
       const {id} = n;
@@ -90,3 +91,4 @@ window.noteApp = new Vue({
 
 // 2. 从后端获取高亮信息，还原至网页
 // getRemoteData().then(s => highlighter.fromStore(s.startMeta, s.endMeta, s.id, s.text));
+*/

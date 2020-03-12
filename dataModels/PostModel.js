@@ -210,6 +210,11 @@ const postSchema = new Schema({
   hide: {
     type: String,
     default: "null"
+  },
+  // 内容对版本
+  cv: {
+    type: Number,
+    default: 1
   }
 }, {toObject: {
   getters: true,

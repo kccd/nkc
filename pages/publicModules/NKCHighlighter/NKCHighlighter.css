@@ -10,27 +10,32 @@
 }
 /* 文本超出隐藏并显示省略号 */
 .post-node-mark {
-  background: #ffffbb;
+  background: #ffffd4;
+  border-bottom: 1px dashed #333;
 }
 .post-node-hover,
 .post-node-hover > * {
-  background: #e85a71;
+  background: #ffcdcd;
+  cursor: pointer;
 }
-#modulePostNoteButton {
-  position: fixed;
+.nkc-hl-btn {
+  position: absolute;
   width: 5rem;
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
   border-radius: 3px;
   cursor: pointer;
   font-size: 1rem;
-  display: none;
   user-select: none;
-  height: 1.6rem;
-  line-height: 1.6rem;
+  height: 2rem;
+  line-height: 2rem;
   text-align: center;
   background-color: #e85a71;
   color: #fff;
+  z-index: 1000;
 }
-#modulePostNoteButton:active {
+.nkc-hl-btn:active {
   opacity: 0.8;
+}
+.nkc-hl-btn:hover {
+  opacity: 0.9;
 }

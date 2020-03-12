@@ -21,7 +21,6 @@
   "dependencies": {
     "bluebird": "^3.5.3",
     "chart.js": "^2.7.2",
-    "cheerio": "^1.0.0-rc.2",
     "colors": "^1.1.2",
     "commonmark": "^0.28.1",
     "cookie-signature": "^1.1.0",

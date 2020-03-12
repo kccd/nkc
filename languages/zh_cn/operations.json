@@ -653,6 +653,12 @@
   "experimentalStickerSettings": "后台管理 - 表情设置",
   "experimentalEditorSettings": "后台管理 - 编辑器设置",
   "hidePost": "折叠回复",
+  "addNote": "添加笔记",
+  "managementNote": "管理所有笔记(屏蔽、编辑和删除)",
+  "deleteNote": "删除笔记",
+  "modifyNote": "编辑笔记",
+  "viewNote": "查看笔记",
+  "nkcManagementNote": "前台管理 - 笔记管理",
 
 
   "userSettingsHomeToLatest": "首页调整：主页 > 最新",

@@ -1,31 +1,28 @@
 /* 
   events:
-    selected: 划词
-
+    select: 划词
+    create: 创建实例
+    hover: 鼠标悬浮
+    hoverOut: 鼠标移开
 
 
 */
 window.Source = class {
   constructor(options) {
-    const {hl, nodes, notes, _id} = options;
+    const {hl, nodes, id} = options;
     const self = this;
     this.hl = hl;
-    this.notes = notes;
     this.nodes = nodes;
-    this.doms = [];
-    if(!_id) {
-      this._id = `nkc-hl-l-id-${Date.now()}`;
-    } else {
-      this._id = `nkc-hl-id-${_id}`;
-    }
+    this.content = hl.getNodesContent(nodes);
+    this.dom = [];
+    this.id = id;
+    this._id = `nkc-hl-id-${id}`;
     this.nodes.forEach(node => {
-      const {tagName, index, offset, length} = node;
-      const doms = self.hl.root.getElementsByTagName(tagName);
-      const parent = doms[index];
-      const targetNotes = self.getNodes(parent, offset, length); 
+      const {offset, length} = node;
+      const targetNotes = self.getNodes(this.hl.root, offset, length);
       targetNotes.map(targetNode => {
         const span = document.createElement("span");
-        self.doms.push(span);
+        self.dom.push(span);
         span.addEventListener("mouseover", () => {
           self.hl.emit(self.hl.eventNames.hover, self);
         });
@@ -41,23 +38,23 @@ window.Source = class {
       });
     });
     this.hl.sources.push(this);
-    this.hl.emit(this.hl.eventNames[_id?"restore":"create"], this);
+    this.hl.emit(this.hl.eventNames.create, this);
   }
   addClass(klass) {
-    const {doms} = this;
-    doms.map(dom => {
-      dom.classList.add(klass);
+    const {dom} = this;
+    dom.map(d => {
+      d.classList.add(klass);
     });
   }
   removeClass(klass) {
-    const {doms} = this;
-    doms.map(dom => {
-      dom.classList.remove(klass);
+    const {dom} = this;
+    dom.map(d => {
+      d.classList.remove(klass);
     });
   }
   destroy() {
-    this.doms.map(dom => {
-      dom.className = "";
+    this.dom.map(d => {
+      d.className = "";
     });
   }
   getSources() {
@@ -70,11 +67,22 @@ window.Source = class {
     let curLength = length;
     let nodes = [];
     let started = false;
-    while(node = nodeStack.pop()) {
+    const self = this;
+    while(!!(node = nodeStack.pop())) {
       const children = node.childNodes;
-      for(let i = children.length - 1; i >= 0; i--) {
-        nodeStack.push(children[i]);
-      }
+      loop:
+        for (let i = children.length - 1; i >= 0; i--) {
+          const node = children[i];
+          if(node.nodeType === 1) {
+            const cl = node.classList;
+            for(const c of self.hl.excludedElementClass) {
+              if(cl.contains(c)) {
+                continue loop;
+              }
+            }
+          }
+          nodeStack.push(node);
+        }
       if(node.nodeType === 3 && node.textContent.length) {
         curOffset += node.textContent.length;
         if(curOffset > offset) {
@@ -114,15 +122,16 @@ window.Source = class {
     });
     return nodes;
   }
-}
+};
 
 window.NKCHighlighter = class {
   constructor(options) {
     const {
-      rootElementId,
+      rootElementId, excludedElementClass = []
     } = options;
     const self = this;
     self.root = document.getElementById(rootElementId);
+    self.excludedElementClass = excludedElementClass;
     self.position = {
       x: 0,
       y: 0
@@ -134,9 +143,8 @@ window.NKCHighlighter = class {
       create: "create",
       hover: "hover",
       hoverOut: "hoverOut",
-      select: "select",
-      restore: "restore"
-    }
+      select: "select"
+    };
 
     window.addEventListener("mouseup", function(e) {
       self.position.x = e.clientX;
@@ -158,11 +166,28 @@ window.NKCHighlighter = class {
       });
     });
   }
+  getParent(self, d) {
+    if(d === self.root) return;
+    if(d.nodeType === 1) {
+      for(const c of self.excludedElementClass) {
+        if(d.classList.contains(c)) throw new Error("划词区域已被忽略");
+      }
+    }
+    if(d.parentNode) self.getParent(self, d.parentNode);
+  }
   getRange() {
-    const range = window.getSelection().getRangeAt(0);
-    const {startOffset, endOffset} = range;
-    if(startOffset === endOffset) return;
-    return range;
+    try{
+      const range = window.getSelection().getRangeAt(0);
+      const {startOffset, endOffset, startContainer, endContainer} = range;
+      if(this.excludedElementClass.length) {
+        this.getParent(this, startContainer);
+        this.getParent(this, endContainer);
+      }
+      if(startOffset === endOffset) return;
+      return range;
+    } catch(err) {
+      console.log(err);
+    }
   }
   destroy(source) {
     if(typeof source === "string") {
@@ -173,15 +198,15 @@ window.NKCHighlighter = class {
   restoreSources(sources = []) {
     for(const source of sources) {
       source.hl = this;
-      new Source(source);  
+      new Source(source);
     }
   }
-  createSource(range, notes) {
+  getNodes(range) {
     const {startContainer, endContainer, startOffset, endOffset} = range;
     if(startOffset === endOffset) return;
     let selectedNodes = [], startNode, endNode;
     if(startContainer.nodeType !== 3 || startContainer.nodeType !== 3) return;
-    if(startContainer === endContainer) { 
+    if(startContainer === endContainer) {
       // 相同节点
       startNode = startContainer;
       endNode = startNode;
@@ -189,7 +214,7 @@ window.NKCHighlighter = class {
         node: startNode,
         offset: startOffset,
         length: endOffset - startOffset
-      }); 
+      });
     } else {
       startNode = startContainer;
       endNode = endContainer;
@@ -212,31 +237,30 @@ window.NKCHighlighter = class {
         });
       }
     }
-    const parent = this.getSameParentNode(startNode, endNode);
-    const {tagName} = parent;
-    const doms = this.root.getElementsByTagName(tagName);
-    let index = -1;
-    for(let i = 0; i < doms.length; i++) {
-      if(doms[i] === parent) {
-        index = i;
-        break;
-      }
-    }
-    if(index === -1) throw "获取父元素索引出错";
     const nodes = [];
     for(const obj of selectedNodes) {
       const {node, offset, length} = obj;
-      const offset_ = this.getOffset(parent, node);
+      const content = node.textContent.slice(offset, offset + length);
+      const offset_ = this.getOffset(node);
       nodes.push({
-        tagName,
-        index,
+        content,
         offset: offset_ + offset,
         length
       });
     }
+    return nodes;
+  }
+  getNodesContent(nodes) {
+    let content = "";
+    nodes.map(node => {
+      content += node.content;
+    });
+    return content;
+  }
+  createSource(id, nodes) {
     return new Source({
       hl: this,
-      notes,
+      id,
       nodes,
     });
   }
@@ -263,15 +287,26 @@ window.NKCHighlighter = class {
     }
     source.removeClass(className);
   }
-  getOffset(root, text) {
-    const nodeStack = [root];
+  getOffset(text) {
+    const nodeStack = [this.root];
     let curNode = null;
     let offset = 0;
-    while (curNode = nodeStack.pop()) {
+    const self = this;
+    while (!!(curNode = nodeStack.pop())) {
       const children = curNode.childNodes;
-      for (let i = children.length - 1; i >= 0; i--) {
-        nodeStack.push(children[i]);
-      }
+      loop:
+        for (let i = children.length - 1; i >= 0; i--) {
+          const node = children[i];
+          if(node.nodeType === 1) {
+            const cl = node.classList;
+            for(const c of self.excludedElementClass) {
+              if(cl.contains(c)) {
+                continue loop;
+              }
+            }
+          }
+          nodeStack.push(node);
+        }
 
       if (curNode.nodeType === 3 && curNode !== text) {
         offset += curNode.textContent.length;
@@ -284,7 +319,8 @@ window.NKCHighlighter = class {
   }
   findNodes(startNode, endNode) {
     const selectedNodes = [];
-    const parent = this.getSameParentNode(startNode, endNode);
+    // const parent = this.getSameParentNode(startNode, endNode);
+    const parent = this.root;
     if(parent) {
       let start = false, end = false;
       const getChildNode = (node) => {

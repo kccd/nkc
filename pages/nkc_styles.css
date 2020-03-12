@@ -2943,7 +2943,7 @@ img.emoji {
   margin-top: 1.5rem;
   position: relative;
   font-size: 16px;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 .thread-content img[data-type="view"]{
   border-radius: 7px;

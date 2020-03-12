@@ -8,5 +8,9 @@ module.exports = {
   sticker: {
     GET: "nkcManagementSticker",
     POST: "nkcManagementSticker"
+  },
+  note: {
+    GET: "nkcManagementNote",
+    POST: "nkcManagementNote"
   }
 };

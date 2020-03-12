@@ -2,7 +2,7 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    const {db, data, query, state} = ctx;
+    const {db, data, query, state, nkcModules} = ctx;
     const {type} = query;
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);

@@ -1,10 +1,11 @@
-+includeCSS("/css/modules/commonModal.css")
++includeCSS("/publicModules/commonModal/commonModal.css")
 .modal.fade#moduleCommonModal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
   .modal-dialog.modal-sm(role="document")#moduleCommonModalApp
     .modal-content
       .modal-header
         .fa.fa-remove(data-dismiss="modal" aria-label="Close")
         .modal-title {{title}}
+        .quote-content(v-if="quote") {{quote}}
       .modal-body
         .form
           .form-group(v-for="d, index in data")

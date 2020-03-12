@@ -1,0 +1,159 @@
+@import "../skin";
+#moduleNotePanel{
+  width: 28rem;
+  .note-panel-body{
+    padding: 0.5rem 1rem;
+    .note-panel-quote{
+      border-left: 3px solid #b9b9b9;
+      font-weight: 700;
+      padding: 0.5rem;
+      font-size: 1.2rem;
+      font-style: oblique;
+      max-height: 7.4rem;
+      color:#555;
+      background-color: #e3e3e3;
+      .hideText(@line: 4);
+      margin: 0.5rem 0;
+    }
+    .note-panel-textarea{
+      height: 2.5rem;
+      width: 100%;
+      max-height: 10rem;
+      //overflow: hidden;
+      resize: none;
+      padding: 0.3rem;
+      border: 1px solid #ccc;
+      &:focus{
+        outline: none;
+      }
+    }
+    .note-panel-notes{
+      max-height: 45rem;
+      overflow-y: auto;
+      .note-panel-end{
+        text-align: center;
+        border-top: 1px solid #eee;
+        margin: 1rem 2rem 0 2rem;
+        height: 1rem;
+        position: relative;
+        span{
+          height: 1.6rem;
+          line-height: 1.6rem;
+          color: #aaa;
+          position: absolute;
+          top: -0.8rem;
+          left: 0;
+          right: 0;
+          margin: auto;
+          width: 8rem;
+          background-color: #fff;
+          display: inline-block;
+          font-size: 1rem;
+        }
+      }
+      .note-panel-note{
+        margin-bottom: 0.6rem;
+        &:last-child{
+          margin-bottom: 1rem;
+        }
+        .note-panel-user{
+          display: table-cell;
+          vertical-align: top;
+          .note-panel-user-avatar{
+            cursor: pointer;
+            img{
+              margin-top: 3px;
+              height: 3.2rem;
+              width: 3.2rem;
+              border-radius: 3px;
+            }
+          }
+        }
+        .note-panel-content-body{
+          display: table-cell;
+          vertical-align: top;
+          padding-left: 0.5rem;
+          width: 100%;
+          position: relative;
+          .note-panel-username{
+            font-size: 1rem;
+            color: #999;
+            font-style: oblique;
+            display: inline-block;
+            margin-right: 0.3rem;
+            &:hover{
+              cursor: pointer;
+            }
+          }
+          .note-panel-time{
+            display: inline-block;
+            font-size: 1rem;
+            color: #999;
+            font-style: oblique;
+          }
+
+          .note-panel-content{
+            color: @dark;
+            word-break: break-all;
+            font-size: 1.2rem;
+          }
+          .note-panel-options{
+            position: absolute;
+            top: 0;
+            right: 0;
+            &:hover{
+              ul{
+                display: block;
+                width: 5rem;
+                height: auto;
+              }
+            }
+            ul{
+              padding: 0;
+              margin: 0;
+              overflow: hidden;
+              display: block;
+              position: absolute;
+              top: 0;
+              right: 0;
+              transition: width 200ms;
+              width: 0;
+              height: 0;
+              user-select: none;
+              background-color: #fff;
+              border: 1px solid #f4f4f4;
+              box-shadow: 2px 3px 12px 0 rgba(0, 0, 0, 0.1);
+              z-index: 100;
+              li{
+                font-size: 1rem;
+                list-style: none;
+                height: 1.4rem;
+                line-height: 1.4rem;
+                text-align: center;
+                cursor: pointer;
+                &:hover{
+                  background-color: @primary;
+                  color: #fff;
+                }
+                &:first-child{
+                  border-bottom: 1px solid #f4f4f4;
+                }
+              }
+            }
+            &>.fa{
+              cursor: pointer;
+              height: 1.4rem;
+              width: 1.4rem;
+              text-align: center;
+              line-height: 1.4rem;
+              color: #aaa;
+              &:hover{
+                color: #555;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

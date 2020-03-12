@@ -10,6 +10,7 @@ NKC.modules.CommonModal = function() {
     data: {
       title: "",
       info: "",
+      quote: "",
       data: {}
     },
     methods: {
@@ -21,6 +22,7 @@ NKC.modules.CommonModal = function() {
   this_.open = function(callback, options) {
     this_.callback = callback;
     this_.app.data = options.data;
+    this_.app.quote = options.quote;
     this_.app.title = options.title;
     this_.app.info = options.info || "";
     this_.dom.modal("show");

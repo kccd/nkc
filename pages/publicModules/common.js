@@ -395,7 +395,7 @@ NKC.methods.doExchange = function(arr) {
   } else {
     return arr;
   }
-}
+};
 
 // 页面折叠记录位置
 NKC.modules.PagePosition = function() {

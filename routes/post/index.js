@@ -369,6 +369,11 @@ router
     //     await newReplies.save();
     //   }
     // }
+
+    // 判断文本是否有变化，有变化版本号加1
+    if(c !== targetPost.c) {
+      targetPost.cv ++;
+    }
     targetPost.uidlm = user.uid;
     targetPost.iplm = ctx.address;
     targetPost.t = t;

@@ -101,6 +101,7 @@ operationObj.defaultOperations = [
   "topAllPost", // 置顶任何人的回复
   "modifyAllResource", // 可修改任何人的附件
 	"visitAllUserProfile", // 可查看任何人的个人中心
+	"managementNote", // 可屏蔽编辑任何人的笔记
 ];
 
 

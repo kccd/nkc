@@ -17,49 +17,24 @@ const schema = new Schema({
     required: true,
     index: 1
   },
-  notes: {
-    /* [
-      {
-        // 批注时间
-        toc: {
-          type: Date,
-          default: Date.now,
-          index: 1
-        },
-        // 批注的用户
-        uid: {
-          type: String,
-          default: Date.now,
-          index: 1
-        },
-        // 批注的内容
-        c: {
-          type: String,
-          required: true
-        }    
-      }
-    ] */
-    type: Schema.Types.Mixed,
-    required: true
+  // 原文对应的版本号
+  cv: {
+    type: Number,
+    default: null
   },
   toc: {
     type: Date,
-    defalt: Date.now,
+    default: Date.now,
     index: 1
+  },
+  // 划选文字
+  content: {
+    type: String,
+    default: ""
   },
   nodes: {
     /* [
       {
-        // 元素名
-        tagName: {
-          type: String,
-          required: true
-        },
-        // 元素索引
-        index: {
-          type: Number,
-          required: true
-        },
         // 文本节点的开始位置
         offset: {
           type: Number,
@@ -71,7 +46,7 @@ const schema = new Schema({
           required: true
         },
         // 节点的文本
-        c: {
+        content: {
           type: String,
           default: ""
         }
@@ -84,9 +59,52 @@ const schema = new Schema({
   collection: 'notes'
 });
 
-schema.statics.getNotes = async (type, targetId) => {
-  const notes = await mongoose.model("notes").find({type, targetId}).sort({toc: -1});
-  return notes.map(note => note.toObject());
+schema.statics.getNotesByPostId = async (pid, cv) => {
+  const NoteModel = mongoose.model("notes");
+  const match = {
+    type: "post",
+    targetId: pid,
+  };
+  if(cv !== undefined) {
+    match.cv = cv;
+  }
+  const notes = await NoteModel.find(match);
+  return await NoteModel.extendNotes(notes);
+};
+schema.statics.extendNote = async (note, options) => {
+  const notes = await mongoose.model("notes").extendNotes([note], options);
+  return notes[0];
+};
+schema.statics.extendNotes = async (notes_, options = {}) => {
+  const {disabled, deleted} = options;
+  const NoteContentModel = mongoose.model("noteContent");
+  const notes = [], notesId = [];
+  notes_.map(n => {
+    if(n.toObject) n = n.toObject();
+    notes.push(n);
+    notesId.push(n._id);
+  });
+  const match = {
+    noteId: {$in: notesId},
+    cid: null
+  };
+  if(disabled !== undefined) {
+    match.disabled = disabled;
+  }
+  if(deleted !== undefined) {
+    match.deleted = deleted;
+  }
+  let noteContent = await NoteContentModel.find(match).sort({toc: 1});
+  noteContent = await NoteContentModel.extendNoteContent(noteContent);
+  const noteContentObj = {};
+  noteContent.map(n => {
+    if(!noteContentObj[n.noteId]) noteContentObj[n.noteId] = [];
+    noteContentObj[n.noteId].push(n);
+  });
+  return notes.map(note => {
+    note.notes = noteContentObj[note._id] || [];
+    return note;
+  });
 };
 
 module.exports = mongoose.model('notes', schema);
