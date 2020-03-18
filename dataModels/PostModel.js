@@ -356,9 +356,9 @@ postSchema.methods.ensurePermission = async function(options) {
 };
 
 
+// 保存POST前检测内容是否有@
 postSchema.pre('save', async function(next) {
   // analyzing the content(post.c) to find p.atUsers change
-
   try {
     const UserModel = mongoose.model('users');
 
@@ -368,7 +368,8 @@ postSchema.pre('save', async function(next) {
     // 截取所有@起向后15字符的字符串
     var positions = [];
     // 引用的内容再次发布，不解析at
-    const e = c.replace(/<blockquote.*?blockquote>/im,'');
+    let e = c.replace(/<blockquote.*?blockquote>/im,'');
+    e = e.replace(/<code\s[\s\S]*?<\/code>/ig, "").replace(/<pre\s[\s\S]*?<\/pre>/ig, "");
     var d = e.replace(/<[^>]+>/g,"");
     var pos = d.indexOf("@");
     while(pos > -1){
@@ -376,7 +377,7 @@ postSchema.pre('save', async function(next) {
       pos = d.indexOf("@",pos+1)
     }
     // 验证每个@是否含有特殊字符
-    for(var i=0;i<positions.length;i++){
+    for(var i = 0; i < positions.length; i++){
       var atPos = positions[i].indexOf("@"); // @符号位置
       var semiPos = positions[i].indexOf(";"); // 分号位置
       var colonPos = positions[i].indexOf(":"); // 冒号位置
@@ -402,7 +403,7 @@ postSchema.pre('save', async function(next) {
       // 用户名从最后一个字符开始，逐个向前在数据库中查询
       var evePos = positions[i].toLowerCase();
       // 用户名至少含有一个字符，不可以为空
-      if(evePos == "") {
+      if(evePos === "") {
         positions.splice(i, 1);
         break;
       }
@@ -422,7 +423,7 @@ postSchema.pre('save', async function(next) {
     // 这是之前的，先屏蔽掉
     //  const matchedUsernames = c.match(/@([^@\s]*)\s/g);
     //  console.log(matchedUsernames)
-    if (positions) {
+    if (positions && positions.length) {
       await Promise.all(positions.map(async str => {
         // const username = str.slice(1, -1); //slice the @ and [\s] in reg
         const usernameLowerCase = str.toLowerCase();

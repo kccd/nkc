@@ -56,7 +56,13 @@ block shopContent
                   div 待上架  
               th.order-links
                 a(href=`/editor?type=post&id=${product.oc}` target="_blank") 修改商品信息
-                a(href=`/shop/manage/shelf?productId=${product.productId}`) 修改出售信息    
+                a(href=`/shop/manage/shelf?productId=${product.productId}`) 修改出售信息
+                if product.productStatus === "insale"
+                  a.pointer(onclick=`stopSale('${product.productId}')`) 停售
+                else if product.productStatus === "stopsale"
+                  a.pointer(onclick=`goonSale('${product.productId}')`) 复售
+                else
+                  a.pointer(onclick=`shelfNow('${product.productId}')`) 立即上架
             tr.param-header
               td(colspan=1 rowspan=product.productParams.length + 1)
               th 规格名

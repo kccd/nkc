@@ -139,7 +139,7 @@ messageRouter
     // 新朋友通知
     if(chat.newFriends) {
       const friendsApplication = await db.FriendsApplicationModel.findOne({respondentId: user.uid}).sort({toc: -1});
-      const newFriendsApplicationCount = await db.FriendsApplicationModel.count({respondentId: user.uid, agree: null});
+      const newFriendsApplicationCount = await db.FriendsApplicationModel.count({respondentId: user.uid, agree: "null"});
       if(friendsApplication) {
         const targetUser = await db.UserModel.findOne({uid: friendsApplication.applicantId});
         if(targetUser) {

@@ -2,7 +2,6 @@ const Router = require('koa-router');
 const loginRouter = new Router();
 loginRouter
 	.use('/', async (ctx, next) => {
-		const {nkcModules} = ctx;
 		const {user} = ctx.data;
 		if(user) {
 			return ctx.redirect('/');
@@ -121,6 +120,9 @@ loginRouter
     } else {
 			ctx.throw(400, `未知的登录方式：${loginType}`);
 		}
+
+		// 判断用户是否注销
+		if(user.destroyed) ctx.throw(400, "此账号已被注销");
 
 		if(loginType !== 'code') {
 

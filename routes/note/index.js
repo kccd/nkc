@@ -19,6 +19,7 @@ router
       options.deleted = false;
     }
     data.note = await db.NoteModel.extendNote(note, options);
+    ctx.template = "note/note.pug";
     await next();
   })
   .use("/:_id/c/:cid", async (ctx, next) => {
@@ -42,7 +43,7 @@ router
     checkString(content, {
       name: "笔记内容",
       minLength: 1,
-      maxLength: 400
+      maxLength: 1000
     });
     await noteContent.cloneAndUpdateContent(content);
     noteContent.content = content;
@@ -60,12 +61,12 @@ router
   .post("/", async (ctx, next) => {
     const {db, body, data, nkcModules} = ctx;
     const {checkString} = nkcModules.checkData;
-    const {_id, targetId, content, type, nodes} = body;
+    const {_id, targetId, content, type, node} = body;
     const {user} = data;
     checkString(content, {
       name: "笔记内容",
       minLength: 1,
-      maxLength: 400
+      maxLength: 1000
     });
 
     let cv = null;
@@ -82,14 +83,20 @@ router
     if(_id) {
       note = await db.NoteModel.findOne({_id});
       if(!note) ctx.throw(400, `笔记ID错误，请重试。id:${_id}`);
+    } else if(node) {
+      const {offset, length} = node;
+      note = await db.NoteModel.findOne({
+        cv,
+        targetId,
+        type,
+        "node.offset": offset,
+        "node.length": length
+      });
     }
 
     if(!note) {
       // 新建
-      let quoteContent = "";
-      for(const node of nodes) {
-        quoteContent += node.content;
-      }
+      let quoteContent = node.content;
       note = db.NoteModel({
         _id: await db.SettingModel.operateSystemID("notes", 1),
         uid: user.uid,
@@ -97,7 +104,7 @@ router
         content: quoteContent,
         cv,
         targetId,
-        nodes
+        node
       });
       await note.save();
     }
@@ -107,9 +114,13 @@ router
       toc: time,
       uid: user.uid,
       content,
+      type,
+      targetId,
       noteId: note._id
     });
     await noteContent.save();
+    data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
+    data.noteContent.edit = false;
     data.note = await db.NoteModel.extendNote(note);
     await next();
   });

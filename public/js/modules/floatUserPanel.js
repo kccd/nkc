@@ -117,8 +117,7 @@ var floatUserPanel = new Vue({
                       top: top + height + 10,
                       left: left
                     });
-                  })["catch"](function (err) {
-                    console.log(err);
+                  })["catch"](function (err) {// console.log(err);
                   });
 
                 case 5:

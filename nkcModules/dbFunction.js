@@ -243,7 +243,10 @@ fn.forumsListSort = (forums, types) => {
 	const result = [];
 	for(let forum of forums) {
 		if(forum.parentsId.length === 0) {
-			result.push(forum.toObject());
+		  if(forum.toObject) {
+		    forum = forum.toObject();
+      }
+			result.push(forum);
 		}
 	}
 	return result;

@@ -18,7 +18,8 @@ block title
   -const postTo = data.userOperationsId.includes('quotePost')
   -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
   -const addKcb = data.userOperationsId.includes('creditKcb')
-  -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
+  -const disablePost = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
+  -const unblockPosts = permission("unblockPosts") && data.isModerator;
   -const highlight = data.highlight;
   -const digestPost = data.userOperationsId.includes('digestPost') && data.isModerator;
   -const unDigestPost = data.userOperationsId.includes('unDigestPost')  && data.isModerator;
@@ -148,7 +149,7 @@ block title
                   span.fa.fa-edit &nbsp;编辑
         if disablePost && !targetThread
           li
-            a(onclick=`disablePostClick('${post.pid}', "${targetThread?'thread':'post'}")`)
+            a(onclick=`disabledThreadPost('${post.pid}')`)
               span.fa.fa-eye-slash &nbsp;退修或删除
         if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
           if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
@@ -514,6 +515,11 @@ block content
                     for post, index in data.toppedPosts
                       include single_post
           if data.posts.length
+            mixin managePosts
+              .paging-button
+                a.button.radius-left(onclick="managePosts()") 管理
+                a.button(onclick="markAllPosts()") 全选
+                a.button.radius-right(onclick="disabledMarkedPosts()") 屏蔽或退修
             div
               .row
                 .thread-div
@@ -526,6 +532,9 @@ block content
                         .paging-button
                           a.button.radius-left(href=`/t/${thread.tid}` class=data.t!=="author"?"active":"")  全部
                           a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t==="author"?"active":"")  只看作者
+                        if disablePost
+                          //- 回复的批量管理
+                          +managePosts
 
                       .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
                         for post, index in data.posts
@@ -545,6 +554,9 @@ block content
                             include single_post
                       .col-xs-12.col-md-12
                         include ../publicModules/paging/paging_input
+                        if disablePost
+                          //- 回复的批量管理
+                          +managePosts
                       if data.user
                         .col-xs-12.col-md-12
                           - var hasMobile = data.user.authLevel > 0;
@@ -653,8 +665,6 @@ block content
                 strong {{contract.contractCode}}
 
     include ../debug_output.pug
-    include ../thread_to_recycle.pug
-    include ../post_to_recycle.pug
     include ../publicModules/post_warning
     if state.userColumn
       -const column = state.userColumn

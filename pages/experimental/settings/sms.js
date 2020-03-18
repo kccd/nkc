@@ -7,7 +7,8 @@ var app = new Vue({
     test: {
       name: 'register',
       mobile: '',
-      nationCode: '86'
+      nationCode: '86',
+      content: ""
     }
   },
   mounted: function() {
@@ -44,21 +45,29 @@ var app = new Vue({
         case 'changeMobile': return '更改手机号';
         case 'reset': return '绑定新手机号';
         case 'withdraw': return '提现';
+        case 'destroy': return '账号注销';
+        case "unbindMobile": return "解绑手机号"
       }
     },
     testSendMessage: function() {
-      var name = this.test.name;
-      var mobile = this.test.mobile;
-      var nationCode = this.test.nationCode;
-      if(!name) return screenTopWarning('请选择测试类型');
-      if(!nationCode) return screenTopWarning('请选择测试手机国际区号');
-      if(!mobile) return screenTopWarning('请输入测试手机号码');
-      nkcAPI('/e/settings/sms/test', 'POST', {name: name, mobile: mobile, nationCode: nationCode})
+      var self = this;
+      sweetQuestion("确定要发送短消息？")
         .then(function() {
-          screenTopAlert('测试短信发送成功');
-        })
-        .catch(function(data) {
-          screenTopWarning(data.error || data);
+          var name = self.test.name;
+          var mobile = self.test.mobile;
+          var nationCode = self.test.nationCode;
+          var content = self.test.content;
+          if(!name) return screenTopWarning('请选择测试类型');
+          if(!nationCode) return screenTopWarning('请选择测试手机国际区号');
+          if(!mobile) return screenTopWarning('请输入测试手机号码');
+          if(!content) return screenTopWarning("请输入自定义验证码");
+          nkcAPI('/e/settings/sms/test', 'POST', {name: name, mobile: mobile, nationCode: nationCode, content: content})
+            .then(function() {
+              screenTopAlert('短信发送成功');
+            })
+            .catch(function(data) {
+              screenTopWarning(data.error || data);
+            })
         })
     },
     save: function() {
@@ -107,64 +116,6 @@ var app = new Vue({
         .catch(function(data) {
           screenTopWarning(data.error || data);
         })
-      
-      // nkcAPI('/e/settings/sms', 'PATCH', {smsSettings: smsSettings})
-      //   .then(function() {
-      //     screenTopAlert('保存成功');
-      //   })
-      //   .catch(function(data) {
-      //     screenTopWarning(data.error || data);
-      //   })
     }
   }
 });
-
-
-
-/*
-var app;
-var data;
-$(function() {
-	data = $('#data').text();
-	data = JSON.parse(data);
-	data.login.name = '登录';
-	data.register.name = '注册';
-	data.changeMobile.name = '更换手机号';
-	data.bindMobile.name = '绑定手机号';
-	data.getback.name = '找回密码';
-	app = new Vue({
-		el: '#app',
-		data: {
-			settings: [data.login, data.register, data.changeMobile, data.bindMobile, data.getback]
-		},
-		updated: function() {
-			for(var i = 0; i < app.settings.length; i++) {
-				var setting = app.settings[i];
-				if(setting.validityPeriod < 0) setting.validityPeriod = 0;
-				if(setting.sameMobileOneDay < 0) setting.sameMobileOneDay = 0;
-				if(setting.sameIpOneDay < 0) setting.sameIpOneDay = 0;
-				setting.validityPeriod = parseInt(setting.validityPeriod);
-				setting.sameMobileOneDay = parseInt(setting.sameMobileOneDay);
-				setting.sameIpOneDay = parseInt(setting.sameIpOneDay);
-			}
-		},
-		methods: {
-			submit: function() {
-				var obj = {
-					login: app.settings[0],
-					register: app.settings[1],
-					changeMobile: app.settings[2],
-					bindMobile: app.settings[3],
-					getback: app.settings[4]
-				};
-				nkcAPI('/e/settings/sms', 'PATCH', obj)
-					.then(function() {
-						screenTopAlert('保存成功');
-					})
-					.catch(function(data) {
-						screenTopWarning(data.error || data);
-					})
-			}
-		}
-	});
-});*/

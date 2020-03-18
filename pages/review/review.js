@@ -46,41 +46,33 @@ var app = new Vue({
         url = "/review";
       } else {
         // 不通过
-        if(data.postType === "thread") {
-          if(data.delType === "toRecycle") {
-            /*d = {
-              fid: "recycle",
-              para: data
-            };*/
-            d = {
-              postsId: [data.postId],
-              reason: data.reason,
-              remindUser: data.noticeType,
-              violation: data.illegalType
-            };
-            method = "POST";
-            // url = "/t/" + data.threadId + "/disabled";
-            url = "/threads/recycle";
-          } else {
-            /*d = {
-              para: data
-            };*/
-            d = {
-              postsId: [data.postId],
-              reason: data.reason,
-              remindUser: data.noticeType,
-              violation: data.illegalType
-            };
-            // url = "/t/" + data.threadId + "/moveDraft";
-            url = "/threads/draft";
-            method = "POST";
-          }
-        } else {
-          d = {
-            disabled: true,
+        if(data.delType === "toRecycle") {
+          /*d = {
+            fid: "recycle",
             para: data
+          };*/
+          d = {
+            postsId: [data.postId],
+            reason: data.reason,
+            remindUser: data.noticeType,
+            violation: data.illegalType
           };
-          url = '/p/'+data.postId+'/disabled'
+          method = "POST";
+          // url = "/t/" + data.threadId + "/disabled";
+          url = "/threads/recycle";
+        } else {
+          /*d = {
+            para: data
+          };*/
+          d = {
+            postsId: [data.postId],
+            reason: data.reason,
+            remindUser: data.noticeType,
+            violation: data.illegalType
+          };
+          // url = "/t/" + data.threadId + "/moveDraft";
+          url = "/threads/draft";
+          method = "POST";
         }
       }
 

@@ -40,6 +40,7 @@ block content
                 |正在编辑文章《
                 a(href=data.thread.url target="_blank")=`${data.thread.title}`
                 | 》下的
+                -console.log(data.thread.comment)
                 if data.thread.comment
                   | 评论
                 else 

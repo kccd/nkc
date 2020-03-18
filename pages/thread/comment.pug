@@ -78,8 +78,10 @@ if data.highlight === comment.pid
       div
         .text-center [本条回复已被退回修改，请作者点击编辑按钮修改]
         p.text-center.text-danger= `退修原因：${comment.reason}`
-    if comment.disabled && permission("disabledPost")
-      a(onclick=`enablePost('${comment.pid}')`) [此楼已屏蔽，点击解除]
+    if comment.disabled
+      span.text-primary [此楼已屏蔽]&nbsp;
+      if permission("unblockPosts") && data.isModerator
+        a(onclick=`enablePost('${comment.pid}')`) [点击解除]
 
 
   include ./postEdit

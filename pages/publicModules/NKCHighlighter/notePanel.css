@@ -1,8 +1,12 @@
-/* 弹窗皮肤 */
-/* 弹窗模块可引入该文件用于默认的弹窗样式 */
-/* 默认颜色 */
-/* 垂直居中 */
-.vc {
+#moduleNotePanel {
+  /* 弹窗皮肤 */
+  /* 弹窗模块可引入该文件用于默认的弹窗样式 */
+  /* 默认颜色 */
+  /* 垂直居中 */
+  /* 文本超出隐藏并显示省略号 */
+  width: 28rem;
+}
+#moduleNotePanel .vc {
   position: absolute;
   top: 0;
   left: 0;
@@ -10,27 +14,26 @@
   bottom: 0;
   margin: auto;
 }
-/* 文本超出隐藏并显示省略号 */
-.modal-dialog .modal-content {
+#moduleNotePanel .modal-dialog .modal-content {
   border-radius: 3px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
-.modal-dialog .modal-content .modal-header {
+#moduleNotePanel .modal-dialog .modal-content .modal-header {
   text-align: center;
   position: relative;
   padding: 0;
   border: none;
   overflow: hidden;
 }
-.modal-dialog .modal-content .modal-header .modal-title {
+#moduleNotePanel .modal-dialog .modal-content .modal-header .modal-title {
   height: 5rem;
   color: #282c37;
   font-weight: 700;
   line-height: 5rem;
   font-size: 1.3rem;
 }
-.modal-dialog .modal-content .modal-header .fa {
+#moduleNotePanel .modal-dialog .modal-content .modal-header .fa {
   cursor: pointer;
   color: #aaa;
   font-size: 1.2rem;
@@ -42,29 +45,26 @@
   line-height: 2.5rem;
   text-align: center;
 }
-.modal-dialog .modal-content .modal-header .fa:hover {
+#moduleNotePanel .modal-dialog .modal-content .modal-header .fa:hover {
   background-color: #eee;
 }
-.modal-dialog .modal-content .modal-body {
+#moduleNotePanel .modal-dialog .modal-content .modal-body {
   padding: 0 1rem;
   overflow: hidden;
 }
-.modal-dialog .modal-content .modal-footer {
+#moduleNotePanel .modal-dialog .modal-content .modal-footer {
   border: none;
   padding: 0 1rem 1rem 1rem;
 }
-.modal-dialog .modal-content .modal-footer .options-button {
+#moduleNotePanel .modal-dialog .modal-content .modal-footer .options-button {
   padding-right: 0;
 }
-.modal-dialog .modal-content .modal-footer .options-button > a:last-child {
+#moduleNotePanel .modal-dialog .modal-content .modal-footer .options-button > a:last-child {
   margin-right: 0;
 }
-.modal-backdrop.in {
+#moduleNotePanel .modal-backdrop.in {
   filter: alpha(opacity=20);
   opacity: 0.2;
-}
-#moduleNotePanel {
-  width: 28rem;
 }
 #moduleNotePanel .note-panel-body {
   padding: 0.5rem 1rem;
@@ -128,57 +128,49 @@
   margin-bottom: 1rem;
 }
 #moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user {
-  display: table-cell;
-  vertical-align: top;
-}
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-user-avatar {
-  cursor: pointer;
-}
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-user-avatar img {
-  margin-top: 3px;
-  height: 3.2rem;
-  width: 3.2rem;
-  border-radius: 3px;
-}
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body {
-  display: table-cell;
-  vertical-align: top;
-  padding-left: 0.5rem;
+  display: inline-block;
   width: 100%;
   position: relative;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-username {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-user-avatar {
+  cursor: pointer;
+  vertical-align: top;
+  font-size: 0;
+  margin-right: 0.5rem;
+}
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-user-avatar img {
+  margin-top: 3px;
+  height: 1.2rem;
+  width: 1.2rem;
+  border-radius: 3px;
+}
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-username {
   font-size: 1rem;
   color: #999;
   font-style: oblique;
   display: inline-block;
   margin-right: 0.3rem;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-username:hover {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-username:hover {
   cursor: pointer;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-time {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-time {
   display: inline-block;
   font-size: 1rem;
   color: #999;
   font-style: oblique;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-content {
-  color: #282c37;
-  word-break: break-all;
-  font-size: 1.2rem;
-}
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-options {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options {
   position: absolute;
   top: 0;
   right: 0;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-options:hover ul {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options:hover ul {
   display: block;
   width: 5rem;
   height: auto;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-options ul {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options ul {
   padding: 0;
   margin: 0;
   overflow: hidden;
@@ -195,7 +187,7 @@
   box-shadow: 2px 3px 12px 0 rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-options ul li {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options ul li {
   font-size: 1rem;
   list-style: none;
   height: 1.4rem;
@@ -203,14 +195,14 @@
   text-align: center;
   cursor: pointer;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-options ul li:hover {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options ul li:hover {
   background-color: #2b90d9;
   color: #fff;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-options ul li:first-child {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options ul li:first-child {
   border-bottom: 1px solid #f4f4f4;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-options > .fa {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options > .fa {
   cursor: pointer;
   height: 1.4rem;
   width: 1.4rem;
@@ -218,6 +210,19 @@
   line-height: 1.4rem;
   color: #aaa;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-options > .fa:hover {
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options > .fa:hover {
   color: #555;
+}
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body {
+  width: 100%;
+}
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body textarea {
+  height: 2.5rem;
+  width: 100%;
+  overflow: hidden;
+}
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-content {
+  color: #282c37;
+  word-break: break-all;
+  font-size: 1.2rem;
 }

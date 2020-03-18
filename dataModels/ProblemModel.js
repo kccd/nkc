@@ -61,6 +61,11 @@ const problemSchema = new Schema({
 	QQ: {
 		type: Number,
 		maxlength: [15, 'QQ位数不能超过15位']
+	},
+	// 是否提醒了用户
+	reminded: {
+		type: Boolean,
+		default: false
 	}
 }, {
 	collection: 'problems'

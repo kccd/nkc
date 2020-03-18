@@ -1,0 +1,70 @@
+extends ../bootstrap_base
+block title
+  title 专业地图
+  +includeCSS("/forums/forums.css")
+block content
+  mixin renderForumsInline(forums)
+    .app-forums-inline
+      for f in forums
+        a.app-forum-inline(href=`/f/${f.fid}`)=f.displayName
+  mixin renderForums(forums, showBorder)
+    .app-forums
+      for f in forums
+        -const parentForum = !!(f.childrenForums && f.childrenForums.length)
+        .app-forum(class=showBorder?"border":"")
+          if !parentForum
+            a.app-forum-avatar(href=`/f/${f.fid}`)
+              if f.iconFileName
+                img(src=tools.getUrl("forumAvatar", f.fid))
+              else
+                div(style=`background-color: ${f.color}`)
+          a.app-forum-body(href=`/f/${f.fid}`)
+            .app-forum-name=f.displayName
+              if !parentForum
+                .app-forum-number (
+                  span.number=f.countThreads
+                  | /
+                  span.number=f.countPosts
+                  | )
+            //-.app-forum-info
+              span.value=f.countThreads
+              span.name 篇文章
+              span.value=f.countPosts
+              span.name 条回复
+            .app-forum-description=f.description
+          .app-forum-subscribe
+            if f.canSubscribe
+              if !data.user
+                div(onclick=`NKC.methods.toLogin('login')`) 关注
+              else if f.subscribed
+                div.cancel(onclick=`subscribeForum(false, "${f.fid}")` data-button-fid=f.fid) 取关
+              else
+                div(onclick=`subscribeForum(true, "${f.fid}")` data-button-fid=f.fid) 关注
+              //- div(data-number-fid=f.fid)=f.followerCount || ""
+          if f.childrenForums && f.childrenForums.length
+            div(style="padding-left: 1rem;")
+              +renderForums(f.childrenForums)
+  mixin pageBody
+    if data.recommendForums && data.recommendForums.length
+      .forums-header 推荐
+      .m-l-1
+        +renderForums(data.recommendForums)
+    if data.user
+      if data.visitedForums && data.visitedForums.length
+        .forums-header 最近访问
+        +renderForumsInline(data.visitedForums)
+      if data.subForums && data.subForums.length
+        .forums-header 我关注的
+        +renderForumsInline(data.subForums)
+    .forums-header 话题
+    +renderForums(data.topicForums, true)
+    .forums-header 学科
+    +renderForums(data.disciplineForums, true)
+  if state.isApp
+    +pageBody
+  else
+    .container-fluid.max-width
+      +pageBody
+block scripts
+  include ../publicModules/subscribeTypes/subscribeTypes
+  +includeJS("/forums/forums.js")

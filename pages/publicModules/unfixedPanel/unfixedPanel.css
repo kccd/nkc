@@ -6,17 +6,18 @@
   background-color: #fff;
   border: 1px solid #ddd;
   box-shadow: 4px 4px 12px 0 rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
+  border-radius: 5px;
   z-index: 1050;
 }
 .unfixed-panel .unfixed-panel-header {
   height: 3rem;
+  border-radius: 5px 5px 0 0;
   line-height: 3rem;
   position: relative;
   user-select: none;
   box-sizing: border-box;
   border-bottom: 1px solid #f4f4f4;
-  background-color: #f8f8ee;
+  background-color: #ffffff;
 }
 .unfixed-panel .unfixed-panel-header .unfixed-panel-title {
   padding: 0 3rem 0 1rem;

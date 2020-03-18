@@ -87,7 +87,8 @@ block content
           select(style='display:inline-block;vertical-align: middle' v-model='test.nationCode')
             option(v-for='nationCode in nationCodes' :value='nationCode.code') +{{nationCode.code}} {{nationCode.chineseName}}
           input(style='display:inline-block;' placeholder='手机号码' v-model='test.mobile')
-          button(@click='testSendMessage') 测试
+          input(style='display:inline-block;' placeholder='自定义验证码' v-model='test.content')
+          button(@click='testSendMessage') 发送
         button.mdui-btn.mdui-btn-block.mdui-color-theme.mdui-m-t-3.mdui-m-b-5(@click='save') 保存
 block scripts
   script(src=`/nationCodes/nationCodes.js?v=${global.NKC.startTime}`)

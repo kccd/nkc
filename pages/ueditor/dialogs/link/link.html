@@ -13,6 +13,12 @@
 </head>
 <body>
     <table>
+        <tr style="line-height: 1rem;">
+            <td colspan="2"><var id="lang_notice_link"></var>
+                <br>
+                <var id="lang_notice_http"></var>
+            </td>
+        </tr>
         <tr>
             <td><label for="text"> <var id="lang_input_text"></var></label></td>
         </tr>
@@ -37,9 +43,9 @@
                  <input id="target" type="checkbox"/>
              </td>
         </tr>
-        <tr>
+        <!-- <tr>
             <td colspan="2" id="msg"></td>
-        </tr>
+        </tr> -->
     </table>
 <script type="text/javascript">
     var range = editor.selection.getRange(),
@@ -88,13 +94,26 @@
             };
             //修改链接内容的情况太特殊了，所以先做到这里了
             //todo:情况多的时候，做到command里
-            if(orgText && text.value != orgText){
-                link[browser.ie ? 'innerText' : 'textContent'] =  obj.textValue = text.value;
-                range.selectNode(link).select()
+            /* if(orgText && text.value != orgText){
+                obj.textValue = text.value;
+                // link[browser.ie ? 'innerText' : 'textContent'] =  obj.textValue = text.value;
+                // range.selectNode(link).select()
             }
             if(range.collapsed){
                 obj.textValue = text.value;
                 // 检测链接文本是否为空
+            } */
+            obj.textValue = text.value || "";
+            var href = obj.href;
+            var host = window.location.host.replace(".", "\\.");
+            var textValue = obj.textValue;
+            var reg = new RegExp("^http[s]?:\\/\\/" + host);
+            if(!reg.test(href)) {
+                obj.textValue = href;
+            }
+            if(orgText){
+                link[browser.ie ? 'innerText' : 'textContent'] =  obj.textValue || "";
+                range.selectNode(link).select()
             }
             editor.execCommand('link',utils.clearEmptyAttrs(obj) );
             dialog.close();
@@ -116,13 +135,13 @@
             return false;
         }
     };
-    $G('href').onblur = function(){
+    /* $G('href').onblur = function(){
         if(!hrefStartWith(this.value,["http","/","ftp://",'#'])){
             $G("msg").innerHTML = "<span style='color: red'>"+lang.httpPrompt+"</span>";
         }else{
             $G("msg").innerHTML = "";
         }
-    };
+    }; */
 
     function hrefStartWith(href,arr){
         href = href.replace(/^\s+|\s+$/g, '');

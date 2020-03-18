@@ -30,3 +30,24 @@ var app = new Vue({
     }
   }
 });
+
+function restore(id) {
+  sweetQuestion("确定要执行此操作？")
+    .then(function() {
+      return nkcAPI("/e/log/secret", "POST", {
+        type: "restore",
+        id: id
+      });
+    })
+    .then(function(data) {
+      var warning = data.warning;
+      if(warning && warning.length) {
+        sweetInfo("账号已恢复！但部分信息由于“"+warning.join("、")+"”等原因未能成功恢复。");
+      } else {
+        sweetSuccess("账号已恢复");
+      }
+    })
+    .catch(sweetError);
+
+
+}

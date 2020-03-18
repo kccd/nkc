@@ -7,6 +7,15 @@ var NKC = {
     videoExt: ["mp4"]
   }
 };
+
+NKC.methods.getLoginStatus = function() {
+  if(NKC.configs.isApp) {
+    return !!appGetFromLocal("user");
+  } else {
+    return !!NKC.configs.uid;
+  }
+};
+
 /*
 * 判断运行环境
 * */
@@ -397,7 +406,51 @@ NKC.methods.doExchange = function(arr) {
   }
 };
 
-// 页面折叠记录位置
+/*
+* 批量 屏蔽或退修 回复或文章
+* @param {String/Array} pid postId或postId组成的数组
+* */
+NKC.methods.disabledPosts = function(pid) {
+  var postsId = pid;
+  if(typeof pid === "string"){
+    postsId = [pid]
+  }
+  if(!pid || !postsId.length) return;
+  if(!window.DisabledPost) {
+    window.DisabledPost = new NKC.modules.DisabledPost();
+  }
+  window.DisabledPost.open(function(data) {
+    var body = {
+      postsId: postsId,
+      reason: data.reason,
+      remindUser: data.remindUser,
+      violation: data.violation
+    };
+    var url;
+    if(data.type === "toDraft") {
+      url = "/threads/draft";
+    } else {
+      url = "/threads/recycle";
+    }
+    nkcAPI(url, "POST", body)
+      .then(function() {
+        screenTopAlert("操作成功");
+        DisabledPost.close();
+        DisabledPost.unlock();
+      })
+      .catch(function(data) {
+        sweetError(data);
+        DisabledPost.unlock();
+      })
+  });
+};
+
+/*
+* 页面折叠记录位置
+* 创建实例的时候记录位置
+* 执行方法restore时跳转到之前记录的位置
+* @author pengxiguaa 2020-3-4
+* */
 NKC.modules.PagePosition = function() {
   var self = this;
   self.fromTheBottom = $(document).height() - $(document).scrollTop();
@@ -407,4 +460,26 @@ NKC.modules.PagePosition = function() {
       window.scrollTo(0, distance);
     }, 100);
   }
+};
+
+/*
+* 发送短信验证码
+* @param {String} type 验证码类型
+* @return {Promise}
+* @author pengxiguaa 2020-3-4
+* */
+
+NKC.methods.sendMobileCode = function(type) {
+  return nkcAPI("/sendMessage/" + type, "POST")
+};
+/*
+* 发送邮件验证码
+* @param {String} type 验证码类型
+* @return {Promise}
+* @author pengxiguaa 2020-3-4
+* */
+NKC.methods.sendEmailCode = function(type) {
+  return nkcAPI("/u/" + NKC.configs.uid + "/settings/email", "POST", {
+    operation: type
+  });
 };

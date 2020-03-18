@@ -39,6 +39,7 @@ userRouter
     const {db, body, params, data, redis} = ctx;
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
+    if(targetUser.destroyed) ctx.throw(403, "对方账号已注销");
     const {user} = data;
     // 判断是否有权限发送信息
     await db.MessageModel.ensureSystemLimitPermission(user.uid, targetUser.uid);

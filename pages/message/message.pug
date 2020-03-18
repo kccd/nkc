@@ -105,14 +105,16 @@ block content
               span &nbsp;申请添加你为好友
             .ms-application-description(v-if='message.description') {{message.description}}
           .ms-application-button
-            div(v-if='message.agree === null')
-              button.btn.btn-success.btn-xs(@click='postApplication(true, message)') 同意
-              button.btn.btn-danger.btn-xs(@click='postApplication(false, message)') 拒绝
-            div(v-else-if='message.agree')
+            div(v-if='message.agree === "null"')
+              button.btn.btn-default.btn-xs(@click='postApplication("ignored", message)') 忽略
+              button.btn.btn-success.btn-xs(@click='postApplication("true", message)') 同意
+              button.btn.btn-danger.btn-xs(@click='postApplication("false", message)') 拒绝
+            div(v-else-if='message.agree === "true"')
               div.text-success 已同意
-            div(v-else-if='!message.agree')
+            div(v-else-if='message.agree === "false"')
               div.text-danger 已拒绝
-
+            div(v-else-if="message.agree === 'ignored'")
+              div 已忽略
   // 好友分组内容
   mixin categoriesContent
     .ms-friend-body(v-if='category')

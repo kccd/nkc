@@ -215,7 +215,11 @@ threadRouter
 		const {data, params, db, query, nkcModules, body, state} = ctx;
 		let {token, paraId} = query;
 		let {page = 0, pid, last_page, highlight, step, t} = query;
-		const {tid} = params;
+    let {tid} = params;
+    try{
+      const arr = tid.match(/^[0-9]+/);
+      if(arr && arr.length) tid = arr[0];
+    } catch(err) {}
 		data.highlight = highlight;
 		data.complaintTypes = ctx.state.language.complaintTypes;
     const thread = await db.ThreadModel.findOnly({tid});
@@ -758,13 +762,22 @@ threadRouter
       data.attachmentsCount = await db.ResourceModel.count({mediaType: "mediaAttachment", references: {$in: pid}});
     }
     const hidePostSettings = await db.SettingModel.getSettings("hidePost");
-    const threadNotes = await db.NoteModel.getNotesByPostId(data.thread.oc, data.thread.firstPost.cv);
-    data.notes = [
-      {
-        pid: data.thread.oc,
-        notes: threadNotes
-      }
-    ];
+    /*if(ctx.permission("addNote")) {
+
+    }*/
+
+    const notePosts = [{
+      pid: data.thread.oc,
+      cv: data.thread.firstPost.cv
+    }];
+    data.posts.map(post => {
+      notePosts.push({
+        pid: post.pid,
+        cv: post.cv
+      });
+    });
+    data.notes = await db.NoteModel.getNotesByPosts(notePosts);
+
     data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;
 		data.step = step;

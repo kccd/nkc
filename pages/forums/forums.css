@@ -1,0 +1,188 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+.forums-header {
+  margin-bottom: 0.5rem;
+  background-color: #f6f6f6;
+  height: 3rem;
+  line-height: 3.2rem;
+  padding: 0 1rem;
+  color: #555;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.app-forums-inline {
+  padding: 0 1rem;
+}
+.app-forums-inline .app-forum-inline {
+  display: inline-block;
+  color: #555;
+  font-weight: 700;
+  margin: 0 0.5rem 0.5rem 0;
+  font-size: 1.35rem;
+}
+.app-forums-inline .app-forum-inline:hover,
+.app-forums-inline .app-forum-inline:active,
+.app-forums-inline .app-forum-inline:visited {
+  text-decoration: none;
+  color: #777;
+}
+.container-fluid .app-forum {
+  transition: background-color 500ms;
+}
+.container-fluid .app-forum:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+.container-fluid .app-forum .app-forum-avatar div,
+.container-fluid .app-forum .app-forum-avatar img {
+  margin-left: 0!important;
+}
+.app-forums .app-forum {
+  margin: 0.5rem 0;
+  padding: 0.2rem 0;
+  position: relative;
+}
+.app-forums .app-forum.border {
+  border-bottom: 1px solid #f6f6f6;
+}
+.app-forums .app-forum .app-forum-avatar {
+  display: table-cell;
+  vertical-align: top;
+  padding-top: 0.1rem;
+}
+.app-forums .app-forum .app-forum-avatar div,
+.app-forums .app-forum .app-forum-avatar img {
+  height: 3rem;
+  width: 3rem;
+  border-radius: 4px;
+}
+.app-forums .app-forum .app-forum-avatar:active {
+  background-color: #f6f6f6;
+}
+.app-forums .app-forum .app-forum-body {
+  color: #555;
+  padding-right: 0.5rem;
+  display: table-cell;
+  vertical-align: top;
+  padding-left: 1rem;
+  width: 100%;
+}
+.app-forums .app-forum .app-forum-body:active {
+  background-color: #f6f6f6;
+}
+.app-forums .app-forum .app-forum-body:hover,
+.app-forums .app-forum .app-forum-body:active,
+.app-forums .app-forum .app-forum-body:visited,
+.app-forums .app-forum .app-forum-body:link {
+  text-decoration: none;
+}
+.app-forums .app-forum .app-forum-body .app-forum-name {
+  font-size: 1.4rem;
+  height: 2rem;
+  color: #555;
+  font-weight: 700;
+  padding-right: 6rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.app-forums .app-forum .app-forum-body .app-forum-description {
+  box-sizing: border-box;
+  font-size: 1rem;
+  color: #666;
+  max-height: 3.5rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-style: oblique;
+}
+.app-forums .app-forum .app-forum-body .app-forum-info .name {
+  font-size: 1rem;
+  margin-right: 0.4rem;
+  font-style: oblique;
+}
+.app-forums .app-forum .app-forum-body .app-forum-info .value {
+  font-style: oblique;
+  margin-right: 0.1rem;
+  font-size: 1.2rem;
+  color: #e87a8c;
+  font-weight: 700;
+}
+.app-forums .app-forum .app-forum-number {
+  display: inline-block;
+  font-size: 1rem;
+}
+.app-forums .app-forum .app-forum-number .number {
+  color: #e85a71;
+}
+.app-forums .app-forum .app-forum-subscribe {
+  height: 6rem;
+  position: absolute;
+  box-sizing: border-box;
+  top: -0.1rem;
+  right: 0;
+  margin: auto;
+  width: 6rem;
+  /*div:last-child{
+        margin-top: 0.3rem;
+        font-style: oblique;
+        color: #777;
+        font-size: 1.1rem;
+        font-weight: 700;
+        position: relative;
+        &:after{
+          content: "+1";
+          position: absolute;
+          right: 0;
+          font-size: 1rem;
+          bottom: 0.1rem;
+          color: rgba(232, 122, 140, 0);
+          font-style: oblique;
+        }
+        &.show:after{
+          color: rgba(232, 122, 140, 1);
+          bottom: 0.1rem;
+          transition: color 1000ms, bottom 1000ms;
+        }
+        &.move:after{
+          bottom: 1.7rem;
+          color: rgba(232, 122, 140, 0);
+        }
+      }*/
+}
+.app-forums .app-forum .app-forum-subscribe div {
+  margin: auto;
+  text-align: center;
+}
+.app-forums .app-forum .app-forum-subscribe div:first-child {
+  margin-top: 0;
+  cursor: pointer;
+  border-radius: 1rem;
+  border: 1px solid #2b90d9;
+  color: #2b90d9;
+  width: 4rem;
+  font-size: 1rem;
+  height: 2rem;
+  line-height: 2rem;
+  text-align: center;
+}
+.app-forums .app-forum .app-forum-subscribe div:first-child.cancel {
+  color: #9baec8;
+  border: 1px solid #9baec8;
+}
+.app-forums .app-forum .app-forum-subscribe div:first-child:active {
+  background-color: #2b90d9;
+  color: #fff;
+}

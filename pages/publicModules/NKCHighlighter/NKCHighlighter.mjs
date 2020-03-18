@@ -4,38 +4,102 @@
     create: 创建实例
     hover: 鼠标悬浮
     hoverOut: 鼠标移开
-
-
 */
 window.Source = class {
   constructor(options) {
-    const {hl, nodes, id} = options;
+    let {hl, node, id, _id} = options;
+    id = id ||_id;
     const self = this;
     this.hl = hl;
-    this.nodes = nodes;
-    this.content = hl.getNodesContent(nodes);
+    this.node = node;
+    this.content = hl.getNodesContent(node);
     this.dom = [];
     this.id = id;
     this._id = `nkc-hl-id-${id}`;
-    this.nodes.forEach(node => {
-      const {offset, length} = node;
-      const targetNotes = self.getNodes(this.hl.root, offset, length);
-      targetNotes.map(targetNode => {
+    const {offset, length} = this.node;
+    const targetNotes = self.getNodes(this.hl.root, offset, length);
+    targetNotes.map(targetNode => {
+      if(!targetNode.textContent.length) return;
+      const parentNode = targetNode.parentNode;
+      if(parentNode.classList.contains("nkc-hl")) {
+        // 存在高亮嵌套的问题
+        // 理想状态下，所有选区处于平级，重合部分被分隔，仅添加多个class
+        let parentsId = parentNode.getAttribute("data-nkc-hl-id");
+        parentsId = parentsId.split("-");
+        const sources = [];
+        for(const pid of parentsId) {
+          sources.push(self.hl.getSourceByID(Number(pid)));
+        }
+
+        for(const node of parentNode.childNodes) {
+          if(!node.textContent.length) continue;
+          const span = document.createElement("span");
+          span.className = `nkc-hl`;
+          span.onmouseover = parentNode.onmouseover;
+          span.onmouseout = parentNode.onmouseout;
+          span.onclick = parentNode.onclick;
+          sources.map(s => {
+            s.dom.push(span);
+          });
+
+          // 新选区
+          if(node === targetNode) {
+            // 如果新选区完全覆盖上层选区，则保留上层选区的事件，否则添加新选区相关事件
+            if(parentNode.childNodes.length !== 1 || targetNotes.length === 1) {
+              span.onmouseover = function() {
+                self.hl.emit(self.hl.eventNames.hover, self);
+              };
+              span.onmouseout = function() {
+                self.hl.emit(self.hl.eventNames.hoverOut, self);
+              };
+              span.onclick = function() {
+                self.hl.emit(self.hl.eventNames.click, self);
+              };
+            }
+            // 覆盖区域添加class nkc-hl-cover
+            span.className += ` nkc-hl-cover`;
+            span.setAttribute(`data-nkc-hl-id`, parentsId.concat([self.id]).join("-"));
+            self.dom.push(span);
+          } else {
+            span.setAttribute(`data-nkc-hl-id`, parentsId.join("-"));
+          }
+          span.appendChild(node.cloneNode(false));
+          parentNode.replaceChild(span, node);
+        }
+        sources.map(s => {
+          const parentIndex = s.dom.indexOf(parentNode);
+          if(parentIndex !== -1) {
+            s.dom.splice(parentIndex, 1);
+          }
+        });
+        // 清除上层选区dom的相关事件和class
+        // parentNode.classList.remove(`nkc-hl`, source._id, `nkc-hl-cover`);
+        // parentNode.className = "";
+        parentNode.onmouseout = null;
+        parentNode.onmouseover = null;
+        parentNode.onclick = null;
+      } else {
+        // 全新选区 无覆盖的情况
         const span = document.createElement("span");
-        self.dom.push(span);
-        span.addEventListener("mouseover", () => {
+
+        span.classList.add("nkc-hl");
+        span.setAttribute("data-nkc-hl-id", self.id);
+
+        span.onmouseover = function() {
           self.hl.emit(self.hl.eventNames.hover, self);
-        });
-        span.addEventListener("mouseout", () => {
+        };
+        span.onmouseout = function() {
           self.hl.emit(self.hl.eventNames.hoverOut, self);
-        });
-        span.addEventListener("click", () => {
+        };
+        span.onclick = function() {
           self.hl.emit(self.hl.eventNames.click, self);
-        });
-        span.setAttribute("class", `nkc-hl ${self._id}`);
+        };
+
+        self.dom.push(span);
+
         span.appendChild(targetNode.cloneNode(false));
         targetNode.parentNode.replaceChild(span, targetNode);
-      });
+      }
     });
     this.hl.sources.push(this);
     this.hl.emit(this.hl.eventNames.create, this);
@@ -79,6 +143,10 @@ window.Source = class {
               if(cl.contains(c)) {
                 continue loop;
               }
+            }
+            const elementTagName = node.tagName.toLowerCase();
+            if(self.hl.excludedElementTagName.includes(elementTagName)) {
+              continue;
             }
           }
           nodeStack.push(node);
@@ -127,18 +195,18 @@ window.Source = class {
 window.NKCHighlighter = class {
   constructor(options) {
     const {
-      rootElementId, excludedElementClass = []
+      rootElementId, excludedElementClass = [],
+      excludedElementTagName = []
     } = options;
     const self = this;
     self.root = document.getElementById(rootElementId);
     self.excludedElementClass = excludedElementClass;
-    self.position = {
-      x: 0,
-      y: 0
-    };
+    self.excludedElementTagName = excludedElementTagName;
+
     self.range = {};
     self.sources = [];
     self.events = {};
+    self.disabled = false;
     self.eventNames = {
       create: "create",
       hover: "hover",
@@ -146,31 +214,38 @@ window.NKCHighlighter = class {
       select: "select"
     };
 
-    window.addEventListener("mouseup", function(e) {
-      self.position.x = e.clientX;
-      self.position.y = e.clientY;
-      const range = self.getRange();
-      if(!range) return;
-      if(
-        range.startContainer === self.range.startContainer &&
-        range.endContainer === self.range.endContainer &&
-        range.startOffset === self.range.startOffset &&
-        range.endOffset === self.range.endOffset
-      ) return;
-      // 限制选择文字的区域，只能是selecter内的文字
-      if(!self.root.contains(range.startContainer) || !self.root.contains(range.endContainer)) return;
-      self.range = range;
-      self.emit(self.eventNames.select, {
-        position: self.position,
-        range
-      });
-    });
+    const initEvent = () => {
+      try{
+        // 屏蔽划词事件
+        if(self.disabled) return;
+        const range = self.getRange();
+        if(!range || range.collapsed) return;
+        if(
+          range.startContainer === self.range.startContainer &&
+          range.endContainer === self.range.endContainer &&
+          range.startOffset === self.range.startOffset &&
+          range.endOffset === self.range.endOffset
+        ) return;
+        // 限制选择文字的区域，只能是root下的选区
+        if(!self.root.contains(range.startContainer) || !self.root.contains(range.endContainer)) return;
+        self.range = range;
+        self.emit(self.eventNames.select, {
+          range
+        });
+      } catch(err) {
+        console.log(err.message || err);
+      }
+    };
+    document.addEventListener("mouseup", initEvent);
   }
   getParent(self, d) {
     if(d === self.root) return;
     if(d.nodeType === 1) {
       for(const c of self.excludedElementClass) {
-        if(d.classList.contains(c)) throw new Error("划词区域已被忽略");
+        if(d.classList.contains(c)) throw new Error("划词越界");
+      }
+      if(self.excludedElementClass.includes(d.tagName.toLowerCase())) {
+        throw new Error("划词越界");
       }
     }
     if(d.parentNode) self.getParent(self, d.parentNode);
@@ -179,11 +254,9 @@ window.NKCHighlighter = class {
     try{
       const range = window.getSelection().getRangeAt(0);
       const {startOffset, endOffset, startContainer, endContainer} = range;
-      if(this.excludedElementClass.length) {
-        this.getParent(this, startContainer);
-        this.getParent(this, endContainer);
-      }
-      if(startOffset === endOffset) return;
+      this.getParent(this, startContainer);
+      this.getParent(this, endContainer);
+      if(startOffset === endOffset && startContainer === endContainer) return;
       return range;
     } catch(err) {
       console.log(err);
@@ -203,9 +276,10 @@ window.NKCHighlighter = class {
   }
   getNodes(range) {
     const {startContainer, endContainer, startOffset, endOffset} = range;
-    if(startOffset === endOffset) return;
+    console.log(range)
+    // if(startOffset === endOffset) return;
     let selectedNodes = [], startNode, endNode;
-    if(startContainer.nodeType !== 3 || startContainer.nodeType !== 3) return;
+    // if(startContainer.nodeType !== 3 || startContainer.nodeType !== 3) return;
     if(startContainer === endContainer) {
       // 相同节点
       startNode = startContainer;
@@ -218,16 +292,15 @@ window.NKCHighlighter = class {
     } else {
       startNode = startContainer;
       endNode = endContainer;
-      selectedNodes.push({
-        node: startNode,
-        offset: startOffset,
-        length: startNode.textContent.length - startOffset
-      });
-      selectedNodes.push({
-        node: endNode,
-        offset: 0,
-        length: endOffset
-      });
+      // 当起始节点不为文本节点时，无需插入起始节点
+      // 在获取子节点时会将插入起始节点的子节点，如果这里不做判断，会出现起始节点内容重复的问题。
+      if(startNode.nodeType === 3) {
+        selectedNodes.push({
+          node: startNode,
+          offset: startOffset,
+          length: startNode.textContent.length - startOffset
+        });
+      }
       const nodes = this.findNodes(startNode, endNode);
       for(const node of nodes) {
         selectedNodes.push({
@@ -236,7 +309,13 @@ window.NKCHighlighter = class {
           length: node.textContent.length
         });
       }
+      selectedNodes.push({
+        node: endNode,
+        offset: 0,
+        length: endOffset
+      });
     }
+
     const nodes = [];
     for(const obj of selectedNodes) {
       const {node, offset, length} = obj;
@@ -248,25 +327,35 @@ window.NKCHighlighter = class {
         length
       });
     }
-    return nodes;
-  }
-  getNodesContent(nodes) {
-    let content = "";
-    nodes.map(node => {
+    if(!nodes.length) return null;
+
+    let content = "",  offset = 0, length = 0;
+    for(let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
       content += node.content;
-    });
-    return content;
+      length += node.length;
+      if(i === 0) offset = node.offset;
+    }
+
+    return {
+      content,
+      offset,
+      length
+    }
   }
-  createSource(id, nodes) {
+  getNodesContent(node) {
+    return node.content;
+  }
+  createSource(id, node) {
     return new Source({
       hl: this,
       id,
-      nodes,
+      node,
     });
   }
   getSourceByID(id) {
     for(const s of this.sources) {
-      if(s.id === id) return source;
+      if(s.id === id) return s;
     }
   }
   addClass(id, className) {
@@ -304,6 +393,10 @@ window.NKCHighlighter = class {
                 continue loop;
               }
             }
+            const elementTagName = node.tagName.toLowerCase();
+            if(self.excludedElementTagName.includes(elementTagName)) {
+              continue;
+            }
           }
           nodeStack.push(node);
         }
@@ -319,8 +412,8 @@ window.NKCHighlighter = class {
   }
   findNodes(startNode, endNode) {
     const selectedNodes = [];
-    // const parent = this.getSameParentNode(startNode, endNode);
-    const parent = this.root;
+    // const parent = this.root;
+    const parent = this.getSameParentNode(startNode, endNode);
     if(parent) {
       let start = false, end = false;
       const getChildNode = (node) => {
@@ -361,6 +454,39 @@ window.NKCHighlighter = class {
       }
     }
     return parent;
+  }
+  getSourceById(id) {
+    for(const s of this.sources) {
+      if(s.id === id) {
+        return s;
+      }
+    }
+  }
+  getStartNodeOffset(range) {
+    // 将文本节点从划词处分隔
+    // 在分割处插入span并获取span的位置
+    // 移除span并拼接分隔后的节点
+    const {startContainer, startOffset} = range;
+    let span = document.createElement("span");
+    let endNode;
+    if(startOffset === 0) {
+      endNode = startContainer;
+    } else {
+      endNode = startContainer.splitText(startOffset);
+    }
+    endNode.parentNode.insertBefore(span, endNode);
+    span = $(span);
+    const offset = span.offset();
+    span.remove();
+    // 未拼接分割后的节点，而是当点击添加按钮后重新获取range
+    // endNode.parentNode.normalize();
+    return offset;
+  }
+  lock() {
+    this.disabled = true;
+  }
+  unlock() {
+    this.disabled = false;
   }
   on(eventName, callback) {
     if(!this.events[eventName]) {

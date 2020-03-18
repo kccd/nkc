@@ -1,0 +1,179 @@
+@import "../publicModules/base";
+.forums-header{
+  margin-bottom: 0.5rem;
+  background-color: #f6f6f6;
+  height: 3rem;
+  line-height: 3.2rem;
+  padding: 0 1rem;
+  color: #555;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.app-forums-inline{
+  padding: 0 1rem;
+  .app-forum-inline{
+    display: inline-block;
+    color: #555;
+    font-weight: 700;
+    margin: 0 0.5rem 0.5rem 0;
+    font-size: 1.35rem;
+    &:hover, &:active, &:visited{
+      text-decoration: none;
+      color: #777;
+    }
+  }
+}
+.container-fluid{
+  .app-forum{
+    transition: background-color 500ms;
+    &:hover{
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+    .app-forum-avatar{
+      div, img{
+        margin-left: 0!important;
+      }
+    }
+  }
+}
+.app-forums{
+  @listHeight: 6rem;
+  @listPaddingRight: 6rem;
+  .app-forum{
+    margin: 0.5rem 0;
+    padding: 0.2rem 0;
+    position: relative;
+    &.border{
+      border-bottom: 1px solid #f6f6f6;
+    }
+    .app-forum-avatar{
+      display: table-cell;
+      vertical-align: top;
+      padding-top: 0.1rem;
+      div, img{
+        height: 3rem;
+        width: 3rem;
+        border-radius: 4px;
+      }
+      &:active{
+        background-color: #f6f6f6;
+      }
+    }
+    .app-forum-body{
+      &:active{
+        background-color: #f6f6f6;
+      }
+      color: #555;
+      &:hover, &:active, &:visited, &:link{
+        text-decoration: none;
+      }
+      padding-right: 0.5rem;
+      display: table-cell;
+      vertical-align: top;
+      padding-left: 1rem;
+      width: 100%;
+      .app-forum-name{
+        font-size: 1.4rem;
+        height: 2rem;
+        color: #555;
+        font-weight: 700;
+        padding-right: @listPaddingRight;
+        .hideText(@line: 1);
+      }
+      .app-forum-description{
+        //padding: 0.2rem 0.5rem;
+        box-sizing: border-box;
+        //border-radius: 2px;
+        //background-color: #f6f6f6;
+        font-size: 1rem;
+        color: #666;
+        max-height: 3.5rem;
+        .hideText(@line: 2);
+        font-style: oblique;
+      }
+      .app-forum-info{
+
+        .name{
+          font-size: 1rem;
+          margin-right: 0.4rem;
+          font-style: oblique;
+        }
+        .value{
+          font-style: oblique;
+          margin-right: 0.1rem;
+          font-size: 1.2rem;
+          color: #e87a8c;
+          font-weight: 700;
+        }
+      }
+    }
+    .app-forum-number{
+      display: inline-block;
+      font-size: 1rem;
+      .number{
+        color: @accent;
+      }
+    }
+    .app-forum-subscribe{
+      height: @listHeight;
+      position: absolute;
+      box-sizing: border-box;
+      top: -0.1rem;
+      right: 0;
+      margin: auto;
+      width: @listPaddingRight ;
+      div{
+        margin: auto;
+        text-align: center;
+      }
+      div:first-child{
+        margin-top: 0;
+        cursor: pointer;
+        @buttonHeight: 2rem;
+        border-radius: @buttonHeight * 0.5;
+        border: 1px solid @primary;
+        color: @primary;
+        width: 4rem;
+        font-size: 1rem;
+        height: @buttonHeight;
+        line-height: @buttonHeight;
+        text-align: center;
+        //box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+        &.cancel{
+          color: @darkGray;
+          border: 1px solid @darkGray;
+        }
+        &:active{
+          background-color: @primary;
+          color: #fff;
+        }
+      }
+      /*div:last-child{
+        margin-top: 0.3rem;
+        font-style: oblique;
+        color: #777;
+        font-size: 1.1rem;
+        font-weight: 700;
+        position: relative;
+        &:after{
+          content: "+1";
+          position: absolute;
+          right: 0;
+          font-size: 1rem;
+          bottom: 0.1rem;
+          color: rgba(232, 122, 140, 0);
+          font-style: oblique;
+        }
+        &.show:after{
+          color: rgba(232, 122, 140, 1);
+          bottom: 0.1rem;
+          transition: color 1000ms, bottom 1000ms;
+        }
+        &.move:after{
+          bottom: 1.7rem;
+          color: rgba(232, 122, 140, 0);
+        }
+      }*/
+    }
+  }
+}

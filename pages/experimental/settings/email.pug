@@ -44,6 +44,7 @@ block content
               select(style='display:inline-block;vertical-align: middle;' v-model='test.name')
                 option(v-for='t in emailSettings.templates' :value='t.name') {{tran(t.name)}}
               input(style='display:inline-block;' placeholder='邮箱地址' v-model='test.email')
+              input(style='display:inline-block;' placeholder='自定义验证码' v-model='test.content')
               button(@click='testSendEmail') 测试
         .row.mdui-m-b-5
           .col-xs-12.col-md-2.text-right

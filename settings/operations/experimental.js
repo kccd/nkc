@@ -4,9 +4,6 @@ module.exports = {
 	  GET: "experimentalLogin",
     POST: "experimentalLogin"
   },
-	status: {
-		GET: 'visitExperimentalStatus'
-	},
 	settings: {
 		editor: {
 			GET: "experimentalEditorSettings",
@@ -301,7 +298,8 @@ module.exports = {
 			DELETE: 'deletePublicLogs'
 		},
 		secret: {
-			GET: 'visitSecretLogs'
+			GET: 'visitSecretLogs',
+			POST: 'visitSecretLogs'
 		},
     message: {
 		  GET: "visitMessageLogs"

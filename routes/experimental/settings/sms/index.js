@@ -42,14 +42,15 @@ smsRouter
   // })
   .post('/test', async (ctx, next) => {
     const {body, nkcModules} = ctx;
-    const {name, nationCode, mobile} = body;
+    const {name, nationCode, mobile, content} = body;
     if(!name) ctx.throw(400, '测试类型不能为空');
     if(!nationCode) ctx.throw(400, '测试手机国际区号不能为空');
     if(!mobile) ctx.throw(400, '测试手机号码不能为空');
+    if(!content) ctx.throw(400, "自定义验证码不能为空");
     const {sendMessage} = nkcModules;
     await sendMessage({
       type: name,
-      code: '<后台测试>',
+      code: content,
       mobile: mobile,
       nationCode: nationCode || '86'
     });

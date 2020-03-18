@@ -108,7 +108,7 @@ const floatUserPanel = new Vue({
             });
           })
           .catch(err => {
-            console.log(err);
+            // console.log(err);
           });
       });
       dom.attr("data-float-init", "true");
@@ -137,7 +137,7 @@ const floatUserPanel = new Vue({
               resolve(userObj);
             })
             .catch(err => {
-              console.log(err)
+              console.log(err);
               reject(err);
             });
         }    
@@ -148,4 +148,4 @@ const floatUserPanel = new Vue({
       SubscribeTypes.subscribeUser(user.uid, !subscribed);
     }
   }
-})
+});

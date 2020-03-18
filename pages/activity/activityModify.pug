@@ -123,15 +123,8 @@ block content
                     .form-group
                       label.col-sm-2.control-label 活动详情：
                       .col-sm-10
-                        include ../ueditor/ueditor.pug   
+                        #editor
                         div#replyxxx(style="display:none")=data.activity.description
-                        .checkbox-inline(style="display:none")
-                          label
-                            input#ParseURL(type='checkbox' checked)
-                            | 处理URL
-                        .form-group
-                        include ../media/media_index.pug       
-
                     .form-group
                       label.col-sm-2.control-label 通知内容：
                       .col-sm-10
@@ -191,20 +184,20 @@ block content
                             th
 block scripts
   -if(!data.modifyType || data.modifyType === 'modify')
-    script(src="/jquery-ui-1.10.4.custom.js")
     script(src="/bootstrap/js/bootstrap-datetimepicker.min.js" charset="UTF-8")
     script(src="/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8")
     script(src='/bootstrap/js/bootstrap-chinese-region.min.js' charset="UTF-8")
     script(src='/external_pkgs/cropper/js/cropper.js', charset="UTF-8")
-    script(src=`/interface_common.js?v=${global.NKC.startTime}`)
     script(src='/commonmark/dist/commonmark.js')
     script(src='/xbbcode-parser/xbbcode.js')
-    script(src='/xss/dist/xss.js')  
-    script(src=`/nkc_render.js?v=${global.NKC.startTime}`)
+    script(src='/xss/dist/xss.js')
     +includeJS("/publicModules/customForm/customForm.js")
+    include ../publicModules/selectDraft/selectDraft
+    include ../publicModules/selectResource/selectResource
+    include ../publicModules/sticker/selectSticker
+    include ../ueditor/ueditorBase
     script(src=`/activity/activityCommon.js?v=${global.NKC.startTime}` charset="UTF-8")
     include ../publicModules/crop/crop
-    script(src=`/media/media_index.js?v=${startTime}`)
     script(src=`/activity/activityModify.js?v=${global.NKC.startTime}` charset="UTF-8")
   if data.modifyType === "manage"
     +includeJS("/activity/activityManage.js")

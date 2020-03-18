@@ -10687,11 +10687,13 @@ UE.commands['insertformulacode'] = {
         },200);
 
 
-        setTimeout(function(){
+        // 2020-03-02 pengxiguaa 调整编辑器中公式渲染
+        // 仅仅在公式输入框处渲染公式，而编辑器中的公式无需渲染
+        /*setTimeout(function(){
             if(document.getElementById('ueditor_0').contentWindow.MathJax){
                 document.getElementById('ueditor_0').contentWindow.MathJax.Hub.PreProcess(me.document.getElementById('view'),function(){document.getElementById('ueditor_0').contentWindow.MathJax.Hub.Process(me.document.getElementById('view'))})
             }
-        },200);
+        },200);*/
     }
 };
 

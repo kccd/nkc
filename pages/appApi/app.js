@@ -317,3 +317,18 @@ function emitEvent(name, data) {
     extra: data || {}
   });
 }
+
+
+// 从本地读取
+function appGetFromLocal(key) {
+  if(!key) throw '属性名不能为空';
+  var data = api.getPrefs({
+    sync: true,
+    key: key
+  });
+  try{
+    data = JSON.parse(data);
+  } catch(err) {
+  }
+  return data;
+}

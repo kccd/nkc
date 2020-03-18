@@ -1,5 +1,5 @@
-@import "../skin";
 #moduleNotePanel{
+  @import "../skin";
   width: 28rem;
   .note-panel-body{
     padding: 0.5rem 1rem;
@@ -57,24 +57,21 @@
           margin-bottom: 1rem;
         }
         .note-panel-user{
-          display: table-cell;
-          vertical-align: top;
+          display: inline-block;
+          width: 100%;
+          position: relative;
           .note-panel-user-avatar{
             cursor: pointer;
+            vertical-align: top;
+            font-size: 0;
+            margin-right: 0.5rem;
             img{
               margin-top: 3px;
-              height: 3.2rem;
-              width: 3.2rem;
+              height: 1.2rem;
+              width: 1.2rem;
               border-radius: 3px;
             }
           }
-        }
-        .note-panel-content-body{
-          display: table-cell;
-          vertical-align: top;
-          padding-left: 0.5rem;
-          width: 100%;
-          position: relative;
           .note-panel-username{
             font-size: 1rem;
             color: #999;
@@ -90,12 +87,6 @@
             font-size: 1rem;
             color: #999;
             font-style: oblique;
-          }
-
-          .note-panel-content{
-            color: @dark;
-            word-break: break-all;
-            font-size: 1.2rem;
           }
           .note-panel-options{
             position: absolute;
@@ -151,6 +142,19 @@
                 color: #555;
               }
             }
+          }
+        }
+        .note-panel-content-body{
+          width: 100%;
+          textarea{
+            height: 2.5rem;
+            width: 100%;
+            overflow: hidden;
+          }
+          .note-panel-content{
+            color: @dark;
+            word-break: break-all;
+            font-size: 1.2rem;
           }
         }
       }

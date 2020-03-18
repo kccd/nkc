@@ -14,7 +14,7 @@ block content
       .hidden#data= JSON.stringify({id: data.problem._id})
       .col-xs-12.col-md-12.box-shadow-panel
         h4(style='color: #aaa;')
-          a.btn.btn-default.btn-sm(href=`/u/${data.user.uid}/myProblems`) << 返回列表
+          a.btn.btn-default.btn-sm(onclick="window.history.back(-1)") << 返回列表
         .col-xs-12.col-md-12
           .h2.text-center#title= problem.t
           .text-center &nbsp;&nbsp;上报于&nbsp;&nbsp;
@@ -30,17 +30,18 @@ block content
               span.label.label-success 已解决
             else
               span.label.label-danger 暂未解决
-          h4.m-t-3
-            strong 问题详情    
-          .m-t-1#content!= markdown_safe(problem.c)
+
+          h4.m-t-2  
+            strong 问题详情
+          .m-t-2#content!= markdown_safe(problem.c)
           if problem.QQ
             h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
           if problem.email
             h5#emailDiv=`邮箱地址：${problem.email || '暂未填写'}`
           if problem.resolved
-            h4.m-t-3
+            h4.m-t-2
               strong 解决说明
-            .m-t-1!=markdown_safe(problem.restorLog)  
+            .m-t-2!=markdown_safe(problem.restorLog)
 
 block scripts
   include ../../publicModules/highlight/highlight

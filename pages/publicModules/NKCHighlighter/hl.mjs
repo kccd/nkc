@@ -5,6 +5,8 @@
   div.article-attachment 附件
   div.article-audio 音频
   div.article-video-body 视频
+                         代码
+                         公式
 *
 *
 *
@@ -13,55 +15,86 @@
 NKC.modules.NKCHL = class {
   constructor(options) {
     const self = this;
-    const {el, type, id, notes = [], excludedElementClass = []} = options;
+    const {type, targetId, notes = [], excludedElementClass = []} = options;
     self.type = type;
-    self.id = id;
+    self.id = targetId;
 
+    const el = `${type}-content-${targetId}`;
     self.rootElement = document.getElementById(el);
-
-    body.addEventListener("click", () => {
-      self.removeBtn();
-    });
+    window.addEventListener("mouseup", () => {
+      setTimeout(() => {
+        self.removeBtn();
+      }, 50)
+    }, true);
     const hl = new NKCHighlighter({
       rootElementId: el,
+      excludedElementTagName: [
+        "video",
+        "audio",
+        "source",
+        "code",
+        "pre",
+        "table"
+      ],
       excludedElementClass: [
-        "article-img-body",
-        "article-attachment",
-        "article-audio",
-        "article-video-body"
+        "article-img-body", // 图片
+        "article-attachment", // 附件
+        "article-audio", // 音频
+        "MathJax_CHTML", // 公式
+        "article-video-body", // 视频
+        "article-quote", // 引用
       ].concat(excludedElementClass)
     });
     self.hl = hl;
     hl
       .on(hl.eventNames.select, data => {
-      const {position, range} = data;
-      self.sleep(200)
-        .then(() => {
-          const btn = self.createBtn(position);
-          btn.onclick = () => {
-            let nodes = hl.getNodes(range);
-            const content = hl.getNodesContent(nodes);
-            self.newNote({
-              id: "",
-              content,
-              targetId: self.id,
-              type: "post",
-              notes: [],
-              nodes,
-            })
-              .then(note => {
-                hl.createSource(note._id, note.nodes);
+        if(!NKC.methods.getLoginStatus()) {
+          return;
+        }
+        // if(window.notePanel && window.notePanel.isOpen()) return;
+        let {range} = data;
+        self.sleep(200)
+          .then(() => {
+            const offset = self.hl.getStartNodeOffset(range);
+            if(!offset) return;
+            const btn = self.createBtn2(offset);
+            // const btn = self.createBtn(position);
+            btn.onclick = () => {
+              // 重新获取range
+              // 避免dom变化导致range对象未更新的问题
+              range = hl.getRange();
+              let node = hl.getNodes(range);
+              const content = hl.getNodesContent(node);
+              self.newNote({
+                id: "",
+                content,
+                targetId: self.id,
+                type: "post",
+                notes: [],
+                node,
               })
-              .catch(sweetError)
-          }
-        })
-        .catch(sweetError)
+                .then(note => {
+                  hl.createSource(note._id, note.node);
+                })
+                .catch(sweetError)
+            }
+          })
+          .catch(sweetError)
       })
       .on(hl.eventNames.create, source => {
-        hl.addClass(source, "post-node-mark");
+        // hl.addClass(source, "post-node-mark");
       })
       .on(hl.eventNames.click, function(source) {
-        self.showNotePanel(source.id);
+        if(NKC.methods.getLoginStatus()) {
+          if($(window).width() >= 768) {
+            // if(window.notePanel && window.notePanel.isOpen()) return;
+            self.showNotePanel(source.id);
+          } else {
+            NKC.methods.visitUrl(`/note/${source.id}`, true);
+          }
+        } else {
+          NKC.methods.toLogin("login");
+        }
       })
       .on(hl.eventNames.hover, function(source) {
         hl.addClass(source, "post-node-hover");
@@ -70,6 +103,16 @@ NKC.modules.NKCHL = class {
         hl.removeClass(source, "post-node-hover");
       });
     hl.restoreSources(notes);
+  }
+  createBtn2(offset) {
+    const {top, left} = offset;
+    const span = $("<span><span>添加笔记</span></span>");
+    span.addClass("nkc-hl-btn").css({
+      top: top - 2.6 * 12 + "px",
+      left: left - 1.8 * 12 + "px"
+    });
+    $(body).append(span);
+    return span[0];
   }
   createBtn(position) {
     this.removeBtn();
@@ -105,7 +148,6 @@ NKC.modules.NKCHL = class {
   }
   newNote(note) {
     this.initNotePanel();
-    const self = this;
     return new Promise((resolve, reject) => {
       window.notePanel.open(data => {
         resolve(data);
@@ -117,22 +159,9 @@ NKC.modules.NKCHL = class {
   showNotePanel(id) {
     this.initNotePanel();
     window.notePanel.open(data => {
-      console.log(data);
     }, {
       id
     });
   }
 };
-const data = NKC.methods.getDataById("threadForumsId");
-const nkchl = [];
 
-data.notes.map(n => {
-  const {pid, notes} = n;
-  notes.map(note => note.id = note._id);
-  nkchl.push(new NKC.modules.NKCHL({
-    el: `post-content-${pid}`,
-    type: "post",
-    id: pid,
-    notes: notes
-  }));
-});

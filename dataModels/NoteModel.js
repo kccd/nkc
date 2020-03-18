@@ -32,44 +32,56 @@ const schema = new Schema({
     type: String,
     default: ""
   },
-  nodes: {
-    /* [
-      {
-        // 文本节点的开始位置
-        offset: {
-          type: Number,
-          required: true
-        },
-        // 文本节点的结束位置
-        length: {
-          type: Number,
-          required: true
-        },
-        // 节点的文本
-        content: {
-          type: String,
-          default: ""
-        }
-      }
-    ] */
-    type: Schema.Types.Mixed,
-    required: true
+  node: {
+    // 文本节点的开始位置
+    offset: {
+      type: Number,
+      required: true,
+      index: 1
+    },
+    // 文本节点的结束位置
+    length: {
+      type: Number,
+      required: true,
+      index: 1
+    }
   }
 }, {
   collection: 'notes'
 });
 
-schema.statics.getNotesByPostId = async (pid, cv) => {
+schema.statics.getNotesByPosts = async (posts) => {
   const NoteModel = mongoose.model("notes");
   const match = {
     type: "post",
-    targetId: pid,
+    $or: []
   };
-  if(cv !== undefined) {
-    match.cv = cv;
+  posts.map(post => {
+    const obj = {
+      targetId: post.pid
+    };
+    if(post.cv !== undefined) {
+      obj.cv = post.cv
+    }
+    match.$or.push(obj);
+  });
+  let notes = await NoteModel.find(match).sort({toc: 1});
+  // notes = await NoteModel.extendNotes(notes);
+  const map = new Map();
+  for(const p of posts) {
+    if(!map.has(p.pid)) {
+      map.set(p.pid, {
+        type: "post",
+        targetId: p.pid,
+        notes: []
+      })
+    }
   }
-  const notes = await NoteModel.find(match);
-  return await NoteModel.extendNotes(notes);
+  for(const note of notes) {
+    const value = map.get(note.targetId);
+    value.notes.push(note);
+  }
+  return [...map.values()];
 };
 schema.statics.extendNote = async (note, options) => {
   const notes = await mongoose.model("notes").extendNotes([note], options);

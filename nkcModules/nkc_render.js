@@ -715,9 +715,9 @@ function nkc_render(options){
     renderedHTML = blockDomHtml + renderedHTML;
     renderedHTML = linkAlienate(renderedHTML); //please check linkAlienate()
     if(dataType === "post") {
-      renderedHTML = `<div id="post-content-${post.pid}">${renderedHTML}</div>`;
+      renderedHTML = `<div class="render-content" id="post-content-${post.pid}">${renderedHTML}</div>`;
     } else {
-      renderedHTML = `<div>${renderedHTML}</div>`;
+      renderedHTML = `<div class="render-content">${renderedHTML}</div>`;
     }
 
     return renderedHTML

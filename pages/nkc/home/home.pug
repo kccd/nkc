@@ -1,6 +1,6 @@
-extends ./nkc
+extends ../nkc
 block nkcTitle
-  title 前台管理 - 首页管理
+  title 主页设置 - 前台管理
 block nkcContent
   #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, goods: data.goods, toppedThreads: data.toppedThreads})
   .col-xs-12.col-md-12.box-shadow-panel.management-home#app(v-cloak)
@@ -136,6 +136,6 @@ block nkcContent
           button.management-button(@click="saveToppedThreads") 保存
 
 block nkcScripts
-  include ../publicModules/crop/crop_new
-  include ../publicModules/moveThread/moveThread
-  +includeJS("/js/nkc/home.js")
+  include ../../publicModules/crop/crop_new
+  include ../../publicModules/moveThread/moveThread
+  +includeJS("/nkc/home/home.js")

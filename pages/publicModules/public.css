@@ -279,17 +279,16 @@ table{
   border-color: #2b90d9;
 }
 .btn-theme:hover{
+  opacity: 0.9;
   color: #fff;
-  background-color: #438abe;
-  border-color: #438abe;
+}
+.btn-theme[disabled]{
+  opacity: 0.65;
 }
 .btn-theme:focus{
   color: #fff;
-  background-color: #438abe;
-  border-color: #438abe;
+  opacity: 0.9;
 }
-
-
 
 .list-header{
   height: 2rem;
@@ -2164,6 +2163,15 @@ button.thread-author-subscribe.active{
 button.thread-author-subscribe:focus{
   outline: none;
 }
+
+/*
+ 通过服务器experimental_render渲染得到的html结构中，
+ 最外层都会被一个class为render-content的div包裹
+*/
+.render-content{
+  overflow: hidden;
+}
+
 [data-sticker-rid]{
   cursor: pointer;
 }

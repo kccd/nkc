@@ -5,8 +5,7 @@ const logger = async (ctx, next) => {
   const { db, address: ip, port, url, method} = ctx;
   const processTime = ctx.processTime;
   const {apiFunction} = nkcModules;
-  const logSettings = await db.SettingModel.findOne({_id: "log"});
-  const {operationsId} = logSettings.c;
+  const {operationsId} = ctx.state.logSettings;
   // 获取用户的个人基本信息
   if(ctx.data.user){
     let userPersonal;
@@ -95,6 +94,7 @@ const logger = async (ctx, next) => {
       }else if(type.type === 'timeLine'){
         await new db.InfoBehaviorModel(behavior).save()
       }else if(type.type === 'secret'){
+        behavior.type = behavior.operationId;
         if(ctx.data.operationId === "modifyPassword"){
           behavior.oldHashType = userPersonal.hashType;
           behavior.oldHash = userPersonal.password.hash;
@@ -110,15 +110,15 @@ const logger = async (ctx, next) => {
           behavior.oldUsernameLowerCase = oldChangeUsername.toLowerCase();
         }
         if(ctx.data.operationId === "bindEmail"){
-          behavior.email = newBindEmail
+          behavior.newEmail = newBindEmail
         }
         if(ctx.data.operationId === "changeEmail"){
           behavior.oldEmail = userPersonal.email;
           behavior.newEmail = newChangeEmail;
         }
         if(ctx.data.operationId === "bindMobile"){
-          behavior.mobile = newBindMobile;
-          behavior.nationCode = newBindNationCode;
+          behavior.newMobile = newBindMobile;
+          behavior.newNationCode = newBindNationCode;
         }
         if(ctx.data.operationId === "modifyMobile"){
           behavior.oldMobile = userPersonal.mobile;

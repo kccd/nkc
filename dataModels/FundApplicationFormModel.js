@@ -3,6 +3,7 @@ const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const fundApplicationFormSchema = new Schema({
   _id: Number,
+	// 申请年份 用于生成申请表的代号
 	year: {
   	type: String,
 		default: null,
@@ -17,36 +18,44 @@ const fundApplicationFormSchema = new Schema({
 		type: String,
 		default: ''
 	},
+	// 基金项目ID
   fundId: {
     type: String,
     required: true,
     index: 1
   },
+	// 是否未固定金额
 	fixedMoney: {
   	type: Boolean,
 		required: true
 	},
+	// 申请时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
+	// 提交时间
 	timeToSubmit: {
   	type: Date,
 		default: null
 	},
+	// 通过审核的时间
 	timeToPassed: {
 		type: Date,
 		default: null
 	},
+	// 完成的时间
 	timeOfCompleted: {
   	type: Date,
 		default: null
 	},
+	// 最后修改时间
   tlm: {
     type: Date,
     index: 1
   },
+	// 来自个人或团队 personal、team
 	from: {
   	type: String,
 		required: true

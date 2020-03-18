@@ -32,13 +32,13 @@ emailRouter
   })
   .post('/test', async (ctx, next) => {
     const {nkcModules, body} = ctx;
-    const {name, email} = body;
+    const {name, email, content} = body;
     const {sendEmail} = nkcModules;
     if(!email) ctx.throw(400, '测试邮箱地址不能为空');
     await sendEmail({
       type: name,
       email: email,
-      code: '<后台测试>'
+      code: content
     });
     await next();
   });

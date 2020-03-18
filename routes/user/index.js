@@ -15,6 +15,7 @@ const subRouter = require("./sub");
 const profileRouter = require("./profile");
 const transferRouter = require("./transfer");
 const myProblemsRouter = require("./myProblems");
+const destroyRouter = require("./destroy");
 const userRouter = new Router();
 
 
@@ -452,5 +453,6 @@ userRouter
   .use("/:uid/transfer", transferRouter.routes(), transferRouter.allowedMethods())
 	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods())
   .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
+  .use("/:uid/destroy", destroyRouter.routes(), destroyRouter.allowedMethods())
   .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods());
 module.exports = userRouter;

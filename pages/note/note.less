@@ -1,0 +1,114 @@
+@import "../publicModules/base";
+#note{
+  .origin-content{
+    padding: 1rem;
+    color: #555;
+    background-color: #f4f4f4;
+    font-size: 1.3rem;
+    font-style: oblique;
+  }
+  .notes{
+    padding: 1rem;
+    .form{
+      textarea{
+        width: 100%;
+        height: 3rem;
+        resize: none;
+        overflow: hidden;
+      }
+    }
+    .note{
+      margin: 0 0 1rem 0;
+      .note-user{
+        position: relative;
+        width: 100%;
+        .note-user-avatar{
+          display: inline-block;
+          vertical-align: top;
+          margin-right: 0.5rem;
+          img{
+            margin-top: -2px;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 3px;
+          }
+        }
+        .note-user-username{
+          cursor: pointer;
+          display: inline-block;
+          font-size: 1rem;
+          color: #999;
+          font-style: oblique;
+          margin-right: 0.3rem;
+        }
+        .note-time{
+          font-size: 1rem;
+          display: inline-block;
+          color: #999;
+          font-style: oblique;
+        }
+
+        .note-options{
+          position: absolute;
+          top: 0;
+          right: 0;
+          ul{
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transition: width 200ms;
+            display: block;
+            width: 5rem;
+            height: auto;
+            user-select: none;
+            background-color: #fff;
+            border: 1px solid #f4f4f4;
+            box-shadow: 2px 3px 12px 0 rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            li{
+              font-size: 1rem;
+              list-style: none;
+              height: 3rem;
+              line-height: 3rem;
+              text-align: center;
+              cursor: pointer;
+              &:hover{
+                background-color: @primary;
+                color: #fff;
+              }
+              &:first-child{
+                border-bottom: 1px solid #f4f4f4;
+              }
+            }
+          }
+
+          &>.fa{
+            cursor: pointer;
+            height: 1.4rem;
+            width: 1.4rem;
+            text-align: center;
+            line-height: 1.4rem;
+            color: #aaa;
+            &:hover{
+              color: #555;
+            }
+          }
+        }
+      }
+      .note-content-body{
+        width: 100%;
+        .note-content{
+          textarea{
+            width: 100%;
+            height: 3rem;
+            resize: none;
+            overflow: hidden;
+          }
+        }
+      }
+    }
+  }
+}

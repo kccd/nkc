@@ -12,6 +12,18 @@ const schema = new Schema({
     default: Date.now,
     index: 1
   },
+  // 原文类型
+  type: {
+    type: String,
+    required: true,
+    index: 1
+  },
+  // 原文ID
+  targetId: {
+    type: String,
+    required: true,
+    index: 1
+  },
   content: {
     type: String,
     default: ''
@@ -47,27 +59,43 @@ const schema = new Schema({
 });
 
 /*
-* 拓展笔记的创建者
+* 拓展笔记的创建者、渲染内容。
 * @param {[Object]} noteContent 笔记内容对象组成的数组
 * @return {[Object]} 拓展user后的数据
 * @author pengxiguaa 2020-3-12
 * */
-schema.statics.extendNoteContent = async (noteContent) => {
+schema.statics.extendNoteContent = async (noteContent, options = {}) => {
+  const {extendNote} = options;
   const isArr = Array.isArray(noteContent);
   if(!isArr) {
     noteContent = [noteContent];
   }
   const {experimental_render} = require("../nkcModules/nkc_render");
   const UserModel = mongoose.model("users");
-  const usersId = [], usersObj = {};
-  noteContent.map(n => usersId.push(n.uid));
+  const usersId = [], usersObj = {}, notesId = [], notesObj = {};
+  noteContent.map(n => {
+    usersId.push(n.uid);
+    if(extendNote) notesId.push(n.noteId);
+  });
   const users = await UserModel.find({uid: {$in: usersId}});
   users.map(user => usersObj[user.uid] = user);
+  if(extendNote) {
+    const notes = await mongoose.model("notes").find({_id: {$in: notesId}});
+    notes.map(note => {
+      notesObj[note._id] = note
+    });
+  }
   const result = [];
   for(let c of noteContent) {
     if(c.toObject) c = c.toObject();
     c.user = usersObj[c.uid];
     c.html = experimental_render({c: c.content});
+    if(extendNote) {
+      c.note = notesObj[c.noteId];
+      if(c.note.type === "post") {
+        c.url = `/p/${c.note.targetId}`;
+      }
+    }
     result.push(c);
   }
   if(!isArr) return result[0];
@@ -78,6 +106,7 @@ schema.statics.extendNoteContent = async (noteContent) => {
 * 复制一份到数据库，添加cid字段表示该数据为cid对应内容的历史
 * */
 schema.methods.cloneAndUpdateContent = async function(content) {
+  if(this.content === content) return;
   const NoteContentModel = mongoose.model("noteContent");
   const nc = this.toObject();
   const tlm = Date.now();
@@ -86,6 +115,7 @@ schema.methods.cloneAndUpdateContent = async function(content) {
   nc._id = await mongoose.model("settings").operateSystemID("noteContent", 1);
   nc.cid = this._id;
   nc.tlm = tlm;
+  nc.deleted = true;
   const newNodeContent = NoteContentModel(nc);
   await newNodeContent.save();
   await this.update({

@@ -48,6 +48,8 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
           .inline-block(style='float: right;')
             -var floornumber = data.paging.start+index
             span.lighttext= floornumber + '楼'
+            .single-post-checkbox
+              input(type="checkbox" data-pid=post.pid)
         //- 显示post链接
         if showPostUrl
           .inline-block(style='float: right; font-size: 1rem;')
@@ -69,8 +71,11 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
             include ./postCredits
           if !disabledHidePost
             .hide-post-mask
-        if post.disabled && disablePost
-          a(onclick=`enablePost('${post.pid}')`) [此楼已屏蔽，点击解除]
+        if post.disabled
+          div
+            span.text-primary [此楼已屏蔽]&nbsp;
+            if unblockPosts
+              a(onclick=`enablePost('${post.pid}')`) [点击解除]
         //- 隐藏post的操作菜单
         if !hidePostOptions
           div

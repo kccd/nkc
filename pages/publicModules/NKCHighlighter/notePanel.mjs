@@ -61,13 +61,13 @@ NKC.modules.NotePanel = class {
           Promise.resolve()
             .then(() => {
               if(!content) throw "请输入笔记内容";
-              const {type, targetId, nodes, _id} = note;
+              const {type, targetId, node, _id} = note;
               return nkcAPI("/note", "POST", {
                 _id,
                 type,
                 targetId,
                 content,
-                nodes
+                node
               });
             })
             .then(data => {
@@ -166,7 +166,11 @@ NKC.modules.NotePanel = class {
           } else {
             method = "POST";
             url = `/nkc/note`;
-            data.type = "disable";
+            if(n.disabled) {
+              data.type = "cancelDisable";
+            } else {
+              data.type = "disable";
+            }
             data.noteId = note._id;
             data.noteContentId = n._id;
           }
@@ -175,6 +179,11 @@ NKC.modules.NotePanel = class {
               return nkcAPI(url, method, data);
             })
             .then(function() {
+              if(type === "delete") {
+                n.deleted = true;
+              } else {
+                n.disabled = !n.disabled;
+              }
               sweetSuccess("操作成功");
             })
             .catch(sweetError)
@@ -183,5 +192,8 @@ NKC.modules.NotePanel = class {
     });
     self.open = self.app.open;
     self.close = self.app.close;
+    self.isOpen = () => {
+      return !!this.app.show;
+    }
   }
 };
