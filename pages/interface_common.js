@@ -289,13 +289,17 @@ function asyncSweetSuccess(text, options) {
         confirmButtonText: "关闭",
         timer: options.timer,
         text: text
-      }).then(() => resolve());
+      }).then(function() {
+        resolve()
+      });
     } else {
       return Swal({
         type: "success",
         confirmButtonText: "关闭",
         text: text
-      }).then(() => resolve());
+      }).then(function(){
+        resolve()
+      });
     }
   })
 }
@@ -307,7 +311,9 @@ function asyncSweetError(text) {
       type: "error",
       confirmButtonText: "关闭",
       text: text.error || text
-    }).then(() => resolve());
+    }).then(function() {
+      resolve();
+    });
   })
 }
 

@@ -131,7 +131,9 @@ function zipExtractToDir(zipFilePath, targetPath) {
       let outsideDir = Object.values(zip.entries())[0];
       if(!outsideDir.isDirectory) reject("格式错误，请使用只包含一个文件夹的压缩包");
       zip.extract(null, targetPath, err => {
-        if(err) throw err;
+        if(err) {
+          return reject(err);
+        }
         zip.close();
         resolve(path.resolve(targetPath + "/" + outsideDir.name));
       });
