@@ -762,6 +762,23 @@ threadRouter
       data.attachmentsCount = await db.ResourceModel.count({mediaType: "mediaAttachment", references: {$in: pid}});
     }
     const hidePostSettings = await db.SettingModel.getSettings("hidePost");
+    /*if(ctx.permission("addNote")) {
+
+    }*/
+    if(ctx.permission("viewNote")) {
+      const notePosts = [{
+        pid: data.thread.oc,
+        cv: data.thread.firstPost.cv
+      }];
+      data.posts.map(post => {
+        notePosts.push({
+          pid: post.pid,
+          cv: post.cv
+        });
+      });
+      data.notes = await db.NoteModel.getNotesByPosts(notePosts);
+    }
+
     data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;
 		data.step = step;
@@ -827,7 +844,7 @@ threadRouter
 		const {post, postType} = body;
 		const {columnCategoriesId = [], anonymous = false, did} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		if(postType === "comment" && post.c.length > 1000) {
+		if(postType === "comment" && post.c.length > 2000) {
       ctx.throw(400, "评论内容不能超过1000字符");
     }
 

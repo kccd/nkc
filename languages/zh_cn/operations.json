@@ -654,6 +654,12 @@
   "experimentalStickerSettings": "后台管理 - 表情设置",
   "experimentalEditorSettings": "后台管理 - 编辑器设置",
   "hidePost": "折叠回复",
+  "addNote": "添加笔记",
+  "managementNote": "管理所有笔记(屏蔽、编辑和删除)",
+  "deleteNote": "删除笔记",
+  "modifyNote": "编辑笔记",
+  "viewNote": "查看笔记",
+  "nkcManagementNote": "前台管理 - 笔记管理",
   "unblockPosts": "撤销屏蔽回复",
   "destroyAccount": "账号注销",
   "unbindEmail": "解绑邮箱",
@@ -690,5 +696,13 @@
   "visitShopAccount": "访问商城中的个人主页",
 
   "blockCurrentActivity": "[SY]屏蔽活动",
-  "unBlockCurrentActivity": "[SY]解除屏蔽活动"
+  "unBlockCurrentActivity": "[SY]解除屏蔽活动",
+
+  "visitToolsList": "访问工具列表",
+  "visitTool": "访问网站工具",
+  "uploadTool": "上传网站工具",
+  "updateTool": "更新网站工具",
+  "visitUpdatePage": "访问更新工具页面",
+  "deleteTool": "删除网站工具",
+  "visitToolsManager": "访问网站工具管理页面"
 }

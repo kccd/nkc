@@ -278,7 +278,7 @@ block content
               .home-app-img
                 img(src=`/statics/apps/activity.png`)
               .home-app-name 活动
-            a.home-app(href=`/tools/index.htm`)
+            a.home-app(href=`/tools`)
               .home-app-img
                 img(src=`/statics/apps/tools.png`)
               .home-app-name 计算工具
@@ -305,19 +305,22 @@ block content
             for post in data.latestPosts
               .home-post
                 .home-post-time=fromNow(post.toc)
-                if post.anonymous
+                if !post.user
                   span 匿名用户
                 else
-                  a.home-post-user(href=`/u/${post.uid}`)
-                    img(src=tools.getUrl("userAvatar", post.user.avatar) data-float-uid=post.uid)
+                  a.home-post-user(href=`/u/${post.user.uid}`)
+                    img(src=tools.getUrl("userAvatar", post.user.avatar) data-float-uid=post.user.uid)
                     span=post.user.username
-                span 回复
-                if post.thread.firstPost.anonymous
+                if post.type === "reply"
+                  span 回复
+                else
+                  span 评论
+                if !post.targetUser
                   span 匿名用户
                 else
-                  a.home-post-user(href=`/u/${post.thread.firstPost.uid}`)
-                    img(src=tools.getUrl("userAvatar", post.thread.firstPost.user.avatar) data-float-uid=post.thread.uid)
-                    span=post.thread.firstPost.user.username
+                  a.home-post-user(href=`/u/${post.targetUser.uid}`)
+                    img(src=tools.getUrl("userAvatar", post.targetUser.avatar) data-float-uid=post.targetUser.uid)
+                    span=post.targetUser.username
                 span ：
                 a.home-post-content(href=post.url)
                   div=post.c

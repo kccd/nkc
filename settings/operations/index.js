@@ -72,6 +72,8 @@ const reader = require("./reader");
 const appDownload = require("./appDownload");
 const sticker = require("./sticker");
 const stickers = require("./stickers");
+const note = require("./note");
+const tools = require('./tools');
 const operationObj = {};
 
 
@@ -100,6 +102,7 @@ operationObj.defaultOperations = [
   "topAllPost", // 置顶任何人的回复
   "modifyAllResource", // 可修改任何人的附件
 	"visitAllUserProfile", // 可查看任何人的个人中心
+	"managementNote", // 可屏蔽编辑任何人的笔记
 ];
 
 
@@ -232,6 +235,8 @@ operationObj.operationTree = {
 		
 		sticker, // 表情中心
 		stickers, // 共享表情
+		note, // 批注
+		tools, // 网站工具
     test,
 	}
 };

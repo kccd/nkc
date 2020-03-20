@@ -209,7 +209,7 @@ block content
   -const {exactPost} = data
     .container-fluid.max-width
       .hidden#threadId= data.thread.tid
-      .hidden#threadForumsId=objToStr({pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
+      .hidden#threadForumsId=objToStr({notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
@@ -683,7 +683,7 @@ block scripts
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')
 
-  +includeJS("/nkc_render.js")
+  //+includeJS("/nkc_render.js")
   +includeJS("/interface_editor_reply.js")
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
@@ -703,6 +703,9 @@ block scripts
   include ../publicModules/lazySizes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
+  if permission("viewNote")
+    include ../publicModules/NKCHighlighter/NKCHighlighter
+  //- include ../publicModules/postNotes/postNotes
   if data.attachmentsCount > 0
     include ../publicModules/resourceInfo/resourceInfo
     include ../publicModules/attachments/attachments_js

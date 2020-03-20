@@ -7,6 +7,15 @@ var NKC = {
     videoExt: ["mp4"]
   }
 };
+
+NKC.methods.getLoginStatus = function() {
+  if(NKC.configs.isApp) {
+    return !!appGetFromLocal("user");
+  } else {
+    return !!NKC.configs.uid;
+  }
+};
+
 /*
 * 判断运行环境
 * */

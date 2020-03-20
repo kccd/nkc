@@ -1,17 +1,22 @@
-+includeCSS("/css/modules/commonModal.css")
++includeCSS("/publicModules/commonModal/commonModal.css")
 .modal.fade#moduleCommonModal(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
   .modal-dialog.modal-sm(role="document")#moduleCommonModalApp
     .modal-content
       .modal-header
         .fa.fa-remove(data-dismiss="modal" aria-label="Close")
         .modal-title {{title}}
+        .quote-content(v-if="quote") {{quote}}
       .modal-body
         .form
           .form-group(v-for="d, index in data")
             h5(v-if="d.label") {{d.label}}
-            input.form-control(v-if="d.dom === 'input' && d.type === 'number'" :type="!d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
-            input.form-control(v-if="d.dom === 'input' && d.type !== 'number'" :type="!d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
-            textarea.form-control(v-if="d.dom === 'textarea'" v-model="d.value" :placeholder="d.placeholder || ''" :rows="d.rows || 4" @keyup.enter="!d.disabledKeyup?submit:';'" )
+            //- 数字input
+            input.form-control(v-if="d.dom === 'input' && d.type === 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model.number="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+            //- 非数字input
+            input.form-control(v-if="d.dom === 'input' && d.type !== 'number' && d.type !== 'file'" :type="d.type || 'text'" v-model="d.value" :placeholder="d.placeholder || ''" @keyup.enter="submit" )
+            //- 文件input
+            input.form-control(v-if="d.dom === 'input' && d.type == 'file'" type="file" @change="pickedFile(index)" @keyup.enter="submit" :ref="'input' + index" :accept="d.accept")
+            //- 单选
             .radio(v-if="d.dom === 'radio'")
               label.m-r-05(v-for="r in d.radios")
                 input(type="radio" :value="r.value" v-model="d.value")

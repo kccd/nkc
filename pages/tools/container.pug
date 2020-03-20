@@ -1,0 +1,27 @@
+extends ../bootstrap_base
+
+block title
+  title=data.toolInfo.name
+
+block content
+  .container-fluid.max-width
+    iframe.col-xs-12.col-md-12#toolContainer(src=`/tools/${data.toolInfo._id}${data.toolInfo.entry}`, frameborder="0",  onload="changeFrameHeight()")
+    style.
+      #toolContainer {
+        min-height: 1024px;
+        min-height: 100vh;
+      }
+    //- .col-xs-12.col-md-12!= data.htmlcode
+
+block scripts
+  script.
+    function changeFrameHeight() {
+      var frame = $("#toolContainer")[0]
+      var docbody = frame.contentDocument.body;
+      frame.height = docbody.scrollHeight;
+      //- docbody.onresize = function() {
+      //-   changeFrameHeight();
+      //- }
+      //- console.log(docbody)
+    }
+    

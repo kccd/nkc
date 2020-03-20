@@ -275,6 +275,47 @@ function sweetQuestion(text) {
       })
   });
 }
+// promise版本弹框
+function asyncSweetSuccess(text, options) {
+  return new Promise(function(resolve, reject) {
+    options = options || {
+      autoHide: true,
+      timer: 2000
+    };
+    text = text + "";
+    if(options.autoHide) {
+      return Swal({
+        type: "success",
+        confirmButtonText: "关闭",
+        timer: options.timer,
+        text: text
+      }).then(function() {
+        resolve()
+      });
+    } else {
+      return Swal({
+        type: "success",
+        confirmButtonText: "关闭",
+        text: text
+      }).then(function(){
+        resolve()
+      });
+    }
+  })
+}
+function asyncSweetError(text) {
+  return new Promise(function(resolve, reject) {
+    text = text.error || text;
+    text = text + "";
+    return Swal({
+      type: "error",
+      confirmButtonText: "关闭",
+      text: text.error || text
+    }).then(function() {
+      resolve();
+    });
+  })
+}
 
 function screenTopAlert(text){
   return screenTopAlertOfStyle(text,'success')

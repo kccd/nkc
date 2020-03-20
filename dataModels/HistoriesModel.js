@@ -103,6 +103,10 @@ let HistoriesSchema = new Schema({
     type: Boolean,
     default: false
   },
+  // 内容版本号
+  cv: {
+    type: Number
+  },
 	digest: Boolean,
 	hideHistories: Boolean,
 	hasImage: Boolean,

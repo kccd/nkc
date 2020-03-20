@@ -654,7 +654,8 @@ function nkc_render(options){
   };
 
 
-  render.experimental_render = function(post){
+  render.experimental_render = function(post, dataType){
+    if(post.mainForumsId) dataType = "post";
     var content = post.c || '';
     var lang = post.l || '';
     var renderedHTML = '';
@@ -713,6 +714,12 @@ function nkc_render(options){
     }
     renderedHTML = blockDomHtml + renderedHTML;
     renderedHTML = linkAlienate(renderedHTML); //please check linkAlienate()
+    if(dataType === "post") {
+      renderedHTML = `<div class="render-content" id="post-content-${post.pid}">${renderedHTML}</div>`;
+    } else {
+      renderedHTML = `<div class="render-content">${renderedHTML}</div>`;
+    }
+
     return renderedHTML
   };
 

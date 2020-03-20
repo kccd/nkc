@@ -1241,6 +1241,7 @@ span.applicationForm-report-icon.system{
   margin-bottom: 4rem;
 }
 .applicationForm-abstract-content{
+  word-break: break-word;
   padding: 1.2rem;
   font-size: 1.2rem;
 }

@@ -1,6 +1,7 @@
 var editor = {};
 var draftsId = {};
 var timeout = {};
+var disableButton = {};
 function closeSaveCommentDraft(pid) {
   clearTimeout(timeout[pid]);
 }
@@ -79,7 +80,7 @@ function postComment(tid, pid, firstInput) {
     }
   }
   var draftBtn = $('<button class="btn btn-default btn-sm m-r-05" onclick="saveCommentDraft(\''+tid+'\', \''+pid+'\')">存草稿</button>');
-  var subBtn = $('<button class="btn btn-primary btn-sm" onclick="submitPostComment(\''+tid+'\', \''+pid+'\', '+firstInput+')">提交</button>');
+  var subBtn = $('<button class="btn btn-primary btn-sm" data-comment-button="'+pid+'" onclick="submitPostComment(\''+tid+'\', \''+pid+'\', '+firstInput+')">提交</button>');
   var btnDiv = $("<div class='text-right m-t-05 m-b-1'></div>");
   btnDiv.append(draftBtn);
   if(!firstInput) {
@@ -108,6 +109,9 @@ function closePostComment(pid, restorePagePosition) {
 }
 
 function submitPostComment(tid, pid, firstInput) {
+  if(disableButton[pid]) return;
+  $("button[data-comment-button='"+pid+"']").attr("disabled", "disabled").text("提交中");
+  disableButton[pid] = true;
   var content = editor[pid].getContent();
   nkcAPI("/t/" + tid, "POST", {
     postType: "comment",
@@ -147,9 +151,13 @@ function submitPostComment(tid, pid, firstInput) {
         editor[pid].execCommand('cleardoc');
         initUserPanel();
       }
+      delete disableButton[pid];
+      $("button[data-comment-button='"+pid+"']").removeAttr("disabled").text("提交");
     })
     .catch(function(data) {
       screenTopWarning(data);
+      delete disableButton[pid];
+      $("button[data-comment-button='"+pid+"']").removeAttr("disabled").text("提交");
     })
 }
 

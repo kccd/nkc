@@ -206,6 +206,9 @@ module.exports = {
 				collection: {
 					GET: "userProfile"
 				}
+			},
+			note: {
+				GET: "userProfile"
 			}
 		},
 		destroy: {

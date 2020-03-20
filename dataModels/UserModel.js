@@ -1804,4 +1804,25 @@ userSchema.statics.destroyAccount = async (options) => {
   });
 };
 
+// 红包奖励
+userSchema.methods.setRedEnvelope = async function() {
+  const PostModel = mongoose.model("posts");
+  const SettingModel = mongoose.model("settings");
+  const apiFn = require("../nkcModules/apiFunction");
+  const postCountToday = await PostModel.count({uid: this.uid, toc: {$gte: apiFn.today()}});
+  if(postCountToday !== 1) return;
+
+  if(!this.generalSettings) {
+    await this.extendGeneralSettings();
+  }
+  if(this.generalSettings.lotterySettings.close) return;
+  const redEnvelopeSettings = await SettingModel.getSettings('redEnvelope');
+  if(redEnvelopeSettings.random.close) return;
+  const {chance} = redEnvelopeSettings.random;
+  const number = Math.ceil(Math.random()*100);
+  if(number <= chance) {
+    await this.generalSettings.update({'lotterySettings.status': true});
+  }
+};
+
 module.exports = mongoose.model('users', userSchema);

@@ -110,7 +110,8 @@ block content
                 a(onclick=`enablePost('${post.pid}')`) [点击解除]
           .m-t-1.m-b-1
             a.pointer.m-r-1(href=`/t/${post.tid}#container`) 回复
-            a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 评论
+            if data.thread.oc !== data.post.pid
+              a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 评论
           -let comment = post;
           include ../thread/postEdit
 
@@ -148,6 +149,7 @@ block content
                 a(href=`/u/${u.uid}` target='_blank' title=u.username)
                   img(src=`/avatar/${u.avatar}`)
 block scripts
+  .hidden#data=objToStr({notes: data.notes})
   include ../publicModules/complaint/complaint
   include ../publicModules/selectResource/selectResource
   include ../publicModules/sticker/selectSticker
@@ -158,6 +160,8 @@ block scripts
   include ../ueditor/ueditorBase
   include ../MathJax.pug
   include ../publicModules/disabledPost/disabledPost
+  if permission("viewNote")
+    include ../publicModules/NKCHighlighter/NKCHighlighter
   +includeJS(`/thread/comments.js`)
   include ../publicModules/imageViewer
   if permission("getPostAuthor")
@@ -185,3 +189,18 @@ block scripts
         pid: pid
       });
     }
+    $(function () {
+
+      var data = NKC.methods.getDataById("data");
+
+      if (data.notes && data.notes.length) {
+        for (var i = 0; i < data.notes.length; i++) {
+          var n = data.notes[i];
+          new NKC.modules.NKCHL({
+            type: n.type,
+            targetId: n.targetId,
+            notes: n.notes
+          });
+        }
+      }
+    });
