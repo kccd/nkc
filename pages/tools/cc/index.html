@@ -1,0 +1,149 @@
+<html>
+<HEAD>
+<TITLE>恒流源在线在线计算器-科创在线-专业极客的学术社区</TITLE>
+<SCRIPT>
+
+var a=0
+function clearform1()
+{
+
+	clearform();
+	if(a==1)
+	{
+		msgwindow4.close();
+		msgwindow2.close();
+		msgwindow3.close();
+		msgwindow1.close();
+	}
+	a=0;
+}
+
+
+function compute1()
+{
+	//msgwindow=window.open("currpres.htm","currpresw","toolbar=no,scrollbars=yes,resizable=yes,width=200 ,height=300")
+	compute();
+}
+
+function compute()
+{
+	var i=document.form1.I.value;
+	var v=document.form1.V.value;
+	var r1=(.1*v)/i;
+	document.form2.R_1.value=r1;
+
+
+	var r2=10*r1;
+	document.form2.R_2.value=r2;
+
+	var pmx=(v-i*r1)*i;
+	var p=document.form1.P.value;
+	document.form2.pmx.value=pmx;
+
+	var r3=(v-(i*r1+.7))/(.1*i);
+	document.form2.R_3.value=r3;
+
+	var ro=(100-i/100)*(1+1000*r1*i/26);
+	document.form2.R_o.value=ro;
+
+	if(pmx>p)
+	document.form2.war.value="Too much power dissipation in Q1.";
+	else
+	document.form2.war.value="";
+
+}
+
+function clearform(form1)
+{
+
+	document.form1.I.value="10"
+	document.form1.P.value="300"
+	document.form1.V.value="12"
+
+	compute()
+}
+
+function openother()
+{
+msgwindow1=window.open("curren1.gif","curren1w","toolbar=no,scrollbars=yes,resizable=yes,width=400 ,height=350");
+msgwindow2=window.open("curren2.gif","curren2w","toolbar=no,scrollbars=yes,resizable=yes,width=400 ,height=350");
+msgwindow3=window.open("curren3.gif","curren3w","toolbar=no,scrollbars=yes,resizable=yes,width=400 ,height=350");
+msgwindow4=window.open("curren4.gif","curren4w","toolbar=no,scrollbars=yes,resizable=yes,width=400 ,height=350");
+a=1;
+}
+</SCRIPT>
+
+</HEAD>
+<BODY>
+
+<TABLE  width=600 border=0 align="center" cellspacing="0">
+  <TBODY>
+  <TR>
+    <TD vAlign=top width=628 colSpan=4 height=28><B><U><FONT
+      size=2>1、输入参数</FONT></U></B> </TD></TR>
+  <TR>
+    <FORM name=form1>
+    <TD vAlign=top width=60></TD>
+    <TD vAlign=top width=241>
+      <P align=center><FONT size=2>希望的电流值：</FONT></P>
+      <P align=center><FONT size=2>Iout=&nbsp; <INPUT size=10 value=10
+      name=I>mA</FONT></P></TD>
+    <TD vAlign=top width=175>
+      <P align=center><FONT size=2>Q1耗散功率：</FONT></P>
+      <P align=center><FONT size=2>Ptot= <INPUT size=5 value=300
+      name=P>mW</FONT></P></TD>
+    <TD vAlign=top width=152>
+      <P align=center><FONT size=2>电源电压</FONT></P>
+      <P align=center><FONT size=2>E1=</FONT><FONT size=2> <INPUT size=5
+      value=12 name=V>V</FONT></P></TD></FORM></TR></TBODY></TABLE>
+<table height=247 width=600 border=0 align="center">
+  <tbody>
+    <tr>
+      <td width=269 height=21><b><font size=2><u>2、电路图</u></font></b></td>
+      <td valign=top width=329 height=21><b><u><font
+      size=2>3、输出结果</font></u></b> </td>
+    </tr>
+    <tr>
+      <td height=220><img height=197 src="./CIS.JPG"
+      width=238 border=0></td>
+      <td valign=top height=220>
+	  <form name=form2>
+        <p align=left><font size=2><br>
+          R1=
+          <input size=6 name=R_1>
+          kOhm<br>
+          R2=
+          <input size=6 name=R_2>
+          kOhm<br>
+          R3=
+          <input size=6 name=R_3>
+          kOhm<br>
+          Ro=
+          <input size=6 name=R_o>
+          kOhm<br>
+          Px=
+          <input size=6 name=pmx>
+          mW<br>
+          <font
+      color=#ff0000>警告:</font><br>
+          <input size=35 name=war>
+          <br>
+          <input onClick=compute1() type=button size=5 value=" 计算 " name=comp>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <input onClick=clearform1(form1) type=button size=5 value=" 重置 " name=clear>
+        </font></p>
+      </form>
+	  <table width="314" height=36 weith=10 border=0>
+	    <tr>
+	      <td>Ro为在确保恒流下的最大负载电阻</td>
+	      </tr>
+	    <tr>
+	      <td>Px为功率管消耗的功率	        </td>
+	    </tr>
+		<tr><td>科创在线 尤小翠编制 2011年11月1日</td></tr></table>
+	  </td>
+    </tr>
+  </tbody>
+</table>
+
+</BODY></HTML>

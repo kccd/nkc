@@ -72,6 +72,7 @@ const reader = require("./reader");
 const appDownload = require("./appDownload");
 const sticker = require("./sticker");
 const stickers = require("./stickers");
+const tools = require('./tools');
 const operationObj = {};
 
 
@@ -232,6 +233,7 @@ operationObj.operationTree = {
 		
 		sticker, // 表情中心
 		stickers, // 共享表情
+		tools, // 网站工具
     test,
 	}
 };

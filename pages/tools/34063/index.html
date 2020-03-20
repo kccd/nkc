@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0047)http://www.nomad.ee/micros/mc34063a/index.shtml -->
+<HTML><!-- #BeginTemplate "/Templates/nomad.dwt" --><HEAD><TITLE>MC34063A design tool</TITLE><LINK
+href="/favicon.ico" rel=icon type=image/ico><LINK href="/favicon.ico"
+rel="SHORTCUT ICON"><!-- #BeginEditable "header" --><!-- #EndEditable -->
+<LINK 
+href="../34063自动设计软件/MC34063A design tool.files/nomad.css" rel=stylesheet>
+<META content="Microsoft FrontPage 4.0" name=GENERATOR></HEAD>
+<BODY aLink=#cc0033 bgColor=#ffffff link=#3333ff text=#000000 vLink=#003399><!-- #BeginEditable "page" -->
+<SCRIPT language=javascript>
+
+/*
+This code is (c) Nomad Systems 2001,
+http://www.nomad.ee
+
+Feel free to use and modify, but give credits when credits are due.
+A comment line would be nice.
+*/
+var vin;		// input voltage
+var vout;		// output voltage
+var iout;		// output current
+var vripple;	// ripple voltage (peak to peak)
+var fmin;		// minimum switching freq
+var vsat=1.0;	// switch transistor saturation voltage
+var vf=0.4;		// rectifier forward drop
+var r1;
+var r2;
+var r48=new Array(
+	1.0, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2.0, 2.2, 2.4, 2.7, 3.0,
+	3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1,
+	10.0, 11.0, 12.0, 13.0, 15.0, 16.0, 18.0, 20.0, 22.0, 24.0, 27.0, 30.0,
+	33.0, 36.0, 39.0, 43.0, 47.0, 51.0, 56.0, 62.0, 68.0, 75.0, 82.0, 91.0);
+
+// choose feedback resistors for output voltage vo
+// output voltage is Vout=1.25(1+R2/R1)
+//
+function calcr1r2(vo)
+{
+var bv=vo*1000;
+var i;
+var j;
+	vo=Math.abs(vo);
+	for (j=0;j<48;j++)	// go through R1 values
+	{
+		for (i=0;i<48;i++)	// and try all R2 values
+		{
+			v=1.25*(1+(r48[i]/r48[j]));
+			if (Math.abs(vo-v)<Math.abs(vo-bv))
+			{
+				r2=r48[i];
+				r1=r48[j];
+				bv=v;
+			}
+		}
+	}
+	return bv;
+}
+
+function calculate()
+{
+var tontoff;	// ton/toff ratio
+var ton;		// switch on time
+var toff;		// switch off time
+var ipk;		// switch peak current
+var rsc;		// sense current resistor
+var lmin;		// minimum indictor value
+var avo;		// actual vout
+	// take entered values from form
+	r1=r2=0;
+	vin=parseFloat(document.forms["input"].elements["vin"].value);
+	vout=parseFloat(document.forms["input"].elements["vout"].value);
+	iout=parseFloat(document.forms["input"].elements["iout"].value)/1000;
+	vripple=parseFloat(document.forms["input"].elements["vripple"].value)/1000;
+	fmin=parseFloat(document.forms["input"].elements["fmin"].value)*1000;
+	if (vin>40 || vin<3)
+	{
+		alert("Vin must be 3 to 40 volts");
+		return;
+	}
+	if (Math.abs(vin-vout)<(vsat+vf))
+	{
+		alert("No suitable configuration for Vout at this Vin!");
+		return;
+	}
+	avo=calcr1r2(vout);
+	// choose architecture
+	if (vout>vin)
+	{
+		document.images["schematics"].src="stepup.gif";
+		// calculate some temporary values
+		tontoff=(vout+vf-vin)/(vin-vsat);
+		sumtontoff=1/fmin;
+		toff=sumtontoff/(tontoff+1);
+		ton=sumtontoff-toff;
+		// calculate components
+		ct=(4.0*0.00001*ton)*1000000000000;
+		ipk=2*iout*(tontoff+1);
+		if (ipk*1000>1500)
+			alert("Switch peak current "+Math.floor(ipk*1000)+"mA exceeds 1500mA limit!");
+		rsc=0.3/ipk;
+		lmin=(((vin-vsat)/ipk)*ton)*1000000;
+		co=9*((iout*ton)/vripple)*1000000;
+		document.forms["input"].elements["result"].value=
+				"Ct="+Math.round(ct)+" pF\n"+
+				"Ipk="+Math.round(ipk*1000)+" mA\n"+
+				"Rsc="+Math.round(rsc*1000)/1000+" Ohm\n"+
+				"Lmin="+Math.round(lmin)+" uH\n"+
+				"Co="+Math.round(co)+" uF\n"+
+				"R=180 Ohm\n"+
+				"R1="+r1+"k R2="+r2+"k ("+Math.round(avo*100.0)/100.0+"V)";
+	}
+	else
+	{
+		if (vout<0)
+		{
+			document.images["schematics"].src="inverter.gif";
+			// calculate some temporary values
+			tontoff=(Math.abs(vout)+vf)/(vin-vsat);
+			sumtontoff=1/fmin;
+			toff=sumtontoff/(tontoff+1);
+			ton=sumtontoff-toff;
+			// calculate components
+			ct=(4.0*0.00001*ton)*1000000000000;
+			ipk=2*iout*(tontoff+1);
+			if (ipk*1000>1500)
+				alert("Switch peak current "+Math.floor(ipk*1000)+"mA exceeds 1500mA limit!");
+			rsc=0.3/ipk;
+			lmin=(((vin-vsat)/ipk)*ton)*1000000;
+			co=9*((iout*ton)/vripple)*1000000;
+			document.forms["input"].elements["result"].value=
+				"Ct="+Math.round(ct)+" pF\n"+
+				"Ipk="+Math.round(ipk*1000)+" mA\n"+
+				"Rsc="+Math.round(rsc*1000)/1000+" Ohm\n"+
+				"Lmin="+Math.round(lmin)+" uH\n"+
+				"Co="+Math.round(co)+" uF\n"+
+				"R1="+r1+"k R2="+r2+"k ("+Math.round(avo*100.0)/100.0+"V)";
+		}
+		else
+		{
+			document.images["schematics"].src="stepdown.gif";
+			// calculate some temporary values
+			tontoff=(vout+vf)/(vin-vsat-vout);
+			sumtontoff=1/fmin;
+			toff=sumtontoff/(tontoff+1);
+			ton=sumtontoff-toff;
+			// calculate components
+			ct=(4.0*0.00001*ton)*1000000000000;
+			ipk=2*iout;
+			if (ipk*1000>1500)
+				alert("Switch peak current "+Math.floor(ipk*1000)+"mA exceeds 1500mA limit!");
+			rsc=0.3/ipk;
+			lmin=(((vin-vsat-vout)/ipk)*ton)*1000000;
+			co=((ipk*sumtontoff)/(8*vripple))*1000000;
+			document.forms["input"].elements["result"].value=
+					"Ct="+Math.round(ct)+" pF\n"+
+					"Ipk="+Math.round(ipk*1000)+" mA\n"+
+					"Rsc="+Math.round(rsc*1000)/1000+" Ohm\n"+
+					"Lmin="+Math.round(lmin)+" uH\n"+
+					"Co="+Math.round(co)+" uF\n"+
+					"R1="+r1+"k R2="+r2+"k ("+Math.round(avo*100.0)/100.0+"V)";
+		}
+	}
+
+}
+</SCRIPT>
+
+<DIV align=center>
+<H3><font color="#FF0000">MC34063或IRM03A接成标准的DC—DC</font></H3>
+<H3><font color="#FF0000">1：极性反转。2：升压。3：降压。三种典型电路时，外围元件参数的自动计算</font></H3>
+<p align="left"><font color="#0000FF">使用方法：</font><font color="#008080">只要在左中部框中输入你想要的参数，然后点击“进行计算并且刷新电路图”按钮，它就可以自动给所有相关的外围元件参数和相对应的标准电路图纸，使设计DC—DC电路实现智能化高效化。</font><font color="#0000FF">关于警告：</font><font color="#008080">如果您输入的参数超过了34063的极限，它会自动弹出警告窗口提醒您更改它们。</font><font color="#0000FF">特殊输入</font><font color="#008080">：要设计极性反转电路请在输入或输出电压数字的前面加上负号，比如－5V。</font></p>
+<TABLE border=0 width=700>
+  <TBODY>
+  <TR>
+    <TD>
+      <P>&nbsp;这是一种用于DC－DC电源变换的集成电路，应用比较广泛，通用廉价易购。极性反转效率最高６５％，升压效率最高９０％，降压效率最高８０％，变换效率和工作频率滤波电容等成正比。</P>
+      <P>另外，输出功率达不到要求的时候，比如＞250～300MA时，可以通过外接扩功率管的方法扩大电流，双极型或MOS型　　扩流管均可，计算公式和其他参数及其含义详见最下部详细介绍即可。</P>
+    </TD></TR></TBODY></TABLE>
+<TABLE border=0 width=700>
+  <TBODY>
+  <TR>
+    <TD vAlign=top width=200>
+      <FORM action="" name=input>
+      <TABLE border=0 width=217 name="values">
+        <TBODY>
+        <TR>
+          <TD align=right width=58>输入电压 </TD>
+          <TD width=69><INPUT name=vin size=10> </TD>
+          <TD align=left width=30>V </TD></TR>
+        <TR>
+          <TD align=right width=58>输出电压 </TD>
+          <TD width=69><INPUT name=vout size=10> </TD>
+          <TD align=left width=30>V </TD></TR>
+        <TR>
+          <TD align=right width=58>输出电流 </TD>
+          <TD width=69><INPUT name=iout size=10> </TD>
+          <TD align=left width=30>mA </TD></TR>
+        <TR>
+          <TD align=right width=58>输出电压波纹系数 </TD>
+          <TD width=69><INPUT name=vripple size=10> </TD>
+          <TD align=left width=30>mV(pp) </TD></TR>
+        <TR>
+          <TD align=right width=58>工作频率 </TD>
+          <TD width=69><INPUT name=fmin size=10> </TD>
+          <TD align=left width=30>kHz </TD></TR>
+        <TR>
+          <TD align=right width=157 colspan="3"><INPUT name=button onclick=calculate(); size=10 type=button value=进行计算并且刷新电路图>
+          </TD>
+        </TR></TBODY></TABLE><TEXTAREA cols=28 name=result rows=8 wrap=off>		  </TEXTAREA>
+      </FORM></TD>
+  <TD width=500><IMG name=schematics
+      src="inverter.gif" width="437" height="417"> </TD>
+  </TR></TBODY></TABLE>
+<p>
+<P class=STYLE22 align=center>程序来源：科创论坛&nbsp;整理：123123123</P>
+<P class=STYLE22 align=center><A
+href="http://www.kechuang.org/"><STRONG>科创在线</STRONG></A> 2011&nbsp;</p>
+</DIV>
+<!-- #EndEditable --><!-- #EndTemplate -->
+<p><font color="#FF0000">外围元件标称含义和它们取值的</font><font color="#FF0000">计算公式：</font></p>
+<p><font color="#FF0000">Vout</font>(输出电压)＝1.25V（１＋R1／R2）</p>
+<p><font color="#FF0000">Ct</font><font color="#000000">(</font>定时电容<font color="#000000">)</font>：决定内部工作频率。Ct=0.000 004*Ton(工作频率）</p>
+<p><font color="#FF0000">Ipk</font>=2*Iomax*T/toff</p>
+<p><font color="#FF0000">Rsc</font><font color="#000000">(</font>限流电阻)：决定输出电流。Rsc＝0.33／Ipk</p>
+<p><font color="#FF0000">Lmin</font><font color="#000000">(</font>电感)：Lmin＝(Vimin－Vces)*Ton/ Ipk</p>
+<p><font color="#FF0000">Co</font>(滤波电容)：决定输出电压波纹系数，Co＝Io*ton/Vp-p(波纹系数）</p>
+<p>固定值参数：</p>
+<p>Vces=1.0V　　ton/toff=(Vo+Vf－Vimin)/(Vimin－Vces）　　Vimin:输入电压不稳定时的最小值　　</p>
+<p>Vf=1.2V 快速开关二极管正向压降</p>
+<p><font color="#FF0000">其他手册参数：</font></p>
+<table border="1" width="100%">
+  <tr>
+    <td width="20%" align="center">　参数名称</td>
+    <td width="17%" align="center">符号</td>
+    <td width="15%" align="center">单位</td>
+    <td width="22%" align="center">MC34063（美国Motorola公司）</td>
+    <td width="31%" align="center">ＣＷ34063（国产）</td>
+    <td width="15%" align="center">IRM03A（日本夏普公司）</td>
+  </tr>
+  <tr>
+    <td width="20%" align="center">输入电压</td>
+    <td width="17%" align="center">Vin</td>
+    <td width="15%" align="center">V</td>
+    <td width="22%" align="center">2.5～40V</td>
+    <td width="31%" align="center">2.5～40V</td>
+    <td width="15%" align="center">2.5～40V</td>
+  </tr>
+  <tr>
+    <td width="20%" align="center">输出电压</td>
+    <td width="17%" align="center">Vout</td>
+    <td width="15%" align="center">V</td>
+    <td width="22%" align="center">1.25～40V</td>
+    <td width="31%" align="center">1.25～40V</td>
+    <td width="15%" align="center">1.25～40V</td>
+  </tr>
+  <tr>
+    <td width="20%" align="center">最大输出电流</td>
+    <td width="17%" align="center">Iomax</td>
+    <td width="15%" align="center">A</td>
+    <td width="22%" align="center">1.5A</td>
+    <td width="31%" align="center">1.5A</td>
+    <td width="15%" align="center">1.8A</td>
+  </tr>
+  <tr>
+    <td width="20%" align="center">最高工作频率</td>
+    <td width="17%" align="center">f</td>
+    <td width="15%" align="center">kHz</td>
+    <td width="22%" align="center">0.1～100KHZ</td>
+    <td width="31%" align="center">0.1～100KHZ</td>
+    <td width="15%" align="center">0.1～100KHZ</td>
+  </tr>
+  <tr>
+    <td width="20%" align="center">功率</td>
+    <td width="17%" align="center">P</td>
+    <td width="15%" align="center">W</td>
+    <td width="22%" align="center">1.25W</td>
+    <td width="31%" align="center">1.25W</td>
+    <td width="15%" align="center">0.9W</td>
+  </tr>
+  <tr>
+    <td width="20%" align="center">工作温度</td>
+    <td width="17%" align="center">Ta</td>
+    <td width="15%" align="center">度</td>
+    <td width="22%" align="center">0～70度</td>
+    <td width="31%" align="center">0～70度</td>
+    <td width="15%" align="center">0～70度</td>
+  </tr>
+</table>
+<p><font color="#FF0000">在实际应用中的注意：</font></p>
+<p>1：快速开关二极管可以选用IN4148，在要求高效率的场合必须使用IN5819！</p>
+<p>2：34063能承受的电压，即输入输出电压绝对值之和不能超过40V，否则不能安全稳定的工作。　</p>
+</BODY></HTML>

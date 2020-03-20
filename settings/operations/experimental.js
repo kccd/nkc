@@ -347,5 +347,8 @@ module.exports = {
 	},
   console: {
 	  GET: 'visitExperimentalConsole'
-  }
+	},
+	tools: {
+		GET: "visitToolsManager"
+	}
 };

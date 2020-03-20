@@ -33,7 +33,8 @@ function delLogs(){
 }
 
 
-function searchLogs(){
+// 获取查询表单数据
+function checkFormData() {
   var sTime = $("#startTime").val().trim();
   var eTime = $("#endTime").val().trim();
   var uid = $("#userId").val().trim();
@@ -41,21 +42,45 @@ function searchLogs(){
   var operationId = $("#operationId").val().trim();
   var st = (new Date(sTime)).getTime();
   var et = (new Date(eTime)).getTime();
-  var t = $("#dataT").attr("data-t");
-  t = t || "";
   if(st && et && st > et){
-    return sweetError("结束时间不能早于开始时间");
+    sweetError("结束时间不能早于开始时间");
+    return null;
   }
-  var c = {
+  return {
     sTime: sTime,
     eTime: eTime,
     uid: uid,
     operationId: operationId,
     ip: ip
   };
+}
+
+
+
+function searchLogs(){
+  var c = checkFormData();
+  if(!c) return;
+  var t = $("#dataT").attr("data-t");
+  t = t || "";
   var url = '/e/log/public?c=' + NKC.methods.strToBase64(JSON.stringify(c));
   if(t) {
     url += '&t='+ t;
   }
   NKC.methods.visitUrl(url);
+}
+
+
+
+// 删除查询出来的所有记录
+function deleteCurrentRecord() {
+  var c = checkFormData();
+  var url = '/e/log/public';
+  return sweetQuestion("确认删除当前查询结果中的所有日志吗？")
+    .then(function() {
+      console.log(c);
+       return nkcAPI(url + '?del=' +  NKC.methods.strToBase64(JSON.stringify(c)), "DELETE")
+    })
+    .then(function() {location.reload()})
+    .catch(sweetError);
+    
 }

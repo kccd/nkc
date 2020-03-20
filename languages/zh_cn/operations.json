@@ -690,5 +690,13 @@
   "visitShopAccount": "访问商城中的个人主页",
 
   "blockCurrentActivity": "[SY]屏蔽活动",
-  "unBlockCurrentActivity": "[SY]解除屏蔽活动"
+  "unBlockCurrentActivity": "[SY]解除屏蔽活动",
+
+  "visitToolsList": "访问工具列表",
+  "visitTool": "访问网站工具",
+  "uploadTool": "上传网站工具",
+  "updateTool": "更新网站工具",
+  "visitUpdatePage": "访问更新工具页面",
+  "deleteTool": "删除网站工具",
+  "visitToolsManager": "访问网站工具管理页面"
 }

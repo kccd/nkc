@@ -1,0 +1,26 @@
+extends ../bootstrap_base
+
+block title
+  title 工具列表
+  +includeCSS("/tools/list2.css")
+
+block content
+  .container-fluid.max-width
+    #toollist
+      for info, index in data.list
+        .tool-item
+          .tool-container
+            .tool-info
+              p.tool-summary #{info.summary}
+              p.tool-name #{info.name}
+            .tool-control
+              a.tool-author(href=info.uid? `/u/${info.uid}/profile`: null)
+                span.tool-author-label author
+                span.tool-author-text #{info.author || "[匿名]"}
+              .tool-start
+                if info.isOtherSite
+                  a.tool-start-button(href=`${info.entry}`, target="_blank") 打开
+                else
+                  a.tool-start-button(href=`/tools/open/${info._id}`, target="_blank") 打开
+      //- include ./index.htm
+      //- +includeCSS("/tools/list.css")
