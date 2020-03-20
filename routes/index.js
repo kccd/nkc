@@ -95,7 +95,6 @@ router.use("/rs", resourcesRouter.routes(), resourcesRouter.allowedMethods());
 router.use("/reader", readerRouter.routes(), readerRouter.allowedMethods());
 router.use("/banner", userBannerRouter.routes(), userBannerRouter.allowedMethods());
 router.use("/stickers", stickersRouter.routes(), stickersRouter.allowedMethods());
-router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
 router.use("/note", noteRouter.routes(), noteRouter.allowedMethods());
 router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
 router.use("/tools", siteToolsRouter.routes(), siteToolsRouter.allowedMethods());
