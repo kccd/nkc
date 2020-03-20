@@ -88,7 +88,7 @@ router
     let sticker = await db.StickerModel.findOnly({from: "upload", rid});
     if(!sticker) ctx.throw(404, "表情不存在");
     if(sticker.disabled && !ctx.permission("nkcManagementSticker")) ctx.throw(403, "表情已被屏蔽");
-    
+
     if(t === "json") {
       sticker = sticker.toObject();
       sticker.targetUser = await db.UserModel.findOne({uid: sticker.tUid}, {username: 1, avatar: 1, uid: 1});
