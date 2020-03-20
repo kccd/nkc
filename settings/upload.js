@@ -45,6 +45,7 @@ const paths = {
   forumBannerPath: "resources/forum_banner",
   columnAvatarPath: "resources/column_avatar",
   columnBannerPath: "resources/column_banner",
+  toolsPath: "resources/tools"
 };
 
 const pathsObj = {};

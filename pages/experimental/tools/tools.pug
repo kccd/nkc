@@ -1,0 +1,53 @@
+extends ../experimental
+
+block eTitle
+  +includeCSS("/experimental/tools/tools.css")
+  title 网站工具管理
+
+block eContent
+  .container-fluid.max-width
+    #app
+      .form-group
+        button.btn.btn-primary(@click=`addTool()`) 上传工具
+      .form-group.text-danger
+        p 注意：仅支持上传zip格式的压缩包，上传后服务器会自动解压。
+      .table-responsive
+        table.table.table-bordered
+          thead
+            tr
+              th 版本号
+              th 最后修改时间
+              th 工具名
+              th 简介
+              th 作者
+              th 入口
+              th 是否是站外链接
+              th 操作
+          tbody
+            //- 循环模板
+            for info, index in data.list
+              tr
+                th= info.version
+                th= format("YYYY/MM/DD HH:mm:ss", info.lastModify)
+                th= info.name
+                th= info.summary
+                - let author = info.author? info.author:'[匿名]'
+                th
+                  if info.uid
+                    a(href=`/u/${info.uid}`, target="_blank") #{author}
+                  else
+                    span #{author}
+                th
+                  if info.isOtherSite
+                    a(href=`${info.entry}`, target="_blank") #{info.entry}
+                  else
+                    a(href=`/tools/open/${info._id}`, target="_blank") #{info.entry}
+                th #{info.isOtherSite? '是':'否'}
+                th
+                  button.btn.btn-sm.btn-default(@click=`editTool('${info.version}','${info.name}','${info.summary}','${info.uid}','${info.author}','${info.entry}',${info.isOtherSite},'${info._id}')`) 编辑
+                  button.btn.btn-sm.btn-danger(@click=`deleteTool('${info._id}','${info.name}')`) 删除
+            
+
+block scripts
+  include ../../publicModules/commonModal/commonModal
+  +includeJS('/experimental/tools/tools.js')

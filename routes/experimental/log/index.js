@@ -36,5 +36,5 @@ logRouter
   .use('/share', shareRouter.routes(), shareRouter.allowedMethods())
   .use("/shop", shopRouter.routes(), shopRouter.allowedMethods())
   .use("/message", messageRouter.routes(), messageRouter.allowedMethods())
-  .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods());
+  .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
 module.exports = logRouter;

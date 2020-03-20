@@ -16,6 +16,10 @@ NKC.modules.CommonModal = function() {
     methods: {
       submit: function() {
         this_.callback(this.data);
+      },
+      pickedFile: function(index) {
+        var dom = this.$refs['input'+index][0];
+        this.data[index].value = dom.files[0];
       }
     }
   });
