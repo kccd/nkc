@@ -54,7 +54,7 @@
       .note-panel-note{
         margin-bottom: 0.6rem;
         &:last-child{
-          margin-bottom: 1rem;
+          margin-bottom: 1.5rem;
         }
         .note-panel-user{
           display: inline-block;
@@ -122,12 +122,13 @@
                 line-height: 1.4rem;
                 text-align: center;
                 cursor: pointer;
+                border-bottom: 1px solid #f4f4f4;
                 &:hover{
                   background-color: @primary;
                   color: #fff;
                 }
-                &:first-child{
-                  border-bottom: 1px solid #f4f4f4;
+                &:last-child{
+                  border-bottom: none;
                 }
               }
             }
@@ -149,7 +150,7 @@
           textarea{
             height: 2.5rem;
             width: 100%;
-            overflow: hidden;
+            //overflow: hidden;
           }
           .note-panel-content{
             color: @dark;

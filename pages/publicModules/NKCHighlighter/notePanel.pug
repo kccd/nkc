@@ -31,7 +31,7 @@ include ../../publicModules/unfixedPanel/unfixedPanel
         span 我也是有底线的
 
     .form.p-t-05
-      textarea.note-panel-textarea.create-textarea(rows=4 placeholder="添加笔记（公开、200字限制）" v-model="content" @input="autoResize" @keyup.ctrl.enter="saveNewNote")
+      textarea.note-panel-textarea.create-textarea(rows=4 placeholder="添加笔记（公开、500字限制）" v-model="content" @input="autoResize" @keyup.ctrl.enter="saveNewNote")
       .m-b-05(v-if="content")
         button.btn.btn-xs.btn-primary(@click="saveNewNote") 保存
 

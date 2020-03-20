@@ -125,7 +125,7 @@
   margin-bottom: 0.6rem;
 }
 #moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note:last-child {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 #moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user {
   display: inline-block;
@@ -194,13 +194,14 @@
   line-height: 1.4rem;
   text-align: center;
   cursor: pointer;
+  border-bottom: 1px solid #f4f4f4;
 }
 #moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options ul li:hover {
   background-color: #2b90d9;
   color: #fff;
 }
-#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options ul li:first-child {
-  border-bottom: 1px solid #f4f4f4;
+#moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options ul li:last-child {
+  border-bottom: none;
 }
 #moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-user .note-panel-options > .fa {
   cursor: pointer;
@@ -219,7 +220,6 @@
 #moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body textarea {
   height: 2.5rem;
   width: 100%;
-  overflow: hidden;
 }
 #moduleNotePanel .note-panel-body .note-panel-notes .note-panel-note .note-panel-content-body .note-panel-content {
   color: #282c37;

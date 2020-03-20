@@ -26,7 +26,7 @@ block content
               button.btn.btn-sm.btn-primary(@click="saveNote(n)" :disabled="n.content === n._content") 保存
               button.btn.btn-sm.btn-default(@click="modifyNoteContent(n)") 取消
       .m-t-05.form
-        textarea.form-control(ref="newNote" v-model="content" placeholder="添加笔记" @keyup.ctrl.enter="saveNewNote"
+        textarea.form-control(ref="newNote" v-model="content" placeholder="添加笔记（公开、500字限制）" @keyup.ctrl.enter="saveNewNote"
           @input="resetTextarea(null)"
           @focus="resetTextarea(null)"
         )

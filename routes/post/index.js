@@ -17,11 +17,16 @@ const router = new Router();
 
 router
   .get('/:pid', async (ctx, next) => {
+
     const {nkcModules, data, db, query} = ctx;
-		const {token, page=0, highlight} = query;
+		const {token, page=0, highlight, redirect} = query;
     const {pid} = ctx.params;
     data.highlight = highlight;
     const post = await db.PostModel.findOnly({pid});
+    if(redirect === "true") {
+      const url = await db.PostModel.getUrl(post.pid, true);
+      return ctx.redirect(url);
+    }
     const thread = await post.extendThread();
     await thread.extendFirstPost();
     data.thread = {
@@ -176,11 +181,11 @@ router
     if(from === "nkcAPI") {
       q.parentPostId = pid;
       const count = await db.PostModel.count(q);
-      const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
+      let paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
       if(paging.page >= paging.pageCount) {
         if(paging.pageCount > 0) paging.page = paging.pageCount - 1;
         else paging.page = 0;
-        paging.start = paging.page * paging.perpage
+        paging = nkcModules.apiFunction.paging(paging.page, count, threadPostCommentList);
       }
       let parentPosts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
       const pids = new Set();
@@ -204,7 +209,6 @@ router
         return post;
       });
       const topPosts = [];
-
       for(const post of posts) {
         post.url = await db.PostModel.getUrl(post);
         if(post.parentPostId === pid) {
@@ -272,15 +276,12 @@ router
       data.posts = posts;
       data.paging = paging;
     }
-    /*if(ctx.permission("addNote")) {
-
-    }*/
-
-    data.notes = await db.NoteModel.getNotesByPosts([{
-      pid: data.post.pid,
-      cv: data.post.cv
-    }]);
-
+    if(ctx.permission("viewNote")) {
+      data.notes = await db.NoteModel.getNotesByPosts([{
+        pid: data.post.pid,
+        cv: data.post.cv
+      }]);
+    }
     await next();
   })
   .patch('/:pid', async (ctx, next) => {

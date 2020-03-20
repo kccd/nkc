@@ -21,7 +21,7 @@
 }
 #note .notes .form textarea {
   width: 100%;
-  height: 3rem;
+  height: 5rem;
   resize: none;
   overflow: hidden;
 }
@@ -86,13 +86,14 @@
   line-height: 3rem;
   text-align: center;
   cursor: pointer;
+  border-bottom: 1px solid #f4f4f4;
 }
 #note .notes .note .note-user .note-options ul li:hover {
   background-color: #2b90d9;
   color: #fff;
 }
-#note .notes .note .note-user .note-options ul li:first-child {
-  border-bottom: 1px solid #f4f4f4;
+#note .notes .note .note-user .note-options ul li:last-child {
+  border-bottom: none;
 }
 #note .notes .note .note-user .note-options > .fa {
   cursor: pointer;
@@ -110,7 +111,7 @@
 }
 #note .notes .note .note-content-body .note-content textarea {
   width: 100%;
-  height: 3rem;
+  height: 5rem;
   resize: none;
   overflow: hidden;
 }

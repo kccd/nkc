@@ -160,7 +160,8 @@ block scripts
   include ../ueditor/ueditorBase
   include ../MathJax.pug
   include ../publicModules/disabledPost/disabledPost
-  include ../publicModules/NKCHighlighter/NKCHighlighter
+  if permission("viewNote")
+    include ../publicModules/NKCHighlighter/NKCHighlighter
   +includeJS(`/thread/comments.js`)
   include ../publicModules/imageViewer
   if permission("getPostAuthor")

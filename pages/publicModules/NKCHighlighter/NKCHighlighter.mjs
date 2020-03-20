@@ -25,6 +25,7 @@ window.Source = class {
         // 存在高亮嵌套的问题
         // 理想状态下，所有选区处于平级，重合部分被分隔，仅添加多个class
         let parentsId = parentNode.getAttribute("data-nkc-hl-id");
+        if(!parentsId) return;
         parentsId = parentsId.split("-");
         const sources = [];
         for(const pid of parentsId) {
@@ -214,29 +215,50 @@ window.NKCHighlighter = class {
       select: "select"
     };
 
-    const initEvent = () => {
-      try{
-        // 屏蔽划词事件
-        if(self.disabled) return;
-        const range = self.getRange();
-        if(!range || range.collapsed) return;
-        if(
-          range.startContainer === self.range.startContainer &&
-          range.endContainer === self.range.endContainer &&
-          range.startOffset === self.range.startOffset &&
-          range.endOffset === self.range.endOffset
-        ) return;
-        // 限制选择文字的区域，只能是root下的选区
-        if(!self.root.contains(range.startContainer) || !self.root.contains(range.endContainer)) return;
-        self.range = range;
-        self.emit(self.eventNames.select, {
-          range
-        });
-      } catch(err) {
-        console.log(err.message || err);
-      }
-    };
-    document.addEventListener("mouseup", initEvent);
+    let interval;
+
+    document.addEventListener("mousedown", () => {
+      clearInterval(interval);
+    });
+
+    document.addEventListener("selectionchange", () => {
+      self.range = {};
+      clearInterval(interval);
+
+      interval = setTimeout(() => {
+        self.initEvent();
+      }, 500);
+    });
+
+
+  }
+  initEvent() {
+    try{
+      // 屏蔽划词事件
+      if(this.disabled) return;
+      const range = this.getRange();
+      if(!range || range.collapsed) return;
+      if(
+        range.startContainer === this.range.startContainer &&
+        range.endContainer === this.range.endContainer &&
+        range.startOffset === this.range.startOffset &&
+        range.endOffset === this.range.endOffset
+      ) return;
+      // 限制选择文字的区域，只能是root下的选区
+      if(!this.contains(range.startContainer) || !this.contains(range.endContainer)) return;
+      this.range = range;
+      this.emit(this.eventNames.select, {
+        range
+      });
+    } catch(err) {
+      console.log(err.message || err);
+    }
+  }
+  contains(node) {
+    while((node = node.parentNode)) {
+      if(node === this.root) return true;
+    }
+    return false;
   }
   getParent(self, d) {
     if(d === self.root) return;
@@ -244,7 +266,7 @@ window.NKCHighlighter = class {
       for(const c of self.excludedElementClass) {
         if(d.classList.contains(c)) throw new Error("划词越界");
       }
-      if(self.excludedElementClass.includes(d.tagName.toLowerCase())) {
+      if(self.excludedElementTagName.includes(d.tagName.toLowerCase())) {
         throw new Error("划词越界");
       }
     }
@@ -256,10 +278,14 @@ window.NKCHighlighter = class {
       const {startOffset, endOffset, startContainer, endContainer} = range;
       this.getParent(this, startContainer);
       this.getParent(this, endContainer);
+      const nodes = this.findNodes(startContainer, endContainer);
+      nodes.map(node => {
+        this.getParent(this, node);
+      });
       if(startOffset === endOffset && startContainer === endContainer) return;
       return range;
     } catch(err) {
-      console.log(err);
+      console.log(err.message || err);
     }
   }
   destroy(source) {
@@ -276,7 +302,6 @@ window.NKCHighlighter = class {
   }
   getNodes(range) {
     const {startContainer, endContainer, startOffset, endOffset} = range;
-    console.log(range)
     // if(startOffset === endOffset) return;
     let selectedNodes = [], startNode, endNode;
     // if(startContainer.nodeType !== 3 || startContainer.nodeType !== 3) return;
@@ -462,24 +487,48 @@ window.NKCHighlighter = class {
       }
     }
   }
+  offset(node) {
+    let top = 0, left = 0, _position;
+
+    const getOffset = (n, init) => {
+      if(n.nodeType !== 1) {
+        return;
+      }
+      _position = window.getComputedStyle(n)['position'];
+
+      if (typeof(init) === 'undefined' && _position === 'static') {
+        getOffset(n.parentNode);
+        return;
+      }
+
+      top = n.offsetTop + top - n.scrollTop;
+      left = n.offsetLeft + left - n.scrollLeft;
+
+      if (_position === 'fixed') {
+        return;
+      }
+      getOffset(n.parentNode);
+    };
+
+    getOffset(node, true);
+
+    return {
+      top, left
+    };
+  }
   getStartNodeOffset(range) {
-    // 将文本节点从划词处分隔
-    // 在分割处插入span并获取span的位置
-    // 移除span并拼接分隔后的节点
-    const {startContainer, startOffset} = range;
+    // 在选区起始处插入span
+    // 获取span的位置信息
+    // 移除span
     let span = document.createElement("span");
-    let endNode;
-    if(startOffset === 0) {
-      endNode = startContainer;
-    } else {
-      endNode = startContainer.splitText(startOffset);
-    }
-    endNode.parentNode.insertBefore(span, endNode);
-    span = $(span);
-    const offset = span.offset();
-    span.remove();
-    // 未拼接分割后的节点，而是当点击添加按钮后重新获取range
-    // endNode.parentNode.normalize();
+    // span.style.display = "none";
+    span.style.display = "inline-block";
+    span.style.verticalAlign = "top";
+    range.insertNode(span);
+    const parentNode = span.parentNode;
+    span.style.width = "30px";
+    const offset = this.offset(span);
+    parentNode.removeChild(span);
     return offset;
   }
   lock() {

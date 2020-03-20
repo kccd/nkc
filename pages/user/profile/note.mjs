@@ -2,7 +2,8 @@ const data = NKC.methods.getDataById("subUsersId");
 const noteApp = new Vue({
   el: "#note",
   data: {
-    threads: data.threads
+    threads: data.threads,
+    timeout: null
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
@@ -71,10 +72,21 @@ const noteApp = new Vue({
     textareaAutoResize(nc, t) {
       const textArea = this.getTextarea(nc, t);
       const num = 4 * 12;
-      textArea.style.height = '4rem';
       if(num < textArea.scrollHeight) {
         textArea.style.height = textArea.scrollHeight + 'px';
+      } else {
+        textArea.style.height = '4rem';
       }
+      /*clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        const textArea = this.getTextarea(nc, t);
+        const num = 4 * 12;
+        if(num < textArea.scrollHeight) {
+          textArea.style.height = textArea.scrollHeight + 'px';
+        } else {
+          textArea.style.height = '4rem';
+        }
+      }, 100);*/
     }
   }
 });

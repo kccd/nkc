@@ -37,7 +37,7 @@
   text-align: center;
   background-color: @btnColor;
   color: #fff;
-  z-index: 10000000000;
+  z-index: 1000;
   &:active{
     opacity: 0.8;
   }
@@ -50,6 +50,9 @@
     height: 2rem;
     line-height: 2rem;
     display: block;
+    .fa{
+      margin-right: 0.3rem;
+    }
     &:after{
       position: absolute;
       content: "";
@@ -62,6 +65,21 @@
       border-style: solid;
       border-width: 5px 5px 0 5px;
       border-color: @btnColor transparent transparent transparent;
+    }
+  }
+  @media (max-width: 767px) {
+    position: fixed;
+    right: 1rem;
+    &>span{
+      width: 5rem;
+      &:after{
+        border-width: 5px 5px 5px 0;
+        top: 0;
+        bottom: 0;
+        left: -5px;
+        right: auto;
+        border-color: transparent @btnColor transparent transparent;
+      }
     }
   }
 }

@@ -32,7 +32,7 @@ const app = new Vue({
         textArea = this.$refs[nc._id][0];
       }
       if(!textArea) return;
-      const rem = 3;
+      const rem = 5;
       const num = rem * 12;
       textArea.style.height = rem + 'rem';
       if(num < textArea.scrollHeight) {
@@ -45,16 +45,20 @@ const app = new Vue({
       Promise.resolve()
         .then(() => {
           if(!content) throw "请输入笔记内容";
-          const {type, targetId, _id} = note;
+          const {type, targetId, _id, node} = note;
           return nkcAPI("/note", "POST", {
             _id,
             type,
             targetId,
+            node,
             content
           });
         })
         .then(data => {
           app.content = "";
+          /*if(!app.note._id) {
+            window.location.href = `/note/${data.note._id}`;
+          }*/
           data.note.notes.map(note => {
             note.options = false;
             note.edit = false;

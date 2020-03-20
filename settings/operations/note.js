@@ -1,4 +1,5 @@
 module.exports = {
+  GET: "viewNote",
   POST: "addNote",
   PARAMETER: {
     GET: "viewNote",

@@ -43,7 +43,7 @@
   text-align: center;
   background-color: #e85a71;
   color: #fff;
-  z-index: 10000000000;
+  z-index: 1000;
 }
 .nkc-hl-btn:active {
   opacity: 0.8;
@@ -58,6 +58,9 @@
   line-height: 2rem;
   display: block;
 }
+.nkc-hl-btn > span .fa {
+  margin-right: 0.3rem;
+}
 .nkc-hl-btn > span:after {
   position: absolute;
   content: "";
@@ -70,4 +73,21 @@
   border-style: solid;
   border-width: 5px 5px 0 5px;
   border-color: #e85a71 transparent transparent transparent;
+}
+@media (max-width: 767px) {
+  .nkc-hl-btn {
+    position: fixed;
+    right: 1rem;
+  }
+  .nkc-hl-btn > span {
+    width: 5rem;
+  }
+  .nkc-hl-btn > span:after {
+    border-width: 5px 5px 5px 0;
+    top: 0;
+    bottom: 0;
+    left: -5px;
+    right: auto;
+    border-color: transparent #e85a71 transparent transparent;
+  }
 }

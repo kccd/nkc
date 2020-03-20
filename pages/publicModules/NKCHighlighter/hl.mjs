@@ -43,6 +43,7 @@ NKC.modules.NKCHL = class {
         "MathJax_CHTML", // 公式
         "article-video-body", // 视频
         "article-quote", // 引用
+        "nkcHiddenBox", // 学术分隐藏
       ].concat(excludedElementClass)
     });
     self.hl = hl;
@@ -62,21 +63,25 @@ NKC.modules.NKCHL = class {
             btn.onclick = () => {
               // 重新获取range
               // 避免dom变化导致range对象未更新的问题
-              range = hl.getRange();
+              // range = hl.getRange();
               let node = hl.getNodes(range);
               const content = hl.getNodesContent(node);
-              self.newNote({
-                id: "",
-                content,
-                targetId: self.id,
-                type: "post",
-                notes: [],
-                node,
-              })
-                .then(note => {
-                  hl.createSource(note._id, note.node);
+              if($(window).width() < 768) {
+                NKC.methods.visitUrl(`/note?content=${content}&targetId=${self.id}&type=post&offset=${node.offset}&length=${node.length}`, true);
+              } else {
+                self.newNote({
+                  id: "",
+                  content,
+                  targetId: self.id,
+                  type: "post",
+                  notes: [],
+                  node,
                 })
-                .catch(sweetError)
+                  .then(note => {
+                    hl.createSource(note._id, note.node);
+                  })
+                  .catch(sweetError)
+              }
             }
           })
           .catch(sweetError)
@@ -105,12 +110,20 @@ NKC.modules.NKCHL = class {
     hl.restoreSources(notes);
   }
   createBtn2(offset) {
+    this.removeBtn();
     const {top, left} = offset;
     const span = $("<span><span>添加笔记</span></span>");
-    span.addClass("nkc-hl-btn").css({
-      top: top - 2.6 * 12 + "px",
-      left: left - 1.8 * 12 + "px"
-    });
+    span.addClass("nkc-hl-btn");
+    if($(window).width() >= 768) {
+      span.css({
+        top: top - 2.6 * 12 + "px",
+        left: left - 1.8 * 12 + "px"
+      });
+    } else {
+      span.css({
+        top: top - $(document).scrollTop() - 3+ "px"
+      });
+    }
     $(body).append(span);
     return span[0];
   }
@@ -118,7 +131,7 @@ NKC.modules.NKCHL = class {
     this.removeBtn();
     const btn = document.createElement("span");
     btn.classList.add("nkc-hl-btn");
-    btn.innerText = "添加笔记";
+    btn.innerText = "记笔记";
     const rootJQ = $(this.rootElement);
     const {top, left} = rootJQ.offset();
     const scrollTop = $(window).scrollTop();

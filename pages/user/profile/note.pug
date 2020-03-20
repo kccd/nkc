@@ -31,7 +31,7 @@
                       .note(v-html="n.html")
                 .note-content(v-if="note.edit").m-b-1
                   textarea.form-control(
-                    placeholder="添加笔记"
+                    placeholder="添加笔记（公开、500字限制）"
                     v-model="note.newContent" :ref="'note' + note._id" @keyup.ctrl.enter="saveNewNote(note)" @input="textareaAutoResize(note, 'note')" @focus="textareaAutoResize(note, 'note')")
                   .m-t-05
                     button.btn.btn-xs.btn-primary(@click="saveNewNote(note)") 保存

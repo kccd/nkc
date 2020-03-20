@@ -703,7 +703,8 @@ block scripts
   include ../publicModules/lazySizes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
-  include ../publicModules/NKCHighlighter/NKCHighlighter
+  if permission("viewNote")
+    include ../publicModules/NKCHighlighter/NKCHighlighter
   //- include ../publicModules/postNotes/postNotes
   if data.attachmentsCount > 0
     include ../publicModules/resourceInfo/resourceInfo

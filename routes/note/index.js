@@ -1,5 +1,28 @@
 const router = require("koa-router")();
 router
+  .get("/", async (ctx, next) => {
+    const {data, query, nkcModules} = ctx;
+    const {
+      content, offset, length, type, targetId
+    } = query;
+    nkcModules.checkData.checkString(content, {
+      name: "划词内容",
+      minLength: 1
+    });
+    data.note = {
+      type,
+      targetId,
+      content,
+      node: {
+        offset: Number(offset),
+        content,
+        length: Number(length)
+      },
+      notes: []
+    };
+    ctx.template = "note/note.pug";
+    await next();
+  })
   .use("/:_id", async (ctx, next) => {
     const {params, db, data} = ctx;
     const {_id} = params;
@@ -60,7 +83,7 @@ router
   })
   .post("/", async (ctx, next) => {
     const {db, body, data, nkcModules} = ctx;
-    const {checkString} = nkcModules.checkData;
+    const {checkString, checkNumber} = nkcModules.checkData;
     const {_id, targetId, content, type, node} = body;
     const {user} = data;
     checkString(content, {
@@ -74,6 +97,8 @@ router
     if(type === "post") {
       const post = await db.PostModel.findOnly({pid: targetId}, {cv: 1});
       cv = post.cv;
+    } else {
+      ctx.throw(400, "未知划词类型");
     }
 
     const time = Date.now();
@@ -85,6 +110,14 @@ router
       if(!note) ctx.throw(400, `笔记ID错误，请重试。id:${_id}`);
     } else if(node) {
       const {offset, length} = node;
+      checkNumber(offset, {
+        name: "划词偏移量",
+        min: 0
+      });
+      checkNumber(length, {
+        name: "划词长度",
+        min: 1
+      });
       note = await db.NoteModel.findOne({
         cv,
         targetId,
