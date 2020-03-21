@@ -73,6 +73,7 @@ activeUserSchema.statics.saveActiveUsersToCache = async () => {
   const activeUsers = await mongoose.model("activeUsers").getActiveUsers();
   const activeUsers_ = [];
   for(const u of activeUsers) {
+    if(!u) continue;
     activeUsers_.push({
       uid: u.uid,
       avatar: u.avatar,
