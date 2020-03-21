@@ -6,9 +6,12 @@ shareRouter
     const {params, db, data, nkcModules} = ctx;
     const {token} = params;
     const {user} = data;
-    const share = await db.ShareModel.findOne({token});
-    if(!share) ctx.throw(403, '无效的token');
     const lock = await nkcModules.redLock.lock(`share:${token}`, 6000);
+    const share = await db.ShareModel.findOne({token});
+    if(!share) {
+      await lock.unlock();
+      ctx.throw(403, '无效的token');
+    }
     const {uid, tokenType} = share;
     // 这里可以取到uid,id,toc,machine,ip, port,shareType,code,originUrl,type
     // kcd先默认为0，如果有kcb奖励则在下方update
@@ -85,6 +88,7 @@ shareRouter
   const {ShareModel} = db;
   let {str, type, targetId} = body;
   const {user} = data;
+  const lock = await nkcModules.redLock.lock(`getShareToken:${user.uid}`, 6000);
   let uid;
   if(user){
     uid = user.uid
@@ -135,7 +139,10 @@ shareRouter
   let token, n = 0;
   do{
     n++;
-    if(n > 100) ctx.throw(500, '生成唯一token失败');
+    if(n > 100) {
+      await lock.unlock();
+      ctx.throw(500, '生成唯一token失败');
+    }
     token = apiFn.getRandomString("a0", 8);
     const tokenCount = await db.ShareModel.count({token});
     if(!tokenCount) break;
@@ -165,6 +172,7 @@ shareRouter
   });
   await shareLogs.save();
   data.newUrl = "/s/" + token;
+  await lock.unlock();
   await next();
 });
 module.exports = shareRouter;
