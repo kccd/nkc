@@ -1389,4 +1389,5 @@ $(function() {
 			}));
 		}
 	}
+	NKC.methods.highlightBlockByClassName(".render-content");
 });
