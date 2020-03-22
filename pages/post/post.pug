@@ -160,6 +160,7 @@ block scripts
   include ../ueditor/ueditorBase
   include ../MathJax.pug
   include ../publicModules/disabledPost/disabledPost
+  include ../publicModules/highlight/highlight
   if permission("viewNote")
     include ../publicModules/NKCHighlighter/NKCHighlighter
   +includeJS(`/thread/comments.js`)
@@ -203,4 +204,6 @@ block scripts
           });
         }
       }
+
+      NKC.methods.highlightBlockByClassName(".render-content");
     });
