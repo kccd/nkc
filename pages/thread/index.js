@@ -1389,4 +1389,8 @@ $(function() {
 			}));
 		}
 	}
+	var renderContent = document.getElementsByClassName("render-content");
+	for(var i = 0; i < renderContent.length; i++) {
+		NKC.methods.highlightBlock(renderContent[i]);
+	}
 });
