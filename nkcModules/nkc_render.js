@@ -679,7 +679,7 @@ function nkc_render(options){
       default:
         renderedHTML = plain_escape(content)
     }
-  
+
     var resources = {};
     post.resources = post.resources || [];
     for(var i = 0; i < post.resources.length; i++) {
@@ -696,6 +696,8 @@ function nkc_render(options){
       base: '/twemoji',
       ext: '.svg'
     });
+
+
     // 渲染at
     // 取出帖子引用部分，帖子引用部分的at不被渲染
     var blockDomArray = renderedHTML.match(/<blockquote cite.*?blockquote>/im);
@@ -713,7 +715,10 @@ function nkc_render(options){
       }
     }
     renderedHTML = blockDomHtml + renderedHTML;
-    renderedHTML = linkAlienate(renderedHTML); //please check linkAlienate()
+    // 旧编辑器：如果是外链，则只能在新窗口打开
+    // 新编辑器：用户可以在插入链接时手动选择是否在新窗口打开
+    // renderedHTML = linkAlienate(renderedHTML); //please check linkAlienate()
+
     if(dataType === "post") {
       renderedHTML = `<div class="render-content" id="post-content-${post.pid}">${renderedHTML}</div>`;
     } else {
