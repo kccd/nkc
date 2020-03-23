@@ -84,6 +84,7 @@ block content
             | 》
           if post.t
             div.ThreadTitle= post.t
+          -post.c = hideContentByUser(post.c, data.user, 'thread')
           div.ThreadPostBody#ThreadPostBody!= experimental_render(post)
           if post.credits && post.credits.length > 0
             .nkcpanel.ThreadPostCredits
