@@ -15,6 +15,7 @@ block eContent
         table.table.table-bordered
           thead
             tr
+              th ID
               th 版本号
               th 最后修改时间
               th 工具名
@@ -27,6 +28,7 @@ block eContent
             //- 循环模板
             for info, index in data.list
               tr
+                th= info._id
                 th= info.version
                 th= format("YYYY/MM/DD HH:mm:ss", info.lastModify)
                 th= info.name
