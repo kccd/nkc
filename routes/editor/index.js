@@ -2,7 +2,7 @@ const Router = require("koa-router");
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
-    const {db, data, query, state} = ctx;
+    const {db, data, query, state, nkcModules} = ctx;
     const {type} = query;
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
@@ -50,11 +50,16 @@ router
         data.l = data.post.l;
         data.title = data.post.t;
       }
+      let parentPostCount;
+      if(data.post.parentPostId) {
+        parentPostCount = await db.PostModel.count({pid: data.post.parentPostId});
+      }
 
       data.thread = {
         tid: thread.tid,
         title: firstPost.t,
-        url: `/t/${thread.tid}`
+        url: `/t/${thread.tid}`,
+        comment: !!parentPostCount
       };
       selectedForumsId = thread.mainForumsId || [];
     } else if(type === "forum_declare") { // 修改专业说明

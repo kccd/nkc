@@ -13,6 +13,7 @@ const subscribeThread = require("./subscribe/thread");
 const subscribeCollection = require("./subscribe/collection");
 const summaryPie = require("./summary/pie");
 const summaryCalendar = require("./summary/calendar");
+const note = require("./note");
 const serverConfig = require("../../../config/server.json");
 router
   .use("/", async (ctx, next) => {
@@ -41,6 +42,10 @@ router
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(targetUser.uid, "sub");
     data.fansId = await db.SubscribeModel.getUserFansId(targetUser.uid);
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
+    const noteCount = await db.NoteContentModel.count({
+      uid: targetUser.uid,
+      deleted: false
+    });
     if(state.isApp) {
       data.appLinks = [
         {
@@ -97,6 +102,11 @@ router
           type: "follower",
           name: "我的粉丝",
           url: `/u/${targetUser.uid}/profile/follower`,
+        },
+        {
+          type: "note",
+          name: "我的笔记",
+          url: `/u/${targetUser.uid}/profile/note`,
         }
       ];
     } else {
@@ -132,6 +142,12 @@ router
               url: `/u/${targetUser.uid}/profile/draft`,
               name: "我的草稿",
               count: draftCount
+            },
+            {
+              type: "note",
+              url: `/u/${targetUser.uid}/profile/note`,
+              name: "我的笔记",
+              count: noteCount
             }
           ]
         },
@@ -325,5 +341,6 @@ router
   .get("/finance", finance)
   .get("/draft", draft)
   .get("/thread", thread)
+  .get("/note", note)
   .get("/post", post);
 module.exports = router;

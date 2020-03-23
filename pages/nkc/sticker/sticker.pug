@@ -4,7 +4,7 @@ block nkcTitle
   +includeCSS("/nkc/sticker/sticker.css")
 block nkcContent
   #data.hidden=objToStr({stickers: data.stickers, t: data.t})
-  .col-xs-12.col-md-12.box-shadow-panel.management-sticker#app(v-cloak)
+  .col-xs-12.col-md-12.management-sticker#app(v-cloak)
     div
       ul.nav.nav-tabs.m-b-1
         li(class=!data.t?"active":"")

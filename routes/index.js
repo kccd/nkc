@@ -47,6 +47,7 @@ const userAvatarRouter = routers.userAvatar;
 const userBannerRouter = routers.userBanner;
 const newResourceRouter = routers.newResource;
 const librariesRouter = routers.libraries;
+const noteRouter = routers.note;
 // 网站工具
 const siteToolsRouter = routers.tools;
 
@@ -94,7 +95,7 @@ router.use("/rs", resourcesRouter.routes(), resourcesRouter.allowedMethods());
 router.use("/reader", readerRouter.routes(), readerRouter.allowedMethods());
 router.use("/banner", userBannerRouter.routes(), userBannerRouter.allowedMethods());
 router.use("/stickers", stickersRouter.routes(), stickersRouter.allowedMethods());
-router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
-;
+router.use("/note", noteRouter.routes(), noteRouter.allowedMethods());
+router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
 router.use("/tools", siteToolsRouter.routes(), siteToolsRouter.allowedMethods());
 module.exports = router;

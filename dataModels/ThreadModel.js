@@ -625,7 +625,9 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     }
   }
   await this.update({lm: pid});
-  if(!user.generalSettings.lotterySettings.close) {
+  // 红包奖励判断
+  await user.setRedEnvelope();
+  /*if(!user.generalSettings.lotterySettings.close) {
     const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
     if(!redEnvelopeSettings.c.random.close) {
       const {chance} = redEnvelopeSettings.c.random;
@@ -637,7 +639,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
         }
       }
     }
-  }
+  }*/
   return _post
 };
 
@@ -1701,7 +1703,10 @@ threadSchema.methods.createNewPost = async function(post) {
     }
   }
   await this.update({lm: pid});
-  const userGeneral = await UserGeneralModel.findOne({uid: post.uid});
+  // 红包奖励判断
+  const user = await UserModel.findOnly({uid: post.uid});
+  await user.setRedEnvelope();
+  /*const userGeneral = await UserGeneralModel.findOne({uid: post.uid});
   if(!userGeneral.lotterySettings.close) {
     const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
     if(!redEnvelopeSettings.c.random.close) {
@@ -1714,7 +1719,7 @@ threadSchema.methods.createNewPost = async function(post) {
         }
       }
     }
-  }
+  }*/
   return _post
 };
 /*

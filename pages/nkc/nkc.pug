@@ -25,6 +25,12 @@ block content
                 | 表情管理
                 if !permission("nkcManagementSticker")
                   | （无权）
+            li(class=data.nav === 'note' ? "active" : "")
+              a(href=`/nkc/note`)
+                .fa.fa-file-text
+                | 笔记管理
+                if !permission("nkcManagementNote")
+                  | （无权）
       .col-xs-12.col-md-10.box-shadow-panel
         block nkcContent
 block scripts

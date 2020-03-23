@@ -28,5 +28,17 @@ func.getFileMD5 = async (filePath) => {
       }
     });
   });
-}
+};
+
+/*
+* 获取一段文本的md5
+* @param {String} text 文本内容
+* @return {String} md5
+* @author pengxiguaa 2020-3-10
+* */
+func.getTextMD5 = async (text) => {
+  const c = crypto.createHash("md5");
+  c.update(text);
+  return c.digest("hex");
+};
 module.exports = func;

@@ -2163,6 +2163,15 @@ button.thread-author-subscribe.active{
 button.thread-author-subscribe:focus{
   outline: none;
 }
+
+/*
+ 通过服务器experimental_render渲染得到的html结构中，
+ 最外层都会被一个class为render-content的div包裹
+*/
+.render-content{
+  overflow: hidden;
+}
+
 [data-sticker-rid]{
   cursor: pointer;
 }

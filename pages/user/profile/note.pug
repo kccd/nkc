@@ -1,0 +1,41 @@
+#note(v-cloak)
+  include ../../publicModules/paging/paging
+  .account-notes
+    .note-threads(v-if="!threads || !threads.length")
+      .null 空空如也~
+    .note-threads(v-else)
+      .note-thread(v-for="t in threads")
+        .note-thread-cover(v-if="t.cover")
+          .note-thread-cover-image(:style="'background-image: url(' + getUrl('cover', t.cover) + ')'")
+        .note-thread-info
+          a(:href="'/t/'+t.tid" target="_blank").note-thread-title {{t.title}}
+          .note-thread-abstract {{t.abstract}}
+        .note-thread-posts
+          .note-thread-post(v-for="post in t.posts")
+            .note-thread-note(v-for="note in post.notes")
+              .note-origin-content
+                a(:href="post.url" target="_blank") {{note.content}}
+              .note-content-body
+                .note-content(v-for="n in note.notes")
+                  .time {{fromNow(n.toc)}}
+                  .options
+                    .fa.fa-pencil(title="编辑" @click="modifyNote(n)")
+                    .fa.fa-trash(title="删除" @click="deleteNote(note, n)")
+                  .content
+                    div(v-if="n.edit").m-b-1
+                      textarea.form-control(v-model="n.content" :ref="n._id" @keyup.ctrl.enter="saveContent(n)" @input="textareaAutoResize(n)" @focus="textareaAutoResize(n)")
+                      .m-t-05
+                        button.btn.btn-xs.btn-primary(@click="saveContent(n)") 保存
+                        button.btn.btn-xs.btn-default(@click="modifyNote(n)") 取消
+                    div(v-else)
+                      .note(v-html="n.html")
+                .note-content(v-if="note.edit").m-b-1
+                  textarea.form-control(
+                    placeholder="添加笔记（公开、500字限制）"
+                    v-model="note.newContent" :ref="'note' + note._id" @keyup.ctrl.enter="saveNewNote(note)" @input="textareaAutoResize(note, 'note')" @focus="textareaAutoResize(note, 'note')")
+                  .m-t-05
+                    button.btn.btn-xs.btn-primary(@click="saveNewNote(note)") 保存
+                    button.btn.btn-xs.btn-default(@click="addNote(note)") 取消
+              .add-note
+                .fa.fa-plus(@click="addNote(note)" title="添加笔记") &nbsp;添加笔记
+  include ../../publicModules/paging/paging_input

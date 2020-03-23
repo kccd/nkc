@@ -15,8 +15,8 @@ luckRouter
     const {user} = data;
     const redEnvelopeSettings = await db.SettingModel.findOnly({_id: 'redEnvelope'});
     const {random} = redEnvelopeSettings.c;
-    if(random.close) ctx.throw(403, '抱歉，抽奖功能已关闭！');
-    if(!user.generalSettings.lotterySettings.status) ctx.throw(403, '抱歉，您暂未获得抽奖机会，请刷新。');
+    if(random.close) ctx.throw(403, '抱歉，红包功能已关闭！');
+    if(!user.generalSettings.lotterySettings.status) ctx.throw(403, '抱歉，您暂未获得开红包机会，请刷新。');
     let n = 1;
     const number = Math.ceil(Math.random()*100);
     let result;

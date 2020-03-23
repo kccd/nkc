@@ -39,7 +39,7 @@ function restore(id) {
         id: id
       });
     })
-    .then((data) => {
+    .then(function(data) {
       var warning = data.warning;
       if(warning && warning.length) {
         sweetInfo("账号已恢复！但部分信息由于“"+warning.join("、")+"”等原因未能成功恢复。");

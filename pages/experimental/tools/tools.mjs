@@ -8,19 +8,20 @@ new Vue({
   methods: {
     editTool: function(version, name, summary, uid, author, entry, isOtherSite, id) {
       CommonModal.open(function(form) {
-        console.log(form);
         let formData = new FormData();
         form.forEach(d => {
           formData.append(d.name, d.value);
-        })
+        });
         formData.append("_id", id);
         nkcUploadFile("/tools/update", "post", formData, (e, percent) => {
-          console.log(percent)
+          // console.log(percent)
         })
-        .then(() => asyncSweetSuccess("修改成功", {autoHide: false}))
+        .then(() => {
+          asyncSweetSuccess("修改成功", {autoHide: false});
+          CommonModal.close();
+        })
         .then(() => location.reload())
         .catch(asyncSweetError);
-        CommonModal.close();
       }, {
         title: '修改工具信息',
         data: [
@@ -95,18 +96,19 @@ new Vue({
     },
     addTool: function() {
       CommonModal.open(function(form){
-        console.log(form);
         let formData = new FormData();
         form.forEach(d => {
           formData.append(d.name, d.value);
-        })
+        });
         nkcUploadFile("/tools/upload", "post", formData, (e, percent) => {
           console.log(percent)
         })
-        .then(() => asyncSweetSuccess("上传成功", {autoHide: false}))
+        .then(() => {
+          asyncSweetSuccess("上传成功", {autoHide: false});
+          CommonModal.close();
+        })
         .then(() => location.reload())
         .catch(asyncSweetError);
-        CommonModal.close();
       }, {
         title: '上传工具',
         data: [
@@ -173,4 +175,4 @@ new Vue({
       })
     }
   }
-})
+});

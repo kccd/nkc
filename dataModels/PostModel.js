@@ -210,6 +210,11 @@ const postSchema = new Schema({
   hide: {
     type: String,
     default: "null"
+  },
+  // 内容对版本
+  cv: {
+    type: Number,
+    default: 1
   }
 }, {toObject: {
   getters: true,
@@ -824,22 +829,9 @@ postSchema.statics.newPost = async (options) => {
       await redis.pubMessage(message);
     }
   }
-  if(!user.generalSettings) {
-    await user.extendGeneralSettings();
-  }
-  if(!user.generalSettings.lotterySettings.close) {
-    const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
-    if(!redEnvelopeSettings.c.random.close) {
-      const {chance} = redEnvelopeSettings.c.random;
-      const number = Math.ceil(Math.random()*100);
-      if(number <= chance) {
-        const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
-        if(postCountToday === 1) {
-          await user.generalSettings.update({'lotterySettings.status': true});
-        }
-      }
-    }
-  }
+  // 红包奖励判断
+  await user.setRedEnvelope();
+
   return _post
 };
 
@@ -849,7 +841,19 @@ postSchema.statics.newPost = async (options) => {
 * @return {String} 不带域名的url
 * @author pengxiguaa 2019-6-11
 * */
-postSchema.statics.getUrl = async function(pid) {
+postSchema.statics.getUrl = async function(pid, redirect) {
+  // 2020-3-20 pengxiguaa
+  // 由于新能问题，此方法不再返回带楼层的链接地址
+  // 返回post详细页并附带跳转参数，post详情页路由再做处理。
+
+  if(!redirect) {
+    if(typeof(pid) !== "string") {
+      pid = pid.pid;
+    }
+    return `/p/${pid}?redirect=true`;
+  }
+
+
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model("settings");
   const pageSettings = await SettingModel.findOnly({_id: "page"});
@@ -952,12 +956,14 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
     pid: 1,
     toc: 1,
     anonymous: 1,
+    parentPostId: 1,
     tid: 1
   }).sort({toc: -1}).limit(limit);
-  const usersId = [], threadsId = [];
+  const usersId = [], threadsId = [], parentPostsId = [];
   posts.map(post => {
     usersId.push(post.uid);
     threadsId.push(post.tid);
+    if(post.parentPostId) parentPostsId.push(post.parentPostId);
   });
   const users = await UserModel.find({uid: {$in: usersId}}, {avatar: 1, uid: 1, username: 1});
   let threads = await ThreadModel.find({tid: {$in: threadsId}});
@@ -965,9 +971,11 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
     firstPost: 1,
     firstPostUser: 1
   });
-  const usersObj = {}, threadsObj = {};
+  const parentPosts = await PostModel.find({pid: {$in: parentPostsId}});
+  const usersObj = {}, threadsObj = {}, parentPostsObj = {};
   users.map(user => usersObj[user.uid] = user);
   threads.map(thread => threadsObj[thread.tid] = thread);
+  parentPosts.map(post => parentPostsObj[post.pid] = post);
   const results = [];
   for(const post of posts) {
     const user = usersObj[post.uid];
@@ -977,7 +985,23 @@ postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
     if(!post.anonymous) post.user = user;
     post.thread = thread;
     post.url = await PostModel.getUrl(post.pid);
-    results.push(post);
+    const r = {
+      toc: post.toc,
+      url: post.url,
+      c: post.c,
+      user: post.user,
+      targetUser: thread.firstPost.user,
+      type: "reply"
+    };
+    if(post.parentPostId) {
+      const parentPost = parentPostsObj[post.parentPostId];
+      if(!parentPost.anonymous) {
+        await parentPost.extendUser();
+      }
+      r.targetUser = parentPost.user;
+      r.type = "comment";
+    }
+    results.push(r);
   }
   return results;
 };

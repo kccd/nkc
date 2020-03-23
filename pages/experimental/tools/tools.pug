@@ -1,20 +1,17 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
-  -const mainContainer1400 = true;
-  -const hiddenFooter = true;
-  link(href='/experimental/index.css' rel='stylesheet')
-  link(rel='stylesheet' href=`/experimental/tools/tools.css?v=${startTime}`)
-  link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
+block eTitle
+  +includeCSS("/experimental/tools/tools.css")
   title 网站工具管理
 
-block content
+block eContent
   .container-fluid.max-width
-    .row
-      include ../nav
-      #app
-        .form-group
-          button.btn.btn-primary(@click=`addTool()`) 上传工具
+    #app
+      .form-group
+        button.btn.btn-primary(@click=`addTool()`) 上传工具
+      .form-group.text-danger
+        p 注意：仅支持上传zip格式的压缩包，上传后服务器会自动解压。
+      .table-responsive
         table.table.table-bordered
           thead
             tr
@@ -35,12 +32,12 @@ block content
                 th= info.name
                 th= info.summary
                 - let author = info.author? info.author:'[匿名]'
-                th 
+                th
                   if info.uid
-                    a(href=`/u/${info.uid}/profile`, target="_blank") #{author}
+                    a(href=`/u/${info.uid}`, target="_blank") #{author}
                   else
                     span #{author}
-                th 
+                th
                   if info.isOtherSite
                     a(href=`${info.entry}`, target="_blank") #{info.entry}
                   else

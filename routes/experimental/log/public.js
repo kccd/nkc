@@ -47,7 +47,7 @@ router
     await next()
   })
   .del('/', async (ctx, next) => {
-    const {data, db, query, nkcModules} = ctx;
+    const {db, query} = ctx;
     let {del} = query;
     del = del? JSON.parse(decodeURIComponent(Buffer.from(del, "base64").toString())) : {};
     const delMap = {
@@ -56,7 +56,7 @@ router
         // {"uid": uid},
         // {"ip": ip}
       ]
-    }
+    };
     if(del.sTime) {
       delMap.$and[0].reqTime.$gt = new Date(del.sTime);
     }
@@ -72,5 +72,5 @@ router
     await db.LogModel.remove(delMap);
     
     await next();
-  })
+  });
 module.exports = router;

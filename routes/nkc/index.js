@@ -1,6 +1,7 @@
 const router = require("koa-router")();
 const homeRouter = require("./home");
 const stickerRouter = require("./sticker");
+const noteRouter = require("./note");
 const moment = require("moment");
 router
   .get("/", async (ctx, next) => {
@@ -178,5 +179,6 @@ router
     await next();
   })
   .use("/home", homeRouter.routes(), homeRouter.allowedMethods())
+  .use("/note", noteRouter.routes(), noteRouter.allowedMethods())
   .use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
 module.exports = router;

@@ -4,7 +4,7 @@ block title
     title 主页
   else
     title=`主页 - ${data.name}`
-  +includeCSS("/css/user/profile.css")
+  +includeCSS("/user/profile/profile.css")
 block content
   .container-fluid.max-width
     .row
@@ -139,6 +139,8 @@ block content
           include ./finance
         else if data.type === "follower"
           include ./follower
+        else if data.type === "note"
+          include ./note
         else if data.type === "subscribe/user"
           include ./subscribe/user
         else if data.type === "subscribe/topic"
@@ -167,9 +169,12 @@ block content
                   | 购物车
 
 
-  .hidden#subUsersId=objToStr({subThreadsId: data.subThreadsId, collectionThreadsId: data.collectionThreadsId, subUsersId: data.subUsersId, subForumsId: data.subForumsId, subColumnsId: data.subColumnsId, subscribes: data.subscribesObj})
+  .hidden#subUsersId=objToStr({threads: data.threads, subThreadsId: data.subThreadsId, collectionThreadsId: data.collectionThreadsId, subUsersId: data.subUsersId, subForumsId: data.subForumsId, subColumnsId: data.subColumnsId, subscribes: data.subscribesObj})
 block scripts
   include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/commonModal/commonModal
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../publicModules/moment
   if !data.type
     include ../../user/summary/calendar
     include ../../user/summary/pie
@@ -177,5 +182,5 @@ block scripts
       var SummaryCalendar = new NKC.modules.SummaryCalender($(".summary-calendar")[0]);
       var SummaryPie = new NKC.modules.SummaryPie($(".summary-pie")[0]);
   +includeJS("/js/user/profile.js")
-  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
-  include ../../publicModules/moment
+  if data.type === "note"
+    +includeJS("/user/profile/note.js")

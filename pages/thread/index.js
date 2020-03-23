@@ -1372,3 +1372,22 @@ function disabledMarkedPosts() {
 	var postsId = getMarkedPostsId();
 	disabledThreadPost(postsId);
 }
+
+var nkchl = [];
+
+$(function() {
+
+	var data = NKC.methods.getDataById("threadForumsId");
+
+	if(data.notes && data.notes.length) {
+		for(var i = 0; i < data.notes.length; i++) {
+			var n = data.notes[i];
+			nkchl.push(new NKC.modules.NKCHL({
+				type: n.type,
+				targetId: n.targetId,
+				notes: n.notes
+			}));
+		}
+	}
+	NKC.methods.highlightBlockByClassName(".render-content");
+});

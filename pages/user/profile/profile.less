@@ -1,4 +1,4 @@
-@import "../base";
+@import "../../publicModules/base";
 body{
   background-color: #f6f6f6;
 }
@@ -651,6 +651,139 @@ body{
   }
 }
 
+.account-notes{
+  .note-threads{
+    .null{
+      padding: 5rem 0;
+      text-align: center;
+    }
+    .note-thread{
+      margin-bottom: 2rem;
+      .note-thread-cover{
+        vertical-align: top;
+        display: table-cell;
+        width: 11rem;
+        .note-thread-cover-image{
+          width: 10rem;
+          height: 7rem;
+          background-size: cover;
+          border-radius: 3px;
+        }
+      }
+      .note-thread-info{
+        display: table-cell;
+        vertical-align: top;
+        .note-thread-title{
+          font-weight: 700;
+          color: @dark;
+          height: 2rem;
+          .hideText(@line: 1);
+          font-size: 1.4rem;
+        }
+        .note-thread-abstract{
+          max-height: 5rem;
+          .hideText(@line: 3);
+        }
+      }
+      .note-thread-posts{
+        .note-thread-post{
+          .note-thread-note{
+            .note-origin-content{
+              a{
+                color: #757575;
+                cursor: pointer;
+                text-decoration: none;
+                &:hover, &:active, &:visited{
+                  text-decoration: none;
+                }
+                padding-right: 2rem;
+                &:hover{
+                  color: @dark;
+                }
+              }
+              position: relative;
+              display: block;
+              margin-top: 0.5rem;
+              font-style: oblique;
+              font-size: 1.25rem;
+              font-weight: 700;
+              padding: 0.5rem;
+              background-color: #f4f4f4;
+            }
+            .note-content-body{
+              padding: 0.5rem 0;
+              .note-content{
+                margin-bottom: 0.3rem;
+                &>textarea{
+                  height: 4rem;
+                  resize: none;
+                  overflow: hidden;
+                }
+                .time{
+                  display: inline-block;
+                  font-size: 1rem;
+                  font-style: oblique;
+                  color: @accent;
+                }
+                .options{
+                  float: right;
+                  display: inline-block;
+                  padding-left: 0.2rem;
+                  text-align: right;
+                  .fa{
+                    padding-left: 0.3rem;
+                    cursor: pointer;
+                    color: #aaa;
+                    &:hover{
+                      color: #555;
+                    }
+                  }
+                }
+                .content{
+                  vertical-align: top;
+                  width: 100%;
+                  textarea{
+                    width: 100%;
+                    height: 4rem;
+                    resize: none;
+                    overflow: hidden;
+                    &:focus{
+                      outline: none;
+                    }
+                  }
+                  .note{
+
+                  }
+                }
+              }
+            }
+            .add-note{
+              text-align: center;
+              //padding: 0 2rem;
+              .fa{
+                display: block;
+                height: 1.6rem;
+                border-radius: 1rem;
+                max-width: 100%;
+                text-align: center;
+                font-size: 1rem;
+                line-height: 1.6rem;
+                //background-color: #f4f4f4;
+                cursor: pointer;
+                border: 1px solid #f4f4f4;
+                color: #b7b7b7;
+                &:hover{
+                  //background-color: #f9f9f9;
+                  color: #555;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 @media (max-width: 768px) {
   .account-thread-avatar{

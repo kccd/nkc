@@ -963,7 +963,7 @@ line-height: 1.4;
 }
 
 .ThreadPostBody pre{
-  padding: 0;
+  padding: 0.5rem;
   margin-top: 5px;
   margin-bottom: 5px;
 }

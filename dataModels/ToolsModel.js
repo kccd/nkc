@@ -8,6 +8,12 @@ const toolsSchema = new Schema({
     type: Number,
     required: true
   },
+  // 创建时间
+  toc: {
+    type: Date,
+    default: Date.now,
+    index: 1
+  },
   // 工具名字
   name: {
     type: String,

@@ -77,7 +77,6 @@ function deleteCurrentRecord() {
   var url = '/e/log/public';
   return sweetQuestion("确认删除当前查询结果中的所有日志吗？")
     .then(function() {
-      console.log(c);
        return nkcAPI(url + '?del=' +  NKC.methods.strToBase64(JSON.stringify(c)), "DELETE")
     })
     .then(function() {location.reload()})

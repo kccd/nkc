@@ -14,7 +14,7 @@ block content
               p.tool-summary #{info.summary}
               p.tool-name #{info.name}
             .tool-control
-              a.tool-author(href=info.uid? `/u/${info.uid}/profile`: null)
+              a.tool-author(href=info.uid? `/u/${info.uid}`: null)
                 span.tool-author-label author
                 span.tool-author-text #{info.author || "[匿名]"}
               .tool-start
