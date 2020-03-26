@@ -2,8 +2,8 @@ const Router = require('koa-router');
 const kcbRouter = new Router();
 kcbRouter
   .get('/', async (ctx, next) => {
-    const {nkcModules, data, db, query} = ctx;
-    const {page = 0, t, content} = query;
+    const {nkcModules, data, db, query, state} = ctx;
+    const {page = 0, t, content, operatingid} = query;
     const q = {};
     if(t === 'username') {
       const u = await db.UserModel.findOne({usernameLowerCase: content.toLowerCase()});
@@ -30,9 +30,12 @@ kcbRouter
       ];
     } else if(t === 'ip') {
       q.ip = content;
-    } else if(t === "operation") {
-      q.type = content;
     }
+    if(operatingid) {
+      q.type = operatingid;
+    }
+    let kcbsTypes = state.language['kcbsTypes'];
+    data.kcbsTypes = kcbsTypes;
     const count = await db.KcbsRecordModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -48,6 +51,7 @@ kcbRouter
     data.paging = paging;
     data.t = t;
     data.content = content;
+    data.operatingid = operatingid;
     ctx.template = 'experimental/log/kcb.pug';
     await next();
   })

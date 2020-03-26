@@ -80,18 +80,49 @@
       // 获取公式源代码
       var formulaCodeText = $("#mathInput").val();
       var formulaCode = formulaCodeText.substr(0, 2);
+      
       if(formulaCode.indexOf("$") > -1) {
         if(formulaCode === "$$"){
-          editor.execCommand('insertformulacode', '<span contenteditable="false" style="max-width:100%">'+formulaCodeText+'</span><span><br></span>');
+          // insertformulacode
+          // 3: $$...$$
+          editor.execCommand('inserthtml', formulaToHtml(3, formulaCodeText));
         }else{
-          editor.execCommand('insertformulacode', '<span contenteditable="false">'+formulaCodeText+'</span>&nbsp;');
+          // 1: $...$
+          editor.execCommand('inserthtml', formulaToHtml(1, formulaCodeText));
         }
       }else{
-        editor.execCommand('insertformulacode', '<span>'+formulaCodeText+'</span>&nbsp;');
+        if(formulaCode === "\\(") {
+          // 2: \(...\)
+          editor.execCommand('inserthtml', formulaToHtml(2, formulaCodeText));
+        }else {
+          // 4: \[...\]
+          editor.execCommand('inserthtml', formulaToHtml(4, formulaCodeText));
+        }
       }
       dialog.close();
       return false;
     }
+
+
+
+
+
+    // 转换成nkcsource标签的html文本
+  function formulaToHtml(typeid, code) {
+    var nkcsource = document.createElement("nkcsource");
+    nkcsource.setAttribute("data-type", "formula");
+    nkcsource.setAttribute("data-id", typeid);
+    nkcsource.setAttribute("contenteditable", "false");
+    if(typeid == 3 || typeid == 4) {
+      // 占整行
+      nkcsource.innerHTML = code;
+    }else {
+      // 行内
+      nkcsource.innerHTML = code;
+      nkcsource.style.display = "inline-block";
+    }
+    return nkcsource.outerHTML;
+  }
   </script>
 </body>
 </html>
