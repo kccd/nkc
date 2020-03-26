@@ -1,0 +1,19 @@
++includeCSS("/publicModules/insertHideContent/insertHideContent.css")
+#insertHideContentContainer
+  #insertHideContentApp(v-cloak)
+    .module-sr-body
+      .module-sr-header
+        .module-sr-title 插入隐藏内容
+        .fa.fa-remove(@click="close")
+      .module-sr-content
+        .container-fluid
+          .row
+            .form-group
+              label 限制查看学术分值
+                input.form-control(type="number" v-model="score")
+          .row
+            .col-xs-7
+            button.btn.btn-default.col-xs-2(@click="close") 取消
+            button.btn.btn-primary.col-xs-2.insert-hide-content-action(@click="insert") {{isModify? "修改分值":"插入"}}
+        
++includeJS("/publicModules/insertHideContent/insertHideContent.js")

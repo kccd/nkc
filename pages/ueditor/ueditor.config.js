@@ -364,18 +364,18 @@
         //,rgb2Hex:true               //默认产出的数据中的color自动从rgb格式变成16进制格式
 
 		// xss 过滤是否开启,inserthtml等操作
-		,xssFilterRules: true
+		,xssFilterRules: false
 		//input xss过滤
-		,inputXssFilter: true
+		,inputXssFilter: false
 		//output xss过滤
-		,outputXssFilter: true
+		,outputXssFilter: false
 		// xss过滤白名单 名单来源: https://raw.githubusercontent.com/leizongmin/js-xss/master/lib/default.js
 		,whitList: {
 			a:      ['target', 'href', 'title', 'class', 'style', 'datatype'],
 			abbr:   ['title', 'class', 'style'],
 			address: ['class', 'style'],
 			area:   ['shape', 'coords', 'href', 'alt'],
-			article: [],
+			article: ["style", "data-type", "data-id", "contenteditable", "class"],
 			aside:  [],
 			audio:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'class'],
 			b:      ['class', 'style'],
@@ -393,7 +393,7 @@
 			dd:     ['class', 'style'],
 			del:    ['datetime'],
 			details: ['open'],
-			div:    ['class', 'style', 'contenteditable'],
+			div:    ["style", "data-type", "data-id", "contenteditable", "class"],
 			dl:     ['class', 'style'],
 			dt:     ['class', 'style'],
 			em:     ['class', 'style'],
@@ -414,7 +414,7 @@
 			mark:   [],
 			nav:    [],
 			ol:     ['class'],
-			p:      ['class', 'style'],
+			p:      ['class', 'style', 'contenteditable'],
 			pre:    ['class', 'style'],
 			s:      [],
 			section:[],
@@ -433,7 +433,10 @@
 			tt:     [],
 			u:      [],
 			ul:     ['class', 'style'],
-			video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style', 'poster']
+            video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style', 'poster'],
+            hidecontent: ["style", "class"],
+            input:  ["type", "placeholder"],
+            img:    ["draggable"]
 		}
     };
 

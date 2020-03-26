@@ -48,6 +48,7 @@ block eContent
                 th
                   button.btn.btn-sm.btn-default(@click=`editTool('${info.version}','${info.name}','${info.summary}','${info.uid}','${info.author}','${info.entry}',${info.isOtherSite},'${info._id}')`) 编辑
                   button.btn.btn-sm.btn-danger(@click=`deleteTool('${info._id}','${info.name}')`) 删除
+                  button.btn.btn-sm.btn-primary(@click=`hideTool('${info._id}','${info.name}',${info.isHide})`) #{info.isHide?'解除屏蔽':'屏蔽'}
             
 
 block scripts

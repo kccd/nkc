@@ -88,7 +88,7 @@ new Vue({
       });
     },
     deleteTool: function(id, toolname) {
-      sweetConfirm(`确定要删除 ${toolname} 吗？`)
+      sweetConfirm(`确定要删除 ${toolname} 吗？（此操作不可恢复）`)
       .then(() => nkcAPI("/tools/delete?_id=" + id, "DELETE"))
       .then(() => asyncSweetSuccess("删除成功", {autoHide: false}))
       .then(() => location.reload())
@@ -173,6 +173,13 @@ new Vue({
           }
         ]
       })
+    },
+    hideTool: function(id, toolname, isHide) {
+      sweetConfirm(isHide? `要解除屏蔽 ${toolname} 吗？`:`确定要屏蔽 ${toolname} 吗？（可以随时解除屏蔽）`)
+      .then(() => nkcAPI("/tools/hide?_id=" + id, "DELETE"))
+      .then(() => asyncSweetSuccess(isHide? "已解除":"已屏蔽", {autoHide: false}))
+      .then(() => location.reload())
+      .catch(asyncSweetError);
     }
   }
 });
