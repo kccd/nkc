@@ -364,11 +364,14 @@
         //,rgb2Hex:true               //默认产出的数据中的color自动从rgb格式变成16进制格式
 
 		// xss 过滤是否开启,inserthtml等操作
-		,xssFilterRules: true
+		// ,xssFilterRules: true
+		,xssFilterRules: false
 		//input xss过滤
-		,inputXssFilter: true
+		,inputXssFilter: false
+		// ,inputXssFilter: true
 		//output xss过滤
-		,outputXssFilter: true
+		// ,outputXssFilter: true
+		,outputXssFilter: false
 		// xss过滤白名单 名单来源: https://raw.githubusercontent.com/leizongmin/js-xss/master/lib/default.js
 		,whitList: {
 			a:      ['target', 'href', 'title', 'class', 'style', 'datatype'],

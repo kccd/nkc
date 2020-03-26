@@ -47,10 +47,15 @@ const postSchema = new Schema({
 	  index: 1,
     default: []
   },
-  // 引用的PID
+  // 引用的PID  旧
   rpid: {
     type: [String],
     default: []
+  },
+  // 引用的post id
+  quote: {
+    type: String,
+    default: ""
   },
   // 所有上级post
   parentPostsId: {

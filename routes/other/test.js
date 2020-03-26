@@ -4,7 +4,11 @@ const testRouter = new Router();
 
 testRouter
   .get('/', async (ctx, next) => {
+    const {data, db} = ctx;
     ctx.template = "test/test.pug";
+    let posts = await db.PostModel.find({pid: "873762"});
+    posts = await db.PostModel.extendPosts(posts);
+    data.post = posts[0];
     await next();
   })
   .get("/home", async (ctx, next) => {

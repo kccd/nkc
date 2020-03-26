@@ -46,6 +46,12 @@ var Tools = function() {
         }
         return "/p/" + id;
       }
+      case "resource": {
+        return "/r/" + id
+      }
+      case "videoCover": {
+        return "/frameImg/" + id
+      }
     }
   };
   self.floatUserInfo = function(uid) {

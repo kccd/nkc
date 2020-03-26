@@ -6924,7 +6924,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     'p{margin:5px 0;}</style>' +
                     ( options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
-                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\']],displayMath: [[\'$$\',\'$$\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
+                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({skipStartupTypeset: \'true\', jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\']],displayMath: [[\'$$\',\'$$\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
                     '<script async=\'async\' src=\'/ueditor/MathJax-2.6-latest/MathJax.js\'></script>' +
                     '</head><body class=\'view\' id=\'view\'></body>' +
                     '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +

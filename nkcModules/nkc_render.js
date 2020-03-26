@@ -20,7 +20,7 @@ function nkc_render(options){
     tools = NKC.methods.tools;
   }else{
     commonmark = require('commonmark');
-    plain_escape = require('../pages/plain_escaper');
+    plain_escape = require('./plainEscaper');
     XBBCODE = require('xbbcode-parser');
     xss = require('xss');
     twemoji = require('twemoji');
@@ -349,12 +349,15 @@ function nkc_render(options){
     })
   }
 
-  render.hiddenReplaceHTML = function(text){
+  render.hiddenReplaceHTML = function(text, script){
     return text.replace(/\[hide=([0-9]{1,3}).*?]([^]*?)\[\/hide]/gm, //multiline match
     function(match,p1,p2,offset,string){
       var specified_xsf = parseInt(p1)
       var hidden_content = p2
-      
+      // 脚本转换数据
+      if(script) {
+        return `<div data-type="xsf" data-id="${specified_xsf}">${hidden_content}</div>`;
+      }
       //return '[hide='+specified_xsf+']'+hidden_content+'[/hide]'
 
       return '<div class="nkcHiddenBox">'
@@ -459,7 +462,7 @@ function nkc_render(options){
       //在这里做了style的过滤
       html = custom_xss_process(content)
     }
-    html = render.hiddenReplaceHTML(html)
+    // html = render.hiddenReplaceHTML(html)
     // fix for older posts where they forgot to inject attachments.
 
     // 旧的处理方法 仅作参考
@@ -546,7 +549,7 @@ function nkc_render(options){
 
     rendered= custom_xss_process(rendered);
 
-    rendered = render.hiddenReplaceHTML(rendered);
+    // rendered = render.hiddenReplaceHTML(rendered);
     return rendered;
   };
 
@@ -559,7 +562,7 @@ function nkc_render(options){
   // 附件 <a href="/r/rid"></a>
   // @param {String} html 
   // @param {[Object]} resources 资源文件对象所组成的数组
-  var renderResourceDom = function(html, resources) {
+  var renderResourceDom = function(html, resources, script) {
     var k = function(number){
       return (number || 0).toPrecision(3)
     };
@@ -569,6 +572,7 @@ function nkc_render(options){
     return html
       // 图片处理
       .replace(/<img\ssrc="\/r\/([0-9]+?)" \/>/img, function(content, v1) {
+        if(script) return `<nkcsource data-type="picture" data-id="${v1}"></nkcsource>`;
         var resource = resources[v1];
         if(!resource) {
           resource = {
@@ -588,10 +592,12 @@ function nkc_render(options){
       })
       // 表情处理
       .replace(/<img\ssrc="\/sticker\/([0-9]+?)" \/>/img, function(content, v1) {
+        if(script) return `<nkcsource data-type="sticker" data-id="${v1}"></nkcsource>`;
         return '<span class="article-sticker-body" data-sticker-rid="'+v1+'"><img src="'+tools.getUrl('sticker', v1)+'"></span>'
       })
       // 视频处理
       .replace(/<video\ssrc="\/r\/([0-9]+?)"><\/video>/igm, function(content, v1) {
+        if(script) return `<nkcsource data-type="video" data-id="${v1}"></nkcsource>`;
         var resource = resources[v1];
         if(!resource) {
           return "（视频：" + plain_escape(v1) + "）";
@@ -606,6 +612,7 @@ function nkc_render(options){
       })
       // 音频处理
       .replace(/<audio\ssrc="\/r\/([0-9]+?)"><\/audio>/igm, function(content, v1) {
+        if(script) return `<nkcsource data-type="audio" data-id="${v1}"></nkcsource>`;
         var resource = resources[v1];
         if(!resource) {
           return "（音频：" + plain_escape(v1) + "）";
@@ -623,6 +630,7 @@ function nkc_render(options){
       })
       // 附件处理
       .replace(/<a\shref="\/r\/([0-9]+?)"><\/a>/img, function(content, v1) {
+        if(script) return `<nkcsource data-type="attachment" data-id="${v1}"></nkcsource>`;
         var resource = resources[v1];
         if(!resource) {
           return "（附件：" + plain_escape(v1) + "）";
@@ -654,7 +662,7 @@ function nkc_render(options){
   };
 
 
-  render.experimental_render = function(post, dataType){
+  render.experimental_render = function(post, dataType, script){
     if(post.mainForumsId) dataType = "post";
     var content = post.c || '';
     var lang = post.l || '';
@@ -689,7 +697,10 @@ function nkc_render(options){
 
     
     // 处理媒体文件dom
-    renderedHTML = renderResourceDom(renderedHTML, resources);
+    renderedHTML = renderResourceDom(renderedHTML, resources, script);
+
+    renderedHTML = render.hiddenReplaceHTML(renderedHTML, script);
+
 
     renderedHTML = twemoji.parse(renderedHTML, {
       folder: '/2/svg',
