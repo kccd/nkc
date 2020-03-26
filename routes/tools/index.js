@@ -108,7 +108,19 @@ router
       await moveDir(completePath, filePath);
     }
     await next();
-  });
+  })
+  // 屏蔽工具
+  .del("/hide", async (ctx, next) => {
+    const {db, query} = ctx;
+    let id = query._id;
+    if(!id) ctx.throw(400, "缺少参数 _id");
+    let toolsModel = db.ToolsModel;
+    let result = await toolsModel.findOne({_id: id});
+    let toolinfo = result.toObject();
+    let isHide = toolinfo.isHide;
+    await toolsModel.where({_id: id}).update({isHide: !isHide});
+    await next();
+  })
 
 
 

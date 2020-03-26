@@ -44,6 +44,11 @@ const toolsSchema = new Schema({
   isOtherSite: {
     type: Boolean,
     default: false
+  },
+  // 是否被屏蔽了
+  isHide: {
+    type: Boolean,
+    default: false
   }
 });
 
