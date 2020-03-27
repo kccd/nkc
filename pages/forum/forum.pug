@@ -135,9 +135,7 @@ block content
             .m-b-1
               include ../publicModules/paging/forum_nav
             if data.forum.declare
-              -const declareObj = {l: 'html', c: data.forum.declare};
-              -declareObj.c = hideContentByUser(declareObj.c, data.user, 'list')
-              div.forum-declare!= experimental_render(declareObj)
+              div.forum-declare!= data.forum.declare
             if data.forum.basicThreads.length > 0
               +listHeader("快速入门")
               for thread in data.forum.basicThreads
