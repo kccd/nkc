@@ -4011,10 +4011,12 @@ nkcsource[data-type="audio"]{
   border-radius: 2px;
   border: 1px solid #d6d6d6;
   background: #fff;
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
   display: inline-block;
   width: 34.5rem;
   max-width: 100%;
+  /* margin-top: 6px; */
+  display: block;
 }
 
 /* 文章中的附件 旧*/
@@ -4077,12 +4079,14 @@ nkcsource[data-type="audio"]{
 }
 /* 文章中的附件 新*/
 nkcsource[data-type="attachment"]{
-  display: inline-block;
+  display: block;
   padding: 0.5rem;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
   border-radius: 2px;
   border: 1px solid #d6d6d6;
   background: #fff;
+  max-width: 414px;
+  /* margin-top: 6px; */
 }
 nkcsource[data-type="attachment"] .article-attachment-icon{
   display: table-cell;

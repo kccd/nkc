@@ -13,9 +13,7 @@ for(const filename of files) {
 module.exports = (type, html, resources = []) => {
   const _resources = {};
   resources.map(r => {
-    if(type === "article") {
-      _resources[r.rid] = r
-    }
+    _resources[r.rid] = r
   });
   const sourceMethods = sources[type];
   const $ = cheerio.load(html);

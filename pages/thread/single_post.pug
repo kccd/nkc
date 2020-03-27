@@ -63,7 +63,8 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         -post.c = hideContentByUser(post.c, data.user, 'thread')
         div(class=!disabledHidePost?"hide-post part":"" data-pid=post.pid)
           .thread-post-mask
-            .ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
+            //- .ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
+            .ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= nkcRender.renderHTML({type: "article", html: post.c, resources: post.resources})
             if post.toc.toLocaleString() !== post.tlm.toLocaleString()
               p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
             //+postCredits(post)

@@ -9,7 +9,6 @@ class NKCRender {
     // 学术分判断
     let {
       type = "article",
-      id = "",
       html = "",
       resources = []
     } = options;

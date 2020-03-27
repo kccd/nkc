@@ -407,7 +407,8 @@ block content
                                       span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
                       if data.paging.page === 0
                         if data.thread.type === "article"
-                          div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
+                          //- div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
+                          div.thread-content.ThreadPostBody#thread-content!= nkcRender.renderHTML({type: "article", html: post.c, resources: post.resources})
                         else if data.thread.type === "product"
                           div.thread-content.ThreadPostBody
                             include ./product/product.pug

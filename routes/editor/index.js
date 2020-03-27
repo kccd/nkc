@@ -222,6 +222,14 @@ router
       }
     }
     state.editorSettings = await db.SettingModel.getSettings("editor");
+    if(data.post && data.post.pid) {
+      const resources = await db.ResourceModel.find({references: data.post.pid});
+      data.post.c = nkcModules.nkcRender.renderHTML({
+        type: "editor",
+        html: data.post.c || "",
+        resources: resources
+      })
+    }
     await next();
   });
 module.exports = router;

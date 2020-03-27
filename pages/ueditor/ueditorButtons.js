@@ -39,7 +39,7 @@
             // var dom = NKC.methods.resourceToHtml(res.data, res.type);
             if(res.type === "emoji") {
               editor.execCommand('inserthtml', 
-              "<nkcsource data-type='sticker' data-id='"+ res.data +"' contenteditable='false'><img src=\""+ NKC.methods.tools.getUrl(res.type, res.data) +"\"></nkcsource>");
+              "<nkcsource data-type='twemoji' data-id='"+ res.data +"' contenteditable='false'><img src=\""+ NKC.methods.tools.getUrl(res.type, res.data) +"\"></nkcsource>");
             }else if(res.type === "sticker") {
               editor.execCommand('inserthtml', 
               "<nkcsource data-type='sticker' data-id='"+ res.data.rid +"' contenteditable='false'><img src=\""+ NKC.methods.tools.getUrl(res.type, res.data.rid) +"\"></nkcsource>");
@@ -76,6 +76,16 @@
               var type = source.mediaType;
               type = type.substring(5);
               type = type[0].toLowerCase() + type.substring(1);
+              // if(type === "video") {
+              //   editor.execCommand("insertvideo", {
+              //     //视频地址
+              //     url: "/r/"+ source.rid,
+              //     //视频宽高值， 单位px
+              //     width: 200,
+              //     height: 100
+              //   });
+              //   continue;
+              // }
               // var dom = NKC.methods.resourceToHtml(data[i]);
               editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
             }
@@ -255,31 +265,40 @@
   // 转换成nkcsource标签的html文本
   function resourceToHtml(type, rid, name) {
     var nkcsource = document.createElement("nkcsource");
+    var newline = false;
     var handles = {
       "picture": function() {
         nkcsource.style.display = "inline-block";
         return "<img src=\"/r/"+ rid +"\">";
       },
       "sticker": function() {
+        nkcsource.setAttribute("contenteditable", "false");
         nkcsource.style.display = "inline-block";
         return "<img src=\"/r/"+ rid +"\">";
       },
       "video": function() {
-        return "<video src=\"/r/"+ rid +"\" controls>";
+        newline = true;
+        nkcsource.setAttribute("contenteditable", "false");
+        return "<video src=\"/r/"+ rid +"\" controls><video>";
       },
       "audio": function() {
-        return "<audio src=\"/r/"+ rid +"\" controls>";
+        newline = true;
+        nkcsource.setAttribute("contenteditable", "false");
+        return "<audio src=\"/r/"+ rid +"\" controls></audio>";
       },
       "attachment": function() {
+        newline = true;
         nkcsource.setAttribute("contenteditable", "false");
         return "<img src=\"/ueditor/themes/default/images/attachment.png\"><a href='/r/"+ rid +"' target='_blank'>"+ name +"</a>"
       },
       "pre": function() {},
       "xsf": function() {
+        newline = true;
         nkcsource.setAttribute("data-message", "学术分"+rid+"分以上可见");
         return "<p><br></p>";
       },
       "twemoji": function() {
+        nkcsource.setAttribute("contenteditable", "false");
         nkcsource.style.display = "inline-block";
         return "<img src=\"/r/"+ rid +"\">";
       },
@@ -291,6 +310,6 @@
       nkcsource.setAttribute("data-id", rid);
     }
     nkcsource.innerHTML = hit();
-    return nkcsource.outerHTML;
+    return nkcsource.outerHTML + (newline? "<span>"+ decodeURI("%E2%80%8E") +"<span>": "");
   }
 }());
