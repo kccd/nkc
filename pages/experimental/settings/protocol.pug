@@ -4,6 +4,7 @@ block title
   -const mainContainer1400 = true;
   link(href='/experimental/index.css' rel='stylesheet')
   title 协议设置
+  include ../../publicModules/plyr/plyr.css.pug
 block content
   style.
     .dl-horizontal dt{
@@ -97,6 +98,8 @@ block scripts
   include ../../publicModules/selectResource/selectResource
   include ../../publicModules/selectDraft/selectDraft
   include ../../publicModules/sticker/selectSticker
+  include ../../publicModules/lazySizes
+  include ../../publicModules/plyr/plyr.js.pug
   +includeJS("/commonmark/dist/commonmark.js")
   +includeJS("/plainEscaper.js")
   +includeJS("/xbbcode-parser/xbbcode.js")
