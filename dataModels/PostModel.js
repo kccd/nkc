@@ -1,5 +1,10 @@
 const settings = require('../settings');
+<<<<<<< HEAD
 const {HTMLToPlain} = require("../nkcModules/nkcRender");
+=======
+const nkcRender = require('../nkcModules/nkcRender');
+const cheerio = require("../nkcModules/nkcRender/cheerio");
+>>>>>>> 57623c43c32386172fd9ca0ec5ee5ccebcacf96a
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -227,18 +232,7 @@ const postSchema = new Schema({
   virtuals: true
 }});
 
-postSchema.pre('save' , function(next) {
-  if(!this.iplm) {
-    this.iplm = this.ipoc;
-  }
-  if(!this.tlm) {
-    this.tlm = this.toc;
-  }
-  if(!this.uidlm) {
-    this.uidlm = this.uid;
-  }
-  next();
-});
+
 
 postSchema.virtual('reason')
   .get(function() {
@@ -360,6 +354,31 @@ postSchema.methods.ensurePermission = async function(options) {
     }
   }
 };
+
+
+// 
+postSchema.pre('save' , function(next) {
+  if(!this.iplm) {
+    this.iplm = this.ipoc;
+  }
+  if(!this.tlm) {
+    this.tlm = this.toc;
+  }
+  if(!this.uidlm) {
+    this.uidlm = this.uid;
+  }
+  next();
+});
+
+
+// 
+postSchema.pre("save", async function(next) {
+  this.c = nkcRender.renderHTML({
+    type: "data",
+    html: this.c
+  });
+  await next();
+});
 
 
 // 保存POST前检测内容是否有@
@@ -499,15 +518,13 @@ postSchema.pre('save', async function(next) {
   // correct reference to the post
   try {
     const ResourceModel = mongoose.model('resources');
-	  const {c, pid, l} = this;
-	  let newResources = [];
-	  if(l !== 'html') {
-		  newResources = (c.match(/{r=[0-9]{1,20}}/g) || [])
-		    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
-	  } else {
-		  newResources = (c.match(/\/r\/[0-9]{1,20}/g) || [])
-			  .map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
-	  }
+    const {c, pid} = this;
+    const $ = cheerio.load(c);
+    let newResources = [];
+    $("nkcsource").each((index, el) => {
+      newResources.push($(el).data("id"));
+    })
+    
 	  let oldResources = await ResourceModel.find({references: pid}, {rid: 1});
 	  oldResources = oldResources.map(r => r.rid);
 

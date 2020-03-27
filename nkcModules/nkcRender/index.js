@@ -19,24 +19,22 @@ class NKCRender {
     // 学术分判断
     let {
       type = "article",
-      html = "",
-      resources = [],
-      atUser = [],
-      xsf = 0
+      post = {},
+      user = {},
     } = options;
 
-
+    const {resources = [], atUser = []} = post;
+    const {xsf = 0} = user;
+    let html = post.c || "";
     // 过滤标签及样式
     html = htmlFilter(html);
     // 序列化html
     const $ = cheerio.load(html);
     // 渲染文章中的图片、视频、音频等特殊模板
     const _resources = {};
-    resources.map(r => {
-      if(type === "article") {
-        _resources[r.rid] = r
-      }
-    });
+    for(const r of resources) {
+      _resources[r.rid] = r
+    }
     const sourceMethods = sources[type];
     for(const name in sourceMethods) {
       if(!sourceMethods.hasOwnProperty(name)) continue;
@@ -45,13 +43,15 @@ class NKCRender {
         const dom = $(this);
         const _html = dom.toString();
         const id = dom.data().id + "";
-        const resource = id? _resources[id]: undefined;
+        const resource = _resources[id];
         if(resource) {
           resource.oname = plainEscape(resource.oname || "");
         }
-        return method(_html, id, resource);
+        return method(_html, id, resource, user);
       });
     }
+
+    // @检测
 
     return $("body").html();
   }

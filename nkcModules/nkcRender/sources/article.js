@@ -26,6 +26,7 @@ module.exports = {
         .append(img);
       nkcSource.append(imgBody);
     }
+    nkcSource.attr("_rendered", "");
     return $("body").html();
   },
   sticker(html, id) {
@@ -65,22 +66,14 @@ module.exports = {
   },
   audio(html = "", id, resource = {}) {
     const url = getUrl("resource", id);
-    const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource");
-    const audio = $(`<audio>你的浏览器不支持audio标签，请升级。</audio>`)
-      .addClass("plyr-dom")
-      .attr({
-        "preload": "none",
-        "controls": "controls",
-        "data-rid": id
-      });
-    const source = $(`<source>`)
-      .attr({
-        "src": url,
-        "type": "audio/mp3"
-      });
-    nkcSource.append(audio.append(source));
-    return $("body").html();
+    html = `
+      <nkcsource data-type="audio" data-id="${id}" _rendered>
+        <audio class="plyr-dom" preload="none" controls data-rid="rid">
+          <source src="${url}" type="audio/mp3"/>
+          你的浏览器不支持audio标签，请升级。
+        </audio>
+      </nkcsource>`;
+    return html;
   },
   attachment(html = "", id, resource = {}) {
     const {
@@ -143,7 +136,7 @@ module.exports = {
       )
     }
     nkcSource.append(iconBody).append(content);
-    return $("body").html();
+    return $("body").html().trim();
   },
   formula(html, id) {
     const $ = cheerio.load(html);
@@ -164,10 +157,16 @@ module.exports = {
   pre(html) {
     return html;
   },
-  xsf(html, id) {
+  xsf(html, id, r, user = {}) {
+    const {xsf = 0} = user;
     const $ = cheerio.load(html);
     const nkcSource = $("nkcSource");
-    const content = nkcSource.html();
+    let content;
+    if(Number(id) <= xsf) {
+      content = nkcSource.html();
+    } else {
+      content = "内容已隐藏";
+    }
     nkcSource.html(
       $(`<span>浏览这段内容需要${id}学术分</span>`)
     )
