@@ -96,7 +96,11 @@
           editor.execCommand('inserthtml', formulaToHtml(2, formulaCodeText));
         }else {
           // 4: \[...\]
-          editor.execCommand('inserthtml', formulaToHtml(4, formulaCodeText));
+          if(formulaCodeText.substring(0, 2) !== "\\[") {   // 没带头尾加上头尾
+            editor.execCommand('inserthtml', formulaToHtml(4, "\\["+ formulaCodeText +"\\]"));
+          }else {
+            editor.execCommand('inserthtml', formulaToHtml(4, formulaCodeText));
+          }
         }
       }
       dialog.close();
