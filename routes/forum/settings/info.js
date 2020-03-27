@@ -21,7 +21,7 @@ infoRouter
 				}
 			})
 			// 富文本内容中每一个source添加引用
-			await db.ResourceModel.toReferenSource("f-" + forum.fid, declare);
+			await db.ResourceModel.toReferenceSource("f-" + forum.fid, declare);
 			
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
