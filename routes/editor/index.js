@@ -1,5 +1,7 @@
 const Router = require("koa-router");
 const router = new Router();
+const nkcRender = require('../../nkcModules/nkcRender');
+
 router
   .get("/", async (ctx, next) => {
     const {db, data, query, state, nkcModules} = ctx;
@@ -67,6 +69,12 @@ router
       const {id} = query;
       const forum = await db.ForumModel.findOnly({fid: id});
       if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业说明");
+      // 渲染nkcsource
+      forum.declare = nkcRender.renderHTML({
+				type: "article",
+        html: forum.declare,
+        
+			})
       data.post = {
         c: forum.declare
       };
