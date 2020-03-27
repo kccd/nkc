@@ -176,5 +176,13 @@ module.exports = {
           .html(content)
       );
     return $("body").html();
+  },
+  twemoji(html, id) {
+    const $ = cheerio.load(html);
+    const nkcSource = $("nkcsource");
+    nkcSource.html(
+      $(`<img src="${getUrl('twemoji', id)}" alt="${id}">`)
+    );
+    return $("body").html();
   }
 };

@@ -4166,6 +4166,7 @@ nkcsource[data-type="xsf"]{
   border-color: #ff6d6d;
   border-radius: 5px;
   padding: 5px;
+  display: block;
   background-color: #fff8f8;
 }
 nkcsource[data-type="xsf"]>span:first-child{
@@ -4183,9 +4184,37 @@ nkcsource[data-type="xsf"]>span:last-child{
   border-color: #ffcccc;
   border-radius: 3px;
   padding: 5px;
+  display: block;
 }
 
-
+/* 文章引用*/
+.quote-post{
+  position: relative;
+  font-size: 1rem;
+  font-style: oblique;
+}
+.quote-post .quote-position a, .quote-post .quote-position span.anonymous{
+  padding: 0 0.5rem;
+}
+.quote-post .quote-cancel{
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  width: 2rem;
+  text-align: center;
+  line-height: 2rem;
+  font-size: 1.3rem;
+  color: #929276;
+  cursor: pointer;
+}
+.quote-post .quote-cancel:hover{
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.quote-post .quote-content{
+  font-size: 1.2rem;
+  font-style: normal;
+}
 
 
 

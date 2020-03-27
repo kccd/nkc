@@ -1,6 +1,16 @@
-const cheerio = require("cheerio");
-const sourceRender = require("./sourceRender");
+const cheerio = require("./cheerio");
 const htmlFilter = require("./htmlFilter");
+
+const plainEscape = require("../plainEscaper");
+const fs = require("fs");
+const path = require("path");
+const filePath = path.resolve(__dirname, "./sources");
+const files = fs.readdirSync(filePath);
+const sources = {};
+for(const filename of files) {
+  const name = filename.split(".")[0];
+  sources[name] = require(filePath + `/${name}`);
+}
 
 class NKCRender {
   renderHTML(options) {
@@ -9,23 +19,54 @@ class NKCRender {
     // 学术分判断
     let {
       type = "article",
-      id = "",
       html = "",
-      resources = []
+      resources = [],
+      atUser = [],
+      xsf = 0
     } = options;
+
 
     // 过滤标签及样式
     html = htmlFilter(html);
+    // 序列化html
+    const $ = cheerio.load(html);
     // 渲染文章中的图片、视频、音频等特殊模板
-    html = sourceRender(type, html, resources);
+    const _resources = {};
+    resources.map(r => {
+      if(type === "article") {
+        _resources[r.rid] = r
+      }
+    });
+    const sourceMethods = sources[type];
+    for(const name in sourceMethods) {
+      if(!sourceMethods.hasOwnProperty(name)) continue;
+      const method = sourceMethods[name];
+      $(`nkcsource[data-type="${name}"]`).replaceWith(function() {
+        const dom = $(this);
+        const _html = dom.toString();
+        const id = dom.data().id + "";
+        const resource = id? _resources[id]: undefined;
+        if(resource) {
+          resource.oname = plainEscape(resource.oname || "");
+        }
+        return method(_html, id, resource);
+      });
+    }
 
-    return html
+    return $("body").html();
   }
+
   plainEscape(c) {
     return plainEscape(c);
   }
-  renderHTMLToEditor() {
-
+  HTMLToPlain(html, count) {
+    const $ = cheerio.load(html);
+    $("nkcsource, blockquote").remove();
+    let text = $.text();
+    const textLength = text.length;
+    text = text.slice(0, count);
+    if(count < textLength) text += "...";
+    return text;
   }
   renderPlain(options) {
 

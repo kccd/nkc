@@ -258,10 +258,7 @@ block content
                                 button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'unPush')`) 取消热销
                               else
                                 button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'push')`) 设为热销
-                            //-if data.userOperationsId.includes('homeTop') && !data.ads.movable.includes(data.thread.tid) && !data.ads.fixed.includes(data.thread.tid)
-                              button.btn.btn-default.btn-sm#threadTop(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
-                            //-if data.userOperationsId.includes('unHomeTop') && (data.ads.movable.includes(data.thread.tid) || data.ads.fixed.includes(data.thread.tid))
-                              button.btn.btn-default.btn-sm#threadTop(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
+
                             if data.userOperationsId.includes('closeThread') && !thread.closed
                               button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
                             if data.userOperationsId.includes('openThread') && thread.closed
@@ -272,21 +269,6 @@ block content
                               button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
                           if data.thread.type === "fund"
                             h5.text-danger 科创基金类文章无法退修
-                          //-if permission('addThreadForum') || permission("removeThreadForum") || permission('moveThread') || permission("moveDraft")
-                            div
-                              if permission('addThreadForum') || permission("removeThreadForum")
-                                div(v-if='forums.length !== 0')
-                                  h5 已选择专业
-                                  div
-                                    for forum in thread.forums
-                                      span(style=`border-radius: 4px;display: inline-block;margin-right: 0.5rem;color: #fff;padding: 0.5rem 1rem;background-color: ${forum.color}`)=`${forum.forumType === 'topic'?'(话题)':'(学科)'}${forum.displayName}`
-                                        .fa.fa-remove(style='cursor: pointer;' onclick=`removeForumsId("${data.thread.tid}", "${forum.fid}")`)
-
-                              if permission('moveThread') || permission("moveDraft")
-                                if data.thread.type === "fund"
-                                  h5.text-danger 科创基金类文章无法退修
-                                div(style='margin-top:0.5rem;')
-                                  button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 退修或删除
 
                 .col-xs-12.col-md-12
                   .row
@@ -407,7 +389,8 @@ block content
                                       span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
                       if data.paging.page === 0
                         if data.thread.type === "article"
-                          div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
+                          //div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
+                          div.thread-content.ThreadPostBody#thread-content!= nkcRender.renderHTML({type: 'article', html: post.c, resources: post.resources})
                         else if data.thread.type === "product"
                           div.thread-content.ThreadPostBody
                             include ./product/product.pug
@@ -564,10 +547,19 @@ block content
                           //- 回复的输入面板
                           mixin inputPanel
                             .form-group
-                              div#quoteContent
-                            .form-group
-                              div#quoteCancel(style='display: none')
-                                button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
+                              #quoteContent(v-cloak v-if="pid")
+                                blockquote.quote-post
+                                  .quote-cancel(@click="clear")
+                                    .fa.fa-remove
+                                  .quote-position
+                                    | 引用
+                                    a(:href="'/u/' + uid" target="_blank" v-if="uid") {{username}}
+                                    span(v-else) {{username}}
+                                    | 发表于
+                                    a(:href="getUrl('post', pid, true)" target="_blank") {{step}}
+                                    | 楼的内容
+                                  .quote-content {{c}}
+
                             .form-group(style="background-color:#fff;")
                               script#container(name='content', type='text/plain')
                             .row

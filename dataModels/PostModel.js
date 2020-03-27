@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const {HTMLToPlain} = require("../nkcModules/nkcRender");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -617,7 +618,8 @@ const defaultOptions = {
   credit: true,
   showAnonymousUser: false,
   excludeAnonymousPost: false,
-  url: false
+  url: false,
+  quote: true, // 仅支持同一篇文章
 };
 
 postSchema.statics.extendPosts = async (posts, options) => {
@@ -633,6 +635,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   Object.assign(o, options);
   o.usersVote = o.usersVote && !!o.uid;
   const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {}, voteObj = {}, kcbsRecordsObj = {}, xsfsRecordsObj = {};
+  let postsId = [], postsObj = {};
   let grades, resources;
   posts.map(post => {
     pid.add(post.pid);
@@ -691,8 +694,22 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
   }
 
+  if(o.quote && posts.length) {
+    const tid = posts[0].tid;
+    const quotePosts = await PostModel.find({tid, parentPostId: ""}, {
+      pid: 1, c: 1, uid: 1, anonymous: 1
+    });
+    postsId = quotePosts.map(q => {
+      postsObj[q.pid] = q;
+      return q.pid;
+    });
+  }
+
   const results = [];
-  for(const post of posts) {
+  for(let post of posts) {
+    if(post.toObject) {
+      post = post.toObject();
+    }
     post.ownPost = post.uid === o.uid;
     if(post.anonymous && o.excludeAnonymousPost) continue;
     post.credits = [];
@@ -732,7 +749,28 @@ postSchema.statics.extendPosts = async (posts, options) => {
     if(o.url) {
       post.url = await PostModel.getUrl(post.pid);
     }
-    results.push(post.toObject());
+    if(o.quote && post.quote) {
+      const quotePost = postsObj[post.quote];
+      const index = postsId.indexOf(post.quote);
+      if(index !== -1 || quotePost) {
+        let username, uid;
+        if(quotePost.anonymous) {
+          username = "匿名用户";
+        } else {
+          const user = await UserModel.findOne({uid: quotePost.uid}, {username: 1});
+          username = user.username;
+          uid = quotePost.uid;
+        }
+        const c = HTMLToPlain(quotePost.c, 50);
+        post.quotePost = {
+          username,
+          uid,
+          step: index,
+          c
+        }
+      }
+    }
+    results.push(post);
   }
   return results;
 };
@@ -1024,5 +1062,4 @@ postSchema.statics.ensureHidePostPermission = async (thread, user) => {
   }
   return false;
 };
-
 module.exports = mongoose.model('posts', postSchema);

@@ -40,6 +40,9 @@ var Tools = function() {
       case "emoji": {
         return "/twemoji/2/svg/" + id + ".svg"
       }
+      case "twemoji": {
+        return "/twemoji/2/svg/" + id + ".svg"
+      }
       case "post": {
         if(t) {
           return "/p/" + id + "?redirect=true";
