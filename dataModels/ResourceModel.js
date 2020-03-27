@@ -110,8 +110,8 @@ resourceSchema.methods.getFilePath = async function() {
 };
 
 // 存储文章中的nkcsource
-resourceSchema.statics.toReferenSource = async function(id, declare) {
-  let model = mongoose.model("resources")
+resourceSchema.statics.toReferenceSource = async function(id, declare) {
+  let model = mongoose.model("resources");
 	let $ = cheerio.load(declare);
 	$("nkcsource").each(async (index, el) => {
 		let $el = $(el);
@@ -127,7 +127,7 @@ resourceSchema.statics.toReferenSource = async function(id, declare) {
 		});
 		// console.log("forum:" + fid + " referened to resource:" + rid);
 	})
-}
+};
 
 
 // 查找一个post引用的所有source
