@@ -17,7 +17,6 @@ const router = new Router();
 
 router
   .get('/:pid', async (ctx, next) => {
-
     const {nkcModules, data, db, query} = ctx;
 		const {token, page=0, highlight, redirect} = query;
     const {pid} = ctx.params;
@@ -103,8 +102,11 @@ router
 		// 拓展其他信息
     // await post.extendUser();
     // await post.extendResources();
-    let posts = await db.PostModel.extendPosts([post], {uid: data.user?data.user.uid: ''});
-    data.post = posts[0];
+    const extendPostOptions = {
+      uid: data.user?data.user.uid: "",
+      visitor: data.user
+    };
+    data.post = await db.PostModel.extendPost(post, extendPostOptions);
     data.postUrl = await db.PostModel.getUrl(data.post);
     const voteUp = await db.PostsVoteModel.find({pid, type: 'up'}).sort({toc: 1});
     const uid = new Set();
@@ -196,7 +198,7 @@ router
       q.parentPostsId = {$in: [...pids]};
       let posts = await db.PostModel.find(q).sort({toc: 1});
       posts = posts.concat(parentPosts);
-      posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+      posts = await db.PostModel.extendPosts(posts, extendPostOptions);
       const postsObj = {};
       posts = posts.map(post => {
         const index = toDraftPostsId.indexOf(post.pid);
@@ -249,7 +251,7 @@ router
       const count = await db.PostModel.count(q);
       const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
       let posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-      posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+      posts = await db.PostModel.extendPosts(posts, extendPostOptions);
       const parentPostsId = new Set();
       await Promise.all(posts.map(async post => {
         post.url = await db.PostModel.getUrl(post);
@@ -262,7 +264,7 @@ router
       // 拓展上级post
       let parentPosts = await db.PostModel.find({pid: {$in: [...parentPostsId]}});
       const postsObj = {};
-      parentPosts = await db.PostModel.extendPosts(parentPosts, {uid: data.user? data.user.uid: ""});
+      parentPosts = await db.PostModel.extendPosts(parentPosts, extendPostOptions);
       parentPosts.map(p => {
         /*const index = toDraftPostsId.indexOf(post.pid);
         if(index !== -1) {

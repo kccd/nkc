@@ -18,7 +18,10 @@ router
       if(p.parentPostId !== pid) pidArr.add(p.parentPostId);
     }
     let posts = await db.PostModel.find({pid: {$in: [...pidArr]}});
-    posts = await db.PostModel.extendPosts(posts, {uid: data.user? data.user.uid: ""});
+    posts = await db.PostModel.extendPosts(posts, {
+      uid: data.user? data.user.uid: "",
+      visitor: data.user
+    });
     const postsObj = {};
     posts = posts.map(post => {
       post.posts = [];

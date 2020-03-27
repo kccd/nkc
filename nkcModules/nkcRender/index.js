@@ -24,7 +24,6 @@ class NKCRender {
     } = options;
 
     const {resources = [], atUser = []} = post;
-    const {xsf = 0} = user;
     let html = post.c || "";
     // 过滤标签及样式
     html = htmlFilter(html);

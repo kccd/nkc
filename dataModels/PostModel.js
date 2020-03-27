@@ -1,10 +1,7 @@
 const settings = require('../settings');
-<<<<<<< HEAD
-const {HTMLToPlain} = require("../nkcModules/nkcRender");
-=======
 const nkcRender = require('../nkcModules/nkcRender');
+const {HTMLToPlain, renderHTML} = nkcRender;
 const cheerio = require("../nkcModules/nkcRender/cheerio");
->>>>>>> 57623c43c32386172fd9ca0ec5ee5ccebcacf96a
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -375,7 +372,7 @@ postSchema.pre('save' , function(next) {
 postSchema.pre("save", async function(next) {
   this.c = nkcRender.renderHTML({
     type: "data",
-    html: this.c
+    post: this
   });
   await next();
 });
@@ -628,6 +625,8 @@ postSchema.post('save', async function(doc, next) {
 });
 
 const defaultOptions = {
+  visitor: {xsf: 0},
+  renderHTML: true,
   user: true,
   userGrade: true,
   resource: true,
@@ -638,7 +637,11 @@ const defaultOptions = {
   url: false,
   quote: true, // 仅支持同一篇文章
 };
-
+postSchema.statics.extendPost = async (post, options) => {
+  const PostModel = mongoose.model("posts");
+  const posts = await PostModel.extendPosts([post], options);
+  return posts[0];
+};
 postSchema.statics.extendPosts = async (posts, options) => {
   // 若需要判断用户是否点赞点踩，需要options.user
   const UserModel = mongoose.model('users');
@@ -711,11 +714,11 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
   }
 
-  if(o.quote && posts.length) {
+  if(posts.length) {
     const tid = posts[0].tid;
     const quotePosts = await PostModel.find({tid, parentPostId: ""}, {
       pid: 1, c: 1, uid: 1, anonymous: 1
-    });
+    }).sort({toc: 1});
     postsId = quotePosts.map(q => {
       postsObj[q.pid] = q;
       return q.pid;
@@ -766,6 +769,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
     if(o.url) {
       post.url = await PostModel.getUrl(post.pid);
     }
+    // 如果存在引用
     if(o.quote && post.quote) {
       const quotePost = postsObj[post.quote];
       const index = postsId.indexOf(post.quote);
@@ -780,6 +784,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
         }
         const c = HTMLToPlain(quotePost.c, 50);
         post.quotePost = {
+          pid: quotePost.pid,
           username,
           uid,
           step: index,
@@ -787,6 +792,15 @@ postSchema.statics.extendPosts = async (posts, options) => {
         }
       }
     }
+    // 如果需要渲染html
+    if(o.renderHTML) {
+      post.c = renderHTML({
+        type: "article",
+        post,
+        user: o.visitor
+      });
+    }
+    post.step = postsId.indexOf(post.pid);
     results.push(post);
   }
   return results;

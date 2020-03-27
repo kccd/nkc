@@ -227,7 +227,7 @@ style.
         p(style="font-size:15px") 公告
         p(style="font-size:12px")!=product.dealInfo.dealAnnouncement
   .col-xs-12.col-md-12#productInfoContent
-    div!=experimental_render(post)
+    div=post.c
 block scripts
   +includeJS('/external_pkgs/jquery/jquery-1.11.1.js')
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')

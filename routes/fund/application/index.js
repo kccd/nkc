@@ -119,7 +119,10 @@ applicationRouter
       const paging = apiFn.paging(page, length);
       data.paging = paging;
       const comments = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-      data.comments = await db.PostModel.extendPosts(comments);
+      data.comments = await db.PostModel.extendPosts(comments, {
+      	visitor: data.user,
+				uid: data.user?data.user.uid: ""
+			});
     }
 
 		await applicationForm.extendSupporters();

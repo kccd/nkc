@@ -282,7 +282,6 @@ block content
                       if thread.type !== "fund"
                         .h3.thread-title.text-center= thread.firstPost.t
                       -const post = thread.firstPost;
-                      -post.c = hideContentByUser(post.c, data.user, 'thread')
                       if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"
                         -var agencyIndex = 1;
                         -var agencyArray = [];
@@ -390,7 +389,7 @@ block content
                       if data.paging.page === 0
                         if data.thread.type === "article"
                           //- div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
-                          div.thread-content.ThreadPostBody#thread-content!= nkcRender.renderHTML({type: "article", html: post.c, resources: post.resources})
+                          div.thread-content.ThreadPostBody#thread-content!= post.c
                         else if data.thread.type === "product"
                           div.thread-content.ThreadPostBody
                             include ./product/product.pug
@@ -399,14 +398,14 @@ block content
                           div.thread-content.ThreadPostBody#thread-content
                             include ./fund/fund.pug
                         +postEditTime(post)
-                        -const creditPost = data.posts[0];
+                        -const creditPost = data.thread.firstPost;
                         include ./postCredits
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
-                          div.ThreadPostBody#thread-content!= experimental_render(post)
+                          div.ThreadPostBody#thread-content!= post.c
                           +postEditTime(post)
-                          -const creditPost = data.posts[0];
+                          -const creditPost = data.thread.firstPost;
                           include ./postCredits
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
@@ -521,20 +520,19 @@ block content
 
                       .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
                         for post, index in data.posts
-                          if index !== 0 || data.paging.page !== 0
-                            //- 文章作者的post无需折叠
-                            -let disabledHidePost;
-                            if data.thread.uid && post.uid && data.thread.uid === post.uid
-                              //- 作者的回复不折叠
-                              -disabledHidePost = true;
-                            else
-                              //- 服务器根据证书判断的该用户的回复是否需要折叠
-                              -disabledHidePost = !['half', 'all'].includes(post.hidePost);
-                              //- -disabledHidePost = !post.hide;
-                            -let previousPost;
-                            if index !== 1
-                              -previousPost = data.posts[index-1];
-                            include single_post
+                          //- 文章作者的post无需折叠
+                          -let disabledHidePost;
+                          if data.thread.uid && post.uid && data.thread.uid === post.uid
+                            //- 作者的回复不折叠
+                            -disabledHidePost = true;
+                          else
+                            //- 服务器根据证书判断的该用户的回复是否需要折叠
+                            -disabledHidePost = !['half', 'all'].includes(post.hidePost);
+                            //- -disabledHidePost = !post.hide;
+                          -let previousPost;
+                          if index !== 1
+                            -previousPost = data.posts[index-1];
+                          include single_post
                       .col-xs-12.col-md-12
                         include ../publicModules/paging/paging_input
                         if disablePost
