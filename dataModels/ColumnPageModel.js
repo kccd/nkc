@@ -1,5 +1,6 @@
 const mongoose = require("../settings/database");
 const Schema = mongoose.Schema;
+const cheerio = require("../nkcModules/nkcRender/cheerio");
 const schema = new Schema({
   _id: Number,
   columnId: {
@@ -37,15 +38,9 @@ const schema = new Schema({
 });
 // 记录引用资源的专栏独立页面
 schema.pre("save", async function(next) {
-  const newResources = (this.c.match(/\/r\/[0-9]{1,20}/g) || [])
-    .map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
-  for(const rid of newResources) {
-    await mongoose.model("resources").updateOne({rid}, {
-      $addToSet: {
-        references: `column-${this._id}`
-      }
-    });
-  }
+  const id = `column-${this._id}`;
+  const ResourceModel = mongoose.model("resources");
+  await ResourceModel.toReferenceSource(id, this.c);
   await next();
 });
 
