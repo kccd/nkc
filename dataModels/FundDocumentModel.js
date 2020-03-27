@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const {renderHTML} = require("../nkcModules/nkcRender");
 const documentSchema = new Schema({
 	_id: Number,
 	applicationFormId: { // 基金
@@ -133,18 +134,13 @@ documentSchema.methods.extendResources = async function() {
 
 documentSchema.pre('save', async function(next) {
 	const ResourceModel = mongoose.model('resources');
-	const content = this.c || "";
-	const newResources = (content.match(/\/r\/[0-9]{1,20}/g) || [])
-		.map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
-	for(const rid of newResources) {
-		const resource = await ResourceModel.findOne({rid});
-		if(!resource) continue;
-		await resource.update({
-			$addToSet: {
-				references: `fund-${this._id}`
-			}
-		});
-	}
+	this.c = renderHTML({
+		type: "data",
+		post: {
+			c: this.c
+		}
+	});
+	await ResourceModel.toReferenceSource(`fund-${this._id}`, this.c);
 	return next()
 	
 	/*try {

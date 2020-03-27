@@ -24,8 +24,7 @@ block content
           div
             if data.page.t
               .column-page-title=data.page.t
-            -data.page.c = hideContentByUser(data.page.c, data.user, 'thread')
-            .column-page-content!=experimental_render(data.page)
+            .column-page-content!=data.page.c
             if data.user && data.user.uid === data.column.uid
               .m-t-1.text-right
                 if data.page.hidden

@@ -134,7 +134,7 @@ resourceSchema.statics.toReferenceSource = async function(id, declare) {
 resourceSchema.statics.getResourcesByReference = async function(id) {
   let model = mongoose.model("resources");
   return await model.find({references: id});
-}
+};
 
 
 module.exports = mongoose.model('resources', resourceSchema);

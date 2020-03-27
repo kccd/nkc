@@ -14,12 +14,19 @@ router
     } else if(t === "edit") {
       const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: id});
       if(!page) ctx.throw(400, `未找到ID为${id}的自定义页面`);
+      page.c = nkcModules.nkcRender.renderHTML({
+        type: "editor",
+        post: {
+          c: page.c,
+          resources: await db.ResourceModel.getResourcesByReference(`column-${page._id}`)
+        }
+      });
       data.page = page;
       ctx.template = "columns/settings/editPage.pug";
     } else {
       data.pages = await db.ColumnPageModel.find({columnId: column._id}).sort({toc: -1});
       for(const page of data.pages) {
-        page.c = nkcModules.apiFunction.obtainPureText(page.c, true, 200);
+        page.c = nkcModules.nkcRender.HTMLToPlain(page.c, 200);
       }
       ctx.template = "columns/settings/page.pug";
     }

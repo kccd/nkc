@@ -22,13 +22,30 @@ settingsRouter
 			s = 1;
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
+		if(s === 3) {
+			applicationForm.project.c = nkcModules.nkcRender.renderHTML({
+				type: "editor",
+				post: {
+					c: applicationForm.project.c,
+					resources: await db.ResourceModel.getResourcesByReference(`fund-${applicationForm.project._id}`)
+				}
+			})
+		}
 		if(s === 4) {
       data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
       data.forumsThreadTypes = await db.ThreadTypeModel.find({}).sort({order: 1});
 		}
 		
 		if(s === 5) {
-			await data.applicationForm.project.extendResources();
+
+			const project = data.applicationForm.project;
+			project.c = nkcModules.nkcRender.renderHTML({
+				type: "article",
+				post: {
+					c: project.c,
+					resources: await db.ResourceModel.getResourcesByReference(`fund-${project._id}`)
+				}
+			});
 		}
 		if(s > 5) ctx.throw(404, 'not found');
 		data.s = s;
