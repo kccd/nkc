@@ -71,9 +71,12 @@ router
       if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业说明");
       // 渲染nkcsource
       forum.declare = nkcRender.renderHTML({
-				type: "article",
-        html: forum.declare,
-        
+				type: "editor",
+        post: {
+          c: forum.declare,
+          resources: await db.ResourceModel.getResourcesByReference("forum-"+id)
+        },
+        user: data.user
 			})
       data.post = {
         c: forum.declare
@@ -240,4 +243,6 @@ router
     }
     await next();
   });
+
+
 module.exports = router;
