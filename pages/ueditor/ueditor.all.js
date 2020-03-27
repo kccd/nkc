@@ -23462,6 +23462,7 @@ UE.plugins['catchremoteimage'] = function () {
             catcherActionUrl = me.getActionUrl(me.getOpt('catcherActionName')),
             catcherUrlPrefix = me.getOpt('catcherUrlPrefix'),
             catcherFieldName = me.getOpt('catcherFieldName');
+        var $ = window.top.$;
         var remoteImages = [],
             imgs = domUtils.getElementsByTagName(me.document, "img"),
             test = function (src, urls) {
@@ -23527,6 +23528,8 @@ UE.plugins['catchremoteimage'] = function () {
                                 "src": newSrc,
                                 "_src": newSrc
                             });
+                            // img标签用nkcsource标签包起来
+                            $(ci).wrap("<nkcsource data-type='picture' data-id='"+ info.r.rid +"'></nkcsource>")
                             break;
                         }
                         // for (j = 0; cj = list[j++];) {
@@ -29053,7 +29056,7 @@ UE.ui = baidu.editor.ui = {};
                     return;
                 if(baidu.editor.ui.PastePicker){
                     pastePop = new baidu.editor.ui.Popup({
-                        content:new baidu.editor.ui.PastePicker({editor:editor}),
+                        content:new baidu.editor.ui.PastePicker({editor:editor}),  // stack0
                         editor:editor,
                         className:'edui-wordpastepop'
                     });

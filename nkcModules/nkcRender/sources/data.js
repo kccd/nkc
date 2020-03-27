@@ -14,7 +14,10 @@ module.exports = {
     return html
   },
   xsf(html) {
-    return html;
+    const $ = cheerio.load(html);
+    let content = $("nkcsource > strong").text();
+    $("nkcsource").html(content);
+    return $("body").html();
   },
   attachment(html) {
     const $ = cheerio.load(html);

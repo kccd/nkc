@@ -1,5 +1,8 @@
 const Router = require('koa-router');
 const infoRouter = new Router();
+const nkcRender = require('../../../nkcModules/nkcRender');
+const cheerio = require('cheerio');
+
 infoRouter
 	.get('/', async (ctx, next) => {
 		ctx.template = 'interface_forum_settings_info.pug';
@@ -11,6 +14,14 @@ infoRouter
 		const {forum} = data;
 		let {did, operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId} = body;
 		if(operation && operation === 'updateDeclare') {
+			// 把回传的富文本内容处理指定的格式再入库
+			declare = nkcRender.renderHTML({
+				type: "data",
+				html: declare
+			})
+			// 富文本内容中每一个source添加引用
+			await toReferenNkcsource(forum.fid, declare, db.ResourceModel);
+			
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
 			if(did) {
@@ -60,4 +71,28 @@ infoRouter
 		}
 		await next();
 	});
+
+
+
+// 存储文章中的nkcsource
+async function toReferenNkcsource(fid, declare, model) {
+	let $ = cheerio.load(declare);
+	$("nkcsource").each(async (index, el) => {
+		let $el = $(el);
+		let type = $el.attr("data-type");
+		if(type === "pre" || type === "xsf" || type === "formula") return;
+		let rid = $el.attr("data-id");
+		let resource = await model.findOne({rid: rid});
+		if(!resource) return;
+		await resource.update({
+			$addToSet: {
+				references: "f"+fid
+			}
+		});
+		// console.log("forum:" + fid + " referened to resource:" + rid);
+	})
+}
+
+
+
 module.exports = infoRouter;

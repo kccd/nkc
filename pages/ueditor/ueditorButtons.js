@@ -231,7 +231,7 @@
   
     editor.ready(function() {
       var editDoc = editor.document;
-      editDoc.addEventListener("click", function(e) {
+      editDoc.addEventListener("dblclick", function(e) {
          var target = e.target;
          if(target.tagName.toLowerCase() !== "nkcsource") return;
          var type = target.dataset.type;
@@ -295,7 +295,7 @@
       "xsf": function() {
         newline = true;
         nkcsource.setAttribute("data-message", "学术分"+rid+"分以上可见");
-        return "<p><br></p>";
+        return "<strong style='font-weight:normal;'><br></strong>";
       },
       "twemoji": function() {
         nkcsource.setAttribute("contenteditable", "false");

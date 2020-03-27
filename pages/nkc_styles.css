@@ -4171,6 +4171,8 @@ nkcsource[data-type="xsf"]{
   border-radius: 5px;
   padding: 5px;
   background-color: #fff8f8;
+  display: inline-block;
+  width: 100%;
 }
 nkcsource[data-type="xsf"]>span:first-child{
   color: white;
