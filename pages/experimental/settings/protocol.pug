@@ -1,17 +1,15 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
-  -const mainContainer1400 = true;
-  link(href='/experimental/index.css' rel='stylesheet')
+block eTitle
   title 协议设置
-block content
+  include ../../publicModules/plyr/plyr.css.pug
+block eContent
   style.
     .dl-horizontal dt{
       margin-bottom: 10px;
     }
   .container-fluid.max-width
     .row
-      include ../nav
       .col-xs-12.col-md-2
         #content
           .list-group
@@ -94,6 +92,8 @@ block content
 
 
 block scripts
+  include ../../publicModules/plyr/plyr.js.pug
+  include ../../publicModules/lazySizes
   include ../../publicModules/selectResource/selectResource
   include ../../publicModules/selectDraft/selectDraft
   include ../../publicModules/sticker/selectSticker
