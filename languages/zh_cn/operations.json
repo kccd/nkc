@@ -705,5 +705,7 @@
   "visitUpdatePage": "访问更新工具页面",
   "deleteTool": "删除网站工具",
   "visitToolsManager": "访问网站工具管理页面",
-  "hideTool": "屏蔽网站工具"
+  "hideTool": "屏蔽网站工具",
+
+  "ipinfo": "查询ip信息"
 }

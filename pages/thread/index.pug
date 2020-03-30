@@ -173,7 +173,7 @@ block title
         if disablePost
           li
             -const ipoc = post.iplm || post.ipoc;
-            a(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
+            a(onclick=`getIpInfo('${ipoc}')` title=ipoc target='_blank')
               span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
 
   mixin postEditTime(post)

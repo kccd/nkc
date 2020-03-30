@@ -74,6 +74,7 @@ const sticker = require("./sticker");
 const stickers = require("./stickers");
 const note = require("./note");
 const tools = require('./tools');
+const ipinfo = require('./ipinfo');
 const operationObj = {};
 
 
@@ -237,6 +238,7 @@ operationObj.operationTree = {
 		stickers, // 共享表情
 		note, // 批注
 		tools, // 网站工具
+		ipinfo, // ip信息
     test,
 	}
 };
