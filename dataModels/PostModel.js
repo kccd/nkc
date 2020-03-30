@@ -6,23 +6,28 @@ const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
 const postSchema = new Schema({
+  // post id
   pid: {
     type: String,
     unique: true,
     required: true
   },
+  // 已经@过的用户
   atUsers: {
     type: [Schema.Types.Mixed],
     default: []
   },
+  // 富文本内容
   c: {
     type: String,
     default: ''
   },
+  // 旧 平学术分和科创币
   credits: {
     type: [Schema.Types.Mixed],
     default: []
   },
+  // 是否被屏蔽
   disabled: {
     type: Boolean,
     default: false,
@@ -34,23 +39,27 @@ const postSchema = new Schema({
 		default: null,
 		index: 1
 	},
+  // 创建者的ip
   ipoc: {
     type: String,
     default: '0.0.0.0'
   },
+  // 修改者的ip
   iplm: {
     type: String,
   },
+  // 旧 内容格式，数据统一成了html
   l: {
     type: String,
     default: "html",
   },
+  // 旧 收藏的用户
   recUsers: {
     type: [String],
 	  index: 1,
     default: []
   },
-  // 引用的PID  旧
+  // 旧 引用的PID
   rpid: {
     type: [String],
     default: []
@@ -77,15 +86,11 @@ const postSchema = new Schema({
     type: Number,
     default: 0
   },
+  // 标题
   t: {
     type: String,
     default: ''
   },
-  /* fid: {
-    type: String,
-    required: true,
-    index: 1
-  }, */
   // 主要分类
   mainForumsId: {
     type: [String],
@@ -104,53 +109,64 @@ const postSchema = new Schema({
     default: [],
     index: 1
   },
+  // 所属文章ID
   tid: {
     type: String,
     required: true,
     index: 1
   },
+  // 创建的时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 修改的时间
   tlm: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 发表者ID
   uid: {
     type: String,
     required: true,
     index: 1
   },
+  // 修改者ID
   uidlm: {
     type: String,
     index: 1
   },
+  // 旧 文章是否有图
   hasImage: {
     type: Boolean,
     index: 1,
     default: false
   },
+  // 是否隐藏历史记录
 	hideHistories: {
   	type: Boolean,
 		default: false
 	},
+  // 是否加精
 	digest: {
   	type: Boolean,
 		default: false,
 		index: 1
 	},
+  // 加精的时间
   digestTime: {
     type: Date,
     default: null,
     index: 1
   },
+  // 支持数
   voteUp: {
     type: Number,
     default: 0
   },
+  // 反对数
   voteDown: {
     type: Number,
     default: 0

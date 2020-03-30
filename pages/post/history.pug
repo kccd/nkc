@@ -1,0 +1,32 @@
+extends ../bootstrap_base
+block title
+  title 历史记录
+  +includeCSS("/post/history.css")
+block content
+  .container-fluid.max-width.history
+    .row
+      .col-xs-12
+        if data.userOperationsId.includes('disableHistories')
+          if data.post.hideHistories
+            button.btn.btn-danger(onclick=`disabledHistories("${data.post.pid}", false)`) 解除屏蔽
+          else
+            button.btn.btn-danger(onclick=`disabledHistories("${data.post.pid}", true)`) 屏蔽所有
+      .col-xs-12
+        for h, index in data.histories
+          -let c = data.histories[index + 1];
+          .single-history
+            .single-history-header
+              .version=`版本号：${h.version}`
+              .time=`发表时间：${format('YYYY/MM/DD HH:mm:ss', h.tlm)}`
+              .user
+                |发表人：
+                if h.targetUser
+                  a.username(href=`/u/${h.targetUser.uid}` data-float-uid=h.targetUser.uid target="_blank")=h.targetUser.username
+                else
+                  span 匿名用户
+                .ip=` ${h.iplm}`
+            .single-history-body
+              .content!=htmlDiff(c?c.c:"", h.c)
+block scripts
+  include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug

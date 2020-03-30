@@ -171,6 +171,7 @@ resourceRouter
       delete newResource.tlm;
       delete newResource.originId;
       delete newResource.toc;
+      delete newResource.hits;
 
       newResource.rid = await db.SettingModel.operateSystemID("resources", 1);
       newResource.uid = user.uid;

@@ -10,7 +10,7 @@ module.exports = {
     } = resource || {};
     const url = getUrl("resource", rid);
     const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource");
+    const nkcSource = $("nkcsource").html("");
     const img = $(`<img alt="${oname}" data-type="view" dataimg="content">`);
     if(!width || !height) {
       img.attr("src", url);
@@ -45,7 +45,7 @@ module.exports = {
     const poster = getUrl("videoCover", rid);
     const url = getUrl("resource", rid);
     const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource");
+    const nkcSource = $("nkcsource").html("");
     const videoBody = $(`<span></span>`);
     const video = $(`<video>你的浏览器不支持video标签，请升级。</video>`)
       .addClass("plyr-dom")

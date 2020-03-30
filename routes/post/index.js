@@ -300,15 +300,15 @@ router
       survey, did, cover = ""
     } = post;
     const {pid} = ctx.params;
-    const {state, data, db, fs} = ctx;
+    const {state, data, db} = ctx;
     const {user} = data;
-    const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-    const authLevel = await userPersonal.getAuthLevel();
+    const authLevel = await user.extendAuthLevel();
 	  if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
 	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
-    if(targetPost.parentPostId && c.length > 1000) ctx.throw(400, "评论内容不能超过1000字节");
+    const _targetPost = targetPost.toObject();
+    if(targetPost.parentPostId && c.length > 2000) ctx.throw(400, "评论内容不能超过1000字节");
     const targetThread = await targetPost.extendThread();
     if(targetThread.oc === pid) {
       ctx.nkcModules.checkData.checkString(t, {
@@ -362,25 +362,8 @@ router
 
 
 
-    const objOfPost = Object.assign(targetPost, {}).toObject();
-    objOfPost._id = undefined;
-    const histories = new db.HistoriesModel(objOfPost);
-    await histories.save();
-    // const quote = await dbFn.getQuote(c);
-    // let rpid = '';
-    // if(quote && quote[2]) {
-    //   rpid = quote[2];
-    //   const username = quote[1];
-    //   if(rpid !== targetPost.pid) {
-    //     const quoteUser = await db.UserModel.findOne({username: username});
-    //     const newReplies = new db.ReplyModel({
-    //       fromPid: pid,
-    //       toPid: rpid,
-    //       toUid: quoteUser.uid
-    //     });
-    //     await newReplies.save();
-    //   }
-    // }
+    // 生成历史记录
+    await db.HistoriesModel.createHistory(_targetPost);
 
     // 判断文本是否有变化，有变化版本号加1
     if(c !== targetPost.c) {

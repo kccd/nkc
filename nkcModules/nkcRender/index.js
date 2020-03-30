@@ -60,7 +60,6 @@ class NKCRender {
   }
   HTMLToPlain(html, count) {
     const $ = cheerio.load(html);
-    $("nkcsource, blockquote").remove();
     let text = $.text();
     const textLength = text.length;
     text = text.slice(0, count);

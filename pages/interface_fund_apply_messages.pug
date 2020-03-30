@@ -130,8 +130,7 @@
                 div
                   each k in applicationForm.project.keyWordsEn
                     a.applicationForm-keyword.en(href=`/search?c=${k}`)=k
-        -applicationForm.project.c = hideContentByUser(applicationForm.project.c, data.user, 'thread');
-        div!= experimental_render(applicationForm.project)
+        div!=applicationForm.project.c
   .row
     .col-xs-12.col-md-12
       .applicationForm-header 其他信息

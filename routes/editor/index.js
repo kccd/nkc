@@ -14,6 +14,8 @@ router
       return await next();
     }
     ctx.template = "editor/editor.pug";
+
+    let referenceId;
     // 需要预制的专业和文章分类
     let selectedForumsId = [];
     let selectedCategoriesId = [];
@@ -45,7 +47,7 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.type = (thread.oc === data.post.pid)? "modifyThread": "modifyPost";
       const firstPost = await thread.extendFirstPost();
-
+      referenceId = data.post.pid;
       if(data.post.l !== "html") {
         ctx.template = "interface_editor.pug";
         data.content = data.post.c;
@@ -70,14 +72,7 @@ router
       const forum = await db.ForumModel.findOnly({fid: id});
       if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业说明");
       // 渲染nkcsource
-      forum.declare = nkcRender.renderHTML({
-				type: "editor",
-        post: {
-          c: forum.declare,
-          resources: await db.ResourceModel.getResourcesByReference("forum-"+id)
-        },
-        user: data.user
-			})
+      referenceId = `forum-${forum.fid}`;
       data.post = {
         c: forum.declare
       };
@@ -233,12 +228,14 @@ router
       }
     }
     state.editorSettings = await db.SettingModel.getSettings("editor");
-    if(data.post && data.post.pid) {
-      const resources = await db.ResourceModel.find({references: data.post.pid});
+    if(data.post && data.post.pid && referenceId) {
       data.post.c = nkcModules.nkcRender.renderHTML({
         type: "editor",
-        html: data.post.c || "",
-        resources: resources
+        post: {
+          c: data.post.c,
+          resources: await db.ResourceModel.getResourcesByReference(referenceId)
+        },
+        user: data.user
       })
     }
     await next();

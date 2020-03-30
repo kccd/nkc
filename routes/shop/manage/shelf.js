@@ -273,6 +273,12 @@ shelfRouter
         ip: ctx.address,
         type: "product"
       };
+      options.content = nkcModules.nkcRender.renderHTML({
+        type: "data",
+        post: {
+          c: options.content
+        }
+      });
       await db.ThreadModel.ensurePublishPermission(options);
       const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
       product = db.ShopGoodsModel({

@@ -1,0 +1,19 @@
+.history .single-history {
+  margin: 1rem 0;
+}
+.history .single-history .single-history-header {
+  background-color: #f4f4f4;
+  font-style: oblique;
+  border-radius: 3px;
+  padding: 0.5rem;
+}
+.history .single-history .single-history-header .user .username {
+  display: inline-block;
+}
+.history .single-history .single-history-header .user .ip {
+  display: inline-block;
+}
+.history .single-history .single-history-body {
+  background-color: #f4f4f4;
+  padding: 0.5rem;
+}
