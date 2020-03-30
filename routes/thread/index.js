@@ -152,7 +152,7 @@ threadRouter
     await next();
 	})
 	.get('/:tid', async (ctx, next) => {
-		const {data, params, db, query, nkcModules, state} = ctx;
+    const {data, params, db, query, nkcModules, state} = ctx;
 		let {token, paraId} = query;
 		let {page = 0, pid, last_page, highlight, step, t} = query;
     let {tid} = params;
