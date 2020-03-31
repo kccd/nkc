@@ -483,3 +483,16 @@ NKC.methods.sendEmailCode = function(type) {
     operation: type
   });
 };
+
+
+/**
+ * ajax获取ip信息
+ */
+NKC.methods.getIpInfo = function(ip) {
+	return nkcAPI("/ipinfo?ip=" + ip, "GET")
+		.then(function(res) {return res.ipInfo})
+		.then(function(info){
+			if(!info) return sweetError("获取ip信息失败");
+			return Sweetalert2("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.province + info.city +"</p>")
+		})
+};
