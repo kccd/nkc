@@ -16,17 +16,52 @@ block content
           -let c = data.histories[index + 1];
           .single-history
             .single-history-header
-              .version=`版本号：${h.version}`
-              .time=`发表时间：${format('YYYY/MM/DD HH:mm:ss', h.tlm)}`
+              if index === 0
+                .version=`版本号：当前版本 `
+              else
+                .version=`版本号：${h.version} `
+                  span.m-r-05
+                  button.btn.btn-xs.btn-danger(onclick=`rollback('${h.pid}', '${h._id}')`) 回滚至此版本
+              .time=`时间：${format('YYYY/MM/DD HH:mm:ss', h.tlm)}`
               .user
                 |发表人：
                 if h.targetUser
                   a.username(href=`/u/${h.targetUser.uid}` data-float-uid=h.targetUser.uid target="_blank")=h.targetUser.username
                 else
                   span 匿名用户
-                .ip=` ${h.iplm}`
+                a.m-l-05.pointer.ip(onclick=`NKC.methods.getIpInfo('${h.iplm}')`)=` ${h.iplm}`
             .single-history-body
+              h4.content!=htmlDiff(c?c.t:"", h.t || "")
               .content!=htmlDiff(c?c.c:"", h.c)
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  script.
+    function rollback(pid, id) {
+      sweetQuestion("确定要执行此操作？")
+      .then(function() {
+        return nkcAPI("/p/" + pid + "/history/rollback/" + id, "POST")
+      })
+      .then(function(data) {
+        sweetSuccess("操作成功");
+        window.location.href = data.url;
+      })
+      .catch(sweetError)
+    }
+    function disabledHistories(pid, type) {
+      var obj = {};
+      var text = '屏蔽成功';
+      if (type === true) {
+        obj.operation = 'disableHistories'
+      } else {
+        text = '解除屏蔽成功';
+        obj.operation = 'unDisableHistories'
+      }
+      nkcAPI('/p/' + pid + '/history', 'PATCH', obj)
+        .then(function () {
+          screenTopAlert(text);
+        })
+        .catch(function (data) {
+          screenTopWarning(data.error || data);
+        })
+    }

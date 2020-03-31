@@ -15,12 +15,12 @@ router
     data.post = targetPost;
     data.histories = [];
     const histories = await db.HistoriesModel.find({pid}).sort({tlm: 1});
+    histories.push(targetPost);
     const usersId = [];
     histories.map(h => usersId.push(h.uidlm));
     const users = await db.UserModel.find({uid: {$in: usersId}});
     const usersObj = {};
     users.map(user => usersObj[user.uid] = user);
-    const resources = await db.ResourceModel.getResourcesByReference(data.post.pid);
     for(let i = 0; i < histories.length; i++) {
       const h = histories[i].toObject();
       h.c = nkcRender.HTMLToPlain(h.c);

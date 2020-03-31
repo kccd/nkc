@@ -408,7 +408,7 @@
 			header: [],
 			hr:     [],
 			i:      ['class', 'style'],
-			img:    ['src', 'alt', 'title', 'width', 'id', '_src', 'loadingclass', 'data-latex', 'style'],
+			img:    ["draggable", 'src', 'alt', 'title', 'width', 'id', '_src', 'loadingclass', 'data-latex', 'style'],
 			ins:    ['datetime'],
 			li:     ['class', 'style'],
 			mark:   [],
@@ -436,8 +436,7 @@
 			ul:     ['class', 'style'],
             video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style', 'poster'],
             hidecontent: ["style", "class"],
-            input:  ["type", "placeholder"],
-            img:    ["draggable"]
+            input:  ["type", "placeholder"]
 		}
     };
 

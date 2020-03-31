@@ -26,7 +26,7 @@ const schema = new Schema({
   },
   l: {
     type: String,
-    default: "html"
+    default: ""
   },
   toc: {
     type: Date,

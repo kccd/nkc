@@ -22,11 +22,8 @@ class NKCRender {
       post = {},
       user = {},
     } = options;
-
-    const {resources = [], atUser = []} = post;
+    const {resources = [], atUsers = []} = post;
     let html = post.c || "";
-    // 过滤标签及样式
-    html = htmlFilter(html);
     // 序列化html
     const $ = cheerio.load(html);
     // 渲染文章中的图片、视频、音频等特殊模板
@@ -49,10 +46,19 @@ class NKCRender {
         return method(_html, id, resource, user);
       });
     }
+    html = $("body").html();
 
     // @检测
+    if(type === "article" && atUsers && atUsers.length) {
+      for(const u of atUsers) {
+        const str = `@${u.username}`;
+        const reg = new RegExp(str, "g");
+        html = html.replace(reg, `<a href="/u/${u.uid}" target="_blank">${str}</a>`);
+      }
+    }
 
-    return $("body").html();
+    // 过滤标签及样式
+    return htmlFilter(html);
   }
 
   plainEscape(c) {

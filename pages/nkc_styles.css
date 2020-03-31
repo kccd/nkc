@@ -3865,6 +3865,11 @@ nkcsource[data-type="sticker"]>img{
   cursor: pointer;
 }
 
+/*文章中的emoji */
+nkcsource[data-type="twemoji"]>img{
+  max-width: 26px;
+  max-height: 26px;
+}
 /*文章中的图片 旧*/
 
 .article-img-body{

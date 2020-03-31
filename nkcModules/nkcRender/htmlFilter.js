@@ -28,6 +28,7 @@ for(var i = 1; i <= 6; i++) {
   wl['h'+i] = ['style'];
 }
 
+
 const nkcXSS = new xss.FilterXSS({
   css: {
     whiteList: {
