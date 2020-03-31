@@ -1320,14 +1320,3 @@ $(function() {
 	}
 	NKC.methods.highlightBlockBySelector("nkcsource[data-type='pre']");
 });
-
-
-// ajax获取ip信息
-function getIpInfo(ip) {
-	nkcAPI("/ipinfo?ip=" + ip, "GET")
-		.then(res => res.ipInfo)
-		.then(info => {
-			if(!info) return sweetError("获取ip信息失败");
-			return Sweetalert2("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.province + info.city +"</p>")
-		})
-}
