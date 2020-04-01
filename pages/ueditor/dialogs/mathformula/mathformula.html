@@ -113,18 +113,19 @@
 
     // 转换成nkcsource标签的html文本
   function formulaToHtml(typeid, code) {
-    var nkcsource = document.createElement("nkcsource");
-    nkcsource.setAttribute("data-type", "formula");
-    nkcsource.setAttribute("data-id", typeid);
+    // var nkcsource = document.createElement("nkcsource");
+    // nkcsource.setAttribute("data-type", "formula");
+    // nkcsource.setAttribute("data-id", typeid);
     // nkcsource.setAttribute("contenteditable", "false");
-    if(typeid == 3 || typeid == 4) {
-      // 占整行
-      nkcsource.innerHTML = code;
-    }else {
-      // 行内
-      nkcsource.innerHTML = code;
-    }
-    return nkcsource.outerHTML;
+    // if(typeid == 3 || typeid == 4) {
+    //   // 占整行
+    //   nkcsource.innerHTML = code;
+    // }else {
+    //   // 行内
+    //   nkcsource.innerHTML = code;
+    // }
+    // return nkcsource.outerHTML;
+    return code;
   }
   </script>
 </body>

@@ -394,6 +394,7 @@ function initVueApp() {
         if(!EditorReady) {
           return sweetError("编辑器尚未初始化");
         } else {
+          this.content = this.replaceEmojiChar(this.content);
           editor.setContent(this.content);
         }
       },
@@ -648,6 +649,25 @@ function initVueApp() {
         }
         return post;
       },
+      // 将正文中的twemoji部分替换成emoji字符
+      replaceTwemoji: function(content) {
+        var parser = document.createElement("div");
+        parser.innerHTML = content;
+        console.log($(parser));
+        $(parser)
+          .find("[data-tag='nkcsource'][data-type='twemoji']")
+          .each(function(index, imgElem) {
+            $(imgElem).replaceWith(imgElem.dataset.char);
+          })
+        return parser.innerHTML;
+      },
+      // 将正文中的emoji字符替换成twemoji Img标签
+      replaceEmojiChar: function(content) {
+        return twemoji.replace(content, function(char) {
+          var id = twemoji.convert.toCodePoint(char);
+          return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ id +"' data-char='"+ char +"' src=\"/twemoji/2/svg/"+ id +".svg\">"
+        })
+      },
       // 提交内容
       submit: function() {
         var self = this;
@@ -658,6 +678,10 @@ function initVueApp() {
             PostButton.disabledSubmit = true;
             type = self.type;
             post = self.getPost();
+          })
+          // 将正文中的twemoji部分替换成emoji字符
+          .then(function(){
+            post.c = self.replaceTwemoji(post.c);
           })
           .then(function() {
             if(type === "newThread") { // 发新帖：从专业点发表、首页点发表、草稿箱

@@ -13,112 +13,104 @@ body img{
   max-width: 100%;
 }
 
-nkcsource {
+[data-tag="nkcsource"] {
   display: inline-block;
-}
-
-nkcsource + nkcsource {
-  margin-top: 6px;
-}
-/* 图片 */
-nkcsource[data-type="picture"] {
-  max-width: 60%;
-}
-nkcsource[data-type="picture"] img{
-  user-select: none;
-}
-/*代码*/
-nkcsource[data-type="pre"] {
-  width: 100%;
   box-sizing: border-box;
 }
-  /* 学术分隐藏内容 */
-nkcsource[data-type="xsf"] {
+
+
+
+/* 学术分隐藏内容 */
+[data-tag="nkcsource"][data-type="xsf"] {
   background-color: #d3edff;
   padding: 7px 10px;
   margin: 10px 0;
   border-left: 5px solid #ddd;
-  width: 100%;
-  box-sizing: border-box;
+  width: 98%;
+  display: block;
 }
-nkcsource[data-type="xsf"]::before {
+[data-tag="nkcsource"][data-type="xsf"]::before {
   content: attr(data-message);
   font-size: 12px;
   color: #969696;
   cursor: pointer;
   display: block;
+  margin-bottom: 4px;
 }
 nkcsource[data-type="xsf"] strong{
   display: block;
   font-weight: normal;
 }
 
-  /* 附件 */
-nkcsource[data-type="attachment"] {
-  background-color: rgb(241, 243, 244);
-  height: 48px;
-  line-height: 48px;
-  width: 60%;
-  box-sizing: border-box;
-  padding-left: 48px;
+/* 附件 */
+.editor-attachment-container {
+  border: 1px dashed rgb(193, 193, 193);
+}
+[data-tag="nkcsource"][data-type="attachment"] {
+  padding: 10px;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  width: 98%;
+  line-height: 34px;
   position: relative;
-  border: 1px solid #d8d8d8;
-}
-nkcsource[data-type="attachment"] > img {
-  height: 32px;
-  width: 32px;
-  user-select: none;
-  position: absolute;
-  left: 8px;
-  top: 8px;
-}
-nkcsource[data-type="attachment"] > a{
-  font-size: 15px;
   text-decoration: none;
-  color: #555;
+  color: rgb(43, 144, 217);
+}
+[data-tag="nkcsource"][data-type="attachment"]:active {
+  color: rgb(43, 144, 217);
+}
+[data-tag="nkcsource"][data-type="attachment"]::before {
+  content: "";
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background-image: url(/ueditor/themes/default/images/attachment.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  margin-right: 6px;
+  transform: translateY(5px);
+}
+[data-tag="nkcsource"][data-type="attachment"]::after {
+  content: "点击下载";
+  display: block;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: .3s opacity;
+  color: rgb(0, 138, 236);
+}
+[data-tag="nkcsource"][data-type="attachment"]:hover::after {
+  opacity: 1;
 }
 
-
-  /* 公式 */
-nkcsource[data-type="formula"] {
-  background-color: #d3edff;
-  text-align: center;
-  box-sizing: border-box;
-  padding: 2px;
-}
-nkcsource[data-type="formula"][data-id="3"],
-nkcsource[data-type="formula"][data-id="4"] {
-  width: 100%;
-}
 
 
 /* 视频 */
-nkcsource[data-type="video"] {
-  background-color: rgb(241, 243, 244);
+[data-tag="nkcsource"][data-type="video"] {
+  background-color: rgb(0, 0, 0);
   text-align: center;
-  width: 100%;
-  border: 1px solid #d8d8d8;
-  font-size: 0;
-}
-nkcsource[data-type="video"] video{
-  width: 60%;
+  width: 98%;
+  height: 352px;
+  margin-right: 2px;
 }
 
-  /* 音频 */
-nkcsource[data-type="audio"] {
+/* 音频 */
+[data-tag="nkcsource"][data-type="audio"] {
   background-color: rgb(241, 243, 244);
   text-align: center;
-  width: 60%;
-  box-sizing: border-box;
-  border: 1px solid #d8d8d8;
-  font-size: 0;
+  width: 98%;
+  /* display: block; */
 }
-nkcsource[data-type="audio"] > audio:focus {
+[data-tag="nkcsource"][data-type="audio"]:focus {
   outline: none;
 }
 
-/* 表情 */
-nkcsource[data-type="twemoji"],
-nkcsource[data-type="sticker"] {
-  /* display: inline-block; */
+/* 代码 */
+[data-tag="nkcsource"][data-type="pre"] {
+  display: block;
 }
