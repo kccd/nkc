@@ -38,11 +38,9 @@
           window.SelectSticker.open(function(res) {
             // var dom = NKC.methods.resourceToHtml(res.data, res.type);
             if(res.type === "emoji") {
-              editor.execCommand('inserthtml', 
-              "<nkcsource data-type='twemoji' data-id='"+ res.data +"' contenteditable='false'><img src=\""+ NKC.methods.tools.getUrl(res.type, res.data) +"\"></nkcsource>");
+              editor.execCommand('inserthtml', resourceToHtml("twemoji", res.data));
             }else if(res.type === "sticker") {
-              editor.execCommand('inserthtml', 
-              "<nkcsource data-type='sticker' data-id='"+ res.data.rid +"' contenteditable='false'><img src=\""+ NKC.methods.tools.getUrl(res.type, res.data.rid) +"\"></nkcsource>");
+              editor.execCommand('inserthtml', resourceToHtml("sticker", res.data.rid));
             }
           });
         } else {
@@ -233,7 +231,7 @@
       var editDoc = editor.document;
       editDoc.addEventListener("dblclick", function(e) {
          var target = e.target;
-         if(target.tagName.toLowerCase() !== "nkcsource") return;
+         if(target.dataset.tag !== "nkcsource") return;
          var type = target.dataset.type;
          var score = target.dataset.id;
          if(type !== "xsf") return;
@@ -264,52 +262,57 @@
   
   // 转换成nkcsource标签的html文本
   function resourceToHtml(type, rid, name) {
-    var nkcsource = document.createElement("nkcsource");
+    // var nkcsource = document.createElement("nkcsource");
     var newline = false;
     var handles = {
       "picture": function() {
-        nkcsource.style.display = "inline-block";
-        return "<img src=\"/r/"+ rid +"\">";
+        // nkcsource.style.display = "inline-block";
+        return "<img data-tag='nkcsource' data-type='picture' data-id='"+ rid +"' src=\"/r/"+ rid +"\">";
       },
       "sticker": function() {
-        nkcsource.setAttribute("contenteditable", "false");
-        nkcsource.style.display = "inline-block";
-        return "<img src=\"/r/"+ rid +"\">";
+        // nkcsource.setAttribute("contenteditable", "false");
+        // nkcsource.style.display = "inline-block";
+        return "<img data-tag='nkcsource' data-type='sticker' data-id='"+ rid +"' src=\"/sticker/"+ rid +"\">";
       },
       "video": function() {
-        newline = true;
-        nkcsource.setAttribute("contenteditable", "false");
-        return "<video src=\"/r/"+ rid +"\" controls><video>";
+        // newline = true;
+        // nkcsource.setAttribute("contenteditable", "false");
+        // return "<video src=\"/r/"+ rid +"\" controls><video>";
+        return '<p style="margin-top:0px; max-width:100%; color:rgba(0, 0, 0, 0.9); font-family:-apple-system-font, BlinkMacSystemFont,;"><video data-tag="nkcsource" data-type="video" data-id="'+ rid +'" src="/r/'+ rid +'" controls></video>'+ decodeURI("%E2%80%8E") +'</p><br>';
       },
       "audio": function() {
-        newline = true;
-        nkcsource.setAttribute("contenteditable", "false");
-        return "<audio src=\"/r/"+ rid +"\" controls></audio>";
+        // newline = true;
+        // nkcsource.setAttribute("contenteditable", "false");
+        // return "<audio src=\"/r/"+ rid +"\" controls></audio>";
+        return '<p style="margin-top:0px; max-width:100%; color:rgba(0, 0, 0, 0.9); font-family:-apple-system-font, BlinkMacSystemFont,;"><audio data-tag="nkcsource" data-type="audio" data-id="'+ rid +'" src="/r/'+ rid +'" controls></audio>'+ decodeURI("%E2%80%8E") +'</p><br>';
       },
       "attachment": function() {
-        newline = true;
-        nkcsource.setAttribute("contenteditable", "false");
-        return "<img src=\"/ueditor/themes/default/images/attachment.png\"><a href='/r/"+ rid +"' target='_blank'>"+ name +"</a>"
+        // newline = true;
+        // nkcsource.setAttribute("contenteditable", "false");
+        // return "<img src=\"/ueditor/themes/default/images/attachment.png\"><a href='/r/"+ rid +"' target='_blank'>"+ name +"</a>"
+        return '<p style="margin-top:0px; max-width:100%; color:rgba(0, 0, 0, 0.9); font-family:-apple-system-font, BlinkMacSystemFont,;"><a data-tag="nkcsource" data-type="attachment" data-id="'+ rid +'" href="/r/'+ rid +'" target="_blank" contenteditable="false">'+ name +'</a>&#8203;</p>'
       },
       "pre": function() {},
       "xsf": function() {
         newline = true;
-        nkcsource.setAttribute("data-message", "学术分"+rid+"分以上可见");
-        return "<strong style='font-weight:normal;'><br></strong>";
+        // nkcsource.setAttribute("data-message", "学术分"+rid+"分以上可见");
+        return '<section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="学术分'+ rid +'分以上可见"><p style="margin-top:0px; max-width:100%; color:rgba(0, 0, 0, 0.9); font-family:-apple-system-font, BlinkMacSystemFont,;">&#8203;<br></p></section>';
       },
       "twemoji": function() {
-        nkcsource.setAttribute("contenteditable", "false");
-        nkcsource.style.display = "inline-block";
-        return "<img src=\"/r/"+ rid +"\">";
+        // nkcsource.setAttribute("contenteditable", "false");
+        // nkcsource.style.display = "inline-block";
+        var emojiChar = twemoji.convert.fromCodePoint(rid);
+        return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ rid +"' data-char='"+ emojiChar +"' src=\"/twemoji/2/svg/"+ rid +".svg\">";
       },
       "formula": function() {}
     }
     var hit = handles[type];
     if(hit) {
-      nkcsource.setAttribute("data-type", type);
-      nkcsource.setAttribute("data-id", rid);
+      // nkcsource.setAttribute("data-type", type);
+      // nkcsource.setAttribute("data-id", rid);
     }
-    nkcsource.innerHTML = hit();
-    return nkcsource.outerHTML + (newline? "<span>"+ decodeURI("%E2%80%8E") +"<span>": "");
+    // nkcsource.innerHTML = hit();
+    // return nkcsource.outerHTML + (newline? "<span>"+ decodeURI("%E2%80%8E") +"<span>": "");
+    return hit? hit() : "";
   }
 }());

@@ -40,7 +40,7 @@
       +resourcePaging
       .module-ss-stickers
         div(v-if="type === 'emoji'")
-          .emoji(v-for="e in emoji" @click="selectEmoji(e)" :key="e")
+          .emoji(v-for="e, index in emoji" @click="selectEmoji(e, index)" :key="e")
             img(:src=`getUrl('emoji', e)`)
         div(v-else-if="type === 'upload'")
           .upload-body

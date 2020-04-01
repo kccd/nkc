@@ -13561,9 +13561,9 @@ UE.plugins['insertcode'] = function() {
 
                     });
                 }
-                // me.execCommand('inserthtml','<pre id="coder"class="brush:'+lang+';toolbar:false">'+code+'</pre>',true);
-                // 应需求改为用nkcsource标签包裹
-                me.execCommand('inserthtml','<nkcsource data-type="pre" data-id="'+ lang +'"><pre id="coder"class="brush:'+lang+';toolbar:false">'+code+'</pre></nkcsource>', true);
+                me.execCommand('inserthtml','<pre data-tag="nkcsource" data-type="pre" data-id="'+ lang +'" id="coder"class="brush:'+lang+';toolbar:false">'+code+'</pre>',true);
+                // // 应需求改为用nkcsource标签包裹
+                // me.execCommand('inserthtml','<nkcsource data-type="pre" data-id="'+ lang +'"><pre id="coder"class="brush:'+lang+';toolbar:false">'+code+'</pre></nkcsource>', true);
 
                 pre = me.document.getElementById('coder');
                 domUtils.removeAttributes(pre,'id');

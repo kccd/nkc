@@ -1320,3 +1320,44 @@ $(function() {
 	}
 	NKC.methods.highlightBlockBySelector("nkcsource[data-type='pre']");
 });
+
+
+
+EventTarget.prototype.once = function(name, handle) {
+	let self = this;
+	let newHandle = function(){
+		handle();
+		self.removeEventListener(name, newHandle);
+	}
+	self.addEventListener(name, newHandle);
+}
+
+var timer;
+document.addEventListener("selectionchange", function() {
+	document.once("mouseup", function(){
+		clearTimeout(timer);
+		timer = setTimeout(function() {
+			var selection = getSelection();
+			var range = selection.getRangeAt(0);
+			if(range.collapsed) return;
+			// 获取原文中需要处理的dom
+			var startNode = range.startContainer;
+			var endNode = range.endContainer;
+			if(startNode === endNode) {
+				console.log("[A]需要处理的Node：", startNode);
+			}else {
+				var nodeList = [startNode], 
+					currentNode = startNode;
+				// 兄弟节点遍历
+				while(!currentNode.contains(endNode)) {
+					currentNode = currentNode.nextSibling;
+					nodeList.push(currentNode);
+				}
+				nodeList.push(endNode);
+				console.log("[B]需要处理的Node：", nodeList);
+			}
+			var frag = range.cloneContents();
+			console.log(frag);
+		}, 1000);
+	})
+})
