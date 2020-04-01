@@ -237,10 +237,10 @@
          if(type !== "xsf") return;
          window.insertHideContent.open(function(newscore) {
           target.dataset.id = newscore;
-          target.dataset.message = "学术分"+newscore+"分以上可见";
+          target.dataset.message = "浏览这段内容需要"+newscore+"学术分";
         }, parseFloat(score));
       })
-    })
+    });
     
     return new UE.ui.Button({
       name:'hideContent',
@@ -278,25 +278,25 @@
         // newline = true;
         // nkcsource.setAttribute("contenteditable", "false");
         // return "<video src=\"/r/"+ rid +"\" controls><video>";
-        return '<p style="margin-top:0px; max-width:100%; color:rgba(0, 0, 0, 0.9); font-family:-apple-system-font, BlinkMacSystemFont,;"><video data-tag="nkcsource" data-type="video" data-id="'+ rid +'" src="/r/'+ rid +'" controls></video>'+ decodeURI("%E2%80%8E") +'</p><br>';
+        return '<p><br></p><p><video data-tag="nkcsource" data-type="video" data-id="'+ rid +'" src="/r/'+ rid +'" controls></video>'+ decodeURI("%E2%80%8E") +'</p>';
       },
       "audio": function() {
         // newline = true;
         // nkcsource.setAttribute("contenteditable", "false");
         // return "<audio src=\"/r/"+ rid +"\" controls></audio>";
-        return '<p style="margin-top:0px; max-width:100%; color:rgba(0, 0, 0, 0.9); font-family:-apple-system-font, BlinkMacSystemFont,;"><audio data-tag="nkcsource" data-type="audio" data-id="'+ rid +'" src="/r/'+ rid +'" controls></audio>'+ decodeURI("%E2%80%8E") +'</p><br>';
+        return '<p><br></p><p><audio data-tag="nkcsource" data-type="audio" data-id="'+ rid +'" src="/r/'+ rid +'" controls></audio>'+ decodeURI("%E2%80%8E") +'</p>';
       },
       "attachment": function() {
         // newline = true;
         // nkcsource.setAttribute("contenteditable", "false");
         // return "<img src=\"/ueditor/themes/default/images/attachment.png\"><a href='/r/"+ rid +"' target='_blank'>"+ name +"</a>"
-        return '<p style="margin-top:0px; max-width:100%; color:rgba(0, 0, 0, 0.9); font-family:-apple-system-font, BlinkMacSystemFont,;"><a data-tag="nkcsource" data-type="attachment" data-id="'+ rid +'" href="/r/'+ rid +'" target="_blank" contenteditable="false">'+ name +'</a>&#8203;</p>'
+        return '<p><a data-tag="nkcsource" data-type="attachment" data-id="'+ rid +'" href="/r/'+ rid +'" target="_blank" contenteditable="false">'+ name +'</a>&#8203;</p>'
       },
       "pre": function() {},
       "xsf": function() {
         newline = true;
         // nkcsource.setAttribute("data-message", "学术分"+rid+"分以上可见");
-        return '<section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="学术分'+ rid +'分以上可见"><p style="margin-top:0px; max-width:100%; color:rgba(0, 0, 0, 0.9); font-family:-apple-system-font, BlinkMacSystemFont,;">&#8203;<br></p></section>';
+        return '<p><br></p><section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="浏览这段内容需要'+ rid +'学术分"><p>&#8203;<br></p></section>';
       },
       "twemoji": function() {
         // nkcsource.setAttribute("contenteditable", "false");

@@ -101,10 +101,9 @@ module.exports = {
   xsf(html, id, r, user = {}) {
     const {xsf = 0} = user;
     const $ = cheerio.load(html);
-    const nkcSource = $("nkcSource");
     let content;
     if(Number(id) <= xsf) {
-      content = nkcSource.html();
+      content = $("section").html();
     } else {
       content = "内容已隐藏";
     }

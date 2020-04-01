@@ -572,7 +572,7 @@ function nkc_render(options){
     return html
       // 图片处理
       .replace(/<img\ssrc="\/r\/([0-9]+?)" \/>/img, function(content, v1) {
-        if(script) return `<img data-tag="nkcsource" data-type="picture" data-id="${v1}"></img>`;
+        if(script) return `<img data-tag="nkcsource" data-type="picture" data-id="${v1}" src="/r/${v1}"></img>`;
         var resource = resources[v1];
         if(!resource) {
           resource = {
@@ -592,12 +592,12 @@ function nkc_render(options){
       })
       // 表情处理
       .replace(/<img\ssrc="\/sticker\/([0-9]+?)" \/>/img, function(content, v1) {
-        if(script) return `<img data-tag="nkcsource" data-type="sticker" data-id="${v1}"></img>`;
+        if(script) return `<img data-tag="nkcsource" data-type="sticker" data-id="${v1}" src="/sticker/${v1}"></img>`;
         return '<span class="article-sticker-body" data-sticker-rid="'+v1+'"><img src="'+tools.getUrl('sticker', v1)+'"></span>'
       })
       // 视频处理
       .replace(/<video\ssrc="\/r\/([0-9]+?)"><\/video>/igm, function(content, v1) {
-        if(script) return `<video data-tag="nkcsource" data-type="video" data-id="${v1}"></video>`;
+        if(script) return `<video data-tag="nkcsource" data-type="video" data-id="${v1}" src="/r/${v1}"></video>`;
         var resource = resources[v1];
         if(!resource) {
           return "（视频：" + plain_escape(v1) + "）";
@@ -612,7 +612,7 @@ function nkc_render(options){
       })
       // 音频处理
       .replace(/<audio\ssrc="\/r\/([0-9]+?)"><\/audio>/igm, function(content, v1) {
-        if(script) return `<audio data-tag="nkcsource" data-type="audio" data-id="${v1}"></audio>`;
+        if(script) return `<audio data-tag="nkcsource" data-type="audio" data-id="${v1}" src="/r/${v1}"></audio>`;
         var resource = resources[v1];
         if(!resource) {
           return "（音频：" + plain_escape(v1) + "）";
@@ -633,7 +633,7 @@ function nkc_render(options){
         var resource = resources[v1];
         if(script) {
           let filename = resource?resource.oname:"未知文件名";
-          return `<a data-tag="nkcsource" data-type="attachment" data-id="${v1}" data-name="${filename}"></a>`
+          return `<a data-tag="nkcsource" data-type="attachment" data-id="${v1}" href="/r/${v1}">${filename}</a>`
         }
         if(!resource) {
           return "（附件：" + plain_escape(v1) + "）";

@@ -51,6 +51,7 @@ class NKCRender {
       });
     }
     html = $("body").html();
+
     if(type === "article") {
       // @检测
       if(atUsers && atUsers.length) {

@@ -855,6 +855,10 @@ threadRouter
     await updateCount([newThread], true);
 		// 发表评论 组装评论dom 返回给前端实时显示
 		if(postType === "comment") {
+      const extendPostOptions = {
+        uid: data.user?data.user.uid: '',
+        visitor: data.user, // 用于渲染页面时比对学术分隐藏
+      };
       let comment = await db.PostModel.findOnly({pid: data.post.pid});
       comment = (await db.PostModel.extendPosts([comment], extendPostOptions))[0];
       if(comment.parentPostId) {

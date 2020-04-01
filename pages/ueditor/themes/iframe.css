@@ -18,6 +18,10 @@ body img{
   box-sizing: border-box;
 }
 
+/* 图片*/
+[data-tag="nkcsource"][data-type="picture"] {
+  max-width: 60%;
+}
 
 
 /* 学术分隐藏内容 */
@@ -25,7 +29,7 @@ body img{
   background-color: #d3edff;
   padding: 7px 10px;
   margin: 10px 0;
-  border-left: 5px solid #ddd;
+  /*border-left: 5px solid #ddd;*/
   width: 98%;
   display: block;
 }
@@ -73,7 +77,7 @@ nkcsource[data-type="xsf"] strong{
   margin-right: 6px;
   transform: translateY(5px);
 }
-[data-tag="nkcsource"][data-type="attachment"]::after {
+/*[data-tag="nkcsource"][data-type="attachment"]::after {
   content: "点击下载";
   display: block;
   position: absolute;
@@ -86,7 +90,7 @@ nkcsource[data-type="xsf"] strong{
 }
 [data-tag="nkcsource"][data-type="attachment"]:hover::after {
   opacity: 1;
-}
+}*/
 
 
 
@@ -94,14 +98,15 @@ nkcsource[data-type="xsf"] strong{
 [data-tag="nkcsource"][data-type="video"] {
   background-color: rgb(0, 0, 0);
   text-align: center;
-  width: 98%;
-  height: 352px;
+  max-width: 60%;
+  /*height: 352px;*/
   margin-right: 2px;
 }
 
 /* 音频 */
-[data-tag="nkcsource"][data-type="audio"] {
+[data-tag="nkcsource"][data-type="audio"]{
   background-color: rgb(241, 243, 244);
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
   text-align: center;
   width: 98%;
   /* display: block; */

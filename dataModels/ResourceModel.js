@@ -111,10 +111,12 @@ resourceSchema.methods.getFilePath = async function() {
 
 // 检测html内容中的资源并将指定id存入resource.reference
 resourceSchema.statics.toReferenceSource = async function(id, declare) {
+  console.log(declare);
   const model = mongoose.model("resources");
 	const $ = cheerio.load(declare);
   const resourcesId = [];
   $(`[data-tag="nkcsource"]`).each((index, el) => {
+    el = $(el);
     const {type, id} = el.data();
     if(!["picture", "video", "audio", "attachment"].includes(type)) return;
     resourcesId.push(id);

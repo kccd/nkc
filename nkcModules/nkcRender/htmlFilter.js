@@ -18,6 +18,7 @@ defaultWL.mn = [];
 defaultWL.annotation = ['encoding'];
 defaultWL.iframe = [];
 defaultWL.embed = [];
+defaultWL.section = ["data-tag", "data-type", "data-id", "data-message"];
 defaultWL.img = ["src", "alt", "class", "data-src", "data-type", "dataimg", "style", "data-tag", "data-id"];
 defaultWL.video = ["src", "class", "preload", "controls", "poster", "data-rid", "data-plyr-title", "data-tag", "data-type", "data-id"];
 defaultWL.audio = ["src", "class", "preload", "controls", "data-rid", "data-tag", "data-type", "data-id"];
