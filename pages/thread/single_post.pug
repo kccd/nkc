@@ -60,7 +60,6 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         .clearfix
         if(post.t && post.t !== '' && index !== 0)
           div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
-        -post.c = hideContentByUser(post.c, data.user, 'thread')
         div(class=!disabledHidePost?"hide-post part":"" data-pid=post.pid)
           .thread-post-mask
 

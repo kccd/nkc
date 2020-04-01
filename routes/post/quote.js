@@ -12,7 +12,7 @@ router
     if(targetPost.disabled) ctx.throw(403, '无法引用已经被禁用的回复');
     if(!targetPost.reviewed) ctx.throw(403, "回复未通过审核，暂无法引用");
     let username, uid;
-    let postsId = await db.PostModel.find({tid: targetPost.tid}, {pid: 1}).sort({toc: 1});
+    let postsId = await db.PostModel.find({tid: targetPost.tid, parentPostId: ''}, {pid: 1}).sort({toc: 1});
     postsId = postsId.map(p => p.pid);
     if(targetPost.anonymous) {
       username = "匿名用户";

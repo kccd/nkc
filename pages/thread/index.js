@@ -1318,5 +1318,5 @@ $(function() {
 			}));
 		}
 	}
-	NKC.methods.highlightBlockBySelector("nkcsource[data-type='pre']");
+	NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
 });

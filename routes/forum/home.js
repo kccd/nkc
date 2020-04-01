@@ -17,7 +17,7 @@ homeRouter
 				resources: await db.ResourceModel.getResourcesByReference("forum-"+ forum.fid)
 			},
 			user: data.user
-		})
+		});
 		
 		if(forum.valuableThreads.length === 0 &&
 			forum.basicThreads.length === 0 &&

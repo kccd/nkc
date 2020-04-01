@@ -9,33 +9,29 @@ module.exports = {
       rid = id
     } = resource || {};
     const url = getUrl("resource", rid);
-    const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource").html("");
-    const img = $(`<img alt="${oname}" data-type="view" dataimg="content">`);
     if(!width || !height) {
-      img.attr("src", url);
-      nkcSource.append(img)
+      return `
+        <span data-tag="nkcsource" data-type="picture" data-id="${id}">
+          <img src="${url}" alt="${oname}" data-type="view" dataimg="content">
+        </span>
+      `.trim();
     } else {
-      nkcSource.css("width", width + "px");
-      // 前端图片懒加载
-      img.attr("data-src", url);
-      img.addClass("lazyload");
-      const imgBody = $(`<span></span>`);
-      imgBody
-        .css("padding-top", (height * 100)/width + "%")
-        .append(img);
-      nkcSource.append(imgBody);
+      return `
+        <span data-tag="nkcsource" data-type="picture" data-id="${id}" style="width: ${width}px;">
+          <span style="padding-top: ${(height * 100) / width}%">
+            <img data-src="${url}" alt="${oname}" data-type="view" dataimg="content" class="lazyload">
+          </span>
+        </span>
+      `.trim();
     }
-    nkcSource.attr("_rendered", "");
-    return $("body").html();
   },
   sticker(html, id) {
-    const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource");
     const url = getUrl("sticker", id);
-    const img = $(`<img alt="表情" src="${url}">`);
-    nkcSource.append(img);
-    return $("body").html();
+    return `
+      <span data-tag="nkcsource" data-type="sticker" data-id="${id}">
+        <img src="${url}" alt="sticker">
+      </span>
+    `.trim();
   },
   video(html = "", id, resource = {}) {
     const {
@@ -44,36 +40,24 @@ module.exports = {
     } = resource;
     const poster = getUrl("videoCover", rid);
     const url = getUrl("resource", rid);
-    const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource").html("");
-    const videoBody = $(`<span></span>`);
-    const video = $(`<video>你的浏览器不支持video标签，请升级。</video>`)
-      .addClass("plyr-dom")
-      .attr({
-        "preload": "none",
-        "controls": "controls",
-        "poster": poster,
-        "data-rid": rid,
-        "data-plyr-title": oname
-      });
-    const source = $(`<source>`)
-      .attr({
-        "src": url,
-        "type": "video/mp4"
-      });
-    nkcSource.append(videoBody.append(video.append(source)));
-    return $("body").html();
+    return `
+      <span data-tag="nkcsource">
+        <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
+          <source src="${url}" type="video/mp4"> 你的浏览器不支持video标签，请升级。
+        </video>
+      </span>
+    `.trim();
   },
   audio(html = "", id, resource = {}) {
     const url = getUrl("resource", id);
-    html = `
-      <nkcsource data-type="audio" data-id="${id}" _rendered>
+    return `
+      <span data-tag="nkcsource" data-type="audio" data-id="${id}">
         <audio class="plyr-dom" preload="none" controls data-rid="rid">
           <source src="${url}" type="audio/mp3"/>
           你的浏览器不支持audio标签，请升级。
         </audio>
-      </nkcsource>`;
-    return html;
+      </span>
+    `.trim();
   },
   attachment(html = "", id, resource = {}) {
     const {
@@ -85,74 +69,31 @@ module.exports = {
     } = resource;
     const fileCover = getUrl("fileCover", ext);
     const url = getUrl("resource", rid);
-    const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource");
-    const iconBody = $(`<span></span>`)
-      .addClass("article-attachment-icon")
-      .append(
-        $(`<img>`).attr("src", fileCover)
-      );
-    const content = $(`<span></span>`)
-      .addClass("article-attachment-content")
-      .append(
-        $("<a></a>")
-          .addClass("article-attachment-name")
-          .attr({
-            "target": "_blank",
-            "href": url,
-            "title": oname
-          })
-          .text(oname)
-      )
-      .append(
-        $(`<span></span>`)
-          .addClass("article-attachment-info")
-          .append(
-            $(`<span></span>`)
-              .addClass("article-attachment-size")
-              .text(getSize(size))
-          )
-          .append(
-            $(`<span></span>`)
-              .addClass("article-attachment-ext")
-              .text(ext.toUpperCase())
-          )
-          .append(
-            $(`<span></span>`)
-              .addClass("article-attachment-hits")
-              .text(hits + "次下载")
-          )
-      );
+    let pdfHTML = "";
     if(ext === "pdf") {
       const pdfUrl = getUrl("pdf", rid);
-      content.find(".article-attachment-info").append(
-        $(`<span></span>`)
-          .addClass("article-attachment-reader")
-          .append(
-            $(`<a></a>`)
-              .attr("href", pdfUrl)
-              .text("预览")
-          )
-      )
+      pdfHTML = `
+        <span class="article-attachment-reader">
+          <a href="${pdfUrl}" target="_blank">预览</a>
+        </span>
+      `.trim();
     }
-    nkcSource.append(iconBody).append(content);
-    return $("body").html().trim();
-  },
-  formula(html, id) {
-    const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource");
-    let text = nkcSource.text();
-    if(id === "1") {
-      text = `$${text}$`;
-    } else if(id === "2") {
-      text = `\\(${text}\\)`;
-    } else if(id === "4") {
-      text = `\\[${text}\\]`;
-    } else {
-      text = `$$${text}$$`;
-    }
-    nkcSource.text(text);
-    return $("body").html();
+    return `
+      <span data-tag="nkcsource" data-type="attachment" data-id="${id}">
+        <span class="article-attachment-icon">
+          <img src="${fileCover}" alt="attachment icon">
+        </span>
+        <span class="article-attachment-content">
+          <a class="article-attachment-name" href="${url}" title="${oname}" target="_blank">${oname}</a>
+          <span class="article-attachment-info">
+            <span class="article-attachment-size">${getSize(size)}</span>
+            <span class="article-attachment-ext">${ext.toUpperCase()}</span>
+            <span class="article-attachment-hits">${hits}次下载</span>
+            ${pdfHTML}
+          </span>
+        </span>
+      </span>  
+    `.trim();
   },
   pre(html) {
     return html;
@@ -167,21 +108,6 @@ module.exports = {
     } else {
       content = "内容已隐藏";
     }
-    nkcSource.html(
-      $(`<span>浏览这段内容需要${id}学术分</span>`)
-    )
-      .append(
-        $(`<span></span>`)
-          .html(content)
-      );
-    return $("body").html();
+    return `<span data-tag="nkcsource" data-type="xsf" data-id="${id}"><span>浏览这段内容需要${id}学术分</span><span>${content}</span></span>`;
   },
-  twemoji(html, id) {
-    const $ = cheerio.load(html);
-    const nkcSource = $("nkcsource");
-    nkcSource.html(
-      $(`<img src="${getUrl('twemoji', id)}" alt="${id}">`)
-    );
-    return $("body").html();
-  }
 };

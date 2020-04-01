@@ -1,6 +1,5 @@
 const mongoose = require("../settings/database");
 const Schema = mongoose.Schema;
-const {renderHTML} = require("../nkcModules/nkcRender");
 const schema = new Schema({
   _id: Number,
   columnId: {
@@ -40,12 +39,6 @@ const schema = new Schema({
 schema.pre("save", async function(next) {
   const id = `column-${this._id}`;
   const ResourceModel = mongoose.model("resources");
-  this.c = renderHTML({
-    type: "data",
-    post: {
-      c: this.c
-    }
-  });
   await ResourceModel.toReferenceSource(id, this.c);
   await next();
 });

@@ -1,7 +1,6 @@
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-const {renderHTML} = require("../nkcModules/nkcRender");
 const documentSchema = new Schema({
 	_id: Number,
 	applicationFormId: { // 基金
@@ -134,12 +133,6 @@ documentSchema.methods.extendResources = async function() {
 
 documentSchema.pre('save', async function(next) {
 	const ResourceModel = mongoose.model('resources');
-	this.c = renderHTML({
-		type: "data",
-		post: {
-			c: this.c
-		}
-	});
 	await ResourceModel.toReferenceSource(`fund-${this._id}`, this.c);
 	return next()
 	

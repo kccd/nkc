@@ -364,14 +364,14 @@
         //,rgb2Hex:true               //默认产出的数据中的color自动从rgb格式变成16进制格式
 
 		// xss 过滤是否开启,inserthtml等操作
-		,xssFilterRules: false
+		,xssFilterRules: true
 		//input xss过滤
-		,inputXssFilter: false
+		,inputXssFilter: true
 		//output xss过滤
-		,outputXssFilter: false
+		,outputXssFilter: true
 		// xss过滤白名单 名单来源: https://raw.githubusercontent.com/leizongmin/js-xss/master/lib/default.js
 		,whitList: {
-			a:      ['target', 'href', 'title', 'class', 'style', 'datatype'],
+			a:      ['target', 'href', 'title', 'class', 'style', 'datatype', "contenteditable"],
 			abbr:   ['title', 'class', 'style'],
 			address: ['class', 'style'],
 			area:   ['shape', 'coords', 'href', 'alt'],
@@ -413,7 +413,7 @@
 			li:     ['class', 'style'],
 			mark:   [],
             nav:    [],
-            nkcsource: ["data-type", "data-id", "data-message"],
+            nkcsource: ["data-type", "data-id", "data-message", "contenteditable"],
 			ol:     ['class'],
 			p:      ['class', 'style', 'contenteditable'],
 			pre:    ['class', 'style'],
@@ -434,9 +434,9 @@
 			tt:     [],
 			u:      [],
 			ul:     ['class', 'style'],
-            video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style', 'poster'],
-            hidecontent: ["style", "class"],
-            input:  ["type", "placeholder"]
+			video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style', 'poster'],
+			hidecontent: ["style", "class"],
+			input:  ["type", "placeholder"],
 		}
     };
 

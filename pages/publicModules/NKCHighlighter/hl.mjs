@@ -28,6 +28,22 @@ NKC.modules.NKCHL = class {
     }, true);
     const hl = new NKCHighlighter({
       rootElementId: el,
+      clownClass: [
+        "MathJax_CHTML", // 公式
+      ],
+      clownAttr: [
+        {
+          "data-tag": "nkcsource"
+        }
+      ],
+      clownTagName: [
+        "code",
+        "pre",
+        "video",
+        "audio",
+        "source",
+        "table"
+      ],
       excludedElementTagName: [
         "video",
         "audio",

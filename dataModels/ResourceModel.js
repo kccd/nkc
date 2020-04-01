@@ -109,24 +109,23 @@ resourceSchema.methods.getFilePath = async function() {
   return filePath;
 };
 
-// 存储文章中的nkcsource
+// 检测html内容中的资源并将指定id存入resource.reference
 resourceSchema.statics.toReferenceSource = async function(id, declare) {
-  let model = mongoose.model("resources");
-	let $ = cheerio.load(declare);
-	$("nkcsource").each(async (index, el) => {
-		let $el = $(el);
-		let type = $el.attr("data-type");
-		if(!["audio", "video", "picture", "attachment"].includes(type)) return;
-		let rid = $el.attr("data-id");
-		let resource = await model.findOne({rid: rid});
-		if(!resource) return;
-		await resource.update({
-			$addToSet: {
-				references: id
-			}
-		});
-		// console.log("forum:" + fid + " referened to resource:" + rid);
-	})
+  const model = mongoose.model("resources");
+	const $ = cheerio.load(declare);
+  const resourcesId = [];
+  $(`[data-tag="nkcsource"]`).each((index, el) => {
+    const {type, id} = el.data();
+    if(!["picture", "video", "audio", "attachment"].includes(type)) return;
+    resourcesId.push(id);
+  });
+  await model.updateMany({
+    rid: {$in: resourcesId}
+  }, {
+    $addToSet: {
+      references: id
+    }
+  });
 };
 
 

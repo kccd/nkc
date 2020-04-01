@@ -23,5 +23,5 @@ protocolRouter
     }
     ctx.template = 'interface_protocol.pug';
     await next();
-  })
+  });
 module.exports = protocolRouter;

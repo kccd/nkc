@@ -1,72 +1,40 @@
 const xss = require('xss');
-const wl = xss.whiteList;
-wl.font = ['color'];
-wl.code = ['class'];
-wl.span = ['style'];
-wl.a = ['target', 'href', 'title', 'style'];
-wl.p = ['align','style'];
-wl.div = ['style'];
-wl.table = ['border','width','cellpadding','cellspacing'];
-wl.tbody = [];
-wl.tr = [];
-wl.th = ['width'];
-wl.td = ['width','valign','colspan','top','rowspan'];
-wl.math = [];
-wl.semantics = [];
-wl.mrow = [];
-wl.msup = [];
-wl.mn = [];
-wl.annotation = ['encoding'];
-wl.iframe = [];
-wl.embed = [];
-wl.img = ['src'];
-wl.pre = ['class'];
-wl.video = ['src'];
-wl.audio = ['src'];
-wl.nkcsource = ['data-type', 'data-id'];
+
+const defaultWL = Object.assign({}, xss.whiteList);
+
+defaultWL.font = ['color'];
+defaultWL.code = ['class'];
+defaultWL.p = ['align','style'];
+defaultWL.table = ['border','width','cellpadding','cellspacing'];
+defaultWL.tbody = [];
+defaultWL.tr = [];
+defaultWL.th = ['width'];
+defaultWL.td = ['width','valign','colspan','top','rowspan'];
+defaultWL.math = [];
+defaultWL.semantics = [];
+defaultWL.mrow = [];
+defaultWL.msup = [];
+defaultWL.mn = [];
+defaultWL.annotation = ['encoding'];
+defaultWL.iframe = [];
+defaultWL.embed = [];
+defaultWL.img = ["src", "alt", "class", "data-src", "data-type", "dataimg", "style", "data-tag", "data-id"];
+defaultWL.video = ["src", "class", "preload", "controls", "poster", "data-rid", "data-plyr-title", "data-tag", "data-type", "data-id"];
+defaultWL.audio = ["src", "class", "preload", "controls", "data-rid", "data-tag", "data-type", "data-id"];
+defaultWL.source = ["src", "type"];
+defaultWL.span = ["class", "style", 'data-type', 'data-id', "_rendered", "style", "data-tag"];
+defaultWL.a = ["class", "href", "target", "title", "style", "data-type", "data-tag", "data-id"];
+defaultWL.pre = ['class', "data-tag", "data-type", "data-id"];
+
 for(var i = 1; i <= 6; i++) {
-  wl['h'+i] = ['style'];
+  defaultWL['h'+i] = ['style'];
 }
-
-
-const nkcXSS = new xss.FilterXSS({
-  css: {
-    whiteList: {
-      position: /^fixed|relative$/,
-      top: true,
-      left: true,
-      fontSize: true,
-      display: true,
-      "background-image": true,
-      "font-weight":true,
-      "font-size":true,
-      "font-style":true,
-      "text-decoration-line":true,
-      "text-decoration": true,
-      "background-color":true,
-      "color":true,
-      "font-family":true,
-      "text-align":true,
-      "text-indent":true,
-      "padding-bottom":true,
-      "padding-top":true,
-      "padding-left":true,
-      "padding-right":true,
-      "height":true,
-      "width":true,
-      "vertical-align":true,
-      "margin-top":true,
-      "bottom":true,
-      "word-spacing":true,
-      "border-bottom":true,
-      "max-width": true
-    }
-  }
-});
 
 module.exports = (html) => {
   html = xss(html, {
-    whiteList: wl,
+    whiteList: defaultWL,
+    // stripIgnoreTagBody: ["script"],
+    // stripIgnoreTag: true,
     onTagAttr: function(tag, name, value, isWhiteAttr) {
       if(isWhiteAttr) {
         if(tag === 'a' && name === 'href') {
@@ -74,7 +42,38 @@ module.exports = (html) => {
           return `href=${valueHandled}`;
         }
       }
+    },
+    css: {
+      whiteList: {
+        position: /^fixed|relative$/,
+        top: true,
+        left: true,
+        fontSize: true,
+        display: true,
+        "font-weight":true,
+        "font-size":true,
+        "font-style":true,
+        "text-decoration-line":true,
+        "text-decoration": true,
+        "background-color":true,
+        "color":true,
+        "font-family":true,
+        "text-align":true,
+        "text-indent":true,
+        "padding-bottom":true,
+        "padding-top":true,
+        "padding-left":true,
+        "padding-right":true,
+        "height":true,
+        "width":true,
+        "vertical-align":true,
+        "margin-top":true,
+        "bottom":true,
+        "word-spacing":true,
+        "border-bottom":true,
+        "max-width": true
+      }
     }
   });
-  return nkcXSS.process(html);
+  return html;
 };

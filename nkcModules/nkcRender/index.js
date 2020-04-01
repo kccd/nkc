@@ -1,6 +1,6 @@
 const cheerio = require("./cheerio");
 const htmlFilter = require("./htmlFilter");
-
+const twemoji = require("twemoji");
 const plainEscape = require("../plainEscaper");
 const fs = require("fs");
 const path = require("path");
@@ -28,37 +28,60 @@ class NKCRender {
     const $ = cheerio.load(html);
     // 渲染文章中的图片、视频、音频等特殊模板
     const _resources = {};
-    for(const r of resources) {
-      _resources[r.rid] = r
+    for(let r of resources) {
+      if(r.toObject) {
+        r = r.toObject();
+      }
+      _resources[r.rid] = r;
     }
     const sourceMethods = sources[type];
     for(const name in sourceMethods) {
       if(!sourceMethods.hasOwnProperty(name)) continue;
       const method = sourceMethods[name];
-      $(`nkcsource[data-type="${name}"]`).replaceWith(function() {
+      $(`[data-tag="nkcsource"][data-type="${name}"]`).replaceWith(function() {
         const dom = $(this);
         const _html = dom.toString();
         const id = dom.data().id + "";
         const resource = _resources[id];
-        if(resource) {
+        if(resource && !resource._rendered) {
           resource.oname = plainEscape(resource.oname || "");
+          resource._rendered = true;
         }
         return method(_html, id, resource, user);
       });
     }
     html = $("body").html();
-
-    // @检测
-    if(type === "article" && atUsers && atUsers.length) {
-      for(const u of atUsers) {
-        const str = `@${u.username}`;
-        const reg = new RegExp(str, "g");
-        html = html.replace(reg, `<a href="/u/${u.uid}" target="_blank">${str}</a>`);
+    if(type === "article") {
+      // @检测
+      if(atUsers && atUsers.length) {
+        for(const u of atUsers) {
+          const str = `@${u.username}`;
+          const reg = new RegExp(str, "g");
+          html = html.replace(reg, `<a href="/u/${u.uid}" target="_blank">${str}</a>`);
+        }
       }
+      // twemoji本地化
+      html = twemoji.parse(html, {
+        folder: '/2/svg',
+        class: "emoji",
+        attributes: () => {
+          return {
+            "data-tag": "nkcsource",
+            "data-type": "twemoji"
+          }
+        },
+        base: '/twemoji',
+        ext: '.svg'
+      });
     }
 
     // 过滤标签及样式
-    return htmlFilter(html);
+    html = htmlFilter(html);
+    let id;
+    if(post.pid) {
+      id = `post-content-${post.pid}`;
+    }
+    return `<div class="render-content" id="${id}">${html}</div>`;
   }
 
   plainEscape(c) {
@@ -71,9 +94,6 @@ class NKCRender {
     text = text.slice(0, count);
     if(count < textLength) text += "...";
     return text;
-  }
-  renderPlain(options) {
-
   }
 }
 

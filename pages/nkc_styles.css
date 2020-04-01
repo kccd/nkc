@@ -3855,18 +3855,18 @@ ul.nav.navbar-nav.navbar-md>li>a{
 
 /*文章中的表情 新*/
 
-nkcsource[data-type="sticker"]{
+span[data-type="sticker"]{
   display: inline;
   font-size: 0;
   vertical-align: text-bottom;
 }
-nkcsource[data-type="sticker"]>img{
+span[data-type="sticker"]>img{
   vertical-align: text-bottom;
   cursor: pointer;
 }
 
 /*文章中的emoji */
-nkcsource[data-type="twemoji"]>img{
+span[data-type="twemoji"]>img{
   max-width: 26px;
   max-height: 26px;
 }
@@ -3910,19 +3910,19 @@ nkcsource[data-type="twemoji"]>img{
 
 /*文章中的图片 新*/
 
-nkcsource[data-type="picture"]{
+span[data-type="picture"]{
   position: relative;
   display: inline-block;
   vertical-align: text-bottom;
   max-width: 100%;
   font-size: 0;
 }
-nkcsource[data-type="picture"]>span{
+span[data-type="picture"]>span{
   width: 100%;
   position: relative;
   display: inline-block;
 }
-nkcsource[data-type="picture"]>span>img{
+span[data-type="picture"]>span>img{
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -3932,16 +3932,16 @@ nkcsource[data-type="picture"]>span>img{
   width: 100%;
   height: 100%;
 }
-nkcsource[data-type="picture"]>span>img.lazyload {
+span[data-type="picture"]>span>img.lazyload {
   opacity: 0;
 }
-nkcsource[data-type="picture"]>span>img.lazyloading{
+span[data-type="picture"]>span>img.lazyloading{
   opacity: 1;
   transition: opacity 300ms;
   background: #c7c7c7 url(/statics/loading.gif) no-repeat center;
   background-size: 3rem;
 }
-nkcsource[data-type="picture"]>span>img.lazyloaded{
+span[data-type="picture"]>span>img.lazyloaded{
   z-index: 101;
   background: rgba(0, 0, 0, 0);
 }
@@ -3966,12 +3966,12 @@ nkcsource[data-type="picture"]>span>img.lazyloaded{
 }
 
 /* 文章中的视频 新*/
-nkcsource[data-type="video"]{
+span[data-type="video"]{
   width: 100%;
   padding-top: 75%;
   position: relative;
 }
-nkcsource[data-type="video"]>div{
+span[data-type="video"]>div{
   height: 100%;
   width: 100%;
   display: block;
@@ -3980,7 +3980,7 @@ nkcsource[data-type="video"]>div{
   top: 0;
   left: 0;
 }
-nkcsource[data-type="video"] video{
+span[data-type="video"] video{
   max-width: 100%;
 }
 
@@ -4011,7 +4011,7 @@ nkcsource[data-type="video"] video{
   margin-left: 0.5rem;
 }
 /*文章中的音频 新*/
-nkcsource[data-type="audio"]{
+span[data-type="audio"]{
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
   border-radius: 2px;
   border: 1px solid #d6d6d6;
@@ -4083,7 +4083,7 @@ nkcsource[data-type="audio"]{
   font-weight: 700;
 }
 /* 文章中的附件 新*/
-nkcsource[data-type="attachment"]{
+span[data-type="attachment"]{
   display: block;
   padding: 0.5rem;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
@@ -4091,29 +4091,28 @@ nkcsource[data-type="attachment"]{
   border: 1px solid #d6d6d6;
   background: #fff;
   max-width: 414px;
-  /* margin-top: 6px; */
 }
-nkcsource[data-type="attachment"] .article-attachment-icon{
+span[data-type="attachment"] .article-attachment-icon{
   display: table-cell;
   vertical-align: top;
   width: 3.3rem;
 }
-nkcsource[data-type="attachment"] .article-attachment-icon img{
+span[data-type="attachment"] .article-attachment-icon img{
   width: 3.3rem;
   max-width: none;
   height: 3.3rem;
 }
-nkcsource[data-type="attachment"] .article-attachment-content{
+span[data-type="attachment"] .article-attachment-content{
   padding-left: 0.5rem;
   vertical-align: top;
   width: 30rem;
   max-width: 100%;
   display: table-cell;
 }
-nkcsource[data-type="attachment"] .article-attachment-name:hover, .article-attachment-name:focus{
+span[data-type="attachment"] .article-attachment-name:hover, .article-attachment-name:focus{
   color: #2b90d9;
 }
-nkcsource[data-type="attachment"] .article-attachment-name{
+span[data-type="attachment"] .article-attachment-name{
   display: block;
   height: 1.8rem;
   font-size: 1.3rem;
@@ -4125,20 +4124,20 @@ nkcsource[data-type="attachment"] .article-attachment-name{
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
-nkcsource[data-type="attachment"] .article-attachment-info>span{
+span[data-type="attachment"] .article-attachment-info>span{
   display: inline-block;
   font-size: 1.15rem;
   margin-right: 0.5rem;
 }
-nkcsource[data-type="attachment"] .article-attachment-size{
+span[data-type="attachment"] .article-attachment-size{
   color: #e85a71;
   font-weight: 700;
 }
-nkcsource[data-type="attachment"] .article-attachment-ext{
+span[data-type="attachment"] .article-attachment-ext{
   color: #e85a71;
   font-weight: 700;
 }
-nkcsource[data-type="attachment"] .article-attachment-reader{
+span[data-type="attachment"] .article-attachment-reader{
   color: #2b90d9;
   font-weight: 700;
 }
@@ -4169,18 +4168,17 @@ nkcsource[data-type="attachment"] .article-attachment-reader{
 }
 
 /* 学术分隐藏 新*/
-nkcsource[data-type="xsf"]{
+span[data-type="xsf"]{
   border-style: solid;
   border-width: 1px;
   border-color: #ff6d6d;
   border-radius: 5px;
   padding: 5px;
-  display: block;
   background-color: #fff8f8;
-  display: inline-block;
+  display: block;
   width: 100%;
 }
-nkcsource[data-type="xsf"]>span:first-child{
+span[data-type="xsf"]>span:first-child{
   color: white;
   margin-bottom: 5px;
   background: #ff8888;
@@ -4188,7 +4186,7 @@ nkcsource[data-type="xsf"]>span:first-child{
   text-align: center;
   display: block;
 }
-nkcsource[data-type="xsf"]>span:last-child{
+span[data-type="xsf"]>span:last-child{
   border-style: dashed;
   background: white;
   border-width: 1px;

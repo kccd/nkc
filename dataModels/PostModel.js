@@ -1,7 +1,6 @@
 const settings = require('../settings');
 const nkcRender = require('../nkcModules/nkcRender');
 const {HTMLToPlain, renderHTML} = nkcRender;
-const cheerio = require("../nkcModules/nkcRender/cheerio");
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -385,6 +384,7 @@ postSchema.pre('save' , function(next) {
 
 
 // 
+/*
 postSchema.pre("save", async function(next) {
   this.c = nkcRender.renderHTML({
     type: "data",
@@ -392,6 +392,7 @@ postSchema.pre("save", async function(next) {
   });
   await next();
 });
+*/
 
 
 // 保存POST前检测内容是否有@
@@ -532,36 +533,7 @@ postSchema.pre('save', async function(next) {
   try {
     const ResourceModel = mongoose.model('resources');
     const {c, pid} = this;
-    const $ = cheerio.load(c);
-    let newResources = [];
-    $("nkcsource").each((index, el) => {
-      newResources.push($(el).data("id"));
-    })
-    
-	  let oldResources = await ResourceModel.find({references: pid}, {rid: 1});
-	  oldResources = oldResources.map(r => r.rid);
-
-	  // 未清除旧的资源对象上的pid，为了回滚历史时使用
-    /*// 从旧的资源对象中移除pid
-    for(const rid of oldResources) {
-      if(newResources.includes(rid)) continue;
-      await ResourceModel.updateOne({rid}, {
-        $pull: {
-          references: pid
-        }
-      });
-    }*/
-    // 将pid写到新的资源对象中
-    for(const rid of newResources) {
-      if(oldResources.includes(rid)) continue;
-      const resource = await ResourceModel.findOne({rid});
-      if(!resource) continue;
-      await resource.update({
-        $addToSet: {
-          references: pid
-        }
-      });
-    }
+    await ResourceModel.toReferenceSource(pid, c);
     return next()
   } catch(e) {
     return next(e)

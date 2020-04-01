@@ -1,10 +1,9 @@
 const Router = require("koa-router");
 const router = new Router();
-const nkcRender = require('../../nkcModules/nkcRender');
 
 router
   .get("/", async (ctx, next) => {
-    const {db, data, query, state, nkcModules} = ctx;
+    const {db, data, query, state} = ctx;
     const {type} = query;
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
@@ -15,7 +14,6 @@ router
     }
     ctx.template = "editor/editor.pug";
 
-    let referenceId;
     // 需要预制的专业和文章分类
     let selectedForumsId = [];
     let selectedCategoriesId = [];
@@ -47,7 +45,6 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.type = (thread.oc === data.post.pid)? "modifyThread": "modifyPost";
       const firstPost = await thread.extendFirstPost();
-      referenceId = data.post.pid;
       if(data.post.l !== "html") {
         ctx.template = "interface_editor.pug";
         data.content = data.post.c;
@@ -72,7 +69,6 @@ router
       const forum = await db.ForumModel.findOnly({fid: id});
       if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业说明");
       // 渲染nkcsource
-      referenceId = `forum-${forum.fid}`;
       data.post = {
         c: forum.declare
       };
@@ -228,16 +224,6 @@ router
       }
     }
     state.editorSettings = await db.SettingModel.getSettings("editor");
-    if(data.post && data.post.pid && referenceId) {
-      data.post.c = nkcModules.nkcRender.renderHTML({
-        type: "editor",
-        post: {
-          c: data.post.c,
-          resources: await db.ResourceModel.getResourcesByReference(referenceId)
-        },
-        user: data.user
-      })
-    }
     await next();
   });
 

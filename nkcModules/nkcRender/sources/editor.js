@@ -13,9 +13,18 @@ module.exports = {
     return html;
   },
   xsf(html, id) {
-    let $ = cheerio.load(html);
-    $("nkcsource").attr("data-message", `学术分${id}以上可见`);
-    $("nkcsource").attr("_rendered", "");
+    const $ = cheerio.load(html);
+    const nkcSource = $("nkcSource");
+    nkcSource.attr({
+      "data-message": `学术分${id}以上可见`,
+      "_rendered": ""
+    });
+    const content = nkcSource.html();
+    nkcSource.append(
+      $(`<strong></strong>`)
+        .html(content)
+        .css("font-weight", "normal")
+    );
     return $("body").html();
   },
   attachment(html, id, resource = {}) {
@@ -23,7 +32,7 @@ module.exports = {
       oname = "未知"
     } = resource;
     const url = getUrl("resource", id);
-    html = `<nkcsource data-type="attachment" data-id="${id}" contenteditable="false" _renderd><img src="/ueditor/themes/default/images/attachment.png"><a href="${url}" target="_blank" >${oname}</a></nkcsource>`;
+    html = `<nkcsource data-type="attachment" data-id="${id}" contenteditable="false" _renderd><img src="/ueditor/themes/default/images/attachment.png"><a href="${url}" target="_blank" contenteditable="false" data-aaa="asdfasdfa">${oname}</a></nkcsource>`;
     return html;
   },
   sticker(html, id) {
@@ -39,6 +48,7 @@ module.exports = {
   pre(html) {
     let $ = cheerio.load(html);
     $("nkcsource").attr("_rendered", "");
+    console.log(html)
     return $("body").html();
   },
   twemoji(html, id) {
@@ -48,7 +58,6 @@ module.exports = {
   },
   formula(html) {
     let $ = cheerio.load(html);
-    $("nkcsource").attr("contenteditable", "false");
     $("nkcsource").attr("_rendered", "");
     return $("body").html();
   }

@@ -268,12 +268,11 @@
     var newline = false;
     var handles = {
       "picture": function() {
-        nkcsource.style.display = "inline-block";
+        nkcsource.setAttribute("contenteditable", "false");
         return "<img src=\"/r/"+ rid +"\">";
       },
       "sticker": function() {
         nkcsource.setAttribute("contenteditable", "false");
-        nkcsource.style.display = "inline-block";
         return "<img src=\"/r/"+ rid +"\">";
       },
       "video": function() {
@@ -295,21 +294,25 @@
       "xsf": function() {
         newline = true;
         nkcsource.setAttribute("data-message", "学术分"+rid+"分以上可见");
-        return "<strong style='font-weight:normal;'><br></strong>";
+        return "<strong><br></strong>";
       },
       "twemoji": function() {
         nkcsource.setAttribute("contenteditable", "false");
-        nkcsource.style.display = "inline-block";
         return "<img src=\"/r/"+ rid +"\">";
       },
       "formula": function() {}
-    }
+    };
     var hit = handles[type];
     if(hit) {
       nkcsource.setAttribute("data-type", type);
       nkcsource.setAttribute("data-id", rid);
     }
     nkcsource.innerHTML = hit();
-    return nkcsource.outerHTML + (newline? "<span>"+ decodeURI("%E2%80%8E") +"<span>": "");
+    if(newline) {
+      return "<p>"+nkcsource.outerHTML+"&#8203;</p>"
+    } else {
+      return nkcsource.outerHTML;
+    }
+    return "&#8203;" + nkcsource.outerHTML + (newline? "&#8203;": "");
   }
 }());

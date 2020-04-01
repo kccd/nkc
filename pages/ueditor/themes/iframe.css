@@ -20,15 +20,26 @@ nkcsource {
 nkcsource + nkcsource {
   margin-top: 6px;
 }
-
-
-/* 学术分隐藏内容 */
+/* 图片 */
+nkcsource[data-type="picture"] {
+  max-width: 60%;
+}
+nkcsource[data-type="picture"] img{
+  user-select: none;
+}
+/*代码*/
+nkcsource[data-type="pre"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+  /* 学术分隐藏内容 */
 nkcsource[data-type="xsf"] {
   background-color: #d3edff;
   padding: 7px 10px;
   margin: 10px 0;
   border-left: 5px solid #ddd;
   width: 100%;
+  box-sizing: border-box;
 }
 nkcsource[data-type="xsf"]::before {
   content: attr(data-message);
@@ -37,25 +48,43 @@ nkcsource[data-type="xsf"]::before {
   cursor: pointer;
   display: block;
 }
+nkcsource[data-type="xsf"] strong{
+  display: block;
+  font-weight: normal;
+}
 
-/* 附件 */
+  /* 附件 */
 nkcsource[data-type="attachment"] {
-  padding: 0.5rem;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
-  border-radius: 2px;
-  border: 1px solid #d6d6d6;
-  background: #fff;
-  width: 100%;
+  background-color: rgb(241, 243, 244);
+  height: 48px;
+  line-height: 48px;
+  width: 60%;
+  box-sizing: border-box;
+  padding-left: 48px;
+  position: relative;
+  border: 1px solid #d8d8d8;
 }
 nkcsource[data-type="attachment"] > img {
-  height: 22px;
+  height: 32px;
+  width: 32px;
+  user-select: none;
+  position: absolute;
+  left: 8px;
+  top: 8px;
+}
+nkcsource[data-type="attachment"] > a{
+  font-size: 15px;
+  text-decoration: none;
+  color: #555;
 }
 
 
-/* 公式 */
+  /* 公式 */
 nkcsource[data-type="formula"] {
-  background-color: rgb(225, 255, 225);
+  background-color: #d3edff;
   text-align: center;
+  box-sizing: border-box;
+  padding: 2px;
 }
 nkcsource[data-type="formula"][data-id="3"],
 nkcsource[data-type="formula"][data-id="4"] {
@@ -65,16 +94,24 @@ nkcsource[data-type="formula"][data-id="4"] {
 
 /* 视频 */
 nkcsource[data-type="video"] {
-  background-color: rgb(0, 0, 0);
-  text-align: center;
-  width: 100%;
-}
-
-/* 音频 */
-nkcsource[data-type="audio"] {
   background-color: rgb(241, 243, 244);
   text-align: center;
   width: 100%;
+  border: 1px solid #d8d8d8;
+  font-size: 0;
+}
+nkcsource[data-type="video"] video{
+  width: 60%;
+}
+
+  /* 音频 */
+nkcsource[data-type="audio"] {
+  background-color: rgb(241, 243, 244);
+  text-align: center;
+  width: 60%;
+  box-sizing: border-box;
+  border: 1px solid #d8d8d8;
+  font-size: 0;
 }
 nkcsource[data-type="audio"] > audio:focus {
   outline: none;

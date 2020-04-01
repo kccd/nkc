@@ -23,15 +23,7 @@ settingsRouter
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
 		if(s === 3) {
-			if(applicationForm.project && applicationForm.project.c) {
-				applicationForm.project.c = nkcModules.nkcRender.renderHTML({
-					type: "editor",
-					post: {
-						c: applicationForm.project.c,
-						resources: await db.ResourceModel.getResourcesByReference(`fund-${applicationForm.project._id}`)
-					}
-				})
-			}
+			
 		}
 		if(s === 4) {
       data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);

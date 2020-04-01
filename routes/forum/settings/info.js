@@ -13,13 +13,6 @@ infoRouter
 		const {forum} = data;
 		let {did, operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId} = body;
 		if(operation && operation === 'updateDeclare') {
-			// 把回传的富文本内容处理指定的格式再入库
-			declare = nkcRender.renderHTML({
-				type: "data",
-				post: {
-					c: declare
-				}
-			})
 			// 富文本内容中每一个source添加引用
 			await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
 			

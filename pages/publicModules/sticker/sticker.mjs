@@ -85,10 +85,10 @@ class StickerViewer {
           }
 
           // 新
-          const dom2 = $("nkcsource[data-type='sticker']");
+          const dom2 = $("span[data-tag='nkcsource'][data-type='sticker']");
           dom2.each(function() {
             const d = $(this);
-            if(d.attr("data-sticker-init") === "true") reutrn;
+            if(d.attr("data-sticker-init") === "true") return;
             d.on("click", function() {
               self.app.open($(this).attr("data-id"), !!$(this).attr("data-sticker-management"));
             });
