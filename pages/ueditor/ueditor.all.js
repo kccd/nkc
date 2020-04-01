@@ -7241,7 +7241,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             var root = UE.htmlparser(me.body.innerHTML,ignoreBlank);
             me.filterOutputRule(root);
             me.fireEvent('aftergetcontent', cmd,root);
-            return  root.toHtml(formatter);
+            var content = root.toHtml(formatter);
+            content = NKC.methods.ueditor.getContent(content);      // emoji图片换成字符
+            return  content;
         },
 
         /**
@@ -7340,6 +7342,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         setContent: function (html, isAppendTo, notFireSelectionchange) {
             var me = this;
 
+            html = NKC.methods.ueditor.setContent(html);  
             me.fireEvent('beforesetcontent', html);
             var root = UE.htmlparser(html);
             me.filterInputRule(root);
@@ -8034,6 +8037,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
         }
     };
+
     utils.inherits(Editor, EventBase);
 })();
 
@@ -29825,6 +29829,7 @@ UE.ui = baidu.editor.ui = {};
         })
 
     }
+    
 
 })();
 

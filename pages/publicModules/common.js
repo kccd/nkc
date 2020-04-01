@@ -496,3 +496,41 @@ NKC.methods.getIpInfo = function(ip) {
 			return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.province + info.city +"</p>")
 		})
 };
+
+
+
+
+
+/**
+ * ueditor设置内容和获取内容
+ */
+NKC.methods.ueditor = {
+  getContent: function(content){
+    content = replaceTwemoji(content);
+    return content;
+  },
+  setContent: function(html) {
+    html = replaceEmojiChar(html);
+    return html;
+  }
+}
+
+// 处理emoji 20200401
+// 将正文中的twemoji部分替换成emoji字符
+function replaceTwemoji(content) {
+  var parser = document.createElement("div");
+  parser.innerHTML = content;
+  $(parser)
+    .find("[data-tag='nkcsource'][data-type='twemoji']")
+    .each(function(index, imgElem) {
+      $(imgElem).replaceWith(imgElem.dataset.char);
+    })
+  return parser.innerHTML;
+}
+// 将正文中的emoji字符替换成twemoji Img标签
+function replaceEmojiChar(content) {
+  return twemoji.replace(content, function(char) {
+    var id = twemoji.convert.toCodePoint(char);
+    return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ id +"' data-char='"+ char +"' src=\"/twemoji/2/svg/"+ id +".svg\">"
+  })
+}
