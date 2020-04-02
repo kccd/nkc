@@ -173,7 +173,7 @@ block title
         if disablePost
           li
             -const ipoc = post.iplm || post.ipoc;
-            a(href=`http://www.ip138.com/ips138.asp?ip=${ipoc.toString()}&action=2` title=ipoc target='_blank')
+            a(onclick=`NKC.methods.getIpInfo('${ipoc}')` title=ipoc target='_blank')
               span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
 
   mixin postEditTime(post)
@@ -258,10 +258,7 @@ block content
                                 button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'unPush')`) 取消热销
                               else
                                 button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'push')`) 设为热销
-                            //-if data.userOperationsId.includes('homeTop') && !data.ads.movable.includes(data.thread.tid) && !data.ads.fixed.includes(data.thread.tid)
-                              button.btn.btn-default.btn-sm#threadTop(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
-                            //-if data.userOperationsId.includes('unHomeTop') && (data.ads.movable.includes(data.thread.tid) || data.ads.fixed.includes(data.thread.tid))
-                              button.btn.btn-default.btn-sm#threadTop(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
+
                             if data.userOperationsId.includes('closeThread') && !thread.closed
                               button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
                             if data.userOperationsId.includes('openThread') && thread.closed
@@ -272,21 +269,6 @@ block content
                               button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
                           if data.thread.type === "fund"
                             h5.text-danger 科创基金类文章无法退修
-                          //-if permission('addThreadForum') || permission("removeThreadForum") || permission('moveThread') || permission("moveDraft")
-                            div
-                              if permission('addThreadForum') || permission("removeThreadForum")
-                                div(v-if='forums.length !== 0')
-                                  h5 已选择专业
-                                  div
-                                    for forum in thread.forums
-                                      span(style=`border-radius: 4px;display: inline-block;margin-right: 0.5rem;color: #fff;padding: 0.5rem 1rem;background-color: ${forum.color}`)=`${forum.forumType === 'topic'?'(话题)':'(学科)'}${forum.displayName}`
-                                        .fa.fa-remove(style='cursor: pointer;' onclick=`removeForumsId("${data.thread.tid}", "${forum.fid}")`)
-
-                              if permission('moveThread') || permission("moveDraft")
-                                if data.thread.type === "fund"
-                                  h5.text-danger 科创基金类文章无法退修
-                                div(style='margin-top:0.5rem;')
-                                  button.btn.btn-danger.btn-sm(type="button" class="btn btn-primary" data-toggle="modal" data-target="#recycleModal" data-whatever="@mdo") 退修或删除
 
                 .col-xs-12.col-md-12
                   .row
@@ -300,7 +282,6 @@ block content
                       if thread.type !== "fund"
                         .h3.thread-title.text-center= thread.firstPost.t
                       -const post = thread.firstPost;
-                      -post.c = hideContentByUser(post.c, data.user, 'thread')
                       if post.authorInfos && post.authorInfos.length > 0 && data.thread.type !== "product"
                         -var agencyIndex = 1;
                         -var agencyArray = [];
@@ -407,7 +388,8 @@ block content
                                       span.keyWordstagEn(style="cursor:pointer" onclick=`turnSearch("${keyEn}")`)!=keyEn
                       if data.paging.page === 0
                         if data.thread.type === "article"
-                          div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
+                          //- div.thread-content.ThreadPostBody#thread-content!= experimental_render(post)
+                          div.thread-content.ThreadPostBody#thread-content!= post.c
                         else if data.thread.type === "product"
                           div.thread-content.ThreadPostBody
                             include ./product/product.pug
@@ -416,14 +398,14 @@ block content
                           div.thread-content.ThreadPostBody#thread-content
                             include ./fund/fund.pug
                         +postEditTime(post)
-                        -const creditPost = data.posts[0];
+                        -const creditPost = data.thread.firstPost;
                         include ./postCredits
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
-                          div.ThreadPostBody#thread-content!= experimental_render(post)
+                          div.ThreadPostBody#thread-content!= post.c
                           +postEditTime(post)
-                          -const creditPost = data.posts[0];
+                          -const creditPost = data.thread.firstPost;
                           include ./postCredits
                         .text-center
                           .showThreadContentBtn(onclick='showThreadContent()' hide-text='收起') 加载全文
@@ -514,108 +496,116 @@ block content
                     -const disabledHighlight = true;
                     for post, index in data.toppedPosts
                       include single_post
-          if data.posts.length
-            mixin managePosts
-              .paging-button
-                a.button.radius-left(onclick="managePosts()") 管理
-                a.button(onclick="markAllPosts()") 全选
-                a.button.radius-right(onclick="disabledMarkedPosts()") 屏蔽或退修
-            div
-              .row
-                .thread-div
-                  .col-xs-12.col-md-12
-                    .row
-                      .col-xs-12.col-md-12(style='margin-top: 1rem;')
-                        include ../publicModules/paging/paging
-                        //-include ../interface_navigation_paging
-                        //-if- !data.thread.firstPost.anonymous
-                        .paging-button
-                          a.button.radius-left(href=`/t/${thread.tid}` class=data.t!=="author"?"active":"")  全部
-                          a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t==="author"?"active":"")  只看作者
-                        if disablePost
-                          //- 回复的批量管理
-                          +managePosts
+          //if data.posts.length
+          mixin managePosts
+            .paging-button
+              a.button.radius-left(onclick="managePosts()") 管理
+              a.button(onclick="markAllPosts()") 全选
+              a.button.radius-right(onclick="disabledMarkedPosts()") 屏蔽或退修
+          div
+            .row
+              .thread-div
+                .col-xs-12.col-md-12
+                  .row
+                    .col-xs-12.col-md-12(style='margin-top: 1rem;')
+                      include ../publicModules/paging/paging
+                      //-include ../interface_navigation_paging
+                      //-if- !data.thread.firstPost.anonymous
+                      .paging-button
+                        a.button.radius-left(href=`/t/${thread.tid}` class=data.t!=="author"?"active":"")  全部
+                        a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t==="author"?"active":"")  只看作者
+                      if disablePost
+                        //- 回复的批量管理
+                        +managePosts
 
-                      .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
-                        for post, index in data.posts
-                          if index !== 0 || data.paging.page !== 0
-                            //- 文章作者的post无需折叠
-                            -let disabledHidePost;
-                            if data.thread.uid && post.uid && data.thread.uid === post.uid
-                              //- 作者的回复不折叠
-                              -disabledHidePost = true;
-                            else
-                              //- 服务器根据证书判断的该用户的回复是否需要折叠
-                              -disabledHidePost = !['half', 'all'].includes(post.hidePost);
-                              //- -disabledHidePost = !post.hide;
-                            -let previousPost;
-                            if index !== 1
-                              -previousPost = data.posts[index-1];
-                            include single_post
+                    .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
+                      for post, index in data.posts
+                        //- 文章作者的post无需折叠
+                        -let disabledHidePost;
+                        if data.thread.uid && post.uid && data.thread.uid === post.uid
+                          //- 作者的回复不折叠
+                          -disabledHidePost = true;
+                        else
+                          //- 服务器根据证书判断的该用户的回复是否需要折叠
+                          -disabledHidePost = !['half', 'all'].includes(post.hidePost);
+                          //- -disabledHidePost = !post.hide;
+                        -let previousPost;
+                        if index !== 1
+                          -previousPost = data.posts[index-1];
+                        include single_post
+                    .col-xs-12.col-md-12
+                      include ../publicModules/paging/paging_input
+                      if disablePost
+                        //- 回复的批量管理
+                        +managePosts
+                    if data.user
                       .col-xs-12.col-md-12
-                        include ../publicModules/paging/paging_input
-                        if disablePost
-                          //- 回复的批量管理
-                          +managePosts
-                      if data.user
-                        .col-xs-12.col-md-12
-                          - var hasMobile = data.user.authLevel > 0;
+                        - var hasMobile = data.user.authLevel > 0;
 
-                          //- 回复的输入面板
-                          mixin inputPanel
-                            .form-group
-                              div#quoteContent
-                            .form-group
-                              div#quoteCancel(style='display: none')
-                                button#quoteCancel.ForumThreadHasImage(style='background-color: #337ab7' onclick=`cancelQuote()`) 取消引用
-                            .form-group(style="background-color:#fff;")
-                              script#container(name='content', type='text/plain')
-                            .row
-                              .col-xs-12
-                                label(style="font-size:16px") 专栏
-                                include ../editor/toColumn
+                        //- 回复的输入面板
+                        mixin inputPanel
+                          .form-group
+                            #quoteContent(v-cloak v-if="pid")
+                              blockquote.quote-post
+                                .quote-cancel(@click="clear")
+                                  .fa.fa-remove
+                                .quote-position
+                                  | 引用
+                                  a(:href="'/u/' + uid" target="_blank" v-if="uid") {{username}}
+                                  span(v-else) {{username}}
+                                  | 发表于
+                                  a(:href="getUrl('post', pid, true)" target="_blank") {{step}}
+                                  | 楼的内容
+                                .quote-content {{c}}
 
-                                if data.sendAnonymousPost
-                                  .checkbox
-                                    label
-                                      if data.user && data.thread && data.thread.firstPost && data.thread.firstPost.ownPost && data.thread.firstPost.anonymous
-                                        input#sendAnonymousPost(type='checkbox' checked=true)
-                                      else
-                                        input#sendAnonymousPost(type='checkbox')
-                                      span 匿名发表
-                                //-
-                                  if state.userColumn && !data.addedToColumn
-                                    -const column = state.userColumn
-                                    include ../publicModules/toColumn/selectCategories
-                                div
-                                  .checkbox
-                                    label
-                                      input#protocolCheckbox(type="checkbox" checked=true)
-                                      span
-                                        | 我已阅读并同意遵守与本次发表相关的全部协议。
-                                        a(href=`/protocol` target="_blank") 查看协议
-                                .form-group
-                                  button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
-                                  button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
-                                  button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
-                          //- 主题已关闭
-                          if thread.closed
-                            .col-xs-12.col-md-12(style='margin: 2rem 0;')
-                              .h4.text-center(style='color: #aaaaaa;')
-                                span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复/评论
-                          else
-                            //- 发表权限判断
-                            include ./postPermission
-                            if showEditor
-                              +inputPanel
+                          .form-group(style="background-color:#fff;")
+                            script#container(name='content', type='text/plain')
+                          .row
+                            .col-xs-12
+                              label(style="font-size:16px") 专栏
+                              include ../editor/toColumn
 
-                      else
-                        .col-xs-12.col-md-12
-                          p 想参与大家的讨论？现在就&nbsp;
-                            a.pointer(onclick="NKC.methods.toLogin('login')") 登录
-                            | &nbsp;或者&nbsp;
-                            a.pointer(onclick="NKC.methods.toLogin('register')") 注册
-                            | 。
+                              if data.sendAnonymousPost
+                                .checkbox
+                                  label
+                                    if data.user && data.thread && data.thread.firstPost && data.thread.firstPost.ownPost && data.thread.firstPost.anonymous
+                                      input#sendAnonymousPost(type='checkbox' checked=true)
+                                    else
+                                      input#sendAnonymousPost(type='checkbox')
+                                    span 匿名发表
+                              //-
+                                if state.userColumn && !data.addedToColumn
+                                  -const column = state.userColumn
+                                  include ../publicModules/toColumn/selectCategories
+                              div
+                                .checkbox
+                                  label
+                                    input#protocolCheckbox(type="checkbox" checked=true)
+                                    span
+                                      | 我已阅读并同意遵守与本次发表相关的全部协议。
+                                      a(href=`/protocol` target="_blank") 查看协议
+                              .form-group
+                                button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
+                                button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
+                                button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
+                        //- 主题已关闭
+                        if thread.closed
+                          .col-xs-12.col-md-12(style='margin: 2rem 0;')
+                            .h4.text-center(style='color: #aaaaaa;')
+                              span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复/评论
+                        else
+                          //- 发表权限判断
+                          include ./postPermission
+                          if showEditor
+                            +inputPanel
+
+                    else
+                      .col-xs-12.col-md-12
+                        p 想参与大家的讨论？现在就&nbsp;
+                          a.pointer(onclick="NKC.methods.toLogin('login')") 登录
+                          | &nbsp;或者&nbsp;
+                          a.pointer(onclick="NKC.methods.toLogin('register')") 注册
+                          | 。
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"
@@ -679,7 +669,7 @@ block scripts
   script=`NKC.configs.postHeight.md=${data.postHeight.md}`
   script=`NKC.configs.postHeight.float=${data.postHeight.float || 0.5}`
   script(src='/commonmark/dist/commonmark.js')
-  script(src='/plain_escaper.js')
+  script(src='/plainEscaper.js')
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')
 
@@ -695,6 +685,7 @@ block scripts
   include ../publicModules/selectDraft/selectDraft
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../publicModules/insertHideContent/insertHideContent
   //-include ../publicModules/highlight/highlight_editor
   include ../publicModules/highlight/highlight
   include ../publicModules/complaint/complaint

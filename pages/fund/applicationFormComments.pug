@@ -12,4 +12,4 @@ if data.comments
             span=post.user.username
         .form-time=fromNow(post.toc)
         -post.c = hideContentByUser(post.c, data.user, 'thread')
-        .form-comment-content!=experimental_render(post)
+        .form-comment-content!=post.c

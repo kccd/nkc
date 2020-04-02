@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const cheerio = require('cheerio');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
@@ -108,6 +109,32 @@ resourceSchema.methods.getFilePath = async function() {
   return filePath;
 };
 
+// 检测html内容中的资源并将指定id存入resource.reference
+resourceSchema.statics.toReferenceSource = async function(id, declare) {
+  const model = mongoose.model("resources");
+	const $ = cheerio.load(declare);
+  const resourcesId = [];
+  $(`[data-tag="nkcsource"]`).each((index, el) => {
+    el = $(el);
+    const {type, id} = el.data();
+    if(!["picture", "video", "audio", "attachment"].includes(type)) return;
+    resourcesId.push(id);
+  });
+  await model.updateMany({
+    rid: {$in: resourcesId}
+  }, {
+    $addToSet: {
+      references: id
+    }
+  });
+};
+
+
+// 查找一个post引用的所有source
+resourceSchema.statics.getResourcesByReference = async function(id) {
+  let model = mongoose.model("resources");
+  return await model.find({references: id});
+};
 
 
 module.exports = mongoose.model('resources', resourceSchema);

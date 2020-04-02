@@ -1,25 +1,32 @@
 const settings = require('../settings');
+const nkcRender = require('../nkcModules/nkcRender');
+const {HTMLToPlain, renderHTML} = nkcRender;
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
 const postSchema = new Schema({
+  // post id
   pid: {
     type: String,
     unique: true,
     required: true
   },
+  // 已经@过的用户
   atUsers: {
     type: [Schema.Types.Mixed],
     default: []
   },
+  // 富文本内容
   c: {
     type: String,
     default: ''
   },
+  // 旧 平学术分和科创币
   credits: {
     type: [Schema.Types.Mixed],
     default: []
   },
+  // 是否被屏蔽
   disabled: {
     type: Boolean,
     default: false,
@@ -31,26 +38,35 @@ const postSchema = new Schema({
 		default: null,
 		index: 1
 	},
+  // 创建者的ip
   ipoc: {
     type: String,
     default: '0.0.0.0'
   },
+  // 修改者的ip
   iplm: {
     type: String,
   },
+  // 旧 内容格式，数据统一成了html
   l: {
     type: String,
     default: "html",
   },
+  // 旧 收藏的用户
   recUsers: {
     type: [String],
 	  index: 1,
     default: []
   },
-  // 引用的PID
+  // 旧 引用的PID
   rpid: {
     type: [String],
     default: []
+  },
+  // 引用的post id
+  quote: {
+    type: String,
+    default: ""
   },
   // 所有上级post
   parentPostsId: {
@@ -69,15 +85,11 @@ const postSchema = new Schema({
     type: Number,
     default: 0
   },
+  // 标题
   t: {
     type: String,
     default: ''
   },
-  /* fid: {
-    type: String,
-    required: true,
-    index: 1
-  }, */
   // 主要分类
   mainForumsId: {
     type: [String],
@@ -96,53 +108,64 @@ const postSchema = new Schema({
     default: [],
     index: 1
   },
+  // 所属文章ID
   tid: {
     type: String,
     required: true,
     index: 1
   },
+  // 创建的时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 修改的时间
   tlm: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 发表者ID
   uid: {
     type: String,
     required: true,
     index: 1
   },
+  // 修改者ID
   uidlm: {
     type: String,
     index: 1
   },
+  // 旧 文章是否有图
   hasImage: {
     type: Boolean,
     index: 1,
     default: false
   },
+  // 是否隐藏历史记录
 	hideHistories: {
   	type: Boolean,
 		default: false
 	},
+  // 是否加精
 	digest: {
   	type: Boolean,
 		default: false,
 		index: 1
 	},
+  // 加精的时间
   digestTime: {
     type: Date,
     default: null,
     index: 1
   },
+  // 支持数
   voteUp: {
     type: Number,
     default: 0
   },
+  // 反对数
   voteDown: {
     type: Number,
     default: 0
@@ -221,18 +244,7 @@ const postSchema = new Schema({
   virtuals: true
 }});
 
-postSchema.pre('save' , function(next) {
-  if(!this.iplm) {
-    this.iplm = this.ipoc;
-  }
-  if(!this.tlm) {
-    this.tlm = this.toc;
-  }
-  if(!this.uidlm) {
-    this.uidlm = this.uid;
-  }
-  next();
-});
+
 
 postSchema.virtual('reason')
   .get(function() {
@@ -354,6 +366,33 @@ postSchema.methods.ensurePermission = async function(options) {
     }
   }
 };
+
+
+// 
+postSchema.pre('save' , function(next) {
+  if(!this.iplm) {
+    this.iplm = this.ipoc;
+  }
+  if(!this.tlm) {
+    this.tlm = this.toc;
+  }
+  if(!this.uidlm) {
+    this.uidlm = this.uid;
+  }
+  next();
+});
+
+
+// 
+/*
+postSchema.pre("save", async function(next) {
+  this.c = nkcRender.renderHTML({
+    type: "data",
+    post: this
+  });
+  await next();
+});
+*/
 
 
 // 保存POST前检测内容是否有@
@@ -493,39 +532,8 @@ postSchema.pre('save', async function(next) {
   // correct reference to the post
   try {
     const ResourceModel = mongoose.model('resources');
-	  const {c, pid, l} = this;
-	  let newResources = [];
-	  if(l !== 'html') {
-		  newResources = (c.match(/{r=[0-9]{1,20}}/g) || [])
-		    .map(str => str.replace(/{r=([0-9]{1,20})}/, '$1'));
-	  } else {
-		  newResources = (c.match(/\/r\/[0-9]{1,20}/g) || [])
-			  .map(str => str.replace(/\/r\/([0-9]{1,20})/, '$1'));
-	  }
-	  let oldResources = await ResourceModel.find({references: pid}, {rid: 1});
-	  oldResources = oldResources.map(r => r.rid);
-
-	  // 未清除旧的资源对象上的pid，为了回滚历史时使用
-    /*// 从旧的资源对象中移除pid
-    for(const rid of oldResources) {
-      if(newResources.includes(rid)) continue;
-      await ResourceModel.updateOne({rid}, {
-        $pull: {
-          references: pid
-        }
-      });
-    }*/
-    // 将pid写到新的资源对象中
-    for(const rid of newResources) {
-      if(oldResources.includes(rid)) continue;
-      const resource = await ResourceModel.findOne({rid});
-      if(!resource) continue;
-      await resource.update({
-        $addToSet: {
-          references: pid
-        }
-      });
-    }
+    const {c, pid} = this;
+    await ResourceModel.toReferenceSource(pid, c);
     return next()
   } catch(e) {
     return next(e)
@@ -605,6 +613,8 @@ postSchema.post('save', async function(doc, next) {
 });
 
 const defaultOptions = {
+  visitor: {xsf: 0},
+  renderHTML: true,
   user: true,
   userGrade: true,
   resource: true,
@@ -612,9 +622,14 @@ const defaultOptions = {
   credit: true,
   showAnonymousUser: false,
   excludeAnonymousPost: false,
-  url: false
+  url: false,
+  quote: true, // 仅支持同一篇文章
 };
-
+postSchema.statics.extendPost = async (post, options) => {
+  const PostModel = mongoose.model("posts");
+  const posts = await PostModel.extendPosts([post], options);
+  return posts[0];
+};
 postSchema.statics.extendPosts = async (posts, options) => {
   // 若需要判断用户是否点赞点踩，需要options.user
   const UserModel = mongoose.model('users');
@@ -628,6 +643,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
   Object.assign(o, options);
   o.usersVote = o.usersVote && !!o.uid;
   const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {}, voteObj = {}, kcbsRecordsObj = {}, xsfsRecordsObj = {};
+  let postsId = [], postsObj = {};
   let grades, resources;
   posts.map(post => {
     pid.add(post.pid);
@@ -686,8 +702,22 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
   }
 
+  if(posts.length) {
+    const tid = posts[0].tid;
+    const quotePosts = await PostModel.find({tid, parentPostId: ""}, {
+      pid: 1, c: 1, uid: 1, anonymous: 1
+    }).sort({toc: 1});
+    postsId = quotePosts.map(q => {
+      postsObj[q.pid] = q;
+      return q.pid;
+    });
+  }
+
   const results = [];
-  for(const post of posts) {
+  for(let post of posts) {
+    if(post.toObject) {
+      post = post.toObject();
+    }
     post.ownPost = post.uid === o.uid;
     if(post.anonymous && o.excludeAnonymousPost) continue;
     post.credits = [];
@@ -727,7 +757,39 @@ postSchema.statics.extendPosts = async (posts, options) => {
     if(o.url) {
       post.url = await PostModel.getUrl(post.pid);
     }
-    results.push(post.toObject());
+    // 如果存在引用
+    if(o.quote && post.quote) {
+      const quotePost = postsObj[post.quote];
+      const index = postsId.indexOf(post.quote);
+      if(index !== -1 && quotePost) {
+        let username, uid;
+        if(quotePost.anonymous) {
+          username = "匿名用户";
+        } else {
+          const user = await UserModel.findOne({uid: quotePost.uid}, {username: 1});
+          username = user.username;
+          uid = quotePost.uid;
+        }
+        const c = HTMLToPlain(quotePost.c, 50);
+        post.quotePost = {
+          pid: quotePost.pid,
+          username,
+          uid,
+          step: index,
+          c
+        }
+      }
+    }
+    // 如果需要渲染html
+    if(o.renderHTML) {
+      post.c = renderHTML({
+        type: "article",
+        post,
+        user: o.visitor
+      });
+    }
+    post.step = postsId.indexOf(post.pid);
+    results.push(post);
   }
   return results;
 };
@@ -1019,5 +1081,4 @@ postSchema.statics.ensureHidePostPermission = async (thread, user) => {
   }
   return false;
 };
-
 module.exports = mongoose.model('posts', postSchema);

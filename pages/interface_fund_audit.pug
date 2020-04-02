@@ -87,7 +87,7 @@ block content
                   if fund.detailedProject
                     p= project.abstract
                     br
-                  div#projectContent!= experimental_render(project)
+                  div#projectContent!=project.c
                   hr
                   h4= `学科分类：${applicationForm.forum.displayName}`
                   h4= `研究周期：${applicationForm.projectCycle}天`
@@ -235,7 +235,7 @@ block content
               if fund.detailedProject
                 p= project.abstract
                 br
-              div#projectContent!= experimental_render(project)
+              div#projectContent!=project.c
               hr
               h4= `学科分类：${applicationForm.forum.displayName}`
               h4= `研究周期：${applicationForm.projectCycle}天`

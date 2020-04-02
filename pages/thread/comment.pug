@@ -70,7 +70,7 @@ if data.highlight === comment.pid
       -const votePost = comment;
       include ../module_vote
     -comment.c = hideContentByUser(comment.c, data.user, 'thread')
-    .post-comment-content!=experimental_render(comment)
+    .post-comment-content!=comment.c
     -let creditPost = comment;
     include ./postCredits
   div

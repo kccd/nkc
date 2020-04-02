@@ -150,82 +150,32 @@ threadRouter
       data.threads = threads;
     }
     await next();
-    /*const {from, keywords, applicationFormId, self} = query;
-		if(from === 'applicationForm') {
-			const outPostObj = (post) => {
-				return {
-					toc: post.toc.toLocaleString(),
-					tid: post.tid,
-					username: post.user.username,
-					uid: post.uid,
-					t: post.t,
-					pid: post.pid
-				}
-			};
-			const perpage = (page, length) => {
-				const perpage = 20;
-				const start = perpage*page;
-				return {
-					page,
-					start,
-					perpage,
-					pageCount: Math.ceil(length/perpage)
-				}
-			};
-			const page = query.page? parseInt(query.page): 0;
-			data.paging = {page: 0, pageCount: 1, perpage: 8};
-			const threads = [];
-			let targetThreads = [];
-			if(self === 'true') {
-				const length = await db.ThreadModel.count({uid: user.uid, disabled: false});
-				const paging= perpage(page, length);
-				targetThreads = await db.ThreadModel.find({uid: user.uid, disabled: false}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-				data.paging = paging;
-			} else {
-				const applicationForm = await db.FundApplicationFormModel.findOnly({_id: applicationFormId});
-				const users = await applicationForm.extendMembers();
-				const usersId = users.map(u => u.uid);
-				usersId.push(user.uid);
-				const post = await db.PostModel.findOne({pid: keywords, uid: {$in: usersId}, disabled: false});
-				if(post !== null) {
-					await post.extendThread();
-					if(post.pid === post.thread.oc) {
-						await post.extendUser();
-						threads.push(outPostObj(post));
-					}
-				}
-				const targetUser = await db.UserModel.findOne({usernameLowerCase: keywords.toLowerCase()});
-				if(targetUser !== null && usersId.includes(targetUser.uid)) {
-					const length = await db.ThreadModel.count({uid: targetUser.uid, disabled: false});
-					const paging = perpage(page, length);
-					targetThreads = await db.ThreadModel.find({uid: targetUser.uid, disabled: false}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-					data.paging = paging;
-				}
-			}
-			for(let t of targetThreads) {
-				const post = await t.extendFirstPost();
-				await post.extendUser();
-				threads.push(outPostObj(post))
-			}
-			data.threads = threads;
-		}
-		await next();*/
 	})
 	.get('/:tid', async (ctx, next) => {
-		const {data, params, db, query, nkcModules, body, state} = ctx;
+    const {data, params, db, query, nkcModules, state} = ctx;
 		let {token, paraId} = query;
 		let {page = 0, pid, last_page, highlight, step, t} = query;
     let {tid} = params;
+    const extendPostOptions = {
+      uid: data.user?data.user.uid: '',
+      visitor: data.user, // 用于渲染页面时比对学术分隐藏
+    };
+    // 适配旧链接，去掉tid尾部非数字的部分
     try{
       const arr = tid.match(/^[0-9]+/);
       if(arr && arr.length) tid = arr[0];
     } catch(err) {}
+    // 高亮的postID
 		data.highlight = highlight;
+    // 【待改】加载投诉类型，可改为点击投诉，弹出弹窗时再从服务器拿取数据
 		data.complaintTypes = ctx.state.language.complaintTypes;
+		// 加载文章，如果文章不存在，此处会抛出404
     const thread = await db.ThreadModel.findOnly({tid});
+    // 拓展文章所属专业
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
 		// 验证权限 - new
 		// 如果是分享出去的连接，含有token，则允许直接访问
+    // 【待改】判断用户是否是通过分享链接阅读文章，如果是则越过权限
 		if(!token){
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 		}else{
@@ -259,14 +209,17 @@ threadRouter
 			}
 			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
     }
-    // 加载用户的帖子
+    // 获取当前用户有权查看文章的专业ID
     const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
+		// 获取当前文章所在的专业（不含用户无权访问的专业）
     const mainForums = forums.filter(forum => thread.mainForumsId.includes(forum.fid));
+    // 文章的专业导航
     data.forumsNav = [];
     for(const f of thread.mainForumsId) {
       const nav = await db.ForumModel.getForumNav(fidOfCanGetThreads, f);
       if(nav.length) data.forumsNav.push(nav);
     }
+    // 判断用户是否具有专家权限
     let isModerator = ctx.permission('superModerator');
     if(!isModerator) {
       // 若用户为某个父级专业的专家，则用户具有专家权限
@@ -277,31 +230,38 @@ threadRouter
     }
 		data.isModerator = isModerator;
 
-    // 此人不是专家且文章
+    // 文章处于待审核的状态
+    // 若当前用户不是专家、不是作者，则在此抛出403
     if(!thread.reviewed) {
       if(!data.user || (!isModerator && data.user.uid !== thread.uid)) ctx.throw(403, "文章还未通过审核，暂无法阅读");
     }
 
-
-		// const breadcrumbForums = await forum.getBreadcrumbForums();
-		// 判断文章是否被退回或被彻底屏蔽
+		// 文章处于已被退回的状态
 		if(thread.recycleMark) {
+		  // 用户不具有专家权限
 			if(!isModerator) {
-				// 访问用户没有查看被退回帖子的权限，若不是自己发表的文章则报权限不足
+				// 访问用户没有查看被退回文章的权限，且不是自己发表的文章则抛出403
 				if(!data.userOperationsId.includes('displayRecycleMarkThreads')) {
 					if(!data.user || thread.uid !== data.user.uid) ctx.throw(403, '文章已被退回修改，暂无法阅读。');
 				}
 			}
-			// 取出帖子被退回的原因
+			// 获取文章被退回的原因
 			const threadLogOne = await db.DelPostLogModel.findOne({"threadId":tid,"postType":"thread","delType":"toDraft","modifyType":false}).sort({toc: -1});
 			thread.reason = threadLogOne.reason || '';
 		}
-		const firstPost = await db.PostModel.findOne({pid: thread.oc}, {anonymous: 1});
-		if(!firstPost) ctx.throw(500, `未找到id为${thread.oc}的post`);
+
+		// 加载文章的首条POST并拓展（包含文章文本内容）
+    let firstPost = await db.PostModel.findOne({pid: thread.oc});
+		if(!firstPost) ctx.throw(500, `文章数据错误，oc:${thread.oc}`);
+    firstPost = await db.PostModel.extendPost(firstPost, extendPostOptions);
+		thread.firstPost = firstPost;
+		// 设置匿名标志，前端页面会根据此标志，判断是否默认勾选匿名发表勾选框
     data.anonymous = firstPost.anonymous;
-		// 构建查询条件
+
+    // 查询文章的回复
 		const match = {
 			tid,
+      type: "post",
       parentPostsId: {
 			  $size: 0
       }
@@ -367,12 +327,14 @@ threadRouter
     } else {
 		  match.reviewed = true;
     }
-		// 统计post总数，分页
-    const pageSettings = (await db.SettingModel.findOnly({_id: "page"})).c;
-		const count = await db.PostModel.count(match);
+    // 获取分页设置
+    const {pageSettings} = state;
+    // 获取当前文章下回复的总数目
+    const count = await db.PostModel.count(match);
 		const paging_ = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		const {pageCount} = paging_;
-		// 删除退休超时的post
+
+		//【待改】删除退休超时的post
 		const postAll = await db.PostModel.find({tid:tid,toDraft:true});
 		for(let postSin of postAll){
 			let onLog = await db.DelPostLogModel.findOne({delType: 'toDraft', postType: 'post', postId: postSin.pid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}})
@@ -386,19 +348,20 @@ threadRouter
 			}
 		}
 		await db.DelPostLogModel.updateMany({delType: 'toDraft', postType: 'post', threadId: tid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}}, {$set: {delType: 'toRecycle'}});
+
+
+		// 高亮楼层
 		if(pid && step === undefined) {
-      const disabled = data.userOperationsId.includes('displayDisabledPosts');
       const url = await db.PostModel.getUrl(pid);
-			// const {page, step} = await thread.getStep({pid, disabled});
 			ctx.status = 303;
-      // return ctx.redirect(`/t/${tid}?page=${page}&highlight=${pid}#highlight`);
       return ctx.redirect(url);
 		}
+		// 访问最后一页
 		if(last_page) {
 			page = pageCount -1;
 		}
 
-    // 是否有权限置顶文章
+    // 设置标志 表示用户是否有权限置顶文章
     if(
       ctx.permission("topAllPost") ||
       (data.user && data.user.uid === thread.uid && await db.PostModel.ensureToppingPermission(data.user.uid))
@@ -406,17 +369,21 @@ threadRouter
       data.topPost = true;
     }
 
-		// 查询该文章下的所有post
+		// 获取文章下当前页的所有回复
+    // 计算页数
 		const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		data.paging = paging;
+		// 加载回复
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-    data.posts = await db.PostModel.extendPosts(posts, {uid: data.user?data.user.uid: ''});
-    // 筛选出置顶的文章
+		// 拓展回复信息
+    data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
+    // 获取置顶文章
     if(paging.page === 0 && thread.toppedPostsId && thread.toppedPostsId.length) {
       match.pid = {$in: thread.toppedPostsId};
       let toppedPosts = await db.PostModel.find(match);
       toppedPosts = await db.PostModel.extendPosts(toppedPosts, {
         uid: data.user? data.user.uid: "",
+        visitor: data.user,
         url: true
       });
       const toppedPostsObj = {};
@@ -429,21 +396,16 @@ threadRouter
         if(p) data.toppedPosts.push(p);
       }
     }
-    await thread.extendFirstPost();
-    await thread.firstPost.extendResources();
-    const ownPost = data.user && data.user.uid === thread.uid;
+
+    // 判断 如果文章为匿名发表，则清除作者信息
     if(thread.firstPost.anonymous) {
       thread.uid = "";
       thread.firstPost.uid = "";
       thread.firstPost.uidlm = "";
-    } else {
-      await thread.firstPost.extendUser();
-      await db.UserModel.extendUsersInfo([thread.firstPost.user]);
-      await thread.firstPost.user.extendGrade();
     }
-    thread.firstPost = thread.firstPost.toObject();
-    thread.firstPost.ownPost = ownPost;
-		// 添加给被退回的post加上标记
+    // 设置标志 表明当前用户是否为文章作者
+    thread.firstPost.ownPost = data.user && data.user.uid === thread.uid;
+		// 【待改】给被退回的post加上标记
 		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid}, {postId: 1, reason: 1});
 		const toDraftPostsId = toDraftPosts.map(post => post.postId);
 		data.posts.map(async post => {
@@ -456,13 +418,13 @@ threadRouter
 		// data.posts = posts;
 		// console.log(data.posts)
 		// 加载文章所在专业位置，移动文章的选择框
-		data.forumList = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
+		// data.forumList = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
 		// data.parentForums = await forum.extendParentForum();
-		data.forumsThreadTypes = await db.ThreadTypeModel.find().sort({order: 1});
+		// data.forumsThreadTypes = await db.ThreadTypeModel.find().sort({order: 1});
 		// data.selectedArr = breadcrumbForums.map(f => f.fid);
 		// data.selectedArr.push(forum.fid);
 		data.cat = thread.cid;
-		// 若不是游客访问，加载用户的最新发表的文章
+		// 若当前用户已登录，则加载用户已发表的文章
 		if(data.user) {
 		  data.usersThreads = await data.user.getUsersThreads();
 			if(state.userColumn) {
@@ -475,9 +437,7 @@ threadRouter
           oc: thread.oc,
           uid: thread.uid
         });
-      }
-			// 专栏判断
-      if(thread.uid === data.user.uid) {
+        // 专栏判断
         data.authorColumn = await db.UserModel.getUserColumn(thread.uid);
         if(data.authorColumn) {
           // 判断是否已经加入专栏
@@ -486,25 +446,12 @@ threadRouter
         }
       }
 		}
-		// data.ads = (await db.SettingModel.findOnly({type: 'system'})).ads;
-		// 判断是否显示在专栏加精、置顶...按钮
-    // 旧专栏
-		/*const {mid, toMid} = thread;
-		let myForum, othersForum;
-		if(mid !== '') {
-			myForum = await db.PersonalForumModel.findOne({uid: mid});
-			data.myForum = myForum
-		}
 
-		if(toMid !== '') {
-			othersForum = await db.PersonalForumModel.findOne({uid: toMid});
-			data.othersForum = othersForum
-		}*/
-		// 判断文章是否匿名
+		// 判断文章是否匿名 加载作者的其他文章
 		if(!data.anonymous) {
       data.targetUser = await thread.extendUser();
       await data.targetUser.extendGrade();
-      await db.UserModel.extendUsersInfo([data.targetUser]);
+      await db.UserModel.extendUserInfo(data.targetUser);
       data.targetColumn = await db.UserModel.getUserColumn(data.targetUser.uid);
       if(data.targetColumn) {
         data.columnPost = await db.ColumnPostModel.findOne({columnId: data.targetColumn._id, type: "thread", pid: thread.oc});
@@ -512,7 +459,7 @@ threadRouter
       const q = {
         uid: data.targetUser.uid,
         reviewed: true,
-        mainForumsId: {$in: fidOfCanGetThreads},
+        mainForumsId: { $in: fidOfCanGetThreads},
         recycleMark: {$ne: true}
       };
       let targetUserThreads = await db.ThreadModel.find(q).sort({toc: -1}).limit(10);
@@ -527,12 +474,16 @@ threadRouter
     }
 		// 文章访问量加1
 		await thread.update({$inc: {hits: 1}});
+
 		data.thread = thread;
 		data.forums = forums;
+
 		data.replyTarget = `t/${tid}`;
-		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
-		data.ads = homeSettings.c.ads;
+		// const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
+		// data.ads = homeSettings.c.ads;
 		ctx.template = 'thread/index.pug';
+
+		// 【待改】如果当前文章为商品贴
 		if(thread.type === "product") {
 			const products = await db.ShopGoodsModel.find({tid:thread.tid, oc:thread.firstPost.pid})
 			let productArr = await db.ShopGoodsModel.extendProductsInfo(products);
@@ -565,21 +516,18 @@ threadRouter
           cartProductCount: await db.ShopCartModel.getProductCount(data.user)
         }
       }
+      // 获取用户地址信息
+      let userAddress = "";
+      if(data.user && thread.type === "product"){
+        let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
+        const {status, province, city} = ipInfo;
+        if(status && status == "1"){
+          userAddress = province + " " + city;
+        }
+      }
+      data.userAddress = userAddress;
       
-		}
-		// 获取用户地址信息
-		let userAddress = "";
-		if(data.user && thread.type === "product"){
-			let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
-			const {status, province, city} = ipInfo;
-			if(status && status == "1"){
-				userAddress = province + " " + city;
-			}
-		}
-		data.userAddress = userAddress;
-
-		// 基金文章
-		if(thread.type === "fund") {
+		} else if(thread.type === "fund") { // 基金文章
 		  const user = data.user;
       let applicationForm = await db.FundApplicationFormModel.findOne({tid: thread.tid});
       if(!applicationForm) {
@@ -594,10 +542,6 @@ threadRouter
       await applicationForm.extendMembers();
       await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
       applicationForm.project = thread.firstPost;
-      /*await applicationForm.extendProject();
-      if(applicationForm.project) {
-        await applicationForm.project.extendResources();
-      }*/
       await applicationForm.extendThreads();
       await applicationForm.extendForum();
       if(fund.money.fixed) {
@@ -673,7 +617,7 @@ threadRouter
       }
     }
 
-		// await thread.extendLastPost();
+		// 【待改】加载鼓励、学术分
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
       thread.firstPost.usersVote = vote?vote.type: '';
@@ -681,7 +625,7 @@ threadRouter
       data.xsfSettings = await db.SettingModel.getSettings("xsf");
       data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
     }
-		// 加载收藏
+		// 设置标志 是否关注，是否收藏
 		data.collected = false;
 		data.subscribed = false;
 		if(data.user) {
@@ -695,7 +639,7 @@ threadRouter
         uid: data.user.uid
       });
 			if(sub) data.subscribed = true;
-
+			// 设置标志 是否可以发表匿名回复
 			data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", data.user.uid, thread.mainForumsId);
 
 		}
@@ -762,9 +706,7 @@ threadRouter
       data.attachmentsCount = await db.ResourceModel.count({mediaType: "mediaAttachment", references: {$in: pid}});
     }
     const hidePostSettings = await db.SettingModel.getSettings("hidePost");
-    /*if(ctx.permission("addNote")) {
-
-    }*/
+    // 加载笔记信息
     if(ctx.permission("viewNote")) {
       const notePosts = [{
         pid: data.thread.oc,
@@ -913,8 +855,12 @@ threadRouter
     await updateCount([newThread], true);
 		// 发表评论 组装评论dom 返回给前端实时显示
 		if(postType === "comment") {
+      const extendPostOptions = {
+        uid: data.user?data.user.uid: '',
+        visitor: data.user, // 用于渲染页面时比对学术分隐藏
+      };
       let comment = await db.PostModel.findOnly({pid: data.post.pid});
-      comment = (await db.PostModel.extendPosts([comment], {uid: data.user.uid}))[0];
+      comment = (await db.PostModel.extendPosts([comment], extendPostOptions))[0];
       if(comment.parentPostId) {
         comment.parentPost = await db.PostModel.findOnly({pid: comment.parentPostId});
         if(comment.parentPost.uid !== data.user.uid) {
@@ -933,7 +879,7 @@ threadRouter
           await ctx.redis.pubMessage(message);
         }
         data.level1Comment = comment.parentPost.parentPostId === "";
-        comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost]))[0];
+        comment.parentPost = (await db.PostModel.extendPosts([comment.parentPost], extendPostOptions))[0];
       }
       // 修改post时间限制
       data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);

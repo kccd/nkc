@@ -59,7 +59,7 @@ block eContent
                 th=format("YYYY/MM/DD HH:mm:ss", log.toc)
                 th=tools.getSize(log.appSize)
                 th
-                  div!=experimental_render({c: log.appDescription})
+                  div!=nkcRender.plainEscape(log.appDescription)
                 th
                   a(href=`/app/${data.t}/${log.hash}` target="_blank") 点击下载
                 th

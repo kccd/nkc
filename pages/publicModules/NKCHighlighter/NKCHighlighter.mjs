@@ -135,23 +135,24 @@ window.Source = class {
     const self = this;
     while(!!(node = nodeStack.pop())) {
       const children = node.childNodes;
-      loop:
-        for (let i = children.length - 1; i >= 0; i--) {
-          const node = children[i];
-          if(node.nodeType === 1) {
-            const cl = node.classList;
-            for(const c of self.hl.excludedElementClass) {
-              if(cl.contains(c)) {
-                continue loop;
-              }
-            }
-            const elementTagName = node.tagName.toLowerCase();
-            if(self.hl.excludedElementTagName.includes(elementTagName)) {
-              continue;
+      // loop:
+      for (let i = children.length - 1; i >= 0; i--) {
+        const node = children[i];
+        if(self.hl.isClown(node)) continue;
+        /*if(node.nodeType === 1) {
+          const cl = node.classList;
+          for(const c of self.hl.excludedElementClass) {
+            if(cl.contains(c)) {
+              continue loop;
             }
           }
-          nodeStack.push(node);
-        }
+          const elementTagName = node.tagName.toLowerCase();
+          if(self.hl.excludedElementTagName.includes(elementTagName)) {
+            continue;
+          }
+        }*/
+        nodeStack.push(node);
+      }
       if(node.nodeType === 3 && node.textContent.length) {
         curOffset += node.textContent.length;
         if(curOffset > offset) {
@@ -197,12 +198,19 @@ window.NKCHighlighter = class {
   constructor(options) {
     const {
       rootElementId, excludedElementClass = [],
-      excludedElementTagName = []
+      excludedElementTagName = [],
+
+      clownClass = [], clownAttr = [], clownTagName = []
     } = options;
     const self = this;
     self.root = document.getElementById(rootElementId);
     self.excludedElementClass = excludedElementClass;
     self.excludedElementTagName = excludedElementTagName;
+
+    self.clownClass = clownClass;
+    self.clownAttr = clownAttr;
+    self.clownTagName = clownTagName;
+
 
     self.range = {};
     self.sources = [];
@@ -262,14 +270,15 @@ window.NKCHighlighter = class {
   }
   getParent(self, d) {
     if(d === self.root) return;
-    if(d.nodeType === 1) {
+    if(this.isClown(d)) throw new  Error("划词越界");
+    /*if(d.nodeType === 1) {
       for(const c of self.excludedElementClass) {
         if(d.classList.contains(c)) throw new Error("划词越界");
       }
       if(self.excludedElementTagName.includes(d.tagName.toLowerCase())) {
         throw new Error("划词越界");
       }
-    }
+    }*/
     if(d.parentNode) self.getParent(self, d.parentNode);
   }
   getRange() {
@@ -408,23 +417,24 @@ window.NKCHighlighter = class {
     const self = this;
     while (!!(curNode = nodeStack.pop())) {
       const children = curNode.childNodes;
-      loop:
-        for (let i = children.length - 1; i >= 0; i--) {
-          const node = children[i];
-          if(node.nodeType === 1) {
-            const cl = node.classList;
-            for(const c of self.excludedElementClass) {
-              if(cl.contains(c)) {
-                continue loop;
-              }
-            }
-            const elementTagName = node.tagName.toLowerCase();
-            if(self.excludedElementTagName.includes(elementTagName)) {
-              continue;
+      // loop:
+      for (let i = children.length - 1; i >= 0; i--) {
+        const node = children[i];
+        /*if(node.nodeType === 1) {
+          const cl = node.classList;
+          for(const c of self.excludedElementClass) {
+            if(cl.contains(c)) {
+              continue loop;
             }
           }
-          nodeStack.push(node);
-        }
+          const elementTagName = node.tagName.toLowerCase();
+          if(self.excludedElementTagName.includes(elementTagName)) {
+            continue;
+          }
+        }*/
+        if(self.isClown(node)) continue;
+        nodeStack.push(node);
+      }
 
       if (curNode.nodeType === 3 && curNode !== text) {
         offset += curNode.textContent.length;
@@ -458,6 +468,25 @@ window.NKCHighlighter = class {
       getChildNode(parent);
     }
     return selectedNodes;
+  }
+  isClown(node) {
+    // 判断node是否需要排除
+    if(node.nodeType === 1) {
+      const cl = node.classList;
+      for(const c of this.clownClass) {
+        if(cl.contains(c)) {
+          return true;
+        }
+      }
+      const elementTagName = node.tagName.toLowerCase();
+      if(this.clownTagName.includes(elementTagName)) {
+        return true;
+      }
+      for(const key in this.clownAttr) {
+        if(!this.clownAttr.hasOwnProperty(key)) continue;
+        if(node.getAttribute(key) === this.clownAttr[key]) return true;
+      }
+    }
   }
   getSameParentNode(startNode, endNode) {
     const self = this;

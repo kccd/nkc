@@ -10,7 +10,8 @@ if !state.isApp
         title: false,
         toolbar: false,
       }
-      $(".article-img-body").viewer(options);
+      $("[data-tag='nkcsource'][data-type='picture']").viewer(options);
+      // $(".article-img-body").viewer(options);
       $("#productImageDom").viewer(options);
       $("#pikeImpor").viewer(options);
       //- $("#applicationForm").viewer(options);

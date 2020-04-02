@@ -2,7 +2,84 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
-let HistoriesSchema = new Schema({
+const schema = new Schema({
+  pid: {
+    type: String,
+    required: true,
+    index: 1
+  },
+  t: {
+    type: String,
+    default: ""
+  },
+  c: {
+    type: String,
+    default: ""
+  },
+  ipoc: {
+    type: String,
+    default: ""
+  },
+  iplm: {
+    type: String,
+    default: ""
+  },
+  l: {
+    type: String,
+    default: ""
+  },
+  toc: {
+    type: Date,
+    required: true,
+    index: 1
+  },
+  tlm: Date,
+  uid: {
+    type: String,
+    required: true,
+    index: 1
+  },
+  uidlm: {
+    type: String,
+    default: "",
+    index: 1
+  },
+  cv: {
+    type: Number
+  },
+  // 中文摘要
+  abstractCn: {
+    type: String,
+    default: ""
+  },
+  // 英文摘要
+  abstractEn: {
+    type: String,
+    default: ""
+  },
+  // 中文关键词
+  keyWordsCn: {
+    type: Array,
+    default: []
+  },
+  // 英文关键词
+  keyWordsEn: {
+    type: Array,
+    default: []
+  },
+  // 作者信息
+  authorInfos: {
+    type: Array,
+    default: []
+  },
+  // 封面图图片hash
+  cover: {
+    type: String,
+    default: ""
+  }
+});
+
+/*let HistoriesSchema = new Schema({
   pid: {
     type: String,
     required: true
@@ -51,34 +128,6 @@ let HistoriesSchema = new Schema({
   t: {
     type: String,
     default: ''
-  },/* 
-  fid: {
-    type: String,
-    // required: true,
-    index: 1
-  }, */
-  // 主要分类
-  mainForumsId: {
-    type: [String],
-    default: [],
-    index: 1
-  },
-  // 辅助分类
-  minorForumsId: {
-    type: [String],
-    default: [],
-    index: 1
-  },
-  // 自定义分类
-  customForumsId: {
-    type: [String],
-    default: [],
-    index: 1
-  },
-  tid: {
-    type: String,
-    required: true,
-    index: 1
   },
   toc: {
     type: Date,
@@ -99,21 +148,13 @@ let HistoriesSchema = new Schema({
     type: String,
     index: 1
   },
-  anonymous: {
-    type: Boolean,
-    default: false
-  },
   // 内容版本号
   cv: {
     type: Number
-  },
-	digest: Boolean,
-	hideHistories: Boolean,
-	hasImage: Boolean,
-	toDraft: Boolean
-});
+  }
+});*/
 
-HistoriesSchema.pre('save', function(next) {
+schema.pre('save', function(next) {
   try {
     if (!this.iplm) {
       this.iplm = this.ipoc;
@@ -130,4 +171,20 @@ HistoriesSchema.pre('save', function(next) {
   }
 });
 
-module.exports = mongoose.model('histories', HistoriesSchema);
+/*
+* 创建历史记录
+* @param {Object} oldPost 修改前的post
+* @return {Object}  history
+* @author pengxiguaa 2020-3-30
+* */
+schema.statics.createHistory = async (oldPost) => {
+  const model = mongoose.model("histories");
+  let history = Object.assign({}, oldPost);
+  delete history._id;
+  delete history.__v;
+  history = model(history);
+  await history.save();
+  return history;
+};
+
+module.exports = mongoose.model('histories', schema);

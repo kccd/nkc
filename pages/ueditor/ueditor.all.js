@@ -6924,7 +6924,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     'p{margin:5px 0;}</style>' +
                     ( options.iframeCssUrl ? '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + utils.unhtml(options.iframeCssUrl) + '\'/>' : '' ) +
                     (options.initialStyle ? '<style>' + options.initialStyle + '</style>' : '') +
-                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\']],displayMath: [[\'$$\',\'$$\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
+                    '<script type=\'text/x-mathjax-config\'>MathJax.Hub.Config({skipStartupTypeset: \'true\', jax: [\'input/TeX\',\'output/CommonHTML\'],extensions: [\'tex2jax.js\',\'MathZoom.js\'],tex2jax:{inlineMath:  [[\'$\', \'$\']],displayMath: [[\'$$\',\'$$\']],ignoreClass:\'container|ignoreRender\',processClass:\'ThreadPostBody|QuestionText\'},\'CommonHTML\':{showMathMenu:false,preferredFont:\'STIX\',scale: 100,minScaleAdjust: 50},TeX: {equationNumbers: {autoNumber: \'AMS\'}},messageStyle: \'none\'})</script>'+
                     '<script async=\'async\' src=\'/ueditor/MathJax-2.6-latest/MathJax.js\'></script>' +
                     '</head><body class=\'view\' id=\'view\'></body>' +
                     '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +
@@ -7241,7 +7241,9 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             var root = UE.htmlparser(me.body.innerHTML,ignoreBlank);
             me.filterOutputRule(root);
             me.fireEvent('aftergetcontent', cmd,root);
-            return  root.toHtml(formatter);
+            var content = root.toHtml(formatter);
+            content = NKC.methods.ueditor.getContent(content);      // emoji图片换成字符
+            return  content;
         },
 
         /**
@@ -7340,6 +7342,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         setContent: function (html, isAppendTo, notFireSelectionchange) {
             var me = this;
 
+            html = NKC.methods.ueditor.setContent(html);  
             me.fireEvent('beforesetcontent', html);
             var root = UE.htmlparser(html);
             me.filterInputRule(root);
@@ -8034,6 +8037,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
             }
         }
     };
+
     utils.inherits(Editor, EventBase);
 })();
 
@@ -13561,7 +13565,9 @@ UE.plugins['insertcode'] = function() {
 
                     });
                 }
-                me.execCommand('inserthtml','<pre id="coder"class="brush:'+lang+';toolbar:false">'+code+'</pre>',true);
+                me.execCommand('inserthtml','<pre data-tag="nkcsource" data-type="pre" data-id="'+ lang +'" id="coder"class="brush:'+lang+';toolbar:false">'+code+'</pre>',true);
+                // // 应需求改为用nkcsource标签包裹
+                // me.execCommand('inserthtml','<nkcsource data-type="pre" data-id="'+ lang +'"><pre id="coder"class="brush:'+lang+';toolbar:false">'+code+'</pre></nkcsource>', true);
 
                 pre = me.document.getElementById('coder');
                 domUtils.removeAttributes(pre,'id');
@@ -23460,6 +23466,7 @@ UE.plugins['catchremoteimage'] = function () {
             catcherActionUrl = me.getActionUrl(me.getOpt('catcherActionName')),
             catcherUrlPrefix = me.getOpt('catcherUrlPrefix'),
             catcherFieldName = me.getOpt('catcherFieldName');
+        var $ = window.top.$;
         var remoteImages = [],
             imgs = domUtils.getElementsByTagName(me.document, "img"),
             test = function (src, urls) {
@@ -23525,6 +23532,14 @@ UE.plugins['catchremoteimage'] = function () {
                                 "src": newSrc,
                                 "_src": newSrc
                             });
+                            // img标签用nkcsource标签包起来
+                            // $(ci).wrap("<nkcsource data-type='picture' data-id='"+ info.r.rid +"'></nkcsource>")
+                            // 添加属性
+                            $(ci).attr({
+                                "data-tag": "nkcsource",
+                                "data-type": "picture",
+                                "data-id": info.r.rid
+                            })
                             break;
                         }
                         // for (j = 0; cj = list[j++];) {
@@ -29051,7 +29066,7 @@ UE.ui = baidu.editor.ui = {};
                     return;
                 if(baidu.editor.ui.PastePicker){
                     pastePop = new baidu.editor.ui.Popup({
-                        content:new baidu.editor.ui.PastePicker({editor:editor}),
+                        content:new baidu.editor.ui.PastePicker({editor:editor}),  // stack0
                         editor:editor,
                         className:'edui-wordpastepop'
                     });
@@ -29820,6 +29835,7 @@ UE.ui = baidu.editor.ui = {};
         })
 
     }
+    
 
 })();
 

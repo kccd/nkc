@@ -1,5 +1,7 @@
 const Router = require('koa-router');
 const infoRouter = new Router();
+const nkcRender = require('../../../nkcModules/nkcRender');
+
 infoRouter
 	.get('/', async (ctx, next) => {
 		ctx.template = 'interface_forum_settings_info.pug';
@@ -11,6 +13,9 @@ infoRouter
 		const {forum} = data;
 		let {did, operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId} = body;
 		if(operation && operation === 'updateDeclare') {
+			// 富文本内容中每一个source添加引用
+			await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
+			
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
 			if(did) {
@@ -60,4 +65,6 @@ infoRouter
 		}
 		await next();
 	});
+
+
 module.exports = infoRouter;

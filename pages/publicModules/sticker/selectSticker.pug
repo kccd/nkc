@@ -40,7 +40,7 @@
       +resourcePaging
       .module-ss-stickers
         div(v-if="type === 'emoji'")
-          .emoji(v-for="e in emoji" @click="selectEmoji(e)" :key="e")
+          .emoji(v-for="e, index in emoji" @click="selectEmoji(e, index)" :key="e")
             img(:src=`getUrl('emoji', e)`)
         div(v-else-if="type === 'upload'")
           .upload-body
@@ -53,7 +53,7 @@
             .upload-content
               .warning(v-if="!localStickers.length")
                 h5 注意事项
-                div!=experimental_render({c: state.stickerSettings.notesAboutUploading})
+                div!=nkcRender.plainEscape(state.stickerSettings.notesAboutUploading)
               .upload-sticker(v-for="s in localStickers")
                 .mask
                   span(v-if="s.error" @click="restartUpload(s)") 点击重试
@@ -67,7 +67,7 @@
         div(v-else)
           .sticker(v-for="s in stickers" @click="selectSticker(s)" :key="s._id" :class="{'share': type === 'share'}")
             img(:src=`getUrl('sticker', s.rid)`)
-          .share-warning(v-if="type === 'share'")!=experimental_render({c: state.stickerSettings.notesAboutUsing})
+          .share-warning(v-if="type === 'share'")!=nkcRender.plainEscape(state.stickerSettings.notesAboutUsing)
 
 
 

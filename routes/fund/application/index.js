@@ -63,7 +63,25 @@ applicationRouter
 		await applicationForm.extendApplicant().then(u => u.extendLifePhotos());
 		await applicationForm.extendProject();
 		if(applicationForm.project) {
-			await applicationForm.project.extendResources();
+			if(applicationForm.tid) {
+				const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
+				let firstPost= await db.PostModel.findOnly({pid: thread.oc});
+				firstPost = await db.PostModel.extendPost(firstPost, {
+					uid: data.user? data.user.uid: "",
+					user: data.user
+				});
+				// applicationForm.project = firstPost;
+				applicationForm.project.c = firstPost.c;
+			} else {
+				applicationForm.project.c = ctx.nkcModules.nkcRender.renderHTML({
+					type: "article",
+					post: {
+						c: applicationForm.project.c,
+						resources: await db.ResourceModel.getResourcesByReference(`fund-${applicationForm.project._id}`)
+					},
+					user: data.user
+				});
+			}
 		}
 		await applicationForm.extendThreads();
 		await applicationForm.extendForum();
@@ -103,9 +121,11 @@ applicationRouter
 		// 已发表的申请，项目内容从文章读取
     if(applicationForm.tid) {
       const thread = await db.ThreadModel.findOnly({tid: applicationForm.tid});
-      const firstPost= await db.PostModel.findOnly({pid: thread.oc});
-      await firstPost.extendResources();
-      await firstPost.extendUser();
+      let firstPost= await db.PostModel.findOnly({pid: thread.oc});
+      firstPost = await db.PostModel.extendPost(firstPost, {
+      	uid: data.user? data.user.uid: "",
+				user: data.user
+			});
       applicationForm.project = firstPost;
       const q = {
         tid: applicationForm.tid,
@@ -119,7 +139,10 @@ applicationRouter
       const paging = apiFn.paging(page, length);
       data.paging = paging;
       const comments = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
-      data.comments = await db.PostModel.extendPosts(comments);
+      data.comments = await db.PostModel.extendPosts(comments, {
+      	visitor: data.user,
+				uid: data.user?data.user.uid: ""
+			});
     }
 
 		await applicationForm.extendSupporters();
@@ -297,6 +320,7 @@ applicationRouter
 		}
 		// 填写项目信息
 		if(s === 3) {
+			await applicationForm.extendProject();
 			if(applicationForm.projectId === null){
 				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newDocument = db.FundDocumentModel({

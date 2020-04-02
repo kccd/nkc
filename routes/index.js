@@ -50,6 +50,8 @@ const librariesRouter = routers.libraries;
 const noteRouter = routers.note;
 // 网站工具
 const siteToolsRouter = routers.tools;
+// ip信息
+const ipinfoRouter = routers.ipinfo;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
@@ -98,4 +100,5 @@ router.use("/stickers", stickersRouter.routes(), stickersRouter.allowedMethods()
 router.use("/note", noteRouter.routes(), noteRouter.allowedMethods());
 router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
 router.use("/tools", siteToolsRouter.routes(), siteToolsRouter.allowedMethods());
+router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 module.exports = router;

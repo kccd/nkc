@@ -41,7 +41,7 @@ block content
                       span.redFontColor (数据错误，请联系管理员)
                   br
                   h4 结题报告：
-                  p= data.report.c
+                  p!= nkcRender.plainEscape(data.report.c)
                   br
                   if !applicationForm.fixedMoney
                     h3 资金预算

@@ -14,7 +14,7 @@ var CheckData = function () {
   * @return {Number}
   * @author pengxiguaa 2019-9-6
   * */
-  this.getLength = function(data) {
+  self.getLength = function(data) {
     data = data.toString();
     var zhCN = data.match(/[^\x00-\xff]/g) || [];
     return data.length + zhCN.length;
@@ -75,6 +75,36 @@ var CheckData = function () {
       self.te(400, name + "长度不能大于" + maxLength + "个字节");
     }
   };
+
+  /**
+   * 检测标签内容长度
+   * @param html 标签正确闭合的html文本
+   * @private {Object} options
+   *    name: 变量名
+   *    minLength: 最小字节长度
+   *    maxLength: 最大字节长度
+   * @author yuu 2020-3-27
+   */
+  /*self.checkTagContent = function(html, {minLength = 1, maxLength = 5000, name = ""}) {
+    const cheerio = require('cheerio')
+    let $ = cheerio.load("");
+    let content = $(html).text();
+    // console.log(content);
+    if(typeof(html) !== "string") {
+      self.te(400, name + "数据类型错误");
+      // console.log(name + "数据类型错误");
+      
+    }
+    if(content.length < minLength) {
+      self.te(400, name + "长度不能小于" + minLength + "个字节");
+      // console.log(name + "长度不能小于" + minLength + "个字节");
+      
+    }
+    if(content.length > maxLength) {
+      self.te(400, name + "长度不能大于" + maxLength + "个字节");
+      // console.log(name + "长度不能大于" + maxLength + "个字节");
+    }
+  };*/
 
   /*
   * 检测邮箱格式

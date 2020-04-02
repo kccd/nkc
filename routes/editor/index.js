@@ -1,8 +1,9 @@
 const Router = require("koa-router");
 const router = new Router();
+
 router
   .get("/", async (ctx, next) => {
-    const {db, data, query, state, nkcModules} = ctx;
+    const {db, data, query, state} = ctx;
     const {type} = query;
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
@@ -12,6 +13,7 @@ router
       return await next();
     }
     ctx.template = "editor/editor.pug";
+
     // 需要预制的专业和文章分类
     let selectedForumsId = [];
     let selectedCategoriesId = [];
@@ -43,7 +45,6 @@ router
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.type = (thread.oc === data.post.pid)? "modifyThread": "modifyPost";
       const firstPost = await thread.extendFirstPost();
-
       if(data.post.l !== "html") {
         ctx.template = "interface_editor.pug";
         data.content = data.post.c;
@@ -67,6 +68,7 @@ router
       const {id} = query;
       const forum = await db.ForumModel.findOnly({fid: id});
       if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业说明");
+      // 渲染nkcsource
       data.post = {
         c: forum.declare
       };
@@ -224,4 +226,6 @@ router
     state.editorSettings = await db.SettingModel.getSettings("editor");
     await next();
   });
+
+
 module.exports = router;

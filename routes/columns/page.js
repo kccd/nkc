@@ -84,9 +84,16 @@ router
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
     if(!page) ctx.throw(404, `未找到ID为${pageId}的自定义页面`);
     if(page.hidden && (!user || column.uid !== user.uid)) ctx.throw(403, "该页面已被专栏主关闭");
+    data.pageContent = nkcModules.nkcRender.HTMLToPlain(page.c, 150);
+    page.c = nkcModules.nkcRender.renderHTML({
+      type: 'article',
+      post: {
+        c: page.c,
+        resources: await db.ResourceModel.getResourcesByReference(`column-${pageId}`)
+      },
+      user: data.user
+    });
     data.page = page;
-    page.resources = await db.ResourceModel.find({references: `column-${pageId}`});
-    data.pageContent = nkcModules.apiFunction.obtainPureText(page.c, true, 150);
     data.navCategories = await db.ColumnPostCategoryModel.getColumnNavCategory(column._id);
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     data.timeline = await db.ColumnModel.getTimeline(column._id);

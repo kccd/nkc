@@ -78,7 +78,7 @@ block content
                     textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.post.pid}'].reason`)
                 .m-t-1
                   button.btn.btn-sm.btn-primary(@click=`submit('${r.post.pid}')`) 提交
-              .review-post-content!=experimental_render(r.post)
+              .review-post-content!=r.post.c
 
         .p-t-1
           include ../publicModules/paging/paging_input
@@ -95,7 +95,6 @@ block content
 
 
 block scripts
-  include ../publicModules/lazySizes
+  include ../publicModules/nkcSource
   include ../publicModules/moment
   +includeJS("/review/review.js")
-  include ../publicModules/plyr/plyr.js.pug

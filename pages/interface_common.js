@@ -275,6 +275,13 @@ function sweetQuestion(text) {
       })
   });
 }
+// html内容弹窗
+function asyncSweetCustom(html) {
+  return Swal({
+    confirmButtonText: "关闭",
+    html: html || ""
+  })
+}
 // promise版本弹框
 function asyncSweetSuccess(text, options) {
   return new Promise(function(resolve, reject) {

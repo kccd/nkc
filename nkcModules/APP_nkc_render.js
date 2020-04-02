@@ -18,7 +18,7 @@ function APP_nkc_render(options){
     twemoji = window.twemoji;
   }else{
     commonmark = require('commonmark');
-    plain_escape = require('../pages/plain_escaper');
+    plain_escape = require('./plainEscaper');
     XBBCODE = require('xbbcode-parser');
     xss = require('xss');
     twemoji = require('twemoji');

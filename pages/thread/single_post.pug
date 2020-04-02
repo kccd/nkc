@@ -46,8 +46,8 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         //- 隐藏楼层
         if !hidePostStep
           .inline-block(style='float: right;')
-            -var floornumber = data.paging.start+index
-            span.lighttext= floornumber + '楼'
+            // -var floornumber = data.paging.start+index
+            span.lighttext= post.step + '楼'
             .single-post-checkbox
               input(type="checkbox" data-pid=post.pid)
         //- 显示post链接
@@ -60,10 +60,13 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         .clearfix
         if(post.t && post.t !== '' && index !== 0)
           div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
-        -post.c = hideContentByUser(post.c, data.user, 'thread')
         div(class=!disabledHidePost?"hide-post part":"" data-pid=post.pid)
           .thread-post-mask
-            .ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!= experimental_render(post)
+
+            if post.quotePost
+              -const quotePost = post.quotePost;
+              include ./quotePost
+            .ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!=post.c
             if post.toc.toLocaleString() !== post.tlm.toLocaleString()
               p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
             //+postCredits(post)

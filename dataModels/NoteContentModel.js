@@ -70,7 +70,7 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
   if(!isArr) {
     noteContent = [noteContent];
   }
-  const {experimental_render} = require("../nkcModules/nkc_render");
+  const {plainEscape} = require("../nkcModules/nkcRender");
   const UserModel = mongoose.model("users");
   const usersId = [], usersObj = {}, notesId = [], notesObj = {};
   noteContent.map(n => {
@@ -89,7 +89,7 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
   for(let c of noteContent) {
     if(c.toObject) c = c.toObject();
     c.user = usersObj[c.uid];
-    c.html = experimental_render({c: c.content});
+    c.html = plainEscape(c.content);
     if(extendNote) {
       c.note = notesObj[c.noteId];
       if(c.note.type === "post") {

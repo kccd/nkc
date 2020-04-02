@@ -4,8 +4,8 @@ script.
   NKC.methods.highlightBlock = function(dom) {
     hljs.highlightBlock(dom);
   };
-  NKC.methods.highlightBlockByClassName = function(selector) {
-    var dom = $(selector).find("pre");
+  NKC.methods.highlightBlockBySelector = function(selector) {
+    var dom = $(selector);
     if(!dom || !dom.length) return;
     for(var i = 0; i < dom.length; i++) {
       NKC.methods.highlightBlock(dom[i]);

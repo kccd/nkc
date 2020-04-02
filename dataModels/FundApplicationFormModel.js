@@ -547,6 +547,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 	const FundApplicationUserModel = mongoose.model("fundApplicationUsers");
 	const FundApplicationFormHistoryModel = require('./FundApplicationHistoryModel');
 	const FundApplicationForm = mongoose.model('fundApplicationForms');
+	await this.extendProject();
 	const {
 		fixedMoney,
 		from,

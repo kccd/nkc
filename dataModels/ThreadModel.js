@@ -524,11 +524,14 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   const redis = require('../redis');
   const MessageModel = mongoose.model('messages');
   const UserModel = mongoose.model('users');
-  const ReplyModel = mongoose.model('replies');
-  const dbFn = require('../nkcModules/dbFunction');
-  const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {c, t, l, abstractCn, abstractEn, keyWordsCn = [], keyWordsEn = [], authorInfos=[], originState, parentPostId} = post;
+  const {quote = "", c, t, l, abstractCn, abstractEn, keyWordsCn = [], keyWordsEn = [], authorInfos=[], originState, parentPostId} = post;
+  // 如果存在引用，则先判断引用的post是否存在
+  let quotePost;
+  if(quote) {
+    quotePost = await PostModel.findOne({tid: this.tid, pid: post.quote, type: "post"});
+  }
+  // 处理作者信息
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
@@ -543,19 +546,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
       }
     }
   }
-  const quote = await dbFn.getQuote(c);
-  if(this.uid !== user.uid) {
-    const replyWriteOfThread = new ReplyModel({
-      fromPid: pid,
-      toPid: this.oc,
-      toUid: this.uid
-    });
-    await replyWriteOfThread.save();
-  }
-  let rpid = [];
-  if(quote && quote[2]) {
-    rpid.push(quote[2]);
-  }
+  // 发表评论时，更新上层post上的postCount字段（表示评论数量）
   let parentPostsId = [];
   if(parentPostId) {
     const parentPost = await PostModel.findOne({pid: parentPostId});
@@ -564,6 +555,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
       await PostModel.updateMany({pid: {$in: parentPostsId}}, {$inc: {postCount: 1}});
     }
   }
+  // 创建post数据
   let _post = await new PostModel({
     pid,
     c,
@@ -576,6 +568,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     originState,
     ipoc: ip,
     iplm: ip,
+    quote,
     l,
     mainForumsId: this.mainForumsId,
     minorForumsId: this.minorForumsId,
@@ -583,8 +576,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     parentPostsId,
     parentPostId,
     uid: user.uid,
-    uidlm: user.uid,
-    rpid
+    uidlm: user.uid
   });
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
@@ -593,53 +585,30 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     lm: pid,
     tlm: Date.now()
   });
-  if(quote && quote[2] !== this.oc) {
-    const quPid = quote[2];
-    const quPost = await PostModel.findOne({pid: quPid});
-    if(quPost) {
-      const reply = new ReplyModel({
-        fromPid: pid,
-        toPid: quPid,
-        toUid: quPost.uid
-      });
-      await reply.save();
-      const messageId = await SettingModel.operateSystemID('messages', 1);
-      const message = MessageModel({
-        _id: messageId,
-        r: quPost.uid,
-        ty: 'STU',
-        c: {
-          type: 'replyPost',
-          targetPid: pid+'',
-          pid: quPid+''
-        }
-      });
-
-      await message.save();
-
-      await redis.pubMessage(message);
-      // 如果引用作者的回复，则作者将只会收到 引用提醒
-      if(quPost.uid === this.uid) {
-        _post.hasQuote = true;
+  // 如果存在引用，则给被引用者发送引用通知
+  if(quotePost) {
+    const messageId = await SettingModel.operateSystemID('messages', 1);
+    const message = MessageModel({
+      _id: messageId,
+      r: quotePost.uid,
+      ty: 'STU',
+      c: {
+        type: 'replyPost',
+        targetPid: pid+'',
+        pid: quotePost.pid+''
       }
+    });
+
+    await message.save();
+
+    await redis.pubMessage(message);
+    // 如果引用作者的回复，则作者将只会收到 引用提醒
+    if(quotePost.uid === this.uid) {
+      _post.hasQuote = true;
     }
   }
-  await this.update({lm: pid});
   // 红包奖励判断
   await user.setRedEnvelope();
-  /*if(!user.generalSettings.lotterySettings.close) {
-    const redEnvelopeSettings = await SettingModel.findOnly({_id: 'redEnvelope'});
-    if(!redEnvelopeSettings.c.random.close) {
-      const {chance} = redEnvelopeSettings.c.random;
-      const number = Math.ceil(Math.random()*100);
-      if(number <= chance) {
-        const postCountToday = await PostModel.count({uid: user.uid, toc: {$gte: apiFn.today()}});
-        if(postCountToday === 1) {
-          await user.generalSettings.update({'lotterySettings.status': true});
-        }
-      }
-    }
-  }*/
   return _post
 };
 

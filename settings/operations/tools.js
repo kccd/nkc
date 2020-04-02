@@ -13,5 +13,8 @@ module.exports = {
   },
   delete: {
     DELETE: 'deleteTool'
+  },
+  hide: {
+    DELETE: 'hideTool'
   }
 }

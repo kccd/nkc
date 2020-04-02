@@ -12,3 +12,115 @@ blockquote {
 body img{
   max-width: 100%;
 }
+
+[data-tag="nkcsource"] {
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+/* 图片*/
+[data-tag="nkcsource"][data-type="picture"] {
+  max-width: 60%;
+}
+
+/*twemoji*/
+[data-tag="nkcsource"][data-type="twemoji"] {
+  width: 26px;
+  height: 26px;
+}
+
+/* 学术分隐藏内容 */
+[data-tag="nkcsource"][data-type="xsf"] {
+  background-color: #d3edff;
+  padding: 7px 10px;
+  margin: 10px 0;
+  /*border-left: 5px solid #ddd;*/
+  width: 98%;
+  display: block;
+}
+[data-tag="nkcsource"][data-type="xsf"]::before {
+  content: attr(data-message);
+  font-size: 12px;
+  color: #969696;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 4px;
+}
+nkcsource[data-type="xsf"] strong{
+  display: block;
+  font-weight: normal;
+}
+
+/* 附件 */
+.editor-attachment-container {
+  border: 1px dashed rgb(193, 193, 193);
+}
+[data-tag="nkcsource"][data-type="attachment"] {
+  padding: 10px;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  width: 98%;
+  line-height: 34px;
+  position: relative;
+  text-decoration: none;
+  color: rgb(43, 144, 217);
+}
+[data-tag="nkcsource"][data-type="attachment"]:active {
+  color: rgb(43, 144, 217);
+}
+[data-tag="nkcsource"][data-type="attachment"]::before {
+  content: "";
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background-image: url(/ueditor/themes/default/images/attachment.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  margin-right: 6px;
+  transform: translateY(5px);
+}
+/*[data-tag="nkcsource"][data-type="attachment"]::after {
+  content: "点击下载";
+  display: block;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: .3s opacity;
+  color: rgb(0, 138, 236);
+}
+[data-tag="nkcsource"][data-type="attachment"]:hover::after {
+  opacity: 1;
+}*/
+
+
+
+/* 视频 */
+[data-tag="nkcsource"][data-type="video"] {
+  background-color: rgb(0, 0, 0);
+  text-align: center;
+  max-width: 60%;
+  /*height: 352px;*/
+  margin-right: 2px;
+}
+
+/* 音频 */
+[data-tag="nkcsource"][data-type="audio"]{
+  background-color: rgb(241, 243, 244);
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
+  text-align: center;
+  width: 98%;
+  /* display: block; */
+}
+[data-tag="nkcsource"][data-type="audio"]:focus {
+  outline: none;
+}
+
+/* 代码 */
+[data-tag="nkcsource"][data-type="pre"] {
+  display: block;
+}

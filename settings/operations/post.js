@@ -24,7 +24,7 @@ module.exports = {
 			PATCH: 'disableHistories',
 			rollback: {
 				PARAMETER: {
-					GET: 'rollbackPost'
+					POST: 'rollbackPost'
 				}
 			}
 		},

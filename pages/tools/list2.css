@@ -34,27 +34,27 @@
 }
 .tool-item .tool-name {
   font-weight: bold;
-  position: absolute;
-  top: 10px;
+  /* position: absolute;
+  top: 10px; */
   transition: 0.3s top, 0.3s transform, 0.2s opacity;
   font-size: 22px;
 }
 .tool-item .tool-summary {
   overflow: hidden;
-  opacity: 0;
-  transform: scale3d(0.33, 0.33, 0);
-  transition: 0.2s opacity, 0.3s transform;
-  position: absolute;
-  top: 10px;
+  /* opacity: 0; */
+  /* transform: scale3d(0.33, 0.33, 0);
+  transition: 0.2s opacity, 0.3s transform; */
+  /* position: absolute;
+  top: 10px; */
 }
-.tool-item .tool-container:hover .tool-name {
+/* .tool-item .tool-container:hover .tool-name {
   transform: scale3d(3, 3, 0);
   opacity: 0;
 }
 .tool-item .tool-container:hover .tool-summary {
   transform: scale3d(1, 1, 1);
   opacity: 1;
-}
+} */
 .tool-item .tool-control {
   height: 20%;
   font-size: 0;

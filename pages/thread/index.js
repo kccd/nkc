@@ -2,6 +2,7 @@ var SubscribeTypes, UserInfo, surveyForms = [], draftId = "", author = {};
 var hidePostMaxHeight;
 var hidePostFloat;
 var Attachments;
+var quotePostApp;
 $(document).ready(function(){
   var DW = $(document).width();
   hidePostFloat = NKC.configs.postHeight.float;
@@ -367,7 +368,7 @@ function cancelTopped(tid) {
 }*/
 
 function assemblePostObject(){  //bbcode , markdown
-	var quoteHtml = document.getElementById('quoteContent').innerHTML;
+	/*var quoteHtml = document.getElementById('quoteContent').innerHTML;
 	var replyHtml = ue.getContent();
 	// if(replyHtml.replace(/<[^>]+>/g,"")==''){screenTopWarning('请填写内容。');return;}
 	var replyContent = quoteHtml + replyHtml;
@@ -378,7 +379,7 @@ function assemblePostObject(){  //bbcode , markdown
 		c: replyContent,
 		l:"html",
 	}
-	/*if(geid('ParseURL').checked){
+	/!*if(geid('ParseURL').checked){
 		if(post.l=='markdown'){
 			post.c = common.URLifyMarkdown(post.c)
 		}
@@ -388,10 +389,18 @@ function assemblePostObject(){  //bbcode , markdown
 		if(post.l=='html'){
 			post.c = common.URLifyHTML(post.c)
 		}
-	}*/
+	}*!/
 	//  return console.log(post.c)
-	post.c = post.c.replace(/\[\/quote] *\n+/gi,'[/quote]')
+	post.c = post.c.replace(/\[\/quote] *\n+/gi,'[/quote]')*/
 
+	/* 2020-3-26 pengxiguaa */
+	var post = {
+		c: ue.getContent(),
+		l: "html"
+	};
+	if(window.quotePostApp && window.quotePostApp) {
+		post.quote = window.quotePostApp.pid
+	}
 	return post
 }
 
@@ -518,126 +527,46 @@ function submit(tid) {
     })
 }
 
-/*// 发表回复
-function submit(tid){
-	$("#ReplyContent").find(".MathJax_Preview").each(function(){
-		if($(this).next().next().length !== 0){
-			if($(this).next().next().attr("type").length > 15){
-				var mathfur = "$$" + $(this).next().next().html() + "$$";
-			}else{
-				var mathfur = "$" + $(this).next().next().html() + "$";
-			}
-			$(this).next().next().replaceWith(mathfur);
-			$(this).next().replaceWith("");
-			$(this).replaceWith("")
-		}else{
-			$(this).parent().remove()
-		}
-	});
-	// try{
-		var post = assemblePostObject();
-		if(!post || post.c.replace(/<[^>]+>/g,"") === ''){screenTopWarning('请填写内容。');return;}
-	// }catch(err){
-	// 	return;
-	// }
-	
-	geid('ButtonReply').disabled=true;
-
-  // 转发到专栏
-  try{
-    post.columnCategoriesId = getSelectedColumnCategoriesId();
-  } catch(err) {
-    return screenTopWarning(err);
-  }
-
-  var sendAnonymousPostDom = $("#sendAnonymousPost");
-  if(sendAnonymousPostDom.length) {
-    post.anonymous = sendAnonymousPostDom.prop("checked");
-  }
-
-	return nkcAPI('/t/' + tid, 'POST', {
-		post:post,
-	})
-		.then(function(data){
-			// window.location.href = data.redirect;
-			openToNewLocation(data.redirect);
-		})
-		.catch(function(data){
-			screenTopWarning(data || data.error);
-			geid('ButtonReply').disabled=false;
-		})
-}*/
-
-// 取消引用
-function cancelQuote(){
-	geid('quoteContent').innerHTML = "";
-	geid('quoteCancel').style.display = "none";
-}
-
-// 无引用回复
-function quotePostWithout() {
-	window.location.href = "#container"
-}
-
 // 点击引用
-function quotePost(pid, number, page){
-	geid("quoteCancel").style.display = "inline";
-	if(!ue) return screenTopAlert('权限不足');
-	nkcAPI('/p/'+pid+'/quote', 'GET',{})
-		.then(function(pc){
-      var post = pc.message;
-      var strAuthor;
-		  if(post.anonymous) {
-        strAuthor = "<span class='anonymous-name'>匿名用户</span>&nbsp;" // 获取被引用的用户
-      } else {
-        strAuthor = "<a href='/u/"+pc.targetUser.uid+"'>"+pc.targetUser.username+"</a>&nbsp;" // 获取被引用的用户
-      }
-
-      var strFlor = "&nbsp;<a href='"+pc.postUrl+"'>"+number+"</a>&nbsp;";
-			/*if(page > 0){
-				var strFlor = "<a href='/t/"+pc.message.tid+'?&page='+page+'#'+pc.message.pid+"'>"+number+"</a>&nbsp;"  // 获取被引用的楼层
-			}else{
-				var strFlor = "<a href='/t/"+pc.message.tid+'#'+pc.message.pid+"'>"+number+"</a>&nbsp;"  // 获取被引用的楼层
-			}*/
-			var length_limit = 50;
-			var content = post.c;
-
-			// 去掉换行
-			content = content.replace(/\n/igm,'');
-			content = content.replace(/\r/igm,'');
-			content = content.replace(/<blockquote cite.*?blockquote>/igm, '')
-			var replaceArr = [
-				{reg: /<[^>]*>/gm, rep: ''},
-				{reg: /<\/[^>]*>/, rep: ' '},
-			];
-			if(post.l === 'html') {
-				for(var i in replaceArr) {
-					var obj = replaceArr[i];
-					content = content.replace(obj.reg, obj.rep)
+function quotePost(pid){
+	if(!window.quotePostApp) {
+		window.quotePostApp = new Vue({
+			el: "#quoteContent",
+			data: {
+				username: "",
+				uid: "",
+				step: "",
+				c: "",
+				pid: ""
+			},
+			methods: {
+				getUrl: NKC.methods.tools.getUrl,
+				load: function(pid) {
+					var self = this;
+					nkcAPI('/p/' + pid + "/quote", "GET")
+						.then(function(data) {
+							var qp = data.quotePost;
+							if(!qp || !qp.pid) return;
+							self.username = qp.username;
+							self.uid = qp.uid;
+							self.pid = qp.pid;
+							self.step = qp.step;
+							self.c = qp.c;
+							window.location.href='#container';
+						})
+						.catch(sweetError);
+				},
+				clear: function() {
+					this.username = "";
+					this.uid = "";
+					this.step = "";
+					this.c = "";
+					this.pid = "";
 				}
 			}
-			var str = content.replace(/\[quote.*?][^]*?\[\/quote]/g,'').slice(0,length_limit).trim();
-			str = str.replace(/@([^@\s]*)\s/gm, function(matched) {
-				var str1 = matched.replace('@', '@ ')
-				return str1
-			});
-			// 引用内容的字数不超过50
-			if(str.length>=length_limit){
-				str = str.substring(0,50) + '.....'
-			}
-			// str = '[quote='+post.user.username+','+post.pid+'][/quote]'
-			// geid('ReplyContent').value += str
-      if(!post.anonymous) {
-        str = '<blockquote cite='+post.user.username+','+post.pid+' display="none">'+'引用 '+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
-      } else {
-        str = '<blockquote cite=anonymous,'+post.pid+' display="none">'+'引用 '+strAuthor+'发表于'+strFlor+'楼的内容：<br>'+str+'</blockquote>'
-      }
-
-			geid('quoteContent').innerHTML = str
-			// geid('ReplyContent-elem').innerHTML = str
-			window.location.href='#container';
-			// openToNewLocation('#container');
-		})
+		});
+	}
+	window.quotePostApp.load(pid);
 }
 
 function dateTimeString(t){
@@ -1389,5 +1318,46 @@ $(function() {
 			}));
 		}
 	}
-	NKC.methods.highlightBlockByClassName(".render-content");
+	NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
 });
+
+
+
+/*EventTarget.prototype.once = function(name, handle) {
+	let self = this;
+	let newHandle = function(){
+		handle();
+		self.removeEventListener(name, newHandle);
+	}
+	self.addEventListener(name, newHandle);
+}
+
+var timer;
+document.addEventListener("selectionchange", function() {
+	document.once("mouseup", function(){
+		clearTimeout(timer);
+		timer = setTimeout(function() {
+			var selection = getSelection();
+			var range = selection.getRangeAt(0);
+			if(range.collapsed) return;
+			// 获取原文中需要处理的dom
+			var startNode = range.startContainer;
+			var endNode = range.endContainer;
+			if(startNode === endNode) {
+				console.log("[A]需要处理的Node：", startNode);
+			}else {
+				var nodeList = [startNode], 
+					currentNode = startNode;
+				// 兄弟节点遍历
+				while(!currentNode.contains(endNode)) {
+					currentNode = currentNode.nextSibling;
+					nodeList.push(currentNode);
+				}
+				nodeList.push(endNode);
+				console.log("[B]需要处理的Node：", nodeList);
+			}
+			var frag = range.cloneContents();
+			console.log(frag);
+		}, 1000);
+	})
+})*/

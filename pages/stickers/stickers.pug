@@ -8,7 +8,7 @@ block content
       .col-xs-12.col-md-12.box-shadow-panel
         div
           h4 热门表情
-          .using-warning!=experimental_render({c: state.stickerSettings.notesAboutUsing})
+          .using-warning!=nkcRender.plainEscape(state.stickerSettings.notesAboutUsing)
           .m-t-05
             include ../publicModules/paging/paging
           .stickers-body

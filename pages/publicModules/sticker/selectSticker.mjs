@@ -74,7 +74,8 @@ NKC.modules.SelectSticker = function() {
         let url = `/sticker?page=${page}&c=own&reviewed=true&perpage=${this.perpage}`;
         if(type === "share") {
           url = `/stickers?page=${page}&perpage=${this.sharePerpage}`;
-        }        
+        }
+        
         nkcAPI(url, "GET")
           .then(data => {
             self.app.stickers = data.stickers;
@@ -99,10 +100,10 @@ NKC.modules.SelectSticker = function() {
           data: sticker
         });
       },
-      selectEmoji(emoji) {
+      selectEmoji(emojiCode, index) {
         self.callback({
           type: "emoji",
-          data: emoji
+          data: emojiCode
         });
       },
       addLocalFile(file) {

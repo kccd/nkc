@@ -210,17 +210,17 @@ if data.reports && data.reports.length && data.reports.length > 0
             if !r.support
               -r.c = `拨款失败：${r.c}`;
           .applicationForm-report-content
-            -r.c = r.c.replace(/\n/g, '<br/>');
-            -r.c = r.c.replace(/\s/g, '&nbsp;');
+            // -r.c = r.c.replace(/\n/g, '<br/>');
+            // -r.c = r.c.replace(/\s/g, '&nbsp;');
             if r.support === false
-              .text-danger!= experimental_render(r)
+              .text-danger!= nkcRender.plainEscape(r.c)
             else if r.support === true
-              .text-success!= experimental_render(r)
+              .text-success!= nkcRender.plainEscape(r.c)
             else
               if r.type === "system"
-                .text-success!=experimental_render(r)
+                .text-success!=nkcRender.plainEscape(r.c)
               else
-                div!= experimental_render(r)
+                div!= nkcRender.plainEscape(r.c)
 
         if status.completed
           div.time

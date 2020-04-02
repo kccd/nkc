@@ -84,8 +84,7 @@ block content
             | 》
           if post.t
             div.ThreadTitle= post.t
-          -post.c = hideContentByUser(post.c, data.user, 'thread')
-          div.ThreadPostBody#ThreadPostBody!= experimental_render(post)
+          div.ThreadPostBody#ThreadPostBody!=post.c
           if post.credits && post.credits.length > 0
             .nkcpanel.ThreadPostCredits
               for c,index in post.credits
@@ -206,5 +205,5 @@ block scripts
         }
       }
 
-      NKC.methods.highlightBlockByClassName(".render-content");
+      NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
     });

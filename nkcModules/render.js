@@ -1,4 +1,5 @@
 const render = require('./nkc_render');
+const nkcRender = require("./nkcRender");
 const moment = require('moment');
 const pug = require('pug');
 const jsdiff = require('diff');
@@ -410,6 +411,7 @@ let pugRender = (template, data, state) => {
     server: settings.server,
     plain:render.plain_render,
     experimental_render:render.experimental_render,
+		nkcRender,
     replaceContent: replaceContent,
     highlightString,
     toQueryString,

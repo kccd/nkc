@@ -273,6 +273,7 @@ shelfRouter
         ip: ctx.address,
         type: "product"
       };
+
       await db.ThreadModel.ensurePublishPermission(options);
       const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
       product = db.ShopGoodsModel({

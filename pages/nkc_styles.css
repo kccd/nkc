@@ -1340,30 +1340,6 @@ pre {
   padding:0;
 }
 
-.nkcHiddenBox{
-    border-style: solid;
-    border-width: 1px;
-    border-color: #ff6d6d;
-    border-radius: 5px;
-    padding: 5px;
-    background-color: #fff8f8;
-}
-.nkcHiddenNotes{
-    color: white;
-    margin-bottom: 5px;
-    background: #ff8888;
-    border-radius: 3px;
-    text-align: center;
-    display: block;
-}
-.nkcHiddenContent{
-    border-style: dashed;
-    background: white;
-    border-width: 1px;
-    border-color: #ffcccc;
-    border-radius: 3px;
-    padding: 5px;
-}
 .UserPostTitle{
     margin-bottom: 5px;
     /* color: #6691b7; */
@@ -3865,6 +3841,9 @@ ul.nav.navbar-nav.navbar-md>li>a{
 .play-btn:hover{
   cursor: pointer;
 }
+
+/* 文章中的表情 旧*/
+
 .article-sticker-body{
   display: inline;
   font-size: 0;
@@ -3873,6 +3852,26 @@ ul.nav.navbar-nav.navbar-md>li>a{
 .article-sticker-body img{
   vertical-align: text-bottom;
 }
+
+/*文章中的表情 新*/
+
+span[data-type="sticker"]{
+  display: inline;
+  font-size: 0;
+  vertical-align: text-bottom;
+}
+span[data-type="sticker"]>img{
+  vertical-align: text-bottom;
+  cursor: pointer;
+}
+
+/*文章中的emoji */
+span[data-type="twemoji"]>img{
+  max-width: 26px;
+  max-height: 26px;
+}
+/*文章中的图片 旧*/
+
 .article-img-body{
   position: relative;
   display: inline-block;
@@ -3907,6 +3906,48 @@ ul.nav.navbar-nav.navbar-md>li>a{
   z-index: 101;
   background: rgba(0, 0, 0, 0);
 }
+
+
+/*文章中的图片 新*/
+
+span[data-type="picture"]{
+  position: relative;
+  display: inline-block;
+  vertical-align: text-bottom;
+  max-width: 100%;
+  font-size: 0;
+}
+span[data-type="picture"]>span{
+  width: 100%;
+  position: relative;
+  display: inline-block;
+}
+span[data-type="picture"]>span>img{
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  z-index: 0;
+  left: 0;
+  border-radius: 7px;
+  width: 100%;
+  height: 100%;
+}
+span[data-type="picture"]>span>img.lazyload {
+  opacity: 0;
+}
+span[data-type="picture"]>span>img.lazyloading{
+  opacity: 1;
+  transition: opacity 300ms;
+  background: #c7c7c7 url(/statics/loading.gif) no-repeat center;
+  background-size: 3rem;
+}
+span[data-type="picture"]>span>img.lazyloaded{
+  z-index: 101;
+  background: rgba(0, 0, 0, 0);
+}
+
+
+/* 文章中的视频 旧*/
 .article-video-body{
   width: 100%;
   padding-top: 75%;
@@ -3923,6 +3964,67 @@ ul.nav.navbar-nav.navbar-md>li>a{
   top: 0;
   left: 0;
 }
+
+/* 文章中的视频 新*/
+span[data-type="video"]{
+  width: 100%;
+  padding-top: 75%;
+  position: relative;
+}
+span[data-type="video"]>div{
+  height: 100%;
+  width: 100%;
+  display: block;
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+}
+span[data-type="video"] video{
+  max-width: 100%;
+}
+
+/* 文章中的音频 旧*/
+.article-audio{
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  margin-bottom: 1rem;
+  display: inline-block;
+  width: 34.5rem;
+  max-width: 100%;
+}
+.article-audio-name{
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  word-break: break-all;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.article-audio-size{
+  color: #e85a71;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+/*文章中的音频 新*/
+span[data-type="audio"]{
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  /* margin-bottom: 1rem; */
+  display: inline-block;
+  width: 34.5rem;
+  max-width: 100%;
+  /* margin-top: 6px; */
+  display: block;
+}
+
+/* 文章中的附件 旧*/
 .article-attachment{
   display: inline-block;
   padding: 0.5rem;
@@ -3980,19 +4082,41 @@ ul.nav.navbar-nav.navbar-md>li>a{
   color: #2b90d9;
   font-weight: 700;
 }
-.article-audio{
+/* 文章中的附件 新*/
+span[data-type="attachment"]{
+  display: block;
+  padding: 0.5rem;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
   border-radius: 2px;
   border: 1px solid #d6d6d6;
   background: #fff;
-  margin-bottom: 1rem;
-  display: inline-block;
-  width: 34.5rem;
-  max-width: 100%;
+  max-width: 414px;
 }
-.article-audio-name{
-  text-align: center;
-  font-size: 1.2rem;
+span[data-type="attachment"] .article-attachment-icon{
+  display: table-cell;
+  vertical-align: top;
+  width: 3.3rem;
+}
+span[data-type="attachment"] .article-attachment-icon img{
+  width: 3.3rem;
+  max-width: none;
+  height: 3.3rem;
+}
+span[data-type="attachment"] .article-attachment-content{
+  padding-left: 0.5rem;
+  vertical-align: top;
+  width: 30rem;
+  max-width: 100%;
+  display: table-cell;
+}
+span[data-type="attachment"] .article-attachment-name:hover, .article-attachment-name:focus{
+  color: #2b90d9;
+}
+span[data-type="attachment"] .article-attachment-name{
+  display: block;
+  height: 1.8rem;
+  font-size: 1.3rem;
+  color: #2b90d9;
   font-weight: 700;
   word-break: break-all;
   display: -webkit-box;
@@ -4000,11 +4124,109 @@ ul.nav.navbar-nav.navbar-md>li>a{
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
-.article-audio-size{
-  color: #e85a71;
+span[data-type="attachment"] .article-attachment-info>span{
   display: inline-block;
-  margin-left: 0.5rem;
+  font-size: 1.15rem;
+  margin-right: 0.5rem;
 }
+span[data-type="attachment"] .article-attachment-size{
+  color: #e85a71;
+  font-weight: 700;
+}
+span[data-type="attachment"] .article-attachment-ext{
+  color: #e85a71;
+  font-weight: 700;
+}
+span[data-type="attachment"] .article-attachment-reader{
+  color: #2b90d9;
+  font-weight: 700;
+}
+/* 学术分隐藏 旧*/
+.nkcHiddenBox{
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ff6d6d;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #fff8f8;
+}
+.nkcHiddenNotes{
+  color: white;
+  margin-bottom: 5px;
+  background: #ff8888;
+  border-radius: 3px;
+  text-align: center;
+  display: block;
+}
+.nkcHiddenContent{
+  border-style: dashed;
+  background: white;
+  border-width: 1px;
+  border-color: #ffcccc;
+  border-radius: 3px;
+  padding: 5px;
+}
+
+/* 学术分隐藏 新*/
+span[data-type="xsf"]{
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ff6d6d;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #fff8f8;
+  display: block;
+  width: 100%;
+}
+span[data-type="xsf"]>span:first-child{
+  color: white;
+  margin-bottom: 5px;
+  background: #ff8888;
+  border-radius: 3px;
+  text-align: center;
+  display: block;
+}
+span[data-type="xsf"]>span:last-child{
+  border-style: dashed;
+  background: white;
+  border-width: 1px;
+  border-color: #ffcccc;
+  border-radius: 3px;
+  padding: 5px;
+  display: block;
+}
+
+/* 文章引用*/
+.quote-post{
+  position: relative;
+  font-size: 1rem;
+  font-style: oblique;
+}
+.quote-post .quote-position a, .quote-post .quote-position span.anonymous{
+  padding: 0 0.5rem;
+}
+.quote-post .quote-cancel{
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2rem;
+  width: 2rem;
+  text-align: center;
+  line-height: 2rem;
+  font-size: 1.3rem;
+  color: #929276;
+  cursor: pointer;
+}
+.quote-post .quote-cancel:hover{
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.quote-post .quote-content{
+  font-size: 1.2rem;
+  font-style: normal;
+}
+
+
+
 .mediaVideo {
   max-width:100%;
   max-height:300px

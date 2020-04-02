@@ -2170,6 +2170,7 @@ button.thread-author-subscribe:focus{
 */
 .render-content{
   overflow: hidden;
+  padding-bottom: 0.5rem;
 }
 
 [data-sticker-rid]{

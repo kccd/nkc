@@ -18,18 +18,23 @@ block content
           h2 科创人民银行
             span.h4!= ` 科创币剩余 <strong style="color: #ffa100;font-size: 2rem;text-decoration: underline;">${data.kcbSettings.totalMoney/100}</strong> 个`
         .col-xs-12.col-md-12
-          .hidden(ref='data')= JSON.stringify({kcbsRecords: data.kcbsRecords, content: data.content, t: data.t})
+          .hidden(ref='data')= JSON.stringify({kcbsRecords: data.kcbsRecords, content: data.content, t: data.t, operatingid: data.operatingid})
           h4 按条件查询记录
         .col-xs-12.col-md-12
           .form-inline(style='margin-bottom: 1rem;')
             .form-group
-              select.form-control(v-model='searchType')
+              select.form-control(v-model='searchType' @change="optionChange" ref="selectTypeDom")
                 option(value='username') 用户名
                 option(value='uid') UID
                 option(value='ip') IP
-                option(value="operation") 操作ID
             .form-group
-              input.form-control(placeholder='请输入内容' v-model='searchText' @keyup.enter='searchUser')
+              input.form-control(:placeholder='searchTextPlaceholder' v-model='searchText' @keyup.enter='searchUser')
+            .form-group
+              | 操作名: 
+              select.form-control(v-model='searchOperatingId')
+                option(value='') 不限
+                each val, key in data.kcbsTypes
+                  option(value=`${key}`) #{val}
             .form-group
               button.btn.btn-primary(type='submit' @click='searchUser') 搜索
               span &nbsp;

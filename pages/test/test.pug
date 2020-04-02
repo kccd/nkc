@@ -1,58 +1,18 @@
 extends ../bootstrap_base
 block title
   title 测试
-  style.
-    .active{
-      border: 1px solid red;
-    }
+  include ../publicModules/plyr/plyr.css.pug
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-6.post-content#post-12
-        div
-          div 值返回值是一个 DOMRect 对象，这个对象是由该元素的 getClientRects() 方法返回的一组矩形的集合, 即：是与该元素相关的CSS 边框集合 
-          div 值返回值是一个 DOMRect 对象，这个对象是由该元素的 getClientRects() 方法返回的一组矩形的集合, 即：是与该元素相关的CSS 边框集合 
-          div 值返回值是一个 DOMRect 对象，这个对象是由该元素的 getClientRects() 方法返回的一组矩形的集合, 即：是与该元素相关的CSS 边框集合 
-          div 值返回值是一个 DOMRect 对象，这个对象是由该元素的 getClientRects() 方法返回的一组矩形的集合, 即：是与该元素相关的CSS 边框集合 
-          div 值返回值是一个 DOMRect 对象，这个对象是由该元素的 getClientRects() 方法返回的一组矩形的集合, 即：是与该元素相关的CSS 边框集合 
-          div 值返回值是一个 DOMRect 对象，这个对象是由该元素的 getClientRects() 方法返回的一组矩形的集合, 即：是与该元素相关的CSS 边框集合 
-          div 值返回值是一个 DOMRect 对象，这个对象是由该元素的 getClientRects() 方法返回的一组矩形的集合, 即：是与该元素相关的CSS 边框集合 
-          p 这是p标签
-          code console.log(123);
-          h2 这是h2标签
-        
-block scripts
-  //- include ../publicModules/nkcPostNote/nkcPostNote
-  //- include ../publicModules/commonModal/commonModal
-  //- script.
-  //-   const postNote = new NKC.modules.PostNote({
-  //-     selecter: ".post-content"
-  //-   });
-  //-   console.log(postNote);
+      .col-xs-12.col-md-6
+        div!=nkcRender.renderHTML({type: "article", id: data.post.pid, html: data.post.c, resources: data.post.resources})
 
-  //- include ../publicModules/NKCHighlighter/NKCHighlighter
-  +includeCSS("/publicModules/NKCHighlighter/NKCHighlighter.css")
-  +includeJS("/publicModules/NKCHighlighter/NKCHighlighter.js")
-  script.
-    var hl = new NKCHighlighter({
-      rootElementId: "post-12"
-    });
-    hl
-      .on(hl.eventNames.select, data => {
-        hl.createSource(data.range, [{
-          uid: NKC.configs.uid,
-          c: "这是批注内容"
-        }]);
-      })
-      .on(hl.eventNames.create, source => {
-        hl.addClass(source, "post-node-mark");
-      })
-      .on(hl.eventNames.click, source => {
-        console.log(source);
-      })
-      .on(hl.eventNames.hover, source => {
-        hl.addClass(source, "post-node-hover");
-      })
-      .on(hl.eventNames.hoverOut, source => {
-        hl.removeClass(source, "post-node-hover");
-      })
+block scripts
+  include ../publicModules/plyr/plyr.js.pug
+  include ../publicModules/lazySizes
+  include ../publicModules/sticker/sticker
+  include ../publicModules/imageViewer
+  include ../publicModules/mathFormula
+
+

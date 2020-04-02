@@ -483,3 +483,56 @@ NKC.methods.sendEmailCode = function(type) {
     operation: type
   });
 };
+
+
+/**
+ * ajax获取ip信息
+ */
+NKC.methods.getIpInfo = function(ip) {
+	return nkcAPI("/ipinfo?ip=" + ip, "GET")
+		.then(function(res) {return res.ipInfo})
+		.then(function(info){
+			if(!info) return sweetError("获取ip信息失败");
+			return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.province + info.city +"</p>")
+		})
+};
+
+
+
+
+// 处理emoji 20200401
+// 将正文中的twemoji部分替换成emoji字符
+NKC.methods.replaceTwemoji = function(content) {
+  var parser = document.createElement("div");
+  parser.innerHTML = content;
+  $(parser)
+    .find("[data-tag='nkcsource'][data-type='twemoji']")
+    .each(function(index, imgElem) {
+      $(imgElem).replaceWith(imgElem.dataset.char);
+    });
+  return parser.innerHTML;
+};
+// 将正文中的emoji字符替换成twemoji Img标签
+// 依赖twemoji模块
+NKC.methods.replaceEmojiChar = function(content) {
+  return twemoji.replace(content, function(char) {
+    var id = twemoji.convert.toCodePoint(char);
+    return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ id +"' data-char='"+ char +"' src=\"/twemoji/2/svg/"+ id +".svg\">"
+  })
+};
+
+/**
+ * ueditor设置内容和获取内容
+ */
+NKC.methods.ueditor = {
+  // ueditor执行getContent时
+  getContent: function(content){
+    content = NKC.methods.replaceTwemoji(content);
+    return content;
+  },
+  // ueditor执行setContent时
+  setContent: function(html) {
+    html = NKC.methods.replaceEmojiChar(html);
+    return html;
+  }
+};
