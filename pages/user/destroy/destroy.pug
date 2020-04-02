@@ -15,7 +15,7 @@ block content
         div
           h4.text-danger
             strong 注意事项
-          div!=experimental_render({c: data.regSettings.noticeForDestroy})
+          div!=nkcRender.plainEscape(data.regSettings.noticeForDestroy)
           hr
           div#app(v-cloak)
             if !data.passed

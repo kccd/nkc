@@ -21,7 +21,10 @@ router
     const count = await db.PostModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count, 100);
     let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-    posts = await db.PostModel.extendPosts(posts);
+    posts = await db.PostModel.extendPosts(posts, {
+      uid: data.user?data.user.uid: '',
+      visitor: data.user
+    });
     data.results = [];
     const tid = new Set(), uid = new Set();
     for(const post of posts) {

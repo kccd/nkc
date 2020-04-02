@@ -21,7 +21,7 @@ module.exports = async (ctx, next) => {
   let postsId = new Set();
   noteContent.map(n => {
     n = n.toObject();
-    n.html = nkcModules.nkc_render.experimental_render({c: n.content});
+    n.html = nkcModules.nkcRender.plainEscape(n.content);
     n.edit = false;
     const {targetId, noteId} = n;
     postsId.add(targetId);

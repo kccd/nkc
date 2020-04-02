@@ -13,6 +13,9 @@ for(const filename of files) {
 }
 
 class NKCRender {
+  constructor() {
+    this.htmlFilter = htmlFilter;
+  }
   renderHTML(options) {
     // 渲染html
     // <nkcsource></nkcsource>模板解析
@@ -86,7 +89,8 @@ class NKCRender {
   }
 
   plainEscape(c) {
-    return plainEscape(c);
+    c = plainEscape(c);
+    return htmlFilter(c);
   }
   HTMLToPlain(html, count) {
     const $ = cheerio.load(html);

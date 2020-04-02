@@ -23,7 +23,7 @@ settingsRouter
 		}
 		if(applicationForm.status.submitted && s === 1) s = 2;
 		if(s === 3) {
-			
+			await applicationForm.extendProject();
 		}
 		if(s === 4) {
       data.forumList = await db.ForumModel.getAccessibleForums(data.userRoles, data.userGrade, data.user);
@@ -31,8 +31,7 @@ settingsRouter
 		}
 		
 		if(s === 5) {
-
-			const project = data.applicationForm.project;
+			const project = await data.applicationForm.extendProject();
 			project.c = nkcModules.nkcRender.renderHTML({
 				type: "article",
 				post: {

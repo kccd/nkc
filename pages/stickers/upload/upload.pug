@@ -8,7 +8,7 @@ block content
       .col-md-offset-3.col-xs-12.col-md-6.box-shadow-panel
         .upload-info
           h4 注意事项
-          div!=experimental_render({c: state.stickerSettings.notesAboutUploading})
+          div!=nkcRender.plainEscape(state.stickerSettings.notesAboutUploading)
         .form.m-t-1#app(v-cloak)
           .form-group
             a(href=`/sticker`) < 返回我的表情

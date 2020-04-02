@@ -70,7 +70,8 @@ applicationRouter
 					uid: data.user? data.user.uid: "",
 					user: data.user
 				});
-				applicationForm.project = firstPost;
+				// applicationForm.project = firstPost;
+				applicationForm.project.c = firstPost.c;
 			} else {
 				applicationForm.project.c = ctx.nkcModules.nkcRender.renderHTML({
 					type: "article",
@@ -319,6 +320,7 @@ applicationRouter
 		}
 		// 填写项目信息
 		if(s === 3) {
+			await applicationForm.extendProject();
 			if(applicationForm.projectId === null){
 				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newDocument = db.FundDocumentModel({

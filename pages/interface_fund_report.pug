@@ -109,11 +109,11 @@ block content
                   div.content(style=i === length-1?`border: none;`:'')
                     -r.c = hideContentByUser(r.c, data.user, 'thread')
                     if r.support === false
-                      div.redFontColor!= experimental_render(r)
+                      div.redFontColor!= nkcRender.plainEscape(r.c)
                     else if r.support === true
-                      div.greenFontColor!= experimental_render(r)
+                      div.greenFontColor!= nkcRender.plainEscape(r.c)
                     else
-                      div!= experimental_render(r)
+                      div!= nkcRender.plainEscape(r.c)
       else if data.type === 'reportAudit'
         .col-xs-12.col-md-6
           .panel.panel-default
@@ -134,8 +134,8 @@ block content
               h3.text-center=`申请第${number+1}期拨款`
               if number !== 0
                 h4 提交的报告：
-                -data.report.c = hideContentByUser(data.report.c, data.user, 'thread')
-                div!= experimental_render(data.report)
+                // -data.report.c = hideContentByUser(data.report.c, data.user, 'thread')
+                div!= nkcRender.plainEscape(data.report.c)
                 br
                 if reportNeedThreads
                   h4 附带的文章：

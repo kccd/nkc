@@ -10,7 +10,6 @@ block columnTitle
       background-color: #f6f6f6;
     }
   style=`body{background-color: ${data.column.color};}`
-  include ../publicModules/plyr/plyr.css.pug
 
 block content
   include ./modules/banner
@@ -37,12 +36,10 @@ block content
           include ./modules/management
           include ./modules/info
 block scripts
-  include ../publicModules/plyr/plyr.js.pug
-  include ../publicModules/lazySizes
+  include ../publicModules/nkcSource
   include ../publicModules/commonModal/commonModal
   include ../publicModules/selectColor
   include ../publicModules/subscribeTypes/subscribeTypes
-  include ../publicModules/sticker/sticker
 
   +includeJS("/columns/settings/page.js")
   +includeJS("/columns/column.js")

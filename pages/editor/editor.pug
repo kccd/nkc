@@ -204,7 +204,7 @@ block content
       .col-xs-12.col-md-3.box-shadow-panel
         div
           h5.text-danger 温馨提示：
-          div!=experimental_render({c: state.editorSettings.notes})
+          div!=nkcRender.plainEscape(state.editorSettings.notes)
   .hidden#data=objToStr({originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft})
 block scripts
   include ../ueditor/ueditorBase
