@@ -484,7 +484,6 @@ window.NKCHighlighter = class {
       }
       for(const key in this.clownAttr) {
         if(!this.clownAttr.hasOwnProperty(key)) continue;
-        console.log(node.getAttribute(key), this.clownAttr[key]);
         if(node.getAttribute(key) === this.clownAttr[key]) return true;
       }
     }

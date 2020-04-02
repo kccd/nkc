@@ -2,7 +2,7 @@ const {getUrl, getSize} = require("../../tools");
 const cheerio = require("../cheerio");
 
 module.exports = {
-  picture(html, id, resource) {
+  /*picture(html, id, resource) {
     const url = getUrl("resource", id);
     html = `<nkcsource data-type="picture" data-id="${id}" contenteditable="false" _rendered><img src="${url}"></nkcsource>`;
     return html;
@@ -60,5 +60,5 @@ module.exports = {
     let $ = cheerio.load(html);
     $("nkcsource").attr("_rendered", "");
     return $("body").html();
-  }
+  }*/
 };

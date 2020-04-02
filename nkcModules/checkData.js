@@ -85,7 +85,7 @@ var CheckData = function () {
    *    maxLength: 最大字节长度
    * @author yuu 2020-3-27
    */
-  self.checkTagContent = function(html, {minLength = 1, maxLength = 5000, name = ""}) {
+  /*self.checkTagContent = function(html, {minLength = 1, maxLength = 5000, name = ""}) {
     const cheerio = require('cheerio')
     let $ = cheerio.load("");
     let content = $(html).text();
@@ -104,7 +104,7 @@ var CheckData = function () {
       self.te(400, name + "长度不能大于" + maxLength + "个字节");
       // console.log(name + "长度不能大于" + maxLength + "个字节");
     }
-  };
+  };*/
 
   /*
   * 检测邮箱格式

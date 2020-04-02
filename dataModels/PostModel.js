@@ -761,7 +761,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
     if(o.quote && post.quote) {
       const quotePost = postsObj[post.quote];
       const index = postsId.indexOf(post.quote);
-      if(index !== -1 || quotePost) {
+      if(index !== -1 && quotePost) {
         let username, uid;
         if(quotePost.anonymous) {
           username = "匿名用户";

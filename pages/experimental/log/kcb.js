@@ -17,7 +17,7 @@ var app = new Vue({
       openToNewLocation('/e/log/kcb?t=' + this.searchType + '&content=' + this.searchText + "&operatingid=" + this.searchOperatingId);
     },
     optionChange: function() {
-      let typeCn = this.$refs.selectTypeDom.selectedOptions[0].innerText;
+      var typeCn = this.$refs.selectTypeDom.selectedOptions[0].innerText;
       this.searchTextPlaceholder = '请输入' + typeCn;
       this.searchText = "";
     }

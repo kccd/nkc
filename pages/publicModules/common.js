@@ -500,24 +500,9 @@ NKC.methods.getIpInfo = function(ip) {
 
 
 
-
-/**
- * ueditor设置内容和获取内容
- */
-NKC.methods.ueditor = {
-  getContent: function(content){
-    content = replaceTwemoji(content);
-    return content;
-  },
-  setContent: function(html) {
-    html = replaceEmojiChar(html);
-    return html;
-  }
-};
-
 // 处理emoji 20200401
 // 将正文中的twemoji部分替换成emoji字符
-function replaceTwemoji(content) {
+NKC.methods.replaceTwemoji = function(content) {
   var parser = document.createElement("div");
   parser.innerHTML = content;
   $(parser)
@@ -526,11 +511,28 @@ function replaceTwemoji(content) {
       $(imgElem).replaceWith(imgElem.dataset.char);
     });
   return parser.innerHTML;
-}
+};
 // 将正文中的emoji字符替换成twemoji Img标签
-function replaceEmojiChar(content) {
+// 依赖twemoji模块
+NKC.methods.replaceEmojiChar = function(content) {
   return twemoji.replace(content, function(char) {
     var id = twemoji.convert.toCodePoint(char);
     return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ id +"' data-char='"+ char +"' src=\"/twemoji/2/svg/"+ id +".svg\">"
   })
-}
+};
+
+/**
+ * ueditor设置内容和获取内容
+ */
+NKC.methods.ueditor = {
+  // ueditor执行getContent时
+  getContent: function(content){
+    content = NKC.methods.replaceTwemoji(content);
+    return content;
+  },
+  // ueditor执行setContent时
+  setContent: function(html) {
+    html = NKC.methods.replaceEmojiChar(html);
+    return html;
+  }
+};
