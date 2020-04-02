@@ -62,7 +62,8 @@ NKC.modules.SelectDraft = class {
           return info;
         },
         insert(data) {
-          self.callback(data);
+          var content = NKC.methods.ueditor.setContent(data.content);
+          self.callback({content:content});
           data.delay = 3;
           const func = () => {
             setTimeout(() => {

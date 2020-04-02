@@ -420,7 +420,7 @@
 			s:      [],
 			section:["data-tag", "data-type", "data-id", "data-message"],
 			small:  [],
-			span:   ['class', 'style', 'contenteditable', 'dataType'],
+			span:   ['class', 'style', 'contenteditable', 'dataType', 'data-tag', 'data-type', 'data-id'],
 			sub:    ['class', 'style'],
 			sup:    ['class', 'style'],
             strong: ['class', 'style'],
