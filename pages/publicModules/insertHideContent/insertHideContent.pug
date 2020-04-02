@@ -12,8 +12,8 @@
               label 限制查看学术分值
                 input.form-control(type="number" v-model="score")
           .row
-            .col-xs-7
-            button.btn.btn-default.col-xs-2(@click="close") 取消
-            button.btn.btn-primary.col-xs-2.insert-hide-content-action(@click="insert") {{isModify? "修改分值":"插入"}}
+            .col-xs-5
+            button.btn.btn-default.col-xs-3(@click="close") 取消
+            button.btn.btn-primary.col-xs-3.insert-hide-content-action(@click="insert") {{isModify? "修改":"插入"}}
         
 +includeJS("/publicModules/insertHideContent/insertHideContent.js")

@@ -23533,7 +23533,13 @@ UE.plugins['catchremoteimage'] = function () {
                                 "_src": newSrc
                             });
                             // img标签用nkcsource标签包起来
-                            $(ci).wrap("<nkcsource data-type='picture' data-id='"+ info.r.rid +"'></nkcsource>")
+                            // $(ci).wrap("<nkcsource data-type='picture' data-id='"+ info.r.rid +"'></nkcsource>")
+                            // 添加属性
+                            $(ci).attr({
+                                "data-tag": "nkcsource",
+                                "data-type": "picture",
+                                "data-id": info.r.rid
+                            })
                             break;
                         }
                         // for (j = 0; cj = list[j++];) {

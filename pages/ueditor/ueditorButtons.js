@@ -240,8 +240,13 @@
          target.dataset.message = "学术分"+newscore+"分以上可见";
        }, parseFloat(score));
       };
+      var count = 0;
       editDoc.addEventListener("dblclick", handle);
-      editDoc.addEventListener("touch", handle);
+      editDoc.addEventListener("touchend", function(e) {   // 手机端模拟双击
+        ++count;
+        if(count == 2) return handle(e);
+        setTimeout(function(){ count = 0; }, 700);
+      });
     });
 
     return new UE.ui.Button({

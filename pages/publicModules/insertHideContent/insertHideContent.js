@@ -34,7 +34,9 @@ NKC.modules.insertHideContent = function() {
         }
       },
       insert: function() {
-        this.callback(this.score);
+        var score = parseFloat(this.score);
+        if(score < 1) return sweetWarning("分值必须大于1分")
+        this.callback(score);
         this.close();
       },
       callback: function(){}
