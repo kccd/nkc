@@ -597,7 +597,7 @@ function nkc_render(options){
       })
       // 视频处理
       .replace(/<video\ssrc="\/r\/([0-9]+?)"><\/video>/igm, function(content, v1) {
-        if(script) return `<video data-tag="nkcsource" data-type="video" data-id="${v1}" src="/r/${v1}"></video>`;
+        if(script) return `<video data-tag="nkcsource" data-type="video" data-id="${v1}" src="/r/${v1}" controls></video>`;
         var resource = resources[v1];
         if(!resource) {
           return "（视频：" + plain_escape(v1) + "）";
@@ -612,7 +612,7 @@ function nkc_render(options){
       })
       // 音频处理
       .replace(/<audio\ssrc="\/r\/([0-9]+?)"><\/audio>/igm, function(content, v1) {
-        if(script) return `<audio data-tag="nkcsource" data-type="audio" data-id="${v1}" src="/r/${v1}"></audio>`;
+        if(script) return `<audio data-tag="nkcsource" data-type="audio" data-id="${v1}" src="/r/${v1}" controls></audio>`;
         var resource = resources[v1];
         if(!resource) {
           return "（音频：" + plain_escape(v1) + "）";

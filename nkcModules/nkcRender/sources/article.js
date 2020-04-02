@@ -84,7 +84,7 @@ module.exports = {
           <img src="${fileCover}" alt="attachment icon">
         </span>
         <span class="article-attachment-content">
-          <a class="article-attachment-name" href="${url}" title="${oname}" target="_blank">${oname}</a>
+          <a class="article-attachment-name" href="${url}?t=attachment" title="${oname}" target="_blank">${oname}</a>
           <span class="article-attachment-info">
             <span class="article-attachment-size">${getSize(size)}</span>
             <span class="article-attachment-ext">${ext.toUpperCase()}</span>

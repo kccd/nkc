@@ -31,11 +31,9 @@ NKC.modules.NKCHL = class {
       clownClass: [
         "MathJax_CHTML", // 公式
       ],
-      clownAttr: [
-        {
-          "data-tag": "nkcsource"
-        }
-      ],
+      clownAttr: {
+        "data-tag": "nkcsource"
+      },
       clownTagName: [
         "code",
         "pre",
@@ -44,6 +42,7 @@ NKC.modules.NKCHL = class {
         "source",
         "table"
       ],
+      // 旧 已废弃
       excludedElementTagName: [
         "video",
         "audio",
@@ -52,6 +51,7 @@ NKC.modules.NKCHL = class {
         "pre",
         "table"
       ],
+      // 旧 已废弃
       excludedElementClass: [
         "article-img-body", // 图片
         "article-attachment", // 附件

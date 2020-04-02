@@ -23,6 +23,11 @@ body img{
   max-width: 60%;
 }
 
+/*twemoji*/
+[data-tag="nkcsource"][data-type="twemoji"] {
+  width: 26px;
+  height: 26px;
+}
 
 /* 学术分隐藏内容 */
 [data-tag="nkcsource"][data-type="xsf"] {
