@@ -229,19 +229,21 @@
   
     editor.ready(function() {
       var editDoc = editor.document;
-      editDoc.addEventListener("dblclick", function(e) {
-         var target = e.target;
-         if(target.dataset.tag !== "nkcsource") return;
-         var type = target.dataset.type;
-         var score = target.dataset.id;
-         if(type !== "xsf") return;
-         window.insertHideContent.open(function(newscore) {
-          target.dataset.id = newscore;
-          target.dataset.message = "浏览这段内容需要"+newscore+"学术分";
-        }, parseFloat(score));
-      })
+      var handle = function(e) {
+        var target = e.target;
+        if(target.dataset.tag !== "nkcsource") return;
+        var type = target.dataset.type;
+        var score = target.dataset.id;
+        if(type !== "xsf") return;
+        window.insertHideContent.open(function(newscore) {
+         target.dataset.id = newscore;
+         target.dataset.message = "学术分"+newscore+"分以上可见";
+       }, parseFloat(score));
+      };
+      editDoc.addEventListener("dblclick", handle);
+      editDoc.addEventListener("touch", handle);
     });
-    
+
     return new UE.ui.Button({
       name:'hideContent',
       title:'插入隐藏内容',
@@ -262,16 +264,11 @@
   
   // 转换成nkcsource标签的html文本
   function resourceToHtml(type, rid, name) {
-    // var nkcsource = document.createElement("nkcsource");
-    var newline = false;
     var handles = {
       "picture": function() {
-        // nkcsource.style.display = "inline-block";
         return "<img data-tag='nkcsource' data-type='picture' data-id='"+ rid +"' src=\"/r/"+ rid +"\">";
       },
       "sticker": function() {
-        // nkcsource.setAttribute("contenteditable", "false");
-        // nkcsource.style.display = "inline-block";
         return "<img data-tag='nkcsource' data-type='sticker' data-id='"+ rid +"' src=\"/sticker/"+ rid +"\">";
       },
       "video": function() {
@@ -299,20 +296,12 @@
         return '<p><br></p><section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="浏览这段内容需要'+ rid +'学术分"><p>&#8203;<br></p></section>';
       },
       "twemoji": function() {
-        // nkcsource.setAttribute("contenteditable", "false");
-        // nkcsource.style.display = "inline-block";
         var emojiChar = twemoji.convert.fromCodePoint(rid);
         return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ rid +"' data-char='"+ emojiChar +"' src=\"/twemoji/2/svg/"+ rid +".svg\">";
       },
       "formula": function() {}
     };
     var hit = handles[type];
-    if(hit) {
-      // nkcsource.setAttribute("data-type", type);
-      // nkcsource.setAttribute("data-id", rid);
-    }
-    // nkcsource.innerHTML = hit();
-    // return nkcsource.outerHTML + (newline? "<span>"+ decodeURI("%E2%80%8E") +"<span>": "");
     return hit? hit() : "";
   }
 }());

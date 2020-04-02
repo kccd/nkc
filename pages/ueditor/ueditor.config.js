@@ -408,7 +408,7 @@
 			header: [],
 			hr:     [],
 			i:      ['class', 'style'],
-			img:    ["draggable", 'src', 'alt', 'title', 'width', 'id', '_src', 'loadingclass', 'data-latex', 'style', "data-tag", "data-type", "data-id"],
+			img:    ["draggable", 'src', 'alt', 'title', 'width', 'id', '_src', 'loadingclass', 'data-latex', 'style', "data-tag", "data-type", "data-id", "data-char"],
 			ins:    ['datetime'],
 			li:     ['class', 'style'],
 			mark:   [],

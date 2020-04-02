@@ -75,7 +75,6 @@ NKC.modules.SelectSticker = function() {
         if(type === "share") {
           url = `/stickers?page=${page}&perpage=${this.sharePerpage}`;
         }
-        console.log(url);
         
         nkcAPI(url, "GET")
           .then(data => {
