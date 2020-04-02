@@ -14,6 +14,8 @@ NKC.modules.insertHideContent = function() {
       if(ui.position.left > winWidth - 100) ui.position.left = winWidth - 100;
     }
   });
+  var width = $(window).width();
+  self.dom.css("left", (width - self.dom.width())*0.5);
   self.app = new Vue({
     el: "#insertHideContentApp",
     data: {
@@ -35,7 +37,7 @@ NKC.modules.insertHideContent = function() {
       },
       insert: function() {
         var score = parseFloat(this.score);
-        if(score < 1) return sweetWarning("分值必须大于1分")
+        if(score < 1) return sweetWarning("分值必须大于1");
         this.callback(score);
         this.close();
       },

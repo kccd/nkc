@@ -237,7 +237,7 @@
         if(type !== "xsf") return;
         window.insertHideContent.open(function(newscore) {
          target.dataset.id = newscore;
-         target.dataset.message = "学术分"+newscore+"分以上可见";
+         target.dataset.message = "浏览这段内容需要"+newscore+"学术分";
        }, parseFloat(score));
       };
       var count = 0;
@@ -251,7 +251,7 @@
 
     return new UE.ui.Button({
       name:'hideContent',
-      title:'插入隐藏内容',
+      title:'学术分隐藏',
       className: 'edui-default edui-for-hide-content edui-icon',
       onclick:function () {
         if(window.insertHideContent) {
