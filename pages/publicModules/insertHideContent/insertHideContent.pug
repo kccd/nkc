@@ -10,7 +10,7 @@
           .row
             .form-group
               label 请输入学术分值
-                input.form-control(type="number" v-model="score")
+                input.form-control(type="number" v-model.number="score" v-on:keyup.enter="insert")
           .row
             .col-xs-5
             button.btn.btn-default.col-xs-3(@click="close") 取消
