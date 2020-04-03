@@ -34,6 +34,13 @@ const schema = new Schema({
     default: null,
     index: 1
   },
+  // 选区ID
+  notesId: {
+    type: [Number],
+    default: [],
+    index: 1
+  },
+  // 旧 选区ID
   noteId: {
     type: Number,
     required: true,
