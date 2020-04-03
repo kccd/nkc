@@ -666,12 +666,14 @@ body{
         .note-thread-cover-image{
           width: 10rem;
           height: 7rem;
+          margin-left: 1rem;
           background-size: cover;
           border-radius: 3px;
         }
       }
       .note-thread-info{
         display: table-cell;
+        width: 100%;
         vertical-align: top;
         .note-thread-title{
           font-weight: 700;
@@ -702,18 +704,26 @@ body{
                 }
               }
               position: relative;
+              border-left: 4px solid #aaa;
               display: block;
               margin-top: 0.5rem;
-              font-style: oblique;
+              //font-style: oblique;
               font-size: 1.25rem;
               font-weight: 700;
               padding: 0.5rem;
               background-color: #f4f4f4;
             }
             .note-content-body{
-              padding: 0.5rem 0;
+              padding-top: 0.5rem;
               .note-content{
                 margin-bottom: 0.3rem;
+                &:hover{
+                  .options{
+                    .fa{
+                      color: #555;
+                    }
+                  }
+                }
                 &>textarea{
                   height: 4rem;
                   resize: none;
@@ -722,7 +732,7 @@ body{
                 .time{
                   display: inline-block;
                   font-size: 1rem;
-                  font-style: oblique;
+                  //font-style: oblique;
                   color: @accent;
                 }
                 .options{
@@ -741,6 +751,7 @@ body{
                 }
                 .content{
                   vertical-align: top;
+                  word-break: break-all;
                   width: 100%;
                   textarea{
                     width: 100%;
@@ -758,23 +769,23 @@ body{
               }
             }
             .add-note{
-              text-align: center;
+              text-align: left;
               //padding: 0 2rem;
               .fa{
-                display: block;
+                width: 7rem;
                 height: 1.6rem;
                 border-radius: 1rem;
                 max-width: 100%;
                 text-align: center;
                 font-size: 1rem;
-                line-height: 1.6rem;
+                line-height: 1.7rem;
                 //background-color: #f4f4f4;
                 cursor: pointer;
-                border: 1px solid #f4f4f4;
-                color: #b7b7b7;
+                color: #fff;
+                background-color: @primary;
                 &:hover{
                   //background-color: #f9f9f9;
-                  color: #555;
+                  opacity: 0.8;
                 }
               }
             }

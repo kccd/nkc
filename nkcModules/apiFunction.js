@@ -229,7 +229,14 @@ fn.fromNow = (time) => {
 // reduce[bull] 是否进行略缩，默认为false
 // count[int]   略缩后剩下的字数
 fn.obtainPureText = (content, reduce, count) => {
-  if(!content) return content;
+  const nkcRender = require("../nkcModules/nkcRender");
+  count = parseInt(count);
+  if(reduce === true) {
+    return nkcRender.htmlToPlain(content, count);
+  } else {
+    return nkcRender.htmlToPlain(content);
+  }
+  /*if(!content) return content;
   // 过滤HTML空格
   content = content.replace(/&nbsp;/ig,"");
   // 过滤HTML引用
@@ -246,7 +253,7 @@ fn.obtainPureText = (content, reduce, count) => {
       content = content.substr(0,count) + "...";
     }
   }
-  return content;
+  return content;*/
 };
 
 // 将全部板块转为app可用json
