@@ -26,6 +26,7 @@ const schema = new Schema({
   },
   content: {
     type: String,
+    index: 1,
     default: ''
   },
   // cid不为null, 则词记录是历史
