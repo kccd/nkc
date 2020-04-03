@@ -19,7 +19,7 @@ router
     } else {
       data.pages = await db.ColumnPageModel.find({columnId: column._id}).sort({toc: -1});
       for(const page of data.pages) {
-        page.c = nkcModules.nkcRender.HTMLToPlain(page.c, 200);
+        page.c = nkcModules.nkcRender.htmlToPlain(page.c, 200);
       }
       ctx.template = "columns/settings/page.pug";
     }

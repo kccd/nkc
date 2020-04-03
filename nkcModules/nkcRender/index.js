@@ -92,8 +92,9 @@ class NKCRender {
     c = plainEscape(c);
     return htmlFilter(c);
   }
-  HTMLToPlain(html, count) {
+  htmlToPlain(html = "", count) {
     const $ = cheerio.load(html);
+    $(`[data-tag="nkcsource"]`).remove();
     let text = $.text();
     const textLength = text.length;
     text = text.slice(0, count);

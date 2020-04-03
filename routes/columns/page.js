@@ -84,7 +84,7 @@ router
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
     if(!page) ctx.throw(404, `未找到ID为${pageId}的自定义页面`);
     if(page.hidden && (!user || column.uid !== user.uid)) ctx.throw(403, "该页面已被专栏主关闭");
-    data.pageContent = nkcModules.nkcRender.HTMLToPlain(page.c, 150);
+    data.pageContent = nkcModules.nkcRender.htmlToPlain(page.c, 150);
     page.c = nkcModules.nkcRender.renderHTML({
       type: 'article',
       post: {

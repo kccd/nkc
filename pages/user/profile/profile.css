@@ -673,11 +673,13 @@ body {
 .account-notes .note-threads .note-thread .note-thread-cover .note-thread-cover-image {
   width: 10rem;
   height: 7rem;
+  margin-left: 1rem;
   background-size: cover;
   border-radius: 3px;
 }
 .account-notes .note-threads .note-thread .note-thread-info {
   display: table-cell;
+  width: 100%;
   vertical-align: top;
 }
 .account-notes .note-threads .note-thread .note-thread-info .note-thread-title {
@@ -701,9 +703,9 @@ body {
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-origin-content {
   position: relative;
+  border-left: 4px solid #aaa;
   display: block;
   margin-top: 0.5rem;
-  font-style: oblique;
   font-size: 1.25rem;
   font-weight: 700;
   padding: 0.5rem;
@@ -724,10 +726,13 @@ body {
   color: #282c37;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body {
-  padding: 0.5rem 0;
+  padding-top: 0.5rem;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content {
   margin-bottom: 0.3rem;
+}
+.account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content:hover .options .fa {
+  color: #555;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content > textarea {
   height: 4rem;
@@ -737,7 +742,6 @@ body {
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .time {
   display: inline-block;
   font-size: 1rem;
-  font-style: oblique;
   color: #e85a71;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .options {
@@ -756,6 +760,7 @@ body {
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .content {
   vertical-align: top;
+  word-break: break-all;
   width: 100%;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .content textarea {
@@ -768,22 +773,22 @@ body {
   outline: none;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .add-note {
-  text-align: center;
+  text-align: left;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .add-note .fa {
-  display: block;
+  width: 7rem;
   height: 1.6rem;
   border-radius: 1rem;
   max-width: 100%;
   text-align: center;
   font-size: 1rem;
-  line-height: 1.6rem;
+  line-height: 1.7rem;
   cursor: pointer;
-  border: 1px solid #f4f4f4;
-  color: #b7b7b7;
+  color: #fff;
+  background-color: #2b90d9;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .add-note .fa:hover {
-  color: #555;
+  opacity: 0.8;
 }
 @media (max-width: 768px) {
   .account-thread-avatar > div {

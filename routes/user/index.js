@@ -235,8 +235,8 @@ userRouter
             continue;
           }
         }
-
-        post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
+        post.c = nkcModules.nkcRender.htmlToPlain(post.c, 200);
+        // post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);
         let firstPost = {};
         let link;
         if(thread.oc === post.pid) {

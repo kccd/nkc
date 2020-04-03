@@ -1,6 +1,6 @@
 const settings = require('../settings');
 const nkcRender = require('../nkcModules/nkcRender');
-const {HTMLToPlain, renderHTML} = nkcRender;
+const {htmlToPlain, renderHTML} = nkcRender;
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -822,7 +822,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
           username = user.username;
           uid = quotePost.uid;
         }
-        const c = HTMLToPlain(quotePost.c, 50);
+        const c = htmlToPlain(quotePost.c, 50);
         post.quotePost = {
           pid: quotePost.pid,
           username,
@@ -983,18 +983,16 @@ postSchema.statics.getUrl = async function(pid, redirect) {
   let posts, perpage;
   if(!isComment) {
     perpage = pageSettings.c.threadPostList;
-    posts = await PostModel.find({tid: post.tid, parentPostId: ""}, {pid: 1, _id: 0}).sort({toc: 1});
+    posts = await PostModel.find({type: "post", tid: post.tid, parentPostId: ""}, {pid: 1, _id: 0}).sort({toc: 1});
   } else {
     perpage = pageSettings.c.threadPostCommentList;
-    posts = await PostModel.find({parentPostsId: post.parentPostsId[0]}).sort({toc: 1});
+    posts = await PostModel.find({type: "post", parentPostsId: post.parentPostsId[0]}).sort({toc: 1});
   }
-  let page;
-  for(let i = 0; i < posts.length; i++) {
-    if(posts[i].pid !== post.pid) continue;
-    page = Math.ceil((i+1)/perpage) - 1;
-    if(page < 0) page = 0;
-    break;
-  }
+  const postsId = posts.map(p => p.pid);
+  const step = postsId.indexOf(post.pid); // 0 - ..
+  // 文章内容
+  if(step === -1) return `/t/${post.tid}`;
+  const page = Math.floor(step/perpage);
   if(!isComment) {
     return `/t/${post.tid}?page=${page}&highlight=${post.pid}#highlight`;
   } else {
