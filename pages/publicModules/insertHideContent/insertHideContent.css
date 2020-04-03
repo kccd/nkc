@@ -308,3 +308,8 @@
 .insert-hide-content-action {
   margin-left: 10px;
 }
+
+
+input::-webkit-inner-spin-button {
+  display: none;
+}
