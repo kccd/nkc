@@ -23,7 +23,7 @@ router
     users.map(user => usersObj[user.uid] = user);
     for(let i = 0; i < histories.length; i++) {
       const h = histories[i].toObject();
-      h.c = nkcRender.HTMLToPlain(h.c);
+      h.c = nkcRender.htmlToPlain(h.c);
       if(targetPost.anonymous) {
         h.uid = "";
         h.uidlm = "";

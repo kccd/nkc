@@ -166,12 +166,14 @@ fn.encodeRFC5987ValueChars = (str) => {
 * */
 fn.getRandomNumber = (obj) => {
 	const {count, min, max, repeat} = obj;
-	if(!repeat && (max-min+1) < count) {
-		const error = new Error(`范围[${min}, ${max}]不可能生成${count}个不同的数字。`);
+  const arr = [];
+  if(!repeat && (max-min+1) < count) {
+		/*const error = new Error(`范围[${min}, ${max}]不可能生成${count}个不同的数字。`);
 		error.status = 500;
-		throw error;
+		throw error;*/
+		// 抛出错误不友好 改为返回空数组
+    return arr;
 	}
-	const arr = [];
 	while(arr.length < count) {
 		const number = Math.round(Math.random()*(max-min) + min);
 		if(repeat) {
@@ -227,7 +229,14 @@ fn.fromNow = (time) => {
 // reduce[bull] 是否进行略缩，默认为false
 // count[int]   略缩后剩下的字数
 fn.obtainPureText = (content, reduce, count) => {
-  if(!content) return content;
+  const nkcRender = require("../nkcModules/nkcRender");
+  count = parseInt(count);
+  if(reduce === true) {
+    return nkcRender.htmlToPlain(content, count);
+  } else {
+    return nkcRender.htmlToPlain(content);
+  }
+  /*if(!content) return content;
   // 过滤HTML空格
   content = content.replace(/&nbsp;/ig,"");
   // 过滤HTML引用
@@ -244,7 +253,7 @@ fn.obtainPureText = (content, reduce, count) => {
       content = content.substr(0,count) + "...";
     }
   }
-  return content;
+  return content;*/
 };
 
 // 将全部板块转为app可用json

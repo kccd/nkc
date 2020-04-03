@@ -19,7 +19,7 @@ NKC.modules.insertHideContent = function() {
   self.app = new Vue({
     el: "#insertHideContentApp",
     data: {
-      score: 0,
+      score: 1,
       isModify: false
     },
     methods: {
@@ -27,7 +27,7 @@ NKC.modules.insertHideContent = function() {
         self.dom.hide();
       },
       open: function(callback, initScore) {
-        this.score = 0;
+        this.score = 1;
         self.dom.show();
         if(callback && typeof callback === "function") this.callback = callback;
         if(initScore && typeof initScore === "number") {
@@ -36,8 +36,11 @@ NKC.modules.insertHideContent = function() {
         }
       },
       insert: function() {
-        var score = parseFloat(this.score);
-        if(score < 1) return sweetWarning("分值必须大于1");
+        var score = parseInt(this.score);
+        if(score !== this.score) return sweetWarning("分值必须是整数");
+        if(score < 1) return sweetWarning("分值必须大于0");
+        if(score > 99) return sweetWarning("分值必须小于100");
+
         this.callback(score);
         this.close();
       },

@@ -25,7 +25,7 @@ router
       uid,
       pid: targetPost.pid,
       step: postsId.indexOf(targetPost.pid),
-      c: nkcModules.nkcRender.HTMLToPlain(targetPost.c, 50)
+      c: nkcModules.nkcRender.htmlToPlain(targetPost.c, 50)
     };
     await next();
   });
