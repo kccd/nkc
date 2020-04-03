@@ -8052,7 +8052,7 @@ UE.Editor.defaultOptions = function(editor){
         initialContent: '',
         initialStyle:'',
         autoClearinitialContent: false,
-        iframeCssUrl: _url + 'themes/iframe.css',
+        iframeCssUrl: _url + 'themes/iframe.css?v=' + NKC.configs.startTime,
         textarea: 'editorValue',
         focus: false,
         focusInEnd: true,

@@ -166,12 +166,14 @@ fn.encodeRFC5987ValueChars = (str) => {
 * */
 fn.getRandomNumber = (obj) => {
 	const {count, min, max, repeat} = obj;
-	if(!repeat && (max-min+1) < count) {
-		const error = new Error(`范围[${min}, ${max}]不可能生成${count}个不同的数字。`);
+  const arr = [];
+  if(!repeat && (max-min+1) < count) {
+		/*const error = new Error(`范围[${min}, ${max}]不可能生成${count}个不同的数字。`);
 		error.status = 500;
-		throw error;
+		throw error;*/
+		// 抛出错误不友好 改为返回空数组
+    return arr;
 	}
-	const arr = [];
 	while(arr.length < count) {
 		const number = Math.round(Math.random()*(max-min) + min);
 		if(repeat) {
