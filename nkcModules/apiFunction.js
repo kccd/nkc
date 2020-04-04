@@ -8,7 +8,8 @@ let fn = {};
 fn.paging = (page = 0, count, perpage, buttonCount = 5) => {
   if(!perpage) perpage = defaultPerpage;
   page = parseInt(page);
-  const pageCount = Math.ceil(count/perpage);
+  let pageCount = Math.ceil(count/perpage);
+  if(pageCount <= 0) pageCount = 1;
   /*if(page >= pageCount) {
     if(pageCount > 0) page = pageCount - 1;
     else page = 0;
