@@ -8,6 +8,7 @@ const app = new Vue({
   data: {
     uid: NKC.configs.uid,
     note: data.note,
+    submitting: false,
     content: ""
   },
   mounted() {
@@ -46,6 +47,7 @@ const app = new Vue({
         .then(() => {
           if(!content) throw "请输入笔记内容";
           const {type, targetId, _id, node} = note;
+          app.submitting = true;
           return nkcAPI("/note", "POST", {
             _id,
             type,
@@ -64,11 +66,15 @@ const app = new Vue({
             note.edit = false;
           });
           app.note = data.note;
+          app.submitting = false;
           setTimeout(() => {
             app.resetTextarea();
           }, 50)
         })
-        .catch(sweetError);
+        .catch(err => {
+          app.submitting = false;
+          sweetError(err);
+        });
     },
     saveNote(n) {
       // 保存编辑

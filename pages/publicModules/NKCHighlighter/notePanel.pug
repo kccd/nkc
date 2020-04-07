@@ -33,7 +33,8 @@ include ../../publicModules/unfixedPanel/unfixedPanel
     .form.p-t-05
       textarea.note-panel-textarea.create-textarea(rows=4 placeholder="添加笔记（公开、500字限制）" v-model="content" @input="autoResize" @keyup.ctrl.enter="saveNewNote")
       .m-b-05(v-if="content")
-        button.btn.btn-xs.btn-primary(@click="saveNewNote") 保存
+        button.btn.btn-xs.btn-primary(v-if="submitting") 保存中...
+        button.btn.btn-xs.btn-primary(v-else @click="saveNewNote") 保存
 
 
 

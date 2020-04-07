@@ -82,6 +82,8 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
+    // 选区不存在：新建选区、存储笔记内容
+    // 选区存在：存储笔记内容
     const {db, body, data, nkcModules} = ctx;
     const {checkString, checkNumber} = nkcModules.checkData;
     const {_id, targetId, content, type, node} = body;
@@ -149,12 +151,17 @@ router
       content,
       type,
       targetId,
-      noteId: note._id
+      notesId: [note._id]
     });
     await noteContent.save();
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
     data.noteContent.edit = false;
-    data.note = await db.NoteModel.extendNote(note);
+    const options = {};
+    if(!ctx.permission("managementNote")) {
+      options.disabled = false;
+      options.deleted = false;
+    }
+    data.note = await db.NoteModel.extendNote(note, options);
     await next();
   });
 module.exports = router;

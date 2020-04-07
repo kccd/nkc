@@ -11,25 +11,27 @@ module.exports = async (ctx, next) => {
 
   const noteContent = await db.NoteContentModel.find(match, {
     targetId: 1,
-    noteId: 1,
+    notesId: 1,
     type: 1,
     content: 1,
     uid: 1,
     toc: 1
   }).sort({toc: 1});
-  const notesContentObj = {}, notesId = [];
+  const notesContentObj = {}, _notesId = [];
   let postsId = new Set();
   noteContent.map(n => {
     n = n.toObject();
     n.html = nkcModules.nkcRender.plainEscape(n.content);
     n.edit = false;
-    const {targetId, noteId} = n;
+    const {targetId, notesId} = n;
     postsId.add(targetId);
-    if(!notesContentObj[noteId]) notesContentObj[noteId] = [];
-    notesContentObj[noteId].push(n);
-    notesId.push(noteId)
+    notesId.map(noteId => {
+      if(!notesContentObj[noteId]) notesContentObj[noteId] = [];
+      notesContentObj[noteId].push(n);
+      _notesId.push(noteId)
+    });
   });
-  const notes = await db.NoteModel.find({_id: {$in: notesId}}, {
+  const notes = await db.NoteModel.find({_id: {$in: _notesId}}, {
     content: 1,
     type: 1,
     targetId: 1,

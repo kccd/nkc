@@ -97,7 +97,9 @@ schema.statics.extendNotes = async (notes_, options = {}) => {
     notesId.push(n._id);
   });
   const match = {
-    noteId: {$in: notesId},
+    // noteId: {$in: notesId},
+
+    notesId: {$in: notesId},
     cid: null
   };
   if(disabled !== undefined) {
@@ -110,8 +112,10 @@ schema.statics.extendNotes = async (notes_, options = {}) => {
   noteContent = await NoteContentModel.extendNoteContent(noteContent);
   const noteContentObj = {};
   noteContent.map(n => {
-    if(!noteContentObj[n.noteId]) noteContentObj[n.noteId] = [];
-    noteContentObj[n.noteId].push(n);
+    n.notesId.map(noteId => {
+      if(!noteContentObj[noteId]) noteContentObj[noteId] = [];
+      noteContentObj[noteId].push(n);
+    });
   });
   return notes.map(note => {
     note.notes = noteContentObj[note._id] || [];

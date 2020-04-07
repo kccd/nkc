@@ -38,13 +38,13 @@ const schema = new Schema({
   // 选区ID
   notesId: {
     type: [Number],
-    default: [],
+    required: true,
     index: 1
   },
   // 旧 选区ID
   noteId: {
     type: Number,
-    required: true,
+    default: null,
     index: 1
   },
   disabled: {
@@ -83,7 +83,7 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
   const usersId = [], usersObj = {}, notesId = [], notesObj = {};
   noteContent.map(n => {
     usersId.push(n.uid);
-    if(extendNote) notesId.push(n.noteId);
+    if(extendNote) notesId.push(n.notesId[n.notesId.length - 1]);
   });
   const users = await UserModel.find({uid: {$in: usersId}});
   users.map(user => usersObj[user.uid] = user);
@@ -99,7 +99,7 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
     c.user = usersObj[c.uid];
     c.html = plainEscape(c.content);
     if(extendNote) {
-      c.note = notesObj[c.noteId];
+      c.note = notesObj[c.notesId[c.notesId.length - 1]];
       if(c.note.type === "post") {
         c.url = `/p/${c.note.targetId}`;
       }
