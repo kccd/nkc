@@ -1,7 +1,7 @@
 extend ../bootstrap_base
 block title
   include ../publicModules/web_header
-  +includeCSS("/css/home/home_all.css")
+  +includeCSS("/home/home_all.css")
   +includeCSS("/swiper/dist/css/swiper.css")
 block content  
   mixin forumList(f)
@@ -354,4 +354,4 @@ block scripts
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   // 23
   +includeJS("/swiper/dist/js/swiper.js")
-  +includeJS("/js/home/home_all.js")
+  +includeJS("/home/home_all.js")

@@ -1,0 +1,857 @@
+@import "../publicModules/base.less";
+body{
+  background-color: #f4f4f4;
+  padding-top: 0;
+}
+.navbar-default.nkcshade{
+  box-shadow: none;
+  background-color: #fff;
+}
+.navbar-default.nkcshade.home-fixed-header{
+  box-shadow: rgba(0, 0, 0, 0.14) 0 1px 6px;
+  background-color: rgba(250, 250, 250, 0.95);
+}
+.home-buttons{
+  margin-bottom: 0.5rem;
+  &>div{
+    text-align: center;
+    padding: 0;
+  }
+  a{
+    height: 3rem;
+    line-height: 3rem;
+    display: block;
+    border-radius: 3px;
+    box-sizing: border-box;
+    margin: 0 2px;
+    border: 1px solid @primary;
+    text-align: center;
+    color: @primary;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+  }
+}
+.home-header{
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  //margin-bottom: 0.5rem;
+  .fa{
+    font-size: 1.4rem;
+    color: @dark;
+    &.fa-flask{
+      font-size: 1.5rem;
+    }
+  }
+  .header-name{
+    display: inline-block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-right: 1rem;
+    color: @accent;
+  }
+  .header-description{
+    display: inline-block;
+    font-size: 1.15rem;
+    color: #868686;
+  }
+}
+.home-forums{
+  .home-forums-list{
+    background-color: #fff;
+    .home-forums-body{
+      padding: 0.3rem;
+      &:hover{
+        background-color: rgba(0, 0, 0, 0.027);
+        border-radius: 2px;
+      }
+    }
+    .home-forum-parent{
+      display: table-cell;
+      vertical-align: top;
+      .home-forum-panel{
+        @parentHeight: 2.5rem;
+        @parentWidth: 12rem;
+        height: @parentHeight;
+        /* &:hover{
+          background-color: @gray;
+          .home-forum-panel-name{
+            color: @dark;
+            span{
+              border: none;
+            }
+          }
+        } */
+        .home-forum-panel-icon{
+          height: @parentHeight;
+          width: @parentHeight;
+          border-radius: 5px;
+          overflow: hidden;
+        }
+        .home-forum-panel-name{
+          font-weight: 700;
+          height: @parentHeight;
+          line-height: @parentHeight;
+          width: @parentWidth - @parentHeight;
+        }
+      }
+    }
+    .home-forum-child{
+      display: table-cell;
+      vertical-align: top;
+    }
+  }
+  .home-forum-panel{
+    @panelHeight: 2rem;
+    @panelWidth: 12rem;
+    @shadowTime: 100ms;
+    vertical-align: top;
+    height: @panelHeight;
+    font-size: 0;
+    width: @panelWidth;
+    cursor: pointer;
+    transition:  box-shadow @shadowTime, background-color @shadowTime;
+    &:hover{
+      // box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      // background-color: @darkGray;
+      .home-forum-panel-name{
+        // color: #fff;
+        color: @accent;
+        span{
+          //border-bottom: 1px solid @accent;
+        }
+      }
+    }
+    border-radius: 2px;
+    overflow: hidden;
+    display: inline-block;
+    margin: 0.25rem 0.5rem 0.25rem 0;
+    .home-forum-panel-icon{
+      display: inline-block;
+      height: @panelHeight;
+      width: @panelHeight;
+      vertical-align: top;
+      box-sizing: border-box;
+      border: 2px solid #eee;
+      border-radius: 50%;
+    }
+    .home-forum-panel-name{
+      vertical-align: top;
+      font-size: 1.25rem;
+      color: @dark;
+      transition:  color @shadowTime;
+      line-height: @panelHeight;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      display: inline-block;
+      height: @panelHeight;
+      width: @panelWidth - @panelHeight;
+      &>div{
+        height: 100%;
+        width: 100%;
+        .hideText(@line: 1)
+      }
+    }
+  }
+}
+
+.home-hot-forums{
+  .home-hot-forum{
+    @hotHeight: 5rem;
+    height: @hotHeight;
+    .home-hot-forum-cover{
+      display: table-cell;
+      vertical-align: top;
+      .home-hot-forum-icon{
+        height: @hotHeight;
+        width: @hotHeight;
+        border-radius: 2px;
+      }
+    }
+    .home-hot-forum-content{
+      display: table-cell;
+      padding-left: 0.5rem;
+      vertical-align: top;
+      .home-hot-forum-name{
+        color: @dark;
+        font-weight: 700;
+        font-size: 1.4rem;
+      }
+    }
+  }
+}
+.home-top{
+  background-color: #fff;
+  padding: 4rem 0 0.5rem 0;
+  box-shadow: 0 0 3px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+  .home-covers{
+    padding: 0;
+    background-color: #fff;
+    overflow: hidden;
+    .home-covers-md{
+      position: relative;
+      height: 21.3rem;
+      overflow: hidden;
+      .swiper-container{
+        height: 100%;
+        border-radius: 2px;
+        box-sizing: border-box;
+        border: 3px solid #eee;
+      }
+      .swiper-wrapper{
+        height: 100%;
+        a.swiper-slide{
+          height: 100%;
+          border-radius: 2px;
+          overflow: hidden;
+          position: relative;
+        }
+      }
+    }
+    .home-covers-sm{
+      font-size: 0;
+      padding-right: 0.3rem;
+      .home-cover-sm{
+        width: 33%;
+        display: inline-block;
+        padding-right: 0.6rem;
+        a{
+          display: block;
+          margin-bottom: 0.6rem;
+          position: relative;
+          box-sizing: border-box;
+          border: 2px solid #eee;
+          border-radius: 5px;
+          overflow: hidden;
+          .home-covers-sm-img{
+            background-size: cover;
+            height: 10rem;
+          }
+          .home-covers-sm-title{
+            background-color: rgba(0,0,0,0.4);
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 80%);
+            color: #fff;
+            position: absolute;
+            bottom: 0;
+            font-size: 1rem;
+            line-height: 2rem;
+            .hideText(@line: 1);
+            padding: 0 0.5rem;
+            left: 0;
+            width: 100%;
+            height: 2rem;
+          }
+        }
+      }
+    }
+    /*.home-covers-sm{
+      height: 10rem;
+      position: relative;
+      display: block;
+      overflow: hidden;
+      border-radius: 2px;
+      border: 3px solid #eee;
+      box-sizing: border-box;
+      &>div{
+        height: 100%;
+        border-radius: 2px;
+        background-size: cover;
+      }
+      .home-covers-sm-title{
+        background-color: rgba(0,0,0,0.4);
+        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 40%);
+        color: #fff;
+        position: absolute;
+        bottom: 0;
+        font-size: 1rem;
+        line-height: 2rem;
+        .hideText(@line: 1);
+        padding: 0 0.5rem;
+        left: 0;
+        width: 100%;
+        height: 2rem;
+      }
+    }*/
+  }
+}
+.home-notices{
+  .home-notice{
+    a{
+      color: #666;
+      font-size: 1.3rem;
+      &:hover, &:focus{
+        text-decoration: none;
+        color: @dark;
+      }
+    }
+  }
+}
+.home-funds{
+  .home-fund-donation{
+    height: 4rem;
+    display: block;
+    line-height: 4rem;
+    text-align: center;
+    background-color: @primary;
+    color: #fff;
+    font-size: 1.4rem;
+    transition: background-color 100ms;
+    border-radius: 3px;
+    &:hover, &:focus{
+      text-decoration: none;
+      background-color: #277dbb;
+    }
+  }
+  .home-fund{
+    margin-bottom: 1rem;
+    .home-fund-name{
+      font-size: 1.3rem;
+      color: #555;
+      &:hover, &:focus{
+        text-decoration: none;
+        color: @accent;
+      }
+    }
+    .home-fund-info{
+      position: relative;
+      .home-fund-code{
+        font-size: 1.25rem;
+        display: inline-block;
+        font-weight: 700;
+        margin-right: 1rem;
+      }
+      .home-fund-link{
+        color: #888;
+        display: inline-block;
+        &:hover,&:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+        &.fund-name{
+          position: absolute;
+          top: 0;
+          right: 0;
+        }
+      }
+      .home-fund-user{
+        display: inline-block;
+        color: #888;
+        &:hover,&:focus{
+          color: @accent;
+          text-decoration: none!important;
+        }
+        img{
+          width: 1.6rem;
+          height: 1.6rem;
+          margin-top: -2px;
+          margin-right: 2px;
+          border-radius: 50%;
+        }
+      }
+    }
+
+  }
+}
+.home-subscribes.recommend{
+  max-height: 6rem;
+  overflow: hidden;
+}
+.home-subscribe-forum{
+  display: inline-block;
+  width: 6.7rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  vertical-align: top;
+  color: @dark;
+  &:hover, &:focus{
+    text-decoration: none;
+    color: @dark;
+  }
+  .home-subscribe-forum-avatar{
+    font-size: 0;
+    width: 100%;
+    text-align: center;
+    &>*{
+      display: inline-block;
+      height: 4rem;
+      width: 4rem;
+      border-radius: 50%;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    }
+  }
+  .home-subscribe-forum-info{
+    font-size: 1rem;
+    height: 1.4rem;
+    .hideText(@line: 1);
+    margin-top: 0.5rem;
+    color: #868686;
+  }
+}
+.home-managements{
+  margin-top: 0.5rem;
+  .home-management{
+    position: relative;
+    font-size: 1.2rem;
+    display: inline-block;
+    margin-right: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #555;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+    &:hover{
+      color: @dark;
+    }
+    .count{
+      display: inline-block;
+      position: absolute;
+      top: -0.5rem;
+      right: -1rem;
+      height: 1.3rem;
+      line-height: 1.4rem;
+      padding: 0 0.4rem;
+      font-size: 1rem;
+      border-radius: 0.65rem;
+      background-color: rgba(255, 0, 0, 0.6);
+      color: #fff;
+    }
+  }
+}
+.home-apps{
+  .home-app{
+    @imgHeight: 3.4rem;
+    margin-top: 0.5rem;
+    display: inline-block;
+    width: 25%;
+    text-align: center;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+    &:hover{
+      color: @dark;
+    }
+    color: #555;
+    img{
+      height: @imgHeight;
+      width: @imgHeight;
+    }
+    .home-app-name{
+      font-size: 1.2rem;
+      height: 1.6rem;
+      .hideText(@line: 1);
+      font-weight: 700;
+      margin-top: 1rem;
+    }
+  }
+}
+.home-active-users{
+  margin-top: 0.5rem;
+  .home-active-user{
+    display: inline-block;
+    margin: 0.75rem;
+    img{
+      height: 6.2rem;
+      width: 6.2rem;
+      border-radius: 3px;
+    }
+  }
+}
+.home-columns{
+  .home-column{
+    display: inline-block;
+    width: 8.5rem;
+    vertical-align: top;
+    text-align: center;
+    margin: 0 0.5rem 1rem 0;
+    color: #555;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+    &:hover{
+      color: @dark;
+    }
+    .home-column-avatar{
+      img{
+        width: 6rem;
+        height: 6rem;
+        border-radius: 10px;
+        box-sizing: border-box;
+        border: 3px solid #eee;
+      }
+    }
+    .home-column-name{
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+      height: 1.6rem;
+      .hideText(@line: 1);
+    }
+  }
+}
+.home-columns-link{
+  text-align: center;
+  .home-columns-link-info{
+    font-size: 1.15rem;
+    color :#777;
+    margin-top: 0.5rem;
+  }
+  a{
+    display: inline-block;
+    height: 2.4rem;
+    line-height: 2.4rem;
+    border-radius: 2px;
+    padding: 0 2rem;
+    background-color: @accent;
+    color: #fff;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+    &:hover{
+      background-color: #d15166;
+    }
+  }
+}
+.home-users{
+  .home-user{
+    width: 8.5rem;
+    display: inline-block;
+    text-align: center;
+    margin: 0 0.5rem 1rem 0;
+    color: #555;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+    &:hover{
+      color: @dark;
+    }
+    .home-user-avatar{
+      img{
+        height: 6rem;
+        width: 6rem;
+        border-radius: 50%;
+        box-sizing: border-box;
+        border: 3px solid #eee;
+      }
+    }
+    .home-user-name{
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+      height: 1.6rem;
+      .hideText(@line: 1);
+    }
+  }
+}
+footer.footer{
+  margin-top: 0;
+  background-color: #fff;
+}
+.home-goods{
+  font-size: 0;
+  & .home-goods-content:last-child{
+    margin-bottom: 0;
+  }
+  .home-goods-content{
+    margin-top: 0.6rem;
+    display: block;
+    margin-bottom: 2rem;
+    &:hover, &:focus{
+      text-decoration: none;
+    }
+    .home-goods-avatar{
+      display: table-cell;
+      &>div{
+        height: 10rem;
+        width: 16rem;
+        border-radius: 5px;
+        box-sizing: border-box;
+        border: 2px solid #eee;
+        background-size: cover;
+        margin-right: 1rem;
+      }
+    }
+    .home-goods-info{
+      vertical-align: top;
+      display: table-cell;
+      width: 100%;
+
+      padding-top: 0;
+      .home-goods-name{
+        font-size: 1.6rem;
+        height: 2.2rem;
+        color: #3a3a3a;
+        &:hover{
+          color: #cf8425;
+        }
+        .hideText(@line: 1);
+        //font-weight: 700;
+        //color: #ee8b42;
+      }
+      .home-goods-description{
+        font-size: 1.2rem;
+        height: 3.6rem;
+        margin-top: 0.8rem;
+        color: #777;
+        .hideText(@line: 2)
+      }
+      .home-goods-other{
+        position: relative;
+        margin-top: 1rem;
+        height: 2.2rem;
+        line-height: 2.2rem;
+        text-align: left;
+        .home-goods-user{
+          vertical-align: top;
+          display: inline-block;
+          height: 100%;
+          color: #777;
+          &:hover, &:focus{
+            text-decoration: none;
+            color: @accent;
+          }
+          img{
+            height: 1.6rem;
+            width: 1.6rem;
+            margin-right: 0.3rem;
+            margin-top: -0.8rem;
+            border-radius: 50%;
+          }
+          span{
+            font-size: 1.1rem;
+          }
+        }
+        .home-goods-price{
+          position: absolute;
+          right: 1rem;
+          top: 0;
+          font-size: 1.6rem;
+          //display: inline-block;
+          //background-color: #ff4400;
+          color: #ff4400;
+          //border-radius: 2px;
+          //line-height: 2.4rem;
+          //color: #fff;
+          font-weight: 700;
+
+          font-style: italic;
+          //padding: 0 1rem;
+        }
+      }
+
+    }
+  }
+}
+.home-goods-forums{
+  font-size: 1.2rem;
+  text-align: left;
+  margin-top: 1rem;
+  a{
+    margin-right: 1rem;
+    display: inline-block;
+    color:#555;
+    &:hover, &:focus{
+      text-decoration: none;
+      color: #cf8425;
+    }
+    font-weight: 700;
+    .home-goods-forum-icon{
+      height: 1.6rem;
+      width: 1.6rem;
+      box-sizing: border-box;
+      border: 2px solid #eee;
+      margin-right: 0.2rem;
+      display: inline-block;
+      border-radius: 50%;
+      vertical-align: top;
+    }
+
+  }
+
+}
+.home-visited-forums{
+  max-height: 5.5rem;
+  overflow: hidden;
+  .home-visited-forum{
+    display: inline-block;
+    vertical-align: top;
+    margin: 0.35rem 1rem 0.5rem 0;
+    color: #555;
+    &:hover, &:focus{
+      text-decoration: none;
+      color: @accent;
+    }
+    .home-visited-forum-icon{
+      vertical-align: top;
+      margin-top: -2px;
+      display: inline-block;
+      height: 2rem;
+      width: 2rem;
+      box-sizing: border-box;
+      border: 2px solid #eee;
+      border-radius: 50%;
+      margin-right: 0.2rem;
+    }
+    span{
+      font-size: 1.25rem;
+    }
+  }
+}
+.home-threads{
+  .home-threads-more-link{
+    height: 2.5rem;
+    line-height: 2.5rem;
+    text-align: center;
+    background-color: #f4f4f4;
+    display: block;
+    color: #aaa;
+    transition: color 100ms;
+    &:hover, &:focus{
+      text-decoration: none;
+      color: #555;
+    }
+  }
+
+  .home-thread:last-child{
+    margin-bottom: 0;
+  }
+  .home-thread{
+    margin-bottom: 1.5rem;
+    .home-thread-title{
+      font-size: 1.3rem;
+      color: #3a3a3a;
+      transition: color 100ms;
+      &:hover, &:focus{
+        text-decoration: none;
+        color: @accent;
+      }
+    }
+    .home-thread-cover{
+      display: table-cell;
+      vertical-align: top;
+      padding-top: 0.3rem;
+      img{
+        width: 8rem;
+        height: 5rem;
+        border-radius: 2px;
+        margin-right: 0.7rem;
+        box-sizing: border-box;
+        //border: 2px solid #eee;
+      }
+    }
+    .home-thread-content{
+      display: table-cell;
+      width: 100%;
+      padding-top: 0.4rem;
+      vertical-align: top;
+      .home-thread-abstract{
+        height: 3rem;
+        font-size: 1.1rem;
+        overflow: hidden;
+        color: #777;
+        .hideText(@line: 2);
+        word-break: break-word;
+      }
+    }
+    .home-thread-info{
+      margin-top: 0.2rem;
+      position: relative;
+      .home-thread-user{
+        color: #aaa;
+        &:hover, &:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+        img{
+          height: 1.4rem;
+          width: 1.4rem;
+          border-radius: 50%;
+          margin-right: 0.3rem;
+          margin-top: -3px;
+        }
+        span{
+        }
+      }
+      .home-thread-forum{
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #777;
+        &:hover,&:focus{
+          text-decoration: none;
+          color: @accent;
+        }
+      }
+    }
+  }
+}
+.home-posts{
+  .home-post{
+    margin-bottom: 1rem;
+    &>span{
+      margin: 0 0.2rem;
+    }
+    .home-post-time{
+      display: inline-block;
+      color:#555;
+      margin-right: 0.2rem;
+    }
+    .home-post-user{
+      color: @primary;
+      img{
+        height: 2rem;
+        width: 2rem;
+        border-radius: 50%;
+        box-sizing: border-box;
+        border: 2px solid #eee;
+        margin-top: -1px;
+      }
+      span{
+        font-size: 1.2rem;
+      }
+    }
+    .home-post-content {
+      display: block;
+      margin-top: 0.3rem;
+      background-color: #f4f4f4;
+      padding: 0.5rem;
+      color: #777;
+      cursor: pointer;
+      border-radius: 2px;
+      &:hover, &:focus{
+        text-decoration: none;
+      }
+      div{
+        max-height: 3.2rem;
+        font-size: 1.15rem;
+        .hideText(@line: 2);
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .home-goods .home-goods-content .home-goods-avatar > div{
+    width: 10rem;
+    height: 7rem;
+  }
+  .home-top .home-covers .home-covers-md{
+    height: 12rem;
+  }
+  .home-forums .home-forums-list .home-forum-parent{
+    display: block;
+  }
+  .home-forums .home-forums-list .home-forum-child{
+    display: block;
+    padding: 0.5rem 0 0.5rem 1rem;
+  }
+  .home-forums .home-forum-panel .home-forum-panel-name{
+    width: inherit;
+  }
+  .home-forums .home-forum-panel{
+    width: inherit;
+  }
+  .home-subscribe-forum{
+    width: 5.7rem;
+  }
+}
