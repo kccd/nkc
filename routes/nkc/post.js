@@ -9,9 +9,15 @@ router
     let posts = await db.PostModel.find({})
       .sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     posts = await db.PostModel.extendPosts(posts, {
-
+      visitor: {xsf: 9999},
+      renderHTML: true,
+      user: true,
+      resource: true,
+      showAnonymousUser: true,
+      url: true
     });
     data.posts = posts;
+    data.paging = paging;
     ctx.template = "nkc/post/post.pug";
     await next();
   });
