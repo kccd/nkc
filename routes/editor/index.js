@@ -1,3 +1,4 @@
+const markNotes = require('../../nkcModules/nkcRender/markNotes');
 const Router = require("koa-router");
 const router = new Router();
 
@@ -41,6 +42,10 @@ router
     } else if(type === "post") { // 修改文章或者修改回复
       const {id} = query;
       data.post = await db.PostModel.findOnly({pid: id});
+      // -> 把笔记标记在文中
+      let notes = await db.NoteModel.find({type: "post", targetId: data.post.pid});
+      data.post.c = markNotes.setMark(data.post.c, notes.map(note => note.toObject()));
+      // <- 把笔记标记在文中
       const thread = await db.ThreadModel.findOnly({tid: data.post.tid});
       await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
       data.type = (thread.oc === data.post.pid)? "modifyThread": "modifyPost";
@@ -226,6 +231,5 @@ router
     state.editorSettings = await db.SettingModel.getSettings("editor");
     await next();
   });
-
 
 module.exports = router;
