@@ -520,6 +520,18 @@ NKC.methods.replaceEmojiChar = function(content) {
     return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ id +"' data-char='"+ char +"' src=\"/twemoji/2/svg/"+ id +".svg\">"
   })
 };
+// 将学术分隐藏的data-message属性加上
+NKC.methods.addXsfDataMessage = function(content) {
+  var parser = document.createElement("div");
+  parser.innerHTML = content;
+  $(parser)
+    .find("[data-tag='nkcsource'][data-type='xsf']")
+    .each(function(index, el){
+      var id = $(el).attr("data-id");
+      $(el).attr("data-message", "浏览这段内容需要" + id + "学术分(双击修改)");
+    });
+  return parser.innerHTML;
+}
 
 /**
  * ueditor设置内容和获取内容
@@ -533,6 +545,7 @@ NKC.methods.ueditor = {
   // ueditor执行setContent时
   setContent: function(html) {
     html = NKC.methods.replaceEmojiChar(html);
+    html = NKC.methods.addXsfDataMessage(html);
     return html;
   }
 };

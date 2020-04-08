@@ -26,6 +26,7 @@ defaultWL.source = ["src", "type"];
 defaultWL.span = ["class", "style", 'data-type', 'data-id', "_rendered", "style", "data-tag"];
 defaultWL.a = ["class", "href", "target", "title", "style", "data-type", "data-tag", "data-id"];
 defaultWL.pre = ['class', "data-tag", "data-type", "data-id"];
+defaultWL.em = ['class', 'style', 'note-tag', 'note-id', 'tag-type', 'contenteditable'];
 
 for(var i = 1; i <= 6; i++) {
   defaultWL['h'+i] = ['style'];

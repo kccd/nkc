@@ -13,6 +13,7 @@ const Path = require("path");
 const toppedRouter = require("./topped");
 const authorRouter = require("./author");
 const resourcesRouter = require("./resources");
+const markNotes = require('../../nkcModules/nkcRender/markNotes');
 const router = new Router();
 
 router
@@ -295,6 +296,12 @@ router
       body = ctx.body;
     }
     const post = body.post;
+
+    let {html, notes} = markNotes.getMark(post.c);
+    post.c = html;
+    console.log(notes);
+    
+    
     const {
       columnCategoriesId=[], anonymous, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
       survey, did, cover = ""
