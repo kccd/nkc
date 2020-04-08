@@ -392,10 +392,9 @@ postSchema.pre("save", async function(next) {
   const NoteContentModel = mongoose.model("noteContent");
   const SettingModel = mongoose.model("settings");
   const {getMark} = require("../nkcModules/nkcRender/markNotes");
-  const {c, pid, cv} = this;
   // 去掉插入post中的选区标记
   // 重新计算选区信息
-  const {html, notes} = getMark(c);
+  const {html, notes} = getMark(this.c);
   // 将去掉选区标记后的内容存到数据库
   this.c = html;
   // 与更改前的内容比较
@@ -404,34 +403,36 @@ postSchema.pre("save", async function(next) {
   if(!_post) return await next();
   if(this.c !== _post.c) {
     // 内容版本号加一（与选区版本对应）
-    this.cv ++;
     // 更新选区信息
-    for(const note of notes) {
-      const {_id, offset = 0, length = 0, isLost = false} = note;
-      // 获取更改前的选区信息
-      let _note = await NoteModel.findOne({type: "post", targetId: pid, _id, cv});
-      if(_note) continue;
-      // 复制选区
-      _note = _note.toObject();
-      delete _note._id;
-      delete _note.__v;
-      _note.node.offset = offset;
-      _note.node.length = length;
-      _note.isLost = isLost;
-      // 版本号与修改后的内容版本对应
-      _note.cv = this.cv;
-      _note._id = await SettingModel.operateSystemID("notes", 1);
-      _note = NoteModel(_note);
-      // 将新选区的ID添加到所有笔记内容数据中
+    const notesObj = {};
+    notes.map(note => notesObj[note._id] = note);
+    const _notes  = await NodeModel.getNotesByPost(this);
+    this.cv ++;
+    const notesDB = _notes.notes;
+    for(let noteDB of notesDB) {
+      const newNote = notesObj[noteDB._id];
+      noteDB = noteDB.toObject();
+      const noteId = noteDB._id;
+      delete noteDB._id;
+      delete noteDB.__v;
+      noteDB.node.offset = 0;
+      noteDB.node.length = 0;
+      if(newNote) {
+        noteDB.node.offset = newNote.offset || 0;
+        noteDB.node.length = newNote.length || 0;
+      }
+      noteDB.cv = this.cv;
+      noteDB._id = await SettingModel.operateSystemID("notes", 1);
+      noteDB = NoteModel(noteDB);
       await NoteContentModel.updateMany({
-        notesId: _id
+        notesId: noteId
       }, {
         $addToSet: {
-          notesId: _note._id
+          notesId: noteDB._id
         }
       });
       // 存入新的选区
-      await _note.save();
+      await noteDB.save();
     }
   }
   await next();
