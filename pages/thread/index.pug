@@ -695,6 +695,7 @@ block scripts
   include ../publicModules/lazySizes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
+  include ../MathJax.pug
   if permission("viewNote")
     include ../publicModules/NKCHighlighter/NKCHighlighter
   //- include ../publicModules/postNotes/postNotes
@@ -710,7 +711,6 @@ block scripts
       script=`NKC.configs.fid = '${fid}';`
   if data.user
     include ../ueditor/ueditorBase
-  include ../MathJax.pug
   if data.user && showEditor
     +includeJS("/thread/initPostInput.js")
   if state.userColumn && !data.addedToColumn && showEditor

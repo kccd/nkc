@@ -5,6 +5,80 @@ var NKC = {
     imageExt: ["jpg", "jpeg", "png", "svg", "gif"],
     audioExt: ["mp3"],
     videoExt: ["mp4"]
+  },
+  events: {},
+  eventsLog: {},
+  /*
+  * 注册事件
+  * @param {String} eventName 事件名称
+  * @param {Function} callback 事件触发后执行该函数
+  *   callback: @param {Data} 任何类型的数据，却决于NKC.emit发送的数据
+  *             @param {Function} next 执行下一个注册此事件的函数
+  * 例如：
+  * 注册一个事件，在接受数据后触发
+  * NKC.on("getData", function(data, next) {
+  *   console.log(1);
+  *   next();
+  * });
+  * NKC.on("getData", function(data, next) {
+  *   console.log(2);
+  *   next();
+  * });
+  * 触发事件
+  * nkcAPI(url, GET)
+  *   .then(function(data) {
+  *     NKC.emit("getData", data);
+  *   })
+  *
+  * */
+  // 注册事件
+  on: function(eventName, callback) {
+    if(!NKC.events[eventName]) NKC.events[eventName] = [];
+    NKC.events[eventName].push(callback);
+  },
+  //
+  remove: function(eventName, callback) {
+    var events = NKC.events[eventName] || [];
+    for(var i = 0; i < events.length; i++) {
+      var event = events[i];
+      if(callback === event) {
+        return events.splice(i, 1);
+      }
+    }
+  },
+  // 注册事件，只触发一次
+  one: function(eventName, callback) {
+    var _func = function(data, next) {
+      callback(data, next);
+      NKC.remove(_func);
+    };
+    NKC.on(eventName, _func);
+  },
+  // 注册事件，只触发一次
+  // 如果事件在注册前已经触发过
+  // 那么此事件在注册时会立即触发。
+  oneAfter: function(eventName, callback) {
+    if(NKC.eventsLog[eventName]) return callback(undefined, function(){});
+    NKC.one(eventName, callback);
+  },
+  /*
+  * 触发事件
+  * @param {String} eventName 事件名
+  * @param {Data} 发送的数据
+  * */
+  emit: function(eventName, data) {
+    NKC.eventsLog[eventName] = true;
+    var events = NKC.events[eventName] || [];
+    var _events = events.concat([]);
+
+    var func = function(arr, i) {
+      if(i >= arr.length) return;
+      var callback = arr[i];
+      callback(data, function() {
+        func(arr, i+1)
+      });
+    };
+    func(_events, 0);
   }
 };
 

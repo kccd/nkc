@@ -24,13 +24,13 @@
 script.
   window.MathJax = {
     startup: {
-      typeset: true,
+      typeset: false,
       ready: function() {
         MathJax.startup.defaultReady();
-        MathJax.startup.promise.then(function() {
-          console.log("渲染完成");
-        })
-        ;
+        MathJax.typesetPromise()
+        .then(function() {
+          NKC.emit("mathJaxRendered");
+        });
       }
     },
     options: {

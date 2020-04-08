@@ -9,6 +9,6 @@ include ../MathJax
 script.
   NKC.methods.renderFormula = function() {
     if (window.MathJax) {
-      window.MathJax.Hub.Queue(["Typeset", MathJax.Hub])
+      window.MathJax.typeset();
     }
   }

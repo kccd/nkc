@@ -1308,17 +1308,21 @@ $(function() {
 
 	var data = NKC.methods.getDataById("threadForumsId");
 
-	if(data.notes && data.notes.length) {
-		for(var i = 0; i < data.notes.length; i++) {
-			var n = data.notes[i];
-			nkchl.push(new NKC.modules.NKCHL({
-				type: n.type,
-				targetId: n.targetId,
-				notes: n.notes
-			}));
+	NKC.oneAfter("mathJaxRendered", function(_data, next) {
+		if(data.notes && data.notes.length) {
+			for(var i = 0; i < data.notes.length; i++) {
+				var n = data.notes[i];
+				nkchl.push(new NKC.modules.NKCHL({
+					type: n.type,
+					targetId: n.targetId,
+					notes: n.notes
+				}));
+			}
 		}
-	}
+		next();
+	});
 	NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
+
 });
 
 
