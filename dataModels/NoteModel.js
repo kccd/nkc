@@ -32,6 +32,11 @@ const schema = new Schema({
     type: String,
     default: ""
   },
+  // 因为作者编辑了原文，导致选区改变了
+  newContent: {
+    type: String,
+    default: ""
+  },
   node: {
     // 文本节点的开始位置
     offset: {

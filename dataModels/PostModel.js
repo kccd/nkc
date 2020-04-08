@@ -422,6 +422,7 @@ postSchema.pre("save", async function(next) {
       if(newNote) {
         noteDB.node.offset = newNote.offset || 0;
         noteDB.node.length = newNote.length || 0;
+        noteDB.node.newContent = newNote.content || "";
       }
       noteDB.cv = this.cv;
       noteDB._id = await SettingModel.operateSystemID("notes", 1);
