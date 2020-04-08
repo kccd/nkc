@@ -244,7 +244,14 @@ const postSchema = new Schema({
   virtuals: true
 }});
 
-
+// 标志 表示是否禁止划词选区的更新 默认为false
+postSchema.virtual('disableNoteUpdate')
+  .get(function() {
+    return this._disableNoteUpdate
+  })
+  .set(function(disableNoteUpdate) {
+    this._disableNoteUpdate = disableNoteUpdate
+  });
 
 postSchema.virtual('reason')
   .get(function() {
@@ -395,7 +402,8 @@ postSchema.pre("save", async function(next) {
   // 去掉插入post中的选区标记
   // 重新计算选区信息
   const {html, notes} = getMark(this.c);
-
+  console.log(`新-----`);
+  console.log(notes);
   // 将去掉选区标记后的内容存到数据库
   this.c = html;
   // 与更改前的内容比较
@@ -403,39 +411,44 @@ postSchema.pre("save", async function(next) {
   const _post = await PostModel.findOne({pid: this.pid}, {c: 1});
   if(!_post) return await next();
   if(this.c !== _post.c) {
-    // 内容版本号加一（与选区版本对应）
-    // 更新选区信息
-    const notesObj = {};
-    notes.map(note => notesObj[note._id] = note);
-    const _notes  = await NoteModel.getNotesByPost(this);
     this.cv ++;
-    const notesDB = _notes.notes;
-    for(let noteDB of notesDB) {
-      const newNote = notesObj[noteDB._id];
-      noteDB = noteDB.toObject();
-      const noteId = noteDB._id;
-      delete noteDB._id;
-      delete noteDB.toc;
-      delete noteDB.__v;
-      noteDB.node.offset = 0;
-      noteDB.node.length = 0;
-      if(newNote) {
-        noteDB.node.offset = newNote.offset || 0;
-        noteDB.node.length = newNote.length || 0;
-        noteDB.node.newContent = newNote.content || "";
-      }
-      noteDB.cv = this.cv;
-      noteDB._id = await SettingModel.operateSystemID("notes", 1);
-      noteDB = NoteModel(noteDB);
-      await NoteContentModel.updateMany({
-        notesId: noteId
-      }, {
-        $addToSet: {
-          notesId: noteDB._id
-        }
+    if(!this.disableNoteUpdate) {
+      // 内容版本号加一（与选区版本对应）
+      // 更新选区信息
+      const notesObj = {};
+      notes.map(note => notesObj[note._id] = note);
+      const _notes  = await NoteModel.getNotesByPost({
+        pid: this.pid,
+        cv: this.cv - 1
       });
-      // 存入新的选区
-      await noteDB.save();
+      const notesDB = _notes.notes;
+      for(let noteDB of notesDB) {
+        const newNote = notesObj[noteDB._id];
+        noteDB = noteDB.toObject();
+        const noteId = noteDB._id;
+        delete noteDB._id;
+        delete noteDB.toc;
+        delete noteDB.__v;
+        noteDB.node.offset = 0;
+        noteDB.node.length = 0;
+        if(newNote) {
+          noteDB.node.offset = newNote.offset || 0;
+          noteDB.node.length = newNote.length || 0;
+          noteDB.node.newContent = newNote.content || "";
+        }
+        noteDB.cv = this.cv;
+        noteDB._id = await SettingModel.operateSystemID("notes", 1);
+        noteDB = NoteModel(noteDB);
+        await NoteContentModel.updateMany({
+          notesId: noteId
+        }, {
+          $addToSet: {
+            notesId: noteDB._id
+          }
+        });
+        // 存入新的选区
+        await noteDB.save();
+      }
     }
   }
   await next();

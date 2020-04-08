@@ -59,7 +59,7 @@ const schema = new Schema({
 schema.statics.getNotesByPost = async (post) => {
   const NoteModel = mongoose.model("notes");
   return (await NoteModel.getNotesByPosts([post]))[0];
-}
+};
 
 schema.statics.getNotesByPosts = async (posts) => {
   const NoteModel = mongoose.model("notes");
