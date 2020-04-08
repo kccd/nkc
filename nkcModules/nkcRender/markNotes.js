@@ -105,14 +105,13 @@ function reduFormulaExpression(html) {
  * @param {string} notes[].length - 笔记关键字长度
  */
 function setMark(html, notes = []) {
-  console.log(notes);
-  
   if(!notes.length) return html;
   // 处理数学公式
   html = canvertFormulaExpression(html);
   // 包含所有笔记位置信息的映射表,偏移量为键,值为笔记的开始或结束点组成的数组
   let map = {};
   notes.forEach(note => {
+    if(note.node.length === 0) return;
     let startOffset = note.node.offset;
     let endOffset = note.node.offset + note.node.length;
     if(map[startOffset]) {
@@ -126,6 +125,7 @@ function setMark(html, notes = []) {
       map[endOffset] = [{ id: note._id, type: "end" }];
     }
   });
+  
   let offsets = Object.keys(map); 
   const $ = cheerio.load(html, {decodeEntities: false});
   let body = $("body")[0];
@@ -135,6 +135,7 @@ function setMark(html, notes = []) {
     let len = text.length;
     // 当此前已遍历的总字数超过了某个偏移量,说明这个本文节点存在那个偏移量的点,即此处要插标签(但此时还不知到标签应当插到此文本节点的何处)
     let willMark = offsets.filter(offset => prevLen + len >= offset);
+    offsets = offsets.filter(offset => !willMark.includes(offset));
     // 如果这个文本节点上不需要插标签,那么就跳过此节点,并且把此文本节点的长度计入总字数
     if(!willMark.length) return prevLen += text.length;
     // 计算这些标签需要插入到此文本节点的哪些位置,并按这些位置分割文本为数组
@@ -145,6 +146,7 @@ function setMark(html, notes = []) {
       textFragment.push(frag);
     })
     textFragment.unshift(text.substring(0, textOffsets[0]));
+    
     // 重组这些文本,并借此在适当位置插入标签
     let newNodeData = textFragment[0];
     willMark.forEach((offset, index) => {
@@ -181,21 +183,22 @@ exports.setMark = setMark;
  * @desc 关于返回的notes:
  * [
  *    {
- *        id     对应库中的 _id 字段,
+ *        _id     对应库中的 _id 字段,
  *        offset 笔记选区起始位置怕偏移量,
- *        length 笔记选区长度,
- *        isLost 选区是否已经丢失
+ *        length 笔记选区长度(已经丢失的笔记为0)
  *    }
  *    ...
  * ]
  */
 function getMark(html) {
+  // 处理数学公式
+  html = canvertFormulaExpression(html);
   const $ = cheerio.load(html, {decodeEntities: false});
   let body = $("body")[0];
   let prevLen = 0;
   let random = Math.floor(Math.random() * Math.pow(10, 10)) + "";
   let map = {};
-  $("body [note-tag]").text(random)
+  $("body [note-tag]").text(random);
   eachTextNode(body, (text, node) => {
     let parentNode = node.parent;
     if(text === random && hasAttr($(parentNode), "note-tag")) {
@@ -215,9 +218,9 @@ function getMark(html) {
   let notes = [];
   for(let noteId in map) {
     let rec = map[noteId];
-    let note = { id: noteId };
+    let note = { _id: noteId };
     if(!rec.hasOwnProperty("start") || !rec.hasOwnProperty("end")) {
-      notes.push({ ...note, isLost: true});
+      notes.push({ ...note, length: 0, isLost: true});
     }else {
       let start = map[noteId].start;
       let end = map[noteId].end;
@@ -228,9 +231,14 @@ function getMark(html) {
       });
     }
   }
+
+  html = $("body").html();
+  // 还原数学公式
+  html = reduFormulaExpression(html);
+  html = htmlFilter(html);
   
   return {
-    html: htmlFilter($("body").html()),
+    html: html,
     notes
   }
 }

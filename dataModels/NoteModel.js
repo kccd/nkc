@@ -56,6 +56,11 @@ const schema = new Schema({
   collection: 'notes'
 });
 
+schema.statics.getNotesByPost = async (post) => {
+  const NoteModel = mongoose.model("notes");
+  return (await NoteModel.getNotesByPosts([post]))[0];
+}
+
 schema.statics.getNotesByPosts = async (posts) => {
   const NoteModel = mongoose.model("notes");
   const match = {

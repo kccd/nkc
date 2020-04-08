@@ -43,7 +43,8 @@ router
       const {id} = query;
       data.post = await db.PostModel.findOnly({pid: id});
       // -> 把笔记标记在文中
-      let notes = await db.NoteModel.find({type: "post", targetId: data.post.pid});
+      // let notes = await db.NoteModel.find({type: "post", targetId: data.post.pid});
+      let notes = (await db.NoteModel.getNotesByPost(data.post)).notes;
       data.post.c = markNotes.setMark(data.post.c, notes.map(note => note.toObject()));
       // <- 把笔记标记在文中
       const thread = await db.ThreadModel.findOnly({tid: data.post.tid});
