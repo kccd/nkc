@@ -395,9 +395,7 @@ postSchema.pre("save", async function(next) {
   // 去掉插入post中的选区标记
   // 重新计算选区信息
   const {html, notes} = getMark(this.c);
-  console.log(notes);
-  
-  
+
   // 将去掉选区标记后的内容存到数据库
   this.c = html;
   // 与更改前的内容比较
