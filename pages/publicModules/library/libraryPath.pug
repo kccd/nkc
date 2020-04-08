@@ -1,4 +1,4 @@
-+includeCSS("/css/modules/libraryPath.css")
++includeCSS("/publicModules/library/libraryPath.css")
 .modal.fade#moduleLibraryPath(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
   .modal-dialog.modal-sm(role="document")#moduleLibraryPathApp
     .modal-content
@@ -46,4 +46,4 @@
           a(data-dismiss="modal") 关闭
           a.active(@click="submit" :class="{'disabled': !folder}") 确定
 
-+includeJS("/js/modules/libraryPath.js")
++includeJS("/publicModules/library/libraryPath.js")

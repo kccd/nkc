@@ -7,7 +7,7 @@ if data.user
           button(type="button" class="close" data-dismiss="modal" aria-label="Close")
             span(aria-hidden="true") &times;
           h5.modal-title(v-if="edit") {{!type._id?"新建分类":"编辑分类"}}
-          h5.modal-title(v-else) 选择分类
+          h5.modal-title(v-else) 选择分类{{loaded}}
         .modal-body(v-if="!loaded")
           .m-t-3.m-b-3.text-center 加载中...
         .modal-body(v-else)

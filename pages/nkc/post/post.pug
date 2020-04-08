@@ -1,0 +1,32 @@
+extends ../nkc
+block nkcTitle
+  title 最新发表
+  +includeCSS("/nkc/post/post.css")
+block nkcContent
+  .row
+    .col-xs-12.col-md-8.col-md-offset-2
+      include ../../publicModules/paging/paging
+      .management-posts
+        for post in data.posts
+          .management-post
+            .post-header
+              .post-time=format("YYYY/MM/DD HH:mm:ss", post.toc)
+              a(href=`/u/${post.uid}` target="_blank" data-float-uid=post.uid).post-user
+                img(src=tools.getUrl("userAvatar", post.user.avatar))
+                span= post.user.username
+              if post.type === "thread"
+                span 发表文章
+              else if !post.parentPostId
+                span 发表回复
+              else
+                span 发表评论
+              a.post-url(href=post.url target="_blank") 原文链接
+            .post-title=`标题：${post.t || '无'}`
+            .post-content!=post.c
+      include ../../publicModules/paging/paging_input
+
+block nkcScripts
+  include ../../publicModules/nkcSource
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS("/nkc/post/post.js")

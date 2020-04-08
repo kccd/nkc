@@ -1,7 +1,7 @@
 extend ../../bootstrap_base
 block title
   title 结算
-  +includeCSS("/css/shop/shop.css")
+  +includeCSS("/shop/shop-less.css")
 block content
   .container-fluid.max-width
     .row.shop-bill
@@ -123,4 +123,4 @@ block content
   #data.hidden=objToStr({addresses: data.addresses, results: data.results})
 block scripts
   include ../../publicModules/selectAddress/selectAddress
-  +includeJS("/js/shop/bill.js")          
+  +includeJS("/shop/bill/bill.js")

@@ -1,276 +1,281 @@
-var receiveAddress, receiveName, receiveMobile;
-var paramCert = {} // 要求上传凭证的产品
-$(document).ready(function() {
-  $('input[type=radio][name=address]').change(function() {
-    $(".addressSelected").removeClass("addressSelected");
-    $(this).parents(".addressBox").addClass("addressSelected");
-    // 获取收货信息
-    $("#finalAddress").text($(this).next().find(".address").text());
-    $("#finalName").text($(this).next().find(".username").text());
-    $("#finalMobile").text($(this).next().find(".mobile").text());
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+"use strict";
+
+var data = NKC.methods.getDataById("data"); // 默认选择第一个运费模板
+
+data.results.map(function (r) {
+  r.buyMessage = "";
+  r.products.map(function (p) {
+    var product = p.product;
+
+    if (!product.isFreePost) {
+      p.freightName = product.freightTemplates[0].name;
+      p.certId = "";
+    }
   });
-})
+});
+var app = new Vue({
+  el: "#app",
+  data: {
+    addresses: data.addresses,
+    // 地址
+    selectedAddress: data.addresses[0] || "",
+    // 已选择的地址
+    results: data.results,
+    // 商品规格数据
+    freightTotal: 0,
+    // 运费总计
+    priceTotal: 0,
+    // 商品总计
+    showAddressForm: false,
+    addressForm: {
+      username: "",
+      address: "",
+      location: "",
+      mobile: ""
+    }
+  },
+  mounted: function mounted() {
+    this.extendProduct();
+    window.SelectAddress = new NKC.modules.SelectAddress();
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    visitUrl: NKC.methods.visitUrl,
+    checkString: NKC.methods.checkData.checkString,
+    // 隐藏添加地址的输入框
+    switchAddressForm: function switchAddressForm() {
+      this.showAddressForm = !this.showAddressForm;
+    },
+    // 添加新地址
+    saveAddressForm: function saveAddressForm() {
+      var self = this;
+      var _this$addressForm = this.addressForm,
+          username = _this$addressForm.username,
+          address = _this$addressForm.address,
+          location = _this$addressForm.location,
+          mobile = _this$addressForm.mobile;
+      this.checkString(username, {
+        name: "收件人姓名",
+        minLength: 1,
+        maxLength: 50
+      });
+      this.checkString(location, {
+        name: "所在地区",
+        minLength: 1,
+        maxLength: 100
+      });
+      this.checkString(address, {
+        name: "详细地址",
+        minLength: 1,
+        maxLength: 500
+      });
+      this.checkString(mobile, {
+        name: "手机号",
+        minLength: 1,
+        maxLength: 100
+      });
+      nkcAPI("/u/".concat(NKC.configs.uid, "/settings/transaction"), "PATCH", {
+        operation: "add",
+        addresses: [this.addressForm]
+      }).then(function (data) {
+        self.addresses = data.addresses;
 
-/**
- * 提交订单并付款
- * @para:[
- *  {
- *    paraId: 规格id
- *    productCount: 商品数量
- *  }
- * ]
- */
-function submitOrders() {
-  // 获取配送地址
-  var receiveDom = $("input[name='address']:checked");
-  receiveAddress = receiveDom.next().find(".address").text();
-  receiveName = receiveDom.next().find(".username").text();
-  receiveMobile = receiveDom.next().find(".mobile").text();
-  if(!receiveAddress) return sweetWarning("请选择收货地址")
-  if(!receiveName) return sweetWarning("收件人不得为空，请完善信息后提交订单");
-  if(!receiveMobile) return sweetWarning("联系方式不得为空, 请完善信息后提交订单");
-  var receInfo = {
-    receiveAddress: receiveAddress,
-    receiveName: receiveName,
-    receiveMobile: receiveMobile
-  };
-  var para = [];
-  // 检查购买限制
-  if($(".limitBuy").length > 0){
-    return sweetWarning("有商品存在购买限制，请重新下单")
-  }
-  // 获取账单信息
-  var data = document.getElementById('data');
-  data = JSON.parse(data.innerHTML);
-  for(var i in data) {
-    // 获取卖家留言
-    var message = $("#message"+data[i].user.uid).val();
-    data[i].message = message;
-  }
-  // 获取帐单中的产品与数量
-  $(".order").each(function() {
-    var needUploadCert = $(this).attr("data-upload-cert");
-    var paraId = $(this).attr("paid");
-    if(needUploadCert === "true") {
-      if(!paramCert[paraId]) {
-        sweetWarning("请上传凭证");
-        throw "请上传凭证"
+        if (self.addresses.length) {
+          self.selectedAddress = self.addresses[self.addresses.length - 1];
+        } else {
+          self.selectedAddress = "";
+        }
+
+        self.switchAddressForm();
+      })["catch"](sweetError);
+    },
+    selectLocation: function selectLocation() {
+      var self = this;
+      SelectAddress.open(function (data) {
+        self.addressForm.location = data.join(" ");
+      });
+    },
+    // 改变规格的数量
+    changeCount: function changeCount(type, param) {
+      if (type == "up") {
+        if (param.count >= param.productParam.stocksSurplus) {
+          // 数量不能大于规格库存
+          screenTopWarning("库存不足");
+          return;
+        }
+
+        ;
+        param.count++;
+      } else if (param.count > 1) {
+        param.count--;
       }
+
+      this.extendProduct();
+    },
+    // 计算规格运费、价格
+    extendProduct: function extendProduct() {
+      var freightTotal = 0,
+          priceTotal_ = 0;
+      this.results.map(function (r) {
+        r.products.map(function (p) {
+          // 根据用户选择的快递名获取快递模板
+          var freightName = p.freightName;
+          var _p$product = p.product,
+              freightTemplates = _p$product.freightTemplates,
+              isFreePost = _p$product.isFreePost;
+
+          if (!isFreePost) {
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (var _iterator = freightTemplates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var t = _step.value;
+
+                if (t.name === freightName) {
+                  p.freight = t;
+                }
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+                  _iterator["return"]();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+          } // 统计同一商品下规格的总个数以及总价格
+
+
+          var countTotal = 0,
+              priceTotal = 0;
+          p.params.map(function (param) {
+            var count = param.count,
+                price = param.price;
+            countTotal += count;
+            priceTotal += count * price;
+          });
+          p.countTotal = countTotal;
+          p.priceTotal = priceTotal;
+          p.freightTotal = 0;
+
+          if (!isFreePost) {
+            if (p.countTotal === 1) {
+              p.freightTotal = p.freight.firstPrice;
+            } else {
+              p.freightTotal = p.freight.firstPrice + p.freight.addPrice * (p.countTotal - 1);
+            }
+          } // 根据每个商品的总运费、商品总价格计算整个订单的运费以及商品价格
+
+
+          freightTotal += p.freightTotal;
+          priceTotal_ += p.priceTotal;
+        });
+      });
+      this.freightTotal = freightTotal;
+      this.priceTotal = priceTotal_;
+    },
+    selectAddress: function selectAddress(address) {
+      this.selectedAddress = address;
+    },
+    setFreightByName: function setFreightByName() {
+      this.extendProduct();
+    },
+    // 刷新用户的快递信息
+    getAddresses: function getAddresses() {
+      var self = this;
+      nkcAPI(window.location.href + "&t=".concat(Date.now()), "GET").then(function (data) {
+        self.addresses = data.addresses;
+        sweetSuccess("刷新成功");
+      })["catch"](sweetError);
+    },
+    // 用户选择了凭证文件
+    selectedFile: function selectedFile(r, p) {
+      var product = p.product;
+      var dom = $("input.hidden.input-".concat(product.productId));
+      dom = dom[0];
+      var file = dom.files[0];
+      var formData = new FormData();
+      formData.append("type", "shopping");
+      formData.append("file", file);
+      nkcUploadFile("/shop/cert", "POST", formData).then(function (data) {
+        p.certId = data.cert._id;
+        Vue.set(r.products, r.products.indexOf(p), p);
+        sweetSuccess("上传成功");
+      })["catch"](sweetError);
+    },
+    // 查看凭证
+    getCert: function getCert(certId) {
+      NKC.methods.visitUrl("/shop/cert/".concat(certId), true);
+    },
+    submit: function submit() {
+      var results = this.results,
+          selectedAddress = this.selectedAddress;
+      var body = {
+        params: [],
+        address: selectedAddress
+      };
+      Promise.resolve().then(function () {
+        if (!body.address) throw "请选择收货地址";
+        results.map(function (userObj) {
+          var products = userObj.products,
+              user = userObj.user,
+              buyMessage = userObj.buyMessage;
+          var r = {
+            uid: user.uid,
+            buyMessage: buyMessage,
+            products: []
+          };
+          products.map(function (productObj) {
+            var product = productObj.product,
+                params = productObj.params,
+                priceTotal = productObj.priceTotal,
+                freightTotal = productObj.freightTotal,
+                certId = productObj.certId,
+                freightName = productObj.freightName;
+            if (product.uploadCert && !certId) throw "请上传凭证";
+            if (!product.isFreePost && !freightName) throw "请选择物流";
+            var p = {
+              productId: product.productId,
+              priceTotal: priceTotal,
+              freightTotal: freightTotal,
+              certId: certId,
+              freightName: freightName,
+              productParams: []
+            };
+            params.map(function (paramObj) {
+              var productParam = paramObj.productParam,
+                  count = paramObj.count,
+                  price = paramObj.price,
+                  cartId = paramObj.cartId;
+              p.productParams.push({
+                _id: productParam._id,
+                cartId: cartId,
+                count: count,
+                price: price
+              });
+            });
+            r.products.push(p);
+          });
+          body.params.push(r);
+        });
+        console.log(body);
+        return nkcAPI("/shop/order", "POST", body);
+      }).then(function (data) {
+        openToNewLocation('/shop/pay?ordersId=' + data.ordersId.join("-"));
+        sweetSuccess("提交成功，正在前往付款页面");
+      })["catch"](sweetError);
     }
-  })
-  var tempArr = [];
-  // 获取账单中全部商品的快递方式
-  $(".tempArr").each(function() {
-    var cartId = $(this).find("option:selected").attr("cartid");
-    var option = {
-      cartId: cartId,
-      freight: Number($("#freightSingle"+cartId).text())*100
-    }
-    tempArr.push(option)
-  })
-  $("#submitPay").attr('disabled',true);
-  nkcAPI('/shop/order', "POST", {post: data, receInfo: receInfo, paramCert: paramCert, tempArr: tempArr})
-  .then(function(data) {
-    // window.location.href = '/shop/pay?ordersId=' + data.ordersId;
-    openToNewLocation('/shop/pay?ordersId=' + data.ordersId);
-  })
-  .catch(function(data) {
-    sweetWarning(data || data.error)
-    // sweetWarning(data || data.error);
-    $("#submitPay").attr('disabled',false);
-  })
-}
-
-/**
- * 新增收货地址
- */
-function addAddress() {
-
-}
-
-/**
- * 切换收货地址
- */
-
-
-function uploadCert(id) {
-  var input = $("#input_" + id);
-  input.click();
-}
-function inputChange(a) {
-  var paramId = a.getAttribute("data-param-id");
-  var file = a.files[0];
-  var formData = new FormData();
-  formData.append("type", "shopping");
-  formData.append("file", file);
-  uploadFilePromise("/shop/cert", formData, function(d) {
-    console.log(d);
-  })
-    .then(function(data) {
-      screenTopAlert("上传成功");
-      paramCert[paramId] = data.cert._id;
-      $(".cert-" + paramId + " button").removeClass("hidden");
-    })
-    .catch(function(data) {
-      sweetWarning(data);
-    });
-}
-function viewCert(id) {
-  window.open("/shop/cert/" + paramCert[id]);
-}
-
-/**
- * 商品数量加一
- */
-function countAddOne(para) {
-  $(para).attr("disabled","true");
-  var count = parseInt($(para).next().text());
-  count++;
-  // 获取当前商品总数量,并修改购物车中的商品数量，并检测商品数量是否超过总数量
-  var productParamId = $(para).attr("productParamId");
-  var cartId = $(para).attr("cartId");
-  var post = {
-    productParamId: productParamId,
-    cartId: cartId,
-    count: count
   }
-  nkcAPI("/shop/bill/add", "PATCH", post)
-  .then(function(data) {
-    $(para).removeAttr("disabled");
-    $(para).next().text(count+"");
-    // 获取商品差值
-    var singlePricesPlus = data.singlePrices - Number($(para).parents("tr").find("#singlePrices").text())*100;
-    $(para).parents("tr").find("#singlePrices").text(numToFloatTwo(data.singlePrices));
+});
 
-    // 当前商品新总价
-    var singlePrices = data.singlePrices;
-    // 重新计算当前商品总邮费
-    // 1.获取当前邮费规则
-    var isFreePost = $("#isFreePost"+cartId).attr("isFreePost");
-    var freightAddPrice = 0;
-    var freightFirstPrice = 0;
-    if(isFreePost && isFreePost==="false") {
-      freightFirstPrice = Number($("#tempArr"+cartId).find("option:selected").attr("dataffp"));
-      freightAddPrice = Number($("#tempArr"+cartId).find("option:selected").attr("dataafp"));
-    }
-    // 2.计算邮费
-    var currentSingleFreight = freightFirstPrice + (freightAddPrice*(count-1));
-    // 3.获取邮费差值
-    var currentSingleFreightPlus = currentSingleFreight - Number($("#freightSingle"+cartId).text())*100;
-    // 4.显示结果
-    $("#freightSingle"+cartId).text(numToNumberTwo(currentSingleFreight));
-
-    // 计算总差值
-    var totalPricePlus = singlePricesPlus + currentSingleFreightPlus;
-    // console.log();
-    //根据总差值， 修改商品总计和全订单总计
-    $("#billTotalPrice"+data.sellUid).text(numToNumberTwo(totalPricePlus + Number($("#billTotalPrice"+data.sellUid).text())*100));
-    $("#totalPrice").text(numToNumberTwo(totalPricePlus + Number($("#totalPrice").text())*100));
-  })
-  .catch(function(data) {
-    $(para).removeAttr("disabled");
-    return sweetWarning(data.error || data)
-  })
-}
-
-/**
- * 商品数量减一
- */
-function countPlusOne(para) {
-  $(para).attr("disabled","true");
-  var count = parseInt($(para).prev().text());
-  count--;
-  if(count < 1) {
-    $(para).removeAttr("disabled");
-    return sweetWarning("至少购买一件商品");
-  }
-  var productParamId = $(para).attr("productParamId");
-  var cartId = $(para).attr("cartId");
-  var post = {
-    productParamId: productParamId,
-    cartId: cartId,
-    count: count
-  }
-  nkcAPI("/shop/bill/plus", "PATCH", post)
-  .then(function(data) {
-    $(para).removeAttr("disabled");
-    $(para).prev().text(count+"");
-    // 获取商品差值
-    var singlePricesPlus = data.singlePrices - Number($(para).parents("tr").find("#singlePrices").text())*100;
-    $(para).parents("tr").find("#singlePrices").text(numToFloatTwo(data.singlePrices));
-
-    // 当前商品新总价
-    var singlePrices = data.singlePrices;
-    // 重新计算当前商品总邮费
-    // 1.获取当前邮费规则
-    var isFreePost = $("#isFreePost"+cartId).attr("isFreePost");
-    var freightAddPrice = 0;
-    var freightFirstPrice = 0;
-    if(isFreePost && isFreePost === "false") {
-      freightFirstPrice = Number($("#tempArr"+cartId).find("option:selected").attr("dataffp"));
-      freightAddPrice = Number($("#tempArr"+cartId).find("option:selected").attr("dataafp"));
-    }
-    // 2.计算邮费
-    var currentSingleFreight = freightFirstPrice + (freightAddPrice*(count-1));
-    // 3.获取邮费差值
-    var currentSingleFreightPlus = currentSingleFreight - Number($("#freightSingle"+cartId).text())*100;
-    // 4.显示结果
-    $("#freightSingle"+cartId).text(numToNumberTwo(currentSingleFreight));
-
-    // 计算总差值
-    var totalPricePlus = singlePricesPlus + currentSingleFreightPlus;
-    // console.log();
-    //根据总差值， 修改商品总计和全订单总计
-    $("#billTotalPrice"+data.sellUid).text(numToNumberTwo(totalPricePlus + Number($("#billTotalPrice"+data.sellUid).text())*100));
-    $("#totalPrice").text(numToNumberTwo(totalPricePlus + Number($("#totalPrice").text())*100));
-  })
-  .catch(function(data) {
-    $(para).removeAttr("disabled");
-    return sweetWarning(data.error || data);
-  })
-}
-
-/**
- * 重新计算商品合计
- */
-function reCountSinglePrice(count) {
-
-}
-
-/**
- * 检测当前商品是否限购
- */
-
-function numToFloatTwo(str) {
-	str = (str/100).toFixed(2);
-	return str;
-} 
-
-/**
- * 修改运送方式，并修改当前小项价格
- */
-function changeFreightTemplate(para) {
-  // 获取被修改的cart所在billID
-  var billId = $(para).attr("datauid");
-  // 获取被修改的cartId
-  const cartId = $(para).attr("dataid");
-  // 获取当前选中的模板id
-  var freightId = $(para).val();
-  // 获取新模板的首价格与后续价格
-  var newFirstPrice = Number($(para).find("option:selected").attr("dataffp"));
-  var newAddPrice = Number($(para).find("option:selected").attr("dataafp"));
-  // 获取当前cart运费总价
-  var currentSingleFreight = Number($("#freightSingle"+cartId).text())*100;
-  // 获取当前商品数量
-  var cartCount = $("#cartCount"+cartId).text();
-
-  // 计算新的当前cart运费
-  var newCartFreightPrice = newFirstPrice + (newAddPrice * (cartCount - 1));
-  // 计算与当前cart运费的差值
-  var freightSinglePlus = newCartFreightPrice - currentSingleFreight;
-
-  // 将计算好的数值放到cart，小计，总计中
-  $("#freightSingle"+cartId).text(numToNumberTwo(newCartFreightPrice));
-  $("#billTotalPrice"+billId).text(numToNumberTwo(freightSinglePlus + Number($("#billTotalPrice"+billId).text())*100));
-  $("#totalPrice").text(numToNumberTwo(freightSinglePlus + Number($("#totalPrice").text())*100));
-}
+},{}]},{},[1])
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm5vZGVfbW9kdWxlcy9fYnJvd3Nlci1wYWNrQDYuMS4wQGJyb3dzZXItcGFjay9fcHJlbHVkZS5qcyIsInBhZ2VzL3Nob3AvYmlsbC9iaWxsLm1qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7O0FDQUEsSUFBTSxJQUFJLEdBQUcsR0FBRyxDQUFDLE9BQUosQ0FBWSxXQUFaLENBQXdCLE1BQXhCLENBQWIsQyxDQUVBOztBQUNBLElBQUksQ0FBQyxPQUFMLENBQWEsR0FBYixDQUFpQixVQUFBLENBQUMsRUFBSTtBQUNwQixFQUFBLENBQUMsQ0FBQyxVQUFGLEdBQWUsRUFBZjtBQUNBLEVBQUEsQ0FBQyxDQUFDLFFBQUYsQ0FBVyxHQUFYLENBQWUsVUFBQSxDQUFDLEVBQUk7QUFDbEIsUUFBTSxPQUFPLEdBQUcsQ0FBQyxDQUFDLE9BQWxCOztBQUNBLFFBQUcsQ0FBQyxPQUFPLENBQUMsVUFBWixFQUF3QjtBQUN0QixNQUFBLENBQUMsQ0FBQyxXQUFGLEdBQWdCLE9BQU8sQ0FBQyxnQkFBUixDQUF5QixDQUF6QixFQUE0QixJQUE1QztBQUNBLE1BQUEsQ0FBQyxDQUFDLE1BQUYsR0FBVyxFQUFYO0FBQ0Q7QUFDRixHQU5EO0FBT0QsQ0FURDtBQVdBLElBQU0sR0FBRyxHQUFHLElBQUksR0FBSixDQUFRO0FBQ2xCLEVBQUEsRUFBRSxFQUFFLE1BRGM7QUFFbEIsRUFBQSxJQUFJLEVBQUU7QUFDSixJQUFBLFNBQVMsRUFBRSxJQUFJLENBQUMsU0FEWjtBQUN1QjtBQUMzQixJQUFBLGVBQWUsRUFBRSxJQUFJLENBQUMsU0FBTCxDQUFlLENBQWYsS0FBcUIsRUFGbEM7QUFFc0M7QUFDMUMsSUFBQSxPQUFPLEVBQUUsSUFBSSxDQUFDLE9BSFY7QUFHbUI7QUFDdkIsSUFBQSxZQUFZLEVBQUUsQ0FKVjtBQUlhO0FBQ2pCLElBQUEsVUFBVSxFQUFFLENBTFI7QUFLVztBQUVmLElBQUEsZUFBZSxFQUFFLEtBUGI7QUFRSixJQUFBLFdBQVcsRUFBRTtBQUNY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RDtBQXVCQSxVQUFBLElBQUksQ0FBQyxNQUFMLENBQVksSUFBWixDQUFpQixDQUFqQjtBQUNELFNBL0JEO0FBZ0NBLFFBQUEsT0FBTyxDQUFDLEdBQVIsQ0FBWSxJQUFaO0FBQ0EsZUFBTyxNQUFNLENBQUMsYUFBRCxFQUFnQixNQUFoQixFQUF3QixJQUF4QixDQUFiO0FBQ0QsT0FyQ0gsRUFzQ0csSUF0Q0gsQ0FzQ1EsVUFBQSxJQUFJLEVBQUk7QUFDWixRQUFBLGlCQUFpQixDQUFDLHdCQUF3QixJQUFJLENBQUMsUUFBTCxDQUFjLElBQWQsQ0FBbUIsR0FBbkIsQ0FBekIsQ0FBakI7QUFDQSxRQUFBLFlBQVksQ0FBQyxlQUFELENBQVo7QUFDRCxPQXpDSCxXQTBDUyxVQTFDVDtBQTJDRDtBQWpNTTtBQXJCUyxDQUFSLENBQVoiLCJmaWxlIjoiZ2VuZXJhdGVkLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXNDb250ZW50IjpbIihmdW5jdGlvbigpe2Z1bmN0aW9uIHIoZSxuLHQpe2Z1bmN0aW9uIG8oaSxmKXtpZighbltpXSl7aWYoIWVbaV0pe3ZhciBjPVwiZnVuY3Rpb25cIj09dHlwZW9mIHJlcXVpcmUmJnJlcXVpcmU7aWYoIWYmJmMpcmV0dXJuIGMoaSwhMCk7aWYodSlyZXR1cm4gdShpLCEwKTt2YXIgYT1uZXcgRXJyb3IoXCJDYW5ub3QgZmluZCBtb2R1bGUgJ1wiK2krXCInXCIpO3Rocm93IGEuY29kZT1cIk1PRFVMRV9OT1RfRk9VTkRcIixhfXZhciBwPW5baV09e2V4cG9ydHM6e319O2VbaV1bMF0uY2FsbChwLmV4cG9ydHMsZnVuY3Rpb24ocil7dmFyIG49ZVtpXVsxXVtyXTtyZXR1cm4gbyhufHxyKX0scCxwLmV4cG9ydHMscixlLG4sdCl9cmV0dXJuIG5baV0uZXhwb3J0c31mb3IodmFyIHU9XCJmdW5jdGlvblwiPT10eXBlb2YgcmVxdWlyZSYmcmVxdWlyZSxpPTA7aTx0Lmxlbmd0aDtpKyspbyh0W2ldKTtyZXR1cm4gb31yZXR1cm4gcn0pKCkiLCJjb25zdCBkYXRhID0gTktDLm1ldGhvZHMuZ2V0RGF0YUJ5SWQoXCJkYXRhXCIpO1xuXG4vLyDpu5jorqTpgInmi6nnrKzkuIDkuKrov5DotLnmqKHmnb9cbmRhdGEucmVzdWx0cy5tYXAociA9PiB7XG4gIHIuYnV5TWVzc2FnZSA9IFwiXCI7XG4gIHIucHJvZHVjdHMubWFwKHAgPT4ge1xuICAgIGNvbnN0IHByb2R1Y3QgPSBwLnByb2R1Y3Q7XG4gICAgaWYoIXByb2R1Y3QuaXNGcmVlUG9zdCkge1xuICAgICAgcC5mcmVpZ2h0TmFtZSA9IHByb2R1Y3QuZnJlaWdodFRlbXBsYXRlc1swXS5uYW1lXG4gICAgICBwLmNlcnRJZCA9IFwiXCI7XG4gICAgfVxuICB9KVxufSlcblxuY29uc3QgYXBwID0gbmV3IFZ1ZSh7XG4gIGVsOiBcIiNhcHBcIixcbiAgZGF0YToge1xuICAgIGFkZHJlc3NlczogZGF0YS5hZGRyZXNzZXMsIC8vIOWcsOWdgFxuICAgIHNlbGVjdGVkQWRkcmVzczogZGF0YS5hZGRyZXNzZXNbMF0gfHwgXCJcIiwgLy8g5bey6YCJ5oup55qE5Zyw5Z2AXG4gICAgcmVzdWx0czogZGF0YS5yZXN1bHRzLCAvLyDllYblk4Hop4TmoLzmlbDmja5cbiAgICBmcmVpZ2h0VG90YWw6IDAsIC8vIOi/kOi0ueaAu+iuoVxuICAgIHByaWNlVG90YWw6IDAsIC8vIOWVhuWTgeaAu+iuoVxuXG4gICAgc2hvd0FkZHJlc3NGb3JtOiBmYWxzZSxcbiAgICBhZGRyZXNzRm9ybToge1xuICAgICAgdXNlcm5hbWU6IFwiXCIsXG4gICAgICBhZGRyZXNzOiBcIlwiLFxuICAgICAgbG9jYXRpb246IFwiXCIsXG4gICAgICBtb2JpbGU6IFwiXCJcbiAgICB9XG4gIH0sXG4gIG1vdW50ZWQoKSB7XG4gICAgdGhpcy5leHRlbmRQcm9kdWN0KCk7XG4gICAgd2luZG93LlNlbGVjdEFkZHJlc3MgPSBuZXcgTktDLm1vZHVsZXMuU2VsZWN0QWRkcmVzcygpO1xuICB9LFxuICBtZXRob2RzOiB7XG4gICAgZ2V0VXJsOiBOS0MubWV0aG9kcy50b29scy5nZXRVcmwsXG4gICAgdmlzaXRVcmw6IE5LQy5tZXRob2RzLnZpc2l0VXJsLFxuICAgIGNoZWNrU3RyaW5nOiBOS0MubWV0aG9kcy5jaGVja0RhdGEuY2hlY2tTdHJpbmcsXG4gICAgLy8g6ZqQ6JeP5re75Yqg5Zyw5Z2A55qE6L6T5YWl5qGGXG4gICAgc3dpdGNoQWRkcmVzc0Zvcm0oKSB7XG4gICAgICB0aGlzLnNob3dBZGRyZXNzRm9ybSA9ICF0aGlzLnNob3dBZGRyZXNzRm9ybTtcbiAgICB9LFxuICAgIC8vIOa3u+WKoOaWsOWcsOWdgFxuICAgIHNhdmVBZGRyZXNzRm9ybSgpIHtcbiAgICAgIGNvbnN0IHNlbGYgPSB0aGlzO1xuICAgICAgY29uc3Qge3VzZXJuYW1lLCBhZGRyZXNzLCBsb2NhdGlvbiwgbW9iaWxlfSA9IHRoaXMuYWRkcmVzc0Zvcm07XG4gICAgICB0aGlzLmNoZWNrU3RyaW5nKHVzZXJuYW1lLCB7XG4gICAgICAgIG5hbWU6IFwi5pS25Lu25Lq65aeT5ZCNXCIsXG4gICAgICAgIG1pbkxlbmd0aDogMSxcbiAgICAgICAgbWF4TGVuZ3RoOiA1MFxuICAgICAgfSk7XG4gICAgICB0aGlzLmNoZWNrU3RyaW5nKGxvY2F0aW9uLCB7XG4gICAgICAgIG5hbWU6IFwi5omA5Zyo5Zyw5Yy6XCIsXG4gICAgICAgIG1pbkxlbmd0aDogMSxcbiAgICAgICAgbWF4TGVuZ3RoOiAxMDBcbiAgICAgIH0pO1xuICAgICAgdGhpcy5jaGVja1N0cmluZyhhZGRyZXNzLCB7XG4gICAgICAgIG5hbWU6IFwi6K+m57uG5Zyw5Z2AXCIsXG4gICAgICAgIG1pbkxlbmd0aDogMSxcbiAgICAgICAgbWF4TGVuZ3RoOiA1MDBcbiAgICAgIH0pO1xuICAgICAgdGhpcy5jaGVja1N0cmluZyhtb2JpbGUsIHtcbiAgICAgICAgbmFtZTogXCLmiYvmnLrlj7dcIixcbiAgICAgICAgbWluTGVuZ3RoOiAxLFxuICAgICAgICBtYXhMZW5ndGg6IDEwMFxuICAgICAgfSk7XG4gICAgICBua2NBUEkoYC91LyR7TktDLmNvbmZpZ3MudWlkfS9zZXR0aW5ncy90cmFuc2FjdGlvbmAsIFwiUEFUQ0hcIiwge1xuICAgICAgICBvcGVyYXRpb246IFwiYWRkXCIsXG4gICAgICAgIGFkZHJlc3NlczogW3RoaXMuYWRkcmVzc0Zvcm1dXG4gICAgICB9KVxuICAgICAgICAudGhlbihkYXRhID0+IHtcbiAgICAgICAgICBzZWxmLmFkZHJlc3NlcyA9IGRhdGEuYWRkcmVzc2VzO1xuICAgICAgICAgIGlmKHNlbGYuYWRkcmVzc2VzLmxlbmd0aCkge1xuICAgICAgICAgICAgc2VsZi5zZWxlY3RlZEFkZHJlc3MgPSBzZWxmLmFkZHJlc3Nlc1tzZWxmLmFkZHJlc3Nlcy5sZW5ndGggLSAxXTtcbiAgICAgICAgICB9IGVsc2Uge1xuICAgICAgICAgICAgc2VsZi5zZWxlY3RlZEFkZHJlc3MgPSBcIlwiO1xuICAgICAgICAgIH1cbiAgICAgICAgICBzZWxmLnN3aXRjaEFkZHJlc3NGb3JtKCk7XG4gICAgICAgIH0pXG4gICAgICAgIC5jYXRjaChzd2VldEVycm9yKTtcbiAgICB9LFxuICAgIHNlbGVjdExvY2F0aW9uKCkge1xuICAgICAgY29uc3Qgc2VsZiA9IHRoaXM7XG4gICAgICBTZWxlY3RBZGRyZXNzLm9wZW4oZGF0YSA9PiB7XG4gICAgICAgIHNlbGYuYWRkcmVzc0Zvcm0ubG9jYXRpb24gPSBkYXRhLmpvaW4oXCIgXCIpO1xuICAgICAgfSlcbiAgICB9LFxuICAgIC8vIOaUueWPmOinhOagvOeahOaVsOmHj1xuICAgIGNoYW5nZUNvdW50KHR5cGUsIHBhcmFtKSB7XG4gICAgICBpZih0eXBlID09IFwidXBcIikge1xuICAgICAgICBpZihwYXJhbS5jb3VudCA+PSBwYXJhbS5wcm9kdWN0UGFyYW0uc3RvY2tzU3VycGx1cykgeyAvLyDmlbDph4/kuI3og73lpKfkuo7op4TmoLzlupPlrZhcbiAgICAgICAgICBzY3JlZW5Ub3BXYXJuaW5nKFwi5bqT5a2Y5LiN6LazXCIpO1xuICAgICAgICAgIHJldHVyblxuICAgICAgICB9O1xuICAgICAgICBwYXJhbS5jb3VudCArKztcbiAgICAgIH0gZWxzZSBpZihwYXJhbS5jb3VudCA+IDEpe1xuICAgICAgICBwYXJhbS5jb3VudCAtLTtcbiAgICAgIH1cbiAgICAgIHRoaXMuZXh0ZW5kUHJvZHVjdCgpO1xuICAgIH0sXG4gICAgLy8g6K6h566X6KeE5qC86L+Q6LS544CB5Lu35qC8XG4gICAgZXh0ZW5kUHJvZHVjdCgpIHtcbiAgICAgIGxldCBmcmVpZ2h0VG90YWwgPSAwLCBwcmljZVRvdGFsXyA9IDA7XG4gICAgICB0aGlzLnJlc3VsdHMubWFwKHIgPT4ge1xuICAgICAgICByLnByb2R1Y3RzLm1hcChwID0+IHtcbiAgICAgICAgICAvLyDmoLnmja7nlKjmiLfpgInmi6nnmoTlv6vpgJLlkI3ojrflj5blv6vpgJLmqKHmnb9cbiAgICAgICAgICBjb25zdCB7ZnJlaWdodE5hbWV9ID0gcDtcbiAgICAgICAgICBjb25zdCB7ZnJlaWdodFRlbXBsYXRlcywgaXNGcmVlUG9zdH0gPSBwLnByb2R1Y3Q7XG4gICAgICAgICAgaWYoIWlzRnJlZVBvc3QpIHtcbiAgICAgICAgICAgIGZvcihjb25zdCB0IG9mIGZyZWlnaHRUZW1wbGF0ZXMpIHtcbiAgICAgICAgICAgICAgaWYodC5uYW1lID09PSBmcmVpZ2h0TmFtZSkge1xuICAgICAgICAgICAgICAgIHAuZnJlaWdodCA9IHQ7XG4gICAgICAgICAgICAgIH1cbiAgICAgICAgICAgIH0gICAgICBcbiAgICAgICAgICB9XG4gICAgICAgICAgLy8g57uf6K6h5ZCM5LiA5ZWG5ZOB5LiL6KeE5qC855qE5oC75Liq5pWw5Lul5Y+K5oC75Lu35qC8XG4gICAgICAgICAgbGV0IGNvdW50VG90YWwgPSAwLCBwcmljZVRvdGFsID0gMDtcbiAgICAgICAgICBwLnBhcmFtcy5tYXAocGFyYW0gPT4ge1xuICAgICAgICAgICAgY29uc3Qge2NvdW50LCBwcmljZX0gPSBwYXJhbTsgXG4gICAgICAgICAgICBjb3VudFRvdGFsICs9IGNvdW50O1xuICAgICAgICAgICAgcHJpY2VUb3RhbCArPSAoY291bnQgKiBwcmljZSk7XG4gICAgICAgICAgfSk7XG4gICAgICAgICAgcC5jb3VudFRvdGFsID0gY291bnRUb3RhbDtcbiAgICAgICAgICBwLnByaWNlVG90YWwgPSBwcmljZVRvdGFsO1xuICAgICAgICAgIHAuZnJlaWdodFRvdGFsID0gMDtcbiAgICAgICAgICBpZighaXNGcmVlUG9zdCkge1xuICAgICAgICAgICAgaWYocC5jb3VudFRvdGFsID09PSAxKSB7XG4gICAgICAgICAgICAgIHAuZnJlaWdodFRvdGFsID0gcC5mcmVpZ2h0LmZpcnN0UHJpY2U7XG4gICAgICAgICAgICB9IGVsc2Uge1xuICAgICAgICAgICAgICBwLmZyZWlnaHRUb3RhbCA9IHAuZnJlaWdodC5maXJzdFByaWNlICsgKHAuZnJlaWdodC5hZGRQcmljZSAqIChwLmNvdW50VG90YWwgLSAxKSk7XG4gICAgICAgICAgICB9XG4gICAgICAgICAgfVxuICAgICAgICAgIC8vIOagueaNruavj+S4quWVhuWTgeeahOaAu+i/kOi0ueOAgeWVhuWTgeaAu+S7t+agvOiuoeeul+aVtOS4quiuouWNleeahOi/kOi0ueS7peWPiuWVhuWTgeS7t+agvFxuICAgICAgICAgIGZyZWlnaHRUb3RhbCArPSBwLmZyZWlnaHRUb3RhbDtcbiAgICAgICAgICBwcmljZVRvdGFsXyArPSBwLnByaWNlVG90YWw7XG4gICAgICAgIH0pO1xuICAgICAgfSk7XG4gICAgICB0aGlzLmZyZWlnaHRUb3RhbCA9IGZyZWlnaHRUb3RhbDtcbiAgICAgIHRoaXMucHJpY2VUb3RhbCA9IHByaWNlVG90YWxfO1xuICAgIH0sXG4gICAgc2VsZWN0QWRkcmVzcyhhZGRyZXNzKSB7XG4gICAgICB0aGlzLnNlbGVjdGVkQWRkcmVzcyA9IGFkZHJlc3M7XG4gICAgfSxcbiAgICBzZXRGcmVpZ2h0QnlOYW1lKCkge1xuICAgICAgdGhpcy5leHRlbmRQcm9kdWN0KCk7XG4gICAgfSxcbiAgICAvLyDliLfmlrDnlKjmiLfnmoTlv6vpgJLkv6Hmga9cbiAgICBnZXRBZGRyZXNzZXMoKSB7XG4gICAgICBjb25zdCBzZWxmID0gdGhpcztcbiAgICAgIG5rY0FQSSh3aW5kb3cubG9jYXRpb24uaHJlZiArIGAmdD0ke0RhdGUubm93KCl9YCwgXCJHRVRcIilcbiAgICAgICAgLnRoZW4oZGF0YSA9PiB7XG4gICAgICAgICAgc2VsZi5hZGRyZXNzZXMgPSBkYXRhLmFkZHJlc3NlcztcbiAgICAgICAgICBzd2VldFN1Y2Nlc3MoXCLliLfmlrDmiJDlip9cIik7XG4gICAgICAgIH0pXG4gICAgICAgIC5jYXRjaChzd2VldEVycm9yKVxuICAgIH0sXG4gICAgLy8g55So5oi36YCJ5oup5LqG5Yet6K+B5paH5Lu2XG4gICAgc2VsZWN0ZWRGaWxlKHIsIHApIHtcbiAgICAgIGNvbnN0IHtwcm9kdWN0fSA9IHA7XG4gICAgICBsZXQgZG9tID0gJChgaW5wdXQuaGlkZGVuLmlucHV0LSR7cHJvZHVjdC5wcm9kdWN0SWR9YCk7XG4gICAgICBkb20gPSBkb21bMF07XG4gICAgICBjb25zdCBmaWxlID0gZG9tLmZpbGVzWzBdO1xuICAgICAgY29uc3QgZm9ybURhdGEgPSBuZXcgRm9ybURhdGEoKTtcbiAgICAgIGZvcm1EYXRhLmFwcGVuZChcInR5cGVcIiwgXCJzaG9wcGluZ1wiKTtcbiAgICAgIGZvcm1EYXRhLmFwcGVuZChcImZpbGVcIiwgZmlsZSk7XG4gICAgICBua2NVcGxvYWRGaWxlKFwiL3Nob3AvY2VydFwiLCBcIlBPU1RcIiwgZm9ybURhdGEpXG4gICAgICAgIC50aGVuKGRhdGEgPT4ge1xuICAgICAgICAgIHAuY2VydElkID0gZGF0YS5jZXJ0Ll9pZDtcbiAgICAgICAgICBWdWUuc2V0KHIucHJvZHVjdHMsIHIucHJvZHVjdHMuaW5kZXhPZihwKSwgcCk7XG4gICAgICAgICAgc3dlZXRTdWNjZXNzKFwi5LiK5Lyg5oiQ5YqfXCIpO1xuICAgICAgICB9KVxuICAgICAgICAuY2F0Y2goc3dlZXRFcnJvcik7XG4gICAgfSxcbiAgICAvLyDmn6XnnIvlh63or4FcbiAgICBnZXRDZXJ0KGNlcnRJZCkge1xuICAgICAgTktDLm1ldGhvZHMudmlzaXRVcmwoYC9zaG9wL2NlcnQvJHtjZXJ0SWR9YCwgdHJ1ZSk7XG4gICAgfSxcbiAgICBzdWJtaXQoKSB7XG4gICAgICBjb25zdCB7cmVzdWx0cywgc2VsZWN0ZWRBZGRyZXNzfSA9IHRoaXM7XG4gICAgICBjb25zdCBib2R5ID0ge1xuICAgICAgICBwYXJhbXM6IFtdLFxuICAgICAgICBhZGRyZXNzOiBzZWxlY3RlZEFkZHJlc3NcbiAgICAgIH07XG5cbiAgICAgIFByb21pc2UucmVzb2x2ZSgpXG4gICAgICAgIC50aGVuKCgpID0+IHtcbiAgICAgICAgICBpZighYm9keS5hZGRyZXNzKSB0aHJvdyBcIuivt+mAieaLqeaUtui0p+WcsOWdgFwiO1xuICAgICAgICAgIHJlc3VsdHMubWFwKHVzZXJPYmogPT4ge1xuICAgICAgICAgICAgY29uc3Qge3Byb2R1Y3RzLCB1c2VyLCBidXlNZXNzYWdlfSA9IHVzZXJPYmo7XG4gICAgICAgICAgICBjb25zdCByID0ge1xuICAgICAgICAgICAgICB1aWQ6IHVzZXIudWlkLFxuICAgICAgICAgICAgICBidXlNZXNzYWdlLFxuICAgICAgICAgICAgICBwcm9kdWN0czogW11cbiAgICAgICAgICAgIH1cbiAgICAgICAgICAgIHByb2R1Y3RzLm1hcChwcm9kdWN0T2JqID0+IHtcbiAgICAgICAgICAgICAgY29uc3Qge3Byb2R1Y3QsIHBhcmFtcywgcHJpY2VUb3RhbCwgZnJlaWdodFRvdGFsLCBjZXJ0SWQsIGZyZWlnaHROYW1lfSA9IHByb2R1Y3RPYmo7XG4gICAgICAgICAgICAgIGlmKHByb2R1Y3QudXBsb2FkQ2VydCAmJiAhY2VydElkKSB0aHJvdyBcIuivt+S4iuS8oOWHreivgVwiO1xuICAgICAgICAgICAgICBpZighcHJvZHVjdC5pc0ZyZWVQb3N0ICYmICFmcmVpZ2h0TmFtZSkgdGhyb3cgXCLor7fpgInmi6nnianmtYFcIjtcbiAgICAgICAgICAgICAgY29uc3QgcCA9IHtcbiAgICAgICAgICAgICAgICBwcm9kdWN0SWQ6IHByb2R1Y3QucHJvZHVjdElkLFxuICAgICAgICAgICAgICAgIHByaWNlVG90YWwsXG4gICAgICAgICAgICAgICAgZnJlaWdodFRvdGFsLFxuICAgICAgICAgICAgICAgIGNlcnRJZCxcbiAgICAgICAgICAgICAgICBmcmVpZ2h0TmFtZSxcbiAgICAgICAgICAgICAgICBwcm9kdWN0UGFyYW1zOiBbXVxuICAgICAgICAgICAgICB9O1xuICAgICAgICAgICAgICBwYXJhbXMubWFwKHBhcmFtT2JqID0+IHtcbiAgICAgICAgICAgICAgICBjb25zdCB7cHJvZHVjdFBhcmFtLCBjb3VudCwgcHJpY2UsIGNhcnRJZH0gPSBwYXJhbU9iajtcbiAgICAgICAgICAgICAgICBwLnByb2R1Y3RQYXJhbXMucHVzaCh7XG4gICAgICAgICAgICAgICAgICBfaWQ6IHByb2R1Y3RQYXJhbS5faWQsXG4gICAgICAgICAgICAgICAgICBjYXJ0SWQsXG4gICAgICAgICAgICAgICAgICBjb3VudCxcbiAgICAgICAgICAgICAgICAgIHByaWNlXG4gICAgICAgICAgICAgICAgfSk7XG4gICAgICAgICAgICAgIH0pO1xuICAgICAgICAgICAgICByLnByb2R1Y3RzLnB1c2gocCk7XG4gICAgICAgICAgICB9KVxuICAgICAgICAgICAgYm9keS5wYXJhbXMucHVzaChyKTtcbiAgICAgICAgICB9KTtcbiAgICAgICAgICBjb25zb2xlLmxvZyhib2R5KTtcbiAgICAgICAgICByZXR1cm4gbmtjQVBJKFwiL3Nob3Avb3JkZXJcIiwgXCJQT1NUXCIsIGJvZHkpO1xuICAgICAgICB9KVxuICAgICAgICAudGhlbihkYXRhID0+IHtcbiAgICAgICAgICBvcGVuVG9OZXdMb2NhdGlvbignL3Nob3AvcGF5P29yZGVyc0lkPScgKyBkYXRhLm9yZGVyc0lkLmpvaW4oXCItXCIpKTtcbiAgICAgICAgICBzd2VldFN1Y2Nlc3MoXCLmj5DkuqTmiJDlip/vvIzmraPlnKjliY3lvoDku5jmrL7pobXpnaJcIik7XG4gICAgICAgIH0pXG4gICAgICAgIC5jYXRjaChzd2VldEVycm9yKTtcbiAgICB9XG4gIH1cbn0pIl19
