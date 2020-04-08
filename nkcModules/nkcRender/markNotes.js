@@ -23,20 +23,6 @@ function eachTextNode(node, handle) {
 
 
 /**
- * 按顺序遍历所有节点,需传入handle
- * @param {Object} node - cheerio dom节点
- * @param {Function} handle - 处理器
- */
-function eachNode(node, handle) {
-  if(!handle) return;
-  handle(node);
-  for(let child of node.children) {
-    eachTextNode(child, handle)
-  }
-}
-
-
-/**
  * 节点上是否有某个属性
  * @param {Object} $node - cheerio 被选择器包裹的dom节点 
  * @param {string} attrName  - 属性名
@@ -97,6 +83,36 @@ function reduFormulaExpression(html) {
 }
 
 
+
+// 正文中可能出现的emoji
+let emojisReg = /😀|😁|😂|😃|😄|😅|😆|😇|😈|😉|😊|😋|😌|😍|😎|😏|😐|😑|😒|😓|😔|😕|😖|😗|😘|😙|😚|😛|😜|😝|😞|😟|😠|😡|😢|😣|😤|😥|😦|😧|😨|😩|😪|😫|😬|😭|😮|😯|😰|😱|😲|😳|😴|😵|😶|😷|🙁|🙂|🙃|🙄|🤣|☠|☢|☣|👿|💀|👽|👻/g;
+
+/**
+ * 把html字符串中的emoji转换成临时标签
+ * @param {string} html - html字符串
+ */
+function canvertEmojis(html) {
+  return html.replace(emojisReg, origin => {
+    return `<span this-is-emoji data='${origin}'></span>`
+  })
+}
+
+/**
+ * 把emoji临时标签换回字符串
+ * @param {string} html 
+ */
+function reduEmojis(html) {
+  const $ = cheerio.load(html, {decodeEntities: false});
+  $("[this-is-emoji]")
+    .each((_, el) => {
+      let emoji = $(el).attr("data");      
+      $(el).replaceWith(emoji);
+    })
+  return $("body").html();
+}
+
+
+
 /**
  * 把笔记的开始和结束位置标记在文章中
  * @param {string} html - html文本
@@ -109,6 +125,8 @@ function setMark(html, notes = []) {
   if(!notes.length) return html;
   // 处理数学公式
   html = canvertFormulaExpression(html);
+  // 处理emoji
+  html = canvertEmojis(html);
   // 包含所有笔记位置信息的映射表,偏移量为键,值为笔记的开始或结束点组成的数组
   let map = {};
   notes.forEach(note => {
@@ -169,6 +187,8 @@ function setMark(html, notes = []) {
   html = $(body).html();
   // 还原数学公式
   html = reduFormulaExpression(html);
+  // 还原emoji
+  html = reduEmojis(html);
   html = htmlFilter(html);
   return html;
 }
@@ -194,6 +214,8 @@ exports.setMark = setMark;
 function getMark(html) {
   // 处理数学公式
   html = canvertFormulaExpression(html);
+  // 处理emoji
+  html = canvertEmojis(html);
   const $ = cheerio.load(html, {decodeEntities: false});
   let body = $("body")[0];
   let prevLen = 0;
@@ -249,6 +271,8 @@ function getMark(html) {
   html = $("body").html();
   // 还原数学公式
   html = reduFormulaExpression(html);
+  // 还原emoji
+  html = reduEmojis(html);
   html = htmlFilter(html);
   
   return {
