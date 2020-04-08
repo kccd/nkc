@@ -24,11 +24,11 @@
 script.
   window.MathJax = {
     startup: {
-      typeset: false,
+      // elements: ".math-jax", // 指定渲染的dom或class
+      typeset: true,
       ready: function() {
         MathJax.startup.defaultReady();
-        MathJax.typesetPromise()
-        .then(function() {
+        MathJax.startup.promise.then(function() {
           NKC.emit("mathJaxRendered");
         });
       }
