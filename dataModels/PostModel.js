@@ -414,6 +414,7 @@ postSchema.pre("save", async function(next) {
       noteDB = noteDB.toObject();
       const noteId = noteDB._id;
       delete noteDB._id;
+      delete noteDB.toc;
       delete noteDB.__v;
       noteDB.node.offset = 0;
       noteDB.node.length = 0;
