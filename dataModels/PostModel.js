@@ -395,6 +395,10 @@ postSchema.pre("save", async function(next) {
   // 去掉插入post中的选区标记
   // 重新计算选区信息
   const {html, notes} = getMark(this.c);
+  console.log("notes: ");
+  
+  console.log(notes);
+  
   // 将去掉选区标记后的内容存到数据库
   this.c = html;
   // 与更改前的内容比较
@@ -406,7 +410,7 @@ postSchema.pre("save", async function(next) {
     // 更新选区信息
     const notesObj = {};
     notes.map(note => notesObj[note._id] = note);
-    const _notes  = await NodeModel.getNotesByPost(this);
+    const _notes  = await NoteModel.getNotesByPost(this);
     this.cv ++;
     const notesDB = _notes.notes;
     for(let noteDB of notesDB) {
