@@ -200,16 +200,28 @@ function getMark(html) {
   let random = Math.floor(Math.random() * Math.pow(10, 10)) + "";
   let map = {};
   $("body [note-tag]").text(random);
+  let recording = [];   // 记录正在录制内容的noteId
   eachTextNode(body, (text, node) => {
     let parentNode = node.parent;
     if(text === random && hasAttr($(parentNode), "note-tag")) {
       let noteId = $(parentNode).attr("note-id");
       let tagType = $(parentNode).attr("tag-type");
-      // console.log(`offset:${prevLen}, noteId:${noteId}, tagType:${tagType}`);
-      if(!map[noteId]) map[noteId] = {};
+      if(!map[noteId]) 
+        map[noteId] = {content: ""};
       map[noteId][tagType] = prevLen;
+      // 遇到选区开始节点后,开始记录content,直到遇到选区结束节点,结束记录content
+      if(tagType === "start") {
+        recording.push(noteId);     // 开启录制内容
+      }else if(tagType === "end") {
+        let index = recording.indexOf(noteId);
+        if(index >= 0) recording.splice(index, 1);    // 关闭录制内容
+      }
       return;
-    } 
+    }
+    // 正在录制的noteId,此文本节点的内容追加到content字段
+    recording.forEach(noteId => {
+      map[noteId].content += text;
+    })
     prevLen += text.length;
   })
   // 再删除一遍,以免意外入库
@@ -228,7 +240,8 @@ function getMark(html) {
       notes.push({
         ...note,
         offset: start,
-        length: end - start
+        length: end - start,
+        content: rec.content
       });
     }
   }
