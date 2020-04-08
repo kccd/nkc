@@ -63,7 +63,6 @@ router
         comment: !!parentPostCount
       };
       selectedForumsId = thread.mainForumsId || [];
-      data.post.c = func (html, []);
     } else if(type === "forum_declare") { // 修改专业说明
       data.type = "modifyForumDeclare";
       const {id} = query;

@@ -15,7 +15,7 @@
 NKC.modules.NKCHL = class {
   constructor(options) {
     const self = this;
-    const {type, targetId, notes = [], excludedElementClass = []} = options;
+    const {type, targetId, notes = []} = options;
     self.type = type;
     self.id = targetId;
 
@@ -30,37 +30,22 @@ NKC.modules.NKCHL = class {
       rootElementId: el,
       clownClass: [
         "MathJax_CHTML", // 公式
+        "MathJax"
       ],
       clownAttr: {
         "data-tag": "nkcsource"
       },
       clownTagName: [
         "code",
+        "svg",
         "pre",
         "video",
         "audio",
         "source",
-        "table"
-      ],
-      // 旧 已废弃
-      excludedElementTagName: [
-        "video",
-        "audio",
-        "source",
-        "code",
-        "pre",
-        "table"
-      ],
-      // 旧 已废弃
-      excludedElementClass: [
-        "article-img-body", // 图片
-        "article-attachment", // 附件
-        "article-audio", // 音频
-        "MathJax_CHTML", // 公式
-        "article-video-body", // 视频
-        "article-quote", // 引用
-        "nkcHiddenBox", // 学术分隐藏
-      ].concat(excludedElementClass)
+        "table",
+        "style",
+        "script"
+      ]
     });
     self.hl = hl;
     hl

@@ -734,6 +734,9 @@ body {
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content:hover .options .fa {
   color: #555;
 }
+.account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content:hover .options .user a {
+  text-decoration: underline;
+}
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content > textarea {
   height: 4rem;
   resize: none;
@@ -743,6 +746,7 @@ body {
   display: inline-block;
   font-size: 1rem;
   color: #e85a71;
+  margin-right: 0.5rem;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .options {
   float: right;
@@ -757,6 +761,24 @@ body {
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .options .fa:hover {
   color: #555;
+}
+.account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .options .user {
+  font-weight: 700;
+  display: inline-block;
+  color: #555;
+  font-size: 1rem;
+}
+.account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .options .user a {
+  cursor: pointer;
+  user-select: none;
+  color: #2b90d9;
+}
+.account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .options .user a img {
+  margin-top: -2px;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  margin-right: 0.3rem;
 }
 .account-notes .note-threads .note-thread .note-thread-posts .note-thread-post .note-thread-note .note-content-body .note-content .content {
   vertical-align: top;

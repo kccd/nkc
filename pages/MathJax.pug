@@ -1,23 +1,47 @@
 //- 公式渲染模块
-+includeCSS('/katex.min.css')
-script(type='text/x-mathjax-config').
-  MathJax.Hub.Config({
-    jax: ["input/TeX","output/CommonHTML"],
-    extensions: ["tex2jax.js","MathZoom.js"],
-    tex2jax:{
-        inlineMath:  [["$", "$"], ["\\(","\\)"]],
-        displayMath: [["$$","$$"], ["\\[","\\]"]],
-      ignoreClass:'container',
-      processClass:"ThreadPostBody|QuestionText"
+//+includeCSS('/katex.min.css')
+//script(type='text/x-mathjax-config').
+//  MathJax.Hub.Config({
+//    jax: ["input/TeX","output/CommonHTML"],
+//    extensions: ["tex2jax.js","MathZoom.js"],
+//    tex2jax:{
+//        inlineMath:  [["$", "$"], ["\\(","\\)"]],
+//        displayMath: [["$$","$$"], ["\\[","\\]"]],
+//      ignoreClass:'container',
+//      processClass:"ThreadPostBody|QuestionText"
+//    },
+//    "CommonHTML":{
+//      showMathMenu:false,
+//      preferredFont:"STIX",
+//      scale: 100,
+//      minScaleAdjust: 50
+//    },
+//    TeX: {
+//      equationNumbers: {autoNumber: "AMS"}
+//    }
+//  })
+//script(async src='/external_pkgs/MathJax-2.6-latest/MathJax.js')
+script.
+  window.MathJax = {
+    startup: {
+      typeset: true,
+      ready: function() {
+        MathJax.startup.defaultReady();
+        MathJax.startup.promise.then(function() {
+          console.log("渲染完成");
+        })
+        ;
+      }
     },
-    "CommonHTML":{
-      showMathMenu:false,
-      preferredFont:"STIX",
-      scale: 100,
-      minScaleAdjust: 50
+    options: {
+      // processHtmlClass: "", // 指定渲染元素
+      // ignoreHtmlClass: "", // 忽略的元素
     },
-    TeX: {
-      equationNumbers: {autoNumber: "AMS"}
+
+    tex: {
+      inlineMath: [["$", "$"], ["\\(", "\\)"]],
+      displayMath: [ ['$$','$$'], ['\\[','\\]'] ]
     }
-  })
-script(async src='/external_pkgs/MathJax-2.6-latest/MathJax.js')
+  }
+
+script(async src="/external_pkgs/MathJax-3.0.1/es5/tex-mml-chtml.js")

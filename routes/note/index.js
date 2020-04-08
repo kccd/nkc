@@ -111,7 +111,11 @@ router
       note = await db.NoteModel.findOne({_id});
       if(!note) ctx.throw(400, `笔记ID错误，请重试。id:${_id}`);
     } else if(node) {
-      const {offset, length} = node;
+      const {offset, length, content} = node;
+      checkString(content, {
+        name: "划词内容",
+        minLength: 1
+      });
       checkNumber(offset, {
         name: "划词偏移量",
         min: 0

@@ -1,4 +1,20 @@
 #note(v-cloak)
+  //-.account-note-search
+    .form
+      .form-group
+        input.form-control(placeholder="请输入关键词")
+        button.btn.btn-default 搜索
+  .paging-button
+    a.button.radius-left(
+      class=!data.t?"active":""
+      href=`/u/${data.targetUser.uid}/profile/note`
+      data-type="reload"
+      ) 全部
+    a.button.radius-right(
+      class=data.t==="own"?"active":""
+      href=`/u/${data.targetUser.uid}/profile/note?t=own`
+      data-type="reload"
+      ) 我的
   include ../../publicModules/paging/paging
   .account-notes
     .note-threads(v-if="!threads || !threads.length")
@@ -18,9 +34,14 @@
               .note-content-body
                 .note-content(v-for="n in note.notes")
                   .time {{fromNow(n.toc)}}
-                  .options
+                  .options(v-if="n.uid === uid")
                     .fa.fa-pencil(title="编辑" @click="modifyNote(n)")
                     .fa.fa-trash(title="删除" @click="deleteNote(note, n)")
+                  .options(v-else)
+                    .user
+                      a(@click="visitUrl('/u/' + n.uid, true)" :data-float-uid="n.uid")
+                        img(:src="getUrl('userAvatar', n.user.avatar)")
+                        span {{n.user.username}}
                   .content
                     div(v-if="n.edit").m-b-1
                       textarea.form-control(v-model="n.content" :ref="n._id" @keyup.ctrl.enter="saveContent(n)" @input="textareaAutoResize(n)" @focus="textareaAutoResize(n)")

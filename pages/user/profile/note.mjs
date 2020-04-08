@@ -2,11 +2,18 @@ const data = NKC.methods.getDataById("subUsersId");
 const noteApp = new Vue({
   el: "#note",
   data: {
+    uid: NKC.configs.uid,
     threads: data.threads,
     timeout: null
   },
+  mounted() {
+    if(window.floatUserPanel) {
+      window.floatUserPanel.initPanel();
+    }
+  },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    visitUrl: NKC.methods.visitUrl,
     fromNow: NKC.methods.fromNow,
     modifyNote(nc) {
       nc.edit = !nc.edit;
