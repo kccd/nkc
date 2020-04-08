@@ -401,12 +401,13 @@ postSchema.pre("save", async function(next) {
   // 与更改前的内容比较
   // 如果有改动则更新选区信息
   const _post = await PostModel.findOne({pid: this.pid}, {c: 1});
+  if(!_post) return await next();
   if(this.c !== _post.c) {
     // 内容版本号加一（与选区版本对应）
     this.cv ++;
     // 更新选区信息
     for(const note of notes) {
-      const {_id, offset, length} = note;
+      const {_id, offset = 0, length = 0, isLost = false} = note;
       // 获取更改前的选区信息
       let _note = await NoteModel.findOne({type: "post", targetId: pid, _id, cv});
       if(_note) continue;
@@ -416,6 +417,7 @@ postSchema.pre("save", async function(next) {
       delete _note.__v;
       _note.node.offset = offset;
       _note.node.length = length;
+      _note.isLost = isLost;
       // 版本号与修改后的内容版本对应
       _note.cv = this.cv;
       _note._id = await SettingModel.operateSystemID("notes", 1);

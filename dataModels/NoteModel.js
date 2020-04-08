@@ -45,6 +45,12 @@ const schema = new Schema({
       required: true,
       index: 1
     }
+  },
+  // 丢失选区
+  isLost: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {
   collection: 'notes'
