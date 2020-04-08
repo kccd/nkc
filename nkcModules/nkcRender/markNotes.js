@@ -2,8 +2,6 @@ const cheerio = require('cheerio');
 const htmlFilter = require('./htmlFilter');
 
 
-
-
 /**
  * 按顺序遍历文本节点,需传入handle
  * @param {Object} node - cheerio dom节点
@@ -15,6 +13,9 @@ function eachTextNode(node, handle) {
     handle(node.data, node);
   }else if(node.type === "tag") {
     for(let child of node.children) {
+      // 跳过nkcsource
+      if(child.attribs && child.attribs["data-tag"] === "nkcsource") continue;
+      // 遍历子节点
       eachTextNode(child, handle)
     }
   }
