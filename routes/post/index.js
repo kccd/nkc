@@ -297,11 +297,6 @@ router
     }
     const post = body.post;
 
-    let {html, notes} = markNotes.getMark(post.c);
-    post.c = html;
-    console.log(notes);
-    
-    
     const {
       columnCategoriesId=[], anonymous, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
       survey, did, cover = ""

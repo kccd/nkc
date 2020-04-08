@@ -40,17 +40,12 @@ const schema = new Schema({
       index: 1
     },
     // 文本节点的结束位置
+    // 为0时，表示游离选区
     length: {
       type: Number,
       required: true,
       index: 1
     }
-  },
-  // 丢失选区
-  isLost: {
-    type: Boolean,
-    default: false,
-    index: 1
   }
 }, {
   collection: 'notes'
