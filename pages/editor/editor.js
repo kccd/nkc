@@ -659,12 +659,6 @@ function initVueApp() {
             type = self.type;
             post = self.getPost();
           })
-          // // 将正文中的twemoji部分替换成emoji字符
-          // .then(function(){
-          //   post.c = self.replaceTwemoji(post.c);
-          //   console.log(post.c);
-          //   debugger;
-          // })
           .then(function() {
             if(type === "newThread") { // 发新帖：从专业点发表、首页点发表、草稿箱
               self.checkTitle();
