@@ -7,7 +7,7 @@ module.exports = async (ctx, next) => {
   const match = {
     deleted: false,
     type: "post",
-    uid: targetUser.uid
+    uid: targetUser.uid,
   };
   let noteContent = await db.NoteContentModel.find(match).sort({toc: 1});
   noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
@@ -16,17 +16,17 @@ module.exports = async (ctx, next) => {
   noteContent.map(n => {
     n.html = nkcModules.nkcRender.plainEscape(n.content);
     n.edit = false;
-    const {targetId, notesId} = n;
+    const {targetId, noteId} = n;
     postsId.add(targetId);
-    const noteId = notesId[notesId.length - 1];
     if(!notesContentObj[noteId]) notesContentObj[noteId] = [];
     notesContentObj[noteId].push(n);
     _notesId.push(noteId);
   });
 
-  const notes = await db.NoteModel.find({_id: {$in: _notesId}}, {
+  const notes = await db.NoteModel.find({latest: true, originId: {$in: _notesId}}, {
     content: 1,
     type: 1,
+    originId: 1,
     targetId: 1,
     _id: 1
   });
@@ -34,10 +34,10 @@ module.exports = async (ctx, next) => {
 
   notes.map(note => {
     note = note.toObject();
-    const {targetId} = note;
+    const {targetId, originId} = note;
     note.edit = "";
     note.newContent = "";
-    note.notes = notesContentObj[note._id] || [];
+    note.notes = notesContentObj[originId] || [];
     if(!postNotesObj[targetId]) postNotesObj[targetId] = [];
     postNotesObj[targetId].push(note);
   });
@@ -114,11 +114,11 @@ module.exports = async (ctx, next) => {
     const notesId = [];
     for(const thread of data.threads) {
       for(const note of thread.notes) {
-        notesId.push(note._id);
+        notesId.push(note.originId);
       }
       for(const post of thread.posts) {
         for(const note of post.notes) {
-          notesId.push(note._id);
+          notesId.push(note.originId);
         }
       }
     }
@@ -127,7 +127,7 @@ module.exports = async (ctx, next) => {
     const ncMatch = {
       type: "post",
       deleted: false,
-      notesId: {$in: notesId},
+      noteId: {$in: notesId},
       $or: [
         {
           uid: targetUser.uid
@@ -143,19 +143,19 @@ module.exports = async (ctx, next) => {
     const ncObj = {};
     noteContent.map(nc => {
       nc.edit = false;
-      const noteId = nc.notesId[nc.notesId.length - 1];
+      const {noteId} = nc;
       if(!ncObj[noteId]) ncObj[noteId] = [];
       ncObj[noteId].push(nc);
     });
     for(const thread of data.threads) {
       for(const note of thread.notes) {
-        const notes = ncObj[note._id];
+        const notes = ncObj[note.originId];
         if(!notes) continue;
         note.notes = notes;
       }
       for(const post of thread.posts) {
         for(const note of post.notes) {
-          const notes = ncObj[note._id];
+          const notes = ncObj[note.originId];
           if(!notes) continue;
           note.notes = notes;
         }

@@ -49,8 +49,8 @@ const noteApp = new Vue({
     deleteNote(note, nc) {
       sweetQuestion("确定要执行删除操作？")
         .then(() => {
-          const {notesId, _id} = nc;
-          return nkcAPI(`/note/${notesId[notesId.length - 1]}/c/${_id}`, "DELETE");
+          const {noteId, _id} = nc;
+          return nkcAPI(`/note/${noteId}/c/${_id}`, "DELETE");
         })
         .then(() => {
           const index = note.notes.indexOf(nc);
@@ -59,8 +59,8 @@ const noteApp = new Vue({
         .catch(sweetError);
     },
     saveContent(nc) {
-      const {content, notesId, _id} = nc;
-      nkcAPI(`/note/${notesId[notesId.length - 1]}/c/${_id}`, "PATCH", {
+      const {content, noteId, _id} = nc;
+      nkcAPI(`/note/${noteId}/c/${_id}`, "PATCH", {
         content
       })
         .then(data => {

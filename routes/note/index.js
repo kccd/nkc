@@ -48,9 +48,10 @@ router
   .use("/:_id/c/:cid", async (ctx, next) => {
     const {params, db, data} = ctx;
     const {cid} = params;
-    const {user} = data;
+    const {user, note} = data;
     const noteContent = await db.NoteContentModel.findOne({_id: cid});
     if(!noteContent) ctx.throw(400, `笔记不存在，cid: ${noteContent._id}`);
+    if(note.originId !== noteContent.noteId) ctx.throw(400, `划词选区与笔记内容无法对应`);
     if(user.uid !== noteContent.uid) ctx.throw(403, "权限不足");
     if(noteContent.disabled) ctx.throw(400, "笔记已被屏蔽");
     if(noteContent.deleted) ctx.throw(400, "笔记已被删除");
@@ -136,8 +137,11 @@ router
     if(!note) {
       // 新建
       let quoteContent = node.content;
+      const _id = await db.SettingModel.operateSystemID("notes", 1);
       note = db.NoteModel({
-        _id: await db.SettingModel.operateSystemID("notes", 1),
+        _id,
+        originId: _id,
+        latest: true,
         uid: user.uid,
         type,
         content: quoteContent,
@@ -155,7 +159,7 @@ router
       content,
       type,
       targetId,
-      notesId: [note._id]
+      noteId: note.originId
     });
     await noteContent.save();
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);

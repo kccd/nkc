@@ -25,7 +25,8 @@ router
       keyWordsEn, keyWordsCn,
       authorInfos
     } = targetPost;
-    originPost.c = c;
+    const notes = await db.NoteModel.getNotesByPost(targetPost);
+    originPost.c = nkcModules.nkcRender.markNotes.setMark(c, notes.notes);
     originPost.t = t;
     originPost.l = l;
     originPost.abstractEn = abstractEn;
@@ -36,9 +37,8 @@ router
     originPost.uidlm = uidlm;
     originPost.iplm = iplm;
     originPost.tlm = Date.now();
-    originPost.disableNoteUpdate = true;
     await originPost.save();
-    const newCV = originPost.cv;
+    /*const newCV = originPost.cv;
     // 获取历史版本的笔记选区
     let oldNotes = await db.NoteModel.getNotesByPost(targetPost);
     oldNotes = oldNotes.notes;
@@ -59,7 +59,7 @@ router
         }
       });
       await note.save();
-    }
+    }*/
     data.url = await db.PostModel.getUrl(originPost.pid, true);
     await next();
   });

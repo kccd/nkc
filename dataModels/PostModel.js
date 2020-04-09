@@ -396,14 +396,11 @@ postSchema.pre("save", async function(next) {
   // 判断文本是否有变化，有变化版本号加1
   const PostModel = mongoose.model("posts");
   const NoteModel = mongoose.model("notes");
-  const NoteContentModel = mongoose.model("noteContent");
   const SettingModel = mongoose.model("settings");
   const {getMark} = require("../nkcModules/nkcRender/markNotes");
   // 去掉插入post中的选区标记
   // 重新计算选区信息
   const {html, notes} = getMark(this.c);
-  console.log(`新-----`);
-  console.log(notes);
   // 将去掉选区标记后的内容存到数据库
   this.c = html;
   // 与更改前的内容比较
@@ -411,24 +408,37 @@ postSchema.pre("save", async function(next) {
   const _post = await PostModel.findOne({pid: this.pid}, {c: 1});
   if(!_post) return await next();
   if(this.c !== _post.c) {
+    const oldCV = this.cv;
     this.cv ++;
     if(!this.disableNoteUpdate) {
       // 内容版本号加一（与选区版本对应）
       // 更新选区信息
-      const notesObj = {};
-      notes.map(note => notesObj[note._id] = note);
+      const notesObj = {}, notesId = [];
+      notes.map(note => {
+        notesObj[note._id] = note;
+        notesId.push(note._id);
+      });
+      const markNotesObj = {};
+      const markNotes = await NoteModel.find({_id: {$in: notesId}});
+      markNotes.map(n => {
+        const {_id, originId} = n;
+        const note = notesObj[_id];
+        note.originId = originId;
+        markNotesObj[n.originId] = note;
+      });
+
       const _notes  = await NoteModel.getNotesByPost({
         pid: this.pid,
-        cv: this.cv - 1
+        cv: oldCV
       });
       const notesDB = _notes.notes;
-      for(let noteDB of notesDB) {
-        const newNote = notesObj[noteDB._id];
-        noteDB = noteDB.toObject();
-        const noteId = noteDB._id;
+      for(const _noteDB of notesDB) {
+        let noteDB = _noteDB.toObject();
+        const newNote = markNotesObj[noteDB.originId];
         delete noteDB._id;
         delete noteDB.toc;
         delete noteDB.__v;
+        noteDB.latest = true;
         noteDB.node.offset = 0;
         noteDB.node.length = 0;
         if(newNote) {
@@ -439,14 +449,8 @@ postSchema.pre("save", async function(next) {
         noteDB.cv = this.cv;
         noteDB._id = await SettingModel.operateSystemID("notes", 1);
         noteDB = NoteModel(noteDB);
-        await NoteContentModel.updateMany({
-          notesId: noteId
-        }, {
-          $addToSet: {
-            notesId: noteDB._id
-          }
-        });
         // 存入新的选区
+        await _noteDB.update({latest: false});
         await noteDB.save();
       }
     }

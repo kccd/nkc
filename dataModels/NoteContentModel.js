@@ -36,15 +36,9 @@ const schema = new Schema({
     index: 1
   },
   // 选区ID
-  notesId: {
-    type: [Number],
-    required: true,
-    index: 1
-  },
-  // 旧 选区ID
   noteId: {
     type: Number,
-    default: null,
+    required: true,
     index: 1
   },
   disabled: {
@@ -83,14 +77,14 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
   const usersId = [], usersObj = {}, notesId = [], notesObj = {};
   noteContent.map(n => {
     usersId.push(n.uid);
-    if(extendNote) notesId.push(n.notesId[n.notesId.length - 1]);
+    if(extendNote) notesId.push(n.noteId);
   });
   const users = await UserModel.find({uid: {$in: usersId}});
   users.map(user => usersObj[user.uid] = user);
   if(extendNote) {
-    const notes = await mongoose.model("notes").find({_id: {$in: notesId}});
+    const notes = await mongoose.model("notes").find({originId: {$in: notesId}, latest: true});
     notes.map(note => {
-      notesObj[note._id] = note
+      notesObj[note.originId] = note
     });
   }
   const result = [];
@@ -99,7 +93,7 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
     c.user = usersObj[c.uid];
     c.html = plainEscape(c.content);
     if(extendNote) {
-      c.note = notesObj[c.notesId[c.notesId.length - 1]];
+      c.note = notesObj[c.noteId];
       if(c.note.type === "post") {
         c.url = `/p/${c.note.targetId}`;
       }
