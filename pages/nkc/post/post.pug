@@ -21,8 +21,9 @@ block nkcContent
               else
                 span 发表评论
               a.post-url(href=post.url target="_blank") 原文链接
-            .post-title=`标题：${post.t || '无'}`
-            .post-content!=post.c
+            .post-body
+              .post-title=`标题：${post.t || '无'}`
+              .post-content!=post.c
       include ../../publicModules/paging/paging_input
 
 block nkcScripts

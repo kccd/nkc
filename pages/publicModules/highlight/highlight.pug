@@ -11,3 +11,6 @@ script.
       NKC.methods.highlightBlock(dom[i]);
     }
   };
+  NKC.methods.highlightNKCSource = function() {
+    NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
+  }

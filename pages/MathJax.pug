@@ -1,28 +1,8 @@
-//- 公式渲染模块
-//+includeCSS('/katex.min.css')
-//script(type='text/x-mathjax-config').
-//  MathJax.Hub.Config({
-//    jax: ["input/TeX","output/CommonHTML"],
-//    extensions: ["tex2jax.js","MathZoom.js"],
-//    tex2jax:{
-//        inlineMath:  [["$", "$"], ["\\(","\\)"]],
-//        displayMath: [["$$","$$"], ["\\[","\\]"]],
-//      ignoreClass:'container',
-//      processClass:"ThreadPostBody|QuestionText"
-//    },
-//    "CommonHTML":{
-//      showMathMenu:false,
-//      preferredFont:"STIX",
-//      scale: 100,
-//      minScaleAdjust: 50
-//    },
-//    TeX: {
-//      equationNumbers: {autoNumber: "AMS"}
-//    }
-//  })
-//script(async src='/external_pkgs/MathJax-2.6-latest/MathJax.js')
 script.
   window.MathJax = {
+    loader: {
+      load: ["input/tex", "output/chtml"],
+    },
     startup: {
       // elements: ".math-jax", // 指定渲染的dom或class
       typeset: true,
@@ -40,7 +20,8 @@ script.
 
     tex: {
       inlineMath: [["$", "$"], ["\\(", "\\)"]],
-      displayMath: [ ['$$','$$'], ['\\[','\\]'] ]
+      displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
+      processEscapes: false, // use \$ to produce a literal dollar sign
     }
   }
 

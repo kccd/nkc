@@ -11,7 +11,6 @@
 /* 文本超出隐藏并显示省略号 */
 .management-posts .management-post {
   vertical-align: top;
-  border-bottom: 2px dotted #e85a71;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
 }
@@ -41,6 +40,9 @@
   border-radius: 50%;
   margin-right: 0.3rem;
 }
-.management-posts .management-post .post-title {
+.management-posts .management-post .post-body {
+  background-color: #f4f4f4;
+}
+.management-posts .management-post .post-body .post-title {
   font-weight: 700;
 }
