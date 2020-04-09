@@ -340,7 +340,58 @@ NKC.methods.getRandomColor = function() {
 * @return {String} html字符串
 * @author pengxiguaa 2019-9-25
 * */
-NKC.methods.resourceToHtml = function(resource, type) {
+NKC.methods.appResourceToHtml = function(resource) {
+  // 兼容代码 为了兼容旧版app
+  return nkcAPI("/r/" + resource.rid + "?t=object", 'GET')
+    .then(function(data) {
+      resource = data.resource;
+      var mediaType = resource.mediaType;
+      var type;
+      if(mediaType === "mediaPicture") {
+        type = "picture";
+      } else if(mediaType === "mediaVideo") {
+        type = "video";
+      } else if(mediaType === "mediaAudio") {
+        type = "audio";
+      } else {
+        type = "attachment";
+      }
+      return NKC.methods.resourceToHtml(type, resource.rid, resource.oname);
+    })
+    .catch(sweetError);
+};
+NKC.methods.resourceToHtml = function(type, rid, name) {
+  var handles = {
+    "picture": function() {
+      return "<img data-tag='nkcsource' data-type='picture' data-id='"+ rid +"' src=\"/r/"+ rid +"\">";
+    },
+    "sticker": function() {
+      return "<img data-tag='nkcsource' data-type='sticker' data-id='"+ rid +"' src=\"/sticker/"+ rid +"\">";
+    },
+    "video": function() {
+      return '<p><br></p><p><video data-tag="nkcsource" data-type="video" data-id="'+ rid +'" src="/r/'+ rid +'" controls></video>'+ decodeURI("%E2%80%8E") +'</p>';
+    },
+    "audio": function() {
+      return '<p><br></p><p><audio data-tag="nkcsource" data-type="audio" data-id="'+ rid +'" src="/r/'+ rid +'" controls></audio>'+ decodeURI("%E2%80%8E") +'</p>';
+    },
+    "attachment": function() {
+      return '<p><a data-tag="nkcsource" data-type="attachment" data-id="'+ rid +'" href="/r/'+ rid +'" target="_blank" contenteditable="false">'+ name +'</a>&#8203;</p>'
+    },
+    "pre": function() {},
+    "xsf": function() {
+      return '<p><br></p><section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="浏览这段内容需要'+ rid +'学术分(双击修改)"><p>&#8203;<br></p></section>';
+    },
+    "twemoji": function() {
+      var emojiChar = twemoji.convert.fromCodePoint(rid);
+      return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ rid +"' data-char='"+ emojiChar +"' src=\"/twemoji/2/svg/"+ rid +".svg\">";
+    },
+    "formula": function() {}
+  };
+  var hit = handles[type];
+  return hit? hit() : "";
+};
+
+/*NKC.methods.resourceToHtml = function(resource, type) {
   var html = "";
   if(type === "sticker") {
     html = '<img src="' + NKC.methods.tools.getUrl('sticker', resource.rid) + '">';
@@ -362,7 +413,7 @@ NKC.methods.resourceToHtml = function(resource, type) {
   }
   
   return html;
-};
+};*/
 
 /*toAppLogin
 * 跳转到登录/注册。手机端打开登录window，网页端打开登录弹窗。
