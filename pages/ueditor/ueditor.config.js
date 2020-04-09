@@ -396,7 +396,7 @@
 			div:    ["style", "data-type", "data-id", "contenteditable", "class"],
 			dl:     ['class', 'style'],
 			dt:     ['class', 'style'],
-			em:     ['class', 'style'],
+			em:     ['class', 'style', 'note-tag', 'note-id', 'tag-type', 'contenteditable'],
 			font:   ['color', 'size', 'face'],
 			footer: [],
 			h1:     ['class', 'style'],

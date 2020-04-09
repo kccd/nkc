@@ -48,9 +48,10 @@ router
   .use("/:_id/c/:cid", async (ctx, next) => {
     const {params, db, data} = ctx;
     const {cid} = params;
-    const {user} = data;
+    const {user, note} = data;
     const noteContent = await db.NoteContentModel.findOne({_id: cid});
     if(!noteContent) ctx.throw(400, `笔记不存在，cid: ${noteContent._id}`);
+    if(note.originId !== noteContent.noteId) ctx.throw(400, `划词选区与笔记内容无法对应`);
     if(user.uid !== noteContent.uid) ctx.throw(403, "权限不足");
     if(noteContent.disabled) ctx.throw(400, "笔记已被屏蔽");
     if(noteContent.deleted) ctx.throw(400, "笔记已被删除");
@@ -82,6 +83,8 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
+    // 选区不存在：新建选区、存储笔记内容
+    // 选区存在：存储笔记内容
     const {db, body, data, nkcModules} = ctx;
     const {checkString, checkNumber} = nkcModules.checkData;
     const {_id, targetId, content, type, node} = body;
@@ -109,7 +112,11 @@ router
       note = await db.NoteModel.findOne({_id});
       if(!note) ctx.throw(400, `笔记ID错误，请重试。id:${_id}`);
     } else if(node) {
-      const {offset, length} = node;
+      const {offset, length, content} = node;
+      checkString(content, {
+        name: "划词内容",
+        minLength: 1
+      });
       checkNumber(offset, {
         name: "划词偏移量",
         min: 0
@@ -130,8 +137,11 @@ router
     if(!note) {
       // 新建
       let quoteContent = node.content;
+      const _id = await db.SettingModel.operateSystemID("notes", 1);
       note = db.NoteModel({
-        _id: await db.SettingModel.operateSystemID("notes", 1),
+        _id,
+        originId: _id,
+        latest: true,
         uid: user.uid,
         type,
         content: quoteContent,
@@ -149,12 +159,17 @@ router
       content,
       type,
       targetId,
-      noteId: note._id
+      noteId: note.originId
     });
     await noteContent.save();
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent);
     data.noteContent.edit = false;
-    data.note = await db.NoteModel.extendNote(note);
+    const options = {};
+    if(!ctx.permission("managementNote")) {
+      options.disabled = false;
+      options.deleted = false;
+    }
+    data.note = await db.NoteModel.extendNote(note, options);
     await next();
   });
 module.exports = router;

@@ -2,6 +2,18 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
+  // 当前选区第一个条记录的ID，复制后的选区_id不相同，但originId始终为第一条记录的_id
+  originId: {
+    type: Number,
+    required: true,
+    index: 1
+  },
+  // 在originId中，是否为最新的选区
+  latest: {
+    type: Number,
+    default: true,
+    index: 1
+  },
   uid: {
     type: String,
     required: true,
@@ -32,6 +44,12 @@ const schema = new Schema({
     type: String,
     default: ""
   },
+
+  // 因为作者编辑了原文，导致选区改变了
+  newContent: {
+    type: String,
+    default: ""
+  },
   node: {
     // 文本节点的开始位置
     offset: {
@@ -40,6 +58,7 @@ const schema = new Schema({
       index: 1
     },
     // 文本节点的结束位置
+    // 为0时，表示游离选区
     length: {
       type: Number,
       required: true,
@@ -49,6 +68,11 @@ const schema = new Schema({
 }, {
   collection: 'notes'
 });
+
+schema.statics.getNotesByPost = async (post) => {
+  const NoteModel = mongoose.model("notes");
+  return (await NoteModel.getNotesByPosts([post]))[0];
+};
 
 schema.statics.getNotesByPosts = async (posts) => {
   const NoteModel = mongoose.model("notes");
@@ -94,10 +118,11 @@ schema.statics.extendNotes = async (notes_, options = {}) => {
   notes_.map(n => {
     if(n.toObject) n = n.toObject();
     notes.push(n);
-    notesId.push(n._id);
+    notesId.push(n.originId);
   });
   const match = {
     noteId: {$in: notesId},
+    // notesId: {$in: notesId},
     cid: null
   };
   if(disabled !== undefined) {
@@ -110,11 +135,12 @@ schema.statics.extendNotes = async (notes_, options = {}) => {
   noteContent = await NoteContentModel.extendNoteContent(noteContent);
   const noteContentObj = {};
   noteContent.map(n => {
-    if(!noteContentObj[n.noteId]) noteContentObj[n.noteId] = [];
-    noteContentObj[n.noteId].push(n);
+    const {noteId} = n;
+    if(!noteContentObj[noteId]) noteContentObj[noteId] = [];
+    noteContentObj[noteId].push(n);
   });
   return notes.map(note => {
-    note.notes = noteContentObj[note._id] || [];
+    note.notes = noteContentObj[note.originId] || [];
     return note;
   });
 };

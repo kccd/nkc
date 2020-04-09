@@ -26,6 +26,7 @@ const schema = new Schema({
   },
   content: {
     type: String,
+    index: 1,
     default: ''
   },
   // cid不为null, 则词记录是历史
@@ -34,6 +35,7 @@ const schema = new Schema({
     default: null,
     index: 1
   },
+  // 选区ID
   noteId: {
     type: Number,
     required: true,
@@ -80,9 +82,9 @@ schema.statics.extendNoteContent = async (noteContent, options = {}) => {
   const users = await UserModel.find({uid: {$in: usersId}});
   users.map(user => usersObj[user.uid] = user);
   if(extendNote) {
-    const notes = await mongoose.model("notes").find({_id: {$in: notesId}});
+    const notes = await mongoose.model("notes").find({originId: {$in: notesId}, latest: true});
     notes.map(note => {
-      notesObj[note._id] = note
+      notesObj[note.originId] = note
     });
   }
   const result = [];

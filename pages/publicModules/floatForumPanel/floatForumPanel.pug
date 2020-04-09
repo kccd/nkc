@@ -5,7 +5,7 @@
   引入后此模块会自动为具有属性“data-float-fid”的dom添加相应事件
   若有新的dom生成，只需执行“floatUserPanel.initPanel()”即可为新dom添加相应事件，此方法会忽略掉已经处理过的dom
 
-+includeCSS("/css/modules/floatForumPanel.css")
++includeCSS("/publicModules/floatForumPanel/floatForumPanel.css")
 
 #floatForumPanel(v-cloak v-show="show")
   transition(name="fade")
@@ -26,4 +26,4 @@
             | 条回复  
       .float-forum-bottom
         .float-forum-description(:title="forum.description") {{forum.description || "暂无简介"}}      
-+includeJS("/js/modules/floatForumPanel.js")
++includeJS("/publicModules/floatForumPanel/floatForumPanel.js")

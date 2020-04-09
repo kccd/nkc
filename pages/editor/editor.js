@@ -24,13 +24,15 @@ $(function() {
   data = NKC.methods.getDataById("data");
   editor = UE.getEditor("content", NKC.configs.ueditor.editorConfigs);
   editor.methods = {};
-  editor.addListener( 'ready', function( editor ) {
+  editor.addListener( 'ready', function( statu ) {
     // 编辑器准备就绪
     // 计算工具栏上边距
     // 开始初始化vue
     resetBodyPaddingTop();
     EditorReady = true;
     initVueApp();
+    // 点击末行空白处插入新行
+    autoAddNewline(editor);
   });
   // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
   // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
@@ -659,12 +661,6 @@ function initVueApp() {
             type = self.type;
             post = self.getPost();
           })
-          // // 将正文中的twemoji部分替换成emoji字符
-          // .then(function(){
-          //   post.c = self.replaceTwemoji(post.c);
-          //   console.log(post.c);
-          //   debugger;
-          // })
           .then(function() {
             if(type === "newThread") { // 发新帖：从专业点发表、首页点发表、草稿箱
               self.checkTitle();
@@ -1044,4 +1040,42 @@ window.onbeforeunload = function() {
 };
 NKC.methods.selectedDraft = function(draft) {
   PostInfo.insertDraft(draft);
+}
+
+
+/**
+ * 点击末行空白处插入新行
+ * @param {Object} readyEditor - 一个已经就绪的编辑器实例 
+ */
+function autoAddNewline(readyEditor) {
+  var doc = readyEditor.document;
+  var body = readyEditor.body;
+  if(!body) return;
+  var handle = function(event) {
+    var lastChild = body.lastChild;
+    var lastChildContent = $(lastChild).text();
+    // 最后一行是否是空行
+    var isEmptyLine = lastChildContent.length == 0 || lastChildContent === decodeURI("%E2%80%8B");
+    // 是空行不就不插入新行
+    if(isEmptyLine) return;
+    var lastChildHeight = $(lastChild).height();
+    var cursorOffsetPotision = { top: event.offsetY, left: event.offsetX };
+    var lastLinePosition = $(lastChild).position();
+    // console.log("最后一行的位置:", lastLinePosition);
+    // console.log("鼠标点击的位置:", cursorOffsetPotision);
+    if(cursorOffsetPotision.top > lastLinePosition.top + lastChildHeight + 6 &&     // 6 是行间距(它使检测区域相对于富文本最后一行向下移动)
+      cursorOffsetPotision.top <= lastLinePosition.top + lastChildHeight + 60) {    // 20 是检测区域高度(检测区域:富文本最后一行的正下方的一个矩形区域)
+        var newLine = $("<p><br></p>")[0];
+        $(body).append(newLine);
+        var range = new Range();
+        range.setStart(newLine, 0);
+        range.setEnd(newLine, 0);
+        range.collapse(true);
+        var selection = doc.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+  }
+  body.addEventListener("click", handle);
+  body.addEventListener("touchend", handle);
 }

@@ -237,7 +237,7 @@
         if(type !== "xsf") return;
         window.insertHideContent.open(function(newscore) {
          target.dataset.id = newscore;
-         target.dataset.message = "浏览这段内容需要"+newscore+"学术分";
+         target.dataset.message = "浏览这段内容需要"+newscore+"学术分(双击修改)";
        }, parseFloat(score));
       };
       var count = 0;
@@ -277,28 +277,18 @@
         return "<img data-tag='nkcsource' data-type='sticker' data-id='"+ rid +"' src=\"/sticker/"+ rid +"\">";
       },
       "video": function() {
-        // newline = true;
-        // nkcsource.setAttribute("contenteditable", "false");
-        // return "<video src=\"/r/"+ rid +"\" controls><video>";
         return '<p><br></p><p><video data-tag="nkcsource" data-type="video" data-id="'+ rid +'" src="/r/'+ rid +'" controls></video>'+ decodeURI("%E2%80%8E") +'</p>';
       },
       "audio": function() {
-        // newline = true;
-        // nkcsource.setAttribute("contenteditable", "false");
-        // return "<audio src=\"/r/"+ rid +"\" controls></audio>";
         return '<p><br></p><p><audio data-tag="nkcsource" data-type="audio" data-id="'+ rid +'" src="/r/'+ rid +'" controls></audio>'+ decodeURI("%E2%80%8E") +'</p>';
       },
       "attachment": function() {
-        // newline = true;
-        // nkcsource.setAttribute("contenteditable", "false");
-        // return "<img src=\"/ueditor/themes/default/images/attachment.png\"><a href='/r/"+ rid +"' target='_blank'>"+ name +"</a>"
         return '<p><a data-tag="nkcsource" data-type="attachment" data-id="'+ rid +'" href="/r/'+ rid +'" target="_blank" contenteditable="false">'+ name +'</a>&#8203;</p>'
       },
       "pre": function() {},
       "xsf": function() {
         newline = true;
-        // nkcsource.setAttribute("data-message", "学术分"+rid+"分以上可见");
-        return '<p><br></p><section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="浏览这段内容需要'+ rid +'学术分"><p>&#8203;<br></p></section>';
+        return '<p><br></p><section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="浏览这段内容需要'+ rid +'学术分(双击修改)"><p>&#8203;<br></p></section>';
       },
       "twemoji": function() {
         var emojiChar = twemoji.convert.fromCodePoint(rid);

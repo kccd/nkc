@@ -1,5 +1,6 @@
 const cheerio = require("./cheerio");
 const htmlFilter = require("./htmlFilter");
+const markNotes = require("./markNotes");
 const twemoji = require("twemoji");
 const plainEscape = require("../plainEscaper");
 const fs = require("fs");
@@ -15,6 +16,7 @@ for(const filename of files) {
 class NKCRender {
   constructor() {
     this.htmlFilter = htmlFilter;
+    this.markNotes = markNotes;
   }
   renderHTML(options) {
     // 渲染html
@@ -85,7 +87,7 @@ class NKCRender {
     if(post.pid) {
       id = `post-content-${post.pid}`;
     }
-    return `<div class="render-content" id="${id}">${html}</div>`;
+    return `<div class="render-content math-jax" id="${id}">${html}</div>`;
   }
 
   plainEscape(c) {

@@ -31,7 +31,8 @@ block content
           @focus="resetTextarea(null)"
         )
         .m-t-05.m-b-1
-          button.btn-block.btn.btn-primary(:disabled="!content" @click="saveNewNote") 保存
+          button.btn-block.btn.btn-primary(:disabled="!content" v-if="submitting") 保存中...
+          button.btn-block.btn.btn-primary(:disabled="!content" @click="saveNewNote" v-else) 保存
 
   .hidden#data=objToStr({note: data.note})
 block scripts

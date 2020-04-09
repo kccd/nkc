@@ -10,7 +10,6 @@ $(function() {
 	    replace_selection(c, e.target.getAttribute('data-unicode'), true)
 	  })
   }
-
 });
 
 /*if($("#targetPost").length > 0) {

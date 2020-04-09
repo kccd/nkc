@@ -730,8 +730,8 @@ threadRouter
 		const {
 			data, nkcModules, params, db, body, state, address: ip
 		} = ctx;
-		const {user} = data;
-
+    const {user} = data;
+    
 		try{
       await db.UserModel.checkUserBaseInfo(user, true);
     } catch(err) {

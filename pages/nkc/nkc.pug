@@ -31,6 +31,12 @@ block content
                 | 笔记管理
                 if !permission("nkcManagementNote")
                   | （无权）
+            li(class=data.nav === 'post' ? "active" : "")
+              a(href=`/nkc/post`)
+                .fa.fa-paper-plane
+                | 最新发表
+                if !permission("nkcManagementPost")
+                  | （无权）
       .col-xs-12.col-md-10.box-shadow-panel
         block nkcContent
 block scripts

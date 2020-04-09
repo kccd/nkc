@@ -74,15 +74,3 @@ if pageCount > 1
           button(
             id="paging_nav_button"
             onclick=`var newPage = Number($("#paging_nav_input").val());openToNewLocation('${state.url}?page='+(newPage>0?newPage-1:0)+'${skipId || ''}${query}')`) 确定
-          script.
-            ;(function () {
-              var input = document.getElementById("paging_nav_input");
-              if (!input) return;
-              input.onkeydown = function (e) {
-                if (e.key === "Enter" || e.keyCode === 13) {
-                  var button = document.getElementById("paging_nav_button");
-                  if (!button) return;
-                  button.click();
-                }
-              }
-            })();

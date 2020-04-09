@@ -8,6 +8,7 @@ NKC.modules.NotePanel = class {
         disableNoteContent: false,
         show: false,
         edit: false,
+        submitting: false,
         // 新添加的笔记内容
         content: "",
         // 显示笔记
@@ -62,6 +63,7 @@ NKC.modules.NotePanel = class {
             .then(() => {
               if(!content) throw "请输入笔记内容";
               const {type, targetId, node, _id} = note;
+              self.app.submitting = true;
               return nkcAPI("/note", "POST", {
                 _id,
                 type,
@@ -77,11 +79,15 @@ NKC.modules.NotePanel = class {
               self.callback(data.note);
               self.app.extendNoteContent(data.note);
               self.app.note = data.note;
+              self.app.submitting = false;
               setTimeout(() => {
                 self.app.scrollToBottom();
               }, 200)
             })
-            .catch(sweetError);
+            .catch(err => {
+              sweetError(err);
+              self.app.submitting = false;
+            });
         },
         modifyNoteContent(n) {
           if(n.edit) {

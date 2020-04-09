@@ -896,6 +896,18 @@ $(function () {
     });
   }
 
+  ;(function () {
+    var input = document.getElementById("paging_nav_input");
+    if (!input) return;
+    input.onkeydown = function (e) {
+      if (e.key === "Enter" || e.keyCode === 13) {
+        var button = document.getElementById("paging_nav_button");
+        if (!button) return;
+        button.click();
+      }
+    }
+  })();
+
   // markDiv("#highlight");
 
   /*var forumBlock = $(".forum-block-children");

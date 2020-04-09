@@ -4,7 +4,7 @@
   /publicModules/SubscribeTypes模块需要一同引入
   引入后此模块会自动为具有属性“data-float-uid”的dom添加相应事件
   若有新的dom生成，只需执行“floatUserPanel.initPanel()”即可为新dom添加相应事件，此方法会忽略已经处理过的dom
-+includeCSS("/css/modules/floatUserPanel.css")
++includeCSS("/publicModules/floatUserPanel/floatUserPanel.2.css")
 #floatUserPanel(v-cloak v-show="show")
   transition(name="fade")
     .float-user(v-if="user && (over || onPanel)")
@@ -44,4 +44,4 @@
             a.link(:href="'/m/' + user.column._id" target="_blank" :title="user.column.name") 专栏
 
 include ../moment
-+includeJS("/js/modules/floatUserPanel.js")
++includeJS("/publicModules/floatUserPanel/floatUserPanel.2.js")

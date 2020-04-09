@@ -12,5 +12,9 @@ module.exports = {
   note: {
     GET: "nkcManagementNote",
     POST: "nkcManagementNote"
+  },
+  post: {
+    GET: "nkcManagementPost",
+    POST: "nkcManagementPost"
   }
 };

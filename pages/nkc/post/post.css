@@ -1,0 +1,48 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+.management-posts .management-post {
+  vertical-align: top;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+}
+.management-posts .management-post .post-header {
+  font-style: oblique;
+  font-weight: 700;
+}
+.management-posts .management-post .post-header .post-time {
+  display: inline-block;
+  margin-right: 0.5rem;
+  color: #e85a71;
+  font-size: 1.3rem;
+}
+.management-posts .management-post .post-header > span {
+  margin-right: 0.5rem;
+}
+.management-posts .management-post .post-header .post-user {
+  display: inline-block;
+  color: #2b90d9;
+  margin-right: 0.5rem;
+}
+.management-posts .management-post .post-header .post-user img {
+  margin-top: -2px;
+  display: inline-block;
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+}
+.management-posts .management-post .post-body {
+  background-color: #f4f4f4;
+}
+.management-posts .management-post .post-body .post-title {
+  font-weight: 700;
+}

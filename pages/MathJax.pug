@@ -1,23 +1,28 @@
-//- 公式渲染模块
-+includeCSS('/katex.min.css')
-script(type='text/x-mathjax-config').
-  MathJax.Hub.Config({
-    jax: ["input/TeX","output/CommonHTML"],
-    extensions: ["tex2jax.js","MathZoom.js"],
-    tex2jax:{
-        inlineMath:  [["$", "$"], ["\\(","\\)"]],
-        displayMath: [["$$","$$"], ["\\[","\\]"]],
-      ignoreClass:'container',
-      processClass:"ThreadPostBody|QuestionText"
+script.
+  window.MathJax = {
+    loader: {
+      load: ["input/tex", "output/chtml"],
     },
-    "CommonHTML":{
-      showMathMenu:false,
-      preferredFont:"STIX",
-      scale: 100,
-      minScaleAdjust: 50
+    startup: {
+      // elements: ".math-jax", // 指定渲染的dom或class
+      typeset: true,
+      ready: function() {
+        MathJax.startup.defaultReady();
+        MathJax.startup.promise.then(function() {
+          NKC.emit("mathJaxRendered");
+        });
+      }
     },
-    TeX: {
-      equationNumbers: {autoNumber: "AMS"}
+    options: {
+      // processHtmlClass: "", // 指定渲染元素
+      // ignoreHtmlClass: "", // 忽略的元素
+    },
+
+    tex: {
+      inlineMath: [["$", "$"], ["\\(", "\\)"]],
+      displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
+      processEscapes: false, // use \$ to produce a literal dollar sign
     }
-  })
-script(async src='/external_pkgs/MathJax-2.6-latest/MathJax.js')
+  }
+
+script(async src="/external_pkgs/MathJax-3.0.1/es5/tex-mml-chtml.js")

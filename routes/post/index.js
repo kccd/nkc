@@ -13,6 +13,7 @@ const Path = require("path");
 const toppedRouter = require("./topped");
 const authorRouter = require("./author");
 const resourcesRouter = require("./resources");
+const markNotes = require('../../nkcModules/nkcRender/markNotes');
 const router = new Router();
 
 router
@@ -295,6 +296,7 @@ router
       body = ctx.body;
     }
     const post = body.post;
+
     const {
       columnCategoriesId=[], anonymous, t, c, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState,
       survey, did, cover = ""
@@ -366,9 +368,9 @@ router
     await db.HistoriesModel.createHistory(_targetPost);
 
     // 判断文本是否有变化，有变化版本号加1
-    if(c !== targetPost.c) {
+    /*if(c !== targetPost.c) {
       targetPost.cv ++;
-    }
+    }*/
     targetPost.uidlm = user.uid;
     targetPost.iplm = ctx.address;
     targetPost.t = t;
