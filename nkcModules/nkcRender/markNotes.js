@@ -1,4 +1,4 @@
-const cheerio = require('./customCheerio');
+const cheerio = require('./cheerio');
 const htmlFilter = require('./htmlFilter');
 const twemoji = require("twemoji");
 
