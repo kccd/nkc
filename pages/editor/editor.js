@@ -861,13 +861,14 @@ function hideButton() {
 }
 
 // 适配APP快捷插入图片、资源等
-function mediaInsertUE(rid, fileType, name) {
+function mediaInsertUE(rid, fileType, name, mediaType) {
   var resource = {
     rid: rid,
     ext: fileType,
-    oname: name
+    oname: name,
+    mediaType: mediaType
   };
-  var html = NKC.methods.resourceToHtml(resource);
+  var html = NKC.methods.appResourceToHtml(resource);
   try{
     editor.execCommand("inserthtml", html);
   } catch(err) {
@@ -935,7 +936,7 @@ function appUpdateVideo() {
         }
       },function(ret, err) {
         if(ret) {
-          mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname);
+          mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname, ret.r.mediaType);
           api.toast({
             msg: "视频处理完毕",
             duration: 1000,
@@ -997,7 +998,7 @@ function appUpdateImage() {
         }
       }, function(ret ,err) {
         if(ret) {
-          mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname);
+          mediaInsertUE(ret.r.rid, ret.r.ext, ret.r.oname, ret.r.mediaType);
           api.toast({
             msg: "图片已处理",
             duration: 1000,

@@ -36,11 +36,10 @@
       onclick:function () {
         if(window.SelectSticker) {
           window.SelectSticker.open(function(res) {
-            // var dom = NKC.methods.resourceToHtml(res.data, res.type);
             if(res.type === "emoji") {
-              editor.execCommand('inserthtml', resourceToHtml("twemoji", res.data));
+              editor.execCommand('inserthtml', NKC.methods.resourceToHtml("twemoji", res.data));
             }else if(res.type === "sticker") {
-              editor.execCommand('inserthtml', resourceToHtml("sticker", res.data.rid));
+              editor.execCommand('inserthtml', NKC.methods.resourceToHtml("sticker", res.data.rid));
             }
           });
         } else {
@@ -84,8 +83,7 @@
               //   });
               //   continue;
               // }
-              // var dom = NKC.methods.resourceToHtml(data[i]);
-              editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
+              editor.execCommand('inserthtml', NKC.methods.resourceToHtml(type, source.rid, source.oname));
             }
           }, {
             fastSelect: true
@@ -125,8 +123,7 @@
               var type = source.mediaType;
               type = type.substring(5);
               type = type[0].toLowerCase() + type.substring(1);
-              // var dom = NKC.methods.resourceToHtml(data[i]);
-              editor.execCommand('inserthtml', resourceToHtml(type, source.rid, source.oname));
+              editor.execCommand('inserthtml', NKC.methods.resourceToHtml(type, source.rid, source.oname));
             }
           }, {
             fastSelect: true,
@@ -256,7 +253,7 @@
       onclick:function () {
         if(window.insertHideContent) {
           window.insertHideContent.open(function(score) {
-            editor.execCommand("inserthtml", resourceToHtml("xsf", score))
+            editor.execCommand("inserthtml", NKC.methods.resourceToHtml("xsf", score))
           });
         } else {
           return sweetError("未初始化资源选择模块");
@@ -264,39 +261,4 @@
       }
     })
   });
-  
-  
-  
-  // 转换成nkcsource标签的html文本
-  function resourceToHtml(type, rid, name) {
-    var handles = {
-      "picture": function() {
-        return "<img data-tag='nkcsource' data-type='picture' data-id='"+ rid +"' src=\"/r/"+ rid +"\">";
-      },
-      "sticker": function() {
-        return "<img data-tag='nkcsource' data-type='sticker' data-id='"+ rid +"' src=\"/sticker/"+ rid +"\">";
-      },
-      "video": function() {
-        return '<p><br></p><p><video data-tag="nkcsource" data-type="video" data-id="'+ rid +'" src="/r/'+ rid +'" controls></video>'+ decodeURI("%E2%80%8E") +'</p>';
-      },
-      "audio": function() {
-        return '<p><br></p><p><audio data-tag="nkcsource" data-type="audio" data-id="'+ rid +'" src="/r/'+ rid +'" controls></audio>'+ decodeURI("%E2%80%8E") +'</p>';
-      },
-      "attachment": function() {
-        return '<p><a data-tag="nkcsource" data-type="attachment" data-id="'+ rid +'" href="/r/'+ rid +'" target="_blank" contenteditable="false">'+ name +'</a>&#8203;</p>'
-      },
-      "pre": function() {},
-      "xsf": function() {
-        newline = true;
-        return '<p><br></p><section data-tag="nkcsource" data-type="xsf" data-id="'+ rid +'" data-message="浏览这段内容需要'+ rid +'学术分(双击修改)"><p>&#8203;<br></p></section>';
-      },
-      "twemoji": function() {
-        var emojiChar = twemoji.convert.fromCodePoint(rid);
-        return "<img data-tag='nkcsource' data-type='twemoji' data-id='"+ rid +"' data-char='"+ emojiChar +"' src=\"/twemoji/2/svg/"+ rid +".svg\">";
-      },
-      "formula": function() {}
-    };
-    var hit = handles[type];
-    return hit? hit() : "";
-  }
 }());
