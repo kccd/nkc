@@ -143,6 +143,10 @@ function setMark(html, notes = []) {
     // 当此前已遍历的总字数超过了某个偏移量,说明这个本文节点存在那个偏移量的点,即此处要插标签(但此时还不知到标签应当插到此文本节点的何处)
     let willMark = offsets.filter(offset => prevLen + len >= offset);
     offsets = offsets.filter(offset => !willMark.includes(offset));
+    node.data = text.replace(/\<|\>/g, source => {
+      if(source === "<") return "&lt;";
+      if(source === ">") return "&gt;";
+    })
     // 如果这个文本节点上不需要插标签,那么就跳过此节点,并且把此文本节点的长度计入总字数
     if(!willMark.length) return prevLen += text.length;
     // 计算这些标签需要插入到此文本节点的哪些位置,并按这些位置分割文本为数组
@@ -153,6 +157,12 @@ function setMark(html, notes = []) {
       textFragment.push(frag);
     })
     textFragment.unshift(text.substring(0, textOffsets[0]));
+    textFragment = textFragment.map(frag => {
+      return frag.replace(/\<|\>/g, source => {
+        if(source === "<") return "&lt;";
+        if(source === ">") return "&gt;";
+      })
+    })
     
     // 重组这些文本,并借此在适当位置插入标签
     let newNodeData = textFragment[0];
@@ -172,7 +182,7 @@ function setMark(html, notes = []) {
     prevLen += text.length;
   })
 
-  html = $(body).html();
+  html = $(body).originHtml();
   // 还原数学公式
   html = reduFormulaExpression(html);
   // 还原emoji

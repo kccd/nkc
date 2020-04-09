@@ -40,7 +40,9 @@ function eachTextNode(node, handle) {
       if(!selector.length) return selector;           // 如果selector不是数组或者没有选中任何元素,那就不处理
       if(!selector.html) return selector;             // 我们需要代理的方法必须存在才能去代理
       let oldHtml = selector.html;
-      selector.html = function() {
+      // 输出字符转义后的html
+      selector.html = function(p) {
+        if(p) oldHtml.apply(selector, arguments);
         eachTextNode(selector[0], (text, node) => {
           if(!text) return;
           node.data = text.replace(/\<|\>/g, source => {
@@ -48,6 +50,10 @@ function eachTextNode(node, handle) {
             if(source === ">") return "&gt;";
           })
         })
+        return oldHtml.apply(selector, arguments);
+      }
+      // 输出原始html
+      selector.originHtml = function() {
         return oldHtml.apply(selector, arguments);
       }
       return selector;
