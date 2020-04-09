@@ -33,7 +33,7 @@ function hasAttr($node, attrName) {
 
 
 // 数学公式模式
-const formulaReg = /((\$\$|\$).+?\2)|(\\\[.+\\\])|\\\(.+\\\)/;
+const formulaReg = /((\$\$|\$).+?\2)|(\\\[.+\\\])|\\\(.+\\\)/g;
 // html标签模式
 const htmlTagReg = /<[a-zA-Z\-]+(\s.*)*>/;
 
