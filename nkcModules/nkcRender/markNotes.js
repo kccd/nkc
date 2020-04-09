@@ -255,7 +255,7 @@ function getMark(html) {
       });
     }
   }
-
+ 
   html = $("body").html();
   // 还原数学公式
   html = reduFormulaExpression(html);

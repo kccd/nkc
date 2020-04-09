@@ -102,7 +102,7 @@ function APP_nkc_render(options){
     if(in_browser){
       return html
     }else{
-      var cheerio = require('cheerio')
+      var cheerio = require('./nkcRender/customCheerio')
       var $ = cheerio.load(html)
       //for all <a> s
       $('a').each(function(i,elem){
