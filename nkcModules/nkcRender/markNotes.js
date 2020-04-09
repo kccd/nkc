@@ -37,34 +37,17 @@ const formulaReg = /((\$\$|\$).+?\2)|(\\\[.+\\\])|\\\(.+\\\)/;
 // html标签模式
 const htmlTagReg = /<[a-zA-Z\-]+(\s.*)*>/;
 
+
 /**
  * 把html字符串中的数学公式表达式转换成临时标签
  * @param {string} html - html字符串
  */
 function canvertFormulaExpression(html) {
   if(!html) return html;
-  let source = html;
-  let build = "";
-  while(1) {
-    let matchResult = source.match(formulaReg);
-    if(matchResult === null) {
-      build += source;
-      break;
-    }
-    // 匹配到了一个公式
-    let formula = matchResult[0];
-    let start =  matchResult.index;
-    let len = formula.length;
-    // 测试公式是否跨HTML标签了
-    if(htmlTagReg.test(formula)) {
-      build += source.substring(0, start + len);
-      source = source.substring(start + len);
-      continue;
-    }
-    build += source.substring(0, start) + `<span this-is-formula data='${formula}'></span>`;
-    source = source.substring(start + len);
-  }
-  return build;
+  return html.replace(formulaReg, formula => {
+    if(htmlTagReg.test(formula)) return formula;
+    return `<span this-is-formula data='${formula}'></span>`;
+  });
 }
 
 
