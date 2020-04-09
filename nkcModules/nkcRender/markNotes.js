@@ -1,5 +1,6 @@
-const cheerio = require('cheerio');
+const cheerio = require('./customCheerio');
 const htmlFilter = require('./htmlFilter');
+const twemoji = require("twemoji");
 
 
 /**
@@ -56,7 +57,7 @@ function canvertFormulaExpression(html) {
  * @param {string} html 
  */
 function reduFormulaExpression(html) {
-  const $ = cheerio.load(html, {decodeEntities: false});
+  const $ = cheerio.load(html);
   $("[this-is-formula]")
     .each((_, el) => {
       let formula = $(el).attr("data");      
@@ -67,17 +68,21 @@ function reduFormulaExpression(html) {
 
 
 
-// 正文中可能出现的emoji
-let emojisReg = /😀|😁|😂|😃|😄|😅|😆|😇|😈|😉|😊|😋|😌|😍|😎|😏|😐|😑|😒|😓|😔|😕|😖|😗|😘|😙|😚|😛|😜|😝|😞|😟|😠|😡|😢|😣|😤|😥|😦|😧|😨|😩|😪|😫|😬|😭|😮|😯|😰|😱|😲|😳|😴|😵|😶|😷|🙁|🙂|🙃|🙄|🤣|☠|☢|☣|👿|💀|👽|👻/g;
-
 /**
  * 把html字符串中的emoji转换成临时标签
  * @param {string} html - html字符串
  */
 function canvertEmojis(html) {
-  return html.replace(emojisReg, origin => {
-    return `<span this-is-emoji data='${origin}'></span>`
-  })
+  return twemoji.parse(html, {
+    folder: '/',
+    attributes: () => {
+      return {
+        "this-is-emoji": ""
+      }
+    },
+    base: '/twemoji',
+    ext: '.svg'
+  });
 }
 
 /**
@@ -85,10 +90,10 @@ function canvertEmojis(html) {
  * @param {string} html 
  */
 function reduEmojis(html) {
-  const $ = cheerio.load(html, {decodeEntities: false});
+  const $ = cheerio.load(html);
   $("[this-is-emoji]")
     .each((_, el) => {
-      let emoji = $(el).attr("data");      
+      let emoji = $(el).attr("alt");      
       $(el).replaceWith(emoji);
     })
   return $("body").html();
@@ -129,7 +134,7 @@ function setMark(html, notes = []) {
   });
   
   let offsets = Object.keys(map); 
-  const $ = cheerio.load(html, {decodeEntities: false});
+  const $ = cheerio.load(html);
   let body = $("body")[0];
   let prevLen = 0;
   // 遍历文本节点
@@ -199,7 +204,7 @@ function getMark(html) {
   html = canvertFormulaExpression(html);
   // 处理emoji
   html = canvertEmojis(html);
-  const $ = cheerio.load(html, {decodeEntities: false});
+  const $ = cheerio.load(html);
   let body = $("body")[0];
   let prevLen = 0;
   let random = Math.floor(Math.random() * Math.pow(10, 10)) + "";
