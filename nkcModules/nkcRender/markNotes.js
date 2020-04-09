@@ -143,12 +143,15 @@ function setMark(html, notes = []) {
     // 当此前已遍历的总字数超过了某个偏移量,说明这个本文节点存在那个偏移量的点,即此处要插标签(但此时还不知到标签应当插到此文本节点的何处)
     let willMark = offsets.filter(offset => prevLen + len >= offset);
     offsets = offsets.filter(offset => !willMark.includes(offset));
-    node.data = text.replace(/\<|\>/g, source => {
-      if(source === "<") return "&lt;";
-      if(source === ">") return "&gt;";
-    })
-    // 如果这个文本节点上不需要插标签,那么就跳过此节点,并且把此文本节点的长度计入总字数
-    if(!willMark.length) return prevLen += text.length;
+    // 如果这个文本节点上不需要插标签,那么就跳过此节点,并且把此文本节点的长度计入总字数,然后转义<>
+    if(!willMark.length) {
+      prevLen += text.length;
+      node.data = text.replace(/\<|\>/g, source => {
+        if(source === "<") return "&lt;";
+        if(source === ">") return "&gt;";
+      })
+      return;
+    }
     // 计算这些标签需要插入到此文本节点的哪些位置,并按这些位置分割文本为数组
     let textOffsets = willMark.map(offset => offset - prevLen);
     let textFragment = [];
