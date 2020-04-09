@@ -1,5 +1,5 @@
 const {getUrl, getSize} = require("../../tools");
-const cheerio = require("../cheerio");
+const cheerio = require("../customCheerio");
 
 module.exports = {
   picture(html = "", id, resource = {}) {

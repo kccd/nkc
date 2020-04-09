@@ -1,5 +1,5 @@
 const settings = require('../settings');
-const cheerio = require('cheerio');
+const cheerio = require('../nkcModules/nkcRender/customCheerio');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
