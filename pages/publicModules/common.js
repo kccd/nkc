@@ -341,20 +341,24 @@ NKC.methods.getRandomColor = function() {
 * @author pengxiguaa 2019-9-25
 * */
 NKC.methods.appResourceToHtml = function(resource) {
-  var mediaType = resource.mediaType;
-  var type;
-  if(mediaType === "mediaPicture") {
-    type = "picture";
-  } else if(mediaType === "mediaVideo") {
-    type = "video";
-  } else if(mediaType === "mediaAudio") {
-    type = "audio";
-  } else {
-    type = "attachment";
-  }
-  var rid = resource.rid;
-  var name = resource.oname;
-  return NKC.methods.resourceToHtml(type, rid, name);
+  // 兼容代码 为了兼容旧版app
+  return nkcAPI("/r/" + resource.rid + "?t=object", 'GET')
+    .then(function(data) {
+      resource = data.resource;
+      var mediaType = resource.mediaType;
+      var type;
+      if(mediaType === "mediaPicture") {
+        type = "picture";
+      } else if(mediaType === "mediaVideo") {
+        type = "video";
+      } else if(mediaType === "mediaAudio") {
+        type = "audio";
+      } else {
+        type = "attachment";
+      }
+      return NKC.methods.resourceToHtml(type, resource.rid, resource.oname);
+    })
+    .catch(sweetError);
 };
 NKC.methods.resourceToHtml = function(type, rid, name) {
   var handles = {

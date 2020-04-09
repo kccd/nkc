@@ -868,13 +868,15 @@ function mediaInsertUE(rid, fileType, name, mediaType) {
     oname: name,
     mediaType: mediaType
   };
-  var html = NKC.methods.appResourceToHtml(resource);
-  try{
-    editor.execCommand("inserthtml", html);
-  } catch(err) {
-    console.log(err);
-    sweetError("编辑器未准备就绪");
-  }
+  NKC.methods.appResourceToHtml(resource)
+    .then(function(html) {
+      try{
+        editor.execCommand("inserthtml", html);
+      } catch(err) {
+        console.log(err);
+        sweetError("编辑器未准备就绪");
+      }
+    });
 }
 
 // 适配app，将编辑器内容存在app本地

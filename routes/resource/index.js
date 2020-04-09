@@ -101,6 +101,10 @@ resourceRouter
     // 表明客户端希望以附件的形式加载资源
     if(t === "attachment") {
       ctx.fileType = "attachment";
+    } else if(t === "object") {
+      // 返回数据对象
+      data.resource = resource;
+      ctx.filePath = undefined;
     }
     ctx.resource = resource;
     ctx.type = ext;

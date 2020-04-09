@@ -407,6 +407,7 @@ postSchema.pre("save", async function(next) {
   // 如果有改动则更新选区信息
   const _post = await PostModel.findOne({pid: this.pid}, {c: 1});
   if(!_post) return await next();
+  console.log(`内容未改变：${this.c === _post.c}`);
   if(this.c !== _post.c) {
     const oldCV = this.cv;
     this.cv ++;
