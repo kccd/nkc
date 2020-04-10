@@ -18,6 +18,41 @@ function eachTextNode(node, handle) {
 }
 
 
+/**
+ * 转义文本节点中的<>&字符
+ * @param {Object} $node - cheerio 被包装的dom节点
+ */
+function safeTextNode($node) {
+  $node.each((index, node) => {
+    eachTextNode(node, (text, node) => {
+      if(!text) return;
+      node.data = text.replace(/\<|\>|\&/g, source => {
+        if(source === "<") return "&lt;";
+        if(source === ">") return "&gt;";
+        if(source === "&") return "&amp;";
+      })
+    })
+  })
+}
+
+/**
+ * 
+ * @param {Object} $node - cheerio 被包装的dom节点
+ */
+function reduTextNode($node) {
+  $node.each((index, node) => {
+    eachTextNode(node, (text, node) => {
+      if(!text) return;
+      node.data = text.replace(/(\&lt;)|(\&gt;)|(\&amp;)/g, source => {
+        if(source === "&lt;") return "<";
+        if(source === "&gt;") return ">";
+        if(source === "&amp;") return "&";
+      })
+    })
+  })
+}
+
+
 // 修改load方法
 (() => {
   let oldLoad = cheerio.load;
@@ -51,15 +86,11 @@ function eachTextNode(node, handle) {
       // 输出字符转义后的html
       selector.html = function(p) {
         if(p) oldHtml.apply(selector, arguments);
-        eachTextNode(selector[0], (text, node) => {
-          if(!text) return;
-          node.data = text.replace(/\<|\>|\&/g, source => {
-            if(source === "<") return "&lt;";
-            if(source === ">") return "&gt;";
-            if(source === "&") return "&amp;";
-          })
-        })
+        // 先转义文本节点中的标签字符
+        safeTextNode(selector);
         let output = oldHtml.apply(selector, arguments);
+        // 输出完之后再转回来
+        reduTextNode(selector);
         return output;
       }
       // 输出原始html
