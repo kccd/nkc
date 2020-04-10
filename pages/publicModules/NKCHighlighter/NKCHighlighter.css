@@ -28,6 +28,27 @@
 .nkc-hl > .nkc-hl-cover > .nkc-hl-cover > .nkc-hl-cover > .nkc-hl-cover > .nkc-hl-cover {
   background-color: #eec600;
 }
+.nkc-free-notes {
+  vertical-align: top;
+}
+.nkc-free-notes:before {
+  content: "迷失的笔记：";
+  font-size: 1.2rem;
+  padding-right: 0.4rem;
+}
+.nkc-free-notes > span {
+  overflow: hidden;
+  text-align: center;
+  margin: 0 0.5rem 0.5rem 0;
+  font-size: 1.2rem;
+  border-bottom: 1px dashed #333;
+  background-color: rgba(238, 198, 0, 0.15);
+  cursor: pointer;
+  user-select: none;
+}
+.nkc-free-notes > span:hover {
+  background-color: #ff8b74;
+}
 .post-node-hover,
 .post-node-hover > * {
   background: #ff8b74 !important;

@@ -35,7 +35,7 @@ NKC.modules.NKCHL = class {
       clownAttr: {
         "data-tag": "nkcsource"
       },
-      clownTagName: [
+      /*clownTagName: [
         "code",
         "svg",
         "pre",
@@ -45,7 +45,7 @@ NKC.modules.NKCHL = class {
         "table",
         "style",
         "script"
-      ]
+      ]*/
     });
     self.hl = hl;
     hl
