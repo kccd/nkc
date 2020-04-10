@@ -436,7 +436,8 @@
 			ul:     ['class', 'style'],
 			video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width', 'class', 'style', 'poster', "data-tag", "data-type", "data-id"],
 			hidecontent: ["style", "class"],
-			input:  ["type", "placeholder"],
+            input:  ["type", "placeholder"],
+            xmp:    ['class', 'style', "data-tag", "data-type", "data-id"]
 		}
     };
 
