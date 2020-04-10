@@ -311,7 +311,7 @@ function getMark(html) {
       let tagType = $(parentNode).attr("tag-type");
       if(!map[noteId]) 
         map[noteId] = {content: ""};
-      map[noteId][tagType] = prevLen - 1;
+      map[noteId][tagType] = prevLen;
       // 遇到选区开始节点后,开始记录content,直到遇到选区结束节点,结束记录content
       if(tagType === "start") {
         recording.push(noteId);     // 开启录制内容
