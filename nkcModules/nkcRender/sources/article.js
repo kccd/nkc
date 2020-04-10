@@ -1,6 +1,6 @@
 const {getUrl, getSize} = require("../../tools");
 const cheerio = require("../customCheerio");
-
+const {htmlEscape} = require("../htmlEscape");
 module.exports = {
   picture(html = "", id, resource = {}) {
     const {
@@ -96,7 +96,10 @@ module.exports = {
     `.trim();
   },
   pre(html) {
-    return html;
+    return html.replace(/<pre(.*?)>([\s\S]*?)<\/pre>/ig, (content, v1, v2) => {
+      v2 = htmlEscape(v2);
+      return `<pre${v1}>${v2}</pre>`;
+    });
   },
   xsf(html, id, r, user = {}) {
     const {xsf = 0} = user;

@@ -1,7 +1,7 @@
 const cheerio = require('./customCheerio');
 const htmlFilter = require('./htmlFilter');
 const twemoji = require("twemoji");
-
+const {htmlEscape} = require("./htmlEscape");
 
 /**
  * 按顺序遍历文本节点,需传入handle
@@ -15,7 +15,7 @@ function eachTextNode(node, handle) {
   }else if(node.type === "tag") {
     for(let child of node.children) {
       // 跳过nkcsource
-      if(child.attribs && child.attribs["data-tag"] === "nkcsource") continue;
+      // if(child.attribs && child.attribs["data-tag"] === "nkcsource") continue;
       // 遍历子节点
       eachTextNode(child, handle)
     }
@@ -63,7 +63,7 @@ function reduFormulaExpression(html) {
       let formula = $(el).attr("data");      
       $(el).replaceWith(formula);
     })
-  return $("body").html();
+  return $("body").safeHtml();
 }
 
 
@@ -96,7 +96,7 @@ function reduEmojis(html) {
       let emoji = $(el).attr("alt");      
       $(el).replaceWith(emoji);
     })
-  return $("body").html();
+  return $("body").safeHtml();
 }
 
 
@@ -133,7 +133,7 @@ function setMark(html, notes = []) {
     }
   });
   
-  let offsets = Object.keys(map); 
+  let offsets = Object.keys(map);
   const $ = cheerio.load(html);
   let body = $("body")[0];
   let prevLen = 0;
@@ -144,12 +144,16 @@ function setMark(html, notes = []) {
     let willMark = offsets.filter(offset => prevLen + len >= offset);
     offsets = offsets.filter(offset => !willMark.includes(offset));
     // 如果这个文本节点上不需要插标签,那么就跳过此节点,并且把此文本节点的长度计入总字数,然后转义<>
+    var needAdd = node.parent.attribs && node.parent.attribs["data-tag"] !== "nkcsource";
     if(!willMark.length) {
-      prevLen += text.length;
-      node.data = text.replace(/\<|\>/g, source => {
+      if(needAdd)
+        prevLen += text.length;
+
+      node.data = htmlEscape(text);
+      /*node.data = text.replace(/\<|\>/g, source => {
         if(source === "<") return "&lt;";
         if(source === ">") return "&gt;";
-      })
+      })*/
       return;
     }
     // 计算这些标签需要插入到此文本节点的哪些位置,并按这些位置分割文本为数组
@@ -161,12 +165,13 @@ function setMark(html, notes = []) {
     })
     textFragment.unshift(text.substring(0, textOffsets[0]));
     textFragment = textFragment.map(frag => {
-      return frag.replace(/\<|\>/g, source => {
+      return htmlEscape(frag);
+      /*return frag.replace(/\<|\>/g, source => {
         if(source === "<") return "&lt;";
         if(source === ">") return "&gt;";
-      })
+      })*/
     })
-    
+
     // 重组这些文本,并借此在适当位置插入标签
     let newNodeData = textFragment[0];
     willMark.forEach((offset, index) => {
@@ -185,7 +190,7 @@ function setMark(html, notes = []) {
     prevLen += text.length;
   })
 
-  html = $(body).originHtml();
+  html = $(body).html();
   // 还原数学公式
   html = reduFormulaExpression(html);
   // 还原emoji
@@ -269,7 +274,7 @@ function getMark(html) {
     }
   }
  
-  html = $("body").html();
+  html = $("body").safeHtml();
   // 还原数学公式
   html = reduFormulaExpression(html);
   // 还原emoji
