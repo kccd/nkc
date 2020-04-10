@@ -10,7 +10,7 @@ function eachTextNode(node, handle) {
   if(!handle) return;
   if(node.type === "text") {
     handle(node.data, node);
-  }else if(node.type === "tag") {
+  }else if(node.children.length) {
     for(let child of node.children) {
       eachTextNode(child, handle)
     }
@@ -22,10 +22,18 @@ function eachTextNode(node, handle) {
 (() => {
   let oldLoad = cheerio.load;
   function newLoad(html, option) {
-    return oldLoad.call(cheerio, html, {
+    let $ = oldLoad.call(cheerio, html, {
       decodeEntities: false,
       ...option
+    })
+    $("pre").each((index, el) => {
+      let newCode = $(el).html().replace(/\<|\>/g, source => {
+        if(source === "<") return "&lt;";
+        if(source === ">") return "&gt;";
+      })
+      $(el).text(newCode);
     });
+    return $;
   }
   cheerio.load = newLoad;
 })();
@@ -45,12 +53,14 @@ function eachTextNode(node, handle) {
         if(p) oldHtml.apply(selector, arguments);
         eachTextNode(selector[0], (text, node) => {
           if(!text) return;
-          node.data = text.replace(/\<|\>/g, source => {
+          node.data = text.replace(/\<|\>|\&/g, source => {
             if(source === "<") return "&lt;";
             if(source === ">") return "&gt;";
+            if(source === "&") return "&amp;";
           })
         })
-        return oldHtml.apply(selector, arguments);
+        let output = oldHtml.apply(selector, arguments);
+        return output;
       }
       // 输出原始html
       selector.originHtml = function() {

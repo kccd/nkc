@@ -1064,7 +1064,7 @@ function autoAddNewline(readyEditor) {
     // console.log("最后一行的位置:", lastLinePosition);
     // console.log("鼠标点击的位置:", cursorOffsetPotision);
     if(cursorOffsetPotision.top > lastLinePosition.top + lastChildHeight + 6 &&     // 6 是行间距(它使检测区域相对于富文本最后一行向下移动)
-      cursorOffsetPotision.top <= lastLinePosition.top + lastChildHeight + 60) {    // 20 是检测区域高度(检测区域:富文本最后一行的正下方的一个矩形区域)
+      cursorOffsetPotision.top <= lastLinePosition.top + lastChildHeight + 60) {    // 60 是检测区域高度(检测区域:富文本最后一行的正下方的一个矩形区域)
         var newLine = $("<p><br></p>")[0];
         $(body).append(newLine);
         var range = new Range();
