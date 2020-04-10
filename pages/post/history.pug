@@ -21,6 +21,7 @@ block content
               else
                 .version=`版本号：${h.version} `
                   span.m-r-05
+                  a.btn.btn-xs.btn-primary(href=`/p/${h.pid}/history/${h._id}` target="_blank") 查看详情
                   button.btn.btn-xs.btn-danger(onclick=`rollback('${h.pid}', '${h._id}')`) 回滚至此版本
               .time=`时间：${format('YYYY/MM/DD HH:mm:ss', h.tlm)}`
               .user
@@ -40,7 +41,7 @@ block scripts
     function rollback(pid, id) {
       sweetQuestion("确定要执行此操作？")
       .then(function() {
-        return nkcAPI("/p/" + pid + "/history/rollback/" + id, "POST")
+        return nkcAPI("/p/" + pid + "/history/"+id+"/rollback", "POST")
       })
       .then(function(data) {
         sweetSuccess("操作成功");

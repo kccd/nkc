@@ -56,6 +56,63 @@ router
 		}
 		await next();
 	})
-  .use('/rollback', rollback.routes(), rollback.allowedMethods());
+  .use("/:_id", async (ctx, next) => {
+    const {pid, _id} = ctx.params;
+    const {db, data} = ctx;
+    const {PostModel, HistoriesModel, ThreadModel} = db;
+    const originPost = await PostModel.findOnly({pid});
+    let targetPost = await HistoriesModel.findOnly({_id});
+    const targetThread = await ThreadModel.findOnly({tid: originPost.tid});
+    await targetThread.extendForums(['mainForums', 'minorForums']);
+    await targetThread.ensurePermission(data.userRoles, data.userGrade, data.user);
+    data.originPost = originPost;
+    data.targetPost = targetPost;
+    await next();
+  })
+  .get("/:_id", async (ctx, next) => {
+    const {db, data} = ctx;
+    const {nkcRender} = ctx.nkcModules;
+    const {originPost, targetPost} = data;
+    data.histories = [];
+    let histories = await db.HistoriesModel.find({pid: originPost.pid}).sort({tlm: 1});
+    // histories = [originPost].concat(histories);
+    const usersId = [];
+    histories.map(h => usersId.push(h.uidlm));
+    const users = await db.UserModel.find({uid: {$in: usersId}});
+    const usersObj = {};
+    users.map(user => usersObj[user.uid] = user);
+    for(let i = 0; i < histories.length; i++) {
+      const h = histories[i].toObject();
+      h.c = nkcRender.htmlToPlain(h.c);
+      if(targetPost.anonymous) {
+        h.uid = "";
+        h.uidlm = "";
+      } else {
+        h.targetUser = usersObj[h.uidlm];
+      }
+      h.version = i + 1;
+      data.histories.push(h);
+    }
+    if(targetPost.anonymous) {
+      data.post.uid = "";
+      data.post.uidlm = "";
+    }
+    data.histories.reverse();
+    for(const h of data.histories) {
+      if(h._id === targetPost._id) {
+        data.targetPost = h;
+      }
+    }
+    data.targetPost = await db.PostModel.extendPost(data.targetPost, {
+      visitor: {
+        xsf: 999
+      },
+      uid: data.user?data.user.uid: ""
+    });
+    data.notes = await db.NoteModel.getNotesByPost(data.targetPost);
+    ctx.template = "post/history_single.pug";
+    await next();
+  })
+  .use('/:hid/rollback', rollback.routes(), rollback.allowedMethods());
 
 module.exports = router;

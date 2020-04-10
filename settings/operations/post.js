@@ -22,9 +22,10 @@ module.exports = {
 		history: {
 			GET: 'visitPostHistory',
 			PATCH: 'disableHistories',
-			rollback: {
-				PARAMETER: {
-					POST: 'rollbackPost'
+			PARAMETER: {
+				GET: "visitPostHistory",
+				rollback: {
+					POST: "rollbackPost"
 				}
 			}
 		},
