@@ -402,11 +402,11 @@ postSchema.pre("save", async function(next) {
   // 重新计算选区信息
   const {html, notes} = getMark(this.c);
   // 将去掉选区标记后的内容存到数据库
-  this.c = html;
   // 与更改前的内容比较
   // 如果有改动则更新选区信息
   const _post = await PostModel.findOne({pid: this.pid}, {c: 1});
   if(!_post) return await next();
+  this.c = html;
   if(this.c !== _post.c) {
     const oldCV = this.cv;
     this.cv ++;

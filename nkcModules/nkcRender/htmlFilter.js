@@ -77,5 +77,11 @@ module.exports = (html) => {
       }
     }
   });
+  // 处理pre
+  html = html.replace(/<pre(.*?)>([\s\S]*?)<\/pre>/ig, (content, v1, v2) => {
+    v2 = v2.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return `<pre${v1}>${v2}</pre>`;
+  });
+
   return html;
 };
