@@ -6770,6 +6770,47 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
 
         UE.instants['ueditorInstant' + me.uid] = me;
     };
+
+    /**
+     * 点击末行空白处插入新行
+     * @param {Object} readyEditor - 一个已经就绪的编辑器实例 
+     * @author yuu
+     */
+    function autoAddNewline(readyEditor) {
+        var doc = readyEditor.document;
+        var body = readyEditor.body;
+        if(!body) return;
+        var handle = function(event) {
+        var lastChild = body.lastChild;
+        var lastChildContent = $(lastChild).text();
+        // 最后一行是否是空行
+        var isEmptyLine = lastChildContent.length == 0 || lastChildContent === decodeURI("%E2%80%8B");
+        // 是空行不就不插入新行
+        if(isEmptyLine) return;
+        var lastChildHeight = $(lastChild).height();
+        var cursorOffsetPotision = { top: event.offsetY, left: event.offsetX };
+        var lastLinePosition = $(lastChild).position();
+        // console.log("最后一行的位置:", lastLinePosition);
+        // console.log("鼠标点击的位置:", cursorOffsetPotision);
+        if(cursorOffsetPotision.top > lastLinePosition.top + lastChildHeight + 6 &&     // 6 是行间距(它使检测区域相对于富文本最后一行向下移动)
+            cursorOffsetPotision.top <= lastLinePosition.top + lastChildHeight + 60) {    // 60 是检测区域高度(检测区域:富文本最后一行的正下方的一个矩形区域)
+            var newLine = $("<p><br></p>")[0];
+            $(body).append(newLine);
+            var range = new Range();
+            range.setStart(newLine, 0);
+            range.setEnd(newLine, 0);
+            range.collapse(true);
+            var selection = doc.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            }
+        }
+        body.addEventListener("click", handle);
+        body.addEventListener("touchend", handle);
+    }
+
+
+
     Editor.prototype = {
          registerCommand : function(name,obj){
             this.commands[name] = obj;
@@ -6929,6 +6970,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                     '</head><body class=\'view\' id=\'view\'></body>' +
                     '<script type=\'text/javascript\' ' + (ie ? 'defer=\'defer\'' : '' ) +' id=\'_initialScript\'>' +
                     'setTimeout(function(){editor = window.parent.UE.instants[\'ueditorInstant' + me.uid + '\'];editor._setup(document);},0);' +
+                    ''+
                     'var _tmpScript = document.getElementById(\'_initialScript\');_tmpScript.parentNode.removeChild(_tmpScript);</script></html>';
                 container.appendChild(domUtils.createElement(document, 'iframe', {
                     id: 'ueditor_' + me.uid,
@@ -7045,6 +7087,12 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 me.document.execCommand('enableObjectResizing', false, false);
             } catch (e) {
             }
+
+            /**
+             * 添加点击空白处自动添加新行功能
+             * @author yuu
+             */
+            autoAddNewline(me);
 
             //挂接快捷键
             me._bindshortcutKeys();
