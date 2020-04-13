@@ -62,7 +62,7 @@ class NKCRender {
         for(const u of atUsers) {
           const str = `@${u.username}`;
           const reg = new RegExp(str, "g");
-          html = html.replace(reg, `<a href="/u/${u.uid}" target="_blank">${str}</a>`);
+          html = html.replace(reg, `<a href="/u/${u.uid}" target="_blank" data-tag="nkcsource" data-type="at">${str}</a>`);
         }
       }
       // twemoji本地化
