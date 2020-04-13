@@ -53,18 +53,37 @@ block content
                     -let text = !index?"当前版本": `版本号：${h.version}`
                     a(href=`/p/${data.post.pid}/history?t=detail&c=${h._id}` class=data.c === h._id.toString()?"active":"").list=text
                 col-xs-12.col-md-8
-                  -let h;
-                  for _h in data.histories
+                  -let h, index;
+                  for _h, _index in data.histories
                     if _h._id.toString() === data.c.toString()
                       -h = _h;
+                      -index = _index;
+                      -break;
+                  .single-history-header.m-t-1
+                    if index === 0
+                      .version=`版本号：当前版本 `
+                    else
+                      .version=`版本号：${h.version} `
+                        span.m-r-05
+                          a.btn.btn-xs.btn-primary(href=`/p/${h.pid}/history?t=detail&c=${h._id}`) 查看详情
+                          button.btn.btn-xs.btn-danger(onclick=`rollback('${h.pid}', '${h._id}')`) 回滚至此版本
+                    .time=`时间：${format('YYYY/MM/DD HH:mm:ss', h.tlm)}`
+                    .user
+                      | 发表人：
+                      if h.targetUser
+                        a.username(href=`/u/${h.targetUser.uid}` data-float-uid=h.targetUser.uid target="_blank")=h.targetUser.username
+                      else
+                        span 匿名用户
+                      a.m-l-05.pointer.ip(onclick=`NKC.methods.getIpInfo('${h.iplm}')`)=` ${h.iplm}`
                   .title.m-t-1=`标题：${h.t || '无'}`
                   div!=h.c
 
 block scripts
-  include ../publicModules/nkcSource
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
-  include ../publicModules/NKCHighlighter/NKCHighlighter
+  if data.t === "detail"
+    include ../publicModules/nkcSource
+    include ../publicModules/NKCHighlighter/NKCHighlighter
   script.
     var data = NKC.methods.getDataById("data");
     NKC.oneAfter("mathJaxRendered", function (_data, next) {
