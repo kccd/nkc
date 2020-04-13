@@ -7,7 +7,7 @@
 */
 window.Source = class {
   constructor(options) {
-    let {hl, node, id, _id} = options;
+    let {hl, node, id, _id, content} = options;
     id = id ||_id;
     const self = this;
     this.hl = hl;
@@ -17,7 +17,32 @@ window.Source = class {
     this.id = id;
     this._id = `nkc-hl-id-${id}`;
     const {offset, length} = this.node;
-    const targetNotes = self.getNodes(this.hl.root, offset, length);
+    let targetNotes;
+    if(length === 0) {
+      // 如果length为0，那么此选区定位丢失
+      // 在hl.root同级后插入一个div
+      // 将丢失选区的笔记装在此div里，并添加点击事件
+      const {root} = hl;
+      let {nextSibling, parentNode} = root;
+      let nkcFreeNotes;
+      if(nextSibling === null) {
+        nkcFreeNotes = document.createElement("div");
+        nkcFreeNotes.classList.add("nkc-free-notes");
+      } else {
+        nkcFreeNotes = nextSibling;
+      }
+      const noteNode = document.createElement("span");
+      noteNode.innerText = content;
+
+      nkcFreeNotes.appendChild(noteNode);
+      if(!nextSibling) {
+        parentNode.appendChild(nkcFreeNotes);
+      }
+      targetNotes = [noteNode];
+    } else {
+      targetNotes = self.getNodes(this.hl.root, offset, length);
+    }
+    // const targetNotes = self.getNodes(this.hl.root, offset, length);
     targetNotes.map(targetNode => {
       if(!targetNode.textContent.length) return;
       const parentNode = targetNode.parentNode;
@@ -97,8 +122,7 @@ window.Source = class {
         };
 
         self.dom.push(span);
-
-        span.appendChild(targetNode.cloneNode(false));
+        span.appendChild(targetNode.cloneNode(true));
         targetNode.parentNode.replaceChild(span, targetNode);
       }
     });
@@ -271,14 +295,6 @@ window.NKCHighlighter = class {
   getParent(self, d) {
     if(d === self.root) return;
     if(this.isClown(d)) throw new  Error("划词越界");
-    /*if(d.nodeType === 1) {
-      for(const c of self.excludedElementClass) {
-        if(d.classList.contains(c)) throw new Error("划词越界");
-      }
-      if(self.excludedElementTagName.includes(d.tagName.toLowerCase())) {
-        throw new Error("划词越界");
-      }
-    }*/
     if(d.parentNode) self.getParent(self, d.parentNode);
   }
   getRange() {
@@ -420,18 +436,6 @@ window.NKCHighlighter = class {
       // loop:
       for (let i = children.length - 1; i >= 0; i--) {
         const node = children[i];
-        /*if(node.nodeType === 1) {
-          const cl = node.classList;
-          for(const c of self.excludedElementClass) {
-            if(cl.contains(c)) {
-              continue loop;
-            }
-          }
-          const elementTagName = node.tagName.toLowerCase();
-          if(self.excludedElementTagName.includes(elementTagName)) {
-            continue;
-          }
-        }*/
         if(self.isClown(node)) continue;
         nodeStack.push(node);
       }
@@ -447,7 +451,6 @@ window.NKCHighlighter = class {
   }
   findNodes(startNode, endNode) {
     const selectedNodes = [];
-    // const parent = this.root;
     const parent = this.getSameParentNode(startNode, endNode);
     if(parent) {
       let start = false, end = false;

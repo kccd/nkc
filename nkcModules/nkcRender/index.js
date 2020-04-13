@@ -55,8 +55,7 @@ class NKCRender {
         return method(_html, id, resource, user);
       });
     }
-    html = $("body").html();
-
+    html = $("body").safeHtml();
     if(type === "article") {
       // @检测
       if(atUsers && atUsers.length) {
