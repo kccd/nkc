@@ -10,7 +10,7 @@ ipinfoRouter
     ipInfo.ip = targetIp;
     ctx.data.ipInfo = ipInfo;
     await next();
-  })
+  });
 
 
 module.exports = ipinfoRouter;

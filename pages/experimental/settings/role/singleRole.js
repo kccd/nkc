@@ -2,6 +2,8 @@ var app = new Vue({
   el: '#app',
   data: {
     role: '',
+    roles: [],
+    cloneRoleId: "",
     operations: [],
     defaultOperationsId: [],
     type: '',
@@ -12,6 +14,7 @@ var app = new Vue({
     var data = document.getElementById('data');
     data = JSON.parse(data.innerHTML);
     this.role = data.role;
+    this.roles = data.roles;
     this.users = data.users;
     this.operations = data.operations;
     this.defaultOperationsId = data.defaultOperationsId;
@@ -29,6 +32,22 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
+    cloneOperations: function() {
+      var roles = this.roles;
+      var cloneRoleId = this.cloneRoleId;
+      if(!cloneRoleId) return;
+      var role;
+      for(var i = 0; i < roles.length; i++) {
+        var _role = roles[i];
+        if(cloneRoleId === _role._id) role = _role;
+      }
+      if(!role) return;
+      sweetQuestion("确定要复制“"+role.displayName+"”的权限设置？")
+        .then(function() {
+          app.role.operationsId = [].concat(role.operationsId);
+        })
+        .catch(sweetError)
+    },
     isDefault: function(operationId) {
       return this.defaultOperationsId.indexOf(operationId) !== -1;
     },
