@@ -1,3 +1,7 @@
+@import "../publicModules/base";
+body{
+  background-color: #f4f4f4;
+}
 .history{
   .single-history{
     .btn{
@@ -25,10 +29,21 @@
     margin: 1rem 0;
   }
 }
-.history-single{
-  .list-a{
+.history-detail{
+  .title{
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .list{
+    display: block;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    font-size: 1.25rem;
+    color: #555;
+    font-weight: 700;
+    text-align: left;
     &.active{
-      font-size: 2rem;
+      color: @primary;
     }
   }
 }

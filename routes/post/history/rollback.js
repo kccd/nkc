@@ -3,17 +3,6 @@ const router = new Router();
 
 router
   .post('/', async (ctx, next) => {
-    /*const {pid, _id} = ctx.params;
-    const {db, data, nkcModules} = ctx;
-
-    const {PostModel, HistoriesModel, ThreadModel} = db;
-    const originPost = await PostModel.findOnly({pid});
-    // return console.log(typeof new mongoose.Types.ObjectId(_id))
-    let targetPost = await HistoriesModel.findOnly({_id});
-    const targetThread = await ThreadModel.findOnly({tid: originPost.tid});
-    await targetThread.extendForums(['mainForums', 'minorForums']);
-    await targetThread.ensurePermission(data.userRoles, data.userGrade, data.user);*/
-
     const {db, data, nkcModules} = ctx;
     const {originPost, targetPost} = data;
 
