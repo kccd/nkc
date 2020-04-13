@@ -139,40 +139,35 @@ function isLost(offset) {
  * @param {number} start - 起始偏移量
  * @param {number} end - 结束偏移量
  * @param {string} content - 全文
+ * @param {string} focusContent - 划词内容
  */
-function createNote(noteId, start, end, content) {
-  const fill = 5, postLength = content.length;
-  let lastIndex = postLength - 1;
-  console.log(start, end)
-  // start在最后一个字(不管end丢没丢都不认了)
-  if(!isLost(start) && start == lastIndex) {
-    end = lastIndex;
-    start = (postLength > fill)? lastIndex - fill + 1 : 0;
-    console.log("[1]");
-    
-  }
-  // end在第一个字(不管start丢没丢都不认了)
-  if(!isLost(end) && end == lastIndex) {
-    start = 0;
-    end = postLength >= fill? fill - 1: lastIndex;
-    console.log("[2]");
-  }
+function createNote(noteId, start, end, content, focusContent) {
+  const fill = 5, postLength = content.length, last = postLength - 1;
   // start丢失 end存在
   if(isLost(start) && !isLost(end)) {
-    start = (end >= fill - 1)? end - fill: 0;
-    console.log("[3]");
+    start = end - fill;
   }
   // end丢失   start存在
   if(isLost(end) && !isLost(start)) {
-    end = (start <= postLength - fill)? start + fill: lastIndex;
-    console.log("[4]");
+    end = start + fill;
   }
-  let length = end - start;
-  return { 
+  // 越界处理
+  if(start < 0) start = 0;
+  if(end > postLength) end = postLength;
+  // 无内容处理
+  if(start >= last) {    // start在文章最后一个字
+    end = postLength;
+    start = postLength - fill;
+  }
+  if(end <= 0) {        // end在文章第一个字
+    start = 0;
+    end = start + fill;
+  }
+  return {
     _id: noteId,
     offset: start,
     length: end - start,
-    content: content.substr(start, length)
+    content: content.substr(start, end - start)
   }
 }
 
@@ -333,21 +328,21 @@ function getMark(html) {
   // 格式化和处理不完整的标记
   let notes = [];
   for(let noteId in map) {
-    // notes.push(createNote(noteId, rec.start, rec.end, content));
     let rec = map[noteId];
-    let note = { _id: noteId };
-    if(!rec.hasOwnProperty("start") || !rec.hasOwnProperty("end")) {
-      notes.push({ ...note, length: 0, isLost: true});
-    }else {
-      let start = map[noteId].start;
-      let end = map[noteId].end;
-      notes.push({
-        ...note,
-        offset: start,
-        length: end - start,
-        content: rec.content
-      });
-    }
+    notes.push(createNote(noteId, rec.start, rec.end, content, rec.content));
+    // let note = { _id: noteId };
+    // if(!rec.hasOwnProperty("start") || !rec.hasOwnProperty("end")) {
+    //   notes.push({ ...note, length: 0, isLost: true});
+    // }else {
+    //   let start = map[noteId].start;
+    //   let end = map[noteId].end;
+    //   notes.push({
+    //     ...note,
+    //     offset: start,
+    //     length: end - start,
+    //     content: rec.content
+    //   });
+    // }
   }
 
   // console.log(notes);
