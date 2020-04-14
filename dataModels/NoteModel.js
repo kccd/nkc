@@ -10,7 +10,7 @@ const schema = new Schema({
   },
   // 在originId中，是否为最新的选区
   latest: {
-    type: Number,
+    type: Boolean,
     default: true,
     index: 1
   },

@@ -31,8 +31,6 @@ $(function() {
     resetBodyPaddingTop();
     EditorReady = true;
     initVueApp();
-    // 点击末行空白处插入新行
-    autoAddNewline(editor);
   });
   // 实例化专栏模块，如果不存在构造函数则用户没有权限转发。
   // 在提交数据前，读取专栏分类的时候，注意判断是否存在实例PostToColumn。
@@ -1043,42 +1041,4 @@ window.onbeforeunload = function() {
 };
 NKC.methods.selectedDraft = function(draft) {
   PostInfo.insertDraft(draft);
-}
-
-
-/**
- * 点击末行空白处插入新行
- * @param {Object} readyEditor - 一个已经就绪的编辑器实例 
- */
-function autoAddNewline(readyEditor) {
-  var doc = readyEditor.document;
-  var body = readyEditor.body;
-  if(!body) return;
-  var handle = function(event) {
-    var lastChild = body.lastChild;
-    var lastChildContent = $(lastChild).text();
-    // 最后一行是否是空行
-    var isEmptyLine = lastChildContent.length == 0 || lastChildContent === decodeURI("%E2%80%8B");
-    // 是空行不就不插入新行
-    if(isEmptyLine) return;
-    var lastChildHeight = $(lastChild).height();
-    var cursorOffsetPotision = { top: event.offsetY, left: event.offsetX };
-    var lastLinePosition = $(lastChild).position();
-    // console.log("最后一行的位置:", lastLinePosition);
-    // console.log("鼠标点击的位置:", cursorOffsetPotision);
-    if(cursorOffsetPotision.top > lastLinePosition.top + lastChildHeight + 6 &&     // 6 是行间距(它使检测区域相对于富文本最后一行向下移动)
-      cursorOffsetPotision.top <= lastLinePosition.top + lastChildHeight + 60) {    // 60 是检测区域高度(检测区域:富文本最后一行的正下方的一个矩形区域)
-        var newLine = $("<p><br></p>")[0];
-        $(body).append(newLine);
-        var range = new Range();
-        range.setStart(newLine, 0);
-        range.setEnd(newLine, 0);
-        range.collapse(true);
-        var selection = doc.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
-  }
-  body.addEventListener("click", handle);
-  body.addEventListener("touchend", handle);
 }
