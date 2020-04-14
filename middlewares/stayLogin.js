@@ -119,6 +119,7 @@ module.exports = async (ctx, next) => {
       });
       user.newVoteUp = newVoteUp>0?newVoteUp:0;
     }
+    userGrade = await user.extendGrade();
     // 判断用户是否被封禁
 		if(user.certs.includes('banned')) {
       const role = await db.RoleModel.extendRole('banned');
@@ -134,8 +135,7 @@ module.exports = async (ctx, next) => {
       const defaultRole = await db.RoleModel.extendRole('default');
 			userOperationsId = defaultRole.operationsId;
 			// 根据用户积分计算用户等级，并且获取该等级下的所有权限
-			userGrade = await user.extendGrade();
-			if(userGrade) {
+      if(userGrade) {
 				userOperationsId = userOperationsId.concat(userGrade.operationsId);
       }
       // 根据用户的角色获取权限
@@ -162,7 +162,7 @@ module.exports = async (ctx, next) => {
     return ctx.state.language[type][operationId] || operationId;
   };
 
-	data.userOperationsId = userOperationsId;
+	data.userOperationsId = [...new Set(userOperationsId)];
 	data.userRoles = userRoles;
 	data.userGrade = userGrade;
   data.user = user;
