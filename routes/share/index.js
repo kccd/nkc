@@ -1,6 +1,12 @@
 const Router = require('koa-router');
 const shareRouter = new Router();
 const apiFn = require('../../nkcModules/apiFunction');
+const serverConfig = require("../../config/server");
+const reg = new RegExp(`^` +
+  serverConfig.domain
+    .replace(/\//g, "\\/")
+    .replace(/\./g, "\\.")
+  , "i");
 shareRouter
   .get('/:token', async (ctx) => {
     const {params, db, data, nkcModules} = ctx;
@@ -50,6 +56,12 @@ shareRouter
         uid: user?user.uid: ''
       });
       await shareAccessLog.save();
+    }
+    // 点击本站内的分享链接不给予奖励
+    const referer = ctx.get("referer");
+    if(referer && reg.test(referer)) {
+      await lock.unlock();
+      return ctx.redirect(shareUrl);
     }
     // 若分享者是游客
     if(['', 'visitor'].includes(uid)) {
