@@ -10,8 +10,6 @@ router
     } else {
       c = {};
     }
-    data.c = c;
-    data.t = t;
     const searchMap = {};
     if(c.sTime || c.eTime) {
       searchMap.reqTime = {};
@@ -27,6 +25,7 @@ router
     if(c.operationId) {
       searchMap.operationId = c.operationId;
     }
+    data.c = encodeURIComponent(new Buffer(JSON.stringify(c)).toString('base64'));
     let paging;
     if(!t) {
       const count = await db.LogModel.count(searchMap);
@@ -41,6 +40,7 @@ router
       paging = nkcModules.apiFunction.paging(page, count, 60);
       data.result = await db.VisitorLogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
     }
+    data.t = t;
     data.searchMap = c;
     data.paging = paging;
     ctx.template = 'experimental/log/public.pug';
