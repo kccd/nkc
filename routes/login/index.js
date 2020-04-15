@@ -174,7 +174,7 @@ loginRouter
 		ctx.setCookie("userInfo", {
       uid: user.uid,
       username: user.username,
-      lastLogin: Date.now()
+      lastLogin: userPersonal.secret
     });
 
 		ctx.data = {

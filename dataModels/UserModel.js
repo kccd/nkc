@@ -648,6 +648,7 @@ userSchema.pre('save', async function(next) {
 * @author pengxiguaa 2019-8-16
 * */
 userSchema.statics.createUser = async (option) => {
+  const apiFunction = require("../nkcModules/apiFunction");
 	const UserModel = mongoose.model('users');
 	const UsersPersonalModel = mongoose.model('usersPersonal');
 	const SubscribeModel = mongoose.model("subscribes");
@@ -666,6 +667,7 @@ userSchema.statics.createUser = async (option) => {
 	userObj.toc = toc;
 	userObj.tlv = toc;
 	userObj.tlm = toc;
+	userObj.secret = apiFunction.getRandomString("aA0", 64);
 	userObj.certs = [];
 	// 生成默认用户名，符号"-"和uid保证此用户名全局唯一
 	if(!userObj.username) {

@@ -32,6 +32,11 @@ const usersPersonalSchema = new Schema({
     type: Number,
     default: 0
   },
+	// 修改密码后刷新
+	secret: {
+  	type: String,
+		required: true
+	},
   password: {
     salt: {
       type: String,

@@ -105,6 +105,7 @@ fn.newPasswordObject = (plain) => {
   let hash = fn.sha256HMAC(plain,salt);
   return {
     hashType:'sha256HMAC',
+    secret: fn.getRandomString("aA0", 64),
     password:{
       hash:hash,
       salt:salt,

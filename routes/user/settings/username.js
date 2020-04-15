@@ -44,9 +44,12 @@ router
 		// 同步到elasticSearch搜索数据库
     await nkcModules.elasticSearch.save("user", user);
 
+    const _usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
+
     ctx.setCookie("userInfo", {
       uid: user.uid,
       username: user.username,
+      lastLogin: _usersPersonal.secret
     });
 		await next();
 	});

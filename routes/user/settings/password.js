@@ -23,7 +23,16 @@ passwordRouter
 		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者');
 		const newPassword = apiFunction.newPasswordObject(password);
-		await userPersonal.update({password: newPassword.password, hashType: newPassword.hashType});
+		await userPersonal.update({
+			password: newPassword.password,
+			secret: newPassword.secret,
+			hashType: newPassword.hashType
+		});
+		ctx.setCookie("userInfo", {
+			uid: user.uid,
+			username: user.username,
+			lastLogin: newPassword.secret
+		});
 		// 兼容app，修改app时去掉
 		data.loginKey = "";
 		await next();
