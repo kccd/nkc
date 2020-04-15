@@ -17,8 +17,8 @@ window.Source = class {
     this.id = id;
     this._id = `nkc-hl-id-${id}`;
     const {offset, length} = this.node;
-    let targetNotes;
-    if(length === 0) {
+    let targetNotes = self.getNodes(this.hl.root, offset, length);
+    if(length === 0 || !targetNotes.length) {
       // 如果length为0，那么此选区定位丢失
       // 在hl.root同级后插入一个div
       // 将丢失选区的笔记装在此div里，并添加点击事件
@@ -39,8 +39,6 @@ window.Source = class {
         parentNode.appendChild(nkcFreeNotes);
       }
       targetNotes = [noteNode];
-    } else {
-      targetNotes = self.getNodes(this.hl.root, offset, length);
     }
     // const targetNotes = self.getNodes(this.hl.root, offset, length);
     targetNotes.map(targetNode => {

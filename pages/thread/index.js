@@ -1307,7 +1307,6 @@ var nkchl = [];
 $(function() {
 
 	var data = NKC.methods.getDataById("threadForumsId");
-
 	NKC.oneAfter("mathJaxRendered", function(_data, next) {
 		if(data.notes && data.notes.length) {
 			for(var i = 0; i < data.notes.length; i++) {
@@ -1322,7 +1321,15 @@ $(function() {
 		next();
 	});
 	NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
-
+	// app锚点无法滚动到指定位置，每次都会滚动到页面底部
+	// 此处针对app特殊处理，一秒钟后手动触发滚动到锚点
+	var hash = window.location.hash;
+	if(NKC.configs.isApp && hash) {
+		setTimeout(function() {
+			window.location.hash = "";
+			window.location.hash = hash;
+		}, 1000)
+	}
 });
 
 

@@ -1,27 +1,50 @@
+@import "../publicModules/base";
+body{
+  background-color: #f4f4f4;
+}
+.single-history-header{
+  background-color: #f4f4f4;
+  font-style: oblique;
+  border-radius: 3px;
+  padding: 0.5rem;
+  .user{
+    .username{
+      display: inline-block;
+    }
+    .ip{
+      display: inline-block;
+    }
+  }
+}
 .history{
   .single-history{
-    button{
+    .btn{
       font-style: normal;
     }
-    .single-history-header{
-      background-color: #f4f4f4;
-      font-style: oblique;
-      border-radius: 3px;
-      padding: 0.5rem;
-      .user{
-        .username{
-          display: inline-block;
-        }
-        .ip{
-          display: inline-block;
-        }
-      }
-    }
+
     .single-history-body{
       background-color: #f4f4f4;
       padding: 0.5rem;
       word-break: break-all;
     }
     margin: 1rem 0;
+  }
+}
+.history-detail{
+  .title{
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .list{
+    display: block;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    font-size: 1.25rem;
+    color: #555;
+    font-weight: 700;
+    text-align: left;
+    &.active{
+      color: @primary;
+    }
   }
 }
