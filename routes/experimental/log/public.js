@@ -46,7 +46,7 @@ router
     ctx.template = 'experimental/log/public.pug';
     await next()
   })
-  .del('/', async (ctx, next) => {
+  /*.del('/', async (ctx, next) => {
     const {db, query} = ctx;
     let {del} = query;
     del = del? JSON.parse(decodeURIComponent(Buffer.from(del, "base64").toString())) : {};
@@ -72,5 +72,5 @@ router
     await db.LogModel.remove(delMap);
     
     await next();
-  });
+  });*/
 module.exports = router;
