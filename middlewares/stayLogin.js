@@ -53,11 +53,17 @@ module.exports = async (ctx, next) => {
 		  if(global.NKC.NODE_ENV !== 'production') console.log(err);
 		}
 	}
-	let userOperationsId = [], userRoles = [], userGrade = {}, user;
+	let userOperationsId = [], userRoles = [], userGrade = {}, user, usersPersonal;
 	if(userInfo) {
 	  try {
-	    const {uid} = userInfo;
-      user = await db.UserModel.findOne({uid});
+	    const {uid, lastLogin = ""} = userInfo;
+      const _user = await db.UserModel.findOne({uid});
+      if(_user) {
+        usersPersonal = await db.UsersPersonalModel.findOne({uid: _user.uid, secret: lastLogin});
+        if(usersPersonal) {
+          user = _user;
+        }
+      }
       if(!user) ctx.setCookie('userInfo', '');
     } catch(err) {
       ctx.setCookie('userInfo', '');
@@ -153,7 +159,8 @@ module.exports = async (ctx, next) => {
 		// 重置cookie的过期时间，让有活动的用户保持登录
     ctx.setCookie("userInfo", {
       uid: user.uid,
-      username: user.username
+      username: user.username,
+      lastLogin: usersPersonal.secret
     });
   }
   // 根据用户语言设置加载语言对象

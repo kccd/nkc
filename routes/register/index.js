@@ -50,13 +50,13 @@ registerRouter
 	  delete option.type;
 		user = await db.UserModel.createUser(option);
 		await user.extendGrade();
-
     await imgCodeObj.update({uid: user.uid});
 
+    const _usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     ctx.setCookie("userInfo", {
       uid: user.uid,
       username: user.username,
-      lastLogin: Date.now()
+      lastLogin: _usersPersonal.secret
     });
 	  ctx.data = {
 		  user
