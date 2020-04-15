@@ -7,7 +7,7 @@ block eContent
       .col-xs-12.col-md-12  
         include ./roleNav      
       .col-xs-12.col-md-12.m-t-1
-      .hidden#data=JSON.stringify({defaultOperationsId: data.defaultOperationsId, role: data.role, operationTypes: data.operationTypes, operations: data.operations, users: data.users})
+      .hidden#data=JSON.stringify({roles: data.roles,defaultOperationsId: data.defaultOperationsId, role: data.role, operationTypes: data.operationTypes, operations: data.operations, users: data.users})
     .row#app(v-cloak)
       button.btn.btn-primary.btn-fab(@click='save') 保存
       .col-xs-12.col-md-7.col-md-offset-2
@@ -100,6 +100,14 @@ block eContent
                 span {{t.displayName}}
                 span.badge {{t.operations.length}}
           .rol-xs-12.col-md-9
+            div(v-if="role.defaultRole && role._id !== 'dev'")
+              .form-inline.m-b-1
+                .form-group
+                  select.form-control(v-model="cloneRoleId")
+                    option(v-for="r in roles" :value="r._id" v-if="r.defaultRole && r._id !== role._id") {{r.displayName}}
+                .form-group
+                  button.btn.btn-default(@click="cloneOperations") 一键复制
+              h5.text-danger 此操作将会覆盖原设置。
             .panel.panel-default
               .panel-heading {{type.displayName}}
               table.table.table-hover
