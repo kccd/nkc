@@ -295,7 +295,7 @@ module.exports = {
     },
 		public: {
 			GET: 'visitPublicLogs',
-			DELETE: 'deletePublicLogs'
+			// DELETE: 'deletePublicLogs'
 		},
 		secret: {
 			GET: 'visitSecretLogs',
