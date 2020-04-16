@@ -295,7 +295,7 @@ module.exports = {
     },
 		public: {
 			GET: 'visitPublicLogs',
-			// DELETE: 'deletePublicLogs'
+			DELETE: 'deletePublicLogs'
 		},
 		secret: {
 			GET: 'visitSecretLogs',
@@ -343,7 +343,13 @@ module.exports = {
     },
     review: {
 		  GET: "experimentalReviewLog"
-    }
+		},
+		smscode: {
+			GET: "viewSmscodeRecord"
+		},
+		emailcode: {
+			GET: "viewEmailcodeRecord"
+		}
 	},
   console: {
 	  GET: 'visitExperimentalConsole'

@@ -177,3 +177,9 @@ tbody tr th {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
+
+
+#timeRange,
+#cleanupTimeRange {
+  width: 300px;
+}

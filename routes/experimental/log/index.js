@@ -16,6 +16,8 @@ const warningRouter = require("./warning");
 const shareRouter = require("./share");
 const shopRouter = require("./shop");
 const messageRouter = require("./message");
+const smscodeRouter = require("./smscode");
+const emailcodeRouter = require("./emailcode");
 logRouter
   .get('/', async (ctx, next) => {
     const {nkcModules} =ctx;
@@ -37,4 +39,6 @@ logRouter
   .use("/shop", shopRouter.routes(), shopRouter.allowedMethods())
   .use("/message", messageRouter.routes(), messageRouter.allowedMethods())
   .use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
+  .use("/smscode", smscodeRouter.routes(), smscodeRouter.allowedMethods())
+  .use("/emailcode", emailcodeRouter.routes(), emailcodeRouter.allowedMethods())
 module.exports = logRouter;
