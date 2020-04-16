@@ -25,9 +25,11 @@ router
     if(c.operationId) {
       searchMap.operationId = c.operationId;
     }
+    let logType = c.logType || "user";
     data.c = encodeURIComponent(new Buffer(JSON.stringify(c)).toString('base64'));
     let paging;
-    if(!t) {
+    // tab类型，默认是 可以看所有日志
+    if(!t || logType === "user") {
       const count = await db.LogModel.count(searchMap);
       paging = nkcModules.apiFunction.paging(page, count, 60);
       const logs = await db.LogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
@@ -35,26 +37,26 @@ router
         await behavior.extendUser();
         return behavior;
       }));
-    } else {
+    } else if(t === "visitor" || logType === "visitor") {
+      // 游客
       const count = await db.VisitorLogModel.count(searchMap);
       paging = nkcModules.apiFunction.paging(page, count, 60);
       data.result = await db.VisitorLogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
     }
     data.t = t;
     data.searchMap = c;
+    data.searchMap.logType = logType;
     data.paging = paging;
     ctx.template = 'experimental/log/public.pug';
     await next()
   })
-  /*.del('/', async (ctx, next) => {
+  .del('/', async (ctx, next) => {
     const {db, query} = ctx;
     let {del} = query;
     del = del? JSON.parse(decodeURIComponent(Buffer.from(del, "base64").toString())) : {};
     const delMap = {
       "$and":[
-        {"reqTime": {}},
-        // {"uid": uid},
-        // {"ip": ip}
+        {"reqTime": {}}
       ]
     };
     if(del.sTime) {
@@ -63,14 +65,13 @@ router
     if(del.eTime) {
       delMap.$and[0].reqTime.$lt = new Date(del.eTime);
     }
-    if(del.ip) {
-      delMap.$and[1].ip =  del.ip;
+
+    if(del.logType === "user") {
+      await db.LogModel.remove(delMap);
+    }else if(del.logType === "visitor") {
+      await db.VisitorLogModel.remove(delMap);
     }
-    if(del.uid) {
-      delMap.$and[2].uid =  del.uid;
-    }
-    await db.LogModel.remove(delMap);
     
     await next();
-  });*/
+  });
 module.exports = router;

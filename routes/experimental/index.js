@@ -6,10 +6,10 @@ const consoleRouter = require('./console');
 const loginRouter = require("./login");
 const toolsRouter = require("./tools");
 const experimentalRouter = new Router();
-
 experimentalRouter
   .use("/", async (ctx, next) => {
     const {data, path, db, nkcModules} = ctx;
+    const exConfig = await nkcModules.apiFunction.getConfigByName("experimental");
     if(path === "/e/login") return await next();
     if(!data.user) return ctx.redirect("/login");
     const experimentalSettings = await db.SettingModel.findById('safe');
@@ -17,12 +17,15 @@ experimentalRouter
     if(experimentalVerifyPassword) {
       const experimental = ctx.getCookie("experimental");
       if(!experimental) return ctx.redirect("/e/login");
-      const {uid, time} = experimental;
-      if(data.user.uid !== uid || Date.now() - time > experimentalTimeout*60*1000) {
+      const {lastLogin, uid, p, time} = experimental;
+      const up = await db.UsersPersonalModel.findOne({uid: data.user.uid, secret: p});
+      if(lastLogin !== exConfig.secret || !up || data.user.uid !== uid || Date.now() - time > experimentalTimeout*60*1000) {
         return ctx.redirect("/e/login");
       }
       ctx.setCookie("experimental", {
         uid,
+        p,
+        lastLogin: exConfig.secret,
         time: Date.now()
       });
     }

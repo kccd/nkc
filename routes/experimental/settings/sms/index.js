@@ -3,34 +3,58 @@ const smsRouter = new Router();
 smsRouter
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		if(ctx.get('FROM') !== 'nkcAPI') {
-      ctx.template = 'experimental/settings/sms.pug';
-    } else {
-      data.smsSettings = (await db.SettingModel.findOnly({_id: 'sms'})).c;
-    }
+    data.smsSettings = await db.SettingModel.getSettings('sms');
+    data.smsSettings.appKey = "**********************************";
+    ctx.template = 'experimental/settings/sms/sms.pug';
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {db, body} = ctx;
+		const {db, body, nkcModules} = ctx;
+		const {checkString} = nkcModules.checkData;
 		const {smsSettings} = body;
-		const smsSettingsDB = await db.SettingModel.findOnly({_id: 'sms'});
-    if(!smsSettings.appId) return screenTopWarning('appId不能为空');
-    if(!smsSettings.appKey) return screenTopWarning('appKey不能为空');
-    if(!smsSettings.smsSign) return screenTopWarning('短信签名不能为空');
-    for(const template of smsSettings.templates) {
-      if (smsSettings.status) {
-        if (template.id === '') return screenTopWarning(template.name + '的模板ID不能为空');
-        if (template.validityPeriod === '') return screenTopWarning(template.name + '的有效时间不能为空');
-        if (template.validityPeriod <= 0) return screenTopWarning(template.name + '的有效时间必须大于0');
-        if (template.sameIpOneDay === '') return screenTopWarning(template.name + '的IP次数限制不能为空');
-        if (template.sameIpOneDay <= 0) return screenTopWarning(template.name + '的IP次数限制必须大于0');
-        if (template.sameMobileOneDay === '') return screenTopWarning(template.name + '的手机号码次数限制不能为空');
-        if (template.sameMobileOneDay <= 0) return screenTopWarning(template.name + '的手机号码次数限制必须大于0');
-      }
+		const reg = /^\**?$/;
+    const smsSettingsDB = await db.SettingModel.findOnly({_id: 'sms'});
+    const {templates, restrictedNumber, appId, appKey, smsSign} = smsSettings;
+
+    checkString(appId, {
+      name: "App ID",
+      minLength: 1
+    });
+    checkString(appKey, {
+      name: "APP Key",
+      minLength: 1
+    });
+    checkString(smsSign, {
+      name: "短信签名",
+      minLength: 1
+    });
+
+    const obj  = {
+      "c.appId": appId,
+      "c.smsSign": smsSign
+    };
+    if(!reg.test(appKey)) {
+      obj["c.appKey"] = appKey;
     }
-    await smsSettingsDB.update({c: smsSettings});
+
+    for(const template of templates) {
+      if (template.id === '') ctx.throw(400, template.name + '的模板ID不能为空');
+      if (template.validityPeriod === '') ctx.throw(400, template.name + '的有效时间不能为空');
+      if (template.validityPeriod <= 0) ctx.throw(400, template.name + '的有效时间必须大于0');
+      if (template.sameIpOneDay === '') ctx.throw(400, template.name + '的IP次数限制不能为空');
+      if (template.sameIpOneDay <= 0) ctx.throw(400, template.name + '的IP次数限制必须大于0');
+      if (template.sameMobileOneDay === '') ctx.throw(400, template.name + '的手机号码次数限制不能为空');
+      if (template.sameMobileOneDay <= 0) ctx.throw(400, template.name + '的手机号码次数限制必须大于0');
+    }
+
+    obj["c.templates"] = templates;
+    obj["c.restrictedNumber"] = restrictedNumber;
+
+    await smsSettingsDB.update({
+      $set: obj
+    });
     await db.SettingModel.saveSettingsToRedis("sms");
-		await next();
+    await next();
   })
   // .post('/restricted', async (ctx, next) => {
   //   const {body, db} = ctx

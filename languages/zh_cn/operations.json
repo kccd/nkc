@@ -708,5 +708,8 @@
   "visitToolsManager": "访问网站工具管理页面",
   "hideTool": "屏蔽网站工具",
 
-  "ipinfo": "查询ip信息"
+  "ipinfo": "查询ip信息",
+
+  "viewSmscodeRecord": "查看短信验证码记录",
+  "viewEmailcodeRecord": "查看邮件验证码记录"
 }
