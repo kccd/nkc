@@ -172,7 +172,9 @@ function deleteCurrentRecord() {
     .then(function() {
        return nkcAPI(url + '?del=' +  NKC.methods.strToBase64(JSON.stringify(c)), "DELETE")
     })
-    .then(function() {location.reload()})
+    .then(function() {
+      sweetSuccess("删除成功");
+    })
     .catch(sweetError);
     
 }

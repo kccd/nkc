@@ -4,10 +4,12 @@ const Schema = mongoose.Schema;
 smsCodeSchema = new Schema({
   toc: {
     type: Date,
+		index: 1,
     default: Date.now
   },
   type: {
     type: String,
+		index: 1,
     required: true
   },
   code: {
