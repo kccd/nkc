@@ -47,6 +47,7 @@ block content
               table.table.table-bordered
                 thead
                   tr
+                    th ID
                     th 时间
                     th 用户
                     th 操作名（操作ID）
@@ -59,6 +60,7 @@ block content
                 tbody
                   for log, index in data.result
                     tr
+                      th=log._id
                       th= format("YYYY/MM/DD HH:mm:ss", log.reqTime)
                       th
                         if log.user

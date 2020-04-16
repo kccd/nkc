@@ -1,13 +1,12 @@
 const Router = require('koa-router');
 const emailRouter = new Router();
+const reg = /^\**?$/;
 emailRouter
   .get('/', async (ctx, next) => {
-    if(ctx.get('FROM') !== 'nkcAPI') {
-      ctx.template = 'experimental/settings/email.pug';
-      return await next();
-    }
     const {data, db} = ctx;
-    data.emailSettings = (await db.SettingModel.findOnly({_id: 'email'})).c;
+    ctx.template = 'experimental/settings/email/email.pug';
+    data.emailSettings = await db.SettingModel.getSettings("email");
+    data.emailSettings.smtpConfig.auth.pass = "********";
     await next();
   })
   .patch('/', async (ctx, next) => {
@@ -26,7 +25,17 @@ emailRouter
     if(!secure && port === '') ctx.throw(400, '自定义端口不能为空');
     if(!user || !pass) ctx.throw(400, '账号或密码不能为空');
     const emailSettingsDB = await db.SettingModel.findOnly({_id: 'email'});
-    await emailSettingsDB.update({c: emailSettings});
+    const obj = {
+      "c.from": from,
+      "c.templates": templates,
+      "c.smtpConfig.host": host,
+      "c.smtpConfig.port": port,
+      "c.smtpConfig.auth.user": user
+    };
+    if(!reg.test(pass)) {
+      obj["c.smtpConfig.auth.pass"] = pass;
+    }
+    await emailSettingsDB.update({$set: obj});
     await db.SettingModel.saveSettingsToRedis("email");
     await next();
   })

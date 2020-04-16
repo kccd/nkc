@@ -1,7 +1,7 @@
 
 const nkcModules = require('../nkcModules');
 
-const logger = async (ctx, next) => {
+module.exports = async (ctx, next) => {
   const { db, address: ip, port, url, method} = ctx;
   const processTime = ctx.processTime;
   const {apiFunction} = nkcModules;
@@ -174,4 +174,3 @@ const logger = async (ctx, next) => {
     await next();
   }
 };
-module.exports = logger;

@@ -1,7 +1,8 @@
-var app = new Vue({
+const data = NKC.methods.getDataById("data");
+const app = new Vue({
   el: '#app',
   data: {
-    emailSettings: {},
+    emailSettings: data.emailSettings,
     test: {
       name: 'bindEmail',
       content: "",
@@ -40,14 +41,5 @@ var app = new Vue({
           screenTopWarning(data.error || data);
         })
     }
-  },
-  mounted: function() {
-    nkcAPI('/e/settings/email?t=' + Date.now(), 'GET', {})
-      .then(function(data) {
-        app.emailSettings = data.emailSettings;
-      })
-      .catch(function(data) {
-        screenTopWarning(data.error || data);
-      })
   }
 });

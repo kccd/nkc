@@ -7,26 +7,22 @@ router
   })
   .post("/", async (ctx, next) =>{
     const {data, body, db, nkcModules} = ctx;
+    const exConfig = await nkcModules.apiFunction.getConfigByName("experimental");
     const {password} = body;
+    if(!nkcModules.apiFunction.testPassword(password, "sha256HMAC", {
+      salt: exConfig.salt,
+      hash: exConfig.hash
+    })) {
+      ctx.throw(400, "密码错误");
+    }
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: data.user.uid});
-    await userPersonal.ensurePassword(password);
     ctx.setCookie("experimental", {
       uid: data.user.uid,
+      p: userPersonal.secret,
+      lastLogin: exConfig.secret,
       time: Date.now()
     });
     data.redirect = "/e/console";
-    // const urls = ctx.getCookie("visitedUrls");
-    // ctx.setCookie("experimental", {
-    //   uid: data.user.uid,
-    //   time: Date.now()
-    // });
-    // if(!urls || urls.length === 0) {
-    //   data.redirect = "/e";
-    // } else if(urls[0].indexOf("/e") === -1){
-    //   data.redirect = "/e";
-    // } else {
-    //   data.redirect = urls[0];
-    // }
     await next();
   });
 module.exports = router;
