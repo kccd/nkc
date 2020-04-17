@@ -1,3 +1,4 @@
+// 已登录用户日志 包含历史上的游客日志
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;

@@ -1,3 +1,4 @@
+// 关于用户阅读文章、专业等信息的记录
 const mongoose = require('../settings/database');
 const settings = require('../settings');
 const {database} = settings;

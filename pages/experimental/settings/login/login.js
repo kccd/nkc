@@ -3,7 +3,6 @@ var app = new Vue({
   el: "#app",
   data: {
     loginSettings: data.loginSettings,
-    operations: data.operations
   },
   methods: {
     save: function() {
