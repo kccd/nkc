@@ -1,65 +1,60 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
-  +includeCSS('/experimental/index.css')
+block eTitle
   title 短信验证码记录
-block content
+block eContent
 
   .container-fluid.max-width
     .row
-      include ../nav
       .col-xs-12.col-md-12
-        .col-xs-12.col-md-12
-          .form.form-inline.m-b-1
-            .form-group
-              label 时间范围
-              input.form-control#timeRange(readonly stime=data.repc.sTime etime=data.repc.eTime)
-          //- 清理那页不显示
-          .form.form-inline.m-b-2
-            .form-group
-              label IP
-              input.form-control#ip(value=data.repc.ip)
-            .form-group
-              label 类型
-              input.form-control#optype(value=data.repc.optype)
-          .form.form-inline.m-b-2
-            .form-group
-              label 区号
-              input.form-control#nationCode(value=data.repc.nationCode)
-            .form-group
-              label 手机号
-              input.form-control#phonenumber(value=data.repc.phonenumber)
-            .form-group
-              button#search.btn.btn-primary.btn-block 查询
-        .col-xs-12.col-md-12
-          include ../../publicModules/paging/paging
-          .table-responsive
-            table.table.table-bordered
-              thead
+        .form.form-inline.m-b-1
+          .form-group
+            label 时间范围
+            input.form-control#timeRange(readonly stime=data.repc.sTime etime=data.repc.eTime)
+        //- 清理那页不显示
+        .form.form-inline.m-b-2
+          .form-group
+            label IP
+            input.form-control#ip(value=data.repc.ip)
+          .form-group
+            label 类型
+            input.form-control#optype(value=data.repc.optype)
+        .form.form-inline.m-b-2
+          .form-group
+            label 区号
+            input.form-control#nationCode(value=data.repc.nationCode)
+          .form-group
+            label 手机号
+            input.form-control#phonenumber(value=data.repc.phonenumber)
+          .form-group
+            button#search.btn.btn-primary.btn-block 查询
+      .col-xs-12.col-md-12
+        include ../../publicModules/paging/paging
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th 创建时间
+                th 手机号
+                th 区号
+                th 类型
+                th IP
+                th 是否已被使用
+            tbody
+              for rec, index in data.result
                 tr
-                  th 创建时间
-                  th 手机号
-                  th 区号
-                  th 类型
-                  th IP
-                  th 是否已被使用
-              tbody
-                for rec, index in data.result
-                  tr
-                    td= format("YYYY/MM/DD HH:mm:ss", rec.toc)
-                    td= rec.mobile
-                    td= rec.nationCode
-                    - let typeChineseName = lang("secretBehaviors", rec.type);
-                    td= typeChineseName? (typeChineseName + "("+rec.type+")") : rec.type
-                    td= rec.ip
-                    td 
-                      span(style=`color:${rec.used?"green":"red"}`) #{rec.used? "是": "否"}
-          include ../../publicModules/paging/paging_input
+                  td= format("YYYY/MM/DD HH:mm:ss", rec.toc)
+                  td= rec.mobile
+                  td= rec.nationCode
+                  - let typeChineseName = lang("secretBehaviors", rec.type);
+                  td= typeChineseName? (typeChineseName + "("+rec.type+")") : rec.type
+                  td= rec.ip
+                  td
+                    span(style=`color:${rec.used?"green":"red"}`) #{rec.used? "是": "否"}
+        include ../../publicModules/paging/paging_input
 
 block scripts
 
-  +includeJS('/interface_common.js')
-  +includeJS('/experimental/settings/operation.js')
   +includeJS('/laydate/laydate-v5.0.9/laydate.js')
   +includeJS('/experimental/log/smscode.js')
 
