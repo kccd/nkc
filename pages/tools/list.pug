@@ -9,8 +9,8 @@ block content
     #toollist
       for info, index in data.list
         if !info.isHide
-          .tool-item
-            .tool-container(onclick='location.href="' + `${info.isOtherSite? info.entry: '/tools/open/' + info._id}` + '"')
+          .tool-item(onclick=`NKC.methods.visitUrl('${info.isOtherSite? info.entry: '/tools/open/' + info._id}', '_blank')`)
+            .tool-container
               .tool-info
                 p.tool-name #{info.name}
                 p.tool-summary #{info.summary}

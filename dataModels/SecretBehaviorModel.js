@@ -1,3 +1,5 @@
+// 关于手机、邮箱、用户名和密码等操作的记录
+
 const mongoose = require('../settings/database');
 const Schema = mongoose.Schema;
 const secretBehaviorSchema = new Schema({
@@ -8,7 +10,14 @@ const secretBehaviorSchema = new Schema({
 	type: {
 		type: String,
 		index: 1,
-		//enum: ['bindMobile', 'bindEmail', 'changeMobile', 'changeEmail', 'changeUsername', 'changePassword']
+		/*
+		enum: [
+		  'bindMobile', 'modifyMobile', 'unbindMobile',
+		  'bindEmail', 'unbindEmail', 'changeEmail',
+		  'modifyUsername', 'modifyPassword',
+		  'destroy'
+		]
+		*/
 	},
 	uid: {
 		type: String,

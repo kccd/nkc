@@ -13,6 +13,16 @@ const emailCodeSchema = new Schema({
     required: true,
     index: 1
   },
+	ip: {
+  	type: String,
+		default: "",
+		index: 1,
+	},
+	port: {
+  	type: String,
+		default: "",
+		index: 1
+	},
   token: {
     type: String,
     required: true,
@@ -34,12 +44,18 @@ const emailCodeSchema = new Schema({
 });
 
 emailCodeSchema.statics.ensureSendPermission = async (obj) => {
-	const {email, type} = obj;
+	const {email, type, ip} = obj;
 	const EmailCodeModel = mongoose.model('emailCodes');
-	const {sendEmailCount} = require('../settings/sendMessage');
+	const {sendEmailCount, sameIpSendEmailCount} = require('../settings/sendMessage');
 	const emailCodes = await EmailCodeModel.find({email, type, toc: {$gt: (Date.now() - 24*60*60*1000)}});
 	if(emailCodes.length >= sendEmailCount) {
-		const err = new Error('24小时内发送给同一邮箱的邮件不能超过5封。');
+		const err = new Error(`24小时内发送给同一邮箱的邮件不能超过${sendEmailCount}封。`);
+		err.status = 400;
+		throw err;
+	}
+	const emailCodesCount = await EmailCodeModel.count({ip, type, toc: {$gt: (Date.now() - 24*60*60*1000)}});
+	if(emailCodesCount >= sameIpSendEmailCount) {
+		const err = new Error(`24小时内同一IP发送邮件不能超过${sameIpSendEmailCount}封。`);
 		err.status = 400;
 		throw err;
 	}

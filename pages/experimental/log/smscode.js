@@ -30,6 +30,17 @@
     range: true,
     done: function(date) {
       $("#timeRange").val(date);
+    },
+    ready: function () {
+      if (window.screen.width <= 480) {
+        var top = '280px';
+        if (window.screen.height < 600) {
+          top = '-5px';
+          $('.layui-laydate-content').css({ padding: '5px 10px' })
+        }
+        $('.layui-laydate-range').css({ left: '50%', top: top, marginLeft:'-137px',width: '274px' });
+        $('.layui-laydate-main').css({ display: 'block' })
+      }
     }
   });
 
