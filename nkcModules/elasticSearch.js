@@ -528,7 +528,7 @@ func.updateThread = async (thread) => {
     type: "documents",
     id: thread.tid,
     body: {
-      docType,
+      docType: "thread",
       toc,
       pid,
       description,
