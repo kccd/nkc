@@ -33,7 +33,7 @@
     },
     ready: function () {
       if (window.screen.width <= 480) {
-        var top = '50px';
+        var top = '280px';
         if (window.screen.height < 600) {
           top = '-5px';
           $('.layui-laydate-content').css({ padding: '5px 10px' })
