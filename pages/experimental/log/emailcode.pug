@@ -1,59 +1,65 @@
-extends ../experimental
+extends ../../bootstrap_base
 
-block eTitle
+block title
+  +includeCSS('/experimental/index.css')
   title 邮件验证码记录
-block eContent
+block content
 
   .container-fluid.max-width
     .row
+      include ../nav
       .col-xs-12.col-md-12
-        .form.form-inline.m-b-1
-          .form-group
-            label 时间范围
-            input.form-control#timeRange(readonly stime=data.repc.sTime etime=data.repc.eTime)
-        //- 清理那页不显示
-        .form.form-inline.m-b-2
-          .form-group
-            label 类型
-            input.form-control#optype(value=data.repc.optype)
-        .form.form-inline.m-b-2
-          .form-group
-            label 用户id
-            input.form-control#userid(value=data.repc.userid)
-          .form-group
-            label 邮箱
-            input.form-control#emailAddr(value=data.repc.emailAddr)
-          .form-group
-            button#search.btn.btn-primary.btn-block 查询
-      .col-xs-12.col-md-12
-        include ../../publicModules/paging/paging
-        .table-responsive
-          table.table.table-bordered
-            thead
-              tr
-                th 创建时间
-                th 邮箱
-                th 用户
-                th 类型
-                th 是否已被使用
-            tbody
-              for rec, index in data.result
+        .col-xs-12.col-md-12
+          .form.form-inline.m-b-1
+            .form-group
+              label 时间范围
+              input.form-control#timeRange(readonly stime=data.repc.sTime etime=data.repc.eTime)
+          //- 清理那页不显示
+          .form.form-inline.m-b-2
+            .form-group
+              label 类型
+              input.form-control#optype(value=data.repc.optype)
+          .form.form-inline.m-b-2
+            .form-group
+              label 用户id
+              input.form-control#userid(value=data.repc.userid)
+            .form-group
+              label 邮箱
+              input.form-control#emailAddr(value=data.repc.emailAddr)
+            .form-group
+              button#search.btn.btn-primary.btn-block 查询
+        .col-xs-12.col-md-12
+          include ../../publicModules/paging/paging
+          .table-responsive
+            table.table.table-bordered
+              thead
                 tr
-                  td= format("YYYY/MM/DD HH:mm:ss", rec.toc)
-                  td #{rec.email}
-                  td
-                    a(href=`/u/${rec.uid}` target="_blank") #{rec.uid}
-                  - let typeChineseName = lang("secretBehaviors", rec.type);
-                  td #{typeChineseName? (lang("secretBehaviors", rec.type) + "("+rec.type+")") : rec.type}
-                  td
-                    span(style=`color:${rec.used?"green":"red"}`) #{rec.used? "是": "否"}
-        include ../../publicModules/paging/paging_input
-
+                  th 创建时间
+                  th 邮箱
+                  th 用户
+                  th 类型
+                  th 是否已被使用
+              tbody
+                for rec, index in data.result
+                  tr
+                    td= format("YYYY/MM/DD HH:mm:ss", rec.toc)
+                    td= rec.email
+                    td 
+                      img(src=tools.getUrl("userAvatar", rec.user.avatar) style="width:40px;height:40;margin-right:10px")
+                      a(href=`/u/${rec.uid}` target="_blank" data-float-uid=rec.uid)= rec.user.username
+                    - let typeChineseName = lang("secretBehaviors", rec.type);
+                    td= typeChineseName? `${typeChineseName}(${rec.type})` : rec.type
+                    td 
+                      span(style=`color:${rec.used?"green":"red"}`)= rec.used? "是": "否"
+          include ../../publicModules/paging/paging_input
 
 block scripts
-
+  +includeJS('/interface_common.js')
+  +includeJS('/experimental/settings/operation.js')
   +includeJS('/laydate/laydate-v5.0.9/laydate.js')
   +includeJS('/experimental/log/emailcode.js')
+  include ../../publicModules/subscribeTypes/subscribeTypes.pug
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
 
 
 

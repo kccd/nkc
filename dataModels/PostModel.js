@@ -615,19 +615,23 @@ postSchema.pre('save', async function(next) {
   }
 });
 
-postSchema.pre('save', async function(next) {
-  // elasticSearch: insert/update data
+postSchema.statics.updateElasticSearch = async function(post) {
   const elasticSearch = require("../nkcModules/elasticSearch");
   const ThreadModel = mongoose.model("threads");
+  const thread = await ThreadModel.findOne({tid: post.tid});
+  let docType;
+  if(!thread || !thread.oc || thread.oc === post.pid) {
+    docType = "thread";
+  } else {
+    docType = "post"
+  }
+  await elasticSearch.save(docType, post);
+};
+
+postSchema.pre('save', async function(next) {
+  // elasticSearch: insert/update data
   try{
-    const thread = await ThreadModel.findOne({tid: this.tid});
-    let docType;
-    if(!thread || !thread.oc || thread.oc === this.pid) {
-      docType = "thread";
-    } else {
-      docType = "post"
-    }
-    await elasticSearch.save(docType, this);
+    postSchema.statics.updateElasticSearch(this);
     return next();
   } catch(err) {
     return next(err);
@@ -652,6 +656,7 @@ postSchema.pre('save', async function(next) {
 
   }*/
 });
+
 
 postSchema.post('save', async function(doc, next) {
   // if p.atUsers has changed, we should generate a invitation
