@@ -516,7 +516,21 @@ threadSchema.methods.updateThreadMessage = async function() {
   // 更新文章 统计数据
   await thread.update(updateObj);
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
+  // await this.updateSearchDate();
 };
+
+
+/**
+ * 更新搜索引擎中的数据
+ */
+threadSchema.methods.updateSearchDate = async function() {
+  const PostModel = mongoose.model('posts');
+  let posts = await PostModel.find({tid: this.tid});
+  await Promise.all(posts.map(async post => {
+    return await PostModel.updateElasticSearch(post);
+  }));
+}
+
 
 threadSchema.methods.newPost = async function(post, user, ip) {
   const SettingModel = mongoose.model('settings');

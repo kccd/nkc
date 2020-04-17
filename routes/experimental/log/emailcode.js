@@ -25,11 +25,16 @@ router
     }
     let count = await db.EmailCodeModel.count(searchMap);
     let paging = nkcModules.apiFunction.paging(page, count, 40);
-    data.result = await db.EmailCodeModel
+    let result = await db.EmailCodeModel
       .find(searchMap)
       .sort({toc:-1})
       .skip(paging.start)
       .limit(paging.perpage);
+    result = await Promise.all(result.map(async record => {
+      record.user = await db.UserModel.findOne({uid: record.uid});
+      return record;
+    }));
+    data.result = result;
     data.paging = paging;
     data.repc = c;
     data.c = encodeURIComponent(new Buffer(JSON.stringify(c)).toString('base64'));

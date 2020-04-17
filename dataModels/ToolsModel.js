@@ -20,9 +20,15 @@ const toolsSchema = new Schema({
     required: true
   },
   // 作者uid(如果有的话)
-  uid: String,
+  uid: {
+    type: String,
+    default: ""
+  },
   // 作者的名字(如果有的话)
-  author: String,
+  author:{
+    type: String,
+    default: ""
+  },
   // 版本号
   version: {
     type: String,

@@ -520,6 +520,38 @@ func.delete = async (docType, id) => {
   });
 };
 
+
+// 更新
+func.updateThread = async (thread) => {
+  return await client.update({
+    index: indexName,
+    type: "documents",
+    id: thread.tid,
+    body: {
+      docType,
+      toc,
+      pid,
+      description,
+      username,
+      uid,
+      tid,
+      aid,
+      digest,
+      mainForumsId,
+      title: t,
+      content: apiFunction.obtainPureText(c),
+      abstractCN: abstractCn,
+      abstractEN: abstractEn,
+      keywordsCN: keyWordsCn,
+      keywordsEN: keyWordsEn,
+      authors: authorInfos.map(a => a.name),
+      voteUp,
+      voteDown
+    }
+  })
+}
+
+
 module.exports = func;
 
 

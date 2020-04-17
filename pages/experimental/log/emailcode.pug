@@ -43,22 +43,23 @@ block content
                 for rec, index in data.result
                   tr
                     td= format("YYYY/MM/DD HH:mm:ss", rec.toc)
-                    td #{rec.email}
+                    td= rec.email
                     td 
-                      a(href=`/u/${rec.uid}` target="_blank") #{rec.uid}
+                      img(src=tools.getUrl("userAvatar", rec.user.avatar) style="width:40px;height:40;margin-right:10px")
+                      a(href=`/u/${rec.uid}` target="_blank" data-float-uid=rec.uid)= rec.user.username
                     - let typeChineseName = lang("secretBehaviors", rec.type);
-                    td #{typeChineseName? (lang("secretBehaviors", rec.type) + "("+rec.type+")") : rec.type}
+                    td= typeChineseName? `${typeChineseName}(${rec.type})` : rec.type
                     td 
-                      span(style=`color:${rec.used?"green":"red"}`) #{rec.used? "是": "否"}
+                      span(style=`color:${rec.used?"green":"red"}`)= rec.used? "是": "否"
           include ../../publicModules/paging/paging_input
 
-
 block scripts
-
   +includeJS('/interface_common.js')
   +includeJS('/experimental/settings/operation.js')
   +includeJS('/laydate/laydate-v5.0.9/laydate.js')
   +includeJS('/experimental/log/emailcode.js')
+  include ../../publicModules/subscribeTypes/subscribeTypes.pug
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
 
 
 
