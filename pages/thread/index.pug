@@ -26,7 +26,7 @@ block title
 
   if (thread.firstPost&&thread.firstPost.c)
     -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
-    
+
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
     link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
@@ -156,10 +156,11 @@ block title
             li
               a(href=`/p/${post.pid}/history`)
                 span.fa.fa-history &nbsp;历史版本
-        li
-          a(onclick=`NKC.modules.violationRecord.open({uid:'${post.uid}'})`)
-            span.fa.fa-newspaper-o &nbsp;
-            span 违规记录
+        if permission("violationRecord")
+          li
+            a(onclick=`NKC.modules.violationRecord.open({uid:'${post.uid}'})`)
+              span.fa.fa-newspaper-o &nbsp;
+              span 违规记录
         if data.user
           li.divider
             if targetThread && targetThread.oc === post.pid
@@ -700,7 +701,8 @@ block scripts
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
   //- 违规记录模块 NKC.modules.violationRecord
-  include ../publicModules/violationRecord/violationRecord.pug
+  if permission("violationRecord")
+    include ../publicModules/violationRecord/violationRecord.pug
   include ../MathJax.pug
   if permission("viewNote")
     include ../publicModules/NKCHighlighter/NKCHighlighter

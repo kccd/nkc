@@ -8,7 +8,7 @@ router.get('/', async (ctx, next) => {
   data.record = await db.UsersScoreLogModel.find({
     uid: uid,
     operationId: 'violation'
-  })
+  });
   await next();
 });
 module.exports = router;

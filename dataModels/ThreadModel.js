@@ -3,7 +3,7 @@ const mongoose = settings.database;
 const redisClient = require("../settings/redisClient");
 const Schema = mongoose.Schema;
 const apiFunction = require('../nkcModules/apiFunction');
-const elasticSearch = require('../nkcModules/elasticSearch')
+const elasticSearch = require('../nkcModules/elasticSearch');
 const {getQueryObj, obtainPureText} = apiFunction;
 const threadSchema = new Schema({
   tid: {
@@ -254,7 +254,7 @@ threadSchema.virtual('categories')
   })
   .set(function(f) {
     this._categories = f
-  });  
+  });
 
 threadSchema.virtual('category')
   .get(function() {
@@ -289,7 +289,7 @@ threadSchema.methods.extendLastPost = async function() {
     .find({tid: this.tid, disabled: {$nin:[true]}})
     .sort({toc: -1}).limit(1))[0]
 };
-/* 
+/*
   拓展文章的专业
   @param types 数组，专业的类型：mainForums, minorForums, customForums(自定义，待定)
   @return 专业对象数组
@@ -658,7 +658,7 @@ threadSchema.methods.getStep = async function(obj) {
       lastPost           Boolean        true     是否推展最新回复
       lastPostUser       Boolean        true     是否推展最新回复的用户
   @return 文章对象数组
-  @author pengxiguaa 2019/1/24    
+  @author pengxiguaa 2019/1/24
  */
 const defaultOptions = {
   forum: true,
@@ -804,7 +804,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     thread.categories = [];
     if(o.firstPost) {
       const firstPost = postsObj[thread.oc];
-      if(!firstPost) continue;	    
+      if(!firstPost) continue;
       if(firstPost.anonymous && o.excludeAnonymousPost) continue;
       if(o.firstPostUser) {
         let user;
@@ -856,7 +856,7 @@ threadSchema.statics.extendThreads = async (threads, options) => {
   }
   return results;
 };
-/* 
+/*
   通过tid查找文章
   @param tid: 文章id
   @author pengxiguaa 2019/3/7
@@ -874,17 +874,17 @@ threadSchema.statics.findThreadById = async (tid) => {
  * 发表文章的权限判断
  * -------
  * @description ：根据用户等级、证书和身份认证等级，获取发表文章的条数限制和时间限制。
- * 
- * @param {Object} options 
+ *
+ * @param {Object} options
  * @参数说明 options对象中必要参数
  * | uid      --  用户id
  * | fids     --  发表文章目标专业的fid数组集合，不可为空
  * | title    --  文章标题
  * | content  --  文章内容
  * | 其余未作说明的参数为非必要
- * 
+ *
  * @return 无返回
- * 
+ *
  * @author pengxiguaa 2019-03-07
  */
 threadSchema.statics.ensurePublishPermission = async (options) => {
@@ -935,7 +935,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
   const latestThread = await ThreadModel.findOne({uid: user.uid, toc: {$gt: (Date.now() - postToForumTimeLimit * 60 * 1000)}});
   if(latestThread) throwErr(400, `您当前的账号等级限定发表文章间隔时间不能小于${postToForumTimeLimit}分钟，请稍后再试。`);
 };
-/* 
+/*
   发表文章接口，未完成
   @param options
     uid: string 发表者ID
@@ -945,7 +945,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
     title: String 标题
     content: String 内容
     abstractCn: String 摘要
-  @author pengxiguaa 2019/3/7  
+  @author pengxiguaa 2019/3/7
 */
 threadSchema.statics.publishArticle = async (options) => {
   const ThreadModel = mongoose.model('threads');
@@ -1451,7 +1451,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
       delType: "toRecycle"
     });
     const tUser = await UserModel.findOne({uid: thread.uid});
-    
+
     // 文章被删，触发科创币加减
     if(tUser) {
       await KcbsRecordModel.insertSystemRecord('threadBlocked', tUser, {
@@ -1513,8 +1513,8 @@ threadSchema.statics.autoCoverImage = async (ctx, thread, post) => {
  * 发帖
  * -------
  * @description ：使用该方法可新生成一篇文章，包含thread、post等新数据。
- * 
- * @param {Object} options 
+ *
+ * @param {Object} options
  * @参数说明 options对象中必要参数
  * | type  --  用于区别文章类型，product、article等
  * | ip    --  用户ip
@@ -1524,7 +1524,7 @@ threadSchema.statics.autoCoverImage = async (ctx, thread, post) => {
  * | fids  --  发表文章目标专业的fid数组集合，不可为空
  * | cids  --  发表文章目标专业的分类集合，可为空，但不可为undefined
  * | 其余未作说明的参数为非必要
- * 
+ *
  * @return {Object} _post 返回一个包含pid、tid等的post，便于后续的业务逻辑中使用
  */
 threadSchema.statics.postNewThread = async (options) => {
@@ -1563,15 +1563,15 @@ threadSchema.statics.postNewThread = async (options) => {
  * 创建一条post
  * -------
  * @description ：使用该方法可新生成一条回复。
- * 
- * @param {Object} options 
+ *
+ * @param {Object} options
  * @参数说明 options对象中必要参数
  * | ip    --  用户ip
  * | c     --  回复主体内容
  * | t     --  回复标题
  * | uid   --  发表文章的用户ID
  * | 其余未作说明的参数为非必要
- * 
+ *
  * @return {Object} _post 返回一个包含pid、tid等的post，便于后续的业务逻辑中使用
  */
 threadSchema.methods.createNewPost = async function(post) {
@@ -1635,7 +1635,7 @@ threadSchema.methods.createNewPost = async function(post) {
     surveyId: post.surveyId || null,
     type: postType,
     rpid
-  }); 
+  });
   if(!this.oc) await this.update({oc: pid});
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
