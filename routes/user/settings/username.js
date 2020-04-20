@@ -5,6 +5,14 @@ router
 		const {data, db, body, nkcModules} = ctx;
 		const {user} = data;
 		const {newUsername} = body;
+		const behavior = {
+      oldUsername: user.username,
+      oldUsernameLowerCase: user.usernameLowerCase,
+      uid: user.uid,
+      type: "modifyUsername",
+      ip: ctx.address,
+      port: ctx.port
+    };
 		// 验证用户名字符串
     await db.UserModel.checkUsername(newUsername);
     // 验证用户的kcb
@@ -34,8 +42,10 @@ router
 
 		user.username = newUsername;
 		user.usernameLowerCase = usernameLowerCase;
-
+    behavior.newUsername = user.username;
+    behavior.newUsernameLowerCase = user.usernameLowerCase;
 		await user.save();
+		await db.SecretBehaviorModel(behavior).save();
     await db.UsersGeneralModel.updateOne({uid: user.uid}, {
       $inc: {
         modifyUsernameCount: 1

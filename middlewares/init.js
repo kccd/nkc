@@ -1,5 +1,4 @@
 const tools = require('../tools');
-const colors = require("colors");
 const body = require('./body');
 const settings = require('../settings');
 const nkcModules = require('../nkcModules');
@@ -62,17 +61,30 @@ module.exports = async (ctx, next) => {
 	  ctx.address = ip;
 	  ctx.port = port;
     ctx.body = ctx.request.body;
-	  ctx.db = db;
+    const _body= Object.assign({}, ctx.query, ctx.body);
+    if(_body.password) {
+      _body.password = (_body.password || "").slice(0, 2);
+    }
+    if(_body.oldPassword) {
+      _body.oldPassword = (_body.oldPassword || "").slice(0, 2);
+    }
+    if(_body.newPassword) {
+      _body.newPassword = (_body.newPassword || "").slice(0, 2);
+    }
+    ctx._body = _body;
+    ctx.db = db;
 	  ctx.tools = tools;
     ctx.redis = redis;
     ctx.settings = settings;
     ctx.fs = fsSync;
-  
+
     ctx.state = {
       url: ctx.url.replace(/\?.*/ig, ""),
       isApp: false,
       appOS: undefined,
       twemoji: settings.editor.twemoji,
+      // 当前操作
+      operation: await db.OperationModel.findOnly({_id: ctx.data.operationId}),
       // - 初始化网站设置
       pageSettings: await db.SettingModel.getSettings("page"),
       postSettings: await db.SettingModel.getSettings("post"),
@@ -82,7 +94,7 @@ module.exports = async (ctx, next) => {
       // 缓存相关
       cachePage: false
     };
-    
+
     // 判断是否为APP发起的请求
     let userAgent = ctx.header["user-agent"];
     userAgent = (userAgent || "").match(/NKC\/APP\/([a-z]+)/ig);
@@ -179,10 +191,9 @@ module.exports = async (ctx, next) => {
 	  await body(ctx, () => {});
   }
   finally {
-    ctx.status = ctx.response.status;
-    const passed = Date.now() - ctx.reqTime;
-    ctx.set('X-Response-Time', passed);
-    ctx.processTime = passed.toString();
+    // 记录日志
+    // 在控制台打印日志
+    // 向web后台管理控制台推送日志
     await logger(ctx);
   }
 };

@@ -1,8 +1,7 @@
 const fn = async (ctx, next) => {
-  const {db, data} = ctx;
+  const {data, state} = ctx;
 	if(!data.userOperationsId.includes(data.operationId)) {
-		const operation = await db.OperationModel.findOne({_id: data.operationId});
-		ctx.throw(403, `${operation?operation.errInfo:"权限不足"}`);
+		ctx.throw(403, `${state.operation.errInfo || "权限不足"}`);
 	}
 	await next();
 };

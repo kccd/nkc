@@ -19,6 +19,14 @@ emailRouter
 		});
 		await emailCode.update({used: true});
 		await userPersonal.update({email});
+		await db.SecretBehaviorModel({
+			type: "bindEmail",
+			uid: user.uid,
+			ip: ctx.address,
+			port: ctx.port,
+			oldEmail: "",
+			newEmail: email
+		}).save();
 		data.success = true;
 		ctx.template = 'interface_user_settings_email.pug';
 		await next();
@@ -77,6 +85,14 @@ emailRouter
 		await oldSmsCode.update({used: true});
 		await smsCode.update({used: true});
 		await userPersonal.update({email});
+		await db.SecretBehaviorModel({
+			type: "changeEmail",
+			uid: user.uid,
+			ip: ctx.address,
+			port: ctx.port,
+			oldEmail: userPersonal.email,
+			newEmail: email
+		}).save();
 		data.success = true;
 		ctx.template = 'interface_user_settings_email.pug';
 		await next();

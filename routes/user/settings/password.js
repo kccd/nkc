@@ -7,7 +7,7 @@ passwordRouter
 	})
 	.patch('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
-		const {oldPassword, password} = body;
+		const {oldPassword = "", password = ""} = body;
 		const {apiFunction} = ctx.nkcModules;
 		const {user} = data;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
@@ -23,11 +23,24 @@ passwordRouter
 		if(contentLength(password) < 8) ctx.throw(400, '密码长度不能小于8位');
 		if(!checkPass(password)) ctx.throw(400, '密码要具有数字、字母和符号三者中的至少两者');
 		const newPassword = apiFunction.newPasswordObject(password);
+		const behavior = {
+			uid: user.uid,
+			ip: ctx.address,
+			port: ctx.port,
+			type: "modifyPassword",
+			oldHashType: userPersonal.hashType,
+			oldHash: userPersonal.password.hash,
+			oldSalt: userPersonal.password.salt,
+			newHashType: newPassword.hashType,
+			newHash: newPassword.password.hash,
+			newSalt: newPassword.password.salt
+		};
 		await userPersonal.update({
 			password: newPassword.password,
 			secret: newPassword.secret,
 			hashType: newPassword.hashType
 		});
+		await db.SecretBehaviorModel(behavior).save();
 		ctx.setCookie("userInfo", {
 			uid: user.uid,
 			username: user.username,

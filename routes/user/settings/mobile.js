@@ -47,6 +47,16 @@ mobileRouter
 		await smsCodeOld.update({used: true});
 		await smsCode.update({used: true});
 		await userPersonal.update({nationCode, mobile});
+		await db.SecretBehaviorModel({
+			type: "modifyMobile",
+			uid: user.uid,
+			ip: ctx.address,
+			port: ctx.port,
+			oldNationCode: userPersonal.nationCode,
+			oldMobile: userPersonal.mobile,
+			newNationCode: nationCode,
+			newMobile: mobile
+		}).save();
 		await next();
 	})
 	.post('/', async (ctx, next) => {
@@ -68,6 +78,16 @@ mobileRouter
 		await db.SettingModel.checkMobile(nationCode, mobile, user.uid);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		await userPersonal.update({nationCode, mobile});
+		await db.SecretBehaviorModel({
+			type: "bindMobile",
+			uid: user.uid,
+			ip: ctx.address,
+			port: ctx.port,
+			oldNationCode: "",
+			oldMobile: "",
+			newNationCode: nationCode,
+			newMobile: mobile
+		}).save();
 		await next();
 	})
 	.del("/", async (ctx, next) => {

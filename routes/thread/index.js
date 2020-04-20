@@ -526,7 +526,7 @@ threadRouter
         }
       }
       data.userAddress = userAddress;
-      
+
 		} else if(thread.type === "fund") { // 基金文章
 		  const user = data.user;
       let applicationForm = await db.FundApplicationFormModel.findOne({tid: thread.tid});
@@ -693,9 +693,7 @@ threadRouter
       }
       data.hasPermissionToHidePost = await db.PostModel.ensureHidePostPermission(data.thread, data.user)
 		}
-		// data.targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: data.targetUser.uid});
-		// data.thread = data.thread.toObject();
-    
+
     // 加载附件数目
     if(
       ctx.permission("getPostResources") &&
@@ -731,7 +729,7 @@ threadRouter
 			data, nkcModules, params, db, body, state, address: ip
 		} = ctx;
     const {user} = data;
-    
+
 		try{
       await db.UserModel.checkUserBaseInfo(user, true);
     } catch(err) {
