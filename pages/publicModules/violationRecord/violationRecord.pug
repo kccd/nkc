@@ -15,7 +15,7 @@
             th 原因
           tbody
             tr(v-for="res, index of list")
-              td {{dateFormat("yyyy-M-d H:m:s", new Date(res.toc))}}
+              td {{format("YYYY-MM-DD HH:mm:ss", new Date(res.toc))}}
               td {{res.description}}
         //- 加载完了并且没有违规记录
         span(v-else-if="!loadding && !list.length") 无违规记录
@@ -23,5 +23,5 @@
         span(v-else) 加载中...
       .modal-footer
         button.btn.btn-primary.btn-sm(@click='close()') 确定
-
+include ../moment
 +includeJS("/publicModules/violationRecord/violationRecord.js")
