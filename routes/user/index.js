@@ -16,6 +16,8 @@ const profileRouter = require("./profile");
 const transferRouter = require("./transfer");
 const myProblemsRouter = require("./myProblems");
 const destroyRouter = require("./destroy");
+// 违规记录
+const violationRouter = require("./violationRecord");
 const userRouter = new Router();
 
 
@@ -454,5 +456,6 @@ userRouter
 	.use('/:uid/production', productionRouter.routes(), productionRouter.allowedMethods())
   .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
   .use("/:uid/destroy", destroyRouter.routes(), destroyRouter.allowedMethods())
-  .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods());
+  .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods())
+  .use("/:uid/violationRecord", violationRouter.routes(), violationRouter.allowedMethods());
 module.exports = userRouter;

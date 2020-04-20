@@ -521,34 +521,32 @@ func.delete = async (docType, id) => {
 };
 
 
-// 更新
-func.updateThread = async (thread) => {
+// 更新帖子的专业信息
+func.updateThreadForums = async (thread) => {
   return await client.update({
     index: indexName,
     type: "documents",
-    id: thread.tid,
+    id: `thread_${thread.tid}`,
     body: {
-      docType: "thread",
-      toc,
-      pid,
-      description,
-      username,
-      uid,
-      tid,
-      aid,
-      digest,
-      mainForumsId,
-      title: t,
-      content: apiFunction.obtainPureText(c),
-      abstractCN: abstractCn,
-      abstractEN: abstractEn,
-      keywordsCN: keyWordsCn,
-      keywordsEN: keyWordsEn,
-      authors: authorInfos.map(a => a.name),
-      voteUp,
-      voteDown
+      doc: {
+        mainForumsId: thread.mainForumsId
+      }
     }
   })
+}
+
+// 更新帖子回复的专业信息
+func.updateCommentForums = async (post) => {
+  // return await client.update({
+  //   index: "posts",
+  //   type: "posts",
+  //   id: post.pid,
+  //   body: {
+  //     doc: {
+  //       mainForumsId: post.mainForumsId
+  //     }
+  //   }
+  // })
 }
 
 

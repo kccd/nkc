@@ -43,24 +43,15 @@ block eContent
             tbody
               for rec, index in data.result
                 tr
-                  th 创建时间
-                  th 手机号
-                  th 区号
-                  th 类型
-                  th IP
-                  th 是否已被使用
-              tbody
-                for rec, index in data.result
-                  tr
-                    td= format("YYYY/MM/DD HH:mm:ss", rec.toc)
-                    td= rec.mobile
-                    td= rec.nationCode
-                    - let typeChineseName = lang("secretBehaviors", rec.type);
-                    td= typeChineseName? (typeChineseName + "("+rec.type+")") : rec.type
-                    td= rec.ip
-                    td 
-                      span(style=`color:${rec.used?"green":"red"}`) #{rec.used? "是": "否"}
-          include ../../publicModules/paging/paging_input
+                  td= format("YYYY/MM/DD HH:mm:ss", rec.toc)
+                  td= rec.mobile
+                  td= rec.nationCode
+                  - let typeChineseName = lang("secretBehaviors", rec.type);
+                  td= typeChineseName? (typeChineseName + "("+rec.type+")") : rec.type
+                  td= rec.ip
+                  td 
+                    span(style=`color:${rec.used?"green":"red"}`) #{rec.used? "是": "否"}
+        include ../../publicModules/paging/paging_input
 
 block scripts
   +includeJS('/laydate/laydate-v5.0.9/laydate.js')
