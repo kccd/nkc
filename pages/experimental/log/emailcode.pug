@@ -41,12 +41,12 @@ block eContent
                 tr
                   td= format("YYYY/MM/DD HH:mm:ss", rec.toc)
                   td= rec.email
-                  td 
+                  td
                     img(src=tools.getUrl("userAvatar", rec.user.avatar) style="width:40px;height:40;margin-right:10px")
                     a(href=`/u/${rec.uid}` target="_blank" data-float-uid=rec.uid)= rec.user.username
                   - let typeChineseName = lang("secretBehaviors", rec.type);
                   td= typeChineseName? `${typeChineseName}(${rec.type})` : rec.type
-                  td 
+                  td
                     span(style=`color:${rec.used?"green":"red"}`)= rec.used? "是": "否"
         include ../../publicModules/paging/paging_input
 

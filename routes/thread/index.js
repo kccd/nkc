@@ -526,12 +526,6 @@ threadRouter
         }
       }
       data.userAddress = userAddress;
-      // 获取用户违规记录
-      data.userViolationRecord = await db.UsersScoreLogModel.find({
-        uid: '74296',
-        operationId: 'violation'
-      })
-      
 		} else if(thread.type === "fund") { // 基金文章
 		  const user = data.user;
       let applicationForm = await db.FundApplicationFormModel.findOne({tid: thread.tid});

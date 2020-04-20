@@ -518,26 +518,10 @@ threadSchema.methods.updateThreadMessage = async function() {
   await thread.update(updateObj);
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
   // 更新搜索引擎中帖子的专业信息
-  elasticSearch.updateThreadForums(thread);
+  await elasticSearch.updateThreadForums(thread);
   // 更新搜索引擎中帖子的评论信息 todo: debug
-  let posts = await PostModel.find({tid: this.tid});
-  await Promise.all(posts.map(async post => {
-    return await elasticSearch.updateCommentForums(post);
-  }));
+  // await elasticSearch.updateCommentForums(thread);
 };
-
-
-/**
- * 更新搜索引擎中的数据
- */
-threadSchema.methods.updateSearchDate = async function() {
-  const PostModel = mongoose.model('posts');
-  let posts = await PostModel.find({tid: this.tid});
-  await Promise.all(posts.map(async post => {
-    return await PostModel.updateElasticSearch(post);
-  }));
-}
-
 
 threadSchema.methods.newPost = async function(post, user, ip) {
   const SettingModel = mongoose.model('settings');

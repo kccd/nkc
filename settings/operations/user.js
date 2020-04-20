@@ -216,7 +216,7 @@ module.exports = {
 			POST: "destroyAccount"
 		},
 		violationRecord: {
-			GET: "violation"
+			GET: "violationRecord"
 		}
 	}
 };

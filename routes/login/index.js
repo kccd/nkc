@@ -13,7 +13,7 @@ loginRouter
 		await next();
 	})
 	.post('/', async (ctx, next) => {
-		const {data, db, body, tools, state} = ctx;
+		const {db, body, tools} = ctx;
 		const {loginType} = body;
 		const {
 			encryptInMD5WithSalt,
@@ -23,6 +23,30 @@ loginRouter
 		let user;
 		let userPersonal;
 		let {password, username, mobile, nationCode, code, imgCode} = body;
+
+		const behaviorOptions = {
+			type: "login",
+			ip: ctx.address,
+			port: ctx.port
+		};
+
+		if(!loginType) {
+			behaviorOptions.username = username;
+			behaviorOptions.password = password;
+		} else if(loginType === "code") {
+			behaviorOptions.mobile = mobile;
+			behaviorOptions.nationCode = nationCode;
+			behaviorOptions.code = code;
+		} else {
+			behaviorOptions.mobile = mobile;
+			behaviorOptions.nationCode = nationCode;
+			behaviorOptions.password = password;
+		}
+
+		// 验证次数
+		await db.AccountBehaviorModel.ensurePermission(behaviorOptions);
+
+
 		if(!loginType) {
 
 			// 账号+密码
@@ -38,7 +62,7 @@ loginRouter
 
 			const users = await db.UserModel.find({usernameLowerCase: username.toLowerCase()});
 			if(users.length === 0) {
-				ctx.throw(400, '用户名不存在, 请检查用户名');
+				ctx.throw(400, '用户名或密码错误');
 			}
 			if(users.length > 1) {
 				/*历史原因, 数据库中可能出现同名或者用户名小写重复的用户, which导致一些奇怪的问题, 兼容代码*/
@@ -98,7 +122,14 @@ loginRouter
       await imgCodeObj.update({used: true});
 
       // 验证短信验证码
-			const smsCode = await db.SmsCodeModel.ensureCode(option);
+			let smsCode;
+			try{
+				smsCode = await db.SmsCodeModel.ensureCode(option);
+			} catch(err) {
+				// 验证未通过，留下记录，用于下一次判断次数
+				await db.AccountBehaviorModel.insertBehavior(behaviorOptions);
+				ctx.throw(err.status, err.message);
+			}
 
 			await smsCode.update({used: true});
 
@@ -127,8 +158,6 @@ loginRouter
 		if(loginType !== 'code') {
 
 			let {
-				tries=1,
-				lastTry = 0,
 				hashType
 			} = userPersonal;
 
@@ -136,37 +165,31 @@ loginRouter
 
 			const {hash, salt} = userPersonal.password;
 
-			const loginSettings = await db.SettingModel.getSettings("login");
-
-			if(Date.now() - lastTry < 3600000) {
-        if(tries >= loginSettings.maxLoginCountOneHour) {
-          ctx.throw(400, '密码错误次数过多, 请在一小时后再试');
-        }
-      } else {
-			  tries = 0;
-      }
-			switch(hashType) {
-				case 'pw9':
+			try{
+				if(hashType === "pw9") {
 					if(encryptInMD5WithSalt(password, salt) !== hash) {
-						tries++;
-						lastTry = Date.now();
-						await userPersonal.update({tries, lastTry});
-						ctx.throw(400, '密码错误, 请重新输入');
+						if(!loginType) {
+							throw "用户名或密码错误";
+						} else {
+							throw "手机号或密码错误";
+						}
 					}
-					break;
-				case 'sha256HMAC':
+				} else if(hashType === "sha256HMAC") {
 					if(encryptInSHA256HMACWithSalt(password, salt) !== hash) {
-						tries++;
-						lastTry = Date.now();
-						await userPersonal.update({tries, lastTry});
-						ctx.throw(400, '密码错误, 请重新输入');
+						if(!loginType) {
+							throw "用户名或密码错误";
+						} else {
+							throw "手机号或密码错误";
+						}
 					}
-					break;
-				default: ctx.throw(400, '未知的密码加密类型');
+				} else {
+					throw "未知的密码加密类型";
+				}
+			} catch(err) {
+				// 验证未通过，留下记录，用于下一次判断次数
+				await db.AccountBehaviorModel.insertBehavior(behaviorOptions);
+				ctx.throw(400, err);
 			}
-			tries = 0;
-			await userPersonal.update({tries});
-
 		}
 
 		await user.extendGrade();

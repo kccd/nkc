@@ -8,16 +8,39 @@ block eContent
       .col-xs-12.col-md-12
         .form.form-horizontal
           .form-group
-            label.col-sm-2.control-label 最大尝试登录次数
-            .col-sm-5
-              input.form-control(type="text" v-model.number="loginSettings.maxLoginCountOneHour")
-              span.text-danger 若一小时内尝试登录的次数超过{{loginSettings.maxLoginCountOneHour}}，则需等待一小时后才能再次尝试登录。
+            h4.col-sm-2.control-label 登录限制
+            .col-sm-5.form-inline
+              .m-t-1
+                h5.text-danger 一小时内，最大失败次数限制。
+              .m-t-1
+                label IP次数限制
+                input.form-control(type="text" v-model.number="loginSettings.login.ipCountLimit")
+              .m-t-1
+                label 用户名次数限制
+                input.form-control(type="text" v-model.number="loginSettings.login.usernameCountLimit")
+              .m-t-1
+                label 手机号次数限制
+                input.form-control(type="text" v-model.number="loginSettings.login.mobileCountLimit")
+          .form-group
+            h4.col-sm-2.control-label 找回密码限制
+            .col-sm-5.form-inline
+              .m-t-1
+                label IP次数限制
+                input.form-control(type="text" v-model.number="loginSettings.resetPassword.ipCountLimit")
+              .m-t-1
+                label 用户名次数限制
+                input.form-control(type="text" v-model.number="loginSettings.resetPassword.usernameCountLimit")
+              .m-t-1
+                label 手机号次数限制
+                input.form-control(type="text" v-model.number="loginSettings.resetPassword.mobileCountLimit")
+              .m-t-1
+                label 邮箱次数限制
+                input.form-control(type="text" v-model.number="loginSettings.resetPassword.emailCountLimit")
+
           .form-group
             label.col-sm-2.control-label
             .col-sm-10
               button.btn.btn-primary(@click="save") 保存
-
-
 
 
 block scripts

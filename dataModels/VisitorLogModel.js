@@ -1,3 +1,4 @@
+// 游客日志
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;

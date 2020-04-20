@@ -8,13 +8,43 @@ router
     await next();
   })
   .patch("/", async (ctx, next) => {
-    const {db, body} = ctx;
-    let {maxLoginCountOneHour} = body;
-    maxLoginCountOneHour = parseInt(maxLoginCountOneHour);
-    if(maxLoginCountOneHour < 1) ctx.throw(400, "最大尝试登录次数不能小于1");
+    const {db, body, nkcModules} = ctx;
+    const {checkNumber} = nkcModules.checkData;
+    const {
+      login, resetPassword
+    } = body;
+    checkNumber(login.ipCountLimit, {
+      name: "登录IP次数限制",
+      min: 0
+    });
+    checkNumber(login.usernameCountLimit, {
+      name: "登录用户名次数限制",
+      min: 0
+    });
+    checkNumber(login.mobileCountLimit, {
+      name: "登录手机号次数限制",
+      min: 0
+    });
+    checkNumber(resetPassword.ipCountLimit, {
+      name: "找回密码IP次数限制",
+      min: 0
+    });
+    checkNumber(resetPassword.usernameCountLimit, {
+      name: "找回密码用户名次数限制",
+      min: 0
+    });
+    checkNumber(resetPassword.mobileCountLimit, {
+      name: "找回密码手机号次数限制",
+      min: 0
+    });
+    checkNumber(resetPassword.emailCountLimit, {
+      name: "找回密码邮箱次数限制",
+      min: 0
+    });
     await db.SettingModel.updateOne({_id: "login"}, {
       $set: {
-        "c.maxLoginCountOneHour": maxLoginCountOneHour
+        "c.login": login,
+        "c.resetPassword": resetPassword
       }
     });
     await db.SettingModel.saveSettingsToRedis("login");

@@ -626,7 +626,7 @@ postSchema.statics.updateElasticSearch = async function(post) {
     docType = "post"
   }
   await elasticSearch.save(docType, post);
-}
+};
 
 postSchema.pre('save', async function(next) {
   // elasticSearch: insert/update data

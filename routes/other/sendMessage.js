@@ -63,7 +63,16 @@ sendMessageRouter
 		if(!userPersonal.mobile) ctx.throw(400, '此账号未绑定手机号码。');
 	  if(!nationCode) ctx.throw(400, '请输入国际区号。');
 	  if(!mobile) ctx.throw(400, '请输入手机号码。');
+	  const behaviorOptions = {
+			ip: ctx.address,
+			mobile,
+			username,
+			nationCode,
+			type: "resetPassword"
+		};
+	  await db.AccountBehaviorModel.ensurePermission(behaviorOptions);
 		if(userPersonal.mobile !== mobile || userPersonal.nationCode !== nationCode) {
+			await db.AccountBehaviorModel.insertBehavior(behaviorOptions);
 			ctx.throw(400, '账号与手机号码无法对应。');
 		}
 		const type = 'getback';
