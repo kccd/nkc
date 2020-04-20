@@ -27,8 +27,6 @@ subscribeRouter
 		const targetUser = await db.UserModel.findOnly({uid});
 		if(!user || targetUser.uid !== user.uid) ctx.throw(403, '权限不足');
 		const {type} = body;
-		// const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid});
-		// if(targetUserSubscribe.subscribeForums.length !== 0) ctx.throw(400, '您已选择过要关注的领域');
 		if(type === 'subscribeForums') {
 			const {subscribeForums} = body;
 			const subSettings = await db.SettingModel.findById("subscribe");

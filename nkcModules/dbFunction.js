@@ -89,60 +89,6 @@ fn.checkRegisterCode = async (regCode) => {
   return regCodeOfDB;
 };
 
-fn.createUser = async (data) => {
-  let userObj = Object.assign({}, data);
-  let userCount = await db.SettingModel.operateSystemID('users', 1);
-  let time = Date.now();
-  userObj.toc = time;
-  userObj.tlv = time;
-  userObj.uid = userCount;
-  userObj.certs = [];
-  userObj.moderators = [userCount];
-  if(userObj.mobile) userObj.certs = ['mobile'];
-  if(userObj.email) userObj.certs = ['email'];
-  if(!userObj.isA) {
-    userObj.certs.push('examinated');
-  }
-  if(typeof(userObj.password) === 'string') {
-    let passwordObj = apiFn.newPasswordObject(userObj.password);
-    userObj.password = passwordObj.password;
-    userObj.hashType = passwordObj.hashType;
-  }
-  userObj.newMessage = {
-    messages: 0,
-    at: 0,
-    replies: 0,
-    system: 0
-  };
-  userObj.abbr = userObj.username.slice(0, 6);
-  userObj.displayName = userObj.username + '的专栏';
-  userObj.descriptionOfForum = userObj.username + '的专栏';
-  let users = new db.UserModel(userObj);
-  let usersPersonal = new db.UsersPersonalModel(userObj);
-  let personalForums = new db.PersonalForumModel(userObj);
-  let usersSubscribe = new db.UsersSubscribeModel(userObj);
-  try{
-    await users.save();
-    await usersPersonal.save();
-    await personalForums.save();
-    await usersSubscribe.save();
-    const allSystemMessages = await db.SmsModel.find({fromSystem: true});
-    for(let sms of allSystemMessages) {
-    	const viewedUsers = sms.viewedUsers;
-    	viewedUsers.push(userObj.uid);
-	    await sms.update({viewedUsers});
-    }
-  }catch(err) {
-    await db.UserModel.deleteMany({uid: userObj.uid});
-    await db.UsersPersonalModel.deleteMany({uid: userObj.uid});
-    await db.PersonalForumModel.deleteMany({uid: userObj.uid});
-    await db.UsersSubscribeModel.deleteMany({uid: userObj.uid});
-    await db.SettingModel.operateSystemID('users', -1);
-    throw `新建用户出错！err: ${err}`;
-  }
-  return userObj;
-};
-
 fn.getAvailableForums = async ctx => {
   const forums = await ctx.db.ForumModel.aggregate([
     {$match: {
@@ -206,7 +152,7 @@ fn.getQuote = async function(c) {
   //return c.match(/\[quote=(.*?),(.*?)]/);
   //HTML
   return c.match(/cite="(.*?),(.*?)"/)
-  
+
 };
 
 

@@ -27,8 +27,7 @@ photoSmallRouter
 					if(displayPhoto === 0) {
 						ctx.throw(403, '权限不足');
 					} else if(displayPhoto === 1) {
-						const targetUserSubscribe = await db.UsersSubscribeModel.findOnly({uid: photo.uid});
-						const {subscribeUsers} = targetUserSubscribe;
+						const subscribeUsers = await db.SubscribeModel.getUserSubUsersId(photo.uid);
 						if (!subscribeUsers.includes(user.uid)) {
 							ctx.throw(403, '权限不足');
 						}

@@ -120,7 +120,7 @@ router
 		obj.type = 'kcb';
 		await db.KcbsRecordModel.insertSystemRecord('postToForum', data.user, ctx);
 		await thread.updateThreadMessage();
-		
+
 		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {
@@ -128,7 +128,7 @@ router
       return ctx.redirect(`/t/${_post.tid}`);
 		}
 		data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
-		
+
     await next();
   })
   .del('/', async (ctx, next) => {
@@ -141,7 +141,7 @@ router
 			ctx.throw(400, `该专业下仍有${allChildrenFid.length}个专业, 请转移后再删除该专业`);
 		}
     const count = await ThreadModel.count({$or: [
-      { 
+      {
         mainForumsId: fid
       },
       {
@@ -154,7 +154,6 @@ router
     } else {
       await forum.remove()
 		}
-		await db.UsersSubscribeModel.updateMany({"subscribeForums":fid}, {"$pull":{"subscribeForums":fid}})
     return next()
   })
 	.use('/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
@@ -342,7 +341,7 @@ router
 			// 最近访问的专业
 			data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId.slice(0, 10));
 		}
-    
+
 		ctx.template = 'forum/forum.pug';
 		await next();
   })
