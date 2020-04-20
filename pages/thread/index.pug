@@ -156,6 +156,10 @@ block title
             li
               a(href=`/p/${post.pid}/history`)
                 span.fa.fa-history &nbsp;历史版本
+        li
+          a(onclick=`NKC.modules.violationRecord.open({uid:'${post.uid}'})`)
+            span.fa.fa-newspaper-o &nbsp;
+            span 违规记录
         if data.user
           li.divider
             if targetThread && targetThread.oc === post.pid
@@ -695,6 +699,8 @@ block scripts
   include ../publicModules/lazySizes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
+  //- 违规记录模块 NKC.modules.violationRecord
+  include ../publicModules/violationRecord/violationRecord.pug
   include ../MathJax.pug
   if permission("viewNote")
     include ../publicModules/NKCHighlighter/NKCHighlighter

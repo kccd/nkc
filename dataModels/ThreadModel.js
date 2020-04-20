@@ -3,6 +3,7 @@ const mongoose = settings.database;
 const redisClient = require("../settings/redisClient");
 const Schema = mongoose.Schema;
 const apiFunction = require('../nkcModules/apiFunction');
+const elasticSearch = require('../nkcModules/elasticSearch')
 const {getQueryObj, obtainPureText} = apiFunction;
 const threadSchema = new Schema({
   tid: {
@@ -516,6 +517,10 @@ threadSchema.methods.updateThreadMessage = async function() {
   // 更新文章 统计数据
   await thread.update(updateObj);
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
+  // 更新搜索引擎中帖子的专业信息
+  await elasticSearch.updateThreadForums(thread);
+  // 更新搜索引擎中帖子的评论信息 todo: debug
+  // await elasticSearch.updateCommentForums(thread);
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {

@@ -214,6 +214,9 @@ module.exports = {
 		destroy: {
     	GET: "destroyAccount",
 			POST: "destroyAccount"
+		},
+		violationRecord: {
+			GET: "violationRecord"
 		}
 	}
 };
