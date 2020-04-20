@@ -1,52 +1,91 @@
 const moment = require('moment');
 
 module.exports = async (ctx) => {
-  const processTime = ctx.processTime;
-  const {address: ip, port} = ctx;
+  ctx.status = ctx.response.status;
+  const passed = Date.now() - ctx.reqTime;
+  ctx.set('X-Response-Time', passed);
+  const processTime = passed.toString();
+  const {
+    status = 500, error, method, path, _body, address, port,
+    reqTime, data, state, db
+  } = ctx;
+  const referer = ctx.get("referer");
+  const userAgent = ctx.get("User-Agent");
+  const {operation, logSettings} = state;
+  const operationId = operation._id;
+  const {operationsId} = logSettings;
   const log = {
-    error: ctx.error,
-    method: ctx.method,
-    path: ctx.path,
-    query: ctx.query,
-    status: ctx.status,
-    ip,
-    port,
-    reqTime: ctx.reqTime,
+    error,
+    method,
+    path,
+    query: _body,
+    status,
+    ip: address,
+    port: port,
+    operationId,
+    reqTime,
     processTime,
-    uid: ctx.data.user? ctx.data.user.uid : 'visitor'
+    referer,
+    userAgent,
+    uid: data.user? data.user.uid: ""
   };
-  const {operationId} = ctx.data;
+  // 存入日志
+  if(operationsId.includes(operationId)) {
+    setImmediate(async () => {
+      if(data.user) {
+        await db.LogModel(log).save();
+      } else {
+        await db.VisitorLogModel(log).save();
+      }
+    });
+  }
   const d = {
     url: log.path,
     method: log.method,
     status: log.status,
     uid: log.uid,
     reqTime: log.reqTime,
-    resTime: processTime,
-    consoleType: 'web',
+    resTime: log.processTime,
+    consoleType: "web",
     processId: global.NKC.processId,
-    error: ''
+    error: log.error,
+    from: log.referer,
+    address: log.ip,
   };
+
+  const operationName = operation.description || "未知操作";
+
+  // （body中间件控制着是否在控制台打印，如果未文件则不打印）
   if(ctx.logIt) {
-    d.from = ctx.req.headers.referer;
-    d.address = ctx.address;
-    let operationName = operationId || '';
-    if(ctx.state.lang) {
-      operationName = ctx.state.lang('operations', operationId) || '未知操作';
-    }
-    if (ctx.error) {
+    if(d.error) {
+      // 控制台打印请求记录
       console.error(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Error '.bgRed} ${log.uid.bgCyan} ${log.method.green} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).red} ${operationName.grey}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} `+
+        `${(' ' + global.NKC.processId + ' ').grey} `+
+        `${' Error '.bgRed} ${log.uid.bgCyan} `+
+        `${log.method.green} ${log.path.bgBlue} `+
+        `<${processTime.green}ms> `+
+        `${String(log.status).red} `+
+        `${operationName.grey}`
       );
-      d.error = ctx.error;
-      global.NKC.io.of('/console').NKC.webMessage(d);
+      // 非线上环境打印错误详细信息
       if (global.NKC.NODE_ENV !== 'production')
         console.error(log.error);
     } else {
+      // 控制台打印请求记录
       console.log(
-        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' ' + global.NKC.processId + ' ').grey} ${' Info '.bgGreen} ${log.uid.bgCyan} ${log.method.green} ${log.path.bgBlue} <${processTime.green}ms> ${String(log.status).green} ${operationName.grey}`
+        `${moment().format('YYYY/MM/DD HH:mm:ss').grey} `+
+        `${(' ' + global.NKC.processId + ' ').grey} `+
+        `${' Info '.bgGreen} `+
+        `${log.uid.bgCyan} `+
+        `${log.method.green} `+
+        `${log.path.bgBlue} `+
+        `<${processTime.green}ms> `+
+        `${String(log.status).green} `+
+        `${operationName.grey}`
       );
-      global.NKC.io.of('/console').NKC.webMessage(d);
     }
+    // 网站后台控制台监看请求记录
+    global.NKC.io.of('/console').NKC.webMessage(d);
   }
 };

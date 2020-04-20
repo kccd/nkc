@@ -13,6 +13,7 @@ function submitPassword(uid) {
   if(obj.password !== obj.password2) {
     return sweetError('两次输入的新密码不一致');
   }
+  delete obj.password2;
   nkcAPI('/u/'+uid+'/settings/password', 'PATCH', obj)
     .then(function() {
       sweetSuccess('修改成功');
