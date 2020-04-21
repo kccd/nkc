@@ -4,11 +4,13 @@ router
   .get('/', async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     let {page=0, c, t} = query;
+    let noopReturn = false;
     if(c) {
       c = JSON.parse(decodeURIComponent(Buffer.from(c, "base64").toString()));
       data.openDeleteEntry = true;
     } else {
       c = {};
+      if(t === "cleanup") noopReturn = true;
     }
     const searchMap = {};
     if(c.sTime || c.eTime) {
@@ -28,20 +30,22 @@ router
     let logType = c.logType || "user";
     data.c = encodeURIComponent(new Buffer(JSON.stringify(c)).toString('base64'));
     let paging;
-    // tab类型，默认是 可以看所有日志
-    if(!t || logType === "user") {
-      const count = await db.LogModel.count(searchMap);
-      paging = nkcModules.apiFunction.paging(page, count, 60);
-      const logs = await db.LogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
-      data.result = await Promise.all(logs.map(async behavior => {
-        await behavior.extendUser();
-        return behavior;
-      }));
-    } else if(t === "visitor" || logType === "visitor") {
-      // 游客
-      const count = await db.VisitorLogModel.count(searchMap);
-      paging = nkcModules.apiFunction.paging(page, count, 60);
-      data.result = await db.VisitorLogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
+    data.result = [];
+    if(!noopReturn) {
+      if(t !== "visitor" && logType === "user") {
+        const count = await db.LogModel.count(searchMap);
+        paging = nkcModules.apiFunction.paging(page, count, 60);
+        const logs = await db.LogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
+        data.result = await Promise.all(logs.map(async behavior => {
+          await behavior.extendUser();
+          return behavior;
+        }));
+      } else {
+        // 游客
+        const count = await db.VisitorLogModel.count(searchMap);
+        paging = nkcModules.apiFunction.paging(page, count, 60);
+        data.result = await db.VisitorLogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
+      }
     }
     data.t = t;
     data.searchMap = c;

@@ -12,8 +12,8 @@ const Router = require('koa-router');
 const path = require('path');
 const router = new Router();
 router
-  .get('/', async (ctx) => {
-		const {data, params, db, nkcModules} = ctx;
+  /*.get('/', async (ctx) => {
+		const {data, params, db} = ctx;
 		const {user} = data;
 		const {fid} = params;
 		const forum = await db.ForumModel.findOnly({fid});
@@ -40,7 +40,7 @@ router
 				return ctx.redirect(`/f/${forum.fid}/home`);
 			}
 		}
-	})
+	})*/
 	.post('/', async (ctx, next) => {
 		const {data, params, db, address: ip, fs, query, nkcModules, state} = ctx;
 		const {ForumModel, ThreadModel, SubscribeModel} = db;
@@ -158,9 +158,24 @@ router
   })
 	.use('/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
 	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
-	.use(['/home', '/latest', '/followers', '/visitors', "/library"], async (ctx, next) => {
-		const {data, db, params, query} = ctx;
+	// .use(['/home', '/latest', '/followers', '/visitors', "/library"], async (ctx, next) => {
+	.use("/", async (ctx, next) => {
+		const {data, db, params, query, url, method} = ctx;
+		let _url = url.replace(/\?.*/g, "");
+		_url = _url.replace(/^\/f\/[0-9]+?\/(.+)/i, "$1");
 		const {fid} = params;
+		if(
+			!(
+				(_url === `/f/${fid}` && method === "GET") ||
+				(_url === "home" && method === "GET") ||
+				(_url === "followers" && method === "GET") ||
+				(_url === "visitors" && method === "GET") ||
+				(_url === "library" && ["GET", "POST"].includes(method))
+			)
+		) {
+			return await next();
+		}
+
 		const {token} = query;
 
 		const forum = await db.ForumModel.findOnly({fid});
@@ -345,9 +360,154 @@ router
 		ctx.template = 'forum/forum.pug';
 		await next();
   })
+	.get('/', async (ctx, next) => {
+		const {data, db, query, state} = ctx;
+		const {pageSettings} = state;
+		const {forum} = data;
+		let {page = 0, s, cat, d} = query;
+		page = parseInt(page);
+
+		// 满足以下条件，跳转到专业首页
+		// 1. 用户已登录
+		// 2. 访问最新文章列表第一页
+		// 3. 填写了专业说明
+		// 4. 用户未访问过此专业
+		if(data.user && page === 0 && forum.declare) {
+			const behavior = await db.UsersBehaviorModel.findOne({fid: forum.fid, uid: data.user.uid});
+			let url;
+			if(!behavior) {
+				url = `/f/${forum.fid}/home`;
+				const {token} = ctx.query;
+				if(token) {
+					url += `?token=${token}`;
+				}
+				return ctx.redirect(url);
+			}
+		}
+
+		// 构建查询条件
+		const match = {};
+		// 获取加精文章
+		if(d) {
+			match.digest = true;
+			data.d = d;
+		}
+		// 加载某个类别的文章
+		if(cat) {
+			match.categoriesId = parseInt(cat);
+			data.cat = match.categoriesId;
+		}
+		// 拿到该专业下可从中拿文章的所有子专业id
+		let fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user, forum.fid);
+		fidOfCanGetThreads.push(forum.fid);
+
+		// 构建置顶文章查询条件
+		const toppedThreadMatch = {
+			topped: true,
+			reviewed: true,
+			mainForumsId: forum.fid,
+			disabled: false
+		};
+		if(forum.fid === "recycle") {
+			delete toppedThreadMatch.disabled;
+		}
+		// 加载、拓展置顶文章
+		const toppedThreads = await db.ThreadModel.find(toppedThreadMatch).sort({tlm: -1});
+
+		data.toppedThreads = await db.ThreadModel.extendThreads(toppedThreads, {
+			htmlToText: true
+		});
+		if(forum.fid === "recycle") {
+			data.toppedThreads.map(t => t.disabled = false);
+		}
+
+		const topThreadsId = toppedThreads.map(t => t.tid);
+
+		match.mainForumsId = {$in: fidOfCanGetThreads};
+		match.tid = {$nin: topThreadsId};
+		if(forum.fid !== "recycle") {
+			match.disabled = false;
+		}
+		if(data.user) {
+			if(!ctx.permission("superModerator")) {
+				const canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
+				match.$or = [
+					{
+						reviewed: true
+					},
+					{
+						reviewed: false,
+						uid: data.user.uid
+					},
+					{
+						reviewed: false,
+						mainForumsId: {$in: canManageFid}
+					}
+				]
+			}
+		} else {
+			match.reviewed = true;
+		}
+		const count = await db.ThreadModel.count(match);
+		const {apiFunction} = ctx.nkcModules;
+		const paging = apiFunction.paging(page, count, pageSettings.forumThreadList);
+		data.paging = paging;
+		const limit = paging.perpage;
+		const skip = paging.start;
+		let sort;
+		if(s === "toc") {
+			sort = {toc: -1};
+		} else {
+			sort = {tlm: -1};
+		}
+		data.s = s;
+		let threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);
+
+		threads = await db.ThreadModel.extendThreads(threads, {
+			category: true,
+			htmlToText: true
+		});
+
+
+		const superModerator = ctx.permission("superModerator");
+		let canManageFid = [];
+		if(data.user) {
+			canManageFid = await db.ForumModel.canManagerFid(data.userRoles, data.userGrade, data.user);
+		}
+		data.threads = [];
+		for(const thread of threads) {
+			if(forum.fid === "recycle") {
+				// 为了在访问回收站时隐藏"已屏蔽，仅自己可见";
+				thread.disabled = false;
+			}
+			if (thread.recycleMark) {
+				// 根据权限过滤掉 屏蔽、退修的内容
+				if (data.user) {
+					// 不具有特殊权限且不是自己
+					if (!superModerator) {
+						const mainForumsId = thread.mainForumsId;
+						let has = false;
+						for (const fid of mainForumsId) {
+							if (canManageFid.includes(fid)) {
+								has = true;
+							}
+						}
+						if (!has) continue;
+					}
+				} else {
+					continue;
+				}
+			}
+			data.threads.push(thread);
+		}
+
+		data.type = 'latest';
+		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
+		await next();
+	})
   .use("/card", cardRouter.routes(), cardRouter.allowedMethods())
-	.use('/latest', latestRouter.routes(), latestRouter.allowedMethods())
 	.use('/visitors', visitorRouter.routes(), visitorRouter.allowedMethods())
+	.use("/latest", latestRouter.routes(), latestRouter.allowedMethods())
 	.use('/followers', followerRouter.routes(), followerRouter.allowedMethods())
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
   .use("/banner", bannerRouter.routes(), bannerRouter.allowedMethods())

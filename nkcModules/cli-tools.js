@@ -1,4 +1,5 @@
 const readline = require('readline');
+let color = require("colors");
 
 
 /**
@@ -18,19 +19,19 @@ const processLength = 20;
  * 在当前行输出进度条
  * @param {number} process - 0 到 1之间的数，表示百分比
  */
-function printProcess(stream, process) {
+function printProcess(stream, process, text) {
   process = parseFloat(process);
   process = Math.round(process * 10000) / 10000;
   readline.clearLine(stream);
   readline.cursorTo(stream, 0);
   if(process >= 1) {
-    stream.write(`████████████████████ 100%`,'utf-8');
+    stream.write(`████████████████████ 100% ${color.green("完成")}`,'utf-8');
     return;
   }
   let s = Math.round(processLength * process);
   let l = processLength - s;
   let p = repeat("█", s) + repeat("░", l);
-  stream.write(`${p} ${process * 100}%`,'utf-8');
+  stream.write(`${p} ${String(process * 100).substr(0, 4)}% ${text || ""}`,'utf-8');
 }
 
 exports.printProcess = printProcess;

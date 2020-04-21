@@ -12,7 +12,13 @@ for(const filename of files) {
   const name = filename.split(".")[0];
   sources[name] = require(filePath + `/${name}`);
 }
-
+const serverConfig = require("../../config/server");
+const linkReg = new RegExp(`^` +
+  serverConfig.domain
+    .replace(/\//g, "\\/")
+    .replace(/\./g, "\\.")
+  + "|^\/"
+  , "i");
 class NKCRender {
   constructor() {
     this.htmlFilter = htmlFilter;
@@ -38,6 +44,17 @@ class NKCRender {
         r = r.toObject();
       }
       _resources[r.rid] = r;
+    }
+    if(type === "article") {
+      // 外链在新标签页打开
+      const links = $("a[target!='_blank']");
+      for(let i = 0; i < links.length; i++) {
+        const a = links.eq(i);
+        const href = a.attr("href");
+        if(!linkReg.test(href)) {
+          a.attr("target", "_blank");
+        }
+      }
     }
     const sourceMethods = sources[type];
     for(const name in sourceMethods) {
