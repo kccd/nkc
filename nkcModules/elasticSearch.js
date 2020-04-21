@@ -529,31 +529,23 @@ func.updateThreadForums = async (thread) => {
     body: {
       query: {
         bool: {
+          // must = and
           must: [
-            {
-              match: {
-                tid: thread.tid
-              }
-            },
+            // 条件 tid = thread.tid
+            {match: {tid: thread.tid}},
             {
               bool: {
+                // should = or
                 should: [
-                  {
-                    match: {
-                      docType: "post"
-                    }
-                  },
-                  {
-                    match: {
-                      docType: "thread"
-                    }
-                  }
+                  {match: {docType: "post"}},
+                  {match: {docType: "thread"}}
                 ]
               }
             }
           ]
         }
       },
+      // 对匹配到的每一条数据执行此脚本
       script: {
         source: "ctx._source.mainForumsId = "+ JSON.stringify(thread.mainForumsId)
       }

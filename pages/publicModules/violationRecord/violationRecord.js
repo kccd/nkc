@@ -8,9 +8,6 @@ NKC.modules.violationRecord = new function violationRecord() {
       list: [],
       loadding: true
     },
-    watch: {
-      
-    },
     methods: {
       open: function(option) {
         var self = this;
@@ -18,9 +15,9 @@ NKC.modules.violationRecord = new function violationRecord() {
         $dom.modal("show");
         self.loadding = true;
         nkcAPI("/u/" + option.uid + "/violationRecord", "GET")
-          .then(res => {
+          .then(function(res){
             self.loadding = false;
-            let record = res.record;
+            var record = res.record;
             self.list = record;
           })
       },

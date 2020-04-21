@@ -9,14 +9,8 @@
         h4.modal-title 违规记录
       .modal-body
         //- 加载完了并且有至少一条记录
-        table.table.table-bordered(v-if="!loadding && list.length")
-          thead
-            th 时间
-            th 原因
-          tbody
-            tr(v-for="res, index of list")
-              td {{dateFormat("yyyy-M-d H:m:s", new Date(res.toc))}}
-              td {{res.description}}
+        div(v-if="!loadding && list.length")
+          p(v-for="res, index of list") {{dateFormat("yyyy-M-d H:m:s", new Date(res.toc))}}, {{res.type}}, {{res.reason}}
         //- 加载完了并且没有违规记录
         span(v-else-if="!loadding && !list.length") 无违规记录
         //- 没加载完
