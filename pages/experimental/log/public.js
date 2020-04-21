@@ -176,5 +176,4 @@ function deleteCurrentRecord() {
       sweetSuccess("删除成功");
     })
     .catch(sweetError);
-    
 }

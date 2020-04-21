@@ -519,8 +519,6 @@ threadSchema.methods.updateThreadMessage = async function() {
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
   // 更新搜索引擎中帖子的专业信息
   await elasticSearch.updateThreadForums(thread);
-  // 更新搜索引擎中帖子的评论信息 todo: debug
-  // await elasticSearch.updateCommentForums(thread);
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
