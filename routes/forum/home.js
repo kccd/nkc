@@ -18,15 +18,15 @@ homeRouter
 			},
 			user: data.user
 		});
-		
+
 		if(forum.valuableThreads.length === 0 &&
 			forum.basicThreads.length === 0 &&
 			!forum.declare
 		) {
 			if(ctx.query.token) {
-				return ctx.redirect(`/f/${forum.fid}/latest?token=${ctx.query.token}`);
+				return ctx.redirect(`/f/${forum.fid}?token=${ctx.query.token}`);
 			}else{
-				return ctx.redirect(`/f/${forum.fid}/latest`);
+				return ctx.redirect(`/f/${forum.fid}`);
 			}
 		}
 		await next();

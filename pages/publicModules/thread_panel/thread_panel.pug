@@ -50,7 +50,7 @@
             if !displayForumNav && thread.categories.length !== 0
               for category in thread.categories
                 if data.threadTypesId.includes(category.cid)
-                  a(href=`/f/${data.forum.fid}/latest?cat=${category.cid}`)= category.name
+                  a(href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
           else
             -let forum;
             for f in thread.forums

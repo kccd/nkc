@@ -103,7 +103,7 @@ block content
               .forum-category
                 a(class=!data.cat ? "active" : "" href=`/f/${data.forum.fid}`) 全部
                 for threadType in data.threadTypes
-                  a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}/latest?cat=${threadType.cid}`)= threadType.name
+                  a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}?cat=${threadType.cid}`)= threadType.name
             -let showPagingSortButton = true;
             -let showPagingDigestButton = true;
             if canManagement
@@ -273,7 +273,7 @@ block scripts
     if data.folderId
       script=`NKC.configs.folderId = ${data.folderId};`
     if data.tLid
-      script=`NKC.configs.tLid = ${data.tLid};`  
+      script=`NKC.configs.tLid = ${data.tLid};`
     if data.libraryClosed
       script=`NKC.configs.closed = ${!!data.libraryClosed};`
     if data.uploadResourcesId
