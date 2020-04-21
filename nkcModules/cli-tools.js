@@ -31,7 +31,7 @@ function printProcess(stream, process, text) {
   let s = Math.round(processLength * process);
   let l = processLength - s;
   let p = repeat("█", s) + repeat("░", l);
-  stream.write(`${p} ${process * 100}% ${text || ""}`,'utf-8');
+  stream.write(`${p} ${String(process * 100).substr(0, 4)}% ${text || ""}`,'utf-8');
 }
 
 exports.printProcess = printProcess;
