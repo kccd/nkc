@@ -1,9 +1,7 @@
 const router = require('koa-router')();
 router.get('/', async (ctx, next) => {
-  const {nkcModules, data, db, params, query} = ctx;
-  const {user} = data;
+  const {data, db, params} = ctx;
   const {uid} = params;
-  const {page = 0} = query;
   const targetUser = await db.UserModel.findOnly({uid});
   // 此用户的违规记录
   let violationRecord = await db.UsersScoreLogModel.find({
