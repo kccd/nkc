@@ -6773,7 +6773,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
 
     /**
      * 点击末行空白处插入新行
-     * @param {Object} readyEditor - 一个已经就绪的编辑器实例 
+     * @param {Object} readyEditor - 一个已经就绪的编辑器实例
      * @author yuu
      */
     function autoAddNewline(readyEditor) {
@@ -7390,7 +7390,7 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
         setContent: function (html, isAppendTo, notFireSelectionchange) {
             var me = this;
 
-            html = NKC.methods.ueditor.setContent(html);  
+            html = NKC.methods.ueditor.setContent(html);
             me.fireEvent('beforesetcontent', html);
             var root = UE.htmlparser(html);
             me.filterInputRule(root);
@@ -10286,6 +10286,9 @@ UE.commands['inserthtml'] = {
         if(!html){
             return;
         }
+        if(NKC && NKC.methods.ueditor.insertContent) {
+          html = NKC.methods.ueditor.insertContent(html);
+        }
         if(me.fireEvent('beforeinserthtml',html) === true){
             return;
         }
@@ -12967,7 +12970,7 @@ UE.plugins['paragraph'] = function() {
                         } );
                     }
                     tmpRange.setEndAfter( tmpNode );
-                    
+
                     para = range.document.createElement( style );
                     if(attrs){
                         domUtils.setAttributes(para,attrs);
@@ -12979,7 +12982,7 @@ UE.plugins['paragraph'] = function() {
                     //需要内容占位
                     if(domUtils.isEmptyNode(para)){
                         domUtils.fillChar(range.document,para);
-                        
+
                     }
 
                     tmpRange.insertNode( para );
@@ -13103,7 +13106,7 @@ UE.plugins['paragraph'] = function() {
 
         },
         doDirectionality = function(range,editor,forward){
-            
+
             var bookmark,
                 filterFn = function( node ) {
                     return   node.nodeType == 1 ? !domUtils.isBookmarkNode(node) : !domUtils.isWhitespace(node);
@@ -23036,7 +23039,7 @@ UE.plugins['formatmatch'] = function(){
      });
 
     function addList(type,evt){
-        
+
         if(browser.webkit){
             var target = evt.target.tagName == 'IMG' ? evt.target : null;
         }
@@ -23102,7 +23105,7 @@ UE.plugins['formatmatch'] = function(){
 
     me.commands['formatmatch'] = {
         execCommand : function( cmdName ) {
-          
+
             if(flag){
                 flag = 0;
                 list = [];
@@ -23111,7 +23114,7 @@ UE.plugins['formatmatch'] = function(){
             }
 
 
-              
+
             var range = me.selection.getRange();
             img = range.getClosedNode();
             if(!img || img.tagName != 'IMG'){
@@ -23538,7 +23541,7 @@ UE.plugins['catchremoteimage'] = function () {
         if(!isPc) {
             imgWidth = {
                 style: "max-width: 50%"
-            }   
+            }
         }
         for (var i = 0, ci; ci = imgs[i++];) {
             domUtils.setAttributes(ci, imgWidth);
@@ -25652,7 +25655,7 @@ UE.ui = baidu.editor.ui = {};
         domUtils = baidu.editor.dom.domUtils,
         UIBase = baidu.editor.ui.UIBase,
         uiUtils = baidu.editor.ui.uiUtils;
-    
+
     var Mask = baidu.editor.ui.Mask = function (options){
         this.initOptions(options);
         this.initUIBase();
@@ -25948,7 +25951,7 @@ UE.ui = baidu.editor.ui = {};
         }
     };
     utils.inherits(Popup, UIBase);
-    
+
     domUtils.on( document, 'mousedown', function ( evt ) {
         var el = evt.target || evt.srcElement;
         closeAllPopup( evt,el );
@@ -26045,7 +26048,7 @@ UE.ui = baidu.editor.ui = {};
     var utils = baidu.editor.utils,
         uiUtils = baidu.editor.ui.uiUtils,
         UIBase = baidu.editor.ui.UIBase;
-    
+
     var TablePicker = baidu.editor.ui.TablePicker = function (options){
         this.initOptions(options);
         this.initTablePicker();
@@ -26129,7 +26132,7 @@ UE.ui = baidu.editor.ui = {};
     var browser = baidu.editor.browser,
         domUtils = baidu.editor.dom.domUtils,
         uiUtils = baidu.editor.ui.uiUtils;
-    
+
     var TPL_STATEFUL = 'onmousedown="$$.Stateful_onMouseDown(event, this);"' +
         ' onmouseup="$$.Stateful_onMouseUp(event, this);"' +
         ( browser.ie ? (
@@ -26138,7 +26141,7 @@ UE.ui = baidu.editor.ui = {};
         : (
         ' onmouseover="$$.Stateful_onMouseOver(event, this);"' +
         ' onmouseout="$$.Stateful_onMouseOut(event, this);"' ));
-    
+
     baidu.editor.ui.Stateful = {
         alwalysHoverable: false,
         target:null,//目标元素和this指向dom不一样
@@ -27781,7 +27784,7 @@ UE.ui = baidu.editor.ui = {};
         setValue : function(value){
             this._value = value;
         }
-        
+
     };
     utils.inherits(MenuButton, SplitButton);
 })();
@@ -29883,7 +29886,7 @@ UE.ui = baidu.editor.ui = {};
         })
 
     }
-    
+
 
 })();
 

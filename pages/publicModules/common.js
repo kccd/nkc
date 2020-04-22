@@ -411,7 +411,7 @@ NKC.methods.resourceToHtml = function(type, rid, name) {
       html = '<p><a href="' + '/r/' + rid + '"><img src=' + '/default/default_thumbnail.png' + '>' + name + '</a></p>';
     }
   }
-  
+
   return html;
 };*/
 
@@ -431,14 +431,14 @@ NKC.methods.toLogin = function(type) {
 };
 
 
-/* 
+/*
   滚动页面
   @param {Object} optons
     @param {Number} top
-    @param {Number} left 
+    @param {Number} left
     @param {Dom} 设置滚动的dom元素, 默认window
     @param {String} behavior smooth: 平滑滚动, instant: 瞬间滚动（默认）
-  @author pengxiguaa 2019-10-28  
+  @author pengxiguaa 2019-10-28
 */
 NKC.methods.scrollTop = function(dom, distance) {
   if(dom) {
@@ -446,13 +446,13 @@ NKC.methods.scrollTop = function(dom, distance) {
       dom = $(dom);
       dom.scrollTop(distance);
     } else {
-      dom.scrollTo(0, distance);  
+      dom.scrollTo(0, distance);
     }
   } else {
     window.scrollTo(0, distance);
   }
 };
-/* 
+/*
   本地存储
   @param {String} name 键名
   @param {Object} data 数据
@@ -461,7 +461,7 @@ NKC.methods.scrollTop = function(dom, distance) {
 NKC.methods.saveToLocalStorage = function(name, data) {
   window.localStorage.setItem(name, JSON.stringify(data));
 };
-/* 
+/*
   从本地存储中读取
   @param {String} name 键名
   @return {Object} 数据
@@ -473,7 +473,7 @@ NKC.methods.getFromLocalStorage = function(name) {
   return JSON.parse(data);
 };
 
-/* 
+/*
   从多个数组中取值，组成与原数组长度相同的不重复的新数组
   @param arr 原数组：
   [
@@ -656,7 +656,7 @@ NKC.methods.addXsfDataMessage = function(content) {
       $(el).attr("data-message", "浏览这段内容需要" + id + "学术分(双击修改)");
     });
   return parser.innerHTML;
-}
+};
 
 /**
  * ueditor设置内容和获取内容
@@ -671,6 +671,16 @@ NKC.methods.ueditor = {
   setContent: function(html) {
     html = NKC.methods.replaceEmojiChar(html);
     html = NKC.methods.addXsfDataMessage(html);
+    return html;
+  },
+  insertContent: function(html) {
+    html = $("<div>"+html+"</div>");
+    var span = html.find("span.nkc-hl");
+    span.css({
+      "background-color": "",
+      "border-bottom": ""
+    }).removeClass("nkc-hl");
+    html = html.html();
     return html;
   }
 };

@@ -1,107 +1,100 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
-  +includeCSS('/experimental/index.css')
+block eTitle
   title 操作设置
-block content
+block eContent
 
   .container-fluid.max-width
     .row
-      include ../nav
       .col-xs-12.col-md-12
-        .row
-          .col-xs-12.col-md-12
-            ul.nav.nav-tabs.m-b-2#dataT(data-t=data.t)
-              li(class=!data.t?"active":"")
-                a(href=`/e/log/public`) 用户
-              li(class=data.t === "visitor"?"active":"")
-                a(href=`/e/log/public?t=visitor`) 游客
-              li(class=data.t === "cleanup"? "active":"")
-                a(href=`/e/log/public?t=cleanup`) 清理
-          .col-xs-12.col-md-12
-            .form.form-inline
-              .form-group
-                - let sTime = data.searchMap.sTime || "";
-                - let eTime = data.searchMap.eTime || "";
-                label 时间范围
-                if data.t !== "cleanup"
-                  input.form-control#timeRange(req="true" data-stime=`${sTime}` data-etime=`${eTime}` readonly)
-                if data.t === "cleanup"
-                  input.form-control#cleanupTimeRange(req="true" data-stime=`${sTime}` data-etime=`${eTime}` readonly)
-                  label(for="cleanupTimeRange" style="color:red") 只能查询三个月前的日志
-            //- 清理那页不显示
+        ul.nav.nav-tabs.m-b-2#dataT(data-t=data.t)
+          li(class=!data.t?"active":"")
+            a(href=`/e/log/public`) 用户
+          li(class=data.t === "visitor"?"active":"")
+            a(href=`/e/log/public?t=visitor`) 游客
+          li(class=data.t === "cleanup"? "active":"")
+            a(href=`/e/log/public?t=cleanup`) 清理
+      .col-xs-12.col-md-12
+        .form.form-inline
+          .form-group
+            - let sTime = data.searchMap.sTime || "";
+            - let eTime = data.searchMap.eTime || "";
+            label 时间范围
             if data.t !== "cleanup"
-              .form.form-inline.m-t-1
-                .form-group
-                  label 用户ID
-                  input.form-control#userId(value=`${data.searchMap.uid||''}`)
-                .form-group
-                  label IP
-                  input.form-control#ipAdress(value=`${data.searchMap.ip||''}`)
-            .form.form-inline.m-t-1.m-b-2
-              //- 选择用户和游客的下拉
-              if data.t === "cleanup"
-                .form-group
-                  label(for="logType") 查询类型
-                  select#logType.form-control
-                    option(value="user")&attributes({"selected": data.searchMap.logType === "user"? "true": undefined}) 用户
-                    option(value="visitor")&attributes({"selected": data.searchMap.logType === "visitor"? "true": undefined}) 游客
-              //- 清理那页不显示
-              if data.t !== "cleanup"
-                .form-group
-                  label 操作ID
-                  input.form-control#operationId(value=`${data.searchMap.operationId || ""}`)
-              .form-group
-                button.btn.btn-primary.btn-block(onclick='searchLogs()') 查询
-              //- 如果是请求了查询结果，就打开删除操作的按钮，以方便地将查询出来的结果批量删除
-              if data.t === "cleanup"
-                .form-group
-                  button.btn.btn-primary.btn-block.btn-danger(onclick='deleteCurrentRecord()'  disabled=!data.result.length) 删除查询结果
-          .col-xs-12.col-md-12
-            include ../../publicModules/paging/paging
-            .table-responsive
-              table.table.table-bordered
-                thead
-                  tr
-                    th ID
-                    th 时间
-                    th 用户
-                    th 操作名（操作ID）
-                    th URL
-                    th 方法
-                    th 状态
-                    th IP
-                    th 来源
-                    th 客户端（点击查看详情）
-                tbody
-                  for log, index in data.result
-                    tr
-                      th=log._id
-                      th= format("YYYY/MM/DD HH:mm:ss", log.reqTime)
-                      th
-                        if log.user
-                          a(href=`/u/${log.uid}` target="_blank")=log.user.username
-                        else
-                          |游客
-                      th= `${lang("operations", log.operationId)}（${log.operationId}）`
-                      th= log.path
-                      th= log.method
-                      th= log.status
-                      th
-                        a(href=ipUrl(log.ip) target="_blank")=log.ip
-                      th
-                        .referer
-                          a(href=log.referer target="_blank")=log.referer
-                      th
-                        .user-agent(onclick=`sweetAlert('${log.userAgent}')`)=log.userAgent
-            include ../../publicModules/paging/paging_input
+              input.form-control#timeRange(req="true" data-stime=`${sTime}` data-etime=`${eTime}` readonly)
+            if data.t === "cleanup"
+              input.form-control#cleanupTimeRange(req="true" data-stime=`${sTime}` data-etime=`${eTime}` readonly)
+              label(for="cleanupTimeRange" style="color:red") 只能查询三个月前的日志
+        //- 清理那页不显示
+        if data.t !== "cleanup"
+          .form.form-inline.m-t-1
+            .form-group
+              label 用户ID
+              input.form-control#userId(value=`${data.searchMap.uid||''}`)
+            .form-group
+              label IP
+              input.form-control#ipAdress(value=`${data.searchMap.ip||''}`)
+        .form.form-inline.m-t-1.m-b-2
+          //- 选择用户和游客的下拉
+          if data.t === "cleanup"
+            .form-group
+              label(for="logType") 查询类型
+              select#logType.form-control
+                option(value="user")&attributes({"selected": data.searchMap.logType === "user"? "true": undefined}) 用户
+                option(value="visitor")&attributes({"selected": data.searchMap.logType === "visitor"? "true": undefined}) 游客
+          //- 清理那页不显示
+          if data.t !== "cleanup"
+            .form-group
+              label 操作ID
+              input.form-control#operationId(value=`${data.searchMap.operationId || ""}`)
+          .form-group
+            button.btn.btn-primary.btn-block(onclick='searchLogs()') 查询
+          //- 如果是请求了查询结果，就打开删除操作的按钮，以方便地将查询出来的结果批量删除
+          if data.t === "cleanup"
+            .form-group
+              button.btn.btn-primary.btn-block.btn-danger(onclick='deleteCurrentRecord()'  disabled=!data.result.length) 删除查询结果
+      .col-xs-12.col-md-12
+        include ../../publicModules/paging/paging
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th ID
+                th 时间
+                th 用户
+                th 操作名（操作ID）
+                th URL
+                th 方法
+                th 状态
+                th IP
+                th 来源
+                th 客户端（点击查看详情）
+            tbody
+              for log, index in data.result
+                tr
+                  th=log._id
+                  th= format("YYYY/MM/DD HH:mm:ss", log.reqTime)
+                  th
+                    if log.user
+                      a(href=`/u/${log.uid}` target="_blank")=log.user.username
+                    else
+                      |游客
+                  th= `${lang("operations", log.operationId)}（${log.operationId}）`
+                  th= log.path
+                  th= log.method
+                  th= log.status
+                  th
+                    a(href=ipUrl(log.ip) target="_blank")=log.ip
+                  th
+                    .referer
+                      a(href=log.referer target="_blank")=log.referer
+                  th
+                    .user-agent(onclick=`sweetAlert('${log.userAgent}')`)=log.userAgent
+        include ../../publicModules/paging/paging_input
 
 
 block scripts
 
-  +includeJS('/interface_common.js')
-  +includeJS('/experimental/settings/operation.js')
-  //- +includeJS('/laydate/laydate.dev.js')
   +includeJS('/laydate/laydate-v5.0.9/laydate.js')
   +includeJS('/experimental/log/public.js')
 

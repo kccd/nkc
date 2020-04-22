@@ -59,12 +59,15 @@ var $timeRange = $("#timeRange");
 if($timeRange[0]) {
   var sTime = $timeRange.data("stime");
   var eTime = $timeRange.data("etime");
+  var time;
+  if(sTime && eTime) time = sTime + " - " + eTime;
   var timeRange = $timeRange[0];
   // 绑定layDate时间下拉
   laydate.render({
     elem: timeRange,
     format: "yyyy-M-d H:m:s",
-    value: (sTime? sTime:(dateFormat("yyyy-M-d", nowDate) + " 0:0:0")) + " - " + (eTime? eTime:(dateFormat("yyyy-M-d", nowDate) + " 23:59:59")),
+    value: time,
+    // value: (sTime? sTime:(dateFormat("yyyy-M-d", nowDate) + " 0:0:0")) + " - " + (eTime? eTime:(dateFormat("yyyy-M-d", nowDate) + " 23:59:59")),
     type: 'datetime',
     range: true,
     done: function(date) {
