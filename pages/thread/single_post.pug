@@ -1,15 +1,18 @@
 if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
+  -let userBannedNotice;
+  if post.user && post.user.certs.includes('banned')
+    -userBannedNotice = "该会员已被开除，不能继续参与讨论";
   //- class=post.pid===highlight?"highlight-dom":""
   //- 是否高亮
   div.single-post(id=(!disabledHighlight && post.pid===highlight)?"highlight":"")
     if previousPost
       // 获取前一条post当天日期零点的时间戳
       -let prepostTimeStamp = new Date(previousPost.toc)
-      -prepostTimeStamp.setHours(0,0,0,0) 
+      -prepostTimeStamp.setHours(0,0,0,0)
       -let prepostTimeStampStr = prepostTimeStamp.getTime()
       // 获取post当天日期零点的时间戳
       -let postTimeStamp = new Date(post.toc)
-      -postTimeStamp.setHours(0,0,0,0) 
+      -postTimeStamp.setHours(0,0,0,0)
       -let postTimeStampStr = postTimeStamp.getTime()
       if postTimeStampStr > prepostTimeStampStr
         div.single-post-time
@@ -31,13 +34,16 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
         .inline-block(style='margin-bottom: 0;')
           if !post.anonymous
             a(href=`/u/${post.uid}` data-float-uid=post.uid)
-              img(src=`/avatar/${post.user.avatar}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
+              img(class=userBannedNotice?"user-banned-avatar":"" src=`/avatar/${post.user.avatar}?t=sm` style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
               span= post.user.username
             -const targetUser = post.user;
             include ../user/module_user_grade_icon
           else
             img(src=anonymousInfo.avatar style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
             span.anonymous-name= anonymousInfo.username
+          if post.user && post.user.certs.includes('banned')
+          if userBannedNotice
+            span.hidden-xs.hidden-sm.user-banned=userBannedNotice
           if post.digest
             span &nbsp;
             span.fa.fa-star(style='color: #ffbf16;' title='精选')
@@ -58,6 +64,8 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
               | &nbsp;&nbsp;
             a(href=post.url style="color: #aaa;") 上下文
         .clearfix
+        if userBannedNotice
+          div.hidden-sm.hidden-md.hidden-lg.user-banned=userBannedNotice
         if(post.t && post.t !== '' && index !== 0)
           div.dirt.ThreadPostTitle.ThreadPostBody #{post.t}
         div(class=!disabledHidePost?"hide-post part":"" data-pid=post.pid)
