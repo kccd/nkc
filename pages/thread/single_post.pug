@@ -41,7 +41,6 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
           else
             img(src=anonymousInfo.avatar style='width: 30px; height: 30px;border-radius: 50%;margin-right: 0.5rem;')
             span.anonymous-name= anonymousInfo.username
-          if post.user && post.user.certs.includes('banned')
           if userBannedNotice
             span.hidden-xs.hidden-sm.user-banned=userBannedNotice
           if post.digest
