@@ -11,11 +11,11 @@ const {ThrottleGroup} = require("stream-throttle");
 // 存放用户设置
 const downloadGroups = {};
 
-/* 
+/*
 {
   tg: Object, // 限速
   rate: 2345, // 速度 b
-} 
+}
 */
 
 resourceRouter
@@ -24,7 +24,7 @@ resourceRouter
     const {user} = data;
     if(!user) ctx.throw(400, "权限不足");
     const uploadSettings = await db.SettingModel.getUploadSettingsByUser(user);
-    data.extensions = uploadSettings.extensions; 
+    data.extensions = uploadSettings.extensions;
     data.fileCount = uploadSettings.fileCountOneDay;
     await next();
   })
@@ -52,7 +52,7 @@ resourceRouter
       const match = {
         toc: {
           $gte: nkcModules.apiFunction.today()
-        }  
+        }
       };
       if(!data.user) {
         // 游客
@@ -96,7 +96,7 @@ resourceRouter
     if(!ctx.request.headers['range']){
       await resource.update({$inc:{hits:1}});
     }
-    
+
     ctx.filePath = filePath;
     // 表明客户端希望以附件的形式加载资源
     if(t === "attachment") {
@@ -144,7 +144,7 @@ resourceRouter
     const {generateFolderName, extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = upload;
     const {selectDiskCharacterUp} = mediaPath;
     const {user} = data;
-    
+
     let mediaRealPath;
     const {files, fields} = ctx.body;
     const {file} = files;
@@ -258,8 +258,8 @@ resourceRouter
         originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
         let originSaveName = originId + '.' + extension;
         const originFilePath = originPath + descPathOfOrigin + originSaveName; // 原图存放路径
-  
-  
+
+
         // 图片自动旋转
         try{
           await imageMagick.allInfo(path);
@@ -403,7 +403,7 @@ resourceRouter
           }
         }
       }
-      
+
     }
     // 视频压缩转码
     if (videoExts.indexOf(extension.toLowerCase()) > -1) {
@@ -461,7 +461,7 @@ resourceRouter
       extension = "mp4";
       saveName = rid + "." + extension;
       mediaFilePath = mediaFilePath.replace(nameReg, "mp4")
-    } 
+    }
     // 音频转为mp3
     if(audioExts.indexOf(extension.toLowerCase()) > -1) {
       const timeStr = Date.now() + "_" + file.hash;
@@ -537,16 +537,19 @@ resourceRouter
       toc: Date.now(),
       mediaType: mediaType
     });
-    
+
     // 创建表情数据
     if(type === "sticker") {
+      if(mediaType !== "mediaPicture") {
+        ctx.throw(400, "图片格式错误");
+      }
       await db.StickerModel.uploadSticker({
         rid,
         uid: data.user.uid,
         share: !!share
       });
     }
-    
+
     ctx.data.r = await r.save();
     await next()
   })
