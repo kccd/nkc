@@ -21,20 +21,23 @@ function urlPathEval(fromUrl, toUrl) {
   return new URL(toUrl, fullFromUrl).href;
 }
 
-$('a[href]:not([data-type="reload"])').on('click', function(e) {
-  e.preventDefault();
-  let href = '';
+document.body.addEventListener('click', (e)  => {
   const target = e.target;
+  let $a = null;
   if (target.nodeName.toLocaleLowerCase() === 'a') {
-    href = target.href;
+    $a = target;
   } else {
-    href = $(target)
-      .parents('a')
-      .attr('href');
+    $a = $(target).parents('a');
+    if($a.length) $a = $a[0];
   }
-  const targetUrl = urlPathEval(location.href, href);
-  NKC.methods.rn.emit('openNewPage', {
-    href: targetUrl
-  });
+  const href = $a.getAttribute('href');
+  if($a && $a.getAttribute('data-type') !== 'reload' && href) {
+    e.preventDefault();
+    const targetUrl = urlPathEval(location.href, href);
+    NKC.methods.rn.emit('openNewPage', {
+      href: targetUrl
+    });
+  }
 });
+
 

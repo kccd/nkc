@@ -84,7 +84,11 @@ var NKC = {
 
 NKC.methods.getLoginStatus = function() {
   if(NKC.configs.isApp) {
-    return !!appGetFromLocal("user");
+    if(NKC.configs.platform === "apiCloud") {
+      return !!appGetFromLocal("user");
+    } else if(NKC.configs.platform === 'reactNative') {
+      return !!NKC.configs.uid;
+    }
   } else {
     return !!NKC.configs.uid;
   }
@@ -109,7 +113,14 @@ NKC.methods.getRunType = function() {
 * */
 NKC.methods.visitUrl = function(url, blank) {
   if(NKC.configs.isApp) {
-    NKC.methods.openOnlinePage(url);
+    if(NKC.configs.platform === "apiCloud") {
+      NKC.methods.openOnlinePage(url);
+    } else if(NKC.configs.platform === 'reactNative') {
+      NKC.methods.rn.emit('openNewPage', {
+        href: location.origin + url
+      });
+    }
+
   } else {
     if(blank) {
       window.open(url);
