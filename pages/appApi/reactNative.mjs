@@ -3,7 +3,6 @@ NKC.methods.rn = {};
 NKC.methods.rn.postMessage = function(obj) {
   window.ReactNativeWebView.postMessage(JSON.stringify(obj));
 };
-
 NKC.methods.rn.emit = function(type, data) {
   data = data || {};
   NKC.methods.rn.postMessage({
