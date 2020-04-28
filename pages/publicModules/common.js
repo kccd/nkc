@@ -288,6 +288,9 @@ NKC.methods.logout = function() {
       return nkcAPI(href, "GET");
     })
     .then(function() {
+      if(NKC.configs.platform === 'reactNative') {
+        NKC.methods.rn.emit("logout");
+      }
       window.location.reload();
     })
     .catch(function (data) {
@@ -422,9 +425,13 @@ NKC.methods.resourceToHtml = function(type, rid, name) {
 * */
 NKC.methods.toLogin = function(type) {
   if(NKC.configs.isApp) {
-    emitEvent("openLoginPage", {
-      type: type
-    });
+    if(NKC.configs.platform === 'apiCloud') {
+      emitEvent("openLoginPage", {
+        type: type
+      });
+    } else if(NKC.configs.platform === 'reactNative') {
+      NKC.methods.rn.emit("openLoginPage", {type: type});
+    }
   } else {
     Login.open(type === "register"? "register": "login");
   }
