@@ -81,7 +81,7 @@ block body
     if kcb > 0
       script!=`sweetAlert("你发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
-  if !state.isApp && !data.user
+  if (!state.isApp) && !data.user
     include ./publicModules/login/login
   if state.isApp && state.platform === 'reactNative'
     +includeJS('/appApi/reactNative.js')
