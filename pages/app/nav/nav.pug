@@ -1,10 +1,10 @@
-extends ../base
+extends ../../bootstrap_base
 block title
   +includeCSS("/app/nav/nav.css")
 block content
   .app-nav
     .nav-header
-      .nav-header-icon.nav-back
+      .nav-header-icon.nav-back(onclick='closeWin()')
         .fa.fa-arrow-left
     .nav-user
       .user-avatar
@@ -44,7 +44,7 @@ block content
               .fa.fa-columns
             span 我的专栏
             .icon-right
-              .fa.fa-angle-right     
+              .fa.fa-angle-right
         else if data.user && state.columnPermission
           a.nav-link(href=`/column/apply`)
             .icon-left
@@ -57,7 +57,7 @@ block content
             .fa.fa-smile-o
           span 我的表情
           .icon-right
-            .fa.fa-angle-right       
+            .fa.fa-angle-right
         .nav-link-header 应用
         .nav-apps
           a.nav-app(href=`/fund`)
@@ -191,10 +191,11 @@ block content
               .fa.fa-bug
             span 报告问题
             .icon-right
-              .fa.fa-angle-right     
+              .fa.fa-angle-right
       .nav-logout
         .fa.fa-sign-out &nbsp;
         span 退出登录
     .nav-footer
 block scripts
   +includeJS("/app/nav/nav.js")
+

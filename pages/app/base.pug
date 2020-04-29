@@ -1,33 +1,34 @@
-doctype html
-include ../publicModules/mixin.pug
-html(lang='zh-CN')
-  head
-    meta(charset='UTF-8')
-    meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
-    meta(name="viewport" content="width=device-width, initial-scale=1")
-    meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
-    +includeJS("/appAPi/api.js")
-    +includeCSS('/bootstrap/css/bootstrap.css')
-    +includeCSS('/font-awesome/css/font-awesome.css')
-    +includeCSS('/publicModules/public.css')
-    style.
-      html{
-        height: 100%;
-        font-size: 10px;
-      }
-      body{
-        min-height: 100%;
-        padding: 0;
-        margin: 0;
-      }
-    block title
-  body
-    block content
-    +includeJS('/jquery/jquery-1.11.1.js')
-    +includeJS('/Promise/promise.min.js')
-    +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js')
-    +includeJS('/vue/dist/vue.js')
-    +includeJS('/publicModules/common.js')
-    +includeJS('/interface_common.js')
-    +includeJS("/appAPi/app.js")
-    block scripts
+//-
+  doctype html
+  include ../publicModules/mixin.pug
+  html(lang='zh-CN')
+    head
+      meta(charset='UTF-8')
+      meta(http-equiv="X-UA-Compatible" content="IE=edge,chrome=1")
+      meta(name="viewport" content="width=device-width, initial-scale=1")
+      meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
+      +includeJS("/appAPi/api.js")
+      +includeCSS('/bootstrap/css/bootstrap.css')
+      +includeCSS('/font-awesome/css/font-awesome.css')
+      +includeCSS('/publicModules/public.css')
+      style.
+        html{
+          height: 100%;
+          font-size: 10px;
+        }
+        body{
+          min-height: 100%;
+          padding: 0;
+          margin: 0;
+        }
+      block title
+    body
+      block content
+      +includeJS('/jquery/jquery-1.11.1.js')
+      +includeJS('/Promise/promise.min.js')
+      +includeJS('/external_pkgs/polyfill/dist/polyfill.min.js')
+      +includeJS('/vue/dist/vue.js')
+      +includeJS('/publicModules/common.js')
+      +includeJS('/interface_common.js')
+      +includeJS("/appAPi/app.js")
+      block scripts
