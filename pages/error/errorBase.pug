@@ -7,7 +7,7 @@ block head
   +includeCSS('/font-awesome/css/font-awesome.css')
   +includeCSS('/bootstrap/css/bootstrap.css')
   link(rel='shortcut icon' href='/favicon.ico')
-  title= data.status
+  title= `${data.status}:${data.error}`
   +includeCSS("/publicModules/public.css")
   +includeCSS("/nkc_styles.css")
   +includeCSS("/error/error.css")
@@ -38,7 +38,7 @@ block body
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/vue/dist/vue.js')
   +includeJS("/publicModules/common.js")
-  if state.isApp
+  if state.isApp && state.platform === 'apiCloud'
     script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";`
     +includeJS("/appAPi/app.js")
   +includeJS("/interface_common.js")
