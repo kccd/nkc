@@ -1,10 +1,9 @@
-const apiFn = require('../nkcModules').apiFunction;
-const {encodeRFC5987ValueChars} = apiFn;
 const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
 module.exports = async (ctx, next) => {
   const {filePath, fileType, fileName, resource, fs, tg} = ctx;
+  const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   if(filePath && ctx.method === 'GET') {
     let stats;
     try{
@@ -35,7 +34,7 @@ module.exports = async (ctx, next) => {
     }
     // 设置文件类型
     ctx.type = ext;
-    
+
     if(fileType !== "attachment" && extArr.includes(ext)) { // 图片
       ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
       ctx.body = fs.createReadStream(filePath);

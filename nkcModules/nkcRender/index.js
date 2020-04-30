@@ -28,6 +28,7 @@ class NKCRender {
     // 渲染html
     // <nkcsource></nkcsource>模板解析
     // 学术分判断
+    const self = this;
     let {
       type = "article",
       post = {},
@@ -66,7 +67,7 @@ class NKCRender {
         const id = dom.data().id + "";
         const resource = _resources[id];
         if(resource && !resource._rendered) {
-          resource.oname = plainEscape(resource.oname || "");
+          resource.oname = self.encodeRFC5987ValueChars(resource.oname || "");
           resource._rendered = true;
         }
         return method(_html, id, resource, user);
@@ -105,7 +106,24 @@ class NKCRender {
     }
     return `<div class="render-content math-jax" id="${id}">${html}</div>`;
   }
-
+  encodeRFC5987ValueChars(str) {
+    return encodeURIComponent(str).
+      // 注意，仅管 RFC3986 保留 "!"，但 RFC5987 并没有
+      // 所以我们并不需要过滤它
+      replace(/['()]/g, (c) => {
+        if(c === "'") {
+          return '%27';
+        } else if(c === '(') {
+          return '%28';
+        } else {
+          return '%29';
+        }
+      }). // i.e., %27 %28 %29
+      replace(/\*/g, '%2A');
+      // 下面的并不是 RFC5987 中 URI 编码必须的
+      // 所以对于 |`^ 这3个字符我们可以稍稍提高一点可读性
+      // replace(/%(?:7C|60|5E)/g, unescape);
+  }
   plainEscape(c) {
     c = plainEscape(c);
     return htmlFilter(c);
