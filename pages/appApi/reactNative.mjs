@@ -23,21 +23,55 @@ function urlPathEval(fromUrl, toUrl) {
 
 document.body.addEventListener('click', (e)  => {
   const target = e.target;
-  let $a = null;
-  if (target.nodeName.toLocaleLowerCase() === 'a') {
-    $a = target;
-  } else {
-    $a = $(target).parents('a');
-    if($a.length) $a = $a[0];
-  }
-  const href = $a.getAttribute('href');
-  if($a && $a.getAttribute('data-type') !== 'reload' && href) {
-    e.preventDefault();
-    const targetUrl = urlPathEval(location.href, href);
-    NKC.methods.rn.emit('openNewPage', {
-      href: targetUrl
+  const targetNodeName = target.nodeName.toLowerCase();
+  const dataType = target.getAttribute('data-type');
+  let src = target.getAttribute('src');
+  if(!src) src = target.getAttribute('data-src');
+  if(targetNodeName === 'img' && dataType === 'view' && src) {
+    src = window.location.origin + src;
+    // 图片处理
+    const images = document.querySelectorAll('img[data-type="view"]');
+    const urls = [];
+    let index;
+    for(let i = 0; i < images.length; i++) {
+      const image = images[i];
+      const name = image.getAttribute('alt');
+      let _src = image.getAttribute('src');
+      if(!_src) {
+        _src = image.getAttribute('data-src');
+      }
+      if(!_src) return;
+      _src = window.location.origin + _src;
+      if(_src === src) {
+        index = i;
+      }
+      urls.push({
+        url: _src,
+        name
+      });
+    }
+    NKC.methods.rn.emit('viewImage', {
+      urls,
+      index,
     });
+    e.preventDefault();
+  } else {
+    // 链接处理
+    let $a = null;
+    if (targetNodeName === 'a') {
+      $a = target;
+    } else {
+      $a = $(target).parents('a');
+      if($a.length) $a = $a[0];
+    }
+    let href;
+    if($a) href = $a.getAttribute('href');
+    if(href && $a.getAttribute('data-type') !== 'reload') {
+      e.preventDefault();
+      const targetUrl = urlPathEval(location.href, href);
+      NKC.methods.rn.emit('openNewPage', {
+        href: targetUrl
+      });
+    }
   }
 });
-
-
