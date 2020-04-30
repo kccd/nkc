@@ -68,7 +68,6 @@ class NKCRender {
         const resource = _resources[id];
         if(resource && !resource._rendered) {
           resource.oname = self.encodeRFC5987ValueChars(resource.oname || "");
-          console.log(resource.oname);
           resource._rendered = true;
         }
         return method(_html, id, resource, user);
