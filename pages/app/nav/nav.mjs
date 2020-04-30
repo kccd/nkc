@@ -1,4 +1,4 @@
-if(NKC.configs.platform === 'apiCloud') {
+/*if(NKC.configs.platform === 'apiCloud') {
   $(() => {
     window.ready()
       .then(() => {
@@ -27,14 +27,29 @@ if(NKC.configs.platform === 'apiCloud') {
   });
 } else if(NKC.configs.platform === 'reactNative'){
   window.closeWin = closeWin;
-}
+  window.logout = function() {
+    NKC.methods.rn.emit("logout");
+  }
+}*/
 
 
-function closeWin() {
+window.closeWin = function() {
   if(NKC.configs.platform === 'apiCloud') {
     api.closeWin();
   } else if(NKC.configs.platform === 'reactNative') {
     NKC.methods.rn.emit('closeWebView');
   }
-
-}
+};
+window.logout = function() {
+  nkcAPI("/logout", "GET")
+    .then(() => {
+      if(NKC.configs.platform === 'apiCloud') {
+        emitEvent("logout");
+      } else if(NKC.configs.platform === 'reactNative') {
+        NKC.methods.rn.emit('logout');
+      }
+    })
+    .catch(data => {
+      screenTopWarning(data);
+    })
+};
