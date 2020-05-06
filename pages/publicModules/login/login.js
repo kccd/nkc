@@ -20,8 +20,6 @@ NKC.modules.Login = function() {
       imgCode: "",
       waiting: 0,
       svgData: "",
-
-
       error: "",
       info : "",
       submitting: false,

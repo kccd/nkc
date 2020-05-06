@@ -14,7 +14,7 @@ $(document).ready(function(){
     hidePostMaxHeight = NKC.configs.postHeight.md;
   }
   var hidePostDom = $(".hide-post.part");
-  
+
   new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
   		setTimeout(function() {
@@ -40,7 +40,7 @@ $(document).ready(function(){
 	  .catch(function(data) {
 	  	console.error(data);
 	  });
-  
+
   if(window.moduleToColumn) {
     moduleToColumn.init();
   }
@@ -50,7 +50,7 @@ $(document).ready(function(){
   if(NKC.modules.UserInfo) {
     UserInfo = new NKC.modules.UserInfo();
 	}
-	
+
 	if($("#container").length) {
 		autoSaveDraft();
 	}
@@ -72,12 +72,12 @@ $(document).ready(function(){
 		  contract: ""
 	  }
   });
-  
+
   $("#moduleAuthor").modal({
 	  show: false
   });
-  
-  
+
+
 	//编辑器缩放
   NKC.methods.markDom($("#highlight>.highlight"));
 	if($(".w-e-text-container").length === 0) return;
@@ -135,7 +135,7 @@ $(document).ready(function(){
 
 
 	var editor = geid('ReplyContent');
-	
+
 	var proxy = geid('proxy');
 	if(proxy){
 		proxy.addEventListener('click', function(e) {
@@ -1332,6 +1332,10 @@ $(function() {
 	}
 });
 
+if(NKC.configs.isApp) {
+	window._userSelect = true;
+}
+
 
 
 /*EventTarget.prototype.once = function(name, handle) {
@@ -1357,7 +1361,7 @@ document.addEventListener("selectionchange", function() {
 			if(startNode === endNode) {
 				console.log("[A]需要处理的Node：", startNode);
 			}else {
-				var nodeList = [startNode], 
+				var nodeList = [startNode],
 					currentNode = startNode;
 				// 兄弟节点遍历
 				while(!currentNode.contains(endNode)) {
