@@ -89,6 +89,8 @@
           .pull-left
             input.hidden#moduleSelectResourceInput(type="file" multiple="true" @change="selectedFiles")
             button.btn.btn-default.btn-sm(@click="clickInput") 上传
+            button.btn.btn-default.btn-sm(v-if='isApp' @click="takePicture") 拍照
+            button.btn.btn-default.btn-sm(v-if='isApp' @click="takeVideo") 录像
             button.btn.btn-default.btn-sm(@click="crash") 刷新
             #pasteContent.text-left.hidden-xs.hidden-sm(@click="readyPaste") 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。
           //button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
