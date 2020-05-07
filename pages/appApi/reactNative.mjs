@@ -63,13 +63,17 @@ document.body.addEventListener('click', (e)  => {
       $a = $(target).parents('a');
       if($a.length) $a = $a[0];
     }
-    let href;
-    if($a) href = $a.getAttribute('href');
+    let href, title;
+    if($a) {
+      href = $a.getAttribute('href');
+      title = $a.getAttribute('title');
+    }
     if(href && $a.getAttribute('data-type') !== 'reload') {
       e.preventDefault();
       const targetUrl = urlPathEval(location.href, href);
       NKC.methods.rn.emit('openNewPage', {
-        href: targetUrl
+        href: targetUrl,
+        title
       });
     }
   }

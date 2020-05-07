@@ -20,8 +20,6 @@ NKC.modules.Login = function() {
       imgCode: "",
       waiting: 0,
       svgData: "",
-
-
       error: "",
       info : "",
       submitting: false,
@@ -86,8 +84,12 @@ NKC.modules.Login = function() {
           this.submitting = true;
           nkcAPI("/login", "POST", body)
             .then(function() {
-              window.location.reload();
               this_.succeed = true;
+              if(NKC.configs.isApp) {
+                NKC.methods.rn.emit("login")
+              } else {
+                window.location.reload();
+              }
             })
             .catch(function(data) {
               throwError(data);
@@ -108,7 +110,11 @@ NKC.modules.Login = function() {
             .then(function() {
               // window.location.reload();
               this_.succeed = true;
-              window.location.href = "/register/subscribe";
+              if(NKC.configs.isApp) {
+                NKC.methods.rn.emit("login")
+              } else {
+                window.location.href = "/register/subscribe";
+              }
             })
             .catch(function(data) {
               throwError(data);
@@ -163,18 +169,24 @@ NKC.modules.Login = function() {
           .catch(function(data) {
             sweetError(data);
           })
+      },
+      close: function() {
+        if(NKC.configs.isApp) {
+          NKC.methods.rn.emit("closeWebView");
+        } else {
+          self.dom.modal("hide");
+        }
+      },
+      open: function(type) {
+        self.dom.modal("show");
+        self.app.type = type || "login";
+        self.app.getSvgData();
       }
 
     }
   });
-  self.open = function(type) {
-    self.dom.modal("show");
-    self.app.type = type || "login";
-    self.app.getSvgData();
-  };
-  self.close = function() {
-    self.dom.modal("hide");
-  }
+  self.open = self.app.open;
+  self.close = self.app.close;
 };
 
 var Login = new NKC.modules.Login();
