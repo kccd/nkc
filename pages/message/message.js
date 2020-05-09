@@ -365,7 +365,7 @@ $(function() {
         document.getElementById("btn"+videoId).style.display = "inline-block";
         document.getElementById(videoId).pause();
       },
-      
+
       // 初始化手机页面
       initMobile: function(type) {
         app.showMobileNavbar = true;
@@ -1872,13 +1872,13 @@ function stopOrStartPlay(id) {
   }
 }
 
-// 
+//
 function stopPlayType(id) {
   app.messages[id].c.playType = false;
   Vue.set(app.messages, id, app.messages[id]);
 }
 
-// 
+//
 function startPlayType(id) {
   app.messages[id].c.playType = true;
   Vue.set(app.messages, id, app.messages[id]);
