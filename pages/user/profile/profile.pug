@@ -9,10 +9,11 @@ block content
   .container-fluid.max-width
     .row
       if state.isApp
-        .col-xs-12.col-md-3.box-shadow-panel
-          .app-navs
-            for link in data.appLinks
-              a.app-nav(href=link.url class=link.type===data.type?"active":"" data-type="reload")=link.name
+        if state.platform !== 'reactNative'
+          .col-xs-12.col-md-3.box-shadow-panel
+            .app-navs
+              for link in data.appLinks
+                a.app-nav(href=link.url class=link.type===data.type?"active":"" data-type="reload")=link.name
 
       else
         .col-xs-12.col-md-3.box-shadow-panel

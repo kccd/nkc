@@ -32,7 +32,7 @@ block content
                     .visited-forum-icon(style=`background-color: ${f.color}`)
                   a(href=`/f/${f.fid}`).visited-forum-name= f.displayName
         div
-          if data.t === "subscribe"
+          if data.t === "subscribe" && state.platform !== 'reactNative'
             .subscribe-lists.m-b-1
               .subscribe-list
                 a(data-type="reload" href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
