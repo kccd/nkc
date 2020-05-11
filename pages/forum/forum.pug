@@ -97,7 +97,8 @@ block content
           div
             .m-b-1
               //- 手机导航 其他文章链接
-              include ../publicModules/mobile_drawer/right_drawer
+              if !(state.isApp && state.platform === 'reactNative')
+                include ../publicModules/mobile_drawer/right_drawer
               include ../publicModules/paging/forum_nav
             if data.threadTypes.length
               .forum-category
