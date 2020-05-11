@@ -29,6 +29,8 @@ messageRouter
     const {data, db, query, state} = ctx;
     const {user} = data;
 
+    data.page = query.page;
+
     if(ctx.reqType === "app") {
       data.templates = await db.MessageTypeModel.getTemplates("app");
     } else {
