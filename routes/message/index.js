@@ -26,7 +26,7 @@ messageRouter
     await next();
   })
   .get('/', async (ctx, next) => {
-    const {data, db, query, state} = ctx;
+    const {data, db, query, state, nkcModules} = ctx;
     const {user} = data;
 
     data.page = query.page;
@@ -105,6 +105,10 @@ messageRouter
       userList.push({
         time: tlm || toc,
         type: 'UTU',
+        name: targetUser.username || targetUser.uid,
+        icon: nkcModules.tools.getUrl('userAvatar', targetUser.avatar),
+        platform: targetUser.online? (targetUser.onlineType === 'phone'? 'app': 'web'): 'outline',
+        abstract: typeof message.c === 'string'? message.c : message.c.na,
         user: targetUser,
         friend,
         message,
@@ -120,7 +124,11 @@ messageRouter
         time: message?message.tc: new Date('2000-1-1'),
         type: 'STE',
         message,
-        count: user.newMessage.newSystemInfoCount
+        count: user.newMessage.newSystemInfoCount,
+        name: '系统通知',
+        icon: '/statics/message_type/STE.jpg',
+        platform: null,
+        abstract: message.c,
       });
     }
     // 获取提醒
@@ -134,7 +142,10 @@ messageRouter
         type: 'STU',
         message,
         count: user.newMessage.newReminderCount,
-        content: message?ctx.state.lang("messageTypes", message.c.type):""
+        content: message?ctx.state.lang("messageTypes", message.c.type):"",
+        icon: '/statics/message_type/STU.jpg',
+        platform: null,
+        abstract: message?ctx.state.lang("messageTypes", message.c.type): "",
       });
     }
 
@@ -149,7 +160,11 @@ messageRouter
             type: 'newFriends',
             time: friendsApplication.toc,
             count: newFriendsApplicationCount,
-            targetUser
+            targetUser,
+            name: '新朋友',
+            icon: '/statics/message_type/newFriends.jpg',
+            platform: null,
+            abstract: `${targetUser.username}申请添加你为好友`,
           })
         }
       }
@@ -178,7 +193,12 @@ messageRouter
     // 加载好友
     const friends = await db.FriendModel.find({uid: user.uid});
     const usersFriends = [];
-    await Promise.all(friends.map(async f => {
+
+    let friendList = [];
+
+    const usersIcon = {};
+
+    for(let f of friends) {
       const {tUid} = f;
       const targetUser = await db.UserModel.findOne({uid: tUid});
       if(!targetUser) return;
@@ -186,11 +206,75 @@ messageRouter
       await db.UserModel.extendUserInfo(targetUser);
       f.targetUser = targetUser.toObject();
       usersFriends.push(f);
-    }));
+
+      const fl = {
+        name: f.info.name || targetUser.username || targetUser.uid,
+        icon: nkcModules.tools.getUrl('userAvatar', targetUser.avatar),
+        platform: targetUser.online? (targetUser.onlineType === 'phone'? 'app': 'web'): 'outline',
+        abstract: targetUser.description || '',
+        type: 'UTU',
+        uid: targetUser.uid,
+        fid: f._id,
+      };
+      friendList.push(fl);
+      usersIcon[fl.uid] = fl.icon;
+    }
+
+    friendList = nkcModules.pinyin.getGroupsByFirstLetter(friendList, 'name');
+
+    friendList.unshift({
+      title: '系统',
+      data: [
+        {
+          name: '系统通知',
+          icon: '/statics/message_type/STE.jpg',
+          platform: null,
+          abstract: `系统通知`,
+          type: 'STE',
+          uid: null,
+          fid: null,
+        },
+        {
+          name: '应用提醒',
+          icon: '/statics/message_type/STU.jpg',
+          platform: null,
+          abstract: `应用提醒`,
+          type: 'STU',
+          uid: null,
+          fid: null,
+        },
+        {
+          name: '新朋友',
+          icon: '/statics/message_type/newFriends.jpg',
+          platform: null,
+          abstract: `申请添加好友`,
+          type: 'newFriends',
+          uid: null,
+          fid: null,
+        },
+      ]
+    });
+    data.friendList = friendList;
+
     data.usersFriends = usersFriends;
 
     // 分组信息
     data.categories = await db.FriendsCategoryModel.find({uid: user.uid}).sort({toc: -1});
+
+    const categoryList = [];
+
+    for(const c of data.categories) {
+      const {name, friendsId, description, id} = c;
+      const category = {
+        name,
+        abstract: description,
+        usersId: friendsId,
+        cid: id,
+        icon: friendsId.map(uid => usersIcon[uid]).slice(0, 9)
+      };
+      categoryList.push(category);
+    }
+    data.categoryList = categoryList;
     await next();
   })
   .use('/friendsApplication', friendsApplicationRouter.routes(), friendsApplicationRouter.allowedMethods())
