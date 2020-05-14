@@ -74,7 +74,7 @@ if data.highlight === comment.pid
     -let creditPost = comment;
     include ./postCredits
   div
-    if comment.toDraft
+    if comment.todraft
       div
         .text-center [本条回复已被退回修改，请作者点击编辑按钮修改]
         p.text-center.text-danger= `退修原因：${comment.reason}`

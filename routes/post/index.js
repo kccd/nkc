@@ -62,7 +62,7 @@ router
 	    userOperationsId: data.userOperationsId,
 	    user
     };
-    // 权限判断		
+    // 权限判断
     if(!token){
       // 权限判断
       await post.ensurePermission(options);
@@ -79,7 +79,7 @@ router
 				allShareLimit = new db.ShareLimitModel({});
 				await allShareLimit.save();
       }
-      
+
       let shareLimitTime;
       for(const f of forums) {
         const timeLimit = Number(f.shareLimitTime);
@@ -204,6 +204,7 @@ router
       posts = posts.map(post => {
         const index = toDraftPostsId.indexOf(post.pid);
         if(index !== -1) {
+          post.todraft = true;
           post.reason = toDraftPosts[index].reason;
         }
         post.posts = [];
