@@ -4142,6 +4142,19 @@ span[data-tag="nkcsource"][data-type="attachment"] .article-attachment-reader{
   color: #2b90d9;
   font-weight: 700;
 }
+
+/*公式水平滚动*/
+.MathJax{
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+.MathJax>.MJX-TEX{
+  overflow: hidden;
+  padding: 1px 3px 1px 3px;
+}
 /* 学术分隐藏 旧*/
 .nkcHiddenBox{
   border-style: solid;
