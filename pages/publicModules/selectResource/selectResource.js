@@ -406,7 +406,9 @@ NKC.modules.SelectResource = function() {
         this.getResources(0);
       },
       takePicture: function() {
-        NKC.methods.rn.emit("takePictureAndUpload");
+        NKC.methods.rn.emit("takePictureAndUpload", {}, function(data) {
+          alert(data.path)
+        });
       },
       takeVideo: function() {
         NKC.methods.rn.emit("takeVideoAndUpload");

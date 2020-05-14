@@ -1332,7 +1332,7 @@ $(function() {
 	}
 });
 
-if(NKC.configs.isApp) {
+if (NKC.configs.platform === 'reactNative') {
 	window._userSelect = true;
 }
 

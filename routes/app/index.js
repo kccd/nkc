@@ -57,6 +57,11 @@ appRouter
     ctx.filePath = url;
     await next();
   })
+  .get('/location', async (ctx, next) => {
+    const {data, nkcModules} = ctx;
+    data.location = nkcModules.location;
+    await next();
+  })
   .use("/nav", navRouter.routes(), navRouter.allowedMethods())
   .use('/check', checkRouter.routes(), checkRouter.allowedMethods());
 module.exports = appRouter;

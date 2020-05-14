@@ -1,16 +1,31 @@
-NKC.methods.rn = {};
+NKC.methods.rn = {
+  index: 0,
+  callback: {}
+};
 
 NKC.methods.rn.postMessage = function(obj) {
   window.ReactNativeWebView.postMessage(JSON.stringify(obj));
 };
 
-NKC.methods.rn.emit = function(type, data) {
+NKC.methods.rn.emit = function(type, data, callback) {
   data = data || {};
+  var index = NKC.methods.rn.index++;
+  NKC.methods.rn.callback[index] = callback;
   NKC.methods.rn.postMessage({
     type: type,
-    data: data
+    data: data,
+    webFunctionId: index
   });
 };
+
+NKC.methods.rn.onMessage = function(res) {
+  var webFunctionId = res.webFunctionId;
+  var data = res.data;
+  var func = NKC.methods.rn.callback[webFunctionId];
+  if(func) {
+    func(data);
+  }
+}
 
 function urlPathEval(fromUrl, toUrl) {
   if (!toUrl) {
@@ -20,6 +35,8 @@ function urlPathEval(fromUrl, toUrl) {
   let fullFromUrl = new URL(fromUrl, location.origin);
   return new URL(toUrl, fullFromUrl).href;
 }
+
+
 
 document.body.addEventListener('click', (e)  => {
   const target = e.target;
@@ -79,3 +96,6 @@ document.body.addEventListener('click', (e)  => {
     }
   }
 });
+
+// 同步cookie信息
+NKC.methods.rn.emit('syncPageInfo', {uid: NKC.configs.uid});
