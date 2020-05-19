@@ -12,3 +12,7 @@ script.
     if(typeof moment === "undefined") throw 'moment is not loaded';
     return moment(t).fromNow();
   };
+  NKC.methods.timeFormat = function(t, m) {
+    if (typeof moment === "undefined") throw 'moment is not loaded';
+    return moment(t).format(m || 'YYYY/MM/DD HH:mm:ss');
+  }

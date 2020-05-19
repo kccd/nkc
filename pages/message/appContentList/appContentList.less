@@ -1,0 +1,161 @@
+@backgroundColor: #f2f2f2;
+body, html{
+  height: 100%;
+  background-color: @backgroundColor;
+}
+#container{
+  box-sizing: border-box;
+  position: relative;
+  height: 100%;
+  #listContainer{
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+    width: 100%;
+    .message-emoji{
+      height: 1.4rem;
+      width: 1.4rem;
+      vertical-align: text-bottom;
+    }
+    .listItem{
+      margin: 1rem 1rem;
+      .message-time{
+        text-align: center;
+        span{
+          display: inline-block;
+          font-size: 1.1rem;
+          color: #999;
+          border-radius: 5px;
+        }
+      }
+      .message-withdrawn{
+        text-align: center;
+        span{
+          display: inline-block;
+          font-size: 1.1rem;
+          color: #999;
+          border-radius: 5px;
+        }
+      }
+      .message{
+        display: flex;
+        @imgWidth: 3rem;
+        @smartWidth: 0.5rem;
+        &.left{
+          flex-direction: row;
+          .messageContainer{
+            margin-left: 1rem;
+            margin-right: 2rem;
+            .messageContent{
+              background-color: #fff;
+              color: #555;
+            }
+            .smart{
+              left: -2 * @smartWidth;
+              border-top: @smartWidth solid transparent;
+              border-right: @smartWidth solid #fff;
+              border-bottom: @smartWidth solid transparent;
+              border-left: @smartWidth solid transparent;
+              &:before{
+                left: 0;
+              }
+            }
+          }
+        }
+        &.right{
+          flex-direction: row-reverse;
+          .messageContainer{
+            margin-left: 2rem;
+            margin-right: 1rem;
+            .messageContent{
+              background-color: #6aafe6;
+              color: #fff;
+            }
+            .smart{
+              right: -2 * @smartWidth;
+              border-top: @smartWidth solid transparent;
+              border-right: @smartWidth solid transparent;
+              border-bottom: @smartWidth solid transparent;
+              border-left: @smartWidth solid #6aafe6;
+              &:before{
+                right: 0;
+              }
+            }
+          }
+        }
+        .icon{
+          width: @imgWidth;
+          img{
+            box-sizing: border-box;
+            //border: 2px solid rgba(255, 255, 255, 1);
+            width: @imgWidth;
+            height: @imgWidth;
+            border-radius: @imgWidth/2;
+          }
+        }
+        .messageContainer{
+          min-height: @imgWidth;
+          display: flex;
+          align-items: center;
+          position: relative;
+          .messageContent{
+            min-height: @imgWidth;
+            display: inline-block;
+            word-break: break-all;
+            font-size: 1.3rem;
+            border-radius: 3px;
+            padding: 0.8rem 0.8rem 0.5rem 0.8rem;
+            .image{
+              width: 100%;
+              img{
+                max-height: 30rem;
+                max-width: 100%;
+              }
+            }
+            .video{
+              width: 100%;
+              video{
+                max-height: 30rem;
+                max-width: 100%;
+              }
+            }
+            .audio{
+              width: 100%;
+              audio{
+                max-height: 30rem;
+                max-width: 100%;
+              }
+            }
+          }
+          .smart{
+            position: absolute;
+            top: (@imgWidth - @smartWidth)/2.5;
+            width: 0;
+            height: 0;
+            &:before{
+              height: @smartWidth * 2;
+              width: @smartWidth;
+              background-color: @backgroundColor;
+              position: absolute;
+              border-radius: 5px;
+              content: "";
+              top: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+  #inputContainer{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 5rem;
+    box-sizing: border-box;
+    margin-top: 10rem;
+    background-color: #fff;
+  }
+}
+

@@ -55,6 +55,15 @@ var Tools = function() {
       case "videoCover": {
         return "/frameImg/" + id
       }
+      case "messageResource": {
+        return "/message/resource/" + id;
+      }
+      case "userHome": {
+        return "/u/" + id
+      }
+      case "messageCover": {
+        return "/message/frame/" + id
+      }
     }
   };
   self.floatUserInfo = function(uid) {

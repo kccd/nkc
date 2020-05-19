@@ -127,7 +127,10 @@ router
       ctx.status = 303;
       return ctx.redirect(`/t/${_post.tid}`);
 		}
-		data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
+
+		data.redirect = await db.PostModel.getUrl(_post.pid, true);
+
+		// data.redirect = `/t/${_post.tid}?&pid=${_post.pid}`;
 
     await next();
   })

@@ -112,22 +112,28 @@ NKC.methods.getRunType = function() {
 * @author pengxiguaa 2019-7-26
 * */
 NKC.methods.visitUrl = function(url, blank) {
-  if(NKC.configs.isApp) {
-    if(NKC.configs.platform === "apiCloud") {
-      NKC.methods.openOnlinePage(url);
-    } else if(NKC.configs.platform === 'reactNative') {
-      NKC.methods.rn.emit('openNewPage', {
-        href: location.origin + url
-      });
-    }
-
+  if(!blank) {
+    return window.location.href = url;
   } else {
-    if(blank) {
-      window.open(url);
+    if(NKC.configs.isApp) {
+      if(NKC.configs.platform === 'apiCloud') {
+        NKC.methods.openOnlinePage(url);
+      } else {
+        NKC.methods.rn.emit('openNewPage', {
+          href: location.origin + url
+        });
+      }
     } else {
-      window.location.href = url;
+      window.open(url);
     }
   }
+};
+/*
+* 打开一个新页面并关闭当前页面，用于app发表内容后的跳转，跳转到新页面并关闭编辑器页。
+* @param {String} url 链接
+* */
+NKC.methods.visitUrlAndClose = function(url) {
+  NKC.methods.rn.emit('openNewPageAndClose', {href: location.origin + url})
 };
 /*
 * app打开在线网页

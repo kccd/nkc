@@ -407,11 +407,13 @@ NKC.modules.SelectResource = function() {
       },
       takePicture: function() {
         NKC.methods.rn.emit("takePictureAndUpload", {}, function(data) {
-          alert(data.path)
+          self.app.crash();
         });
       },
       takeVideo: function() {
-        NKC.methods.rn.emit("takeVideoAndUpload");
+        NKC.methods.rn.emit("takeVideoAndUpload", {}, function(data) {
+          self.app.crash();
+        });
       }
     }
   });

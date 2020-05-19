@@ -1,5 +1,6 @@
 const Router = require("koa-router");
 const router = new Router();
+
 router
   .get("/", async (ctx, next) => {
     const {db, query, data, state} = ctx;
@@ -26,6 +27,8 @@ router
 
       const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
       messages.map(m => {
+        delete m.ip;
+        delete m.port;
         if(m.withdrawn) m.c = '';
       });
       data.messages = messages.reverse();
@@ -97,6 +100,9 @@ router
       }
       data.messages = applications.reverse();
     }
+    data.type = type;
+    data.messages2 = await db.MessageModel.extendMessages(data.user.uid, data.messages);
+    ctx.template = 'message/appContentList/appContentList.pug';
     await next();
   });
 module.exports = router;
