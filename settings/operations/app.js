@@ -1,5 +1,8 @@
 module.exports = {
 	GET: 'visitAppDownload',
+	location: {
+		GET: "selectLocation",
+	},
 	check: {
 		GET: 'APPcheckout',
 	},

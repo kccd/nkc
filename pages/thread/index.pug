@@ -209,7 +209,8 @@ block title
               else
                 a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, false)`) 取消屏蔽
 block content
-  include ../publicModules/mobile_drawer/right_drawer
+  if !(state.isApp && state.platform === 'reactNative')
+    include ../publicModules/mobile_drawer/right_drawer
   -const moveThread = data.isModerator || data.userOperationsId.includes('moveThread');
   -const {exactPost} = data
     .container-fluid.max-width

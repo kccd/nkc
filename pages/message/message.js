@@ -1431,6 +1431,9 @@ $(function() {
       this.getUserList()
         .then(function() {
           // 通过名片进入信息页面
+          if(NKC.configs.isApp) {
+            return;
+          }
           if(targetUser) {
             app.selectUser({
               type: 'UTU',
@@ -1452,27 +1455,6 @@ $(function() {
               var li = app.userList[0];
               app.selectUser(li);
             }
-            /*var hasNewMessage = false;
-            // 判断是否有新信息
-            for(var i = 0; i < app.userList.length; i++) {
-              var li = app.userList[i];
-              if(li.count !== 0 && li.type === 'UTU') {
-                hasNewMessage = true;
-                app.selectUser({
-                  type: 'UTU',
-                  user: li.user
-                });
-                break;
-              }
-            }
-            // 若没有新信息则打开第一个人
-            if(!hasNewMessage && app.userList.length > 0) {
-              var li = app.userList[0];
-              app.selectUser({
-                type: 'UTU',
-                user: li.user
-              });
-            }*/
           }
         });
 
@@ -1802,6 +1784,18 @@ $(function() {
           }
         }
       });
+      if(NKC.configs.isApp) {
+        this.showMobileContacts = false;
+        this.showMobileGroups = false;
+        this.showMobileList = false;
+        if(data.page === 'friends') {
+          this.showMobileContacts = true;
+        } else if(data.page === 'categories') {
+          this.showMobileGroups = true;
+        } else {
+          this.showMobileList = true;
+        }
+      }
     }
   })
 });

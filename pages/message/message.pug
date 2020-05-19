@@ -600,7 +600,7 @@ block content
           .ms-list-time {{item.timeStr}}
             .ms-lise-remove.fa.fa-remove(title="移除该聊天" @click.stop='removeChat(item)')
           div.new-message-count(v-if='item.count > 0') {{item.count}}
-  .hidden#data=JSON.stringify({targetUser: data.targetUser, grades: data.grades, messageSettings: data.messageSettings, userDigestThreadCount: data.userDigestThreadCount})
+  .hidden#data=JSON.stringify({page: data.page, targetUser: data.targetUser, grades: data.grades, messageSettings: data.messageSettings, userDigestThreadCount: data.userDigestThreadCount})
   .container-fluid(style='max-width: 1400px;height: 100%;' v-cloak )#app
     //input.hidden#imgInput(type='file' multiple="multiple" accept="image/*" @change="uploadResource")
     input.hidden#fileInput(type='file' multiple="multiple" @change="uploadResource")
@@ -874,6 +874,9 @@ block content
 block footer
 
 block scripts
+  if state.isApp && state.platform === 'reactNative'
+    +includeJS('/socket.io-client/dist/socket.io.js')
+    +includeJS('/message/socket.js')
   script(src=`/bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
   //- 为了让IE兼容Symbol transliteration插件用到该属性
   script.
