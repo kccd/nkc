@@ -519,7 +519,11 @@ function submit(tid) {
       })
     })
     .then(function(data) {
-      openToNewLocation(data.redirect);
+    	if(NKC.configs.platform === 'reactNative') {
+				NKC.methods.visitUrlAndClose(data.redirect);
+			} else {
+				openToNewLocation(data.redirect);
+			}
     })
     .catch(function(data) {
       sweetError(data);

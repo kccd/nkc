@@ -890,7 +890,8 @@ threadRouter
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}`)
 		}
-    data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
+    // data.redirect = `/t/${thread.tid}?&pid=${_post.pid}`;
+    data.redirect = await db.PostModel.getUrl(_post.pid, true);
 		// 如果是编辑的草稿，则删除草稿
     if(did) {
       await db.DraftModel.removeDraftById(did, data.user.uid);

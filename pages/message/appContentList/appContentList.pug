@@ -1,0 +1,43 @@
+extends ../../bootstrap_base
+block title
+  title 聊天窗口
+  +includeCSS('/message/appContentList/appContentList.css')
+block content
+  .hidden#data=objToStr({messages: data.messages2, type: data.type})
+  #container(v-cloak)
+    #listContainer(:style='listContainerStyle')
+      #info 加载更多
+      .listItem(v-for="message in messages")
+        //- 时间戳
+        .message-time(v-if="message.contentType === 'time'")
+          span {{timeFormat(message.content)}}
+        //- 被撤回的消息
+        .message-withdrawn(v-else-if="message.contentType === 'withdrawn'")
+          span(v-if="message.position === 'left'") 对方撤回了一条消息
+          span(v-else) 你撤回了一条消息
+        // 正常消息
+        .message(v-else :class='message.position')
+          .icon(@click='openUserHome(message.sUser.uid)')
+            img(:src="message.sUser.icon")
+          .messageContainer
+            .smart
+            .messageContent
+              .html(v-html='message.content' v-if="message.contentType === 'html'")
+              .image(v-if="message.contentType === 'img'" @click="visitImages(message.content.fileUrl)")
+                img(:src="message.content.fileUrl")
+              .file(v-if="message.contentType === 'file'")
+                a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}
+              .video(v-if="message.contentType === 'video'")
+                video(preload='none' controls='controls' :src="message.content.fileUrl" type="video/mp4" :poster="message.content.fileCover")
+                  | 你的浏览器不支持video标签，请升级。
+              .audio(v-if="message.contentType === 'voice'")
+                audio(preload='none' controls='controls' :src="message.content.fileUrl")
+
+    #inputContainer(:style='inputContainerStyle')
+      .textarea
+        textarea(v-model='content')
+
+
+block scripts
+  include ../../publicModules/moment
+  +includeJS('/message/appContentList/appContentList.js')

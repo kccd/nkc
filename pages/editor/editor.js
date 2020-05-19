@@ -143,7 +143,7 @@ function initVueApp() {
             } else {
               self.visitUrl("/editor?type=redit&id=" + self.oldDraft.did);
             }
-            
+
           })
           .catch(function() { // 用户选择了取消加载，则启动自动保存草稿且开启关闭页面的警告
             self.autoSaveToDraft();
@@ -717,11 +717,15 @@ function initVueApp() {
           })
           .then(function(data) {
             self.showCloseInfo = false;
-            self.visitUrl(data.redirect || "/");
-            if(NKC.configs.isApp) {
+            if(NKC.configs.platform === 'reactNative') {
+              NKC.methods.visitUrlAndClose(data.redirect);
+            } else if(NKC.configs.platform === 'apiCloud') {
+              self.visitUrl(data.redirect || "/");
               setTimeout(function() {
                 api.closeWin();
-              }, 1000)
+              }, 1000);
+            } else {
+              self.visitUrl(data.redirect || "/");
             }
             // 解锁发表按钮
             // PostButton.disabledSubmit = false;
