@@ -98,6 +98,8 @@ const message = async (i) => {
 async function sendMessage(channel, message) {
   try{
     message = JSON.parse(message);
+    const _message = await db.MessageModel.extendMessage(undefined, message);
+    message._message = _message;
     if(channel === 'withdrawn') {
       // 撤回信息
       const {r, s, _id} = message;
@@ -128,6 +130,7 @@ async function sendMessage(channel, message) {
           myUid: r,
           message
         });
+        message._message.position = 'right';
         io.to(`user/${s}`).emit('message', {
           user: sUser,
           targetUser: rUser,

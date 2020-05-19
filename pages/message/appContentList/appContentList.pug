@@ -3,9 +3,9 @@ block title
   title 聊天窗口
   +includeCSS('/message/appContentList/appContentList.css')
 block content
-  .hidden#data=objToStr({messages: data.messages2, type: data.type})
+  .hidden#data=objToStr({tUser: data.tUser, mUser: data.mUser, messages: data.messages2, type: data.type, twemoji: data.twemoji})
   #container(v-cloak)
-    #listContainer(:style='listContainerStyle')
+    #listContainer(ref="listContent")
       #info 加载更多
       .listItem(v-for="message in messages")
         //- 时间戳
@@ -21,6 +21,10 @@ block content
             img(:src="message.sUser.icon")
           .messageContainer
             .smart
+            .status.sending(v-if='message.status === "sending"')
+              .fa.fa-circle-o-notch.fa-spin
+            .status.error(v-else-if='message.status === "error"')
+              .fa.fa-exclamation-circle
             .messageContent
               .html(v-html='message.content' v-if="message.contentType === 'html'")
               .image(v-if="message.contentType === 'img'" @click="visitImages(message.content.fileUrl)")
@@ -33,11 +37,27 @@ block content
               .audio(v-if="message.contentType === 'voice'")
                 audio(preload='none' controls='controls' :src="message.content.fileUrl")
 
-    #inputContainer(:style='inputContainerStyle')
-      .textarea
-        textarea(v-model='content')
+    #inputContainer
+      .option-body.sticker-panel(v-if="showStickerPanel")
+        .sticker-item(v-for="tmj in twemoji")
+          img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectSticker(tmj)")
+      .options
+        .option-item.sticker
+          .fa.fa-smile-o(@click.stop="switchStickerPanel(undefined)")
+        .option-item.photo
+          .fa.fa-camera-retro
+        .option-item.video
+          .fa.fa-video-camera
+        .option-item.file
+          .fa.fa-file-text-o
+      .form
+        .textarea
+          textarea(v-model='content' @input="autoResize()" ref='input' placeholder="请输入聊天内容")
+        .button
+          button(@click="sendMessage()" :class="!content?'disabled':''") 发送
 
 
 block scripts
   include ../../publicModules/moment
+  +includeJS('/plainEscaper.js')
   +includeJS('/message/appContentList/appContentList.js')

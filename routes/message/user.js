@@ -58,6 +58,7 @@ userRouter
     });
     await message.save();
     // 判断是否已创建聊天
+    data.message2 = await db.MessageModel.extendMessage(data.user.uid, message);
     await db.CreatedChatModel.createChat(user.uid, uid, true);
     const message_ = message.toObject();
     message_.socketId = socketId;
