@@ -1,8 +1,11 @@
 const data = NKC.methods.getDataById('data');
 window.app = new Vue({
-  el: '#container',
+  el: '#app',
   data: {
+    // socketID
     socketId: Date.now() + '' + Math.round(Math.random()*1000),
+    // 消息类型，UTU, STU, STE
+    type: data.type,
     // 消息内容列表
     originMessages: data.messages,
     // 是否显示表情列表
@@ -14,7 +17,9 @@ window.app = new Vue({
     // 自己
     mUser: data.mUser,
     // 输入框输入的内容
-    content: ''
+    content: '',
+    // 获取消息内容 锁
+    getMessageStatus: 'canLoad', // canLoad, loading, cantLoad
   },
   methods: {
     // 格式化时间
@@ -22,6 +27,7 @@ window.app = new Vue({
     // 获取链接
     getUrl: NKC.methods.tools.getUrl,
     toast(c) {
+      c = c.error || c.message || c;
       NKC.methods.rn.emit('toast', {
         content: c
       });
@@ -106,26 +112,50 @@ window.app = new Vue({
         href: location.origin + this.getUrl('userHome', uid)
       });
     },
+    // 选择本地附件
+    selectLocalFiles() {
+      const fileDom = this.$refs.file;
+      fileDom.value = null;
+      fileDom.click();
+    },
+    // 选择完本地附件
+    selectedLocalFiles() {
+      const fileDom = this.$refs.file;
+      for(const file of fileDom.files) {
+        this.sendMessage('sendFile', file);
+      }
+    },
     // 发送消息
-    sendMessage(message) {
+    sendMessage(type, c) {
       const self = this;
-      const type = message? 'resend': 'send';
-      const focus = $(this.$refs.input).is(':focus');
-      if(!message) {
+      NKC.methods.rn.emit('getKeyboardStatus', {}, function(data) {
+        self.keepFocus(data.keyboardStatus === 'show');
+      })
+      let message
+
+      if(['sendText', 'sendFile'].includes(type)) {
         // 发送一条信息
-        const {content} = self;
         const localMessageId = Date.now();
         message = {
           _id: localMessageId,
           contentType: 'html',
-          content,
           s: self.mUser.uid,
           r: self.tUser.uid,
           messageType: 'UTU',
         }
+        const formData = new FormData();
+        if(type === 'sendText') {
+          message.content = c;
+        } else {
+          message.content = c.name;
+          formData.append('file', c);
+        }
+        formData.append('content', message.content);
+        formData.append('socketId', self.socketId);
+        message.formData = formData;
       } else {
         // 重发一条消息
-
+        message = c;
       }
       message.status = 'sending'; // sent已发送、sending正在发送、error出错
       message.time = Date.now();
@@ -133,15 +163,15 @@ window.app = new Vue({
       Promise.resolve()
         .then(() => {
           if(!message.content) throw '请输入聊天内容';
-          self.originMessages.push(message);
+          if(type !== 'resend') {
+            self.originMessages.push(message);
+          }
           self.content = "";
           self.autoResize(true);
           self.scrollToBottom();
-          self.keepFocus(true);
-          return nkcAPI(`/message/user/${message.r}`, 'POST', {
-            content: message.content,
-            socketId: self.socketId,
-          });
+          // self.keepFocus(true);
+
+          return nkcUploadFile(`/message/user/${message.r}`, 'POST', message.formData);
         })
         .then((data) => {
           const index = self.originMessages.indexOf(message);
@@ -156,15 +186,103 @@ window.app = new Vue({
           self.toast(data.error || data.message || data);
         })
     },
+    // 获取消息
+    getMessage() {
+      const {firstMessageId, tUser, type} = self = this;
+      let url = `/message/data?type=${type}`;
+      if(firstMessageId) {
+        url += `&firstMessageId=${firstMessageId}`;
+      }
+      if(tUser.uid) {
+        url += `&uid=${tUser.uid}`;
+      }
+      if(self.getMessageStatus !== 'canLoad') return;
+      self.getMessageStatus = 'loading';
+      return nkcAPI(url, 'GET')
+        .then(data => {
+          self.originMessages = self.originMessages.concat(data.messages2);
+          if(data.messages2.length) {
+            self.getMessageStatus = 'canLoad';
+          } else {
+            self.getMessageStatus = 'cantLoad';
+          }
+        })
+        .catch(data => {
+          self.toast(data);
+          self.getMessageStatus = 'canLoad';
+        });
+    },
+    getOriginMessageById(id) {
+      for(const m of this.originMessages) {
+        if(m._id === id) return m;
+      }
+    },
+    // rn接收到新消息通知web
     insertMessage(message) {
-      if(![this.tUser.uid, this.mUser.uid].includes(message.r)) return;
+      const {messageType, r, s} = message;
+      const {tUser, mUser} = this;
+      if(messageType === 'UTU') {
+        const usersId = [tUser.uid, mUser.uid];
+        if(!usersId.includes(r) || !usersId.includes(s)) return;
+      } else {
+        if(r !== mUser.uid) return;
+      }
       this.originMessages.push(message);
+      if(this.mUser.uid !== message.s) {
+        this.markAsRead();
+      }
       this.scrollToBottom();
+    },
+    // 撤回
+    withdrawn(messageId, targetUser) {
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          if(!targetUser) {
+            return nkcAPI('/message/withdrawn', 'PATCH', {messageId})
+          }
+        })
+        .then(() => {
+          const originMessage = self.getOriginMessageById(messageId);
+          if(originMessage) originMessage.contentType = 'withdrawn';
+        })
+        .catch(self.toast)
+    },
+    // 标记为已读
+    markAsRead() {
+      const {type, tUser} = self = this;
+      nkcAPI('/message/mark', 'PATCH', {
+        type,
+        uid: tUser.uid
+      })
+        .catch(self.toast)
+    },
+    // 调用原生拍照
+    useCamera(type) {
+      let name = 'takePictureAndSendToUser';
+      if(type === 'video') {
+        name = 'takeVideoAndSendToUser';
+      }
+      NKC.methods.rn.emit(name, {
+        uid: this.tUser.uid,
+        socketId: null
+      });
     }
   },
   computed: {
+    // 第一条消息的ID，用户加载消息内容列表
+    firstMessageId() {
+      const {messages} = this;
+      for(const m of messages) {
+        if(m.contentType !== 'time') {
+          return m._id;
+        }
+      }
+    },
+    // 处理过的消息内容列表
     messages() {
       const {originMessages, mUser, tUser} = this;
+      const now = new Date().getTime();
       let messagesId = [];
       const messagesObj = {};
       const messages = [];
@@ -174,8 +292,10 @@ window.app = new Vue({
         messagesId.push(_id);
         m.position = ownMessage? 'right': 'left';
         m.sUser = ownMessage? mUser: tUser;
+        m.canWithdrawn = m.status === 'sent' && ownMessage && (now - new Date(m.time) < 60000);
         messagesObj[_id] = m;
       }
+      messagesId = [...new Set(messagesId)];
       messagesId = messagesId.sort((a, b) => a - b);
       for(const id of messagesId) {
         messages.push(messagesObj[id]);
@@ -205,11 +325,27 @@ window.app = new Vue({
   },
   mounted() {
     const self = this;
+    const listContent = self.$refs.listContent;
     window.addEventListener('click', () => {
       if(self.showStickerPanel) {
         self.switchStickerPanel(false);
       }
     });
-    self.scrollToBottom()
+    self.scrollToBottom();
+    listContent.onscroll = function() {
+      const scrollTop = this.scrollTop;
+      if(scrollTop > 20) return;
+      listContent.scrollTo = listContent.scrollTop;
+      listContent.height = listContent.scrollHeight;
+      self.getMessage()
+        .then(function() {
+          const height = listContent.scrollHeight;
+          listContent.scrollTop = height - listContent.height;
+        })
+        .catch(function(data){
+          self.toast(data.error || data.message || data);
+        })
+
+    }
   }
 });

@@ -662,13 +662,14 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
           message.contentType = 'html';
           message.content = c;
         } else {
-          const {id, na, ty} = c;
+          const {id, na, ty, vl} = c;
           message.contentType = ty; // img, voice, file, video
           message.content = {
             filename: na,
             fileId: id,
             fileUrl: getUrl('messageResource', id),
-            fileCover: getUrl('messageCover', id)
+            fileCover: getUrl('messageCover', id),
+            fileTimer: vl
           }
         }
       }
@@ -689,7 +690,7 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
       message.content = message.content.replace(/\[f\/(.*?)]/g, function(r, v1) {
         return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
       });
-      message.content = nkcRender.htmlFilter(message.content);
+      message.content = nkcRender.URLifyHTML(message.content);
     }
     _messages.push(message);
   }

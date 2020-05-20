@@ -1,6 +1,6 @@
 @import '../../publicModules/base';
 @backgroundColor: #f2f2f2;
-body, html{
+body, html, #app{
   height: 100%;
   background-color: @backgroundColor;
 }
@@ -20,6 +20,11 @@ body, html{
     //background-color: green;
     /*height: 100%;
     width: 100%;*/
+    #info{
+      text-align: center;
+      color: #888;
+      padding: 0.5rem 0;
+    }
     .message-emoji{
       height: 1.8rem;
       width: 1.8rem;
@@ -76,7 +81,7 @@ body, html{
         &.right{
           flex-direction: row-reverse;
           .messageContainer{
-            margin-left: 2rem;
+            margin-left: 3rem;
             margin-right: 1rem;
             .messageContent{
               background-color: #6aafe6;
@@ -175,11 +180,16 @@ body, html{
               color: #ccc;
               font-size: 1.5rem;
             }
+            &.withdrawn{
+              color: #ccc;
+              font-size: 1.8rem;
+            }
           }
         }
       }
     }
   }
+
   #inputContainer{
     //position: absolute;
     //bottom: 0;

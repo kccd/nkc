@@ -94,6 +94,7 @@ messageRouter
       let message = messageObj[lmId];
       if(!message) {
         message = {
+          _id: null,
           ty: "UTU",
           c: "",
           tc: c.toc
@@ -102,13 +103,25 @@ messageRouter
       const targetUser = userObj[tUid];
       if(!targetUser) continue;
       const friend = friendObj[tUid];
+      let abstract;
+      if(message.withdrawn) {
+        if(message.r === user.uid) {
+          abstract = '对方撤回了一条消息';
+        } else {
+          abstract = '你撤回了一条消息';
+        }
+      } else {
+        abstract = typeof message.c === 'string'? message.c : message.c.na;
+      }
       userList.push({
         time: tlm || toc,
         type: 'UTU',
         name: targetUser.username || targetUser.uid,
+        uid: targetUser.uid,
         icon: nkcModules.tools.getUrl('userAvatar', targetUser.avatar),
         platform: targetUser.online? (targetUser.onlineType === 'phone'? 'app': 'web'): 'outline',
-        abstract: typeof message.c === 'string'? message.c : message.c.na,
+        abstract,
+        messageId: message? message._id: null,
         user: targetUser,
         friend,
         message,
@@ -124,10 +137,12 @@ messageRouter
         time: message?message.tc: new Date('2000-1-1'),
         type: 'STE',
         message,
+        uid: null,
         count: user.newMessage.newSystemInfoCount,
         name: '系统通知',
         icon: '/statics/message_type/STE.jpg',
         platform: null,
+        messageId: message? message._id: null,
         abstract: message.c,
       });
     }
@@ -141,6 +156,8 @@ messageRouter
         timeStr: message?moment(message.tc).format("MM/DD HH:mm"): moment().format("MM/DD HH:mm"),
         type: 'STU',
         message,
+        uid: null,
+        messageId: message? message._id: null,
         count: user.newMessage.newReminderCount,
         content: message?ctx.state.lang("messageTypes", message.c.type):"",
         icon: '/statics/message_type/STU.jpg',
@@ -160,7 +177,9 @@ messageRouter
             type: 'newFriends',
             time: friendsApplication.toc,
             count: newFriendsApplicationCount,
+            uid: null,
             targetUser,
+            messageId: null,
             name: '新朋友',
             icon: '/statics/message_type/newFriends.jpg',
             platform: null,

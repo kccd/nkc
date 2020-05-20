@@ -3,61 +3,70 @@ block title
   title 聊天窗口
   +includeCSS('/message/appContentList/appContentList.css')
 block content
-  .hidden#data=objToStr({tUser: data.tUser, mUser: data.mUser, messages: data.messages2, type: data.type, twemoji: data.twemoji})
-  #container(v-cloak)
-    #listContainer(ref="listContent")
-      #info 加载更多
-      .listItem(v-for="message in messages")
-        //- 时间戳
-        .message-time(v-if="message.contentType === 'time'")
-          span {{timeFormat(message.content)}}
-        //- 被撤回的消息
-        .message-withdrawn(v-else-if="message.contentType === 'withdrawn'")
-          span(v-if="message.position === 'left'") 对方撤回了一条消息
-          span(v-else) 你撤回了一条消息
-        // 正常消息
-        .message(v-else :class='message.position')
-          .icon(@click='openUserHome(message.sUser.uid)')
-            img(:src="message.sUser.icon")
-          .messageContainer
-            .smart
-            .status.sending(v-if='message.status === "sending"')
-              .fa.fa-circle-o-notch.fa-spin
-            .status.error(v-else-if='message.status === "error"')
-              .fa.fa-exclamation-circle
-            .messageContent
-              .html(v-html='message.content' v-if="message.contentType === 'html'")
-              .image(v-if="message.contentType === 'img'" @click="visitImages(message.content.fileUrl)")
-                img(:src="message.content.fileUrl")
-              .file(v-if="message.contentType === 'file'")
-                a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}
-              .video(v-if="message.contentType === 'video'")
-                video(preload='none' controls='controls' :src="message.content.fileUrl" type="video/mp4" :poster="message.content.fileCover")
-                  | 你的浏览器不支持video标签，请升级。
-              .audio(v-if="message.contentType === 'voice'")
-                audio(preload='none' controls='controls' :src="message.content.fileUrl")
+  .hidden#data=objToStr({type: data.type, tUser: data.tUser, mUser: data.mUser, messages: data.messages2, type: data.type, twemoji: data.twemoji})
+  #app(v-cloak)
+    #container
+      #listContainer(ref="listContent")
+        #info
+          span(v-if="getMessageStatus === 'loading'") 加载中~
+          //span(v-else-if="getMessageStatus === 'canLoad'") 加载中~
+          span(v-else-if="getMessageStatus === 'cantLoad'") 到顶了
+        .listItem(v-for="message in messages")
+          //- 时间戳
+          .message-time(v-if="message.contentType === 'time'")
+            span {{timeFormat(message.content)}}
+          //- 被撤回的消息
+          .message-withdrawn(v-else-if="message.contentType === 'withdrawn'")
+            span(v-if="message.position === 'left'") 对方撤回了一条消息
+            span(v-else) 你撤回了一条消息
+          // 正常消息
+          .message(v-else :class='message.position')
+            .icon(@click='openUserHome(message.sUser.uid)')
+              img(:src="message.sUser.icon")
+            .messageContainer
+              .smart
+              .status.sending(v-if='message.status === "sending"')
+                .fa.fa-circle-o-notch.fa-spin
+              .status.error(v-else-if='message.status === "error"' @click="sendMessage('resend', message)")
+                .fa.fa-exclamation-circle
+              .status.withdrawn(v-if='message.canWithdrawn' @click="withdrawn(message._id)")
+                .fa.fa-trash
+              .messageContent
+                .html(v-html='message.content' v-if="message.contentType === 'html'")
+                .image(v-if="message.contentType === 'img'" @click="visitImages(message.content.fileUrl)")
+                  img(:src="message.content.fileUrl")
+                .file(v-if="message.contentType === 'file'")
+                  a(:href="message.content.fileUrl" target='_blank') {{message.content.filename}}
+                .video(v-if="message.contentType === 'video'")
+                  video(preload='none' controls='controls' :src="message.content.fileUrl" type="video/mp4" :poster="message.content.fileCover")
+                    | 你的浏览器不支持video标签，请升级。
+                .audio(v-if="message.contentType === 'voice'")
+                  audio(preload='none' controls='controls' :src="message.content.fileUrl")
 
-    #inputContainer
-      .option-body.sticker-panel(v-if="showStickerPanel")
-        .sticker-item(v-for="tmj in twemoji")
-          img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectSticker(tmj)")
-      .options
-        .option-item.sticker
-          .fa.fa-smile-o(@click.stop="switchStickerPanel(undefined)")
-        .option-item.photo
-          .fa.fa-camera-retro
-        .option-item.video
-          .fa.fa-video-camera
-        .option-item.file
-          .fa.fa-file-text-o
-      .form
-        .textarea
-          textarea(v-model='content' @input="autoResize()" ref='input' placeholder="请输入聊天内容")
-        .button
-          button(@click="sendMessage()" :class="!content?'disabled':''") 发送
+      #inputContainer(v-if="type === 'UTU'")
+        input.hidden(type='file' multiple='true' ref='file' @change="selectedLocalFiles")
+        .option-body.sticker-panel(v-if="showStickerPanel")
+          .sticker-item(v-for="tmj in twemoji")
+            img.emoji(:src="'/twemoji/2/svg/' + tmj + '.svg'" @click="selectSticker(tmj)")
+        .options
+          .option-item.sticker(@click.stop="switchStickerPanel(undefined)")
+            .fa.fa-smile-o
+          .option-item.photo(@click='useCamera("picture")')
+            .fa.fa-camera-retro
+          .option-item.video(@click='useCamera("video")')
+            .fa.fa-video-camera
+          .option-item.file(@click='selectLocalFiles')
+            .fa.fa-file-text-o
+        .form
+          .textarea
+            textarea(v-model='content' @input="autoResize()" ref='input' placeholder="请输入聊天内容")
+          .button
+            button(@click="sendMessage('sendText', content)" :class="!content?'disabled':''") 发送
 
 
 block scripts
+  script.
+    window._userSelect = true;
   include ../../publicModules/moment
   +includeJS('/plainEscaper.js')
   +includeJS('/message/appContentList/appContentList.js')

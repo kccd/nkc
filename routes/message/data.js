@@ -3,7 +3,7 @@ const router = new Router();
 
 router
   .get("/", async (ctx, next) => {
-    const {db, query, data, state, nkcModules} = ctx;
+    const {db, query, data, state, nkcModules, redis} = ctx;
     const {user} = data;
     const {type, firstMessageId, uid} = query;
     data.twemoji = state.twemoji;
@@ -133,6 +133,14 @@ router
       name: user.username || user.uid
     }
     data.messages2 = await db.MessageModel.extendMessages(data.user.uid, data.messages);
+
+    await redis.pubMessage({
+      ty: 'markAsRead',
+      messageType: type,
+      uid: user.uid,
+      targetUid: uid
+    });
+
     ctx.template = 'message/appContentList/appContentList.pug';
     await next();
   });
