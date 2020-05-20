@@ -3,6 +3,7 @@ const htmlFilter = require("./htmlFilter");
 const markNotes = require("./markNotes");
 const twemoji = require("twemoji");
 const plainEscape = require("../plainEscaper");
+const URLifyHTML = require("../URLifyHTML");
 const fs = require("fs");
 const path = require("path");
 const filePath = path.resolve(__dirname, "./sources");
@@ -126,6 +127,10 @@ class NKCRender {
   }
   plainEscape(c) {
     c = plainEscape(c);
+    return htmlFilter(c);
+  }
+  URLifyHTML(c) {
+    c = URLifyHTML(c);
     return htmlFilter(c);
   }
   htmlToPlain(html = "", count) {

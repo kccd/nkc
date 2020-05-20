@@ -3,10 +3,11 @@ const router = new Router();
 
 router
   .get("/", async (ctx, next) => {
-    const {db, query, data, state} = ctx;
+    const {db, query, data, state, nkcModules, redis} = ctx;
     const {user} = data;
     const {type, firstMessageId, uid} = query;
     data.twemoji = state.twemoji;
+    const {getUrl} = nkcModules.tools;
     if(type === "UTU") {
       const targetUser = await db.UserModel.findOnly({uid});
       const q = {
@@ -33,6 +34,12 @@ router
       });
       data.messages = messages.reverse();
       data.targetUser = targetUser;
+      data.tUser = {
+        uid: targetUser.uid,
+        home: getUrl('userHome', targetUser.uid),
+        icon: getUrl('userAvatar', targetUser.avatar),
+        name: targetUser.username || targetUser.uid
+      }
       await db.UserModel.extendUserInfo(targetUser);
       data.targetUserGrade = await targetUser.extendGrade();
       await db.MessageModel.updateMany({ty: 'UTU', r: user.uid, s: uid, vd: false}, {$set: {vd: true}});
@@ -57,6 +64,12 @@ router
       }
       const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
       data.messages = messages.reverse();
+      data.tUser = {
+        icon: '/statics/message_type/STE.jpg',
+        name: '系统通知',
+        uid: null,
+        home: null
+      }
     } else if(type === "STU") {
       const {user} = data;
       const q = {
@@ -72,6 +85,12 @@ router
       const remind = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
       const messages = await db.MessageModel.extendSTUMessages(remind);
       data.messages = messages.reverse();
+      data.tUser = {
+        icon: '/statics/message_type/STU.jpg',
+        name: '应用提醒',
+        uid: null,
+        home: null
+      }
     } else if(type === "newFriends") {
       const q = {
         respondentId: user.uid
@@ -99,9 +118,29 @@ router
         });
       }
       data.messages = applications.reverse();
+      data.tUser = {
+        icon: '/statics/message_type/newFriends.jpg',
+        name: '新朋友',
+        uid: null,
+        home: null
+      }
     }
     data.type = type;
+    data.mUser = {
+      uid: user.uid,
+      home: getUrl('userHome', user.uid),
+      icon: getUrl('userAvatar', user.avatar),
+      name: user.username || user.uid
+    }
     data.messages2 = await db.MessageModel.extendMessages(data.user.uid, data.messages);
+
+    await redis.pubMessage({
+      ty: 'markAsRead',
+      messageType: type,
+      uid: user.uid,
+      targetUid: uid
+    });
+
     ctx.template = 'message/appContentList/appContentList.pug';
     await next();
   });

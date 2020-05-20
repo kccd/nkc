@@ -708,3 +708,19 @@ NKC.methods.ueditor = {
     return html;
   }
 };
+
+/*
+* 打开聊天页面
+* */
+
+NKC.methods.toChat = function(uid, name, type) {
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('toChat', {
+      uid: uid,
+      name: name || uid,
+      type: type || 'UTU'
+    });
+  } else {
+    NKC.methods.visitUrl("/message?uid=" + uid, true);
+  }
+}

@@ -619,121 +619,81 @@ messageSchema.statics.sendFundMessage = async (applicationFormId, type) => {
   }
 };
 
+messageSchema.statics.extendMessage = async (uid, message) => {
+  const messages = await mongoose.model("messages").extendMessages(uid, [message]);
+  for(const m of messages) {
+    if(m.contentType !== 'time') {
+      return m;
+    }
+  }
+}
+
 messageSchema.statics.extendMessages = async (uid, messages) => {
 
   // contentType: html, file, video, voice, img, time
+  // status: sent, sending, error
 
   const nkcRender = require("../nkcModules/nkcRender");
   const {getUrl} = require("../nkcModules/tools");
-  const UserModel = mongoose.model("users");
   const _messages = [];
-  const usersId = [], usersObj = {};
 
-  messages.map(m => {
-    if(m.s) usersId.push(m.s);
-    if(m.r) usersId.push(m.r);
-  });
-
-  const users = await UserModel.find({uid: {$in: usersId}});
-
-  users.map(u => {
-    const {uid, avatar, username} = u;
-    usersObj[uid] = {
-      uid,
-      home: getUrl('userHome', uid),
-      icon: getUrl('userAvatar', avatar),
-      name: username
-    }
-  });
 
   for(let i = 0; i < messages.length; i++) {
 
     const m = messages[i];
     const {r, s, ty, tc, c, _id, withdrawn} = m;
 
-    // 添加时间戳
-    // 第一条信息 || 相隔时间超过60秒
-    //
-    if(i === 0) {
-      _messages.push({
-        contentType: 'time',
-        content: tc,
-      });
-    } else {
-      const lastMessage = messages[i - 1];
-      if(new Date(tc).getTime() - new Date(lastMessage.tc).getTime() > 60000) {
-        _messages.push({
-          contentType: 'time',
-          content: tc,
-        });
-      }
-    }
-
     const message = {
-      position: 'left',
-      rUser: usersObj[r],
-      sUser: null,
+      r,
+      s,
       messageType: ty,
       time: tc,
       _id,
+      status: 'sent',
     };
 
     if(ty === 'UTU') {
-      message.position = s === uid? 'right': 'left';
-      message.sUser = usersObj[s];
+      // 用户
       if(withdrawn) {
         message.contentType = 'withdrawn';
         message.content = null;
       } else {
         if(typeof c === 'string') {
           message.contentType = 'html';
-          message.content = nkcRender.plainEscape(c);
+          message.content = c;
         } else {
-          const {id, na, ty} = c;
+          const {id, na, ty, vl} = c;
           message.contentType = ty; // img, voice, file, video
           message.content = {
             filename: na,
             fileId: id,
             fileUrl: getUrl('messageResource', id),
-            fileCover: getUrl('messageCover', id)
+            fileCover: getUrl('messageCover', id),
+            fileTimer: vl
           }
         }
       }
     } else if(ty === 'STE') {
-      message.sUser = {
-        icon: '/statics/message_type/STE.jpg',
-        name: '系统通知',
-        uid: null,
-        home: null
-      }
+      // 系统通知
       message.contentType = 'html';
-      message.content = nkcRender.plainEscape(c);
+      message.content = c;
     } else if(ty === 'STU') {
-      message.sUser = {
-        icon: '/statics/message_type/STU.jpg',
-        name: '应用提醒',
-        uid: null,
-        home: null
-      }
+      // 应用提醒
+      message.contentType = 'html';
     } else if(ty === 'newFriends') {
-      message.sUser = {
-        icon: '/statics/message_type/newFriends.jpg',
-        name: '新朋友',
-        uid: null,
-        home: null
-      }
+      // 新朋友
+      message.contentType = 'html';
     }
 
     if(message.contentType === 'html' && message.content) {
+      message.content = nkcRender.plainEscape(message.content);
       message.content = message.content.replace(/\[f\/(.*?)]/g, function(r, v1) {
         return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
       });
-      message.content = nkcRender.htmlFilter(message.content);
+      message.content = nkcRender.URLifyHTML(message.content);
     }
-
     _messages.push(message);
   }
-  console.log(_messages[0]);
   return _messages;
 };
 

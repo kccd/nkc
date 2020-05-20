@@ -1,5 +1,6 @@
+@import '../../publicModules/base';
 @backgroundColor: #f2f2f2;
-body, html{
+body, html, #app{
   height: 100%;
   background-color: @backgroundColor;
 }
@@ -7,15 +8,26 @@ body, html{
   box-sizing: border-box;
   position: relative;
   height: 100%;
+  //background-color: red;
+  display: flex;
+  flex-direction: column;
   #listContainer{
     box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: auto;
-    height: 100%;
+    flex: 1;
     width: 100%;
+    //background-color: green;
+    /*height: 100%;
+    width: 100%;*/
+    #info{
+      text-align: center;
+      color: #888;
+      padding: 0.5rem 0;
+    }
     .message-emoji{
-      height: 1.4rem;
-      width: 1.4rem;
+      height: 1.8rem;
+      width: 1.8rem;
       vertical-align: text-bottom;
     }
     .listItem{
@@ -46,7 +58,7 @@ body, html{
           flex-direction: row;
           .messageContainer{
             margin-left: 1rem;
-            margin-right: 2rem;
+            margin-right: 3rem;
             .messageContent{
               background-color: #fff;
               color: #555;
@@ -61,16 +73,22 @@ body, html{
                 left: 0;
               }
             }
+            .status{
+              right: -2rem;
+            }
           }
         }
         &.right{
           flex-direction: row-reverse;
           .messageContainer{
-            margin-left: 2rem;
+            margin-left: 3rem;
             margin-right: 1rem;
             .messageContent{
               background-color: #6aafe6;
               color: #fff;
+              a{
+                color: #fff;
+              }
             }
             .smart{
               right: -2 * @smartWidth;
@@ -81,6 +99,9 @@ body, html{
               &:before{
                 right: 0;
               }
+            }
+            .status{
+              left: -2rem;
             }
           }
         }
@@ -106,6 +127,9 @@ body, html{
             font-size: 1.3rem;
             border-radius: 3px;
             padding: 0.8rem 0.8rem 0.5rem 0.8rem;
+            a{
+              text-decoration: underline;
+            }
             .image{
               width: 100%;
               img{
@@ -130,7 +154,7 @@ body, html{
           }
           .smart{
             position: absolute;
-            top: (@imgWidth - @smartWidth)/2.5;
+            top: (@imgWidth - @smartWidth)/3;
             width: 0;
             height: 0;
             &:before{
@@ -140,22 +164,120 @@ body, html{
               position: absolute;
               border-radius: 5px;
               content: "";
-              top: 0;
+              top: @smartWidth * -2;
+            }
+          }
+          .status{
+            position: absolute;
+            top: 0;
+            font-size: 1.8rem;
+            width: 2rem;
+            text-align: center;
+            &.error{
+              color: @accent;
+            }
+            &.sending{
+              color: #ccc;
+              font-size: 1.5rem;
+            }
+            &.withdrawn{
+              color: #ccc;
+              font-size: 1.8rem;
             }
           }
         }
       }
     }
   }
+
   #inputContainer{
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    //position: absolute;
+    //bottom: 0;
+    //left: 0;
     width: 100%;
-    height: 5rem;
     box-sizing: border-box;
-    margin-top: 10rem;
     background-color: #fff;
+    padding: 0.5rem 1rem;
+    .options{
+      height: 2rem;
+      line-height: 2.4rem;
+      margin-bottom: 0.5rem;
+      .option-item{
+        margin-right: 1rem;
+        font-size: 1.8rem;
+        display: inline-block;
+        &.photo{
+          font-size: 1.7rem;
+        }
+        &.file{
+          font-size: 1.7rem;
+        }
+      }
+    }
+    .form{
+      display: flex;
+      @inputHeight: 2.8rem;
+      .textarea{
+        font-size: 0;
+        flex: 1;
+        textarea{
+          width: 100%;
+          font-size: 1.4rem;
+          padding: 0.5rem;
+          min-height: @inputHeight;
+          max-height: 7rem;
+          height: @inputHeight;
+          overflow-x: hidden;
+          overflow-y: auto;
+          border-radius: 3px;
+          border: 1px solid #eee;
+          resize: none;
+          &:focus{
+            outline: none;
+          }
+        }
+      }
+      .button{
+        width: 5rem;
+        margin-left: 1rem;
+        position: relative;
+        button{
+          width: 100%;
+          position: absolute;
+          border-radius: 3px;
+          color: #fff;
+          height: @inputHeight;
+          bottom: 0;
+          left: 0;
+          border: none;
+          background-color: @primary;
+          &:focus{
+            outline: none;
+          }
+          &:active{
+            opacity: 0.7;
+          }
+          &.disabled{
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+    .option-body.sticker-panel{
+      background-color: #f4f4f4;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      .sticker-item{
+        display: inline-block;
+        height: 2rem;
+        width: 12.5%;
+        margin: 0.5rem 0;
+        img{
+          height: 100%;
+          width: 100%;
+        }
+      }
+    }
   }
 }
 
