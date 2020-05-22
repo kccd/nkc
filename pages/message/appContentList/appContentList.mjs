@@ -98,7 +98,7 @@ window.app = new Vue({
           });
         }
       }
-      urls.reverse();
+      // urls.reverse();
       const index = urls.map(u => u.url).indexOf(url);
       urls.map(u => u.url = location.origin + u.url);
       NKC.methods.rn.emit('viewImage', {
@@ -221,16 +221,22 @@ window.app = new Vue({
     insertMessage(message) {
       const {messageType, r, s} = message;
       const {tUser, mUser} = this;
+
       if(messageType === 'UTU') {
         const usersId = [tUser.uid, mUser.uid];
         if(!usersId.includes(r) || !usersId.includes(s)) return;
-      } else {
+        if(this.mUser.uid !== message.s) {
+          this.markAsRead();
+        }
+      } else if(messageType === 'STU') {
+        if(r !== mUser.uid) return;
+        this.markAsRead();
+      } else if(messageType === 'STE') {
+        this.markAsRead();
+      } else if(messageType === 'friendsApplication') {
         if(r !== mUser.uid) return;
       }
       this.originMessages.push(message);
-      if(this.mUser.uid !== message.s) {
-        this.markAsRead();
-      }
       this.scrollToBottom();
     },
     // 撤回
@@ -251,22 +257,39 @@ window.app = new Vue({
     // 标记为已读
     markAsRead() {
       const {type, tUser} = self = this;
-      nkcAPI('/message/mark', 'PATCH', {
-        type,
-        uid: tUser.uid
-      })
-        .catch(self.toast)
+      setTimeout(() => {
+        nkcAPI('/message/mark', 'PATCH', {
+          type,
+          uid: tUser.uid
+        })
+          .catch(self.toast)
+      }, 1000);
+
     },
-    // 调用原生拍照
+    // 调用原生拍照、录像和录音
     useCamera(type) {
       let name = 'takePictureAndSendToUser';
       if(type === 'video') {
         name = 'takeVideoAndSendToUser';
+      } else if(type === 'audio') {
+        name = 'recordAudioAndSendToUser';
       }
       NKC.methods.rn.emit(name, {
         uid: this.tUser.uid,
         socketId: null
       });
+    },
+    // 处理好友添加申请
+    newFriendOperation(id, agree) {
+      const self = this;
+      const message = self.getOriginMessageById(id);
+      nkcAPI('/u/' + message.s + '/friends/agree', 'POST', {
+        agree,
+      })
+        .then(function(data) {
+          message.content = data.message.content;
+        })
+        .catch(self.toast)
     }
   },
   computed: {

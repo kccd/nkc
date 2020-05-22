@@ -131,6 +131,18 @@ html,
   align-items: center;
   position: relative;
 }
+#container #listContainer .listItem .message .messageContainer.nkc-media {
+  padding-top: 0.5rem;
+}
+#container #listContainer .listItem .message .messageContainer.nkc-media .messageContent {
+  font-size: 0!important;
+  overflow: hidden;
+  border-radius: 3px;
+  padding: 0;
+}
+#container #listContainer .listItem .message .messageContainer.nkc-media .smart {
+  display: none;
+}
 #container #listContainer .listItem .message .messageContainer .messageContent {
   min-height: 3rem;
   display: inline-block;
@@ -146,21 +158,21 @@ html,
   width: 100%;
 }
 #container #listContainer .listItem .message .messageContainer .messageContent .image img {
-  max-height: 30rem;
+  max-height: 18rem;
   max-width: 100%;
 }
 #container #listContainer .listItem .message .messageContainer .messageContent .video {
   width: 100%;
 }
 #container #listContainer .listItem .message .messageContainer .messageContent .video video {
-  max-height: 30rem;
+  max-height: 18rem;
   max-width: 100%;
 }
 #container #listContainer .listItem .message .messageContainer .messageContent .audio {
   width: 100%;
 }
 #container #listContainer .listItem .message .messageContainer .messageContent .audio audio {
-  max-height: 30rem;
+  max-height: 20rem;
   max-width: 100%;
 }
 #container #listContainer .listItem .message .messageContainer .smart {
@@ -196,6 +208,45 @@ html,
   color: #ccc;
   font-size: 1.8rem;
 }
+#container #listContainer .listItem .message .messageContainer .server-message button {
+  border: none;
+  height: 2.4rem;
+  border-radius: 3px;
+  padding: 0 1.2rem;
+  margin: 0 0.5rem;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button:focus {
+  outline: none;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button.agree {
+  color: #fff;
+  background-color: #209620;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button.disagree {
+  color: #fff;
+  background-color: #d9534f;
+}
+#container #listContainer .listItem .message .messageContainer .server-message button.ignored {
+  color: #fff;
+  background-color: #aaa;
+}
+#container #listContainer .listItem .message .messageContainer .server-message div {
+  display: block;
+  text-align: center;
+  padding: 0.5rem 0;
+  font-size: 1.2rem;
+  border-radius: 3px;
+  color: #fff;
+}
+#container #listContainer .listItem .message .messageContainer .server-message div.agree {
+  background-color: #209620;
+}
+#container #listContainer .listItem .message .messageContainer .server-message div.disagree {
+  background-color: #d9534f;
+}
+#container #listContainer .listItem .message .messageContainer .server-message div.ignored {
+  background-color: #aaa;
+}
 #container #inputContainer {
   width: 100%;
   box-sizing: border-box;
@@ -227,7 +278,7 @@ html,
 }
 #container #inputContainer .form .textarea textarea {
   width: 100%;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   padding: 0.5rem;
   min-height: 2.8rem;
   max-height: 7rem;

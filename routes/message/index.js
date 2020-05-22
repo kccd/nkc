@@ -113,10 +113,14 @@ messageRouter
       } else {
         abstract = typeof message.c === 'string'? message.c : message.c.na;
       }
+      let name;
+      if(friend) {
+        name = friend.info.name;
+      }
       userList.push({
         time: tlm || toc,
         type: 'UTU',
-        name: targetUser.username || targetUser.uid,
+        name: name || targetUser.username || targetUser.uid,
         uid: targetUser.uid,
         icon: nkcModules.tools.getUrl('userAvatar', targetUser.avatar),
         platform: targetUser.online? (targetUser.onlineType === 'phone'? 'app': 'web'): 'outline',
@@ -207,10 +211,12 @@ messageRouter
         userList.push(o);
       }
     }
-    data.userList = userList;
 
     // 加载好友
     const friends = await db.FriendModel.find({uid: user.uid});
+
+    data.userList = userList;
+
     const usersFriends = [];
 
     let friendList = [];

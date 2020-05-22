@@ -8,7 +8,9 @@ block content
     #container
       #listContainer(ref="listContent")
         #info
-          span(v-if="getMessageStatus === 'loading'") 加载中~
+          span(v-if="getMessageStatus === 'loading'")
+            .fa.fa-circle-o-notch.fa-spin
+            | &nbsp;加载中...
           //span(v-else-if="getMessageStatus === 'canLoad'") 加载中~
           span(v-else-if="getMessageStatus === 'cantLoad'") 到顶了
         .listItem(v-for="message in messages")
@@ -23,7 +25,7 @@ block content
           .message(v-else :class='message.position')
             .icon(@click='openUserHome(message.sUser.uid)')
               img(:src="message.sUser.icon")
-            .messageContainer
+            .messageContainer(:class="['img', 'video'].includes(message.contentType)?'nkc-media':''")
               .smart
               .status.sending(v-if='message.status === "sending"')
                 .fa.fa-circle-o-notch.fa-spin
@@ -31,7 +33,7 @@ block content
                 .fa.fa-exclamation-circle
               .status.withdrawn(v-if='message.canWithdrawn' @click="withdrawn(message._id)")
                 .fa.fa-trash
-              .messageContent
+              .messageContent(:class="['img', 'video'].includes(message.contentType)?'p-a-0':''")
                 .html(v-html='message.content' v-if="message.contentType === 'html'")
                 .image(v-if="message.contentType === 'img'" @click="visitImages(message.content.fileUrl)")
                   img(:src="message.content.fileUrl")
@@ -55,6 +57,8 @@ block content
             .fa.fa-camera-retro
           .option-item.video(@click='useCamera("video")')
             .fa.fa-video-camera
+          .option-item.audio(@click='useCamera("audio")')
+            .fa.fa-microphone
           .option-item.file(@click='selectLocalFiles')
             .fa.fa-file-text-o
         .form
