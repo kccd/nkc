@@ -332,7 +332,7 @@ threadSchema.methods.ensurePermission = async function(roles, grade, user) {
     try {
       await forum.ensurePermission(roles, grade, user);
     } catch(err) {
-      const status = err.status;
+      let status = err.status;
       try{
         err = JSON.parse(err.message || err);
         err = err.errorData;
@@ -340,6 +340,7 @@ threadSchema.methods.ensurePermission = async function(roles, grade, user) {
       let errorType = "noPermissionToReadThread";
       if(forum.fid === "recycle") {
         errorType = "threadHasBeenBanned";
+        status = 404;
       }
       throwError(status, err, errorType);
     }
