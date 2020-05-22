@@ -716,6 +716,10 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
             fileCover: getUrl('messageCover', id),
             fileTimer: vl
           }
+          if(ty === 'voice') {
+            message.content.fileUrl += "?channel=mp3";
+            message.content.playStatus = 'unPlay';
+          }
         }
       }
     } else if(ty === 'STE') {

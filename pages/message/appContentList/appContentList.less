@@ -157,10 +157,35 @@ body, html, #app{
               }
             }
             .audio{
-              width: 100%;
-              audio{
-                max-height: 20rem;
-                max-width: 100%;
+              width: 8rem;
+              position: relative;
+              img{
+                height: 1.6rem;
+                width: 1.6rem;
+                position: absolute;
+                top: 0;
+              }
+              .time{
+                height: 1.6rem;
+                width: 1.6rem;
+                position: absolute;
+                top: 0;
+              }
+              .left{
+                .time{
+                  right: 0;
+                }
+                img{
+                  left: 0;
+                }
+              }
+              .right{
+                .time{
+                  left: 0;
+                }
+                img{
+                  right: 0;
+                }
               }
             }
           }
@@ -262,6 +287,9 @@ body, html, #app{
         margin-right: 1rem;
         font-size: 1.8rem;
         display: inline-block;
+        &:active{
+          opacity: 0.7;
+        }
         &.photo{
           font-size: 1.7rem;
         }

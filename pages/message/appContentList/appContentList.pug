@@ -23,7 +23,7 @@ block content
             span(v-else) 你撤回了一条消息
           // 正常消息
           .message(v-else :class='message.position')
-            .icon(@click='openUserHome(message.sUser.uid)')
+            .icon(@click='openUserHome(message)')
               img(:src="message.sUser.icon")
             .messageContainer(:class="['img', 'video'].includes(message.contentType)?'nkc-media':''")
               .smart
@@ -42,8 +42,16 @@ block content
                 .video(v-if="message.contentType === 'video'")
                   video(preload='none' controls='controls' :src="message.content.fileUrl" type="video/mp4" :poster="message.content.fileCover")
                     | 你的浏览器不支持video标签，请升级。
-                .audio(v-if="message.contentType === 'voice'")
-                  audio(preload='none' controls='controls' :src="message.content.fileUrl")
+                .audio(v-if="message.contentType === 'voice'" @click="playVoice(message)")
+                  div.left(v-if='message.position === "left"')
+                    img(src=`/default/stopRight.png` v-if="message.content.playStatus === 'unPlay'")
+                    img(v-else src=`/default/playRight.gif`)
+                    .time {{message.content.fileTimer}}''
+                  div.right(v-else)
+                    .time {{message.content.fileTimer}}''
+                    img(src=`/default/stopLeft.png` v-if="message.content.playStatus === 'unPlay'")
+                    img(v-else src=`/default/playLeft.gif`)
+
 
       #inputContainer(v-if="type === 'UTU'")
         input.hidden(type='file' multiple='true' ref='file' @change="selectedLocalFiles")

@@ -1,4 +1,6 @@
 const data = NKC.methods.getDataById('data');
+const audio = new Audio();
+
 window.app = new Vue({
   el: '#app',
   data: {
@@ -20,6 +22,8 @@ window.app = new Vue({
     content: '',
     // 获取消息内容 锁
     getMessageStatus: 'canLoad', // canLoad, loading, cantLoad
+    // 语音播放器实例
+    audio: new Audio(),
   },
   methods: {
     // 格式化时间
@@ -107,10 +111,17 @@ window.app = new Vue({
       })
     },
     // 访问用户主页
-    openUserHome(uid) {
-      NKC.methods.rn.emit('openNewPage', {
-        href: location.origin + this.getUrl('userHome', uid)
-      });
+    openUserHome(message) {
+      if(message.messageType !== 'UTU') return;
+      if(NKC.configs.uid === message.s) {
+        NKC.methods.rn.emit('openNewPage', {
+          href: window.location.origin + NKC.methods.tools.getUrl('userHome', message.s)
+        })
+      } else {
+        NKC.methods.rn.emit('openNewPage', {
+          href: window.location.origin + NKC.methods.tools.getUrl('messageUserDetail', message.s)
+        })
+      }
     },
     // 选择本地附件
     selectLocalFiles() {
@@ -290,7 +301,33 @@ window.app = new Vue({
           message.content = data.message.content;
         })
         .catch(self.toast)
-    }
+    },
+    // 播放语音
+    playVoice(message) {
+      const {audio, stopPlayVoice, getOriginMessageById} = this;
+      if(message.content.playStatus === 'playing') {
+        return stopPlayVoice();
+      }
+      stopPlayVoice();
+      audio.src = message.content.fileUrl + `&t=${Date.now()}`;
+      setTimeout(() => {
+        audio.play();
+        const originMessage = getOriginMessageById(message._id);
+        originMessage.content.playStatus = 'playing';
+      }, 200);
+    },
+    // 停止播放语音
+    stopPlayVoice() {
+      const {audio} = this;
+      try{
+        audio.pause()
+      } catch(err) {}
+      for(const m of this.originMessages) {
+        if(m.contentType === 'voice') {
+          m.content.playStatus = 'unPlay';
+        }
+      }
+    },
   },
   computed: {
     // 第一条消息的ID，用户加载消息内容列表
@@ -316,6 +353,7 @@ window.app = new Vue({
         m.position = ownMessage? 'right': 'left';
         m.sUser = ownMessage? mUser: tUser;
         m.canWithdrawn = m.status === 'sent' && ownMessage && (now - new Date(m.time) < 60000);
+
         messagesObj[_id] = m;
       }
       messagesId = [...new Set(messagesId)];
@@ -370,5 +408,9 @@ window.app = new Vue({
         })
 
     }
+
+    self.audio.addEventListener('ended', () => {
+      self.stopPlayVoice();
+    });
   }
 });

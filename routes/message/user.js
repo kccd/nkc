@@ -47,12 +47,12 @@ userRouter
     await db.MessageModel.ensureSystemLimitPermission(user.uid, targetUser.uid);
     await db.MessageModel.ensurePermission(user.uid, uid, data.userOperationsId.includes('canSendToEveryOne'));
 
-    let file, content, socketId, voiceTimer;
+    let file, content, socketId, voiceTime;
 
     if(body.fields) {
       content = body.fields.content;
       socketId = body.fields.socketId;
-      voiceTimer = body.fields.voiceTimer;
+      voiceTime = body.fields.voiceTime;
       file = body.files.file || null;
     } else {
       content = body.content;
@@ -103,7 +103,7 @@ userRouter
         ty: messageTy,
         id: _id,
         na: name,
-        vl: voiceTimer || null
+        vl: voiceTime || null
       }
 
       await fs.rename(path, targetPath);

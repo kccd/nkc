@@ -95,6 +95,10 @@ const audioAMRTransMP3 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
 }
 
+const audioAACTransMP3 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
+}
+
 // WAV转码为MP3
 const audioWAVTransMP3 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
@@ -108,6 +112,7 @@ module.exports = {
   videoFirstThumbTaker,
   videoTranscode,
   videoAviTransAvi,
+  audioAACTransMP3,
   videoReduceRate,
   videoMoveMetaToFirstThumb,
   videoSetPixelAndscale,

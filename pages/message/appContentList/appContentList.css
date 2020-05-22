@@ -169,11 +169,32 @@ html,
   max-width: 100%;
 }
 #container #listContainer .listItem .message .messageContainer .messageContent .audio {
-  width: 100%;
+  width: 8rem;
+  position: relative;
 }
-#container #listContainer .listItem .message .messageContainer .messageContent .audio audio {
-  max-height: 20rem;
-  max-width: 100%;
+#container #listContainer .listItem .message .messageContainer .messageContent .audio img {
+  height: 1.6rem;
+  width: 1.6rem;
+  position: absolute;
+  top: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .time {
+  height: 1.6rem;
+  width: 1.6rem;
+  position: absolute;
+  top: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .left .time {
+  right: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .left img {
+  left: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .right .time {
+  left: 0;
+}
+#container #listContainer .listItem .message .messageContainer .messageContent .audio .right img {
+  right: 0;
 }
 #container #listContainer .listItem .message .messageContainer .smart {
   position: absolute;
@@ -262,6 +283,9 @@ html,
   margin-right: 1rem;
   font-size: 1.8rem;
   display: inline-block;
+}
+#container #inputContainer .options .option-item:active {
+  opacity: 0.7;
 }
 #container #inputContainer .options .option-item.photo {
   font-size: 1.7rem;

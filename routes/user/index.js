@@ -93,6 +93,16 @@ userRouter
         }
       }
       return await next();
+    } else if(from === 'message') {
+      if(!user) ctx.throw(403, '你暂未登录');
+      data.friend = await db.FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
+      data.FriendCategories = await db.FriendsCategoryModel.find({uid: user.uid}).sort({toc: -1});
+      data.targetUserName = targetUser.username || targetUser.uid;
+      if(data.friend && data.friend.info.name) {
+        data.targetUserName = data.friend.info.name || data.targetUserName;
+      }
+      ctx.template = 'message/appUserDetail/appUserDetail.pug';
+      return await next();
     }
     // 获取用户能够访问的专业ID
     const accessibleFid = await db.ForumModel.getAccessibleForumsId(data.userRoles, data.userGrade, data.user);
