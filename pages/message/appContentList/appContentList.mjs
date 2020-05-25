@@ -114,13 +114,9 @@ window.app = new Vue({
     openUserHome(message) {
       if(message.messageType !== 'UTU') return;
       if(NKC.configs.uid === message.s) {
-        NKC.methods.rn.emit('openNewPage', {
-          href: window.location.origin + NKC.methods.tools.getUrl('userHome', message.s)
-        })
+        NKC.methods.visitUrl(NKC.methods.tools.getUrl('userHome', message.s), true);
       } else {
-        NKC.methods.rn.emit('openNewPage', {
-          href: window.location.origin + NKC.methods.tools.getUrl('messageUserDetail', message.s)
-        })
+        NKC.methods.visitUrl(NKC.methods.tools.getUrl('messageUserDetail', message.s), true);
       }
     },
     // 选择本地附件

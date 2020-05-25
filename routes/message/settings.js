@@ -42,6 +42,7 @@ settingsRouter
     friend.cid = cid;
     await db.FriendsCategoryModel.updateMany({uid: user.uid, _id: {$nin: cid}, friendsId: uid}, {$pull: {friendsId: uid}});
     await db.FriendsCategoryModel.updateMany({uid: user.uid, _id: {$in: cid}}, {$addToSet: {friendsId: uid}});
+    if(!friend.info.phone.length) friend.info.phone = [''];
     await friend.save();
     friend.targetUser = await db.UserModel.findOnly({uid: friend.tUid});
     await redis.pubMessage({

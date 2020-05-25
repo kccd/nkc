@@ -64,6 +64,9 @@ var Tools = function() {
       case "messageCover": {
         return "/message/frame/" + id
       }
+      case "messageUserDetail": {
+        return "/u/" + id + "?from=message"
+      }
     }
   };
   self.floatUserInfo = function(uid) {

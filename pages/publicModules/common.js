@@ -724,3 +724,43 @@ NKC.methods.toChat = function(uid, name, type) {
     NKC.methods.visitUrl("/message?uid=" + uid, true);
   }
 }
+
+
+/*
+* app toast
+* */
+
+NKC.methods.appToast = function(data) {
+  var content = data.message || data.error || data;
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('toast', {
+      content: content
+    });
+  } else {
+    screenTopAlert(content);
+  }
+}
+
+/*
+* app reload webView
+* */
+NKC.methods.appReloadPage = function() {
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('reloadWebView');
+  } else {
+    window.location.reload();
+  }
+}
+
+/*
+* app select location
+* */
+NKC.methods.appSelectLocation = function() {
+  if(NKC.configs.platform === 'reactNative') {
+    return new Promise(function(resolve, reject) {
+      NKC.methods.rn.emit('selectLocation', {}, function(data) {
+        resolve(data);
+      });
+    })
+  }
+}
