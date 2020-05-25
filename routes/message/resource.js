@@ -16,6 +16,7 @@ resourceRouter
     if(channel && channel === "mp3") {
       filePath = PATH.join(settings.upload.messageVoiceBrowser, path);
       filePath = filePath.replace("amr", "mp3");
+      filePath = filePath.replace("aac", "mp3");
     }
     if(videoExt.includes(ext)) {
       filePath = PATH.join(settings.upload.messageVideoBrowser, path);

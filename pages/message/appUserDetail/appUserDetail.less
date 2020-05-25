@@ -1,0 +1,36 @@
+@import '../../publicModules/base';
+
+#app{
+  padding: 1.5rem;
+  .user-info{
+    @height: 5rem;
+    display: flex;
+    padding-bottom: 1rem;
+    .avatar-container{
+      height: @height;
+      width: @height;
+      border-radius: @height / 2;
+      overflow: hidden;
+      box-sizing: border-box;
+      border: 2px solid #ddd;
+      img{
+        height: 100%;
+        width: 100%;
+      }
+    }
+    .name-container{
+      padding-left: 1rem;
+      box-sizing: border-box;
+      flex: 1;
+      .name{
+        font-size: 1.8rem;
+        margin-bottom: 0.2rem;
+      }
+      .description{
+        font-size: 1.1rem;
+        font-style: oblique;
+        .hideText(@line: 2)
+      }
+    }
+  }
+}

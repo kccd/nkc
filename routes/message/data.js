@@ -108,7 +108,8 @@ router
         if(!targetUser) return;
         applications.push({
           _id: f._id,
-          username: targetUser.username,
+          ty: 'newFriends',
+          username: targetUser.username || targetUser.uid,
           avatar: targetUser.avatar,
           description: f.description,
           uid: targetUser.uid,
@@ -134,12 +135,7 @@ router
     }
     data.messages2 = await db.MessageModel.extendMessages(data.user.uid, data.messages);
 
-    await redis.pubMessage({
-      ty: 'markAsRead',
-      messageType: type,
-      uid: user.uid,
-      targetUid: uid
-    });
+    await db.MessageModel.markAsRead(type, user.uid, uid);
 
     ctx.template = 'message/appContentList/appContentList.pug';
     await next();

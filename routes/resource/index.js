@@ -4,7 +4,7 @@ const pathModule = require('path');
 const infoRouter = require("./info");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
-const audioExts = ["wav", "amr", "mp3"];
+const audioExts = ["wav", "amr", "mp3", "aac"];
 
 const {ThrottleGroup} = require("stream-throttle");
 
@@ -473,6 +473,8 @@ resourceRouter
           await ffmpeg.audioWAVTransMP3(path, outputVideoPath);
         }else if(['amr'].indexOf(extension.toLowerCase()) > -1) {
           await ffmpeg.audioAMRTransMP3(path, outputVideoPath);
+        } else if(['aac'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.audioAACTransMP3(path, outputVideoPath)
         } else {
           await fs.rename(path, outputVideoPath);
         }

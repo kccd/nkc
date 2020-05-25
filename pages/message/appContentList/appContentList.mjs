@@ -1,4 +1,6 @@
 const data = NKC.methods.getDataById('data');
+const audio = new Audio();
+
 window.app = new Vue({
   el: '#app',
   data: {
@@ -20,6 +22,8 @@ window.app = new Vue({
     content: '',
     // 获取消息内容 锁
     getMessageStatus: 'canLoad', // canLoad, loading, cantLoad
+    // 语音播放器实例
+    audio: new Audio(),
   },
   methods: {
     // 格式化时间
@@ -98,7 +102,7 @@ window.app = new Vue({
           });
         }
       }
-      urls.reverse();
+      // urls.reverse();
       const index = urls.map(u => u.url).indexOf(url);
       urls.map(u => u.url = location.origin + u.url);
       NKC.methods.rn.emit('viewImage', {
@@ -107,10 +111,17 @@ window.app = new Vue({
       })
     },
     // 访问用户主页
-    openUserHome(uid) {
-      NKC.methods.rn.emit('openNewPage', {
-        href: location.origin + this.getUrl('userHome', uid)
-      });
+    openUserHome(message) {
+      if(message.messageType !== 'UTU') return;
+      if(NKC.configs.uid === message.s) {
+        NKC.methods.rn.emit('openNewPage', {
+          href: window.location.origin + NKC.methods.tools.getUrl('userHome', message.s)
+        })
+      } else {
+        NKC.methods.rn.emit('openNewPage', {
+          href: window.location.origin + NKC.methods.tools.getUrl('messageUserDetail', message.s)
+        })
+      }
     },
     // 选择本地附件
     selectLocalFiles() {
@@ -221,16 +232,22 @@ window.app = new Vue({
     insertMessage(message) {
       const {messageType, r, s} = message;
       const {tUser, mUser} = this;
+
       if(messageType === 'UTU') {
         const usersId = [tUser.uid, mUser.uid];
         if(!usersId.includes(r) || !usersId.includes(s)) return;
-      } else {
+        if(this.mUser.uid !== message.s) {
+          this.markAsRead();
+        }
+      } else if(messageType === 'STU') {
+        if(r !== mUser.uid) return;
+        this.markAsRead();
+      } else if(messageType === 'STE') {
+        this.markAsRead();
+      } else if(messageType === 'friendsApplication') {
         if(r !== mUser.uid) return;
       }
       this.originMessages.push(message);
-      if(this.mUser.uid !== message.s) {
-        this.markAsRead();
-      }
       this.scrollToBottom();
     },
     // 撤回
@@ -251,23 +268,66 @@ window.app = new Vue({
     // 标记为已读
     markAsRead() {
       const {type, tUser} = self = this;
-      nkcAPI('/message/mark', 'PATCH', {
-        type,
-        uid: tUser.uid
-      })
-        .catch(self.toast)
+      setTimeout(() => {
+        nkcAPI('/message/mark', 'PATCH', {
+          type,
+          uid: tUser.uid
+        })
+          .catch(self.toast)
+      }, 1000);
+
     },
-    // 调用原生拍照
+    // 调用原生拍照、录像和录音
     useCamera(type) {
       let name = 'takePictureAndSendToUser';
       if(type === 'video') {
         name = 'takeVideoAndSendToUser';
+      } else if(type === 'audio') {
+        name = 'recordAudioAndSendToUser';
       }
       NKC.methods.rn.emit(name, {
         uid: this.tUser.uid,
         socketId: null
       });
-    }
+    },
+    // 处理好友添加申请
+    newFriendOperation(id, agree) {
+      const self = this;
+      const message = self.getOriginMessageById(id);
+      nkcAPI('/u/' + message.s + '/friends/agree', 'POST', {
+        agree,
+      })
+        .then(function(data) {
+          message.content = data.message.content;
+        })
+        .catch(self.toast)
+    },
+    // 播放语音
+    playVoice(message) {
+      const {audio, stopPlayVoice, getOriginMessageById} = this;
+      if(message.content.playStatus === 'playing') {
+        return stopPlayVoice();
+      }
+      stopPlayVoice();
+      audio.src = message.content.fileUrl + `&t=${Date.now()}`;
+      setTimeout(() => {
+        audio.play();
+        const originMessage = getOriginMessageById(message._id);
+        originMessage.content.playStatus = 'playing';
+      }, 200);
+    },
+    // 停止播放语音
+    stopPlayVoice() {
+      const {audio} = this;
+      try{
+        audio.pause()
+      } catch(err) {}
+      for(const m of this.originMessages) {
+        if(m.contentType === 'voice') {
+          m.content.playStatus = 'unPlay';
+        }
+      }
+    },
   },
   computed: {
     // 第一条消息的ID，用户加载消息内容列表
@@ -293,6 +353,7 @@ window.app = new Vue({
         m.position = ownMessage? 'right': 'left';
         m.sUser = ownMessage? mUser: tUser;
         m.canWithdrawn = m.status === 'sent' && ownMessage && (now - new Date(m.time) < 60000);
+
         messagesObj[_id] = m;
       }
       messagesId = [...new Set(messagesId)];
@@ -347,5 +408,9 @@ window.app = new Vue({
         })
 
     }
+
+    self.audio.addEventListener('ended', () => {
+      self.stopPlayVoice();
+    });
   }
 });

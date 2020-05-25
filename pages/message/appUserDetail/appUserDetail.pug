@@ -1,0 +1,20 @@
+extends ../../bootstrap_base
+block title
+  //title=data.targetUserName
+  title 用户详情
+  +includeCSS('/message/appUserDetail/appUserDetail.css')
+block content
+  -const {targetUser} = data;
+  .hidden#data=objToStr({friend: data.friend, targetUser: data.targetUser, friendCategories: data.friendCategories})
+  #app(v-cloak)
+    .user-info
+      .avatar-container
+        img(src=tools.getUrl('userAvatar', targetUser.avatar))
+      .name-container
+        .name=targetUser.username
+        .description=targetUser.description || '暂无简介'
+    .friend-info
+      div(v-if="!friend")
+        button.btn.btn-default.btn-sm 添加好友
+block scripts
+  +includeJS('/message/appUserDetail/appUserDetail.js')

@@ -1,0 +1,48 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+#app {
+  padding: 1.5rem;
+}
+#app .user-info {
+  display: flex;
+  padding-bottom: 1rem;
+}
+#app .user-info .avatar-container {
+  height: 5rem;
+  width: 5rem;
+  border-radius: 2.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 2px solid #ddd;
+}
+#app .user-info .avatar-container img {
+  height: 100%;
+  width: 100%;
+}
+#app .user-info .name-container {
+  padding-left: 1rem;
+  box-sizing: border-box;
+  flex: 1;
+}
+#app .user-info .name-container .name {
+  font-size: 1.8rem;
+  margin-bottom: 0.2rem;
+}
+#app .user-info .name-container .description {
+  font-size: 1.1rem;
+  font-style: oblique;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}

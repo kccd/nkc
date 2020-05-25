@@ -47,12 +47,12 @@ userRouter
     await db.MessageModel.ensureSystemLimitPermission(user.uid, targetUser.uid);
     await db.MessageModel.ensurePermission(user.uid, uid, data.userOperationsId.includes('canSendToEveryOne'));
 
-    let file, content, socketId, voiceTimer;
+    let file, content, socketId, voiceTime;
 
     if(body.fields) {
       content = body.fields.content;
       socketId = body.fields.socketId;
-      voiceTimer = body.fields.voiceTimer;
+      voiceTime = body.fields.voiceTime;
       file = body.files.file || null;
     } else {
       content = body.content;
@@ -64,7 +64,7 @@ userRouter
       if(content === '') ctx.throw(400, '内容不能为空');
     } else {
       const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'];
-      const voiceExt = ['amr'];
+      const voiceExt = ['amr', 'aac'];
       const videoExt = ["mp4", "mov", "3gp", "avi"];
       const {messageFilePath, generateFolderName, messageImageSMPath, messageVoiceBrowser, messageVideoBrowser} = settings.upload;
       const {name, size, path} = file;
@@ -103,16 +103,16 @@ userRouter
         ty: messageTy,
         id: _id,
         na: name,
-        vl: voiceTimer || null
+        vl: voiceTime || null
       }
 
       await fs.rename(path, targetPath);
-
       // 将amr语音文件转为mp3
       if(voiceExt.includes(ext)){
         let voiceMp3Path = generateFolderName(messageVoiceBrowser) + _id + '.mp3';
         let targetMp3Path = messageVoiceBrowser + voiceMp3Path;
         await ffmpeg.audioAMRTransMP3(targetPath, targetMp3Path);
+
       } else if(imageExt.includes(ext)) {
         // await tools.imageMagick.allInfo(targetPath);
         const timePath = generateFolderName(messageImageSMPath) + _id + '.' + ext;

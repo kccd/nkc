@@ -120,6 +120,18 @@ body, html, #app{
           display: flex;
           align-items: center;
           position: relative;
+          &.nkc-media{
+            padding-top: 0.5rem;
+            .messageContent{
+              font-size: 0!important;
+              overflow: hidden;
+              border-radius: 3px;
+              padding: 0;
+            }
+            .smart{
+              display: none;
+            }
+          }
           .messageContent{
             min-height: @imgWidth;
             display: inline-block;
@@ -133,22 +145,47 @@ body, html, #app{
             .image{
               width: 100%;
               img{
-                max-height: 30rem;
+                max-height: 18rem;
                 max-width: 100%;
               }
             }
             .video{
               width: 100%;
               video{
-                max-height: 30rem;
+                max-height: 18rem;
                 max-width: 100%;
               }
             }
             .audio{
-              width: 100%;
-              audio{
-                max-height: 30rem;
-                max-width: 100%;
+              width: 8rem;
+              position: relative;
+              img{
+                height: 1.6rem;
+                width: 1.6rem;
+                position: absolute;
+                top: 0;
+              }
+              .time{
+                height: 1.6rem;
+                width: 1.6rem;
+                position: absolute;
+                top: 0;
+              }
+              .left{
+                .time{
+                  right: 0;
+                }
+                img{
+                  left: 0;
+                }
+              }
+              .right{
+                .time{
+                  left: 0;
+                }
+                img{
+                  right: 0;
+                }
               }
             }
           }
@@ -185,6 +222,50 @@ body, html, #app{
               font-size: 1.8rem;
             }
           }
+          .server-message{
+            @colorAgree: #209620;
+            @colorDisagree: #d9534f;
+            @colorIgnored: #aaa;
+            button{
+              border: none;
+              height: 2.4rem;
+              border-radius: 3px;
+              padding: 0 1.2rem;
+              margin: 0 0.5rem;
+              &:focus{
+                outline: none;
+              }
+              &.agree{
+                color: #fff;
+                background-color: @colorAgree;
+              }
+              &.disagree{
+                color: #fff;
+                background-color: @colorDisagree;
+              }
+              &.ignored{
+                 color: #fff;
+                background-color: @colorIgnored;
+              }
+            }
+            div{
+              display: block;
+              text-align: center;
+              padding: 0.5rem 0;
+              font-size: 1.2rem;
+              border-radius: 3px;
+              color: #fff;
+              &.agree{
+                background-color: @colorAgree;
+              }
+              &.disagree{
+                background-color: @colorDisagree;
+              }
+              &.ignored{
+                background-color: @colorIgnored;
+              }
+            }
+          }
         }
       }
     }
@@ -206,6 +287,9 @@ body, html, #app{
         margin-right: 1rem;
         font-size: 1.8rem;
         display: inline-block;
+        &:active{
+          opacity: 0.7;
+        }
         &.photo{
           font-size: 1.7rem;
         }
@@ -222,7 +306,7 @@ body, html, #app{
         flex: 1;
         textarea{
           width: 100%;
-          font-size: 1.4rem;
+          font-size: 1.3rem;
           padding: 0.5rem;
           min-height: @inputHeight;
           max-height: 7rem;

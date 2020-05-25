@@ -414,6 +414,11 @@ NKC.modules.SelectResource = function() {
         NKC.methods.rn.emit("takeVideoAndUpload", {}, function(data) {
           self.app.crash();
         });
+      },
+      recordAudio: function() {
+        NKC.methods.rn.emit("recordAudioAndUpload", {}, function(data) {
+          self.app.crash();
+        });
       }
     }
   });
