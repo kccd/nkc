@@ -54,5 +54,8 @@ module.exports = {
   },
   data: {
     GET: "messageDataGet"
+  },
+  addFriend: {
+    GET: 'sendAnApplicationToAddAFriend'
   }
 };

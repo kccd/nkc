@@ -14,6 +14,7 @@ const dataRouter = require("./data");
 const searchRouter = require('./search');
 const blackRouter = require('./blackList');
 const frameRouter = require('./frame');
+const addFriend = require("./addFriend");
 const moment = require("moment");
 messageRouter
   .use('/', async (ctx, next) => {
@@ -315,5 +316,6 @@ messageRouter
   .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods())
   .use("/blackList", blackRouter.routes(), blackRouter.allowedMethods())
   .use("/frame", frameRouter.routes(), frameRouter.allowedMethods())
+  .use("/addFriend", addFriend.routes(), addFriend.allowedMethods())
   .use("/data", dataRouter.routes(), dataRouter.allowedMethods());
 module.exports = messageRouter;
