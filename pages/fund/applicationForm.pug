@@ -28,7 +28,7 @@ block fundContent
               a(href=`/u/${applicationForm.uid}` target='_blank')= applicationForm.applicant.user.username
               span 组队邀请
             -for(let aUser of applicationForm.members)
-              if aUser.uid === user.uid
+              if aUser.uid === data.user.uid
                 case aUser.agree
                   when false
                     h3.redFontColor.text-center 已拒绝
@@ -67,7 +67,7 @@ block fundContent
                   a(href=`/u/${user.uid}`)
                     img(src=`/avatar/${user.avatar}`)
                     span.redFontColor= `${user.username}`
-      if applicationForm.project              
+      if applicationForm.project
         .panel.panel-default
           .panel-body.applicationForm
             h5.text-center 分享
