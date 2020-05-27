@@ -57,5 +57,8 @@ module.exports = {
   },
   addFriend: {
     GET: 'sendAnApplicationToAddAFriend'
-  }
+  },
+  category: {
+    GET: 'messageCategory'
+  },
 };

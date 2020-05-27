@@ -1,0 +1,118 @@
+@import '../../publicModules/base';
+
+@imgHeight: 2.4rem;
+
+#app{
+  padding-top: 1rem;
+
+  .friend-header{
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+  .friends{
+    /*max-height: 10rem;
+    overflow-x: hidden;
+    overflow-y: auto;*/
+    .header{
+      background-color: #f4f4f4;
+      padding-left: 0.5rem;
+      font-size: 1.2rem;
+    }
+    .user{
+      display: flex;
+      padding: 0.5rem 0.2rem;
+      //justify-content: center;
+      align-items: center;
+      &:active{
+        background-color: #f4f4f4;
+      }
+      &.active{
+        background-color: #ddd;
+      }
+      .avatar{
+        height: @imgHeight;
+        width: @imgHeight;
+        border-radius: 50%;
+        overflow: hidden;
+        img{
+          width: 100%;
+          height: 100%;
+        }
+        margin-right: 0.5rem;
+      }
+      .name{
+        font-size: 1.4rem;
+        flex: 1;
+        height: @imgHeight - 0.5rem;
+        .hideText(@line: 1);
+      }
+    }
+  }
+  .button-save{
+    position: fixed;
+    right: 2rem;
+    bottom: 3rem;
+    height: 4.5rem;
+    width: 4.5rem;
+    border-radius: 50%;
+    background-color: @primary;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid #eee;
+    &:active{
+      opacity: 0.7;
+    }
+    .fa{
+      font-size: 2rem;
+    }
+    &.remove{
+      bottom: 9rem;
+      border: 1px solid #eee;
+      background-color: #fff;
+      color: #777;
+    }
+  }
+  .category-info{
+    .name{
+      font-size: 2rem;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    .description{
+      font-size: 1.3rem;
+      font-style: oblique;
+      color: #555;
+    }
+    .users{
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+      .user{
+        height: 6rem;
+        width: 6rem;
+        display: inline-block;
+        text-align: center;
+        .avatar{
+          display: inline-block;
+          height: 4rem;
+          width: 4rem;
+          border-radius: 5px;
+          overflow: hidden;
+          img{
+            height: 100%;
+            width: 100%;
+          }
+        }
+        .name{
+          font-size: 1.2rem;
+          height: 1.4rem;
+          .hideText(@line: 1);
+          margin: 0,
+        }
+      }
+    }
+  }
+}

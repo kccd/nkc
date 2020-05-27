@@ -51,6 +51,7 @@ const app = new Vue({
         .then(() => {
           self.page = 0;
           self.end = false;
+          self.users = [];
           self.pageCount = 999999;
           return self.getUser();
         })
@@ -74,10 +75,9 @@ const app = new Vue({
     },
     toSendMessage(u) {
       NKC.methods.toChat(u.uid);
+    },
+    addFriend(u) {
+      NKC.methods.visitUrl(`/message/addFriend?uid=${u.uid}`, true);
     }
-  },
-  mounted() {
-    this.content = '我';
-    this.search();
   }
 })

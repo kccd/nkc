@@ -666,6 +666,8 @@
   "unbindEmail": "解绑邮箱",
   "unbindMobile": "解绑手机号",
 
+  "messageCategory": "创建、查看或修改消息系统好友分组",
+
 
   "userSettingsHomeToLatest": "首页调整：主页 设置为 最新",
   "userSettingsLatestToHome": "首页调整：最新 设置为 主页",

@@ -764,3 +764,11 @@ NKC.methods.appSelectLocation = function() {
     })
   }
 }
+/*
+*  close webView
+* */
+NKC.methods.appClosePage = function() {
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('closeWebView');
+  }
+}
