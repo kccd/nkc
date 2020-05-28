@@ -3,9 +3,12 @@
   .modal-dialog(role="document")#moduleLoginApp
     .modal-content
       .modal-header
-        button.close(data-dismiss="modal" aria-label="Close")
-          span(aria-hidden="true") &times;
-        //h4.modal-title 图片选择
+        if !state.isApp
+          button.close(@click="close")
+            span(aria-hidden="true") &times;
+        else
+          .rn-close(@click="close") 关闭
+          //h4.modal-title 图片选择
       .modal-body.p-t-0.p-b-0
         .row
           .col-xs-12.col-md-12

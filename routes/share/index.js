@@ -100,7 +100,7 @@ shareRouter
   const {ShareModel} = db;
   let {str, type, targetId} = body;
   const {user} = data;
-  const lock = await nkcModules.redLock.lock(`getShareToken:${user.uid}`, 6000);
+  const lock = await nkcModules.redLock.lock(`getShareToken:${user?user.uid:'visitor'}`, 6000);
   let uid;
   if(user){
     uid = user.uid
@@ -127,6 +127,10 @@ shareRouter
   } else if(type === "forum") {
     const forum = await db.ForumModel.findOnly({fid: targetId});
     await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
+  } else {
+    data.newUrl = str;
+    await lock.unlock();
+    return await next();
   }
   // 加载奖励设置，判断当天分享次数是否达到上限
   const redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");

@@ -8,7 +8,16 @@ router
     // 若存在username则通过username用正则查找匹配的用户
     // 两者皆存在时将通过uid查找的用户放到最前面（一个或不存在），将通过username查找的用户分页返回
     const {nkcModules, data, db, query} = ctx;
-    let {uid, username, page = 0} = query;
+    let {uid, username, page = 0, type = 'search'} = query;
+
+    const {user} = data;
+
+    if(type === 'getPage') {
+      const friends = await db.FriendModel.find({uid: user.uid}, {tUid: 1});
+      data.friendsUid = friends.map(f => f.tUid);
+      ctx.template = 'message/appSearch/appSearch.pug';
+      return await next();
+    }
     if(!uid && !username) ctx.throw(400, 'uid or username is required');
     let users = [];
     if(uid && page === 0) {

@@ -153,6 +153,17 @@ friendsRouter
       application.c = 'ignored';
     }
     redis.pubMessage(application);
+    const targetUser = await db.UserModel.findOne({uid});
+    const _application = {
+      _id: application._id,
+      ty: 'newFriends',
+      username: targetUser.username || targetUser.uid,
+      description: application.description,
+      uid: targetUser.uid,
+      toc: application.toc,
+      agree,
+    };
+    data.message = await db.MessageModel.extendMessage(data.user.uid, _application);
     await next();
   })
   .post('/disagree', async (ctx, next) => {

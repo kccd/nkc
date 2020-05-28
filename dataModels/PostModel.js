@@ -283,7 +283,7 @@ postSchema.virtual('hidePost')
   })
   .set(function(ownPost) {
     this._ownPost = ownPost
-  });  
+  });
 
 postSchema.virtual('user')
   .get(function() {
@@ -375,7 +375,7 @@ postSchema.methods.ensurePermission = async function(options) {
 };
 
 
-// 
+//
 postSchema.pre('save' , function(next) {
   if(!this.iplm) {
     this.iplm = this.ipoc;
@@ -458,7 +458,7 @@ postSchema.pre("save", async function(next) {
   await next();
 });
 
-// 
+//
 /*
 postSchema.pre("save", async function(next) {
   this.c = nkcRender.renderHTML({
@@ -850,7 +850,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
           username = user.username;
           uid = quotePost.uid;
         }
-        const c = htmlToPlain(quotePost.c, 50);
+        const c = nkcRender.htmlToPlain(quotePost.c, 50);
         post.quotePost = {
           pid: quotePost.pid,
           username,
@@ -862,7 +862,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
     }
     // 如果需要渲染html
     if(o.renderHTML) {
-      post.c = renderHTML({
+      post.c = nkcRender.renderHTML({
         type: "article",
         post,
         user: o.visitor
@@ -890,7 +890,7 @@ postSchema.methods.updatePostsVote = async function() {
   this.voteDown = downNum;
   await this.update({voteUp: upNum, voteDown: downNum});
 };
-/* 
+/*
   新建post
   @param options
     title: 标题

@@ -32,7 +32,7 @@ block content
                     .visited-forum-icon(style=`background-color: ${f.color}`)
                   a(href=`/f/${f.fid}`).visited-forum-name= f.displayName
         div
-          if data.t === "subscribe"
+          if data.t === "subscribe" && state.platform !== 'reactNative'
             .subscribe-lists.m-b-1
               .subscribe-list
                 a(data-type="reload" href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
@@ -68,7 +68,9 @@ block content
                 b 空空如也~
           else
             .m-b-0
-              include ../publicModules/mobile_drawer/right_drawer
+
+              if !(state.isApp && state.platform === 'reactNative')
+                include ../publicModules/mobile_drawer/right_drawer
 
               -let showPagingSortButton = true;
               if canManagement
@@ -78,7 +80,7 @@ block content
                   a.button.radius-left(onclick="selectAll()") 全选
                   a.button(onclick="moveSelectedThreads()") 移动
                   a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-              if data.t === "latest" || data.t === "column" || data.t === "recommend"
+              if (data.t === "latest" || data.t === "column" || data.t === "recommend") && state.platform !== 'reactNative'
                 .paging-button
                   a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "" data-type="reload") 全部
                   a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 推荐

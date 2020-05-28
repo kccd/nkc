@@ -48,8 +48,8 @@ router
       data.userGrade,
       user
     );
-  
-  
+
+
     let q = {};
     let threadListType;
     if(t) {
@@ -82,20 +82,20 @@ router
         }
       }
     }
-  
+
     data.t = threadListType;
     data.navbar = {highlight: threadListType};
-    
+
     if(threadListType === "home") {
       await home({
         ctx, fidOfCanGetThreads
       });
       return await next();
     }
-  
+
     const topicsId = await db.ForumModel.getForumsIdFromRedis("topic");
     const disciplinesId = await db.ForumModel.getForumsIdFromRedis("discipline");
-  
+
     // 排除话题下的文章
     if(!homeSettings.list || !homeSettings.list.topic) {
       fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !topicsId.includes(fid));
@@ -107,15 +107,15 @@ router
     data.homeSettings = homeSettings;
     // 置顶文章轮播图
     data.ads = (await db.ThreadModel.getAds(fidOfCanGetThreads)).movable;
-  
+
     // 网站公告
-  
+
     data.noticeThreads = await db.ThreadModel.getNotice(fidOfCanGetThreads);
     // 一周活跃用户
     data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
     // 全站精选
     data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
-    
+
     // 最近访问的专业
     if(data.user) {
       const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 20);
@@ -123,7 +123,7 @@ router
     }
 
     let subTid = [], subUid = [], subColumnId = [], subForumsId = [];
-  
+
     if(threadListType === "latest") {
       q = {
         mainForumsId: {
@@ -181,7 +181,7 @@ router
       if(d === "forum" || d === "all") {
         subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
       }
-      
+
       q = {
         mainForumsId: {
           $in: fidOfCanGetThreads
@@ -229,7 +229,7 @@ router
     }
     data.threads = [];
     let paging;
-  
+
     const count = await db.ThreadModel.count(q);
     paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
     let sort = {tlm: -1};
@@ -286,7 +286,7 @@ router
     if(threadListType !== "latest") {
       data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
     }
-  
+
     if(threadListType !== "recommend") {
       data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
     }

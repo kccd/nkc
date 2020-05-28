@@ -41,6 +41,7 @@ const messageSchema = new Schema({
   *   voice 声音
   *   img 图片
   *   file 一般文件
+  *   video 视频
   *
   * pid
   * type
@@ -471,7 +472,6 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
     }
     results.push(r);
   }
-
   return results;
 
 };
@@ -618,5 +618,227 @@ messageSchema.statics.sendFundMessage = async (applicationFormId, type) => {
   }
 };
 
+messageSchema.statics.extendMessage = async (uid, message) => {
+  const messages = await mongoose.model("messages").extendMessages(uid, [message]);
+  for(const m of messages) {
+    if(m.contentType !== 'time') {
+      return m;
+    }
+  }
+}
+
+/*
+* 渲染 应用提醒 的富文本内容
+* 应用提醒的内容是根据后台模板动态生成的
+* */
+messageSchema.statics.getSTUMessageContent = async (message) => {
+  const MessageTypeModel = mongoose.model("messageTypes");
+  const getValue = MessageTypeModel.getValue;
+  const plainEscaper = require("../nkcModules/plainEscaper");
+  const messageType = await MessageTypeModel.findOne({_id: 'STU'});
+  const {templates} = messageType;
+  const templatesObj = {};
+  templates.map(t => templatesObj[t.type] = t);
+  const {c} = message;
+  const {type} = c;
+  const template = templatesObj[type];
+  const {parameters} = template;
+  let content = plainEscaper(template.content);
+  content = content.replace(/\[url=(.*?)\((.*?)\)]/ig, (v1, v2, v3) => {
+    let url, name;
+    if(!parameters.includes(v2)) {
+      url = v2;
+    } else {
+      url = getValue(v2, c);
+    }
+    if(!parameters.includes(v3)) {
+      name = v3;
+    } else {
+      name = getValue(v3, c);
+    }
+    return `&nbsp;<a href="${url}" target="_blank">${name}</a>&nbsp;`
+  });
+  content = content.replace(/\[text=(.*?)]/ig, (v1, v2) => {
+    let text;
+    if(!parameters.includes(v2)) {
+      text = v2;
+    } else {
+      text = getValue(v2, c);
+    }
+    return `&nbsp;<b>${text}</b>&nbsp;`
+  });
+  return content;
+}
+
+/*
+* 拓展消息对象，用于reactNativeAPP，web端调整后公用
+* */
+messageSchema.statics.extendMessages = async (uid, messages) => {
+
+  // contentType: html, file, video, voice, img, time
+  // status: sent, sending, error
+
+  const nkcRender = require("../nkcModules/nkcRender");
+  const MessageModel = mongoose.model("messages");
+  const {getUrl} = require("../nkcModules/tools");
+  const _messages = [];
+
+  for(let i = 0; i < messages.length; i++) {
+
+    const m = messages[i];
+    const {r, s, ty, tc, c, _id, withdrawn} = m;
+
+    const message = {
+      r,
+      s,
+      messageType: ty,
+      time: tc,
+      _id,
+      status: 'sent',
+    };
+
+    if(ty === 'UTU') {
+      // 用户
+      if(withdrawn) {
+        message.contentType = 'withdrawn';
+        message.content = null;
+      } else {
+        if(typeof c === 'string') {
+          message.contentType = 'html';
+          message.content = c;
+        } else {
+          const {id, na, ty, vl} = c;
+          message.contentType = ty; // img, voice, file, video
+          message.content = {
+            filename: na,
+            fileId: id,
+            fileUrl: getUrl('messageResource', id),
+            fileCover: getUrl('messageCover', id),
+            fileTimer: vl
+          }
+          if(ty === 'voice') {
+            message.content.fileUrl += "?channel=mp3";
+            message.content.playStatus = 'unPlay';
+          }
+        }
+      }
+    } else if(ty === 'STE') {
+      // 系统通知
+      message.contentType = 'html';
+      message.content = c;
+    } else if(ty === 'STU') {
+      message.contentType = 'html';
+      message.content = await MessageModel.getSTUMessageContent(m);
+    } else if(ty === 'newFriends') {
+      // 新朋友
+      const {toc, username, agree, description, _id} = m;
+      message.time = toc;
+      message.s = m.uid;
+      message.content = `
+        <div class="server-message">
+          用户「
+          <a href="/u/${m.uid}" target="_blank">
+            ${username}
+          </a>
+          」申请添加你为好友。
+          </br>附加说明：${description || '无'}
+          </br>
+          <div class="button-container">
+          ${(() => {
+            if(agree === 'null') {
+              return `
+                <button class="agree" onclick="window.app.newFriendOperation(${_id}, 'true')">同意</button>
+                <button class="disagree" onclick="window.app.newFriendOperation(${_id}, 'false')">拒绝</button>
+                <button class="ignored" onclick="window.app.newFriendOperation(${_id}, 'ignored')">忽略</button>` 
+            } else if(agree === 'true') {
+              return `<div class="agree">已同意</div>`
+            } else if(agree === 'false') {
+              return `<div class="disagree">已拒绝</div>`
+            } else {
+              return `<div class="ignored">已忽略</div>`
+            }
+          })()}
+          </div>
+        </div>
+      `;
+      message.contentType = 'html';
+    }
+
+    if(message.contentType === 'html') {
+      message.content = message.content || "";
+      if(['STE', 'UTU'].includes(ty)) {
+        // 系统通知、用户间消息
+
+        // 替换空格
+        message.content = message.content.replace(/ /g, '&nbsp;');
+        // 处理链接 上下顺序不能变 处理链接函数里做了 > 判断
+        message.content = nkcRender.URLifyHTML(message.content);
+        // 替换换行符
+        message.content = message.content.replace(/\n/g, '<br/>');
+        message.content = message.content.replace(/\[f\/(.*?)]/g, function(r, v1) {
+          return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
+        });
+      }
+    }
+
+    _messages.push(message);
+  }
+
+  return _messages;
+};
+
+/*
+* 标记信息为已读
+* */
+messageSchema.statics.markAsRead = async (type, uid, tUid) => {
+  const MessageModel = mongoose.model("messages");
+  const CreatedChatModel = mongoose.model('createdChat');
+  const SystemInfoLogModel = mongoose.model('systemInfoLogs');
+  const redis = require("../redis");
+  if(type === "UTU") {
+    await MessageModel.updateMany({
+      ty: 'UTU',
+      r: uid,
+      s: tUid,
+      vd: false
+    }, {
+      $set: {
+        vd: true
+      }
+    });
+    await CreatedChatModel.updateMany({uid, tUid}, {$set: {unread: 0}});
+  } else if(type === 'STE') {
+    const allInfo = await MessageModel.find({ty: 'STE'}, {_id: 1});
+    const allInfoLog = await SystemInfoLogModel.find({uid}, {mid: 1});
+    const allInfoId = [];
+    const allInfoLogId = [];
+
+    for(const o of allInfo) {
+      allInfoId.push(o._id);
+    }
+    for(const o of allInfoLog) {
+      allInfoLogId.push(o.mid);
+    }
+    for(const id of allInfoId) {
+      if(!allInfoLogId.includes(id)) {
+        const log = SystemInfoLogModel({
+          uid,
+          mid: id
+        });
+        await log.save();
+      }
+    }
+  } else if(type === 'STU'){
+    await MessageModel.updateMany({ty: type, r: uid, vd: false}, {$set: {vd: true}});
+  }
+  await redis.pubMessage({
+    ty: 'markAsRead',
+    messageType: type,
+    uid,
+    targetUid: tUid
+  });
+}
+
 const MessageModel = mongoose.model('messages', messageSchema);
 module.exports = MessageModel;
+

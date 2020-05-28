@@ -1,0 +1,98 @@
+@import '../../publicModules/base';
+
+@inputHeight: 3rem;
+@buttonWidth: 6rem;
+#app{
+  padding-top: 1rem;
+  .form{
+    height: @inputHeight;
+    position: relative;
+    input{
+      width: 100%;
+      height: @inputHeight;
+      padding-right: @buttonWidth;
+    }
+    button{
+      position: absolute;
+      top: 0;
+      height: @inputHeight;
+      width: @buttonWidth;
+      right: 0;
+      border: none;
+      border-radius: 0 3px 3px 0;
+      background-color: @primary;
+      color: #fff;
+      &:focus{
+        outline: none;
+      }
+      &:active{
+        opacity: 0.7;
+      }
+      &.searching{
+        opacity: 0.7;
+      }
+    }
+  }
+  .list{
+    margin-top: 2rem;
+    .null{
+      text-align: center;
+    }
+    .load-more{
+      height: 4rem;
+      &:active{
+        opacity: 0.7;
+      }
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .user{
+      display: flex;
+      margin: 0.5rem 0;
+      padding-bottom: 0.5rem;
+      .user-avatar{
+        img{
+          height: 100%;
+          width: 100%;
+        }
+        height: 4rem;
+        width: 4rem;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 1rem;
+      }
+      .user-info-container{
+        flex: 1;
+        .username{
+          font-size: 1.5rem;
+        }
+        .description{
+          font-size: 1.1rem;
+          color: #888;
+          font-style: oblique;
+          height: 1.5rem;
+          .hideText(@line: 1);
+
+        }
+        .buttons{
+          button{
+            height: 2rem;
+            width: 6rem;
+            border: none;
+            font-size: 1rem;
+            background-color: #eee;
+            color: #555;
+            border-radius: 3px;
+            &:focus{
+              outline: none;
+            }
+            &:active{
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+    }
+  }
+}

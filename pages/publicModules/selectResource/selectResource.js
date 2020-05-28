@@ -17,6 +17,7 @@ NKC.modules.SelectResource = function() {
   self.app = new Vue({
     el: "#moduleSelectResourceApp",
     data: {
+      isApp: NKC.configs.isApp && NKC.configs.platform === 'reactNative',
       uid: "",
       user: "",
       pageType: "list", // list: 资源列表, uploader: 上传
@@ -404,6 +405,21 @@ NKC.modules.SelectResource = function() {
         this.resourceType = t;
         this.getResources(0);
       },
+      takePicture: function() {
+        NKC.methods.rn.emit("takePictureAndUpload", {}, function(data) {
+          self.app.crash();
+        });
+      },
+      takeVideo: function() {
+        NKC.methods.rn.emit("takeVideoAndUpload", {}, function(data) {
+          self.app.crash();
+        });
+      },
+      recordAudio: function() {
+        NKC.methods.rn.emit("recordAudioAndUpload", {}, function(data) {
+          self.app.crash();
+        });
+      }
     }
   });
   self.open = self.app.open;

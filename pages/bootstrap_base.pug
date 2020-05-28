@@ -6,8 +6,10 @@ block head
   meta(name="viewport" content="width=device-width, initial-scale=1")
   meta(name="format-detection" content="telephone=no")
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
+  if state.isApp && state.platform === 'reactNative'
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
   link(rel='shortcut icon' href='/favicon.ico')
-  if state.isApp
+  if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
   //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
@@ -22,7 +24,7 @@ block head
   block title
     meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
-  
+
 block body
   block navbar
     div
@@ -45,8 +47,9 @@ block body
   +includeJS('/publicModules/common.js')
   //-app使用的js
   if state.isApp
-    script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";`
-    +includeJS("/appAPi/app.js")
+    script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";NKC.configs.platform="${state.platform}"`
+    if state.platform === 'apiCloud'
+      +includeJS("/appAPi/app.js")
   +includeJS('/bootstrap/js/bootstrap.min.js')
   +includeJS('/twemoji/2/twemoji.min.js')
   +includeJS('/Promise/promise.min.js')
@@ -78,8 +81,10 @@ block body
     if kcb > 0
       script!=`sweetAlert("你发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
-  if !state.isApp && !data.user
+  if (!state.isApp || state.platform === 'reactNative') && !data.user
     include ./publicModules/login/login
+  if state.isApp && state.platform === 'reactNative'
+    +includeJS('/appApi/reactNative.js')
   block scripts
   if !state.isApp
     //- 生成二维码 页脚
@@ -87,3 +92,6 @@ block body
     script.
       console.log('(c)2019 成都科创科学文化研究院')
       console.log('Project Repository: https://github.com/kccd/nkc')
+  if state.isApp && state.platform === 'reactNative'
+    script.
+      document.body.style.userSelect = window._userSelect || 'none';

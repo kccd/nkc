@@ -9,6 +9,9 @@
   margin: auto;
 }
 /* 文本超出隐藏并显示省略号 */
+html {
+  font-size: 10px;
+}
 body {
   background-color: #f4f4f4;
   position: relative;
