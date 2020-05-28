@@ -35,3 +35,4 @@ function unSubscribed(fid) {
   const num = Number(number.eq(0).text() || 0);
   number.text(num? num - 1: num);
 }
+
