@@ -80,8 +80,13 @@ module.exports = async (ctx, next) => {
 
     ctx.state = {
       url: ctx.url.replace(/\?.*/ig, ""),
+      // app请求的标识
       isApp: false,
+      // app所在系统:  android, ios
       appOS: undefined,
+      // app平台: apiCloud, reactNative
+      platform: undefined,
+      // ReactNative
       twemoji: settings.editor.twemoji,
       // 当前操作
       operation: await db.OperationModel.findOnly({_id: ctx.data.operationId}),
@@ -96,11 +101,21 @@ module.exports = async (ctx, next) => {
     };
 
     // 判断是否为APP发起的请求
-    let userAgent = ctx.header["user-agent"];
-    userAgent = (userAgent || "").match(/NKC\/APP\/([a-z]+)/ig);
-    if(userAgent !== null) {
+    // apiCloud: NKC/APP/android
+    // ReactNative: rn-android、rn-ios
+    let userAgent = ctx.header["user-agent"] || "";
+    let reg = /NKC\/APP\/(.+)/;
+    userAgent = reg.exec(userAgent);
+    if(userAgent !== null && ['rn-android', 'rn-ios', 'android'].includes(userAgent[1])) {
+      const _userAgent = userAgent[1];
       ctx.state.isApp = true;
-      ctx.state.appOS = userAgent[0].includes("android")? "android": "ios"
+      ctx.state.appOS = _userAgent.replace('rn-', '');
+      if(_userAgent === 'android') {
+        // 兼容apiCloud
+        ctx.state.platform = 'apiCloud';
+      } else {
+        ctx.state.platform = 'reactNative';
+      }
     }
 	  // 权限判断
     // @param {String} o 操作名

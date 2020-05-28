@@ -84,7 +84,11 @@ var NKC = {
 
 NKC.methods.getLoginStatus = function() {
   if(NKC.configs.isApp) {
-    return !!appGetFromLocal("user");
+    if(NKC.configs.platform === "apiCloud") {
+      return !!appGetFromLocal("user");
+    } else if(NKC.configs.platform === 'reactNative') {
+      return !!NKC.configs.uid;
+    }
   } else {
     return !!NKC.configs.uid;
   }
@@ -108,15 +112,28 @@ NKC.methods.getRunType = function() {
 * @author pengxiguaa 2019-7-26
 * */
 NKC.methods.visitUrl = function(url, blank) {
-  if(NKC.configs.isApp) {
-    NKC.methods.openOnlinePage(url);
+  if(!blank) {
+    return window.location.href = url;
   } else {
-    if(blank) {
-      window.open(url);
+    if(NKC.configs.isApp) {
+      if(NKC.configs.platform === 'apiCloud') {
+        NKC.methods.openOnlinePage(url);
+      } else {
+        NKC.methods.rn.emit('openNewPage', {
+          href: location.origin + url
+        });
+      }
     } else {
-      window.location.href = url;
+      window.open(url);
     }
   }
+};
+/*
+* 打开一个新页面并关闭当前页面，用于app发表内容后的跳转，跳转到新页面并关闭编辑器页。
+* @param {String} url 链接
+* */
+NKC.methods.visitUrlAndClose = function(url) {
+  NKC.methods.rn.emit('openNewPageAndClose', {href: location.origin + url})
 };
 /*
 * app打开在线网页
@@ -288,6 +305,9 @@ NKC.methods.logout = function() {
       return nkcAPI(href, "GET");
     })
     .then(function() {
+      if(NKC.configs.platform === 'reactNative') {
+        NKC.methods.rn.emit("logout");
+      }
       window.location.reload();
     })
     .catch(function (data) {
@@ -422,9 +442,13 @@ NKC.methods.resourceToHtml = function(type, rid, name) {
 * */
 NKC.methods.toLogin = function(type) {
   if(NKC.configs.isApp) {
-    emitEvent("openLoginPage", {
-      type: type
-    });
+    if(NKC.configs.platform === 'apiCloud') {
+      emitEvent("openLoginPage", {
+        type: type
+      });
+    } else if(NKC.configs.platform === 'reactNative') {
+      NKC.methods.rn.emit("openLoginPage", {type: type});
+    }
   } else {
     Login.open(type === "register"? "register": "login");
   }
@@ -684,3 +708,67 @@ NKC.methods.ueditor = {
     return html;
   }
 };
+
+/*
+* 打开聊天页面
+* */
+
+NKC.methods.toChat = function(uid, name, type) {
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('toChat', {
+      uid: uid,
+      name: name,
+      type: type || 'UTU'
+    });
+  } else {
+    NKC.methods.visitUrl("/message?uid=" + uid, true);
+  }
+}
+
+
+/*
+* app toast
+* */
+
+NKC.methods.appToast = function(data) {
+  var content = data.message || data.error || data;
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('toast', {
+      content: content
+    });
+  } else {
+    screenTopAlert(content);
+  }
+}
+
+/*
+* app reload webView
+* */
+NKC.methods.appReloadPage = function() {
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('reloadWebView');
+  } else {
+    window.location.reload();
+  }
+}
+
+/*
+* app select location
+* */
+NKC.methods.appSelectLocation = function() {
+  if(NKC.configs.platform === 'reactNative') {
+    return new Promise(function(resolve, reject) {
+      NKC.methods.rn.emit('selectLocation', {}, function(data) {
+        resolve(data);
+      });
+    })
+  }
+}
+/*
+*  close webView
+* */
+NKC.methods.appClosePage = function() {
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('closeWebView');
+  }
+}

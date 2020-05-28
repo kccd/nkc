@@ -333,7 +333,7 @@
   "modifyFriendCategory" : "修改好友分组信息",
   "removeFriendCategory": "删除好友分组",
   "addFriendsCategory": "添加好友分组",
-  "messageSearchUser": "信息中的搜索用户",
+  "messageSearchUser": "消息中的搜索用户",
   "visitHomeSubscription": "首页我的关注",
 
   "visitActivityIndex": "访问活动主页面",
@@ -666,6 +666,8 @@
   "unbindEmail": "解绑邮箱",
   "unbindMobile": "解绑手机号",
 
+  "messageCategory": "创建、查看或修改消息系统好友分组",
+
 
   "userSettingsHomeToLatest": "首页调整：主页 设置为 最新",
   "userSettingsLatestToHome": "首页调整：最新 设置为 主页",
@@ -674,6 +676,7 @@
   "userSettingsSubscribeToHome": "首页调整：关注 设置为 主页",
   "userSettingsHomeToSubscribe": "首页调整：主页 设置为 关注",
 
+  "selectLocation": "app加载地区信息",
   "APPgetUserInfo": "app获取用户信息",
   "APPgetUserPosts": "app获取用户的回复",
   "APPgetUserThreads": "app获取用户的文章",

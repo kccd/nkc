@@ -72,7 +72,8 @@ const message = async (i) => {
     await  Promise.all(friendsUid.map(friendUid => {
       io.in(`user/${friendUid}`).emit('userConnect', {
         targetUid: uid,
-        onlineType
+        onlineType,
+        platform: onlineType === 'phone'? 'app': 'web'
       })
     }));
     socket.join(`user/${uid}`, async () => {
@@ -98,6 +99,8 @@ const message = async (i) => {
 async function sendMessage(channel, message) {
   try{
     message = JSON.parse(message);
+    const _message = await db.MessageModel.extendMessage(undefined, message);
+    message._message = _message;
     if(channel === 'withdrawn') {
       // 撤回信息
       const {r, s, _id} = message;
@@ -128,6 +131,7 @@ async function sendMessage(channel, message) {
           myUid: r,
           message
         });
+        message._message.position = 'right';
         io.to(`user/${s}`).emit('message', {
           user: sUser,
           targetUser: rUser,
@@ -199,7 +203,8 @@ async function disconnect(io, socket) {
   const friendsUid = await db.MessageModel.getUsersFriendsUid(uid);
   await Promise.all(friendsUid.map(friendUid => {
     io.in(`user/${friendUid}`).emit('userDisconnect', {
-      targetUid: uid
+      targetUid: uid,
+      platform: 'outline'
     });
   }));
 }

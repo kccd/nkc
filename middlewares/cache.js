@@ -19,8 +19,13 @@ module.exports = async (ctx, next) => {
 
   // 同上，但由于APP需要排除页面头尾，所以缓存和web端不公用。
   if(state.isApp) {
-    tocKey = `app:page:${url}:toc`;
-    dataKey = `app:page:${url}:data`;
+    if(state.platform === 'reactNative') {
+      tocKey = `app:RN:page:${url}:toc`;
+      dataKey = `app:RN:page:${url}:data`;
+    } else {
+      tocKey = `app:AC:page:${url}:toc`;
+      dataKey = `app:AC:page:${url}:data`;
+    }
   }
   const cacheSettings = await db.SettingModel.getSettings("cache");
 

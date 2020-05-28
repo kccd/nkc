@@ -1,0 +1,368 @@
+@import '../../publicModules/base';
+@backgroundColor: #f2f2f2;
+body, html, #app{
+  height: 100%;
+  background-color: @backgroundColor;
+}
+#container{
+  box-sizing: border-box;
+  position: relative;
+  height: 100%;
+  //background-color: red;
+  display: flex;
+  flex-direction: column;
+  #listContainer{
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex: 1;
+    width: 100%;
+    //background-color: green;
+    /*height: 100%;
+    width: 100%;*/
+    #info{
+      text-align: center;
+      color: #888;
+      padding: 0.5rem 0;
+    }
+    .message-emoji{
+      height: 1.8rem;
+      width: 1.8rem;
+      vertical-align: text-bottom;
+    }
+    .listItem{
+      margin: 1rem 1rem;
+      .message-time{
+        text-align: center;
+        span{
+          display: inline-block;
+          font-size: 1.1rem;
+          color: #999;
+          border-radius: 5px;
+        }
+      }
+      .message-withdrawn{
+        text-align: center;
+        span{
+          display: inline-block;
+          font-size: 1.1rem;
+          color: #999;
+          border-radius: 5px;
+        }
+      }
+      .message{
+        display: flex;
+        @imgWidth: 36px;
+        @smartWidth: 6px;
+        &.left{
+          flex-direction: row;
+          .messageContainer{
+            margin-left: 1rem;
+            margin-right: 3rem;
+            .messageContent{
+              background-color: #fff;
+              color: #555;
+            }
+            .smart{
+              left: -2 * @smartWidth;
+              border-top: @smartWidth solid transparent;
+              border-right: @smartWidth solid #fff;
+              border-bottom: @smartWidth solid transparent;
+              border-left: @smartWidth solid transparent;
+              &:before{
+                left: 0;
+              }
+            }
+            .status{
+              right: -2rem;
+            }
+          }
+        }
+        &.right{
+          flex-direction: row-reverse;
+          .messageContainer{
+            margin-left: 3rem;
+            margin-right: 1rem;
+            .messageContent{
+              background-color: #6aafe6;
+              color: #fff;
+              a{
+                color: #fff;
+              }
+            }
+            .smart{
+              right: -2 * @smartWidth;
+              border-top: @smartWidth solid transparent;
+              border-right: @smartWidth solid transparent;
+              border-bottom: @smartWidth solid transparent;
+              border-left: @smartWidth solid #6aafe6;
+              &:before{
+                right: 0;
+              }
+            }
+            .status{
+              left: -2rem;
+            }
+          }
+        }
+        .icon{
+          width: @imgWidth;
+          img{
+            box-sizing: border-box;
+            //border: 2px solid rgba(255, 255, 255, 1);
+            width: @imgWidth;
+            height: @imgWidth;
+            border-radius: @imgWidth/2;
+          }
+        }
+        .messageContainer{
+          min-height: @imgWidth;
+          display: flex;
+          align-items: center;
+          position: relative;
+          &.nkc-media{
+            padding-top: 0.5rem;
+            .messageContent{
+              font-size: 0!important;
+              overflow: hidden;
+              border-radius: 3px;
+              padding: 0;
+            }
+            .smart{
+              display: none;
+            }
+          }
+          .messageContent{
+            min-height: @imgWidth;
+            display: inline-block;
+            word-break: break-all;
+            font-size: 1.3rem;
+            border-radius: 3px;
+            padding: 0.8rem 0.8rem 0.5rem 0.8rem;
+            a{
+              text-decoration: underline;
+            }
+            .image{
+              width: 100%;
+              img{
+                max-height: 18rem;
+                max-width: 100%;
+              }
+            }
+            .video{
+              width: 100%;
+              video{
+                max-height: 18rem;
+                max-width: 100%;
+              }
+            }
+            .audio{
+              width: 8rem;
+              position: relative;
+              img{
+                height: 1.6rem;
+                width: 1.6rem;
+                position: absolute;
+                top: 0;
+              }
+              .time{
+                height: 1.6rem;
+                width: 1.6rem;
+                position: absolute;
+                top: 0;
+              }
+              .left{
+                .time{
+                  right: 0;
+                }
+                img{
+                  left: 0;
+                }
+              }
+              .right{
+                .time{
+                  left: 0;
+                }
+                img{
+                  right: 0;
+                }
+              }
+            }
+          }
+          .smart{
+            position: absolute;
+            top: (@imgWidth - @smartWidth)/3;
+            width: 0;
+            height: 0;
+            &:before{
+              height: @smartWidth * 2;
+              width: @smartWidth;
+              background-color: @backgroundColor;
+              position: absolute;
+              border-radius: 5px;
+              content: "";
+              top: @smartWidth * -2;
+            }
+          }
+          .status{
+            position: absolute;
+            top: 0;
+            font-size: 1.8rem;
+            width: 2rem;
+            text-align: center;
+            &.error{
+              color: @accent;
+            }
+            &.sending{
+              color: #ccc;
+              font-size: 1.5rem;
+            }
+            &.withdrawn{
+              color: #ccc;
+              font-size: 1.8rem;
+            }
+          }
+          .server-message{
+            @colorAgree: #209620;
+            @colorDisagree: #d9534f;
+            @colorIgnored: #aaa;
+            button{
+              border: none;
+              height: 2.4rem;
+              border-radius: 3px;
+              padding: 0 1.2rem;
+              margin: 0 0.5rem;
+              &:focus{
+                outline: none;
+              }
+              &.agree{
+                color: #fff;
+                background-color: @colorAgree;
+              }
+              &.disagree{
+                color: #fff;
+                background-color: @colorDisagree;
+              }
+              &.ignored{
+                 color: #fff;
+                background-color: @colorIgnored;
+              }
+            }
+            div{
+              display: block;
+              text-align: center;
+              padding: 0.5rem 0;
+              font-size: 1.2rem;
+              border-radius: 3px;
+              color: #fff;
+              &.agree{
+                background-color: @colorAgree;
+              }
+              &.disagree{
+                background-color: @colorDisagree;
+              }
+              &.ignored{
+                background-color: @colorIgnored;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  #inputContainer{
+    //position: absolute;
+    //bottom: 0;
+    //left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+    padding: 0.5rem 1rem;
+    .options{
+      height: 2rem;
+      line-height: 2.4rem;
+      margin-bottom: 0.5rem;
+      .option-item{
+        margin-right: 1rem;
+        font-size: 1.8rem;
+        display: inline-block;
+        &:active{
+          opacity: 0.7;
+        }
+        &.photo{
+          font-size: 1.7rem;
+        }
+        &.file{
+          font-size: 1.7rem;
+        }
+      }
+    }
+    .form{
+      display: flex;
+      @inputHeight: 3.2rem;
+      .textarea{
+        font-size: 0;
+        flex: 1;
+        textarea{
+          width: 100%;
+          font-size: 1.3rem;
+          padding: 0.5rem;
+          min-height: @inputHeight;
+          max-height: 7rem;
+          height: @inputHeight;
+          overflow-x: hidden;
+          overflow-y: auto;
+          border-radius: 3px;
+          border: 1px solid #eee;
+          box-sizing: border-box;
+          resize: none;
+          &:focus{
+            outline: none;
+          }
+        }
+      }
+      .button{
+        width: 5rem;
+        margin-left: 1rem;
+        position: relative;
+        button{
+          width: 100%;
+          position: absolute;
+          border-radius: 3px;
+          color: #fff;
+          height: @inputHeight;
+          bottom: 0;
+          left: 0;
+          border: none;
+          background-color: @primary;
+          &:focus{
+            outline: none;
+          }
+          &:active{
+            opacity: 0.7;
+          }
+          &.disabled{
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+    .option-body.sticker-panel{
+      background-color: #f4f4f4;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      .sticker-item{
+        display: inline-block;
+        height: 2rem;
+        width: 12.5%;
+        margin: 0.5rem 0;
+        img{
+          height: 100%;
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+

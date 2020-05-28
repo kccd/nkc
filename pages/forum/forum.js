@@ -25,12 +25,19 @@ function showSameForums() {
 function openEditSite() {
   var fid = NKC.methods.getDataById("forumInfo").fid;
   var url = window.location.origin + "/editor?type=forum&id=" + fid;
-  api.openWin({
-    name: url,
-    url: 'widget://html/common/editorInfo.html',
-    pageParam: {
-      realUrl: url,
-      shareType: "common"
-    }
-  })
+
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit("openEditorPage", {
+      url: url
+    })
+  } else {
+    api.openWin({
+      name: url,
+      url: 'widget://html/common/editorInfo.html',
+      pageParam: {
+        realUrl: url,
+        shareType: "common"
+      }
+    })
+  }
 }

@@ -16,7 +16,8 @@ resourceRouter
     if(channel && channel === "mp3") {
       filePath = PATH.join(settings.upload.messageVoiceBrowser, path);
       filePath = filePath.replace("amr", "mp3");
-    } 
+      filePath = filePath.replace("aac", "mp3");
+    }
     if(videoExt.includes(ext)) {
       filePath = PATH.join(settings.upload.messageVideoBrowser, path);
       filePath = filePath.replace(ext, "mp4");
@@ -41,7 +42,7 @@ resourceRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png'];
+    const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'];
     const voiceExt = ['amr'];
     const videoExt = ["mp4", "mov", "3gp", "avi"];
     const {data, db, body, settings, tools, fs} = ctx;

@@ -207,3 +207,7 @@ block scripts
       })
       NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
     });
+
+    if (NKC.configs.platform === 'reactNative') {
+      window._userSelect = true;
+    }

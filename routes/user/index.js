@@ -69,7 +69,40 @@ userRouter
     if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
       if(data.user) {
         data.subscribed = state.subUsersId.includes(uid);
+        data.friend = null;
+        const friend = await db.FriendModel.findOne({uid: data.user.uid, tUid: data.targetUser.uid});
+        if(friend) {
+          const categories = await db.FriendsCategoryModel.find({
+            uid: data.user.uid,
+          });
+          data.friendCategories = categories.map(c => {
+            const {_id,name, description, friendsId} = c;
+            return {
+              _id,
+              name,
+              description,
+              usersId: friendsId
+            };
+          })
+          data.friend = {
+            uid: friend.uid,
+            tUid: friend.tUid,
+            ...friend.info
+          };
+          if(!data.friend.phone || !data.friend.phone.length) data.friend.phone = [''];
+        }
       }
+      return await next();
+    } else if(from === 'message') {
+      if(!user) ctx.throw(403, '你暂未登录');
+      data.friend = await db.FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
+      data.inBlacklist = !!(await db.MessageBlackListModel.findOne({uid: user.uid, tUid: targetUser.uid}));
+      data.friendCategories = await db.FriendsCategoryModel.find({uid: user.uid}).sort({toc: -1});
+      data.targetUserName = targetUser.username || targetUser.uid;
+      if(data.friend && data.friend.info.name) {
+        data.targetUserName = data.friend.info.name || data.targetUserName;
+      }
+      ctx.template = 'message/appUserDetail/appUserDetail.pug';
       return await next();
     }
     // 获取用户能够访问的专业ID

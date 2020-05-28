@@ -113,3 +113,9 @@
 #moduleLogin .button-icon.succeed{
   font-size: 1.2rem;
 }
+#moduleLogin .rn-close{
+  text-align: right;
+  font-size: 1.3rem;
+  height: 2rem;
+  color: #555;
+}

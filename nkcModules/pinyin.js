@@ -21,7 +21,7 @@ func.getFirstLetter = (text = "") => {
 func.sortByFirstLetter = (type, arr, key) => {
   let results = [];
   if(type === "array") {
-    
+
   } else if(type === "object") {
     const obj = {};
     letters.map(l => {
@@ -37,6 +37,29 @@ func.sortByFirstLetter = (type, arr, key) => {
     });
     return results;
   }
+};
+
+// 根据首拼音分组
+func.getGroupsByFirstLetter = (arr, key) => {
+  let results = [];
+  const obj = {};
+  letters.map(l => {
+    obj[l] = [];
+  });
+  arr.map(a => {
+    const text = a[key];
+    const letter = func.getFirstLetter(text);
+    obj[letter].push(a);
+  });
+  letters.map(l => {
+    const values = obj[l];
+    if(!values || !values.length) return;
+    results.push({
+      title: l,
+      data: values
+    });
+  });
+  return results;
 };
 
 module.exports = func;
