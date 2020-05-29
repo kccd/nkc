@@ -64,6 +64,11 @@ router
           name: "我的草稿",
         },
         {
+          type: "note",
+          name: "我的笔记",
+          url: `/u/${targetUser.uid}/profile/note`,
+        },
+        {
           type: "subscribe/user",
           url: `/u/${targetUser.uid}/profile/subscribe/user`,
           name: "关注的用户",
@@ -102,11 +107,6 @@ router
           type: "follower",
           name: "我的粉丝",
           url: `/u/${targetUser.uid}/profile/follower`,
-        },
-        {
-          type: "note",
-          name: "我的笔记",
-          url: `/u/${targetUser.uid}/profile/note`,
         }
       ];
     } else {
