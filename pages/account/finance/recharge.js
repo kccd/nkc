@@ -23,7 +23,10 @@ var app = new Vue({
       else {
         return this.error = '充值数额必须大于0';
       }
-      var newWindow = window.open();
+      var newWindow;
+      if(NKC.configs.platform !== 'reactNative') {
+        newWindow = window.open();
+      }
       nkcAPI('/account/finance/recharge?type=get_url&money=' + money, 'GET')
         .then(function(data) {
           if(NKC.configs.platform === 'reactNative') {
