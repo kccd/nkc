@@ -121,12 +121,14 @@ var app = new Vue({
         account: this.selectedAccount
       })
         .then(function(data) {
+          return sweetSuccess('提现成功');
           app.user = data.user;
           app.succeedMoney = money;
           app.succeed = true;
           app.submitted = false;
         })
         .catch(function(data) {
+          return sweetError(data);
           app.error = data.error || data;
           app.submitted = false;
         });
