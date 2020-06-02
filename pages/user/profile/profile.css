@@ -818,3 +818,28 @@ body {
     height: 6rem!important;
   }
 }
+.app-records {
+  font-size: 1.2rem;
+}
+.app-records .record {
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+  display: flex;
+}
+.app-records .record .record-left {
+  flex: 1;
+}
+.app-records .record .record-left .time {
+  font-size: 1.2rem;
+}
+.app-records .record .record-right {
+  width: 8rem;
+}
+.app-records .record .record-right .number {
+  width: 100%;
+  text-align: right;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e85a71;
+}

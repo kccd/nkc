@@ -1,3 +1,34 @@
+mixin item(record)
+  .record
+    .record-left
+      .time= format("YYYY-MM-DD HH:mm:ss", record.toc)
+      .id= `交易ID：${record._id}`
+      .type= `交易类型：${lang('kcbsTypes', record.type)}`
+
+      .target
+        span 交易对象：
+        if record.to === data.targetUser.uid
+          if !record.fromUser
+            span 科创人民很行
+          else
+            a(href=`/u/${record.from}` target="_blank")= record.fromUser.username
+        else
+          if !record.toUser
+            span 科创人民很行
+          else
+            a(href=`/u/${record.to}` target="_blank")= record.toUser.username
+      .description= `其他说明：${record.description || '无'}`
+      .other
+        if record.post
+          a(href=record.post.url target="_blank")=`文号（${record.pid}）`
+        if record.ordersId && record.ordersId.length !== 0
+          span=`订单号（${record.ordersId.join(', ')}）`
+    .record-right
+      .number
+        span=record.to === data.targetUser.uid? '+':'-'
+        | &nbsp;
+        span=record.num / 100
+
 
 div
   h4 我的资产
@@ -17,96 +48,102 @@ div
       a(href=`/u/${data.targetUser.uid}/profile/finance?t=payout` data-type="reload") 支出
   .m-t-1
     include ../../publicModules/paging/paging
-  div(style='font-size: 1rem;')
-    if data.t !== 'all'
-      .table-responsive
-        table.table.table-bordered
-          thead
-            tr
-              th 时间
-              th 账单ID
-              th 类型
-              th 说明
-              th
-                if !data.t
-                  span 支付者
-                else if data.t === 'payout'
-                  span 收款人
-              th 金额
-              th 其他
-          tbody
-            for record in data.kcbsRecords
-              tr
-                th= format("YYYY-MM-DD HH:mm:ss", record.toc)
-                th= record._id
-                th= lang('kcbsTypes', record.type)
-                th
-                  .table-content(title=record.description)= record.description
-                th
-                  -let targetUser;
-                  if !data.t
-                    -targetUser = record.fromUser
-                  else
-                    -targetUser = record.toUser
-                  if !targetUser
-                    span 科创人民很行
-                  else
-                    span= targetUser.username
-                th= record.num / 100
-                th
-                  if record.post
-                    a(href=record.post.url target="_blank")=`文号（${record.pid}）`
-                  if record.ordersId && record.ordersId.length !== 0
-                    span=`订单号（${record.ordersId.join(', ')}）`
 
-      if !data.kcbsRecords.length
-        .text-center 暂无记录
+  div(style='font-size: 1rem;')
+    if state.platform === 'reactNative'
+      .app-records
+        for record in data.kcbsRecords
+          +item(record)
     else
-      .table-responsive
-        table.table.table-bordered
-          thead
-            tr
-              th 时间
-              th 账单ID
-              th 类型
-              th 说明
-              th 交易对象
-              th 收入
-              th 支出
-              th 其他
-          tbody
-            for record in data.kcbsRecords
+      if data.t !== 'all'
+        .table-responsive
+          table.table.table-bordered
+            thead
               tr
-                th= format("YYYY-MM-DD HH:mm:ss", record.toc)
-                th= record._id
-                th= lang('kcbsTypes', record.type)
+                th 时间
+                th 账单ID
+                th 类型
+                th 说明
                 th
-                  .table-content(title=record.description)= record.description
-                th
-                  if record.to === data.targetUser.uid
-                    if !record.fromUser
+                  if !data.t
+                    span 支付者
+                  else if data.t === 'payout'
+                    span 收款人
+                th 金额
+                th 其他
+            tbody
+              for record in data.kcbsRecords
+                tr
+                  th= format("YYYY-MM-DD HH:mm:ss", record.toc)
+                  th= record._id
+                  th= lang('kcbsTypes', record.type)
+                  th
+                    .table-content(title=record.description)= record.description
+                  th
+                    -let targetUser;
+                    if !data.t
+                      -targetUser = record.fromUser
+                    else
+                      -targetUser = record.toUser
+                    if !targetUser
                       span 科创人民很行
                     else
-                      a(href=`/u/${record.from}` target="_blank")= record.fromUser.username
-                  else
-                    if !record.toUser
-                      sapn 科创人民很行
-                    else
-                      a(href=`/u/${record.to}` target="_blank")= record.toUser.username
-                th
-                  if record.to === data.targetUser.uid
-                    span= record.num / 100
-                th
-                  if record.from === data.targetUser.uid
-                    span= record.num / 100
-                th
-                  if record.post
-                    a(href=record.post.url target="_blank")=`文号（${record.pid}）`
-                  if record.ordersId && record.ordersId.length !== 0
-                    span=`订单号（${record.ordersId.join(', ')}）`
+                      span= targetUser.username
+                  th= record.num / 100
+                  th
+                    if record.post
+                      a(href=record.post.url target="_blank")=`文号（${record.pid}）`
+                    if record.ordersId && record.ordersId.length !== 0
+                      span=`订单号（${record.ordersId.join(', ')}）`
 
-      if !data.kcbsRecords.length
-        .text-center 暂无记录
+        if !data.kcbsRecords.length
+          .text-center 暂无记录
+      else
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th 时间
+                th 账单ID
+                th 类型
+                th 说明
+                th 交易对象
+                th 收入
+                th 支出
+                th 其他
+            tbody
+              for record in data.kcbsRecords
+                tr
+                  th= format("YYYY-MM-DD HH:mm:ss", record.toc)
+                  th= record._id
+                  th= lang('kcbsTypes', record.type)
+                  th
+                    .table-content(title=record.description)= record.description
+                  th
+                    if record.to === data.targetUser.uid
+                      if !record.fromUser
+                        span 科创人民很行
+                      else
+                        a(href=`/u/${record.from}` target="_blank")= record.fromUser.username
+                    else
+                      if !record.toUser
+                        sapn 科创人民很行
+                      else
+                        a(href=`/u/${record.to}` target="_blank")= record.toUser.username
+                  th
+                    if record.to === data.targetUser.uid
+                      span= record.num / 100
+                  th
+                    if record.from === data.targetUser.uid
+                      span= record.num / 100
+                  th
+                    if record.post
+                      a(href=record.post.url target="_blank")=`文号（${record.pid}）`
+                    if record.ordersId && record.ordersId.length !== 0
+                      span=`订单号（${record.ordersId.join(', ')}）`
+
+        if !data.kcbsRecords.length
+          .text-center 暂无记录
   if data.paging.pageCount > 1
     div
       include ../../publicModules/paging/paging_input
