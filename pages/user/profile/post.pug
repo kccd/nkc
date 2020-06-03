@@ -56,10 +56,10 @@ div
                   .thread-hits
                     .fa.fa-eye
                     span=post.thread.hits
-                if post.thread.count - 1
+                if post.thread.count
                   .thread-comment
                     .fa.fa-comment
-                    span=post.thread.count - 1
+                    span=post.thread.count
                 if post.thread.firstPost.anonymous
                   span 匿名
   if data.paging.pageCount > 1

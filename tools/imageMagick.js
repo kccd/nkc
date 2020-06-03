@@ -74,7 +74,7 @@ const watermarkifyLogo = (trans, dpi, position, waterSmallPath, path) => {
   return spawnProcess('magick', ['composite', '-dissolve', trans, '-gravity', position  ,'-geometry', dpi, waterSmallPath, path, path]);
 };
 
-// username 水印 
+// username 水印
 const watermarkifyFont = (dpi, font, position, path, temporaryPath) =>{
   if(linux) {
     return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#5c5d6d91', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
@@ -85,19 +85,81 @@ const watermarkifyFont = (dpi, font, position, path, temporaryPath) =>{
 }
 
 // 手机图片上传自动旋转
+// 或采用 -auto-orient 参数
 const allInfo = async path => {
+
+  if(linux) {
+    await spawnProcess('convert', [path,'-auto-orient', path]);
+  } else {
+    await spawnProcess('magick', ['convert', path,'-auto-orient', path]);
+  }
+
+  /*
+
+  const configs = {
+    RightTop: '90',
+    LeftBottom: '270',
+    BottomRight: '180'
+  };
   let back;
-  back = await spawnProcess('magick', ['identify','-format','%[orientation]', path])
-  if(back.trim() === "RightTop"){
-    return spawnProcess('magick', ['convert', path, '-rotate', '90', path]);
+
+  // 获取图片的旋转信息
+  if(linux) {
+    back = await spawnProcess('identify', ['-format','%[orientation]', path]);
+  } else {
+    back = await spawnProcess('magick', ['identify','-format','%[orientation]', path]);
   }
-  if(back.trim() === "LeftBottom"){
-    return spawnProcess('magick', ['convert', path, '-rotate', '270', path]);
+
+  back = back.trim();
+
+  const rotate = configs[back];
+
+  if(!rotate) return; // 无需旋转
+
+  // 旋转图片
+  if(linux) {
+    await spawnProcess('convert', [path, '-rotate', rotate, path]);
+  } else {
+    await spawnProcess('magick', ['convert', path, '-rotate', rotate, path]);
   }
-  if(back.trim() === "BottomRight"){
-    return spawnProcess('magick', ['convert', path, '-rotate', '180', path]);
-  }
+
+  // 清理旋转信息
+  if(linux) {
+    await spawnProcess('convert', [path, '-strip', path]);
+  } else {
+    await spawnProcess('magick', ['convert', path, '-strip', path]);
+  }*/
 }
+
+// 20200525为脚本写的一个函数处理图片旋转信息
+// 之前服务器根据旋转信息旋转图片之后未清理旋转参数
+// 新版chrome浏览器在网页中同样解析了图片上的旋转参数导致图片反生旋转
+// 仅支持windows
+
+const clearPictureExif = async (path) => {
+  const configs = {
+    RightTop: '90',
+    LeftBottom: '270',
+    BottomRight: '180'
+  };
+  let back;
+
+  // 获取图片的旋转信息
+  if(linux) {
+    back = await spawnProcess('identify', ['-format','%[orientation]', path]);
+  } else {
+    back = await spawnProcess('magick', ['identify','-format','%[orientation]', path]);
+  }
+
+  back = back.trim();
+
+  const rotate = configs[back];
+
+  if(!rotate) return; // 无需旋转
+
+  await spawnProcess('magick', ['convert', path, '-strip', path]);
+
+};
 
 // 旋转图片
 const pictureRotate = async path => {
@@ -473,7 +535,8 @@ module.exports = {
   shopLogoify,
   shopCertImageify,
   shopCertSmallImageify,
-  pictureRotate
+  pictureRotate,
+  clearPictureExif
 };
 
 

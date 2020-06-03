@@ -874,9 +874,6 @@ block content
 block footer
 
 block scripts
-  if state.isApp && state.platform === 'reactNative'
-    +includeJS('/socket.io-client/dist/socket.io.js')
-    +includeJS('/message/socket.js')
   script(src=`/bootstrap/js/bootstrap-chinese-region.min.js?v=${global.NKC.startTime}` charset="UTF-8")
   //- 为了让IE兼容Symbol transliteration插件用到该属性
   script.

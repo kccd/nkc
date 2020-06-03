@@ -104,7 +104,7 @@ module.exports = async (ctx, next) => {
     // apiCloud: NKC/APP/android
     // ReactNative: rn-android、rn-ios
     let userAgent = ctx.header["user-agent"] || "";
-    let reg = /^NKC\/APP\/(.+)/;
+    let reg = /NKC\/APP\/(.+)/;
     userAgent = reg.exec(userAgent);
     if(userAgent !== null && ['rn-android', 'rn-ios', 'android'].includes(userAgent[1])) {
       const _userAgent = userAgent[1];

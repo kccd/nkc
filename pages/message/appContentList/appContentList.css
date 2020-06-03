@@ -77,11 +77,11 @@ html,
   color: #555;
 }
 #container #listContainer .listItem .message.left .messageContainer .smart {
-  left: -1rem;
-  border-top: 0.5rem solid transparent;
-  border-right: 0.5rem solid #fff;
-  border-bottom: 0.5rem solid transparent;
-  border-left: 0.5rem solid transparent;
+  left: -12px;
+  border-top: 6px solid transparent;
+  border-right: 6px solid #fff;
+  border-bottom: 6px solid transparent;
+  border-left: 6px solid transparent;
 }
 #container #listContainer .listItem .message.left .messageContainer .smart:before {
   left: 0;
@@ -104,11 +104,11 @@ html,
   color: #fff;
 }
 #container #listContainer .listItem .message.right .messageContainer .smart {
-  right: -1rem;
-  border-top: 0.5rem solid transparent;
-  border-right: 0.5rem solid transparent;
-  border-bottom: 0.5rem solid transparent;
-  border-left: 0.5rem solid #6aafe6;
+  right: -12px;
+  border-top: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 6px solid #6aafe6;
 }
 #container #listContainer .listItem .message.right .messageContainer .smart:before {
   right: 0;
@@ -117,16 +117,16 @@ html,
   left: -2rem;
 }
 #container #listContainer .listItem .message .icon {
-  width: 3rem;
+  width: 36px;
 }
 #container #listContainer .listItem .message .icon img {
   box-sizing: border-box;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
 }
 #container #listContainer .listItem .message .messageContainer {
-  min-height: 3rem;
+  min-height: 36px;
   display: flex;
   align-items: center;
   position: relative;
@@ -144,7 +144,7 @@ html,
   display: none;
 }
 #container #listContainer .listItem .message .messageContainer .messageContent {
-  min-height: 3rem;
+  min-height: 36px;
   display: inline-block;
   word-break: break-all;
   font-size: 1.3rem;
@@ -198,18 +198,18 @@ html,
 }
 #container #listContainer .listItem .message .messageContainer .smart {
   position: absolute;
-  top: 0.83333333rem;
+  top: 10px;
   width: 0;
   height: 0;
 }
 #container #listContainer .listItem .message .messageContainer .smart:before {
-  height: 1rem;
-  width: 0.5rem;
+  height: 12px;
+  width: 6px;
   background-color: #f2f2f2;
   position: absolute;
   border-radius: 5px;
   content: "";
-  top: -1rem;
+  top: -12px;
 }
 #container #listContainer .listItem .message .messageContainer .status {
   position: absolute;
@@ -304,13 +304,14 @@ html,
   width: 100%;
   font-size: 1.3rem;
   padding: 0.5rem;
-  min-height: 2.8rem;
+  min-height: 3.2rem;
   max-height: 7rem;
-  height: 2.8rem;
+  height: 3.2rem;
   overflow-x: hidden;
   overflow-y: auto;
   border-radius: 3px;
   border: 1px solid #eee;
+  box-sizing: border-box;
   resize: none;
 }
 #container #inputContainer .form .textarea textarea:focus {
@@ -326,7 +327,7 @@ html,
   position: absolute;
   border-radius: 3px;
   color: #fff;
-  height: 2.8rem;
+  height: 3.2rem;
   bottom: 0;
   left: 0;
   border: none;

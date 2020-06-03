@@ -717,7 +717,7 @@ NKC.methods.toChat = function(uid, name, type) {
   if(NKC.configs.platform === 'reactNative') {
     NKC.methods.rn.emit('toChat', {
       uid: uid,
-      name: name || uid,
+      name: name,
       type: type || 'UTU'
     });
   } else {
@@ -762,5 +762,13 @@ NKC.methods.appSelectLocation = function() {
         resolve(data);
       });
     })
+  }
+}
+/*
+*  close webView
+* */
+NKC.methods.appClosePage = function() {
+  if(NKC.configs.platform === 'reactNative') {
+    NKC.methods.rn.emit('closeWebView');
   }
 }

@@ -36,10 +36,10 @@ div
               .thread-hits
                 .fa.fa-eye
                 span=thread.hits
-            if thread.count - 1
+            if thread.count
               .thread-comment
                 .fa.fa-comment
-                span=thread.count - 1
+                span=thread.count
             if thread.firstPost.anonymous
               span 匿名
   .m-t-05

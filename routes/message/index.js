@@ -15,6 +15,7 @@ const searchRouter = require('./search');
 const blackRouter = require('./blackList');
 const frameRouter = require('./frame');
 const addFriend = require("./addFriend");
+const categoryRouter = require('./category');
 const moment = require("moment");
 messageRouter
   .use('/', async (ctx, next) => {
@@ -133,7 +134,12 @@ messageRouter
         count: unread
       });
     }
-    const {chat} = data.user.generalSettings.messageSettings;
+    const {chat, beep} = data.user.generalSettings.messageSettings;
+    data.sound = {
+      UTU: !!beep.usersMessage,
+      STE: !!beep.systemInfo,
+      STU: !!beep.reminder
+    };
     let message;
     // 获取通知
     if(chat.systemInfo) {
@@ -317,5 +323,6 @@ messageRouter
   .use("/blackList", blackRouter.routes(), blackRouter.allowedMethods())
   .use("/frame", frameRouter.routes(), frameRouter.allowedMethods())
   .use("/addFriend", addFriend.routes(), addFriend.allowedMethods())
+  .use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
   .use("/data", dataRouter.routes(), dataRouter.allowedMethods());
 module.exports = messageRouter;

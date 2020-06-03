@@ -52,8 +52,8 @@ body, html, #app{
       }
       .message{
         display: flex;
-        @imgWidth: 3rem;
-        @smartWidth: 0.5rem;
+        @imgWidth: 36px;
+        @smartWidth: 6px;
         &.left{
           flex-direction: row;
           .messageContainer{
@@ -300,7 +300,7 @@ body, html, #app{
     }
     .form{
       display: flex;
-      @inputHeight: 2.8rem;
+      @inputHeight: 3.2rem;
       .textarea{
         font-size: 0;
         flex: 1;
@@ -315,6 +315,7 @@ body, html, #app{
           overflow-y: auto;
           border-radius: 3px;
           border: 1px solid #eee;
+          box-sizing: border-box;
           resize: none;
           &:focus{
             outline: none;

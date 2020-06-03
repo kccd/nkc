@@ -768,11 +768,16 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
       message.content = message.content || "";
       if(['STE', 'UTU'].includes(ty)) {
         // 系统通知、用户间消息
-        message.content = nkcRender.plainEscape(message.content);
+
+        // 替换空格
+        message.content = message.content.replace(/ /g, '&nbsp;');
+        // 处理链接 上下顺序不能变 处理链接函数里做了 > 判断
+        message.content = nkcRender.URLifyHTML(message.content);
+        // 替换换行符
+        message.content = message.content.replace(/\n/g, '<br/>');
         message.content = message.content.replace(/\[f\/(.*?)]/g, function(r, v1) {
           return '<img class="message-emoji" src="/twemoji/2/svg/'+ v1 +'.svg"/>';
         });
-        message.content = nkcRender.URLifyHTML(message.content);
       }
     }
 

@@ -35,13 +35,14 @@ include ../interface_fund_apply_messages
       if !applicationForm.status.submitted
         -let flag = false;
         -const membersId = applicationForm.members.map(m => m.uid) || [];
-        if membersId.includes(data.user.uid) && data.user.uid !== applicationForm._id
+        //-if membersId.includes(data.user.uid) && data.user.uid !== applicationForm._id
           duv.m-b-1.m-t-1
             h4.text-center=`来自`
-            a(href=`/u/${applicationForm.uid}` target='_blank')= applicationForm.applicant.user.username
-            span 组队邀请
+              a(href=`/u/${applicationForm.uid}` target='_blank')= applicationForm.applicant.user.username
+              span 组队邀请
             -for(let aUser of applicationForm.members)
-              if aUser.uid === user.uid
+              -console.log(aUser.uid, data.user.uid)
+              if aUser.uid === data.user.uid
                 case aUser.agree
                   when false
                     h3.redFontColor.text-center 已拒绝
