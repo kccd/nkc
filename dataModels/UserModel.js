@@ -114,6 +114,11 @@ const userSchema = new Schema({
     default: [],
     index: 1
   },
+  hidden: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   postSign: String,
 	volumeA: {
   	type: Boolean,

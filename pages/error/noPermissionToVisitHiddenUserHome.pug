@@ -1,0 +1,11 @@
+extends ./errorBase
+block errorContent
+  .error-icon=`${data.status} Not Found`
+  .error-list.b-s-10
+    .error-header 抱歉！您不能查看此用户的主页：
+    ul
+      li 此用户主页已被锁定
+    .error-code
+      span message：
+      code= data.error
+    .error-info 

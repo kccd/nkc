@@ -327,3 +327,13 @@ body{
   color: #9baec8;
   cursor: pointer;
 }
+
+/* 已隐藏的用户主页提示 */
+.hidden-user-home-tip {
+  line-height: 34px;
+  text-align: center;
+  background-color: rgb(255, 124, 124);
+  margin-bottom: 6px;
+  border-radius: 4px;
+  color: white;
+}

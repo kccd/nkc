@@ -718,5 +718,6 @@
 
   "violationRecord": "查看用户违规记录",
 
-  "deletePost": "删除文章"
+  "deletePost": "删除文章",
+  "hideUserHome": "设置用户主页的显示和隐藏"
 }
