@@ -7,10 +7,10 @@ block title
 block content
   .container-fluid.max-width
     include ../publicModules/mobile_drawer/mobile_drawer
-    if data.targetUser.hidden
-      .row
-        .hidden-user-home-tip 此用户主页已对外隐藏
     .row
+      if data.targetUser.hidden
+        .col-xs-12.col-md-12
+          .hidden-user-home-tip 此用户主页已对外隐藏
       .col-xs-12.col-md-2.box-shadow-panel.p-r-0
         .p-a-0.m-b-1.user-home-panel
           .user-image
