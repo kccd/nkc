@@ -37,7 +37,7 @@ window.closeWin = function() {
   if(NKC.configs.platform === 'apiCloud') {
     api.closeWin();
   } else if(NKC.configs.platform === 'reactNative') {
-    NKC.methods.rn.emit('closeWebView');
+    NKC.methods.rn.emit('closeWebView', {drawer: true});
   }
 };
 window.logout = function() {

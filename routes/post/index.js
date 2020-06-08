@@ -8,6 +8,7 @@ const voteRouter = require('./vote');
 const warningRouter = require("./warning");
 const anonymousRouter = require("./anonymous");
 const hideRouter = require("./hide");
+const deleteRouter = require("./delete");
 const postRouter = require("./post");
 const Path = require("path");
 const toppedRouter = require("./topped");
@@ -491,5 +492,6 @@ router
   .use("/:pid/topped", toppedRouter.routes(), toppedRouter.allowedMethods())
   .use("/:pid/anonymous", anonymousRouter.routes(), anonymousRouter.allowedMethods())
   .use("/:pid/resources", resourcesRouter.routes(), resourcesRouter.allowedMethods())
-  .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods());
+  .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods())
+  .use("/:pid/delete", deleteRouter.routes(), deleteRouter.allowedMethods());
 module.exports = router;

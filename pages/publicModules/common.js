@@ -119,8 +119,11 @@ NKC.methods.visitUrl = function(url, blank) {
       if(NKC.configs.platform === 'apiCloud') {
         NKC.methods.openOnlinePage(url);
       } else {
+        if(url.indexOf('http') !== 0) {
+          url = location.origin + url;
+        }
         NKC.methods.rn.emit('openNewPage', {
-          href: location.origin + url
+          href: url
         });
       }
     } else {

@@ -23,10 +23,17 @@ var app = new Vue({
       else {
         return this.error = '充值数额必须大于0';
       }
-      var newWindow = window.open();
+      var newWindow;
+      if(NKC.configs.platform !== 'reactNative') {
+        newWindow = window.open();
+      }
       nkcAPI('/account/finance/recharge?type=get_url&money=' + money, 'GET')
         .then(function(data) {
-          newWindow.location = data.url;
+          if(NKC.configs.platform === 'reactNative') {
+            NKC.methods.visitUrl(data.url, true);
+          } else {
+            newWindow.location = data.url;
+          }
           app.error = '请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。'
         })
         .catch(function(data) {
