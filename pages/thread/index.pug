@@ -147,6 +147,8 @@ block title
               li
                 a(href=`/editor?ver=ue&type=post&id=${post.pid}`)
                   span.fa.fa-edit &nbsp;编辑
+                a(onclick=`NKC.methods.deletePost('${post.pid}')`)
+                  span.fa.fa-trash &nbsp;删除
         if disablePost && !targetThread
           li
             a(onclick=`disabledThreadPost('${post.pid}')`)
@@ -741,3 +743,4 @@ block scripts
     include ../publicModules/floatUserPanel/userInfo
   include ../publicModules/imageViewer
   +includeJS("/thread/index.js")
+  +includeJS("/thread/deletePost.js")

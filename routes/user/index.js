@@ -19,6 +19,8 @@ const destroyRouter = require("./destroy");
 // 违规记录
 const violationRouter = require("./violationRecord");
 const userRouter = new Router();
+// 隐藏用户主页
+const hideRouter = require("./hide");
 
 
 userRouter
@@ -65,6 +67,9 @@ userRouter
     const targetUser = await db.UserModel.findById(uid);
     await targetUser.extendGrade();
     data.targetUser = targetUser;
+    if(targetUser.hidden && !ctx.permission("hideUserHome")) {
+      nkcModules.throwError(404, "根据相关法律法规和政策，该内容不予显示", "noPermissionToVisitHiddenUserHome");
+    }
     await db.UserModel.extendUsersInfo([targetUser]);
     if(user) {
       data.inBlacklist = !!(await db.BlacklistModel.findOne({uid: user.uid, tUid: targetUser.uid}));
@@ -492,5 +497,6 @@ userRouter
   .use("/:uid/profile", profileRouter.routes(), profileRouter.allowedMethods())
   .use("/:uid/destroy", destroyRouter.routes(), destroyRouter.allowedMethods())
   .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods())
-  .use("/:uid/violationRecord", violationRouter.routes(), violationRouter.allowedMethods());
+  .use("/:uid/violationRecord", violationRouter.routes(), violationRouter.allowedMethods())
+  .use("/:uid/hide", hideRouter.routes(), hideRouter.allowedMethods());
 module.exports = userRouter;

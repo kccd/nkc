@@ -10,7 +10,10 @@ module.exports = {
 		},
     clear: {
 		  POST: "clearUserInfo"
-    },
+		},
+		hide: {
+			POST: "hideUserHome", // 隐藏用户的主页
+		},
 		banned: {
 			PATCH: 'unBannedUser',
 			DELETE: 'bannedUser'

@@ -720,5 +720,8 @@
   "viewSmscodeRecord": "查看短信验证码记录",
   "viewEmailcodeRecord": "查看邮件验证码记录",
 
-  "violationRecord": "查看用户违规记录"
+  "violationRecord": "查看用户违规记录",
+
+  "deletePost": "删除文章",
+  "hideUserHome": "设置用户主页的显示和隐藏"
 }

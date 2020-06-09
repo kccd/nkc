@@ -8,6 +8,9 @@ block content
   .container-fluid.max-width
     include ../publicModules/mobile_drawer/mobile_drawer
     .row
+      if data.targetUser.hidden
+        .col-xs-12.col-md-12
+          .hidden-user-home-tip 此用户主页已对外隐藏
       .col-xs-12.col-md-2.box-shadow-panel.p-r-0
         .p-a-0.m-b-1.user-home-panel
           .user-image
@@ -15,15 +18,21 @@ block content
               .btn-ban
                 .fa.fa-ban(data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="用户违规？点我！")
 
-                <ul class="dropdown-menu">
+                ul.dropdown-menu
                   if data.targetUser.certs.includes("banned") && permission("unBannedUser")
                     li
                       a(onclick=` bannedUser("${data.targetUser.uid}", false)`) 解除封禁
-                    <li role="separator" class="divider"></li>
                   if !data.targetUser.certs.includes("banned") && permission("bannedUser")
                     li
                       a(onclick=` bannedUser("${data.targetUser.uid}", true)`) 封禁用户
-                    <li role="separator" class="divider"></li>
+                  if permission("unBannedUser")
+                    if data.targetUser.hidden
+                      li
+                        a(onclick=`hideUserHome(false, ${data.targetUser.uid})`) 显示主页
+                    else
+                      li
+                        a(onclick=`hideUserHome(true, ${data.targetUser.uid})`) 隐藏主页
+                  li.divider(role="separator")
                   if permission("clearUserInfo")
                     li
                       a(onclick=` clearUserInfo("${data.targetUser.uid}", "avatar")`) 删除头像
@@ -33,7 +42,6 @@ block content
                       a(onclick=` clearUserInfo("${data.targetUser.uid}", "username")`) 删除用户名
                     li
                       a(onclick=` clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
-                </ul>
             .user-banner-mask
             a(href=`/avatar/${data.targetUser.avatar}?t=lg` target="_blank").user-avatar
               img(src=`/avatar/${data.targetUser.avatar}`)
