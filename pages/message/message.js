@@ -99,7 +99,9 @@ $(function() {
       grades: grades,
 
       // 系统强制限制 若未满足要求则无法给当前用户发送短消息
-      showMandatoryLimitInfo: false
+      showMandatoryLimitInfo: false,
+      // 黑名单提示
+      blacklistInfo: ''
 
     },
     beforeCreate: function() {
@@ -480,19 +482,17 @@ $(function() {
 
       // 加入用户到黑名单列表
       addToBlackList: function() {
-        if(confirm("确认要将该用户加入黑名单？") === false) return;
         var isFriend = true;
         var tUid = app.friend.tUid;
         if(!tUid) {
           tUid = app.friend.targetUser.uid;
           isFriend = false;
         }
-        nkcAPI("/message/blackList", "POST", {
-          tUid: tUid,
-          type: "add"
-        })
+        NKC.methods.addUserToBlacklist(tUid, 'message')
           .then(function(data) {
-            app.blackListUid = data.blackListUid;
+            if(!data) return;
+            var index = app.blackListUid.indexOf(tUid);
+            if(index === -1) app.blackListUid.push(tUid);
             for(var i = 0; i < app.userList.length; i++) {
               var item = app.userList[i];
               if(item.type === "UTU" && item.user && item.user.uid === tUid) {
@@ -500,28 +500,19 @@ $(function() {
               }
             }
             if(isFriend) {
-              app.deleteFriend(true);
+              // app.deleteFriend(true);
             }
-            screenTopAlert("已将用户加入到黑名单，可在资料设置处查看黑名单列表。");
-          })
-          .catch(function(data) {
-            screenTopWarning(data);
           })
       },
 
       // 将用户从黑名单列表中移除
       removeFromBlackList: function() {
-        if(confirm("确认要将用户从黑名单中移除？") === false) return;
-        nkcAPI("/message/blackList", "POST", {
-          tUid: app.friend.tUid || app.friend.targetUser.uid,
-          type: "remove"
-        })
+        var tUid = app.friend.tUid || app.friend.targetUser.uid;
+        NKC.methods.removeUserFromBlacklist(tUid)
           .then(function(data) {
-            app.blackListUid = data.blackListUid;
-            screenTopAlert("已将用户从黑名单中移除。");
-          })
-          .catch(function(data) {
-            screenTopWarning(data);
+            if(!data) return;
+            var index = app.blackListUid.indexOf(tUid);
+            if(index !== -1) app.blackListUid.splice(index, 1);
           })
       },
 
@@ -767,6 +758,7 @@ $(function() {
             app.twemoji = data.twemoji;
             app.targetUserSendLimit = data.targetUserSendLimit;
             app.showMandatoryLimitInfo = data.showMandatoryLimitInfo;
+            app.blacklistInfo = data.blacklistInfo;
             app.targetUserGrade = data.targetUserGrade;
             if(data.messages.length === 0) {
               app.info = '没有了~';
@@ -1281,7 +1273,7 @@ $(function() {
           })
           .catch(function(data) {
             // 发送失败 标记信息为发送失败 点击重发
-            screenTopWarning(data.error || data);
+            sweetError(data.error || data);
             var index = app.messages.indexOf(message);
             app.messages[index].status = 'failed';
             Vue.set(app.messages, index, app.messages[index]);

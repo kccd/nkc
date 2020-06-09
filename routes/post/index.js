@@ -135,7 +135,10 @@ router
     data.xsfSettings = await db.SettingModel.getSettings("xsf");
     ctx.template = 'post/post.pug';
 
-    if(data.user) data.complaintTypes = ctx.state.language.complaintTypes;
+    if(data.user) {
+      data.complaintTypes = ctx.state.language.complaintTypes;
+      data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
+    }
 
     const from = ctx.get("FROM");
 

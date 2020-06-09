@@ -12,7 +12,6 @@ const chatRouter = require('./chat');
 const friendsApplicationRouter = require('./friendsApplication');
 const dataRouter = require("./data");
 const searchRouter = require('./search');
-const blackRouter = require('./blackList');
 const frameRouter = require('./frame');
 const addFriend = require("./addFriend");
 const categoryRouter = require('./category');
@@ -57,7 +56,7 @@ messageRouter
     }
 
     data.messageTypes = await db.MessageTypeModel.find().sort({toc: 1});
-    const blackList = await db.MessageBlackListModel.find({
+    const blackList = await db.BlacklistModel.find({
       uid: user.uid
     }, {
       tUid: 1
@@ -320,7 +319,6 @@ messageRouter
   .use('/chat', chatRouter.routes(), chatRouter.allowedMethods())
   .use('/search', searchRouter.routes(), searchRouter.allowedMethods())
   .use('/systemInfo', systemInfoRouter.routes(), systemInfoRouter.allowedMethods())
-  .use("/blackList", blackRouter.routes(), blackRouter.allowedMethods())
   .use("/frame", frameRouter.routes(), frameRouter.allowedMethods())
   .use("/addFriend", addFriend.routes(), addFriend.allowedMethods())
   .use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())

@@ -110,10 +110,6 @@ module.exports = {
       },
       bank: {
         POST: 'userBindBankAccounts'
-      },
-      message: {
-			  GET: "userMessageSettings",
-        PATCH: "userMessageSettings"
       }
 		},
 		auth: {
@@ -209,6 +205,9 @@ module.exports = {
 			},
 			note: {
 				GET: "userProfile"
+			},
+			blacklist: {
+				GET: 'userProfile'
 			}
 		},
 		destroy: {

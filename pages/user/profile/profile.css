@@ -843,3 +843,53 @@ body {
   font-weight: 700;
   color: #e85a71;
 }
+.black-list .list-container .list-body {
+  position: relative;
+  height: 3.6rem;
+  margin: 1rem 0;
+}
+.black-list .list-container .list-body .item-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 3.6rem;
+  width: 3.6rem;
+}
+.black-list .list-container .list-body .item-left img {
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+}
+.black-list .list-container .list-body .item-center {
+  padding: 0 3rem 0 4.6rem;
+}
+.black-list .list-container .list-body .item-center .username {
+  font-size: 1.3rem;
+  height: 1.8rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.black-list .list-container .list-body .item-center .description {
+  margin-top: 0.3rem;
+  font-size: 1rem;
+  font-style: oblique;
+}
+.black-list .list-container .list-body .item-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 3.6rem;
+  width: 2rem;
+}
+.black-list .list-container .list-body .item-right .icon {
+  text-align: center;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 1.3rem;
+}
+.black-list .list-container .list-body .item-right .icon:hover {
+  color: #333;
+}

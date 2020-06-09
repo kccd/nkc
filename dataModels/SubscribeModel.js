@@ -510,14 +510,14 @@ schema.statics.getUserSubscribeTypeFromRedis = async (uid, typeId, subType) => {
  * -------
  * 关注专业
  * -------
- * @param {Object} options 
+ * @param {Object} options
  * @参数说明 options对象中必要参数
  * | uid   --  用户ID
  * | fids  --  目标专业的fid数组集合，不可为空
  * | 其余未作说明的参数为非必要
- * 
+ *
  * @return 无返回
- * 
+ *
  * @author Kris 2019-06-10
  */
 schema.statics.autoAttentionForum = async function(options) {

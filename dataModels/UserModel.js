@@ -685,12 +685,12 @@ userSchema.statics.createUser = async (option) => {
 		await user.save();
 		await userPersonal.save();
 		await userGeneral.save();
-		
+
 		// 创建默认关注分类
     // 2019/11/21 创建“个人中心”时移除
     // await SubscribeModel.createDefaultType("post", uid);
     // await SubscribeModel.createDefaultType("replay", uid);
-    
+
     // 创建默认数据 关注专业
 		for(const fid of defaultSubscribeForumsId) {
 		  const sub = SubscribeModel({
@@ -738,14 +738,14 @@ userSchema.methods.extendGrade = async function() {
 	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
 	return this.grade = grade;
 };
-/* 
+/*
   拓展全局设置
   @author pengxiguaa 2019/3/6
 */
 userSchema.methods.extendGeneralSettings = async function() {
   return this.generalSettings = await mongoose.model('usersGeneral').findOnly({uid: this.uid});
 };
-/* 
+/*
   验证用户是否完善资料，包括：用户名、密码
   未完善则会抛出错误
   @author pengxiguaa 2019/3/7
@@ -880,7 +880,7 @@ userSchema.methods.getPostLimit = async function() {
 
 };
 
-/* 
+/*
   拓展用户基本信息，显示在用户面板中，任何人可见的内容
   @param users: 用户对象数组
   @author pengxiguaa 2019/2/27
@@ -920,7 +920,10 @@ userSchema.statics.extendUsersInfo = async (users) => {
     if(column) {
       user.column = {
         _id: column._id,
-        name: column.name
+        name: column.name,
+        banner: column.banner,
+        avatar: column.avatar,
+        abbr: column.abbr
       }
     }
     for(const cert of certs) {
@@ -962,10 +965,10 @@ userSchema.methods.extendAuthLevel = async function() {
   return this.authLevel = await userPersonal.getAuthLevel();
 };
 
-/* 
+/*
   通过uid查找单一用户
   @param uid: 用户ID
-  @author pengxiguaa 2019/3/7 
+  @author pengxiguaa 2019/3/7
 */
 userSchema.statics.findById = async (uid) => {
   const UserModel = mongoose.model('users');

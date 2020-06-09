@@ -11,7 +11,7 @@ function autoSaveCommentDraft(tid, pid) {
       .then(function() {
         var content = editor[pid].getContent();
         if(!content) throw "请输入评论内容";
-        var draftId = draftsId[pid] || "";  
+        var draftId = draftsId[pid] || "";
         var method = "POST";
         var url = "/u/"+NKC.configs.uid+"/drafts";
         var data = {
@@ -23,7 +23,7 @@ function autoSaveCommentDraft(tid, pid) {
           desType: "thread",
           desTypeId: tid,
         };
-        return nkcAPI(url, method, data)  
+        return nkcAPI(url, method, data)
       })
       .then(function(data) {
         draftsId[pid] = data.draft.did;
@@ -33,7 +33,7 @@ function autoSaveCommentDraft(tid, pid) {
         console.log(err);
         autoSaveCommentDraft(tid, pid);
       })
-    
+
   }, 60000);
 }
 
@@ -94,9 +94,20 @@ function postComment(tid, pid, firstInput) {
     editor[pid].destroy();
   }
   editor[pid] = UE.getEditor('edit_' + pid, NKC.configs.ueditor.commentConfigs);
-  
+
   postContainer.show();
   autoSaveCommentDraft(tid, pid);
+
+  if(!NKC.configs.uid) return;
+  nkcAPI('/blacklist?pid=' + pid, 'GET')
+    .then(function(data) {
+      var blacklistInfo = data.blacklistInfo;
+      if(blacklistInfo) {
+        var blacklistInfoDom = $("<div class='blacklist-info'><div class='fa fa-exclamation-circle'></div><span>"+blacklistInfo+"</span></div>");
+        editContainer.prepend(blacklistInfoDom);
+      }
+    })
+
 }
 
 function closePostComment(pid, restorePagePosition) {
@@ -156,7 +167,7 @@ function submitPostComment(tid, pid, firstInput) {
       $("button[data-comment-button='"+pid+"']").removeAttr("disabled").text("提交");
     })
     .catch(function(data) {
-      screenTopWarning(data);
+      sweetError(data);
       delete disableButton[pid];
       $("button[data-comment-button='"+pid+"']").removeAttr("disabled").text("提交");
     })
@@ -191,7 +202,7 @@ function viewPostComments(tid, pid, page, callback) {
         setTimeout(function() {
           NKC.methods.initVideo();
         }, 300);
-        
+
       }
       initUserPanel();
     })

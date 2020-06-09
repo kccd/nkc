@@ -56,30 +56,20 @@ window.app = new Vue({
       const _removeFriend = this._removeFriend;
       Promise.resolve()
         .then(() => {
-          if(!inBlacklist) {
-            return sweetQuestion("确认要将该用户加入黑名单？")
-          }
-        })
-        .then(() => {
           if(!inBlacklist && friend) {
-            return _removeFriend();
+            // return _removeFriend();
           }
         })
         .then(() => {
           if(!inBlacklist) {
-            return nkcAPI("/message/blackList", 'POST', {
-              tUid,
-              type: 'add'
-            })
+            return NKC.methods.addUserToBlacklist(tUid, 'message');
           } else {
-            return nkcAPI('/message/blackList', 'POST', {
-              tUid,
-              type: 'remove'
-            })
+            return NKC.methods.removeUserFromBlacklist(tUid);
           }
         })
-        .then(() => {
-          NKC.methods.appToast('操作成功');
+        .then((data) => {
+          if(!data) return;
+          // NKC.methods.appToast('操作成功');
           NKC.methods.appReloadPage();
         })
         .catch(NKC.methods.appToast)

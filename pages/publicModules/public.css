@@ -2195,3 +2195,20 @@ div.user-banned{
   filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);
   _filter:none;
 }
+
+.blacklist-info{
+  border-radius: 1px;
+  padding: 0.6rem 1rem;
+  background-color: #ffd0d4;
+}
+.blacklist-info .fa{
+  color: #ff4f4f;
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+  vertical-align: middle;
+}
+.blacklist-info span{
+  vertical-align: middle;
+  font-size: 1.2rem;
+  color: #555;
+}

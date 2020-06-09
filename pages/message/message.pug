@@ -715,6 +715,9 @@ block content
               +messageContent
             .ms-right-input(v-if='target === "UTU"')
               div(v-if="showMandatoryLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.mandatoryLimitInfo}}
+              div(v-else-if="blacklistInfo" style="padding: 1rem;").p-t-2 {{blacklistInfo}}
+                if permission('canSendToEveryOne')
+                  button.btn.btn-default.btn-sm(@click='blacklistInfo = ""') 继续
               div(v-else-if="showCustomizeLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.customizeLimitInfo}}
               div(v-else-if="showSystemLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.systemLimitInfo}}
                 .m-t-1.text-center
@@ -805,6 +808,9 @@ block content
           // 聊天窗口 footer
           .mobile-footer-input-div(v-if='target === "UTU"')
             div(v-if="showMandatoryLimitInfo" style="height: 6rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.mandatoryLimitInfo}}
+            div(v-else-if="blacklistInfo" style="height: 12rem;padding: 0.5rem;text-align: center;").p-t-2 {{blacklistInfo}}
+              if permission('canSendToEveryOne')
+                button.btn.btn-default.btn-sm(@click='blacklistInfo = ""') 继续
             div(v-else-if="showCustomizeLimitInfo" style="height: 6rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.customizeLimitInfo}}
             div(v-else-if="showSystemLimitInfo" style="height: 12rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.systemLimitInfo}}
               .m-t-1.text-center

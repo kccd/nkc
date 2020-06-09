@@ -154,6 +154,8 @@ block content
           include ./subscribe/thread
         else if data.type === "subscribe/collection"
           include ./subscribe/collection
+        else if data.type === "blacklist"
+          include ./blacklist
       if !state.isApp
         .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs
           .account-nav

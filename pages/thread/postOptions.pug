@@ -55,6 +55,16 @@
         li
           a(onclick=`moduleComplaint.open("post", "${comment.pid}")`)
             span.fa.fa-minus-circle &nbsp;投诉
+      if comment.uid
+        li
+          if data.blacklistUsersId.includes(comment.uid)
+            //- 移出黑名单
+            a(onclick=`NKC.methods.removeUserFromBlacklist("${comment.uid}")`)
+              span.fa.fa-ban &nbsp;移出黑名单
+          else
+            //- 加入黑名单
+            a(onclick=`NKC.methods.addUserToBlacklist("${comment.uid}", 'post', "${comment.pid}")`)
+              span.fa.fa-ban &nbsp;加入黑名单
     li.divider
     li
       a

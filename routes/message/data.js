@@ -53,6 +53,7 @@ router
       } catch(err) {
         data.showMandatoryLimitInfo = true;
       }
+      data.blacklistInfo = await db.BlacklistModel.getBlacklistInfo(targetUser.uid, data.user.uid);
     } else if(type === "STE") {
       const q = {
         ty: 'STE'

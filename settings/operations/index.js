@@ -75,6 +75,7 @@ const stickers = require("./stickers");
 const note = require("./note");
 const tools = require('./tools');
 const ipinfo = require('./ipinfo');
+const blacklist = require('./blacklist');
 const operationObj = {};
 
 
@@ -110,7 +111,7 @@ operationObj.defaultOperations = [
 operationObj.operationTree = {
 	home: {
 		GET: 'visitHome',// 首页
-		
+
 		logo, // 网站logo
 
 		poster, //活动海报
@@ -155,7 +156,7 @@ operationObj.operationTree = {
 		exam,// 考试
 
 		e,// 后台管理
-		
+
 		nkc, // 前台管理
 
 		f,//专业
@@ -208,11 +209,11 @@ operationObj.operationTree = {
 		lottery, // 抽奖页
 
 		shop, //商城
-		
+
 		imageEdit, // 编辑图片
 
 		protocol, // 论坛协议
-    
+
     account, // 个人中心
 
     complaint, // 用户投诉
@@ -229,16 +230,17 @@ operationObj.operationTree = {
 
     library, // 文库
     libraries, // 文库
-		
+
 		appDownload, // 为了兼容旧版APP下载 2020-1-18，APP更新多个版本之后可移除该路由
-		
+
 		reader, // 阅读器 pdf
-		
+
 		sticker, // 表情中心
 		stickers, // 共享表情
 		note, // 批注
 		tools, // 网站工具
 		ipinfo, // ip信息
+		blacklist, // 黑名单
     test,
 	}
 };

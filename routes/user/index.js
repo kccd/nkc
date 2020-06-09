@@ -66,6 +66,9 @@ userRouter
     await targetUser.extendGrade();
     data.targetUser = targetUser;
     await db.UserModel.extendUsersInfo([targetUser]);
+    if(user) {
+      data.inBlacklist = !!(await db.BlacklistModel.findOne({uid: user.uid, tUid: targetUser.uid}));
+    }
     if(from && from === "panel" && ctx.request.get('FROM') === "nkcAPI") {
       if(data.user) {
         data.subscribed = state.subUsersId.includes(uid);
@@ -96,7 +99,6 @@ userRouter
     } else if(from === 'message') {
       if(!user) ctx.throw(403, '你暂未登录');
       data.friend = await db.FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
-      data.inBlacklist = !!(await db.MessageBlackListModel.findOne({uid: user.uid, tUid: targetUser.uid}));
       data.friendCategories = await db.FriendsCategoryModel.find({uid: user.uid}).sort({toc: -1});
       data.targetUserName = targetUser.username || targetUser.uid;
       if(data.friend && data.friend.info.name) {

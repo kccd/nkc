@@ -1,6 +1,6 @@
 window.draft = new (class {
   constructor() {
-  
+
   }
   removeDraft(did) {
     nkcAPI('/u/' + NKC.configs.uid + "/drafts/" + did, "DELETE")
@@ -30,11 +30,11 @@ window.draft = new (class {
       })
       .catch(function(){})
   }
-  
+
   getInputs() {
     return $(".draft-checkbox input");
   }
-  
+
   getSelectedDraftsId() {
     var arr = [];
     var dom = this.getInputs();
@@ -46,7 +46,7 @@ window.draft = new (class {
     }
     return arr;
   }
-  
+
   selectAll() {
     var selectedDraftsId = this.getSelectedDraftsId();
     var dom = this.getInputs();
@@ -56,7 +56,7 @@ window.draft = new (class {
       dom.prop("checked", false);
     }
   }
-  
+
   removeSelectedDrafts() {
     var selectedDraftsId = this.getSelectedDraftsId();
     var self = this;    if(!selectedDraftsId.length) return;
@@ -98,7 +98,7 @@ window.user = new (class {
       return;
     }
     subsId = subscribes.map(s => s._id);
-    
+
     SubscribeTypes.open(function(typesId) {
       nkcAPI("/account/subscribes", "PATCH", {
         type: "modifyType",
@@ -121,7 +121,7 @@ window.user = new (class {
       selectTypesWhenSubscribe: true
     });
   }
-  
+
   subscribe(id, type) {
     const buttonsDom = $(`.account-follower-buttons[data-${type}='${id}']`);
     let subId, func;
@@ -142,9 +142,9 @@ window.user = new (class {
       subId = this.collectionThreadsId;
       func = SubscribeTypes.collectionThreadPromise;
     }
-    
+
     const sub = !subId.includes(id);
-    
+
     new Promise((resolve, reject) => {
       if(!["user", "collection", "thread"].includes(type) || !sub) {
         resolve();
@@ -184,8 +184,8 @@ window.user = new (class {
         }
       })
       .catch(sweetError);
-    
-    
+
+
     /*if(sub) {
       SubscribeTypes.open(function(cid) {
         func(id, sub, cid)
@@ -204,9 +204,9 @@ window.user = new (class {
             sweetError(data);
           })
       });
-      
+
     } else {
-      
+
       func(id, sub)
         .then(function() {
           buttonsDom.removeClass("active");
@@ -225,12 +225,22 @@ window.user = new (class {
   }
   editType() {
     SubscribeTypes.open(function() {
-    
+
     }, {
       editType: true
     })
   }
 })();
+
+
+window.removeBlacklist = (uid, _id) => {
+  NKC.methods.removeUserFromBlacklist(uid)
+    .then(data => {
+      if(!data) return;
+      const dom = $(`[data-type="blacklist"][data-id="${_id}"]`);
+      if(dom && dom.length) dom.remove();
+    })
+}
 
 if(NKC.configs.isApp) {
   window.ready()

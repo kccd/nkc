@@ -287,6 +287,9 @@ module.exports = {
 	},
 	log: {
     GET: 'visitPublicLogs',
+		blacklist: {
+    	GET: 'visitExperimentalBlacklist'
+		},
     shop: {
       GET: "visitExperimentalShop"
     },

@@ -360,6 +360,7 @@
   "post-vote-down": "回复或文章-点踩",
   "visitExperimentalKcb": "访问【后台管理-查看记录-科创币】",
   "visitExperimentalXsf": "访问【后台管理-查看记录-学术分】",
+  "visitExperimentalBlacklist": "访问【后台管理-查看记录-黑名单】",
   "visitERedEnvelope": "访问【后台管理-设置-红包设置】",
   "visitLottery": "访问抽奖页面",
   "getRedEnvelope": "获取红包",
@@ -561,8 +562,6 @@
   "visitProtocol": "[CO]查看协议",
   "messageDataGet": "加载短消息（用户短消息、系统通知、应用提醒）",
   "experimentalUserAuth": "后台管理-身份认证设置",
-  "userMessageSettings": "用户消息设置",
-  "messageBlackList": "消息加入黑名单",
   "postWarningPost": "发送建议消息",
   "postWarningPatch": "修改文章或回复的建议详情",
   "experimentalWarningLog": "后台管理-查看建议记录",
@@ -668,6 +667,10 @@
 
   "messageCategory": "创建、查看或修改消息系统好友分组",
 
+  "checkBlacklist": "检查用户是否在黑名单",
+  "addUserToBlacklist": "将用户加入黑名单",
+  "removeUserFromBlacklist": "将用户从黑名单移除",
+
 
   "userSettingsHomeToLatest": "首页调整：主页 设置为 最新",
   "userSettingsLatestToHome": "首页调整：最新 设置为 主页",
@@ -675,6 +678,7 @@
   "userSettingsSubscribeToLatest": "首页调整：关注 设置为 最新",
   "userSettingsSubscribeToHome": "首页调整：关注 设置为 主页",
   "userSettingsHomeToSubscribe": "首页调整：主页 设置为 关注",
+
 
   "selectLocation": "app加载地区信息",
   "APPgetUserInfo": "app获取用户信息",

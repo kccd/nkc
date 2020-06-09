@@ -14,6 +14,7 @@ const subscribeCollection = require("./subscribe/collection");
 const summaryPie = require("./summary/pie");
 const summaryCalendar = require("./summary/calendar");
 const note = require("./note");
+const blacklist = require("./blacklist");
 const serverConfig = require("../../../config/server.json");
 router
   .use("/", async (ctx, next) => {
@@ -107,6 +108,11 @@ router
           type: "follower",
           name: "我的粉丝",
           url: `/u/${targetUser.uid}/profile/follower`,
+        },
+        {
+          type: 'blacklist',
+          name: '黑名单',
+          url: `/u/${targetUser.uid}/profile/blacklist`,
         }
       ];
     } else {
@@ -215,6 +221,14 @@ router
               name: "我的粉丝",
               url: `/u/${targetUser.uid}/profile/follower`,
               count: data.fansId.length
+            },
+            {
+              type: 'blacklist',
+              name: '黑名单',
+              url: `/u/${targetUser.uid}/profile/blacklist`,
+              count: await db.BlacklistModel.count({
+                uid: targetUser.uid
+              }),
             }
           ]
         }
@@ -342,5 +356,6 @@ router
   .get("/draft", draft)
   .get("/thread", thread)
   .get("/note", note)
+  .get("/blacklist", blacklist)
   .get("/post", post);
 module.exports = router;

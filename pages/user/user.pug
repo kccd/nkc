@@ -54,20 +54,18 @@ block content
                     a(onclick=`NKC.methods.toChat("${data.targetUser.uid}", '${data.targetUser.username}')` target="_blank") 私信
                   else
                     a(href=`/message?uid=${data.targetUser.uid}` target="_blank") 私信
-                  if data.targetUser.column
-                    a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
                   if data.userSubUid.includes(data.targetUser.uid)
                     a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", false)`) 已关注
                   else
                     a(onclick=` SubscribeTypes.subscribeUser("${data.targetUser.uid}", true)`) 关注
+                  if data.inBlacklist
+                    a(onclick=`NKC.methods.removeUserFromBlacklist("${data.targetUser.uid}")`) 取黑
+                  else
+                    a(onclick=`NKC.methods.addUserToBlacklist("${data.targetUser.uid}", 'userCard')`) 加黑
                 else
                   a(onclick="Login.open()") 私信
-                  if data.targetUser.column
-                    a.user-button-column(href=`/m/${data.targetUser.column._id}`) 专栏
                   a(onclick="Login.open()") 关注
-          else if data.targetUser.column
-            .user-button
-              a.user-button-column.only-one(href=`/m/${data.targetUser.column._id}`) 专栏
+                  a(onclick="Login.open()") 加黑
           .user-number
             .col-xs-3
               .number=data.targetUser.threadCount - data.targetUser.disabledThreadsCount
@@ -83,6 +81,15 @@ block content
               .title 科创币
           .user-description!=markdown_safe(data.targetUser.description || "")
           .user-register.p-b-1=`${format("YYYY/MM/DD", data.targetUser.toc)}注册，${fromNow(data.targetUser.tlv)}活动`
+        if data.targetUser.column
+          .user-column.m-b-1
+            .panel-header 专栏
+            .column-container
+              .column-avatar
+                img(src=`/column/avatar/${data.targetUser.column.avatar}`)
+              .column-info
+                a(href=`/m/${data.targetUser.column._id}` target="_blank").column-name=data.targetUser.column.name
+                .column-description=data.targetUser.column.abbr
         #leftDom.hidden-sm.hidden-xs
           if data.targetUserSubForums && data.targetUserSubForums.length > 0
             .panel-header 关注的领域
@@ -94,7 +101,8 @@ block content
             .panel-header 管理
             .m-b-2
               .user-card-sub-div
-                a(href=`/u/${data.targetUser.uid}/transaction`).btn.btn-default.btn-sm 查看地址信息
+                a(href=`/u/${data.targetUser.uid}/transaction`).btn.btn-default.btn-sm 查看地址
+                button.btn.btn-default.btn-sm(onclick=`NKC.modules.violationRecord.open({uid:'${data.targetUser.uid}'})`) 违规信息
           .m-b-1.row
             include ../publicModules/share/user-card
           if data.user &&  data.user.uid !== data.targetUser.uid
@@ -187,6 +195,7 @@ block scripts
   include ../publicModules/floatForumPanel/floatForumPanel
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../publicModules/complaint/complaint
+  include ../publicModules/violationRecord/violationRecord
   if data.user
     include ../publicModules/subscribeTypes/subscribeTypes
   if state.userColumn

@@ -855,3 +855,57 @@ body{
     }
   }
 }
+
+
+.black-list{
+  @itemHeight: 3.6rem;
+  @itemIcon: 2rem;
+  .list-container{
+    .list-body{
+      position: relative;
+      height: @itemHeight;
+      margin: 1rem 0;
+      .item-left{
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: @itemHeight;
+        width: @itemHeight;
+        img{
+          height: 100%;
+          width: 100%;
+          border-radius: 50%;
+        }
+      }
+      .item-center{
+        padding: 0 @itemIcon + 1rem 0 @itemHeight + 1rem;
+        .username{
+          font-size: 1.3rem;
+          height: 1.8rem;
+          .hideText(@line: 1);
+        }
+        .description{
+          margin-top: 0.3rem;
+          font-size: 1rem;
+          font-style: oblique;
+        }
+      }
+      .item-right{
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: @itemHeight;
+        width: @itemIcon;
+        .icon{
+          text-align: center;
+          color: #aaa;
+          cursor: pointer;
+          font-size: 1.3rem;
+          &:hover{
+            color: #333;
+          }
+        }
+      }
+    }
+  }
+}

@@ -54,6 +54,7 @@ friendsRouter
       });
       await applicationLog.save();
     }
+    await db.BlacklistModel.removeUserFromBlacklist(data.user.uid, uid);
     applicationLog = applicationLog.toObject();
     applicationLog.ty = 'friendsApplication';
     applicationLog.c = 'postApplication';
@@ -163,6 +164,7 @@ friendsRouter
       toc: application.toc,
       agree,
     };
+    await db.BlacklistModel.removeUserFromBlacklist(user.uid, targetUser.uid);
     data.message = await db.MessageModel.extendMessage(data.user.uid, _application);
     await next();
   })

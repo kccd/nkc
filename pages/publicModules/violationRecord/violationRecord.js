@@ -6,18 +6,20 @@ NKC.modules.violationRecord = new function violationRecord() {
     el: "#violationRecordApp",
     data: {
       list: [],
-      loadding: true
+      loading: true,
+      blacklistCount: {},
     },
     methods: {
       open: function(option) {
         var self = this;
         self.list = [];
         $dom.modal("show");
-        self.loadding = true;
+        self.loading = true;
         nkcAPI("/u/" + option.uid + "/violationRecord", "GET")
           .then(function(res){
-            self.loadding = false;
+            self.loading = false;
             self.list = res.record;
+            self.blacklistCount = res.blacklistCount;
           })
       },
       close: function() {

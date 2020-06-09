@@ -53,7 +53,7 @@
           if permission("visitMessageLogs")
             li
               a(href='/e/log/message') 短消息
-          if permission("visitExperimentalShop")    
+          if permission("visitExperimentalShop")
             li
               a(href='/e/log/shop') 交易订单
           li
@@ -90,7 +90,8 @@
             a(href='/e/log/smscode') 短信验证码记录
           li
             a(href='/e/log/emailcode') 邮件验证码记录
-
+          li
+            a(href='/e/log/blacklist') 黑名单
 
       li.dropdown(role='presentation')
         a.dropdown-toggle(data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false')
@@ -135,7 +136,7 @@
             li
               a(href='/e/settings/thread') 文章
           <li role="separator" class="divider"></li>
-          if permission('visitRoleSettings')    
+          if permission('visitRoleSettings')
             li
               a(href='/e/settings/role') 证书
           if permission('experimentalSafeSettings')
@@ -164,18 +165,18 @@
               a(href=`/e/settings/library`) 文库
           if permission("experimentalDownloadSettings")
             li
-              a(href=`/e/settings/upload`) 上传   
+              a(href=`/e/settings/upload`) 上传
           if permission("experimentalUploadSettings")
             li
-              a(href=`/e/settings/download`) 下载     
-          if permission("experimentalStickerSettings")       
+              a(href=`/e/settings/download`) 下载
+          if permission("experimentalStickerSettings")
             li
               a(href=`/e/settings/sticker`) 表情
-          if permission("experimentalEditorSettings")       
+          if permission("experimentalEditorSettings")
             li
-              a(href=`/e/settings/editor`) 编辑器    
+              a(href=`/e/settings/editor`) 编辑器
 
-          <li role="separator" class="divider"></li>    
+          <li role="separator" class="divider"></li>
           li
             a(href='/e/settings/home/logo') 网站首页
           li
@@ -216,6 +217,6 @@
             a(href='/e/settings/app') APP
       li
         a(href='/e/settings/shop') 商城设置
-      
+
       li
         a(href="/e/tools") 网站工具
