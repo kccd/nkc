@@ -52,6 +52,8 @@ const noteRouter = routers.note;
 const siteToolsRouter = routers.tools;
 // ip信息
 const ipinfoRouter = routers.ipinfo;
+// 黑名单
+const blacklistRouter = routers.blacklist;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
@@ -101,4 +103,5 @@ router.use("/note", noteRouter.routes(), noteRouter.allowedMethods());
 router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
 router.use("/tools", siteToolsRouter.routes(), siteToolsRouter.allowedMethods());
 router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
+router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
 module.exports = router;

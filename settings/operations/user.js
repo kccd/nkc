@@ -10,7 +10,10 @@ module.exports = {
 		},
     clear: {
 		  POST: "clearUserInfo"
-    },
+		},
+		hide: {
+			POST: "hideUserHome", // 隐藏用户的主页
+		},
 		banned: {
 			PATCH: 'unBannedUser',
 			DELETE: 'bannedUser'
@@ -110,10 +113,6 @@ module.exports = {
       },
       bank: {
         POST: 'userBindBankAccounts'
-      },
-      message: {
-			  GET: "userMessageSettings",
-        PATCH: "userMessageSettings"
       }
 		},
 		auth: {
@@ -209,6 +208,9 @@ module.exports = {
 			},
 			note: {
 				GET: "userProfile"
+			},
+			blacklist: {
+				GET: 'userProfile'
 			}
 		},
 		destroy: {

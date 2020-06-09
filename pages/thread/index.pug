@@ -147,6 +147,8 @@ block title
               li
                 a(href=`/editor?ver=ue&type=post&id=${post.pid}`)
                   span.fa.fa-edit &nbsp;编辑
+                //-a(onclick=`NKC.methods.deletePost('${post.pid}')`)
+                //-  span.fa.fa-trash &nbsp;删除
         if disablePost && !targetThread
           li
             a(onclick=`disabledThreadPost('${post.pid}')`)
@@ -171,6 +173,16 @@ block title
               li
                 a(onclick=`moduleComplaint.open("post", "${post.pid}")`)
                   span.fa.fa-minus-circle &nbsp;投诉
+          if post.uid
+            li
+              if data.blacklistUsersId.includes(post.uid)
+                //- 移出黑名单
+                a(onclick=`NKC.methods.removeUserFromBlacklist("${post.uid}")`)
+                  span.fa.fa-ban &nbsp;移出黑名单
+              else
+                //- 加入黑名单
+                a(onclick=`NKC.methods.addUserToBlacklist("${post.uid}", 'post', "${post.pid}")`)
+                  span.fa.fa-ban &nbsp;加入黑名单
         li.divider
         li
           a
@@ -603,6 +615,8 @@ block content
                           //- 发表权限判断
                           include ./postPermission
                           if showEditor
+                            -const blacklistInfo = data.blacklistInfo;
+                            include ../publicModules/blacklistInfo
                             +inputPanel
 
                     else
@@ -729,3 +743,4 @@ block scripts
     include ../publicModules/floatUserPanel/userInfo
   include ../publicModules/imageViewer
   +includeJS("/thread/index.js")
+  +includeJS("/thread/deletePost.js")

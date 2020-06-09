@@ -103,7 +103,7 @@ window.app = new Vue({
       // 验证限制号码字符串 去掉无用数据 并转为数组
       Promise.resolve()
         .then(function() {
-
+          smsSettings.appId += '';
           const {appId, appKey, smsSign} = smsSettings;
           self.checkString(appId, {
             name: "App ID",
@@ -131,7 +131,7 @@ window.app = new Vue({
             }
           }
 
-          var checkString = NKC.methods.checkData.checkString;  
+          var checkString = NKC.methods.checkData.checkString;
           smsSettings.restrictedNumber.forEach(function (ele) {
             ele.number = ele.number.toString();
             checkString(ele.code, {

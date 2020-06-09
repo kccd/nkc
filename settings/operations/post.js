@@ -58,6 +58,9 @@ module.exports = {
 		},
 		hide: {
 			PATCH: "hidePost"
-		}
+		},
+		/*delete: {
+			GET: "deletePost"
+		}*/
 	}
 };

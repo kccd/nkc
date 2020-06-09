@@ -91,6 +91,7 @@ body{
 }
 .user-card-panel .user-button>*:first-child{
   border-radius: 10px 0 0 10px;
+  border-right: none;
 }
 .user-card-panel .user-button>*:last-child{
   border-radius: 0 10px 10px 0;
@@ -326,4 +327,58 @@ body{
   font-size: 1rem;
   color: #9baec8;
   cursor: pointer;
+}
+.user-column{
+
+}
+.column-container{
+  position: relative;
+  height: 4.4rem;
+}
+.column-avatar{
+  position: absolute;
+  top: 0.2rem;
+  left: 0;
+  height: 4.4rem;
+  width: 4.4rem;
+  text-align: center;
+}
+.column-avatar img{
+  width: 100%;
+  border-radius: 5px;
+  height: 100%;
+}
+.column-info{
+  padding-left: 5rem;
+}
+.column-info .column-name{
+  height: 1.8rem;
+  font-size: 1.25rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.column-info .column-description{
+  font-size: 1rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  color: #666;
+  font-style: oblique;
+  -webkit-line-clamp: 2;
+}
+
+
+/* 已隐藏的用户主页提示 */
+.hidden-user-home-tip {
+  line-height: 4rem;
+  text-align: center;
+  background-color: #222;
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+  border-radius: 2px;
+  color: white;
 }

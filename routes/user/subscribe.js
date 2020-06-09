@@ -94,6 +94,7 @@ subscribeRouter
     await db.SubscribeTypeModel.updateCount(cid);
     ctx.data.targetUser = await db.UserModel.findOnly({uid});
     await db.KcbsRecordModel.insertSystemRecord('followed', ctx.data.targetUser, ctx);
+    await db.BlacklistModel.removeUserFromBlacklist(user.uid, ctx.data.targetUser.uid);
     await next();
   })
   // 取消关注该用户

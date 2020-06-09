@@ -143,7 +143,7 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
   判断用户是否有权限发送信息
   @param fromUid 当前用户ID
   @param toUid 对方用户ID
-  @parma sendToEveryOne 是否拥有”不加好友也能发送信息“的权限
+  @parma sendToEveryOne 是否拥有”消息管理员“的权限
   @author pengxiguaa 2019/2/12
 */
 messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) => {
@@ -151,13 +151,15 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   const MessageModel = mongoose.model('messages');
   const FriendModel = mongoose.model('friends');
   const UsersGeneralModel = mongoose.model('usersGeneral');
-  const MessageBlackListModel = mongoose.model("messageBlackLists");
+  const BlacklistModel = mongoose.model("blacklists");
   const ThreadModel = mongoose.model("threads");
   const apiFunction = require('../nkcModules/apiFunction');
   const user = await UserModel.findOnly({uid: fromUid});
   const targetUser = await UserModel.findOnly({uid: toUid});
   const {messageCountLimit, messagePersonCountLimit} = await user.getMessageLimit();
   const today = apiFunction.today();
+  // 消息管理员无需权限判断
+  if(sendToEveryOne) return;
   const messageCount = await MessageModel.count({
     s: user.uid,
     ty: 'UTU',
@@ -166,7 +168,7 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     }
   });
   if(messageCount >= messageCountLimit) {
-    throwErr(403, `根据您的证书和等级，您每天最多只能发送${messageCountLimit}条信息`);
+    throwErr(403, `根据你的证书和等级，你每天最多只能发送${messageCountLimit}条信息`);
   }
   let todayUid = await MessageModel.aggregate([
     {
@@ -187,7 +189,7 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   todayUid = todayUid.map(o => o._id);
   if(!todayUid.includes(toUid)) {
     if(todayUid.length >= messagePersonCountLimit) {
-      throwErr(403, `根据您的证书和等级，您每天最多只能给${messagePersonCountLimit}个用户发送信息`);
+      throwErr(403, `根据你的证书和等级，你每天最多只能给${messagePersonCountLimit}个用户发送信息`);
     }
   }
 
@@ -200,18 +202,20 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   }*/
 
   // 黑名单判断
-  let blackList = await MessageBlackListModel.findOne({
+  let blackList = await BlacklistModel.findOne({
     uid: fromUid,
     tUid: toUid
   });
-  if(blackList) throwErr(403, "您已将对方添加到了消息黑名单中，无法发送消息。");
-  if(!sendToEveryOne) {
-    blackList = await MessageBlackListModel.findOne({
-      uid: toUid,
-      tUid: fromUid
-    });
-    if(blackList) throwErr(403, "对方拒绝接送您的消息。");
-  }
+  if(blackList) throwErr(403, "你已将对方加入黑名单，无法发送消息。");
+  blackList = await BlacklistModel.findOne({
+    uid: toUid,
+    tUid: fromUid
+  });
+  if(blackList) throwErr(403, "你在对方的黑名单中，对方可能不希望与你交流。");
+
+  // 好友间发消息无需防骚扰判断
+  const friendRelationship = await FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
+  if(friendRelationship) return;
 
   // 系统防骚扰
   const messageSettings = (await mongoose.model("settings").findById("message")).c;

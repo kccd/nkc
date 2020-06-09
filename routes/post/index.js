@@ -8,6 +8,7 @@ const voteRouter = require('./vote');
 const warningRouter = require("./warning");
 const anonymousRouter = require("./anonymous");
 const hideRouter = require("./hide");
+const deleteRouter = require("./delete");
 const postRouter = require("./post");
 const Path = require("path");
 const toppedRouter = require("./topped");
@@ -135,7 +136,10 @@ router
     data.xsfSettings = await db.SettingModel.getSettings("xsf");
     ctx.template = 'post/post.pug';
 
-    if(data.user) data.complaintTypes = ctx.state.language.complaintTypes;
+    if(data.user) {
+      data.complaintTypes = ctx.state.language.complaintTypes;
+      data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
+    }
 
     const from = ctx.get("FROM");
 
@@ -491,5 +495,6 @@ router
   .use("/:pid/topped", toppedRouter.routes(), toppedRouter.allowedMethods())
   .use("/:pid/anonymous", anonymousRouter.routes(), anonymousRouter.allowedMethods())
   .use("/:pid/resources", resourcesRouter.routes(), resourcesRouter.allowedMethods())
-  .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods());
+  .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods())
+  .use("/:pid/delete", deleteRouter.routes(), deleteRouter.allowedMethods());
 module.exports = router;

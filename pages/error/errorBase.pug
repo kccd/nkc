@@ -7,7 +7,7 @@ block head
   +includeCSS('/font-awesome/css/font-awesome.css')
   +includeCSS('/bootstrap/css/bootstrap.css')
   link(rel='shortcut icon' href='/favicon.ico')
-  title= `${data.status}:${data.error}`
+  title= `${data.status}${data.error?':'+data.error: ''}`
   +includeCSS("/publicModules/public.css")
   +includeCSS("/nkc_styles.css")
   +includeCSS("/error/error.css")

@@ -83,3 +83,14 @@ function clearUserInfo(uid, type) {
       screenTopWarning(data);
     })
 }
+
+/**
+ * 隐藏和显示用户主页
+ * @param {boolean} - 是否隐藏用户主页
+ * @param {string} - 目标用户id
+ */
+function hideUserHome(isHidden, uid) {
+  return nkcAPI("/u/" + uid + "/hide", "POST", {setHidden: isHidden})
+    .catch(sweetError)
+    .then(function() {location.reload()});
+}

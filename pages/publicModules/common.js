@@ -775,3 +775,72 @@ NKC.methods.appClosePage = function() {
     NKC.methods.rn.emit('closeWebView');
   }
 }
+
+/*
+* 添加用户到黑名单
+* @param {String} tUid 被拉黑用户的ID
+* @param {String} form 拉黑途径 message, userCard, post
+* @param {String} pid from=post时所对应的post ID
+* */
+NKC.methods.addUserToBlacklist = function(tUid, from, pid) {
+  var isFriend = false, subscribed = false;
+  return Promise.resolve()
+    .then(function() {
+      return nkcAPI('/blacklist?tUid=' + tUid,  'GET')
+    })
+    .then(function(data) {
+      isFriend = data.isFriend;
+      subscribed = data.subscribed;
+      var bl = data.bl;
+      if(bl) throw '对方已在黑名单中';
+      var info;
+      if(isFriend) {
+        info = '该会员在你的好友列表中，确定放入黑名单吗？';
+      } else if(subscribed) {
+        info = '该会员在你的关注列表中，确定放入黑名单吗？';
+      }
+      if(info) return sweetQuestion(info);
+    })
+    .then(function() {
+      if(isFriend) {
+        return nkcAPI('/friend/' + tUid, 'DELETE', {})
+      }
+    })
+    .then(function() {
+      if(subscribed) {
+        return SubscribeTypes.subscribeUserPromise(tUid, false);
+      }
+    })
+    .then(function() {
+      return nkcAPI('/blacklist', 'POST', {
+        tUid: tUid,
+        from: from,
+        pid: pid
+      })
+    })
+    .then(function(data) {
+      sweetSuccess('操作成功');
+      return data;
+    })
+    .catch(sweetError);
+}
+
+/*
+* 将用户从黑名单中移除
+* @param {String} tUid 需要移除用户的ID
+* */
+NKC.methods.removeUserFromBlacklist = function(tUid) {
+  return Promise.resolve()
+    .then(function() {
+      return nkcAPI('/blacklist?tUid=' + tUid, 'GET')
+    })
+    .then(function(data) {
+      if(!data.bl) throw '对方未在黑名单中';
+      return nkcAPI('/blacklist?tUid=' + tUid, 'DELETE');
+    })
+    .then(function(data) {
+      sweetSuccess('操作成功');
+      return data;
+    })
+    .catch(sweetError);
+}

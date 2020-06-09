@@ -22,9 +22,6 @@ if 1 || !state.isApp
         a.list-group-item(href=`/u/${data.user.uid}/settings/transaction` class=data.selected==="transaction"?"selected":"")
           span.fa.fa-usd &nbsp;&nbsp;
           span 交易信息
-        a.list-group-item(href=`/u/${data.user.uid}/settings/message` class=data.selected==="message"?"selected":"")
-          span.fa.fa-minus-circle &nbsp;&nbsp;
-          span 黑名单
         a.list-group-item(href=`/u/${data.user.uid}/settings/security` class=data.selected==="security"?"selected":"")
           span.fa.fa-shield &nbsp;&nbsp;
           span 账号安全

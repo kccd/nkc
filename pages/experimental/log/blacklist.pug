@@ -1,0 +1,63 @@
+extends ../experimental
+block eTitle
+  title 黑名单
+  +includeCSS('/experimental/log/blacklist.css')
+block eContent
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12.m-b-05
+        ul.nav.nav-tabs
+          li(class=!data.t? 'active':'')
+            a(href='/e/log/blacklist') 全部记录
+          li(class=data.t === 'tUid'? 'active':'')
+            a(href='/e/log/blacklist?t=tUid') 被拉黑排行
+          li(class=data.t === 'uid'? 'active': '')
+            a(href='/e/log/blacklist?t=uid') 拉黑排行
+      .col-xs-12.col-md-12
+        include ../../publicModules/paging/paging
+        .blacklist
+          if !data.t
+            table.table.table-bordered
+              thead
+                tr
+                  th 时间
+                  th 用户
+                  th 被拉黑用户
+                  th 来自
+              tbody
+                for d in data.bl
+                  tr
+                    th=dateString(d.toc)
+                    th.user
+                      img(src=tools.getUrl('userAvatar', d.user.avatar) data-float-uid=d.user.uid)
+                      a(href=`/u/${d.user.uid}` target="_blank" data-float-uid=d.user.uid)=d.user.username
+                    th.user
+                      img(src=tools.getUrl('userAvatar', d.tUser.avatar) data-float-uid=d.tUser.uid)
+                      a(href=`/u/${d.tUser.uid}` target="_blank" data-float-uid=d.tUser.uid)=d.tUser.username
+                    th.from
+                      if d.from === 'message'
+                        span 短消息系统
+                      else if d.from === 'userCard'
+                        span 用户名片
+                      else
+                        span 文号
+                        a(href=tools.getUrl('post', d.pid, true) target="_blank")=d.pid
+          else
+            p 仅显示前200名用户
+            table.table.table-bordered
+              thead
+                tr
+                  th 用户
+                  th=`${data.t === 'tUid'? '被': ''}拉黑数`
+              tbody
+                for d in data.bl
+                  tr
+                    th.user
+                      img(src=tools.getUrl('userAvatar', d.user.avatar) data-float-uid=d.user.uid)
+                      a(href=`/u/${d.user.uid}` target="_blank" data-float-uid=d.user.uid)=d.user.username
+                    th=d.count
+
+        include ../../publicModules/paging/paging_input
+block scripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug

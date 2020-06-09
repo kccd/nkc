@@ -396,7 +396,6 @@ threadRouter
         if(p) data.toppedPosts.push(p);
       }
     }
-
     // 判断 如果文章为匿名发表，则清除作者信息
     if(thread.firstPost.anonymous) {
       thread.uid = "";
@@ -692,6 +691,7 @@ threadRouter
         data.userPostCountToday = todayPostCount - todayThreadCount;
       }
       data.hasPermissionToHidePost = await db.PostModel.ensureHidePostPermission(data.thread, data.user)
+      data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 		}
 
     // 加载附件数目
@@ -719,6 +719,16 @@ threadRouter
       data.notes = await db.NoteModel.getNotesByPosts(notePosts);
     }
 
+    // 黑名单判断
+    if(data.thread.uid && data.user) {
+      data.blacklistInfo =
+        await db.BlacklistModel.getBlacklistInfo(
+          data.thread.uid,
+          data.user.uid,
+          ctx.permission('canSendToEveryOne')
+        );
+    }
+
     data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;
 		data.step = step;
@@ -735,6 +745,8 @@ threadRouter
     } catch(err) {
       ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
+
+    const {post, postType} = body;
 
     // 根据发表设置，判断用户是否有权限发表文章
     // 1. 身份认证等级
@@ -776,12 +788,23 @@ threadRouter
 		await thread.extendFirstPost();
 		if(thread.closed) ctx.throw(400, '主题已关闭，暂不能发表回复/评论');
 
+    if(!ctx.permission('canSendToEveryOne')) {
+      let inBlacklist;
+      if(postType === 'comment') {
+        const pp = await db.PostModel.findOnly({pid: post.parentPostId});
+        inBlacklist = await db.BlacklistModel.inBlacklist(pp.uid, user.uid);
+      } else {
+        inBlacklist = await db.BlacklistModel.inBlacklist(thread.uid, user.uid);
+      }
+      if(inBlacklist) ctx.throw(403, `你在对方的黑名单中，对方可能不希望与你交流。`);
+    }
+
 		data.thread = thread;
 		await thread.extendForums(['mainForums', 'minorForums']);
 		data.forum = thread.forum;
 		// 权限判断
 		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-		const {post, postType} = body;
+
 		const {columnCategoriesId = [], anonymous = false, did} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(postType === "comment" && post.c.length > 2000) {
@@ -805,6 +828,8 @@ threadRouter
 
     data.post = _post;
 		data.targetUser = await thread.extendUser();
+
+    data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
 
 		// 转发到专栏
     if(columnCategoriesId.length > 0 && state.userColumn) {

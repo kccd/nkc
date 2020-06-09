@@ -404,6 +404,7 @@ function assemblePostObject(){  //bbcode , markdown
 	return post
 }
 
+
 // 公式处理
 function modifyMathJax() {
   $("#ReplyContent").find(".MathJax_Preview").each(function(){
