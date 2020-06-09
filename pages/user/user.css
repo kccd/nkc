@@ -374,10 +374,11 @@ body{
 
 /* 已隐藏的用户主页提示 */
 .hidden-user-home-tip {
-  line-height: 34px;
+  line-height: 4rem;
   text-align: center;
-  background-color: rgb(255, 124, 124);
+  background-color: #222;
+  font-size: 1.3rem;
   margin-bottom: 6px;
-  border-radius: 4px;
+  border-radius: 2px;
   color: white;
 }

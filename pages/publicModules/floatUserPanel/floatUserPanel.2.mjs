@@ -4,7 +4,7 @@ window.floatUserPanel = new Vue({
     user: "",
     uid: NKC.configs.uid,
     over: false,
-    show: false, 
+    show: false,
     count: 1,
     onPanel: false,
     users: {},
@@ -94,7 +94,7 @@ window.floatUserPanel = new Vue({
             });
 
             const documentWidth = $(document).width() - 10;
-            
+
             const panelWidth = 26 * 12;
 
             if((left + panelWidth) > documentWidth) {
@@ -128,6 +128,7 @@ window.floatUserPanel = new Vue({
         } else {
           nkcAPI(`/u/${id}?from=panel`, "GET")
             .then(data => {
+              if(data.targetUser.hidden) return;
               const userObj = {
                 subscribed: data.subscribed,
                 user: data.targetUser
@@ -139,8 +140,8 @@ window.floatUserPanel = new Vue({
               console.log(err);
               reject(err);
             });
-        }    
-      });      
+        }
+      });
     },
     subscribe() {
       const {user, subscribed} = this;

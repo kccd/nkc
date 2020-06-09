@@ -90,7 +90,7 @@ function clearUserInfo(uid, type) {
  * @param {string} - 目标用户id
  */
 function hideUserHome(isHidden, uid) {
-  return nkcAPI(`/u/${uid}/hide`, "POST", {setHidden: isHidden})
+  return nkcAPI("/u/" + uid + "/hide", "POST", {setHidden: isHidden})
     .catch(sweetError)
-    .then(() => location.reload());
+    .then(function() {location.reload()});
 }

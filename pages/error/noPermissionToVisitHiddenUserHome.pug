@@ -1,11 +1,8 @@
 extends ./errorBase
 block errorContent
-  .error-icon=`${data.status} Not Found`
+  .error-icon=`404 Not Found`
   .error-list.b-s-10
-    .error-header 抱歉！您不能查看此用户的主页：
-    ul
-      li 此用户主页已被锁定
-    .error-code
-      span message：
-      code= data.error
-    .error-info 
+    .error-header 根据相关法律法规和政策，内容不予显示。
+    .error-info.m-t-1 想了解更多信息，请阅读
+      a(href=`/t/66350`) 禁止事项
+      | 。

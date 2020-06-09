@@ -10,7 +10,7 @@ block content
     .row
       if data.targetUser.hidden
         .col-xs-12.col-md-12
-          .hidden-user-home-tip 此用户主页已对外隐藏
+          .hidden-user-home-tip 用户名片已屏蔽
       .col-xs-12.col-md-2.box-shadow-panel.p-r-0
         .p-a-0.m-b-1.user-home-panel
           .user-image
@@ -25,13 +25,13 @@ block content
                   if !data.targetUser.certs.includes("banned") && permission("bannedUser")
                     li
                       a(onclick=` bannedUser("${data.targetUser.uid}", true)`) 封禁用户
-                  if permission("unBannedUser")
+                  if permission("hideUserHome")
                     if data.targetUser.hidden
                       li
-                        a(onclick=`hideUserHome(false, ${data.targetUser.uid})`) 显示主页
+                        a(onclick=`hideUserHome(false, ${data.targetUser.uid})`) 取消屏蔽用户名片
                     else
                       li
-                        a(onclick=`hideUserHome(true, ${data.targetUser.uid})`) 隐藏主页
+                        a(onclick=`hideUserHome(true, ${data.targetUser.uid})`) 屏蔽用户名片
                   li.divider(role="separator")
                   if permission("clearUserInfo")
                     li
