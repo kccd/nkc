@@ -114,6 +114,7 @@ const userSchema = new Schema({
     default: [],
     index: 1
   },
+  // 用户名片是否被屏蔽
   hidden: {
     type: Boolean,
     default: false,
