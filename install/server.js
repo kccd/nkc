@@ -75,8 +75,8 @@ function createServer() {
 
 
 try{
-  // installModules();
-  // upload.initFolders();
+  installModules();
+  upload.initFolders();
   createServer();
 } catch(err) {
   console.log(err);
