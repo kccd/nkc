@@ -1,10 +1,8 @@
+require('./global');
 const fs = require('fs');
 if(!fs.existsSync('./install/install.lock')) {
   return require('./install/server.js')
 }
-
-
-require('./global');
 
 // 启动测试环境相关工具
 if(global.NKC.NODE_ENV !== "production") {

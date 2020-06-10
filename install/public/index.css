@@ -2,32 +2,47 @@ html{
   font-size: 12px;
 }
 body{
-  background-color: #f4f4f4;
-}
-.mdui-typo .page-title{
-  margin: 0;
-  color: #555!important;
-}
-.page-title-img{
-  margin: 0 .5rem 0 0;
-}
-.mdui-container{
-  max-width: 900px;
-}
-.page-panel{
-  padding: 2.5rem 1rem;
   background-color: #fff;
-  overflow: hidden;
-  margin-bottom: 1rem;
-  border-radius: 3px;
 }
-.mdui-typo a:before{
-  background-color: rgba(0,0,0,0);
+[v-cloak]{
+  display: none;
 }
-.mdui-typo .nav-link{
-  color: #555;
-  font-size: 1.2rem;
+
+.from{
+  max-width: 50rem;
+  margin: auto;
 }
-.mdui-typo .nav-link:hover{
+.from.success{
+  text-align: center;
+  font-size: 2rem;
+}
+.site-name{
+  font-style: oblique;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 6rem;
   color: #000;
+  text-shadow: 5px 5px 1px #ccc;
+}
+.content{
+  margin: 3rem auto;
+  max-width: 60rem;
+  background-color: #fff;
+  padding: 1rem;
+  padding-bottom: 5rem;
+}
+.title{
+  font-size: 1.3rem;
+  color: #555;
+  font-weight: 700;
+}
+pre{
+  margin-top: 2rem;
+}
+.name{
+  font-size: 1rem;
+  color: #555;
+}
+.form-horizontal{
+  margin-bottom: 3rem;
 }

@@ -5,7 +5,6 @@ const otherRouter = new Router();
 const editorRouter = require('./editor');
 const shopLogo = require('./shopLogo');
 const resourcesRouter = require('./resources');
-const defaultRouter = require('./default');
 const attachIconRouter = require('./attachIcon');
 const pfAvatar = require('./pfAvatar');
 const pfBanner = require('./pfBanner');
@@ -59,7 +58,6 @@ otherRouter
   .use('ro', roRouter.routes(), roRouter.allowedMethods())
   .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
   .use('ad', adRouter.routes(), adRouter.allowedMethods())
-  .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
   .use('attachIcon', attachIconRouter.routes(), attachIconRouter.allowedMethods())
 	.use('photo', photoRouter.routes(), photoRouter.allowedMethods())
 	.use('photo_small', photoSmallRouter.routes(), photoSmallRouter.allowedMethods())

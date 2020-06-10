@@ -4,19 +4,19 @@ var app = new Vue({
     error: '',
     success: false,
     saving: false,
-    forced: [],
     server: {
       address: '0.0.0.0',
       port: 9000
     },
     account: {
       username: 'admin',
-      password: ''
+      password: '',
+      password2: ''
     },
     mongodb: {
       address: '127.0.0.1',
       port: 27017,
-      databaseName: 'kc',
+      databaseName: 'nkc',
       username: '',
       password: '',
     },
@@ -30,12 +30,8 @@ var app = new Vue({
       port: 9200,
       username: '',
       password: '',
-      articlesIndex: 'kc_articles',
-      usersIndex: 'kc_users',
+      indexName: 'nkc'
     }
-  },
-  mounted: function() {
-
   },
   methods: {
     save: function() {
@@ -47,7 +43,6 @@ var app = new Vue({
         elasticSearch: this.elasticSearch,
         redis: this.redis,
         server: this.server,
-        forced: this.forced.length !== 0
       })
         .then(function() {
           app.success = true;

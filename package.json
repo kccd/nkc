@@ -86,7 +86,8 @@
     "twemoji": "^2.5.0",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "pm2": "^4.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

@@ -1,139 +1,134 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  title= `${data.config.name} v${data.config.version}`
-  <link rel="stylesheet" href="/mdui/css/mdui.css">
-  <link rel="stylesheet" href="/index.css">
-</head>
-<body class='mdui-theme-primary-blue-grey mdui-color-theme-accent-pink mdui-appbar-with-tab mdui-appbar-with-toolbar'>
-<div class="mdui-container mdui-typo" id='app'>
-  <div class="mdui-appbar mdui-shadow-0 mdui-appbar-fixed mdui-color-white mdui-shadow-1">
-    div.mdui-container
-      <div class="mdui-toolbar">
-        img.page-title-img(src='/favicon.ico')
-        h3.page-title= `${data.config.name} v${data.config.version} 安装 `
-        <div class="mdui-toolbar-spacer"></div>
-        <a href="https://www.kechuang.org" class="nav-link" target='_blank'>官网</a>
-        <a href="https://www.kechuang.org" class="nav-link" target='_blank'>文档</a>
-      </div>
-  </div>
-  div(v-if='!success').mdui-p-b-5
-    .page-panel
-      .mdui-col-md-4
-        h3 管理员账号
-      .mdui-col-md-8
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">用户名（30字节以内）</label>
-        <input class="mdui-textfield-input" type="text" v-model='account.username'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">密码（至少8位数且包含字母、数字以及符号三者中的至少两者）</label>
-        <input class="mdui-textfield-input" type="password" placeholder='' v-model='account.password'>
-        </div>
-    .page-panel
-      .mdui-col-md-4
-        h3 服务器
-      .mdui-col-md-8
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">地址</label>
-        <input class="mdui-textfield-input" type="text" v-model='server.address'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">端口</label>
-        <input class="mdui-textfield-input" type="number" placeholder='' v-model.number='server.port'>
-        </div>
-    .page-panel
-      .mdui-col-md-4
-        h3 MongoDB
-      .mdui-col-md-8
-        <div class="mdui-textfield">
-          <label class="mdui-textfield-label">地址</label>
-          <input class="mdui-textfield-input" type="text" v-model='mongodb.address'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">端口</label>
-        <input class="mdui-textfield-input" type="number" v-model.number='mongodb.port'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">用户名（若数据库未启用验证则此项可忽略）</label>
-        <input class="mdui-textfield-input" type="text" v-model='mongodb.username'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">密码（若数据库未启用验证则此项可忽略）</label>
-        <input class="mdui-textfield-input" type="text" v-model='mongodb.password'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">数据库名</label>
-        <input class="mdui-textfield-input" type="text" v-model='mongodb.databaseName'>
-        </div>
-    .page-panel
-      .mdui-col-md-4
-        h3 Elasticsearch
-      .mdui-col-md-8
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">地址</label>
-        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.address'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">端口</label>
-        <input class="mdui-textfield-input" type="number" v-model.number='elasticSearch.port'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">文章索引</label>
-        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.articlesIndex'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">用户索引</label>
-        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.usersIndex'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">用户名（若数据库未启用验证则此项可忽略）</label>
-        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.username'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">密码（若数据库未启用验证则此项可忽略）</label>
-        <input class="mdui-textfield-input" type="text" v-model='elasticSearch.password'>
-        </div>
-    .page-panel
-      .mdui-col-md-4
-        h3 Redis
-      .mdui-col-md-8
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">address</label>
-        <input class="mdui-textfield-input" type="text" v-model='redis.address'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">port</label>
-        <input class="mdui-textfield-input" type="number" v-model.number='redis.port'>
-        </div>
-        <div class="mdui-textfield">
-        <label class="mdui-textfield-label">password（若数据库未配置密码则此项可忽略）</label>
-        <input class="mdui-textfield-input" type="text" v-model='redis.password'>
-        </div>
-    .mdui-m-t-2
-      span 强制安装：
-      <label class="mdui-switch">
-      <input type="checkbox" value='true' v-model='forced'>
-      <i class="mdui-switch-icon"></i>
-      </label>
-      div.mdui-text-color-grey 强制安装将会清空同名的数据库，请谨慎操作。
-    .mdui-m-t-2.mdui-text-color-red
-      span {{error}}
-    .mdui-m-t-2.mdui-m-b-5
-      button.mdui-btn.mdui-btn-block.mdui-color-theme(@click='save' v-if='!saving') 安装
-      button.mdui-btn.mdui-btn-block.mdui-color-theme(@click='save' v-else disabled) 安装中，请稍后
-  div(v-else)
-    .page-panel.mdui-text-center
-      h2.page-title 安装完成
-</div>
-<script src="/vue/dist/vue.js"></script>
-<script src="/mdui/js/mdui.js"></script>
-script(src=`/Promise/promise.min.js?v=${global.NKC.startTime}`)
-<script src="/axios/axios.min.js"></script>
-script(src=`/interface_common.js?v=${Date.now()}`)
-script(src=`/index.js?v=${Date.now()}`)
-</body>
-</html>
+doctype html
+html(lang='zh-CN')
+  head
+    title=data.config.name
+    meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    link(rel="stylesheet" href=`/bootstrap/css/bootstrap.css?t=${data.time}`)
+    link(rel="stylesheet" href=`/font-awesome/css/font-awesome.css?t=${data.time}`)
+    link(rel="stylesheet" href=`/index.css?t=${data.time}`)
+  body
+    .container#app(v-cloak)
+      .site-name=data.config.name
+      .content
+        .from.success(v-if="success")
+          | 安装完成！
+          pre.text-left
+            | // 执行以下命令启动网站
+            | # pm2 start pm2.config.js
+        .from(v-else)
+          .form-horizontal
+            .form-group
+              .col-sm-3
+              .col-sm-8
+                .title 网站服务
+            .form-group
+              .name.col-sm-3.control-label 地址
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='server.address')
+            .form-group
+              .name.col-sm-3.control-label 端口
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='server.port')
+          .form-horizontal
+            .form-group
+              .col-sm-3
+              .col-sm-8
+                .title 管理员
+            .form-group
+              .name.col-sm-3.control-label 用户名
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='account.username')
+            .form-group
+              .name.col-sm-3.control-label 密码
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='account.password' placeholder="请输入管理员密码")
+            .form-group
+              .name.col-sm-3.control-label 重复密码
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='account.password2' placeholder="请输入管理员密码")
+          .form-horizontal
+            .form-group
+              .col-sm-3
+              .col-sm-8
+                .title MongoDB
+            .form-group
+              .name.col-sm-3.control-label 地址
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='mongodb.address')
+            .form-group
+              .name.col-sm-3.control-label 端口
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='mongodb.port')
+            .form-group
+              .name.col-sm-3.control-label 数据库名
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='mongodb.databaseName')
+            .form-group
+              .name.col-sm-3.control-label 用户名
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='mongodb.username' placeholder="无需验证可不填写")
+
+            .form-group
+              .name.col-sm-3.control-label 密码
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='mongodb.password' placeholder="无需验证可不填写")
+          .form-horizontal
+            .form-group
+              .col-sm-3
+              .col-sm-8
+                .title Elasticsearch
+            .form-group
+              .name.col-sm-3.control-label 地址
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='elasticSearch.address')
+            .form-group
+              .name.col-sm-3.control-label 端口
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='elasticSearch.port')
+            .form-group
+              .name.col-sm-3.control-label 索引名
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='elasticSearch.indexName')
+            .form-group
+              .name.col-sm-3.control-label 用户名
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='elasticSearch.username' placeholder="无需验证可不填写")
+            .form-group
+              .name.col-sm-3.control-label 密码
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='elasticSearch.password' placeholder="无需验证可不填写")
+          .form-horizontal
+            .form-group
+              .col-sm-3
+              .col-sm-8
+                .title Redis
+            .form-group
+              .name.col-sm-3.control-label 地址
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='redis.address')
+            .form-group
+              .name.col-sm-3.control-label 端口
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='redis.port')
+            .form-group
+              .name.col-sm-3.control-label 密码
+              .col-sm-8
+                input.form-control(type='text' v-model.trim='redis.password' placeholder="无需验证可不填写")
+          .form-horizontal
+            .form-group(v-if='error')
+              .col-sm-3
+              .col-sm-8
+                code {{error}}
+            .form-group
+              .col-sm-3
+              .col-sm-8
+                button.btn.btn.btn-default.btn-block.btn-lg(v-if='!saving' @click='save') 立即安装
+                button.btn.btn.btn-default.btn-block.btn-lg(v-else)
+                  .fa.fa-spinner.fa-spin
+                  | &nbsp;&nbsp;安装中...
+    script(src=`/vue/dist/vue.js?t=${data.time}`)
+    script(src=`/jquery/jquery-1.11.1.js?t=${data.time}`)
+    script(src=`/Promise/promise.min.js?t=${data.time}`)
+    script(src=`/interface_common.js?t=${data.time}`)
+    script(src=`/index.js?t=${data.time}`)
+

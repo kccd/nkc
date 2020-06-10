@@ -3,4 +3,4 @@
 -var logos = ['kclogo_umaru1_nc','kclogo_misaka1','kclogo_winter1']
 -var logo = logos[Math.floor(Math.random()*logos.length)]
 .canvas-logo
-  img(src='/resources/site_specific/'+logo+'.png' title=quote)
+  img(src=tools.getUrl('siteFile', logo + '.png') title=quote)

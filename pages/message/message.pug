@@ -26,11 +26,6 @@ block content
           //.ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
           .ms-single-content
             .arrow
-            //- div(v-if="message.c.na && ['mp4', 'mov'].indexOf(message.c.na) > -1" )
-            //-   div.ms-single-content-video
-            //-     //- span(style="display:inline-block;width: 80px;height: 80px;position: absolute; left:0;right: 0;top: 0;bottom: 0;margin: auto;z-index:1005;background-image:url(/default/play.jpg)" @click="openVideo(message.c.id)" :id="'btn' + message.c.id")
-            //-     video(:src="'/message/resource/'+ message.c.id" :poster="'/message/frame/' + message.c.id" style="width:100%;height:100%;background-color:black" :id="message.c.id" controls="controls")
-            //- div(v-else)
             div(v-if="!message.c.ty" v-html="message.html")
             div.ms-single-content-video(v-if="message.c.ty === 'video'")
               video(:src="'/message/resource/'+ message.c.id" :poster="'/message/frame/' + message.c.id" style="width:100%;height:100%;background-color:black" :id="message.c.id" controls="controls")

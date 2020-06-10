@@ -67,6 +67,9 @@ var Tools = function() {
       case "messageUserDetail": {
         return "/u/" + id + "?from=message"
       }
+      case 'siteFile': {
+        return "/statics/site/" + id;
+      }
     }
   };
   self.floatUserInfo = function(uid) {
