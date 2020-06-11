@@ -11,7 +11,13 @@ block content
   .container-fluid.max-width
     .row
       include ../nav
-      .col-xs-12.col-md-12
+      .rol-xs-12.col-md-2
+        .list-group
+          a.pointer.list-group-item.active(href="/e/settings/user")
+            span 普通信息管理
+          a.pointer.list-group-item(href="/e/settings/sensitive")
+            span 敏感信息管理
+      .rol-xs-12.col-md-10
         .row#content
           if data.targetUser
             -const targetUser = data.targetUser;

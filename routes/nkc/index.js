@@ -3,6 +3,7 @@ const homeRouter = require("./home");
 const stickerRouter = require("./sticker");
 const noteRouter = require("./note");
 const postRouter = require("./post");
+const section = require("./section");
 const moment = require("moment");
 router
   .get("/", async (ctx, next) => {
@@ -182,5 +183,6 @@ router
   .use("/home", homeRouter.routes(), homeRouter.allowedMethods())
   .use("/note", noteRouter.routes(), noteRouter.allowedMethods())
   .use("/post", postRouter.routes(), postRouter.allowedMethods())
-  .use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
+  .use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
+  .use("/section", section.routes(), section.allowedMethods());
 module.exports = router;

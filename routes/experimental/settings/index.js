@@ -41,6 +41,7 @@ const transferRouter = require("./transfer");
 const libraryRouter = require("./library");
 const stickerRouter = require("./sticker");
 const editorRouter = require("./editor");
+const userSensitiveRouter = require("./userSensitive");
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -88,5 +89,6 @@ settingRouter
 	.use("/thread", threadRouter.routes(), threadRouter.allowedMethods())
 	.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
 	.use("/editor", editorRouter.routes(), editorRouter.allowedMethods())
-  .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
+	.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods())
+	.use('/sensitive', userSensitiveRouter.routes(), userSensitiveRouter.allowedMethods());
 module.exports = settingRouter;

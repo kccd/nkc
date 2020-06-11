@@ -34,6 +34,7 @@
     "easyimage": "^3.1.1",
     "echarts": "^4.1.0",
     "elasticsearch": "^14.0.0",
+    "element-ui": "^2.13.2",
     "farmhash": "^2.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",

@@ -1,3 +1,4 @@
+const FileType = require('file-type');
 const Router = require('koa-router');
 const resourceRouter = new Router();
 const pathModule = require('path');
@@ -196,8 +197,11 @@ resourceRouter
 
     if(name === "blob" && fileName) name = fileName;
     // 获取文件格式 extension
-    const extensionE = pathModule.extname(name).replace('.', '');
-    let extension = extensionE.toLowerCase();
+    let extension = (await FileType.fromFile(path)).ext;
+    const pathExtension = pathModule.extname(name).replace('.', '').toLowerCase();
+    if(extension !== pathExtension) {
+      ctx.throw(400, "文件实际内容与后缀名不对应，禁止上传");
+    }
     if(extension === "") {
       ctx.throw(400, "未知的文件格式");
     }
@@ -556,4 +560,5 @@ resourceRouter
     await next()
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods());
+
 module.exports = resourceRouter;

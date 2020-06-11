@@ -186,6 +186,10 @@ module.exports = {
 				PATCH: 'modifyEUserInfo'
 			}
 		},
+		sensitive: {
+			GET: 'visitUserSensitiveInfo',
+			PATCH: 'modifyUserSensitiveInfo'
+		},
 		forum: {
 			GET: 'visitEForumSettings',
 			PATCH: 'modifyEForumSettings'

@@ -12,7 +12,12 @@ const usersPersonalSchema = new Schema({
     type: String,
     default: '',
     match: /.*@.*/
-  },
+	},
+	unverifiedEmail: {
+    type: String,
+    default: '',
+    match: /.*@.*/
+	},
 	nationCode: {
 		type: String,
 		default: '',
@@ -22,7 +27,12 @@ const usersPersonalSchema = new Schema({
     type: String,
     default:'',
     index: 1
-  },
+	},
+	unverifiedMobile: {
+    type: String,
+    default:'',
+    index: 1
+	},
   hashType: {
     type: String,
     default: ""

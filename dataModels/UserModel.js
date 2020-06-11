@@ -432,6 +432,8 @@ userSchema.methods.extend = async function(options) {
   this.mobile = userPersonal.mobile;
   this.nationCode = userPersonal.nationCode;
   this.email = userPersonal.email;
+  this.unverifiedEmail = userPersonal.unverifiedEmail;
+  this.unverifiedMobile = userPersonal.unverifiedMobile;
   // 判断注册类型
   if(this.email) {
 	  const behavior = await SecretBehaviorModel.findOne({uid: this.uid, operationId: 'bindEmail'});

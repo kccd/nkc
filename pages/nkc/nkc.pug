@@ -19,6 +19,12 @@ block content
                 | 主页设置
                 if !permission("nkcManagementHome")
                   | （无权）
+            li(class=data.nav === 'section' ? "active" : "")
+              a(href=`/nkc/section`)
+                .fa.fa-puzzle-piece
+                | 板块设置
+                if !permission("nkcManagementSection")
+                  | （无权）
             li(class=data.nav === 'sticker' ? "active" : "")
               a(href=`/nkc/sticker?t=unReviewed`)
                 .fa.fa-smile-o
