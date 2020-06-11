@@ -9,7 +9,7 @@ emailRouter
 		const {data, db, query} = ctx;
 		const {user} = data;
 		let {email, token} = query;
-    email = (email || "").toLowerCase();
+		email = (email || "").toLowerCase();
 		await db.SettingModel.checkEmail(email, user.uid);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		const emailCode = await db.EmailCodeModel.ensureEmailCode({
@@ -18,7 +18,7 @@ emailRouter
 			type: 'bindEmail'
 		});
 		await emailCode.update({used: true});
-		await userPersonal.update({email});
+		await userPersonal.update({email, unverifiedEmail: ''});
 		await db.SecretBehaviorModel({
 			type: "bindEmail",
 			uid: user.uid,
@@ -132,7 +132,13 @@ emailRouter
         email,
         code: token,
         type
-      });
+			});
+			// 添加一个未验证的邮箱
+			await db.UsersPersonalModel.updateOne({uid: user.uid}, {
+				$set: {
+					unverifiedEmail: email
+				}
+			})
 		} else if(operation === 'verifyOldEmail') {
 			if(!userPersonal.email) ctx.throw(400, '你暂未绑定任何邮箱');
 			const type = 'verifyOldEmail';
@@ -168,6 +174,12 @@ emailRouter
 			} catch (err) {
 				ctx.throw(400, `旧邮箱${err.message}`);
 			}
+			// 添加一个未验证的邮箱
+			await db.UsersPersonalModel.updateOne({uid: user.uid}, {
+				$set: {
+					unverifiedEmail: email
+				}
+			})
 			await db.SettingModel.checkEmail(email, user.uid);
 			const sameUserPersonal = await db.UsersPersonalModel.findOne({email});
 			if (sameUserPersonal) ctx.throw(400, '该邮箱已被其他账号绑定，请更换');

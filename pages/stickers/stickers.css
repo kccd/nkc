@@ -1,0 +1,185 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+body {
+  background-color: #f4f4f4;
+}
+.sticker-upload .form .sticker {
+  height: 5rem;
+  border: 1px solid #eee;
+  margin: 0 1rem 1rem 0;
+  position: relative;
+  overflow: hidden;
+}
+.sticker-upload .form .sticker .sticker-image {
+  display: table-cell;
+  text-align: center;
+}
+.sticker-upload .form .sticker .sticker-image div {
+  height: 5rem;
+  line-height: 5rem;
+  width: 5rem;
+  border-right: 1px solid #eee;
+  overflow: hidden;
+}
+.sticker-upload .form .sticker .sticker-image div img {
+  max-height: 5rem;
+  max-width: 5rem;
+}
+.sticker-upload .form .sticker .sticker-content {
+  display: table-cell;
+  width: 100%;
+  vertical-align: top;
+  padding-left: 1rem;
+}
+.sticker-upload .form .sticker .sticker-content .file-name {
+  height: 1.7rem;
+  padding-right: 3.5rem;
+  font-weight: 700;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.sticker-upload .form .sticker .sticker-content .file-ext {
+  height: 1.4rem;
+  font-size: 1rem;
+  color: #828282;
+}
+.sticker-upload .form .sticker .sticker-content .file-progress {
+  height: 1.9rem;
+  font-size: 1.2rem;
+}
+.sticker-upload .form .sticker .sticker-content .file-progress .uploaded {
+  color: green;
+}
+.sticker-upload .form .sticker .sticker-content .file-progress .unUploaded {
+  color: #555;
+}
+.sticker-upload .form .sticker .sticker-content .file-progress .uploading {
+  color: #2b90d9;
+}
+.sticker-upload .form .sticker .sticker-content .file-progress .upload-error {
+  color: #e85a71;
+}
+.sticker-upload .form .sticker .sticker-content .file-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.sticker-upload .form .sticker .sticker-content .file-button .fa {
+  width: 1.7rem;
+  height: 1.7rem;
+  line-height: 1.7rem;
+  text-align: center;
+  color: #777;
+}
+.sticker-upload .form .sticker .sticker-content .file-button .fa:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+}
+.sticker-upload .form .sticker.add {
+  line-height: 5rem;
+  text-align: center;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+.stickers .null {
+  height: 5rem;
+  line-height: 5rem;
+  text-align: center;
+}
+.stickers .stickers-body {
+  font-size: 0;
+}
+.stickers .sticker {
+  user-select: none;
+  height: 84px;
+  width: 84px;
+  text-align: center;
+  line-height: 84px;
+  border: 1px solid #aaa;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  margin: 0 1rem 1rem 0;
+}
+.stickers .sticker img {
+  max-height: 95%;
+  max-width: 95%;
+}
+.stickers .sticker .selectbox {
+  position: absolute;
+  top: 0;
+  cursor: pointer;
+  right: 0;
+  height: 1.4rem;
+  width: 1.4rem;
+  line-height: 1.4rem;
+  text-align: center;
+  background-color: #fff;
+  z-index: 100;
+  font-size: 1.4rem;
+}
+.stickers .sticker .un-review {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #eee;
+  font-size: 1rem;
+}
+.stickers .sticker .un-passed {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #eee;
+  font-size: 1rem;
+}
+.stickers .sticker .un-passed .fa {
+  height: 1.2rem;
+  text-align: center;
+  border-radius: 50%;
+  line-height: 1.3rem;
+  font-size: 1rem;
+  width: 1.2rem;
+  background-color: #e85a71;
+  color: #fff;
+}
+.stickers .hot-stickers .hot-stickers-button {
+  font-size: 1.2rem;
+  color: #2b90d9;
+  font-weight: 700;
+}
+.stickers .hot-stickers .hot-stickers-body .hot-sticker {
+  user-select: none;
+  height: 84px;
+  width: 84px;
+  text-align: center;
+  line-height: 84px;
+  border: 1px solid #aaa;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  margin: 0 1rem 1rem 0;
+  font-size: 0;
+}
+.stickers .hot-stickers .hot-stickers-body .hot-sticker img {
+  max-height: 95%;
+  max-width: 95%;
+}
+.stickers .using-warning {
+  color: #555;
+  font-size: 1rem;
+}

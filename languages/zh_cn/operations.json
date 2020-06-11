@@ -723,5 +723,10 @@
   "violationRecord": "查看用户违规记录",
 
   "deletePost": "删除文章",
-  "hideUserHome": "屏蔽/取消屏蔽用户名片页"
+  "hideUserHome": "屏蔽/取消屏蔽用户名片页",
+
+  "visitUserSensitiveInfo": "访问用户敏感信息",
+  "modifyUserSensitiveInfo": "修改用户敏感信息",
+
+  "nkcManagementSection": "网站板块管理"
 }

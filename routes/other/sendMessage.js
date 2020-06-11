@@ -120,6 +120,12 @@ sendMessageRouter
   	const smsCode = db.SmsCodeModel(smsCodeObj);
 		await smsCode.save();
 		await sendMessage(smsCodeObj);
+		// 添加一个未验证的手机号
+		await db.UsersPersonalModel.updateOne({uid: user.uid}, {
+			$set: {
+				unverifiedMobile: mobile
+			}
+		})
 		await next();
   })
 	.post('/changeMobile', async (ctx, next) => {
@@ -164,6 +170,12 @@ sendMessageRouter
 		const smsCode = db.SmsCodeModel(smsCodeObj);
 		await smsCode.save();
 		await sendMessage(smsCodeObj);
+		// 添加一个未验证的手机号
+		await db.UsersPersonalModel.updateOne({uid: user.uid}, {
+			$set: {
+				unverifiedMobile: body.mobile
+			}
+		})
 		await next();
 	})
   .post("/withdraw", async (ctx, next) => {

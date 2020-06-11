@@ -133,7 +133,7 @@ userRouter
     await targetUser.update(userObj);
     await targetUsersPersonal.update(userPersonalObj);
     await next();
-  });
+	});
 	/*.patch('/:uid', async (ctx, next) => {
 		const {params, db, body, nkcModules} = ctx;
 		const {operation} = body;

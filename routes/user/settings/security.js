@@ -9,12 +9,14 @@ router
     data.havePassword = true;
     const {hash, salt} = userPersonal.password;
     if(!hash || !salt) data.havePassword = false;
-    let {mobile, nationCode, email} = userPersonal;
+    let {mobile, nationCode, email, unverifiedEmail, unverifiedMobile} = userPersonal;
     if(mobile) mobile = mobile.slice(0, 3) + "****" + mobile.slice(7);
     if(email) email = email.replace(/.{4}@/ig, "****@");
     data.mobile = mobile;
     data.userEmail = email;
     data.nationCode = nationCode;
+    data.unverifiedEmail = unverifiedEmail;
+    data.unverifiedMobile = unverifiedMobile;
     ctx.template = "interface_user_settings_security.pug";
     await next();
   });
