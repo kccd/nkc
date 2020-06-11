@@ -7,8 +7,6 @@ const {fork} = require("child_process");
 const fs = require('fs');
 const path = require('path');
 const mongodb = require('./config/mongodb');
-const {database, elastic, user} = settings;
-const {client} = elastic;
 require('colors');
 
 const {
@@ -42,7 +40,8 @@ jobs.updateActiveUsers = cronStr => {
         	if(p) postCount++;
         }
       }
-      const vitality = user.vitalityArithmetic(threadCount, postCount);
+      const vitality = 3 * threadCount + postCount;
+      // const vitality = user.vitalityArithmetic(threadCount, postCount);
       const newActiveUser = new ActiveUserModel({
         lWThreadCount: threadCount,
         lWPostCount: postCount,
@@ -210,7 +209,7 @@ jobs.shop = () => {
       } catch(err) {
         await refund.update({
           error: err.message || JSON.stringify(err)
-        });        
+        });
       }
     }
 
@@ -230,7 +229,7 @@ jobs.shop = () => {
       } catch(err) {
         await refund.update({
           error: err.message || JSON.stringify(err)
-        }); 
+        });
       }
     }
 
@@ -242,7 +241,7 @@ jobs.shop = () => {
       orderToc: {
         $lt: time - (shopSettings.refund.pay*60*60*1000)
       }
-    }); 
+    });
     for(const order of orders) {
       try {
         await order.cancelOrder(

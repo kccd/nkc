@@ -4,6 +4,7 @@ module.exports = [
     name: 'cookie',
     data: {
       secret: randomBytes(128).toString('hex').toString(),
+      experimentalSecret: randomBytes(128).toString('hex').toString(),
       maxAge: 604800000
     }
   },

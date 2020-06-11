@@ -1,6 +1,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const upload = require("../settings/upload");
 global.NKC = {};
 global.NKC.createFile = (p, data) => {
   console.log(`creating config - ${p}`);

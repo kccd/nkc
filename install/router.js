@@ -112,13 +112,6 @@ router
 
     // 连接数据库，生成默认数据
     const db = require('../dataModels');
-    const db_ = Object.assign({}, db);
-
-    for(const name in db_) {
-      if(!db_.hasOwnProperty(name)) continue;
-      console.log(`clearing collection '${name}'`);
-      await db_[name].remove({});
-    }
 
     const defaultData = require('../defaultData');
     await defaultData.init();
@@ -126,7 +119,13 @@ router
     // 创建管理员账号
     console.log(`creating the admin account ...`);
     const user = await db.UserModel.createUser({});
-    await user.update({certs: ['dev'], username, usernameLowerCase: username.toLowerCase()});
+    await user.update({
+      certs: ['dev'],
+      username,
+      usernameLowerCase: username.toLowerCase(),
+      volumeA: true,
+      volumeB: true,
+    });
     const passwordObj = apiFunction.newPasswordObject(password);
     await db.UsersPersonalModel.update({password: passwordObj.password, hashType: passwordObj.hashType});
     console.log(`done`);
@@ -135,19 +134,22 @@ router
     const thread = db.ThreadModel({
       tid: await db.SettingModel.operateSystemID('threads', 1),
       uid: user.uid,
-      fid: forum.fid,
+      mainForumsId: [forum.fid],
       mid: user.uid,
       count: 1,
-      remain: 1
+      remain: 1,
+      reviewed: true,
     });
     const post = db.PostModel({
       t: article.title,
       c: article.content,
       uid: user.uid,
-      fid: forum.fid,
+      mainForumsId: [forum.fid],
+      type: 'thread',
       pid: await db.SettingModel.operateSystemID('posts', 1),
       tid: thread.tid,
-      l: 'html'
+      l: 'html',
+      reviewed: true,
     });
     thread.oc = post.pid;
     await thread.save();

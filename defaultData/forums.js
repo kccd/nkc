@@ -24,6 +24,6 @@ module.exports = [
     isVisibleForNCC: true,
     rolesId: ['dev', 'default', 'visitor'],
     type: 'forum',
-    parentId: '1'
+    parentsId: [1]
   }
 ];

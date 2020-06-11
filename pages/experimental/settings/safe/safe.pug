@@ -25,6 +25,21 @@ block eContent
               input.form-control(type='text' v-model.number='safeSettings.experimentalTimeout')
               h5.text-danger {{safeSettings.experimentalTimeout}}分钟内无任何操作，需重新进行密码验证。
           .form-group
+            label.col-sm-2.control-label 设置密码
+            .col-sm-4
+              div.m-t-05 {{safeSettings.hasPassword? '已设置': '未设置'}}
+                span.m-r-1
+                button.btn.btn-xs.btn-default(@click="passwordForm = !passwordForm") {{passwordForm? '取消': '修改'}}
+          .form-group(v-if="passwordForm")
+            label.col-sm-2.control-label 密码
+            .col-sm-4
+              input.form-control(type='password' v-model.trim='password')
+          .form-group(v-if="passwordForm")
+            label.col-sm-2.control-label 重复密码
+            .col-sm-4
+              input.form-control(type='password' v-model.trim='password2')
+
+          .form-group
             label.col-sm-2.control-label
             .col-sm-4
               h5.text-danger(v-if="error") {{error}}

@@ -67,7 +67,7 @@ const start = async () => {
     await elasticSearch.init();
     console.log('ElasticSearch is ready...'.green);
 
-    const port = serverConfig.port + global.NKC.processId;
+    const port = Number(serverConfig.port) + global.NKC.processId;
     const address = serverConfig.address;
     server = http.createServer(app);
     server.listen(port, address, async () => {
