@@ -68,7 +68,7 @@ remittanceRouter
 				//支付宝
 				if(paymentType === 'alipay') {
 					const {alipay} = ctx.nkcModules;
-					const {transferError} = ctx.settings.alipay;
+					const {transferError} = alipay;
 					let alipayData;
 					try {
 						alipayData = await alipay.transfer({
@@ -177,7 +177,7 @@ remittanceRouter
 			if(remittance[0].money > balance) ctx.throw(400, '该基金余额不足。');
 			const {number, name} = account;
 			const {alipay} = ctx.nkcModules;
-			const {transferError} = ctx.settings.alipay;
+			const {transferError} = alipay;
 			let alipayData;
 			const _id = Date.now();
 			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
