@@ -1,5 +1,4 @@
 const {randomBytes} = require('crypto');
-const path = require("path");
 module.exports = [
   {
     name: 'cookie',
@@ -12,11 +11,11 @@ module.exports = [
   {
     name: 'attachment',
     data: [
-      {
+      /*{
         path: path.resolve(__dirname, '../resources'), // 资源目录
         startingTime: '1999-01-01', // 开始时间
         endTime: '2099-01-01', // 结束时间
-      }
+      }*/
     ]
   },
   {
