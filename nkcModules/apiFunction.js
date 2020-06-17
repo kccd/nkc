@@ -229,7 +229,7 @@ fn.fromNow = (time) => {
 
 
 // 获取纯文本,以及略缩文字
-// content[str] 原文本 
+// content[str] 原文本
 // reduce[bull] 是否进行略缩，默认为false
 // count[int]   略缩后剩下的字数
 fn.obtainPureText = (content, reduce, count) => {
@@ -347,7 +347,7 @@ fn.makeRandomCode = (digit) => {
   }
   return ranstr;
 }
-/* 
+/*
   随机交换数组元素的位置
   @param arr: 需要交换元素顺序的数组
   @author pengxiguaa 2019/2/19
@@ -358,10 +358,10 @@ fn.shuffle = (arr) => {
     const index = Math.round(Math.random()*(length-1));
     const n = arr[i];
     arr[i] = arr[index];
-    arr[index] = n;      
+    arr[index] = n;
   }
 }
-/* 
+/*
   从多个数组中取值，组成与原数组长度相同的不重复的新数组
   @param arr 原数组：
   [
@@ -486,7 +486,7 @@ fn.getTrackInfo = async (trackNumber, trackName) => {
 
 /**
  * 查询物流信息(阿里云)
- * @param {String} trackNumber 快递单号 
+ * @param {String} trackNumber 快递单号
  * @param {String} trackName 快递公司简称
  * @return {JSON} data:由接口返回的物流信息，JSON
  * @author Kris 2019-3-18
@@ -564,7 +564,7 @@ fn.calculateFreightPrice = (freightPriceObj, count, isFreePost) => {
 /**
  * 生成新的app跳转的url
  * @param {*} state 这里必须传入ctx.state
- * @param {*} url 
+ * @param {*} url
  */
 fn.generateAppLink = (state, url) => {
   /*state.cachePage = false;
@@ -788,5 +788,4 @@ fn.getConfigByName = async (name) => {
     })
   });
 };
-
 module.exports = fn;

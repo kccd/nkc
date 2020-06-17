@@ -6,7 +6,6 @@
 /node_modules
 /settings/mongoDB.js
 /.idea
-/package-lock.json
 /resources
 /tmp
 /log.txt

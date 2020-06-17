@@ -54,6 +54,8 @@ const siteToolsRouter = routers.tools;
 const ipinfoRouter = routers.ipinfo;
 // 黑名单
 const blacklistRouter = routers.blacklist;
+// 附件
+const attachmentRouter = routers.attachment;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
@@ -104,4 +106,5 @@ router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
 router.use("/tools", siteToolsRouter.routes(), siteToolsRouter.allowedMethods());
 router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
+router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 module.exports = router;

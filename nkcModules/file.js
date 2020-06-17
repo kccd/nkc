@@ -1,12 +1,49 @@
 const ei = require("easyimage");
+const FileType = require('file-type');
 const {upload, statics, mediaPath} = require("../settings");
 const fsSync = require("../nkcModules/fsSync");
 const fs = require("fs");
 const db = require("../dataModels");
 const mime = require('mime');
+const func = {};
+const PATH = require('path');
+const attachmentConfig = require("../config/attachment.json");
+const mkdirp = require("mkdirp");
+const moment = require('moment');
+
+func.folders = {
+  attachment: './attachments'
+}
+
+func.getBasePath = async () => {
+  const now = Date.now();
+  if(!attachmentConfig.length) {
+    return PATH.resolve(__dirname, '../resources');
+  }
+  let basePath;
+  for(const a of attachmentConfig) {
+    const {path, startingTime, endTime} = a;
+    const _path = PATH.resolve(path);
+    if(!fs.existsSync(path)) throw `指定的目录 ${path} 不存在`;
+    const sTime = new Date(startingTime + ' 00:00:00').getTime();
+    const eTime = new Date(endTime + ' 00:00:00').getTime();
+    if(now >= sTime && now < eTime) {
+      basePath = _path;
+      break;
+    }
+  }
+  if(!basePath) throw `未找到指定的目录，请检查目录配置是否正确`;
+  return basePath;
+}
+
+func.getFullPath = async (p) => {
+  const path = PATH.resolve(await func.getBasePath(), p);
+  await mkdirp(path);
+  return path;
+};
 
 // 保存专栏头像
-exports.saveColumnAvatar = async (columnId, file) => {
+func.saveColumnAvatar = async (columnId, file) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = mime.getExtension(file.type);
@@ -48,7 +85,7 @@ exports.saveColumnAvatar = async (columnId, file) => {
 };
 
 // 获取专栏头像文件位置
-exports.getColumnAvatar = async (hash, t) => {
+func.getColumnAvatar = async (hash, t) => {
   let filePath = upload.columnAvatarPath + "/" + hash + ".jpg";
   if(t) {
     filePath = upload.columnAvatarPath + "/" + hash + "_" + t + ".jpg";
@@ -60,7 +97,7 @@ exports.getColumnAvatar = async (hash, t) => {
 };
 
 // 删除专栏头像文件
-exports.deleteColumnAvatar = async (columnId) => {
+func.deleteColumnAvatar = async (columnId) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
   await column.update({avatar: ""});
   /*const t = ["", "_sm", "_lg"];
@@ -71,7 +108,7 @@ exports.deleteColumnAvatar = async (columnId) => {
 };
 
 // 保存专栏背景
-exports.saveColumnBanner = async (columnId, file) => {
+func.saveColumnBanner = async (columnId, file) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = mime.getExtension(file.type);
@@ -106,7 +143,7 @@ exports.saveColumnBanner = async (columnId, file) => {
 };
 
 // 获取背景链接
-exports.getColumnBanner = async (hash, t) => {
+func.getColumnBanner = async (hash, t) => {
   let filePath = upload.columnBannerPath + "/" + hash + ".jpg";
   if(t) {
     filePath = upload.columnBannerPath + "/" + hash + "_" + t + ".jpg";
@@ -118,7 +155,7 @@ exports.getColumnBanner = async (hash, t) => {
 };
 
 // 删除专栏背景文件
-exports.deleteColumnBanner = async (columnId) => {
+func.deleteColumnBanner = async (columnId) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
   await column.update({banner: ""});
   /*const t = ["", "_sm"];
@@ -133,7 +170,7 @@ exports.deleteColumnBanner = async (columnId) => {
 * @param {File} file 文件对象
 * @author pengxiguaa 2019-8-2
 * */
-exports.saveUserAvatar = async (uid, file) => {
+func.saveUserAvatar = async (uid, file) => {
   const user = await db.UserModel.findOnly({uid});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = mime.getExtension(file.type);
@@ -179,7 +216,7 @@ exports.saveUserAvatar = async (uid, file) => {
 * @return {String} 文件路径
 * @author pengxiguaa 2019-8-2
 * */
-exports.getUserAvatar = async (hash, type) => {
+func.getUserAvatar = async (hash, type) => {
   let filePath;
   if(type === "sm") {
     filePath = upload.avatarSmallPath + "/" + hash + ".jpg";
@@ -204,7 +241,7 @@ exports.getUserAvatar = async (hash, type) => {
 * @param {String} uid 用户ID
 * @author pengxiguaa 2019-8-2
 * */
-exports.deleteUserAvatar = async (uid) =>{
+func.deleteUserAvatar = async (uid) =>{
   const user = await db.UserModel.findOnly({uid});
   await user.update({avatar: ""});
 };
@@ -215,7 +252,7 @@ exports.deleteUserAvatar = async (uid) =>{
 * @param {File} file 文件对象
 * @author pengxiguaa 2019-8-2
 * */
-exports.saveUserBanner = async (uid, file) => {
+func.saveUserBanner = async (uid, file) => {
   const user = await db.UserModel.findOnly({uid});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = mime.getExtension(file.type);
@@ -243,7 +280,7 @@ exports.saveUserBanner = async (uid, file) => {
 * @return {String} 文件路径
 * @author pengxiguaa 2019-8-2
 * */
-exports.getUserBanner = async (hash) => {
+func.getUserBanner = async (hash) => {
   let filePath = upload.userBannerPath + "/" + hash + ".jpg";
   if(!fsSync.existsSync(filePath)) {
     filePath = statics.defaultUserBannerPath;
@@ -256,7 +293,7 @@ exports.getUserBanner = async (hash) => {
 * @param {String} uid 用户ID
 * @author pengxiguaa 2019-8-2
 * */
-exports.deleteUserBanner = async (uid) =>{
+func.deleteUserBanner = async (uid) =>{
   const user = await db.UserModel.findOnly({uid});
   await user.update({banner: ""});
 };
@@ -266,7 +303,7 @@ exports.deleteUserBanner = async (uid) =>{
 * @param {String} hash 图片hash
 * @author pengxiguaa 2019-9-17
 * */
-exports.getPostCover = async (hash) => {
+func.getPostCover = async (hash) => {
   let filePath = upload.coverPath + "/" + hash + ".jpg";
   if(!hash || !fsSync.existsSync(filePath)) {
     filePath = statics.defaultPostCoverPath;
@@ -280,7 +317,7 @@ exports.getPostCover = async (hash) => {
 * @param {File} 图片数据
 * @author pengxiguaa 2019-9-17
 * */
-exports.savePostCover = async (pid, file) => {
+func.savePostCover = async (pid, file) => {
   const post = await db.PostModel.findOnly({pid});
   const {hash, path} = file;
   const filePath = upload.coverPath + "/" + hash + ".jpg";
@@ -301,7 +338,7 @@ exports.savePostCover = async (pid, file) => {
 * @param {File} 图像数据
 * @author pengxiguaa 2019-10-16
 * */
-exports.saveResourceCover = async (rid, file) => {
+func.saveResourceCover = async (rid, file) => {
   const resource = await db.ResourceModel.findOnly({rid});
   const {hash, path} = file;
   const filePath = upload.coverPath + "/" + hash + ".jpg";
@@ -322,7 +359,7 @@ exports.saveResourceCover = async (rid, file) => {
 * @param {File} 图片数据
 * @author pengxiguaa 2019-9-17
 * */
-exports.saveDraftCover = async (did, file) => {
+func.saveDraftCover = async (did, file) => {
   const draft = await db.DraftModel.findOnly({did});
   const {hash, path} = file;
   const filePath = upload.coverPath + "/" + hash + ".jpg";
@@ -348,7 +385,7 @@ exports.saveDraftCover = async (did, file) => {
 *   }
 * @author pengxiguaa 2019-9-17
 * */
-exports.modifyPostCovers = async (pid, covers) => {
+func.modifyPostCovers = async (pid, covers) => {
   const post = await db.PostModel.findOnly({pid});
   let coversHash = [], files = [];
   for(const c of covers) {
@@ -384,10 +421,10 @@ exports.modifyPostCovers = async (pid, covers) => {
   await post.update({covers: coversHash});
 };
 
-/* 
+/*
   根据postID生成封面图
 */
-exports.createPostCoverByPostId = async (pid) => {
+func.createPostCoverByPostId = async (pid) => {
   const post = await db.PostModel.findOne({pid});
   if(!post) return;
   const ext = ["jpg", "jpeg", "bmp", "png", "mp4"];
@@ -415,7 +452,7 @@ exports.createPostCoverByPostId = async (pid) => {
 /*
 * 首页指定文章封面图
 * */
-exports.saveHomeAdCover = async (file, type) => {
+func.saveHomeAdCover = async (file, type) => {
   const {hash, path} = file;
   const filePath = upload.coverPath + "/" + hash + ".jpg";
   let height = 253, width = 400;
@@ -431,3 +468,22 @@ exports.saveHomeAdCover = async (file, type) => {
     quality: 90
   });
 };
+/*
+* 检查文件类型与格式是否对应，返回文件格式
+* */
+func.getFileExtension = async (file, extensions = []) => {
+  let extension = (await FileType.fromFile(file.path)).ext;
+  const pathExtension = PATH.extname(file.name).replace('.', '').toLowerCase();
+  if(extension !== pathExtension) {
+    throwErr(400, "文件内容与后缀名无法对应");
+  }
+  if(!extension) throwErr(400, '未知的文件格式');
+  if(extensions.length) {
+    if(!extensions.includes(extension)) {
+      throwErr(400, `文件格式不被允许，请选择${extensions.join(', ')}格式的文件。`);
+    }
+  }
+  return extension;
+}
+
+module.exports = func;

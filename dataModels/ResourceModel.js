@@ -98,7 +98,7 @@ const resourceSchema = new Schema({
     default: null
   }
 });
-/* 
+/*
   获取文件路径
 */
 resourceSchema.methods.getFilePath = async function() {
@@ -136,5 +136,99 @@ resourceSchema.statics.getResourcesByReference = async function(id) {
   return await model.find({references: id});
 };
 
+/*
+* 检查用户是否有权限上传当前文件
+* @param {Object} user 用户对象
+* @param {File} file 文件对象
+* */
+resourceSchema.statics.checkUploadPermission = async (user, file) => {
+  const SettingModel = mongoose.model("settings");
+  const ResourceModel = mongoose.model("resources");
+  const {getSize} = require("../nkcModules/tools");
+  const {getFileExtension} = require("../nkcModules/file");
+  const uploadSettings = await SettingModel.getSettings('upload');
+  const {countLimit, sizeLimit, extensionLimit} = uploadSettings;
+  let {size, ext} = file;
+  if(!ext) ext = await getFileExtension(file);
+  // 检查文件大小是否符合要求
+  let settingSize;
+  for(const s of sizeLimit.others) {
+    if(s.ext === ext) {
+      settingSize = s.size;
+      break;
+    }
+  }
+  if(settingSize === undefined) {
+    settingSize = sizeLimit.default;
+  }
+  if(size <= settingSize * 1024) {}
+  else {
+    throwErr(400, `${ext}文件不能超过${getSize(settingSize * 1024, 1)}`);
+  }
+
+  if(!user.grade) await user.extendGrade();
+  if(!user.roles) await user.extendRoles();
+
+  // 检查用户当前上传的文件总数是否达到极限
+  const today = require("../nkcModules/apiFunction").today();
+  const uploadedCount = await ResourceModel.count({uid: user.uid, toc: {$gte: today}});
+  const certList = [];
+  certList.push(`grade-${user.grade._id}`);
+  user.roles.map(role => {
+    certList.push(`role-${role._id}`);
+  });
+  let settingCount = undefined;
+  for(const cl of countLimit.others) {
+    if(certList.includes(cl.type)) {
+      if(settingCount === undefined || settingCount < cl.count) {
+        settingCount = cl.count;
+      }
+    }
+  }
+  if(settingCount === undefined) {
+    settingCount = countLimit.default;
+  }
+  if(uploadedCount >= settingCount) throwErr(400, '今日上传文件数量已达上限');
+
+  // 检查文件格式黑白名单
+  let blacklistArr = undefined, whitelistArr = undefined;
+  for(const el of extensionLimit.others) {
+    if(certList.includes(el.type)) {
+      const {blacklist, whitelist, using} = el;
+      if(using === 'blacklist') {
+        if(!blacklistArr) blacklistArr = [];
+        blacklistArr = blacklistArr.concat(blacklist);
+      } else if(using === 'whitelist') {
+        if(!whitelistArr) whitelistArr = [];
+        whitelistArr = whitelistArr.concat(whitelist);
+      } else {
+        throwErr(500, `后台上传配置错误，using: ${using}`);
+      }
+    }
+  }
+  // 如果用户没有后台配置的证书或等级，则黑白名单取默认值
+  if(blacklistArr === undefined && whitelistArr === undefined) {
+    const {defaultBlacklist, defaultWhitelist, using} = extensionLimit;
+    if(using === 'blacklist') {
+      blacklistArr = [].concat(defaultBlacklist);
+    } else if(using === 'whitelist') {
+      whitelistArr = [].concat(defaultWhitelist);
+    } else {
+      throwErr(500, `后台上传配置错误，using: ${using}`);
+    }
+  }
+  if(blacklistArr === undefined) {
+    // 仅存白名单
+    if(!whitelistArr.includes(ext)) throwErr(400, '文件格式不被允许');
+  } else if(whitelistArr === undefined) {
+    // 仅存黑名单
+    if(blacklistArr.includes(ext)) throwErr(400, '文件格式不被允许');
+  } else {
+    // 黑白名单均有
+    // 去除同时存在于黑名单和白名单的文件格式
+    blacklistArr = blacklistArr.filter(b => !whitelistArr.includes(b));
+    if(blacklistArr.includes(ext)) throwErr(400, '文件格式不被允许');
+  }
+};
 
 module.exports = mongoose.model('resources', resourceSchema);

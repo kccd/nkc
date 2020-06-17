@@ -19,6 +19,7 @@
   "author": "nkc",
   "license": "ISC",
   "dependencies": {
+    "mkdirp": "^1.0.4",
     "awesome-static": "^1.4.3",
     "bluebird": "^3.5.3",
     "chart.js": "^2.7.2",

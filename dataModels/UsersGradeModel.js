@@ -108,5 +108,6 @@ const usersGradeSchema = new Schema({
   }
 });
 
+
 const UsersGradeModel = mongoose.model('usersGrades', usersGradeSchema);
 module.exports = UsersGradeModel;

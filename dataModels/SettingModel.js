@@ -74,7 +74,7 @@ settingSchema.methods.extendAds = async function() {
   }));
   return this.adThreads = adThreads;
 };
-/* 
+/*
   通过系统设置的ID查找数据
   @return setting
   @author pengxiguaa 2019/3/7
@@ -232,40 +232,19 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
   }
 };
 
-/* 
-  根据用户的证书以及等级 获取用户与上传相关的设置
-  @param {Schema Object} user 用户对象
-*/
-settingSchema.statics.getUploadSettingsByUser = async (user) => {
-  if(!user) throwErr(500, "user is required");
-  const uploadSettings = await mongoose.model("settings").getSettings("upload");
-  const {options} = uploadSettings;
-  const optionsObj = {};
-  options.map(o => {
-    const {type, id} = o;
-    optionsObj[`${type}_${id}`] = o;
-  });
-  if(!user.grade) await user.extendGrade();
-  if(!user.roles) await user.extendRoles();
-  let fileCountOneDay = 0, extensions = [];
-  const gradeOption = optionsObj[`grade_${user.grade._id}`];
-  const userOptions = gradeOption? [gradeOption]: [];
-  for(const role of user.roles) {
-    const option = optionsObj[`role_${role._id}`];
-    if(option) userOptions.push(option);
-  }
-  for(let i = 0; i < userOptions.length; i++) {
-    const option = userOptions[i];
-    if(fileCountOneDay < option.fileCountOneDay) fileCountOneDay = option.fileCountOneDay;
-    if(i === 0) {
-      extensions = option.blackExtensions;
-    } else {
-      extensions = extensions.filter(e => option.blackExtensions.includes(e));
-    }
-  }
+/*
+* 获取水印透明度
+* @return {Number} 水印透明度
+* @author pengxiguaa 2020/6/17
+* */
+settingSchema.statics.getWatermarkSettings = async () => {
+  const SettingModel = mongoose.model('settings');
+  const uploadSettings = await SettingModel.getSettings('upload');
   return {
-    fileCountOneDay,
-    blackExtensions: extensions
+    transparency: 255 * (1 - uploadSettings.watermark.transparency / 100),
+    enabled: uploadSettings.watermark.enabled,
+    minHeight: uploadSettings.watermark.minHeight,
+    minWidth: uploadSettings.watermark.minWidth
   }
 };
 

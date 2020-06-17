@@ -24,9 +24,9 @@ resourceRouter
     const {db, data} = ctx;
     const {user} = data;
     if(!user) ctx.throw(400, "权限不足");
-    const uploadSettings = await db.SettingModel.getUploadSettingsByUser(user);
+    /*const uploadSettings = await db.SettingModel.getUploadSettingsByUser(user);
     data.extensions = uploadSettings.extensions;
-    data.fileCount = uploadSettings.fileCountOneDay;
+    data.fileCount = uploadSettings.fileCountOneDay;*/
     await next();
   })
   .get('/:rid', async (ctx, next) => {
@@ -151,11 +151,6 @@ resourceRouter
     const {file} = files;
     const {type, fileName, md5, share} = fields;
 
-
-    const {fileCountOneDay, blackExtensions} = await db.SettingModel.getUploadSettingsByUser(data.user);
-    const fileCount = await db.ResourceModel.count({uid: data.user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
-    if(fileCount >= fileCountOneDay) ctx.throw(403, "今日上传文件数量已达上限");
-
     if(type === "checkMD5") {
       // 前端提交待上传文件的md5，用于查找resources里是否与此md5匹配的resource
       // 若不匹配，则返回“未匹配”给前端，前端收到请求后会再次向服务器发起请求，并将待上传的文件上传到服务器。
@@ -167,7 +162,12 @@ resourceRouter
         data.uploaded = false;
         return await next();
       }
-      if(blackExtensions.includes(resource.ext)) ctx.throw(403, "文件格式不被允许");
+      // 检测用户上传相关权限
+      const _file = {
+        size: resource.size,
+        ext: resource.ext
+      };
+      await db.ResourceModel.checkUploadPermission(user, _file);
       // 在此处复制原resource的信息
       const newResource = resource.toObject();
       delete newResource.__v;
@@ -195,23 +195,12 @@ resourceRouter
     }
     let { name, size, path, hash} = file;
 
+    // 检查上传权限
+    await db.ResourceModel.checkUploadPermission(user, file);
+
     if(name === "blob" && fileName) name = fileName;
     // 获取文件格式 extension
-    let extension = (await FileType.fromFile(path)).ext;
-    const pathExtension = pathModule.extname(name).replace('.', '').toLowerCase();
-    if(extension !== pathExtension) {
-      ctx.throw(400, "文件实际内容与后缀名不对应，禁止上传");
-    }
-    if(extension === "") {
-      ctx.throw(400, "未知的文件格式");
-    }
-    if(blackExtensions.includes(extension)) {
-      await fs.unlink(path);
-      ctx.throw(403, "文件格式不被允许");
-    }
-    if(extension === "gif" && size > 5 * 1024 * 1024) {
-      ctx.throw(400, "为了提高观看体验，请上传视频，GIF最大只支持5MB。");
-    }
+    let extension = await nkcModules.file.getFileExtension(file);
     // 图片最大尺寸
     // const { largeImage } = settings.upload.sizeLimit;
     // 根据自增id定义文件新名称 saveName
@@ -344,13 +333,16 @@ resourceRouter
         // const colunameWidth = colunameLength * 12;
         // const coluHeight = 24;
         // 获取水印图片路径
-        let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
-        waterSmall = waterSmall.c;
+        // let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
+        // waterSmall = waterSmall.c;
         // const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
-        const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
-        const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";
+        const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+        const waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+        /*const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
+        const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";*/
         // 获取透明度
-        const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
+        // const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
+        const watermarkSettings = await db.SettingModel.getWatermarkSettings();
         // 图片水印尺寸
         let {siteLogoWidth, siteLogoHeigth} = await imageMagick.waterInfo(waterSmallPath);
         siteLogoWidth = parseInt(siteLogoWidth);
@@ -395,12 +387,12 @@ resourceRouter
           await imageMagick.imageNarrow(path);
         }
         // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
-        const homeSettings = await ctx.db.SettingModel.getSettings("home");
-        if(extension !== "gif" && width >= homeSettings.waterLimit.minWidth && height >= homeSettings.waterLimit.minHeight && waterAdd === true){
+        // const homeSettings = await ctx.db.SettingModel.getSettings("home");
+        if(extension !== "gif" && width >= watermarkSettings.minWidth && height >= watermarkSettings.minHeight && watermarkSettings.enabled === true){
           if(waterStyle === "siteLogo"){
-            await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path)
+            await imageMagick.watermarkify(watermarkSettings.transparency, waterGravity, waterBigPath, path)
           }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
-            await imageMagick.watermarkifyLogo(transparency, logoCoor, waterGravity, waterSmallPath, path);
+            await imageMagick.watermarkifyLogo(watermarkSettings.transparency, logoCoor, waterGravity, waterSmallPath, path);
             var temporaryPath = extGetPath(extension);
             await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path, temporaryPath);
             // await fs.copyFile(temporaryPath, path);

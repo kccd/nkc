@@ -49,8 +49,13 @@ var Tools = function() {
         }
         return "/p/" + id;
       }
+      // 用户上传的附件
       case "resource": {
         return "/r/" + id
+      }
+      // 其他资源，包含avatar, banner等等
+      case "attach": {
+        return "/a/" + id
       }
       case "videoCover": {
         return "/frameImg/" + id
@@ -69,6 +74,9 @@ var Tools = function() {
       }
       case 'siteFile': {
         return "/statics/site/" + id;
+      }
+      case 'defaultFile': {
+        return "/default/" + id;
       }
     }
   };

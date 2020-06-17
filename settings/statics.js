@@ -3,7 +3,8 @@ const defaultPath = path.resolve('public/default');
 const staticPath = path.resolve('public/statics');
 const siteSpecificPath = path.resolve(staticPath, '/site');
 const attachIconPath = path.resolve('resources/attachIcon');
-const watermark = path.resolve(defaultPath, './default_watermark3.png');
+const normalWatermark = path.resolve(defaultPath, './watermark_normal.png');
+const smallWatermark = path.resolve(defaultPath, './watermark_small.png')
 const fontTtf = path.resolve(defaultPath, './simsun.ttc');
 const banner = path.resolve(siteSpecificPath, './ad_default.jpg');
 const defaultPfBannerPath = defaultPath + '/default_pf_banner.jpg';
@@ -29,7 +30,9 @@ const defaultRoleIconPath = staticPath + '/role_icon';
 module.exports = {
   siteSpecificPath,
   defaultRoleIconPath,
-  watermark,
+  watermark: normalWatermark,
+  normalWatermark,
+  smallWatermark,
   banner,
   fontTtf,
   defaultPfBannerPath,
