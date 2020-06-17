@@ -213,20 +213,20 @@ resourceRouter
     let mediaType;
     if(pictureExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/picture";
-      mediaRealPath = selectDiskCharacterUp("mediaPicture");
       mediaType = "mediaPicture";
+      mediaRealPath = await db.ResourceModel.getMediaPath('mediaPicture');
     }else if(videoExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/video";
-      mediaRealPath = selectDiskCharacterUp("mediaVideo");
       mediaType = "mediaVideo";
+      mediaRealPath = await db.ResourceModel.getMediaPath('mediaVideo');
     }else if(audioExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/audio";
-      mediaRealPath = selectDiskCharacterUp("mediaAudio");
       mediaType = "mediaAudio";
+      mediaRealPath = await db.ResourceModel.getMediaPath('mediaAudio');
     }else{
       // mediaRealPath = mediaPath + "/attachment";
-      mediaRealPath = selectDiskCharacterUp("mediaAttachment");
       mediaType = "mediaAttachment";
+      mediaRealPath = await db.ResourceModel.getMediaPath('mediaAttachment');
     }
 
     // 带有年份月份的文件储存路径 /2018/04/

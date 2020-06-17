@@ -31,9 +31,15 @@ const receiptConfig = {
   sign_type: 'MD5'
 };
 
-const privateKey = fs.readFileSync(path.resolve(__dirname, '../key/rsa_private_key.pem'));
-const publicKey = fs.readFileSync(path.resolve(__dirname, '../key/alipay_public_key.pem'));
-
+let privateKey = '', publicKey = '';
+const privateKeyPath = path.resolve(__dirname, '../key/rsa_private_key.pem');
+const publicKeyPath = path.resolve(__dirname, '../key/alipay_public_key.pem');
+if(fs.existsSync(privateKeyPath)) {
+  privateKey = fs.readFileSync(privateKeyPath);
+}
+if(fs.existsSync(publicKeyPath)) {
+  publicKey = fs.readFileSync(publicKeyPath);
+}
 
 const func = {};
 
