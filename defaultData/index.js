@@ -66,6 +66,13 @@ defaultData.init = async () => {
       console.log(`inserting forum '${forum.displayName}' into database`);
     }
   }
+  const messageTypes = require('./messageTypes');
+  const messageTypesCount = await db.MessageTypeModel.count();
+  if(messageTypesCount === 0) {
+    const f = db.MessageTypeModel(messageTypes);
+    await f.save();
+    console.log(`inserting messageTypes '${messageTypes._id}' into database`);
+  }
 };
 
 module.exports = defaultData;

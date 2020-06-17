@@ -17,12 +17,12 @@ $('#inputFile').on('change', function() {
 	if(file) {
 		upLoadFile = file;
 	}
-	var reader = new FileReader();
-	reader.onload = function() {
-    var url = reader.result;
-    insertToImage(url);
-	};
-  reader.readAsDataURL(upLoadFile);
+	// var reader = new FileReader();
+	// reader.onload = function() {
+  //   var url = reader.result;
+  //   insertToImage(url);
+	// };
+  // reader.readAsDataURL(upLoadFile);
   savePoster();
 });
 
@@ -223,7 +223,7 @@ function savePoster() {
 			screenTopAlert('海报上传成功');
 		})
 		.fail(function(data) {
-			screenTopWarning(JSON.parse(data.responseText).error);
+      sweetError(JSON.parse(data.responseText));
 		})
 }
 

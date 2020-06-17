@@ -79,7 +79,12 @@ const roleSchema = new Schema({
 		type: Number,
 		default: 0
 	},
-
+	// 是否是默认证书
+	defaultRole: {
+		type: Boolean,
+		default: false,
+	},
+	
   postToForum: {
 	  countLimit: {
 	    unlimited: {
