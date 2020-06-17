@@ -21,6 +21,15 @@ router
     if(watermark.transparency > 100) watermark.transparency = 100;
     countLimit.others = await db.RoleModel.filterSettings(countLimit.others, ['visitor']);
     extensionLimit.others = await db.RoleModel.filterSettings(extensionLimit.others, ['visitor']);
+    // 水印尺寸限制
+    checkNumber(watermark.minHeight, {
+      name: '水印尺寸限制最小高度',
+      min: 0
+    });
+    checkNumber(watermark.minWidth, {
+      name: '水印尺寸限制最小宽度',
+      min: 0
+    });
     // 尺寸限制
     checkNumber(sizeLimit.default, {
       name: '文件尺寸',

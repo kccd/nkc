@@ -25,11 +25,11 @@ block eContent
               h5 仅给尺寸满足以下条件的图片添加水印
               .form-inline.m-b-1
                 span 最小宽度：
-                input.form-control.form-inline(type='text' v-model="us.watermark.minWidth")
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.minWidth")
                 span &nbsp;px
               .form-inline
                 span 最小高度：
-                input.form-control.form-inline(type='text' v-model="us.watermark.minHeight")
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.minHeight")
                 span &nbsp;px
           .form-group
             label.col-sm-2.control-label 透明度
