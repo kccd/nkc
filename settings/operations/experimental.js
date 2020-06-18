@@ -197,16 +197,10 @@ module.exports = {
 		grade: {
 			GET: 'visitUsersGradeSettings',
 			PATCH: 'modifyUsersGradeSettings',
-			// POST: 'addUsersGrade',
-			/*PARAMETER: {
-				GET: 'visitUsersGradeSettings',
-				PATCH: 'modifyUsersGradeSettings',
-				DELETE: 'deleteUsersGrade'
-			}*/
 		},
-		number: {
-			GET: 'visitNumberSettings',
-			PATCH: 'modifyNumberSettings'
+		score: {
+			GET: 'experimentalScoreSettings',
+			PATCH: 'experimentalScoreSettings'
 		},
 		kcb: {
 			GET: 'visitKcbSettings',

@@ -1,4 +1,3 @@
-const FileType = require('file-type');
 const Router = require('koa-router');
 const resourceRouter = new Router();
 const pathModule = require('path');
