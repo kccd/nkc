@@ -1470,42 +1470,6 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   }
 };
 
-/**
- * 自动生成封面图
- * @param {Object} ctx 可用工具对象
- * @param {Object} thread 帖子对象
- * @param {Object} post post对象
- */
-threadSchema.statics.autoCoverImage = async (ctx, thread, post) => {
-  const path = require("path");
-  const {fs} = ctx;
-  const {selectDiskCharacterDown} = ctx.settings.mediaPath;
-  const {coverPath, frameImgPath} = ctx.settings.upload;
-  const {coverify} = ctx.tools.imageMagick;
-  await thread.extendFirstPost();
-  await thread.firstPost.extendResources();
-  const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg', 'mp4'].indexOf(e.ext.toLowerCase()) > -1);
-  if(cover){
-    const middlePath = selectDiskCharacterDown(cover);
-    let coverMiddlePath;
-    if(cover.ext === "mp4"){
-      coverMiddlePath = path.join(path.resolve(frameImgPath), `/${cover.rid}.jpg`);
-    }else{
-      coverMiddlePath = path.join(middlePath, cover.path);
-    }
-    let coverExists = await fs.exists(coverMiddlePath);
-    if(!coverExists){
-      thread.hasCover = false;
-      await thread.save();
-    }else{
-      await coverify(coverMiddlePath, `${coverPath}/${post.tid}.jpg`)
-      .catch(e => {
-        thread.hasCover = false;
-        return thread.save()
-      });
-    }
-  }
-};
 
 /**
  * -------

@@ -6,13 +6,13 @@ const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 
 downloadRouter
 .post('/', async (ctx, next) => {
-    const {fs, nkcModules} = ctx;
+    const {fs, nkcModules, db} = ctx;
     const settings = ctx.settings;
     const {imageMagick} = ctx.tools;
     const timeStr = new Date().getTime();
     const url = ctx.body.loadsrc;
     ctx.data.source = url;
-/*    console.log("----*获取目标url*----");
+/*  console.log("----*获取目标url*----");
     console.log("----*目标url*----")
     console.log(url)*/
 
@@ -58,7 +58,7 @@ downloadRouter
                     error = new Error('请求失败。\n' + `状态码: ${statusCode}`);
                     error.status = statusCode;
                     reject(error)
-                } 
+                }
                 res.setEncoding('binary');
                 // res.on('error', (err) => {
                 //     reject(err);
@@ -77,14 +77,13 @@ downloadRouter
                 reject(err);
             })
         })
-            
+
     };
 
     let funcResult = await downloadImg(url, './tmp/upload_'+timeStr);
-    
+
     //获得图片格式和尺寸
-    const {mediaPath, uploadPath, generateFolderName,extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = settings.upload;
-    let {selectDiskCharacterUp} = settings.mediaPath;
+    const {generateFolderName,extGetPath, thumbnailPath, mediumPath, originPath} = settings.upload;
     let extension = funcResult.exts;
     // 如果是webp格式图片，则转换为jpg
     if(extension == "webp") {
@@ -103,7 +102,7 @@ downloadRouter
     // 图片名称279471.png
     const saveName = rid + '.' + extension;
 
-    let mediaRealPath = selectDiskCharacterUp("mediaPicture");
+    let mediaRealPath = await db.ResourceModel.getMediaPath('mediaPicture');
     let mediaType = "mediaPicture";
     let middlePath = generateFolderName(mediaRealPath);
     // 路径 d:\nkc\resources\video/2018/04/256647.mp4
@@ -180,13 +179,16 @@ downloadRouter
     // const colunameWidth = colunameLength * 12;
     // const coluHeight = 24;
     // 获取水印图片路径
-    let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
-    waterSmall = waterSmall.c;
+    // let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
+    // waterSmall = waterSmall.c;
     // const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
-    const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
-    const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";
+    /*const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
+    const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";*/
+    const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+    const waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+    const watermarkSettings = await db.SettingModel.getWatermarkSettings();
     // 获取透明度
-    const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
+    // const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
     // 图片水印尺寸
     let {siteLogoWidth, siteLogoHeigth} = await imageMagick.waterInfo(waterSmallPath);
     siteLogoWidth = parseInt(siteLogoWidth);
@@ -229,11 +231,12 @@ downloadRouter
       await imageMagick.imageNarrow(path)
     }
     // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
-    if(extension !== "gif" && width > 600 && height > 200 && waterAdd === true){
+    if(extension !== "gif" && width >= watermarkSettings.minWidth && height >= watermarkSettings.minHeight && watermarkSettings.enabled === true && waterAdd) {
+      // if(extension !== "gif" && width > 600 && height > 200 && waterAdd === true){
       if(waterStyle === "siteLogo"){
-        await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path);
+        await imageMagick.watermarkify(watermarkSettings.transparency, waterGravity, waterBigPath, path);
       }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
-        await imageMagick.watermarkifyLogo(transparency, logoCoor, waterGravity, waterSmallPath, path);
+        await imageMagick.watermarkifyLogo(watermarkSettings.transparency, logoCoor, waterGravity, waterSmallPath, path);
         var temporaryPath = extGetPath(extension);
         await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path, temporaryPath)
       }
@@ -257,7 +260,7 @@ downloadRouter
     // // 添加水印
     // if(size > largeImage) {
     //     await imageMagick.attachify(path);
-    // } 
+    // }
     // // else {
     // //     const {width, height} = await imageMagick.info(path);
     // //     if(height > 400 || width > 300) {

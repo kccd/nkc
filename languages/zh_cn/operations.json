@@ -540,7 +540,6 @@
   "visitRecycleMarkThreads": "查看等待修改的文章",
   "orderListToExcel": "[CO]订单表格导出至excel",
   "getOrigins": "[VI]获取原图",
-  "saveNewEditPicture": "[CO]上传编辑好的新图片",
   "modifyKcbRecordReason": "屏蔽/解除屏蔽 鼓励原因",
   "visitUserBannerSettings": "访问账号背景设置",
   "clearUserInfo": "删除用户的信息（头像、背景、用户名和个人简介）",

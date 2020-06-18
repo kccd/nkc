@@ -1,8 +1,6 @@
-const {scheduleJob, RecurrenceRule} = require('node-schedule');
+const {scheduleJob} = require('node-schedule');
 const moment = require('moment');
 const {spawn} = require('child_process');
-const settings = require('./settings');
-const backup = require('./settings/backup');
 const {fork} = require("child_process");
 const fs = require('fs');
 const path = require('path');
@@ -13,7 +11,7 @@ const {
   PostModel, ThreadModel, UserModel, ActiveUserModel,
   SubscribeModel,
   ShopOrdersModel, ShopRefundModel, ShopGoodsModel,
-  SettingModel, UsersGeneralModel, KcbsRecordModel
+  SettingModel
 } = require('./dataModels');
 
 const jobs = {};
@@ -54,7 +52,8 @@ jobs.updateActiveUsers = cronStr => {
 };
 
 jobs.backupDatabase = () => {
-	scheduleJob(backup.cronStr, async () => {
+  if(!mongodb.backupTime || !mongodb.backupDir) return;
+	scheduleJob(mongodb.backupTime, async () => {
 		fs.appendFile(`${path.resolve(__dirname)}/backup.log`, `\n\n${moment().format('YYYY-MM-DD HH:mm:ss')} 开始备份数据...\n`, (err) => {
 			if(err) {
 				console.log(err);
@@ -71,9 +70,9 @@ jobs.backupDatabase = () => {
       '--host',
       `${mongodb.address}:${mongodb.port}`,
       '--db',
-      backup.database,
+      mongodb.database,
       '--out',
-      `${backup.out}${moment().format('YYYYMMDD')}`,
+      `${path.resolve(mongodb.backupDir)}/${moment().format('YYYYMMDD')}`,
       `--excludeCollection`,
       `visitorLogs`
     ];
