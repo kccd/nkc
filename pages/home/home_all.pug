@@ -3,7 +3,7 @@ block title
   include ../publicModules/web_header
   +includeCSS("/home/home_all.css")
   +includeCSS("/swiper/dist/css/swiper.css")
-block content  
+block content
   mixin forumList(f)
     .home-forums-body
       .home-forum-parent
@@ -74,7 +74,7 @@ block content
                   for f in data.visitedForums
                     a.home-visited-forum(href=`/f/${f.fid}` data-float-fid=f.fid)
                       if f.iconFileName
-                        img.home-visited-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                        img.home-visited-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
                       else
                         .home-visited-forum-icon(style=`background-color: ${f.color}`)
                       span=f.displayName
@@ -92,7 +92,7 @@ block content
                     a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
                       .home-subscribe-forum-avatar
                         if forum.iconFileName
-                          img(src=tools.getUrl("forumAvatar", forum.fid))
+                          img(src=tools.getUrl("forumAvatar", forum.logo))
                         else
                           div(style=`background-color: ${forum.color}`)
                       .home-subscribe-forum-info=forum.displayName
@@ -112,11 +112,11 @@ block content
                 a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
                   .home-subscribe-forum-avatar
                     if forum.iconFileName
-                      img(src=tools.getUrl("forumAvatar", forum.fid))
+                      img(src=tools.getUrl("forumAvatar", forum.logo))
                     else
                       div(style=`background-color: ${forum.color}`)
                   .home-subscribe-forum-info=forum.displayName
-        
+
         if data.toppedThreads.length
           .home-forums-list.m-b-1
             .home-header
@@ -190,16 +190,16 @@ block content
                           if minPrice === undefined || minPrice > price
                             -minPrice = price;
                           if maxPrice === undefined || maxPrice < price
-                            -maxPrice = price;  
+                            -maxPrice = price;
                         if minPrice === maxPrice
                           .home-goods-price=`￥${minPrice/100}`
-                        else  
+                        else
                           .home-goods-price=`￥${minPrice/100} - ￥${maxPrice/100}`
             .home-goods-forums 更多请访问：
               for f in data.goodsForums
                 a(href=`/f/${f.fid}` data-float-fid=f.fid)
                   if f.iconFileName
-                    img.home-goods-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                    img.home-goods-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
                   else
                     .home-goods-forum-icon(style=`background-color: ${f.color}`)
                   span=f.displayName

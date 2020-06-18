@@ -20,12 +20,12 @@ block content
                 .fa.fa-lightbulb-o
                 if !data.thread.comment
                   |正在回复文章《
-                else  
+                else
                   |正在评论文章《
                 a(href=data.thread.url target="_blank")=`${data.thread.title}`
                 if !data.thread.comment
                   |》
-                else  
+                else
                   |》下的回复
             else if data.type === "modifyThread"
               .editor-type-info
@@ -41,8 +41,8 @@ block content
                 | 》下的
                 if data.thread.comment
                   | 评论
-                else 
-                  | 回复  
+                else
+                  | 回复
             else if data.type === "modifyForumDeclare"
               .editor-type-info
                 .fa.fa-lightbulb-o
@@ -61,7 +61,7 @@ block content
               .editor-main-forums
                 .editor-main-forum(v-for="f, index in selectedForums")
                   .editor-main-forum-avatar(:style="'background-color: ' + f.color" v-if="!f.iconFileName" :data-float-fid="f.fid")
-                  img.editor-main-forum-avatar(:src="getUrl('forumAvatar', f.fid)" v-else :data-float-fid="f.fid")
+                  img.editor-main-forum-avatar(:src="getUrl('forumAvatar', f.logo)" v-else :data-float-fid="f.fid")
                   .editor-main-forum-name(:data-float-fid="f.fid")
                     span {{f.fName}}
                     span(v-if="f.cName") ：{{f.cName}}
