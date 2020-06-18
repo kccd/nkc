@@ -17,7 +17,7 @@ directAlipay.config({
   seller_email,
   partner: seller_id,
   key,
-  return_url: global.NKC.NODE_ENV === 'production'?
+  return_url: process.env.NODE_ENV === 'production'?
     'https://www.kechuang.org/fund/donation/return':
     'http://localhost:9000/fund/donation/return',
   notify_url: 'https://www.kechuang.org/fund/donation/verify'

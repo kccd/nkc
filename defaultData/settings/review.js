@@ -20,6 +20,12 @@ module.exports = {
         },
         grades: [
           {
+            gradeId: 0,
+            status: false,
+            type: "all",
+            count: 10
+          },
+          {
             gradeId: 1,
             status: false,
             type: "all",
@@ -51,12 +57,6 @@ module.exports = {
           },
           {
             gradeId: 6,
-            status: false,
-            type: "all",
-            count: 10
-          },
-          {
-            gradeId: 7,
             status: false,
             type: "all",
             count: 10
@@ -87,6 +87,12 @@ module.exports = {
         },
         grades: [
           {
+            gradeId: 0,
+            status: false,
+            type: "all",
+            count: 10
+          },
+          {
             gradeId: 1,
             status: false,
             type: "all",
@@ -118,12 +124,6 @@ module.exports = {
           },
           {
             gradeId: 6,
-            status: false,
-            type: "all",
-            count: 10
-          },
-          {
-            gradeId: 7,
             status: false,
             type: "all",
             count: 10

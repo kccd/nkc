@@ -1,6 +1,6 @@
 const ei = require("easyimage");
 const FileType = require('file-type');
-const {upload, statics, mediaPath} = require("../settings");
+const {upload, statics} = require("../settings");
 const fsSync = require("../nkcModules/fsSync");
 const fs = require("fs");
 const db = require("../dataModels");
@@ -434,7 +434,7 @@ func.createPostCoverByPostId = async (pid) => {
     if(cover.ext === "mp4") {
       filePath = upload.frameImgPath + "/" + cover.rid + ".jpg";
     } else {
-      filePath = mediaPath.selectDiskCharacterDown(cover) + "/" + cover.path;
+      filePath = await cover.getFilePath();
     }
     if(!fsSync.existsSync(filePath)) return;
     const targetPath = upload.coverPath + "/" + pid + ".jpg";

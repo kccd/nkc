@@ -127,7 +127,7 @@ NKC.modules.SelectResource = function() {
         setTimeout(function() {
           try{
             self.cropper.getCroppedCanvas().toBlob(function(blob) {
-              var file = NKC.methods.blobToFile(blob, Date.now() + ".jpeg");
+              var file = NKC.methods.blobToFile(blob, Date.now() + ".jpg");
               self.app.uploadSelectFile(file);
               self.app.changePageType("list");
               self.app.resetCropper();

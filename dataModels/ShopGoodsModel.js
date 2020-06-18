@@ -1,4 +1,4 @@
-/* 
+/*
   商品数据表
   @author Kris 2019/2/18
 */
@@ -63,7 +63,7 @@ const shopGoodsSchema = new Schema({
     type: String,
     required: true,
     index: 1
-  },/* 
+  },/*
   // 商品名称
   productName: {
     type: String,
@@ -119,7 +119,7 @@ const shopGoodsSchema = new Schema({
   //   type: String,
   //   required: true
   // },
-  
+
   // 是否免邮
   isFreePost: {
     type: Boolean,
@@ -229,10 +229,10 @@ const shopGoodsSchema = new Schema({
 });
 
 
-/* 
+/*
   拓展商品信息
   @param products: 商品对象组成的数组
-  @param o: 
+  @param o:
     参数    数据类型(默认值) 介绍
     user:   Boolean(true) 是否拓展商品所属用户
     dealInfo: Boolean(true) 是否拓展商家基础信息
@@ -264,13 +264,13 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
   products.map(p => {
     if(o.user)
       uid.add(p.uid);
-    if(o.post)  
+    if(o.post)
       pid.add(p.oc);
     if(o.thread)
       tid.add(p.tid);
     if(o.productParam)
       productId.add(p.productId);
-  }); 
+  });
   let users, posts, threads, dealInfos, productParams;
   if(o.user) {
     users = await UserModel.find({uid: {$in: [...uid]}});
@@ -336,7 +336,7 @@ shopGoodsSchema.statics.extendProductsInfo = async (products, o) => {
 shopGoodsSchema.methods.ensurePermission = async function() {
   if(this.disabled) throwErr(403, `商品已被屏蔽，暂无法浏览、收藏、添加到购物车和或购买`);
 };
-/* 
+/*
   通过id查询商品
   @author pengxiguaa 2019/3/7
 */
@@ -414,9 +414,7 @@ shopGoodsSchema.methods.onshelf = async function() {
   // 将商品的主页图片复制裁剪到文章封面图文件夹
   const resource = await ResourceModel.findOne({rid: imgMaster});
   if(resource) {
-    const {path} = resource;
-    const basePath = settings.mediaPath.selectDiskCharacterDown(resource);
-    const imgPath = basePath + path;
+    const imgPath = await resource.getFilePath();
     const targetPath = settings.upload.coverPath + '/' + tid + '.jpg';
     await tools.imageMagick.coverify(imgPath, targetPath);
   }
@@ -444,7 +442,7 @@ shopGoodsSchema.statics.getHomeGoods = async () => {
   return results;
 };
 
-/* 
+/*
   重新计算剩余库存
   @param {String} productId 商品ID
 */
@@ -459,18 +457,18 @@ shopGoodsSchema.statics.computeSellCount = async (productId) => {
   if(!product) throwErr(500, `商品ID错误，productId: ${productId}`);
   if(product.stockCostMethod === "orderReduceStock") {
     // 下单减库存
-    
+
   } else {
     // 付款减库存
   }
   const productParams = await ShopProductsParamsModel.find({productId: product.productId});
   const costs = await ShopCostRecordModel.find({
-    productId, 
+    productId,
     refundStatus: {$ne: "success"}
   });
   const ordersId = costs.map(c => c.orderId);
   for(const productParam of productParams) {
-    
+
   }
 };
 
