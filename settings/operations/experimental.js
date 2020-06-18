@@ -149,7 +149,10 @@ module.exports = {
       },
       list: {
         GET: 'visitHomeListSettings',
-        PATCH: 'modifyHomeListSettings'
+				PATCH: 'modifyHomeListSettings',
+				biglogo: {
+					POST: 'uploadHomeBigLogo'
+				}
       }
 		},
 		app:{

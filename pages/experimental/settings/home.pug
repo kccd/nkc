@@ -35,7 +35,7 @@ block content
               button.btn.btn-default(onclick='saveNotice()') 保存
 
         else if data.type === 'list'
-          .hidden#data=objToStr({homeSettings: data.homeSettings})
+          .hidden#data=objToStr(data)
           .row#app(v-cloak)
             .col-xs-12.col-md-12
               .form
@@ -87,9 +87,11 @@ block content
                   h4.setting-block-title 首页大LOGO
                   .container
                     .row
-                      
-                  p.help-block 上传多个将在每次刷新页面时随机选取一个展示
-                  button.btn.btn-primary(@click="pickPicture") 选取图片
+                      .logo-item.col-xs-6.col-sm-3(v-for="(f, index) in logoFiles")
+                        img(:src="f.url")
+                        .logo-item-control.fa.fa-trash(@click="deleteBigLogo(index)")
+                  p.help-block 推荐388*107px，上传多个将在每次刷新页面时随机选取一个展示
+                  button.btn.btn-primary(@click="pickPicture" :disabled="logoFileUploadding") {{logoFileUploadding? '上传中...' : '选取图片'}}
                   input#inputFile.hidden(type="file" multiple accept="image/*" @change="addFile")
                 .form-group
                   h5.text-danger(v-if="error") {{error}}

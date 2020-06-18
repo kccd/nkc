@@ -4,6 +4,13 @@ router
   .get('/', async (ctx, next) => {
     const {db, data} = ctx;
     data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
+    let homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
+    data.homeBigLogo = homeBigLogo.map(attachId => {
+      return {
+        aid: attachId,
+        url: `/a/${attachId}`
+      };
+    })
     ctx.template = 'experimental/settings/home.pug';
     data.type = 'list';
     await next();
@@ -29,5 +36,25 @@ router
     });
     await db.SettingModel.saveSettingsToRedis("home");
     await next();
+  })
+  .post('/biglogo', async (ctx, next) => {
+    const {body, db, data} = ctx;
+    const {fields, files, type, aid} = body;
+    if(type === "delete") {
+      await db.SettingModel.updateOne({_id: 'home'}, {
+        $pull: {
+          "c.homeBigLogo": aid
+        }
+      })
+      await db.SettingModel.saveSettingsToRedis('home');
+    } else {
+      data.saved = [];
+      for(let key in files) {
+        const file = files[key];
+        let attachment = await db.AttachmentModel.saveHomeBigLogo(file);
+        data.saved.push({aid: attachment._id, url: `/a/${attachment._id}`});
+      }
+    }
+    next();
   });
 module.exports = router;

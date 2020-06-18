@@ -728,5 +728,7 @@
   "modifyUserSensitiveInfo": "修改用户敏感信息",
 
   "nkcManagementSection": "网站板块管理",
-  "getAttachment": "获取附件（给所有人，内部有权限判断）"
+  "getAttachment": "获取附件（给所有人，内部有权限判断）",
+
+  "uploadHomeBigLogo": "上传首页大Logo"
 }
