@@ -158,8 +158,9 @@ router
           fid: forum.fid,
           cid: category? category.cid: "",
           description: forum.description,
-          iconFileName: forum.iconFileName,
           color: forum.color,
+          logo: forum.logo,
+          banner: forum.banner,
           fName: forum.displayName,
           cName: category? category.name: ""
         });
