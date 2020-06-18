@@ -8,8 +8,8 @@ block content
     .home-forums-body
       .home-forum-parent
         a(href=`/f/${f.fid}` data-float-fid=f.fid).home-forum-panel
-          if f.iconFileName
-            img.home-forum-panel-icon(src=`/forum_avatar/${f.fid}`)
+          if f.logo
+            img.home-forum-panel-icon(src=tools.getUrl('forumAvatar', f.logo))
           else
             .home-forum-panel-icon(style=`background-color: ${f.color}`)
           .home-forum-panel-name
@@ -18,8 +18,8 @@ block content
       .home-forum-child
         for cf in f.childrenForums || []
           a(href=`/f/${cf.fid}` data-float-fid=cf.fid).home-forum-panel
-            if cf.iconFileName
-              img.home-forum-panel-icon(src=`/forum_avatar/${cf.fid}`)
+            if cf.logo
+              img.home-forum-panel-icon(src=tools.getUrl('forumAvatar', cf.logo))
             else
               .home-forum-panel-icon(style=`background-color: ${cf.color}`)
             .home-forum-panel-name
@@ -73,7 +73,7 @@ block content
                 .home-visited-forums
                   for f in data.visitedForums
                     a.home-visited-forum(href=`/f/${f.fid}` data-float-fid=f.fid)
-                      if f.iconFileName
+                      if f.logo
                         img.home-visited-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
                       else
                         .home-visited-forum-icon(style=`background-color: ${f.color}`)
@@ -91,7 +91,7 @@ block content
                       -break;
                     a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
                       .home-subscribe-forum-avatar
-                        if forum.iconFileName
+                        if forum.logo
                           img(src=tools.getUrl("forumAvatar", forum.logo))
                         else
                           div(style=`background-color: ${forum.color}`)
@@ -111,7 +111,7 @@ block content
               for forum in data.subForums
                 a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
                   .home-subscribe-forum-avatar
-                    if forum.iconFileName
+                    if forum.logo
                       img(src=tools.getUrl("forumAvatar", forum.logo))
                     else
                       div(style=`background-color: ${forum.color}`)
@@ -198,7 +198,7 @@ block content
             .home-goods-forums 更多请访问：
               for f in data.goodsForums
                 a(href=`/f/${f.fid}` data-float-fid=f.fid)
-                  if f.iconFileName
+                  if f.logo
                     img.home-goods-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
                   else
                     .home-goods-forum-icon(style=`background-color: ${f.color}`)

@@ -71,7 +71,9 @@ block content
                   input.form-control(placeholder='请输入文号' v-model='forum._valuableThreadsId')
               .form-group
                 .col-sm-5.col-sm-offset-2
-                  button.btn.btn-default(@click=`save`) 保存
+                  button.btn.btn-default(@click=`save` v-if="!submitting") 保存
+                  button.btn.btn-default(v-else disabled) 保存中...
+                    .fa.fa-spinner.fa-spin
 block scripts
   include ../../publicModules/selectColor
   include ../../publicModules/crop/crop_new

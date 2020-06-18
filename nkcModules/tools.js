@@ -28,6 +28,9 @@ var Tools = function() {
       case "forumAvatar": {
         return "/a/" + id + t;
       }
+      case "forumBanner": {
+        return "/a/" + id + t
+      }
       case "columnAvatar": {
         return "/column/avatar/" + id + t
       }

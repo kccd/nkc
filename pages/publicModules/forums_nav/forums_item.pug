@@ -5,6 +5,6 @@
       style=`background-color: ${f.color || '#808080'}`
       title=f.description
     ).topic-item
-      if f.iconFileName
-        img(src=`/forum_avatar/${f.fid}`)
+      if f.logo
+        img(src=tools.getUrl('forumAvatar', f.logo))
       span=f.displayName

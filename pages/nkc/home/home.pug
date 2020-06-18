@@ -71,10 +71,9 @@ block nkcContent
               .fa.fa-angle-right(title="右移" @click="moveForum(recommendForums, f, 'right')")
               .fa.fa-trash(title="删除" @click="removeForum(recommendForums, index)")
             .home-top-forum-info
-              .home-top-forum-icon(v-if="!f.iconFileName" :style="'background-color: '+f.color")
+              .home-top-forum-icon(v-if="!f.logo" :style="'background-color: '+f.color")
               img.home-top-forum-icon(v-else :src="getUrl('forumAvatar', f.logo)")
               a.pointer(@click="visitUrl('/f/' + f.fid, true)").home-top-forum-name {{f.displayName}}
-
         .m-t-1
           button.management-button(@click="saveRecommendForums") 保存
     div.m-t-2

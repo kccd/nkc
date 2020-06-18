@@ -342,8 +342,9 @@ func.saveUserBanner$2 = async (uid, file) => {
     type: "userChangeBanner"
   });
   await log.save();
-  await user.update({banner: file.hash});
+  await user.update({banner: aid});
   await fsSync.unlink(file.path);
+  return aid;
 };
 /*
 * 获取用户背景
