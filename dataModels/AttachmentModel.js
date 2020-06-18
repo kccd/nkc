@@ -150,4 +150,17 @@ schema.statics.getWatermarkFilePath = async (c) => {
   return await water.getFilePath();
 }
 
+/**
+ * 获取首页大Logo
+ */
+schema.statics.getHomeBigLogo = async () => {
+  const SM = mongoose.model('settings');
+  const homeSettings = await SM.getSettings('home');
+  if(!homeSettings.homeBigLogo || (homeSettings.homeBigLogo.length)) {
+    return [];
+  } else {
+    return homeSettings.homeBigLogo;
+  }
+}
+
 module.exports = mongoose.model('attachments', schema);

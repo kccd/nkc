@@ -150,7 +150,8 @@ if(vueDom) {
       info: '',
       list: [],
       recommend: [],
-      error: ""
+			error: "",
+			logoFiles: []
     },
     mounted: function() {
       var data = NKC.methods.getDataById("data");
@@ -206,7 +207,24 @@ if(vueDom) {
           .catch(function(data) {
             app.error = data.error || data;
           });
-      }
+			},
+			pickPicture: function() {
+				$("#inputFile").click();
+			},
+			addFile: function() {
+				var self = this;
+				var files = $("#inputFile")[0].files;
+				[].forEach.call(files, function(file) {
+					var reader = new FileReader();
+					reader.readAsDataURL(file);
+					reader.onload = function() {
+						self.logoFiles.push({
+							file: file,
+							dataURL: reader.result
+						})
+					}
+				})
+			}
     }
   });
 }

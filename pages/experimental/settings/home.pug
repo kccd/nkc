@@ -16,7 +16,7 @@ block content
         .list-group
           a.list-group-item(class=data.type==='logo'?'active': '' href=`/e/settings/home/logo`) LOGO
           a.list-group-item(class=data.type==='notice'?'active': '' href=`/e/settings/home/notice`) 网站公告
-          a.list-group-item(class=data.type==='list'?'active': '' href=`/e/settings/home/list`) 首页文章列表
+          a.list-group-item(class=data.type==='list'?'active': '' href=`/e/settings/home/list`) 首页显示风格
       .col-xs-12.col-md-10
         if data.type === 'top'
 
@@ -40,7 +40,7 @@ block content
             .col-xs-12.col-md-12
               .form
                 .form-group
-                  h4 一、首页可显示文章的专业类型
+                  h4.setting-block-title 首页可显示文章的专业类型
                   .checkbox
                     span 话题
                     label
@@ -49,7 +49,7 @@ block content
                     label
                       input(type='checkbox' value="discipline" v-model="list")
                 .form-group
-                  h4 二、游客首页
+                  h4.setting-block-title 游客首页
                   .radioBox
                     span 最新
                     label
@@ -58,32 +58,39 @@ block content
                     label
                       input(type='radio' value="home" v-model="homeSettings.visitorThreadList")
                 .form-group.form-inline
-                  h4 三、热门文章
+                  h4.setting-block-title 热门文章
                   h5 回复数不低于：
                     input.form-control(type="text" v-model.number="homeSettings.hotThreads.postCount")
                   h5
                     span 回复用户的总数(已去重)不低于：
                     input.form-control(type="text" v-model.number="homeSettings.hotThreads.postUserCount")
                 .form-group.form-inline
-                  h4 四、推荐条件
+                  h4.setting-block-title 推荐条件
                   h5
-                    span 1、
                     span 精选文章
                     label
                       input(type='checkbox' value="featuredThreads" v-model="recommend")
                   h5
-                    span 2、热门文章
+                    span 热门文章
                     label
                       input(type='checkbox' value="hotThreads" v-model="recommend")
                   h5
-                    span 3、点赞总数不低于
+                    span 点赞总数不低于
                     input.form-control(type='text' v-model.number='homeSettings.recommend.voteUpTotal')
                   h5
-                    span 4、独立点赞数不低于
+                    span 独立点赞数不低于
                     input.form-control(type='text' v-model.number='homeSettings.recommend.voteUpMax')
                   h5
-                    span 5、鼓励次数不低于
+                    span 鼓励次数不低于
                     input.form-control(type='text' v-model.number='homeSettings.recommend.encourageTotal')
+                .form-group
+                  h4.setting-block-title 首页大LOGO
+                  .container
+                    .row
+                      
+                  p.help-block 上传多个将在每次刷新页面时随机选取一个展示
+                  button.btn.btn-primary(@click="pickPicture") 选取图片
+                  input#inputFile.hidden(type="file" multiple accept="image/*" @change="addFile")
                 .form-group
                   h5.text-danger(v-if="error") {{error}}
                   h5.text-success(v-if="info") {{info}}

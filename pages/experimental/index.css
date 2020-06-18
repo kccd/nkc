@@ -183,3 +183,26 @@ tbody tr th {
 #cleanupTimeRange {
   width: 300px;
 }
+
+
+.setting-block-title {
+  position: relative;
+}
+.setting-block-title::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 6px;
+  background-color: red;
+  position: absolute;
+  left: -12px;
+  top: 0;
+  border-radius: 3px;
+}
+
+.setting-item-label {
+  font-weight: normal;
+}
+.setting-item-label + .setting-item-label {
+  margin-left: 14px;
+}

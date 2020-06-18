@@ -14,6 +14,7 @@ module.exports = {
     logos: [],
     logo: "",
     smallLogo: "",
+    homeBigLogo: [],
     noticeThreadsId: [],
     list: {
       topic: true,
