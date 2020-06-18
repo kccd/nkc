@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const ei = require("easyimage");
 const moment = require("moment");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
@@ -48,7 +49,6 @@ const schema = new Schema({
 }, {
   collection: 'attachments'
 });
-
 /*
 * 获取附件所在文件夹路径
 * @param {Boolean} upload true: 获取上传相关路径，false: 获取下载相关路径
@@ -92,13 +92,12 @@ schema.statics.saveWatermark = async (file, c = 'normal') => {
   const {fullPath, timePath} = await AM.getAttachmentPath(true);
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
-  const savePath = `${timePath}/${fileName}`;
   const realPath = `${fullPath}/${fileName}`;
   const {path, size, name} = file;
   await fsPromise.rename(path, realPath);
   const attachment = AM({
     _id: aid,
-    path: savePath,
+    path: timePath,
     size,
     name,
     ext,
@@ -120,11 +119,11 @@ schema.statics.saveWatermark = async (file, c = 'normal') => {
 * @return {String} 磁盘路径
 * @author pengxiguaa 2020/6/12
 * */
-schema.methods.getFilePath = async function() {
+schema.methods.getFilePath = async function(t) {
   const AP = mongoose.model('attachments');
   const attachmentPath = await AP.getAttachmentPath();
-  const {path} = this;
-  const filePath = attachmentPath + path;
+  const {path, _id, ext} = this;
+  const filePath = `${attachmentPath}${path}/${_id}${t?'_' + t: ''}.${ext}`;
   if(fs.existsSync(filePath)) {
     return filePath;
   } else {
@@ -149,5 +148,84 @@ schema.statics.getWatermarkFilePath = async (c) => {
   const water = await AP.findById(id);
   return await water.getFilePath();
 }
+
+/*
+* 保存专业Logo
+* @param {File} file 文件对象
+* @return {Object} attachment对象
+* @author pengxiguaa 2020/6/18
+* */
+schema.statics.saveForumImage = async (fid, type, file) => {
+  if(!['logo', 'banner'].includes(type)) throwErr(400, '未知的图片类型');
+  type = {
+    'logo': 'Logo',
+    'banner': 'Banner'
+  }[type];
+  const AM = mongoose.model("attachments");
+  const ForumModel = mongoose.model('forums');
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['jpg', 'jpeg', 'png']);
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const aid = AM.getNewId();
+  const fileName = `${aid}.${ext}`;
+  const targetFilePath = `${fullPath}/${fileName}`;
+  const {size, name} = file;
+  const attachment = AM({
+    _id: aid,
+    size,
+    name,
+    type: `forum${type}`,
+    ext,
+    path: timePath
+  });
+  await attachment.save();
+  if(type === 'Logo') {
+    // 正常
+    await ei.resize({
+      src: file.path,
+      dst: targetFilePath,
+      height: 192,
+      width: 192,
+      quality: 90
+    });
+    // 大图
+    const targetFilePathLG = `${fullPath}/${aid}_lg.${ext}`;
+    await ei.resize({
+      src: file.path,
+      dst: targetFilePathLG,
+      height: 600,
+      width: 600,
+      quality: 90
+    });
+    // 小图
+    const targetFilePathSM = `${fullPath}/${aid}_sm.${ext}`;
+    await ei.resize({
+      src: file.path,
+      dst: targetFilePathSM,
+      height: 48,
+      width: 48,
+      quality: 90
+    });
+    await ForumModel.updateOne({fid}, {
+      $set: {
+        logo: aid
+      }
+    });
+  } else {
+    await ei.resize({
+      src: file.path,
+      dst: targetFilePath,
+      height: 300,
+      width: 1200,
+      quality: 90
+    });
+    await ForumModel.updateOne({fid}, {
+      $set: {
+        banner: aid
+      }
+    })
+  }
+  return attachment;
+};
 
 module.exports = mongoose.model('attachments', schema);

@@ -12,7 +12,7 @@ const mkdirp = require("mkdirp");
 
 func.folders = {
   attachment: './attachment',
-  media: './media',
+  resource: './resource',
 }
 
 func.getBasePath = async () => {
