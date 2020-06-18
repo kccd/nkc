@@ -15,8 +15,8 @@ div
           style=`background-color: ${f.color || '#808080'};`
           title=f.description
         ).topic-item
-          if f.iconFileName
-            img(src=`/forum_avatar/${f.fid}`)
+          if f.logo
+            img(src=tools.getUrl('forumAvatar', f.logo))
           span=f.displayName
   .forums-nav-header
     +listHeader("话题")
@@ -27,8 +27,8 @@ div
           href=`/f/${pf.fid}`
           title=pf.description
         )
-          if pf.iconFileName
-            img(src=`/forum_avatar/${pf.fid}`)
+          if pf.logo
+            img(src=tools.getUrl('forumAvatar', pf.logo))
           else
             img(style=`background-color: ${pf.color || '#808080'};`)
           span=pf.displayName
@@ -40,8 +40,8 @@ div
               style=`background-color: ${cf.color || '#808080'}`
               title=cf.description
             ).topic-item
-              if cf.iconFileName
-                img(src=`/forum_avatar/${cf.fid}`)
+              if cf.logo
+                img(src=tools.getUrl('forumAvatar', cf.logo))
               span=cf.displayName
   .forums-nav-header
     +listHeader("学科")
@@ -52,8 +52,8 @@ div
           href=`/f/${pf.fid}`
           title=pf.description
         )
-          if pf.iconFileName
-            img(src=`/forum_avatar/${pf.fid}`)
+          if pf.logo
+            img(src=tools.getUrl('forumAvatar', pf.logo))
           else
             img(style=`background-color: ${pf.color || '#808080'};`)
           span=pf.displayName
@@ -65,6 +65,6 @@ div
               style=`background-color: ${cf.color || '#808080'}`
               title=cf.description
             ).topic-item
-              if cf.iconFileName
-                img(src=`/forum_avatar/${cf.fid}`)
+              if cf.logo
+                img(src=tools.getUrl('forumAvatar', cf.logo))
               span=cf.displayName

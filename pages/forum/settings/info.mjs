@@ -70,6 +70,7 @@ const app = new Vue({
 			const {forum} = self;
 			Promise.resolve()
 				.then(() => {
+					self.submitting = true;
 					forum.noticeThreadsId = self.str2arr(forum._noticeThreadsId);
 					forum.basicThreadsId = self.str2arr(forum._basicThreadsId);
 					forum.valuableThreadsId = self.str2arr(forum._valuableThreadsId);
@@ -95,9 +96,10 @@ const app = new Vue({
 						self.forum.banner = data.banner;
 					}
 					sweetSuccess('保存成功');
+					self.submitting = false;
 				})
 				.catch(err => {
-
+					self.submitting = false;
 					sweetError(err);
 				});
 		}

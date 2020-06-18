@@ -60,7 +60,7 @@ block content
                 small （必选，最多可选两个）
               .editor-main-forums
                 .editor-main-forum(v-for="f, index in selectedForums")
-                  .editor-main-forum-avatar(:style="'background-color: ' + f.color" v-if="!f.iconFileName" :data-float-fid="f.fid")
+                  .editor-main-forum-avatar(:style="'background-color: ' + f.color" v-if="!f.logo" :data-float-fid="f.fid")
                   img.editor-main-forum-avatar(:src="getUrl('forumAvatar', f.logo)" v-else :data-float-fid="f.fid")
                   .editor-main-forum-name(:data-float-fid="f.fid")
                     span {{f.fName}}

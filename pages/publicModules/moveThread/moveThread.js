@@ -110,6 +110,8 @@ NKC.modules.MoveThread = function() {
             fName: f.displayName,
             description: f.description,
             iconFileName: f.iconFileName,
+            logo: f.logo,
+            banner: f.banner,
             cName: f.selectedThreadType? f.selectedThreadType.name: "",
             color: f.color
           });

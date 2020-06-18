@@ -46,11 +46,11 @@ block content
         .forum-info-panel.m-b-1
           .forum-banner
             .forum-banner-cover
-            .forum-banner-img(style=`background-image: url(/f/${data.forum.fid}/banner)`)
+            .forum-banner-img(style=`background-image: url(${tools.getUrl('forumBanner', data.forum.banner)})`)
           .forum-info-body
             .forum-avatar
-              if data.forum.iconFileName
-                img.forum-avatar-icon(src=`/forum_avatar/${data.forum.fid}`)
+              if data.forum.logo
+                img.forum-avatar-icon(src=tools.getUrl('forumAvatar', data.forum.logo))
               else
                 .forum-avatar-icon(style=`background-color: ${data.forum.color}`)
             .forum-info

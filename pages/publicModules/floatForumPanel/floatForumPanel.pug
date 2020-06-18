@@ -13,7 +13,7 @@
     .float-forum(v-if="forum && (over || onPanel)")
       .float-forum-top
         a(:href="'/f/' + forum.fid" target="_blank").float-forum-cover
-          img.float-forum-icon(v-if="forum.iconFileName" :src="getUrl('forumAvatar', forum.logo)")
+          img.float-forum-icon(v-if="forum.logo" :src="getUrl('forumAvatar', forum.logo)")
           .float-forum-icon(v-else :style="'background-color: ' + forum.color + ';'")
         .float-forum-info
           a(:href="'/f/' + forum.fid" target="_blank" :style="uid?'padding-right: 3.5rem;':''").float-forum-name {{forum.displayName}}

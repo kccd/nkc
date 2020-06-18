@@ -1,7 +1,7 @@
 .forum-block
   .forum-block-info(data-float-fid=forumData.fid)
-    if forumData.iconFileName
-      img.forum-block-icon(src=`/forum_avatar/${forumData.fid}`)
+    if forumData.logo
+      img.forum-block-icon(src=tools.getUrl('forumAvatar', forumData.logo))
     else
       .forum-block-icon(style=`background-color: ${forumData.color}`)
     a(href=`/f/${forumData.fid}` ).forum-block-name=forumData.displayName

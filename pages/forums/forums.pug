@@ -14,7 +14,7 @@ block content
         .app-forum(class=showBorder?"border":"")
           if !parentForum
             a.app-forum-avatar(href=`/f/${f.fid}`)
-              if f.iconFileName
+              if f.logo
                 img(src=tools.getUrl("forumAvatar", f.logo))
               else
                 div(style=`background-color: ${f.color}`)

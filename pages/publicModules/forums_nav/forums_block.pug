@@ -12,8 +12,8 @@ div
       for forum in state.subForums
         .forum-block
           .forum-block-info
-            if forum.iconFileName
-              img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
+            if forum.logo
+              img.forum-block-icon(src=tools.getUrl('forumAvatar', forum.logo))
             else
               .forum-block-icon(style=`background-color: ${forum.color}`)
             a(href=`/f/${forum.fid}` title=`${forum.description}`).forum-block-name=forum.displayName
@@ -23,8 +23,8 @@ div
     if pf.forumType === "topic"
       .forum-block.hide-children
         .forum-block-info
-          if pf.iconFileName
-            img.forum-block-icon(src=`/forum_avatar/${pf.fid}`)
+          if pf.logo
+            img.forum-block-icon(src=tools.getUrl('forumAvatar', pf.logo))
           else
             .forum-block-icon(style=`background-color: ${pf.color}`)
           a(href=`/f/${pf.fid}` title=`${pf.description}`).forum-block-name=pf.displayName
@@ -34,8 +34,8 @@ div
             for cf in pf.childrenForums
               .forum-block.hide-children
                 .forum-block-info
-                  if cf.iconFileName
-                    img.forum-block-icon(src=`/forum_avatar/${cf.fid}`)
+                  if cf.logo
+                    img.forum-block-icon(src=tools.getUrl('forumAvatar', cf.logo))
                   else
                     .forum-block-icon(style=`background-color: ${cf.color}`)
                   a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName
@@ -45,8 +45,8 @@ div
     if pf.forumType === "discipline"
       .forum-block.hide-children
         .forum-block-info
-          if pf.iconFileName
-            img.forum-block-icon(src=`/forum_avatar/${pf.fid}`)
+          if pf.logo
+            img.forum-block-icon(src=tools.getUrl('forumAvatar', pf.fid))
           else
             .forum-block-icon(style=`background-color: ${pf.color}`)
           a(href=`/f/${pf.fid}` title=`${pf.description}`).forum-block-name=pf.displayName
@@ -56,8 +56,8 @@ div
             for cf in pf.childrenForums
               .forum-block.hide-children
                 .forum-block-info
-                  if cf.iconFileName
-                    img.forum-block-icon(src=`/forum_avatar/${cf.fid}`)
+                  if cf.logo
+                    img.forum-block-icon(src=tools.getUrl('forumAvatar', cf.logo))
                   else
                     .forum-block-icon(style=`background-color: ${cf.color}`)
                   a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName
