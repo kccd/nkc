@@ -9,10 +9,10 @@ const func = {};
 const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
-const moment = require('moment');
 
 func.folders = {
-  attachment: './attachments'
+  attachment: './attachment',
+  media: './media',
 }
 
 func.getBasePath = async () => {

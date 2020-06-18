@@ -13,7 +13,6 @@ const kcbRouter = require('./kcb');
 const logRouter = require('./log');
 const threadRouter = require("./thread");
 const usernameRouter = require("./username");
-const numberRouter = require('./number');
 const homeRouter = require('./home');
 const appRouter = require('./app');
 const pageRouter = require('./page');
@@ -62,7 +61,6 @@ settingRouter
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
 	.use('/app', appRouter.routes(), appRouter.allowedMethods())
 	.use('/page', pageRouter.routes(), pageRouter.allowedMethods())
-	.use('/number', numberRouter.routes(), numberRouter.allowedMethods())
 	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
 	.use('/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
 	.use('/grade', gradeRouter.routes(), gradeRouter.allowedMethods())

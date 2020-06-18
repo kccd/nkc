@@ -102,9 +102,9 @@ const resourceSchema = new Schema({
   获取文件路径
 */
 resourceSchema.methods.getFilePath = async function() {
-  const {selectDiskCharacterDown} = require("../settings/mediaPath");
+  const ResourceModel = mongoose.model('resources');
   const {path} = this;
-  let filePath = selectDiskCharacterDown(this);
+  let filePath = await ResourceModel.getMediaPath(this.mediaType);
   filePath += path;
   return filePath;
 };
@@ -229,6 +229,23 @@ resourceSchema.statics.checkUploadPermission = async (user, file) => {
     blacklistArr = blacklistArr.filter(b => !whitelistArr.includes(b));
     if(blacklistArr.includes(ext)) throwErr(400, '文件格式不被允许');
   }
+};
+
+/*
+* 获取附件文件夹路径，不包含文件
+* @param {String} type mediaAttachment: 附件, mediaPicture: 图片, mediaVideo: 视频, mediaAudio: 音频
+* @return {String} 文件夹路径
+* @author pengxiguaa 2020/6/17
+* */
+resourceSchema.statics.getMediaPath = async (type) => {
+  const file = require("../nkcModules/file");
+  const mediaNames = {
+    'mediaPicture': 'picture',
+    'mediaVideo': 'video',
+    'mediaAttachment': 'attachment',
+    'mediaAudio': 'audio'
+  };
+  return await file.getFullPath(file.folders.media + `/${mediaNames[type]}`);
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

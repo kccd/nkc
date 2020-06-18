@@ -71,7 +71,7 @@ html(lang='zh-CN')
             .form-group
               .name.col-sm-3.control-label 密码
               .col-sm-8
-                input.form-control(type='text' v-model.trim='mongodb.password' placeholder="无需验证可不填写")
+                input.form-control(type='password' v-model.trim='mongodb.password' placeholder="无需验证可不填写")
           .form-horizontal
             .form-group
               .col-sm-3
@@ -96,7 +96,7 @@ html(lang='zh-CN')
             .form-group
               .name.col-sm-3.control-label 密码
               .col-sm-8
-                input.form-control(type='text' v-model.trim='elasticSearch.password' placeholder="无需验证可不填写")
+                input.form-control(type='password' v-model.trim='elasticSearch.password' placeholder="无需验证可不填写")
           .form-horizontal
             .form-group
               .col-sm-3
@@ -113,7 +113,7 @@ html(lang='zh-CN')
             .form-group
               .name.col-sm-3.control-label 密码
               .col-sm-8
-                input.form-control(type='text' v-model.trim='redis.password' placeholder="无需验证可不填写")
+                input.form-control(type='password' v-model.trim='redis.password' placeholder="无需验证可不填写")
           .form-horizontal
             .form-group(v-if='error')
               .col-sm-3

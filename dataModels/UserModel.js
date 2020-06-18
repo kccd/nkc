@@ -613,8 +613,8 @@ userSchema.methods.updateUserMessage = async function() {
 userSchema.methods.calculateScore = async function() {
 	const SettingModel = mongoose.model('settings');
 	// 积分设置
-	const scoreSettings = await SettingModel.findOnly({_id: 'score'});
-	const {coefficients} = scoreSettings.c;
+  const gradeSettings = await SettingModel.getSettings('grade');
+	const {coefficients} = gradeSettings;
 
 	const {xsf, postCount, threadCount, disabledPostsCount, disabledThreadsCount, violationCount, dailyLoginCount, digestThreadsCount, digestPostsCount, recCount} = this;
 	// 积分计算
@@ -743,7 +743,11 @@ userSchema.methods.extendGrade = async function() {
 	if(!this.score || this.score < 0) {
 		this.score = 0
 	}
-	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
+	let grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
+	if(!grade) {
+	  // 如果未找到对应的用户等级（通常发生在删除了积分值为0的配置）时，读取最小等级
+	  grade = await UsersGradeModel.findOne().sort({score: 1});
+  }
 	return this.grade = grade;
 };
 /*
