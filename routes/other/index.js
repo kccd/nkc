@@ -18,7 +18,6 @@ const photoSmallRouter = require('./photo_small');
 const fundBannerRouter = require('./fundBanner');
 const fundBannerSmallRouter = require('./fundLogo');
 const authRouter = require('./auth');
-const forumAvatarRouter = require('./forum_avatar');
 const frameImgRouter = require('./frameImg');
 const posterRouter = require('./poster');
 const pageRouter = require('./page');
@@ -63,7 +62,6 @@ otherRouter
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())
 	.use('fundLogo', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
-	.use('forum_avatar', forumAvatarRouter.routes(), forumAvatarRouter.allowedMethods())
 	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
   .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods())
   .use('poster', posterRouter.routes(), posterRouter.allowedMethods())

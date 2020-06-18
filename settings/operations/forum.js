@@ -8,10 +8,6 @@ module.exports = {
     card: {
       GET: "visitForumCard"
     },
-    banner: {
-		  GET: 'visitForumBanner',
-      PATCH: "modifyForumBanner"
-    },
 		latest: {
 			GET: 'visitForumLatest' // 查看专业最新文章列表
 		},
@@ -33,9 +29,6 @@ module.exports = {
 			merge: {
 				GET: 'visitForumMergeSettings', // 查看专业合并
 				PATCH: 'modifyMergeSettings', // 修改专业合并设置
-			},
-			image: {
-				GET: 'visitForumImageSettings', // 查看专业头像设置
 			},
 			kind: {
 				PATCH: "addForumKind", // 添加专业类别

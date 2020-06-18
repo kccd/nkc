@@ -34,12 +34,6 @@ module.exports = {
 			GET: 'getUserAvatar',
 		}
 	},*/
-	forum_avatar: {// 专业logo
-		PARAMETER: {
-			POST: 'updateForumAvatar',
-			GET: 'getForumAvatar'
-		}
-	},
 	r: {// 资源
     POST: 'uploadResources',
     // GET: "getUploadSettings",

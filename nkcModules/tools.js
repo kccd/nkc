@@ -26,7 +26,7 @@ var Tools = function() {
         return "/statics/grade_icon/v" + id + "l.png";
       }
       case "forumAvatar": {
-        return "/forum_avatar/" + id;
+        return "/a/" + id + t;
       }
       case "columnAvatar": {
         return "/column/avatar/" + id + t
