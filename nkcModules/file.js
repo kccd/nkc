@@ -9,6 +9,7 @@ const func = {};
 const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
+const { sync } = require("mkdirp");
 
 func.folders = {
   attachment: './attachment',
@@ -224,9 +225,9 @@ func.saveUserAvatar$2 = async (uid, file) => {
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
   const {fullPath, timePath} = await AM.getAttachmentPath(true);
   const aid = AM.getNewId();
-  resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 192);
-  resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 48);
-  resizeImage(file.path, `${fullPath}/${aid}_lg.${ext}`, 600);
+  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 192);
+  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 48);
+  await resizeImage(file.path, `${fullPath}/${aid}_lg.${ext}`, 600);
   const attachment = AM({
     _id: aid,
     path: timePath,
@@ -236,8 +237,8 @@ func.saveUserAvatar$2 = async (uid, file) => {
     type: 'userAvatar',
     uid
   });
-  await user.update({avatar: aid});
   await attachment.save();
+  await user.update({avatar: aid});
   await fsSync.unlink(file.path);
 }
 
@@ -306,6 +307,42 @@ func.saveUserBanner = async (uid, file) => {
     type: "userChangeBanner"
   });
   await log.save();
+  await fsSync.unlink(file.path);
+};
+
+/**
+* 保存用户背景2.0
+* 作为附件存储
+* @param {String} uid 用户ID
+* @param {File} file 文件对象
+*/
+func.saveUserBanner$2 = async (uid, file) => {
+  const AM = db.AttachmentModel;
+  const user = await db.UserModel.findOnly({uid});
+  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
+  const ext = (await FileType.fromFile(file.path)).ext;
+  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const aid = AM.getNewId();
+  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 400, 800, 95);
+  const attachment = AM({
+    _id: aid,
+    path: timePath,
+    size: file.size,
+    name: file.name,
+    ext,
+    type: 'userBanner',
+    uid
+  });
+  await attachment.save();
+  const log = await db.ImageLogModel({
+    uid,
+    imgType: "userBanner",
+    imgId: aid,
+    type: "userChangeBanner"
+  });
+  await log.save();
+  await user.update({banner: file.hash});
   await fsSync.unlink(file.path);
 };
 /*
@@ -528,7 +565,7 @@ func.getFileExtension = async (file, extensions = []) => {
  * @param {string} fromFile - 目标文件路径  
  * @param {string} toFile - 新文件路径
  */
-func.resizeImage = (fromFile, toFile) => {
+function resizeImage(fromFile, toFile) {
   let height = 48;
   let width = 48;
   let quality = 90;
