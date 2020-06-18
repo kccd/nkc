@@ -123,6 +123,15 @@ function saveWaterMarkSettings() {
 		})
 }
 
+
+function uploadHomeBigLogo(files) {
+	var form = new FormData();
+	files.forEach((file, index) => {
+		form.append('file' + index, file);
+	})
+	return nkcUploadFile("/e/settings/home/list/biglogo", "POST", form);
+}
+
 function saveHomeListSettings() {
   var inputs = $('input[name="list"]');
   var topic = inputs.eq(0).is(':checked');
@@ -150,7 +159,9 @@ if(vueDom) {
       info: '',
       list: [],
       recommend: [],
-      error: ""
+			error: "",
+			logoFiles: [],
+			logoFileUploadding: false
     },
     mounted: function() {
       var data = NKC.methods.getDataById("data");
@@ -165,8 +176,11 @@ if(vueDom) {
       }
       if(data.homeSettings.recommend.hotThreads) {
         this.recommend.push("hotThreads")
-      }
-      this.homeSettings = data.homeSettings;
+			}
+			this.homeSettings = data.homeSettings;
+			if(data.homeBigLogo) {
+				this.logoFiles = this.logoFiles.concat(data.homeBigLogo);
+			}
     },
     methods: {
       save: function() {
@@ -206,7 +220,36 @@ if(vueDom) {
           .catch(function(data) {
             app.error = data.error || data;
           });
-      }
+			},
+			pickPicture: function() {
+				$("#inputFile").click();
+			},
+			addFile: function() {
+				var self = this;
+				var files = [].slice.call($("#inputFile")[0].files);
+				self.logoFileUploadding = true;
+				uploadHomeBigLogo(files)
+					.then(data => {
+						self.logoFiles = self.logoFiles.concat(data.saved);
+						self.logoFileUploadding = false;
+					})
+				$("#inputFile").val("");
+			},
+			deleteBigLogo: function(index) {
+				var fileItem = this.logoFiles[index];
+				console.log("你要删除: " + fileItem.aid);
+				nkcAPI("/e/settings/home/list/biglogo", "POST", {
+					type: "delete",
+					aid: fileItem.aid
+				})
+				.then(() => {
+					this.logoFiles.splice(index, 1);
+					screenTopAlert('删除成功');
+				})
+				.cache(err => {
+					screenTopAlert(err.error);
+				})
+			}
     }
   });
 }

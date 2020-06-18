@@ -19,8 +19,7 @@ router
     if(!user || uid !== user.uid) ctx.throw(403, '权限不足');
     const {file} = body.files;
     if(!file) ctx.throw(400, 'no file uploaded');
-    await nkcModules.file.saveUserBanner(user.uid, file);
-    user.banner = file.hash;
+    user.banner = await nkcModules.file.saveUserBanner$2(user.uid, file);
     await next();
   });
 module.exports = router;

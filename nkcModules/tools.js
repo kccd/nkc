@@ -5,7 +5,7 @@ var Tools = function() {
     if(size) t = "?t=" + size;
     switch(type) {
       case "userAvatar": {
-        return "/avatar/" + id + t
+        return "/a/" + id + t
       }
       case "userBanner": {
         return "/banner/"+ id + t

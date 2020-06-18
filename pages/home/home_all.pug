@@ -266,10 +266,11 @@ block content
           .home-header
             .header-name 应用
           .home-apps
-            a.home-app(href=`/fund`)
-              .home-app-img
-                img(src=`/statics/apps/fund.png`)
-              .home-app-name 科创基金
+            if data.enableFund
+              a.home-app(href=`/fund`)
+                .home-app-img
+                  img(src=`/statics/apps/fund.png`)
+                .home-app-name= data.fundName || "基金"
             a.home-app(href=`/exam`)
               .home-app-img
                 img(src=`/statics/apps/exam.png`)
@@ -282,21 +283,22 @@ block content
               .home-app-img
                 img(src=`/statics/apps/tools.png`)
               .home-app-name 计算工具
-        .home-forums-other.m-b-1
-          .home-header
-            .header-name 最新基金申请
-          .home-funds
-            for form in data.fundApplicationForms
-              .home-fund
-                a.home-fund-name(href=`/fund/a/${form._id}`)=form.project.t
-                .home-fund-info
-                  .home-fund-code=form.code
-                  a(href=`/fund/list/${form.fund._id}`).home-fund-link.fund-name=form.fund.name
-                  a(href=`/u/${form.uid}`).home-fund-user
-                    img(src=tools.getUrl("userAvatar", form.applicant.user.avatar) data-float-uid=form.uid)
-                    span=form.applicant.user.username
+        if data.enableFund
+          .home-forums-other.m-b-1
+            .home-header
+              .header-name 最新基金申请
+            .home-funds
+              for form in data.fundApplicationForms
+                .home-fund
+                  a.home-fund-name(href=`/fund/a/${form._id}`)=form.project.t
+                  .home-fund-info
+                    .home-fund-code=form.code
+                    a(href=`/fund/list/${form.fund._id}`).home-fund-link.fund-name=form.fund.name
+                    a(href=`/u/${form.uid}`).home-fund-user
+                      img(src=tools.getUrl("userAvatar", form.applicant.user.avatar) data-float-uid=form.uid)
+                      span=form.applicant.user.username
 
-            a.home-fund-donation(href=`/fund/donation`) 赞助科创基金
+              a.home-fund-donation(href=`/fund/donation`)= `赞助${data.fundName}`
         //- 最新回复
         .home-forums-other.m-b-1
           .home-header

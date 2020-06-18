@@ -27,6 +27,7 @@ const defaultColumnAvatarPath = defaultPath + "/column_avatar.jpg";
 const defaultColumnBannerPath = defaultPath + "/column_banner.jpg";
 const defaultPosterPath = defaultPath + "/default_poster.jpg";
 const defaultRoleIconPath = staticPath + '/role_icon';
+const defaultHomeBigLogo = siteSpecificPath + '/kclogo_misaka1.png';
 module.exports = {
   siteSpecificPath,
   defaultRoleIconPath,
@@ -55,5 +56,6 @@ module.exports = {
   defaultVideoCoverPath,
   defaultColumnAvatarPath,
   defaultColumnBannerPath,
-  defaultPosterPath
+  defaultPosterPath,
+  defaultHomeBigLogo
 };

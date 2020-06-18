@@ -61,25 +61,35 @@ module.exports = async (options) => {
   data.forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
   // 公告通知
   data.notices = await db.ThreadModel.getNotice(fidOfCanGetThreads);
-  // 基金申请
-  
-  const queryOfFunding = {
-    disabled: false,
-    'status.adminSupport': true,
-    'status.completed': {$ne: true}
-  };
-  const funding = await db.FundApplicationFormModel.find(queryOfFunding).sort({toc: -1}).limit(5);
-  data.fundApplicationForms = [];
-  for(const a of funding) {
-    await a.extendFund();
-    if(a.fund) {
-      await a.extendApplicant({
-        extendSecretInfo: false
-      });
-      await a.extendProject();
-      data.fundApplicationForms.push(a);
+
+  // 是否启用了基金
+  const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
+  let enableFund = fundSettings.c.enableFund;
+  if(enableFund) {
+    // 基金名称
+    data.fundName = fundSettings.c.fundName;
+    // 基金申请
+    const queryOfFunding = {
+      disabled: false,
+      'status.adminSupport': true,
+      'status.completed': {$ne: true}
+    };
+    const funding = await db.FundApplicationFormModel.find(queryOfFunding).sort({toc: -1}).limit(5);
+    data.fundApplicationForms = [];
+    for(const a of funding) {
+      await a.extendFund();
+      if(a.fund) {
+        await a.extendApplicant({
+          extendSecretInfo: false
+        });
+        await a.extendProject();
+        data.fundApplicationForms.push(a);
+      }
     }
   }
+  data.enableFund = enableFund;
+  // 首页大Logo
+  data.homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
   // 浏览过的专业
   if(data.user) {
     const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 20);

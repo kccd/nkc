@@ -183,3 +183,48 @@ tbody tr th {
 #cleanupTimeRange {
   width: 300px;
 }
+
+
+.setting-block-title {
+  position: relative;
+}
+.setting-block-title::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 6px;
+  background-color: red;
+  position: absolute;
+  left: -12px;
+  top: 0;
+  border-radius: 3px;
+}
+
+.setting-item-label {
+  font-weight: normal;
+}
+.setting-item-label + .setting-item-label {
+  margin-left: 14px;
+}
+
+.logo-item {
+  position: relative;
+}
+.logo-item > .logo-item-control {
+  position: absolute;
+  top: 6px;
+  right: 20px;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  background-color: red;
+  padding: 6px;
+  transform: scale(0);
+  transition: 0.2s transform;
+}
+.logo-item:hover > .logo-item-control {
+  transform: scale(1);
+}
+.logo-item > img {
+  width: 100%;
+}

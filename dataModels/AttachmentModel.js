@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const fs = require("fs");
 const fsPromise = fs.promises;
 const statics = require('../settings/statics');
+const FileType = require('file-type');
 const schema = new Schema({
   _id: String,
   type: {
@@ -114,6 +115,39 @@ schema.statics.saveWatermark = async (file, c = 'normal') => {
   return attachment;
 }
 
+/**
+ * 保存首页大Logo
+ * @param {File} file - file对象
+ */
+schema.statics.saveHomeBigLogo = async file => {
+  const FILE = require("../nkcModules/file");
+  const ext = (await FileType.fromFile(file.path)).ext;
+  const AM = mongoose.model('attachments');
+  const SM = mongoose.model('settings');
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const aid = AM.getNewId();
+  const fileName = `${aid}.${ext}`;
+  const realPath = `${fullPath}/${fileName}`;
+  const {path, size, name} = file;
+  await fsPromise.rename(path, realPath);
+  const attachment = AM({
+    _id: aid,
+    path: timePath,
+    size,
+    name,
+    ext,
+    type: 'homeBigLogo',
+  });
+  await attachment.save();
+  await SM.updateOne({_id: 'home'}, {
+    $push: {
+      "c.homeBigLogo": aid
+    }
+  });
+  await SM.saveSettingsToRedis('home');
+  return attachment;
+}
+
 /*
 * 获取文件在磁盘的真实路径
 * @return {String} 磁盘路径
@@ -149,6 +183,18 @@ schema.statics.getWatermarkFilePath = async (c) => {
   return await water.getFilePath();
 }
 
+/**
+ * 获取首页大Logo
+ */
+schema.statics.getHomeBigLogo = async () => {
+  const SM = mongoose.model('settings');
+  const homeSettings = await SM.getSettings('home');
+  if(!homeSettings.homeBigLogo || !(homeSettings.homeBigLogo.length)) {
+    return [];
+  } else {
+    return homeSettings.homeBigLogo;
+  }
+}
 /*
 * 保存专业Logo
 * @param {File} file 文件对象

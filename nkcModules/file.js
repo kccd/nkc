@@ -9,6 +9,7 @@ const func = {};
 const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
+const { sync } = require("mkdirp");
 
 func.folders = {
   attachment: './attachment',
@@ -209,6 +210,39 @@ func.saveUserAvatar = async (uid, file) => {
   }
   await fsSync.unlink(file.path);
 };
+
+/**
+* 保存用户头像2.0
+* 保存到附件中
+* @param {String} uid 用户ID
+* @param {File} file 文件对象
+ */
+func.saveUserAvatar$2 = async (uid, file) => {
+  const AM = db.AttachmentModel;
+  const user = await db.UserModel.findOnly({uid});
+  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
+  const ext = (await FileType.fromFile(file.path)).ext;
+  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const aid = AM.getNewId();
+  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 192);
+  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 48);
+  await resizeImage(file.path, `${fullPath}/${aid}_lg.${ext}`, 600);
+  const attachment = AM({
+    _id: aid,
+    path: timePath,
+    size: file.size,
+    name: file.name,
+    ext,
+    type: 'userAvatar',
+    uid
+  });
+  await attachment.save();
+  await user.update({avatar: aid});
+  await fsSync.unlink(file.path);
+}
+
+
 /*
 * 获取用户头像
 * @param {String} hash 文件hash
@@ -236,6 +270,7 @@ func.getUserAvatar = async (hash, type) => {
   }
   return filePath;
 };
+
 /*
 * 删除用户头像
 * @param {String} uid 用户ID
@@ -273,6 +308,43 @@ func.saveUserBanner = async (uid, file) => {
   });
   await log.save();
   await fsSync.unlink(file.path);
+};
+
+/**
+* 保存用户背景2.0
+* 作为附件存储
+* @param {String} uid 用户ID
+* @param {File} file 文件对象
+*/
+func.saveUserBanner$2 = async (uid, file) => {
+  const AM = db.AttachmentModel;
+  const user = await db.UserModel.findOnly({uid});
+  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
+  const ext = (await FileType.fromFile(file.path)).ext;
+  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const aid = AM.getNewId();
+  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 400, 800, 95);
+  const attachment = AM({
+    _id: aid,
+    path: timePath,
+    size: file.size,
+    name: file.name,
+    ext,
+    type: 'userBanner',
+    uid
+  });
+  await attachment.save();
+  const log = await db.ImageLogModel({
+    uid,
+    imgType: "userBanner",
+    imgId: aid,
+    type: "userChangeBanner"
+  });
+  await log.save();
+  await user.update({banner: aid});
+  await fsSync.unlink(file.path);
+  return aid;
 };
 /*
 * 获取用户背景
@@ -484,6 +556,35 @@ func.getFileExtension = async (file, extensions = []) => {
     }
   }
   return extension;
+}
+
+/**
+ * 重设图片尺寸
+ * 参数：
+ * fromFile, toFile[, height[, width[, quality]]]
+ * 尺寸参数只传入一个时既做高又做宽
+ * @param {string} fromFile - 目标文件路径  
+ * @param {string} toFile - 新文件路径
+ */
+function resizeImage(fromFile, toFile) {
+  let height = 48;
+  let width = 48;
+  let quality = 90;
+  if(typeof arguments[2] === "number" && typeof arguments[3] !== "number") {
+    height = arguments[2], width = arguments[2];
+  } else if(typeof arguments[2] === "number" && typeof arguments[3] === "number") {
+    height = arguments[2], width = arguments[3];
+  }
+  if(typeof arguments[4] === "number") {
+    quality = arguments[4];
+  }
+  return ei.resize({
+    src: fromFile,
+    dst: toFile,
+    height,
+    width,
+    quality
+  });
 }
 
 module.exports = func;

@@ -75,7 +75,7 @@ function selectBanner() {
       }
     }, "POST")
       .then(function (data) {
-        $("#userBanner").attr("src", "/banner/" + data.user.banner + "?time=" + Date.now());
+        $("#userBanner").attr("src", "/a/" + data.user.banner);
         emitEventToUpdateLocalUser(data);
         selectImage.close();
       })
