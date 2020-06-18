@@ -73,6 +73,16 @@ const forumSchema = new Schema({
     type: String,
     default: ''
   },
+  // 专业logo
+  logo: {
+    type: String,
+    default: '',
+  },
+  // 专业背景
+  banner: {
+    type: String,
+    default: ''
+  },
   moderators: {
     type: [String],
     default: []
@@ -80,13 +90,7 @@ const forumSchema = new Schema({
   order: {
     type: Number,
     default: 0
-  },/*
-
-  parentId: {
-    type: String,
-    default: ''
-  }, */
-
+  },
   // 可访问的
   accessible: {
     type: Boolean,
@@ -1408,6 +1412,5 @@ forumSchema.statics.getForumsByFid = async (fid) => {
   }
   return results;
 };
-
 
 module.exports = mongoose.model('forums', forumSchema);

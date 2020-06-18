@@ -9,11 +9,10 @@ const func = {};
 const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
-const FileType = require("file-type");
 
 func.folders = {
   attachment: './attachment',
-  media: './media',
+  resource: './resource',
 }
 
 func.getBasePath = async () => {
@@ -224,12 +223,22 @@ func.saveUserAvatar$2 = async (uid, file) => {
   const ext = (await FileType.fromFile(file.path)).ext;
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
   const {fullPath, timePath} = await AM.getAttachmentPath(true);
-  const realPath = `${fullPath}/${file.name}`;
   const aid = AM.getNewId();
-  resizeImage(file.path, `${fullPath}/${aid}${ext}`, 192);
-  resizeImage(file.path, realPath, 48);
-  resizeImage(file.path, realPath, 600);
+  resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 192);
+  resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 48);
+  resizeImage(file.path, `${fullPath}/${aid}_lg.${ext}`, 600);
+  const attachment = AM({
+    _id: aid,
+    path: timePath,
+    size: file.size,
+    name: file.name,
+    ext,
+    type: 'userAvatar',
+    uid
+  });
   await user.update({avatar: aid});
+  await attachment.save();
+  await fsSync.unlink(file.path);
 }
 
 
@@ -260,6 +269,7 @@ func.getUserAvatar = async (hash, type) => {
   }
   return filePath;
 };
+
 /*
 * 删除用户头像
 * @param {String} uid 用户ID
