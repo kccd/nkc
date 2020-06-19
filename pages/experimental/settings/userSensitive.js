@@ -25,7 +25,7 @@ function createElements(users) {
     var tr = newElement('tr', {}, {});
     var th1 = newElement('th', {}, {});
     var img = newElement('img', {
-      src: '/avatar/'+user.avatar
+      src: NKC.methods.tools.getUrl('userAvatar', user.avatar)
     }, {
       width: '2rem',
       height: '2rem',

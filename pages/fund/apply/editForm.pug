@@ -53,7 +53,7 @@ block fundContent
                           h5 已选择：
                             span(v-if="selectedMembers.length === 0") 无
                             .fund-user-panel(v-for="u in selectedMembers")
-                              img(:src="'/avatar/' + u.avatar + '?t=sm'")
+                              img(:src="getUrl('userAvatar', u.avatar, 'sm')")
                               a(:href="'/u/' + u.uid" target="_blank" :title="'uid：' + u.uid") {{u.username}}
                               .fa.fa-remove(@click="removeMember(u)")
                         .row
@@ -68,7 +68,7 @@ block fundContent
                           button.btn.btn-default.btn-sm(@click="clearSearchUsers" :disabled="form.from==='personal'") 清空
                         .fund-user
                           .fund-user-panel(v-for="u in searchUsers")
-                            img(:src="'/avatar/' + u.avatar + '?t=sm'")
+                            img(:src="getUrl('userAvatar', u.avatar, 'sm')")
                             a(:href="'/u/' + u.uid" target="_blank" :title="'uid：' + u.uid") {{u.username}}
                             .fa.fa-plus(@click="addMember(u)")
 

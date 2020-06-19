@@ -1,6 +1,6 @@
 .row
   .text-center
-    img(src=`/avatar/${targetUser.avatar}?t=sm` style='width: 7rem;height: 7rem;border-radius: 50%;')
+    img(src=tools.getUrl('userAvatar', targetUser.avatar, 'sm') style='width: 7rem;height: 7rem;border-radius: 50%;')
   .text-center
     a(href=`/u/${targetUser.uid}`)
       h4= targetUser.username

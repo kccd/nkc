@@ -8,7 +8,7 @@ block content
         .fa.fa-arrow-left
     .nav-user
       .user-avatar
-        img(src=`/avatar/${data.user.avatar}` data-type="view" id="userAvatar")
+        img(src=tools.getUrl('userAvatar', data.user.avatar) data-type="view" id="userAvatar")
       .user-info
         .user-name(id="username")=data.user.username
         .user-certs

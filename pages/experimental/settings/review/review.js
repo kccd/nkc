@@ -51,6 +51,7 @@ var app = new Vue({
     this.extendConditions();
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
     saveCertId: function() {
       nkcAPI("/e/settings/review", "PATCH", {
         type: 'saveCertsId',

@@ -773,6 +773,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       forumType: 1,
       color: 1,
       parentsId: 1,
+      logo: 1,
+      banner: 1,
       iconFileName: 1
     });
     /* forums.map(forum => {

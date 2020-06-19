@@ -8,7 +8,7 @@
     .search-result-info
       if !result.anonymous
         a.clear-a-style.search-result-author(href=`/u/${result.postUser.uid}`)
-          img(src=`/avatar/${result.postUser.avatar}?t=sm`)
+          img(src=tools.getUrl('userAvatar', result.postUser.avatar, 'sm'))
           span=result.postUser.username
       else
         span.clear-a-style.search-result-author
@@ -26,7 +26,7 @@
         div(style="max-width: 100%;width: 70rem;")
           .search-result-avatar
             a(href=`/u/${result.user.uid}` target="_blank")
-              img(src=`/avatar/${result.user.avatar}`)
+              img(src=tools.getUrl('userAvatar', result.user.avatar))
           .search-result-user-info
             .display-i-b.m-r-05
               a.clear-a-style(href=`/u/${result.user.uid}` target="_blank").search-result-username!=result.username
@@ -103,7 +103,7 @@
         img(src=tools.getUrl("userAvatar", result.resource.user.avatar, "sm"))
         span=result.resource.user.username
       .search-result-time=fromNow(result.resource.tlm || result.resource.toc)
-    .search-result-abstract= "文件：" + (result.c || "暂无简介") 
+    .search-result-abstract= "文件：" + (result.c || "暂无简介")
     .search-result-info.resource
       a(href=`/r/${result.resource.rid}` target="_blank")
         .fa.fa-cloud-download &nbsp;

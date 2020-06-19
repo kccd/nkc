@@ -21,7 +21,7 @@ block content
         .hidden-info {{format('YYYY-MM-DD HH:mm:ss', message.tc)}} {{targetUser.friend&&targetUser.friend.info.name?targetUser.friend.info.name:targetUser.username}}
         .ms-single-img
           a(@click='selectFriend({targetUser: targetUser})')
-            img(:src="'/avatar/' + targetUser.avatar")
+            img(:src="getUrl('userAvatar', targetUser.avatar)")
         .ms-single-content-div
           //.ms-single-time {{format('YYYY-MM-DD HH:mm:ss', message.tc)}}
           .ms-single-content
@@ -82,7 +82,7 @@ block content
               img(:src="message.c.playType ? voiceImg.playLeft : voiceImg.stopLeft", style="width:30px")
         .ms-single-img
           a(href=`/u/${data.user.uid}/settings` target="_blank")
-            img(:src="'/avatar/' + user.avatar")
+            img(:src="getUrl('userAvatar', user.avatar)")
 
   // 新朋友通知
   mixin newFriendsContent
@@ -93,7 +93,7 @@ block content
         .ms-application-user
           .ms-application-avatar
             a(:href="'/u/' + message.uid" target="_blank")
-              img(:src="'/avatar/' + message.avatar")
+              img(:src="getUrl('userAvatar', message.avatar)")
           .ms-application-user-info
             .ms-application-username
               a(:href="'/u/' + message.uid" target="_blank") {{message.username}}
@@ -128,13 +128,13 @@ block content
               div(v-for='o in friendsByOrder')
                 .friend-letter {{o.letter}}
                 .friend-li(v-for='friend in o.friends' @click="addFriendToSelectedFriends(friend)")
-                  img(style='height: 2rem;width: 2rem;border-radius:50%;' :src="'/avatar/' + friend.targetUser.avatar")
+                  img(style='height: 2rem;width: 2rem;border-radius:50%;' :src="getUrl('userAvatar', friend.targetUser.avatar)")
                   span {{friend.info.name || friend.targetUser.username}}
           .col-xs-6.col-md-6
             .header 已选择的好友
             .selected-friends
               .friend-li(v-for='friend in category.friends' @click="removeFriendFromSelectedFriends(friend)")
-                img(style='height: 2rem;width: 2rem;border-radius:50%;' :src="'/avatar/' + friend.targetUser.avatar")
+                img(style='height: 2rem;width: 2rem;border-radius:50%;' :src="getUrl('userAvatar', friend.targetUser.avatar)")
                 span {{friend.info.name || friend.targetUser.username}}
                 .remove.fa.fa-remove
 
@@ -143,10 +143,6 @@ block content
         p {{category.description}}
         .category-user(v-if='category.friendsId.length === 0')
           div 一个好友也没有，快去添加好友吧~
-        //.category-user(v-else-if='!category.friends')
-          .category-user-avatar(v-for="(uid, index) in category.friendsId")
-            img(:src="'/avatar/' + uid")
-            .category-username.loading 加载中...
         .category-user
           .category-user-avatar(v-for="(friend, index) in category.friends")
             //.category-checkbox(v-if='editCategory')
@@ -157,7 +153,7 @@ block content
               2. 若处于非编辑状态，则打开好友信息
             .category-user-avatar-div(@click="editCategory? (selectCategoryFriendsId.indexOf(friend.targetUser.uid) !== -1?selectCategoryFriendsId.splice(selectCategoryFriendsId.indexOf(friend.targetUser.uid), 1): selectCategoryFriendsId.push(friend.targetUser.uid)):selectFriend(friend)")
               .ms-point(:class="{online: friend.targetUser.online}")
-              img(:src="'/avatar/' + friend.targetUser.avatar")
+              img(:src="getUrl('userAvatar', friend.targetUser.avatar)")
             .category-username {{friend.info.name || friend.targetUser.username}}
       .ms-friend-button-fixed
         .fa.fa-plus(title="添加好友" v-if="category.friendsId.length === 0 && !editCategory" @click='editCategoryBegin')
@@ -178,7 +174,7 @@ block content
       .ms-friend-button-fixed
         .fa.fa-floppy-o(v-if='showFriendNotes || showPermissionSettings' @click='saveFriendSettings')
       .ms-friend-avatar
-        img(:src='"/avatar/" + friend.targetUser.avatar')
+        img(:src='getUrl("userAvatar", friend.targetUser.avatar)')
       .ms-friend-username(v-if='friend.info && friend.info.name') {{friend.info.name}}
         span ({{friend.targetUser.username}})
       .ms-friend-username(v-else) {{friend.targetUser.username}}
@@ -304,7 +300,7 @@ block content
       .ms-notice-content
         div(v-if="message.c.type === 'replyThread'")
           a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
-            img.remind-user-avatar(:src='"/avatar/" + message.targetUser.avatar')
+            img.remind-user-avatar(:src='getUrl("userAvatar", message.targetUser.avatar)')
             span {{message.targetUser.username}}
           span 在您的文章
           a.remind-link(:href="'/t/' + message.post.tid" target='_blank')
@@ -313,7 +309,7 @@ block content
           a.remind-link.remind-content(:href="'/t/' + message.post.tid + '?page=' + message.targetPost.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank') {{message.targetPost.c}}
         div(v-else-if="message.c.type === 'replyPost'")
           a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
-            img.remind-user-avatar(:src='"/avatar/" + message.targetUser.avatar')
+            img.remind-user-avatar(:src='getUrl("userAvatar", message.targetUser.avatar)')
             span {{message.targetUser.username}}
           span 在文章
           a.remind-link(:href="'/t/' + message.firstPost.tid" target='_blank')
@@ -369,7 +365,7 @@ block content
           span 逾期未修改，文章将被彻底屏蔽，不可恢复，届时不再另行通知。
         div(v-else-if="message.c.type === '@'")
           a.remind-link(:href="'/u/' + message.targetUser.uid" target='_blank')
-            img.remind-user-avatar(:src='"/avatar/" + message.targetUser.avatar')
+            img.remind-user-avatar(:src='getUrl("userAvatar", message.targetUser.avatar)')
             span {{message.targetUser.username}}
           span 在回复中@了你，
           a.remind-link(:href="'/t/' + message.targetPost.tid + '?page=' + message.targetPost.page + '&highlight=' + message.targetPost.pid + '#' + message.targetPost.pid" target='_blank')
@@ -445,7 +441,7 @@ block content
             div(v-if="c.friendsId.length === 0").friend-category-avatar.text
               span {{c.name[0]}}
             div(v-else).friend-category-avatar
-              img(v-for="(friend, index) in c.friends" v-if="index < 9" :src="'/avatar/'+friend.targetUser.avatar")
+              img(v-for="(friend, index) in c.friends" v-if="index < 9" :src="getUrl('userAvatar', friend.targetUser.avatar)")
         .ms-list-center
           .ms-list-title {{c.name}}
           .ms-list-content
@@ -505,7 +501,7 @@ block content
           .ms-list-left
             .ms-list-img
               .ms-point(:class="{online: friend.targetUser.online}")
-              img.ms-list-avatar(:src="'/avatar/'+friend.targetUser.avatar")
+              img.ms-list-avatar(:src="getUrl('userAvatar', friend.targetUser.avatar)")
           .ms-list-center
             .ms-list-title {{friend.info.name || friend.targetUser.username}}
             .ms-list-content
@@ -526,7 +522,7 @@ block content
         .ms-list-left
           .ms-list-img
             .ms-point(:class="{online: item.user.online}")
-            img.ms-list-avatar(:src="'/avatar/'+item.user.avatar")
+            img.ms-list-avatar(:src="getUrl('userAvatar', item.user.avatar)")
         .ms-list-center
           .ms-list-title {{item.friend && item.friend.info.name? item.friend.info.name:item.user.username}}
           .ms-list-content
@@ -627,7 +623,7 @@ block content
                       .ms-list-left
                         .ms-list-img
                           .ms-point(:class="{online: user.online}")
-                          img.ms-list-avatar(:src="'/avatar/'+user.avatar")
+                          img.ms-list-avatar(:src="getUrl('userAvatar', user.avatar)")
                       .ms-list-center
                         .ms-list-title {{user.username}}
                         .ms-list-content {{user.description || '暂未填写个人简介'}}
@@ -645,7 +641,7 @@ block content
             .ms-user-info
               .ms-user-avatar
                 .ms-point(class='online' v-if="socketStatus === 'connect'")
-                img(src=`/avatar/${data.user.avatar}`)
+                img(src=tools.getUrl('userAvatar', data.user.avatar))
               div.ms-user-username= data.user.username
               //- div.ms-user-description= data.user.description
           .ms-list-type
@@ -775,7 +771,7 @@ block content
             .ms-list-left
               .ms-list-img
                 .ms-point(:class="{online: searchUser.online}")
-                img.ms-list-avatar(:src="'/avatar/' + searchUser.avatar")
+                img.ms-list-avatar(:src="getUrl('userAvatar', searchUser.avatar)")
             .ms-list-center
               .ms-list-title {{searchUser.username}}
                 .ms-list-content {{searchUser.description || '暂未填写个人简介'}}

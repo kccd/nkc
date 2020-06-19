@@ -3,12 +3,12 @@ block shopAccountTitle
   title 基本信息
 block shopAccountContent
   .user-base-info
-    img.user-avatar(src=`/avatar/${data.user.avatar}`)
+    img.user-avatar(src=tools.getUrl('userAvatar', data.user.avatar))
     .user-base-info-name
       .username= data.user.username
       .info= `身份认证等级：${data.user.authLevel}`
       .info= `身份认证等级：${data.user.authLevel}`
-  hr    
+  hr
   .row.text-center
     .col-xs-3.col-md-3
       a.h5(href='###') 待付款 &nbsp;
@@ -22,7 +22,7 @@ block shopAccountContent
     .col-xs-3.col-md-3
       a.h5(href='###') 待评价 &nbsp;
       span 12
-  hr  
+  hr
   .logistics-info
     .shop-account-header 物流信息
     for item in data.goods
@@ -33,7 +33,7 @@ block shopAccountContent
           .title= item.name
           for i in item.info
             .info= i
-          a(href='###') 查看物流详情  
+          a(href='###') 查看物流详情
         .shop-goods-option
           button 确认收货
           br

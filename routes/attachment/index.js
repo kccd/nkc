@@ -1,13 +1,20 @@
 const router = require('koa-router')();
 router
   .get('/:id', async (ctx, next) => {
-    const {params, db, query} = ctx;
+    const {params, db, query, settings} = ctx;
+    const {statics} = settings;
     const {id} = params;
-    const {t} = query;
+    const {t, c} = query;
     if(t && !['sm', 'lg'].includes(t)) ctx.throw(400, '位置的文件尺寸');
-    const a = await db.AttachmentModel.findOnly({_id: id});
-    ctx.filePath = await a.getFilePath(t);
-    ctx.type = a.ext;
+    const a = await db.AttachmentModel.findOne({_id: id});
+    if(!a) {
+      if(c === 'userAvatar') {
+        ctx.filePath = statics.defaultAvatarPath;
+      }
+    } else {
+      ctx.filePath = await a.getFilePath(t);
+      ctx.type = a.ext;
+    }
     await next();
   })
 module.exports = router;

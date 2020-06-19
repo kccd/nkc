@@ -31,6 +31,7 @@ var app = new Vue({
     format: NKC.methods.format,
     fromNow: NKC.methods.fromNow,
     visitUrl: NKC.methods.visitUrl,
+    getUrl: NKC.methods.tools.getUrl,
     reset: function() {
       this.filter = {
         uid: "",

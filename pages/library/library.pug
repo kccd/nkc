@@ -49,7 +49,7 @@ block content
                     .lib-r-n(onclick=`showResource('${r.rid}')`)=r.name
                     .lib-r-de
                       .lib-r-u(onmouseover=tools.floatUserInfo(r.uid))
-                        img(src=`/avatar/${r.user.avatar}?t=sm`)
+                        img(src=tools.getUrl('userAvatar', r.user.avatar, 'sm'))
                         a(href=`/u/${r.uid}` target="_blank")=r.user.username
                       .lib-r-t=format("YYYY/MM/DD", r.tlm || r.toc)
                       .lib-r-s=(r.ext || "未知").toUpperCase()

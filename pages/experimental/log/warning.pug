@@ -26,13 +26,11 @@ block eContent
                 th {{warning.type==="warningPost"?"回复":"文章"}}
                 th
                   a(:href="'/u/' + warning.targetUser.uid" target="_blank").clear-a-style
-                    //img(:src="'/avatar/' + warning.tUid" style="width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;")
                     span {{warning.targetUser.username}}
                 th
                   a(:href="warning.link" target="_blank") {{warning.thread.firstPost.t}}
                 th
                   a(:href="'/u/' + warning.handlerId" target="_blank").clear-a-style
-                    //img(:src="'/avatar/' + warning.handlerId" style="width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;")
                     span {{warning.handler.username}}
                 th
                   span(v-if="!warning.modify") {{warning.reason}}
@@ -42,31 +40,6 @@ block eContent
                     .m-t-1
                       button.btn.btn-xs.btn-primary(@click="save(warning)") 保存
                       button.btn.btn-xs.btn-default(@click="warning.modify = false") 取消
-          //-.warning-panel(v-for="warning in warnings")
-            span.warning-handler
-              a(:href="'/u/' + warning.handlerId" target="_blank").clear-a-style
-                img(:src="'/avatar/' + warning.handlerId" style="width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;")
-                span {{warning.handler.username}}
-            span.warning-time(:title="format('YYYY/MM/DD HH:mm:ss', warning.toc)") {{fromNow(warning.toc)}}
-            span.warning-info 建议
-            span.warning-handler
-              a(:href="'/u/' + warning.targetUser.uid" target="_blank").clear-a-style
-                img(:src="'/avatar/' + warning.tUid" style="width: 2rem;height: 2rem;border-radius: 50%;margin-right: 0.5rem;")
-                span {{warning.targetUser.username}}
-            span.warning-info 修改
-            span.warning-type {{warning.type==="warningPost"?"回复内容":"文章内容"}}
-            div.warning-link
-              |原文链接：
-              a(:href="warning.link" target="_blank") {{warning.thread.firstPost.t}}
-            div.warning-reason
-              span 修改建议：
-              span(v-if="!warning.modify") {{warning.reason}}
-                button.btn.btn-sm.btn-default(@click="warning.modify = true") 修改
-              div(v-else)
-                textarea.form-control(v-model="warning.reason" rows=4)
-                .m-t-1
-                  button.btn.btn-sm.btn-primary(@click="save(warning)") 保存
-                  button.btn.btn-sm.btn-default(@click="warning.modify = false") 取消
         include ../../publicModules/paging/paging_input
 
 

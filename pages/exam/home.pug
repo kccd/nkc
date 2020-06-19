@@ -1,5 +1,5 @@
 extends ../bootstrap_base
-block title 
+block title
   title=`${state.serverSettings.websiteName} | 考试系统`
   -const {countOneDay, count, waitingTime} = data.examSettings;
   +includeCSS('/exam/exam.css')
@@ -9,19 +9,19 @@ block content
       .col-xs-12.col-md-8
         h2.m-b-2 参与考试获得证书
         ul
-          li 
+          li
             h5 通过A卷考试可获得普通证书，可以参加所有普通话题的交流。
-          li 
+          li
             h5 通过B卷考试可获得高级证书，可参与相应特种科技爱好话题的交流。
-          li 
+          li
             h5 通过A卷考试的用户将来可以再参加B卷考试。
-          li 
+          li
             h5=`同一用户每天最多进行 ${countOneDay} 次考试。`
-          li 
-            h5=`同一用户的考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`  
-        .row.m-t-2 
+          li
+            h5=`同一用户的考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`
+        .row.m-t-2
           .col-xs-12.col-md-12
-                
+
         .row.m-t-2.exam-link
           .col-xs-12.col-md-6
             +listHeader('A卷（基础级）')
@@ -43,27 +43,27 @@ block content
           a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/question`) 出题记录
             if data.unViewedCount > 0
               .red-point=` ${data.unViewedCount}`
-        else 
+        else
           a.m-t-1.exam-add-question-btn(style='background-color: #aaa;') 参与出题
           p 当前只允许学术分1分以上的会员命题，您还没有学术分。点击
             a(href='https://www.kechuang.org/t/67256' target='_blank') 这里
             |了解学术分制度。
         a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/paper?t=self`) 考试记录
         if permission('addExamsCategory') || permission('visitExamsQuestionAuth') || permission('visitExamsQuestionAuth')
-          .p-t-2  
+          .p-t-2
           +listHeader('管理操作')
           if permission('addExamsCategory')
             a.m-t-1.btn.btn-default.btn-block(href=`/exam/categories/editor`) 考卷管理
-          if permission('visitExamQuestionManagement')  
-            a.m-t-1.btn.btn-default.btn-block(href=`/exam/questions`) 试题管理  
-          if permission('visitExamsQuestionAuth')  
+          if permission('visitExamQuestionManagement')
+            a.m-t-1.btn.btn-default.btn-block(href=`/exam/questions`) 试题管理
+          if permission('visitExamsQuestionAuth')
             a.m-t-1.btn.btn-default.btn-block(href=`/exam/auth`)
               if data.unauthCount
                 span= `试题审核 `
                 span.red-point=data.unauthCount
               else
-                | 试题审核          
-        .p-t-2        
+                | 试题审核
+        .p-t-2
         +listHeader('考试记录')
         for paper in data.papers
           .m-t-1
@@ -76,14 +76,14 @@ block content
             | 】
             if paper.category.volume === 'A'
               span 基础级
-            else 
+            else
               span 专业级
-        .p-t-2  
+        .p-t-2
         +listHeader('命题人')
-        for li in data.usersList  
+        for li in data.usersList
           a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
             - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`科创币 ${li.user.kcb/100}\n`+`${li.user.info.certsName}`;
-            img.user-list-avatar(src=`/avatar/${li.user.avatar}?t=sm`  title=title)
+            img.user-list-avatar(src=tools.getUrl('userAvatar', li.user.avatar, 'sm') title=title)
 block scripts
   script.
     $(function() {

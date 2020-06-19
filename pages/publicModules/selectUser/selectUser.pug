@@ -12,7 +12,7 @@
             span(v-if="!selectedUsers.length") 无
           .selected-user(v-for="u, index in selectedUsers")
             .selected-user-avatar
-              img(:src="'/avatar/' + u.avatar + '?t=sm'")
+              img(:src="getUrl('userAvatar', u.avatar, 'sm')")
             .selected-user-name {{u.username}}
               .fa.fa-remove(@click="removeUser(index)")
         .input-group
@@ -32,7 +32,7 @@
           h5.text-danger(v-if="searchInfo") {{searchInfo}}
           .search-user(v-for="u in searchUsers" @click="selectUser(u)")
             .search-user-avatar
-              img(:src="'/avatar/' + u.avatar + '?t=sm'")
+              img(:src="getUrl('userAvatar', u.avatar, 'sm')")
             .search-user-info
               .search-user-name {{u.username}}
                 //.button.fa.fa-plus-circle(@click="selectUser(u)")

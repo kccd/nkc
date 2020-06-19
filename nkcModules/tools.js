@@ -1,11 +1,11 @@
 var Tools = function() {
   var self = this;
   self.getUrl = function(type, id, size) {
-    var t = "";
-    if(size) t = "?t=" + size;
+    var t = "?c=" + type;
+    if(size) t += "&t=" + size;
     switch(type) {
       case "userAvatar": {
-        return "/a/" + id + t
+        return "/a/" + (id || 'null') + t
       }
       case "userBanner": {
         return "/a/"+ id + t

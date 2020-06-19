@@ -6,4 +6,4 @@
           data-float-uid=u.uid
         )
           a(href=`/u/${u.uid}` target="_blank")
-            img(src=`/avatar/${u.avatar}`)
+            img(src=tools.getUrl('userAvatar', u.avatar))

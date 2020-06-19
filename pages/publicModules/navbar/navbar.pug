@@ -23,7 +23,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         .navbar-brand.userInfo-m
           .userInfo-m-point.message-switch.message-count(class=!messageSum?"disabled":"")=messageSum
           img(
-            src=`/avatar/${data.user.avatar}`
+            src=tools.getUrl('userAvatar', data.user.avatar)
             onclick="toggleNKCDrawer('right')"
           )
       else
@@ -65,13 +65,13 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             a.new-thread(href=editorHref)
               .fa.fa-pencil-square-o &nbsp;
               | 发表文章
-          li.new-message.message-switch(class=messageSum?"":"hidden") 
-            a(href="/message") 消息  
+          li.new-message.message-switch(class=messageSum?"":"hidden")
+            a(href="/message") 消息
             .nav-user-avatar-count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
-              
+
             //.message-switch(class=messageSum?"":"hidden")
               | 消息
-              span=messageSum?messageSum:""  
+              span=messageSum?messageSum:""
           li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
             .nav-user-content
               div
@@ -80,7 +80,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                 .nav-user-other
                   .nav-user-info
                     .nav-user-avatar
-                      img(src=`/avatar/${data.user.avatar}`)
+                      img(src=tools.getUrl('userAvatar', data.user.avatar))
                     .nav-user-name=data.user.username
                     .nav-user-level
                       span.user-grade(style=`color: ${data.user.grade.color};`)
@@ -135,7 +135,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(onclick="NKC.methods.logout()" title='不，不要走！' class=showColumnLink?"col-xs-6":"col-xs-12").nav-user-link
                       .fa.fa-sign-out
                       | 退出登录
-            img.nav-user-avatar-sm(src=`/avatar/${data.user.avatar}`)
+            img.nav-user-avatar-sm(src=tools.getUrl('userAvatar', data.user.avatar))
         else
           li.userInfo
             a(onclick="Login.open()" title='还记得密码吗？') 登录
@@ -176,7 +176,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     if data.user
       .nkc-drawer-header
       .nkc-drawer-avatar
-        img(src=`/avatar/${data.user.avatar}`)
+        img(src=tools.getUrl('userAvatar', data.user.avatar))
       .nkc-drawer-username= data.user.username
       .nkc-drawer-certs= data.user.info.certsName
       .nkc-drawer-count

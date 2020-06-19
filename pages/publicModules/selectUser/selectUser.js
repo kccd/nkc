@@ -33,6 +33,7 @@ NKC.modules.SelectUser = function() {
     },
     methods: {
       checkString: NKC.methods.checkData.checkString,
+      getUrl: NKC.methods.tools.getUrl,
       removeUser: function(index) {
         this.selectedUsersId.splice(index, 1);
       },

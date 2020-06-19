@@ -27,7 +27,7 @@ block content
           div
             .column-transfer-user(v-for="u in targetUsers")
               .inline-block(v-if="u.uid !== user.uid")
-                img(:src="'/avatar/' + u.avatar")
+                img(:src="getUrl('userAvatar', u.avatar)")
                 span 用户名：{{u.name}}, 用户ID：{{u.uid}}
                 a.btn.btn-xs.btn-default(:href="'/u/' + u.uid" target="_blank") 个人名片
                 button.btn.btn-xs.btn-success(@click="targetUser = u") 选择
@@ -36,7 +36,7 @@ block content
           h4
             b 目标用户
           div.m-b-1
-            img.m-r-05(:src="'/avatar/' + targetUser.avatar" style="width: 2rem;height: 2rem;border-radius:3px;")
+            img.m-r-05(:src="getUrl('userAvatar', targetUser.avatar)" style="width: 2rem;height: 2rem;border-radius:3px;")
             a(:href="'/u/' + targetUser.uid"
               style="font-size: 1.6rem;vertical-align: top;" target="_blank"
             ) {{targetUser.username}}
@@ -66,6 +66,7 @@ block scripts
       mounted: function() {
       },
       methods: {
+        getUrl: NKC.methods.tools.getUrl,
         search: function() {
           var keyword = this.keyword;
           if(!keyword) return;

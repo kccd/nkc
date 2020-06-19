@@ -257,24 +257,24 @@ block content
                     -const passed = s1? 'passed': '';
                     -let info = '';
                     if r
-                      if s1 
+                      if s1
                         -info= '完成';
                       else
                         if r.verify
                           -info= '完成';
-                        else  
+                        else
                           if r.status
                             -info= '未确认';
-                          else 
-                            if r.passed  
+                          else
+                            if r.passed
                               -info= '已申请';
                             else if r.passed === false
                               -info= '未通过'
                             else
                               if r.apply
                                 -info= '已申请';
-                              else 
-                                -info='未申请';    
+                              else
+                                -info='未申请';
                     li(class=passed)= text + info
                     if(s1 === true && s2 !== true && displayNext)
                       li.next
@@ -361,7 +361,7 @@ block content
                   -for(let user of applicationForm.supporters)
                     .vote-user
                       a(href=`/u/${user.uid}`)
-                        img(src=`/avatar/${user.avatar}`)
+                        img(src=tools.getUrl('userAvatar', user.avatar))
                         span= `${user.username}`
                   br
                   br
@@ -370,7 +370,7 @@ block content
                   -for(let user of applicationForm.objectors)
                     .vote-user
                       a(href=`/u/${user.uid}`)
-                        img(src=`/avatar/${user.avatar}`)
+                        img(src=tools.getUrl('userAvatar', user.avatar))
                         span.redFontColor= `${user.username}`
           .panel.panel-default
             .panel-body.applicationForm

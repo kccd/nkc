@@ -188,7 +188,7 @@ block content
                   button(@click="addUser('anonymous')") 添加
                   div(v-if="selectedUsers.length > 0")
                     .review-user-span(v-for="user, index in selectedUsers")
-                      img(:src="'/avatar/' + user.avatar + '?t=sm'")
+                      img(:src="getUrl('userAvatar', user.avatar, 'sm')")
                       a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
                       .fa.fa-remove(@click="removeUser(index, 'anonymous')" title="点击移除")
                 hr
@@ -224,7 +224,7 @@ block content
                   button(@click="addUser('survey')") 添加
                   div(v-if="selectedUsersSurvey.length > 0")
                     .review-user-span(v-for="user, index in selectedUsersSurvey")
-                      img(:src="'/avatar/' + user.avatar + '?t=sm'")
+                      img(:src="getUrl('userAvatar', user.avatar, 'sm')")
                       a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
                       .fa.fa-remove(@click="removeUser(index, 'survey')" title="点击移除")
                 div.m-t-1 时间限制：
