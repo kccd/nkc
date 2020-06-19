@@ -85,8 +85,46 @@ func.saveColumnAvatar = async (columnId, file) => {
   await fsSync.unlink(file.path);
 };
 
-func.saveColumnAvatar$2 = async () => {
-
+/**
+ * 存储专栏头像2.0
+ * @param {File} file node File对象
+ */
+func.saveColumnAvatar$2 = async (columnId, file) => {
+  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
+  const ext = (await FileType.fromFile(file.path)).ext;
+  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
+  const column = await db.ColumnModel.findOnly({_id: columnId});
+  const AM = db.AttachmentModel;
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const aid = AM.getNewId();
+  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 100);
+  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 250);
+  await resizeImage(file.path, `${fullPath}/${aid}_lg.${ext}`, 500);
+  const attachment = AM({
+    _id: aid,
+    path: timePath,
+    size: file.size,
+    name: file.name,
+    ext,
+    type: 'columnAvatar',
+    hash: file.hash,
+    uid: column.uid
+  });
+  await attachment.save();
+  await column.update({avatar: aid});
+  const imgTypes = ["columnAvatar", "columnAvatarSM", "columnAvatarLG"];
+  for(const imgType of imgTypes) {
+    const log = await db.ImageLogModel({
+      uid: column.uid,
+      columnId: columnId,
+      imgType,
+      imgId: aid,
+      type: "columnChangeAvatar"
+    });
+    await log.save();
+  }
+  await fsSync.unlink(file.path);
+  return aid;
 }
 
 // 获取专栏头像文件位置
@@ -146,6 +184,48 @@ func.saveColumnBanner = async (columnId, file) => {
   }
   await fsSync.unlink(file.path);
 };
+
+/**
+ * 保存专栏背景2.0
+ * @param {string} columnId 专栏id
+ * @param {File} file node 文件对象
+ */
+func.saveColumnBanner$2 = async (columnId, file) => {
+  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
+  const ext = (await FileType.fromFile(file.path)).ext;
+  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
+  const column = await db.ColumnModel.findOnly({_id: columnId});
+  const AM = db.AttachmentModel;
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const aid = AM.getNewId();
+  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 720, 1280);
+  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 480, 1920);
+  const attachment = AM({
+    _id: aid,
+    path: timePath,
+    size: file.size,
+    name: file.name,
+    ext,
+    type: 'columnBanner',
+    hash: file.hash,
+    uid: column.uid
+  });
+  await attachment.save();
+  await column.update({banner: aid});
+  const imgTypes = ["columnBanner", "columnBannerSM"];
+  for(const imgType of imgTypes) {
+    const log = await db.ImageLogModel({
+      uid: column.uid,
+      columnId: columnId,
+      imgType,
+      imgId: aid,
+      type: "columnChangeBanner"
+    });
+    await log.save();
+  }
+  await fsSync.unlink(file.path);
+  return aid;
+}
 
 // 获取背景链接
 func.getColumnBanner = async (hash, t) => {
@@ -239,7 +319,8 @@ func.saveUserAvatar$2 = async (uid, file) => {
     name: file.name,
     ext,
     type: 'userAvatar',
-    uid
+    uid,
+    hash: file.hash
   });
   await attachment.save();
   await user.update({avatar: aid});
@@ -336,7 +417,8 @@ func.saveUserBanner$2 = async (uid, file) => {
     name: file.name,
     ext,
     type: 'userBanner',
-    uid
+    uid,
+    hash: file.hash
   });
   await attachment.save();
   const log = await db.ImageLogModel({

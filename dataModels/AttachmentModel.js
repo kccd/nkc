@@ -143,6 +143,7 @@ schema.statics.saveHomeBigLogo = async file => {
     name,
     ext,
     type: 'homeBigLogo',
+    hash: file.hash
   });
   await attachment.save();
   await SM.updateOne({_id: 'home'}, {

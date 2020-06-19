@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const {existsSync} = require("../tools/fsSync");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
@@ -1182,31 +1183,32 @@ userSchema.statics.getUsersFriendsId = async (uid) => {
   return friends.map(c => c.tUid);
 };
 
-/*
+/**
 * 判断用户是否上传了头像
-* @param {String} uid 用户id
-* @author pengxiguaa 2019-5-13
+* @param {String} attachId 附件id
 * @return {Boolean} 是否上传
-* */
-userSchema.statics.uploadedAvatar = async (avatar) => {
-  if(!avatar) return false;
-  let {avatarPath} = require("../settings/upload");
-  const {existsSync} = require("../tools/fsSync");
-  avatarPath += `/${avatar}.jpg`;
-  return existsSync(avatarPath);
+*/
+userSchema.statics.uploadedAvatar = async (attachId) => {
+  if(!attachId) return false;
+  const AM = mongoose.model('attachments');
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const attachment = await AM.findOnly({_id: attachId});
+  if(!attachment) return false;
+  return existsSync(`${fullPath}/${attachId}.${attachment.ext}`);
 };
-/*
+
+/**
 * 判断用户是否上传了背景
-* @param {String} uid 用户id
-* @author pengxiguaa 2019-5-13
+* @param {String} attachId 附件id
 * @return {Boolean} 是否上传
-* */
-userSchema.statics.uploadedBanner = async (banner) => {
-  if(!banner) throwErr(500, "userModel.uploadedBanner: banner is required");
-  let {userBannerPath} = require("../settings/upload");
-  const {existsSync} = require("../tools/fsSync");
-  userBannerPath += `/${banner}.jpg`;
-  return existsSync(userBannerPath);
+*/
+userSchema.statics.uploadedBanner = async (attachId) => {
+  if(!attachId) return false;
+  const AM = mongoose.model('attachments');
+  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const attachment = await AM.findOnly({_id: attachId});
+  if(!attachment) return false;
+  return existsSync(`${fullPath}/${attachId}.${attachment.ext}`);
 };
 
 /*

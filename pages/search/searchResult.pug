@@ -65,7 +65,7 @@
         div(style="max-width: 100%;width: 70rem;")
           .search-result-avatar
             a(href=`/m/${result.column._id}` target="_blank")
-              img(src=`/column/avatar/${result.column.avatar}`)
+              img(src=`/a/${result.column.avatar}`)
           .search-result-user-info
             .display-i-b.m-r-1
               a.clear-a-style(href=`/m/${result.column._id}` target="_blank").search-result-username!=result.name
@@ -88,7 +88,7 @@
     a(href=`/m/${result.page.columnId}/page/${result.page._id}` target="_blank").clear-a-style.search-result-title!= result.t
     .search-result-info
       a.clear-a-style.search-result-author(href=`/m/${result.page.columnId}`)
-        img(src=`/column/avatar/${result.column.avatar}`)
+        img(src=`/a/${result.column.avatar}`)
         span=result.column.name
       span 专栏
       .search-result-time=fromNow(result.page.toc)
