@@ -8,7 +8,7 @@ var Tools = function() {
         return "/a/" + id + t
       }
       case "userBanner": {
-        return "/banner/"+ id + t
+        return "/a/"+ id + t
       }
       case "postCover": {
         return "/nr/cover/" + id + t

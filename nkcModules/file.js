@@ -85,6 +85,10 @@ func.saveColumnAvatar = async (columnId, file) => {
   await fsSync.unlink(file.path);
 };
 
+func.saveColumnAvatar$2 = async () => {
+
+}
+
 // 获取专栏头像文件位置
 func.getColumnAvatar = async (hash, t) => {
   let filePath = upload.columnAvatarPath + "/" + hash + ".jpg";
