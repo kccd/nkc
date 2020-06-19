@@ -154,6 +154,7 @@ var app = new Vue({
   },
   methods: {
     format: NKC.methods.format,
+    getUrl: NKC.methods.tools.getUrl,
     strToHTML: NKC.methods.strToHTML,
     visitUrl: NKC.methods.visitUrl,
     selectForum: function(forum) {

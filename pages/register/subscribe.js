@@ -19,6 +19,7 @@ var app = new Vue({
     // this.getForums();
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
     visitUrl: function(url) {
       NKC.methods.visitUrl(url, true);
     },

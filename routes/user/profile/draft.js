@@ -66,6 +66,8 @@ module.exports = async (ctx, next) => {
           cid: category? category.cid: "",
           description: forum.description,
           iconFileName: forum.iconFileName,
+          logo: forum.logo,
+          banner: forum.banner,
           color: forum.color,
           fName: forum.displayName,
           cName: category? category.name: ""

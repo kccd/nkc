@@ -9,6 +9,9 @@ NKC.modules.UserInfo = function() {
     data: {
       user: "",
       loading: true
+    },
+    methods: {
+      getUrl: NKC.methods.tools.getUrl,
     }
   });
   self.open = function(options) {

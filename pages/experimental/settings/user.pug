@@ -5,8 +5,8 @@ block title
   link(href='/experimental/index.css' rel='stylesheet')
   if data.role
     title=`${data.role.displayName} | 用户管理`
-  else 
-    title 用户管理  
+  else
+    title 用户管理
 block content
   .container-fluid.max-width
     .row
@@ -91,7 +91,7 @@ block content
                 if role._id !== 'visitor'
                   if data.t === role._id
                     span.m-r-1(style='font-size: 1.4rem;')=role.displayName
-                  else  
+                  else
                     a.m-r-1(href=`/e/settings/user?t=${role._id}`)= role.displayName
             .col-xs-12.col-md-12
               table.table.table-hover(style='display: none;padding: 0.5rem;border: 1px solid #cccccc;')#searchResult
@@ -125,7 +125,7 @@ block content
                   for user in data.users
                     tr
                       th
-                        img(src=`/avatar/${user.avatar}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
+                        img(src=tools.getUrl('userAvatar', user.avatar) style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
                         a(href=`/u/${user.uid}` target='_blank')= user.username || user.uid
                       th= user.threadCount
                       th= user.postCount

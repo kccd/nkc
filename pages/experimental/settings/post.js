@@ -10,6 +10,7 @@ var app = new Vue({
   },
   methods: {
     checkNumber: NKC.methods.checkData.checkNumber,
+    getUrl: NKC.methods.tools.getUrl,
     addUser: function(type) {
       var uid = this.uid;
       var this_ = this;

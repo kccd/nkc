@@ -1006,6 +1006,8 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
     color: 1,
     parentsId: 1,
     iconFileName: 1,
+    logo: 1,
+    banner: 1,
     description: 1
   }).sort({order: 1});
 
@@ -1056,7 +1058,9 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     color: 1,
     parentsId: 1,
     iconFileName: 1,
-    description: 1
+    description: 1,
+    logo: 1,
+    banner: 1,
   }).sort({order: 1});
 
   const forumsObj = {};
@@ -1214,6 +1218,8 @@ forumSchema.statics.getUserSubForums = async (uid, fid) => {
     color: 1,
     parentsId: 1,
     iconFileName: 1,
+    logo: 1,
+    banner: 1,
     description: 1
   });
   const userSubForums = [];
@@ -1379,6 +1385,8 @@ forumSchema.statics.getForumNav = async (fids = [], fid) => {
     parentsId: 1,
     description: 1,
     iconFileName: 1,
+    logo: 1,
+    banner: 1,
     color: 1
   });
   const forumsObj = {};

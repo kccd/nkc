@@ -168,7 +168,7 @@ if data.reports && data.reports.length && data.reports.length > 0
               span.applicationForm-report-icon.system 系统
             else
               span.applicationForm-report-icon
-                img(src=`/avatar/${applicationForm.applicant.user.avatar}?t=sm`)
+                img(src=tools.getUrl('userAvatar', applicationForm.applicant.user.avatar, 'sm'))
                 a(hrefA=`/u/${applicationForm.uid}` target="_blank")=applicationForm.applicant.user.username
             span(title=r.toc.toLocaleString())=fromNow(r.toc)
             if ensureFundOperatorPermission('admin', user, data.applicationForm.fund)

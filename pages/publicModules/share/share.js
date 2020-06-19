@@ -23,7 +23,7 @@ function shareToOther(shareType, type, title, pid, description, avatar){
   if(shareType === "column") {
     lk = origin + "/column/avatar/" + avatar
   } else if(shareType === "user") {
-    lk = origin + "/avatar/" + pid
+    lk = origin + NKC.methods.tools.getUrl('userAvatar', pid)
   }
   var newLink = window.open();
   var str = window.location.origin + window.location.pathname;

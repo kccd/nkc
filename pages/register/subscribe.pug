@@ -45,7 +45,7 @@ block content
           .col-xs-12.col-md-3(v-for="u in users")
             .module-user-panel-md
               .avatar
-                img(:src="'/avatar/' + u.avatar")
+                img(:src="getUrl('userAvatar', u.avatar)")
               .info
                 a.pointer(@click="visitUrl('/u/' + u.uid)").name {{u.username}}
                 .button(v-if="subUsersId.indexOf(u.uid) !== -1" @click="subscribeUser(u.uid, false)") 取关

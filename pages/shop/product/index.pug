@@ -10,7 +10,7 @@ block title
   meta(name='description' content=`${product.post.abstract}`)
   link(rel='stylesheet' href='/external_pkgs/citySet/citySet.css')
   link(rel='stylesheet' href=`/external_pkgs/etalage/css/etalage.css?v=${startTime}`)
-  
+
   title 商品
   style.
     .title {
@@ -166,9 +166,9 @@ block content
             div.item
               div(style="display:none")#paraId!=`${paraId}`
               a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
-              a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+              a.btn.btn.addCart(role='button' onclick=`addProductToCart()`)
                 span.fa.fa-shopping-cart  加入购物车
-        .col-xs-1.col-md-1 
+        .col-xs-1.col-md-1
 
       .col-xs-12.col-md-12
         //- .col-xs-12.col-md-3
@@ -211,7 +211,7 @@ block content
         //-       ul.list-group
         //-         -for(var i=0;i<9;i++)
         //-           li.list-group-item
-        //-             a(href="#") 
+        //-             a(href="#")
         //-               img(src="/default/shop1.jpg" style="width:32px;height:auto;float:right")
         //-               span(style="display:block;font-weight:700;color:#666") KC901S 3GHz Handheld Network Analyzer multi RF-meter
         //-             span $ 12.00
@@ -240,14 +240,14 @@ block content
                 .panel.panel-default
                   div(style="width:100%;text-align:center;display: block;margin: 20px 0;")
                     a(href=`/t/${product.tid}#ReplyContent` style="color:black;font-weight:bold") 前往讨论区
-                      span.fa.fa-hand-o-right 
+                      span.fa.fa-hand-o-right
                   ul.list-group
                     -for(let post of data.posts)
-                      li.list-group-item 
+                      li.list-group-item
                         .media
                           .media-left.media-middle
                             a(href='#')
-                              img.media-object(src=`/avatar/${post.user.avatar}`, alt='...', style="width:64px")
+                              img.media-object(src=tools.getUrl('userAvatar', post.user.avatar), alt='...', style="width:64px")
                           .media-body
                             a(href=`/u/${post.uid}` style="font-size:large").media-heading!=`${post.user.username}`
                             //- span.fa.fa-graduation-cap(style="color:blue") &nbsp;&nbsp;
@@ -257,7 +257,7 @@ block content
   #shareBox(style="background: #ccc;width:150px;position: fixed;right: -999px;top: 128px;")
     .ThreadTitle22(style='border: 1px solid #ddd;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background:#FFFFFF')
       .changeDis(style='width:100%')
-        p.lighttext.airnum1#hideShare(style='font-size:21px;text-align:end;margin-top:0px;margin-bottom:10px;') 
+        p.lighttext.airnum1#hideShare(style='font-size:21px;text-align:end;margin-top:0px;margin-bottom:10px;')
           a.btn.btn-default.btn-sm(style="padding:0") 收起
         .hrdiv(style='width:80%;height:1px;background-color:#ddd;margin:0 auto;')
       .changeDisNone.text-center(style='width: 100%;')

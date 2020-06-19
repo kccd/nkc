@@ -95,10 +95,10 @@ block eContent
                   span {{format("YYYY/MM/DD HH:mm:ss", m.toc)}}
 
                 th(style="width: 15rem;")
-                  img.user-avatar(:src="'/avatar/' + m.user.avatar")
+                  img.user-avatar(:src="getUrl('userAvatar', m.user.avatar)")
                   a.pointer(@click="visitUrl('/u/' + m.user.uid, true)" :onmouseover="'floatUserPanel.open(this, \"'+m.user.uid+'\")'") {{m.user.username}}
                 th(style="width: 15rem;")
-                  img.user-avatar(:src="'/avatar/' + m.targetUser.avatar")
+                  img.user-avatar(:src="getUrl('userAvatar', m.targetUser.avatar)")
                   a.pointer(@click="visitUrl('/u/' + m.targetUser.uid, true)" :onmouseover="'floatUserPanel.open(this, \"'+m.targetUser.uid+'\")'") {{m.targetUser.username}}
                 th(style="width: 15rem;") {{m.ip}}
                 th(v-if="!m.c.ty")

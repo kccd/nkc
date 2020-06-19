@@ -115,6 +115,7 @@ NKC.modules.SurveyEdit = function() {
     methods: {
       checkNumber: NKC.methods.checkData.checkNumber,
       checkString: NKC.methods.checkData.checkString,
+      getUrl: NKC.methods.tools.getUrl,
       removeUser: function(index) {
         this.survey.permission.uid.splice(index, 1);
       },

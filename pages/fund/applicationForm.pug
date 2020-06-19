@@ -56,7 +56,7 @@ block fundContent
               -for(let user of applicationForm.supporters)
                 .vote-user
                   a(href=`/u/${user.uid}`)
-                    img(src=`/avatar/${user.avatar}`)
+                    img(src=tools.getUrl('userAvatar', user.avatar))
                     span= `${user.username}`
               br
               br
@@ -65,7 +65,7 @@ block fundContent
               -for(let user of applicationForm.objectors)
                 .vote-user
                   a(href=`/u/${user.uid}`)
-                    img(src=`/avatar/${user.avatar}`)
+                    img(src=tools.getUrl('userAvatar', user.avatar))
                     span.redFontColor= `${user.username}`
       if applicationForm.project
         .panel.panel-default

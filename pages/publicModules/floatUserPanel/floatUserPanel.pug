@@ -21,7 +21,7 @@
         .user_avatar
           .user_avatar_div
             a(:href="'/u/' + user.uid" target="_blank")
-              img(:src="'/avatar/' + user.avatar")
+              img(:src="getUrl('userAvatar', user.avatar)")
             //-if data.user
               span(v-if=`${data.user?"true":"false"} && user.uid !== '${data.user.uid}'`)
                 .user_sub_btn(v-if="subUid.indexOf(user.uid) === -1" :onclick="'subscribeUser(\"'+user.uid+'\", true)'") 关注

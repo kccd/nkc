@@ -20,6 +20,7 @@ var floatUserPanel = new Vue({
   methods: {
     fromNow: NKC.methods.fromNow,
     format: NKC.methods.format,
+    getUrl: NKC.methods.tools.getUrl,
     close: function(uid) {
       var this_ = this;
       clearTimeout(this.timeout);

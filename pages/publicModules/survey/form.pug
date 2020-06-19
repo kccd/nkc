@@ -91,7 +91,7 @@
           p {{postResult}}
           .form-post-users
             a(onclick="NKC.methods.visitUrl('/u/' + user.uid)" :data-float-uid="user.uid" v-for="user in users")
-              img(:src="'/avatar/' + user.avatar")
+              img(:src="getUrl('userAvatar', user.avatar)")
         //- 时间限制
         p(v-if="timeInfo") {{timeInfo}}
         //- 奖励
@@ -125,7 +125,6 @@
             a(onclick="Login.open('register')") 注册
             | 。
 
-        //p(v-else-if="totalScore") 总分{{totalScore}}，总打分{{postScore}}，平均打分{{(postScore/answerCount).toFixed(2)}}。
       .form-button(v-if="!posted")
         button.btn.btn-primary.btn-sm(disabled v-if="!havePermission || status !== 'beginning'")  提交
         button.btn.btn-primary.btn-sm(@click="submit" v-else)  提交

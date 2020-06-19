@@ -43,8 +43,8 @@ block content
                     li
                       a(onclick=` clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
             .user-banner-mask
-            a(href=`/avatar/${data.targetUser.avatar}?t=lg` target="_blank").user-avatar
-              img(src=`/avatar/${data.targetUser.avatar}`)
+            a(href=tools.getUrl('userAvatar', data.targetUser.avatar, 'lg') target="_blank").user-avatar
+              img(src=tools.getUrl('userAvatar', data.targetUser.avatar))
             .user-banner(style=`background-image: url(/banner/${data.targetUser.banner});`)
           .user-name=data.targetUser.username || data.targetUser.uid
           if data.targetUser.destroyed

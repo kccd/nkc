@@ -46,7 +46,7 @@ block content
               .time
                 if !post.anonymous
                   a(href=`/u/${post.uid}` target='_blank' onmouseover=`floatUserPanel.open(this, '${post.uid}')`)
-                    img.user-avatar(src=`/avatar/${post.user.avatar}`)
+                    img.user-avatar(src=tools.getUrl('userAvatar', post.user.avatar))
                     .username= post.user.username
                 else
                   img.user-avatar(src=anonymousInfo.avatar)
@@ -97,7 +97,7 @@ block content
                   span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
                   span.TPCIA
                     a(href=`${profile}` style='text-decoration: none;')
-                      img.TPCIAI(src=`/avatar/${c.fromUser.avatar}?t=sm`)
+                      img.TPCIAI(src=tools.getUrl('userAvatar', c.fromUser.avatar, 'sm'))
                       span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
                   span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
                   span.TPCReason #{c.description}
@@ -147,7 +147,7 @@ block content
             for u, index in data.voteUpUsers
               if index < 30
                 a(href=`/u/${u.uid}` target='_blank' title=u.username)
-                  img(src=`/avatar/${u.avatar}`)
+                  img(src=tools.getUrl('userAvatar', u.avatar))
 block scripts
   .hidden#data=objToStr({notes: data.notes})
   include ../publicModules/complaint/complaint

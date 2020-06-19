@@ -48,7 +48,7 @@ function selectAvatar() {
       }
     }, "POST")
       .then(function(data) {
-        $("#userAvatar").attr("src", "/avatar/" + data.user.avatar + '?time=' + Date.now());
+        $("#userAvatar").attr("src", NKC.methods.tools.getUrl('userAvatar', data.user.avatar) + '?time=' + Date.now());
         emitEventToUpdateLocalUser(data);
         selectImage.close();
       })

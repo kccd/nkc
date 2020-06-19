@@ -113,6 +113,7 @@ NKC.modules.SurveyForm = function(id) {
     },
     methods: {
       format: NKC.methods.format,
+      getUrl: NKC.methods.tools.getUrl,
       getColor: NKC.methods.getRandomColor,
       // 修改投票结果
       modifyPost: function() {
