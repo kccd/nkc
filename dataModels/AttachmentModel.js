@@ -42,6 +42,11 @@ const schema = new Schema({
     type: String,
     default: '',
   },
+  hash: {
+    type: String,
+    index: 1,
+    default: ''
+  },
   c: {
     type: String,
     default: '',
@@ -94,12 +99,13 @@ schema.statics.saveWatermark = async (file, c = 'normal') => {
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
   const realPath = `${fullPath}/${fileName}`;
-  const {path, size, name} = file;
+  const {path, size, name, hash} = file;
   await fsPromise.rename(path, realPath);
   const attachment = AM({
     _id: aid,
     path: timePath,
     size,
+    hash,
     name,
     ext,
     c,
@@ -215,10 +221,11 @@ schema.statics.saveForumImage = async (fid, type, file) => {
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
   const targetFilePath = `${fullPath}/${fileName}`;
-  const {size, name} = file;
+  const {size, name, hash} = file;
   const attachment = AM({
     _id: aid,
     size,
+    hash,
     name,
     type: `forum${type}`,
     ext,

@@ -46,7 +46,10 @@ block content
         .forum-info-panel.m-b-1
           .forum-banner
             .forum-banner-cover
-            .forum-banner-img(style=`background-image: url(${tools.getUrl('forumBanner', data.forum.banner)})`)
+            if !data.forum.banner
+              .forum-banner-img(style=`background-image: url(${tools.getUrl('defaultFile', 'forum_banner.jpg')})`)
+            else
+              .forum-banner-img(style=`background-image: url(${tools.getUrl('forumBanner', data.forum.banner)})`)
           .forum-info-body
             .forum-avatar
               if data.forum.logo

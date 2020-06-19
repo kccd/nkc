@@ -105,6 +105,7 @@ router
       fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !disciplinesId.includes(fid));
     }
     data.homeSettings = homeSettings;
+    data.homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
     // 置顶文章轮播图
     data.ads = (await db.ThreadModel.getAds(fidOfCanGetThreads)).movable;
 
