@@ -45,7 +45,7 @@ block content
             .user-banner-mask
             a(href=tools.getUrl('userAvatar', data.targetUser.avatar, 'lg') target="_blank").user-avatar
               img(src=tools.getUrl('userAvatar', data.targetUser.avatar))
-            .user-banner(style=`background-image: url(/banner/${data.targetUser.banner});`)
+            .user-banner(style=`background-image: url(${tools.getUrl('userBanner', data.targetUser.banner)});`)
           .user-name=data.targetUser.username || data.targetUser.uid
           if data.targetUser.destroyed
             .user-destroyed 用户已注销

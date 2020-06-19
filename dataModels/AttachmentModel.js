@@ -163,11 +163,15 @@ schema.methods.getFilePath = async function(t) {
   const AP = mongoose.model('attachments');
   const attachmentPath = await AP.getAttachmentPath();
   const {path, _id, ext} = this;
+  const normalFilePath = `${attachmentPath}${path}/${_id}.${ext}`;
   const filePath = `${attachmentPath}${path}/${_id}${t?'_' + t: ''}.${ext}`;
+
   if(fs.existsSync(filePath)) {
     return filePath;
+  } else if(fs.existsSync(normalFilePath)) {
+    return normalFilePath;
   } else {
-    throwErr(400, '文件未找到');
+    throwErr(400 , '文件未找到');
   }
 }
 

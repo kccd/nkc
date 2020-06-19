@@ -8,8 +8,12 @@ router
     if(t && !['sm', 'lg'].includes(t)) ctx.throw(400, '位置的文件尺寸');
     const a = await db.AttachmentModel.findOne({_id: id});
     if(!a) {
-      if(c === 'userAvatar') {
-        ctx.filePath = statics.defaultAvatarPath;
+      switch(c) {
+        case 'userAvatar':
+          ctx.filePath = statics.defaultAvatarPath; break;
+        case 'userBanner':
+          ctx.filePath = statics.defaultUserBannerPath; break;
+        default: ctx.throw(400, '数据未找到');
       }
     } else {
       ctx.filePath = await a.getFilePath(t);

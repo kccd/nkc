@@ -37,18 +37,24 @@ function selectAvatar() {
   selectImage.show(function(data) {
     var user = NKC.methods.getDataById("data").user;
     var formData = new FormData();
-    formData.append("file", data);
-    uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {
-      $(".upload-info").text('上传中...' + percentage);
-      if(e.total === e.loaded) {
-        $(".upload-info").text('上传完成！');
-        setTimeout(function() {
-          $(".upload-info").text('');
-        }, 2000);
-      }
-    }, "POST")
+    Promise.resolve()
+      .then(function() {
+        return NKC.methods.blobToFile(data);
+      })
+      .then(function(file) {
+        formData.append("file", file);
+        return uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {
+          $(".upload-info").text('上传中...' + percentage);
+          if(e.total === e.loaded) {
+            $(".upload-info").text('上传完成！');
+            setTimeout(function() {
+              $(".upload-info").text('');
+            }, 2000);
+          }
+        }, "POST")
+      })
       .then(function(data) {
-        $("#userAvatar").attr("src", NKC.methods.tools.getUrl('userAvatar', data.user.avatar) + '?time=' + Date.now());
+        $("#userAvatar").attr("src", NKC.methods.tools.getUrl('userAvatar', data.user.avatar) + '&time=' + Date.now());
         emitEventToUpdateLocalUser(data);
         selectImage.close();
       })

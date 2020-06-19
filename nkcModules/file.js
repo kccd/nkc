@@ -221,8 +221,7 @@ func.saveUserAvatar$2 = async (uid, file) => {
   const AM = db.AttachmentModel;
   const user = await db.UserModel.findOnly({uid});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
-  const ext = (await FileType.fromFile(file.path)).ext;
-  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
+  const ext = await func.getFileExtension(file, ['png', 'jpg', 'jpeg']);
   const {fullPath, timePath} = await AM.getAttachmentPath(true);
   const aid = AM.getNewId();
   await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 192);
@@ -233,6 +232,7 @@ func.saveUserAvatar$2 = async (uid, file) => {
     path: timePath,
     size: file.size,
     name: file.name,
+    hash: file.hash,
     ext,
     type: 'userAvatar',
     uid
@@ -240,6 +240,7 @@ func.saveUserAvatar$2 = async (uid, file) => {
   await attachment.save();
   await user.update({avatar: aid});
   await fsSync.unlink(file.path);
+  return attachment;
 }
 
 
@@ -563,7 +564,7 @@ func.getFileExtension = async (file, extensions = []) => {
  * 参数：
  * fromFile, toFile[, height[, width[, quality]]]
  * 尺寸参数只传入一个时既做高又做宽
- * @param {string} fromFile - 目标文件路径  
+ * @param {string} fromFile - 目标文件路径
  * @param {string} toFile - 新文件路径
  */
 function resizeImage(fromFile, toFile) {

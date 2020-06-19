@@ -21,8 +21,8 @@ block content
             .account-nav-xs.hidden-md.hidden-lg=data.name
           .account-nav(class=data.type?"hidden-sm hidden-xs":"")
             .account-user-banner
-              a(href=`/banner/${data.targetUser.banner}?t=lg` target="_blank")
-                img(src=`/banner/${data.targetUser.banner}`)
+              a(href=tools.getUrl('userBanner', data.targetUser.banner, 'lg') target="_blank")
+                img(src=tools.getUrl('userBanner', data.targetUser.banner))
             .account-user-avatar
               a(href=tools.getUrl('userAvatar', data.targetUser.avatar, 'lg') target="_blank")
                 img(src=tools.getUrl('userAvatar', data.targetUser.avatar))
