@@ -56,8 +56,8 @@ router
     });
     await column.save();
     await category.save();
-    await nkcModules.file.saveColumnAvatar(column._id, avatar);
-    await nkcModules.file.saveColumnBanner(column._id, banner);
+    await nkcModules.file.saveColumnAvatar$2(column._id, avatar);
+    await nkcModules.file.saveColumnBanner$2(column._id, banner);
     data.column = column;
     await db.ColumnModel.toSearch(column._id);
     await next();

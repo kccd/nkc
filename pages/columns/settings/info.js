@@ -12,8 +12,8 @@ var app = new Vue({
   data: {
     avatar: "",
     banner: "",
-    avatarUrl: "/column/avatar/" + data.column.avatar,
-    bannerUrl: "/column/banner/" + data.column.banner,
+    avatarUrl: "/a/" + data.column.avatar,
+    bannerUrl: "/a/" + data.column.banner,
 
     column: data.column,
 

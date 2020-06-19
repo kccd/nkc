@@ -36,7 +36,7 @@ var Tools = function() {
         return "/a/" + id + t
       }
       case "columnAvatar": {
-        return "/column/avatar/" + id + t
+        return "/a/" + id + t
       }
       case "pdf": {
         return "/reader/pdf/web/viewer?file=%2fr%2f" + id

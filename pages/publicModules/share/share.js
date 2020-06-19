@@ -21,7 +21,7 @@ function shareToOther(shareType, type, title, pid, description, avatar){
   var origin = window.location.origin;
   var lk = origin +'/default/logo3.png';
   if(shareType === "column") {
-    lk = origin + "/column/avatar/" + avatar
+    lk = origin + "/a/" + avatar
   } else if(shareType === "user") {
     lk = origin + NKC.methods.tools.getUrl('userAvatar', pid)
   }
