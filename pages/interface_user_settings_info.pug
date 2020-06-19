@@ -20,7 +20,7 @@ block content
                 label.col-sm-2.control-label 头像：
                 .col-sm-10
                   .user-settings-img-avatar
-                    a(href=`${tools.getUrl("userAvatar", data.user.avatar)}?t=lg` target="_blank")
+                    a(href=`${tools.getUrl("userAvatar", data.user.avatar, 'lg')}` target="_blank")
                       img#userAvatar(src=tools.getUrl("userAvatar", data.user.avatar) style='width: 100%;')
                     .text-center.m-t-1
                       button.btn.btn-default.btn-sm(onclick='selectAvatar()') 选择图片
@@ -29,8 +29,8 @@ block content
                 label.col-sm-2.control-label 背景：
                 .col-sm-10
                   .user-settings-img-banner
-                    a(href=`/a/${data.user.banner}` target="_blank")
-                      img#userBanner(src=`/a/${data.user.banner}` style='width: 100%;')
+                    a(href=tools.getUrl('userBanner', data.user.banner) target="_blank")
+                      img#userBanner(src=tools.getUrl('userBanner', data.user.banner) style='width: 100%;')
                     .text-center.m-t-1
                       button.btn.btn-default.btn-sm(onclick='selectBanner()') 选择图片
                       h5.upload-info-banner

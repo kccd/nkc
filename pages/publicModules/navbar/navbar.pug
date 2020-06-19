@@ -76,7 +76,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             .nav-user-content
               div
                 .nav-user-banner
-                  img(src=`/banner/${data.user.banner}`)
+                  img(src=tools.getUrl('userBanner', data.user.banner))
                 .nav-user-other
                   .nav-user-info
                     .nav-user-avatar
