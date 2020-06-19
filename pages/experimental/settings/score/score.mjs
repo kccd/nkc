@@ -12,7 +12,10 @@ const s2mArr = [];
 const s2oArr = [];
 const o2sArr = [];
 
+const scoresObj = {};
+
 for(const s of scores) {
+  scoresObj[s.type] = s;
   const {
     type, enabled, name, icon, unit,
     money2score, score2other, other2score, score2money,
@@ -88,7 +91,42 @@ const app = new Vue({
       });
     },
     save() {
-
+      const {
+        typeArr, nameArr, iconArr, unitArr,
+        weightArr, m2sArr, s2mArr, s2oArr, o2sArr
+      } = this;
+      typeArr.map(({type, enabled}) => {
+        scoresObj[type].enabled = enabled;
+      });
+      nameArr.map(({type, name}) => {
+        scoresObj[type].name = name;
+      });
+      unitArr.map(({type, unit}) => {
+        scoresObj[type].unit = unit;
+      });
+      weightArr.map(({type, weight}) => {
+        scoresObj[type].weight = weight;
+      });
+      m2sArr.map(({type, money2score}) => {
+        scoresObj[type].money2score = money2score;
+      });
+      s2mArr.map(({type, score2money}) => {
+        scoresObj[type].score2money = score2money;
+      });
+      s2oArr.map(({type, score2other}) => {
+        scoresObj[type].score2other = score2other;
+      });
+      o2sArr.map(({type, other2score}) => {
+        scoresObj[type].other2score = other2score;
+      });
+      this.scoreSettings.scores = scoresObj;
+      const formData = new FormData();
+      formData.append('scoreSettings', JSON.stringify(this.scoreSettings));
+      for(const icon of iconArr) {
+        const {iconFile, type} = icon;
+        if(!iconFile) continue;
+        formData.append(type, iconFile);
+      }
     }
   }
 });

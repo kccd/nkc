@@ -5,12 +5,11 @@ block eTitle
 block eContent
   .container-fluid.max-width
     #data.hidden=objToStr({scoreSettings: data.scoreSettings})
-    .row
-      .col-xs-12.col-md-12#app(v-cloak)
-        table.table
-          thead
-            tr
-              th(colspan=10) 积分设置
+    .row#app(v-cloak)
+      .col-xs-12.col-md-12
+      .col-xs-12.col-md-12
+        h4 积分设置
+        table.table.table-bordered
           tbody
             tr
               th 启用
@@ -62,6 +61,7 @@ block eContent
                 .checkbox
                   label
                     input(type='checkbox' :value='true' v-model='a.other2score')
+        h4
         .m-t-1
           button.btn.btn-default(@click='save') 保存
 block scripts
