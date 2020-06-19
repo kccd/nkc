@@ -4,6 +4,66 @@ block eTitle
   +includeCSS(`/experimental/settings/score/score.css`)
 block eContent
   .container-fluid.max-width
-
+    #data.hidden=objToStr({scoreSettings: data.scoreSettings})
+    .row
+      .col-xs-12.col-md-12#app(v-cloak)
+        table.table
+          thead
+            tr
+              th(colspan=10) 积分设置
+          tbody
+            tr
+              th 启用
+              th(v-for='a in typeArr')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='true' v-model='a.enabled')
+                    .checkbox-span {{a.type}}
+            tr
+              th 名称
+              th(v-for='a in nameArr')
+                input.form-control(type='text' v-model.trim='a.name')
+            tr
+              th 图标
+              th(v-for='a in iconArr')
+                .score-icon
+                  img(:src="a.iconData" v-if='a.iconData')
+                  img(:src="getUrl('scoreIcon', a.icon)" v-else)
+                button.btn.btn-default.btn-xs(@click='selectIcon(a)') 更换
+            tr
+              th 单位
+              th(v-for='a in unitArr')
+                input.form-control(type='text' v-model.trim='a.unit')
+            tr
+              th 比重
+              th(v-for='a in weightArr')
+                input.form-control(type='text' v-model.number='a.weight')
+            tr
+              th 允许充值
+              th(v-for='a in m2sArr')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='true' v-model='a.money2score')
+            tr
+              th 允许提现
+              th(v-for='a in s2mArr')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='true' v-model='a.score2money')
+            tr
+              th 兑出到其他积分
+              th(v-for='a in s2oArr')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='true' v-model='a.score2other')
+            tr
+              th 从其他积分兑入
+              th(v-for='a in o2sArr')
+                .checkbox
+                  label
+                    input(type='checkbox' :value='true' v-model='a.other2score')
+        .m-t-1
+          button.btn.btn-default(@click='save') 保存
 block scripts
+  include ../../../publicModules/crop/crop_new
   +includeJS(`/experimental/settings/score/score.js`)

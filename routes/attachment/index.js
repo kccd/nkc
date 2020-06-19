@@ -13,6 +13,8 @@ router
           ctx.filePath = statics.defaultAvatarPath; break;
         case 'userBanner':
           ctx.filePath = statics.defaultUserBannerPath; break;
+        case 'scoreIcon':
+          ctx.filePath = statics.defaultScoreIconPath; break;
         default: ctx.throw(400, '数据未找到');
       }
     } else {

@@ -28,7 +28,9 @@ const defaultColumnBannerPath = defaultPath + "/column_banner.jpg";
 const defaultPosterPath = defaultPath + "/default_poster.jpg";
 const defaultRoleIconPath = staticPath + '/role_icon';
 const defaultHomeBigLogo = siteSpecificPath + '/kclogo_misaka1.png';
+const defaultScoreIconPath = staticPath + '/kcb.png';
 module.exports = {
+  defaultScoreIconPath,
   siteSpecificPath,
   defaultRoleIconPath,
   watermark: normalWatermark,

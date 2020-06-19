@@ -1,51 +1,95 @@
-function saveNumberSettings() {
-  var coefficients = {
-    postToForum: $('#postToForum').val(),
-    postToThread: $('#postToThread').val(),
-    digest: $('#digest').val(),
-    digestPost: $('#digestPost').val(),
-    dailyLogin: $('#dailyLogin').val(),
-    xsf: $('#xsf').val(),
-    thumbsUp: $('#thumbsUp').val(),
-    violation: $('#violation').val()
-  };
-  nkcAPI('/e/settings/number', 'PATCH', {coefficients: coefficients})
-    .then(function() {
-      screenTopAlert('保存成功');
-    })
-    .catch(function(data) {
-      screenTopWarning(data.error||data);
-    })
-}
-
-function updateFormula() {
-  var dailyLogin = $('#dailyLogin').val();
-  var postToForum = $('#postToForum').val();
-  var postToThread = $('#postToThread').val();
-  var digest = $('#digest').val();
-  var digestPost_ = $('#digestPost').val();
-  var thumbsUp = $('#thumbsUp').val();
-  var violation = $('#violation').val();
-  var xsf = $('#xsf').val();
-
-  var text = '公式：(在线天数 x ' + dailyLogin + ') + ' + '(文章数 x ' + postToForum + ') + (' + '回复数 x ' + postToThread + ') + (' + '精选文章数 x ' + digest + ') + (' + '精选回复数 x ' + digestPost_ + ') + (' + '被点赞数^(1/2) x ' + thumbsUp + ') + (' + '学术分 x ' + xsf + ') + (' + '违规数 x ' + violation + ')';
-  $('#formula').text(text);
-}
-
-$(function() {
-  updateFormula();
-  $('.formula input').on('input', function() {
-    updateFormula();
-  });
-});
-
 const data = NKC.methods.getDataById('data');
+const selectImage = new NKC.methods.selectImage();
+const {scores} = data.scoreSettings;
+const arr = [];
+const typeArr = [];
+const nameArr = [];
+const iconArr = [];
+const unitArr = [];
+const weightArr = [];
+const m2sArr = [];
+const s2mArr = [];
+const s2oArr = [];
+const o2sArr = [];
+
+for(const s of scores) {
+  const {
+    type, enabled, name, icon, unit,
+    money2score, score2other, other2score, score2money,
+    weight
+  } = s;
+  typeArr.push({
+    type,
+    enabled,
+  });
+  nameArr.push({
+    type,
+    name,
+  });
+  iconArr.push({
+    type,
+    icon,
+    iconFile: '',
+    iconData: ''
+  });
+  unitArr.push({
+    type,
+    unit
+  });
+  weightArr.push({
+    type,
+    weight
+  });
+  m2sArr.push({
+    type,
+    money2score
+  });
+  s2mArr.push({
+    type,
+    score2money
+  });
+  s2oArr.push({
+    type,
+    score2other
+  });
+  o2sArr.push({
+    type,
+    other2score
+  });
+}
+
 const app = new Vue({
   el: '#app',
   data: {
-
+    scoreSettings: data.scoreSettings,
+    typeArr,
+    nameArr,
+    iconArr,
+    unitArr,
+    weightArr,
+    m2sArr,
+    s2mArr,
+    s2oArr,
+    o2sArr
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
+    selectIcon(a) {
+      selectImage.show(blob => {
+        const file = NKC.methods.blobToFile(blob);
+        NKC.methods.fileToUrl(file)
+          .then(data => {
+            a.iconData = data;
+            a.iconFile = file;
+            selectImage.close();
+          });
+      }, {
+        aspectRatio: 1
+      });
+    },
+    save() {
 
+    }
   }
 });
+
