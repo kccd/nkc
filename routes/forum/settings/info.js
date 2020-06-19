@@ -48,7 +48,7 @@ infoRouter
 		if(sameName) ctx.throw(400, "专业简称已存在");
 		checkString(brief, {
 			name: '专业简介',
-			minLength: 1,
+			minLength: 0,
 			maxLength: 40
 		});
 		checkString(description, {
