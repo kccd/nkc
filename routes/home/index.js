@@ -49,7 +49,6 @@ router
       user
     );
 
-
     let q = {};
     let threadListType;
     if(t) {
@@ -324,6 +323,34 @@ router
       data.unReviewedCount = count;
     }
     data.paging = paging;
+
+    // 是否启用了基金
+    const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
+    let enableFund = fundSettings.c.enableFund;
+    if(enableFund) {
+      // 基金名称
+      data.fundName = fundSettings.c.fundName;
+      // 基金申请
+      const queryOfFunding = {
+        disabled: false,
+        'status.adminSupport': true,
+        'status.completed': {$ne: true}
+      };
+      const funding = await db.FundApplicationFormModel.find(queryOfFunding).sort({toc: -1}).limit(5);
+      data.fundApplicationForms = [];
+      for(const a of funding) {
+        await a.extendFund();
+        if(a.fund) {
+          await a.extendApplicant({
+            extendSecretInfo: false
+          });
+          await a.extendProject();
+          data.fundApplicationForms.push(a);
+        }
+      }
+    }
+    data.enableFund = enableFund;
+
     ctx.template = "home/home.pug";
     await next();
   });

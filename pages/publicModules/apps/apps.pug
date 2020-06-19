@@ -1,9 +1,10 @@
 +includeCSS("/publicModules/apps/apps.css")
 .module-apps.m-b-1
   .panel-header 网站应用
-  a.module-app(href="/fund")
-    img(src=`/statics/apps/fund.png`)
-    span 科创基金
+  if data.enableFund
+    a.module-app(href="/fund")
+      img(src=`/statics/apps/fund.png`)
+      span= data.fundName || "基金"
   if data.user
     a.module-app(href="/exam")
       img(src=`/statics/apps/exam.png`)
