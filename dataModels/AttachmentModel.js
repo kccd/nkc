@@ -59,19 +59,15 @@ const schema = new Schema({
 * 获取附件所在文件夹路径
 * @param {Boolean} upload true: 获取上传相关路径，false: 获取下载相关路径
 * */
-schema.statics.getAttachmentPath = async (upload) => {
+schema.statics.getAttachmentPath = async () => {
   const file = require("../nkcModules/file");
   const {attachment} = file.folders;
-  if(upload) {
-    const timePath = moment().format(`/YYYY/MM`);
-    const fullPath = await file.getFullPath(attachment + timePath);
-    return {
-      fullPath,
-      timePath,
-    }
-  } else {
-    return await file.getFullPath(attachment);
-  }
+  const timePath = moment().format(`/YYYY/MM`);
+  const fullPath = await file.getFullPath(attachment + timePath);
+  return {
+    fullPath,
+    timePath,
+  };
 }
 
 /*
@@ -160,9 +156,10 @@ schema.statics.saveHomeBigLogo = async file => {
 * @author pengxiguaa 2020/6/12
 * */
 schema.methods.getFilePath = async function(t) {
-  const AP = mongoose.model('attachments');
-  const attachmentPath = await AP.getAttachmentPath();
-  const {path, _id, ext} = this;
+  const file = require("../nkcModules/file");
+  const {path, _id, ext, toc} = this;
+  const {attachment} = file.folders;
+  const attachmentPath = await file.getFullPath(attachment, toc);
   const normalFilePath = `${attachmentPath}${path}/${_id}.${ext}`;
   const filePath = `${attachmentPath}${path}/${_id}${t?'_' + t: ''}.${ext}`;
 
