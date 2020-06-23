@@ -282,5 +282,51 @@ schema.statics.saveForumImage = async (fid, type, file) => {
   }
   return attachment;
 };
-
+/*
+* 保存积分的图标
+* @param {File} file 图片文件
+* @param {String} scoreType 积分类型
+* @return {Object} attachment object
+* @author pengxiguaa 2020/6/22
+* */
+schema.statics.saveScoreIcon = async (file, scoreType) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const SettingModel = mongoose.model('settings');
+  const FILE = require('../nkcModules/file');
+  const ext = await FILE.getFileExtension(file, ['png', 'jpg', 'jpeg']);
+  const aid = AttachmentModel.getNewId();
+  const {fullPath, timePath} = await AttachmentModel.getAttachmentPath();
+  const {size, name, path, hash} = file;
+  await ei.resize({
+    src: path,
+    dst: `${fullPath}/${aid}.png`,
+    height: 128,
+    width: 128,
+    quality: 90
+  });
+  await ei.resize({
+    src: path,
+    dst: `${fullPath}/${aid}_sm.png`,
+    height: 48,
+    width: 48,
+    quality: 90
+  });
+  const attachment = AttachmentModel({
+    _id: aid,
+    name,
+    size,
+    ext,
+    hash,
+    path: timePath,
+    type: 'scoreIcon'
+  });
+  await attachment.save();
+  const obj = {};
+  obj[`c.scores.${scoreType}.icon`] = aid;
+  await SettingModel.updateOne({_id: 'score'}, {
+    $set: obj
+  });
+  await SettingModel.saveSettingsToRedis('score');
+  return attachment;
+};
 module.exports = mongoose.model('attachments', schema);

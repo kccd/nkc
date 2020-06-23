@@ -1,6 +1,9 @@
 const data = NKC.methods.getDataById('data');
 const selectImage = new NKC.methods.selectImage();
 const {scores} = data.scoreSettings;
+data.scoreSettings._withdrawTimeBegin = getHMS(data.scoreSettings.withdrawTimeBegin);
+data.scoreSettings._withdrawTimeEnd = getHMS(data.scoreSettings.withdrawTimeEnd);
+
 const arr = [];
 const typeArr = [];
 const nameArr = [];
@@ -12,15 +15,21 @@ const s2mArr = [];
 const s2oArr = [];
 const o2sArr = [];
 
-const scoresObj = {};
+const types = [
+  'score1',
+  'score2',
+  'score3',
+  'score4',
+  'score5'
+];
 
-for(const s of scores) {
-  scoresObj[s.type] = s;
+for(const type of types) {
+  if(!scores.hasOwnProperty(type)) continue;
   const {
-    type, enabled, name, icon, unit,
+    enabled, name, icon, unit,
     money2score, score2other, other2score, score2money,
     weight
-  } = s;
+  } = scores[type];
   typeArr.push({
     type,
     enabled,
@@ -73,10 +82,50 @@ const app = new Vue({
     m2sArr,
     s2mArr,
     s2oArr,
-    o2sArr
+    o2sArr,
+
+    submitting: false,
+  },
+  computed: {
+    mainScoreSelect() {
+      const arr = [
+        {
+          type: '',
+          name: '无'
+        }
+      ];
+      this.nameArr.map(n => {
+        arr.push({
+          type: n.type,
+          name: n.name
+        });
+      });
+      return arr;
+    },
+    commonScoreSelect() {
+      const arr = [
+        {
+          type: '',
+          name: '无'
+        },
+        {
+          type: 'mainScore',
+          name: '交易积分'
+        }
+      ];
+      this.nameArr.map(n => {
+        arr.push({
+          type: n.type,
+          name: n.name
+        });
+      });
+      return arr;
+    }
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    getHMS,
+    HMSToNumber,
     selectIcon(a) {
       selectImage.show(blob => {
         const file = NKC.methods.blobToFile(blob);
@@ -95,6 +144,8 @@ const app = new Vue({
         typeArr, nameArr, iconArr, unitArr,
         weightArr, m2sArr, s2mArr, s2oArr, o2sArr
       } = this;
+      const scoreSettings = JSON.parse(JSON.stringify(this.scoreSettings));
+      const scoresObj = scoreSettings.scores;
       typeArr.map(({type, enabled}) => {
         scoresObj[type].enabled = enabled;
       });
@@ -119,15 +170,37 @@ const app = new Vue({
       o2sArr.map(({type, other2score}) => {
         scoresObj[type].other2score = other2score;
       });
-      this.scoreSettings.scores = scoresObj;
+      scoreSettings.withdrawTimeBegin = HMSToNumber(scoreSettings._withdrawTimeBegin);
+      scoreSettings.withdrawTimeEnd = HMSToNumber(scoreSettings._withdrawTimeEnd);
+      delete scoreSettings._withdrawTimeEnd;
+      delete scoreSettings._withdrawTimeBegin;
       const formData = new FormData();
-      formData.append('scoreSettings', JSON.stringify(this.scoreSettings));
+      formData.append('scoreSettings', JSON.stringify(scoreSettings));
       for(const icon of iconArr) {
         const {iconFile, type} = icon;
-        if(!iconFile) continue;
+        if (!iconFile) continue;
         formData.append(type, iconFile);
       }
+      nkcUploadFile('/e/settings/score', 'PATCH', formData)
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(err => {
+          sweetError(err);
+        });
     }
   }
 });
 
+
+function getHMS(t) {
+  return {
+    hour: Math.floor(t/3600000),
+    min: Math.floor(t/60000) % 60,
+    sec: Math.floor(t/1000) % 60
+  }
+}
+
+function HMSToNumber(t) {
+  return t.hour * 60 * 60 * 1000 + t.min * 60 * 1000 + t.sec * 1000;
+}

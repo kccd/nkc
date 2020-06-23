@@ -184,7 +184,7 @@
                   .selected-users(v-if="selectedUsers.length")
                     .selected-user(v-for="u in selectedUsers")
                       .selected-user-avatar
-                        img(:src="getUrl('userAvatar', u.avatar, 'sm'))
+                        img(:src="getUrl('userAvatar', u.avatar, 'sm')")
                       .selected-user-name {{u.username}}
                         .fa.fa-remove(@click="removeUser(index)")
 
