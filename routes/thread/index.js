@@ -729,6 +729,9 @@ threadRouter
         );
     }
 
+    // 帖子设置
+    data.threadSettings = await db.SettingModel.getSettings("thread");
+
     data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;
 		data.step = step;

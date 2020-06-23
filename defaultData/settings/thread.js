@@ -4,6 +4,10 @@ module.exports = {
     displayPostAttachments: {
       gradesId: [],
       rolesId: []
+    },
+    playerTips: {
+      isDisplay: false,
+      tipContent: ""
     }
   }
 };

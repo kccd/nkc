@@ -104,7 +104,10 @@ class StickerViewer {
               self.app.sticker = data.sticker;
               self.app.loading = false;
             })
-            .catch(sweetError);
+            .catch(data => {
+              sweetError(data);
+              self.app.close();
+            });
         },
         close() {
           self.dom.modal("hide");

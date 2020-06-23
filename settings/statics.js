@@ -28,6 +28,8 @@ const defaultColumnBannerPath = defaultPath + "/column_banner.jpg";
 const defaultPosterPath = defaultPath + "/default_poster.jpg";
 const defaultRoleIconPath = staticPath + '/role_icon';
 const defaultHomeBigLogo = siteSpecificPath + '/kclogo_misaka1.png';
+// 默认表情图
+const defualtStickerImage = defaultPath + '/default_avatar.gif';
 module.exports = {
   siteSpecificPath,
   defaultRoleIconPath,
@@ -57,5 +59,6 @@ module.exports = {
   defaultColumnAvatarPath,
   defaultColumnBannerPath,
   defaultPosterPath,
-  defaultHomeBigLogo
+  defaultHomeBigLogo,
+  defualtStickerImage
 };
