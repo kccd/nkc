@@ -103,8 +103,8 @@ const resourceSchema = new Schema({
 */
 resourceSchema.methods.getFilePath = async function() {
   const ResourceModel = mongoose.model('resources');
-  const {path} = this;
-  let filePath = await ResourceModel.getMediaPath(this.mediaType);
+  const {path, toc} = this;
+  let filePath = await ResourceModel.getMediaPath(this.mediaType, toc);
   filePath += path;
   return filePath;
 };
@@ -234,18 +234,20 @@ resourceSchema.statics.checkUploadPermission = async (user, file) => {
 /*
 * 获取附件文件夹路径，不包含文件
 * @param {String} type mediaAttachment: 附件, mediaPicture: 图片, mediaVideo: 视频, mediaAudio: 音频
+* @param {Date} t 基础时间，用于查找资源文件夹
 * @return {String} 文件夹路径
 * @author pengxiguaa 2020/6/17
 * */
-resourceSchema.statics.getMediaPath = async (type) => {
+resourceSchema.statics.getMediaPath = async (type, t) => {
   const file = require("../nkcModules/file");
   const mediaNames = {
     'mediaPicture': 'picture',
     'mediaVideo': 'video',
     'mediaAttachment': 'attachment',
-    'mediaAudio': 'audio'
+    'mediaAudio': 'audio',
+    'mediaOrigin': 'origin',
   };
-  return await file.getFullPath(file.folders.media + `/${mediaNames[type]}`);
+  return await file.getFullPath(file.folders.resource + `/${mediaNames[type]}`, t);
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

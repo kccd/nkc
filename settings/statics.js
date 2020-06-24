@@ -30,7 +30,9 @@ const defaultRoleIconPath = staticPath + '/role_icon';
 const defaultHomeBigLogo = siteSpecificPath + '/kclogo_misaka1.png';
 // 默认表情图
 const defualtStickerImage = defaultPath + '/default_avatar.gif';
+const defaultScoreIconPath = staticPath + '/kcb.png';
 module.exports = {
+  defaultScoreIconPath,
   siteSpecificPath,
   defaultRoleIconPath,
   watermark: normalWatermark,

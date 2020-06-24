@@ -16,8 +16,31 @@ func.folders = {
   resource: './resource',
 }
 
-func.getBasePath = async () => {
-  const now = Date.now();
+/*
+* 根据时间和配置文件获取资源所磁盘位置
+* 配置文件数据格式:
+* [
+*   {
+*      path: '路径2',
+*      startingTime: '1990-01-01',
+*      endTime: '2010-01-01'
+*   },
+*   {
+*      path: '路径2',
+*      startingTime: '2010-01-01',
+*      endTime: '2030-01-01'
+*   }
+* ]
+* @param {Date} t 时间，默认为当前时间
+* @return {String} 路径
+* */
+func.getBasePath = async (t) => {
+  let now;
+  if(t) {
+    now = new Date(t);
+  } else {
+    now = Date.now();
+  }
   if(!attachmentConfig.length) {
     return PATH.resolve(__dirname, '../resources');
   }
@@ -37,8 +60,8 @@ func.getBasePath = async () => {
   return basePath;
 }
 
-func.getFullPath = async (p) => {
-  const path = PATH.resolve(await func.getBasePath(), p);
+func.getFullPath = async (p, t) => {
+  const path = PATH.resolve(await func.getBasePath(t), p);
   await mkdirp(path);
   return path;
 };

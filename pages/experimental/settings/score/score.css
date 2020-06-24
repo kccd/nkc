@@ -1,0 +1,14 @@
+.checkbox-span {
+  padding-top: 0.25rem;
+  cursor: pointer;
+}
+.score-icon {
+  height: 2rem;
+  width: 2rem;
+  border: 1px solid #ddd;
+  display: inline-block;
+}
+.score-icon img {
+  height: 100%;
+  width: 100%;
+}
