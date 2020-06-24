@@ -248,4 +248,33 @@ settingSchema.statics.getWatermarkSettings = async () => {
   }
 };
 
+/*
+* 获取启用的积分ID
+* */
+settingSchema.statics.getEnabledScores = async () => {
+  const SettingModel = mongoose.model('settings');
+  const scoreSettings = await SettingModel.getSettings('score');
+  const {scores} = scoreSettings;
+  const types = [];
+  for(let i = 1; i <= 5; i++) {
+    const scoreType = `score${i}`;
+    if(scores[scoreType].enabled) {
+      types.push({
+        type: scoreType,
+        name: scores[scoreType].name,
+        unit: scores[scoreType].unit
+      });
+    }
+  }
+  return types;
+};
+
+/*
+* 获取交易积分
+* */
+settingSchema.statics.getMainScore = async () => {
+  const SettingModel = mongoose.model('settings');
+  const scoreSettings = await SettingModel.getSettings('score');
+  return scoreSettings.scores.score1;
+};
 module.exports = mongoose.model('settings', settingSchema);

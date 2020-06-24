@@ -1,6 +1,6 @@
 extends ../../bootstrap_base
 block title
-  title 科创币提现
+  title 提现中心
   +includeCSS('/account/finance/finance.css')
 block content
   .container-fluid.max-width
@@ -20,7 +20,9 @@ block content
             a(onclick="NKC.methods.visitUrl('/account/finance/withdraw')") 再次提现
           .row(v-else )
             .col-xs-12.col-xs-12
+              -const targetUserScores = data.userScores;
               include ./nav
+              include ../../account/finance/rechargeNav
             .col-xs-12.col-xs-12.m-t-1
               h5.text-danger 注意事项：
               ul

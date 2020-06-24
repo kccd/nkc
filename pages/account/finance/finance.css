@@ -13,8 +13,8 @@
 }
 .default-panel .kcb{
   border-bottom: 1px solid #eee;
-  font-weight: 700;
-  font-size: 2rem;
+  /*font-weight: 700;*/
+  font-size: 1.6rem;
   color: #a94442;
 }
 .default-panel input{
@@ -32,7 +32,7 @@
 .default-panel.active{
   border: 1px solid #337ab7;
 }
-.default-panel .pointer, .payment-pannel .pointer{
+.default-panel .pointer, .payment-panel .pointer{
   position: absolute;
   bottom: 0;
   height: 2rem;
@@ -42,7 +42,7 @@
   color: #fff;
   background-color: #337ab7;
 }
-.payment-pannel{
+.payment-panel{
   border: 1px solid #eee;
   min-height: 4rem;
   line-height: 4rem;
@@ -50,7 +50,7 @@
   text-align: center;
   position: relative;
 }
-.payment-pannel.active{
+.payment-panel.active{
   border: 1px solid #337ab7;
 }
 .pay{

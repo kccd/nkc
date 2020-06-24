@@ -45,6 +45,10 @@ router
       }
     } else {
       user.kcb = await db.UserModel.updateUserKcb(user.uid);
+      data.userScores = await db.UserModel.getUserScores(user.uid);
+      data.mainScore = await db.SettingModel.getMainScore();
+      const rechargeSettings = await db.SettingModel.getSettings('recharge');
+      data.rechargeSettings = rechargeSettings.recharge;
       ctx.template = 'account/finance/recharge.pug';
     }
     await next();

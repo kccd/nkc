@@ -29,6 +29,7 @@ router
         $gte: today
       }
     });
+    data.userScores = await db.UserModel.getUserScores(user.uid);
     ctx.template = 'account/finance/withdraw.pug';
     await next();
   })

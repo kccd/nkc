@@ -175,7 +175,9 @@
           if permission("experimentalEditorSettings")
             li
               a(href=`/e/settings/editor`) 编辑器
-
+          if permission("experimentalRechargeSettings")
+            li
+              a(href=`/e/settings/recharge`) 充值/提现
           <li role="separator" class="divider"></li>
           li
             a(href='/e/settings/home/logo') 网站首页

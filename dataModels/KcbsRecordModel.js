@@ -21,6 +21,12 @@ const kcbsRecordSchema = new Schema({
     default: Date.now,
     index: 1
   },
+  // 积分类型
+  scoreType: {
+    type: String,
+    required: true,
+    index: 1,
+  },
   // 交易类型
   type: {
     type: String,
@@ -99,11 +105,7 @@ const kcbsRecordSchema = new Schema({
   *  alipayName: String,
   *  alipayFee: Number,
   *  alipayInterface: Boolean  // 调用阿里接口是否成功 null: 未知，false: 失败， true: 成功
-  *
   * }
-  *
-  *
-  *
   * */
 }, {
   collection: 'kcbsRecords',
@@ -294,7 +296,7 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   });
 };
 
-/* 
+/*
   获取支付宝链接，去充值或付款。付款时需传递参数options.type = 'pay'
   @param options
     uid: 充值用户、付款用户
@@ -305,7 +307,7 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     notes: 账单说明，例如：充值23个科创币
     backParams: 携带的参数，会原样返回
   @return url: 返回链接
-  @author pengxiguaa 2019/3/13  
+  @author pengxiguaa 2019/3/13
 */
 kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   let {uid, money, ip, port, title, notes, backParams} = options;

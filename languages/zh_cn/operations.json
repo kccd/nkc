@@ -723,5 +723,7 @@
   "nkcManagementSection": "网站板块管理",
   "getAttachment": "获取附件（给所有人，内部有权限判断）",
 
-  "uploadHomeBigLogo": "上传首页大Logo"
+  "uploadHomeBigLogo": "上传首页大Logo",
+
+  "experimentalRechargeSettings": "后台管理 - 充值/提现设置"
 }

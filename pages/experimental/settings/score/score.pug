@@ -12,10 +12,11 @@ block eContent
           tbody
             tr
               th 启用
-              th(v-for='a in typeArr')
+              th(v-for='a, index in typeArr')
                 .checkbox
                   label
-                    input(type='checkbox' :value='true' v-model='a.enabled')
+                    input(type='checkbox' :value='true' v-model='a.enabled' v-if='index !== 0')
+                    input(type='checkbox' :value='true' v-model='a.enabled' disabled v-else)
                     .checkbox-span {{a.type}}
             tr
               th 名称
@@ -38,18 +39,6 @@ block eContent
                 input.form-control(type='text' v-model.number='a.weight' v-if='index === 0' disabled)
                 input.form-control(type='text' v-model.number='a.weight' v-else)
             tr
-              th 允许充值
-              th(v-for='a in m2sArr')
-                .checkbox
-                  label
-                    input(type='checkbox' :value='true' v-model='a.money2score')
-            tr
-              th 允许提现
-              th(v-for='a in s2mArr')
-                .checkbox
-                  label
-                    input(type='checkbox' :value='true' v-model='a.score2money')
-            tr
               th 兑出到其他积分
               th(v-for='a in s2oArr')
                 .checkbox
@@ -61,6 +50,9 @@ block eContent
                 .checkbox
                   label
                     input(type='checkbox' :value='true' v-model='a.other2score')
+            tr
+              th(colspan=10).score-operations-header
+                .text-center - 积分策略 -
             tr(v-for='o in scoreSettings.operations')
               th {{o.name}}
               th
@@ -77,12 +69,11 @@ block eContent
         h4 其他
         .form.form-horizontal
           .form-group
-            label.col-sm-2.control-label 交易积分
+            label.col-sm-2.control-label 系统账户名称
             .col-sm-3.form-inline
-              select.form-control(v-model='scoreSettings.mainScore')
-                option(v-for='n in mainScoreSelect' :value='n.type') {{n.name}}
+              input.form-control(type='text' v-model.trim='scoreSettings.nkcBankName')
           .form-group
-            label.col-sm-2.control-label 附件上传下载
+            label.col-sm-2.control-label 附件交易
             .col-sm-3.form-inline
               select.form-control(v-model='scoreSettings.attachmentScore')
                 option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
@@ -90,6 +81,16 @@ block eContent
             label.col-sm-2.control-label 商品买卖
             .col-sm-3.form-inline
               select.form-control(v-model='scoreSettings.shopScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 用户名修改
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.usernameScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
+            label.col-sm-2.control-label 去图片/视频水印
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.watermarkScore')
                 option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
           .form-group
             label.col-sm-2.control-label 鼓励转账
@@ -104,68 +105,6 @@ block eContent
             label.col-sm-2.control-label 最大鼓励数额
             .col-sm-3.form-inline
               input.form-control(type='text' v-model.number='scoreSettings.creditMax')
-      .col-xs-12.col-md-12.m-b-2
-        h4 提现设置
-        .form
-          .form-horizontal
-            .form-group
-              label.col-sm-2.control-label 提现
-              .col-sm-10
-                .radio
-                  label.m-r-1
-                    input(type='radio' :value="true" v-model='scoreSettings.withdrawEnabled')
-                    span 启用
-                  label
-                    input(type='radio' :value="false" v-model='scoreSettings.withdrawEnabled')
-                    span 禁用
-            .form-group
-              label.col-sm-2.control-label 最小提现金额
-              .col-sm-3.form-inline
-                input.form-control(type='text' v-model.number='scoreSettings.withdrawMin')
-                span &nbsp;元
-            .form-group
-              label.col-sm-2.control-label 最大提现金额
-              .col-sm-3.form-inline
-                input.form-control(type='text' v-model.number='scoreSettings.withdrawMin')
-                span &nbsp;元
-            .form-group
-              label.col-sm-2.control-label 每天最大提现次数
-              .col-sm-3.form-inline
-                input.form-control(type='text' v-model.number='scoreSettings.withdrawCountOneDay')
-            .form-group
-              label.col-sm-2.control-label 允许提现的时间段
-              .col-sm-10.form-inline
-                select.form-control(v-model.number="scoreSettings._withdrawTimeBegin.hour")
-                  -for (var i = 0; i < 24; i++)
-                    option(:value=i)=i
-                span 时
-                select.form-control(v-model.number="scoreSettings._withdrawTimeBegin.min")
-                  -for (var i = 0; i < 60; i++)
-                    option(:value=i)=i
-                span 分
-                select.form-control(v-model.number="scoreSettings._withdrawTimeBegin.sec")
-                  -for (var i = 0; i < 60; i++)
-                    option(:value=i)=i
-                span 秒
-                span.m-l-1.m-r-1 至
-                select.form-control(v-model.number="scoreSettings._withdrawTimeEnd.hour")
-                  -for (var i = 0; i < 24; i++)
-                    option(:value=i)=i
-                span 时
-                select.form-control(v-model.number="scoreSettings._withdrawTimeEnd.min")
-                  -for (var i = 0; i < 60; i++)
-                    option(:value=i)=i
-                span 分
-                select.form-control(v-model.number="scoreSettings._withdrawTimeEnd.sec")
-                  -for (var i = 0; i < 60; i++)
-                    option(:value=i)=i
-                span 秒
-            .form-group
-              label.col-sm-2.control-label 提现手续费
-              .col-sm-3.form-inline
-                input.form-control(type='text' v-model.number='scoreSettings.withdrawFee')
-                span &nbsp;%
-                h5 提现1000，实际到账{{1000 - 1000 * scoreSettings.withdrawFee / 100}}
       .col-xs-12.col-md-12.m-b-2
         h4
         .m-t-1

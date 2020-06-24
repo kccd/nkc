@@ -31,14 +31,9 @@ mixin item(record)
 
 
 div
-  h4 我的资产
-    small.p-l-1.text-success 科创币&nbsp;
-      strong.h4.text-danger= data.targetUser.kcb / 100
-      | &nbsp;个
-    .display-i-b.p-l-1
-      a.btn.btn-success.btn-sm(href="/account/finance/recharge") 充值
-      span &nbsp;
-      a.btn.btn-default.btn-sm(href="/account/finance/withdraw") 提现
+  -const targetUserScores = data.targetUserScores;
+  -const showRechargeButton = true;
+  include ../../account/finance/nav
   .ul.nav.nav-tabs
     li(role='presentation' class=data.t === 'all' ? 'active' : '')
       a(href=`/u/${data.targetUser.uid}/profile/finance?t=all` data-type="reload") 所有

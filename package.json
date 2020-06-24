@@ -89,7 +89,8 @@
     "xbbcode-parser": "^0.1.2",
     "xss": "^1.0.3",
     "pm2": "^4.4.0",
-    "file-type": "^14.6.1"
+    "file-type": "^14.6.1",
+    "mathjs": "^7.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
