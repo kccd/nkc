@@ -138,7 +138,6 @@ func.receipt1 = async (o) => {
   } else {
     notifyUrl = alipayConfig.notifyUrl || ""
   }
-  console.log(notifyUrl);
   goodsInfo = goodsInfo || [];
   const goods_detail = [];
   for(const g of goodsInfo) {

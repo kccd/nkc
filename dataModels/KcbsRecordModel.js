@@ -27,6 +27,12 @@ const kcbsRecordSchema = new Schema({
     required: true,
     index: 1,
   },
+  // 手续费
+  fee: {
+    type: Number,
+    default: 0,
+    index: 1,
+  },
   // 交易类型
   type: {
     type: String,
@@ -38,6 +44,11 @@ const kcbsRecordSchema = new Schema({
     type: Number,
     required: true,
     index: 1
+  },
+  // 实际付款金额（元，含手续费）
+  payment: {
+    type: Number,
+    default: null,
   },
   // 备注
   description: {
@@ -240,6 +251,12 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   const PostModel = mongoose.model('posts');
   const ForumModel = mongoose.model('forums');
   const KcbsTypeModel = mongoose.model('kcbsTypes');
+  const SettingModel = mongoose.model('settings');
+  const scoreTypes = await SettingModel.getScores();
+  const scoreTypesObj = {};
+  scoreTypes.map(s => {
+    scoreTypesObj[s.type] = s.name;
+  });
   const uid = new Set(), pid = new Set(), tid = new Set(), fid = new Set(), kcbsTypesId = new Set();
   for(const r of records) {
     if(r.from !== 'bank') {
@@ -291,6 +308,7 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     if(r.pid) {
       r.post = postsObj[r.pid];
     }
+    r.scoreName = scoreTypesObj[r.scoreType];
     r.kcbsType = typesObj[r.type];
     return r
   });
@@ -310,7 +328,7 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   @author pengxiguaa 2019/3/13
 */
 kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
-  let {uid, money, ip, port, title, notes, backParams} = options;
+  let {uid, money, ip, port, title, notes, backParams, score, fee} = options;
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const SettingModel = mongoose.model('settings');
   money = Number(money);
@@ -318,13 +336,17 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   else {
     throwErr(400, '金额必须大于0');
   }
+  const mainScore = await SettingModel.getMainScore();
   const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
   const record = KcbsRecordModel({
     _id: kcbsRecordId,
+    scoreType: mainScore.type,
     from: 'bank',
     to: uid,
     type: 'recharge',
-    num: money,
+    fee,
+    num: score,
+    payment: money,
     ip,
     port,
     verify: false,
@@ -332,7 +354,7 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   });
   await record.save();
   const o = {
-    money: money/100,
+    money,
     id: kcbsRecordId,
     title,
     notes,

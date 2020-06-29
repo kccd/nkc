@@ -4,7 +4,7 @@ block eTitle
   +includeCSS('/experimental/settings/recharge/recharge.css')
 block eContent
   #data.hidden=objToStr({rechargeSettings: data.rechargeSettings})
-  .container-fluid#app(v-cloak)
+  .container-fluid.max-width#app(v-cloak)
     .row(v-if='recharge && withdraw')
       .col-xs-12.col-md-12.m-b-2
         h4 充值设置

@@ -1,22 +1,16 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
-  -const mainContainer1400 = true;
-  +includeCSS('/experimental/index.css')
-  title 科创币交易记录
+block eTitle
+  title 积分交易记录
   style.
     tbody tr th {
       max-width: 12rem;
     }
-block content
+block eContent
 
   .container-fluid.max-width
     .row
-      include ../nav
       #app(v-cloak)
-        .col-xs-12.col-md-12
-          h2 科创人民银行
-            span.h4!= ` 科创币剩余 <strong style="color: #ffa100;font-size: 2rem;text-decoration: underline;">${data.kcbSettings.totalMoney/100}</strong> 个`
         .col-xs-12.col-md-12
           .hidden(ref='data')= JSON.stringify({kcbsRecords: data.kcbsRecords, content: data.content, t: data.t, operatingid: data.operatingid})
           h4 按条件查询记录
@@ -30,7 +24,7 @@ block content
             .form-group
               input.form-control(:placeholder='searchTextPlaceholder' v-model='searchText' @keyup.enter='searchUser')
             .form-group
-              | 操作名: 
+              | 操作名:
               select.form-control(v-model='searchOperatingId')
                 option(value='') 不限
                 each val, key in data.kcbsTypes
@@ -47,6 +41,7 @@ block content
               tr
                 th 时间
                 th 账单ID
+                th 积分名
                 th 操作名/操作ID
                 th 支出者
                 th 收入者
@@ -59,13 +54,14 @@ block content
               tr(v-for='(record, index) of kcbsRecords' :style="!record.verify?'background-color: #aaa;': ''")
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
                 th {{record._id}}
+                th {{record.scoreName}}
                 th {{record.typeInfo}}（{{record.type}}）
 
                 th
-                  span(v-if='record.from === "bank"') 科创人民很行
+                  span(v-if='record.from === "bank"')=data.nkcBankName
                   a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :title='"科创币：" + record.fromUser.kcb/100') {{record.fromUser.username}}
                 th
-                  span(v-if='record.to === "bank"') 科创人民很行
+                  span(v-if='record.to === "bank"')=data.nkcBankName
                   a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb/100') {{record.toUser.username}}
                 th {{record.num>0?'+':''}}{{record.num/100}}
                 th {{record.description}}

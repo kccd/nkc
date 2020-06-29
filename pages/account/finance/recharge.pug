@@ -46,12 +46,22 @@ block content
                     .pointer(v-if='payment === p.type')
                       .fa.fa-check
                     span {{p.name}}
-                .col-xs-12.m-t-1
-                  span.text-danger {{payInfo}}
-              hr
-              .text-center
-                h5.text-danger(v-if='error') {{error}}
-                button.pay.cp(@click='pay') 去支付
+                .col-xs-12.m-t-05
+                  span.fee-info {{payInfo}}
+              div(v-if="finalPrice && payment")
+                hr
+                .text-right
+                  .money-panel
+                    span.info {{mainScore.name}} {{finalPrice}} {{mainScore.unit}}：
+                    span.money {{finalPrice}}元
+                  .money-panel(v-if="fee > 0")
+                    span.info 手续费：
+                    span.money {{fee}}元
+                  .money-panel
+                    span.info.total 总计：
+                    span.money.total {{fee + finalPrice}}元
+                  h5.text-danger(v-if='error') {{error}}
+                  button.m-t-05.pay.cp(@click='pay') 去支付
           else
             .col-xs-12.p-t-2.p-b-1
               .text-center 充值功能已关闭

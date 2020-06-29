@@ -5,6 +5,7 @@
   position: relative;
   padding: 0 1rem;
   margin-bottom: 1rem;
+  user-select: none;
 }
 .default-panel>div{
   height: 5rem;
@@ -49,6 +50,7 @@
   cursor: pointer;
   text-align: center;
   position: relative;
+  user-select: none;
 }
 .payment-panel.active{
   border: 1px solid #337ab7;
@@ -74,4 +76,25 @@
   font-size: 1rem;
   line-height: 1.8rem;
   color: #a94442;
+}
+
+.fee-info{
+  color: #666;
+  font-size: 1rem;
+}
+
+.money-panel{
+
+}
+.money-panel .info{
+  font-size: 1rem;
+  font-style: oblique;
+}
+.money-panel .money{
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #e85a71;
+}
+.money-panel .money.total{
+  font-size: 1.4rem;
 }

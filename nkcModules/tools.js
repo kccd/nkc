@@ -1,7 +1,9 @@
 var Tools = function() {
   var self = this;
   self.getUrl = function(type, id, size) {
-    id = id || 'default';
+    if(['', undefined, null].includes(id)) {
+      id = 'default';
+    }
     var t = "?c=" + type;
     if(size) t += "&t=" + size;
     switch(type) {

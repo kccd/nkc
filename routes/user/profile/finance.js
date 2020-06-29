@@ -27,5 +27,6 @@ module.exports = async (ctx, next) => {
   data.t = t;
   targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
   data.targetUserScores = await db.UserModel.updateUserScores(targetUser.uid);
+  data.nkcBankName = await db.SettingModel.getNKCBankName();
   await next();
 };

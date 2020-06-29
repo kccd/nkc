@@ -37,7 +37,7 @@ func.folders = {
 func.getBasePath = async (t) => {
   let now;
   if(t) {
-    now = new Date(t);
+    now = new Date(t).getTime();
   } else {
     now = Date.now();
   }

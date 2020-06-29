@@ -27,14 +27,21 @@ const data = {
     usernameScore: 'score1',
     // 去水印使用的积分
     watermarkScore: 'score1',
+    // 发表奖励
+    postReward: 'score1',
+    // 精选奖励
+    digestReward: 'score1',
+    // 分享奖励
+    shareReward: 'score1',
     // 银行名称
     nkcBankName: '科创人民很行',
     // 交易系统
     scores: {
       score1: {
+        type: 'score1',
         enabled: true,
         // 积分名称
-        name: '积分1',
+        name: '积分一',
         // 积分图标，自定义时此字段为attachmentId
         icon: '',
         // 积分单位
@@ -48,7 +55,8 @@ const data = {
       },
       score2: {
         enabled: false,
-        name: '积分2',
+        type: 'score2',
+        name: '积分二',
         icon: '',
         unit: '分',
         score2other: false,
@@ -57,7 +65,8 @@ const data = {
       },
       score3: {
         enabled: false,
-        name: '积分3',
+        name: '积分三',
+        type: 'score3',
         icon: '',
         unit: '分',
         score2other: false,
@@ -66,7 +75,8 @@ const data = {
       },
       score4: {
         enabled: false,
-        name: '积分4',
+        type: 'score4',
+        name: '积分四',
         icon: '',
         unit: '分',
         score2other: false,
@@ -75,7 +85,8 @@ const data = {
       },
       score5: {
         enabled: false,
-        name: '积分5',
+        type: 'score5',
+        name: '积分五',
         icon: '',
         unit: '分',
         score2other: false,
