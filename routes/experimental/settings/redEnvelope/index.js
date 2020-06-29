@@ -3,7 +3,10 @@ const redEnvelopeRouter = new Router();
 redEnvelopeRouter
   .get('/', async (ctx, next) => {
     const {data, db} = ctx;
-    data.redEnvelopeSettings = (await db.SettingModel.findOnly({_id: 'redEnvelope'})).c;
+    data.redEnvelopeSettings = await db.SettingModel.getSettings('redEnvelope');
+    data.postRewardScore = await db.SettingModel.getScoreByOperationType('postRewardScore');
+    data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
+    data.shareRewardScore = await db.SettingModel.getScoreByOperationType('shareRewardScore');
     ctx.template = 'experimental/settings/redEnvelope.pug';
     await next();
   })

@@ -28,11 +28,11 @@ const data = {
     // 去水印使用的积分
     watermarkScore: 'score1',
     // 发表奖励
-    postReward: 'score1',
+    postRewardScore: 'score1',
     // 精选奖励
-    digestReward: 'score1',
+    digestRewardScore: 'score1',
     // 分享奖励
-    shareReward: 'score1',
+    shareRewardScore: 'score1',
     // 银行名称
     nkcBankName: '科创人民很行',
     // 交易系统

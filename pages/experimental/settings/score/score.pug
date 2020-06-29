@@ -11,50 +11,60 @@ block eContent
         table.table.table-bordered
           tbody
             tr
-              th 启用
-              th(v-for='a, index in typeArr')
+              th(colspan=3) 启用
+              th(v-for='a, index in scores')
                 .checkbox
                   label
                     input(type='checkbox' :value='true' v-model='a.enabled' v-if='index !== 0')
                     input(type='checkbox' :value='true' v-model='a.enabled' disabled v-else)
                     .checkbox-span {{a.type}}
             tr
-              th 名称
-              th(v-for='a in nameArr')
+              th(colspan=3) 名称
+              th(v-for='a in scores')
                 input.form-control(type='text' v-model.trim='a.name')
             tr
-              th 图标
+              th(colspan=3) 图标
               th(v-for='a in iconArr')
                 .score-icon
                   img(:src="a.iconData" v-if='a.iconData')
                   img(:src="getUrl('scoreIcon', a.icon)" v-else)
                 button.btn.btn-default.btn-xs(@click='selectIcon(a)') 更换
             tr
-              th 单位
-              th(v-for='a in unitArr')
+              th(colspan=3) 单位
+              th(v-for='a in scores')
                 input.form-control(type='text' v-model.trim='a.unit')
             tr
-              th 比重
-              th(v-for='a, index in weightArr')
+              th(colspan=3) 比重
+              th(v-for='a, index in scores')
                 input.form-control(type='text' v-model.number='a.weight' v-if='index === 0' disabled)
                 input.form-control(type='text' v-model.number='a.weight' v-else)
             tr
-              th 兑出到其他积分
-              th(v-for='a in s2oArr')
+              th(colspan=3) 兑出到其他积分
+              th(v-for='a in scores')
                 .checkbox
                   label
                     input(type='checkbox' :value='true' v-model='a.score2other')
             tr
-              th 从其他积分兑入
-              th(v-for='a in o2sArr')
+              th(colspan=3) 从其他积分兑入
+              th(v-for='a in scores')
                 .checkbox
                   label
                     input(type='checkbox' :value='true' v-model='a.other2score')
             tr
               th(colspan=10).score-operations-header
                 .text-center - 积分策略 -
+          tbody
+            tr
+              th 操作名
+              th 周期
+              th 次数
             tr(v-for='o in scoreSettings.operations')
               th {{o.name}}
+              th
+                select.form-control(v-model='o.cycle')
+                  option(value='day') 每天
+              th
+                input.form-control(type='text' v-model.number='o.count')
               th
                 input.form-control(type='text' v-model.number='o.score1')
               th
@@ -95,17 +105,17 @@ block eContent
           .form-group
             label.col-sm-2.control-label 随机红包
             .col-sm-3.form-inline
-              select.form-control(v-model='scoreSettings.postReward')
+              select.form-control(v-model='scoreSettings.postRewardScore')
                 option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
           .form-group
             label.col-sm-2.control-label 精选稿费
             .col-sm-3.form-inline
-              select.form-control(v-model='scoreSettings.digestReward')
+              select.form-control(v-model='scoreSettings.digestRewardScore')
                 option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
           .form-group
             label.col-sm-2.control-label 分享奖励
             .col-sm-3.form-inline
-              select.form-control(v-model='scoreSettings.shareReward')
+              select.form-control(v-model='scoreSettings.shareRewardScore')
                 option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
           .form-group
             label.col-sm-2.control-label 鼓励转账

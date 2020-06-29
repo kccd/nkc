@@ -643,7 +643,7 @@ function insertHtmlAtCaret(html) {
       range = sel.getRangeAt(0);
       //删除当前 Range 对象表示的文档区域
       range.deleteContents();
-      
+
       // Range.createContextualFragment() would be useful here but is
       // non-standard and not supported in all browsers (IE9, for one)
       //createElement() 方法可创建元素节点。
@@ -666,7 +666,7 @@ function insertHtmlAtCaret(html) {
         range.collapse(true);
         //从当前selection对象中移除所有的range对象
         sel.removeAllRanges();
-        sel.addRange(range);  
+        sel.addRange(range);
       }
     }
   } else if (document.selection && document.selection.type != "Control") {
@@ -1542,7 +1542,7 @@ function copyLink(id) {
   if(id) {
     var copyLinkId = "copyLink" + id;
     var obj = document.getElementById(copyLinkId);
-    obj.select(); 
+    obj.select();
   }else{
     return screenTopWarning("链接复制失败，请手动复制")
   }
@@ -1642,7 +1642,7 @@ function lottery() {
   nkcAPI('/lottery', 'POST', {})
     .then(function(data) {
       var result = data.result;
-      var kcb = data.kcb;
+      var score = data.score;
       var domClose = document.getElementsByClassName('lottery-close');
       if(domClose.length === 0) return;
       domClose = domClose[0];
@@ -1659,7 +1659,7 @@ function lottery() {
       header[0].innerText = result.name;
       var content = domOpen.getElementsByClassName('lottery-info');
       if(content.length === 0) return;
-      content[0].innerText = '获得' + numToFloatTwo(kcb) + '个科创币';
+      content[0].innerText = '获得' + score.name + numToFloatTwo(score.num) + score.unit;
     })
     .catch(function(data) {
       screenTopWarning(data.error || data);
@@ -1824,7 +1824,7 @@ function toggleNKCDrawer(type) {
         api.setFrameAttr({
           name: api.frameName,
           bounces: false
-        });        
+        });
       }
     }
     openNKCDrawer(type);
@@ -1990,7 +1990,7 @@ function openVideo(para, vid) {
   }catch(err) {
     console.log(err)
   }
-}  
+}
 
 /*
 * 设置文章或回复通过审核
@@ -2058,7 +2058,7 @@ function openToNewLocation(url, target) {
 
 /**
  * 给url添加apptype参数
- * @param {*} urlStr 
+ * @param {*} urlStr
  */
 function addApptypeToUrl(url) {
   // 去掉hash值

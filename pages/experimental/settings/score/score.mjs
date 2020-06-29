@@ -4,16 +4,8 @@ const {scores} = data.scoreSettings;
 data.scoreSettings._withdrawTimeBegin = getHMS(data.scoreSettings.withdrawTimeBegin);
 data.scoreSettings._withdrawTimeEnd = getHMS(data.scoreSettings.withdrawTimeEnd);
 
-const arr = [];
-const typeArr = [];
-const nameArr = [];
+
 const iconArr = [];
-const unitArr = [];
-const weightArr = [];
-const m2sArr = [];
-const s2mArr = [];
-const s2oArr = [];
-const o2sArr = [];
 
 const types = [
   'score1',
@@ -22,51 +14,18 @@ const types = [
   'score4',
   'score5'
 ];
-
+const _scores = [];
 for(const type of types) {
   if(!scores.hasOwnProperty(type)) continue;
+  _scores.push(scores[type]);
   const {
-    enabled, name, icon, unit,
-    money2score, score2other, other2score, score2money,
-    weight
+    icon
   } = scores[type];
-  typeArr.push({
-    type,
-    enabled,
-  });
-  nameArr.push({
-    type,
-    name,
-  });
   iconArr.push({
     type,
     icon,
     iconFile: '',
     iconData: ''
-  });
-  unitArr.push({
-    type,
-    unit
-  });
-  weightArr.push({
-    type,
-    weight
-  });
-  m2sArr.push({
-    type,
-    money2score
-  });
-  s2mArr.push({
-    type,
-    score2money
-  });
-  s2oArr.push({
-    type,
-    score2other
-  });
-  o2sArr.push({
-    type,
-    other2score
   });
 }
 
@@ -74,22 +33,15 @@ const app = new Vue({
   el: '#app',
   data: {
     scoreSettings: data.scoreSettings,
-    typeArr,
-    nameArr,
+    scores: _scores,
     iconArr,
-    unitArr,
-    weightArr,
-    m2sArr,
-    s2mArr,
-    s2oArr,
-    o2sArr,
-
     submitting: false,
   },
   computed: {
     mainScoreSelect() {
       const arr = [];
-      this.nameArr.map(n => {
+      this.scores.map(n => {
+        if(!n.enabled) return;
         arr.push({
           type: n.type,
           name: n.name
@@ -122,35 +74,9 @@ const app = new Vue({
     },
     save() {
       const {
-        typeArr, nameArr, iconArr, unitArr,
-        weightArr, m2sArr, s2mArr, s2oArr, o2sArr
+        iconArr
       } = this;
       const scoreSettings = JSON.parse(JSON.stringify(this.scoreSettings));
-      const scoresObj = scoreSettings.scores;
-      typeArr.map(({type, enabled}) => {
-        scoresObj[type].enabled = enabled;
-      });
-      nameArr.map(({type, name}) => {
-        scoresObj[type].name = name;
-      });
-      unitArr.map(({type, unit}) => {
-        scoresObj[type].unit = unit;
-      });
-      weightArr.map(({type, weight}) => {
-        scoresObj[type].weight = weight;
-      });
-      m2sArr.map(({type, money2score}) => {
-        scoresObj[type].money2score = money2score;
-      });
-      s2mArr.map(({type, score2money}) => {
-        scoresObj[type].score2money = score2money;
-      });
-      s2oArr.map(({type, score2other}) => {
-        scoresObj[type].score2other = score2other;
-      });
-      o2sArr.map(({type, other2score}) => {
-        scoresObj[type].other2score = other2score;
-      });
       scoreSettings.withdrawTimeBegin = HMSToNumber(scoreSettings._withdrawTimeBegin);
       scoreSettings.withdrawTimeEnd = HMSToNumber(scoreSettings._withdrawTimeEnd);
       delete scoreSettings._withdrawTimeEnd;

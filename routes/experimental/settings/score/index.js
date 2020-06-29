@@ -16,44 +16,38 @@ router
 		const {db, body, nkcModules} = ctx;
 		const {checkNumber, checkString} = nkcModules.checkData;
 		const {files, fields} = body;
-		const _files = [];
 		const scoreSettings = JSON.parse(fields.scoreSettings);
 		const {
-			moneyWeight, withdrawEnabled, withdrawMin, withdrawMax,
-			withdrawCountOneDay, withdrawTimeBegin, withdrawTimeEnd,
-			withdrawFee, creditMin, creditMax, mainScore, attachmentScore, shopScore,
+			creditMin, creditMax, nkcBankName,
 			scores
 		} = scoreSettings;
-		checkNumber(withdrawMin, {
-			name: '最小提现金额',
-			min: 0.01,
-			max: withdrawMax,
-			fractionDigits: 2,
+		const operationScores = {
+			attachmentScore: '附件交易',
+			shopScore: '商品交易',
+			usernameScore: '用户名修改',
+			watermarkScore: '去图片/视频水印',
+			postRewardScore: '随机红包',
+			digestRewardScore: '精选稿费',
+			shareRewardScore: '分享奖励',
+			creditScore: '鼓励转账'
+		};
+		checkString(nkcBankName, {
+			name: '系统账户名称',
+			minLength: 1,
+			maxLength: 20
 		});
-		checkNumber(withdrawMax, {
-			name: '最大提现金额',
-			min: withdrawMin,
-			fractionDigits: 2,
-		});
-		checkNumber(withdrawCountOneDay, {
-			name: '每天最大提现次数',
-			min: 0,
-		});
-		checkNumber(withdrawTimeBegin, {
-			name: '提现时间段',
-			min: 0,
-			max: withdrawTimeEnd,
-		});
-		checkNumber(withdrawTimeEnd, {
-			name: '提现时间段',
-			min: withdrawTimeBegin,
-		});
-		checkNumber(withdrawFee, {
-			name: '提现手续费',
-			min: 0,
-			max: 100,
-			fractionDigits: 4,
-		});
+		const enabledScoreTypes = [];
+		for(const scoreType in scores) {
+			if(!scores.hasOwnProperty(scoreType)) continue;
+			if(scores[scoreType].enabled) enabledScoreTypes.push(scoreType);
+		}
+		for(const operationName in operationScores) {
+			if(!operationScores.hasOwnProperty(operationName)) continue;
+			if(!enabledScoreTypes.includes(scoreSettings[operationName])) {
+				ctx.throw(400, `「${operationScores[operationName]}」积分类型设置错误，请检查`);
+			}
+		}
+
 		checkNumber(creditMin, {
 			name: '最小提现金额',
 			min: 0.01,
@@ -65,6 +59,7 @@ router
 			min: creditMin,
 			fractionDigits: 2,
 		});
+
 		await db.SettingModel.updateOne({_id: 'score'}, {
 			$set: {
 				c: scoreSettings

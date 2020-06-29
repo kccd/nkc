@@ -52,6 +52,7 @@ router
 		};
 		let message;
     const messageId = await db.SettingModel.operateSystemID('messages', 1);
+    const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
 		if(thread.oc === pid) {
 			await thread.update({digest: true, digestTime});
 			// await db.UsersScoreLogModel.insertLog(log);
@@ -59,6 +60,7 @@ router
         const record = db.KcbsRecordModel({
           _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
           from: 'bank',
+					scoreType: digestRewardScore.type,
           type: 'digestThreadAdditional',
           to: data.targetUser.uid,
           toc: digestTime,
@@ -95,6 +97,7 @@ router
         const record = db.KcbsRecordModel({
           _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
           from: 'bank',
+					scoreType: digestRewardScore.type,
           type: 'digestPostAdditional',
           to: data.targetUser.uid,
           toc: digestTime,

@@ -18,8 +18,7 @@ var app = new Vue({
   },
   mounted: function() {
     // var data = document.getElementById('data');
-    var data = this.$refs.data;
-    data = JSON.parse(data.innerText);
+    var data = NKC.methods.getDataById('data');
     // 处理随机红包
     for(var ra in data.redEnvelopeSettings.random.awards) {
       data.redEnvelopeSettings.random.awards[ra].kcb = numToFloatTwo(data.redEnvelopeSettings.random.awards[ra].kcb);

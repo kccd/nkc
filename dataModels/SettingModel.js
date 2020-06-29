@@ -270,6 +270,7 @@ settingSchema.statics.getEnabledScores = async () => {
 };
 /*
 * 获取全部积分
+* @return {[Object]} 所有的积分对象，只包含type、name、unit属性
 * */
 settingSchema.statics.getScores = async () => {
   const SettingModel = mongoose.model("settings");
@@ -288,6 +289,8 @@ settingSchema.statics.getScores = async () => {
 };
 /*
 * 获取交易积分
+* @return {Object} 积分对象
+* @author pengxiguaa 2020/6/24
 * */
 settingSchema.statics.getMainScore = async () => {
   const SettingModel = mongoose.model('settings');
@@ -296,6 +299,8 @@ settingSchema.statics.getMainScore = async () => {
 };
 /*
 * 获取积分银行名称
+* @return {String} 积分银行名称
+* @author pengxiguaa 2020/6/29
 * */
 settingSchema.statics.getNKCBankName = async () => {
   const SettingModel = mongoose.model('settings');
@@ -305,6 +310,8 @@ settingSchema.statics.getNKCBankName = async () => {
 
 /*
 * 获取充值设置
+* @return {Object} 充值设置
+* @author pengxiguaa 2020/6/29
 * */
 settingSchema.statics.getRechargeSettings = async () => {
   const SettingModel = mongoose.model('settings');
@@ -313,10 +320,42 @@ settingSchema.statics.getRechargeSettings = async () => {
 };
 /*
 * 获取提现设置
+* @return {Object} 提现设置
+* @author pengxiguaa 2020/6/29
 * */
 settingSchema.statics.getWithdrawSettings = async () => {
   const SettingModel = mongoose.model('settings');
   const rechargeSettings = await SettingModel.getSettings('recharge');
   return rechargeSettings.withdraw;
 };
+
+/*
+* 获取指定操作使用的积分类型
+* @param {String} type
+*   postRewardScore: 随机红包,
+*   digestRewardScore: 精选红包,
+*   shareRewardScore: 分享奖励
+*   watermarkScore: 去水印
+*   usernameScore: 修改用户名
+*   shopScore: 商品交易
+*   creditScore: 鼓励
+*   attachmentScore: 附件下载
+* */
+settingSchema.statics.getScoreByOperationType = async (type) => {
+  const SettingModel = mongoose.model('settings');
+  if(![
+    'postRewardScore',
+    'digestRewardScore',
+    'shareRewardScore',
+    'waterRewardScore',
+    'usernameScore',
+    'shopScore',
+    'creditScore',
+    'attachmentScore'
+  ].includes(type)) throwErr(500, `未知的操作类型 type: ${type}`);
+  const scoreSettings = await SettingModel.getSettings('score');
+  const scoreName = scoreSettings[type];
+  return scoreSettings.scores[scoreName];
+};
+
 module.exports = mongoose.model('settings', settingSchema);
