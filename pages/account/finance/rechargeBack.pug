@@ -8,18 +8,18 @@ block content
       include ../../publicModules/icon-success
       div(v-if='pay')
         h3 付款成功
-        h5 您已成功付款&nbsp;
-          span.text-danger {{money/100}}
-          |&nbsp;元
+        //h5 你已成功付款&nbsp;
+        //  span.text-danger {{money/100}}
+        //  |&nbsp;元
         a(href='/shop/order?t=unShip') 查看订单
-      div(v-else)  
+      div(v-else)
         h3 充值成功
-        h5 您已成功充值&nbsp;
+        h5 你已成功充值{{mainScore.name}}&nbsp;
           span.text-danger {{money/100}}
-          |&nbsp;个科创币，账户当前科创币总计&nbsp;
-          span.text-danger {{kcb/100}}
-          |&nbsp;个
-        a(href='/account/finance').m-r-1 查看记录
+          |&nbsp;{{mainScore.unit}}，账户当前{{mainScore.name}}总计&nbsp;
+          span.text-danger {{userMainScore/100}}
+          |&nbsp;{{mainScore.unit}}
+        a(href=`/u/${data.user.uid}/profile/finance`).m-r-1 查看记录
         a(href='/account/finance/recharge') 再次充值
     div(v-else).p-t-3.p-b-3
       h4  付款信息确认中，请稍后 {{info}}
@@ -34,6 +34,8 @@ block scripts
         money: 0,
         kcb: 0,
         pay: false,
+        mainScore: '',
+        userMainScore: '',
         kcbsRecordId: ''
       },
       methods: {
@@ -44,10 +46,12 @@ block scripts
               if(data.verify) {
                 this_.kcb = data.user.kcb;
                 this_.money = data.money;
+                this_.userMainScore = data.userMainScore;
+                this_.mainScore = data.mainScore;
                 this_.success = true;
               } else {
                 setTimeout(function() {
-                 this_.verify(); 
+                 this_.verify();
                 }, 2000);
               }
             })
@@ -67,7 +71,7 @@ block scripts
           setTimeout(function() {
             this_.waiting();
           }, 200);
-        } 
+        }
       },
       mounted: function() {
         var data = document.getElementById('data');
@@ -77,4 +81,4 @@ block scripts
         this.verify();
         this.waiting();
       }
-    });    
+    });

@@ -17,77 +17,80 @@ const data = {
     // 鼓励转账金额限制
     creditMin: 0.01, // 最小金额
     creditMax: 0.01, // 最大金额
-    // 交易积分类型
-    mainScore: '',
     // 附件上传下载扣除的积分类型
-    attachmentScore: 'mainScore',
+    attachmentScore: 'score1',
     // 鼓励扣除的积分类型
-    creditScore: 'mainScore',
+    creditScore: 'score1',
     // 商品交易使用的积分
-    shopScore: 'mainScore',
+    shopScore: 'score1',
+    // 修改用户名使用的积分
+    usernameScore: 'score1',
+    // 去水印使用的积分
+    watermarkScore: 'score1',
+    // 发表奖励
+    postReward: 'score1',
+    // 精选奖励
+    digestReward: 'score1',
+    // 分享奖励
+    shareReward: 'score1',
+    // 银行名称
+    nkcBankName: '科创人民很行',
     // 交易系统
     scores: {
       score1: {
+        type: 'score1',
         enabled: true,
         // 积分名称
-        name: '积分1',
+        name: '积分一',
         // 积分图标，自定义时此字段为attachmentId
         icon: '',
         // 积分单位
         unit: '分',
-        // 是否允许充值
-        money2score: false,
         // 兑出
         score2other: false,
         // 兑入
         other2score: false,
-        // 是否允许提现
-        score2money: false,
         // 积分比重
         weight: 1,
       },
       score2: {
         enabled: false,
-        name: '积分2',
+        type: 'score2',
+        name: '积分二',
         icon: '',
         unit: '分',
-        money2score: false,
         score2other: false,
         other2score: false,
-        score2money: false,
         weight: 1,
       },
       score3: {
         enabled: false,
-        name: '积分3',
+        name: '积分三',
+        type: 'score3',
         icon: '',
         unit: '分',
-        money2score: false,
         score2other: false,
         other2score: false,
-        score2money: false,
         weight: 1,
       },
       score4: {
         enabled: false,
-        name: '积分4',
+        type: 'score4',
+        name: '积分四',
         icon: '',
         unit: '分',
-        money2score: false,
         score2other: false,
         other2score: false,
-        score2money: false,
         weight: 1,
       },
       score5: {
         enabled: false,
-        name: '积分5',
+        type: 'score5',
+        name: '积分五',
         icon: '',
         unit: '分',
-        money2score: false,
         score2other: false,
         other2score: false,
-        score2money: false,
         weight: 1,
       }
     },

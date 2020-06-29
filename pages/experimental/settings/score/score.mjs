@@ -88,12 +88,7 @@ const app = new Vue({
   },
   computed: {
     mainScoreSelect() {
-      const arr = [
-        {
-          type: '',
-          name: '无'
-        }
-      ];
+      const arr = [];
       this.nameArr.map(n => {
         arr.push({
           type: n.type,
@@ -103,29 +98,15 @@ const app = new Vue({
       return arr;
     },
     commonScoreSelect() {
-      const arr = [
-        {
-          type: '',
-          name: '无'
-        },
-        {
-          type: 'mainScore',
-          name: '交易积分'
-        }
-      ];
-      this.nameArr.map(n => {
-        arr.push({
-          type: n.type,
-          name: n.name
-        });
-      });
-      return arr;
+      return this.mainScoreSelect;
     }
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     getHMS,
     HMSToNumber,
+    checkString: NKC.methods.checkData.checkString,
+    checkNumber: NKC.methods.checkData.checkNumber,
     selectIcon(a) {
       selectImage.show(blob => {
         const file = NKC.methods.blobToFile(blob);

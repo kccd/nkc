@@ -12,3 +12,11 @@
   height: 100%;
   width: 100%;
 }
+.score-operations-header {
+  height: 2rem;
+  width: 100%;
+  background-color: #f4f4f4;
+}
+.score-operations-header .text-center {
+  color: #888;
+}

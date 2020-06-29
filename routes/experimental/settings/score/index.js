@@ -24,11 +24,6 @@ router
 			withdrawFee, creditMin, creditMax, mainScore, attachmentScore, shopScore,
 			scores
 		} = scoreSettings;
-		checkNumber(moneyWeight, {
-			name: '提现比重',
-			min: 0.01,
-			fractionDigits: 2,
-		});
 		checkNumber(withdrawMin, {
 			name: '最小提现金额',
 			min: 0.01,
@@ -84,16 +79,4 @@ router
 		}
 		await next();
 	})
-	.patch('/123', async (ctx, next) => {
-		const {db, body} = ctx;
-		const {coefficients} = body;
-		for(key in coefficients) {
-			if(!coefficients.hasOwnProperty(key)) continue;
-			coefficients[key] = parseFloat(coefficients[key]);
-		}
-		const scoreSettings = await db.SettingModel.findOnly({_id: 'score'});
-		await scoreSettings.update({'c.coefficients': coefficients});
-		await db.SettingModel.saveSettingsToRedis("score");
-		await next();
-	});
 module.exports = router;

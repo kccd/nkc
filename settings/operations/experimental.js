@@ -280,6 +280,10 @@ module.exports = {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'
     },
+		recharge: {
+			GET: 'experimentalRechargeSettings',
+			PATCH: 'experimentalRechargeSettings',
+		}
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',

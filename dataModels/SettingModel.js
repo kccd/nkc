@@ -248,4 +248,75 @@ settingSchema.statics.getWatermarkSettings = async () => {
   }
 };
 
+/*
+* 获取启用的积分ID
+* */
+settingSchema.statics.getEnabledScores = async () => {
+  const SettingModel = mongoose.model('settings');
+  const scoreSettings = await SettingModel.getSettings('score');
+  const {scores} = scoreSettings;
+  const types = [];
+  for(let i = 1; i <= 5; i++) {
+    const scoreType = `score${i}`;
+    if(scores[scoreType].enabled) {
+      types.push({
+        type: scoreType,
+        name: scores[scoreType].name,
+        unit: scores[scoreType].unit
+      });
+    }
+  }
+  return types;
+};
+/*
+* 获取全部积分
+* */
+settingSchema.statics.getScores = async () => {
+  const SettingModel = mongoose.model("settings");
+  const scoreSettings = await SettingModel.getSettings('score');
+  const {scores} = scoreSettings;
+  const types = [];
+  for(let i = 1; i <= 5; i++) {
+    const scoreType = `score${i}`;
+    types.push({
+      type: scoreType,
+      name: scores[scoreType].name,
+      unit: scores[scoreType].unit
+    })
+  }
+  return types;
+};
+/*
+* 获取交易积分
+* */
+settingSchema.statics.getMainScore = async () => {
+  const SettingModel = mongoose.model('settings');
+  const scoreSettings = await SettingModel.getSettings('score');
+  return scoreSettings.scores.score1;
+};
+/*
+* 获取积分银行名称
+* */
+settingSchema.statics.getNKCBankName = async () => {
+  const SettingModel = mongoose.model('settings');
+  const scoreSettings = await SettingModel.getSettings('score');
+  return scoreSettings.nkcBankName;
+}
+
+/*
+* 获取充值设置
+* */
+settingSchema.statics.getRechargeSettings = async () => {
+  const SettingModel = mongoose.model('settings');
+  const rechargeSettings = await SettingModel.getSettings('recharge');
+  return rechargeSettings.recharge;
+};
+/*
+* 获取提现设置
+* */
+settingSchema.statics.getWithdrawSettings = async () => {
+  const SettingModel = mongoose.model('settings');
+  const rechargeSettings = await SettingModel.getSettings('recharge');
+  return rechargeSettings.withdraw;
+};
 module.exports = mongoose.model('settings', settingSchema);

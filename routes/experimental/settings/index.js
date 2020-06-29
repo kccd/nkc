@@ -40,6 +40,7 @@ const transferRouter = require("./transfer");
 const libraryRouter = require("./library");
 const stickerRouter = require("./sticker");
 const editorRouter = require("./editor");
+const rechargeRouter = require('./recharge');
 const userSensitiveRouter = require("./userSensitive");
 settingRouter
 	.get('/', async (ctx, next) => {
@@ -88,5 +89,6 @@ settingRouter
 	.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
 	.use("/editor", editorRouter.routes(), editorRouter.allowedMethods())
 	.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods())
+	.use('/recharge', rechargeRouter.routes(), rechargeRouter.allowedMethods())
 	.use('/sensitive', userSensitiveRouter.routes(), userSensitiveRouter.allowedMethods());
 module.exports = settingRouter;

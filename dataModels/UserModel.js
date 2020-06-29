@@ -1191,10 +1191,10 @@ userSchema.statics.getUsersFriendsId = async (uid) => {
 userSchema.statics.uploadedAvatar = async (attachId) => {
   if(!attachId) return false;
   const AM = mongoose.model('attachments');
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
-  const attachment = await AM.findOnly({_id: attachId});
+  const attachment = await AM.findOne({_id: attachId});
   if(!attachment) return false;
-  return existsSync(`${fullPath}/${attachId}.${attachment.ext}`);
+  const filePath = await attachment.getFilePath();
+  return existsSync(filePath);
 };
 
 /**
@@ -1205,10 +1205,10 @@ userSchema.statics.uploadedAvatar = async (attachId) => {
 userSchema.statics.uploadedBanner = async (attachId) => {
   if(!attachId) return false;
   const AM = mongoose.model('attachments');
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
-  const attachment = await AM.findOnly({_id: attachId});
+  const attachment = await AM.findOne({_id: attachId});
   if(!attachment) return false;
-  return existsSync(`${fullPath}/${attachId}.${attachment.ext}`);
+  const filePath = await attachment.getFilePath();
+  return existsSync(filePath);
 };
 
 /*
@@ -1844,4 +1844,140 @@ userSchema.methods.setRedEnvelope = async function() {
   }
 };
 
+/*
+* 根据积分记录更新用户的指定积分值
+* @param {String} uid 用户ID
+* @param {String} scoreType 积分类型
+* @return {Number} 新的积分值
+* @author pengxiguaa 2020/6/24
+* */
+userSchema.statics.updateUserScore = async (uid, scoreType) => {
+  const UserModel = mongoose.model('users');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const user = await UserModel.findOne({uid}, {uid: 1});
+  if(!user) throwErr(500, `用户未找到 uid:${uid}`);
+  if(!['score1', 'score2', 'score3', 'score4', 'score5'].includes(scoreType))
+    throwErr(500, `积分类型错误 type: ${scoreType}`);
+  const fromRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        scoreType,
+        from: uid,
+        verify: true
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const toRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        scoreType,
+        to: uid,
+        verify: true
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const expenses = fromRecords.length? fromRecords[0].total: 0;
+  const income = toRecords.length? toRecords[0].total: 0;
+  const total = income - expenses;
+  const obj = {};
+  obj[scoreType] = total;
+  await UsersPersonalModel.updateOne({uid}, {
+    $set: obj
+  });
+  return total;
+};
+/*
+* 获取用户的指定积分
+* @param {String} uid 用户ID
+* @param {String} scoreType 积分类型
+* @return {Number} 积分值
+* @author pengxiguaa 2020/06/24
+* */
+userSchema.statics.getUserScore = async (uid, scoreType) => {
+  if(!['score1', 'score2', 'score3', 'score4', 'score5'].includes(scoreType))
+    throwErr(500, `积分类型错误 type: ${scoreType}`);
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const usersPersonal = await UsersPersonalModel.findOne({uid}, {
+    score1: 1,
+    score2: 1,
+    score3: 1,
+    score4: 1,
+    score5: 1
+  });
+  if(!usersPersonal) throwErr(400, `用户未找到 uid: ${uid}`);
+  return usersPersonal[scoreType];
+};
+/*
+* 获取用户的交易积分
+* @param {String} uid 用户ID
+* @return {Number} 积分值
+* @author pengxiguaa 2020/6/24
+* */
+userSchema.statics.getUserMainScore = async (uid) => {
+  const UserModel = mongoose.model('users');
+  return await UserModel.getUserScore(uid, 'score1');
+};
+
+/*
+* 获取用户所有已开启的积分
+* @param {String} uid 用户ID
+* @return {Object} {score1: Number, score2: Number, ...}
+* @author pengxiguaa 2020/6/24
+* */
+userSchema.statics.getUserScores = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const enabledScores = await SettingModel.getEnabledScores();
+  const arr = [];
+  for(const score of enabledScores) {
+    const {type, name, unit} = score;
+    arr.push({
+      type,
+      name,
+      unit,
+      number: await UserModel.getUserScore(uid, type)
+    });
+  }
+  return arr;
+};
+
+/*
+* 更新用户所有积分
+* @param {String} uid 用户ID
+* @return {Object} {score1: Number, score2: Number, ...}
+* @author pengxiguaa 2020/6/24
+* */
+userSchema.statics.updateUserScores = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const enabledScores = await SettingModel.getEnabledScores();
+  const arr = [];
+  for(const score of enabledScores) {
+    const {type, name, unit} = score;
+    arr.push({
+      type,
+      name,
+      unit,
+      number: await UserModel.updateUserScore(uid, type)
+    });
+  }
+  return arr;
+};
 module.exports = mongoose.model('users', userSchema);

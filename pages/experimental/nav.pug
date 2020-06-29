@@ -65,7 +65,7 @@
           li
             a(href='/e/log/exam') 考试
           li
-            a(href='/e/log/kcb') 科创币
+            a(href='/e/log/kcb') 积分
           li
             a(href='/e/log/xsf') 学术分
           li
@@ -175,7 +175,9 @@
           if permission("experimentalEditorSettings")
             li
               a(href=`/e/settings/editor`) 编辑器
-
+          if permission("experimentalRechargeSettings")
+            li
+              a(href=`/e/settings/recharge`) 充值/提现
           <li role="separator" class="divider"></li>
           li
             a(href='/e/settings/home/logo') 网站首页

@@ -34,8 +34,7 @@ kcbRouter
     if(operatingid) {
       q.type = operatingid;
     }
-    let kcbsTypes = state.language['kcbsTypes'];
-    data.kcbsTypes = kcbsTypes;
+    data.kcbsTypes = state.language['kcbsTypes'];
     const count = await db.KcbsRecordModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -43,15 +42,12 @@ kcbRouter
     for(const record of data.kcbsRecords) {
       record.typeInfo = ctx.state.lang("kcbsTypes", record.type);
     }
-
-    data.kcbSettings = {
-      totalMoney: await db.UserModel.updateUserKcb("bank")
-    };
     // data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
     data.paging = paging;
     data.t = t;
     data.content = content;
     data.operatingid = operatingid;
+    data.nkcBankName = await db.SettingModel.getNKCBankName();
     ctx.template = 'experimental/log/kcb.pug';
     await next();
   })

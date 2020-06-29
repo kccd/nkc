@@ -1,0 +1,146 @@
+extends ../../experimental
+block eTitle
+  title 充值/提现设置
+  +includeCSS('/experimental/settings/recharge/recharge.css')
+block eContent
+  #data.hidden=objToStr({rechargeSettings: data.rechargeSettings})
+  .container-fluid.max-width#app(v-cloak)
+    .row(v-if='recharge && withdraw')
+      .col-xs-12.col-md-12.m-b-2
+        h4 充值设置
+        .form-horizontal
+          .form-group
+            label.col-sm-2.control-label 充值
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type='radio' :value="true" v-model='recharge.enabled')
+                  span 启用
+                label
+                  input(type='radio' :value="false" v-model='recharge.enabled')
+                  span 禁用
+          .form-group
+            label.col-sm-2.control-label 单次最小充值金额
+            .col-sm-3.form-inline
+              input.form-control(type='text' v-model.number='recharge._min')
+              span &nbsp;元
+          .form-group
+            label.col-sm-2.control-label 单次最大充值金额
+            .col-sm-3.form-inline
+              input.form-control(type='text' v-model.number='recharge._max')
+              span &nbsp;元
+          .form-group
+            label.col-sm-2.control-label 支付平台
+            .col-sm-3
+              table.table.table-bordered
+                thead
+                  tr
+                    th 平台
+                    th 提现手续费(%)
+                    th 启用
+                tbody
+                  tr
+                    th 支付宝
+                    th
+                      input.form-control(type='text' v-model.number='recharge.aliPay._fee')
+                    th
+                      .checkbox
+                        label
+                          input(type='checkbox' :value='true' v-model='recharge.aliPay.enabled')
+                  tr
+                    th 微信支付
+                    th
+                      input.form-control(type='text' v-model.number='recharge.weChat._fee')
+                    th
+                      .checkbox
+                        label
+                          input(type='checkbox' :value='true' v-model='recharge.weChat.enabled')
+      .col-xs-12.col-md-12
+        h4 提现设置
+        .form-horizontal
+          .form-group
+            label.col-sm-2.control-label 提现
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type='radio' :value="true" v-model='withdraw.enabled')
+                  span 启用
+                label
+                  input(type='radio' :value="false" v-model='withdraw.enabled')
+                  span 禁用
+          .form-group
+            label.col-sm-2.control-label 单次最小提现金额
+            .col-sm-3.form-inline
+              input.form-control(type='text' v-model.number='withdraw._min')
+              span &nbsp;元
+          .form-group
+            label.col-sm-2.control-label 单次最大提现金额
+            .col-sm-3.form-inline
+              input.form-control(type='text' v-model.number='withdraw._max')
+              span &nbsp;元
+          .form-group
+            label.col-sm-2.control-label 每天最大提现次数
+            .col-sm-3.form-inline
+              input.form-control(type='text' v-model.number='withdraw.countOneDay')
+          .form-group
+            label.col-sm-2.control-label 允许提现的时间段
+            .col-sm-10.form-inline
+              select.form-control(v-model.number="withdraw._startingTime.hour")
+                -for (var i = 0; i < 24; i++)
+                        option(:value=i)=i
+              span 时
+              select.form-control(v-model.number="withdraw._startingTime.min")
+                -for (var i = 0; i < 60; i++)
+                        option(:value=i)=i
+              span 分
+              select.form-control(v-model.number="withdraw._startingTime.sec")
+                -for (var i = 0; i < 60; i++)
+                        option(:value=i)=i
+              span 秒
+              span.m-l-1.m-r-1 至
+              select.form-control(v-model.number="withdraw._endTime.hour")
+                -for (var i = 0; i < 24; i++)
+                        option(:value=i)=i
+              span 时
+              select.form-control(v-model.number="withdraw._endTime.min")
+                -for (var i = 0; i < 60; i++)
+                        option(:value=i)=i
+              span 分
+              select.form-control(v-model.number="withdraw._endTime.sec")
+                -for (var i = 0; i < 60; i++)
+                        option(:value=i)=i
+              span 秒
+          .form-group
+            label.col-sm-2.control-label 支付平台
+            .col-sm-3
+              table.table.table-bordered
+                thead
+                  tr
+                    th 平台
+                    th 提现手续费(%)
+                    th 启用
+                tbody
+                  tr
+                    th 支付宝
+                    th
+                      input.form-control(type='text' v-model.number='withdraw.aliPay._fee')
+                    th
+                      .checkbox
+                        label
+                          input(type='checkbox' :value='true' v-model='withdraw.aliPay.enabled')
+                  tr
+                    th 微信支付
+                    th
+                      input.form-control(type='text' v-model.number='withdraw.weChat._fee')
+                    th
+                      .checkbox
+                        label
+                          input(type='checkbox' :value='true' v-model='withdraw.weChat.enabled')
+
+        .m-t-2
+          button.btn.btn-primary(@click='save' v-if='!submitting') 保存
+          button.btn.btn-primary(v-else disabled) 保存中...
+            .fa.fa-spinner.fa-spin
+block scripts
+  include ../../../publicModules/math
+  +includeJS('/experimental/settings/recharge/recharge.js')
