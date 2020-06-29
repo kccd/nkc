@@ -110,18 +110,6 @@ const audioWMATransMP3 = async (inputPath, outputPath) => {
 }
 
 /**
- * 视频加水印
- * @param {Object} options 配置
- * videoPath 视频路径, imagePath 水印路径, output 输出位置, position 水印位置, scale 水印大小, alpha 水印透明度 
- */
-const addWaterMask = async (op) => {
-  op.position = op.position || {x: 10, y: 10};
-  op.scale = op.scale || {width: 40, height: 40};
-  op.alpha = op.alpha || 400;
-  return spawnProcess('ffmpeg', ['-i', op.videoPath, '-i', op.imagePath, '-filter_complex', `[1:v]scale=${op.scale.width}:${op.scale.height}[scale];[scale]geq=a='${op.alpha}':lum='lum(X,Y)':cb='cb(X,Y)':cr='cr(X,Y)'[trans];[0:v][trans]overlay=${op.position.x}:${op.position.y}`, op.output]);
-}
-
-/**
  * 获取视频的帧宽高
  * @param {string} inputPath 视频路径
  */
@@ -168,46 +156,6 @@ const getImageSize = async (inputPath) => {
 }
 
 /**
- * 添加水印到左上角
- * @param {object} op 配置
- */
-const addWaterMasktoNorthwest = async (op) => {
-  return addWaterMask({...op, position: {x: 12, y: 12}});
-}
-
-/**
- * 添加水印到右上角
- * @param {object} op 配置
- */
-const addWaterMasktoNortheast = async (op) => {
-  return addWaterMask({...op, position: {x: "W-w-12", y: 12}});
-}
-
-/**
- * 添加水印到右下角
- * @param {object} op 配置
- */
-const addWaterMasktoSoutheast = async (op) => {
-  return addWaterMask({...op, position: {x: "W-w-12", y: "H-h-12"}});
-}
-
-/**
- * 添加水印到左下角
- * @param {object} op 配置
- */
-const addWaterMasktoSouthwest = async (op) => {
-  return addWaterMask({...op, position: {x: 12, y: "H-h-12"}});
-}
-
-/**
- * 添加水印到正中间
- * @param {object} op 配置
- */
-const addWaterMasktoCenter = async (op) => {
-  return addWaterMask({...op, position: {x: "(W-w)/2", y: "(H-h)/2"}});
-}
-
-/**
  * ffmpeg滤镜处理
  * @param {string} inputPath 输入文件路径
  * @param {array} filters 滤镜指令（数组，一层滤镜一个元素）
@@ -216,99 +164,9 @@ const ffmpegFilter = async (inputPath, outputPath, filters) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-filter_complex', filters.join(";"), '-y', outputPath]);
 }
 
-/**
- * 添加图文水印到左上角
- * @param {object} op 配置
- * 配置项：
- *  input 输入路径， output 输出路径， image 图片路径， text 文字
- */
-async function addImageTextWaterMasktoNorthwest(op) {
-  let fontSize = 40;
-  let imageSize = 60;
-  let textSize = await getDrawTextSize(op.text, fontSize);
-  return ffmpegFilter(op.input, op.output, [
-    `movie='${op.image}'[logo]`,
-    `[logo]scale=${imageSize}:${imageSize}[image]`,
-    `[image]pad=(${imageSize}+${textSize.width}):${imageSize}:0:0:black@0, drawtext=x=w-tw:y=10:text='${op.text}':fontsize=${fontSize}:fontcolor=white:shadowx=0:shadowy=0:shadowcolor=black:fontfile='C\\:/Users/Chris/Pictures/simsun.ttc'[watermask]`,
-    "[0:v][watermask]overlay=10:10",
-  ])
-}
 
-
-/**
- * 添加图文水印到右上角
- * @param {object} op 配置
- * 配置项：
- *  input 输入路径， output 输出路径， image 图片路径， text 文字
- */
-async function addImageTextWaterMasktoNortheast(op) {
-  let fontSize = 40;
-  let imageSize = 60;
-  let textSize = await getDrawTextSize(op.text, fontSize);
-  return ffmpegFilter(op.input, op.output, [
-    `movie='${op.image}'[logo]`,
-    `[logo]scale=${imageSize}:${imageSize}[image]`,
-    `[image]pad=(${imageSize}+${textSize.width}):${imageSize}:0:0:black@0, drawtext=x=w-tw:y=10:text='${op.text}':fontsize=${fontSize}:fontcolor=white:shadowx=0:shadowy=0:shadowcolor=black:fontfile='C\\:/Users/Chris/Pictures/simsun.ttc'[watermask]`,
-    "[0:v][watermask]overlay=(W-w-10):10",
-  ])
-}
-
-
-/**
- * 添加图文水印到右下角
- * @param {object} op 配置
- * 配置项：
- *  input 输入路径， output 输出路径， image 图片路径， text 文字
- */
-async function addImageTextWaterMasktoSoutheast(op) {
-  let fontSize = 40;
-  let imageSize = 60;
-  let textSize = await getDrawTextSize(op.text, fontSize);
-  return ffmpegFilter(op.input, op.output, [
-    `movie='${op.image}'[logo]`,
-    `[logo]scale=${imageSize}:${imageSize}[image]`,
-    `[image]pad=(${imageSize}+${textSize.width}):${imageSize}:0:0:black@0, drawtext=x=w-tw:y=10:text='${op.text}':fontsize=${fontSize}:fontcolor=white:shadowx=0:shadowy=0:shadowcolor=black:fontfile='C\\:/Users/Chris/Pictures/simsun.ttc'[watermask]`,
-    "[0:v][watermask]overlay=(W-w-10):(H-h-10)",
-  ])
-}
-
-/**
- * 添加图文水印到左下角
- * @param {object} op 配置
- * 配置项：
- *  input 输入路径， output 输出路径， image 图片路径， text 文字
- */
-async function addImageTextWaterMasktoSouthwest(op) {
-  let fontSize = 40;
-  let imageSize = 60;
-  let textSize = await getDrawTextSize(op.text, fontSize);
-  return ffmpegFilter(op.input, op.output, [
-    `movie='${op.image}'[logo]`,
-    `[logo]scale=${imageSize}:${imageSize}[image]`,
-    `[image]pad=(${imageSize}+${textSize.width}):${imageSize}:0:0:black@0, drawtext=x=w-tw:y=10:text='${op.text}':fontsize=${fontSize}:fontcolor=white:shadowx=0:shadowy=0:shadowcolor=black:fontfile='C\\:/Users/Chris/Pictures/simsun.ttc'[watermask]`,
-    "[0:v][watermask]overlay=10:(H-h-10)",
-  ])
-}
-
-/**
- * 添加图文水印到正中间
- * @param {object} op 配置
- * 配置项：
- *  input 输入路径， output 输出路径， image 图片路径， text 文字
- */
-async function addImageTextWaterMasktoCenter(op) {
-  let fontSize = 40;
-  let imageSize = 60;
-  let textSize = await getDrawTextSize(op.text, fontSize);
-  return ffmpegFilter(op.input, op.output, [
-    `movie='${op.image}'[logo]`,
-    `[logo]scale=${imageSize}:${imageSize}[image]`,
-    `[image]pad=(${imageSize}+${textSize.width}):${imageSize}:0:0:white@0, drawtext=x=w-tw:y=10:text='${op.text}':fontsize=${fontSize}:fontcolor=white:shadowx=0:shadowy=0:shadowcolor=black:fontfile='C\\:/Users/Chris/Pictures/simsun.ttc'[watermask]`,
-    "[0:v][watermask]overlay=(W-w)/2:(H-h)/2",
-  ])
-}
-
-
+const fontFilePath = settings.statics.fontNotoSansHansMedium;
+const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");
 
 /**
  * 视频加图片水印
@@ -321,11 +179,12 @@ const addImageWaterMask = async (op) => {
     imagePath, 
     output, 
     position =  {x: 10, y: 10},
-    flex = 0.06
+    flex = 0.1,
+    transparency = 0.5
   } = op;
   let videoSize = await getVideoSize(videoPath);
   let width = videoSize.width * flex;
-  return spawnProcess('ffmpeg', ['-i', videoPath, '-i', imagePath, '-filter_complex', `[1:v]scale=${width}:${width}/a[logo];[0:v][logo]overlay=${position.x}:${position.y}`, output]);
+  return spawnProcess('ffmpeg', ['-i', videoPath, '-i', imagePath, '-filter_complex', `[1:v]scale=${width}:${width}/a, lut=a=val*${transparency}[logo];[0:v][logo]overlay=${position.x}:${position.y}`, output]);
 }
 
 /**
@@ -340,21 +199,23 @@ async function addImageTextWaterMask(op) {
     output,
     image,
     text,
-    flex = 0.1,
-    position = {x: 10, y: 10}
+    flex = 0.08,
+    position = {x: 10, y: 10},
+    transparency = 0.5
   } = op;
   const videoSize = await getVideoSize(input);
   const logoSize = await getImageSize(image);
-  const textSize = await getDrawTextSize(text, videoSize.height * flex);
+  let padHeight = parseInt(videoSize.height * flex);
+  let logoHeight = padHeight;
+  let logoWidth = parseInt(logoSize.width * (logoHeight / logoSize.height));
+  const textSize = await getDrawTextSize(text, padHeight - 10);
+  let padWidth = logoWidth + textSize.width;
 
-  let logoHeight = parseFloat((textSize.height * 1.4).toFixed(2));
-  let logoWidth = parseFloat((logoSize.width * (logoHeight / logoSize.height)).toFixed(2));
-
-  image = image.replace("\\", "/").replace(":", "\\:");
+  image = image.replace(/\\/g, "/").replace(":", "\\:");
   return ffmpegFilter(input, output, [
     `movie='${image}'[logo]`,
     `[logo]scale=${logoWidth}:${logoHeight}[image]`,
-    `[image]pad=(${logoWidth}+${textSize.width}):${logoHeight}:0:0:white@0, drawtext=x=w-tw:y=(h-th)/2:text='${text}':fontsize=${textSize.height}:fontcolor=white:shadowx=0:shadowy=0:shadowcolor=black:fontfile='C\\:/Users/Chris/Pictures/simsun.ttc'[watermask]`,
+    `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=w-tw:y=(h-th)/2:text='${text}':fontsize=${textSize.height}:fontcolor=white:shadowx=0:shadowy=0:shadowcolor=black:fontfile='${fontFilePathForFFmpeg}', lut=a=val*${transparency}[watermask]`,
     `[0:v][watermask]overlay=${position.x}:${position.y}`
   ])
 }
@@ -375,21 +236,10 @@ module.exports = {
   audioAMRTransMP3,
   audioWAVTransMP3,
   audioWMATransMP3,
-  addWaterMask,
   getVideoSize,
   getImageSize,
   getDrawTextSize,
-  addWaterMasktoNorthwest,
-  addWaterMasktoNortheast,
-  addWaterMasktoSoutheast,
-  addWaterMasktoSouthwest,
-  addWaterMasktoCenter,
   ffmpegFilter,
-  addImageTextWaterMasktoNorthwest,
-  addImageTextWaterMasktoNortheast,
-  addImageTextWaterMasktoSoutheast,
-  addImageTextWaterMasktoSouthwest,
-  addImageTextWaterMasktoCenter,
   addImageWaterMask,
   addImageTextWaterMask
 };

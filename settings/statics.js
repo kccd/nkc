@@ -6,6 +6,7 @@ const attachIconPath = path.resolve(staticPath, './file_cover');
 const normalWatermark = path.resolve(defaultPath, './watermark_normal.png');
 const smallWatermark = path.resolve(defaultPath, './watermark_small.png')
 const fontTtf = path.resolve(defaultPath, './simsun.ttc');
+const fontNotoSansHansMedium = path.resolve(defaultPath, './NotoSansHans-Medium.otf');
 const banner = path.resolve(siteSpecificPath, './ad_default.jpg');
 const defaultPfBannerPath = defaultPath + '/default_pf_banner.jpg';
 const defaultPfAvatarPath = defaultPath + '/default_pf_avatar.jpg';
@@ -40,6 +41,7 @@ module.exports = {
   smallWatermark,
   banner,
   fontTtf,
+  fontNotoSansHansMedium,
   defaultPfBannerPath,
   defaultPfAvatarPath,
   defaultAvatarPath,

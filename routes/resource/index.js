@@ -382,178 +382,220 @@ resourceRouter
 
       let {generalSettings} = user;
       let {waterSetting} = generalSettings;
+      const watermarkSettings = await db.SettingModel.getWatermarkSettings();
+      let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
       
       // 如果设置了需要加水印
-      // if(waterSetting.waterAdd) {
-      //   let text;
-      //   if(waterSetting.waterStyle === "userLogo"){
-      //     text = ctx.data.user?ctx.data.user.username : "科创论坛";
-      //   }else if(waterSetting.waterStyle === "coluLogo"){
-      //     const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
-      //     text = column?column.name : ctx.data.user.name+"的专栏";
-      //   }else{
-      //     text = "";
-      //   }
-      //   let waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
-      //   let waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
-      //   path = path.replace(/\\/g, "/");
-      //   outputVideoPath = outputVideoPath.replace(/\\/g, "/");
-      //   // 右下角
-      //   if(waterSetting.waterGravity === "southeast") {
-      //     if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-      //       await ffmpeg.addImageTextWaterMasktoSoutheast({
-      //         input: path,
-      //         output: outputVideoPath,
-      //         image: waterSmallPath,
-      //         text
-      //       });
-      //     } else if(waterSetting.waterStyle === "siteLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterBigPath,
-      //         position: {x: "W-w-10", y: "H-h-10"}
-      //       });
-      //     } else if(waterSetting.waterStyle === "singleLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterSmallPath,
-      //         position: {x: "W-w-10", y: "H-h-10"}
-      //       });
-      //     }
-      //   }
-      //   // 右上角
-      //   if(waterSetting.waterGravity === "northeast") {
-      //     if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-      //       await ffmpeg.addImageTextWaterMasktoNortheast({
-      //         input: path,
-      //         output: outputVideoPath,
-      //         image: waterSmallPath,
-      //         text
-      //       });
-      //     } else if(waterSetting.waterStyle === "siteLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterBigPath,
-      //         position: {x: "W-w-10", y: "10"}
-      //       });
-      //     } else if(waterSetting.waterStyle === "singleLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterSmallPath,
-      //         position: {x: "W-w-10", y: "10"}
-      //       });
-      //     }
-      //   }
-      //   // 左上角
-      //   if(waterSetting.waterGravity === "northwest") {
-      //     if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-      //       await ffmpeg.addImageTextWaterMasktoNorthwest({
-      //         input: path,
-      //         output: outputVideoPath,
-      //         image: waterSmallPath,
-      //         text
-      //       });
-      //     } else if(waterSetting.waterStyle === "siteLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterBigPath,
-      //         position: {x: "10", y: "10"}
-      //       });
-      //     } else if(waterSetting.waterStyle === "singleLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterSmallPath,
-      //         position: {x: "10", y: "10"}
-      //       });
-      //     }
-      //   }
-      //   // 左下角
-      //   if(waterSetting.waterGravity === "southwest") {
-      //     if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-      //       await ffmpeg.addImageTextWaterMasktoSouthwest({
-      //         input: path,
-      //         output: outputVideoPath,
-      //         image: waterSmallPath,
-      //         text
-      //       });
-      //     } else if(waterSetting.waterStyle === "siteLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterBigPath,
-      //         position: {x: "10", y: "H-h-10"}
-      //       });
-      //     } else if(waterSetting.waterStyle === "singleLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterSmallPath,
-      //         position: {x: "10", y: "H-h-10"}
-      //       });
-      //     }
-      //   }
-      //   // 正中间
-      //   if(waterSetting.waterGravity === "center") {
-      //     if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-      //       await ffmpeg.addImageTextWaterMasktoCenter({
-      //         input: path,
-      //         output: outputVideoPath,
-      //         image: waterSmallPath,
-      //         text
-      //       });
-      //     } else if(waterSetting.waterStyle === "siteLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterBigPath,
-      //         position: {
-      //           x: "(W-w)/2",
-      //           y: "(H-h)/2"
-      //         }
-      //       });
-      //     } else if(waterSetting.waterStyle === "singleLogo") {
-      //       await ffmpeg.addImageWaterMask({
-      //         videoPath: path,
-      //         output: outputVideoPath,
-      //         imagePath: waterSmallPath,
-      //         position: {
-      //           x: "(W-w)/2",
-      //           y: "(H-h)/2"
-      //         }
-      //       });
-      //     }
-      //   }
-      // } else {
-      //   // 视频转码
-      //   if(['3gp'].indexOf(extension.toLowerCase()) > -1){
-      //     await ffmpeg.video3GPTransMP4(path, outputVideoPath);
-      //   }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
-      //     await ffmpeg.videoMP4TransH264(path, outputVideoPath);
-      //   }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
-      //     await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
-      //   }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
-      //     await ffmpeg.videoAviTransAvi(path, path);
-      //     await ffmpeg.videoAVITransMP4(path, outputVideoPath);
-      //   }
-      // }
+      if(watermarkSettings.enabled) {
+        let text;
+        if(waterSetting.waterStyle === "userLogo"){
+          text = ctx.data.user?ctx.data.user.username : "科创论坛";
+        }else if(waterSetting.waterStyle === "coluLogo"){
+          const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
+          text = column?column.name : ctx.data.user.name+"的专栏";
+        }else{
+          text = "";
+        }
+        let waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+        let waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+        path = path.replace(/\\/g, "/");
+        outputVideoPath = outputVideoPath.replace(/\\/g, "/");
+        // 右下角
+        if(waterSetting.waterGravity === "southeast") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "W-w-10",
+                y: "H-h-10"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {x: "W-w-10", y: "H-h-10"},
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {x: "W-w-10", y: "H-h-10"},
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+        // 右上角
+        if(waterSetting.waterGravity === "northeast") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "W-w-10",
+                y: "10"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {x: "W-w-10", y: "10"},
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {x: "W-w-10", y: "10"},
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+        // 左上角
+        if(waterSetting.waterGravity === "northwest") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "10",
+                y: "10"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {x: "10", y: "10"},
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {x: "10", y: "10"},
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+        // 左下角
+        if(waterSetting.waterGravity === "southwest") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "10",
+                y: "H-h-10"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {x: "10", y: "H-h-10"},
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {x: "10", y: "H-h-10"},
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+        // 正中间
+        if(waterSetting.waterGravity === "center") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "(W-w)/2",
+                y: "(H-h)/2"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {
+                x: "(W-w)/2",
+                y: "(H-h)/2"
+              },
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {
+                x: "(W-w)/2",
+                y: "(H-h)/2"
+              },
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+      } else {
+        // 视频转码
+        if(['3gp'].indexOf(extension.toLowerCase()) > -1){
+          await ffmpeg.video3GPTransMP4(path, outputVideoPath);
+        }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.videoMP4TransH264(path, outputVideoPath);
+        }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
+        }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
+          await ffmpeg.videoAviTransAvi(path, path);
+          await ffmpeg.videoAVITransMP4(path, outputVideoPath);
+        }
+      }
 
       // 视频转码
-      if(['3gp'].indexOf(extension.toLowerCase()) > -1){
-        await ffmpeg.video3GPTransMP4(path, outputVideoPath);
-      }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoMP4TransH264(path, outputVideoPath);
-      }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
-      }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
-        await ffmpeg.videoAviTransAvi(path, path);
-        await ffmpeg.videoAVITransMP4(path, outputVideoPath);
-      }
+      // if(['3gp'].indexOf(extension.toLowerCase()) > -1){
+      //   await ffmpeg.video3GPTransMP4(path, outputVideoPath);
+      // }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
+      //   await ffmpeg.videoMP4TransH264(path, outputVideoPath);
+      // }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
+      //   await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
+      // }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
+      //   await ffmpeg.videoAviTransAvi(path, path);
+      //   await ffmpeg.videoAVITransMP4(path, outputVideoPath);
+      // }
 
       // 将元数据移动到视频的第一帧
       // await ffmpeg.videoMoveMetaToFirstThumb(outputVideoPath, outputVideoPath);
