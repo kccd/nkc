@@ -9,6 +9,8 @@ var app = new Vue({
     submitting: false,
     num: 1,
     transferSettings: data.transferSettings,
+    enabledScores: data.enabledScores,
+    shopScore: data.shopScore,
     from: {
       type: "bank", // bank, user,
       user: ""
@@ -16,7 +18,8 @@ var app = new Vue({
     to: {
       type: "user",
       user: ""
-    }
+    },
+    scoreType: 'score1'
   },
   computed: {
     warning: function() {
@@ -44,14 +47,15 @@ var app = new Vue({
     saveTransferSettings: function() {
       var checkNumber = this.checkNumber;
       var transferSettings = this.transferSettings;
+      var shopScore = this.shopScore;
 
       Promise.resolve()
-        .then(function() { 
+        .then(function() {
           checkNumber(transferSettings.kcbOnce, {
-            name: "单次转账KCB上限",
+            name: "单次转账"+shopScore.name+"上限",
             min: 0,
             fractionDigits: 2
-          }); 
+          });
           checkNumber(transferSettings.countOneDay, {
             name: "每天转账总次数上限",
             min: 0
@@ -59,7 +63,7 @@ var app = new Vue({
           checkNumber(transferSettings.countToUserOneDay, {
             name: "对同一用户每天转账次数上限",
             min: 0
-          }); 
+          });
           return nkcAPI("/e/settings/transfer", "PATCH", {
             transferSettings: transferSettings
           });
@@ -83,6 +87,7 @@ var app = new Vue({
         from: this.from.type==="bank"?"bank": this.from.user.uid,
         to: this.to.type==="bank"?"bank": this.to.user.uid,
         password: this.password,
+        scoreType: this.scoreType,
         num: this.num
       })
         .then(function(data) {

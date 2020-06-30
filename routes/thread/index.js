@@ -620,7 +620,10 @@ threadRouter
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
       thread.firstPost.usersVote = vote?vote.type: '';
-      data.kcbSettings = await db.SettingModel.getSettings("kcb");
+      // data.kcbSettings = await db.SettingModel.getSettings("kcb");
+      data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
+      data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+      data.creditSettings = await db.SettingModel.getCreditSettings();
       data.xsfSettings = await db.SettingModel.getSettings("xsf");
       data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
     }
@@ -731,7 +734,6 @@ threadRouter
 
     // 帖子设置
     data.threadSettings = await db.SettingModel.getSettings("thread");
-    data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
     data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;
 		data.step = step;

@@ -37,6 +37,11 @@ router
         t: thread.firstPost.t
       }
     };
+    if(data.user) {
+      data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
+      data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+      data.creditSettings = await db.SettingModel.getCreditSettings();
+    }
 	  const forums = await thread.extendForums(['mainForums', 'minorForums']);
     const {user} = data;
     let isModerator = ctx.permission('superModerator');

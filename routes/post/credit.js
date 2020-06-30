@@ -116,13 +116,14 @@ router
 		const {user} = data;
 		const {pid} = params;
 		let {num, description} = body;
-		num = Number(num);
-    if(num%1 !== 0) ctx.throw(400, "科创币仅支持到小数点后两位");
+    const creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+    num = Number(num);
+    if(num%1 !== 0) ctx.throw(400, `${creditScore.name}仅支持到小数点后两位`);
 		const fromUser = user;
 		const post = await db.PostModel.findOnly({pid});
 		if(post.anonymous) ctx.throw(400, "无法鼓励匿名用户");
     const toUser = await db.UserModel.findOnly({uid: post.uid});
-    if(fromUser.uid === toUser.uid) ctx.throw(400, '自己给自己鼓励不需要科创币');
+    if(fromUser.uid === toUser.uid) ctx.throw(400, '无法给自己鼓励');
     const thread = await db.ThreadModel.findOnly({tid: post.tid});
 		if(thread.disabled) {
 			ctx.throw(403,'文章已被封禁');
@@ -130,13 +131,15 @@ router
 		if(post.disabled) {
 		  ctx.throw(403, '回复已被封禁');
     }
-		const kcbSettings = await db.SettingModel.findOnly({_id: 'kcb'});
-		if(num < kcbSettings.c.minCount) ctx.throw(400, `科创币最少为${kcbSettings.c.minCount/100}`);
-		if(num > kcbSettings.c.maxCount) ctx.throw(400, `科创币不能大于${kcbSettings.c.maxCount/100}`);
-		fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
-		if(fromUser.kcb < num) ctx.throw(400, '您的科创币不足');
+		const creditSettings = await db.SettingModel.getCreditSettings();
+		await db.UserModel.updateUserScores(user.uid);
+		const userScore = await db.UserModel.getUserScore(user.uid, creditScore.type);
+		if(num < creditSettings.min) ctx.throw(400, `${creditScore.name}最少为${creditSettings.min/100}`);
+		if(num > creditSettings.max) ctx.throw(400, `${creditScore.name}不能大于${creditSettings.max/100}`);
+		// fromUser.kcb = await db.UserModel.updateUserKcb(fromUser.uid);
+		if(userScore < num) ctx.throw(400, `你的${creditScore.name}不足`);
 		if(description.length < 2) ctx.throw(400, '理由写的太少了');
-    if(description.length > 60) ctx.throw(400, '理由不能超过60个字');
+    if(description.length > 60) ctx.throw(400, '理由不能超过60个字符');
     await db.KcbsRecordModel.insertUsersRecord({
       fromUser,
       toUser,

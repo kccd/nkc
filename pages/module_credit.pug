@@ -1,4 +1,4 @@
-if data.user && data.kcbSettings && data.xsfSettings
+if data.user && data.xsfSettings && data.creditScore
   .credit-panel.bootstrap-modal
     div(class="modal fade" id="creditModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel").bootstrap-modal
       div(class="modal-dialog modal-sm" role="document")
@@ -10,10 +10,10 @@ if data.user && data.kcbSettings && data.xsfSettings
           .modal-body
             .form
               .form-group
-                span.kcb-info= `向作者转账科创币以资鼓励`
+                span.kcb-info= `向作者转账${data.creditScore.name}以资鼓励`
               .form-group
                 label 分值
-                span.kcb-info(style='display:inline-block;')=`（${data.kcbSettings.minCount/100} - ${data.kcbSettings.maxCount/100}）`
+                span.kcb-info(style='display:inline-block;')=`（${data.creditSettings.min/100} - ${data.creditSettings.max/100}）`
                 span.xsf-info(style='display:inline-block;')=`（-${data.xsfSettings.reduceLimit} 到 ${data.xsfSettings.addLimit}）`
                 input.form-control.num(value='1' type='number')
               .form-group

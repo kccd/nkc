@@ -12,13 +12,20 @@ router
   .get("/", async (ctx, next) => {
     const {data, db} = ctx;
     data.transferSettings = await db.SettingModel.getSettings("transfer");
+    data.shopScore = await db.SettingModel.getScoreByOperationType('shopScore');
+    data.enabledScores = await db.SettingModel.getEnabledScores();
+    data.nkcBankName = await db.SettingModel.getNKCBankName();
     ctx.template = "experimental/settings/transfer/transfer.pug";
     await next();
   })
   .post("/", async (ctx, next) => {
     const {db, body, data, nkcModules} = ctx;
     const {user} = data;
-    const {from, to, password, num} = body;
+    const {from, to, password, num, scoreType} = body;
+    const enabledScores = await db.SettingModel.getEnabledScores();
+    const enabledScoresType = enabledScores.map(e => e.type);
+    if(!enabledScoresType.includes(scoreType)) ctx.throw(400, '已选积分暂未开启，请刷新');
+    const score = await db.SettingModel.getScoreByScoreType(scoreType);
     const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     try{
       await userPersonal.ensurePassword(password);
@@ -43,10 +50,15 @@ router
 
     const kcb = num * 100;
 
-    if(fromUser && fromUser.kcb < kcb) ctx.throw(400, "支付方科创币不足");
+
+    if(fromUser) {
+      const fromUserScore = await db.UserModel.getUserScore(fromUser.uid, scoreType)
+      if(fromUserScore < kcb) ctx.throw(400, `支付方${score.name}不足`);
+    }
 
     const record = db.KcbsRecordModel({
       _id: await db.SettingModel.operateSystemID("kcbsRecords", 1),
+      scoreType,
       from,
       to,
       type: "transfer",
@@ -57,11 +69,13 @@ router
 
     await record.save();
     if(from !== "bank") {
-      await db.UserModel.updateUserKcb(from);
+      await db.UserModel.updateUserScores(from);
+      // await db.UserModel.updateUserKcb(from);
       data.from = await db.UserModel.findOne({uid: from});
     }
     if(to !== "bank") {
-      await db.UserModel.updateUserKcb(to);
+      await db.UserModel.updateUserScores(to);
+      // await db.UserModel.updateUserKcb(to);
       data.to = await db.UserModel.findOne({uid: to});
     }
 
@@ -78,7 +92,7 @@ router
       name: "单次转账KCB上限",
       min: 0,
       fractionDigits: 2
-    }); 
+    });
     checkNumber(countOneDay, {
       name: "每天转账总次数上限",
       min: 0
@@ -86,7 +100,7 @@ router
     checkNumber(countToUserOneDay, {
       name: "对同一用户每天转账次数上限",
       min: 0
-    }); 
+    });
     await db.SettingModel.updateOne({_id: "transfer"}, {
       $set: {
         c: {

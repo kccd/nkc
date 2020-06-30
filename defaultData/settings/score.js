@@ -1,19 +1,6 @@
 const data = {
   _id: 'score',
   c: {
-    // 允许体现
-    withdrawEnabled: false,
-    // 最小提现金额
-    withdrawMin: 0.01, // 分
-    // 最大提现金额
-    withdrawMax: 0.01, // 分
-    // 每天最大提现次数
-    withdrawCountOneDay: 0,
-    // 提现时段
-    withdrawTimeBegin: 0, // 开始时间点
-    withdrawTimeEnd: 0, // 结束时间点
-    // 提现手续比例
-    withdrawFee: 0.6, // 0.6%
     // 鼓励转账金额限制
     creditMin: 0.01, // 最小金额
     creditMax: 0.01, // 最大金额
@@ -134,7 +121,6 @@ const operations = [
   'liked',
   'unLiked',
   'reportIssue',
-  'modifyUsername',
   'digestThread',
   'unDigestThread',
   'waterPay',

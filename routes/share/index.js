@@ -68,7 +68,6 @@ shareRouter
       await lock.unlock();
       return ctx.redirect(shareUrl);
     }
-    const targetUser = await db.UserModel.findOnly({uid});
     // 若该ip已经访问过则不给予分享着奖励
     // 不属于站外的用户（已经登录的用户）访问时不给予分享者奖励
     if(user) {
@@ -87,7 +86,7 @@ shareRouter
     // 给予奖励
     const {status, num} = await share.computeReword("visit", ctx.address, ctx.port);
     // 计算分享者的kcb
-    targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
+    // targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
     // 将分享者获得的kcb写入当前用户访问的记录上
     if(status) {
       await shareLogs.update({kcb: num});

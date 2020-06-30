@@ -134,6 +134,10 @@ kcbsRecordSchema.virtual('fromUser')
     this._fromUser = p;
   });
 
+/*
+* 执行操作后的加减积分，根据settings中的score判断
+* */
+
 // 与银行间的交易记录
 kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
   additionalReward = additionalReward || 0;
@@ -228,8 +232,10 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
   } = options;
   if(fromUser.uid === toUser.uid) throwErr(400, "无法对自己执行此操作");
   const _id = await SettingModel.operateSystemID('kcbsRecords', 1);
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const record = KcbsRecordModel({
     _id,
+    scoreType: creditScore.type,
     from: fromUser.uid,
     to: toUser.uid,
     num,
@@ -240,8 +246,10 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     type: 'creditKcb'
   });
   await record.save();
-  fromUser.kcb = await UserModel.updateUserKcb(fromUser.uid);
-  toUser.kcb = await UserModel.updateUserKcb(toUser.uid);
+  await UserModel.updateUserScores(fromUser.uid);
+  await UserModel.updateUserScores(toUser.uid);
+  // fromUser.kcb = await UserModel.updateUserKcb(fromUser.uid);
+  // toUser.kcb = await UserModel.updateUserKcb(toUser.uid);
 };
 
 

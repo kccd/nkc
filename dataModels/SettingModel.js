@@ -297,6 +297,20 @@ settingSchema.statics.getMainScore = async () => {
   const scoreSettings = await SettingModel.getSettings('score');
   return scoreSettings.scores.score1;
 };
+
+/*
+* 获取指定type的积分对象
+* @param {String} type 积分类型
+* @return {Object} 积分对象
+* @author pengxiguaa 2020/6/30
+* */
+settingSchema.statics.getScoreByScoreType = async (type) => {
+  const SettingModel = mongoose.model('settings');
+  const scoreSettings = await SettingModel.getSettings('score');
+  if(!['score1', 'score2', 'score3', 'score4', 'score5'].includes(type)) throwErr(500, '积分类型错误');
+  return scoreSettings.scores[type];
+}
+
 /*
 * 获取积分银行名称
 * @return {String} 积分银行名称
@@ -358,4 +372,17 @@ settingSchema.statics.getScoreByOperationType = async (type) => {
   return scoreSettings.scores[scoreName];
 };
 
+/*
+* 获取鼓励限制
+* @return {Object} min: 最小值, max: 最大值
+* @author pengxiguaa 2020/6/29
+* */
+settingSchema.statics.getCreditSettings = async () => {
+  const SettingModel = mongoose.model('settings');
+  const scoreSettings = await SettingModel.getSettings('score');
+  return {
+    min: scoreSettings.creditMin,
+    max: scoreSettings.creditMax
+  };
+};
 module.exports = mongoose.model('settings', settingSchema);

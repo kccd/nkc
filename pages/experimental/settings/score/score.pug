@@ -57,7 +57,7 @@ block eContent
             tr
               th 操作名
               th 周期
-              th 次数
+              th 次数(0: 关闭, -1: 无限次)
             tr(v-for='o in scoreSettings.operations')
               th {{o.name}}
               th
