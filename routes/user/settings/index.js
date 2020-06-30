@@ -32,11 +32,24 @@ settingRouter
 		await next();
 	})
   .get(['/', '/info'], async (ctx, next) => {
-    const {data, db} = ctx;
-    data.selected = "info";
-    data.usernameSettings = await db.SettingModel.getSettings("username");
-    data.modifyUsernameCount = data.user.generalSettings.modifyUsernameCount;
-    data.user.kcb = await db.UserModel.updateUserKcb(data.user.uid);
+		const {data, db} = ctx;
+		const {user} = data;
+		data.selected = "info";
+		// 全局用户设置，包括修改用户名需要多少积分
+		data.usernameSettings = await db.SettingModel.getSettings("username");
+		// 此用户的用户名修改次数
+		data.modifyUsernameCount = data.user.generalSettings.modifyUsernameCount;
+		// data.user.kcb = await db.UserModel.updateUserKcb(data.user.uid);
+		await db.UserModel.updateUserScores(user.uid);
+		// 修改用户名需要使用的积分对象
+		let scoreObject = await db.SettingModel.getScoreByOperationType("usernameScore");
+		// 此用户此类型积分剩余多少
+		let myScore = await db.UserModel.getUserScore(user.uid, scoreObject.type);
+		// 传递到页面
+		data.usernameScore = {
+			...scoreObject,
+			number: myScore
+		}
     ctx.template = 'interface_user_settings_info.pug';
     await next();
   })

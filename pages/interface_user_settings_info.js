@@ -100,10 +100,11 @@ var app = new Vue({
     usernameSettings: data.usernameSettings,
     user: data.user,
     modifyUsernameCount: data.modifyUsernameCount,
-    newUsername: ""
+    newUsername: "",
+    usernameScore: data.usernameScore
   },
   computed: {
-    needKcb: function () {
+    needScore: function () {
       if (this.usernameSettings.free) return 0;
       if (this.modifyUsernameCount < this.usernameSettings.freeCount) return 0;
       var reduce = this.modifyUsernameCount + 1 - this.usernameSettings.freeCount;

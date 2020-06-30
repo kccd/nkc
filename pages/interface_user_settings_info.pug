@@ -5,7 +5,7 @@ block title
   link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
 
 block content
-  #data.hidden=objToStr({user: data.user, usernameSettings: data.usernameSettings, modifyUsernameCount: data.modifyUsernameCount})
+  #data.hidden=objToStr({user: data.user, usernameSettings: data.usernameSettings, modifyUsernameCount: data.modifyUsernameCount, usernameScore: data.usernameScore})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -42,13 +42,13 @@ block content
                     .btn.btn-default.btn-xs(onclick='changeUsername()') 修改
                   #app(style="display: none")
                     div(v-if="!usernameSettings.free")
-                      p.text-info 为了避免频繁修改影响网友辨识，只能免费修改{{usernameSettings.freeCount}}次，超过后每修改一次用户名将多花费{{usernameSettings.onceKcb/100}}个科创币。最多不会超过{{usernameSettings.maxKcb/100}}个科创币。
-                      p.text-info 你已经修改过{{modifyUsernameCount}}次用户名，当前修改需要花费{{needKcb/100}}个科创币。
-                      p.text-danger(v-if="user.kcb < needKcb") 你当前的科创币不足，点击&nbsp;
+                      p.text-info 为了避免频繁修改影响网友辨识，只能免费修改{{usernameSettings.freeCount}}次，超过后每修改一次用户名将多花费{{usernameSettings.onceKcb/100}}{{usernameScore.unit}}{{usernameScore.name}}。最多不会超过{{usernameSettings.maxKcb/100}}{{usernameScore.unit}}{{usernameScore.name}}。
+                      p.text-info 你已经修改过{{modifyUsernameCount}}次用户名，当前修改需要花费{{needScore/100}}{{usernameScore.unit}}{{usernameScore.name}}。
+                      p.text-danger(v-if="usernameScore.number < needScore") 你当前的{{usernameScore.name}}不足，点击&nbsp;
                         b
                           a(href=`/account/finance/recharge` target="_blank") 这里
                         | &nbsp;充值。
-                    .col-xs-12(v-if="usernameSettings.free || user.kcb >= needKcb")
+                    .col-xs-12(v-if="usernameSettings.free || usernameScore.number >= needScore")
                       .form
                         .form-group
                           label 请输入新用户名
