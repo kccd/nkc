@@ -52,23 +52,40 @@ waterRouter
       if(waterAlreadyPay.waterSetting.waterPayInfo === true){
         ctx.throw(400,"您已经购买了这项服务")
       }
-      // 验证科创币
-      // const waterPayType = await db.TypesOfScoreChangeModel.findOne({_id: "waterPay"});
-      const waterPayType = await db.KcbsTypeModel.findOnly({_id: 'waterPay'});
-      user.kcb = await db.UserModel.updateUserKcb(user.uid);
-      if(waterPayType && user.kcb < parseInt(waterPayType.num*-1)){
-        ctx.throw(400,"您的科创币不足"+(parseInt(waterPayType.num*-1)/100));
+      
+      // 上传设置
+      const uploadSettings = await db.SettingModel.getSettings('upload');
+      // 去水印功能需要的积分数
+      let needScore = uploadSettings.watermark.buyNoWatermark;
+      // 去水印功能使用的哪种积分
+      let scoreObject = await db.SettingModel.getScoreByOperationType("watermarkScore");
+      // 更新此用户所有积分
+      await db.UserModel.updateUserScores(user.uid);
+      // 当前用户持有的积分
+      let myScore = await db.UserModel.getUserScore(user.uid, scoreObject.type);
+      // 分够不够
+      if(needScore && myScore < needScore){
+        ctx.throw(400, `您的${scoreObject.name}不足${needScore/100}${scoreObject.unit}`);
       }
-      // 消耗科创币，并生成记录
-      // const {user, type, typeIdOfScoreChange, port, ip, fid, pid, tid, description} = options;
-      // console.log(user)
-      await db.KcbsRecordModel.insertSystemRecord('waterPay', data.user, ctx);
-      // 修改水印设置
-      const paySuccess = {
-        waterPayInfo: true,
-        waterPayTime: Date.now()
-      }
-      await db.UsersGeneralModel.update({uid:user.uid},{$set: {'waterSetting.waterPayInfo': true,'waterSetting.waterPayTime':Date.now()}})
+      // 够了，生成一条转给银行的转账记录
+      await db.KcbsRecordModel({
+        _id: await db.SettingModel.operateSystemID("kcbsRecords", 1),
+        type: "waterPay",
+        from: user.uid,
+        to: "bank",
+        num: needScore,
+        ip: ctx.address,
+        port: ctx.port,
+        scoreType: scoreObject.type
+      }).save();
+      // 更新此用户的水印设置
+      await db.UsersGeneralModel.update({uid: user.uid}, {
+        $set: {
+          'waterSetting.waterPayInfo': true,
+          'waterSetting.waterPayTime': Date.now(),
+          'waterSetting.waterAdd': false
+        }
+      })
     }
     if(type === "save"){
       const userWaterSetting = await db.UsersGeneralModel.findOne({uid: user.uid});

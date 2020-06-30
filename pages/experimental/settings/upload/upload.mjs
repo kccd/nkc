@@ -6,6 +6,7 @@ extensionLimit.others.map(o => {
   o._blacklist = o.blacklist.join(', ');
   o._whitelist = o.whitelist.join(', ');
 });
+data.uploadSettings.watermark.buyNoWatermark /= 100;
 var app = new Vue({
   el: "#app",
   data: {
@@ -69,6 +70,8 @@ var app = new Vue({
         delete o._blacklist;
         delete o._whitelist;
       });
+      // 积分乘以100用于存储
+      us.watermark.buyNoWatermark *= 100;
 
       const formData = new FormData();
       return Promise.resolve()

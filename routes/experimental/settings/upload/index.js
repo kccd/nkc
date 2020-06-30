@@ -30,6 +30,10 @@ router
       name: '水印尺寸限制最小宽度',
       min: 0
     });
+    checkNumber(watermark.buyNoWatermark, {
+      name: '开启去水印功能需花费积分',
+      min: 0
+    });
     // 尺寸限制
     checkNumber(sizeLimit.default, {
       name: '文件尺寸',

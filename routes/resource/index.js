@@ -386,7 +386,7 @@ resourceRouter
       let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
       
       // 如果设置了需要加水印
-      if(watermarkSettings.enabled) {
+      if(waterSetting.waterAdd) {
         let text;
         if(waterSetting.waterStyle === "userLogo"){
           text = ctx.data.user?ctx.data.user.username : "科创论坛";

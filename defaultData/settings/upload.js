@@ -42,7 +42,8 @@ module.exports = {
       normalAttachId: '',
       smallAttachId: '',
       minHeight: 479,
-      minWidth: 799
+      minWidth: 799,
+      buyNoWatermark: 200     // 购买去水印功能所需积分，默认2积分
     }
   }
 };

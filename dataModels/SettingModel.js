@@ -348,6 +348,7 @@ settingSchema.statics.getScoreByOperationType = async (type) => {
     'digestRewardScore',
     'shareRewardScore',
     'waterRewardScore',
+    'watermarkScore',
     'usernameScore',
     'shopScore',
     'creditScore',
