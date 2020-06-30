@@ -27,7 +27,7 @@ router
       } else {
         paging = nkcModules.apiFunction.paging(page, count, limit);
       }
-      
+
       data.stickers = await db.StickerModel.find(q).sort({order: -1}).skip(paging.start).limit(paging.perpage);
       data.stickers.map(s => {
         s.reason = s.reason.replace("\n", "");
@@ -88,7 +88,7 @@ router
     const {rid} = params;
     const {t} = query;
     let sticker = await db.StickerModel.findOnly({from: "upload", rid});
-    
+
     if(t === "json") {
       if(!sticker) ctx.throw(404, "表情不存在");
       if(sticker.disabled && !ctx.permission("nkcManagementSticker")) ctx.throw(403, "表情已被屏蔽");
@@ -101,7 +101,7 @@ router
     } else {
       // 未找到表情或者表情被禁用且无权查看时，返回默认图片
       if(!sticker || (sticker.disabled && !ctx.permission("nkcManagementSticker"))) {
-        ctx.filePath = statics.defualtStickerImage;
+        ctx.filePath = statics.defaultStickerImage;
         return next();
       }
       const resource = await db.ResourceModel.findOnly({rid, type: "sticker", mediaType: "mediaPicture"});

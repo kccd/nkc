@@ -29,10 +29,14 @@ const defaultColumnBannerPath = defaultPath + "/column_banner.jpg";
 const defaultPosterPath = defaultPath + "/default_poster.jpg";
 const defaultRoleIconPath = staticPath + '/role_icon';
 const defaultHomeBigLogo = siteSpecificPath + '/kclogo_misaka1.png';
+const deletedPhotoPath = defaultPath + '/deleted_photo.jpg';
+const disabledPhotoPath = defaultPath + '/disabled_photo.jpg';
 // 默认表情图
-const defualtStickerImage = defaultPath + '/default_avatar.gif';
+const defaultStickerImage = defaultPath + '/default_avatar.gif';
 const defaultScoreIconPath = staticPath + '/kcb.png';
 module.exports = {
+  deletedPhotoPath,
+  disabledPhotoPath,
   defaultScoreIconPath,
   siteSpecificPath,
   defaultRoleIconPath,
@@ -64,5 +68,5 @@ module.exports = {
   defaultColumnBannerPath,
   defaultPosterPath,
   defaultHomeBigLogo,
-  defualtStickerImage
+  defaultStickerImage
 };
