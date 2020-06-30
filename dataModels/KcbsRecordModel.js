@@ -136,10 +136,133 @@ kcbsRecordSchema.virtual('fromUser')
 
 /*
 * 执行操作后的加减积分，根据settings中的score判断
+* @param {String} type 操作类型
+* @param {Object} u 目标用户
+* @param {Object} ctx koa上下文
+* @param {Number} additionalReward 额外扣除的kcb, 不适用于积分系统，暂时无用
+* @author pengxiguaa 2020/6/30
 * */
+kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const redLock = require('../nkcModules/redLock');
+  const lock = await redLock.lock('kcbsRecord', 6000);
+  try{
+    await KcbsRecordModel.insertSystemRecordContent(type, u, ctx, additionalReward);
+    await lock.unlock();
+  } catch(err) {
+    await lock.unlock();
+    throw err;
+  }
+};
+kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additionalReward) => {
+  const SettingModel = mongoose.model('settings');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const UserModel = mongoose.model('users');
+  const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const {address: ip, port, data} = ctx;
+  if(!u) return;
+  const operation = await SettingModel.getScoreOperationByType(type);
+  const {
+    count,
+    cycle,
+  } = operation;
+  let allowed;
+  // 无限次
+  if(count === -1) {
+    allowed = true;
+  } else if(count === 0) {
+    allowed = false;
+  } else {
+    let minTime;
+    if(cycle === 'day') {
+      minTime = apiFunction.today();
+    }
+    // 获取当天此人当前操作执行的次数
+    const operationLogCount = await ScoreOperationLogModel.count({
+      uid: u.uid,
+      type,
+      toc: {$gte: minTime}
+    });
+    allowed = operationLogCount < count;
+  }
+  if(!allowed) return;
+  const enabledScores = await SettingModel.getEnabledScores();
+  let recordsId = [];
+  for(const enabledScore of enabledScores) {
+    const scoreType = enabledScore.type;
+    const number = operation[scoreType];
+    if(number === 0) continue;
+    let from, to;
+    let num = Math.abs(number);
+    if(number > 0) {
+      // 加分
+      from = 'bank';
+      to = u.uid;
+    } else {
+      // 减分
+      from = u.uid;
+      to = 'bank';
+    }
+    const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
+    const newRecords = KcbsRecordModel({
+      _id: kcbsRecordId,
+      from,
+      to,
+      num,
+      scoreType,
+      type,
+      ip,
+      port,
+    });
+    if(data.targetUser && data.user) {
+      if(data.user !== u) {
+        newRecords.tUid = data.user.uid;
+      } else {
+        newRecords.tUid = data.targetUser.uid;
+      }
+    }
+    let thread, post;
+    if(data.thread) {
+      thread = data.thread;
+    } else if (data.targetThread) {
+      thread = data.targetThread;
+    }
+    if(data.post) {
+      post = data.post;
+    } else if (data.targetPost) {
+      post = data.targetPost;
+    }
+    if(thread) {
+      newRecords.tid = thread.tid;
+      newRecords.fid = thread.fid;
+    }
+    if(post) {
+      newRecords.pid = post.pid;
+      newRecords.fid = post.fid;
+      newRecords.tid = post.tid;
+    }
+    if(data.problem) newRecords.problemId = data.problem._id;
+    await newRecords.save();
+    recordsId.push(kcbsRecordId);
+  }
+  // 已创建积分账单记录
+  if(recordsId.length) {
+    const scoreOperationLog = ScoreOperationLogModel({
+      _id: await SettingModel.operateSystemID('scoreOperationLogs', 1),
+      uid: u.uid,
+      type,
+      ip,
+      port,
+      recordsId
+    });
+    await scoreOperationLog.save();
+    await UserModel.updateUserScores(u.uid);
+  }
+};
 
 // 与银行间的交易记录
-kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
+kcbsRecordSchema.statics.insertSystemRecord_old = async (type, u, ctx, additionalReward) => {
   additionalReward = additionalReward || 0;
   const UserModel = mongoose.model("users");
   const {nkcModules, address, port, data, db} = ctx;

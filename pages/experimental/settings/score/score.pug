@@ -58,6 +58,7 @@ block eContent
               th 操作名
               th 周期
               th 次数(0: 关闭, -1: 无限次)
+              th(colspan=5).text-center 加减的分值（支持小数点后两位，为正加分，为负扣分，为零则不作处理。）
             tr(v-for='o in scoreSettings.operations')
               th {{o.name}}
               th
@@ -66,15 +67,15 @@ block eContent
               th
                 input.form-control(type='text' v-model.number='o.count')
               th
-                input.form-control(type='text' v-model.number='o.score1')
+                input.form-control(type='text' v-model.number='o._score1')
               th
-                input.form-control(type='text' v-model.number='o.score2')
+                input.form-control(type='text' v-model.number='o._score2')
               th
-                input.form-control(type='text' v-model.number='o.score3')
+                input.form-control(type='text' v-model.number='o._score3')
               th
-                input.form-control(type='text' v-model.number='o.score4')
+                input.form-control(type='text' v-model.number='o._score4')
               th
-                input.form-control(type='text' v-model.number='o.score5')
+                input.form-control(type='text' v-model.number='o._score5')
       .col-xs-12.col-md-12.m-b-2
         h4 其他
         .form.form-horizontal
@@ -123,13 +124,13 @@ block eContent
               select.form-control(v-model='scoreSettings.creditScore')
                 option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
           .form-group
-            label.col-sm-2.control-label 最小鼓励数额
+            label.col-sm-2.control-label 最小鼓励金额
             .col-sm-3.form-inline
-              input.form-control(type='text' v-model.number='scoreSettings.creditMin')
+              input.form-control(type='text' v-model.number='scoreSettings._creditMin')
           .form-group
-            label.col-sm-2.control-label 最大鼓励数额
+            label.col-sm-2.control-label 最大鼓励金额
             .col-sm-3.form-inline
-              input.form-control(type='text' v-model.number='scoreSettings.creditMax')
+              input.form-control(type='text' v-model.number='scoreSettings._creditMax')
       .col-xs-12.col-md-12.m-b-2
         h4
         .m-t-1

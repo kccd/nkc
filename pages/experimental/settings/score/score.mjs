@@ -4,8 +4,8 @@ const {scores} = data.scoreSettings;
 data.scoreSettings._withdrawTimeBegin = getHMS(data.scoreSettings.withdrawTimeBegin);
 data.scoreSettings._withdrawTimeEnd = getHMS(data.scoreSettings.withdrawTimeEnd);
 
-
-const iconArr = [];
+data.scoreSettings._creditMin = data.scoreSettings.creditMin / 100;
+data.scoreSettings._creditMax = data.scoreSettings.creditMax / 100;
 
 const types = [
   'score1',
@@ -14,6 +14,14 @@ const types = [
   'score4',
   'score5'
 ];
+
+data.scoreSettings.operations.map(operation => {
+  for(const type of types) {
+    operation[`_${type}`] = operation[type] / 100;
+  }
+});
+
+const iconArr = [];
 const _scores = [];
 for(const type of types) {
   if(!scores.hasOwnProperty(type)) continue;
@@ -79,16 +87,47 @@ const app = new Vue({
       const scoreSettings = JSON.parse(JSON.stringify(this.scoreSettings));
       scoreSettings.withdrawTimeBegin = HMSToNumber(scoreSettings._withdrawTimeBegin);
       scoreSettings.withdrawTimeEnd = HMSToNumber(scoreSettings._withdrawTimeEnd);
-      delete scoreSettings._withdrawTimeEnd;
-      delete scoreSettings._withdrawTimeBegin;
-      const formData = new FormData();
-      formData.append('scoreSettings', JSON.stringify(scoreSettings));
-      for(const icon of iconArr) {
-        const {iconFile, type} = icon;
-        if (!iconFile) continue;
-        formData.append(type, iconFile);
-      }
-      nkcUploadFile('/e/settings/score', 'PATCH', formData)
+      const self = this;
+      Promise.resolve()
+        .then(() => {
+          scoreSettings.operations.map(operation => {
+            for(const type of types) {
+              const oldValue = operation[`_${type}`];
+              self.checkNumber(oldValue, {
+                name: '积分策略中加减的积分值',
+                fractionDigits: 2,
+              });
+              operation[type] = oldValue * 100;
+              delete operation[`_${type}`];
+            }
+          });
+
+          this.checkNumber(scoreSettings._creditMin, {
+            name: '最小鼓励金额',
+            min: 0.01,
+            fractionDigits: 2
+          });
+          this.checkNumber(scoreSettings._creditMax, {
+            name: '最大鼓励金额',
+            min: 0.01,
+            fractionDigits: 2
+          });
+          if(scoreSettings._creditMin > scoreSettings._creditMax) throw '鼓励金额设置错误';
+          scoreSettings.creditMin = scoreSettings._creditMin * 100;
+          scoreSettings.creditMax = scoreSettings._creditMax * 100;
+          delete scoreSettings._creditMin;
+          delete scoreSettings._creditMax;
+          delete scoreSettings._withdrawTimeEnd;
+          delete scoreSettings._withdrawTimeBegin;
+          const formData = new FormData();
+          formData.append('scoreSettings', JSON.stringify(scoreSettings));
+          for(const icon of iconArr) {
+            const {iconFile, type} = icon;
+            if (!iconFile) continue;
+            formData.append(type, iconFile);
+          }
+          return nkcUploadFile('/e/settings/score', 'PATCH', formData)
+        })
         .then(() => {
           sweetSuccess('保存成功');
         })

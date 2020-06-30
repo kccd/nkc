@@ -2,8 +2,8 @@ const data = {
   _id: 'score',
   c: {
     // 鼓励转账金额限制
-    creditMin: 0.01, // 最小金额
-    creditMax: 0.01, // 最大金额
+    creditMin: 1, // 最小金额
+    creditMax: 1000, // 最大金额
     // 附件上传下载扣除的积分类型
     attachmentScore: 'score1',
     // 鼓励扣除的积分类型

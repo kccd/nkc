@@ -48,17 +48,34 @@ router
 			}
 		}
 
+
+		for(const operation of scoreSettings.operations) {
+			const {count, cycle} = operation;
+			if(!['day'].includes(cycle)) ctx.throw(400, '积分策略中的周期设置错误')
+			checkNumber(count, {
+				name: '积分策略中的次数'
+			});
+			if(count < 0 && count !== -1) ctx.throw(400, '积分策略中的次数只能为-1或非负整数');
+			for(const scoreType in scores) {
+				if(!scores.hasOwnProperty(scoreType)) continue;
+				checkNumber(operation[scoreType], {
+					name: '积分策略中的加减积分值',
+					fractionDigits: 2
+				});
+			}
+		}
+
 		checkNumber(creditMin, {
-			name: '最小提现金额',
-			min: 0.01,
-			max: creditMax,
+			name: '最小鼓励金额',
+			min: 1,
 			fractionDigits: 2,
 		});
 		checkNumber(creditMax, {
-			name: '最大提现金额',
-			min: creditMin,
+			name: '最大鼓励金额',
+			min: 1,
 			fractionDigits: 2,
 		});
+		if(creditMin > creditMax) ctx.throw(400, '鼓励金额设置错误');
 
 		await db.SettingModel.updateOne({_id: 'score'}, {
 			$set: {

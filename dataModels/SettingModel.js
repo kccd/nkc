@@ -385,4 +385,23 @@ settingSchema.statics.getCreditSettings = async () => {
     max: scoreSettings.creditMax
   };
 };
+/*
+* 获取指定的积分操作类型对象，用于积分加减计算
+* @param {String} type 操作名
+* @return {Object} 与此操作相关的积分设置，包含周期、次数等
+* @author pengxiguaa 2020/6/30
+* */
+settingSchema.statics.getScoreOperationByType = async (type) => {
+  const SettingModel = mongoose.model('settings');
+  const scoreSettings = await SettingModel.getSettings('score');
+  let operation;
+  for(const o of scoreSettings.operations) {
+    if(o.type === type) {
+      operation = o;
+      break;
+    }
+  }
+  if(!operation) throwErr(500, '积分操作类型错误');
+  return operation;
+};
 module.exports = mongoose.model('settings', settingSchema);
