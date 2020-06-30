@@ -4,6 +4,7 @@ router
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
     data.usernameSettings = await db.SettingModel.getSettings("username");
+    data.scoreObject = await db.SettingModel.getScoreByOperationType("usernameScore");
     ctx.template = "experimental/settings/username/username.pug";
     await next();
   })

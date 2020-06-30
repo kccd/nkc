@@ -1524,6 +1524,43 @@ userSchema.statics.checkModifyUsername = async (uid) => {
   return kcb;
 };
 
+/**
+ * 判断用户是否有足够的积分修改用户名，并返回花费的积分和所需积分数
+ * @param {String} uid 用户id
+ */
+userSchema.statics.checkModifyUsernameScore = async (uid) => {
+  let UserModel = mongoose.model("users");
+  let SettingModel = await mongoose.model("settings");
+  // 全局用户名设置
+  let usernameSettings = await SettingModel.getSettings("username");
+  let usersGeneral = await mongoose.model("usersGeneral").findOnly({uid});
+  // 如果是免费修改用户名
+  if(usernameSettings.free) return 0;
+  // 花积分改名的次数
+  const reduce = usersGeneral.modifyUsernameCount + 1 - usernameSettings.freeCount;
+  // 如果从来没有花积分改名
+  if(reduce <= 0) return 0;
+  // 更新此用户的各项积分
+  await UserModel.updateUserScores(uid);
+  // 修改用户名需要使用哪种积分
+  let scoreObject = await SettingModel.getScoreByOperationType("usernameScore");
+  // 此用户此类型积分剩余多少
+  let myScore = await UserModel.getUserScore(uid, scoreObject.type);
+  // 此次改名需要花费
+  let score;
+  if(reduce * usernameSettings.onceKcb < usernameSettings.maxKcb) {
+    score = reduce * usernameSettings.onceKcb;
+  } else {
+    score = usernameSettings.maxKcb;
+  }
+  if(myScore < score)
+    throwErr(400, `${scoreObject.name}不足`);
+  return {
+    scoreObject,
+    needScore: score       // 此次改名所需积分数
+  };
+}
+
 /*
 * 验证发表文章权限，编辑器提示。
 * */

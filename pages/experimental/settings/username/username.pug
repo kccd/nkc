@@ -9,7 +9,7 @@ block eContent
         h4 修改用户名
         .form-horizontal
           .form-group
-            label.col-sm-2.control-label 花费科创币
+            label.col-sm-2.control-label= "花费" + data.scoreObject.name
             .col-sm-10
               .radio
                 label.m-r-1
@@ -24,11 +24,11 @@ block eContent
               .col-sm-4
                 input.form-control(type="text" v-model.number="usernameSettings.freeCount")
             .form-group
-              label.col-sm-2.control-label 花费增量（科创币）
+              label.col-sm-2.control-label= "花费增量（" + data.scoreObject.name + "）"
               .col-sm-4
                 input.form-control(type="text" v-model.number="usernameSettings.onceKcb")
             .form-group
-              label.col-sm-2.control-label 花费最大值（科创币）
+              label.col-sm-2.control-label= "花费最大值（" + data.scoreObject.name + "）"
               .col-sm-4
                 input.form-control(type="text" v-model.number="usernameSettings.maxKcb")
           .form-group
