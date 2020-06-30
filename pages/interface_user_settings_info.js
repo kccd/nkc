@@ -81,7 +81,7 @@ function selectBanner() {
       }
     }, "POST")
       .then(function (data) {
-        $("#userBanner").attr("src", "/a/" + data.user.banner);
+        $("#userBanner").attr("src", NKC.methods.tools.getUrl('userBanner', data.user.banner) + '&time=' + Date.now());
         emitEventToUpdateLocalUser(data);
         selectImage.close();
       })

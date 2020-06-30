@@ -119,6 +119,11 @@ block eContent
               select.form-control(v-model='scoreSettings.shareRewardScore')
                 option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
           .form-group
+            label.col-sm-2.control-label 问卷调查奖励
+            .col-sm-3.form-inline
+              select.form-control(v-model='scoreSettings.surveyRewardScore')
+                option(v-for='n in commonScoreSelect' :value='n.type') {{n.name}}
+          .form-group
             label.col-sm-2.control-label 鼓励转账
             .col-sm-3.form-inline
               select.form-control(v-model='scoreSettings.creditScore')

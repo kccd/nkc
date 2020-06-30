@@ -30,7 +30,8 @@ router
           ctx.filePath = statics.defaultUserBannerPath; break;
         case 'scoreIcon':
           ctx.filePath = statics.defaultScoreIconPath; break;
-        default: ctx.throw(400, '数据未找到');
+        default: ctx.filePath = statics.defaultAvatarPath;
+        // default: ctx.throw(400, '数据未找到');
       }
     }
     await next();

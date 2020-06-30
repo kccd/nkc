@@ -2671,15 +2671,15 @@ img.emoji {
 .nav-user-content .nav-user-count{
   height: 1.6rem;
   line-height: 1.6rem;
-  text-align: left;
   margin-top: 1rem;
   padding: 0 1rem;
   overflow: hidden;
+  text-align: center;
 }
 .nav-user-content .nav-user-count-span{
-  width: 49%;
   display: inline-block;
   text-align: center;
+  margin-right: 0.5rem;
 }
 .nav-user-content .nav-user-count-span img{
   height: 1.4rem;

@@ -261,7 +261,7 @@ kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additi
   }
 };
 
-// 与银行间的交易记录
+/*// 与银行间的交易记录
 kcbsRecordSchema.statics.insertSystemRecord_old = async (type, u, ctx, additionalReward) => {
   additionalReward = additionalReward || 0;
   const UserModel = mongoose.model("users");
@@ -343,7 +343,7 @@ kcbsRecordSchema.statics.insertSystemRecord_old = async (type, u, ctx, additiona
   // 写入交易记录，紧接着更新用户的kcb数据
   await newRecords.save();
   u.kcb = await UserModel.updateUserKcb(u.uid);
-};
+};*/
 
 // 用户间转账记录
 kcbsRecordSchema.statics.insertUsersRecord = async (options) => {

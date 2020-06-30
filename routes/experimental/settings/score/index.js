@@ -29,6 +29,7 @@ router
 			postRewardScore: '随机红包',
 			digestRewardScore: '精选稿费',
 			shareRewardScore: '分享奖励',
+			surveyRewardScore: '问卷调查奖励',
 			creditScore: '鼓励转账'
 		};
 		checkString(nkcBankName, {

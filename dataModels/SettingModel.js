@@ -262,6 +262,7 @@ settingSchema.statics.getEnabledScores = async () => {
       types.push({
         type: scoreType,
         name: scores[scoreType].name,
+        icon: scores[scoreType].icon,
         unit: scores[scoreType].unit
       });
     }
@@ -281,6 +282,7 @@ settingSchema.statics.getScores = async () => {
     const scoreType = `score${i}`;
     types.push({
       type: scoreType,
+      icon: scores[scoreType].icon,
       name: scores[scoreType].name,
       unit: scores[scoreType].unit
     })
@@ -366,7 +368,8 @@ settingSchema.statics.getScoreByOperationType = async (type) => {
     'usernameScore',
     'shopScore',
     'creditScore',
-    'attachmentScore'
+    'attachmentScore',
+    'surveyRewardScore',
   ].includes(type)) throwErr(500, `未知的操作类型 type: ${type}`);
   const scoreSettings = await SettingModel.getSettings('score');
   const scoreName = scoreSettings[type];

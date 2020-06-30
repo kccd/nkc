@@ -7,6 +7,8 @@ NKC.modules.SurveyEdit = function() {
       disabled: true,
       deadlineMax: "",
       targetUser: "",
+      targetUserSurveyRewardScore: '',
+      surveyRewardScore: '',
       survey: "",
       newSurvey: "",
       grades: [],
@@ -110,6 +112,8 @@ NKC.modules.SurveyEdit = function() {
           this_.newSurvey.permission.gradesId = arr;
           this_.roles = data.roles;
           this_.targetUser = data.user;
+          this_.surveyRewardScore = data.surveyRewardScore;
+          this_.targetUserSurveyRewardScore = data.targetUserSurveyRewardScore;
         })
     },
     methods: {

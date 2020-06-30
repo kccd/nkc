@@ -34,12 +34,20 @@ block content
             .account-user-certs=data.targetUser.info.certsName
             .account-user-description!=markdown_safe(data.targetUser.description)
             .account-user-kcb
-              .col-xs-6
-                img(src="/statics/kcb.png")
-                span=data.targetUser.kcb/100
-              .col-xs-6
-                img(src="/statics/xsf.png")
+              for s in data.targetUserScores
+                .account-user-score(title=`${s.name}：${s.number}`)
+                  img(src=tools.getUrl('scoreIcon', s.icon))
+                  span=s.number / 100
+              .account-user-score(title=`学术分：${data.targetUser.xsf}`)
+                img(src=tools.getUrl('defaultFile', 'xsf.png'))
                 span=data.targetUser.xsf
+              //-
+                .col-xs-6
+                  img(src="/statics/kcb.png")
+                  span=data.targetUser.kcb/100
+                .col-xs-6
+                  img(src="/statics/xsf.png")
+                  span=data.targetUser.xsf
             .account-user-links
               .account-user-links
                 a(href=`/u/${data.targetUser.uid}`).col-xs-6.account-user-link

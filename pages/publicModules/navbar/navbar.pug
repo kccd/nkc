@@ -85,11 +85,12 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                         img.grade-icon(src=tools.getUrl("gradeIcon", data.user.grade._id) title=data.user.grade.displayName)
                     .nav-user-certs=data.user.info.certsName
                     .nav-user-count
-                      .nav-user-count-span(title=`科创币：${data.user.kcb/100}`)
-                        img(src="/statics/kcb.png")
-                        span=data.user.kcb / 100
+                      for s in state.userScores
+                        .nav-user-count-span(title=`${s.name}：${s.number / 100}`)
+                          img(src=tools.getUrl('scoreIcon', s.icon))
+                          span=s.number / 100
                       .nav-user-count-span(title=`学术分：${data.user.xsf}`)
-                        img(src="/statics/xsf.png")
+                        img(src=tools.getUrl('defaultFile', 'xsf.png'))
                         span=data.user.xsf
                   .nav-user-links
                     a(href=`/u/${data.user.uid}/profile`).col-xs-6.nav-user-link

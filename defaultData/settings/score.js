@@ -20,6 +20,8 @@ const data = {
     digestRewardScore: 'score1',
     // 分享奖励
     shareRewardScore: 'score1',
+    // 问卷调查奖励
+    surveyRewardScore: 'score1',
     // 银行名称
     nkcBankName: '科创人民很行',
     // 交易系统

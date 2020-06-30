@@ -17,6 +17,8 @@ router
     data.users = await survey.getPostUsers();
     data.allowedUsers = await db.UserModel.find({uid: {$in: survey.permission.uid}});
     data.targetUser = await db.UserModel.findOnly({uid: survey.uid});
+    data.surveyRewardScore = await db.SettingModel.getScoreByOperationType('surveyRewardScore');
+    data.targetUserSurveyRewardScore = await db.UserModel.getUserScore(data.user.uid, data.surveyRewardScore.type);
     if(data.user) {
       data.surveyPost = await db.SurveyPostModel.findOne({uid: data.user.uid, surveyId: survey._id});
       try{

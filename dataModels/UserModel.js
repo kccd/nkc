@@ -1984,8 +1984,9 @@ userSchema.statics.getUserScores = async (uid) => {
   const enabledScores = await SettingModel.getEnabledScores();
   const arr = [];
   for(const score of enabledScores) {
-    const {type, name, unit} = score;
+    const {type, name, unit, icon} = score;
     arr.push({
+      icon,
       type,
       name,
       unit,
@@ -2007,8 +2008,9 @@ userSchema.statics.updateUserScores = async (uid) => {
   const enabledScores = await SettingModel.getEnabledScores();
   const arr = [];
   for(const score of enabledScores) {
-    const {type, name, unit} = score;
+    const {type, name, unit, icon} = score;
     arr.push({
+      icon,
       type,
       name,
       unit,

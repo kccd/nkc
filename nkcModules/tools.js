@@ -40,6 +40,9 @@ var Tools = function() {
       case "columnAvatar": {
         return "/a/" + id + t
       }
+      case "columnBanner": {
+        return "/a/" + id + t
+      }
       case "pdf": {
         return "/reader/pdf/web/viewer?file=%2fr%2f" + id
       }

@@ -78,6 +78,7 @@ router
     // 验证信息是否来自支付宝
     await nkcModules.alipay2.verifySign(body);
     // 查询科创币充值记录
+    const mainScore = await db.SettingModel.getMainScore();
     const record = await db.KcbsRecordModel.findOne({_id: out_trade_no});
     if(!record) return ctx.body = 'success';
     const totalAmount = Number(body.total_fee);
@@ -130,6 +131,7 @@ router
             _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
             from: record.to,
             to: record.from,
+            scoreType: mainScore.type,
             type: 'pay',
             ordersId: [order.orderId],
             num: order.orderPrice + order.orderFreightPrice,

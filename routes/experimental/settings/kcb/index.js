@@ -88,9 +88,11 @@ router
         "c.alipayInterface": false
       });
 
+      const mainScore = await db.SettingModel.getMainScore();
       const r = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID("kcbsRecords", 1),
         from: record.to,
+        scoreType: mainScore.type,
         to: record.from,
         type: "cancelWithdraw",
         num: record.num,
