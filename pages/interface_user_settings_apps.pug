@@ -89,18 +89,18 @@ block content
           .panel-body
             .form-horizontal
               .form-group
-                label.col-sm-2.control-label 图片水印：
+                label.col-sm-2.control-label 是否添加水印：
                 .col-sm-9
                   label.radio-inline
                     input(type='radio' name='isWater' id='radio1' value="yes" checked=data.waterSetting.waterAdd === true)
-                    span 为图片添加水印
+                    span 添加水印
                   label.radio-inline#isPay(data=`${data.waterSetting.waterPayInfo}`)
                     input(type='radio' name='isWater' id='radio2' value="no" checked=data.waterSetting.waterAdd === false onClick=`isAlreadyPay(${data.waterSetting.waterPayInfo})`)
                     span 不添加水印
               .form-group#payForWater(style="display:none")
                 label.col-sm-2.control-label
                 .col-sm-9
-                  h5.text-danger=`隐藏水印功能需要花费${data.kcbPayForWater/100}科创币，是否继续?`
+                  h5.text-danger=`隐藏水印功能需要花费${data.noWatermark.number/100}${data.noWatermark.name}，是否继续?`
                 .col-sm-2
                 .col-sm-9
                   button.btn.btn-primary.btn-sm#save(onclick=`yesPayForWater(${data.user.uid})`) 继续

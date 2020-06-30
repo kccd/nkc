@@ -16,6 +16,8 @@ router
     /*const waterPayType = await db.TypesOfScoreChangeModel.findOnly({_id: "waterPay"});
     data.kcbPayForWater = parseInt(waterPayType.change*-1);*/
     user.kcb = await db.UserModel.updateUserKcb(user.uid);
+    // 更新此用户的各项积分
+    await db.UserModel.updateUserScores(user.uid);
     const waterPayType = await db.KcbsTypeModel.findOnly({_id: 'waterPay'});
     data.kcbPayForWater = parseInt(waterPayType.num*-1);
     const userWaterSetting = await db.UsersGeneralModel.findOne({uid: user.uid});
@@ -24,6 +26,13 @@ router
     }else{
       await new db.UsersGeneralModel({uid:user.uid}).save()
     }
+    // 上传设置
+    const uploadSettings = await db.SettingModel.getSettings('upload');
+    // 去水印功能需要的积分数
+    let needSocre = uploadSettings.watermark.buyNoWatermark;
+    // 去水印功能使用的积分
+    let scoreObject = await db.SettingModel.getScoreByOperationType("watermarkScore");
+    data.noWatermark = {...scoreObject, number: needSocre};
     // 判断用户是否有专栏
     const column = await db.ColumnModel.findOne({uid: user.uid});
     data.hasColumn = !!column;

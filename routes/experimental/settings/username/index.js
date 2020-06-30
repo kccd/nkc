@@ -15,8 +15,8 @@ router
     freeCount = parseInt(freeCount);
     onceKcb = parseInt(onceKcb);
     if(freeCount < 0) ctx.throw(400, "免费修改次数不能小于0");
-    if(maxKcb < 0) ctx.throw(400, "花费科创币最大值不能小于0");
-    if(onceKcb < 0) ctx.throw(400, "花费科创币增量不能小于0");
+    if(maxKcb < 0) ctx.throw(400, "花费积分最大值不能小于0");
+    if(onceKcb < 0) ctx.throw(400, "花费积分增量不能小于0");
     await db.SettingModel.updateOne({_id: "username"}, {
       $set: {
         "c.maxKcb": maxKcb,
