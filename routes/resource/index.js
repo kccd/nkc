@@ -26,6 +26,7 @@ resourceRouter
     const {cache} = settings;
     const resource = await db.ResourceModel.findOnly({rid, type: "resource"});
     const {mediaType, ext} = resource;
+    const {user} = data;
     let filePath = await resource.getFilePath();
     let speed;
     if(mediaType === "mediaAttachment") {
@@ -92,6 +93,19 @@ resourceRouter
     // 表明客户端希望以附件的形式加载资源
     if(t === "attachment") {
       ctx.fileType = "attachment";
+      // 下载附件需要的积分
+      const operation = await db.SettingModel.getScoreOperationByType("attachmentDownload");
+      // 此用户目前持有的所有积分
+      await db.UserModel.updateUserScores(user.uid);
+      let myAllScore = await db.UserModel.getUserScores(user.uid);
+      // 判断积分是否足够，不够就抛错
+      for(let score of myAllScore) {
+        if(score.number < operation[score.type]) {
+          throwErr(`你的${score.name}不足，无法下载附件。`);
+        }
+      }
+      // 扣除积分
+      await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
     } else if(t === "object") {
       // 返回数据对象
       data.resource = resource;
