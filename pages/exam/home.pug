@@ -82,7 +82,7 @@ block content
         +listHeader('命题人')
         for li in data.usersList
           a(href=`/u/${li.user.uid}` target='_blank' style='display:inline-block;')
-            - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`科创币 ${li.user.kcb/100}\n`+`${li.user.info.certsName}`;
+            - var title = `${li.user.username}\n`+`学术分 ${li.user.xsf}\n`+`${li.user.info.certsName}`;
             img.user-list-avatar(src=tools.getUrl('userAvatar', li.user.avatar, 'sm') title=title)
 block scripts
   script.

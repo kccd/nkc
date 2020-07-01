@@ -10,6 +10,7 @@ NKC.modules.SurveyForm = function(id) {
       targetUser: "",
       showResult: false,
       havePermission: false,
+      surveyRewardScore: '',
       posted: false,
       options: [], // vote: optionsId, score: {score: 2}, survey: {answer: id}
       status: "", // unStart, beginning, end;
@@ -22,10 +23,12 @@ NKC.modules.SurveyForm = function(id) {
       rewardInfo: function() {
         var reward = this.survey.reward;
         var kcb = this.targetUser.kcb;
+        var scoreName = this.surveyRewardScore.name;
+        var scoreUnit = this.surveyRewardScore.unit;
         if(!reward.status) return;
         if(reward.rewardedCount >= reward.rewardCount) return;
         if(kcb/100 < reward.onceKcb) return;
-        return "作者设定每次提交奖励"+reward.onceKcb/100+"个科创币，数量有限，发完即止。";
+        return "作者设定每次提交奖励"+reward.onceKcb/100+scoreUnit + scoreName + "，数量有限，发完即止。";
       },
       // 已选结果
       optionsObj: function() {
@@ -175,6 +178,8 @@ NKC.modules.SurveyForm = function(id) {
         var this_ = this;
         var survey = this.survey;
         var options = this.options;
+        var scoreName = this.surveyRewardScore.name;
+        var scoreUnit = this.surveyRewardScore.unit;
         this.errorInfo = {};
         // 检测打分范围是否符合要求
         if(survey.type === "score") {
@@ -205,7 +210,7 @@ NKC.modules.SurveyForm = function(id) {
         })
           .then(function(data) {
             if(data.rewardNum !== undefined) {
-              sweetSuccess("提交成功！获得" + data.rewardNum/100 + "个科创币。", {autoHide: false});
+              sweetSuccess("提交成功！获得" + data.rewardNum/100 + scoreUnit + scoreName, {autoHide: false});
             } else {
               sweetSuccess("提交成功");
             }
@@ -260,6 +265,7 @@ NKC.modules.SurveyForm = function(id) {
             app.showResult = data.showResult;
             app.users = data.users;
             app.targetUser = data.targetUser;
+            app.surveyRewardScore = data.surveyRewardScore;
             if(data.surveyPost) {
               app.surveyPost = data.surveyPost;
               options = data.surveyPost.options;

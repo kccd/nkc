@@ -18,6 +18,9 @@ block content
     .nav-banner-mask
     .nav-banner(style=`background-image: url(${tools.getUrl('userBanner', data.user.banner)})` id="userBanner")
     .nav-content
+      .nav-scores
+        -const targetUserScores = state.userScores;
+        include ../../publicModules/userScores
       .nav-numbers
         a.nav-number(href=`/u/${data.user.uid}/profile/thread`)
           .name 文章
@@ -28,9 +31,6 @@ block content
         a.nav-number
           .name 学术分
           .value(id="userXSF")=data.user.xsf
-        a.nav-number(href=`/u/${data.user.uid}/profile/finance?t=all`)
-          .name 科创币
-          .value(id="userKCB")=data.user.kcb/100
       .nav-links
         a.nav-link(href=`/u/${data.user.uid}`)
           .icon-left

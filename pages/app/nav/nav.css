@@ -219,6 +219,9 @@ body {
   border-radius: 50%;
   border: 1px solid #ddd;
 }
+.app-nav .nav-scores {
+  background-color: #f6f6f6;
+}
 .app-nav .nav-numbers {
   font-size: 0;
   background-color: #fff;
@@ -228,7 +231,7 @@ body {
   padding: 1rem 0 0.7rem 0;
   text-align: center;
   color: #000;
-  width: 25%;
+  width: 33.333333%;
   display: inline-block;
   font-size: 1.2rem;
 }

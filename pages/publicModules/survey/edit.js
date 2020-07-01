@@ -49,8 +49,10 @@ NKC.modules.SurveyEdit = function() {
       rewardWarning: function() {
         var targetUser = this.targetUser;
         var survey = this.survey;
-        if(targetUser.kcb/100 < survey.reward.onceKcb*survey.reward.rewardCount) {
-          return "你的科创币不足，透支后将不再奖励。"
+        var surveyRewardScore = this.surveyRewardScore;
+        var targetUserSurveyRewardScore = this.targetUserSurveyRewardScore;
+        if(targetUserSurveyRewardScore/100 < survey.reward.onceKcb*survey.reward.rewardCount) {
+          return "你的"+surveyRewardScore.name+"不足，透支后将不再奖励。"
         }
       },
       timeStartDay: function() {

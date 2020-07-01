@@ -9,16 +9,14 @@
         include ../user/module_user_grade
   .user-panel-cert=userPanel.info.certsName
   .user-panel-number-div
-    .col-xs-3
+    .col-xs-4
       .user-panel-number=userPanel.threadCount
       .user-panel-title 文章
-    .col-xs-3
+    .col-xs-4
       .user-panel-number=userPanel.postCount
       .user-panel-title 回复
-    .col-xs-3
+    .col-xs-4
       .user-panel-number=userPanel.xsf
       .user-panel-title 学术分
-    .col-xs-3
-      .user-panel-number=userPanel.kcb/100
-      .user-panel-title 科创币
+
   .user-panel-description!=markdown(userPanel.description || "")

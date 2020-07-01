@@ -662,7 +662,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
   if(!["unCost", "unShip"].includes(order.orderStatus)) throwErr(400, "卖家仅能取消待付款或待发货的订单");
   if(order.orderStatus === "unShip") {
     if(money >= 100 && money <= 5000) {}
-    else throwErr(400, "补偿金额不能小于1科创币且不能大于50科创币");
+    else throwErr(400, `补偿金额不能小于1${mainScore.name}且不能大于50${mainScore.name}`);
   }
   const refund = ShopRefundModel({
     _id: await SettingModel.operateSystemID("shopRefunds", 1),

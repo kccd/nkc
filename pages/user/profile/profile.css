@@ -96,20 +96,12 @@ body {
 .account-nav .account-user-kcb {
   overflow: hidden;
   margin: 0.5rem 0 1rem 0;
-  text-align: center;
 }
 .account-nav .account-user-kcb > div {
   padding: 0;
-  margin-right: 0.5rem;
-  display: inline-block;
   text-align: center;
 }
-.account-nav .account-user-kcb img {
-  vertical-align: text-bottom;
-  height: 1.8rem;
-  width: 1.8rem;
-  margin-right: 0.4rem;
-}
+
 .account-nav .account-user-links {
   overflow: hidden;
 }

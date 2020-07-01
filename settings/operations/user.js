@@ -154,9 +154,6 @@ module.exports = {
 		    POST: 'disagreeApplicationToAddAFriend'
       }
     },
-    kcb: {
-		  GET: 'visitUserKcb'
-    },
     transfer: {
       GET: "transferKcbToUser",
       POST: "transferKcbToUser"

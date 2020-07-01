@@ -11,6 +11,9 @@ var app = new Vue({
     this.records = data.records;
     this.t = data.t || "username";
     this.content = data.content;
+    setTimeout(function() {
+      floatUserPanel.initPanel();
+    }, 500);
   },
   methods: {
     format: NKC.methods.format,
@@ -18,5 +21,5 @@ var app = new Vue({
       // window.location.href = "/e/log/recharge?t=" + app.t + "&content=" + app.content;
       openToNewLocation("/e/log/recharge?t=" + app.t + "&content=" + app.content);
     }
-  }
+  },
 });

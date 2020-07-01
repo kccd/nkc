@@ -2212,3 +2212,21 @@ div.user-banned{
   font-size: 1.2rem;
   color: #555;
 }
+.nkc-scores{
+  text-align: center;
+  padding: 0.5rem 0;
+}
+.nkc-score{
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+.nkc-score img{
+  height: 1.4rem;
+  width: 1.4rem;
+  margin-right: 0.2rem;
+  vertical-align: text-bottom;
+}
+.nkc-score span{
+  font-size: 1rem;
+  color: #555;
+}

@@ -5,7 +5,6 @@ const infoRouter = require("./info");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["wav", "amr", "mp3", "aac"];
-
 const {ThrottleGroup} = require("stream-throttle");
 
 // 存放用户设置
@@ -135,6 +134,7 @@ resourceRouter
     const {generateFolderName, extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = upload;
     const {user} = data;
 
+    const {websiteName} = await db.SettingModel.getSettings('server');
     let mediaRealPath;
     const {files, fields} = ctx.body;
     const {file} = files;
@@ -284,14 +284,14 @@ resourceRouter
         // 获取文字（用户名）水印的字符数、宽度、高度
         let username;
         if(waterStyle === "userLogo"){
-          username = ctx.data.user?ctx.data.user.username : "科创论坛";
+          username = ctx.data.user?ctx.data.user.username : websiteName;
         }else if(waterStyle === "coluLogo"){
           const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
           username = column?column.name : ctx.data.user.name+"的专栏";
         }else{
           username = "";
         }
-        // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
+        // const username = ctx.data.user?ctx.data.user.username : websiteName";
         const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
         const usernameWidth = usernameLength * 12;
         const usernameHeight = 24;
@@ -384,12 +384,12 @@ resourceRouter
       let {waterSetting} = generalSettings;
       const watermarkSettings = await db.SettingModel.getWatermarkSettings();
       let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
-      
+
       // 如果设置了需要加水印
       if(waterSetting.waterAdd) {
         let text;
         if(waterSetting.waterStyle === "userLogo"){
-          text = ctx.data.user?ctx.data.user.username : "科创论坛";
+          text = ctx.data.user?ctx.data.user.username : websiteName;
         }else if(waterSetting.waterStyle === "coluLogo"){
           const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
           text = column?column.name : ctx.data.user.name+"的专栏";

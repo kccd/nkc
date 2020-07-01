@@ -1505,7 +1505,7 @@ userSchema.statics.checkUsername = async (username = "") => {
 * @return {Number} 花费的科创币
 * @author pengxiguaa 2019-8-21
 * */
-userSchema.statics.checkModifyUsername = async (uid) => {
+/*userSchema.statics.checkModifyUsername = async (uid) => {
   const user = await mongoose.model("users").findOnly({uid});
   user.kcb = await mongoose.model("users").updateUserKcb(uid);
   const usersGeneral = await mongoose.model("usersGeneral").findOnly({uid});
@@ -1522,7 +1522,7 @@ userSchema.statics.checkModifyUsername = async (uid) => {
   if(user.kcb < kcb)
     throwErr(400, "科创币不足");
   return kcb;
-};
+};*/
 
 /**
  * 判断用户是否有足够的积分修改用户名，并返回花费的积分和所需积分数

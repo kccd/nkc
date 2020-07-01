@@ -4,7 +4,7 @@ block eTitle
 block eContent
   .container-fluid.max-width
     .row
-      .hidden#data= objToStr({usernameSettings: data.usernameSettings})
+      .hidden#data= objToStr({usernameSettings: data.usernameSettings, scoreObject: data.scoreObject})
       .col-xs-12.col-md-12#app(v-cloak)
         h4 修改用户名
         .form-horizontal

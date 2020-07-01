@@ -22,7 +22,7 @@ const spawnProcess = (pathName, args, options = {}) => {
     });
     bat.on('close', (code) => {
       if(code !== 0) {
-        reject(err);
+        return reject(err);
       }
       resolve(data);
     });
@@ -129,7 +129,7 @@ const getVideoSize = async (inputPath) => {
  */
 async function getDrawTextSize(text, fontsize) {
   return new Promise((resolve, reject) => {
-    exec(`ffmpeg -i C:/Users/Chris/Pictures/input.mp4 -vf "drawtext=fontfile='C\\:/Users/Chris/Pictures/simsun.ttc':fontsize=${fontsize}:text='${text}':x=0+0*print(tw):y=0+0*print(th)" -vframes 1 -f null -`, 
+    exec(`ffmpeg -i C:/Users/Chris/Pictures/input.mp4 -vf "drawtext=fontfile='C\\:/Users/Chris/Pictures/simsun.ttc':fontsize=${fontsize}:text='${text}':x=0+0*print(tw):y=0+0*print(th)" -vframes 1 -f null -`,
     function(err, stdout, stderr ) {
       let results = stderr.split("\n").reverse();
       resolve({
@@ -176,8 +176,8 @@ const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:
 const addImageWaterMask = async (op) => {
   let {
     videoPath,
-    imagePath, 
-    output, 
+    imagePath,
+    output,
     position =  {x: 10, y: 10},
     flex = 0.1,
     transparency = 0.5

@@ -20,7 +20,7 @@ redEnvelopeRouter
       ctx.throw(400, "随机红包的弹出几率设置错误，范围：(0, 100]");
     }
     for(const award of random.awards) {
-      if(award.kcb <= 0) ctx.throw(400, '奖金科创币得数量必须大于0');
+      if(award.kcb <= 0) ctx.throw(400, '奖金数额必须大于0');
       if(award.chance < 0) ctx.throw(400, '概率不能小于0');
       if(award.float < 0) ctx.throw(400, '政府浮动不能小于0');
       if(!award.name) ctx.throw(400, '奖金名不能为空');
@@ -37,9 +37,9 @@ redEnvelopeRouter
       const s = share[key];
       s.kcb = Number(s.kcb);
       s.maxKcb = Number(s.maxKcb);
-      if((s.kcb + '').includes('.') || (s.kcb + '').includes('.')) ctx.throw(400, '科创币仅支持整数');
-      if(s.kcb <= 0) ctx.throw(400, '分享奖励中的科创币不能小于1');
-      if(s.kcb > s.maxKcb) ctx.throw(400, '分享奖励中的科创币不能大于奖励上限');
+      if((s.kcb + '').includes('.') || (s.kcb + '').includes('.')) ctx.throw(400, `奖励数额仅支持整数`);
+      if(s.kcb <= 0) ctx.throw(400, '分享奖励数额不能小于1');
+      if(s.kcb > s.maxKcb) ctx.throw(400, '分享奖励数额不能大于奖励上限');
     }
     await db.SettingModel.update({_id: 'redEnvelope'}, {$set: {'c.random': random, 'c.draftFee': draftFee, 'c.share': share}});
     await db.SettingModel.saveSettingsToRedis("redEnvelope");

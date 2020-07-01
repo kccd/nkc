@@ -181,18 +181,15 @@ block content
       .ms-friend-description {{friend.targetUser.description || '暂未填写个人简介'}}
       .ms-friend-count
         .col-xs-12.col-md-10.col-md-offset-1
-          .col-xs-3.col-md-3
+          .col-xs-4.col-md-4
             .friend-count-key 文章
             .friend-count-value {{friend.targetUser.threadCount-friend.targetUser.disabledThreadsCount}}
-          .col-xs-3.col-md-3
+          .col-xs-4.col-md-4
             .friend-count-key 回复
             .friend-count-value {{friend.targetUser.postCount - friend.targetUser.disabledPostsCount}}
-          .col-xs-3.col-md-3
+          .col-xs-4.col-md-4
             .friend-count-key 学术分
             .friend-count-value {{friend.targetUser.xsf}}
-          .col-xs-3.col-md-3
-            .friend-count-key 科创币
-            .friend-count-value {{friend.targetUser.kcb/100}}
       .ms-friend-button
         .col-xs-12.col-md-10.col-md-offset-1
           .col-xs-12(v-if="!friend.targetUser.column")
