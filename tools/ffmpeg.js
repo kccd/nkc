@@ -9,6 +9,11 @@ const {stat, unlink} = fs;
 const path = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const {upload} = require('../settings');
+
+const fontFilePath = settings.statics.fontNotoSansHansMedium;
+const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");
+const tempImageForFFmpeg = settings.statics.deletedPhotoPath;
+
 const spawnProcess = (pathName, args, options = {}) => {
   return new Promise((resolve, reject) => {
     const bat = spawn(pathName, args, options);
@@ -22,7 +27,7 @@ const spawnProcess = (pathName, args, options = {}) => {
     });
     bat.on('close', (code) => {
       if(code !== 0) {
-        return reject(err);
+        reject(err);
       }
       resolve(data);
     });
@@ -114,13 +119,14 @@ const audioWMATransMP3 = async (inputPath, outputPath) => {
  * @param {string} inputPath 视频路径
  */
 const getVideoSize = async (inputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath])
-    .catch(data => {
-      let results = data.match(/Video: (.*?), (.*?), (.*?)[,\s]/)[3].split("x");
-      return Promise.resolve({
-        width: parseInt(results[0]),
-        height: parseInt(results[1])
-      });
+  return spawnProcess('ffprobe', ["-v", "error", "-show_entries", "stream=width,height", "-of", "csv=p=0:s=x", inputPath])
+    .then(data => {
+      data = data.trim();
+      let info = data.split("x");
+      return {
+        width: parseInt(info[0]),
+        height: parseInt(info[1])
+      }
     })
 }
 
@@ -129,12 +135,12 @@ const getVideoSize = async (inputPath) => {
  */
 async function getDrawTextSize(text, fontsize) {
   return new Promise((resolve, reject) => {
-    exec(`ffmpeg -i C:/Users/Chris/Pictures/input.mp4 -vf "drawtext=fontfile='C\\:/Users/Chris/Pictures/simsun.ttc':fontsize=${fontsize}:text='${text}':x=0+0*print(tw):y=0+0*print(th)" -vframes 1 -f null -`,
+    exec(`ffmpeg -i ${tempImageForFFmpeg} -vf "drawtext=fontfile='${fontFilePathForFFmpeg}':fontsize=${fontsize}:text='${text}':x=0+0*print(tw):y=0+0*print(th)" -vframes 1 -f null -`, 
     function(err, stdout, stderr ) {
-      let results = stderr.split("\n").reverse();
+      let results = stderr.trim().split("\n").reverse();
       resolve({
-        width: parseFloat(results[3]),
-        height: parseFloat(results[4])
+        width: parseFloat(results[8]),
+        height: parseFloat(results[9])
       });
     });
   });
@@ -164,10 +170,6 @@ const ffmpegFilter = async (inputPath, outputPath, filters) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-filter_complex', filters.join(";"), '-y', outputPath]);
 }
 
-
-const fontFilePath = settings.statics.fontNotoSansHansMedium;
-const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");
-
 /**
  * 视频加图片水印
  * @param {Object} options 配置
@@ -176,8 +178,8 @@ const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:
 const addImageWaterMask = async (op) => {
   let {
     videoPath,
-    imagePath,
-    output,
+    imagePath, 
+    output, 
     position =  {x: 10, y: 10},
     flex = 0.1,
     transparency = 0.5

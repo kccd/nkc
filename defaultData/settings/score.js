@@ -125,9 +125,9 @@ const operations = [
   'reportIssue',
   'digestThread',
   'unDigestThread',
-  'waterPay',
   'digestPost',
-  'unDigestPost'
+  'unDigestPost',
+  'attachmentDownload'
 ];
 data.c.operations = [];
 for(const o of operations) {

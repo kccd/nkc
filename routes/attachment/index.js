@@ -2,7 +2,8 @@ const router = require('koa-router')();
 const fsPromise = require('fs').promises;
 router
   .get('/:id', async (ctx, next) => {
-    const {params, db, query, settings} = ctx;
+    const {params, db, query, settings, data} = ctx;
+    const {user} = data;
     const {statics} = settings;
     const {id} = params;
     const {t, c} = query;
