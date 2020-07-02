@@ -6,6 +6,7 @@ const categoryRouter = require('./category');
 const kindRouter = require('./kind');
 const permissionRouter = require('./permission');
 const mergeRouter = require('./merge');
+const scoreRouter = require('./score');
 settingsRouter
 	.use('/', async (ctx, next) => {
 		const {data, db, params, url} = ctx;
@@ -41,5 +42,6 @@ settingsRouter
 	.use('/category', categoryRouter.routes(), categoryRouter.allowedMethods())
 	.use('/kind', kindRouter.routes(), kindRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
+	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
 	.use('/merge', mergeRouter.routes(), mergeRouter.allowedMethods());
 module.exports = settingsRouter;

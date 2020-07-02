@@ -8,16 +8,16 @@ block content
       .col-xs-12.col-md-8.col-md-offset-2
         #data.hidden= objToStr({mainScore: data.mainScore, countToday: data.countToday, withdrawSettings: data.withdrawSettings, userMainScore: data.userMainScore, alipayAccounts: data.alipayAccounts, bankAccounts: data.bankAccounts})
         div#app(v-cloak)
-          .row(v-if="succeed").text-center.m-t-4
-            include ../../publicModules/icon-success
-            h3 提现成功
-            h5 你已成功提现
-              strong.text-danger &nbsp;{{succeedMoney/100}}&nbsp;
-              |个科创币，当前科创币剩余
-              strong.text-danger &nbsp;{{user.kcb/100}}&nbsp;
-              |个
-            a(onclick=`NKC.methods.visitUrl('/u/${data.user.uid}/profile/finance?t=payout')`).m-r-1 查看记录
-            a(onclick="NKC.methods.visitUrl('/account/finance/withdraw')") 再次提现
+          //.row(v-if="succeed").text-center.m-t-4
+          //  include ../../publicModules/icon-success
+          //  h3 提现成功
+          //  h5 你已成功提现
+          //    strong.text-danger &nbsp;{{succeedMoney/100}}&nbsp;
+          //    |个科创币，当前科创币剩余
+          //    strong.text-danger &nbsp;{{user.kcb/100}}&nbsp;
+          //    |个
+          //  a(onclick=`NKC.methods.visitUrl('/u/${data.user.uid}/profile/finance?t=payout')`).m-r-1 查看记录
+          //  a(onclick="NKC.methods.visitUrl('/account/finance/withdraw')") 再次提现
           .row(v-else )
             .col-xs-12.col-xs-12
               -const targetUserScores = data.userScores;

@@ -197,7 +197,8 @@ module.exports = async (ctx, next) => {
     ctx.state.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
     ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
     ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
-    
+    ctx.state.userScores = await db.UserModel.getUserScores(data.user.uid);
+
     data.user.roles = userRoles;
     data.user.grade = userGrade;
   }

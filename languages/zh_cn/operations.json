@@ -727,5 +727,6 @@
 
   "experimentalRechargeSettings": "后台管理 - 充值/提现设置",
 
-  "getUserAllScores": "获取某用户的所有积分"
+  "getUserAllScores": "获取某用户的所有积分",
+  "forumScoreSettings": "专业积分策略设置"
 }

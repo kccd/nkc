@@ -1,0 +1,9 @@
+extends ../../experimental
+block eTitle
+  title 专业设置
+block eContent
+  #data.hidden=objToStr({forums: data.forums})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-12
+        h4 专业排序

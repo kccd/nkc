@@ -249,43 +249,50 @@ settingSchema.statics.getWatermarkSettings = async () => {
 };
 
 /*
-* 获取启用的积分ID
+* 获取启用的积分对象
+* @return {[Object]} 积分对象
+* @author pengxiguaa 2020/7/2
 * */
 settingSchema.statics.getEnabledScores = async () => {
   const SettingModel = mongoose.model('settings');
-  const scoreSettings = await SettingModel.getSettings('score');
-  const {scores} = scoreSettings;
-  const types = [];
-  for(let i = 1; i <= 5; i++) {
-    const scoreType = `score${i}`;
-    if(scores[scoreType].enabled) {
-      types.push({
-        type: scoreType,
-        name: scores[scoreType].name,
-        unit: scores[scoreType].unit
-      });
-    }
+  const scores = await SettingModel.getScores();
+  const _scores = [];
+  for(const score of scores) {
+    if(score.enabled) _scores.push(score);
   }
-  return types;
+  return _scores;
 };
+
+/**
+ * 获取启用的积分类型名数组
+ * @returns {string[]} 积分类型名数组  ["score1", "score2" ... ]
+ */
+settingSchema.statics.getEnabledScoreTypes = async () => {
+  let scores = await settingSchema.statics.getEnabledScores();
+  return scores.map(score => {
+    return score.type;
+  });
+};
+
 /*
 * 获取全部积分
-* @return {[Object]} 所有的积分对象，只包含type、name、unit属性
+* @return {[Object]} 所有的积分对象
+* @author pengxiguaa 2020/7/2
 * */
 settingSchema.statics.getScores = async () => {
   const SettingModel = mongoose.model("settings");
   const scoreSettings = await SettingModel.getSettings('score');
-  const {scores} = scoreSettings;
-  const types = [];
-  for(let i = 1; i <= 5; i++) {
-    const scoreType = `score${i}`;
-    types.push({
-      type: scoreType,
-      name: scores[scoreType].name,
-      unit: scores[scoreType].unit
-    })
-  }
-  return types;
+  return scoreSettings.scores;
+};
+/*
+* 获取全部积分类型
+* @return {[String]} 积分类型组成的数组
+* @author pengxiguaa 2020/7/2
+* */
+settingSchema.statics.getScoresType = async () => {
+  const SettingModel = mongoose.model('settings');
+  const scores = await SettingModel.getScores();
+  return scores.map(s => s.type);
 };
 /*
 * 获取交易积分
@@ -294,8 +301,8 @@ settingSchema.statics.getScores = async () => {
 * */
 settingSchema.statics.getMainScore = async () => {
   const SettingModel = mongoose.model('settings');
-  const scoreSettings = await SettingModel.getSettings('score');
-  return scoreSettings.scores.score1;
+  const scores = await SettingModel.getScores();
+  return scores[0];
 };
 
 /*
@@ -306,9 +313,14 @@ settingSchema.statics.getMainScore = async () => {
 * */
 settingSchema.statics.getScoreByScoreType = async (type) => {
   const SettingModel = mongoose.model('settings');
-  const scoreSettings = await SettingModel.getSettings('score');
-  if(!['score1', 'score2', 'score3', 'score4', 'score5'].includes(type)) throwErr(500, '积分类型错误');
-  return scoreSettings.scores[type];
+  const scoresType = await SettingModel.getScoresType();
+  if(!scoresType.includes(type)) throwErr(500, `积分类型错误 type: ${type}`);
+  const scores = await SettingModel.getScores();
+  for(const score of scores) {
+    if(score.type === type) {
+      return score;
+    }
+  }
 }
 
 /*
@@ -366,11 +378,12 @@ settingSchema.statics.getScoreByOperationType = async (type) => {
     'usernameScore',
     'shopScore',
     'creditScore',
-    'attachmentScore'
+    'attachmentScore',
+    'surveyRewardScore',
   ].includes(type)) throwErr(500, `未知的操作类型 type: ${type}`);
   const scoreSettings = await SettingModel.getSettings('score');
-  const scoreName = scoreSettings[type];
-  return scoreSettings.scores[scoreName];
+  const scoreType = scoreSettings[type];
+  return await SettingModel.getScoreByScoreType(scoreType);
 };
 
 /*
@@ -387,22 +400,78 @@ settingSchema.statics.getCreditSettings = async () => {
   };
 };
 /*
-* 获取指定的积分操作类型对象，用于积分加减计算
+* 获取指定的积分操作类型对象，用于积分加减计算，此方法取出的是后台积分策略（非专业）
 * @param {String} type 操作名
 * @return {Object} 与此操作相关的积分设置，包含周期、次数等
 * @author pengxiguaa 2020/6/30
 * */
-settingSchema.statics.getScoreOperationByType = async (type) => {
+settingSchema.statics.getDefaultScoreOperationByType = async (type) => {
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  const scoreOperation = await ScoreOperationModel.findOne({
+    from: 'default',
+    type,
+  });
+  if(!scoreOperation) throwErr(400, `未找到指定的默认积分策略 type: ${type}`);
+  return scoreOperation;
+};
+
+/*
+* 指定类型和专业id数组，获取积分策略对象
+* @param {String} type 操作名
+* @param {[String]} forumsId 专业id组成的数组
+* @return {[Object]} 积分策略对象组成的数组
+* */
+settingSchema.statics.getScoreOperationsByType = async (type, forumsId = []) => {
+  const ScoreOperationModel = mongoose.model('scoreOperations');
   const SettingModel = mongoose.model('settings');
-  const scoreSettings = await SettingModel.getSettings('score');
-  let operation;
-  for(const o of scoreSettings.operations) {
-    if(o.type === type) {
-      operation = o;
-      break;
-    }
+  let scoreOperations = [];
+  if(forumsId.length) {
+    scoreOperations = await ScoreOperationModel.find({
+      from: 'forum',
+      fid: {$in: forumsId}
+    });
   }
-  if(!operation) throwErr(500, '积分操作类型错误');
-  return operation;
+  if(!scoreOperations.length) {
+    scoreOperations[0] = await SettingModel.getDefaultScoreOperationByType(type);
+  }
+  return scoreOperations.filter(s => s.count !== 0);
+};
+/*
+* 获取所有默认积分策略操作对象
+* @return {[Object]} 默认策略操作对象
+* @author pengxiguaa 2020/7/2
+* */
+settingSchema.statics.getDefaultScoreOperations = async () => {
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  return await ScoreOperationModel.find({
+    from: 'default'
+  }).sort({toc: 1});
+};
+/*
+* 获取所有专业配置的积分策略操作对象
+* @return {[Object]} 积分策略操作对象
+* @author pengxiguaa 2020/7/2
+* */
+settingSchema.statics.getForumAvailableScoreOperations = async () => {
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  const operations = await ScoreOperationModel.find({
+    forumAvailable: true,
+    from: 'default'
+  }).sort({toc: 1});
+  return operations.map(o => o.toObject());
+};
+/*
+* 获取专业已配置的积分策略操作对象
+* @param {String} fid 专业ID
+* @return {[Object]} 积分策略操作对象
+* @author pengxiguaa 2020/7/2
+* */
+settingSchema.statics.getForumScoreOperations = async (fid) => {
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  return await ScoreOperationModel.find({
+    from: 'forum',
+    fid
+  })
+    .sort({toc: 1});
 };
 module.exports = mongoose.model('settings', settingSchema);

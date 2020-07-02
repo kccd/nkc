@@ -6,6 +6,7 @@ router
 		const {pid} = params;
 		let {kcb} = body;
     const post = await db.PostModel.findOnly({pid});
+		const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
     const thread = await post.extendThread();
     const forums = await thread.extendForums(['mainForums', 'minorForums']);
     let isModerator = ctx.permission('superModerator');
@@ -24,8 +25,8 @@ router
     if(!redEnvelopeSettings.c.draftFee.close) {
       if(!kcb) ctx.throw(400, '参数错误，请刷新');
       num = Number(kcb);
-      if(num%1 !== 0) ctx.throw(400, "科创币仅支持到小数点后两位");
-      if(!redEnvelopeSettings.c.draftFee.close && (num < redEnvelopeSettings.c.draftFee.minCount || num > redEnvelopeSettings.c.draftFee.maxCount)) ctx.throw(400, '科创币数额不在范围内');
+      if(num%1 !== 0) ctx.throw(400, `${digestRewardScore.name}仅支持到小数点后两位`);
+      if(!redEnvelopeSettings.c.draftFee.close && (num < redEnvelopeSettings.c.draftFee.minCount || num > redEnvelopeSettings.c.draftFee.maxCount)) ctx.throw(400, `${digestRewardScore.name}数额不在范围内`);
     }
 		data.targetUser = targetUser;
 
@@ -52,7 +53,6 @@ router
 		};
 		let message;
     const messageId = await db.SettingModel.operateSystemID('messages', 1);
-    const digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
 		if(thread.oc === pid) {
 			await thread.update({digest: true, digestTime});
 			// await db.UsersScoreLogModel.insertLog(log);

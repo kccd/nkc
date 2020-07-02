@@ -19,6 +19,8 @@ router
     if(deadlineMax) {
       data.deadlineMax = deadlineMax;
     }
+    data.surveyRewardScore = await db.SettingModel.getScoreByOperationType('surveyRewardScore');
+    data.targetUserSurveyRewardScore = await db.UserModel.getUserScore(user.uid, data.surveyRewardScore.type);
     await next();
   })
   .post("/", async (ctx, next) => {

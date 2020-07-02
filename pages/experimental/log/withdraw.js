@@ -3,7 +3,8 @@ var app = new Vue({
   data: {
     records: [],
     t: "",
-    content: ""
+    content: "",
+    mainScore: "",
   },
   mounted: function() {
     var data = document.getElementById("data");
@@ -11,6 +12,10 @@ var app = new Vue({
     this.records = data.records;
     this.t = data.t || "username";
     this.content = data.content;
+    this.mainScore = data.mainScore;
+    setTimeout(function() {
+      floatUserPanel.initPanel();
+    }, 500)
   },
   methods: {
     format: NKC.methods.format,
@@ -33,7 +38,8 @@ var app = new Vue({
         })
     },
     fail: function(record) {
-      if(confirm("此操作将会把“调用接口”的状态改为“失败”，并且退还给用户 " +record.num/100+ " 科创币，确定要继续吗？") === false) return;
+      const mainScoreName = this.mainScore.name;
+      if(confirm("此操作将会把“调用接口”的状态改为“失败”，并且退还给用户 " +record.num/100+ " "+mainScoreName+"，确定要继续吗？") === false) return;
       nkcAPI("/e/settings/kcb/record", 'PATCH', {
         type: "fail",
         kcbsRecordId: record._id

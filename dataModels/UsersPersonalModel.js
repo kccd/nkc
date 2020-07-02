@@ -281,6 +281,16 @@ const usersPersonalSchema = new Schema({
   	type: Number,
 		default: 0,
 		index: 1
+	},
+	score6: {
+  	type: Number,
+		default: 0,
+		index: 1,
+	},
+	score7: {
+  	type: Number,
+		default: 0,
+		index:1
 	}
 },
   {

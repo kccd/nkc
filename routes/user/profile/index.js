@@ -43,6 +43,7 @@ router
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(targetUser.uid, "sub");
     data.fansId = await db.SubscribeModel.getUserFansId(targetUser.uid);
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
+    data.targetUserScores = await db.UserModel.updateUserScores(targetUser.uid);
     const noteCount = await db.NoteContentModel.count({
       uid: targetUser.uid,
       deleted: false

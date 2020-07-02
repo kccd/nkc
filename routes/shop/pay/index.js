@@ -106,11 +106,12 @@ router
     for(let order of orders) {
       totalMoney += (order.orderPrice+order.orderFreightPrice);
     }
-    user.kcb = await db.UserModel.updateUserKcb(user.uid);
-    if(user.kcb < totalMoney) ctx.throw(400, "您的科创币不足，请先充值或选择其他付款方式支付");
-    if(totalMoney !== parseInt(Number(totalPrice)*100)) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
-
+    await db.UserModel.updateUserScores(user.uid);
     const mainScore = await db.SettingModel.getMainScore();
+    const userMainScore = await db.UserModel.getUserScore(user.uid, mainScore.type);
+    // user.kcb = await db.UserModel.updateUserKcb(user.uid);
+    if(userMainScore < totalMoney) ctx.throw(400, `你的${mainScore.name}不足，请先充值或选择其他付款方式支付`);
+    if(totalMoney !== parseInt(Number(totalPrice)*100)) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
 
     for(let order of orders) {
       const r = db.KcbsRecordModel({

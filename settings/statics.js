@@ -33,7 +33,7 @@ const deletedPhotoPath = defaultPath + '/deleted_photo.jpg';
 const disabledPhotoPath = defaultPath + '/disabled_photo.jpg';
 // 默认表情图
 const defaultStickerImage = defaultPath + '/default_avatar.gif';
-const defaultScoreIconPath = staticPath + '/kcb.png';
+const defaultScoreIconPath = defaultPath + '/kcb.png';
 module.exports = {
   deletedPhotoPath,
   disabledPhotoPath,

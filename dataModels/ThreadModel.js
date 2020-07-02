@@ -1437,6 +1437,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
     // 未超时则忽略
     if(!delThreadLog) continue;
     // 将文章移动到回收站
+    const _threadMainForumsId = thread.mainForumsId;
     forumsId = forumsId.concat(thread.mainForumsId);
     await thread.update({
       recycleMark: false,
@@ -1456,6 +1457,9 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
     // 文章被删，触发科创币加减
     if(tUser) {
       await KcbsRecordModel.insertSystemRecord('threadBlocked', tUser, {
+        state: {
+          _scoreOperationForumsId: _threadMainForumsId
+        },
         data: {
           user: {},
           thread

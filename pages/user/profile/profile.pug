@@ -34,12 +34,9 @@ block content
             .account-user-certs=data.targetUser.info.certsName
             .account-user-description!=markdown_safe(data.targetUser.description)
             .account-user-kcb
-              .col-xs-6
-                img(src="/statics/kcb.png")
-                span=data.targetUser.kcb/100
-              .col-xs-6
-                img(src="/statics/xsf.png")
-                span=data.targetUser.xsf
+              -const targetUserScores = data.targetUserScores;
+              -const targetUserXSF = data.targetUser.xsf;
+              include ../../publicModules/userScores
             .account-user-links
               .account-user-links
                 a(href=`/u/${data.targetUser.uid}`).col-xs-6.account-user-link
@@ -65,19 +62,15 @@ block content
         if !data.type
           .account-info
             .row
-              .col-xs-6.col-md-3
+              .col-xs-6.col-md-4
                 a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
                   .account-info-value=data.targetUser.threadCount
                   .account-info-name 文章
-              .col-xs-6.col-md-3
+              .col-xs-6.col-md-4
                 a(href=`/u/${data.targetUser.uid}/profile/post` title="点击查看回复")
                   .account-info-value=data.targetUser.postCount
                   .account-info-name 回复
-              .col-xs-6.col-md-3
-                a(href=`/u/${data.targetUser.uid}/profile/finance` title="点击查看账单")
-                  .account-info-value=data.targetUser.kcb/100
-                  .account-info-name 科创币
-              .col-xs-6.col-md-3
+              .col-xs-6.col-md-4
                 a
                   .account-info-value=data.targetUser.xsf
                   .account-info-name 学术分

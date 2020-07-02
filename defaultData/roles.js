@@ -20,6 +20,7 @@ module.exports = [
     modifyPostTimeLimit: 0.5,
     type: 'system',
     operationsId: [
+      "getAttachment",
       "APPGetNav",
       "APPcheckout",
       "APPgetScoreChange",
@@ -369,6 +370,7 @@ module.exports = [
     modifyPostTimeLimit: 0,
     type: 'system',
     operationsId: [
+      "getAttachment",
       "APPGetNav",
       "APPcheckout",
       "activityListIndex",
@@ -470,6 +472,7 @@ module.exports = [
     modifyPostTimeLimit: 0,
     type: 'system',
     operationsId: [
+      "getAttachment",
       "APPcheckout",
       "APPgetScoreChange",
       "activityApplyPost",

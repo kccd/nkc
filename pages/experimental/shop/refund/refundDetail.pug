@@ -4,13 +4,13 @@ block title
   +includeCSS('/shop/shop.css')
 block shopSettings
 
-  mixin userInfo(u) 
+  mixin userInfo(u)
     .m-b-3
       h5 用户名：
         a(href=`/u/${u.uid}` target="_blank")= u.username
         | &nbsp;
         a(target="_blank" href=`/message?uid=${u.uid}`) 发私信
-      h5=`文章：${u.threadCount}，回复：${u.postCount}，学术分：${u.xsf}，科创币：${u.kcb/100}`
+      h5=`文章：${u.threadCount}，回复：${u.postCount}，学术分：${u.xsf}`
       h5=`手机号：${u.nationCode?"+"+u.nationCode+" ":""}${u.mobile}`
       h5=`邮箱：${u.email? u.email: "未绑定"}`
       h5=`说明：${u.reason}`
@@ -21,7 +21,7 @@ block shopSettings
             .pointer.shop-cert(title=cert.name onclick=`app.viewCert({_id: ${cert._id}})`)
               if cert.ext === "jpg"
                 img(src=`/shop/cert/${cert._id}?type=sm` style='width: 100%;')
-              else  
+              else
                 .text-center.shop-cert-file.p-t-2
                   span.fa.fa-file &nbsp;
                   span=cert.name
@@ -29,7 +29,7 @@ block shopSettings
   .col-xs-12.col-sm-10.col-md-10(style='margin-bottom: 1rem;padding:1rem')
     a.btn.btn-primary(href=`/e/settings/shop/refunds`) 返回申请列表
     .hidden#data= JSON.stringify({order: data.order, user: data.user, refund: data.refund, refunds: data.refunds})
-    .row#app(v-cloak)   
+    .row#app(v-cloak)
       div(v-if='order')
         .col-xs-12.col-md-12
           .row
@@ -85,21 +85,21 @@ block shopSettings
                 h4 卖家
                 hr
                 +userInfo(data.seller)
-                   
 
 
-              div(v-if='order.refundStatus === "ing" && refund.status === "P_APPLY_RM"')  
+
+              div(v-if='order.refundStatus === "ing" && refund.status === "P_APPLY_RM"')
                 .form
                   .form-group
                     h4.text-danger 用户申请只退款
-                    div 
+                    div
                       <label class="radio-inline">
                         <input type="radio" :value="true" v-model="agree"> 同意，系统随即打款
                       </label>
                       br
                       <label class="radio-inline">
                         <input type="radio" :value="false" v-model="agree"> 拒绝
-                      </label>  
+                      </label>
                   .form-group(v-if="agree === false")
                     h5 理由（不超过1000字节）：
                     textarea.form-control(rows="8" v-model="reason")

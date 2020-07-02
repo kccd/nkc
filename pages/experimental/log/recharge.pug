@@ -1,7 +1,7 @@
 extends ../../bootstrap_base
 
 block title
-  title 科创币充值记录
+  title 积分充值记录
   +includeCSS('/experimental/index.css')
   style.
     tbody tr th {
@@ -45,11 +45,13 @@ block content
                 th {{format('YYYY/MM/DD HH:mm:ss', record.toc)}}
                 th {{record._id}}
                 th
-                  a(:href="'/u/' + record.toUser.uid" target='_blank' :title='"科创币：" + record.toUser.kcb/100') {{record.toUser.username}}
+                  a(:href="'/u/' + record.toUser.uid" target='_blank' :data-float-uid='record.toUser.uid') {{record.toUser.username}}
                 th {{record.num/100}}
                 th {{record.ip}}:{{record.port}}
                 th {{record.verify?"是":"否"}}
           include ../../interface_navigation_paging
 block scripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../../publicModules/moment
   +includeJS("/experimental/log/recharge.js")

@@ -6,9 +6,13 @@ if creditPost && creditPost.credits && creditPost.credits.length > 0
         if c.type === "creditKcb"
           -number = number/100;
         span.TPCQ!= `${(number > 0 ? '+' : '')}${number} &nbsp;`
-        span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
+        if c.type === 'xsf'
+          span.TPCType 学术分 &nbsp;&nbsp;
+        else
+          span.TPCType=`${data.creditScore.name} `
+            |&nbsp;&nbsp;
         span.TPCIA
-          a(href=`/u/${c.fromUser.uid}` style='text-decoration: none;')
+          a(href=`/u/${c.fromUser.uid}` style='text-decoration: none;' data-float-uid=c.fromUser.uid)
             img.TPCIAI(src=tools.getUrl('userAvatar', c.fromUser.avatar, 'sm'))
             span.TPCIssuer &nbsp;#{c.fromUser.username} &nbsp;&nbsp;
         span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;

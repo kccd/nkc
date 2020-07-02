@@ -117,6 +117,7 @@ router
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
+		ctx.state._scoreOperationForumsId = thread.mainForumsId;
 		await db.KcbsRecordModel.insertSystemRecord('postToForum', data.user, ctx);
 		await thread.updateThreadMessage();
 

@@ -59,10 +59,10 @@ block eContent
 
                 th
                   span(v-if='record.from === "bank"')=data.nkcBankName
-                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :title='"科创币：" + record.fromUser.kcb/100') {{record.fromUser.username}}
+                  a(:href="'/u/' + record.fromUser.uid" v-else target='_blank' :data-float-uid='record.fromUser.uid') {{record.fromUser.username}}
                 th
                   span(v-if='record.to === "bank"')=data.nkcBankName
-                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :title='"科创币：" + record.toUser.kcb/100') {{record.toUser.username}}
+                  a(:href="'/u/' + record.toUser.uid" v-else target='_blank' :data-float-uid='record.toUser.uid') {{record.toUser.username}}
                 th {{record.num>0?'+':''}}{{record.num/100}}
                 th {{record.description}}
                   span.text-danger {{record.hideDescription?"【已屏蔽】":""}}
@@ -73,5 +73,7 @@ block eContent
                 th {{record.verify?"是":"否"}}
           include ../../interface_navigation_paging
 block scripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../../publicModules/moment
   script(src=`/experimental/log/kcb.js?v=${global.NKC.startTime}`)

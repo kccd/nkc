@@ -195,6 +195,8 @@ block content
             .forum-links
               a.forum-link(href=`/f/${data.forum.fid}/settings/info`) 基本信息
               a.forum-link(href=`/f/${data.forum.fid}/settings/category`) 分类
+              if permission('forumScoreSettings')
+                a.forum-link(href=`/f/${data.forum.fid}/settings/score`) 积分策略
               if permission('visitForumPermissionSettings')
                 a.forum-link(href=`/f/${data.forum.fid}/settings/permission`) 权限
         if data.moderators && data.moderators.length

@@ -31,5 +31,8 @@ var app = new Vue({
       this.searchType = data.t;
       this.searchOperatingId = data.operatingid;
     }
+    setTimeout(function() {
+      floatUserPanel.initPanel();
+    }, 500)
   }
 });

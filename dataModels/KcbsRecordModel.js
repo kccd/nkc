@@ -160,38 +160,39 @@ kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additi
   const UserModel = mongoose.model('users');
   const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
   const apiFunction = require('../nkcModules/apiFunction');
-  const {address: ip, port, data} = ctx;
+  const {address: ip, port, data, state = {}} = ctx;
   if(!u) return;
-  const operation = await SettingModel.getScoreOperationByType(type);
-  const {
-    count,
-    cycle,
-  } = operation;
-  let allowed;
-  // 无限次
-  if(count === -1) {
-    allowed = true;
-  } else if(count === 0) {
-    allowed = false;
-  } else {
-    let minTime;
-    if(cycle === 'day') {
-      minTime = apiFunction.today();
-    }
-    // 获取当天此人当前操作执行的次数
-    const operationLogCount = await ScoreOperationLogModel.count({
-      uid: u.uid,
-      type,
-      toc: {$gte: minTime}
-    });
-    allowed = operationLogCount < count;
-  }
-  if(!allowed) return;
+  let operations = await SettingModel.getScoreOperationsByType(type, state._scoreOperationForumsId); // 专业ID待传
+  if(!operations.length) return;
   const enabledScores = await SettingModel.getEnabledScores();
+  const scores = {};
+  // 获取当天此人当前操作执行的次数
+  const operationLogCount = await ScoreOperationLogModel.count({
+    uid: u.uid,
+    type,
+    toc: {$gte: apiFunction.today()}
+  });
+  operations = operations.filter(o => o.count === -1 || o.count > operationLogCount);
+  if(!operations.length) return;
+  for(const o of operations) {
+    for(const e of enabledScores) {
+      const scoreType = e.type;
+      const oldScoreNumber = scores[scoreType];
+      const newScoreNumber = o[scoreType];
+      if(newScoreNumber === undefined) continue;
+      if(
+        oldScoreNumber === undefined ||
+        oldScoreNumber < newScoreNumber
+      ) {
+        scores[scoreType] = newScoreNumber;
+      }
+    }
+  }
   let recordsId = [];
   for(const enabledScore of enabledScores) {
     const scoreType = enabledScore.type;
-    const number = operation[scoreType];
+    const number = scores[scoreType];
+    if(number === undefined) continue;
     if(number === 0) continue;
     let from, to;
     let num = Math.abs(number);
@@ -261,7 +262,7 @@ kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additi
   }
 };
 
-// 与银行间的交易记录
+/*// 与银行间的交易记录
 kcbsRecordSchema.statics.insertSystemRecord_old = async (type, u, ctx, additionalReward) => {
   additionalReward = additionalReward || 0;
   const UserModel = mongoose.model("users");
@@ -343,7 +344,7 @@ kcbsRecordSchema.statics.insertSystemRecord_old = async (type, u, ctx, additiona
   // 写入交易记录，紧接着更新用户的kcb数据
   await newRecords.save();
   u.kcb = await UserModel.updateUserKcb(u.uid);
-};
+};*/
 
 // 用户间转账记录
 kcbsRecordSchema.statics.insertUsersRecord = async (options) => {

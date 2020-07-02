@@ -58,23 +58,26 @@ schema.statics.rewardPost = async (options) => {
   const {uid, ip, port, surveyId} = options;
   if(!uid) return;
   const SurveyModel = mongoose.model("surveys");
+  const SettingModel = mongoose.model("settings");
   const UserModel = mongoose.model("users");
+  const surveyRewardScore = await SettingModel.getScoreByOperationType('surveyRewardScore');
   const survey = await SurveyModel.findOne({_id: surveyId});
   if(!survey) throwErr(500, `未找到ID为${surveyId}的调查表单`);
   if(survey.uid === uid) return;
   const user = await UserModel.findOne({uid});
   if(!user) return;
   const targetUser = await UserModel.findOne({uid: survey.uid});
+  const targetUserScore = await UserModel.getUserScore(targetUser.uid, surveyRewardScore.type);
   const {reward} = survey;
   if(!reward.status) return;
   if(reward.onceKcb <= 0) return;
   if(reward.rewardCount <= reward.rewardedCount) return;
-  if(reward.onceKcb > targetUser.kcb) return;
+  if(reward.onceKcb > targetUserScore) return;
   const KcbsRecordModel = mongoose.model("kcbsRecords");
-  const SettingModel = mongoose.model("settings");
   const record = KcbsRecordModel({
     _id: await SettingModel.operateSystemID("kcbsRecords", 1),
     type: "postSurvey",
+    scoreType: surveyRewardScore.type,
     from: targetUser.uid,
     to: user.uid,
     num: reward.onceKcb,

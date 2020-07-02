@@ -1,4 +1,4 @@
-/* 
+/*
   商品订单表
   @author Kris 2019/2/22
 */
@@ -375,15 +375,15 @@ shopOrdersSchema.statics.userExtendOrdersInfo = async (orders, o) => {
     return order
   }))
 };
-/* 
+/*
   获取多个订单的信息，包括：订单名（多个商品名拼接）、订单介绍、订单价格（总计）、订单ID数组
   @param orders: 订单对象数组
-  @return obj: 
+  @return obj:
     name: 订单名
     description: 订单介绍
     totalMoney: 总价格
     ordersId: 订单ID
-  @author pengxiguaa 2019/3/20  
+  @author pengxiguaa 2019/3/20
 */
 shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
   const ShopOrdersModel = mongoose.model('shopOrders');
@@ -414,7 +414,7 @@ shopOrdersSchema.statics.getOrdersInfo = async (orders) => {
     ordersId
   }
 };
-/* 
+/*
   构造查询条件
   @param q: 自定义查询条件
   @return 查询对象
@@ -426,7 +426,7 @@ shopOrdersSchema.statics.getQueryData = async (q) => {
   }, q);
 };
 
-/* 
+/*
   处理超过30分钟未付款的订单
   @param uid: 用户ID
   @author pengxiguaa 2019/3/21
@@ -477,7 +477,7 @@ shopOrdersSchema.statics.checkRefundCanBeAll = async (orders) => {
   })
 }
 
-/* 
+/*
   翻译订单当前所处的状态，会在订单对象上添加”status“属性，值为订单状态字符串
   @param orders: 订单对象所组成的数组
   @author pengxiguaa 2019/3/21
@@ -541,9 +541,11 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
     case "success": throwErr(400, "订单已被关闭，请刷新"); break;
   }
   const time = Date.now();
+  const mainScore = await SettingModel.getMainScore();
   const record = KcbsRecordModel({
     _id: await SettingModel.operateSystemID('kcbsRecords', 1),
     from: "bank",
+    scoreType: mainScore.type,
     to: order.sellUid,
     description: ``,
     type: "sell",
@@ -589,7 +591,7 @@ shopOrdersSchema.methods.extendCerts = async function(type) {
     }
   }
   return this.certs = certs;
-};  
+};
 /**
  * 买家取消订单
  * @author pengxiguaa 2019/4/2
@@ -652,6 +654,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
   const MessageModel = mongoose.model("messages");
   const UserModel = mongoose.model("users");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const mainScore = await SettingModel.getMainScore();
   const {sellUid} = this;
   const orders = await ShopOrdersModel.userExtendOrdersInfo([this]);
   const order = orders[0];
@@ -659,7 +662,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
   if(!["unCost", "unShip"].includes(order.orderStatus)) throwErr(400, "卖家仅能取消待付款或待发货的订单");
   if(order.orderStatus === "unShip") {
     if(money >= 100 && money <= 5000) {}
-    else throwErr(400, "补偿金额不能小于1科创币且不能大于50科创币");
+    else throwErr(400, `补偿金额不能小于1${mainScore.name}且不能大于50${mainScore.name}`);
   }
   const refund = ShopRefundModel({
     _id: await SettingModel.operateSystemID("shopRefunds", 1),
@@ -693,6 +696,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     const refundRecord = KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
+      scoreType: mainScore.type,
       to: order.buyUid,
       type: "refund",
       num: order.orderPrice,
@@ -703,6 +707,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: sellUid,
       to: order.buyUid,
+      scoreType: mainScore.type,
       description,
       type: "sellerCancelOrder",
       num: money,

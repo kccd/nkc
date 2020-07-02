@@ -343,6 +343,7 @@ threadRouter
 				const tUser = await db.UserModel.findOne({uid: onLog.delUserId});
 				data.post = await db.PostModel.findOne({pid: onLog.postId});
 				if(tUser && data.post) {
+				  ctx.state._scoreOperationForumsId = data.post.mainForumsId;
           await db.KcbsRecordModel.insertSystemRecord('postBlocked', tUser, ctx);
         }
 			}
@@ -857,6 +858,7 @@ threadRouter
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
+		ctx.state._scoreOperationForumsId = data.thread.mainForumsId;
 		await db.KcbsRecordModel.insertSystemRecord('postToThread', user, ctx);
 		// await db.UsersScoreLogModel.insertLog(obj);
 
