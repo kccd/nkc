@@ -15,7 +15,7 @@ if(!threadSettings.playerTips.isDisplay) {
       container.querySelector(".plyr-mask").remove();
       player.play();
     });
-    maskDownloadButton.addEventListener("click", () => NKC.methods.visitUrl(player.download));
+    maskDownloadButton.addEventListener("click", () => NKC.methods.visitUrl(player.download, "_blank"));
     container.appendChild(maskDom);
   }
 }

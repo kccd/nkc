@@ -199,6 +199,7 @@ module.exports = async (ctx, next) => {
     } else {
       ctx.template = 'error/error.pug';
     }
+    
     ctx.data.error = error;
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;

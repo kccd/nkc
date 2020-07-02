@@ -139,6 +139,7 @@ function editorRole(uid, type) {
 		})
 }
 
+
 $("#searchInput").keydown(function (e) {//当按下按键时
 	if (e.which === 13) {//.which属性判断按下的是哪个键，回车键的键位序号为13
 		searchUser();
@@ -152,5 +153,25 @@ function editUserInfo(uid) {
   ModifyAccountInfo.open({
     uid: uid
   });
+}
+
+/**
+ * 显示用户的所有积分
+ * @param {String} uid 用户id
+ */
+function showUserScores(uid) {
+  $("#myAllScore").html();
+  $("#myAllScoreDialog").modal("show");
+  nkcAPI("/e/settings/userScores?uid=" + uid, "GET")
+    .then(data => {
+      var scores = data.scores;
+      var str = "";
+      for(var index in scores) {
+        var score = scores[index];
+        str += score.name + ": ";
+        str += (score.number / 100) + score.unit + "<br>"
+      }
+      $("#myAllScore").html(str);
+    })
 }
 

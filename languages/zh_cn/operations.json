@@ -725,5 +725,7 @@
 
   "uploadHomeBigLogo": "上传首页大Logo",
 
-  "experimentalRechargeSettings": "后台管理 - 充值/提现设置"
+  "experimentalRechargeSettings": "后台管理 - 充值/提现设置",
+
+  "getUserAllScores": "获取某用户的所有积分"
 }

@@ -147,10 +147,21 @@ block content
                       th= `${user.regIP} : ${user.regPort}`
                       th
                         button.btn.btn-default.btn-sm(onclick=`editUserInfo('${user.uid}')`) 编辑
+                        button.btn.btn-default.btn-sm(onclick=`showUserScores('${user.uid}')`) 查看积分
               include ../../interface_navigation_paging
+
 block scripts
   include ../../publicModules/moment
   include ../../publicModules/modifyAccountInfo
   +includeJS(`/experimental/settings/user.js`)
 
-
+  .modal.fade#myAllScoreDialog(tabindex="-1" role="dialog" aria-labelledby="myAllScoreLabel")
+    .modal-dialog(role="document")
+    .modal-content#myAllScoreDialogContent(style="width: 650px;margin: 0 auto;")
+      .modal-header
+        button(type="button" class="close" data-dismiss="modal" aria-label="Close" aria-hidden="true") &times;
+        h5.modal-title#myAllScoreLabel 用户积分
+      .modal-body#myAllScore
+        | 1283u9182
+      .modal-footer
+        button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 确定
