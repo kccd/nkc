@@ -57,7 +57,7 @@ block eContent
             tr
               th 操作名
               th 周期
-              th 次数(0: 关闭, -1: 无限次)
+              th 次数(0关闭, -1无限次)
               th(colspan=100).text-center 加减的分值（支持小数点后两位，为正加分，为负扣分，为零则不作处理。）
             tr(v-for='o in scoreSettings.operations')
               th {{o.name}}

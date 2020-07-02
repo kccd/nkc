@@ -53,6 +53,7 @@ router
 		};
 		let message;
     const messageId = await db.SettingModel.operateSystemID('messages', 1);
+    ctx.state._scoreOperationForumsId = thread.mainForumsId;
 		if(thread.oc === pid) {
 			await thread.update({digest: true, digestTime});
 			// await db.UsersScoreLogModel.insertLog(log);
@@ -176,6 +177,7 @@ router
 			tid: thread.tid,
 			ip: ctx.address
 		};
+		ctx.state._scoreOperationForumsId = thread.mainForumsId;
 		if(thread.oc === pid) {
 			await thread.update({digest: false});
 			// await db.UsersScoreLogModel.insertLog(log);

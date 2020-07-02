@@ -47,6 +47,7 @@ subscribeRouter
     });*/
     await db.SubscribeModel.saveUserSubForumsId(user.uid);
     await db.SubscribeTypeModel.updateCount(cid);
+    ctx.state._scoreOperationForumsId = [fid];
 		await db.KcbsRecordModel.insertSystemRecord('subscribeForum', user, ctx);
 		await next();
 	})
@@ -70,6 +71,7 @@ subscribeRouter
     });*/
     await db.SubscribeModel.saveUserSubForumsId(user.uid);
     await db.SubscribeTypeModel.updateCount(cid);
+    ctx.state._scoreOperationForumsId = [fid];
     await db.KcbsRecordModel.insertSystemRecord('unSubscribeForum', user, ctx);
 		await next();
 	});
