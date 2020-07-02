@@ -1,9 +1,45 @@
 extends ../../experimental
 block eTitle
   title 专业设置
+  +includeCSS('/experimental/settings/forum/forum.css')
 block eContent
-  #data.hidden=objToStr({forums: data.forums})
+  #data.hidden=objToStr({forums: data.forums, forumSettings: data.forumSettings})
   .container-fluid.max-width#app(v-cloak)
     .row
       .col-xs-12.col-md-12
+        h4 新建专业
+        .form.form-inline.m-b-2
+          .form-group
+            input.form-control(type='text' v-model.tirm='forumName' placeholder='请输入专业名称')
+          .form-group
+            button.btn.btn-default(@click='addForum') 提交
+
         h4 专业排序
+        .forums.m-b-2
+          .forum(v-for='f, index in forums')
+            .forum-top(:data-float-fid='f.fid')
+              img.forum-avatar(:src="getUrl('forumAvatar', f.logo)")
+              .forum-name {{f.displayName}}
+            .forum-bottom
+              button.btn.btn-default.btn-xs(@click='move(index, "left")') 左移
+              button.btn.btn-default.btn-xs(@click='move(index, "right")') 右移
+        h4 专业分类
+        .categories.m-b-2
+          table.table.table-bordered
+            thead
+              tr
+                th 分类名
+                th 分类介绍
+                th 其他
+            tbody
+              tr(v-for='c in forumSettings.categories' style='max-width: 50rem;')
+
+
+
+        .m-t-05
+          button.btn.btn-primary(@click='save') 保存
+
+block scripts
+  include ../../../publicModules/subscribeTypes/subscribeTypes
+  include ../../../publicModules/floatForumPanel/floatForumPanel
+  +includeJS('/experimental/settings/forum/forum.js')

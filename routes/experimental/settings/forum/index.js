@@ -4,8 +4,9 @@ router
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
+		data.forumSettings = await db.SettingModel.getSettings('forum');
 		data.type = 'forum';
-		ctx.template = 'experimental/settings/forum.pug';
+		ctx.template = 'experimental/settings/forum/forum.pug';
 		await next();
 	})
 	.patch('/', async (ctx, next) => {

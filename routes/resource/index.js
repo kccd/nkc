@@ -74,6 +74,16 @@ resourceRouter
           ctx.throw(403, `未登录用户每天只能下载${fileCountOneDay}个附件，请登录或注册后重试。`);
         }
       }
+      // 判断下载是否需要积分
+        // 需要
+          // 判断是否需要显示下载页 c
+            // 需要
+              // return 返回页面
+            // 不需要
+              // 扣分
+              // 返回文件
+        // 不需要
+          // 返回文件
     }
     if (mediaType === "mediaPicture") {
       try {

@@ -38,6 +38,19 @@ defaultData.init = async () => {
     }
   }
 
+  const forumCategories = require("./forumCategory");
+  const fcDB = await db.ForumCategoryModel.count();
+  if(!fcDB.length) {
+    for(const f of forumCategories) {
+      const fc = db.ForumCategoryModel({
+        _id: await db.SettingModel.operateSystemID('forumCategories', 1),
+        name: f.name
+      });
+      await fc.save();
+      console.log(`inserting forum category into database`);
+    }
+  }
+
   const {forumAvailable, normal} = require("./scoreOperation");
   const scoreOperations = forumAvailable.concat(normal);
   for(const so of scoreOperations) {

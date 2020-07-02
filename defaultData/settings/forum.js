@@ -3,9 +3,14 @@ module.exports = {
   c: {
     categories: [
       {
-        type: 'topic',
+        type: 1,
         name: '话题',
         order: 1,
+      },
+      {
+        type: 2,
+        name: '学科',
+        order: 2,
       }
     ]
   }
