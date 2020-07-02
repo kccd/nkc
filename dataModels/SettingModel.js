@@ -262,6 +262,18 @@ settingSchema.statics.getEnabledScores = async () => {
   }
   return _scores;
 };
+
+/**
+ * 获取启用的积分类型名数组
+ * @returns {string[]} 积分类型名数组  ["score1", "score2" ... ]
+ */
+settingSchema.statics.getEnabledScoreTypes = async () => {
+  let scores = await settingSchema.statics.getEnabledScores();
+  return scores.map(score => {
+    return score.type;
+  });
+};
+
 /*
 * 获取全部积分
 * @return {[Object]} 所有的积分对象

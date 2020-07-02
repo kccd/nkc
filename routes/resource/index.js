@@ -74,16 +74,51 @@ resourceRouter
           ctx.throw(403, `未登录用户每天只能下载${fileCountOneDay}个附件，请登录或注册后重试。`);
         }
       }
-      // 判断下载是否需要积分
-        // 需要
-          // 判断是否需要显示下载页 c
-            // 需要
-              // return 返回页面
-            // 不需要
-              // 扣分
-              // 返回文件
-        // 不需要
-          // 返回文件
+
+      const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
+      const enabledScoreTypes = await db.SettingModel.getEnabledScoreTypes();
+      // 此用户目前持有的所有积分
+      await db.UserModel.updateUserScores(user.uid);
+      let myAllScore = await db.UserModel.getUserScores(user.uid);
+      // 下载此附件是否需要积分状态位
+      let needScore = false;
+      for(let typeName of enabledScoreTypes) {
+        let number = operation[typeName];
+        if(number == 0) {
+          needScore = true;
+          break;
+        };
+      }
+      if(needScore) {
+        // 积分是否足够状态位
+        data.enough = true;
+        // 检测积分是否足够
+        for(let score of myAllScore) {
+          if(score.number + operation[score.type] < 0) {
+            data.enough = false;
+          }
+          score.addNumber = operation[score.type];
+        }
+        data.myAllScore = myAllScore;
+        // 是否需要显示下载扣分询问页面 (c 为 download 就直接扣分并返回文件)
+        if(c !== "download") {
+          // 结束路由，返回页面
+          ctx.state.forumsTree = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+          ctx.filePath = null;
+          data.rid = resource.rid;
+          ctx.template = "resource/download.pug";
+          return next();
+        } else {
+          // 积分不够，返回错误页面
+          if(!data.enough) {
+            return nkcModules.throwError(403, "", "scoreNotEnough");
+          } else {
+            // 积分足够
+            // 扣除积分，继续往下走返回文件
+            await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
+          }
+        }
+      }
     }
     if (mediaType === "mediaPicture") {
       try {
@@ -102,73 +137,10 @@ resourceRouter
     // 表明客户端希望以附件的形式加载资源
     if(t === "attachment") {
       ctx.fileType = "attachment";
-      // 下载附件需要的积分
-      const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
-      // 如果需要用到积分，就返回一个询问页面
-      for(let key of Object.keys(operation)) {
-        if(key.startsWith("score")) {
-          if(operation[key] != 0) {
-            ctx.state.forumsTree = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
-            ctx.filePath = null;
-            ctx.template = "resource/download.pug";
-            break;
-          }
-        }
-      }
-      // 此用户目前持有的所有积分
-      await db.UserModel.updateUserScores(user.uid);
-      let myAllScore = await db.UserModel.getUserScores(user.uid);
-      data.myAllScore = myAllScore;
-      // 判断积分是否足够，标记状态位
-      data.enough = true;
-      for(let score of myAllScore) {
-        if(score.number + operation[score.type] < 0) {
-          data.enough = false;
-        }
-        score.addNumber = operation[score.type];
-      }
-      data.rid = rid;
-      ctx.resource = resource;
-      ctx.type = ext;
-      return await next();
     } else if(t === "object") {
       // 返回数据对象
       data.resource = resource;
       ctx.filePath = undefined;
-    } else if(t === "download") {
-      // 下载附件需要的积分
-      const operation = await db.SettingModel.getScoreOperationByType("attachmentDownload");
-      // 如果不需要积分就返回资源文件
-      let needScore = false;
-      for(let key of Object.keys(operation)) {
-        if(key.startsWith("score")) {
-          if(operation[key] != 0) {
-            needScore = true;
-            break;
-          }
-        }
-      }
-      if(!needScore) {
-        return ctx.redirect("?t=attachment");
-      }
-      // 此用户目前持有的所有积分
-      await db.UserModel.updateUserScores(user.uid);
-      let myAllScore = await db.UserModel.getUserScores(user.uid);
-      // 判断积分是否足够，标记状态位
-      data.enough = true;
-      for(let score of myAllScore) {
-        if(score.number + operation[score.type] < 0) {
-          data.enough = false;
-        }
-      }
-      if(!data.enough) {
-        return nkcModules.throwError(403, "", "scoreNotEnough");
-      }
-      ctx.resource = resource;
-      ctx.type = ext;
-      // 扣除积分
-      await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
-      return await next();
     }
     ctx.resource = resource;
     ctx.type = ext;
@@ -208,6 +180,7 @@ resourceRouter
     const {generateFolderName, extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = upload;
     const {user} = data;
 
+    const {websiteName} = await db.SettingModel.getSettings('server');
     let mediaRealPath;
     const {files, fields} = ctx.body;
     const {file} = files;
