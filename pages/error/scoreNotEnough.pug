@@ -1,0 +1,11 @@
+extends ./errorBase
+block errorContent
+  .error-icon=`403 Forbidden`
+  .error-list.b-s-10
+    .error-header 您的积分不足，无法完成下载。
+    //-.error-code
+      span message：
+      code=data.error
+    .error-info.m-t-1 您可以
+      a.m-l-0(href=`/account/finance/recharge`) 充值
+      | 以获取积分。

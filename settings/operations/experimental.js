@@ -189,6 +189,9 @@ module.exports = {
 				PATCH: 'modifyEUserInfo'
 			}
 		},
+		userScores: {
+			GET: 'getUserAllScores'
+		},
 		sensitive: {
 			GET: 'visitUserSensitiveInfo',
 			PATCH: 'modifyUserSensitiveInfo'
