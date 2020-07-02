@@ -4,7 +4,7 @@ block eTitle
   +includeCSS(`/experimental/settings/score/score.css`)
 block eContent
   .container-fluid.max-width
-    #data.hidden=objToStr({scoreSettings: data.scoreSettings})
+    #data.hidden=objToStr({scoreSettings: data.scoreSettings, scoresType: data.scoresType})
     .row#app(v-cloak)
       .col-xs-12.col-md-12.m-b-2
         h4 积分列表
@@ -58,7 +58,7 @@ block eContent
               th 操作名
               th 周期
               th 次数(0: 关闭, -1: 无限次)
-              th(colspan=5).text-center 加减的分值（支持小数点后两位，为正加分，为负扣分，为零则不作处理。）
+              th(colspan=100).text-center 加减的分值（支持小数点后两位，为正加分，为负扣分，为零则不作处理。）
             tr(v-for='o in scoreSettings.operations')
               th {{o.name}}
               th
@@ -66,16 +66,8 @@ block eContent
                   option(value='day') 每天
               th
                 input.form-control(type='text' v-model.number='o.count')
-              th
-                input.form-control(type='text' v-model.number='o._score1')
-              th
-                input.form-control(type='text' v-model.number='o._score2')
-              th
-                input.form-control(type='text' v-model.number='o._score3')
-              th
-                input.form-control(type='text' v-model.number='o._score4')
-              th
-                input.form-control(type='text' v-model.number='o._score5')
+              th(v-for='t in types')
+                input.form-control(type='text' v-model.number='o["_" + t]')
       .col-xs-12.col-md-12.m-b-2
         h4 其他
         .form.form-horizontal

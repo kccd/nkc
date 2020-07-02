@@ -37,6 +37,26 @@ defaultData.init = async () => {
       console.log(`inserting kcbs records type '${type._id}' into database`);
     }
   }
+
+  const {forumAvailable, normal} = require("./scoreOperation");
+  const scoreOperations = forumAvailable.concat(normal);
+  for(const so of scoreOperations) {
+    let scoreOperation = await db.ScoreOperationModel.findOne({
+      type: so,
+      from: 'default',
+    });
+    if(!scoreOperation) {
+      scoreOperation = db.ScoreOperationModel({
+        _id: await db.SettingModel.operateSystemID('scoreOperations', 1),
+        type: so,
+        forumAvailable: forumAvailable.includes(so),
+        from: 'default'
+      });
+      await scoreOperation.save();
+      console.log(`inserting score operation ${so}`);
+    }
+  }
+
   const permission = require('../nkcModules/permission');
   const operationsId = permission.getOperationsId();
   for(let operationId of operationsId) {

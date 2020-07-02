@@ -191,8 +191,10 @@ module.exports = async (ctx, next) => {
 	  try{
 	    const errObj = JSON.parse(error);
 	    const {errorType, errorData} = errObj;
-	    error = errorData;
-	    ctx.errorType = errorType;
+	    if(errorType) {
+        error = errorData;
+        ctx.errorType = errorType;
+      }
     } catch(err) {}
 	  if(ctx.errorType) {
 	    ctx.template = `error/${ctx.errorType}.pug`;

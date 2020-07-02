@@ -25,8 +25,8 @@ const data = {
     // 银行名称
     nkcBankName: '科创人民很行',
     // 交易系统
-    scores: {
-      score1: {
+    scores: [
+      {
         type: 'score1',
         enabled: true,
         // 积分名称
@@ -42,7 +42,7 @@ const data = {
         // 积分比重
         weight: 1,
       },
-      score2: {
+      {
         enabled: false,
         type: 'score2',
         name: '积分二',
@@ -52,7 +52,7 @@ const data = {
         other2score: false,
         weight: 1,
       },
-      score3: {
+      {
         enabled: false,
         name: '积分三',
         type: 'score3',
@@ -62,7 +62,7 @@ const data = {
         other2score: false,
         weight: 1,
       },
-      score4: {
+      {
         enabled: false,
         type: 'score4',
         name: '积分四',
@@ -72,7 +72,7 @@ const data = {
         other2score: false,
         weight: 1,
       },
-      score5: {
+      {
         enabled: false,
         type: 'score5',
         name: '积分五',
@@ -81,65 +81,28 @@ const data = {
         score2other: false,
         other2score: false,
         weight: 1,
-      }
-    },
-    operations: [
-      {
-        type: 'postToThread',
-        count: 3, // 周期内最多奖励次数
-        cycle: 'day', // 周期 day, hour, month
-        score1: 0,
-        score2: 0,
-        score3: 0,
-        score4: 0,
-        score5: 0
       },
       {
-        type: 'postToForum',
-        count: 3, // 周期内最多奖励次数
-        cycle: 'day', // 周期 day, hour, month
-        score1: 0,
-        score2: 0,
-        score3: 0,
-        score4: 0,
-        score5: 0
-      }
+        enabled: false,
+        type: 'score6',
+        name: '积分六',
+        icon: '',
+        unit: '分',
+        score2other: false,
+        other2score: false,
+        weight: 1,
+      },
+      {
+        enabled: false,
+        type: 'score7',
+        name: '积分七',
+        icon: '',
+        unit: '分',
+        score2other: false,
+        other2score: false,
+        weight: 1,
+      },
     ]
   }
 };
-
-const operations = [
-  'postToForum',
-  'postToThread',
-  'dailyLogin',
-  'violation',
-  'threadBlocked',
-  'postBlocked',
-  'subscribeForum',
-  'unSubscribeForum',
-  'followed',
-  'unFollowed',
-  'fundDonation',
-  'liked',
-  'unLiked',
-  'reportIssue',
-  'digestThread',
-  'unDigestThread',
-  'digestPost',
-  'unDigestPost',
-  'attachmentDownload'
-];
-data.c.operations = [];
-for(const o of operations) {
-  data.c.operations.push({
-    type: o,
-    count: 3,
-    cycle: 'day',
-    score1: 0,
-    score2: 0,
-    score3: 0,
-    score4: 0,
-    score5: 0,
-  });
-}
 module.exports = data;

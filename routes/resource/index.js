@@ -93,7 +93,7 @@ resourceRouter
     if(t === "attachment") {
       ctx.fileType = "attachment";
       // 下载附件需要的积分
-      const operation = await db.SettingModel.getScoreOperationByType("attachmentDownload");
+      const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
       // 此用户目前持有的所有积分
       await db.UserModel.updateUserScores(user.uid);
       let myAllScore = await db.UserModel.getUserScores(user.uid);
@@ -161,7 +161,10 @@ resourceRouter
       if(!md5) ctx.throw(400, "md5不能为空");
       if(!fileName) ctx.throw(400, "文件名不能为空");
       const resource = await db.ResourceModel.findOne({hash: md5, mediaType: "mediaAttachment"});
-      if(!resource) {
+      if(
+        !resource || // 未上传过
+        !resource.ext // 上传过，但格式丢失
+      ) {
         data.uploaded = false;
         return await next();
       }

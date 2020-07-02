@@ -653,10 +653,15 @@ func.saveHomeAdCover = async (file, type) => {
 * 检查文件类型与格式是否对应，返回文件格式
 * */
 func.getFileExtension = async (file, extensions = []) => {
-  let extension = (await FileType.fromFile(file.path)).ext;
+  let extension = await FileType.fromFile(file.path);
   const pathExtension = PATH.extname(file.name).replace('.', '').toLowerCase();
+  if(extension) {
+    extension = extension.ext;
+  } else {
+    extension = pathExtension;
+  }
   if(extension !== pathExtension) {
-    throwErr(400, "文件内容与后缀名无法对应");
+    throwErr(400, `文件内容格式(${extension})与后缀名(${pathExtension})无法对应`);
   }
   if(!extension) throwErr(400, '未知的文件格式');
   if(extensions.length) {

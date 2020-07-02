@@ -321,10 +321,17 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
     type: 'scoreIcon'
   });
   await attachment.save();
-  const obj = {};
-  obj[`c.scores.${scoreType}.icon`] = aid;
+  const scores = await SettingModel.getScores();
+  for(const score of scores) {
+    if(score.type === scoreType) {
+      score.icon = aid;
+      break;
+    }
+  }
   await SettingModel.updateOne({_id: 'score'}, {
-    $set: obj
+    $set: {
+      'c.scores': scores
+    }
   });
   await SettingModel.saveSettingsToRedis('score');
   return attachment;

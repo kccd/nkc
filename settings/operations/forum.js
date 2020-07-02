@@ -45,6 +45,10 @@ module.exports = {
 			permission: {
 				GET: 'visitForumPermissionSettings', // 查看专业权限设置
 				PATCH: 'modifyForumPermission' // 修改专业权限设置
+			},
+			score: {
+				GET: 'forumScoreSettings',
+				PATCH: 'forumScoreSettings'
 			}
 		},
 		subscribe: {

@@ -19,6 +19,10 @@ if data.type !== 'category' && data.type !== 'merge'
       a.list-group-item(href=`/f/${data.forum.fid}/settings/permission`)
         span.fa.fa-user-circle &nbsp;&nbsp;
         span 权限设置
+    if permission('forumScoreSettings')
+      a.list-group-item(href=`/f/${data.forum.fid}/settings/score`)
+        span.fa.fa-user-circle &nbsp;&nbsp;
+        span 积分策略设置
     if permission('visitForumMergeSettings')
       a.list-group-item(href=`/f/${data.forum.fid}/settings/merge`)
         span.fa.fa-user-circle &nbsp;&nbsp;

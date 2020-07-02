@@ -33,6 +33,7 @@ router
 
     for(const r of results) {
       const {type, thread, post} = r;
+      ctx.state._scoreOperationForumsId = [].concat(thread.mainForumsId);
       if(type === "thread") {
 
         // 将文章移动至回收站

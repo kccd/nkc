@@ -6,8 +6,12 @@ router
 		const {t} = query;
 		data.t = t;
 		data.scoreSettings = await db.SettingModel.getSettings('score');
-		data.scoreSettings.operations.map(o => {
+		data.scoresType = await db.SettingModel.getScoresType();
+		const scoreOperations = await db.SettingModel.getDefaultScoreOperations();
+		data.scoreSettings.operations = scoreOperations.map(o => {
+			o = o.toObject();
 			o.name = ctx.state.lang('kcbsTypes', o.type);
+			return o;
 		});
 		ctx.template = 'experimental/settings/score/score.pug';
 		await next();
@@ -19,8 +23,9 @@ router
 		const scoreSettings = JSON.parse(fields.scoreSettings);
 		const {
 			creditMin, creditMax, nkcBankName,
-			scores
+			scores, operations
 		} = scoreSettings;
+		delete scoreSettings.operations;
 		const operationScores = {
 			attachmentScore: '附件交易',
 			shopScore: '商品交易',
@@ -37,33 +42,62 @@ router
 			minLength: 1,
 			maxLength: 20
 		});
+
+		const scoresType = await db.SettingModel.getScoresType();
+		const submitScoresType = scores.map(s => s.type);
 		const enabledScoreTypes = [];
-		for(const scoreType in scores) {
-			if(!scores.hasOwnProperty(scoreType)) continue;
-			if(scores[scoreType].enabled) enabledScoreTypes.push(scoreType);
+		if(submitScoresType.length !== scoresType.length) ctx.throw(400, '积分数据错误，请刷新后重试');
+
+		for(const score of scores) {
+			const scoreType = score.type;
+
+			const {weight, unit, name} = score;
+			checkNumber(weight, {
+				name: '积分比重',
+				min: 0.01,
+				fractionDigits: 2,
+			});
+			checkString(unit, {
+				name: '积分单位',
+				minLength: 1,
+				maxLength: 10,
+			});
+			checkString(name, {
+				name: '积分名称',
+				minLength: 1,
+				maxLength: 20
+			});
+
+			if(!scoresType.includes(scoreType)) ctx.throw(400, '积分数据错误，请刷新后重试');
+			if(score.enabled) enabledScoreTypes.push(scoreType);
 		}
 		for(const operationName in operationScores) {
 			if(!operationScores.hasOwnProperty(operationName)) continue;
 			if(!enabledScoreTypes.includes(scoreSettings[operationName])) {
-				ctx.throw(400, `「${operationScores[operationName]}」积分类型设置错误，请检查`);
+				ctx.throw(400, `「${operationScores[operationName]}」积分类型设置的积分暂未开启，请检查`);
 			}
 		}
 
-
-		for(const operation of scoreSettings.operations) {
-			const {count, cycle} = operation;
+		for(const operation of operations) {
+			const {count, cycle, _id} = operation;
+			const _operation = {
+				cycle,
+				count,
+			};
 			if(!['day'].includes(cycle)) ctx.throw(400, '积分策略中的周期设置错误')
 			checkNumber(count, {
 				name: '积分策略中的次数'
 			});
 			if(count < 0 && count !== -1) ctx.throw(400, '积分策略中的次数只能为-1或非负整数');
-			for(const scoreType in scores) {
-				if(!scores.hasOwnProperty(scoreType)) continue;
+			for(const scoreType of scoresType) {
 				checkNumber(operation[scoreType], {
 					name: '积分策略中的加减积分值',
-					fractionDigits: 2
 				});
+				_operation[scoreType] = operation[scoreType];
 			}
+			await db.ScoreOperationModel.updateOne({_id}, {
+				$set: _operation
+			});
 		}
 
 		checkNumber(creditMin, {
@@ -84,8 +118,7 @@ router
 			}
 		});
 		await db.SettingModel.saveSettingsToRedis('score');
-		for(let i = 1; i <= 5; i++) {
-			const scoreType = `score${i}`;
+		for(const scoreType of scoresType) {
 			const file = files[scoreType];
 			if(!file) continue;
 			await db.AttachmentModel.saveScoreIcon(file, scoreType);

@@ -1890,11 +1890,13 @@ userSchema.methods.setRedEnvelope = async function() {
 * */
 userSchema.statics.updateUserScore = async (uid, scoreType) => {
   const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
   const UsersPersonalModel = mongoose.model('usersPersonal');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const scoresType = await SettingModel.getScoresType();
   const user = await UserModel.findOne({uid}, {uid: 1});
   if(!user) throwErr(500, `用户未找到 uid:${uid}`);
-  if(!['score1', 'score2', 'score3', 'score4', 'score5'].includes(scoreType))
+  if(!scoresType.includes(scoreType))
     throwErr(500, `积分类型错误 type: ${scoreType}`);
   const fromRecords = await KcbsRecordModel.aggregate([
     {
@@ -1948,16 +1950,16 @@ userSchema.statics.updateUserScore = async (uid, scoreType) => {
 * @author pengxiguaa 2020/06/24
 * */
 userSchema.statics.getUserScore = async (uid, scoreType) => {
-  if(!['score1', 'score2', 'score3', 'score4', 'score5'].includes(scoreType))
+  const SettingModel = mongoose.model('settings');
+  const scoresType = await SettingModel.getScoresType();
+  if(!scoresType.includes(scoreType))
     throwErr(500, `积分类型错误 type: ${scoreType}`);
   const UsersPersonalModel = mongoose.model('usersPersonal');
-  const usersPersonal = await UsersPersonalModel.findOne({uid}, {
-    score1: 1,
-    score2: 1,
-    score3: 1,
-    score4: 1,
-    score5: 1
-  });
+  const obj = {};
+  for(const s of scoresType) {
+    obj[s] = 1;
+  }
+  const usersPersonal = await UsersPersonalModel.findOne({uid}, obj);
   if(!usersPersonal) throwErr(400, `用户未找到 uid: ${uid}`);
   return usersPersonal[scoreType];
 };
