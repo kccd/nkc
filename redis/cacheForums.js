@@ -1,5 +1,5 @@
 require('colors');
-const {CacheModel, ThreadModel, ActiveUserModel, ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
+const {CacheModel, ThreadModel, ActiveUserModel, ForumCategoryModel, ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
 const client = require('../settings/redisClient');
 
 async function func() {
@@ -32,13 +32,13 @@ async function func() {
     });
   });
   for(const forum of forums) {
-    
+
     const {
       visibility,
       isVisibleForNCC,
       rolesId,
       gradesId,
-      accessible, 
+      accessible,
       displayOnParent,
       relation,
       fid
@@ -194,7 +194,7 @@ async function func() {
   * 8. 角色和等级 role-grade:roleId-gradeId
   * 9. 无法访问的专业 canNotAccessibleForumsId:canNotAccessibleForumsId
   * */
-  
+
   for(const roleId in roles) {
 
     if(!roles.hasOwnProperty(roleId)) continue;
@@ -285,6 +285,9 @@ async function func() {
   }
 
   await ActiveUserModel.saveActiveUsersToCache();
+
+  // 缓存专业分类
+  await ForumCategoryModel.saveCategoryToRedis();
 
   console.log(`缓存更新完成`.green);
 }

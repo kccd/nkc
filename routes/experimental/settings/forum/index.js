@@ -69,6 +69,7 @@ router
 		});
 		await db.ForumCategoryModel.remove({_id: {$nin: cid}});
 		await db.SettingModel.saveSettingsToRedis("forum");
+		await db.ForumCategoryModel.saveCategoryToRedis();
 		await next();
 	});
 module.exports = router;
