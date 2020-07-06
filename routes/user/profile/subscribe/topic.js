@@ -1,5 +1,6 @@
 module.exports = async (ctx, next) => {
   const {params, nkcModules, data, db, state} = ctx;
+  return ctx.redirect(`/u/${data.targetUser.uid}/profile/subscribe/forum`);
   const {page = 0} = params;
   const {match} = state;
   const {subTopicsId, targetUser} = data;

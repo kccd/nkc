@@ -190,6 +190,9 @@ module.exports = {
 				topic: {
 					GET: "userProfile"
 				},
+				forum: {
+					GET: 'userProfile',
+				},
 				discipline: {
 					GET: "userProfile"
 				},

@@ -149,6 +149,8 @@ block content
           include ./subscribe/collection
         else if data.type === "blacklist"
           include ./blacklist
+        else if data.type === 'subscribe/forum'
+          include ./subscribe/forum
       if !state.isApp
         .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs
           .account-nav
