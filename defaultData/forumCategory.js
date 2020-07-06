@@ -3,6 +3,6 @@ module.exports = [
     name: '话题',
   },
   {
-    name: '学科'
+    name: '学科',
   }
 ]

@@ -6,6 +6,7 @@ const app = new Vue({
     forumName: '',
     forums: data.forums,
     forumSettings: data.forumSettings,
+    forumCategories: data.forumCategories,
   },
   mounted() {
     setTimeout(() => {
@@ -14,25 +15,42 @@ const app = new Vue({
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
-    move(index, direction) {
+    move(index, arr, direction) {
       if(
-        (index === 0 && direction === 'lefe') ||
-        (index + 1 === this.forums.length && direction === 'right')
+        (index === 0 && direction === 'left') ||
+        (index + 1 === arr.length && direction === 'right')
       ) return;
-      const forum = this.forums[index];
+      const forum = arr[index];
       let _index;
       if(direction === 'left') {
         _index = index - 1;
       } else {
         _index = index + 1;
       }
-      const _forum = this.forums[_index];
-      this.forums[_index] = forum;
-      Vue.set(this.forums, index, _forum);
+      const _forum = arr[_index];
+      arr[_index] = forum;
+      Vue.set(arr, index, _forum);
     },
     save() {
       const fidArr = this.forums.map(f => f.fid);
-      nkcAPI('/e/settings/forum', 'PATCH', {fidArr})
+      const {forumCategories} = this;
+      const {checkString} = NKC.methods.checkData;
+      Promise.resolve()
+        .then(() => {
+          for(const fc of forumCategories) {
+            checkString(fc.name, {
+              name: '分类名',
+              minLength: 1,
+              maxLength: 20
+            });
+            checkString(fc.description, {
+              name: '分类介绍',
+              minLength: 0,
+              maxLength: 100
+            });
+          }
+          return nkcAPI('/e/settings/forum', 'PATCH', {fidArr, categories: forumCategories});
+        })
         .then(() => {
           sweetSuccess('保存成功');
         })
@@ -55,6 +73,15 @@ const app = new Vue({
           }, 2000);
         })
         .catch(sweetError);
+    },
+    addForumCategory() {
+      this.forumCategories.push({
+        name: '',
+        description: ''
+      });
+    },
+    remove(index, arr) {
+      arr.splice(index, 1);
     }
   }
 })

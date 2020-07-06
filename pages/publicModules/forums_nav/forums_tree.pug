@@ -62,9 +62,15 @@ if data.forum && data.visitedForums && data.visitedForums.length
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
             a(href=`/f/${forum.fid}`).forum-block-name=forum.displayName
-.m-b-1
-  .panel-header 话题
-  +renderForums(topics)
-.m-b-1
-  .panel-header 学科
-  +renderForums(disciplines)
+for fc in state.categoryForums
+  if fc.forums.length
+    .m-b-1
+      .panel-header(title=fc.description)=fc.name
+      +renderForums(fc.forums)
+//-
+  .m-b-1
+    .panel-header 话题
+    +renderForums(topics)
+  .m-b-1
+    .panel-header 学科
+    +renderForums(disciplines)

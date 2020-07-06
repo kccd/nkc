@@ -40,11 +40,11 @@ defaultData.init = async () => {
 
   const forumCategories = require("./forumCategory");
   const fcDB = await db.ForumCategoryModel.count();
-  if(!fcDB.length) {
+  if(fcDB === 0) {
     for(const f of forumCategories) {
       const fc = db.ForumCategoryModel({
         _id: await db.SettingModel.operateSystemID('forumCategories', 1),
-        name: f.name
+        name: f.name,
       });
       await fc.save();
       console.log(`inserting forum category into database`);

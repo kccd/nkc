@@ -181,6 +181,21 @@ module.exports = async (ctx, next) => {
       data.userGrade,
       data.user
     );
+    const forumsObj = {};
+    ctx.state.forumsTree.map(f => {
+      const {categoryId} = f;
+      if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
+      forumsObj[categoryId].push(f);
+    });
+    ctx.state.forumCategories = await db.ForumCategoryModel.getCategories();
+
+    ctx.state.categoryForums = [];
+    ctx.state.forumCategories.map(fc => {
+      const _fc = Object.assign({}, fc);
+      const {_id} = _fc;
+      _fc.forums = forumsObj[_id] || [];
+      if(_fc.forums.length) ctx.state.categoryForums.push(_fc);
+    });
   }
   // 获取用户的关注
   if(data.user && !isResourcePost) {

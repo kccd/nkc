@@ -11,9 +11,10 @@ NKC.modules.MoveThread = function() {
       selectedForums: [],
       loading: true,
       moveType: "add", // replace, add
-      forumType: "topic", // discipline, topic
+      forumType: "", // discipline, topic
       forum: "",
       hideMoveType: false,
+      forumCategories: [],
       showAnonymousCheckbox: false,
       onlyAnonymous: false,
       forumCountLimit: 20,
@@ -42,7 +43,8 @@ NKC.modules.MoveThread = function() {
         var arr = [];
         for(var i = 0 ; i < this.forums.length; i++) {
           var forum = this.forums[i];
-          if(forum.forumType === this.forumType) {
+          // if(forum.forumType === this.forumType) {
+          if(forum.categoryId === this.forumType) {
             if(!this.onlyAnonymous) {
               arr.push(forum);
               continue;
@@ -60,6 +62,7 @@ NKC.modules.MoveThread = function() {
       }
     },
     methods: {
+      getUrl: NKC.methods.tools.getUrl,
       getCategory: function(forum, categoriesId) {
         var threadTypes = forum.threadTypes;
         for(var i = 0; i < threadTypes.length; i++) {
@@ -148,6 +151,8 @@ NKC.modules.MoveThread = function() {
         }
         this_.app.forums = data.forums;
         this_.app.loading = false;
+        this_.app.forumCategories = data.forumCategories;
+        if(!this_.app.forumType) this_.app.forumType = this_.app.forumCategories[0]._id;
         this_.app.forumCountLimit = 20;
         if(options) {
           this_.app.showRecycle = options.showRecycle || false;
@@ -182,7 +187,7 @@ NKC.modules.MoveThread = function() {
     this_.app.moveType = "replace";
     this_.app.showAnonymousCheckbox = false;
     this_.app.onlyAnonymous = false;
-    this_.app.forumType = "topic";
+    this_.app.forumType = "";
     this_.unlock();
   };
   this_.lock = function() {

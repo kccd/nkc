@@ -10,6 +10,13 @@
   line-height: 2.2rem;
   font-weight: 700;
 }
+.move-thread-forum-name img{
+  height: 1.4rem;
+  width: 1.4rem;
+  border-radius: 2px;
+  vertical-align: text-bottom;
+  margin-right: 0.5rem;
+}
 .move-thread-child-forums .move-thread-forum-name, .move-thread-selected-forums .move-thread-forum-name {
   display: inline-block;
   font-size: 1rem;

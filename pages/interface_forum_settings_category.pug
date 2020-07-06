@@ -23,28 +23,20 @@ block content
                       a(href=`/f/${forum.fid}/settings/${data.type}`)= forum.displayName
                       span &nbsp;/&nbsp;
                     span= forum.displayName
-                    -if(data.parentForums.length == 0)
+                    if(!data.parentForums.length)
                       span (顶级专业)
               .form-group
-                label.col-sm-2.control-label 当前属性
+                label.col-sm-2.control-label 专业分类
                 .col-sm-5
-                  h5
-                    -if(forum.forumType == "discipline")
-                      span 学科
-                    -else
-                      span 话题
-              -if(data.parentForums.length == 0)
-                .form-group
-                  label.col-sm-2.control-label 选择专业属性
-                  .col-sm-5
-                    label.radio
-                      input#radioDis(type="radio", name="forumType", value="discipline" checked=forum.forumType === 'discipline')
-                      span 学科
-                    label.radio
-                      input#radioTop(type="radio", name="forumType", value="topic" checked=forum.forumType === 'topic')
-                      span 话题
-                    button.btn.btn-default(style='margin-top: 0.5rem;' onclick=`selectForumType("${forum.fid}")`) 保存属性
-              .form-group 
+                  // parentForums
+                  for c in data.forumCategories
+                    .radio
+                      label
+                        input(type='radio' name='forumCategory' value=c._id checked=forum.categoryId === c._id disabled=!!data.parentForums.length)
+                        strong=c.name
+                        | &nbsp;
+                        small=c.description
+              .form-group
                 label.col-sm-2.control-label 当前类别
                 .col-sm-5
                   p
@@ -52,7 +44,7 @@ block content
                       span 暂无类别
                     else if data.forum.kindName == "shop"
                       span 商城
-                      span(style="margin-left:15px") 
+                      span(style="margin-left:15px")
                         button.btn.btn-sm.btn-danger(onclick=`clearKind(${forum.fid})`) 清除类别
                     else if data.forum.kindName === "fund"
                       span 基金

@@ -2,7 +2,7 @@ module.exports = async (options) => {
   const {ctx, fidOfCanGetThreads} = options;
   const {data, db, nkcModules} = ctx;
   const {user} = data;
-  
+
   // 获取与用户有关的数据
   if(user) {
     const subForumsId = await db.SubscribeModel.getUserSubForumsId(user.uid);
@@ -16,7 +16,7 @@ module.exports = async (options) => {
       data.subForums.push(forum);
     }
   }
-  
+
   // 最新文章
   const threads = await db.ThreadModel.find({
     mainForumsId: {$in: fidOfCanGetThreads},
@@ -54,11 +54,25 @@ module.exports = async (options) => {
   // data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads, "toc", 3);
   // 最新原创文章
   data.originalThreads = await db.ThreadModel.getOriginalThreads(fidOfCanGetThreads);
-    
+
     // 含有最新回复的文章
   data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 10);
   // 专业导航
-  data.forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
+  const forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
+  const forumsObj = {};
+  forumsTree.map(f => {
+    const {categoryId} = f;
+    if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
+    forumsObj[categoryId].push(f);
+  });
+  data.categoryForums = [];
+
+  ctx.state.forumCategories.map(fc => {
+    const _fc = Object.assign({}, fc);
+    const {_id} = _fc;
+    _fc.forums = forumsObj[_id] || [];
+    if(_fc.forums.length) data.categoryForums.push(_fc);
+  });
   // 公告通知
   data.notices = await db.ThreadModel.getNotice(fidOfCanGetThreads);
 
@@ -96,6 +110,6 @@ module.exports = async (options) => {
     data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
   }
   await nkcModules.apiFunction.extendManagementInfo(ctx);
-  
+
   ctx.template = "home/home_all.pug";
 };

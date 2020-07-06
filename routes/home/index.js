@@ -350,7 +350,6 @@ router
       }
     }
     data.enableFund = enableFund;
-
     ctx.template = "home/home.pug";
     await next();
   });

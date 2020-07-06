@@ -170,12 +170,18 @@ const forumSchema = new Schema({
     default: [],
     index: 1
 	},
-	// 专业类型
+	// 专业类型 旧
 	//--topic 话题
 	//--discipline 学科
 	forumType: {
 		type: String,
 		default: 'discipline'
+  },
+  // 专业分类
+  categoryId: {
+    type: Number,
+    required: true,
+    index: 1,
   },
 	// 上级板块
 	parentsId: {
@@ -1005,6 +1011,7 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
     allowedAnonymousPost: 1,
     color: 1,
     parentsId: 1,
+    categoryId: 1,
     iconFileName: 1,
     logo: 1,
     banner: 1,
@@ -1058,6 +1065,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     color: 1,
     parentsId: 1,
     iconFileName: 1,
+    categoryId: 1,
     description: 1,
     logo: 1,
     banner: 1,

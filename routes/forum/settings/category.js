@@ -19,6 +19,7 @@ categoryRouter
 		}
 		data.parentForums = parentForums;
 		data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
+		data.forumCategories = await db.ForumCategoryModel.getCategories();
 		ctx.template = 'interface_forum_settings_category.pug';
 		await next();
 	})
@@ -26,32 +27,25 @@ categoryRouter
 		const {data, db, body, redis} = ctx;
 		const {forum} = data;
 		const {operation} = body;
-		if(operation === 'selectForumType') {
-      const {forumType} = body;
-      if(!['topic', 'discipline'].includes(forumType)) ctx.throw(400, `未定义的专业属性：${forumType}`);
-      if(forum.parentsId.length !== 0) ctx.throw(400, '该专业不是顶级专业，暂无法更改专业属性');
-      const fids = await forum.getAllChildForumsId();
-      fids.push(forum.fid);
-			await db.ForumModel.updateMany({fid: {$in: fids}}, {$set: {
-        forumType: forumType
-      }});
-		}else if(operation === 'savePosition') {
+		if(operation === 'savePosition') {
 			const {parentId} = body;
 			if(parentId === forum.fid) ctx.throw(400, '板块不能成为自己的子版块');
 			if(!parentId) {
 				await forum.update({parentsId: []});
 			} else {
 				const targetForum = await db.ForumModel.findOnly({fid: parentId});
-				await forum.update({parentsId:[parentId], forumType:targetForum.forumType});
+				await forum.update({parentsId:[parentId], categoryId:targetForum.categoryId});
         forum.parentsId = [parentId];
         const fids = await forum.getAllChildForumsId();
         await db.ForumModel.updateMany({fid: {$in: fids}}, {$set: {
-          forumType: targetForum.forumType
+						categoryId: targetForum.categoryId
         }});
 				await forum.updateForumMessage();
 			}
 		} else if(operation === 'saveOrder') {
-			const {childrenFid, threadTypesCid} = body;
+			const {childrenFid, threadTypesCid, categoryId} = body;
+			const forumCategory = await db.ForumCategoryModel.findOne({_id: categoryId});
+			if(!forumCategory) ctx.throw(400, `专业分类ID错误 id: ${categoryId}`);
 			for(let i = 0; i < childrenFid.length; i++) {
 				const fid = childrenFid[i];
 				const childrenForum = await db.ForumModel.findOnly({fid});
@@ -62,6 +56,13 @@ categoryRouter
 				const threadType = await db.ThreadTypeModel.findOnly({cid});
 				await threadType.update({order: i});
 			}
+			const forumsId = await forum.getAllChildForumsId();
+			forumsId.push(forum.fid);
+			await db.ForumModel.updateMany({fid: {$in: forumsId}}, {
+				$set: {
+					categoryId
+				}
+			});
 		} else if(operation === 'changeThreadType') {
 			const {name, oldName} = body;
 			const threadType = await db.ThreadTypeModel.findOne({name: oldName, fid: forum.fid});
