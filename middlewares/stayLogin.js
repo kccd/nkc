@@ -2,6 +2,7 @@ const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
 const resourceOperations = [
+  "getAttachment",
   "getUserAvatar",
   "getUserBanner",
   "column_single_avatar_get",
