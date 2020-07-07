@@ -57,13 +57,14 @@ const schema = new Schema({
 });
 /*
 * 获取附件所在文件夹路径
-* @param {Boolean} upload true: 获取上传相关路径，false: 获取下载相关路径
+* @param {Date} t 指定時間
 * */
-schema.statics.getAttachmentPath = async () => {
+schema.statics.getAttachmentPath = async (t) => {
   const file = require("../nkcModules/file");
   const {attachment} = file.folders;
-  const timePath = moment().format(`/YYYY/MM`);
-  const fullPath = await file.getFullPath(attachment + timePath);
+  t = t || new Date();
+  const timePath = moment(t).format(`/YYYY/MM`);
+  const fullPath = await file.getFullPath(attachment + timePath, t);
   return {
     fullPath,
     timePath,
@@ -91,7 +92,7 @@ schema.statics.saveWatermark = async (file, c = 'normal') => {
   const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
   const AM = mongoose.model('attachments');
   const SM = mongoose.model('settings');
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const {fullPath, timePath} = await AM.getAttachmentPath();
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
   const realPath = `${fullPath}/${fileName}`;
@@ -126,7 +127,7 @@ schema.statics.saveHomeBigLogo = async file => {
   const ext = (await FileType.fromFile(file.path)).ext;
   const AM = mongoose.model('attachments');
   const SM = mongoose.model('settings');
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const {fullPath, timePath} = await AM.getAttachmentPath();
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
   const realPath = `${fullPath}/${fileName}`;
@@ -219,7 +220,7 @@ schema.statics.saveForumImage = async (fid, type, file) => {
   const ForumModel = mongoose.model('forums');
   const FILE = require('../nkcModules/file');
   const ext = await FILE.getFileExtension(file, ['jpg', 'jpeg', 'png']);
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const {fullPath, timePath} = await AM.getAttachmentPath();
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
   const targetFilePath = `${fullPath}/${fileName}`;
