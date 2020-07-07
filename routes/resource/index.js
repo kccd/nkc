@@ -89,8 +89,6 @@ resourceRouter
           break;
         };
       }
-      // 对游客的判断以及积分值的判断
-      console.log(needScore);
       if(needScore) {
         // 积分是否足够状态位
         data.enough = true;
