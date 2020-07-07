@@ -7,12 +7,11 @@ block eTitle
       max-width: 12rem;
     }
 block eContent
-
+  #data.hidden=objToStr({scoreType: data.scoreType, kcbsRecords: data.kcbsRecords, content: data.content, t: data.t, operationId: data.operationId, scores: data.scores})
   .container-fluid.max-width
     .row
       #app(v-cloak)
         .col-xs-12.col-md-12
-          .hidden(ref='data')= JSON.stringify({kcbsRecords: data.kcbsRecords, content: data.content, t: data.t, operatingid: data.operatingid})
           h4 按条件查询记录
         .col-xs-12.col-md-12
           .form-inline(style='margin-bottom: 1rem;')
@@ -24,11 +23,17 @@ block eContent
             .form-group
               input.form-control(:placeholder='searchTextPlaceholder' v-model='searchText' @keyup.enter='searchUser')
             .form-group
-              | 操作名:
-              select.form-control(v-model='searchOperatingId')
+              label 操作名：
+              select.form-control(v-model='searchoperationId')
                 option(value='') 不限
                 each val, key in data.kcbsTypes
                   option(value=`${key}`) #{val}
+            .form-group
+              label 积分类型：
+              select.form-control(v-model='searchScoreType')
+                option(value='') 不限
+                for s in data.scores
+                  option(value=s.type)=s.name
             .form-group
               button.btn.btn-primary(type='submit' @click='searchUser') 搜索
               span &nbsp;

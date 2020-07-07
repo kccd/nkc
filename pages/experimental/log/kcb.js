@@ -5,16 +5,15 @@ var app = new Vue({
     searchType: 'username',
     searchText: '',
     searchTextPlaceholder: '请输入用户名',
-    searchOperatingId: ''
+    searchoperationId: '',
+    searchScoreType: '',
   },
   methods: {
     fromNow: NKC.methods.fromNow,
     format: NKC.methods.format,
     ipUrl: NKC.methods.ipUrl,
     searchUser: function() {
-      if(!this.searchText) return screenTopWarning('输入不能为空');
-      // window.location.href = '/e/log/kcb?t=' + this.searchType + '&content=' + this.searchText;
-      openToNewLocation('/e/log/kcb?t=' + this.searchType + '&content=' + this.searchText + "&operatingid=" + this.searchOperatingId);
+      openToNewLocation('/e/log/kcb?t=' + this.searchType + '&content=' + this.searchText + "&operationId=" + this.searchoperationId + '&scoreType=' + this.searchScoreType);
     },
     optionChange: function() {
       var typeCn = this.$refs.selectTypeDom.selectedOptions[0].innerText;
@@ -23,14 +22,12 @@ var app = new Vue({
     }
   },
   mounted: function() {
-    var data = JSON.parse(this.$refs.data.innerText);
-    this.kcbsRecords = data.kcbsRecords;
-    // console.log(data);
-    if(data.t && data.content) {
-      this.searchText = data.content;
-      this.searchType = data.t;
-      this.searchOperatingId = data.operatingid;
-    }
+    var data = NKC.methods.getDataById('data');
+    this.kcbsRecords = data.kcbsRecords || '';
+    this.searchText = data.content || '';
+    this.searchType = data.t || 'username';
+    this.searchoperationId = data.operationId || '';
+    this.searchScoreType = data.scoreType || '';
     setTimeout(function() {
       floatUserPanel.initPanel();
     }, 500)

@@ -282,11 +282,12 @@ jobs.shop = () => {
   });
 };
 // 凌晨4点，核对kcb账单
-jobs.checkKcbsRecords = async () => {
+// 调整积分后 注释
+/*jobs.checkKcbsRecords = async () => {
   scheduleJob("0 0 4 * * *", async () => {
     fork("./timedTasks/checkKcbsRecords.js");
   });
-};
+};*/
 // 自动将退修未修改的文章移动到回收站
 jobs.moveRecycleMarkThreads = () => {
   const ThreadModel = require("./dataModels/ThreadModel");
