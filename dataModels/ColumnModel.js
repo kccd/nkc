@@ -236,7 +236,11 @@ schema.statics.getUserSubColumns = async (uid) => {
 schema.statics.toSearch = async (columnId) => {
   const ColumnModel = mongoose.model('columns');
   const column = await ColumnModel.findOne({_id: columnId});
-  if(!column) throwErr(404, `未找到ID为${columnId}的专栏`);
+  if(!column) {
+    const err = new Error(`未找到ID为${columnId}的专栏`);
+    err.status = 404;
+    throw err;
+  }
   await ColumnModel.saveColumnToElasticSearch(column);
 };
 

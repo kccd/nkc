@@ -418,7 +418,8 @@ schema.statics.removeFromES = async (lid) => {
 schema.statics.saveAllLibraryFileToElasticSearch = async () => {
   const LibraryModel = mongoose.model('libraries');
   const match = {
-    type: 'file'
+    type: 'file',
+    deleted: false,
   };
   const count = await LibraryModel.count(match);
   const limit = 2000;
