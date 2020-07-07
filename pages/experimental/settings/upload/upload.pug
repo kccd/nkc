@@ -57,9 +57,9 @@ block eContent
               .p-t-05.m-b-05
                 input(type='file' accept="image/*" ref='smallWatermarkInput' @change='selectedWatermark("small")').m-b-05
           .form-group
-            label.col-sm-2.control-label 开启去水印功能需花费积分
-            .col-sm-10
-              input(type='number' v-model.number="us.watermark.buyNoWatermark")
+            label.col-sm-2.control-label=`去水印花费积分（${data.watermarkScore.name}/${data.watermarkScore.unit}）`
+            .col-sm-10.form-inline
+              input.form-control(type='text' v-model.number="us.watermark.buyNoWatermark")
         h4 文件设置
         .form.form-horizontal
           .form-group.m-b-2

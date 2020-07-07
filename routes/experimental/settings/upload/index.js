@@ -6,6 +6,7 @@ router
     data.certList = await db.RoleModel.getCertList(['visitor']);
     uploadSettings.countLimit.others = await db.RoleModel.filterSettings(uploadSettings.countLimit.others, ['visitor']);
     uploadSettings.extensionLimit.others = await db.RoleModel.filterSettings(uploadSettings.extensionLimit.others, ['visitor']);
+    data.watermarkScore = await db.SettingModel.getScoreByOperationType('watermarkScore');
     data.uploadSettings = uploadSettings;
     ctx.template = "experimental/settings/upload/upload.pug";
     await next();
