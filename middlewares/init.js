@@ -97,6 +97,7 @@ module.exports = async (ctx, next) => {
       serverSettings: await db.SettingModel.getSettings("server"),
       stickerSettings: await db.SettingModel.getSettings("sticker"),
       logSettings: await db.SettingModel.getSettings("log"),
+      threadSettings: await db.SettingModel.getSettings('thread'),
       // 缓存相关
       cachePage: false
     };
@@ -201,7 +202,7 @@ module.exports = async (ctx, next) => {
     } else {
       ctx.template = 'error/error.pug';
     }
-    
+
     ctx.data.error = error;
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;

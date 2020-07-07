@@ -1,9 +1,8 @@
-#threadSettings= JSON.stringify(data.threadSettings)
-
+#threadSettings=objToStr({isDisplay: state.threadSettings.playerTips.isDisplay})
 template#plyrMask
   .plyr-mask
     .plyr-mask-wrap
-      p.player-tip-content= data.threadSettings.playerTips.tipContent
+      p.player-tip-content= state.threadSettings.playerTips.tipContent
       p.player-tip-button
         button.download
           i.fa.fa-arrow-circle-down(aria-hidden="true")
@@ -14,4 +13,3 @@ template#plyrMask
 
 +includeJS("/publicModules/plyr/mask.js")
 +includeCSS("/publicModules/plyr/mask.css")
-          

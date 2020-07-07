@@ -1,6 +1,5 @@
 const threadSettings = NKC.methods.getDataById("threadSettings");
-
-if(!threadSettings.playerTips.isDisplay) {
+if(!threadSettings.isDisplay) {
   NKC.methods.initPlyrMask = () => {};
 } else {
   NKC.methods.initPlyrMask = function(player) {
