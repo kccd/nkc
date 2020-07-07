@@ -135,7 +135,7 @@ const getVideoSize = async (inputPath) => {
  */
 async function getDrawTextSize(text, fontsize) {
   return new Promise((resolve, reject) => {
-    exec(`ffmpeg -i ${tempImageForFFmpeg} -vf "drawtext=fontfile='${fontFilePathForFFmpeg}':fontsize=${fontsize}:text='${text}':x=0+0*print(tw):y=0+0*print(th)" -vframes 1 -f null -`, 
+    exec(`ffmpeg -i ${tempImageForFFmpeg} -vf "drawtext=fontfile='${fontFilePathForFFmpeg}':fontsize=${fontsize}:text='${text}':x=0+0*print(tw):y=0+0*print(th)" -vframes 1 -f null -`,
     function(err, stdout, stderr ) {
       let results = stderr.trim().split("\n").reverse();
       resolve({
@@ -178,8 +178,8 @@ const ffmpegFilter = async (inputPath, outputPath, filters) => {
 const addImageWaterMask = async (op) => {
   let {
     videoPath,
-    imagePath, 
-    output, 
+    imagePath,
+    output,
     position =  {x: 10, y: 10},
     flex = 0.1,
     transparency = 0.5
@@ -201,7 +201,7 @@ async function addImageTextWaterMask(op) {
     output,
     image,
     text,
-    flex = 0.08,
+    flex = 0.06,
     position = {x: 10, y: 10},
     transparency = 0.5
   } = op;
