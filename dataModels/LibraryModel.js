@@ -1,4 +1,4 @@
-/* 
+/*
   文件夹或文件记录
 */
 const settings = require('../settings');
@@ -121,7 +121,7 @@ const schema = new mongoose.Schema({
 }, {
   collection: "libraries"
 });
-/* 
+/*
   创建文件夹
   @param {Object} options
     @param {String} name 文件夹名称
@@ -161,7 +161,7 @@ schema.statics.newFolder = async (options = {}) => {
   if(pl) await pl.computeCount();
   return library;
 };
-/* 
+/*
   创建文件记录
   @param {Object} options
     @param {String} name 文件名称
@@ -205,7 +205,7 @@ schema.statics.newFile = async (options = {}) => {
   await pl.computeCount();
   return library;
 };
-/* 
+/*
   校验文件、文件夹名称及简介
 */
 schema.statics.checkLibraryInfo = async (type, options) => {
@@ -238,7 +238,7 @@ schema.statics.checkLibraryInfo = async (type, options) => {
   if(saveName !== 0) throwErr(400, `当前目录下${valueName}名已存在`);
 }
 
-/* 
+/*
   拓展资源或文件夹
 */
 schema.statics.extendLibraries = async (libraries) => {
@@ -293,7 +293,7 @@ schema.methods.getFiles = async function() {
   return pinyin.sortByFirstLetter("object", files, "name");
 };
 
-/* 
+/*
   获取文件夹和上层文件夹组成的数组 层级关系
   @return {[Object]} [顶层, 2层, 3层,..., 当前文件夹]
   @author pengxiguaa 2019-10-23
@@ -307,21 +307,21 @@ schema.methods.getNav = async function() {
       const library = await LibraryModel.findOne({_id: lib.lid});
       if(library) await getParent(library);
     }
-  };  
+  };
   await getParent(this);
   return arr;
-};  
+};
 
-/* 
+/*
   获取当前文件夹或文件夹的目录结构
-  @return {String} 
+  @return {String}
 */
 schema.methods.getPath = async function() {
   const nav = await this.getNav();
   return "/ " + nav.map(n => n.name).join(" / ");
 };
 
-/* 
+/*
   计算当前文件夹以及上层所有文件夹中文件的数量
 */
 schema.methods.computeCount = async function() {
@@ -381,7 +381,7 @@ schema.methods.ensurePermission = async function(user, operation, modifyOtherLib
     throwErr(403, "权限不足");
   }
 };
-/* 
+/*
   同步文库文件记录到搜索数据库
   @param {Number} lid 文件记录ID
   @author pengxiguaa 2019-10-29
@@ -401,7 +401,7 @@ schema.statics.saveToES = async (lid) => {
   };
   await elasticSearch.save("resource", resourceData);
 }
-/* 
+/*
   从搜索数据库中删除文库文件记录
   @param {Number} lid 文件记录ID
   @author pengxiguaa 2019-10-29
@@ -410,5 +410,27 @@ schema.statics.removeFromES = async (lid) => {
   const elasticSearch = require("../nkcModules/elasticSearch");
   await elasticSearch.delete("resource", lid);
 };
+
+/*
+* 同步所有文库文件到ES数据库
+* @author pengxiguaa 2020/7/8
+* */
+schema.statics.saveAllLibraryFileToElasticSearch = async () => {
+  const LibraryModel = mongoose.model('libraries');
+  const match = {
+    type: 'file'
+  };
+  const count = await LibraryModel.count(match);
+  const limit = 2000;
+  for(let i = 0; i <= count; i+=limit) {
+    const files = await LibraryModel.find(match, {_id: 1}).sort({toc: 1}).skip(i).limit(limit);
+    for(const file of files) {
+      await LibraryModel.saveToES(file._id);
+    }
+    console.log(`【同步LibraryFile到ES】 总：${count}, 当前：${i} - ${i + limit}`);
+  }
+  console.log(`【同步LibraryFile到ES】完成`);
+};
+
 module.exports = mongoose.model("libraries", schema);
 

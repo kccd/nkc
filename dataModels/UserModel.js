@@ -639,13 +639,9 @@ userSchema.methods.calculateScore = async function() {
 * @author pengxiguaa 2019-8-16
 * */
 userSchema.pre('save', async function(next) {
-  const elasticSearch = require("../nkcModules/elasticSearch");
-  try {
-    await elasticSearch.save("user", this);
-    await next();
-  } catch(e) {
-    return next(e)
-  }
+  const UserModel = mongoose.model('users');
+  await UserModel.saveUserToElasticSearch(this);
+  await next();
 });
 
 
@@ -2021,4 +2017,37 @@ userSchema.statics.updateUserScores = async (uid) => {
   }
   return arr;
 };
+
+/*
+* 同步所有用户信息到ES数据库
+* @author pengxiguaa 2020/7/7
+* */
+userSchema.statics.saveAllUserToElasticSearch = async () => {
+  const UserModel = mongoose.model('users');
+  const count = await UserModel.count();
+  const limit = 2000;
+  for(let i = 0; i <= count; i+=limit) {
+    const users = await UserModel.find().sort({toc: 1}).skip(i).limit(limit);
+    for(const user of users) {
+      await UserModel.saveUserToElasticSearch(user);
+    }
+    console.log(`【同步User到ES】 总：${count}, 当前：${i} - ${i + limit}`);
+  }
+  console.log(`【同步User到ES】完成`);
+};
+
+/*
+* 同步用户信息到ES数据库
+* @param {Object} user 用户对象
+* @author pengxiguaa 2020/7/7
+* */
+userSchema.statics.saveUserToElasticSearch = async (user) => {
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  try{
+    await elasticSearch.save("user", user);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = mongoose.model('users', userSchema);

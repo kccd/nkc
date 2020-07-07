@@ -628,6 +628,24 @@ postSchema.statics.updateElasticSearch = async function(post) {
   await elasticSearch.save(docType, post);
 };
 
+/*
+* 同步所有的post到es
+* @author pengxiguaa 2020/7/7
+* */
+postSchema.statics.saveAllPostToElasticSearch = async function() {
+  const PostModel = mongoose.model('posts');
+  const count = await PostModel.count();
+  const limit = 2000;
+  for(let i = 0; i <= count; i+=limit) {
+    const posts = await PostModel.find().sort({toc: 1}).skip(i).limit(limit);
+    for(const post of posts) {
+      await PostModel.updateElasticSearch(post);
+    }
+    console.log(`【同步Post到ES】 总：${count}, 当前：${i} - ${i + limit}`);
+  }
+  console.log(`【同步Post到ES】完成`);
+};
+
 postSchema.pre('save', async function(next) {
   // elasticSearch: insert/update data
   try{
