@@ -44,6 +44,7 @@ module.exports = async (options) => {
   // 一周活跃用户
   data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
   // 热销商品
+  data.showShopGoods = (await db.SettingModel.getSettings("home")).showShopGoods;
   data.goodsForums = await db.ForumModel.find({kindName: "shop"});
   data.goods = await db.ShopGoodsModel.getHomeGoods();
   // 首页置顶
@@ -55,7 +56,7 @@ module.exports = async (options) => {
   // 最新原创文章
   data.originalThreads = await db.ThreadModel.getOriginalThreads(fidOfCanGetThreads);
     
-    // 含有最新回复的文章
+  // 含有最新回复的文章
   data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 10);
   // 专业导航
   data.forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);

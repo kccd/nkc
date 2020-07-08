@@ -20,7 +20,8 @@ const app = new Vue({
     recommendForums: data.recommendForums,
     columns: data.columns,
     goods: data.goods,
-    toppedThreads: data.toppedThreads
+    toppedThreads: data.toppedThreads,
+    showShopGoods: (data.showGoods? "t": "")
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -172,9 +173,11 @@ const app = new Vue({
     },
     saveGoods() {
       const goodsId = this.goods.map(g => g.productId);
+      const showShopGoods = !!this.showShopGoods;
       nkcAPI("/nkc/home", "PATCH", {
         operation: "saveGoods",
-        goodsId
+        goodsId,
+        showShopGoods
       })
         .then(() => {
           sweetSuccess("保存成功");

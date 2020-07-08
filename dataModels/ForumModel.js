@@ -217,6 +217,12 @@ const forumSchema = new Schema({
     type: Number,
     default: null,
     index: 1
+  },
+  // 是否开启流控
+  openReduceVisits: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {toObject: {
 		getters: true,

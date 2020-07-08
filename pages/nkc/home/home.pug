@@ -2,7 +2,7 @@ extends ../nkc
 block nkcTitle
   title 主页设置 - 前台管理
 block nkcContent
-  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, goods: data.goods, toppedThreads: data.toppedThreads})
+  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads})
   .col-xs-12.col-md-12.box-shadow-panel.management-home#app(v-cloak)
     div
       .management-header 首页推荐
@@ -35,13 +35,6 @@ block nkcContent
         .row.m-t-2
           .col-xs-12.col-md-12
             h4 固定图，只显示6篇
-            .select
-              span 显示模式：
-              select()
-                option 全自动
-                option 半自动
-                option 全手动
-              
             .radio
               span 显示顺序：
               label.m-r-1
@@ -99,6 +92,14 @@ block nkcContent
           button.management-button(@click="saveColumns") 保存
     div.m-t-2
       .management-header 首页热销商品
+      .radio
+        span 是否显示：
+        label.m-r-1
+          input(type="radio" value="t" v-model.boolean="showShopGoods")
+          span 是
+        label.m-r-1
+          input(type="radio" value="" v-model.boolean="showShopGoods")
+          span 否
       .home-top-goods
         .home-top-goods-body(v-for="g, index in goods")
           .home-goods-buttons

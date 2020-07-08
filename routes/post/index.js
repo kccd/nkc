@@ -139,6 +139,8 @@ router
     data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
     data.kcbSettings = await db.SettingModel.getSettings("kcb");
     data.xsfSettings = await db.SettingModel.getSettings("xsf");
+    // 读取帖子设置是因为页面读取了这里面的视频遮罩设置
+    data.threadSettings = await db.SettingModel.getSettings("thread");
     ctx.template = 'post/post.pug';
 
     if(data.user) {

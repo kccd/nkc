@@ -115,6 +115,17 @@ block content
                     .radiobox(style='display: inline-block;margin-right: 1rem;')
                       span 禁止
                       input(type='radio' name='allowedAnonymousPost'  checked=!forum.allowedAnonymousPost)
+              .form-group
+                label.col-sm-3.control-label 流控
+                .col-sm-5
+                  h5
+                    .radiobox(style='display: inline-block;margin-right: 1rem;')
+                      span 开启
+                      input(type='radio' name='openReduceVisits' checked=forum.openReduceVisits)
+                    .radiobox(style='display: inline-block;margin-right: 1rem;')
+                      span 关闭
+                      input(type='radio' name='openReduceVisits' checked=!forum.openReduceVisits)
+                  p.text-danger *开启流控以后，该专业的文章就不在各类自动推荐的地方显示(beta)
               if permission("createForumLibrary")         
                 .form-group        
                   label.col-sm-3.control-label 专业文库
