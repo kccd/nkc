@@ -85,3 +85,15 @@ body {
 .error-list .status-true {
   color: green;
 }
+.resource-oname {
+  font-size: 1.4em;
+  font-weight: bold;
+}
+.resource-size {
+  font-weight: normal;
+}
+.resource-downloaded-tip {
+  display: none;
+  padding: 0.5rem 0;
+  font-size: 1.2rem;
+}

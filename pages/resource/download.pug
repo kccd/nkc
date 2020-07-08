@@ -8,6 +8,7 @@ block content
   .container-fluid.max-width(style="padding-bottom: 100px")
     .tip-wrap
       .error-list.b-s-10
+        - let {ext, size, oname} = data.resource;
         - let text = (() => {
         -  let str = "";
         -  for(let score of data.myAllScore) {
@@ -20,7 +21,9 @@ block content
         -  str = str.substring(0, str.length - 1);
         -  return str;
         - })()
-        .error-header= `下载${data.resource.ext === "pdf"? "或预览":""}此资源需要${text}。`
+        .resource-oname= oname
+        .resource-size= "大小: " + (size / 1024 / 1024).toFixed(2) + "Mb"
+        .resource-scores= "花费: " + text
         .error-code= `你今日总下载次数为${data.todyOperationCount}次`
 
         - let text2 = (() => {
@@ -38,9 +41,11 @@ block content
         .error-code
           span= `你当前剩余${text2}。`
           code= data.enough? '确认要支付积分吗?' : '积分不足'
+        .resource-downloaded-tip
+          code= `附件下载中，${~~(data.resourceExpired / 1000 / 60)}分钟内重复下载不会扣分。`
         .error-info
           if data.enough
-            a.m-l-0(onclick=`payForDownloadResource(${data.rid})`) 下载
+            a.m-l-0.download-button(onclick=`payForDownloadResource(${data.rid})`) 下载
             if data.resource.ext === "pdf"
               | &nbsp;&nbsp;&nbsp;
               a.m-l-0(onclick=`previewPDFResource(${data.rid})`) 预览

@@ -5,6 +5,10 @@ window.payForDownloadResource = function(rid) {
   let downloadAttr = document.createAttribute("download");
   a.setAttributeNode(downloadAttr);
   a.click();
+  $(".resource-scores").remove();
+  $(".error-code").remove();
+  $(".resource-downloaded-tip").show();
+  $(".download-button").text("重新下载");
 }
 
 // 预览PDF
@@ -13,5 +17,4 @@ window.previewPDFResource = function(rid) {
   a.href = `/r/${rid}?c=preview_pdf`;
   a.setAttribute("target", "_blank");
   a.click();
-  window.close();
 }
