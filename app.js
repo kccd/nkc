@@ -85,50 +85,11 @@ app
   .use(conditional())
   .use(etag())
   .use(urlRewrite)
-  .use(async (ctx, next) => {
-    ctx._time = Date.now();
-    await next();
-  })
   .use(init)
-  .use(async (ctx, next) => {
-    console.log(`init: ${Date.now() - ctx._time}ms`);
-    ctx._time = Date.now();
-    await next();
-  })
   .use(stayLogin)
-  .use(async (ctx, next) => {
-    console.log(`stayLogin: ${Date.now() - ctx._time}ms`);
-    ctx._time = Date.now();
-    await next();
-  })
   .use(cache)
-  .use(async (ctx, next) => {
-    console.log(`cache: ${Date.now() - ctx._time}ms`);
-    ctx._time = Date.now();
-    await next();
-  })
   .use(permission)
-  .use(async (ctx, next) => {
-    console.log(`permission: ${Date.now() - ctx._time}ms`);
-    ctx._time = Date.now();
-    await next();
-  })
   .use(logger)
-  .use(async (ctx, next) => {
-    console.log(`logger: ${Date.now() - ctx._time}ms`);
-    ctx._time = Date.now();
-    await next();
-  })
   .use(mainRouter.routes())
-  .use(async (ctx, next) => {
-    console.log(`mainRouter: ${Date.now() - ctx._time}ms`);
-    ctx._time = Date.now();
-    await next();
-  })
-  .use(body)
-  .use(async (ctx, next) => {
-    console.log(`body: ${Date.now() - ctx._time}ms`);
-    ctx._time = Date.now();
-    await next();
-  });
+  .use(body);
 module.exports = app.callback();
