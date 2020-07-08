@@ -21,7 +21,7 @@ block content
         -  return str;
         - })()
         .error-header= `下载${data.resource.ext === "pdf"? "或预览":""}此资源需要${text}。`
-        .error-code= `您今日总下载次数为${data.todyOperationCount}次`
+        .error-code= `你今日总下载次数为${data.todyOperationCount}次`
 
         - let text2 = (() => {
         -  let str = "";
@@ -44,10 +44,9 @@ block content
             if data.resource.ext === "pdf"
               | &nbsp;&nbsp;&nbsp;
               a.m-l-0(onclick=`previewPDFResource(${data.rid})`) 预览
-          else 
+          else
             a.m-l-0(href=`/account/finance/recharge`) 充值
           | &nbsp;&nbsp;&nbsp;
           a(onclick="window.close()") 返回上一页
 
   +includeJS("/resource/download.js")
-    

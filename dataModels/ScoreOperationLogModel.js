@@ -55,16 +55,15 @@ schema.statics.getOperationLogCount = async function(user, type) {
 /**
  * 获取用户某附件最近一次下载操作记录
  * @param {Object} user 用户记录
- * @param {String} type 操作类型
+ * @param {String} rid 附件id
  */
 schema.statics.getLastAttachmentDownloadLog = async function(user, rid) {
   const KcbsRecordModel = mongoose.model('kcbsRecords');
-  let [lastLog] = await KcbsRecordModel.find({
+  return await KcbsRecordModel.findOne({
     from: user.uid,
     type: "attachmentDownload",
     rid
-  }).sort({_id:-1}).limit(1);
-  return lastLog;
+  }).sort({toc: -1});
 }
 
 

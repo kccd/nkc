@@ -5,7 +5,6 @@ window.payForDownloadResource = function(rid) {
   let downloadAttr = document.createAttribute("download");
   a.setAttributeNode(downloadAttr);
   a.click();
-  window.close();
 }
 
 // 预览PDF

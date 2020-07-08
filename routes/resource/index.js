@@ -79,7 +79,7 @@ resourceRouter
       }
 
       const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
-      const enabledScoreTypes = await db.SettingModel.getEnabledScoreTypes();
+      const enabledScoreTypes = await db.SettingModel.getEnabledScoresType();
       // 下载此附件是否需要积分状态位
       let needScore = false;
       // 此操作是否需要积分(更新状态位)
@@ -97,12 +97,12 @@ resourceRouter
       if(needScore) {
         // 当前是游客
         if(!data.user) {
-          ctx.throw(403, '此附件需要积分下载，请先登录或者注册。');
+          ctx.throw(403, '你暂未登录，请登录或者注册后重试。');
         }else {
         // 当前是用户
           // 此用户今日下载附件的总次数
-          let todyOperationCount = await db.ScoreOperationLogModel.getOperationLogCount(user, "attachmentDownload");
-          data.todyOperationCount = todyOperationCount;
+          let todayOperationCount = await db.ScoreOperationLogModel.getOperationLogCount(user, "attachmentDownload");
+          data.todayOperationCount = todayOperationCount;
           // 此用户最后一次此附件的转账记录
           let lastAttachmentDownloadLog = await db.ScoreOperationLogModel.getLastAttachmentDownloadLog(user, resource.rid);
           let nowTime = new Date();
@@ -112,7 +112,7 @@ resourceRouter
           // 如果最后一次下载到现在没有超过规定时间就不扣积分
           if(nowTime - lastAttachmentDownloadTime <= howLongOneMinute /* 一分钟 */) needScore = false;
           // 今日下载次数大于设置的次数 并且 设置的次数不为 -1 就不扣积分
-          if(todyOperationCount > operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
+          if(todayOperationCount > operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
         }
       }
       // 需要扣分的话进行下面的逻辑
@@ -152,6 +152,21 @@ resourceRouter
         } else {
           // 结束路由，返回页面
           ctx.state.forumsTree = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+          const forumsObj = {};
+          ctx.state.forumsTree.map(f => {
+            const {categoryId} = f;
+            if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
+            forumsObj[categoryId].push(f);
+          });
+          ctx.state.forumCategories = await db.ForumCategoryModel.getCategories();
+          ctx.state.userScores = await db.UserModel.getUserScores(data.user.uid);
+          ctx.state.categoryForums = [];
+          ctx.state.forumCategories.map(fc => {
+            const _fc = Object.assign({}, fc);
+            const {_id} = _fc;
+            _fc.forums = forumsObj[_id] || [];
+            if(_fc.forums.length) ctx.state.categoryForums.push(_fc);
+          });
           ctx.filePath = null;
           ctx.template = "resource/download.pug";
           return next();
