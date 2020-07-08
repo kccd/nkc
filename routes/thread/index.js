@@ -618,6 +618,7 @@ threadRouter
     }
 
 		// 【待改】加载鼓励、学术分
+    data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
       thread.firstPost.usersVote = vote?vote.type: '';

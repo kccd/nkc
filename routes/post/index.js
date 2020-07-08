@@ -37,6 +37,7 @@ router
         t: thread.firstPost.t
       }
     };
+    data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
     if(data.user) {
       data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
       data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
