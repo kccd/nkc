@@ -267,7 +267,7 @@ settingSchema.statics.getEnabledScores = async () => {
  * 获取启用的积分类型名数组
  * @returns {string[]} 积分类型名数组  ["score1", "score2" ... ]
  */
-settingSchema.statics.getEnabledScoreTypes = async () => {
+settingSchema.statics.getEnabledScoresType = async () => {
   let scores = await settingSchema.statics.getEnabledScores();
   return scores.map(score => {
     return score.type;

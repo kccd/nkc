@@ -76,7 +76,7 @@ resourceRouter
       }
 
       const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
-      const enabledScoreTypes = await db.SettingModel.getEnabledScoreTypes();
+      const enabledScoreTypes = await db.SettingModel.getEnabledScoresType();
       // 此用户目前持有的所有积分
       await db.UserModel.updateUserScores(user.uid);
       let myAllScore = await db.UserModel.getUserScores(user.uid);

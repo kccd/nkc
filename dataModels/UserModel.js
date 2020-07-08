@@ -2016,7 +2016,8 @@ userSchema.statics.updateUserScores = async (uid) => {
       number: await UserModel.updateUserScore(uid, type)
     });
   }
-  return arr;
+  const enabledScoresType = await SettingModel.getEnabledScoresType();
+  return arr.filter(a => enabledScoresType.includes(a.type));
 };
 
 /*
