@@ -49,6 +49,11 @@ router
       user
     );
 
+    // 筛选出没有开启流控的专业
+    let forumInReduceVisits = await db.ForumModel.find({openReduceVisits: true});
+    forumInReduceVisits = forumInReduceVisits.map(forum => forum.fid);
+    fidOfCanGetThreads = fidOfCanGetThreads.filter(fid => !forumInReduceVisits.includes(fid));
+
     let q = {};
     let threadListType;
     if(t) {

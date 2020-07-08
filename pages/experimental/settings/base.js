@@ -1,6 +1,7 @@
 function submitBase() {
 	var obj = {
-		websiteName: $('#websiteName').val(),
+    websiteName: $('#websiteName').val(),
+    websiteAbbr: $('#websiteAbbr').val(),
 		github: $('#github').val(),
 		record: $('#record').val(),
 		copyright: $('#copyright').val(),

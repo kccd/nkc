@@ -28,7 +28,10 @@ resourceRouter
     const {user} = data;
     let filePath = await resource.getFilePath();
     let speed;
+    data.resource = resource;
     if(mediaType === "mediaAttachment") {
+      // 告诉浏览器不要把这次的响应结果缓存下来
+      ctx.set("Cache-Control", "no-store");
       const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
       const {fileCountOneDay} = downloadOptions;
       speed = downloadOptions.speed;
@@ -76,20 +79,47 @@ resourceRouter
       }
 
       const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
-      const enabledScoreTypes = await db.SettingModel.getEnabledScoresType();
-      // 此用户目前持有的所有积分
-      await db.UserModel.updateUserScores(user.uid);
-      let myAllScore = await db.UserModel.getUserScores(user.uid);
+      const enabledScoreTypes = await db.SettingModel.getEnabledScoreTypes();
       // 下载此附件是否需要积分状态位
       let needScore = false;
+      // 此操作是否需要积分(更新状态位)
       for(let typeName of enabledScoreTypes) {
         let number = operation[typeName];
-        if(number == 0) {
+        // 如果设置的操作花费的积分不为0才考虑扣积分
+        if(number !== 0) {
           needScore = true;
           break;
-        };
+        }
       }
+      // 设置的次数为 0 表示关闭积分交易，不扣积分
+      if(operation.count === 0) needScore = false;
+      // 配置中下载需要积分
       if(needScore) {
+        // 当前是游客
+        if(!data.user) {
+          ctx.throw(403, '此附件需要积分下载，请先登录或者注册。');
+        }else {
+        // 当前是用户
+          // 此用户今日下载附件的总次数
+          let todyOperationCount = await db.ScoreOperationLogModel.getOperationLogCount(user, "attachmentDownload");
+          data.todyOperationCount = todyOperationCount;
+          // 此用户最后一次此附件的转账记录
+          let lastAttachmentDownloadLog = await db.ScoreOperationLogModel.getLastAttachmentDownloadLog(user, resource.rid);
+          let nowTime = new Date();
+          let lastAttachmentDownloadTime = lastAttachmentDownloadLog? lastAttachmentDownloadLog.toc : 0;
+          let howLongOneDay = 24 * 60 * 60 * 1000;
+          let howLongOneMinute = 60 * 1000;
+          // 如果最后一次下载到现在没有超过规定时间就不扣积分
+          if(nowTime - lastAttachmentDownloadTime <= howLongOneMinute /* 一分钟 */) needScore = false;
+          // 今日下载次数大于设置的次数 并且 设置的次数不为 -1 就不扣积分
+          if(todyOperationCount > operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
+        }
+      }
+      // 需要扣分的话进行下面的逻辑
+      if(needScore) {
+        // 此用户目前持有的所有积分
+        await db.UserModel.updateUserScores(user.uid);
+        let myAllScore = await db.UserModel.getUserScores(user.uid);
         // 积分是否足够状态位
         data.enough = true;
         // 检测积分是否足够
@@ -100,23 +130,31 @@ resourceRouter
           score.addNumber = operation[score.type];
         }
         data.myAllScore = myAllScore;
+        data.rid = resource.rid;
         // 是否需要显示下载扣分询问页面 (c 为 download 就直接扣分并返回文件)
-        if(c !== "download") {
-          // 结束路由，返回页面
-          ctx.state.forumsTree = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
-          ctx.filePath = null;
-          data.rid = resource.rid;
-          ctx.template = "resource/download.pug";
-          return next();
-        } else {
+        if(c === "download") {
           // 积分不够，返回错误页面
           if(!data.enough) {
             return nkcModules.throwError(403, "", "scoreNotEnough");
           } else {
-            // 积分足够
             // 扣除积分，继续往下走返回文件
             await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
           }
+        } else if(c === "preview_pdf") {
+          // 积分不够，返回错误页面
+          if(!data.enough) {
+            return nkcModules.throwError(403, "", "scoreNotEnough");
+          } else {
+            await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
+            // 重定向到预览页面
+            return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid);
+          }
+        } else {
+          // 结束路由，返回页面
+          ctx.state.forumsTree = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+          ctx.filePath = null;
+          ctx.template = "resource/download.pug";
+          return next();
         }
       }
     }

@@ -92,6 +92,12 @@ const kcbsRecordSchema = new Schema({
   ordersId: {
     type: [String]
   },
+  // 涉及的资源的资源id(下载资源操作 attachmentDownload)
+  rid: {
+    type: String,
+    default: '',
+    index: 1
+  },
   shareToken: {
     type: String,
     default: "",
@@ -167,11 +173,7 @@ kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additi
   const enabledScores = await SettingModel.getEnabledScores();
   const scores = {};
   // 获取当天此人当前操作执行的次数
-  const operationLogCount = await ScoreOperationLogModel.count({
-    uid: u.uid,
-    type,
-    toc: {$gte: apiFunction.today()}
-  });
+  const operationLogCount = await ScoreOperationLogModel.getOperationLogCount(u, type);
   operations = operations.filter(o => o.count === -1 || o.count > operationLogCount);
   if(!operations.length) return;
   for(const o of operations) {
@@ -242,6 +244,10 @@ kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additi
       newRecords.pid = post.pid;
       newRecords.fid = post.fid;
       newRecords.tid = post.tid;
+    }
+    // 操作涉及到的资源的资源id
+    if(data.rid) {
+      newRecords.rid = data.rid;
     }
     if(data.problem) newRecords.problemId = data.problem._id;
     await newRecords.save();

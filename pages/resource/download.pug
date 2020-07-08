@@ -20,7 +20,8 @@ block content
         -  str = str.substring(0, str.length - 1);
         -  return str;
         - })()
-        .error-header= `下载此资源需要${text}。`
+        .error-header= `下载${data.resource.ext === "pdf"? "或预览":""}此资源需要${text}。`
+        .error-code= `您今日总下载次数为${data.todyOperationCount}次`
 
         - let text2 = (() => {
         -  let str = "";
@@ -36,10 +37,13 @@ block content
         - })()
         .error-code
           span= `你当前剩余${text2}。`
-          code= data.enough? '确认下载吗?' : '积分不足'
+          code= data.enough? '确认要支付积分吗?' : '积分不足'
         .error-info
           if data.enough
             a.m-l-0(onclick=`payForDownloadResource(${data.rid})`) 下载
+            if data.resource.ext === "pdf"
+              | &nbsp;&nbsp;&nbsp;
+              a.m-l-0(onclick=`previewPDFResource(${data.rid})`) 预览
           else 
             a.m-l-0(href=`/account/finance/recharge`) 充值
           | &nbsp;&nbsp;&nbsp;

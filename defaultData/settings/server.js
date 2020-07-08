@@ -2,6 +2,7 @@ module.exports = {
   _id: 'server',
   c: {
     websiteName: '科创',
+    websiteAbbr: '科创',
     serverName: 'nkc $ server',
     telephone: '00000000',
     github: 'https://github.com/kccd/nkc.git',
@@ -23,10 +24,6 @@ module.exports = {
         {
           name: "计算工具",
           url: "/tools",
-        },
-        {
-          name: "科创基金",
-          url: "/fund"
         },
         {
           name: "考试系统",

@@ -1089,13 +1089,13 @@ postSchema.statics.ensureAttachmentPermission = async function(uid) {
 };
 
 
-/*
+/**
 * 获取最新回复
 * @param {[String]} fid, 可以访问的专业ID所组成的数组
 * @param {Number} limit, 条数
 * @return {[Object]} post数组
 * @author pengxiguaa 2019-12-05
-* */
+*/
 postSchema.statics.getLatestPosts = async (fid, limit = 9) => {
   const {obtainPureText} = require("../nkcModules/apiFunction");
   const PostModel = mongoose.model("posts");

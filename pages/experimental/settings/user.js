@@ -163,7 +163,7 @@ function showUserScores(uid) {
   $("#myAllScore").html();
   $("#myAllScoreDialog").modal("show");
   nkcAPI("/e/settings/userScores?uid=" + uid, "GET")
-    .then(data => {
+    .then(function(data){
       var scores = data.scores;
       var str = "";
       for(var index in scores) {
