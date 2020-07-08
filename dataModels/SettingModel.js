@@ -241,7 +241,8 @@ settingSchema.statics.getWatermarkSettings = async () => {
   const SettingModel = mongoose.model('settings');
   const uploadSettings = await SettingModel.getSettings('upload');
   return {
-    transparency: 255 * (1 - uploadSettings.watermark.transparency / 100),
+    // transparency: 255 * (1 - uploadSettings.watermark.transparency / 100),
+    transparency: 100 - uploadSettings.watermark.transparency,
     enabled: uploadSettings.watermark.enabled,
     minHeight: uploadSettings.watermark.minHeight,
     minWidth: uploadSettings.watermark.minWidth

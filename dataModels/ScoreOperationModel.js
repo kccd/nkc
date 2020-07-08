@@ -8,7 +8,7 @@ const schema = new mongoose.Schema({
   },
   count: {
     type: Number,
-    default: 3,
+    default: 0,
   },
   cycle: {
     type: String,
