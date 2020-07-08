@@ -2003,9 +2003,10 @@ userSchema.statics.getUserScores = async (uid) => {
 userSchema.statics.updateUserScores = async (uid) => {
   const UserModel = mongoose.model('users');
   const SettingModel = mongoose.model('settings');
-  const enabledScores = await SettingModel.getEnabledScores();
+  // const enabledScores = await SettingModel.getEnabledScores();
+  const scores = await SettingModel.getScores();
   const arr = [];
-  for(const score of enabledScores) {
+  for(const score of scores) {
     const {type, name, unit, icon} = score;
     arr.push({
       icon,
