@@ -8,7 +8,7 @@ block content
   .container-fluid.max-width(style="padding-bottom: 100px")
     .tip-wrap
       .error-list.b-s-10
-        - let {ext, size, oname} = data.resource;
+        - let {rid, ext, size, oname} = data.resource;
         - let text = (() => {
         -  let str = "";
         -  for(let score of data.myAllScore) {
@@ -46,10 +46,10 @@ block content
           span.name= `附件下载中... （${~~(data.resourceExpired / 1000 / 60)}分钟内重复下载不会扣分）`
         .error-info.m-t-1
           if data.enough
-            a.m-l-0.download-button(onclick=`payForDownloadResource(${data.rid})`) 立即下载
+            a.m-l-0.download-button(onclick=`payForDownloadResource(${rid})`) 立即下载
             if data.resource.ext === "pdf"
               | &nbsp;&nbsp;&nbsp;
-              a.m-l-0(onclick=`previewPDFResource(${data.rid})`) 预览
+              a.m-l-0(onclick=`previewPDFResource(${rid})`) 预览
           else
             a.m-l-0(href=`/account/finance/recharge`) 充值
           | &nbsp;&nbsp;&nbsp;

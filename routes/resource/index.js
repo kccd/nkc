@@ -29,9 +29,9 @@ resourceRouter
     let filePath = await resource.getFilePath();
     let speed;
     data.resource = resource;
+    // 告诉浏览器不要把这次的响应结果缓存下来
+    ctx.set("Cache-Control", "no-store");
     if(mediaType === "mediaAttachment") {
-      // 告诉浏览器不要把这次的响应结果缓存下来
-      ctx.set("Cache-Control", "no-store");
       const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
       const {fileCountOneDay} = downloadOptions;
       speed = downloadOptions.speed;
