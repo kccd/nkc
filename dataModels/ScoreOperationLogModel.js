@@ -33,7 +33,7 @@ const schema = new mongoose.Schema({
     type: [String],
     default: [],
     index: 1
-  }
+  },
 }, {
   collection: 'scoreOperationLogs'
 });

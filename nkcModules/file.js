@@ -118,7 +118,7 @@ func.saveColumnAvatar$2 = async (columnId, file) => {
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
   const column = await db.ColumnModel.findOnly({_id: columnId});
   const AM = db.AttachmentModel;
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const {fullPath, timePath} = await AM.getAttachmentPath();
   const aid = AM.getNewId();
   await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 100);
   await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 250);
@@ -219,7 +219,7 @@ func.saveColumnBanner$2 = async (columnId, file) => {
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
   const column = await db.ColumnModel.findOnly({_id: columnId});
   const AM = db.AttachmentModel;
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const {fullPath, timePath} = await AM.getAttachmentPath();
   const aid = AM.getNewId();
   await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 720, 1280);
   await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 480, 1920);
@@ -329,7 +329,7 @@ func.saveUserAvatar$2 = async (uid, file) => {
   const user = await db.UserModel.findOnly({uid});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = await func.getFileExtension(file, ['png', 'jpg', 'jpeg']);
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const {fullPath, timePath} = await AM.getAttachmentPath();
   const aid = AM.getNewId();
   await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 192);
   await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 48);
@@ -430,7 +430,7 @@ func.saveUserBanner$2 = async (uid, file) => {
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = (await FileType.fromFile(file.path)).ext;
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
-  const {fullPath, timePath} = await AM.getAttachmentPath(true);
+  const {fullPath, timePath} = await AM.getAttachmentPath();
   const aid = AM.getNewId();
   await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 400, 800, 95);
   const attachment = AM({
