@@ -68,13 +68,13 @@ module.exports = {
       rid = id,
     } = resource;
     const fileCover = getUrl("fileCover", ext);
-    const url = getUrl("resource", rid);
+    let url = getUrl("resource", rid);
     let pdfHTML = "";
     if(ext === "pdf") {
-      const pdfUrl = getUrl("pdf", rid);
+      url = getUrl("pdf", rid);
       pdfHTML = `
         <span class="article-attachment-reader">
-          <a href="${url + "?t=attachment"}" target="_blank">预览</a>
+          <a href="${url}" target="_blank">预览</a>
         </span>
       `.trim();
     }

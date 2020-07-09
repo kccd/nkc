@@ -44,7 +44,7 @@ var Tools = function() {
         return "/a/" + id + t
       }
       case "pdf": {
-        return "/reader/pdf/web/viewer?file=%2fr%2f" + id
+        return "/r/" + id + '?c=nkc_source_pdf';
       }
       case "sticker": {
         return "/sticker/" + id;

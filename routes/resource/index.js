@@ -172,6 +172,10 @@ resourceRouter
           ctx.template = "resource/download.pug";
           return next();
         }
+      } else {
+        if(c === "nkc_source_pdf") {
+          return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid);
+        }
       }
     }
     if (mediaType === "mediaPicture") {
@@ -186,7 +190,6 @@ resourceRouter
     if(!ctx.request.headers['range']){
       await resource.update({$inc:{hits:1}});
     }
-
     ctx.filePath = filePath;
     // 表明客户端希望以附件的形式加载资源
     if(t === "attachment") {
