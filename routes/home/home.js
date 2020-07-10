@@ -14,30 +14,30 @@ module.exports = async (options) => {
     for(let fid of subForumsId) {
       const forum = forumsObj[fid];
       if(!forum) continue;
-      // // 查出3篇此专业的最新内容放进forum
-      // let posts = await db.PostModel.find({
-      //   mainForumsId: {$in: [fid]},
-      //   disabled: false,
-      //   reviewed: true,
-      //   toDraft: {$ne: true},
-      //   type: "thread",
-      // }).sort({toc: -1}).limit(3);
-      // const threadsId = posts.map(post => post.tid);
-      // const threads = await db.ThreadModel.find({
-      //   tid: {$in: threadsId},
-      //   mainForumsId: {$in: [fid]}, disabled: false, reviewed: true, recycleMark: {$ne: true}
-      // }).sort({toc: -1});
-      // forum.latestThreads = await db.ThreadModel.extendThreads(threads, {
-      //   lastPost: true,
-      //   lastPostUser: true,
-      //   category: true,
-      //   forum: true,
-      //   firstPost: true,
-      //   firstPostUser: true,
-      //   userInfo: false,
-      //   firstPostResource: false,
-      //   htmlToText: true
-      // });
+      // 查出3篇此专业的最新内容放进forum
+      let posts = await db.PostModel.find({
+        mainForumsId: {$in: [fid]},
+        disabled: false,
+        reviewed: true,
+        toDraft: {$ne: true},
+        type: "thread",
+      }).sort({toc: -1}).limit(3);
+      const threadsId = posts.map(post => post.tid);
+      const threads = await db.ThreadModel.find({
+        tid: {$in: threadsId},
+        mainForumsId: {$in: [fid]}, disabled: false, reviewed: true, recycleMark: {$ne: true}
+      }).sort({toc: -1});
+      forum.latestThreads = await db.ThreadModel.extendThreads(threads, {
+        lastPost: true,
+        lastPostUser: true,
+        category: true,
+        forum: true,
+        firstPost: true,
+        firstPostUser: true,
+        userInfo: false,
+        firstPostResource: false,
+        htmlToText: true
+      });
       data.subForums.push(forum);
     }
   }
