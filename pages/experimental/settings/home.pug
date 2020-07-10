@@ -1,17 +1,14 @@
-extends ../../bootstrap_base
-
-block title
-  -const mainContainer1400 = true;
+extends ../experimental
+block eTitle
   link(href='/experimental/index.css' rel='stylesheet')
   link(rel='stylesheet' href='/jquery/jquery.minicolors.css')
   link(rel='stylesheet' href='/jcrop/css/jquery.Jcrop.min.css')
   link(rel='stylesheet' href='/icheck/skins/minimal/red.css')
   title 网站首页设置
-block content
+block eContent
 
   .container-fluid.max-width
     .row
-      include ../nav
       .col-xs-12.col-md-2
         .list-group
           a.list-group-item(class=data.type==='notice'?'active': '' href=`/e/settings/home/notice`) 网站公告
@@ -84,11 +81,10 @@ block content
                     input.form-control(type='text' v-model.number='homeSettings.recommend.encourageTotal')
                 .form-group
                   h4.setting-block-title 首页大LOGO
-                  .container
-                    .row
-                      .logo-item.col-xs-6.col-sm-3(v-for="(f, index) in logoFiles")
-                        img(:src="f.url")
-                        .logo-item-control.fa.fa-trash(@click="deleteBigLogo(index)")
+                  .row
+                    .logo-item.col-xs-6.col-sm-3(v-for="(f, index) in logoFiles")
+                      img(:src="f.url")
+                      .logo-item-control.fa.fa-trash(@click="deleteBigLogo(index)")
                   p.help-block 推荐388*107px，上传多个将在每次刷新页面时随机选取一个展示
                   button.btn.btn-primary(@click="pickPicture" :disabled="logoFileUploadding") {{logoFileUploadding? '上传中...' : '选取图片'}}
                   input#inputFile.hidden(type="file" multiple accept="image/*" @change="addFile")
@@ -148,8 +144,7 @@ block scripts
   script(src=`/jcrop/js/jquery.Jcrop.min.js?v=${global.NKC.startTime}`)
   script(src=`/jquery/jquery.minicolors.js?v=${NKC.startTime}`)
   script(src='/icheck/icheck.js')
-  script(src=`/interface_common.js?v=${NKC.startTime}`)
-  script(src=`/experimental/settings/home.js?v=${NKC.startTime}`)
+  +includeJS('/experimental/settings/home.js')
 
 
 

@@ -17,7 +17,8 @@ router
       type: "withdraw",
       toc: {
         $gte: today
-      }
+      },
+      verify: true,
     });
     data.mainScore = await db.SettingModel.getMainScore();
     data.userScores = await db.UserModel.updateUserScores(user.uid);
@@ -43,7 +44,8 @@ router
         type: "withdraw",
         toc: {
           $gte: today
-        }
+        },
+        verify: true,
       });
       if(countToday >= countOneDay) ctx.throw(403, "你今日的提现次数已用完，请明天再试");
       checkNumber(money, {

@@ -215,7 +215,7 @@ if(vueDom) {
           recommend: homeSettings.recommend
         })
           .then(function() {
-            app.info = "保存成功";
+          	sweetSuccess('保存成功');
           })
           .catch(function(data) {
             app.error = data.error || data;
