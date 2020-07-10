@@ -1,6 +1,8 @@
 module.exports = {
   _id: 'fund',
   c: {
+    enableFund: false,
+    fundName: '科创基金',
     description: '这是基金描述',
     terms: '这是基金协议',
     money: 0,
