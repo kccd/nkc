@@ -864,3 +864,16 @@ footer.footer {
     width: 5.7rem;
   }
 }
+.home-subscribe-forum-item + .home-subscribe-forum-item {
+  margin-top: 20px;
+  border-top: 1px solid #e6e6e6;
+  padding-top: 10px;
+}
+.home-subscribe-forum-item .home-subscribe-forum-wrap,
+.home-subscribe-forum-item .home-subscribe-forum-newthread {
+  display: table-cell;
+  vertical-align: top;
+}
+.home-subscribe-forum-item .home-subscribe-forum-newthread {
+  padding-top: 10px;
+}

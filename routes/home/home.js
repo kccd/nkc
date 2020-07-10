@@ -10,12 +10,39 @@ module.exports = async (options) => {
     const forumsObj = {};
     forums.map(f => forumsObj[f.fid] = f);
     data.subForums = [];
+    // 查出此用户已关注的专业
     for(let fid of subForumsId) {
       const forum = forumsObj[fid];
       if(!forum) continue;
+      // // 查出3篇此专业的最新内容放进forum
+      // let posts = await db.PostModel.find({
+      //   mainForumsId: {$in: [fid]},
+      //   disabled: false,
+      //   reviewed: true,
+      //   toDraft: {$ne: true},
+      //   type: "thread",
+      // }).sort({toc: -1}).limit(3);
+      // const threadsId = posts.map(post => post.tid);
+      // const threads = await db.ThreadModel.find({
+      //   tid: {$in: threadsId},
+      //   mainForumsId: {$in: [fid]}, disabled: false, reviewed: true, recycleMark: {$ne: true}
+      // }).sort({toc: -1});
+      // forum.latestThreads = await db.ThreadModel.extendThreads(threads, {
+      //   lastPost: true,
+      //   lastPostUser: true,
+      //   category: true,
+      //   forum: true,
+      //   firstPost: true,
+      //   firstPostUser: true,
+      //   userInfo: false,
+      //   firstPostResource: false,
+      //   htmlToText: true
+      // });
       data.subForums.push(forum);
     }
   }
+
+  const homeSettings = await db.SettingModel.getSettings("home");
 
   // 最新文章
   const threads = await db.ThreadModel.find({
@@ -44,7 +71,7 @@ module.exports = async (options) => {
   // 一周活跃用户
   data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
   // 热销商品
-  data.showShopGoods = (await db.SettingModel.getSettings("home")).showShopGoods;
+  data.showShopGoods = homeSettings.showShopGoods;
   data.goodsForums = await db.ForumModel.find({kindName: "shop"});
   data.goods = await db.ShopGoodsModel.getHomeGoods();
   // 首页置顶
@@ -55,7 +82,8 @@ module.exports = async (options) => {
   // data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads, "toc", 3);
   // 最新原创文章
   data.originalThreads = await db.ThreadModel.getOriginalThreads(fidOfCanGetThreads);
-
+  // 最新原创文章显示模式
+  data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
   // 含有最新回复的文章
   data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 10);
   // 专业导航

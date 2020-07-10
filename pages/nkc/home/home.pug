@@ -2,7 +2,7 @@ extends ../nkc
 block nkcTitle
   title 主页设置 - 前台管理
 block nkcContent
-  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads})
+  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode})
   .col-xs-12.col-md-12.box-shadow-panel.management-home#app(v-cloak)
     div
       .management-header 首页推荐
@@ -141,6 +141,18 @@ block nkcContent
                   span {{thread.firstPost.user.username}}
         .m-t-1
           button.management-button(@click="saveToppedThreads") 保存
+    div.m-t-2
+      .management-header 最新原创
+      .radio
+        span 显示方式：
+        label.m-r-1
+          input(type="radio" value="simple" v-model="originalThreadDisplayMode")
+          span 简略显示
+        label.m-r-1
+          input(type="radio" value="full" v-model="originalThreadDisplayMode")
+          span 完整显示
+      .m-t-1
+        button.management-button(@click="saveOriginalThreadDisplayMode") 保存
 
 block nkcScripts
   include ../../publicModules/crop/crop_new

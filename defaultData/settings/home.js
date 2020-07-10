@@ -39,6 +39,7 @@ module.exports = {
       voteUpTotal: 20, // 总点赞数
       voteUpMax: 10, // 最高点赞数
       encourageTotal: 10 // 总鼓励数
-    }
+    },
+    originalThreadDisplayMode: "simple"     // 首页上“最新原创”板块文章的显示方式， “simple” 简略显示， “full” 完整显示
   }
 };

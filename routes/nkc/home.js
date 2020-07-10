@@ -55,6 +55,8 @@ router
       const thread = threadsObj[tid];
       if(thread) data.toppedThreads.push(thread);
     });
+    // 首页上 “最新原创” 板块文章条目显示模式 “simple”或空 - 简略， “full” - 完整
+    data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
     ctx.template = "nkc/home/home.pug";
     await next();
   })
@@ -133,6 +135,13 @@ router
       await db.SettingModel.updateOne({_id: "home"}, {
         $set: {
           "c.toppedThreadsId": toppedThreadsId
+        }
+      });
+    } else if(operation === "saveOriginalThreadDisplayMode") {
+      const {originalThreadDisplayMode} = body;
+      await db.SettingModel.updateOne({_id: "home"}, {
+        $set: {
+          "c.originalThreadDisplayMode": originalThreadDisplayMode
         }
       });
     }

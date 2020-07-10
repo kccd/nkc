@@ -1,0 +1,103 @@
+.thread-panel(class=!thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":"")
+  if !thread.reviewed
+    include ../module_review
+  if thread.disabled
+    include ../module_disabled
+  if thread.recycleMark
+    include ../module_toDraft
+  .thread-panel-body
+    .thread-panel-content
+      //- 作者信息 专业信息 时间
+      .thread-panel-author-info
+        if canManagement
+          .checkbox.thread-checkbox
+            label
+              input(
+                type="checkbox"
+                data-thread-id=thread.tid
+                data-post-id=thread.oc
+                data-thread-fids=thread.mainForumsId.join("-")
+                data-thread-cids=(thread.categoriesId || []).join("-")
+              )
+
+
+        if !thread.firstPost.anonymous
+          .thread-panel-author(data-float-uid=thread.uid)
+            a(href=`/u/${thread.uid}` target="_blank")
+              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
+            a(
+              href=`/u/${thread.uid}` target="_blank"
+            )= thread.firstPost.user.username
+        else
+          .thread-panel-author
+            img(src=anonymousInfo.avatar)
+            span.anonymous-name= anonymousInfo.username
+
+
+        .thread-panel-forum
+          if data.forum
+            -let displayForumNav = false;
+            for f in thread.forums
+              if f.fid !== data.forum.fid
+                -displayForumNav = true;
+                a(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
+            if !displayForumNav && thread.categories.length !== 0
+              for category in thread.categories
+                if data.threadTypesId.includes(category.cid)
+                  a(href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
+          else
+            -let forum;
+            for f in thread.forums
+              -forum = f;
+              if f.forumType === 'topic'
+                -break;
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid)= forum.displayName
+
+        .thread-panel-time=fromNow(thread.toc)
+
+        .thread-panel-button
+          if thread.firstPost.voteUp
+            .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
+          if thread.hits
+            .fa.fa-eye=` ${thread.hits}`
+          if thread.count
+            .fa.fa-comment=` ${thread.count}`
+        if thread.from
+          .thread-panel-from
+            if thread.from === 'own'
+              span 自己的文章
+            else if thread.from === 'subForum'
+              span 关注的专业
+            else if thread.from === 'subFriend'
+              span 好友
+            else if thread.from === "subThread"
+              span 关注的文章
+            else if thread.from === "collection"
+                span 收藏
+
+      //- 文章标题
+      .thread-panel-title
+        a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t)= thread.firstPost.t
+        -const pageCount = thread.count / state.pageSettings.threadPostList
+        -let ellipsis = false;
+        -for(let i = 1; i < pageCount; i++)
+          if i < 4 || i > pageCount - 3
+            a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
+          else if !ellipsis
+            span.thread-title-page ...
+            -ellipsis = true;
+      .thread-panel-abstract
+        if thread.firstPost.cover
+          .thread-panel-cover.hidden-md.hidden-lg
+            .thread-panel-image(
+              style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
+            )
+        .thread-panel-abstract-content
+          .thread-panel-reply
+            a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
+            if !thread.lastPost.anonymous
+              a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)
+                img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
+            else
+              .thread-panel-reply-user
+                img(src=tools.getUrl("anonymousUserAvatar"))

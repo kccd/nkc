@@ -855,3 +855,26 @@ footer.footer{
     width: 5.7rem;
   }
 }
+
+
+
+// 关注的专业
+.home-subscribe-forum-item {
+  // background-color: rgb(226, 226, 226);
+
+  & + .home-subscribe-forum-item {
+    margin-top: 20px;
+    border-top: 1px solid rgb(230, 230, 230);
+    padding-top: 10px;
+  }
+  
+  .home-subscribe-forum-wrap,
+  .home-subscribe-forum-newthread {
+    display: table-cell;
+    vertical-align: top;
+  }
+
+  .home-subscribe-forum-newthread {
+    padding-top: 10px;
+  }
+}
