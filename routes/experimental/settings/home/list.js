@@ -55,6 +55,6 @@ router
         data.saved.push({aid: attachment._id, url: `/a/${attachment._id}`});
       }
     }
-    next();
+    return next();
   });
 module.exports = router;
