@@ -36,7 +36,7 @@ module.exports = [
     displayOnParent: true,
     visibility: true,
     isVisibleForNCC: true,
-    rolesId: ['dev', 'default', 'visitor'],
+    rolesId: ['dev'],
     type: 'forum',
     parentsId: [1]
   }

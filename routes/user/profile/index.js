@@ -122,6 +122,10 @@ router
           url: `/u/${targetUser.uid}/profile/blacklist`,
         }
       ];
+      data.name = "";
+      data.appLinks.map(link => {
+        if (data.type === link.type) data.name = link.name;
+      });
     } else {
       data.navLinks = [
         {

@@ -4,7 +4,7 @@ mixin item(record)
       .time= format("YYYY-MM-DD HH:mm:ss", record.toc)
       .id= `交易ID：${record._id}`
       .type= `交易类型：${lang('kcbsTypes', record.type)}`
-
+      .type= `积分类型：${record.scoreName}`
       .target
         span 交易对象：
         if record.to === data.targetUser.uid

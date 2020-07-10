@@ -133,11 +133,6 @@ module.exports = {
 			PATCH: 'modifyWebBase'
 		},
 		home: {
-			logo: {
-				GET: 'visitHomeLogoSettings',
-				PATCH: 'modifyHomeLogoSettings',
-				DELETE: 'deleteHomeLogo'
-			},
 			top: {
 				GET: 'visitHomeTopSettings',
 				PATCH: 'modifyHomeTopSettings'
