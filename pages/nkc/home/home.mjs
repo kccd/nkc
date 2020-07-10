@@ -21,7 +21,9 @@ const app = new Vue({
     columns: data.columns,
     goods: data.goods,
     toppedThreads: data.toppedThreads,
-    showShopGoods: (data.showGoods? "t": "")
+    showShopGoods: (data.showGoods? "t": ""),
+    // 首页“最新原创”文章条目显示模式，为空就默认为简略显示
+    originalThreadDisplayMode: data.originalThreadDisplayMode
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -194,6 +196,20 @@ const app = new Vue({
           sweetSuccess("保存成功");
         })
         .catch(sweetError)
+    },
+    saveOriginalThreadDisplayMode() {
+      const originalThreadDisplayMode = this.originalThreadDisplayMode;
+      nkcAPI("/nkc/home", "PATCH", {
+        operation: "saveOriginalThreadDisplayMode",
+        originalThreadDisplayMode
+      })
+        .then(() => {
+          sweetSuccess("保存成功");
+        })
+        .catch(sweetError)
     }
   }
 });
+
+console.log(app);
+

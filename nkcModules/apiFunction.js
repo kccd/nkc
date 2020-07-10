@@ -191,6 +191,30 @@ fn.getRandomNumber = (obj) => {
 	return arr;
 };
 
+/**
+ * 指定范围和个数生成随机整数数组 
+ */
+fn.getRandomNumber$2 = (obj) => {
+  let {count, min, max, repeat} = obj;
+  if(count === 0) return [];
+  if(min >= max) return [];
+  let numberPoolLength = max - min + 1;
+  if(numberPoolLength < count) {
+    count = numberPoolLength;
+  }
+  const arr = [];
+  const numberPool = Array(numberPoolLength).fill().map((_, index) => index + min);
+  while(arr.length < count) {
+    let randomIndex = Math.floor(Math.random() * (numberPool.length - 1 - 0 + 1)) + 0;
+    arr.push(
+      repeat
+        ? numberPool[randomIndex]
+        : numberPool.splice(randomIndex, 1)[0]
+    );
+  }
+  return arr;
+}
+
 fn.today = (time) => {
 	const moment = require('moment');
 	let t;

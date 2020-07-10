@@ -126,7 +126,7 @@ function saveWaterMarkSettings() {
 
 function uploadHomeBigLogo(files) {
 	var form = new FormData();
-	files.forEach((file, index) => {
+	files.forEach(function(file, index){
 		form.append('file' + index, file);
 	})
 	return nkcUploadFile("/e/settings/home/list/biglogo", "POST", form);
@@ -229,7 +229,7 @@ if(vueDom) {
 				var files = [].slice.call($("#inputFile")[0].files);
 				self.logoFileUploadding = true;
 				uploadHomeBigLogo(files)
-					.then(data => {
+					.then(function(data){
 						self.logoFiles = self.logoFiles.concat(data.saved);
 						self.logoFileUploadding = false;
 					})
@@ -237,13 +237,12 @@ if(vueDom) {
 			},
 			deleteBigLogo: function(index) {
 				let logoFiles = this.logoFiles;
-				var fileItem = logoFiles[index];
-				console.log("你要删除: " + fileItem.aid);
+				let fileItem = logoFiles[index];
 				nkcAPI("/e/settings/home/list/biglogo", "POST", {
 					type: "delete",
 					aid: fileItem.aid
 				})
-				.then(() => {
+				.then(function(){
 					logoFiles.splice(index, 1);
 					screenTopAlert('删除成功');
 				})

@@ -1200,7 +1200,7 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
     type: "thread",
     originState: {$nin: ["0", "", "1", "2"]}
   }).sort({toc: -1}).limit(10);
-  const {getRandomNumber} = require("../nkcModules/apiFunction");
+  const {getRandomNumber$2: getRandomNumber} = require("../nkcModules/apiFunction");
   const numbers = getRandomNumber({
     min: 0,
     max: posts.length - 1,

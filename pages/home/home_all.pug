@@ -109,13 +109,29 @@ block content
               //.header-description 关注最新话题，足不出户便能游遍世界~
             .home-subscribes
               for forum in data.subForums
-                a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
-                  .home-subscribe-forum-avatar
-                    if forum.logo
-                      img(src=tools.getUrl("forumAvatar", forum.logo))
+                .home-subscribe-forum-item
+                  .home-subscribe-forum-wrap
+                    a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
+                      .home-subscribe-forum-avatar
+                        if forum.logo
+                          img(src=tools.getUrl("forumAvatar", forum.logo))
+                        else
+                          div(style=`background-color: ${forum.color}`)
+                      .home-subscribe-forum-info=forum.displayName
+                  .home-subscribe-forum-newthread
+                    if forum.latestThreads.length
+                      for thread in forum.latestThreads
+                        include ../publicModules/thread_panel/thread_panel_for_subscribe_forum
                     else
-                      div(style=`background-color: ${forum.color}`)
-                  .home-subscribe-forum-info=forum.displayName
+                      | 暂无新内容
+              //- for forum in data.subForums
+              //-   a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
+              //-     .home-subscribe-forum-avatar
+              //-       if forum.logo
+              //-         img(src=tools.getUrl("forumAvatar", forum.logo))
+              //-       else
+              //-         div(style=`background-color: ${forum.color}`)
+              //-     .home-subscribe-forum-info=forum.displayName
 
         if data.columns.length
           .home-forums-list.m-b-1
@@ -148,8 +164,12 @@ block content
               //-.fa.fa-tags
               .header-name 最新原创
             .home-threads.p-t-05
-              for thread in data.originalThreads
-                include ../publicModules/thread_panel/thread_panel
+              if !data.originalThreadDisplayMode || data.originalThreadDisplayMode === "simple"
+                for thread in data.originalThreads
+                  include ../publicModules/thread_panel/thread_panel_simple
+              if data.originalThreadDisplayMode === "full"
+                for thread in data.originalThreads
+                  include ../publicModules/thread_panel/thread_panel
               a.home-threads-more-link(href=`/?t=latest`) 查看全部新讨论
         for cf in data.categoryForums
           .home-forums-list.m-b-1
@@ -172,22 +192,6 @@ block content
         //  for f in data.forumsTree
         //    if f.forumType === "discipline"
         //      +forumList(f)
-        if data.columns.length
-          .home-forums-list.m-b-1
-            .home-header
-              //- fa.fa-flask
-              .header-name 热门专栏
-              //.header-description 关注最新学科，足不出户便能游遍世界~
-            .home-columns
-              for column in data.columns
-                a(href=`/m/${column._id}`).home-column
-                  .home-column-avatar
-                    img(src=tools.getUrl("columnAvatar", column.avatar))
-                  .home-column-name=column.name
-            if !state.userColumn && data.user && state.columnPermission
-              .home-columns-link
-                a(href=`/column/apply`) 开设专栏
-                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
         if data.goodsForums.length && data.showShopGoods
           .home-forum-list.m-b-1
             .home-header
