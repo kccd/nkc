@@ -43,7 +43,7 @@ block content
           .error-code
             code 积分不足
         .resource-downloaded-tip.m-t-1
-          span.name= `附件下载中... （${~~(data.resourceExpired / 1000 / 60)}分钟内重复下载不会扣分）`
+          span.name= `附件下载中... （${(data.resourceExpired / 1000 / 60 / 60)}小时内重复下载不会扣分）`
         .error-info.m-t-1
           if data.enough
             a.m-l-0.download-button(onclick=`payForDownloadResource(${rid})`) 立即下载

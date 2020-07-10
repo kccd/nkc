@@ -428,6 +428,7 @@ settingSchema.statics.getScoreOperationsByType = async (type, forumsId = []) => 
   let scoreOperations = [];
   if(forumsId.length) {
     scoreOperations = await ScoreOperationModel.find({
+      type,
       from: 'forum',
       fid: {$in: forumsId}
     });

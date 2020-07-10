@@ -108,12 +108,12 @@ resourceRouter
           let nowTime = new Date();
           let lastAttachmentDownloadTime = lastAttachmentDownloadLog? lastAttachmentDownloadLog.toc : 0;
           let howLongOneDay = 24 * 60 * 60 * 1000;
-          let howLongOneMinute = 60 * 1000;
-          data.resourceExpired = howLongOneMinute;
+          let howLongOneMinute =10* 1000;
+          data.resourceExpired = howLongOneDay;
           // 如果最后一次下载到现在没有超过规定时间就不扣积分
-          if(nowTime - lastAttachmentDownloadTime <= howLongOneMinute /* 一分钟 */) needScore = false;
+          if(nowTime - lastAttachmentDownloadTime <= data.resourceExpired /* 一分钟 */) needScore = false;
           // 今日下载次数大于设置的次数 并且 设置的次数不为 -1 就不扣积分
-          if(todayOperationCount > operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
+          if(todayOperationCount >= operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
         }
       }
       // 需要扣分的话进行下面的逻辑

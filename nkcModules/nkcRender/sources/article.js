@@ -71,10 +71,10 @@ module.exports = {
     let url = getUrl("resource", rid);
     let pdfHTML = "";
     if(ext === "pdf") {
-      url = getUrl("pdf", rid);
+      const pdfUrl = getUrl("pdf", rid);
       pdfHTML = `
         <span class="article-attachment-reader">
-          <a href="${url}" target="_blank">预览</a>
+          <a href="${pdfUrl}" target="_blank">预览</a>
         </span>
       `.trim();
     }
