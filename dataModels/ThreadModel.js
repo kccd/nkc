@@ -1694,4 +1694,133 @@ threadSchema.methods.isModerator = async function(uid, type) {
   }
 };
 
+/*
+* 更新首页自动推荐数据
+* @param {String} type 推荐类型 fixed: 固定图, movable: 轮播图
+* @param {Number} count 文章数量
+* */
+threadSchema.statics.updateHomeAutomaticRecommendThreads = async () => {
+  const ThreadModel = mongoose.model('threads');
+  const fixedData = await ThreadModel.updateHomeRecommendThreadsByType('fixed');
+  await ThreadModel.updateHomeRecommendThreadsByType('movable', fixedData.map(f => f.tid));
+};
+threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThreadsId = []) => {
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const SettingModel = mongoose.model('settings');
+  const ComplaintModel = mongoose.model('complaints');
+  const homeSettings = await SettingModel.getSettings('home');
+  let optionName;
+  if(type === 'fixed') {
+    optionName = 'automaticFixed';
+  } else {
+    optionName = 'automaticMovable';
+  }
+  // 去除自动推荐相关的条件
+  const {
+    count,
+    timeOfPost, digest, postVoteUpMinCount, postVoteDownMaxCount,
+    threadVoteUpMinCount, reportedAndUnReviewed, original, flowControl
+  } = homeSettings.ads[optionName];
+  const match = {
+    type: 'thread',
+    tid: {$nin: excludedThreadsId},
+    disabled: false,
+    toRecycle: {$ne: true},
+    $and: [
+      {
+        toc: {$gte: timeOfPost.min}
+      },
+      {
+        toc: {$lte: timeOfPost.max}
+      }
+    ],
+    digest,
+    voteUp: {$gte: postVoteUpMinCount},
+    voteDown: {$lte: postVoteDownMaxCount},
+    flowControl
+  };
+  // 是否必须为原创
+  if(original) {
+    match.original = {$in: ['3', '4', '5', '6']};
+  }
+  // 排除被举报但未被处理的文章
+  if(!reportedAndUnReviewed) {
+    const complaints = await ComplaintModel.find({type: 'thread'}, {contentId: 1});
+    const threadsId = complaints.map(c => c.contentId);
+    match.tid = {$nin: threadsId};
+  }
+  const posts = await PostModel.aggregate([
+    {
+      $match: match
+    },
+    {
+      $group: {
+        _id: ' $pid'
+      }
+    },
+    {
+      $sample: {
+        size: count
+      }
+    }
+  ]);
+  let threads = await ThreadModel.find({
+    oc: {$in: posts.map(p => p.pid)},
+    disabled: false,
+  });
+  threads = await ThreadModel.extendThreads(threads);
+  const arr = [];
+  for(const thread of threads) {
+    arr.push({
+      title: thread.firstPost.t,
+      tid: thread.tid,
+      cover: thread.firstPost.cover,
+      type: 'automatic'
+    });
+  }
+  const obj = {};
+  obj[`c.ads.${optionName}.data`] = arr;
+  await SettingModel.updateOne({_id: 'home'}, {
+    $set: obj
+  });
+  await SettingModel.saveSettingsToRedis('home');
+  return arr;
+};
+
+threadSchema.statics.getHomeRecommendThreads = async (fid) => {
+  const SettingModel = mongoose.model('settings');
+  const homeSettings = await SettingModel.getSettings('home');
+  const {
+    recommendType, automaticOptions,
+    fixed, movable, automatic
+  } = homeSettings.ads;
+  const {proportion, movableCount, fixedCount} = automaticOptions;
+  let fixedArr = [], movableArr = [];
+  if(proportion === 0) {
+    // 手动推送
+    fixedArr = fixed;
+
+    movableArr = movable;
+  } else if(proportion === 1) {
+    // 自动推送
+    if(automatic.length > fixedCount) {
+      fixedArr = automatic.slice(0, fixedCount);
+      movableArr = automatic.slice(fixedCount, -1);
+    } else {
+      fixedArr = automatic;
+    }
+  } else {
+    // 手动加自动
+  }
+
+  /*const fixedIndex = apiFunction.getRandomNumber({
+    count: ads.fixed.length < 6? ads.fixed.length: 6,
+    min: 0,
+    max: ads.fixed.length - 1>0?ads.fixed.length - 1:0,
+    repeat: false
+  });*/
+
+};
+
 module.exports = mongoose.model('threads', threadSchema);

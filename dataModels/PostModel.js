@@ -238,6 +238,12 @@ const postSchema = new Schema({
   cv: {
     type: Number,
     default: 1
+  },
+  // 是否开启流控
+  flowControl: {
+    type: Boolean,
+    default: false,
+    index: 1
   }
 }, {toObject: {
   getters: true,

@@ -43,7 +43,8 @@ homeTopRouter
     const newTop = {
       title,
       tid,
-      cover: cover.hash
+      cover: cover.hash,
+      type: 'manual', // manual: 手动的, automatic: 自动的
     };
     if(topType === "movable") {
       movable.unshift(newTop);
