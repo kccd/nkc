@@ -1724,17 +1724,14 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
   } = homeSettings.ads[optionName];
   const match = {
     type: 'thread',
+    cover: {$ne: ''},
     tid: {$nin: excludedThreadsId},
     disabled: false,
     toRecycle: {$ne: true},
-    $and: [
-      {
-        toc: {$gte: timeOfPost.min}
-      },
-      {
-        toc: {$lte: timeOfPost.max}
-      }
-    ],
+    toc: {
+      $gte: new Date(Date.now() - (timeOfPost.max * 24 * 60 * 60 * 1000)),
+      $lte: new Date(Date.now() - (timeOfPost.min * 24 * 60 * 60 * 1000))
+    },
     digest,
     voteUp: {$gte: postVoteUpMinCount},
     voteDown: {$lte: postVoteDownMaxCount},
@@ -1750,13 +1747,14 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
     const threadsId = complaints.map(c => c.contentId);
     match.tid = {$nin: threadsId};
   }
+
   const posts = await PostModel.aggregate([
     {
       $match: match
     },
     {
       $group: {
-        _id: ' $pid'
+        _id: '$pid'
       }
     },
     {
@@ -1765,10 +1763,14 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
       }
     }
   ]);
+
   let threads = await ThreadModel.find({
-    oc: {$in: posts.map(p => p.pid)},
+    oc: {$in: posts.map(p => p._id)},
     disabled: false,
   });
+
+  console.log(threads);
+
   threads = await ThreadModel.extendThreads(threads);
   const arr = [];
   for(const thread of threads) {
@@ -1800,7 +1802,6 @@ threadSchema.statics.getHomeRecommendThreads = async (fid) => {
   if(proportion === 0) {
     // 手动推送
     fixedArr = fixed;
-
     movableArr = movable;
   } else if(proportion === 1) {
     // 自动推送
