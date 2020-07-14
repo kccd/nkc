@@ -34,6 +34,8 @@ voteRouter
     let weights = 1;
     if(user.xsf > 0) weights = 2;
     if(isModerator) weights = 5;
+    const thread = await post.extendThread();
+    ctx.state._scoreOperationForumsId = thread.mainForumsId;
     if(!vote) {
       vote = db.PostsVoteModel({
         uid: user.uid,
@@ -61,6 +63,8 @@ voteRouter
     const {data, db} = ctx;
     const {user, post, isModerator} = data;
     let vote = await db.PostsVoteModel.findOne({uid: user.uid, pid: post.pid});
+    const thread = await post.extendThread();
+    ctx.state._scoreOperationForumsId = thread.mainForumsId;
     // 普通用户1， 学者2， 专家5
     let weights = 1;
     if(user.xsf > 0) weights = 2;

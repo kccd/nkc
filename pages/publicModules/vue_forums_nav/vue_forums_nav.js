@@ -16,6 +16,7 @@ var vue_forums_Nav = new Vue({
     this.subForums = data.subForums;
   },
   methods: {
+    getUrl: NKC.methods.tools.getUrl,
     openForum: function(forum) {
       window.open( '/f/' + forum.fid);
     },

@@ -76,7 +76,7 @@ app
   .use(staticServe(path.resolve('./public')))
   .use(staticServe(path.resolve('./node_modules')))
   .use(staticServe(path.resolve('./pages')))
-  .use(favicon(__dirname + '/resources/site_specific/favicon.ico'))
+  .use(favicon(__dirname + '/public/statics/site/favicon.ico'))
   .use(static("./resources/tools", {route: "/tools"}))
   // 请求头安全设置
   .use(helmet())
@@ -93,6 +93,3 @@ app
   .use(mainRouter.routes())
   .use(body);
 module.exports = app.callback();
-
-// 
-// 

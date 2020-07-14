@@ -19,6 +19,7 @@
   "author": "nkc",
   "license": "ISC",
   "dependencies": {
+    "mkdirp": "^1.0.4",
     "awesome-static": "^1.4.3",
     "bluebird": "^3.5.3",
     "chart.js": "^2.7.2",
@@ -34,7 +35,7 @@
     "easyimage": "^3.1.1",
     "echarts": "^4.1.0",
     "elasticsearch": "^14.0.0",
-    "farmhash": "^2.1.0",
+    "element-ui": "^2.13.2",
     "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",
     "fs-extra": "^7.0.1",
@@ -86,7 +87,10 @@
     "twemoji": "^2.5.0",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "pm2": "^4.4.0",
+    "file-type": "^14.6.1",
+    "mathjs": "^7.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

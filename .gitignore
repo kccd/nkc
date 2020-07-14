@@ -6,8 +6,6 @@
 /node_modules
 /settings/mongoDB.js
 /.idea
-/secret.txt
-/package-lock.json
 /resources
 /tmp
 /log.txt
@@ -18,7 +16,7 @@
 /backup.log
 /scripts
 /config.js
-/page/test
+/pages/test
 
 
 
@@ -26,6 +24,4 @@
 /install/install.lock
 /pm2.cluster.config.js
 
-/settings/diskCharacterOptions.js
-/settings/mediaPath.js
-/settings/mediaPathOptions.js
+/test

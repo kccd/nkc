@@ -12,7 +12,12 @@ const usersPersonalSchema = new Schema({
     type: String,
     default: '',
     match: /.*@.*/
-  },
+	},
+	unverifiedEmail: {
+    type: String,
+    default: '',
+    match: /.*@.*/
+	},
 	nationCode: {
 		type: String,
 		default: '',
@@ -22,7 +27,12 @@ const usersPersonalSchema = new Schema({
     type: String,
     default:'',
     index: 1
-  },
+	},
+	unverifiedMobile: {
+    type: String,
+    default:'',
+    index: 1
+	},
   hashType: {
     type: String,
     default: ""
@@ -245,6 +255,42 @@ const usersPersonalSchema = new Schema({
 			type: Number,
 			default: 1
 		}
+	},
+	// 积分缓存
+	score1: {
+  	type: Number,
+		default: 0,
+		index: 1,
+	},
+	score2: {
+  	type: Number,
+		default: 0,
+		index: 1
+	},
+	score3: {
+  	type: Number,
+		default: 0,
+		index: 1,
+	},
+	score4: {
+  	type: Number,
+		default: 0,
+		index: 1
+	},
+	score5: {
+  	type: Number,
+		default: 0,
+		index: 1
+	},
+	score6: {
+  	type: Number,
+		default: 0,
+		index: 1,
+	},
+	score7: {
+  	type: Number,
+		default: 0,
+		index:1
 	}
 },
   {
@@ -302,7 +348,7 @@ usersPersonalSchema.methods.extendIdPhotos = async function() {
 	}
 };
 
-// 获取身份认证等级 
+// 获取身份认证等级
 usersPersonalSchema.methods.getAuthLevel = async function() {
 	if(!this.mobile) return 0;
 	const {idCardA, idCardB, handheldIdCard} = await this.extendIdPhotos();

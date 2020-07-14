@@ -9,12 +9,12 @@
         .form
           h5 仅限于小额退款等用途，资金将直接转到买家账户，不可追回，请谨慎操作。
           .form-group
-            label 转账金额（不超过{{kcbOnce/100}}kcb，精确到0.01）
+            label 转账金额（不超过{{kcbOnce/100}}{{score.unit}}{{score.name}}，精确到0.01）
             input.form-control(type="number" v-model.number="number" placeholder="请输入转账金额")
           .form-group
             label 登录密码
-            input.form-control(type="password" v-model="password" placeholder="请输入登录密码")  
-          .form-group(v-if="error")    
+            input.form-control(type="password" v-model="password" placeholder="请输入登录密码")
+          .form-group(v-if="error")
             .error {{error}}
       .modal-footer
         .options-button

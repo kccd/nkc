@@ -181,10 +181,10 @@ router
         abbr
       });
       if(avatar) {
-        await nkcModules.file.saveColumnAvatar(column._id, avatar);
+        await nkcModules.file.saveColumnAvatar$2(column._id, avatar);
       }
       if(banner) {
-        await nkcModules.file.saveColumnBanner(column._id, banner);
+        await nkcModules.file.saveColumnBanner$2(column._id, banner);
       }
       await db.ColumnModel.toSearch(column._id);
     } else if(type === "color") {

@@ -93,12 +93,12 @@ var CheckData = function () {
     if(typeof(html) !== "string") {
       self.te(400, name + "数据类型错误");
       // console.log(name + "数据类型错误");
-      
+
     }
     if(content.length < minLength) {
       self.te(400, name + "长度不能小于" + minLength + "个字节");
       // console.log(name + "长度不能小于" + minLength + "个字节");
-      
+
     }
     if(content.length > maxLength) {
       self.te(400, name + "长度不能大于" + maxLength + "个字节");
@@ -115,7 +115,7 @@ var CheckData = function () {
       self.te(400, "邮箱格式不符合要求");
     }
   };
-  
+
 };
 if(inBrowser) {
   NKC.methods.checkData = new CheckData();

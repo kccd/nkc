@@ -5,7 +5,6 @@ const infoRouter = require("./info");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["wav", "amr", "mp3", "aac"];
-
 const {ThrottleGroup} = require("stream-throttle");
 
 // 存放用户设置
@@ -19,24 +18,19 @@ const downloadGroups = {};
 */
 
 resourceRouter
-  .get('/', async (ctx, next) => {
-    const {db, data} = ctx;
-    const {user} = data;
-    if(!user) ctx.throw(400, "权限不足");
-    const uploadSettings = await db.SettingModel.getUploadSettingsByUser(user);
-    data.extensions = uploadSettings.extensions;
-    data.fileCount = uploadSettings.fileCountOneDay;
-    await next();
-  })
   .get('/:rid', async (ctx, next) => {
     const {query, params, data, db, fs, settings, nkcModules} = ctx;
     const {rid} = params;
-    const {t} = query;
+    const {t, c} = query;
     const {cache} = settings;
     const resource = await db.ResourceModel.findOnly({rid, type: "resource"});
     const {mediaType, ext} = resource;
+    const {user} = data;
     let filePath = await resource.getFilePath();
     let speed;
+    data.resource = resource;
+    // 告诉浏览器不要把这次的响应结果缓存下来
+    ctx.set("Cache-Control", "no-store");
     if(mediaType === "mediaAttachment") {
       const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
       const {fileCountOneDay} = downloadOptions;
@@ -83,6 +77,112 @@ resourceRouter
           ctx.throw(403, `未登录用户每天只能下载${fileCountOneDay}个附件，请登录或注册后重试。`);
         }
       }
+
+      const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
+      const enabledScoreTypes = await db.SettingModel.getEnabledScoresType();
+      // 下载此附件是否需要积分状态位
+      let needScore = false;
+      // 此操作是否需要积分(更新状态位)
+      for(let typeName of enabledScoreTypes) {
+        let number = operation[typeName];
+        // 如果设置的操作花费的积分不为0才考虑扣积分
+        if(number !== 0) {
+          needScore = true;
+          break;
+        }
+      }
+      // 设置的次数为 0 表示关闭积分交易，不扣积分
+      if(operation.count === 0) needScore = false;
+
+      // 临时添加 忽略pdf文件
+      if(resource.ext === 'pdf') {
+        needScore = false;
+      }
+
+      // 配置中下载需要积分
+      if(needScore) {
+        // 当前是游客
+        if(!data.user) {
+          ctx.throw(403, '你暂未登录，请登录或者注册后重试。');
+        }else {
+        // 当前是用户
+          // 此用户今日下载附件的总次数
+          let todayOperationCount = await db.ScoreOperationLogModel.getOperationLogCount(user, "attachmentDownload");
+          data.todayOperationCount = todayOperationCount;
+          // 此用户最后一次此附件的转账记录
+          let lastAttachmentDownloadLog = await db.ScoreOperationLogModel.getLastAttachmentDownloadLog(user, resource.rid);
+          let nowTime = new Date();
+          let lastAttachmentDownloadTime = lastAttachmentDownloadLog? lastAttachmentDownloadLog.toc : 0;
+          let howLongOneDay = 24 * 60 * 60 * 1000;
+          let howLongOneMinute =10* 1000;
+          data.resourceExpired = howLongOneDay;
+          // 如果最后一次下载到现在没有超过规定时间就不扣积分
+          if(nowTime - lastAttachmentDownloadTime <= data.resourceExpired /* 一分钟 */) needScore = false;
+          // 今日下载次数大于设置的次数 并且 设置的次数不为 -1 就不扣积分
+          if(todayOperationCount >= operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
+        }
+      }
+      // 需要扣分的话进行下面的逻辑
+      if(needScore) {
+        // 此用户目前持有的所有积分
+        await db.UserModel.updateUserScores(user.uid);
+        let myAllScore = await db.UserModel.getUserScores(user.uid);
+        // 积分是否足够状态位
+        data.enough = true;
+        // 检测积分是否足够
+        for(let score of myAllScore) {
+          if(score.number + operation[score.type] < 0) {
+            data.enough = false;
+          }
+          score.addNumber = operation[score.type];
+        }
+        data.myAllScore = myAllScore;
+        data.rid = resource.rid;
+        // 是否需要显示下载扣分询问页面 (c 为 download 就直接扣分并返回文件)
+        if(c === "download") {
+          // 积分不够，返回错误页面
+          if(!data.enough) {
+            return nkcModules.throwError(403, "", "scoreNotEnough");
+          } else {
+            // 扣除积分，继续往下走返回文件
+            await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
+          }
+        } else if(c === "preview_pdf") {
+          // 积分不够，返回错误页面
+          if(!data.enough) {
+            return nkcModules.throwError(403, "", "scoreNotEnough");
+          } else {
+            await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
+            // 重定向到预览页面
+            return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid);
+          }
+        } else {
+          // 结束路由，返回页面
+          ctx.state.forumsTree = await db.ForumModel.getForumsTree(data.userRoles, data.userGrade, data.user);
+          const forumsObj = {};
+          ctx.state.forumsTree.map(f => {
+            const {categoryId} = f;
+            if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
+            forumsObj[categoryId].push(f);
+          });
+          ctx.state.forumCategories = await db.ForumCategoryModel.getCategories();
+          ctx.state.userScores = await db.UserModel.getUserScores(data.user.uid);
+          ctx.state.categoryForums = [];
+          ctx.state.forumCategories.map(fc => {
+            const _fc = Object.assign({}, fc);
+            const {_id} = _fc;
+            _fc.forums = forumsObj[_id] || [];
+            if(_fc.forums.length) ctx.state.categoryForums.push(_fc);
+          });
+          ctx.filePath = null;
+          ctx.template = "resource/download.pug";
+          return next();
+        }
+      } else {
+        if(c === "nkc_source_pdf") {
+          return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid);
+        }
+      }
     }
     if (mediaType === "mediaPicture") {
       try {
@@ -96,7 +196,6 @@ resourceRouter
     if(!ctx.request.headers['range']){
       await resource.update({$inc:{hits:1}});
     }
-
     ctx.filePath = filePath;
     // 表明客户端希望以附件的形式加载资源
     if(t === "attachment") {
@@ -140,20 +239,15 @@ resourceRouter
   .post('/', async (ctx, next) => {
     const {fs, tools, settings, db, data, nkcModules} = ctx;
     const { imageMagick, ffmpeg } = tools;
-    const {upload, mediaPath} = settings;
+    const {upload} = settings;
     const {generateFolderName, extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = upload;
-    const {selectDiskCharacterUp} = mediaPath;
     const {user} = data;
 
+    const {websiteName} = await db.SettingModel.getSettings('server');
     let mediaRealPath;
     const {files, fields} = ctx.body;
     const {file} = files;
     const {type, fileName, md5, share} = fields;
-
-
-    const {fileCountOneDay, blackExtensions} = await db.SettingModel.getUploadSettingsByUser(data.user);
-    const fileCount = await db.ResourceModel.count({uid: data.user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
-    if(fileCount >= fileCountOneDay) ctx.throw(403, "今日上传文件数量已达上限");
 
     if(type === "checkMD5") {
       // 前端提交待上传文件的md5，用于查找resources里是否与此md5匹配的resource
@@ -162,11 +256,19 @@ resourceRouter
       if(!md5) ctx.throw(400, "md5不能为空");
       if(!fileName) ctx.throw(400, "文件名不能为空");
       const resource = await db.ResourceModel.findOne({hash: md5, mediaType: "mediaAttachment"});
-      if(!resource) {
+      if(
+        !resource || // 未上传过
+        !resource.ext // 上传过，但格式丢失
+      ) {
         data.uploaded = false;
         return await next();
       }
-      if(blackExtensions.includes(resource.ext)) ctx.throw(403, "文件格式不被允许");
+      // 检测用户上传相关权限
+      const _file = {
+        size: resource.size,
+        ext: resource.ext
+      };
+      await db.ResourceModel.checkUploadPermission(user, _file);
       // 在此处复制原resource的信息
       const newResource = resource.toObject();
       delete newResource.__v;
@@ -194,20 +296,16 @@ resourceRouter
     }
     let { name, size, path, hash} = file;
 
-    if(name === "blob" && fileName) name = fileName;
+    // 检查上传权限
+
+    if(name === "blob" && fileName) {
+      name = fileName;
+      file.name = fileName;
+    }
+
+    await db.ResourceModel.checkUploadPermission(user, file);
     // 获取文件格式 extension
-    const extensionE = pathModule.extname(name).replace('.', '');
-    let extension = extensionE.toLowerCase();
-    if(extension === "") {
-      ctx.throw(400, "未知的文件格式");
-    }
-    if(blackExtensions.includes(extension)) {
-      await fs.unlink(path);
-      ctx.throw(403, "文件格式不被允许");
-    }
-    if(extension === "gif" && size > 5 * 1024 * 1024) {
-      ctx.throw(400, "为了提高观看体验，请上传视频，GIF最大只支持5MB。");
-    }
+    let extension = await nkcModules.file.getFileExtension(file);
     // 图片最大尺寸
     // const { largeImage } = settings.upload.sizeLimit;
     // 根据自增id定义文件新名称 saveName
@@ -220,20 +318,20 @@ resourceRouter
     let mediaType;
     if(pictureExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/picture";
-      mediaRealPath = selectDiskCharacterUp("mediaPicture");
       mediaType = "mediaPicture";
+      mediaRealPath = await db.ResourceModel.getMediaPath('mediaPicture');
     }else if(videoExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/video";
-      mediaRealPath = selectDiskCharacterUp("mediaVideo");
       mediaType = "mediaVideo";
+      mediaRealPath = await db.ResourceModel.getMediaPath('mediaVideo');
     }else if(audioExts.indexOf(extension.toLowerCase()) > -1) {
       // mediaRealPath = mediaPath + "/audio";
-      mediaRealPath = selectDiskCharacterUp("mediaAudio");
       mediaType = "mediaAudio";
+      mediaRealPath = await db.ResourceModel.getMediaPath('mediaAudio');
     }else{
       // mediaRealPath = mediaPath + "/attachment";
-      mediaRealPath = selectDiskCharacterUp("mediaAttachment");
       mediaType = "mediaAttachment";
+      mediaRealPath = await db.ResourceModel.getMediaPath('mediaAttachment');
     }
 
     // 带有年份月份的文件储存路径 /2018/04/
@@ -254,37 +352,13 @@ resourceRouter
         const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 略缩图路径+名称
         const mediumFilePath = mediumPath + descPathOfThumbnail + saveName; // 中号图路径 + 名称
         // 获取原图id
-        const descPathOfOrigin = generateFolderName(originPath); // 原图存放路径
+        const originImagePath = await db.ResourceModel.getMediaPath('mediaOrigin');
+        const descPathOfOrigin = generateFolderName(originImagePath); // 原图存放路径
         originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
         let originSaveName = originId + '.' + extension;
-        const originFilePath = originPath + descPathOfOrigin + originSaveName; // 原图存放路径
-
-
+        const originFilePath = originImagePath + descPathOfOrigin + originSaveName; // 原图存放路径
         // 图片自动旋转
-        try{
-          await imageMagick.allInfo(path);
-        }catch(e){
-          mediaRealPath = selectDiskCharacterUp("mediaAttachment");
-          middlePath = generateFolderName(mediaRealPath);
-          mediaFilePath = mediaRealPath + middlePath + saveName;
-          await fs.copyFile(path, mediaFilePath);
-          await fs.unlink(path);
-          const r = new ctx.db.ResourceModel({
-            rid,
-            oname: name,
-            path: middlePath + saveName,
-            tpath: middlePath + saveName,
-            ext: extension,
-            size,
-            hash,
-            uid: ctx.data.user.uid,
-            toc: Date.now(),
-            mediaType: "mediaAttachment"
-          });
-          ctx.data.r = await r.save();
-          ctx.throw(400, "图片上传失败，已被放至附件");
-          return await next()
-        }
+        await imageMagick.allInfo(path);
         // 获取图片尺寸
         const { width, height } = await imageMagick.info(path);
         // 生成无水印原图
@@ -322,14 +396,14 @@ resourceRouter
         // 获取文字（用户名）水印的字符数、宽度、高度
         let username;
         if(waterStyle === "userLogo"){
-          username = ctx.data.user?ctx.data.user.username : "科创论坛";
+          username = ctx.data.user?ctx.data.user.username : websiteName;
         }else if(waterStyle === "coluLogo"){
           const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
           username = column?column.name : ctx.data.user.name+"的专栏";
         }else{
           username = "";
         }
-        // const username = ctx.data.user?ctx.data.user.username : "科创论坛";
+        // const username = ctx.data.user?ctx.data.user.username : websiteName";
         const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
         const usernameWidth = usernameLength * 12;
         const usernameHeight = 24;
@@ -340,13 +414,16 @@ resourceRouter
         // const colunameWidth = colunameLength * 12;
         // const coluHeight = 24;
         // 获取水印图片路径
-        let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
-        waterSmall = waterSmall.c;
+        // let waterSmall = await ctx.db.SettingModel.findOne({_id:"home"});
+        // waterSmall = waterSmall.c;
         // const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
-        const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
-        const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";
+        const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+        const waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+        /*const waterSmallPath = settings.upload.webLogoPath + "/" + waterSmall.smallLogo + ".png";
+        const waterBigPath = settings.upload.webLogoPath + "/" + waterSmall.logo + ".png";*/
         // 获取透明度
-        const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
+        // const transparency = waterSmall.watermarkTransparency?waterSmall.watermarkTransparency : "50";
+        const watermarkSettings = await db.SettingModel.getWatermarkSettings();
         // 图片水印尺寸
         let {siteLogoWidth, siteLogoHeigth} = await imageMagick.waterInfo(waterSmallPath);
         siteLogoWidth = parseInt(siteLogoWidth);
@@ -391,12 +468,12 @@ resourceRouter
           await imageMagick.imageNarrow(path);
         }
         // 如果图片尺寸大于600, 并且用户水印设置为true，则为图片添加水印
-        const homeSettings = await ctx.db.SettingModel.getSettings("home");
-        if(extension !== "gif" && width >= homeSettings.waterLimit.minWidth && height >= homeSettings.waterLimit.minHeight && waterAdd === true){
+        // const homeSettings = await ctx.db.SettingModel.getSettings("home");
+        if(extension !== "gif" && width >= watermarkSettings.minWidth && height >= watermarkSettings.minHeight && watermarkSettings.enabled === true && waterAdd){
           if(waterStyle === "siteLogo"){
-            await imageMagick.watermarkify(transparency, waterGravity, waterBigPath, path)
+            await imageMagick.watermarkify(watermarkSettings.transparency, waterGravity, waterBigPath, path)
           }else if(waterStyle === "coluLogo" || waterStyle === "userLogo" || waterStyle === "singleLogo"){
-            await imageMagick.watermarkifyLogo(transparency, logoCoor, waterGravity, waterSmallPath, path);
+            await imageMagick.watermarkifyLogo(watermarkSettings.transparency, logoCoor, waterGravity, waterSmallPath, path);
             var temporaryPath = extGetPath(extension);
             await imageMagick.watermarkifyFont(userCoor, username, waterGravity, path, temporaryPath);
             // await fs.copyFile(temporaryPath, path);
@@ -415,7 +492,199 @@ resourceRouter
       // 视频封面图路径
       var videoImgPath = frameImgPath + "/" + rid + ".jpg";
 
-      try{
+      let {generalSettings} = user;
+      let {waterSetting} = generalSettings;
+      const watermarkSettings = await db.SettingModel.getWatermarkSettings();
+      let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
+
+      // 如果设置了需要加水印
+      if(waterSetting.waterAdd) {
+        let text;
+        if(waterSetting.waterStyle === "userLogo"){
+          text = ctx.data.user?ctx.data.user.username : websiteName;
+        }else if(waterSetting.waterStyle === "coluLogo"){
+          const column = await ctx.db.ColumnModel.findOne({uid: ctx.data.user.uid});
+          text = column?column.name : ctx.data.user.name+"的专栏";
+        }else{
+          text = "";
+        }
+        let waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+        let waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+        path = path.replace(/\\/g, "/");
+        outputVideoPath = outputVideoPath.replace(/\\/g, "/");
+        // 右下角
+        if(waterSetting.waterGravity === "southeast") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "W-w-10",
+                y: "H-h-10"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {x: "W-w-10", y: "H-h-10"},
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {x: "W-w-10", y: "H-h-10"},
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+        // 右上角
+        if(waterSetting.waterGravity === "northeast") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "W-w-10",
+                y: "10"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {x: "W-w-10", y: "10"},
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {x: "W-w-10", y: "10"},
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+        // 左上角
+        if(waterSetting.waterGravity === "northwest") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "10",
+                y: "10"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {x: "10", y: "10"},
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {x: "10", y: "10"},
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+        // 左下角
+        if(waterSetting.waterGravity === "southwest") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "10",
+                y: "H-h-10"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {x: "10", y: "H-h-10"},
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {x: "10", y: "H-h-10"},
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+        // 正中间
+        if(waterSetting.waterGravity === "center") {
+          if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
+            await ffmpeg.addImageTextWaterMask({
+              input: path,
+              output: outputVideoPath,
+              image: waterSmallPath,
+              text,
+              position: {
+                x: "(W-w)/2",
+                y: "(H-h)/2"
+              },
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "siteLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterBigPath,
+              position: {
+                x: "(W-w)/2",
+                y: "(H-h)/2"
+              },
+              flex: 0.2,
+              transparency: ffmpegTransparency
+            });
+          } else if(waterSetting.waterStyle === "singleLogo") {
+            await ffmpeg.addImageWaterMask({
+              videoPath: path,
+              output: outputVideoPath,
+              imagePath: waterSmallPath,
+              position: {
+                x: "(W-w)/2",
+                y: "(H-h)/2"
+              },
+              transparency: ffmpegTransparency
+            });
+          }
+        }
+      } else {
+        // 视频转码
         if(['3gp'].indexOf(extension.toLowerCase()) > -1){
           await ffmpeg.video3GPTransMP4(path, outputVideoPath);
         }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
@@ -426,28 +695,19 @@ resourceRouter
           await ffmpeg.videoAviTransAvi(path, path);
           await ffmpeg.videoAVITransMP4(path, outputVideoPath);
         }
-      }catch(e) {
-        mediaRealPath = selectDiskCharacterUp("mediaAttachment");
-        middlePath = generateFolderName(mediaRealPath);
-        mediaFilePath = mediaRealPath + middlePath + saveName;
-        await fs.copyFile(path, mediaFilePath);
-        await fs.unlink(path);
-        const r = new ctx.db.ResourceModel({
-          rid,
-          oname: name,
-          path: middlePath + saveName,
-          tpath: middlePath + saveName,
-          ext: extension,
-          size,
-          hash,
-          uid: ctx.data.user.uid,
-          toc: Date.now(),
-          mediaType: "mediaAttachment"
-        });
-        ctx.data.r = await r.save();
-        ctx.throw(400, "视频转码失败，已被放至附件");
-        return await next()
       }
+
+      // 视频转码
+      // if(['3gp'].indexOf(extension.toLowerCase()) > -1){
+      //   await ffmpeg.video3GPTransMP4(path, outputVideoPath);
+      // }else if(['mp4'].indexOf(extension.toLowerCase()) > -1) {
+      //   await ffmpeg.videoMP4TransH264(path, outputVideoPath);
+      // }else if(['mov'].indexOf(extension.toLowerCase()) > -1) {
+      //   await ffmpeg.videoMOVTransMP4(path, outputVideoPath);
+      // }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
+      //   await ffmpeg.videoAviTransAvi(path, path);
+      //   await ffmpeg.videoAVITransMP4(path, outputVideoPath);
+      // }
 
       // 将元数据移动到视频的第一帧
       // await ffmpeg.videoMoveMetaToFirstThumb(outputVideoPath, outputVideoPath);
@@ -460,7 +720,7 @@ resourceRouter
       name = name.replace(nameReg, "mp4");
       extension = "mp4";
       saveName = rid + "." + extension;
-      mediaFilePath = mediaFilePath.replace(nameReg, "mp4")
+      mediaFilePath = mediaFilePath.replace(nameReg, "mp4");
     }
     // 音频转为mp3
     if(audioExts.indexOf(extension.toLowerCase()) > -1) {
@@ -468,37 +728,14 @@ resourceRouter
       //输出音频路径
       const newpath = pathModule.resolve();
       const outputVideoPath = newpath + "/tmp/" + timeStr + ".mp3";
-      try{
-        if(['wav'].indexOf(extension.toLowerCase()) > -1) {
-          await ffmpeg.audioWAVTransMP3(path, outputVideoPath);
-        }else if(['amr'].indexOf(extension.toLowerCase()) > -1) {
-          await ffmpeg.audioAMRTransMP3(path, outputVideoPath);
-        } else if(['aac'].indexOf(extension.toLowerCase()) > -1) {
-          await ffmpeg.audioAACTransMP3(path, outputVideoPath)
-        } else {
-          await fs.rename(path, outputVideoPath);
-        }
-      }catch(e) {
-        mediaRealPath = selectDiskCharacterUp("mediaAttachment");
-        middlePath = generateFolderName(mediaRealPath);
-        mediaFilePath = mediaRealPath + middlePath + saveName;
-        await fs.copyFile(path, mediaFilePath);
-        await fs.unlink(path);
-        const r = new ctx.db.ResourceModel({
-          rid,
-          oname: name,
-          path: middlePath + saveName,
-          tpath: middlePath + saveName,
-          ext: extension,
-          size,
-          hash,
-          uid: ctx.data.user.uid,
-          toc: Date.now(),
-          mediaType: "mediaAttachment"
-        });
-        ctx.data.r = await r.save();
-        ctx.throw(400, "音频转码失败，已被放至附件")
-        return await next()
+      if(['wav'].indexOf(extension.toLowerCase()) > -1) {
+        await ffmpeg.audioWAVTransMP3(path, outputVideoPath);
+      }else if(['amr'].indexOf(extension.toLowerCase()) > -1) {
+        await ffmpeg.audioAMRTransMP3(path, outputVideoPath);
+      } else if(['aac'].indexOf(extension.toLowerCase()) > -1) {
+        await ffmpeg.audioAACTransMP3(path, outputVideoPath)
+      } else {
+        await fs.rename(path, outputVideoPath);
       }
 
       await fs.rename(outputVideoPath, path);
@@ -556,4 +793,5 @@ resourceRouter
     await next()
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods());
+
 module.exports = resourceRouter;

@@ -1,6 +1,6 @@
 extends ../../experimental
 block eTitle
-  title 科创币转账
+  title 转账
   style.
     .transfer-user{
       width: 20rem;
@@ -27,7 +27,7 @@ block eTitle
     }
 block eContent
   .container-fluid.max-width
-    .hidden#data=objToStr({transferSettings: data.transferSettings, toppingSettings: data.toppingSettings, roles: data.roles, grades: data.grades})
+    .hidden#data=objToStr({shopScore: data.shopScore, enabledScores: data.enabledScores, transferSettings: data.transferSettings, toppingSettings: data.toppingSettings, roles: data.roles, grades: data.grades})
     #app(v-cloak)
       .row.m-b-3
         .col-xs-12.col-md-4
@@ -35,7 +35,7 @@ block eContent
             h3 小额转账设置
             .form
               .form-group
-                label 单次转账KCB上限（精确到0.01）
+                label=`单次转账${data.shopScore.name}上限（精确到0.01）`
                 input.form-control(type="text" v-model.number="transferSettings.kcbOnce")
               .form-group
                 label 每天转账总次数上限
@@ -44,17 +44,17 @@ block eContent
                 label 对同一用户每天转账次数上限
                 input.form-control(type="text" v-model.number="transferSettings.countToUserOneDay")
               .form-group
-                button.btn.btn-primary(@click="saveTransferSettings") 保存  
+                button.btn.btn-primary(@click="saveTransferSettings") 保存
         .col-xs-12
-          hr        
-      .row        
+          hr
+      .row
         .col-xs-12.col-md-6
           h4 支付方
           hr
           .radio
             label.m-r-2
               input(type="radio" value="bank" v-model="from.type")
-              span 科创人民很行
+              span=data.nkcBankName
             label
               input(type="radio" value="user" v-model="from.type")
               span 指定用户
@@ -66,7 +66,7 @@ block eContent
               .transfer-username
                 a.pointer(@click="visitUrl('/u/' + from.user.uid, true)") {{from.user.username}}
               .description {{from.user.description}}
-              .info 当前KCB：
+              //.info 当前KCB：
                 strong.text-danger {{from.user.kcb/100}}
               .info 注册于{{format('YYYY/MM/DD HH:mm:ss', from.user.toc)}}
               .info 最后活动 {{fromNow(from.user.tlv)}}
@@ -76,7 +76,7 @@ block eContent
           .radio
             label.m-r-2
               input(type="radio" value="bank" v-model="to.type")
-              span 科创人民很行
+              span=data.nkcBankName
             label
               input(type="radio" value="user" v-model="to.type")
               span 指定用户
@@ -88,20 +88,29 @@ block eContent
               .transfer-username
                 a.pointer(@click="visitUrl('/u/' + to.user.uid, true)") {{to.user.username}}
               .description {{to.user.description}}
-              .info 当前KCB：
+              //.info 当前KCB：
                 strong.text-danger {{to.user.kcb/100}}
               .info 注册于{{format('YYYY/MM/DD HH:mm:ss', to.user.toc)}}
               .info 最后活动 {{fromNow(to.user.tlv)}}
         .col-xs-12.col-md-12.m-t-1
           hr
-          h5 科创币数额（大于0，精确到0.01）
-          input.form-control(style="max-width: 20rem" v-model.number="num" type="text")
-          h5 请输入登录密码
-          input.form-control(style="max-width: 20rem" v-model="password" type="password")
-          h5.text-danger(v-if="warning || error") {{warning || error}}
-          .m-t-05
-            button.btn.btn-primary(v-if="submitting || warning" disabled) 提交
-            button.btn.btn-primary(v-else @click="submit") 提交
+          .form
+            .form-group
+              label 积分类型
+              .form-inline
+                select.form-control(v-model='scoreType')
+                  option(v-for='e in enabledScores' :value='e.type') {{e.name}}
+            .form-group
+              label 数额（大于0，精确到0.01）
+              .form-inline
+                input.form-control(v-model.number="num" type="text")
+            .form-group
+              label 请输入登录密码
+              .form-inline
+                input.form-control(v-model="password" type="password")
+            .form-group
+              button.btn.btn-primary(v-if="submitting" disabled) 提交
+              button.btn.btn-primary(v-else @click="submit") 提交
 block scripts
   include ../../../publicModules/selectUser/selectUser
   include ../../../publicModules/moment

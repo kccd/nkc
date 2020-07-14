@@ -65,7 +65,7 @@
           li
             a(href='/e/log/exam') 考试
           li
-            a(href='/e/log/kcb') 科创币
+            a(href='/e/log/kcb') 积分
           li
             a(href='/e/log/xsf') 学术分
           li
@@ -175,10 +175,12 @@
           if permission("experimentalEditorSettings")
             li
               a(href=`/e/settings/editor`) 编辑器
-
+          if permission("experimentalRechargeSettings")
+            li
+              a(href=`/e/settings/recharge`) 充值/提现
           <li role="separator" class="divider"></li>
           li
-            a(href='/e/settings/home/logo') 网站首页
+            a(href='/e/settings/home/notice') 网站首页
           li
             a(href='/e/settings/page') 分页设置
           li
@@ -193,7 +195,7 @@
             a(href='/e/settings/exam') 考试设置
           li
             a(href='/e/settings/message') 聊天设置
-          li
+          //li
             a(href='/e/settings/share') 分享设置
           li
             a(href='/e/settings/red-envelope') 奖励设置
@@ -206,7 +208,7 @@
           li
             a(href='/e/settings/xsf') 学术分
           li
-            a(href='/e/settings/number') 积分
+            a(href='/e/settings/score') 积分
           //- li
             a(href='/e/settings/upload') 上传文件
             li

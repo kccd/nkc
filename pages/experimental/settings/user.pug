@@ -5,13 +5,19 @@ block title
   link(href='/experimental/index.css' rel='stylesheet')
   if data.role
     title=`${data.role.displayName} | 用户管理`
-  else 
-    title 用户管理  
+  else
+    title 用户管理
 block content
   .container-fluid.max-width
     .row
       include ../nav
-      .col-xs-12.col-md-12
+      .rol-xs-12.col-md-2
+        .list-group
+          a.pointer.list-group-item.active(href="/e/settings/user")
+            span 普通信息管理
+          a.pointer.list-group-item(href="/e/settings/sensitive")
+            span 敏感信息管理
+      .rol-xs-12.col-md-10
         .row#content
           if data.targetUser
             -const targetUser = data.targetUser;
@@ -85,7 +91,7 @@ block content
                 if role._id !== 'visitor'
                   if data.t === role._id
                     span.m-r-1(style='font-size: 1.4rem;')=role.displayName
-                  else  
+                  else
                     a.m-r-1(href=`/e/settings/user?t=${role._id}`)= role.displayName
             .col-xs-12.col-md-12
               table.table.table-hover(style='display: none;padding: 0.5rem;border: 1px solid #cccccc;')#searchResult
@@ -119,7 +125,7 @@ block content
                   for user in data.users
                     tr
                       th
-                        img(src=`/avatar/${user.avatar}` style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
+                        img(src=tools.getUrl('userAvatar', user.avatar) style='width: 2rem;height: 2rem;margin-right: 0.5rem;border-radius: 50%;')
                         a(href=`/u/${user.uid}` target='_blank')= user.username || user.uid
                       th= user.threadCount
                       th= user.postCount
@@ -141,10 +147,21 @@ block content
                       th= `${user.regIP} : ${user.regPort}`
                       th
                         button.btn.btn-default.btn-sm(onclick=`editUserInfo('${user.uid}')`) 编辑
+                        button.btn.btn-default.btn-sm(onclick=`showUserScores('${user.uid}')`) 查看积分
               include ../../interface_navigation_paging
+
 block scripts
   include ../../publicModules/moment
   include ../../publicModules/modifyAccountInfo
   +includeJS(`/experimental/settings/user.js`)
 
-
+  .modal.fade#myAllScoreDialog(tabindex="-1" role="dialog" aria-labelledby="myAllScoreLabel")
+    .modal-dialog(role="document")
+    .modal-content#myAllScoreDialogContent(style="width: 650px;margin: 0 auto;")
+      .modal-header
+        button(type="button" class="close" data-dismiss="modal" aria-label="Close" aria-hidden="true") &times;
+        h5.modal-title#myAllScoreLabel 用户积分
+      .modal-body#myAllScore
+        | 1283u9182
+      .modal-footer
+        button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 确定

@@ -43,8 +43,8 @@ const schema = new Schema({
     default: false,
     index: 1
   },
-  /* 
-    退款状态 
+  /*
+    退款状态
       B : buyer // 买家
       S : seller // 卖家
       M: money
@@ -128,7 +128,7 @@ schema.statics.findById = async (_id) => {
   return refund;
 };
 
-/** 
+/**
   * @name extendLogs
   * @description 推展退款申请操作记录,翻译操作类型
   * @param {Array} refunds 退款申请对象数组
@@ -139,7 +139,7 @@ schema.statics.extendLogs = async (refunds, lang) => {
   refunds.map(r => {
     r.logs.map(l => {
       l.description = lang("shopRefundStatus", l.status) || l.status;
-    }); 
+    });
   });
 };
 
@@ -158,7 +158,7 @@ schema.statics.extendLastLog = async (refunds, lang) => {
   });
 };
 
-/* 
+/*
   退款接口
   1. 生成科创币记录
   2. 退还kcb
@@ -174,6 +174,7 @@ schema.methods.returnMoney = async function () {
   const ShopCostRecordModel = mongoose.model("shopCostRecord");
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model("settings");
+  const mainScore = await SettingModel.getMainScore();
   const refund = await ShopRefundModel.findById(this._id);
   const {_id, money, orderId, status, sellerId, buyerId} = refund;
   if(money >= 0){}
@@ -197,14 +198,14 @@ schema.methods.returnMoney = async function () {
   const time = Date.now();
 
   // 买家申请退款的金额(money)和已支付的金额(orderPrice) 分为以下几种情况
-  /* 
-    1. 申请退款金额小于支付金额 
+  /*
+    1. 申请退款金额小于支付金额
       orderPrice > money
       a. 退还买家申请退款的金额
       b. 将剩余部分转给卖家
     2. 支付的钱在平台，申请退款的金额等于支付的金额
       orderPrice === money
-      a. 退还买家申请退款的金额  
+      a. 退还买家申请退款的金额
   */
   // 退单个商品的情况
   if(param) {
@@ -213,6 +214,7 @@ schema.methods.returnMoney = async function () {
       from: "bank",
       to: buyerId,
       type: "refund",
+      scoreType: mainScore.type,
       toc: time,
       num: money,
       description: param.product.name,
@@ -228,11 +230,12 @@ schema.methods.returnMoney = async function () {
       from: "bank",
       to: buyerId,
       type: "refund",
+      scoreType: mainScore.type,
       toc: time,
       num: money,
       description,
       ordersId: [orderId]
-    }); 
+    });
     await record.save();
     await UserModel.updateUserKcb(record.to);
     if(orderStatus === "unShip") {
@@ -241,6 +244,7 @@ schema.methods.returnMoney = async function () {
         _id: await SettingModel.operateSystemID("kcbsRecords", 1),
         from: "bank",
         to: buyerId,
+        scoreType: mainScore.type,
         type: "refund",
         toc: time,
         num: orderFreightPrice,
@@ -256,6 +260,7 @@ schema.methods.returnMoney = async function () {
         from: "bank",
         to: sellerId,
         type: "refund",
+        scoreType: mainScore.type,
         toc: time,
         num: orderFreightPrice,
         description: description+"(运费)",
@@ -271,6 +276,7 @@ schema.methods.returnMoney = async function () {
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
       to: buyerId,
+      scoreType: mainScore.type,
       type: "refund",
       num: money,
       toc: time,
@@ -284,6 +290,7 @@ schema.methods.returnMoney = async function () {
       type: "sell",
       num: diff,
       toc: time,
+      scoreType: mainScore.type,
       description,
       ordersId: [orderId]
     });
@@ -300,7 +307,7 @@ schema.methods.returnMoney = async function () {
       status: "RM_CO",
       succeed: true,
       tlm: time
-    }, 
+    },
     $addToSet: {
       logs: {
         status: "RM_CO",
@@ -433,7 +440,7 @@ schema.methods.sellerAgreeRM = async function(reason) {
   const ShopCostRecordModel = mongoose.model("shopCostRecord");
   const ShopProductsParamModel = mongoose.model("shopProductsParams");
   const {time} = await this.ensureRefundPermission(reason, [
-    "B_APPLY_RM", 
+    "B_APPLY_RM",
     "B_APPLY_RP",
     "B_INPUT_INFO",
     "B_INPUT_CERT_RM"
@@ -507,7 +514,7 @@ schema.methods.sellerDisagreeRM = async function(reason) {
     orderId: this.orderId,
     refundId: this._id
   });
-};  
+};
 
 /**
  * 卖家同意退货申请或超时自动同意
@@ -529,7 +536,7 @@ schema.methods.sellerAgreeRP = async function(reason, sellerInfo) {
       mobile: mobile[0]
     };
   }
-  
+
   const ShopRefundModel = mongoose.model("shopRefunds");
   const {time} = await this.ensureRefundPermission(reason, [
     "B_APPLY_RP"

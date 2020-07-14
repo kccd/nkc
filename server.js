@@ -1,10 +1,8 @@
+require('./global');
 const fs = require('fs');
 if(!fs.existsSync('./install/install.lock')) {
   return require('./install/server.js')
 }
-
-
-require('./global');
 
 // 启动测试环境相关工具
 if(global.NKC.NODE_ENV !== "production") {
@@ -45,7 +43,7 @@ const jobsInit = async () => {
   jobs.updateForums(updateDate.updateForumsCronStr);
   jobs.shop();
   jobs.backupDatabase();
-  jobs.checkKcbsRecords();
+  // jobs.checkKcbsRecords();
   jobs.moveRecycleMarkThreads();
 };
 
@@ -69,7 +67,7 @@ const start = async () => {
     await elasticSearch.init();
     console.log('ElasticSearch is ready...'.green);
 
-    const port = serverConfig.port + global.NKC.processId;
+    const port = Number(serverConfig.port) + global.NKC.processId;
     const address = serverConfig.address;
     server = http.createServer(app);
     server.listen(port, address, async () => {

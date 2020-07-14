@@ -1,6 +1,6 @@
 .module-user-panel-md
   .avatar
-    img(src=`/avatar/${targetUser.avatar}`)
+    img(src=tools.getUrl('userAvatar', targetUser.avatar))
   .info
     a(href=`/u/${targetUser.uid}` target="_blank").name= targetUser.username
     if data.user && data.user.uid !== targetUser.uid

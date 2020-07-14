@@ -4,7 +4,7 @@ block title
   -const {fundSettings} = data;
   -const {closed} = fundSettings;
   -const mainContainer1400 = true
-  title= `科创基金设置`
+  title= `基金设置`
   link(rel='stylesheet' href='/fund.css')
 
 block content
@@ -14,17 +14,27 @@ block content
       .panel-body
         .row
           .col-xs-12.col-md-6.col-md-offset-3
-            h2.text-center 科创基金总设置
+            h2.text-center 基金总设置
             br
+            span 是否启用基金：
+            label.radio-inline
+              input(type='radio' name='enableFund' checked= fundSettings.enableFund)
+              h5 是
+            label.radio-inline
+              input(type='radio' name='enableFund' checked= !fundSettings.enableFund)
+              h5 否
             h4 基本信息
             hr
-            span 科创基金介绍：
-            textarea.form-control#description(rows=5 placeholder='科创基金介绍')= fundSettings.description || ''
+            span 基金名称：
+            input.form-control#fundName(placeholder='基金名称' value= fundSettings.fundName)
             br
-            span 科创基金条款
-            textarea.form-control#terms(rows=10 placeholder='科创基金条款')= fundSettings.terms || ''
+            span 基金介绍：
+            textarea.form-control#description(rows=5 placeholder='基金介绍')= fundSettings.description || ''
             br
-            span 科创基金赞助说明
+            span 基金条款
+            textarea.form-control#terms(rows=10 placeholder='基金条款')= fundSettings.terms || ''
+            br
+            span 基金赞助说明
             textarea.form-control#donationDescription(rows=10 placeholder='赞助说明')= fundSettings.donationDescription || ''
             br
             span 资金池介绍

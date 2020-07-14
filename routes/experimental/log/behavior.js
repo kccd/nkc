@@ -3,6 +3,7 @@ const router = new Router();
 router
   .get('/', async(ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
+    ctx.template = 'experimental/log/behavior.pug';
     const {page = 0, t = "", c = ""} = query;
     data.c = c;
     data.t = t;
@@ -32,7 +33,6 @@ router
       await behavior.extendUser();
 			return behavior;
 		}));
-    ctx.template = 'experimental/log/behavior.pug';
     await next()
   });
 module.exports = router;

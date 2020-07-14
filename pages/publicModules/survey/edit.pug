@@ -119,12 +119,12 @@
               input(type="radio" v-model="survey.reward.status" :value="true")
               span 开启
           .survey-scores(v-if="survey.reward.status")
-            h5.text-info 你当前拥有{{targetUser.kcb/100}}个科创币。
-            h5.text-info(v-if="rewardKcbTotal") 每次提交奖励 {{survey.reward.onceKcb}} 个科创币，总共奖励 {{survey.reward.rewardCount}} 次，共计 {{rewardKcbTotal}} 个科创币。
+            h5.text-info 你当前拥有{{targetUserSurveyRewardScore/100}}{{surveyRewardScore.unit}}{{surveyRewardScore.name}}。
+            h5.text-info(v-if="rewardKcbTotal") 每次提交奖励 {{survey.reward.onceKcb}} {{surveyRewardScore.unit}}{{surveyRewardScore.name}}，总共奖励 {{survey.reward.rewardCount}} 次，共计 {{rewardKcbTotal}} {{surveyRewardScore.unit}}{{surveyRewardScore.name}}。
             h5.text-danger(v-if="rewardWarning") {{rewardWarning}}
             h5 单次奖励
               input(type="text" v-model.number="survey.reward.onceKcb" @change="toInt")
-              | &nbsp;科创币（精确到0.01），
+              | &nbsp;{{surveyRewardScore.unit}}{{surveyRewardScore.name}}（精确到0.01），
               | 总奖励次数
               input(type="text" v-model.number="survey.reward.rewardCount" @change="toInt")
       .form-group
@@ -184,7 +184,7 @@
                   .selected-users(v-if="selectedUsers.length")
                     .selected-user(v-for="u in selectedUsers")
                       .selected-user-avatar
-                        img(:src="'/avatar/' + u.avatar + '?t=sm'")
+                        img(:src="getUrl('userAvatar', u.avatar, 'sm')")
                       .selected-user-name {{u.username}}
                         .fa.fa-remove(@click="removeUser(index)")
 

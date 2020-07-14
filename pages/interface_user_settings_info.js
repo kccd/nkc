@@ -37,18 +37,24 @@ function selectAvatar() {
   selectImage.show(function(data) {
     var user = NKC.methods.getDataById("data").user;
     var formData = new FormData();
-    formData.append("file", data);
-    uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {
-      $(".upload-info").text('上传中...' + percentage);
-      if(e.total === e.loaded) {
-        $(".upload-info").text('上传完成！');
-        setTimeout(function() {
-          $(".upload-info").text('');
-        }, 2000);
-      }
-    }, "POST")
+    Promise.resolve()
+      .then(function() {
+        return NKC.methods.blobToFile(data);
+      })
+      .then(function(file) {
+        formData.append("file", file);
+        return uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {
+          $(".upload-info").text('上传中...' + percentage);
+          if(e.total === e.loaded) {
+            $(".upload-info").text('上传完成！');
+            setTimeout(function() {
+              $(".upload-info").text('');
+            }, 2000);
+          }
+        }, "POST")
+      })
       .then(function(data) {
-        $("#userAvatar").attr("src", "/avatar/" + data.user.avatar + '?time=' + Date.now());
+        $("#userAvatar").attr("src", NKC.methods.tools.getUrl('userAvatar', data.user.avatar) + '&time=' + Date.now());
         emitEventToUpdateLocalUser(data);
         selectImage.close();
       })
@@ -75,7 +81,7 @@ function selectBanner() {
       }
     }, "POST")
       .then(function (data) {
-        $("#userBanner").attr("src", "/banner/" + data.user.banner + "?time=" + Date.now());
+        $("#userBanner").attr("src", NKC.methods.tools.getUrl('userBanner', data.user.banner) + '&time=' + Date.now());
         emitEventToUpdateLocalUser(data);
         selectImage.close();
       })
@@ -94,10 +100,11 @@ var app = new Vue({
     usernameSettings: data.usernameSettings,
     user: data.user,
     modifyUsernameCount: data.modifyUsernameCount,
-    newUsername: ""
+    newUsername: "",
+    usernameScore: data.usernameScore
   },
   computed: {
-    needKcb: function () {
+    needScore: function () {
       if (this.usernameSettings.free) return 0;
       if (this.modifyUsernameCount < this.usernameSettings.freeCount) return 0;
       var reduce = this.modifyUsernameCount + 1 - this.usernameSettings.freeCount;

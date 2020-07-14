@@ -127,7 +127,7 @@ NKC.modules.SelectResource = function() {
         setTimeout(function() {
           try{
             self.cropper.getCroppedCanvas().toBlob(function(blob) {
-              var file = NKC.methods.blobToFile(blob, Date.now() + ".jpeg");
+              var file = NKC.methods.blobToFile(blob, Date.now() + ".jpg");
               self.app.uploadSelectFile(file);
               self.app.changePageType("list");
               self.app.resetCropper();
@@ -335,7 +335,7 @@ NKC.modules.SelectResource = function() {
         var files = input.files;
         if(files.length <= 0) return;
         for(var i = 0; i < files.length; i++) {
-          if(this.files.length >= 20) continue;
+          // if(this.files.length >= 20) continue;
           var f = files[i];
           this.uploadSelectFile(f);
         }

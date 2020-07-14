@@ -11,6 +11,7 @@ router
   .patch("/", async (ctx, next) => {
     const {db, body} = ctx;
     let {gradesId, rolesId} = body.threadSettings.displayPostAttachments;
+    let {isDisplay, tipContent} = body.threadSettings.playerTips;
     rolesId = rolesId.filter(r => r !== "default");
     const grades = await db.UsersGradeModel.find({_id: {$in: gradesId}});
     const roles = await db.RoleModel.find({_id: {$in: rolesId}});
@@ -21,6 +22,10 @@ router
         "c.displayPostAttachments": {
           rolesId: roles.map(r => r._id),
           gradesId: grades.map(g => g._id)
+        },
+        "c.playerTips": {
+          isDisplay,
+          tipContent
         }
       }
     });

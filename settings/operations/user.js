@@ -154,9 +154,6 @@ module.exports = {
 		    POST: 'disagreeApplicationToAddAFriend'
       }
     },
-    kcb: {
-		  GET: 'visitUserKcb'
-    },
     transfer: {
       GET: "transferKcbToUser",
       POST: "transferKcbToUser"
@@ -192,6 +189,9 @@ module.exports = {
 				},
 				topic: {
 					GET: "userProfile"
+				},
+				forum: {
+					GET: 'userProfile',
 				},
 				discipline: {
 					GET: "userProfile"

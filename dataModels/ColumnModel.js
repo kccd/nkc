@@ -234,8 +234,23 @@ schema.statics.getUserSubColumns = async (uid) => {
 * 更新专栏在搜索数据库中的数据
 * */
 schema.statics.toSearch = async (columnId) => {
-  const column = await mongoose.model("columns").findOne({_id: columnId});
-  if(!column) throwErr(404, `未找到ID为${columnId}的专栏`);
+  const ColumnModel = mongoose.model('columns');
+  const column = await ColumnModel.findOne({_id: columnId});
+  if(!column) {
+    const err = new Error(`未找到ID为${columnId}的专栏`);
+    err.status = 404;
+    throw err;
+  }
+  await ColumnModel.saveColumnToElasticSearch(column);
+};
+
+/*
+* 同步专栏数据到ES数据库
+* @param {Object} column 专栏对象
+* @author pengxiguaa 2020/7/7
+* */
+schema.statics.saveColumnToElasticSearch = async (column) => {
+  if(!column) throwErr('专栏不能为空');
   const data = {
     username: column.name,
     description: column.abbr,
@@ -243,8 +258,26 @@ schema.statics.toSearch = async (columnId) => {
     toc: column.toc,
     tid: column._id
   };
-  const es = require("../nkcModules/elasticSearch");
-  await es.save("column", data);
+  const es = require('../nkcModules/elasticSearch');
+  await es.save('column', data);
+};
+
+/*
+* 同步所有专栏数据到ES数据库
+* @author pengxiguaa 2020/7/7
+* */
+schema.statics.saveAllColumnToElasticSearch = async () => {
+  const ColumnModel = mongoose.model('columns');
+  const count = await ColumnModel.count();
+  const limit = 2000;
+  for(let i = 0; i <= count; i+=limit) {
+    const columns = await ColumnModel.find().sort({toc: 1}).skip(i).limit(limit);
+    for(const column of columns) {
+      await ColumnModel.saveColumnToElasticSearch(column);
+    }
+    console.log(`【同步Column到ES】 总：${count}, 当前：${i} - ${i + limit}`);
+  }
+  console.log(`【同步Column到ES】完成`);
 };
 
 

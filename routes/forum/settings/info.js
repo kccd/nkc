@@ -1,67 +1,93 @@
 const Router = require('koa-router');
 const infoRouter = new Router();
-const nkcRender = require('../../../nkcModules/nkcRender');
 
 infoRouter
 	.get('/', async (ctx, next) => {
-		ctx.template = 'interface_forum_settings_info.pug';
-
+		ctx.template = 'forum/settings/info.pug';
 		await next();
 	})
 	.patch('/', async (ctx, next) => {
-		const {data, db, body} = ctx;
+		const {data, db, body, nkcModules} = ctx;
 		const {forum} = data;
-		let {did, operation, declare, displayName, abbr, color, description, noticeThreadsId, brief, basicThreadsId, valuableThreadsId} = body;
-		if(operation && operation === 'updateDeclare') {
+		if(body.opeartion) {
+			const {did, declare} = body;
 			// 富文本内容中每一个source添加引用
 			await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
-			
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
 			await forum.update({declare});
 			if(did) {
-			  await db.DraftModel.removeDraftById(did, data.user.uid);
-      }
+				await db.DraftModel.removeDraftById(did, data.user.uid);
+			}
 			data.redirect = `/f/${forum.fid}/home`;
-		} else {
-			if(brief.length > 15) ctx.throw(400, "专业简介不能超过15个字");
-      if(!displayName) ctx.throw(400, '专业名称不能为空');
-      const sameName = await db.ForumModel.count({fid: {$ne: forum.fid}, displayName});
-      if(sameName) ctx.throw(400, "专业名称已存在");
-			if(!abbr) ctx.throw(400, '专业简称不能为空');
-			if(brief.length > 15) ctx.throw(400, '专业简介不能超过15个字');
+			return await next();
+		}
+		const {checkString} = nkcModules.checkData;
 
-			const sameAbbrForum = await db.ForumModel.findOne({abbr});
-			if(sameAbbrForum && sameAbbrForum.fid !== forum.fid) ctx.throw(400, '专业简称已存在');
+		let {
+			displayName, abbr, color,
+			description, noticeThreadsId,
+			brief, basicThreadsId, valuableThreadsId
+		} = JSON.parse(body.fields.forum);
 
-			// if(!description) ctx.throw(400, '专业介绍不能为空');
 
-			let basicThreadsId_ = [], valuableThreadsId_ = [], noticeThreadsId_ = [];
-			await Promise.all(basicThreadsId.split(',').map(async pid => {
-				pid = pid.trim();
-				const thread = await db.ThreadModel.findOne({oc: pid});
-				if(thread) basicThreadsId_.push(pid);
-			}));
+		const logoFile = body.files.logo;
+		const bannerFile = body.files.banner;
 
-			await Promise.all(valuableThreadsId.split(',').map(async pid => {
-				pid = pid.trim();
-				const thread = await db.ThreadModel.findOne({oc: pid});
-				if(thread) valuableThreadsId_.push(pid);
-			}));
+		checkString(displayName, {
+			name: '专业名称',
+			minLength: 1,
+			maxLength: 30
+		});
+		let sameName = await db.ForumModel.count({fid: {$ne: forum.fid}, displayName});
+		if(sameName) ctx.throw(400, "专业名称已存在");
+		checkString(abbr, {
+			name: '专业简称',
+			minLength: 1,
+		});
+		sameName = await db.ForumModel.count({fid: {$ne: forum.fid}, abbr});
+		if(sameName) ctx.throw(400, "专业简称已存在");
+		checkString(brief, {
+			name: '专业简介',
+			minLength: 0,
+			maxLength: 40
+		});
+		checkString(description, {
+			name: '专业介绍',
+			minLength: 1,
+			maxLength: 1000
+		});
+		const posts = await db.PostModel.find({pid: {$in: [].concat(basicThreadsId).concat(valuableThreadsId).concat(noticeThreadsId)}}, {pid: 1});
+		const postsId = posts.map(p => p.pid);
+		basicThreadsId = basicThreadsId.filter(b => postsId.includes(b));
+		valuableThreadsId = valuableThreadsId.filter(b => postsId.includes(b));
+		noticeThreadsId = noticeThreadsId.filter(b => postsId.includes(b));
 
-			await Promise.all(noticeThreadsId.split(',').map(async pid => {
-				pid = pid.trim();
-				const thread = await db.ThreadModel.findOne({oc: pid});
-				if(thread) noticeThreadsId_.push(pid);
-			}));
-      await forum.update({displayName, abbr, color, description, brief, basicThreadsId: basicThreadsId_, valuableThreadsId: valuableThreadsId_, noticeThreadsId: noticeThreadsId_});
-      
-      if(forum.lid) {
-        await db.LibraryModel.updateOne({_id: forum.lid}, {$set: {
-          name: displayName,
-          description
-        }});
-      }
+		await forum.update({
+			displayName, abbr, color, description,
+			brief,
+			basicThreadsId,
+			valuableThreadsId,
+			noticeThreadsId
+		});
 
+		if(logoFile) {
+			logoFile.name = `${Date.now()}.png`;
+			data.logo = (await db.AttachmentModel.saveForumImage(forum.fid, 'logo', logoFile))._id;
+		}
+		if(bannerFile) {
+			bannerFile.name = `${Date.now()}.png`;
+			data.banner = (await db.AttachmentModel.saveForumImage(forum.fid, 'banner', bannerFile))._id;
+		}
+
+		if(forum.lid) {
+			await db.LibraryModel.updateOne({
+				_id: forum.lid
+			}, {
+				$set: {
+					name: displayName,
+					description
+				}
+			});
 		}
 		await next();
 	});

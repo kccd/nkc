@@ -343,6 +343,7 @@ threadRouter
 				const tUser = await db.UserModel.findOne({uid: onLog.delUserId});
 				data.post = await db.PostModel.findOne({pid: onLog.postId});
 				if(tUser && data.post) {
+				  ctx.state._scoreOperationForumsId = data.post.mainForumsId;
           await db.KcbsRecordModel.insertSystemRecord('postBlocked', tUser, ctx);
         }
 			}
@@ -617,10 +618,14 @@ threadRouter
     }
 
 		// 【待改】加载鼓励、学术分
+    data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
 		if(data.user) {
       const vote = await db.PostsVoteModel.findOne({uid: data.user.uid, pid: thread.oc});
       thread.firstPost.usersVote = vote?vote.type: '';
-      data.kcbSettings = await db.SettingModel.getSettings("kcb");
+      // data.kcbSettings = await db.SettingModel.getSettings("kcb");
+      data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
+      data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+      data.creditSettings = await db.SettingModel.getCreditSettings();
       data.xsfSettings = await db.SettingModel.getSettings("xsf");
       data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
     }
@@ -729,6 +734,8 @@ threadRouter
         );
     }
 
+    // 帖子设置
+    data.threadSettings = await db.SettingModel.getSettings("thread");
     data.postHeight = hidePostSettings.postHeight;
 		data.pid = pid;
 		data.step = step;
@@ -852,6 +859,7 @@ threadRouter
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
+		ctx.state._scoreOperationForumsId = data.thread.mainForumsId;
 		await db.KcbsRecordModel.insertSystemRecord('postToThread', user, ctx);
 		// await db.UsersScoreLogModel.insertLog(obj);
 

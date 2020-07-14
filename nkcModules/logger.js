@@ -1,5 +1,5 @@
 const moment = require('moment');
-
+const languages = require("../languages");
 module.exports = async (ctx) => {
   ctx.status = ctx.response.status;
   const passed = Date.now() - ctx.reqTime;
@@ -53,7 +53,7 @@ module.exports = async (ctx) => {
     address: log.ip,
   };
 
-  const operationName = operation.description || "未知操作";
+  const operationName = languages['zh_cn'].operations[operationId] || operationId;
 
   // （body中间件控制着是否在控制台打印，如果未文件则不打印）
   if(ctx.logIt) {

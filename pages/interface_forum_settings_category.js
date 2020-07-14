@@ -355,10 +355,21 @@ function editorThreadType(fid) {
 }
 
 function submit(fid) {
+	var categoryDom = $('input[name="forumCategory"]');
+	var categoryId;
+	for(var i = 0; i < categoryDom.length; i ++) {
+		var dom = categoryDom.eq(i);
+		if(dom.prop('checked')) {
+			categoryId = dom.val();
+			break;
+		}
+	}
+	if(!categoryId) return sweetError("请选择专业分类");
 	var obj = {
 		operation: 'saveOrder',
 		childrenFid: childrenFid,
-		threadTypesCid: threadTypesCid
+		threadTypesCid: threadTypesCid,
+		categoryId: categoryId,
 	};
 	nkcAPI('/f/'+fid+'/settings/category', 'PATCH', obj)
 		.then(function() {
@@ -373,7 +384,7 @@ function submit(fid) {
 
 /**
  * 专业添加类别
- * @param {String} kindName 
+ * @param {String} kindName
  */
 function saveKind(kindName) {
 	var kindName = $("#kinds").val();
@@ -389,7 +400,7 @@ function saveKind(kindName) {
 
 /**
  * 专业清除类别
- * @param {String} fid 
+ * @param {String} fid
  */
 function clearKind(fid) {
 	var sureClear = confirm("确定要清除当前专业的类别吗？");

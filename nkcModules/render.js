@@ -122,7 +122,7 @@ let creditString = (t) => {
     case 'xsf':
       return '学术分';
     case 'creditKcb':
-      return '科创币';   
+      return '科创币';
     default:
       return '[未定义积分]'
   }
@@ -322,7 +322,7 @@ function getProvinceCity(str) {
 function numToFloatTwo(str) {
 	str = (str/100).toFixed(2);
 	return str;
-} 
+}
 
 function calculateFreightPrice(freightPriceObj, count, isFreePost) {
   const {firstFreightPrice, addFreightPrice} = freightPriceObj;

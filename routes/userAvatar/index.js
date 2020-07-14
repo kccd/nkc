@@ -20,8 +20,8 @@ router
     if(!user || uid !== user.uid) ctx.throw(403, '权限不足');
     const {file} = body.files;
     if(!file) ctx.throw(400, 'no file uploaded');
-    await nkcModules.file.saveUserAvatar(user.uid, file);
-    user.avatar = file.hash;
+    const attachment = await nkcModules.file.saveUserAvatar$2(user.uid, file);
+    user.avatar = attachment._id;
     await next();
   });
 module.exports = router;

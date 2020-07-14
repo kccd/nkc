@@ -37,6 +37,12 @@ router
         t: thread.firstPost.t
       }
     };
+    data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+    if(data.user) {
+      data.digestRewardScore = await db.SettingModel.getScoreByOperationType('digestRewardScore');
+      data.creditScore = await db.SettingModel.getScoreByOperationType('creditScore');
+      data.creditSettings = await db.SettingModel.getCreditSettings();
+    }
 	  const forums = await thread.extendForums(['mainForums', 'minorForums']);
     const {user} = data;
     let isModerator = ctx.permission('superModerator');
@@ -134,6 +140,8 @@ router
     data.redEnvelopeSettings = await db.SettingModel.getSettings("redEnvelope");
     data.kcbSettings = await db.SettingModel.getSettings("kcb");
     data.xsfSettings = await db.SettingModel.getSettings("xsf");
+    // 读取帖子设置是因为页面读取了这里面的视频遮罩设置
+    data.threadSettings = await db.SettingModel.getSettings("thread");
     ctx.template = 'post/post.pug';
 
     if(data.user) {

@@ -9,24 +9,25 @@ if data.type !== 'category' && data.type !== 'merge'
     a(href=`/f/${data.forum.fid}` style='text-decoration: none;') 查看专业
 
   .list-group
-    a.list-group-item(href=`/f/${data.forum.fid}/settings/image`)
-      span.fa.fa-user-circle &nbsp;&nbsp;
-      span 图片设置
     a.list-group-item(href=`/f/${data.forum.fid}/settings/info`)
       span.fa.fa-user-circle &nbsp;&nbsp;
       span 基本信息设置
     a.list-group-item(href=`/f/${data.forum.fid}/settings/category`)
       span.fa.fa-user-circle &nbsp;&nbsp;
       span 分类设置
-    if permission('visitForumPermissionSettings')  
+    if permission('visitForumPermissionSettings')
       a.list-group-item(href=`/f/${data.forum.fid}/settings/permission`)
         span.fa.fa-user-circle &nbsp;&nbsp;
         span 权限设置
-    if permission('visitForumMergeSettings')    
+    if permission('forumScoreSettings')
+      a.list-group-item(href=`/f/${data.forum.fid}/settings/score`)
+        span.fa.fa-user-circle &nbsp;&nbsp;
+        span 积分策略设置
+    if permission('visitForumMergeSettings')
       a.list-group-item(href=`/f/${data.forum.fid}/settings/merge`)
         span.fa.fa-user-circle &nbsp;&nbsp;
         span 合并设置
-if permission('deleteForum')        
+if permission('deleteForum')
   button.btn.btn-danger.btn-block(onclick=`deleteForum("${data.forum.fid}")`) 删除当前专业
 h4 当前专业
 .text-center.h2

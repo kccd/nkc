@@ -51,8 +51,8 @@ module.exports = async (ctx, next) => {
     }
   }
   await next();
-  // 如果不需要缓存页面或请求的是文件，则不建立缓存
-  if(ctx.filePath ||!state.cachePage) return;
+  // 如果不需要缓存页面或请求的是文件或状态码不是200，则不建立缓存
+  if(ctx.filePath ||!state.cachePage || ctx.status !== 200) return;
   const html = ctx.body.toString();
   setImmediate(async () => {
     await redisClient.setAsync(tocKey, ctx.reqTime.getTime());

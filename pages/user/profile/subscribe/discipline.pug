@@ -7,8 +7,8 @@ div
     for subscribe in data.subscribes
       .account-follower
         .account-follower-avatar
-          if subscribe.forum.iconFileName
-            img.img(src=tools.getUrl("forumAvatar", subscribe.forum.fid))
+          if subscribe.forum.logo
+            img.img(src=tools.getUrl("forumAvatar", subscribe.forum.logo))
           else
             .img(style=`background-color: ${subscribe.forum.color};`)
         .account-follower-content

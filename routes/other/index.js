@@ -5,7 +5,6 @@ const otherRouter = new Router();
 const editorRouter = require('./editor');
 const shopLogo = require('./shopLogo');
 const resourcesRouter = require('./resources');
-const defaultRouter = require('./default');
 const attachIconRouter = require('./attachIcon');
 const pfAvatar = require('./pfAvatar');
 const pfBanner = require('./pfBanner');
@@ -19,8 +18,6 @@ const photoSmallRouter = require('./photo_small');
 const fundBannerRouter = require('./fundBanner');
 const fundBannerSmallRouter = require('./fundLogo');
 const authRouter = require('./auth');
-const forumAvatarRouter = require('./forum_avatar');
-const coverRouter = require('./cover');
 const frameImgRouter = require('./frameImg');
 const posterRouter = require('./poster');
 const pageRouter = require('./page');
@@ -59,16 +56,13 @@ otherRouter
   .use('ro', roRouter.routes(), roRouter.allowedMethods())
   .use('qr', qrCodeRouter.routes(), qrCodeRouter.allowedMethods())
   .use('ad', adRouter.routes(), adRouter.allowedMethods())
-  .use('default', defaultRouter.routes(), defaultRouter.allowedMethods())
   .use('attachIcon', attachIconRouter.routes(), attachIconRouter.allowedMethods())
 	.use('photo', photoRouter.routes(), photoRouter.allowedMethods())
 	.use('photo_small', photoSmallRouter.routes(), photoSmallRouter.allowedMethods())
 	.use('fundBanner', fundBannerRouter.routes(), fundBannerRouter.allowedMethods())
 	.use('fundLogo', fundBannerSmallRouter.routes(), fundBannerSmallRouter.allowedMethods())
 	.use('auth', authRouter.routes(), authRouter.allowedMethods())
-	.use('forum_avatar', forumAvatarRouter.routes(), forumAvatarRouter.allowedMethods())
 	.use('page', pageRouter.routes(), pageRouter.allowedMethods())
-  .use('cover', coverRouter.routes(), coverRouter.allowedMethods())
   .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods())
   .use('poster', posterRouter.routes(), posterRouter.allowedMethods())
 	.use("appDownload", appDownload.routes(), appDownload.allowedMethods())

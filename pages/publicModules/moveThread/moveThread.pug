@@ -45,18 +45,22 @@
 
           .move-thread-select-forums-button
             .paging-button
-              a.button.radius-left(@click="forumType = 'topic'" :class="{'active': forumType==='topic'}") 话题
-              a.button.radius-right(@click="forumType = 'discipline'" :class="{'active': forumType==='discipline'}") 学科
+              //forumCategories
+              a.button(v-for='c in forumCategories' @click="forumType = c._id" :class="{'active': forumType===c._id}") {{c.name}}
+              //a.button.radius-left(@click="forumType = 'topic'" :class="{'active': forumType==='topic'}") 话题
+              //a.button.radius-right(@click="forumType = 'discipline'" :class="{'active': forumType==='discipline'}") 学科
           .move-thread-select-forums(:class="{'topic': forumType === 'topic'}")
             .move-thread-forum-body(v-for="forum in showForums")
               .move-thread-forum-name {{forum.displayName}}
-                .fa.fa-plus(v-if="!forum.childrenForums || forum.childrenForums.length === 0" @click="select(forum)")
+                .fa.fa-plus(v-if="!forum.childrenForums || forum.childrenForums.length === 0" @click="selectForum(forum)")
               .move-thread-child-forums(v-if="forum.allChildForums && forum.allChildForums.length")
                 .move-thread-forum-name(
                   :style="'background-color: ' + f.color" v-for="f in forum.allChildForums"
                   v-if="!onlyAnonymous || f.allowedAnonymousPost"
                   @click="selectForum(f)"
-                ) {{f.displayName}}
+                )
+                  //img(:src='getUrl("forumAvatar", f.logo)')
+                  | {{f.displayName}}
                   .fa.fa-plus
       .modal-footer
         .display-i-b(v-if="submitting") 处理中，请稍候...

@@ -127,12 +127,12 @@ func.save = async (docType, document) => {
     username = ""
 
   } = document;
-  
+
   if(docType === "thread") {
     const fundForm = await FundApplicationFormModel.findOne({tid});
     if(fundForm) aid = fundForm.code;
   }
-  
+
   // 唯一ID，存在测更新body，不存在则新建数据。
   let id;
 
@@ -552,7 +552,6 @@ func.updateThreadForums = async (thread) => {
     }
   });
 }
-
 
 module.exports = func;
 

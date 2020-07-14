@@ -1,4 +1,4 @@
-//-  
+//-
   在需要显示专业悬浮面板的页面引入此pug文件
   此模块依赖NKC中的方法，请在block scripts中引入
   /publicModules/SubscribeTypes模块需要一同引入
@@ -13,7 +13,7 @@
     .float-forum(v-if="forum && (over || onPanel)")
       .float-forum-top
         a(:href="'/f/' + forum.fid" target="_blank").float-forum-cover
-          img.float-forum-icon(v-if="forum.iconFileName" :src="getUrl('forumAvatar', forum.fid)")
+          img.float-forum-icon(v-if="forum.logo" :src="getUrl('forumAvatar', forum.logo)")
           .float-forum-icon(v-else :style="'background-color: ' + forum.color + ';'")
         .float-forum-info
           a(:href="'/f/' + forum.fid" target="_blank" :style="uid?'padding-right: 3.5rem;':''").float-forum-name {{forum.displayName}}
@@ -23,7 +23,7 @@
             .number {{forum.countThreads}}
             | 篇文章，
             .number {{forum.countPosts}}
-            | 条回复  
+            | 条回复
       .float-forum-bottom
-        .float-forum-description(:title="forum.description") {{forum.description || "暂无简介"}}      
+        .float-forum-description(:title="forum.description") {{forum.description || "暂无简介"}}
 +includeJS("/publicModules/floatForumPanel/floatForumPanel.js")

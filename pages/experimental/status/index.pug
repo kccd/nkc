@@ -42,7 +42,7 @@ block content
               a(href=`/u/${targetUser.uid}` target="_blank" style="display: inline-block;" onmouseover=tools.floatUserInfo(targetUser.uid)).text-center
                 div(style='height: 3rem;width: 3rem;display: inline-block;position: relative;margin: 0.5rem;')
                   div(style='position: absolute;height: 1rem;width: 1rem;right: 0;bottom: 0;background-color:#2bd62b;border-radius: 50%;')
-                  img(src=`/avatar/${targetUser.avatar}` style="width: 3rem;height: 3rem;border-radius: 50%;")
+                  img(src=tools.getUrl('userAvatar', targetUser.avatar) style="width: 3rem;height: 3rem;border-radius: 50%;")
 block scripts
   include ../../publicModules/floatUserPanel/floatUserPanel
   +includeJS("/echarts/dist/echarts.min.js")

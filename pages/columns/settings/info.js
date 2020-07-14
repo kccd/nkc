@@ -12,8 +12,8 @@ var app = new Vue({
   data: {
     avatar: "",
     banner: "",
-    avatarUrl: "/column/avatar/" + data.column.avatar,
-    bannerUrl: "/column/banner/" + data.column.banner,
+    avatarUrl: NKC.methods.tools.getUrl('columnAvatar', data.column.avatar),
+    bannerUrl: NKC.methods.tools.getUrl('columnBanner', data.column.banner),
 
     column: data.column,
 

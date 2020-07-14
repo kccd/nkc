@@ -3,13 +3,13 @@ block title
   include ../publicModules/web_header
   +includeCSS("/home/home_all.css")
   +includeCSS("/swiper/dist/css/swiper.css")
-block content  
+block content
   mixin forumList(f)
     .home-forums-body
       .home-forum-parent
         a(href=`/f/${f.fid}` data-float-fid=f.fid).home-forum-panel
-          if f.iconFileName
-            img.home-forum-panel-icon(src=`/forum_avatar/${f.fid}`)
+          if f.logo
+            img.home-forum-panel-icon(src=tools.getUrl('forumAvatar', f.logo))
           else
             .home-forum-panel-icon(style=`background-color: ${f.color}`)
           .home-forum-panel-name
@@ -18,8 +18,8 @@ block content
       .home-forum-child
         for cf in f.childrenForums || []
           a(href=`/f/${cf.fid}` data-float-fid=cf.fid).home-forum-panel
-            if cf.iconFileName
-              img.home-forum-panel-icon(src=`/forum_avatar/${cf.fid}`)
+            if cf.logo
+              img.home-forum-panel-icon(src=tools.getUrl('forumAvatar', cf.logo))
             else
               .home-forum-panel-icon(style=`background-color: ${cf.color}`)
             .home-forum-panel-name
@@ -73,8 +73,8 @@ block content
                 .home-visited-forums
                   for f in data.visitedForums
                     a.home-visited-forum(href=`/f/${f.fid}` data-float-fid=f.fid)
-                      if f.iconFileName
-                        img.home-visited-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                      if f.logo
+                        img.home-visited-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
                       else
                         .home-visited-forum-icon(style=`background-color: ${f.color}`)
                       span=f.displayName
@@ -91,8 +91,8 @@ block content
                       -break;
                     a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
                       .home-subscribe-forum-avatar
-                        if forum.iconFileName
-                          img(src=tools.getUrl("forumAvatar", forum.fid))
+                        if forum.logo
+                          img(src=tools.getUrl("forumAvatar", forum.logo))
                         else
                           div(style=`background-color: ${forum.color}`)
                       .home-subscribe-forum-info=forum.displayName
@@ -111,12 +111,29 @@ block content
               for forum in data.subForums
                 a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
                   .home-subscribe-forum-avatar
-                    if forum.iconFileName
-                      img(src=tools.getUrl("forumAvatar", forum.fid))
+                    if forum.logo
+                      img(src=tools.getUrl("forumAvatar", forum.logo))
                     else
                       div(style=`background-color: ${forum.color}`)
                   .home-subscribe-forum-info=forum.displayName
-        
+
+        if data.columns.length
+          .home-forums-list.m-b-1
+            .home-header
+              //- fa.fa-flask
+              .header-name 热门专栏
+              //.header-description 关注最新学科，足不出户便能游遍世界~
+            .home-columns
+              for column in data.columns
+                a(href=`/m/${column._id}`).home-column
+                  .home-column-avatar
+                    img(src=tools.getUrl("columnAvatar", column.avatar))
+                  .home-column-name=column.name
+            if !state.userColumn && data.user && state.columnPermission
+              .home-columns-link
+                a(href=`/column/apply`) 开设专栏
+                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
+
         if data.toppedThreads.length
           .home-forums-list.m-b-1
             .home-header
@@ -134,20 +151,27 @@ block content
               for thread in data.originalThreads
                 include ../publicModules/thread_panel/thread_panel
               a.home-threads-more-link(href=`/?t=latest`) 查看全部新讨论
-        .home-forums-list.m-b-1
-          .home-header
-            //-.fa.fa-tags
-            .header-name 话题
-          for f in data.forumsTree
-            if f.forumType === "topic"
+        for cf in data.categoryForums
+          .home-forums-list.m-b-1
+            .home-header
+              .header-name(title=cf.description)=cf.name
+            for f in cf.forums
               +forumList(f)
-        .home-forums-list.m-b-1
-          .home-header
-            //- fa.fa-flask
-            .header-name 学科
-          for f in data.forumsTree
-            if f.forumType === "discipline"
-              +forumList(f)
+
+        //.home-forums-list.m-b-1
+        //  .home-header
+        //    //-.fa.fa-tags
+        //    .header-name 话题
+        //  for f in data.forumsTree
+        //    if f.forumType === "topic"
+        //      +forumList(f)
+        //.home-forums-list.m-b-1
+        //  .home-header
+        //    //- fa.fa-flask
+        //    .header-name 学科
+        //  for f in data.forumsTree
+        //    if f.forumType === "discipline"
+        //      +forumList(f)
         if data.columns.length
           .home-forums-list.m-b-1
             .home-header
@@ -164,7 +188,7 @@ block content
               .home-columns-link
                 a(href=`/column/apply`) 开设专栏
                 .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
-        if data.goodsForums.length
+        if data.goodsForums.length && data.showShopGoods
           .home-forum-list.m-b-1
             .home-header
               .header-name 热销商品
@@ -190,31 +214,19 @@ block content
                           if minPrice === undefined || minPrice > price
                             -minPrice = price;
                           if maxPrice === undefined || maxPrice < price
-                            -maxPrice = price;  
+                            -maxPrice = price;
                         if minPrice === maxPrice
                           .home-goods-price=`￥${minPrice/100}`
-                        else  
+                        else
                           .home-goods-price=`￥${minPrice/100} - ￥${maxPrice/100}`
             .home-goods-forums 更多请访问：
               for f in data.goodsForums
                 a(href=`/f/${f.fid}` data-float-fid=f.fid)
-                  if f.iconFileName
-                    img.home-goods-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                  if f.logo
+                    img.home-goods-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
                   else
                     .home-goods-forum-icon(style=`background-color: ${f.color}`)
                   span=f.displayName
-
-        .home-forums-list.m-b-1
-          .home-header
-            //- fa.fa-flask
-            .header-name 活跃用户
-            //.header-description 关注最新学科，足不出户便能游遍世界~
-          .home-users
-            for u in data.activeUsers
-              a(href=`/u/${u.uid}` data-float-uid=u.uid).home-user
-                .home-user-avatar
-                  img(src=tools.getUrl("userAvatar", u.avatar))
-                .home-user-name=u.username
 
       .col-xs-12.col-md-4.box-shadow-panel.p-l-0
         .m-b-1
@@ -266,10 +278,11 @@ block content
           .home-header
             .header-name 应用
           .home-apps
-            a.home-app(href=`/fund`)
-              .home-app-img
-                img(src=`/statics/apps/fund.png`)
-              .home-app-name 科创基金
+            if data.enableFund
+              a.home-app(href=`/fund`)
+                .home-app-img
+                  img(src=`/statics/apps/fund.png`)
+                .home-app-name= data.fundName || "基金"
             a.home-app(href=`/exam`)
               .home-app-img
                 img(src=`/statics/apps/exam.png`)
@@ -282,21 +295,22 @@ block content
               .home-app-img
                 img(src=`/statics/apps/tools.png`)
               .home-app-name 计算工具
-        .home-forums-other.m-b-1
-          .home-header
-            .header-name 最新基金申请
-          .home-funds
-            for form in data.fundApplicationForms
-              .home-fund
-                a.home-fund-name(href=`/fund/a/${form._id}`)=form.project.t
-                .home-fund-info
-                  .home-fund-code=form.code
-                  a(href=`/fund/list/${form.fund._id}`).home-fund-link.fund-name=form.fund.name
-                  a(href=`/u/${form.uid}`).home-fund-user
-                    img(src=tools.getUrl("userAvatar", form.applicant.user.avatar) data-float-uid=form.uid)
-                    span=form.applicant.user.username
+        if data.enableFund
+          .home-forums-other.m-b-1
+            .home-header
+              .header-name 最新基金申请
+            .home-funds
+              for form in data.fundApplicationForms
+                .home-fund
+                  a.home-fund-name(href=`/fund/a/${form._id}`)=form.project.t
+                  .home-fund-info
+                    .home-fund-code=form.code
+                    a(href=`/fund/list/${form.fund._id}`).home-fund-link.fund-name=form.fund.name
+                    a(href=`/u/${form.uid}`).home-fund-user
+                      img(src=tools.getUrl("userAvatar", form.applicant.user.avatar) data-float-uid=form.uid)
+                      span=form.applicant.user.username
 
-            a.home-fund-donation(href=`/fund/donation`) 赞助科创基金
+              a.home-fund-donation(href=`/fund/donation`)= `赞助${data.fundName}`
         //- 最新回复
         .home-forums-other.m-b-1
           .home-header
@@ -348,6 +362,17 @@ block content
                         img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) data-float-uid=thread.firstPost.uid)
                         span=thread.firstPost.user.username
                     a(href=`/f/${thread.forums[0].fid}` data-float-fid=thread.forums[0].fid).home-thread-forum=thread.forums[0].displayName
+        .home-forums-other.m-b-1
+          .home-header
+            //- fa.fa-flask
+            .header-name 活跃用户
+            //.header-description 关注最新学科，足不出户便能游遍世界~
+          .home-users
+            for u in data.activeUsers
+              a(href=`/u/${u.uid}` data-float-uid=u.uid).home-user
+                .home-user-avatar
+                  img(src=tools.getUrl("userAvatar", u.avatar))
+                .home-user-name=u.username
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel

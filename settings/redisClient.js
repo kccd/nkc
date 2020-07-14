@@ -41,6 +41,9 @@ module.exports = client;
 * user:uid:subscribeType:subscribeTypeId:topic
 * user:uid:subscribeType:subscribeTypeId:discipline
 *
+* 专业分类
+* forumCategories
+*
 * 设置 settingsId(设置ID)
 * settings:settingsId json string
 *

@@ -37,6 +37,42 @@ defaultData.init = async () => {
       console.log(`inserting kcbs records type '${type._id}' into database`);
     }
   }
+
+  const forumCategories = require("./forumCategory");
+  const fcDB = await db.ForumCategoryModel.count();
+  let firstForumCategoryId;
+  if(fcDB === 0) {
+    for(const f of forumCategories) {
+      const _id = await db.SettingModel.operateSystemID('forumCategories', 1);
+      if(firstForumCategoryId === undefined) firstForumCategoryId = _id;
+      const fc = db.ForumCategoryModel({
+        _id,
+        name: f.name,
+      });
+      await fc.save();
+      console.log(`inserting forum category into database`);
+    }
+  }
+
+  const {forumAvailable, normal} = require("./scoreOperation");
+  const scoreOperations = forumAvailable.concat(normal);
+  for(const so of scoreOperations) {
+    let scoreOperation = await db.ScoreOperationModel.findOne({
+      type: so,
+      from: 'default',
+    });
+    if(!scoreOperation) {
+      scoreOperation = db.ScoreOperationModel({
+        _id: await db.SettingModel.operateSystemID('scoreOperations', 1),
+        type: so,
+        forumAvailable: forumAvailable.includes(so),
+        from: 'default'
+      });
+      await scoreOperation.save();
+      console.log(`inserting score operation ${so}`);
+    }
+  }
+
   const permission = require('../nkcModules/permission');
   const operationsId = permission.getOperationsId();
   for(let operationId of operationsId) {
@@ -61,10 +97,18 @@ defaultData.init = async () => {
   const forumsCount = await db.ForumModel.count();
   if(forumsCount === 0) {
     for(const forum of forums) {
+      forum.categoryId = firstForumCategoryId;
       const f = db.ForumModel(forum);
       await f.save();
       console.log(`inserting forum '${forum.displayName}' into database`);
     }
+  }
+  const messageTypes = require('./messageTypes');
+  const messageTypesCount = await db.MessageTypeModel.count();
+  if(messageTypesCount === 0) {
+    const f = db.MessageTypeModel(messageTypes);
+    await f.save();
+    console.log(`inserting messageTypes '${messageTypes._id}' into database`);
   }
 };
 

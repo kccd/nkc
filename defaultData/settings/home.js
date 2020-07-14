@@ -9,11 +9,13 @@ module.exports = {
     },
     toppedThreadsId: [],
     recommendForumsId: [],
+    showShopGoods: true,    // 是否显示热销商品板块，默认显示，可以在前台设置中修改
     shopGoodsId: [],
     columnsId: [],
     logos: [],
     logo: "",
     smallLogo: "",
+    homeBigLogo: [],
     noticeThreadsId: [],
     list: {
       topic: true,

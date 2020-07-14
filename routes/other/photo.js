@@ -8,6 +8,7 @@ photoRouter
 		const {data, db, fs} = ctx;
 		const {user} = data;
 		const {photoId} = ctx.params;
+		const {disabledPhotoPath, deletedPhotoPath} = ctx.settings.statics;
 		const photo = await db.PhotoModel.findOnly({_id: photoId});
 		if(photo.type === 'fund') {
 			// const applicationForm = db.FundApplicationFormModel.findOnly({_id: photo.applicationFormId});
@@ -48,15 +49,15 @@ photoRouter
 		}
 		ctx.filePath = photoPath + photo.path;
 		if(photo.status === 'deleted') {
-			ctx.filePath = path.resolve(__dirname, '../../resources/default_things/deleted_photo.jpg');
+			ctx.filePath = deletedPhotoPath;
 		}
 		if(photo.status === 'disabled') {
-			ctx.filePath = path.resolve(__dirname, '../../resources/default_things/disabled_photo.jpg');
+			ctx.filePath = disabledPhotoPath;
 		}
 		try{
 			await fs.access(ctx.filePath);
 		} catch(err) {
-			ctx.filePath = path.resolve(__dirname, '../../resources/default_things/deleted_photo.jpg');
+			ctx.filePath = deletedPhotoPath;
 		}
 		ctx.set('Cache-Control', 'public, no-cache');
 		const tlm = await ctx.fs.stat(ctx.filePath);

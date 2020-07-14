@@ -23,7 +23,7 @@
         if !data.column || data.column.uid !== post.uid
           if !thread.firstPost.anonymous
             a(href=`/u/${thread.firstPost.uid}` target="_blank").column-post-author
-              img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm`)
+              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
               span=thread.firstPost.user.username
           else
             span.column-post-author

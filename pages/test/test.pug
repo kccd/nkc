@@ -4,37 +4,22 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-6 Lorem ipsum dolor sit amet, consectetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=2+c234+asd+c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adtetur$a+b=c$ adipisicing elit. Doloribus ducimus ratione vel voluptate? Ab, aliquam commodi dolores eaque, hic illum labore laborum magnam, necessitatibus non nostrum quisquam sequi sunt totam?
-
+      .col-xs-12.col-md-6 hello
+        button.btn.btn-default(onclick='selectForum()') 选择专业
+        button.btn.btn-default(onclick='closeForum()') 关闭
+  #moduleSelectForum
+    .select-forum(v-cloak style='max-width: 20rem;')
+      p {{name}}
 
 block scripts
-  //- 公式渲染模块
-  +includeCSS('/katex.min.css')
-  script(type='text/x-mathjax-config').
-    MathJax.Hub.Config({
-      skipStartupTypeset: true,
-      jax: ["input/TeX","output/CommonHTML"],
-      extensions: ["tex2jax.js","MathZoom.js"],
-      tex2jax:{
-          inlineMath:  [["$", "$"], ["\\(","\\)"]],
-          displayMath: [["$$","$$"], ["\\[","\\]"]],
-        ignoreClass:'container',
-        processClass:"ThreadPostBody|QuestionText"
-      },
-      "CommonHTML":{
-        showMathMenu:false,
-        preferredFont:"STIX",
-        scale: 100,
-        minScaleAdjust: 50
-      },
-      TeX: {
-        equationNumbers: {autoNumber: "AMS"}
-      }
-    })
-  script(async src='/external_pkgs/MathJax-2.6-latest/MathJax.js')
+  include ../publicModules/selectForum/selectForumPanel
   script.
-    setTimeout(() => {
-      console.log("开始渲染...")
-      MathJax.Hub.Typeset();
-      console.log("done.");
-    }, 3000);
+    const selectForumPanel = new NKC.modules.SelectForumPanel();
+    function selectForum() {
+      selectForumPanel.open();
+    }
+    function closeForum() {
+      selectForumPanel.close();
+    }
+
+

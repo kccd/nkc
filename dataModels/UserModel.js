@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const {existsSync} = require("../tools/fsSync");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 
@@ -433,6 +434,8 @@ userSchema.methods.extend = async function(options) {
   this.mobile = userPersonal.mobile;
   this.nationCode = userPersonal.nationCode;
   this.email = userPersonal.email;
+  this.unverifiedEmail = userPersonal.unverifiedEmail;
+  this.unverifiedMobile = userPersonal.unverifiedMobile;
   // 判断注册类型
   if(this.email) {
 	  const behavior = await SecretBehaviorModel.findOne({uid: this.uid, operationId: 'bindEmail'});
@@ -611,8 +614,8 @@ userSchema.methods.updateUserMessage = async function() {
 userSchema.methods.calculateScore = async function() {
 	const SettingModel = mongoose.model('settings');
 	// 积分设置
-	const scoreSettings = await SettingModel.findOnly({_id: 'score'});
-	const {coefficients} = scoreSettings.c;
+  const gradeSettings = await SettingModel.getSettings('grade');
+	const {coefficients} = gradeSettings;
 
 	const {xsf, postCount, threadCount, disabledPostsCount, disabledThreadsCount, violationCount, dailyLoginCount, digestThreadsCount, digestPostsCount, recCount} = this;
 	// 积分计算
@@ -636,13 +639,9 @@ userSchema.methods.calculateScore = async function() {
 * @author pengxiguaa 2019-8-16
 * */
 userSchema.pre('save', async function(next) {
-  const elasticSearch = require("../nkcModules/elasticSearch");
-  try {
-    await elasticSearch.save("user", this);
-    await next();
-  } catch(e) {
-    return next(e)
-  }
+  const UserModel = mongoose.model('users');
+  await UserModel.saveUserToElasticSearch(this);
+  await next();
 });
 
 
@@ -741,7 +740,11 @@ userSchema.methods.extendGrade = async function() {
 	if(!this.score || this.score < 0) {
 		this.score = 0
 	}
-	const grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
+	let grade = await UsersGradeModel.findOne({score: {$lte: this.score}}).sort({score: -1});
+	if(!grade) {
+	  // 如果未找到对应的用户等级（通常发生在删除了积分值为0的配置）时，读取最小等级
+	  grade = await UsersGradeModel.findOne().sort({score: 1});
+  }
 	return this.grade = grade;
 };
 /*
@@ -1176,31 +1179,32 @@ userSchema.statics.getUsersFriendsId = async (uid) => {
   return friends.map(c => c.tUid);
 };
 
-/*
+/**
 * 判断用户是否上传了头像
-* @param {String} uid 用户id
-* @author pengxiguaa 2019-5-13
+* @param {String} attachId 附件id
 * @return {Boolean} 是否上传
-* */
-userSchema.statics.uploadedAvatar = async (avatar) => {
-  if(!avatar) return false;
-  let {avatarPath} = require("../settings/upload");
-  const {existsSync} = require("../tools/fsSync");
-  avatarPath += `/${avatar}.jpg`;
-  return existsSync(avatarPath);
+*/
+userSchema.statics.uploadedAvatar = async (attachId) => {
+  if(!attachId) return false;
+  const AM = mongoose.model('attachments');
+  const attachment = await AM.findOne({_id: attachId});
+  if(!attachment) return false;
+  const filePath = await attachment.getFilePath();
+  return existsSync(filePath);
 };
-/*
+
+/**
 * 判断用户是否上传了背景
-* @param {String} uid 用户id
-* @author pengxiguaa 2019-5-13
+* @param {String} attachId 附件id
 * @return {Boolean} 是否上传
-* */
-userSchema.statics.uploadedBanner = async (banner) => {
-  if(!banner) throwErr(500, "userModel.uploadedBanner: banner is required");
-  let {userBannerPath} = require("../settings/upload");
-  const {existsSync} = require("../tools/fsSync");
-  userBannerPath += `/${banner}.jpg`;
-  return existsSync(userBannerPath);
+*/
+userSchema.statics.uploadedBanner = async (attachId) => {
+  if(!attachId) return false;
+  const AM = mongoose.model('attachments');
+  const attachment = await AM.findOne({_id: attachId});
+  if(!attachment) return false;
+  const filePath = await attachment.getFilePath();
+  return existsSync(filePath);
 };
 
 /*
@@ -1497,7 +1501,7 @@ userSchema.statics.checkUsername = async (username = "") => {
 * @return {Number} 花费的科创币
 * @author pengxiguaa 2019-8-21
 * */
-userSchema.statics.checkModifyUsername = async (uid) => {
+/*userSchema.statics.checkModifyUsername = async (uid) => {
   const user = await mongoose.model("users").findOnly({uid});
   user.kcb = await mongoose.model("users").updateUserKcb(uid);
   const usersGeneral = await mongoose.model("usersGeneral").findOnly({uid});
@@ -1514,7 +1518,44 @@ userSchema.statics.checkModifyUsername = async (uid) => {
   if(user.kcb < kcb)
     throwErr(400, "科创币不足");
   return kcb;
-};
+};*/
+
+/**
+ * 判断用户是否有足够的积分修改用户名，并返回花费的积分和所需积分数
+ * @param {String} uid 用户id
+ */
+userSchema.statics.checkModifyUsernameScore = async (uid) => {
+  let UserModel = mongoose.model("users");
+  let SettingModel = await mongoose.model("settings");
+  // 全局用户名设置
+  let usernameSettings = await SettingModel.getSettings("username");
+  let usersGeneral = await mongoose.model("usersGeneral").findOnly({uid});
+  // 如果是免费修改用户名
+  if(usernameSettings.free) return 0;
+  // 花积分改名的次数
+  const reduce = usersGeneral.modifyUsernameCount + 1 - usernameSettings.freeCount;
+  // 如果从来没有花积分改名
+  if(reduce <= 0) return 0;
+  // 更新此用户的各项积分
+  await UserModel.updateUserScores(uid);
+  // 修改用户名需要使用哪种积分
+  let scoreObject = await SettingModel.getScoreByOperationType("usernameScore");
+  // 此用户此类型积分剩余多少
+  let myScore = await UserModel.getUserScore(uid, scoreObject.type);
+  // 此次改名需要花费
+  let score;
+  if(reduce * usernameSettings.onceKcb < usernameSettings.maxKcb) {
+    score = reduce * usernameSettings.onceKcb;
+  } else {
+    score = usernameSettings.maxKcb;
+  }
+  if(myScore < score)
+    throwErr(400, `${scoreObject.name}不足`);
+  return {
+    scoreObject,
+    needScore: score       // 此次改名所需积分数
+  };
+}
 
 /*
 * 验证发表文章权限，编辑器提示。
@@ -1833,6 +1874,181 @@ userSchema.methods.setRedEnvelope = async function() {
   const number = Math.ceil(Math.random()*100);
   if(number <= chance) {
     await this.generalSettings.update({'lotterySettings.status': true});
+  }
+};
+
+/*
+* 根据积分记录更新用户的指定积分值
+* @param {String} uid 用户ID
+* @param {String} scoreType 积分类型
+* @return {Number} 新的积分值
+* @author pengxiguaa 2020/6/24
+* */
+userSchema.statics.updateUserScore = async (uid, scoreType) => {
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const scoresType = await SettingModel.getScoresType();
+  const user = await UserModel.findOne({uid}, {uid: 1});
+  if(!user) throwErr(500, `用户未找到 uid:${uid}`);
+  if(!scoresType.includes(scoreType))
+    throwErr(500, `积分类型错误 type: ${scoreType}`);
+  const fromRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        scoreType,
+        from: uid,
+        verify: true
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const toRecords = await KcbsRecordModel.aggregate([
+    {
+      $match: {
+        scoreType,
+        to: uid,
+        verify: true
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: "$num"
+        }
+      }
+    }
+  ]);
+  const expenses = fromRecords.length? fromRecords[0].total: 0;
+  const income = toRecords.length? toRecords[0].total: 0;
+  const total = income - expenses;
+  const obj = {};
+  obj[scoreType] = total;
+  await UsersPersonalModel.updateOne({uid}, {
+    $set: obj
+  });
+  return total;
+};
+/*
+* 获取用户的指定积分
+* @param {String} uid 用户ID
+* @param {String} scoreType 积分类型
+* @return {Number} 积分值
+* @author pengxiguaa 2020/06/24
+* */
+userSchema.statics.getUserScore = async (uid, scoreType) => {
+  const SettingModel = mongoose.model('settings');
+  const scoresType = await SettingModel.getScoresType();
+  if(!scoresType.includes(scoreType))
+    throwErr(500, `积分类型错误 type: ${scoreType}`);
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const obj = {};
+  for(const s of scoresType) {
+    obj[s] = 1;
+  }
+  const usersPersonal = await UsersPersonalModel.findOne({uid}, obj);
+  if(!usersPersonal) throwErr(400, `用户未找到 uid: ${uid}`);
+  return usersPersonal[scoreType];
+};
+/*
+* 获取用户的交易积分
+* @param {String} uid 用户ID
+* @return {Number} 积分值
+* @author pengxiguaa 2020/6/24
+* */
+userSchema.statics.getUserMainScore = async (uid) => {
+  const UserModel = mongoose.model('users');
+  return await UserModel.getUserScore(uid, 'score1');
+};
+
+/*
+* 获取用户所有已开启的积分
+* @param {String} uid 用户ID
+* @return {Object} {score1: Number, score2: Number, ...}
+* @author pengxiguaa 2020/6/24
+* */
+userSchema.statics.getUserScores = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const enabledScores = await SettingModel.getEnabledScores();
+  const arr = [];
+  for(const score of enabledScores) {
+    const {type, name, unit, icon} = score;
+    arr.push({
+      icon,
+      type,
+      name,
+      unit,
+      number: await UserModel.getUserScore(uid, type)
+    });
+  }
+  return arr;
+};
+
+/*
+* 更新用户所有积分
+* @param {String} uid 用户ID
+* @return {Object} {score1: Number, score2: Number, ...}
+* @author pengxiguaa 2020/6/24
+* */
+userSchema.statics.updateUserScores = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  // const enabledScores = await SettingModel.getEnabledScores();
+  const scores = await SettingModel.getScores();
+  const arr = [];
+  for(const score of scores) {
+    const {type, name, unit, icon} = score;
+    arr.push({
+      icon,
+      type,
+      name,
+      unit,
+      number: await UserModel.updateUserScore(uid, type)
+    });
+  }
+  const enabledScoresType = await SettingModel.getEnabledScoresType();
+  return arr.filter(a => enabledScoresType.includes(a.type));
+};
+
+/*
+* 同步所有用户信息到ES数据库
+* @author pengxiguaa 2020/7/7
+* */
+userSchema.statics.saveAllUserToElasticSearch = async () => {
+  const UserModel = mongoose.model('users');
+  const count = await UserModel.count();
+  const limit = 2000;
+  for(let i = 0; i <= count; i+=limit) {
+    const users = await UserModel.find().sort({toc: 1}).skip(i).limit(limit);
+    for(const user of users) {
+      await UserModel.saveUserToElasticSearch(user);
+    }
+    console.log(`【同步User到ES】 总：${count}, 当前：${i} - ${i + limit}`);
+  }
+  console.log(`【同步User到ES】完成`);
+};
+
+/*
+* 同步用户信息到ES数据库
+* @param {Object} user 用户对象
+* @author pengxiguaa 2020/7/7
+* */
+userSchema.statics.saveUserToElasticSearch = async (user) => {
+  const elasticSearch = require('../nkcModules/elasticSearch');
+  try{
+    await elasticSearch.save("user", user);
+  } catch (err) {
+    console.log(err);
   }
 };
 

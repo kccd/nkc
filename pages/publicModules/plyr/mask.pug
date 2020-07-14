@@ -1,0 +1,15 @@
+#threadSettings=objToStr({isDisplay: state.threadSettings.playerTips.isDisplay})
+template#plyrMask
+  .plyr-mask
+    .plyr-mask-wrap
+      p.player-tip-content= state.threadSettings.playerTips.tipContent
+      p.player-tip-button
+        button.download
+          i.fa.fa-arrow-circle-down(aria-hidden="true")
+          | 下载
+        button.play
+          i.fa.fa-play-circle(aria-hidden="true")
+          | 预览
+
++includeJS("/publicModules/plyr/mask.js")
++includeCSS("/publicModules/plyr/mask.css")

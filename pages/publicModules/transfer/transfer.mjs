@@ -1,7 +1,7 @@
 NKC.modules.Transfer = class {
   constructor() {
     const self = this;
-    self.dom = $("#moduleTransfer"); 
+    self.dom = $("#moduleTransfer");
     self.dom.modal({
       show: false,
       backdrop: "static"
@@ -10,6 +10,7 @@ NKC.modules.Transfer = class {
       el: "#moduleTransferApp",
       data: {
         loading: true,
+        score: '',
         error: "",
         password: "",
         number: "",
@@ -22,6 +23,7 @@ NKC.modules.Transfer = class {
           nkcAPI(`/u/${tUid}/transfer?t=${Date.now()}`, "GET")
             .then(data => {
               self.app.kcbOnce = data.kcbOnce;
+              self.app.score = data.shopScore;
             })
             .catch(data => {
               self.app.kcbOnce = data.kcbOnce;

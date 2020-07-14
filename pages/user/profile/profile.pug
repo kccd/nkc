@@ -21,11 +21,11 @@ block content
             .account-nav-xs.hidden-md.hidden-lg=data.name
           .account-nav(class=data.type?"hidden-sm hidden-xs":"")
             .account-user-banner
-              a(href=`/banner/${data.targetUser.banner}?t=lg` target="_blank")
-                img(src=`/banner/${data.targetUser.banner}`)
+              a(href=tools.getUrl('userBanner', data.targetUser.banner, 'lg') target="_blank")
+                img(src=tools.getUrl('userBanner', data.targetUser.banner))
             .account-user-avatar
-              a(href=`/avatar/${data.targetUser.avatar}?t=lg` target="_blank")
-                img(src=`/avatar/${data.targetUser.avatar}`)
+              a(href=tools.getUrl('userAvatar', data.targetUser.avatar, 'lg') target="_blank")
+                img(src=tools.getUrl('userAvatar', data.targetUser.avatar))
             .account-user-name=data.targetUser.username
             .account-user-level
               span.user-grade(style=`color: ${data.targetUser.grade.color};`)
@@ -34,12 +34,9 @@ block content
             .account-user-certs=data.targetUser.info.certsName
             .account-user-description!=markdown_safe(data.targetUser.description)
             .account-user-kcb
-              .col-xs-6
-                img(src="/statics/kcb.png")
-                span=data.targetUser.kcb/100
-              .col-xs-6
-                img(src="/statics/xsf.png")
-                span=data.targetUser.xsf
+              -const targetUserScores = data.targetUserScores;
+              -const targetUserXSF = data.targetUser.xsf;
+              include ../../publicModules/userScores
             .account-user-links
               .account-user-links
                 a(href=`/u/${data.targetUser.uid}`).col-xs-6.account-user-link
@@ -65,19 +62,15 @@ block content
         if !data.type
           .account-info
             .row
-              .col-xs-6.col-md-3
+              .col-xs-6.col-md-4
                 a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
                   .account-info-value=data.targetUser.threadCount
                   .account-info-name 文章
-              .col-xs-6.col-md-3
+              .col-xs-6.col-md-4
                 a(href=`/u/${data.targetUser.uid}/profile/post` title="点击查看回复")
                   .account-info-value=data.targetUser.postCount
                   .account-info-name 回复
-              .col-xs-6.col-md-3
-                a(href=`/u/${data.targetUser.uid}/profile/finance` title="点击查看账单")
-                  .account-info-value=data.targetUser.kcb/100
-                  .account-info-name 科创币
-              .col-xs-6.col-md-3
+              .col-xs-6.col-md-4
                 a
                   .account-info-value=data.targetUser.xsf
                   .account-info-name 学术分
@@ -156,6 +149,8 @@ block content
           include ./subscribe/collection
         else if data.type === "blacklist"
           include ./blacklist
+        else if data.type === 'subscribe/forum'
+          include ./subscribe/forum
       if !state.isApp
         .col-xs-12.col-md-2.box-shadow-panel.hidden-sm.hidden-xs
           .account-nav

@@ -1,21 +1,17 @@
-const {scheduleJob, RecurrenceRule} = require('node-schedule');
+const {scheduleJob} = require('node-schedule');
 const moment = require('moment');
 const {spawn} = require('child_process');
-const settings = require('./settings');
-const backup = require('./settings/backup');
 const {fork} = require("child_process");
 const fs = require('fs');
 const path = require('path');
 const mongodb = require('./config/mongodb');
-const {database, elastic, user} = settings;
-const {client} = elastic;
 require('colors');
 
 const {
   PostModel, ThreadModel, UserModel, ActiveUserModel,
   SubscribeModel,
   ShopOrdersModel, ShopRefundModel, ShopGoodsModel,
-  SettingModel, UsersGeneralModel, KcbsRecordModel
+  SettingModel
 } = require('./dataModels');
 
 const jobs = {};
@@ -42,7 +38,8 @@ jobs.updateActiveUsers = cronStr => {
         	if(p) postCount++;
         }
       }
-      const vitality = user.vitalityArithmetic(threadCount, postCount);
+      const vitality = 3 * threadCount + postCount;
+      // const vitality = user.vitalityArithmetic(threadCount, postCount);
       const newActiveUser = new ActiveUserModel({
         lWThreadCount: threadCount,
         lWPostCount: postCount,
@@ -55,7 +52,8 @@ jobs.updateActiveUsers = cronStr => {
 };
 
 jobs.backupDatabase = () => {
-	scheduleJob(backup.cronStr, async () => {
+  if(!mongodb.backupTime || !mongodb.backupDir) return;
+	scheduleJob(mongodb.backupTime, async () => {
 		fs.appendFile(`${path.resolve(__dirname)}/backup.log`, `\n\n${moment().format('YYYY-MM-DD HH:mm:ss')} 开始备份数据...\n`, (err) => {
 			if(err) {
 				console.log(err);
@@ -72,9 +70,9 @@ jobs.backupDatabase = () => {
       '--host',
       `${mongodb.address}:${mongodb.port}`,
       '--db',
-      backup.database,
+      mongodb.database,
       '--out',
-      `${backup.out}${moment().format('YYYYMMDD')}`,
+      `${path.resolve(mongodb.backupDir)}/${moment().format('YYYYMMDD')}`,
       `--excludeCollection`,
       `visitorLogs`
     ];
@@ -210,7 +208,7 @@ jobs.shop = () => {
       } catch(err) {
         await refund.update({
           error: err.message || JSON.stringify(err)
-        });        
+        });
       }
     }
 
@@ -230,7 +228,7 @@ jobs.shop = () => {
       } catch(err) {
         await refund.update({
           error: err.message || JSON.stringify(err)
-        }); 
+        });
       }
     }
 
@@ -242,7 +240,7 @@ jobs.shop = () => {
       orderToc: {
         $lt: time - (shopSettings.refund.pay*60*60*1000)
       }
-    }); 
+    });
     for(const order of orders) {
       try {
         await order.cancelOrder(
@@ -284,11 +282,12 @@ jobs.shop = () => {
   });
 };
 // 凌晨4点，核对kcb账单
-jobs.checkKcbsRecords = async () => {
+// 调整积分后 注释
+/*jobs.checkKcbsRecords = async () => {
   scheduleJob("0 0 4 * * *", async () => {
     fork("./timedTasks/checkKcbsRecords.js");
   });
-};
+};*/
 // 自动将退修未修改的文章移动到回收站
 jobs.moveRecycleMarkThreads = () => {
   const ThreadModel = require("./dataModels/ThreadModel");

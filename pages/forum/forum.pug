@@ -46,11 +46,14 @@ block content
         .forum-info-panel.m-b-1
           .forum-banner
             .forum-banner-cover
-            .forum-banner-img(style=`background-image: url(/f/${data.forum.fid}/banner)`)
+            if !data.forum.banner
+              .forum-banner-img(style=`background-image: url(${tools.getUrl('defaultFile', 'forum_banner.jpg')})`)
+            else
+              .forum-banner-img(style=`background-image: url(${tools.getUrl('forumBanner', data.forum.banner)})`)
           .forum-info-body
             .forum-avatar
-              if data.forum.iconFileName
-                img.forum-avatar-icon(src=`/forum_avatar/${data.forum.fid}`)
+              if data.forum.logo
+                img.forum-avatar-icon(src=tools.getUrl('forumAvatar', data.forum.logo))
               else
                 .forum-avatar-icon(style=`background-color: ${data.forum.color}`)
             .forum-info
@@ -190,9 +193,10 @@ block content
           .m-b-1
             .panel-header 专业设置
             .forum-links
-              a.forum-link(href=`/f/${data.forum.fid}/settings/image`) 图标
               a.forum-link(href=`/f/${data.forum.fid}/settings/info`) 基本信息
               a.forum-link(href=`/f/${data.forum.fid}/settings/category`) 分类
+              if permission('forumScoreSettings')
+                a.forum-link(href=`/f/${data.forum.fid}/settings/score`) 积分策略
               if permission('visitForumPermissionSettings')
                 a.forum-link(href=`/f/${data.forum.fid}/settings/permission`) 权限
         if data.moderators && data.moderators.length

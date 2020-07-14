@@ -1,46 +1,71 @@
-extend ../shopBase
-block shopTitle
+extends ../../bootstrap_base
+block title
   title 付款
+  +includeCSS('/shop/pay/pay.css')
 block content
-  .container-fluid.max-width
+  #data.hidden=objToStr({ordersId: data.ordersId, totalMoney: data.ordersInfo.totalMoney/100, userMainScore: data.userMainScore, mainScore: data.mainScore, rechargeSettings: data.rechargeSettings})
+  .container-fluid.max-width#app(v-cloak)
     .row
       .col-xs-12.col-md-12
-        h3 科创商城收银台
+        h3 收银台
         hr
-        h4=`商品：`
+        h5=`商品列表：`
         div(style="padding:5px")
           for title in data.ordersInfo.description
-            p!=title
-           
-        h4 总计：
+            div=title
+
+        h5 总计：
           span.text-danger#totalPrice=data.ordersInfo.totalMoney/100
           |&nbsp;元
-      .col-xs-12.col-md-12#info.hidden
-        h4.text-danger 请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。
-      .col-xs-12.col-md-12#success.hidden
-        h4.text-success 付款成功！正在前往我的订单...
-      .col-xs-12.col-md-7#kcbPayment
-        h5 使用科创币付款
-        h5=`我的科创币：`
-          span.text-danger=data.user.kcb/100
-        div.m-t-3
-          -let klass=''
-          if data.user.kcb < data.ordersInfo.totalMoney
-            -klass='hidden'
-            h4.text-danger 账户科创币不足，
-              a(href='/account/finance/recharge' target='_blank') 去充值
-              | 然后刷新当前页面或者选择其他支付方式完成付款。
-          .form(style='max-width: 20rem;' class=klass)
-            .form-group
-              h5 请输入登录密码
-              input.form-control(type='password')#password
-            .form-group
-              button.btn.btn-primary(onclick=`submit('${data.ordersId}')`) 确认支付  
-              button.btn.btn-info(onclick=`javascript :history.back(-1);`) 返回
-      .col-xs-12.col-md-4.col-md-offset-1#otherPayment
-        h5 使用其他支付方式付款
-        div.m-t-2
-          div(style='position:relative;height:48px;width:48px;overflow:hidden;' onclick=`alipay('${data.ordersId}')`).cp
-            img(src='/default/fund_pay.jpg' style='position:absolute;left:-96px;')
-block scripts    
+      .col-xs-12.col-md-6
+        h5 选择支付方式
+        .payments
+          .payment(:class="{'active': payment === 'mainScore'}")
+            .icon
+              img(src=tools.getUrl('scoreIcon', data.mainScore.icon))
+            .info
+              .name {{mainScore.name}}
+              .description 当前账户剩余{{mainScore.name}}{{userMainScore/100}}{{mainScore.unit}}，
+                a(href=`/account/finance/recharge` target='_blank') 去充值
+            .selection
+              label
+                input(type='radio' value='mainScore' v-model='payment')
+          .payment(v-if='aliPay.enabled' :class="{'active': payment === 'aliPay'}")
+            .icon.aliPay
+              img(src=tools.getUrl('defaultFile', 'fund_pay.jpg'))
+            .info
+              .name 支付宝
+              .description(v-if='aliPay.fee')
+                | 服务商（非本站）将收取 {{aliPay._fee}}% 的手续费
+              .description(v-else)
+            .selection
+              label
+                input(type='radio' value='aliPay' v-model='payment')
+      .col-xs-12.col-md-12(v-if='payment === "mainScore"')
+        .m-t-1
+          //- 积分余额不足
+          .text-danger(v-if='needRecharge') 当前{{mainScore.name}}不足，请
+            a(href='/account/finance/recharge' target="_blank") 充值
+            | 或选择其他支付方式。
+          div(v-else)
+            .m-t-2
+              h4 需支付：{{mainScore.name}}
+                span.text-danger {{totalMoney}}
+                | {{mainScore.unit}}
+            .form(style='max-width: 20rem;')
+              .form-group
+                h5 请输入登录密码
+                input.form-control(type='password' v-model.trim='password')
+              .form-group
+                button.btn.btn-primary(@click=`submit`) 确认支付
+                button.btn.btn-info(onclick=`javascript :history.back(-1);`) 返回
+      .col-xs-12.col-md-12(v-if='payment === "aliPay"')
+        .m-t-2
+          h4 需支付：
+            span.text-danger {{aliPay.totalPrice}}
+            |元
+            span.fee-info(v-if='aliPay.feePrice > 0') （含手续费{{aliPay.feePrice}}元）
+          button.btn.btn-primary(@click='useAliPay') 立即支付
+
+block scripts
   +includeJS('/shop/pay/pay.js')

@@ -1,4 +1,4 @@
-if data.user && data.redEnvelopeSettings && !data.redEnvelopeSettings.draftFee.close
+if data.user && data.redEnvelopeSettings && !data.redEnvelopeSettings.draftFee.close && data.digestRewardScore
   .digest-panel
     div(class="modal fade" id="digestModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel").bootstrap-modal
       div(class="modal-dialog modal-sm" role="document")
@@ -8,7 +8,7 @@ if data.user && data.redEnvelopeSettings && !data.redEnvelopeSettings.draftFee.c
               span(aria-hidden="true") &times;
             h4.modal-title#gridSystemModalLabel 评为精选
           .modal-body
-            span= `奖励科创币，范围 ${data.redEnvelopeSettings.draftFee.minCount/100} 到 ${data.redEnvelopeSettings.draftFee.maxCount/100}`
+            span= `奖励${data.digestRewardScore.name}(${data.digestRewardScore.unit})，范围 ${data.redEnvelopeSettings.draftFee.minCount/100} 到 ${data.redEnvelopeSettings.draftFee.maxCount/100}`
             input(value=data.redEnvelopeSettings.draftFee.defaultCount/100 type='number' name='digestKcb')
           .modal-footer
             button(type="button" class="btn btn-default" data-dismiss="modal") 关闭

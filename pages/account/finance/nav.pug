@@ -1,12 +1,12 @@
 .row
   .col-xs-12.col-xs-12
     h4 我的资产
-      small.p-l-1.text-success 科创币&nbsp;
-        strong.h4.text-danger= data.user.kcb/100
-        |&nbsp;个
-  .col-xs-12.col-xs-12
-    .ul.nav.nav-tabs
-      li(role='presentation' class=pageType==="recharge"?'active':"")
-        a(onclick="NKC.methods.visitUrl('/account/finance/recharge')") 充值
-      li(role='presentation' class=pageType!=="recharge"?'active':"")
-        a(onclick="NKC.methods.visitUrl('/account/finance/withdraw')") 提现
+      for score in targetUserScores
+        small.p-l-1.text-success=`${score.name} `
+          strong.h4.text-danger=score.number / 100
+          span=` ${score.unit}`
+      if showRechargeButton
+        .display-i-b.p-l-1
+          a.btn.btn-success.btn-sm(href="/account/finance/recharge") 充值
+          span &nbsp;
+          a.btn.btn-default.btn-sm(href="/account/finance/withdraw") 提现

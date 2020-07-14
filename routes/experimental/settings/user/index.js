@@ -5,7 +5,7 @@ userRouter
 		ctx.template = 'experimental/settings/user.pug';
 		ctx.data.type = 'user';
 		await next();
-	})
+	}) 
 	.get('/', async (ctx, next) => {
 		const {query, data, db} = ctx;
 		let {page = 0, searchType, content, t} = query;
@@ -133,7 +133,7 @@ userRouter
     await targetUser.update(userObj);
     await targetUsersPersonal.update(userPersonalObj);
     await next();
-  });
+	});
 	/*.patch('/:uid', async (ctx, next) => {
 		const {params, db, body, nkcModules} = ctx;
 		const {operation} = body;

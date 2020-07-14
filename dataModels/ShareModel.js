@@ -220,9 +220,11 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
   };
   let status = false;
   let num = 0;
+  const shareRewardScore = await mongoose.model('settings').getScoreByOperationType('shareRewardScore');
   if(clickReward && type === "visit") {
     const record = await KcbsRecordModel({
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
+      scoreType: shareRewardScore.type,
       from: "bank",
       to: uid,
       type: "share",
@@ -247,6 +249,7 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
       _id: await SettingModel.operateSystemID("kcbsRecords", 1),
       from: "bank",
       to: uid,
+      scoreType: shareRewardScore.type,
       type: "share",
       num: registerSettings.kcb,
       c: {
@@ -265,7 +268,8 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
     num = typeSettings.kcb;
   }
   await this.update(updateObj);
-  await mongoose.model("users").updateUserKcb(uid);
+  // await mongoose.model("users").updateUserKcb(uid);
+  await mongoose.model('users').updateUserScores(uid);
   return {
     status,
     num

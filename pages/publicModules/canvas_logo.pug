@@ -1,6 +1,14 @@
--var quotes=['好读书，不求甚解。','实践和理论相结合。','同学们，你们是祖国的栋梁，要注意实验安全！','华语世界最纯粹的科技/文艺/爱好社区, Since 2001.','从这里开始你的发现之旅。','发展科技爱好，倡导科学理性。','那榆蔭下的一潭，不是清泉，是天上虹。','揉碎在浮藻間，沉澱著彩虹似的夢。','发展体育运动，提高人民体质','科创精神就是向李小平同志学习。','天行健，君子以自强不息。','地势坤，君子以厚德载物。','自强不息，厚德载物；独立精神，自由思想。','博学、审问、慎思、明辨、笃行。','思想自由，兼容并包。','博学而笃志，切问而近思。']
--var quote = quotes[Math.floor(Math.random()*quotes.length)]
--var logos = ['kclogo_umaru1_nc','kclogo_misaka1','kclogo_winter1']
--var logo = logos[Math.floor(Math.random()*logos.length)]
+-let quotes = ['好读书，不求甚解。','实践和理论相结合。','同学们，你们是祖国的栋梁，要注意实验安全！','华语世界最纯粹的科技/文艺/爱好社区, Since 2001.','从这里开始你的发现之旅。','发展科技爱好，倡导科学理性。','那榆蔭下的一潭，不是清泉，是天上虹。','揉碎在浮藻間，沉澱著彩虹似的夢。','发展体育运动，提高人民体质','科创精神就是向李小平同志学习。','天行健，君子以自强不息。','地势坤，君子以厚德载物。','自强不息，厚德载物；独立精神，自由思想。','博学、审问、慎思、明辨、笃行。','思想自由，兼容并包。','博学而笃志，切问而近思。'];
+-let quote = quotes[Math.floor(Math.random()*quotes.length)];
+//- -var logos = ['kclogo_umaru1_nc','kclogo_misaka1','kclogo_winter1']
+//- -var logo = logos[Math.floor(Math.random()*logos.length)]
+//- .canvas-logo
+//-   img(src=tools.getUrl('siteFile', logo + '.png') title=quote)
+-let logos = data.homeBigLogo;
+-let logosLength = logos.length;
+-let logo = logos[Math.floor(Math.random() * logosLength)];
+-let finallyLogo = tools.getUrl('siteFile', 'kclogo_misaka1.png');
+-let url = logosLength? `/a/${logo}` : finallyLogo;
+
 .canvas-logo
-  img(src='/resources/site_specific/'+logo+'.png' title=quote)
+  img(src=url)

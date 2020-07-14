@@ -5,28 +5,23 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
-        h4 我的资产 
-          small.p-l-1.text-success 科创币&nbsp;
-            strong.h4.text-danger= data.user.kcb/100
-            |&nbsp;个
-          .display-i-b.p-l-1 
-            a.btn.btn-success.btn-sm(onclick="NKC.methods.visitUrl('/account/finance/recharge')") 充值
-            span &nbsp;
-            a.btn.btn-default.btn-sm(onclick="NKC.methods.visitUrl('/account/finance/withdraw')") 提现
+        -const targetUserScores = data.userScores;
+        include ../../account/finance/nav
+        include ../../account/finance/rechargeNav
       .col-xs-12.col-md-12.m-b-1
-        .ul.nav.nav-tabs  
+        .ul.nav.nav-tabs
           li(role='presentation' class=data.t==='all'?'active': '')
-            a(href=`/account/finance?t=all`) 所有  
+            a(href=`/account/finance?t=all`) 所有
           li(role='presentation' class=!data.t?'active':'')
             a(href=`/account/finance`) 收入
           li(role='presentation' class=data.t==='payout'?'active':'')
             a(href=`/account/finance?t=payout`) 支出
       .col-xs-12.col-md-12
-        include ../../interface_navigation_paging  
+        include ../../interface_navigation_paging
       .col-xs-12.col-md-12(style='font-size: 1rem;')
         if data.t !== 'all'
           .table-responsive
-            table.table.table-bordered  
+            table.table.table-bordered
               thead
                 tr
                   th 时间
@@ -65,10 +60,10 @@ block content
                         span=`订单号（${record.ordersId.join(', ')}）`
 
           if !data.kcbsRecords.length
-            .text-center 暂无记录        
-        else 
+            .text-center 暂无记录
+        else
           .table-responsive
-            table.table.table-bordered  
+            table.table.table-bordered
               thead
                 tr
                   th 时间
@@ -86,22 +81,22 @@ block content
                     th= record._id
                     th= lang('kcbsTypes', record.type)
                     th= record.description
-                    th  
+                    th
                       if record.to === data.user.uid
                         if !record.fromUser
                           span 科创人民很行
-                        else 
+                        else
                           a(href=`/u/${record.from}` target="_blank")= record.fromUser.username
                       else
                         if !record.toUser
                           sapn 科创人民很行
-                        else 
+                        else
                           a(href=`/u/${record.to}` target="_blank")= record.toUser.username
                     th
                       if record.to === data.user.uid
                         span= record.num/100
                     th
-                      if record.from === data.user.uid    
+                      if record.from === data.user.uid
                         span= record.num/100
                     th
                       if record.post
@@ -110,6 +105,6 @@ block content
                         span=`订单号（${record.ordersId.join(', ')}）`
 
           if !data.kcbsRecords.length
-            .text-center 暂无记录            
+            .text-center 暂无记录
       .col-xs-12.col-md-12
-        include ../../interface_navigation_paging              
+        include ../../interface_navigation_paging

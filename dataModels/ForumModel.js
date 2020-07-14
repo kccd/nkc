@@ -73,6 +73,16 @@ const forumSchema = new Schema({
     type: String,
     default: ''
   },
+  // 专业logo
+  logo: {
+    type: String,
+    default: '',
+  },
+  // 专业背景
+  banner: {
+    type: String,
+    default: ''
+  },
   moderators: {
     type: [String],
     default: []
@@ -80,13 +90,7 @@ const forumSchema = new Schema({
   order: {
     type: Number,
     default: 0
-  },/* 
-
-  parentId: {
-    type: String,
-    default: ''
-  }, */
-
+  },
   // 可访问的
   accessible: {
     type: Boolean,
@@ -166,12 +170,18 @@ const forumSchema = new Schema({
     default: [],
     index: 1
 	},
-	// 专业类型
+	// 专业类型 旧
 	//--topic 话题
 	//--discipline 学科
 	forumType: {
 		type: String,
 		default: 'discipline'
+  },
+  // 专业分类
+  categoryId: {
+    type: Number,
+    required: true,
+    index: 1,
   },
 	// 上级板块
 	parentsId: {
@@ -212,6 +222,12 @@ const forumSchema = new Schema({
   lid: {
     type: Number,
     default: null,
+    index: 1
+  },
+  // 是否开启流控
+  openReduceVisits: {
+    type: Boolean,
+    default: false,
     index: 1
   }
 }, {toObject: {
@@ -442,7 +458,7 @@ forumSchema.statics.updateCount = async function (threads, isAdd) {
   }
 };
 
-/* 
+/*
   更新当前专业信息，再更新上级所有专业的信息
   @author pengxiguaa 2019/1/26
 */
@@ -520,13 +536,13 @@ forumSchema.methods.newPost = async function(post, user, ip, cids, toMid, fids) 
   await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
   // await ForumModel.updateMany({fid: {$in: fids}}, {$inc: {
   //   'tCount.normal': 1,
-  //   'countPosts': 1, 
+  //   'countPosts': 1,
   //   'countThreads': 1
   // }});
   return _post;
 };
 
-/* 
+/*
   加载当前专业的下级专业
   @param q 查询专业的其他条件
   @return 下级专业对象数组
@@ -539,7 +555,7 @@ forumSchema.methods.extendChildrenForums = async function(q) {
 	return this.childrenForums = await ForumModel.find(q).sort({order: 1});
 };
 
-/* 
+/*
   加载当前专业的上级专业
   @return 上级专业对象数组
   @author pengxigua 2019/1/24
@@ -769,7 +785,7 @@ forumSchema.statics.getAllChildrenFid = async function(fid) {
 
 
 
-/* 
+/*
   获取专业下的所有专业的id
   @return 专业id数组
   @author pengxiguaa 2019/1/26
@@ -784,7 +800,7 @@ forumSchema.statics.getAllChildForumsIdByFid = async function(fid) {
 
 
 
-/* 
+/*
   获取专业下的全部专业
   @return 专业对象数组
   @author pengxiguaa 2019/1/26
@@ -795,7 +811,7 @@ forumSchema.methods.getAllChildForums = async function() {
   const forums = await ForumModel.find({fid: {$in: allChildForumsId}});
   return this.allChildForums = forums;
 }
-/* 
+/*
   验证多个专业的权限，只要有一个专业无权访问都会抛出403错误
   @param arr: 专业对象数组[forum1, forums, ...]或专业id数组[fid1, fid2, ...]
   @param userInfo: 用户对象或uid
@@ -934,7 +950,7 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
 
   return [...new Set(fid)];
 };
-/* 
+/*
   判断用户是否具有当前操作的权限
   @param data.user 用户对象
   @param data.userRoles 用户所有的角色
@@ -961,7 +977,7 @@ forumSchema.methods.ensureModeratorsPermission = async function(data) {
   }
 };
 
-/* 
+/*
   获取相关专业
   @param fids 能够看到入口的专业，若为空则不考虑权限
   @return 专业对象数组
@@ -1001,7 +1017,10 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
     allowedAnonymousPost: 1,
     color: 1,
     parentsId: 1,
+    categoryId: 1,
     iconFileName: 1,
+    logo: 1,
+    banner: 1,
     description: 1
   }).sort({order: 1});
 
@@ -1052,9 +1071,12 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     color: 1,
     parentsId: 1,
     iconFileName: 1,
-    description: 1
+    categoryId: 1,
+    description: 1,
+    logo: 1,
+    banner: 1,
   }).sort({order: 1});
-  
+
   const forumsObj = {};
   forums = forums.map(forum => {
     forum = forum.toObject();
@@ -1062,9 +1084,9 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     forumsObj[forum.fid] = forum;
     return forum;
   });
-  
+
   const results = [];
-  
+
   for(const f of forums) {
     if(!f.parentsId.length) {
       results.push(f);
@@ -1077,7 +1099,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     }
   }
   return results;
-  
+
   /*
   const insetForums = (childrenForums, fid) => {
     let arr = [];
@@ -1099,7 +1121,7 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
       insetForums(f.childrenForums, f.fid);
     }
   }
-  
+
   return results;*/
 };
 
@@ -1210,6 +1232,8 @@ forumSchema.statics.getUserSubForums = async (uid, fid) => {
     color: 1,
     parentsId: 1,
     iconFileName: 1,
+    logo: 1,
+    banner: 1,
     description: 1
   });
   const userSubForums = [];
@@ -1246,15 +1270,15 @@ forumSchema.statics.publishPermission = async (data, fids) => {
  * 生成一条新的thread
  * -------
  * @description ：使用该方法可新生成一条新的thread，并调用newPost方法生成firstPost。
- * 
- * @param {Object} options 
+ *
+ * @param {Object} options
  * @参数说明 options对象中必要参数
  * | uid   --  用户ID
  * | fids  --  目标专业的fid数组集合，不可为空
  * | 其余未作说明的参数为非必要
- * 
+ *
  * @return {Object} _post 返回一个包含pid、tid等的post，便于后续的业务逻辑中使用
- * 
+ *
  * @author Kris 2019-06-10
  */
 forumSchema.statics.createNewThread = async function(options) {
@@ -1322,7 +1346,7 @@ forumSchema.statics.getForumsIdFromRedis = async (forumType) => {
   }
   return forumsId;
 };
-/* 
+/*
   创建文库
   @param {String} uid 创建者ID
   @return {Object} 文库对象
@@ -1359,7 +1383,7 @@ forumSchema.statics.getRecommendForums = async (fid = []) => {
   return forumsIndex.map(index => {
     return forums[index];
   });
-  
+
 };
 
 /*
@@ -1375,6 +1399,8 @@ forumSchema.statics.getForumNav = async (fids = [], fid) => {
     parentsId: 1,
     description: 1,
     iconFileName: 1,
+    logo: 1,
+    banner: 1,
     color: 1
   });
   const forumsObj = {};
@@ -1408,6 +1434,5 @@ forumSchema.statics.getForumsByFid = async (fid) => {
   }
   return results;
 };
-
 
 module.exports = mongoose.model('forums', forumSchema);

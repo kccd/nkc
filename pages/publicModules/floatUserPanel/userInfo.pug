@@ -9,8 +9,8 @@
         .text-center.m-t-1.m-b-1(v-if="loading") 加载中...
         .module-user-info-info(v-else)
           .module-user-info-avatar
-            a(:href="'/avatar/' + user.avatar + '?t=lg'" target="_blank")
-              img(:src="'/avatar/' + user.avatar")
+            a(:href="getUrl('userAvatar', user.avatar, 'lg')" target="_blank")
+              img(:src="getUrl('userAvatar', user.avatar)")
           a.module-user-info-name(:href="'/u/' + user.uid" target="_blank") {{user.username}}
           .module-user-info-grade
             span {{user.grade.displayName}}
@@ -28,8 +28,5 @@
               .col-xs-3
                 .title 学术分
                 .count {{user.xsf}}
-              .col-xs-3
-                .title 科创币
-                .count {{user.kcb/100}}
 
 +includeJS("/publicModules/floatUserPanel/userInfo.js")

@@ -32,7 +32,8 @@ permissionRouter
       shareLimitTime,
       allowedAnonymousPost,
       moderators,
-      subType
+      subType,
+      openReduceVisits      // 是否开启流控
 		} = body;
 		const rolesDB = await db.RoleModel.find();
 		const rolesIdDB = rolesDB.map(r => r._id);
@@ -84,7 +85,8 @@ permissionRouter
         shareLimitTime,
         moderators: moderators_,
         subType,
-        allowedAnonymousPost: !!allowedAnonymousPost
+        allowedAnonymousPost: !!allowedAnonymousPost,
+        openReduceVisits
 		  }
 		);
 		await redis.cacheForums();

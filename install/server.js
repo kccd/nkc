@@ -1,7 +1,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const upload = require('../settings/upload');
+const upload = require("../settings/upload");
 global.NKC = {};
 global.NKC.createFile = (p, data) => {
   console.log(`creating config - ${p}`);
@@ -29,16 +29,6 @@ function installModules() {
   }
 }
 
-function copyDefaultFiles() {
-  const fse = require('fs-extra');
-  const dirs = fs.readdirSync(path.resolve(__dirname, './defaultFiles'));
-  for(const dir of dirs) {
-    const from = path.resolve(__dirname, `./defaultFiles/${dir}`);
-    const to = path.resolve(__dirname, `../resources/${dir}`);
-    console.log(`Copying folder '${from}' to ${to}`);
-    fse.copy(from, to);
-  }
-}
 
 function createServer() {
   console.log(`Creating installer server...`);
@@ -75,7 +65,7 @@ function createServer() {
   app.use(koaStatic(path.resolve('./install/public')));
   app.use(koaStatic(path.resolve('./pages')));
   app.use(koaStatic(path.resolve('./node_modules')));
-  app.use(koaStatic(path.resolve('./resources/site_specific')));
+  app.use(koaStatic(path.resolve('./statics/site')));
   app.use(router.routes(), router.allowedMethods());
   http.createServer(app.callback()).listen(9000, () => {
     console.log('server is running http://127.0.0.1:9000');
@@ -88,7 +78,6 @@ function createServer() {
 try{
   installModules();
   upload.initFolders();
-  copyDefaultFiles();
   createServer();
 } catch(err) {
   console.log(err);

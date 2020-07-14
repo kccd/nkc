@@ -26,8 +26,8 @@ block content
             .visited-forums
               for f in data.visitedForums
                 .visited-forum(data-float-fid=f.fid)
-                  if f.iconFileName
-                    img.visited-forum-icon(src=tools.getUrl("forumAvatar", f.fid))
+                  if f.logo
+                    img.visited-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
                   else
                     .visited-forum-icon(style=`background-color: ${f.color}`)
                   a(href=`/f/${f.fid}`).visited-forum-name= f.displayName

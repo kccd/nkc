@@ -10,6 +10,7 @@ const subscribeTopic = require("./subscribe/topic");
 const subscribeDiscipline = require("./subscribe/discipline");
 const subscribeColumn = require("./subscribe/column");
 const subscribeThread = require("./subscribe/thread");
+const subscribeForum = require('./subscribe/forum');
 const subscribeCollection = require("./subscribe/collection");
 const summaryPie = require("./summary/pie");
 const summaryCalendar = require("./summary/calendar");
@@ -43,6 +44,7 @@ router
     data.subThreadsId = await db.SubscribeModel.getUserSubThreadsId(targetUser.uid, "sub");
     data.fansId = await db.SubscribeModel.getUserFansId(targetUser.uid);
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
+    data.targetUserScores = await db.UserModel.updateUserScores(targetUser.uid);
     const noteCount = await db.NoteContentModel.count({
       uid: targetUser.uid,
       deleted: false
@@ -75,6 +77,11 @@ router
           name: "关注的用户",
         },
         {
+          type: "subscribe/forum",
+          url: `/u/${targetUser.uid}/profile/subscribe/forum`,
+          name: "关注的专业",
+        },
+        /*{
           type: "subscribe/topic",
           url: `/u/${targetUser.uid}/profile/subscribe/topic`,
           name: "关注的话题",
@@ -83,7 +90,7 @@ router
           type: "subscribe/discipline",
           url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
           name: "关注的学科",
-        },
+        },*/
         {
           type: "subscribe/column",
           name: "关注的专栏",
@@ -115,6 +122,10 @@ router
           url: `/u/${targetUser.uid}/profile/blacklist`,
         }
       ];
+      data.name = "";
+      data.appLinks.map(link => {
+        if (data.type === link.type) data.name = link.name;
+      });
     } else {
       data.navLinks = [
         {
@@ -167,6 +178,12 @@ router
               count: data.subUsersId.length
             },
             {
+              type: "subscribe/forum",
+              url: `/u/${targetUser.uid}/profile/subscribe/forum`,
+              name: "关注的专业",
+              count: data.subForumsId.length
+            },
+            /*{
               type: "subscribe/topic",
               url: `/u/${targetUser.uid}/profile/subscribe/topic`,
               name: "关注的话题",
@@ -177,7 +194,7 @@ router
               url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
               name: "关注的学科",
               count: data.subDisciplinesId.length
-            },
+            },*/
             {
               type: "subscribe/column",
               name: "关注的专栏",
@@ -347,6 +364,7 @@ router
   .get("/summary/calendar", summaryCalendar)
   .get("/subscribe/user", subscribeUser)
   .get("/subscribe/topic", subscribeTopic)
+  .get("/subscribe/forum", subscribeForum)
   .get("/subscribe/discipline", subscribeDiscipline)
   .get("/subscribe/column", subscribeColumn)
   .get("/subscribe/thread", subscribeThread)

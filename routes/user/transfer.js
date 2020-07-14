@@ -10,6 +10,8 @@ router
       countToUserOneDay
     } = await db.SettingModel.getSettings("transfer");
 
+    data.shopScore = await db.SettingModel.getScoreByOperationType('shopScore');
+
     data.kcbOnce = kcbOnce;
 
     if(targetUser.uid === user.uid) ctx.throw(403, `不允许给自己转账`);
@@ -48,22 +50,26 @@ router
     const {db, body, nkcModules, data} = ctx;
     const {checkNumber} = nkcModules.checkData;
     const {password, number} = body;
-    const {user, kcbOnce, targetUser} =  data;
+    const {user, kcbOnce, targetUser, shopScore} =  data;
     checkNumber(number, {
       name: "转账金额",
       min: 1
     });
     if(!password) ctx.throw(400, "密码不能为空");
-    if(number > kcbOnce) ctx.throw(400, `转账金额不能超过${kcbOnce/100}kcb`);
+    if(number > kcbOnce) ctx.throw(400, `转账金额不能超过${kcbOnce/100}${shopScore.unit}${shopScore.name}`);
     const usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     await usersPersonal.ensurePassword(password);
 
-    await db.UserModel.updateUserKcb(user.uid);
+    await db.UserModel.updateUserScores(user.uid);
+    // await db.UserModel.updateUserKcb(user.uid);
 
-    if(user.kcb < number) ctx.throw(400, "你的kcb不足");
+    const userScore = await db.UserModel.getUserScore(user.uid, shopScore.type);
+
+    if(userScore < number) ctx.throw(400, `你的${shopScore.name}不足`);
 
     const record = db.KcbsRecordModel({
       _id: await db.SettingModel.operateSystemID("kcbsRecords", 1),
+      scoreType: shopScore.type,
       from: user.uid,
       to: targetUser.uid,
       type: "transferToUser",
@@ -74,8 +80,10 @@ router
 
     await record.save();
 
-    await db.UserModel.updateUserKcb(user.uid);
-    await db.UserModel.updateUserKcb(targetUser.uid);
+    await db.UserModel.updateUserScores(user.uid);
+    await db.UserModel.updateUserScores(targetUser.uid);
+    // await db.UserModel.updateUserKcb(user.uid);
+    // await db.UserModel.updateUserKcb(targetUser.uid);
     await next();
   });
 module.exports = router;

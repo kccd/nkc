@@ -17,7 +17,7 @@ block content
             -var link = `openToNewLocation('/problem/list?cid=${type._id}')`
             li.m-r-05(class=cls onclick=link)= `${type.name} ${type.count}`
         <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-btn-block" @click='addType' style="background: #d9e1e8;color: #2b90d9">新建分类</button>
-      
+
       .col-xs-12.col-md-12.box-shadow-panel
         //- 工具栏
         .col-xs-12.col-md-12
@@ -40,7 +40,7 @@ block content
               .media-left
                 if problem.user
                   a(href=`/u/${problem.user.uid}`)
-                    img.media-object(src=`/avatar/${problem.user.avatar}` style='width: 50px;height: 50px;border-radius: 50%;')
+                    img.media-object(src=tools.getUrl('userAvatar', problem.user.avatar) style='width: 50px;height: 50px;border-radius: 50%;')
                 else
                   .text-center(style='height: 50px;width: 50px;line-height: 50px;background-color: #aaa;border-radius: 50%;color: #fff;font-size: 2em;') 匿
               .media-body
@@ -64,58 +64,11 @@ block content
                     span= `${fromNow(problem.toc)}`
                   a(href=`/problem/list/${problem._id}` style='text-decoration: none;')
                     h4= problem.t
-          
+
           .col-xs-12.col-md-12
             hr(style='margin: 5px 0 15px 0;')
             include ../publicModules/paging/paging.pug
 
-    //.col-xs-12.col-md-6
-      .row
-        ul.nav.nav-pills
-          li(role='presentation' class=!data.type?'active': '')
-            a(href='/problem/list') 全部
-              span.badge= (data.unsolvedCount + data.resolvedCount) || ''
-          li(role='presentation' class=data.type==='unsolved'?'active': '')
-            a(href='/problem/list?type=unsolved') 未解决
-              span.badge= (data.unsolvedCount) || ''
-          li(role='presentation' class=data.type==='resolved'?'active': '')
-            a(href='/problem/list?type=resolved') 已完成
-              span.badge= (data.resolvedCount) || ''
-        br
-        include ../interface_navigation_paging
-        br
-        for problem in data.problems
-          hr(style='margin: 5px 0;')
-          .media
-            .media-left
-              if problem.user
-                a(href=`/u/${problem.user.uid}`)
-                  img.media-object(src=`/avatar/${problem.user.uid}` style='width: 50px;height: 50px;border-radius: 50%;')
-              else
-                .text-center(style='height: 50px;width: 50px;line-height: 50px;background-color: #aaa;border-radius: 50%;color: #fff;font-size: 2em;') 匿
-            .media-body
-              if data.type !== 'resolved'
-                if !problem.viewed
-                  span.label.label-warning 未读
-                  span &nbsp;&nbsp;
-                if !data.type
-                  if problem.resolved
-                    span.label.label-success 已完成
-                  else
-                    span.label.label-danger 未解决
-                  span &nbsp;&nbsp;
-              div(style='color: #aaa;display: inline')
-                span
-                  if problem.user
-                    a(href=`/u/${problem.user.uid}`)= problem.user.username
-                  else
-                    span 匿名用户
-                span &nbsp;&nbsp;上报于&nbsp;&nbsp;
-                  span= `${fromNow(problem.toc)}`
-                a(href=`/problem/list/${problem._id}` style='text-decoration: none;')
-                  h4= problem.t
-        if data.problems.length === 0
-          h4(style='color: #aaa;') 暂无问题
 block scripts
   script(src=`/mdui/js/mdui.min.js?v=${startTime}`)
   script(src=`/vue/dist/vue.min.js?v=${startTime}`)

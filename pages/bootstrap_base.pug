@@ -77,8 +77,8 @@ block body
     if data.user.newVoteUp > 0
       script!=`sweetAlert("你发表的内容新增了 ${data.user.newVoteUp} 个好评👍！")`
     // 因精选而获得的科创币
-    -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
-    if kcb > 0
+    // -let kcb = data.user.generalSettings.draftFeeSettings.kcb;
+    //-if kcb > 0
       script!=`sweetAlert("你发表的内容被评为精选，共获得 ${kcb/100} 个科创币！")`
 
   if (!state.isApp || state.platform === 'reactNative') && !data.user

@@ -4,7 +4,6 @@ const settingsRouter = require('./settings');
 const homeRouter = require('./home');
 const latestRouter = require('./latest');
 const followerRouter = require('./follower');
-const bannerRouter = require('./banner');
 const visitorRouter = require('./visitor');
 const libraryRouter = require("./library");
 const cardRouter = require("./card");
@@ -118,6 +117,7 @@ router
 		};
 		await db.UsersScoreLogModel.insertLog(obj);
 		obj.type = 'kcb';
+		ctx.state._scoreOperationForumsId = thread.mainForumsId;
 		await db.KcbsRecordModel.insertSystemRecord('postToForum', data.user, ctx);
 		await thread.updateThreadMessage();
 
@@ -513,7 +513,6 @@ router
 	.use("/latest", latestRouter.routes(), latestRouter.allowedMethods())
 	.use('/followers', followerRouter.routes(), followerRouter.allowedMethods())
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
-  .use("/banner", bannerRouter.routes(), bannerRouter.allowedMethods())
   .use("/library", libraryRouter.routes(), libraryRouter.allowedMethods());
 module.exports = router;
 

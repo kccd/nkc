@@ -7,6 +7,8 @@ NKC.modules.SurveyEdit = function() {
       disabled: true,
       deadlineMax: "",
       targetUser: "",
+      targetUserSurveyRewardScore: '',
+      surveyRewardScore: '',
       survey: "",
       newSurvey: "",
       grades: [],
@@ -47,8 +49,10 @@ NKC.modules.SurveyEdit = function() {
       rewardWarning: function() {
         var targetUser = this.targetUser;
         var survey = this.survey;
-        if(targetUser.kcb/100 < survey.reward.onceKcb*survey.reward.rewardCount) {
-          return "你的科创币不足，透支后将不再奖励。"
+        var surveyRewardScore = this.surveyRewardScore;
+        var targetUserSurveyRewardScore = this.targetUserSurveyRewardScore;
+        if(targetUserSurveyRewardScore/100 < survey.reward.onceKcb*survey.reward.rewardCount) {
+          return "你的"+surveyRewardScore.name+"不足，透支后将不再奖励。"
         }
       },
       timeStartDay: function() {
@@ -110,11 +114,14 @@ NKC.modules.SurveyEdit = function() {
           this_.newSurvey.permission.gradesId = arr;
           this_.roles = data.roles;
           this_.targetUser = data.user;
+          this_.surveyRewardScore = data.surveyRewardScore;
+          this_.targetUserSurveyRewardScore = data.targetUserSurveyRewardScore;
         })
     },
     methods: {
       checkNumber: NKC.methods.checkData.checkNumber,
       checkString: NKC.methods.checkData.checkString,
+      getUrl: NKC.methods.tools.getUrl,
       removeUser: function(index) {
         this.survey.permission.uid.splice(index, 1);
       },

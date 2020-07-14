@@ -21,6 +21,18 @@ const kcbsRecordSchema = new Schema({
     default: Date.now,
     index: 1
   },
+  // 积分类型
+  scoreType: {
+    type: String,
+    required: true,
+    index: 1,
+  },
+  // 手续费
+  fee: {
+    type: Number,
+    default: 0,
+    index: 1,
+  },
   // 交易类型
   type: {
     type: String,
@@ -32,6 +44,11 @@ const kcbsRecordSchema = new Schema({
     type: Number,
     required: true,
     index: 1
+  },
+  // 实际付款金额（元，含手续费）
+  payment: {
+    type: Number,
+    default: null,
   },
   // 备注
   description: {
@@ -75,6 +92,12 @@ const kcbsRecordSchema = new Schema({
   ordersId: {
     type: [String]
   },
+  // 涉及的资源的资源id(下载资源操作 attachmentDownload)
+  rid: {
+    type: String,
+    default: '',
+    index: 1
+  },
   shareToken: {
     type: String,
     default: "",
@@ -99,11 +122,7 @@ const kcbsRecordSchema = new Schema({
   *  alipayName: String,
   *  alipayFee: Number,
   *  alipayInterface: Boolean  // 调用阿里接口是否成功 null: 未知，false: 失败， true: 成功
-  *
   * }
-  *
-  *
-  *
   * */
 }, {
   collection: 'kcbsRecords',
@@ -121,8 +140,136 @@ kcbsRecordSchema.virtual('fromUser')
     this._fromUser = p;
   });
 
-// 与银行间的交易记录
+/*
+* 执行操作后的加减积分，根据settings中的score判断
+* @param {String} type 操作类型
+* @param {Object} u 目标用户
+* @param {Object} ctx koa上下文
+* @param {Number} additionalReward 额外扣除的kcb, 不适用于积分系统，暂时无用
+* @author pengxiguaa 2020/6/30
+* */
 kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalReward) => {
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const redLock = require('../nkcModules/redLock');
+  const lock = await redLock.lock('kcbsRecord', 6000);
+  try{
+    await KcbsRecordModel.insertSystemRecordContent(type, u, ctx, additionalReward);
+    await lock.unlock();
+  } catch(err) {
+    await lock.unlock();
+    throw err;
+  }
+};
+kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additionalReward) => {
+  const SettingModel = mongoose.model('settings');
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const UserModel = mongoose.model('users');
+  const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const {address: ip, port, data, state = {}} = ctx;
+  if(!u) return;
+  let operations = await SettingModel.getScoreOperationsByType(type, state._scoreOperationForumsId); // 专业ID待传
+  if(!operations.length) return;
+  const enabledScores = await SettingModel.getEnabledScores();
+  const scores = {};
+  // 获取当天此人当前操作执行的次数
+  const operationLogCount = await ScoreOperationLogModel.getOperationLogCount(u, type);
+  operations = operations.filter(o => o.count === -1 || o.count > operationLogCount);
+  if(!operations.length) return;
+  for(const o of operations) {
+    for(const e of enabledScores) {
+      const scoreType = e.type;
+      const oldScoreNumber = scores[scoreType];
+      const newScoreNumber = o[scoreType];
+      if(newScoreNumber === undefined) continue;
+      if(
+        oldScoreNumber === undefined ||
+        oldScoreNumber < newScoreNumber
+      ) {
+        scores[scoreType] = newScoreNumber;
+      }
+    }
+  }
+  let recordsId = [];
+  for(const enabledScore of enabledScores) {
+    const scoreType = enabledScore.type;
+    const number = scores[scoreType];
+    if(number === undefined) continue;
+    if(number === 0) continue;
+    let from, to;
+    let num = Math.abs(number);
+    if(number > 0) {
+      // 加分
+      from = 'bank';
+      to = u.uid;
+    } else {
+      // 减分
+      from = u.uid;
+      to = 'bank';
+    }
+    const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
+    const newRecords = KcbsRecordModel({
+      _id: kcbsRecordId,
+      from,
+      to,
+      num,
+      scoreType,
+      type,
+      ip,
+      port,
+    });
+    if(data.targetUser && data.user) {
+      if(data.user !== u) {
+        newRecords.tUid = data.user.uid;
+      } else {
+        newRecords.tUid = data.targetUser.uid;
+      }
+    }
+    let thread, post;
+    if(data.thread) {
+      thread = data.thread;
+    } else if (data.targetThread) {
+      thread = data.targetThread;
+    }
+    if(data.post) {
+      post = data.post;
+    } else if (data.targetPost) {
+      post = data.targetPost;
+    }
+    if(thread) {
+      newRecords.tid = thread.tid;
+      newRecords.fid = thread.fid;
+    }
+    if(post) {
+      newRecords.pid = post.pid;
+      newRecords.fid = post.fid;
+      newRecords.tid = post.tid;
+    }
+    // 操作涉及到的资源的资源id
+    if(data.rid) {
+      newRecords.rid = data.rid;
+    }
+    if(data.problem) newRecords.problemId = data.problem._id;
+    await newRecords.save();
+    recordsId.push(kcbsRecordId);
+  }
+  // 已创建积分账单记录
+  if(recordsId.length) {
+    const scoreOperationLog = ScoreOperationLogModel({
+      _id: await SettingModel.operateSystemID('scoreOperationLogs', 1),
+      uid: u.uid,
+      type,
+      ip,
+      port,
+      recordsId
+    });
+    await scoreOperationLog.save();
+    await UserModel.updateUserScores(u.uid);
+  }
+};
+
+/*// 与银行间的交易记录
+kcbsRecordSchema.statics.insertSystemRecord_old = async (type, u, ctx, additionalReward) => {
   additionalReward = additionalReward || 0;
   const UserModel = mongoose.model("users");
   const {nkcModules, address, port, data, db} = ctx;
@@ -203,7 +350,7 @@ kcbsRecordSchema.statics.insertSystemRecord = async (type, u, ctx, additionalRew
   // 写入交易记录，紧接着更新用户的kcb数据
   await newRecords.save();
   u.kcb = await UserModel.updateUserKcb(u.uid);
-};
+};*/
 
 // 用户间转账记录
 kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
@@ -215,8 +362,10 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
   } = options;
   if(fromUser.uid === toUser.uid) throwErr(400, "无法对自己执行此操作");
   const _id = await SettingModel.operateSystemID('kcbsRecords', 1);
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const record = KcbsRecordModel({
     _id,
+    scoreType: creditScore.type,
     from: fromUser.uid,
     to: toUser.uid,
     num,
@@ -227,8 +376,10 @@ kcbsRecordSchema.statics.insertUsersRecord = async (options) => {
     type: 'creditKcb'
   });
   await record.save();
-  fromUser.kcb = await UserModel.updateUserKcb(fromUser.uid);
-  toUser.kcb = await UserModel.updateUserKcb(toUser.uid);
+  await UserModel.updateUserScores(fromUser.uid);
+  await UserModel.updateUserScores(toUser.uid);
+  // fromUser.kcb = await UserModel.updateUserKcb(fromUser.uid);
+  // toUser.kcb = await UserModel.updateUserKcb(toUser.uid);
 };
 
 
@@ -238,6 +389,12 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
   const PostModel = mongoose.model('posts');
   const ForumModel = mongoose.model('forums');
   const KcbsTypeModel = mongoose.model('kcbsTypes');
+  const SettingModel = mongoose.model('settings');
+  const scoreTypes = await SettingModel.getScores();
+  const scoreTypesObj = {};
+  scoreTypes.map(s => {
+    scoreTypesObj[s.type] = s.name;
+  });
   const uid = new Set(), pid = new Set(), tid = new Set(), fid = new Set(), kcbsTypesId = new Set();
   for(const r of records) {
     if(r.from !== 'bank') {
@@ -289,12 +446,13 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     if(r.pid) {
       r.post = postsObj[r.pid];
     }
+    r.scoreName = scoreTypesObj[r.scoreType];
     r.kcbsType = typesObj[r.type];
     return r
   });
 };
 
-/* 
+/*
   获取支付宝链接，去充值或付款。付款时需传递参数options.type = 'pay'
   @param options
     uid: 充值用户、付款用户
@@ -305,10 +463,10 @@ kcbsRecordSchema.statics.extendKcbsRecords = async (records) => {
     notes: 账单说明，例如：充值23个科创币
     backParams: 携带的参数，会原样返回
   @return url: 返回链接
-  @author pengxiguaa 2019/3/13  
+  @author pengxiguaa 2019/3/13
 */
 kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
-  let {uid, money, ip, port, title, notes, backParams} = options;
+  let {uid, money, ip, port, title, notes, backParams, score, fee} = options;
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const SettingModel = mongoose.model('settings');
   money = Number(money);
@@ -316,13 +474,17 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   else {
     throwErr(400, '金额必须大于0');
   }
+  const mainScore = await SettingModel.getMainScore();
   const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
   const record = KcbsRecordModel({
     _id: kcbsRecordId,
+    scoreType: mainScore.type,
     from: 'bank',
     to: uid,
     type: 'recharge',
-    num: money,
+    fee,
+    num: score,
+    payment: money,
     ip,
     port,
     verify: false,
@@ -330,7 +492,7 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   });
   await record.save();
   const o = {
-    money: money/100,
+    money,
     id: kcbsRecordId,
     title,
     notes,

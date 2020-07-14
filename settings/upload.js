@@ -56,8 +56,7 @@ for(const key in paths) {
 
 function extGetPath(ext) {
   var originPath = "tmp/temporary.";
-  var finalPath = path.resolve(originPath + ext);
-  return finalPath;
+  return path.resolve(originPath + ext);
 }
 
 function initFolders() {
@@ -71,32 +70,6 @@ function initFolders() {
     }
   }
 }
-
-/*const uploadDir = path.resolve('tmp');
-const uploadPath = path.resolve('resources/upload');
-const coverPath = path.join(__dirname, '../resources/cover');
-const pfBannerPath = path.resolve('resources/pf_banners');
-const pfAvatarPath = path.resolve('resources/pf_avatars');
-const avatarPath = path.resolve('resources/newavatar');
-const avatarSmallPath = path.resolve('resources/newavatar_small');
-const posterPath = path.resolve('resources/poster');
-const posterSmallPath = path.resolve('resources/poster_small');
-const thumbnailPath = path.resolve('resources/thumbnails');
-const adPath = path.resolve('resources/ad_posts');
-const siteSpecificPath = path.resolve('resources/site_specific');
-const qrCodePath = path.resolve('resources/qr');
-const photoPath = path.resolve('resources/photo');
-const photoSmallPath = path.resolve('resources/photo_small');
-const fundBannerPath = path.resolve('resources/fundBanner');
-const fundLogoPath = path.resolve('resources/fundLogo');
-const webLogoPath = path.resolve('resources/logo');
-const userBannerPath = path.resolve('resources/user_banners');
-const messageFilePath = path.resolve('resources/message');
-const messageImageSMPath = path.resolve('resources/message/sm');
-const frameImgPath = path.resolve('resources/frameImage');
-const androidSavePath = path.resolve('resources/app/android');
-const iosSavePath = path.resolve('resources/app/ios');
-const friendImagePath = path.resolve('resource/friend_image');*/
 
 function generateFolderName(basePath) {
   const moment = require('moment');
@@ -178,29 +151,6 @@ const uploadSettings = {
 	count: {
   	lifePhoto: 1000 //生活照最多1000张
 	},
-  /*coverPath,
-  uploadPath,
-  pfBannerPath,
-  pfAvatarPath,
-  avatarPath,
-  avatarSmallPath,
-  posterPath,
-  posterSmallPath,
-  thumbnailPath,
-  adPath,
-  photoPath,
-  siteSpecificPath,
-  qrCodePath,
-	photoSmallPath,
-	fundBannerPath,
-  messageFilePath,
-	fundLogoPath,
-	webLogoPath,
-	userBannerPath,
-  messageImageSMPath,
-  frameImgPath,
-  iosSavePath,
-  androidSavePath,*/
   avatarSize: 192,
 	forumAvatarSize: 96,
   avatarSmallSize: 48,

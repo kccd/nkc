@@ -2,7 +2,7 @@ extends ../nkc
 block nkcTitle
   title 主页设置 - 前台管理
 block nkcContent
-  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, goods: data.goods, toppedThreads: data.toppedThreads})
+  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads})
   .col-xs-12.col-md-12.box-shadow-panel.management-home#app(v-cloak)
     div
       .management-header 首页推荐
@@ -71,10 +71,9 @@ block nkcContent
               .fa.fa-angle-right(title="右移" @click="moveForum(recommendForums, f, 'right')")
               .fa.fa-trash(title="删除" @click="removeForum(recommendForums, index)")
             .home-top-forum-info
-              .home-top-forum-icon(v-if="!f.iconFileName" :style="'background-color: '+f.color")
-              img.home-top-forum-icon(v-else :src="getUrl('forumAvatar', f.fid)")
+              .home-top-forum-icon(v-if="!f.logo" :style="'background-color: '+f.color")
+              img.home-top-forum-icon(v-else :src="getUrl('forumAvatar', f.logo)")
               a.pointer(@click="visitUrl('/f/' + f.fid, true)").home-top-forum-name {{f.displayName}}
-
         .m-t-1
           button.management-button(@click="saveRecommendForums") 保存
     div.m-t-2
@@ -93,6 +92,14 @@ block nkcContent
           button.management-button(@click="saveColumns") 保存
     div.m-t-2
       .management-header 首页热销商品
+      .radio
+        span 是否显示：
+        label.m-r-1
+          input(type="radio" value="t" v-model.boolean="showShopGoods")
+          span 是
+        label.m-r-1
+          input(type="radio" value="" v-model.boolean="showShopGoods")
+          span 否
       .home-top-goods
         .home-top-goods-body(v-for="g, index in goods")
           .home-goods-buttons

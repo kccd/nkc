@@ -19,7 +19,7 @@ block content
                   .form-group
                     label.control-label.col-sm-2 头像
                     h5.col-xs-10
-                      img(src=`/avatar/${data.targetUser.avatar}?t=sm`)
+                      img(src=tools.getUrl('userAvatar', data.targetUser.avatar, 'sm'))
 
                     label.control-label.col-sm-2 用户名
                     h5.col-xs-10

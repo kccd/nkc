@@ -133,11 +133,6 @@ module.exports = {
 			PATCH: 'modifyWebBase'
 		},
 		home: {
-			logo: {
-				GET: 'visitHomeLogoSettings',
-				PATCH: 'modifyHomeLogoSettings',
-				DELETE: 'deleteHomeLogo'
-			},
 			top: {
 				GET: 'visitHomeTopSettings',
 				PATCH: 'modifyHomeTopSettings'
@@ -149,7 +144,10 @@ module.exports = {
       },
       list: {
         GET: 'visitHomeListSettings',
-        PATCH: 'modifyHomeListSettings'
+				PATCH: 'modifyHomeListSettings',
+				biglogo: {
+					POST: 'uploadHomeBigLogo'
+				}
       }
 		},
 		app:{
@@ -186,6 +184,13 @@ module.exports = {
 				PATCH: 'modifyEUserInfo'
 			}
 		},
+		userScores: {
+			GET: 'getUserAllScores'
+		},
+		sensitive: {
+			GET: 'visitUserSensitiveInfo',
+			PATCH: 'modifyUserSensitiveInfo'
+		},
 		forum: {
 			GET: 'visitEForumSettings',
 			PATCH: 'modifyEForumSettings'
@@ -193,16 +198,10 @@ module.exports = {
 		grade: {
 			GET: 'visitUsersGradeSettings',
 			PATCH: 'modifyUsersGradeSettings',
-			// POST: 'addUsersGrade',
-			/*PARAMETER: {
-				GET: 'visitUsersGradeSettings',
-				PATCH: 'modifyUsersGradeSettings',
-				DELETE: 'deleteUsersGrade'
-			}*/
 		},
-		number: {
-			GET: 'visitNumberSettings',
-			PATCH: 'modifyNumberSettings'
+		score: {
+			GET: 'experimentalScoreSettings',
+			PATCH: 'experimentalScoreSettings'
 		},
 		kcb: {
 			GET: 'visitKcbSettings',
@@ -279,6 +278,10 @@ module.exports = {
 		  GET: 'visitERedEnvelope',
       PATCH: 'modifyEPostSettings'
     },
+		recharge: {
+			GET: 'experimentalRechargeSettings',
+			PATCH: 'experimentalRechargeSettings',
+		}
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',

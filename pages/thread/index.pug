@@ -209,7 +209,7 @@ block title
             span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
             span.TPCIA
               a(href=`${profile}` style='text-decoration: none;')
-                img.TPCIAI(src=`/avatar/${c.fromUser.avatar}?t=sm`)
+                img.TPCIAI(src=tools.getUrl('userAvatar', c.fromUser.avatar, 'sm'))
                 span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
             span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
             span.TPCReason #{c.description}
@@ -359,7 +359,7 @@ block content
                         .thread-info.text-center(style="margin-top:1.5rem")
                           if !thread.firstPost.anonymous
                             a(href=`/u/${thread.uid}` data-float-uid=thread.uid)
-                              img(src=`/avatar/${thread.firstPost.user.avatar}?t=sm` style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
+                              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                               span= ` ${thread.firstPost.user.username}`
                           else
                             img(src=anonymousInfo.avatar style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
@@ -379,7 +379,8 @@ block content
                           else
                             for forum, index in thread.forums
                               if index > 0
-                                span ,&nbsp;
+                                //-span ,&nbsp;
+                                span(style='color: #333;') ，
                               a(href=`/f/${forum.fid}` data-float-fid=forum.fid)=forum.displayName
                         if (post.abstractCn.length !== 0 || post.abstractEn.length !== 0) && data.thread.type !== "product"
                           .abstract(style="margin-top:1rem; word-break: break-all;")

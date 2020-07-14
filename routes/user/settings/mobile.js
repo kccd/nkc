@@ -46,7 +46,7 @@ mobileRouter
 		}
 		await smsCodeOld.update({used: true});
 		await smsCode.update({used: true});
-		await userPersonal.update({nationCode, mobile});
+		await userPersonal.update({nationCode, mobile, unverifiedMobile: ''});
 		await db.SecretBehaviorModel({
 			type: "modifyMobile",
 			uid: user.uid,
@@ -77,7 +77,7 @@ mobileRouter
 		await smsCode.update({used: true});
 		await db.SettingModel.checkMobile(nationCode, mobile, user.uid);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		await userPersonal.update({nationCode, mobile});
+		await userPersonal.update({nationCode, mobile, unverifiedMobile: ''});
 		await db.SecretBehaviorModel({
 			type: "bindMobile",
 			uid: user.uid,

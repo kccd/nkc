@@ -43,9 +43,9 @@ block content
                     li
                       a(onclick=` clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
             .user-banner-mask
-            a(href=`/avatar/${data.targetUser.avatar}?t=lg` target="_blank").user-avatar
-              img(src=`/avatar/${data.targetUser.avatar}`)
-            .user-banner(style=`background-image: url(/banner/${data.targetUser.banner});`)
+            a(href=tools.getUrl('userAvatar', data.targetUser.avatar, 'lg') target="_blank").user-avatar
+              img(src=tools.getUrl('userAvatar', data.targetUser.avatar))
+            .user-banner(style=`background-image: url(${tools.getUrl('userBanner', data.targetUser.banner)});`)
           .user-name=data.targetUser.username || data.targetUser.uid
           if data.targetUser.destroyed
             .user-destroyed 用户已注销
@@ -75,16 +75,16 @@ block content
                   a(onclick="Login.open()") 关注
                   a(onclick="Login.open()") 加黑
           .user-number
-            .col-xs-3
+            .col-xs-4
               .number=data.targetUser.threadCount - data.targetUser.disabledThreadsCount
               .title 文章
-            .col-xs-3
+            .col-xs-4
               .number=data.targetUser.postCount - data.targetUser.disabledPostsCount
               .title 回复
-            .col-xs-3
+            .col-xs-4
               .number=data.targetUser.xsf
               .title 学术分
-            .col-xs-3(title=`科创币：${data.targetUser.kcb/100}`)
+            //-.col-xs-3(title=`科创币：${data.targetUser.kcb/100}`)
               .number=data.targetUser.kcb/100
               .title 科创币
           .user-description!=markdown_safe(data.targetUser.description || "")
@@ -94,7 +94,7 @@ block content
             .panel-header 专栏
             .column-container
               .column-avatar
-                img(src=`/column/avatar/${data.targetUser.column.avatar}`)
+                img(src=tools.getUrl('columnAvatar', data.targetUser.column.avatar))
               .column-info
                 a(href=`/m/${data.targetUser.column._id}` target="_blank").column-name=data.targetUser.column.name
                 .column-description=data.targetUser.column.abbr

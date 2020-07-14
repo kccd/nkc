@@ -63,7 +63,7 @@ emailRegisterSchema.statics.ensureSendPermission = async (email) => {
 	const {sendEmailCount} = require('../settings/sendMessage');
 	const emails = await EmailRegisterModel.find({email, toc: {$gt: (Date.now() - 24*60*60*1000)}});
 	if(emails.length >= sendEmailCount) {
-		const err = new Error('24小时内发送给同一邮箱的邮件不能超过5封。');
+		const err = new Error(`24小时内发送给同一邮箱的邮件不能超过${sendEmailCount}封。`);
 		err.status = 400;
 		throw err;
 	}

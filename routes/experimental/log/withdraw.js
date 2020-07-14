@@ -29,6 +29,7 @@ router
     const paging = nkcModules.apiFunction.paging(page, count);
     const records = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.records = await db.KcbsRecordModel.extendKcbsRecords(records);
+    data.mainScore = await db.SettingModel.getMainScore();
     ctx.template = "experimental/log/withdraw.pug";
     data.t = t;
     data.content = content;

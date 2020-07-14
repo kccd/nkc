@@ -12,6 +12,8 @@ router
     const order = await db.ShopOrdersModel.findById(orderId);
     let orders = await db.ShopOrdersModel.userExtendOrdersInfo([order]);
     orders = await db.ShopOrdersModel.translateOrderStatus(orders);
+    data.mainScore = await db.SettingModel.getMainScore();
+    data.userMainScore = await db.UserModel.getUserScore(data.user.uid, data.mainScore.type);
     const {sellUid, buyUid} = order;
     if(sellUid !== data.user.uid) ctx.throw(400, "您不是订单中商品的卖家，无权取消订单");
     if(order.closeStatus) ctx.throw(400, "订单已被关闭，无需取消订单");
@@ -31,9 +33,12 @@ router
     const {orderId, reason, password} = body;
     let money = body.money * 100;
     money = Number(money.toFixed(0));
-    if(money%1 !== 0) ctx.throw(400, "科创币仅支持小数点后两位");
-    user.kcb = await db.UserModel.updateUserKcb(user.uid);
-    if(user.kcb < money) ctx.throw(400, "您的科创币不足");
+    const mainScore = await db.SettingModel.getMainScore();
+    if(money%1 !== 0) ctx.throw(400, `${mainScore.name}仅支持小数点后两位`);
+    // user.kcb = await db.UserModel.updateUserKcb(user.uid);
+    await db.UserModel.updateUserScores(user.uid);
+    const userMainScore = await db.UserModel.getUserScore(user.uid, mainScore.type);
+    if(userMainScore < money) ctx.throw(400, `你的${mainScore.name}不足`);
     const order = await db.ShopOrdersModel.findById(orderId);
     if(order.orderStatus === "unShip") {
       const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});

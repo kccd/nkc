@@ -4,17 +4,17 @@ mixin item(record)
       .time= format("YYYY-MM-DD HH:mm:ss", record.toc)
       .id= `交易ID：${record._id}`
       .type= `交易类型：${lang('kcbsTypes', record.type)}`
-
+      .type= `积分类型：${record.scoreName}`
       .target
         span 交易对象：
         if record.to === data.targetUser.uid
           if !record.fromUser
-            span 科创人民很行
+            span=data.nkcBankName
           else
             a(href=`/u/${record.from}` target="_blank")= record.fromUser.username
         else
           if !record.toUser
-            span 科创人民很行
+            span=data.nkcBankName
           else
             a(href=`/u/${record.to}` target="_blank")= record.toUser.username
       .description= `其他说明：${record.description || '无'}`
@@ -31,14 +31,9 @@ mixin item(record)
 
 
 div
-  h4 我的资产
-    small.p-l-1.text-success 科创币&nbsp;
-      strong.h4.text-danger= data.targetUser.kcb / 100
-      | &nbsp;个
-    .display-i-b.p-l-1
-      a.btn.btn-success.btn-sm(href="/account/finance/recharge") 充值
-      span &nbsp;
-      a.btn.btn-default.btn-sm(href="/account/finance/withdraw") 提现
+  -const targetUserScores = data.targetUserScores;
+  -const showRechargeButton = true;
+  include ../../account/finance/nav
   .ul.nav.nav-tabs
     li(role='presentation' class=data.t === 'all' ? 'active' : '')
       a(href=`/u/${data.targetUser.uid}/profile/finance?t=all` data-type="reload") 所有
@@ -62,6 +57,7 @@ div
               tr
                 th 时间
                 th 账单ID
+                th 积分名
                 th 类型
                 th 说明
                 th
@@ -76,6 +72,7 @@ div
                 tr
                   th= format("YYYY-MM-DD HH:mm:ss", record.toc)
                   th= record._id
+                  th=record.scoreName
                   th= lang('kcbsTypes', record.type)
                   th
                     .table-content(title=record.description)= record.description
@@ -86,7 +83,7 @@ div
                     else
                       -targetUser = record.toUser
                     if !targetUser
-                      span 科创人民很行
+                      span=data.nkcBankName
                     else
                       span= targetUser.username
                   th= record.num / 100
@@ -105,6 +102,7 @@ div
               tr
                 th 时间
                 th 账单ID
+                th 积分名
                 th 类型
                 th 说明
                 th 交易对象
@@ -116,18 +114,19 @@ div
                 tr
                   th= format("YYYY-MM-DD HH:mm:ss", record.toc)
                   th= record._id
+                  th=record.scoreName
                   th= lang('kcbsTypes', record.type)
                   th
                     .table-content(title=record.description)= record.description
                   th
                     if record.to === data.targetUser.uid
                       if !record.fromUser
-                        span 科创人民很行
+                        span=data.nkcBankName
                       else
                         a(href=`/u/${record.from}` target="_blank")= record.fromUser.username
                     else
                       if !record.toUser
-                        sapn 科创人民很行
+                        sapn=data.nkcBankName
                       else
                         a(href=`/u/${record.to}` target="_blank")= record.toUser.username
                   th

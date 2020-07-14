@@ -1,39 +1,168 @@
 extends ../../experimental
 block eTitle
   title 上传设置
+  +includeCSS('/experimental/settings/upload/upload.css')
 block eContent
   .container-fluid.max-width
-    #data.hidden=objToStr({roleOptions: data.roleOptions, gradeOptions: data.gradeOptions})
+    #data.hidden=objToStr({uploadSettings: data.uploadSettings, certList: data.certList})
     .row#app(v-cloak)
-      .col-xs-12.col-md-12.table-responsive
-        table.table.table-striped
-          thead
-            tr
-              th 证书
-              th 每天上传文件个数
-              th 禁止的文件格式（英文逗号分隔）
-          tbody 
-            tr(v-for="o in roleOptions")
-              th {{o.name}}
-              th 
-                input(type="text" v-model.number="o.fileCountOneDay")
-              th
-                input.form-control(v-model.number="o.blackExtensions" type="text")
-        h4 用户等级（普通会员）        
-        table.table.table-striped
-          thead
-            tr
-              th 证书
-              th 每天上传文件个数
-              th 禁止的文件格式（英文逗号分隔）
-          tbody 
-            tr(v-for="o in gradeOptions")
-              th {{o.name}}
-              th 
-                input(type="text" v-model.number="o.fileCountOneDay")
-              th
-                input.form-control(v-model.number="o.blackExtensions" type="text")
-        .m-t-1
-          button.btn.btn-primary(@click="submit") 保存
+      .col-xs-12.col-md-12
+        h4 水印设置
+        .form.form-horizontal.m-b-4
+          .form-group
+            label.col-sm-2.control-label 状态
+            .col-sm-10
+              .radio
+                label.m-r-1
+                  input(type='radio' :value='true' v-model="us.watermark.enabled")
+                  span 开启
+                label
+                  input(type='radio' :value='false' v-model="us.watermark.enabled")
+                  span 关闭
+          .form-group
+            label.col-sm-2.control-label 尺寸限制
+            .col-sm-4
+              h5 仅给尺寸满足以下条件的图片添加水印
+              .form-inline.m-b-1
+                span 最小宽度：
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.minWidth")
+                span &nbsp;px
+              .form-inline
+                span 最小高度：
+                input.form-control.form-inline(type='text' v-model.number="us.watermark.minHeight")
+                span &nbsp;px
+          .form-group
+            label.col-sm-2.control-label 透明度
+            .col-sm-5
+              h5 {{us.watermark.transparency}}%
+              input(type="range" min="0" max="100" v-model.number="us.watermark.transparency")
+          .form-group
+            label.col-sm-2.control-label 图片
+            .col-sm-3
+              h5 正常
+              .us.watermark.m-r-05
+                div(:style="'opacity:' +  (1 - (us.watermark.transparency / 100))")
+                  img(:src="normalWatermarkData" v-if="normalWatermarkData")
+                  img(src=tools.getUrl('defaultFile', 'watermark_normal.png') v-else-if="!us.watermark.normalAttachId")
+                  img(:src="getUrl('attach', us.watermark.normalAttachId)" v-else)
+              .p-t-05.m-b-05
+                input(type='file' accept="image/*" ref='normalWatermarkInput' @change='selectedWatermark("normal")').m-b-05
+            .col-sm-3
+              h5 小
+              .us.watermark.m-r-05
+                div(:style="'opacity:' +  (1 - (us.watermark.transparency / 100))")
+                  img(:src="smallWatermarkData" v-if="smallWatermarkData")
+                  img(src=tools.getUrl('defaultFile', 'watermark_small.png') v-else-if="!us.watermark.smallAttachId")
+                  img(:src="getUrl('attach', us.watermark.smallAttachId)" v-else)
+              .p-t-05.m-b-05
+                input(type='file' accept="image/*" ref='smallWatermarkInput' @change='selectedWatermark("small")').m-b-05
+          .form-group
+            label.col-sm-2.control-label=`去水印花费积分（${data.watermarkScore.name}/${data.watermarkScore.unit}）`
+            .col-sm-10.form-inline
+              input.form-control(type='text' v-model.number="us.watermark.buyNoWatermark")
+        h4 文件设置
+        .form.form-horizontal
+          .form-group.m-b-2
+            label.col-sm-2.control-label 文件尺寸
+            .col-sm-4
+              table.table.table-bordered.m-b-05
+                thead
+                  tr
+                    th 格式
+                    th 尺寸（KB）
+                    th 其他
+                tbody
+                  tr(v-for='s, index in us.sizeLimit.others')
+                    th
+                      input.form-control(type='text' v-model.trim='s.ext')
+                    th
+                      input.form-control(type='text' v-model.number='s.size')
+                    th
+                      button.btn.btn-xs.btn-default(@click="removeFromArr(us.sizeLimit.others, index)") 删除
+                  tr
+                    th
+                      input.form-control(type='text' value='其他' disabled)
+                    th
+                      input.form-control(type='text' v-model.number='us.sizeLimit.default')
+                    th
+              button.btn.btn-default.btn-sm(@click="addSizeLimit") 添加
+          .form-group.m-b-2
+            label.col-sm-2.control-label 文件数量
+            .col-sm-4
+              table.table.table-bordered.m-b-05
+                thead
+                  tr
+                    th 分组
+                    th 数量/每天
+                    th 其他
+                tbody
+                  tr(v-for='s, index in us.countLimit.others')
+                    th
+                      select.form-control(v-model='s.type')
+                        option(v-for="c in certList" :value="c.type") {{c.name}}
+                    th
+                      input.form-control(type='text' v-model.number='s.count')
+                    th
+                      button.btn.btn-xs.btn-default(@click="removeFromArr(us.countLimit.others, index)") 删除
+                  tr
+                    th
+                      select.form-control(disabled)
+                        option 其他
+                    th
+                      input.form-control(type='text' v-model='us.countLimit.default')
+                    th
+              button.btn.btn-default.btn-sm(@click="addCountLimit()") 添加
+          .form-group.m-b-2
+            label.col-sm-2.control-label 文件格式
+            .col-sm-8
+              table.table.table-bordered.m-b-05
+                thead
+                  tr
+                    th 分组
+                    th 白名单
+                    th 黑名单
+                    th 启用
+                    th 其他
+                tbody
+                  tr(v-for='s, index in us.extensionLimit.others')
+                    th
+                      select.form-control(v-model='s.type')
+                        option(v-for="c in certList" :value="c.type") {{c.name}}
+                    th
+                      textarea.form-control(v-model='s._whitelist' placeholder='英文逗号分隔')
+                    th
+                      textarea.form-control(v-model='s._blacklist' placeholder='英文逗号分隔')
+                    th
+                      .radio
+                        label.m-r-1
+                          input(type='radio' value="whitelist" v-model='s.using')
+                          span 白名单
+                        label
+                          input(type='radio' value="blacklist" v-model='s.using')
+                          span 黑名单
+                    th
+                      button.btn.btn-xs.btn-default(@click="removeFromArr(us.extensionLimit.others, index)") 删除
+                  tr
+                    th
+                      select.form-control(disabled)
+                        option 其他
+                    th
+                      textarea.form-control(v-model='us.extensionLimit._defaultWhitelist' placeholder='英文逗号分隔')
+                    th
+                      textarea.form-control(v-model='us.extensionLimit._defaultBlacklist' placeholder='英文逗号分隔')
+                    th
+                      .radio
+                        label.m-r-1
+                          input(type='radio' value="whitelist" v-model='us.extensionLimit.using')
+                          span 白名单
+                        label
+                          input(type='radio' value="blacklist" v-model='us.extensionLimit.using')
+                          span 黑名单
+                    th
+
+              button.btn.btn-default.btn-sm(@click="addExtensionLimit()") 添加
+              .m-t-5
+                button.btn.btn-primary.btn-block(@click="submit") 保存
+
 block scripts
-  +includeJS("/experimental/settings/upload/upload.js")        
+  +includeJS("/experimental/settings/upload/upload.js")

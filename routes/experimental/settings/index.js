@@ -13,7 +13,6 @@ const kcbRouter = require('./kcb');
 const logRouter = require('./log');
 const threadRouter = require("./thread");
 const usernameRouter = require("./username");
-const numberRouter = require('./number');
 const homeRouter = require('./home');
 const appRouter = require('./app');
 const pageRouter = require('./page');
@@ -41,6 +40,9 @@ const transferRouter = require("./transfer");
 const libraryRouter = require("./library");
 const stickerRouter = require("./sticker");
 const editorRouter = require("./editor");
+const rechargeRouter = require('./recharge');
+const userSensitiveRouter = require("./userSensitive");
+const userScoresRouter = require("./userScores");
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -61,7 +63,6 @@ settingRouter
 	.use('/home', homeRouter.routes(), homeRouter.allowedMethods())
 	.use('/app', appRouter.routes(), appRouter.allowedMethods())
 	.use('/page', pageRouter.routes(), pageRouter.allowedMethods())
-	.use('/number', numberRouter.routes(), numberRouter.allowedMethods())
 	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
 	.use('/kcb', kcbRouter.routes(), kcbRouter.allowedMethods())
 	.use('/grade', gradeRouter.routes(), gradeRouter.allowedMethods())
@@ -88,5 +89,8 @@ settingRouter
 	.use("/thread", threadRouter.routes(), threadRouter.allowedMethods())
 	.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
 	.use("/editor", editorRouter.routes(), editorRouter.allowedMethods())
-  .use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
+	.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods())
+	.use('/recharge', rechargeRouter.routes(), rechargeRouter.allowedMethods())
+	.use('/sensitive', userSensitiveRouter.routes(), userSensitiveRouter.allowedMethods())
+	.use('/userScores', userScoresRouter.routes(), userScoresRouter.allowedMethods());
 module.exports = settingRouter;

@@ -1,14 +1,20 @@
 var Tools = function() {
   var self = this;
   self.getUrl = function(type, id, size) {
-    var t = "";
-    if(size) t = "?t=" + size;
+    if(['', undefined, null].includes(id)) {
+      id = 'default';
+    }
+    var t = "?c=" + type;
+    if(size) t += "&t=" + size;
     switch(type) {
       case "userAvatar": {
-        return "/avatar/" + id + t
+        return "/a/" + id + t
       }
       case "userBanner": {
-        return "/banner/"+ id + t
+        return "/a/"+ id + t
+      }
+      case "scoreIcon": {
+        return "/a/" + id + t
       }
       case "postCover": {
         return "/nr/cover/" + id + t
@@ -26,13 +32,19 @@ var Tools = function() {
         return "/statics/grade_icon/v" + id + "l.png";
       }
       case "forumAvatar": {
-        return "/forum_avatar/" + id;
+        return "/a/" + id + t;
+      }
+      case "forumBanner": {
+        return "/a/" + id + t
       }
       case "columnAvatar": {
-        return "/column/avatar/" + id + t
+        return "/a/" + id + t
+      }
+      case "columnBanner": {
+        return "/a/" + id + t
       }
       case "pdf": {
-        return "/reader/pdf/web/viewer?file=%2fr%2f" + id
+        return "/r/" + id + '?c=nkc_source_pdf';
       }
       case "sticker": {
         return "/sticker/" + id;
@@ -49,8 +61,13 @@ var Tools = function() {
         }
         return "/p/" + id;
       }
+      // 用户上传的附件
       case "resource": {
         return "/r/" + id
+      }
+      // 其他资源，包含avatar, banner等等
+      case "attach": {
+        return "/a/" + id
       }
       case "videoCover": {
         return "/frameImg/" + id
@@ -66,6 +83,12 @@ var Tools = function() {
       }
       case "messageUserDetail": {
         return "/u/" + id + "?from=message"
+      }
+      case 'siteFile': {
+        return "/statics/site/" + id;
+      }
+      case 'defaultFile': {
+        return "/default/" + id;
       }
     }
   };

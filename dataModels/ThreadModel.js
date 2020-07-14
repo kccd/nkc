@@ -773,6 +773,8 @@ threadSchema.statics.extendThreads = async (threads, options) => {
       forumType: 1,
       color: 1,
       parentsId: 1,
+      logo: 1,
+      banner: 1,
       iconFileName: 1
     });
     /* forums.map(forum => {
@@ -1435,6 +1437,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
     // 未超时则忽略
     if(!delThreadLog) continue;
     // 将文章移动到回收站
+    const _threadMainForumsId = thread.mainForumsId;
     forumsId = forumsId.concat(thread.mainForumsId);
     await thread.update({
       recycleMark: false,
@@ -1454,6 +1457,9 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
     // 文章被删，触发科创币加减
     if(tUser) {
       await KcbsRecordModel.insertSystemRecord('threadBlocked', tUser, {
+        state: {
+          _scoreOperationForumsId: _threadMainForumsId
+        },
         data: {
           user: {},
           thread
@@ -1470,42 +1476,6 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   }
 };
 
-/**
- * 自动生成封面图
- * @param {Object} ctx 可用工具对象
- * @param {Object} thread 帖子对象
- * @param {Object} post post对象
- */
-threadSchema.statics.autoCoverImage = async (ctx, thread, post) => {
-  const path = require("path");
-  const {fs} = ctx;
-  const {selectDiskCharacterDown} = ctx.settings.mediaPath;
-  const {coverPath, frameImgPath} = ctx.settings.upload;
-  const {coverify} = ctx.tools.imageMagick;
-  await thread.extendFirstPost();
-  await thread.firstPost.extendResources();
-  const cover = thread.firstPost.resources.find(e => ['jpg', 'jpeg', 'bmp', 'png', 'svg', 'mp4'].indexOf(e.ext.toLowerCase()) > -1);
-  if(cover){
-    const middlePath = selectDiskCharacterDown(cover);
-    let coverMiddlePath;
-    if(cover.ext === "mp4"){
-      coverMiddlePath = path.join(path.resolve(frameImgPath), `/${cover.rid}.jpg`);
-    }else{
-      coverMiddlePath = path.join(middlePath, cover.path);
-    }
-    let coverExists = await fs.exists(coverMiddlePath);
-    if(!coverExists){
-      thread.hasCover = false;
-      await thread.save();
-    }else{
-      await coverify(coverMiddlePath, `${coverPath}/${post.tid}.jpg`)
-      .catch(e => {
-        thread.hasCover = false;
-        return thread.save()
-      });
-    }
-  }
-};
 
 /**
  * -------

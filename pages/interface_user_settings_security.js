@@ -133,6 +133,7 @@ function displayChangeDiv() {
   $('#changeBtnDiv').show();
 }
 var data = NKC.methods.getDataById("data");
+
 var app = new Vue({
   el: "#app",
   data: {
@@ -142,7 +143,7 @@ var app = new Vue({
     formType: "", // changeEmail, unbindEmail
 
     oldEmailCode: "",
-    newEmail: "",
+    newEmail: data.unverifiedEmail,
     newEmailCode: '',
 
     newTime: 0,
@@ -259,7 +260,7 @@ var mobileApp = new Vue({
     nationCodes: window.nationCodes,
     mobile: data.mobile,
     formType: !data.mobile? "bind": "",
-    newMobile: "",
+    newMobile: data.unverifiedMobile,
     newNationCode: "86",
     newCode: "",
     oldCode: "",

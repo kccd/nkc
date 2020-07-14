@@ -33,10 +33,10 @@ block content
             textarea.form-control(rows=7 v-model="reason")
           div(v-if="needPassword")
             .form-group
-              h5 请输入补偿金额（科创币：1 - 50）
-              h5=`您当前科创币剩余 `
-                strong.text-danger=data.user.kcb/100
-                span &nbsp;
+              h5=`请输入补偿金额（${data.mainScore.name}：1 - 50）`
+              h5=`你当前${data.mainScore.name}剩余 `
+                strong.text-danger=data.userMainScore/100
+                span=` ${data.mainScore.unit}`
               input.form-control(type="text" v-model.number="money")
             .form-group
               h5 请输入登录密码

@@ -1,0 +1,69 @@
+body{
+  .payment:last-child{
+    border: 1px solid #ccc;
+  }
+}
+.fee-info{
+  font-size: 1rem;
+  color: #444;
+}
+.payment{
+  min-height: 4.4rem;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  padding-right: 4rem;
+  position: relative;
+  &.active{
+    background-color: rgba(43, 144, 217, 0.1);
+  }
+  .icon{
+    position: absolute;
+    top: 0.4rem;
+    left: 1rem;
+    height: 3.6rem;
+    width: 3.6rem;
+    line-height: 3.6rem;
+    text-align: center;
+    overflow: hidden;
+    img{
+      height: 100%;
+      width: 100%;
+    }
+    &.aliPay{
+      img{
+        position: absolute;
+        top: 0;
+        left: -7.2rem;
+        height: 100%;
+        width: auto;
+      }
+    }
+  }
+  .info{
+    padding-left: 6rem;
+    .name{
+      margin-top: 0.3rem;
+      font-size: 1.3rem;
+    }
+    .description{
+
+    }
+  }
+  .selection{
+    position: absolute;
+    cursor: pointer;
+    top:0;
+    right: 0;
+    height: 4.4rem;
+    line-height: 4.4rem;
+    width: 4rem;
+    overflow: hidden;
+    text-align: center;
+    label{
+      width: 100%;
+    }
+    input{
+      position: relative;
+    }
+  }
+}

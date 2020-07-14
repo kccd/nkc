@@ -2,6 +2,7 @@ const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
 const resourceOperations = [
+  "getAttachment",
   "getUserAvatar",
   "getUserBanner",
   "column_single_avatar_get",
@@ -181,6 +182,21 @@ module.exports = async (ctx, next) => {
       data.userGrade,
       data.user
     );
+    const forumsObj = {};
+    ctx.state.forumsTree.map(f => {
+      const {categoryId} = f;
+      if(!forumsObj[categoryId]) forumsObj[categoryId] = [];
+      forumsObj[categoryId].push(f);
+    });
+    ctx.state.forumCategories = await db.ForumCategoryModel.getCategories();
+
+    ctx.state.categoryForums = [];
+    ctx.state.forumCategories.map(fc => {
+      const _fc = Object.assign({}, fc);
+      const {_id} = _fc;
+      _fc.forums = forumsObj[_id] || [];
+      if(_fc.forums.length) ctx.state.categoryForums.push(_fc);
+    });
   }
   // 获取用户的关注
   if(data.user && !isResourcePost) {
@@ -197,7 +213,8 @@ module.exports = async (ctx, next) => {
     ctx.state.subColumnsId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
     ctx.state.columnPermission = await db.UserModel.ensureApplyColumnPermission(data.user);
     ctx.state.userColumn = await db.UserModel.getUserColumn(data.user.uid);
-    
+    ctx.state.userScores = await db.UserModel.getUserScores(data.user.uid);
+
     data.user.roles = userRoles;
     data.user.grade = userGrade;
   }

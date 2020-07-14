@@ -13,7 +13,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         span.icon-bar
         span.icon-bar
         span.icon-bar
-      a.navbar-brand.website-logo(href="/" )= `${state.serverSettings?state.serverSettings.websiteName: '科创论坛'}`
+      a.navbar-brand.website-logo(href="/" )= `${state.serverSettings?state.serverSettings.websiteAbbr: '科创论坛'}`
       form.navbar-search.hidden-lg.hidden-md.hidden-sm.inline-block.form-inline(action='/search' method='GET')
         input.inline-block.form-control(type='text' name='c' placeholder='关键词 文号 用户')
         button.btn.btn-default(type='submit')
@@ -23,7 +23,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         .navbar-brand.userInfo-m
           .userInfo-m-point.message-switch.message-count(class=!messageSum?"disabled":"")=messageSum
           img(
-            src=`/avatar/${data.user.avatar}`
+            src=tools.getUrl('userAvatar', data.user.avatar)
             onclick="toggleNKCDrawer('right')"
           )
       else
@@ -57,7 +57,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
 
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if data.user
-          - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`科创币 ${data.user.kcb/100}\n`+`${data.user.info.certsName}`;
+          - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`${data.user.info.certsName}`;
           li.userInfo
             -let editorHref = "/editor";
             if data.forum
@@ -65,22 +65,19 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             a.new-thread(href=editorHref)
               .fa.fa-pencil-square-o &nbsp;
               | 发表文章
-          li.new-message.message-switch(class=messageSum?"":"hidden") 
-            a(href="/message") 消息  
+          li.new-message.message-switch(class=messageSum?"":"hidden")
+            a(href="/message") 消息
             .nav-user-avatar-count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
-              
-            //.message-switch(class=messageSum?"":"hidden")
-              | 消息
-              span=messageSum?messageSum:""  
+
           li.dropdown.userInfo.nav-user(onmousover="displayOwnInfo()")
             .nav-user-content
               div
                 .nav-user-banner
-                  img(src=`/banner/${data.user.banner}`)
+                  img(src=tools.getUrl('userBanner', data.user.banner))
                 .nav-user-other
                   .nav-user-info
                     .nav-user-avatar
-                      img(src=`/avatar/${data.user.avatar}`)
+                      img(src=tools.getUrl('userAvatar', data.user.avatar))
                     .nav-user-name=data.user.username
                     .nav-user-level
                       span.user-grade(style=`color: ${data.user.grade.color};`)
@@ -88,12 +85,9 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                         img.grade-icon(src=tools.getUrl("gradeIcon", data.user.grade._id) title=data.user.grade.displayName)
                     .nav-user-certs=data.user.info.certsName
                     .nav-user-count
-                      .nav-user-count-span(title=`科创币：${data.user.kcb/100}`)
-                        img(src="/statics/kcb.png")
-                        span=data.user.kcb / 100
-                      .nav-user-count-span(title=`学术分：${data.user.xsf}`)
-                        img(src="/statics/xsf.png")
-                        span=data.user.xsf
+                      -const targetUserScores = state.userScores
+                      -const targetUserXSF = data.user.xsf;
+                      include ../../publicModules/userScores
                   .nav-user-links
                     a(href=`/u/${data.user.uid}/profile`).col-xs-6.nav-user-link
                       .fa.fa-user-circle
@@ -135,7 +129,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(onclick="NKC.methods.logout()" title='不，不要走！' class=showColumnLink?"col-xs-6":"col-xs-12").nav-user-link
                       .fa.fa-sign-out
                       | 退出登录
-            img.nav-user-avatar-sm(src=`/avatar/${data.user.avatar}`)
+            img.nav-user-avatar-sm(src=tools.getUrl('userAvatar', data.user.avatar))
         else
           li.userInfo
             a(onclick="Login.open()" title='还记得密码吗？') 登录
@@ -176,22 +170,22 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
     if data.user
       .nkc-drawer-header
       .nkc-drawer-avatar
-        img(src=`/avatar/${data.user.avatar}`)
+        img(src=tools.getUrl('userAvatar', data.user.avatar))
       .nkc-drawer-username= data.user.username
       .nkc-drawer-certs= data.user.info.certsName
+      div
+        -const targetUserScores = state.userScores;
+        include ../../publicModules/userScores
       .nkc-drawer-count
-        .col-xs-3
+        .col-xs-4
           .nkc-drawer-count-number=data.user.threadCount - data.user.disabledThreadsCount
           .nkc-drawer-count-title 文章
-        .col-xs-3
+        .col-xs-4
           .nkc-drawer-count-number=data.user.postCount - data.user.disabledPostsCount
           .nkc-drawer-count-title 回复
-        .col-xs-3
+        .col-xs-4
           .nkc-drawer-count-number=data.user.xsf
           .nkc-drawer-count-title 学术分
-        .col-xs-3
-          .nkc-drawer-count-number=data.user.kcb/100
-          .nkc-drawer-count-title 科创币
     else
       .nkc-drawer-header
       .nkc-drawer-visitor

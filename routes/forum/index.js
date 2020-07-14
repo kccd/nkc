@@ -30,6 +30,7 @@ forumRouter
 
 		data.forums = nkcModules.dbFunction.forumsListSort(forums, threadTypes);
 
+		data.forumCategories = await db.ForumCategoryModel.getCategories();
 
 		data.disciplineForums = [];
 		data.topicForums = [];
@@ -41,6 +42,7 @@ forumRouter
 				data.disciplineForums.push(f);
 			}
 		});
+
 
 		if(user) {
 			const subForums = [], visitedForums = [];
@@ -91,7 +93,7 @@ forumRouter
     await newForum.save();
 
     // await newForum.createLibrary(data.user.uid);
-    
+
     await redis.cacheForums();
 		data.forum = newForum;
 		await next();

@@ -4,22 +4,12 @@ router
   .get('/', async (ctx, next) => {
     const {data, db, nkcModules} = ctx;
     const {user} = data;
-    user.kcb = await db.UserModel.updateUserKcb(user.uid);
     const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
     const {alipayAccounts, bankAccounts} = usersPersonal;
     data.alipayAccounts = alipayAccounts;
     data.bankAccounts = bankAccounts;
-    const kcbSettings = await db.SettingModel.findById("kcb");
-    data.withdrawSettings = {
-      withdrawAuth: kcbSettings.c.withdrawAuth,
-      withdrawTimeBegin: kcbSettings.c.withdrawTimeBegin,
-      withdrawTimeEnd: kcbSettings.c.withdrawTimeEnd,
-      withdrawCount: kcbSettings.c.withdrawCount,
-      withdrawMin: kcbSettings.c.withdrawMin,
-      withdrawMax: kcbSettings.c.withdrawMax,
-      withdrawStatus: kcbSettings.c.withdrawStatus,
-      withdrawFee: kcbSettings.c.withdrawFee
-    };
+    const rechargeSettings = await db.SettingModel.getSettings('recharge');
+    data.withdrawSettings = await rechargeSettings.withdraw;
     const today = nkcModules.apiFunction.today();
     data.countToday = await db.KcbsRecordModel.count({
       from: user.uid,
@@ -27,28 +17,26 @@ router
       type: "withdraw",
       toc: {
         $gte: today
-      }
+      },
+      verify: true,
     });
+    data.mainScore = await db.SettingModel.getMainScore();
+    data.userScores = await db.UserModel.updateUserScores(user.uid);
+    data.userMainScore = await db.UserModel.getUserMainScore(user.uid);
     ctx.template = 'account/finance/withdraw.pug';
     await next();
   })
   .post("/", async (ctx, next) => {
     const {nkcModules, data, db, body} = ctx;
     const lock = await nkcModules.redLock.lock("withdraw", 6000);
+    const {checkNumber} = nkcModules.checkData;
     try{
       const {user} = data;
-      let {money, password, code, to, account} = body;
-      const kcbSettings = await db.SettingModel.findById("kcb");
-      const {
-        withdrawTimeEnd,
-        withdrawTimeBegin,
-        withdrawCount,
-        withdrawStatus,
-        withdrawMax,
-        withdrawMin,
-        withdrawFee,
-      } = kcbSettings.c;
-      if(!withdrawStatus) ctx.throw(403, "提现功能暂未开放");
+      let {money, password, code, to, account, score} = body;
+      const rechargeSettings = await db.SettingModel.getSettings('recharge');
+      const {enabled, min, max, startingTime, endTime, countOneDay} = rechargeSettings.withdraw;
+      const payment = rechargeSettings.withdraw[to];
+      if(!enabled) ctx.throw(403, "提现功能已关闭");
       const today = nkcModules.apiFunction.today();
       const countToday = await db.KcbsRecordModel.count({
         from: user.uid,
@@ -56,18 +44,24 @@ router
         type: "withdraw",
         toc: {
           $gte: today
-        }
+        },
+        verify: true,
       });
-      if(countToday >= withdrawCount) ctx.throw(403, "您今日的提现次数已用完，请明天再试");
-      user.kcb = await db.UserModel.updateUserKcb(user.uid);
+      if(countToday >= countOneDay) ctx.throw(403, "你今日的提现次数已用完，请明天再试");
+      checkNumber(money, {
+        name: '提现金额',
+        min: min / 100,
+        max: max / 100,
+        fractionDigits: 2,
+      });
+      const _money = Number((score * (1 - payment.fee)).toFixed(2));
+      if(_money !== money) ctx.throw(400, '页面数据已更新，请刷新后重试');
+      score = Number((score * 100).toFixed(0));
+      await db.UserModel.updateUserScores(user.uid);
+      const userMainScore = await db.UserModel.getUserMainScore(user.uid);
+      const mainScore = await db.SettingModel.getMainScore();
       const usersPersonal = await db.UsersPersonalModel.findById(user.uid);
-      money = money.toFixed(0);
-      money = Number(money);
-      if(money > 0){}
-      else ctx.throw(400, "提现金额不正确");
-      if(money < withdrawMin) ctx.throw(400, `提现金额不得低于${withdrawMin/100}元`);
-      if(money > user.kcb) ctx.throw(400, `科创币不足`);
-      if(money > withdrawMax) ctx.throw(400, `提现金额不能超过${withdrawMax/100}元`);
+      if(score > userMainScore) ctx.throw(400, `你的${mainScore.name}不足`);
       if(!password) ctx.throw(400, "登录密码不能为空");
       if(!code) ctx.throw(400, "短信验证码不能为空");
       if(!to) ctx.throw(400, "提现账户类型错误");
@@ -86,44 +80,43 @@ router
       // 验证登录密码
       await usersPersonal.ensurePassword(password);
       now = now.getHours()*60*60*1000 + now.getMinutes()*60*1000 + now.getSeconds()*1000;
-      if(now < withdrawTimeBegin || now > withdrawTimeEnd) ctx.throw(403, "提现暂未开放");
+      if(now < startingTime || now > endTime) ctx.throw(403, "提现暂未开放");
 
-      if(to === "alipay") {
+      if(to === "aliPay") {
         const {alipayAccounts} = usersPersonal;
         let existing = false;
         for(const a of alipayAccounts) {
           if(a.account === account.account && a.name === account.name) existing = true;
         }
-        if(!existing) ctx.throw(400, "您未绑定该收款账户，请检查");
+        if(!existing) ctx.throw(400, "你未绑定该收款账户，请检查");
         const _id = await db.SettingModel.operateSystemID("kcbsRecords", 1);
-        const description = `科创币提现`;
+        const description = `${mainScore.name}提现`;
 
         const record = await db.KcbsRecordModel({
           _id,
           from: user.uid,
           to: "bank",
           type: "withdraw",
+          scoreType: mainScore.type,
+          fee: payment.fee,
           ip: ctx.address,
           port: ctx.port,
-          num: money,
+          num: score,
           description,
           c: {
             alipayAccount: account.account,
             alipayName: account.name,
-            alipayFee: withdrawFee,
+            alipayFee: payment.fee,
             alipayInterface: null
           }
         });
 
         await record.save();
         try {
-          let alipayMoney = money*(1-withdrawFee);
-          alipayMoney = alipayMoney/100;
-          alipayMoney = alipayMoney.toFixed(2);
           await nkcModules.alipay2.transfer({
             account: account.account,
             name: account.name,
-            money: alipayMoney,
+            money,
             id: _id,
             notes: description
           });
@@ -131,8 +124,7 @@ router
           await record.update({
             "c.alipayInterface": true
           });
-
-          user.kcb = await db.UserModel.updateUserKcb(user.uid);
+          await db.UserModel.updateUserScores(user.uid);
 
         } catch(err) {
           await record.update({
@@ -150,5 +142,6 @@ router
       await lock.unlock();
       ctx.throw(err);
     }
+    await next();
   });
 module.exports = router;

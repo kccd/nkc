@@ -143,18 +143,20 @@ messageRouter
     // 获取通知
     if(chat.systemInfo) {
       message = await db.MessageModel.findOne({ty: 'STE'}).sort({tc: -1});
-      list.push({
-        time: message?message.tc: new Date('2000-1-1'),
-        type: 'STE',
-        message,
-        uid: null,
-        count: user.newMessage.newSystemInfoCount,
-        name: '系统通知',
-        icon: '/statics/message_type/STE.jpg',
-        platform: null,
-        messageId: message? message._id: null,
-        abstract: message.c,
-      });
+      if(message) {
+        list.push({
+          time: message?message.tc: new Date('2000-1-1'),
+          type: 'STE',
+          message,
+          uid: null,
+          count: user.newMessage.newSystemInfoCount,
+          name: '系统通知',
+          icon: '/statics/message_type/STE.jpg',
+          platform: null,
+          messageId: message? message._id: null,
+          abstract: message.c,
+        });
+      }
     }
     // 获取提醒
     if(chat.reminder) {

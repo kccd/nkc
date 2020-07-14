@@ -3,9 +3,9 @@ const kcbRouter = new Router();
 kcbRouter
   .get('/', async (ctx, next) => {
     const {nkcModules, data, db, query, state} = ctx;
-    const {page = 0, t, content, operatingid} = query;
+    const {page = 0, t, content, operationId, scoreType} = query;
     const q = {};
-    if(t === 'username') {
+    if(t === 'username' && content) {
       const u = await db.UserModel.findOne({usernameLowerCase: content.toLowerCase()});
       if(u) {
         q.$or = [
@@ -19,7 +19,7 @@ kcbRouter
       } else {
         data.info = '用户名不存在';
       }
-    } else if(t === 'uid') {
+    } else if(t === 'uid' && content) {
       q.$or = [
         {
           from: content
@@ -28,14 +28,16 @@ kcbRouter
           to: content
         }
       ];
-    } else if(t === 'ip') {
+    } else if(t === 'ip' && content) {
       q.ip = content;
     }
-    if(operatingid) {
-      q.type = operatingid;
+    if(operationId) {
+      q.type = operationId;
     }
-    let kcbsTypes = state.language['kcbsTypes'];
-    data.kcbsTypes = kcbsTypes;
+    if(scoreType) {
+      q.scoreType = scoreType;
+    }
+    data.kcbsTypes = state.language['kcbsTypes'];
     const count = await db.KcbsRecordModel.count(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -43,15 +45,14 @@ kcbRouter
     for(const record of data.kcbsRecords) {
       record.typeInfo = ctx.state.lang("kcbsTypes", record.type);
     }
-
-    data.kcbSettings = {
-      totalMoney: await db.UserModel.updateUserKcb("bank")
-    };
     // data.kcbSettings = (await db.SettingModel.findOnly({_id: 'kcb'})).c;
     data.paging = paging;
     data.t = t;
     data.content = content;
-    data.operatingid = operatingid;
+    data.operationId = operationId;
+    data.scoreType = scoreType;
+    data.scores = await db.SettingModel.getScores();
+    data.nkcBankName = await db.SettingModel.getNKCBankName();
     ctx.template = 'experimental/log/kcb.pug';
     await next();
   })

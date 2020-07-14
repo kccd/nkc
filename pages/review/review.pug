@@ -25,7 +25,6 @@ block content
               .review-time=`${format("YYYY/MM/DD HH:mm:ss", r.post.toc)}`
               .review-info 用户：
               .review-user
-                //-img(src=`/avatar/${r.user.uid}`).review-user-avatar
                 if r.post.anonymous
                   span=anonymousInfo.username
                 else

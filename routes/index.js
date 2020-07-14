@@ -29,7 +29,6 @@ const examRouter = routers.exam;
 const forgotPasswordRouter = routers.forgotPassword;
 const shopRouter = routers.shop;
 const accountRouter = routers.account;
-const imageEditRouter = routers.imageEdit;
 const complaintRouter = routers.complaint;
 const searchRouter = routers.search;
 const protocolRouter = routers.protocol;
@@ -54,6 +53,8 @@ const siteToolsRouter = routers.tools;
 const ipinfoRouter = routers.ipinfo;
 // 黑名单
 const blacklistRouter = routers.blacklist;
+// 附件
+const attachmentRouter = routers.attachment;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
@@ -90,7 +91,6 @@ router.use('/account', accountRouter.routes(), accountRouter.allowedMethods());
 router.use("/review", reviewRouter.routes(), reviewRouter.allowedMethods());
 router.use("/m", columnsRouter.routes(), columnsRouter.allowedMethods());
 router.use("/column", columnRouter.routes(), columnRouter.allowedMethods());
-router.use('/imageEdit', imageEditRouter.routes(), imageEditRouter.allowedMethods());
 router.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods());
 router.use("/threads", threadsRouter.routes(), threadsRouter.allowedMethods());
 router.use("/avatar", userAvatarRouter.routes(), userAvatarRouter.allowedMethods());
@@ -104,4 +104,5 @@ router.use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods());
 router.use("/tools", siteToolsRouter.routes(), siteToolsRouter.allowedMethods());
 router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
+router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 module.exports = router;

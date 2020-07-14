@@ -1,7 +1,6 @@
 const Router = require('koa-router');
-const directAlipay = require('direct-alipay');
-const {directConfig} = require('../../settings/alipaySecret');
-directAlipay.config(directConfig);
+const alipay = require("../../nkcModules/alipay2");
+const directAlipay = alipay.getDonationDirectAlipay();
 const donationRouter = new Router();
 donationRouter
 	.use('/', async (ctx, next) => {

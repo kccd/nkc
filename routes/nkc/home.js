@@ -36,6 +36,8 @@ router
       const product = goodsObj[productId];
       if(product) data.goods.push(product);
     });
+    // 主页是否显示热销商品板块
+    data.showShopGoods = homeSettings.showShopGoods;
     let threads = await db.ThreadModel.find({tid: {$in: homeSettings.toppedThreadsId}});
     threads = await db.ThreadModel.extendThreads(threads, {
       forum: false,
@@ -111,14 +113,15 @@ router
         }
       });
     } else if(operation === "saveGoods") {
-      const {goodsId} = body;
+      const {goodsId, showShopGoods} = body;
       for(const productId of goodsId) {
         const product = await db.ShopGoodsModel.findOne({productId});
         if(!product) ctx.throw(400, `未找到ID为${productId}的专业`);
       }
       await db.SettingModel.updateOne({_id: "home"}, {
         $set: {
-          "c.shopGoodsId": goodsId
+          "c.shopGoodsId": goodsId,
+          "c.showShopGoods": showShopGoods
         }
       });
     } else if(operation === "saveToppedThreads") {

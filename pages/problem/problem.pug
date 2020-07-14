@@ -7,7 +7,7 @@ block title
   style.
     body {
       background: #f8f8f8;
-    } 
+    }
     pre{
       padding: 1rem;
       background-color: #fff;
@@ -42,7 +42,7 @@ block content
           h4(style='color: #aaa;')
             if problem.user
               a(href=`/u/${problem.user.uid}` target='_blank')
-                img(src=`/avatar/${problem.user.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
+                img(src=tools.getUrl('userAvatar', problem.user.avatar, 'sm') style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
                 span= problem.user.username
             else
               span 匿名用户
@@ -62,30 +62,16 @@ block content
           .title 修复详情
           if problem.restorerId.length
             if problem.restorer
-              //-a(href=`/u/${problem.restorerId}` target='_blank').resolve-auther
-                img(src=`/avatar/${problem.restorer.avatar}?t=sm` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
-                span= problem.restorer.username
+
               .m-t-1.resolve-time= `时间：`+problem.resolveTime.toLocaleString()
           else
             .resolve-auther 暂无修复记录
           #logDev
-        
-        //if problem.restorer && problem.resolveTime
-          h4.text-right(style='color: #aaa;padding-top:2rem;')
-            span(style='margin-right: 0.5rem;')= problem.resolveTime.toLocaleString()
-            a(href=`/u/${problem.restorer.uid}`)
-              img(src=`/avatar_small/${problem.restorer.uid}` style='height: 25px;width: 25px;border-radius: 50%;margin-right: 0.2rem;')
-              span= problem.restorer.username
 
 
       .col-xs-12.col-md-5.box-shadow-panel
         .form
-          //- .form-group
-          //-   label 标题
-          //-   input.form-control#title(type='text' value=problem.t)
-          //- .form-group
-          //-   label 详细内容
-          //-   textarea.form-control#content(rows=23)= problem.c
+
           .form-group
             label 修复详情
             textarea.form-control#log(rows=23 disabled=cantEdit)= problem.restorLog

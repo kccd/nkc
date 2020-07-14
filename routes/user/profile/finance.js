@@ -26,5 +26,6 @@ module.exports = async (ctx, next) => {
   data.paging = paging;
   data.t = t;
   targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
+  data.nkcBankName = await db.SettingModel.getNKCBankName();
   await next();
 };

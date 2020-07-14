@@ -24,6 +24,20 @@ module.exports = [
     isVisibleForNCC: true,
     rolesId: ['dev', 'default', 'visitor'],
     type: 'forum',
-    parentId: '1'
+    parentsId: [1]
+  },
+  {
+    fid: 'recycle',
+    displayName: '回收站',
+    abbr: '回收站',
+    description: '系统回收站',
+    brief: '回收站',
+    accessible: true,
+    displayOnParent: true,
+    visibility: true,
+    isVisibleForNCC: true,
+    rolesId: ['dev'],
+    type: 'forum',
+    parentsId: [1]
   }
 ];

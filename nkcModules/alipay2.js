@@ -1,25 +1,27 @@
-/* 
-  单笔转账到支付宝账户
-  @param options
-    account: 收款账户
-    name: 收款账户的真实姓名
-    id: 系统唯一的转账ID
-    money: 转账的金额（元）
-    notes: 转账备注，会显示在支付宝账单上
-  @author pengxiguaa 2019/3/11
-*/
 const rp = require('request-promise');
 const fs = require('fs');
 const queryString = require('querystring');
 const moment = require('moment');
 const crypto = require('crypto');
 const path = require('path');
+const directAlipay = require('direct-alipay');
 const alipayConfig = require('../config/alipay.json');
-
 const {
   transfer,
   receipt
 } = alipayConfig;
+
+const {seller_id, seller_email, key} = receipt;
+
+directAlipay.config({
+  seller_email,
+  partner: seller_id,
+  key,
+  return_url: process.env.NODE_ENV === 'production'?
+    'https://www.kechuang.org/fund/donation/return':
+    'http://localhost:9000/fund/donation/return',
+  notify_url: 'https://www.kechuang.org/fund/donation/verify'
+});
 
 const serverConfig = require('../config/server.json');
 
@@ -29,11 +31,32 @@ const receiptConfig = {
   sign_type: 'MD5'
 };
 
-const privatekey = fs.readFileSync(path.resolve(__dirname, '../key/rsa_private_key.pem'));
-const publicKey = fs.readFileSync(path.resolve(__dirname, '../key/alipay_public_key.pem'));
-
+let privateKey = '', publicKey = '';
+const privateKeyPath = path.resolve(__dirname, '../key/rsa_private_key.pem');
+const publicKeyPath = path.resolve(__dirname, '../key/alipay_public_key.pem');
+if(fs.existsSync(privateKeyPath)) {
+  privateKey = fs.readFileSync(privateKeyPath);
+}
+if(fs.existsSync(publicKeyPath)) {
+  publicKey = fs.readFileSync(publicKeyPath);
+}
 
 const func = {};
+
+func.getDonationDirectAlipay = () => {
+  return directAlipay;
+}
+
+/*
+  单笔转账到支付宝账户
+  @param options
+    account: 收款账户
+    name: 收款账户的真实姓名
+    id: 系统唯一的转账ID
+    money: 转账的金额（元）
+    notes: 转账备注，会显示在支付宝账单上
+  @author pengxiguaa 2019/3/11
+*/
 func.transfer = async (o) => {
   const {account, name, id, money, notes} = o;
   if(!account) throwErr('收款方支付宝账号不能为空');
@@ -62,7 +85,7 @@ func.transfer = async (o) => {
   const sign = crypto.createSign('RSA-SHA256');
   sign.write(str);
   sign.end();
-  options.sign = sign.sign(privatekey, 'base64');
+  options.sign = sign.sign(privateKey, 'base64');
   const link = transfer.url + '?' + queryString.stringify(options);
   return new Promise((resolve, reject) => {
     rp(link)
@@ -85,7 +108,7 @@ func.transfer = async (o) => {
       });
   });
 };
-/* 
+/*
   收款 电脑网页收款
   @param options
     money: 收款金额
@@ -115,7 +138,6 @@ func.receipt1 = async (o) => {
   } else {
     notifyUrl = alipayConfig.notifyUrl || ""
   }
-  console.log(notifyUrl);
   goodsInfo = goodsInfo || [];
   const goods_detail = [];
   for(const g of goodsInfo) {
@@ -157,14 +179,14 @@ func.receipt1 = async (o) => {
   const sign = crypto.createSign('RSA-SHA256');
   sign.write(str);
   sign.end();
-  options.sign = sign.sign(privatekey, 'base64');
+  options.sign = sign.sign(privateKey, 'base64');
   return url + '?' + queryString.stringify(options);
 };
 
-/* 
+/*
   收款 电脑网页收款 验证签名，判断是否为支付宝的请求
   @param notifyData: 支付宝服务器post请求所带的数据
-  @author pengxiguaa 2019/3/11 
+  @author pengxiguaa 2019/3/11
 */
 func.verifySign1 = async (d) => {
   const notifyData = Object.assign({}, d);

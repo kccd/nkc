@@ -25,6 +25,7 @@ router
   })
   .get('/', async (ctx, next) => {
     const {data, query, db} = ctx;
+    const {user} = data;
     let {ordersId} = query;
     data.ordersId = ordersId;
     data.ordersInfo = await db.ShopOrdersModel.getOrdersInfo(data.orders);
@@ -35,16 +36,40 @@ router
         if(product.productStatus == "stopsale") ctx.throw(400, `商品id为(${product.productId})的商品停售，不可购买，请重新下单`)
       }
     }
+    data.mainScore = await db.SettingModel.getMainScore();
+    await db.UserModel.updateUserScores(user.uid);
+    data.userMainScore = await db.UserModel.getUserMainScore(user.uid);
+    const rechargeSettings = await db.SettingModel.getSettings('recharge');
+    data.rechargeSettings = rechargeSettings.recharge;
     ctx.template = 'shop/pay/pay.pug';
     await next();
   })
   .get('/alipay', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, query, nkcModules} = ctx;
     const {user, orders} = data;
+    let {money} = query;
+    money = Number(money);
+    const {checkNumber} = nkcModules.checkData;
+    try{
+      checkNumber(money, {
+        name: '付款金额',
+        min: 0.01,
+        fractionDigits: 2,
+      });
+    } catch(err) {
+      ctx.throw(400, '付款金额存在异常，请刷新后重试');
+    }
     const ordersInfo = await db.ShopOrdersModel.getOrdersInfo(orders);
+    const score = ordersInfo.totalMoney;
+    const rechargeSettings = await db.SettingModel.getRechargeSettings();
+    const aliPay = rechargeSettings.aliPay;
+    let _money = score / ((1 - aliPay.fee) * 100);
+    _money = Number((_money.toFixed(2)));
+    if(_money !== money) ctx.throw(400, '付款金额存在异常，请刷新后重试');
     data.alipayUrl = await db.KcbsRecordModel.getAlipayUrl({
       uid: user.uid,
-      money: ordersInfo.totalMoney,
+      score,
+      money,
       ip: ctx.address,
       port: ctx.port,
       title: ordersInfo.description,
@@ -81,14 +106,18 @@ router
     for(let order of orders) {
       totalMoney += (order.orderPrice+order.orderFreightPrice);
     }
-    user.kcb = await db.UserModel.updateUserKcb(user.uid);
-    if(user.kcb < totalMoney) ctx.throw(400, "您的科创币不足，请先充值或选择其他付款方式支付");
+    await db.UserModel.updateUserScores(user.uid);
+    const mainScore = await db.SettingModel.getMainScore();
+    const userMainScore = await db.UserModel.getUserScore(user.uid, mainScore.type);
+    // user.kcb = await db.UserModel.updateUserKcb(user.uid);
+    if(userMainScore < totalMoney) ctx.throw(400, `你的${mainScore.name}不足，请先充值或选择其他付款方式支付`);
     if(totalMoney !== parseInt(Number(totalPrice)*100)) ctx.throw(400, "订单价格已被修改，请重新发起付款或刷新当前页面");
 
     for(let order of orders) {
       const r = db.KcbsRecordModel({
         _id: await db.SettingModel.operateSystemID('kcbsRecords', 1),
         from: order.buyUid,
+        scoreType: mainScore.type,
         to: 'bank',
         type: 'pay',
         ordersId: [order.orderId],

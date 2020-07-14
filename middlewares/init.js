@@ -4,6 +4,7 @@ const settings = require('../settings');
 const nkcModules = require('../nkcModules');
 const db = require('../dataModels');
 const {logger} = nkcModules;
+const languages = require('../languages');
 const fs = require('fs');
 const {promisify} = require('util');
 const redis = require('../redis');
@@ -96,6 +97,7 @@ module.exports = async (ctx, next) => {
       serverSettings: await db.SettingModel.getSettings("server"),
       stickerSettings: await db.SettingModel.getSettings("sticker"),
       logSettings: await db.SettingModel.getSettings("log"),
+      threadSettings: await db.SettingModel.getSettings('thread'),
       // 缓存相关
       cachePage: false
     };
@@ -190,14 +192,17 @@ module.exports = async (ctx, next) => {
 	  try{
 	    const errObj = JSON.parse(error);
 	    const {errorType, errorData} = errObj;
-	    error = errorData;
-	    ctx.errorType = errorType;
+	    if(errorType) {
+        error = errorData;
+        ctx.errorType = errorType;
+      }
     } catch(err) {}
 	  if(ctx.errorType) {
 	    ctx.template = `error/${ctx.errorType}.pug`;
     } else {
       ctx.template = 'error/error.pug';
     }
+
     ctx.data.error = error;
 	  ctx.data.status = ctx.status;
 	  ctx.data.url = ctx.url;

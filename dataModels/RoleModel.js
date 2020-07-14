@@ -79,7 +79,12 @@ const roleSchema = new Schema({
 		type: Number,
 		default: 0
 	},
-
+	// 是否是默认证书
+	defaultRole: {
+		type: Boolean,
+		default: false,
+	},
+	
   postToForum: {
 	  countLimit: {
 	    unlimited: {
@@ -129,6 +134,7 @@ const roleSchema = new Schema({
 	collection: 'roles'
 });
 
+
 roleSchema.virtual('userCount')
 	.get(function() {
 		return this._userCount;
@@ -149,7 +155,7 @@ roleSchema.methods.extendUserCount = async function() {
 	if(this._id === 'scholar') {
 		q.xsf = {$gt: 0};
 	} else if(this._id === 'default') {
-		
+
 	} else {
 		q.certs = this._id;
 	}
@@ -179,5 +185,64 @@ roleSchema.statics.extendRole = async (_id) => {
   role.modifyPostTimeLimit = Number(role.modifyPostTimeLimit || 0);
   return role;
 };
+
+/*
+* 获取所有证书和用户等级ID
+* @param {[String]} blacklist 排除的证书
+* @return {[Object, ...]} object: {type: 'role', id: String(RoleId), name: String(RoleName)}
+* @author pengxiguaa 2020/6/12
+* */
+roleSchema.statics.getCertList = async (blacklist = []) => {
+	blacklist.push('default');
+	const RM = mongoose.model("roles");
+	const GM = mongoose.model("usersGrades");
+	const roles = await RM.find({_id: {$nin: blacklist}}, {_id: 1, displayName: 1}).sort({toc: 1});
+	const grades = await GM.find({}, {_id: 1, displayName: 1}).sort({_id: 1});
+	const data = [];
+	for(const role of roles) {
+		data.push({
+			type: `role-${role._id}`,
+			name: `证书 - ${role.displayName}`
+		});
+	}
+	for(const grade of grades) {
+		data.push({
+			type: `grade-${grade._id}`,
+			name: `等级 - ${grade.displayName}`
+		});
+	}
+	return data;
+}
+
+/*
+* 后台管理中存在大量与证书和用户等级相关的设置，此方法用于过滤掉存在已被删除的证书或等级的设置
+* @param {[Object]} data 待处理的数据，每一条数据都至少包含type字段用于过滤
+* 	data: [
+*     {
+*       type: String, // role-id, grade-id
+* 			...
+*     }
+*   ]
+* @param {[String]} blacklist 排除的证书
+* @return {[Object]} 同data
+* @author pengxiguaa 2020/6/12
+* */
+roleSchema.statics.filterSettings = async (data = [], blacklist = []) => {
+	blacklist.push('default');
+	let rolesId = await mongoose.model("roles").find({_id: {$nin: blacklist}}, {_id: 1});
+	let gradesId = await mongoose.model('usersGrades').find({}, {_id: 1});
+	rolesId = rolesId.map(role => role._id);
+	gradesId = gradesId.map(grade => grade._id);
+	const _data = [];
+	for(const d of data) {
+		const [type, id] = d.type.split('-');
+		if(
+			(type === 'role' && rolesId.includes(id)) ||
+			(type === 'grade' && gradesId.includes(Number(id)))
+		) _data.push(d);
+	}
+	return _data;
+}
+
 const RoleModel = mongoose.model('roles', roleSchema);
 module.exports = RoleModel;

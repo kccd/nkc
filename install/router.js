@@ -25,57 +25,27 @@ router
     const {query} = ctx;
     ctx.body = pug.renderFile(path.resolve('./install/public/index.pug'), {data: {
       config: config,
-      step: query.step
+      step: query.step,
+      time: Date.now(),
     }});
-  })
-  .post('/check/mongodb', async (ctx, next) => {
-    const {body} = ctx;
-    const {data} = body;
-    try {
-      await checkMongodb(data, ctx);
-    } catch(err) {
-      ctx.throw(500, `${err.message}`);
-    }
-    await next();
-  })
-  .post('/check/elasticSearch', async (ctx, next) => {
-    const {body} = ctx;
-    const {data} = body;
-    try{
-      await checkElasticSearch(data, ctx);
-    } catch(err) {
-      ctx.throw(500, `${err.message}`);
-    }
-    await next();
-  })
-  .post('/check/redis', async (ctx, next) => {
-    const {body} = ctx;
-    const {data} = body;
-    try{
-      await checkRedis(data, ctx);
-    } catch(err) {
-      ctx.throw(500, `${err.message}`);
-    }
-    await next();
   })
   .post('/save', async (ctx, next) => {
     const {body} = ctx;
-    const {mongodb, elasticSearch, redis, account, server, forced} = body;
-    let {username, password} = account;
-    username = username.trim();
-    password = password.trim();
-    if(!username) ctx.throw(400, '请输入管理员账号');
-    if(!password) ctx.throw(400, '管理员账号密码不能为空');
+    const {mongodb, elasticSearch, redis, account, server} = body;
+    const {username, password} = account;
+    if(!username) ctx.throw(400, '管理员用户名不能为空');
+    if(!password) ctx.throw(400, '管理员密码不能为空');
+    if(account.password !== account.password2) ctx.throw(400, '两次输入的管理员密码不相同');
     if(checkString.contentLength(username) > 30) ctx.throw(400, '管理员账号用户名不能超过30字节');
     if(!checkString.checkPass(password)) ctx.throw(400, '密码必须包含字母、数字以及符号三者中的至少两者');
     if(password.length < 8) ctx.throw(400, '密码不能小于8位');
     try{
-      await checkServer(server, ctx);
+      await checkServer(server);
     } catch(err) {
-      ctx.throw(500, `服务器：${err.message || err}`);
+      ctx.throw(500, `网站服务：${err.message || err}`);
     }
     try{
-      await checkMongodb(mongodb, ctx, forced);
+      await checkMongodb(mongodb);
     } catch(err) {
       ctx.throw(500, `MongoDB: ${err.message || err}`);
     }
@@ -93,20 +63,11 @@ router
     // 开始生成各个数据库的配置文件，为下一步创建管理员账号做准备
     // socket
     defaultConfig.push({
-      name: 'socket',
-      data: {
-        serverClient: false,
-        transports: ['polling', 'websocket'],
-        pingInterval: 30000
-      }
-    });
-    // server
-    defaultConfig.push({
       name: 'server',
       data: {
         address: server.address,
         port: server.port,
-        domain: `http://127.0.0.1:${server.port}`
+        domain: `http://127.0.0.1`
       }
     });
     // redis
@@ -139,6 +100,7 @@ router
         port: elasticSearch.port,
         username: elasticSearch.username || '',
         password: elasticSearch.password || '',
+        indexName: elasticSearch.indexName,
         analyzer: "ik_max_word",
         searchAnalyzer: "ik_smart"
       }
@@ -150,21 +112,20 @@ router
 
     // 连接数据库，生成默认数据
     const db = require('../dataModels');
-    const db_ = Object.assign({}, db);
-
-    for(const name in db_) {
-      if(!db_.hasOwnProperty(name)) continue;
-      console.log(`clearing collection '${name}'`);
-      await db_[name].remove({});
-    }
 
     const defaultData = require('../defaultData');
     await defaultData.init();
 
     // 创建管理员账号
-    console.log(`creating the dev account ...`);
+    console.log(`creating the admin account ...`);
     const user = await db.UserModel.createUser({});
-    await user.update({certs: ['dev'], username, usernameLowerCase: username.toLowerCase()});
+    await user.update({
+      certs: ['dev'],
+      username,
+      usernameLowerCase: username.toLowerCase(),
+      volumeA: true,
+      volumeB: true,
+    });
     const passwordObj = apiFunction.newPasswordObject(password);
     await db.UsersPersonalModel.update({password: passwordObj.password, hashType: passwordObj.hashType});
     console.log(`done`);
@@ -173,19 +134,22 @@ router
     const thread = db.ThreadModel({
       tid: await db.SettingModel.operateSystemID('threads', 1),
       uid: user.uid,
-      fid: forum.fid,
+      mainForumsId: [forum.fid],
       mid: user.uid,
       count: 1,
-      remain: 1
+      remain: 1,
+      reviewed: true,
     });
     const post = db.PostModel({
       t: article.title,
       c: article.content,
       uid: user.uid,
-      fid: forum.fid,
+      mainForumsId: [forum.fid],
+      type: 'thread',
       pid: await db.SettingModel.operateSystemID('posts', 1),
       tid: thread.tid,
-      l: 'html'
+      l: 'html',
+      reviewed: true,
     });
     thread.oc = post.pid;
     await thread.save();
@@ -194,54 +158,50 @@ router
     fs.writeFileSync(path.resolve(__dirname, './install.lock'), new Date());
 
     console.log(`\nThe installation is complete`);
-    console.log(`Enter 'npm start' to start kc server\n`);
+    console.log(`\nrun 'pm2 start pm2.config.js' to start the server.`);
     await next();
   });
 module.exports = router;
 
 
 
-function checkMongodb(data, ctx, forced) {
-  let {address, port, username, password, databaseName} = data;
-  if(!address || !port) ctx.throw(400, '地址和端口不能为空');
-  if(port < 0 || port >= 65536) ctx.throw(400, '填写的端口超出端口有效范围 >= 0 且 < 65536');
+function checkMongodb(data) {
+  const {address, port, username, password, databaseName} = data;
   let url, accountStr = '';
-  username = username.trim();
-  password = password.trim();
-  if(!databaseName) ctx.throw(400, 'database name is required');
-  if(username && !password) ctx.throw(400, '请输入密码');
-  if(!username && password) ctx.throw(400, '请输入用户名');
-  if(username && password) {
-    accountStr = `${username}:${password}@`;
-  }
-  url = `mongodb://${accountStr}${address}:${port}/${databaseName}`;
-  return new Promise((resolve, reject) => {
-    mongoose.connect(url, {
-      autoIndex: true,
-      poolSize: 50,
-      keepAlive: 120,
-      useMongoClient: true
-    }, async (err) => {
-      if(err) return reject(err);
-      if(!forced) {
-        const collections = await mongoose.connections[0].db.collections();
-        if(collections.length !== 0) {
-          return reject(new Error(`数据库 "${databaseName}" 已存在，请更换数据库名或选择强制安装（清空已有数据）`));
-        }
+  return Promise.resolve()
+    .then(() => {
+      if(!address || !port) throw '地址或端口不能为空';
+      if(!databaseName) throw '数据库名不能为空';
+      if(username && !password) throw '请输入密码';
+      if(!username && password) throw '请输入用户名';
+      if(username && password) {
+        accountStr = `${username}:${password}@`;
       }
-      resolve();
-    });
-  });
+      url = `mongodb://${accountStr}${address}:${port}/${databaseName}`;
+      return new Promise((resolve, reject) => {
+        mongoose.connect(url, {
+          autoIndex: true,
+          poolSize: 50,
+          keepAlive: 120,
+          useMongoClient: true
+        }, async (err) => {
+          if(err) return reject(err);
+          const collections = await mongoose.connections[0].db.collections();
+          if(collections.length !== 0) {
+            return reject(new Error(`数据库 "${databaseName}" 已存在，请更换数据库名。`));
+          }
+          resolve();
+        });
+      });
+    })
 }
 
-function checkElasticSearch(data, ctx) {
-  let {address, port, username, password, articlesIndex, usersIndex} = data;
-  if(!address || !port) ctx.throw(400, '地址和端口不能为空');
-  if(port < 0 || port >= 65536) ctx.throw(400, '填写的端口超出端口有效范围 >= 0 且 < 65536');
-  username = username.trim();
-  password = password.trim();
-  if(username && !password) ctx.throw(400, '请输入密码');
-  if(!username && password) ctx.throw(400, '请输入用户名');
+function checkElasticSearch(data) {
+  let {address, port, username, password, indexName} = data;
+  if(!address || !port) throw  '地址和端口不能为空';
+  if(!indexName) throw '索引名不能为空';
+  if(username && !password) throw '请输入密码';
+  if(!username && password) throw '请输入用户名';
   const options = {
     host: `${address}:${port}`
   };
@@ -249,12 +209,7 @@ function checkElasticSearch(data, ctx) {
     options.httpAuth = `${username}:${password}`;
   }
   let client;
-  try{
-    client = new ElasticSearch.Client(options);
-  } catch(err) {
-    return reject(err);
-  }
-
+  client = new ElasticSearch.Client(options);
   return new Promise((resolve, reject) => {
     client.ping({
       requestTimeout: 3000
@@ -267,11 +222,9 @@ function checkElasticSearch(data, ctx) {
   });
 }
 
-function checkRedis(data, ctx) {
+function checkRedis(data) {
   let {address, port, password} = data;
-  if(!address || !port) ctx.throw(400, '地址和端口不能为空');
-  if(port < 0 || port >= 65536) ctx.throw(400, '填写的端口超出端口有效范围 >= 0 且 < 65536');
-  password = password.trim();
+  if(!address || !port) throw '地址和端口不能为空';
   const options = {
     host: address,
     port
@@ -292,8 +245,9 @@ function checkRedis(data, ctx) {
   });
 }
 
-function checkServer(data, ctx) {
-  const {address, port} = data;
-  if(!address || !port) ctx.throw(400, '地址和端口不能为空');
-  if(port < 0 || port >= 65536) ctx.throw(400, '填写的端口超出端口有效范围 >= 0 且 < 65536');
+function checkServer(data) {
+  return Promise.resolve()
+    .then(() => {
+      if(!data.address || !data.port) throw '地址或端口不能为空';
+    })
 }
