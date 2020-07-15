@@ -16,6 +16,8 @@ for(let i = 0; i < data.ads.fixed.length; i++) {
 const app = new Vue({
   el: "#app",
   data: {
+    page: {},
+    recommendThreads: data.recommendThreads,
     ads: data.ads,
     recommendForums: data.recommendForums,
     columns: data.columns,
@@ -32,6 +34,27 @@ const app = new Vue({
   computed: {
     selectedRecommendForumsId() {
       return data.recommendForums.map(f => f.fid);
+    },
+    nav() {
+      const {pageId} = this;
+      const arr = [
+        {
+          id: 'other',
+          name: '其他'
+        },
+        {
+          id: 'movable',
+          name: '轮播图'
+        },
+        {
+          id: 'fixed',
+          name: '固定图'
+        }
+      ];
+      arr.map(a => {
+        a.active = a.id === pageId;
+      });
+      return arr;
     }
   },
   methods: {
@@ -40,6 +63,15 @@ const app = new Vue({
     getUrl: NKC.methods.tools.getUrl,
     floatUserInfo: NKC.methods.tools.floatUserInfo,
     visitUrl: NKC.methods.visitUrl,
+    getRecommendTypeName(id) {
+      return {
+        movable: '轮播图',
+        fixed: '固定图'
+      }[id]
+    },
+    selectPage(page) {
+      this.page = page;
+    },
     selectLocalFile(ad) {
       const options = {};
       if(ad.type === "movable") {
@@ -113,7 +145,7 @@ const app = new Vue({
           ads.splice(index, 1)
         })
         .catch(() => {})*/
-      
+
     },
     addForum() {
       const self = this;

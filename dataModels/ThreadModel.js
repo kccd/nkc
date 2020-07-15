@@ -1696,14 +1696,27 @@ threadSchema.methods.isModerator = async function(uid, type) {
 
 /*
 * 更新首页自动推荐数据
-* @param {String} type 推荐类型 fixed: 固定图, movable: 轮播图
-* @param {Number} count 文章数量
+* @author pengxiguaa 2020/7/15
 * */
 threadSchema.statics.updateHomeAutomaticRecommendThreads = async () => {
   const ThreadModel = mongoose.model('threads');
-  const fixedData = await ThreadModel.updateHomeRecommendThreadsByType('fixed');
-  await ThreadModel.updateHomeRecommendThreadsByType('movable', fixedData.map(f => f.tid));
+  const SettingModel = mongoose.model('settings');
+  const homeSettings = await SettingModel.getSettings('home');
+  let exception = homeSettings.ads.movable.concat(homeSettings.ads.fixed).map(t => t.tid);
+  const fixedData = await ThreadModel.updateHomeRecommendThreadsByType('fixed', exception);
+  exception = exception.concat(fixedData.map(t => t.tid));
+  await ThreadModel.updateHomeRecommendThreadsByType('movable', exception);
 };
+/*
+* 更新指定类型的首页推荐文章
+* @param {String} type fixed: 固定推荐, movable: 滚动推荐
+* @param {[String]} excludedThreadsId 需要排除的threadID
+* @return {[Object]}
+*   @param {String} tid 文章ID
+*   @param {String} title 文章标题
+*   @param {String} cover 文章封面
+* @author pengxiguaa 2020/7/15
+* */
 threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThreadsId = []) => {
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
@@ -1768,8 +1781,6 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
     oc: {$in: posts.map(p => p._id)},
     disabled: false,
   });
-
-  console.log(threads);
 
   threads = await ThreadModel.extendThreads(threads);
   const arr = [];

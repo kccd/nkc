@@ -2,8 +2,120 @@ extends ../nkc
 block nkcTitle
   title 主页设置 - 前台管理
 block nkcContent
-  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode})
+  #data.hidden=objToStr({recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode})
   .col-xs-12.col-md-12.box-shadow-panel.management-home#app(v-cloak)
+    ul.nav.nav-tabs
+      li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
+        a.pointer {{n.name}}
+    div(v-if='["fixed", "movable"].includes(page.id)')
+      div
+        h4 {{page.name}}
+        .form.form-horizontal
+          .form-group
+            label.col-sm-3.control-label 显示类型
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='manual' v-model='recommendThreads[page.id].displayType')
+                  span 手动
+                label.m-r-1
+                  input(type='radio' value='automatic' v-model='recommendThreads[page.id].displayType')
+                  span 自动
+                label
+                  input(type='radio' value='all' v-model='recommendThreads[page.id].displayType')
+                  span 半自动
+          .form-group
+            label.col-sm-3.control-label 显示顺序
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='random' v-model='recommendThreads[page.id].order')
+                  span 随机
+                label
+                  input(type='radio' value='fixed' v-model='recommendThreads[page.id].order')
+                  span 正序
+          span(v-if='recommendThreads[page.id].displayType !== "manual"')
+            .form-group.form-inline(v-if='recommendThreads[page.id].displayType === "all"')
+              label.col-sm-3.control-label 比例（手动:自动）
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].automaticProportion')
+            .form-group.form-inline
+              label.col-sm-3.control-label 更新间隔（小时）
+              .col-sm-9
+                span
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].timeInterval')
+            .form-group.form-inline
+              label.col-sm-3.control-label 文章数量
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].automaticCount')
+                .m-t-05 更新时缓存的文章数量
+            .form-group.form-inline
+              label.col-sm-3.control-label 文章发表时间（天）
+              .col-sm-9
+                span 最小：
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].timeOfPost.min')
+                .m-t-05
+                span 最大：
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].timeOfPost.max')
+            .form-group.form-inline
+              label.col-sm-3.control-label 最小点赞数
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].postVoteUpMinCount')
+            .form-group.form-inline
+              label.col-sm-3.control-label 最大点踩数
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].postVoteDownMaxCount')
+            .form-group.form-inline
+              label.col-sm-3.control-label 最小点赞数（包含回复）
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].threadVoteUpMinCount')
+            .form-group
+              label.col-sm-3.control-label 仅限原创文章
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='recommendThreads[page.id].original')
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model='recommendThreads[page.id].original')
+                    span 否
+            .form-group
+              label.col-sm-3.control-label 仅限精选文章
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='recommendThreads[page.id].digest')
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model='recommendThreads[page.id].digest')
+                    span 否
+            .form-group
+              label.col-sm-3.control-label 包含举报未处理的文章
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='recommendThreads[page.id].reportedAndUnReviewed')
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model='recommendThreads[page.id].reportedAndUnReviewed')
+                    span 否
+            .form-group
+              label.col-sm-3.control-label 包含流控文章
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='recommendThreads[page.id].flowControl')
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model='recommendThreads[page.id].flowControl')
+                    span 否
+        div(v-if='recommendThreads[page.id].displayType !== "automatic"')
+          h4 手动已推荐的文章
+          
+          .row
+            .col-xs-12.col-md-6(v-for='t in recommendThreads[page.id].manuallySelectedThreads')
+
+
     div
       .management-header 首页推荐
       .home-top-threads

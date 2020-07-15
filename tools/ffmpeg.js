@@ -201,7 +201,7 @@ async function addImageTextWaterMask(op) {
     output,
     image,
     text,
-    flex = 0.06,
+    flex = 0.08,
     position = {x: 10, y: 10},
     transparency = 0.5
   } = op;

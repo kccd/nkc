@@ -5,6 +5,7 @@ router
     data.nav = "home";
     const homeSettings = await db.SettingModel.getSettings("home");
     data.ads = homeSettings.ads;
+    data.recommendThreads = homeSettings.recommendThreads;
     data.recommendForumsId = homeSettings.recommendForumsId;
     const forums = await db.ForumModel.find({fid: {$in: data.recommendForumsId}});
     const forumsObj = {};
