@@ -52,6 +52,7 @@ const timedTasksInit = async () => {
  const timedTasks = require("./timedTasks");
  await timedTasks.cacheActiveUsers();
  await timedTasks.clearTimeoutPageCache();
+ await timedTasks.updateRecommendThreads();
 };
 
 const start = async () => {

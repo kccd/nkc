@@ -103,9 +103,7 @@ settingSchema.statics.saveSettingsToRedis = async (_id) => {
   const SettingModel = mongoose.model("settings");
   const settings = await SettingModel.findOne({_id});
   if(settings) {
-    setTimeout(async () => {
-      await redisClient.setAsync(`settings:${_id}`, JSON.stringify(settings));
-    });
+    await redisClient.setAsync(`settings:${_id}`, JSON.stringify(settings));
   }
   return settings;
 };

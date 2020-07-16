@@ -5,7 +5,13 @@ homeTopRouter
     const {params, db, data} = ctx;
     const {tid} = params;
     const homeSettings = await db.SettingModel.getSettings("home");
-    const adsId = homeSettings.ads.fixed.concat(homeSettings.ads.movable).map(t => t.tid);
+    const {fixed, movable} = homeSettings.recommendThreads;
+    const ads = movable.manuallySelectedThreads.concat(
+      movable.automaticallySelectedThreads,
+      fixed.manuallySelectedThreads,
+      fixed.automaticallySelectedThreads
+    );
+    const adsId = ads.map(a => a.tid);
     if(adsId.includes(tid)) ctx.throw(400, "文章已经被推送到首页了");
     const thread = await db.ThreadModel.findOnly({tid});
     const firstPost = await db.PostModel.findOnly({pid: thread.oc});
@@ -27,8 +33,12 @@ homeTopRouter
     const {params, db, body, nkcModules} = ctx;
     const {tid} = params;
     const homeSettings = await db.SettingModel.getSettings("home");
-    const {movable, fixed} = homeSettings.ads;
-    const ads = movable.concat(fixed);
+    const {movable, fixed} = homeSettings.recommendThreads;
+    const ads = movable.manuallySelectedThreads.concat(
+      movable.automaticallySelectedThreads,
+      fixed.manuallySelectedThreads,
+      fixed.automaticallySelectedThreads
+    );
     const adsId = ads.map(a => a.tid);
     if(adsId.includes(tid)) ctx.throw(400, "文章已经被推送到首页了");
     const {cover} = body.files;
@@ -47,47 +57,52 @@ homeTopRouter
       type: 'manual', // manual: 手动的, automatic: 自动的
     };
     if(topType === "movable") {
-      movable.unshift(newTop);
+      movable.manuallySelectedThreads.unshift(newTop);
     } else {
-      fixed.unshift(newTop);
+      fixed.manuallySelectedThreads.unshift(newTop);
     }
     await db.SettingModel.updateOne({_id: "home"}, {
       $set: {
-        "c.ads.fixed": fixed,
-        "c.ads.movable": movable
+        "c.recommendThreads.fixed": fixed,
+        "c.recommendThreads.movable": movable
       }
     });
     await db.SettingModel.saveSettingsToRedis("home");
-    /*const thread = await db.ThreadModel.findOnly({tid});
-    const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
-    if(homeSettings.c.ads.includes(thread.tid)) ctx.throw(400, '文章已被置顶');
-    const post = await thread.extendFirstPost();
-    if(!post.cover) ctx.throw(400, '文章没有封面图，暂不能在首页置顶显示');
-    await homeSettings.update({$addToSet: {'c.ads': thread.tid}});
-    await db.SettingModel.saveSettingsToRedis("home");*/
     await next();
   })
   .del('/', async (ctx, next) => {
     const {params, db} = ctx;
     const {tid} = params;
     const homeSettings = await db.SettingModel.getSettings("home");
-    let {movable, fixed} = homeSettings.ads;
-    for(let i = 0; i < movable.length; i++) {
-      if(movable[i].tid === tid) {
-        movable.splice(i, 1);
+    let {movable, fixed} = homeSettings.recommendThreads;
+    for(let i = 0; i < movable.manuallySelectedThreads.length; i++) {
+      if(movable.manuallySelectedThreads[i].tid === tid) {
+        movable.manuallySelectedThreads.splice(i, 1);
         break;
       }
     }
-    for(let i = 0; i < fixed.length; i++) {
-      if(fixed[i].tid === tid) {
-        fixed.splice(i, 1);
+    for(let i = 0; i < fixed.manuallySelectedThreads.length; i++) {
+      if(fixed.manuallySelectedThreads[i].tid === tid) {
+        fixed.manuallySelectedThreads.splice(i, 1);
+        break;
+      }
+    }
+    for(let i = 0; i < movable.automaticallySelectedThreads.length; i++) {
+      if(movable.automaticallySelectedThreads[i].tid === tid) {
+        movable.automaticallySelectedThreads.splice(i, 1);
+        break;
+      }
+    }
+    for(let i = 0; i < fixed.automaticallySelectedThreads.length; i++) {
+      if(fixed.automaticallySelectedThreads[i].tid === tid) {
+        fixed.automaticallySelectedThreads.splice(i, 1);
         break;
       }
     }
     await db.SettingModel.updateOne({_id: "home"}, {
       $set: {
-        "c.ads.movable": movable,
-        "c.ads.fixed": fixed
+        "c.recommendThreads.movable": movable,
+        "c.recommendThreads.fixed": fixed
       }
     });
     await db.SettingModel.saveSettingsToRedis("home");

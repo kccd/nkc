@@ -12,3 +12,16 @@ global.throwErr = (code, message) => {
   if(code) err.status = code;
   throw err;
 };
+
+Array.prototype.shuffle = function() {
+  const array = this;
+  let m = array.length;
+  let t, i;
+  while(m) {
+    i = Math.floor(Math.random() * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
+}

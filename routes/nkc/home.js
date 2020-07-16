@@ -72,18 +72,19 @@ router
   .patch("/", async (ctx, next) => {
     const {nkcModules, body, db, data} = ctx;
     const {operation} = body;
+    const {checkNumber, checkString} = nkcModules.checkData;
     if(operation === "saveAds") {
       let {movable, fixed, movableOrder, fixedOrder} = body;
-      movableOrder = movableOrder === "random"? "random": "fixed";
-      fixedOrder = fixedOrder === "random"? "random": "fixed";
+      movableOrder = movableOrder === "random" ? "random" : "fixed";
+      fixedOrder = fixedOrder === "random" ? "random" : "fixed";
       movable.concat(fixed).map(ad => {
         nkcModules.checkData.checkString(ad.title, {
           name: "标题",
           minLength: 1,
           maxLength: 200
         });
-        if(!ad.cover) ctx.throw(400, "封面图不能为空");
-        if(!ad.tid) ctx.throw(400, "文章ID不能为空");
+        // if (!ad.cover) ctx.throw(400, "封面图不能为空");
+        if (!ad.tid) ctx.throw(400, "文章ID不能为空");
       });
       await db.SettingModel.updateOne({_id: "home"}, {
         $set: {
@@ -92,6 +93,87 @@ router
           "c.ads.fixedOrder": fixedOrder,
           "c.ads.movableOrder": movableOrder
         }
+      });
+    } else if(operation === 'updateThreadList') {
+      const {type} = body;
+      if(!['fixed', 'movable'].includes(type)) ctx.throw(500, `数据类型错误 type: ${type}`);
+      await db.ThreadModel.updateAutomaticRecommendThreadsByType(type);
+      const homeSettings = await db.SettingModel.getSettings('home');
+      data.automaticallySelectedThreads = homeSettings.recommendThreads[type].automaticallySelectedThreads;
+    } else if(operation === 'saveRecommendThreads') {
+      const {type, options} = body;
+      if(!['fixed', 'movable'].includes(type)) ctx.throw(500, `数据类型错误 type: ${type}`);
+      if(!['manual', 'automatic', 'all'].includes(options.displayType)) {
+        ctx.throw(400, '请选择显示类型');
+      }
+      if(!['fixed', 'random'].includes(options.order)) {
+        ctx.throw(400, '请选择显示方式');
+      }
+      checkNumber(options.automaticProportion, {
+        name: '比例（手动:自动）',
+        min: 0.01,
+        fractionDigits: 2
+      });
+      checkNumber(options.timeInterval, {
+        name: '更新间隔',
+        min: 0.01,
+        fractionDigits: 2
+      });
+      checkNumber(options.automaticCount, {
+        name: '文章数量',
+        min: 1
+      });
+      checkNumber(options.timeOfPost.min, {
+        name: '文章发表最小时间',
+        min: 0,
+        fractionDigits: 2
+      });
+      checkNumber(options.timeOfPost.max, {
+        name: '文章发表最大时间',
+        min: 0,
+        fractionDigits: 2
+      });
+      if(options.timeOfPost.min >= options.timeOfPost.max) {
+        ctx.throw(400, '文章发表时间设置不正确');
+      }
+      checkNumber(options.postVoteUpMinCount, {
+        name: '最小点赞数',
+        min: 0,
+      });
+      checkNumber(options.postVoteDownMaxCount, {
+        name: '最大点踩数',
+        min: 0
+      });
+      checkNumber(options.threadVoteUpMinCount, {
+        name: '最小点赞数（包含回复）',
+        min: 0
+      });
+      options.original = !!options.original;
+      options.digest = !!options.digest;
+      options.reportedAndUnReviewed = !!options.reportedAndUnReviewed;
+      options.flowControl = !!options.flowControl;
+      options.manuallySelectedThreads.map(t => {
+        const {tid, title, cover} = t;
+        if(!tid) ctx.throw(400, '文章数据错误');
+        if(!cover) ctx.throw(400, '文章封面不能为空');
+        checkString(title, {
+          name: '文章标题',
+          minLength: 1
+        });
+      });
+      options.automaticallySelectedThreads.map(t => {
+        const {tid, title, cover} = t;
+        if(!tid) ctx.throw(400, '文章数据错误');
+        // if(!cover) ctx.throw(400, '文章封面不能为空');
+        checkString(title, {
+          name: '文章标题',
+          minLength: 1
+        });
+      });
+      const obj = {};
+      obj[`c.recommendThreads.${type}`] = options;
+      await db.SettingModel.updateOne({_id: 'home'}, {
+        $set: obj
       });
     } else if(operation === "saveRecommendForums") {
       const {forumsId} = body;

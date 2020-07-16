@@ -63,7 +63,7 @@ module.exports = async (options) => {
     count: 200,
   });
   // 置顶文章轮播图
-  data.ads = await db.ThreadModel.getAds(fidOfCanGetThreads);
+  data.ads = await db.ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);
   // 推荐专业
   data.recommendForums = await db.ForumModel.getRecommendForums(fidOfCanGetThreads);
   // 热门专栏
