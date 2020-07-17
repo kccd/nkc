@@ -19,7 +19,7 @@ block content
     .friend-info
       button.btn.btn-success.btn-block(@click='sendToUser') 发消息
       button.btn.btn-default.btn-block(@click='visitUserHome') 动态
-      button.btn.btn-default.btn-block(@click='switchNote').btn-note 备注信息
+      button.btn.btn-default.btn-block(@click='switchNote' v-if='friend').btn-note 备注信息
         .fa.fa-angle-up(v-if="showNote")
         .fa.fa-angle-down(v-else)
       .m-t-05(v-if="!friend")

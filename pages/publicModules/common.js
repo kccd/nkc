@@ -200,12 +200,12 @@ NKC.methods.base64ToBlob = function(data) {
 * @author pengxiguaa 2019-7-29
 * */
 NKC.methods.blobToFile = function(blob, fileName) {
-  /*blob.lastModifiedDate = new Date();
-  blob.name = fileName;
-  return blob;*/
-  return new File([blob], fileName || Date.now() + '.png', {
+  blob.lastModifiedDate = new Date();
+  blob.name = fileName || Date.now() + '.png';
+  return blob;
+  /*return new File([blob], fileName || Date.now() + '.png', {
     lastModified: Date.now()
-  });
+  });*/
 };
 /*
 * base64转文件对象
