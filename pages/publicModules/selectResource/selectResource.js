@@ -285,10 +285,7 @@ NKC.modules.SelectResource = function() {
             if(!data.uploaded) {
               // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
               var formData = new FormData();
-              formData.append("file", f.data);
-              if(f.data.constructor === Blob) {
-                formData.append("fileName", f.data.name || (Date.now() + ".png"));
-              }
+              formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
               return nkcUploadFile("/r", "POST", formData, function(e, progress) {
                 f.progress = progress;
               });

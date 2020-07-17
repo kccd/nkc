@@ -39,10 +39,7 @@ function selectAvatar() {
     var formData = new FormData();
     Promise.resolve()
       .then(function() {
-        return NKC.methods.blobToFile(data);
-      })
-      .then(function(file) {
-        formData.append("file", file);
+        formData.append("file", data, Date.now() + '.png');
         return uploadFilePromise('/avatar/' + user.uid, formData, function(e, percentage) {
           $(".upload-info").text('上传中...' + percentage);
           if(e.total === e.loaded) {
@@ -70,7 +67,7 @@ function selectBanner() {
   selectImage.show(function(data){
     var user = NKC.methods.getDataById("data").user;
     var formData = new FormData();
-    formData.append("file", data);
+    formData.append("file", data, Date.now() + '.png');
     uploadFilePromise('/banner/' + user.uid, formData, function (e, percentage) {
       $(".upload-info-banner").text('上传中...' + percentage);
       if (e.total === e.loaded) {
