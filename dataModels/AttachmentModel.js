@@ -7,46 +7,57 @@ const fs = require("fs");
 const fsPromise = fs.promises;
 const statics = require('../settings/statics');
 const FileType = require('file-type');
+const FILE = require('../nkcModules/file');
 const schema = new Schema({
+  // 附件ID mongoose.Types.ObjectId().toString()
   _id: String,
+  // 附件类型
   type: {
     type: String,
     required: true,
     index: 1
   },
+  // 附件拥有者ID
   uid: {
     type: String,
     default: '',
     index: 1,
   },
+  // 附件目录 不包含文件名，如：/avatar/2020/07/
   path: {
     type: String,
     required: true,
     index: 1,
   },
+  // 创建时间
   toc: {
     type: Date,
     default: Date.now,
     index: 1
   },
+  // 附件大小
   size: {
     type: Number,
     default: 0,
   },
+  // 附件格式
   ext: {
     type: String,
     required: true,
     index: 1
   },
+  // 附件原文件名
   name: {
     type: String,
     default: '',
   },
+  // 附件hash
   hash: {
     type: String,
     index: 1,
     default: ''
   },
+  //
   c: {
     type: String,
     default: '',
@@ -55,6 +66,7 @@ const schema = new Schema({
 }, {
   collection: 'attachments'
 });
+
 /*
 * 获取附件所在文件夹路径
 * @param {Date} t 指定時間
@@ -337,4 +349,15 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
   await SettingModel.saveSettingsToRedis('score');
   return attachment;
 };
+
+/*
+* 保存文章封面
+*
+* */
+schema.statics.savePostCover = async (file, post) => {
+  const now = Date.now();
+  const targetFilePath = await FILE.getPath('postCover', now);
+
+};
+
 module.exports = mongoose.model('attachments', schema);

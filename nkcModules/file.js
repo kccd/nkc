@@ -9,7 +9,7 @@ const func = {};
 const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
-const { sync } = require("mkdirp");
+const fileFolder = require('../settings/fileFolder');
 
 func.folders = {
   attachment: './attachment',
@@ -65,6 +65,24 @@ func.getFullPath = async (p, t) => {
   await mkdirp(path);
   return path;
 };
+
+/*
+* 根据附件类型和时间获取附件目录，用于存储和获取附件
+* @param {String} type 文件类型 如：userAvatar、userBanner 详情看/settings/fileFolder.js
+* @param {Date/undefined} time 指定的时间，默认取当前时间
+* @return {String} 完成目录
+* */
+func.getPath = async (type, time) => {
+  const _path = fileFolder[type];
+  if(!_path) throwErr(500, `文件类型错误 type: ${type}`);
+  time = time || new Date();
+  const file = require('../nkcModules/file');
+  const timePath = moment(time).format(`/YYYY/MM`);
+  return await file.getFullPath(_path + timePath, time);
+};
+
+
+
 
 // 保存专栏头像
 func.saveColumnAvatar = async (columnId, file) => {
@@ -671,6 +689,7 @@ func.getFileExtension = async (file, extensions = []) => {
   }
   return extension;
 }
+
 
 /**
  * 重设图片尺寸

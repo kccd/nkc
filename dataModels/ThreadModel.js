@@ -1869,6 +1869,9 @@ threadSchema.statics.getHomeRecommendThreadsByType = async (type, fid = []) => {
       }
     } else {
       results = manuallySelectedThreads.concat(automaticallySelectedThreads);
+      if(order === 'random') {
+        results = apiFunction.arrayShuffle(results);
+      }
     }
   }
   return results;

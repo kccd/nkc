@@ -57,9 +57,11 @@ func.updateFixedRecommendThreads = async () => {
   const homeSettings = await db.SettingModel.getSettings('home');
   setTimeout(async () => {
     try{
-      console.log(`开始更新首页推荐文章（固定图）...`);
-      await db.ThreadModel.updateHomeRecommendThreadsByType('fixed');
-      console.log(`首页推荐文章（固定图）更新完成`);
+      if(homeSettings.recommendThreads.fixed.displayType !== 'manual') {
+        console.log(`开始更新首页推荐文章（固定图）...`);
+        await db.ThreadModel.updateHomeRecommendThreadsByType('fixed');
+        console.log(`首页推荐文章（固定图）更新完成`);
+      }
     } catch(err) {
       if(global.NKC.NODE_ENV !== 'production') {
         console.log(err);
@@ -77,9 +79,11 @@ func.updateMovableRecommendThreads = async () => {
   const homeSettings = await db.SettingModel.getSettings('home');
   setTimeout(async () => {
     try{
-      console.log(`开始更新首页推荐文章（轮播图）...`);
-      await db.ThreadModel.updateHomeRecommendThreadsByType('movable');
-      console.log(`首页推荐文章（轮播图）更新完成`);
+      if(homeSettings.recommendThreads.movable.displayType !== 'manual') {
+        console.log(`开始更新首页推荐文章（轮播图）...`);
+        await db.ThreadModel.updateHomeRecommendThreadsByType('movable');
+        console.log(`首页推荐文章（轮播图）更新完成`);
+      }
     } catch(err) {
       if(global.NKC.NODE_ENV !== 'production') {
         console.log(err);

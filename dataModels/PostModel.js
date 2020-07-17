@@ -198,6 +198,7 @@ const postSchema = new Schema({
   // 原创声明
   originState: {
     type: String,
+    index: 1,
     default: "0"
   },
   // 是否已经审核
