@@ -170,7 +170,12 @@ schema.methods.getFilePath = async function(t) {
   } else if(fs.existsSync(normalFilePath)) {
     return normalFilePath;
   } else {
-    throwErr(400 , '文件未找到');
+    // 为了兼容测试环境（访问时因无图导致大量报错）
+    if(global.NKC.NODE_ENV === 'production') {
+      throwErr(400 , '文件未找到');
+    } else {
+      return '';
+    }
   }
 }
 
