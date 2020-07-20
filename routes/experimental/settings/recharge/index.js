@@ -10,8 +10,6 @@ router
     const {db, body, nkcModules} = ctx;
     const {checkNumber} = nkcModules.checkData;
     const {recharge, withdraw} = body;
-    console.log(recharge);
-    console.log(withdraw);
     checkNumber(recharge.min, {
       name: '单次最小充值金额',
       min: 0,

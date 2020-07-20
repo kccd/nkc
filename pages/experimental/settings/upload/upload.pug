@@ -109,7 +109,7 @@ block eContent
                       select.form-control(disabled)
                         option 其他
                     th
-                      input.form-control(type='text' v-model='us.countLimit.default')
+                      input.form-control(type='text' v-model.number='us.countLimit.default')
                     th
               button.btn.btn-default.btn-sm(@click="addCountLimit()") 添加
           .form-group.m-b-2
