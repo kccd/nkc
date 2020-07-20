@@ -53,7 +53,7 @@ block content
           .forum-info-body
             .forum-avatar
               if data.forum.logo
-                img.forum-avatar-icon(src=tools.getUrl('forumAvatar', data.forum.logo))
+                img.forum-avatar-icon(src=tools.getUrl('forumLogo', data.forum.logo))
               else
                 .forum-avatar-icon(style=`background-color: ${data.forum.color}`)
             .forum-info

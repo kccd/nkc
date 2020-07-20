@@ -9,7 +9,7 @@ block content
       .home-forum-parent
         a(href=`/f/${f.fid}` data-float-fid=f.fid).home-forum-panel
           if f.logo
-            img.home-forum-panel-icon(src=tools.getUrl('forumAvatar', f.logo))
+            img.home-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo))
           else
             .home-forum-panel-icon(style=`background-color: ${f.color}`)
           .home-forum-panel-name
@@ -19,7 +19,7 @@ block content
         for cf in f.childrenForums || []
           a(href=`/f/${cf.fid}` data-float-fid=cf.fid).home-forum-panel
             if cf.logo
-              img.home-forum-panel-icon(src=tools.getUrl('forumAvatar', cf.logo))
+              img.home-forum-panel-icon(src=tools.getUrl('forumLogo', cf.logo))
             else
               .home-forum-panel-icon(style=`background-color: ${cf.color}`)
             .home-forum-panel-name
@@ -74,7 +74,7 @@ block content
                   for f in data.visitedForums
                     a.home-visited-forum(href=`/f/${f.fid}` data-float-fid=f.fid)
                       if f.logo
-                        img.home-visited-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
+                        img.home-visited-forum-icon(src=tools.getUrl("forumLogo", f.logo))
                       else
                         .home-visited-forum-icon(style=`background-color: ${f.color}`)
                       span=f.displayName
@@ -92,7 +92,7 @@ block content
                     a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
                       .home-subscribe-forum-avatar
                         if forum.logo
-                          img(src=tools.getUrl("forumAvatar", forum.logo))
+                          img(src=tools.getUrl("forumLogo", forum.logo))
                         else
                           div(style=`background-color: ${forum.color}`)
                       .home-subscribe-forum-info=forum.displayName
@@ -114,7 +114,7 @@ block content
                     a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
                       .home-subscribe-forum-avatar
                         if forum.logo
-                          img(src=tools.getUrl("forumAvatar", forum.logo))
+                          img(src=tools.getUrl("forumLogo", forum.logo))
                         else
                           div(style=`background-color: ${forum.color}`)
                       .home-subscribe-forum-info=forum.displayName
@@ -128,7 +128,7 @@ block content
               //-   a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
               //-     .home-subscribe-forum-avatar
               //-       if forum.logo
-              //-         img(src=tools.getUrl("forumAvatar", forum.logo))
+              //-         img(src=tools.getUrl("forumLogo", forum.logo))
               //-       else
               //-         div(style=`background-color: ${forum.color}`)
               //-     .home-subscribe-forum-info=forum.displayName
@@ -227,7 +227,7 @@ block content
               for f in data.goodsForums
                 a(href=`/f/${f.fid}` data-float-fid=f.fid)
                   if f.logo
-                    img.home-goods-forum-icon(src=tools.getUrl("forumAvatar", f.logo))
+                    img.home-goods-forum-icon(src=tools.getUrl("forumLogo", f.logo))
                   else
                     .home-goods-forum-icon(style=`background-color: ${f.color}`)
                   span=f.displayName

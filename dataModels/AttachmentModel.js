@@ -23,7 +23,7 @@ const schema = new Schema({
     default: '',
     index: 1,
   },
-  // 附件目录 不包含文件名，如：/avatar/2020/07/
+  // 附件目录 不包含文件名
   path: {
     type: String,
     default: '',
@@ -104,15 +104,16 @@ schema.statics.saveWatermark = async (file, c = 'normal') => {
   const ext = await FILE.getFileExtension(file, ['jpg', 'png', 'jpeg']);
   const AM = mongoose.model('attachments');
   const SM = mongoose.model('settings');
-  const {fullPath, timePath} = await AM.getAttachmentPath();
+  const toc = new Date();
+  const fileFolder = await FILE.getPath('watermark', toc);
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
-  const realPath = `${fullPath}/${fileName}`;
+  const realPath = PATH.resolve(fileFolder, `./${fileName}`);
   const {path, size, name, hash} = file;
   await fsPromise.rename(path, realPath);
   const attachment = AM({
     _id: aid,
-    path: timePath,
+    toc,
     size,
     hash,
     name,
@@ -139,15 +140,16 @@ schema.statics.saveHomeBigLogo = async file => {
   const ext = (await FileType.fromFile(file.path)).ext;
   const AM = mongoose.model('attachments');
   const SM = mongoose.model('settings');
-  const {fullPath, timePath} = await AM.getAttachmentPath();
+  const toc = new Date();
+  const fileFolder = await FILE.getPath('homeBigLogo', toc);
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
-  const realPath = `${fullPath}/${fileName}`;
+  const realPath = PATH.resolve(fileFolder, `./${fileName}`);
   const {path, size, name} = file;
   await fsPromise.rename(path, realPath);
   const attachment = AM({
     _id: aid,
-    path: timePath,
+    toc,
     size,
     name,
     ext,
@@ -227,31 +229,29 @@ schema.statics.getHomeBigLogo = async () => {
 * @author pengxiguaa 2020/6/18
 * */
 schema.statics.saveForumImage = async (fid, type, file) => {
-  if(!['logo', 'banner'].includes(type)) throwErr(400, '未知的图片类型');
-  type = {
-    'logo': 'Logo',
-    'banner': 'Banner'
-  }[type];
+  if(!['forumLogo', 'forumBanner'].includes(type)) throwErr(400, '未知的图片类型');
   const AM = mongoose.model("attachments");
   const ForumModel = mongoose.model('forums');
   const FILE = require('../nkcModules/file');
   const ext = await FILE.getFileExtension(file, ['jpg', 'jpeg', 'png']);
+  const toc = new Date();
+  const fileFolder = await FILE.getPath(type, toc)
   const {fullPath, timePath} = await AM.getAttachmentPath();
   const aid = AM.getNewId();
   const fileName = `${aid}.${ext}`;
-  const targetFilePath = `${fullPath}/${fileName}`;
+  const targetFilePath = PATH.resolve(fileFolder, `./${fileName}`);
   const {size, name, hash} = file;
   const attachment = AM({
     _id: aid,
+    toc,
     size,
     hash,
     name,
-    type: `forum${type}`,
+    type,
     ext,
-    path: timePath
   });
   await attachment.save();
-  if(type === 'Logo') {
+  if(type === 'forumLogo') {
     // 正常
     await ei.resize({
       src: file.path,
@@ -261,7 +261,7 @@ schema.statics.saveForumImage = async (fid, type, file) => {
       quality: 90
     });
     // 大图
-    const targetFilePathLG = `${fullPath}/${aid}_lg.${ext}`;
+    const targetFilePathLG = PATH.resolve(fileFolder, `./${aid}_lg.${ext}`);
     await ei.resize({
       src: file.path,
       dst: targetFilePathLG,
@@ -270,7 +270,7 @@ schema.statics.saveForumImage = async (fid, type, file) => {
       quality: 90
     });
     // 小图
-    const targetFilePathSM = `${fullPath}/${aid}_sm.${ext}`;
+    const targetFilePathSM = PATH.resolve(fileFolder, `./${aid}_sm.${ext}`);
     await ei.resize({
       src: file.path,
       dst: targetFilePathSM,
@@ -312,18 +312,19 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
   const FILE = require('../nkcModules/file');
   const ext = await FILE.getFileExtension(file, ['png', 'jpg', 'jpeg']);
   const aid = AttachmentModel.getNewId();
-  const {fullPath, timePath} = await AttachmentModel.getAttachmentPath();
+  const toc = new Date();
+  const fileFolder = await FILE.getPath('scoreIcon', toc);
   const {size, name, path, hash} = file;
   await ei.resize({
     src: path,
-    dst: `${fullPath}/${aid}.png`,
+    dst: PATH.resolve(fileFolder, `./${aid}.png`),
     height: 128,
     width: 128,
     quality: 90
   });
   await ei.resize({
     src: path,
-    dst: `${fullPath}/${aid}_sm.png`,
+    dst: PATH.resolve(fileFolder, `./${aid}_sm.png`),
     height: 48,
     width: 48,
     quality: 90
@@ -334,7 +335,7 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
     size,
     ext,
     hash,
-    path: timePath,
+    toc,
     type: 'scoreIcon'
   });
   await attachment.save();

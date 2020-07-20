@@ -15,7 +15,7 @@ block content
           if !parentForum
             a.app-forum-avatar(href=`/f/${f.fid}`)
               if f.logo
-                img(src=tools.getUrl("forumAvatar", f.logo))
+                img(src=tools.getUrl("forumLogo", f.logo))
               else
                 div(style=`background-color: ${f.color}`)
           a.app-forum-body(href=`/f/${f.fid}`)

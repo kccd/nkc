@@ -146,14 +146,15 @@ func.saveColumnAvatar$2 = async (columnId, file) => {
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
   const column = await db.ColumnModel.findOnly({_id: columnId});
   const AM = db.AttachmentModel;
-  const {fullPath, timePath} = await AM.getAttachmentPath();
+  const toc = new Date();
+  const fileFolder = await func.getPath('columnAvatar', toc)
   const aid = AM.getNewId();
-  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 100);
-  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 250);
-  await resizeImage(file.path, `${fullPath}/${aid}_lg.${ext}`, 500);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}_sm.${ext}`), 100);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}.${ext}`), 250);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}_lg.${ext}`), 500);
   const attachment = AM({
     _id: aid,
-    path: timePath,
+    toc,
     size: file.size,
     name: file.name,
     ext,
@@ -247,13 +248,14 @@ func.saveColumnBanner$2 = async (columnId, file) => {
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
   const column = await db.ColumnModel.findOnly({_id: columnId});
   const AM = db.AttachmentModel;
-  const {fullPath, timePath} = await AM.getAttachmentPath();
+  const toc = new Date();
+  const fileFolder = await func.getPath('columnBanner', toc);
   const aid = AM.getNewId();
-  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 720, 1280);
-  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 480, 1920);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}_sm.${ext}`), 720, 1280);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}.${ext}`), 480, 1920);
   const attachment = AM({
     _id: aid,
-    path: timePath,
+    toc,
     size: file.size,
     name: file.name,
     ext,
