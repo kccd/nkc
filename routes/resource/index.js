@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const resourceRouter = new Router();
 const pathModule = require('path');
 const infoRouter = require("./info");
+const noticeRouter = require("./notice");
 const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
 const videoExts = ["mp4", "mov", "3gp", "avi"];
 const audioExts = ["wav", "amr", "mp3", "aac"];
@@ -327,6 +328,12 @@ resourceRouter
       mediaType = "mediaAttachment";
       mediaRealPath = await db.ResourceModel.getMediaPath('mediaAttachment');
     }
+
+    // 为文件处理过程生成任务id
+    let taskId = noticeRouter.createProcessTask(user.uid);
+    // 任务id发送给前端
+    ctx.res.write(taskId);
+    ctx.res.end();
 
     // 带有年份月份的文件储存路径 /2018/04/
     // const middlePath = generateFolderName(uploadPath);
@@ -782,10 +789,11 @@ resourceRouter
         share: !!share
       });
     }
-
     ctx.data.r = await r.save();
-    await next()
+
+    noticeRouter.sendCompleteToUser(user.uid, taskId);
   })
-  .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods());
+  .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
+  .use("/:rid/fileConvertNotice", noticeRouter.routes(), noticeRouter.allowedMethods());
 
 module.exports = resourceRouter;

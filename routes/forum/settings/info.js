@@ -9,7 +9,7 @@ infoRouter
 	.patch('/', async (ctx, next) => {
 		const {data, db, body, nkcModules} = ctx;
 		const {forum} = data;
-		if(body.opeartion) {
+		if(body.operation) {
 			const {did, declare} = body;
 			// 富文本内容中每一个source添加引用
 			await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);

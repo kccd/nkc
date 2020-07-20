@@ -208,8 +208,8 @@ async function addImageTextWaterMask(op) {
   const videoSize = await getVideoSize(input);
   const logoSize = await getImageSize(image);
   let padHeight = parseInt(videoSize.height * flex);
-  let logoHeight = padHeight;
-  let logoWidth = parseInt(logoSize.width * (logoHeight / logoSize.height));
+  let logoHeight = padHeight - 1;
+  let logoWidth = parseInt(logoSize.width * (logoHeight / logoSize.height)) - 1;
   const textSize = await getDrawTextSize(text, padHeight - 10);
   let padWidth = logoWidth + textSize.width;
 

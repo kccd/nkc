@@ -7,38 +7,40 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.726);
     z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    .plyr-mask-wrap {
-      max-width: 100%;
-      width: 500px;
-      min-height: 100px;
-      padding: 10px;
-      color: white;
-      // background-color: red;
-      position: absolute;
+    display: table;
+    .plyr-mask-fix {
+      display: table-cell;
+      vertical-align: middle;
+      .plyr-mask-wrap {
+        max-width: 100%;
+        width: 500px;
+        min-height: 100px;
+        padding: 10px;
+        color: white;
+        margin: 0 auto;
+        // background-color: red;
 
-      .player-tip-content {
-        text-align: center;
-      }
+        .player-tip-content {
+          text-align: center;
+        }
 
-      .player-tip-button {
-        text-align: center;
-        button + button {
-          margin-left: 14px;
-        }
-        button:hover {
-          transform: scale(1.2);
-        }
-        button {
-          transition: 0.2s transform;
-          background-color: transparent;
-          border: none;
-          outline: none;
-          i {
-            margin-right: 8px;
-            font-size: 1.2em;
+        .player-tip-button {
+          text-align: center;
+          button + button {
+            margin-left: 14px;
+          }
+          button:hover {
+            transform: scale(1.2);
+          }
+          button {
+            transition: 0.2s transform;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            i {
+              margin-right: 8px;
+              font-size: 1.2em;
+            }
           }
         }
       }

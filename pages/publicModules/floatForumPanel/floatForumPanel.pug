@@ -26,4 +26,10 @@
             | 条回复
       .float-forum-bottom
         .float-forum-description(:title="forum.description") {{forum.description || "暂无简介"}}
+      .float-forum-latest(v-if="forum.latestThreads.length")
+        h4.title 最新
+        .content
+          .content-item(v-for="latest in forum.latestThreads")
+            a(:href="'/t/' + latest.firstPost.tid" target="_blank") {{latest.firstPost.t}}
+
 +includeJS("/publicModules/floatForumPanel/floatForumPanel.js")

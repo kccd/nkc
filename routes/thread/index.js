@@ -946,5 +946,5 @@ threadRouter
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())
   .use("/:tid/subscribe", subscribeRouter.routes(), subscribeRouter.allowedMethods())
-	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
+  .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

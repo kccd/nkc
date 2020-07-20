@@ -125,8 +125,11 @@ window.floatForumPanel = new Vue({
           nkcAPI(`/f/${fid}/card`, "GET")
             .then(data => {
               forumsObj = {
-                forum: data.forum,
-                subscribed: data.subscribed
+                forum: {
+                  ...data.forum,
+                  latestThreads: data.latestThreads
+                },
+                subscribed: data.subscribed,
               };
               self.forums[data.forum.fid] = forumsObj;
               resolve(forumsObj);

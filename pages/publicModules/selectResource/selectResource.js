@@ -262,6 +262,8 @@ NKC.modules.SelectResource = function() {
         this.files.splice(index, 1);
       },
       startUpload: function(f) {
+        // 本次上传的任务id，由服务器生成
+        let serverTaskId = null;
         f.error = "";
         this.selectCategory("upload");
         Promise.resolve()
@@ -283,32 +285,54 @@ NKC.modules.SelectResource = function() {
           })
           .then(function(data) {
             if(!data.uploaded) {
-              // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
-              var formData = new FormData();
-              formData.append("file", f.data);
-              if(f.data.constructor === Blob) {
-                formData.append("fileName", f.data.name || (Date.now() + ".png"));
+              return new Promise(function(resolve, reject){
+                // 连接转换通知通道
+                var sse = new EventSource("/r/0/fileConvertNotice?uid="+ NKC.configs.uid);
+                sse.onopen = resolve;
+                sse.onerror = reject;
+                sse.addEventListener("complete", function(event) {
+                  if(event.lastEventId + "" === serverTaskId + "") {
+                    uploadedAction();
+                    sse.close();
+                  }
+                })
+              }).then(function() {
+                // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
+                var formData = new FormData();
+                formData.append("file", f.data);
+                if(f.data.constructor === Blob) {
+                  formData.append("fileName", f.data.name || (Date.now() + ".png"));
+                }
+                return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+                  f.progress = progress;
+                });
+              })
+            }
+          })
+          .then(function(taskId) {
+            serverTaskId = taskId;
+            console.log("视频处理任务ID: ", taskId);
+          });
+
+        // 上传完成动作
+        function uploadedAction() {
+          return Promise.resolve()
+            .then(function() {
+              f.status = "uploaded";
+              var index = self.app.files.indexOf(f);
+              self.app.files.splice(index, 1);
+              if(self.app.category === "upload" && !self.app.files.length) {
+                self.app.category = "all";
+                self.app.getResources(0);
               }
-              return nkcUploadFile("/r", "POST", formData, function(e, progress) {
-                f.progress = progress;
-              });
-            }
-          })
-          .then(function() {
-            f.status = "uploaded";
-            var index = self.app.files.indexOf(f);
-            self.app.files.splice(index, 1);
-            if(self.app.category === "upload" && !self.app.files.length) {
-              self.app.category = "all";
-              self.app.getResources(0);
-            }
-          })
-          .catch(function(data) {
-            f.status = "unUpload";
-            f.progress = 0;
-            f.error = data.error || data;
-            screenTopWarning(data.error || data);
-          })
+            })
+            .catch(function(data) {
+              f.status = "unUpload";
+              f.progress = 0;
+              f.error = data.error || data;
+              screenTopWarning(data.error || data);
+            })
+        }
         // 上传文件
       },
       newFile: function(file) {
