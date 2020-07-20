@@ -7,7 +7,7 @@ const fs = require("fs");
 const fsPromise = fs.promises;
 const statics = require('../settings/statics');
 const FileType = require('file-type');
-const FILE = require('../nkcModules/file');
+const PATH = require('path');
 const schema = new Schema({
   // 附件ID mongoose.Types.ObjectId().toString()
   _id: String,
@@ -26,7 +26,7 @@ const schema = new Schema({
   // 附件目录 不包含文件名，如：/avatar/2020/07/
   path: {
     type: String,
-    required: true,
+    default: '',
     index: 1,
   },
   // 创建时间
@@ -171,11 +171,10 @@ schema.statics.saveHomeBigLogo = async file => {
 * */
 schema.methods.getFilePath = async function(t) {
   const file = require("../nkcModules/file");
-  const {path, _id, ext, toc} = this;
-  const {attachment} = file.folders;
-  const attachmentPath = await file.getFullPath(attachment, toc);
-  const normalFilePath = `${attachmentPath}${path}/${_id}.${ext}`;
-  const filePath = `${attachmentPath}${path}/${_id}${t?'_' + t: ''}.${ext}`;
+  const {_id, ext, toc, type} = this;
+  const fileFolderPath = await file.getPath(type, toc);
+  const normalFilePath = PATH.resolve(fileFolderPath, `./${_id}.${ext}`);
+  const filePath = PATH.resolve(fileFolderPath, `./${_id}${t?'_'+t:''}.${ext}`);
 
   if(fs.existsSync(filePath)) {
     return filePath;
@@ -357,12 +356,53 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
 
 /*
 * 保存文章封面
-*
+* @param {String} pid post id
+* @param {File} file 文件对象 可选 默认从post resources中选取图片
 * */
-schema.statics.savePostCover = async (file, post) => {
+schema.statics.savePostCover = async (pid, file) => {
+  const PostModel = mongoose.model('posts');
+  const ResourceModel = mongoose.model('resources');
+  const FILE = require('../nkcModules/file');
+  if(file === undefined) {
+    const post = await PostModel.findOne({pid});
+    if(!post) return;
+    const extArr = ['jpg', 'jpeg', 'png'];
+    const cover = await ResourceModel.findOne({ext: {$in: extArr}, references: pid});
+    if(!cover) return;
+    const filePath = await cover.getFilePath();
+    if(!fs.existsSync(filePath)) return;
+    file = await FILE.getFileObjectByFilePath(filePath);
+  }
+  const AttachmentModel = mongoose.model('attachments');
+  const {size, hash, path, name} = file;
   const now = Date.now();
-  const targetFilePath = await FILE.getPath('postCover', now);
-
+  const _id = await AttachmentModel.getNewId();
+  const targetFileFolder = await FILE.getPath('postCover', now);
+  const ext = 'jpg';
+  const targetFilePath = PATH.resolve(targetFileFolder, `./${_id}.${ext}`)
+  const a = AttachmentModel({
+    _id,
+    type: 'postCover',
+    toc: now,
+    size,
+    hash,
+    ext,
+    name
+  });
+  await ei.resize({
+    src: path,
+    dst: targetFilePath,
+    height: 400,
+    width: 800,
+    background: '#ffffff',
+    quality: 90
+  });
+  await a.save();
+  await PostModel.updateOne({pid}, {
+    $set: {
+      cover: _id,
+    }
+  });
 };
 
 module.exports = mongoose.model('attachments', schema);

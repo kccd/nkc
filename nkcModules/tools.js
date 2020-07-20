@@ -17,7 +17,8 @@ var Tools = function() {
         return "/a/" + id + t
       }
       case "postCover": {
-        return "/nr/cover/" + id + t
+        // return "/nr/cover/" + id + t
+        return '/a/' + id + t;
       }
       case "cover": {
         return "/nr/cover/" + id + t
