@@ -19,7 +19,7 @@ categoryRouter
 		}
 		data.parentForums = parentForums;
 		data.threadTypes = await db.ThreadTypeModel.find({fid: forum.fid}).sort({order: 1});
-		data.forumCategories = await db.ForumCategoryModel.getCategories();
+		data.forumCategories = await db.ForumCategoryModel.getAllCategories();
 		ctx.template = 'interface_forum_settings_category.pug';
 		await next();
 	})

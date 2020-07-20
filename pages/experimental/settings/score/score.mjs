@@ -115,7 +115,7 @@ const app = new Vue({
           for(const icon of iconArr) {
             const {iconFile, type} = icon;
             if (!iconFile) continue;
-            formData.append(type, iconFile);
+            formData.append(type, iconFile, iconFile.name);
           }
           return nkcUploadFile('/e/settings/score', 'PATCH', formData)
         })
@@ -128,7 +128,6 @@ const app = new Vue({
     }
   }
 });
-
 
 function getHMS(t) {
   return {

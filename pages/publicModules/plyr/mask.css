@@ -6,37 +6,38 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.726);
   z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: table;
 }
-.plyr .plyr-mask .plyr-mask-wrap {
-  max-width: 100%;
-  width: 500px;
+.plyr .plyr-mask .plyr-mask-fix {
+  display: table-cell;
+  vertical-align: middle;
+}
+.plyr .plyr-mask .plyr-mask-fix .plyr-mask-wrap {
+  max-width: 42rem;
   min-height: 100px;
   padding: 10px;
   color: white;
-  position: absolute;
+  margin: 0 auto;
 }
-.plyr .plyr-mask .plyr-mask-wrap .player-tip-content {
+.plyr .plyr-mask .plyr-mask-fix .plyr-mask-wrap .player-tip-content {
   text-align: center;
 }
-.plyr .plyr-mask .plyr-mask-wrap .player-tip-button {
+.plyr .plyr-mask .plyr-mask-fix .plyr-mask-wrap .player-tip-button {
   text-align: center;
 }
-.plyr .plyr-mask .plyr-mask-wrap .player-tip-button button + button {
+.plyr .plyr-mask .plyr-mask-fix .plyr-mask-wrap .player-tip-button button + button {
   margin-left: 14px;
 }
-.plyr .plyr-mask .plyr-mask-wrap .player-tip-button button:hover {
+.plyr .plyr-mask .plyr-mask-fix .plyr-mask-wrap .player-tip-button button:hover {
   transform: scale(1.2);
 }
-.plyr .plyr-mask .plyr-mask-wrap .player-tip-button button {
+.plyr .plyr-mask .plyr-mask-fix .plyr-mask-wrap .player-tip-button button {
   transition: 0.2s transform;
   background-color: transparent;
   border: none;
   outline: none;
 }
-.plyr .plyr-mask .plyr-mask-wrap .player-tip-button button i {
+.plyr .plyr-mask .plyr-mask-fix .plyr-mask-wrap .player-tip-button button i {
   margin-right: 8px;
   font-size: 1.2em;
 }

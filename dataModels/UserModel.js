@@ -1189,8 +1189,12 @@ userSchema.statics.uploadedAvatar = async (attachId) => {
   const AM = mongoose.model('attachments');
   const attachment = await AM.findOne({_id: attachId});
   if(!attachment) return false;
-  const filePath = await attachment.getFilePath();
-  return existsSync(filePath);
+  try{
+    const filePath = await attachment.getFilePath();
+    return existsSync(filePath);
+  } catch(err) {
+    return false;
+  }
 };
 
 /**
@@ -1203,8 +1207,14 @@ userSchema.statics.uploadedBanner = async (attachId) => {
   const AM = mongoose.model('attachments');
   const attachment = await AM.findOne({_id: attachId});
   if(!attachment) return false;
-  const filePath = await attachment.getFilePath();
-  return existsSync(filePath);
+  try{
+    const filePath = await attachment.getFilePath();
+    return existsSync(filePath);
+  } catch(err) {
+    return false;
+  }
+
+
 };
 
 /*
