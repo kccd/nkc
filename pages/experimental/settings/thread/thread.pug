@@ -31,6 +31,7 @@ block eContent
               label.m-r-1
                 input(type="checkbox" v-model="settings.playerTips.isDisplay")
                 | 显示遮罩
+          .form-group
             label.col-sm-2.control-label 提示内容
             .col-sm-10
               textarea.m-r-1(name="tipContent" cols="40" rows="6" v-model="settings.playerTips.tipContent")

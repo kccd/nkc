@@ -4,17 +4,14 @@ if(!threadSettings.isDisplay) {
 } else {
   NKC.methods.initPlyrMask = function(player) {
     const container = player.elements.container;
-    const playButton = container.querySelector(".plyr__control--overlaid[data-plyr='play']");
-    playButton.remove();
-    let template = document.querySelector("#plyrMask");
-    let maskDom = template.content.cloneNode(true);
-    let maskPlayButton = maskDom.querySelector(".player-tip-button .play");
-    let maskDownloadButton = maskDom.querySelector(".player-tip-button .download");
-    maskPlayButton.addEventListener("click", () => {
-      container.querySelector(".plyr-mask").remove();
+    let maskDom = $("#plyrMask .plyr-mask").clone(false);
+    let maskPlayButton = maskDom.find(".player-tip-button .play");
+    let maskDownloadButton = maskDom.find(".player-tip-button .download");
+    maskPlayButton.on("click", () => {
+      maskDom.remove();
       player.play();
     });
-    maskDownloadButton.addEventListener("click", () => NKC.methods.visitUrl(player.download, "_blank"));
-    container.appendChild(maskDom);
+    maskDownloadButton.on("click", () => NKC.methods.visitUrl(player.download, "_blank"));
+    $(container).append(maskDom);
   }
 }

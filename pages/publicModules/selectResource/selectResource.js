@@ -263,7 +263,7 @@ NKC.modules.SelectResource = function() {
       },
       startUpload: function(f) {
         // 本次上传的任务id，由服务器生成
-        let serverTaskId = null;
+        var serverTaskId = null;
         f.error = "";
         this.selectCategory("upload");
         Promise.resolve()
