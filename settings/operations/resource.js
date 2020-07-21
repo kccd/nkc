@@ -1,20 +1,12 @@
 module.exports = {
-	logo: {
-		POST: 'uploadHomeLogo',
-		PARAMETER: {
-			GET: 'getHomeLogo'
-		}
-	},
 	avatar: {// 用户头像
 		PARAMETER: {
-			GET: 'getUserAvatar',
 			POST: 'uploadUserAvatar'
 		}
 	},
   banner: {
     PARAMETER: {
       POST: "modifyUserBanner",
-      GET: "getUserBanner"
     }
   },
 	shopLogo: {
