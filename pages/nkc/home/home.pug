@@ -132,7 +132,7 @@ block nkcContent
                 .btn-upload(title='修改封面' @click='selectLocalFile(t)').pointer
                   .fa.fa-cloud-upload
                 .cover
-                  img(:src="getUrl('cover', t.cover)")
+                  img(:src="getUrl('recommendThreadCover', t.cover)")
         div(v-if='recommendThreads[page.id].displayType !== "automatic"')
           +threadList({name: '手动推荐', listName: 'manuallySelectedThreads'})
         div(v-if='recommendThreads[page.id].displayType !== "manual"')

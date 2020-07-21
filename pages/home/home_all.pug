@@ -36,7 +36,7 @@ block content
               .swiper-wrapper
                 for thread in data.ads.movable
                   a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                    'background-image': `url(${tools.getUrl('postCover', thread.cover)})`
+                    'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
                   })
                     .swiper-title= `${thread.title}`
               .swiper-pagination
@@ -49,7 +49,7 @@ block content
               for thread in data.ads.fixed
                 .home-cover-sm
                   a(href=`/t/${thread.tid}` target="_blank" title=thread.title)
-                    .home-covers-sm-img(style=`background-image:url(${tools.getUrl('postCover', thread.cover)})`)
+                    .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
                     .home-covers-sm-title=thread.title
         .hidden-md.hidden-lg.hidden-sm.home-buttons
           .col-xs-4

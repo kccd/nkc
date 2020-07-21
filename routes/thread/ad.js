@@ -49,11 +49,13 @@ homeTopRouter
       minLength: 1,
       maxLength: 500
     });
-    await nkcModules.file.saveHomeAdCover(cover, topType);
+    const aid = await db.AttachmentModel.saveRecommendThreadCover(cover, topType);
+    // await nkcModules.file.saveHomeAdCover(cover, topType);
     const newTop = {
       title,
       tid,
-      cover: cover.hash,
+      cover: aid,
+      // cover: cover.hash,
       type: 'manual', // manual: 手动的, automatic: 自动的
     };
     if(topType === "movable") {

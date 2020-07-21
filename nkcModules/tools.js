@@ -49,6 +49,9 @@ var Tools = function() {
       case "watermark": {
         return "/a/" + id + t
       }
+      case "recommendThreadCover": {
+        return '/a/' + id + t
+      }
       case "pdf": {
         return "/r/" + id + '?c=nkc_source_pdf';
       }

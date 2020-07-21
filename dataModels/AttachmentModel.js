@@ -359,6 +359,7 @@ schema.statics.saveScoreIcon = async (file, scoreType) => {
 * 保存文章封面
 * @param {String} pid post id
 * @param {File} file 文件对象 可选 默认从post resources中选取图片
+* @author pengxiguaa 2020/7/21
 * */
 schema.statics.savePostCover = async (pid, file) => {
   const PostModel = mongoose.model('posts');
@@ -405,5 +406,48 @@ schema.statics.savePostCover = async (pid, file) => {
     }
   });
 };
+
+/*
+* 保存首页推荐文章封面
+* @param {File} File 文件对象
+* @param {String} type 图片类型 movable: 轮播图, fixed: 固定图
+* @return {String} 附件对象ID
+* @author pengxiguaa 2020/7/21
+* */
+schema.statics.saveRecommendThreadCover = async (file, type) => {
+  const AttachmentModel = mongoose.model('attachments');
+  const {hash, path, size, name} = file;
+  const FILE = require('../nkcModules/file');
+  const toc = new Date();
+  const t = 'recommendThreadCover';
+  const fileFolder = await FILE.getPath(t, toc);
+  const aid = await AttachmentModel.getNewId();
+  const ext = 'jpg';
+  const filePath = PATH.resolve(fileFolder, `./${aid}.${ext}`);
+  let height = 253, width = 400;
+  if(type === 'movable') {
+    height = 336;
+    width = 800;
+  }
+  await ei.resize({
+    src: path,
+    dst: filePath,
+    height,
+    width,
+    quality: 90
+  });
+  const a = AttachmentModel({
+    _id: aid,
+    toc,
+    ext,
+    type: t,
+    name,
+    size,
+    hash
+  });
+  await a.save();
+  return aid;
+};
+
 
 module.exports = mongoose.model('attachments', schema);

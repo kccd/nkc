@@ -19,4 +19,6 @@ module.exports = {
   scoreIcon: './attachment/website',
   // 文章封面
   postCover: './attachment/cover',
+  // 首页推荐文章的封面（轮播图、固定图）
+  recommendThreadCover: './attachment/cover',
 };
