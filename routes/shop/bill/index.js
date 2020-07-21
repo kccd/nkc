@@ -31,7 +31,7 @@ router
     } else {
       billType = "cart";
       cartsId = cartsId.split('-');
-      const cartsData = await db.ShopCartModel.find({_id: {$in: cartsId}}); 
+      const cartsData = await db.ShopCartModel.find({_id: {$in: cartsId}});
       data.cartsData = await db.ShopCartModel.extendCartsInfo(cartsData, {
         userGradeId: data.user.grade._id
       });
@@ -56,7 +56,7 @@ router
         cartId: _id,
         price: productParam.useDiscount? productParam.price: productParam.originPrice,
         count
-      }; 
+      };
     }
     for(const paramId in paramsObj) {
       if(!paramsObj.hasOwnProperty(paramId)) continue;
@@ -88,7 +88,7 @@ router
       data.results.push(usersObj[userId]);
     }
     // 将账单按卖家进行分类
-    let newCartData = {}; 
+    let newCartData = {};
     for(const cart of data.cartsData) {
       const newCartDataUid = cart.product.uid;
       // 计算单个商品运费
@@ -149,12 +149,8 @@ router
     data.newCartData = newCartData;
     // 计算账单总价格
     // 取出全部收货地址
-    let addresses = [];
-    const userPersonal = await db.UsersPersonalModel.findOne({"uid":user.uid});
-    if(userPersonal){
-      addresses = userPersonal.addresses;
-    }
-    data.addresses = addresses;
+    const userPersonal = await db.UsersPersonalModel.findOnly({"uid": user.uid});
+    data.addresses = userPersonal.addresses || [];
     ctx.template = 'shop/bill/bill.pug';
     await next();
   })
