@@ -165,7 +165,7 @@ router
 	.use("/", async (ctx, next) => {
 		const {data, db, params, query, url, method} = ctx;
 		let _url = url.replace(/\?.*/g, "");
-		_url = _url.replace(/^\/f\/[0-9]+?\/(.+)/i, "$1");
+		_url = _url.replace(/^\/f\/[0-9a-zA-Z]+?\/(.+)/i, "$1");
 		const {fid} = params;
 		if(
 			!(

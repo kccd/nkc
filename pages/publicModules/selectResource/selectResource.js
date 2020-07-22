@@ -266,6 +266,7 @@ NKC.modules.SelectResource = function() {
         var serverTaskId = null;
         f.error = "";
         this.selectCategory("upload");
+        var fileId = null;
         Promise.resolve()
           .then(function() {
             if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
@@ -281,59 +282,47 @@ NKC.modules.SelectResource = function() {
             formData.append("type", "checkMD5");
             formData.append("fileName", f.name);
             formData.append("md5", md5);
+            fileId = md5;
             return nkcUploadFile("/r", "POST", formData);
           })
           .then(function(data) {
             if(!data.uploaded) {
-              return new Promise(function(resolve, reject){
-                // 连接转换通知通道
-                var sse = new EventSource("/r/0/fileConvertNotice?uid="+ NKC.configs.uid);
-                sse.onopen = resolve;
-                sse.onerror = reject;
-                sse.addEventListener("complete", function(event) {
-                  if(event.lastEventId + "" === serverTaskId + "") {
-                    uploadedAction();
-                    sse.close();
-                  }
-                })
-              }).then(function() {
-                // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
-                var formData = new FormData();
-                formData.append("file", f.data);
-                if(f.data.constructor === Blob) {
-                  formData.append("fileName", f.data.name || (Date.now() + ".png"));
+              // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
+              var formData = new FormData();
+              formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
+              formData.append("fileId", fileId);
+              var receiver = function(data) {
+                if(data.fileId && data.fileId === fileId && data.statu && data.statu === "complete") {
+                  completeAction();
+                } else {
+                  commonSocket.once("message", receiver);
                 }
-                return nkcUploadFile("/r", "POST", formData, function(e, progress) {
-                  f.progress = progress;
-                });
-              })
+              };
+              commonSocket.once("message", receiver);
+              return nkcUploadFile("/r", "POST", formData, function(e, progress) {
+                f.progress = progress;
+              }, 60 * 60 * 1000);
             }
-          })
-          .then(function(taskId) {
-            serverTaskId = taskId;
-            console.log("视频处理任务ID: ", taskId);
           });
 
-        // 上传完成动作
-        function uploadedAction() {
-          return Promise.resolve()
-            .then(function() {
-              f.status = "uploaded";
-              var index = self.app.files.indexOf(f);
-              self.app.files.splice(index, 1);
-              if(self.app.category === "upload" && !self.app.files.length) {
-                self.app.category = "all";
-                self.app.getResources(0);
-              }
-            })
-            .catch(function(data) {
-              f.status = "unUpload";
-              f.progress = 0;
-              f.error = data.error || data;
-              screenTopWarning(data.error || data);
-            })
-        }
-        // 上传文件
+          function completeAction() {
+            return Promise.resolve()
+              .then(function() {
+                f.status = "uploaded";
+                var index = self.app.files.indexOf(f);
+                self.app.files.splice(index, 1);
+                if(self.app.category === "upload" && !self.app.files.length) {
+                  self.app.category = "all";
+                  self.app.getResources(0);
+                }
+              })
+              .catch(function(data) {
+                f.status = "unUpload";
+                f.progress = 0;
+                f.error = data.error || data;
+                screenTopWarning(data.error || data);
+              })
+          }
       },
       newFile: function(file) {
         return {

@@ -65,7 +65,7 @@ const app = new Vue({
         minLength: 1,
         maxLength: 100
       });
-      nkcAPI(`/u/${NKC.configs.uid}/settings/transaction`, "PATCH", {
+      nkcAPI(`/u/${NKC.configs.uid}/settings/transaction`, "PUT", {
         operation: "add",
         addresses: [this.addressForm]
       })

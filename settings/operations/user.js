@@ -53,7 +53,7 @@ module.exports = {
 			},
 			transaction: {
 				GET: 'visitUserTransactionSettings',
-				PATCH: 'modifyUserTransaction'
+				PUT: 'modifyUserTransaction'
 			},
 			social: {
 				GET: 'visitUserSocialSettings',

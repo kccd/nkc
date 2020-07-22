@@ -248,7 +248,7 @@ resourceRouter
     let mediaRealPath;
     const {files, fields} = ctx.body;
     const {file} = files;
-    const {type, fileName, md5, share} = fields;
+    const {type, fileName, md5, share, fileId} = fields;
 
     if(type === "checkMD5") {
       // 前端提交待上传文件的md5，用于查找resources里是否与此md5匹配的resource
@@ -335,17 +335,20 @@ resourceRouter
       mediaRealPath = await db.ResourceModel.getMediaPath('mediaAttachment');
     }
 
-    // 为文件处理过程生成任务id
-    let taskId = noticeRouter.createProcessTask(user.uid);
-    // 任务id发送给前端
-    ctx.res.write(taskId);
-    ctx.res.end();
+    // // 为文件处理过程生成任务id
+    // let taskId = noticeRouter.createProcessTask(user.uid);
+    // // 任务id发送给前端
+    // ctx.res.write(taskId);
+    // ctx.res.end();
 
     // 带有年份月份的文件储存路径 /2018/04/
     // const middlePath = generateFolderName(uploadPath);
     let middlePath = generateFolderName(mediaRealPath);
     // 路径 d:\nkc\resources\video/2018/04/256647.mp4
     let mediaFilePath = mediaRealPath + middlePath + saveName;
+
+    // 提前返回，待转换完成用socket通知前端
+    ctx.res.end();
 
     // 图片裁剪水印
     if (pictureExts.indexOf(extension.toLowerCase()) > -1) {
@@ -797,7 +800,9 @@ resourceRouter
     }
     ctx.data.r = await r.save();
 
-    noticeRouter.sendCompleteToUser(user.uid, taskId);
+    // 通知前端转换完成了
+    global.NKC.io.of('/common').to(`user/${user.uid}`).send({fileId, statu: "complete"});
+    // noticeRouter.sendCompleteToUser(user.uid, taskId);
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
   .use("/:rid/fileConvertNotice", noticeRouter.routes(), noticeRouter.allowedMethods());

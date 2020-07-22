@@ -13,7 +13,7 @@ transactionRouter
 		ctx.template = 'interface_user_settings_transaction.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, params, data, body, nkcModules} = ctx;
     const {uid} = params;
     const {checkString} = nkcModules.checkData;

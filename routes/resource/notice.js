@@ -9,36 +9,8 @@ noticeRouter
     ctx.respond = false;
     let {res, query} = ctx;
     let {uid} = query;
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
-    });
-    res.write("data: 文件处理完之后我会再发一条complete事件通知你\n\n");
-    return new Promise((resolve, reject) => {
-      res.socket.on("close", resolve);
-      if(store.has(uid)) {
-        let desc = store.get(uid);
-        desc.complete = (taskId) => {
-          res.write("event: complete\nid: "+ taskId +"\ndata: 处理完成\n\n");
-          resolve();
-        }
-      } else {
-        /**
-         * @todo 可能存在内存泄露问题，待优化
-         */
-        store.set(uid, {
-          tasks: [],
-          complete: (taskId) => {
-            res.write("event: complete\nid: "+ taskId +"\ndata: 处理完成\n\n");
-            resolve();
-          }
-        });
-      }
-
-    }).finally(() => {
-      res.end();
-    })
+    global.NKC.io.of('/common').send(uid);
+    await next();
   });
 
 module.exports = noticeRouter;
