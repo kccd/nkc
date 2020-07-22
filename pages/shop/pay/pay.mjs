@@ -61,7 +61,10 @@ const app = new Vue({
     useAliPay() {
       const {ordersId, aliPay} = this;
       const {totalPrice, feePrice} = aliPay;
-      let newWindow = window.open();
+      let newWindow;
+      if(NKC.configs.platform !== 'reactNative') {
+        newWindow = window.open();
+      }
       Promise.resolve()
         .then(() => {
           return nkcAPI(`/shop/pay/alipay?ordersId=${ordersId}&money=${totalPrice}`, 'GET')
