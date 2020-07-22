@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const bannedRouter = new Router();
 bannedRouter
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, params} = ctx;
 		const {uid} = params;
 		const targetUser = await db.UserModel.findOnly({uid});

@@ -1,4 +1,4 @@
 module.exports = {
   GET: "review",
-  PATCH: "review"
+  PUT: "review"
 };

@@ -5,7 +5,7 @@ module.exports = {
 	},
 	settings: {
 		GET: 'visitFundSettings',
-		PATCH: 'modifyFundSettings'
+		PUT: 'modifyFundSettings'
 	},
 	info: {
 		GET: 'visitFundInfo'
@@ -15,7 +15,7 @@ module.exports = {
 		POST: 'addFundBill',
 		PARAMETER: {
 			GET: 'visitFundBill',
-			PATCH: 'modifyFundBill',
+			PUT: 'modifyFundBill',
 			DELETE: 'deleteFundBill'
 		}
 	},
@@ -30,7 +30,7 @@ module.exports = {
 		POST: 'addFund',
 		PARAMETER: {
 			DELETE: 'deleteFundObject',
-			PATCH: 'modifyFundObject',
+			PUT: 'modifyFundObject',
 			GET: 'visitFundObjectHome',
 			settings: {
 				GET: 'visitFundObjectSettings'
@@ -73,7 +73,7 @@ module.exports = {
 		PARAMETER: {
 			GET: 'visitFundApplicationForm',
 			POST: 'restoreFundApplicationForm',
-			PATCH: 'modifyApplicationForm',
+			PUT: 'modifyApplicationForm',
 			DELETE: 'deleteApplicationForm',
 			report: {
 				GET: 'visitFundApplicationReport',
@@ -96,7 +96,7 @@ module.exports = {
 				}
 			},*/
 			member: {
-				PATCH: 'modifyFundApplicationMember'
+				PUT: 'modifyFundApplicationMember'
 			},
 			vote: {
 				POST: 'submitFundApplicationVote'
@@ -121,14 +121,14 @@ module.exports = {
 					POST: 'submitFundApplyRemittance'
 				},
 				verify: {
-					PATCH: 'confirmationFundRemittance'
+					PUT: 'confirmationFundRemittance'
 				}
 			},
 			excellent: {
-				PATCH: 'fundApplicationFormExcellent'
+				PUT: 'fundApplicationFormExcellent'
 			},
 			disabled: {
-				PATCH: 'modifyFundApplicationFormStatus'
+				PUT: 'modifyFundApplicationFormStatus'
 			}
 		}
 	}

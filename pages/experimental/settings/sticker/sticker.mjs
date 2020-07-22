@@ -7,7 +7,7 @@ const app = new Vue({
   methods: {
     submit() {
       const {stickerSettings} = this;
-      nkcAPI("/e/settings/sticker", "PATCH", {
+      nkcAPI("/e/settings/sticker", "PUT", {
         stickerSettings
       })
       .then(() => {

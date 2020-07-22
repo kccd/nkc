@@ -14,7 +14,7 @@ $(function() {
       fromNow: NKC.methods.fromNow,
       save: function(warning) {
         if(!warning.reason) return screenTopWarning("修改建议不能为空");
-        nkcAPI("/p/" + warning.pid + "/warning", "PATCH", {
+        nkcAPI("/p/" + warning.pid + "/warning", "PUT", {
           reason: warning.reason,
           warningId: warning._id
         })

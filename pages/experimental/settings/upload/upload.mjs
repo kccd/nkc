@@ -83,7 +83,7 @@ var app = new Vue({
           if(smallWatermarkFile) {
             formData.append('smallWatermark', smallWatermarkFile);
           }
-          return nkcUploadFile('/e/settings/upload', 'PATCH', formData);
+          return nkcUploadFile('/e/settings/upload', 'PUT', formData);
         })
         .then(() => {
           sweetSuccess('保存成功');

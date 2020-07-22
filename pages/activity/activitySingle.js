@@ -69,7 +69,7 @@ function onedit(acid) {
     acid: acid,
     enrollInfo: enrollInfo
   }
-  nkcAPI("/activity/single/"+acid, "PATCH", {post:post})
+  nkcAPI("/activity/single/"+acid, "PUT", {post:post})
   .then(function(data) {
     sweetAlert("修改成功！");
     setTimeout(function() {

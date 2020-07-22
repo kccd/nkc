@@ -110,7 +110,7 @@ var app = new Vue({
     },
     save: function() {
       var role = this.role;
-      nkcAPI('/e/settings/role/' + role._id, 'PATCH', {role: role})
+      nkcAPI('/e/settings/role/' + role._id, 'PUT', {role: role})
         .then(function() {
           screenTopAlert('保存成功');
         })

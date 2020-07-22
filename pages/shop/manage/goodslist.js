@@ -9,7 +9,7 @@ function editProductParamInfo() {
  * 立即上架
  */
 function shelfRightNow(uid, productId) {
-  nkcAPI('/shop/manage/'+uid+'/goodslist/shelfRightNow', "PATCH", {productId:productId})
+  nkcAPI('/shop/manage/'+uid+'/goodslist/shelfRightNow', "PUT", {productId:productId})
   .then(function() {
     sweetAlert("上架成功");
     var targetUrl = '/shop/manage/'+uid+'/goodslist';
@@ -27,7 +27,7 @@ function shelfRightNow(uid, productId) {
 function stopSale(uid,productId) {
   var sureStopSale = confirm("是否确认停售该商品?");
   if(sureStopSale){
-    nkcAPI('/shop/manage/'+uid+'/goodslist/productStopSale', "PATCH", {productId: productId})
+    nkcAPI('/shop/manage/'+uid+'/goodslist/productStopSale', "PUT", {productId: productId})
     .then(function(data) {
       sweetAlert("商品已停售");
       window.location.reload();
@@ -44,7 +44,7 @@ function stopSale(uid,productId) {
 function goonSale(uid,productId) {
   var sureGoonSale = confirm("是否确认复售该商品?");
   if(sureGoonSale) {
-    nkcAPI('/shop/manage/'+uid+'/goodslist/productGoonSale', "PATCH", {productId: productId})
+    nkcAPI('/shop/manage/'+uid+'/goodslist/productGoonSale', "PUT", {productId: productId})
     .then(function(data) {
       sweetAlert("商品已复售");
       window.location.reload();
@@ -95,7 +95,7 @@ function paramToEdit(uid,paraId) {
     price: paramPrice.toFixed(2)*100,
     stocksSurplus: stocksSurplus.toFixed(0)*1
   }
-  nkcAPI('/shop/manage/'+uid+'/goodslist/editParam', "PATCH", {obj:obj})
+  nkcAPI('/shop/manage/'+uid+'/goodslist/editParam', "PUT", {obj:obj})
   .then(function(data) {
     sweetAlert("修改成功");
     $("#save"+paraId).css("display", "none");

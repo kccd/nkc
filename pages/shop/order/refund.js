@@ -123,7 +123,7 @@ var app = new Vue({
       for(var i = 0; i < certs.length; i++ ) {
         certsId.push(certs[i]._id);
       }
-      nkcAPI("/shop/cert", "PATCH", {
+      nkcAPI("/shop/cert", "PUT", {
         certsId: certsId
       })
         .then(function() {

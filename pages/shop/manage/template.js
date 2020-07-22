@@ -25,7 +25,7 @@ app = new Vue({
         templates: app.templates
       }
       app.saveBtnDis = true;
-      nkcAPI("/shop/manage/"+app.uid+"/template", "PATCH", post)
+      nkcAPI("/shop/manage/"+app.uid+"/template", "PUT", post)
       .then(function(data) {
         sweetAlert("保存成功");
         app.saveBtnDis = false;

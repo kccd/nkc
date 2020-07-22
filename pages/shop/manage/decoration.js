@@ -246,7 +246,7 @@ function addStoreClass(storeId) {
   if(!newClassName){
     return screenTopWarning("请输入分类名称");
   }
-  nkcAPI('/shop/manage/'+storeId+'/decoration/addClass', "PATCH", {newClassName})
+  nkcAPI('/shop/manage/'+storeId+'/decoration/addClass', "PUT", {newClassName})
   .then(function(data) {
     screenTopAlert("保存成功");
     $('#storeAddClassPickModal').modal('hide');
@@ -264,7 +264,7 @@ function addStoreClass(storeId) {
 function delStoreClass(storeId, index) {
   var r = confirm("是否删除当前分类");
   if(r){
-    nkcAPI('/shop/manage/'+storeId+'/decoration/delClass', "PATCH", {index})
+    nkcAPI('/shop/manage/'+storeId+'/decoration/delClass', "PUT", {index})
     .then(function(data) {
       screenTopAlert("删除成功");
       $('#storeAddClassPickModal').modal('hide');
@@ -325,7 +325,7 @@ function addSingleClassify(storeId, productId, index) {
   var post  = {
     arr
   }
-  nkcAPI('/shop/manage/'+storeId+'/decoration/addSingleClass', "PATCH", {arr, index})
+  nkcAPI('/shop/manage/'+storeId+'/decoration/addSingleClass', "PUT", {arr, index})
   .then(function(data) {
     editSingleClassify(index, storeId)
   })
@@ -353,7 +353,7 @@ function delSingleClassify(storeId, productId, index) {
   var post  = {
     arr
   }
-  nkcAPI('/shop/manage/'+storeId+'/decoration/addSingleClass', "PATCH", {arr, index})
+  nkcAPI('/shop/manage/'+storeId+'/decoration/addSingleClass', "PUT", {arr, index})
   .then(function(data) {
     editSingleClassify(index, storeId)
   })

@@ -278,7 +278,7 @@ function sendMessage(acid) {
     noticeContent: noticeContent
   }
   var url = '/activity/modify/' + acid;
-  var method = "PATCH";
+  var method = "PUT";
   var alertInfo = "通知已发给全体报名者"
   nkcAPI(url, method, post)
     .then(function(){

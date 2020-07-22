@@ -14,7 +14,7 @@ router
     await type.save();
     await next();
   })
-  .patch('/:typeId', async (ctx, next) => {
+  .put('/:typeId', async (ctx, next) => {
     const {db, body, params} = ctx;
     let {typeId} = params;
     typeId = Number(typeId);

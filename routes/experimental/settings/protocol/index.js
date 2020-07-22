@@ -39,7 +39,7 @@ protocolRouter
     await next();
   })
   // 后台更新协议
-  .patch('/:type', async (ctx, next) => {
+  .put('/:type', async (ctx, next) => {
     const {data, db, body} = ctx;
     let {id, protocolName, protocolTypeId, protocolTypeName, protocolContent} = body;
     if(!protocolName) ctx.throw(400, "未填写协议名称");
@@ -81,7 +81,7 @@ protocolRouter
     // 富文本内容中每一个source添加引用
     await db.ResourceModel.toReferenceSource("protocol-" + protocolTypeId, protocolContent);
     protocol = db.ProtocolModel({
-      protocolName, 
+      protocolName,
       protocolTypeId,
       protocolTypeName,
       protocolContent

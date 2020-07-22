@@ -7,7 +7,7 @@ router
     ctx.template = 'experimental/settings/exam.pug';
 		await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {db, body} = ctx;
     const {examSettings} = body;
     let {count, countOneDay, waitingTime} = examSettings;

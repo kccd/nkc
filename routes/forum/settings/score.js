@@ -10,7 +10,7 @@ router
     ctx.template = 'forum/settings/score.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {nkcModules, data, db, body} = ctx;
     const {forumScoreOperations} = body;
     const {forum} = data;

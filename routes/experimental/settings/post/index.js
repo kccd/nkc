@@ -19,7 +19,7 @@ router
     data.grades = await db.UsersGradeModel.find().sort({toc: 1});
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {body, db, nkcModules} = ctx;
     const {roles, grades, postToThread, postToForum, postLibrary} = body;
     const q = {};

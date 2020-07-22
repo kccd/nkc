@@ -61,7 +61,7 @@ authRouter
 		await targetUserPersonal.update({submittedAuth: true});
 		await next();
 	})
-	.patch('/2', async (ctx, next) => {
+	.put('/2', async (ctx, next) => {
 		const {db, body, params} = ctx;
 		const {uid} = params;
 		const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid});
@@ -108,7 +108,7 @@ authRouter
 		await targetUserPersonal.update({submittedAuth: true});
 		await next();
 	})
-	.patch('/3', async (ctx, next) => {
+	.put('/3', async (ctx, next) => {
 		const {db, body, params} = ctx;
 		const {uid} = params;
 		const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid});

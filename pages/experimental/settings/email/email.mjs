@@ -33,7 +33,7 @@ const app = new Vue({
 
     },
     save: function() {
-      nkcAPI('/e/settings/email', 'PATCH', {emailSettings: this.emailSettings})
+      nkcAPI('/e/settings/email', 'PUT', {emailSettings: this.emailSettings})
         .then(function() {
           screenTopAlert('保存成功');
         })

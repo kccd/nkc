@@ -92,7 +92,7 @@ function saveUserInfo(uid, callback) {
 		mobile: $('#mobile').val()
 	};
 	obj.nationCode = parseInt(obj.nationCode);
-	nkcAPI('/e/settings/user/'+uid, 'PATCH', obj)
+	nkcAPI('/e/settings/user/'+uid, 'PUT', obj)
 		.then(function() {
 			if(callback) {
 				callback();
@@ -121,7 +121,7 @@ function editorRole(uid, type) {
 			roleDisplayName: roleDisplayName
 		};
 	}
-	nkcAPI('/e/settings/user/'+uid, 'PATCH', obj)
+	nkcAPI('/e/settings/user/'+uid, 'PUT', obj)
 		.then(function() {
 			window.location.reload();
 		})

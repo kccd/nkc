@@ -53,7 +53,7 @@ var app = new Vue({
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     saveCertId: function() {
-      nkcAPI("/e/settings/review", "PATCH", {
+      nkcAPI("/e/settings/review", "PUT", {
         type: 'saveCertsId',
         certsId: app.reviewSettings.certsId
       })
@@ -139,7 +139,7 @@ var app = new Vue({
     addUser: function(type) {
       var uid = this.uid[type];
       if(!uid) return screenTopWarning("请输入用户ID");
-      nkcAPI("/e/settings/review", "PATCH", {
+      nkcAPI("/e/settings/review", "PUT", {
         tab: this.tab,
         type: "addUser",
         listType: type,
@@ -164,7 +164,7 @@ var app = new Vue({
         })
     },
     removeUser: function(uid, type) {
-      nkcAPI("/e/settings/review", "PATCH", {
+      nkcAPI("/e/settings/review", "PUT", {
         tab: this.tab,
         type: "removeUser",
         listType: type,
@@ -214,7 +214,7 @@ var app = new Vue({
           }
         }
       }
-      nkcAPI("/e/settings/review", "PATCH", {
+      nkcAPI("/e/settings/review", "PUT", {
         type: "saveBlacklist",
         tab: this.tab,
         blacklist: blacklist
@@ -229,7 +229,7 @@ var app = new Vue({
 
     },
     saveWhitelist: function() {
-      nkcAPI("/e/settings/review", "PATCH", {
+      nkcAPI("/e/settings/review", "PUT", {
         type: "saveWhitelist",
         tab: this.tab,
         whitelist: app.review.whitelist

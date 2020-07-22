@@ -56,7 +56,7 @@ function submit() {
 }
 
 function delCarousel(index) {
-  nkcAPI('/e/settings/shop/homeSetting/carousel', 'PATCH', {index:index})
+  nkcAPI('/e/settings/shop/homeSetting/carousel', 'PUT', {index:index})
   .then(function(data) {
     screenTopAlert("删除成功");
     window.location.reload();

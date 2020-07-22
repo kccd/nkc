@@ -134,7 +134,7 @@ function countAddOne(para) {
     cartId: cartId,
     count: count
   }
-  nkcAPI("/shop/bill/add", "PATCH", post)
+  nkcAPI("/shop/bill/add", "PUT", post)
   .then(function(data) {
     $(para).removeAttr("disabled");
     $(para).next().text(count+"");
@@ -191,7 +191,7 @@ function countPlusOne(para) {
     cartId: cartId,
     count: count
   }
-  nkcAPI("/shop/bill/plus", "PATCH", post)
+  nkcAPI("/shop/bill/plus", "PUT", post)
   .then(function(data) {
     $(para).removeAttr("disabled");
     $(para).prev().text(count+"");
@@ -244,7 +244,7 @@ function reCountSinglePrice(count) {
 function numToFloatTwo(str) {
 	str = (str/100).toFixed(2);
 	return str;
-} 
+}
 
 /**
  * 修改运送方式，并修改当前小项价格

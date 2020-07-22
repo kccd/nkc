@@ -107,7 +107,7 @@ billsRouter
 		await bill.remove();
 		await next();
 	})
-	.patch('/:billId', async (ctx, next) => {
+	.put('/:billId', async (ctx, next) => {
 		const {body} = ctx;
 		const {obj} = body;
 		const {bill} = ctx.data;

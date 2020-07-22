@@ -15,7 +15,7 @@ historiesRouter
     ctx.template = 'experimental/settings/app.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const { nkcModules, db, body } = ctx;
     const { newVersion, operating } = body;
     const { checkString } = nkcModules.checkData;

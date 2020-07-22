@@ -661,7 +661,10 @@ func.getFileExtension = async (file, extensions = []) => {
     extension = pathExtension;
   }
   if(extension !== pathExtension) {
-    throwErr(400, `文件内容格式(${extension})与后缀名(${pathExtension})无法对应`);
+    const jpgArr = ['jpg', 'jpeg'];
+    if(!jpgArr.includes(extension) || !jpgArr.includes(pathExtension)) {
+      throwErr(400, `文件内容格式(${extension})与后缀名(${pathExtension})无法对应`);
+    }
   }
   if(!extension) throwErr(400, '未知的文件格式');
   if(extensions.length) {

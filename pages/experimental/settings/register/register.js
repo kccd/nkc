@@ -45,7 +45,7 @@ var app = new Vue({
         fid.push(selectedForums[i].fid);
       }
       app.info = "";
-      nkcAPI("/e/settings/register", "PATCH", {
+      nkcAPI("/e/settings/register", "PUT", {
         defaultSubscribeForumsId: fid,
         regSettings: this.regSettings
       })

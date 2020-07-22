@@ -16,7 +16,7 @@ router
 		ctx.template = 'experimental/settings/score/score.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body, nkcModules} = ctx;
 		const {checkNumber, checkString} = nkcModules.checkData;
 		const {files, fields} = body;

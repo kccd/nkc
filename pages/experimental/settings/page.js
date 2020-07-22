@@ -13,7 +13,7 @@ var app = new Vue({
     save: function() {
       this.error = "";
       this.info = "";
-      nkcAPI("/e/settings/page", "PATCH", {
+      nkcAPI("/e/settings/page", "PUT", {
         pageSettings: this.pageSettings
       })
         .then(function() {

@@ -5,7 +5,7 @@ settingsRouter
 		ctx.template = 'interface_fund_general_settings.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {user} = data;
 		const fundSettings = await db.SettingModel.findOne({_id: 'fund'});

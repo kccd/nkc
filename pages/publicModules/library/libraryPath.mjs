@@ -69,7 +69,7 @@ NKC.modules.LibraryPath = class {
             method = "POST";
             url = `/library/${folder._id}/list`;
           } else {
-            method = "PATCH";
+            method = "PUT";
             url = `/library/${folder._id}`;
           }
           nkcAPI(url, method, {

@@ -328,7 +328,7 @@ function cancelTopped(tid) {
   if(status.innerHTML === setDigest) dateObj = {digest: true};
   else if(status.innerHTML === unSetDigest) dateObj = {digest: false};
   else return screenTopWarning('到底是要设置精华还是撤销精华？');
-  nkcAPI('/t/'+tid+'/digest', 'PATCH',dateObj)
+  nkcAPI('/t/'+tid+'/digest', 'PUT',dateObj)
   .then(function(back){
     var oldStatus = status.innerHTML;
     if(status.innerHTML === setDigest) {
@@ -352,7 +352,7 @@ function cancelTopped(tid) {
   if(status.innerHTML === setTop) dataObj = {topped: true};
   else if(status.innerHTML === unSetTop) dataObj = {topped: false};
   else return screenTopWarning('到底是要设置置顶还是撤销置顶？');
-  nkcAPI('/t/'+tid+'/topped', 'PATCH',dataObj)
+  nkcAPI('/t/'+tid+'/topped', 'PUT',dataObj)
   .then(function(back){
     var oldStatus = status.innerHTML;
     if(oldStatus === setTop) {
@@ -653,7 +653,7 @@ function switchVInPersonalForum(tid, name, type) {
 		target = geid('visibility');
 		var hideInMid = false;
 		if(target.innerHTML === visible) hideInMid = true;
-		nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PATCH',{hideInMid: hideInMid})
+		nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PUT',{hideInMid: hideInMid})
 			.then(function() {
 				if(target.innerHTML === hidden) {
 					target.innerHTML = visible;
@@ -730,7 +730,7 @@ function switchDInPersonalForum(tid, name, type) {
 		target = geid('digest');
 		var digestInMid = false;
 		if(target.innerHTML === normal) digestInMid = true;
-		nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PATCH',{digestInMid: digestInMid})
+		nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PUT',{digestInMid: digestInMid})
 			.then(function() {
 				if(target.innerHTML === normal) {
 					screenTopAlert('已将该帖在个人专栏加精');
@@ -795,7 +795,7 @@ function switchTInPersonalForum(tid, name, type) {
 		target = geid('topped');
 		var toppedInMid = false;
 		if(target.innerHTML === normal) toppedInMid = true;
-		nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PATCH', {toppedInMid: toppedInMid})
+		nkcAPI('/t/'+tid+'/switchInPersonalForum', 'PUT', {toppedInMid: toppedInMid})
 			.then(function() {
 				if(target.innerHTML === normal) {
 					screenTopAlert('已将该帖在个人专栏置顶');
@@ -854,7 +854,7 @@ function adSwitch(tid) {
 	var btn = geid('adBtn');
 	var nowIsAd = '取消首页置顶';
 	var nowNormal = '首页置顶';
-	nkcAPI('/t/'+tid+'/ad', 'PATCH', {})
+	nkcAPI('/t/'+tid+'/ad', 'PUT', {})
 		.then(function() {
 			if(btn.innerHTML === nowIsAd) {
 				screenTopAlert('取消首页置顶成功');

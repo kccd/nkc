@@ -6,7 +6,7 @@ router
     ctx.template = 'shop/manage/settings/settings.pug';
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {nkcModules, data, db, body} = ctx;
     const {user} = data;
     const {

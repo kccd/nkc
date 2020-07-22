@@ -353,7 +353,7 @@ function submit(id) {
 	var method = 'POST';
 	if(id !== undefined) {
 		url = '/fund/list/'+ id;
-		method = 'PATCH';
+		method = 'PUT';
 	}
 	nkcAPI(url, method, {fundObj: fundObj})
 		.then(function(data){

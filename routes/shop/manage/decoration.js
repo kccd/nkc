@@ -133,7 +133,7 @@ decorationRouter
     await storeDecoration.update({$set:{storeLeftFeatureds: arr}})
     await next();
   })
-  .patch('/addClass', async (ctx, next) => {
+  .put('/addClass', async (ctx, next) => {
     const {data, params, body, db} = ctx;
     const storeId = params.account;
     const {newClassName} = body;
@@ -168,7 +168,7 @@ decorationRouter
 
     await next();
   })
-  .patch('/addSingleClass', async (ctx, next) => {
+  .put('/addSingleClass', async (ctx, next) => {
     const {data, params, body, db, query} = ctx;
     const {index, arr} = body;
     const nullIndex = arr.indexOf("");
@@ -181,7 +181,7 @@ decorationRouter
     await storeDecoration.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
     await next();
   })
-  .patch('/delClass', async(ctx, next) => {
+  .put('/delClass', async(ctx, next) => {
     const {data, params, body, db, query} = ctx;
     const storeId = params.account;
     const {index} = body;

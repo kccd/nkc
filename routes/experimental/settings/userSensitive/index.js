@@ -56,7 +56,7 @@ userRouter
 
 		await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     let {data} = ctx;
     data.message = '123123333';
     await next();

@@ -5,7 +5,7 @@ userRouter
 		ctx.template = 'experimental/settings/user.pug';
 		ctx.data.type = 'user';
 		await next();
-	}) 
+	})
 	.get('/', async (ctx, next) => {
 		const {query, data, db} = ctx;
 		let {page = 0, searchType, content, t} = query;
@@ -72,7 +72,7 @@ userRouter
 		data.roles = await db.RoleModel.find({type: {$in: ['common', 'management']}}).sort({toc: 1});
 		await next();
 	})
-  .patch("/:uid", async (ctx, next) => {
+  .put("/:uid", async (ctx, next) => {
     const {params, db, body, nkcModules} = ctx;
     let {
       username = "", description = "", certs = [], email = "",
@@ -134,7 +134,7 @@ userRouter
     await targetUsersPersonal.update(userPersonalObj);
     await next();
 	});
-	/*.patch('/:uid', async (ctx, next) => {
+	/*.put('/:uid', async (ctx, next) => {
 		const {params, db, body, nkcModules} = ctx;
 		const {operation} = body;
 		const {uid} = params;

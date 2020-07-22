@@ -7,6 +7,9 @@ testRouter
   .get("/home", async (ctx, next) => {
     ctx.template = "home/home_all.pug";
     await next();
+  })
+  .put('/', async (ctx, next) => {
+    await next();
   });
 
 module.exports = testRouter;

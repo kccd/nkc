@@ -91,7 +91,7 @@ const app = new Vue({
             if(!ad.cover) throw "封面图不能为空";
             if(!ad.tid) throw "文章ID不能为空";
           });
-          return nkcAPI("/nkc/home", "PATCH", {
+          return nkcAPI("/nkc/home", "PUT", {
             operation: "saveAds",
             movable,
             fixed,
@@ -111,7 +111,7 @@ const app = new Vue({
           ads.splice(index, 1)
         })
         .catch(() => {})*/
-      
+
     },
     addForum() {
       const self = this;
@@ -151,7 +151,7 @@ const app = new Vue({
     },
     saveRecommendForums() {
       const forumsId = this.recommendForums.map(forum => forum.fid);
-      nkcAPI("/nkc/home", "PATCH", {
+      nkcAPI("/nkc/home", "PUT", {
         operation: "saveRecommendForums",
         forumsId
       })
@@ -162,7 +162,7 @@ const app = new Vue({
     },
     saveColumns(){
       const columnsId = this.columns.map(c => c._id);
-      nkcAPI("/nkc/home", "PATCH", {
+      nkcAPI("/nkc/home", "PUT", {
         operation: "saveColumns",
         columnsId
       })
@@ -174,7 +174,7 @@ const app = new Vue({
     saveGoods() {
       const goodsId = this.goods.map(g => g.productId);
       const showShopGoods = !!this.showShopGoods;
-      nkcAPI("/nkc/home", "PATCH", {
+      nkcAPI("/nkc/home", "PUT", {
         operation: "saveGoods",
         goodsId,
         showShopGoods
@@ -186,7 +186,7 @@ const app = new Vue({
     },
     saveToppedThreads() {
       const toppedThreadsId = this.toppedThreads.map(t => t.tid);
-      nkcAPI("/nkc/home", "PATCH", {
+      nkcAPI("/nkc/home", "PUT", {
         operation: "saveToppedThreads",
         toppedThreadsId
       })

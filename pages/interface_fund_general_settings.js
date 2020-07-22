@@ -63,7 +63,7 @@ function submit() {
 	obj.closed.reason = reason;
 	obj.closed.openingHours = openingTime;
 
-	nkcAPI('/fund/settings', 'PATCH', {settingsObj: obj})
+	nkcAPI('/fund/settings', 'PUT', {settingsObj: obj})
 		.then(function() {
 			screenTopAlert('提交成功。');
 		})

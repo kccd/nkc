@@ -17,7 +17,7 @@ router
     });
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {data, db, body} = ctx;
     const {type, listType, uid, whitelist, blacklist, tab, certsId} = body;
     if(certsId) {

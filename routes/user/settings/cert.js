@@ -10,7 +10,7 @@ certRouter
 		ctx.template = 'interface_user_settings_cert.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {body, data, db} = ctx;
 		const {user} = data;
 		const {displayPhoto} = body;

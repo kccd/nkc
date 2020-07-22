@@ -8,7 +8,7 @@ router
 		data.type = 'logo';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {body, db, nkcModules} = ctx;
 		const {id, type, operation} = body;
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});

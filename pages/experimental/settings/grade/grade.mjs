@@ -19,7 +19,7 @@ const app = new Vue({
 				app.grades[index].color = color.val();
 			}
 			const {grades, gradeSettings} = this;
-			nkcAPI("/e/settings/grade", "PATCH", {
+			nkcAPI("/e/settings/grade", "PUT", {
 				grades,
 				gradeSettings,
 			})

@@ -5,7 +5,7 @@ passwordRouter
 		ctx.template = 'interface_user_settings_password.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {oldPassword = "", password = ""} = body;
 		const {apiFunction} = ctx.nkcModules;

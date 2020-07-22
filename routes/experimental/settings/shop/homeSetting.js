@@ -51,7 +51,7 @@ homeSettingRouter
     data.homeSetting = homeSetting;
     await next();
   })
-  .patch('/carousel', async (ctx, next) => {
+  .put('/carousel', async (ctx, next) => {
     const {data, body} = ctx;
     const {index} = body;
     let homeSetting = data.homeSetting;

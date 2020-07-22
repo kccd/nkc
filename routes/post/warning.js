@@ -35,7 +35,7 @@ router
     ctx.redis.pubMessage(message);
     await next();
   })
-  .patch("/", async (ctx, next) =>{
+  .put("/", async (ctx, next) =>{
     const {data, db, body} = ctx;
     const {warningId, reason} = body;
     const {user} = data;

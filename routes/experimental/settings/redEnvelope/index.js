@@ -10,7 +10,7 @@ redEnvelopeRouter
     ctx.template = 'experimental/settings/redEnvelope.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {db, body} = ctx;
     const {random, draftFee, share} = body;
     // 随机红包

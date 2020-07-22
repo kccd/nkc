@@ -104,7 +104,7 @@ const app = new Vue({
           this.convertNumber(withdraw, 'toServer');
           this.convertNumber(recharge, 'toServer');
           this.submitting = true;
-          return nkcAPI('/e/settings/recharge', 'PATCH', {recharge, withdraw})
+          return nkcAPI('/e/settings/recharge', 'PUT', {recharge, withdraw})
         })
         .then(() => {
           self.submitting = false;

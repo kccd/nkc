@@ -116,7 +116,7 @@ function submit2(){
       throw {error: '两遍密码不一致。'};
       return;
     }
-    return nkcAPI('/forgotPassword/mobile', 'PATCH',{mobile:mobile, mcode:mcode, password:password, nationCode: nationCode})
+    return nkcAPI('/forgotPassword/mobile', 'PUT',{mobile:mobile, mcode:mcode, password:password, nationCode: nationCode})
   })
   .then(function(res){
     info_report2('修改密码成功！')

@@ -88,7 +88,7 @@ block scripts
           NKC.methods.visitUrl("/e/log/recycle", false);
         },
         save: function(log) {
-          nkcAPI("/t/" + log.thread.tid + "/moveDraft/reason", "PATCH", {
+          nkcAPI("/t/" + log.thread.tid + "/moveDraft/reason", "PUT", {
             log: log
           })
             .then(function() {

@@ -5,7 +5,7 @@ baseRouter
     ctx.template = 'experimental/settings/role/singleRole.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body, data} = ctx;
 		const {role} = data;
 		let {displayName, abbr, color, description, modifyPostTimeLimit} = body;

@@ -49,7 +49,7 @@ const app = new Vue({
               maxLength: 100
             });
           }
-          return nkcAPI('/e/settings/forum', 'PATCH', {fidArr, categories: forumCategories});
+          return nkcAPI('/e/settings/forum', 'PUT', {fidArr, categories: forumCategories});
         })
         .then(() => {
           sweetSuccess('保存成功');

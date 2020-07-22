@@ -77,7 +77,7 @@ var app = new Vue({
           delete results_.examCountLimit;
           delete results_.authLevel;
           obj[self.type] = results_;
-          return nkcAPI('/e/settings/post', 'PATCH', obj);
+          return nkcAPI('/e/settings/post', 'PUT', obj);
         })
         .then(function() {
           screenTopAlert('保存成功');

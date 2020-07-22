@@ -51,7 +51,7 @@ function submit(name){
 			time = new Date(year + ' ' + month + ' ' + day);
 			if(!time) return screenTopWarning('请输入正确的时间！');
 		}
-		nkcAPI('/auth/'+targetUid, 'PATCH', {reason: reason, status: status, type: name, time: time})
+		nkcAPI('/auth/'+targetUid, 'PUT', {reason: reason, status: status, type: name, time: time})
 			.then(function(){
 				screenTopAlert('提交成功！');
 			})

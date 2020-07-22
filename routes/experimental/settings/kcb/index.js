@@ -8,7 +8,7 @@ router
 		ctx.template = 'experimental/settings/kcb.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body} = ctx;
     const {kcbsTypes, kcbSettings} = body;
     const kcbSettingsDB = await db.SettingModel.findById("kcb");
@@ -65,7 +65,7 @@ router
     await db.SettingModel.saveSettingsToRedis("kcb");
 		await next();
 	})
-  .patch("/record", async (ctx, next) => {
+  .put("/record", async (ctx, next) => {
     const {body, db} = ctx;
     const {
       kcbsRecordId,

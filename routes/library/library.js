@@ -83,7 +83,7 @@ router
     await db.LibraryModel.saveToES(file._id);
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     // 修改文件或文件夹
     const {data, body, db} = ctx;
     const {library} = data;

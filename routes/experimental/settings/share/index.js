@@ -16,7 +16,7 @@ shareRouter
     data.shareLimit = await db.ShareLimitModel.find({});
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {body, db} = ctx;
     const {shareLimit} = body;
     for(var i in shareLimit){

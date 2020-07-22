@@ -20,7 +20,7 @@ permissionRouter
     ctx.template = 'interface_forum_settings_permission.pug'
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {data, body, db, redis} = ctx;
 		const {forum} = data;
 		let {

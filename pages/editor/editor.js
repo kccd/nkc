@@ -693,7 +693,7 @@ function initVueApp() {
               if(self.coverData) {
                 formData.append("postCover", NKC.methods.blobToFile(self.coverData));
               }
-              return nkcUploadFile("/p/" + self.post.pid, "PATCH", formData);
+              return nkcUploadFile("/p/" + self.post.pid, "PUT", formData);
             } else if(type === "modifyThread") { // 修改thread
               self.checkTitle();
               self.checkContent();
@@ -705,10 +705,10 @@ function initVueApp() {
               if(self.coverData) {
                 formData.append("postCover", NKC.methods.blobToFile(self.coverData));
               }
-              return nkcUploadFile("/p/" + self.post.pid, "PATCH", formData);
+              return nkcUploadFile("/p/" + self.post.pid, "PUT", formData);
             } else if(type === "modifyForumDeclare") { // 修改专业详情
               self.checkContent();
-              return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PATCH", {
+              return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PUT", {
                 declare: post.c,
                 did: self.draftId,
                 operation: "updateDeclare"

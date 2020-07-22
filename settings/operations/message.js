@@ -30,16 +30,16 @@ module.exports = {
     }
   },
   settings: {
-    PATCH: 'modifyMessageSettings',
+    PUT: 'modifyMessageSettings',
     PARAMETER: {
-      PATCH: 'modifyMessageSettingsForUser'
+      PUT: 'modifyMessageSettingsForUser'
     }
   },
   mark: {
-    PATCH: 'modifyMessageStatus'
+    PUT: 'modifyMessageStatus'
   },
   withdrawn: {
-    PATCH: 'userWithdrawnMessage'
+    PUT: 'userWithdrawnMessage'
   },
   newMessages: {
     GET: 'getNewMessages'

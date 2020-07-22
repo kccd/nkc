@@ -216,7 +216,7 @@ var app = new Vue({
       if(!category.name) return this.error = "请输入分类名";
       if(!category.description) return this.error = "请输入分类介绍";
       if(category._id) { // 修改分类
-        nkcAPI("/m/" + this.column._id + "/category/" + category._id, "PATCH", category)
+        nkcAPI("/m/" + this.column._id + "/category/" + category._id, "PUT", category)
           .then(function() {
             app.editInfo = false;
           })

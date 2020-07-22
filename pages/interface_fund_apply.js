@@ -237,7 +237,7 @@ function saveApplicationMethod(callback) {
 		obj.newMembers = selectedUsers;
 		obj.from = 'team';
 	}
-	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
+	nkcAPI('/fund/a/'+applicationFormId, 'PUT', obj)
 		.then(function(data){
 			if(callback === undefined) {
 				screenTopAlert('保存成功！');
@@ -381,7 +381,7 @@ function saveApplicantMessages(callback){
 			},
 			s: s
 		};
-		nkcAPI('/fund/a/'+applicationFormId, 'PATCH', data)
+		nkcAPI('/fund/a/'+applicationFormId, 'PUT', data)
 			.then(function(data) {
 				if(callback !== undefined) {
 					return callback(data);
@@ -416,7 +416,7 @@ function saveProject(callback) {
 		abstract: abstract,
 		c: content
 	};
-	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', {s: s, project: project})
+	nkcAPI('/fund/a/'+applicationFormId, 'PUT', {s: s, project: project})
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -596,7 +596,7 @@ function  saveBudgetMoney(id, callback) {
 		budgetMoney: budgetMoney,
 		s: s
 	};
-	nkcAPI('/fund/a/'+id, 'PATCH', obj)
+	nkcAPI('/fund/a/'+id, 'PUT', obj)
 		.then(function(data) {
 			if(callback !== undefined) {
 				callback(data);
@@ -636,7 +636,7 @@ function savePurpose(callback) {
 		obj.budgetMoney = purpose;
 	}
 	obj.category = $('#category').attr('fid');
-	nkcAPI('/fund/a/'+ applicationFormId, 'PATCH', obj)
+	nkcAPI('/fund/a/'+ applicationFormId, 'PUT', obj)
 		.then(function(data) {
 			if(callback === undefined){
 				screenTopAlert('保存成功！');
@@ -916,7 +916,7 @@ function saveThreadsList(callback) {
 		threadsId: threadsId,
 		s: s
 	};
-	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
+	nkcAPI('/fund/a/'+applicationFormId, 'PUT', obj)
 		.then(function(data) {
 			if(callback === undefined) {
 				screenTopAlert('保存成功！');
@@ -961,7 +961,7 @@ function submitApplicationForm() {
 	var obj = {
 		s: s
 	};
-	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
+	nkcAPI('/fund/a/'+applicationFormId, 'PUT', obj)
 		.then(function() {
 			openToNewLocation('/fund/a/'+applicationFormId);
 			// window.location.href = '/fund/a/'+applicationFormId;
@@ -1061,7 +1061,7 @@ function userMessagesForm() {
 // 		budgetMoney: budgetMoney,
 // 		s: 6
 // 	};
-// 	nkcAPI('/fund/a/'+applicationFormId, 'PATCH', obj)
+// 	nkcAPI('/fund/a/'+applicationFormId, 'PUT', obj)
 // 		.then(function() {
 // 			window.location.href = '/fund/a/'+id;
 // 		})

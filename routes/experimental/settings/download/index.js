@@ -42,7 +42,7 @@ router
 		ctx.template = 'experimental/settings/download.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
     const {options} = body;
     const options_ = [];

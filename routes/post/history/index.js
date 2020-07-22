@@ -59,7 +59,7 @@ router
     ctx.template = 'post/history.pug';
     await next();
   })
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {body, db, params, data} = ctx;
 		// if(data.userLevel < 6) ctx.throw(403, '权限不足');
 		const {pid} = params;

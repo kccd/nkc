@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const markRouter = new Router();
 markRouter
-  .patch('/', async(ctx, next) => {
+  .put('/', async(ctx, next) => {
     const {data, db, body} = ctx;
     const {type, uid} = body;
     const {user} = data;

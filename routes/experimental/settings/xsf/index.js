@@ -7,7 +7,7 @@ xsfRouter
     ctx.template = 'experimental/settings/xsf.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {db, body} = ctx;
     const {addLimit, reduceLimit} = body.xsfSettings;
     if(addLimit <= 0) ctx.throw(400, '加学术分分值不能小于1');

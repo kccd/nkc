@@ -166,7 +166,7 @@ router
     await thread.updateThreadEncourage();
 		await next();
 	})
-  .patch("/kcb/:recordId", async (ctx, next) => {
+  .put("/kcb/:recordId", async (ctx, next) => {
     const {db, body, params} = ctx;
     const {recordId, pid} = params;
     const {hide} = body;

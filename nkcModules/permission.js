@@ -1,6 +1,6 @@
 const permission = {};
 const operationObj = require('../settings/operations');
-const methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'];
+const methods = ['GET', 'POST', 'PUT', 'DELETE'];
 
 permission.getOperationsId = () => {
 	const fn = (obj, arr) => {

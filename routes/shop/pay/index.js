@@ -66,14 +66,22 @@ router
     let _money = score / ((1 - aliPay.fee) * 100);
     _money = Number((_money.toFixed(2)));
     if(_money !== money) ctx.throw(400, '付款金额存在异常，请刷新后重试');
+    let notes = (ordersInfo.description || "").join('；');
+    if(notes.length > 800) {
+      notes = notes.slice(0, 800) + '...';
+    }
+    let title = notes;
+    if(title.length > 100) {
+      title = title.slice(0, 100) + '...';
+    }
     data.alipayUrl = await db.KcbsRecordModel.getAlipayUrl({
       uid: user.uid,
       score,
       money,
       ip: ctx.address,
       port: ctx.port,
-      title: ordersInfo.description,
-      notes: ordersInfo.description,
+      title,
+      notes,
       backParams: {
         type: 'pay',
         ordersId: ordersInfo.ordersId

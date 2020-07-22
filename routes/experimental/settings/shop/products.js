@@ -27,7 +27,7 @@ productsRouter
 		ctx.template = "experimental/shop/products/products.pug"
 		await next();
 	})
-	.patch('/bansale', async(ctx, next) => {
+	.put('/bansale', async(ctx, next) => {
 		const {data, db, params, body, nkcModules} = ctx;
 		const {productId} = body;
 		const product = await db.ShopGoodsModel.findOne({productId: productId});
@@ -36,7 +36,7 @@ productsRouter
 		}
 		await next();
 	})
-	.patch("/clearban", async(ctx, next) => {
+	.put("/clearban", async(ctx, next) => {
 		const {data, db,params, body} = ctx;
 		const {productId} = body;
 		const product = await db.ShopGoodsModel.findOne({productId: productId});

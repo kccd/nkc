@@ -61,7 +61,7 @@ router
     data.question = (await db.QuestionModel.extendQuestions([q]))[0];
     await next();
   })
-  .patch('/:_id', async (ctx, next) => {
+  .put('/:_id', async (ctx, next) => {
     const {db, data, body, params, tools, settings, fs} = ctx;
     const {contentLength} = tools.checkString;
     const {user} = data;
@@ -133,7 +133,7 @@ router
         if(q.auth === false) q.reason = reason;
       }
     }
-    
+
     if(file) {
       const {path} = file;
       const questionPath = settings.upload.questionImagePath;

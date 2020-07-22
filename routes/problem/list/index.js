@@ -66,7 +66,7 @@ listRouter
 		ctx.template = 'problem/problem.pug';
 		await next();
 	})
-	.patch('/:_id', async (ctx, next) => {
+	.put('/:_id', async (ctx, next) => {
 		const {params, data, db, body} = ctx;
 		const {user} = data;
 		const {_id} = params;
@@ -80,7 +80,7 @@ listRouter
 		const problemsType = await db.ProblemsTypeModel.findOnly({name: typeName});
 		body.typeId = problemsType._id;
 		body.resolveTime = Date.now();
-		
+
 		if(user) {
 			body.restorerId = user.uid;
 		} else {

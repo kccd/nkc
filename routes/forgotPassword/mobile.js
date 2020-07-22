@@ -6,7 +6,7 @@ router
     ctx.template = 'forgotPassword/mobile.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {db, body, tools} = ctx;
     const {username, mobile, code, password} = body;
     const nationCode = body.nationCode.toString();

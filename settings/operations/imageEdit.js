@@ -1,6 +1,6 @@
 module.exports = {
   POST: 'saveNewEditPicture',
   getOriginId:{
-    PATCH: "getOriginId"
+    PUT: "getOriginId"
   }
 };

@@ -100,7 +100,7 @@ window.user = new (class {
     subsId = subscribes.map(s => s._id);
 
     SubscribeTypes.open(function(typesId) {
-      nkcAPI("/account/subscribes", "PATCH", {
+      nkcAPI("/account/subscribes", "PUT", {
         type: "modifyType",
         typesId: typesId,
         subscribesId: subsId
