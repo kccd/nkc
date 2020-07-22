@@ -66,6 +66,9 @@ const app = new Vue({
         .then(() => {
           return nkcAPI(`/shop/pay/alipay?ordersId=${ordersId}&money=${totalPrice}`, 'GET')
             .then(data => {
+
+              console.log(data.alipayUrl);
+
               if(NKC.configs.platform === 'reactNative') {
                 NKC.methods.visitUrl(data.alipayUrl, true);
               } else {
