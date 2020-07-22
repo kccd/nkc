@@ -1987,9 +1987,14 @@ userSchema.statics.getUserMainScore = async (uid) => {
 * @author pengxiguaa 2020/6/24
 * */
 userSchema.statics.getUserScores = async (uid) => {
-  const UserModel = mongoose.model('users');
+  const UsersPersonalModel = mongoose.model('usersPersonal');
   const SettingModel = mongoose.model('settings');
   const enabledScores = await SettingModel.getEnabledScores();
+  const obj = {};
+  for(const s of enabledScores) {
+    obj[s.type] = 1;
+  }
+  const usersPersonal = await UsersPersonalModel.findOnly({uid}, obj);
   const arr = [];
   for(const score of enabledScores) {
     const {type, name, unit, icon} = score;
@@ -1998,7 +2003,7 @@ userSchema.statics.getUserScores = async (uid) => {
       type,
       name,
       unit,
-      number: await UserModel.getUserScore(uid, type)
+      number: usersPersonal[type],
     });
   }
   return arr;
