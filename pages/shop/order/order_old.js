@@ -5,7 +5,7 @@ function cancelOrder(orderId) {
   var reason = prompt("【临时理由输入框】请输入取消订单的理由（取消后不可恢复）：", "");
   if(reason === null) return;
   if(reason === '') return screenTopWarning('理由不能为空');
-  nkcAPI("/shop/order/"+orderId+"/cancel", "PATCH", {
+  nkcAPI("/shop/order/"+orderId+"/cancel", "PUT", {
     reason: reason
   })
   .then(function(data) {
@@ -32,7 +32,7 @@ function visitLogisticsInfo(orderId) {
 function comfirmReceipt(orderId) {
   var isReceipt = confirm("确认收货后，货款将打入卖家账户")
   if(isReceipt){
-    nkcAPI('/shop/order/'+orderId+'/receipt', "PATCH", {})
+    nkcAPI('/shop/order/'+orderId+'/receipt', "PUT", {})
     .then(function(data) {
       screenTopAlert("已确认收货");
       window.location.reload();

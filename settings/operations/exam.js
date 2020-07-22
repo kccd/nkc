@@ -16,7 +16,7 @@ module.exports = {
   },
   category: {
     PARAMETER: {
-	    PATCH: 'modifyExamsCategory',
+	    PUT: 'modifyExamsCategory',
     }
   },
   auth: {
@@ -33,7 +33,7 @@ module.exports = {
   question: {
     POST: 'postQuestion',
 	  PARAMETER: {
-      PATCH: 'modifyQuestion',
+      PUT: 'modifyQuestion',
       DELETE: 'removeQuestion',
       disabled: {
 	      DELETE: 'enabledQuestion',

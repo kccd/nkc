@@ -109,7 +109,7 @@ NKC.modules.NotePanel = class {
           let url, method, data = {};
           if(n.uid === uid) {
             url = `/note/${note._id}/c/${n._id}`;
-            method = "PATCH";
+            method = "PUT";
             data.content = n._content;
           } else {
             url = `/nkc/note`;

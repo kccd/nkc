@@ -8,7 +8,7 @@ testRouter
     ctx.template = "home/home_all.pug";
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     await next();
   });
 

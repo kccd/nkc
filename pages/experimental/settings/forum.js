@@ -83,7 +83,7 @@ function saveForumsOrder() {
 	var obj = {
 		fidArr: fidArr
 	};
-	nkcAPI('/e/settings/forum', 'PATCH', obj)
+	nkcAPI('/e/settings/forum', 'PUT', obj)
 		.then(function() {
 			screenTopAlert('保存成功');
 		})

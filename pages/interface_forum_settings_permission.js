@@ -58,7 +58,7 @@ function submit(fid) {
 		allowedAnonymousPost: allowedAnonymousPost,
 		openReduceVisits: openReduceVisits
 	};
-	nkcAPI('/f/'+fid+'/settings/permission', 'PATCH', obj)
+	nkcAPI('/f/'+fid+'/settings/permission', 'PUT', obj)
 		.then(function() {
 			screenTopAlert('保存成功');
 		})

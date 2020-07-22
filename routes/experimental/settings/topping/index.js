@@ -9,7 +9,7 @@ router
     ctx.template = "experimental/settings/topping/topping.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {data, body, db} = ctx;
     let {rolesId, defaultRoleGradesId} = body;
     const roles = await db.RoleModel.find({_id: {$in: rolesId}});

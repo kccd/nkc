@@ -1,7 +1,7 @@
 module.exports = {
   GET: "test",
   POST: 'test',
-  PATCH: 'test',
+  PUT: 'test',
   PARAMETER: {
     GET: "test",
   }

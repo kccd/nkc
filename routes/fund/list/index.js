@@ -29,7 +29,7 @@ listRouter
 		await next();
 	})
 	// 修改基金项目
-	.patch('/:fundId', async (ctx, next) => {
+	.put('/:fundId', async (ctx, next) => {
 		const {data, db} = ctx;
 		const fundId = ctx.params.fundId.toUpperCase();
 		const {fundObj} = ctx.body;

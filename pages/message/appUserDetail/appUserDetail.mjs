@@ -138,7 +138,7 @@ window.app = new Vue({
     saveFriendInfo() {
       const {friend, targetUser} = this;
       friend.info.phone = friend.info._phone.map(p => p.number);
-      nkcAPI(`/message/settings/${targetUser.uid}`, 'PATCH', {
+      nkcAPI(`/message/settings/${targetUser.uid}`, 'PUT', {
         info: friend.info,
         cid: friend.cid,
       })

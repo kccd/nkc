@@ -26,7 +26,7 @@ var app = new Vue({
     },
     save: function(type) {
       this.clearErrorInfo();
-      nkcAPI("/e/settings/message", "PATCH", {
+      nkcAPI("/e/settings/message", "PUT", {
         type: "modifyMessageType",
         messageType: type
       })
@@ -45,7 +45,7 @@ var app = new Vue({
       };
       obj.messageSettings = this.messageSettings;
       if(!obj.messageSettings.systemLimitInfo ||!obj.messageSettings.customizeLimitInfo || !obj.messageSettings.mandatoryLimitInfo) return screenTopWarning("请输入受限提示");
-      nkcAPI('/e/settings/message', 'PATCH', obj)
+      nkcAPI('/e/settings/message', 'PUT', obj)
         .then(function() {
           screenTopAlert('保存成功');
         })

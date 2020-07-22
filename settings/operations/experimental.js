@@ -7,20 +7,20 @@ module.exports = {
 	settings: {
 		editor: {
 			GET: "experimentalEditorSettings",
-			PATCH: "experimentalEditorSettings"
+			PUT: "experimentalEditorSettings"
 		},
 		sticker: {
 			GET: "experimentalStickerSettings",
-			PATCH: "experimentalStickerSettings"
+			PUT: "experimentalStickerSettings"
 		},
 		thread: {
 			GET: "experimentalThreadSettings",
-			PATCH: "experimentalThreadSettings"
+			PUT: "experimentalThreadSettings"
 		},
     transfer: {
       GET: "experimentalTransferKCB",
       POST: "experimentalTransferKCB",
-      PATCH: "experimentalTransferKCB"
+      PUT: "experimentalTransferKCB"
     },
 	  hidePost: {
       GET: "experimentalHidePostSettings",
@@ -28,19 +28,19 @@ module.exports = {
     },
 	  topping: {
       GET: "experimentalToppingSettings",
-      PATCH: "experimentalToppingSettings"
+      PUT: "experimentalToppingSettings"
     },
 	  username: {
 	    GET: "experimentalUsernameSettings",
-      PATCH: "experimentalUsernameSettings"
+      PUT: "experimentalUsernameSettings"
     },
 	  login: {
 	    GET: "experimentalLoginSettings",
-      PATCH: "experimentalLoginSettings"
+      PUT: "experimentalLoginSettings"
     },
 	  cache: {
 	    GET: "experimentalCacheSettings",
-      PATCH: "experimentalCacheSettings"
+      PUT: "experimentalCacheSettings"
     },
 		shop: {
 			GET: 'visitShopSettings',
@@ -57,23 +57,23 @@ module.exports = {
         },
         settings: {
           GET: "visitShopRefundSettings",
-          PATCH: "modifyShopRefundSettings"
+          PUT: "modifyShopRefundSettings"
         }
 			},
 			products: {
 				GET: "visitiShopProducts",
 				bansale:{
-					PATCH: "shopAdminBanProductSale"
+					PUT: "shopAdminBanProductSale"
 				},
 				clearban: {
-					PATCH: "shopAdminClearBanSale"
+					PUT: "shopAdminClearBanSale"
 				}
 			},
 			auth: {
 				GET: "visitShopAuth",
 				POST: "setShopAuth",
 				delban: {
-					PATCH: "delShelfAuth"
+					PUT: "delShelfAuth"
 				}
 			},
 			applys: {
@@ -89,7 +89,7 @@ module.exports = {
 				carousel: {
 					GET: 'visitHomeSettingCarousel',
 					POST: 'changeHomeSettingCarousel',
-					PATCH: 'deleteHomeSettingCarousel'
+					PUT: 'deleteHomeSettingCarousel'
 				},
 				featured: {
 					GET: 'visitHomeSettingFeatured',
@@ -110,41 +110,41 @@ module.exports = {
 			POST: 'postNewProtocol',
 			PARAMETER: {
 				GET: "visitProtocolType",
-				PATCH: "updateProtocolType",
+				PUT: "updateProtocolType",
 				POST: "deleteProtocolType"
 			}
 		},
 		sms: {
 			GET: 'visitSmsSettings',
-			PATCH: 'modifySmsSettings',
+			PUT: 'modifySmsSettings',
       test: {
         POST: 'testSendMessage'
       }
 		},
 		email: {
 			GET: 'visitExperimentalEmailSettings',
-			PATCH: 'modifyEmailSettings',
+			PUT: 'modifyEmailSettings',
       test: {
 			  POST: 'testSendEmail'
       }
 		},
 		base: {
 			GET: 'visitWebBaseSettings',
-			PATCH: 'modifyWebBase'
+			PUT: 'modifyWebBase'
 		},
 		home: {
 			top: {
 				GET: 'visitHomeTopSettings',
-				PATCH: 'modifyHomeTopSettings'
+				PUT: 'modifyHomeTopSettings'
 			},
 			notice: {
 				GET: 'visitHomeNoticeSettings',
-				PATCH: 'modifyHomeNoticeSettings',
+				PUT: 'modifyHomeNoticeSettings',
 				DELETE: 'deleteHomeNotice'
       },
       list: {
         GET: 'visitHomeListSettings',
-				PATCH: 'modifyHomeListSettings',
+				PUT: 'modifyHomeListSettings',
 				biglogo: {
 					POST: 'uploadHomeBigLogo'
 				}
@@ -153,7 +153,7 @@ module.exports = {
 		app:{
 			GET: "experimentalAppSettings",
 			POST: "experimentalAppSettings",
-			PATCH: "experimentalAppSettings"
+			PUT: "experimentalAppSettings"
 		},
 		role: {
 			GET: 'visitRoleSettings',
@@ -161,7 +161,7 @@ module.exports = {
 			PARAMETER: {
 				GET: 'visitRoleUsers',
         DELETE: 'deleteRole',
-        PATCH: 'modifyRole',
+        PUT: 'modifyRole',
 				icon: {
           POST: 'uploadRoleIcon'
         }
@@ -170,10 +170,10 @@ module.exports = {
 		operation: {
 			GET: 'visitOperationSetting',
 			POST: 'addOperationType',
-			PATCH: 'modifyOperation',
+			PUT: 'modifyOperation',
 			PARAMETER: {
 				GET: 'visitOperationType',
-				PATCH: 'modifyOperationType',
+				PUT: 'modifyOperationType',
 				DELETE: 'deleteOperationType'
 			}
 		},
@@ -181,7 +181,7 @@ module.exports = {
 			GET: 'visitEUserSettings',
 			PARAMETER: {
 				GET: 'visitEUserInfo',
-				PATCH: 'modifyEUserInfo'
+				PUT: 'modifyEUserInfo'
 			}
 		},
 		userScores: {
@@ -189,30 +189,30 @@ module.exports = {
 		},
 		sensitive: {
 			GET: 'visitUserSensitiveInfo',
-			PATCH: 'modifyUserSensitiveInfo'
+			PUT: 'modifyUserSensitiveInfo'
 		},
 		forum: {
 			GET: 'visitEForumSettings',
-			PATCH: 'modifyEForumSettings'
+			PUT: 'modifyEForumSettings'
 		},
 		grade: {
 			GET: 'visitUsersGradeSettings',
-			PATCH: 'modifyUsersGradeSettings',
+			PUT: 'modifyUsersGradeSettings',
 		},
 		score: {
 			GET: 'experimentalScoreSettings',
-			PATCH: 'experimentalScoreSettings'
+			PUT: 'experimentalScoreSettings'
 		},
 		kcb: {
 			GET: 'visitKcbSettings',
-			PATCH: 'modifyKcbSettings',
+			PUT: 'modifyKcbSettings',
       record: {
-        PATCH: "modifyWithdrawRecord"
+        PUT: "modifyWithdrawRecord"
       }
 		},
     xsf: {
 		  GET: 'visitXsfSettings',
-      PATCH: 'modifyXsfSettings'
+      PUT: 'modifyXsfSettings'
     },
 		log: {
 			GET: 'logParamsSetting',
@@ -220,73 +220,73 @@ module.exports = {
 		},
 		page: {
 			GET: 'visitPageSettings',
-			PATCH: 'modifyPageSettings'
+			PUT: 'modifyPageSettings'
 		},
 		exam: {
 			GET: 'visitExamSettings',
-			PATCH: 'modifyExamSettings'
+			PUT: 'modifyExamSettings'
 		},
 		message: {
 			GET: 'visitEMessageSettings',
-			PATCH: 'modifyEMessageSettings'
+			PUT: 'modifyEMessageSettings'
 		},
 		share: {
 			GET: 'visitEShareSettings',
-			PATCH: 'modifyEShareSettings'
+			PUT: 'modifyEShareSettings'
 		},
 		post: {
 			GET: 'visitEPostSettings',
-			PATCH: 'modifyEPostSettings'
+			PUT: 'modifyEPostSettings'
 		},
     sub: {
       GET: "experimentalSubSettings",
-      PATCH: "experimentalSubSettings"
+      PUT: "experimentalSubSettings"
     },
     register: {
       GET: "experimentalRegisterSettings",
-      PATCH: "experimentalRegisterSettings"
+      PUT: "experimentalRegisterSettings"
     },
     safe: {
       GET: "experimentalSafeSettings",
-      PATCH: "experimentalSafeSettings"
+      PUT: "experimentalSafeSettings"
     },
     auth: {
       GET: "experimentalUserAuth",
-      PATCH: "experimentalUserAuth"
+      PUT: "experimentalUserAuth"
     },
     review: {
       GET: "experimentalReviewSettings",
-      PATCH: "experimentalReviewSettings"
+      PUT: "experimentalReviewSettings"
     },
     column: {
 		  GET: "experimentalColumnSettings",
-      PATCH: "experimentalColumnSettings"
+      PUT: "experimentalColumnSettings"
     },
     library: {
       GET: "experimentalLibrarySettings",
-      PATCH: "experimentalLibrarySettings"
+      PUT: "experimentalLibrarySettings"
     },
     download: {
       GET: "experimentalDownloadSettings",
-      PATCH: "experimentalDownloadSettings"
+      PUT: "experimentalDownloadSettings"
     },
     upload: {
       GET: "experimentalUploadSettings",
-      PATCH: "experimentalUploadSettings"
+      PUT: "experimentalUploadSettings"
     },
     'red-envelope': {
 		  GET: 'visitERedEnvelope',
-      PATCH: 'modifyEPostSettings'
+      PUT: 'modifyEPostSettings'
     },
 		recharge: {
 			GET: 'experimentalRechargeSettings',
-			PATCH: 'experimentalRechargeSettings',
+			PUT: 'experimentalRechargeSettings',
 		}
 	},
 	systemInfo: {
 		GET: 'visitSystemInfo',
 		POST: 'sendSystemInfo',
-    PATCH: "modifySystemInfo"
+    PUT: "modifySystemInfo"
 	},
 	log: {
     GET: 'visitPublicLogs',

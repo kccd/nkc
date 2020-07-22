@@ -64,7 +64,7 @@ var app = new Vue({
             name: "对同一用户每天转账次数上限",
             min: 0
           });
-          return nkcAPI("/e/settings/transfer", "PATCH", {
+          return nkcAPI("/e/settings/transfer", "PUT", {
             transferSettings: transferSettings
           });
         })

@@ -7,7 +7,7 @@ var app = new Vue({
   methods: {
     save: function() {
       var loginSettings = this.loginSettings;
-      nkcAPI("/e/settings/login", "PATCH", loginSettings)
+      nkcAPI("/e/settings/login", "PUT", loginSettings)
         .then(function() {
           sweetSuccess("保存成功");
         })

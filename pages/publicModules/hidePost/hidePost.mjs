@@ -23,7 +23,7 @@ NKC.modules.HidePost = class {
           self.dom.modal("hide");
         },
         submit() {
-          nkcAPI(`/p/${this.pid}/hide`, "PATCH", {
+          nkcAPI(`/p/${this.pid}/hide`, "PUT", {
             hide: this.hide
           })
             .then(() => {

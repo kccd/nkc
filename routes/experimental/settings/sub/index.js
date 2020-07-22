@@ -8,7 +8,7 @@ router
     ctx.template = "experimental/settings/sub/sub.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body} = ctx;
     let {subUserCountLimit, subForumCountLimit, subThreadCountLimit} = body;
     subUserCountLimit = Math.round(Number(subUserCountLimit));

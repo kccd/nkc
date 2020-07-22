@@ -82,7 +82,7 @@ const app = new Vue({
 					if(self.bannerFile) {
 						formData.append('banner', self.bannerFile);
 					}
-					return nkcUploadFile(`/f/${self.forum.fid}/settings/info`, 'PATCH', formData);
+					return nkcUploadFile(`/f/${self.forum.fid}/settings/info`, 'PUT', formData);
 				})
 				.then((data) => {
 					if(data.logo) {

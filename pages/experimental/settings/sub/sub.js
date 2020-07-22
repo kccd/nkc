@@ -19,7 +19,7 @@ var app = new Vue({
         subSettings.subForumCountLimit < 0 ||
         subSettings.subThreadCountLimit < 0
       ) return this.error = "";
-      nkcAPI("/e/settings/sub", "PATCH", subSettings)
+      nkcAPI("/e/settings/sub", "PUT", subSettings)
         .then(function() {
           app.info = "保存成功";
         })

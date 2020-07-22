@@ -25,7 +25,7 @@ function saveAdsOrder() {
 			}
 		}
 	}
-	nkcAPI('/e/settings/home/top', 'PATCH', {operation: 'modifyOrder', ads: ads})
+	nkcAPI('/e/settings/home/top', 'PUT', {operation: 'modifyOrder', ads: ads})
 		.then(function() {
 			window.location.reload();
 		})
@@ -64,7 +64,7 @@ $('#inputFile').on('change', function() {
 });
 
 function defaultLogo(id, type) {
-	nkcAPI('/e/settings/home/logo', 'PATCH', {id: id, type: type, operation: 'saveLogo'})
+	nkcAPI('/e/settings/home/logo', 'PUT', {id: id, type: type, operation: 'saveLogo'})
 		.then(function() {
 			window.location.reload();
 		})
@@ -86,7 +86,7 @@ function deleteLogo(id) {
 function saveNotice() {
 	var value = $('#threadId').val();
 	var arr = value.split(',');
-	nkcAPI('/e/settings/home/notice', 'PATCH', {id: arr})
+	nkcAPI('/e/settings/home/notice', 'PUT', {id: arr})
 		.then(function() {
 			window.location.reload();
 		})
@@ -109,7 +109,7 @@ function saveWaterMarkSettings() {
 	var watermarkTransparency = $('#watermarkTransparency').val();
 	var waterLimitMinWidth = $("#waterLimitMinWidth").val();
   var waterLimitMinHeight = $("#waterLimitMinHeight").val();
-	nkcAPI('/e/settings/home/logo', 'PATCH', {
+	nkcAPI('/e/settings/home/logo', 'PUT', {
 		watermarkTransparency: watermarkTransparency,
     waterLimitMinWidth: parseInt(waterLimitMinWidth),
     waterLimitMinHeight: parseInt(waterLimitMinHeight),
@@ -138,7 +138,7 @@ function saveHomeListSettings() {
   var discipline = inputs.eq(1).is(':checked');
   var visitorThreadList = $('input[name="visitor"]');
   visitorThreadList = visitorThreadList.eq(0).is(":checked")?"latest": "recommend";
-  nkcAPI('/e/settings/home/list', 'PATCH', {
+  nkcAPI('/e/settings/home/list', 'PUT', {
     topic: topic,
     discipline: discipline,
     visitorThreadList: visitorThreadList
@@ -207,7 +207,7 @@ if(vueDom) {
         if(list.indexOf("discipline") !== -1) {
           homeSettings.list.discipline = true;
         }
-        nkcAPI('/e/settings/home/list', 'PATCH', {
+        nkcAPI('/e/settings/home/list', 'PUT', {
           topic: homeSettings.list.topic,
           discipline: homeSettings.list.discipline,
           visitorThreadList: homeSettings.visitorThreadList,

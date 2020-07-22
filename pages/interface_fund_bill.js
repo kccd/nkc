@@ -119,7 +119,7 @@ function submit(id) {
 		var url, method;
 		if(id) {
 			url = '/fund/bills/'+id;
-			method = 'PATCH';
+			method = 'PUT';
 		} else {
 			url = '/fund/bills';
 			method = 'POST';

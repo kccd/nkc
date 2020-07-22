@@ -9,7 +9,7 @@ emailRouter
     data.emailSettings.smtpConfig.auth.pass = "********";
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {db, body} = ctx;
     const {emailSettings} = body;
     const {from, templates, smtpConfig} = emailSettings;

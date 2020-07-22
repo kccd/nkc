@@ -8,7 +8,7 @@ router
     ctx.template = "experimental/settings/cache/cache.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {body, db} = ctx;
     const {type, cache} = body;
     if(type === "modify") {

@@ -43,7 +43,7 @@ router
     data.paging = paging;
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body, data} = ctx;
     const {type, subscribesId, typesId} = body;
     if(type === "modifyType") {

@@ -37,7 +37,7 @@ var app = new Vue({
     post: function(arr, index) {
       var data = arr[index];
       if(!data) return;
-      var d, url, method = "PATCH";
+      var d, url, method = "PUT";
       if(data.pass) {
         // 通过
         d = {

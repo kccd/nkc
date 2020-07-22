@@ -212,7 +212,7 @@ function moveForum(fid) {
 	if(selected.length > 0) {
 		obj.parentId = selected[(selected.length - 1)];
 	}
-	nkcAPI('/f/'+fid+'/settings/category', 'PATCH', obj)
+	nkcAPI('/f/'+fid+'/settings/category', 'PUT', obj)
 		.then(function() {
 			window.location.reload();
 		})
@@ -227,7 +227,7 @@ function selectForumType(fid) {
 		operation: 'selectForumType',
 		forumType: forumType
 	}
-	nkcAPI('/f/'+fid+'/settings/category', 'PATCH', obj)
+	nkcAPI('/f/'+fid+'/settings/category', 'PUT', obj)
 	.then(function() {
 		window.location.reload();
 	})
@@ -345,7 +345,7 @@ function editorThreadType(fid) {
 		oldName: oldName
 	};
 	if(oldName === name) return screenTopWarning('分类名未更改');
-	nkcAPI('/f/'+fid+'/settings/category', 'PATCH', obj)
+	nkcAPI('/f/'+fid+'/settings/category', 'PUT', obj)
 		.then(function() {
 			screenTopAlert('修改成功');
 		})
@@ -371,7 +371,7 @@ function submit(fid) {
 		threadTypesCid: threadTypesCid,
 		categoryId: categoryId,
 	};
-	nkcAPI('/f/'+fid+'/settings/category', 'PATCH', obj)
+	nkcAPI('/f/'+fid+'/settings/category', 'PUT', obj)
 		.then(function() {
 			screenTopAlert('保存成功');
 		})
@@ -388,7 +388,7 @@ function submit(fid) {
  */
 function saveKind(kindName) {
 	var kindName = $("#kinds").val();
-	nkcAPI("/f/"+fid+"/settings/kind", "PATCH", {kindName: kindName})
+	nkcAPI("/f/"+fid+"/settings/kind", "PUT", {kindName: kindName})
 	.then(function(data) {
 		screenTopAlert("类别设置成功");
 		window.location.reload();
@@ -405,7 +405,7 @@ function saveKind(kindName) {
 function clearKind(fid) {
 	var sureClear = confirm("确定要清除当前专业的类别吗？");
 	if(sureClear) {
-		nkcAPI("/f/"+fid+"/settings/kind/clear", "PATCH", {})
+		nkcAPI("/f/"+fid+"/settings/kind/clear", "PUT", {})
 		.then(function(data) {
 			screenTopAlert("类别已清除");
 			window.location.reload();

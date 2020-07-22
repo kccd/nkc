@@ -62,7 +62,7 @@ function submitIdCardAuth(uid) {
 		obj.reason = reason;
 		obj.passed = false;
 	}
-	nkcAPI('/u/'+uid+'/auth/2', 'PATCH', obj)
+	nkcAPI('/u/'+uid+'/auth/2', 'PUT', obj)
 		.then(function() {
 			screenTopAlert('提交成功');
 		})
@@ -86,7 +86,7 @@ function submitHandHeldAuth(uid) {
 		obj.reason = reason;
 		obj.passed = false;
 	}
-	nkcAPI('/u/'+uid+'/auth/3', 'PATCH', obj)
+	nkcAPI('/u/'+uid+'/auth/3', 'PUT', obj)
 		.then(function() {
 			screenTopAlert('提交成功');
 		})

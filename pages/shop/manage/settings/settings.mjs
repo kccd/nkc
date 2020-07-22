@@ -80,7 +80,7 @@ window.app = new Vue({
               fractionDigits: 2
             });
           });
-          return nkcAPI("/shop/manage/settings", "PATCH", {
+          return nkcAPI("/shop/manage/settings", "PUT", {
             dealDescription, dealAnnouncement, address, templates, location
           });
         })

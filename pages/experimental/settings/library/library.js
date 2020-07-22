@@ -67,7 +67,7 @@ var app = new Vue({
       }
     },
     submit: function() {
-      nkcAPI("/e/settings/library", "PATCH", {
+      nkcAPI("/e/settings/library", "PUT", {
         roles: this.roles,
         grades: this.grades
       })

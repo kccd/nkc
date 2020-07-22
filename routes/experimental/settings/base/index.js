@@ -7,7 +7,7 @@ baseRouter
 		ctx.template = 'experimental/settings/base.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body} = ctx;
 		let {links, websiteName, websiteAbbr, github, copyright, record, description, keywords, brief, telephone, statement} = body;
 		if(!websiteName) ctx.throw(400, '网站名不能为空');

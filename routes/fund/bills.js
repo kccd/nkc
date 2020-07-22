@@ -129,7 +129,7 @@ billsRouter
 		await bill.remove();
 		await next();
 	})
-	.patch('/:billId', async(ctx, next) => {
+	.put('/:billId', async(ctx, next) => {
 		const {body, data} = ctx;
 		// if(data.userLevel < 7) ctx.throw(403,'权限不足');
 		const {billObj} = body;

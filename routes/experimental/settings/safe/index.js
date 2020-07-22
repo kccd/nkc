@@ -9,7 +9,7 @@ router
     ctx.template = "experimental/settings/safe/safe.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
     const {safeSettings, password} = body;
     safeSettings.experimentalVerifyPassword = !!safeSettings.experimentalVerifyPassword;

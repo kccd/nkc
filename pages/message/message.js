@@ -443,7 +443,7 @@ $(function() {
         if(!category || !app.editCategory) return;
         var method = 'POST', url = '/friend_category';
         if(category._id) {
-          method = 'PATCH';
+          method = 'PUT';
           url += '/' + category._id;
         }
         nkcAPI(url, method, {
@@ -575,7 +575,7 @@ $(function() {
         if(!app.friend) return;
         var locationInput = document.getElementById('location');
         app.friend.info.location = locationInput.value;
-        nkcAPI('/message/settings/' + app.friend.tUid, 'PATCH', {
+        nkcAPI('/message/settings/' + app.friend.tUid, 'PUT', {
           info: app.friend.info,
           cid: app.friend.cid
         })
@@ -928,7 +928,7 @@ $(function() {
           return screenTopWarning("请至少勾选一项防骚扰设置");
         }
 
-        nkcAPI('/message/settings', 'PATCH', {
+        nkcAPI('/message/settings', 'PUT', {
           beep: beep,
           onlyReceiveFromFriends: app.onlyReceiveFromFriends,
           limit: messageLimit
@@ -981,7 +981,7 @@ $(function() {
             .then(function() {
               app.scrollToBottom();
               if(item.count === 0) return;
-              nkcAPI('/message/mark', 'PATCH', {
+              nkcAPI('/message/mark', 'PUT', {
                 type: 'UTU',
                 uid: app.targetUser.uid
               })
@@ -1022,7 +1022,7 @@ $(function() {
             .then(function() {
               app.scrollToBottom();
               if(item.count === 0) return;
-              nkcAPI('/message/mark', 'PATCH', {
+              nkcAPI('/message/mark', 'PUT', {
                 type: 'STE'
               })
                 .then(function() {
@@ -1041,7 +1041,7 @@ $(function() {
             .then(function() {
               app.scrollToBottom();
               if(item.count === 0) return;
-              nkcAPI('/message/mark', 'PATCH', {
+              nkcAPI('/message/mark', 'PUT', {
                 type: 'remind'
               })
                 .then(function() {
@@ -1069,7 +1069,7 @@ $(function() {
             .then(function() {
               app.scrollToBottom();
               if(item.count === 0) return;
-              nkcAPI('/message/mark', 'PATCH', {
+              nkcAPI('/message/mark', 'PUT', {
                 type: item.type
               })
                 .then(function() {
@@ -1313,7 +1313,7 @@ $(function() {
                   beep("notice");
                   if(app.target === 'UTU' && data.target === 'UTU' && app.targetUser.uid === data.targetUser.uid) {
                     app.messages = app.messages.concat(messages);
-                    nkcAPI('/message/mark', 'PATCH', {
+                    nkcAPI('/message/mark', 'PUT', {
                       type: 'STU',
                       uid: app.targetUser.uid
                     })
@@ -1322,7 +1322,7 @@ $(function() {
                       });
                   } else if(app.target === data.target) {
                     app.messages = app.messages.concat(messages);
-                    nkcAPI('/message/mark', 'PATCH', {
+                    nkcAPI('/message/mark', 'PUT', {
                       type: app.target
                     })
                       .catch(function(data) {
@@ -1390,7 +1390,7 @@ $(function() {
 
       // 撤回信息
       withdrawn: function(message) {
-        nkcAPI('/message/withdrawn', 'PATCH', {messageId: message._id})
+        nkcAPI('/message/withdrawn', 'PUT', {messageId: message._id})
           .then(function() {
             message.withdrawn = true;
             Vue.set(app.messages, app.messages.indexOf(message), message);
@@ -1512,7 +1512,7 @@ $(function() {
           app.updateUserList({message: message});
           if(app.target === 'STE') {
             app.messages.push(message);
-            nkcAPI('/message/mark', 'PATCH', {
+            nkcAPI('/message/mark', 'PUT', {
               type: 'STE'
             })
               .catch(function(data) {
@@ -1524,7 +1524,7 @@ $(function() {
           app.updateUserList({message: message});
           if(app.target === 'STU') {
             app.messages.push(message);
-            nkcAPI('/message/mark', 'PATCH', {
+            nkcAPI('/message/mark', 'PUT', {
               type: 'STU'
             })
               .catch(function(data) {
@@ -1539,7 +1539,7 @@ $(function() {
           // 插入数据
           if(app.target === 'UTU' && app.targetUser) {
             if(app.targetUser.uid === user.uid) {
-              nkcAPI('/message/mark', 'PATCH', {
+              nkcAPI('/message/mark', 'PUT', {
                 type: 'UTU',
                 uid: app.targetUser.uid
               })

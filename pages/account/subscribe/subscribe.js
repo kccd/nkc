@@ -87,7 +87,7 @@ var app = new Vue({
         })
     },
     moveType: function(t, d) {
-      nkcAPI("/account/subscribe_types/" + t._id, "PATCH", {
+      nkcAPI("/account/subscribe_types/" + t._id, "PUT", {
         type: "order",
         direction: d
       })
@@ -251,7 +251,7 @@ var app = new Vue({
         selectedTypesId = sub.cid;
       }
       SubscribeTypes.open(function(typesId) {
-        nkcAPI("/account/subscribes", "PATCH", {
+        nkcAPI("/account/subscribes", "PUT", {
           type: "modifyType",
           typesId: typesId,
           subscribesId: subsId

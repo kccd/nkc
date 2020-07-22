@@ -2158,9 +2158,9 @@ var UPDATES_LAST_INDEX_WRONG = (function () {
 // nonparticipating capturing group, copied from es5-shim's String#split patch.
 var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
 
-var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
+var PUT = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
 
-if (PATCH) {
+if (PUT) {
   patchedExec = function exec(str) {
     var re = this;
     var lastIndex, reCopy, match, i;

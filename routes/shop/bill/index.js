@@ -160,7 +160,7 @@ router
     ctx.template = 'shop/bill/bill.pug';
     await next();
   })
-  .patch("/add", async(ctx, next) => {
+  .put("/add", async(ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
     const {productParamId, cartId, count} = body;
@@ -198,7 +198,7 @@ router
 
     await next();
   })
-  .patch("/plus", async(ctx, next) => {
+  .put("/plus", async(ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
     const {productParamId, cartId, count} = body;

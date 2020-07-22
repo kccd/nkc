@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const settingsRouter = new Router();
 settingsRouter
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
     const {beep, onlyReceiveFromFriends, messageSettings, limit} = body;
@@ -28,7 +28,7 @@ settingsRouter
     }
     await next();
   })
-  .patch('/:uid', async (ctx, next) => {
+  .put('/:uid', async (ctx, next) => {
     const {data, db, params, body, redis} = ctx;
     const {info, cid} = body;
     const {user} = data;

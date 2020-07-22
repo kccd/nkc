@@ -38,7 +38,7 @@ router
     });
     await next();
   })
-  .patch('/:_id', async (ctx, next) => {
+  .put('/:_id', async (ctx, next) => {
     const {body, data, db, params,redis} = ctx;
     const {_id} = params;
     const {user} = data;

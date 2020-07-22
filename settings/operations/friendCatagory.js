@@ -1,7 +1,7 @@
 module.exports = {
   POST: 'addFriendsCategory',
   PARAMETER: {
-    PATCH: 'modifyFriendCategory',
+    PUT: 'modifyFriendCategory',
     DELETE: 'removeFriendCategory'
   }
 };

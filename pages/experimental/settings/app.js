@@ -3,7 +3,7 @@ var CommonModal = new NKC.modules.CommonModal();
 function setStable(hash, type) {
   sweetQuestion("确定要执行当前操作？")
     .then(function() {
-      nkcAPI("/e/settings/app", "PATCH", {
+      nkcAPI("/e/settings/app", "PUT", {
         operation: "modifyStable",
         hash: hash,
         stable: !!type
@@ -20,7 +20,7 @@ function setStable(hash, type) {
 function setDisabled(hash, type) {
   sweetQuestion("确定要执行当前操作？")
     .then(function() {
-      nkcAPI("/e/settings/app", "PATCH", {
+      nkcAPI("/e/settings/app", "PUT", {
         operation: "modifyDisabled",
         hash: hash,
         disabled: !!type
@@ -43,7 +43,7 @@ function edit(hash) {
   }
   if(!log) return;
   CommonModal.open(function(data) {
-    nkcAPI("/e/settings/app", "PATCH", {
+    nkcAPI("/e/settings/app", "PUT", {
       operation: "modifyVersion",
       hash: hash,
       version: data[0].value,
@@ -130,7 +130,7 @@ var app = new Vue({
     changeDownLoadState: function (item) {
       var newVersion = JSON.parse(JSON.stringify(item));
       newVersion.canDown = !newVersion.canDown;
-      nkcAPI('/e/settings/app/histories', 'PATCH', { newVersion: newVersion, operating: 'changeState' })
+      nkcAPI('/e/settings/app/histories', 'PUT', { newVersion: newVersion, operating: 'changeState' })
         .then(function (res) {
           item.canDown = !item.canDown;
           return sweetSuccess('修改成功！');
@@ -142,7 +142,7 @@ var app = new Vue({
       var that = this;
       var newVersion = JSON.parse(JSON.stringify(item));
       newVersion.stable = true;
-      nkcAPI('/e/settings/app/histories', 'PATCH', { newVersion: newVersion, operating: 'setStable' })
+      nkcAPI('/e/settings/app/histories', 'PUT', { newVersion: newVersion, operating: 'setStable' })
         .then(function (res) {
           that.data.histories.forEach(function (ele) {
             ele.stable = false;
@@ -161,7 +161,7 @@ var app = new Vue({
         var newVersion = JSON.parse(JSON.stringify(item));
         newVersion.appVersion = data[0].value;
         newVersion.appDescription = data[1].value;
-        nkcAPI('/e/settings/app/histories', 'PATCH', { newVersion: newVersion, operating: 'updateVersion' })
+        nkcAPI('/e/settings/app/histories', 'PUT', { newVersion: newVersion, operating: 'updateVersion' })
           .then(function (res) {
             return sweetSuccess('修改成功！');
             // location.reload();

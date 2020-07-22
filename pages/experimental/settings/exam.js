@@ -10,7 +10,7 @@ var app = new Vue({
   },
   methods: {
     save: function() {
-      nkcAPI('/e/settings/exam', 'PATCH', {examSettings: app.examSettings})
+      nkcAPI('/e/settings/exam', 'PUT', {examSettings: app.examSettings})
         .then(function() {
           screenTopAlert('保存成功');
         })

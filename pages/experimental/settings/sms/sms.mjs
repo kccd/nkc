@@ -40,7 +40,7 @@ window.app = new Vue({
               smsSign
             }
           };
-          return nkcAPI("/e/settings/sms", "PATCH", body)
+          return nkcAPI("/e/settings/sms", "PUT", body)
         })
         .then(data => {
           sweetSuccess("保存成功");
@@ -148,7 +148,7 @@ window.app = new Vue({
           })
         })
         .then(function () {
-          return nkcAPI('/e/settings/sms', 'PATCH', {smsSettings: smsSettings})
+          return nkcAPI('/e/settings/sms', 'PUT', {smsSettings: smsSettings})
         })
         .then(function() {
           sweetSuccess("保存成功");

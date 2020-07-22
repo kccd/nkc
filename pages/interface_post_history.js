@@ -7,7 +7,7 @@ function disabledHistories(pid, type) {
 		text = '解除屏蔽成功';
 		obj.operation = 'unDisableHistories'
 	}
-	nkcAPI('/p/'+pid+'/history', 'PATCH', obj)
+	nkcAPI('/p/'+pid+'/history', 'PUT', obj)
 		.then(function() {
 			screenTopAlert(text);
 		})

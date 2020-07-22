@@ -19,7 +19,7 @@ router
 		ctx.template = 'experimental/settings/home.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {id} = body;
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});

@@ -10,7 +10,7 @@ function submitBase() {
 		brief: $('#brief').val(),
 		telephone: $('#telephone').val(),
 	};
-	nkcAPI('/e/settings/base', 'PATCH', obj)
+	nkcAPI('/e/settings/base', 'PUT', obj)
 		.then(function() {
 			screenTopAlert('保存成功');
 			setTimeout(function() {
@@ -42,7 +42,7 @@ var app = new Vue({
       this.info = "";
       var settings = this.serverSettings;
       settings.keywords = this.keywords;
-      nkcAPI("/e/settings/base", "PATCH", settings)
+      nkcAPI("/e/settings/base", "PUT", settings)
         .then(function() {
           sweetSuccess("保存成功");
         })

@@ -2,7 +2,7 @@ module.exports = {
   GET: "column_get",
   PARAMETER: {
     GET: 'column_single_get',
-    PATCH: "column_single_settings",
+    PUT: "column_single_settings",
     top: {
       POST: "pushColumnToHome",
       DELETE: "pushColumnToHome"
@@ -10,10 +10,10 @@ module.exports = {
     category: {
       GET: "column_single_settings_post",
       POST: "column_single_settings_post",
-      PATCH: "column_single_settings_post",
+      PUT: "column_single_settings_post",
       PARAMETER: {
         DELETE: "column_single_settings_post",
-        PATCH: "column_single_settings_post"
+        PUT: "column_single_settings_post"
       }
     },
     post: {
@@ -75,7 +75,7 @@ module.exports = {
       POST: "column_single_settings_page",
       PARAMETER: {
         GET: "column_single_page",
-        PATCH: "column_single_settings_page",
+        PUT: "column_single_settings_page",
         DELETE: "column_single_settings_page"
       }
     }

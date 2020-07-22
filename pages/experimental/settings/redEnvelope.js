@@ -103,7 +103,7 @@ var app = new Vue({
         draftFee: this.draftFeeDemo,
         share: this.shareDemo
       };
-      nkcAPI('/e/settings/red-envelope',  'PATCH', data)
+      nkcAPI('/e/settings/red-envelope',  'PUT', data)
         .then(function() {
           screenTopAlert('保存成功');
         })

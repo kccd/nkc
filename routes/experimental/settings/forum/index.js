@@ -10,7 +10,7 @@ router
 		ctx.template = 'experimental/settings/forum/forum.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body, nkcModules} = ctx;
 		const {checkString} = nkcModules.checkData;
 		const {fidArr, categories} = body;

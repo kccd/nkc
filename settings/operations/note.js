@@ -6,7 +6,7 @@ module.exports = {
     c: {
       PARAMETER: {
         DELETE: "deleteNote",
-        PATCH: "modifyNote"
+        PUT: "modifyNote"
       }
     }
   }

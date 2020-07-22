@@ -44,7 +44,7 @@ router
     });
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {nkcModules, tools, db, body} = ctx;
     const {username, email, code, password} = body;
     const {checkPass, contentLength, checkEmailFormat} = tools.checkString;

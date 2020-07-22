@@ -40,7 +40,7 @@ function modifyOperationType(id, displayName) {
 	} else if(displayName === '') {
 		return screenTopWarning('分类名不能为空');
 	} else {
-		nkcAPI('/e/settings/operation/'+id, 'PATCH', {displayName: displayName, operation: 'modifyDisplayName'})
+		nkcAPI('/e/settings/operation/'+id, 'PUT', {displayName: displayName, operation: 'modifyDisplayName'})
 			.then(function() {
 				window.location.reload();
 			})
@@ -90,7 +90,7 @@ function moveOperations() {
 		operations: operations,
 		operation: 'moveOperations'
 	};
-	nkcAPI('/e/settings/operation/'+id, 'PATCH', obj)
+	nkcAPI('/e/settings/operation/'+id, 'PUT', obj)
 		.then(function() {
 			screenTopAlert('移动成功');
 		})
@@ -108,7 +108,7 @@ function deleteOperations(id) {
 		operations: operations,
 		operation: 'deleteOperations'
 	};
-	nkcAPI('/e/settings/operation/'+id, 'PATCH', obj)
+	nkcAPI('/e/settings/operation/'+id, 'PUT', obj)
 		.then(function() {
 			screenTopAlert('移除成功');
 		})
@@ -128,7 +128,7 @@ function editorOperation(id, description, errInfo) {
 	if(errInfo === '') {
 		return screenTopWarning('错误提示不能为空');
 	}
-	nkcAPI('/e/settings/operation', 'PATCH', {operationId: id, description: description, errInfo:errInfo})
+	nkcAPI('/e/settings/operation', 'PUT', {operationId: id, description: description, errInfo:errInfo})
 		.then(function() {
 			screenTopAlert('修改成功');
 		})

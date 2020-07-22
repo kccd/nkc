@@ -45,7 +45,7 @@ goodslistRouter
     await next();
   })
   // 提交规格修改信息
-  .patch('/editParam', async (ctx, next) => {
+  .put('/editParam', async (ctx, next) => {
     const {data, db, nkcModules, body} = ctx;
     const {user} = data;
     let {paramId, productId, originPrice, price, stocksSurplus, useDiscount, name, isEnable} = body.paramData;
@@ -109,7 +109,7 @@ goodslistRouter
     await next();
   })
   // 提交商品修改信息
-  .patch('/editProduct', async (ctx, next) => {
+  .put('/editProduct', async (ctx, next) => {
     const {data, body, query, db} = ctx;
     const {user} = data;
     const {
@@ -176,7 +176,7 @@ goodslistRouter
     await next();
   })
   // 立即上架
-  .patch('/shelfRightNow', async (ctx ,next) => {
+  .put('/shelfRightNow', async (ctx ,next) => {
     const {data, body, params, db} = ctx;
     const {productId} = body;
     const product = await db.ShopGoodsModel.findOne({productId});
@@ -184,7 +184,7 @@ goodslistRouter
     await next();
   })
   // 商品停售
-  .patch('/productStopSale', async(ctx, next) => {
+  .put('/productStopSale', async(ctx, next) => {
     const {data, body, db} = ctx;
     const {productId} = body;
     const product = await db.ShopGoodsModel.findOne({productId});
@@ -194,7 +194,7 @@ goodslistRouter
     await next();
   })
   // 商品复售
-  .patch('/productGoonSale', async(ctx, next) => {
+  .put('/productGoonSale', async(ctx, next) => {
     const {data, body, db} = ctx;
     const {productId} = body;
     const product = await db.ShopGoodsModel.findOne({productId});

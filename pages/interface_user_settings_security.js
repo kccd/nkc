@@ -14,7 +14,7 @@ function submitPassword(uid) {
     return sweetError('两次输入的新密码不一致');
   }
   delete obj.password2;
-  nkcAPI('/u/'+uid+'/settings/password', 'PATCH', obj)
+  nkcAPI('/u/'+uid+'/settings/password', 'PUT', obj)
     .then(function() {
       sweetSuccess('修改成功');
     })
@@ -362,7 +362,7 @@ var mobileApp = new Vue({
       if(obj.mobile === '') {
         return sweetError('请输入新手机号码');
       }
-      nkcAPI('/u/'+NKC.configs.uid+'/settings/mobile', 'PATCH', obj)
+      nkcAPI('/u/'+NKC.configs.uid+'/settings/mobile', 'PUT', obj)
         .then(function() {
           sweetSuccess('更改绑定成功');
           window.location.reload();

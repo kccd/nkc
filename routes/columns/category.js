@@ -43,7 +43,7 @@ router
     await db.ColumnPostCategoryModel.computeCategoryOrder(column._id);
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, data, body} = ctx;
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
@@ -56,7 +56,7 @@ router
     }
     await next();
   })
-  .patch("/:categoryId", async (ctx, next) => {
+  .put("/:categoryId", async (ctx, next) => {
     const {tools, data, db, body} = ctx;
     const {categoryId} = ctx.params;
     const {column, user} = data;

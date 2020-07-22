@@ -6,7 +6,7 @@ router
     ctx.template = 'experimental/settings/recharge/recharge.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
     const {checkNumber} = nkcModules.checkData;
     const {recharge, withdraw} = body;

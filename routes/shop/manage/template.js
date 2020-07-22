@@ -18,7 +18,7 @@ templateRouter
     ctx.template = 'shop/manage/template.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {data, db, query, body} = ctx;
     const {user} = data;
     const {templates} = body;

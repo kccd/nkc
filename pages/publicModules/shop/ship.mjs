@@ -62,7 +62,7 @@ NKC.modules.ShopShip = class {
             body.trackName = trackName;
             body.trackNumber = trackNumber;
           }
-          nkcAPI(url, "PATCH", {post: body})
+          nkcAPI(url, "PUT", {post: body})
             .then(function() {
               self.close();
               sweetSuccess("保存成功")

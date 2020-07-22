@@ -10,7 +10,7 @@ function submit(fid) {
     fid: fid,
     mergeForumId: mergeForumId
   }
-	nkcAPI('/f/'+fid+'/settings/merge', 'PATCH', obj)
+	nkcAPI('/f/'+fid+'/settings/merge', 'PUT', obj)
 		.then(function() {
       screenTopAlert('保存成功');
       $("#startConcat").attr('disabled',false);

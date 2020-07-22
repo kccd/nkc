@@ -8,7 +8,7 @@ var app = new Vue({
   },
   methods:  {
     save: function() {
-      nkcAPI("/e/settings/thread", "PATCH", {threadSettings: this.settings})
+      nkcAPI("/e/settings/thread", "PUT", {threadSettings: this.settings})
         .then(function() {
           sweetSuccess("保存成功");
         })

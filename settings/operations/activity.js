@@ -18,7 +18,7 @@ module.exports = {
       GET: "visitActivitySingle",
       POST: "activityApplyPost",
       DELETE: "cancelActivityApply",
-      PATCH: "activityEditPost"
+      PUT: "activityEditPost"
     }
   },
   myApply: {
@@ -37,7 +37,7 @@ module.exports = {
       GET: 'getActivityModify',
       POST: 'postActivityModify',
       DELETE: 'delActivityModify',
-      PATCH: 'sendActivityMessage'
+      PUT: 'sendActivityMessage'
     }
   }
 };

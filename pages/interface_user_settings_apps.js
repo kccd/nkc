@@ -58,7 +58,7 @@ function submit(uid) {
     waterStyle: waterStyleValue,
     waterGravity: waterGravityValue
   }
-  nkcAPI('/u/'+uid+'/settings/water', 'PATCH', optionArr)
+  nkcAPI('/u/'+uid+'/settings/water', 'PUT', optionArr)
     .then(function(){
       sweetSuccess('修改成功');
     })
@@ -88,7 +88,7 @@ function hideButton(){
 
 // 付费提示
 function yesPayForWater(uid){
-  nkcAPI('/u/'+uid+'/settings/water', 'PATCH', {
+  nkcAPI('/u/'+uid+'/settings/water', 'PUT', {
     type: "pay"
   })
     .then(function(){
@@ -134,7 +134,7 @@ function saveAppInfo() {
   selectTypesWhenSubscribe = selectTypesWhenSubscribe.eq(0).prop("checked");
   var color = $("input[data-control='selectColor']");
   color = color.val();
-  nkcAPI("/u/" + data.user.uid + "/settings/apps", "PATCH", {
+  nkcAPI("/u/" + data.user.uid + "/settings/apps", "PUT", {
     homeThreadList: homeThreadList,
     color: color,
     showEnvelope: showEnvelope,

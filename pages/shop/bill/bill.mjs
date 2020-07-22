@@ -45,30 +45,33 @@ const app = new Vue({
     saveAddressForm() {
       const self = this;
       const {username, address, location, mobile} = this.addressForm;
-      this.checkString(username, {
-        name: "收件人姓名",
-        minLength: 1,
-        maxLength: 50
-      });
-      this.checkString(location, {
-        name: "所在地区",
-        minLength: 1,
-        maxLength: 100
-      });
-      this.checkString(address, {
-        name: "详细地址",
-        minLength: 1,
-        maxLength: 500
-      });
-      this.checkString(mobile, {
-        name: "手机号",
-        minLength: 1,
-        maxLength: 100
-      });
-      nkcAPI(`/u/${NKC.configs.uid}/settings/transaction`, "PATCH", {
-        operation: "add",
-        addresses: [this.addressForm]
-      })
+      Promise.resolve()
+        .then(() => {
+          self.checkString(username, {
+            name: "收件人姓名",
+            minLength: 1,
+            maxLength: 50
+          });
+          self.checkString(location, {
+            name: "所在地区",
+            minLength: 1,
+            maxLength: 100
+          });
+          self.checkString(address, {
+            name: "详细地址",
+            minLength: 1,
+            maxLength: 500
+          });
+          self.checkString(mobile, {
+            name: "手机号",
+            minLength: 1,
+            maxLength: 100
+          });
+          return nkcAPI(`/u/${NKC.configs.uid}/settings/transaction`, "PUT", {
+            operation: "add",
+            addresses: [self.addressForm]
+          })
+        })
         .then(data => {
           self.addresses = data.addresses;
           if(self.addresses.length) {
@@ -112,12 +115,12 @@ const app = new Vue({
               if(t.name === freightName) {
                 p.freight = t;
               }
-            }      
+            }
           }
           // 统计同一商品下规格的总个数以及总价格
           let countTotal = 0, priceTotal = 0;
           p.params.map(param => {
-            const {count, price} = param; 
+            const {count, price} = param;
             countTotal += count;
             priceTotal += (count * price);
           });

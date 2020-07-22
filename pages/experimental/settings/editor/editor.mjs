@@ -6,7 +6,7 @@ const app = new Vue({
   },
   methods: {
     submit() {
-      nkcAPI("/e/settings/editor", "PATCH", {
+      nkcAPI("/e/settings/editor", "PUT", {
         editorSettings: this.editorSettings
       })
       .then(() => {

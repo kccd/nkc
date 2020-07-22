@@ -15,14 +15,14 @@ module.exports = {
   },
   subscribes: {
     GET: "account_subscribe",
-    PATCH: "account_subscribe",
+    PUT: "account_subscribe",
   },
   subscribe_types: {
     GET: "account_subscribe",
     POST: "account_subscribe",
     PARAMETER: {
       DELETE: "account_subscribe",
-      PATCH: "account_subscribe"
+      PUT: "account_subscribe"
     }
   }
 }

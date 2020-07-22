@@ -10,7 +10,7 @@ router
     data.subscribeType = type;
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, data, body, tools} = ctx;
     const {contentLength} = tools.checkString;
     const {subscribeType, user} = data;

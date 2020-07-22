@@ -19,7 +19,7 @@ gulp.task("buildCSS", () => {
 const mjsPath = `pages/**/*.mjs`;
 
 gulp.task('browserify', function (done) {
-  glob(mjsPath,function (err, files) {
+  return glob(mjsPath,function (err, files) {
     if (err) return done(err);
     files.map(function (entry) {
       return browserify({

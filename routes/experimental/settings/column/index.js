@@ -9,7 +9,7 @@ router
     ctx.data.roles = await ctx.db.RoleModel.find({}).sort({toc: -1});
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {body, db} = ctx;
     let {
       xsfCount, digestCount, userGrade,

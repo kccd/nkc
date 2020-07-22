@@ -9,7 +9,7 @@ var app = new Vue({
   },
   methods: {
     save: function() {
-      nkcAPI('/e/settings/xsf', 'PATCH', {xsfSettings: this.xsfSettings})
+      nkcAPI('/e/settings/xsf', 'PUT', {xsfSettings: this.xsfSettings})
         .then(function() {
           screenTopAlert('保存成功');
         })

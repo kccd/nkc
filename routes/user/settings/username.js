@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
 router
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {data, db, body, nkcModules} = ctx;
 		const {user} = data;
 		const {newUsername} = body;

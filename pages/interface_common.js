@@ -795,7 +795,7 @@ function deleteBill(id) {
 
 // 封禁用户
 function bannedUser(uid, banned) {
-	var method = 'PATCH';
+	var method = 'PUT';
 	if(banned) method = 'DELETE';
 	nkcAPI('/u/'+uid+'/banned', method, {})
 		.then(function() {
@@ -1622,7 +1622,7 @@ function postsVote(pid, type) {
 
 // 屏蔽鼓励原因
 function hideKcbRecordReason(pid, recordId, hide) {
-  nkcAPI("/p/" + pid + "/credit/kcb/" + recordId, "PATCH", {
+  nkcAPI("/p/" + pid + "/credit/kcb/" + recordId, "PUT", {
     hide: !!hide
   })
     .then(function() {
@@ -1726,7 +1726,7 @@ function disablePostClick(pid, type){
 }
 
 function disablePost(pid,para){
-  nkcAPI('/p/'+pid+'/disabled', 'PATCH',{disabled: true,para: para})
+  nkcAPI('/p/'+pid+'/disabled', 'PUT',{disabled: true,para: para})
     .then(function(res){
       screenTopAlert(pid+' 已屏蔽')
       //location.reload()
@@ -1761,7 +1761,7 @@ function disabledThread(tid, para) {
 }
 
 function moveThread(tid,fid,cid,para){
-  return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
+  return nkcAPI('/t/'+tid+'/moveThread','PUT',{
     tid:tid,
     fid:fid,
     cid:cid,
@@ -1998,7 +1998,7 @@ function openVideo(para, vid) {
 * @author pengxiguaa 2019-7-26
 * */
 function reviewPost(pid) {
-  nkcAPI("/review", "PATCH", {
+  nkcAPI("/review", "PUT", {
     pid: pid
   })
     .then(function() {

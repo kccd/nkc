@@ -66,7 +66,7 @@ router
     data.coverHash = cover.hash;
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {nkcModules, body, db, data} = ctx;
     const {operation} = body;
     if(operation === "saveAds") {

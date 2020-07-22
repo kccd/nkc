@@ -35,7 +35,7 @@ function submit(_id, callback) {
 	if(obj.resolved) {
 		obj.reminded = $("input[name='remind']").prop("checked");
 	}
-	nkcAPI('/problem/list/'+_id, 'PATCH', obj)
+	nkcAPI('/problem/list/'+_id, 'PUT', obj)
 		.then(function() {
 			if(callback) {
 				return callback();

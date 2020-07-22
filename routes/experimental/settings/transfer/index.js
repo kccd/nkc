@@ -81,7 +81,7 @@ router
 
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
     const {transferSettings} = body;
     const {checkNumber} = nkcModules.checkData;

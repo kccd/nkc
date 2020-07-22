@@ -8,7 +8,7 @@ router
     ctx.template = "experimental/settings/thread/thread.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body} = ctx;
     let {gradesId, rolesId} = body.threadSettings.displayPostAttachments;
     let {isDisplay, tipContent} = body.threadSettings.playerTips;

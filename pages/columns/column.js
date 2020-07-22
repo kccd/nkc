@@ -21,7 +21,7 @@ function showShareDom(){
   $(".column-share-body").toggle();
 }
 function saveSettings() {
-  nkcAPI("/m/" + data.columnId, "PATCH", {
+  nkcAPI("/m/" + data.columnId, "PUT", {
     type: "color",
     color: bodyBackgroundColor
   })

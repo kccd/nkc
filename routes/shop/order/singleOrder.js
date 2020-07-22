@@ -31,7 +31,7 @@ router
     await next();
   })
   // 确认收货
-  .patch('/receipt', async(ctx, next) => {
+  .put('/receipt', async(ctx, next) => {
     const {data, db, params, body} = ctx;
     const {user} = data;
     const {orderId} = params;

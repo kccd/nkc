@@ -300,7 +300,7 @@ router
     }
     await next();
   })
-  .patch('/:pid', async (ctx, next) => {
+  .put('/:pid', async (ctx, next) => {
     let body, files = {};
     if(ctx.body.fields) {
       body = JSON.parse(ctx.body.fields.body);

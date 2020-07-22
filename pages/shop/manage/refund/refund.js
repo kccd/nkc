@@ -119,7 +119,7 @@ var app = new Vue({
           }
         }
         app.uploadStatus = "上传中... " + (index+1) + "/" + arr.length + " " + p.toFixed(1) + "%";
-        
+
       })
         .then(function(data) {
           var cert = data.cert;
@@ -152,14 +152,14 @@ var app = new Vue({
       } else if(this.refund.status === "B_INPUT_CERT_RM") {
         type = agree? "uploadCerts": "agreeRM";
       } else if(this.refund.status === "P_APPLY_RM") {
-        method = "PATCH";
+        method = "PUT";
         url = "/shop/cert";
         type = "uploadCerts";
       } else {
         return this.error = "申请记录状态异常，请刷新";
-      }  
-        
-      
+      }
+
+
       var certsId = [];
 
       if(type === "uploadCerts") {

@@ -11,7 +11,7 @@ router
     ctx.template = "experimental/settings/upload/upload.pug";
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
     const {fields, files} = body;
     const {checkNumber} = nkcModules.checkData;

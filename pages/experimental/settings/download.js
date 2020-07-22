@@ -7,7 +7,7 @@ var app = new Vue({
   },
   methods: {
     submit: function() {
-      nkcAPI("/e/settings/download", "PATCH", {
+      nkcAPI("/e/settings/download", "PUT", {
         options: this.roleOptions.concat(this.gradeOptions)
       })
         .then(function() {

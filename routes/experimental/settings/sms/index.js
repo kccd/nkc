@@ -8,7 +8,7 @@ smsRouter
     ctx.template = 'experimental/settings/sms/sms.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body, nkcModules} = ctx;
 		const {checkString} = nkcModules.checkData;
 		const {smsSettings} = body;

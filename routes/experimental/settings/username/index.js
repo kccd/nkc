@@ -8,7 +8,7 @@ router
     ctx.template = "experimental/settings/username/username.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body} = ctx;
     let {maxKcb, freeCount, onceKcb, free} = body;
     maxKcb = parseInt(maxKcb);

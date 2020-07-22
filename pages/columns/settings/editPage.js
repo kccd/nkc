@@ -23,7 +23,7 @@ function save() {
     content: content
   };
   if(data.page) {
-    method = "PATCH";
+    method = "PUT";
     url = "/m/" + data.column._id + "/page/" + data.page._id;
     body.type = "modifyContent";
   } else {
