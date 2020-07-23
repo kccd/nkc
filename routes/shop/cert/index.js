@@ -17,7 +17,7 @@ router
     if(!ctx.permission("getAnyBodyShopCert")) {
       if(cert.uid !== user.uid) {
         if(
-          cert.type !== "shopping" || 
+          cert.type !== "shopping" ||
           !await db.ShopOrdersModel.findOne({sellUid: user.uid, orderId: cert.orderId})
         ) {
           ctx.throw(403, "您没有权限查看别人的凭证");
@@ -63,7 +63,7 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {settings, tools, db, body, data} = ctx;
+    const {settings, tools, db, body, data, fsPromise} = ctx;
     const {files, fields} = body;
     const {type, orderId, paramId} = fields;
     const {user} = data;
@@ -102,10 +102,10 @@ router
       const targetSmallPath = shopCertsPath + datePath + certId + "_sm.jpg";
       await shopCertImageify(path, targetPath);
       await shopCertSmallImageify(path, targetSmallPath);
-      await ctx.fs.unlink(path);
+      await fsPromise.unlink(path);
     } else {
       const targetPath = shopCertsPath + datePath + certId + "." + ext;
-      await ctx.fs.rename(path, targetPath);
+      await fsPromise.copyFile(path, targetPath);
     }
     const cert = db.ShopCertModel({
       _id: certId,

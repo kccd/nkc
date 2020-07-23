@@ -237,7 +237,7 @@ resourceRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {fs, tools, settings, db, data, nkcModules} = ctx;
+    const {fs, fsPromise, tools, settings, db, data, nkcModules} = ctx;
     const { imageMagick, ffmpeg } = tools;
     const {upload} = settings;
     const {generateFolderName, extGetPath, thumbnailPath, mediumPath, frameImgPath} = upload;
@@ -712,7 +712,7 @@ resourceRouter
       // 将元数据移动到视频的第一帧
       // await ffmpeg.videoMoveMetaToFirstThumb(outputVideoPath, outputVideoPath);
       // 移动已经转好码的视频文件再次移动到tmp临时文件夹下
-      await fs.rename(outputVideoPath, path);
+      await fsPromise.copyFile(outputVideoPath, path);
       // 生成视频封面图
       await ffmpeg.videoFirstThumbTaker(path, videoImgPath);
       // 修改视频保存信息
@@ -735,19 +735,19 @@ resourceRouter
       } else if(['aac'].indexOf(extension.toLowerCase()) > -1) {
         await ffmpeg.audioAACTransMP3(path, outputVideoPath)
       } else {
-        await fs.rename(path, outputVideoPath);
+        await fsPromise.copyFile(path, outputVideoPath);
       }
 
-      await fs.rename(outputVideoPath, path);
+      await fsPromise.copyFile(outputVideoPath, path);
       let nameReg = new RegExp(extension, "igm");
       name = name.replace(nameReg, "mp3");
       extension = "mp3";
       saveName = rid + "." + extension;
       mediaFilePath = mediaFilePath.replace(nameReg, "mp3");
     }
-    // await fs.rename(path, mediaFilePath);
-    await fs.copyFile(path, mediaFilePath);
-    await fs.unlink(path);
+    // await fsPromise.copyFile(path, mediaFilePath);
+    await fsPromise.copyFile(path, mediaFilePath);
+    await fsPromise.unlink(path);
 
     // 判断图片的宽高
     let height, width, resourceType = "resource";

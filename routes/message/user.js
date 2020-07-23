@@ -37,7 +37,7 @@ userRouter
     await next();
   })
   .post('/:uid', async (ctx, next) => {
-    const {db, body, params, data, redis, settings, fs, tools} = ctx;
+    const {db, body, params, data, redis, settings, fs, fsPromise, tools} = ctx;
     const {uid} = params;
     const {ffmpeg} = tools;
     const targetUser = await db.UserModel.findOnly({uid});
@@ -106,7 +106,7 @@ userRouter
         vl: voiceTime || null
       }
 
-      await fs.rename(path, targetPath);
+      await fsPromise.copyFile(path, targetPath);
       // 将amr语音文件转为mp3
       if(voiceExt.includes(ext)){
         let voiceMp3Path = generateFolderName(messageVoiceBrowser) + _id + '.mp3';

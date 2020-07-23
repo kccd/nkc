@@ -6,6 +6,7 @@ const db = require('../dataModels');
 const {logger} = nkcModules;
 const languages = require('../languages');
 const fs = require('fs');
+const fsPromise = fs.promises;
 const {promisify} = require('util');
 const redis = require('../redis');
 const cookieConfig = require("../config/cookie");
@@ -78,6 +79,7 @@ module.exports = async (ctx, next) => {
     ctx.redis = redis;
     ctx.settings = settings;
     ctx.fs = fsSync;
+    ctx.fsPromise = fsPromise;
 
     ctx.state = {
       url: ctx.url.replace(/\?.*/ig, ""),

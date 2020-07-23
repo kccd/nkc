@@ -67,17 +67,17 @@ router
     if(role._id !== 'dev') {
       const operations = await db.OperationModel.find({_id: {$in: operationsId}});
       updateObj.operationsId = operations.map(o => o._id);
-    }    
+    }
     await roleDB.update(updateObj);
     await redis.cacheForums();
     await next();
   })
   .post('/icon', async (ctx, next) => {
-    const {fs, body, data, settings} = ctx;
+    const {fs, fsPromise, body, data, settings} = ctx;
     const {defaultRoleIconPath} = settings.statics;
     const {role} = data;
     const {file} = body.files;
-    await fs.rename(file.path, defaultRoleIconPath + '/' + role._id + '.png');
+    await fsPromise.copyFile(file.path, defaultRoleIconPath + '/' + role._id + '.png');
     await role.update({hasIcon: true});
     await next();
   })
