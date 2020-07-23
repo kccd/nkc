@@ -1,11 +1,87 @@
 module.exports = {
   _id: 'home',
   c: {
+    recommendThreads: {
+      fixed: {
+        order: 'random', // 文章显示顺序， random: 随机, fixed: 顺序
+        manuallySelectedThreads: [], // 手动推荐的文章
+        automaticallySelectedThreads: [], // 自动推荐的文章
+        displayType: 'manual', // manual: 手动, automatic: 自动, all: 混合
+        automaticProportion: 1, // 当现实方式为「混合」时，自动推荐的文章所占的比例
+        automaticCount: 20, // 自动选择推荐文章的数量
+        timeOfPost: { // 文章的发表时间限制
+          min: 1, // 距离当前最短一天
+          max: 365 // 距离当前最长365天
+        },
+        timeInterval: 1, // 自动更新的间隔时间（小时）
+        digest: false, // 文章是否必须是精选
+        postVoteUpMinCount: 0, // 文章的最小点赞数
+        postVoteDownMaxCount: 99999, // 文章的最大点踩数
+        threadVoteUpMinCount: 0, // 文章（包含所有回复）的最小点赞数
+        reportedAndUnReviewed: false, // 是否包含被举报且未处理的文章
+        original: false, // 文章是否必须为原创
+        flowControl: false, // 是否包含流控文章
+      },
+      movable: {
+        order: 'random', // 文章显示顺序， random: 随机, fixed: 顺序
+        manuallySelectedThreads: [], // 手动推荐的文章
+        automaticallySelectedThreads: [], // 自动推荐的文章
+        displayType: 'manual', // manual: 手动, automatic: 自动, all: 混合
+        automaticProportion: 1, // 当现实方式为「混合」时，自动推荐的文章所占的比例
+        automaticCount: 20, // 自动选择推荐文章的数量
+        timeOfPost: { // 文章的发表时间限制
+          min: 1, // 距离当前最短一天
+          max: 365 // 距离当前最长365天
+        },
+        timeInterval: 1, // 自动更新的间隔时间（小时）
+        digest: false, // 文章是否必须是精选
+        postVoteUpMinCount: 0, // 文章的最小点赞数
+        postVoteDownMaxCount: 99999, // 文章的最大点踩数
+        threadVoteUpMinCount: 0, // 文章（包含所有回复）的最小点赞数
+        reportedAndUnReviewed: false, // 是否包含被举报且未处理的文章
+        original: false, // 文章是否必须为原创
+        flowControl: false, // 是否包含流控文章
+      }
+    },
     ads: {
-      movable: [],
-      fixed: [],
+      movable: [], // 手动 轮播
+      fixed: [], // 手动 固定
       fixedOrder: "random",
-      movableOrder: "random"
+      movableOrder: "random",
+      automaticFixed: {
+        data: [],
+        count: 0,
+        status: false,
+        proportion: 0,
+        timeOfPost: { // 发表时间范围
+          min: 1, // 最小时间
+          max: 365 // 最大时间
+        },
+        digest: false, // 是否必须精选
+        postVoteUpMinCount: 0, // 内容最小点赞数
+        postVoteDownMaxCount: 99999, // 内容最大点踩数
+        threadVoteUpMinCount: 0, // 内容+回复总体最小点赞数
+        reportedAndUnReviewed: false, // 是否推送被举报且未被处理的文章
+        original: false, // 是否必须为原创
+        flowControl: false, // 是否推送收流量控制的文章
+      },
+      automaticMovable: {
+        data: [],
+        count: 0,
+        status: false,
+        proportion: 0,
+        timeOfPost: { // 发表时间范围
+          min: 1, // 最小时间
+          max: 365 // 最大时间
+        },
+        digest: false, // 是否必须精选
+        postVoteUpMinCount: 0, // 内容最小点赞数
+        postVoteDownMaxCount: 99999, // 内容最大点踩数
+        threadVoteUpMinCount: 0, // 内容+回复总体最小点赞数
+        reportedAndUnReviewed: false, // 是否推送被举报且未被处理的文章
+        original: false, // 是否必须为原创
+        flowControl: false, // 是否推送收流量控制的文章
+      },
     },
     toppedThreadsId: [],
     recommendForumsId: [],
@@ -28,7 +104,7 @@ module.exports = {
     },
     // 游客默认显示 推荐、最新
     visitorThreadList: "recommend",
-    // 人们文章 条件
+    // 热门文章 条件
     hotThreads: {
       postCount: 50,
       postUserCount: 20

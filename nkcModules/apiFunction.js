@@ -192,7 +192,7 @@ fn.getRandomNumber = (obj) => {
 };
 
 /**
- * 指定范围和个数生成随机整数数组 
+ * 指定范围和个数生成随机整数数组
  */
 fn.getRandomNumber$2 = (obj) => {
   let {count, min, max, repeat} = obj;
@@ -811,5 +811,22 @@ fn.getConfigByName = async (name) => {
       }
     })
   });
+};
+/*
+* 打乱数组元素顺序
+* @param {Array} array 数组
+* @return {Array} 被打乱顺序的原数组
+* @author pengxiguaa 2020/7/16
+* */
+fn.arrayShuffle = (array) => {
+  let m = array.length;
+  let t, i;
+  while(m) {
+    i = Math.floor(Math.random() * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
 };
 module.exports = fn;

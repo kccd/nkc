@@ -6,7 +6,7 @@
     .media
       .media-left
         if forum.logo
-          img.media-object(src=tools.getUrl('forumAvatar', forum.logo) style=`height: 2.5rem;width: 2.5rem;border-radius: 50%;`)
+          img.media-object(src=tools.getUrl('forumLogo', forum.logo) style=`height: 2.5rem;width: 2.5rem;border-radius: 50%;`)
         else
           .media-object(style=`height: 2.5rem;width: 2.5rem;border-radius: 50%;background-color: ${forum.color}`)
       .media-body

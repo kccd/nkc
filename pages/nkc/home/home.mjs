@@ -13,9 +13,13 @@ for(let i = 0; i < data.ads.fixed.length; i++) {
   modifyAd(ad, "fixed");
 }
 
+console.log(data);
+
 const app = new Vue({
   el: "#app",
   data: {
+    page: {id: 'movable', name: '轮播图'},
+    recommendThreads: data.recommendThreads,
     ads: data.ads,
     recommendForums: data.recommendForums,
     columns: data.columns,
@@ -23,7 +27,9 @@ const app = new Vue({
     toppedThreads: data.toppedThreads,
     showShopGoods: (data.showGoods? "t": ""),
     // 首页“最新原创”文章条目显示模式，为空就默认为简略显示
-    originalThreadDisplayMode: data.originalThreadDisplayMode
+    originalThreadDisplayMode: data.originalThreadDisplayMode,
+
+    updating: false,
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -32,6 +38,27 @@ const app = new Vue({
   computed: {
     selectedRecommendForumsId() {
       return data.recommendForums.map(f => f.fid);
+    },
+    nav() {
+      const {page} = this;
+      const arr = [
+        {
+          id: 'other',
+          name: '其他'
+        },
+        {
+          id: 'movable',
+          name: '轮播图'
+        },
+        {
+          id: 'fixed',
+          name: '固定图'
+        }
+      ];
+      arr.map(a => {
+        a.active = a.id === page.id;
+      });
+      return arr;
     }
   },
   methods: {
@@ -40,6 +67,65 @@ const app = new Vue({
     getUrl: NKC.methods.tools.getUrl,
     floatUserInfo: NKC.methods.tools.floatUserInfo,
     visitUrl: NKC.methods.visitUrl,
+    removeFromArr(arr, index) {
+      arr.splice(index, 1);
+    },
+    moveFromArr(arr, index, type) {
+      const count = arr.length;
+      if(index === 0 && type === 'left') return;
+      if(index + 1 === count && type === 'right') return;
+      let _index;
+      if(type === 'left') {
+        _index = index - 1;
+      } else {
+        _index = index + 1;
+      }
+      const item = arr[index];
+      const _item = arr[_index];
+      Vue.set(arr, index, _item);
+      Vue.set(arr, _index, item);
+    },
+    getRecommendTypeName(id) {
+      return {
+        movable: '轮播图',
+        fixed: '固定图'
+      }[id]
+    },
+    selectPage(page) {
+      this.page = page;
+    },
+    saveRecommendThreads() {
+      const {page} = this;
+      const options = this.recommendThreads[page.id];
+      nkcAPI(`/nkc/home`, 'PATCH', {
+        operation: 'saveRecommendThreads',
+        type: page.id,
+        options
+      })
+        .then(() => {
+          sweetSuccess('保存成功');
+        })
+        .catch(sweetError);
+    },
+    updateThreadList() {
+      const {page} = this;
+      this.updating = true;
+      const pageId = page.id;
+      const self = this;
+      nkcAPI('/nkc/home', 'PATCH', {
+        operation: 'updateThreadList',
+        type: pageId
+      })
+        .then(data => {
+          self.recommendThreads[pageId].automaticallySelectedThreads = data.automaticallySelectedThreads;
+          Vue.set(self.saveRecommendThreads);
+          sweetSuccess('更新成功');
+          self.updating = false;
+        })
+        .catch(err => {
+          self.updating = false;
+        });
+    },
     selectLocalFile(ad) {
       const options = {};
       if(ad.type === "movable") {
@@ -113,7 +199,7 @@ const app = new Vue({
           ads.splice(index, 1)
         })
         .catch(() => {})*/
-      
+
     },
     addForum() {
       const self = this;

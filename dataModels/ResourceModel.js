@@ -247,7 +247,7 @@ resourceSchema.statics.getMediaPath = async (type, t) => {
     'mediaAudio': 'audio',
     'mediaOrigin': 'origin',
   };
-  return await file.getFullPath(file.folders.resource + `/${mediaNames[type]}`, t);
+  return await file.getFullPath(`./resource/${mediaNames[type]}`, t);
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

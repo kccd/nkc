@@ -72,11 +72,11 @@ infoRouter
 
 		if(logoFile) {
 			logoFile.name = `${Date.now()}.png`;
-			data.logo = (await db.AttachmentModel.saveForumImage(forum.fid, 'logo', logoFile))._id;
+			data.logo = (await db.AttachmentModel.saveForumImage(forum.fid, 'forumLogo', logoFile))._id;
 		}
 		if(bannerFile) {
 			bannerFile.name = `${Date.now()}.png`;
-			data.banner = (await db.AttachmentModel.saveForumImage(forum.fid, 'banner', bannerFile))._id;
+			data.banner = (await db.AttachmentModel.saveForumImage(forum.fid, 'forumBanner', bannerFile))._id;
 		}
 
 		if(forum.lid) {

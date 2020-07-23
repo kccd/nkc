@@ -15,7 +15,7 @@ block content
           if !parentForum
             a.app-forum-avatar(href=`/f/${f.fid}`)
               if f.logo
-                img(src=tools.getUrl("forumAvatar", f.logo))
+                img(src=tools.getUrl("forumLogo", f.logo))
               else
                 div(style=`background-color: ${f.color}`)
           a.app-forum-body(href=`/f/${f.fid}`)
@@ -56,10 +56,13 @@ block content
       if data.subForums && data.subForums.length
         .forums-header 我关注的
         +renderForumsInline(data.subForums)
-    .forums-header 话题
-    +renderForums(data.topicForums, true)
-    .forums-header 学科
-    +renderForums(data.disciplineForums, true)
+    for fc in data.forumCategories
+      -const _forums = [];
+      for f in data.forums
+        if f.categoryId === fc._id
+          -_forums.push(f);
+      .forums-header=fc.name
+      +renderForums(_forums, true)
   if state.isApp
     +pageBody
   else

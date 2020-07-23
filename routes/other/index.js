@@ -6,8 +6,6 @@ const editorRouter = require('./editor');
 const shopLogo = require('./shopLogo');
 const resourcesRouter = require('./resources');
 const attachIconRouter = require('./attachIcon');
-const pfAvatar = require('./pfAvatar');
-const pfBanner = require('./pfBanner');
 const adRouter = require('./ad');
 const rtRouter = require('./rt');
 const rmRouter = require('./rm');
@@ -21,7 +19,6 @@ const authRouter = require('./auth');
 const frameImgRouter = require('./frameImg');
 const posterRouter = require('./poster');
 const pageRouter = require('./page');
-const logoRouter = require('./logo');
 const appDownload = require("./appDownload");
 const testRouter = require('./test');
 otherRouter
@@ -43,14 +40,11 @@ otherRouter
 		}
 		return ctx.redirect(`/`);
 	})
-	.use('logo', logoRouter.routes(), logoRouter.allowedMethods())
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   .use('edit', editorRouter.routes(), editorRouter.allowedMethods())
   .use('shopLogo', shopLogo.routes(), shopLogo.allowedMethods())
   .use('resources', resourcesRouter.routes(), resourcesRouter.allowedMethods())
-  .use('pfa', pfAvatar.routes(), pfAvatar.allowedMethods())
-  .use('pfb', pfBanner.routes(), pfBanner.allowedMethods())
   .use('rt', rtRouter.routes(), rtRouter.allowedMethods())
   .use('rm', rmRouter.routes(), rmRouter.allowedMethods())
   .use('ro', roRouter.routes(), roRouter.allowedMethods())

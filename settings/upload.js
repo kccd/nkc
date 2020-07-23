@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
+const fileFolder = require('./fileFolder');
 const {mkdirSync} = fs;
-
 
 const paths = {
   configDir: 'config',
@@ -11,15 +11,9 @@ const paths = {
   uploadPath: 'resources/upload',
   mediaPath: 'resources/media',
   coverPath: 'resources/cover',
-  pfBannerPath: 'resources/pf_banners',
-  pfAvatarPath: 'resources/pf_avatars',
-  avatarPath: 'resources/newavatar',
   shopLogoPath: 'resources/shopLogo',
-  avatarLargePath: 'resources/newavatar_large',
-  avatarSmallPath: 'resources/newavatar_small',
   thumbnailPath: 'resources/thumbnails',
   mediumPath: 'resources/mediums',
-  originPath: 'resources/origins',
   adPath: 'resources/ad_posts',
   siteSpecificPath: 'resources/site_specific',
   qrCodePath: 'resources/qr',
@@ -27,8 +21,6 @@ const paths = {
   photoSmallPath: 'resources/photo_small',
   fundBannerPath: 'resources/fundBanner',
   fundLogoPath: 'resources/fundLogo',
-  webLogoPath: 'resources/logo',
-  userBannerPath: 'resources/user_banners',
   messageVideoFramePath: 'resources/message',
   messageFilePath: 'resources/message',
   messageImageSMPath: 'resources/message/sm',
@@ -42,9 +34,6 @@ const paths = {
   posterPath: 'resources/poster',
   questionImagePath: 'resources/question_image',
   shopCertsPath: 'resources/shop_certs',
-  forumBannerPath: "resources/forum_banner",
-  columnAvatarPath: "resources/column_avatar",
-  columnBannerPath: "resources/column_banner",
   toolsPath: "resources/tools"
 };
 

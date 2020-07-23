@@ -83,7 +83,7 @@ function deleteLogo(id) {
 		})
 }
 
-function saveNotice() {
+window.saveNotice = function saveNotice() {
 	var value = $('#threadId').val();
 	var arr = value.split(',');
 	nkcAPI('/e/settings/home/notice', 'PATCH', {id: arr})

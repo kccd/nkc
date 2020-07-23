@@ -3,13 +3,14 @@ const FileType = require('file-type');
 const {upload, statics} = require("../settings");
 const fsSync = require("../nkcModules/fsSync");
 const fs = require("fs");
+const fsPromise = fs.promises;
 const db = require("../dataModels");
 const mime = require('mime');
 const func = {};
+const moment = require('moment');
 const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
-const { sync } = require("mkdirp");
 
 func.folders = {
   attachment: './attachment',
@@ -66,47 +67,31 @@ func.getFullPath = async (p, t) => {
   return path;
 };
 
-// 保存专栏头像
-func.saveColumnAvatar = async (columnId, file) => {
-  const column = await db.ColumnModel.findOnly({_id: columnId});
-  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
-  const ext = mime.getExtension(file.type);
-  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
-  await ei.resize({
-    src: file.path,
-    dst: upload.columnAvatarPath + "/" + file.hash + "_sm.jpg",
-    height: 100,
-    width: 100,
-    quality: 90
-  });
-  await ei.resize({
-    src: file.path,
-    dst: upload.columnAvatarPath + "/" + file.hash + ".jpg",
-    height: 250,
-    width: 250,
-    quality: 90
-  });
-  await ei.resize({
-    src: file.path,
-    dst: upload.columnAvatarPath + "/" + file.hash + "_lg.jpg",
-    height: 500,
-    width: 500,
-    quality: 90
-  });
-  await column.update({avatar: file.hash});
-  const imgTypes = ["columnAvatar", "columnAvatarSM", "columnAvatarLG"];
-  for(const imgType of imgTypes) {
-    const log = await db.ImageLogModel({
-      uid: column.uid,
-      columnId: columnId,
-      imgType,
-      imgId: file.hash,
-      type: "columnChangeAvatar"
-    });
-    await log.save();
-  }
-  await fsSync.unlink(file.path);
+/*
+* 根据附件类型和时间获取附件目录，用于存储和获取附件
+* @param {String} type 文件类型 如：userAvatar、userBanner 详情看/settings/fileFolder.js
+* @param {Date/undefined} time 指定的时间，默认取当前时间
+* @return {String} 完成目录
+* */
+func.getPath = async (type, time) => {
+  const _path = await func.getFileFolderPathByFileType(type);
+  if(!_path) throwErr(500, `文件类型错误 type: ${type}`);
+  time = time || new Date();
+  const file = require('../nkcModules/file');
+  const timePath = moment(time).format(`/YYYY/MM`);
+  return await file.getFullPath(_path + timePath, time);
 };
+/*
+* 获取指定类型附件所在的文件夹目录 不包含年月
+* @param {String} type 附件类型
+* @return {String} 路劲
+* @author pengxiguaa 2020/7/20
+* */
+func.getFileFolderPathByFileType = async (type) => {
+  const fileFolder = require('../settings/fileFolder');
+  return fileFolder[type];
+}
+
 
 /**
  * 存储专栏头像2.0
@@ -118,14 +103,15 @@ func.saveColumnAvatar$2 = async (columnId, file) => {
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
   const column = await db.ColumnModel.findOnly({_id: columnId});
   const AM = db.AttachmentModel;
-  const {fullPath, timePath} = await AM.getAttachmentPath();
+  const toc = new Date();
+  const fileFolder = await func.getPath('columnAvatar', toc)
   const aid = AM.getNewId();
-  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 100);
-  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 250);
-  await resizeImage(file.path, `${fullPath}/${aid}_lg.${ext}`, 500);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}_sm.${ext}`), 100);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}.${ext}`), 250);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}_lg.${ext}`), 500);
   const attachment = AM({
     _id: aid,
-    path: timePath,
+    toc,
     size: file.size,
     name: file.name,
     ext,
@@ -150,62 +136,11 @@ func.saveColumnAvatar$2 = async (columnId, file) => {
   return aid;
 }
 
-// 获取专栏头像文件位置
-func.getColumnAvatar = async (hash, t) => {
-  let filePath = upload.columnAvatarPath + "/" + hash + ".jpg";
-  if(t) {
-    filePath = upload.columnAvatarPath + "/" + hash + "_" + t + ".jpg";
-  }
-  if(!fsSync.existsSync(filePath)) {
-    filePath = statics.defaultColumnAvatarPath;
-  }
-  return filePath;
-};
 
 // 删除专栏头像文件
 func.deleteColumnAvatar = async (columnId) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
   await column.update({avatar: ""});
-  /*const t = ["", "_sm", "_lg"];
-  for(const tt of t) {
-    const filePath = upload.columnAvatarPath + "/" + column.avatar + tt + ".jpg";
-    await fsSync.unlink(filePath);
-  }*/
-};
-
-// 保存专栏背景
-func.saveColumnBanner = async (columnId, file) => {
-  const column = await db.ColumnModel.findOnly({_id: columnId});
-  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
-  const ext = mime.getExtension(file.type);
-  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
-  await ei.resize({
-    src: file.path,
-    dst: upload.columnBannerPath + "/" + file.hash + "_sm.jpg",
-    height: 720,
-    width: 1280,
-    quality: 90
-  });
-  await ei.resize({
-    src: file.path,
-    dst: upload.columnBannerPath + "/" + file.hash + ".jpg",
-    height: 480,
-    width: 1920,
-    quality: 90
-  });
-  await column.update({banner: file.hash});
-  const imgTypes = ["columnBanner", "columnBannerSM"];
-  for(const imgType of imgTypes) {
-    const log = await db.ImageLogModel({
-      uid: column.uid,
-      columnId: columnId,
-      imgType,
-      imgId: file.hash,
-      type: "columnChangeBanner"
-    });
-    await log.save();
-  }
-  await fsSync.unlink(file.path);
 };
 
 /**
@@ -219,13 +154,14 @@ func.saveColumnBanner$2 = async (columnId, file) => {
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
   const column = await db.ColumnModel.findOnly({_id: columnId});
   const AM = db.AttachmentModel;
-  const {fullPath, timePath} = await AM.getAttachmentPath();
+  const toc = new Date();
+  const fileFolder = await func.getPath('columnBanner', toc);
   const aid = AM.getNewId();
-  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 720, 1280);
-  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 480, 1920);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}_sm.${ext}`), 720, 1280);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}.${ext}`), 480, 1920);
   const attachment = AM({
     _id: aid,
-    path: timePath,
+    toc,
     size: file.size,
     name: file.name,
     ext,
@@ -250,72 +186,11 @@ func.saveColumnBanner$2 = async (columnId, file) => {
   return aid;
 }
 
-// 获取背景链接
-func.getColumnBanner = async (hash, t) => {
-  let filePath = upload.columnBannerPath + "/" + hash + ".jpg";
-  if(t) {
-    filePath = upload.columnBannerPath + "/" + hash + "_" + t + ".jpg";
-  }
-  if(!fsSync.existsSync(filePath)) {
-    filePath = statics.defaultColumnBannerPath;
-  }
-  return filePath;
-};
 
 // 删除专栏背景文件
 func.deleteColumnBanner = async (columnId) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
   await column.update({banner: ""});
-  /*const t = ["", "_sm"];
-  for(const tt of t) {
-    const filePath = upload.columnBannerPath + "/" + column.hash + tt + ".jpg";
-    await fsSync.unlink(filePath);
-  }*/
-};
-/*
-* 保存用户头像
-* @param {String} uid 用户ID
-* @param {File} file 文件对象
-* @author pengxiguaa 2019-8-2
-* */
-func.saveUserAvatar = async (uid, file) => {
-  const user = await db.UserModel.findOnly({uid});
-  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
-  const ext = mime.getExtension(file.type);
-  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
-  await ei.resize({
-    src: file.path,
-    dst: upload.avatarPath + "/" + file.hash + ".jpg",
-    height: 192,
-    width: 192,
-    quality: 90
-  });
-  await ei.resize({
-    src: file.path,
-    dst: upload.avatarSmallPath + "/" + file.hash + ".jpg",
-    height: 48,
-    width: 48,
-    quality: 90
-  });
-  await ei.resize({
-    src: file.path,
-    dst: upload.avatarLargePath + "/" + file.hash + ".jpg",
-    height: 600,
-    width: 600,
-    quality: 90
-  });
-  await user.update({avatar: file.hash});
-  const imgTypes = ["userAvatar", "userAvatarSM", "userAvatarLG"];
-  for(const imgType of imgTypes) {
-    const log = await db.ImageLogModel({
-      uid: user.uid,
-      imgType,
-      imgId: file.hash,
-      type: "userChangeAvatar"
-    });
-    await log.save();
-  }
-  await fsSync.unlink(file.path);
 };
 
 /**
@@ -329,14 +204,15 @@ func.saveUserAvatar$2 = async (uid, file) => {
   const user = await db.UserModel.findOnly({uid});
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = await func.getFileExtension(file, ['png', 'jpg', 'jpeg']);
-  const {fullPath, timePath} = await AM.getAttachmentPath();
+  const now = new Date;
+  const fileFolder = await func.getPath('userAvatar', now);
   const aid = AM.getNewId();
-  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 192);
-  await resizeImage(file.path, `${fullPath}/${aid}_sm.${ext}`, 48);
-  await resizeImage(file.path, `${fullPath}/${aid}_lg.${ext}`, 600);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}.${ext}`), 192);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}_sm.${ext}`), 48);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}_lg.${ext}`), 600);
   const attachment = AM({
     _id: aid,
-    path: timePath,
+    toc: now,
     size: file.size,
     name: file.name,
     hash: file.hash,
@@ -346,38 +222,9 @@ func.saveUserAvatar$2 = async (uid, file) => {
   });
   await attachment.save();
   await user.update({avatar: aid});
-  await fsSync.unlink(file.path);
   return attachment;
 }
 
-
-/*
-* 获取用户头像
-* @param {String} hash 文件hash
-* @param {String} type 图片尺寸
-* @return {String} 文件路径
-* @author pengxiguaa 2019-8-2
-* */
-func.getUserAvatar = async (hash, type) => {
-  let filePath;
-  if(type === "sm") {
-    filePath = upload.avatarSmallPath + "/" + hash + ".jpg";
-    if(!fsSync.existsSync(filePath)) {
-      filePath = upload.avatarPath + "/" + hash + ".jpg";
-    }
-  } else if(type === "lg") {
-    filePath = upload.avatarLargePath + "/" + hash + ".jpg";
-    if(!fsSync.existsSync(filePath)) {
-      filePath = upload.avatarPath + "/" + hash + ".jpg";
-    }
-  } else {
-    filePath = upload.avatarPath + "/" + hash + ".jpg";
-  }
-  if(!fsSync.existsSync(filePath)) {
-    filePath = statics.defaultAvatarPath;
-  }
-  return filePath;
-};
 
 /*
 * 删除用户头像
@@ -389,34 +236,6 @@ func.deleteUserAvatar = async (uid) =>{
   await user.update({avatar: ""});
 };
 
-/*
-* 保存用户背景
-* @param {String} uid 用户ID
-* @param {File} file 文件对象
-* @author pengxiguaa 2019-8-2
-* */
-func.saveUserBanner = async (uid, file) => {
-  const user = await db.UserModel.findOnly({uid});
-  if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
-  const ext = mime.getExtension(file.type);
-  if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
-  await ei.resize({
-    src: file.path,
-    dst: upload.userBannerPath + "/" + file.hash + ".jpg",
-    height: 400,
-    width: 800,
-    quality: 95
-  });
-  await user.update({banner: file.hash});
-  const log = await db.ImageLogModel({
-    uid: user.uid,
-    imgType: "userBanner",
-    imgId: file.hash,
-    type: "userChangeBanner"
-  });
-  await log.save();
-  await fsSync.unlink(file.path);
-};
 
 /**
 * 保存用户背景2.0
@@ -430,12 +249,13 @@ func.saveUserBanner$2 = async (uid, file) => {
   if(file.size > 20*1024*1024) throwErr(400, '图片不能超过20M');
   const ext = (await FileType.fromFile(file.path)).ext;
   if(!["png", "jpg", "jpeg"].includes(ext)) throwErr(400, "仅支持jpg、jpeg和png格式的图片");
-  const {fullPath, timePath} = await AM.getAttachmentPath();
+  const now = new Date;
+  const fileFolder = await func.getPath('userBanner', now);
   const aid = AM.getNewId();
-  await resizeImage(file.path, `${fullPath}/${aid}.${ext}`, 400, 800, 95);
+  await resizeImage(file.path, PATH.resolve(fileFolder, `./${aid}.${ext}`), 400, 800, 95);
   const attachment = AM({
     _id: aid,
-    path: timePath,
+    toc: now,
     size: file.size,
     name: file.name,
     ext,
@@ -452,21 +272,7 @@ func.saveUserBanner$2 = async (uid, file) => {
   });
   await log.save();
   await user.update({banner: aid});
-  await fsSync.unlink(file.path);
   return aid;
-};
-/*
-* 获取用户背景
-* @param {String} hash 文件hash
-* @return {String} 文件路径
-* @author pengxiguaa 2019-8-2
-* */
-func.getUserBanner = async (hash) => {
-  let filePath = upload.userBannerPath + "/" + hash + ".jpg";
-  if(!fsSync.existsSync(filePath)) {
-    filePath = statics.defaultUserBannerPath;
-  }
-  return filePath;
 };
 
 /*
@@ -670,6 +476,26 @@ func.getFileExtension = async (file, extensions = []) => {
     }
   }
   return extension;
+}
+
+/*
+* 手动构建File对象
+* @param {String} filePath 文件路径
+* */
+func.getFileObjectByFilePath = async (filePath) => {
+  const HASH = require('../nkcModules/hash');
+  const name = PATH.basename(filePath);
+  const ext = PATH.extname(filePath).replace('.', '');
+  const hash = await HASH.getFileMD5(filePath);
+  const stats = await fsPromise.stat(filePath);
+  const size = stats.size;
+  return {
+    path: filePath,
+    name,
+    ext,
+    hash,
+    size,
+  };
 }
 
 /**

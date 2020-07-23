@@ -241,7 +241,7 @@ resourceRouter
     const {fs, tools, settings, db, data, nkcModules} = ctx;
     const { imageMagick, ffmpeg } = tools;
     const {upload} = settings;
-    const {generateFolderName, extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = upload;
+    const {generateFolderName, extGetPath, thumbnailPath, mediumPath, frameImgPath} = upload;
     const {user} = data;
 
     const {websiteName} = await db.SettingModel.getSettings('server');

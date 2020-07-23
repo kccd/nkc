@@ -49,4 +49,56 @@ func.clearTimeoutPageCache = async () => {
   }, 180000);
 };
 
+/*
+* 定时更新首页的固定推荐文章
+* @author pengxiguaa 2020/7/16
+* */
+func.updateFixedRecommendThreads = async () => {
+  const homeSettings = await db.SettingModel.getSettings('home');
+  setTimeout(async () => {
+    try{
+      if(homeSettings.recommendThreads.fixed.displayType !== 'manual') {
+        console.log(`开始更新首页推荐文章（固定图）...`);
+        await db.ThreadModel.updateHomeRecommendThreadsByType('fixed');
+        console.log(`首页推荐文章（固定图）更新完成`);
+      }
+    } catch(err) {
+      if(global.NKC.NODE_ENV !== 'production') {
+        console.log(err);
+      }
+    } finally {
+      await func.updateFixedRecommendThreads();
+    }
+  }, homeSettings.recommendThreads.fixed.timeInterval * 60 * 60 * 1000);
+}
+/*
+* 定时更新首页的轮播图推荐文章
+* @author pengxiguaa 2020/7/16
+* */
+func.updateMovableRecommendThreads = async () => {
+  const homeSettings = await db.SettingModel.getSettings('home');
+  setTimeout(async () => {
+    try{
+      if(homeSettings.recommendThreads.movable.displayType !== 'manual') {
+        console.log(`开始更新首页推荐文章（轮播图）...`);
+        await db.ThreadModel.updateHomeRecommendThreadsByType('movable');
+        console.log(`首页推荐文章（轮播图）更新完成`);
+      }
+    } catch(err) {
+      if(global.NKC.NODE_ENV !== 'production') {
+        console.log(err);
+      }
+    } finally {
+      await func.updateMovableRecommendThreads();
+    }
+  }, homeSettings.recommendThreads.movable.timeInterval * 60 * 60 * 1000);
+}
+/*
+* 更新首页的推荐文章
+* */
+func.updateRecommendThreads = async () => {
+  await func.updateFixedRecommendThreads();
+  await func.updateMovableRecommendThreads();
+}
+
 module.exports = func;

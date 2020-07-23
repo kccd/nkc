@@ -44,7 +44,7 @@ block eContent
                 div(:style="'opacity:' +  (1 - (us.watermark.transparency / 100))")
                   img(:src="normalWatermarkData" v-if="normalWatermarkData")
                   img(src=tools.getUrl('defaultFile', 'watermark_normal.png') v-else-if="!us.watermark.normalAttachId")
-                  img(:src="getUrl('attach', us.watermark.normalAttachId)" v-else)
+                  img(:src="getUrl('watermark', us.watermark.normalAttachId)" v-else)
               .p-t-05.m-b-05
                 input(type='file' accept="image/*" ref='normalWatermarkInput' @change='selectedWatermark("normal")').m-b-05
             .col-sm-3
@@ -53,7 +53,7 @@ block eContent
                 div(:style="'opacity:' +  (1 - (us.watermark.transparency / 100))")
                   img(:src="smallWatermarkData" v-if="smallWatermarkData")
                   img(src=tools.getUrl('defaultFile', 'watermark_small.png') v-else-if="!us.watermark.smallAttachId")
-                  img(:src="getUrl('attach', us.watermark.smallAttachId)" v-else)
+                  img(:src="getUrl('watermark', us.watermark.smallAttachId)" v-else)
               .p-t-05.m-b-05
                 input(type='file' accept="image/*" ref='smallWatermarkInput' @change='selectedWatermark("small")').m-b-05
           .form-group
