@@ -292,7 +292,7 @@ NKC.modules.SelectResource = function() {
               formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
               formData.append("fileId", fileId);
               var receiver = function(data) {
-                if(data.fileId && data.fileId === fileId && data.statu && data.statu === "complete") {
+                if(data.fileId && data.fileId === fileId && data.state && data.state === "complete") {
                   completeAction();
                 } else {
                   commonSocket.once("message", receiver);

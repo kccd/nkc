@@ -38,7 +38,8 @@ const resourceSchema = new Schema({
   // 文件路径
   path: {
     type: String,
-    required: true
+    default: ''
+    // required: true
   },
   // 文件大小
   size: {
@@ -96,6 +97,12 @@ const resourceSchema = new Schema({
     type: Number,
     index: 1,
     default: null
+  },
+  // usable: 正常, useless: 处理失败，不可用, inProcess: 处理中
+  state: {
+    type: String,
+    index: 1,
+    default: 'inProcess'
   }
 });
 /*
@@ -240,14 +247,7 @@ resourceSchema.statics.checkUploadPermission = async (user, file) => {
 * */
 resourceSchema.statics.getMediaPath = async (type, t) => {
   const file = require("../nkcModules/file");
-  const mediaNames = {
-    'mediaPicture': 'picture',
-    'mediaVideo': 'video',
-    'mediaAttachment': 'attachment',
-    'mediaAudio': 'audio',
-    'mediaOrigin': 'origin',
-  };
-  return await file.getFullPath(`./resource/${mediaNames[type]}`, t);
+  return await file.getPath(type, t);
 };
 
 module.exports = mongoose.model('resources', resourceSchema);

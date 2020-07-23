@@ -26,5 +26,16 @@ module.exports = {
   // 聊天中的图片文件
   messageImage: './message/image',
   // 聊天中的音频文件
-  messageVoice: './message/voice'
+  messageVoice: './message/voice',
+
+  // 上传附件 图片
+  mediaPicture: './resource/picture',
+  // 上传附件 图片原图
+  mediaOrigin: './resource/origin',
+  // 上传附件 视频
+  mediaVideo: './resource/video',
+  // 上传附件 音频
+  mediaAudio: './resource/audio',
+  // 上传附件 附件
+  mediaAttachment: './resource/attachment',
 };
