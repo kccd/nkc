@@ -338,7 +338,7 @@ resourceRouter
     ctx.data.r = await r.save();
 
     setImmediate(async () => {
-      await mediaMethods[mediaType](file, r);
+      await mediaMethods[mediaType](file, r, user);
     });
 
     // 通知前端转换完成了
