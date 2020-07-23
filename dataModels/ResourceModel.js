@@ -2,7 +2,7 @@ const settings = require('../settings');
 const cheerio = require('../nkcModules/nkcRender/customCheerio');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-
+const PATH = require('path');
 const resourceSchema = new Schema({
 	rid: {
     type: String,
@@ -110,10 +110,9 @@ const resourceSchema = new Schema({
 */
 resourceSchema.methods.getFilePath = async function() {
   const ResourceModel = mongoose.model('resources');
-  const {path, toc} = this;
-  let filePath = await ResourceModel.getMediaPath(this.mediaType, toc);
-  filePath += path;
-  return filePath;
+  const {toc, ext, rid} = this;
+  const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
+  return PATH.resolve(fileFolder, `./${rid}.${ext}`);
 };
 
 // 检测html内容中的资源并将指定id存入resource.reference

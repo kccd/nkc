@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const RoRouter = new Router();
 const {upload, statics, cache} = require('../../settings');
 const {defaultOriginPath} = statics;
+const PATH = require("path");
 RoRouter
   .get('/:originId', async (ctx, next) => {
     const {originId} = ctx.params;
@@ -11,8 +12,8 @@ RoRouter
     const extArr = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'];
     let url;
     if(extArr.includes(extension.toLowerCase()) && targetResource.tpath) {
-      const originPath = await db.ResourceModel.getMediaPath('mediaOrigin', targetResource.toc);
-      url = originPath + '/' + targetResource.tpath;
+      const fileFolder = await db.ResourceModel.getMediaPath('mediaOrigin', targetResource.toc);
+      url = PATH.resolve(fileFolder, `./${targetResource.originId}.${targetResource.ext}`);
       try{
         await fs.access(url);
       } catch (e) {
