@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const infoRouter = new Router();
 infoRouter
-	.patch('info', async (ctx, next) => {
+	.put('info', async (ctx, next) => {
 		const {data, body, nkcModules} = ctx;
 		const {user} = data;
 		let {description, postSign} = body;

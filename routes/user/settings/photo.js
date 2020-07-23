@@ -10,7 +10,7 @@ photoRouter
 		ctx.template = 'interface_user_settings_photo.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {body, data, db} = ctx;
 		const {user} = data;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});

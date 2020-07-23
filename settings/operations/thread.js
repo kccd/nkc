@@ -5,7 +5,7 @@ module.exports = {
 		POST: 'postToThread',
 		moveDraft: {
       reason: {
-        PATCH: "modifyReasonThreadReturn"
+        PUT: "modifyReasonThreadReturn"
       }
 		},
     collection: {
@@ -30,7 +30,7 @@ module.exports = {
 			DELETE: 'homeAd'
 		},
 		/*switchInPersonalForum: {
-			PATCH: 'switchInPersonalForum'
+			PUT: 'switchInPersonalForum'
 		},*/
 		close: {
 			POST: 'closeThread',

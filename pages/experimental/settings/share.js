@@ -7,7 +7,7 @@ var app = new Vue({
     submit: function() {
       var obj = {};
       obj.shareLimit = app.shareLimit;
-      nkcAPI('/e/settings/share', 'PATCH', obj)
+      nkcAPI('/e/settings/share', 'PUT', obj)
         .then(function() {
           screenTopAlert('保存成功');
         })

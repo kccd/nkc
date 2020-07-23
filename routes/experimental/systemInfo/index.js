@@ -22,7 +22,7 @@ sysInfoRouter
     await redis.pubMessage(message);
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body} = ctx;
     const {_id, c} = body;
     if(!c) ctx.throw(400, "通知内容不能为空");

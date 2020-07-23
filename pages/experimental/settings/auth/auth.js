@@ -56,7 +56,7 @@ var app = new Vue({
         auditorId.push(id);
       }
       this.authSettings.auditorId = auditorId;
-      nkcAPI("/e/settings/auth", "PATCH", {
+      nkcAPI("/e/settings/auth", "PUT", {
         authSettings: this.authSettings
       })
         .then(function() {

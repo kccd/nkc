@@ -36,7 +36,7 @@ orderRouter
 		await next();
 	})
 	// 发货
-	.patch('/sendGoods', async(ctx, next) => {
+	.put('/sendGoods', async(ctx, next) => {
 		const {data, db, params, query, body} = ctx;
 		const {orderId, trackNumber, trackName} = body.post;
 		if(!orderId || !trackNumber) ctx.throw(400, "请填写快递单号");
@@ -54,7 +54,7 @@ orderRouter
 		await next();
 	})
 	// 修改物流信息
-	.patch('/editGoods', async(ctx, next) => {
+	.put('/editGoods', async(ctx, next) => {
 		const {data, db, params, query, body} = ctx;
 		const {orderId, trackNumber, trackName} = body.post;
 		if(!orderId || !trackNumber) ctx.throw(400, "请填写快递单号");
@@ -64,7 +64,7 @@ orderRouter
 		await next();
 	})
 	// 无物流发货
-	.patch('/sendGoodsNoLog', async(ctx, next) => {
+	.put('/sendGoodsNoLog', async(ctx, next) => {
 		const {data, db, params, query, body} = ctx;
 		const {orderId} = body.post;
 		const order = await db.ShopOrdersModel.findOne({orderId});
@@ -76,7 +76,7 @@ orderRouter
 		await next();
 	})
   // 修改订单价格
-  .patch('/editOrder', async(ctx, next) => {
+  .put('/editOrder', async(ctx, next) => {
     const {data, db, query, body} = ctx;
     const {user} = data;
     const {orderId, price} = body.post;
@@ -89,7 +89,7 @@ orderRouter
     await order.update({$set:{"orderPrice":price}});
     await next();
 	})
-	.patch('/editOrderTrackNumber', async(ctx, next) => {
+	.put('/editOrderTrackNumber', async(ctx, next) => {
 		const {data, db, query, body} = ctx;
 		const {user} = data;
 		const {orderId, trackNumber} = body;
@@ -144,7 +144,7 @@ orderRouter
 		await next();
 	})
 	// 修改订单卖家备注
-	.patch('/editSellMessage', async (ctx, next) => {
+	.put('/editSellMessage', async (ctx, next) => {
 		const {data, body, query, db} = ctx;
 		const {sellMessage, orderId} = body;
 		const order = await db.ShopOrdersModel.findOne({orderId});
@@ -154,7 +154,7 @@ orderRouter
 		await next();
 	})
 	// 修改购买记录中的价格
-	.patch("/editCostRecord", async (ctx, next) => {
+	.put("/editCostRecord", async (ctx, next) => {
 		const {nkcModules, data, body, db} = ctx;
 		const {type, costId, orderId, costObj, freightPrice} = body;
 		const {user} = data;
@@ -208,7 +208,7 @@ orderRouter
 		await order.update({orderPrice, orderFreightPrice: freightPrice});
 		await next();
 	})
-	/*.patch('/editCostRecord', async (ctx, next) => {
+	/*.put('/editCostRecord', async (ctx, next) => {
 		const {data, body, query, db} = ctx;
 		const {costId, orderId, costObj, orderObj} = body;
 		// 找出购买记录并修改
@@ -224,7 +224,7 @@ orderRouter
 		await next();
 	})*/
 	// 修改购买订单中的价格
-	.patch('/editOrderPrice', async (ctx, next) => {
+	.put('/editOrderPrice', async (ctx, next) => {
 		const {data, body, query, db} = ctx;
 		const {orderId, orderObj} = body;
 		// 找出订单并修改

@@ -17,7 +17,7 @@ router
     await next();
   })
   // 移动文件夹
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body, data} = ctx;
     const {foldersId, targetFolderId} = body;
     const {library} = data;
@@ -42,7 +42,7 @@ router
         ignoreCount ++;
         continue;
       }
-      
+
       // 当目标文件夹是已选文件夹的子文件夹时 忽略
       if(navId.includes(_id)) {
         ignoreCount++;

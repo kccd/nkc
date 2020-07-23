@@ -23,7 +23,7 @@ categoryRouter
 		ctx.template = 'interface_forum_settings_category.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {data, db, body, redis} = ctx;
 		const {forum} = data;
 		const {operation} = body;

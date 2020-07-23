@@ -128,7 +128,7 @@ var app = new Vue({
 
       uploadFilePromise("/m/" + this.column._id, formData, function(e, a) {
         app.info = "提交中..." + a;
-      }, "PATCH")
+      }, "PUT")
         .then(function() {
           app.info = "提交成功";
         })

@@ -58,7 +58,7 @@ router
     data.noteContent = noteContent;
     await next();
   })
-  .patch("/:_id/c/:cid", async (ctx, next) => {
+  .put("/:_id/c/:cid", async (ctx, next) => {
     // 修改笔记内容
     const {data, body, nkcModules, db} = ctx;
     const {noteContent} = data;

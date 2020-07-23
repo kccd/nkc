@@ -7,7 +7,7 @@ permissionsRouter
 		data.operationTypes = await db.OperationTypeModel.find().sort({toc: 1});
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {body, nkcModules, data} = ctx;
 		const {role} = data;
 		if(role._id === 'dev') {

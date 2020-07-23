@@ -65,7 +65,7 @@ $(document).ready(function() {
         var paramDom = '<tr><td style="width:5%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td><td style="width:10%"><input type="text" class="pname pnameCla" data-role="tagsinput" value="'+params[i].name+'"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%" value="'+params[i].values+'"></td>><td style="width:5%"><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
         $("#paramsTable").find("tbody").append(paramDom)
         $(".pvalue").tagsinput({
-          maxChars: 8, // 单个标记最大字符数 
+          maxChars: 8, // 单个标记最大字符数
           maxTags: 20, // 最大标签数
         })
       }
@@ -103,7 +103,7 @@ $(document).ready(function() {
     }
   }
   $("#test").tagsinput({
-    maxChars: 8, // 单个标记最大字符数 
+    maxChars: 8, // 单个标记最大字符数
     maxTags: 20, // 最大标签数
     trimValue: true, // 默认删除编辑周围的空格
     // typeahead: {
@@ -135,7 +135,7 @@ $(document).ready(function() {
             loadsrc : newSrc
           }
           var newimgstr = $(this)
-          
+
           nkcAPI("/download", "POST", data)
           .then( function(data){
             newimgstr.attr("src","")
@@ -153,7 +153,7 @@ $(document).ready(function() {
       })
     }
     setTimeout(function(){test()},5000)
-    
+
   })
   $('input[type=radio][name=shelfMethod]').change(function() {
     if(this.value == 'insale') {
@@ -211,7 +211,7 @@ $(document).ready(function() {
     }else{
       $("#purchaseLimitDom").css("display", "none");
     }
-  })  
+  })
   // $('input[type=radio][name=isPurchaseLimit]').change(function() {
   //   if(this.value == "yes") {
   //     $("#purchaseLimitDom").css("display", "");
@@ -331,7 +331,7 @@ function submitToShelf() {
   var proSta = $("input[name='shelfMethod']:checked").val();
   if(proSta == "insale") {
     productStatus = "insale";
-  }else if(proSta == "notonshelf") { 
+  }else if(proSta == "notonshelf") {
     productStatus = "notonshelf"
   }else if(proSta == "insaletime") {
     productStatus = "notonshelf";
@@ -343,11 +343,11 @@ function submitToShelf() {
   var singleParams = getSingleParams();
   // 获取物流价格
   var freightTemplates = [];
-  var isFreePost = true; 
+  var isFreePost = true;
   var freightPrice = {
     firstFreightPrice: null,
     addFreightPrice: null
-  }; 
+  };
   var freightMethod = $("input[name='freightMethod']:checked").val();
   if(freightMethod !== "freePost") {
     isFreePost = false;
@@ -489,7 +489,7 @@ function IsPC() {
 
 /**
  * 图片管理器加载图片
- * 
+ *
  */
 function manageImageLoader(turn) {
   if(turn == "prev"){
@@ -568,7 +568,7 @@ function addNewParam() {
   var newParamDom = '<tr><td style="width:5%"><a class="btn btn-danger btn-sm padding-0 margin-right-10" onclick="delParamTable(this)">删除</a></td><td style="width:10%"><input type="text" class="pname pnameCla" data-role="tagsinput"></td><td><input type="text" class="pvalue" data-role="tagsinput" style="width:100%"></td><td style="width:5%"><a class="btn btn-info btn-sm padding-0 margin-right-10" onclick="saveNewParam(this)">保存</a></td></tr>';
   $("#paramsTable").find("tbody").append(newParamDom)
   $(".pvalue").tagsinput({
-    maxChars: 8, // 单个标记最大字符数 
+    maxChars: 8, // 单个标记最大字符数
     maxTags: 20, // 最大标签数
   })
 }
@@ -1014,7 +1014,7 @@ function obtainProductPrice() {
       if(dprice > price){
         dprice = price;
       }
-      
+
       var para = {
         index: index,
         name: name,
@@ -1078,7 +1078,7 @@ function getShopForum() {
 }
 
 /**
- * 
+ *
  */
 function editProductShelf(uid, productId) {
   $("#resaveBtn").attr("disabled", true)
@@ -1128,11 +1128,11 @@ function editProductShelf(uid, productId) {
   }
   // 获取物流价格
   var freightTemplates = [];
-  var isFreePost = true; 
+  var isFreePost = true;
   var freightPrice = {
     firstFreightPrice: null,
     addFreightPrice: null
-  }; 
+  };
   var freightMethod = $("input[name='freightMethod']:checked").val();
   if(freightMethod !== "freePost") {
     isFreePost = false;
@@ -1184,7 +1184,7 @@ function editProductShelf(uid, productId) {
     imgIntroductions: imgIntroductions,
     imgMaster: imgMaster,
   }
-  nkcAPI('/shop/manage/'+uid+'/goodslist/editProduct', "PATCH", post)
+  nkcAPI('/shop/manage/'+uid+'/goodslist/editProduct', "PUT", post)
   .then(function(data) {
     screenTopAlert("修改成功");
     // window.location.href = "/shop/manage/"+uid+"/goodslist";

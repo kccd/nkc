@@ -335,7 +335,7 @@ remittanceRouter
 		}
 		await next();
 	})
-	.patch('/verify', async (ctx, next) => {
+	.put('/verify', async (ctx, next) => {
 		const {data, body, db} = ctx;
 		const {number} = body;
 		if(number === undefined) {

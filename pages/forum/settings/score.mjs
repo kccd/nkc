@@ -52,7 +52,7 @@ const app = new Vue({
               delete scoreOperation[`_${scoreType}`];
             }
           }
-          return nkcAPI(`/f/${forum.fid}/settings/score`, 'PATCH', {
+          return nkcAPI(`/f/${forum.fid}/settings/score`, 'PUT', {
             forumScoreOperations
           });
         })

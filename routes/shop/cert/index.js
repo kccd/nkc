@@ -46,7 +46,7 @@ router
     data.cert = cert;
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {body, db, data} = ctx;
     const {user} = data;
     const {certsId} = body;

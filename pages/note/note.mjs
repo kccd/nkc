@@ -82,7 +82,7 @@ const app = new Vue({
       let url, method, data = {};
       if(n.uid === uid) {
         url = `/note/${note._id}/c/${n._id}`;
-        method = "PATCH";
+        method = "PUT";
         data.content = n.content;
       } else {
         url = `/nkc/note`;

@@ -6,7 +6,7 @@ infoRouter
 		ctx.template = 'forum/settings/info.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {data, db, body, nkcModules} = ctx;
 		const {forum} = data;
 		if(body.operation) {

@@ -12,7 +12,7 @@ window.modifySellMessage = function(uid, orderId) {
   const dom = $(`tr[data-order-id='${orderId}'] .data-sell-message`);
   CommonModal.open((data) => {
     const value = data[0].value;
-    nkcAPI('/shop/manage/'+uid+'/order/editSellMessage', "PATCH", {sellMessage: value, orderId: orderId})
+    nkcAPI('/shop/manage/'+uid+'/order/editSellMessage', "PUT", {sellMessage: value, orderId: orderId})
       .then(function() {
         dom.text(value);
         CommonModal.close();
@@ -87,7 +87,7 @@ window.modifyParamPrice = function(sellUid, orderId, costId) {
           min: 0.01,
           fractionDigits: 2
         });
-        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PUT", {
           type: "modifyParam",
           costId,
           orderId,
@@ -123,7 +123,7 @@ window.modifyParamCount = function(sellUid, orderId, costId) {
           name: "商品数量",
           min: 1
         });
-        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PUT", {
           type: "modifyParam",
           costId,
           orderId,
@@ -165,7 +165,7 @@ window.modifyFreight = function(sellUid, orderId) {
           min: 0,
           fractionDigits: 2
         });
-        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PATCH", {
+        return nkcAPI(`/shop/manage/${sellUid}/order/editCostRecord`, "PUT", {
           type: "modifyFreight",
           orderId,
           freightPrice: newFreightPrice * 100,

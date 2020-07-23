@@ -54,7 +54,7 @@ const app = new Vue({
       const {_id, name, description} = self.category;
       let method, url;
       if(_id) {
-        method = 'PATCH';
+        method = 'PUT';
         url = `/friend_category/${_id}`;
       } else {
         method = 'POST';

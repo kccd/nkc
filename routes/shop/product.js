@@ -46,7 +46,7 @@ productRouter
     // ctx.template = "shop/product/index.pug";
     await next();
   })
-  .patch('/:productId/changePara', async (ctx, next) => {
+  .put('/:productId/changePara', async (ctx, next) => {
     const {data, body, db, params} = ctx;
     const {paraId} = body;
     const {productId} = params;
@@ -67,7 +67,7 @@ productRouter
     await next();
   })
   // 商品禁售,权限分配给管理员
-  .patch('/:productId/banSale', async (ctx, next) => {
+  .put('/:productId/banSale', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {productId} = body;
 		const product = await db.ShopGoodsModel.findOne({productId: productId});

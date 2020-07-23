@@ -46,7 +46,7 @@ var app = new Vue({
       if(!this.code) return screenTopWarning('请输入验证码');
       if(!this.password) return screenTopWarning('请输入新密码');
       if(this.password !== this.password2) return screenTopWarning('两次输入的密码不一致');
-      nkcAPI('/forgotPassword/mobile', 'PATCH', {
+      nkcAPI('/forgotPassword/mobile', 'PUT', {
         nationCode: this.nationCode,
         username: this.username,
         mobile: this.mobile,

@@ -139,7 +139,7 @@ var app = new Vue({
           formData.append('auth', JSON.stringify(app.auth));
         }
         url = '/exam/question/' + q._id;
-        method = 'PATCH';
+        method = 'PUT';
       }
       formData.append('question', JSON.stringify(q));
       submitting = '提交中';

@@ -10,7 +10,7 @@ mobileRouter
 		data.nationCode = userPersonal.nationCode;
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		let {mobile, code, oldCode, nationCode} = body;
 		if(!oldCode) ctx.throw(400, '旧手机验证码不能为空');

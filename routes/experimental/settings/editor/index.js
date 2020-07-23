@@ -6,7 +6,7 @@ router
     ctx.template = "experimental/settings/editor/editor.pug";
     await next();
   })
-  .patch("/" , async (ctx, next) => {
+  .put("/" , async (ctx, next) => {
     const {body, db} = ctx;
     const {checkString} = ctx.nkcModules.checkData;
     const {editorSettings} = body;

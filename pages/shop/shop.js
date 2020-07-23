@@ -44,7 +44,7 @@ function calculateFreightPrice(count) {
   $("#freightPrice").text(totalPrice);
 }
 
-/* 
+/*
   添加商品到购物车
   @param id: 商品规格ID
   @param count: 添加到购物车的商品数量
@@ -73,7 +73,7 @@ function choiceProductParams(para,productId) {
   // 先判断是否含有class
   var isActive = $(para).hasClass("activeIndex");
   if(isActive){
-    return; 
+    return;
   }else{
     // 先使用消除其他class
     $(".activeIndex").addClass("normalIndex");
@@ -84,7 +84,7 @@ function choiceProductParams(para,productId) {
   }
   // 获取当前的paraId
   var paraId = $(para).attr("paraId")
-  nkcAPI("/shop/product/"+productId+"/changePara" ,"PATCH", {paraId: paraId})
+  nkcAPI("/shop/product/"+productId+"/changePara" ,"PUT", {paraId: paraId})
   .then(function (data) {
     var productParams = data.productParams;
     $("#originPrice").text(numToFloatTwo(productParams.originPrice));
@@ -184,7 +184,7 @@ function delStock() {
   buyCount -= 1;
   if(buyCount < 1) {
     screenTopWarning("至少购买一件")
-    buyCount =1 
+    buyCount =1
   }
   $("#buyCount").val(buyCount);
   if(isFreePost !== "freePost") {
@@ -195,12 +195,12 @@ function delStock() {
 
 /**
  * 价格显示为保留两位小数
- * @param {*} str 
+ * @param {*} str
  */
 function numToFloatTwo(str) {
 	str = (str/100).toFixed(2);
 	return str;
-} 
+}
 function numToNumberTwo(str) {
   str = Number((str/100).toFixed(2));
 	return str;
@@ -212,7 +212,7 @@ function numToNumberTwo(str) {
 function banSale(productId) {
   var sureban = confirm("确定禁售该商品吗？");
   if(sureban) {
-    nkcAPI("/shop/product/"+productId+"/banSale", "PATCH", {productId:productId})
+    nkcAPI("/shop/product/"+productId+"/banSale", "PUT", {productId:productId})
     .then(function(data) {
       screenTopAlert("禁售成功");
       window.location.reload();

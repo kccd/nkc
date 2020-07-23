@@ -14,7 +14,7 @@ window.modifyParam = function (productId, paramId) {
     };
 
 
-    nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/editParam`, "PATCH", {paramData})
+    nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/editParam`, "PUT", {paramData})
       .then(() => {
         sweetSuccess("修改成功");
         CommonModal.close();
@@ -212,7 +212,7 @@ window.setParam = function(productId, paramId, param) {
 window.shelfNow = function(productId) {
   sweetQuestion("确认要上架该商品？")
     .then(() => {
-      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/shelfRightNow`, "PATCH", {productId});
+      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/shelfRightNow`, "PUT", {productId});
     })
     .then(() => {
       sweetSuccess("商品已上架");
@@ -225,7 +225,7 @@ window.shelfNow = function(productId) {
 window.stopSale = function(productId) {
   sweetQuestion("确认要停售该商品？")
     .then(() => {
-      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/productStopSale`, "PATCH", {productId});
+      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/productStopSale`, "PUT", {productId});
     })
     .then(() => {
       sweetSuccess("商品已停售");
@@ -239,7 +239,7 @@ window.stopSale = function(productId) {
 window.goonSale = function(productId) {
   sweetQuestion("确认要复售该商品？")
     .then(() => {
-      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/productGoonSale`, "PATCH", {productId});
+      return nkcAPI(`/shop/manage/${NKC.configs.uid}/goodslist/productGoonSale`, "PUT", {productId});
     })
     .then(() => {
       sweetSuccess("商品已复售");

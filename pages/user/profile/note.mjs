@@ -60,7 +60,7 @@ const noteApp = new Vue({
     },
     saveContent(nc) {
       const {content, noteId, _id} = nc;
-      nkcAPI(`/note/${noteId}/c/${_id}`, "PATCH", {
+      nkcAPI(`/note/${noteId}/c/${_id}`, "PUT", {
         content
       })
         .then(data => {

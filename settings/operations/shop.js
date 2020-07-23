@@ -8,10 +8,10 @@ module.exports = {
         DELETE: "pushGoodsToHome"
       },
       changePara: {
-        PATCH: 'changeProductParams'
+        PUT: 'changeProductParams'
       },
       banSale: {
-        PATCH: 'banSaleProductParams'
+        PUT: 'banSaleProductParams'
       }
     }
   },
@@ -24,7 +24,7 @@ module.exports = {
     // 作为卖家编辑交易设置，包含全局公告、运费模板
     settings: {
       GET: "modifyStoreInfo",
-      PATCH: "modifyStoreInfo"
+      PUT: "modifyStoreInfo"
     },
     // 上架相关
     shelf: {
@@ -45,7 +45,7 @@ module.exports = {
       },
       template: {
         GET: 'visitFreightTemplate',
-        PATCH: 'saveFreightTemplate'
+        PUT: 'saveFreightTemplate'
       },
       /* // 上架相关
       shelf: {
@@ -67,16 +67,16 @@ module.exports = {
           POST: "modifyStoreDecorationFeatured"
         },
         addClass: {
-          PATCH: 'addStoreClassFeatured'
+          PUT: 'addStoreClassFeatured'
         },
         delClass: {
-          PATCH: 'delStoreClassFeatured'
+          PUT: 'delStoreClassFeatured'
         },
         singleClass: {
           GET: 'getStoreSingleClassify'
         },
         addSingleClass: {
-          PATCH: 'addStoreSingleClassify'
+          PUT: 'addStoreSingleClassify'
         },
         GET: 'visitStoreDecorationIndex',
         POST: 'modifyStoreDecoration'
@@ -93,19 +93,19 @@ module.exports = {
       order: {
         GET: 'visitShopOrderIndex',
         sendGoods: {
-          PATCH: 'sendGoods'
+          PUT: 'sendGoods'
         },
         editGoods: {
-          PATCH: 'editGoodsLogositics'
+          PUT: 'editGoodsLogositics'
         },
         sendGoodsNoLog:{
-          PATCH: "sendGoodsNoLog"
+          PUT: "sendGoodsNoLog"
         },
         editOrder: {
-          PATCH: 'editOrder'
-        },      
+          PUT: 'editOrder'
+        },
         editOrderTrackNumber: {
-          PATCH: 'editOrderTrackNumber'
+          PUT: 'editOrderTrackNumber'
         },
         detail: {
           GET: "visitStoreOrderDetail"
@@ -122,13 +122,13 @@ module.exports = {
           POST: "storeCancelOrder"
         },
         editSellMessage: {
-          PATCH: "editSellMessage",
+          PUT: "editSellMessage",
         },
         editCostRecord: {
-          PATCH: "editCostRecord",
+          PUT: "editCostRecord",
         },
         editOrderPrice: {
-          PATCH: "editOrderPrice"
+          PUT: "editOrderPrice"
         },
         orderListToExcel: {
           GET: "orderListToExcel"
@@ -138,20 +138,20 @@ module.exports = {
         GET: "visitStoreGoodsList",
         editParam: {
           GET: "visitStoreGoodsParamEdit",
-          PATCH: "submitEditToParam"
+          PUT: "submitEditToParam"
         },
         editProduct: {
           GET: "visitStoreGoodsProductEdit",
-          PATCH: "submitEditToProduct",
+          PUT: "submitEditToProduct",
         },
         shelfRightNow: {
-          PATCH: "productShelfRightNow"
+          PUT: "productShelfRightNow"
         },
         productStopSale: {
-          PATCH: "productStopSale"
+          PUT: "productStopSale"
         },
         productGoonSale: {
-          PATCH: "productGoonSale"
+          PUT: "productGoonSale"
         }
       }
     },
@@ -169,7 +169,7 @@ module.exports = {
     POST: 'addProductToCart',
     GET: 'visitShopCart',
     PARAMETER: {
-      PATCH: 'modifyCartData',
+      PUT: 'modifyCartData',
       DELETE: 'modifyCartData'
     }
   },
@@ -177,10 +177,10 @@ module.exports = {
     GET: 'visitShopBill',
     POST: 'submitShopBill',
     add: {
-      PATCH: 'billParamAddOne',
+      PUT: 'billParamAddOne',
     },
     plus: {
-      PATCH: 'billParamPlusOne',
+      PUT: 'billParamPlusOne',
     }
   },
   order: {
@@ -194,7 +194,7 @@ module.exports = {
         GET: "visitOrderLogistics"
       },
       receipt: {
-        PATCH: 'confirmOrderReceipt'
+        PUT: 'confirmOrderReceipt'
       },
       detail: {
         GET: 'visitSingleOrderDetail'
@@ -216,7 +216,7 @@ module.exports = {
   },
   cert: {
     POST: 'shopUploadCert',
-    PATCH: 'saveShopCerts',
+    PUT: 'saveShopCerts',
     PARAMETER: {
       GET: 'shopGetCert',
       DELETE: 'shopDeleteCert'

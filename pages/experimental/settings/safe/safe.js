@@ -30,7 +30,7 @@ var app = new Vue({
             if(password !== password2) throw '两次输入的密码不一致';
             body.password = password;
           }
-          return nkcAPI('/e/settings/safe', 'PATCH', body)
+          return nkcAPI('/e/settings/safe', 'PUT', body)
         })
         .then(function() {
           sweetSuccess('保存成功');

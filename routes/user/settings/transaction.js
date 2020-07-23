@@ -22,7 +22,7 @@ transactionRouter
     let {addresses, operation} = body;
     const reg = /^[0-9]*$/;
     if(operation === "add") {
-      
+
     } else {
       userAddresses.length = 0;
     }

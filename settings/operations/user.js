@@ -15,7 +15,7 @@ module.exports = {
 			POST: "hideUserHome", // 隐藏用户的主页
 		},
 		banned: {
-			PATCH: 'unBannedUser',
+			PUT: 'unBannedUser',
 			DELETE: 'bannedUser'
 		},
 		transaction: {
@@ -30,26 +30,26 @@ module.exports = {
 		settings: {
 			GET: 'visitUserInfoSettings',
 			username: {
-				PATCH: 'modifyUsername'
+				PUT: 'modifyUsername'
 			},
       info: {
         GET: 'visitUserInfoSettings',
-        PATCH: 'modifyUserInfo'
+        PUT: 'modifyUserInfo'
       },
       security: {
 			  GET: "visitUserInfoSettings",
-        PATCH: "modifyUserInfo"
+        PUT: "modifyUserInfo"
       },
 			/* resource: {
 				GET: "userSettingsResource"
 			}, */
       apps: {
         GET: 'visitUserInfoSettings',
-        PATCH: 'modifyUserInfo'
+        PUT: 'modifyUserInfo'
       },
 			resume: {
 				GET: 'visitUserResumeSettings',
-				PATCH: 'modifyUserResume'
+				PUT: 'modifyUserResume'
 			},
 			transaction: {
 				GET: 'visitUserTransactionSettings',
@@ -57,27 +57,27 @@ module.exports = {
 			},
 			social: {
 				GET: 'visitUserSocialSettings',
-				PATCH: 'modifyUserSocial'
+				PUT: 'modifyUserSocial'
 			},
 			photo: {
 				GET: 'visitUserPhotoSettings',
-				PATCH: 'modifyUserPhotoSettings'
+				PUT: 'modifyUserPhotoSettings'
 			},
 			water: {
 				GET: "visitUserWaterSettings",
-				PATCH: "modifyUserWaterSettings"
+				PUT: "modifyUserWaterSettings"
 			},
 			cert: {
 				GET: 'visitUserCertPhotoSettings',
-				PATCH: 'modifyUserCertPhotoSettings'
+				PUT: 'modifyUserCertPhotoSettings'
 			},
 			password: {
 				GET: 'visitPasswordSettings',
-				PATCH: 'modifyPassword'
+				PUT: 'modifyPassword'
 			},
 			mobile: {
 				GET: 'visitMobileSettings',
-				PATCH: 'modifyMobile',
+				PUT: 'modifyMobile',
 				DELETE: "unbindMobile",
 				POST: 'bindMobile'
 			},
@@ -102,11 +102,11 @@ module.exports = {
 			},
       'red_envelope': {
 			  GET: 'visitUserRedEnvelopeSettings',
-        PATCH: 'modifyUserRedEnvelopeSettings'
+        PUT: 'modifyUserRedEnvelopeSettings'
       },
       display: {
 			  GET: 'userDisplaySettings',
-        PATCH: 'userDisplaySettings'
+        PUT: 'userDisplaySettings'
       },
       alipay: {
         POST: "userBindAlipayAccounts"
@@ -120,7 +120,7 @@ module.exports = {
 			DELETE: 'cancelSubmitVerify',
 			PARAMETER: {
 				POST: 'submitVerify',
-				PATCH: 'modifyUserVerifyStatus'
+				PUT: 'modifyUserVerifyStatus'
 			}
 		},
 		drafts: {

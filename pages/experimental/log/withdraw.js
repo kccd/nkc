@@ -26,7 +26,7 @@ var app = new Vue({
     success: function(record) {
       if(confirm("此操作将会把“调用接口”的状态改为“成功”，确定要继续吗？") === false) return;
       // 退回用户kcb
-      nkcAPI("/e/settings/kcb/record", 'PATCH', {
+      nkcAPI("/e/settings/kcb/record", 'PUT', {
         type: "success",
         kcbsRecordId: record._id
       })
@@ -40,7 +40,7 @@ var app = new Vue({
     fail: function(record) {
       const mainScoreName = this.mainScore.name;
       if(confirm("此操作将会把“调用接口”的状态改为“失败”，并且退还给用户 " +record.num/100+ " "+mainScoreName+"，确定要继续吗？") === false) return;
-      nkcAPI("/e/settings/kcb/record", 'PATCH', {
+      nkcAPI("/e/settings/kcb/record", 'PUT', {
         type: "fail",
         kcbsRecordId: record._id
       })

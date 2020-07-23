@@ -289,7 +289,7 @@ var app = new Vue({
       var step = this.step;
       var body = {
         s: step
-      }, url = "/fund/a/" + this.form._id, method = "PATCH";
+      }, url = "/fund/a/" + this.form._id, method = "PUT";
       if(step === 1) {
         this.saveError = "";
         this.saveInfo = "";

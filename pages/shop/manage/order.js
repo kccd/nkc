@@ -36,7 +36,7 @@ function sendGoods() {
     trackNumber: trackNumber,
     trackName: trackName
   }
-  nkcAPI('/shop/manage/'+sellUid+'/order/sendGoods', "PATCH", {post: para})
+  nkcAPI('/shop/manage/'+sellUid+'/order/sendGoods', "PUT", {post: para})
   .then(function(data) {
     sweetAlert("订单发货成功");
     $("#sendGoodsModal").modal("hide");
@@ -44,7 +44,7 @@ function sendGoods() {
   })
   .catch(function(data) {
     sweetWarning(data || data.error);
-  }) 
+  })
 }
 
 /**
@@ -60,7 +60,7 @@ function sendGoodsNoLog() {
   var para = {
     orderId: orderId
   }
-  nkcAPI('/shop/manage/'+sellUid+'/order/sendGoodsNoLog', "PATCH", {post: para})
+  nkcAPI('/shop/manage/'+sellUid+'/order/sendGoodsNoLog', "PUT", {post: para})
   .then(function(data) {
     sweetAlert("订单发货成功");
     $("#sendGoodsModal").modal("hide");
@@ -68,7 +68,7 @@ function sendGoodsNoLog() {
   })
   .catch(function(data) {
     sweetWarning(data || data.error);
-  }) 
+  })
 }
 
 
@@ -76,7 +76,7 @@ function sendGoodsNoLog() {
  * 打开弹窗，填写运单号
  * @param {String} orderId  订单号
  * @param {String} sellUid  卖家uid
- * 
+ *
  */
 function openSendGoodsModal(sellUid, orderId) {
   $("#sendGoodsModal").modal("show");
@@ -103,7 +103,7 @@ function editOrder() {
     orderId: orderId
   }
   // 向服务器发起修改请求
-  nkcAPI('/shop/manage/'+sellUid+'/order/editOrder', "PATCH", {post:para})
+  nkcAPI('/shop/manage/'+sellUid+'/order/editOrder', "PUT", {post:para})
   .then(function(data) {
     sweetAlert("价格修改成功")
     $("#editOrderModal").modal("hide");
@@ -155,7 +155,7 @@ function editTrackNum() {
   */
 function saveTrackNum(sellUid,orderId) {
   var trackNumber = $("#trackNumVal").val().trim();
-  nkcAPI('/shop/manage/'+sellUid+'/order/editOrderTrackNumber', "PATCH", {orderId: orderId, trackNumber: trackNumber})
+  nkcAPI('/shop/manage/'+sellUid+'/order/editOrderTrackNumber', "PUT", {orderId: orderId, trackNumber: trackNumber})
   .then(function(data) {
     sweetAlert("修改成功");
     $("#saveTrackNum").css("display", "none");
@@ -176,7 +176,7 @@ function editSellMessage(uid,orderId) {
   if(sellMessage.length == 0) {
     return sweetWarning("不填写备注无需保存");
   }
-  nkcAPI('/shop/manage/'+uid+'/order/editSellMessage', "PATCH", {sellMessage: sellMessage, orderId: orderId})
+  nkcAPI('/shop/manage/'+uid+'/order/editSellMessage', "PUT", {sellMessage: sellMessage, orderId: orderId})
   .then(function(data) {
     sweetAlert("备注修改成功");
   })
@@ -250,7 +250,7 @@ function saveProductSinglePrice(sellUid, orderId, costId) {
     costObj: costObj,
     orderObj: orderObj
   };
-  nkcAPI('/shop/manage/'+sellUid+'/order/editCostRecord', "PATCH", postObj)
+  nkcAPI('/shop/manage/'+sellUid+'/order/editCostRecord', "PUT", postObj)
   .then(function(data) {
     sweetAlert("保存成功");
   })
@@ -292,7 +292,7 @@ function saveOrderFreightPrice(sellUid, orderId) {
     orderId: orderId,
     orderObj: orderObj
   }
-  nkcAPI('/shop/manage/'+sellUid+'/order/editOrderPrice', "PATCH", postObj)
+  nkcAPI('/shop/manage/'+sellUid+'/order/editOrderPrice', "PUT", postObj)
   .then(function(data) {
     sweetAlert("保存成功");
   })
@@ -329,7 +329,7 @@ function saveOrderProductCount(sellUid, costId, orderId) {
   var productSingleCountHis = Number($("#productSingleCountHis"+costId).text());
   var productTotalPrice = Number($("#productTotalPrice"+orderId).text());
   var productFreightPrice = Number($("#productFreightPrice"+orderId).text());
-  
+
   var countDiff = newProductCount - productSingleCountHis;
   var totalPriceDiff = countDiff * singlePrice;
   productTotalPrice += totalPriceDiff;
@@ -353,7 +353,7 @@ function saveOrderProductCount(sellUid, costId, orderId) {
     costObj: costObj,
     orderObj: orderObj
   };
-  nkcAPI('/shop/manage/'+sellUid+'/order/editCostRecord', "PATCH", postObj)
+  nkcAPI('/shop/manage/'+sellUid+'/order/editCostRecord', "PUT", postObj)
   .then(function(data) {
     sweetAlert("保存成功");
   })
@@ -395,7 +395,7 @@ function editGoods() {
     trackNumber: trackNumber,
     trackName: trackName
   }
-  nkcAPI('/shop/manage/'+sellUid+'/order/editGoods', "PATCH", {post: para})
+  nkcAPI('/shop/manage/'+sellUid+'/order/editGoods', "PUT", {post: para})
   .then(function(data) {
     sweetAlert("物流信息修改成功");
     $("#sendGoodsModal").modal("hide");
@@ -403,7 +403,7 @@ function editGoods() {
   })
   .catch(function(data) {
     sweetWarning(data || data.error);
-  }) 
+  })
 }
 
 /**
@@ -421,7 +421,7 @@ function editNotGoods() {
     trackNumber: "no",
     trackName: ""
   }
-  nkcAPI('/shop/manage/'+sellUid+'/order/editGoods', "PATCH", {post: para})
+  nkcAPI('/shop/manage/'+sellUid+'/order/editGoods', "PUT", {post: para})
   .then(function(data) {
     sweetAlert("物流信息修改成功");
     $("#sendGoodsModal").modal("hide");
@@ -429,5 +429,5 @@ function editNotGoods() {
   })
   .catch(function(data) {
     sweetWarning(data || data.error);
-  }) 
+  })
 }

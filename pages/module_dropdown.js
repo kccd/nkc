@@ -215,7 +215,7 @@ function selectbtn(){
 		arr.prop('checked', true);
 	}
 }
-/* 
+/*
   移动专业文章列表中的文章
   @author pengxiguaa 2019/1/27
 */
@@ -243,7 +243,7 @@ function moveListThreads(fid) {
   var postTo = function(index, arr) {
     if(!arr[index]) return;
     var targetTid = arr[index];
-    nkcAPI('/t/' + targetTid + '/forum', 'PATCH', data)
+    nkcAPI('/t/' + targetTid + '/forum', 'PUT', data)
       .then(function() {
         screenTopAlert('文章 ' + targetTid + ' 已移动到专业 ' + data.toFid);
         postTo(index+1, arr);
@@ -287,7 +287,7 @@ function moveThreads(id) {
 }
 
 /*function moveThread(tid,fid,cid, callback){
-		return nkcAPI('/t/'+tid+'/moveThread','PATCH',{
+		return nkcAPI('/t/'+tid+'/moveThread','PUT',{
 			tid:tid,
 			fid:fid,
 			cid:cid,
@@ -303,7 +303,7 @@ function moveThreads(id) {
 				// screenTopWarning(tid+ ' 无法送 ' + fid+ (cid?' 的 '+cid:''))
 			})
 	}*/
-	
+
 function moveThreadToRecycle(id,para) {
 	var arr = $('input.ThreadCheckboxes');
 	var tid = [];

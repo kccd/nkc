@@ -136,7 +136,7 @@ NKC.modules.Library = class {
           return folders.concat(files_);
         },
         uploadedCount() {
-          let count = 0; 
+          let count = 0;
           this.selectedFiles.map(f => {
             if(f.status === "uploaded") count ++;
           });
@@ -149,7 +149,7 @@ NKC.modules.Library = class {
           });
           return count;
         }
-        
+
       },
       methods: {
         getUrl: NKC.methods.tools.getUrl,
@@ -397,7 +397,7 @@ NKC.modules.Library = class {
                   description,
                   category
                 };
-                return nkcAPI(`/library/${_id}`, "PATCH", body);
+                return nkcAPI(`/library/${_id}`, "PUT", body);
 
               } else {
                 // 将线上文件提交到文库
@@ -452,7 +452,7 @@ NKC.modules.Library = class {
           const libraryListCategories = NKC.methods.getFromLocalStorage("libraryListCategories");
           const listCategories = libraryListCategories[this.lid];
           if(listCategories) {
-            this.listCategories = listCategories; 
+            this.listCategories = listCategories;
           }
         },
         // 文件夹访问记录存到浏览器本地
@@ -535,8 +535,8 @@ NKC.modules.Library = class {
           body.foldersId = foldersId;
 
           const url = `/library/${this.folder._id}/list`;
-          const method = "PATCH";
-          
+          const method = "PUT";
+
           LibraryPath.open((data) => {
             body.targetFolderId = data.folder._id;
             nkcAPI(url, method, body)
@@ -608,7 +608,7 @@ NKC.modules.Library = class {
               category = res[2].value;
             }
             if(!name) return sweetError("名称不能为空");
-            nkcAPI("/library/" + folder._id, "PATCH", {
+            nkcAPI("/library/" + folder._id, "PUT", {
               name,
               description,
               category

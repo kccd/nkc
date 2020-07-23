@@ -40,7 +40,7 @@ forgotPasswordRouter
 	data.nationCode = nationCode;
 	await next();
 })
-.patch('/mobile', async (ctx, next) => {
+.put('/mobile', async (ctx, next) => {
 	const {db, body} = ctx;
 	const {password, mcode, mobile, nationCode} = body;
 	if(!mobile || !nationCode || !mcode) ctx.throw(400, '参数错误，请刷新页面后重新提交。');
@@ -104,7 +104,7 @@ forgotPasswordRouter
 	});
 	await next();
 })
-.patch('/email', async (ctx, next) => {
+.put('/email', async (ctx, next) => {
 	const {db, body} = ctx;
 	const {email, password, password2, token} = body;
 	if(!email || !token) ctx.throw(400, '参数错误，请刷新页面后重新提交。');

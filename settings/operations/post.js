@@ -1,7 +1,7 @@
 module.exports = {
 	PARAMETER: {
 		GET: 'visitPost',
-		PATCH: 'modifyPost',
+		PUT: 'modifyPost',
 		quote: {
 			GET: 'quotePost'
 		},
@@ -15,13 +15,13 @@ module.exports = {
 			kcb: {
 				POST: 'creditKcb',
         PARAMETER: {
-          PATCH: "modifyKcbRecordReason"
+          PUT: "modifyKcbRecordReason"
         }
 			}
 		},
 		history: {
 			GET: 'visitPostHistory',
-			PATCH: 'disableHistories',
+			PUT: 'disableHistories',
 			PARAMETER: {
 				rollback: {
 					POST: "rollbackPost"
@@ -42,7 +42,7 @@ module.exports = {
     },
     warning: {
 		  POST: "postWarningPost",
-      PATCH: "postWarningPatch"
+      PUT: "postWarningPatch"
     },
     author: {
 		  GET: "getPostAuthor"
@@ -57,7 +57,7 @@ module.exports = {
 			GET: "getPostResources"
 		},
 		hide: {
-			PATCH: "hidePost"
+			PUT: "hidePost"
 		},
 		/*delete: {
 			GET: "deletePost"

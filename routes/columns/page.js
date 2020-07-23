@@ -21,7 +21,7 @@ router
     await db.ColumnPageModel.toSearch(page._id);
     await next();
   })
-  .patch("/:pageId", async (ctx, next) => {
+  .put("/:pageId", async (ctx, next) => {
     const {data, db, body, params} = ctx;
     const {column, user} = data;
     const {pageId} = params;

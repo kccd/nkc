@@ -102,7 +102,7 @@ script.
           }
           func("检测到您输入了新密码，保存后旧密码将会被覆盖，确定要执行此操作吗？")
             .then(function() {
-              return nkcAPI("/e/settings/user/" + user.uid, "PATCH", {
+              return nkcAPI("/e/settings/user/" + user.uid, "PUT", {
                 username: user.username || "",
                 description: user.description || "",
                 email: usersPersonal.email,

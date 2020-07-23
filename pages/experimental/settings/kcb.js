@@ -48,7 +48,7 @@ var app = new Vue({
       if(this.kcbSettingsDemo.withdrawTimeBegin >= this.kcbSettingsDemo.withdrawTimeEnd) {
         return screenTopWarning("允许提现的时间段设置错误，开始时间必须小于结束时间");
       }
-      nkcAPI('/e/settings/kcb', 'PATCH', {
+      nkcAPI('/e/settings/kcb', 'PUT', {
         kcbsTypes: this.kcbsTypesDemo,
         minCount: this.kcbSettingsDemo.minCount,
         maxCount: this.kcbSettingsDemo.maxCount,

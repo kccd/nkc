@@ -252,7 +252,7 @@ window.app = new Vue({
       Promise.resolve()
         .then(() => {
           if(!targetUser) {
-            return nkcAPI('/message/withdrawn', 'PATCH', {messageId})
+            return nkcAPI('/message/withdrawn', 'PUT', {messageId})
           }
         })
         .then(() => {
@@ -265,7 +265,7 @@ window.app = new Vue({
     markAsRead() {
       const {type, tUser} = self = this;
       setTimeout(() => {
-        nkcAPI('/message/mark', 'PATCH', {
+        nkcAPI('/message/mark', 'PUT', {
           type,
           uid: tUser.uid
         })

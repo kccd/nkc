@@ -10,7 +10,7 @@ router
     ctx.template = "experimental/settings/register/register.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {body, db, nkcModules} = ctx;
     let {defaultSubscribeForumsId, regSettings} = body;
     const {

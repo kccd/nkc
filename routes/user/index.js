@@ -66,6 +66,12 @@ userRouter
     const targetUser = await db.UserModel.findById(uid);
     await targetUser.extendGrade();
     data.targetUser = targetUser;
+
+    // 用户积分
+    if(ctx.permission('viewUserScores')) {
+      data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
+    }
+
     if(targetUser.hidden && !ctx.permission("hideUserHome")) {
       nkcModules.throwError(404, "根据相关法律法规和政策，该内容不予显示", "noPermissionToVisitHiddenUserHome");
     }

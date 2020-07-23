@@ -117,7 +117,7 @@ const app = new Vue({
             if (!iconFile) continue;
             formData.append(type, iconFile, iconFile.name);
           }
-          return nkcUploadFile('/e/settings/score', 'PATCH', formData)
+          return nkcUploadFile('/e/settings/score', 'PUT', formData)
         })
         .then(() => {
           sweetSuccess('保存成功');

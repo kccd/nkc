@@ -9,7 +9,7 @@ socialRouter
 		ctx.template = 'interface_user_settings_social.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body, params} = ctx;
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});

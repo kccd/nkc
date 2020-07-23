@@ -47,7 +47,7 @@
     },
     reduceCount: function(c) {
       if(c.count === 1) return;
-      nkcAPI('/shop/cart/' + c._id, 'PATCH', {
+      nkcAPI('/shop/cart/' + c._id, 'PUT', {
         type: 'reduceCount'
       })
         .then(function(data) {
@@ -58,7 +58,7 @@
         });
     },
     addCount: function(c) {
-      nkcAPI('/shop/cart/' + c._id, 'PATCH', {
+      nkcAPI('/shop/cart/' + c._id, 'PUT', {
         type: 'addCount'
       })
         .then(function(data) {
@@ -69,7 +69,7 @@
         });
     },
     changeCount: function(c) {
-      nkcAPI('/shop/cart/' + c._id, 'PATCH', {
+      nkcAPI('/shop/cart/' + c._id, 'PUT', {
         type: 'changeCount',
         count: c.count
       })
@@ -141,7 +141,7 @@ function changeCount(type, productId) {
   } else {
     type = "reduceCount";
   }
-  nkcAPI('/shop/cart/' + productId, 'PATCH', {
+  nkcAPI('/shop/cart/' + productId, 'PUT', {
     type: type
   })
     .then(function(data) {

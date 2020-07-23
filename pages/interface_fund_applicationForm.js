@@ -16,7 +16,7 @@
 // })
 
 function agree(_id) {
-	nkcAPI('/fund/a/'+_id+'/member', 'PATCH', {agree: true})
+	nkcAPI('/fund/a/'+_id+'/member', 'PUT', {agree: true})
 		.then(function(){
 			window.location.reload();
 		})
@@ -26,7 +26,7 @@ function agree(_id) {
 }
 
 function disagree(_id) {
-	nkcAPI('/fund/a/'+_id+'/member', 'PATCH', {agree: false})
+	nkcAPI('/fund/a/'+_id+'/member', 'PUT', {agree: false})
 		.then(function(){
 			window.location.reload();
 		})
@@ -85,7 +85,7 @@ function revoked(type, _id) {
 
 function disableApplicationForm(id, type) {
 	if(type === true && confirm('确定要封禁该基金申请？') === false) return;
-	nkcAPI('/fund/a/'+id+'/disabled', 'PATCH',{type: type})
+	nkcAPI('/fund/a/'+id+'/disabled', 'PUT',{type: type})
 		.then(function() {
 			window.location.reload();
 		})
@@ -95,7 +95,7 @@ function disableApplicationForm(id, type) {
 }
 
 function excellent(id, type) {
-	nkcAPI('/fund/a/'+id+'/excellent', 'PATCH', {type: type})
+	nkcAPI('/fund/a/'+id+'/excellent', 'PUT', {type: type})
 		.then(function() {
 			window.location.reload();
 		})

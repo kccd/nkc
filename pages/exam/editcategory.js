@@ -76,11 +76,11 @@ var app = new Vue({
       }
 
       if(category.passScore < 1 || category.passScore > this.questionsCount) return screenTopWarning('及格分数不能大于试题总数且不能小于1');
-      if(category.time <= 0) return screenTopWarning('答题时间必须大于0分钟'); 
+      if(category.time <= 0) return screenTopWarning('答题时间必须大于0分钟');
       category.disabled = ['true', true].indexOf(category.disabled) !== -1;
       var method = 'POST', url = '/exam/categories';
       if(category._id) {
-        method = 'PATCH';
+        method = 'PUT';
         url = '/exam/category/' + category._id;
       }
       nkcAPI(url, method, {category: category})

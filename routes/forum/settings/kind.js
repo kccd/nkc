@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const kindRouter = new Router();
 kindRouter
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
     const {data, db, body, params} = ctx;
     const {fid} = params;
     const {kindName} = body;
@@ -12,7 +12,7 @@ kindRouter
     await forum.update({$set:{kindName}})
 		await next();
   })
-  .patch('/clear', async (ctx, next) => {
+  .put('/clear', async (ctx, next) => {
     const {data, db, body, params} = ctx;
     const {fid} = params;
     const forum = await db.ForumModel.findOne({fid});

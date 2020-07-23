@@ -6,7 +6,7 @@ router
     ctx.template = "experimental/settings/sticker/sticker.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {body, db} = ctx;
     const {stickerSettings} = body;
     const {checkString} = ctx.nkcModules.checkData;

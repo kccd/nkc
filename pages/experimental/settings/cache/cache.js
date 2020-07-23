@@ -11,7 +11,7 @@ var app = new Vue({
       this.info = "";
       this.error = "";
       var cache = this.cacheSettings;
-      nkcAPI("/e/settings/cache", "PATCH", {
+      nkcAPI("/e/settings/cache", "PUT", {
         type: "modify",
         cache: cache
       })
@@ -23,7 +23,7 @@ var app = new Vue({
         })
     },
     clearAll: function() {
-      nkcAPI("/e/settings/cache", "PATCH", {
+      nkcAPI("/e/settings/cache", "PUT", {
         type: "clear"
       })
         .then(function() {

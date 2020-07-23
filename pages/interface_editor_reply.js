@@ -404,7 +404,7 @@
       var url;
       var data;
       if (type === 'post') {
-        method = 'PATCH';
+        method = 'PUT';
         url = '/p/' + id;
         data = {post: post};
       } else if (type === 'forum') {
@@ -416,7 +416,7 @@
         url = '/t/' + id;
         data = {post: post};
       } else if (type === 'application' && cat === 'p') { // 编辑项目内容
-          method = 'PATCH';
+          method = 'PUT';
           url = '/fund/a/' + id;
           data = {project: post, s: 3}
       } else if(type === 'application' && cat === 'c') { // 评论

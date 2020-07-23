@@ -33,7 +33,7 @@ var app = new Vue({
     },
     save: function(type) {
       var addresses = this.addresses;
-      nkcAPI("/u/" + this.user.uid + "/settings/transaction", "PATCH", {
+      nkcAPI("/u/" + this.user.uid + "/settings/transaction", "PUT", {
         addresses: addresses
       })
         .then(function() {

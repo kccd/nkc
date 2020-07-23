@@ -39,7 +39,7 @@ router
     ctx.template = "interface_user_settings_apps.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body, data} = ctx;
     const {
       homeThreadList, showEnvelope, selectTypesWhenSubscribe,

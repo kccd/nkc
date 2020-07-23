@@ -35,7 +35,7 @@ operationRouter
 		await newType.save();
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {description, errInfo, operationId} = body;
 		if(!description) ctx.throw(400, '操作说明不能为空');
@@ -52,7 +52,7 @@ operationRouter
 		data.operationType = operationType;
 		await next();
 	})
-	.patch('/:_id', async (ctx, next) => {
+	.put('/:_id', async (ctx, next) => {
 		const {db, params, body} = ctx;
 		const {_id} = params;
 		const {operation} = body;

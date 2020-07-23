@@ -80,7 +80,7 @@ block scripts
   script(src='/interface_common.js')
   script.
     function disagree(id) {
-      nkcAPI('/fund/a/'+id+'/member', 'PATCH', {agree: false})
+      nkcAPI('/fund/a/'+id+'/member', 'PUT', {agree: false})
       .then(function() {
         screenTopAlert('您已拒绝用户的邀请');
         setTimeout(function(){
@@ -93,7 +93,7 @@ block scripts
       })
     };
     function agree(id) {
-      nkcAPI('/fund/a/'+id+'/member', 'PATCH', {agree: true})
+      nkcAPI('/fund/a/'+id+'/member', 'PUT', {agree: true})
       .then(function () {
         screenTopAlert('您已同意用户的邀请');
         setTimeout(function () {

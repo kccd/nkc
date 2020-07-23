@@ -8,7 +8,7 @@ router
 		ctx.template = "experimental/settings/grade/grade.pug";
 		await next();
 	})
-	.patch("/", async (ctx, next) => {
+	.put("/", async (ctx, next) => {
 		const {db, body, nkcModules, redis} = ctx;
 		const {grades, gradeSettings} = body;
 		const {checkString, checkNumber} = nkcModules.checkData;

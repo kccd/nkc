@@ -180,7 +180,7 @@ applicationRouter
 	})
 
 	//修改申请表
-	.patch('/:_id', async (ctx, next) => {
+	.put('/:_id', async (ctx, next) => {
 		const {data, db, body, params} = ctx;
 		const {user} = data;
 		const {useless, newMembers, account, newApplicant, s, project, projectCycle, budgetMoney, threadsId, category} = body;

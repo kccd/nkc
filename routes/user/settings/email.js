@@ -250,7 +250,7 @@ emailRouter
 		}
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		await next();
 	});
 module.exports = emailRouter;

@@ -116,7 +116,7 @@ singleRouter
     }
     await next();
   })
-  .patch('/:acid', async (ctx, next) => {
+  .put('/:acid', async (ctx, next) => {
     const {data, db, query, body, params} = ctx;
     const {user} = data;
     const {ActivityModel, ActivityApplyModel, UsersModel} = db;

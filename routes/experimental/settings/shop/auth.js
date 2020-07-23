@@ -25,7 +25,7 @@ authRouter
 		await shopSetting.update({$set:{banList:banList}});
 		await next();
 	})
-	.patch('/delban', async (ctx, next) => {
+	.put('/delban', async (ctx, next) => {
 		const {data, db, body} = ctx;
 		const {uid} = body;
 		const shopSetting = await db.ShopSettingsModel.findOne({type: "homeSetting"});

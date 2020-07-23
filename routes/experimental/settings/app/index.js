@@ -12,7 +12,7 @@ appRouter
 		ctx.template = 'experimental/settings/app.pug';
 		await next();
 	})
-	.patch("/", async (ctx, next) => {
+	.put("/", async (ctx, next) => {
 		const {db, body, nkcModules} = ctx;
 		const {checkString} = nkcModules.checkData;
 		const {operation, hash, stable, disabled, version, description} = body;

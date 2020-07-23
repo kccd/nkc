@@ -16,7 +16,7 @@ var app = new Vue({
     //   name = prompt('请输入分类名：', name);
     //   if(name === null) return;
     //   if(name === '') return screenTopWarning('分类名不能为空');
-    //   nkcAPI('/problem/type/' + cid, 'PATCH', {name: name})
+    //   nkcAPI('/problem/type/' + cid, 'PUT', {name: name})
     //     .then(function() {
     //       window.location.reload();
     //     })

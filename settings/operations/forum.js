@@ -24,31 +24,31 @@ module.exports = {
 			GET: 'visitForumInfoSettings', // 查看专业基本信息设置
 			info: {
 				GET: 'visitForumInfoSettings', // 查看专业基本信息设置
-				PATCH: 'modifyForumInfo' // 修改专业基本信息设置
+				PUT: 'modifyForumInfo' // 修改专业基本信息设置
 			},
 			merge: {
 				GET: 'visitForumMergeSettings', // 查看专业合并
-				PATCH: 'modifyMergeSettings', // 修改专业合并设置
+				PUT: 'modifyMergeSettings', // 修改专业合并设置
 			},
 			kind: {
-				PATCH: "addForumKind", // 添加专业类别
+				PUT: "addForumKind", // 添加专业类别
 				clear: {
-					PATCH: "delForumKind" // 清除专业类别
+					PUT: "delForumKind" // 清除专业类别
 				}
 			},
 			category: {
 				GET: 'visitForumCategorySettings', // 查看专业分类设置
-				PATCH: 'modifyForumCategory', // 修改专业分类设置
+				PUT: 'modifyForumCategory', // 修改专业分类设置
 				POST: 'addForumCategory', // 添加专业下的文章分类
 				DELETE: 'removeForumCategory' // 删除专业下的文章分类
 			},
 			permission: {
 				GET: 'visitForumPermissionSettings', // 查看专业权限设置
-				PATCH: 'modifyForumPermission' // 修改专业权限设置
+				PUT: 'modifyForumPermission' // 修改专业权限设置
 			},
 			score: {
 				GET: 'forumScoreSettings',
-				PATCH: 'forumScoreSettings'
+				PUT: 'forumScoreSettings'
 			}
 		},
 		subscribe: {

@@ -5,7 +5,7 @@ router
     ctx.template = 'interface_user_settings_red_envelope.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {body, data} = ctx;
     const {user} = data;
     let {close} = body;

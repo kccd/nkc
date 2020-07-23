@@ -7,14 +7,14 @@ module.exports = {
 		GET: 'visitProblemList',
 		PARAMETER: {
 			GET: 'visitProblem',
-			PATCH: 'modifyProblem',
+			PUT: 'modifyProblem',
 			DELETE: 'deleteProblem'
 		}
 	},
   type: {
 	  POST: 'addProblemsType',
     PARAMETER: {
-	    PATCH: 'modifyProblemsType',
+	    PUT: 'modifyProblemsType',
       DELETE: 'deleteProblemsType'
     }
   }

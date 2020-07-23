@@ -29,7 +29,7 @@ function addBanUid() {
 function delBanUid(uid) {
   var suredel = window.confirm("确定解禁该用户？");
   if(suredel) {
-    nkcAPI('/e/settings/shop/auth/delban', "PATCH", {uid: uid})
+    nkcAPI('/e/settings/shop/auth/delban', "PUT", {uid: uid})
     .then(function(data){
       screenTopAlert("解禁成功");
       window.location.reload();

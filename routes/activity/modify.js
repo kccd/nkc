@@ -147,7 +147,7 @@ modifyRouter
     }
     await next();
   })
-  .patch('/:acid', async(ctx, next) => {
+  .put('/:acid', async(ctx, next) => {
     const {data, db, params, query, body} = ctx;
 		const {user} = data;
     const {acid} = params;

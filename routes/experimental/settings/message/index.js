@@ -11,7 +11,7 @@ messageRouter
     ctx.template = 'experimental/settings/message/message.pug';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {body, db, nkcModules} = ctx;
     const {roles, grades, type, messageType, messageSettings} = body;
     if(type === "modifyMessageType") {

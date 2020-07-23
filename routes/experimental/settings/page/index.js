@@ -7,7 +7,7 @@ router
 		ctx.template = 'experimental/settings/page.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
 		const {db, body} = ctx;
 		const {pageSettings} = body;
     let {

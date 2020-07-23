@@ -339,7 +339,7 @@ function submit(uid) {
 	} else {
 		obj.gender = 'women';
 	}
-	nkcAPI('/u/'+uid+'/settings/resume', 'PATCH', obj)
+	nkcAPI('/u/'+uid+'/settings/resume', 'PUT', obj)
 		.then(function() {
 			sweetSuccess('保存成功');
 		})
@@ -470,7 +470,7 @@ function submitSocial(uid) {
   var obj = {
     accounts: accounts
   };
-  nkcAPI('/u/'+uid+'/settings/social', 'PATCH', obj)
+  nkcAPI('/u/'+uid+'/settings/social', 'PUT', obj)
     .then(function() {
       sweetSuccess('保存成功');
     })
@@ -545,7 +545,7 @@ function submitPhoto(uid) {
       break;
     }
   }
-  nkcAPI('/u/'+uid+'/settings/photo', 'PATCH', {displayPhoto: displayPhoto})
+  nkcAPI('/u/'+uid+'/settings/photo', 'PUT', {displayPhoto: displayPhoto})
     .then(function(){
       sweetSuccess('保存成功');
     })
@@ -571,7 +571,7 @@ function submitCert(uid) {
       break;
     }
   }
-  nkcAPI('/u/'+uid+'/settings/cert', 'PATCH', {displayPhoto: displayPhoto})
+  nkcAPI('/u/'+uid+'/settings/cert', 'PUT', {displayPhoto: displayPhoto})
     .then(function(){
       sweetSuccess('保存成功');
     })

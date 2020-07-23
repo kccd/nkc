@@ -82,7 +82,7 @@ router
     data.paging = paging;
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {data, db, body} = ctx;
     const {pid} = body;
 

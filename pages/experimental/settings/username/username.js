@@ -20,7 +20,7 @@ var app = new Vue({
         freeCount: us.freeCount,
         free: !!us.free
       };
-      nkcAPI("/e/settings/username", "PATCH", us)
+      nkcAPI("/e/settings/username", "PUT", us)
         .then(function() {
           sweetSuccess("保存成功");
         })

@@ -441,7 +441,7 @@ function fileNameShrink(content,length){
 // 编辑图片
 function pictureEdit(rid) {
   // 向服务器获取原图
-  nkcAPI("/imageEdit/getOriginId", "PATCH", {rid: rid})
+  nkcAPI("/imageEdit/getOriginId", "PUT", {rid: rid})
   .then(function(data) {
     if(data.originId) {
       moduleCrop.replace("/ro/"+data.originId)

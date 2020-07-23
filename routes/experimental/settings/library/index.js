@@ -8,7 +8,7 @@ router
     ctx.template = "experimental/settings/library/library.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body} = ctx;
     const {roles, grades} = body;
     await db.SettingModel.updateOne({_id: "library"}, {$set: {

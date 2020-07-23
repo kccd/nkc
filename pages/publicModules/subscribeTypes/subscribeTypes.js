@@ -63,7 +63,7 @@ NKC.modules.SubscribeTypes = function() {
         var selectedTypesId = this.selectedTypesId;
         if(!this.hideInfo && this.selectTypesWhenSubscribe && this.selectTypesWhenSubscribe.length > 0) {
           var uid = NKC.configs.uid;
-          nkcAPI("/u/" + uid + "/settings/apps", "PATCH", {selectTypesWhenSubscribe: false})
+          nkcAPI("/u/" + uid + "/settings/apps", "PUT", {selectTypesWhenSubscribe: false})
             .then(function() {
               NKC.configs.selectTypesWhenSubscribe = false;
             })
@@ -93,7 +93,7 @@ NKC.modules.SubscribeTypes = function() {
       moveType: function(index, d) {
         var type = this.types[index];
         var this_ = this;
-        nkcAPI("/account/subscribe_types/" + type._id, "PATCH", {
+        nkcAPI("/account/subscribe_types/" + type._id, "PUT", {
           type: "order",
           direction: d
         })
@@ -130,7 +130,7 @@ NKC.modules.SubscribeTypes = function() {
         };
         if(_id) {
           url = "/account/subscribe_types/" + _id;
-          method = "PATCH";
+          method = "PUT";
           body.type = "info";
         }
         nkcAPI(url, method, body)

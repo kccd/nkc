@@ -1,7 +1,7 @@
 const Router = require("koa-router");
 const router = new Router();
 router
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body, params, data} = ctx;
     const {pid} = params;
     const {user} = data;

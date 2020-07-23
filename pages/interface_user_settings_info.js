@@ -4,7 +4,7 @@ function submit(id) {
 		postSign: $('#postSign').val(),
 	};
 
-	nkcAPI('/u/'+id+'/settings/info', 'PATCH', obj)
+	nkcAPI('/u/'+id+'/settings/info', 'PUT', obj)
 		.then(function(data) {
 			screenTopAlert('修改成功');
       emitEventToUpdateLocalUser(data);
@@ -114,7 +114,7 @@ var app = new Vue({
   },
   methods: {
     saveNewUsername: function() {
-      nkcAPI("/u/" + this.user.uid + "/settings/username", "PATCH", {newUsername: this.newUsername})
+      nkcAPI("/u/" + this.user.uid + "/settings/username", "PUT", {newUsername: this.newUsername})
         .then(function(data) {
           sweetSuccess("修改成功");
           emitEventToUpdateLocalUser(data);

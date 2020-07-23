@@ -74,7 +74,7 @@ myProblems
 		await next();
   })
   
-	// .patch('/:_id', async (ctx, next) => {
+	// .put('/:_id', async (ctx, next) => {
 	// 	const {params, data, db, body} = ctx;
 	// 	const {user} = data;
 	// 	const {_id} = params;

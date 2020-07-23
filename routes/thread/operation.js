@@ -38,7 +38,7 @@ operationRouter
     await next();
   })
   // 修改退修原因
-  .patch("/moveDraft/reason", async (ctx, next) => {
+  .put("/moveDraft/reason", async (ctx, next) => {
     const {body, db} = ctx;
     const {log} = body;
     if(!log.reason) ctx.throw(400, "退修原因不能为空");

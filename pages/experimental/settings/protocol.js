@@ -1,7 +1,7 @@
-$("document").ready(function() {  
+$("document").ready(function() {
   if($("#protocolHide").length > 0) {
     var protocolHide = $("#protocolHide").text();
-    ue.ready(function(){ 
+    ue.ready(function(){
       ue.setContent(protocolHide);
     })
   }
@@ -46,7 +46,7 @@ function updateProtocol(id) {
   }
   post.id = id;
   document.getElementById("updateEdit").disabled = true;
-  nkcAPI("/e/settings/protocol/"+id, "PATCH", post)
+  nkcAPI("/e/settings/protocol/"+id, "PUT", post)
   .then(function(data) {
     screenTopAlert("保存成功");
     openToNewLocation('/e/settings/protocol/' + data.protocolTypeId);

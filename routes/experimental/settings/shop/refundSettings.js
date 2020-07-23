@@ -8,7 +8,7 @@ router
     ctx.template = 'experimental/shop/refund/settings.pug';
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body} = ctx;
     let {cert, sellerReceive, buyerReceive, agree, buyerTrack, sellerTrack, pay} = body.shopSettings.refund;
     var checkNum = (num) => {

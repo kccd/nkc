@@ -54,6 +54,9 @@ block content
               -const targetUser = data.targetUser
               include ./module_user_grade
             .user-certs=data.targetUser.info.certsName
+            div
+              -const targetUserScores = data.targetUserScores;
+              include ../publicModules/userScores
           if !data.user || data.user.uid !== data.targetUser.uid
             .user-card-panel
               .user-button

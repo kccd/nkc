@@ -9,7 +9,7 @@ var app = new Vue({
   methods: {
     submit: function() {
       var toppingSettings = this.toppingSettings;
-      nkcAPI("/e/settings/topping", "PATCH", toppingSettings)
+      nkcAPI("/e/settings/topping", "PUT", toppingSettings)
         .then(function() {
           sweetSuccess("保存成功");
         })

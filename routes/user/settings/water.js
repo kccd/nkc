@@ -38,7 +38,7 @@ waterRouter
 		ctx.template = 'interface_user_settings_water.pug';
 		await next();
 	})
-	.patch('/', async (ctx, next) => {
+	.put('/', async (ctx, next) => {
     const {body, data, db, port, ip} = ctx;
     const {type, waterAdd, waterGravity, waterStyle} = body;
     const {user} = data;

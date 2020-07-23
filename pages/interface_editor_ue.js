@@ -368,7 +368,7 @@ function onPost() {
   var url;
   var data;
   if (queryType === 'post') {
-    method = 'PATCH';
+    method = 'PUT';
     url = '/p/' + queryId;
     data = {post: post};
   } else if (queryType === 'forum') {
@@ -380,7 +380,7 @@ function onPost() {
     url = '/t/' + queryId;
     data = {post: post};
   } else if (queryType === 'application' && queryCat === 'p') { // 编辑项目内容
-    method = 'PATCH';
+    method = 'PUT';
     url = '/fund/a/' + queryId;
     data = {project: post, s: 3}
   } else if(queryType === 'application' && queryCat === 'c') { // 评论
@@ -398,12 +398,12 @@ function onPost() {
       url = '/t/' + desTypeId;
       data = {post: post};
     }else if(desType === "post"){
-      method = 'PATCH';
+      method = 'PUT';
       url = '/p/' + desTypeId;
       data = {post: post};
     }
   } else if(queryType === 'forum_declare') {
-    method = 'PATCH';
+    method = 'PUT';
     url = '/f/' + queryId + '/settings/info';
     data = {declare: post.c, operation: 'updateDeclare'}
   } else {

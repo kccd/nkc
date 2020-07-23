@@ -1,7 +1,7 @@
 const Router = require('koa-router');
 const categoryRouter = new Router();
 categoryRouter
-  .patch('/:_id', async (ctx, next) => {
+  .put('/:_id', async (ctx, next) => {
     const {data, db, body, tools, params} = ctx;
     const {_id} = params;
     const categoryDB = await db.ExamsCategoryModel.findOnly({_id});

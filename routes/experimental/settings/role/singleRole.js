@@ -31,7 +31,7 @@ router
     data.users = await db.UserModel.find(q).sort({toc: -1}).limit(10);
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {tools, body, data, db, redis} = ctx;
     const {contentLength} = tools.checkString;
     const {role} = body;

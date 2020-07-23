@@ -15,7 +15,7 @@ router
     data.type = 'list';
     await next();
   })
-  .patch('/', async (ctx, next) => {
+  .put('/', async (ctx, next) => {
     const {db, body} = ctx;
     const {topic, discipline, visitorThreadList, hotThreads, recommend} = body;
     if(!["home", "latest"].includes(visitorThreadList)) ctx.throw(400, `参数visitorThreadList错误：${visitorThreadList}`);

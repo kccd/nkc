@@ -2,12 +2,12 @@ module.exports = {
 	mobile: {
 		GET: 'visitFindPasswordByMobile',
 		POST: 'findPasswordVerifyMobile',
-		PATCH: 'modifyPasswordByMobile'
+		PUT: 'modifyPasswordByMobile'
 	},
 	email: {
 		GET: 'visitFindPasswordByEmail',
 		POST: 'findPasswordSendVerifyEmail',
-		PATCH: 'modifyPasswordByEmail',
+		PUT: 'modifyPasswordByEmail',
 		verify: {
 			GET: 'findPasswordVerifyEmail'
 		}

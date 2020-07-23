@@ -10,7 +10,7 @@ var app = new Vue({
   },
   methods: {
     save: function() {
-      nkcAPI("/e/settings/shop/refunds/settings", "PATCH", {
+      nkcAPI("/e/settings/shop/refunds/settings", "PUT", {
         shopSettings: app.shopSettings
       })
         .then(function() {

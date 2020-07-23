@@ -5,7 +5,7 @@ router
     ctx.template = "interface_user_settings_display.pug";
     await next();
   })
-  .patch("/", async (ctx, next) => {
+  .put("/", async (ctx, next) => {
     const {db, body, data} = ctx;
     const {homeThreadList} = body;
     if(!["subscribe", "latest"].includes(homeThreadList)) ctx.throw(400, `参数homeThreadList错误：${homeThreadList}`);

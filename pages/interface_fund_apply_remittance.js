@@ -234,7 +234,7 @@ function applyRemittance(number, id) {
 }
 
 function verifyRemittance(number, id) {
-	nkcAPI('/fund/a/'+id+'/remittance/verify', 'PATCH', {number: number})
+	nkcAPI('/fund/a/'+id+'/remittance/verify', 'PUT', {number: number})
 		.then(function() {
 			window.location.reload();
 		})

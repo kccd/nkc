@@ -1,5 +1,5 @@
 function setHidden(columnId, pageId, hidden) {
-  nkcAPI("/m/" + columnId + "/page/" + pageId, "PATCH", {
+  nkcAPI("/m/" + columnId + "/page/" + pageId, "PUT", {
     hidden: !!hidden,
     type: "hide"
   })
@@ -26,7 +26,7 @@ function deletePage(columnId, pageId) {
 }
 
 function toNav(columnId, pageId) {
-  nkcAPI("/m/" + columnId + "/page/" + pageId, "PATCH", {
+  nkcAPI("/m/" + columnId + "/page/" + pageId, "PUT", {
     type: "toNav"
   })
     .then(function() {
