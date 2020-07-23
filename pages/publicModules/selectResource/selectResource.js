@@ -291,38 +291,26 @@ NKC.modules.SelectResource = function() {
               var formData = new FormData();
               formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
               formData.append("fileId", fileId);
-              var receiver = function(data) {
-                if(data.fileId && data.fileId === fileId && data.state && data.state === "complete") {
-                  completeAction();
-                } else {
-                  commonSocket.once("message", receiver);
-                }
-              };
-              commonSocket.once("message", receiver);
               return nkcUploadFile("/r", "POST", formData, function(e, progress) {
                 f.progress = progress;
               }, 60 * 60 * 1000);
             }
-          });
-
-          function completeAction() {
-            return Promise.resolve()
-              .then(function() {
-                f.status = "uploaded";
-                var index = self.app.files.indexOf(f);
-                self.app.files.splice(index, 1);
-                if(self.app.category === "upload" && !self.app.files.length) {
-                  self.app.category = "all";
-                  self.app.getResources(0);
-                }
-              })
-              .catch(function(data) {
-                f.status = "unUpload";
-                f.progress = 0;
-                f.error = data.error || data;
-                screenTopWarning(data.error || data);
-              })
-          }
+          })
+          .then(function() {
+            f.status = "uploaded";
+            var index = self.app.files.indexOf(f);
+            self.app.files.splice(index, 1);
+            if(self.app.category === "upload" && !self.app.files.length) {
+              self.app.category = "all";
+              self.app.getResources(0);
+            }
+          })
+          .catch(function(data) {
+            f.status = "unUpload";
+            f.progress = 0;
+            f.error = data.error || data;
+            screenTopWarning(data.error || data);
+          })
       },
       newFile: function(file) {
         return {
