@@ -22,7 +22,7 @@ router
   })
   .post('/', async (ctx, next) => {
     const imageExt = ['apk', 'ipa'];
-    const {data, db, body, settings, tools, fs} = ctx;
+    const {data, db, body, settings, tools, fs, fsPromise} = ctx;
     const {file} = body.files;
     const {name, size, path, hash} = file;
     const {appPlatform, appVersion, appDescription, appToc} = body.fields || {};
@@ -66,7 +66,7 @@ router
     ext = ext.replace('.', '');
     if(['exe'].includes(ext)) ctx.throw(403, '暂不支持上传该类型的文件');
     appPath = appFilePath + "/" + name;
-    await fs.rename(path, appPath);
+    await fsPromise.copyFile(path, appPath);
 
     // 添加上传记录
     await db.AppVersionModel.update({latest:true,appPlatForm:appPlatform}, {

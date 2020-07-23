@@ -50,7 +50,7 @@ appRouter
 		await next();
 	})
 	.post("/", async (ctx, next) => {
-		const {db, body, nkcModules, fs, settings} = ctx;
+		const {db, body, nkcModules, fs, fsPromise, settings} = ctx;
 		const {checkString} = nkcModules.checkData;
 		const {file} = body.files;
 		const {name, size, path, hash} = file;
@@ -76,7 +76,7 @@ appRouter
 		} else{
 			targetPath = settings.upload.iosSavePath + '/' + hash + ".ipa";
 		}
-		await fs.rename(path, targetPath);
+		await fsPromise.copyFile(path, targetPath);
 		const v = db.AppVersionModel({
 			appSize: size,
 			fileName: name,

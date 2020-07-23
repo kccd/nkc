@@ -45,7 +45,7 @@ resourceRouter
     const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'];
     const voiceExt = ['amr'];
     const videoExt = ["mp4", "mov", "3gp", "avi"];
-    const {data, db, body, settings, tools, fs} = ctx;
+    const {data, db, body, settings, tools, fs, fsPromise} = ctx;
     const { imageMagick, ffmpeg } = ctx.tools;
     try{
       await fs.access(settings.upload.messageFilePath);
@@ -119,7 +119,7 @@ resourceRouter
           vl: voiceTimer ? voiceTimer : ''
         }
       });
-      await fs.rename(path, targetPath);
+      await fsPromise.copyFile(path, targetPath);
       // 将amr语音文件转为mp3
       if(voiceExt.includes(ext)){
         let voiceMp3Path = generateFolderName(messageVoiceBrowser) + _id + '.mp3';

@@ -25,7 +25,7 @@ router
     await next()
   })
   .post('/', async (ctx, next) => {
-  	const {settings, data, fs, tools, params, body} = ctx;
+  	const {settings, data, fs, tools, params, body, fsPromise} = ctx;
     const {user} = data;
     if(!user) ctx.throw(403, '权限不足');
     const {uid} = user;
@@ -58,9 +58,7 @@ router
     }
 
 
-    await fs.rename(path, targetFile);
-    // await fs.rename(path, targetSmallFile);
-	  // await fs.unlink(path);
+    await fsPromise.copyFile(path, targetFile);
 		await next();
   });
 

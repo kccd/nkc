@@ -110,7 +110,7 @@ schema.statics.saveWatermark = async (file, c = 'normal') => {
   const fileName = `${aid}.${ext}`;
   const realPath = PATH.resolve(fileFolder, `./${fileName}`);
   const {path, size, name, hash} = file;
-  await fsPromise.rename(path, realPath);
+  await fsPromise.copyFile(path, realPath);
   const attachment = AM({
     _id: aid,
     toc,
@@ -146,7 +146,7 @@ schema.statics.saveHomeBigLogo = async file => {
   const fileName = `${aid}.${ext}`;
   const realPath = PATH.resolve(fileFolder, `./${fileName}`);
   const {path, size, name} = file;
-  await fsPromise.rename(path, realPath);
+  await fsPromise.copyFile(path, realPath);
   const attachment = AM({
     _id: aid,
     toc,
