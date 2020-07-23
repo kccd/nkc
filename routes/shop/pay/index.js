@@ -47,7 +47,7 @@ router
   .get('/alipay', async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     const {user, orders} = data;
-    let {money} = query;
+    let {money, redirect} = query;
     money = Number(money);
     const {checkNumber} = nkcModules.checkData;
     try{
@@ -87,6 +87,9 @@ router
         ordersId: ordersInfo.ordersId
       }
     });
+    if(redirect) {
+      return ctx.redirect(data.alipayUrl);
+    }
     await next();
   })
   .post('/', async (ctx, next) => {
