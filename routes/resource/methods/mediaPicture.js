@@ -61,13 +61,71 @@ module.exports = async (options) => {
       await fsPromise.copyFile(path, mediumPath);
     }
 
-    // 获取用户水印设置
-    const usersGeneral = await db.UsersGeneralModel.findOnly({uid: user.uid});
-    const waterSetting = usersGeneral? usersGeneral.waterSetting: {
-      waterAdd: true,
-      waterStyle: 'siteLogo',
-      waterGravity: 'southeast'
-    };
+    if(ext !== 'gif') {
+      // 获取用户水印设置
+      const usersGeneral = await db.UsersGeneralModel.findOnly({uid: user.uid});
+      const waterSetting = usersGeneral? usersGeneral.waterSetting: {
+        waterAdd: true,
+        waterStyle: 'siteLogo',
+        waterGravity: 'southeast'
+      };
+      let username = '';
+      const {websiteName} = await db.SettingModel.getSettings('server');
+      if(waterSetting.waterStyle === 'userLogo') {
+        username = user.username || websiteName;
+      } else if(waterSetting.waterStyle === 'coluLogo') {
+        const column = await db.ColumnModel.findOne({uid: user.uid});
+        if(column) {
+          username = column.name;
+        }
+      }
+      const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
+      const usernameWidth = usernameLength * 12;
+      const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
+      const waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
+      const watermarkSettings = await db.SettingModel.getWatermarkSettings();
+      let {siteLogoWidth, siteLogoHeight} = await imageMagick.waterInfo(waterSmallPath);
+      siteLogoWidth = parseInt(siteLogoWidth);
+      siteLogoHeight = parseInt(siteLogoHeight);
+
+      const positions = {
+        // 正中心
+        center: [`-${parseInt(usernameWidth / 2 + 23)}+0`, `+0+0`],
+        southeast: [`+${parseInt(usernameWidth + 10)}+10`, `+10+${parseInt((siteLogoHeight - 24) / 2 + 10)}`],
+        southwest: [`+10+10`, `+${parseInt(siteLogoWidth + 10)}+${parseInt((siteLogoHeight - 24) / 2 + 10)}`],
+        northeast: [`+${parseInt(usernameWidth+10)}+10`, `+10+${parseInt((siteLogoHeight - 24) / 2 + 10)}`],
+        northwest: [`+10+10`, `+${parseInt(siteLogoWidth+10)}+${parseInt((siteLogoHeight - 24) / 2 + 10)}`],
+      };
+      const [logoCoor, userCoor] = positions[waterSetting.waterGravity] || [`+0+0`, `+0+0`];
+
+      // 如果图片宽度或尺寸达到限定值，则将图片压缩至1920
+      if(size > 500000 || width > 1920) {
+        await imageMagick.imageNarrow(path);
+      }
+
+      if(
+        width >= watermarkSettings.minWidth &&
+        height >= watermarkSettings.minHeight &&
+        watermarkSettings.enabled &&
+        waterSetting.waterAdd
+      ) {
+        if(waterSetting.waterStyle === 'siteLogo') {
+          await imageMagick.watermarkify(watermarkSettings.transparency, waterSetting.waterGravity, waterBigPath, path);
+        } else {
+          await imageMagick.watermarkifyLogo(watermarkSettings.transparency, logoCoor, waterSetting.waterGravity, waterSmallPath, path);
+          await imageMagick.watermarkifyFont(userCoor, username, waterSetting.waterGravity, path);
+        }
+      }
+    }
+    await fsPromise.copyFile(path, normalPath);
+    const pictureInfo = await imageMagick.info(normalPath);
+    const newHeight = pictureInfo.height;
+    const newWidth = pictureInfo.width;
+    await resource.update({
+      width: newWidth,
+      height: newHeight,
+      originId,
+      state: 'usable'
+    });
   }
-  // await fsPromise.copyFile(path)
 };
