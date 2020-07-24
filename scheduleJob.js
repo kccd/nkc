@@ -3,6 +3,7 @@ const moment = require('moment');
 const {spawn} = require('child_process');
 const {fork} = require("child_process");
 const fs = require('fs');
+const fsPromise = fs.promises;
 const path = require('path');
 const mongodb = require('./config/mongodb');
 require('colors');
@@ -320,5 +321,30 @@ jobs.cacheUserSubscribes = () => {
     }
   });
 };
+
+
+/*
+* 清理文件上传缓存 24小时以前的缓存
+* */
+jobs.clearFileCache = async () => {
+  const {uploadDir} = require('./settings/upload');
+  scheduleJob("0 0 4 * * *", async () => {
+    console.log(`正在清理文件缓存...`);
+    let count = 0;
+    const time = Date.now() - 24*60*60*1000;
+    const dir = await fsPromise.readdir(uploadDir);
+    for(const d of dir) {
+      const filePath = path.resolve(uploadDir, `./${d}`);
+      if(filePath.indexOf('upload_') !== 0) return;
+      const state = await fsPromise.stat(filePath);
+      if(!state.isFile()) continue;
+      const fileTime = (new Date(state.mtime)).getTime();
+      if(fileTime > time) continue;
+      await fsPromise.unlink(filePath);
+      count ++;
+    }
+    console.log(`文件缓存清理完成，共清理文件${count}个`);
+  });
+}
 
 module.exports = jobs;
