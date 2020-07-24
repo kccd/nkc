@@ -83,6 +83,9 @@ var app = new Vue({
     pay: function() {
       const {totalPrice, payment, finalPrice} = this;
       let newWindow;
+      let redirect = false;
+      const isPhone = NKC.methods.isPhone();
+      let url = `/account/finance/recharge?type=get_url&money=${totalPrice}&score=${finalPrice}&payment=${payment}`;
       Promise.resolve()
         .then(() => {
           if(!['aliPay', 'weChat'].includes(payment)) throw '请选择支付方式';
@@ -91,11 +94,19 @@ var app = new Vue({
             throw '充值金额必须大于0';
           }
           if(NKC.configs.platform !== 'reactNative') {
-            newWindow = window.open();
+            if(isPhone) {
+              url += '&redirect=true';
+              screenTopAlert('正在前往支付宝...')
+              redirect = true;
+              return window.location.href = url;
+            } else {
+              newWindow = window.open();
+            }
           }
-          return nkcAPI(`/account/finance/recharge?type=get_url&money=${totalPrice}&score=${finalPrice}&payment=${payment}`, 'GET');
+          return nkcAPI(url, 'GET');
         })
         .then(data => {
+          if(redirect) return;
           if(NKC.configs.platform === 'reactNative') {
             NKC.methods.visitUrl(data.url, true);
           } else {

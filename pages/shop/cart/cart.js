@@ -97,14 +97,14 @@
           if(app.selectedId.indexOf(cartId[i]) === -1) {
             app.selectedId.push(cartId[i]);
           }
-        } 
+        }
       } else {
         for(var i = 0 ; i < cartId.length; i++) {
           var index = app.selectedId.indexOf(cartId[i]);
           if(index !== -1) {
             app.selectedId.splice(index, 1);
           }
-        } 
+        }
       }
     }
   }
@@ -126,7 +126,10 @@ function selectAll(cartId) {
   }
   showButton()
 }
-function getNumber(str, fractionDigits = 0) {
+function getNumber(str, fractionDigits) {
+  if(fractionDigits === undefined) {
+    fractionDigits = 0;
+  }
   str = str + "";
   str = str.replace("￥", "");
   str = parseFloat(str);

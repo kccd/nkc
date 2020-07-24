@@ -61,13 +61,21 @@ const app = new Vue({
     useAliPay() {
       const {ordersId, aliPay} = this;
       const {totalPrice, feePrice} = aliPay;
+      let url = `/shop/pay/alipay?ordersId=${ordersId}&money=${totalPrice}`;
+      const isPhone = NKC.methods.isPhone();
       let newWindow;
       if(NKC.configs.platform !== 'reactNative') {
-        newWindow = window.open();
+        if(isPhone) {
+          url += '&redirect=true';
+          screenTopAlert('正在前往支付宝...');
+          return window.location.href = url;
+        } else {
+          newWindow = window.open();
+        }
       }
       Promise.resolve()
         .then(() => {
-          return nkcAPI(`/shop/pay/alipay?ordersId=${ordersId}&money=${totalPrice}`, 'GET')
+          return nkcAPI(url, 'GET')
             .then(data => {
               if(NKC.configs.platform === 'reactNative') {
                 NKC.methods.visitUrl(data.alipayUrl, true);
