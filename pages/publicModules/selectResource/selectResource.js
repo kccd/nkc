@@ -85,6 +85,7 @@ NKC.modules.SelectResource = function() {
       }
     },
     methods: {
+      getUrl: NKC.methods.tools.getUrl,
       cancelCropPicture: function() {
         this.resetCropper();
         this.changePageType("list");
