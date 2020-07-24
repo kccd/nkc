@@ -68,9 +68,11 @@ block body
   if data.user
     script!=`NKC.configs.uid="${data.user.uid}";`
     script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
+    +includeJS('/socket.io-client/dist/socket.io.js')
+    //- 通用socket
+    +includeJS('/socket/commonSocket.js')
     if !state.isApp
       //- 接入即时通信
-      +includeJS('/socket.io-client/dist/socket.io.js')
       +includeJS('/message/socket.js')
 
     //- 新增好评

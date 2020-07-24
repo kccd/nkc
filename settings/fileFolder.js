@@ -27,6 +27,8 @@ module.exports = {
   messageImage: './message/image',
   // 聊天中的音频文件
   messageVoice: './message/voice',
+  // 聊天中的附件
+  messageFiles: './message/files',
 
   // 上传附件 图片
   mediaPicture: './resource/picture',

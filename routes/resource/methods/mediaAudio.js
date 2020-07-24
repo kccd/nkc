@@ -12,7 +12,7 @@ module.exports = async (options) => {
   let {path} = file;
   let {rid, toc, ext} = resource;
   // 音频文件目录
-  let mediaAudio = await FILE.getPath("mediaVideo", toc);
+  let mediaAudio = await FILE.getPath("mediaAudio", toc);
   // 输出音频路径
   const outputVideoPath = Path.resolve(mediaAudio, `./${rid}.mp3`);
   // 获取文件格式 extension

@@ -1,5 +1,6 @@
 const PATH = require('path');
 const Router = require('koa-router');
+const FILE = require('../../nkcModules/file');
 const frameRouter = new Router();
 frameRouter
   .get('/:_id', async (ctx, next) => {
@@ -10,7 +11,8 @@ frameRouter
     const {ext, path} = messageFile;
     let rePath = path.replace(_id+"."+ext, _id+"-frame.jpg");
     // let path = "/2019/08/262-frame.jpg";
-    let filePath = PATH.join(settings.upload.messageVideoFramePath, rePath);
+    let saveDir = await FILE.getPath("messageVideo", messageFile.toc);
+    let filePath = `${saveDir}/${messageFile._id}-frame.jpg`;
     try {
       await fs.access(filePath);
     } catch(err) {
