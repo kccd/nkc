@@ -10,7 +10,7 @@ const fsPromise = require('fs').promises;
 const db = require('../../../dataModels');
 module.exports = async (options) => {
   const {file, resource, user, pictureType} = options;
-  const {path, name, size, hash} = file;
+  const {path, size} = file;
   const {rid, toc, ext} = resource;
   if(pictureType === 'sticker') {
     // 表情上传
@@ -79,6 +79,8 @@ module.exports = async (options) => {
           username = column.name;
         }
       }
+
+      // 计算名称长度
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
       const usernameWidth = usernameLength * 12;
       const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
@@ -88,6 +90,7 @@ module.exports = async (options) => {
       siteLogoWidth = parseInt(siteLogoWidth);
       siteLogoHeight = parseInt(siteLogoHeight);
 
+      // 计算水印位置
       const positions = {
         // 正中心
         center: [`-${parseInt(usernameWidth / 2 + 23)}+0`, `+0+0`],
@@ -103,6 +106,7 @@ module.exports = async (options) => {
         await imageMagick.imageNarrow(path);
       }
 
+      // 打水印
       if(
         width >= watermarkSettings.minWidth &&
         height >= watermarkSettings.minHeight &&
@@ -117,7 +121,11 @@ module.exports = async (options) => {
         }
       }
     }
+
+    // 移动文件
     await fsPromise.copyFile(path, normalPath);
+
+    // 获取裁剪后图片的宽高
     const pictureInfo = await imageMagick.info(normalPath);
     const newHeight = pictureInfo.height;
     const newWidth = pictureInfo.width;

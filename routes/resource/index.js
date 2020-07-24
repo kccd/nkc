@@ -338,12 +338,17 @@ resourceRouter
     ctx.data.r = await r.save();
 
     setImmediate(async () => {
-      await mediaMethods[mediaType]({
-        file,
-        user,
-        resource: r,
-        pictureType: resourceType,
-      });
+      try{
+        await mediaMethods[mediaType]({
+          file,
+          user,
+          resource: r,
+          pictureType: resourceType,
+        });
+      } catch(err) {
+        console.log(err);
+        await r.update({state: 'useless'});
+      }
     });
 
     // 通知前端转换完成了

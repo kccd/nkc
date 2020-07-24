@@ -6,24 +6,17 @@ const PATH = require("path");
 RoRouter
   .get('/:originId', async (ctx, next) => {
     const {originId} = ctx.params;
-    const {db, fs} = ctx;
+    const {db, fs, settings, nkcModules} = ctx;
     const targetResource = await db.OriginImageModel.findOnly({originId});
     const extension = targetResource.ext;
-    const extArr = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'];
-    let url;
-    if(extArr.includes(extension.toLowerCase()) && targetResource.tpath) {
-      const fileFolder = await db.ResourceModel.getMediaPath('mediaOrigin', targetResource.toc);
-      url = PATH.resolve(fileFolder, `./${targetResource.originId}.${targetResource.ext}`);
-      try{
-        await fs.access(url);
-      } catch (e) {
-        url = defaultOriginPath;
-      }
-    } else {
+    const fileFolder = await nkcModules.file.getPath('mediaOrigin', targetResource.toc);
+    let url = PATH.resolve(fileFolder, `./${targetResource.originId}.${extension}`);
+    try{
+      await fs.access(url);
+    } catch (e) {
       url = defaultOriginPath;
     }
     ctx.filePath = url;
-    ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
     ctx.type = extension;
     await next();
   });
