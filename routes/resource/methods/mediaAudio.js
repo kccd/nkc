@@ -3,20 +3,20 @@
 * @param {Object} resource
 * */
 
-const SettingModel = require('../../../dataModels/SettingModel');
 const FILE = require('../../../nkcModules/file');
 const fsPromise = require('fs').promises;
+const Path = require("path");
 
-module.exports = async (file, resource, user) => {
-  let {path, hash} = file;
-  let {rid} = resource;
-  let {uid} = user;
+module.exports = async (options) => {
+  let {file, resource} = options;
+  let {path} = file;
+  let {rid, toc, ext} = resource;
   // 音频文件目录
-  let mediaAudio = await FILE.getPath("mediaVideo", Date.now());
+  let mediaAudio = await FILE.getPath("mediaVideo", toc);
   // 输出音频路径
-  const outputVideoPath = `${mediaAudio}/${rid}.mp3`;
+  const outputVideoPath = Path.resolve(mediaAudio, `./${rid}.mp3`);
   // 获取文件格式 extension
-  let extension = await FILE.getFileExtension(file);
+  let extension = ext;
 
   if(['wav'].indexOf(extension.toLowerCase()) > -1) {
     await ffmpeg.audioWAVTransMP3(path, outputVideoPath);
@@ -32,7 +32,4 @@ module.exports = async (file, resource, user) => {
   await resource.update({
     state: 'usable'
   })
-
-  // 发送消息给前端(转换完毕了)
-  global.NKC.io.of('/common').to(`user/${uid}`).send({fileId: hash, state: "audioProcessFinish"});
 }

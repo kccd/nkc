@@ -338,12 +338,20 @@ resourceRouter
     ctx.data.r = await r.save();
 
     setImmediate(async () => {
-      await mediaMethods[mediaType](file, r, user);
+      try{
+        await mediaMethods[mediaType]({
+          file,
+          user,
+          resource: r,
+          pictureType: resourceType,
+        });
+        // 通知前端转换完成了
+        global.NKC.io.of('/common').to(`user/${user.uid}`).send({rid: r.rid, state: "fileProcessFinish"});
+      } catch(err) {
+        console.log(err);
+        await r.update({state: 'useless'});
+      }
     });
-
-    // 通知前端转换完成了
-    // global.NKC.io.of('/common').to(`user/${user.uid}`).send({fileId, state: "complete"});
-    // noticeRouter.sendCompleteToUser(user.uid, taskId);
   })
   .post('/1', async (ctx, next) => {
     const {fs, fsPromise, tools, settings, db, data, nkcModules} = ctx;

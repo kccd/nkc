@@ -85,6 +85,7 @@ NKC.modules.SelectResource = function() {
       }
     },
     methods: {
+      getUrl: NKC.methods.tools.getUrl,
       cancelCropPicture: function() {
         this.resetCropper();
         this.changePageType("list");
@@ -290,7 +291,6 @@ NKC.modules.SelectResource = function() {
               // 后端找不到相同md5的文件（仅针对附件），则将本地文件上传
               var formData = new FormData();
               formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
-              formData.append("fileId", fileId);
               return nkcUploadFile("/r", "POST", formData, function(e, progress) {
                 f.progress = progress;
               }, 60 * 60 * 1000);
@@ -426,8 +426,8 @@ NKC.modules.SelectResource = function() {
 
   // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
   commonSocket.on("message", function(data) {
-    if(data.state === "videoProcessFinish" || data.state === "audioProcessFinish") {
-      console.log("视频处理完成");
+    if(data.state === "fileProcessFinish") {
+      console.log("文件处理完成");
       self.app.category = "all";
       self.app.getResources(0);
     }

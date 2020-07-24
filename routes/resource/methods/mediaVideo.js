@@ -6,21 +6,23 @@ const FILE = require('../../../nkcModules/file');
 const {AttachmentModel, ColumnModel, SettingModel} = require("../../../dataModels");
 const imageMagick = require("../../../tools/imageMagick");
 const ffmpeg = require("../../../tools/ffmpeg");
+const Path = require('path');
 
-module.exports = async (file, resource, user) => {
-  let { name, size, path, hash} = file;
-  let {rid} = resource;
-  let {generalSettings, uid} = user;
+module.exports = async (options) => {
+  let {file, resource, user} = options;
+  let {path} = file;
+  let {rid, toc, ext} = resource;
+  let {generalSettings} = user;
   let {waterSetting} = generalSettings;
 
   // 视频文件目录
-  let videoDir = await FILE.getPath("mediaVideo", Date.now());
+  let videoDir = await FILE.getPath("mediaVideo", toc);
   // 输出视频路径
-  let outputVideoPath = `${videoDir}/${rid}.mp4`;
+  let outputVideoPath = Path.resolve(videoDir, `./${rid}.mp4`);
   // 视频封面图路径
-  let videoCoverPath = `${videoDir}/${rid}_cover.jpg`;
+  let videoCoverPath = Path.resolve(videoDir, `./${rid}_cover.jpg`);
   // 获取文件格式 extension
-  let extension = await FILE.getFileExtension(file);
+  let extension = ext;
 
   const watermarkSettings = await SettingModel.getWatermarkSettings();
   let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
@@ -238,7 +240,4 @@ module.exports = async (file, resource, user) => {
     height,
     width,
   })
-
-  // 发送消息给前端(转换完毕了)
-  global.NKC.io.of('/common').to(`user/${uid}`).send({fileId: hash, state: "videoProcessFinish"});
 }

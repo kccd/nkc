@@ -70,6 +70,9 @@ var Tools = function() {
         }
         return "/p/" + id;
       }
+      case 'mediaPicture': {
+        return "/r/" + id + t;
+      }
       // 用户上传的附件
       case "resource": {
         return "/r/" + id
