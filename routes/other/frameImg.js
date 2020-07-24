@@ -5,6 +5,7 @@ const path = require('path');
 const {upload, statics, cache} = require('../../settings');
 const {frameImgPath, uploadPath} = upload;
 const {defaultVideoCoverPath} = statics;
+const FILE = require('../../nkcModules/file');
 
 router
   .get('/', async (ctx, next) => {
@@ -12,19 +13,23 @@ router
     await next()
   })
   .get('/:tid', async (ctx, next) => {
+    const {db} = ctx;
     const {tid} = ctx.params;
     const {fs} = ctx;
-    let url = `${frameImgPath}/${tid}.jpg`;
+    let rid = tid;
+    const resource = await db.ResourceModel.findOnly({rid, type: "resource"});
+    let dir = await FILE.getPath("mediaVideo", resource.toc);
+    let filePath = `${dir}/${rid}_cover.jpg`;
     try {
-      stat = await fs.stat(url);
+      stat = await fs.stat(filePath);
     } catch(e) {
-      url = defaultVideoCoverPath;
+      filePath = defaultVideoCoverPath;
     } finally {
-      ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
       ctx.type = 'jpg';
-      ctx.filePath = url
+      ctx.filePath = filePath
     }
     await next()
+    ctx.set('Cache-Control', 'no-cache');
   });
 
 module.exports = router;

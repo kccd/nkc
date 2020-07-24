@@ -423,6 +423,16 @@ NKC.modules.SelectResource = function() {
       }
     }
   });
+
+  // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
+  commonSocket.on("message", function(data) {
+    if(data.state === "videoProcessFinish" || data.state === "audioProcessFinish") {
+      console.log("视频处理完成");
+      self.app.category = "all";
+      self.app.getResources(0);
+    }
+  })
+
   self.open = self.app.open;
   self.close = self.app.close;
 };
