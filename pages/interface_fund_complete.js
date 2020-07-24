@@ -336,16 +336,33 @@ function refund(money) {
 		type: 'refund',
 		actualMoney: actualMoney
 	};
-	var newWindow = window.open();
-	nkcAPI('/fund/donation', 'POST', obj)
+	var newWindow;
+	var isPhone = NKC.methods.isPhone();
+	var url = '/fund/donation?getUrl=true&fundId=' + obj.fundId + '&money=' + obj.money + '&type=' + obj.type + '&actualMoney=' + obj.actualMoney;
+	if(NKC.configs.platform !== 'reactNative') {
+		if(isPhone) {
+			url += '&redirect=true';
+			screenTopAlert("正在前往支付宝...");
+			return window.location.href = url;
+		} else {
+			newWindow = window.open();
+		}
+	}
+	nkcAPI(url, 'GET')
 		.then(function(data) {
-			newWindow.location = data.url;
-			$('#donation-mask').removeClass('hidden');
+			if(NKC.configs.platform === 'reactNative') {
+				NKC.methods.visitUrl(data.url, true);
+			} else {
+				newWindow.location = data.url;
+			}
+			sweetInfo('请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。');
 		})
 		.catch(function(data) {
-			newWindow.location = '/fund/donation?error='+data.error;
-			screenTopWarning(data.error);
-		})
+			sweetError(data);
+			if(newWindow) {
+				newWindow.document.body.innerHTML = data.error || data;
+			}
+		});
 }
 
 function disappearMask(){

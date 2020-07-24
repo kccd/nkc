@@ -847,3 +847,11 @@ NKC.methods.removeUserFromBlacklist = function(tUid) {
     })
     .catch(sweetError);
 }
+
+/*
+* 判断是否为手机浏览器
+* @return {Boolean}
+* */
+NKC.methods.isPhone = function() {
+  return /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
+}

@@ -101,4 +101,32 @@ func.updateRecommendThreads = async () => {
   await func.updateMovableRecommendThreads();
 }
 
+
+/*
+* 修改resource上传状态，修改两小时之前上传且状态任然处于【正在上传】的文件的状态为【上传失败】。
+* */
+func.clearResourceState = async() => {
+  setTimeout(async () => {
+    try{
+      console.log(`正在处理异常资源上传状态...`);
+      const time = Date.now() - 2*60*60*1000;
+      await db.ResourceModel.updateMany({
+        toc: {$lte: time},
+        state: 'inProcess'
+      }, {
+        $set: {
+          state: 'useless'
+        }
+      });
+    } catch(err) {
+      if(global.NKC.NODE_ENV !== 'production') {
+        console.log(err);
+      }
+    } finally {
+      console.log(`异常资源上传状态处理完成`);
+      await func.clearResourceState();
+    }
+  }, 60*60*1000);
+}
+
 module.exports = func;

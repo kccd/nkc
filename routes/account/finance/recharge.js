@@ -12,6 +12,7 @@ router
       money, // 需要支付的金额
       payment,
       score, // 充值所得积分
+      redirect,
     } = query;
     money = Number(money);
     if(type === 'get_url') {
@@ -42,6 +43,9 @@ router
           type: 'recharge'
         }
       });
+      if(redirect) {
+        return ctx.redirect(data.url);
+      }
     } else if(type === 'back') {
       let backParams = query.extra_common_param;
       backParams = JSON.parse(backParams);

@@ -57,15 +57,37 @@ function submit() {
 		$('#submit').removeClass('disabled').attr('onclick', fn);
 		return screenTopWarning('非匿名赞助要求用户必须登录，请登录后再试。');
 	}
-	var newWindow = window.open();
-	nkcAPI('/fund/donation', 'POST', obj)
+
+	var url = '/fund/donation?getUrl=true&money=' + obj.money + '&anonymous=' + obj.anonymous;
+	var isPhone = NKC.methods.isPhone();
+	var newWindow;
+
+	if(NKC.configs.platform !== 'reactNative') {
+		if(isPhone) {
+			url += '&redirect=true';
+			screenTopAlert('正在前往支付宝...');
+			return window.location.href = url;
+		} else {
+			newWindow = window.open();
+		}
+	}
+
+	nkcAPI(url, 'GET')
 		.then(function(data) {
-			newWindow.location = data.url;
-			$('#donation-mask').removeClass('hidden');
-			$('#submit').removeClass('disabled').attr('onclick', fn);
+			if(NKC.configs.platform === 'reactNative') {
+				NKC.methods.visitUrl(data.url, true);
+			} else {
+				newWindow.location = data.url;
+			}
+			sweetInfo('请在浏览器新打开的窗口完成支付！若没有新窗口打开，请检查新窗口是否已被浏览器拦截。');
+			// $('#donation-mask').removeClass('hidden');
+			// $('#submit').removeClass('disabled').attr('onclick', fn);
 		})
 		.catch(function(data) {
-			newWindow.location = '/fund/donation?error='+data.error;
+			if(newWindow) {
+				newWindow.document.body.innerHTML = data.error || data;
+			}
+			sweetError(data);
 			$('#submit').removeClass('disabled').attr('onclick', fn);
 		})
 }

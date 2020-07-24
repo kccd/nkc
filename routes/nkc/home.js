@@ -62,11 +62,10 @@ router
     await next();
   })
   .post("/", async (ctx, next) => {
-    const {nkcModules, body, data} = ctx;
+    const {body, data, db} = ctx;
     const {topType} = body.fields;
     const {cover} = body.files;
-    await nkcModules.file.saveHomeAdCover(cover, topType);
-    data.coverHash = cover.hash;
+    data.coverHash = await db.AttachmentModel.saveRecommendThreadCover(cover, topType);
     await next();
   })
   .put("/", async (ctx, next) => {

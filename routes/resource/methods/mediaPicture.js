@@ -12,18 +12,19 @@ module.exports = async (options) => {
   const {file, resource, user, pictureType} = options;
   const {path, size} = file;
   const {rid, toc, ext} = resource;
+  // 构建文件目标目录
+  const fileFolder = await FILE.getPath('mediaPicture', toc);
+  const normalPath = PATH.resolve(fileFolder, `./${rid}.${ext}`);
+  let originId;
   if(pictureType === 'sticker') {
     // 表情上传
     await imageMagick.stickerify(path);
   } else {
     // 普通图片上传
 
-    // 构建文件目标目录
-    const fileFolder = await FILE.getPath('mediaPicture', toc);
     const thumbnailPath = PATH.resolve(fileFolder, `./${rid}_sm.${ext}`);
     const mediumPath = PATH.resolve(fileFolder, `./${rid}_md.${ext}`);
-    const normalPath = PATH.resolve(fileFolder, `./${rid}.${ext}`);
-    const originId = await db.SettingModel.operateSystemID('originImg', 1);
+    originId = await db.SettingModel.operateSystemID('originImg', 1);
     const originFolder = await FILE.getPath('mediaOrigin', toc);
     const originPath = PATH.resolve(originFolder, `./${originId}.${ext}`);
 
@@ -105,7 +106,6 @@ module.exports = async (options) => {
       if(size > 500000 || width > 1920) {
         await imageMagick.imageNarrow(path);
       }
-
       // 打水印
       if(
         width >= watermarkSettings.minWidth &&
@@ -121,19 +121,18 @@ module.exports = async (options) => {
         }
       }
     }
-
-    // 移动文件
-    await fsPromise.copyFile(path, normalPath);
-
-    // 获取裁剪后图片的宽高
-    const pictureInfo = await imageMagick.info(normalPath);
-    const newHeight = pictureInfo.height;
-    const newWidth = pictureInfo.width;
-    await resource.update({
-      width: newWidth,
-      height: newHeight,
-      originId,
-      state: 'usable'
-    });
   }
+  // 移动文件
+  await fsPromise.copyFile(path, normalPath);
+
+  // 获取裁剪后图片的宽高
+  const pictureInfo = await imageMagick.info(normalPath);
+  const newHeight = pictureInfo.height;
+  const newWidth = pictureInfo.width;
+  await resource.update({
+    width: newWidth,
+    height: newHeight,
+    originId,
+    state: 'usable'
+  });
 };
