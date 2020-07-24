@@ -13,12 +13,10 @@ for(let i = 0; i < data.ads.fixed.length; i++) {
   modifyAd(ad, "fixed");
 }
 
-console.log(data);
-
 const app = new Vue({
   el: "#app",
   data: {
-    page: {id: 'movable', name: '轮播图'},
+    page: {id: 'other', name: '其他'},
     recommendThreads: data.recommendThreads,
     ads: data.ads,
     recommendForums: data.recommendForums,
@@ -97,7 +95,7 @@ const app = new Vue({
     saveRecommendThreads() {
       const {page} = this;
       const options = this.recommendThreads[page.id];
-      nkcAPI(`/nkc/home`, 'PATCH', {
+      nkcAPI(`/nkc/home`, 'PUT', {
         operation: 'saveRecommendThreads',
         type: page.id,
         options
@@ -112,7 +110,7 @@ const app = new Vue({
       this.updating = true;
       const pageId = page.id;
       const self = this;
-      nkcAPI('/nkc/home', 'PATCH', {
+      nkcAPI('/nkc/home', 'PUT', {
         operation: 'updateThreadList',
         type: pageId
       })
@@ -141,6 +139,7 @@ const app = new Vue({
         nkcUploadFile("/nkc/home", "POST", formData)
           .then(data => {
             ad.cover = data.coverHash;
+            console.log(ad.cover);
           })
           .catch(sweetError);
         SelectImage.close();
@@ -285,7 +284,7 @@ const app = new Vue({
     },
     saveOriginalThreadDisplayMode() {
       const originalThreadDisplayMode = this.originalThreadDisplayMode;
-      nkcAPI("/nkc/home", "PATCH", {
+      nkcAPI("/nkc/home", "PUT", {
         operation: "saveOriginalThreadDisplayMode",
         originalThreadDisplayMode
       })
