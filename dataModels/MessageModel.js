@@ -124,7 +124,7 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
     uid,
     reviewed: true,
     disabled: false,
-    recycleMark: false,
+    recycleMark: {$ne: true},
     mainForumsId: {$ne: "recycle"}
   });
   if(userThreadCount < threadCount) throwErr(403, mandatoryLimitInfo);
