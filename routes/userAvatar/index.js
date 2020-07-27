@@ -1,6 +1,10 @@
 const Router = require("koa-router");
 const router = new Router();
 router
+  .get("/:id", async (ctx) => {
+    const {id} = ctx.params;
+    return ctx.redirect(ctx.nkcModules.tools.getUrl('userAvatar', id));
+  })
   .post("/:uid", async (ctx, next) => {
     const {nkcModules, data, params, body} = ctx;
     const {uid} = params;

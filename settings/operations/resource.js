@@ -1,6 +1,7 @@
 module.exports = {
 	avatar: {// 用户头像
 		PARAMETER: {
+			GET: "getUserAvatar",
 			POST: 'uploadUserAvatar'
 		}
 	},
@@ -27,7 +28,7 @@ module.exports = {
 		}
 	},*/
 	r: {// 资源
-    POST: 'uploadResources',                                   
+    POST: 'uploadResources',
     // GET: "getUploadSettings",
 		PARAMETER: {
 			GET: 'getResources',
