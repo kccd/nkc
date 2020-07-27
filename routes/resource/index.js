@@ -311,7 +311,7 @@ resourceRouter
     }
 
     const resourceType = mediaType === 'mediaPicture' && type === 'sticker'? 'sticker': 'resource';
-    const r = new ctx.db.ResourceModel({
+    const r = ctx.db.ResourceModel({
       rid,
       type: resourceType,
       oname: name,
@@ -335,7 +335,8 @@ resourceRouter
         share: !!share
       });
     }
-    ctx.data.r = await r.save();
+    await r.save();
+    ctx.data.r = r;
 
     setImmediate(async () => {
       try{
@@ -352,6 +353,7 @@ resourceRouter
         await r.update({state: 'useless'});
       }
     });
+    await next();
   })
   .post('/1', async (ctx, next) => {
     const {fs, fsPromise, tools, settings, db, data, nkcModules} = ctx;
