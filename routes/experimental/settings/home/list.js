@@ -17,7 +17,7 @@ router
   })
   .put('/', async (ctx, next) => {
     const {db, body} = ctx;
-    const {topic, discipline, visitorThreadList, hotThreads, recommend} = body;
+    const {topic, discipline, visitorThreadList, hotThreads, recommend, subscribesDisplayMode} = body;
     if(!["home", "latest"].includes(visitorThreadList)) ctx.throw(400, `参数visitorThreadList错误：${visitorThreadList}`);
     const {postCount, postUserCount} = hotThreads;
     if(postCount < 0) ctx.throw(400, "热门文章最小回复数不能小于0");
@@ -31,7 +31,8 @@ router
         'c.list.discipline': !!discipline,
         'c.visitorThreadList': visitorThreadList,
         'c.hotThreads': hotThreads,
-        'c.recommend': recommend
+        'c.recommend': recommend,
+        'c.subscribesDisplayMode': subscribesDisplayMode
       }
     });
     await db.SettingModel.saveSettingsToRedis("home");

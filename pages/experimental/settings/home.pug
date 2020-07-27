@@ -89,6 +89,16 @@ block eContent
                   button.btn.btn-primary(@click="pickPicture" :disabled="logoFileUploadding") {{logoFileUploadding? '上传中...' : '选取图片'}}
                   input#inputFile.hidden(type="file" multiple accept="image/*" @change="addFile")
                 .form-group
+                  h4.setting-block-title “关注的专业”显示方式
+                  .radioBox
+                    label
+                      input(type='radio' value="row" v-model="homeSettings.subscribesDisplayMode")
+                      span 横排专业头像
+                    br
+                    label
+                      input(type='radio' value="column" v-model="homeSettings.subscribesDisplayMode")
+                      span 竖排专业头像加三条最新文章
+                .form-group
                   h5.text-danger(v-if="error") {{error}}
                   h5.text-success(v-if="info") {{info}}
                   button.btn.btn-primary(@click="save") 保存
