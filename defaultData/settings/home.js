@@ -56,40 +56,6 @@ module.exports = {
       fixed: [], // 手动 固定
       fixedOrder: "random",
       movableOrder: "random",
-      automaticFixed: {
-        data: [],
-        count: 0,
-        status: false,
-        proportion: 0,
-        timeOfPost: { // 发表时间范围
-          min: 1, // 最小时间
-          max: 365 // 最大时间
-        },
-        digest: false, // 是否必须精选
-        postVoteUpMinCount: 0, // 内容最小点赞数
-        postVoteDownMaxCount: 99999, // 内容最大点踩数
-        threadVoteUpMinCount: 0, // 内容+回复总体最小点赞数
-        reportedAndUnReviewed: false, // 是否推送被举报且未被处理的文章
-        original: false, // 是否必须为原创
-        flowControl: false, // 是否推送收流量控制的文章
-      },
-      automaticMovable: {
-        data: [],
-        count: 0,
-        status: false,
-        proportion: 0,
-        timeOfPost: { // 发表时间范围
-          min: 1, // 最小时间
-          max: 365 // 最大时间
-        },
-        digest: false, // 是否必须精选
-        postVoteUpMinCount: 0, // 内容最小点赞数
-        postVoteDownMaxCount: 99999, // 内容最大点踩数
-        threadVoteUpMinCount: 0, // 内容+回复总体最小点赞数
-        reportedAndUnReviewed: false, // 是否推送被举报且未被处理的文章
-        original: false, // 是否必须为原创
-        flowControl: false, // 是否推送收流量控制的文章
-      },
     },
     toppedThreadsId: [],
     recommendForumsId: [],
