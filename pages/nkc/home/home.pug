@@ -58,6 +58,14 @@ block nkcContent
                 span 最大：
                 input.form-control(type='text' v-model.number='recommendThreads[page.id].timeOfPost.max')
             .form-group.form-inline
+              label.col-sm-3.control-label 文章回复数量
+              .col-sm-9
+                span 最小：
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].countOfPost.min')
+                .m-t-05
+                span 最大：
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].countOfPost.max')
+            .form-group.form-inline
               label.col-sm-3.control-label 最小点赞数
               .col-sm-9
                 input.form-control(type='text' v-model.number='recommendThreads[page.id].postVoteUpMinCount')
@@ -120,7 +128,7 @@ block nkcContent
           .row
             .col-xs-12(:class="page.id === 'movable'? 'col-md-6': 'col-md-3'" v-for=`t, index in recommendThreads[page.id].${listName}`)
               .recommend-thread
-                .title {{t.title}}
+                a(:href='"/t/" + t.tid' target='_blank').title {{t.title}}
                 .btn-close(@click=`removeFromArr(recommendThreads[page.id].${listName}, index)` title='移除')
                   .fa.fa-trash
                 .btn-move

@@ -132,8 +132,19 @@ router
         min: 0,
         fractionDigits: 2
       });
+      checkNumber(options.countOfPost.min, {
+        name: '文章最小回复数量',
+        min: 0
+      });
+      checkNumber(options.countOfPost.max, {
+        name: '文章最大回复数量',
+        min: 0
+      });
       if(options.timeOfPost.min >= options.timeOfPost.max) {
         ctx.throw(400, '文章发表时间设置不正确');
+      }
+      if(options.countOfPost.min >= options.countOfPost.max) {
+        ctx.throw(400, '文章回复数量设置不正确');
       }
       checkNumber(options.postVoteUpMinCount, {
         name: '最小点赞数',
