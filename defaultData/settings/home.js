@@ -10,8 +10,12 @@ module.exports = {
         automaticProportion: 1, // 当现实方式为「混合」时，自动推荐的文章所占的比例
         automaticCount: 20, // 自动选择推荐文章的数量
         timeOfPost: { // 文章的发表时间限制
-          min: 1, // 距离当前最短一天
+          min: 0, // 距离当前最短一天
           max: 365 // 距离当前最长365天
+        },
+        countOfPost: {
+          min: 0,
+          max: 30
         },
         timeInterval: 1, // 自动更新的间隔时间（小时）
         digest: false, // 文章是否必须是精选
@@ -30,8 +34,12 @@ module.exports = {
         automaticProportion: 1, // 当现实方式为「混合」时，自动推荐的文章所占的比例
         automaticCount: 20, // 自动选择推荐文章的数量
         timeOfPost: { // 文章的发表时间限制
-          min: 1, // 距离当前最短一天
+          min: 0, // 距离当前最短一天
           max: 365 // 距离当前最长365天
+        },
+        countOfPost: {
+          min: 0,
+          max: 30
         },
         timeInterval: 1, // 自动更新的间隔时间（小时）
         digest: false, // 文章是否必须是精选

@@ -517,6 +517,11 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.replyUserCount = userCount.length - 1;
   // 更新文章 统计数据
   await thread.update(updateObj);
+  await PostModel.updateOne({pid: oc.pid}, {
+    $set: {
+      threadPostCount: updateObj.count
+    }
+  });
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
   // 更新搜索引擎中帖子的专业信息
   await elasticSearch.updateThreadForums(thread);
@@ -1738,7 +1743,7 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
   if(!['fixed', 'movable'].includes(type)) throwErr(500, `推荐类型错误 type: ${type}`);
   // 去除自动推荐相关的条件
   const {
-    automaticCount,
+    automaticCount, countOfPost,
     timeOfPost, digest, postVoteUpMinCount, postVoteDownMaxCount,
     threadVoteUpMinCount, reportedAndUnReviewed, original, flowControl
   } = homeSettings.recommendThreads[type];
@@ -1752,6 +1757,11 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
       $gte: new Date(Date.now() - (timeOfPost.max * 24 * 60 * 60 * 1000)),
       $lte: new Date(Date.now() - (timeOfPost.min * 24 * 60 * 60 * 1000))
     },
+    threadPostCount: {
+      $gte: countOfPost.min,
+      $lte: countOfPost.max
+    },
+    voteUpTotal: {$gte: threadVoteUpMinCount},
     digest,
     voteUp: {$gte: postVoteUpMinCount},
     voteDown: {$lte: postVoteDownMaxCount},

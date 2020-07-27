@@ -85,6 +85,12 @@ const postSchema = new Schema({
     type: Number,
     default: 0
   },
+  // 作为文章内容时，文章下所有回复的数量，包含封禁的回复
+  threadPostCount: {
+    type: Number,
+    index: 1,
+    default: 0,
+  },
   // 标题
   t: {
     type: String,
@@ -163,12 +169,26 @@ const postSchema = new Schema({
   // 支持数
   voteUp: {
     type: Number,
+    index: 1,
     default: 0
+  },
+  // 支持数 包含回复，不包含评论
+  voteUpTotal: {
+    type: Number,
+    default: 0,
+    index: 1,
   },
   // 反对数
   voteDown: {
     type: Number,
+    index: 1,
     default: 0
+  },
+  // 反对数 包含回复，不包含评论
+  voteDownTotal: {
+    type: Number,
+    default: 0,
+    index: 1,
   },
   // 中文摘要
   abstractCn: {
@@ -901,19 +921,48 @@ postSchema.statics.extendPosts = async (posts, options) => {
 
 
 postSchema.methods.updatePostsVote = async function() {
+  const PostModel = mongoose.model('posts');
   const PostsVoteModel = mongoose.model('postsVotes');
-  const votes = await PostsVoteModel.find({pid: this.pid});
+
+  let postsId = [];
+
+  if(this.type === 'thread') {
+    const posts = await PostModel.find({tid: this.tid}, {pid: 1});
+    postsId = posts.map(post => post.pid);
+  } else {
+    postsId = [this.pid];
+  }
+
+  const votes = await PostsVoteModel.find({pid: {$in: postsId}});
+
   let upNum = 0, downNum = 0;
+  let upNumTotal = 0, downNumTotal = 0;
+
   for(const vote of votes) {
     if(vote.type === 'up') {
-      upNum += vote.num;
+      upNumTotal += vote.num;
+      if(vote.pid === this.pid) {
+        upNum += vote.num;
+      }
     } else {
-      downNum += vote.num;
+      downNumTotal += vote.num;
+      if(vote.pid === this.pid) {
+        downNum += vote.num;
+      }
     }
   }
   this.voteUp = upNum;
   this.voteDown = downNum;
-  await this.update({voteUp: upNum, voteDown: downNum});
+  this.voteUpTotal = upNumTotal;
+  this.voteDownTotal = downNumTotal;
+
+  await this.update({
+    voteUp: upNum,
+    voteDown: downNum,
+    voteUpTotal: upNumTotal,
+    voteDownTotal: downNumTotal
+  });
+
 };
 /*
   新建post
