@@ -80,6 +80,10 @@
 .recommend-thread .btn-upload:hover {
   background-color: #535353;
 }
+.recommend-thread .cover-container {
+  height: 16rem;
+  overflow: hidden;
+}
 .recommend-thread .cover {
   max-height: 16rem;
   overflow: hidden;

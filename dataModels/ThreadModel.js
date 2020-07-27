@@ -1769,7 +1769,7 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
   };
   // 是否必须为原创
   if(original) {
-    match.original = {$in: ['3', '4', '5', '6']};
+    match.originState = {$in: ['4', '5', '6']};
   }
   // 排除被举报但未被处理的文章
   if(!reportedAndUnReviewed) {
