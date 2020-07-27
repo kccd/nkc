@@ -84,6 +84,8 @@ module.exports = async (options) => {
   data.originalThreads = await db.ThreadModel.getOriginalThreads(fidOfCanGetThreads);
   // 最新原创文章显示模式
   data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
+  // “关注的专业”显示方式
+  data.subscribesDisplayMode = homeSettings.subscribesDisplayMode;
   // 含有最新回复的文章
   data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 10);
   // 专业导航

@@ -108,30 +108,32 @@ block content
               .header-name 关注的专业
               //.header-description 关注最新话题，足不出户便能游遍世界~
             .home-subscribes
-              for forum in data.subForums
-                .home-subscribe-forum-item
-                  .home-subscribe-forum-wrap
-                    a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
-                      .home-subscribe-forum-avatar
-                        if forum.logo
-                          img(src=tools.getUrl("forumLogo", forum.logo))
-                        else
-                          div(style=`background-color: ${forum.color}`)
-                      .home-subscribe-forum-info=forum.displayName
-                  .home-subscribe-forum-newthread
-                    if forum.latestThreads.length
-                      for thread in forum.latestThreads
-                        include ../publicModules/thread_panel/thread_panel_for_subscribe_forum
-                    else
-                      | 暂无新内容
-              //- for forum in data.subForums
-              //-   a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
-              //-     .home-subscribe-forum-avatar
-              //-       if forum.logo
-              //-         img(src=tools.getUrl("forumLogo", forum.logo))
-              //-       else
-              //-         div(style=`background-color: ${forum.color}`)
-              //-     .home-subscribe-forum-info=forum.displayName
+              if data.subscribesDisplayMode === "column"
+                for forum in data.subForums
+                  .home-subscribe-forum-item
+                    .home-subscribe-forum-wrap
+                      a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
+                        .home-subscribe-forum-avatar
+                          if forum.logo
+                            img(src=tools.getUrl("forumLogo", forum.logo))
+                          else
+                            div(style=`background-color: ${forum.color}`)
+                        .home-subscribe-forum-info=forum.displayName
+                    .home-subscribe-forum-newthread
+                      if forum.latestThreads.length
+                        for thread in forum.latestThreads
+                          include ../publicModules/thread_panel/thread_panel_for_subscribe_forum
+                      else
+                        | 暂无新内容
+              if data.subscribesDisplayMode === "row" || !data.subscribesDisplayMode
+                for forum in data.subForums
+                  a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
+                    .home-subscribe-forum-avatar
+                      if forum.logo
+                        img(src=tools.getUrl("forumLogo", forum.logo))
+                      else
+                        div(style=`background-color: ${forum.color}`)
+                    .home-subscribe-forum-info=forum.displayName
 
         if data.columns.length
           .home-forums-list.m-b-1
