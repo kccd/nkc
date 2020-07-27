@@ -517,6 +517,11 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.replyUserCount = userCount.length - 1;
   // 更新文章 统计数据
   await thread.update(updateObj);
+  await PostModel.updateOne({pid: oc.pid}, {
+    $set: {
+      threadPostCount: updateObj.count
+    }
+  });
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
   // 更新搜索引擎中帖子的专业信息
   await elasticSearch.updateThreadForums(thread);
@@ -1200,7 +1205,7 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
     type: "thread",
     originState: {$nin: ["0", "", "1", "2"]}
   }).sort({toc: -1}).limit(10);
-  const {getRandomNumber} = require("../nkcModules/apiFunction");
+  const {getRandomNumber$2: getRandomNumber} = require("../nkcModules/apiFunction");
   const numbers = getRandomNumber({
     min: 0,
     max: posts.length - 1,
@@ -1692,6 +1697,201 @@ threadSchema.methods.isModerator = async function(uid, type) {
     }
     return true;
   }
+};
+
+/*
+* 更新首页自动推荐数据
+* @author pengxiguaa 2020/7/15
+* */
+threadSchema.statics.updateAutomaticRecommendThreadsByType = async (type) => {
+  const ThreadModel = mongoose.model('threads');
+  const SettingModel = mongoose.model('settings');
+  const homeSettings = await SettingModel.getSettings('home');
+  const {fixed, movable} = homeSettings.recommendThreads;
+  let exception = [];
+  if(type === 'fixed') {
+    exception = movable.manuallySelectedThreads
+      .concat(
+        movable.automaticallySelectedThreads,
+        fixed.manuallySelectedThreads,
+      );
+  } else {
+    exception = fixed.manuallySelectedThreads
+      .concat(
+        fixed.automaticallySelectedThreads,
+        movable.manuallySelectedThreads
+      );
+  }
+  await ThreadModel.updateHomeRecommendThreadsByType(type, exception);
+};
+/*
+* 更新指定类型的首页推荐文章
+* @param {String} type fixed: 固定推荐, movable: 滚动推荐
+* @param {[String]} excludedThreadsId 需要排除的threadID
+* @return {[Object]}
+*   @param {String} tid 文章ID
+*   @param {String} title 文章标题
+*   @param {String} cover 文章封面
+* @author pengxiguaa 2020/7/15
+* */
+threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThreadsId = []) => {
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const SettingModel = mongoose.model('settings');
+  const ComplaintModel = mongoose.model('complaints');
+  const homeSettings = await SettingModel.getSettings('home');
+  if(!['fixed', 'movable'].includes(type)) throwErr(500, `推荐类型错误 type: ${type}`);
+  // 去除自动推荐相关的条件
+  const {
+    automaticCount, countOfPost,
+    timeOfPost, digest, postVoteUpMinCount, postVoteDownMaxCount,
+    threadVoteUpMinCount, reportedAndUnReviewed, original, flowControl
+  } = homeSettings.recommendThreads[type];
+  const match = {
+    type: 'thread',
+    cover: {$ne: ''},
+    tid: {$nin: excludedThreadsId},
+    disabled: false,
+    toRecycle: {$ne: true},
+    toc: {
+      $gte: new Date(Date.now() - (timeOfPost.max * 24 * 60 * 60 * 1000)),
+      $lte: new Date(Date.now() - (timeOfPost.min * 24 * 60 * 60 * 1000))
+    },
+    threadPostCount: {
+      $gte: countOfPost.min,
+      $lte: countOfPost.max
+    },
+    voteUpTotal: {$gte: threadVoteUpMinCount},
+    digest,
+    voteUp: {$gte: postVoteUpMinCount},
+    voteDown: {$lte: postVoteDownMaxCount},
+    flowControl
+  };
+  // 是否必须为原创
+  if(original) {
+    match.original = {$in: ['3', '4', '5', '6']};
+  }
+  // 排除被举报但未被处理的文章
+  if(!reportedAndUnReviewed) {
+    const complaints = await ComplaintModel.find({type: 'thread'}, {contentId: 1});
+    const threadsId = complaints.map(c => c.contentId);
+    match.tid = {$nin: threadsId};
+  }
+
+  const posts = await PostModel.aggregate([
+    {
+      $match: match
+    },
+    {
+      $group: {
+        _id: '$pid'
+      }
+    },
+    {
+      $sample: {
+        size: automaticCount * 2
+      }
+    }
+  ]);
+  let threads = await ThreadModel.find({
+    oc: {$in: posts.map(p => p._id)},
+    disabled: false,
+  });
+  threads = threads.slice(0, automaticCount);
+  threads = await ThreadModel.extendThreads(threads);
+  const arr = [];
+  for(const thread of threads) {
+    arr.push({
+      title: thread.firstPost.t,
+      tid: thread.tid,
+      cover: thread.firstPost.cover,
+      type: 'automatic'
+    });
+  }
+  const obj = {};
+  obj[`c.recommendThreads.${type}.automaticallySelectedThreads`] = arr;
+  await SettingModel.updateOne({_id: 'home'}, {
+    $set: obj
+  });
+  await SettingModel.saveSettingsToRedis('home');
+  return arr;
+};
+/*
+* 获取首页推荐文章
+* */
+threadSchema.statics.getHomeRecommendThreadsByType = async (type, fid = []) => {
+  if(!['fixed', 'movable'].includes(type)) throwErr(500, `推荐文章类型错误 type: ${type}`);
+  const SettingModel = mongoose.model('settings');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const homeSettings = await SettingModel.getSettings('home');
+  const ThreadModel = mongoose.model('threads');
+  const options = homeSettings.recommendThreads[type];
+  let {
+    displayType, order, manuallySelectedThreads,
+    automaticallySelectedThreads, automaticProportion
+  } = options;
+  let threadsId = manuallySelectedThreads.concat(
+    automaticallySelectedThreads
+  );
+  threadsId = threadsId.map(t => t.tid);
+  const threads = await ThreadModel.find({tid: {$in: threadsId}}, {tid: 1});
+  const threadsObj = {};
+  threads.map(thread => {
+    threadsObj[thread.tid] = true;
+  });
+  manuallySelectedThreads = manuallySelectedThreads.filter(t => threadsObj[t.tid]);
+  automaticallySelectedThreads = automaticallySelectedThreads.filter(t => threadsObj[t.tid]);
+  let results = [];
+  if(displayType === 'manual') {
+    // 只从手动推荐文章中选取
+    if(order === 'random') {
+      manuallySelectedThreads = apiFunction.arrayShuffle(manuallySelectedThreads);
+    }
+    if(type === 'fixed') {
+      results = manuallySelectedThreads.slice(0, 6);
+    } else {
+      results = manuallySelectedThreads;
+    }
+  } else if(displayType === 'automatic') {
+    // 只从自动推荐文章中选取
+    if(order === 'random') {
+      automaticallySelectedThreads = apiFunction.arrayShuffle(automaticallySelectedThreads);
+    }
+    if(type === 'fixed') {
+      results = automaticallySelectedThreads.slice(0, 6);
+    } else {
+      results = automaticallySelectedThreads;
+    }
+  } else {
+    // 根据比例从手动和自动推荐文章中选取
+    if(type === 'fixed') {
+      const automaticCount = 6 / (automaticProportion + 1);
+      const manualCount = 6 - automaticCount;
+      if(order === 'random') {
+        manuallySelectedThreads = apiFunction.arrayShuffle(manuallySelectedThreads);
+        automaticallySelectedThreads = apiFunction.arrayShuffle(automaticallySelectedThreads);
+      }
+      results = manuallySelectedThreads.slice(0, manualCount).concat(
+        automaticallySelectedThreads.slice(0, automaticCount)
+      );
+      if(order === 'random') {
+        results = apiFunction.arrayShuffle(results);
+      }
+    } else {
+      results = manuallySelectedThreads.concat(automaticallySelectedThreads);
+      if(order === 'random') {
+        results = apiFunction.arrayShuffle(results);
+      }
+    }
+  }
+  return results;
+};
+threadSchema.statics.getHomeRecommendThreads = async (fid) => {
+  const ThreadModel = mongoose.model('threads');
+  return {
+    fixed: await ThreadModel.getHomeRecommendThreadsByType('fixed', fid),
+    movable: await ThreadModel.getHomeRecommendThreadsByType('movable', fid)
+  };
 };
 
 module.exports = mongoose.model('threads', threadSchema);

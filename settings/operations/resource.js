@@ -1,20 +1,13 @@
 module.exports = {
-	logo: {
-		POST: 'uploadHomeLogo',
-		PARAMETER: {
-			GET: 'getHomeLogo'
-		}
-	},
 	avatar: {// 用户头像
 		PARAMETER: {
-			GET: 'getUserAvatar',
+			GET: "getUserAvatar",
 			POST: 'uploadUserAvatar'
 		}
 	},
   banner: {
     PARAMETER: {
       POST: "modifyUserBanner",
-      GET: "getUserBanner"
     }
   },
 	shopLogo: {
@@ -41,8 +34,11 @@ module.exports = {
 			GET: 'getResources',
       info: {
 			  GET: "getResourceInfo"
-      }
-		},
+			},
+			fileConvertNotice: {
+				GET: "fileConvertNotice"
+			}
+		}
 	},
 	rt: {
 		PARAMETER: {

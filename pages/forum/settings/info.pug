@@ -20,7 +20,7 @@ block content
                 .col-sm-5
                   .forum-logo
                     img(v-if='logoData' :src='logoData')
-                    img(v-else-if='forum.logo' :src='getUrl("attach", forum.logo)')
+                    img(v-else-if='forum.logo' :src='getUrl("forumLogo", forum.logo)')
                     span(v-else) 未上传
                   .m-t-05
                     button.btn.btn-default.btn-sm(@click="selectLogo") 选择图片
@@ -29,7 +29,7 @@ block content
                 .col-sm-5
                   .forum-banner
                     img(v-if='bannerData' :src='bannerData')
-                    img(v-else-if='forum.banner' :src='getUrl("attach", forum.banner)')
+                    img(v-else-if='forum.banner' :src='getUrl("forumBanner", forum.banner)')
                     span(v-else) 未上传
                   .m-t-05
                     button.btn.btn-default.btn-sm(@click="selectBanner") 选择图片

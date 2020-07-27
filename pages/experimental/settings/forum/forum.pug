@@ -18,7 +18,7 @@ block eContent
         .forums.m-b-2
           .forum(v-for='f, index in forums')
             .forum-top(:data-float-fid='f.fid')
-              img.forum-avatar(:src="getUrl('forumAvatar', f.logo)")
+              img.forum-avatar(:src="getUrl('forumLogo', f.logo)")
               .forum-name {{f.displayName}}
             .forum-bottom
               button.btn.btn-default.btn-xs(@click='move(index, forums, "left")')

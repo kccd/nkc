@@ -1,146 +1,302 @@
 extends ../nkc
 block nkcTitle
   title 主页设置 - 前台管理
+  +includeCSS('/nkc/home/home.css')
 block nkcContent
-  #data.hidden=objToStr({ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads})
-  .col-xs-12.col-md-12.box-shadow-panel.management-home#app(v-cloak)
-    div
-      .management-header 首页推荐
-      .home-top-threads
-        .row
-          .col-xs-12.col-md-12
-            h4 轮播图
-            .radio
-              span 显示顺序：
-              label.m-r-1
-                input(type="radio" value="random" v-model="ads.movableOrder")
-                span 随机
-              label.m-r-1
-                input(type="radio" value="fixed" v-model="ads.movableOrder")
-                span 正序
-          .col-xs-12.col-md-6(v-for="ad, index in ads.movable").m-b-1
-            .home-top-thread
-              .home-top-thread-cover
-                .home-top-thread-remove(@click="remove(ads.movable, index)")
+  #data.hidden=objToStr({recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode})
+  .col-xs-12.col-md-12.management-home#app(v-cloak)
+    ul.nav.nav-tabs
+      li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
+        a.pointer {{n.name}}
+    div(v-if='["fixed", "movable"].includes(page.id)')
+      div
+        .form.form-horizontal
+          .form-group
+            label.col-sm-3.control-label 显示类型
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='manual' v-model='recommendThreads[page.id].displayType')
+                  span 手动
+                label.m-r-1
+                  input(type='radio' value='automatic' v-model='recommendThreads[page.id].displayType')
+                  span 自动
+                label
+                  input(type='radio' value='all' v-model='recommendThreads[page.id].displayType')
+                  span 半自动
+          .form-group
+            label.col-sm-3.control-label 显示顺序
+            .col-sm-9
+              .radio
+                label.m-r-1
+                  input(type='radio' value='random' v-model='recommendThreads[page.id].order')
+                  span 随机
+                label
+                  input(type='radio' value='fixed' v-model='recommendThreads[page.id].order')
+                  span 正序
+          span(v-if='recommendThreads[page.id].displayType !== "manual"')
+            .form-group.form-inline(v-if='recommendThreads[page.id].displayType === "all"')
+              label.col-sm-3.control-label 比例（手动:自动）
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].automaticProportion')
+            .form-group.form-inline
+              label.col-sm-3.control-label 更新间隔（小时）
+              .col-sm-9
+                span
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].timeInterval')
+            .form-group.form-inline
+              label.col-sm-3.control-label 文章数量
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].automaticCount')
+                .m-t-05 更新时缓存的文章数量
+            .form-group.form-inline
+              label.col-sm-3.control-label 文章发表时间（天）
+              .col-sm-9
+                span 最小：
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].timeOfPost.min')
+                .m-t-05
+                span 最大：
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].timeOfPost.max')
+            .form-group.form-inline
+              label.col-sm-3.control-label 文章回复数量
+              .col-sm-9
+                span 最小：
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].countOfPost.min')
+                .m-t-05
+                span 最大：
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].countOfPost.max')
+            .form-group.form-inline
+              label.col-sm-3.control-label 最小点赞数
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].postVoteUpMinCount')
+            .form-group.form-inline
+              label.col-sm-3.control-label 最大点踩数
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].postVoteDownMaxCount')
+            .form-group.form-inline
+              label.col-sm-3.control-label 最小点赞数（包含回复）
+              .col-sm-9
+                input.form-control(type='text' v-model.number='recommendThreads[page.id].threadVoteUpMinCount')
+            .form-group
+              label.col-sm-3.control-label 仅限原创文章
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='recommendThreads[page.id].original')
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model='recommendThreads[page.id].original')
+                    span 否
+            .form-group
+              label.col-sm-3.control-label 仅限精选文章
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='recommendThreads[page.id].digest')
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model='recommendThreads[page.id].digest')
+                    span 否
+            .form-group
+              label.col-sm-3.control-label 包含举报未处理的文章
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='recommendThreads[page.id].reportedAndUnReviewed')
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model='recommendThreads[page.id].reportedAndUnReviewed')
+                    span 否
+            .form-group
+              label.col-sm-3.control-label 包含流控文章
+              .col-sm-9
+                .radio
+                  label.m-r-1
+                    input(type='radio' :value='true' v-model='recommendThreads[page.id].flowControl')
+                    span 是
+                  label
+                    input(type='radio' :value='false' v-model='recommendThreads[page.id].flowControl')
+                    span 否
+
+        mixin threadList(options)
+          -const {name, listName} = options;
+          hr
+          h4=name
+            if listName === 'automaticallySelectedThreads'
+              button.btn.btn-sm.btn-default(v-if='updating' disabled) 更新中...
+              button.btn.btn-sm.btn-default(v-else @click='updateThreadList') 更新
+          .row
+            .col-xs-12(:class="page.id === 'movable'? 'col-md-6': 'col-md-3'" v-for=`t, index in recommendThreads[page.id].${listName}`)
+              .recommend-thread
+                a(:href='"/t/" + t.tid' target='_blank').title {{t.title}}
+                .btn-close(@click=`removeFromArr(recommendThreads[page.id].${listName}, index)` title='移除')
                   .fa.fa-trash
-                img.pointer(:src="getUrl('postCover', ad.cover)" @click="visitUrl('/t/' + ad.tid, true)")
-                input.home-top-thread-title(v-model="ad.title")
-                //.home-top-thread-index {{index + 1 }}
-                .home-top-thread-button(@click="selectLocalFile(ad)" title="更换封面")
+                .btn-move
+                  span.pointer(@click=`moveFromArr(recommendThreads[page.id].${listName}, index, 'left')` title='左移')
+                    .fa.fa-chevron-left
+                  span {{index + 1}}
+                  span.pointer(@click=`moveFromArr(recommendThreads[page.id].${listName}, index, 'right')` title='右移')
+                    .fa.fa-chevron-right
+                .btn-upload(title='修改封面' @click='selectLocalFile(t)').pointer
                   .fa.fa-cloud-upload
-                .home-top-thread-buttons
-                  .fa.fa-angle-left(@click="move(ad, 'left')" title="左移")
-                  div {{index + 1}}
-                  .fa.fa-angle-right(@click="move(ad, 'right')" title="右移")
-        .row.m-t-2
-          .col-xs-12.col-md-12
-            h4 固定图，只显示6篇
-            .radio
-              span 显示顺序：
-              label.m-r-1
-                input(type="radio" value="random" v-model="ads.fixedOrder")
-                span 随机
-              label.m-r-1
-                input(type="radio" value="fixed" v-model="ads.fixedOrder")
-                span 正序
-          .col-xs-12.col-md-3(v-for="ad, index in ads.fixed").m-b-1
-            .home-top-thread.fixed
-              .home-top-thread-cover
-                .home-top-thread-remove(@click="remove(ads.fixed, index)")
-                  .fa.fa-trash
-                img.pointer(:src="getUrl('postCover', ad.cover)" @click="visitUrl('/t/' + ad.tid, true)")
-                input.home-top-thread-title(v-model="ad.title")
-                //.home-top-thread-index {{index + 1 }}
-                .home-top-thread-button(@click="selectLocalFile(ad)" title="更换封面")
-                  .fa.fa-cloud-upload
-                .home-top-thread-buttons
-                  .fa.fa-angle-left(@click="move(ad, 'left')" title="左移")
-                  div {{index + 1}}
-                  .fa.fa-angle-right(@click="move(ad, 'right')" title="右移")
-          .col-xs-12.col-md-12.m-t-1
-            button.management-button(@click="saveAds") 保存
-    div.m-t-2
-      .management-header 首页推荐专业
-      .home-top-forums
-        button.btn.btn-sm.btn-default(@click="addForum") 添加专业
-        .m-t-05
-          .home-top-forum(v-for="f,index in recommendForums")
+                .cover
+                  img(:src="getUrl('recommendThreadCover', t.cover)")
+        div(v-if='recommendThreads[page.id].displayType !== "automatic"')
+          +threadList({name: '手动推荐', listName: 'manuallySelectedThreads'})
+        div(v-if='recommendThreads[page.id].displayType !== "manual"')
+          +threadList({name: '自动推荐', listName: 'automaticallySelectedThreads'})
+        .m-t-1
+          button.btn.btn-primary(@click='saveRecommendThreads') 保存
+    div(v-else-if='page.id === "other"')
+      //-div
+        .management-header 首页推荐
+        .home-top-threads
+          .row
+            .col-xs-12.col-md-12
+              h4 轮播图
+              .radio
+                span 显示顺序：
+                label.m-r-1
+                  input(type="radio" value="random" v-model="ads.movableOrder")
+                  span 随机
+                label.m-r-1
+                  input(type="radio" value="fixed" v-model="ads.movableOrder")
+                  span 正序
+            .col-xs-12.col-md-6(v-for="ad, index in ads.movable").m-b-1
+              .home-top-thread
+                .home-top-thread-cover
+                  .home-top-thread-remove(@click="remove(ads.movable, index)")
+                    .fa.fa-trash
+                  img.pointer(:src="getUrl('postCover', ad.cover)" @click="visitUrl('/t/' + ad.tid, true)")
+                  input.home-top-thread-title(v-model="ad.title")
+                  //.home-top-thread-index {{index + 1 }}
+                  .home-top-thread-button(@click="selectLocalFile(ad)" title="更换封面")
+                    .fa.fa-cloud-upload
+                  .home-top-thread-buttons
+                    .fa.fa-angle-left(@click="move(ad, 'left')" title="左移")
+                    div {{index + 1}}
+                    .fa.fa-angle-right(@click="move(ad, 'right')" title="右移")
+          .row.m-t-2
+            .col-xs-12.col-md-12
+              h4 固定图，只显示6篇
+              .radio
+                span 显示顺序：
+                label.m-r-1
+                  input(type="radio" value="random" v-model="ads.fixedOrder")
+                  span 随机
+                label.m-r-1
+                  input(type="radio" value="fixed" v-model="ads.fixedOrder")
+                  span 正序
+            .col-xs-12.col-md-3(v-for="ad, index in ads.fixed").m-b-1
+              .home-top-thread.fixed
+                .home-top-thread-cover
+                  .home-top-thread-remove(@click="remove(ads.fixed, index)")
+                    .fa.fa-trash
+                  img.pointer(:src="getUrl('postCover', ad.cover)" @click="visitUrl('/t/' + ad.tid, true)")
+                  input.home-top-thread-title(v-model="ad.title")
+                  //.home-top-thread-index {{index + 1 }}
+                  .home-top-thread-button(@click="selectLocalFile(ad)" title="更换封面")
+                    .fa.fa-cloud-upload
+                  .home-top-thread-buttons
+                    .fa.fa-angle-left(@click="move(ad, 'left')" title="左移")
+                    div {{index + 1}}
+                    .fa.fa-angle-right(@click="move(ad, 'right')" title="右移")
+            .col-xs-12.col-md-12.m-t-1
+              button.management-button(@click="saveAds") 保存
+      div.m-t-2
+        .management-header 首页推荐专业
+        .home-top-forums
+          button.btn.btn-sm.btn-default(@click="addForum") 添加专业
+          .m-t-05
+            .home-top-forum(v-for="f,index in recommendForums")
+              .home-top-forum-buttons
+                .fa.fa-angle-left(title="左移" @click="moveForum(recommendForums, f, 'left')")
+                .display-i-b {{index + 1}}
+                .fa.fa-angle-right(title="右移" @click="moveForum(recommendForums, f, 'right')")
+                .fa.fa-trash(title="删除" @click="removeForum(recommendForums, index)")
+              .home-top-forum-info
+                .home-top-forum-icon(v-if="!f.logo" :style="'background-color: '+f.color")
+                img.home-top-forum-icon(v-else :src="getUrl('forumLogo', f.logo)")
+                a.pointer(@click="visitUrl('/f/' + f.fid, true)").home-top-forum-name {{f.displayName}}
+          .m-t-1
+            button.management-button(@click="saveRecommendForums") 保存
+      div.m-t-2
+        .management-header 首页专栏
+        .home-top-forums
+          .home-top-forum(v-for="f,index in columns")
             .home-top-forum-buttons
-              .fa.fa-angle-left(title="左移" @click="moveForum(recommendForums, f, 'left')")
+              .fa.fa-angle-left(title="左移" @click="moveForum(columns, f, 'left')")
               .display-i-b {{index + 1}}
-              .fa.fa-angle-right(title="右移" @click="moveForum(recommendForums, f, 'right')")
-              .fa.fa-trash(title="删除" @click="removeForum(recommendForums, index)")
+              .fa.fa-angle-right(title="右移" @click="moveForum(columns, f, 'right')")
+              .fa.fa-trash(title="删除" @click="removeForum(columns, index)")
             .home-top-forum-info
-              .home-top-forum-icon(v-if="!f.logo" :style="'background-color: '+f.color")
-              img.home-top-forum-icon(v-else :src="getUrl('forumAvatar', f.logo)")
-              a.pointer(@click="visitUrl('/f/' + f.fid, true)").home-top-forum-name {{f.displayName}}
+              img.home-top-forum-icon( :src="getUrl('columnAvatar', f._id)")
+              a.pointer(@click="visitUrl('/m/' + f._id, true)").home-top-forum-name {{f.name}}
+          .m-t-1
+            button.management-button(@click="saveColumns") 保存
+      div.m-t-2
+        .management-header 首页热销商品
+        .radio
+          span 是否显示：
+          label.m-r-1
+            input(type="radio" value="t" v-model.boolean="showShopGoods")
+            span 是
+          label.m-r-1
+            input(type="radio" value="" v-model.boolean="showShopGoods")
+            span 否
+        .home-top-goods
+          .home-top-goods-body(v-for="g, index in goods")
+            .home-goods-buttons
+              .fa.fa-angle-up(title="上移" @click="moveForum(goods, g, 'left')")
+              .fa.fa-angle-down(title="下移" @click="moveForum(goods, g, 'right')")
+              .fa.fa-trash(title="删除" @click="removeForum(goods, index)")
+            .home-goods-content
+              .home-goods-avatar
+                div(:style="'background-image: url(/r/'+g.imgMaster+')'")
+              .home-goods-info
+                a.pointer(@click="visitUrl('/t/' + g.tid)" :title="g.name").home-goods-name {{g.name}}
+                .home-goods-description {{g.abstract}}
+                .home-goods-other
+                  a.pointer.home-goods-user(@click="visitUrl('/u/' + g.user.uid)")
+                    img(:src="getUrl('userAvatar', g.user.avatar)" :onmouseover="floatUserInfo(g.user.uid)")
+                    span {{g.user.username}}
+                  .home-goods-price
+                  .home-goods-price ￥ {{g.productParams[0].originPrice / 100}}
+          .m-t-1
+            button.management-button(@click="saveGoods") 保存
+      div.m-t-2
+        .management-header 全站置顶
+        .home-top-goods
+          .home-top-goods-body(v-for="thread, index in toppedThreads")
+            .home-goods-buttons
+              .fa.fa-angle-up(title="上移" @click="moveForum(toppedThreads, thread, 'left')")
+              .fa.fa-angle-down(title="下移" @click="moveForum(toppedThreads, thread, 'right')")
+              .fa.fa-trash(title="删除" @click="removeForum(toppedThreads, index)")
+            .home-goods-content
+              .home-goods-avatar(v-if="thread.firstPost.cover")
+                div(:style="'background-image: url('+getUrl('postCover', thread.firstPost.cover)+')'")
+              .home-goods-info
+                a.pointer(@click="visitUrl('/t/' + thread.tid)" :title="thread.firstPost.t").home-goods-name {{thread.firstPost.t}}
+                .home-goods-description {{thread.firstPost.abstract || thread.firstPost.c}}
+                .home-goods-other
+                  a.home-goods-user(v-if="thread.firstPost.anonymous") 匿名
+                  a.pointer.home-goods-user(@click="visitUrl('/u/' + thread.firstPost.user.uid)" v-else)
+                    img(:src="getUrl('userAvatar', thread.firstPost.user.avatar)" :onmouseover="floatUserInfo(thread.uid)")
+                    span {{thread.firstPost.user.username}}
+          .m-t-1
+            button.management-button(@click="saveToppedThreads") 保存
+      div.m-t-2
+        .management-header 最新原创
+        .radio
+          span 显示方式：
+          label.m-r-1
+            input(type="radio" value="simple" v-model="originalThreadDisplayMode")
+            span 简略显示
+          label.m-r-1
+            input(type="radio" value="full" v-model="originalThreadDisplayMode")
+            span 完整显示
         .m-t-1
-          button.management-button(@click="saveRecommendForums") 保存
-    div.m-t-2
-      .management-header 首页专栏
-      .home-top-forums
-        .home-top-forum(v-for="f,index in columns")
-          .home-top-forum-buttons
-            .fa.fa-angle-left(title="左移" @click="moveForum(columns, f, 'left')")
-            .display-i-b {{index + 1}}
-            .fa.fa-angle-right(title="右移" @click="moveForum(columns, f, 'right')")
-            .fa.fa-trash(title="删除" @click="removeForum(columns, index)")
-          .home-top-forum-info
-            img.home-top-forum-icon( :src="getUrl('columnAvatar', f._id)")
-            a.pointer(@click="visitUrl('/m/' + f._id, true)").home-top-forum-name {{f.name}}
-        .m-t-1
-          button.management-button(@click="saveColumns") 保存
-    div.m-t-2
-      .management-header 首页热销商品
-      .radio
-        span 是否显示：
-        label.m-r-1
-          input(type="radio" value="t" v-model.boolean="showShopGoods")
-          span 是
-        label.m-r-1
-          input(type="radio" value="" v-model.boolean="showShopGoods")
-          span 否
-      .home-top-goods
-        .home-top-goods-body(v-for="g, index in goods")
-          .home-goods-buttons
-            .fa.fa-angle-up(title="上移" @click="moveForum(goods, g, 'left')")
-            .fa.fa-angle-down(title="下移" @click="moveForum(goods, g, 'right')")
-            .fa.fa-trash(title="删除" @click="removeForum(goods, index)")
-          .home-goods-content
-            .home-goods-avatar
-              div(:style="'background-image: url(/r/'+g.imgMaster+')'")
-            .home-goods-info
-              a.pointer(@click="visitUrl('/t/' + g.tid)" :title="g.name").home-goods-name {{g.name}}
-              .home-goods-description {{g.abstract}}
-              .home-goods-other
-                a.pointer.home-goods-user(@click="visitUrl('/u/' + g.user.uid)")
-                  img(:src="getUrl('userAvatar', g.user.avatar)" :onmouseover="floatUserInfo(g.user.uid)")
-                  span {{g.user.username}}
-                .home-goods-price
-                .home-goods-price ￥ {{g.productParams[0].originPrice / 100}}
-        .m-t-1
-          button.management-button(@click="saveGoods") 保存
-    div.m-t-2
-      .management-header 全站置顶
-      .home-top-goods
-        .home-top-goods-body(v-for="thread, index in toppedThreads")
-          .home-goods-buttons
-            .fa.fa-angle-up(title="上移" @click="moveForum(toppedThreads, thread, 'left')")
-            .fa.fa-angle-down(title="下移" @click="moveForum(toppedThreads, thread, 'right')")
-            .fa.fa-trash(title="删除" @click="removeForum(toppedThreads, index)")
-          .home-goods-content
-            .home-goods-avatar(v-if="thread.firstPost.cover")
-              div(:style="'background-image: url('+getUrl('postCover', thread.firstPost.cover)+')'")
-            .home-goods-info
-              a.pointer(@click="visitUrl('/t/' + thread.tid)" :title="thread.firstPost.t").home-goods-name {{thread.firstPost.t}}
-              .home-goods-description {{thread.firstPost.abstract || thread.firstPost.c}}
-              .home-goods-other
-                a.home-goods-user(v-if="thread.firstPost.anonymous") 匿名
-                a.pointer.home-goods-user(@click="visitUrl('/u/' + thread.firstPost.user.uid)" v-else)
-                  img(:src="getUrl('userAvatar', thread.firstPost.user.avatar)" :onmouseover="floatUserInfo(thread.uid)")
-                  span {{thread.firstPost.user.username}}
-        .m-t-1
-          button.management-button(@click="saveToppedThreads") 保存
+          button.management-button(@click="saveOriginalThreadDisplayMode") 保存
 
 block nkcScripts
   include ../../publicModules/crop/crop_new

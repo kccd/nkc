@@ -16,7 +16,7 @@ div
           title=f.description
         ).topic-item
           if f.logo
-            img(src=tools.getUrl('forumAvatar', f.logo))
+            img(src=tools.getUrl('forumLogo', f.logo))
           span=f.displayName
   .forums-nav-header
     +listHeader("话题")
@@ -28,7 +28,7 @@ div
           title=pf.description
         )
           if pf.logo
-            img(src=tools.getUrl('forumAvatar', pf.logo))
+            img(src=tools.getUrl('forumLogo', pf.logo))
           else
             img(style=`background-color: ${pf.color || '#808080'};`)
           span=pf.displayName
@@ -41,7 +41,7 @@ div
               title=cf.description
             ).topic-item
               if cf.logo
-                img(src=tools.getUrl('forumAvatar', cf.logo))
+                img(src=tools.getUrl('forumLogo', cf.logo))
               span=cf.displayName
   .forums-nav-header
     +listHeader("学科")
@@ -53,7 +53,7 @@ div
           title=pf.description
         )
           if pf.logo
-            img(src=tools.getUrl('forumAvatar', pf.logo))
+            img(src=tools.getUrl('forumLogo', pf.logo))
           else
             img(style=`background-color: ${pf.color || '#808080'};`)
           span=pf.displayName
@@ -66,5 +66,5 @@ div
               title=cf.description
             ).topic-item
               if cf.logo
-                img(src=tools.getUrl('forumAvatar', cf.logo))
+                img(src=tools.getUrl('forumLogo', cf.logo))
               span=cf.displayName

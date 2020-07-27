@@ -2,9 +2,11 @@ const Router = require('koa-router');
 const resourceRouter = new Router();
 const pathModule = require('path');
 const infoRouter = require("./info");
-const pictureExts = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
-const videoExts = ["mp4", "mov", "3gp", "avi"];
-const audioExts = ["wav", "amr", "mp3", "aac"];
+const noticeRouter = require("./notice");
+const mediaMethods = require("./methods");
+const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
+const videoExtensions = ["mp4", "mov", "3gp", "avi"];
+const audioExtensions = ["wav", "amr", "mp3", "aac"];
 const {ThrottleGroup} = require("stream-throttle");
 
 // 存放用户设置
@@ -237,17 +239,134 @@ resourceRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {fs, tools, settings, db, data, nkcModules} = ctx;
+    const {db, data, nkcModules} = ctx;
+    const {user} = data;
+    const {files, fields} = ctx.body;
+    const {file} = files;
+    const {type, fileName, md5, share} = fields;
+    if(type === "checkMD5") {
+      // 前端提交待上传文件的md5，用于查找resources里是否与此md5匹配的resource
+      // 若不匹配，则返回“未匹配”给前端，前端收到请求后会再次向服务器发起请求，并将待上传的文件上传到服务器。
+      // 若匹配，则读取目标resource上的相关信息，并写入到新的resource中。封面图、
+      if(!md5) ctx.throw(400, "md5不能为空");
+      if(!fileName) ctx.throw(400, "文件名不能为空");
+      const resource = await db.ResourceModel.findOne({hash: md5, mediaType: "mediaAttachment"});
+      if(
+        !resource || // 未上传过
+        !resource.ext // 上传过，但格式丢失
+      ) {
+        data.uploaded = false;
+        return await next();
+      }
+      // 检测用户上传相关权限
+      const _file = {
+        size: resource.size,
+        ext: resource.ext
+      };
+      await db.ResourceModel.checkUploadPermission(user, _file);
+      // 在此处复制原resource的信息
+      const newResource = resource.toObject();
+      delete newResource.__v;
+      delete newResource._id;
+      delete newResource.references;
+      delete newResource.tlm;
+      delete newResource.originId;
+      delete newResource.toc;
+      delete newResource.hits;
+
+      newResource.rid = await db.SettingModel.operateSystemID("resources", 1);
+      newResource.uid = user.uid;
+      newResource.hash = md5;
+      newResource.oname = fileName;
+
+      const r = db.ResourceModel(newResource);
+      await r.save();
+      data.r = r;
+      data.uploaded = true;
+      return await next();
+    }
+    if(!file) {
+      ctx.throw(400, 'no file uploaded');
+    }
+    let { name, size, hash} = file;
+    // 检查上传权限
+    if(name === "blob" && fileName) {
+      name = fileName;
+      file.name = fileName;
+    }
+    // 验证上传权限
+    await db.ResourceModel.checkUploadPermission(user, file);
+    const extension = await nkcModules.file.getFileExtension(file);
+    const rid = await ctx.db.SettingModel.operateSystemID('resources', 1);
+
+    let mediaType;
+    if(pictureExtensions.includes(extension)) {
+      mediaType = "mediaPicture";
+    } else if(videoExtensions.includes(extension)) {
+      mediaType = "mediaVideo";
+    } else if(audioExtensions.includes(extension)) {
+      mediaType = "mediaAudio";
+    } else {
+      mediaType = "mediaAttachment";
+    }
+
+    const resourceType = mediaType === 'mediaPicture' && type === 'sticker'? 'sticker': 'resource';
+    const r = ctx.db.ResourceModel({
+      rid,
+      type: resourceType,
+      oname: name,
+      ext: extension,
+      size,
+      hash,
+      uid: ctx.data.user.uid,
+      toc: Date.now(),
+      mediaType,
+      state: 'inProcess'
+    });
+
+    // 创建表情数据
+    if(type === "sticker") {
+      if(mediaType !== "mediaPicture") {
+        ctx.throw(400, "图片格式错误");
+      }
+      await db.StickerModel.uploadSticker({
+        rid,
+        uid: data.user.uid,
+        share: !!share
+      });
+    }
+    await r.save();
+    ctx.data.r = r;
+
+    setImmediate(async () => {
+      try{
+        await mediaMethods[mediaType]({
+          file,
+          user,
+          resource: r,
+          pictureType: resourceType,
+        });
+        // 通知前端转换完成了
+        global.NKC.io.of('/common').to(`user/${user.uid}`).send({rid: r.rid, state: "fileProcessFinish"});
+      } catch(err) {
+        console.log(err);
+        await r.update({state: 'useless'});
+      }
+    });
+    await next();
+  })
+  .post('/1', async (ctx, next) => {
+    const {fs, fsPromise, tools, settings, db, data, nkcModules} = ctx;
     const { imageMagick, ffmpeg } = tools;
     const {upload} = settings;
-    const {generateFolderName, extGetPath, thumbnailPath, mediumPath, originPath, frameImgPath} = upload;
+    const {generateFolderName, extGetPath, thumbnailPath, mediumPath, frameImgPath} = upload;
     const {user} = data;
 
     const {websiteName} = await db.SettingModel.getSettings('server');
     let mediaRealPath;
     const {files, fields} = ctx.body;
     const {file} = files;
-    const {type, fileName, md5, share} = fields;
+    const {type, fileName, md5, share, fileId} = fields;
 
     if(type === "checkMD5") {
       // 前端提交待上传文件的md5，用于查找resources里是否与此md5匹配的resource
@@ -334,11 +453,20 @@ resourceRouter
       mediaRealPath = await db.ResourceModel.getMediaPath('mediaAttachment');
     }
 
+    // // 为文件处理过程生成任务id
+    // let taskId = noticeRouter.createProcessTask(user.uid);
+    // // 任务id发送给前端
+    // ctx.res.write(taskId);
+    // ctx.res.end();
+
     // 带有年份月份的文件储存路径 /2018/04/
     // const middlePath = generateFolderName(uploadPath);
     let middlePath = generateFolderName(mediaRealPath);
     // 路径 d:\nkc\resources\video/2018/04/256647.mp4
     let mediaFilePath = mediaRealPath + middlePath + saveName;
+
+    // 提前返回，待转换完成用socket通知前端
+    ctx.res.end();
 
     // 图片裁剪水印
     if (pictureExts.indexOf(extension.toLowerCase()) > -1) {
@@ -712,7 +840,7 @@ resourceRouter
       // 将元数据移动到视频的第一帧
       // await ffmpeg.videoMoveMetaToFirstThumb(outputVideoPath, outputVideoPath);
       // 移动已经转好码的视频文件再次移动到tmp临时文件夹下
-      await fs.rename(outputVideoPath, path);
+      await fsPromise.copyFile(outputVideoPath, path);
       // 生成视频封面图
       await ffmpeg.videoFirstThumbTaker(path, videoImgPath);
       // 修改视频保存信息
@@ -735,19 +863,19 @@ resourceRouter
       } else if(['aac'].indexOf(extension.toLowerCase()) > -1) {
         await ffmpeg.audioAACTransMP3(path, outputVideoPath)
       } else {
-        await fs.rename(path, outputVideoPath);
+        await fsPromise.copyFile(path, outputVideoPath);
       }
 
-      await fs.rename(outputVideoPath, path);
+      await fsPromise.copyFile(outputVideoPath, path);
       let nameReg = new RegExp(extension, "igm");
       name = name.replace(nameReg, "mp3");
       extension = "mp3";
       saveName = rid + "." + extension;
       mediaFilePath = mediaFilePath.replace(nameReg, "mp3");
     }
-    // await fs.rename(path, mediaFilePath);
-    await fs.copyFile(path, mediaFilePath);
-    await fs.unlink(path);
+    // await fsPromise.copyFile(path, mediaFilePath);
+    await fsPromise.copyFile(path, mediaFilePath);
+    await fsPromise.unlink(path);
 
     // 判断图片的宽高
     let height, width, resourceType = "resource";
@@ -761,20 +889,20 @@ resourceRouter
     }
 
     const r = new ctx.db.ResourceModel({
-      rid,
-      type: resourceType,
-      oname: name,
-      height,
-      width,
-      path: middlePath + saveName,
-      tpath: middlePath + saveName,
-      ext: extension,
-      size,
-      hash,
-      originId,
-      uid: ctx.data.user.uid,
-      toc: Date.now(),
-      mediaType: mediaType
+      rid, // 1
+      type: resourceType, //1
+      oname: name, // 1
+      height,// 0
+      width, //0
+      path: middlePath + saveName,//0
+      tpath: middlePath + saveName,//0
+      ext: extension,//1
+      size,//1
+      hash,//1
+      originId, //0
+      uid: ctx.data.user.uid,//1
+      toc: Date.now(),//1
+      mediaType: mediaType//1
     });
 
     // 创建表情数据
@@ -788,10 +916,14 @@ resourceRouter
         share: !!share
       });
     }
-
     ctx.data.r = await r.save();
-    await next()
+
+    // 通知前端转换完成了
+    global.NKC.io.of('/common').to(`user/${user.uid}`).send({fileId, state: "complete"});
+    // noticeRouter.sendCompleteToUser(user.uid, taskId);
   })
-  .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods());
+  .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
+  .use("/:rid/fileConvertNotice", noticeRouter.routes(), noticeRouter.allowedMethods());
 
 module.exports = resourceRouter;
+

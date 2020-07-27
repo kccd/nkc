@@ -17,7 +17,7 @@ var Tools = function() {
         return "/a/" + id + t
       }
       case "postCover": {
-        return "/nr/cover/" + id + t
+        return '/a/' + id + t;
       }
       case "cover": {
         return "/nr/cover/" + id + t
@@ -31,7 +31,7 @@ var Tools = function() {
       case "gradeIcon": {
         return "/statics/grade_icon/v" + id + "l.png";
       }
-      case "forumAvatar": {
+      case "forumLogo": {
         return "/a/" + id + t;
       }
       case "forumBanner": {
@@ -42,6 +42,15 @@ var Tools = function() {
       }
       case "columnBanner": {
         return "/a/" + id + t
+      }
+      case "homeBigLogo": {
+        return "/a/" + id + t
+      }
+      case "watermark": {
+        return "/a/" + id + t
+      }
+      case "recommendThreadCover": {
+        return '/a/' + id + t
       }
       case "pdf": {
         return "/r/" + id + '?c=nkc_source_pdf';
@@ -60,6 +69,9 @@ var Tools = function() {
           return "/p/" + id + "?redirect=true";
         }
         return "/p/" + id;
+      }
+      case 'mediaPicture': {
+        return "/r/" + id + t;
       }
       // 用户上传的附件
       case "resource": {

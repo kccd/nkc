@@ -419,7 +419,7 @@ NKC.modules.Library = class {
               file.status = "uploaded";
             })
             .catch(data => {
-              file.error = data.error || data;
+              file.error = data.error || data.message || data;
               file.status = "notUploaded";
             })
             .finally(() => {

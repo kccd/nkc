@@ -13,7 +13,7 @@ div
         .forum-block
           .forum-block-info
             if forum.logo
-              img.forum-block-icon(src=tools.getUrl('forumAvatar', forum.logo))
+              img.forum-block-icon(src=tools.getUrl('forumLogo', forum.logo))
             else
               .forum-block-icon(style=`background-color: ${forum.color}`)
             a(href=`/f/${forum.fid}` title=`${forum.description}`).forum-block-name=forum.displayName
@@ -24,7 +24,7 @@ div
       .forum-block.hide-children
         .forum-block-info
           if pf.logo
-            img.forum-block-icon(src=tools.getUrl('forumAvatar', pf.logo))
+            img.forum-block-icon(src=tools.getUrl('forumLogo', pf.logo))
           else
             .forum-block-icon(style=`background-color: ${pf.color}`)
           a(href=`/f/${pf.fid}` title=`${pf.description}`).forum-block-name=pf.displayName
@@ -35,7 +35,7 @@ div
               .forum-block.hide-children
                 .forum-block-info
                   if cf.logo
-                    img.forum-block-icon(src=tools.getUrl('forumAvatar', cf.logo))
+                    img.forum-block-icon(src=tools.getUrl('forumLogo', cf.logo))
                   else
                     .forum-block-icon(style=`background-color: ${cf.color}`)
                   a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName
@@ -46,7 +46,7 @@ div
       .forum-block.hide-children
         .forum-block-info
           if pf.logo
-            img.forum-block-icon(src=tools.getUrl('forumAvatar', pf.fid))
+            img.forum-block-icon(src=tools.getUrl('forumLogo', pf.fid))
           else
             .forum-block-icon(style=`background-color: ${pf.color}`)
           a(href=`/f/${pf.fid}` title=`${pf.description}`).forum-block-name=pf.displayName
@@ -57,7 +57,7 @@ div
               .forum-block.hide-children
                 .forum-block-info
                   if cf.logo
-                    img.forum-block-icon(src=tools.getUrl('forumAvatar', cf.logo))
+                    img.forum-block-icon(src=tools.getUrl('forumLogo', cf.logo))
                   else
                     .forum-block-icon(style=`background-color: ${cf.color}`)
                   a(href=`/f/${cf.fid}` title=`${cf.description}`).forum-block-name=cf.displayName

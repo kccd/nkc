@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const originImageSchema = new Schema({
   originId: {
     type: String,
+    index: 1,
     default: ""
   },
   ext: {
@@ -13,7 +14,7 @@ const originImageSchema = new Schema({
   },
   path: {
     type: String,
-    required: true
+    default: ''
   },
   toc: {
     type: Date,

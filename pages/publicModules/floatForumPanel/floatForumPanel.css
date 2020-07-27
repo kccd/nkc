@@ -115,3 +115,11 @@
   color: #e85a71;
   font-weight: 700;
 }
+#floatForumPanel .float-forum .float-forum-latest {
+  padding: 0 0.8rem;
+}
+#floatForumPanel .float-forum .float-forum-latest .title {
+  font-size: 1em;
+  font-weight: bold;
+  color: black;
+}

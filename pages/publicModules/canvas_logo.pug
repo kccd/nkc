@@ -8,7 +8,7 @@
 -let logosLength = logos.length;
 -let logo = logos[Math.floor(Math.random() * logosLength)];
 -let finallyLogo = tools.getUrl('siteFile', 'kclogo_misaka1.png');
--let url = logosLength? `/a/${logo}` : finallyLogo;
+-let url = logosLength? tools.getUrl('homeBigLogo', logo) : finallyLogo;
 
 .canvas-logo
   img(src=url)

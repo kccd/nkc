@@ -442,7 +442,8 @@ router
 	  await targetPost.save();
 
     if(targetThread.oc === pid && files && files.postCover) {
-      await ctx.nkcModules.file.savePostCover(pid, files.postCover);
+      await db.AttachmentModel.savePostCover(pid, files.postCover);
+      // await ctx.nkcModules.file.savePostCover(pid, files.postCover);
     }
 	  if(!isModerator && !data.userOperationsId.includes('displayDisabledPosts')) {
 	  	q.disabled = false;

@@ -83,7 +83,7 @@ downloadRouter
     let funcResult = await downloadImg(url, './tmp/upload_'+timeStr);
 
     //获得图片格式和尺寸
-    const {generateFolderName,extGetPath, thumbnailPath, mediumPath, originPath} = settings.upload;
+    const {generateFolderName,extGetPath, thumbnailPath, mediumPath} = settings.upload;
     let extension = funcResult.exts;
     // 如果是webp格式图片，则转换为jpg
     if(extension == "webp") {
@@ -120,10 +120,11 @@ downloadRouter
     const thumbnailFilePath = thumbnailPath + descPathOfThumbnail + saveName; // 略缩图路径+名称
     const mediumFilePath = mediumPath + descPathOfThumbnail + saveName; // 中号图路径 + 名称
     // 获取原图id
-    const descPathOfOrigin = generateFolderName(originPath); // 原图存放路径
-    originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
+    const originImagePath = await db.ResourceModel.getMediaPath('mediaOrigin');
+    const descPathOfOrigin = generateFolderName(originImagePath); // 原图存放路径
+    const originId = await ctx.db.SettingModel.operateSystemID("originImg", 1);
     let originSaveName = originId + '.' + extension;
-    const originFilePath = originPath + descPathOfOrigin + originSaveName; // 原图存放路径
+    const originFilePath = originImagePath + descPathOfOrigin + originSaveName; // 原图存放路径
     // 获取图片尺寸
     const { width, height } = await imageMagick.info(path);
     // 生成无水印原图
@@ -271,7 +272,6 @@ downloadRouter
     const hash = await nkcModules.hash.getFileMD5(path);
     await fs.unlink(path);
     const pictureInfo = await imageMagick.info(mediaFilePath);
-    // await fs.rename(path, descFile);
     const r = new ctx.db.ResourceModel({
       rid,
       hash,

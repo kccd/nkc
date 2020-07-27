@@ -7,7 +7,7 @@ router
     const {statics} = settings;
     const {id} = params;
     const {t, c} = query;
-    if(t && !['sm', 'lg'].includes(t)) ctx.throw(400, '位置的文件尺寸');
+    if(t && !['sm', 'lg', 'md'].includes(t)) ctx.throw(400, '未知的文件尺寸');
     const a = await db.AttachmentModel.findOne({_id: id});
     if(a) {
       ctx.filePath = await a.getFilePath(t);

@@ -7,7 +7,7 @@ extensionLimit.others.map(o => {
   o._whitelist = o.whitelist.join(', ');
 });
 data.uploadSettings.watermark.buyNoWatermark /= 100;
-var app = new Vue({
+window.app = new Vue({
   el: "#app",
   data: {
     us: data.uploadSettings,
@@ -19,6 +19,12 @@ var app = new Vue({
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    resetFile() {
+      this.normalWatermarkData = '';
+      this.normalWatermarkFile = '';
+      this.smallWatermarkData = '';
+      this.smallWatermarkFile = '';
+    },
     addSizeLimit() {
       this.us.sizeLimit.others.push({
         ext: '',
@@ -60,6 +66,7 @@ var app = new Vue({
       const us = JSON.parse(JSON.stringify(this.us));
       const {extensionLimit} = us;
       const {normalWatermarkFile, smallWatermarkFile} = this;
+      const self = this;
       const normalWatermarkInput = this.$refs.normalWatermarkInput;
       const smallWatermarkInput = this.$refs.smallWatermarkInput;
       extensionLimit.defaultBlacklist = extensionLimit._defaultBlacklist.split(',').map(e => e.trim());
@@ -85,10 +92,14 @@ var app = new Vue({
           }
           return nkcUploadFile('/e/settings/upload', 'PUT', formData);
         })
-        .then(() => {
+        .then(data => {
           sweetSuccess('保存成功');
           normalWatermarkInput.value = null;
           smallWatermarkInput.value = null;
+          const {normalAttachId, smallAttachId} = data.uploadSettings.watermark;
+          self.us.watermark.normalAttachId = normalAttachId;
+          self.us.watermark.smallAttachId = smallAttachId;
+          self.resetFile();
         })
         .catch(sweetError);
     }

@@ -94,7 +94,7 @@ router
         ctx.throw(500, error);
       }
       // console.log(completePath);
-    } 
+    }
     // 信息入库
     const toolsModel = db.ToolsModel;
     const settingModel = db.SettingModel;
@@ -183,7 +183,7 @@ function checkToolInfo(data) {
 // 移动文件夹到新目录
 async function moveDir(sourcePath, toPath) {
   await deleteFolder(toPath); // 保证目标路径不存在同名文件夹
-  await fsPromises.rename(sourcePath, toPath);
+  await fsPromises.copyFile(sourcePath, toPath);
 }
 
 

@@ -85,6 +85,7 @@ NKC.modules.SelectResource = function() {
       }
     },
     methods: {
+      getUrl: NKC.methods.tools.getUrl,
       cancelCropPicture: function() {
         this.resetCropper();
         this.changePageType("list");
@@ -262,8 +263,11 @@ NKC.modules.SelectResource = function() {
         this.files.splice(index, 1);
       },
       startUpload: function(f) {
+        // 本次上传的任务id，由服务器生成
+        var serverTaskId = null;
         f.error = "";
         this.selectCategory("upload");
+        var fileId = null;
         Promise.resolve()
           .then(function() {
             if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
@@ -279,6 +283,7 @@ NKC.modules.SelectResource = function() {
             formData.append("type", "checkMD5");
             formData.append("fileName", f.name);
             formData.append("md5", md5);
+            fileId = md5;
             return nkcUploadFile("/r", "POST", formData);
           })
           .then(function(data) {
@@ -288,7 +293,7 @@ NKC.modules.SelectResource = function() {
               formData.append("file", f.data, f.data.name || (Date.now() + '.png'));
               return nkcUploadFile("/r", "POST", formData, function(e, progress) {
                 f.progress = progress;
-              });
+              }, 60 * 60 * 1000);
             }
           })
           .then(function() {
@@ -306,7 +311,6 @@ NKC.modules.SelectResource = function() {
             f.error = data.error || data;
             screenTopWarning(data.error || data);
           })
-        // 上传文件
       },
       newFile: function(file) {
         return {
@@ -419,6 +423,16 @@ NKC.modules.SelectResource = function() {
       }
     }
   });
+
+  // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
+  commonSocket.on("message", function(data) {
+    if(data.state === "fileProcessFinish") {
+      console.log("文件处理完成");
+      self.app.category = "all";
+      self.app.getResources(0);
+    }
+  })
+
   self.open = self.app.open;
   self.close = self.app.close;
 };

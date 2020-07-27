@@ -730,5 +730,7 @@
   "getUserAllScores": "获取某用户的所有积分",
   "forumScoreSettings": "专业积分策略设置",
 
+  "fileConvertNotice": "连接文件转换进度通知通道",
+
   "viewUserScores": "可在用户名片查看用户积分"
 }

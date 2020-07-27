@@ -12,7 +12,7 @@ router
     await next();
   })
   .put('/', async (ctx, next) => {
-    const {db, body, nkcModules} = ctx;
+    const {db, body, nkcModules, data} = ctx;
     const {fields, files} = body;
     const {checkNumber} = nkcModules.checkData;
     const uploadSettings = JSON.parse(fields.uploadSettings);
@@ -75,6 +75,7 @@ router
       await db.AttachmentModel.saveWatermark(files.smallWatermark, 'small');
     }
     await db.SettingModel.saveSettingsToRedis('upload');
+    data.uploadSettings = await db.SettingModel.getSettings('upload');
     await next();
   });
 module.exports = router;

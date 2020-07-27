@@ -649,7 +649,12 @@ threadRouter
 		}
 
 		data.homeSettings = await db.SettingModel.getSettings("home");
-		const ads = data.homeSettings.ads.fixed.concat(data.homeSettings.ads.movable);
+		const {fixed, movable} = data.homeSettings.recommendThreads;
+		const ads = fixed.manuallySelectedThreads.concat(
+		  fixed.automaticallySelectedThreads,
+      movable.manuallySelectedThreads,
+      movable.automaticallySelectedThreads
+    );
 		data.homeAd = ads.map(a => a.tid).includes(tid);
 		data.homeTopped = data.homeSettings.toppedThreadsId.includes(tid);
 		if(thread.type === "product" && ctx.permission("pushGoodsToHome")) {
@@ -946,5 +951,5 @@ threadRouter
 	.use('/:tid/topped', toppedRouter.routes(), toppedRouter.allowedMethods())
 	.use('/:tid/close', closeRouter.routes(), closeRouter.allowedMethods())
   .use("/:tid/subscribe", subscribeRouter.routes(), subscribeRouter.allowedMethods())
-	.use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
+  .use('/:tid', operationRouter.routes(), operationRouter.allowedMethods());
 module.exports = threadRouter;

@@ -39,6 +39,6 @@ module.exports = {
     subscribe: {
 		  POST: "subThread",
       DELETE: 'unSubThread'
-    }
+		}
 	}
 };

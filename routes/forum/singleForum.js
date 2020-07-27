@@ -91,9 +91,11 @@ router
 		// 根据thread生成封面图
     const thread = await db.ThreadModel.findOne({tid: _post.tid});
     if(files.postCover) {
-      await nkcModules.file.savePostCover(_post.pid, files.postCover);
+    	await db.AttachmentModel.savePostCover(_post.pid, files.postCover);
+      // await nkcModules.file.savePostCover(_post.pid, files.postCover);
     } else if(!_post.cover) {
-      await nkcModules.file.createPostCoverByPostId(_post.pid);
+			await db.AttachmentModel.savePostCover(_post.pid);
+      // await nkcModules.file.createPostCoverByPostId(_post.pid);
     }
 
     // 转发到专栏

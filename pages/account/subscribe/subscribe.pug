@@ -94,7 +94,7 @@ block content
                         input(type="checkbox" v-model="selectedSubId" :value="sub._id")
                     .small-forum-icon
                       div(v-if="!sub.forum.logo" :style="'background-color: ' + sub.forum.color")
-                      div(v-else :style="'background-image: url(' + getUrl('forumAvatar', sub.forum.logo) + ')'")
+                      div(v-else :style="'background-image: url(' + getUrl('forumLogo', sub.forum.logo) + ')'")
                     .small-forum-content
                       .small-forum-name
                         a.pointer(@click='appOpenUrl("/f/" + sub.fid)' :title="sub.forum.displayName") {{sub.forum.displayName}}

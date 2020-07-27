@@ -2,13 +2,13 @@ const Router = require('koa-router');
 const router = new Router();
 router
   .get('/', async (ctx, next) => {
-    const {db, data} = ctx;
+    const {db, data, nkcModules} = ctx;
     data.homeSettings = (await db.SettingModel.findOnly({_id: 'home'})).c;
     let homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
     data.homeBigLogo = homeBigLogo.map(attachId => {
       return {
         aid: attachId,
-        url: `/a/${attachId}`
+        url: nkcModules.tools.getUrl('homeBigLogo', attachId)
       };
     })
     ctx.template = 'experimental/settings/home.pug';
@@ -17,7 +17,7 @@ router
   })
   .put('/', async (ctx, next) => {
     const {db, body} = ctx;
-    const {topic, discipline, visitorThreadList, hotThreads, recommend} = body;
+    const {topic, discipline, visitorThreadList, hotThreads, recommend, subscribesDisplayMode} = body;
     if(!["home", "latest"].includes(visitorThreadList)) ctx.throw(400, `参数visitorThreadList错误：${visitorThreadList}`);
     const {postCount, postUserCount} = hotThreads;
     if(postCount < 0) ctx.throw(400, "热门文章最小回复数不能小于0");
@@ -31,14 +31,15 @@ router
         'c.list.discipline': !!discipline,
         'c.visitorThreadList': visitorThreadList,
         'c.hotThreads': hotThreads,
-        'c.recommend': recommend
+        'c.recommend': recommend,
+        'c.subscribesDisplayMode': subscribesDisplayMode
       }
     });
     await db.SettingModel.saveSettingsToRedis("home");
     await next();
   })
   .post('/biglogo', async (ctx, next) => {
-    const {body, db, data} = ctx;
+    const {body, db, data, nkcModules} = ctx;
     const {fields, files, type, aid} = body;
     if(type === "delete") {
       await db.SettingModel.updateOne({_id: 'home'}, {
@@ -52,9 +53,9 @@ router
       for(let key in files) {
         const file = files[key];
         let attachment = await db.AttachmentModel.saveHomeBigLogo(file);
-        data.saved.push({aid: attachment._id, url: `/a/${attachment._id}`});
+        data.saved.push({aid: attachment._id, url: nkcModules.tools.getUrl('homeBigLogo', attachment._id)});
       }
     }
-    next();
+    return next();
   });
 module.exports = router;

@@ -1,28 +1,20 @@
 const Router = require('koa-router');
 const RmRouter = new Router();
-const {upload, statics, cache} = require('../../settings');
-const {mediumPath} = upload;
-const {defaultMediumPath} = statics;
+const PATH = require('path');
 RmRouter
   .get('/:rid', async (ctx, next) => {
     const {rid} = ctx.params;
-    const {db, fs} = ctx;
+    const {db, fs, nkcModules, settings} = ctx;
     const targetResource = await db.ResourceModel.findOnly({rid});
     const extension = targetResource.ext;
-    const extArr = ['jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'];
-    let url;
-    if(extArr.includes(extension.toLowerCase()) && targetResource.tpath) {
-      url = mediumPath + '/' + targetResource.tpath;
-      try{
-        await fs.access(url);
-      } catch (e) {
-        url = defaultMediumPath;
-      }
-    } else {
-      url = defaultMediumPath;
+    const fileFolder = await nkcModules.file.getPath('mediaPicture', targetResource.toc);
+    let url = PATH.resolve(fileFolder, `./${rid}_md.${extension}`);
+    try{
+      await fs.access(url);
+    } catch (e) {
+      url = settings.statics.defaultMediumPath;
     }
     ctx.filePath = url;
-    ctx.set('Cache-Control', `public, max-age=${cache.maxAge}`);
     ctx.type = extension;
     await next();
   });

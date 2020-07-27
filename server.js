@@ -43,8 +43,8 @@ const jobsInit = async () => {
   jobs.updateForums(updateDate.updateForumsCronStr);
   jobs.shop();
   jobs.backupDatabase();
-  // jobs.checkKcbsRecords();
   jobs.moveRecycleMarkThreads();
+  jobs.clearFileCache();
 };
 
 // 定时任务 隔一段时间执行
@@ -52,6 +52,8 @@ const timedTasksInit = async () => {
  const timedTasks = require("./timedTasks");
  await timedTasks.cacheActiveUsers();
  await timedTasks.clearTimeoutPageCache();
+ await timedTasks.updateRecommendThreads();
+ await timedTasks.clearResourceState();
 };
 
 const start = async () => {

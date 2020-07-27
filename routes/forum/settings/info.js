@@ -9,7 +9,7 @@ infoRouter
 	.put('/', async (ctx, next) => {
 		const {data, db, body, nkcModules} = ctx;
 		const {forum} = data;
-		if(body.opeartion) {
+		if(body.operation) {
 			const {did, declare} = body;
 			// 富文本内容中每一个source添加引用
 			await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
@@ -72,11 +72,11 @@ infoRouter
 
 		if(logoFile) {
 			logoFile.name = `${Date.now()}.png`;
-			data.logo = (await db.AttachmentModel.saveForumImage(forum.fid, 'logo', logoFile))._id;
+			data.logo = (await db.AttachmentModel.saveForumImage(forum.fid, 'forumLogo', logoFile))._id;
 		}
 		if(bannerFile) {
 			bannerFile.name = `${Date.now()}.png`;
-			data.banner = (await db.AttachmentModel.saveForumImage(forum.fid, 'banner', bannerFile))._id;
+			data.banner = (await db.AttachmentModel.saveForumImage(forum.fid, 'forumBanner', bannerFile))._id;
 		}
 
 		if(forum.lid) {

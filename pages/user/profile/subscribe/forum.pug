@@ -22,7 +22,7 @@ div
       .account-follower
         .account-follower-avatar
           if subscribe.forum.logo
-            img.img(src=tools.getUrl("forumAvatar", subscribe.forum.logo))
+            img.img(src=tools.getUrl("forumLogo", subscribe.forum.logo))
           else
             .img(style=`background-color: ${subscribe.forum.color};`)
         .account-follower-content

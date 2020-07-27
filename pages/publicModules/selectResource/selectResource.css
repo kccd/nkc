@@ -303,3 +303,21 @@
   cursor: pointer;
   margin-bottom: 0.2rem;
 }
+
+#moduleSelectResource .resource-in-process{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  height: 2rem;
+  width: 100%;
+  color: #777;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+#moduleSelectResource .resource-in-process-bg{
+  background-color: #dfdfdf;
+}

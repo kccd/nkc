@@ -60,7 +60,7 @@ const draftSchema = new Schema({
   },
   // 英文摘要
   abstractEn: {
-    type: String, 
+    type: String,
     default: "",
   },
   // 作者信息
@@ -125,7 +125,8 @@ draftSchema.statics.removeDraftById = async (id, uid) => {
   const DraftModel = mongoose.model("draft");
   const SurveyModel = mongoose.model("surveys");
   const draft = await DraftModel.findOne({did: id, uid});
-  if(!draft) throwErr(500, `未找到ID为${id}的草稿`);
+  if(!draft) return;
+  // if(!draft) throwErr(500, `未找到ID为${id}的草稿`);
   await draft.remove();
   if(draft.surveyId) {
     await SurveyModel.remove({uid, _id: draft.surveyId});
