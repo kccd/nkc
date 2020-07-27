@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs');
-const fileFolder = require('./fileFolder');
 const {mkdirSync} = fs;
 
 const paths = {
