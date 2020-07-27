@@ -459,7 +459,8 @@ func.saveHomeAdCover = async (file, type) => {
 * 检查文件类型与格式是否对应，返回文件格式
 * */
 func.getFileExtension = async (file, extensions = []) => {
-  let extension = await FileType.fromFile(file.path);
+  // let extension = await FileType.fromFile(file.path);
+  let extension;
   const pathExtension = PATH.extname(file.name).replace('.', '').toLowerCase();
   if(extension) {
     extension = extension.ext;
