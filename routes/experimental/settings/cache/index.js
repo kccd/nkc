@@ -28,7 +28,7 @@ router
       });
       await db.SettingModel.saveSettingsToRedis("cache");
     } else if(type === "clear") {
-      await ctx.redis.cacheForums();
+      await db.CacheModel.clearAllCache();
     }
     await next();
   });

@@ -29,10 +29,7 @@ func.clearTimeoutPageCache = async () => {
       }).sort({toc: 1}).limit(500);
       for(const cache of caches) {
         try{
-          const {key} = cache;
-          await redisClient.delAsync(`page:${key}:toc`);
-          await redisClient.delAsync(`page:${key}:data`);
-          await cache.remove();
+          await cache.clear();
         } catch(err) {
           if(global.NKC.NODE_ENV !== "production") {
             console.log(err);
