@@ -1834,7 +1834,7 @@ threadSchema.statics.getHomeRecommendThreadsByType = async (type, fid = []) => {
     automaticallySelectedThreads
   );
   threadsId = threadsId.map(t => t.tid);
-  const threads = await ThreadModel.find({tid: {$in: threadsId}}, {tid: 1});
+  const threads = await ThreadModel.find({tid: {$in: threadsId}, mainForumsId: {$in: fid}}, {tid: 1});
   const threadsObj = {};
   threads.map(thread => {
     threadsObj[thread.tid] = true;
