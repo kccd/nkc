@@ -41,8 +41,8 @@ module.exports = client;
 * user:uid:subscribeType:subscribeTypeId:topic
 * user:uid:subscribeType:subscribeTypeId:discipline
 *
-* 专业分类
-* forumCategories
+
+*
 *
 * 设置 settingsId(设置ID)
 * settings:settingsId json string
@@ -64,3 +64,13 @@ module.exports = client;
 *
 * 删除键： delAsync
 * */
+
+/*
+* 用户证书
+* role:${roleId} = jsonString roleObj
+* role:keys = jsonString [roleId, ...]
+*
+* 专业分类
+* forumCategories = jsonString [CategoryObj, ...]
+*
+ */

@@ -847,7 +847,9 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     if(o.forum) {
       const forums = [];
       for(const fid of thread.mainForumsId) {
-        forums.push(forumsObj[fid]);
+        const f = forumsObj[fid];
+        if(f) forums.push(f);
+        // forums.push(forumsObj[fid]);
       }
       thread.forums = forums;
     }

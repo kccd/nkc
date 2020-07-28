@@ -628,7 +628,7 @@ forumSchema.statics.canManagerFid = async function(roles, grade, user, baseFid) 
   }
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user, baseFid);
 
-  const mFid = await client.smembersAsync(`moderator:${uid}`);
+  const mFid = await client.smembersAsync(`moderator:${uid}:forumsId`);
 
   return mFid.filter(f => fid.includes(f));
 };
@@ -742,7 +742,7 @@ forumSchema.methods.isModerator = async function(uid) {
     uid = uid.uid;
   }
   if(!uid) return false;
-  const key = `moderator:${uid}`;
+  const key = `moderator:${uid}:forumsId`;
   const fid = await client.smembersAsync(key);
   return fid.includes(this.fid);
 
@@ -912,7 +912,7 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
   if(!user) {
     // 游客
     for(const roleId of rolesId) {
-      const f = await client.smembersAsync(`role:${roleId}`);
+      const f = await client.smembersAsync(`role:${roleId}:forumsId`);
       fid = fid.concat(f);
     }
 
@@ -931,13 +931,13 @@ forumSchema.statics.getAccessibleForumsId = async (roles, grade, user, baseFid) 
       uid = user.uid;
     }
 
-    const fidForUid = await client.smembersAsync(`moderator:${uid}`);
+    const fidForUid = await client.smembersAsync(`moderator:${uid}:forumsId`);
 
     fid = fid.concat(fidForUid);
 
 
     for(const roleId of rolesId) {
-      const fidForRoleAndGrade = await client.smembersAsync(`role-grade:${roleId}-${gradeId}`);
+      const fidForRoleAndGrade = await client.smembersAsync(`role-grade:${roleId}-${gradeId}:forumsId`);
       fid = fid.concat(fidForRoleAndGrade);
     }
 

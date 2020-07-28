@@ -54,6 +54,7 @@ roleRouter
       type
     });
     await role.save();
+    await db.RoleModel.saveRolesToRedis();
     await redis.cacheForums();
     await next();
 	})
