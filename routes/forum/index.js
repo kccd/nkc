@@ -82,8 +82,10 @@ forumRouter
 				break;
 			}
 		}
+		const forumCategories = await db.ForumCategoryModel.getAllCategories();
 		const newForum = db.ForumModel({
 			fid: _id,
+			categoryId: forumCategories[0]._id,
 			displayName,
 			accessible: false,
 			visibility: false,

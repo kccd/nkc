@@ -6,7 +6,7 @@
       .modal-header
         button.close(data-dismiss="modal" aria-label="Close")
           span(aria-hidden="true") &times;
-        h4.modal-title 移动文章
+        h4.modal-title {{hideMoveType? '选择专业': '移动文章'}}
       .modal-body
         .text-center.m-t-1.m-b-1(v-if="loading") 加载专业列表中...
         div(v-else)
