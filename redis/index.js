@@ -51,5 +51,4 @@ obj.pubWithdrawn = async (message) => {
 };
 
 obj.cacheForums = cacheForums;
-
 module.exports = obj;

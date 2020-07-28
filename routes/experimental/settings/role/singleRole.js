@@ -69,16 +69,17 @@ router
       updateObj.operationsId = operations.map(o => o._id);
     }
     await roleDB.update(updateObj);
-    await redis.cacheForums();
+    await db.RoleModel.saveRolesToRedis();
     await next();
   })
   .post('/icon', async (ctx, next) => {
-    const {fs, fsPromise, body, data, settings} = ctx;
+    const {fs, fsPromise, body, data, db, settings} = ctx;
     const {defaultRoleIconPath} = settings.statics;
     const {role} = data;
     const {file} = body.files;
     await fsPromise.copyFile(file.path, defaultRoleIconPath + '/' + role._id + '.png');
     await role.update({hasIcon: true});
+    await db.RoleModel.saveRolesToRedis();
     await next();
   })
   .del('/', async (ctx, next) => {
@@ -89,7 +90,7 @@ router
     await db.UserModel.updateMany({certs: _id}, {$pull: {certs: _id}});
     await db.ForumModel.updateMany({rolesId: _id}, {$pull: {rolesId: _id}});
 		await role.remove();
-    await redis.cacheForums();
+    await db.RoleModel.saveRolesToRedis();
 		await next();
   });
 module.exports = router;

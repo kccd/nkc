@@ -42,6 +42,7 @@ categoryRouter
         }});
 				await forum.updateForumMessage();
 			}
+			await redis.cacheForums();
 		} else if(operation === 'saveOrder') {
 			const {childrenFid, threadTypesCid, categoryId} = body;
 			const forumCategory = await db.ForumCategoryModel.findOne({_id: categoryId});
@@ -70,7 +71,6 @@ categoryRouter
 			if(!name) ctx.throw(400, '新分类名不能为空');
 			await threadType.update({name});
 		}
-    await redis.cacheForums();
 		await db.ForumModel.saveForumsIdToRedis("topic");
     await db.ForumModel.saveForumsIdToRedis("discipline");
 		await next();
@@ -96,7 +96,7 @@ categoryRouter
 		});
 		await newType.save();
     data.newType = newType;
-    await redis.cacheForums();
+    // await redis.cacheForums();
 		await next();
 	})
 	.del('/', async (ctx, next) => {
@@ -108,7 +108,7 @@ categoryRouter
 		if(!threadType) ctx.throw(400, '分类不存在');
 		await db.ThreadModel.updateMany({categoriesId: threadType.cid}, {$pull: {categoriesId: threadType.cid}});
     await threadType.remove();
-    await redis.cacheForums();
+    // await redis.cacheForums();
 		await next();
 	})
 module.exports = categoryRouter;

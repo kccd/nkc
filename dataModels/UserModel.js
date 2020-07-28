@@ -937,7 +937,7 @@ userSchema.statics.extendUsersInfo = async (users) => {
     }
     for(const cert of certs) {
       const role = await RoleModel.extendRole(cert);
-      if(role.displayName && !role.hidden) {
+      if(role && role.displayName && !role.hidden) {
         info.certsName.push(role.displayName);
       }
     }

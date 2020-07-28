@@ -847,7 +847,9 @@ threadSchema.statics.extendThreads = async (threads, options) => {
     if(o.forum) {
       const forums = [];
       for(const fid of thread.mainForumsId) {
-        forums.push(forumsObj[fid]);
+        const f = forumsObj[fid];
+        if(f) forums.push(f);
+        // forums.push(forumsObj[fid]);
       }
       thread.forums = forums;
     }
@@ -1834,7 +1836,7 @@ threadSchema.statics.getHomeRecommendThreadsByType = async (type, fid = []) => {
     automaticallySelectedThreads
   );
   threadsId = threadsId.map(t => t.tid);
-  const threads = await ThreadModel.find({tid: {$in: threadsId}}, {tid: 1});
+  const threads = await ThreadModel.find({tid: {$in: threadsId}, mainForumsId: {$in: fid}}, {tid: 1});
   const threadsObj = {};
   threads.map(thread => {
     threadsObj[thread.tid] = true;

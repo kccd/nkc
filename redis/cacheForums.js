@@ -1,5 +1,5 @@
 require('colors');
-const {CacheModel, ThreadModel, ActiveUserModel, ForumCategoryModel, ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
+const {ForumModel, RoleModel, UsersGradeModel} = require('../dataModels');
 const client = require('../settings/redisClient');
 
 async function func() {
@@ -114,10 +114,6 @@ async function func() {
     }
   }
 
-  // 清空redis数据库
-  await client.flushdbAsync();
-  // 清空缓存表
-  await CacheModel.remove();
   // 获取下级专业
   for(const forum of forums) {
 
@@ -198,8 +194,7 @@ async function func() {
   for(const roleId in roles) {
 
     if(!roles.hasOwnProperty(roleId)) continue;
-
-    const key = `role:${roleId}`;
+    const key = `role:${roleId}:forumsId`;
 
     if(roles[roleId].length !== 0) {
       await client.saddAsync(key, roles[roleId]);
@@ -210,7 +205,7 @@ async function func() {
 
     if(!grades.hasOwnProperty(gradeId)) continue;
 
-    const key = `grade:${gradeId}`;
+    const key = `grade:${gradeId}:forumsId`;
 
     if(grades[gradeId].length !== 0) {
       await client.saddAsync(key, grades[gradeId]);
@@ -227,7 +222,7 @@ async function func() {
     rolesAndGrades[roleAndGrade] = rolesAndGrades[roleAndGrade].concat(roles[arr[0]]);
     rolesAndGrades[roleAndGrade] = rolesAndGrades[roleAndGrade].concat(grades[arr[1]]);
 
-    const key = `${roleAndGrade}`;
+    const key = `${roleAndGrade}:forumsId`;
 
     const data = await client.smembersAsync(key);
 
@@ -244,7 +239,7 @@ async function func() {
 
     if(!moderators.hasOwnProperty(moderator)) continue;
 
-    const key = `moderator:${moderator}`;
+    const key = `moderator:${moderator}:forumsId`;
 
     if(moderators[moderator].length !== 0) {
       await client.saddAsync(key, moderators[moderator]);
@@ -271,25 +266,7 @@ async function func() {
     await client.saddAsync(key, canNotDisplayOnNavForumsId);
   }
 
-  // 缓存证书信息
-  for(const role of rolesDB) {
-    let key = `role:${role._id}:displayName`;
-    await client.setAsync(key, role.displayName);
-    key = `role:${role._id}:modifyPostTimeLimit`;
-    await client.setAsync(key, role.modifyPostTimeLimit);
-    key = `role:${role._id}:hidden`;
-    await client.setAsync(key, role.hidden?"true":"false");
-    if(role.operationsId.length === 0) continue;
-    key = `role:${role._id}:operationsId`;
-    await client.saddAsync(key, role.operationsId);
-  }
-
-  await ActiveUserModel.saveActiveUsersToCache();
-
-  // 缓存专业分类
-  await ForumCategoryModel.saveCategoryToRedis();
-
-  console.log(`缓存更新完成`.green);
+  console.log(`专业缓存更新完成`.green);
 }
 
 module.exports = func;

@@ -84,7 +84,7 @@ const roleSchema = new Schema({
 		type: Boolean,
 		default: false,
 	},
-	
+
   postToForum: {
 	  countLimit: {
 	    unlimited: {
@@ -175,15 +175,91 @@ roleSchema.methods.getUsers = async function(paging) {
 	}
 	return await UserModel.find(q).sort({toc: -1}).skip(start).limit(perpage);
 };
+
+/*
+* 将单个证书对象缓存到redis
+* @param {Object} role 证书对象
+* @author pengxiguaa 2020/7/28
+* */
+roleSchema.statics.saveRoleObjToRedis = async (role) => {
+	const key = `role:${role._id}`;
+	await redisClient.setAsync(key, JSON.stringify(role));
+}
+/*
+* 缓存单个用户证书信息到redis
+* @param {String} _id 证书id
+* @return {Object} 证书对象
+* @author pengxiguaa 2020/7/28
+* */
+roleSchema.statics.saveRoleToRedis = async (_id) => {
+	const RoleModel = mongoose.model('roles');
+	const role = await RoleModel.findOne({_id});
+	if(!role) throwErr(500, `未知的证书ID _id: ${_id}`);
+	await RoleModel.saveRoleObjToRedis(role);
+	return role;
+};
+/*
+* 缓存全部用户证书信息到redis
+* @return {[Object]} 证书对象组成的数组
+* @author pengxiguaa 2020/7/28
+* */
+roleSchema.statics.saveRolesToRedis = async () => {
+	const RoleModel = mongoose.model('roles');
+	const roles = await RoleModel.find();
+	for(const role of roles) {
+		await RoleModel.saveRoleObjToRedis(role);
+	}
+	const rolesId = roles.map(role => role._id);
+	await RoleModel.saveRolesIdToRedis(rolesId);
+	return roles;
+};
+/*
+* 缓存全部用户证书的ID到redis
+* @param {[String]} rolesId 证书ID组成的数组
+* @author pengxiguaa 2020/7/28
+* */
+roleSchema.statics.saveRolesIdToRedis = async (rolesId) => {
+	const key = `roles:keys`;
+	await redisClient.setAsync(key, JSON.stringify(rolesId))
+	return rolesId;
+};
+/*
+* 从redis获取全部用户证书的ID
+* @return {[String]} 证书ID组成的数组
+* */
+roleSchema.statics.getRolesId = async () => {
+	const key = `roles:keys`;
+	const rolesIdString = await redisClient.getAsync(key);
+	return JSON.parse(rolesIdString);
+};
+/*
+* 从redis获取证书信息
+* @param {String} _id 证书ID
+* @return {Object} 证书对象
+* @author pengxiguaa 2020/7/28
+* */
 roleSchema.statics.extendRole = async (_id) => {
-  const role = {_id};
+	const key = `role:${_id}`;
+	const RoleModel = mongoose.model('roles');
+	const rolesId = await RoleModel.getRolesId();
+	if(!rolesId.includes(_id)) return;
+	let role = await redisClient.getAsync(key);
+	try{
+		role = JSON.parse(role);
+	} catch(err) {
+		const RoleModel = mongoose.model('roles');
+		role = await RoleModel.saveRoleToRedis(_id);
+	}
+	return role;
+
+  /*const role = {_id};
   role.hidden = await redisClient.getAsync(`role:${_id}:hidden`);
   role.hidden = (role.hidden === "true");
   role.displayName = await redisClient.getAsync(`role:${_id}:displayName`);
   role.operationsId = await redisClient.smembersAsync(`role:${_id}:operationsId`);
   role.modifyPostTimeLimit = await redisClient.getAsync(`role:${_id}:modifyPostTimeLimit`);
   role.modifyPostTimeLimit = Number(role.modifyPostTimeLimit || 0);
-  return role;
+  return role;*/
 };
 
 /*
