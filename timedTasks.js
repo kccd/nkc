@@ -126,4 +126,23 @@ func.clearResourceState = async() => {
   }, 60*60*1000);
 }
 
+/*
+* 更新专业最新文章
+* */
+func.updateAllForumLatestThread = async () => {
+  setTimeout(async () => {
+    try{
+      console.log(`正在更新专业最新文章...`);
+      await db.ForumModel.saveAllForumLatestThreadToRedis();
+    } catch(err) {
+      if(global.NKC.NODE_ENV !== 'production') {
+        console.log(err);
+      }
+    } finally {
+      console.log(`专业最新文章更新完成`);
+      await func.updateAllForumLatestThread();
+    }
+  }, 6 * 60 * 1000);
+};
+
 module.exports = func;

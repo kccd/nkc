@@ -1,4 +1,3 @@
-require('colors');
 const moment = require('moment');
 const cookieConfig = require("../../../config/cookie");
 const db = require('../../../dataModels');
@@ -77,7 +76,7 @@ const message = async (i) => {
       })
     }));
     socket.join(`user/${uid}`, async () => {
-      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/message'.bgBlue} ${'连接成功'.bgGreen}`);
+      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgBlue} ${'/message'.bgBlue} ${'连接成功'.bgGreen}`);
       global.NKC.io.of('/console').NKC.socketMessage('/message', true, uid);
     });
     await db.UserModel.update({uid}, {

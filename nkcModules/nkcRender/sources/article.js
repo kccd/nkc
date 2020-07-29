@@ -52,7 +52,7 @@ module.exports = {
     const url = getUrl("resource", id);
     return `
       <span data-tag="nkcsource" data-type="audio" data-id="${id}">
-        <audio class="plyr-dom" preload="none" controls data-rid="rid">
+        <audio class="plyr-dom" preload="none" controls data-rid="${id}">
           <source src="${url}" type="audio/mp3"/>
           你的浏览器不支持audio标签，请升级。
         </audio>
@@ -84,12 +84,12 @@ module.exports = {
           <img src="${fileCover}" alt="attachment icon">
         </span>
         <span class="article-attachment-content">
-          <a class="article-attachment-name" href="${url}?t=attachment" title="${oname}" target="_blank">${oname}</a>
+          <a class="article-attachment-name" ${resource.isFileExist? `href="${url}?t=attachment"`: ""} title="${oname}" target="_blank">${oname}</a>
           <span class="article-attachment-info">
             <span class="article-attachment-size">${getSize(size)}</span>
             <span class="article-attachment-ext">${ext.toUpperCase()}</span>
             <span class="article-attachment-hits">${hits}次下载</span>
-            ${pdfHTML}
+            ${resource.isFileExist?pdfHTML:`<span class="article-attachment-ext">附件已丢失</span>`}
           </span>
         </span>
       </span>  

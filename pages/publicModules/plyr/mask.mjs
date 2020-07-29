@@ -11,8 +11,15 @@ if(!threadSettings.isDisplay) {
     maskPlayButton.on("click", () => {
       maskDom.remove();
       player.play();
+      if(player.type === "audio") {
+        $(player.elements.controls).css("height", "");
+      }
     });
     maskDownloadButton.on("click", () => NKC.methods.visitUrl(player.download, "_blank"));
+    if(player.type === "audio") {
+      maskDom.attr("style", "font-size: 10px");
+      $(player.elements.controls).css("height", "150px");
+    }
     $(container).append(maskDom);
   }
 }

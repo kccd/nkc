@@ -1,68 +1,25 @@
-.thread-panel(class=!thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":"")
-  if !thread.reviewed
-    include ../module_review
-  if thread.disabled
-    include ../module_disabled
-  if thread.recycleMark
-    include ../module_toDraft
+.thread-panel-for-subscribe-forum
   .thread-panel-body
     .thread-panel-content
+      //- 文章标题
+      .thread-panel-title
+        a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.post.t)= thread.post.t
+
       //- 作者信息 专业信息 时间
       .thread-panel-author-info
-        if canManagement
-          .checkbox.thread-checkbox
-            label
-              input(
-                type="checkbox"
-                data-thread-id=thread.tid
-                data-post-id=thread.oc
-                data-thread-fids=thread.mainForumsId.join("-")
-                data-thread-cids=(thread.categoriesId || []).join("-")
-              )
-
-
-        if !thread.firstPost.anonymous
-          .thread-panel-author(data-float-uid=thread.uid)
-            a(href=`/u/${thread.uid}` target="_blank")
-              img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
-            a(
-              href=`/u/${thread.uid}` target="_blank"
-            )= thread.firstPost.user.username
+        if thread.user.uid
+          .thread-panel-author(data-float-uid=thread.user.uid)
+            a(href=`/u/${thread.user.uid}` target="_blank")= thread.user.username
         else
           .thread-panel-author
-            img(src=anonymousInfo.avatar)
-            span.anonymous-name= anonymousInfo.username
+            span.anonymous-name= thread.user.username
 
         .thread-panel-time=fromNow(thread.toc)
 
         .thread-panel-button
-          if thread.firstPost.voteUp
-            .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
+          if thread.post.voteUp
+            .fa.fa-thumbs-up=` ${thread.post.voteUp || ''}`
           if thread.hits
             .fa.fa-eye=` ${thread.hits}`
           if thread.count
             .fa.fa-comment=` ${thread.count}`
-        if thread.from
-          .thread-panel-from
-            if thread.from === 'own'
-              span 自己的文章
-            else if thread.from === 'subForum'
-              span 关注的专业
-            else if thread.from === 'subFriend'
-              span 好友
-            else if thread.from === "subThread"
-              span 关注的文章
-            else if thread.from === "collection"
-                span 收藏
-
-      //- 文章标题
-      .thread-panel-title
-        a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t)= thread.firstPost.t
-        -const pageCount = thread.count / state.pageSettings.threadPostList
-        -let ellipsis = false;
-        -for(let i = 1; i < pageCount; i++)
-          if i < 4 || i > pageCount - 3
-            a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
-          else if !ellipsis
-            span.thread-title-page ...
-            -ellipsis = true;

@@ -812,6 +812,9 @@ postSchema.statics.extendPosts = async (posts, options) => {
 
   if(o.resource) {
     resources = await ResourceModel.find({references: {$in: [...pid]}});
+    await Promise.all(
+      resources.map(async resource => await resource.setFileExist())
+    )
     resources.map(resource => {
       resource.uid = "";
       resource.references.map(id => {

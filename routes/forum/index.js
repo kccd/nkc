@@ -87,8 +87,9 @@ forumRouter
 			fid: _id,
 			categoryId: forumCategories[0]._id,
 			displayName,
-			accessible: false,
+			accessible: true,
 			visibility: false,
+			rolesId: ['dev', 'default'],
 			type: 'forum'
     });
 
@@ -98,6 +99,7 @@ forumRouter
 
     await redis.cacheForums();
 		data.forum = newForum;
+		data.forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
 		await next();
 	})
   .use('/:fid', singleForumRouter.routes(), singleForumRouter.allowedMethods());

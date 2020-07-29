@@ -18,5 +18,7 @@ module.exports = async () => {
   await db.ActiveUserModel.saveActiveUsersToCache();
   // 专业分类
   await db.ForumCategoryModel.saveCategoryToRedis();
+  // 专业最新文章
+  await db.ForumModel.saveAllForumLatestThreadToRedisAsync();
 
 }

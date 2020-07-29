@@ -1,4 +1,3 @@
-const { resolve } = require("bluebird");
 require('colors');
 const moment = require('moment');
 
