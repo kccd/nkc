@@ -1324,12 +1324,13 @@ forumSchema.statics.saveForumsIdToRedis = async (forumType) => {
   const ForumModel = mongoose.model("forums");
   const forums = await ForumModel.find({forumType}, {fid: 1});
   const forumsId = forums.map(t => t.fid);
-  setTimeout(async () => {
+  setImmediate(async () => {
     const key = `forums:${forumType}sId`;
-    await client.delAsync(key);
+    await client.resetSetAsync(key, forumsId);
+    /*await client.delAsync(key);
     if(forumsId.length) {
       await client.saddAsync(key, forumsId);
-    }
+    }*/
   });
   return forumsId
 };

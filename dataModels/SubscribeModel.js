@@ -98,10 +98,11 @@ schema.statics.saveUserSubUsersId = async (uid) => {
   }, {tUid: 1}).sort({toc: -1});
   const usersId = sub.map(s => s.tUid);
   setImmediate(async () => {
-    await redisClient.delAsync(`user:${uid}:subscribeUsersId`);
+    await redisClient.resetSetAsync(`user:${uid}:subscribeUsersId`, usersId);
+    /*await redisClient.delAsync(`user:${uid}:subscribeUsersId`);
     if(usersId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeUsersId`, usersId);
-    }
+    }*/
     await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return usersId;
@@ -134,10 +135,11 @@ schema.statics.saveUserFansId = async (uid) => {
   }, {uid: 1}).sort({toc: -1});
   const usersId = sub.map(s => s.uid);
   setImmediate(async () => {
-    await redisClient.delAsync(`user:${uid}:fansId`);
+    await redisClient.resetSetAsync(`user:${uid}:fansId`, usersId);
+    /*await redisClient.delAsync(`user:${uid}:fansId`);
     if(usersId.length) {
       await redisClient.saddAsync(`user:${uid}:fansId`, usersId);
-    }
+    }*/
     await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return usersId;
@@ -174,10 +176,11 @@ schema.statics.saveUserSubForumsId = async (uid) => {
   }, {fid: 1}).sort({toc: -1});
   const forumsId = subs.map(s => s.fid);
   setImmediate(async () => {
-    await redisClient.delAsync(`user:${uid}:subscribeForumsId`);
+    await redisClient.resetSetAsync(`user:${uid}:subscribeForumsId`, forumsId);
+    /*await redisClient.delAsync(`user:${uid}:subscribeForumsId`);
     if(forumsId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeForumsId`, forumsId);
-    }
+    }*/
     await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return forumsId;
@@ -209,10 +212,11 @@ schema.statics.saveUserSubColumnsId = async (uid) => {
   }, {columnId: 1}).sort({toc: -1});
   const columnsId = subs.map(s => s.columnId);
   setImmediate(async () => {
-    await redisClient.delAsync(`user:${uid}:subscribeColumnsId`);
+    await redisClient.resetSetAsync(`user:${uid}:subscribeColumnsId`, columnsId);
+    /*await redisClient.delAsync(`user:${uid}:subscribeColumnsId`);
     if(columnsId.length) {
       await redisClient.saddAsync(`user:${uid}:subscribeColumnsId`, columnsId);
-    }
+    }*/
     await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return columnsId;
@@ -257,20 +261,23 @@ schema.statics.saveUserSubThreadsId = async (uid, detail) => {
   });
   setImmediate(async () => {
     let key = `user:${uid}:subscribeThreadsId`;
-    await redisClient.delAsync(key);
+    await redisClient.resetSetAsync(key, total);
+    /*await redisClient.delAsync(key);
     if(total.length) {
       await redisClient.saddAsync(key, total);
-    }
+    }*/
     key = `user:${uid}:subscribeThreadsId:replay`;
-    await redisClient.delAsync(key);
+    await redisClient.resetSetAsync(key, reply);
+    /*await redisClient.delAsync(key);
     if(reply.length) {
       await redisClient.saddAsync(key, reply);
-    }
+    }*/
     key = `user:${uid}:subscribeThreadsId:sub`;
-    await redisClient.delAsync(key);
+    await redisClient.resetSetAsync(key, sub);
+    /*await redisClient.delAsync(key);
     if(sub.length) {
       await redisClient.saddAsync(key, sub);
-    }
+    }*/
     await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   if(detail === "replay") {
@@ -302,10 +309,11 @@ schema.statics.saveUserCollectionThreadsId = async (uid) => {
   }, {tid: 1}).sort({toc: -1});
   const threadsId = subs.map(s => s.tid);
   setImmediate(async () => {
-    await redisClient.delAsync(`user:${uid}:collectionThreadsId`);
+    await redisClient.resetSetAsync(`user:${uid}:collectionThreadsId`, threadsId);
+    /*await redisClient.delAsync(`user:${uid}:collectionThreadsId`);
     if(threadsId.length) {
       await redisClient.saddAsync(`user:${uid}:collectionThreadsId`, threadsId);
-    }
+    }*/
     await mongoose.model("subscribes").saveUserSubscribeTypesToRedis(uid);
   });
   return threadsId;
@@ -470,15 +478,15 @@ schema.statics.saveUserSubscribeTypesToRedis = async (uid, data) => {
     const oldSubscribeTypesId = await redisClient.smembersAsync(typeKey);
     for(const key of oldSubscribeTypesId) {
       for(const defaultType of defaultTypes) {
-        await redisClient.delAsync(`user:${uid}:subscribeType:${key}:${defaultType}`);
+        await redisClient.resetSetAsync(`user:${uid}:subscribeType:${key}:${defaultType}`, []);
       }
     }
     // 存入新键
-    await redisClient.saddAsync(typeKey, newSubscribeTypes);
+    await redisClient.resetSetAsync(typeKey, newSubscribeTypes);
     for(const key in results) {
       if(!results.hasOwnProperty(key)) continue;
       if(results[key].length) {
-        await redisClient.saddAsync(key, results[key]);
+        await redisClient.resetSetAsync(key, results[key]);
       }
     }
   });
