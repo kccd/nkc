@@ -17,8 +17,9 @@ module.exports = async (options) => {
       const forum = forumsObj[fid];
       if(!forum) continue;
       if (homeSettings.subscribesDisplayMode === "column") {
+        forum.latestThreads = await db.ForumModel.getLatestThreadsFromRedis(forum.fid);
         // 查出3篇此专业的最新内容放进forum
-        let posts = await db.PostModel.find({
+        /*let posts = await db.PostModel.find({
           mainForumsId: {$in: [fid]},
           disabled: false,
           reviewed: true,
@@ -40,7 +41,7 @@ module.exports = async (options) => {
           userInfo: false,
           firstPostResource: false,
           htmlToText: true
-        });
+        });*/
       }
       data.subForums.push(forum);
     }

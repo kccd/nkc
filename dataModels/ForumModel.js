@@ -1468,26 +1468,31 @@ forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
     recycleMark: {$ne: true},
     mainForumsId: fid,
   }, {
-    tid: 1, oc: 1, uid: 1, hits: 1, count: 1, toc: 1
+    tid: 1, oc: 1, uid: 1, hits: 1, count: 1, toc: 1, digest: 1
   }).sort({toc: -1}).limit(count);
   const postsId = [], usersId = [];
   threads.map(t => {
     postsId.push(t.oc);
     usersId.push(t.uid);
   });
-  const posts = await PostModel.find({pid: {$in: postsId}}, {pid: 1, t: 1});
+  const posts = await PostModel.find({pid: {$in: postsId}}, {pid: 1, t: 1, voteUp: 1, anonymous: 1});
   const users = await UserModel.find({uid: {$in: usersId}}, {username: 1, uid: 1});
   const postsObj = {}, usersObj = {};
   posts.map(p => postsObj[p.pid] = p);
   users.map(u => usersObj[u.uid] = u);
   const results = [];
   for(const thread of threads) {
-    const {tid, oc, uid, hits, count, toc} = thread;
+    const {tid, oc, uid, hits, count, toc, digest} = thread;
     const post = postsObj[oc];
     const user = usersObj[uid];
     if(!post || !user) continue;
+    if(post.anonymous) {
+      user.username = '匿名用户';
+      user.uid = '';
+    }
     results.push({
       tid,
+      digest,
       toc,
       hits,
       count,
