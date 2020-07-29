@@ -983,6 +983,8 @@ footer.footer {
 }
 .thread-panel-for-subscribe-forum .thread-panel-content .thread-panel-title a.title-content {
   font-size: 1.1em;
+  font-weight: normal;
+  color: #444;
 }
 .thread-panel-for-subscribe-forum .thread-panel-content .thread-panel-author-info {
   font-size: 0.8em;

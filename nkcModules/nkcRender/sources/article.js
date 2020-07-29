@@ -86,10 +86,10 @@ module.exports = {
         <span class="article-attachment-content">
           <a class="article-attachment-name" ${resource.isFileExist? `href="${url}?t=attachment"`: ""} title="${oname}" target="_blank">${oname}</a>
           <span class="article-attachment-info">
-            ${resource.isFileExist? `<span class="article-attachment-size">${getSize(size)}</span>`: ""}
-            <span class="article-attachment-ext">${resource.isFileExist? ext.toUpperCase(): "附件已丢失"}</span>
-            ${resource.isFileExist? `<span class="article-attachment-hits">${hits}次下载</span>`: ""}
-            ${resource.isFileExist? pdfHTML : ""}
+            <span class="article-attachment-size">${getSize(size)}</span>
+            <span class="article-attachment-ext">${ext.toUpperCase()}</span>
+            <span class="article-attachment-hits">${hits}次下载</span>
+            ${resource.isFileExist?pdfHTML:`<span class="article-attachment-ext">附件已丢失</span>`}
           </span>
         </span>
       </span>  

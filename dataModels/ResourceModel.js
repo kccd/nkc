@@ -5,6 +5,8 @@ const Schema = mongoose.Schema;
 const PATH = require('path');
 const fsSync = require('../tools/fsSync');
 const { existsSync, exists } = require('fs');
+const fs = require("fs");
+const fsPromise = fs.promises;
 const resourceSchema = new Schema({
 	rid: {
     type: String,
@@ -125,14 +127,13 @@ resourceSchema.virtual('isFileExist')
  * 文件是否存在
  */
 resourceSchema.methods.setFileExist = async function() {
-  let path = await this.getFilePath()
-  let self = this;
-  return new Promise((resolve, reject) => {
-    exists(path, exist => {
-      self.isFileExist = exist;
-      resolve(exist);
-    });
-  });
+  const path = await this.getFilePath()
+  try{
+    await fsPromise.stat(path);
+    this.isFileExist = true;
+  } catch(err) {
+    this.isFileExist = false;
+  }
 }
 
 
