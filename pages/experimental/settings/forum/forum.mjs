@@ -58,6 +58,7 @@ const app = new Vue({
     },
     addForum() {
       const forumName = this.forumName;
+      const self = this;
       Promise.resolve()
         .then(() => {
           if(!forumName) throw '专业名称不能为空';
@@ -67,10 +68,8 @@ const app = new Vue({
           return nkcAPI('/f', 'POST', {displayName: forumName})
         })
         .then(data => {
-          sweetSuccess('创建成功，正在前往专业设置');
-          setTimeout(() => {
-            NKC.methods.visitUrl(`/f/${data.forum.fid}/settings`);
-          }, 2000);
+          sweetSuccess('创建成功');
+          // self.forums = data.forums;
         })
         .catch(sweetError);
     },
@@ -84,5 +83,4 @@ const app = new Vue({
       arr.splice(index, 1);
     }
   }
-})
-
+});

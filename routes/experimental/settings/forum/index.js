@@ -24,7 +24,7 @@ router
 			}
 		}
 		for(let forum of forums) {
-			const order = fidArr.indexOf(forum.fid);
+			const order = fidArr.indexOf(forum.fid) + 1;
 			await forum.update({order});
 		}
 		const cid = [];
