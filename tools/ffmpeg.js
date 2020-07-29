@@ -167,7 +167,18 @@ const getImageSize = async (inputPath) => {
  * @param {array} filters 滤镜指令（数组，一层滤镜一个元素）
  */
 const ffmpegFilter = async (inputPath, outputPath, filters) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-filter_complex', filters.join(";"), '-y', outputPath]);
+  return spawnProcess('ffmpeg',
+    [
+      ...['-i', inputPath],                                              /* 输入 */
+      ...['-filter_complex', filters.join(";")],                         /* 滤镜表达式 */
+      '-y',                                                              /* 覆盖输出 */
+      ...['-c:v', 'libx264'],                                            /* 指定编码器 */
+      ...['-r', '24'],                                                   /* 帧率 */
+      ...['-maxrate', '5M'],                                             /* 最大码率 */
+      ...['-minrate', '1M'],                                             /* 最小码率 */
+      ...['-b:v', '2M'],                                                 /* 平均码率 */
+      outputPath                                                         /* 输出 */
+    ]);
 }
 
 /**

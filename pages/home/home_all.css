@@ -871,9 +871,40 @@ footer.footer {
 }
 .home-subscribe-forum-item .home-subscribe-forum-wrap,
 .home-subscribe-forum-item .home-subscribe-forum-newthread {
-  display: table-cell;
-  vertical-align: top;
+  display: block;
+  float: left;
 }
 .home-subscribe-forum-item .home-subscribe-forum-newthread {
-  padding-top: 10px;
+  padding-top: 6px;
+  width: calc(100% - 6.7rem);
+}
+.home-subscribe-forum-item::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.thread-panel-for-subscribe-forum .thread-panel-content {
+  display: block;
+}
+.thread-panel-for-subscribe-forum .thread-panel-content .thread-panel-author-info,
+.thread-panel-for-subscribe-forum .thread-panel-content .thread-panel-title {
+  float: left;
+  width: unset;
+}
+.thread-panel-for-subscribe-forum .thread-panel-content .thread-panel-title a.title-content {
+  font-size: 1.1em;
+}
+.thread-panel-for-subscribe-forum .thread-panel-content .thread-panel-author-info {
+  font-size: 0.8em;
+}
+.thread-panel-for-subscribe-forum .thread-panel-content::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.thread-panel-for-subscribe-forum .thread-panel-content .thread-panel-author a {
+  color: rgb(170 170 170);
+}
+.thread-panel-for-subscribe-forum + .thread-panel-for-subscribe-forum {
+  margin-top: 4px;
 }

@@ -110,21 +110,7 @@ block content
             .home-subscribes
               if data.subscribesDisplayMode === "column"
                 for forum in data.subForums
-                  .home-subscribe-forum-item
-                    .home-subscribe-forum-wrap
-                      a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
-                        .home-subscribe-forum-avatar
-                          if forum.logo
-                            img(src=tools.getUrl("forumLogo", forum.logo))
-                          else
-                            div(style=`background-color: ${forum.color}`)
-                        .home-subscribe-forum-info=forum.displayName
-                    .home-subscribe-forum-newthread
-                      if forum.latestThreads.length
-                        for thread in forum.latestThreads
-                          include ../publicModules/thread_panel/thread_panel_for_subscribe_forum
-                      else
-                        | 暂无新内容
+                  include ./subscribes_column
               if data.subscribesDisplayMode === "row" || !data.subscribesDisplayMode
                 for forum in data.subForums
                   a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
