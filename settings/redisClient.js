@@ -89,4 +89,6 @@ module.exports = client;
 * 专业分类
 * forumCategories = jsonString [CategoryObj, ...]
 *
+* forum:${fid}:latestThreads jsonString [threadObj, ...]
+*
  */

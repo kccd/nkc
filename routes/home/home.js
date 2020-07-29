@@ -2,7 +2,7 @@ module.exports = async (options) => {
   const {ctx, fidOfCanGetThreads} = options;
   const {data, db, nkcModules} = ctx;
   const {user} = data;
-  
+
   const homeSettings = await db.SettingModel.getSettings("home");
 
   // 获取与用户有关的数据

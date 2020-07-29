@@ -55,6 +55,7 @@ const timedTasksInit = async () => {
  await timedTasks.clearTimeoutPageCache();
  await timedTasks.updateRecommendThreads();
  await timedTasks.clearResourceState();
+ await timedTasks.updateAllForumLatestThread();
 };
 
 const start = async () => {

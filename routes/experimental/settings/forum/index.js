@@ -30,7 +30,7 @@ router
 		const cid = [];
 		if(!categories.length) ctx.throw(400, '专业分类不能为空');
 		for(let i = 0; i < categories.length; i ++) {
-			let {_id, name, description} = categories[i];
+			let {_id, name, description, displayStyle} = categories[i];
 			checkString(name, {
 				name: '分类名',
 				minLength: 1,
@@ -41,12 +41,16 @@ router
 				minLength: 0,
 				maxLength: 100
 			});
+			if(!['simple', 'detailed', 'normal'].includes(displayStyle)) {
+				ctx.throw(400, `专业显示风格错误`);
+			}
 			if(_id !== undefined) {
 				// 已存在
 				await db.ForumCategoryModel.updateOne({_id}, {
 					$set: {
 						name,
 						description,
+						displayStyle,
 						order: i
 					}
 				});
@@ -55,6 +59,7 @@ router
 				const c = db.ForumCategoryModel({
 					_id,
 					name,
+					displayStyle,
 					description,
 					order: i
 				});

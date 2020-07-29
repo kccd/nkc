@@ -76,7 +76,8 @@ const app = new Vue({
     addForumCategory() {
       this.forumCategories.push({
         name: '',
-        description: ''
+        description: '',
+        displayStyle: 'simple'
       });
     },
     remove(index, arr) {

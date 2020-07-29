@@ -1098,6 +1098,16 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
       });
     }
   }
+
+  for(const forum of forums) {
+    // 拓展最新文章
+    if(!forum.childrenForums.length) {
+      forum.latestThreads = await ForumModel.getLatestThreadsFromRedis(forum.fid);
+    } else {
+      forum.latestThreads = [];
+    }
+  }
+
   return results;
 
   /*
@@ -1436,4 +1446,96 @@ forumSchema.statics.getForumsByFid = async (fid) => {
   return results;
 };
 
+/*
+* 缓存专业最新3篇文章到redis
+* @param {Number} count 需要缓存的文章数量
+* @author pengxiguaa 2020/7/29
+* */
+forumSchema.methods.saveLatestThreadToRedisAsync = async function(count) {
+  const self = this;
+  setImmediate(async () => {
+    await self.saveLatestThreadToRedis(count);
+  });
+};
+forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
+  const fid = this.fid;
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const UserModel = mongoose.model('users');
+  const threads = await ThreadModel.find({
+    disabled: false,
+    reviewed: true,
+    recycleMark: {$ne: true},
+    mainForumsId: fid,
+  }, {
+    tid: 1, oc: 1, uid: 1, hits: 1, count: 1, toc: 1
+  }).sort({toc: -1}).limit(count);
+  const postsId = [], usersId = [];
+  threads.map(t => {
+    postsId.push(t.oc);
+    usersId.push(t.uid);
+  });
+  const posts = await PostModel.find({pid: {$in: postsId}}, {pid: 1, t: 1});
+  const users = await UserModel.find({uid: {$in: usersId}}, {username: 1, uid: 1});
+  const postsObj = {}, usersObj = {};
+  posts.map(p => postsObj[p.pid] = p);
+  users.map(u => usersObj[u.uid] = u);
+  const results = [];
+  for(const thread of threads) {
+    const {tid, oc, uid, hits, count, toc} = thread;
+    const post = postsObj[oc];
+    const user = usersObj[uid];
+    if(!post || !user) continue;
+    results.push({
+      tid,
+      toc,
+      hits,
+      count,
+      post,
+      user
+    });
+  }
+  const key = `forum:${fid}:latestThreads`;
+  await client.setAsync(key, JSON.stringify(results));
+};
+/*
+* 更新指定fid的专业的最新文章到redis
+* @param {String} fid 专业ID
+* @param {Number} count 文章数量
+* @author pengxiguaa 2020/7/29
+* */
+forumSchema.statics.saveLatestThreadToRedis = async (fid, count) => {
+  const ForumModel = mongoose.model('forums');
+  const forum = await ForumModel.findOne({fid});
+  if(!forum) return;
+  await forum.saveLatestThreadToRedis(count);
+};
+/*
+* 异步更新redis中所有专业的最新文章
+* @param {Number} count 最新文章的数量
+* @author pengxiguaa 2020/7/29
+* */
+forumSchema.statics.saveAllForumLatestThreadToRedis = async (count) => {
+  const ForumModel = mongoose.model('forums');
+  const forums = await ForumModel.find({});
+  for(const forum of forums) {
+    await forum.saveLatestThreadToRedis(count);
+  }
+}
+forumSchema.statics.saveAllForumLatestThreadToRedisAsync = async (count) => {
+  const ForumModel = mongoose.model('forums');
+  setImmediate(async () => {
+    await ForumModel.saveAllForumLatestThreadToRedis(count);
+  });
+};
+/*
+* 从redis获取专业最新文章
+* @param {String} fid 专业ID
+* @return {[Object]} [thread, ...];
+* */
+forumSchema.statics.getLatestThreadsFromRedis = async (fid) => {
+  const key = `forum:${fid}:latestThreads`;
+  const threadsString = await client.getAsync(key);
+  return JSON.parse(threadsString);
+};
 module.exports = mongoose.model('forums', forumSchema);

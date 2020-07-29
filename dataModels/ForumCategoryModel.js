@@ -1,19 +1,27 @@
 const mongoose = require('../settings/database');
 const schema = mongoose.Schema({
   _id: Number,
+  // 分类名
   name: {
     type: String,
     required: true,
     index: 1,
   },
+  // 分类介绍
   description: {
     type: String,
     default: '',
   },
+  // 序号
   order: {
     type: Number,
     default: 1,
     index: 1
+  },
+  // 分类下专业的显示风格
+  displayStyle: {
+    type: String,
+    default: 'simple', // simple: 简单显示(名称+头像)，normal: 正常显示（名称+头像+简介）, detailed: 详细显示（包含简介以及最新文章）,
   }
 }, {
   collection: 'forumCategories'
@@ -29,16 +37,17 @@ schema.statics.saveCategoryToRedis = async () => {
   const ForumModel = mongoose.model('forums');
   const client = require('../settings/redisClient');
   const forumCategories = await ForumCategoryModel
-    .find({}, {_id: 1, name: 1, description: 1})
+    .find({}, {_id: 1, name: 1, description: 1, displayStyle: 1})
     .sort({order: 1});
   const _forumCategories = [];
   for(const fc of forumCategories) {
-    const {_id, name, description} = fc;
+    const {_id, name, description, displayStyle} = fc;
     const count = await ForumModel.count({categoryId: _id});
     _forumCategories.push({
       _id,
       name,
       description,
+      displayStyle,
       count
     });
   }

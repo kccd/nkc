@@ -35,8 +35,9 @@ block eContent
             table.table.table-bordered
               thead
                 tr
-                  th 分类名
-                  th 分类介绍
+                  th 名称
+                  th 简介
+                  th 专业显示风格
                   th 其他
               tbody
                 tr(v-for='c, index in forumCategories')
@@ -44,6 +45,17 @@ block eContent
                     input.form-control(type='text' v-model.trim='c.name')
                   th
                     textarea.form-control(v-model.trim='c.description')
+                  th
+                    .radio
+                      label.m-r-05
+                        input(type='radio' value='simple' v-model='c.displayStyle')
+                        span 简单
+                      label.m-r-05
+                        input(type='radio' value='normal' v-model='c.displayStyle')
+                        span 正常
+                      label
+                        input(type='radio' value='detailed' v-model='c.displayStyle')
+                        span 详细
                   th
                     button.btn.btn-xs.btn-default(@click='move(index, forumCategories, "left")') 上移
                     button.btn.btn-xs.btn-default(@click='move(index, forumCategories, "right")') 下移

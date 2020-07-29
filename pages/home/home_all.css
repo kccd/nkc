@@ -76,37 +76,127 @@ body {
   background-color: rgba(0, 0, 0, 0.027);
   border-radius: 2px;
 }
-.home-forums .home-forums-list .home-forum-parent {
+.home-forums .home-forums-list .home-forums-body .home-forum-parent {
   display: table-cell;
   vertical-align: top;
 }
-.home-forums .home-forums-list .home-forum-parent .home-forum-panel {
+.home-forums .home-forums-list .home-forums-body .home-forum-parent .home-forum-panel {
   height: 2.5rem;
   /* &:hover{
-          background-color: @gray;
-          .home-forum-panel-name{
-            color: @dark;
-            span{
-              border: none;
+            background-color: @gray;
+            .home-forum-panel-name{
+              color: @dark;
+              span{
+                border: none;
+              }
             }
-          }
-        } */
+          } */
 }
-.home-forums .home-forums-list .home-forum-parent .home-forum-panel .home-forum-panel-icon {
+.home-forums .home-forums-list .home-forums-body .home-forum-parent .home-forum-panel .home-forum-panel-icon {
   height: 2.5rem;
   width: 2.5rem;
   border-radius: 5px;
   overflow: hidden;
 }
-.home-forums .home-forums-list .home-forum-parent .home-forum-panel .home-forum-panel-name {
+.home-forums .home-forums-list .home-forums-body .home-forum-parent .home-forum-panel .home-forum-panel-name {
   font-weight: 700;
   height: 2.5rem;
   line-height: 2.5rem;
   width: 9.5rem;
 }
-.home-forums .home-forums-list .home-forum-child {
+.home-forums .home-forums-list .home-forums-body .home-forum-child {
   display: table-cell;
   vertical-align: top;
+}
+.home-forums .home-forums-list .detailed-forums-body {
+  overflow: hidden;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum {
+  margin-top: 0.6rem;
+  overflow: hidden;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-panel-icon {
+  height: 4rem;
+  width: 4rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  border: 2px solid #eee;
+  border-radius: 5px;
+  display: inline-block;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forums-padding-left {
+  margin-top: 0.6rem;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forums-padding-left .detailed-forum-panel-icon {
+  border-radius: 50%;
+  height: 3.6rem;
+  width: 3.6rem;
+  left: 0.5rem;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forums-padding-left .detailed-forum-panel-name a {
+  font-size: 1.2rem !important;
+  font-weight: normal!important;
+  color: #000;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-body .detailed-forum-panel {
+  position: relative;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-body .detailed-forum-panel .detailed-forum-panel-info {
+  padding-left: 5rem;
+  min-height: 4rem;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-body .detailed-forum-panel .detailed-forum-panel-info .detailed-forum-panel-name a {
+  font-size: 1.3rem;
+  color: #282c37;
+  font-weight: 700;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-body .detailed-forum-panel .detailed-forum-panel-info .detailed-forum-panel-name a:hover {
+  text-decoration: none;
+  color: #e85a71;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-body .detailed-forum-panel .detailed-forum-panel-info .detailed-forum-panel-description {
+  font-size: 1rem;
+  color: #777;
+  margin-top: 0.3rem;
+  height: 2.7rem;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-latest-threads {
+  position: relative;
+  border-left: 1px solid #ccc;
+  padding-left: 0.5rem;
+  padding-bottom: 0.3rem;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-latest-threads .detailed-forum-latest-thread {
+  height: 1.5rem;
+  position: relative;
+  word-break: break-word;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  padding-right: 5rem;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-latest-threads .detailed-forum-latest-thread a {
+  font-size: 1.2rem;
+  font-style: oblique;
+  color: #3494da;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-latest-threads .detailed-forum-latest-thread .time {
+  padding-top: 0.2rem;
+  text-align: right;
+  font-size: 1rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5rem;
+  color: #888;
 }
 .home-forums .home-forum-panel {
   vertical-align: top;
