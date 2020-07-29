@@ -49,6 +49,7 @@ const app = new Vue({
               maxLength: 100
             });
           }
+
           return nkcAPI('/e/settings/forum', 'PUT', {fidArr, categories: forumCategories});
         })
         .then(() => {

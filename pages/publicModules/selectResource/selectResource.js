@@ -270,7 +270,7 @@ NKC.modules.SelectResource = function() {
         var fileId = null;
         Promise.resolve()
           .then(function() {
-            if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
+            // if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
             if(f.status === "uploading") throw "文件正在上传...";
             if(f.status === "uploaded") throw "文件已上传成功！";
             f.status = "uploading";
@@ -318,7 +318,7 @@ NKC.modules.SelectResource = function() {
           ext: file.type.slice(0, 5) === "image"?"picture": "file",
           size: NKC.methods.getSize(file.size),
           data: file,
-          error: file.size >  200*1024*1024?"文件大小不能超过200MB":"",
+          error: /*file.size >  200*1024*1024?"文件大小不能超过200MB":*/ "",
           progress: 0,
           status: "unUpload"
         }

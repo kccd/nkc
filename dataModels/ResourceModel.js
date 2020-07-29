@@ -3,6 +3,8 @@ const cheerio = require('../nkcModules/nkcRender/customCheerio');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const PATH = require('path');
+const fsSync = require('../tools/fsSync');
+const { existsSync, exists } = require('fs');
 const resourceSchema = new Schema({
 	rid: {
     type: String,
@@ -104,7 +106,36 @@ const resourceSchema = new Schema({
     index: 1,
     default: 'inProcess'
   }
-});
+},
+{toObject: {
+  getters: true,
+  virtuals: true
+}});
+
+
+resourceSchema.virtual('isFileExist')
+  .get(function() {
+    return this._isFileExist;
+  })
+  .set(function(val) {
+    return this._isFileExist = val;
+  });
+
+/**
+ * 文件是否存在
+ */
+resourceSchema.methods.setFileExist = async function() {
+  let path = await this.getFilePath()
+  let self = this;
+  return new Promise((resolve, reject) => {
+    exists(path, exist => {
+      self.isFileExist = exist;
+      resolve(exist);
+    });
+  });
+}
+
+
 /*
   获取文件路径
 */

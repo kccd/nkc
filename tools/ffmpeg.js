@@ -14,6 +14,15 @@ const fontFilePath = settings.statics.fontNotoSansHansMedium;
 const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");
 const tempImageForFFmpeg = settings.statics.deletedPhotoPath;
 
+// ffmpeg 码率和帧率控制命令行参数
+const bitrateAndFPSControlParameter = [
+  '-c:v', 'libx264',                                            /* 指定编码器 */
+  '-r', '24',                                                   /* 帧率 */
+  '-maxrate', '5M',                                             /* 最大码率 */
+  '-minrate', '1M',                                             /* 最小码率 */
+  '-b:v', '1.16M',                                              /* 平均码率 */
+]
+
 const spawnProcess = (pathName, args, options = {}) => {
   return new Promise((resolve, reject) => {
     const bat = spawn(pathName, args, options);
@@ -68,17 +77,17 @@ const videoSetPixelAndscale = async (inputPath, outputPath) => {
 
 // 3GP转为MP4
 const video3GPTransMP4 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', outputPath]);
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath]);
 }
 
 // AVI格式视频转avi
 const videoAviTransAvi = async(inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath ,'-y',outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath ,'-y', ...bitrateAndFPSControlParameter, outputPath])
 }
 
 // MP4转码为H264
 const videoMP4TransH264 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-movflags', 'faststart', '-y', outputPath]);
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath]);
 }
 // MP4转码为H264
 // const videoMP4TransH264 = async (inputPath, outputPath) => {
@@ -87,31 +96,31 @@ const videoMP4TransH264 = async (inputPath, outputPath) => {
 
 // MOV转码为MP4
 const videoMOVTransMP4 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-movflags', 'faststart', '-y', outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-vcodec', 'libx264', '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
 }
 
 // AVI转码为MP4
 const videoAVITransMP4 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
 }
 
 // AMR转码为MP3
 const audioAMRTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
 }
 
 const audioAACTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
 }
 
 // WAV转码为MP3
 const audioWAVTransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
 }
 
 // WMA转码为MP3
 const audioWMATransMP3 = async (inputPath, outputPath) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, outputPath])
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
 }
 
 /**
@@ -167,7 +176,14 @@ const getImageSize = async (inputPath) => {
  * @param {array} filters 滤镜指令（数组，一层滤镜一个元素）
  */
 const ffmpegFilter = async (inputPath, outputPath, filters) => {
-  return spawnProcess('ffmpeg', ['-i', inputPath, '-filter_complex', filters.join(";"), '-y', outputPath]);
+  return spawnProcess('ffmpeg',
+    [
+      ...['-i', inputPath],                                              /* 输入 */
+      ...['-filter_complex', filters.join(";")],                         /* 滤镜表达式 */
+      '-y',                                                              /* 覆盖输出 */
+      ...bitrateAndFPSControlParameter,                                  /* 码率和帧率控制参数 */
+      outputPath                                                         /* 输出 */
+    ]);
 }
 
 /**
@@ -186,7 +202,10 @@ const addImageWaterMask = async (op) => {
   } = op;
   let videoSize = await getVideoSize(videoPath);
   let width = videoSize.width * flex;
-  return spawnProcess('ffmpeg', ['-i', videoPath, '-i', imagePath, '-filter_complex', `[1:v]scale=${width}:${width}/a, lut=a=val*${transparency}[logo];[0:v][logo]overlay=${position.x}:${position.y}`, output]);
+  return spawnProcess('ffmpeg', [
+    '-i', videoPath, '-i', imagePath, '-filter_complex', `[1:v]scale=${width}:${width}/a, lut=a=val*${transparency}[logo];[0:v][logo]overlay=${position.x}:${position.y}`, '-y',
+    ...bitrateAndFPSControlParameter,                                  /* 码率和帧率控制参数 */
+    output]);
 }
 
 /**
