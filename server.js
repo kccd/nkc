@@ -16,6 +16,7 @@ const http = require('http'),
   settings = require('./settings'),
   serverConfig = require('./config/server'),
   cacheForums = require('./redis/cacheForums'),
+  cacheBaseInfo = require('./redis/cache'),
   socket = require('./socket'),
   {updateDate, upload} = settings,
   {
@@ -62,8 +63,7 @@ const start = async () => {
       await dataInit();
       await jobsInit();
       await upload.initFolders();
-      // 这里会将缓存数据清空 1号
-      await cacheForums();
+      await cacheBaseInfo();
       await timedTasksInit();
     }
     await elasticSearch.init();

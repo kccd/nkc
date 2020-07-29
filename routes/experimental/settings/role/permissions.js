@@ -8,7 +8,7 @@ permissionsRouter
 		await next();
 	})
 	.put('/', async (ctx, next) => {
-		const {body, nkcModules, data} = ctx;
+		const {body, nkcModules, data, db} = ctx;
 		const {role} = data;
 		if(role._id === 'dev') {
 			ctx.throw(400, '运维权限不允许编辑！！！');
@@ -22,6 +22,7 @@ permissionsRouter
 			}
 		}
 		await role.update({operationsId: newOperationsId});
+		await db.RoleModel.saveRolesToRedis();
 		await next();
 	});
 module.exports = permissionsRouter;

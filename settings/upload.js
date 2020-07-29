@@ -95,7 +95,7 @@ const uploadSettings = {
     multipart: true,
     formidable: {
       maxFields: 20,
-	    maxFileSize: 200*1024*1024,
+	    maxFileSize: 1024*1024*1024,
       uploadDir: pathsObj.uploadDir,
       hash: 'md5',
       keepExtensions: true

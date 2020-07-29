@@ -2,12 +2,28 @@ const Redis = require('redis');
 const Bluebird = require('bluebird');
 Bluebird.promisifyAll(Redis.RedisClient.prototype);
 Bluebird.promisifyAll(Redis.Multi.prototype);
+
+/*
+* 重置redis集合
+* @param {String} key 键名
+* @param {Array} values 新数据
+* @author pengxiguaa 2020/7/29
+* */
+Redis.RedisClient.prototype.resetSetAsync = async function(key, values) {
+  const _values = await this.smembersAsync(key);
+  const _removeValues = _values.filter(v => !values.includes(v));
+  if(_removeValues.length) await this.sremAsync(key, _removeValues);
+  if(values.length) await this.saddAsync(key, values);
+};
+
 const redisConfig = require('../config/redis');
 const client = Redis.createClient({
   host: redisConfig.host,
   port: redisConfig.port,
   db: 1
 });
+
+
 module.exports = client;
 /*
 * 键名 uid(用户ID)
@@ -41,8 +57,8 @@ module.exports = client;
 * user:uid:subscribeType:subscribeTypeId:topic
 * user:uid:subscribeType:subscribeTypeId:discipline
 *
-* 专业分类
-* forumCategories
+
+*
 *
 * 设置 settingsId(设置ID)
 * settings:settingsId json string
@@ -64,3 +80,13 @@ module.exports = client;
 *
 * 删除键： delAsync
 * */
+
+/*
+* 用户证书
+* role:${roleId} = jsonString roleObj
+* role:keys = jsonString [roleId, ...]
+*
+* 专业分类
+* forumCategories = jsonString [CategoryObj, ...]
+*
+ */
