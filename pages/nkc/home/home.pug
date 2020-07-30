@@ -78,45 +78,24 @@ block nkcContent
               .col-sm-9
                 input.form-control(type='text' v-model.number='recommendThreads[page.id].threadVoteUpMinCount')
             .form-group
-              label.col-sm-3.control-label 仅限原创文章
+              label.col-sm-3.control-label 其他筛选条件
               .col-sm-9
-                .radio
+                .checkbox
                   label.m-r-1
-                    input(type='radio' :value='true' v-model='recommendThreads[page.id].original')
-                    span 是
-                  label
-                    input(type='radio' :value='false' v-model='recommendThreads[page.id].original')
-                    span 否
-            .form-group
-              label.col-sm-3.control-label 仅限精选文章
-              .col-sm-9
-                .radio
+                    input(type='checkbox' :value='true' v-model='recommendThreads[page.id].original')
+                    span 原创文章
                   label.m-r-1
-                    input(type='radio' :value='true' v-model='recommendThreads[page.id].digest')
-                    span 是
-                  label
-                    input(type='radio' :value='false' v-model='recommendThreads[page.id].digest')
-                    span 否
-            .form-group
-              label.col-sm-3.control-label 包含举报未处理的文章
-              .col-sm-9
-                .radio
+                    input(type='checkbox' :value='true' v-model='recommendThreads[page.id].digest')
+                    span 精选文章
                   label.m-r-1
-                    input(type='radio' :value='true' v-model='recommendThreads[page.id].reportedAndUnReviewed')
-                    span 是
-                  label
-                    input(type='radio' :value='false' v-model='recommendThreads[page.id].reportedAndUnReviewed')
-                    span 否
-            .form-group
-              label.col-sm-3.control-label 包含流控文章
-              .col-sm-9
-                .radio
+                    input(type='checkbox' :value='true' v-model='recommendThreads[page.id].reportedAndUnReviewed')
+                    span 举报未处理的文章
                   label.m-r-1
-                    input(type='radio' :value='true' v-model='recommendThreads[page.id].flowControl')
-                    span 是
-                  label
-                    input(type='radio' :value='false' v-model='recommendThreads[page.id].flowControl')
-                    span 否
+                    input(type='checkbox' :value='true' v-model='recommendThreads[page.id].flowControl')
+                    span 流控文章
+                  label.m-r-1
+                    input(type='checkbox' :value='true' v-model='recommendThreads[page.id].otherThreads')
+                    span 其他（非原创、未精选、未被举报或举报已处理且未流控）
 
         mixin threadList(options)
           -const {name, listName} = options;

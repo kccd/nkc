@@ -1724,6 +1724,7 @@ threadSchema.statics.updateAutomaticRecommendThreadsByType = async (type) => {
         movable.manuallySelectedThreads
       );
   }
+  exception = exception.map(e => e.tid);
   await ThreadModel.updateHomeRecommendThreadsByType(type, exception);
 };
 /*
@@ -1746,7 +1747,7 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
   // 去除自动推荐相关的条件
   const {
     automaticCount, countOfPost,
-    timeOfPost, digest, postVoteUpMinCount, postVoteDownMaxCount,
+    timeOfPost, digest, postVoteUpMinCount, postVoteDownMaxCount, otherThreads,
     threadVoteUpMinCount, reportedAndUnReviewed, original, flowControl
   } = homeSettings.recommendThreads[type];
   const match = {
@@ -1764,21 +1765,73 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
       $lte: countOfPost.max
     },
     voteUpTotal: {$gte: threadVoteUpMinCount},
-    digest,
     voteUp: {$gte: postVoteUpMinCount},
     voteDown: {$lte: postVoteDownMaxCount},
     flowControl
   };
+
+  // 被举报但未处理的文章ID
+  const complaints = await ComplaintModel.find({type: 'thread'}, {contentId: 1});
+  const threadsId = complaints.map(c => c.contentId);
+
+  const or = [];
+  const and = [];
+
+  // 其他文章
+  if(otherThreads) {
+    or.push({
+      digest: false,
+      originState: {$nin: ['4', '5', '6']},
+      tid: {$nin: threadsId},
+      flowControl: false
+    });
+  }
+
+  // 流控文章
+  if(flowControl) {
+    or.push({
+      flowControl: true
+    });
+  } else {
+    and.push({
+      flowControl: false
+    });
+  }
+  // 是否精选
+  if(digest) {
+    or.push({
+      digest: true
+    });
+  } else {
+    and.push({
+      digest: false
+    });
+  }
   // 是否必须为原创
   if(original) {
-    match.originState = {$in: ['4', '5', '6']};
+    or.push({
+      originState: {$in: ['4', '5', '6']}
+    });
+  } else {
+    and.push({
+      originState: {$nin: ['4', '5', '6']}
+    });
   }
   // 排除被举报但未被处理的文章
-  if(!reportedAndUnReviewed) {
-    const complaints = await ComplaintModel.find({type: 'thread'}, {contentId: 1});
-    const threadsId = complaints.map(c => c.contentId);
-    match.tid = {$nin: threadsId};
+  if(reportedAndUnReviewed) {
+    or.push({
+      tid: {$in: threadsId}
+    });
+  } else {
+    and.push({
+      tid: {$nin: threadsId}
+    });
   }
+
+  if(or.length) {
+    and.push({$or: or});
+  }
+  match.$and = and;
 
   const posts = await PostModel.aggregate([
     {
