@@ -104,8 +104,8 @@ body{
       overflow: hidden;
       @panelHeight: 4rem;
       .detailed-forum{
-        margin-top: 0.6rem;
-        //margin-bottom: 0.6rem;
+        //margin-top: 0.6rem;
+        margin-bottom: 0.5rem;
         overflow: hidden;
         .detailed-forum-panel-icon{
           height: @panelHeight;
@@ -120,12 +120,12 @@ body{
         }
         .detailed-forums-padding-left{
           //padding-left: 0.5rem;
-          margin-top: 0.6rem;
           .detailed-forum-panel-icon{
             border-radius: 50%;
             height: @panelHeight * 0.9;
             width: @panelHeight * 0.9;
-            left: 0.5rem;
+            //left: 0.5rem;
+            left: 0;
           }
           .detailed-forum-panel-name{
             a{
@@ -160,16 +160,31 @@ body{
                 height: 2.7rem;
                 overflow: hidden;
                 .hideText(@line: 2);
+                &.parent{
+                  max-height: 2.7rem;
+                  height: inherit;
+                  margin-bottom: 1rem;
+                }
               }
             }
           }
         }
         .detailed-forum-latest-threads{
           position: relative;
-          border-left: 1px solid #ccc;
+          border-left: 3px solid #ccc;
           padding-left: 0.5rem;
           padding-bottom: 0.3rem;
           .detailed-forum-latest-thread{
+            .latest-thread-point{
+              height: 2px;
+              width: 2px;
+              background-color:#555;
+              border-radius: 50%;
+              position: absolute;
+              top: 9px;
+              left: 0;
+            }
+            padding-left: 0.5rem;
             height: 1.5rem;
             position: relative;
             .hideText(@line: 1);

@@ -112,7 +112,7 @@ body {
   overflow: hidden;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum {
-  margin-top: 0.6rem;
+  margin-bottom: 0.5rem;
   overflow: hidden;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-panel-icon {
@@ -126,14 +126,11 @@ body {
   border-radius: 5px;
   display: inline-block;
 }
-.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forums-padding-left {
-  margin-top: 0.6rem;
-}
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forums-padding-left .detailed-forum-panel-icon {
   border-radius: 50%;
   height: 3.6rem;
   width: 3.6rem;
-  left: 0.5rem;
+  left: 0;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forums-padding-left .detailed-forum-panel-name a {
   font-size: 1.2rem !important;
@@ -167,13 +164,19 @@ body {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-body .detailed-forum-panel .detailed-forum-panel-info .detailed-forum-panel-description.parent {
+  max-height: 2.7rem;
+  height: inherit;
+  margin-bottom: 1rem;
+}
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-latest-threads {
   position: relative;
-  border-left: 1px solid #ccc;
+  border-left: 3px solid #ccc;
   padding-left: 0.5rem;
   padding-bottom: 0.3rem;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-latest-threads .detailed-forum-latest-thread {
+  padding-left: 0.5rem;
   height: 1.5rem;
   position: relative;
   word-break: break-word;
@@ -182,6 +185,15 @@ body {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   padding-right: 5rem;
+}
+.home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-latest-threads .detailed-forum-latest-thread .latest-thread-point {
+  height: 2px;
+  width: 2px;
+  background-color: #555;
+  border-radius: 50%;
+  position: absolute;
+  top: 9px;
+  left: 0;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-latest-threads .detailed-forum-latest-thread a {
   font-size: 1.2rem;

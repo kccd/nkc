@@ -25,6 +25,7 @@ module.exports = {
         reportedAndUnReviewed: false, // 是否包含被举报且未处理的文章
         original: false, // 文章是否必须为原创
         flowControl: false, // 是否包含流控文章
+        otherThreads: true, // 是否包含普通文章（未加精、非原创、未流控、未举报且未处理）
       },
       movable: {
         order: 'random', // 文章显示顺序， random: 随机, fixed: 顺序
@@ -49,6 +50,7 @@ module.exports = {
         reportedAndUnReviewed: false, // 是否包含被举报且未处理的文章
         original: false, // 文章是否必须为原创
         flowControl: false, // 是否包含流控文章
+        otherThreads: true, // 是否包含普通文章（未加精、非原创、未流控、未举报且未处理）
       }
     },
     ads: {
