@@ -43,12 +43,12 @@ const forumSchema = new Schema({
     type: String,
     required: true,
     minlength: [1, '板块名称必须大于等于1字'],
-    maxlength: [10, '板块名称必须小于等于10字']
+    maxlength: [20, '板块名称必须小于等于10字']
   },
 	brief: {
 		type: String,
 		default: '',
-		maxlength: [15, '板块简介应少于15字']
+		maxlength: [20, '板块简介应少于15字']
 	},
 	// 入门
 	basicThreadsId: {

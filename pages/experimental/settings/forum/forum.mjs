@@ -33,10 +33,12 @@ const app = new Vue({
     },
     save() {
       const fidArr = this.forums.map(f => f.fid);
-      const {forumCategories} = this;
+      const {forumCategories, forumSettings} = this;
+      const {recycle} = forumSettings;
       const {checkString} = NKC.methods.checkData;
       Promise.resolve()
         .then(() => {
+          if(!recycle) throw '请输入回收站专业ID';
           for(const fc of forumCategories) {
             checkString(fc.name, {
               name: '分类名',
@@ -50,7 +52,7 @@ const app = new Vue({
             });
           }
 
-          return nkcAPI('/e/settings/forum', 'PUT', {fidArr, categories: forumCategories});
+          return nkcAPI('/e/settings/forum', 'PUT', {fidArr, categories: forumCategories, recycle});
         })
         .then(() => {
           sweetSuccess('保存成功');

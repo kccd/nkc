@@ -43,6 +43,7 @@ forumRouter
 			}
 		});
 
+		data.recycleId = await db.SettingModel.getRecycleId();
 
 		if(user) {
 			const subForums = [], visitedForums = [];

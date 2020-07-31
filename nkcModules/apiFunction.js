@@ -773,10 +773,11 @@ fn.extendManagementInfo = async (ctx) => {
     data.unResolvedProblemCount = await db.ProblemModel.count({resolved: false});
   }
   if(ctx.permission("review")) {
+    const recycleId = await db.SettingModel.getRecycleId();
     const q = {
       reviewed: false,
       disabled: false,
-      mainForumsId: {$ne: "recycle"}
+      mainForumsId: {$ne: recycleId}
     };
     if(!ctx.permission("superModerator")) {
       const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
