@@ -369,6 +369,7 @@ router
 		const {data, db, query, state} = ctx;
 		const {pageSettings} = state;
 		const {forum} = data;
+		const recycleId = await db.SettingModel.getRecycleId();
 		let {page = 0, s, cat, d} = query;
 		page = parseInt(page);
 
@@ -413,7 +414,7 @@ router
 			mainForumsId: forum.fid,
 			disabled: false
 		};
-		if(forum.fid === "recycle") {
+		if(forum.fid === recycleId) {
 			delete toppedThreadMatch.disabled;
 		}
 		// 加载、拓展置顶文章
@@ -422,7 +423,7 @@ router
 		data.toppedThreads = await db.ThreadModel.extendThreads(toppedThreads, {
 			htmlToText: true
 		});
-		if(forum.fid === "recycle") {
+		if(forum.fid === recycleId) {
 			data.toppedThreads.map(t => t.disabled = false);
 		}
 
@@ -430,7 +431,7 @@ router
 
 		match.mainForumsId = {$in: fidOfCanGetThreads};
 		match.tid = {$nin: topThreadsId};
-		if(forum.fid !== "recycle") {
+		if(forum.fid !== recycleId) {
 			match.disabled = false;
 		}
 		if(data.user) {
@@ -481,7 +482,7 @@ router
 		}
 		data.threads = [];
 		for(const thread of threads) {
-			if(forum.fid === "recycle") {
+			if(forum.fid === recycleId) {
 				// 为了在访问回收站时隐藏"已屏蔽，仅自己可见";
 				thread.disabled = false;
 			}

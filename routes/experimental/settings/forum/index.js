@@ -13,8 +13,11 @@ router
 	.put('/', async (ctx, next) => {
 		const {db, body, nkcModules} = ctx;
 		const {checkString} = nkcModules.checkData;
-		const {fidArr, categories} = body;
+		const {fidArr, categories, recycle} = body;
 		const forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
+		if(!recycle) ctx.throw(400, '回收站专业ID不能为空');
+		const forum = await db.ForumModel.findOne({fid: recycle});
+		if(!forum) ctx.throw(400, `回收站专业不存在 fid: ${recycle}`);
 		if(fidArr.length !== forums.length) {
 			ctx.throw(400, '参数错误');
 		}
@@ -72,6 +75,14 @@ router
 				categoryId: cid[0]
 			}
 		});
+		const recycleId = await db.SettingModel.getRecycleId();
+		if(recycleId !== recycle) {
+			await db.SettingModel.updateOne({_id: 'forum'}, {
+				$set: {
+					'c.recycle': recycle
+				}
+			});
+		}
 		await db.ForumCategoryModel.remove({_id: {$nin: cid}});
 		await db.SettingModel.saveSettingsToRedis("forum");
 		await db.ForumCategoryModel.saveCategoryToRedis();

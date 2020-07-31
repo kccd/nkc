@@ -7,6 +7,7 @@ router
     const {postsId, reason, remindUser, violation} = body;
     const results = [];
     const threads = [], threadsId = [];
+    const recycleId = await db.SettingModel.getRecycleId();
     // 验证用户权限、验证内容是否存在
     for(const postId of postsId) {
       const post = await db.PostModel.findOne({pid: postId});
@@ -18,7 +19,7 @@ router
       if(!isModerator) ctx.throw(403, `您没有权限处理ID为${postId}的post`);
       if(type === "thread") {
         if(thread.type === "fund") ctx.throw(403, "科创基金类文章无法退修");
-        if(thread.mainForumsId.includes("recycle")) ctx.throw(400, `无法退回已在回收站的文章，tid: ${thread.tid}`);
+        if(thread.mainForumsId.includes(recycleId)) ctx.throw(400, `无法退回已在回收站的文章，tid: ${thread.tid}`);
         if(thread.recycleMark === true) ctx.throw(400, `ID为${thread.tid}的文章已被退修了`);
       }
       if(type === "post" && post.disabled) {

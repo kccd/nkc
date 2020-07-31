@@ -110,6 +110,7 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
   const ThreadModel = mongoose.model("threads");
   const UserModel = mongoose.model("users");
   const PostModel = mongoose.model("posts");
+  const recycleId = await SettingModel.getRecycleId();
   const targetUser = await UserModel.findOne({uid: tUid});
   if(!targetUser) throwErr(500, `user not found, uid: ${tUid}`);
   await targetUser.extendGrade();
@@ -125,7 +126,7 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
     reviewed: true,
     disabled: false,
     recycleMark: {$ne: true},
-    mainForumsId: {$ne: "recycle"}
+    mainForumsId: {$ne: recycleId}
   });
   if(userThreadCount < threadCount) throwErr(403, mandatoryLimitInfo);
   const userPostCount = await PostModel.count({
@@ -133,7 +134,7 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
     reviewed: true,
     disabled: false,
     toDraft: {$ne: true},
-    mainForumsId: {$ne: "recycle"}
+    mainForumsId: {$ne: recycleId}
   });
   if(userPostCount < postCount) throwErr(403, mandatoryLimitInfo);
 };

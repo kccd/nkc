@@ -19,7 +19,9 @@ NKC.modules.MoveThread = function() {
       onlyAnonymous: false,
       forumCountLimit: 20,
       submitting: false,
-      showRecycle: false
+      showRecycle: false,
+
+      recycleId: '',
     },
     computed: {
 
@@ -83,7 +85,7 @@ NKC.modules.MoveThread = function() {
           for(var i = 0; i < forum.childrenForums.length; i++) {
             var f = forum.childrenForums[i];
             if(!f.childrenForums || f.childrenForums.length === 0) {
-              if(this.showRecycle || f.fid !== "recycle") {
+              if(this.showRecycle || f.fid !== this.recycleId) {
                 f.selectedThreadType = "";
                 arr.push(f);
               }
@@ -145,6 +147,7 @@ NKC.modules.MoveThread = function() {
     this_.dom.modal("show");
     nkcAPI("/f", "GET")
       .then(function(data) {
+        this_.app.recycleId = data.recycleId;
         for(var i = 0; i < data.forums.length; i++) {
           var forum = data.forums[i];
           forum.allChildForums = this_.app.getAllChildForums(forum, []);

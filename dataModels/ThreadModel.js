@@ -325,6 +325,7 @@ threadSchema.methods.extendUser = async function() {
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
   const throwError = require("../nkcMOdules/throwError");
+  const recycleId = await mongoose.model('settings').getRecycleId();
   if(!this.forums) {
     await this.extendForums(["mainForums"]);
   }
@@ -338,7 +339,7 @@ threadSchema.methods.ensurePermission = async function(roles, grade, user) {
         err = err.errorData;
       } catch(e) {}
       let errorType = "noPermissionToReadThread";
-      if(forum.fid === "recycle") {
+      if(forum.fid === recycleId) {
         errorType = "threadHasBeenBanned";
         status = 404;
       }
@@ -910,6 +911,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
   await user.extendGrade();
   const forums = await ForumModel.find({fid: {$in: fids}});
   await Promise.all(forums.map(async forum => {
+    if(await SettingModel.isRecycle(forum.fid)) throwErr(400, '不允许在回收站专业发表内容');
     const childrenForums = await forum.extendChildrenForums();
     if(childrenForums.length !== 0) {
       throwErr(400, `专业【${forum.displayName}】下存在其他专业，请到下属属专业发表内容。`);
@@ -1429,6 +1431,8 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   const DelPostLogModel = mongoose.model("delPostLog");
   const UserModel = mongoose.model("users");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const SettingModel = mongoose.model('settings');
+  const recycleId = await SettingModel.getRecycleId();
   const nkcModules = require("../nkcModules");
   // 删除退修超时的帖子
   // 取出全部被标记的帖子
@@ -1448,7 +1452,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
     forumsId = forumsId.concat(thread.mainForumsId);
     await thread.update({
       recycleMark: false,
-      mainForumsId: ["recycle"],
+      mainForumsId: [recycleId],
       disabled: true,
       reviewed: true,
       categoriesId: []
@@ -1478,7 +1482,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   }
   forumsId = new Set(forumsId);
   if(forumsId.size !== 0) {
-    forumsId.add("recycle");
+    forumsId.add(recycleId);
     await ForumModel.updateForumsMessage([...forumsId]);
   }
 };

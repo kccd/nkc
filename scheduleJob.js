@@ -21,6 +21,7 @@ jobs.updateActiveUsers = cronStr => {
     console.log('now updating the activeusers collection...'.blue);
     const aWeekAgo = Date.now() - 604800000;
     await ActiveUserModel.deleteMany();
+    const recycleId = await SettingModel.getRecycleId();
     const data = await PostModel.aggregate([
       {$project: {_id: 0,pid: 1, toc: 1, uid: 1, tid: 1}},
       {$match: {toc: {$gt: new Date(aWeekAgo)}}},
@@ -33,7 +34,7 @@ jobs.updateActiveUsers = cronStr => {
       for (let post of d.posts) {
         const thread = await ThreadModel.findOne({tid: post.tid, oc: post.pid});
         if(thread) {
-        	if(thread.fid !== 'recycle' && !thread.recycleMark) threadCount++;
+        	if(thread.fid !== recycleId && !thread.recycleMark) threadCount++;
         } else {
         	const p = await PostModel.findOne({pid: post.pid, disabled: false});
         	if(p) postCount++;
