@@ -49,7 +49,7 @@ block content
                   .detailed-forum-latest-thread
                     .latest-thread-point
                     a(href=`/t/${thread.tid}` title=thread.post.t)=thread.post.t
-                    span.time=fromNow(thread.toc)
+                    span.time=fromNow(thread.tlm)
           if f.childrenForums.length && !disableChild
             .col-xs-12.col-md-12.detailed-forums-padding-left
               for ff in f.childrenForums

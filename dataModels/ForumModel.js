@@ -585,33 +585,24 @@ forumSchema.methods.extendFollowers = async function() {
 forumSchema.methods.getBreadcrumbForums = async function() {
 	const ForumModel = mongoose.model('forums');
 	const fid = await client.smembersAsync(`forum:${this.fid}:parentForumsId`);
-  if(fid.length === 0) return fid;
+  if(fid.length === 0 || !this.parentsId.length) return fid;
   const forums_ = await ForumModel.find({fid: {$in: fid}});
   const forums = [];
-  let lastForum;
-  for(const forum of forums_) {
-    let hasChild = false;
-    const {fid} = forum;
-    for(const f of forums_) {
-      if(f.parentsId.length !== 0 && f.parentsId[0] === fid) {
-        hasChild = true;
-        break;
+  const forumsObj = {};
+  for(const f of forums_) {
+    forumsObj[f.fid] = f;
+  }
+  const getParent = (parentId) => {
+    const f = forumsObj[parentId];
+    if(f) {
+      forums.unshift(f);
+      if(f.parentsId && f.parentsId.length) {
+        getParent(f.parentsId[0]);
       }
     }
-    if(hasChild) continue;
-    lastForum = forum;
-  }
-  forums.push(lastForum);
-  let n = 0;
-  while(n < 1000 && forums.length !== fid.length) {
-    n++;
-    for(const forum of forums_) {
-      const f = forums[forums.length - 1];
-      if(f.parentsId.length !== 0 && f.parentsId[0] === forum.fid) {
-        forums.unshift(forum);
-      }
-    }
-  }
+  };
+
+  getParent(this.parentsId[0]);
   return forums;
 };
 
@@ -1468,8 +1459,8 @@ forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
     recycleMark: {$ne: true},
     mainForumsId: fid,
   }, {
-    tid: 1, oc: 1, uid: 1, hits: 1, count: 1, toc: 1, digest: 1
-  }).sort({toc: -1}).limit(count);
+    tid: 1, oc: 1, uid: 1, hits: 1, count: 1, toc: 1, digest: 1, tlm: 1
+  }).sort({tlm: -1}).limit(count);
   const postsId = [], usersId = [];
   threads.map(t => {
     postsId.push(t.oc);
@@ -1482,7 +1473,7 @@ forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
   users.map(u => usersObj[u.uid] = u);
   const results = [];
   for(const thread of threads) {
-    const {tid, oc, uid, hits, count, toc, digest} = thread;
+    const {tid, tlm, oc, uid, hits, count, toc, digest} = thread;
     const post = postsObj[oc];
     const user = usersObj[uid];
     if(!post || !user) continue;
@@ -1494,6 +1485,7 @@ forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
       tid,
       digest,
       toc,
+      tlm,
       hits,
       count,
       post,
