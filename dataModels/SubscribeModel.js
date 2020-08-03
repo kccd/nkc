@@ -485,9 +485,7 @@ schema.statics.saveUserSubscribeTypesToRedis = async (uid, data) => {
     await redisClient.resetSetAsync(typeKey, newSubscribeTypes);
     for(const key in results) {
       if(!results.hasOwnProperty(key)) continue;
-      if(results[key].length) {
-        await redisClient.resetSetAsync(key, results[key]);
-      }
+      await redisClient.resetSetAsync(key, results[key]);
     }
   });
 };

@@ -585,33 +585,24 @@ forumSchema.methods.extendFollowers = async function() {
 forumSchema.methods.getBreadcrumbForums = async function() {
 	const ForumModel = mongoose.model('forums');
 	const fid = await client.smembersAsync(`forum:${this.fid}:parentForumsId`);
-  if(fid.length === 0) return fid;
+  if(fid.length === 0 || !this.parentsId.length) return fid;
   const forums_ = await ForumModel.find({fid: {$in: fid}});
   const forums = [];
-  let lastForum;
-  for(const forum of forums_) {
-    let hasChild = false;
-    const {fid} = forum;
-    for(const f of forums_) {
-      if(f.parentsId.length !== 0 && f.parentsId[0] === fid) {
-        hasChild = true;
-        break;
+  const forumsObj = {};
+  for(const f of forums_) {
+    forumsObj[f.fid] = f;
+  }
+  const getParent = (parentId) => {
+    const f = forumsObj[parentId];
+    if(f) {
+      forums.unshift(f);
+      if(f.parentsId && f.parentsId.length) {
+        getParent(f.parentsId[0]);
       }
     }
-    if(hasChild) continue;
-    lastForum = forum;
-  }
-  forums.push(lastForum);
-  let n = 0;
-  while(n < 1000 && forums.length !== fid.length) {
-    n++;
-    for(const forum of forums_) {
-      const f = forums[forums.length - 1];
-      if(f.parentsId.length !== 0 && f.parentsId[0] === forum.fid) {
-        forums.unshift(forum);
-      }
-    }
-  }
+  };
+
+  getParent(this.parentsId[0]);
   return forums;
 };
 
