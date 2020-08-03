@@ -49,6 +49,8 @@ router
       user
     );
 
+    const recycleId = await db.SettingModel.getRecycleId();
+
     // 筛选出没有开启流控的专业
     let forumInReduceVisits = await db.ForumModel.find({openReduceVisits: true});
     forumInReduceVisits = forumInReduceVisits.map(forum => forum.fid);
@@ -305,7 +307,7 @@ router
       const q = {
         reviewed: false,
         disabled: false,
-        mainForumsId: {$ne: "recycle"}
+        mainForumsId: {$ne: recycleId}
       };
       if(!ctx.permission("superModerator")) {
         const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});

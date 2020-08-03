@@ -20,5 +20,7 @@ module.exports = async () => {
   await db.ForumCategoryModel.saveCategoryToRedis();
   // 专业最新文章
   await db.ForumModel.saveAllForumLatestThreadToRedisAsync();
+  // 后台设置
+  await db.SettingModel.saveAllSettingsToRedis();
 
 }

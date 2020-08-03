@@ -150,7 +150,8 @@ draftsRouter
       }
     }
     if(files && files.postCover) {
-      await nkcModules.file.saveDraftCover(draft.did, files.postCover);
+      await db.AttachmentModel.saveDraftCover(draft.did, files.postCover);
+      // await nkcModules.file.saveDraftCover(draft.did, files.postCover);
     }
     data.draft = await db.DraftModel.findOne({did: draft.did});
     await next();

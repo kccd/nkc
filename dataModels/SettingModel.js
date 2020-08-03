@@ -107,6 +107,18 @@ settingSchema.statics.saveSettingsToRedis = async (_id) => {
   }
   return settings;
 };
+/*
+* 将所有后台设置缓存到redis
+* @author pengxiguaa 2020/7/31
+* */
+settingSchema.statics.saveAllSettingsToRedis = async () => {
+  const SettingModel = mongoose.model('settings');
+  const settings = await SettingModel.find();
+  for(const setting of settings) {
+    const {_id} = setting;
+    await redisClient.setAsync(`settings:${_id}`, JSON.stringify(setting));
+  }
+};
 
 /*
 * 检查号码是否受限
@@ -473,5 +485,27 @@ settingSchema.statics.getForumScoreOperations = async (fid) => {
     fid
   })
     .sort({toc: 1});
+};
+
+/*
+* 获取回收站专业ID
+* @return {String} 专业ID
+* @author pengxiguaa 2020/7/31
+* */
+settingSchema.statics.getRecycleId = async () => {
+  const SettingModel = mongoose.model('settings');
+  const forumSettings = await SettingModel.getSettings('forum');
+  return forumSettings.recycle;
+}
+/*
+* 判断指定fid的专业是否为回收站
+* @param {String} fid 专业ID
+* @return {Boolean} 是否为回收站
+* @author pengxiguaa 2020/7/31
+* */
+settingSchema.statics.isRecycle = async (fid) => {
+  const SettingModel = mongoose.model('settings');
+  const recycleId = await SettingModel.getRecycleId();
+  return fid === recycleId;
 };
 module.exports = mongoose.model('settings', settingSchema);

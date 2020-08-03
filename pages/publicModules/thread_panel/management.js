@@ -17,11 +17,11 @@ function getSelectedThreadsId() {
       var r = {
         tid: d.attr("data-thread-id")
       };
-      var cids = d.attr("data-thread-cids");
-      var fids = d.attr("data-thread-fids");
+      var cids = d.attr("data-thread-cids") || '';
+      var fids = d.attr("data-thread-fids") || '';
       if(cids) {
-        r.cids = cids;
-        r.fids = fids;
+        r.cids = cids.split('-');
+        r.fids = fids.split('-');
       }
       threads.push(r);
     }

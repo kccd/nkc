@@ -403,13 +403,15 @@ userSchema.virtual('user')
 
 userSchema.methods.extendThreads = async function() {
   const ThreadModel = mongoose.model('threads');
-  let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}}).sort({toc: -1}).limit(8);
+  const recycleId = await mongoose.model('settings').getRecycleId();
+  let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: recycleId}}).sort({toc: -1}).limit(8);
   return this.threads = threads;
 };
 
 userSchema.methods.getUsersThreads = async function() {
   const ThreadModel = mongoose.model('threads');
-  let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: 'recycle'}, recycleMark: {"$nin":[true]}}).sort({toc: -1}).limit(8);
+  const recycleId = await mongoose.model('settings').getRecycleId();
+  let threads = await ThreadModel.find({uid: this.uid, fid: {$ne: recycleId}, recycleMark: {"$nin":[true]}}).sort({toc: -1}).limit(8);
   return await ThreadModel.extendThreads(threads);
 };
 
@@ -1103,11 +1105,12 @@ userSchema.methods.ensureSubLimit = async function(type) {
 
 userSchema.statics.getUserPostSummary = async (uid) => {
   const PostModel = mongoose.model("posts");
+  const recycleId = await mongoose.model('settings').getRecycleId();
   const data = await PostModel.aggregate([
     {
       $match: {
         mainForumsId: {
-          $nin: ["recycle"]
+          $nin: [recycleId]
         },
         uid,
         disabled: false
@@ -1308,6 +1311,7 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
   const PostModel = mongoose.model("posts");
   const UsersPersonalModel = mongoose.model("usersPersonal");
   const SettingModel = mongoose.model("settings");
+  const recycleId = await SettingModel.getRecycleId();
 
   const user = await UserModel.findOne({uid});
   if(!user) throwErr(500, "在判断内容是否需要审核的时候，发现未知的uid");
@@ -1350,7 +1354,7 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
     passedCount = await ThreadModel.count({
       disabled: false,
       reviewed: true,
-      mainForumsId: {$ne: "recycle"},
+      mainForumsId: {$ne: recycleId},
       uid
     });
   }

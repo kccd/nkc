@@ -13,7 +13,10 @@ block eContent
             input.form-control(type='text' v-model.tirm='forumName' placeholder='请输入专业名称')
           .form-group
             button.btn.btn-default(@click='addForum') 提交
-
+        h4 回收站（用于存放被删文章的专业）
+        .form.form-inline.m-b-2
+          .form-group
+            input.form-control(type='text' v-model.tirm='forumSettings.recycle' placeholder='请输入专业ID')
         h4 专业排序
         .forums.m-b-2
           .forum(v-for='f, index in forums')

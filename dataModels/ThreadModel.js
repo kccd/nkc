@@ -325,6 +325,7 @@ threadSchema.methods.extendUser = async function() {
 // ------------------------------ 文章权限判断 ----------------------------
 threadSchema.methods.ensurePermission = async function(roles, grade, user) {
   const throwError = require("../nkcMOdules/throwError");
+  const recycleId = await mongoose.model('settings').getRecycleId();
   if(!this.forums) {
     await this.extendForums(["mainForums"]);
   }
@@ -338,7 +339,7 @@ threadSchema.methods.ensurePermission = async function(roles, grade, user) {
         err = err.errorData;
       } catch(e) {}
       let errorType = "noPermissionToReadThread";
-      if(forum.fid === "recycle") {
+      if(forum.fid === recycleId) {
         errorType = "threadHasBeenBanned";
         status = 404;
       }
@@ -910,6 +911,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
   await user.extendGrade();
   const forums = await ForumModel.find({fid: {$in: fids}});
   await Promise.all(forums.map(async forum => {
+    if(await SettingModel.isRecycle(forum.fid)) throwErr(400, '不允许在回收站专业发表内容');
     const childrenForums = await forum.extendChildrenForums();
     if(childrenForums.length !== 0) {
       throwErr(400, `专业【${forum.displayName}】下存在其他专业，请到下属属专业发表内容。`);
@@ -1429,6 +1431,8 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   const DelPostLogModel = mongoose.model("delPostLog");
   const UserModel = mongoose.model("users");
   const KcbsRecordModel = mongoose.model("kcbsRecords");
+  const SettingModel = mongoose.model('settings');
+  const recycleId = await SettingModel.getRecycleId();
   const nkcModules = require("../nkcModules");
   // 删除退修超时的帖子
   // 取出全部被标记的帖子
@@ -1448,7 +1452,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
     forumsId = forumsId.concat(thread.mainForumsId);
     await thread.update({
       recycleMark: false,
-      mainForumsId: ["recycle"],
+      mainForumsId: [recycleId],
       disabled: true,
       reviewed: true,
       categoriesId: []
@@ -1478,7 +1482,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
   }
   forumsId = new Set(forumsId);
   if(forumsId.size !== 0) {
-    forumsId.add("recycle");
+    forumsId.add(recycleId);
     await ForumModel.updateForumsMessage([...forumsId]);
   }
 };
@@ -1561,7 +1565,7 @@ threadSchema.methods.createNewPost = async function(post) {
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
   const pid = await SettingModel.operateSystemID('posts', 1);
-  const {postType, cover = (post.type === "product"? this.tid: ""), c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
+  const {postType, cover = "", c, t, l, abstractCn, abstractEn, keyWordsCn, keyWordsEn, authorInfos=[], originState} = post;
   let newAuthInfos = [];
   if(authorInfos) {
     for(let a = 0;a < authorInfos.length;a++) {
@@ -1724,6 +1728,7 @@ threadSchema.statics.updateAutomaticRecommendThreadsByType = async (type) => {
         movable.manuallySelectedThreads
       );
   }
+  exception = exception.map(e => e.tid);
   await ThreadModel.updateHomeRecommendThreadsByType(type, exception);
 };
 /*
@@ -1746,7 +1751,7 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
   // 去除自动推荐相关的条件
   const {
     automaticCount, countOfPost,
-    timeOfPost, digest, postVoteUpMinCount, postVoteDownMaxCount,
+    timeOfPost, digest, postVoteUpMinCount, postVoteDownMaxCount, otherThreads,
     threadVoteUpMinCount, reportedAndUnReviewed, original, flowControl
   } = homeSettings.recommendThreads[type];
   const match = {
@@ -1764,21 +1769,73 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
       $lte: countOfPost.max
     },
     voteUpTotal: {$gte: threadVoteUpMinCount},
-    digest,
     voteUp: {$gte: postVoteUpMinCount},
     voteDown: {$lte: postVoteDownMaxCount},
     flowControl
   };
+
+  // 被举报但未处理的文章ID
+  const complaints = await ComplaintModel.find({type: 'thread'}, {contentId: 1});
+  const threadsId = complaints.map(c => c.contentId);
+
+  const or = [];
+  const and = [];
+
+  // 其他文章
+  if(otherThreads) {
+    or.push({
+      digest: false,
+      originState: {$nin: ['4', '5', '6']},
+      tid: {$nin: threadsId},
+      flowControl: false
+    });
+  }
+
+  // 流控文章
+  if(flowControl) {
+    or.push({
+      flowControl: true
+    });
+  } else {
+    and.push({
+      flowControl: false
+    });
+  }
+  // 是否精选
+  if(digest) {
+    or.push({
+      digest: true
+    });
+  } else {
+    and.push({
+      digest: false
+    });
+  }
   // 是否必须为原创
   if(original) {
-    match.originState = {$in: ['4', '5', '6']};
+    or.push({
+      originState: {$in: ['4', '5', '6']}
+    });
+  } else {
+    and.push({
+      originState: {$nin: ['4', '5', '6']}
+    });
   }
   // 排除被举报但未被处理的文章
-  if(!reportedAndUnReviewed) {
-    const complaints = await ComplaintModel.find({type: 'thread'}, {contentId: 1});
-    const threadsId = complaints.map(c => c.contentId);
-    match.tid = {$nin: threadsId};
+  if(reportedAndUnReviewed) {
+    or.push({
+      tid: {$in: threadsId}
+    });
+  } else {
+    and.push({
+      tid: {$nin: threadsId}
+    });
   }
+
+  if(or.length) {
+    and.push({$or: or});
+  }
+  match.$and = and;
 
   const posts = await PostModel.aggregate([
     {

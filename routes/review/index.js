@@ -6,10 +6,11 @@ router
     const {nkcModules, data, db, query} = ctx;
     const {page=0} = query;
     const {user} = data;
+    const recycleId = await db.SettingModel.getRecycleId();
     const q = {
       reviewed: false,
       disabled: false,
-      mainForumsId: {$ne: "recycle"}
+      mainForumsId: {$ne: recycleId}
     };
     if(!ctx.permission("superModerator")) {
       const forums = await db.ForumModel.find({moderators: user.uid});

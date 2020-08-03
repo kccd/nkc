@@ -7,6 +7,7 @@ router
     const {postsId, reason, remindUser, violation} = body;
     const results = [];
     const threads = [], threadsId = [];
+    const recycleId = await db.SettingModel.getRecycleId();
     // 验证用户权限、验证内容是否存在
     for(const postId of postsId) {
       const post = await db.PostModel.findOne({pid: postId});
@@ -16,7 +17,7 @@ router
       let type = thread.oc === postId? "thread": "post";
       const isModerator = ctx.permission("superModerator") || await thread.isModerator(user, "or");
       if(!isModerator) ctx.throw(403, `您没有权限处理ID为${postId}的post`);
-      if(type === "thread" && thread.mainForumsId.includes("recycle")) {
+      if(type === "thread" && thread.mainForumsId.includes(recycleId)) {
         ctx.throw(400, `ID为${thread.tid}的文章已被移动到回收站了，请刷新`);
       }
       if(type === "post" && post.disabled) {
@@ -40,11 +41,11 @@ router
         const targetUser = await thread.extendUser();
         // 获取文章所在专业 文章专业更新后需重新计算相关专业内的文章数量
         const forumsId = thread.mainForumsId;
-        forumsId.push("recycle");
+        forumsId.push(recycleId);
         updateForumsId = updateForumsId.concat(forumsId);
         //  更新文章的专业为回收站，并标记为已屏蔽，且设置审核状态为已通过
         await thread.update({
-          mainForumsId: ["recycle"],
+          mainForumsId: [recycleId],
           categoriesId: [],
           disabled: true,
           recycleMark: false,

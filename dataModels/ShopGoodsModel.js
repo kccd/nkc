@@ -396,6 +396,7 @@ shopGoodsSchema.methods.onshelf = async function() {
   const ThreadModel = mongoose.model("threads");
   const ResourceModel = mongoose.model("resources");
   const ShopGoodsModel = mongoose.model("shopGoods");
+  const AttachmentModel = mongoose.model('attachments');
   const tools = require("../tools");
   const settings = require("../settings");
   threadInfo.t = threadInfo.title;
@@ -415,8 +416,12 @@ shopGoodsSchema.methods.onshelf = async function() {
   const resource = await ResourceModel.findOne({rid: imgMaster});
   if(resource) {
     const imgPath = await resource.getFilePath();
-    const targetPath = settings.upload.coverPath + '/' + tid + '.jpg';
-    await tools.imageMagick.coverify(imgPath, targetPath);
+    await AttachmentModel.savePostCover(post.pid, {
+      path: imgPath,
+      size: resource.size,
+      hash: resource.hash,
+      name: resource.name,
+    });
   }
 };
 

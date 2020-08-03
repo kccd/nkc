@@ -8,9 +8,10 @@ router
     const forumsObj = {};
     const forumsId = new Set();
     const threadTypesId = new Set();
+    const recycleId = await db.SettingModel.getRecycleId();
     for(const forum of forums) {
       const {fid, cid} = forum;
-      if(fid === "recycle") ctx.throw(400, "无法将文章移动到回收站");
+      if(fid === recycleId) ctx.throw(400, "无法将文章移动到回收站");
       const threadTypes = await db.ThreadTypeModel.find({fid}, {cid: 1});
       // 应该排除掉的文章分类
       forum.cids = threadTypes.map(t => (t.cid + ""));
@@ -35,7 +36,7 @@ router
     if(moveType === "add") {
       for(const thread of threads) {
         let {mainForumsId, categoriesId} = thread;
-        if(mainForumsId.includes("recycle")) ctx.throw(403, `无法给回收站中的文章添加专业`);
+        if(mainForumsId.includes(recycleId)) ctx.throw(403, `无法给回收站中的文章添加专业`);
         // 排除掉已选专业中未被选择的文章分类
         const forumsId_ = [...forumsId];
         mainForumsId = mainForumsId.concat(forumsId_);

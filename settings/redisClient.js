@@ -9,11 +9,15 @@ Bluebird.promisifyAll(Redis.Multi.prototype);
 * @param {Array} values 新数据
 * @author pengxiguaa 2020/7/29
 * */
-Redis.RedisClient.prototype.resetSetAsync = async function(key, values) {
+Redis.RedisClient.prototype.resetSetAsync = async function(key, values = []) {
   const _values = await this.smembersAsync(key);
   const _removeValues = _values.filter(v => !values.includes(v));
   if(_removeValues.length) await this.sremAsync(key, _removeValues);
-  if(values.length) await this.saddAsync(key, values);
+  if(values.length) {
+    await this.saddAsync(key, values);
+  } else {
+    await this.delAsync(key);
+  }
 };
 
 const redisConfig = require('../config/redis');
@@ -22,7 +26,6 @@ const client = Redis.createClient({
   port: redisConfig.port,
   db: 1
 });
-
 
 module.exports = client;
 /*

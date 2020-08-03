@@ -161,22 +161,16 @@ async function func() {
     let key;
     // 下层子专业
     key = `forum:${forum.fid}:childForumsId`;
-    if (forum.childForumsId.length !== 0) {
-      await client.resetSetAsync(key, forum.childForumsId);
-    }
+    await client.resetSetAsync(key, forum.childForumsId);
 
     // 所有子专业
     key = `forum:${forum.fid}:allChildForumsId`;
-    if (forum.allChildForumsId.length !== 0) {
-      await client.resetSetAsync(key, forum.allChildForumsId);
-    }
+    await client.resetSetAsync(key, forum.allChildForumsId);
 
 
     // 所有父级专业
     key = `forum:${forum.fid}:parentForumsId`;
-    if (forum.parentForumsId.length !== 0) {
-      await client.resetSetAsync(key, forum.parentForumsId);
-    }
+    await client.resetSetAsync(key, forum.parentForumsId);
   }
 
   /*
@@ -196,9 +190,7 @@ async function func() {
     if(!roles.hasOwnProperty(roleId)) continue;
     const key = `role:${roleId}:forumsId`;
 
-    if(roles[roleId].length !== 0) {
-      await client.resetSetAsync(key, roles[roleId]);
-    }
+    await client.resetSetAsync(key, roles[roleId]);
   }
 
   for(const gradeId in grades) {
@@ -207,9 +199,7 @@ async function func() {
 
     const key = `grade:${gradeId}:forumsId`;
 
-    if(grades[gradeId].length !== 0) {
-      await client.resetSetAsync(key, grades[gradeId]);
-    }
+    await client.resetSetAsync(key, grades[gradeId]);
   }
 
   for(const roleAndGrade in rolesAndGrades) {
@@ -224,9 +214,7 @@ async function func() {
 
     const key = `${roleAndGrade}:forumsId`;
 
-    if(rolesAndGrades[roleAndGrade].length !== 0) {
-      await client.resetSetAsync(key, rolesAndGrades[roleAndGrade]);
-    }
+    await client.resetSetAsync(key, rolesAndGrades[roleAndGrade]);
 
   }
 
@@ -236,30 +224,20 @@ async function func() {
 
     const key = `moderator:${moderator}:forumsId`;
 
-    if(moderators[moderator].length !== 0) {
-      await client.resetSetAsync(key, moderators[moderator]);
-    }
+    await client.resetSetAsync(key, moderators[moderator]);
   }
 
   let key = `canNotDisplayOnParentForumsId`;
-  if(canNotDisplayOnParentForumsId.length !== 0) {
-    await client.resetSetAsync(key, canNotDisplayOnParentForumsId);
-  }
+  await client.resetSetAsync(key, canNotDisplayOnParentForumsId);
 
   key = `canNotAccessibleForumsId`;
-  if(canNotAccessibleForumsId.length !== 0) {
-    await client.resetSetAsync(key, canNotAccessibleForumsId);
-  }
+  await client.resetSetAsync(key, canNotAccessibleForumsId);
 
   key = `canDisplayOnNavForumsIdNCC`;
-  if(canDisplayOnNavForumsIdNCC.length !== 0) {
-    await client.resetSetAsync(key, canDisplayOnNavForumsIdNCC);
-  }
+  await client.resetSetAsync(key, canDisplayOnNavForumsIdNCC);
 
   key = `canNotDisplayOnNavForumsId`;
-  if(canNotDisplayOnNavForumsId.length !== 0) {
-    await client.resetSetAsync(key, canNotDisplayOnNavForumsId);
-  }
+  await client.resetSetAsync(key, canNotDisplayOnNavForumsId);
 
   console.log(`专业缓存更新完成`.green);
 

@@ -12,6 +12,10 @@ const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
 
+const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
+const videoExtensions = ["mp4", "mov", "3gp", "avi"];
+const audioExtensions = ["wav", "amr", "mp3", "aac"];
+
 func.folders = {
   attachment: './attachment',
   resource: './resource',
@@ -92,6 +96,20 @@ func.getFileFolderPathByFileType = async (type) => {
   return fileFolder[type];
 }
 
+/*
+* 获取附件的类型 picture, video, audio, attachment
+* */
+func.getMediaTypeByExtension = (extension) => {
+  if(pictureExtensions.includes(extension)) {
+    return 'mediaPicture'
+  } else if(videoExtensions.includes(extension)) {
+    return 'mediaVideo'
+  } else if(audioExtensions.includes(extension)) {
+    return 'mediaAudio'
+  } else {
+    return 'mediaAttachment'
+  }
+};
 
 /**
  * 存储专栏头像2.0
@@ -299,27 +317,6 @@ func.getPostCover = async (hash) => {
 };
 
 /*
-* 修改post的封面图
-* @param {String} pid postID
-* @param {File} 图片数据
-* @author pengxiguaa 2019-9-17
-* */
-func.savePostCover = async (pid, file) => {
-  const post = await db.PostModel.findOnly({pid});
-  const {hash, path} = file;
-  const filePath = upload.coverPath + "/" + hash + ".jpg";
-  await ei.resize({
-    src: path,
-    dst: filePath,
-    height: 400,
-    width: 800,
-    background: "#ffffff",
-    quality: 90
-  });
-  await post.update({cover: hash});
-  await fsSync.unlink(path);
-};
-/*
 * 修改resource的封面
 * @param {String} resource id
 * @param {File} 图像数据
@@ -338,27 +335,6 @@ func.saveResourceCover = async (rid, file) => {
     quality: 90
   });
   await resource.update({cover: hash});
-  await fsSync.unlink(path);
-};
-/*
-* 修改draft的封面图
-* @param {String} did draftID
-* @param {File} 图片数据
-* @author pengxiguaa 2019-9-17
-* */
-func.saveDraftCover = async (did, file) => {
-  const draft = await db.DraftModel.findOnly({did});
-  const {hash, path} = file;
-  const filePath = upload.coverPath + "/" + hash + ".jpg";
-  await ei.resize({
-    src: path,
-    dst: filePath,
-    height: 400,
-    width: 800,
-    background: "#ffffff",
-    quality: 90
-  });
-  await draft.update({cover: hash});
   await fsSync.unlink(path);
 };
 
@@ -499,6 +475,7 @@ func.getFileObjectByFilePath = async (filePath) => {
     ext,
     hash,
     size,
+    mediaType: func.getMediaTypeByExtension(ext),
   };
 }
 
