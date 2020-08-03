@@ -1468,8 +1468,8 @@ forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
     recycleMark: {$ne: true},
     mainForumsId: fid,
   }, {
-    tid: 1, oc: 1, uid: 1, hits: 1, count: 1, toc: 1, digest: 1
-  }).sort({toc: -1}).limit(count);
+    tid: 1, oc: 1, uid: 1, hits: 1, count: 1, toc: 1, digest: 1, tlm: 1
+  }).sort({tlm: -1}).limit(count);
   const postsId = [], usersId = [];
   threads.map(t => {
     postsId.push(t.oc);
@@ -1482,7 +1482,7 @@ forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
   users.map(u => usersObj[u.uid] = u);
   const results = [];
   for(const thread of threads) {
-    const {tid, oc, uid, hits, count, toc, digest} = thread;
+    const {tid, tlm, oc, uid, hits, count, toc, digest} = thread;
     const post = postsObj[oc];
     const user = usersObj[uid];
     if(!post || !user) continue;
@@ -1494,6 +1494,7 @@ forumSchema.methods.saveLatestThreadToRedis = async function(count = 3) {
       tid,
       digest,
       toc,
+      tlm,
       hits,
       count,
       post,

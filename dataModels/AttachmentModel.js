@@ -449,5 +449,44 @@ schema.statics.saveRecommendThreadCover = async (file, type) => {
   return aid;
 };
 
+/*
+* 修改draft的封面图
+* @param {String} did draftID
+* @param {File} 图片数据
+* @author pengxiguaa 2020-8-3
+* */
+schema.statics.saveDraftCover = async (did, file) => {
+  const DraftModel = mongoose.model('draft');
+  const AttachmentModel = mongoose.model('attachments');
+  const draft = await DraftModel.findOne({did});
+  const {path, name} = file;
+  const ext = 'jpg';
+  const FILE = require('../nkcModules/file');
+  if(!draft) return;
+  const toc = new Date();
+  const fileFolder = await FILE.getPath('postCover', toc);
+  const aid = await AttachmentModel.getNewId();
+  const filePath = PATH.resolve(fileFolder, `./${aid}.${ext}`);
+  await ei.resize({
+    src: path,
+    dst: filePath,
+    height: 400,
+    width: 800,
+    background: "#ffffff",
+    quality: 90
+  });
+  const {hash, size} = await FILE.getFileObjectByFilePath(filePath);
+  const a = AttachmentModel({
+    _id: aid,
+    ext,
+    hash,
+    size,
+    name,
+    type: 'postCover'
+  });
+  await a.save();
+  await draft.update({cover: aid});
+};
+
 
 module.exports = mongoose.model('attachments', schema);
