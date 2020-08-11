@@ -11,7 +11,7 @@ function eachTextNode(node, handle) {
   // console.log(node);
   if(node.type === "text") {
     handle(node.data, node);
-  }else if(node.children.length) {
+  }else if(node.children && node.children.length) {
     for(let child of node.children) {
       eachTextNode(child, handle)
     }
@@ -39,7 +39,7 @@ function safeTextNode($node) {
 }
 
 /**
- * 
+ *
  * @param {Object} $node - cheerio 被包装的dom节点
  */
 function reduTextNode($node) {

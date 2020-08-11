@@ -1,9 +1,9 @@
 // 这里只记录特定的记录，并不包含日志
 // 需要记录日志的地方执行nkcSources/logger.js即可
+const {usersBehavior, experimental, timeLine} = require('../settings/operationsType');
 module.exports = async (ctx, next) => {
   const {db, state, data} = ctx;
   const operationId = state.operation._id;
-  const typeId = state.operation.typeId;
   await next();
   if(!data.user) return;
   const behavior = {
@@ -24,18 +24,12 @@ module.exports = async (ctx, next) => {
     cid:  data.thread? data.thread.cid: "",
     toUid: data.targetUser? data.targetUser.uid: ""
   };
-  // 根据操作名判断是否需要存入相应记录
-  let operationTypes = await db.OperationTypeModel.find({_id: {$in: typeId}}, {type: 1});
 
-  operationTypes = operationTypes.map(o => o.type);
-
-  if(operationTypes.includes("experimental")) {
-    await db.ManageBehaviorModel(behavior).save();
-  }
-  if(operationTypes.includes("userBehavior")) {
+  if(usersBehavior.includes(operationId)) {
     await db.UsersBehaviorModel(behavior).save();
-  }
-  if(operationTypes.includes("timeLine")) {
+  } else if(experimental.includes(operationId)) {
+    await db.ManageBehaviorModel(behavior).save();
+  } else if(timeLine.includes(operationId)) {
     await db.InfoBehaviorModel(behavior).save();
   }
 };

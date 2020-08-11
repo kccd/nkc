@@ -8,7 +8,8 @@ const ES = require("elasticsearch");
 
 const {address, port, analyzer, searchAnalyzer, indexName} = esConfig;
 const client = new ES.Client({
-  node: address + ":" + port
+  node: address + ":" + port,
+  requestTimeout: 90000
 });
 
 func.client = client;
