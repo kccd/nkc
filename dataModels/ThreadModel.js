@@ -1771,7 +1771,6 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
     voteUpTotal: {$gte: threadVoteUpMinCount},
     voteUp: {$gte: postVoteUpMinCount},
     voteDown: {$lte: postVoteDownMaxCount},
-    flowControl
   };
 
   // 被举报但未处理的文章ID

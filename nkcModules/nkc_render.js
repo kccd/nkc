@@ -434,7 +434,7 @@ function nkc_render(options){
   var pwbb_experimental = function(post, isHTML){
     var content = post.c || "";
     var html = "";
-    
+
     if(!isHTML){  //bbcode
       // 公式渲染
       html = chemFormulaReplacer(content)
@@ -452,6 +452,11 @@ function nkc_render(options){
       .replace(/\n/g,'<br>')
       .replace(/\{#newline#}/g,'\n')
       .replace(/\[attachment=([0-9]{1,16})\]/g,'#{r=$1}')
+
+      // dz to nkc
+        // dz中的附件音频等
+        .replace(/\[attach]([0-9]{1,16})\[\/attach]/g, '#{r=$1}')
+
       .replace(/\[flash.*?](.+.*?)\[\/flash]/gi, '<a href="$1" target="_blank" style="font-size:20px;">点击此处查看视频</a>')
       .replace(/\[(\/?)strike]/g,'<$1s>')
       .replace(/  /g,'&nbsp&nbsp')
@@ -466,7 +471,7 @@ function nkc_render(options){
     // fix for older posts where they forgot to inject attachments.
 
     // 旧的处理方法 仅作参考
-    // 添加附件下载次数 
+    // 添加附件下载次数
     if(0 && post.l === "html"){
       var extArray = ['jpg','jpeg','gif','png','svg','bmp','mp3','mp4','wma','mid','ogg','webm'];
       for(var i in post.resources){
@@ -506,7 +511,7 @@ function nkc_render(options){
     // html = html.replace(/\<img.*?src="\/default\/picdefault.png".+?\>/img, '');
     // html = html.replace(/\<img.*?src="\/r\/(.+?)".+?\>/img,'<img src="/r/$1" dataimg="content"/>');
     // html = html.replace(/\<img(.*?)\/>/img,'<img $1 dataimg="content"/>');
-    
+
     // 精简图片dom
     // html = html.replace(/\<img\s+?src=['"]\/r\/([0-9]+?)['"].*?>/img, '<img src="/r/$1" />');
     html = html.replace(/<img\s.*?>/img, function(content) {
@@ -560,7 +565,7 @@ function nkc_render(options){
   // 视频 <video src="/r/rid"></video>
   // 音频 <audio src="/r/rid"></video>
   // 附件 <a href="/r/rid"></a>
-  // @param {String} html 
+  // @param {String} html
   // @param {[Object]} resources 资源文件对象所组成的数组
   var renderResourceDom = function(html, resources, script) {
     var k = function(number){
@@ -586,7 +591,7 @@ function nkc_render(options){
         if(!resource.width || !resource.height) {
           return '<div class="article-img-body">'+imgStr+'</div>';
         }
-        return '<div class="article-img-body" style="width: '+resource.width+'px;"><div class="article-img-content" style="padding-top: '+ 
+        return '<div class="article-img-body" style="width: '+resource.width+'px;"><div class="article-img-content" style="padding-top: '+
         resource.height*100/resource.width +
         '%;">'+lazyImgStr+'</div></div>';
       })
@@ -607,7 +612,7 @@ function nkc_render(options){
         '<video class="plyr-dom" preload="none" controls poster="/frameImg/'+v1+ '" data-rid="' + v1 +
         '" data-plyr-title="'+resource.oname+'"' +
         '><source src="/r/'+v1+
-        '" type="video/mp4"></source>你的浏览器不支持video标签，请升级。</video>' + 
+        '" type="video/mp4"></source>你的浏览器不支持video标签，请升级。</video>' +
         '</div></div>'
       })
       // 音频处理
@@ -619,7 +624,7 @@ function nkc_render(options){
         }
 
         return '<div class="article-audio">'+
-          /* '<div class="article-audio-name">' + plain_escape(resource.oname) + 
+          /* '<div class="article-audio-name">' + plain_escape(resource.oname) +
             '<div class="article-audio-size">' + getSize(resource.size) + '</div>' +
           '</div>'+ */
           '<audio class="plyr-dom" preload="none" controls data-rid="'+v1+'">' +
@@ -648,10 +653,10 @@ function nkc_render(options){
         return '<div class="article-attachment">' +
           '<div class="article-attachment-icon">' +
             '<img src="'+ tools.getUrl("fileCover", resource.ext) +'" />'+
-          '</div>' + 
+          '</div>' +
           '<div class="article-attachment-content">' +
             '<a class="article-attachment-name" target="_blank" href="'+resourceUrl+'" title="'+plain_escape(resource.oname)+'">' +
-              plain_escape(resource.oname) + 
+              plain_escape(resource.oname) +
             '</a>' +
             '<div class="article-attachment-info">' +
               '<div class="article-attachment-size">'+getSize(resource.size)+'</div>' +
@@ -698,7 +703,7 @@ function nkc_render(options){
       resources[r.rid] = r;
     }
 
-    
+
     // 处理媒体文件dom
     renderedHTML = renderResourceDom(renderedHTML, resources, script);
 
@@ -717,7 +722,7 @@ function nkc_render(options){
     var blockDomArray = renderedHTML.match(/<blockquote cite.*?blockquote>/im);
     var blockDomHtml = "";
     if(blockDomArray){
-      blockDomHtml = blockDomArray[0];   
+      blockDomHtml = blockDomArray[0];
       renderedHTML = renderedHTML.replace(/<blockquote cite.*?blockquote>/im,'');
     }
     var atUsers = post.atUsers;

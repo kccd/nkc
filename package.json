@@ -19,7 +19,6 @@
   "author": "nkc",
   "license": "ISC",
   "dependencies": {
-    "mkdirp": "^1.0.4",
     "awesome-static": "^1.4.3",
     "bluebird": "^3.5.3",
     "chart.js": "^2.7.2",
@@ -36,6 +35,7 @@
     "echarts": "^4.1.0",
     "elasticsearch": "^14.0.0",
     "element-ui": "^2.13.2",
+    "file-type": "^14.6.1",
     "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",
     "fs-extra": "^7.0.1",
@@ -57,9 +57,12 @@
     "koa-sslify": "^2.1.2",
     "koa-static": "^4.0.2",
     "markdown-it": "^8.4.1",
+    "mathjs": "^7.0.1",
     "mime": "^2.2.0",
+    "mkdirp": "^1.0.4",
     "moment": "^2.20.1",
     "mongoose": "^4.13.10",
+    "mysql2": "^2.1.0",
     "node-schedule": "^1.3.0",
     "node-stream-zip": "^1.9.1",
     "node-threads-pool": "^1.0.0",
@@ -67,6 +70,7 @@
     "open": "^6.3.0",
     "photoswipe": "^4.1.2",
     "pinyin": "^2.9.0",
+    "pm2": "^4.4.0",
     "pug": "^2.0.0-rc.4",
     "qcloudsms_js": "^0.1.0",
     "qr-image": "^3.2.0",
@@ -87,10 +91,7 @@
     "twemoji": "^2.5.0",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3",
-    "pm2": "^4.4.0",
-    "file-type": "^14.6.1",
-    "mathjs": "^7.0.1"
+    "xss": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

@@ -7,27 +7,13 @@ const settings = require('../settings');
 moment.locale('zh-cn');
 const languages = require('../languages');
 const tools = require("./tools");
-
-const xss = require('xss');
-
+const htmlFilter = require('./nkcRender/htmlFilter');
 
 let filters = {
   markdown:render.commonmark_render,
   markdown_safe:render.commonmark_safe,
   bbcode:render.bbcode_render,
   thru: function(k){return k},
-};
-let getCertsInText = (user) => {
-  let perm = require('./permissions.js');
-
-  let certs =  perm.calculateThenConcatCerts(user);
-
-  let s = '';
-  for(i in certs){
-    let cname = perm.getDisplayNameOfCert(certs[i]);
-    s+=cname+' ';
-  }
-  return s;
 };
 
 const replaceContent = (c) => {
@@ -69,25 +55,6 @@ function htmlDiff(earlier,later){
   });
   return outputHTML
 }
-
-/*function testModifyTimeLimit(cs, ownership, toc){
-
-  let smtl = cs.selfModifyTimeLimit;
-  let emtl = cs.elseModifyTimeLimit;
-
-  // if you can modify others in 1y,
-  // you should be able to do that to yourself,
-  // regardless of settings. // wtf r u talking about   wtf r u talking about!!!! --lzszone
-  if(smtl<emtl){
-    smtl = emtl
-  }
-  //who dat fuck wrote these fucking codes,
-  //--test ownership--
-  if(ownership)
-    // if he own the post
-    return Date.now() < toc.getTime() + smtl;
-  return Date.now() < toc.getTime() + emtl
-}*/
 
 function testModifyTimeLimit(time, ownership, toc) {
 	// time === -1 时间无限制
@@ -418,6 +385,7 @@ let pugRender = (template, data, state) => {
     testModifyTimeLimit,
     dateString,
     creditString,
+		htmlFilter,
     htmlDiff,
     filterQuote,
 		hideContentByUser,
