@@ -473,11 +473,27 @@ func.getFileObjectByFilePath = async (filePath) => {
     path: filePath,
     name,
     ext,
+    stats,
     hash,
     size,
     mediaType: func.getMediaTypeByExtension(ext),
   };
 }
+
+/*
+* 检查给定路径时否存在
+* @param {String} targetPath
+* @return {Boolean}
+* @author pengxiguaa 2020/8/10
+* */
+func.exist = async (targetPath) => {
+  try{
+    await fsPromise.stat(targetPath);
+    return true;
+  } catch(err) {
+    return false;
+  }
+};
 
 /**
  * 重设图片尺寸
