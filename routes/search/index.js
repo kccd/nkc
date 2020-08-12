@@ -210,7 +210,7 @@ router
       users.map(user => {
         userObj[user.uid] = user;
       });
-      
+
       let threads = await db.ThreadModel.find({tid: {$in: [...tids]}, reviewed: true});
       threads = await db.ThreadModel.extendThreads(threads, {
         forum: true,
@@ -265,7 +265,7 @@ router
           for(const fid of thread.mainForumsId) {
             if(!fidOfCanGetThreads.includes(fid)) continue loop1;
           }
-  
+
           let link;
           if(thread.oc === post.pid) {
             link = `/t/${thread.tid}`

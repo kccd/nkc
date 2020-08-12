@@ -62,36 +62,12 @@ block content
                 a(data-type="reload" href=`/?t=subscribe&d=forum${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "forum" ? "active" : ""
                 ) 专业
-          if !data.threads.length
-            .p-t-5.p-b-5.text-center
-              h4
-                b 空空如也~
-          else
-            .m-b-0
+          .m-b-0
 
-              if !(state.isApp && state.platform === 'reactNative')
-                include ../publicModules/mobile_drawer/right_drawer
+            if !(state.isApp && state.platform === 'reactNative')
+              include ../publicModules/mobile_drawer/right_drawer
 
-              -let showPagingSortButton = true;
-              if canManagement
-                .paging-button
-                  a.button.radius-left.radius-right(onclick="managementThreads()") 管理
-                .paging-button.management-thread-panel
-                  a.button.radius-left(onclick="selectAll()") 全选
-                  a.button(onclick="moveSelectedThreads()") 移动
-                  a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-              if (data.t === "latest" || data.t === "column" || data.t === "recommend") && state.platform !== 'reactNative'
-                .paging-button
-                  a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "" data-type="reload") 全部
-                  a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 推荐
-                  a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
-
-              include ../publicModules/paging/paging
-
-            for thread in data.threads
-              include ../publicModules/thread_panel/thread_panel
-            -showPagingSortButton = false;
-            -showHomeButton = false;
+            -let showPagingSortButton = true;
             if canManagement
               .paging-button
                 a.button.radius-left.radius-right(onclick="managementThreads()") 管理
@@ -99,7 +75,31 @@ block content
                 a.button.radius-left(onclick="selectAll()") 全选
                 a.button(onclick="moveSelectedThreads()") 移动
                 a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-            include ../publicModules/paging/paging_input
+            if (data.t === "latest" || data.t === "column" || data.t === "recommend") && state.platform !== 'reactNative'
+              .paging-button
+                a.radius-left.button(href=`/?t=latest` class=data.t === "latest" ? "active" : "" data-type="reload") 全部
+                a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 推荐
+                a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
+
+            if !data.threads.length
+              .p-t-5.p-b-5.text-center
+                h4
+                  b 空空如也~
+            else
+              include ../publicModules/paging/paging
+
+              for thread in data.threads
+                include ../publicModules/thread_panel/thread_panel
+              -showPagingSortButton = false;
+              -showHomeButton = false;
+              if canManagement
+                .paging-button
+                  a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                .paging-button.management-thread-panel
+                  a.button.radius-left(onclick="selectAll()") 全选
+                  a.button(onclick="moveSelectedThreads()") 移动
+                  a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+              include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
         .hidden-xs.hidden-sm#rightDom.box-shadow-panel
           .hidden-xs.hidden-sm.m-b-1
