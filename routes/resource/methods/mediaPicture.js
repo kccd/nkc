@@ -87,9 +87,9 @@ module.exports = async (options) => {
       const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
       const waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
       const watermarkSettings = await db.SettingModel.getWatermarkSettings();
-      let {siteLogoWidth, siteLogoHeight} = await imageMagick.waterInfo(waterSmallPath);
-      siteLogoWidth = parseInt(siteLogoWidth);
-      siteLogoHeight = parseInt(siteLogoHeight);
+      const watermarkPictureInfo = await imageMagick.info(waterSmallPath);
+      const siteLogoWidth = parseInt(watermarkPictureInfo.width);
+      const siteLogoHeight = parseInt(watermarkPictureInfo.height);
 
       // 计算水印位置
       const positions = {
