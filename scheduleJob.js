@@ -75,13 +75,15 @@ jobs.backupDatabase = () => {
       mongodb.database,
       '--out',
       `${path.resolve(mongodb.backupDir)}/${moment().format('YYYYMMDD')}`,
-      `--excludeCollection`,
-      `visitorLogs`
     ];
     const day = Number(moment().format("DD"));
-    if(day % 3 === 0) {
+    if(day % 4 !== 0) {
       command.push(`--excludeCollection`);
       command.push(`logs`);
+    }
+    if(day % 12 !== 0) {
+      command.push(`--excludeCollection`);
+      command.push(`visitorLogs`);
     }
 		const process = spawn('mongodump.exe', command);
 		process.stdout.on('data', (d) => {

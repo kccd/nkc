@@ -76,9 +76,7 @@ router
     await db.UsersGeneralModel.updateOne({uid: data.user.uid}, {
       $set: q
     });
-    if(color){
-      await db.UserModel.updateOne({uid: data.user.uid}, {$set: {color}});
-    }
+    await db.UserModel.updateOne({uid: data.user.uid}, {$set: {color}});
     await next();
   });
 module.exports = router;

@@ -9,9 +9,6 @@
   margin: auto;
 }
 /* 文本超出隐藏并显示省略号 */
-body {
-  background-color: #f6f6f6;
-}
 .shop-navs .shop-nav-body .shop-nav-body {
   padding-left: 1rem;
 }

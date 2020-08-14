@@ -22,18 +22,16 @@ const http = require('http'),
   {
     RoleModel,
     ForumModel,
-    OperationModel
-  } = require('./dataModels');
-
+  } = require('./dataModels'),
+  permission = require('./nkcModules/permission');
 let server;
 
 const dataInit = async () => {
   const defaultData = require('./defaultData');
   await defaultData.init();
   // 运维包含所有的操作权限
-  const operations = await OperationModel.find({}, {_id: 1});
-  const operationsId = operations.map(o => o._id);
-  await RoleModel.update({_id: 'dev'}, {$set: {operationsId: operationsId}});
+  const operationsId = permission.getOperationsId();
+  await RoleModel.updateOne({_id: 'dev'}, {$set: {operationsId: operationsId}});
   await ForumModel.updateMany({}, {$addToSet: {rolesId: 'dev'}});
 };
 

@@ -21,9 +21,11 @@ const app = new Koa();
 const conditional = require('koa-conditional-get');
 const etag = require('koa-etag');
 app.on('error', err => {
-	if(!['read ECONNRESET', 'write ECONNABORTED', 'write ECANCELED', 'write ECONNRESET'].includes(err.message)) {
+  console.log(`KOA ERROR:`);
+  console.error(err);
+	/*if(!['read ECONNRESET', 'write ECONNABORTED', 'write ECANCELED', 'write ECONNRESET'].includes(err.message)) {
 		console.log(err);
-	}
+	}*/
 });
 const favicon = require('koa-favicon');
 

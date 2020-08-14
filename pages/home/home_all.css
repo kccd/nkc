@@ -10,7 +10,6 @@
 }
 /* 文本超出隐藏并显示省略号 */
 body {
-  background-color: #f4f4f4;
   padding-top: 0;
 }
 .navbar-default.nkcshade {

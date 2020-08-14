@@ -35,6 +35,12 @@ var app = new Vue({
     var data = NKC.methods.getDataById("data");
     this.serverSettings = data.serverSettings;
     this.keywords = (data.serverSettings.keywords || "").join(",");
+    var self = this;
+    setTimeout(function() {
+      NKC.methods.initSelectColor(function(color) {
+        self.serverSettings.backgroundColor = color;
+      });
+    }, 300)
   },
   methods: {
     save: function() {

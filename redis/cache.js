@@ -22,5 +22,7 @@ module.exports = async () => {
   await db.ForumModel.saveAllForumLatestThreadToRedisAsync();
   // 后台设置
   await db.SettingModel.saveAllSettingsToRedis();
+  // 操作权限
+  await db.OperationModel.saveAllOperationsToRedisAsync()
 
 }
