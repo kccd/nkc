@@ -80,7 +80,6 @@ module.exports = async (ctx, next) => {
     ctx.settings = settings;
     ctx.fs = fsSync;
     ctx.fsPromise = fsPromise;
-
     ctx.state = {
       url: ctx.url.replace(/\?.*/ig, ""),
       // app请求的标识
@@ -92,7 +91,7 @@ module.exports = async (ctx, next) => {
       // ReactNative
       twemoji: settings.editor.twemoji,
       // 当前操作
-      operation: await db.OperationModel.findOnly({_id: ctx.data.operationId}),
+      operation: await db.OperationModel.getOperationById(ctx.data.operationId),
       // - 初始化网站设置
       pageSettings: await db.SettingModel.getSettings("page"),
       postSettings: await db.SettingModel.getSettings("post"),

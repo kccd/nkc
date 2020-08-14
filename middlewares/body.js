@@ -80,6 +80,7 @@ module.exports = async (ctx, next) => {
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';
+      // ctx.body = await ctx.nkcModules.renderPug(ctx.template, ctx.data, ctx.state);
 	    ctx.body = ctx.nkcModules.render(ctx.template, ctx.data, ctx.state);
     }
     await next();

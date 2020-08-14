@@ -94,4 +94,6 @@ module.exports = client;
 *
 * forum:${fid}:latestThreads jsonString [threadObj, ...]
 *
+* 权限 操作
+* operation:${operationId} = jsonString operationObj
  */
