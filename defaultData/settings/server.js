@@ -13,7 +13,7 @@ module.exports = {
     brief: '网站简介',
     keywords: ['科创'],
     language: 'zh_CN',
-    backgroundColor: '#ccb39f',
+    backgroundColor: '#f4f4f4',
     links: {
       info: [
         {
