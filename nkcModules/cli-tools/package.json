@@ -1,0 +1,16 @@
+{
+  "name": "cli-tools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tokisakiyuu",
+  "license": "MIT",
+  "dependencies": {
+    "ansi-escapes": "^4.3.1",
+    "cli-cursor": "^3.1.0",
+    "colors": "^1.4.0"
+  }
+}

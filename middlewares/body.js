@@ -1,6 +1,7 @@
 const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
+
 module.exports = async (ctx, next) => {
   const {filePath, fileType, fileName, resource, fs, tg} = ctx;
   const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;

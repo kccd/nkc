@@ -1,5 +1,5 @@
 module.exports = {
   render: {
-    threadCount: 6
+    threadCount: 10
   }
 }
