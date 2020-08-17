@@ -56,6 +56,12 @@ const resourceSchema = new Schema({
     default: Date.now,
     index: 1
   },
+  // 若附件已被上传过，通过此rid去找到附件的真实路径
+  prid: {
+    type: String,
+    default: '',
+    index: 1
+  },
   // 文件路径（旧）
   tpath: {
     type: String,
@@ -127,6 +133,7 @@ resourceSchema.virtual('isFileExist')
  * 文件是否存在
  */
 resourceSchema.methods.setFileExist = async function() {
+  if(this.mediaType !== 'mediaAttachment') return;
   const path = await this.getFilePath()
   try{
     await fsPromise.stat(path);
@@ -142,7 +149,12 @@ resourceSchema.methods.setFileExist = async function() {
 */
 resourceSchema.methods.getFilePath = async function() {
   const ResourceModel = mongoose.model('resources');
-  const {toc, ext, rid} = this;
+  const {toc, ext, rid, prid} = this;
+  if(prid) {
+    const parentResource = await ResourceModel.findOne({rid: prid});
+    if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
+    return await parentResource.getFilePath();
+  }
   const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
   return PATH.resolve(fileFolder, `./${rid}.${ext}`);
 };
