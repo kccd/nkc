@@ -1,5 +1,8 @@
 const {Eve, Thread, isMainThread} = require('node-threads-pool');
 const threadPoolSettings = require('../settings/threadPool');
+const tools = require("./tools");
+
+let tempDate = new Date();
 
 if(!isMainThread) {
   const render = require('./nkc_render');
@@ -10,7 +13,6 @@ if(!isMainThread) {
   const settings = require('../settings');
   moment.locale('zh-cn');
   const languages = require('../languages');
-  const tools = require("./tools");
   const htmlFilter = require('./nkcRender/htmlFilter');
 
   let filters = {
@@ -368,7 +370,13 @@ if(!isMainThread) {
     }
   }
 
-  new Thread(async ({template, data, state}) => {
+  new Thread(async desc => {
+    // require("../tools/cycle");
+    // desc = JSON.retrocycle(desc);
+    let {template, data, state} = desc;
+    global.NKC = {
+      startTime: tempDate
+    }
     const language = state && state.language? state.language: languages['zh_cn'];
     let options = {
       markdown_safe: render.commonmark_safe,
@@ -394,8 +402,8 @@ if(!isMainThread) {
       delCodeAddShrink,
       applicationFormStatus,
       ensureFundOperatorPermission,
-      startTime: global.NKC.startTime,
-      NODE_ENV: global.NKC.NODE_ENV,
+      startTime: tempDate,
+      NODE_ENV: tempDate,
       getProvinceCity: getProvinceCity,
       numToFloatTwo: numToFloatTwo,
       calculateFreightPrice:calculateFreightPrice,
@@ -432,7 +440,7 @@ if(!isMainThread) {
     options.data = data;
     options.filters = filters;
     options.pretty = true; // 保留换行
-    if(global.NKC.NODE_ENV === 'production') {
+    if(tempDate === 'production') {
       options.cache = true;
     } else {
       // options.debug = true;
@@ -442,12 +450,68 @@ if(!isMainThread) {
 } else {
   const tp = new Eve(__filename, threadPoolSettings.render.threadCount);
   module.exports = async (template, data, state) => {
+    let desc = {template, data, state};
     try{
-      console.log(state);
-      return await tp.run({template, state});
+      // console.log(state);
+      desc = JSON.decycle(desc);
+      desc = serializable(desc);
+      return await tp.run(desc);
     } catch(err) {
+      // console.log(record);
       console.log(err);
       return '<code>页面渲染失败</code>';
     }
   };
+}
+
+
+/**
+ * 简化对象使之可以被克隆
+ */
+function serializable(target) {
+  let result;
+  if(isMongooseModel(target)) {
+    result = target.toObject ? target.toObject() : Object.assign({}, target, target._doc);
+    for(let name in result) {
+      if(name.startsWith("_")) {
+        let value = result[name];
+        result[name.substr(1)] = serializable(value);
+      }
+    }
+  } else if(isObject(target)) {
+    result = {};
+    for(let key in target) {
+      // console.log("Object节点下:", target[key]);
+      result[key] = serializable(target[key]);
+    }
+    
+  } else if(isArray(target)) {
+    result = [];
+    target.forEach(elem => {
+      // console.log("Array节点下", elem);
+      result.push(
+        serializable(elem)
+      )
+    });
+  } else if(typeof target === "function" || typeof target === "symbol") {
+    return undefined;
+  } else {
+    return target;
+  }
+  return result;
+}
+
+// 是否是对象
+function isObject(target) {
+  return Object.prototype.toString.call(target) === "[object Object]";
+}
+
+// 是否是数组
+function isArray(target) {
+  return Object.prototype.toString.call(target) === "[object Array]";
+}
+
+// 是否是mongoose查出来的数据
+function isMongooseModel(target) {
+  return target && target._doc;
 }
