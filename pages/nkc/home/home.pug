@@ -3,7 +3,7 @@ block nkcTitle
   title 主页设置 - 前台管理
   +includeCSS('/nkc/home/home.css')
 block nkcContent
-  #data.hidden=objToStr({recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode})
+  #data.hidden=objToStr({recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
   .col-xs-12.col-md-12.management-home#app(v-cloak)
     ul.nav.nav-tabs
       li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
@@ -277,6 +277,18 @@ block nkcContent
             span 完整显示
         .m-t-1
           button.management-button(@click="saveOriginalThreadDisplayMode") 保存
+      div.m-t-2
+        .management-header 活动
+        .radio
+          span 是否在首页显示入口：
+          label.m-r-1
+            input(type="radio" value="show" v-model="showActivityEnter")
+            span 显示
+          label.m-r-1
+            input(type="radio" value="hidden" v-model="showActivityEnter")
+            span 不显示
+        .m-t-1
+          button.management-button(@click="saveShowActivityEnter") 保存
 
 block nkcScripts
   include ../../publicModules/crop/crop_new

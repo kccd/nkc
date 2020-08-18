@@ -23,16 +23,8 @@ module.exports = {
       ],
       app: [
         {
-          name: "计算工具",
-          url: "/tools",
-        },
-        {
           name: "考试系统",
           url: "/exam"
-        },
-        {
-          name: "活动",
-          url: "/activity"
         }
       ],
       other: [
