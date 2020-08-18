@@ -295,7 +295,6 @@ const app = new Vue({
         .catch(sweetError)
     },
     saveShowActivityEnter() {
-      console.log(this.showActivityEnter);
       let value = this.showActivityEnter === "show";
       nkcAPI("/nkc/home/showActivityEnter", "PUT", {
         showActivityEnter: value
