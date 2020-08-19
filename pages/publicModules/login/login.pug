@@ -12,7 +12,7 @@
       .modal-body.p-t-0.p-b-0
         .row
           .col-xs-12.col-md-12
-            div.site-name 科创
+            div.site-name=state.serverSettings.websiteAbbr
             p.site-description=state.serverSettings.brief
           .col-xs-12.col-md-12(v-if="type === 'login'")
             .login-types

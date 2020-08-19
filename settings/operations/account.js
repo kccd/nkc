@@ -1,6 +1,5 @@
 module.exports = {
   finance: {
-    GET: 'visitUserKcb',
     recharge: {
       GET: 'accountRecharge',
       POST: 'rechargePost'

@@ -6,7 +6,7 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-8
+      .col-xs-12.col-md-8.bg-color-ffffff
         h2.m-b-2 参与考试获得证书
         ul
           li
@@ -37,7 +37,7 @@ block content
                   span.h4.m-r-1(style='display: inline-block;')
                     a(href=`/exam/paper?cid=${category._id}`)=`【${category.name}】`
                   //-p=category.description
-      .col-xs-12.col-md-3.col-md-offset-1
+      .col-xs-12.col-md-3.col-md-offset-1.bg-color-ffffff
         if permission('visitEditQuestion')
           a.m-t-1.exam-add-question-btn(href=`/exam/editor`) 参与出题
           a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/question`) 出题记录
@@ -45,9 +45,11 @@ block content
               .red-point=` ${data.unViewedCount}`
         else
           a.m-t-1.exam-add-question-btn(style='background-color: #aaa;') 参与出题
-          p 当前只允许学术分1分以上的会员命题，您还没有学术分。点击
-            a(href='https://www.kechuang.org/t/67256' target='_blank') 这里
-            |了解学术分制度。
+          p 当前只允许学术分1分以上的会员命题，你还没有学术分。
+            //
+              | 点击
+              a(href='https://www.kechuang.org/t/67256' target='_blank') 这里
+              |了解学术分制度。
         a.m-t-1.btn.btn-default.btn-block(href=`/exam/record/paper?t=self`) 考试记录
         if permission('addExamsCategory') || permission('visitExamsQuestionAuth') || permission('visitExamsQuestionAuth')
           .p-t-2

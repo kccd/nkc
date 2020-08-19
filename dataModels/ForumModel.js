@@ -462,51 +462,56 @@ forumSchema.statics.updateCount = async function (threads, isAdd) {
   更新当前专业信息，再更新上级所有专业的信息
   @author pengxiguaa 2019/1/26
 */
+
+forumSchema.methods.updateForumMessageSync = async function() {
+  const ThreadModel = mongoose.model('threads');
+  const ForumModel = mongoose.model('forums');
+  const PostModel = mongoose.model('posts');
+  const SubscribeModel = mongoose.model("subscribes");
+  const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
+  childrenFid.push(this.fid);
+  const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
+  let countPosts = await PostModel.count({type: "post", mainForumsId: {$in: childrenFid}, parentPostId: ""});
+  /*const followerCount = await SubscribeModel.count({
+    type: "forum",
+    fid: this.fid
+  });*/
+  const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
+  const normal = countThreads - digest;
+  const tCount = {
+    digest,
+    normal
+  };
+  const {today} = require('../nkcModules/apiFunction');
+  const countPostsToday = await PostModel.count({mainForumsId: {$in: childrenFid}, toc: {$gt: today()}, parentPostId: ""});
+  await this.update({tCount, countPosts, countThreads, countPostsToday});
+  const updateParentForumsMessage = async (forum) => {
+    if(forum.parentsId.length === 0) return;
+    const parentsForums = await ForumModel.find({fid: {$in: forum.parentsId}});
+    await Promise.all(parentsForums.map(async parentForum => {
+      const childForums = await parentForum.extendChildrenForums();
+      let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
+      childForums.map(f => {
+        countThreads += f.countThreads;
+        countPosts += f.countPosts;
+        countPostsToday += f.countPostsToday;
+        digest += f.tCount.digest;
+      });
+      const tCount = {
+        digest,
+        normal: (countThreads - digest)
+      };
+      await parentForum.update({countThreads, countPosts, countPostsToday, tCount});
+      await updateParentForumsMessage(parentForum);
+    }));
+  };
+  await updateParentForumsMessage(this);
+}
+
 forumSchema.methods.updateForumMessage = async function() {
+  const self = this;
   setImmediate(async () => {
-    const ThreadModel = mongoose.model('threads');
-    const ForumModel = mongoose.model('forums');
-    const PostModel = mongoose.model('posts');
-    const SubscribeModel = mongoose.model("subscribes");
-    const childrenFid = await ForumModel.getAllChildrenFid(this.fid);
-    childrenFid.push(this.fid);
-    const countThreads = await ThreadModel.count({mainForumsId: {$in: childrenFid}});
-    let countPosts = await PostModel.count({type: "post", mainForumsId: {$in: childrenFid}, parentPostId: ""});
-    /*const followerCount = await SubscribeModel.count({
-      type: "forum",
-      fid: this.fid
-    });*/
-    const digest = await ThreadModel.count({mainForumsId: {$in: childrenFid}, digest: true});
-    const normal = countThreads - digest;
-    const tCount = {
-      digest,
-      normal
-    };
-    const {today} = require('../nkcModules/apiFunction');
-    const countPostsToday = await PostModel.count({mainForumsId: {$in: childrenFid}, toc: {$gt: today()}, parentPostId: ""});
-    await this.update({tCount, countPosts, countThreads, countPostsToday});
-    const updateParentForumsMessage = async (forum) => {
-      if(forum.parentsId.length === 0) return;
-      const parentsForums = await ForumModel.find({fid: {$in: forum.parentsId}});
-      await Promise.all(parentsForums.map(async parentForum => {
-        const childForums = await parentForum.extendChildrenForums();
-        let countThreads = 0, countPosts = 0, countPostsToday = 0, digest = 0;
-        childForums.map(f => {
-          countThreads += f.countThreads;
-          countPosts += f.countPosts;
-          countPostsToday += f.countPostsToday;
-          digest += f.tCount.digest;
-        });
-        const tCount = {
-          digest,
-          normal: (countThreads - digest)
-        };
-        await parentForum.update({countThreads, countPosts, countPostsToday, tCount});
-        await updateParentForumsMessage(parentForum);
-      }));
-    };
-    await updateParentForumsMessage(this);
-    console.log(`专业${this.fid}文章回复条数计算完毕。`);
+    await self.updateForumMessageSync();
   });
 };
 
