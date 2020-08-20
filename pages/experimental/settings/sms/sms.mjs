@@ -16,10 +16,11 @@ window.app = new Vue({
     checkString: NKC.methods.checkData.checkString,
     saveApp() {
       // 保存AppId、App Key和短信签名
-      const {appId, appKey, smsSign} = this.smsSettings;
+      const {appId, appKey, smsSign, platform} = this.smsSettings;
       const self = this;
       Promise.resolve()
         .then(() => {
+          if(!platform) throw '请选择短信平台';
           self.checkString(appId, {
             name: "App ID",
             minLength: 1
@@ -37,7 +38,8 @@ window.app = new Vue({
             smsSettings: {
               appId,
               appKey,
-              smsSign
+              smsSign,
+              platform
             }
           };
           return nkcAPI("/e/settings/sms", "PUT", body)

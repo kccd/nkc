@@ -192,8 +192,9 @@ module.exports = {
 			PUT: 'modifyUserSensitiveInfo'
 		},
 		forum: {
-			GET: 'visitEForumSettings',
-			PUT: 'modifyEForumSettings'
+			GET: 'experimentalForumsSettings',
+			POST: 'experimentalForumsSettings',
+			PUT: 'experimentalForumsSettings'
 		},
 		grade: {
 			GET: 'visitUsersGradeSettings',

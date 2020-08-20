@@ -11,6 +11,12 @@ block eContent
             h4.control-label.col-sm-2 基本设置
             .col-sm-6.p-t-1
               .m-b-05
+                label 短信平台
+                select.form-control(v-model="smsSettings.platform")
+                  option(value='tencentCloud') 腾讯云
+                  option(value='aliCloud') 阿里云
+                  option(value='alidayu') 阿里大于
+              .m-b-05
                 label App ID
                 input.form-control(type="text" v-model="smsSettings.appId")
               .m-b-05

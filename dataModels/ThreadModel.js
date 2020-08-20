@@ -473,10 +473,10 @@ threadSchema.methods.updateThreadEncourage = async function() {
 // 更新文章 信息
 threadSchema.methods.updateThreadMessage = async function() {
   const ThreadModel = mongoose.model("threads");
+  const apiFunction = require('../nkcModules/apiFunction');
+  const today = apiFunction.today();
   const thread = await ThreadModel.findOne({tid: this.tid});
   const PostModel = mongoose.model('posts');
-  const timeToNow = new Date();
-  const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
   const updateObj = {};
   const oc = await PostModel.findOneAndUpdate({tid: thread.tid}, {
     $set: {
@@ -501,7 +501,7 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
   updateObj.count = await PostModel.count({tid: thread.tid, type: "post", parentPostId: ""});
-  updateObj.countToday = await PostModel.count({tid: thread.tid, type: "post", toc: {$gt: time}, parentPostId: ""});
+  updateObj.countToday = await PostModel.count({tid: thread.tid, type: "post", toc: {$gt: today}, parentPostId: ""});
   updateObj.countRemain = await PostModel.count({tid: thread.tid, type: "post", disabled: {$ne: true}, parentPostId: ""});
   const userCount = await PostModel.aggregate([
     {
@@ -1479,11 +1479,6 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
         db: require("./index")
       });
     }
-  }
-  forumsId = new Set(forumsId);
-  if(forumsId.size !== 0) {
-    forumsId.add(recycleId);
-    await ForumModel.updateForumsMessage([...forumsId]);
   }
 };
 

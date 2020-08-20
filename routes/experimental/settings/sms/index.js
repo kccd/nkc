@@ -14,8 +14,8 @@ smsRouter
 		const {smsSettings} = body;
 		const reg = /^\**?$/;
     const smsSettingsDB = await db.SettingModel.findOnly({_id: 'sms'});
-    const {templates, restrictedNumber, appId, appKey, smsSign} = smsSettings;
-
+    const {templates, restrictedNumber, appId, appKey, smsSign, platform} = smsSettings;
+    if(!['aliCloud', 'tencentCloud', 'alidayu'].includes(platform)) ctx.throw(400, `短信平台错误 platform: ${platform}`);
     checkString(appId, {
       name: "App ID",
       minLength: 1
@@ -31,7 +31,8 @@ smsRouter
 
     const obj  = {
       "c.appId": appId,
-      "c.smsSign": smsSign
+      "c.smsSign": smsSign,
+      "c.platform": platform,
     };
     if(!reg.test(appKey)) {
       obj["c.appKey"] = appKey;

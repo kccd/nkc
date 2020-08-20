@@ -281,4 +281,21 @@ resourceSchema.statics.getMediaPath = async (type, t) => {
   return await file.getPath(type, t);
 };
 
+/*
+* 清除附件上传状态
+* @author pengxiguaa 2020/8/19
+* */
+resourceSchema.statics.clearResourceState = async () => {
+  const ResourceModel = mongoose.model('resources');
+  const time = Date.now() - 2*60*60*1000;
+  await ResourceModel.updateMany({
+    toc: {$lte: time},
+    state: 'inProcess'
+  }, {
+    $set: {
+      state: 'useless'
+    }
+  });
+}
+
 module.exports = mongoose.model('resources', resourceSchema);

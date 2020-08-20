@@ -3,6 +3,7 @@
 * */
 const db = require('../dataModels');
 const client = require('../settings/redisClient');
+const tasks = require('../tasks');
 const cacheForums = require('./cacheForums');
 module.exports = async () => {
   // 清空redis数据库
@@ -19,7 +20,8 @@ module.exports = async () => {
   // 专业分类
   await db.ForumCategoryModel.saveCategoryToRedis();
   // 专业最新文章
-  await db.ForumModel.saveAllForumLatestThreadToRedisAsync();
+  // await db.ForumModel.saveAllForumLatestThreadToRedisAsync();
+  await tasks.saveAllForumLatestThreadToRedis();
   // 后台设置
   await db.SettingModel.saveAllSettingsToRedis();
   // 操作权限

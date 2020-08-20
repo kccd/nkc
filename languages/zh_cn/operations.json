@@ -663,6 +663,8 @@
   "addUserToBlacklist": "将用户加入黑名单",
   "removeUserFromBlacklist": "将用户从黑名单移除",
 
+  "experimentalForumsSettings": "后台管理 - 专业设置",
+
 
   "userSettingsHomeToLatest": "首页调整：主页 设置为 最新",
   "userSettingsLatestToHome": "首页调整：最新 设置为 主页",

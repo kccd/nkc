@@ -2,6 +2,7 @@ module.exports = {
   _id: 'sms',
   c: {
     status: false,
+    platform: 'tencent', // ali, tencent
     appId: 0,
     appKey: '',
     smsSign: '',
