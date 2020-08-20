@@ -230,3 +230,8 @@ tbody tr th {
 .logo-item > img {
   width: 100%;
 }
+
+
+#selectSiteIcon {
+  cursor: pointer;
+}

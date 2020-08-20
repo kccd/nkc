@@ -3,7 +3,7 @@ const {Eve, Thread, isMainThread} = require('node-threads-pool');
 const threadPoolSettings = require('../settings/threadPool');
 const tools = require("./tools");
 
-let tempDate = new Date();
+let tempDate = (new Date()).getTime();
 
 if(!isMainThread) {
   const render = require('./nkc_render');

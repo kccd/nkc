@@ -180,6 +180,12 @@ new Vue({
       .then(() => asyncSweetSuccess(isHide? "已解除":"已屏蔽", {autoHide: false}))
       .then(() => location.reload())
       .catch(asyncSweetError);
+    },
+    enableSiteTool: function() {
+      nkcAPI("/tools/enableSiteTools", "POST")
+        .then(data => asyncSweetSuccess(data.message, {autoHide: false}))
+        .then(() => location.reload())
+        .catch(asyncSweetError);
     }
   }
 });

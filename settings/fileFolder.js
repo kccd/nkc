@@ -15,6 +15,8 @@ module.exports = {
   watermark: './attachment/website',
   // 首页logo
   homeBigLogo: './attachment/website',
+  // 网站图标
+  siteIcon: './attachment/website',
   // 积分图标
   scoreIcon: './attachment/website',
   // 文章封面

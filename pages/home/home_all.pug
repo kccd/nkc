@@ -335,14 +335,16 @@ block content
               .home-app-img
                 img(src=`/statics/apps/exam.png`)
               .home-app-name 考试系统
-            a.home-app(href=`/activity`)
-              .home-app-img
-                img(src=`/statics/apps/activity.png`)
-              .home-app-name 活动
-            a.home-app(href=`/tools`)
-              .home-app-img
-                img(src=`/statics/apps/tools.png`)
-              .home-app-name 计算工具
+            if data.showActivityEnter
+              a.home-app(href=`/activity`)
+                .home-app-img
+                  img(src=`/statics/apps/activity.png`)
+                .home-app-name 活动
+            if data.siteToolEnabled
+              a.home-app(href=`/tools`)
+                .home-app-img
+                  img(src=`/statics/apps/tools.png`)
+                .home-app-name 计算工具
         if data.enableFund
           .home-forums-other.m-b-1
             .home-header

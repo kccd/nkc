@@ -9,6 +9,10 @@ block eContent
     #app
       .form-group
         button.btn.btn-primary(@click=`addTool()`) 上传工具
+        if data.siteToolEnabled
+          button.btn.btn-danger(@click=`enableSiteTool()`) 禁用网站工具
+        else
+          button.btn.btn-primary(@click=`enableSiteTool()`) 启用网站工具
       .form-group.text-danger
         p 注意：仅支持上传zip格式的压缩包，上传后服务器会自动解压。
       .table-responsive

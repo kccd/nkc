@@ -42,13 +42,14 @@ footer.footer
             ul.footer-link
               li.text-center
                 canvas.qrcode-canvas(data-path="/")
-          .col-xs-6.col-md-2.footer-li-div
-            .footer-header.text-center 安卓客户端
-            ul.footer-link
-              li.text-center
-                a(href='/app')
-                  canvas.qrcode-canvas(data-path="/app")
-                  span(style='display: block;font-size: 1rem;color: #555555;margin-top: 0.3rem;') 点击下载
+          if state.appStableVersion
+            .col-xs-6.col-md-2.footer-li-div
+              .footer-header.text-center 安卓客户端
+              ul.footer-link
+                li.text-center
+                  a(href='/app')
+                    canvas.qrcode-canvas(data-path="/app")
+                    span(style='display: block;font-size: 1rem;color: #555555;margin-top: 0.3rem;') 点击下载
 
       .col-xs-12.col-md-12
         .website-name

@@ -121,6 +121,22 @@ router
     await toolsModel.where({_id: id}).update({isHide: !isHide});
     await next();
   })
+  // 网站工具的启用和禁用
+  .post("/enableSiteTools", async (ctx, next) => {
+    let {data, db} = ctx;
+    let {SettingModel} = db;
+    const toolSettings = await SettingModel.getSettings("tools");
+    let updatedStatu = !toolSettings.enabled;
+    await SettingModel.updateOne({_id: 'tools'}, {
+      $set: {
+        'c.enabled': updatedStatu
+      }
+    });
+    await SettingModel.saveSettingsToRedis("tools");
+    data.enabled = updatedStatu;
+    data.message = updatedStatu ? "已启用网站工具" : "已禁用网站工具";
+    return next();
+  })
 
 
 

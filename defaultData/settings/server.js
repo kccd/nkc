@@ -13,6 +13,7 @@ module.exports = {
     brief: '网站简介',
     keywords: ['科创'],
     language: 'zh_CN',
+    siteIcon: null,           // 网站图标 为null时默认
     backgroundColor: '#f4f4f4',
     links: {
       info: [
@@ -23,16 +24,8 @@ module.exports = {
       ],
       app: [
         {
-          name: "计算工具",
-          url: "/tools",
-        },
-        {
           name: "考试系统",
           url: "/exam"
-        },
-        {
-          name: "活动",
-          url: "/activity"
         }
       ],
       other: [

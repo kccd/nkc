@@ -33,5 +33,13 @@ baseRouter
 		await serverSettings.update(obj);
 		await db.SettingModel.saveSettingsToRedis("server");
 		await next();
+	})
+	.post('/siteicon', async (ctx, next) => {
+		let {body, db, data} = ctx;
+		let {AttachmentModel} = db;
+		let {icon} = body.files;
+		let attachment = await AttachmentModel.saveSiteIcon(icon);
+		data.aid = attachment._id;
+		return next();
 	});
 module.exports = baseRouter;
