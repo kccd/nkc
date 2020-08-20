@@ -76,6 +76,21 @@ var app = new Vue({
         name: "",
         url: ""
       });
+    },
+    selectSiteIcon: function() {
+      var input = this.$refs.selectSiteIconInput;
+      input.click();
+    },
+    uploadSiteIcon: function() {
+      var self = this;
+      var input = this.$refs.selectSiteIconInput;
+      var file = input.files[0];
+      var form = new FormData();
+      form.append("icon", file);
+      return nkcUploadFile("/e/settings/base/siteicon", "POST", form)
+        .then(function(data){
+          self.serverSettings.siteIcon = data.aid;
+        })
     }
   }
 });

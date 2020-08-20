@@ -13,6 +13,7 @@ module.exports = {
     brief: '网站简介',
     keywords: ['科创'],
     language: 'zh_CN',
+    siteIcon: null,           // 网站图标 为null时默认
     backgroundColor: '#ccb39f',
     links: {
       info: [

@@ -669,8 +669,11 @@ userSchema.statics.createUser = async (option) => {
 
 	const toc = Date.now();
 
-	const uid = await SettingModel.operateSystemID('users', 1);
-	userObj.uid = uid;
+  // 支持手动传uid，应对批量导入用户
+  if(!Reflect.has(userObj, 'uid')) {
+    userObj.uid = await SettingModel.operateSystemID('users', 1);
+  }
+  let {uid} = userObj;
 	userObj.toc = toc;
 	userObj.tlv = toc;
 	userObj.tlm = toc;

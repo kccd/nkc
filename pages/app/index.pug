@@ -6,13 +6,13 @@ html(lang='zh-CN')
     meta(name="viewport" content="width=device-width, initial-scale=1")
     link(href="/bootstrap/css/bootstrap.css" rel='stylesheet' type='text/css')
     link(rel='stylesheet' href='/font-awesome/css/font-awesome.css')
-    link(rel='shortcut icon' href='/favicon.ico')
+    link(rel='shortcut icon' href=state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}` : '/favicon.ico')
     link(href="/app/index.css" rel='stylesheet' type='text/css')
     title 科创
   body
     mixin logo
       div.logo-bottom
-        img(src='/favicon.ico')
+        img(src=state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}` : '/favicon.ico')
         span= state.serverSettings.websiteName
     .container#app(v-cloak)
       .row(v-if='toBrowser')

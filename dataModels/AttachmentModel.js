@@ -166,6 +166,40 @@ schema.statics.saveHomeBigLogo = async file => {
   return attachment;
 }
 
+
+/**
+ * 保存网站图标
+ * @param {File} file - file对象
+ */
+schema.statics.saveSiteIcon = async file => {
+  const FILE = require("../nkcModules/file");
+  const ext = await FILE.getFileExtension(file, ["ico"]);
+  const AM = mongoose.model('attachments');
+  const SM = mongoose.model('settings');
+  const toc = new Date();
+  const fileFolder = await FILE.getPath('siteIcon', toc);
+  const aid = AM.getNewId();
+  const fileName = `${aid}.${ext}`;
+  const realPath = PATH.resolve(fileFolder, `./${fileName}`);
+  const {path, size, name} = file;
+  await fsPromise.copyFile(path, realPath);
+  const attachment = AM({
+    _id: aid,
+    toc,
+    size,
+    name,
+    ext,
+    type: 'siteIcon',
+    hash: file.hash
+  });
+  await attachment.save();
+  await SM.updateOne({_id: 'server'}, {
+    "c.siteIcon": aid
+  });
+  await SM.saveSettingsToRedis('server');
+  return attachment;
+}
+
 /*
 * 获取文件在磁盘的真实路径
 * @return {String} 磁盘路径
@@ -222,6 +256,16 @@ schema.statics.getHomeBigLogo = async () => {
     return homeSettings.homeBigLogo;
   }
 }
+
+/**
+ * 获取网站图标附件ID
+ */
+schema.statics.getSiteIcon = async () => {
+  const SM = mongoose.model('settings');
+  const serverSettings = await SM.getSettings('server');
+  return serverSettings.siteIcon;
+}
+
 /*
 * 保存专业Logo
 * @param {File} file 文件对象
