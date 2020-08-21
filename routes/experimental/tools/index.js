@@ -13,6 +13,9 @@ router
     });
     data.list = list;
 
+    const toolSettings = await db.SettingModel.getSettings("tools");
+    data.siteToolEnabled = toolSettings.enabled;
+
     ctx.template = "experimental/tools/tools.pug";
     await next();
   });

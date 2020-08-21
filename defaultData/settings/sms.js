@@ -8,46 +8,67 @@ module.exports = {
     smsSign: '',
     templates: [
       {
-        name: 'register',
-        id: 0,
-        validityPeriod: 15,
-        sameIpOneDay: 10,
-        sameMobileOneDay: 5
+        "name" : "register",
+        "id" : '',
+        "validityPeriod" : 60,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 10
       },
       {
-        name: 'reset',
-        id: 0,
-        validityPeriod: 15,
-        sameIpOneDay: 10,
-        sameMobileOneDay: 5
+        "name" : "reset",
+        "id" : '',
+        "validityPeriod" : 15,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 5
       },
       {
-        name: 'getback',
-        id: 0,
-        validityPeriod: 15,
-        sameIpOneDay: 10,
-        sameMobileOneDay: 5
+        "name" : "getback",
+        "id" : '',
+        "validityPeriod" : 15,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 5
       },
       {
-        name: 'bindMobile',
-        id: 0,
-        validityPeriod: 15,
-        sameIpOneDay: 10,
-        sameMobileOneDay: 5
+        "name" : "bindMobile",
+        "id" : '',
+        "validityPeriod" : 15,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 5
       },
       {
-        name: 'login',
-        id: 0,
-        validityPeriod: 15,
-        sameIpOneDay: 10,
-        sameMobileOneDay: 5
+        "name" : "login",
+        "id" : '',
+        "validityPeriod" : 15,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 5
       },
       {
-        name: 'changeMobile',
-        id: 0,
-        validityPeriod: 15,
-        sameIpOneDay: 10,
-        sameMobileOneDay: 5
+        "name" : "changeMobile",
+        "id" : '',
+        "validityPeriod" : 15,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 5
+      },
+      {
+        "name" : "withdraw",
+        "id" : '',
+        "validityPeriod" : 15,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 5
+      },
+      {
+        "name" : "destroy",
+        "id" : '',
+        "validityPeriod" : 15,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 5
+      },
+      {
+        "name" : "unbindMobile",
+        "id" : '',
+        "validityPeriod" : 15,
+        "sameIpOneDay" : 10,
+        "sameMobileOneDay" : 5
       }
     ],
     restrictedNumber: []

@@ -471,7 +471,7 @@ threadSchema.methods.updateThreadEncourage = async function() {
 // }
 
 // 更新文章 信息
-threadSchema.methods.updateThreadMessage = async function() {
+threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
   const ThreadModel = mongoose.model("threads");
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
@@ -525,7 +525,7 @@ threadSchema.methods.updateThreadMessage = async function() {
   });
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
   // 更新搜索引擎中帖子的专业信息
-  await elasticSearch.updateThreadForums(thread);
+  if(toSearch) await elasticSearch.updateThreadForums(thread);
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
