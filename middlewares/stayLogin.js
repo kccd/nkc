@@ -201,7 +201,7 @@ module.exports = async (ctx, next) => {
   // 获取用户的关注
   if(data.user && !isResourcePost) {
     data.user.subUid = await db.SubscribeModel.getUserSubUsersId(data.user.uid);
-    ctx.state.subUsersId = data.user.subUid;
+    ctx.state.subUsersId = [...data.user.subUid];
     ctx.state.visibleFid = await db.ForumModel.visibleFid(
       data.userRoles,
       data.userGrade,

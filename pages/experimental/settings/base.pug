@@ -54,6 +54,15 @@ block content
               .text-danger 英文逗号 , 分隔
               textarea.form-control(rows=5 v-model="keywords")
           .form-group
+            label.col-sm-2.control-label 网站图标
+            .col-sm-8
+              img(:src="serverSettings.siteIcon?'/a/'+serverSettings.siteIcon : '/favicon.ico'" @click="selectSiteIcon()" id="selectSiteIcon")
+              input.hide(type="file" accept="image/x-icon" ref="selectSiteIconInput" @change="uploadSiteIcon()")
+          .form-group
+            label.col-sm-2.control-label 网页背景
+            .col-sm-8
+              input.form-control(data-control="selectColor" value=state.serverSettings.backgroundColor)
+          .form-group
             label.col-sm-2.control-label 页脚链接
             .col-sm-8
               h4.text-danger 每种链接的数量最好不超过7（显示区域限制）
@@ -93,6 +102,5 @@ block content
 
 
 block scripts
-
-  script(src='/interface_common.js')
-  script(src='/experimental/settings/base.js')
+  include ../../publicModules/selectColor
+  +includeJS('/experimental/settings/base.js')

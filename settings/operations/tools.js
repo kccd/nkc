@@ -16,5 +16,8 @@ module.exports = {
   },
   hide: {
     DELETE: 'hideTool'
+  },
+  enableSiteTools: {
+    POST: 'enableSiteTools'
   }
 }

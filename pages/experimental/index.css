@@ -8,6 +8,7 @@
   background-color: #f6f6f6!important;
 }
 body{
+  background-color: #fff;
 }
 .e-nav .nav.nav-pills{
   border-radius: 0 0 5px 5px;
@@ -228,4 +229,9 @@ tbody tr th {
 }
 .logo-item > img {
   width: 100%;
+}
+
+
+#selectSiteIcon {
+  cursor: pointer;
 }

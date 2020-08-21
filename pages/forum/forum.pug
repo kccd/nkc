@@ -188,7 +188,7 @@ block content
       .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom.box-shadow-panel
         .m-b-1
           .panel-header 专业介绍
-          .forum-description!= htmlFilter(data.forum.description) || "暂无专业介绍"
+          .forum-description!= nkcRender.htmlFilter(data.forum.description) || "暂无专业介绍"
         if permission('visitForumInfoSettings') && data.isModerator
           .m-b-1
             .panel-header 专业设置

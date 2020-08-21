@@ -21,7 +21,7 @@ block title
 
   - var ownership = data.userOperationsId.includes('modifyOtherPosts')
   - ownership = ownership?true:(data.user && data.user.uid===post.uid)
-  title=`${title} - 科创`
+  title=`${title} - ${state.serverSettings.websiteName}`
   -var processed = post.c.replace(/<blockquote cite.*?blockquote>/igm, '')
   -processed = delAllCode(processed).trim().slice(0,140);
   meta(name='description' content=`${processed}`)

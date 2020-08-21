@@ -10,7 +10,6 @@ require('colors');
 
 const {
   PostModel, ThreadModel, UserModel, ActiveUserModel,
-  SubscribeModel,
   ShopOrdersModel, ShopRefundModel, ShopGoodsModel,
   SettingModel
 } = require('./dataModels');
@@ -50,6 +49,7 @@ jobs.updateActiveUsers = cronStr => {
       });
       await newActiveUser.save();
     }
+    await ActiveUserModel.saveActiveUsersToCache();
   })
 };
 
@@ -114,18 +114,25 @@ jobs.backupDatabase = () => {
 	console.log(`数据库自动备份已启动`.green);
 };
 
-jobs.updateForums = cronStr => {
-	const {ForumModel, ThreadModel} = require('./dataModels');
-	scheduleJob(cronStr, async () => {
-		const t = Date.now();
-		console.log('now updating the forums ...'.blue);
-		const forums = await ForumModel.find({});
-		for(let forum of forums) {
-			await forum.updateForumMessage();
-		}
-		await ThreadModel.updateMany({countToday: {$ne: 0}}, {$set: {countToday: 0}});
-		console.log('done', Date.now()-t+'ms');
-	})
+// 清除专业和文章上的今日更新
+jobs.clearForumAndThreadPostCount = () => {
+  const {ForumModel, ThreadModel} = require('./dataModels');
+  scheduleJob(`0 0 0 * * *`, async () => {
+    await ForumModel.updateMany({
+      countPostsToday: {$ne: 0},
+    }, {
+      $set: {
+        countPostsToday: 0
+      }
+    });
+    await ThreadModel.updateMany({
+      countToday: {$ne: 0}
+    }, {
+      $set: {
+        countToday: 0
+      }
+    });
+  });
 };
 
 jobs.shop = () => {
@@ -300,12 +307,6 @@ jobs.moveRecycleMarkThreads = () => {
   });
 };
 
-jobs.truncateUsersLoginToday = cronStr => {
-
-};
-jobs.indexToES = cronStr => {
-
-};
 
 // jobs.checkKcbsRecords();
 const sleep = (t) => {
@@ -313,15 +314,6 @@ const sleep = (t) => {
     setTimeout(() => {
       resolve();
     }, t)
-  });
-};
-jobs.cacheUserSubscribes = () => {
-  setTimeout(async () => {
-    const users = await UserModel.find({}, {uid: 1}).sort({tlv: -1});
-    for(const user of users) {
-      await SubscribeModel.saveUserSubscribeTypesToRedis(user.uid);
-      await sleep(1000);
-    }
   });
 };
 

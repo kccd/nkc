@@ -663,6 +663,8 @@
   "addUserToBlacklist": "将用户加入黑名单",
   "removeUserFromBlacklist": "将用户从黑名单移除",
 
+  "experimentalForumsSettings": "后台管理 - 专业设置",
+
 
   "userSettingsHomeToLatest": "首页调整：主页 设置为 最新",
   "userSettingsLatestToHome": "首页调整：最新 设置为 主页",
@@ -706,6 +708,7 @@
   "deleteTool": "删除网站工具",
   "visitToolsManager": "访问网站工具管理页面",
   "hideTool": "屏蔽网站工具",
+  "enableSiteTools": "网站工具的启用和禁用",
 
   "ipinfo": "查询ip信息",
 
@@ -724,6 +727,7 @@
   "getAttachment": "获取附件（给所有人，内部有权限判断）",
 
   "uploadHomeBigLogo": "上传首页大Logo",
+  "setSiteIcon": "设置网站图标",
 
   "experimentalRechargeSettings": "后台管理 - 充值/提现设置",
 
@@ -732,5 +736,8 @@
 
   "fileConvertNotice": "连接文件转换进度通知通道",
 
-  "viewUserScores": "可在用户名片查看用户积分"
+  "viewUserScores": "可在用户名片查看用户积分",
+
+  "showActivityEnter": "首页“活动”入口的显示和隐藏"
+
 }

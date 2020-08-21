@@ -7,6 +7,7 @@ const app = new Vue({
     forums: data.forums,
     forumSettings: data.forumSettings,
     forumCategories: data.forumCategories,
+    updating: false,
   },
   mounted() {
     setTimeout(() => {
@@ -15,6 +16,22 @@ const app = new Vue({
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    updateForums() {
+      const self = this;
+      sweetQuestion(`确定要刷新所有专业信息？`)
+        .then(() => {
+          self.updating = true;
+          return nkcAPI(`/e/settings/forum`, 'POST');
+        })
+        .then(() => {
+          sweetSuccess(`刷新成功`);
+          self.updating = false;
+        })
+        .catch(err => {
+          sweetError(err);
+          self.updating = false;
+        });
+    },
     move(index, arr, direction) {
       if(
         (index === 0 && direction === 'left') ||

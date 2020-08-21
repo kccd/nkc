@@ -1,6 +1,7 @@
 const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
+
 module.exports = async (ctx, next) => {
   const {filePath, fileType, fileName, resource, fs, tg} = ctx;
   const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
@@ -80,6 +81,7 @@ module.exports = async (ctx, next) => {
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';
+      // ctx.body = await ctx.nkcModules.renderPug(ctx.template, ctx.data, ctx.state);
 	    ctx.body = ctx.nkcModules.render(ctx.template, ctx.data, ctx.state);
     }
     await next();

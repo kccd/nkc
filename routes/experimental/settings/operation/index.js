@@ -42,6 +42,7 @@ operationRouter
 		if(!errInfo) ctx.throw(400, '错误提示不能为空');
 		const operation = await db.OperationModel.findOnly({_id: operationId});
 		await operation.update({description, errInfo, tlm: Date.now()});
+		await db.OperationModel.saveAllOperationsToRedis();
 		await next();
 	})
 	.get('/:_id', async (ctx, next) => {

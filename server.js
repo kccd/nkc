@@ -15,25 +15,21 @@ const http = require('http'),
   elasticSearch = require("./nkcModules/elasticSearch"),
   settings = require('./settings'),
   serverConfig = require('./config/server'),
-  cacheForums = require('./redis/cacheForums'),
-  cacheBaseInfo = require('./redis/cache'),
   socket = require('./socket'),
   {updateDate, upload} = settings,
   {
     RoleModel,
     ForumModel,
-    OperationModel
-  } = require('./dataModels');
-
+  } = require('./dataModels'),
+  permission = require('./nkcModules/permission');
 let server;
 
 const dataInit = async () => {
   const defaultData = require('./defaultData');
   await defaultData.init();
   // 运维包含所有的操作权限
-  const operations = await OperationModel.find({}, {_id: 1});
-  const operationsId = operations.map(o => o._id);
-  await RoleModel.update({_id: 'dev'}, {$set: {operationsId: operationsId}});
+  const operationsId = permission.getOperationsId();
+  await RoleModel.updateOne({_id: 'dev'}, {$set: {operationsId: operationsId}});
   await ForumModel.updateMany({}, {$addToSet: {rolesId: 'dev'}});
 };
 
@@ -41,7 +37,7 @@ const dataInit = async () => {
 const jobsInit = async () => {
   const jobs = require('./scheduleJob');
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
-  jobs.updateForums(updateDate.updateForumsCronStr);
+  jobs.clearForumAndThreadPostCount();
   jobs.shop();
   jobs.backupDatabase();
   jobs.moveRecycleMarkThreads();
@@ -56,11 +52,13 @@ const timedTasksInit = async () => {
  await timedTasks.updateRecommendThreads();
  await timedTasks.clearResourceState();
  await timedTasks.updateAllForumLatestThread();
+ await timedTasks.updateForumsMessage();
 };
 
 const start = async () => {
   try {
     if(global.NKC.processId === 0) {
+      const cacheBaseInfo = require('./redis/cache');
       await dataInit();
       await jobsInit();
       await upload.initFolders();

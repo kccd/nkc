@@ -10,6 +10,11 @@ router
 		ctx.template = 'experimental/settings/forum/forum.pug';
 		await next();
 	})
+	.post('/', async (ctx, next) => {
+		const {db} = ctx;
+		await db.ForumModel.updateForumsMessage();
+		await next();
+	})
 	.put('/', async (ctx, next) => {
 		const {db, body, nkcModules} = ctx;
 		const {checkString} = nkcModules.checkData;

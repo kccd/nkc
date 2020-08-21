@@ -6,6 +6,7 @@
 /node_modules
 /settings/mongoDB.js
 /.idea
+/.clinic
 /resources
 /tmp
 /log.txt

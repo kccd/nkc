@@ -3,7 +3,10 @@ module.exports = {
   home: {
     GET: "nkcManagementHome",
     POST: "nkcManagementHome",
-    PUT: "nkcManagementHome"
+    PUT: "nkcManagementHome",
+    showActivityEnter: {
+      PUT: "showActivityEnter"
+    }
   },
   sticker: {
     GET: "nkcManagementSticker",

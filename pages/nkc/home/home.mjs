@@ -26,7 +26,8 @@ const app = new Vue({
     showShopGoods: (data.showGoods? "t": ""),
     // 首页“最新原创”文章条目显示模式，为空就默认为简略显示
     originalThreadDisplayMode: data.originalThreadDisplayMode,
-
+    // 是否在首页显示“活动”入口
+    showActivityEnter: data.showActivityEnter ? "show" : "hidden",
     updating: false,
   },
   mounted() {
@@ -292,6 +293,16 @@ const app = new Vue({
           sweetSuccess("保存成功");
         })
         .catch(sweetError)
+    },
+    saveShowActivityEnter() {
+      let value = this.showActivityEnter === "show";
+      nkcAPI("/nkc/home/showActivityEnter", "PUT", {
+        showActivityEnter: value
+      })
+      .then(() => {
+        sweetSuccess("保存成功");
+      })
+      .catch(sweetError)
     }
   }
 });

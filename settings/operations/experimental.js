@@ -130,7 +130,10 @@ module.exports = {
 		},
 		base: {
 			GET: 'visitWebBaseSettings',
-			PUT: 'modifyWebBase'
+			PUT: 'modifyWebBase',
+			siteicon: {
+				POST: 'setSiteIcon'
+			}
 		},
 		home: {
 			top: {
@@ -192,8 +195,9 @@ module.exports = {
 			PUT: 'modifyUserSensitiveInfo'
 		},
 		forum: {
-			GET: 'visitEForumSettings',
-			PUT: 'modifyEForumSettings'
+			GET: 'experimentalForumsSettings',
+			POST: 'experimentalForumsSettings',
+			PUT: 'experimentalForumsSettings'
 		},
 		grade: {
 			GET: 'visitUsersGradeSettings',

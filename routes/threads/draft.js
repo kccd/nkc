@@ -18,7 +18,7 @@ router
       const isModerator = ctx.permission("superModerator") || await thread.isModerator(user, "or");
       if(!isModerator) ctx.throw(403, `您没有权限处理ID为${postId}的post`);
       if(type === "thread") {
-        if(thread.type === "fund") ctx.throw(403, "科创基金类文章无法退修");
+        if(thread.type === "fund") ctx.throw(403, "基金类文章无法退修");
         if(thread.mainForumsId.includes(recycleId)) ctx.throw(400, `无法退回已在回收站的文章，tid: ${thread.tid}`);
         if(thread.recycleMark === true) ctx.throw(400, `ID为${thread.tid}的文章已被退修了`);
       }

@@ -8,12 +8,13 @@ block head
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   if state.isApp && state.platform === 'reactNative'
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
-  link(rel='shortcut icon' href='/favicon.ico')
+  link(rel='shortcut icon' href=state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}` : '/favicon.ico')
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
   //- 字体图标 http://www.fontawesome.com.cn/icons-ui/
   +includeCSS('/font-awesome/css/font-awesome.css')
+  style=`body{background-color: ${state.serverSettings.backgroundColor}}`
   +includeCSS('/nkc_styles.css')
   if state.isApp
     style.

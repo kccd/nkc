@@ -58,6 +58,8 @@ router
     });
     // 首页上 “最新原创” 板块文章条目显示模式 “simple”或空 - 简略， “full” - 完整
     data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
+    // 是否在首页上显示“活动”入口
+    data.showActivityEnter = homeSettings.showActivityEnter;
     ctx.template = "nkc/home/home.pug";
     await next();
   })
@@ -240,5 +242,17 @@ router
     }
     await db.SettingModel.saveSettingsToRedis("home");
     await next();
+  })
+  .put("/showActivityEnter", async (ctx, next) => {
+    let {body, data, db} = ctx;
+    let {showActivityEnter} = body;
+    await db.SettingModel.updateOne({_id: "home"}, {
+      $set: {
+        "c.showActivityEnter": showActivityEnter
+      }
+    });
+    await db.SettingModel.saveSettingsToRedis("home");
+    data.showActivityEnter = showActivityEnter;
+    return next();
   });
 module.exports = router;

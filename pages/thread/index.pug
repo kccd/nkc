@@ -3,7 +3,7 @@ extends ../bootstrap_base.pug
 block title
   -let showEditor = true;
   -const thread = data.thread;
-  title= `${thread.firstPost.t} - 科创`
+  title= `${thread.firstPost.t} - ${state.serverSettings.websiteName}`
   meta#replytarget(value=`${data.replyTarget}`)
 
   -let modifyPostTimeLimit = 0;
@@ -34,7 +34,7 @@ block title
     +includeJS("/external_pkgs/imageToBig/preview.js")
     include ../publicModules/plyr/plyr.css.pug
   if !state.isApp
-    style=`body{background-color: ${(data.user?data.user.color:null) || "#f4f4f4"}!important;`
+    style=`body{background-color: ${(data.user?data.user.color:null) || state.serverSettings.backgroundColor}!important;`
 
   mixin postOptions(post, targetThread, index, dropType)
     -dropType = dropType || "dropdown";

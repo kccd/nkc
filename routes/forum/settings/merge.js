@@ -60,8 +60,8 @@ mergeRouter
         categoriesId: forumThreadTypesId,
       }
     });
-    await forum.updateForumMessage();
-    await targetForum.updateForumMessage();
+    // await forum.updateForumMessage();
+    // await targetForum.updateForumMessage();
     await next();
   });
 module.exports = mergeRouter;

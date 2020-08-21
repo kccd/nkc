@@ -357,6 +357,11 @@ router
       }
     }
     data.enableFund = enableFund;
+    // 是否启用了网站工具
+    const toolSettings = await db.SettingModel.getSettings("tools");
+    data.siteToolEnabled = toolSettings.enabled;
+    // 是否显示“活动”入口
+    data.showActivityEnter = homeSettings.showActivityEnter;
     ctx.template = "home/home.pug";
     await next();
   });

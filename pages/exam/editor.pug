@@ -2,7 +2,7 @@ extends ../bootstrap_base
 block title
   if !data.question
     title 添加试题
-  else 
+  else
     title 修改试题
   +includeCSS('/exam/exam.css')
 block content
@@ -18,7 +18,7 @@ block content
         .m-t-1
           a.m-r-1(style='display: inline-block;' href='/exam/record/question') 查看出题记录
           a(href='/exam/editor' style='display: inline-block;') 继续出题
-      div(v-else) 
+      div(v-else)
         .col-xs-12.col-md-12
           h3 指导意见
           ul
@@ -32,10 +32,10 @@ block content
               .col-sm-10
                 div(v-if='question._id && question.auth === true')
                   h5 {{question.type==='ch4'?'选择': '填空'}}
-                div(v-else)  
+                div(v-else)
                   <label class="radio-inline">
                     <input type="radio" value="ch4" v-model='question.type'> 选择
-                  </label>  
+                  </label>
                   <label class="radio-inline">
                     <input type="radio" value="ans" v-model='question.type'> 填空
                   </label>
@@ -44,25 +44,25 @@ block content
               .col-sm-10
                 div(v-if='question._id && question.auth === true')
                   h5 {{question.volume==='A'?'A(基础级)': 'B(专业级)'}}
-                div(v-else)  
+                div(v-else)
                   <label class="radio-inline">
                     <input type="radio" value="A" v-model='question.volume'> 基础级
-                  </label>  
+                  </label>
                   <label class="radio-inline">
                     <input type="radio" value="B" v-model='question.volume'> 专业级
-                  </label>    
+                  </label>
             .form-group
               label(class="col-sm-2 control-label") 试题类型
               .col-sm-10
                 div(v-if='question._id && question.auth === true')
                   h5 {{question.public?'公共题': '专业题'}}
-                div(v-else)  
+                div(v-else)
                   <label class="radio-inline">
                     <input type="radio" value="true" v-model='question.public'> 公共题
-                  </label>  
+                  </label>
                   <label class="radio-inline">
                     <input type="radio" value="false" v-model='question.public'> 专业题
-                  </label>     
+                  </label>
             .form-group(v-if='question.public === false || question.public === "false"')
               label(class="col-sm-2 control-label") 专业领域
               .col-sm-10
@@ -88,29 +88,29 @@ block content
                 textarea(class="form-control m-b-1" placeholder="200字以内" v-model.trim='question.answerObj[0].text')
                 div(v-if='question.type === "ch4"')
                   span.text-danger 错误答案
-                  textarea(class="form-control" placeholder="200字以内" 
+                  textarea(class="form-control" placeholder="200字以内"
                     v-for='a, index in question.answerObj'
-                    :class="{'m-b-1': question.type === 'ch4' && question.answerObj.length !== index + 1}" 
+                    :class="{'m-b-1': question.type === 'ch4' && question.answerObj.length !== index + 1}"
                     v-model='a.text'
                     v-if='index !== 0'
                   )
-            if permission('submitExamsQuestionAuth') && data.question && data.question.auth === null  
+            if permission('submitExamsQuestionAuth') && data.question && data.question.auth === null
               .form-group(id='auth')
                 label(class="col-sm-2 control-label") 审核
-                .col-sm-10      
+                .col-sm-10
                   <label class="radio-inline">
                     <input type="radio" value="true" v-model='auth.status'> 通过
-                  </label>  
+                  </label>
                   <label class="radio-inline">
                     <input type="radio" value="false" v-model='auth.status'> 不通过
                   </label>
               .form-group(v-if='auth.status === "false" || auth.status === false')
                 label(class="col-sm-2 control-label") 原因
-                .col-sm-10    
-                  textarea.form-control(placeholder='请输入原因，500字以内' v-model='auth.reason' rows=7)  
+                .col-sm-10
+                  textarea.form-control(placeholder='请输入原因，500字以内' v-model='auth.reason' rows=7)
             .form-group
-              label(class="col-sm-2 control-label") 
-              .col-sm-10     
+              label(class="col-sm-2 control-label")
+              .col-sm-10
                 button.btn.btn-primary.btn-block(@click='save' v-if='!submitting') 提交
                 button.btn.btn-primary.btn-block(v-else disabled) {{submitting}}
 block scripts

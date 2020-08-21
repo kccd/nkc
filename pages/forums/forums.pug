@@ -8,7 +8,7 @@ block content
       for f in forums
         a.app-forum-inline(href=`/f/${f.fid}`)=f.displayName
   mixin renderForums(forums, showBorder)
-    .app-forums
+    .app-forums.bgColor
       for f in forums
         -const parentForum = !!(f.childrenForums && f.childrenForums.length)
         .app-forum(class=showBorder?"border":"")
@@ -47,7 +47,7 @@ block content
   mixin pageBody
     if data.recommendForums && data.recommendForums.length
       .forums-header 推荐
-      .m-l-1
+      .p-l-1.bgColor
         +renderForums(data.recommendForums)
     if data.user
       if data.visitedForums && data.visitedForums.length

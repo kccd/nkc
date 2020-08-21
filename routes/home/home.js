@@ -137,6 +137,11 @@ module.exports = async (options) => {
     }
   }
   data.enableFund = enableFund;
+  // 是否启用了网站工具
+  const toolSettings = await db.SettingModel.getSettings("tools");
+  data.siteToolEnabled = toolSettings.enabled;
+  // 是否显示“活动”入口
+  data.showActivityEnter = homeSettings.showActivityEnter;
   // 首页大Logo
   data.homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
   // 浏览过的专业
