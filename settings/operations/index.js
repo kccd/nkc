@@ -126,7 +126,9 @@ operationObj.operationTree = {
 		},
 		'read': {
 			PARAMETER: {
+				GET: 'discuz',
 				PARAMETER: {
+					GET: 'discuz',
 					PARAMETER: {
 						GET: 'discuz'
 					}
