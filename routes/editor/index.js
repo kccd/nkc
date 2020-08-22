@@ -8,11 +8,11 @@ router
     const {type} = query;
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
-    const authLevel = data.user.authLevel;
-    if(!user.volumeA || authLevel < 1) {
+    // const authLevel = data.user.authLevel;
+    /*if(!user.volumeA || authLevel < 1) {
       ctx.template = 'interface_notice.pug';
       return await next();
-    }
+    }*/
     ctx.template = "editor/editor.pug";
 
     // 需要预制的专业和文章分类
