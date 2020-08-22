@@ -103,6 +103,10 @@ block content
               if !(state.isApp && state.platform === 'reactNative')
                 include ../publicModules/mobile_drawer/right_drawer
               include ../publicModules/paging/forum_nav
+
+            if data.forum.declare && data.paging.page === 0
+              div.forum-declare.m-b-1!= data.forum.declare
+
             if data.threadTypes.length
               .forum-category
                 a(class=!data.cat ? "active" : "" href=`/f/${data.forum.fid}`) 全部

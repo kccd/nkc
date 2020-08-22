@@ -1739,6 +1739,7 @@ threadSchema.statics.updateAutomaticRecommendThreadsByType = async (type) => {
 threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThreadsId = []) => {
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
+  const ForumModel = mongoose.model('forums');
   const SettingModel = mongoose.model('settings');
   const ComplaintModel = mongoose.model('complaints');
   const homeSettings = await SettingModel.getSettings('home');
@@ -1793,6 +1794,13 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
   } else {
     and.push({
       flowControl: false
+    });
+
+    // 获取被流控的专业
+    const forums = await ForumModel.find({openReduceVisits: true}, {fid: 1});
+    const forumsId = forums.map(f => f.fid);
+    and.push({
+      mainForumsId: {$nin: forumsId}
     });
   }
   // 是否精选

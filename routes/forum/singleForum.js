@@ -378,7 +378,7 @@ router
 		// 2. 访问最新文章列表第一页
 		// 3. 填写了专业说明
 		// 4. 用户未访问过此专业
-		if(data.user && page === 0 && forum.declare) {
+		/*if(data.user && page === 0 && forum.declare) {
 			const behavior = await db.UsersBehaviorModel.findOne({fid: forum.fid, uid: data.user.uid});
 			let url;
 			if(!behavior) {
@@ -389,7 +389,7 @@ router
 				}
 				return ctx.redirect(url);
 			}
-		}
+		}*/
 
 		// 构建查询条件
 		const match = {};
