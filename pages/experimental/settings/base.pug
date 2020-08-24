@@ -57,7 +57,7 @@ block content
             label.col-sm-2.control-label 网站图标
             .col-sm-8
               img(:src="serverSettings.siteIcon?'/a/'+serverSettings.siteIcon : '/favicon.ico'" @click="selectSiteIcon()" id="selectSiteIcon")
-              input.hide(type="file" accept="image/x-icon" ref="selectSiteIconInput" @change="uploadSiteIcon()")
+              input.hide(type="file" accept="image/x-icon" ref="selectSiteIconInput")
           .form-group
             label.col-sm-2.control-label 网页背景
             .col-sm-8

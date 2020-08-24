@@ -48,13 +48,25 @@ var app = new Vue({
       this.info = "";
       var settings = this.serverSettings;
       settings.keywords = this.keywords;
-      nkcAPI("/e/settings/base", "PUT", settings)
+      var input = this.$refs.selectSiteIconInput;
+      var file = input.files[0];
+      var form = new FormData();
+      form.append("icon", file);
+      form.append("settings", JSON.stringify(settings));
+      return nkcUploadFile("/e/settings/base", "PUT", form)
         .then(function() {
           sweetSuccess("保存成功");
         })
         .catch(function(data) {
           app.error = data.error || data;
         })
+      // nkcAPI("/e/settings/base", "PUT", settings)
+      //   .then(function() {
+      //     sweetSuccess("保存成功");
+      //   })
+      //   .catch(function(data) {
+      //     app.error = data.error || data;
+      //   })
     },
     remove: function(arr, l) {
       var index = arr.indexOf(l);
@@ -81,16 +93,16 @@ var app = new Vue({
       var input = this.$refs.selectSiteIconInput;
       input.click();
     },
-    uploadSiteIcon: function() {
-      var self = this;
-      var input = this.$refs.selectSiteIconInput;
-      var file = input.files[0];
-      var form = new FormData();
-      form.append("icon", file);
-      return nkcUploadFile("/e/settings/base/siteicon", "POST", form)
-        .then(function(data){
-          self.serverSettings.siteIcon = data.aid;
-        })
-    }
+    // uploadSiteIcon: function() {
+    //   var self = this;
+    //   var input = this.$refs.selectSiteIconInput;
+    //   var file = input.files[0];
+    //   var form = new FormData();
+    //   form.append("icon", file);
+    //   return nkcUploadFile("/e/settings/base/siteicon", "POST", form)
+    //     .then(function(data){
+    //       self.serverSettings.siteIcon = data.aid;
+    //     })
+    // }
   }
 });
