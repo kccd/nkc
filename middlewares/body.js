@@ -36,7 +36,45 @@ module.exports = async (ctx, next) => {
     // 设置文件类型
     ctx.type = ext;
 
-    if(fileType !== "attachment" && extArr.includes(ext)) { // 图片
+    let createdStream, contentLength, contentDisposition;
+
+    if(fileType === 'attachment' || (!extArr.includes(ext) && (!rangeExt.includes(ext)))) {
+      contentDisposition = `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`;
+    } else {
+      contentDisposition = `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`;
+    }
+
+    let headerRange = ctx.request.headers['range'];
+    if(headerRange) {
+      const range = utils.parseRange(headerRange, stats.size);
+      if(range) {
+        contentLength = range.end - range.start + 1;
+        createdStream = fs.createReadStream(filePath, {
+          start: range.start,
+          end: range.end
+        });
+        ctx.set("Accept-Ranges", "bytes");
+        ctx.set(`Content-Range`, `bytes ${range.start}-${range.end}/${stats.size}`);
+        ctx.status = 206;
+      }
+    }
+
+    if(!createdStream) {
+      createdStream = fs.createReadStream(filePath);
+      contentLength = stats.size;
+    }
+
+    if(tg) {
+      ctx.body = createdStream.pipe(tg.throttle());
+    } else {
+      ctx.body = createdStream;
+    }
+
+    ctx.set('Content-Disposition', contentDisposition);
+    ctx.set(`Content-Length`, contentLength);
+
+
+    /*if(fileType !== "attachment" && extArr.includes(ext)) { // 图片
       ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
       ctx.body = fs.createReadStream(filePath);
       ctx.set('Content-Length', stats.size);
@@ -69,7 +107,7 @@ module.exports = async (ctx, next) => {
         ctx.body = fss.createReadStream(filePath);
       }
       ctx.set('Content-Length', stats.size);
-    }
+    }*/
     await next();
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;
