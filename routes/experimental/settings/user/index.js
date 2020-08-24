@@ -81,6 +81,7 @@ userRouter
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
     const targetUsersPersonal = await db.UsersPersonalModel.findOnly({uid});
+    const serverSettings = await db.SettingModel.getSettings('server');
     // 用户名重名检测
     if(username) {
       if(targetUser.username !== username) {
@@ -91,7 +92,7 @@ userRouter
         if(sameNameColumn) ctx.throw(400, "用户名与专栏名冲突，请更换");
       }
     } else {
-      username = `kc-${targetUser.uid}`;
+      username = `${serverSettings.websiteCode}-${targetUser.uid}`;
     }
     // 邮箱检测
     if(targetUsersPersonal.email !== email) {

@@ -1,6 +1,6 @@
 extends ../bootstrap_base
 block title
-  title 科创会员专业知识测验
+  title=`${state.serverSettings.websiteName}会员专业知识测验`
   +includeCSS('/exam/exam.css')
 block content
   .container-fluid.max-width#app(v-if='category && paper' v-cloak)
@@ -24,7 +24,7 @@ block content
     .row(v-else)
       .col-xs-12.col-md-3
         img(src=tools.getUrl('siteFile', 'holy_exam.gif'))
-        h3 科创会员专业知识测验
+        h3=`${state.serverSettings.websiteName}会员专业知识测验`
         h5 今日考试次数剩余：{{countOneDay - countToday + 1}} 次
         h5 考试科目：{{category.name + ' ' + {'A':'基础级', 'B': '专业级'}[category.volume]}}
         h5 开考时间：{{format('YYYY-MM-DD HH:mm:ss', paper.toc)}}

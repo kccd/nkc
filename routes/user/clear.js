@@ -5,6 +5,7 @@ router
     const {settings, db, body, params, nkcModules} = ctx;
     const {uid} = params;
     const targetUser = await db.UserModel.findOnly({uid});
+    const serverSettings = await db.SettingModel.getSettings('server');
     const {type} = body;
     const time = Date.now();
     if(type === "avatar") {
@@ -12,7 +13,7 @@ router
     } else if(type === "banner") {
       await nkcModules.file.deleteUserBanner(targetUser.uid);
     } else if(type === "username") {
-      const newUsername = `kc-${targetUser.uid}`;
+      const newUsername = `${serverSettings.websiteCode}-${targetUser.uid}`;
       const newUsernameLowerCase = newUsername.toLowerCase();
       await db.SecretBehaviorModel({
         operationId: "modifyUsername",

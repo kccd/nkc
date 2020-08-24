@@ -1,5 +1,5 @@
 if data.user
-  -let reg = /^kc-/;
+  -let reg = new RegExp(`^${state.serverSettings.websiteCode}-`);
   -const unsetUsername = reg.test(data.user.username) || !data.user.username;
   if unsetUsername || !data.user.setPassword || !data.user.boundEmail || !data.user.boundMobile || !data.user.avatar || !data.user.banner || !data.user.description
     .improve.m-t-1.m-b-1
