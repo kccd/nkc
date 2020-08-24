@@ -7,7 +7,7 @@ var app = new Vue({
     author: "",
     digest: false,
     timeStart: {
-      year: 2000,
+      year: 1970,
       month: 1,
       day: 1
     },
