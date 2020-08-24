@@ -85,4 +85,26 @@ schema.methods.clear = async function() {
   await this.remove();
 };
 
+/*
+* 清除过期的缓存
+* @author pengxiguaa 2020/8/19
+* */
+schema.statics.clearTimeoutPageCache = async () => {
+  const SettingModel = mongoose.model('settings');
+  const CacheModel = mongoose.model('caches');
+  const cacheSettings = await SettingModel.getSettings("cache");
+  const caches = await CacheModel.find({
+    toc: {
+      $lte: Date.now() - (cacheSettings.visitorPageCacheTime * 1000)
+    }
+  }).sort({toc: 1}).limit(2000);
+  for(const cache of caches) {
+    try{
+      await cache.clear();
+    } catch(err) {
+      console.log(err);
+    }
+  }
+}
+
 module.exports = mongoose.model("caches", schema);

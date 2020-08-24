@@ -40,7 +40,6 @@ categoryRouter
         await db.ForumModel.updateMany({fid: {$in: fids}}, {$set: {
 						categoryId: targetForum.categoryId
         }});
-				await forum.updateForumMessage();
 			}
 			await redis.cacheForums();
 		} else if(operation === 'saveOrder') {

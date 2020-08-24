@@ -1,0 +1,9 @@
+const db = require('../dataModels');
+const methods = {};
+methods.updateForumsMessage = db.ForumModel.updateForumsMessage;
+methods.saveAllForumLatestThreadToRedis = db.ForumModel.saveAllForumLatestThreadToRedis;
+methods.clearResourceState = db.ResourceModel.clearResourceState;
+methods.updateHomeRecommendThreadsByType = db.ThreadModel.updateHomeRecommendThreadsByType;
+methods.clearTimeoutPageCache = db.CacheModel.clearTimeoutPageCache;
+methods.saveActiveUsersToCache = db.ActiveUserModel.saveActiveUsersToCache;
+module.exports = methods;

@@ -1,3 +1,4 @@
+return;
 const {Eve, Thread, isMainThread} = require('node-threads-pool');
 const threadPoolSettings = require('../settings/threadPool');
 const tools = require("./tools");
@@ -484,7 +485,7 @@ function serializable(target) {
       // console.log("Object节点下:", target[key]);
       result[key] = serializable(target[key]);
     }
-    
+
   } else if(isArray(target)) {
     result = [];
     target.forEach(elem => {

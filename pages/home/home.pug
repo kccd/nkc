@@ -5,10 +5,11 @@ block title
   +includeCSS("/home/home.css")
 
 block content
+  -const reg = new RegExp(`^${state.serverSettings.websiteCode}-`);
   -const canManagement = permission("superModerator");
   .container-fluid.max-width
     .row
-      if data.user && (/^kc-/.test(data.user.username) || !data.user.username)
+      if data.user && (reg.test(data.user.username) || !data.user.username)
         .col-xs-12.m-b-1
           .home-warning
             .fa.fa-exclamation-circle

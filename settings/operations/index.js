@@ -114,6 +114,28 @@ operationObj.operationTree = {
 	home: {
 		GET: 'visitHome',// 首页
 
+		// 适配dz
+		'forum.php': {
+			GET: 'discuz'
+		},
+		'index.php': {
+			GET: 'discuz'
+		},
+		'read.php': {
+			GET: 'discuz'
+		},
+		'read': {
+			PARAMETER: {
+				GET: 'discuz',
+				PARAMETER: {
+					GET: 'discuz',
+					PARAMETER: {
+						GET: 'discuz'
+					}
+				}
+			}
+		},
+
 		logo, // 网站logo
 
 		poster, //活动海报

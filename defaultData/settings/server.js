@@ -3,6 +3,7 @@ module.exports = {
   c: {
     websiteName: '科创',
     websiteAbbr: '科创',
+    websiteCode: 'kc',
     serverName: 'nkc $ server',
     telephone: '00000000',
     github: 'https://github.com/kccd/nkc.git',
@@ -14,7 +15,7 @@ module.exports = {
     keywords: ['科创'],
     language: 'zh_CN',
     siteIcon: null,           // 网站图标 为null时默认
-    backgroundColor: '#ccb39f',
+    backgroundColor: '#f4f4f4',
     links: {
       info: [
         {

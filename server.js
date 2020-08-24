@@ -15,8 +15,6 @@ const http = require('http'),
   elasticSearch = require("./nkcModules/elasticSearch"),
   settings = require('./settings'),
   serverConfig = require('./config/server'),
-  cacheForums = require('./redis/cacheForums'),
-  cacheBaseInfo = require('./redis/cache'),
   socket = require('./socket'),
   {updateDate, upload} = settings,
   {
@@ -39,7 +37,7 @@ const dataInit = async () => {
 const jobsInit = async () => {
   const jobs = require('./scheduleJob');
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
-  jobs.updateForums(updateDate.updateForumsCronStr);
+  jobs.clearForumAndThreadPostCount();
   jobs.shop();
   jobs.backupDatabase();
   jobs.moveRecycleMarkThreads();
@@ -54,11 +52,13 @@ const timedTasksInit = async () => {
  await timedTasks.updateRecommendThreads();
  await timedTasks.clearResourceState();
  await timedTasks.updateAllForumLatestThread();
+ await timedTasks.updateForumsMessage();
 };
 
 const start = async () => {
   try {
     if(global.NKC.processId === 0) {
+      const cacheBaseInfo = require('./redis/cache');
       await dataInit();
       await jobsInit();
       await upload.initFolders();

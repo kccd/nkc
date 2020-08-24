@@ -40,6 +40,20 @@ otherRouter
 		}
 		return ctx.redirect(`/`);
 	})
+	.get(['forum.php', 'read/:tid/:a/:b'], async (ctx, next) => {
+		let {tid, fid, uid} = ctx.query;
+		tid = tid || ctx.params.tid;
+		ctx.status = 301;
+		if(tid) {
+			return ctx.redirect(`/t/${tid}`);
+		} else if(uid) {
+			return ctx.redirect(`/u/${uid}`);
+		} else if(fid) {
+			return ctx.redirect(`/f/${fid}`);
+		} else {
+			return ctx.redirect(`/`);
+		}
+	})
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
   .use('sendMessage', sendMessageRouter.routes(), sendMessageRouter.allowedMethods())
   .use('edit', editorRouter.routes(), editorRouter.allowedMethods())

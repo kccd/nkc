@@ -1,5 +1,5 @@
 const db = require("./dataModels");
-const redisClient = require("./settings/redisClient");
+const tasks = require('./tasks');
 const func = {};
 /*
 * 定时更新活跃用户的信息 主要是头像
@@ -7,43 +7,27 @@ const func = {};
 func.cacheActiveUsers = async () => {
   setTimeout(async () => {
     try{
-      await db.ActiveUserModel.saveActiveUsersToCache();
+      await tasks.saveActiveUsersToCache();
     } catch(err) {
-      if(global.NKC.NODE_ENV !== "production") {
-        console.log(err);
-      }
+      console.log(err);
     } finally {
       await func.cacheActiveUsers();
     }
-  }, 120000);
+  }, 2 * 60 * 1000);
 };
 
 func.clearTimeoutPageCache = async () => {
   setTimeout(async () => {
     try{
-      const cacheSettings = await db.SettingModel.getSettings("cache");
-      const caches = await db.CacheModel.find({
-        toc: {
-          $lte: Date.now() - (cacheSettings.visitorPageCacheTime * 1000)
-        }
-      }).sort({toc: 1}).limit(500);
-      for(const cache of caches) {
-        try{
-          await cache.clear();
-        } catch(err) {
-          if(global.NKC.NODE_ENV !== "production") {
-            console.log(err);
-          }
-        }
-      }
+      console.log(`正在清除过期页面缓存...`);
+      await tasks.clearTimeoutPageCache();
+      console.log(`过期页面缓存清理完成`);
     } catch (e) {
-      if(global.NKC.NODE_ENV !== "production") {
-        console.log(e);
-      }
+      console.log(e);
     } finally {
       await func.clearTimeoutPageCache();
     }
-  }, 180000);
+  }, 3 * 60 * 1000);
 };
 
 /*
@@ -56,13 +40,11 @@ func.updateFixedRecommendThreads = async () => {
     try{
       if(homeSettings.recommendThreads.fixed.displayType !== 'manual') {
         console.log(`开始更新首页推荐文章（固定图）...`);
-        await db.ThreadModel.updateHomeRecommendThreadsByType('fixed');
+        await tasks.updateHomeRecommendThreadsByType('fixed');
         console.log(`首页推荐文章（固定图）更新完成`);
       }
     } catch(err) {
-      if(global.NKC.NODE_ENV !== 'production') {
-        console.log(err);
-      }
+      console.log(err);
     } finally {
       await func.updateFixedRecommendThreads();
     }
@@ -78,13 +60,11 @@ func.updateMovableRecommendThreads = async () => {
     try{
       if(homeSettings.recommendThreads.movable.displayType !== 'manual') {
         console.log(`开始更新首页推荐文章（轮播图）...`);
-        await db.ThreadModel.updateHomeRecommendThreadsByType('movable');
+        await tasks.updateHomeRecommendThreadsByType('movable');
         console.log(`首页推荐文章（轮播图）更新完成`);
       }
     } catch(err) {
-      if(global.NKC.NODE_ENV !== 'production') {
-        console.log(err);
-      }
+      console.log(err);
     } finally {
       await func.updateMovableRecommendThreads();
     }
@@ -106,24 +86,14 @@ func.clearResourceState = async() => {
   setTimeout(async () => {
     try{
       console.log(`正在处理异常资源上传状态...`);
-      const time = Date.now() - 2*60*60*1000;
-      await db.ResourceModel.updateMany({
-        toc: {$lte: time},
-        state: 'inProcess'
-      }, {
-        $set: {
-          state: 'useless'
-        }
-      });
+      await tasks.clearResourceState();
     } catch(err) {
-      if(global.NKC.NODE_ENV !== 'production') {
-        console.log(err);
-      }
+      console.log(err);
     } finally {
       console.log(`异常资源上传状态处理完成`);
       await func.clearResourceState();
     }
-  }, 60*60*1000);
+  }, 55 * 60 * 1000);
 }
 
 /*
@@ -133,16 +103,32 @@ func.updateAllForumLatestThread = async () => {
   setTimeout(async () => {
     try{
       console.log(`正在更新专业最新文章...`);
-      await db.ForumModel.saveAllForumLatestThreadToRedis();
+      await tasks.saveAllForumLatestThreadToRedis();
     } catch(err) {
-      if(global.NKC.NODE_ENV !== 'production') {
-        console.log(err);
-      }
+      console.log(err);
     } finally {
       console.log(`专业最新文章更新完成`);
       await func.updateAllForumLatestThread();
     }
   }, 6 * 60 * 1000);
+};
+
+/*
+* 定时更新专业文章、回复数
+* @author pengxiguaa 2020/8/19
+* */
+func.updateForumsMessage = async () => {
+  setTimeout(async () => {
+    try{
+      console.log(`正在更新专业文章、回复数...`);
+      await tasks.updateForumsMessage();
+    } catch(err) {
+      console.log(err);
+    } finally {
+      console.log(`专业文章、回复数更新完成`);
+      await func.updateForumsMessage();
+    }
+  }, 30 * 60 * 1000);
 };
 
 module.exports = func;

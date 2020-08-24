@@ -471,12 +471,12 @@ threadSchema.methods.updateThreadEncourage = async function() {
 // }
 
 // 更新文章 信息
-threadSchema.methods.updateThreadMessage = async function() {
+threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
   const ThreadModel = mongoose.model("threads");
+  const apiFunction = require('../nkcModules/apiFunction');
+  const today = apiFunction.today();
   const thread = await ThreadModel.findOne({tid: this.tid});
   const PostModel = mongoose.model('posts');
-  const timeToNow = new Date();
-  const time = new Date(`${timeToNow.getFullYear()}-${timeToNow.getMonth()+1}-${timeToNow.getDate()}`);
   const updateObj = {};
   const oc = await PostModel.findOneAndUpdate({tid: thread.tid}, {
     $set: {
@@ -501,7 +501,7 @@ threadSchema.methods.updateThreadMessage = async function() {
   updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
   updateObj.count = await PostModel.count({tid: thread.tid, type: "post", parentPostId: ""});
-  updateObj.countToday = await PostModel.count({tid: thread.tid, type: "post", toc: {$gt: time}, parentPostId: ""});
+  updateObj.countToday = await PostModel.count({tid: thread.tid, type: "post", toc: {$gt: today}, parentPostId: ""});
   updateObj.countRemain = await PostModel.count({tid: thread.tid, type: "post", disabled: {$ne: true}, parentPostId: ""});
   const userCount = await PostModel.aggregate([
     {
@@ -525,7 +525,7 @@ threadSchema.methods.updateThreadMessage = async function() {
   });
   await PostModel.updateMany({tid: thread.tid}, {$set: {mainForumsId: thread.mainForumsId}});
   // 更新搜索引擎中帖子的专业信息
-  await elasticSearch.updateThreadForums(thread);
+  if(toSearch) await elasticSearch.updateThreadForums(thread);
 };
 
 threadSchema.methods.newPost = async function(post, user, ip) {
@@ -1480,11 +1480,6 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
       });
     }
   }
-  forumsId = new Set(forumsId);
-  if(forumsId.size !== 0) {
-    forumsId.add(recycleId);
-    await ForumModel.updateForumsMessage([...forumsId]);
-  }
 };
 
 
@@ -1744,6 +1739,7 @@ threadSchema.statics.updateAutomaticRecommendThreadsByType = async (type) => {
 threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThreadsId = []) => {
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
+  const ForumModel = mongoose.model('forums');
   const SettingModel = mongoose.model('settings');
   const ComplaintModel = mongoose.model('complaints');
   const homeSettings = await SettingModel.getSettings('home');
@@ -1798,6 +1794,13 @@ threadSchema.statics.updateHomeRecommendThreadsByType = async (type, excludedThr
   } else {
     and.push({
       flowControl: false
+    });
+
+    // 获取被流控的专业
+    const forums = await ForumModel.find({openReduceVisits: true}, {fid: 1});
+    const forumsId = forums.map(f => f.fid);
+    and.push({
+      mainForumsId: {$nin: forumsId}
     });
   }
   // 是否精选

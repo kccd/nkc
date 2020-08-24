@@ -664,7 +664,7 @@ userSchema.statics.createUser = async (option) => {
 	const MessageModel = mongoose.model('messages');
 	const SubscribeTypeModel = mongoose.model("subscribeTypes");
 	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
-
+  const serverSettings = await SettingModel.getSettings('server');
 	const userObj = Object.assign({}, option);
 
 	const toc = Date.now();
@@ -681,7 +681,7 @@ userSchema.statics.createUser = async (option) => {
 	userObj.certs = [];
 	// 生成默认用户名，符号"-"和uid保证此用户名全局唯一
 	if(!userObj.username) {
-	  userObj.username = `kc-${uid}`;
+	  userObj.username = `${serverSettings.websiteCode}-${uid}`;
     userObj.usernameLowerCase = userObj.username;
   }
 

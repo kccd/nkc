@@ -8,7 +8,7 @@ html(lang='zh-CN')
     link(rel='stylesheet' href='/font-awesome/css/font-awesome.css')
     link(rel='shortcut icon' href=state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}` : '/favicon.ico')
     link(href="/app/index.css" rel='stylesheet' type='text/css')
-    title 科创
+    title=state.serverSettings.websiteName
   body
     mixin logo
       div.logo-bottom

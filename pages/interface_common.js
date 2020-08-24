@@ -867,7 +867,7 @@ function deleteForum(fid) {
 var digestDom;
 var creditDom;
 var postWarningDom;
-
+var creditScoreName = '';
 $(function () {
 	var tooltipElements = $('[data-toggle="tooltip"]');
 	if(tooltipElements.length > 0) {
@@ -887,6 +887,7 @@ $(function () {
     creditDom.modal({
       show: false
     });
+    creditScoreName = creditDom.attr('data-credit-score-name');
   }
 
   postWarningDom = $("#module_post_warning");
@@ -1027,7 +1028,7 @@ function credit(pid, type, kcb) {
           })
       } else if(type === 'kcb') {
 
-        if(num.value*100 > kcb) return screenTopWarning('您的科创币不足');
+        if(num.value*100 > kcb) return screenTopWarning('你的'+creditScoreName+'不足');
         var obj = {
           num: num.value*100,
           description: description.value
@@ -1045,61 +1046,6 @@ function credit(pid, type, kcb) {
     }
   });
   creditDom.modal('show');
-}
-
-function addCredit(pid){
-  var cobj = promptCredit(pid)
-  if(cobj){
-    return nkcAPI('/p/'+pid+'/credit/xsf', 'POST',cobj)
-      .then(function(){
-        window.location.reload()
-      })
-      .catch(function(data) {
-        screenTopWarning(data.error)
-      })
-  }
-  else{
-    screenTopWarning('取消评分。')
-  }
-}
-
-function addKcb(pid, kcb) {
-  var num = prompt('向作者转账科创币以资鼓励，科创币数量：', '5');
-  if(!num || !Number(num)) return screenTopWarning('请输入正确的科创币数量');
-  num = Number(num);
-  if(num <= 0) return screenTopWarning('科创币最少为1');
-  if(kcb < num) return screenTopWarning('您的科创币数量不足');
-  var description = prompt('请输入理由：', '');
-  if(!description || description.length < 2) {
-    return screenTopWarning('理由写的太少啦~');
-  }
-  nkcAPI('/p/'+pid+'/credit/kcb', 'POST', {
-    num: num,
-    description: description
-  })
-    .then(function() {
-      screenTopAlert('鼓励成功！');
-    })
-    .catch(function(data) {
-      screenTopWarning(data.error || data);
-    });
-}
-
-function promptCredit(pid){
-  var cobj = {pid:pid}
-
-  var q = prompt('请输入学术分：','1')
-  if(q&&Number(q)){
-    cobj.num=Number(q)
-
-    var reason = prompt('请输入评分理由：','')
-    if(reason&&reason.length>1){
-      cobj.description = reason;
-
-      return cobj
-    }
-  }
-  return null
 }
 
 //舍弃草稿
@@ -1125,18 +1071,6 @@ function removedraft(uid,did){
     })
 }
 
-
-
-
-// // 去标签+略缩
-// function delCodeAddShrink1(content){
-// 	content = content.replace(/<[^>]+>/g,"");
-// 	if(content.length > 10){
-//     var lastContent = content.substr(content.length-50,content.length)
-// 		content = content.substr(0,10) + "......" + lastContent;
-// 	}
-// 	return content
-// }
 
 
 
@@ -1192,32 +1126,6 @@ function htmlAPI(url, method, data, options) {
 				return reject(data);
 			})
 	})
-}
-
-function initHtmlAPI(options) {
-
-
-	window.onpopstate = function(event) {
-		var url = event.currentTarget.location.href;
-		htmlAPI(url, 'GET', {}, options)
-	};
-
-
-	if(!window.history || !window.history.pushState) {
-		return;
-	}
-	$('a[data-toggle="url"]').on('click', function(event) {
-		//阻止a标签默认跳转行为
-		event.preventDefault();
-		var url = $(this).attr('href');
-		htmlAPI(url, 'GET', {}, options)
-			.then(function() {
-				history.pushState({},'科创',url);
-			})
-			.catch(function(data) {
-
-			})
-	});
 }
 
 function createProgressBar() {

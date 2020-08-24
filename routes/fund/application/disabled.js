@@ -15,7 +15,6 @@ disabledRouter
       fids = new Set(thread.mainForumsId);
       fids.add(recycleId);
       await thread.update({mainForumsId: [recycleId]});
-      await db.ForumModel.updateForumsMessage([...fids]);
     } else {
       const fundForums = await db.ForumModel.find({kindName: "fund"});
       fids = new Set();
@@ -26,7 +25,6 @@ disabledRouter
       await thread.update({mainForumsId: [...fids]});
       fids.add(recycleId);
     }
-    await db.ForumModel.updateForumsMessage([...fids]);
     const targetUser = await db.UserModel.findOnly({uid: applicationForm.uid});
     await targetUser.updateUserMessage();
 		await next();

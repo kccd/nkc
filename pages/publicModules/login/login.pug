@@ -12,7 +12,7 @@
       .modal-body.p-t-0.p-b-0
         .row
           .col-xs-12.col-md-12
-            div.site-name 科创
+            div.site-name=state.serverSettings.websiteName
             p.site-description=state.serverSettings.brief
           .col-xs-12.col-md-12(v-if="type === 'login'")
             .login-types
@@ -92,7 +92,7 @@
                     .fa.fa-exclamation-circle
                     span {{error}}
                 .text-left.m-b-1(style="font-size:1rem" v-if="type === 'register'") 注册即代表同意
-                  a(href=`/protocol?type=register` target="_blank") 《科创统一服务协议（注册协议）》
+                  a(href=`/protocol?type=register` target="_blank")=`《${state.serverSettings.websiteName}统一服务协议（注册协议）》`
                 .text-right
                   .pull-left.link(v-if="type === 'login'")
                     a(@click="selectType('register')") 注册

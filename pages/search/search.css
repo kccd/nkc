@@ -1,3 +1,6 @@
+body{
+  background-color: #fff;
+}
 .search-type{
   display: inline-block;
   height: 3rem;

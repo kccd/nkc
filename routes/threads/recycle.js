@@ -167,7 +167,6 @@ router
         await thread.updateThreadMessage();
       }
     }
-    await db.ForumModel.updateForumsMessage([...new Set(updateForumsId)]);
     await next();
   });
 module.exports = router;

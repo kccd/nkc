@@ -7,6 +7,10 @@ block eContent
   .container-fluid.max-width#app(v-cloak)
     .row
       .col-xs-12.col-md-12
+        h4 刷新专业数据（文章数、回复数等）
+        button.btn.btn-danger(@click='updateForums' v-if='!updating') 立即刷新
+        button.btn.btn-danger(v-else disabled) 刷新中...
+          .fa.fa-spinner.fa-spin
         h4 新建专业
         .form.form-inline.m-b-2
           .form-group

@@ -663,6 +663,8 @@
   "addUserToBlacklist": "将用户加入黑名单",
   "removeUserFromBlacklist": "将用户从黑名单移除",
 
+  "experimentalForumsSettings": "后台管理 - 专业设置",
+
 
   "userSettingsHomeToLatest": "首页调整：主页 设置为 最新",
   "userSettingsLatestToHome": "首页调整：最新 设置为 主页",
@@ -736,6 +738,7 @@
 
   "viewUserScores": "可在用户名片查看用户积分",
 
-  "showActivityEnter": "首页“活动”入口的显示和隐藏"
+  "showActivityEnter": "首页“活动”入口的显示和隐藏",
+  "discuz": "适配discuz"
 
 }

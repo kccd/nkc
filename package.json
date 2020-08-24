@@ -91,9 +91,11 @@
     "twemoji": "^2.5.0",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3",
     "ansi-escapes": "^4.3.1",
-    "cli-cursor": "^3.1.0"
+    "cli-cursor": "^3.1.0",
+    "xss": "^1.0.3",
+    "urllib": "^0.5.2",
+    "@alicloud/pop-core": "^1.7.9"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
