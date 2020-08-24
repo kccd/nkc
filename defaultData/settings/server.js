@@ -3,6 +3,7 @@ module.exports = {
   c: {
     websiteName: '科创',
     websiteAbbr: '科创',
+    websiteCode: 'kc',
     serverName: 'nkc $ server',
     telephone: '00000000',
     github: 'https://github.com/kccd/nkc.git',

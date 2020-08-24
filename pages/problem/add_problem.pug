@@ -38,7 +38,7 @@ block content
           .form-group
             button.btn.btn-primary.btn-block#submit 提交
           .form-group
-            h4=`科创论坛值班室：${state.serverSettings.telephone}`
-            
+            h4=`${state.serverSettings.websiteName}值班室：${state.serverSettings.telephone}`
+
 block scripts
   +includeJS("/problem/add_problem.js")
