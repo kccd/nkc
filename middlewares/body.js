@@ -10,7 +10,7 @@ module.exports = async (ctx, next) => {
     try{
       stats = fss.statSync(filePath);
     } catch(err) {
-      ctx.throw(404, err);
+      ctx.throw(500, `file(${path.basename(filePath || '')}) not found`);
     }
     const lastModified = (new Date(stats.mtime)).getTime();
     ctx.set("ETag", lastModified);
