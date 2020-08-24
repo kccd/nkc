@@ -73,41 +73,6 @@ module.exports = async (ctx, next) => {
     ctx.set('Content-Disposition', contentDisposition);
     ctx.set(`Content-Length`, contentLength);
 
-
-    /*if(fileType !== "attachment" && extArr.includes(ext)) { // 图片
-      ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
-      ctx.body = fs.createReadStream(filePath);
-      ctx.set('Content-Length', stats.size);
-    } else if(fileType !== "attachment" && rangeExt.includes(ext)) { // 音频、视频、pdf
-      ctx.set('Content-Disposition', `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`);
-      ctx.set("Accept-Ranges", "bytes");
-      let createdStream = false;
-      if(ctx.request.headers['range']){
-        const range = utils.parseRange(ctx.request.headers["range"], stats.size);
-        if(range){
-          ctx.body = await fss.createReadStream(filePath, {
-            start: range.start,
-            end: range.end
-          });
-          ctx.set("Content-Range", "bytes " + range.start + "-" + range.end + "/" + stats.size);
-          ctx.set("Content-Length", (range.end - range.start + 1));
-          createdStream = true;
-          ctx.status = 206;
-        }
-      }
-      if(!createdStream) {
-        ctx.body = await fss.createReadStream(filePath);
-        ctx.set("Content-Length", stats.size);
-      }
-    } else { // 附件
-      ctx.set('Content-Disposition', `attachment; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`)
-      if(tg) {
-        ctx.body = fss.createReadStream(filePath).pipe(tg.throttle());
-      } else {
-        ctx.body = fss.createReadStream(filePath);
-      }
-      ctx.set('Content-Length', stats.size);
-    }*/
     await next();
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;
