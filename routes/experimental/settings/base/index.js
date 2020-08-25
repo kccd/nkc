@@ -11,34 +11,37 @@ baseRouter
 		const {db, body} = ctx;
 		let {AttachmentModel} = db;
 		let {fields, files} = body;
-		let {links,websiteCode ,websiteName, websiteAbbr, github, backgroundColor, copyright, record, description, keywords, brief, telephone, statement} = JSON.parse(fields['settings']);
+		let {siteIcon, links,websiteCode ,websiteName, websiteAbbr, github, backgroundColor, copyright, record, description, keywords, brief, telephone, statement} = JSON.parse(fields['settings']);
 		let {siteicon} = files;
 		if(!websiteName) ctx.throw(400, '网站名不能为空');
 		if(!websiteCode) ctx.throw(400, `网站代号不能为空`);
 		websiteName = websiteName.trim();
 		const serverSettings = await db.SettingModel.findOnly({_id: 'server'});
 		const keywordsArr = keywords.split(',');
-		const attachment = await AttachmentModel.saveSiteIcon(siteicon);
-		await db.SettingModel.saveSettingsToRedis("server");
 		const obj = {
-		  c: {
+			c: {
 				websiteCode,
 				websiteName,
 				websiteAbbr,
-        github,
+				github,
 				backgroundColor,
-        copyright,
-        record,
-			  statement,
-        description,
-        keywords: keywordsArr,
-        brief,
-        telephone,
+				copyright,
+				record,
+				statement,
+				description,
+				keywords: keywordsArr,
+				brief,
+				telephone,
 				links,
-				siteIcon: attachment._id
-      }
-    };
+				siteIcon: siteIcon
+			}
+		};
+		if(siteicon) {
+			const attachment = await AttachmentModel.saveSiteIcon(siteicon);
+			obj.c.siteIcon = attachment._id;
+		}
 		await serverSettings.update(obj);
+		await db.SettingModel.saveSettingsToRedis("server");
 		await next();
 	});
 module.exports = baseRouter;
