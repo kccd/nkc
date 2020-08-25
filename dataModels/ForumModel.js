@@ -1716,9 +1716,9 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
     const forum = await ForumModel.getForumByIdFromRedis(fid);
     if(forum.moderators.includes(uid)) continue;
     if(!forum) throwErr(400, `专业id错误 fid:${fid}`);
-    const {visibility, permission, displayName} = forum;
+    const {accessible, permission, displayName} = forum;
     const {rolesId, gradesId, relation} = permission[type];
-    if(!visibility) throwErr(`专业 ${displayName} 暂未开放`);
+    if(!accessible) throwErr(`专业「${displayName}」暂未开放`);
 
     let hasRole = false, hasGrade = gradesId.includes(userGradeId);
     for(const userRoleId of userRolesId) {
@@ -1731,7 +1731,7 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
       (relation === 'or' && !hasRole && !hasGrade) ||
       (relation === 'and' && (!hasRole || !hasGrade))
     ) {
-      throwErr(403, `你没有权限在专业「${displayName}」下发表内容`);
+      throwErr(403, `你没有权限在专业「${displayName}下发表内容`);
     }
   }
 };
