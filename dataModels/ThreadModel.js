@@ -959,13 +959,15 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
 */
 threadSchema.statics.publishArticle = async (options) => {
   const ThreadModel = mongoose.model('threads');
+  const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
   const {uid, fids, cids, ip, title, content, abstractCn, type, keyWordsCn} = options;
   if(!uid) throwErr(404, '用户ID不能为空');
   const user = await UserModel.findById(uid);
-  await ThreadModel.ensurePublishPermission(options);
+  // await ThreadModel.ensurePublishPermission(options);
+  await ForumModel.checkWritePermission(options.uid, options.fids);
   const tid = await SettingModel.operateSystemID('threads', 1);
   const thread = ThreadModel({
     tid,
@@ -1510,7 +1512,8 @@ threadSchema.statics.postNewThread = async (options) => {
   const MessageModel = mongoose.model("messages");
   const DraftModel = mongoose.model("draft");
   // 1.检测发表权限
-  await ThreadModel.ensurePublishPermission(options);
+  // await ThreadModel.ensurePublishPermission(options);
+  await ForumModel.checkWritePermission(options.uid, options.fids);
   // 2.生成一条新的thread，并返回post
   const _post = await ForumModel.createNewThread(options);
   // 获取当前的thread

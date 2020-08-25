@@ -14,6 +14,7 @@ const db = require('../dataModels');
 const cacheForums = require('./cacheForums');
 const pub = {};
 pub.publish = async (channel, message) => {
+  global.NKC.io.of('/common').NKC.sendMessage(channel, message);
   global.NKC.io.of('/message').NKC.sendMessage(channel, message);
 };
 

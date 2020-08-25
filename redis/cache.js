@@ -13,6 +13,8 @@ module.exports = async () => {
 
   // 专业权限相关
   await cacheForums();
+  // 专业信息
+  await db.ForumModel.saveAllForumsToRedis();
   // 用户等级
   await db.RoleModel.saveRolesToRedis();
   // 一周活跃用户

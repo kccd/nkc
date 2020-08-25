@@ -99,6 +99,7 @@ forumRouter
     // await newForum.createLibrary(data.user.uid);
 
     await redis.cacheForums();
+		await db.ForumModel.saveForumToRedis(newForum.fid);
 		data.forum = newForum;
 		data.forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
 		await next();

@@ -1,5 +1,5 @@
 var pageName = '';
-var socket = io('/message', {
+var socket = io('/common', {
   forceNew: false,
   reconnection: true,
   autoConnect: true,
@@ -36,7 +36,9 @@ var setNewMessageNumber = function(number) {
 };
 
 socket.on('message', function(data) {
+  if(!data.message) return;
   var ty = data.message.ty;
+  if(!ty) return;
   if(ty === 'STE') {
     newMessageRemind('notice');
   } else if(ty === 'STU') {

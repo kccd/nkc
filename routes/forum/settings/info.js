@@ -89,6 +89,7 @@ infoRouter
 				}
 			});
 		}
+		await db.ForumModel.saveForumToRedis(forum.fid);
 		await next();
 	});
 

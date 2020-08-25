@@ -425,7 +425,7 @@ NKC.modules.SelectResource = function() {
   });
 
   // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
-  commonSocket.on("message", function(data) {
+  socket.on("message", function(data) {
     if(data.state === "fileProcessFinish") {
       console.log("文件处理完成");
       self.app.category = "all";

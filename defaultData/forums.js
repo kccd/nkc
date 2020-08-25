@@ -9,7 +9,14 @@ module.exports = [
     displayOnParent: true,
     visibility: true,
     isVisibleForNCC: true,
-    rolesId: ['dev', 'default', 'visitor'],
+    permission: {
+      write: {
+        rolesId: ['dev', 'default', 'visitor'],
+      },
+      read: {
+        rolesId: ['dev', 'default', 'visitor'],
+      }
+    },
     type: 'category'
   },
   {
@@ -22,7 +29,14 @@ module.exports = [
     displayOnParent: true,
     visibility: true,
     isVisibleForNCC: true,
-    rolesId: ['dev', 'default', 'visitor'],
+    permission: {
+      write: {
+        rolesId: ['dev', 'default', 'visitor'],
+      },
+      read: {
+        rolesId: ['dev', 'default', 'visitor'],
+      }
+    },
     type: 'forum',
     parentsId: [1]
   },
@@ -36,7 +50,14 @@ module.exports = [
     displayOnParent: true,
     visibility: true,
     isVisibleForNCC: true,
-    rolesId: ['dev'],
+    permission: {
+      write: {
+        rolesId: ['dev', 'default', 'visitor'],
+      },
+      read: {
+        rolesId: ['dev', 'default', 'visitor'],
+      }
+    },
     type: 'forum',
     parentsId: [1]
   }

@@ -19,10 +19,13 @@
   "author": "nkc",
   "license": "ISC",
   "dependencies": {
+    "@alicloud/pop-core": "^1.7.9",
+    "ansi-escapes": "^4.3.1",
     "awesome-static": "^1.4.3",
     "bluebird": "^3.5.3",
     "chart.js": "^2.7.2",
     "cheerio": "^1.0.0-rc.3",
+    "cli-cursor": "^3.1.0",
     "colors": "^1.1.2",
     "commonmark": "^0.28.1",
     "cookie-signature": "^1.1.0",
@@ -89,13 +92,10 @@
     "transliteration": "^1.6.6",
     "trek-captcha": "^0.4.0",
     "twemoji": "^2.5.0",
+    "urllib": "^0.5.2",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "ansi-escapes": "^4.3.1",
-    "cli-cursor": "^3.1.0",
-    "xss": "^1.0.3",
-    "urllib": "^0.5.2",
-    "@alicloud/pop-core": "^1.7.9"
+    "xss": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

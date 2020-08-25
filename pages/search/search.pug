@@ -39,7 +39,7 @@ block content
             .form-group
               label 时间范围：
               select(v-model="timeStart.year")
-                -for(var i = 2000; i < 2030; i++)
+                -for(var i = 1970; i < 2030; i++)
                   option(value=i)=i
               select(v-model="timeStart.month")
                 -for(var i = 1; i < 13; i++)
@@ -48,7 +48,7 @@ block content
                 option(v-for="i in timeStartDay" :value="i") {{i}}
               span 至
               select(v-model="timeEnd.year")
-                -for(var i = 2000; i < 2030; i++)
+                -for(var i = 1970; i < 2030; i++)
                   option(value=i)=i
               select(v-model="timeEnd.month")
                 -for(var i = 1; i < 13; i++)

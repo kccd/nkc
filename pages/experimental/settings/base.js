@@ -29,7 +29,8 @@ var app = new Vue({
     serverSettings: "",
     keywords: "",
     error: "",
-    info: ""
+    info: "",
+    tempSiteIcon: "",
   },
   mounted: function() {
     var data = NKC.methods.getDataById("data");
@@ -48,13 +49,18 @@ var app = new Vue({
       this.info = "";
       var settings = this.serverSettings;
       settings.keywords = this.keywords;
-      nkcAPI("/e/settings/base", "PUT", settings)
+      var input = this.$refs.selectSiteIconInput;
+      var file = input.files[0];
+      var form = new FormData();
+      form.append("siteicon", file);
+      form.append("settings", JSON.stringify(settings));
+      return nkcUploadFile("/e/settings/base", "PUT", form)
         .then(function() {
           sweetSuccess("保存成功");
         })
         .catch(function(data) {
           app.error = data.error || data;
-        })
+        });
     },
     remove: function(arr, l) {
       var index = arr.indexOf(l);
@@ -81,16 +87,11 @@ var app = new Vue({
       var input = this.$refs.selectSiteIconInput;
       input.click();
     },
-    uploadSiteIcon: function() {
-      var self = this;
+    selectSiteIconInputChange: function() {
       var input = this.$refs.selectSiteIconInput;
       var file = input.files[0];
-      var form = new FormData();
-      form.append("icon", file);
-      return nkcUploadFile("/e/settings/base/siteicon", "POST", form)
-        .then(function(data){
-          self.serverSettings.siteIcon = data.aid;
-        })
+      var url = URL.createObjectURL(file);
+      this.tempSiteIcon = url;
     }
   }
 });
