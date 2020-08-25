@@ -8,7 +8,7 @@ async function disconnect(data) {
 }
 
 async function error(info) {
-  // console.log("出错了:", info);
+  console.error(info);
 }
 
 function makeSend(io) {

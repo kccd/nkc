@@ -9,12 +9,17 @@ baseRouter
 	})
 	.put('/', async (ctx, next) => {
 		const {db, body} = ctx;
-		let {links,websiteCode ,websiteName, websiteAbbr, github, backgroundColor, copyright, record, description, keywords, brief, telephone, statement} = body;
+		let {AttachmentModel} = db;
+		let {fields, files} = body;
+		let {links,websiteCode ,websiteName, websiteAbbr, github, backgroundColor, copyright, record, description, keywords, brief, telephone, statement} = JSON.parse(fields['settings']);
+		let {siteicon} = files;
 		if(!websiteName) ctx.throw(400, '网站名不能为空');
 		if(!websiteCode) ctx.throw(400, `网站代号不能为空`);
 		websiteName = websiteName.trim();
 		const serverSettings = await db.SettingModel.findOnly({_id: 'server'});
 		const keywordsArr = keywords.split(',');
+		const attachment = await AttachmentModel.saveSiteIcon(siteicon);
+		await db.SettingModel.saveSettingsToRedis("server");
 		const obj = {
 		  c: {
 				websiteCode,
@@ -29,19 +34,11 @@ baseRouter
         keywords: keywordsArr,
         brief,
         telephone,
-        links
+				links,
+				siteIcon: attachment._id
       }
     };
 		await serverSettings.update(obj);
-		await db.SettingModel.saveSettingsToRedis("server");
 		await next();
-	})
-	.post('/siteicon', async (ctx, next) => {
-		let {body, db, data} = ctx;
-		let {AttachmentModel} = db;
-		let {icon} = body.files;
-		let attachment = await AttachmentModel.saveSiteIcon(icon);
-		data.aid = attachment._id;
-		return next();
 	});
 module.exports = baseRouter;

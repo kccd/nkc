@@ -131,9 +131,6 @@ module.exports = {
 		base: {
 			GET: 'visitWebBaseSettings',
 			PUT: 'modifyWebBase',
-			siteicon: {
-				POST: 'setSiteIcon'
-			}
 		},
 		home: {
 			top: {
