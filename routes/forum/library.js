@@ -17,7 +17,7 @@ router
         data.uploadResourcesId = resources.map(r => r.rid);
       }
     }
-    
+
     if(data.forum.lid) {
       const forumLibrary = await db.LibraryModel.findOne({_id: data.forum.lid});
       if(forumLibrary && forumLibrary.closed) data.libraryClosed = true;
@@ -29,19 +29,22 @@ router
     const {forum} = data;
     const {type} = body;
     if(type === "create") {
-      await forum.createLibrary(data.user.uid);
+      data.library = await forum.createLibrary(data.user.uid);
     } else{
       if(!forum.lid) ctx.throw(400, "专业暂未开设文库");
       const library = await db.LibraryModel.findOnly({_id: forum.lid});
       if(!library) ctx.throw(400, `未找到文库, lid: ${forum.lid}`);
+      data.library = library;
       if(type === "open") {
         if(!library.closed) ctx.throw(400, "文库未关闭");
         await library.update({closed: false});
+        data.libraryClosed = false;
       } else {
         if(library.closed) ctx.throw(400, "文库已关闭");
         await library.update({closed: true});
-      } 
-    }    
+        data.libraryClosed = true;
+      }
+    }
     await next();
   });
 module.exports = router;

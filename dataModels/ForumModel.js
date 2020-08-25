@@ -2,7 +2,7 @@ const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const client = settings.redisClient;
-
+const getRedisKeys = require('../nkcModules/getRedisKeys');
 
 const forumSchema = new Schema({
 	abbr: {
@@ -150,6 +150,38 @@ const forumSchema = new Schema({
 		default: 'or',// and
 		index: 1
 	},
+
+  // 发表、阅读权限相关
+  permission: {
+    write: {
+      rolesId: {
+        type: [String],
+        default: ['dev'],
+      },
+      gradesId: {
+        type: [Number],
+        default: []
+      },
+      relation: {
+        type: String,
+        default: 'or'
+      }
+    },
+    read: {
+      rolesId: {
+        type: [String],
+        default: ['dev']
+      },
+      gradesId: {
+        type: [Number],
+        default: []
+      },
+      relation: {
+        type: String,
+        default: 'or'
+      }
+    }
+  },
 
   shareLimitTime: {
 	  type: String,
@@ -1579,4 +1611,175 @@ forumSchema.statics.getLatestThreadsFromRedis = async (fid) => {
   const threadsString = await client.getAsync(key);
   return JSON.parse(threadsString);
 };
+
+/*
+* 保存所有的专业到redis
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.saveAllForumsToRedis = async () => {
+  const ForumModel = mongoose.model('forums');
+  const forums = await ForumModel.find().sort({order: 1});
+  const forumsId = [];
+  for(const _forum of forums) {
+    const forum = _forum.toObject();
+    const key = getRedisKeys(`forumData`, forum.fid);
+    await client.setAsync(key, JSON.stringify(forum));
+    forumsId.push(forum.fid);
+  }
+  // 保存所有专业的id到redis
+  await ForumModel.saveAllForumsIdToRedis(forumsId);
+};
+/*
+* 保存所有的专业ID到redis
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.saveAllForumsIdToRedis = async (forumsId) => {
+  const ForumModel = mongoose.model('forums');
+  if(!forumsId) {
+    const forums = await ForumModel.find({}, {fid: 1}).sort({order: 1});
+    forumsId = forums.map(f => f.fid);
+  }
+  const key = getRedisKeys(`forumsId`);
+  await client.resetSetAsync(key, forumsId);
+};
+/*
+* 从redis获取所有专业的id
+* @return {[String]} [fid, fid, ...]
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.getAllForumsIdFromRedis = async () => {
+  const key = getRedisKeys('forumsId');
+  return await client.smembersAsync(key);
+};
+
+/*
+* 获取所有专业
+* @return {[Object]} 专业对象组成的数组
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.getAllForumsFromRedis = async () => {
+  const ForumModel = mongoose.model('forums');
+  const forumsId = await ForumModel.getAllForumsIdFromRedis();
+  const forums = [];
+  for(const fid of forumsId) {
+    const key = getRedisKeys(`forumData`, fid);
+    let forum = await client.getAsync(key);
+    if(!forum) continue;
+    forum = JSON.parse(forum);
+    forums.push(forum);
+  }
+  return forums;
+};
+
+/*
+* 缓存整个专业信息到redis
+* @param {String} fid
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.saveForumToRedis = async (fid) => {
+  const ForumModel = mongoose.model('forums');
+  let forum = await ForumModel.findOne({fid});
+  if(!forum) throwErr(500, `专业不存在 fid: ${fid}`);
+  forum = forum.toObject();
+  const key = getRedisKeys('forumData', forum.fid);
+  await client.setAsync(key, JSON.stringify(forum));
+  await ForumModel.getAllForumsIdFromRedis();
+};
+
+/*
+* 从redis获取单个专业
+* @param {String} fid 专业ID
+* @return {Object} 专业信息
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.getForumByIdFromRedis = async (fid) => {
+  const key = getRedisKeys(`forumData`, fid);
+  const forum = await client.getAsync(key);
+  return forum? JSON.parse(forum): null;
+};
+
+/*
+* 检查用户在指定专业的权限
+* @param {String} type 执行权限类型 write: 发表, read: 阅读
+* @param {String} uid 用户ID
+* @param {[String]} fid 专业ID组成的数组
+* */
+forumSchema.statics.checkPermission = async (type, user, fid = []) => {
+  const SettingModel = mongoose.model('settings');
+  const recycleId = await SettingModel.getRecycleId();
+  const ForumModel = mongoose.model('forums');
+  const {grade: userGrade, roles: userRoles, uid} = user;
+  const userRolesId = userRoles.map(r => r._id);
+  const userGradeId = userGrade._id;
+  for(const id of fid) {
+    if(id === recycleId) throwErr(400, `不允许发表文章到回收站`);
+    const forum = await ForumModel.getForumByIdFromRedis(fid);
+    if(forum.moderators.includes(uid)) continue;
+    if(!forum) throwErr(400, `专业id错误 fid:${fid}`);
+    const {visibility, permission, displayName} = forum;
+    const {rolesId, gradesId, relation} = permission[type];
+    if(!visibility) throwErr(`专业 ${displayName} 暂未开放`);
+
+    let hasRole = false, hasGrade = gradesId.includes(userGradeId);
+    for(const userRoleId of userRolesId) {
+      if(rolesId.includes(userRoleId)) {
+        hasRole = true;
+        break;
+      }
+    }
+    if(
+      (relation === 'or' && !hasRole && !hasGrade) ||
+      (relation === 'and' && (!hasRole || !hasGrade))
+    ) {
+      throwErr(403, `你没有权限在专业「${displayName}」下发表内容`);
+    }
+  }
+};
+/*
+* 验证用户是否能在指定专业发表内容
+* @param {[String]} 专业ID组成的数组
+* @param {String} uid 用户ID
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.checkWritePermission = async (uid, fid) => {
+  const user = await mongoose.model('users').findOnly({uid});
+  await user.extendRoles();
+  await user.extendGrade();
+  await mongoose.model('forums').checkPermission('write', user, fid);
+};
+
+/*
+* 验证用户是否有权阅读指定专业
+* @param {String} uid 用户ID
+* @param {[String]} [fid, fid, ...] 专业ID
+* */
+forumSchema.statics.checkReadPermission = async (uid, fid) => {
+  const user = await mongoose.model('users').findOnly({uid});
+  await user.extendRoles();
+  await user.extendGrade();
+  await mongoose.model('forums').checkPermission('read', user, fid);
+};
+
+/*
+* 获取用户能够访问的专业
+* @param {String} uid 用户ID
+* @return {[String]} 可访问的专业
+* */
+forumSchema.statics.getReadableForumsByUid = async (uid) => {
+  const ForumModel = mongoose.model('forums');
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOnly({uid});
+  await user.extendRoles();
+  await user.extendGrade();
+  const forumsId = await ForumModel.getAllForumsIdFromRedis();
+  const results = [];
+  for(const fid of forumsId) {
+    try{
+      await ForumModel.checkPermission('read', user, [fid]);
+      results.push(fid);
+    } catch(err) {}
+  }
+  return results;
+};
+
 module.exports = mongoose.model('forums', forumSchema);

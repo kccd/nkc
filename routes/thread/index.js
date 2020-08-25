@@ -815,7 +815,8 @@ threadRouter
 		await thread.extendForums(['mainForums', 'minorForums']);
 		data.forum = thread.forum;
 		// 权限判断
-		await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+		// await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
+    await db.ForumModel.checkWritePermission(data.user.uid, thread.mainForumsId);
 
 		const {columnCategoriesId = [], anonymous = false, did} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
@@ -825,7 +826,7 @@ threadRouter
 
 		// 判断前台有没有提交匿名标志，未提交则默认false
     if(anonymous && !await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid, thread.mainForumsId)) {
-      ctx.throw(400, "您没有权限或文章所在专业不允许发表匿名内容");
+      ctx.throw(400, "你没有权限或文章所在专业不允许发表匿名内容");
     }
 
 		const _post = await thread.newPost(post, user, ctx.address);

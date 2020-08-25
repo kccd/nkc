@@ -28,6 +28,8 @@ const client = Redis.createClient({
 });
 
 module.exports = client;
+/**/
+
 /*
 * 键名 uid(用户ID)
 * user:uid:subscribeForumsId array
@@ -82,9 +84,7 @@ module.exports = client;
 *
 *
 * 删除键： delAsync
-* */
-
-/*
+*
 * 用户证书
 * role:${roleId} = jsonString roleObj
 * role:keys = jsonString [roleId, ...]
@@ -94,6 +94,13 @@ module.exports = client;
 *
 * forum:${fid}:latestThreads jsonString [threadObj, ...]
 *
+* 专业信息
+* forum:${fid} = jsonString forumObj
+*
+* 所有专业的ID
+* forums:id = jsonString [fid, fid, ...];
+*
 * 权限 操作
 * operation:${operationId} = jsonString operationObj
- */
+*
+*/

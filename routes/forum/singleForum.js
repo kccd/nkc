@@ -137,7 +137,8 @@ router
     await next();
   })
   .del('/', async (ctx, next) => {
-    const {params, db} = ctx;
+  	ctx.throw(400, `暂不允许删除专业`);
+    const {params, db, redis} = ctx;
     const {fid} = params;
     const {ThreadModel, ForumModel} = db;
     const forum = await ForumModel.findOnly({fid});
@@ -159,6 +160,8 @@ router
     } else {
       await forum.remove()
 		}
+    await redis.cacheForums();
+    await db.ForumModel.saveAllForumsToRedis();
     return next()
   })
 	.use('/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
