@@ -183,6 +183,11 @@ const forumSchema = new Schema({
     }
   },
 
+  orderBy: {
+    type: String,
+    default: 'tlm', // tlm: 复序, toc: 贴序
+  },
+
   shareLimitTime: {
 	  type: String,
     default: '720' // 小时

@@ -43,7 +43,7 @@ module.exports = async (ctx, next) => {
     } else {
       contentDisposition = `inline; filename=${encodeRFC5987ValueChars(name)}; filename*=utf-8''${encodeRFC5987ValueChars(name)}`;
     }
-
+    ctx.set("Accept-Ranges", "bytes");
     let headerRange = ctx.request.headers['range'];
     if(headerRange) {
       const range = utils.parseRange(headerRange, stats.size);
@@ -53,7 +53,6 @@ module.exports = async (ctx, next) => {
           start: range.start,
           end: range.end
         });
-        ctx.set("Accept-Ranges", "bytes");
         ctx.set(`Content-Range`, `bytes ${range.start}-${range.end}/${stats.size}`);
         ctx.status = 206;
       }

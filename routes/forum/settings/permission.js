@@ -14,7 +14,6 @@ permissionRouter
         } else {
           data.libraryClosed = library.closed;
         }
-
       }
     }
     ctx.template = 'forum/settings/permission.pug';
@@ -29,7 +28,7 @@ permissionRouter
     let {
       accessible, displayOnParent, visibility, isVisibleForNCC,
       shareLimitCount, shareLimitTime, allowedAnonymousPost,
-      moderators, subType, openReduceVisits, permission
+      moderators, subType, openReduceVisits, permission, orderBy
     } = body.forum;
     const {read, write} = permission;
     shareLimitCount = Number(shareLimitCount);
@@ -48,6 +47,7 @@ permissionRouter
       if(!u) ctx.throw(400, `主管专家ID错误 uid: ${uid}`);
     }
     if(!["free", "force", "unSub"].includes(subType)) ctx.throw(400, "请选择关注类型");
+    if(!['tlm', 'toc'].includes(orderBy)) ctx.throw(400, '请选择文章排序方式');
     const rolesId = await db.RoleModel.getRolesId();
     const grades = await db.UsersGradeModel.find();
     const gradesId = grades.map(g => g._id);
@@ -69,6 +69,7 @@ permissionRouter
         openReduceVisits: !!openReduceVisits,
         moderators,
         shareLimitTime,
+        orderBy,
         shareLimitCount,
         subType, permission
       }

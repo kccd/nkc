@@ -464,10 +464,14 @@ router
 		const limit = paging.perpage;
 		const skip = paging.start;
 		let sort;
-		if(s === "toc") {
+		if(s === 'toc') {
 			sort = {toc: -1};
-		} else {
+		} else if(s === 'tlm') {
 			sort = {tlm: -1};
+		} else {
+			sort = {};
+			sort[forum.orderBy] = -1;
+			s = forum.orderBy;
 		}
 		data.s = s;
 		let threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);

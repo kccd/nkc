@@ -148,6 +148,16 @@ block content
                       input(type='radio' :value='false' v-model='forum.openReduceVisits')
                       span 关闭
               .form-group
+                label.col-sm-3.control-label 文章排序
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='tlm' v-model='forum.orderBy')
+                      span 按回复时间
+                    label
+                      input(type='radio' value='toc' v-model='forum.orderBy')
+                      span 按发表时间
+              .form-group
                 label.col-sm-3.control-label 专业文库
                 .col-sm-7
                   div(v-if='!forum.lid')
