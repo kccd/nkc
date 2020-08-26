@@ -70,6 +70,16 @@ block content
                 .col-sm-5
                   input.form-control(placeholder='请输入文号' v-model='forum._valuableThreadsId')
               .form-group
+                label.col-sm-3.control-label 文章默认排序
+                .col-sm-5
+                  .radiobox
+                    span 按最新发文时间
+                    input(type='radio' name='defaultThreadSort')
+                  .radiobox
+                    span 按最新回复时间
+                    input(type='radio' name='defaultThreadSort')
+                  //- p.text-danger *开启流控以后，该专业的文章就不在各类自动推荐的地方显示(beta)
+              .form-group
                 .col-sm-5.col-sm-offset-2
                   button.btn.btn-default(@click=`save` v-if="!submitting") 保存
                   button.btn.btn-default(v-else disabled) 保存中...
@@ -79,4 +89,5 @@ block scripts
   include ../../publicModules/crop/crop_new
   //script(src='/module_forum_settings.js')
 
+  script(src=`/icheck/icheck.js?v=${global.NKC.startTime}`)
   +includeJS('/forum/settings/info.js')

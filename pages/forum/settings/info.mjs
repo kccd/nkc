@@ -105,3 +105,9 @@ const app = new Vue({
 		}
 	}
 });
+
+
+$('input[name="defaultThreadSort"]').iCheck({
+	checkboxClass: 'icheckbox_minimal-red',
+	radioClass: 'iradio_minimal-red',
+});
