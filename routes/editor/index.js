@@ -142,7 +142,21 @@ router
       } else {
         ctx.throw(400, `未知的草稿类型：${desType}`);
       }
-    }
+    } else if(type === "forum_latest_notice") {
+      data.type = "modifyForumLatestNotice";
+      const {id} = query;
+      const forum = await db.ForumModel.findOnly({fid: id});
+      if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业“最新”板块公告");
+      // 渲染nkcsource
+      data.post = {
+        c: forum.latestBlockNotice
+      };
+      data.forum = {
+        fid: forum.fid,
+        title: forum.displayName,
+        url: `/f/${forum.fid}`
+      };
+    } 
     // 拓展专业信息
     data.mainForums = [];
     if(selectedForumsId.length) {

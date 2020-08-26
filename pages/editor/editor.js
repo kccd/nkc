@@ -713,6 +713,12 @@ function initVueApp() {
                 did: self.draftId,
                 operation: "updateDeclare"
               });
+            } else if(type === "modifyForumLatestNotice") {
+              self.checkContent();
+              return nkcAPI("/f/" + self.forum.fid + "/settings/info", "PUT", {
+                content: post.c,
+                operation: "modifyForumLatestNotice"
+              });
             }
           })
           .then(function(data) {

@@ -31,6 +31,7 @@ var app = new Vue({
     error: "",
     info: "",
     tempSiteIcon: "",
+    shouldUploadSiteIcon: false
   },
   mounted: function() {
     var data = NKC.methods.getDataById("data");
@@ -56,6 +57,7 @@ var app = new Vue({
       form.append("settings", JSON.stringify(settings));
       return nkcUploadFile("/e/settings/base", "PUT", form)
         .then(function() {
+          this.shouldUploadSiteIcon = false;
           sweetSuccess("保存成功");
         })
         .catch(function(data) {
@@ -92,6 +94,7 @@ var app = new Vue({
       var file = input.files[0];
       var url = URL.createObjectURL(file);
       this.tempSiteIcon = url;
+      this.shouldUploadSiteIcon = true;
     }
   }
 });

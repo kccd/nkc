@@ -4024,6 +4024,19 @@ span[data-tag="nkcsource"][data-type="audio"]{
   /* margin-top: 6px; */
   display: block;
 }
+.nkcsource-audio-title,
+.nkcsource-video-title {
+  display: block;
+  color: rgb(134, 134, 134);
+  font-size: 0.8em;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.nkcsource-video-title {
+  position: absolute;
+  width: 100%;
+}
 
 /* 文章中的附件 旧*/
 .article-attachment{
