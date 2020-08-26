@@ -135,6 +135,9 @@ operationObj.operationTree = {
 				}
 			}
 		},
+		'home.php': {
+			GET: 'discuz'
+		},
 
 		logo, // 网站logo
 

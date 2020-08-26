@@ -74,11 +74,11 @@ shelfRouter
         name: "商品标题",
         minLength: 6,
         maxLength: 200
-      }); 
+      });
       // 验证商品简介
       checkString(productDescription, {
         name: "商品简介",
-        minLength: 6, 
+        minLength: 6,
         maxLength: 1000
       });
       // 验证图文描述
@@ -145,12 +145,12 @@ shelfRouter
           min: 0.01,
           fractionDigits: 2
         });
-        p.price = price * 100;  
+        p.price = price * 100;
       } else {
         p.price = p.originPrice;
       }
       p._id = _id;
-      p.useDiscount = !!useDiscount;      
+      p.useDiscount = !!useDiscount;
       return p;
     });
     if(isEnableCount === 0) ctx.throw(400, `不允许屏蔽所有规格`);
@@ -274,7 +274,8 @@ shelfRouter
         type: "product"
       };
 
-      await db.ThreadModel.ensurePublishPermission(options);
+      // await db.ThreadModel.ensurePublishPermission(options);
+      await db.ForumModel.checkWritePermission(options.uid, options.fids);
       const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
       product = db.ShopGoodsModel({
         productId,
@@ -389,20 +390,20 @@ shelfRouter
     await Promise.all(imgIntroductions.map(async rid => {
       const resource = await db.ResourceModel.findOne({rid});
       if(!resource) ctx.throw(400, `图片【${rid}】不存在`);
-      if(!['jpg', 'png', 'jpeg'].includes(resource.ext.toLowerCase())) 
+      if(!['jpg', 'png', 'jpeg'].includes(resource.ext.toLowerCase()))
         ctx.throw(400, '商品图片只支持jpg、png和jpeg格式');
     }));
     if(!imgMaster) ctx.throw(400, '商品主要图片不能为空');
     if(!imgIntroductions.includes(imgMaster)) ctx.throw(400, '请在已选择的商品图片中选择商品主要图片');
-    if(!['payReduceStock', 'orderReduceStock'].includes(stockCostMethod)) 
+    if(!['payReduceStock', 'orderReduceStock'].includes(stockCostMethod))
       ctx.throw(400, '库存计数方式错误，仅支持【付款减库存(payReduceStock)】、【下单减库存(orderReduceStock)】');
-    if(!['notonshelf', 'insale'].includes(productStatus)) 
+    if(!['notonshelf', 'insale'].includes(productStatus))
       ctx.throw(400, '商品状态 设置错误，仅支持【上架(insale)】、【不上架(notonshelf)】');
     if(productStatus === 'notonshelf' && shelfTime && Date.now() >= new Date(shelfTime))
-      ctx.throw(400, '商品的上架时间不能早于当前时间，若想立即上架商品请点击【立即上架】按钮'); 
+      ctx.throw(400, '商品的上架时间不能早于当前时间，若想立即上架商品请点击【立即上架】按钮');
     if(productStatus === "insale") {
       shelfTime = Date.now();
-    }  
+    }
     if(productParams.length === 0) ctx.throw(400, '规格信息不能为空');
     if(paramsInfo.length !== 0) {
       let count = paramsInfo[0].values.length;
@@ -417,7 +418,7 @@ shelfRouter
         if(!p.index) ctx.throw(400, '规格索引不能为空');
         const arr = p.index.split('-');
         for(let i = 0; i < arr.length; i++) {
-          if(arr[i] >= paramsInfo[i].values.length) 
+          if(arr[i] >= paramsInfo[i].values.length)
             ctx.throw(400, `规格组合中的规格索引设置错误，规格【${paramsInfo[i].name}】只有${paramsInfo[i].values.length}个值，而索引值为${arr[i]}`);
         }
       }
@@ -455,7 +456,7 @@ shelfRouter
       uploadCertDescription:uploadCertDescription,
       shelfTime,
       isFreePost,
-      freightPrice,     
+      freightPrice,
       freightTemplates,
       params: paramsInfo,
       uid: user.uid,

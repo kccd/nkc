@@ -3,6 +3,7 @@ const permissionRouter = new Router();
 permissionRouter
 	.get('/', async (ctx, next) => {
     const {data, db} = ctx;
+    const {forum} = data;
     data.roles = await db.RoleModel.find().sort({toc: 1});
     data.grades = await db.UsersGradeModel.find().sort({score: 1});
     if(ctx.permission("createForumLibrary")) {
@@ -13,13 +14,71 @@ permissionRouter
         } else {
           data.libraryClosed = library.closed;
         }
-        
       }
     }
-    // ctx.template = 'forum/settings/permission.pug';
-    ctx.template = 'interface_forum_settings_permission.pug'
+    ctx.template = 'forum/settings/permission.pug';
+    data.moderators = await db.UserModel.find({uid: {$in: forum.moderators}});
+    // ctx.template = 'interface_forum_settings_permission.pug'
 		await next();
 	})
+  .put(`/`, async (ctx, next) => {
+    const {data, body, db, redis, nkcModules} = ctx;
+    const {checkNumber} = nkcModules.checkData;
+    const {forum} = data;
+    let {
+      accessible, displayOnParent, visibility, isVisibleForNCC,
+      shareLimitCount, shareLimitTime, allowedAnonymousPost,
+      moderators, subType, openReduceVisits, permission, orderBy
+    } = body.forum;
+    const {read, write} = permission;
+    shareLimitCount = Number(shareLimitCount);
+    shareLimitTime = Number(shareLimitTime);
+    checkNumber(shareLimitCount, {
+      name: '分享链接访问次数限制',
+      min: 0
+    });
+    checkNumber(shareLimitTime, {
+      name: '分享链接有效时间',
+      fractionDigits: 2,
+      min: 0
+    });
+    for(const uid of moderators) {
+      const u = await db.UserModel.findOne({uid});
+      if(!u) ctx.throw(400, `主管专家ID错误 uid: ${uid}`);
+    }
+    if(!["free", "force", "unSub"].includes(subType)) ctx.throw(400, "请选择关注类型");
+    if(!['tlm', 'toc'].includes(orderBy)) ctx.throw(400, '请选择文章排序方式');
+    const rolesId = await db.RoleModel.getRolesId();
+    const grades = await db.UsersGradeModel.find();
+    const gradesId = grades.map(g => g._id);
+    read.rolesId = read.rolesId.filter(r => rolesId.includes(r));
+    read.gradesId = read.gradesId.filter(g => gradesId.includes(g));
+    write.rolesId = write.rolesId.filter(r => rolesId.includes(r));
+    write.gradesId = write.gradesId.filter(g => gradesId.includes(g));
+    const relations = [`and`, 'or'];
+    if(!relations.includes(read.relation) || !relations.includes(write.relation)) {
+      ctx.throw(400, '请选择证书等级关系');
+    }
+    await db.ForumModel.updateOne({fid: forum.fid}, {
+      $set: {
+        accessible: !!accessible,
+        displayOnParent: !!displayOnParent,
+        visibility: !!visibility,
+        isVisibleForNCC: !!isVisibleForNCC,
+        allowedAnonymousPost: !!allowedAnonymousPost,
+        openReduceVisits: !!openReduceVisits,
+        moderators,
+        shareLimitTime,
+        orderBy,
+        shareLimitCount,
+        subType, permission
+      }
+    });
+    await redis.cacheForums();
+    await db.ForumModel.saveForumToRedis(forum.fid);
+    await next();
+  })
+  /*
 	.put('/', async (ctx, next) => {
 		const {data, body, db, redis} = ctx;
 		const {forum} = data;
@@ -33,8 +92,10 @@ permissionRouter
       allowedAnonymousPost,
       moderators,
       subType,
-      openReduceVisits      // 是否开启流控
+      openReduceVisits,      // 是否开启流控
+      permission
 		} = body;
+		const {read, write} = permission;
 		const rolesDB = await db.RoleModel.find();
 		const rolesIdDB = rolesDB.map(r => r._id);
 		const gradesDB = await db.UsersGradeModel.find();
@@ -92,4 +153,5 @@ permissionRouter
 		await redis.cacheForums();
 		await next();
 	});
+   */
 module.exports = permissionRouter;

@@ -34,22 +34,10 @@ module.exports = async function(i){
 
   io.use(async (socket, next) => {
     // 从cookie中获取用户信息
-    const {handshake} = socket;
-    const cookies = new Cookies(handshake.headers.cookie, {
-      keys: [cookieConfig.secret]
-    });
-    let userInfo = cookies.get('userInfo', {
-      signed: true
-    });
-    if(!userInfo) return next(new Error('用户信息验证失败'));
-    let user;
-    try{
-      userInfo = Buffer.from(userInfo, "base64").toString();
-      userInfo = JSON.parse(userInfo);
-      const {uid} = userInfo;
-      user = await db.UserModel.findOnly({uid});
-    } catch(err) {
-      return next(new Error('用户信息验证失败'));
+    const {handshake, NKC} = socket;
+    const {user} = NKC.data;
+    if(!user) {
+      return socket.disconnect(true);
     }
     // 获取该用户的房间中的全部连接id
     const clients = await util.getRoomClientsId(io, `user/${user.uid}`);
@@ -68,10 +56,8 @@ module.exports = async function(i){
     if(!['phone', 'computer'].includes(onlineType)) {
       onlineType = 'computer';
     }
-    socket.NKC = {
-      uid: user.uid,
-      onlineType
-    };
+    socket.NKC.uid = user.uid;
+    socket.NKC.onlineType = onlineType;
     await next();
   });
 

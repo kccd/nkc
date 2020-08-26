@@ -36,13 +36,15 @@ async function func() {
     const {
       visibility,
       isVisibleForNCC,
-      rolesId,
-      gradesId,
+      // rolesId,
+      // gradesId,
       accessible,
       displayOnParent,
-      relation,
+      // relation,
       fid
     } = forum;
+
+    const {rolesId, gradesId, relation} = forum.permission.read;
 
     // 专家
     forum.moderators.map(uid => {

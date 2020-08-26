@@ -94,9 +94,9 @@ resourceRouter
       if(operation.count === 0) needScore = false;
 
       // 临时添加 忽略pdf文件
-      if(resource.ext === 'pdf') {
+      /*if(resource.ext === 'pdf') {
         needScore = false;
-      }
+      }*/
 
       // 配置中下载需要积分
       if(needScore) {

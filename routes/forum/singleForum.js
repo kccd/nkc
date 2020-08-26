@@ -137,7 +137,8 @@ router
     await next();
   })
   .del('/', async (ctx, next) => {
-    const {params, db} = ctx;
+  	ctx.throw(400, `暂不允许删除专业`);
+    const {params, db, redis} = ctx;
     const {fid} = params;
     const {ThreadModel, ForumModel} = db;
     const forum = await ForumModel.findOnly({fid});
@@ -159,6 +160,8 @@ router
     } else {
       await forum.remove()
 		}
+    await redis.cacheForums();
+    await db.ForumModel.saveAllForumsToRedis();
     return next()
   })
 	.use('/subscribe', subscribeRouter.routes(), subscribeRouter.allowedMethods())
@@ -461,10 +464,14 @@ router
 		const limit = paging.perpage;
 		const skip = paging.start;
 		let sort;
-		if(s === "toc") {
+		if(s === 'toc') {
 			sort = {toc: -1};
-		} else {
+		} else if(s === 'tlm') {
 			sort = {tlm: -1};
+		} else {
+			sort = {};
+			sort[forum.orderBy] = -1;
+			s = forum.orderBy;
 		}
 		data.s = s;
 		let threads = await db.ThreadModel.find(match).sort(sort).skip(skip).limit(limit);

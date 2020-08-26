@@ -22,25 +22,16 @@ const pageRouter = require('./page');
 const appDownload = require("./appDownload");
 const testRouter = require('./test');
 otherRouter
-	.get('index.php', async (ctx, next) => {
-    const {nkcModules} = ctx;
-		const {fid} = ctx.query;
-    ctx.status = 301;
-		if(fid) {
-			return ctx.redirect(`/f/${fid}`);
-		}
-		return ctx.redirect( `/`);
-	})
-	.get('read.php', async (ctx, next) => {
-    const {nkcModules} = ctx;
-		const {tid} = ctx.query;
-		ctx.status = 301;
-		if(tid) {
-			return ctx.redirect(`/t/${tid}`);
-		}
-		return ctx.redirect(`/`);
-	})
-	.get(['forum.php', 'read/:tid/:a/:b'], async (ctx, next) => {
+	.get([
+		'forum.php',
+		'home.php',
+		'index.php',
+		'read.php',
+		'read/:tid/:a/:b',
+		'read/:tid',
+		'read/:tid/:a',
+		'read/:tid/:a/',
+	], async (ctx, next) => {
 		let {tid, fid, uid} = ctx.query;
 		tid = tid || ctx.params.tid;
 		ctx.status = 301;
