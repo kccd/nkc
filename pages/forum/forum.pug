@@ -105,7 +105,7 @@ block content
               include ../publicModules/paging/forum_nav
 
             if data.forum.declare && data.paging.page === 0
-              div.forum-declare.m-b-1!= data.forum.declare
+              div.forum-declare.m-b-1!= data.forum.latestBlockNotice
 
             if data.threadTypes.length
               .forum-category

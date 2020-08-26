@@ -65,6 +65,9 @@ const app = new Vue({
 		toEditor() {
 			NKC.methods.visitUrl('/editor?type=forum_declare&id='+this.forum.fid, true);
 		},
+		toLatestNoticeEditor() {
+			NKC.methods.visitUrl('/editor?type=forum_latest_notice&id='+this.forum.fid, true);
+		},
 		save() {
 			const self = this;
 			const {forum} = self;
@@ -104,10 +107,4 @@ const app = new Vue({
 				});
 		}
 	}
-});
-
-
-$('input[name="defaultThreadSort"]').iCheck({
-	checkboxClass: 'icheckbox_minimal-red',
-	radioClass: 'iradio_minimal-red',
 });

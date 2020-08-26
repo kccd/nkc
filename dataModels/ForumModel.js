@@ -65,7 +65,12 @@ const forumSchema = new Schema({
 	declare: {
 		type: String,
 		default: ''
-	},
+  },
+  // 专业“最新”板块公告
+  latestBlockNotice: {
+    type: String,
+    default: ''
+  },
 	noticeThreadsId: {
 		type: [String],
 		default: []

@@ -9,7 +9,8 @@ infoRouter
 	.put('/', async (ctx, next) => {
 		const {data, db, body, nkcModules} = ctx;
 		const {forum} = data;
-		if(body.operation) {
+		let {operation} = body;
+		if(operation === "updateDeclare") {
 			const {did, declare} = body;
 			// 富文本内容中每一个source添加引用
 			await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
@@ -19,6 +20,11 @@ infoRouter
 				await db.DraftModel.removeDraftById(did, data.user.uid);
 			}
 			data.redirect = `/f/${forum.fid}/home`;
+			return await next();
+		} else if(operation === "modifyForumLatestNotice") {
+			const {content} = body;
+			await forum.update({latestBlockNotice: content});
+			data.redirect = `/f/${forum.fid}`;
 			return await next();
 		}
 		const {checkString} = nkcModules.checkData;
