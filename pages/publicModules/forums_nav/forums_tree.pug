@@ -62,6 +62,12 @@ if data.forum && data.visitedForums && data.visitedForums.length
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
             a(href=`/f/${forum.fid}`).forum-block-name=forum.displayName
+.m-b-1
+  .panel-header 文章汇总
+  .home-topic-item-div
+    .forum-block
+      .forum-block-info
+        a(href=`/?t=latest`).forum-block-name 最新文章
 for fc in state.categoryForums
   if fc.forums.length
     .m-b-1

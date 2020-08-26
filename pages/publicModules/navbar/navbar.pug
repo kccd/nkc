@@ -43,15 +43,19 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         if data.user
           li(class=navbar_highlight === 'home' ? 'active' : '')
             a(href='/?t=home') 主页
-          li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
+          li(class=navbar_highlight === 'profile'? 'active':'')
+            a(href=`/u/${data.user.uid}/profile`) 我的
+          //-li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
             a(href='/?t=latest') 最新
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
             a(href='/?t=subscribe') 关注
         else
           li(class=navbar_highlight === 'home' ? 'active' : '')
             a(href='/?t=home') 主页
-          li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
+          //li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
             a(href='/?t=latest') 最新
+          li(class=navbar_highlight === 'profile' ? 'active' : '')
+            a.pointer(onclick="Login.open('login')") 我的
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
             a.pointer(onclick="Login.open('login')") 关注
 
