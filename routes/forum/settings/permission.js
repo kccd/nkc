@@ -27,6 +27,7 @@ permissionRouter
     const {forum} = data;
     let {
       accessible, displayOnParent, visibility, isVisibleForNCC,
+      displayOnSearch,
       shareLimitCount, shareLimitTime, allowedAnonymousPost,
       moderators, subType, openReduceVisits, permission, orderBy
     } = body.forum;
@@ -67,6 +68,7 @@ permissionRouter
         isVisibleForNCC: !!isVisibleForNCC,
         allowedAnonymousPost: !!allowedAnonymousPost,
         openReduceVisits: !!openReduceVisits,
+        displayOnSearch: !!displayOnSearch,
         moderators,
         shareLimitTime,
         orderBy,
