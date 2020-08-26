@@ -65,7 +65,12 @@ const forumSchema = new Schema({
 	declare: {
 		type: String,
 		default: ''
-	},
+  },
+  // 专业“最新”板块公告
+  latestBlockNotice: {
+    type: String,
+    default: ''
+  },
 	noticeThreadsId: {
 		type: [String],
 		default: []
@@ -104,6 +109,13 @@ const forumSchema = new Schema({
 		default: true,
 		index: 1
 	},
+
+  //在搜索页显示
+  displayOnSearch: {
+    type: Boolean,
+    default: true,
+    index: 1
+  },
 
 	// 有权用户在导航可见
 	visibility: {
@@ -1703,6 +1715,7 @@ forumSchema.statics.getForumByIdFromRedis = async (fid) => {
   return forum? JSON.parse(forum): null;
 };
 
+
 /*
 * 检查用户在指定专业的权限
 * @param {String} type 执行权限类型 write: 发表, read: 阅读
@@ -1770,7 +1783,7 @@ forumSchema.statics.checkReadPermission = async (uid, fid) => {
 * @param {String} uid 用户ID
 * @return {[String]} 可访问的专业
 * */
-forumSchema.statics.getReadableForumsByUid = async (uid) => {
+forumSchema.statics.getReadableForumsIdByUid = async (uid) => {
   const ForumModel = mongoose.model('forums');
   const UserModel = mongoose.model('users');
   const user = await UserModel.findOnly({uid});
@@ -1785,6 +1798,23 @@ forumSchema.statics.getReadableForumsByUid = async (uid) => {
     } catch(err) {}
   }
   return results;
+};
+
+/*
+* 获取能够在搜索页显示的专业ID
+* @return {[String]} 专业ID组成的数组
+* @author pengxiguaa 2020/8/26
+* */
+forumSchema.statics.displayOnSearchForumsId = async () => {
+  const ForumModel = mongoose.model('forums');
+  const forums = await ForumModel.getAllForumsFromRedis();
+  const forumsId = [];
+  for(const forum of forums) {
+    if(forum.displayOnSearch) {
+      forumsId.push(forum.fid);
+    }
+  }
+  return forumsId;
 };
 
 module.exports = mongoose.model('forums', forumSchema);

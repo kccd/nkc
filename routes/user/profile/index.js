@@ -49,6 +49,7 @@ router
       uid: targetUser.uid,
       deleted: false
     });
+    data.navbar_highlight = 'profile';
     if(state.isApp) {
       data.appLinks = [
         {

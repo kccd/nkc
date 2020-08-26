@@ -37,6 +37,7 @@ block content
               -const targetUserScores = data.targetUserScores;
               -const targetUserXSF = data.targetUser.xsf;
               include ../../publicModules/userScores
+            .account-user-toc= `注册于${format(`YYYY/MM/DD HH:mm:ss`, data.targetUser.toc)}`
             .account-user-links
               .account-user-links
                 a(href=`/u/${data.targetUser.uid}`).col-xs-6.account-user-link
@@ -74,14 +75,6 @@ block content
                 a
                   .account-info-value=data.targetUser.xsf
                   .account-info-name 学术分
-              .col-xs-12.col-md-6
-                a
-                  .account-info-value=format("YYYY-MM-DD", data.targetUser.toc)
-                  .account-info-name 注册时间
-              .col-xs-12.col-md-6
-                a
-                  .account-info-value=parseInt((Date.now() - new Date(data.targetUser.toc).getTime())/(1000*60*60*24))
-                  .account-info-name 注册天数
 
           .account-summary
             .summary-calendar(data-uid=data.targetUser.uid)

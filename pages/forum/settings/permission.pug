@@ -44,10 +44,19 @@ block content
                 label.col-sm-2.control-label 在父板块显示文章列表
                 .col-sm-10
                   <label class="radio-inline">
-                    <input type="radio" :value="true" v-model='forum.displayOnParent'> 是
+                  <input type="radio" :value="true" v-model='forum.displayOnParent'> 是
                   </label>
                   <label class="radio-inline">
-                    <input type="radio" :value="false" v-model='forum.displayOnParent'> 否
+                  <input type="radio" :value="false" v-model='forum.displayOnParent'> 否
+                  </label>
+              .form-group
+                label.col-sm-2.control-label 在搜索页显示文章
+                .col-sm-10
+                  <label class="radio-inline">
+                  <input type="radio" :value="true" v-model='forum.displayOnSearch'> 是
+                  </label>
+                  <label class="radio-inline">
+                  <input type="radio" :value="false" v-model='forum.displayOnSearch'> 否
                   </label>
         .panel.panel-default
           .panel-heading 阅读权限

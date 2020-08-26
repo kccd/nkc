@@ -4,6 +4,7 @@ router
   .get("/", async (ctx, next) => {
     const time = Date.now();
     const {db, data, query, nkcModules} = ctx;
+    const {nkcRender} = nkcModules;
     let {page=0, t, c, d} = query;
     const {user} = data;
     // 通过mongodb精准搜索用户名
@@ -49,11 +50,14 @@ router
     let results = [];
     data.results = [];
 
-    const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
+    const readableForumsId = await db.ForumModel.getReadableForumsIdByUid(user.uid);
+    const displayOnSearchForumsId = await db.ForumModel.displayOnSearchForumsId();
+    const fidOfCanGetThreads = readableForumsId.filter(id => displayOnSearchForumsId.includes(id));
+    /*const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,
       data.userGrade,
       user
-    );
+    );*/
 
     // 若用户没有选择筛选专业，则默认从用户能进的专业搜索
     // 若用户选择了筛选专业，则加载用户已选专业的所有子专业，并过滤掉用户不能访问的专业。
@@ -314,6 +318,8 @@ router
               username: postUser.username
             }
           }
+          r.title = nkcRender.htmlFilter(r.title);
+          r.abstract = nkcRender.htmlFilter(r.abstract);
         } else if(docType === "user") {
           if(targetUser && targetUser.uid === uid) {
             if(existUser) continue;
@@ -329,6 +335,8 @@ router
             description: highlightObj[`${uid}_description`] || u.description,
             user: u
           };
+          r.username = nkcRender.htmlFilter(r.username);
+          r.description = nkcRender.htmlFilter(r.description);
         } else if(docType === "column") {
           const column = columnObj[tid];
           if(!column) continue;
@@ -341,6 +349,8 @@ router
             abbr: highlightObj[`${tid}_abbr`] || column.abbr,
             column
           };
+          r.name = nkcRender.htmlFilter(r.name);
+          r.abbr = nkcRender.htmlFilter(r.abbr);
         } else if(docType === "columnPage") {
           const page = columnPageObj[tid];
           if(!page) continue;
@@ -357,6 +367,8 @@ router
             column,
             page
           }
+          r.t = nkcRender.htmlFilter(r.t);
+          r.c = nkcRender.htmlFilter(r.c);
         } else if(docType === "resource") {
           let resource = resourcesObj[tid];
           if(!resource) continue;
@@ -368,6 +380,8 @@ router
             c: highlightObj[`${tid}_c`] || resource.description,
             resource
           };
+          r.t = nkcRender.htmlFilter(r.t);
+          r.c = nkcRender.htmlFilter(r.c);
         }
         data.results.push(r);
       }

@@ -1,0 +1,6 @@
+.blacklist .user img {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 2px;
+  margin-right: 0.5rem;
+}
