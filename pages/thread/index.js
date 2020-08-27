@@ -1125,7 +1125,12 @@ function showPost(pid) {
 function switchPost(pid) {
 	var dom = $(".hide-post[data-pid='"+pid+"']");
   if(dom.hasClass("active")) {
-    showPost(pid);
+		var scrollY = window.scrollY;
+		showPost(pid);
+		// 使滚动条卷去的高度不变，body向下伸展
+		scrollTo(0, scrollY);
+		// 使此条post移动到视口的顶部
+		// scrollTo(0, dom.parents(".single-post").offset().top - 45);
   } else {
 		var pagePosition = new NKC.modules.PagePosition();
 		hidePost(pid);
