@@ -175,7 +175,7 @@ table{
   padding-bottom: 6rem;
 }
 .p-b-0{
-  padding-bottom: 0;
+  padding-bottom: 0!important;
 }
 /* padding-left */
 .p-l-0{

@@ -23,7 +23,10 @@ mixin minThreadCover(klass)
         style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
       )
 
-.thread-panel(class=!thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":"")
+-let threadPanelClass = !thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":"";
+if !displayPostAbstract
+  -threadPanelClass += ' p-b-0'
+.thread-panel(class=threadPanelClass)
   if !thread.reviewed
     include ../module_review
   if thread.disabled
