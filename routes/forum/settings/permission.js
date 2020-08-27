@@ -31,7 +31,7 @@ permissionRouter
       shareLimitCount, shareLimitTime, allowedAnonymousPost,
       moderators, subType, openReduceVisits, permission, orderBy
     } = body.forum;
-    const {read, write} = permission;
+    const {read, write, writePost} = permission;
     shareLimitCount = Number(shareLimitCount);
     shareLimitTime = Number(shareLimitTime);
     checkNumber(shareLimitCount, {
@@ -56,8 +56,10 @@ permissionRouter
     read.gradesId = read.gradesId.filter(g => gradesId.includes(g));
     write.rolesId = write.rolesId.filter(r => rolesId.includes(r));
     write.gradesId = write.gradesId.filter(g => gradesId.includes(g));
+    writePost.rolesId = writePost.rolesId.filter(r => rolesId.includes(r));
+    writePost.gradesId = writePost.gradesId.filter(g => gradesId.includes(g));
     const relations = [`and`, 'or'];
-    if(!relations.includes(read.relation) || !relations.includes(write.relation)) {
+    if(!relations.includes(read.relation) || !relations.includes(write.relation) || !relations.includes(writePost.relation)) {
       ctx.throw(400, '请选择证书等级关系');
     }
     await db.ForumModel.updateOne({fid: forum.fid}, {

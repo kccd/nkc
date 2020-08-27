@@ -85,7 +85,7 @@ block content
                 input(type='radio' value='or' v-model='forum.permission.read.relation')
                 span 或
         .panel.panel-default
-          .panel-heading 发表权限
+          .panel-heading 发表权限（文章）
           .panel-body
             strong 证书
             .checkbox
@@ -104,6 +104,27 @@ block content
                 span 与
               label
                 input(type='radio' value='or' v-model='forum.permission.write.relation')
+                span 或
+        .panel.panel-default
+          .panel-heading 发表权限（回复和评论）
+          .panel-body
+            strong 证书
+            .checkbox
+              label(v-for='r in roles').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.writePost.rolesId')
+                span {{r.displayName}}
+            strong 等级
+            .checkbox
+              label(v-for='r in grades').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.writePost.gradesId')
+                span {{r.displayName}}
+            strong 证书等级关系
+            .radio
+              label.m-r-1
+                input(type='radio' value='and' v-model='forum.permission.writePost.relation')
+                span 与
+              label
+                input(type='radio' value='or' v-model='forum.permission.writePost.relation')
                 span 或
         .panel.panel-default
           .panel-heading 主管专家

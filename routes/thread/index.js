@@ -816,7 +816,7 @@ threadRouter
 		data.forum = thread.forum;
 		// 权限判断
 		// await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
-    await db.ForumModel.checkWritePermission(data.user.uid, thread.mainForumsId);
+    await db.ForumModel.checkWritePostPermission(data.user.uid, thread.mainForumsId);
 
 		const {columnCategoriesId = [], anonymous = false, did} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');

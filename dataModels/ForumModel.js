@@ -165,7 +165,23 @@ const forumSchema = new Schema({
 
   // 发表、阅读权限相关
   permission: {
+	  // 发表文章
     write: {
+      rolesId: {
+        type: [String],
+        default: ['dev'],
+      },
+      gradesId: {
+        type: [Number],
+        default: []
+      },
+      relation: {
+        type: String,
+        default: 'or'
+      }
+    },
+    // 发表回复和评论
+    writePost: {
       rolesId: {
         type: [String],
         default: ['dev'],
@@ -1772,7 +1788,7 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
   const userRolesId = userRoles.map(r => r._id);
   const userGradeId = userGrade._id;
   for(const id of fid) {
-    if(type === 'write' && id === recycleId) throwErr(400, `不允许发表文章到回收站，请更换专业`);
+    if(['write', 'writePost'].includes(type) && id === recycleId) throwErr(400, `不允许发表内容到回收站，请更换专业`);
     const forum = await ForumModel.getForumByIdFromRedis(fid);
     if(forum.moderators.includes(uid)) continue;
     if(!forum) throwErr(400, `专业id错误 fid:${fid}`);
@@ -1791,12 +1807,18 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
       (relation === 'or' && !hasRole && !hasGrade) ||
       (relation === 'and' && (!hasRole || !hasGrade))
     ) {
-      throwErr(403, `你没有权限在专业「${displayName}」下发表内容，请更换专业`);
+      if(type === 'read') {
+        throwErr(403, `你没有权限阅读专业「${displayName}」下的内容，请更换专业`);
+      } else if(type === 'write') {
+        throwErr(403, `你没有权限在专业「${displayName}」下发表文章，请更换专业`);
+      } else {
+        throwErr(403, `你没有权限在专业「${displayName}」下发表回复或评论，请更换专业`);
+      }
     }
   }
 };
 /*
-* 验证用户是否能在指定专业发表内容
+* 验证用户是否能在指定专业发表文章
 * @param {[String]} 专业ID组成的数组
 * @param {String} uid 用户ID
 * @author pengxiguaa 2020/8/25
@@ -1807,6 +1829,19 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
   await user.extendGrade();
   await mongoose.model('forums').checkPermission('write', user, fid);
 };
+
+/*
+* 验证用户是否能在指定的专业发表回复和评论
+* @param {[String]} 专业ID组成的数组
+* @param {String} uid 用户ID
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
+  const user = await mongoose.model('users').findOnly({uid});
+  await user.extendRoles();
+  await user.extendGrade();
+  await mongoose.model('forums').checkPermission('writePost', user, fid);
+}
 
 /*
 * 验证用户是否有权阅读指定专业
