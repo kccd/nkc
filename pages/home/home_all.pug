@@ -34,12 +34,12 @@ block content
             .detailed-forum-panel
               if disableChild
                 if f.logo
-                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo) data-float-fid=f.fid)
+                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo) data-float-fid=f.fid data-float-position="right")
                 else
-                  .detailed-forum-panel-icon(style=`background-color: ${f.color}` data-float-fid=f.fid)
+                  .detailed-forum-panel-icon(style=`background-color: ${f.color}` data-float-fid=f.fid data-float-position="right")
               .detailed-forum-panel-info(class=disableChild?'':'p-l-0')
                 .detailed-forum-panel-name
-                  a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                  a(href=`/f/${f.fid}` data-float-fid=f.fid data-float-position="right")=f.displayName
                 .detailed-forum-panel-description(title=f.description class=disableChild? '':'parent')
                   span=f.description || '暂无简介'
           if f.latestThreads && f.latestThreads.length
@@ -63,12 +63,12 @@ block content
             .detailed-forum-panel
               if disableChild
                 if f.logo
-                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo) data-float-fid=f.fid)
+                  img.detailed-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo) data-float-fid=f.fid data-float-position="right")
                 else
-                  .detailed-forum-panel-icon(style=`background-color: ${f.color}` data-float-fid=f.fid)
+                  .detailed-forum-panel-icon(style=`background-color: ${f.color}` data-float-fid=f.fid data-float-position="right")
               .detailed-forum-panel-info(class=disableChild?'':'p-l-0')
                 .detailed-forum-panel-name
-                  a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                  a(href=`/f/${f.fid}` data-float-fid=f.fid data-float-position="right")=f.displayName
                 .detailed-forum-panel-description(title=f.description class=disableChild? '':'parent')
                   span=f.description || '暂无简介'
           if f.childrenForums.length && !disableChild
