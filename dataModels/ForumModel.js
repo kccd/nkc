@@ -116,6 +116,18 @@ const forumSchema = new Schema({
     default: true,
     index: 1
   },
+  // 文章列表是否显示文章摘要
+  displayPostAbstract: {
+    type: Boolean,
+    default: true,
+    index: 1
+  },
+  // 文章列表封面图位置 left: 左侧，right: 右侧，null: 不显示
+  postCoverPosition: {
+    type: String,
+    default: 'left',
+    index: 1
+  },
 
 	// 有权用户在导航可见
 	visibility: {

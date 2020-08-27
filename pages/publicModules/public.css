@@ -1472,14 +1472,14 @@ footer.footer ul li{
   color: #555;
 }
 .thread-panel-post{
-  max-height: 5.3rem;
+  max-height: 3.8rem;
   margin-bottom: 0.1rem;
   overflow: hidden;
   display: inline-block;
   display: -webkit-box;
   font-size: 1.25rem;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-flex-grow: 1;
   word-break: break-word;
   color: #555;
@@ -1543,12 +1543,10 @@ footer.footer ul li{
 }
 .thread-panel-cover-big{
   display: table-cell;
-  padding-right: 1rem;
   position: relative;
 }
 .thread-panel-cover{
   display: table-cell;
-  padding-right: 1rem;
 }
 .thread-panel-cover .thread-panel-image{
   height: 6.7rem;
@@ -1557,14 +1555,18 @@ footer.footer ul li{
   border-radius: 3px;
   background-size: cover;
 }
+.thread-panel-cover .thread-panel-image.min{
+  height: 5rem;
+  width: 8rem;
+}
 .thread-panel-content{
   display: table-cell;
   vertical-align: top;
 }
 .thread-panel-cover-big .thread-panel-image{
-  height: 11rem;
+  height: 10rem;
   margin-bottom: 0.5rem;
-  width: 17rem;
+  width: 15rem;
   border-radius: 3px;
   background-size: cover;
 }

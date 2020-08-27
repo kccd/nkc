@@ -515,6 +515,10 @@ router
 
 		data.type = 'latest';
 		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
+
+		data.displayPostAbstract = data.forum.displayPostAbstract;
+		data.postCoverPosition = data.forum.postCoverPosition;
+
 		await next();
 	})
   .use("/card", cardRouter.routes(), cardRouter.allowedMethods())

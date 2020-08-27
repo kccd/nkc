@@ -192,6 +192,30 @@ block content
                     label
                       input(type='radio' value='toc' v-model='forum.orderBy')
                       span 按发表时间
+              //displayPostAbstract
+              .form-group
+                label.col-sm-3.control-label 文章列表显示文章摘要
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='forum.displayPostAbstract')
+                      span 是
+                    label
+                      input(type='radio' :value='false' v-model='forum.displayPostAbstract')
+                      span 否
+              .form-group
+                label.col-sm-3.control-label 文章列表封面图位置
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='left' v-model='forum.postCoverPosition')
+                      span 左侧
+                    label.m-r-1
+                      input(type='radio' value='right' v-model='forum.postCoverPosition')
+                      span 右侧
+                    label
+                      input(type='radio' value='null' v-model='forum.postCoverPosition')
+                      span 不显示
               .form-group
                 label.col-sm-3.control-label 专业文库
                 .col-sm-7

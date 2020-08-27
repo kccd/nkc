@@ -1,3 +1,28 @@
+-const displayPostAbstract = data.displayPostAbstract !== undefined ? data.displayPostAbstract : state.displayPostAbstract;
+-let postCoverPosition;
+if !displayPostAbstract
+  -postCoverPosition = 'null';
+else
+  -postCoverPosition = data.postCoverPosition !== undefined ? data.postCoverPosition : state.postCoverPosition;
+
+mixin threadCover(klass)
+  if thread.firstPost.cover
+    -let imgClass = '';
+    if !displayPostAbstract
+      -imgClass = 'min'
+    .thread-panel-cover-big.hidden-xs.hidden-sm(class=klass)
+      .thread-panel-image(
+        class=imgClass
+        style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
+      )
+
+mixin minThreadCover(klass)
+  if thread.firstPost.cover
+    .thread-panel-cover.hidden-md.hidden-lg(class=klass)
+      .thread-panel-image(
+        style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
+      )
+
 .thread-panel(class=!thread.reviewed || thread.recycleMark || thread.disabled?"reviewed":"")
   if !thread.reviewed
     include ../module_review
@@ -6,12 +31,8 @@
   if thread.recycleMark
     include ../module_toDraft
   .thread-panel-body
-    //- 文章封面，pc端
-    if thread.firstPost.cover
-      .thread-panel-cover-big.hidden-xs.hidden-sm
-        .thread-panel-image(
-          style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
-        )
+    if postCoverPosition === 'left'
+      +threadCover('p-r-1')
     .thread-panel-content
       //- 作者信息 专业信息 时间
       .thread-panel-author-info
@@ -93,16 +114,20 @@
             span.thread-title-page ...
             -ellipsis = true;
       .thread-panel-abstract
-        if thread.firstPost.cover
-          .thread-panel-cover.hidden-md.hidden-lg
-            .thread-panel-image(
-              style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
-            )
+        if postCoverPosition === 'left'
+          +minThreadCover('p-r-1')
+        //
+          if thread.firstPost.cover
+            .thread-panel-cover.hidden-md.hidden-lg
+              .thread-panel-image(
+                style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`
+              )
         .thread-panel-abstract-content
-          if thread.firstPost.abstractCn
-            a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
-          else
-            a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.c.slice(0, 200)
+          if displayPostAbstract
+            if thread.firstPost.abstractCn
+              a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
+            else
+              a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.c.slice(0, 200)
           .thread-panel-reply
             a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
             if !thread.lastPost.anonymous
@@ -111,3 +136,7 @@
             else
               .thread-panel-reply-user
                 img(src=tools.getUrl("anonymousUserAvatar"))
+        if postCoverPosition === 'right'
+          +minThreadCover('p-l-1')
+    if postCoverPosition === 'right'
+      +threadCover('p-l-1')
