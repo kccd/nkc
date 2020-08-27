@@ -27,11 +27,11 @@ permissionRouter
     const {forum} = data;
     let {
       accessible, displayOnParent, visibility, isVisibleForNCC,
-      displayOnSearch,
+      displayOnSearch, displayPostAbstract, postCoverPosition,
       shareLimitCount, shareLimitTime, allowedAnonymousPost,
       moderators, subType, openReduceVisits, permission, orderBy
     } = body.forum;
-    const {read, write} = permission;
+    const {read, write, writePost} = permission;
     shareLimitCount = Number(shareLimitCount);
     shareLimitTime = Number(shareLimitTime);
     checkNumber(shareLimitCount, {
@@ -56,10 +56,13 @@ permissionRouter
     read.gradesId = read.gradesId.filter(g => gradesId.includes(g));
     write.rolesId = write.rolesId.filter(r => rolesId.includes(r));
     write.gradesId = write.gradesId.filter(g => gradesId.includes(g));
+    writePost.rolesId = writePost.rolesId.filter(r => rolesId.includes(r));
+    writePost.gradesId = writePost.gradesId.filter(g => gradesId.includes(g));
     const relations = [`and`, 'or'];
-    if(!relations.includes(read.relation) || !relations.includes(write.relation)) {
+    if(!relations.includes(read.relation) || !relations.includes(write.relation) || !relations.includes(writePost.relation)) {
       ctx.throw(400, '请选择证书等级关系');
     }
+    if(!['left', 'right', 'null'].includes(postCoverPosition)) ctx.throw(400, `文章列表封面图设置错误 position: ${postCoverPosition}`);
     await db.ForumModel.updateOne({fid: forum.fid}, {
       $set: {
         accessible: !!accessible,
@@ -69,6 +72,8 @@ permissionRouter
         allowedAnonymousPost: !!allowedAnonymousPost,
         openReduceVisits: !!openReduceVisits,
         displayOnSearch: !!displayOnSearch,
+        displayPostAbstract: !!displayPostAbstract,
+        postCoverPosition,
         moderators,
         shareLimitTime,
         orderBy,

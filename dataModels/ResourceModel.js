@@ -115,10 +115,12 @@ const resourceSchema = new Schema({
     default: 'inProcess'
   }
 },
-{toObject: {
-  getters: true,
-  virtuals: true
-}});
+{
+  toObject: {
+    getters: true,
+    virtuals: true
+  }
+});
 
 
 resourceSchema.virtual('isFileExist')
@@ -126,7 +128,7 @@ resourceSchema.virtual('isFileExist')
     return this._isFileExist;
   })
   .set(function(val) {
-    return this._isFileExist = val;
+    return this._isFileExist = val
   });
 
 /**
@@ -183,7 +185,11 @@ resourceSchema.statics.toReferenceSource = async function(id, declare) {
 // 查找一个post引用的所有source
 resourceSchema.statics.getResourcesByReference = async function(id) {
   let model = mongoose.model("resources");
-  return await model.find({references: id});
+  let resources = await model.find({references: id});
+  for(let resource of resources) {
+    await resource.setFileExist();
+  }
+  return resources;
 };
 
 /*

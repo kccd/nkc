@@ -23,6 +23,8 @@ infoRouter
 			return await next();
 		} else if(operation === "modifyForumLatestNotice") {
 			const {content} = body;
+			// 富文本内容中每一个source添加引用
+			await db.ResourceModel.toReferenceSource("forum-notice-" + forum.fid, content);
 			await forum.update({latestBlockNotice: content});
 			data.redirect = `/f/${forum.fid}`;
 			return await next();

@@ -106,7 +106,10 @@ module.exports = async (ctx, next) => {
         appPlatForm: "android",
         stable: true,
         disabled: false
-      })
+      }),
+      // 临时 后期加入后台设置
+      displayPostAbstract: true,
+      postCoverPosition: 'left',
     };
 
     // 判断是否为APP发起的请求

@@ -10,6 +10,7 @@ const cardRouter = require("./card");
 const Router = require('koa-router');
 const path = require('path');
 const router = new Router();
+const nkcRender = require("../../nkcModules/nkcRender");
 router
   /*.get('/', async (ctx) => {
 		const {data, params, db} = ctx;
@@ -364,6 +365,20 @@ router
 			// 最近访问的专业
 			data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId.slice(0, 10));
 		}
+		// 渲染最新板块公告
+		let latestBlockNotice = data.forum.latestBlockNotice;
+		let resources = await db.ResourceModel.getResourcesByReference("forum-notice-"+ forum.fid);
+		for(let resource of resources) {
+			await resource.setFileExist();
+		}
+		data.forum.latestBlockNotice = nkcRender.renderHTML({
+			type: "article",
+			post: {
+				c: latestBlockNotice,
+				resources
+			},
+			user: data.user
+		});
 
 		ctx.template = 'forum/forum.pug';
 		await next();
@@ -515,6 +530,10 @@ router
 
 		data.type = 'latest';
 		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
+
+		data.displayPostAbstract = data.forum.displayPostAbstract;
+		data.postCoverPosition = data.forum.postCoverPosition;
+
 		await next();
 	})
   .use("/card", cardRouter.routes(), cardRouter.allowedMethods())

@@ -51,7 +51,7 @@ router
     data.results = [];
 
     const readableForumsId = await db.ForumModel.getReadableForumsIdByUid(user.uid);
-    const displayOnSearchForumsId = await db.ForumModel.displayOnSearchForumsId();
+    const displayOnSearchForumsId = await db.ForumModel.getDisplayOnSearchForumsIdFromRedis();
     const fidOfCanGetThreads = readableForumsId.filter(id => displayOnSearchForumsId.includes(id));
     /*const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(
       data.userRoles,

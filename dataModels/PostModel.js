@@ -496,7 +496,6 @@ postSchema.pre("save", async function(next) {
 });
 */
 
-
 // 保存POST前检测内容是否有@
 postSchema.pre('save', async function(next) {
   // analyzing the content(post.c) to find p.atUsers change
