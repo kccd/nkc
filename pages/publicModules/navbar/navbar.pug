@@ -43,21 +43,21 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         if data.user
           li(class=navbar_highlight === 'home' ? 'active' : '')
             a(href='/?t=home') 主页
-          li(class=navbar_highlight === 'profile'? 'active':'')
-            a(href=`/u/${data.user.uid}/profile`) 我的
           //-li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
             a(href='/?t=latest') 最新
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
             a(href='/?t=subscribe') 关注
+          li(class=navbar_highlight === 'profile' ? 'active' : '')
+            a(href=`/u/${data.user.uid}/profile`) 我的
         else
           li(class=navbar_highlight === 'home' ? 'active' : '')
             a(href='/?t=home') 主页
           //li(class=navbar_highlight === 'latest' || navbar_highlight === 'column' || navbar_highlight === 'recommend' ? 'active' : '')
             a(href='/?t=latest') 最新
-          li(class=navbar_highlight === 'profile' ? 'active' : '')
-            a.pointer(onclick="Login.open('login')") 我的
           li(class=navbar_highlight === 'subscribe' ? 'active' : '')
             a.pointer(onclick="Login.open('login')") 关注
+          li(class=navbar_highlight === 'profile' ? 'active' : '')
+            a.pointer(onclick="Login.open('login')") 我的
 
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if data.user
@@ -155,12 +155,15 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       .col-xs-4
         a(href='/?t=home') 主页
       .col-xs-4
-        a(href='/?t=latest') 最新
-      .col-xs-4
         if data.user
           a(href='/?t=subscribe') 关注
         else
           a(onclick="Login.open()") 关注
+      .col-xs-4
+        if data.user
+          a(href=`/u/${data.user.uid}/profile`) 我的
+        else
+          a(onclick="Login.open()") 我的
     .m-a-1#navbar_custom_dom
 
     .m-a-1
