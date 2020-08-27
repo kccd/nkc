@@ -21,7 +21,7 @@ var app = new Vue({
       if(time < 0) {
         time = 0;
         this.timeOut = true;
-      };
+      }
       var minutes = Math.floor(time/(1000*60));
       var seconds = Math.floor((time - minutes*60*1000)/1000);
       if(minutes < 10) minutes = '0' + minutes;
@@ -76,7 +76,9 @@ var app = new Vue({
         setInterval(function() {
           app.compute();
         }, 500);
-        NKC.methods.renderFormula();
+        setTimeout(function() {
+          NKC.methods.renderFormula();
+        }, 500)
       })
       .catch(function(err) {
         screenTopWarning(err);
