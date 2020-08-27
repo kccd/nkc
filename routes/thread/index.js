@@ -216,7 +216,7 @@ threadRouter
     // 文章的专业导航
     data.forumsNav = [];
     for(const f of thread.mainForumsId) {
-      const nav = await db.ForumModel.getForumNav(fidOfCanGetThreads, f);
+      const nav = await db.ForumModel.getForumNav(f);
       if(nav.length) data.forumsNav.push(nav);
     }
     // 判断用户是否具有专家权限

@@ -58,6 +58,11 @@ block content
                   <label class="radio-inline">
                   <input type="radio" :value="false" v-model='forum.displayOnSearch'> 否
                   </label>
+
+            p.text-danger
+              | 若「总开关」设置为「关」，则其余设置均默认为「否」。
+              br
+              | 若「导航可见」设置为「否」，则「无权用户在导航可见」默认为「否」。
         .panel.panel-default
           .panel-heading 阅读权限
           .panel-body
