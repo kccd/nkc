@@ -77,101 +77,59 @@ block content
               .col-xs-12.col-md-6.detailed-forums-padding-left
                 +normalForumList(ff, true)
 
-  .home-top
-    .container-fluid.max-width
-      //- 只有封面图的文章入口 轮播
-      .col-xs-12.col-md-12.home-covers
-        .row.m-t-05.m-b-05
-          .col-xs-12.col-md-6.home-covers-md
-            .swiper-container.swiper-home
-              .swiper-wrapper
-                for thread in data.ads.movable
-                  a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
-                    'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
-                  })
-                    .swiper-title= `${thread.title}`
-              .swiper-pagination
-              .swiper-button-next.swiper-button(style='background-image: none;')
-                .fa.fa-angle-right
-              .swiper-button-prev.swiper-button(style='background-image: none;')
-                .fa.fa-angle-left
-          .col-xs-12.col-md-6.hidden-xs.hidden-sm
-            .row.home-covers-sm
-              for thread in data.ads.fixed
-                .home-cover-sm
-                  a(href=`/t/${thread.tid}` target="_blank" title=thread.title)
-                    .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
-                    .home-covers-sm-title=thread.title
-        .hidden-md.hidden-lg.hidden-sm.home-buttons
-          .col-xs-4
-            a(href=`/?t=latest`) 最新
-          .col-xs-4
-            if data.user
-              a(href=`/?t=subscribe`) 关注
-            else
-              a(onclick=`Login.open()`) 关注
-          .col-xs-4
-            if data.user
-              a(href=`/u/${data.user.uid}/profile`) 我的
-            else
-              a(onclick=`Login.open()`) 我的
-        .row
-          if data.user && data.visitedForums.length
-            .col-xs-12.col-md-8
-              .home-forums-list.m-b-1
-                .home-header
-                  .header-name 最近访问
-                .home-visited-forums
-                  for f in data.visitedForums
-                    a.home-visited-forum(href=`/f/${f.fid}` data-float-fid=f.fid)
-                      if f.logo
-                        img.home-visited-forum-icon(src=tools.getUrl("forumLogo", f.logo))
-                      else
-                        .home-visited-forum-icon(style=`background-color: ${f.color}`)
-                      span=f.displayName
-          if data.recommendForums.length
-            .col-xs-12(class=data.user && data.visitedForums.length?"col-md-4":"col-md-12")
-              .home-forums-list
-                .home-header
-                  //.fa.fa-tags
-                  .header-name 推荐专业
-                  //.header-description 热门专业推荐
-                .home-subscribes.recommend
-                  for forum, index in data.recommendForums
-                    if data.user && data.visitedForums.length && index > 4
-                      -break;
-                    a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
-                      .home-subscribe-forum-avatar
-                        if forum.logo
-                          img(src=tools.getUrl("forumLogo", forum.logo))
-                        else
-                          div(style=`background-color: ${forum.color}`)
-                      .home-subscribe-forum-info=forum.displayName
 
   .container-fluid.max-width
     .row
+      .col-xs-12.col-md-12.box-shadow-panel
+        //- 只有封面图的文章入口 轮播
+        .home-top
+          .home-covers
+            .row.m-t-05.m-b-05
+              .col-xs-12.col-md-6.home-covers-md
+                .swiper-container.swiper-home
+                  .swiper-wrapper
+                    for thread in data.ads.movable
+                      a.swiper-slide(href=`/t/${thread.tid}` target="_blank" style={
+                        'background-image': `url(${tools.getUrl('recommendThreadCover', thread.cover)})`
+                      })
+                        .swiper-title= `${thread.title}`
+                  .swiper-pagination
+                  .swiper-button-next.swiper-button(style='background-image: none;')
+                    .fa.fa-angle-right
+                  .swiper-button-prev.swiper-button(style='background-image: none;')
+                    .fa.fa-angle-left
+              .col-xs-12.col-md-6.hidden-xs.hidden-sm
+                .row.home-covers-sm
+                  for thread in data.ads.fixed
+                    .home-cover-sm
+                      a(href=`/t/${thread.tid}` target="_blank" title=thread.title)
+                        .home-covers-sm-img(style=`background-image:url(${tools.getUrl('recommendThreadCover', thread.cover)})`)
+                        .home-covers-sm-title=thread.title
+            .hidden-md.hidden-lg.hidden-sm.home-buttons
+              .col-xs-4
+                a(href=`/?t=latest`) 最新
+              .col-xs-4
+                if data.user
+                  a(href=`/?t=subscribe`) 关注
+                else
+                  a(onclick=`Login.open()`) 关注
+              .col-xs-4
+                if data.user
+                  a(href=`/u/${data.user.uid}/profile`) 我的
+                else
+                  a(onclick=`Login.open()`) 我的
       //- 专业地图
       .col-xs-12.col-md-8.home-forums.box-shadow-panel
-        if data.user && data.subForums.length
+
+        if data.toppedThreads.length
           .home-forums-list.m-b-1
             .home-header
-              //.fa.fa-tags
-              .header-name 关注的专业
-              //.header-description 关注最新话题，足不出户便能游遍世界~
-            .home-subscribes
-              if data.subscribesDisplayMode === "column"
-                for forum in data.subForums
-                  include ./subscribes_column
-              if data.subscribesDisplayMode === "row" || !data.subscribesDisplayMode
-                for forum in data.subForums
-                  a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
-                    .home-subscribe-forum-avatar
-                      if forum.logo
-                        img(src=tools.getUrl("forumLogo", forum.logo))
-                      else
-                        div(style=`background-color: ${forum.color}`)
-                    .home-subscribe-forum-info=forum.displayName
-
+              //-.fa.fa-tags
+              .header-name 置顶
+            .home-threads.p-t-05
+              for thread in data.toppedThreads
+                include ../publicModules/thread_panel/thread_panel
+      
         if data.columns.length
           .home-forums-list.m-b-1
             .home-header
@@ -189,14 +147,6 @@ block content
                 a(href=`/column/apply`) 开设专栏
                 .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
 
-        if data.toppedThreads.length
-          .home-forums-list.m-b-1
-            .home-header
-              //-.fa.fa-tags
-              .header-name 置顶
-            .home-threads.p-t-05
-              for thread in data.toppedThreads
-                include ../publicModules/thread_panel/thread_panel
         if data.originalThreads.length
           .home-forums-list.m-b-1
             .home-header
@@ -210,6 +160,7 @@ block content
                 for thread in data.originalThreads
                   include ../publicModules/thread_panel/thread_panel
               a.home-threads-more-link(href=`/?t=latest`) 查看全部新讨论
+        
         for cf in data.categoryForums
           .home-forums-list.m-b-1
             .home-header
@@ -277,6 +228,26 @@ block content
                   span=f.displayName
 
       .col-xs-12.col-md-4.box-shadow-panel.p-l-0
+        if data.user && data.subForums.length
+          .home-forums-list.m-b-1
+            .home-header
+              //.fa.fa-tags
+              .header-name 关注的专业
+              //.header-description 关注最新话题，足不出户便能游遍世界~
+            .home-subscribes
+              if data.subscribesDisplayMode === "column"
+                for forum in data.subForums
+                  include ./subscribes_column
+              if data.subscribesDisplayMode === "row" || !data.subscribesDisplayMode
+                for forum in data.subForums
+                  a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
+                    .home-subscribe-forum-avatar
+                      if forum.logo
+                        img(src=tools.getUrl("forumLogo", forum.logo))
+                      else
+                        div(style=`background-color: ${forum.color}`)
+                    .home-subscribe-forum-info=forum.displayName
+
         .m-b-1
           include ../publicModules/canvas_logo
         include ../publicModules/improveUserInfo
