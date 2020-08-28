@@ -71,10 +71,10 @@ block body
     script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
     +includeJS('/socket.io-client/dist/socket.io.js')
     //- 通用socket
-    if !state.isApp
+    //if !state.isApp
       //- 接入即时通信
       //- +includeJS('/socket/commonSocket.js')
-      +includeJS('/message/socket.js')
+    +includeJS('/message/socket.js')
 
     //- 新增好评
     if data.user.newVoteUp > 0
