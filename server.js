@@ -71,6 +71,7 @@ const start = async () => {
     const port = Number(serverConfig.port) + global.NKC.processId;
     const address = serverConfig.address;
     server = http.createServer(app);
+    server.keepAliveTimeout = 10 * 1000;
     server.listen(port, address, async () => {
       await socket(server);
       console.log(`nkc ${global.NKC.NODE_ENV} server listening on ${port}`.green);
