@@ -35,25 +35,26 @@ var setNewMessageNumber = function(number) {
   messageCount.html(number);
 };
 
-socket.on('message', function(data) {
-  if(!data.message) return;
-  var ty = data.message.ty;
-  if(!ty) return;
-  if(ty === 'STE') {
-    newMessageRemind('notice');
-  } else if(ty === 'STU') {
-    newMessageRemind('reminder');
-  } else if(ty === 'UTU') {
-    var user = data.user;
-    var myUid = data.myUid;
-    if(user.uid !== myUid) {
-      newMessageRemind('message');
+if(!NKC.configs.isApp) {
+  socket.on('message', function(data) {
+    if(!data.message) return;
+    var ty = data.message.ty;
+    if(!ty) return;
+    if(ty === 'STE') {
+      newMessageRemind('notice');
+    } else if(ty === 'STU') {
+      newMessageRemind('reminder');
+    } else if(ty === 'UTU') {
+      var user = data.user;
+      var myUid = data.myUid;
+      if(user.uid !== myUid) {
+        newMessageRemind('message');
+      }
+    } else if(ty === 'friendsApplication') {
+      newMessageRemind('friendsApplication');
     }
-  } else if(ty === 'friendsApplication') {
-    newMessageRemind('friendsApplication');
-  }
-});
-
+  });
+}
 function newMessageRemind(name) {
   if(pageName && pageName === 'message') return;
   beep(name);

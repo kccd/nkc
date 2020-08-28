@@ -1798,17 +1798,17 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
   const ForumModel = mongoose.model('forums');
   const {grade: userGrade, roles: userRoles, uid} = user;
   const userRolesId = userRoles.map(r => r._id);
-  const userGradeId = userGrade._id;
+  const userGradeId = userGrade? userGrade._id: null;
   for(const id of fid) {
     if(['write', 'writePost'].includes(type) && id === recycleId) throwErr(400, `不允许发表内容到回收站，请更换专业`);
     const forum = await ForumModel.getForumByIdFromRedis(fid);
-    if(forum.moderators.includes(uid)) continue;
     if(!forum) throwErr(400, `专业id错误 fid:${fid}`);
+    if(uid && forum.moderators.includes(uid)) continue;
     const {accessible, permission, displayName} = forum;
     const {rolesId, gradesId, relation} = permission[type];
     if(!accessible) throwErr(`专业「${displayName}」暂未开放，请更换专业`);
 
-    let hasRole = false, hasGrade = gradesId.includes(userGradeId);
+    let hasRole = false, hasGrade = userGradeId && gradesId.includes(userGradeId);
     for(const userRoleId of userRolesId) {
       if(rolesId.includes(userRoleId)) {
         hasRole = true;
@@ -1861,9 +1861,21 @@ forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
 * @param {[String]} [fid, fid, ...] 专业ID
 * */
 forumSchema.statics.checkReadPermission = async (uid, fid) => {
-  const user = await mongoose.model('users').findOnly({uid});
-  await user.extendRoles();
-  await user.extendGrade();
+  const RoleModel = mongoose.model('roles');
+  const UserModel = mongoose.model('users');
+  let user;
+  if(uid === null) {
+    const visitorRole = await RoleModel.extendRole('visitor');
+    user = {
+      uid: null,
+      grade: null,
+      roles: [visitorRole]
+    }
+  } else {
+    user = await UserModel.findOnly({uid});
+    await user.extendRoles();
+    await user.extendGrade();
+  }
   await mongoose.model('forums').checkPermission('read', user, fid);
 };
 
@@ -1874,10 +1886,21 @@ forumSchema.statics.checkReadPermission = async (uid, fid) => {
 * */
 forumSchema.statics.getReadableForumsIdByUid = async (uid) => {
   const ForumModel = mongoose.model('forums');
+  const RoleModel = mongoose.model('roles');
   const UserModel = mongoose.model('users');
-  const user = await UserModel.findOnly({uid});
-  await user.extendRoles();
-  await user.extendGrade();
+  let user;
+  if(!uid) {
+    const visitorRole = await RoleModel.extendRole('visitor');
+    user = {
+      uid: null,
+      grade: null,
+      roles: [visitorRole]
+    }
+  } else {
+    user = await UserModel.findOnly({uid});
+    await user.extendRoles();
+    await user.extendGrade();
+  }
   const forumsId = await ForumModel.getAllForumsIdFromRedis();
   const results = [];
   for(const fid of forumsId) {
