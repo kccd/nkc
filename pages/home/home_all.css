@@ -278,9 +278,10 @@ body {
 }
 .home-top {
   background-color: #fff;
-  padding: 4rem 0 0.5rem 0;
+  padding: 0.5rem 0 0.5rem 0;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
+  margin-top: 56px;
 }
 .home-top .home-covers {
   padding: 0;
