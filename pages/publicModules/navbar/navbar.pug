@@ -6,6 +6,7 @@ if data.user
   -var newMessage = data.user.newMessage;
   -var messageSum = (newMessage.newReminderCount || 0) + (newMessage.newSystemInfoCount || 0) + (newMessage.newUsersMessagesCount || 0) + (newMessage.newApplicationsCount || 0);
 nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;margin-bottom: 15px;")
+
   .container-fluid.max-width
     .navbar-header
       button.navbar-toggle.collapsed(onclick="toggleNKCDrawer('left')")
@@ -14,10 +15,12 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         span.icon-bar
         span.icon-bar
       a.navbar-brand.website-logo(href="/" )= state.serverSettings.websiteName
-      form.navbar-search.hidden-lg.hidden-md.hidden-sm.inline-block.form-inline(action='/search' method='GET')
-        input.inline-block.form-control(type='text' name='c' placeholder='关键词 文号 用户')
-        button.btn.btn-default(type='submit')
+
+      form.navbar-search.hidden-lg.hidden-md.hidden-sm.inline-block.form-inline
+        input.inline-block.form-control(type='text' id="navSearchInputSM" placeholder='关键词 文号 用户')
+        button.btn.btn-default(onclick=`NKC.methods.search("navSearchInputSM")`)
           .fa.fa-search
+
       if data.user
         //- 已登录状态 显示头像
         .navbar-brand.userInfo-m
@@ -139,9 +142,10 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
             a(onclick="Login.open()" title='还记得密码吗？') 登录
           li.userInfo
             a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
-      form.navbar-md.navbar-search.hidden-xs.inline-block.form-inline(action='/search' method='GET')
-        input.inline-block.form-control(type='text' name='c' placeholder='关键词 文号 用户')
-        button.btn.btn-default(type='submit')
+
+      form.navbar-md.navbar-search.hidden-xs.inline-block.form-inline
+        input.inline-block.form-control(type='text' id='navSearchInputMD' placeholder='关键词 文号 用户')
+        button.btn.btn-default(onclick=`NKC.methods.search("navSearchInputMD")`)
           .fa.fa-search
 
 //- 侧滑抽屉
