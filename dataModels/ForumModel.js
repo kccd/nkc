@@ -1801,8 +1801,8 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
   const userGradeId = userGrade? userGrade._id: null;
   for(const id of fid) {
     if(['write', 'writePost'].includes(type) && id === recycleId) throwErr(400, `不允许发表内容到回收站，请更换专业`);
-    const forum = await ForumModel.getForumByIdFromRedis(fid);
-    if(!forum) throwErr(400, `专业id错误 fid:${fid}`);
+    const forum = await ForumModel.getForumByIdFromRedis(id);
+    if(!forum) throwErr(400, `专业id错误 fid: ${id}`);
     if(uid && forum.moderators.includes(uid)) continue;
     const {accessible, permission, displayName} = forum;
     const {rolesId, gradesId, relation} = permission[type];
