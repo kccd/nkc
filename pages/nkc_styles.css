@@ -2930,7 +2930,7 @@ img.emoji {
 .thread-management{
   margin-bottom: 0;
   /*border-bottom: 1px solid #e9e9e9;*/
-  padding-bottom: 1rem;
+  /*padding-bottom: 1rem;*/
 }
 .thread-management .title>span{
   margin-right: 0.5rem;
@@ -4287,6 +4287,7 @@ span[data-tag="nkcsource"][data-type="xsf"]>span:last-child{
 .topped-post .fa{
   /*color: #2b90d9;*/
 }
+
 @media only screen and (max-width : 480px) {
   .moSlide {
     display: block

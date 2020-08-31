@@ -228,6 +228,9 @@ threadRouter
         if(isModerator) break;
       }
     }
+    // 页面顶部导航
+    data.threadNav = await thread.getThreadNav();
+    data.collectedCount = await db.ThreadModel.getCollectedCountByTid(thread.tid);
 		data.isModerator = isModerator;
 
     // 文章处于待审核的状态

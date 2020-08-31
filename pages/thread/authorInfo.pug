@@ -7,7 +7,7 @@
   .thread-author-avatar
     img(src=tools.getUrl("userAvatar", author.avatar))
   .thread-author-base
-    a(href=`/u/${author.uid}`).thread-author-name=author.username
+    a(href=`/u/${author.uid}` target='_blank').thread-author-name=author.username
     .thread-author-cert
       img(src=tools.getUrl("gradeIcon", author.grade._id) title=author.grade.displayName)
       span(title=author.info.certsName)=author.info.certsName
@@ -24,11 +24,11 @@
     .thread-author-time=`${format('YYYY/MM/DD', author.toc)}注册，${fromNow(author.tlv)}活动`
   .thread-author-description!=markdown_safe(author.description) || "暂无简介"
   .thread-author-links
-    a(href=`/u/${author.uid}`).thread-author-link 名片
+    a(href=`/u/${author.uid}` target='_blank').thread-author-link 名片
     if author.column
-      a(href=`/m/${author.column._id}`).thread-author-link 专栏
+      a(href=`/m/${author.column._id}` target='_blank').thread-author-link 专栏
     if data.user
-      a(href=`/message?uid=${author.uid}`).thread-author-link 私信
+      a(href=`/message?uid=${author.uid}` target='_blank').thread-author-link 私信
     else
       a.pointer(onclick="NKC.methods.toLogin()").thread-author-link 私信
     if(data.userOperationsId.includes('bannedUser') && !author.certs.includes('banned'))
