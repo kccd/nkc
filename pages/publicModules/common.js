@@ -863,5 +863,5 @@ NKC.methods.search = function(inputId) {
   var input = $('#' + inputId);
   if(!input.length) return;
   var c = input.val();
-  window.open("/search?c=" + c);
+  window.open("/search?c=" + encodeURI(c));
 }
