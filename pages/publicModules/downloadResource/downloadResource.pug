@@ -1,0 +1,13 @@
++includeCSS("/publicModules/downloadResource/downloadResource.css")
+#moduleDownloadResource
+
+  #moduleDownloadResourceApp
+    .module-header
+      .module-sd-title 下载资料
+      .module-sd-close.fa.fa-close(@click="close")
+    .module-sd-body
+      .module-content
+        iframe(src="/r/956300?t=attachment", frameborder="0")
+        
+include ../moment
++includeJS("/publicModules/downloadResource/downloadResource.js") 

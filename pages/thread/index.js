@@ -1125,7 +1125,7 @@ function showPost(pid) {
 function switchPost(pid) {
 	var dom = $(".hide-post[data-pid='"+pid+"']");
   if(dom.hasClass("active")) {
-		var scrollY = window.scrollY;
+		var scrollY = $(document).scrollTop();
 		showPost(pid);
 		// 使滚动条卷去的高度不变，body向下伸展
 		scrollTo(0, scrollY);

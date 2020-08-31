@@ -1,0 +1,148 @@
+#moduleDownloadResource{
+  @import "../base";
+  display: none;
+  position: fixed;
+  width: 46rem;
+  max-width: 100%;
+  top: 100px;
+  right: 0;
+  z-index: 1050;
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  border: 1px solid #ddd;
+  .null{
+    margin-top: 5rem;
+    text-align: center;
+  }
+  .module-header{
+    height: 3rem;
+    line-height: 3rem;
+    background-color: #f6f6f6;
+    position: relative;
+    .module-sd-title{
+      margin-left: 1rem;
+      color: #666;
+      cursor: move;
+    }
+    .module-sd-close{
+      height: 3rem;
+      width: 3rem;
+      position: absolute;
+      top: 0;
+      right: 0;
+      text-align: center;
+      line-height: 3rem;
+      color: #888;
+      cursor: pointer;
+      &:hover{
+        color: #777;
+        background-color: #ddd;
+      }
+    }
+  }
+  .module-sd-body{
+    .module-content{
+      .module-drafts{
+        .paging-button{
+          padding: 0.5rem 1rem 0 1rem;
+        }
+        .module-draft:last-child{
+          border-bottom: none;
+        }
+        .module-draft-warning{
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          min-height: 2rem;
+          padding-top: 0.4rem;
+          padding-bottom: 0.2rem;
+          color: #888;
+          font-size: 1rem;
+          padding-left: 1rem;
+          left: 0;
+          background-color: #f6f6f6;
+        }
+        .module-draft{
+          padding: 0.3rem 1rem;
+          border-bottom: 1px solid #eee;
+          padding-right: 5.5rem;
+          position: relative;
+          &:hover{
+            background-color: #f6f6f6;
+          }
+          .module-buttons{
+            user-select: none;
+            position: absolute;
+            top: 0;
+            right: 0.5rem;
+            width: 5rem;
+            div{
+              font-size: 1rem;
+              color: @primary;
+              cursor: pointer;
+              margin-bottom: 0.5rem;
+              user-select: none;
+            }
+            div:first-child{
+              margin-top: 0.7rem;
+              margin-bottom: 0.5rem;
+            }
+            div:last-child{
+              span:first-child{
+                color: @accent;
+              }
+              span:last-child{
+                font-weight: 700;
+              }
+              span.disabled{
+                color: #aaa;
+                cursor: not-allowed;
+              }
+            }
+            div>span:hover{
+              opacity: 0.7;
+            }
+          }
+          .module-info{
+            font-size: 1rem;
+            font-style: oblique;
+            height: 1.4rem;
+            .hideText(@line: 1);
+            &>div{
+              display: inline;
+            }
+            .module-time{
+              color: @accent;
+            }
+            .module-from{
+              color: #666;
+            }
+          }
+          .module-article-title{
+            font-size: 1rem;
+            color: #666;
+            font-style: oblique;
+            height: 1.4rem;
+            .hideText(@line: 1);
+            span{
+              color: #333;
+              font-style: normal;
+            }
+          }
+          .module-article-content{
+            font-size: 1rem;
+            font-style: oblique;
+            color: #666;
+            max-height: 1.4rem;
+            .hideText(@line: 1);
+            overflow: hidden;
+            span{
+              font-style: normal;
+              color: #333;
+            }
+          }
+        }
+      }
+    }
+  }
+}
