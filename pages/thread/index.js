@@ -590,7 +590,8 @@ function goEditor(){
 	window.localStorage.replyHtml = ue.getContent();
 	//return console.log(window.localStorage)
 	// window.location = '/editor?type=thread&id='+replyTarget.trim().split('/')[1];
-	openToNewLocation('/editor?type=thread&id='+replyTarget.trim().split('/')[1])
+	// openToNewLocation('/editor?type=thread&id='+replyTarget.trim().split('/')[1])
+	NKC.methods.visitUrl('/editor?type=thread&id='+replyTarget.trim().split('/')[1], true);
 }
 
 

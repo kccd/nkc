@@ -411,6 +411,7 @@ let pugRender = (template, data, state) => {
       for(const id of operationsId) {
         if(data.userOperationsId.includes(id)) return true;
       }
+      return false;
     },
     permissionsAnd: (operationsId) => {
       for(const id of operationsId) {

@@ -429,24 +429,24 @@ settingSchema.statics.getDefaultScoreOperationByType = async (type) => {
 /*
 * 指定类型和专业id数组，获取积分策略对象
 * @param {String} type 操作名
-* @param {[String]} forumsId 专业id组成的数组
+* @param {String} forumId 专业id
 * @return {[Object]} 积分策略对象组成的数组
 * */
-settingSchema.statics.getScoreOperationsByType = async (type, forumsId = []) => {
+settingSchema.statics.getScoreOperationsByType = async (type, fid = '') => {
   const ScoreOperationModel = mongoose.model('scoreOperations');
   const SettingModel = mongoose.model('settings');
-  let scoreOperations = [];
-  if(forumsId.length) {
-    scoreOperations = await ScoreOperationModel.find({
+  let scoreOperation;
+  if(fid) {
+    scoreOperation = await ScoreOperationModel.findOne({
       type,
       from: 'forum',
-      fid: {$in: forumsId}
+      fid
     });
   }
-  if(!scoreOperations.length) {
-    scoreOperations[0] = await SettingModel.getDefaultScoreOperationByType(type);
+  if(!scoreOperation) {
+    scoreOperation = await SettingModel.getDefaultScoreOperationByType(type);
   }
-  return scoreOperations.filter(s => s.count !== 0);
+  if(scoreOperation.count !== 0) return scoreOperation;
 };
 /*
 * 获取所有默认积分策略操作对象

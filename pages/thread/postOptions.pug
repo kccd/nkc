@@ -5,7 +5,7 @@
   ul.dropdown-menu(style='left: auto;right: 0;' data-stopPropagation=true)
     if comment.url
       li
-        a(href=comment.url)
+        a(href=comment.url target='_blank')
           span.fa.fa-newspaper-o &nbsp;
           span 详情
     if permission("getPostAuthor") && comment.anonymous

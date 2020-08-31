@@ -908,6 +908,22 @@ $(function () {
       }
     }
   })();
+  ;(function() {
+    var initInput = function(input) {
+      var id = input.attr('id');
+      input.keydown(function(e) {
+        if(e.keyCode === 13) {
+          NKC.methods.search(id);
+        }
+      })
+    };
+
+    var navInput = $('.navbar-search input');
+    for(var i = 0; i < navInput.length; i++) {
+      var input = navInput.eq(i);
+      initInput(input);
+    }
+  })();
 
   // markDiv("#highlight");
 
