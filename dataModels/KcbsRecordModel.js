@@ -165,30 +165,24 @@ kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additi
   const KcbsRecordModel = mongoose.model('kcbsRecords');
   const UserModel = mongoose.model('users');
   const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
-  const apiFunction = require('../nkcModules/apiFunction');
   const {address: ip, port, data, state = {}} = ctx;
   if(!u) return;
-  let operations = await SettingModel.getScoreOperationsByType(type, state._scoreOperationForumsId); // 专业ID待传
-  if(!operations.length) return;
+  let fid = '';
+  // 多专业情况下 所有有关积分的数据仅从第一个专业上读取
+  if(state._scoreOperationForumsId && state._scoreOperationForumsId.length) {
+    fid = state._scoreOperationForumsId[0];
+  }
+  const operation = await SettingModel.getScoreOperationsByType(type, fid); // 专业ID待传
+  if(!operation) return;
+  if(operation.from === 'default') fid = '';
   const enabledScores = await SettingModel.getEnabledScores();
   const scores = {};
   // 获取当天此人当前操作执行的次数
-  const operationLogCount = await ScoreOperationLogModel.getOperationLogCount(u, type);
-  operations = operations.filter(o => o.count === -1 || o.count > operationLogCount);
-  if(!operations.length) return;
-  for(const o of operations) {
-    for(const e of enabledScores) {
-      const scoreType = e.type;
-      const oldScoreNumber = scores[scoreType];
-      const newScoreNumber = o[scoreType];
-      if(newScoreNumber === undefined) continue;
-      if(
-        oldScoreNumber === undefined ||
-        oldScoreNumber < newScoreNumber
-      ) {
-        scores[scoreType] = newScoreNumber;
-      }
-    }
+  const operationLogCount = await ScoreOperationLogModel.getOperationLogCount(u, type, fid);
+  if(operation.count !== -1 && operation.count <= operationLogCount) return;
+  for(const e of enabledScores) {
+    const scoreType = e.type;
+    scores[scoreType] = operation[scoreType];
   }
   let recordsId = [];
   for(const enabledScore of enabledScores) {
@@ -261,6 +255,7 @@ kcbsRecordSchema.statics.insertSystemRecordContent = async (type, u, ctx, additi
       type,
       ip,
       port,
+      fid,
       recordsId
     });
     await scoreOperationLog.save();
