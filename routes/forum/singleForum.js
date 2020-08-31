@@ -8,39 +8,9 @@ const visitorRouter = require('./visitor');
 const libraryRouter = require("./library");
 const cardRouter = require("./card");
 const Router = require('koa-router');
-const path = require('path');
 const router = new Router();
 const nkcRender = require("../../nkcModules/nkcRender");
 router
-  /*.get('/', async (ctx) => {
-		const {data, params, db} = ctx;
-		const {user} = data;
-		const {fid} = params;
-		const forum = await db.ForumModel.findOnly({fid});
-		if(ctx.query.token) {
-			if(user) {
-				const behavior = await db.UsersBehaviorModel.findOne({fid, uid: user.uid});
-				if(behavior) {
-					return ctx.redirect(`/f/${forum.fid}/latest?token=${ctx.query.token}`);
-				} else {
-					return ctx.redirect(`/f/${forum.fid}/home?token=${ctx.query.token}`);
-				}
-			} else {
-				return ctx.redirect(`/f/${forum.fid}/home?token=${ctx.query.token}`);
-			}
-		}else{
-			if(user) {
-				const behavior = await db.UsersBehaviorModel.findOne({fid, uid: user.uid});
-				if(behavior) {
-					return ctx.redirect(`/f/${forum.fid}/latest`);
-				} else {
-					return ctx.redirect(`/f/${forum.fid}/home`);
-				}
-			} else {
-				return ctx.redirect(`/f/${forum.fid}/home`);
-			}
-		}
-	})*/
 	.post('/', async (ctx, next) => {
 		const {data, params, db, address: ip, fs, query, nkcModules, state} = ctx;
 		const {ForumModel, ThreadModel, SubscribeModel} = db;
