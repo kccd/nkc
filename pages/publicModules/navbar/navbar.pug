@@ -16,7 +16,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         span.icon-bar
       a.navbar-brand.website-logo(href="/" )= state.serverSettings.websiteName
 
-      form.navbar-search.hidden-lg.hidden-md.hidden-sm.inline-block.form-inline
+      .navbar-search.hidden-lg.hidden-md.hidden-sm.inline-block.form-inline
         input.inline-block.form-control(type='text' id="navSearchInputSM" placeholder='关键词 文号 用户')
         button.btn.btn-default(onclick=`NKC.methods.search("navSearchInputSM")`)
           .fa.fa-search
@@ -143,7 +143,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
           li.userInfo
             a(onclick="Login.open('register')" title='恭喜！\n你发现了世界上\n最难注册的论坛') 注册
 
-      form.navbar-md.navbar-search.hidden-xs.inline-block.form-inline
+      .navbar-md.navbar-search.hidden-xs.inline-block.form-inline
         input.inline-block.form-control(type='text' id='navSearchInputMD' placeholder='关键词 文号 用户')
         button.btn.btn-default(onclick=`NKC.methods.search("navSearchInputMD")`)
           .fa.fa-search
