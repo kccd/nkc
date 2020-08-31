@@ -73,6 +73,7 @@ categoryRouter
 		await db.ForumModel.saveForumsIdToRedis("topic");
     await db.ForumModel.saveForumsIdToRedis("discipline");
     await db.ForumModel.saveForumToRedis(forum.fid);
+		await db.ForumCategoryModel.saveCategoryToRedis();
 		await next();
 	})
 	.post('/', async (ctx, next) => {

@@ -44,11 +44,25 @@ block content
                 label.col-sm-2.control-label 在父板块显示文章列表
                 .col-sm-10
                   <label class="radio-inline">
-                    <input type="radio" :value="true" v-model='forum.displayOnParent'> 是
+                  <input type="radio" :value="true" v-model='forum.displayOnParent'> 是
                   </label>
                   <label class="radio-inline">
-                    <input type="radio" :value="false" v-model='forum.displayOnParent'> 否
+                  <input type="radio" :value="false" v-model='forum.displayOnParent'> 否
                   </label>
+              .form-group
+                label.col-sm-2.control-label 在搜索页显示文章
+                .col-sm-10
+                  <label class="radio-inline">
+                  <input type="radio" :value="true" v-model='forum.displayOnSearch'> 是
+                  </label>
+                  <label class="radio-inline">
+                  <input type="radio" :value="false" v-model='forum.displayOnSearch'> 否
+                  </label>
+
+            p.text-danger
+              | 若「总开关」设置为「关」，则其余设置均默认为「否」。
+              br
+              | 若「导航可见」设置为「否」，则「无权用户在导航可见」默认为「否」。
         .panel.panel-default
           .panel-heading 阅读权限
           .panel-body
@@ -71,7 +85,7 @@ block content
                 input(type='radio' value='or' v-model='forum.permission.read.relation')
                 span 或
         .panel.panel-default
-          .panel-heading 发表权限
+          .panel-heading 发表权限（文章）
           .panel-body
             strong 证书
             .checkbox
@@ -90,6 +104,27 @@ block content
                 span 与
               label
                 input(type='radio' value='or' v-model='forum.permission.write.relation')
+                span 或
+        .panel.panel-default
+          .panel-heading 发表权限（回复和评论）
+          .panel-body
+            strong 证书
+            .checkbox
+              label(v-for='r in roles').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.writePost.rolesId')
+                span {{r.displayName}}
+            strong 等级
+            .checkbox
+              label(v-for='r in grades').m-r-1
+                input(type='checkbox' :value='r._id' v-model='forum.permission.writePost.gradesId')
+                span {{r.displayName}}
+            strong 证书等级关系
+            .radio
+              label.m-r-1
+                input(type='radio' value='and' v-model='forum.permission.writePost.relation')
+                span 与
+              label
+                input(type='radio' value='or' v-model='forum.permission.writePost.relation')
                 span 或
         .panel.panel-default
           .panel-heading 主管专家
@@ -157,6 +192,30 @@ block content
                     label
                       input(type='radio' value='toc' v-model='forum.orderBy')
                       span 按发表时间
+              //displayPostAbstract
+              .form-group
+                label.col-sm-3.control-label 文章列表显示文章摘要
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' :value='true' v-model='forum.displayPostAbstract')
+                      span 是
+                    label
+                      input(type='radio' :value='false' v-model='forum.displayPostAbstract')
+                      span 否
+              .form-group
+                label.col-sm-3.control-label 文章列表封面图位置
+                .col-sm-7
+                  .radio
+                    label.m-r-1
+                      input(type='radio' value='left' v-model='forum.postCoverPosition')
+                      span 左侧
+                    label.m-r-1
+                      input(type='radio' value='right' v-model='forum.postCoverPosition')
+                      span 右侧
+                    label
+                      input(type='radio' value='null' v-model='forum.postCoverPosition')
+                      span 不显示
               .form-group
                 label.col-sm-3.control-label 专业文库
                 .col-sm-7

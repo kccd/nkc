@@ -13,13 +13,14 @@ for forum in state.forumsTree
 mixin renderForums(forums)
   for forum in forums
     .forum-block.hide-children
-      .forum-block-info(data-float-fid=forum.fid class=data.forum && data.forum.fid === forum.fid?"active": "")
+      .forum-block-info(class=data.forum && data.forum.fid === forum.fid?"active": "")
         //- 暂时调整 去掉专业导航中的专业图标
           if forum.iconFileName
             img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
           else
             .forum-block-icon(style=`background-color: ${forum.color}`)
-        a(href=`/f/${forum.fid}` class=(!forum.childrenForums || !forum.childrenForums.length)?"child":"parent").forum-block-name=forum.displayName
+        a(href=`/f/${forum.fid}` class=(!forum.childrenForums || !forum.childrenForums.length)?"child":"parent").forum-block-name
+          span(data-float-fid=forum.fid data-float-position='right')=forum.displayName
       if forum.childrenForums && forum.childrenForums.length
         -let inside = false;
         if data.forum && forum.childrenForums
@@ -42,26 +43,32 @@ if data.user && state.subForums && state.subForums.length >0
     .home-topic-item-div
       for forum in state.subForums
         .forum-block
-          .forum-block-info(data-float-fid=forum.fid)
+          .forum-block-info()
             //-
               if forum.iconFileName
                 img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
-            a(href=`/f/${forum.fid}`).forum-block-name=forum.displayName
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid data-float-position='right').forum-block-name=forum.displayName
 if data.forum && data.visitedForums && data.visitedForums.length
   .m-b-1
     .panel-header 最近访问
     .home-topic-item-div
       for forum in data.visitedForums
         .forum-block
-          .forum-block-info(data-float-fid=forum.fid)
+          .forum-block-info()
             //-
               if forum.iconFileName
                 img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
-            a(href=`/f/${forum.fid}`).forum-block-name=forum.displayName
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid data-float-position='right').forum-block-name=forum.displayName
+.m-b-1
+  .panel-header 文章汇总
+  .home-topic-item-div
+    .forum-block
+      .forum-block-info
+        a(href=`/?t=latest`).forum-block-name 最新文章
 for fc in state.categoryForums
   if fc.forums.length
     .m-b-1

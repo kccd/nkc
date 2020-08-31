@@ -855,3 +855,13 @@ NKC.methods.removeUserFromBlacklist = function(tUid) {
 NKC.methods.isPhone = function() {
   return /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent);
 }
+
+/*
+* 页面导航上的搜索
+* */
+NKC.methods.search = function(inputId) {
+  var input = $('#' + inputId);
+  if(!input.length) return;
+  var c = input.val();
+  window.open("/search?c=" + c, '_blank');
+}

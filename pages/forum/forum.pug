@@ -104,7 +104,7 @@ block content
                 include ../publicModules/mobile_drawer/right_drawer
               include ../publicModules/paging/forum_nav
 
-            if data.forum.declare && data.paging.page === 0
+            if data.forum.latestBlockNotice && data.paging.page === 0
               div.forum-declare.m-b-1!= data.forum.latestBlockNotice
 
             if data.threadTypes.length

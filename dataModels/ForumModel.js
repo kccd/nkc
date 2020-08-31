@@ -110,6 +110,25 @@ const forumSchema = new Schema({
 		index: 1
 	},
 
+  //在搜索页显示
+  displayOnSearch: {
+    type: Boolean,
+    default: true,
+    index: 1
+  },
+  // 文章列表是否显示文章摘要
+  displayPostAbstract: {
+    type: Boolean,
+    default: true,
+    index: 1
+  },
+  // 文章列表封面图位置 left: 左侧，right: 右侧，null: 不显示
+  postCoverPosition: {
+    type: String,
+    default: 'left',
+    index: 1
+  },
+
 	// 有权用户在导航可见
 	visibility: {
 		type: Boolean,
@@ -158,7 +177,23 @@ const forumSchema = new Schema({
 
   // 发表、阅读权限相关
   permission: {
+	  // 发表文章
     write: {
+      rolesId: {
+        type: [String],
+        default: ['dev'],
+      },
+      gradesId: {
+        type: [Number],
+        default: []
+      },
+      relation: {
+        type: String,
+        default: 'or'
+      }
+    },
+    // 发表回复和评论
+    writePost: {
       rolesId: {
         type: [String],
         default: ['dev'],
@@ -1479,18 +1514,9 @@ forumSchema.statics.getRecommendForums = async (fid = []) => {
 * @param {[String]} fids 当前用户能访问的专业ID所组成的数组
 * @param {String} fid 专业ID
 * */
-forumSchema.statics.getForumNav = async (fids = [], fid) => {
+forumSchema.statics.getForumNav = async (fid) => {
   const ForumModel = mongoose.model("forums");
-  const forums = await ForumModel.find({fid: {$in: fids}}, {
-    fid: 1,
-    displayName: 1,
-    parentsId: 1,
-    description: 1,
-    iconFileName: 1,
-    logo: 1,
-    banner: 1,
-    color: 1
-  });
+  const forums = await ForumModel.getAllForumsFromRedis();
   const forumsObj = {};
   forums.map(f => forumsObj[f.fid] = f);
   const results = [];
@@ -1629,28 +1655,79 @@ forumSchema.statics.getLatestThreadsFromRedis = async (fid) => {
 forumSchema.statics.saveAllForumsToRedis = async () => {
   const ForumModel = mongoose.model('forums');
   const forums = await ForumModel.find().sort({order: 1});
-  const forumsId = [];
   for(const _forum of forums) {
     const forum = _forum.toObject();
     const key = getRedisKeys(`forumData`, forum.fid);
     await client.setAsync(key, JSON.stringify(forum));
-    forumsId.push(forum.fid);
   }
   // 保存所有专业的id到redis
-  await ForumModel.saveAllForumsIdToRedis(forumsId);
+  await ForumModel.saveAllForumsIdToRedis(forums);
 };
 /*
-* 保存所有的专业ID到redis
+* 保存所有以下数据到redis
+* 1. 所有专业的ID
+* 2. 已开启专业的ID
+* 3. 导航可见的专业的ID
+* 4. 无权用户导航的专业的ID
+* 5. 在上级板块显示文章的专业ID
+* 6. 在搜索页显示文章的专业ID
 * @author pengxiguaa 2020/8/25
 * */
-forumSchema.statics.saveAllForumsIdToRedis = async (forumsId) => {
+forumSchema.statics.saveAllForumsIdToRedis = async (forums) => {
   const ForumModel = mongoose.model('forums');
-  if(!forumsId) {
-    const forums = await ForumModel.find({}, {fid: 1}).sort({order: 1});
-    forumsId = forums.map(f => f.fid);
+  let forumsId = [],
+    accessibleForumsId = [],
+    visibilityForumsId = [],
+    isVisibilityNCCForumsId = [],
+    displayOnParentForumsId = [],
+    displayOnSearchForumsId = [];
+  if(!forums) {
+    forums = await ForumModel.find({}, {
+      fid: 1,
+      accessible: 1,
+      visibility: 1,
+      isVisibilityNCC: 1,
+      displayOnParent: 1,
+      displayOnSearch: 1
+    }).sort({order: 1});
+  }
+  for(const forum of forums) {
+    const {
+      fid, accessible,
+      visibility,
+      isVisibilityNCC,
+      displayOnParent,
+      displayOnSearch
+    } = forum;
+    forumsId.push(fid);
+    // 总开关
+    if(accessible) {
+      accessibleForumsId.push(fid);
+      // 导航可见
+      if(visibility) {
+        visibilityForumsId.push(fid);
+        // 无权用户导航可见
+        if(isVisibilityNCC) {
+          isVisibilityNCCForumsId.push(fid);
+        }
+      }
+      // 在上级板块显示文章
+      if(displayOnParent) {
+        displayOnParentForumsId.push(fid);
+      }
+      // 在搜索页显示文章
+      if(displayOnSearch) {
+        displayOnSearchForumsId.push(fid);
+      }
+    }
   }
   const key = getRedisKeys(`forumsId`);
   await client.resetSetAsync(key, forumsId);
+  await client.resetSetAsync(getRedisKeys('accessibleForumsId'), accessibleForumsId);
+  await client.resetSetAsync(getRedisKeys('visibilityForumsId'), visibilityForumsId);
+  await client.resetSetAsync(getRedisKeys('isVisibilityNCCForumsId'), isVisibilityNCCForumsId);
+  await client.resetSetAsync(getRedisKeys('displayOnParentForumsId'), displayOnParentForumsId);
+  await client.resetSetAsync(getRedisKeys('displayOnSearchForumsId'), displayOnSearchForumsId);
 };
 /*
 * 从redis获取所有专业的id
@@ -1693,7 +1770,7 @@ forumSchema.statics.saveForumToRedis = async (fid) => {
   forum = forum.toObject();
   const key = getRedisKeys('forumData', forum.fid);
   await client.setAsync(key, JSON.stringify(forum));
-  await ForumModel.getAllForumsIdFromRedis();
+  await ForumModel.saveAllForumsIdToRedis();
 };
 
 /*
@@ -1708,6 +1785,7 @@ forumSchema.statics.getForumByIdFromRedis = async (fid) => {
   return forum? JSON.parse(forum): null;
 };
 
+
 /*
 * 检查用户在指定专业的权限
 * @param {String} type 执行权限类型 write: 发表, read: 阅读
@@ -1720,17 +1798,17 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
   const ForumModel = mongoose.model('forums');
   const {grade: userGrade, roles: userRoles, uid} = user;
   const userRolesId = userRoles.map(r => r._id);
-  const userGradeId = userGrade._id;
+  const userGradeId = userGrade? userGrade._id: null;
   for(const id of fid) {
-    if(id === recycleId) throwErr(400, `不允许发表文章到回收站，请更换专业`);
-    const forum = await ForumModel.getForumByIdFromRedis(fid);
-    if(forum.moderators.includes(uid)) continue;
-    if(!forum) throwErr(400, `专业id错误 fid:${fid}`);
+    if(['write', 'writePost'].includes(type) && id === recycleId) throwErr(400, `不允许发表内容到回收站，请更换专业`);
+    const forum = await ForumModel.getForumByIdFromRedis(id);
+    if(!forum) throwErr(400, `专业id错误 fid: ${id}`);
+    if(uid && forum.moderators.includes(uid)) continue;
     const {accessible, permission, displayName} = forum;
     const {rolesId, gradesId, relation} = permission[type];
     if(!accessible) throwErr(`专业「${displayName}」暂未开放，请更换专业`);
 
-    let hasRole = false, hasGrade = gradesId.includes(userGradeId);
+    let hasRole = false, hasGrade = userGradeId && gradesId.includes(userGradeId);
     for(const userRoleId of userRolesId) {
       if(rolesId.includes(userRoleId)) {
         hasRole = true;
@@ -1741,12 +1819,18 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
       (relation === 'or' && !hasRole && !hasGrade) ||
       (relation === 'and' && (!hasRole || !hasGrade))
     ) {
-      throwErr(403, `你没有权限在专业「${displayName}」下发表内容，请更换专业`);
+      if(type === 'read') {
+        throwErr(403, `你没有权限阅读专业「${displayName}」下的内容，请更换专业`);
+      } else if(type === 'write') {
+        throwErr(403, `你没有权限在专业「${displayName}」下发表文章，请更换专业`);
+      } else {
+        throwErr(403, `你没有权限在专业「${displayName}」下发表回复或评论，请更换专业`);
+      }
     }
   }
 };
 /*
-* 验证用户是否能在指定专业发表内容
+* 验证用户是否能在指定专业发表文章
 * @param {[String]} 专业ID组成的数组
 * @param {String} uid 用户ID
 * @author pengxiguaa 2020/8/25
@@ -1759,14 +1843,39 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
 };
 
 /*
+* 验证用户是否能在指定的专业发表回复和评论
+* @param {[String]} 专业ID组成的数组
+* @param {String} uid 用户ID
+* @author pengxiguaa 2020/8/25
+* */
+forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
+  const user = await mongoose.model('users').findOnly({uid});
+  await user.extendRoles();
+  await user.extendGrade();
+  await mongoose.model('forums').checkPermission('writePost', user, fid);
+}
+
+/*
 * 验证用户是否有权阅读指定专业
 * @param {String} uid 用户ID
 * @param {[String]} [fid, fid, ...] 专业ID
 * */
 forumSchema.statics.checkReadPermission = async (uid, fid) => {
-  const user = await mongoose.model('users').findOnly({uid});
-  await user.extendRoles();
-  await user.extendGrade();
+  const RoleModel = mongoose.model('roles');
+  const UserModel = mongoose.model('users');
+  let user;
+  if(uid === null) {
+    const visitorRole = await RoleModel.extendRole('visitor');
+    user = {
+      uid: null,
+      grade: null,
+      roles: [visitorRole]
+    }
+  } else {
+    user = await UserModel.findOnly({uid});
+    await user.extendRoles();
+    await user.extendGrade();
+  }
   await mongoose.model('forums').checkPermission('read', user, fid);
 };
 
@@ -1775,12 +1884,23 @@ forumSchema.statics.checkReadPermission = async (uid, fid) => {
 * @param {String} uid 用户ID
 * @return {[String]} 可访问的专业
 * */
-forumSchema.statics.getReadableForumsByUid = async (uid) => {
+forumSchema.statics.getReadableForumsIdByUid = async (uid) => {
   const ForumModel = mongoose.model('forums');
+  const RoleModel = mongoose.model('roles');
   const UserModel = mongoose.model('users');
-  const user = await UserModel.findOnly({uid});
-  await user.extendRoles();
-  await user.extendGrade();
+  let user;
+  if(!uid) {
+    const visitorRole = await RoleModel.extendRole('visitor');
+    user = {
+      uid: null,
+      grade: null,
+      roles: [visitorRole]
+    }
+  } else {
+    user = await UserModel.findOnly({uid});
+    await user.extendRoles();
+    await user.extendGrade();
+  }
   const forumsId = await ForumModel.getAllForumsIdFromRedis();
   const results = [];
   for(const fid of forumsId) {
@@ -1790,6 +1910,53 @@ forumSchema.statics.getReadableForumsByUid = async (uid) => {
     } catch(err) {}
   }
   return results;
+};
+
+
+/*
+* 获取已开启的专业ID
+* @return {[String]}
+* @author pengxiguaa 2020/8/27
+* */
+forumSchema.statics.getAccessibleForumsIdFromRedis = async () => {
+  const key = getRedisKeys('accessibleForumsId');
+  return await client.smembersAsync(key);
+};
+/*
+* 获取导航可见的专业ID
+* @return {[String]}
+* @author pengxiguaa 2020/8/27
+* */
+forumSchema.statics.getVisibilityForumsIdFromRedis = async () => {
+  const key = getRedisKeys('visibilityForumsId');
+  return await client.smembersAsync(key);
+};
+/*
+* 获取无权用户导航可见的专业ID
+* @return {[String]}
+* @author pengxiguaa 2020/8/27
+* */
+forumSchema.statics.getIsVisibilityNCCForumsIdFromRedis = async () => {
+  const key = getRedisKeys('isVisibilityNCCForumsId');
+  return await client.smembersAsync(key);
+};
+/*
+* 获取可在上层专业显示文章的专业ID
+* @return {[String]}
+* @author pengxiguaa 2020/8/27
+* */
+forumSchema.statics.getDisplayOnParentForumsIdFromRedis = async () => {
+  const key = getRedisKeys('displayOnParentForumsId');
+  return await client.smembersAsync(key);
+};
+/*
+* 获取可在搜索页显示文章的专业ID
+* @return {[String]}
+* @author pengxiguaa 2020/8/27
+* */
+forumSchema.statics.getDisplayOnSearchForumsIdFromRedis = async () => {
+  const key = getRedisKeys('displayOnSearchForumsId');
+  return await client.smembersAsync(key);
 };
 
 module.exports = mongoose.model('forums', forumSchema);

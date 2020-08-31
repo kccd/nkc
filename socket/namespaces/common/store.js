@@ -15,7 +15,7 @@ async function storeUser(socket) {
     socketToUserMap.set(socket, user);
     socket.join(`user/${uid}`, async () => {
       console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/common'.bgBlue} ${'连接成功'.bgGreen}`);
-      global.NKC.io.of('/console').NKC.socketMessage('/commom', true, uid);
+      global.NKC.io.of('/console').NKC.socketMessage('/common', true, uid);
       return resolve(true);
     });
   });
