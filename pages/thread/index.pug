@@ -243,7 +243,7 @@ block content
                     for n in data.threadNav
                       -const {fid, cid, name} = n;
                       span.nav-delimiter >
-                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cid=${cid}` : ''}` data-float-fid=fid)= name
+                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
                   .thread-nav-right
                     .nav-count
                       .nav-post-id=`文号 ${data.thread.oc}`
