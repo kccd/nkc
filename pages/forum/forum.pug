@@ -39,9 +39,7 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
-
         include ../publicModules/forums_nav/forums_tree
-
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
         .forum-info-panel.m-b-1
           .forum-banner
@@ -96,6 +94,20 @@ block content
                     button.btn-sm.forum-sub-btn.btn.success(
                       onclick=`SubscribeTypes.subscribeForum("${data.forum.fid}", true)`
                     ) 关注
+
+          .forum-nav
+            .thread-nav
+              .thread-nav-left
+                a.nav-link(href='/?t=home' title=state.serverSettings.brief) 主页
+                for n in data.forumNav
+                  -const {fid, name, cid} = n;
+                  span.nav-delimiter >
+                  a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
+              .thread-nav-right
+                if data.forum.childrenForums && data.forum.childrenForums.length > 0
+                  span 细分专业：
+                  for f in data.forum.childrenForums
+                    a.m-r-05(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
         if data.type === "latest"
           div
             .m-b-1
@@ -103,7 +115,6 @@ block content
               if !(state.isApp && state.platform === 'reactNative')
                 include ../publicModules/mobile_drawer/right_drawer
               include ../publicModules/paging/forum_nav
-
             if data.forum.latestBlockNotice && data.paging.page === 0
               div.forum-declare.m-b-1!= data.forum.latestBlockNotice
 
@@ -123,6 +134,7 @@ block content
                 a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
             include ../publicModules/paging/paging
             if data.paging.page === 0 && data.toppedThreads.length > 0
+              -const defaultThreadListStyle = {type: 'minimalist'}
               for thread in data.toppedThreads
                 include ../publicModules/thread_panel/thread_panel
               div.topped-thread-header - 以上是置顶 -
@@ -215,9 +227,9 @@ block content
                   .forum-moderator-info
                     .forum-moderator-name=u.username
                     .forum-moderator-description=u.description || "暂无简介"
-        if data.forum.parentForums && data.forum.parentForums.length > 0
+        //-if data.forum.parentForums && data.forum.parentForums.length > 0
           +forumPanel("上级专业", data.forum.parentForums)
-        if data.forum.childrenForums && data.forum.childrenForums.length > 0
+        //-if data.forum.childrenForums && data.forum.childrenForums.length > 0
           +forumPanel("细分专业", data.forum.childrenForums)
         if data.forum.parentsId.length && data.sameLevelForums && data.sameLevelForums.length > 0
           +forumPanel("同级专业", data.sameLevelForums, true)

@@ -194,27 +194,30 @@ block content
                       span 按发表时间
               //displayPostAbstract
               .form-group
-                label.col-sm-3.control-label 文章列表显示文章摘要
+                label.col-sm-3.control-label 文章列表显示模式
                 .col-sm-7
                   .radio
                     label.m-r-1
-                      input(type='radio' :value='true' v-model='forum.displayPostAbstract')
-                      span 是
+                      input(type='radio' value='abstract' v-model='forum.threadListStyle.type')
+                      span 摘要模式
+                    label.m-r-1
+                      input(type='radio' value='brief' v-model='forum.threadListStyle.type')
+                      span 简略模式
                     label
-                      input(type='radio' :value='false' v-model='forum.displayPostAbstract')
-                      span 否
+                      input(type='radio' value='minimalist' v-model='forum.threadListStyle.type')
+                      span 极简模式
               .form-group
-                label.col-sm-3.control-label 文章列表封面图位置
+                label.col-sm-3.control-label 文章列表封面图
                 .col-sm-7
                   .radio
                     label.m-r-1
-                      input(type='radio' value='left' v-model='forum.postCoverPosition')
+                      input(type='radio' value='left' v-model='forum.threadListStyle.cover')
                       span 左侧
                     label.m-r-1
-                      input(type='radio' value='right' v-model='forum.postCoverPosition')
+                      input(type='radio' value='right' v-model='forum.threadListStyle.cover')
                       span 右侧
                     label
-                      input(type='radio' value='null' v-model='forum.postCoverPosition')
+                      input(type='radio' value='null' v-model='forum.threadListStyle.cover')
                       span 不显示
               .form-group
                 label.col-sm-3.control-label 专业文库
