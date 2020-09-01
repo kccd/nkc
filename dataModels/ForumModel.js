@@ -116,13 +116,26 @@ const forumSchema = new Schema({
     default: true,
     index: 1
   },
-  // 文章列表是否显示文章摘要
+
+  // 文章列表的显示风格
+  threadListStyle: {
+	  type: { // 显示样式 abstract: 摘要模式, brief: 简略模式, minimalist: 极简模式
+	    type: String,
+      default: 'abstract',
+    },
+    cover: { // 封面图位置 left: 左侧, right: 右侧, null: 不显示封面图
+      type: String,
+      default: 'left'
+    }
+  },
+
+  // 文章列表是否显示文章摘要 旧
   displayPostAbstract: {
     type: Boolean,
     default: true,
     index: 1
   },
-  // 文章列表封面图位置 left: 左侧，right: 右侧，null: 不显示
+  // 文章列表封面图位置 left: 左侧，right: 右侧，null: 不显示 旧
   postCoverPosition: {
     type: String,
     default: 'left',
@@ -2028,6 +2041,47 @@ forumSchema.statics.getDisplayOnParentForumsIdFromRedis = async () => {
 forumSchema.statics.getDisplayOnSearchForumsIdFromRedis = async () => {
   const key = getRedisKeys('displayOnSearchForumsId');
   return await client.smembersAsync(key);
+};
+
+
+/*
+* 获取专业页的专业链导航
+* @param {String} cid 文章分类ID
+* @return {[Object]}
+* @author pengxiguaa 2020/9/1
+* */
+forumSchema.methods.getForumNav = async function(cid) {
+  const ForumModel = mongoose.model('forums');
+  const ThreadTypeModel = mongoose.model('threadTypes');
+  const forums = [];
+  const getParentForum = async (arr) => {
+    for(const fid of arr) {
+      const f = await ForumModel.getForumByIdFromRedis(fid);
+      if(!f) continue;
+      forums.unshift({
+        fid: f.fid,
+        name: f.displayName
+      });
+      getParentForum(f.parentsId);
+    }
+  };
+  await getParentForum(this.parentsId);
+  forums.push({
+    fid: this.fid,
+    name: this.displayName
+  });
+  if(cid) {
+    console.log({fid: this.fid, cid: Number(cid)})
+    const category = await ThreadTypeModel.findOne({fid: this.fid, cid: Number(cid)});
+    if(category) {
+      forums.push({
+        fid: this.fid,
+        cid,
+        name: category.name
+      });
+    }
+  }
+  return forums;
 };
 
 module.exports = mongoose.model('forums', forumSchema);

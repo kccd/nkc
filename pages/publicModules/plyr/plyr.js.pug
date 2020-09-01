@@ -14,13 +14,14 @@ script.
         title: title,
         controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'pip', 'airplay', 'fullscreen'],
         blankVideo: "/external_pkgs/plyr/blank.mp4",
-        autopause: true
+        autopause: true,
       });
       var url = "/r/" + rid + "?t=attachment";
       if(NKC.methods.getRunType() === "app") {
         url += "&apptype=app";
       }
       player.download = url;
+      player.speed = 1;
       NKC.methods.initPlyrMask(player);
     }
   };

@@ -27,7 +27,7 @@ permissionRouter
     const {forum} = data;
     let {
       accessible, displayOnParent, visibility, isVisibleForNCC,
-      displayOnSearch, displayPostAbstract, postCoverPosition,
+      displayOnSearch, threadListStyle,
       shareLimitCount, shareLimitTime, allowedAnonymousPost,
       moderators, subType, openReduceVisits, permission, orderBy
     } = body.forum;
@@ -62,7 +62,8 @@ permissionRouter
     if(!relations.includes(read.relation) || !relations.includes(write.relation) || !relations.includes(writePost.relation)) {
       ctx.throw(400, '请选择证书等级关系');
     }
-    if(!['left', 'right', 'null'].includes(postCoverPosition)) ctx.throw(400, `文章列表封面图设置错误 position: ${postCoverPosition}`);
+    if(!['abstract', 'brief', 'minimalist'].includes(threadListStyle.type)) ctx.throw(400, `文章列表显示模式设置错误 type: ${threadListStyle.type}`);
+    if(!['left', 'right', 'null'].includes(threadListStyle.cover)) ctx.throw(400, `文章列表封面图设置错误 cover: ${threadListStyle.cover}`);
     await db.ForumModel.updateOne({fid: forum.fid}, {
       $set: {
         accessible: !!accessible,
@@ -72,8 +73,7 @@ permissionRouter
         allowedAnonymousPost: !!allowedAnonymousPost,
         openReduceVisits: !!openReduceVisits,
         displayOnSearch: !!displayOnSearch,
-        displayPostAbstract: !!displayPostAbstract,
-        postCoverPosition,
+        threadListStyle,
         moderators,
         shareLimitTime,
         orderBy,

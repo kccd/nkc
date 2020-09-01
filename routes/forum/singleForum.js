@@ -158,7 +158,7 @@ router
 		const {token} = query;
 
 		const forum = await db.ForumModel.findOnly({fid});
-
+		data.forumNav = await forum.getForumNav(query.cat);
 		// 专业权限判断: 若不是该专业的专家，走正常的权限判断
 		if(!token){
 			await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
@@ -501,8 +501,7 @@ router
 		data.type = 'latest';
 		data.isFollow = data.user && data.forum.followersId.includes(data.user.uid);
 
-		data.displayPostAbstract = data.forum.displayPostAbstract;
-		data.postCoverPosition = data.forum.postCoverPosition;
+		state.threadListStyle = data.forum.threadListStyle;
 
 		await next();
 	})

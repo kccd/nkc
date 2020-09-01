@@ -34,7 +34,6 @@ block title
     include ../publicModules/plyr/plyr.css.pug
   if !state.isApp
     style=`body{background-color: ${(data.user?data.user.color:null) || state.serverSettings.backgroundColor}!important;`
-  +includeCSS('/thread/index.css')
   mixin postOptions(post, targetThread, index, dropType)
     -dropType = dropType || "dropdown";
     .inline-block.post-options(style='margin-right: 0;color: #aaaaaa;' class=dropType)
@@ -237,13 +236,13 @@ block content
             .row
               .thread-div
                 -const showManagement = data.user && data.isModerator && permissionsOr(['moveDraft', 'moveThread', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
-                .col-xs-12.col-md-12.thread-nav
+                .col-xs-12.col-md-12.thread-nav.p-t-1.p-b-2
                   .thread-nav-left.hidden-xs
-                    a.nav-link(href='/' title=state.serverSettings.brief) 主页
+                    a.nav-link(href='/?t=home' title=state.serverSettings.brief) 主页
                     for n in data.threadNav
                       -const {fid, cid, name} = n;
                       span.nav-delimiter >
-                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cid=${cid}` : ''}` data-float-fid=fid)= name
+                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
                   .thread-nav-right
                     .nav-count
                       .nav-post-id=`文号 ${data.thread.oc}`
