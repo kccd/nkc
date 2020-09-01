@@ -190,7 +190,7 @@ block content
                 label.col-sm-2.control-label 参考：
                 .col-sm-12.col-md-5
                   .watermark-body
-                    img.bg(src=tools.getUrl('defaultFile', 'watermarkBackground.jpg'))
+                    img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
                     .watermark(:class="waterSetting.waterGravity + ' ' + watermarkFile.size" style=`opacity: ${1-(data.noWatermark.file.transparency/100)}`)
                       img.wt(:src="watermarkFile.url")
                       span(v-if='watermarkName') {{watermarkName}}
