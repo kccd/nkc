@@ -113,6 +113,8 @@ function turnImg(){
   // var newImg = "< img src='/default/"+$("#waterGravity").val()+".jpg' style='width: 100%;'>"
   // $("#exampleImg").html(newImg)
   $("#newImg").attr("src","/default/"+$("#waterStyle").val()+$("#waterGravity").val()+".jpg");
+  app.waterSetting.waterStyle = $("#waterStyle").val();
+  app.waterSetting.waterGravity = $("#waterGravity").val();
 }
 
 var data = NKC.methods.getDataById("data");
@@ -147,3 +149,36 @@ function saveAppInfo() {
       sweetError(data);
     })
 }
+
+var app = new Vue({
+  el: '#watermarkApp',
+  data: {
+    waterSetting: data.waterSetting,
+    noWatermark: data.noWatermark,
+    columnName: data.columnName,
+    username: data.user.username,
+  },
+  methods: {
+    getUrl: NKC.methods.tools.getUrl,
+  },
+  computed: {
+    watermarkFile: function() {
+      var file = {};
+      if(this.waterSetting.waterStyle === 'siteLogo') {
+        file.url = this.getUrl('watermark', this.noWatermark.file.normalAttachId);
+        file.size = 'normal';
+      } else {
+        file.url = this.getUrl('watermark', this.noWatermark.file.smallAttachId);
+        file.size = 'small';
+      }
+      return file;
+    },
+    watermarkName: function() {
+      if(this.waterSetting.waterStyle === 'userLogo') {
+        return this.username;
+      } else if(this.waterSetting.waterStyle === 'coluLogo') {
+        return this.columnName;
+      }
+    }
+  }
+});
