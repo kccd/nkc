@@ -1,0 +1,70 @@
+#moduleDownloadResource{
+  @import "../base";
+  display: none;
+  position: fixed;
+  width: 46rem;
+  max-width: 100%;
+  top: 100px;
+  right: 0;
+  z-index: 1050;
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  border: 1px solid #ddd;
+  .null{
+    margin-top: 5rem;
+    text-align: center;
+  }
+  .module-header{
+    height: 3rem;
+    line-height: 3rem;
+    background-color: #f6f6f6;
+    position: relative;
+    .module-sd-title{
+      margin-left: 1rem;
+      color: #666;
+      cursor: move;
+    }
+    .module-sd-close{
+      height: 3rem;
+      width: 3rem;
+      position: absolute;
+      top: 0;
+      right: 0;
+      text-align: center;
+      line-height: 3rem;
+      color: #888;
+      cursor: pointer;
+      &:hover{
+        color: #777;
+        background-color: #ddd;
+      }
+    }
+  }
+  .module-sd-body{
+    .module-content{
+      padding: 10px;
+      .resource-oname {
+        font-size: 1.4em;
+        font-weight: bold;
+      }
+      
+      .resource-size {
+        font-weight: normal;
+      }
+      
+      .resource-downloaded-tip {
+        display: none;
+        padding: 0.5rem 0;
+        font-size: 1.2rem;
+      }
+      
+      .resource-control {
+        a {
+          & + a {
+            margin-left: 10px;
+          }
+        }
+      }
+    }
+  }
+}

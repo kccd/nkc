@@ -105,7 +105,7 @@ window.floatForumPanel = new Vue({
               });
             } else if(position === "right") {
               panel.css({
-                top,
+                top: top + height,
                 left: left + width + 10
               });
             } else {

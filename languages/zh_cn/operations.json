@@ -738,6 +738,7 @@
   "viewUserScores": "可在用户名片查看用户积分",
 
   "showActivityEnter": "首页“活动”入口的显示和隐藏",
-  "discuz": "适配discuz"
+  "discuz": "适配discuz",
 
+  "donwloadNeedScore": "询问下载此附件是否需要积分"
 }
