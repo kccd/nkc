@@ -62,7 +62,7 @@ block content
           h4 热门专业
       if !state.isApp
         .col-xs-12.col-md-12.text-center.m-t-4
-          a.register-btn(href=`/`) 开启科创之旅
+          a.register-btn(href=`/`)=`开启${state.serverSettings.websiteAbbr}之旅`
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   +includeJS("/register/subscribe.js")

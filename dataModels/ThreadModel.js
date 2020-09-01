@@ -1958,4 +1958,58 @@ threadSchema.statics.getHomeRecommendThreads = async (fid) => {
   };
 };
 
+
+/*
+* 获取文章页顶部的导航链接
+* @return {[Object]}
+*   object.fid: 专业ID
+*   object.cid: 文章分类ID
+*   object.name: 专业名或文章分类名
+* @author pengxiguaa 2020/8/31
+* */
+threadSchema.methods.getThreadNav = async function() {
+  const {mainForumsId, categoriesId} = this;
+  const ForumModel = mongoose.model('forums');
+  const ThreadTypeModel = mongoose.model('threadTypes');
+  let forums = [];
+  const getParentForum = async (arr) => {
+    for(const fid of arr) {
+      const f = await ForumModel.getForumByIdFromRedis(fid);
+      if(!f) continue;
+      forums.unshift({
+        fid: f.fid,
+        name: f.displayName
+      });
+      getParentForum(f.parentsId);
+    }
+  };
+  await getParentForum(mainForumsId);
+  if(forums.length) {
+    const mainForum = forums[forums.length - 1];
+    const category = await ThreadTypeModel.findOne({cid: {$in: categoriesId}, fid: mainForum.fid}).sort({order: 1});
+    if(category) {
+      forums.push({
+        fid: mainForum.fid,
+        cid: category.cid,
+        name: category.name
+      });
+    }
+  }
+  return forums;
+}
+
+/*
+* 获取文章的收藏数
+* @param {String} tid 文章ID
+* @return {Number}
+* @author pengxiguaa 2020/8.31
+* */
+threadSchema.statics.getCollectedCountByTid = async (tid) => {
+  const SubscribeModel = mongoose.model('subscribes');
+  return await SubscribeModel.count({
+    type: 'collection',
+    tid
+  });
+};
+
 module.exports = mongoose.model('threads', threadSchema);

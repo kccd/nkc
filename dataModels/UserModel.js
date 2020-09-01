@@ -765,7 +765,7 @@ userSchema.methods.extendGeneralSettings = async function() {
   @author pengxiguaa 2019/3/7
 */
 userSchema.methods.ensureUserInfo = async function() {
-  if(!this.username) throwErr(403, '您的账号还未完善资料，请前往资料设置页完善必要资料。');
+  if(!this.username) throwErr(403, '你的账号还未完善资料，请前往资料设置页完善必要资料。');
 };
 
 userSchema.methods.getNewMessagesCount = async function() {

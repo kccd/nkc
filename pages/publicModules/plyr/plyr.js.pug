@@ -12,12 +12,7 @@ script.
       var player = new Plyr(videoDom.eq(i), {
         ratio: '4:3',
         title: title,
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'download', 'captions', 'pip', 'airplay', 'fullscreen'],
-        settings: ['speed'],
-        i18n: {
-          speed: "播放速度",
-          normal: "正常"
-        },
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'pip', 'airplay', 'fullscreen'],
         blankVideo: "/external_pkgs/plyr/blank.mp4",
         autopause: true
       });

@@ -1836,10 +1836,12 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
 * @author pengxiguaa 2020/8/25
 * */
 forumSchema.statics.checkWritePermission = async (uid, fid) => {
+  const ForumModel = mongoose.model('forums');
+  await ForumModel.checkGlobalPostPermission(uid, 'thread');
   const user = await mongoose.model('users').findOnly({uid});
   await user.extendRoles();
   await user.extendGrade();
-  await mongoose.model('forums').checkPermission('write', user, fid);
+  await ForumModel.checkPermission('write', user, fid);
 };
 
 /*
@@ -1849,11 +1851,80 @@ forumSchema.statics.checkWritePermission = async (uid, fid) => {
 * @author pengxiguaa 2020/8/25
 * */
 forumSchema.statics.checkWritePostPermission = async (uid, fid) => {
+  const ForumModel = mongoose.model('forums');
+  await ForumModel.checkGlobalPostPermission(uid, 'post');
   const user = await mongoose.model('users').findOnly({uid});
   await user.extendRoles();
   await user.extendGrade();
-  await mongoose.model('forums').checkPermission('writePost', user, fid);
+  await ForumModel.checkPermission('writePost', user, fid);
 }
+
+/*
+* 根据后台管理-发表设置验证用户是拥有发表全向
+* @param {String} uid 用户ID
+* @param {String} postType 内容类型 post: 回复、评论, thread: 文章
+* */
+forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
+  const UserModel = mongoose.model('users');
+  const SettingModel = mongoose.model('settings');
+  const PostModel = mongoose.model('posts');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const settingsType = {
+    'thread': {
+      key: 'postToForum',
+      name: '文章'
+    },
+    'post': {
+      key: 'postToThread',
+      name: '回复/评论'
+    }
+  }[type];
+  if(!settingsType) throwErr(500, `发表类型错误 type: ${type}`);
+  const user = await UserModel.findOne({uid});
+  if(!user) throwErr(500, `未找到用户 uid: ${uid}`);
+  await user.ensureUserInfo();
+  const postSettings = await SettingModel.getSettings('post');
+  let {
+    authLevelMin,
+    exam,
+  } = postSettings[settingsType.key];
+  const {
+    volumeA, volumeB, notPass
+  } = exam;
+  const {
+    status, countLimit, unlimited
+  } = notPass;
+  const userLevel = await user.extendAuthLevel();
+  authLevelMin = Number(authLevelMin);
+  if(userLevel < authLevelMin) {
+    throwErr(403, `身份认证等级未达要求，发表${settingsType.name}至少需要完成身份认证 ${authLevelMin}`)
+  }
+  const today = apiFunction.today();
+  const todayCount = await PostModel.count({toc: {$gte: today}, uid: user.uid, type});
+  if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
+    if(!status) throwErr(403, '权限不足，请提升账号等级');
+    if(!unlimited && countLimit <= todayCount) throwErr(403, `今日发表${settingsType.name}次数已用完，请明天再试。`);
+  }
+  // 发表回复时间、条数限制
+  let postCountLimit, postTimeLimit;
+  const {
+    postToForumCountLimit,
+    postToForumTimeLimit,
+    postToThreadCountLimit,
+    postToThreadTimeLimit
+  } = await user.getPostLimit();
+  if(type === 'post') {
+    postCountLimit = postToThreadCountLimit;
+    postTimeLimit = postToThreadTimeLimit;
+  } else {
+    postCountLimit = postToForumCountLimit;
+    postTimeLimit = postToForumTimeLimit;
+  }
+  if(todayCount >= postCountLimit) throwErr(400, `你当前的账号等级每天最多只能发表${postCountLimit}篇${settingsType.name}，请明天再试。`);
+  const latestPost = await PostModel.findOne({uid: user.uid, toc: {$gte: (Date.now() - postTimeLimit * 60 * 1000)}}, {pid: 1});
+  if(latestPost) throwErr(400, `你当前的账号等级限定发表${settingsType.name}间隔时间不能小于${postTimeLimit}分钟，请稍后再试。`);
+};
+
 
 /*
 * 验证用户是否有权阅读指定专业

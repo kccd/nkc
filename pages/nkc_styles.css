@@ -2930,7 +2930,7 @@ img.emoji {
 .thread-management{
   margin-bottom: 0;
   /*border-bottom: 1px solid #e9e9e9;*/
-  padding-bottom: 1rem;
+  /*padding-bottom: 1rem;*/
 }
 .thread-management .title>span{
   margin-right: 0.5rem;
@@ -4027,15 +4027,20 @@ span[data-tag="nkcsource"][data-type="audio"]{
 .nkcsource-audio-title,
 .nkcsource-video-title {
   display: block;
-  color: rgb(134, 134, 134);
-  font-size: 0.8em;
+  /*color: rgb(134, 134, 134);*/
+  color: #000;
+  font-size: 1.2rem;
+  /*font-size: 0.8em;*/
   margin: 0 auto;
   text-align: center;
 }
-
+.nkcsource-audio-title {
+  margin-bottom: 0.3rem;
+}
 .nkcsource-video-title {
   position: absolute;
   width: 100%;
+  padding-top: 0.3rem;
 }
 
 /* 文章中的附件 旧*/
@@ -4282,6 +4287,7 @@ span[data-tag="nkcsource"][data-type="xsf"]>span:last-child{
 .topped-post .fa{
   /*color: #2b90d9;*/
 }
+
 @media only screen and (max-width : 480px) {
   .moSlide {
     display: block

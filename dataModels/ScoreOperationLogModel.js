@@ -34,6 +34,12 @@ const schema = new mongoose.Schema({
     default: [],
     index: 1
   },
+  // 读取的专业积分策略
+  fid: {
+    type: String,
+    default: '',
+    index: 1
+  }
 }, {
   collection: 'scoreOperationLogs'
 });
@@ -42,14 +48,17 @@ const schema = new mongoose.Schema({
  * 获取用户今日内指定的操作的次数
  * @param {Object} user 用户记录
  * @param {String} type 操作类型
+ * @param {String} fid 专业ID
  */
-schema.statics.getOperationLogCount = async function(user, type) {
+schema.statics.getOperationLogCount = async function(user, type, fid = '') {
   const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
-  return await ScoreOperationLogModel.count({
+  const match = {
     uid: user.uid,
     type,
+    fid,
     toc: {$gte: apiFunction.today()}
-  });
+  };
+  return await ScoreOperationLogModel.count(match);
 }
 
 /**

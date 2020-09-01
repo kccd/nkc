@@ -7,13 +7,12 @@ block title
   meta#replytarget(value=`${data.replyTarget}`)
 
   -let modifyPostTimeLimit = 0;
-  -for(let i = 0; i < data.userRoles.length; i++)
-    -const r = data.userRoles[i];
-    if r.modifyPostTimeLimit > modifyPostTimeLimit
-      -modifyPostTimeLimit = r.modifyPostTimeLimit
+  for r in data.userRoles
     if r.modifyPostTimeLimit === -1
       -modifyPostTimeLimit = -1;
       -break;
+    if r.modifyPostTimeLimit > modifyPostTimeLimit
+      -modifyPostTimeLimit = r.modifyPostTimeLimit
 
   -const postTo = data.userOperationsId.includes('quotePost')
   -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
@@ -35,7 +34,7 @@ block title
     include ../publicModules/plyr/plyr.css.pug
   if !state.isApp
     style=`body{background-color: ${(data.user?data.user.color:null) || state.serverSettings.backgroundColor}!important;`
-
+  +includeCSS('/thread/index.css')
   mixin postOptions(post, targetThread, index, dropType)
     -dropType = dropType || "dropdown";
     .inline-block.post-options(style='margin-right: 0;color: #aaaaaa;' class=dropType)
@@ -54,7 +53,7 @@ block title
               a(href=`javascript:removeToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
                 span.fa.fa-share-square-o &nbsp;从我的专栏撤稿
         li
-          a(href=`/p/${post.pid}`)
+          a(href=`/p/${post.pid}` target="_blank")
             span.fa.fa-newspaper-o &nbsp;
             span 详情
         if permission("getPostAuthor") && post.anonymous
@@ -237,57 +236,79 @@ block content
           .m-b-1
             .row
               .thread-div
-                .col-xs-12.col-md-12
-                  .thread-management
-                    .title
-                      if thread.forum
-                        a(href=`/f/${thread.forum.fid}` style='text-decoration: none;')
-                          span(style=`padding: 2px 5px;color: #ffffff;border-radius:5px;background-color: ${thread.forum.color}`)= thread.forum.displayName
-                      if data.user
-                        -let canManagement = false;
-                        -for(let i = 0; i < data.userOperationsId.length; i++)
-                          -const operationId = data.userOperationsId[i];
-                          if ['moveDraft', 'moveThread', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop'].includes(operationId)
-                            -canManagement = true;
-                            -break;
-                        if data.isModerator && canManagement
-                          a(onclick="displayManagement();" style='text-decoration: none;float: right;')
-                            .highlight.fa.fa-cog
-                      if data.user
-                        div.managementDiv(style='display: none;margin-top: 1rem;')
-                          .form-inline
-                            //- 设置置顶
-                            if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
-                              button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
-                            if data.isModerator && data.userOperationsId.includes('unToppedThread') && thread.topped
-                              button.btn.btn-default.btn-sm#threadTop(onclick=`cancelTopped('${data.thread.tid}')`) 取消专业置顶
-                            if data.userOperationsId.includes("homeAd")
-                              if data.homeAd
-                                button.btn.btn-default.btn-sm(onclick=`unHomeAd('${data.thread.tid}')`) 取消首页推荐
-                              else
-                                a.btn.btn-default.btn-sm(href=`/t/${data.thread.tid}/ad`).m-l-05 首页推荐
-                            if data.userOperationsId.includes("homeTop")
-                              if data.homeTopped
-                                button.btn.btn-default.btn-sm(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
-                              else
-                                button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
-                            if data.userOperationsId.includes("pushGoodsToHome") && data.product
-                              if data.goodsHomeTopped
-                                button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'unPush')`) 取消热销
-                              else
-                                button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'push')`) 设为热销
+                -const showManagement = data.user && data.isModerator && permissionsOr(['moveDraft', 'moveThread', 'digestThread', 'unDigestThread', 'toppedThread', 'unToppedThread', 'homeTop', 'unHomeTop']);
+                .col-xs-12.col-md-12.thread-nav
+                  .thread-nav-left.hidden-xs
+                    a.nav-link(href='/' title=state.serverSettings.brief) 主页
+                    for n in data.threadNav
+                      -const {fid, cid, name} = n;
+                      span.nav-delimiter >
+                      a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cid=${cid}` : ''}` data-float-fid=fid)= name
+                  .thread-nav-right
+                    .nav-count
+                      .nav-post-id=`文号 ${data.thread.oc}`
+                    .nav-count(title=`浏览数`)
+                      .fa.fa-eye
+                      span=data.thread.hits
+                    .nav-count(title=`回复数`)
+                      .fa.fa-comment
+                      span=data.thread.count
+                    //-.nav-count
+                      //-.fa.fa-share-square-o
+                      span 分享
+                    -let collectEvent;
+                    if !data.user
+                      -collectEvent = `NKC.methods.toLogin()`;
+                    else if data.collected
+                      -collectEvent = `SubscribeTypes.collectionThread('${thread.tid}', false)`;
+                    else
+                      -collectEvent = `SubscribeTypes.collectionThread('${thread.tid}', true)`;
+                    .nav-count.pointer(
+                      onclick=collectEvent
+                    )
+                      //-.fa.fa-folder-o
+                      span=`${data.collected?'已收藏': '收藏'}${data.collectedCount?`(${data.collectedCount})`: ''}`
+                    if showManagement
+                      .nav-count
+                        .fa.fa-cog(onclick="displayManagement()")
+                if showManagement
+                  .col-xs-12.col-md-12
+                    .thread-management
+                      .title
+                        if data.user
+                          div.managementDiv(style='display: none;margin-top: 1rem;')
+                            .form-inline
+                              //- 设置置顶
+                              if data.isModerator && data.userOperationsId.includes('toppedThread') && !thread.topped
+                                button.btn.btn-default.btn-sm#threadTop(onclick=`setTopped('${data.thread.tid}')`) 专业置顶
+                              if data.isModerator && data.userOperationsId.includes('unToppedThread') && thread.topped
+                                button.btn.btn-default.btn-sm#threadTop(onclick=`cancelTopped('${data.thread.tid}')`) 取消专业置顶
+                              if data.userOperationsId.includes("homeAd")
+                                if data.homeAd
+                                  button.btn.btn-default.btn-sm(onclick=`unHomeAd('${data.thread.tid}')`) 取消首页推荐
+                                else
+                                  a.btn.btn-default.btn-sm(href=`/t/${data.thread.tid}/ad`).m-l-05 首页推荐
+                              if data.userOperationsId.includes("homeTop")
+                                if data.homeTopped
+                                  button.btn.btn-default.btn-sm(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
+                                else
+                                  button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
+                              if data.userOperationsId.includes("pushGoodsToHome") && data.product
+                                if data.goodsHomeTopped
+                                  button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'unPush')`) 取消热销
+                                else
+                                  button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'push')`) 设为热销
 
-                            if data.userOperationsId.includes('closeThread') && !thread.closed
-                              button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
-                            if data.userOperationsId.includes('openThread') && thread.closed
-                              button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
-                            if permission("moveThreads")
-                               button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
-                            if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
-                              button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
-                          if data.thread.type === "fund"
-                            h5.text-danger 科创基金类文章无法退修
-
+                              if data.userOperationsId.includes('closeThread') && !thread.closed
+                                button.btn.btn-default.btn-sm(onclick=`closeThread('${data.thread.tid}')`) 关闭主题
+                              if data.userOperationsId.includes('openThread') && thread.closed
+                                button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
+                              if permission("moveThreads")
+                                 button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
+                              if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
+                                button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
+                            if data.thread.type === "fund"
+                              h5.text-danger 科创基金类文章无法退修
                 .col-xs-12.col-md-12
                   .row
                     if !thread.reviewed
@@ -358,7 +379,7 @@ block content
                       if thread.type !== "fund"
                         .thread-info.text-center(style="margin-top:1.5rem")
                           if !thread.firstPost.anonymous
-                            a(href=`/u/${thread.uid}` data-float-uid=thread.uid)
+                            a(href=`/u/${thread.uid}` data-float-uid=thread.uid target="_blank")
                               img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm') style='width: 1.5rem;height: 1.5rem;border-radius:50%;')
                               span= ` ${thread.firstPost.user.username}`
                           else
