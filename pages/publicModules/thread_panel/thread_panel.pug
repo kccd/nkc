@@ -66,15 +66,17 @@ mixin checkBox
             if hasReply
               -tlm = nkcTimeFormat(thread.lastPost.toc);
             span.thread-panel-minimalist-toc
+              if tlm
+                span(title=`最新回复于${format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc)}`)=tlm
+                span.thread-panel-minimalist-line /
               if thread.count
                 span.count(title=`回复数${thread.count}`)
                   //.fa.fa-comment
                   span=thread.count
+              if toc
+                if tlm || thread.count
                   span.thread-panel-minimalist-line /
-              if tlm
-                span(title=`最新回复于${format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc)}`)=tlm
-                span.thread-panel-minimalist-line /
-              span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.toc)}`)=toc
+                span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.toc)}`)=toc
 
       else
         //- 作者信息 专业信息 时间
