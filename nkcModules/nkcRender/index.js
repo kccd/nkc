@@ -105,7 +105,11 @@ class NKCRender {
     if(post.pid) {
       id = `post-content-${post.pid}`;
     }
-    return `<div class="render-content math-jax" id="${id}">${html}</div>`;
+    if(html) {
+      return `<div class="render-content math-jax" id="${id}">${html}</div>`;
+    } else {
+      return '';
+    }
   }
   encodeRFC5987ValueChars(str) {
     return encodeURIComponent(str).

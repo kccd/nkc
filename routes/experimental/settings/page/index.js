@@ -3,8 +3,8 @@ const router = new Router();
 router
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.pageSettings = (await db.SettingModel.findOnly({_id: 'page'})).c;
-		ctx.template = 'experimental/settings/page.pug';
+		data.pageSettings = await db.SettingModel.getSettings('page');
+		ctx.template = 'experimental/settings/page/page.pug';
 		await next();
 	})
 	.put('/', async (ctx, next) => {
@@ -13,7 +13,7 @@ router
     let {
       homeThreadList, searchPostList, searchAllList, userCardThreadList, threadPostList, forumThreadList,
       userCardUserList, forumUserList, searchThreadList, searchUserList, threadPostCommentList,
-      searchColumnList, searchResourceList
+      searchColumnList, searchResourceList, threadListStyle,
     } = pageSettings;
     threadPostCommentList = parseInt(threadPostCommentList);
     homeThreadList = parseInt(homeThreadList);
@@ -28,6 +28,8 @@ router
     forumUserList = parseInt(forumUserList);
     searchColumnList = parseInt(searchColumnList);
     searchResourceList = parseInt(searchResourceList);
+    if(!['abstract', 'brief', 'minimalist'].includes(threadListStyle.type)) ctx.throw(400, `文章列表显示模式错误 type: ${threadListStyle.type}`);
+    if(!['left', 'right', 'null'].includes(threadListStyle.cover)) ctx.throw(400, `文章列表封面图错误 cover: ${threadListStyle.cover}`);
 		await db.SettingModel.updateOne({_id: "page"}, {
       c: {
         homeThreadList,
@@ -42,7 +44,8 @@ router
         forumThreadList,
         forumUserList,
         threadPostList,
-        searchColumnList
+        searchColumnList,
+        threadListStyle,
       }
 		});
 		await db.SettingModel.saveSettingsToRedis("page");

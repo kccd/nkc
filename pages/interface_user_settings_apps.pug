@@ -1,8 +1,58 @@
 extends bootstrap_base
 block title
   title 偏好设置
+  style.
+    .watermark-body{
+      overflow: hidden;
+      position: relative;
+    }
+    .watermark-body .bg{
+      width: 100%;
+    }
+    .watermark-body .watermark{
+      z-index: 100;
+      position: absolute;
+      height: 3rem;
+      line-height: 3rem;
+    }
+    .watermark-body .wt{
+      max-height: 100%;
+    }
+    .watermark-body .watermark.small{
+      height: 1.4rem;
+      line-height: 1.4rem;
+    }
+    .watermark span{
+      color: #fff;
+      vertical-align: middle;
+      margin-left: 0.5rem;
+    }
+    .southeast{
+      right: 1rem;
+      bottom: 1rem;
+    }
+    .northeast{
+      right: 1rem;
+      top: 1rem;
+    }
+    .southwest{
+      bottom: 1rem;
+      left: 1rem;
+    }
+    .northwest{
+      top: 1rem;
+      left: 1rem;
+    }
+    .center{
+      top: 0;
+      left: 0;
+      right:0;
+      bottom: 0;
+      margin: auto;
+      text-align: center;
+    }
 block content
-  #data.hidden=objToStr({user: data.user})
+  #data.hidden=objToStr({columnName: data.columnName, user: data.user, waterSetting: data.waterSetting, noWatermark: data.noWatermark})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -86,7 +136,7 @@ block content
         .panel.panel-default
           .panel-heading
             span 水印风格
-          .panel-body
+          .panel-body#watermarkApp(v-cloak)
             .form-horizontal
               .form-group
                 label.col-sm-2.control-label 是否添加水印：
@@ -103,8 +153,8 @@ block content
                   h5.text-danger=`隐藏水印功能需要花费${data.noWatermark.number/100}${data.noWatermark.name}，是否继续?`
                 .col-sm-2
                 .col-sm-9
-                  button.btn.btn-primary.btn-sm#save(onclick=`yesPayForWater(${data.user.uid})`) 继续
-                  button.btn.btn-default.btn-sm#save(onclick=`hideButton()`) 取消
+                  button.btn.btn-primary.btn-sm(onclick=`yesPayForWater(${data.user.uid})`) 继续
+                  button.btn.btn-default.btn-sm(onclick=`hideButton()`) 取消
               .form-group
                 label.col-sm-2.control-label 水印类型：
                 .col-sm-9(style='margin-bottom: 0.5rem;')
@@ -127,7 +177,7 @@ block content
                         option(selected=(data.waterSetting.waterGravity === "southwest") data="southwest" value="southwest") Southwest(左下角)
                         option(selected=(data.waterSetting.waterGravity === "northwest") data="northwest" value="northwest") Northwest(左上角)
                         option(selected=(data.waterSetting.waterGravity === "center") data="center" value="center") Center(正中间)
-              .form-group
+              //-.form-group
                 label.col-sm-2.control-label 参考：
                 .col-sm-9.col-md-5
                   .row
@@ -136,7 +186,16 @@ block content
                       -var gra = data.waterSetting.waterGravity?data.waterSetting.waterGravity:"southeast";
                       -var imageName = sty + gra;
                       img#newImg(src=`/default/${imageName}.jpg` style='width: 100%;')
-                  h5.text-info 宽度小于600px或高度小于200px的图片不会添加水印
+              .form-group
+                label.col-sm-2.control-label 参考：
+                .col-sm-12.col-md-5
+                  .watermark-body
+                    img.bg(src=tools.getUrl('defaultFile', 'watermark_background.jpg'))
+                    .watermark(:class="waterSetting.waterGravity + ' ' + watermarkFile.size" style=`opacity: ${1-(data.noWatermark.file.transparency/100)}`)
+                      img.wt(:src="watermarkFile.url")
+                      span(v-if='watermarkName') {{watermarkName}}
+                .col-sm-12.col-md-10.col-md-offset-2
+                  h5.text-info=`宽度小于${data.noWatermark.size.minWidth}px或高度小于${data.noWatermark.size.minHeight}px的图片不会添加水印`
               .form-group
                 label.col-sm-2.control-label
                 .col-sm-5
