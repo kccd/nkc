@@ -73,8 +73,10 @@ mixin checkBox
                 span.count(title=`回复数${thread.count}`)
                   //.fa.fa-comment
                   span=thread.count
+              if toc
+                if tlm || thread.count
                   span.thread-panel-minimalist-line /
-              span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.toc)}`)=toc
+                span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.toc)}`)=toc
 
       else
         //- 作者信息 专业信息 时间
