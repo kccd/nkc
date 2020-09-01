@@ -57,15 +57,20 @@ mixin checkBox
               img(src=anonymousInfo.avatar)
           a.thread-panel-minimalist-title(href=`/t/${thread.tid}` title=thread.firstPost.t)=thread.firstPost.t
           .absolute-count
-            span.thread-panel-minimalist-count
+            //span.thread-panel-minimalist-count
               span(title=`回复${thread.count}`)=thread.count
               span.thread-panel-minimalist-line /
               span(title=`浏览${thread.hits}`)=thread.hits
-            -const toc = fromNow(thread.firstPost.toc);
+            -const toc = nkcTimeFormat(thread.firstPost.toc);
             -let tlm;
             if hasReply
-              -tlm = fromNow(thread.lastPost.toc);
-            span.thread-panel-minimalist-toc(title=format('YYYY-MM-DD HH:mm:ss', thread.firstPost.toc))
+              -tlm = nkcTimeFormat(thread.lastPost.toc);
+            span.thread-panel-minimalist-toc
+              if thread.count
+                span.count(title=`回复数${thread.count}`)
+                  //.fa.fa-comment
+                  span=thread.count
+                  span.thread-panel-minimalist-line /
               if tlm
                 span(title=`最新回复于${format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc)}`)=tlm
                 span.thread-panel-minimalist-line /
@@ -129,7 +134,7 @@ mixin checkBox
               else if thread.from === "collection"
                   span 收藏
           if styleType === 'brief' && hasReply
-            .thread-panel-brief-replay.hidden-xs
+            .thread-panel-brief-replay
               if !thread.lastPost.anonymous
                 a(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)=thread.lastPost.user.username
               else
