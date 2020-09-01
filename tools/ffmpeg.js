@@ -224,19 +224,22 @@ async function addImageTextWaterMask(op) {
     position = {x: 10, y: 10},
     transparency = 0.5
   } = op;
-  const videoSize = await getVideoSize(input);
+  const {height: videoHeight, width: videoWidth} = await getVideoSize(input);
   const logoSize = await getImageSize(image);
-  let padHeight = parseInt(videoSize.height * flex);
-  let logoHeight = padHeight - 1;
-  let logoWidth = parseInt(logoSize.width * (logoHeight / logoSize.height)) - 1;
-  const textSize = await getDrawTextSize(text, padHeight - 10);
-  let padWidth = logoWidth + textSize.width;
+  let padHeight = ~~(videoHeight * flex);
+  let logoHeight = padHeight;
+  let logoWidth = ~~(logoSize.width * (logoHeight / logoSize.height));
+  const fontSize = padHeight - 10;
+  const {height: textHeight, width: textWidth} = await getDrawTextSize(text, fontSize);
+  const gap = ~~(logoWidth * 0.1); /* logo和文字之间和间隔 */
+  let padWidth = logoWidth + textWidth + gap;
 
   image = image.replace(/\\/g, "/").replace(":", "\\:");
+
   return ffmpegFilter(input, output, [
     `movie='${image}'[logo]`,
     `[logo]scale=${logoWidth}:${logoHeight}[image]`,
-    `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=w-tw:y=(h-th)/2:text='${text}':fontsize=${textSize.height}:fontcolor=white:shadowx=0:shadowy=0:shadowcolor=black:fontfile='${fontFilePathForFFmpeg}', lut=a=val*${transparency}[watermask]`,
+    `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=${logoWidth + gap}:y=${logoHeight-textHeight}/2:text='${text}':fontsize=${fontSize}:fontcolor=white:fontfile='${fontFilePathForFFmpeg}', lut=a=val*${transparency}[watermask]`,
     `[0:v][watermask]overlay=${position.x}:${position.y}`
   ])
 }

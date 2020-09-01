@@ -60,7 +60,7 @@ NKC.modules.downloadResource = class {
           let infoUrl = `/r/${rid}?t=attachment`;
           let dataUrl = `/r/${rid}?t=attachment&c=download&random=${Math.random()}`;
           // 下载此附件是否需要积分
-          nkcAPI(`/r/${rid}/q`, "GET", {})
+          nkcAPI(`/r/${rid}/q?random=${Math.random()}`, "GET", {})
             .then(data => {
               if(!data.need) {
                 let downloadLink = $("<a></a>");
@@ -92,6 +92,10 @@ NKC.modules.downloadResource = class {
                   number: score.number / 100
                 }
               });
+            })
+            .catch(data => {
+              self.close();
+              sweetError(data);
             })
         },
         open(rid) {
