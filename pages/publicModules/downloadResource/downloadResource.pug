@@ -7,7 +7,23 @@
       .module-sd-close.fa.fa-close(@click="close")
     .module-sd-body
       .module-content
-        iframe(src="/r/956300?t=attachment", frameborder="0")
+        //- +includeCSS("/resource/download.css")
+        .container-fluid.max-width(style="padding-bottom: 100px")
+          .tip-wrap
+            .error-list.b-s-10n(v-if="!loadding")
+              .resource-oname {{fileName}}
+              .resource-size 大小：{{size}}
+              .resource-info.m-t-1 下载或预览当前附件将花费 {{costMessage}}
+                span.name 。
+              .resource-info 你当前剩余 {{holdMessage}}
+                span.name 。
+              .resource-downloaded-tip.m-t-1
+                span.name= `附件下载中... `
+              .resource-control.m-t-1
+                a.download-button(:href="'/r/'+ rid +'?t=attachment&c=download&random=' + Math.random()") 立即下载
+                a(v-if="type === 'pdf'" :href="'/r/'+ rid +'?c=preview_pdf&random=' + Math.random()" target="_blank") 预览
+            .error-list.b-s-10n(v-else)
+              .resource-info 加载中...
         
 include ../moment
 +includeJS("/publicModules/downloadResource/downloadResource.js") 

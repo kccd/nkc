@@ -5,16 +5,26 @@ NKC.modules.downloadResource = class {
     self.app = new Vue({
       el: "#moduleDownloadResourceApp",
       data: {
-        uid: NKC.configs.uid,
-        paging: {},
-        perpage: 7,
-        loading: false,
-        drafts: []
+        rid: "",
+        fileName: "未知",
+        type: "",
+        size: 0,
+        costs: [],
+        hold: [],
+        loadding: true
+      },
+      computed: {
+        costMessage() {
+          return this.costs.map(c => c.name + c.number).join("、");
+        },
+        holdMessage() {
+          return this.hold.map(c => c.name + c.number).join("、");
+        }
       },
       methods: {
         fromNow: NKC.methods.fromNow,
         initDom() {
-          const height = "43.5rem";
+          const height = "20rem";
           self.dom.css({
             height
           });
@@ -45,10 +55,49 @@ NKC.modules.downloadResource = class {
           }
           self.dom.show();
         },
-        open(callback) {
-          self.callback = callback;
+        getResourceInfo(rid) {
+          let self = this;
+          let infoUrl = `/r/${rid}?t=attachment`;
+          let dataUrl = `/r/${rid}?t=attachment&c=download&random=${Math.random()}`;
+          // 下载此附件是否需要积分
+          nkcAPI(`/r/${rid}/q`, "GET", {})
+            .then(data => {
+              if(!data.need) {
+                let downloadLink = $("<a></a>");
+                downloadLink.attr("href", dataUrl);
+                downloadLink[0].click();
+                self.close();
+              } else {
+                return nkcAPI(infoUrl, "GET", {})
+              }
+            })
+            .then(data => {
+              if(!data) return;
+              console.log(data);
+              self.loadding = false;
+              self.rid = data.rid;
+              self.fileName = data.resource.oname;
+              self.type = data.resource.ext;
+              self.size = NKC.methods.getSize(data.resource.size);
+              let myAllScore = data.myAllScore;
+              self.costs = myAllScore.map(score => {
+                return {
+                  name: score.name,
+                  number: score.addNumber / 100 * -1
+                }
+              });
+              self.hold = myAllScore.map(score => {
+                return {
+                  name: score.name,
+                  number: score.number / 100
+                }
+              });
+            })
+        },
+        open(rid) {
+          this.loadding = true;
           this.initDom();
-          // this.getDrafts();
+          this.getResourceInfo(rid);
         },
         close() {
           self.dom.hide();
@@ -59,3 +108,18 @@ NKC.modules.downloadResource = class {
     self.close = self.app.close;
   }
 };
+
+
+(function() {
+  const dr = new NKC.modules.downloadResource();
+  let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
+  attachments.forEach(attachment => {
+    $(attachment).find(".article-attachment-name").on("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      let rid = $(attachment).attr("data-id");
+      dr.open(rid);
+      return false;
+    })
+  })
+}());

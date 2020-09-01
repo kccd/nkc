@@ -42,104 +42,26 @@
   }
   .module-sd-body{
     .module-content{
-      .module-drafts{
-        .paging-button{
-          padding: 0.5rem 1rem 0 1rem;
-        }
-        .module-draft:last-child{
-          border-bottom: none;
-        }
-        .module-draft-warning{
-          position: absolute;
-          bottom: 0;
-          width: 100%;
-          min-height: 2rem;
-          padding-top: 0.4rem;
-          padding-bottom: 0.2rem;
-          color: #888;
-          font-size: 1rem;
-          padding-left: 1rem;
-          left: 0;
-          background-color: #f6f6f6;
-        }
-        .module-draft{
-          padding: 0.3rem 1rem;
-          border-bottom: 1px solid #eee;
-          padding-right: 5.5rem;
-          position: relative;
-          &:hover{
-            background-color: #f6f6f6;
-          }
-          .module-buttons{
-            user-select: none;
-            position: absolute;
-            top: 0;
-            right: 0.5rem;
-            width: 5rem;
-            div{
-              font-size: 1rem;
-              color: @primary;
-              cursor: pointer;
-              margin-bottom: 0.5rem;
-              user-select: none;
-            }
-            div:first-child{
-              margin-top: 0.7rem;
-              margin-bottom: 0.5rem;
-            }
-            div:last-child{
-              span:first-child{
-                color: @accent;
-              }
-              span:last-child{
-                font-weight: 700;
-              }
-              span.disabled{
-                color: #aaa;
-                cursor: not-allowed;
-              }
-            }
-            div>span:hover{
-              opacity: 0.7;
-            }
-          }
-          .module-info{
-            font-size: 1rem;
-            font-style: oblique;
-            height: 1.4rem;
-            .hideText(@line: 1);
-            &>div{
-              display: inline;
-            }
-            .module-time{
-              color: @accent;
-            }
-            .module-from{
-              color: #666;
-            }
-          }
-          .module-article-title{
-            font-size: 1rem;
-            color: #666;
-            font-style: oblique;
-            height: 1.4rem;
-            .hideText(@line: 1);
-            span{
-              color: #333;
-              font-style: normal;
-            }
-          }
-          .module-article-content{
-            font-size: 1rem;
-            font-style: oblique;
-            color: #666;
-            max-height: 1.4rem;
-            .hideText(@line: 1);
-            overflow: hidden;
-            span{
-              font-style: normal;
-              color: #333;
-            }
+      padding: 10px;
+      .resource-oname {
+        font-size: 1.4em;
+        font-weight: bold;
+      }
+      
+      .resource-size {
+        font-weight: normal;
+      }
+      
+      .resource-downloaded-tip {
+        display: none;
+        padding: 0.5rem 0;
+        font-size: 1.2rem;
+      }
+      
+      .resource-control {
+        a {
+          & + a {
+            margin-left: 10px;
           }
         }
       }
