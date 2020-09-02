@@ -4,6 +4,7 @@
 * @param {Object} user 用户对象
 * */
 const imageMagick = require('../../../tools/imageMagick');
+const {addImageTextWaterMaskForImage} = require('../../../tools/ffmpeg');
 const FILE = require("../../../nkcModules/file");
 const PATH = require('path');
 const fsPromise = require('fs').promises;
@@ -117,8 +118,53 @@ module.exports = async (options) => {
         if(waterSetting.waterStyle === 'siteLogo') {
           await imageMagick.watermarkify(watermarkSettings.transparency, waterSetting.waterGravity, waterBigPath, path);
         } else {
-          await imageMagick.watermarkifyLogo(watermarkSettings.transparency, logoCoor, waterSetting.waterGravity, waterSmallPath, path);
-          await imageMagick.watermarkifyFont(watermarkSettings.transparency, userCoor, username, waterSetting.waterGravity, path);
+          // await imageMagick.watermarkifyLogo(watermarkSettings.transparency, logoCoor, waterSetting.waterGravity, waterSmallPath, path);
+          // await imageMagick.watermarkifyFont(watermarkSettings.transparency, userCoor, username, waterSetting.waterGravity, path);
+          let position;
+          // 右下角
+          if(waterSetting.waterGravity === "southeast") {
+            position = {
+              x: "W-w-10",
+              y: "H-h-10"
+            }
+          }
+          // 右上角
+          if(waterSetting.waterGravity === "northeast") {
+            position = {
+              x: "W-w-10",
+              y: "10"
+            }
+          }
+          // 左上角
+          if(waterSetting.waterGravity === "northwest") {
+            position = {
+              x: "10",
+              y: "10"
+            }
+          }
+          // 左下角
+          if(waterSetting.waterGravity === "southwest") {
+            position = {
+              x: "10",
+              y: "H-h-10"
+            }
+          }
+          // 正中间
+          if(waterSetting.waterGravity === "center") {
+            position = {
+              x: "(W-w)/2",
+              y: "(H-h)/2"
+            }
+          }
+          let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
+          await addImageTextWaterMaskForImage({
+            input: path, 
+            output: path, 
+            image: waterSmallPath, 
+            text: username,
+            transparency: ffmpegTransparency,
+            position
+          });
         }
       }
     }

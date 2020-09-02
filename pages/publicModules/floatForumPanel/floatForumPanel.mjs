@@ -98,20 +98,20 @@ window.floatForumPanel = new Vue({
               left = documentWidth - panelWidth;
             }
 
-            if(!position || position === "bottom") {
-              panel.css({
-                top: top + height + 10,
-                left
-              });
-            } else if(position === "right") {
+            if(!position || position === "right") {
               panel.css({
                 top: top + height,
                 left: left + width + 10
               });
-            } else {
+            } else if(position === "bottom") {
               panel.css({
                 top: top + height + 10,
                 left
+              });
+            } else {
+              panel.css({
+                top: top + height,
+                left: left + width + 10
               });
             }
           })
