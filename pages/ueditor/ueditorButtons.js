@@ -56,7 +56,7 @@
     }
     return new UE.ui.Button({
       name:'imageSelector',
-      title:'插入图片',
+      title:'插入图片和附件',
       // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
       // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
       className: 'edui-default edui-for-image-selector edui-icon',
@@ -97,44 +97,44 @@
   
   
   // 插入附件
-  UE.registerUI('resourceSelector',function(editor,uiName){
-    // return sweetError("未引入资源选择模块");
-    if(NKC.modules.SelectResource && !window.SelectResource) {
-      window.SelectResource = new NKC.modules.SelectResource();
-    }
-    return new UE.ui.Button({
-      name:'resourceSelector',
-      title:'插入附件',
-      // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
-      // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
-      className: 'edui-default edui-for-resource-selector edui-icon',
-      onclick:function () {
-        if(window.SelectResource) {
-          window.SelectResource.open(function(data) {
-            console.log(data);
+  // UE.registerUI('resourceSelector',function(editor,uiName){
+  //   // return sweetError("未引入资源选择模块");
+  //   if(NKC.modules.SelectResource && !window.SelectResource) {
+  //     window.SelectResource = new NKC.modules.SelectResource();
+  //   }
+  //   return new UE.ui.Button({
+  //     name:'resourceSelector',
+  //     title:'插入附件',
+  //     // 需要添加的额外样式，指定icon图标，这里默认使用一个重复的icon
+  //     // cssRules :'.edui-default  .edui-for-mathformula .edui-icon',
+  //     className: 'edui-default edui-for-resource-selector edui-icon',
+  //     onclick:function () {
+  //       if(window.SelectResource) {
+  //         window.SelectResource.open(function(data) {
+  //           console.log(data);
             
-            if(data.resources) {
-              data = data.resources;
-            } else {
-              data = [data];
-            }
-            for(var i = 0; i < data.length; i++) {
-              var source = data[i];
-              var type = source.mediaType;
-              type = type.substring(5);
-              type = type[0].toLowerCase() + type.substring(1);
-              editor.execCommand('inserthtml', NKC.methods.resourceToHtml(type, source.rid, source.oname));
-            }
-          }, {
-            fastSelect: true,
-            resourceType: "attachment"
-          });
-        } else {
-          return sweetError("未初始化资源选择模块");
-        }
-      }
-    })
-  });
+  //           if(data.resources) {
+  //             data = data.resources;
+  //           } else {
+  //             data = [data];
+  //           }
+  //           for(var i = 0; i < data.length; i++) {
+  //             var source = data[i];
+  //             var type = source.mediaType;
+  //             type = type.substring(5);
+  //             type = type[0].toLowerCase() + type.substring(1);
+  //             editor.execCommand('inserthtml', NKC.methods.resourceToHtml(type, source.rid, source.oname));
+  //           }
+  //         }, {
+  //           fastSelect: true,
+  //           resourceType: "attachment"
+  //         });
+  //       } else {
+  //         return sweetError("未初始化资源选择模块");
+  //       }
+  //     }
+  //   })
+  // });
   
   // 插入公式
   UE.registerUI('mathFormula',function(editor,uiName){

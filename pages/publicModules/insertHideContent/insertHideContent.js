@@ -39,7 +39,7 @@ NKC.modules.insertHideContent = function() {
         var score = parseInt(this.score);
         if(score !== this.score) return sweetWarning("分值必须是整数");
         if(score < 1) return sweetWarning("分值必须大于0");
-        if(score > 99) return sweetWarning("分值必须小于100");
+        if(score > 5) return sweetWarning("分值必须小于5");
 
         this.callback(score);
         this.close();
