@@ -65,13 +65,11 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if data.user
           - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`${data.user.info.certsName}`;
-          li.userInfo
+          li
             -let editorHref = "/editor";
             if data.forum
               -editorHref = `/editor?type=forum&id=${data.forum.fid}`;
-            a.new-thread(href=editorHref target='_blank')
-              .fa.fa-pencil-square-o &nbsp;
-              | 发表文章
+            a(href=editorHref target='_blank') 发表文章
           li.new-message.message-switch(class=messageSum?"":"hidden")
             a(href="/message") 消息
             .nav-user-avatar-count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""

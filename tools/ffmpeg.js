@@ -277,9 +277,7 @@ async function addImageTextWaterMaskForImage(op) {
     transparency = 0.5
   } = op;
   const {height: imageHeight, width: imageWidth} = await getImageSize(input);
-  console.log(`图片: h ${imageHeight} w ${imageWidth}`);
   const logoSize = await getImageSize(image);
-  console.log(`logo: h ${logoSize.height} w ${logoSize.width}`);
   let padHeight = ~~(imageHeight * flex);
   let logoHeight = padHeight - 1;
   let logoWidth = ~~(logoSize.width * (logoHeight / logoSize.height)) - 1;
@@ -287,7 +285,6 @@ async function addImageTextWaterMaskForImage(op) {
   const {height: textHeight, width: textWidth} = await getDrawTextSize(text, fontSize);
   const gap = ~~(logoWidth * 0.1); /* logo和文字之间和间隔 */
   let padWidth = logoWidth + textWidth + gap;
-  console.log(`pad: h ${padHeight} w ${padWidth}`);
 
   image = image.replace(/\\/g, "/").replace(":", "\\:");
 
