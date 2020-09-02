@@ -1405,7 +1405,7 @@ footer.footer ul li{
 .thread-panel-author-info{
   width: 100%;
   padding-bottom: 0.2rem;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 .thread-panel-author a{
   color: #3494da;
@@ -1447,7 +1447,7 @@ footer.footer ul li{
 .thread-panel-brief-replay{
   display: inline-block;
   color: #aaa;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 .thread-panel-body.brief{
   padding: 0.5rem 0;
@@ -1466,15 +1466,15 @@ footer.footer ul li{
   /*padding-left: 2rem;*/
 }
 .thread-panel-body.brief .thread-panel-author img{
-  height: 2.6rem;
-  margin-top: 0;
-  width: 2.6rem;
+  height: 3rem;
+  margin-top: 0px;
+  width: 3rem;
   border-radius: 3px;
 }
 .thread-panel-body.brief .thread-panel-content{
   position: relative;
   width: 100%;
-  padding-left: 3.5rem;
+  padding-left: 3.8rem;
 }
 .thread-panel-body.brief .thread-panel-author-avatar{
   position: absolute;
@@ -1486,9 +1486,10 @@ footer.footer ul li{
 }
 .thread-panel-body.brief .thread-panel-author a, .thread-panel-body.brief .thread-panel-forum a{
   font-weight: normal;
+  color: #aaa;
 }
 .thread-panel-body.brief .thread-panel-title .title-content{
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: normal;
   color: #000;
 }
@@ -1751,7 +1752,7 @@ span.thread-title-page{
 }
 .thread-panel-button{
   display: inline-block;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #777;
 }
 .thread-panel-button .fa{
@@ -2427,6 +2428,11 @@ div.user-banned{
 .thread-nav .thread-nav-right {
   display: inline-block;
   float: right;
+}
+.thread-nav .thread-nav-right .forum-post-button{
+  background-color: #e85a71;
+  color: #fff;
+  border: 1px solid #e85a71;
 }
 .home-warning{
   background-color: #f7d6d6;

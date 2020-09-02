@@ -2750,8 +2750,10 @@ img.emoji {
 .new-thread{
   box-sizing: border-box;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  background-color: #e85a71;
-  color: #fff!important;
+  /*background-color: #e85a71;*/
+  background-color: #fff;
+  color: #333;
+  /*color: #fff!important;*/
   height: 3rem!important;
   border-radius: 1.5rem;
   line-height: 3rem!important;
@@ -2760,11 +2762,13 @@ img.emoji {
   font-size: 1.1rem;
   display: block;
   margin-top: 0.3rem;
-  border: 1px solid #d97283;
+  /*border: 1px solid #d97283;*/
+  border: 1px solid #aaa;
   transition: background-color 100ms;
 }
 .new-thread:hover, .new-thread:focus{
-  background-color: #cf5468!important;
+  background-color: #f4f4f4!important;
+  color: #777!important;
 }
 .new-message{
   position: relative;

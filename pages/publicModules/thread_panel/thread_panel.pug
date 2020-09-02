@@ -44,9 +44,15 @@ mixin displayForum
         a(href=`/f/${forum.fid}` data-float-fid=forum.fid)= forum.displayName
 
 mixin displayPageCount
-  -const pageCount = thread.count / state.pageSettings.threadPostList
+  -const pageCount = Math.ceil(thread.count / state.pageSettings.threadPostList)
   -let ellipsis = false;
-  -for (let i = 1; i < pageCount; i++)
+  if pageCount >= 2
+    a.thread-title-page(href=`/t/${thread.tid}?&page=${1}`)= 2
+  if pageCount > 3
+    span.thread-title-page.p-a-0 ...
+  if pageCount >= 3
+    a.thread-title-page(href=`/t/${thread.tid}?&page=${pageCount - 1}`)= pageCount
+  //--for (let i = 1; i < pageCount; i++)
     if i < 4 || i > pageCount - 3
       a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
     else if !ellipsis

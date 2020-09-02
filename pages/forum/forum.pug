@@ -100,15 +100,15 @@ block content
                     a.m-r-05(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
                 else
                   if !data.user
-                    button.btn.btn-default.btn-xs(onclick='NKC.methods.toLogin()')
+                    button.forum-post-button.btn.btn-default.btn-xs(onclick='NKC.methods.toLogin()')
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
                   else if state.isApp
-                    button.btn.btn-default.btn-xs(onclick=`openEditSite()`)
+                    button.forum-post-button.btn.btn-default.btn-xs(onclick=`openEditSite()`)
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
                   else
-                    a.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
+                    a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
         if data.type === "latest"
