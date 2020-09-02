@@ -4,19 +4,6 @@ body{
 .swiper-home{
   border-radius: 3px;
 }
-.home-warning{
-  background-color: #f7d6d6;
-  border-radius: 3px;
-  padding: 1rem 1rem;
-  font-size: 1.25rem;
-}
-.home-warning .fa{
-  color: #e85a71;
-  margin-right: 0.5rem;
-  border-radius: 50%;
-  font-size: 1.4rem;
-  vertical-align: baseline;
-}
 .swiper-slide{
   min-height: 16rem;
   position: relative;

@@ -99,14 +99,18 @@ block content
                   for f in data.forum.childrenForums
                     a.m-r-05(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
                 else
-                  -let postButtonEvent;
                   if !data.user
-                    -postButtonEvent = 'NKC.methods.toLogin()';
+                    button.btn.btn-default.btn-xs(onclick='NKC.methods.toLogin()')
+                      .fa.fa-pencil-square-o
+                      | &nbsp;发表文章
+                  else if state.isApp
+                    button.btn.btn-default.btn-xs(onclick=`openEditSite()`)
+                      .fa.fa-pencil-square-o
+                      | &nbsp;发表文章
                   else
-                    -postButtonEvent = `openEditSite()`;
-                  button.btn.btn-default.btn-xs(onclick=postButtonEvent)
-                    .fa.fa-pencil-square-o
-                    | &nbsp;发表文章
+                    a.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
+                      .fa.fa-pencil-square-o
+                      | &nbsp;发表文章
         if data.type === "latest"
           div
             .m-b-1

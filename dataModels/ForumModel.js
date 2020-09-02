@@ -2076,7 +2076,6 @@ forumSchema.methods.getForumNav = async function(cid) {
     name: this.displayName
   });
   if(cid) {
-    console.log({fid: this.fid, cid: Number(cid)})
     const category = await ThreadTypeModel.findOne({fid: this.fid, cid: Number(cid)});
     if(category) {
       forums.push({
