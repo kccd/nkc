@@ -165,10 +165,20 @@ var app = new Vue({
     watermarkFile: function() {
       var file = {};
       if(this.waterSetting.waterStyle === 'siteLogo') {
-        file.url = this.getUrl('watermark', this.noWatermark.file.normalAttachId);
+        var normalAttachId = this.noWatermark.file.normalAttachId;
+        if(normalAttachId) {
+          file.url = this.getUrl('watermark', normalAttachId);
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_normal.png')
+        }
         file.size = 'normal';
       } else {
-        file.url = this.getUrl('watermark', this.noWatermark.file.smallAttachId);
+        var smallAttachId = this.noWatermark.file.smallAttachId;
+        if(smallAttachId) {
+          file.url = this.getUrl('watermark', smallAttachId);
+        } else {
+          file.url = this.getUrl('defaultFile', 'watermark_small.png');
+        }
         file.size = 'small';
       }
       return file;
