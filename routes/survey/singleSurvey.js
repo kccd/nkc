@@ -18,8 +18,8 @@ router
     data.allowedUsers = await db.UserModel.find({uid: {$in: survey.permission.uid}});
     data.targetUser = await db.UserModel.findOnly({uid: survey.uid});
     data.surveyRewardScore = await db.SettingModel.getScoreByOperationType('surveyRewardScore');
-    data.targetUserSurveyRewardScore = await db.UserModel.getUserScore(data.user.uid, data.surveyRewardScore.type);
     if(data.user) {
+      data.targetUserSurveyRewardScore = await db.UserModel.getUserScore(data.user.uid, data.surveyRewardScore.type);
       data.surveyPost = await db.SurveyPostModel.findOne({uid: data.user.uid, surveyId: survey._id});
       try{
         await survey.checkUserPermission(data.user.uid);
@@ -33,7 +33,7 @@ router
         await survey.checkUserPermission("", ctx.address);
         data.havePermission = true;
       } catch(err) {
-        console.log(err);
+        // console.log(err);
       }
     }
 

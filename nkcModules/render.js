@@ -120,7 +120,7 @@ const nkcTimeFormat = (toc) => {
 	if(timeNumber >= t) return '今天';
 	if(timeNumber >= t - oneDayNumber) return '昨天';
 	if(timeNumber >= t - (2 * oneDayNumber)) return '前天';
-	return '更早';
+	return '';
 }
 
 
