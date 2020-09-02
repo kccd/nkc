@@ -1,12 +1,11 @@
 extends ../bootstrap_base
 block title
   title 问题列表
-  link(rel='stylesheet' href=`/mdui/css/mdui.min.css?v=${startTime}`)
-  link(rel='stylesheet' href=`/problem/problem.css?v=${startTime}`)
-  -const mainContainer1400 = true;
+  +includeCSS('/mdui/css/mdui.min.css')
+  +includeCSS('/problem/problem.css')
 block content
-  .container-fluid.max-width#app
-    .row
+  .container-fluid.max-width#app(v-cloak)
+    .row(v-if='show')
       //- 分类栏
       .col-xs-12.col-md-12
         ul.top-label
@@ -39,8 +38,8 @@ block content
               hr(style='margin: 5px 0;')
               .media-left
                 if problem.user
-                  a(href=`/u/${problem.user.uid}`)
-                    img.media-object(src=tools.getUrl('userAvatar', problem.user.avatar) style='width: 50px;height: 50px;border-radius: 50%;')
+                  a(href=`/u/${problem.user.uid}` target='_blank')
+                    img.media-object(src=tools.getUrl('userAvatar', problem.user.avatar) style='width: 50px;height: 50px;border-radius: 50%;' data-float-uid=problem.user.uid)
                 else
                   .text-center(style='height: 50px;width: 50px;line-height: 50px;background-color: #aaa;border-radius: 50%;color: #fff;font-size: 2em;') 匿
               .media-body
@@ -57,7 +56,7 @@ block content
                 div(style='color: #aaa;display: inline')
                   span
                     if problem.user
-                      a(href=`/u/${problem.user.uid}`)= problem.user.username
+                      a(href=`/u/${problem.user.uid}` target='_blank' data-float-uid=problem.user.uid)= problem.user.username
                     else
                       span 匿名用户
                   span &nbsp;&nbsp;上报于&nbsp;&nbsp;
@@ -70,7 +69,7 @@ block content
             include ../publicModules/paging/paging.pug
 
 block scripts
-  script(src=`/mdui/js/mdui.min.js?v=${startTime}`)
-  script(src=`/vue/dist/vue.min.js?v=${startTime}`)
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/problem/problem_list.js?v=${global.NKC.startTime}`)
+  +includeJS('/mdui/js/mdui.min.js')
+  +includeJS('/problem/problem_list.js')
+  include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
