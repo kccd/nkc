@@ -156,11 +156,16 @@ router
         title: forum.displayName,
         url: `/f/${forum.fid}`
       };
-    } 
+    }
     // 拓展专业信息
     data.mainForums = [];
     if(selectedForumsId.length) {
-      const forums = await db.ForumModel.find({fid: {$in: selectedForumsId}});
+      const forums_ = await db.ForumModel.find({fid: {$in: selectedForumsId}});
+      const forums = [];
+      for(const f of forums_) {
+        const childForumsId = [] || await f.getAllChildForumsId();
+        if(!childForumsId.length) forums.push(f);
+      }
       const categories = await db.ThreadTypeModel.find({cid: {$in: selectedCategoriesId}});
       const categoriesObj = {};
       for(const c of categories) {
