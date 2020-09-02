@@ -76,11 +76,14 @@ const watermarkifyLogo = (trans, dpi, position, waterSmallPath, path) => {
 
 // username 水印
 const watermarkifyFont = (trans, dpi, font, position, path, temporaryPath) =>{
+  let alpha = trans / 100;
+  let strokeColorNumber = 255 - 255 * (alpha + 0.2);
+  let args = ['mogrify','-font', fontTtf, '-pointsize', '24', '-background', 'black', '-gravity', position ,'-stroke', `rgba(${strokeColorNumber}, ${strokeColorNumber}, ${strokeColorNumber}, ${alpha})`, '-strokewidth', '1', '-annotate', dpi, font, '-stroke', 'none', '-fill', `rgba(255,255,255,${alpha})`, '-annotate',dpi, font,path, path];
   if(linux) {
-    return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#5c5d6d91', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
+    return spawnProcess(args.shift(), args);
   }
   // return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-background', 'black', '-fill', '#FFF', '-weight', '500','-gravity', position ,'-annotate', dpi, font ,path, path]);
-  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-background', 'black', '-gravity', position ,'-stroke', '#0000004d', '-strokewidth', '2', '-annotate', dpi, font, '-stroke', 'none', '-fill', `rgba(255,255,255,${trans / 100})`, '-annotate',dpi, font,path, path]);
+  return spawnProcess('magick', args);
   // return spawnProcess('magick', [path, '-gravity', position, '-pointsize', '24', '-stroke', '#717171', '-strokewidth', '2', '-annotate', dpi, font, '-stroke', 'none', '-fill', '#FFF', '-font', fontTtf, '-annotate',dpi, font,temporaryPath]);
 }
 
