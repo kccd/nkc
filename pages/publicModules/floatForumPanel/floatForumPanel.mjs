@@ -26,7 +26,7 @@ window.floatForumPanel = new Vue({
         window.SubscribeTypes = new NKC.modules.SubscribeTypes();
       }
     }
-    
+
     this.initPanel();
 
   },
@@ -47,7 +47,7 @@ window.floatForumPanel = new Vue({
       this.over = false;
       this.forum = "";
     },
-    initEvent(dom, position) {
+    initEvent(dom, position = 'right') {
       const self = this;
       dom.on("mouseleave", function() {
         self.timeoutName = setTimeout(() => {
@@ -91,29 +91,25 @@ window.floatForumPanel = new Vue({
             });
 
             const documentWidth = $(document).width() - 10;
-            
+
             const panelWidth = 24 * 12;
+
+            if(position === 'bottom') {
+              top += height + 10;
+              left -= (width + 10);
+            } else {
+              left += width + 10;
+              top += height + 10;
+            }
 
             if((left + panelWidth) > documentWidth) {
               left = documentWidth - panelWidth;
             }
 
-            if(!position || position === "bottom") {
-              panel.css({
-                top: top + height + 10,
-                left
-              });
-            } else if(position === "right") {
-              panel.css({
-                top,
-                left: left + width + 10
-              });
-            } else {
-              panel.css({
-                top: top + height + 10,
-                left
-              });
-            }
+            panel.css({
+              top,
+              left
+            });
           })
           .catch(err => {
             // console.log(err);
@@ -133,7 +129,7 @@ window.floatForumPanel = new Vue({
       return new Promise((resolve, reject) => {
         let forumsObj = self.forums[fid];
         if(forumsObj) {
-          resolve(forumsObj); 
+          resolve(forumsObj);
         } else {
           nkcAPI(`/f/${fid}/card`, "GET")
             .then(data => {

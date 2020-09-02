@@ -41,7 +41,8 @@ window.floatUserPanel = new Vue({
       for(var i = 0; i < doms.length; i++) {
         const dom = doms.eq(i);
         if(dom.attr("data-float-init") === "true") continue;
-        this.initEvent(doms.eq(i));
+        let position = dom.attr("data-float-position");
+        this.initEvent(doms.eq(i), position);
       }
     },
     reset() {
@@ -50,7 +51,7 @@ window.floatUserPanel = new Vue({
       this.over = false;
       this.user = "";
     },
-    initEvent(dom) {
+    initEvent(dom, position = "right") {
       const self = this;
       dom.on("mouseleave", function() {
         self.timeoutName = setTimeout(() => {
@@ -97,12 +98,20 @@ window.floatUserPanel = new Vue({
 
             const panelWidth = 26 * 12;
 
+            if(position === 'bottom') {
+              top += height + 10;
+              left -= (width + 10);
+            } else {
+              left += width + 10;
+              top += height + 10;
+            }
+
             if((left + panelWidth) > documentWidth) {
               left = documentWidth - panelWidth;
             }
 
             panel.css({
-              top: top + height + 10,
+              top,
               left
             });
           })

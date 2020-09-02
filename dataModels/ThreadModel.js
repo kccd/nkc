@@ -304,7 +304,16 @@ threadSchema.methods.extendForums = async function(types) {
     fids = fids.concat(this.minorForumsId);
   }
   const forums = await mongoose.model('forums').find({fid: {$in: fids}});
-  return this.forums = forums;
+  const forumsObj = {};
+  forums.map(f => {
+    forumsObj[f.fid] = f;
+  });
+  const _forums = [];
+  for(const fid of fids) {
+    const forum = forumsObj[fid];
+    if(forum) _forums.push(forum);
+  }
+  return this.forums = _forums;
 };
 
 /* threadSchema.methods.extendForum = async function() {
@@ -1983,7 +1992,7 @@ threadSchema.methods.getThreadNav = async function() {
       getParentForum(f.parentsId);
     }
   };
-  await getParentForum(mainForumsId);
+  await getParentForum([mainForumsId[0]]);
   if(forums.length) {
     const mainForum = forums[forums.length - 1];
     const category = await ThreadTypeModel.findOne({cid: {$in: categoriesId}, fid: mainForum.fid}).sort({order: 1});

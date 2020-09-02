@@ -1,0 +1,8 @@
+-const reg = new RegExp(`^${state.serverSettings.websiteCode}-`);
+if data.user && (reg.test(data.user.username) || !data.user.username)
+  .col-xs-12.m-b-1
+    .home-warning
+      .fa.fa-exclamation-circle
+      | 你还未修改默认用户名，点击&nbsp;
+      a(href=`/u/${data.user.uid}/settings` target="_blank") 这里
+      | &nbsp;去修改。

@@ -37,6 +37,9 @@ module.exports = {
 			},
 			fileConvertNotice: {
 				GET: "fileConvertNotice"
+			},
+			q: {
+				GET: "getResources"
 			}
 		}
 	},

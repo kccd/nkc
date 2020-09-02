@@ -1,7 +1,7 @@
 const {spawn, exec} = require('child_process');
 const imageSize = require("image-size");
 const settings = require('../settings');
-const {banner, watermark, fontTtf} = settings.statics;
+const {banner, watermark, fontTtf, fontNotoSansHansMedium} = settings.statics;
 const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize, webLogoSize, webSmallLogoSize, userBannerSize} = settings.upload;
 const {promisify} = require('util');
 const {platform} = require('os');
@@ -11,6 +11,7 @@ const path = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const execProcess = promisify(exec);
 const {upload} = require('../settings');
+
 const spawnProcess = (pathName, args, options = {}) => {
   return new Promise((resolve, reject) => {
     const bat = spawn(pathName, args, options);
@@ -75,12 +76,16 @@ const watermarkifyLogo = (trans, dpi, position, waterSmallPath, path) => {
 };
 
 // username 水印
-const watermarkifyFont = (dpi, font, position, path, temporaryPath) =>{
+const watermarkifyFont = (trans, dpi, font, position, path, temporaryPath) =>{
+  let alpha = trans / 100;
+  // let strokeColorNumber = (2 - alpha) * 100;
+  const strokeColorNumber = 50;
+  let args = ['mogrify','-font', fontNotoSansHansMedium, '-weight', 800, '-pointsize', '24', '-background', 'black', '-gravity', position ,'-stroke', `rgba(${strokeColorNumber}, ${strokeColorNumber}, ${strokeColorNumber}, ${alpha})`, '-strokewidth', '1', '-annotate', dpi, font, '-stroke', 'none', '-fill', `rgba(255,255,255,${alpha})`, '-annotate',dpi, font,path, path];
   if(linux) {
-    return spawnProcess('mogrify', ['mogrify','-font', fontTtf, '-pointsize', '24', '-fill', '#5c5d6d91', '-weight', 'bolder','-gravity', position ,'-annotate', '+10+10', font ,path, path]);
+    return spawnProcess(args.shift(), args);
   }
   // return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-background', 'black', '-fill', '#FFF', '-weight', '500','-gravity', position ,'-annotate', dpi, font ,path, path]);
-  return spawnProcess('magick', ['mogrify','-font', fontTtf, '-pointsize', '24', '-background', 'black', '-gravity', position ,'-stroke', '#0000004d', '-strokewidth', '2', '-annotate', dpi, font, '-stroke', 'none', '-fill', '#FFF', '-annotate',dpi, font,path, path]);
+  return spawnProcess('magick', args);
   // return spawnProcess('magick', [path, '-gravity', position, '-pointsize', '24', '-stroke', '#717171', '-strokewidth', '2', '-annotate', dpi, font, '-stroke', 'none', '-fill', '#FFF', '-font', fontTtf, '-annotate',dpi, font,temporaryPath]);
 }
 

@@ -22,6 +22,43 @@ mixin checkBox
           data-thread-fids=thread.mainForumsId.join("-")
           data-thread-cids=(thread.categoriesId || []).join("-")
         )
+mixin displayForum
+  if data.forum
+    -let displayForumNav = false;
+    for f in thread.forums
+      if f.fid !== data.forum.fid
+        -displayForumNav = true;
+        .thread-panel-forum
+          a(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
+    if !displayForumNav && thread.categories.length !== 0
+      for category in thread.categories
+        if data.threadTypesId.includes(category.cid)
+          .thread-panel-forum
+            a(href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
+  else
+    -let forum;
+    if thread.forums && thread.forums.length
+      -forum = thread.forums[0];
+    if forum
+      .thread-panel-forum
+        a(href=`/f/${forum.fid}` data-float-fid=forum.fid)= forum.displayName
+
+mixin displayPageCount
+  -const pageCount = Math.ceil(thread.count / state.pageSettings.threadPostList)
+  -let ellipsis = false;
+  if pageCount >= 2
+    a.thread-title-page(href=`/t/${thread.tid}?&page=${1}`)= 2
+  if pageCount > 3
+    span.thread-title-page.p-a-0 ...
+  if pageCount >= 3
+    a.thread-title-page(href=`/t/${thread.tid}?&page=${pageCount - 1}`)= pageCount
+  //--for (let i = 1; i < pageCount; i++)
+    if i < 4 || i > pageCount - 3
+      a.thread-title-page(href=`/t/${thread.tid}?&page=${i}`)= i + 1
+    else if !ellipsis
+      span.thread-title-page ...
+      -ellipsis = true;
+
 -const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
 -const threadListStyle = defaultThreadListStyle || state.threadListStyle;
 -let postCoverPosition = 'null';
@@ -43,42 +80,98 @@ mixin checkBox
   if thread.recycleMark
     include ../module_toDraft
   .thread-panel-body(class=styleType)
-    if postCoverPosition === 'left'
-      +threadCover('p-r-1')
-    .thread-panel-content
-      if styleType === 'minimalist'
+    if styleType === 'minimalist'
+      .thread-panel-content
         .thread-panel-author-info
-          +checkBox
           if !thread.firstPost.anonymous
             a.thread-panel-minimalist-avatar(href=`/u/${thread.uid}` target="_blank" data-float-uid=thread.uid)
               img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
           else
             .thread-panel-minimalist-avatar
               img(src=anonymousInfo.avatar)
-          a.thread-panel-minimalist-title(href=`/t/${thread.tid}` title=thread.firstPost.t)=thread.firstPost.t
+          .thread-panel-minimalist-title
+            +checkBox
+            a.thread-panel-minimalist-title-a(href=`/t/${thread.tid}` title=thread.firstPost.t class=thread.digest ? "digest" : "" )=thread.firstPost.t
+            +displayPageCount
           .absolute-count
-            //span.thread-panel-minimalist-count
-              span(title=`回复${thread.count}`)=thread.count
-              span.thread-panel-minimalist-line /
-              span(title=`浏览${thread.hits}`)=thread.hits
             -const toc = nkcTimeFormat(thread.firstPost.toc);
             -let tlm;
             if hasReply
               -tlm = nkcTimeFormat(thread.lastPost.toc);
             span.thread-panel-minimalist-toc
-              if tlm
-                span(title=`最新回复于${format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc)}`)=tlm
-                span.thread-panel-minimalist-line /
+              if toc
+                span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc)}`)=toc
               if thread.count
+                if toc
+                  span.thread-panel-minimalist-line /
                 span.count(title=`回复数${thread.count}`)
                   //.fa.fa-comment
                   span=thread.count
-              if toc
-                if tlm || thread.count
+              if tlm
+                if toc || thread.count
                   span.thread-panel-minimalist-line /
-                span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.toc)}`)=toc
+                span(title=`最新回复于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.tlm)}`)=tlm
+    else if styleType === 'brief'
+      .thread-panel-content
+        .thread-panel-author-avatar
+          if !thread.firstPost.anonymous
+            .thread-panel-author(data-float-uid=thread.uid)
+              a(href=`/u/${thread.uid}` target="_blank")
+                img(src=tools.getUrl('userAvatar', thread.firstPost.user.avatar, 'sm'))
+          else
+            .thread-panel-author
+              img(src=anonymousInfo.avatar)
+        .thread-panel-author-info
+          +checkBox
+          if !thread.firstPost.anonymous
+            .thread-panel-author(data-float-uid=thread.uid)
+              a(
+                href=`/u/${thread.uid}` target="_blank"
+              )= thread.firstPost.user.username
+          else
+            .thread-panel-author
+              span.anonymous-name= anonymousInfo.username
 
-      else
+          +displayForum
+
+          .thread-panel-time=fromNow(thread.toc)
+
+          .thread-panel-button
+            if thread.firstPost.voteUp
+              .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
+            if thread.hits
+              .fa.fa-eye=` ${thread.hits}`
+            if thread.count
+              .fa.fa-comment=` ${thread.count}`
+          if thread.from
+            .thread-panel-from
+              if thread.from === 'own'
+                span 自己的文章
+              else if thread.from === 'subForum'
+                span 关注的专业
+              else if thread.from === 'subFriend'
+                span 好友
+              else if thread.from === "subThread"
+                span 关注的文章
+              else if thread.from === "collection"
+                span 收藏
+          if hasReply
+            .thread-panel-brief-replay
+              if !thread.lastPost.anonymous
+                a(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)=thread.lastPost.user.username
+              else
+                .thread-panel-reply-user
+                  span 匿名用户
+              span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=` ${fromNow(thread.lastPost.toc)}`
+
+        //- 文章标题
+        .thread-panel-title
+          a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t)= thread.firstPost.t
+          +displayPageCount
+    else
+      if postCoverPosition === 'left'
+        +threadCover('p-r-1')
+      .thread-panel-content
         //- 作者信息 专业信息 时间
         .thread-panel-author-info
           +checkBox
@@ -135,14 +228,7 @@ mixin checkBox
                 span 关注的文章
               else if thread.from === "collection"
                   span 收藏
-          if styleType === 'brief' && hasReply
-            .thread-panel-brief-replay
-              if !thread.lastPost.anonymous
-                a(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)=thread.lastPost.user.username
-              else
-                .thread-panel-reply-user
-                  span 匿名用户
-              span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=` ${fromNow(thread.lastPost.toc)}`
+
 
         //- 文章标题
         .thread-panel-title
@@ -159,21 +245,20 @@ mixin checkBox
           if postCoverPosition === 'left'
             +minThreadCover('p-r-1')
           .thread-panel-abstract-content
-            if styleType === 'abstract'
-              if thread.firstPost.abstractCn
-                a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
-              else
-                a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.c.slice(0, 200)
-              if hasReply
-                .thread-panel-reply
-                  a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
-                  if !thread.lastPost.anonymous
-                    a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)
-                      img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
-                  else
-                    .thread-panel-reply-user
-                      img(src=tools.getUrl("anonymousUserAvatar"))
+            if thread.firstPost.abstractCn
+              a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
+            else
+              a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.c.slice(0, 200)
+            if hasReply
+              .thread-panel-reply
+                a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
+                if !thread.lastPost.anonymous
+                  a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)
+                    img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
+                else
+                  .thread-panel-reply-user
+                    img(src=tools.getUrl("anonymousUserAvatar"))
           if postCoverPosition === 'right'
             +minThreadCover('p-l-1')
-    if postCoverPosition === 'right'
-      +threadCover('p-l-1')
+      if postCoverPosition === 'right'
+        +threadCover('p-l-1')

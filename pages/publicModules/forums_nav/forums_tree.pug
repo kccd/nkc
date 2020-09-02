@@ -20,7 +20,7 @@ mixin renderForums(forums)
           else
             .forum-block-icon(style=`background-color: ${forum.color}`)
         a(href=`/f/${forum.fid}` class=(!forum.childrenForums || !forum.childrenForums.length)?"child":"parent").forum-block-name
-          span(data-float-fid=forum.fid data-float-position='right')=forum.displayName
+          span(data-float-fid=forum.fid)=forum.displayName
       if forum.childrenForums && forum.childrenForums.length
         -let inside = false;
         if data.forum && forum.childrenForums
@@ -49,7 +49,7 @@ if data.user && state.subForums && state.subForums.length >0
                 img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
-            a(href=`/f/${forum.fid}` data-float-fid=forum.fid data-float-position='right').forum-block-name=forum.displayName
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
 if data.forum && data.visitedForums && data.visitedForums.length
   .m-b-1
     .panel-header 最近访问
@@ -62,7 +62,7 @@ if data.forum && data.visitedForums && data.visitedForums.length
                 img.forum-block-icon(src=`/forum_avatar/${forum.fid}`)
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
-            a(href=`/f/${forum.fid}` data-float-fid=forum.fid data-float-position='right').forum-block-name=forum.displayName
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
 .m-b-1
   .panel-header 文章汇总
   .home-topic-item-div

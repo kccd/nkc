@@ -4,6 +4,7 @@
 * @param {Object} user 用户对象
 * */
 const imageMagick = require('../../../tools/imageMagick');
+const {addImageTextWaterMaskForImage} = require('../../../tools/ffmpeg');
 const FILE = require("../../../nkcModules/file");
 const PATH = require('path');
 const fsPromise = require('fs').promises;
@@ -83,13 +84,14 @@ module.exports = async (options) => {
 
       // 计算名称长度
       const usernameLength = username.replace(/[^\x00-\xff]/g,"01").length;
-      const usernameWidth = usernameLength * 12;
+      let usernameWidth = usernameLength * 12;
       const waterSmallPath = await db.AttachmentModel.getWatermarkFilePath('small');
       const waterBigPath = await db.AttachmentModel.getWatermarkFilePath('normal');
       const watermarkSettings = await db.SettingModel.getWatermarkSettings();
       const watermarkPictureInfo = await imageMagick.info(waterSmallPath);
       const siteLogoWidth = parseInt(watermarkPictureInfo.width);
       const siteLogoHeight = parseInt(watermarkPictureInfo.height);
+      usernameWidth += siteLogoWidth * 0.1; /* logo和文字之间的间隙 */
 
       // 计算水印位置
       const positions = {
@@ -116,8 +118,53 @@ module.exports = async (options) => {
         if(waterSetting.waterStyle === 'siteLogo') {
           await imageMagick.watermarkify(watermarkSettings.transparency, waterSetting.waterGravity, waterBigPath, path);
         } else {
-          await imageMagick.watermarkifyLogo(watermarkSettings.transparency, logoCoor, waterSetting.waterGravity, waterSmallPath, path);
-          await imageMagick.watermarkifyFont(userCoor, username, waterSetting.waterGravity, path);
+          // await imageMagick.watermarkifyLogo(watermarkSettings.transparency, logoCoor, waterSetting.waterGravity, waterSmallPath, path);
+          // await imageMagick.watermarkifyFont(watermarkSettings.transparency, userCoor, username, waterSetting.waterGravity, path);
+          let position;
+          // 右下角
+          if(waterSetting.waterGravity === "southeast") {
+            position = {
+              x: "W-w-10",
+              y: "H-h-10"
+            }
+          }
+          // 右上角
+          if(waterSetting.waterGravity === "northeast") {
+            position = {
+              x: "W-w-10",
+              y: "10"
+            }
+          }
+          // 左上角
+          if(waterSetting.waterGravity === "northwest") {
+            position = {
+              x: "10",
+              y: "10"
+            }
+          }
+          // 左下角
+          if(waterSetting.waterGravity === "southwest") {
+            position = {
+              x: "10",
+              y: "H-h-10"
+            }
+          }
+          // 正中间
+          if(waterSetting.waterGravity === "center") {
+            position = {
+              x: "(W-w)/2",
+              y: "(H-h)/2"
+            }
+          }
+          let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
+          await addImageTextWaterMaskForImage({
+            input: path, 
+            output: path, 
+            image: waterSmallPath, 
+            text: username,
+            transparency: ffmpegTransparency,
+            position
+          });
         }
       }
     }
