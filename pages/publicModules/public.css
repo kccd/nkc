@@ -1446,16 +1446,17 @@ footer.footer ul li{
 }
 .thread-panel-brief-replay{
   display: inline-block;
-  float: right;
   color: #555;
   font-size: 1.1rem;
 }
 .thread-panel-body.brief{
   padding: 0.1rem 0;
-  margin: 0.1rem 0;
+  /*margin: 0.1rem 0;*/
+  color: #888;
+  border-bottom: 1px solid #f0f0f0;
 }
-.thread-panel-brief-replay a{
-  color: #3494da;
+.thread-panel-brief-replay a, .thread-panel-brief-replay span{
+  color: #888;
 }
 
 .thread-panel-body.brief:hover{
@@ -1470,6 +1471,7 @@ footer.footer ul li{
 .thread-panel-body.brief .thread-panel-title .title-content{
   font-size: 1.3rem;
   font-weight: normal;
+  color: #000;
 }
 .thread-panel-body.minimalist .thread-panel-content{
   display: block;
@@ -1482,8 +1484,9 @@ footer.footer ul li{
   width: 100%;
   overflow: hidden;
   padding-bottom: 0;
-  padding-right: 14rem;
+  padding-right: 9rem;
   padding-left: 3rem;
+  border-bottom: 1px solid #f0f0f0;
 }
 .thread-panel-body.minimalist .thread-panel-author-info:hover{
   background-color: #f4f4f4;
@@ -1503,17 +1506,16 @@ footer.footer ul li{
   vertical-align: top;
 }
 .thread-panel-minimalist-avatar img{
-  height: 2.6rem;
-  width: 2.6rem;
+  height: 2rem;
+  width: 2rem;
   box-sizing: border-box;
   border-radius: 50%;
-  border: 2px solid rgba(0, 0, 0, 0.2);
 }
 .thread-panel-minimalist-title{
   display: inline-block;
   vertical-align: top;
   font-size: 1.3rem;
-  color: #282c37;
+  color: #000;
   word-break: break-word;
   overflow: hidden;
   display: -webkit-box;
@@ -1523,12 +1525,19 @@ footer.footer ul li{
 }
 .thread-panel-minimalist-toc{
   vertical-align: top;
-  width: 8rem;
+  width: 9rem;
   text-align: right;
   display: inline-block;
   color: #555;
   font-size: 1.1rem;
   overflow: hidden;
+}
+.thread-panel-minimalist-toc .fa{
+  color: #555;
+  margin-right: 2px;
+}
+.thread-panel-minimalist-toc .count{
+  margin-right: 2px;
 }
 .thread-panel-minimalist-count{
   vertical-align: top;
