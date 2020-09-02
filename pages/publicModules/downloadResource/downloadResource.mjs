@@ -57,18 +57,18 @@ NKC.modules.downloadResource = class {
         },
         getResourceInfo(rid) {
           let self = this;
-          let infoUrl = `/r/${rid}?t=attachment`;
+          let infoUrl = `/r/${rid}?t=attachment&random=${Math.random()}`;
           let dataUrl = `/r/${rid}?t=attachment&c=download&random=${Math.random()}`;
           // 下载此附件是否需要积分
-          nkcAPI(`/r/${rid}/q?random=${Math.random()}`, "GET", {})
+          nkcAPI(`/r/${rid}?c=query&random=${Math.random()}`, "GET", {})
             .then(data => {
-              if(!data.need) {
+              if(data.need) {
+                return nkcAPI(infoUrl, "GET", {})
+              } else {
                 let downloadLink = $("<a></a>");
                 downloadLink.attr("href", dataUrl);
                 downloadLink[0].click();
                 self.close();
-              } else {
-                return nkcAPI(infoUrl, "GET", {})
               }
             })
             .then(data => {

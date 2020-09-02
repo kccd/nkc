@@ -121,6 +121,11 @@ resourceRouter
           if(todayOperationCount >= operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
         }
       }
+      if(c === "query") {
+        // 如果只是获取附件和积分相关信息
+        data.need = needScore;
+        return next();
+      }
       // 需要扣分的话进行下面的逻辑
       if(needScore) {
         // 此用户目前持有的所有积分
