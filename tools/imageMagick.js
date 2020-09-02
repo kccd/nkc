@@ -1,7 +1,7 @@
 const {spawn, exec} = require('child_process');
 const imageSize = require("image-size");
 const settings = require('../settings');
-const {banner, watermark, fontTtf} = settings.statics;
+const {banner, watermark, fontTtf, fontNotoSansHansMedium} = settings.statics;
 const {avatarSize, sizeLimit, avatarSmallSize, forumAvatarSize, webLogoSize, webSmallLogoSize, userBannerSize} = settings.upload;
 const {promisify} = require('util');
 const {platform} = require('os');
@@ -77,8 +77,9 @@ const watermarkifyLogo = (trans, dpi, position, waterSmallPath, path) => {
 // username 水印
 const watermarkifyFont = (trans, dpi, font, position, path, temporaryPath) =>{
   let alpha = trans / 100;
-  let strokeColorNumber = 255 - 255 * (alpha + 0.2);
-  let args = ['mogrify','-font', fontTtf, '-pointsize', '24', '-background', 'black', '-gravity', position ,'-stroke', `rgba(${strokeColorNumber}, ${strokeColorNumber}, ${strokeColorNumber}, ${alpha})`, '-strokewidth', '1', '-annotate', dpi, font, '-stroke', 'none', '-fill', `rgba(255,255,255,${alpha})`, '-annotate',dpi, font,path, path];
+  // let strokeColorNumber = (2 - alpha) * 100;
+  const strokeColorNumber = 50;
+  let args = ['mogrify','-font', fontNotoSansHansMedium, '-weight', 800, '-pointsize', '24', '-background', 'black', '-gravity', position ,'-stroke', `rgba(${strokeColorNumber}, ${strokeColorNumber}, ${strokeColorNumber}, ${alpha})`, '-strokewidth', '1', '-annotate', dpi, font, '-stroke', 'none', '-fill', `rgba(255,255,255,${alpha})`, '-annotate',dpi, font,path, path];
   if(linux) {
     return spawnProcess(args.shift(), args);
   }
