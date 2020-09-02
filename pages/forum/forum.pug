@@ -224,11 +224,12 @@ block content
             .panel-header 主管专家
             .forum-moderators
               for u in data.moderators
-                a.forum-moderator(href=`/u/${u.uid}` target="_blank" data-float-uid=u.uid)
+                a.forum-moderator(href=`/u/${u.uid}` target="_blank")
                   .forum-moderator-avatar
-                    img(src=tools.getUrl("userAvatar", u.avatar))
+                    img(src=tools.getUrl("userAvatar", u.avatar) data-float-uid=u.uid)
                   .forum-moderator-info
-                    .forum-moderator-name=u.username
+                    .forum-moderator-name
+                      span(data-float-uid=u.uid)=u.username
                     .forum-moderator-description=u.description || "暂无简介"
         //-if data.forum.parentForums && data.forum.parentForums.length > 0
           +forumPanel("上级专业", data.forum.parentForums)
