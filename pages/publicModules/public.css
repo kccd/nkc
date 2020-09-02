@@ -1386,7 +1386,7 @@ footer.footer ul li{
 }
 .thread-panel-author {
   display: inline-block;
-  margin-right: 0.5rem;
+  /*margin-right: 0.5rem;*/
 }
 .thread-checkbox{
   display: inline;
@@ -1429,7 +1429,7 @@ footer.footer ul li{
 .thread-panel-forum a{
   color: #7e8da0;
   font-weight: 700;
-  margin-right: 0.5rem;
+  /*margin-right: 0.5rem;*/
 }
 .thread-panel-forum a:hover, .thread-panel-forum a:active, .thread-panel-forum a:visited,.thread-panel-forum a:link{
   text-decoration: none;
@@ -1446,24 +1446,43 @@ footer.footer ul li{
 }
 .thread-panel-brief-replay{
   display: inline-block;
-  color: #555;
+  color: #aaa;
   font-size: 1.1rem;
 }
 .thread-panel-body.brief{
-  padding: 0.1rem 0;
+  padding: 0.5rem 0;
   /*margin: 0.1rem 0;*/
   color: #888;
   border-bottom: 1px solid #f0f0f0;
 }
 .thread-panel-brief-replay a, .thread-panel-brief-replay span{
-  color: #888;
+  color: #aaa;
 }
 
 .thread-panel-body.brief:hover{
   background-color: #f4f4f4;
 }
 .thread-panel-body.brief .thread-panel-title{
-  padding-left: 2rem;
+  /*padding-left: 2rem;*/
+}
+.thread-panel-body.brief .thread-panel-author img{
+  height: 2.6rem;
+  margin-top: 0;
+  width: 2.6rem;
+  border-radius: 3px;
+}
+.thread-panel-body.brief .thread-panel-content{
+  position: relative;
+  width: 100%;
+  padding-left: 3.5rem;
+}
+.thread-panel-body.brief .thread-panel-author-avatar{
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+}
+.thread-panel-body.brief  .thread-panel-author-info{
+
 }
 .thread-panel-body.brief .thread-panel-author a, .thread-panel-body.brief .thread-panel-forum a{
   font-weight: normal;
@@ -1472,6 +1491,12 @@ footer.footer ul li{
   font-size: 1.3rem;
   font-weight: normal;
   color: #000;
+}
+.thread-panel-body.brief .thread-panel-title .title-content:visited{
+  color: #6e6e6e;
+}
+.thread-panel-body.brief .thread-panel-title .title-content.digest{
+  color: #e85a71;
 }
 .thread-panel-body.minimalist .thread-panel-content{
   display: block;
@@ -1523,6 +1548,16 @@ footer.footer ul li{
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
+.thread-panel-minimalist-title .thread-panel-minimalist-title-a{
+  color: #000;
+  margin-right: 0.5rem;
+}
+.thread-panel-minimalist-title .thread-panel-minimalist-title-a:visited{
+  color:#6e6e6e;
+}
+.thread-panel-minimalist-title .thread-panel-minimalist-title-a.digest{
+  color: #e85a71;
+}
 .thread-panel-minimalist-toc{
   vertical-align: top;
   width: 9rem;
@@ -1552,7 +1587,7 @@ footer.footer ul li{
   padding: 0 2px;
 }
 @media (min-width: 768px) {
-  .thread-panel-title{
+  .thread-panel-body.abstract .thread-panel-title{
     overflow: hidden;
     width: 100%;
     display: -webkit-box;
