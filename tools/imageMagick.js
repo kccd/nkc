@@ -11,6 +11,7 @@ const path = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const execProcess = promisify(exec);
 const {upload} = require('../settings');
+
 const spawnProcess = (pathName, args, options = {}) => {
   return new Promise((resolve, reject) => {
     const bat = spawn(pathName, args, options);

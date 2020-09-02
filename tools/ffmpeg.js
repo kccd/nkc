@@ -162,7 +162,7 @@ async function getDrawTextSize(text, fontsize) {
 const getImageSize = async (inputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath])
     .catch(data => {
-      let results = data.match(/Video: (.*?), (.*?), (.*?)[,\s]/)[3].split("x");
+      let results = data.match(/[0-9]+x[0-9]+/)[0].split("x");
       return Promise.resolve({
         width: parseInt(results[0]),
         height: parseInt(results[1])
@@ -181,7 +181,22 @@ const ffmpegFilter = async (inputPath, outputPath, filters) => {
       ...['-i', inputPath],                                              /* 输入 */
       ...['-filter_complex', filters.join(";")],                         /* 滤镜表达式 */
       '-y',                                                              /* 覆盖输出 */
-      ...bitrateAndFPSControlParameter,                                  /* 码率和帧率控制参数 */
+      // ...bitrateAndFPSControlParameter,                                  /* 码率和帧率控制参数 */
+      outputPath                                                         /* 输出 */
+    ]);
+}
+
+/**
+ * ffmpeg图片滤镜处理
+ * @param {string} inputPath 输入文件路径
+ * @param {array} filters 滤镜指令（数组，一层滤镜一个元素）
+ */
+const ffmpegImageFilter = async (inputPath, outputPath, filters) => {
+  return spawnProcess('ffmpeg',
+    [
+      ...['-i', inputPath],                                              /* 输入 */
+      ...['-filter_complex', filters.join(";")],                         /* 滤镜表达式 */
+      '-y',                                                              /* 覆盖输出 */
       outputPath                                                         /* 输出 */
     ]);
 }
@@ -239,7 +254,47 @@ async function addImageTextWaterMask(op) {
   return ffmpegFilter(input, output, [
     `movie='${image}'[logo]`,
     `[logo]scale=${logoWidth}:${logoHeight}[image]`,
-    `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=${logoWidth + gap}:y=${logoHeight-textHeight}/2:text='${text}':fontsize=${fontSize}:fontcolor=white:fontfile='${fontFilePathForFFmpeg}', lut=a=val*${transparency}[watermask]`,
+    `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=${logoWidth + gap}:y=${logoHeight-textHeight}/2:text='${text}':fontsize=${fontSize}:fontcolor=white:fontfile='${fontFilePathForFFmpeg}:shadowcolor=black:shadowx=1:shadowy=1', lut=a=val*${transparency}[watermask]`,
+    `[0:v][watermask]overlay=${position.x}:${position.y}`
+  ])
+}
+
+
+/**
+ * 图片添加图文水印
+ * @param {object} op 配置
+ * 配置项：
+ *  input 输入路径， output 输出路径， image 图片路径， text 文字, flex 水印占整个图片高度的百度比, position 水印位置
+ */
+async function addImageTextWaterMaskForImage(op) {
+  let {
+    input,
+    output,
+    image,
+    text,
+    flex = 0.08,
+    position = {x: 10, y: 10},
+    transparency = 0.5
+  } = op;
+  const {height: imageHeight, width: imageWidth} = await getImageSize(input);
+  console.log(`图片: h ${imageHeight} w ${imageWidth}`);
+  const logoSize = await getImageSize(image);
+  console.log(`logo: h ${logoSize.height} w ${logoSize.width}`);
+  let padHeight = ~~(imageHeight * flex);
+  let logoHeight = padHeight - 1;
+  let logoWidth = ~~(logoSize.width * (logoHeight / logoSize.height)) - 1;
+  const fontSize = padHeight - 10;
+  const {height: textHeight, width: textWidth} = await getDrawTextSize(text, fontSize);
+  const gap = ~~(logoWidth * 0.1); /* logo和文字之间和间隔 */
+  let padWidth = logoWidth + textWidth + gap;
+  console.log(`pad: h ${padHeight} w ${padWidth}`);
+
+  image = image.replace(/\\/g, "/").replace(":", "\\:");
+
+  return ffmpegImageFilter(input, output, [
+    `movie='${image}'[logo]`,
+    `[logo]scale=${logoWidth}:${logoHeight}[image]`,
+    `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=${logoWidth + gap}:y=${logoHeight-textHeight}/2:text='${text}':fontsize=${fontSize}:fontcolor=fcfcfc:fontfile='${fontFilePathForFFmpeg}:shadowcolor=b1b1b1:shadowx=1:shadowy=1', lut=a=val*${transparency}[watermask]`,
     `[0:v][watermask]overlay=${position.x}:${position.y}`
   ])
 }
@@ -265,5 +320,6 @@ module.exports = {
   getDrawTextSize,
   ffmpegFilter,
   addImageWaterMask,
-  addImageTextWaterMask
+  addImageTextWaterMask,
+  addImageTextWaterMaskForImage
 };
