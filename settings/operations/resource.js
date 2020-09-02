@@ -39,7 +39,7 @@ module.exports = {
 				GET: "fileConvertNotice"
 			},
 			q: {
-				GET: "donwloadNeedScore"
+				GET: "getResources"
 			}
 		}
 	},

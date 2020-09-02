@@ -73,7 +73,6 @@ NKC.modules.downloadResource = class {
             })
             .then(data => {
               if(!data) return;
-              console.log(data);
               self.loadding = false;
               self.rid = data.rid;
               self.fileName = data.resource.oname;
