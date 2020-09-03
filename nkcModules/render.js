@@ -103,25 +103,6 @@ const format = (type, toc) => {
   return moment(toc).format(type);
 }
 
-const nkcTimeFormat = (toc) => {
-	const now = new Date();
-	const nowNumber = now.getTime();
-	const time = new Date(toc);
-	const timeNumber = time.getTime();
-	// 1h
-	if(nowNumber - timeNumber <= 60 * 60 * 1000) {
-		return '刚刚';
-	}
-	const year = now.getFullYear();
-	const month = now.getMonth() + 1;
-	const day = now.getDate();
-	const oneDayNumber = 24 * 60 * 60 * 1000;
-	let t = new Date(`${year}-${month}-${day} 00:00:00`).getTime();
-	if(timeNumber >= t) return '今天';
-	if(timeNumber >= t - oneDayNumber) return '昨天';
-	if(timeNumber >= t - (2 * oneDayNumber)) return '前天';
-	return '';
-}
 
 
 function highlightString(content, str) {
@@ -393,7 +374,6 @@ let pugRender = (template, data, state) => {
     markdown: render.commonmark_render,
     dateTimeString: dateTimeString,
     fromNow: fromNow,
-		nkcTimeFormat,
 		format: format,
 		LineFeedConversion: LineFeedConversion,
 		getOriginLevel: getOriginLevel,

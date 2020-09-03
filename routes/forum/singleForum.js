@@ -333,7 +333,7 @@ router
 				}
 			});
 			// 最近访问的专业
-			data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId.slice(0, 10));
+			data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId.slice(0, 5));
 		}
 		// 渲染最新板块公告
 		let latestBlockNotice = data.forum.latestBlockNotice;

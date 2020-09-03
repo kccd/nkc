@@ -1464,6 +1464,7 @@ footer.footer ul li{
 }
 .thread-panel-body.brief .thread-panel-title{
   /*padding-left: 2rem;*/
+  margin-bottom: 0.6px;
 }
 .thread-panel-body.brief .thread-panel-author img{
   height: 3rem;
@@ -1567,6 +1568,9 @@ footer.footer ul li{
   color: #555;
   font-size: 1.1rem;
   overflow: hidden;
+}
+.thread-panel-minimalist-toc a{
+  color: #555;
 }
 .thread-panel-minimalist-toc .fa{
   color: #555;
@@ -1919,7 +1923,8 @@ span.thread-title-page{
   display: inline-block;
   /*color: #9baec8;*/
   /*font-weight: 700;*/
-  color: #757d87;
+  /*color: #757d87;*/
+  color: #000;
   padding-left: 0.8rem;
   font-size: 1.2rem;
   line-height: 2rem;

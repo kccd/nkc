@@ -146,7 +146,7 @@ module.exports = async (options) => {
   data.homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
   // 浏览过的专业
   if(data.user) {
-    const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 20);
+    const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);
     data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
   }
   await nkcModules.apiFunction.extendManagementInfo(ctx);

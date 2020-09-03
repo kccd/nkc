@@ -125,7 +125,7 @@ router
 
     // 最近访问的专业
     if(data.user) {
-      const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 20);
+      const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);
       data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
     }
 
