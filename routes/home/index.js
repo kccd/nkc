@@ -278,7 +278,7 @@ router
         }
       }
       if(threadListType === "subscribe") {
-        if(data.user.uid === thread.tid) {
+        if(data.user.uid === thread.uid) {
           thread.from = "own";
         } else if(subTid.includes(thread.tid)) {
           thread.from = 'subThread';

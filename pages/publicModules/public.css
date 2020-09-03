@@ -1871,6 +1871,14 @@ span.thread-title-page{
   font-weight: 700;
   box-sizing: border-box;
   line-height: 3rem;
+  position: relative;
+}
+.panel-header-right-button{
+  float: right;
+  font-size: 1.2rem;
+}
+.panel-header-right-button a{
+  color: #777;
 }
 .box-shadow-panel>div>.panel-header{
   margin: -15px -15px 1rem -15px;

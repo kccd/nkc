@@ -12,11 +12,13 @@ block content
       .col-xs-12.col-md-2.hidden-xs.hidden-sm#leftDom.box-shadow-panel.p-r-0
         include ../publicModules/forums_nav/forums_tree
       .col-xs-12.col-md-7.box-shadow-panel.p-r-0
-        //-if !state.isApp && data.user && data.visitedForums.length
+        if !state.isApp && data.user && state.subForums.length
           .m-b-1
-            .panel-header 最近访问
+            .panel-header 我关注的专业
+              .panel-header-right-button
+                a(href=`/u/${data.user.uid}/profile/subscribe/forum` target="_blank") 管理
             .visited-forums
-              for f in data.visitedForums
+              for f in state.subForums
                 .visited-forum(data-float-fid=f.fid)
                   if f.logo
                     img.visited-forum-icon(src=tools.getUrl("forumLogo", f.logo))
@@ -24,7 +26,9 @@ block content
                     .visited-forum-icon(style=`background-color: ${f.color}`)
                   a(href=`/f/${f.fid}`).visited-forum-name= f.displayName
         div
+          -let threadPanelATarget;
           if data.t === "subscribe" && state.platform !== 'reactNative'
+            -threadPanelATarget = '_blank';
             .subscribe-lists.m-b-1
               .subscribe-list
                 a(data-type="reload" href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
@@ -99,7 +103,6 @@ block content
           include ../publicModules/improveUserInfo
           include ../publicModules/management/management
           include ../publicModules/apps/apps
-
           if data.noticeThreads && data.noticeThreads.length > 0
             -let sideThreads = data.noticeThreads
             -let sideThreadsHideInfo = true;
