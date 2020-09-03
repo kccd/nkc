@@ -235,7 +235,7 @@ block content
           +forumPanel("上级专业", data.forum.parentForums)
         //-if data.forum.childrenForums && data.forum.childrenForums.length > 0
           +forumPanel("细分专业", data.forum.childrenForums)
-        if data.forum.parentsId.length && data.sameLevelForums && data.sameLevelForums.length > 0
+        //-if data.forum.parentsId.length && data.sameLevelForums && data.sameLevelForums.length > 0
           +forumPanel("同级专业", data.sameLevelForums, true)
         if data.forum.noticeThreads.length > 0
           -let sideThreads = data.forum.noticeThreads;
