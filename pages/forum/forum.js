@@ -30,7 +30,7 @@ function openEditSite() {
     NKC.methods.rn.emit("openEditorPage", {
       url: url
     })
-  } else {
+  } else if(NKC.configs.platform === 'apiCloud') {
     api.openWin({
       name: url,
       url: 'widget://html/common/editorInfo.html',
@@ -39,5 +39,7 @@ function openEditSite() {
         shareType: "common"
       }
     })
+  } else {
+    NKC.methods.visitUrl(url, true);
   }
 }

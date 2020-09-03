@@ -1816,6 +1816,11 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
     if(['write', 'writePost'].includes(type) && id === recycleId) throwErr(400, `不允许发表内容到回收站，请更换专业`);
     const forum = await ForumModel.getForumByIdFromRedis(id);
     if(!forum) throwErr(400, `专业id错误 fid: ${id}`);
+    // 发表文章，只允许发表到最底层专业
+    if(type === 'write') {
+      const childForumsId = await ForumModel.getAllChildForumsIdByFid(forum.fid);
+      if(childForumsId.length) throwErr(400, `不允许在父专业发表文章`);
+    }
     if(uid && forum.moderators.includes(uid)) continue;
     const {accessible, permission, displayName} = forum;
     const {rolesId, gradesId, relation} = permission[type];
@@ -2071,7 +2076,6 @@ forumSchema.methods.getForumNav = async function(cid) {
     name: this.displayName
   });
   if(cid) {
-    console.log({fid: this.fid, cid: Number(cid)})
     const category = await ThreadTypeModel.findOne({fid: this.fid, cid: Number(cid)});
     if(category) {
       forums.push({

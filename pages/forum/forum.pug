@@ -35,7 +35,7 @@ block content
       .forum-user-panel-body
         for targetUser in users
           include ../publicModules/user_panel/user_panel
-
+  .hidden#forumInfo=objToStr({fid: data.forum.fid})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
@@ -74,16 +74,6 @@ block content
                     .count=data.forum.countPostsToday
                     .name 条更新
             .forum-buttons
-              //-if permission('visitForumInfoSettings') && data.isModerator
-                a.btn-sm.forum-sub-btn.btn.success(href=`/f/${data.forum.fid}/settings`) 设置
-              if state.isApp && data.user
-                .hidden#forumInfo=objToStr({fid: data.forum.fid})
-                button.btn-sm.forum-sub-btn.btn.success(
-                  onclick=`openEditSite()`
-                ) 发表
-                //a.btn-sm.forum-sub-btn.btn.success(
-                //  href=`/editor?type=forum&id=${data.forum.fid}`
-                //) 发表
               if !data.forum.childrenForums || data.forum.childrenForums.length === 0
                 if data.user
                   if data.subscribed
@@ -108,6 +98,19 @@ block content
                   span 细分专业：
                   for f in data.forum.childrenForums
                     a.m-r-05(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
+                else
+                  if !data.user
+                    button.forum-post-button.btn.btn-default.btn-xs(onclick='NKC.methods.toLogin()')
+                      .fa.fa-pencil-square-o
+                      | &nbsp;发表文章
+                  else if state.isApp
+                    button.forum-post-button.btn.btn-default.btn-xs(onclick=`openEditSite()`)
+                      .fa.fa-pencil-square-o
+                      | &nbsp;发表文章
+                  else
+                    a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
+                      .fa.fa-pencil-square-o
+                      | &nbsp;发表文章
         if data.type === "latest"
           div
             .m-b-1
@@ -221,11 +224,12 @@ block content
             .panel-header 主管专家
             .forum-moderators
               for u in data.moderators
-                a.forum-moderator(href=`/u/${u.uid}` target="_blank" data-float-uid=u.uid)
+                a.forum-moderator(href=`/u/${u.uid}` target="_blank")
                   .forum-moderator-avatar
-                    img(src=tools.getUrl("userAvatar", u.avatar))
+                    img(src=tools.getUrl("userAvatar", u.avatar) data-float-uid=u.uid)
                   .forum-moderator-info
-                    .forum-moderator-name=u.username
+                    .forum-moderator-name
+                      span(data-float-uid=u.uid)=u.username
                     .forum-moderator-description=u.description || "暂无简介"
         //-if data.forum.parentForums && data.forum.parentForums.length > 0
           +forumPanel("上级专业", data.forum.parentForums)

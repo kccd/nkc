@@ -65,13 +65,11 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
       ul.nav.navbar-nav.navbar-right.nav-font-color.navbar-md
         if data.user
           - var title = `${data.user.username}\n`+`学术分 ${data.user.xsf}\n`+`${data.user.info.certsName}`;
-          li.userInfo
+          li
             -let editorHref = "/editor";
             if data.forum
               -editorHref = `/editor?type=forum&id=${data.forum.fid}`;
-            a.new-thread(href=editorHref)
-              .fa.fa-pencil-square-o &nbsp;
-              | 发表文章
+            a(href=editorHref target='_blank') 发表文章
           li.new-message.message-switch(class=messageSum?"":"hidden")
             a(href="/message") 消息
             .nav-user-avatar-count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
@@ -96,41 +94,41 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                       -const targetUserXSF = data.user.xsf;
                       include ../../publicModules/userScores
                   .nav-user-links
-                    a(href=`/u/${data.user.uid}/profile`).col-xs-6.nav-user-link
+                    a(href=`/u/${data.user.uid}/profile` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-user-circle
                       | 我的主页
                     -let showColumnLink = true;
                     if state.userColumn
-                      a(href=`/m/${state.userColumn._id}`).col-xs-6.nav-user-link
+                      a(href=`/m/${state.userColumn._id}` target='_blank').col-xs-6.nav-user-link
                         .fa.fa-columns
                         | 我的专栏
                     else if data.user && state.columnPermission
-                      a(href=`/column/apply`).col-xs-6.nav-user-link
+                      a(href=`/column/apply` target='_blank').col-xs-6.nav-user-link
                         .fa.fa-columns
                         | 开设专栏
                     else
                       -showColumnLink = false;
-                    a(href="/message").col-xs-6.nav-user-link
+                    a(href="/message" target='_blank').col-xs-6.nav-user-link
                       .fa.fa-envelope-o
                       | 消息中心
                       .count.message-switch.message-count(class=messageSum?"":"hidden")=messageSum?messageSum:""
-                    a(href=`/u/${data.user.uid}/profile/draft`).col-xs-6.nav-user-link
+                    a(href=`/u/${data.user.uid}/profile/draft` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
                       //-.count(class=data.user.draftCount?"":"hidden")=data.user.draftCount
-                    a(href=`/u/${data.user.uid}/settings`).col-xs-6.nav-user-link
+                    a(href=`/u/${data.user.uid}/settings` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-cog
                       | 资料设置
-                    a(href=`/u/${data.user.uid}/profile/finance?t=all`).col-xs-6.nav-user-link
+                    a(href=`/u/${data.user.uid}/profile/finance?t=all` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-file-text-o
                       | 我的账单
-                    a(href=`/shop/order`).col-xs-6.nav-user-link
+                    a(href=`/shop/order` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-file-text-o
                       | 我的订单
-                    a(href=`/shop/manage/order`).col-xs-6.nav-user-link
+                    a(href=`/shop/manage/order` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-archive
                       | 我出售的
-                    a(href=`/shop/cart`).col-xs-6.nav-user-link
+                    a(href=`/shop/cart` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-shopping-cart
                       | 购物车
                     a(onclick="NKC.methods.logout()" title='不，不要走！' class=showColumnLink?"col-xs-6":"col-xs-12").nav-user-link

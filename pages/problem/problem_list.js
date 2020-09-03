@@ -2,9 +2,14 @@
 var app = new Vue({
   el: '#app',
   data: {
-    mypdf: ''
+    mypdf: '',
+    show: false,
   },
   mounted: function () {
+    this.show = true;
+    setTimeout(function() {
+      window.floatUserPanel && floatUserPanel.initPanel();
+    }, 500);
   },
   methods: {
     deleteType: function (cid, name) {
