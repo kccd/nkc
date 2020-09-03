@@ -28,6 +28,6 @@ module.exports = async () => {
   await db.SettingModel.saveAllSettingsToRedis();
   // 操作权限
   await db.OperationModel.saveAllOperationsToRedisAsync();
-  // 积分操作设置
+  // 积分操作相关配置
   await db.ScoreOperationModel.saveAllScoreOperationToRedis();
 }

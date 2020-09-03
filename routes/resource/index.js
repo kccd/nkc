@@ -78,7 +78,8 @@ resourceRouter
         }
       }
 
-      const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
+      const operation = await db.ScoreOperationModel.getScoreOperationFromRedis("default", "attachmentDownload");
+      // const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
       const enabledScoreTypes = await db.SettingModel.getEnabledScoresType();
       // 下载此附件是否需要积分状态位
       let needScore = false;

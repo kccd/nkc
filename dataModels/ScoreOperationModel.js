@@ -1,6 +1,6 @@
 const mongoose = require("../settings/database");
-const getRedisKeys = require('../../nkcModules/getRedisKeys');
-const redisClient = require('../../settings/redisClient');
+const getRedisKeys = require('../nkcModules/getRedisKeys');
+const redisClient = require('../settings/redisClient');
 const schema = new mongoose.Schema({
   _id: Number,
   type: {
@@ -70,7 +70,7 @@ const schema = new mongoose.Schema({
 schema.statics.saveAllScoreOperationToRedis = async () => {
   const ScoreOperationModel = mongoose.model('scoreOperations');
   const operations = await ScoreOperationModel.find();
-  const redisOperationKeys = await redisClient.keysAsync(getRedisKeys(`searchScoreOperation`));
+  const redisOperationKeys = await redisClient.keysAsync(getRedisKeys("searchScoreOperation"));
   for(const o of operations) {
     const {from, type} = o;
     const key = getRedisKeys('scoreOperation', from, type);
@@ -112,7 +112,7 @@ schema.statics.downloadNeedScore = async () => {
       break;
     }
   }
-  return !needScore;
+  return needScore;
 }
 
 module.exports = mongoose.model('scoreOperations', schema);

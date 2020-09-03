@@ -62,6 +62,7 @@ router
       from: 'forum',
       fid: forum.fid
     });
+    await db.ScoreOperationModel.saveAllScoreOperationToRedis();
     await next();
   });
 module.exports = router;
