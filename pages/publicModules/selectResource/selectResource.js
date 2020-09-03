@@ -422,7 +422,7 @@ NKC.modules.SelectResource = function() {
         });
       },
       // 预览大图
-      viewPicture: function(e, resource) {
+      /*viewPicture: function(e, resource) {
         if(resource.mediaType !== "mediaPicture") return;
         console.log("预览大图");
         clearTimeout(timer);
@@ -440,16 +440,16 @@ NKC.modules.SelectResource = function() {
             display: "none"
           });
         }, 400);
-      }
+      }*/
     }
   });
 
-  var timer;
+  // var timer;
 
   // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
   socket.on("message", function(data) {
     if(data.state === "fileProcessFinish") {
-      console.log("文件处理完成");
+      // console.log("文件处理完成");
       self.app.category = "all";
       self.app.getResources(0);
     }
