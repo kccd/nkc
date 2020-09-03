@@ -103,4 +103,7 @@ module.exports = client;
 * 权限 操作
 * operation:${operationId} = jsonString operationObj
 *
+* 积分策略
+* scoreOperation:default:${scoreOperationType} = jsonString scoreOperationObj
+*
 */

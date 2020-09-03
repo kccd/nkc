@@ -23,7 +23,7 @@ NKC.modules.SelectResource = function() {
       pageType: "list", // list: 资源列表, uploader: 上传
       category: "all", // all: 全部，unused: 未使用, used: 已使用, upload: 正在上传的文件
       resourceType: "", // all, picture, video, audio, attachment
-      quota: 20,
+      quota: 16,
       paging: {},
       pageNumber: "",
       resources: [],
@@ -160,7 +160,7 @@ NKC.modules.SelectResource = function() {
         // alert(this);
       },
       initModule: function() {
-        var height = "43.5rem";
+        var height = "54.5rem";
         /*var height = "41.5rem";
         if(this.allowedExt.length !== 1) {
           height = "43.5rem";
@@ -420,9 +420,31 @@ NKC.modules.SelectResource = function() {
         NKC.methods.rn.emit("recordAudioAndUpload", {}, function(data) {
           self.app.crash();
         });
+      },
+      // 预览大图
+      viewPicture: function(e, resource) {
+        if(resource.mediaType !== "mediaPicture") return;
+        console.log("预览大图");
+        clearTimeout(timer);
+        var rid = resource.rid;
+        $("#moduleSelectResourceViewPicture").css({
+          display: "block",
+          height: $(window).height(),
+          backgroundImage: "url(/r/"+ rid +")"
+        })
+      },
+      closePicture: function() {
+        // console.log(9879879);
+        timer = setTimeout(function() {
+          $("#moduleSelectResourceViewPicture").css({
+            display: "none"
+          });
+        }, 400);
       }
     }
   });
+
+  var timer;
 
   // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
   socket.on("message", function(data) {
