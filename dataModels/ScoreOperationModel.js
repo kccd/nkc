@@ -76,7 +76,7 @@ schema.statics.saveAllScoreOperationToRedis = async () => {
     const key = getRedisKeys('scoreOperation', from, type);
     const index = redisOperationKeys.indexOf(key);
     if(index !== -1) redisOperationKeys.splice(index, 1);
-    await redisClient.setAsync(key, JSON.stringify(o));    
+    await redisClient.setAsync(key, JSON.stringify(o));
   }
   for(const k of redisOperationKeys) {
     await redisClient.delAsync(k);
@@ -99,20 +99,21 @@ schema.statics.getScoreOperationFromRedis = async (from, type) => {
  */
 schema.statics.downloadNeedScore = async () => {
   const SettingModel = mongoose.model("settings");
-  const operation = await SettingModel.getDefaultScoreOperationByType("attachmentDownload");
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  const operation = await ScoreOperationModel.getScoreOperationFromRedis('default', 'attachmentDownload');
+  if(!operation.count) return false;
+  // const operation = await SettingModel.getDefaultScoreOperationByType("attachmentDownload");
   const enabledScoreTypes = await SettingModel.getEnabledScoresType();
   // 下载此附件是否需要积分状态位
-  let needScore = false;
   // 此操作是否需要积分(更新状态位)
   for(let typeName of enabledScoreTypes) {
     let number = operation[typeName];
     // 如果设置的操作花费的积分不为0才考虑扣积分
     if(number !== 0) {
-      needScore = true;
-      break;
+      return true;
     }
   }
-  return needScore;
+  return false;
 }
 
 module.exports = mongoose.model('scoreOperations', schema);
