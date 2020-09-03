@@ -1,4 +1,6 @@
 const mongoose = require("../settings/database");
+const getRedisKeys = require('../nkcModules/getRedisKeys');
+const redisClient = require('../settings/redisClient');
 const schema = new mongoose.Schema({
   _id: Number,
   type: {
@@ -61,5 +63,57 @@ const schema = new mongoose.Schema({
 }, {
   collection: 'scoreOperations'
 });
+
+/**
+ * 缓存所有积分操作设置
+ */
+schema.statics.saveAllScoreOperationToRedis = async () => {
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  const operations = await ScoreOperationModel.find();
+  const redisOperationKeys = await redisClient.keysAsync(getRedisKeys("searchScoreOperation"));
+  for(const o of operations) {
+    const {from, type} = o;
+    const key = getRedisKeys('scoreOperation', from, type);
+    const index = redisOperationKeys.indexOf(key);
+    if(index !== -1) redisOperationKeys.splice(index, 1);
+    await redisClient.setAsync(key, JSON.stringify(o));
+  }
+  for(const k of redisOperationKeys) {
+    await redisClient.delAsync(k);
+  }
+};
+
+
+/**
+ * 从缓存获取积分操作设置
+ */
+schema.statics.getScoreOperationFromRedis = async (from, type) => {
+  let data = await redisClient.getAsync(getRedisKeys("scoreOperation", from, type));
+  return !data
+    ? null
+    : JSON.parse(data);
+}
+
+/**
+ * 下载附件是否需要积分
+ */
+schema.statics.downloadNeedScore = async () => {
+  const SettingModel = mongoose.model("settings");
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  const operation = await ScoreOperationModel.getScoreOperationFromRedis('default', 'attachmentDownload');
+  if(!operation.count) return false;
+  // const operation = await SettingModel.getDefaultScoreOperationByType("attachmentDownload");
+  const enabledScoreTypes = await SettingModel.getEnabledScoresType();
+  // 下载此附件是否需要积分状态位
+  // 此操作是否需要积分(更新状态位)
+  for(let typeName of enabledScoreTypes) {
+    let number = operation[typeName];
+    // 如果设置的操作花费的积分不为0才考虑扣积分
+    if(number !== 0) {
+      return true;
+    }
+  }
+  return false;
+}
 
 module.exports = mongoose.model('scoreOperations', schema);

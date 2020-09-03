@@ -83,7 +83,7 @@
   font-size: 1rem;
   position: relative;
   overflow: hidden;
-  padding-top: 1.5rem;
+  padding-top: 3.5rem;
   text-align: center;
 }
 #moduleSelectResource .resource-picture.upload .remove-file{
@@ -101,7 +101,7 @@
 #moduleSelectResource  .resources-body{
   font-size: 0;
   position: relative;
-  height: 28rem;
+  height: 39rem;
 }
 #moduleSelectResource .resource-upload-body{
   height: 100%;
@@ -113,7 +113,7 @@
 }
 #moduleSelectResource  .resource{
   width: 23.5%;
-  height: 5.2rem;
+  height: 9.2rem;
   margin: 0 1% 1% 0;
   position: relative;
   font-size: 0;
@@ -320,4 +320,28 @@
 
 #moduleSelectResource .resource-in-process-bg{
   background-color: #dfdfdf;
+}
+
+#moduleSelectResourceApp .resource-picture.media-picture {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: black;
+}
+
+
+/* 图片预览窗 */
+#moduleSelectResourceViewPicture {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 460px;
+  /* background-color: #aaa; */
+  padding: 10px;
+  transition: all 0.4s;
+  pointer-events: none;
+  display: none;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
 }

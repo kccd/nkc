@@ -67,12 +67,11 @@
           .resource-info(v-if="!resources.length") 空空如也~
           //- 资源显示
           .resource(v-else v-for="r, index in resources"
-            :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname"
-            )
+            :title="'时间：'+ new Date(r.toc).toLocaleString()+'\\n文件名：' + r.oname")
             span(v-if='r.state === "usable"')
               .resource-picture(v-if="r.mediaType === 'uploading'" :style="'background-image:url(/rt/' + r.rid + ')'")
-              .resource-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(/rt/' + r.rid + ')'")
-              .resource-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(/frameImg/' + r.rid + ')'")
+              .resource-picture.media-picture(v-if="r.mediaType === 'mediaPicture'" :style="'background-image:url(/rt/' + r.rid + ')'")
+              .resource-picture.media-picture(v-if="r.mediaType === 'mediaVideo'" :style="'background-image:url(/frameImg/' + r.rid + ')'")
               .resource-picture.icon(v-if="r.mediaType === 'mediaAudio'" :style="'background-image:url(/attachIcon/mp3.png)'")
               .resource-picture.icon(v-if="r.mediaType === 'mediaAttachment'" :style="'background-image:url(/attachIcon/'+r.ext+'.png)'")
             span(v-else)
@@ -86,6 +85,7 @@
                 .fa.fa-check-square-o.active(@click="selectResource(r)")
                 .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
               .resource-options(v-else)
+                //-.resource-mask(@click="fastSelectResource(r)" @mouseenter="viewPicture($event, r)" @mouseleave="closePicture()")
                 .resource-mask(@click="fastSelectResource(r)")
                 .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
                 .fa.fa-square-o(@click="selectResource(r)")
@@ -118,6 +118,7 @@
           button(type="button" class="btn btn-primary btn-sm" disabled v-if="croppingPicture") 裁剪中..
             .fa.fa-spinner.fa-spin.fa-fw
           button(type="button" class="btn btn-primary btn-sm" @click="cropPicture" v-else) 确定
+    #moduleSelectResourceViewPicture
 
 +includeJS("/publicModules/crop/dist/cropper.js")
 +includeJS("/publicModules/crop/dist/jquery-cropper.js")

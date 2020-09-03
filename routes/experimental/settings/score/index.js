@@ -98,6 +98,7 @@ router
 			await db.ScoreOperationModel.updateOne({_id}, {
 				$set: _operation
 			});
+			await db.ScoreOperationModel.saveAllScoreOperationToRedis();
 		}
 
 		checkNumber(creditMin, {

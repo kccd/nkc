@@ -119,6 +119,26 @@ var Tools = function() {
     }
     return size;
   };
+  self.briefTime = function(toc) {
+    var now = new Date();
+    var nowNumber = now.getTime();
+    var time = new Date(toc);
+    var timeNumber = time.getTime();
+    // 1h
+    if(nowNumber - timeNumber <= 60 * 60 * 1000) {
+      return '刚刚';
+    }
+    var year = now.getFullYear();
+    var month = now.getMonth() + 1;
+    var day = now.getDate();
+    var oneDayNumber = 24 * 60 * 60 * 1000;
+    var t = new Date(year + '-' + month + '-' + day + ' 00:00:00').getTime();
+    if(timeNumber >= t) return '今天';
+    if(timeNumber >= t - oneDayNumber) return '昨天';
+    if(timeNumber >= t - (2 * oneDayNumber)) return '前天';
+    if(timeNumber >= t - (30 * oneDayNumber)) return '近期';
+    return '较早';
+  }
 };
 
 if(typeof window === "undefined") {

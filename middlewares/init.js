@@ -106,9 +106,11 @@ module.exports = async (ctx, next) => {
         appPlatForm: "android",
         stable: true,
         disabled: false
-      })
+      }),
     };
 
+    // 下载附件是否需要积分
+    ctx.state.downloadNeedScore = await db.ScoreOperationModel.downloadNeedScore();
     ctx.state.threadListStyle = Object.assign({}, ctx.state.pageSettings.threadListStyle);
 
     // 判断是否为APP发起的请求

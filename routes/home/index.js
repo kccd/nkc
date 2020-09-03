@@ -125,7 +125,7 @@ router
 
     // 最近访问的专业
     if(data.user) {
-      const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 20);
+      const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);
       data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
     }
 
@@ -178,13 +178,13 @@ router
       if(d === "all" || d === "thread") {
         subTid = await db.SubscribeModel.getUserSubThreadsId(data.user.uid, "sub");
       }
-      if(d === "all" || d === "own") {
+      /*if(d === "all" || d === "own") {
         subUid = subUid.concat(data.user.uid);
-      }
-      if(d === "all" || d === "reply") {
+      }*/
+      /*if(d === "all" || d === "reply") {
         const subTid_ = await db.SubscribeModel.getUserSubThreadsId(data.user.uid, "replay");
         subTid = subTid.concat(subTid_);
-      }
+      }*/
       if(d === "forum" || d === "all") {
         subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
       }
@@ -278,14 +278,23 @@ router
         }
       }
       if(threadListType === "subscribe") {
-        if(data.user.uid === thread.tid) {
+        if(data.user.uid === thread.uid) {
           thread.from = "own";
         } else if(subTid.includes(thread.tid)) {
           thread.from = 'subThread';
         } else if(subUid.includes(thread.uid)) {
           thread.from = 'subFriend';
         } else {
-          thread.from = "subColumn";
+          let inSubColumnId = false;
+          for(const columnId of thread.columnsId) {
+            if(!subColumnId.includes(columnId)) continue;
+            inSubColumnId = true;
+          }
+          if(inSubColumnId) {
+            thread.from = 'subColumn';
+          } else {
+            thread.from = 'subForum';
+          }
         }
       }
       data.threads.push(thread);

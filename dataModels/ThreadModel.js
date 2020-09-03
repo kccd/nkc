@@ -1219,15 +1219,16 @@ threadSchema.statics.getOriginalThreads = async (fid) => {
     toDraft: {$ne: true},
     type: "thread",
     originState: {$nin: ["0", "", "1", "2"]}
-  }).sort({toc: -1}).limit(10);
-  const {getRandomNumber$2: getRandomNumber} = require("../nkcModules/apiFunction");
-  const numbers = getRandomNumber({
+  }, {tid: 1, pid: 1}).sort({toc: -1}).limit(10);
+  // const {getRandomNumber$2: getRandomNumber} = require("../nkcModules/apiFunction");
+  /*const numbers = getRandomNumber({
     min: 0,
     max: posts.length - 1,
-    count: 3,
+    count: 10,
     repeat: false
-  });
-  const threadsId = numbers.map(n => posts[n].tid);
+  });*/
+  // const threadsId = numbers.map(n => posts[n].tid);
+  const threadsId = posts.map(p => p.tid);
   const threads = await ThreadModel.find({
     tid: {$in: threadsId},
     mainForumsId: {$in: fid}, disabled: false, reviewed: true, recycleMark: {$ne: true}
