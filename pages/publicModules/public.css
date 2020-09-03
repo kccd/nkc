@@ -1466,6 +1466,9 @@ footer.footer ul li{
   /*padding-left: 2rem;*/
   margin-bottom: 0.6px;
 }
+.thread-panel-body.brief .thread-panel-from{
+  color: #aaa;
+}
 .thread-panel-body.brief .thread-panel-author img{
   height: 3rem;
   margin-top: 0px;

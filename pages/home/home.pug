@@ -30,15 +30,15 @@ block content
                 a(data-type="reload" href=`/?t=subscribe&d=all${data.c ? `&c=${data.c}` : ""}`
                   class=!data.d || data.d === 'all' ? "active" : ""
                 ) 全部
-              .subscribe-list
+              //-.subscribe-list
                 a(data-type="reload" href=`/?t=subscribe&d=own${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "own" ? "active" : ""
                 ) 我的文章
               .subscribe-list
                 a(data-type="reload" href=`/?t=subscribe&d=thread${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "thread" ? "active" : ""
-                ) 关注的文章
-              .subscribe-list
+                ) 文章
+              //-.subscribe-list
                 a(data-type="reload" href=`/?t=subscribe&d=reply${data.c ? `&c=${data.c}` : ""}`
                   class=data.d === "reply" ? "active" : ""
                 ) 参与过的文章

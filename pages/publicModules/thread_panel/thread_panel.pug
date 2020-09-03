@@ -155,11 +155,13 @@ mixin displayPageCount
               else if thread.from === 'subForum'
                 span 关注的专业
               else if thread.from === 'subFriend'
-                span 好友
+                span 关注的好友
               else if thread.from === "subThread"
                 span 关注的文章
               else if thread.from === "collection"
                 span 收藏
+              else if thread.from === 'subColumn'
+                span 关注的专栏
           if hasReply
             .thread-panel-brief-replay
               if !thread.lastPost.anonymous
