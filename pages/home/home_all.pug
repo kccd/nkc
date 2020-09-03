@@ -128,11 +128,11 @@ block content
 
         if data.toppedThreads.length
           .home-forums-list.m-b-1
-            .panel-header 置顶
+            .panel-header.m-b-0 置顶
             //-.home-header
               //-.fa.fa-tags
               .header-name 置顶
-            .home-threads.p-t-05
+            .home-threads
               for thread in data.toppedThreads
                 include ../publicModules/thread_panel/thread_panel
 
@@ -322,8 +322,8 @@ block content
         //- 最新回复
         if data.originalThreads.length
           .home-forums-list.m-b-1
-            .panel-header 最新原创
-            .home-threads.p-t-05
+            .panel-header.m-b-0 最新原创
+            .home-threads
               -const defaultThreadListStyle = {type: 'brief'}
               for thread in data.originalThreads
                 include ../publicModules/thread_panel/thread_panel
