@@ -28,6 +28,7 @@ resourceRouter
     let filePath = await resource.getFilePath();
     let speed;
     data.resource = resource;
+    data.rid = resource.rid;
     // 告诉浏览器不要把这次的响应结果缓存下来
     ctx.set("Cache-Control", "no-store");
     if(mediaType === "mediaAttachment") {
@@ -90,6 +91,9 @@ resourceRouter
           break;
         }
       }
+      if(!needScore) {
+        data.settingNoNeed = true;
+      }
       // 设置的次数为 0 表示关闭积分交易，不扣积分
       if(operation.count === 0) needScore = false;
 
@@ -121,11 +125,7 @@ resourceRouter
           if(todayOperationCount >= operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
         }
       }
-      if(c === "query") {
-        // 如果只是获取附件和积分相关信息
-        data.need = needScore;
-        return next();
-      }
+      data.need = needScore;
       // 需要扣分的话进行下面的逻辑
       if(needScore) {
         // 此用户目前持有的所有积分
@@ -142,6 +142,10 @@ resourceRouter
         }
         data.myAllScore = myAllScore;
         data.rid = resource.rid;
+        if(c === "query") {
+          // 如果只是获取附件和积分相关信息
+          return next();
+        }
         // 是否需要显示下载扣分询问页面 (c 为 download 就直接扣分并返回文件)
         if(c === "download") {
           // 积分不够，返回错误页面
@@ -183,6 +187,10 @@ resourceRouter
           return next();
         }
       } else {
+        if(c === "query") {
+          // 如果只是获取附件和积分相关信息
+          return next();
+        }
         if(c === "nkc_source_pdf") {
           return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid);
         }

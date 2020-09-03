@@ -11,7 +11,7 @@ NKC.modules.downloadResource = class {
         size: 0,
         costs: [],
         hold: [],
-        loadding: true
+        status: "loadding"
       },
       computed: {
         costMessage() {
@@ -57,28 +57,27 @@ NKC.modules.downloadResource = class {
         },
         getResourceInfo(rid) {
           let self = this;
-          let infoUrl = `/r/${rid}?t=attachment&random=${Math.random()}`;
-          let dataUrl = `/r/${rid}?t=attachment&c=download&random=${Math.random()}`;
           // 下载此附件是否需要积分
           nkcAPI(`/r/${rid}?c=query&random=${Math.random()}`, "GET", {})
             .then(data => {
-              if(data.need) {
-                return nkcAPI(infoUrl, "GET", {})
-              } else {
+              console.log(data);
+              let dataUrl = `/r/${rid}?t=attachment&c=download&random=${Math.random()}`;
+              if(data.settingNoNeed) {
                 let downloadLink = $("<a></a>");
                 downloadLink.attr("href", dataUrl);
                 downloadLink[0].click();
                 self.close();
+                return;
               }
-            })
-            .then(data => {
-              if(!data) return;
-              self.loadding = false;
+              self.status = data.need
+                ? "needScore"
+                : "noNeedScore"
               self.rid = data.rid;
               self.fileName = data.resource.oname;
               self.type = data.resource.ext;
               self.size = NKC.methods.getSize(data.resource.size);
               let myAllScore = data.myAllScore;
+              if(!myAllScore) return;
               self.costs = myAllScore.map(score => {
                 return {
                   name: score.name,
@@ -98,7 +97,7 @@ NKC.modules.downloadResource = class {
             })
         },
         open(rid) {
-          this.loadding = true;
+          this.status = "loadding";
           this.initDom();
           this.getResourceInfo(rid);
         },

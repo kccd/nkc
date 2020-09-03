@@ -7,5 +7,7 @@ module.exports = (type, v1, v2) => {
     case 'accessibleForumsId': return `forums:accessibleForumsId`;
     case 'displayOnParentForumsId': return `forums:displayOnParentForumsId`;
     case 'displayOnSearchForumsId': return `forums:displayOnSearchForumsId`;
+    case 'scoreOperation': return `scoreOperation:${v1}:${v2}`;
+    case 'searchScoreOperation': return `scoreOperation:*`;
   }
 }

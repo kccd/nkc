@@ -27,6 +27,7 @@ module.exports = async () => {
   // 后台设置
   await db.SettingModel.saveAllSettingsToRedis();
   // 操作权限
-  await db.OperationModel.saveAllOperationsToRedisAsync()
-
+  await db.OperationModel.saveAllOperationsToRedisAsync();
+  // 积分操作设置
+  await db.ScoreOperationModel.saveAllScoreOperationToRedis();
 }
