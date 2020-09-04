@@ -2,7 +2,8 @@ const settings = require('../settings');
 const {existsSync} = require("../tools/fsSync");
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
-
+const getRedisKeys = require('../nkcModules/getRedisKeys');
+const redisClient = require('../settings/redisClient');
 const userSchema = new Schema({
   // 是否注销
   destroyed: {
@@ -610,9 +611,10 @@ userSchema.methods.updateUserMessage = async function() {
   	this[key] = updateObj[key];
   }
   await this.calculateScore();
+  // await this.tryUpdateNumberOfOtherUserOperation();
 };
 
-// 积分计算
+// 参与用户等级计算的积分
 userSchema.methods.calculateScore = async function() {
 	const SettingModel = mongoose.model('settings');
 	// 积分设置
@@ -2074,4 +2076,59 @@ userSchema.statics.saveUserToElasticSearch = async (user) => {
   }
 };
 
+/*
+* 尝试缓存用户的被阅读、被点赞、被回复/被评论的数量到redis
+* */
+userSchema.statics.tryUpdateNumberOfOtherUserOperation = async (uid) => {
+  let time = await redisClient.getAsync(getRedisKeys(`timeToSetOtherUserOperationNumber`));
+  time = Number(time) || 0;
+  const now = Date.now();
+  if(now - time < 24 * 60 * 60 * 1000) return;
+  const UserModel = mongoose.model('users');
+  await UserModel.updateNumberOfOtherUserOperation(uid);
+}
+
+/*
+* 更新用户的被阅读量、被点赞量、被回复/评论量到redis
+* @param {String} uid 用户ID
+* @author pengxiguaa 2020/9/4
+* */
+userSchema.statics.updateNumberOfOtherUserOperation = async (uid) => {
+  const UsersBehaviorModel = mongoose.model('usersBehaviors');
+  const now = Date.now();
+  const match = {
+    timeStamp: {
+      $gte: now - 24 * 60 * 60 * 1000
+    },
+    tUid: uid
+  };
+  const timeKey = getRedisKeys(`timeToSetOtherUserOperationNumber`);
+  const numberKey = getRedisKeys(`numberOfOtherUserOperation`, uid);
+  match.operationId = 'visitThread';
+  const numberOfRead = await UsersBehaviorModel.count(match);
+  match.opeartionId = 'post-vote-up';
+  const numberOfVoteUp = await UsersBehaviorModel.count(match);
+  match.operationId = 'postToThread';
+  const numberOfPost = await UsersBehaviorModel.count(match);
+  await redisClient.setAsync(numberKey, JSON.stringify({
+    read: numberOfRead,
+    voteUp: numberOfVoteUp,
+    post: numberOfPost
+  }));
+  await redisClient.setAsync(timeKey, now.toString());
+};
+/*
+* 从redis中获取用户的被阅读、被点赞、被回复或评论的数量
+* @param {String} uid 用户ID
+* @author pengxiguaa 2020/9/4
+* */
+userSchema.statics.getNumberOfOtherUserOperation = async (uid) => {
+  const numberKey = getRedisKeys(`numberOfOtherUserOperation`, uid);
+  const data = await redisClient.getAsync(numberKey);
+  return !data? {
+    read: 0,
+    voteUp: 0,
+    post: 0
+  }: JSON.parse(data);
+};
 module.exports = mongoose.model('users', userSchema);

@@ -40,15 +40,30 @@ block content
             .account-user-toc= `注册于${format(`YYYY/MM/DD HH:mm:ss`, data.targetUser.toc)}`
             .account-user-links
               .account-user-links
-                a(href=`/u/${data.targetUser.uid}`).col-xs-6.account-user-link
+                a(href=`/u/${data.targetUser.uid}` target='_blank').col-xs-6.account-user-link
                   .fa.fa-user-circle-o
                   | 访客视角
-                a(href="/message").col-xs-6.account-user-link
+                a(href="/message" target='_blank').col-xs-6.account-user-link
                   .fa.fa-comments
                   | 消息中心
-                a(href="/sticker").col-xs-6.account-user-link
+                a(href="/sticker" target='_blank').col-xs-6.account-user-link
                   .fa.fa-smile-o
                   | 我的表情
+                a(href=`/u/${data.targetUser.uid}/settings` target='_blank').col-xs-6.account-user-link
+                  .fa.fa-cog
+                  | 资料设置
+                if data.targetColumn
+                  a(href=`/m/${data.targetColumn._id}` target='_blank').col-xs-6.account-user-link
+                    .fa.fa-columns
+                    | 我的专栏
+                else if data.targetColumnPermission
+                  a(href=`/column/apply` target='_blank').col-xs-6.account-user-link
+                    .fa.fa-columns
+                    | 开设专栏
+
+                a(href=`/u/${data.targetUser.uid}/profile/finance?t=all` target='_blank').col-xs-6.account-user-link
+                  .fa.fa-file-text-o
+                  | 我的账单
             for navLink in data.navLinks
               .account-ul
                 if navLink.name
@@ -63,6 +78,19 @@ block content
         if !data.type
           .account-info
             .row
+              //-
+                .col-xs-6.col-md-3
+                  a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
+                    .account-info-value=data.numberOfOtherUserOperation.read
+                    .account-info-name 被阅读量
+                .col-xs-6.col-md-3
+                  a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
+                    .account-info-value=data.numberOfOtherUserOperation.voteUp
+                    .account-info-name 被点赞量
+                .col-xs-6.col-md-3
+                  a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
+                    .account-info-value=data.numberOfOtherUserOperation.post
+                    .account-info-name 被回复/评论量
               .col-xs-6.col-md-4
                 a(href=`/u/${data.targetUser.uid}/profile/thread` title="点击查看全部文章")
                   .account-info-value=data.targetUser.threadCount
@@ -103,7 +131,7 @@ block content
                     .account-logs-user-time=fromNow(log.timeStamp)
 
           .account-logs
-            .account-header 看过我的用户
+            .account-header 我的读者排名
             .account-description
             div
               if !data.visitSelfLogs.length

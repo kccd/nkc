@@ -4,6 +4,8 @@ div
     if !data.posts.length
       .null 空空如也~
     for post in data.posts
+      //-被回复/评论的用户
+      -const parentPost = post.parentPost? post.parentPost:post.thread.firstPost;
       -let klass = "";
       if post.toDraft
         -klass += "draft";
@@ -20,20 +22,22 @@ div
           .account-reason 审核中，仅自己可见，通过后对所有人可见。
         .account-post-thread-user
           .time=`${fromNow(post.toc)}`
-          | 回复
+          span=post.parentPostId? `评论`: '回复'
           if !post.thread
             span &nbsp;未知用户
-          else if post.thread.firstPost.anonymous
+          else if parentPost.anonymous
             img(src=anonymousInfo.avatar)
             span=anonymousInfo.username
           else
-            a(href=`/u/${post.thread.uid}` data-float-uid=post.thread.uid)
-              img(src=tools.getUrl("userAvatar", post.thread.firstPost.user.avatar, "sm"))
-              span=post.thread.firstPost.user.username
+            a(href=`/u/${parentPost.uid}` data-float-uid=parentPost.uid)
+              img(src=tools.getUrl("userAvatar", parentPost.user.avatar, "sm"))
+              span=parentPost.user.username
           span ：
         a(href=post.url).account-post-content=post.c
         .account-post-thread
-          if !post.thread
+          if post.parentPost
+            .account-thread-abstract=parentPost.abstractCN || parentPost.c
+          else if !post.thread
             .account-post-thread-warning
               .fa.fa-exclamation-circle
               span=post.threadInfo
@@ -48,6 +52,7 @@ div
               .account-thread-info
                 //-.thread-time=format("YYYY/MM/DD HH:mm:ss", post.thread.toc)
                 .thread-time=`${fromNow(post.thread.toc)}`
+                a.thread-forum-link(href=`/f/${post.thread.forums[0].fid}` target="_blank")=post.thread.forums[0].displayName
                 if post.thread.firstPost.voteUp
                   .thread-thumbup
                     .fa.fa-thumbs-up
