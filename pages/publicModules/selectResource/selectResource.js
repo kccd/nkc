@@ -35,6 +35,7 @@ NKC.modules.SelectResource = function() {
       pictureExt: ['swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'],
       files: [],
       croppingPicture: false,
+      isTouchEmit: false
     },
     mounted: function() {
 
@@ -423,8 +424,9 @@ NKC.modules.SelectResource = function() {
       },
       // 预览大图
       viewPicture: function(e, resource) {
+        // console.log(e);
+        if(this.isTouchEmit) return;
         if(resource.mediaType !== "mediaPicture") return;
-        console.log("预览大图");
         clearTimeout(timer);
         var rid = resource.rid;
         $("#moduleSelectResourceViewPicture").css({
@@ -435,11 +437,15 @@ NKC.modules.SelectResource = function() {
       },
       closePicture: function() {
         // console.log(9879879);
+        var self = this;
         timer = setTimeout(function() {
           $("#moduleSelectResourceViewPicture").css({
             display: "none"
           });
         }, 400);
+      },
+      onTouch: function() {
+        this.isTouchEmit = true;
       }
     }
   });

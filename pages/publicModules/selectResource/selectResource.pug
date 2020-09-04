@@ -85,7 +85,7 @@
                 .fa.fa-check-square-o.active(@click="selectResource(r)")
                 .resource-index {{selectedResourcesId.indexOf(r.rid) + 1}}
               .resource-options(v-else)
-                .resource-mask(@click="fastSelectResource(r)" @mouseenter="viewPicture($event, r)" @mouseleave="closePicture()")
+                .resource-mask(@click="fastSelectResource(r)" @mouseenter="viewPicture($event, r)" @mouseleave="closePicture()" @touchstart="onTouch")
                 .fa.fa-edit(@click="editImage(r)" v-if="r.mediaType === 'mediaPicture'")
                 .fa.fa-square-o(@click="selectResource(r)")
             span(v-else-if='r.state === "inProcess"')
