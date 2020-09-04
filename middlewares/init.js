@@ -37,8 +37,12 @@ module.exports = async (ctx, next) => {
       this.__templateFile = fileName
     }
   });
-  let {remoteAddress: ip, remotePort: port} = ctx.req.connection;
+  let port = ctx.get(`X-Forwarded-Remote-Port`);
+  if(port === undefined) {
+    port = ctx.req.connection.remotePort;
+  }
   let XFF = ctx.get('X-Forwarded-For');
+  let ip = '';
   if(XFF !== '') {
     XFF = XFF.replace(/::ffff:/ig, '');
     const [ip_] = XFF.split(':');

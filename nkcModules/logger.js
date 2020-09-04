@@ -66,6 +66,7 @@ module.exports = async (ctx) => {
         `${log.method.green} ${log.path.bgBlue} `+
         `<${processTime.green}ms> `+
         `${String(log.status).red} `+
+        `${address} ` +
         `${operationName.grey}`
       );
       // 非线上环境打印错误详细信息
@@ -82,6 +83,7 @@ module.exports = async (ctx) => {
         `${log.path.bgBlue} `+
         `<${processTime.green}ms> `+
         `${String(log.status).green} `+
+        `${address} ` +
         `${operationName.grey}`
       );
     }
