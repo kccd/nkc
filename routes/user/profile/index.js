@@ -45,6 +45,13 @@ router
     data.fansId = await db.SubscribeModel.getUserFansId(targetUser.uid);
     data.collectionThreadsId = await db.SubscribeModel.getUserCollectionThreadsId(targetUser.uid);
     data.targetUserScores = await db.UserModel.updateUserScores(targetUser.uid);
+    if(targetUser.uid !== user.uid) {
+      data.targetColumn = await db.UserModel.getUserColumn(targetUser.uid);
+      data.targetColumnPermission = await db.UserModel.ensureApplyColumnPermission(targetUser.uid);
+    } else {
+      data.targetColumn = state.userColumn;
+      data.targetColumnPermission = state.columnPermission;
+    }
     const noteCount = await db.NoteContentModel.count({
       uid: targetUser.uid,
       deleted: false
@@ -135,7 +142,7 @@ router
             {
               type: "",
               url: `/u/${targetUser.uid}/profile`,
-              name: "总览",
+              name: "数据概览",
               count: 0
             }
           ]
@@ -184,18 +191,6 @@ router
               name: "关注的专业",
               count: data.subForumsId.length
             },
-            /*{
-              type: "subscribe/topic",
-              url: `/u/${targetUser.uid}/profile/subscribe/topic`,
-              name: "关注的话题",
-              count: data.subTopicsId.length
-            },
-            {
-              type: "subscribe/discipline",
-              url: `/u/${targetUser.uid}/profile/subscribe/discipline`,
-              name: "关注的学科",
-              count: data.subDisciplinesId.length
-            },*/
             {
               type: "subscribe/column",
               name: "关注的专栏",
@@ -217,23 +212,8 @@ router
           ]
         },
         {
-          name: "其他",
+          name: "我的交往",
           links: [
-            {
-              type: "finance",
-              url: `/u/${targetUser.uid}/profile/finance?t=all`,
-              name: "我的账单",
-              count: await db.KcbsRecordModel.count({
-                $or: [
-                  {
-                    from: targetUser.uid
-                  },
-                  {
-                    to: targetUser.uid
-                  }
-                ]
-              })
-            },
             {
               type: "follower",
               name: "我的粉丝",
@@ -326,6 +306,7 @@ router
         data.visitSelfLogs.push(log);
       }
     }
+    // data.numberOfOtherUserOperation = await db.UserModel.getNumberOfOtherUserOperation(targetUser.uid);
     await next();
   })
   .use("/subscribe", async (ctx, next) => {

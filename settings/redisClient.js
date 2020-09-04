@@ -106,4 +106,8 @@ module.exports = client;
 * 积分策略
 * scoreOperation:default:${scoreOperationType} = jsonString scoreOperationObj
 *
+* 用户 我的主页 被阅读量、被点赞量、被回复/评论量统计
+* user:${uid}:numberOfOtherUserOperation = jsonString {read: Number, voteUp: Number, post: Number}
+* user:${uid}:timeToSetOtherUserOperationNumber 缓存被阅读、被回复等数量的时间
+*
 */

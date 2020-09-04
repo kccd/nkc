@@ -11,11 +11,16 @@ module.exports = async (ctx, next) => {
   const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
   let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(user.roles, user.grade, user);
+  const threadsId = [], parentPostId = [];
+  posts.map(post => {
+    threadsId.push(post.tid);
+    if(post.parentPostId) parentPostId.push(post.parentPostId);
+  });
   let threads = await db.ThreadModel.find({
     mainForumsId: {$in: accessibleForumsId},
-    tid: {$in: posts.map(post => post.tid)}});
+    tid: {$in: threadsId}});
   threads = await db.ThreadModel.extendThreads(threads, {
-    forum: false,
+    forum: true,
     category: false,
     firstPost: true,
     firstPostUser: true,
@@ -32,6 +37,18 @@ module.exports = async (ctx, next) => {
   threads.map(thread => {
     threadsObj[thread.tid] = thread;
   });
+  let parentPosts = await db.PostModel.find({
+    pid: {$in: parentPostId},
+    mainForumsId: {$in: accessibleForumsId},
+  });
+  parentPosts = await db.PostModel.extendPosts(parentPosts, {
+    htmlToText: true,
+    renderHTML: false,
+  });
+  const parentPostsObj = {};
+  parentPosts.map(post => {
+    parentPostsObj[post.pid] = post;
+  });
   data.posts = [];
   for(let post of posts) {
     let thread = threadsObj[post.tid];
@@ -46,6 +63,9 @@ module.exports = async (ctx, next) => {
       post.threadInfo = "原文正在等待审核，暂无法阅读";
     } else {
       post.thread = thread;
+    }
+    if(post.parentPostId) {
+      post.parentPost = parentPostsObj[post.parentPostId];
     }
     post.url = await db.PostModel.getUrl(post.pid);
     post.c = nkcModules.apiFunction.obtainPureText(post.c, true, 200);

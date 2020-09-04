@@ -7,7 +7,9 @@ module.exports = {
     'collectThread',     'visitForumHome',
     'viewForumVisitors', 'unSubscribeForum',
     'subscribeForum',    'postToThread',
-    'subscribeUser',     'unSubscribeUser'
+    'subscribeUser',     'unSubscribeUser',
+
+    'post-vote-up',      'post-vote-down'
   ],
   timeLine: [ 'postToForum', 'postToThread' ],
   experimental: [
