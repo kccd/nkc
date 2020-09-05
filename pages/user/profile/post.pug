@@ -5,7 +5,7 @@ div
       .null 空空如也~
     for post in data.posts
       //-被回复/评论的用户
-      -const parentPost = post.parentPost? post.parentPost:post.thread.firstPost;
+      -const parentPost = post.parentPost? post.parentPost:(post.thread? post.thread.firstPost: null);
       -let klass = "";
       if post.toDraft
         -klass += "draft";
