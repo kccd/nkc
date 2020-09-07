@@ -37,9 +37,11 @@ mixin renderForums(forums)
           .forum-block-children(data-fid=forum.fid style="display: none")
               +renderForums(forum.childrenForums)
 
-if data.user && state.subForums && state.subForums.length >0
+if data.user && data.forum && state.subForums && state.subForums.length >0
   .m-b-1
-    .panel-header 我关注的
+    .panel-header 关注的专业
+      .panel-header-right-button
+        a(href=`/u/${data.user.uid}/profile/subscribe/forum` target="_blank") 管理
     .home-topic-item-div
       for forum in state.subForums
         .forum-block
@@ -50,7 +52,7 @@ if data.user && state.subForums && state.subForums.length >0
               else
                 .forum-block-icon(style=`background-color: ${forum.color}`)
             a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
-if data.forum && data.visitedForums && data.visitedForums.length
+if data.visitedForums && data.visitedForums.length
   .m-b-1
     .panel-header 最近访问
     .home-topic-item-div

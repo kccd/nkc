@@ -114,6 +114,7 @@ function initVueApp() {
 
       showCloseInfo: false,
 
+      websiteUserId: data.websiteCode + "ID"
     },
     mounted: function() {
       var this_ = this;
@@ -526,6 +527,7 @@ function initVueApp() {
       },
       // 检测作者信息
       checkAuthorInfos: function() {
+        var self = this;
         var checkAuthorInfos = this.checkAuthorInfos;
         for(var i = 0; i < checkAuthorInfos.length; i++) {
           var info = checkAuthorInfos[i];
@@ -535,7 +537,7 @@ function initVueApp() {
             maxLength: 100
           });
           this.checkString(info.kcid, {
-            name: "KCID",
+            name: self.websiteUserId,
             minLength: 0,
             maxLength: 100
           });

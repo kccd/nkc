@@ -161,7 +161,7 @@ NKC.modules.SelectResource = function() {
         // alert(this);
       },
       initModule: function() {
-        var height = "54.5rem";
+        var height = "43.5rem";
         /*var height = "41.5rem";
         if(this.allowedExt.length !== 1) {
           height = "43.5rem";
@@ -423,7 +423,7 @@ NKC.modules.SelectResource = function() {
         });
       },
       // 预览大图
-      viewPicture: function(e, resource) {
+      /* viewPicture: function(e, resource) {
         // console.log(e);
         if(this.isTouchEmit) return;
         if(resource.mediaType !== "mediaPicture") return;
@@ -446,16 +446,16 @@ NKC.modules.SelectResource = function() {
       },
       onTouch: function() {
         this.isTouchEmit = true;
-      }
+      } */
     }
   });
 
-  var timer;
+  // var timer;
 
   // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
   socket.on("message", function(data) {
     if(data.state === "fileProcessFinish") {
-      console.log("文件处理完成");
+      // console.log("文件处理完成");
       self.app.category = "all";
       self.app.getResources(0);
     }

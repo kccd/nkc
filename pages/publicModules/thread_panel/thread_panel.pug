@@ -1,3 +1,4 @@
+-const aTarget = threadPanelATarget || '_self';
 mixin threadCover(klass)
   if thread.firstPost.cover
     .thread-panel-cover-big.hidden-xs.hidden-sm(class=klass)
@@ -29,19 +30,19 @@ mixin displayForum
       if f.fid !== data.forum.fid
         -displayForumNav = true;
         .thread-panel-forum
-          a(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
+          a(href=`/f/${f.fid}` data-float-fid=f.fid target=aTarget)= f.displayName
     if !displayForumNav && thread.categories.length !== 0
       for category in thread.categories
         if data.threadTypesId.includes(category.cid)
           .thread-panel-forum
-            a(href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
+            a(href=`/f/${data.forum.fid}?cat=${category.cid}` target=aTarget)= category.name
   else
     -let forum;
     if thread.forums && thread.forums.length
       -forum = thread.forums[0];
     if forum
       .thread-panel-forum
-        a(href=`/f/${forum.fid}` data-float-fid=forum.fid)= forum.displayName
+        a(href=`/f/${forum.fid}` data-float-fid=forum.fid target=aTarget)= forum.displayName
 
 mixin displayPageCount
   -const pageCount = Math.ceil(thread.count / state.pageSettings.threadPostList)
@@ -58,7 +59,7 @@ mixin displayPageCount
     else if !ellipsis
       span.thread-title-page ...
       -ellipsis = true;
-
+-const lastPostUrl = `/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`;
 -const hasReply = thread.firstPost.pid !== thread.lastPost.pid;
 -const threadListStyle = defaultThreadListStyle || state.threadListStyle;
 -let postCoverPosition = 'null';
@@ -91,13 +92,13 @@ mixin displayPageCount
               img(src=anonymousInfo.avatar)
           .thread-panel-minimalist-title
             +checkBox
-            a.thread-panel-minimalist-title-a(href=`/t/${thread.tid}` title=thread.firstPost.t class=thread.digest ? "digest" : "" )=thread.firstPost.t
+            a.thread-panel-minimalist-title-a(href=`/t/${thread.tid}` title=thread.firstPost.t class=thread.digest ? "digest" : ""  target=aTarget)=thread.firstPost.t
             +displayPageCount
           .absolute-count
-            -const toc = nkcTimeFormat(thread.firstPost.toc);
+            -const toc = tools.briefTime(thread.firstPost.toc);
             -let tlm;
             if hasReply
-              -tlm = nkcTimeFormat(thread.lastPost.toc);
+              -tlm = tools.briefTime(thread.lastPost.toc);
             span.thread-panel-minimalist-toc
               if toc
                 span(title=`发表于${format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc)}`)=toc
@@ -110,7 +111,8 @@ mixin displayPageCount
               if tlm
                 if toc || thread.count
                   span.thread-panel-minimalist-line /
-                span(title=`最新回复于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.tlm)}`)=tlm
+                a(href=lastPostUrl target=aTarget)
+                  span(title=`最新回复于${format('YYYY-MM-DD HH:mm:ss', thread.firstPost.tlm)}`)=tlm
     else if styleType === 'brief'
       .thread-panel-content
         .thread-panel-author-avatar
@@ -123,6 +125,10 @@ mixin displayPageCount
               img(src=anonymousInfo.avatar)
         .thread-panel-author-info
           +checkBox
+          //- 文章标题
+          .thread-panel-title
+            a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t target=aTarget)= thread.firstPost.t
+            +displayPageCount
           if !thread.firstPost.anonymous
             .thread-panel-author(data-float-uid=thread.uid)
               a(
@@ -150,24 +156,23 @@ mixin displayPageCount
               else if thread.from === 'subForum'
                 span 关注的专业
               else if thread.from === 'subFriend'
-                span 好友
+                span 关注的好友
               else if thread.from === "subThread"
                 span 关注的文章
               else if thread.from === "collection"
                 span 收藏
+              else if thread.from === 'subColumn'
+                span 关注的专栏
           if hasReply
             .thread-panel-brief-replay
               if !thread.lastPost.anonymous
                 a(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)=thread.lastPost.user.username
               else
-                .thread-panel-reply-user
-                  span 匿名用户
-              span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=` ${fromNow(thread.lastPost.toc)}`
+                span 匿名用户
+              | &nbsp;
+              a(href=lastPostUrl target=aTarget)
+                span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=`${fromNow(thread.lastPost.toc)}`
 
-        //- 文章标题
-        .thread-panel-title
-          a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t)= thread.firstPost.t
-          +displayPageCount
     else
       if postCoverPosition === 'left'
         +threadCover('p-r-1')
@@ -188,24 +193,7 @@ mixin displayPageCount
               img(src=anonymousInfo.avatar)
               span.anonymous-name= anonymousInfo.username
 
-          .thread-panel-forum
-            if data.forum
-              -let displayForumNav = false;
-              for f in thread.forums
-                if f.fid !== data.forum.fid
-                  -displayForumNav = true;
-                  a(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
-              if !displayForumNav && thread.categories.length !== 0
-                for category in thread.categories
-                  if data.threadTypesId.includes(category.cid)
-                    a(href=`/f/${data.forum.fid}?cat=${category.cid}`)= category.name
-            else
-              -let forum;
-              for f in thread.forums
-                -forum = f;
-                if f.forumType === 'topic'
-                  -break;
-              a(href=`/f/${forum.fid}` data-float-fid=forum.fid)= forum.displayName
+          +displayForum
 
           .thread-panel-time=fromNow(thread.toc)
 
@@ -219,11 +207,11 @@ mixin displayPageCount
           if thread.from
             .thread-panel-from
               if thread.from === 'own'
-                span 自己的文章
+                span 我的文章
               else if thread.from === 'subForum'
                 span 关注的专业
               else if thread.from === 'subFriend'
-                span 好友
+                span 关注的用户
               else if thread.from === "subThread"
                 span 关注的文章
               else if thread.from === "collection"
@@ -232,7 +220,7 @@ mixin displayPageCount
 
         //- 文章标题
         .thread-panel-title
-          a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t)= thread.firstPost.t
+          a.title-content(href=`/t/${thread.tid}` class=thread.digest ? "digest" : "" title=thread.firstPost.t target=aTarget)= thread.firstPost.t
           -const pageCount = thread.count / state.pageSettings.threadPostList
           -let ellipsis = false;
           -for(let i = 1; i < pageCount; i++)
@@ -246,12 +234,12 @@ mixin displayPageCount
             +minThreadCover('p-r-1')
           .thread-panel-abstract-content
             if thread.firstPost.abstractCn
-              a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
+              a(href=`/t/${thread.tid}` target=aTarget).thread-panel-post=thread.firstPost.abstractCn.slice(0, 200)
             else
-              a(href=`/t/${thread.tid}`).thread-panel-post=thread.firstPost.c.slice(0, 200)
+              a(href=`/t/${thread.tid}` target=aTarget).thread-panel-post=thread.firstPost.c.slice(0, 200)
             if hasReply
               .thread-panel-reply
-                a(href=`/t/${thread.tid}?&last_page=true&highlight=${thread.lastPost.pid}#highlight`)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
+                a(href=lastPostUrl target=aTarget)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
                 if !thread.lastPost.anonymous
                   a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)
                     img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))
