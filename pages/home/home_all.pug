@@ -155,7 +155,7 @@ block content
                 .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
 
         for cf in data.categoryForums
-          .home-forums-list.m-b-1
+          .home-forums-list.m-b-1.category-forums
             .panel-header=cf.name
             //-.home-header
               .header-name(title=cf.description)=cf.name
@@ -218,7 +218,18 @@ block content
       .col-xs-12.col-md-4.box-shadow-panel.p-l-0
         .m-b-1
           include ../publicModules/canvas_logo
+
+        //- 搜索专业
+        .m-b-1
+          .inline-block.form-inline
+            input#searchForumInput.inline-block.form-control(type="text" placeholder="搜索专业")
+            button#searchForum.btn.btn-default
+              .fa.fa-search
+
+        //- 完善资料
         include ../publicModules/improveUserInfo
+        
+
         if data.user && data.subForums.length
           .m-b-1
             .panel-header 关注的专业
