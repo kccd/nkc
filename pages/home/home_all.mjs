@@ -33,7 +33,7 @@ $(function() {
   });
 
   // 搜索专栏
-  $("#searchForum").on("click", () => {
+  /*$("#searchForum").on("click", () => {
     let keyword = $("#searchForumInput").val();
     if(!keyword) return;
     let scrollToFirst = false;
@@ -49,6 +49,6 @@ $(function() {
         $(el).css("backgroundColor", "unset");
       }
     });
-  })
+  })*/
 });
 

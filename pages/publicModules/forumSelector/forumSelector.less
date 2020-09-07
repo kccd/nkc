@@ -1,0 +1,14 @@
+@import '../base';
+.forum-selector-categories{
+  .forum-selector-category{
+    display: inline-block;
+    height: 2rem;
+    line-height: 2rem;
+    padding: 0 0.5rem;
+    cursor: pointer;
+    user-select: none;
+    &.active, &:hover{
+      color: @primary;
+    }
+  }
+}

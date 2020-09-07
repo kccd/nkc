@@ -18,7 +18,7 @@ include ../../../MathJax.pug
           .row
             .form-group
               label 公式输入
-              textarea.formula-text-input(placeholder="$\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$" v-model="text" @input="rendering()")
+              textarea.formula-text-input(placeholder="$\\sum_{i=0}^N\\int_{a}^{b}g(t,i)\\text{d}t$" v-model="text" @input="rendering()")
           .row
             .form-group
               label 公式预览
@@ -27,5 +27,5 @@ include ../../../MathJax.pug
             .col-xs-5
             button.btn.btn-default.col-xs-3(@click="close") 取消
             button.btn.btn-primary.col-xs-3.insert-forumla-action(@click="insert") 插入
-        
+
 +includeJS("/ueditor/dialogs/mathformulaV2/mathformula.js")

@@ -1,33 +1,34 @@
-script.
-  window.MathJax = {
-    loader: {
-      load: ["input/tex", "output/chtml"],
-    },
-    startup: {
-      // elements: ".math-jax", // 指定渲染的dom或class
-      typeset: true,
-      ready: function() {
-        MathJax.startup.defaultReady();
-        MathJax.startup.promise.then(function() {
-          NKC.emit("mathJaxRendered");
-        });
-      }
-    },
-    options: {
-      // processHtmlClass: "", // 指定渲染元素
-      // ignoreHtmlClass: "", // 忽略的元素
-      ignoreHtmlClass:'type-tip',
-      processHtmlClass:"pre-view-formula|render-content",
-      renderActions: {
-        addMenu: [0, '', '']
-      }
-    },
+if !isIncluded('mathJax')
+  script.
+    window.MathJax = {
+      loader: {
+        load: ["input/tex", "output/chtml"],
+      },
+      startup: {
+        // elements: ".math-jax", // 指定渲染的dom或class
+        typeset: true,
+        ready: function() {
+          MathJax.startup.defaultReady();
+          MathJax.startup.promise.then(function() {
+            NKC.emit("mathJaxRendered");
+          });
+        }
+      },
+      options: {
+        // processHtmlClass: "", // 指定渲染元素
+        // ignoreHtmlClass: "", // 忽略的元素
+        ignoreHtmlClass:'type-tip',
+        processHtmlClass:"pre-view-formula|render-content",
+        renderActions: {
+          addMenu: [0, '', '']
+        }
+      },
 
-    tex: {
-      inlineMath: [["$", "$"], ["\\(", "\\)"]],
-      displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
-      processEscapes: false, // use \$ to produce a literal dollar sign
+      tex: {
+        inlineMath: [["$", "$"], ["\\(", "\\)"]],
+        displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
+        processEscapes: false, // use \$ to produce a literal dollar sign
+      }
     }
-  }
 
-script(async src="/external_pkgs/MathJax-3.0.1/es5/tex-mml-chtml.js")
+  script(async src="/external_pkgs/MathJax-3.0.1/es5/tex-mml-chtml.js")
