@@ -125,7 +125,7 @@ block content
                       tr
                         th
                         th 姓名
-                        th KCID(选填)
+                        th {{websiteUserId + "(选填)"}}
                         th 机构名称(选填)
                         th 机构地址(选填)
                         th 通信作者
@@ -216,7 +216,7 @@ block content
         div
           h5.text-danger 温馨提示：
           div!=nkcRender.plainEscape(state.editorSettings.notes)
-  .hidden#data=objToStr({originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft})
+  .hidden#data=objToStr({originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode})
 block scripts
   include ../ueditor/ueditorBase
   include ../publicModules/moment
@@ -231,6 +231,7 @@ block scripts
   include ../publicModules/sticker/selectSticker
   include ../publicModules/moveThread/moveThread
   include ../publicModules/insertHideContent/insertHideContent
+  include ../ueditor/dialogs/mathformulaV2/mathformula
   +includeJS('/tools.js')
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")
