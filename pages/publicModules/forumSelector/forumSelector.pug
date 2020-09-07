@@ -1,0 +1,21 @@
+include ../draggablePanel/draggablePanel
++includeCSS('/publicModules/forumSelector/forumSelector.css')
+#moduleForumSelector.draggable-panel
+  #moduleForumSelectorApp
+    .draggable-panel-header
+      .draggable-panel-title 选择专业
+      .draggable-panel-right-button(@click='close')
+        .fa.fa-remove
+    .draggable-panel-body
+      .draggable-panel-loading(v-if='loading') 加载中...
+      .draggable-panel-content(v-else)
+        .forum-selector
+          .forum-selector-categories
+            .forum-selector-category(
+              v-for='c in forumData'
+              @click='selectForumCategory(c)'
+              :class="{'active': c === selectedForumCategory}"
+              ) {{c.name}}
+          .forum-selector-forums
+
++includeJS('/publicModules/forumSelector/forumSelector.js')

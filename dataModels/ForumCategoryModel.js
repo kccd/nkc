@@ -22,7 +22,19 @@ const schema = mongoose.Schema({
   displayStyle: {
     type: String,
     default: 'simple', // simple: 简单显示(名称+头像)，normal: 正常显示（名称+头像+简介）, detailed: 详细显示（包含简介以及最新文章）,
-  }
+  },
+  // 与自己互斥
+  mutuallyExclusiveWithSelf: {
+    type: Boolean,
+    index: 1,
+    default: false,
+  },
+  // 与别人互斥
+  mutuallyExclusiveWithOthers: {
+    type: Boolean,
+    index: 1,
+    default: false,
+  },
 }, {
   collection: 'forumCategories'
 });

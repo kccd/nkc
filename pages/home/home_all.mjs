@@ -31,5 +31,24 @@ $(function() {
       header.removeClass("home-fixed-header");
     }
   });
+
+  // 搜索专栏
+  /*$("#searchForum").on("click", () => {
+    let keyword = $("#searchForumInput").val();
+    if(!keyword) return;
+    let scrollToFirst = false;
+    $(".category-forums .detailed-forum-panel-name a").each((index, el) => {
+      let text = $(el).text();
+      if(text.includes(keyword)) {
+        $(el).css("backgroundColor", "yellow");
+        if(!scrollToFirst) {
+          $('html, body').animate({scrollTop: $(el).offset().top - 100});
+          scrollToFirst = true;
+        }
+      } else {
+        $(el).css("backgroundColor", "unset");
+      }
+    });
+  })*/
 });
 

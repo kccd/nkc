@@ -5,7 +5,11 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-12
-        h4 以下是视频播放器
-        video(src='/r/314075' controls width='250')
-        h4 以上是视频播放器
+        button.btn.btn-default.btn-sm(onclick='forumSelector.app.open()') 主分类
+        button.btn.btn-default.btn-sm 辅分类
 block scripts
+  include ../publicModules/forumSelector/forumSelector.pug
+  script.
+    var forumSelector = new NKC.modules.ForumSelector();
+    forumSelector.open();
+

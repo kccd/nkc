@@ -19,6 +19,10 @@ router
     let selectedForumsId = [];
     let selectedCategoriesId = [];
 
+    // 取网站代号
+    let serverSetting = await db.SettingModel.getSettings("server");
+    data.websiteCode = String(serverSetting.websiteCode).toLocaleUpperCase();
+
     if(!type) { // 直接进编辑器
       data.type = "newThread";
     } else if(type === "forum") { // 在专业进编辑器，需要预制当前专业

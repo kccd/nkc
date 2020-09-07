@@ -1,0 +1,23 @@
+/* 默认颜色 */
+/* 垂直居中 */
+.vc {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+/* 文本超出隐藏并显示省略号 */
+.forum-selector-categories .forum-selector-category {
+  display: inline-block;
+  height: 2rem;
+  line-height: 2rem;
+  padding: 0 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+.forum-selector-categories .forum-selector-category.active,
+.forum-selector-categories .forum-selector-category:hover {
+  color: #2b90d9;
+}

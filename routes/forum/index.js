@@ -12,6 +12,10 @@ forumRouter
 			subFid = await db.SubscribeModel.getUserSubForumsId(user.uid);
 		}
 		const forumsOrigin = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
+		/*const readableForumsId = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
+    let visibilityForumsId = await db.ForumModel.getVisibilityForumsIdFromRedis();
+		visibilityForumsId = visibilityForumsId.filter(fid => readableForumsId.includes(fid));
+		const forumsOrigin = await db.ForumModel.find({fid: {$in: visibilityForumsId}}).sort({order: 1});*/
 		data.recommendForums = await db.ForumModel.getRecommendForums(forumsOrigin.map(f => f.fid));
 		data.recommendForums = data.recommendForums.slice(0, 4);
 		const forumsObj = {}, forums = [];

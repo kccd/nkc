@@ -27,5 +27,6 @@ module.exports = async (ctx, next) => {
   data.t = t;
   targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
   data.nkcBankName = await db.SettingModel.getNKCBankName();
+  data.name = '我的账单';
   await next();
 };

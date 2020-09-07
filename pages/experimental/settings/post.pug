@@ -247,11 +247,20 @@ block content
               .col-sm-10
                 .m-t-05 文章内容最小字数：
                   input(type="text" v-model.number="postSettings[type].originalWordLimit")
+                hr
+            .row(v-if="type === 'postToForum'")
+              .col-sm-2.text-right
+                h4 辅助专业数量
+              .col-sm-10
+                .m-t-05 最小
+                  input(type="text" v-model.number="postSettings[type].minorForumCount.min")
+                  | 最大
+                  input(type="text" v-model.number="postSettings[type].minorForumCount.max")
             .row
               .col-sm-10.col-sm-offset-2.mdui-m-t-3.text-right
                 button.mdui-btn.mdui-color-theme.mdui-btn-block(@click='save') 保存
 
 block scripts
-  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-  script(src=`/experimental/settings/post.js?=${global.NKC.startTime}`)
+  +includeJS('/mdui/js/mdui.min.js')
+  +includeJS('/experimental/settings/post.js')
 
