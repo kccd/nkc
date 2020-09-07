@@ -40,6 +40,9 @@ block content
               .detailed-forum-panel-info(class=disableChild?'':'p-l-0')
                 .detailed-forum-panel-name
                   a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                  if disableChild
+                    | &nbsp;
+                    span(title=`文章/回复`)=`(${f.countThreads}/${f.countPosts})`
                 .detailed-forum-panel-description(title=f.description class=disableChild? '':'parent')
                   span=f.description || '暂无简介'
           if f.latestThreads && f.latestThreads.length
@@ -69,6 +72,9 @@ block content
               .detailed-forum-panel-info(class=disableChild?'':'p-l-0')
                 .detailed-forum-panel-name
                   a(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
+                  if disableChild
+                    | &nbsp;
+                    span(title=`文章/回复`)=`(${f.countThreads}/${f.countPosts})`
                 .detailed-forum-panel-description(title=f.description class=disableChild? '':'parent')
                   span=f.description || '暂无简介'
           if f.childrenForums.length && !disableChild

@@ -1141,6 +1141,8 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
     forumType: 1,
     allowedAnonymousPost: 1,
     color: 1,
+    countThreads: 1,
+    countPosts: 1,
     parentsId: 1,
     categoryId: 1,
     iconFileName: 1,
@@ -1148,7 +1150,6 @@ forumSchema.statics.getForumsTree = async (userRoles, userGrade, user) => {
     banner: 1,
     description: 1
   }).sort({order: 1});
-
   const forumsObj = {};
   forums = forums.map(forum => {
     forum = forum.toObject();
@@ -1195,6 +1196,8 @@ forumSchema.statics.getForumsTreeLevel2 = async (userRoles, userGrade, user) => 
     forumType: 1,
     color: 1,
     parentsId: 1,
+    countPosts: 1,
+    countThreads: 1,
     iconFileName: 1,
     categoryId: 1,
     description: 1,
