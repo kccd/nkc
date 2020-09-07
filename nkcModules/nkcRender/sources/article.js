@@ -45,9 +45,9 @@ module.exports = {
         <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
           <source src="${url}" type="video/mp4"> 你的浏览器不支持video标签，请升级。
         </video>
-        <span class="nkcsource-video-title">${resource.oname}</span>
       </span>
     `.trim();
+    //<span class="nkcsource-video-title">${resource.oname}</span>
   },
   audio(html = "", id, resource = {}) {
     const url = getUrl("resource", id);
