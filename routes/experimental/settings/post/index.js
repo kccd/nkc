@@ -26,7 +26,7 @@ router
     const {checkNumber} = nkcModules.checkData;
     if(postToForum || postToThread) {
       if(postToForum) {
-        const {exam, originalWordLimit} = postToForum;
+        const {exam, originalWordLimit, minorForumCount} = postToForum;
         if(exam.notPass.status) {
           exam.volumeA = true;
           exam.volumeB = true;
@@ -37,6 +37,16 @@ router
           name: "原创声明内容最小字数",
           min: 0
         });
+        const {min, max} = minorForumCount;
+        checkNumber(min, {
+          name: '辅助专业最小数量',
+          min: 0,
+        });
+        checkNumber(max, {
+          name: '辅助专业最大数量',
+          min: 0
+        });
+        if(max < min) ctx.throw(400, `辅助专业数量设置错误`);
         q['c.postToForum'] = postToForum;
       }
       if(postToThread) {

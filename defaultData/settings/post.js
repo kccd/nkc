@@ -27,7 +27,12 @@ module.exports = {
         uid: []
       },
       // 原创申明 字数最小值
-      originalWordLimit: 500
+      originalWordLimit: 500,
+      // 专业分类辅分类数量
+      minorForumCount: {
+        min: 0,
+        max: 1
+      },
     },
     postToThread: {
       authLevelMin: 0,

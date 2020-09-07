@@ -38,7 +38,10 @@ router
 		const cid = [];
 		if(!categories.length) ctx.throw(400, '专业分类不能为空');
 		for(let i = 0; i < categories.length; i ++) {
-			let {_id, name, description, displayStyle} = categories[i];
+			let {
+				_id, name, description, displayStyle,
+				mutuallyExclusiveWithSelf, mutuallyExclusiveWithOthers
+			} = categories[i];
 			checkString(name, {
 				name: '分类名',
 				minLength: 1,
@@ -59,6 +62,8 @@ router
 						name,
 						description,
 						displayStyle,
+						mutuallyExclusiveWithOthers: !!mutuallyExclusiveWithOthers,
+						mutuallyExclusiveWithSelf: !!mutuallyExclusiveWithSelf,
 						order: i
 					}
 				});
