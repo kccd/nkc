@@ -397,6 +397,10 @@
   display: inline;
   margin-right: 0.3rem;
 }
+.account-thread .account-thread-content .account-thread-info .thread-forum-link {
+  margin-right: 0.5rem;
+  color: #888;
+}
 .account-thread .account-thread-content .account-thread-info .thread-time {
   position: absolute;
   right: 0;

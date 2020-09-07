@@ -9,5 +9,7 @@ module.exports = (type, v1, v2) => {
     case 'displayOnSearchForumsId': return `forums:displayOnSearchForumsId`;
     case 'scoreOperation': return `scoreOperation:${v1}:${v2}`;
     case 'searchScoreOperation': return `scoreOperation:*`;
+    case 'numberOfOtherUserOperation': return `user:${v1}:numberOfOtherUserOperation`; // 用户被阅读量等的数量
+    case 'timeToSetOtherUserOperationNumber': return `user:${v1}timeToSetOtherUserOperationNumber`; // 更新阅读量
   }
 }

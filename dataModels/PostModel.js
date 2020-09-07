@@ -1,6 +1,7 @@
 const settings = require('../settings');
 const nkcRender = require('../nkcModules/nkcRender');
 const {htmlToPlain, renderHTML} = nkcRender;
+const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
 const mongoose = settings.database;
 const {Schema} = mongoose;
 // const {indexPost, updatePost} = settings.elastic;
@@ -732,6 +733,8 @@ postSchema.post('save', async function(doc, next) {
 const defaultOptions = {
   visitor: {xsf: 0},
   renderHTML: true,
+  htmlToText: false,
+  count: 200,
   user: true,
   userGrade: true,
   resource: true,
@@ -837,6 +840,9 @@ postSchema.statics.extendPosts = async (posts, options) => {
   for(let post of posts) {
     if(post.toObject) {
       post = post.toObject();
+    }
+    if(o.htmlToText) {
+      post.c = obtainPureText(post.c, true, o.count);
     }
     post.ownPost = post.uid === o.uid;
     if(post.anonymous && o.excludeAnonymousPost) continue;

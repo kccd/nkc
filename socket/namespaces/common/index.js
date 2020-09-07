@@ -190,10 +190,10 @@ async function sendMessage(channel, message) {
 
 // 出错或断开连接之后
 async function disconnect(io, socket) {
-  const {uid} = socket.NKC;
+  const {uid, address} = socket.NKC;
   if(!uid) return;
   const clients = await util.getRoomClientsId(io, `user/${uid}`);
-  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/common'.bgBlue} ${'断开连接'.bgRed}`);
+  console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/common'.bgBlue} ${'断开连接'.bgRed} ${address}`);
   global.NKC.io.of('/console').NKC.socketMessage('/common', false, uid);
   if(clients.length !== 0) return;
   await  db.UserModel.update({uid}, {

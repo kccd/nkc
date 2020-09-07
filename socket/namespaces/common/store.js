@@ -9,12 +9,13 @@ let socketToUserMap = new WeakMap();
  */
 async function storeUser(socket) {
   return new Promise((resolve, _) => {
-    const {user} = socket.NKC.data;
+    const {address, data} = socket.NKC;
+    const {user} = data;
     const {uid} = user;
     if(!user) return socket.disconnect(true);
     socketToUserMap.set(socket, user);
     socket.join(`user/${uid}`, async () => {
-      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/common'.bgBlue} ${'连接成功'.bgGreen}`);
+      console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/common'.bgBlue} ${'连接成功'.bgGreen} ${address}`);
       global.NKC.io.of('/console').NKC.socketMessage('/common', true, uid);
       return resolve(true);
     });
