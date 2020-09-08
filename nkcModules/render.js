@@ -422,6 +422,12 @@ let pugRender = (template, data, state) => {
       return true;
     },
     state,
+		_moduleState: {},
+		isIncluded: (name) => {
+			if(options._moduleState[name]) return true;
+			options._moduleState[name] = true;
+			return false;
+		},
     ipUrl,
     objToStr,
     anonymousInfo: {

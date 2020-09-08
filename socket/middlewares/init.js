@@ -12,7 +12,7 @@ const func = async (socket, next) => {
     nkcModules,
     data: {}
   };
-  let address = socket.handshake.headers['x-forwarded-for'];
+  let address = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
   if(address !== '') {
     address = address.replace(/::ffff:/ig, '');
     address = address.split(':');

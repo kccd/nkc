@@ -61,6 +61,11 @@ block content
           div(id="content")
           #postInfo(v-cloak)
             hr
+            //-.m-b-2(v-if="['newThread'].indexOf(type) !== -1")
+              .editor-header 专业分类
+              button.btn.btn-default.btn-sm 选择主分类
+              button.btn.btn-default.btn-sm(disabled) 选择辅分类
+
             .m-b-2(v-if="['newThread'].indexOf(type) !== -1")
               .editor-header 专业分类
                 small （必选，最多可选两个）

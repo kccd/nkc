@@ -1,0 +1,44 @@
+.draggable-panel {
+  height: 43rem;
+  position: fixed;
+  width: 30rem;
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+  z-index: 10000;
+  background-color: #fff;
+  border: 1px solid #f0f0f0;
+  box-sizing: border-box;
+  border-radius: 3px;
+  display: none;
+}
+.draggable-panel .draggable-panel-header {
+  height: 2.8rem;
+  position: relative;
+  background-color: #dadada;
+  padding-right: 2.8rem;
+  border-radius: 3px 3px 0 0;
+  user-select: none;
+}
+.draggable-panel .draggable-panel-header .draggable-panel-title {
+  line-height: 2.8rem;
+  color: #000;
+  padding: 0 1rem;
+  cursor: all-scroll;
+}
+.draggable-panel .draggable-panel-header .draggable-panel-right-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2.8rem;
+  width: 2.8rem;
+  line-height: 2.8rem;
+  text-align: center;
+  font-size: 1.3rem;
+}
+.draggable-panel .draggable-panel-header .draggable-panel-right-button:hover {
+  background-color: red;
+  color: #fff;
+}
+.draggable-panel .draggable-panel-loading {
+  margin-top: 3rem;
+  text-align: center;
+}

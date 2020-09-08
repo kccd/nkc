@@ -201,7 +201,21 @@ const pictureRotate = async path => {
   }
 };*/
 const info = async path => {
-  return imageSize(path);
+  const args = ['identify', '-format', '%wx%h', path];
+  let result;
+  if(!linux) {
+    result = await spawnProcess('magick', args);
+  } else {
+    result = await spawnProcess(args.shift(), args);
+  }
+  result = result.replace('\n', '');
+  result = result.trim();
+  const [width, height] = result.split('x');
+  return {
+    height: Number(height),
+    width: Number(width)
+  };
+  // return imageSize(path);
 };
 
 // 获取水印图片尺寸
