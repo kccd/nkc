@@ -132,7 +132,13 @@ class ForumSelector extends NKC.modules.DraggablePanel {
           this.showThreadTypes = false;
         },
         submit() {
-
+          const {selectedForum, selectedThreadType} = this;
+          if(!selectedForum) return sweetError(`请选择专业`);
+          if(!selectedThreadType) return sweetError(`请选择文章分类`);
+          return {
+            fid: selectedForum.fid,
+            cid: selectedThreadType === 'none'? '': selectedThreadType.cid
+          };
         }
       }
     })
