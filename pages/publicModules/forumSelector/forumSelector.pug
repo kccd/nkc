@@ -10,12 +10,72 @@ include ../draggablePanel/draggablePanel
       .draggable-panel-loading(v-if='loading') 加载中...
       .draggable-panel-content(v-else)
         .forum-selector
-          .forum-selector-categories
-            .forum-selector-category(
-              v-for='c in forumData'
-              @click='selectForumCategory(c)'
-              :class="{'active': c === selectedForumCategory}"
-              ) {{c.name}}
-          .forum-selector-forums
+          div(v-if='!showThreadTypes')
+            //-.forum-selector-categories
+              span.m-l-05 已关注：
+              .forum-selector-category(
+                v-for='c in subscribeForums'
+                @click='selectForum(c)' :class="{'active': selectedForum === c}"
+                ) {{c.displayName}}
+            .forum-selector-forums
+              .forum-selector-forum-item
+                .forum-selector-forum(
+                  :class="{'active': selectedForumCategory === c}"
+                  v-for='c in forumData'
+                  @click='selectForumCategory(c)'
+                  :title='c.name + (c.description? "：" + c.description:"")'
+                )
+                  span {{c.name}}
+              .forum-selector-forum-item
+                .forum-selector-forum(
+                  :class="{'active': selectedParentForum === pf}"
+                  v-for='pf in selectedForumCategory.forums'
+                  @click='selectParentForum(pf)'
+                  :title='pf.displayName + "：" + pf.description'
+                  )
+                  span {{pf.displayName}}
+              .forum-selector-forum-item
+                .forum-selector-forum(
+                  :class="{'active': selectedForum === pf}"
+                  v-if='selectedParentForum'
+                  v-for='pf in selectedParentForum.childForums'
+                  @click='selectForum(pf)'
+                  :title='pf.displayName + "：" + pf.description'
+                )
+                  span {{pf.displayName}}
+          div(v-else)
+            .forum-selector-forum-info
+              .forum-selector-forum-avatar
+                img.forum-selector-forum-avatar-img(v-if='selectedForum.logo'
+                  :src="getUrl('forumLogo', selectedForum.logo)")
+                .forum-selector-forum-avatar-img(v-else :style='"background-color: " + selectedForum.color')
+              .forum-selector-forum-name-container
+                .forum-selector-forum-name {{selectedForum.displayName}}
+                //.forum-selector-forum-description
+                  span.text-danger 专业介绍：
+                  | {{selectedForum.description || '暂无'}}
+                .forum-selector-forum-post-description
+                  span.text-danger 发表说明：
+                  | {{selectedForum.description || '暂无'}}
+                .forum-selector-forum-thread-types
+                  span.text-danger 文章分类：
+                  .forum-selector-forum-type(
+                    @click='selectThreadType("none")' :class="{'active': selectedThreadType === 'none'}"
+                  ) 不分类
+                  .forum-selector-forum-type(v-for='tt in selectedForum.threadTypes'
+                    @click='selectThreadType(tt)'
+                    :class="{'active': selectedThreadType === tt}"
+                  ) {{tt.name}}
+
+
+          .forum-selector-button
+            span(v-if='!showThreadTypes')
+              button.btn.btn-default.btn-sm(v-if='!selectedForum' disabled) 下一步
+              button.btn.btn-primary.btn-sm(v-else @click='next') 下一步
+            span(v-else)
+              button.btn.btn-default.btn-sm(@click='previous') 上一步
+              button.btn.btn-primary.btn-sm(v-if='selectedThreadType' @click='submit') 确定
+              button.btn.btn-primary.btn-sm(v-else disabled title='请选择文章分类') 确定
+
 
 +includeJS('/publicModules/forumSelector/forumSelector.js')

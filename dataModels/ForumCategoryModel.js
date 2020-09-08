@@ -67,7 +67,7 @@ schema.statics.saveCategoryToRedis = async () => {
 };
 
 /*
-* 获取全部专业分类并更具order排序
+* 获取含有专业的专业分类并根据order排序
 * @return {[Object]} 专业分类对象组成的数组
 * @author pengxiguaa 2020/7/3
 * */

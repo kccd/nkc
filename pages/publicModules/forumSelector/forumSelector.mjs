@@ -10,10 +10,14 @@ class ForumSelector extends NKC.modules.DraggablePanel {
         loading: true,
         // 专业数组
         forums: [],
-        // 专业树状结构
-        forumTree: [],
         forumCategories: [],
-        selectedForumCategory: ''
+        subscribeForumsId: [],
+        selectedForumCategory: '',
+        selectedParentForum: '',
+        selectedForum: '',
+        selectedThreadType: '',
+
+        showThreadTypes: false,
       },
       computed: {
         forumData() {
@@ -31,20 +35,35 @@ class ForumSelector extends NKC.modules.DraggablePanel {
             results.push(c);
           }
           return results;
+        },
+        subscribeForums() {
+          const {forums, subscribeForumsId} = this;
+          if(!subscribeForumsId.length) return [];
+          const results = [];
+          for(const f of forums) {
+            for(const cf of f.childForums) {
+              if(!subscribeForumsId.includes(cf.fid)) continue;
+              results.push(cf);
+            }
+          }
+          return results;
         }
       },
       mounted() {
 
       },
       methods: {
+        getUrl: NKC.methods.tools.getUrl,
         open() {
+          this.resetSelector();
           self.showPanel();
-          nkcAPI('/f', 'GET')
+          nkcAPI('/f?t=selector', 'GET')
             .then(data => {
               self.app.loading = false;
               self.app.initForums(data);
               console.log(data);
             })
+
             // .catch(sweetError)
         },
         close() {
@@ -52,32 +71,68 @@ class ForumSelector extends NKC.modules.DraggablePanel {
         },
         selectForumCategory(c) {
           this.selectedForumCategory = c;
+          this.selectedForum = '';
+          this.selectedParentForum = '';
+          this.selectedThreadType = '';
         },
         initForums(data) {
-          const {forumCategories, forums} = data;
+          const {forumCategories, forums, subscribeForumsId} = data;
           const forumsObj = [];
           for(const f of forums) {
             if(!forumsObj[f.categoryId]) forumsObj[f.categoryId] = [];
             forumsObj[f.categoryId].push(f);
-            const cf = [];
-            this.getForumChildForums(cf, f.childrenForums);
-            f.cf = cf;
           }
           for(const c of forumCategories) {
             c.forums = forumsObj[c._id] || [];
           }
           this.forums = forums;
           this.forumCategories = forumCategories;
+          this.subscribeForumsId = subscribeForumsId;
           this.selectedForumCategory = forumCategories[0];
         },
-        getForumChildForums(results, arr) {
-          for(const ff of arr) {
-            if(!ff.childrenForums || ff.childrenForums.length === 0) {
-              results.push(ff);
-            } else {
-              this.getForumChildForums(results, ff.childrenForums);
+        selectParentForum(pf) {
+          this.selectedParentForum = pf;
+          this.selectedForum = '';
+          this.selectedThreadType = '';
+          if(this.selectedParentForum.childForums.length === 1) {
+            this.selectForum(this.selectedParentForum.childForums[0]);
+          } else if(this.selectedParentForum.childForums.length === 0) {
+            this.selectForum(this.selectedParentForum);
+          }
+        },
+        selectForum(f) {
+          this.selectedThreadType = '';
+          if(this.selectedForum === f) {
+            this.selectedForum = '';
+          } else {
+            this.selectedForum = f;
+            if(f.threadTypes.length === 0) {
+              this.selectThreadType('none');
             }
           }
+        },
+        selectThreadType(tt) {
+          if(this.selectedThreadType === tt) {
+            this.selectedThreadType = ''
+          } else {
+            this.selectedThreadType = tt;
+          }
+        },
+        next() {
+          this.showThreadTypes = true;
+        },
+        previous() {
+          this.showThreadTypes = false;
+          this.selectedThreadType = '';
+        },
+        resetSelector() {
+          this.selectedForum = '';
+          this.selectedParentForum = '';
+          this.selectedThreadType = '';
+          this.showThreadTypes = false;
+        },
+        submit() {
+
         }
       }
     })
