@@ -115,7 +115,7 @@ module.exports = async (ctx, next) => {
         await user.generalSettings.update({'draftFeeSettings.kcb': 0});
       }
       // 获取新点赞数
-      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"});
+      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"}, {_id: 1});
       let voteIds = votes.map(vote => vote._id.toString());
       if(voteIds.length > 0) {
         // 发系统通知
@@ -128,23 +128,10 @@ module.exports = async (ctx, next) => {
           c: {
             type: 'latestVotes',
             voteIds,
-            // partOfUsernames,
-            // total
           }
         });
         await message.save();
-        // redis.pubMessage(message);
       }
-
-      // let newVoteUp = 0;
-      // votes.map(v => {
-      //   if(v.type === 'up') {
-      //     newVoteUp += v.num;
-      //   } else if(v.type === 'down') {
-      //     newVoteUp -= v.num;
-      //   }
-      // });
-      // user.newVoteUp = newVoteUp>0?newVoteUp:0;
     }
     userGrade = await user.extendGrade();
     // 判断用户是否被封禁
