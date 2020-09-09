@@ -45,27 +45,28 @@ include ../draggablePanel/draggablePanel
                   span {{pf.displayName}}
           div(v-else)
             .forum-selector-forum-info
-              .forum-selector-forum-avatar
-                img.forum-selector-forum-avatar-img(v-if='selectedForum.logo'
-                  :src="getUrl('forumLogo', selectedForum.logo)")
-                .forum-selector-forum-avatar-img(v-else :style='"background-color: " + selectedForum.color')
-              .forum-selector-forum-name-container
-                .forum-selector-forum-name {{selectedForum.displayName}}
-                //.forum-selector-forum-description
-                  span.text-danger 专业介绍：
-                  | {{selectedForum.description || '暂无'}}
-                .forum-selector-forum-post-description
-                  span.text-danger 说明：
-                  | {{selectedForum.noteOfPost || '暂无'}}
-                .forum-selector-forum-thread-types
-                  span.text-danger 文章分类：
-                  .forum-selector-forum-type(
-                    @click='selectThreadType("none")' :class="{'active': selectedThreadType === 'none'}"
-                  ) 不分类
-                  .forum-selector-forum-type(v-for='tt in selectedForum.threadTypes'
-                    @click='selectThreadType(tt)'
-                    :class="{'active': selectedThreadType === tt}"
-                  ) {{tt.name}}
+              div
+                .forum-selector-forum-avatar
+                  img.forum-selector-forum-avatar-img(v-if='selectedForum.logo'
+                    :src="getUrl('forumLogo', selectedForum.logo)")
+                  .forum-selector-forum-avatar-img(v-else :style='"background-color: " + selectedForum.color')
+                .forum-selector-forum-name-container
+                  .forum-selector-forum-name {{selectedForum.displayName}}
+                  //.forum-selector-forum-description
+                    span.text-danger 专业介绍：
+                    | {{selectedForum.description || '暂无'}}
+              .forum-selector-forum-thread-types
+                h5.text-danger 文章分类：
+                .forum-selector-forum-type(v-for='tt in selectedForum.threadTypes'
+                  @click='selectThreadType(tt)'
+                  :class="{'active': selectedThreadType === tt}"
+                ) {{tt.name}}
+                .forum-selector-forum-type(
+                  @click='selectThreadType("none")' :class="{'active': selectedThreadType === 'none'}"
+                ) 不分类
+              .forum-selector-forum-post-description.m-b-05
+                h5.text-danger 注意事项：
+                span {{selectedForum.noteOfPost || '暂无'}}
 
 
           .forum-selector-button

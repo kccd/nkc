@@ -73,8 +73,9 @@ block content
                       span(:data-float-fid="mainForum.fid") {{mainForum.fName}}
                       | :
                       select(v-model='mainForum.cid')
-                        option(:value='""') 不分类
+                        option(:value='null') 请选择分类
                         option(v-for='tt in mainForum.forum.threadTypes' :value='tt.cid') {{tt.name}}
+                        option(:value='""') 不分类
                       //span(v-if="mainForum.cName") ：{{mainForum.cName}}
                   button.btn.btn-default.btn-sm(@click='selectForumsByType("mainForum")') {{mainForum? '修改': '选择'}}
               div(v-if='minorForumCount.max > 0')
@@ -91,8 +92,9 @@ block content
                       span {{mf.forum.displayName}}
                       | :
                       select(v-model='mf.cid')
-                        option(:value='""') 不分类
+                        option(:value='null') 请选择分类
                         option(v-for='tt in mf.forum.threadTypes' :value='tt.cid') {{tt.name}}
+                        option(:value='""') 不分类
                       //span(v-if="mf.cName") ：{{mf.cName}}
                     .fa.fa-trash-o(@click="removeSelectedForums(index + 1)" title="移除")
                   button.btn.btn-default.btn-sm(v-if='!mainForum' disabled title='请先选择主分类') 添加

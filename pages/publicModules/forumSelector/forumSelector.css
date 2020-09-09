@@ -99,16 +99,19 @@
   font-size: 1.4rem;
   font-weight: 700;
 }
-.forum-selector-forum-info .forum-selector-forum-name-container .forum-selector-forum-post-description {
+.forum-selector-forum-info .forum-selector-forum-post-description {
+  margin-top: 1rem;
+}
+.forum-selector-forum-info .forum-selector-forum-post-description span {
+  font-size: 1.35rem;
+}
+.forum-selector-forum-info .forum-selector-forum-description {
   margin-top: 0.5rem;
 }
-.forum-selector-forum-info .forum-selector-forum-name-container .forum-selector-forum-description {
+.forum-selector-forum-info .forum-selector-forum-thread-types {
   margin-top: 0.5rem;
 }
-.forum-selector-forum-info .forum-selector-forum-name-container .forum-selector-forum-thread-types {
-  margin-top: 0.5rem;
-}
-.forum-selector-forum-info .forum-selector-forum-name-container .forum-selector-forum-type {
+.forum-selector-forum-info .forum-selector-forum-type {
   user-select: none;
   height: 2rem;
   line-height: 2rem;
@@ -119,8 +122,8 @@
   border-radius: 2px;
   cursor: pointer;
 }
-.forum-selector-forum-info .forum-selector-forum-name-container .forum-selector-forum-type:hover,
-.forum-selector-forum-info .forum-selector-forum-name-container .forum-selector-forum-type.active {
+.forum-selector-forum-info .forum-selector-forum-type:hover,
+.forum-selector-forum-info .forum-selector-forum-type.active {
   background-color: #2b90d9;
   color: #fff;
 }
