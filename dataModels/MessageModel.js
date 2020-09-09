@@ -460,7 +460,19 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       if(!column) continue;
       r.c.column = column;
     } else if(type === "latestVotes") {
-      
+      let voteIds = r.c.voteIds;
+      const PostsVoteModel = mongoose.model("postsVotes");
+      const UserModel = mongoose.model("users");
+      let votes = await PostsVoteModel.find({
+        _id: {$in: voteIds.map(id => mongoose.Types.ObjectId(id))}
+      });
+      if(!votes.length) continue;
+      r.c.total = votes.length;
+      let users = await UserModel.find({
+        uid: {$in: votes.map(vote => vote.uid)}
+      });
+      let usernames = users.map(user => user.username);
+      r.c.partOfUsernames = usernames.slice(0, 6).join("、");
     }
 
     if(r.c.thread) {

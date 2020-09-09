@@ -49,6 +49,7 @@ if(!NKC.configs.isApp) {
       var myUid = data.myUid;
       if(user.uid !== myUid) {
         newMessageRemind('message');
+        // NKC.methods.showNotification("新消息", data.message.c);
       }
     } else if(ty === 'friendsApplication') {
       newMessageRemind('friendsApplication');
