@@ -16,7 +16,7 @@
 * */
 var editor;
 var CommonModal;
-var PostInfo, PostButton, PostToColumn, PostSurvey;
+var PostInfo, PostButton, PostToColumn, PostSurvey, ForumSelector;
 // 标志：编辑器是否已初始化
 var EditorReady = false;
 var data;
@@ -58,6 +58,8 @@ function initVueApp() {
   PostInfo = new Vue({
     el: "#postInfo",
     data: {
+      // 辅助专业数量限制
+      minorForumCount: data.minorForumCount,
       // 自动保存草稿
       saveDraftTimeout: 60000,
       // 原创申明最小字数限制
@@ -208,6 +210,14 @@ function initVueApp() {
           var forum = selectedForums[i];
           if(forum.cid) arr.push(forum.cid);
         }
+        return arr;
+      },
+      mainForum: function() {
+        return this.selectedForums[0];
+      },
+      minorForums: function() {
+        var arr = [].concat(this.selectedForums);
+        arr.shift();
         return arr;
       }
     },
@@ -523,6 +533,30 @@ function initVueApp() {
           forumCountLimit: 2,
           selectedForumsId: this.selectedForumsId,
           selectedCategoriesId: this.selectedCategoriesId
+        });
+      },
+      selectForumsByType(type) {
+        var self = this;
+        if(!window.ForumSelector)
+          window.ForumSelector = new NKC.modules.ForumSelector();
+        var selectedForumsId = [].concat(self.selectedForumsId);
+        if(type === 'mainForum') {
+          selectedForumsId.shift();
+        }
+        ForumSelector.open(function(r) {
+          if(self.selectedForumsId.indexOf(r.fid) !== -1) return;
+          r.logo = r.forum.logo;
+          r.color = r.forum.color;
+          r.fName = r.forum.displayName;
+          r.cName = r.threadType? r.threadType.name: '';
+          if(type === 'mainForum') {
+            Vue.set(self.selectedForums, 0, r)
+          } else {
+            self.selectedForums.push(r);
+          }
+        }, {
+          selectedForumsId,
+          disabledForumsId: []
         });
       },
       // 检测作者信息

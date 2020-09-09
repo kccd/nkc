@@ -1521,6 +1521,8 @@ threadSchema.statics.postNewThread = async (options) => {
   const PostModel = mongoose.model("posts");
   const MessageModel = mongoose.model("messages");
   const DraftModel = mongoose.model("draft");
+  // 检测专业ID
+  await ForumModel.checkForumCategoryBeforePost(options.fids);
   // 1.检测发表权限
   // await ThreadModel.ensurePublishPermission(options);
   await ForumModel.checkWritePermission(options.uid, options.fids);

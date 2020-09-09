@@ -40,6 +40,12 @@ const forumSchema = new Schema({
     default: '',
     maxlength: [300, '描述应少于300字']
   },
+  // 专业选择器中，有关发表文章的说明
+  noteOfPost: {
+	  type: String,
+    default: '',
+    maxlength: [300, '发表说明应少于300字']
+  },
   displayName: {
     type: String,
     required: true,
@@ -1822,7 +1828,7 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
     // 发表文章，只允许发表到最底层专业
     if(type === 'write') {
       const childForumsId = await ForumModel.getAllChildForumsIdByFid(forum.fid);
-      if(childForumsId.length) throwErr(400, `不允许在父专业发表文章`);
+      if(childForumsId.length) throwErr(400, `不允许在父专业发表文章 fid: ${forum.fid}`);
     }
     if(uid && forum.moderators.includes(uid)) continue;
     const {accessible, permission, displayName} = forum;
@@ -2158,22 +2164,73 @@ forumSchema.statics.getForumSelectorForums = async uid => {
       mainForums.push(forum);
     }
   }
-  const getForumChildForums = (results, arr) => {
+  const getForumChildForums = async (results, arr) => {
     for(const ff of arr) {
-      if(writableForumsId.includes(ff.fid) && (!ff.childForums || ff.childForums.length === 0)) {
+      const childForumsId = await ForumModel.getAllChildForumsIdByFid(ff.fid);
+      if(writableForumsId.includes(ff.fid) && childForumsId.length === 0) {
         results.push(ff);
       } else {
-        getForumChildForums(results, ff.childForums);
+        await getForumChildForums(results, ff.childForums);
       }
     }
   };
-
+  const results = [];
   for(const forum of mainForums) {
     const cf = [];
-    getForumChildForums(cf, forum.childForums);
-    forum.cf = cf;
+    await getForumChildForums(cf, forum.childForums);
+    forum.childForums = cf;
+    const childForumsId = await ForumModel.getAllChildForumsIdByFid(forum.fid);
+    if(cf.length === 0 && childForumsId.length !== 0) {
+      continue;
+    }
+    results.push(forum);
   }
-  return mainForums;
+  return results;
 };
 
+/*
+* 发表文章时，判断专业数量、互斥是否符合要求
+* @param {[String]} fids 专业数组
+* @author pengxiguaa 2020/9/8
+* */
+forumSchema.statics.checkForumCategoryBeforePost = async (_fids) => {
+  const fids = [].concat(_fids);
+  if(fids.length === 0) throwErr(400, '专业ID不能为空');
+  const ForumModel = mongoose.model('forums');
+  const ForumCategoryModel = mongoose.model('forumCategories');
+  const categoriesId = [];
+  for(const fid of fids) {
+    const forum = await ForumModel.getForumByIdFromRedis(fid);
+    if(!forum) throwErr(400, `专业ID错误 fid: ${fid}`);
+    categoriesId.push(forum.categoryId);
+  }
+  const SettingModel = mongoose.model('settings');
+  const postSettings = await SettingModel.getSettings('post');
+  const {min, max} = postSettings.postToForum.minorForumCount;
+  const mainForumId = fids.shift();
+  const minorForumId = fids;
+  if(minorForumId.length < min || minorForumId > max) throwErr(400, `专业分类辅分类数量不符合要求`);
+  // 以下检测专业分类冲突
+  const categories = await ForumCategoryModel.getAllCategories();
+  const categoriesObj = {};
+  categories.map(c => categoriesObj[c._id] = c);
+  let _categories = [];
+  for(const cid of categoriesId) {
+    const category = categoriesObj[cid];
+    if(!category) continue;
+    _categories.push(category);
+  }
+  for(let i = 0; i < _categories.length; i++) {
+    for(let j = 0; j < _categories.length; j++) {
+      const c = _categories[i];
+      const cc = _categories[j];
+      if(i === j || !c.excludedCategoriesId.includes(cc._id)) continue;
+      if(c._id === cc._id) {
+        throwErr(400, `专业分类「${c.name}」下不允许选择多个专业，请重新选择`);
+      } else {
+        throwErr(400, `不允许同时选择「${c.name}」与「${cc.name}」下的专业，请重新选择`);
+      }
+    }
+  }
+};
 module.exports = mongoose.model('forums', forumSchema);

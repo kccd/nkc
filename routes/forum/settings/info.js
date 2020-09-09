@@ -34,7 +34,7 @@ infoRouter
 		let {
 			displayName, abbr, color,
 			description, noticeThreadsId,
-			brief, basicThreadsId, valuableThreadsId
+			brief, basicThreadsId, valuableThreadsId, noteOfPost
 		} = JSON.parse(body.fields.forum);
 
 
@@ -73,6 +73,7 @@ infoRouter
 		await forum.update({
 			displayName, abbr, color, description,
 			brief,
+			noteOfPost,
 			basicThreadsId,
 			valuableThreadsId,
 			noticeThreadsId

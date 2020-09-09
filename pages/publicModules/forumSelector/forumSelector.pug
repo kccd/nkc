@@ -20,7 +20,7 @@ include ../draggablePanel/draggablePanel
             .forum-selector-forums
               .forum-selector-forum-item
                 .forum-selector-forum(
-                  :class="{'active': selectedForumCategory === c}"
+                  :class="{'active': selectedForumCategory === c, 'disabled': disabledForumCategoriesId.includes(c._id)}"
                   v-for='c in forumData'
                   @click='selectForumCategory(c)'
                   :title='c.name + (c.description? "：" + c.description:"")'
@@ -28,19 +28,19 @@ include ../draggablePanel/draggablePanel
                   span {{c.name}}
               .forum-selector-forum-item
                 .forum-selector-forum(
-                  :class="{'active': selectedParentForum === pf}"
+                  :class="{'active': selectedParentForum === pf, 'disabled': disabledAllForumsId.includes(pf.fid)}"
                   v-for='pf in selectedForumCategory.forums'
                   @click='selectParentForum(pf)'
-                  :title='pf.displayName + "：" + pf.description'
+                  :title='pf.displayName + (pf.description? "：" + pf.description:"")'
                   )
                   span {{pf.displayName}}
               .forum-selector-forum-item
                 .forum-selector-forum(
-                  :class="{'active': selectedForum === pf}"
+                  :class="{'active': selectedForum === pf, 'disabled': disabledAllForumsId.includes(pf.fid)}"
                   v-if='selectedParentForum'
                   v-for='pf in selectedParentForum.childForums'
                   @click='selectForum(pf)'
-                  :title='pf.displayName + "：" + pf.description'
+                  :title='pf.displayName + (pf.description? "：" + pf.description:"")'
                 )
                   span {{pf.displayName}}
           div(v-else)
@@ -55,8 +55,8 @@ include ../draggablePanel/draggablePanel
                   span.text-danger 专业介绍：
                   | {{selectedForum.description || '暂无'}}
                 .forum-selector-forum-post-description
-                  span.text-danger 发表说明：
-                  | {{selectedForum.description || '暂无'}}
+                  span.text-danger 说明：
+                  | {{selectedForum.noteOfPost || '暂无'}}
                 .forum-selector-forum-thread-types
                   span.text-danger 文章分类：
                   .forum-selector-forum-type(

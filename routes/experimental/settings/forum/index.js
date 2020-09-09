@@ -94,6 +94,34 @@ router
 			});
 		}
 		await db.ForumCategoryModel.remove({_id: {$nin: cid}});
+		const forumCategories = await db.ForumCategoryModel.find();
+		const forumCategoriesId = forumCategories.map(f => f._id);
+		for(let i = 0; i < forumCategories.length; i++) {
+			const fc = forumCategories[i];
+			const {
+				mutuallyExclusiveWithSelf,
+				mutuallyExclusiveWithOthers
+			} = fc;
+			let excludedCategoriesId = [];
+			// 与自己互斥
+			if(mutuallyExclusiveWithSelf) {
+				excludedCategoriesId.push(fc._id);
+			}
+			// 与其他专业互斥
+			if(mutuallyExclusiveWithOthers) {
+				const arr = forumCategoriesId.concat([]);
+				arr.splice(i, 1);
+				excludedCategoriesId = excludedCategoriesId.concat(arr);
+			}
+			// 其他专业与当前专业互斥
+			for(const f of forumCategories) {
+				if(f === fc || !f.mutuallyExclusiveWithOthers) continue;
+				excludedCategoriesId.push(f._id);
+			}
+
+			excludedCategoriesId = [...new Set(excludedCategoriesId)];
+			await fc.update({excludedCategoriesId});
+		}
 		await db.SettingModel.saveSettingsToRedis("forum");
 		await db.ForumCategoryModel.saveCategoryToRedis();
 		await next();

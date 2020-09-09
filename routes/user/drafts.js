@@ -99,7 +99,7 @@ draftsRouter
     } = post;
     const {user} = data;
     const draftCount = await db.DraftModel.count({uid: user.uid});
-    if(draftCount >= 100) ctx.throw(400, "草稿箱已满，保存草稿失败");
+    if(draftCount >= 100) ctx.throw(400, "草稿箱已满");
     let draft;
     if(draftId) {
       draft = await db.DraftModel.findOne({did: draftId, uid: user.uid});

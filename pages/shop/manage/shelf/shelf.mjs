@@ -72,8 +72,8 @@ window.app = new Vue({
     // 规格信息
     // 已勾选 新的规格分类  独立规格直接新建此数组内
     selectedParams: product?product.productParams:[],
-    // 规格名 
-    /* 
+    // 规格名
+    /*
     {
       name: "颜色",
       values: [
@@ -81,7 +81,7 @@ window.app = new Vue({
         "黄",
         "蓝"
       ]
-    } 
+    }
     */
     params: [],
     // 会员折扣
@@ -95,7 +95,7 @@ window.app = new Vue({
     uploadCert: product? !!product.uploadCert: false,
     uploadCertDescription: product? product.uploadCertDescription: "",
 
-    // 价格显示相关 
+    // 价格显示相关
     productSettings: product? product.productSettings: {
       // 游客是否可见
       priceShowToVisit: true,
@@ -121,10 +121,10 @@ window.app = new Vue({
   mounted() {
     // 编辑商品 预制内容
     if(product) {
-      
+
     } else {
       window.CommonModal = new NKC.modules.CommonModal();
-      window.SelectForums = new NKC.modules.MoveThread();
+      window.SelectForums = new NKC.modules.ForumSelector();
       window.editor = UE.getEditor('container', NKC.configs.ueditor.shopConfigs);
       this.initTime();
       this.addParam();
@@ -150,12 +150,12 @@ window.app = new Vue({
         p = p.filter(v => !!v);
         if(p.length) {
           arr.push(p)
-        };
+        }
       });
       arr = NKC.methods.doExchange(arr);
       arr = arr.map(a => {
         if(Array.isArray(a)) {
-          a = a.join(", ");  
+          a = a.join(", ");
         }
         return a;
       });
@@ -239,7 +239,7 @@ window.app = new Vue({
                 min: 0.01,
                 fractionDigits: 2
               });
-              if(price >= originPrice) throw "规格优惠价必须小于原价";  
+              if(price >= originPrice) throw "规格优惠价必须小于原价";
             }
           });
           body.productParams = productParams;
@@ -343,7 +343,7 @@ window.app = new Vue({
         });
         if(total <= 1) return sweetError("不允许屏蔽所有规格");
       }
-      
+
       param.isEnable = !param.isEnable;
     },
     initTime() {
@@ -391,7 +391,7 @@ window.app = new Vue({
           Vue.set(this.imgIntroductions, index, "");
         })
         .catch(err => {})
-      
+
     },
     reloadTemplate() {
       const self = this;
@@ -421,12 +421,12 @@ window.app = new Vue({
     },
     selectForum() {
       const self = this;
-      SelectForums.open(data => {
-        self.mainForums = data.originForums;
-        SelectForums.close();
+      const shopForumsId = self.shopForums.map(f => f.fid);
+      window.SelectForums.open(data => {
+        self.mainForums = [data.forum];
       }, {
-        forumCountLimit: 1,
-        hideMoveType: true
+        selectedForumsId: self.selectedShopForumId? [self.selectedShopForumId]: [],
+        disabledForumsId: shopForumsId
       })
     },
     addKeywords() {

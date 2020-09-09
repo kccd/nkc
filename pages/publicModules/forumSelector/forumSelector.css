@@ -63,6 +63,12 @@
   background-color: #2b90d9;
   color: #fff;
 }
+.forum-selector-forums .forum-selector-forum-item .forum-selector-forum.disabled,
+.forum-selector-forums .forum-selector-forum-item .forum-selector-forum.disabled:hover {
+  background-color: #eaeaea;
+  color: #b5b5b5;
+  cursor: not-allowed;
+}
 .forum-selector-button {
   height: 3.4rem;
   line-height: 3.4rem;
@@ -103,6 +109,7 @@
   margin-top: 0.5rem;
 }
 .forum-selector-forum-info .forum-selector-forum-name-container .forum-selector-forum-type {
+  user-select: none;
   height: 2rem;
   line-height: 2rem;
   padding: 0 0.5rem;

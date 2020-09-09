@@ -51,6 +51,11 @@
         background-color: @primary;
         color: #fff;
       }
+      &.disabled, &.disabled:hover{
+        background-color: #eaeaea;
+        color: #b5b5b5;
+        cursor: not-allowed;
+      }
     }
   }
 }
@@ -95,6 +100,7 @@
       margin-top: 0.5rem;
     }
     .forum-selector-forum-type{
+      user-select: none;
       height: 2rem;
       line-height: 2rem;
       padding: 0 0.5rem;

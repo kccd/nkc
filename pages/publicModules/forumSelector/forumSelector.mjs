@@ -16,7 +16,8 @@ class ForumSelector extends NKC.modules.DraggablePanel {
         selectedParentForum: '',
         selectedForum: '',
         selectedThreadType: '',
-
+        selectedForumsId: [],
+        disabledForumsId: [],
         showThreadTypes: false,
       },
       computed: {
@@ -47,6 +48,58 @@ class ForumSelector extends NKC.modules.DraggablePanel {
             }
           }
           return results;
+        },
+        forumsObj() {
+          const {forums} = this;
+          const obj = {};
+          for(const f of forums) {
+            obj[f.fid] = f;
+            for(const ff of f.childForums) {
+              obj[ff.fid] = ff;
+            }
+          }
+          return obj;
+        },
+        disabledForumCategoriesId() {
+          const {
+            selectedForumsId, forumsObj,
+            forumCategoriesId, forumCategoriesObj
+          } = this;
+          let arr = [];
+          let excludedForumCategoriesId = [];
+          for(const fid of selectedForumsId) {
+            const forum = forumsObj[fid];
+            if(!forum) continue;
+            const index = arr.indexOf(forum.categoryId);
+            if(index !== -1) continue;
+            const category = forumCategoriesObj[forum.categoryId];
+            if(!category) continue;
+            const {
+              excludedCategoriesId
+            } = category;
+            excludedForumCategoriesId = excludedForumCategoriesId.concat(excludedCategoriesId);
+          }
+          arr = [];
+          for(const cid of excludedForumCategoriesId) {
+            if(arr.includes(cid)) continue;
+            arr.push(cid);
+          }
+
+          return arr;
+        },
+        disabledAllForumsId() {
+          return this.disabledForumsId.concat(this.selectedForumsId);
+        },
+        forumCategoriesId() {
+          return this.forumCategories.map(fc => fc._id);
+        },
+        forumCategoriesObj() {
+          const {forumCategories} = this;
+          const obj = {};
+          for(const fc of forumCategories) {
+            obj[fc._id] = fc;
+          }
+          return obj;
         }
       },
       mounted() {
@@ -54,22 +107,30 @@ class ForumSelector extends NKC.modules.DraggablePanel {
       },
       methods: {
         getUrl: NKC.methods.tools.getUrl,
-        open() {
+        open(callback, options = {}) {
+          self.callback = callback;
+          const {
+            disabledForumsId = [],
+            selectedForumsId = [],
+          } = options;
+          this.disabledForumsId = disabledForumsId;
+          this.selectedForumsId = selectedForumsId;
           this.resetSelector();
           self.showPanel();
           nkcAPI('/f?t=selector', 'GET')
             .then(data => {
               self.app.loading = false;
               self.app.initForums(data);
-              console.log(data);
             })
 
             // .catch(sweetError)
         },
         close() {
           self.hidePanel();
+          this.resetSelector();
         },
         selectForumCategory(c) {
+          if(this.disabledForumCategoriesId.includes(c._id)) return;
           this.selectedForumCategory = c;
           this.selectedForum = '';
           this.selectedParentForum = '';
@@ -88,9 +149,26 @@ class ForumSelector extends NKC.modules.DraggablePanel {
           this.forums = forums;
           this.forumCategories = forumCategories;
           this.subscribeForumsId = subscribeForumsId;
-          this.selectedForumCategory = forumCategories[0];
+          let category = null;
+          for(let i = forumCategories.length - 1; i >= 0; i--) {
+            const c = forumCategories[i];
+            if(this.disabledForumCategoriesId.includes(c._id)) continue;
+            category = c;
+            if(
+              this.selectedForumCategory &&
+              this.selectedForumCategory._id === c._id
+            ) {
+              break;
+            }
+          }
+          if(category) {
+            this.selectForumCategory(category);
+          } else {
+            this.resetSelector();
+          }
         },
         selectParentForum(pf) {
+          if(this.disabledAllForumsId.includes(pf.fid)) return;
           this.selectedParentForum = pf;
           this.selectedForum = '';
           this.selectedThreadType = '';
@@ -101,22 +179,15 @@ class ForumSelector extends NKC.modules.DraggablePanel {
           }
         },
         selectForum(f) {
+          if(this.disabledAllForumsId.includes(f.fid)) return;
           this.selectedThreadType = '';
-          if(this.selectedForum === f) {
-            this.selectedForum = '';
-          } else {
-            this.selectedForum = f;
-            if(f.threadTypes.length === 0) {
-              this.selectThreadType('none');
-            }
+          this.selectedForum = f;
+          if(f.threadTypes.length === 0) {
+            this.selectThreadType('none');
           }
         },
         selectThreadType(tt) {
-          if(this.selectedThreadType === tt) {
-            this.selectedThreadType = ''
-          } else {
-            this.selectedThreadType = tt;
-          }
+          this.selectedThreadType = tt;
         },
         next() {
           this.showThreadTypes = true;
@@ -126,6 +197,7 @@ class ForumSelector extends NKC.modules.DraggablePanel {
           this.selectedThreadType = '';
         },
         resetSelector() {
+          this.selectedForumCategory = '';
           this.selectedForum = '';
           this.selectedParentForum = '';
           this.selectedThreadType = '';
@@ -135,16 +207,19 @@ class ForumSelector extends NKC.modules.DraggablePanel {
           const {selectedForum, selectedThreadType} = this;
           if(!selectedForum) return sweetError(`请选择专业`);
           if(!selectedThreadType) return sweetError(`请选择文章分类`);
-          return {
+          self.callback({
+            forum: selectedForum,
+            threadType: selectedThreadType === 'none'? null: selectedThreadType,
             fid: selectedForum.fid,
             cid: selectedThreadType === 'none'? '': selectedThreadType.cid
-          };
+          });
+          this.close();
         }
       }
     })
   }
-  open(props) {
-    this.app.open(props);
+  open(props, options) {
+    this.app.open(props, options);
   }
 }
 NKC.modules.ForumSelector = ForumSelector;

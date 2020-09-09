@@ -35,6 +35,12 @@ const schema = mongoose.Schema({
     index: 1,
     default: false,
   },
+  // 互斥的专业分类ID，选择当前分类之后不能选择excludedCategoriesId中存在的专业分类
+  excludedCategoriesId: {
+    type: [Number],
+    default: [],
+    index: 1
+  }
 }, {
   collection: 'forumCategories'
 });
@@ -49,18 +55,26 @@ schema.statics.saveCategoryToRedis = async () => {
   const ForumModel = mongoose.model('forums');
   const client = require('../settings/redisClient');
   const forumCategories = await ForumCategoryModel
-    .find({}, {_id: 1, name: 1, description: 1, displayStyle: 1})
+    .find({})
     .sort({order: 1});
   const _forumCategories = [];
   for(const fc of forumCategories) {
-    const {_id, name, description, displayStyle} = fc;
+    const {
+      _id, name, description, displayStyle,
+      mutuallyExclusiveWithOthers,
+      mutuallyExclusiveWithSelf,
+      excludedCategoriesId,
+    } = fc;
     const count = await ForumModel.count({categoryId: _id});
     _forumCategories.push({
       _id,
       name,
       description,
       displayStyle,
-      count
+      count,
+      mutuallyExclusiveWithOthers,
+      mutuallyExclusiveWithSelf,
+      excludedCategoriesId
     });
   }
   await client.setAsync(redisKey, JSON.stringify(_forumCategories));

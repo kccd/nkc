@@ -244,6 +244,7 @@ router
       // 获取发表设置中原创申明文章内容最小字数限制
       const postSettings = await db.SettingModel.getSettings("post");
       data.originalWordLimit = postSettings.postToForum.originalWordLimit;
+      data.minorForumCount = postSettings.postToForum.minorForumCount;
     }
 
     if(data.type === "newThread") {
