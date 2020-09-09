@@ -69,10 +69,13 @@ block content
                   .editor-main-forum(v-if="mainForum")
                     .editor-main-forum-avatar(:style="'background-color: ' + mainForum.color" v-if="!mainForum.logo" :data-float-fid="mainForum.fid")
                     img.editor-main-forum-avatar(:src="getUrl('forumLogo', mainForum.logo)" v-else :data-float-fid="mainForum.fid")
-                    .editor-main-forum-name(:data-float-fid="mainForum.fid")
-                      span {{mainForum.fName}}
-                      span(v-if="mainForum.cName") ：{{mainForum.cName}}
-                    //- .fa.fa-trash-o(@click="removeSelectedForums(index)" title="移除")
+                    .editor-main-forum-name
+                      span(:data-float-fid="mainForum.fid") {{mainForum.fName}}
+                      | :
+                      select(v-model='mainForum.cid')
+                        option(:value='""') 不分类
+                        option(v-for='tt in mainForum.forum.threadTypes' :value='tt.cid') {{tt.name}}
+                      //span(v-if="mainForum.cName") ：{{mainForum.cName}}
                   button.btn.btn-default.btn-sm(@click='selectForumsByType("mainForum")') {{mainForum? '修改': '选择'}}
               div(v-if='minorForumCount.max > 0')
                 .editor-main-forums
@@ -85,8 +88,12 @@ block content
                     .editor-main-forum-avatar(:style="'background-color: ' + mf.color" v-if="!mf.logo" :data-float-fid="mf.fid")
                     img.editor-main-forum-avatar(:src="getUrl('forumLogo', mf.logo)" v-else :data-float-fid="mf.fid")
                     .editor-main-forum-name(:data-float-fid="mf.fid")
-                      span {{mf.fName}}
-                      span(v-if="mf.cName") ：{{mf.cName}}
+                      span {{mf.forum.displayName}}
+                      | :
+                      select(v-model='mf.cid')
+                        option(:value='""') 不分类
+                        option(v-for='tt in mf.forum.threadTypes' :value='tt.cid') {{tt.name}}
+                      //span(v-if="mf.cName") ：{{mf.cName}}
                     .fa.fa-trash-o(@click="removeSelectedForums(index + 1)" title="移除")
                   button.btn.btn-default.btn-sm(v-if='!mainForum' disabled title='请先选择主分类') 添加
                   button.btn.btn-default.btn-sm(v-else-if='minorForums.length >= minorForumCount.max' disabled title='辅分类数量已达上限') 添加
@@ -254,7 +261,7 @@ block scripts
   include ../publicModules/selectResource/selectResource
   include ../publicModules/selectDraft/selectDraft
   include ../publicModules/sticker/selectSticker
-  include ../publicModules/moveThread/moveThread
+  //include ../publicModules/moveThread/moveThread
   include ../publicModules/insertHideContent/insertHideContent
   include ../ueditor/dialogs/mathformulaV2/mathformula
   include ../publicModules/forumSelector/forumSelector

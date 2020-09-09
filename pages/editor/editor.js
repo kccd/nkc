@@ -517,7 +517,7 @@ function initVueApp() {
         });
       },
       // 选择专业，借助moveThread模块
-      selectForums: function() {
+      /*selectForums: function() {
         var self = this;
         if(!NKC.modules.MoveThread) {
           return sweetError("未引入专业选择模块");
@@ -534,7 +534,7 @@ function initVueApp() {
           selectedForumsId: this.selectedForumsId,
           selectedCategoriesId: this.selectedCategoriesId
         });
-      },
+      },*/
       selectForumsByType(type) {
         var self = this;
         if(!window.ForumSelector)
@@ -642,6 +642,10 @@ function initVueApp() {
       // 检测已选专业
       checkForums: function() {
         if(!this.selectedForumsId.length) throw "请至少选择一个专业";
+        for(var i = 0; i < this.selectedForums.length; i++) {
+          var f = this.selectedForums[i];
+          if(f.cid === null) throw "请选择完整的专业分类";
+        }
       },
       // 检测关键词
       checkKeywords: function() {

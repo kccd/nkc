@@ -2209,7 +2209,7 @@ forumSchema.statics.checkForumCategoryBeforePost = async (_fids) => {
   const {min, max} = postSettings.postToForum.minorForumCount;
   const mainForumId = fids.shift();
   const minorForumId = fids;
-  if(minorForumId.length < min || minorForumId > max) throwErr(400, `专业分类辅分类数量不符合要求`);
+  if(minorForumId.length < min || minorForumId.length > max) throwErr(400, `专业分类辅分类数量不符合要求`);
   // 以下检测专业分类冲突
   const categories = await ForumCategoryModel.getAllCategories();
   const categoriesObj = {};

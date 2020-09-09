@@ -8,11 +8,6 @@ router
     const {type} = query;
     const {user} = data;
     await db.UserModel.checkUserBaseInfo(user);
-    // const authLevel = data.user.authLevel;
-    /*if(!user.volumeA || authLevel < 1) {
-      ctx.template = 'interface_notice.pug';
-      return await next();
-    }*/
     ctx.template = "editor/editor.pug";
 
     // 需要预制的专业和文章分类
@@ -170,16 +165,26 @@ router
         const childForumsId = [] || await f.getAllChildForumsId();
         if(!childForumsId.length) forums.push(f);
       }
-      const categories = await db.ThreadTypeModel.find({cid: {$in: selectedCategoriesId}});
+      const categories = await db.ThreadTypeModel.find({fid: {$in: forums.map(f => f.fid)}}).sort({order: 1});
       const categoriesObj = {};
+      const selectedCategoriesObj = {};
+      const cfObj = {};
       for(const c of categories) {
-        categoriesObj[c.fid] = c;
+        categoriesObj[c.cid] = c;
+        if(!cfObj[c.fid]) cfObj[c.fid] = [];
+        cfObj[c.fid].push(c);
+        if(selectedCategoriesId.includes(c.cid)) {
+          selectedCategoriesObj[c.fid] = c;
+        }
       }
       for(const forum of forums) {
-        const category = categoriesObj[forum.fid];
+        const category = selectedCategoriesObj[forum.fid];
+        const f = forum.toObject();
+        f.threadTypes = cfObj[f.fid] || [];
         data.mainForums.push({
+          forum: f,
           fid: forum.fid,
-          cid: category? category.cid: "",
+          cid: category? category.cid: null,
           description: forum.description,
           color: forum.color,
           logo: forum.logo,
