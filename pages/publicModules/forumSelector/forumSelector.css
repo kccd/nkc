@@ -107,6 +107,12 @@
 }
 .forum-selector-forum-info .forum-selector-forum-description {
   margin-top: 0.5rem;
+  height: 1.8rem;
+  overflow: hidden;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 }
 .forum-selector-forum-info .forum-selector-forum-thread-types {
   margin-top: 0.5rem;

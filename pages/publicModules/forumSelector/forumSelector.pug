@@ -52,9 +52,8 @@ include ../draggablePanel/draggablePanel
                   .forum-selector-forum-avatar-img(v-else :style='"background-color: " + selectedForum.color')
                 .forum-selector-forum-name-container
                   .forum-selector-forum-name {{selectedForum.displayName}}
-                  //.forum-selector-forum-description
-                    span.text-danger 专业介绍：
-                    | {{selectedForum.description || '暂无'}}
+                  .forum-selector-forum-description
+                    span(:title='selectedForum.description') {{selectedForum.description || '暂无简介'}}
               .forum-selector-forum-thread-types
                 h5.text-danger 文章分类：
                 .forum-selector-forum-type(v-for='tt in selectedForum.threadTypes'

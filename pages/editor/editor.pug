@@ -88,8 +88,8 @@ block content
                   .editor-main-forum(v-for='mf, index in minorForums')
                     .editor-main-forum-avatar(:style="'background-color: ' + mf.color" v-if="!mf.logo" :data-float-fid="mf.fid")
                     img.editor-main-forum-avatar(:src="getUrl('forumLogo', mf.logo)" v-else :data-float-fid="mf.fid")
-                    .editor-main-forum-name(:data-float-fid="mf.fid")
-                      span {{mf.forum.displayName}}
+                    .editor-main-forum-name
+                      span(:data-float-fid="mf.fid") {{mf.forum.displayName}}
                       | :
                       select(v-model='mf.cid')
                         option(:value='null') 请选择分类

@@ -77,7 +77,7 @@ body{
   vertical-align: top;
 }
 .editor-main-forum-name select{
-  border: none
+  border: 1px solid #dadada;
 }
 .editor-main-forum .fa{
   cursor: pointer;
