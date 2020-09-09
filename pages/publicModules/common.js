@@ -867,29 +867,34 @@ NKC.methods.search = function(inputId) {
 }
 
 
+var siteIconUrl = $(document.head).find("[rel='shortcut icon']").attr("href");
 /**
  * 发送原生消息提示
  */
-NKC.methods.showNotification = function(title, body) {
+NKC.methods.showNotification = function(title, body, time) {
   if(!("Notification" in window)) return;
+  function toShow() {
+    return new Promise(function(resolve, reject) {
+      var notification = new Notification(title, {body: body, icon: siteIconUrl});
+      notification.onclick = function() {resolve({action: "click"})}
+      notification.onclose = function() {resolve({action: "close"})}
+      setTimeout(function() {
+        notification.close()
+      }, time || 10000);
+    })
+  }
   if(Notification.permission !== "granted") {
     return Notification.requestPermission()
       .then(function(status) {
         return new Promise(function(resolve, reject) {
           if(status === "granted") {
-            var notification = new Notification(title, {body: body});
-            notification.onclick = function() {resolve({action: "click"})}
-            notification.onclose = function() {resolve({action: "close"})}
+            return toShow();
           } else {
             reject("用户拒绝通知")
           }
         })
       })
   } else {
-    return new Promise(function(resolve, reject) {
-      var notification = new Notification(title, {body: body});
-      notification.onclick = function() {resolve({action: "click"})}
-      notification.onclose = function() {resolve({action: "close"})}
-    })
+    return toShow();
   }
 }

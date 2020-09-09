@@ -79,7 +79,7 @@ module.exports = async (ctx, next) => {
 		userRoles = [visitorRole];
 	} else {
     // 用户
-		await user.update({tlv: Date.now()});
+		const oldUser = await db.UserModel.findOneAndUpdate({uid: user.uid}, {$set: {tlv: Date.now()}});
 		if(!user.certs.includes('default')) {
 			user.certs.unshift('default');
 		}
@@ -115,20 +115,9 @@ module.exports = async (ctx, next) => {
         await user.generalSettings.update({'draftFeeSettings.kcb': 0});
       }
       // 获取新点赞数
-      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}, type: "up"});
-      let uids = votes.map(vote => vote.uid);
-      let users = await db.UserModel.find({uid: {$in: uids}});
-      let usernames = users.map(user => user.username);
-      let total = usernames.length;
-      let partOfUsernames = "";
-      if(total > 0 && total <= 6) {
-        partOfUsernames = usernames.join("、");
-        // console.log(`${partOfUsernames}赞了你的文章👍！`);
-      } else if(total > 6 ) {
-        partOfUsernames = usernames.splice(0, 6).join("、");
-        // console.log(`${partOfUsernames}等${total}人赞了你的文章👍！`);
-      }
-      if(total > 0) {
+      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"});
+      let voteIds = votes.map(vote => vote._id.toString());
+      if(voteIds.length > 0) {
         // 发系统通知
         const message = db.MessageModel({
           _id: await db.SettingModel.operateSystemID('messages', 1),
@@ -138,23 +127,24 @@ module.exports = async (ctx, next) => {
           ip: ctx.address,
           c: {
             type: 'latestVotes',
-            partOfUsernames,
-            total
+            voteIds,
+            // partOfUsernames,
+            // total
           }
         });
         await message.save();
         // redis.pubMessage(message);
       }
 
-      let newVoteUp = 0;
-      votes.map(v => {
-        if(v.type === 'up') {
-          newVoteUp += v.num;
-        } else if(v.type === 'down') {
-          newVoteUp -= v.num;
-        }
-      });
-      user.newVoteUp = newVoteUp>0?newVoteUp:0;
+      // let newVoteUp = 0;
+      // votes.map(v => {
+      //   if(v.type === 'up') {
+      //     newVoteUp += v.num;
+      //   } else if(v.type === 'down') {
+      //     newVoteUp -= v.num;
+      //   }
+      // });
+      // user.newVoteUp = newVoteUp>0?newVoteUp:0;
     }
     userGrade = await user.extendGrade();
     // 判断用户是否被封禁
