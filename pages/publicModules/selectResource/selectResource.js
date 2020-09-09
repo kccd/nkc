@@ -482,6 +482,15 @@ NKC.modules.SelectResource = function() {
     }
   })
 
+  // 监听文件处理失败信息
+  socket.on("message", function(data) {
+    if(data.state === "fileProcessFailed") {
+      sweetError("文件处理失败\n" + data.err);
+      self.app.category = "all";
+      self.app.getResources(0);
+    }
+  })
+
   self.open = self.app.open;
   self.close = self.app.close;
 };

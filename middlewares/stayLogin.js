@@ -29,7 +29,7 @@ const resourceOperations = [
 module.exports = async (ctx, next) => {
 
   const isResourcePost = resourceOperations.includes(ctx.data.operationId);
-  const {data, db} = ctx;
+  const {data, db, redis} = ctx;
 	// cookie
   let userInfo = ctx.getCookie("userInfo");
 	// let userInfo = ctx.cookies.get('userInfo', {signed: true});
@@ -115,7 +115,37 @@ module.exports = async (ctx, next) => {
         await user.generalSettings.update({'draftFeeSettings.kcb': 0});
       }
       // 获取新点赞数
-      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}});
+      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}, type: "up"});
+      let uids = votes.map(vote => vote.uid);
+      let users = await db.UserModel.find({uid: {$in: uids}});
+      let usernames = users.map(user => user.username);
+      let total = usernames.length;
+      let partOfUsernames = "";
+      if(total > 0 && total <= 6) {
+        partOfUsernames = usernames.join("、");
+        // console.log(`${partOfUsernames}赞了你的文章👍！`);
+      } else if(total > 6 ) {
+        partOfUsernames = usernames.splice(0, 6).join("、");
+        // console.log(`${partOfUsernames}等${total}人赞了你的文章👍！`);
+      }
+      if(total > 0) {
+        // 发系统通知
+        const message = db.MessageModel({
+          _id: await db.SettingModel.operateSystemID('messages', 1),
+          r: user.uid,
+          ty: 'STU',
+          port: ctx.port,
+          ip: ctx.address,
+          c: {
+            type: 'latestVotes',
+            partOfUsernames,
+            total
+          }
+        });
+        await message.save();
+        // redis.pubMessage(message);
+      }
+
       let newVoteUp = 0;
       votes.map(v => {
         if(v.type === 'up') {

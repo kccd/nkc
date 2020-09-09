@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+const settings = require('../settings');
+const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const messageSchema = new Schema({
 
@@ -293,6 +294,11 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
       r.c.post = post;
+    } else if(type === "kcb") {
+      const post = await PostModel.findOne({pid});
+      if(!post) continue;
+      r.c.post = post;
+      r.c.thread = await ThreadModel.findOne({tid: post.tid});
     } else if(type === "digestPost") {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
@@ -453,6 +459,8 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const column = await ColumnModel.findOne({_id: columnId});
       if(!column) continue;
       r.c.column = column;
+    } else if(type === "latestVotes") {
+      
     }
 
     if(r.c.thread) {

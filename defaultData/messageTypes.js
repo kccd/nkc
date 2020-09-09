@@ -338,6 +338,25 @@ module.exports = {
                 "problemURL"
             ],
             content: "你上报的问题[text=problemTitle]已被修复，[url=problemURL(立即查看)]。"
-        }
+        },
+        {
+            parameters: [
+                "userName",
+                "postURL",
+                "kcbCount",
+                "scoreName",
+                "threadTitle"
+            ],
+            content: "[text=userName]在文章[text=threadTitle]向你转账[text=kcbCount][text=scoreName]以资鼓励[url=postURL(立即查看)]。",
+            type: "kcb"
+        },
+        {
+            parameters: [
+                "partOfUsernames",
+                "total"
+            ],
+            content: "[text=partOfUsernames]等[text=total]人赞了你的文章👍！",
+            type: "latestVotes"
+        },
     ]
 };

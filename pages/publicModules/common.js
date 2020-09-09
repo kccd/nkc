@@ -865,3 +865,31 @@ NKC.methods.search = function(inputId) {
   var c = input.val();
   window.open("/search?c=" + encodeURI(c));
 }
+
+
+/**
+ * 发送原生消息提示
+ */
+NKC.methods.showNotification = function(title, body) {
+  if(!("Notification" in window)) return;
+  if(Notification.permission !== "granted") {
+    return Notification.requestPermission()
+      .then(function(status) {
+        return new Promise(function(resolve, reject) {
+          if(status === "granted") {
+            var notification = new Notification(title, {body: body});
+            notification.onclick = function() {resolve({action: "click"})}
+            notification.onclose = function() {resolve({action: "close"})}
+          } else {
+            reject("用户拒绝通知")
+          }
+        })
+      })
+  } else {
+    return new Promise(function(resolve, reject) {
+      var notification = new Notification(title, {body: body});
+      notification.onclick = function() {resolve({action: "click"})}
+      notification.onclose = function() {resolve({action: "close"})}
+    })
+  }
+}
