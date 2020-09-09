@@ -45,3 +45,8 @@ NKC.modules.insertMathformula = function() {
   self.open = self.app.open;
   self.close = self.app.close;
 };
+
+// 忽略标签名以mjx-开头的元素
+Vue.config.ignoredElements = [
+  /^mjx-/
+]

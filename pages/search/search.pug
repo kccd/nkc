@@ -12,13 +12,14 @@ block content
             .form-group
               label 检索词：
               input.form-control.keywords-input(type='text' name='c' placeholder='多个检索词用空格分隔' v-model="c" @keyup.enter="search")
+          .search-form.form-inline(v-show="complexOptions")
             .form-group
               label 多检索词关系：
               span.h5 或
                 input(type="radio" value="or" v-model="relation")
               span.h5 与
                 input(type="radio" value="" v-model="relation")
-          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'" v-show="complexOptions")
             .form-group(v-if="t !== 'user'")
               label 作者筛选：
               input.form-control(type='text' name='c' placeholder='请输入用户名' v-model="author" @keyup.enter="search")
@@ -28,14 +29,14 @@ block content
                 .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'" @click="removeForum(forum)") {{forum.displayName}}
                   .fa.fa-remove
                 button.btn.btn-default.btn-sm(@click="selectForum") 添加
-          .search-form.form-inline(v-if="['post', 'thread', ''].indexOf(t) !== -1")
+          .search-form.form-inline(v-if="['post', 'thread', ''].indexOf(t) !== -1" v-show="complexOptions")
             .form-group
               label 精选：
               span.h5 全部文章
                 input(type="radio" :value="false" v-model="digest")
               span.h5 &nbsp;&nbsp;只看精选
                 input(type="radio" :value="true" v-model="digest")
-          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'" v-show="complexOptions")
             .form-group
               label 时间范围：
               select(v-model="timeStart.year")
@@ -55,7 +56,7 @@ block content
                   option(value=i)=i
               select(v-model="timeEnd.day")
                 option(v-for="i in timeEndDay" :value="i") {{i}}
-          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'" v-show="complexOptions")
             .form-group
               label 排序方式：
               span.h5 匹配程度
@@ -68,7 +69,8 @@ block content
                 input(type="radio" value="" v-model="sort")
               span.h5 &nbsp;&nbsp;升序
                 input(type="radio" value="asc" v-model="sort")
-
+          .search-form.form-inline
+            a(href="javascript:void(0)" @click="openMoreOptions()") {{complexOptions? "收起更多选项" : "更多选项"}}
 
       .col-xs-12.col-md-3
         .search-form.form-inline

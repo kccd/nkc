@@ -21,6 +21,7 @@ var app = new Vue({
     relation: "", // and, 默认or
     t: "",
     c: "",
+    complexOptions: false
   },
   computed: {
     timeStartDay: function() {
@@ -83,6 +84,32 @@ var app = new Vue({
       if(!this.c) return screenTopWarning("请输入关键词");
       NKC.methods.visitUrl("/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options)
       // window.location.href = "/search?c=" + this.strToBase64(this.c || "") + (this.t?"&t="+this.t:"") +"&d=" + this.options;
+    },
+    // 展开或者关闭更多搜索选项
+    openMoreOptions: function() {
+      var isOpen = this.complexOptions;
+      if(isOpen) {
+        this.complexOptions = false;
+        this.selectedForums.length = 0;
+        this.author = "";
+        this.digest = false;
+        this.timeStart = {
+          year: 1970,
+          month: 1,
+          day: 1
+        };
+        this.timeEnd = {
+          year: new Date().getFullYear(),
+          month: new Date().getMonth() + 1,
+          day: new Date().getDate()
+        };
+        this.sortType = "",
+        this.sort = "",
+        this.relation = "",
+        this.t = ""
+      } else {
+        this.complexOptions = true;
+      }
     }
   },
   mounted: function() {
