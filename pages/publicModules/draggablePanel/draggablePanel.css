@@ -2,7 +2,7 @@
   height: 43rem;
   position: fixed;
   width: 36rem;
-  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 15px 1px rgba(0, 0, 0, 0.1);
   z-index: 10000;
   background-color: #fff;
   border: 1px solid #f0f0f0;
