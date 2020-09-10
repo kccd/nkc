@@ -215,8 +215,8 @@ const addImageWaterMask = async (op) => {
     flex = 0.1,
     transparency = 0.5
   } = op;
-  let videoSize = await getVideoSize(videoPath);
-  let width = videoSize.width * flex;
+  const {width: videoWidth, height: videoHeight} = await getVideoSize(videoPath);
+  let width = (videoWidth > videoHeight? videoHeight: videoWidth) * flex;
   return spawnProcess('ffmpeg', [
     '-i', videoPath, '-i', imagePath, '-filter_complex', `[1:v]scale=${width}:${width}/a, lut=a=val*${transparency}[logo];[0:v][logo]overlay=${position.x}:${position.y}`, '-y',
     ...bitrateAndFPSControlParameter,                                  /* 码率和帧率控制参数 */
@@ -241,7 +241,7 @@ async function addImageTextWaterMask(op) {
   } = op;
   const {height: videoHeight, width: videoWidth} = await getVideoSize(input);
   const logoSize = await getImageSize(image);
-  let padHeight = ~~(videoHeight * flex);
+  let padHeight = ~~((videoHeight > videoWidth? videoWidth: videoHeight) * flex);
   let logoHeight = padHeight;
   let logoWidth = ~~(logoSize.width * (logoHeight / logoSize.height));
   const fontSize = padHeight - 10;
@@ -278,7 +278,7 @@ async function addImageTextWaterMaskForImage(op) {
   } = op;
   const {height: imageHeight, width: imageWidth} = await getImageSize(input);
   const logoSize = await getImageSize(image);
-  let padHeight = ~~(imageHeight * flex);
+  let padHeight = ~~((imageHeight > imageWidth? imageWidth: imageHeight) * flex);
   let logoHeight = padHeight - 1;
   let logoWidth = ~~(logoSize.width * (logoHeight / logoSize.height)) - 1;
   const fontSize = padHeight - 10;
