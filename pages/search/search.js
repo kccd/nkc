@@ -51,9 +51,8 @@ var app = new Vue({
     selectedForumsId: function() {
       var arr = [];
       for(var i = 0 ; i < this.selectedForums.length; i++) {
-        arr.push(this.selectedForums[i].forum.fid);
+        arr.push(this.selectedForums[i].fid);
       }
-      console.log(arr);
       return arr;
     }
   },
@@ -74,7 +73,7 @@ var app = new Vue({
       var self = this;
       if(!window.ForumSelector) window.ForumSelector = new NKC.modules.ForumSelector();
       window.ForumSelector.open(function(data) {
-        self.selectedForums.push(data)
+        self.selectedForums.push(data.forum)
       }, {
         from: 'readable',
         selectedForumsId: self.selectedForumsId,

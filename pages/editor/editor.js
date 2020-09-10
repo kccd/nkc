@@ -535,7 +535,7 @@ function initVueApp() {
           selectedCategoriesId: this.selectedCategoriesId
         });
       },*/
-      selectForumsByType(type) {
+      selectForumsByType: function(type) {
         var self = this;
         if(!window.ForumSelector)
           window.ForumSelector = new NKC.modules.ForumSelector();
@@ -555,7 +555,7 @@ function initVueApp() {
             self.selectedForums.push(r);
           }
         }, {
-          selectedForumsId,
+          selectedForumsId: selectedForumsId,
           disabledForumsId: []
         });
       },

@@ -26,10 +26,10 @@ block content
             .form-group(v-if="t !== 'resource'")
               label 专业筛选：
               .search-forum-div
-                .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.forum.color + ';'") {{forum.forum.displayName}}
+                .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
                   //-|:
                     select(v-model='forum.cid')
-                      option(v-for='c in forum.forum.threadTypes' :value='c.cid') {{c.name}}
+                      option(v-for='c in forum.threadTypes' :value='c.cid') {{c.name}}
                       option(:value='""') 不分类
                   .fa.fa-remove(@click="removeForum(forum)")
                 button.btn.btn-default.btn-sm(@click="selectForum") 添加
@@ -74,7 +74,11 @@ block content
               span.h5 &nbsp;&nbsp;升序
                 input(type="radio" value="asc" v-model="sort")
           .search-form.form-inline
-            a(href="javascript:void(0)" @click="openMoreOptions()") {{complexOptions? "收起" : "更多选项"}}
+            span.pointer(@click="openMoreOptions()" style='color: #2b90d9')
+              span(v-if='complexOptions') 收起
+                .fa.fa-caret-up
+              span(v-else) 高级搜索
+                .fa.fa-caret-down
 
       .col-xs-12.col-md-3
         .search-form.form-inline
@@ -116,15 +120,6 @@ block content
             include ../publicModules/paging/paging_input
           else
             h5=`啥也没有找到(ಥ_ʖಥ)，白白浪费 ${data.time/1000} 秒的时间~`
-    //else
-    //  .search-panel.search-panel-center
-    //    form.search-form.form-inline(action='/search' method='GET')
-    //      .form-group
-    //        .search-header=data.serverSettings.websiteName
-    //      .form-group
-    //        input.hidden(type='text' name='t' value=data.t)
-    //        input.form-control(class="input" type='text' name='c' placeholder='请输入关键词' value=data.c)
-    //      button.btn.btn-default(type='submit') 搜索
 block scripts
   include ../publicModules/forumSelector/forumSelector
   include ../publicModules/resourceInfo/resourceInfo
