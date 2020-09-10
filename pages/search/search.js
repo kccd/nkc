@@ -46,6 +46,13 @@ var app = new Vue({
         relation: this.relation
       };
       return this.strToBase64(JSON.stringify(o));
+    },
+    selectedForumsId: function() {
+      var arr = [];
+      for(var i = 0 ; i < this.selectedForums.length; i++) {
+        arr.push(this.selectedForums[i].forum.fid);
+      }
+      return arr;
     }
   },
   methods: {
@@ -62,7 +69,14 @@ var app = new Vue({
       this.selectedForums.push(data);
     },
     selectForum: function() {
-      vueSelectForum.app.show();
+      var self = this;
+      if(!window.ForumSelector) window.ForumSelector = new NKC.modules.ForumSelector();
+      window.ForumSelector.open(function(data) {
+        self.selectedForums.push(data)
+      }, {
+        from: 'readable',
+        selectedForums: self.selectedForumsId
+      });
     },
     removeForum: function(f) {
       var index = this.selectedForums.indexOf(f);
@@ -113,7 +127,6 @@ var app = new Vue({
     }
   },
   mounted: function() {
-    vueSelectForum.init({func: this.addForum, canChooseParentForum: true});
     var data = NKC.methods.getDataById("data");
     try{
       this.c = this.base64ToStr(data.c);
@@ -196,19 +209,19 @@ function selectedThreads(type) {
   promise.resolve()
     .then(function() {
       if(!threadsId.length) throw "请至少勾选一篇文章";
-      
+
     })
     .then(function() {
-    
+
     })
     .catch(function(err) {
       sweetError(err);
     });
-  
+
   console.log(threadsId);
   if(type === "move") {
-  
+
   } else {
-  
+
   }
 }*/

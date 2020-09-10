@@ -112,12 +112,13 @@ class ForumSelector extends NKC.modules.DraggablePanel {
           const {
             disabledForumsId = [],
             selectedForumsId = [],
+            from = 'writable'
           } = options;
           this.disabledForumsId = disabledForumsId;
           this.selectedForumsId = selectedForumsId;
           this.resetSelector();
           self.showPanel();
-          nkcAPI('/f?t=selector', 'GET')
+          nkcAPI(`/f?t=selector&f=${from}`, 'GET')
             .then(data => {
               self.app.loading = false;
               self.app.initForums(data);

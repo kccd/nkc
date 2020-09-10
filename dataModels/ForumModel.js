@@ -2131,8 +2131,10 @@ forumSchema.methods.getForumNav = async function(cid) {
 };
 /*
 * 获取专业选择器可显示的专业
+* @param {String} uid 用户ID
+* @param {String} from 专业来源 writable: 可发表文章的, readable: 可阅读的
 * */
-forumSchema.statics.getForumSelectorForums = async uid => {
+forumSchema.statics.getForumSelectorForums = async (uid, from) => {
   const ForumModel = mongoose.model('forums');
   const ThreadTypeModel = mongoose.model('threadTypes');
   const readableForumsId = await ForumModel.getReadableForumsIdByUid(uid);
@@ -2167,8 +2169,13 @@ forumSchema.statics.getForumSelectorForums = async uid => {
   const getForumChildForums = async (results, arr) => {
     for(const ff of arr) {
       const childForumsId = await ForumModel.getAllChildForumsIdByFid(ff.fid);
-      if(writableForumsId.includes(ff.fid) && childForumsId.length === 0) {
-        results.push(ff);
+      if(childForumsId.length === 0) {
+        if(
+          (from === 'writable' && writableForumsId.includes(ff.fid)) ||
+          from === 'readable'
+        ) {
+          results.push(ff);
+        }
       } else {
         await getForumChildForums(results, ff.childForums);
       }
