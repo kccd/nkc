@@ -329,8 +329,8 @@ jobs.clearFileCache = async () => {
     const time = Date.now() - 24*60*60*1000;
     const dir = await fsPromise.readdir(uploadDir);
     for(const d of dir) {
+      if(d.indexOf('upload_') !== 0) continue;
       const filePath = path.resolve(uploadDir, `./${d}`);
-      if(filePath.indexOf('upload_') !== 0) return;
       const state = await fsPromise.stat(filePath);
       if(!state.isFile()) continue;
       const fileTime = (new Date(state.mtime)).getTime();
