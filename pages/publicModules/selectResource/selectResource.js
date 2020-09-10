@@ -264,12 +264,10 @@ NKC.modules.SelectResource = function() {
         this.files.splice(index, 1);
       },
       startUpload: function(f) {
-        // 本次上传的任务id，由服务器生成
-        var serverTaskId = null;
         f.error = "";
         this.selectCategory("upload");
         var fileId = null;
-        Promise.resolve()
+        return Promise.resolve()
           .then(function() {
             // if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
             if(f.status === "uploading") throw "文件正在上传...";
@@ -301,10 +299,6 @@ NKC.modules.SelectResource = function() {
             f.status = "uploaded";
             var index = self.app.files.indexOf(f);
             self.app.files.splice(index, 1);
-            if(self.app.category === "upload" && !self.app.files.length) {
-              self.app.category = "all";
-              self.app.getResources(0);
-            }
           })
           .catch(function(data) {
             f.status = "unUpload";
@@ -325,23 +319,57 @@ NKC.modules.SelectResource = function() {
         }
       },
       uploadSelectFile: function(f) {
-        f = this.newFile(f);
-        this.files.unshift(f);
-        this.startUpload(f);
-        this.selectCategory("upload");
+        var self = this;
+        if(f.constructor === Array) {
+          // 这个数组中文件的顺序和用户选择的顺序相反，即先选的靠后，后选的靠前
+          f.forEach(function(file) {
+            self.files.push(self.newFile(file));
+          });
+        } else {
+          f = this.newFile(f);
+          this.files.unshift(f);
+        }
+        // return console.log(self.files);
+        function uploadFileSeries() {
+          var file;
+          for(var i = 0; i < self.files.length; i++) {
+            var f = self.files[i];
+            if(f.status !== 'unUpload' || f.error) continue;
+            file = f;
+            break;
+          }
+          // var file = self.files[0];
+          if(!file) return Promise.resolve();
+          return self.startUpload(file)
+            .then(new Promise(function(resolve, _) {
+              console.log("【上传成功】", file.name);
+              setTimeout(resolve, 1000);
+            }))
+            .then(function() {
+              return uploadFileSeries();
+            })
+        }
+        // var promise = this.startUpload(f);
+        return uploadFileSeries()
+          .then(function() {
+            console.log("【全部上传完成】");
+            if(self.category === "upload" && !self.files.length) {
+              setTimeout(function() {
+                self.category = "all";
+                self.getResources(0);
+              }, 500)
+            }
+          })
       },
       // 用户已选择待上传的文件
       selectedFiles: function() {
-        var input = document.getElementById("moduleSelectResourceInput");
-        if(!input) return;
-        var files = input.files;
-        if(files.length <= 0) return;
-        for(var i = 0; i < files.length; i++) {
-          // if(this.files.length >= 20) continue;
-          var f = files[i];
-          this.uploadSelectFile(f);
-        }
+        var self = this;
+        var input = $("#moduleSelectResourceInput")[0];
+        // 这个数组中文件的顺序和用户选择的顺序相反，即先选的靠后，后选的靠前
+        var files = [].slice.call(input.files);
         input.value = "";
+        if(files.length <= 0) return;
+        self.uploadSelectFile(files);
       },
       changePageType: function(pageType) {
         var self = this;
@@ -456,7 +484,16 @@ NKC.modules.SelectResource = function() {
   socket.on("message", function(data) {
     if(data.state === "fileProcessFinish") {
       // console.log("文件处理完成");
-      self.app.category = "all";
+      // self.app.category = "all";
+      self.app.getResources(0);
+    }
+  })
+
+  // 监听文件处理失败信息
+  socket.on("message", function(data) {
+    if(data.state === "fileProcessFailed") {
+      sweetError("文件处理失败\n" + data.err);
+      // self.app.category = "all";
       self.app.getResources(0);
     }
   })

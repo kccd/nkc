@@ -12,30 +12,35 @@ block content
             .form-group
               label 检索词：
               input.form-control.keywords-input(type='text' name='c' placeholder='多个检索词用空格分隔' v-model="c" @keyup.enter="search")
+          .search-form.form-inline(v-show="complexOptions")
             .form-group
               label 多检索词关系：
               span.h5 或
                 input(type="radio" value="or" v-model="relation")
               span.h5 与
                 input(type="radio" value="" v-model="relation")
-          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'" v-show="complexOptions")
             .form-group(v-if="t !== 'user'")
               label 作者筛选：
               input.form-control(type='text' name='c' placeholder='请输入用户名' v-model="author" @keyup.enter="search")
             .form-group(v-if="t !== 'resource'")
               label 专业筛选：
               .search-forum-div
-                .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'" @click="removeForum(forum)") {{forum.displayName}}
-                  .fa.fa-remove
+                .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'") {{forum.displayName}}
+                  //-|:
+                    select(v-model='forum.cid')
+                      option(v-for='c in forum.threadTypes' :value='c.cid') {{c.name}}
+                      option(:value='""') 不分类
+                  .fa.fa-remove(@click="removeForum(forum)")
                 button.btn.btn-default.btn-sm(@click="selectForum") 添加
-          .search-form.form-inline(v-if="['post', 'thread', ''].indexOf(t) !== -1")
+          .search-form.form-inline(v-if="['post', 'thread', ''].indexOf(t) !== -1" v-show="complexOptions")
             .form-group
               label 精选：
               span.h5 全部文章
                 input(type="radio" :value="false" v-model="digest")
               span.h5 &nbsp;&nbsp;只看精选
                 input(type="radio" :value="true" v-model="digest")
-          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'" v-show="complexOptions")
             .form-group
               label 时间范围：
               select(v-model="timeStart.year")
@@ -55,7 +60,7 @@ block content
                   option(value=i)=i
               select(v-model="timeEnd.day")
                 option(v-for="i in timeEndDay" :value="i") {{i}}
-          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'")
+          .search-form.form-inline(v-if="t !== 'user' && t !== 'column'" v-show="complexOptions")
             .form-group
               label 排序方式：
               span.h5 匹配程度
@@ -68,7 +73,12 @@ block content
                 input(type="radio" value="" v-model="sort")
               span.h5 &nbsp;&nbsp;升序
                 input(type="radio" value="asc" v-model="sort")
-
+          .search-form.form-inline
+            span.pointer(@click="openMoreOptions()" style='color: #2b90d9')
+              span(v-if='complexOptions') 收起
+                .fa.fa-caret-up
+              span(v-else) 高级搜索
+                .fa.fa-caret-down
 
       .col-xs-12.col-md-3
         .search-form.form-inline
@@ -110,17 +120,8 @@ block content
             include ../publicModules/paging/paging_input
           else
             h5=`啥也没有找到(ಥ_ʖಥ)，白白浪费 ${data.time/1000} 秒的时间~`
-    //else
-    //  .search-panel.search-panel-center
-    //    form.search-form.form-inline(action='/search' method='GET')
-    //      .form-group
-    //        .search-header=data.serverSettings.websiteName
-    //      .form-group
-    //        input.hidden(type='text' name='t' value=data.t)
-    //        input.form-control(class="input" type='text' name='c' placeholder='请输入关键词' value=data.c)
-    //      button.btn.btn-default(type='submit') 搜索
 block scripts
-  include ../publicModules/selectForum/selectForum
+  include ../publicModules/forumSelector/forumSelector
   include ../publicModules/resourceInfo/resourceInfo
   if permission("superModerator")
     include ../publicModules/moveThread/moveThread

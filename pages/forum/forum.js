@@ -15,7 +15,35 @@ $(function() {
       uploadResourcesId: NKC.configs.uploadResourcesId?NKC.configs.uploadResourcesId.split("-"):[]
     });
   }
+  var threadUrlSwitch = $('#threadUrlSwitch');
+  if(threadUrlSwitch.length) {
+    var threadUrlSwitchStatus = getThreadUrlSwitchStatus();
+    modifyThreadUrl(threadUrlSwitchStatus);
+    threadUrlSwitch.on("click", function() {
+      var s = $(this).prop('checked');
+      modifyThreadUrl(s);
+    });
+  }
 });
+
+var threadUrlSwitchKey = 'forum_thread_a_target';
+
+function modifyThreadUrl(status) {
+  var target = status? '_blank': '_self';
+  $('.thread-panel-url').attr('target', target);
+  $('#threadUrlSwitch').prop('checked', !!status);
+  setThreadUrlSwitchStatus(status);
+}
+/*
+* @return {Boolean}
+* */
+function getThreadUrlSwitchStatus() {
+  return localStorage.getItem(threadUrlSwitchKey) === 'true';
+}
+
+function setThreadUrlSwitchStatus(status) {
+  localStorage.setItem(threadUrlSwitchKey, status);
+}
 
 function showSameForums() {
   $(".sameForums").slideToggle();

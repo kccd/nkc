@@ -29,7 +29,7 @@ const resourceOperations = [
 module.exports = async (ctx, next) => {
 
   const isResourcePost = resourceOperations.includes(ctx.data.operationId);
-  const {data, db} = ctx;
+  const {data, db, redis} = ctx;
 	// cookie
   let userInfo = ctx.getCookie("userInfo");
 	// let userInfo = ctx.cookies.get('userInfo', {signed: true});
@@ -79,7 +79,7 @@ module.exports = async (ctx, next) => {
 		userRoles = [visitorRole];
 	} else {
     // 用户
-		await user.update({tlv: Date.now()});
+		const oldUser = await db.UserModel.findOneAndUpdate({uid: user.uid}, {$set: {tlv: Date.now()}});
 		if(!user.certs.includes('default')) {
 			user.certs.unshift('default');
 		}
@@ -115,16 +115,23 @@ module.exports = async (ctx, next) => {
         await user.generalSettings.update({'draftFeeSettings.kcb': 0});
       }
       // 获取新点赞数
-      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: user.tlv}});
-      let newVoteUp = 0;
-      votes.map(v => {
-        if(v.type === 'up') {
-          newVoteUp += v.num;
-        } else if(v.type === 'down') {
-          newVoteUp -= v.num;
-        }
-      });
-      user.newVoteUp = newVoteUp>0?newVoteUp:0;
+      const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"}, {_id: 1});
+      let voteIds = votes.map(vote => vote._id.toString());
+      if(voteIds.length > 0) {
+        // 发系统通知
+        const message = db.MessageModel({
+          _id: await db.SettingModel.operateSystemID('messages', 1),
+          r: user.uid,
+          ty: 'STU',
+          port: ctx.port,
+          ip: ctx.address,
+          c: {
+            type: 'latestVotes',
+            voteIds,
+          }
+        });
+        await message.save();
+      }
     }
     userGrade = await user.extendGrade();
     // 判断用户是否被封禁

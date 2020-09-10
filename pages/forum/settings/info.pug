@@ -54,6 +54,10 @@ block content
                 .col-sm-5
                   textarea.form-control(placeholder='请输入专业介绍' rows=5 v-model='forum.description')
               .form-group
+                label.col-sm-2.control-label 发表说明
+                .col-sm-5
+                  textarea.form-control(placeholder='请输入发表说明' rows=5 v-model='forum.noteOfPost')
+              .form-group
                 label.col-sm-2.control-label 专业说明
                 .col-sm-5
                   button.btn.btn-default(@click=`toEditor`) 去编辑器

@@ -22,7 +22,7 @@ include ../../../MathJax.pug
           .row
             .form-group
               label 公式预览
-                #mathOutput.pre-view-formula $\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$
+                #mathOutput.pre-view-formula(v-pre) $\sum_{i=0}^N\int_{a}^{b}g(t,i)\text{d}t$
           .row
             .col-xs-5
             button.btn.btn-default.col-xs-3(@click="close") 取消

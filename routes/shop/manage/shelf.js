@@ -130,7 +130,7 @@ shelfRouter
       checkNumber(stocksTotal, {
         name: "规格库存",
         min: 0
-      }),
+      });
       p.stocksTotal = stocksTotal;
       checkNumber(originPrice, {
         name: "规格价格",
@@ -275,7 +275,10 @@ shelfRouter
       };
 
       // await db.ThreadModel.ensurePublishPermission(options);
+      // 检查发表权限
       await db.ForumModel.checkWritePermission(options.uid, options.fids);
+      // 检测专业分类互斥
+      await db.ForumModel.checkForumCategoryBeforePost();
       const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
       product = db.ShopGoodsModel({
         productId,

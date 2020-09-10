@@ -385,7 +385,7 @@ table{
   display: inline-block;
   padding-right: 0.5rem;
   margin-bottom: 0.5rem;
-
+  vertical-align: top;
 }
 .paging-button .input{
   height: 2rem;
@@ -432,6 +432,12 @@ table{
 }
 .paging-button a.active{
   background-color: #2b90d9;
+}
+.paging-button a.button-checkbox{
+  background-color: transparent;
+  box-sizing: border-box;
+  border: 1px solid #9baec8;
+  color: #222;
 }
 /* 操作按钮样式 */
 .options-button{
@@ -1498,10 +1504,10 @@ footer.footer ul li{
   color: #000;
 }
 .thread-panel-body.brief .thread-panel-title .title-content:visited{
-  color: #6e6e6e;
+  color: #00827c;
 }
 .thread-panel-body.brief .thread-panel-title .title-content.digest{
-  color: #e85a71;
+  color: #ff0101;
 }
 .thread-panel-body.minimalist .thread-panel-content{
   display: block;
@@ -1558,10 +1564,10 @@ footer.footer ul li{
   margin-right: 0.5rem;
 }
 .thread-panel-minimalist-title .thread-panel-minimalist-title-a:visited{
-  color:#6e6e6e;
+  color:#00827c;
 }
 .thread-panel-minimalist-title .thread-panel-minimalist-title-a.digest{
-  color: #e85a71;
+  color: #ff0101;
 }
 .thread-panel-minimalist-toc{
   vertical-align: top;
@@ -1608,7 +1614,7 @@ footer.footer ul li{
   border-bottom: solid 1px;
 }
 .thread-panel-title a.title-content.digest{
-  color: #e85a71;
+  color: #ff0101;
 }
 .thread-panel-abstract{
   word-break: break-word;

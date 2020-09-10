@@ -451,6 +451,7 @@ resourceRouter
         global.NKC.io.of('/common').to(`user/${user.uid}`).send({rid: r.rid, state: "fileProcessFinish"});
       } catch(err) {
         console.log(err);
+        global.NKC.io.of('/common').to(`user/${user.uid}`).send({err, state: "fileProcessFailed"});
         await r.update({state: 'useless'});
       }
     });

@@ -64,9 +64,6 @@ var app = new Vue({
       paperProto.init(data.form.project || "");
 
     }
-    vueSelectForum.init({
-      func: this.selectForum
-    });
 
     var this_ = this;
     if(this.step === 3) {
@@ -157,9 +154,6 @@ var app = new Vue({
     getUrl: NKC.methods.tools.getUrl,
     strToHTML: NKC.methods.strToHTML,
     visitUrl: NKC.methods.visitUrl,
-    selectForum: function(forum) {
-      this.selectedForum = forum;
-    },
     toUploadPhoto: function() {
       if(!confirm("页面跳转将可能导致当前页面输入的内容丢失，请注意保存！")) return;
       this.visitUrl("/u/"+this.user.uid+"/settings/resume", true);
@@ -169,7 +163,13 @@ var app = new Vue({
       b.count = parseInt(b.count);
     },
     showSelectForum: function() {
-      vueSelectForum.app.show();
+      if(!window.ForumSelector) {
+        window.ForumSelector = new NKC.modules.ForumSelector();
+      }
+      var self = this;
+      window.ForumSelector.open(data => {
+        self.selectedForum = data.forum;
+      });
     },
     searchUser: function() {
       this.searchError = "";

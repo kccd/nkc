@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+const settings = require('../settings');
+const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: String,
@@ -115,6 +116,26 @@ const getDomByType = (t) => {
     return "'/u/' + item.c.restorer.uid"
   } else if (t === "restorerName") {
     return "item.c.restorer.username"
+  }
+
+  // kcb鼓励相关
+  else if(t === "scoreNumber") {
+    return "item.c.number / 100"
+  } else if(t === "username") {
+    return "item.c.user.username"
+  } else if(t === "description") {
+    return "item.c.description"
+  } else if(t === "threadTitle") {
+    return "item.c.post.t"
+  } else if(t === "scoreName") {
+    return "item.c.scoreName"
+  }
+
+  // 新增点赞相关
+  else if(t === "partOfUsernames") {
+    return "item.c.partOfUsernames";
+  } else if(t === "total") {
+    return "item.c.total";
   }
 };
 const getAppVueDom = (template) => {

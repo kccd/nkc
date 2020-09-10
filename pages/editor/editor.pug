@@ -61,12 +61,46 @@ block content
           div(id="content")
           #postInfo(v-cloak)
             hr
-            //-.m-b-2(v-if="['newThread'].indexOf(type) !== -1")
-              .editor-header 专业分类
-              button.btn.btn-default.btn-sm 选择主分类
-              button.btn.btn-default.btn-sm(disabled) 选择辅分类
-
             .m-b-2(v-if="['newThread'].indexOf(type) !== -1")
+              .editor-header 专业分类
+              div
+                .editor-main-forums
+                  h5 主分类（必选）
+                  .editor-main-forum(v-if="mainForum")
+                    .editor-main-forum-avatar(:style="'background-color: ' + mainForum.color" v-if="!mainForum.logo" :data-float-fid="mainForum.fid")
+                    img.editor-main-forum-avatar(:src="getUrl('forumLogo', mainForum.logo)" v-else :data-float-fid="mainForum.fid")
+                    .editor-main-forum-name
+                      span(:data-float-fid="mainForum.fid") {{mainForum.fName}}
+                      | :
+                      select(v-model='mainForum.cid')
+                        option(:value='null') 请选择分类
+                        option(v-for='tt in mainForum.forum.threadTypes' :value='tt.cid') {{tt.name}}
+                        option(:value='""') 不分类
+                      //span(v-if="mainForum.cName") ：{{mainForum.cName}}
+                  button.btn.btn-default.btn-sm(@click='selectForumsByType("mainForum")') {{mainForum? '修改': '选择'}}
+              div(v-if='minorForumCount.max > 0')
+                .editor-main-forums
+                  h5 辅分类
+                    |&nbsp;(
+                    span(v-if='minorForumCount.min === 0') 可选
+                    span(v-else) 最少{{minorForumCount.min}}个
+                    |，最多{{minorForumCount.max}}个）
+                  .editor-main-forum(v-for='mf, index in minorForums')
+                    .editor-main-forum-avatar(:style="'background-color: ' + mf.color" v-if="!mf.logo" :data-float-fid="mf.fid")
+                    img.editor-main-forum-avatar(:src="getUrl('forumLogo', mf.logo)" v-else :data-float-fid="mf.fid")
+                    .editor-main-forum-name
+                      span(:data-float-fid="mf.fid") {{mf.forum.displayName}}
+                      | :
+                      select(v-model='mf.cid')
+                        option(:value='null') 请选择分类
+                        option(v-for='tt in mf.forum.threadTypes' :value='tt.cid') {{tt.name}}
+                        option(:value='""') 不分类
+                      //span(v-if="mf.cName") ：{{mf.cName}}
+                    .fa.fa-trash-o(@click="removeSelectedForums(index + 1)" title="移除")
+                  button.btn.btn-default.btn-sm(v-if='!mainForum' disabled title='请先选择主分类') 添加
+                  button.btn.btn-default.btn-sm(v-else-if='minorForums.length >= minorForumCount.max' disabled title='辅分类数量已达上限') 添加
+                  button.btn.btn-default.btn-sm(v-else @click='selectForumsByType("minorForum")') 添加
+            //-.m-b-2(v-if="['newThread'].indexOf(type) !== -1")
               .editor-header 专业分类
                 small （必选，最多可选两个）
               .editor-main-forums
@@ -216,7 +250,7 @@ block content
         div
           h5.text-danger 温馨提示：
           div!=nkcRender.plainEscape(state.editorSettings.notes)
-  .hidden#data=objToStr({originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode})
+  .hidden#data=objToStr({minorForumCount: data.minorForumCount, originalWordLimit: data.originalWordLimit, permissionInfo: data.permissionInfo, allowedAnonymousForumsId: data.allowedAnonymousForumsId, havePermissionToSendAnonymousPost: data.havePermissionToSendAnonymousPost, post: data.post, thread: data.thread, mainForums: data.mainForums, type: data.type, forum: data.forum, draftId: data.draftId, oldDraft: data.oldDraft, websiteCode: data.websiteCode})
 block scripts
   include ../ueditor/ueditorBase
   include ../publicModules/moment
@@ -229,9 +263,10 @@ block scripts
   include ../publicModules/selectResource/selectResource
   include ../publicModules/selectDraft/selectDraft
   include ../publicModules/sticker/selectSticker
-  include ../publicModules/moveThread/moveThread
+  //include ../publicModules/moveThread/moveThread
   include ../publicModules/insertHideContent/insertHideContent
   include ../ueditor/dialogs/mathformulaV2/mathformula
+  include ../publicModules/forumSelector/forumSelector
   +includeJS('/tools.js')
   if state.userColumn && !data.addedToColumn
     +includeJS("/publicModules/toColumn/selectCategories.js")

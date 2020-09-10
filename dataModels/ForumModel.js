@@ -40,6 +40,12 @@ const forumSchema = new Schema({
     default: '',
     maxlength: [300, '描述应少于300字']
   },
+  // 专业选择器中，有关发表文章的说明
+  noteOfPost: {
+	  type: String,
+    default: '',
+    maxlength: [300, '发表说明应少于300字']
+  },
   displayName: {
     type: String,
     required: true,
@@ -1822,7 +1828,7 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
     // 发表文章，只允许发表到最底层专业
     if(type === 'write') {
       const childForumsId = await ForumModel.getAllChildForumsIdByFid(forum.fid);
-      if(childForumsId.length) throwErr(400, `不允许在父专业发表文章`);
+      if(childForumsId.length) throwErr(400, `不允许在父专业发表文章 fid: ${forum.fid}`);
     }
     if(uid && forum.moderators.includes(uid)) continue;
     const {accessible, permission, displayName} = forum;
@@ -1970,13 +1976,14 @@ forumSchema.statics.checkReadPermission = async (uid, fid) => {
   }
   await mongoose.model('forums').checkPermission('read', user, fid);
 };
-
 /*
-* 获取用户能够访问的专业
+* 获取有权执行指定操作的专业ID
 * @param {String} uid 用户ID
-* @return {[String]} 可访问的专业
+* @param {String} type 操作类型
+* @return {[String]} 专业ID
+* @author pengxiguaa 2020/9/8
 * */
-forumSchema.statics.getReadableForumsIdByUid = async (uid) => {
+forumSchema.statics.getForumsIdByUidAndType = async (uid, type) => {
   const ForumModel = mongoose.model('forums');
   const RoleModel = mongoose.model('roles');
   const UserModel = mongoose.model('users');
@@ -1997,14 +2004,46 @@ forumSchema.statics.getReadableForumsIdByUid = async (uid) => {
   const results = [];
   for(const fid of forumsId) {
     try{
-      await ForumModel.checkPermission('read', user, [fid]);
+      await ForumModel.checkPermission(type, user, [fid]);
       results.push(fid);
     } catch(err) {}
   }
   return results;
 };
-
-
+/*
+* 通过fid数组从数据库获取forum对象
+* @param {[String]} forumsId 专业ID组成的数组
+* @return {[Object]} 专业对象组成的数组
+* @author pengxiguaa 2020/9/8
+* */
+forumSchema.statics.getForumsByIdFromRedis = async (forumsId = []) => {
+  const ForumModel = mongoose.model('forums');
+  const results = [];
+  for(const fid of forumsId) {
+    const forum = await ForumModel.getForumByIdFromRedis(fid);
+    if(!forum) continue;
+    results.push(forum);
+  }
+  return results;
+};
+/*
+* 获取用户能够访问的专业
+* @param {String} uid 用户ID
+* @return {[String]} 可访问的专业
+* */
+forumSchema.statics.getReadableForumsIdByUid = async (uid) => {
+  const ForumModel = mongoose.model('forums');
+  return await ForumModel.getForumsIdByUidAndType(uid, 'read');
+};
+/*
+* 获取用户能够发表文章的专业
+* @param {String} uid 用户ID
+* @return {[String]} 可发表文章的专业
+* */
+forumSchema.statics.getWritableForumsIdByUid = async (uid) => {
+  const ForumModel = mongoose.model('forums');
+  return await ForumModel.getForumsIdByUidAndType(uid, 'write');
+};
 /*
 * 获取已开启的专业ID
 * @return {[String]}
@@ -2090,5 +2129,115 @@ forumSchema.methods.getForumNav = async function(cid) {
   }
   return forums;
 };
+/*
+* 获取专业选择器可显示的专业
+* @param {String} uid 用户ID
+* @param {String} from 专业来源 writable: 可发表文章的, readable: 可阅读的
+* */
+forumSchema.statics.getForumSelectorForums = async (uid, from) => {
+  const ForumModel = mongoose.model('forums');
+  const ThreadTypeModel = mongoose.model('threadTypes');
+  const readableForumsId = await ForumModel.getReadableForumsIdByUid(uid);
+  const writableForumsId = await ForumModel.getWritableForumsIdByUid(uid);
+  const forums = await ForumModel.getForumsByIdFromRedis(readableForumsId);
+  const types = await ThreadTypeModel.find().sort({order: 1});
+  const childForums = {};
+  const threadTypes = {};
+  for(let t of types) {
+    t = t.toObject();
+    if(!threadTypes[t.fid]) threadTypes[t.fid] = [];
+    threadTypes[t.fid].push(t);
+  }
+  const mainForums = [];
+  for(const forum of forums) {
+    forum.threadTypes = threadTypes[forum.fid] || [];
+    if(!childForums[forum.fid]) {
+      forum.childForums = [];
+      childForums[forum.fid] = forum.childForums;
+    } else {
+      forum.childForums = childForums[forum.fid];
+    }
+    if(forum.parentsId.length) {
+      for(const pfid of forum.parentsId) {
+        if(!childForums[pfid]) childForums[pfid] = [];
+        childForums[pfid].push(forum);
+      }
+    } else {
+      mainForums.push(forum);
+    }
+  }
+  const getForumChildForums = async (results, arr) => {
+    for(const ff of arr) {
+      const childForumsId = await ForumModel.getAllChildForumsIdByFid(ff.fid);
+      if(childForumsId.length === 0) {
+        if(
+          (from === 'writable' && writableForumsId.includes(ff.fid)) ||
+          from === 'readable'
+        ) {
+          results.push(ff);
+        }
+      } else {
+        await getForumChildForums(results, ff.childForums);
+      }
+    }
+  };
+  const results = [];
+  for(const forum of mainForums) {
+    const cf = [];
+    await getForumChildForums(cf, forum.childForums);
+    forum.childForums = cf;
+    const childForumsId = await ForumModel.getAllChildForumsIdByFid(forum.fid);
+    if(cf.length === 0 && childForumsId.length !== 0) {
+      continue;
+    }
+    results.push(forum);
+  }
+  return results;
+};
 
+/*
+* 发表文章时，判断专业数量、互斥是否符合要求
+* @param {[String]} fids 专业数组
+* @author pengxiguaa 2020/9/8
+* */
+forumSchema.statics.checkForumCategoryBeforePost = async (_fids) => {
+  const fids = [].concat(_fids);
+  if(fids.length === 0) throwErr(400, '专业ID不能为空');
+  const ForumModel = mongoose.model('forums');
+  const ForumCategoryModel = mongoose.model('forumCategories');
+  const categoriesId = [];
+  for(const fid of fids) {
+    const forum = await ForumModel.getForumByIdFromRedis(fid);
+    if(!forum) throwErr(400, `专业ID错误 fid: ${fid}`);
+    categoriesId.push(forum.categoryId);
+  }
+  const SettingModel = mongoose.model('settings');
+  const postSettings = await SettingModel.getSettings('post');
+  const {min, max} = postSettings.postToForum.minorForumCount;
+  const mainForumId = fids.shift();
+  const minorForumId = fids;
+  if(minorForumId.length < min || minorForumId.length > max) throwErr(400, `专业分类辅分类数量不符合要求`);
+  // 以下检测专业分类冲突
+  const categories = await ForumCategoryModel.getAllCategories();
+  const categoriesObj = {};
+  categories.map(c => categoriesObj[c._id] = c);
+  let _categories = [];
+  for(const cid of categoriesId) {
+    const category = categoriesObj[cid];
+    if(!category) continue;
+    _categories.push(category);
+  }
+  for(let i = 0; i < _categories.length; i++) {
+    for(let j = 0; j < _categories.length; j++) {
+      const c = _categories[i];
+      const cc = _categories[j];
+      if(i === j || !c.excludedCategoriesId.includes(cc._id)) continue;
+      if(c._id === cc._id) {
+        throwErr(400, `专业分类「${c.name}」下不允许选择多个专业，请重新选择`);
+      } else {
+        throwErr(400, `不允许同时选择「${c.name}」与「${cc.name}」下的专业，请重新选择`);
+      }
+    }
+  }
+};
 module.exports = mongoose.model('forums', forumSchema);

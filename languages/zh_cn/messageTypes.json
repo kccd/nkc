@@ -62,5 +62,12 @@
   "disabledColumn": "【专栏】专栏被屏蔽",
   "columnContributeChange": "【专栏】投稿状态更新",
   "columnContactAdmin": "【专栏】专栏信息已修改",
-  "activityChangeNotice": "【活动系统】活动变更通知"
+  "activityChangeNotice": "【活动系统】活动变更通知",
+  "scoreTransfer": "转账鼓励",
+  "scoreNumber": "转账数额",
+  "scoreName": "积分名",
+  "description": "转账用户留言",
+  "latestVotes": "新增点赞",
+  "partOfUsernames": "点赞用户概述",
+  "total": "点赞总数"
 }
