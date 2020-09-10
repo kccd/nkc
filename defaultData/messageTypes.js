@@ -341,14 +341,14 @@ module.exports = {
         },
         {
             parameters: [
-                "userName",
+                "username",
                 "postURL",
-                "kcbCount",
+                "scoreNumber",
                 "scoreName",
                 "threadTitle"
             ],
-            content: "[text=userName]在文章[text=threadTitle]向你转账[text=kcbCount][text=scoreName]以资鼓励[url=postURL(立即查看)]。",
-            type: "kcb"
+            content: "[text=username]在文章[text=threadTitle]向你转账[text=scoreNumber][text=scoreName]以资鼓励[url=postURL(立即查看)]。",
+            type: "scoreTransfer"
         },
         {
             parameters: [

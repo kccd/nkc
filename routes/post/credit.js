@@ -172,12 +172,15 @@ router
       port: ctx.port,
       ip: ctx.address,
       c: {
-        type: 'kcb',
+        type: 'scoreTransfer',
         pid: post.pid,
-        userName: user.username,
-        kcb: num,
-        scoreName: creditScore.name,
-        threadTitle: post.t,
+        // userName: user.username,
+        uid: user.uid,
+        // kcb: num,
+        number: num,
+        // scoreName: creditScore.name,
+        scoreType: creditScore.type,
+        // threadTitle: post.t,
         description,
       }
     });
