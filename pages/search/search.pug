@@ -26,8 +26,12 @@ block content
             .form-group(v-if="t !== 'resource'")
               label 专业筛选：
               .search-forum-div
-                .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.color + ';'" @click="removeForum(forum)") {{forum.displayName}}
-                  .fa.fa-remove
+                .search-forum(v-for="forum in selectedForums" :style="'background-color: ' + forum.forum.color + ';'") {{forum.forum.displayName}}
+                  //-|:
+                    select(v-model='forum.cid')
+                      option(v-for='c in forum.forum.threadTypes' :value='c.cid') {{c.name}}
+                      option(:value='""') 不分类
+                  .fa.fa-remove(@click="removeForum(forum)")
                 button.btn.btn-default.btn-sm(@click="selectForum") 添加
           .search-form.form-inline(v-if="['post', 'thread', ''].indexOf(t) !== -1" v-show="complexOptions")
             .form-group

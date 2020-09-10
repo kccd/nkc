@@ -53,6 +53,7 @@ var app = new Vue({
       for(var i = 0 ; i < this.selectedForums.length; i++) {
         arr.push(this.selectedForums[i].forum.fid);
       }
+      console.log(arr);
       return arr;
     }
   },
@@ -76,7 +77,8 @@ var app = new Vue({
         self.selectedForums.push(data)
       }, {
         from: 'readable',
-        selectedForums: self.selectedForumsId
+        selectedForumsId: self.selectedForumsId,
+        needThreadType: false,
       });
     },
     removeForum: function(f) {
@@ -118,10 +120,10 @@ var app = new Vue({
           month: new Date().getMonth() + 1,
           day: new Date().getDate()
         };
-        this.sortType = "",
-        this.sort = "",
-        this.relation = "",
-        this.t = ""
+        this.sortType = "";
+        this.sort = "";
+        this.relation = "";
+        this.t = "";
         localStorage.removeItem("search_complexOptions");
       } else {
         this.complexOptions = true;
@@ -169,62 +171,3 @@ $(function() {
 function showResource(lid) {
   ResourceInfo.open({lid: lid})
 }
-/*
-
-function selectAll() {
-  var dom = $(".search-checkbox input");
-  var count = dom.length;
-  var selected = getSelectedThreadsId();
-  if(selected.length === count) {
-    dom.prop("checked", false);
-  } else {
-    dom.prop("checked", true);
-  }
-}
-
-function getSelectedThreadsId() {
-  var threadsId = [];
-  var dom = $(".search-checkbox input");
-  for(var i = 0; i < dom.length; i++) {
-    var d = dom.eq(i);
-    if(!d.prop("checked")) continue;
-    var tid = d.attr("data-thread-id");
-    if(threadsId.indexOf(tid) === -1) threadsId.push(tid);
-  }
-  return threadsId;
-}
-
-function showManageButtons() {
-  var label = $(".search-checkbox label");
-  var buttons = $(".search-buttons");
-  if(label.css("display") === "none") {
-    label.css("display", "inline-block");
-    buttons.css("display", "inline-block");
-  } else {
-    label.css("display", "none");
-    buttons.css("display", "none");
-  }
-  $(".search-checkbox input").prop("checked", false);
-}
-
-function selectedThreads(type) {
-  var threadsId = getSelectedThreadsId();
-  promise.resolve()
-    .then(function() {
-      if(!threadsId.length) throw "请至少勾选一篇文章";
-
-    })
-    .then(function() {
-
-    })
-    .catch(function(err) {
-      sweetError(err);
-    });
-
-  console.log(threadsId);
-  if(type === "move") {
-
-  } else {
-
-  }
-}*/

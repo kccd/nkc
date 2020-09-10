@@ -70,7 +70,10 @@ include ../draggablePanel/draggablePanel
 
 
           .forum-selector-button
-            span(v-if='!showThreadTypes')
+            span(v-if='!needThreadType')
+              button.btn.btn-primary.btn-sm(v-if='selectedForum' @click='fastSubmit') 确定
+              button.btn.btn-primary.btn-sm(v-else disabled title='请选择专业') 确定
+            span(v-else-if='!showThreadTypes')
               button.btn.btn-default.btn-sm(v-if='!selectedForum' disabled) 下一步
               button.btn.btn-primary.btn-sm(v-else @click='next') 下一步
             span(v-else)
