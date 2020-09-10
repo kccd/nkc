@@ -331,7 +331,14 @@ NKC.modules.SelectResource = function() {
         }
         // return console.log(self.files);
         function uploadFileSeries() {
-          var file = self.files[0];
+          var file;
+          for(var i = 0; i < self.files.length; i++) {
+            var f = self.files[i];
+            if(f.status !== 'unUpload' || f.error) continue;
+            file = f;
+            break;
+          }
+          // var file = self.files[0];
           if(!file) return Promise.resolve();
           return self.startUpload(file)
             .then(new Promise(function(resolve, _) {
@@ -477,7 +484,7 @@ NKC.modules.SelectResource = function() {
   socket.on("message", function(data) {
     if(data.state === "fileProcessFinish") {
       // console.log("文件处理完成");
-      self.app.category = "all";
+      // self.app.category = "all";
       self.app.getResources(0);
     }
   })
@@ -486,7 +493,7 @@ NKC.modules.SelectResource = function() {
   socket.on("message", function(data) {
     if(data.state === "fileProcessFailed") {
       sweetError("文件处理失败\n" + data.err);
-      self.app.category = "all";
+      // self.app.category = "all";
       self.app.getResources(0);
     }
   })

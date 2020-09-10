@@ -61,6 +61,9 @@
                 .remove-file
                   .fa.fa-remove(@click="removeFile(index)")
                 span.pointer(@click="startUpload(f)") 上传失败，点击重试
+              .resource-picture.upload(v-else)
+                span 等待中...
+                .fa.fa-spinner.fa-spin.fa-fw
             .resource-name
               span {{f.name}}
         .resources-body(v-else)
