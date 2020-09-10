@@ -2,9 +2,9 @@ extends ../../shop
 block shopTitle
   if data.product
     title 编辑商品
-  else 
-    title 上架商品  
-  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')  
+  else
+    title 上架商品
+  link(href='/bootstrap/css/bootstrap-datetimepicker.min.css' media="screen" rel='stylesheet')
 block shopContent
   #app(v-cloak).shop-shelf
     div(v-if="type === 'create'")
@@ -19,9 +19,10 @@ block shopContent
                 span {{f.displayName}}
         .form-group
           label.col-sm-2.control-label 辅助分类
-          .col-sm-10        
+          .col-sm-10
             .forum(v-for="f in mainForums" :style="'background-color: ' + f.color") {{f.displayName}}
-            button.btn.btn-default.btn-sm(@click="selectForum") 选择
+            button.btn.btn-default.btn-sm(disabled v-if='!selectedShopForumId' title='请先选择商品分类') 选择
+            button.btn.btn-default.btn-sm(@click="selectForum" v-else) 选择
         .form-group
           label.col-sm-2.control-label 商品标题
           .col-sm-10
@@ -35,15 +36,15 @@ block shopContent
         .form-group
           label.col-sm-2.control-label 商品关键词
           .col-sm-10
-            .shelf-keywords    
+            .shelf-keywords
               .shelf-keyword(v-for="k, index in keywords") {{k}}
                 .fa.fa-remove(@click="removeKeyword(index)")
-              button.btn.btn-default.btn-sm(@click="addKeywords") 添加  
+              button.btn.btn-default.btn-sm(@click="addKeywords") 添加
         .form-group
           label.col-sm-2.control-label 图文描述
-          .col-sm-10      
-            script#container(name='content', type='text/plain')      
-     
+          .col-sm-10
+            script#container(name='content', type='text/plain')
+
     .shop-header 其他信息
     .form.form-horizontal.m-t-1
       .form-group
@@ -54,19 +55,19 @@ block shopContent
               img(:src="'/r/' + rid" v-if="rid")
               .fa.fa-plus.add(v-else)
               .buttons(v-if="rid")
-                .fa.fa-angle-left(@click.stop="changeArrIndex(imgIntroductions, index, 'left')" title="左移")      
-                .fa.fa-angle-right(@click.stop="changeArrIndex(imgIntroductions, index, 'right')" title="右移")      
-                .fa.fa-trash(@click.stop="removePicture(index)" title="删除")      
+                .fa.fa-angle-left(@click.stop="changeArrIndex(imgIntroductions, index, 'left')" title="左移")
+                .fa.fa-angle-right(@click.stop="changeArrIndex(imgIntroductions, index, 'right')" title="右移")
+                .fa.fa-trash(@click.stop="removePicture(index)" title="删除")
       .form-group
         label.col-sm-2.control-label 商品规格
         .col-sm-10
           .m-b-1
-            button.btn.btn-default.btn-sm(@click="addParam") 添加规格          
+            button.btn.btn-default.btn-sm(@click="addParam") 添加规格
             button.btn.btn-default.btn-sm(@click="addParams" :disabled="paramForum") 添加组合规格
           .m-b-1.add-param-forum(v-if="paramForum")
             div
               h5 例：若属性1为“红色，蓝色”，属性2为“大，中”，则生成的组合规格为“红色 大”，“红色 中”，“蓝色 大”，“蓝色 中”。
-              button.btn.btn-default.btn-sm(@click="addParamAttribute") 新建属性 
+              button.btn.btn-default.btn-sm(@click="addParamAttribute") 新建属性
             div(v-for="p, index in params")
               h5 属性{{index+1}}
                 .pull-right(v-if="index > 1")
@@ -74,13 +75,13 @@ block shopContent
               textarea.form-control(v-model="p.value" placeholder="属性值间用逗号分隔")
             .m-t-05(v-if="paramAttributes.length")
               h5 属性总览
-              div 
-                .param-name(v-for="p in paramAttributes") {{p}}  
+              div
+                .param-name(v-for="p in paramAttributes") {{p}}
             .m-t-05
               button.btn.btn-danger.btn-sm(@click="paramForum = false") 取消
               button.btn.btn-success.btn-sm(@click="saveParamAttribute" :disabled="!paramAttributes.length") 保存
           .table-responsive.params(v-if="selectedParams.length")
-            table.table.table-bordered 
+            table.table.table-bordered
               thead
                 tr
                   th 排序
@@ -91,23 +92,23 @@ block shopContent
                   th 优惠价（元）
                   th 其他
               tbody
-                tr(v-for="p, index in selectedParams" :style="p._id && !p.isEnable?'background-color: #ccc':''")    
+                tr(v-for="p, index in selectedParams" :style="p._id && !p.isEnable?'background-color: #ccc':''")
                   th
                     button.btn.btn-default.btn-xs(@click="changeArrIndex(selectedParams, index, 'left')") 上移
                     button.btn.btn-default.btn-xs(@click="changeArrIndex(selectedParams, index, 'right')") 下移
-                  th 
+                  th
                     input.form-control(type="text" v-model="p.name" placeholder="请输入规格名称")
                   th.count
-                    input.form-control(type="text" v-model.number="p.stocksTotal" placeholder="请输入库存")  
-                  th.count 
+                    input.form-control(type="text" v-model.number="p.stocksTotal" placeholder="请输入库存")
+                  th.count
                     input.form-control(type="text" v-model.number="p.originPrice" placeholder="请输入价格")
                   th.text-center
                     .checkbox
                       label
                         input(type="checkbox" :value="true" v-model="p.useDiscount")
-                  th.count 
+                  th.count
                     input.form-control(type="text" v-model.number="p.price" :disabled="!p.useDiscount" placeholder="请输入优惠价")
-                  th 
+                  th
                     button.btn.btn-danger.btn-xs(@click="disabledSelectParam(p)" v-if="p._id && p.isEnable") 屏蔽
                     button.btn.btn-success.btn-xs(@click="disabledSelectParam(p)" v-if="p._id && !p.isEnable") 解除屏蔽
                     button.btn.btn-danger.btn-xs(@click="removeSelectParam(index)" v-if="!p._id") 删除
@@ -122,10 +123,10 @@ block shopContent
             label
               input(type="radio" :value="false" v-model="vipDiscount")
               span 关闭
-          .row    
-            .col-xs-12.col-md-6    
+          .row
+            .col-xs-12.col-md-6
               .table-responsive.discount(v-if="vipDiscount").m-t-1
-                table.table.table-bordered 
+                table.table.table-bordered
                   thead
                     tr
                       th 用户等级
@@ -138,7 +139,7 @@ block shopContent
 
       .form-group
         label.col-sm-2.control-label 运费物流
-        .col-sm-10            
+        .col-sm-10
           .radio
             label.m-r-1
               input(type="radio" :value="true" v-model="isFreePost")
@@ -147,50 +148,50 @@ block shopContent
               input(type="radio" :value="false" v-model="isFreePost")
               span 买家承担运费
           .row
-            .col-xs-12.col-md-8    
+            .col-xs-12.col-md-8
               .table-responsive(v-if="!isFreePost").m-t-1.default-templates.table-condensed
                 h4 运费参考
                   button.m-r-05.btn.btn-success.btn-xs(@click="reloadTemplate") 刷新
                   a.btn.btn-success.btn-xs(href=`/shop/manage/settings` target="_blank") 去管理
-                table.table.table-bordered 
+                table.table.table-bordered
                   thead
                     tr
                       th 物流名称
                       th 首件价格（元）
                       th 每增加一件的价格（元）
-                      th 
-                  tbody    
+                      th
+                  tbody
                     tr(v-for="t in defaultTemplates")
-                      th {{t.name}}      
+                      th {{t.name}}
                       th {{t.firstPrice}}
                       th {{t.addPrice}}
                       th
-                        button.btn.btn-default.btn-xs(@click="selectTemplate(t)") 选择  
-          .table-responsive(v-if="!isFreePost").m-t-1          
+                        button.btn.btn-default.btn-xs(@click="selectTemplate(t)") 选择
+          .table-responsive(v-if="!isFreePost").m-t-1
             h5 设置运费
-            table.table.table-bordered 
+            table.table.table-bordered
               thead
                 tr
                   th 物流名称
                   th 首件价格（元）
                   th 每增加一件的价格（元）
                   th
-              tbody    
+              tbody
                 tr(v-for="t, index in freightTemplates")
                   th
                     input.form-control(type="text" v-model.number="t.name" placeholder="请输入物流名称")
-                  th 
+                  th
                     input.form-control(type="text" v-model.number="t.firstPrice" placeholder="请输入首件价格")
-                  th 
-                    input.form-control(type="text" v-model.number="t.addPrice" placeholder="请输入每增加一件的价格")  
-                  th 
-                    button.btn.btn-default.btn-sm(@click="removeFromArr(freightTemplates, index)") 删除  
+                  th
+                    input.form-control(type="text" v-model.number="t.addPrice" placeholder="请输入每增加一件的价格")
+                  th
+                    button.btn.btn-default.btn-sm(@click="removeFromArr(freightTemplates, index)") 删除
                   tr
-                    th(colspan=4 @click="addTemplate").add-template 
-                      .fa.fa-plus &nbsp;自定义        
+                    th(colspan=4 @click="addTemplate").add-template
+                      .fa.fa-plus &nbsp;自定义
       .form-group
         label.col-sm-2.control-label 价格显示
-        .col-sm-10         
+        .col-sm-10
           .checkbox
             label
               input(type="checkbox" :value="true" v-model="productSettings.priceShowToVisit")
@@ -201,7 +202,7 @@ block shopContent
               span 停售后显示价格
       .form-group
         label.col-sm-2.control-label 库存计数
-        .col-sm-10  
+        .col-sm-10
           .radio
             label
               input(type="radio" value="orderReduceStock" v-model="stockCostMethod")
@@ -213,38 +214,38 @@ block shopContent
               input(type="radio" value="payReduceStock" v-model="stockCostMethod")
               span 买家付款减库存（
                 span.text-danger 存在超卖风险
-                | ）  
+                | ）
       .form-group
         label.col-sm-2.control-label 购买限制
         .col-sm-10
           .radio
             label.m-r-1
-              input(type="radio" :value="true" v-model="purchaseLimit.status") 
+              input(type="radio" :value="true" v-model="purchaseLimit.status")
               span 启用
             label
-              input(type="radio" :value="false" v-model="purchaseLimit.status") 
+              input(type="radio" :value="false" v-model="purchaseLimit.status")
               span 关闭
-          div.form-inline(v-if="purchaseLimit.status")    
-            h5 每人限购数量（件）    
-            input.form-control(type="text" v-model.number="purchaseLimit.count" :disabled="!purchaseLimit.status")    
+          div.form-inline(v-if="purchaseLimit.status")
+            h5 每人限购数量（件）
+            input.form-control(type="text" v-model.number="purchaseLimit.count" :disabled="!purchaseLimit.status")
       .form-group
         label.col-sm-2.control-label 购买凭证
-        .col-sm-10      
+        .col-sm-10
           .radio
             label.m-r-1
-              input(type="radio" :value="true" v-model="uploadCert") 
+              input(type="radio" :value="true" v-model="uploadCert")
               span 启用
             label
-              input(type="radio" :value="false" v-model="uploadCert") 
+              input(type="radio" :value="false" v-model="uploadCert")
               span 关闭
-          div(v-if="uploadCert")    
-            h5 凭证说明，提醒买家应该上传什么类型的凭证。    
-            textarea.form-control(rows=3 v-model="uploadCertDescription")             
+          div(v-if="uploadCert")
+            h5 凭证说明，提醒买家应该上传什么类型的凭证。
+            textarea.form-control(rows=3 v-model="uploadCertDescription")
             small.text-info 不超过1000字节
 
       .form-group(v-if="type === 'create'")
         label.col-sm-2.control-label 上架时间
-        .col-sm-10      
+        .col-sm-10
           .radio
             label.m-r-1
               input(type="radio" value="immediately" v-model="shelfType")
@@ -260,13 +261,14 @@ block shopContent
             input.form-control.time#shelfTime(readonly="readonly" type="text")
     .m-t-2.text-center
       hr
-      button.shop-btn.primary(v-if="!submitting" @click="save") 提交        
+      button.shop-btn.primary(v-if="!submitting" @click="save") 提交
       button.shop-btn.disabled(v-else) 提交中..
         .fa.fa-spinner.fa-spin.fa-fw
-  #data.hidden=objToStr({order: data.order, shopForumTypes: data.shopForumTypes, grades: data.grades, dealInfo: data.dealInfo, product: data.product})  
-block shopScripts  
+  #data.hidden=objToStr({order: data.order, shopForumTypes: data.shopForumTypes, grades: data.grades, dealInfo: data.dealInfo, product: data.product})
+block shopScripts
   include ../../../publicModules/commonModal/commonModal
-  include ../../../publicModules/moveThread/moveThread
+  include ../../../publicModules/forumSelector/forumSelector
+  //include ../../../publicModules/moveThread/moveThread
   include ../../../publicModules/selectResource/selectResource
   include ../../../ueditor/ueditor
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")

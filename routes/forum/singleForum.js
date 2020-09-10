@@ -35,8 +35,8 @@ router
       minLength: 6,
       maxLength: 100000
     });
-		if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
-		if(fids.length  > 2) ctx.throw(400, "最多只能选择两个专业");
+		/*if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
+		if(fids.length  > 2) ctx.throw(400, "最多只能选择两个专业");*/
     data.forum = await ForumModel.findOnly({fid});
 		let options = post;
 		options.uid = user.uid;

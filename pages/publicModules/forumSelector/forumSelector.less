@@ -1,14 +1,127 @@
 @import '../base';
+.forum-selector{
+  position: relative;
+}
+@categoryHeight: 3.6rem;
+@forumsHeight: 33rem;
+@buttonHeight: 3.4rem;
 .forum-selector-categories{
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: @categoryHeight;
   .forum-selector-category{
     display: inline-block;
-    height: 2rem;
-    line-height: 2rem;
+    height: @categoryHeight / 2;
+    line-height: @categoryHeight / 2;
     padding: 0 0.5rem;
     cursor: pointer;
     user-select: none;
     &.active, &:hover{
       color: @primary;
+    }
+  }
+}
+.forum-selector-forums{
+  width: 100%;
+  height: @forumsHeight  + @categoryHeight;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-top: 1px solid #f4f4f4;
+  border-bottom: 1px solid #f4f4f4;
+  .forum-selector-forum-item{
+    height: 100%;
+    overflow-y: auto;
+    float: left;
+    width: 33.3%;
+    border-right: 1px solid #f4f4f4;
+    .forum-selector-forum{
+      cursor: pointer;
+      height: 2rem;
+      line-height: 2rem;
+      overflow: hidden;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      user-select: none;
+      padding: 0 0.5rem;
+      &:hover, &.active{
+        background-color: @primary;
+        color: #fff;
+      }
+      &.disabled, &.disabled:hover{
+        background-color: #eaeaea;
+        color: #b5b5b5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+.forum-selector-button{
+  height: @buttonHeight;
+  line-height: @buttonHeight;
+  width: 100%;
+  top: @categoryHeight + @forumsHeight;
+  left: 0;
+  position: absolute;
+  padding: 0 0.5rem;
+  text-align: right;
+}
+
+.forum-selector-forum-info{
+  padding: 0.5rem;
+  .forum-selector-forum-avatar{
+    display: table-cell;
+    .forum-selector-forum-avatar-img{
+      width: 4rem;
+      height: 4rem;
+      border-radius: 3px;
+      margin-right: 1rem;
+    }
+  }
+  .forum-selector-forum-name-container{
+    display: table-cell;
+    vertical-align: top;
+    .forum-selector-forum-name{
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+  }
+  .forum-selector-forum-post-description{
+    margin-top: 1rem;
+  }
+  .forum-selector-forum-post-description span{
+    font-size: 1.35rem;
+  }
+  .forum-selector-forum-description{
+    margin-top: 0.5rem;
+    height: 1.8rem;
+    overflow: hidden;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  .forum-selector-forum-thread-types{
+    //background-color: #f4f4f4;
+    //padding: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .forum-selector-forum-type{
+    user-select: none;
+    height: 2rem;
+    line-height: 2rem;
+    padding: 0 0.5rem;
+    display: inline-block;
+    background-color: #f4f4f4;
+    margin: 0 0.5rem 0.5rem 0;
+    border-radius: 2px;
+    cursor: pointer;
+    &:hover, &.active{
+      background-color: @primary;
+      color: #fff;
     }
   }
 }
