@@ -1,4 +1,5 @@
 var SubscribeTypes;
+var initComplexOptions = !!localStorage.getItem("search_complexOptions");
 
 var app = new Vue({
   el: "#app",
@@ -21,7 +22,7 @@ var app = new Vue({
     relation: "", // and, 默认or
     t: "",
     c: "",
-    complexOptions: false
+    complexOptions: initComplexOptions
   },
   computed: {
     timeStartDay: function() {
@@ -121,8 +122,10 @@ var app = new Vue({
         this.sort = "",
         this.relation = "",
         this.t = ""
+        localStorage.removeItem("search_complexOptions");
       } else {
         this.complexOptions = true;
+        localStorage.setItem("search_complexOptions", "1");
       }
     }
   },

@@ -119,14 +119,14 @@ const getDomByType = (t) => {
   }
 
   // kcb鼓励相关
-  else if(t === "kcbCount") {
-    return "item.c.kcb / 100"
-  } else if(t === "userName") {
-    return "item.c.userName"
+  else if(t === "scoreNumber") {
+    return "item.c.number / 100"
+  } else if(t === "username") {
+    return "item.c.user.username"
   } else if(t === "description") {
     return "item.c.description"
   } else if(t === "threadTitle") {
-    return "item.c.threadTitle"
+    return "item.c.post.t"
   } else if(t === "scoreName") {
     return "item.c.scoreName"
   }

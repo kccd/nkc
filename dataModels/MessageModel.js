@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const SettingModel = require('./SettingModel');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const messageSchema = new Schema({
@@ -294,11 +295,14 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
       r.c.post = post;
-    } else if(type === "kcb") {
+    } else if(type === "scoreTransfer") {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
       r.c.post = post;
       r.c.thread = await ThreadModel.findOne({tid: post.tid});
+      r.c.user = await UserModel.find({uid: r.c.uid});
+      let scoreConfig = await SettingModel.getScoreByScoreType(r.c.scoreType);
+      r.c.scoreName = scoreConfig.name;
     } else if(type === "digestPost") {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
