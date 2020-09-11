@@ -39,12 +39,13 @@ router
       option.name = grade.displayName;
       data.gradeOptions.push(option);
     });
+    data.downloadSettings = downloadSettings;
 		ctx.template = 'experimental/settings/download.pug';
 		await next();
 	})
 	.put('/', async (ctx, next) => {
     const {db, body, nkcModules} = ctx;
-    const {options} = body;
+    const {options, allSpeed} = body;
     const options_ = [];
     const {checkNumber} = nkcModules.checkData;
     for(const option of options) {
@@ -66,14 +67,19 @@ router
       }
       options_.push({
         type,
-        id, 
+        id,
         fileCountOneDay,
         speed
       });
     }
+    checkNumber(allSpeed, {
+      name: '总下载速度',
+      min: 0,
+    });
     await db.SettingModel.updateOne({_id: "download"}, {
       $set: {
-        "c.options": options_
+        "c.options": options_,
+        'c.allSpeed': allSpeed
       }
     });
     await db.SettingModel.saveSettingsToRedis("download");

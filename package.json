@@ -95,6 +95,7 @@
     "urllib": "^0.5.2",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
+    "hex-to-rgba": "^2.0.1",
     "xss": "^1.0.3"
   },
   "devDependencies": {
