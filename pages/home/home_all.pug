@@ -142,23 +142,6 @@ block content
               for thread in data.toppedThreads
                 include ../publicModules/thread_panel/thread_panel
 
-        if data.columns.length
-          .home-forums-list.m-b-1
-            .panel-header 热门专栏
-            //-.home-header
-              //- fa.fa-flask
-              .header-name 热门专栏
-              //.header-description 关注最新学科，足不出户便能游遍世界~
-            .home-columns
-              for column in data.columns
-                a(href=`/m/${column._id}` target="_blank").home-column
-                  .home-column-avatar
-                    img(src=tools.getUrl("columnAvatar", column.avatar))
-                  .home-column-name=column.name
-            if !state.userColumn && data.user && state.columnPermission
-              .home-columns-link
-                a(href=`/column/apply` target="_blank") 开设专栏
-                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
 
         for cf in data.categoryForums
           .home-forums-list.m-b-1.category-forums
@@ -212,15 +195,6 @@ block content
                   else
                     .home-goods-forum-icon(style=`background-color: ${f.color}`)
                   span=f.displayName
-        .home-forums-other.m-b-1
-          .panel-header 活跃用户
-            //.header-description 关注最新学科，足不出户便能游遍世界~
-          .home-users
-            for u in data.activeUsers
-              a(href=`/u/${u.uid}` data-float-uid=u.uid target="_blank").home-user
-                .home-user-avatar
-                  img(src=tools.getUrl("userAvatar", u.avatar))
-                .home-user-name=u.username
       .col-xs-12.col-md-4.box-shadow-panel.p-l-0
         .m-b-1
           include ../publicModules/canvas_logo
@@ -235,6 +209,26 @@ block content
         //- 完善资料
         include ../publicModules/improveUserInfo
 
+        if data.columns.length
+          .home-forums-list.m-b-1
+            .panel-header 热门专栏
+            //-.home-header
+              //- fa.fa-flask
+              .header-name 热门专栏
+              //.header-description 关注最新学科，足不出户便能游遍世界~
+            .home-columns
+              for column in data.columns
+                a(href=`/m/${column._id}` target="_blank").home-column
+                  .home-column-avatar
+                    img(src=tools.getUrl("columnAvatar", column.avatar))
+                  .home-column-info
+                    .home-column-title= column.name
+                    .home-column-description= column.abbr || "无简介"
+                    .home-column-statics= tools.briefTime(column.latestThreadToc) + "更新 共"+ column.threadsCount +"篇文章"
+            if !state.userColumn && data.user && state.columnPermission
+              .home-columns-link
+                a(href=`/column/apply` target="_blank") 开设专栏
+                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
 
         if data.user && data.subForums.length
           .m-b-1
@@ -393,6 +387,17 @@ block content
                         img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) data-float-uid=thread.firstPost.uid)
                         span=thread.firstPost.user.username
                     a(href=`/f/${thread.forums[0].fid}` target="_blank" data-float-fid=thread.forums[0].fid).home-thread-forum=thread.forums[0].displayName
+        
+        //- 活跃用户
+        .home-forums-other.m-b-1
+          .panel-header 活跃用户
+            //.header-description 关注最新学科，足不出户便能游遍世界~
+          .home-users
+            for u in data.activeUsers
+              a(href=`/u/${u.uid}` data-float-uid=u.uid target="_blank").home-user
+                .home-user-avatar
+                  img(src=tools.getUrl("userAvatar", u.avatar))
+                .home-user-name=u.username
 block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatForumPanel/floatForumPanel

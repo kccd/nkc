@@ -17,6 +17,7 @@ module.exports = async (options) => {
   const fileFolder = await FILE.getPath('mediaPicture', toc);
   const normalPath = PATH.resolve(fileFolder, `./${rid}.${ext}`);
   let originId;
+  let outputPath = path;
   if(pictureType === 'sticker') {
     // 表情上传
     await imageMagick.stickerify(path);
@@ -156,10 +157,12 @@ module.exports = async (options) => {
               y: "(H-h)/2"
             }
           }
+
+          outputPath = `${path}.ffmpeg.${ext}`;
           let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
           await addImageTextWaterMaskForImage({
             input: path, 
-            output: path, 
+            output: outputPath,
             image: waterSmallPath, 
             text: username,
             transparency: ffmpegTransparency,
@@ -170,7 +173,7 @@ module.exports = async (options) => {
     }
   }
   // 移动文件
-  await fsPromise.copyFile(path, normalPath);
+  await fsPromise.copyFile(outputPath, normalPath);
 
   // 获取裁剪后图片的宽高
   const pictureInfo = await imageMagick.info(normalPath);

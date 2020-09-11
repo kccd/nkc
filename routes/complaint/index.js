@@ -61,7 +61,7 @@ router
     await next();
   })
   .post("/resolve", async (ctx, next) =>{
-    const {tools, data, db, body} = ctx;
+    const {tools, data, db, body, redis} = ctx;
     const {result, _id, complaints} = body;
     const time = Date.now();
     const {user} = data;
@@ -78,6 +78,26 @@ router
       });
       data.complaint = (await db.ComplaintModel.findById(_id)).toObject();
       data.complaint.handler = await db.UserModel.findOne({uid: data.complaint.handlerId}, {uid: 1, username: 1});
+      const post = await db.PostModel.findOne({pid: complaint.contentId});
+      // 处理完发消息通知用户
+      const message = db.MessageModel({
+        _id: await db.SettingModel.operateSystemID('messages', 1),
+        r: complaint.uid,
+        ty: 'STU',
+        port: ctx.port,
+        ip: ctx.address,
+        c: {
+          type: 'complaintsResolve',
+          uid: post.uid,
+          pid: complaint.contentId,
+          // 投诉理由
+          reasonDescription: complaint.reasonDescription,
+          // 处理说明
+          result
+        }
+      });
+      await message.save();
+      await redis.pubMessage(message);
     } else {
       data.complaints = [];
       for(const c of complaints) {

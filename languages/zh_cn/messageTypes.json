@@ -69,5 +69,13 @@
   "description": "转账用户留言",
   "latestVotes": "新增点赞",
   "partOfUsernames": "点赞用户概述",
-  "total": "点赞总数"
+  "total": "点赞总数",
+
+  "complaintsResolve": "投诉已被处理",
+  "CRUsername": "被投诉用户",
+  "CRUserURL": "被投诉用户主页",
+  "CRContent": "被投诉用户发表的内容类型",
+  "CRContentURL": "被偷投诉用户发表的内容地址",
+  "CRReason": "投诉原因",
+  "CRResult": "投诉处理结果"
 }

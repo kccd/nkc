@@ -9,6 +9,7 @@ const {stat, unlink} = fs;
 const path = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const {upload} = require('../settings');
+const moment = require("moment");
 
 const fontFilePath = settings.statics.fontNotoSansHansMedium;
 const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");

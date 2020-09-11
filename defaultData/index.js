@@ -110,6 +110,33 @@ defaultData.init = async () => {
     await f.save();
     console.log(`inserting messageTypes '${messageTypes._id}' into database`);
   }
+
+  // STU类消息模板新增检测
+  const STU = await db.MessageTypeModel.findOne({_id: "STU"});
+  // 现有的模板
+  let messageTypesMap = {};
+  STU.templates.forEach(template => {
+    messageTypesMap[template.type] = template;
+  })
+  // 新增的模板放在这
+  let waitInsert = [];
+  // 配置文件中的模板
+  messageTypes.templates.forEach(template => {
+    let type = template.type;
+    // 对比差异
+    if(!messageTypesMap[type]) {
+      waitInsert.push(template);
+    }
+  });
+  // 把新增的模板插入数据库
+  for(let newTemplate of waitInsert) {
+    await STU.update({
+      $push: {
+        templates: newTemplate
+      }
+    })
+    console.log("Insert new STU tamplate \""+ newTemplate.type +"\"");
+  }
 };
 
 module.exports = defaultData;
