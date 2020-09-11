@@ -14,6 +14,7 @@ module.exports = {
         fileCountOneDay: 3,
         speed: 1024, // KB
       }
-    ]
+    ],
+    allSpeed: 100 * 1024, //总下载速度 KB
   }
 };

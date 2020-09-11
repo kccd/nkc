@@ -8,6 +8,7 @@ moment.locale('zh-cn');
 const languages = require('../languages');
 const tools = require("./tools");
 const htmlFilter = require('./nkcRender/htmlFilter');
+const hexToRgba = require('hex-to-rgba');
 
 let filters = {
   markdown:render.commonmark_render,
@@ -379,6 +380,7 @@ let pugRender = (template, data, state) => {
 		getOriginLevel: getOriginLevel,
     server: settings.server,
     plain:render.plain_render,
+		hexToRgba,
     experimental_render:render.experimental_render,
 		nkcRender,
     replaceContent: replaceContent,

@@ -1680,7 +1680,8 @@ forumSchema.statics.saveAllForumsToRedis = async () => {
   for(const _forum of forums) {
     const forum = _forum.toObject();
     const key = getRedisKeys(`forumData`, forum.fid);
-    await client.setAsync(key, JSON.stringify(forum));
+    await client.setAsJsonString(key, forum);
+    // await client.setAsync(key, JSON.stringify(forum));
   }
   // 保存所有专业的id到redis
   await ForumModel.saveAllForumsIdToRedis(forums);
@@ -1743,13 +1744,12 @@ forumSchema.statics.saveAllForumsIdToRedis = async (forums) => {
       }
     }
   }
-  const key = getRedisKeys(`forumsId`);
-  await client.resetSetAsync(key, forumsId);
-  await client.resetSetAsync(getRedisKeys('accessibleForumsId'), accessibleForumsId);
-  await client.resetSetAsync(getRedisKeys('visibilityForumsId'), visibilityForumsId);
-  await client.resetSetAsync(getRedisKeys('isVisibilityNCCForumsId'), isVisibilityNCCForumsId);
-  await client.resetSetAsync(getRedisKeys('displayOnParentForumsId'), displayOnParentForumsId);
-  await client.resetSetAsync(getRedisKeys('displayOnSearchForumsId'), displayOnSearchForumsId);
+  await client.setArray(getRedisKeys(`forumsId`), forumsId);
+  await client.setArray(getRedisKeys('accessibleForumsId'), accessibleForumsId);
+  await client.setArray(getRedisKeys('visibilityForumsId'), visibilityForumsId);
+  await client.setArray(getRedisKeys('isVisibilityNCCForumsId'), isVisibilityNCCForumsId);
+  await client.setArray(getRedisKeys('displayOnParentForumsId'), displayOnParentForumsId);
+  await client.setArray(getRedisKeys('displayOnSearchForumsId'), displayOnSearchForumsId);
 };
 /*
 * 从redis获取所有专业的id
@@ -1757,8 +1757,7 @@ forumSchema.statics.saveAllForumsIdToRedis = async (forums) => {
 * @author pengxiguaa 2020/8/25
 * */
 forumSchema.statics.getAllForumsIdFromRedis = async () => {
-  const key = getRedisKeys('forumsId');
-  return await client.smembersAsync(key);
+  return await client.getArray(getRedisKeys('forumsId'));
 };
 
 /*
@@ -1772,9 +1771,8 @@ forumSchema.statics.getAllForumsFromRedis = async () => {
   const forums = [];
   for(const fid of forumsId) {
     const key = getRedisKeys(`forumData`, fid);
-    let forum = await client.getAsync(key);
+    const forum = await client.getFromJsonString(key);
     if(!forum) continue;
-    forum = JSON.parse(forum);
     forums.push(forum);
   }
   return forums;
@@ -1791,7 +1789,7 @@ forumSchema.statics.saveForumToRedis = async (fid) => {
   if(!forum) throwErr(500, `专业不存在 fid: ${fid}`);
   forum = forum.toObject();
   const key = getRedisKeys('forumData', forum.fid);
-  await client.setAsync(key, JSON.stringify(forum));
+  await client.setAsJsonString(key, forum);
   await ForumModel.saveAllForumsIdToRedis();
 };
 
@@ -1803,8 +1801,7 @@ forumSchema.statics.saveForumToRedis = async (fid) => {
 * */
 forumSchema.statics.getForumByIdFromRedis = async (fid) => {
   const key = getRedisKeys(`forumData`, fid);
-  const forum = await client.getAsync(key);
-  return forum? JSON.parse(forum): null;
+  return await client.getFromJsonString(key);
 };
 
 
@@ -2051,7 +2048,7 @@ forumSchema.statics.getWritableForumsIdByUid = async (uid) => {
 * */
 forumSchema.statics.getAccessibleForumsIdFromRedis = async () => {
   const key = getRedisKeys('accessibleForumsId');
-  return await client.smembersAsync(key);
+  return await client.getArray(key);
 };
 /*
 * 获取导航可见的专业ID
@@ -2060,7 +2057,7 @@ forumSchema.statics.getAccessibleForumsIdFromRedis = async () => {
 * */
 forumSchema.statics.getVisibilityForumsIdFromRedis = async () => {
   const key = getRedisKeys('visibilityForumsId');
-  return await client.smembersAsync(key);
+  return await client.getArray(key);
 };
 /*
 * 获取无权用户导航可见的专业ID
@@ -2069,7 +2066,7 @@ forumSchema.statics.getVisibilityForumsIdFromRedis = async () => {
 * */
 forumSchema.statics.getIsVisibilityNCCForumsIdFromRedis = async () => {
   const key = getRedisKeys('isVisibilityNCCForumsId');
-  return await client.smembersAsync(key);
+  return await client.getArray(key);
 };
 /*
 * 获取可在上层专业显示文章的专业ID
@@ -2078,7 +2075,7 @@ forumSchema.statics.getIsVisibilityNCCForumsIdFromRedis = async () => {
 * */
 forumSchema.statics.getDisplayOnParentForumsIdFromRedis = async () => {
   const key = getRedisKeys('displayOnParentForumsId');
-  return await client.smembersAsync(key);
+  return await client.getArray(key);
 };
 /*
 * 获取可在搜索页显示文章的专业ID
@@ -2087,7 +2084,7 @@ forumSchema.statics.getDisplayOnParentForumsIdFromRedis = async () => {
 * */
 forumSchema.statics.getDisplayOnSearchForumsIdFromRedis = async () => {
   const key = getRedisKeys('displayOnSearchForumsId');
-  return await client.smembersAsync(key);
+  return await client.getArray(key);
 };
 
 

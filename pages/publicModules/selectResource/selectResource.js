@@ -35,12 +35,30 @@ NKC.modules.SelectResource = function() {
       pictureExt: ['swf', 'jpg', 'jpeg', 'gif', 'png', 'svg', 'bmp'],
       files: [],
       croppingPicture: false,
-      isTouchEmit: false
+      isTouchEmit: false,
+      sizeLimit: null,
     },
     mounted: function() {
 
     },
     computed: {
+      fileSizeLimit: function() {
+        var sizeLimit = this.sizeLimit;
+        if(!sizeLimit) return '';
+        var arr = [];
+        arr = arr.concat(sizeLimit.others);
+        arr.push({
+          ext: '其他',
+          size: sizeLimit.default
+        });
+        var str = '文件大小限制\n', sweetStr = '';
+        for(var i = 0; i < arr.length; i++) {
+          var a = arr[i];
+          if(i > 0) str += '\n';
+          str += a.ext.toUpperCase() + '：' + this.getSize(a.size * 1024, 1);
+        }
+        return str;
+      },
       show: function() {
         var obj = {};
         var allowedExt = this.allowedExt;
@@ -87,6 +105,30 @@ NKC.modules.SelectResource = function() {
     },
     methods: {
       getUrl: NKC.methods.tools.getUrl,
+      getSize: NKC.methods.tools.getSize,
+      checkFileSize: function(filename, size) {
+        var sizeLimit = this.sizeLimit;
+        if(!sizeLimit) return;
+        var ext = filename.split('.');
+        ext = ext.pop().toLowerCase();
+        var limit;
+        for(var i = 0; i < sizeLimit.others.length; i++) {
+          var s = sizeLimit.others[i];
+          if(s.ext.toLowerCase() === ext) {
+            limit = s;
+            break;
+          }
+        }
+        if(!limit) limit = {
+          ext: ext,
+          size: sizeLimit.default
+        };
+        var _limitSize = limit.size * 1024;
+        if(size > _limitSize) throw ext.toUpperCase() + '文件大小不能超过' + this.getSize(_limitSize, 1);
+      },
+      showFileSizeLimit: function() {
+        asyncSweetCustom(this.fileSizeLimit.replace(/\n/ig, '<br>'));
+      },
       cancelCropPicture: function() {
         this.resetCropper();
         this.changePageType("list");
@@ -238,6 +280,7 @@ NKC.modules.SelectResource = function() {
         var url = "/me/media?quota="+this.quota+"&skip="+skip+"&type=" + this.resourceType + "&c=" + this.category + "&t=" + Date.now();
         nkcAPI(url, "GET")
           .then(function(data) {
+            self.app.sizeLimit = data.sizeLimit;
             self.app.paging = data.paging;
             self.app.pageNumber = self.app.paging.page + 1;
             self.app.resources = data.resources;
@@ -270,6 +313,7 @@ NKC.modules.SelectResource = function() {
         return Promise.resolve()
           .then(function() {
             // if(f.data.size>200*1024*1024) throw "文件大小不能超过200MB";
+            self.app.checkFileSize(f.data.name, f.data.size);
             if(f.status === "uploading") throw "文件正在上传...";
             if(f.status === "uploaded") throw "文件已上传成功！";
             f.status = "uploading";
@@ -304,6 +348,7 @@ NKC.modules.SelectResource = function() {
             f.status = "unUpload";
             f.progress = 0;
             f.error = data.error || data;
+            console.log(data);
             screenTopWarning(data.error || data);
           })
       },
@@ -311,7 +356,7 @@ NKC.modules.SelectResource = function() {
         return {
           name: file.name,
           ext: file.type.slice(0, 5) === "image"?"picture": "file",
-          size: NKC.methods.getSize(file.size),
+          size: NKC.methods.getSize(file.size, 1),
           data: file,
           error: /*file.size >  200*1024*1024?"文件大小不能超过200MB":*/ "",
           progress: 0,
