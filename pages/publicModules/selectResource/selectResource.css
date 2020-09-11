@@ -345,3 +345,10 @@
   background-position: center center;
   background-repeat: no-repeat;
 }
+#moduleSelectResourceApp .size-limit{
+  margin-left: 0.5rem;
+  font-size: 1rem;
+}
+#moduleSelectResourceApp .size-limit .fa{
+  color: #555;
+}
