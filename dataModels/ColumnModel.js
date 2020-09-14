@@ -1,6 +1,5 @@
 const mongoose = require("../settings/database");
 const moment = require("moment");
-const { mongo } = require("../settings/database");
 const Schema = mongoose.Schema;
 const schema = new Schema({
   _id: Number,
