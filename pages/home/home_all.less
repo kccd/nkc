@@ -64,11 +64,11 @@ body{
       font-size: 1.3rem;
       margin: 0 0.3rem 0.5rem 0;
       .home-forums-parent{
-        color: #333;
+        color: #000;
         font-weight: 700;
       }
       .home-forums-child{
-        color: #333;
+        color: #000;
         margin: 0 0.3rem;
         //background-color: #dbeef3;
       }
@@ -144,7 +144,7 @@ body{
           }
           .detailed-forum-panel-name{
             a{
-              font-size: 1.2rem!important;
+              font-size: 1.3rem!important;
               font-weight: 700!important;
               color: #000;
             }
@@ -158,7 +158,7 @@ body{
               min-height: @panelHeight;
               .detailed-forum-panel-name{
                 a{
-                  font-size: 1.3rem;
+                  font-size: 1.35rem;
                   color: #282c37;
                   font-weight: 700;
                   &:hover{
@@ -167,6 +167,7 @@ body{
                   }
                 }
               }
+
               .detailed-forum-panel-description{
                 font-size: 1rem;
                 color: #777;
@@ -326,7 +327,7 @@ body{
         height: 100%;
         border-radius: 2px;
         box-sizing: border-box;
-        border: 3px solid #eee;
+        //border: 3px solid #eee;
       }
       .swiper-wrapper{
         height: 100%;
@@ -350,12 +351,12 @@ body{
           margin-bottom: 0.6rem;
           position: relative;
           box-sizing: border-box;
-          border: 2px solid #eee;
+          //border: 2px solid #eee;
           border-radius: 5px;
           overflow: hidden;
           .home-covers-sm-img{
             background-size: cover;
-            height: 10rem;
+            height: 10.34rem;
           }
           .home-covers-sm-title{
             background-color: rgba(0,0,0,0.4);
@@ -486,6 +487,9 @@ body{
   max-height: 6rem;
   overflow: hidden;
 }
+.home-subscribe-forum-brief{
+  margin: 0 0.5rem 0.5rem 0;
+}
 .home-subscribe-forum{
   display: inline-block;
   width: 6.7rem;
@@ -589,21 +593,33 @@ body{
   }
 }
 .home-columns{
+  .home-column + .home-column {
+    margin-top: 10px;
+  }
   .home-column{
-    display: inline-block;
-    width: 8.5rem;
-    vertical-align: top;
-    text-align: center;
-    margin: 0 0.5rem 1rem 0;
+    display: block;
     color: #555;
+    height: 6rem;
+    position: relative;
     &:hover, &:focus{
       text-decoration: none;
     }
     &:hover{
       color: @dark;
     }
-    .home-column-avatar{
-      img{
+    &::after {
+      content: "";
+      display: block;
+      clear: both;
+    }
+    .home-column-avatar {
+      display: block;
+      width: 6rem;
+      height: 6rem;
+      position: absolute;
+      left: 0;
+      top: 0;
+      img {
         width: 6rem;
         height: 6rem;
         border-radius: 10px;
@@ -611,11 +627,30 @@ body{
         border: 3px solid #eee;
       }
     }
-    .home-column-name{
-      margin-top: 0.5rem;
+    .home-column-info{
+      height: inherit;
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      left: 6rem;
       font-size: 1.2rem;
-      height: 1.6rem;
-      .hideText(@line: 1);
+      padding-top: 0.4rem;
+      padding-left: 0.6rem;
+      .home-column-title {
+        font-size: 1.4rem;
+        color: rgb(40 44 55);
+        font-weight: 700;
+      }
+      .home-column-description {
+        font-size: 1rem;
+        height: 1.3rem;
+        color: rgb(119 119 119);
+        .hideText(@line: 1);
+      }
+      .home-column-statics {
+        font-style: italic;
+      }
     }
   }
 }
@@ -647,8 +682,7 @@ body{
     width: 6.5rem;
     display: inline-block;
     text-align: center;
-    margin: 0 0.5rem 1rem 0;
-    color: #555;
+    margin: 0 0.7rem;
     &:hover, &:focus{
       text-decoration: none;
     }

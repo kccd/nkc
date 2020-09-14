@@ -15,7 +15,11 @@ body{
   /*border-color: #aaa!important;*/
   /*background-color: #f4f4f4!important;*/
 }
-
+.editor-main-forum-note{
+  background-color: #f4f4f4;
+  padding: 0.5rem;
+  border-radius: 3px;
+}
 .editor .edui-default .edui-editor{
   border: none;
 }

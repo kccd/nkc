@@ -286,11 +286,36 @@ schema.statics.saveAllColumnToElasticSearch = async () => {
 * */
 schema.statics.getToppedColumns = async () => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
-  const columns = await mongoose.model("columns").find({_id: {$in: homeSettings.columnsId}});
+  if(!homeSettings.columnsId.length) return [];
+  let columnsId = [];
+  if(homeSettings.columnsId.length <= 6) {
+    columnsId = homeSettings.columnsId;
+  } else {
+    const {getRandomNumber$2} = require('../nkcModules/apiFunction');
+    const arr = getRandomNumber$2({
+      min: 0,
+      max: homeSettings.columnsId.length - 1,
+      count: 6,
+      repeat: false
+    });
+    for(const index of arr) {
+      columnsId.push(homeSettings.columnsId[index]);
+    }
+  }
+  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}});
   const columnsObj = {};
   columns.map(column => columnsObj[column._id] = column);
+  for(let column of columns) {
+    let {_id} = column;
+    let threads = await mongoose.model("columnPosts")         // 查出此专栏的所有可访问文章
+      .find({columnId: parseInt(_id), hidden: false}, {toc: 1})
+      .sort({toc: -1});                                       // 按从新到旧排序
+    column.threadsCount = threads.length;
+
+    column.latestThreadToc = threads.length? threads[0].toc: null;
+  }
   const results = [];
-  homeSettings.columnsId.map(cid => {
+  columnsId.map(cid => {
     const column = columnsObj[cid];
     if(column) results.push(column);
   });

@@ -263,7 +263,7 @@ router
     );
 
     // 加载优秀的文章
-    data.featuredThreads = await db.ThreadModel.getFeaturedThreads(fidOfCanGetThreads);
+    data.featuredThreads = await db.ThreadModel.getFeaturedThreads([fid]);
 
     // 获取用户关注的专业
     if(data.user) {

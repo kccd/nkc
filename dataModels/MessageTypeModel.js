@@ -37,6 +37,7 @@ const schema = new Schema({
 * */
 
 const getDomByType = (t) => {
+  let prefix = "item.c.";
   if(t === "threadTitle") {
     return "item.c.thread.firstPost.t"
   } else if(t === "threadURL") {
@@ -136,6 +137,19 @@ const getDomByType = (t) => {
     return "item.c.partOfUsernames";
   } else if(t === "total") {
     return "item.c.total";
+  }
+
+  // 投诉处理通知相关
+  else if(t === "CRType") {
+    return prefix + "CRType";
+  } else if(t === "CRTarget") {
+    return prefix + "CRTarget";
+  } else if(t === "CRTargetDesc") {
+    return prefix + "CRTargetDesc";
+  } else if(t === "CRReason") {
+    return prefix + "reasonDescription";
+  } else if(t === "CRResult") {
+    return prefix + "result";
   }
 };
 const getAppVueDom = (template) => {

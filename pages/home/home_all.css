@@ -74,11 +74,11 @@ body {
   margin: 0 0.3rem 0.5rem 0;
 }
 .home-forums .home-forums-list .home-forums-brief .home-forums-parent {
-  color: #333;
+  color: #000;
   font-weight: 700;
 }
 .home-forums .home-forums-list .home-forums-brief .home-forums-child {
-  color: #333;
+  color: #000;
   margin: 0 0.3rem;
 }
 .home-forums .home-forums-list .home-forums-body {
@@ -145,7 +145,7 @@ body {
   left: 0;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forums-padding-left .detailed-forum-panel-name a {
-  font-size: 1.2rem !important;
+  font-size: 1.3rem !important;
   font-weight: 700!important;
   color: #000;
 }
@@ -157,7 +157,7 @@ body {
   min-height: 4rem;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-body .detailed-forum-panel .detailed-forum-panel-info .detailed-forum-panel-name a {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   color: #282c37;
   font-weight: 700;
 }
@@ -338,7 +338,6 @@ body {
   height: 100%;
   border-radius: 2px;
   box-sizing: border-box;
-  border: 3px solid #eee;
 }
 .home-top .home-covers .home-covers-md .swiper-wrapper {
   height: 100%;
@@ -363,13 +362,12 @@ body {
   margin-bottom: 0.6rem;
   position: relative;
   box-sizing: border-box;
-  border: 2px solid #eee;
   border-radius: 5px;
   overflow: hidden;
 }
 .home-top .home-covers .home-covers-sm .home-cover-sm a .home-covers-sm-img {
   background-size: cover;
-  height: 10rem;
+  height: 10.34rem;
 }
 .home-top .home-covers .home-covers-sm .home-cover-sm a .home-covers-sm-title {
   background-color: rgba(0, 0, 0, 0.4);
@@ -468,6 +466,9 @@ body {
 .home-subscribes.recommend {
   max-height: 6rem;
   overflow: hidden;
+}
+.home-subscribe-forum-brief {
+  margin: 0 0.5rem 0.5rem 0;
 }
 .home-subscribe-forum {
   display: inline-block;
@@ -579,13 +580,14 @@ body {
   width: 6.2rem;
   border-radius: 3px;
 }
+.home-columns .home-column + .home-column {
+  margin-top: 10px;
+}
 .home-columns .home-column {
-  display: inline-block;
-  width: 8.5rem;
-  vertical-align: top;
-  text-align: center;
-  margin: 0 0.5rem 1rem 0;
+  display: block;
   color: #555;
+  height: 6rem;
+  position: relative;
 }
 .home-columns .home-column:hover,
 .home-columns .home-column:focus {
@@ -594,6 +596,19 @@ body {
 .home-columns .home-column:hover {
   color: #282c37;
 }
+.home-columns .home-column::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.home-columns .home-column .home-column-avatar {
+  display: block;
+  width: 6rem;
+  height: 6rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
 .home-columns .home-column .home-column-avatar img {
   width: 6rem;
   height: 6rem;
@@ -601,15 +616,34 @@ body {
   box-sizing: border-box;
   border: 3px solid #eee;
 }
-.home-columns .home-column .home-column-name {
-  margin-top: 0.5rem;
+.home-columns .home-column .home-column-info {
+  height: inherit;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  left: 6rem;
   font-size: 1.2rem;
-  height: 1.6rem;
+  padding-top: 0.4rem;
+  padding-left: 0.6rem;
+}
+.home-columns .home-column .home-column-info .home-column-title {
+  font-size: 1.4rem;
+  color: rgb(40 44 55);
+  font-weight: 700;
+}
+.home-columns .home-column .home-column-info .home-column-description {
+  font-size: 1rem;
+  height: 1.3rem;
+  color: rgb(119 119 119);
   word-break: break-word;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+}
+.home-columns .home-column .home-column-info .home-column-statics {
+  font-style: italic;
 }
 .home-columns-link {
   text-align: center;
@@ -639,8 +673,7 @@ body {
   width: 6.5rem;
   display: inline-block;
   text-align: center;
-  margin: 0 0.5rem 1rem 0;
-  color: #555;
+  margin: 0 0.7rem;
 }
 .home-users .home-user:hover,
 .home-users .home-user:focus {
