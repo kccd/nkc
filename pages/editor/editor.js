@@ -540,8 +540,9 @@ function initVueApp() {
         if(!window.ForumSelector)
           window.ForumSelector = new NKC.modules.ForumSelector();
         var selectedForumsId = [].concat(self.selectedForumsId);
+        var highlightForumId = '';
         if(type === 'mainForum') {
-          selectedForumsId.shift();
+          highlightForumId = selectedForumsId.shift();
         }
         ForumSelector.open(function(r) {
           if(self.selectedForumsId.indexOf(r.fid) !== -1) return;
@@ -555,6 +556,7 @@ function initVueApp() {
             self.selectedForums.push(r);
           }
         }, {
+          highlightForumId: highlightForumId,
           selectedForumsId: selectedForumsId,
           disabledForumsId: []
         });
