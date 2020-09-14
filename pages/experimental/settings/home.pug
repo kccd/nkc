@@ -98,6 +98,11 @@ block eContent
                     label
                       input(type='radio' value="column" v-model="homeSettings.subscribesDisplayMode")
                       span 竖排专业头像加三条最新文章
+                    br
+                    label
+                      input(type='radio' value="brief" v-model="homeSettings.subscribesDisplayMode")
+                      span 只显示专业名称
+
                 .form-group
                   h5.text-danger(v-if="error") {{error}}
                   h5.text-success(v-if="info") {{info}}

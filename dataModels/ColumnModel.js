@@ -287,7 +287,23 @@ schema.statics.saveAllColumnToElasticSearch = async () => {
 * */
 schema.statics.getToppedColumns = async () => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
-  const columns = await mongoose.model("columns").find({_id: {$in: homeSettings.columnsId}});
+  if(!homeSettings.columnsId.length) return [];
+  let columnsId = [];
+  if(homeSettings.columnsId.length <= 6) {
+    columnsId = homeSettings.columnsId;
+  } else {
+    const {getRandomNumber$2} = require('../nkcModules/apiFunction');
+    const arr = getRandomNumber$2({
+      min: 0,
+      max: homeSettings.columnsId.length - 1,
+      count: 6,
+      repeat: false
+    });
+    for(const index of arr) {
+      columnsId.push(homeSettings.columnsId[index]);
+    }
+  }
+  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}});
   const columnsObj = {};
   columns.map(column => columnsObj[column._id] = column);
   for(let column of columns) {
@@ -300,7 +316,7 @@ schema.statics.getToppedColumns = async () => {
     column.latestThreadToc = threads.length? threads[0].toc: null;
   }
   const results = [];
-  homeSettings.columnsId.map(cid => {
+  columnsId.map(cid => {
     const column = columnsObj[cid];
     if(column) results.push(column);
   });

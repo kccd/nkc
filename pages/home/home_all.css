@@ -74,11 +74,11 @@ body {
   margin: 0 0.3rem 0.5rem 0;
 }
 .home-forums .home-forums-list .home-forums-brief .home-forums-parent {
-  color: #333;
+  color: #000;
   font-weight: 700;
 }
 .home-forums .home-forums-list .home-forums-brief .home-forums-child {
-  color: #333;
+  color: #000;
   margin: 0 0.3rem;
 }
 .home-forums .home-forums-list .home-forums-body {
@@ -145,7 +145,7 @@ body {
   left: 0;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forums-padding-left .detailed-forum-panel-name a {
-  font-size: 1.2rem !important;
+  font-size: 1.3rem !important;
   font-weight: 700!important;
   color: #000;
 }
@@ -157,7 +157,7 @@ body {
   min-height: 4rem;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-body .detailed-forum-panel .detailed-forum-panel-info .detailed-forum-panel-name a {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   color: #282c37;
   font-weight: 700;
 }
@@ -338,7 +338,6 @@ body {
   height: 100%;
   border-radius: 2px;
   box-sizing: border-box;
-  border: 3px solid #eee;
 }
 .home-top .home-covers .home-covers-md .swiper-wrapper {
   height: 100%;
@@ -363,13 +362,12 @@ body {
   margin-bottom: 0.6rem;
   position: relative;
   box-sizing: border-box;
-  border: 2px solid #eee;
   border-radius: 5px;
   overflow: hidden;
 }
 .home-top .home-covers .home-covers-sm .home-cover-sm a .home-covers-sm-img {
   background-size: cover;
-  height: 10rem;
+  height: 10.34rem;
 }
 .home-top .home-covers .home-covers-sm .home-cover-sm a .home-covers-sm-title {
   background-color: rgba(0, 0, 0, 0.4);
@@ -468,6 +466,9 @@ body {
 .home-subscribes.recommend {
   max-height: 6rem;
   overflow: hidden;
+}
+.home-subscribe-forum-brief {
+  margin: 0 0.5rem 0.5rem 0;
 }
 .home-subscribe-forum {
   display: inline-block;
