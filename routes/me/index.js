@@ -17,13 +17,13 @@ meRouter
     quota = parseInt(quota);
     skip = parseInt(skip);
     let queryMap;
-    if(type == "all") {
+    if(type === "all") {
       queryMap = {"uid": user.uid};
-    }else if(type == "picture") {
+    }else if(type === "picture") {
       queryMap = {"uid": user.uid, "mediaType": "mediaPicture"};
-    }else if(type == "video") {
+    }else if(type === "video") {
       queryMap = {"uid": user.uid, "mediaType": "mediaVideo"};
-    }else if(type == "audio") {
+    }else if(type === "audio") {
       queryMap = {"uid": user.uid, "mediaType": "mediaAudio"};
     }else{
       queryMap = {"uid": user.uid, "mediaType": "mediaAttachment"};
@@ -49,6 +49,8 @@ meRouter
     }
     ctx.data.maxSkip = maxSkip;
     ctx.data.resources = await db.ResourceModel.find(queryMap).sort({toc: -1}).skip(newSkip).limit(quota);
+    const uploadSettings = await db.SettingModel.getSettings('upload');
+    data.sizeLimit = uploadSettings.sizeLimit;
     await next();
   })
 	.get('/life_photos', async (ctx, next) => {

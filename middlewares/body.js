@@ -1,9 +1,12 @@
 const path = require('path');
 const fss = require('fs');
 const utils = require('./utils');
+const {ThrottleGroup} = require("stream-throttle");
+
+let allSpeedLimit;
 
 module.exports = async (ctx, next) => {
-  const {filePath, fileType, fileName, resource, fs, tg} = ctx;
+  const {filePath, fileType, fileName, resource, fs, tg, db} = ctx;
   const {encodeRFC5987ValueChars} = ctx.nkcModules.nkcRender;
   if(filePath && ctx.method === 'GET') {
     let stats;
@@ -63,10 +66,21 @@ module.exports = async (ctx, next) => {
       contentLength = stats.size;
     }
 
+    // 全局限速
+    const downloadSettings = await db.SettingModel.getSettings('download');
+    const newAllSpeed = downloadSettings.allSpeed;
+
+    if(!allSpeedLimit || allSpeedLimit.speed !== newAllSpeed) {
+      allSpeedLimit = {
+        tg: new ThrottleGroup({rate: newAllSpeed * 1024}),
+        speed: newAllSpeed
+      };
+    }
+
     if(tg) {
-      ctx.body = createdStream.pipe(tg.throttle());
+      ctx.body = createdStream.pipe(tg.throttle()).pipe(allSpeedLimit.tg.throttle());
     } else {
-      ctx.body = createdStream;
+      ctx.body = createdStream.pipe(allSpeedLimit.tg.throttle());
     }
 
     ctx.set('Content-Disposition', contentDisposition);
