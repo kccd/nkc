@@ -234,7 +234,10 @@ block content
                   .home-column-info
                     .home-column-title= column.name
                     .home-column-description= column.abbr || "无简介"
-                    .home-column-statics= tools.briefTime(column.latestThreadToc) + "更新 共"+ column.threadsCount +"篇文章"
+                    .home-column-statics
+                      if column.latestThreadToc
+                        span=tools.briefTime(column.latestThreadToc) + "更新 "
+                      span= "共"+ column.threadsCount +"篇文章"
             if !state.userColumn && data.user && state.columnPermission
               .home-columns-link
                 a(href=`/column/apply` target="_blank") 开设专栏
@@ -397,7 +400,7 @@ block content
                         img(src=tools.getUrl("userAvatar", thread.firstPost.user.avatar) data-float-uid=thread.firstPost.uid)
                         span=thread.firstPost.user.username
                     a(href=`/f/${thread.forums[0].fid}` target="_blank" data-float-fid=thread.forums[0].fid).home-thread-forum=thread.forums[0].displayName
-        
+
         //- 活跃用户
         .home-forums-other.m-b-1
           .panel-header 活跃用户

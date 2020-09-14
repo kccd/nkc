@@ -633,6 +633,7 @@ body {
 }
 .home-columns .home-column .home-column-info .home-column-description {
   font-size: 1rem;
+  height: 1.3rem;
   color: rgb(119 119 119);
   word-break: break-word;
   display: -webkit-box;

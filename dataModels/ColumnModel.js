@@ -293,11 +293,11 @@ schema.statics.getToppedColumns = async () => {
   for(let column of columns) {
     let {_id} = column;
     let threads = await mongoose.model("columnPosts")         // 查出此专栏的所有可访问文章
-      .find({cid: parseInt(_id), hidden: false}, {toc: 1})
+      .find({columnId: parseInt(_id), hidden: false}, {toc: 1})
       .sort({toc: -1});                                       // 按从新到旧排序
     column.threadsCount = threads.length;
 
-    column.latestThreadToc = threads[0].toc;
+    column.latestThreadToc = threads.length? threads[0].toc: null;
   }
   const results = [];
   homeSettings.columnsId.map(cid => {
