@@ -482,23 +482,48 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
 
     // 投诉处理通知相关
     else if(type === "complaintsResolve") {
-      let {uid, pid} = r.c;
-      // 用户名
-      let {username} = await mongoose.model("users").findOne({uid}, {username: 1});
-      r.c.username = username;
-      // 用户主页
-      r.c.userURL = tools.getUrl("userHome", uid);
-      // 内容关键字
-      let {t: threadTitle, type: postType, parentPostId} = await mongoose.model("posts").findOne({pid}, {type: 1, t: 1, parentPostId: 1});
-      if(postType === "thread") {
-        r.c.contentTitle = `文章《${threadTitle}》`;
-      } else if(postType === "post" && !parentPostId) {
-        r.c.contentTitle = "回复";
-      } else {
-        r.c.contentTitle = "评论";
-      }
+      // let {uid, pid} = r.c;
+      // // 用户名
+      // let {username} = await mongoose.model("users").findOne({uid}, {username: 1});
+      // r.c.username = username;
+      // // 用户主页
+      // r.c.userURL = tools.getUrl("userHome", uid);
+      // // 内容关键字
+      // let {t: threadTitle, type: postType, parentPostId} = await mongoose.model("posts").findOne({pid}, {type: 1, t: 1, parentPostId: 1});
+      // if(postType === "thread") {
+      //   r.c.contentTitle = `文章《${threadTitle}》`;
+      // } else if(postType === "post" && !parentPostId) {
+      //   r.c.contentTitle = "回复";
+      // } else {
+      //   r.c.contentTitle = "评论";
+      // }
       // post详情页
-      r.c.postURL = tools.getUrl("post", pid);
+      // r.c.postURL = tools.getUrl("post", pid);
+      // 投诉类型
+      let complaintType = r.c.complaintType;
+      let contentId = r.c.contentId;
+      if(complaintType === "thread") {
+        r.c.CRType = "文章";
+        // 投诉目标链接
+        r.c.CRTarget = tools.getUrl("thread", contentId)
+        // 投诉目标描述
+        let thread = await mongoose.model("threads").findOne({tid: contentId});
+        let [{firstPost}] = await ThreadModel.extendThreads([thread], {firstPost: true});
+        r.c.CRTargetDesc = `《${firstPost.t}》`;
+      } else if(complaintType === "user") {
+        r.c.CRType = "用户";
+        // 投诉目标链接
+        r.c.CRTarget = tools.getUrl("userHome", contentId);
+        // 投诉目标描述
+        let {username} = await mongoose.model("users").findOne({uid: contentId}, {username: 1});
+        r.c.CRTargetDesc = username;
+      } else if(complaintType === "post") {
+        r.c.CRType = "回复";
+        // 投诉目标链接
+        r.c.CRTarget = tools.getUrl("post", contentId);
+        // 投诉目标描述
+        r.c.CRTargetDesc = "点击查看";
+      }
     }
 
     if(r.c.thread) {

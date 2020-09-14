@@ -140,14 +140,12 @@ const getDomByType = (t) => {
   }
 
   // 投诉处理通知相关
-  else if(t === "CRUsername") {
-    return prefix + "username";
-  } else if(t === "CRUserURL") {
-    return prefix + "userURL";
-  } else if(t === "CRContent") {
-    return prefix + "contentTitle";
-  } else if(t === "CRContentURL") {
-    return prefix + "postURL";
+  else if(t === "CRType") {
+    return prefix + "CRType";
+  } else if(t === "CRTarget") {
+    return prefix + "CRTarget";
+  } else if(t === "CRTargetDesc") {
+    return prefix + "CRTargetDesc";
   } else if(t === "CRReason") {
     return prefix + "reasonDescription";
   } else if(t === "CRResult") {

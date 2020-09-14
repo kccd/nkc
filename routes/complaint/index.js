@@ -78,7 +78,6 @@ router
       });
       data.complaint = (await db.ComplaintModel.findById(_id)).toObject();
       data.complaint.handler = await db.UserModel.findOne({uid: data.complaint.handlerId}, {uid: 1, username: 1});
-      const post = await db.PostModel.findOne({pid: complaint.contentId});
       // 处理完发消息通知用户
       const message = db.MessageModel({
         _id: await db.SettingModel.operateSystemID('messages', 1),
@@ -88,12 +87,16 @@ router
         ip: ctx.address,
         c: {
           type: 'complaintsResolve',
-          uid: post.uid,
-          pid: complaint.contentId,
+          // 发起投诉人
+          uid: complaint.uid,
+          // 可能是pid、uid
+          contentId: complaint.contentId,
           // 投诉理由
           reasonDescription: complaint.reasonDescription,
           // 处理说明
-          result
+          result,
+          // 投诉类型
+          complaintType: complaint.type
         }
       });
       await message.save();
