@@ -2,6 +2,7 @@ const settings = require('../settings');
 const SettingModel = require('./SettingModel');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
+const tools = require("../nkcModules/tools");
 const messageSchema = new Schema({
 
   // 消息id
@@ -479,6 +480,27 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       r.c.partOfUsernames = usernames.slice(0, 6).join("、");
     }
 
+    // 投诉处理通知相关
+    else if(type === "complaintsResolve") {
+      let {uid, pid} = r.c;
+      // 用户名
+      let {username} = await mongoose.model("users").findOne({uid}, {username: 1});
+      r.c.username = username;
+      // 用户主页
+      r.c.userURL = tools.getUrl("userHome", uid);
+      // 内容关键字
+      let {t: threadTitle, type: postType, parentPostId} = await mongoose.model("posts").findOne({pid}, {type: 1, t: 1, parentPostId: 1});
+      if(postType === "thread") {
+        r.c.contentTitle = `文章《${threadTitle}》`;
+      } else if(postType === "post" && !parentPostId) {
+        r.c.contentTitle = "回复";
+      } else {
+        r.c.contentTitle = "评论";
+      }
+      // post详情页
+      r.c.postURL = tools.getUrl("post", pid);
+    }
+
     if(r.c.thread) {
       r.c.thread = (await ThreadModel.extendThreads([r.c.thread], {
         forum: false,
@@ -709,7 +731,7 @@ messageSchema.statics.extendMessages = async (uid, messages) => {
 
   const nkcRender = require("../nkcModules/nkcRender");
   const MessageModel = mongoose.model("messages");
-  const {getUrl} = require("../nkcModules/tools");
+  const {getUrl} = tools;
   const _messages = [];
 
   for(let i = 0; i < messages.length; i++) {
