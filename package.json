@@ -42,6 +42,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",
     "fs-extra": "^7.0.1",
+    "hex-to-rgba": "^2.0.1",
     "icheck": "^1.0.2",
     "image-size": "^0.8.3",
     "immutable": "^3.8.2",
@@ -92,10 +93,10 @@
     "transliteration": "^1.6.6",
     "trek-captcha": "^0.4.0",
     "twemoji": "^2.5.0",
+    "uglify-js": "^3.10.4",
     "urllib": "^0.5.2",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "hex-to-rgba": "^2.0.1",
     "xss": "^1.0.3"
   },
   "devDependencies": {

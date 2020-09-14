@@ -70,6 +70,9 @@ var Tools = function() {
         }
         return "/p/" + id;
       }
+      case "thread": {
+        return "/t/" + id;
+      }
       case 'mediaPicture': {
         return "/r/" + id + t;
       }
