@@ -126,16 +126,21 @@ block content
                 a(class=!data.cat ? "active" : "" href=`/f/${data.forum.fid}`) 全部
                 for threadType in data.threadTypes
                   a(class=`${data.cat === threadType.cid ? 'active' : ''}` href=`/f/${data.forum.fid}?cat=${threadType.cid}`)= threadType.name
-            -let showPagingSortButton = true;
-            -let showPagingDigestButton = true;
-            if canManagement
+            div
+              -let showPagingSortButton = true;
+              -let showPagingDigestButton = true;
+              if canManagement
+                .paging-button
+                  a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                .paging-button.management-thread-panel
+                  a.button.radius-left(onclick="selectAll()") 全选
+                  a.button(onclick="moveSelectedThreads()") 移动
+                  a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+              span.m-r-05
+                include ../publicModules/paging/paging
               .paging-button
-                a.button.radius-left.radius-right(onclick="managementThreads()") 管理
-              .paging-button.management-thread-panel
-                a.button.radius-left(onclick="selectAll()") 全选
-                a.button(onclick="moveSelectedThreads()") 移动
-                a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-            include ../publicModules/paging/paging
+                a.radius-left.radius-right.button.button-checkbox(title='在新窗口打开文章') 新窗
+                  input#threadUrlSwitch(type='checkbox' style='margin-top: 0.4rem;vertical-align: top;')
             if data.paging.page === 0 && data.toppedThreads.length > 0
               -const defaultThreadListStyle = {type: 'minimalist'}
               for thread in data.toppedThreads

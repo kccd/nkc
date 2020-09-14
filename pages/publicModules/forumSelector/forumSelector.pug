@@ -54,22 +54,26 @@ include ../draggablePanel/draggablePanel
                   .forum-selector-forum-name {{selectedForum.displayName}}
                   .forum-selector-forum-description
                     span(:title='selectedForum.description') {{selectedForum.description || '暂无简介'}}
-              .forum-selector-forum-thread-types
-                h5.text-danger 文章分类：
-                .forum-selector-forum-type(v-for='tt in selectedForum.threadTypes'
-                  @click='selectThreadType(tt)'
-                  :class="{'active': selectedThreadType === tt}"
-                ) {{tt.name}}
-                .forum-selector-forum-type(
-                  @click='selectThreadType("none")' :class="{'active': selectedThreadType === 'none'}"
-                ) 不分类
-              .forum-selector-forum-post-description.m-b-05
-                h5.text-danger 注意事项：
-                span {{selectedForum.noteOfPost || '暂无'}}
+              .forum-selector-forum-content
+                .forum-selector-forum-thread-types
+                  h5.text-danger 文章分类：
+                  .forum-selector-forum-type(v-for='tt in selectedForum.threadTypes'
+                    @click='selectThreadType(tt)'
+                    :class="{'active': selectedThreadType === tt}"
+                  ) {{tt.name}}
+                  .forum-selector-forum-type(
+                    @click='selectThreadType("none")' :class="{'active': selectedThreadType === 'none'}"
+                  ) 不分类
+                .forum-selector-forum-post-description.m-b-05
+                  h5.text-danger 注意事项：
+                  span {{selectedForum.noteOfPost || '暂无'}}
 
 
           .forum-selector-button
-            span(v-if='!showThreadTypes')
+            span(v-if='!needThreadType')
+              button.btn.btn-primary.btn-sm(v-if='selectedForum' @click='fastSubmit') 确定
+              button.btn.btn-primary.btn-sm(v-else disabled title='请选择专业') 确定
+            span(v-else-if='!showThreadTypes')
               button.btn.btn-default.btn-sm(v-if='!selectedForum' disabled) 下一步
               button.btn.btn-primary.btn-sm(v-else @click='next') 下一步
             span(v-else)

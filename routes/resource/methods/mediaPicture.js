@@ -160,10 +160,11 @@ module.exports = async (options) => {
 
           outputPath = `${path}.ffmpeg.${ext}`;
           let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
+          outputPath = path + `.ffmpeg.${ext}`;
           await addImageTextWaterMaskForImage({
-            input: path, 
+            input: path,
             output: outputPath,
-            image: waterSmallPath, 
+            image: waterSmallPath,
             text: username,
             transparency: ffmpegTransparency,
             position

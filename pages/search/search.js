@@ -47,6 +47,13 @@ var app = new Vue({
         relation: this.relation
       };
       return this.strToBase64(JSON.stringify(o));
+    },
+    selectedForumsId: function() {
+      var arr = [];
+      for(var i = 0 ; i < this.selectedForums.length; i++) {
+        arr.push(this.selectedForums[i].fid);
+      }
+      return arr;
     }
   },
   methods: {
@@ -63,7 +70,15 @@ var app = new Vue({
       this.selectedForums.push(data);
     },
     selectForum: function() {
-      vueSelectForum.app.show();
+      var self = this;
+      if(!window.ForumSelector) window.ForumSelector = new NKC.modules.ForumSelector();
+      window.ForumSelector.open(function(data) {
+        self.selectedForums.push(data.forum)
+      }, {
+        from: 'readable',
+        selectedForumsId: self.selectedForumsId,
+        needThreadType: false,
+      });
     },
     removeForum: function(f) {
       var index = this.selectedForums.indexOf(f);
@@ -104,10 +119,10 @@ var app = new Vue({
           month: new Date().getMonth() + 1,
           day: new Date().getDate()
         };
-        this.sortType = "",
-        this.sort = "",
-        this.relation = "",
-        this.t = ""
+        this.sortType = "";
+        this.sort = "";
+        this.relation = "";
+        this.t = "";
         localStorage.removeItem("search_complexOptions");
       } else {
         this.complexOptions = true;
@@ -116,7 +131,6 @@ var app = new Vue({
     }
   },
   mounted: function() {
-    vueSelectForum.init({func: this.addForum, canChooseParentForum: true});
     var data = NKC.methods.getDataById("data");
     try{
       this.c = this.base64ToStr(data.c);
@@ -156,62 +170,3 @@ $(function() {
 function showResource(lid) {
   ResourceInfo.open({lid: lid})
 }
-/*
-
-function selectAll() {
-  var dom = $(".search-checkbox input");
-  var count = dom.length;
-  var selected = getSelectedThreadsId();
-  if(selected.length === count) {
-    dom.prop("checked", false);
-  } else {
-    dom.prop("checked", true);
-  }
-}
-
-function getSelectedThreadsId() {
-  var threadsId = [];
-  var dom = $(".search-checkbox input");
-  for(var i = 0; i < dom.length; i++) {
-    var d = dom.eq(i);
-    if(!d.prop("checked")) continue;
-    var tid = d.attr("data-thread-id");
-    if(threadsId.indexOf(tid) === -1) threadsId.push(tid);
-  }
-  return threadsId;
-}
-
-function showManageButtons() {
-  var label = $(".search-checkbox label");
-  var buttons = $(".search-buttons");
-  if(label.css("display") === "none") {
-    label.css("display", "inline-block");
-    buttons.css("display", "inline-block");
-  } else {
-    label.css("display", "none");
-    buttons.css("display", "none");
-  }
-  $(".search-checkbox input").prop("checked", false);
-}
-
-function selectedThreads(type) {
-  var threadsId = getSelectedThreadsId();
-  promise.resolve()
-    .then(function() {
-      if(!threadsId.length) throw "请至少勾选一篇文章";
-      
-    })
-    .then(function() {
-    
-    })
-    .catch(function(err) {
-      sweetError(err);
-    });
-  
-  console.log(threadsId);
-  if(type === "move") {
-  
-  } else {
-  
-  }
-}*/

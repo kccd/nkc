@@ -99,6 +99,10 @@
   font-size: 1.4rem;
   font-weight: 700;
 }
+.forum-selector-forum-info .forum-selector-forum-content {
+  height: 32rem;
+  overflow-y: auto;
+}
 .forum-selector-forum-info .forum-selector-forum-post-description {
   margin-top: 1rem;
 }
@@ -113,9 +117,6 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-}
-.forum-selector-forum-info .forum-selector-forum-thread-types {
-  margin-top: 0.5rem;
 }
 .forum-selector-forum-info .forum-selector-forum-type {
   user-select: none;

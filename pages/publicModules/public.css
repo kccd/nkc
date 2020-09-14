@@ -385,7 +385,7 @@ table{
   display: inline-block;
   padding-right: 0.5rem;
   margin-bottom: 0.5rem;
-
+  vertical-align: top;
 }
 .paging-button .input{
   height: 2rem;
@@ -432,6 +432,12 @@ table{
 }
 .paging-button a.active{
   background-color: #2b90d9;
+}
+.paging-button a.button-checkbox{
+  background-color: transparent;
+  box-sizing: border-box;
+  border: 1px solid #9baec8;
+  color: #222;
 }
 /* 操作按钮样式 */
 .options-button{

@@ -18,6 +18,8 @@ class ForumSelector extends NKC.modules.DraggablePanel {
         selectedThreadType: '',
         selectedForumsId: [],
         disabledForumsId: [],
+
+        needThreadType: true,
         showThreadTypes: false,
       },
       computed: {
@@ -112,12 +114,15 @@ class ForumSelector extends NKC.modules.DraggablePanel {
           const {
             disabledForumsId = [],
             selectedForumsId = [],
+            from = 'writable',
+            needThreadType = true
           } = options;
           this.disabledForumsId = disabledForumsId;
           this.selectedForumsId = selectedForumsId;
+          this.needThreadType = needThreadType;
           this.resetSelector();
           self.showPanel();
-          nkcAPI('/f?t=selector', 'GET')
+          nkcAPI(`/f?t=selector&f=${from}`, 'GET')
             .then(data => {
               self.app.loading = false;
               self.app.initForums(data);
@@ -212,6 +217,15 @@ class ForumSelector extends NKC.modules.DraggablePanel {
             threadType: selectedThreadType === 'none'? null: selectedThreadType,
             fid: selectedForum.fid,
             cid: selectedThreadType === 'none'? '': selectedThreadType.cid
+          });
+          this.close();
+        },
+        fastSubmit() {
+          const {selectedForum} = this;
+          if(!selectedForum) return sweetError(`请选择专业`);
+          self.callback({
+            forum: selectedForum,
+            fid: selectedForum.fid,
           });
           this.close();
         }

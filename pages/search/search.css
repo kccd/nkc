@@ -177,6 +177,9 @@ body{
   border-radius: 3px;
   margin-bottom: 0.3rem;
 }
+.search-forum-div select{
+  color: #222;
+}
 .search-forum-div{
   display: inline-block;
 }
