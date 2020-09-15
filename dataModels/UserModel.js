@@ -1213,11 +1213,13 @@ userSchema.statics.getUsersFriendsId = async (uid) => {
 userSchema.statics.uploadedAvatar = async (attachId) => {
   if(!attachId) return false;
   const AM = mongoose.model('attachments');
+  const FILE = require('../nkcModules/file');
   const attachment = await AM.findOne({_id: attachId});
   if(!attachment) return false;
   try{
     const filePath = await attachment.getFilePath();
-    return existsSync(filePath);
+    return await FILE.access(filePath);
+    // existsSync(filePath);
   } catch(err) {
     return false;
   }
@@ -1231,11 +1233,13 @@ userSchema.statics.uploadedAvatar = async (attachId) => {
 userSchema.statics.uploadedBanner = async (attachId) => {
   if(!attachId) return false;
   const AM = mongoose.model('attachments');
+  const FILE = require('../nkcModules/file');
   const attachment = await AM.findOne({_id: attachId});
   if(!attachment) return false;
   try{
     const filePath = await attachment.getFilePath();
-    return existsSync(filePath);
+    // return existsSync(filePath);
+    return await FILE.access(filePath);
   } catch(err) {
     return false;
   }
