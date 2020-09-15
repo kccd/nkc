@@ -496,13 +496,31 @@ userSchema.methods.updateUserMessage = async function() {
   // const threads = await ThreadModel.find({uid}, {oc: 1, _id: 0});
   // const threadsOc = threads.map(t => t.oc);
   // const threadCount = threads.length;
-  const disabledThreadsCount = await ThreadModel.count({uid, disabled: true});
+  const disabledThreadsCount = await ThreadModel.count({
+    uid, $or: [
+      {
+        disabled: true
+      },
+      {
+        reviewed: {$ne: true}
+      }
+    ]
+  });
   const digestThreadsCount = await ThreadModel.count({uid, digest: true});
   const toppedThreadsCount = await ThreadModel.count({uid, topped: true});
 	const allDigestPostsCount = await PostModel.count({uid, digest: true});
 	const digestPostsCount = allDigestPostsCount - digestThreadsCount;
 	const postCount = await PostModel.count({uid, type: "post"});
-	const disabledPostsCount = await PostModel.count({uid, type: "post", disabled: true});
+	const disabledPostsCount = await PostModel.count({
+    uid, type: "post", $or: [
+      {
+        disabled: true
+      },
+      {
+        reviewed: {$ne: true}
+      }
+    ]
+	});
   // const postCount = await PostModel.count({pid: {$nin: threadsOc}, uid});
   // const disabledPostsCount = await PostModel.count({pid: {$nin: threadsOc}, uid, disabled: true});
 	// 日常登录统计
