@@ -7,10 +7,9 @@ module.exports = async (ctx, next) => {
     ctx.data.user ||
     ctx.get("FROM") === "nkcAPI" || // 排除nkcAPI的请求
     ctx.filePath || // 排除资源文件
-    ctx.request.accepts('json', 'html') !== "html" || // 排除非html
+    // ctx.request.accepts('json', 'html') !== "html" || // 排除非html
     global.NKC.NODE_ENV !== "production" // 排除开发环境
   ) return await next();
-
   const {redisClient} = settings;
   // 缓存时间的键名
   let tocKey = `page:${url}:toc`;
