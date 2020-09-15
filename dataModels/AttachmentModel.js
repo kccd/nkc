@@ -217,12 +217,7 @@ schema.methods.getFilePath = async function(t) {
   } else if(await file.access(normalFilePath)) {
     return normalFilePath;
   } else {
-    // 为了兼容测试环境（访问时因无图导致大量报错）
-    if(global.NKC.NODE_ENV === 'production') {
-      throwErr(400 , '文件未找到');
-    } else {
-      return '';
-    }
+    return '';
   }
 }
 

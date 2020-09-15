@@ -14,7 +14,7 @@ router
       ctx.type = a.ext;
     }
     let notFoundFile;
-    if(!a) {
+    if(!a || !ctx.filePath) {
       notFoundFile = true;
     } else {
       notFoundFile = !await nkcModules.file.access(ctx.filePath);
