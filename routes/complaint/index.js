@@ -44,7 +44,7 @@ router
         $gte: nkcModules.apiFunction.today()
       }
     });
-    if(complaintCount >= 50) ctx.throw(400, "您今天的发起的投诉实在是太多啦~");
+    if(complaintCount >= 50) ctx.throw(400, "你今天的发起的投诉实在是太多啦~");
     const {type, id, reasonType, reasonDescription} = body;
     if(!id) ctx.throw(400, "出现了一个错误，因为服务器不明白投诉内容的ID是什么~");
     if(!type) ctx.throw(500, "出现了一个错误，因为服务器不明白投诉的类型~");
@@ -61,23 +61,38 @@ router
     await next();
   })
   .post("/resolve", async (ctx, next) =>{
-    const {tools, data, db, body, redis} = ctx;
-    const {result, _id, complaints} = body;
+    const {data, db, body, redis} = ctx;
+    const {result, informed, _id, complaints} = body;
     const time = Date.now();
     const {user} = data;
+    let arr = [];
     if(_id) {
+      arr.push({
+        result,
+        informed,
+        _id
+      });
+    } else {
+      arr = complaints;
+    }
+    data.complaints = [];
+    for(const c of arr) {
+      const {_id, result, informed} = c;
       const complaint = await db.ComplaintModel.findById(_id);
-      if(complaint.resolved) ctx.throw(400, "投诉记录已处理，请勿重复提交");
+      if(complaint.resolved) continue;
       await complaint.update({
         $set: {
           resolved: true,
           handlerId: user.uid,
           resolveTime: time,
+          informed,
           result
         }
       });
-      data.complaint = (await db.ComplaintModel.findById(_id)).toObject();
-      data.complaint.handler = await db.UserModel.findOne({uid: data.complaint.handlerId}, {uid: 1, username: 1});
+      const complaint_ = (await db.ComplaintModel.findById(_id)).toObject();
+      complaint_.handler = await db.UserModel.findOne({uid: complaint_.handlerId}, {uid: 1, username: 1});
+      data.complaints.push(complaint_);
+      if(!informed) continue;
       // 处理完发消息通知用户
       const message = db.MessageModel({
         _id: await db.SettingModel.operateSystemID('messages', 1),
@@ -87,38 +102,11 @@ router
         ip: ctx.address,
         c: {
           type: 'complaintsResolve',
-          // 发起投诉人
-          uid: complaint.uid,
-          // 可能是pid、uid
-          contentId: complaint.contentId,
-          // 投诉理由
-          reasonDescription: complaint.reasonDescription,
-          // 处理说明
-          result,
-          // 投诉类型
-          complaintType: complaint.type
+          complaintId: complaint._id,
         }
       });
       await message.save();
       await redis.pubMessage(message);
-    } else {
-      data.complaints = [];
-      for(const c of complaints) {
-        const {_id, result} = c;
-        const complaint = await db.ComplaintModel.findById(_id);
-        if(complaint.resolved) continue;
-        await complaint.update({
-          $set: {
-            resolved: true,
-            handlerId: user.uid,
-            resolveTime: time,
-            result
-          }
-        });
-        const complaint_ = (await db.ComplaintModel.findById(_id)).toObject();
-        complaint_.handler = await db.UserModel.findOne({uid: complaint_.handlerId}, {uid: 1, username: 1});
-        data.complaints.push(complaint_);
-      }
     }
     await next();
   });

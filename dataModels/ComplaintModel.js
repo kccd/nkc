@@ -59,6 +59,11 @@ const schema = new Schema({
   result: {
     type: String,
     default: ""
+  },
+  // 是否通知
+  informed: {
+    type: Boolean,
+    default: false
   }
 }, {
   collection: "complaints"

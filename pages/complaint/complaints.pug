@@ -45,6 +45,8 @@ block content
                 label
                   a(:href="'/u/' + c.handlerId" target="_blank") {{c.handler.username}}
                   span(:title="format('YYYY-MM-DD HH:mm:ss', c.resolveTime)") &nbsp;{{fromNow(c.resolveTime)}} 处理说明：{{c.result || "未填写"}}
+                  span {{c.informed? '已通知': '未通知'}}
+
             .complaint-button.form-inline(v-else)
               .form-group
                 input(type="checkbox" v-model="selectedComplaintsId" :value="c._id")
@@ -52,6 +54,11 @@ block content
               .form-group(v-if="selectedComplaintsId.indexOf(c._id) !== -1")
                 span &nbsp;&nbsp;处理说明：
                 input.complaint-input.btn-sm.form-control(v-model="c.result")
+              .form-group(v-if="selectedComplaintsId.indexOf(c._id) !== -1")
+                .checkbox
+                  label
+                    input(type='checkbox' :value="true" v-model='c.informed')
+                    span &nbsp;发送通知
               .form-group(v-if="selectedComplaintsId.indexOf(c._id) !== -1")
                 button.btn.btn-primary.btn-sm(@click="save(c)") 保存
 
