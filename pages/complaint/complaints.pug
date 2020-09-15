@@ -44,9 +44,8 @@ block content
               div(v-if="c.open")
                 label
                   a(:href="'/u/' + c.handlerId" target="_blank") {{c.handler.username}}
-                  span(:title="format('YYYY-MM-DD HH:mm:ss', c.resolveTime)") &nbsp;{{fromNow(c.resolveTime)}} 处理说明：{{c.result || "未填写"}}
+                  span(:title="format('YYYY-MM-DD HH:mm:ss', c.resolveTime)") &nbsp;{{fromNow(c.resolveTime)}} 处理说明：{{c.result || "未填写"}}&nbsp;
                   span {{c.informed? '已通知': '未通知'}}
-
             .complaint-button.form-inline(v-else)
               .form-group
                 input(type="checkbox" v-model="selectedComplaintsId" :value="c._id")
