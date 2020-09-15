@@ -114,7 +114,7 @@ router
       });
       type = "passThread";
     }
-    await thread.updateThreadMessage();
+    await thread.updateThreadMessage(false);
 
     await db.ReviewModel.newReview(type, post, data.user);
 

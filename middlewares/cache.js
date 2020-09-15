@@ -1,6 +1,5 @@
 module.exports = async (ctx, next) => {
-  const {state, url, settings, db} = ctx;
-
+  const {nkcModules, state, url, settings, db} = ctx;
   // 仅仅只针对游客建立缓存
   if(
     ctx.method !== "GET" ||
@@ -10,7 +9,6 @@ module.exports = async (ctx, next) => {
     ctx.request.accepts('json', 'html') !== "html" || // 排除非html
     global.NKC.NODE_ENV !== "production" // 排除开发环境
   ) return await next();
-
   const {redisClient} = settings;
   // 缓存时间的键名
   let tocKey = `page:${url}:toc`;
@@ -27,36 +25,39 @@ module.exports = async (ctx, next) => {
       dataKey = `app:AC:page:${url}:data`;
     }
   }
-  const cacheSettings = await db.SettingModel.getSettings("cache");
 
+  const cacheSettings = await db.SettingModel.getSettings("cache");
+  // 防止因缓存过期同一时间大量请求数据库
+  const lock = await nkcModules.redLock.lock(`page:cache:lock:${url}`, 30000);
   // 获取缓存生成的时间，判断是否过期
   const toc = await redisClient.getAsync(tocKey);
   if(!toc || (ctx.reqTime.getTime() - Number(toc)) > cacheSettings.visitorPageCacheTime*1000) {
     state.cachePage = true;
   } else {
+    await lock.unlock();
     const html = await redisClient.getAsync(dataKey);
-    if(!html) {
-      state.cachePage = true;
-    } else {
-      // 记录并在控制台打印日志
-      ctx.set("Content-Type", "text/html");
-      ctx.logIt = true;
-      // 阅读文章则文章浏览量加一
-      const url_ = url.replace(/\?.*/, '');
-      const tid = url_.replace(/\/t\/(.*)/i, "$1");
-      if(tid !== url_) {
-        await db.ThreadModel.updateOne({tid}, {$inc: {hits: 1}});
-      }
-      return ctx.body = html;
+    // 记录并在控制台打印日志
+    ctx.set("Content-Type", "text/html");
+    ctx.logIt = true;
+    // 阅读文章则文章浏览量加一
+    const url_ = url.replace(/\?.*/, '');
+    const tid = url_.replace(/\/t\/(.*)/i, "$1");
+    if(tid !== url_) {
+      await db.ThreadModel.updateOne({tid}, {$inc: {hits: 1}});
     }
+    return ctx.body = html;
   }
   await next();
   // 如果不需要缓存页面或请求的是文件或状态码不是200，则不建立缓存
-  if(ctx.filePath ||!state.cachePage || ctx.status !== 200) return;
+  if(ctx.filePath ||!state.cachePage || ctx.status !== 200) {
+    await lock.unlock();
+    return;
+  }
   const html = ctx.body.toString();
+  await redisClient.setAsync(tocKey, ctx.reqTime.getTime());
+  await redisClient.setAsync(dataKey, html);
+  await lock.unlock();
   setImmediate(async () => {
-    await redisClient.setAsync(tocKey, ctx.reqTime.getTime());
-    await redisClient.setAsync(dataKey, html);
     // 生成缓存记录
     const cache = await db.CacheModel.findOneAndUpdate({
       key: url,

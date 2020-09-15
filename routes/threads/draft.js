@@ -134,7 +134,7 @@ router
     // 退修回复后，需要更新文章
     if(threads.length) {
       for(const thread of threads) {
-        await thread.updateThreadMessage();
+        await thread.updateThreadMessage(false);
       }
     }
     await next();

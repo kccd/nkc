@@ -250,50 +250,6 @@ block content
                 if data.subscribesDisplayMode === 'brief'
                   for forum in data.subForums
                     a.home-subscribe-forum-brief(href=`/f/${forum.fid}` data-float-fid=forum.fid)=forum.displayName
-        //-if data.user && data.subForums.length
-          .m-b-1
-            .panel-header 关注的专业
-            .home-forums-list
-              //-.home-header
-                //.fa.fa-tags
-                .header-name 关注的专业
-                //.header-description 关注最新话题，足不出户便能游遍世界~
-              .home-subscribes
-                if data.subscribesDisplayMode === "column"
-                  for forum in data.subForums
-                    include ./subscribes_column
-                if data.subscribesDisplayMode === "row" || !data.subscribesDisplayMode
-                  for forum in data.subForums
-                    a(href=`/f/${forum.fid}` data-float-fid=forum.fid).home-subscribe-forum
-                      .home-subscribe-forum-avatar
-                        if forum.logo
-                          img(src=tools.getUrl("forumLogo", forum.logo))
-                        else
-                          div(style=`background-color: ${forum.color}`)
-                      .home-subscribe-forum-info=forum.displayName
-        if data.columns.length
-          .home-forums-list.m-b-1
-            .panel-header 热门专栏
-            //-.home-header
-              //- fa.fa-flask
-              .header-name 热门专栏
-              //.header-description 关注最新学科，足不出户便能游遍世界~
-            .home-columns
-              for column in data.columns
-                a(href=`/m/${column._id}` target="_blank").home-column
-                  .home-column-avatar
-                    img(src=tools.getUrl("columnAvatar", column.avatar))
-                  .home-column-info
-                    .home-column-title= column.name
-                    .home-column-description= column.abbr || "无简介"
-                    .home-column-statics
-                      if column.latestThreadToc
-                        span=tools.briefTime(column.latestThreadToc) + "更新 "
-                      span= "共" + column.threadsCount + "篇文章"
-            if !state.userColumn && data.user && state.columnPermission
-              .home-columns-link
-                a(href=`/column/apply` target="_blank") 开设专栏
-                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
         if permissionsOr(["visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs", "nkcManagement"])
           .home-forums-other.m-b-1
             .panel-header 网站管理
@@ -350,6 +306,30 @@ block content
                 .home-app-img
                   img(src=`/statics/apps/tools.png`)
                 .home-app-name 计算工具
+        if data.columns.length
+          .home-forums-list.m-b-1
+            .panel-header 热门专栏
+            //-.home-header
+              //- fa.fa-flask
+              .header-name 热门专栏
+              //.header-description 关注最新学科，足不出户便能游遍世界~
+            .home-columns
+              for column in data.columns
+                a(href=`/m/${column._id}` target="_blank").home-column
+                  .home-column-avatar
+                    img(src=tools.getUrl("columnAvatar", column.avatar))
+                  .home-column-info
+                    .home-column-title= column.name
+                    .home-column-description= column.abbr || "无简介"
+                    .home-column-statics
+                      if column.latestThreadToc
+                        span=tools.briefTime(column.latestThreadToc) + "更新 "
+                      span= "共" + column.threadsCount + "篇文章"
+            if !state.userColumn && data.user && state.columnPermission
+              .home-columns-link
+                a(href=`/column/apply` target="_blank") 开设专栏
+                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
+
         if data.enableFund
           .home-forums-other.m-b-1
             .panel-header 最新基金申请

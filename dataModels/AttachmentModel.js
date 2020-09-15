@@ -212,17 +212,12 @@ schema.methods.getFilePath = async function(t) {
   const normalFilePath = PATH.resolve(fileFolderPath, `./${_id}.${ext}`);
   const filePath = PATH.resolve(fileFolderPath, `./${_id}${t?'_'+t:''}.${ext}`);
 
-  if(fs.existsSync(filePath)) {
+  if(await file.access(filePath)) {
     return filePath;
-  } else if(fs.existsSync(normalFilePath)) {
+  } else if(await file.access(normalFilePath)) {
     return normalFilePath;
   } else {
-    // 为了兼容测试环境（访问时因无图导致大量报错）
-    if(global.NKC.NODE_ENV === 'production') {
-      throwErr(400 , '文件未找到');
-    } else {
-      return '';
-    }
+    return '';
   }
 }
 
@@ -416,7 +411,8 @@ schema.statics.savePostCover = async (pid, file) => {
     const cover = await ResourceModel.findOne({ext: {$in: extArr}, references: pid});
     if(!cover) return;
     const filePath = await cover.getFilePath();
-    if(!fs.existsSync(filePath)) return;
+    if(!await FILE.access(filePath)) return;
+    // if(!fs.existsSync(filePath)) return;
     file = await FILE.getFileObjectByFilePath(filePath);
   }
   const AttachmentModel = mongoose.model('attachments');

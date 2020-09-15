@@ -18,30 +18,6 @@ module.exports = async (options) => {
       if(!forum) continue;
       if (homeSettings.subscribesDisplayMode === "column") {
         forum.latestThreads = await db.ForumModel.getLatestThreadsFromRedis(forum.fid);
-        // 查出3篇此专业的最新内容放进forum
-        /*let posts = await db.PostModel.find({
-          mainForumsId: {$in: [fid]},
-          disabled: false,
-          reviewed: true,
-          toDraft: {$ne: true},
-          type: "thread",
-        }).sort({toc: -1}).limit(3);
-        const threadsId = posts.map(post => post.tid);
-        const threads = await db.ThreadModel.find({
-          tid: {$in: threadsId},
-          mainForumsId: {$in: [fid]}, disabled: false, reviewed: true, recycleMark: {$ne: true}
-        }).sort({toc: -1});
-        forum.latestThreads = await db.ThreadModel.extendThreads(threads, {
-          lastPost: true,
-          lastPostUser: true,
-          category: true,
-          forum: true,
-          firstPost: true,
-          firstPostUser: true,
-          userInfo: false,
-          firstPostResource: false,
-          htmlToText: true
-        });*/
       }
       data.subForums.push(forum);
     }
@@ -69,7 +45,7 @@ module.exports = async (options) => {
   // 置顶文章轮播图
   data.ads = await db.ThreadModel.getHomeRecommendThreads(fidOfCanGetThreads);
   // 推荐专业
-  data.recommendForums = await db.ForumModel.getRecommendForums(fidOfCanGetThreads);
+  // data.recommendForums = await db.ForumModel.getRecommendForums(fidOfCanGetThreads);
   // 热门专栏
   data.columns = await db.ColumnModel.getToppedColumns();
   // 一周活跃用户
@@ -91,7 +67,7 @@ module.exports = async (options) => {
   // “关注的专业”显示方式
   data.subscribesDisplayMode = homeSettings.subscribesDisplayMode;
   // 含有最新回复的文章
-  data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 10);
+  data.latestPosts = await db.PostModel.getLatestPosts(fidOfCanGetThreads, 6);
   // 专业导航
   const forumsTree = await db.ForumModel.getForumsTreeLevel2(data.userRoles, data.userGrade, data.user);
   const forumsObj = {};
@@ -145,10 +121,10 @@ module.exports = async (options) => {
   // 首页大Logo
   data.homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
   // 浏览过的专业
-  if(data.user) {
+  /*if(data.user) {
     const visitedForumsId = data.user.generalSettings.visitedForumsId.slice(0, 5);
     data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
-  }
+  }*/
   await nkcModules.apiFunction.extendManagementInfo(ctx);
 
   ctx.template = "home/home_all.pug";

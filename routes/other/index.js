@@ -42,7 +42,8 @@ otherRouter
 		} else if(fid) {
 			return ctx.redirect(`/f/${fid}`);
 		} else {
-			return ctx.redirect(`/`);
+			ctx.throw(404, 'not found');
+			await next();
 		}
 	})
   .use('logout', logoutRouter.routes(), logoutRouter.allowedMethods())
