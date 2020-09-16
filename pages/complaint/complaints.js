@@ -18,15 +18,17 @@ var app = new Vue({
     save: function(c) {
       nkcAPI("/complaint/resolve", "POST", {
         result: c.result,
+        informed: c.informed,
         _id: c._id
       })
         .then(function(data) {
-          const complaint = data.complaint;
+          var complaint = data.complaints[0];
           c.resolved = complaint.resolved;
           c.result = complaint.result;
           c.handlerId = complaint.handlerId;
           c.handler = complaint.handler;
           c.resolveTime = complaint.resolveTime;
+          c.informed = complaint.informed;
         })
         .catch(function(data) {
           screenTopWarning(data);
@@ -53,6 +55,7 @@ var app = new Vue({
         if(selectedComplaintsId.indexOf(complaint._id) !== -1) {
           complaints.push({
             _id: complaint._id,
+            informed: complaint.informed,
             result: complaint.result
           });
         }
@@ -72,6 +75,7 @@ var app = new Vue({
                 cj.handlerId = ci.handlerId;
                 cj.result = ci.result;
                 cj.resolveTime = ci.resolveTime;
+                cj.informed = ci.informed;
               }
             }
           }

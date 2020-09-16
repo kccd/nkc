@@ -124,7 +124,7 @@ body {
   overflow: hidden;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
   overflow: hidden;
 }
 .home-forums .home-forums-list .detailed-forums-body .detailed-forum .detailed-forum-panel-icon {
@@ -468,7 +468,11 @@ body {
   overflow: hidden;
 }
 .home-subscribe-forum-brief {
-  margin: 0 0.5rem 0.5rem 0;
+  margin: 0 0.7rem 0.5rem 0;
+  color: #333;
+}
+.home-subscribe-forum-brief:hover {
+  color: #000;
 }
 .home-subscribe-forum {
   display: inline-block;

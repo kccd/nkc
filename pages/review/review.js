@@ -82,7 +82,9 @@ var app = new Vue({
           app.post(arr, index+1);
         })
         .catch(function(data) {
-          screenTopWarning(data);
+          screenTopWarning("PID: " + data.postId + ' 处理失败! error: ' + data.error || data);
+          console.log(data);
+          app.post(arr, index+1);
         });
     },
     submit: function(pid) {

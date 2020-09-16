@@ -267,6 +267,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const ShopRefundModel = mongoose.model("shopRefunds");
   const ActivityModel = mongoose.model("activity");
   const MessageModel = mongoose.model("messages");
+  const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model("problems");
   const apiFunction = require("../nkcModules/apiFunction");
   const results = [];
@@ -300,8 +301,12 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const post = await PostModel.findOne({pid});
       if(!post) continue;
       r.c.post = post;
-      r.c.thread = await ThreadModel.findOne({tid: post.tid});
-      r.c.user = await UserModel.find({uid: r.c.uid});
+      let thread = await ThreadModel.findOne({tid: post.tid});
+      thread = await await ThreadModel.extendThreads([thread]);
+      if(!thread.length) continue;
+      r.c.thread = thread[0];
+      r.c.user = await UserModel.findOne({uid: r.c.uid});
+      if(!r.c.user) continue;
       let scoreConfig = await SettingModel.getScoreByScoreType(r.c.scoreType);
       r.c.scoreName = scoreConfig.name;
     } else if(type === "digestPost") {
@@ -500,29 +505,37 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       // post详情页
       // r.c.postURL = tools.getUrl("post", pid);
       // 投诉类型
-      let complaintType = r.c.complaintType;
-      let contentId = r.c.contentId;
+      const {complaintId} = r.c;
+      const complaint = await ComplaintModel.findOne({_id: complaintId});
+      if(!complaint || !complaint.resolved || !complaint.informed) continue;
+      const {type: complaintType, contentId, result, reasonDescription} = complaint;
+      r.c.result = result;
+      r.c.reasonDescription = reasonDescription;
       if(complaintType === "thread") {
         r.c.CRType = "文章";
         // 投诉目标链接
         r.c.CRTarget = tools.getUrl("thread", contentId)
         // 投诉目标描述
-        let thread = await mongoose.model("threads").findOne({tid: contentId});
-        let [{firstPost}] = await ThreadModel.extendThreads([thread], {firstPost: true});
+        const thread = await ThreadModel.findOne({tid: contentId});
+        if(!thread) continue;
+        const [{firstPost}] = await ThreadModel.extendThreads([thread], {firstPost: true});
         r.c.CRTargetDesc = `《${firstPost.t}》`;
       } else if(complaintType === "user") {
         r.c.CRType = "用户";
         // 投诉目标链接
         r.c.CRTarget = tools.getUrl("userHome", contentId);
         // 投诉目标描述
-        let {username} = await mongoose.model("users").findOne({uid: contentId}, {username: 1});
-        r.c.CRTargetDesc = username;
+        const user = await UserModel.findOne({uid: contentId}, {username: 1});
+        if(!user) continue;
+        r.c.CRTargetDesc = user.username;
       } else if(complaintType === "post") {
         r.c.CRType = "回复";
         // 投诉目标链接
         r.c.CRTarget = tools.getUrl("post", contentId);
         // 投诉目标描述
         r.c.CRTargetDesc = "点击查看";
+      } else {
+        continue;
       }
     }
 

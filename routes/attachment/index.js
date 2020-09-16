@@ -2,7 +2,7 @@ const router = require('koa-router')();
 const fsPromise = require('fs').promises;
 router
   .get('/:id', async (ctx, next) => {
-    const {params, db, query, settings, data} = ctx;
+    const {params, db, query, settings, data, nkcModules} = ctx;
     const {user} = data;
     const {statics} = settings;
     const {id} = params;
@@ -13,15 +13,11 @@ router
       ctx.filePath = await a.getFilePath(t);
       ctx.type = a.ext;
     }
-    let notFoundFile = false;
-    if(!a) {
+    let notFoundFile;
+    if(!a || !ctx.filePath) {
       notFoundFile = true;
     } else {
-      try{
-        await fsPromise.access(ctx.filePath);
-      } catch(err) {
-        notFoundFile = true;
-      }
+      notFoundFile = !await nkcModules.file.access(ctx.filePath);
     }
     if(notFoundFile) {
       switch(c) {
