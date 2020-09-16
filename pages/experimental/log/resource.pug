@@ -1,0 +1,79 @@
+extends ../experimental
+block eTitle
+  title 附件上传记录
+  style.
+    .normal-width{
+      width: 12rem;
+    }
+    .disabled{
+      background-color: #ffcece;
+    }
+block eContent
+  #data.hidden=objToStr({searchType: data.searchType, searchContent: data.searchContent, t: data.t})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12.m-b-1#app
+        .form.form-inline
+          .form-group
+            select.form-control(v-model='searchType')
+              option(value='rid') 附件ID
+              option(value='uid') 用户ID
+              option(value='username') 用户名
+          .form-group
+            input.form-control(type='text' v-model.trim='searchContent' @keyup.enter='search')
+          .form-group
+            button.btn.btn-default(@click='search') 搜索
+      .col-xs-12.col-md-12
+        span.m-r-05
+          include ../../publicModules/paging/paging
+        .paging-button
+          a.button.radius-left(href=`/e/log/resource?c=${data.c || ''}` class=!data.t?'active':'') 全部
+          a.button(href=`/e/log/resource?t=mediaAttachment&c=${data.c || ''}` class=data.t === 'mediaAttachment'? 'active':'') 附件
+          a.button(href=`/e/log/resource?t=mediaVideo&c=${data.c || ''}` class=data.t === 'mediaVideo'? 'active': '') 视频
+          a.button(href=`/e/log/resource?t=mediaAudio&c=${data.c || ''}` class=data.t === 'mediaAudio'? 'active': '') 音频
+          a.button.radius-right(href=`/e/log/resource?t=mediaPicture&c=${data.c || ''}` class=data.t === 'mediaPicture'? 'active':"") 图片
+        .table-responsive
+          table.table
+            thead
+              tr
+                th 时间
+                th ID
+                th 用户名
+                th 文件信息
+                th 引用
+            tbody
+              for r in data.resources
+                tr(class=!r.isFileExist? 'disabled': '')
+                  th.normal-width=format(`YYYY-MM-DD HH:mm:ss`, r.toc)
+                  th.normal-width
+                    a(href=tools.getUrl('resource', r.rid) target="_blank")=r.rid
+                  th
+                    img(src=tools.getUrl('userAvatar', r.user.avatar) style='width: 1.6rem;height: 1.6rem;border-radius: 50%;' data-float-uid=r.uid).m-r-05
+                    a(href=tools.getUrl('userHome', r.uid) target='_blank' data-float-uid=r.uid)=r.user.username
+                  th
+                    div=`文件名：${r.oname} `
+                      span.text-danger=`${!r.isFileExist? '已丢失': '' }`
+                    div=`文件大小：${tools.getSize(r.size, 1)}`
+                    div=`文件类型：${r.mediaTypeName}`
+                    div=`真实路径：${r.filePath || '未知'}`
+                  th
+                    if !r.targets.length
+                      span 未使用
+                    else
+                      ul
+                        for t, index in r. targets
+                          li
+                            if t.type === 'thread'
+                              span=`来自文章《`
+                              a(href=t.url target='_blank')=t.title
+                              | 》
+                            else
+                              span=`来自文章《`
+                              a(href=t.url target='_blank')=t.title
+                              |》
+                              span 下的回复
+        include ../../publicModules/paging/paging_input
+block scripts
+  include ../../publicModules/subscribeTypes/subscribeTypes
+  include ../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  +includeJS('/experimental/log/resource.js')
