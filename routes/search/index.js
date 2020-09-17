@@ -8,7 +8,7 @@ router
     let {page=0, t, c, d} = query;
     const {user} = data;
     // 通过mongodb精准搜索用户名
-    let targetUser, existUser = false;
+    let targetUser, existUser = false, searchUserFromMongodb = false;
 
     if(c) {
       if(!d) {
@@ -33,6 +33,7 @@ router
         if(fid && fid.length > 0) {
           data.selectedForums = await db.ForumModel.find({fid: {$in: fid}});
         }
+        searchUserFromMongodb = !options.author;
       } catch(err) {
         console.log(err)
       }
@@ -93,7 +94,9 @@ router
       let perpage;
       if(t === "user") {
         perpage = searchUserList;
-        targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
+        if(searchUserFromMongodb) {
+          targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
+        }
       } else if(t === "post") {
         perpage = searchPostList;
       } else if(t === "thread") {
@@ -104,7 +107,9 @@ router
         perpage = searchResourceList;
       } else {
         perpage = searchAllList;
-        targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
+        if(searchUserFromMongodb) {
+          targetUser = await db.UserModel.findOne({usernameLowerCase: c.toLowerCase()});
+        }
       }
       data.paging = nkcModules.apiFunction.paging(page, data.total, perpage);
 

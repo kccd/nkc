@@ -561,7 +561,7 @@ function createMatch(property, query, boost, relation) {
   const obj = {
     bool: {}
   };
-  let keywords = query.split(' ');
+  let keywords = query.split(' ').filter(k => !!k);
   keywords = keywords.map(a => {
     const obj = {
       match_phrase: {}
