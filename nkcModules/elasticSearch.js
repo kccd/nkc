@@ -561,22 +561,15 @@ function createMatch(property, query, boost, relation) {
   const obj = {
     bool: {}
   };
-  let arr = [];
-
-  if(relation === 'should') {
-    arr = query.split(' ');
-  } else {
-    arr.push(query.replace(' ', ''))
-  }
-  arr = arr.map(a => {
+  let keywords = query.split(' ');
+  keywords = keywords.map(a => {
     const obj = {
       match_phrase: {}
     };
     obj.match_phrase[property] = a;
     return obj;
   });
-
-  obj.bool[relation] = arr;
+  obj.bool[relation] = keywords;
   obj.bool.boost = boost;
   return obj
 }
