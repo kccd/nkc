@@ -352,25 +352,22 @@ module.exports = {
         },
         {
             parameters: [
-                "partOfUsernames",
-                "total"
+                "LVUsernames",
+                "LVTotal",
+                "LVTarget",
+                "LVTargetDesc"
             ],
-            content: "[text=partOfUsernames]等[text=total]人赞了你的文章👍！",
+            content: "[text=LVUsernames]等[text=LVTotal]人赞了你的[url=LVTarget(LVTargetDesc)]👍！",
             type: "latestVotes"
         },
         {
             parameters: [
-                // "CRUsername",
-                // "CRUserURL",
-                // "CRContent",
-                // "CRContentURL",
                 "CRReason",
                 "CRResult",
                 "CRType",
                 "CRTarget",
                 "CRTargetDesc"
             ],
-            // content: "你投诉的用户[url=CRUserURL(CRUsername)]所发表的[url=CRContentURL(CRContent)]已经被处理。\n投诉理由：[text=CRReason]\n处理说明：[text=CRResult]",
             type: "complaintsResolve",
             content: "你投诉的[text=CRType][url=CRTarget(CRTargetDesc)]已经被处理。\n投诉理由：[text=CRReason]\n处理说明：[text=CRResult]"
         }

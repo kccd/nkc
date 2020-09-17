@@ -131,10 +131,18 @@ const getDomByType = (t) => {
   }
 
   // 新增点赞相关
-  else if(t === "partOfUsernames") {
-    return "item.c.partOfUsernames";
-  } else if(t === "total") {
-    return "item.c.total";
+  // "LVUsernames",
+  // "LVTotal",
+  // "LVTarget",
+  // "LVTargetDesc"
+  else if(t === "LVUsernames") {
+    return "item.c.LVUsernames";
+  } else if(t === "LVTotal") {
+    return "item.c.LVTotal";
+  } else if(t === "LVTarget") {
+    return "item.c.LVTarget";
+  } else if(t === "LVTargetDesc") {
+    return "item.c.LVTargetDesc";
   }
 
   // 投诉处理通知相关
