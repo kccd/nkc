@@ -337,11 +337,14 @@ schema.statics.getValue = (key, c) => {
       case 'scoreName':
         return c.scoreName
 
-      //点赞相关
-      case 'partOfUsernames':
-        return c.partOfUsernames
-      case 'total':
-        return c.total
+      case 'LVUsernames':
+        return c.LVUsernames;
+      case 'LVTotal':
+        return c.LVTotal
+      case 'LVTarget':
+        return c.LVTarget
+      case 'LVTargetDesc':
+        return c.LVTargetDesc
 
       // 投诉相关
       case 'CRType':

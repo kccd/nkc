@@ -269,6 +269,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const MessageModel = mongoose.model("messages");
   const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model("problems");
+  const PostsVoteModel = mongoose.model('postsVotes');
   const apiFunction = require("../nkcModules/apiFunction");
   const results = [];
 
@@ -469,23 +470,36 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const column = await ColumnModel.findOne({_id: columnId});
       if(!column) continue;
       r.c.column = column;
-    } 
-    
+    }
+
     // 最新点赞通知相关
     else if(type === "latestVotes") {
       // "LVUsernames",
       // "LVTotal",
       // "LVTarget",
       // "LVTargetDesc"
-      let {pid, uids} = r.c;
-      const UserModel = mongoose.model("users");
-      const PostModel = mongoose.model("posts");
-      let users = await UserModel.find({uid: {$in: uids}});
-      let usernames = users.map(user => user.username);
+      let {votesId} = r.c;
+      votesId = votesId.map(v => {
+        return mongoose.Types.ObjectId(v);
+      });
+      const votes = await PostsVoteModel.find({_id: {$in: votesId}}, {
+        pid: 1, uid: 1
+      });
+      if(!votes.length) continue;
+      const usersId = [];
+      let pid = '';
+      votes.map(v => {
+        usersId.push(v.uid);
+        pid = v.pid;
+      });
+      const users = await UserModel.find({uid: {$in: usersId}}, {username: 1});
+      if(!users.length) continue;
+      const usernames = users.map(user => user.username);
       r.c.LVUsernames = usernames.slice(0, 6).join("、");
-      r.c.LVTotal = uids.length;
+      r.c.LVTotal = usersId.length;
       // 目标post
       const post = await PostModel.findOne({pid}, {type: 1, tid: 1, t: 1});
+      if(!post) continue;
       // 如果是文章
       if(post.type === "thread") {
         r.c.LVTarget = tools.getUrl("thread", post.tid);

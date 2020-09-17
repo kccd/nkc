@@ -120,15 +120,15 @@ module.exports = async (ctx, next) => {
       let postGroups = {};
       // 哪个post 哪些人
       for(let vote of votes) {
-        let {uid, pid} = vote;
+        let {_id, pid} = vote;
         if(!postGroups[pid]) {
           postGroups[pid] = [];
         }
-        postGroups[pid].push(uid);
+        postGroups[pid].push(_id.toString());
       }
       // 最新点赞中包含多少个post就会生成多少条消息
       for(let pid in postGroups) {
-        let uids = postGroups[pid];
+        const votesId = postGroups[pid];
         // 发系统通知
         await db.MessageModel({
           _id: await db.SettingModel.operateSystemID('messages', 1),
@@ -138,8 +138,7 @@ module.exports = async (ctx, next) => {
           ip: ctx.address,
           c: {
             type: 'latestVotes',
-            pid,
-            uids
+            votesId
           }
         }).save();
       }
