@@ -201,7 +201,7 @@ const pictureRotate = async path => {
   }
 };*/
 const info = async path => {
-  const args = ['identify', '-format', '%wx%h', path];
+  const args = ['identify', '-format', '%wx%h', path + `[0]`];
   let result;
   if(!linux) {
     result = await spawnProcess('magick', args);

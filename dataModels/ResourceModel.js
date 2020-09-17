@@ -134,17 +134,16 @@ resourceSchema.virtual('isFileExist')
 /**
  * 文件是否存在
  */
-resourceSchema.methods.setFileExist = async function() {
-  if(this.mediaType !== 'mediaAttachment') return;
+resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture', 'mediaVideo', 'mediaAudio']) {
+  if(excludedMediaTypes.includes(this.mediaType)) return;
   const path = await this.getFilePath()
   try{
-    await fsPromise.stat(path);
+    await fsPromise.access(path);
     this.isFileExist = true;
   } catch(err) {
     this.isFileExist = false;
   }
 }
-
 
 /*
   获取文件路径

@@ -504,7 +504,6 @@ func.search = async (t, c, options) => {
       body.sort.push({_score});
     }
   }
-
   return await client.search({
     index: indexName,
     type: "documents",
@@ -558,21 +557,19 @@ module.exports = func;
 
 
 function createMatch(property, query, boost, relation) {
-  const keywords = (query || "").split(" ");
   relation = relation==="or"?"should":"must";
   const obj = {
     bool: {}
   };
-  const arr = [];
-  for(const key of keywords) {
-    const match = {};
-    match[property] = {
-      query: key,
-      operator: "and"
+  let keywords = query.split(' ');
+  keywords = keywords.map(a => {
+    const obj = {
+      match_phrase: {}
     };
-    arr.push({match});
-  }
-  obj.bool[relation] = arr;
+    obj.match_phrase[property] = a;
+    return obj;
+  });
+  obj.bool[relation] = keywords;
   obj.bool.boost = boost;
   return obj
 }
