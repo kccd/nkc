@@ -9,7 +9,7 @@ userRouter
 	.get('/', async (ctx, next) => {
 		const {query, data, db} = ctx;
 		let {page = 0, searchType, content, t} = query;
-		if(['username', 'uid', "mobile", "email"].includes(searchType)) {
+		if(['username', 'uid', "mobile", "email", 'ip'].includes(searchType)) {
 			content = content.trim();
 			let targetUsers = [];
 			if(searchType === 'username') {
@@ -17,9 +17,13 @@ userRouter
 			} else if(searchType === "uid") {
 				targetUsers = await db.UserModel.find({uid: content});
 			} else if(searchType === "mobile") {
-			  const targetUsersPersonal = await db.UsersPersonalModel.find({mobile: content});
-			  const uid = targetUsersPersonal.map(t => t.uid);
+        const targetUsersPersonal = await db.UsersPersonalModel.find({mobile: content});
+        const uid = targetUsersPersonal.map(t => t.uid);
         targetUsers = await db.UserModel.find({uid: {$in: uid}});
+      } else if(searchType === 'ip') {
+			  const usersPersonal = await db.UsersPersonalModel.find({regIP: content.trim()});
+			  const usersId = usersPersonal.map(u => u.uid);
+			  targetUsers = await db.UserModel.find({uid: {$in: usersId}});
       } else {
 			  const targetUserPersonal = await db.UsersPersonalModel.find({email: content});
 			  const uid = targetUserPersonal.map(t => t.uid);

@@ -7,7 +7,9 @@ function searchUser() {
 	} else if(searchType === "UID") {
 		searchType = 'uid';
 	} else if(searchType === "手机号") {
-	  searchType = "mobile";
+    searchType = "mobile";
+  } else if(searchType === 'IP') {
+    searchType = "ip";
   } else {
     searchType = "email";
   }
