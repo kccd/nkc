@@ -740,5 +740,7 @@
   "showActivityEnter": "首页“活动”入口的显示和隐藏",
   "discuz": "适配discuz",
 
+  "experimentalResourceLogs": "后台管理 - 附件上传记录",
+
   "donwloadNeedScore": "询问下载此附件是否需要积分"
 }

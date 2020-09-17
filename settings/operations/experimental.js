@@ -291,6 +291,9 @@ module.exports = {
 	},
 	log: {
     GET: 'visitPublicLogs',
+		resource: {
+    	GET: 'experimentalResourceLogs'
+		},
 		blacklist: {
     	GET: 'visitExperimentalBlacklist'
 		},
