@@ -352,10 +352,12 @@ module.exports = {
         },
         {
             parameters: [
-                "partOfUsernames",
-                "total"
+                "LVUsernames",
+                "LVTotal",
+                "LVTarget",
+                "LVTargetDesc"
             ],
-            content: "[text=partOfUsernames]等[text=total]人赞了你的文章👍！",
+            content: "[text=LVUsernames]等[text=LVTotal]人赞了你的[url=LVTarget(LVTargetDesc)]👍！",
             type: "latestVotes"
         },
         {
