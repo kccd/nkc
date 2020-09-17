@@ -540,11 +540,11 @@ function initVueApp() {
         if(!window.ForumSelector)
           window.ForumSelector = new NKC.modules.ForumSelector();
         var selectedForumsId = [].concat(self.selectedForumsId);
+        var highlightForumId = '';
         if(type === 'mainForum') {
-          selectedForumsId.shift();
+          highlightForumId = selectedForumsId.shift();
         }
         ForumSelector.open(function(r) {
-          if(self.selectedForumsId.indexOf(r.fid) !== -1) return;
           r.logo = r.forum.logo;
           r.color = r.forum.color;
           r.fName = r.forum.displayName;
@@ -552,9 +552,11 @@ function initVueApp() {
           if(type === 'mainForum') {
             Vue.set(self.selectedForums, 0, r)
           } else {
+            if(self.selectedForumsId.indexOf(r.fid) !== -1) return;
             self.selectedForums.push(r);
           }
         }, {
+          highlightForumId: highlightForumId,
           selectedForumsId: selectedForumsId,
           disabledForumsId: []
         });

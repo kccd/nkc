@@ -77,6 +77,14 @@ block content
                     textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.post.pid}'].reason`)
                 .m-t-1
                   button.btn.btn-sm.btn-primary(@click=`submit('${r.post.pid}')`) 提交
+              if r.post.abstractCn
+                .review-post-content=`中文摘要：${r.post.abstractCn}`
+              if r.post.abstractEn
+                .review-post-content=`英文摘要：${r.post.abstractEn}`
+              if r.post.keyWordsCn.length
+                .review-post-content=`中文关键词：${r.post.keyWordsCn.join(', ')}`
+              if r.post.keyWordsEn.length
+                .review-post-content=`英文关键词：${r.post.keyWordsEn.join(', ')}`
               .review-post-content!=r.post.c
 
         .p-t-1

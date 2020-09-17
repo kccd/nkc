@@ -8,8 +8,8 @@ if(username && password) {
 const options = {
   promiseLibrary: Promise,
   autoIndex: true,
-  poolSize: 50,
-  keepAlive: 120,
+  poolSize: 100,
+  keepAlive: 30000,
   useMongoClient: true
 
   // 新属性

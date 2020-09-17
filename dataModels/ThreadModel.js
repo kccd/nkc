@@ -1164,7 +1164,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 5
+        size: 3
       }
     }
   ]);
@@ -1193,7 +1193,7 @@ threadSchema.statics.getFeaturedThreads = async (fid) => {
     },
     {
       $sample: {
-        size: 4
+        size: 3
       }
     }
   ]);

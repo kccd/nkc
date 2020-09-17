@@ -16,8 +16,13 @@ class ForumSelector extends NKC.modules.DraggablePanel {
         selectedParentForum: '',
         selectedForum: '',
         selectedThreadType: '',
+
+        // 外部传入 已选择的专业ID 用于禁止选择已选专业 且参与专业分类的互斥判断
         selectedForumsId: [],
+        // 外部传入 屏蔽的专业 同上
         disabledForumsId: [],
+        // 外部传入 高亮的专业
+        highlightForumId: '',
 
         needThreadType: true,
         showThreadTypes: false,
@@ -115,11 +120,13 @@ class ForumSelector extends NKC.modules.DraggablePanel {
             disabledForumsId = [],
             selectedForumsId = [],
             from = 'writable',
-            needThreadType = true
+            needThreadType = true,
+            highlightForumId = ''
           } = options;
           this.disabledForumsId = disabledForumsId;
           this.selectedForumsId = selectedForumsId;
           this.needThreadType = needThreadType;
+          this.highlightForumId = highlightForumId;
           this.resetSelector();
           self.showPanel();
           nkcAPI(`/f?t=selector&f=${from}`, 'GET')
@@ -127,8 +134,10 @@ class ForumSelector extends NKC.modules.DraggablePanel {
               self.app.loading = false;
               self.app.initForums(data);
             })
-
-            // .catch(sweetError)
+            .catch(err => {
+              console.log(err);
+              sweetError(err);
+            });
         },
         close() {
           self.hidePanel();
@@ -170,6 +179,30 @@ class ForumSelector extends NKC.modules.DraggablePanel {
             this.selectForumCategory(category);
           } else {
             this.resetSelector();
+          }
+          this.highlightForum();
+        },
+        highlightForum() {
+          const {forumData, highlightForumId} = this;
+          if(!highlightForumId) return;
+          let _selectedCategory, _selectedParentForum, _selectedForum;
+          loop1:
+          for(const c of forumData) {
+            _selectedCategory = c;
+            for(const pf of c.forums) {
+              _selectedParentForum = pf;
+              for(const f of pf.childForums) {
+                if(highlightForumId === f.fid) {
+                  _selectedForum = f;
+                  break loop1;
+                }
+              }
+            }
+          }
+          if(_selectedForum) {
+            this.selectedForumCategory = _selectedCategory;
+            this.selectedParentForum = _selectedParentForum;
+            this.selectedForum = _selectedForum;
           }
         },
         selectParentForum(pf) {

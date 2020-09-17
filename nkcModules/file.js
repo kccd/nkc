@@ -53,7 +53,8 @@ func.getBasePath = async (t) => {
   for(const a of attachmentConfig) {
     const {path, startingTime, endTime} = a;
     const _path = PATH.resolve(path);
-    if(!fs.existsSync(path)) throwErr `指定的目录 ${path} 不存在`;
+    if(!await func.access(path)) throwErr `指定的目录 ${path} 不存在`;
+    // if(!fs.existsSync(path)) throwErr `指定的目录 ${path} 不存在`;
     const sTime = new Date(startingTime + ' 00:00:00').getTime();
     const eTime = new Date(endTime + ' 00:00:00').getTime();
     if(now >= sTime && now < eTime) {
@@ -310,7 +311,7 @@ func.deleteUserBanner = async (uid) =>{
 * */
 func.getPostCover = async (hash) => {
   let filePath = upload.coverPath + "/" + hash + ".jpg";
-  if(!hash || !fsSync.existsSync(filePath)) {
+  if(!hash || !await func.access(filePath)) {
     filePath = statics.defaultPostCoverPath;
   }
   return filePath;
@@ -364,7 +365,7 @@ func.modifyPostCovers = async (pid, covers) => {
   for(const c of post.covers) {
     if(!coversHash.includes(c)) { // 修改后，删除了原有的封面图
       const filePath = upload.coverPath + "/" + c + ".jpg";
-      if(fsSync.existsSync(filePath)) {
+      if(func.access(filePath)) {
         await fsSync.unlink(filePath);
       }
     }
@@ -399,7 +400,8 @@ func.createPostCoverByPostId = async (pid) => {
     } else {
       filePath = await cover.getFilePath();
     }
-    if(!fsSync.existsSync(filePath)) return;
+    if(!await func.access(filePath)) return;
+    // if(!fsSync.existsSync(filePath)) return;
     const targetPath = upload.coverPath + "/" + pid + ".jpg";
     await ei.resize({
       src: filePath,
@@ -494,6 +496,18 @@ func.exist = async (targetPath) => {
     return false;
   }
 };
+
+/*
+* 同上
+* */
+func.access = async (targetPath) => {
+  try{
+    await fsPromise.access(targetPath);
+    return true;
+  } catch(err) {
+    return false;
+  }
+}
 
 /**
  * 重设图片尺寸

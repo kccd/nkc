@@ -126,8 +126,6 @@ const getDomByType = (t) => {
     return "item.c.user.username"
   } else if(t === "description") {
     return "item.c.description"
-  } else if(t === "threadTitle") {
-    return "item.c.post.t"
   } else if(t === "scoreName") {
     return "item.c.scoreName"
   }
@@ -322,6 +320,32 @@ schema.statics.getValue = (key, c) => {
         return `/u/${c.restorer.uid}`
       case 'restorerName':
         return c.restorer.username
+
+      // kcb鼓励相关
+      case 'scoreNumber':
+        return c.number / 100
+      case 'description':
+        return c.description
+      case 'scoreName':
+        return c.scoreName
+
+      //点赞相关
+      case 'partOfUsernames':
+        return c.partOfUsernames
+      case 'total':
+        return c.total
+
+      // 投诉相关
+      case 'CRType':
+        return c.CRType
+      case 'CRTarget':
+        return c.CRTarget
+      case 'CRTargetDesc':
+        return c.CRTargetDesc
+      case 'CRReason':
+        return c.reasonDescription
+      case 'CRResult':
+        return c.result
       default: return key;
     }
   } catch(err) {
