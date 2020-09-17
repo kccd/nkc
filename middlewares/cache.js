@@ -47,7 +47,12 @@ module.exports = async (ctx, next) => {
     }
     return ctx.body = html;
   }
-  await next();
+  try{
+    await next();
+  } catch(err) {
+    await lock.unlock();
+    throw err;
+  }
   // 如果不需要缓存页面或请求的是文件或状态码不是200，则不建立缓存
   if(ctx.filePath ||!state.cachePage || ctx.status !== 200) {
     await lock.unlock();
