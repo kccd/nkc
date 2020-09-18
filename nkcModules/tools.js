@@ -141,6 +141,9 @@ var Tools = function() {
     if(timeNumber >= t - (2 * oneDayNumber)) return '前天';
     if(timeNumber >= t - (30 * oneDayNumber)) return '近期';
     return '较早';
+  };
+  self.getIpUrl = function(ip) {
+    return "http://www.ip138.com/ips138.asp?ip=" + ip + "&action=2";
   }
 };
 

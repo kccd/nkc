@@ -179,6 +179,7 @@ module.exports = {
 		},
 		user: {
 			GET: 'visitEUserSettings',
+			PUT: 'modifyEUserInfo',
 			PARAMETER: {
 				GET: 'visitEUserInfo',
 				PUT: 'modifyEUserInfo'
