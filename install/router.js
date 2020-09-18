@@ -101,8 +101,8 @@ router
         username: elasticSearch.username || '',
         password: elasticSearch.password || '',
         indexName: elasticSearch.indexName,
-        analyzer: "ik_max_word",
-        searchAnalyzer: "ik_smart"
+        analyzer: "standard",
+        searchAnalyzer: "standard"
       }
     });
 

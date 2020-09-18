@@ -71,9 +71,20 @@ userRouter
     if(ctx.permission('viewUserScores')) {
       data.targetUserScores = await db.UserModel.getUserScores(targetUser.uid);
     }
-
-    if(targetUser.hidden && !ctx.permission("hideUserHome")) {
-      nkcModules.throwError(404, "根据相关法律法规和政策，该内容不予显示", "noPermissionToVisitHiddenUserHome");
+    // 如果未登录或者已登录但不是自己的名片
+    if(
+      !ctx.permission('hideUserHome') &&
+      (!user || user.uid !== targetUser.uid)
+    ) {
+      if(targetUser.hidden) {
+        nkcModules.throwError(404, "根据相关法律法规和政策，该内容不予显示", "noPermissionToVisitHiddenUserHome");
+      }
+      if(
+        (await db.UserModel.contentNeedReview(targetUser.uid, 'thread')) ||
+        (await db.UserModel.contentNeedReview(targetUser.uid, 'post'))
+      ) {
+        nkcModules.throwError(404, "", "noPermissionToVisitNotReviewedUserHome");
+      }
     }
     await db.UserModel.extendUsersInfo([targetUser]);
     if(user) {

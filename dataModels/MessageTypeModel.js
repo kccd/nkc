@@ -131,10 +131,18 @@ const getDomByType = (t) => {
   }
 
   // 新增点赞相关
-  else if(t === "partOfUsernames") {
-    return "item.c.partOfUsernames";
-  } else if(t === "total") {
-    return "item.c.total";
+  // "LVUsernames",
+  // "LVTotal",
+  // "LVTarget",
+  // "LVTargetDesc"
+  else if(t === "LVUsernames") {
+    return "item.c.LVUsernames";
+  } else if(t === "LVTotal") {
+    return "item.c.LVTotal";
+  } else if(t === "LVTarget") {
+    return "item.c.LVTarget";
+  } else if(t === "LVTargetDesc") {
+    return "item.c.LVTargetDesc";
   }
 
   // 投诉处理通知相关
@@ -329,11 +337,14 @@ schema.statics.getValue = (key, c) => {
       case 'scoreName':
         return c.scoreName
 
-      //点赞相关
-      case 'partOfUsernames':
-        return c.partOfUsernames
-      case 'total':
-        return c.total
+      case 'LVUsernames':
+        return c.LVUsernames;
+      case 'LVTotal':
+        return c.LVTotal
+      case 'LVTarget':
+        return c.LVTarget
+      case 'LVTargetDesc':
+        return c.LVTargetDesc
 
       // 投诉相关
       case 'CRType':

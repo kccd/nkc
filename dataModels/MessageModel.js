@@ -269,6 +269,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const MessageModel = mongoose.model("messages");
   const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model("problems");
+  const PostsVoteModel = mongoose.model('postsVotes');
   const apiFunction = require("../nkcModules/apiFunction");
   const results = [];
 
@@ -469,41 +470,61 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       const column = await ColumnModel.findOne({_id: columnId});
       if(!column) continue;
       r.c.column = column;
-    } else if(type === "latestVotes") {
-      let voteIds = r.c.voteIds;
-      const PostsVoteModel = mongoose.model("postsVotes");
-      const UserModel = mongoose.model("users");
-      let votes = await PostsVoteModel.find({
-        _id: {$in: voteIds.map(id => mongoose.Types.ObjectId(id))}
+    }
+
+    // 最新点赞通知相关
+    else if(type === "latestVotes") {
+      // "LVUsernames",
+      // "LVTotal",
+      // "LVTarget",
+      // "LVTargetDesc"
+      let {votesId} = r.c;
+      votesId = votesId.map(v => {
+        return mongoose.Types.ObjectId(v);
+      });
+      const votes = await PostsVoteModel.find({_id: {$in: votesId}}, {
+        pid: 1, uid: 1
       });
       if(!votes.length) continue;
-      r.c.total = votes.length;
-      let users = await UserModel.find({
-        uid: {$in: votes.map(vote => vote.uid)}
+      const usersId = [];
+      let pid = '';
+      votes.map(v => {
+        usersId.push(v.uid);
+        pid = v.pid;
       });
-      let usernames = users.map(user => user.username);
-      r.c.partOfUsernames = usernames.slice(0, 6).join("、");
+      const users = await UserModel.find({uid: {$in: usersId}}, {username: 1});
+      if(!users.length) continue;
+      const usernames = users.map(user => user.username);
+      r.c.LVUsernames = usernames.slice(0, 6).join("、");
+      r.c.LVTotal = usersId.length;
+      // 目标post
+      const post = await PostModel.findOne({pid}, {type: 1, tid: 1, t: 1});
+      if(!post) continue;
+      // 如果是文章
+      if(post.type === "thread") {
+        r.c.LVTarget = tools.getUrl("thread", post.tid);
+        r.c.LVTargetDesc = `文章《${post.t}》`;
+      } else if(post.type === "post") {
+        r.c.LVTarget = tools.getUrl("post", pid);
+        r.c.LVTargetDesc = `回复(点击查看)`;
+      }
+      // let voteIds = r.c.voteIds;
+      // const PostsVoteModel = mongoose.model("postsVotes");
+      // const UserModel = mongoose.model("users");
+      // let votes = await PostsVoteModel.find({
+      //   _id: {$in: voteIds.map(id => mongoose.Types.ObjectId(id))}
+      // });
+      // if(!votes.length) continue;
+      // r.c.total = votes.length;
+      // let users = await UserModel.find({
+      //   uid: {$in: votes.map(vote => vote.uid)}
+      // });
+      // let usernames = users.map(user => user.username);
+      // r.c.partOfUsernames = usernames.slice(0, 6).join("、");
     }
 
     // 投诉处理通知相关
     else if(type === "complaintsResolve") {
-      // let {uid, pid} = r.c;
-      // // 用户名
-      // let {username} = await mongoose.model("users").findOne({uid}, {username: 1});
-      // r.c.username = username;
-      // // 用户主页
-      // r.c.userURL = tools.getUrl("userHome", uid);
-      // // 内容关键字
-      // let {t: threadTitle, type: postType, parentPostId} = await mongoose.model("posts").findOne({pid}, {type: 1, t: 1, parentPostId: 1});
-      // if(postType === "thread") {
-      //   r.c.contentTitle = `文章《${threadTitle}》`;
-      // } else if(postType === "post" && !parentPostId) {
-      //   r.c.contentTitle = "回复";
-      // } else {
-      //   r.c.contentTitle = "评论";
-      // }
-      // post详情页
-      // r.c.postURL = tools.getUrl("post", pid);
       // 投诉类型
       const {complaintId} = r.c;
       const complaint = await ComplaintModel.findOne({_id: complaintId});

@@ -6,68 +6,96 @@ userRouter
 		ctx.data.type = 'user';
 		await next();
 	})
-	.get('/', async (ctx, next) => {
-		const {query, data, db} = ctx;
-		let {page = 0, searchType, content, t} = query;
-		if(['username', 'uid', "mobile", "email"].includes(searchType)) {
-			content = content.trim();
-			let targetUsers = [];
-			if(searchType === 'username') {
-				targetUsers = await db.UserModel.find({usernameLowerCase: content.toLowerCase()});
-			} else if(searchType === "uid") {
-				targetUsers = await db.UserModel.find({uid: content});
-			} else if(searchType === "mobile") {
-			  const targetUsersPersonal = await db.UsersPersonalModel.find({mobile: content});
-			  const uid = targetUsersPersonal.map(t => t.uid);
-        targetUsers = await db.UserModel.find({uid: {$in: uid}});
+  .get('/', async (ctx, next) => {
+    const {query, data, db, nkcModules} = ctx;
+    const {page = 0, t = 'default', c = '', uid} = query;
+    let users = [], paging = {};
+    let [searchType = '', searchContent = ''] = c.split(',');
+    const match = {};
+    if(t !== 'default') {
+      if(t === 'scholar') {
+        match.xsf = {$gt: 1};
       } else {
-			  const targetUserPersonal = await db.UsersPersonalModel.find({email: content});
-			  const uid = targetUserPersonal.map(t => t.uid);
-			  targetUsers = await db.UserModel.find({uid: {$in: uid}});
+        match.certs = t;
       }
-			if(targetUsers.length) {
-			  data.targetUsers = [];
-			  for(const u of targetUsers) {
-          await u.extend();
-          data.targetUsers.push(u.toObject());
-        }
-			}
-		} else {
-      const q = {};
-      if(t) {
-        const role = await db.RoleModel.findOne({_id: t});
-        if(role) {
-          if(role._id === 'scholar') {
-            q.xsf = {$gt: 0};
-          } else if(role._id === 'default') {
-
-          } else {
-            q.certs = role._id;
-          }
-          data.t = t;
-          data.role = role;
-        }
-      }
-			const {apiFunction} = ctx.nkcModules;
-      const count = await db.UserModel.count(q);
-			const paging = apiFunction.paging(page, count);
-			data.paging = paging;
-			const users = await db.UserModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
-			data.users = await Promise.all(users.map(async user => {
-				await user.extend();
-				return user;
-			}));
     }
-    data.roles = await db.RoleModel.find();
-		await next();
-	})
+    if(searchType === 'uid') {
+      const targetUser = await db.UserModel.findOne({uid: searchContent.trim()});
+      match.uid = targetUser? targetUser.uid: '';
+    } else if(searchType === 'username') {
+      const targetUser = await db.UserModel.findOne({usernameLowerCase: searchContent.trim()});
+      match.uid = targetUser? targetUser.uid: '';
+    } else if(searchType === 'ip') {
+      const usersPersonal = await db.UsersPersonalModel.find({regIP: searchContent.trim()}, {uid: 1});
+      match.uid = {$in: usersPersonal.map(u => u.uid)};
+    }
+    const count = await db.UserModel.count(match);
+    paging = nkcModules.apiFunction.paging(page, count);
+    users = await db.UserModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+    await Promise.all(users.map(async user => {
+      await user.extendGrade();
+      await user.extendRoles();
+      user.roles.reverse();
+    }));
+    users = await db.UserModel.extendUsersSecretInfo(users);
+    for(const u of users) {
+      if(!ctx.permission('visitUserSensitiveInfo')) {
+        delete u.mobile;
+        delete u.nationCode;
+        delete u.email;
+        continue;
+      }
+      u.postNeedReview = await db.UserModel.contentNeedReview(u.uid, 'post');
+      u.threadNeedReview = await db.UserModel.contentNeedReview(u.uid, 'thread');
+      u.scores = await db.UserModel.getUserScores(u.uid);
+      u.badRecords = await db.UserModel.getUserBadRecords(u.uid);
+      u.blacklistCount = await db.BlacklistModel.getBlacklistCount(u.uid);
+    }
+    data.roles = await db.RoleModel.find().sort({toc: 1});
+    data.users = users;
+    data.paging = paging;
+    data.t = t;
+    data.c = c;
+    data.searchType = searchType;
+    data.searchContent = searchContent;
+    ctx.template = 'experimental/settings/user/user.pug';
+    await next();
+  })
+  .put('/', async (ctx, next) => {
+    const {body, db} = ctx;
+    const {type, disable, usersId} = body;
+    let obj;
+    if(type === 'disable') {
+      if(disable) {
+        obj = {
+          $addToSet: {
+            certs: 'banned'
+          }
+        }
+      } else {
+        obj = {
+          $pull: {
+            certs: 'banned'
+          }
+        }
+      }
+    } else if(type === 'hidden') {
+      obj = {
+        $set: {
+          hidden: !!disable
+        }
+      }
+    }
+    await db.UserModel.updateMany({uid: {$in: usersId}}, obj);
+    await next();
+  })
+
 	.get('/:uid', async (ctx, next) => {
 		const {data, db, params} = ctx;
 		const {uid} = params;
 		const targetUser = await db.UserModel.findOnly({uid});
-		await targetUser.extend();
 		await targetUser.extendRoles();
-		data.targetUser = targetUser;
+		data.targetUser = await db.UserModel.extendUserSecretInfo(targetUser);
 		data.targetUsersPersonal = await db.UsersPersonalModel.findOnly({uid});
 		data.roles = await db.RoleModel.find({type: {$in: ['common', 'management']}}).sort({toc: 1});
 		await next();
@@ -135,81 +163,4 @@ userRouter
     await targetUsersPersonal.update(userPersonalObj);
     await next();
 	});
-	/*.put('/:uid', async (ctx, next) => {
-		const {params, db, body, nkcModules} = ctx;
-		const {operation} = body;
-		const {uid} = params;
-		const targetUser = await db.UserModel.findOnly({uid});
-		if(['addRole', 'removeRole'].includes(operation)) {
-			const {roleDisplayName} = body;
-			const role = await db.RoleModel.findOnly({displayName: roleDisplayName});
-			if(role._id === 'dev') ctx.throw(400, '运维人员不可编辑！！！');
-			if(role._id === 'scholar') ctx.throw(400, '无需给用户添加学者角色，若用户的学术分大于0系统会自动为用户添加学者角色');
-			if(['banned', 'visitor'].includes(role._id)) ctx.throw(400, '数据错误，请刷新');
-			if(role._id === 'moderator') ctx.throw(400, '暂不支持专家角色的添加与移除');
-			if(operation === 'addRole') {
-				await targetUser.update({$addToSet: {certs: role._id}});
-			} else {
-				await targetUser.update({$pull: {certs: role._id}});
-			}
-		} else {
-
-			//普通信息修改
-			let {username, description, mobile, nationCode, email} = body;
-
-			username = username.trim();
-
-			if (!username) ctx.throw(400, '用户名不能为空');
-			const pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
-
-			if(pattern.test(username)) ctx.throw(400, '用户名含有非法字符！');
-
-			const {checkEmailFormat} = ctx.tools.checkString;
-
-			const q = {description};
-
-			const targetUserPersonal = await db.UsersPersonalModel.findOnly({uid: targetUser.uid});
-
-			// 检测邮箱
-			if (email) {
-				if (checkEmailFormat(email) === -1) {
-					ctx.throw(400, '邮箱格式不正确');
-				}
-				const u = await db.UsersPersonalModel.findOne({uid: {$ne: targetUser.uid}, email});
-				if(u) ctx.throw(400, '邮箱已被注册');
-				q.email = email;
-			}
-
-			// 检测手机号码
-			if (mobile && nationCode) {
-				const sameMobileUser = await db.UsersPersonalModel.findOne({nationCode, mobile});
-				if (sameMobileUser && sameMobileUser.uid !== targetUser.uid) {
-					ctx.throw(400, '电话号码已被其他用户绑定');
-				} else {
-					q.mobile = mobile;
-					q.nationCode = nationCode;
-				}
-			}
-
-			if (username !== targetUser.username) {
-				//修改用户名流程
-				const sameUsernameUser = await db.UserModel.findOne({usernameLowerCase: username.toLowerCase()});
-				if (sameUsernameUser) ctx.throw(400, '用户名已存在');
-				const oldUsername = await db.SecretBehaviorModel.findOne({
-					type: 'changeUsername',
-					oldUsernameLowerCase: username.toLowerCase(),
-					toc: {$gt: Date.now() - 365 * 24 * 60 * 60 * 1000}
-				}).sort({toc: -1});
-				if (oldUsername && oldUsername.uid !== targetUser.uid) ctx.throw(400, '用户名曾经被人使用过了，请更换。');
-
-				q.username = username;
-				q.usernameLowerCase = username.toLowerCase();
-			}
-			await targetUser.update(q);
-			await targetUserPersonal.update(q);
-			const targetUser_ = await db.UserModel.findOnly({uid: targetUser.uid});
-			await nkcModules.elasticSearch.save("user", targetUser_);
-		}
-		await next();
-	});*/
 module.exports = userRouter;

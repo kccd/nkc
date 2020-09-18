@@ -19,20 +19,20 @@ style.
           .form-group
             label 个人简介
             textarea.form-control(v-model.trim="user.description" rows=3)
-          //- .form-group
-          //-   label 邮箱
-          //-   input.form-control(v-model.trim="usersPersonal.email" type="text")
-          //- .form-group
-          //-   label 国际区号
-          //-   select.form-control(v-model="usersPersonal.nationCode")
-          //-     option(value="") 无
-          //-     option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
-          //- .form-group
-          //-   label 手机号
-          //-   input.form-control(v-model.trim="usersPersonal.mobile" type="text")
-          //- .form-group
-          //-   label 新密码
-          //-   input.form-control(v-model.trim="password" type="password" autocomplete="new-password" )
+          .form-group
+            label 邮箱
+            input.form-control(v-model.trim="usersPersonal.email" type="text")
+          .form-group
+            label 国际区号
+            select.form-control(v-model="usersPersonal.nationCode")
+              option(value="") 无
+              option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
+          .form-group
+            label 手机号
+            input.form-control(v-model.trim="usersPersonal.mobile" type="text")
+          .form-group
+            label 新密码
+            input.form-control(v-model.trim="password" type="password" autocomplete="new-password" )
           .form-group
             label 已获得的证书
             div

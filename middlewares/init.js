@@ -42,7 +42,7 @@ module.exports = async (ctx, next) => {
   let ip = '';
   if(XFF !== '') {
     XFF = XFF.replace(/::ffff:/ig, '');
-    const [ip_] = XFF.split(':');
+    const [ip_] = XFF.split(',');
     if(ip_) ip = ip_;
   }
   try{

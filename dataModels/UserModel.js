@@ -416,50 +416,82 @@ userSchema.methods.getUsersThreads = async function() {
   return await ThreadModel.extendThreads(threads);
 };
 
-userSchema.methods.extend = async function(options) {
-  const ExamsCategoryModel = mongoose.model('examsCategories');
-  let proExamsCategoriesId, pubExamsCategoriesId;
-  if(options) {
-    proExamsCategoriesId = options.proExamsCategoriesId;
-    pubExamsCategoriesId = options.pubExamsCategoriesId;
-  } else {
-    let categories = await ExamsCategoryModel.find({volume: 'B'}, {_id: 1});
-    proExamsCategoriesId = categories.map(c => c._id);
-    categories = await ExamsCategoryModel.find({volume: 'A'}, {_id: 1});
-    pubExamsCategoriesId = categories.map(c => c._id);
-  }
-  const UsersPersonalModel = mongoose.model('usersPersonal');
-  const SecretBehaviorModel = mongoose.model('secretBehaviors');
-  const ExamsPaperModel = mongoose.model('examsPapers');
-  const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
-  this.regPort = userPersonal.regPort;
-  this.regIP = userPersonal.regIP;
-  this.mobile = userPersonal.mobile;
-  this.nationCode = userPersonal.nationCode;
-  this.email = userPersonal.email;
-  this.unverifiedEmail = userPersonal.unverifiedEmail;
-  this.unverifiedMobile = userPersonal.unverifiedMobile;
-  // 判断注册类型
-  if(this.email) {
-	  const behavior = await SecretBehaviorModel.findOne({uid: this.uid, operationId: 'bindEmail'});
-	  if(behavior) {
-		  this.registerType = 'mobile';
-	  } else {
-		  this.registerType = 'email';
-	  }
-  } else {
-  	this.registerType = 'mobile';
-  }
-  // 获取b卷考试科目
-  const paperB = await ExamsPaperModel.findOne({uid: this.uid, passed: true, cid: {$in: proExamsCategoriesId}}).sort({toc: 1});
-  const paperA = await ExamsPaperModel.findOne({uid: this.uid, passed: true, cid: {$in: pubExamsCategoriesId}}).sort({toc: 1});
 
-  if(paperB) {
-    this.paperB = await ExamsCategoryModel.findOne({_id: paperB.cid});
+/*
+* 拓展多个用户的隐私信息 手机号、邮箱等
+* @param {[Object]} 用户对象组成的数组
+* @return {[Object]} 用户对象组成的数组
+* @author pengxiguaa 2020-9-18
+* */
+userSchema.statics.extendUsersSecretInfo = async (users) => {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  const ExamsCategoryModel = mongoose.model('examsCategories');
+  const ExamsPaperModel = mongoose.model('examsPapers');
+  const proExamsCategories = await ExamsCategoryModel.find({volume: 'B'});
+  const proExamsCategoriesObj = {}, proExamsCategoriesId = [];
+  for(const p of proExamsCategories) {
+    proExamsCategoriesId.push(p._id);
+    proExamsCategoriesObj[p._id] = p;
   }
-	if(paperA) {
-    this.paperA = await ExamsCategoryModel.findOne({_id: paperA.cid});
+  const pubExamsCategories = await ExamsCategoryModel.find({volume: 'A'});
+  const pubExamsCategoriesObj = {}, pubExamsCategoriesId = [];
+  for(const p of pubExamsCategories) {
+    pubExamsCategoriesId.push(p._id);
+    pubExamsCategoriesObj[p._id] = p;
   }
+  const usersId = [], usersObj = {};
+  for(const user of users) {
+    usersId.push(user.uid);
+    usersObj[user.uid] = user;
+  }
+  const usersPersonal = await UsersPersonalModel.find({uid: {$in: usersId}}, {
+    uid: 1, mobile: 1, nationCode: 1, email: 1, regIP: 1, regPort: 1,
+    unverifiedEmail: 1, unverifiedMobile: 1
+  });
+  const upObj = {};
+  usersPersonal.map(up => upObj[up.uid] = up);
+  const results = [];
+  for(const u of users) {
+    const user = u.toObject();
+    const up = upObj[user.uid];
+    if(!up) throwErr(500, `usersPersonal not found. uid: ${user.uid}`);
+    const {
+      mobile, nationCode, email, regIP,
+      regPort, unverifiedEmail, unverifiedMobile
+    } = up;
+    user.mobile = mobile;
+    user.nationCode = nationCode;
+    user.email = email;
+    user.regIP = regIP;
+    user.regPort = regPort;
+    user.unverifiedEmail = unverifiedEmail;
+    user.unverifiedMobile = unverifiedMobile;
+    if(user.volumeA) {
+      const paperA = await ExamsPaperModel.findOne({uid: user.uid, passed: true, cid: {$in: pubExamsCategoriesId}}).sort({toc: 1});
+      if(paperA) {
+        user.paperA = pubExamsCategoriesObj[paperA.cid];
+      }
+    }
+    if(user.volumeB) {
+      const paperB = await ExamsPaperModel.findOne({uid: user.uid, passed: true, cid: {$in: proExamsCategoriesId}}).sort({toc: 1});
+      if(paperB) {
+        user.paperB = proExamsCategories[paperB.cid];
+      }
+    }
+    results.push(user);
+  }
+  return results;
+};
+/*
+* 拓展单个用户的隐私信息 手机号、邮箱等
+* @param {Object} 用户对象
+* @return {Object} 用户对象
+* @author pengxiguaa 2020-9-18
+* */
+userSchema.statics.extendUserSecretInfo = async (user) => {
+  const UserModel = mongoose.model('users');
+  const users = await UserModel.extendUsersSecretInfo([user]);
+  return users[0];
 };
 
 userSchema.methods.extendRoles = async function() {
@@ -2153,4 +2185,48 @@ userSchema.statics.getNumberOfOtherUserOperation = async (uid) => {
     post: 0
   }: JSON.parse(data);
 };
+
+/*
+* 获取用户违规记录
+* @param {String} uid 用户ID
+* @return {[]}
+* @author pengxiguaa 2020-9-18
+* */
+userSchema.statics.getUserBadRecords = async (uid) => {
+  const UsersScoreLogModel = mongoose.model('usersScoreLogs');
+  const DelPostLogModel = mongoose.model('delPostLog');
+  const violationRecords = await UsersScoreLogModel.find({
+    uid,
+    operationId: 'violation'
+  }, {
+    toc: 1, description: 1
+  });
+  const toDraftOrRecycle = await DelPostLogModel.find({
+    delUserId: uid,
+    delType: {
+      $in: ['toDraft', 'toRecycle']
+    }
+  }, {
+    toc: 1, reason: 1, delType: 1
+  });
+  const results = [];
+  for(const r of violationRecords) {
+    const {toc, description} = r;
+    results.push({
+      toc,
+      reason: description,
+      type: '违规'
+    });
+  }
+  for(const d of toDraftOrRecycle) {
+    const {toc, delType, reason} = d;
+    results.push({
+      toc,
+      reason,
+      type: {'toDraft': '退修', 'toRecycle': '删除'}[delType]
+    });
+  }
+  return results;
+};
+
 module.exports = mongoose.model('users', userSchema);
