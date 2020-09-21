@@ -1,6 +1,6 @@
 const data = NKC.methods.getDataById('data');
 
-const app = new Vue({
+window.app = new Vue({
   el: '#app',
   data: {
     forumName: '',
@@ -53,6 +53,7 @@ const app = new Vue({
       const {forumCategories, forumSettings} = this;
       const {recycle} = forumSettings;
       const {checkString} = NKC.methods.checkData;
+      const forumsInfo = this.getForumsInfo();
       Promise.resolve()
         .then(() => {
           if(!recycle) throw '请输入回收站专业ID';
@@ -69,7 +70,7 @@ const app = new Vue({
             });
           }
 
-          return nkcAPI('/e/settings/forum', 'PUT', {fidArr, categories: forumCategories, recycle});
+          return nkcAPI('/e/settings/forum', 'PUT', {forumsInfo, categories: forumCategories, recycle});
         })
         .then(() => {
           sweetSuccess('保存成功');
@@ -102,6 +103,90 @@ const app = new Vue({
     },
     remove(index, arr) {
       arr.splice(index, 1);
+    },
+    getAllStyleInput() {
+
+    },
+    getInput() {
+      const input = document.getElementsByTagName('input');
+      const results = {
+        style: [],
+        allStyle: [],
+        cover: [],
+        allCover: [],
+        order: []
+      };
+      for(let i = 0; i < input.length; i++) {
+        const dom = $(input[i]);
+        const name = dom.attr('data-name');
+        if(name === 'forumThreadList') {
+          results.style.push(dom);
+        } else if(name === 'forumCover') {
+          results.cover.push(dom);
+        } else if(name === 'allThreadList') {
+          results.allStyle.push(dom);
+        } else if(name === 'allCover') {
+          results.allCover.push(dom);
+        } else if(name === 'forumOrder') {
+          results.order.push(dom);
+        }
+      }
+      return results;
+    },
+    selectAllThreadListStyle(t) {
+      const {style, allStyle} = this.getInput();
+      for(const d of style) {
+        const value = d.attr('value');
+        d.prop('checked', value === t);
+      }
+      for(const d of allStyle) {
+        const value = d.attr('value');
+        d.prop('checked', value === t);
+      }
+    },
+    selectAllCover(t) {
+      const {cover, allCover} = this.getInput();
+      for(const d of cover) {
+        const value = d.attr('value');
+        d.prop('checked', value === t);
+      }
+      for(const d of allCover) {
+        const value = d.attr('value');
+        d.prop('checked', value === t);
+      }
+    },
+    getForumsInfo() {
+      const {style, cover, order} = this.getInput();
+      const styleObj = {}, coverObj = {}, orderObj = {};
+      for(const s of style) {
+        if(!s.prop('checked')) continue;
+        const value = s.attr('value');
+        const fid = s.attr('data-fid');
+        styleObj[fid] = value;
+      }
+      for(const c of cover) {
+        if(!c.prop('checked')) continue;
+        const value = c.attr('value');
+        const fid = c.attr('data-fid');
+        coverObj[fid] = value;
+      }
+      for(const o of order) {
+        const fid = o.attr('data-fid');
+        orderObj[fid] = Number(o.val());
+      }
+      const results = [];
+      for(const fid in styleObj) {
+        if(!styleObj.hasOwnProperty(fid)) continue;
+        results.push({
+          fid,
+          threadListStyle: {
+            type: styleObj[fid],
+            cover: coverObj[fid],
+          },
+          order: orderObj[fid]
+        });
+      }
+      return results;
     }
   }
 });

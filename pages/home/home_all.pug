@@ -7,34 +7,13 @@ block content
   mixin forumList(f)
     .home-forums-brief
       a.home-forums-parent(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
-      if f.childrenForums
+      if f.childrenForums && f.childrenForums
         span ：
         for cf, index in f.childrenForums
           if index !== 0
             span |
           //-style=`background-color: ${f.color}`
           a.home-forums-child(href=`/f/${cf.fid}` data-float-fid=cf.fid style=`background-color: ${hexToRgba(f.color, 0.1)}`)=cf.displayName
-  mixin forumList_1(f)
-    .home-forums-body
-      .home-forum-parent
-        a(href=`/f/${f.fid}` data-float-fid=f.fid).home-forum-panel
-          if f.logo
-            img.home-forum-panel-icon(src=tools.getUrl('forumLogo', f.logo))
-          else
-            .home-forum-panel-icon(style=`background-color: ${f.color}`)
-          .home-forum-panel-name
-            div
-              span=f.displayName
-      .home-forum-child
-        for cf in f.childrenForums || []
-          a(href=`/f/${cf.fid}` data-float-fid=cf.fid).home-forum-panel
-            if cf.logo
-              img.home-forum-panel-icon(src=tools.getUrl('forumLogo', cf.logo))
-            else
-              .home-forum-panel-icon(style=`background-color: ${cf.color}`)
-            .home-forum-panel-name
-              div
-                span=cf.displayName
   mixin detailedForumList(f, disableChild)
     -f.childrenForums = f.childrenForums || [];
     .detailed-forums-body

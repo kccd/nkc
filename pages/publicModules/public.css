@@ -1971,6 +1971,21 @@ span.thread-title-page{
   font-size: 1.25rem;
   font-style: oblique;
 }
+.forum-simple{
+  margin-bottom: 0.3rem;
+}
+.forum-simple .forum-parent{
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: inline-block;
+}
+.forum-simple .forum-child{
+  color: #000;
+  font-size: 1.2rem;
+  /*display: inline-block;*/
+  margin: 0 0.2rem;
+}
 .forum-block-button{
 
 }
