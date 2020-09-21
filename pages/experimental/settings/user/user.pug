@@ -1,0 +1,142 @@
+extends ../../experimental
+block eTitle
+  title 用户管理
+  +includeCSS('/experimental/settings/user/user.css')
+block eContent
+  .hidden#data=objToStr({users: data.users, roles: data.roles, searchType: data.searchType, searchContent: data.searchContent, t: data.t})
+  mixin managementDOM
+    .paging-button
+      a.button.radius-left(@click='selectAllUsers') 全选
+      a.button(@click='disableUsers("all", false)') 解封
+      a.button(@click='disableUsers("all", true)') 封禁
+      a.button(@click='hiddenUsersHome("all", false)') 显示名片
+      a.button.radius-right(@click='hiddenUsersHome("all", true)') 隐藏名片
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-12.m-b-1
+        ul.nav.nav-tabs
+          li(v-for='role in roles' :class=`{'active': '${data.t}' === role._id}`)
+            a(:href=`'/e/settings/user?t=' + role._id`) {{role.displayName}}
+      .col-xs-12.col-md-12.m-b-1
+        .form.form-inline
+          .form-group
+            select.form-control(v-model='searchType')
+              option(value='username') 用户名
+              option(value='uid') 用户ID
+              option(value='ip') IP
+          .form-group
+            input.form-control(type='text' v-model='searchContent' @keyup.enter='search')
+          .form-group
+            button.btn.btn-primary(@click='search' @keyup.enter='search') 搜索
+          .form-group
+            a.btn.btn-default(href='/e/settings/user') 重置
+      .col-xs-12.col-md-12
+        if data.paging.pageCount > 1
+          span.m-r-1
+            include ../../../publicModules/paging/paging
+        +managementDOM
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th.swd(@click='selectAllUsers')
+                  input(type='checkbox' :checked='isChecked').m-r-05
+                th 注册时间
+                th UID
+                th 用户名
+                th 证书
+                th A卷
+                th B卷
+                th IP
+                th 其他
+            tbody(v-for='u in users' :class="{'hidden-user-home': u.hidden}")
+              tr(:class="{'disabled': u.certs.includes('banned')}")
+                th.swd
+                  input(type='checkbox' :value='u.uid' v-model='selectedUsersId')
+                th.nwd {{format("YYYY-MM-DD HH:mm:ss", u.toc)}}
+                th.mwd
+                  a(:href="getUrl('userHome', u.uid)" target='_blank' :data-float-uid="u.uid") {{u.uid}}
+                th
+                  img.user-avatar(:src="getUrl('userAvatar', u.avatar)" :data-float-uid="u.uid")
+                  a(:href="getUrl('userHome', u.uid)" target="_blank" :data-float-uid="u.uid") {{u.username}}
+                th
+                  span(v-for='r in u.roles') {{r.displayName}}&nbsp;
+                th.mwd
+                  span(v-if='u.volumeA')
+                    span.text-success 通过({{u.paperA?u.paperA.name: '试卷丢失'}})
+                  span(v-else).text-danger 未通过
+                th.mwd
+                  span(v-if='u.volumeB')
+                    span.text-success 通过({{u.paperB?u.paperB.name: '试卷丢失'}})
+                  span(v-else).text-danger 未通过
+                th.nwd
+                  a(:href="getIpUrl(u.regIP)" target="_blank") {{u.regIP}}:{{u.regPort}}
+                th
+                  button.btn.btn-default.btn-xs(@click='disableUsers("one", false, u)' v-if='u.certs.includes("banned")') 解封
+                  button.btn.btn-default.btn-xs(@click='disableUsers("one", true, u)' v-else) 封禁
+                  button.btn.btn-default.btn-xs(v-if='u.hidden' @click='hiddenUsersHome("one", false, u)') 显名片
+                  button.btn.btn-default.btn-xs(v-else @click='hiddenUsersHome("one", true, u)') 隐名片
+                  button.btn.btn-default.btn-xs(@click='editUser(u)') 编辑
+                  button.btn.btn-default.btn-xs(@click='switchDetail(u)') 更多
+                    .fa.fa-caret-down(v-if='!u.showDetail')
+                    .fa.fa-caret-up(v-if='u.showDetail')
+              tr(v-if='u.showDetail')
+                th(colspan=100)
+                  .row
+                    .col-xs-12.col-md-6
+                      .form.form-horizontal
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 手机号：
+                          .col-sm-4.p-t-06
+                            span(v-if='u.nationCode === undefined') 无权查看
+                            span(v-else-if='u.nationCode && u.mobile') +{{u.nationCode}} {{u.mobile}}
+                            span(v-else) 无
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 邮箱：
+                          .col-sm-4.p-t-06
+                            span {{u.email || '无'}}
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 内容审核：
+                          .col-sm-4.p-t-06
+                            span 文章{{u.threadNeedReview? '需审': '免审'}}，回复{{u.postNeedReview? '需审': '免审'}}
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 文章数：
+                          .col-sm-4.p-t-06
+                            span 正常{{u.threadCount - u.disabledThreadsCount}} 被屏蔽{{u.disabledThreadsCount}}
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 回复数：
+                          .col-sm-4.p-t-06
+                            span 正常{{u.postCount - u.disabledPostsCount}} 被屏蔽{{u.disabledPostsCount}}
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 积分：
+                          .col-sm-4.p-t-06
+                            span(v-for='s, index in u.scores') {{index !== 0? ', ':''}}{{s.name}}{{s.number / 100}}{{s.unit}}
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 学术分：
+                          .col-sm-4.p-t-06
+                            span {{u.xsf}}
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 被拉黑数：
+                          .col-sm-4.p-t-06
+                            span {{u.blacklistCount.tCount}}
+                        .form-group.m-b-0
+                          label.col-sm-2.control-label 最后活动：
+                          .col-sm-4.p-t-06
+                            span {{format('YYYY-MM-DD HH:mm:ss', u.tlv)}}
+                    .col-xs-12.col-md-6
+                      span 不良记录：
+                        span(v-if='!u.badRecords.length') 无
+                      ul
+                        li(v-for='r in u.badRecords') {{format("YYYY-MM-DD HH:mm:ss", r.toc)}}&nbsp;
+                          span.text-danger {{r.type}}&nbsp;
+                          |{{r.reason}}
+        if data.paging.pageCount > 1
+          span.m-r-05
+            include ../../../publicModules/paging/paging_input
+        +managementDOM
+block scripts
+  include ../../../publicModules/moment
+  include ../../../publicModules/subscribeTypes/subscribeTypes
+  include ../../../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../../../publicModules/modifyAccountInfo
+  +includeJS('/experimental/settings/user/user.js')

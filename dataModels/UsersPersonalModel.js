@@ -61,6 +61,7 @@ const usersPersonalSchema = new Schema({
   },
   regIP: {
     type: String,
+		index: 1,
     default: '0.0.0.0'
   },
   regPort: {

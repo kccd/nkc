@@ -36,6 +36,9 @@ table{
 .m-t-05{
   margin-top: 0.5rem!important;
 }
+.m-t-08{
+  margin-top: 0.8rem!important;
+}
 .m-t-1{
   margin-top: 1rem!important;
 }
@@ -124,6 +127,12 @@ table{
 }
 .p-t-05{
   padding-top: 0.5rem;
+}
+.p-t-07{
+  padding-top: 0.7rem!important;
+}
+.p-t-06{
+  padding-top: 0.6rem!important;
 }
 .p-a-1{
   padding: 1rem;
