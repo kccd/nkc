@@ -34,6 +34,12 @@ block title
     include ../publicModules/plyr/plyr.css.pug
   if !state.isApp
     style=`body{background-color: ${(data.user?data.user.color:null) || state.serverSettings.backgroundColor}!important;`
+
+  style.
+    #wrap {
+      color: black;
+    }
+  
   mixin postOptions(post, targetThread, index, dropType)
     -dropType = dropType || "dropdown";
     .inline-block.post-options(style='margin-right: 0;color: #aaaaaa;' class=dropType)

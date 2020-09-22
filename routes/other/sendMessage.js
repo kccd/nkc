@@ -123,7 +123,8 @@ sendMessageRouter
 		// 添加一个未验证的手机号
 		await db.UsersPersonalModel.updateOne({uid: user.uid}, {
 			$set: {
-				unverifiedMobile: mobile
+				unverifiedMobile: mobile,
+				nationCode: nationCode
 			}
 		})
 		await next();

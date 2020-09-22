@@ -4361,3 +4361,8 @@ span[data-tag="nkcsource"][data-type="xsf"]>span:last-child{
     width: 17rem;
   }
 }
+
+
+.render-content {
+  line-height: 1.8;
+}
