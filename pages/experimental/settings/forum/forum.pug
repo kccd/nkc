@@ -79,37 +79,12 @@ block eContent
                     button.btn.btn-xs.btn-default(@click='remove(index, forumCategories)') 删除
           .m-t-1
             button.btn.btn-default(@click='addForumCategory') 添加分类
-        mixin renderForums(forums, paddingLeft)
-          -paddingLeft = paddingLeft || 0.5;
-          for f in forums
-            tr
-              th.order-th(style=`padding-left: ${paddingLeft}rem`)
-                input.order.m-r-1(value=f.order data-name='forumOrder' data-fid=f.fid)
-                a.forum-displayName(href=tools.getUrl('forumHome', f.fid) target="_blank" data-float-fid=f.fid).name=f.displayName
-              th
-                .radio
-                  label.m-r-05
-                    input(type='radio' value='abstract' data-name='forumThreadList' data-fid=f.fid checked=f.threadListStyle.type === 'abstract')
-                    span 摘要
-                  label.m-r-05
-                    input(type='radio' value='brief' data-name='forumThreadList' data-fid=f.fid checked=f.threadListStyle.type === 'brief')
-                    span 简略
-                  label
-                    input(type='radio' value='minimalist' data-name='forumThreadList' data-fid=f.fid checked=f.threadListStyle.type === 'minimalist')
-                    span 极简
-              th
-                .radio
-                  label.m-r-05
-                    input(type='radio' value='left' data-name='forumCover' data-fid=f.fid checked=f.threadListStyle.cover === 'left')
-                    span 左侧
-                  label.m-r-05
-                    input(type='radio' value='right' data-name='forumCover' data-fid=f.fid checked=f.threadListStyle.cover === 'right')
-                    span 右侧
-                  label
-                    input(type='radio' value='null' data-name='forumCover' data-fid=f.fid checked=f.threadListStyle.cover === 'null')
-                    span 不显示
-            +renderForums(f.childForums, paddingLeft + 2)
         h4 专业排序
+        .m-b-1
+          .checkbox
+            label(v-for='l in levels').m-r-1
+              input(type='checkbox' :value='l' v-model='selectedLevels' )
+              span 层级{{l}}
         .forums-order.m-b-2
           table.table.table-bordered
             thead
@@ -118,27 +93,53 @@ block eContent
                 th 文章列表模式
                   .radio
                     label.m-r-05
-                      input(type='radio' value='abstract' data-name='allThreadList' onclick='app.selectAllThreadListStyle("abstract")')
+                      input(type='radio' :checked="listTypeCount.abstract === forums.length" onclick='app.selectAllThreadListStyle("abstract")')
                       span 摘要
                     label.m-r-05
-                      input(type='radio' value='brief' data-name='allThreadList' onclick='app.selectAllThreadListStyle("brief")')
+                      input(type='radio' :checked="listTypeCount.brief === forums.length" onclick='app.selectAllThreadListStyle("brief")')
                       span 简略
                     label
-                      input(type='radio' value='minimalist' data-name='allThreadList' onclick='app.selectAllThreadListStyle("minimalist")')
+                      input(type='radio' :checked="listTypeCount.minimalist === forums.length" onclick='app.selectAllThreadListStyle("minimalist")')
                       span 极简
                 th 文章列表封面图
                   .radio
                     label.m-r-05
-                      input(type='radio' value='left' data-name='allCover' onclick='app.selectAllCover("left")')
+                      input(type='radio' :checked="coverCount.left === forums.length" onclick='app.selectAllCover("left")')
                       span 左侧
                     label.m-r-05
-                      input(type='radio' value='right' data-name='allCover' onclick='app.selectAllCover("right")')
+                      input(type='radio' :checked="coverCount.right === forums.length" onclick='app.selectAllCover("right")')
                       span 右侧
                     label
-                      input(type='radio' value='null' data-name='allCover' onclick='app.selectAllCover("null")')
+                      input(type='radio' :checked="coverCount.null === forums.length" onclick='app.selectAllCover("null")')
                       span 不显示
             tbody
-              +renderForums(data.forums)
+              tr(v-for='f in forums' v-if='selectedLevels.includes(f.level)')
+                th.order-th(:style="'padding-left:' + (f.level * 1.5) + 'rem;'")
+                  input.order.m-r-1(type='text' v-model.number='f.order')
+                  a.forum-displayName(:href="getUrl('forumHome', f.fid)" target="_blank" :data-float-fid="f.fid").name {{f.displayName}}
+                th
+                  .radio
+                    label.m-r-05
+                      input(type='radio' value='abstract' v-model='f.threadListStyle.type')
+                      span 摘要
+                    label.m-r-05
+                      input(type='radio' value='brief' v-model='f.threadListStyle.type')
+                      span 简略
+                    label
+                      input(type='radio' value='minimalist' v-model='f.threadListStyle.type')
+                      span 极简
+                th
+                  .radio
+                    label.m-r-05
+                      input(type='radio' value='left' v-model='f.threadListStyle.cover')
+                      span 左侧
+                    label.m-r-05
+                      input(type='radio' value='right' v-model='f.threadListStyle.cover')
+                      span 右侧
+                    label
+                      input(type='radio' value='null' v-model='f.threadListStyle.cover')
+                      span 不显示
+              //+renderForums(data.forums)
         .m-t-05
           button.btn.btn-primary(@click='save') 保存
 block scripts

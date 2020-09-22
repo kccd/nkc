@@ -1,10 +1,30 @@
 const data = NKC.methods.getDataById('data');
 
+const forums = [];
+
+const levels = [];
+
+const func = (arr, level = 1) => {
+  const index = levels.indexOf(level);
+  if(index === -1) levels.push(level);
+  for(const f of arr) {
+    f.level = level;
+    forums.push(f);
+    if(f.childForums && f.childForums.length) {
+      func(f.childForums, level + 1);
+    }
+  }
+};
+
+func(data.forums);
+
 window.app = new Vue({
   el: '#app',
   data: {
+    levels,
+    selectedLevels: levels,
     forumName: '',
-    forums: data.forums,
+    forums,
     forumSettings: data.forumSettings,
     forumCategories: data.forumCategories,
     updating: false,
@@ -13,6 +33,32 @@ window.app = new Vue({
     setTimeout(() => {
       floatForumPanel.initPanel();
     }, 500)
+  },
+  computed: {
+    listTypeCount() {
+      const {forums} = this;
+      const type = {
+        abstract: 0,
+        brief: 0,
+        minimalist: 0
+      };
+      for(const f of forums) {
+        type[f.threadListStyle.type] ++;
+      }
+      return type;
+    },
+    coverCount() {
+      const {forums} = this;
+      const type = {
+        left: 0,
+        right: 0,
+        "null": 0
+      };
+      for(const f of forums) {
+        type[f.threadListStyle.cover] ++;
+      }
+      return type;
+    }
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
@@ -104,9 +150,6 @@ window.app = new Vue({
     remove(index, arr) {
       arr.splice(index, 1);
     },
-    getAllStyleInput() {
-
-    },
     getInput() {
       const input = document.getElementsByTagName('input');
       const results = {
@@ -134,59 +177,31 @@ window.app = new Vue({
       return results;
     },
     selectAllThreadListStyle(t) {
-      const {style, allStyle} = this.getInput();
-      for(const d of style) {
-        const value = d.attr('value');
-        d.prop('checked', value === t);
-      }
-      for(const d of allStyle) {
-        const value = d.attr('value');
-        d.prop('checked', value === t);
+      const {forums} = this;
+      for(const f of forums) {
+        f.threadListStyle.type = t;
       }
     },
     selectAllCover(t) {
-      const {cover, allCover} = this.getInput();
-      for(const d of cover) {
-        const value = d.attr('value');
-        d.prop('checked', value === t);
-      }
-      for(const d of allCover) {
-        const value = d.attr('value');
-        d.prop('checked', value === t);
+      const {forums} = this;
+      for(const f of forums) {
+        f.threadListStyle.cover = t;
       }
     },
     getForumsInfo() {
-      const {style, cover, order} = this.getInput();
-      const styleObj = {}, coverObj = {}, orderObj = {};
-      for(const s of style) {
-        if(!s.prop('checked')) continue;
-        const value = s.attr('value');
-        const fid = s.attr('data-fid');
-        styleObj[fid] = value;
-      }
-      for(const c of cover) {
-        if(!c.prop('checked')) continue;
-        const value = c.attr('value');
-        const fid = c.attr('data-fid');
-        coverObj[fid] = value;
-      }
-      for(const o of order) {
-        const fid = o.attr('data-fid');
-        orderObj[fid] = Number(o.val());
-      }
+      const {forums} = this;
       const results = [];
-      for(const fid in styleObj) {
-        if(!styleObj.hasOwnProperty(fid)) continue;
+      for(const forum of forums) {
         results.push({
-          fid,
+          fid: forum.fid,
           threadListStyle: {
-            type: styleObj[fid],
-            cover: coverObj[fid],
+            type: forum.threadListStyle.type,
+            cover: forum.threadListStyle.cover,
           },
-          order: orderObj[fid]
+          order: forum.order
         });
       }
       return results;
-    }
+    },
   }
 });
