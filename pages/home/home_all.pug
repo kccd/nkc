@@ -7,7 +7,7 @@ block content
   mixin forumList(f)
     .home-forums-brief
       a.home-forums-parent(href=`/f/${f.fid}` data-float-fid=f.fid)=f.displayName
-      if f.childrenForums && f.childrenForums
+      if f.childrenForums && f.childrenForums.length
         span ：
         for cf, index in f.childrenForums
           if index !== 0
