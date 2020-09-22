@@ -63,7 +63,7 @@ block eContent
                   span(v-for='r in u.roles') {{r.displayName}}&nbsp;
                 th.mwd
                   span(v-if='u.volumeA')
-                    span.text-success 通过({{u.paperA?u.paperA.name: '试卷丢失'}})
+                    span.text-success 通过({{u.paperA?u.paperA.name: '试卷丢失或已过B卷'}})
                   span(v-else).text-danger 未通过
                 th.mwd
                   span(v-if='u.volumeB')

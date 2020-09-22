@@ -94,11 +94,7 @@ block content
                   span.nav-delimiter >
                   a.nav-link(href=`/f/${fid}${cid !== undefined ? `?cat=${cid}` : ''}` data-float-fid=fid)= name
               .thread-nav-right
-                if data.forum.childrenForums && data.forum.childrenForums.length > 0
-                  span 细分专业：
-                  for f in data.forum.childrenForums
-                    a.m-r-05(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
-                else
+                if !data.forum.childrenForums || !data.forum.childrenForums.length
                   if !data.user
                     button.forum-post-button.btn.btn-default.btn-xs(onclick='NKC.methods.toLogin()')
                       .fa.fa-pencil-square-o
@@ -111,6 +107,21 @@ block content
                     a.forum-post-button.btn.btn-default.btn-xs(href=`/editor?type=forum&id=${data.forum.fid}` target="_blank")
                       .fa.fa-pencil-square-o
                       | &nbsp;发表文章
+                else
+                  span 细分专业：
+                  for f in data.forum.childrenForums
+                    a.child-forum-panel(href=`/f/${f.fid}` data-float-fid=f.fid style=`background-color: ${f.color}`)= f.displayName
+        //-if data.forum.childrenForums && data.forum.childrenForums.length
+          .m-b-1
+            .panel-header 细分专业
+            //span 细分专业：
+            for f in data.forum.childrenForums
+              .child-forum-panel
+                if f.logo
+                  img.child-forum-avatar(src=tools.getUrl('forumLogo', f.logo))
+                else
+                  .child-forum-avatar(style=`background-color: ${f.color}`)
+                a.m-r-05(href=`/f/${f.fid}` data-float-fid=f.fid)= f.displayName
         if data.type === "latest"
           div
             .m-b-1

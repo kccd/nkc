@@ -7,6 +7,9 @@ var Tools = function() {
     var t = "?c=" + type;
     if(size) t += "&t=" + size;
     switch(type) {
+      case 'forumHome': {
+        return "/f/" + id
+      }
       case "userAvatar": {
         return "/a/" + id + t
       }

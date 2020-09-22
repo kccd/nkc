@@ -1460,6 +1460,7 @@ footer.footer ul li{
   transition: border-bottom 200ms;
 }
 .thread-panel-brief-replay{
+  float: right;
   display: inline-block;
   color: #aaa;
   font-size: 1rem;
@@ -1485,15 +1486,16 @@ footer.footer ul li{
   color: #aaa;
 }
 .thread-panel-body.brief .thread-panel-author img{
-  height: 3rem;
+  height: 3.2rem;
   margin-top: 0px;
-  width: 3rem;
+  width: 3.2rem;
   border-radius: 3px;
 }
 .thread-panel-body.brief .thread-panel-content{
   position: relative;
   width: 100%;
   padding-left: 3.8rem;
+  display: block;
 }
 .thread-panel-body.brief .thread-panel-author-avatar{
   position: absolute;
@@ -1501,14 +1503,14 @@ footer.footer ul li{
   top: 0.2rem;
 }
 .thread-panel-body.brief  .thread-panel-author-info{
-
+  overflow: hidden;
 }
 .thread-panel-body.brief .thread-panel-author a, .thread-panel-body.brief .thread-panel-forum a{
   font-weight: normal;
   color: #aaa;
 }
 .thread-panel-body.brief .thread-panel-title .title-content{
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: normal;
   color: #000;
 }
@@ -1817,7 +1819,7 @@ span.thread-title-page{
   margin-right: 3px;
   color: white;
   background-color: #2b90d9;
-  display: inline;
+  display: inline-block;
   font-size: 13px;
   padding: 2px 5px;
   line-height: 1;
@@ -1970,6 +1972,21 @@ span.thread-title-page{
 .forum-block-name.parent{
   font-size: 1.25rem;
   font-style: oblique;
+}
+.forum-simple{
+  margin-bottom: 0.3rem;
+}
+.forum-simple .forum-parent{
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: inline-block;
+}
+.forum-simple .forum-child{
+  color: #000;
+  font-size: 1.2rem;
+  /*display: inline-block;*/
+  margin: 0 0.2rem;
 }
 .forum-block-button{
 

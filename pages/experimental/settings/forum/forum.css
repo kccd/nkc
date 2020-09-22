@@ -19,3 +19,19 @@
   margin-top: 0.5rem;
   text-align: center;
 }
+.forums-order .radio {
+  margin: 0!important;
+}
+.forums-order th {
+  padding-top: 2px!important;
+  padding-bottom: 2px!important;
+}
+.forums-order input.order {
+  width: 5rem;
+}
+.forums-order .child {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.forums-order .child .forum-displayName {
+  padding: 2rem;
+}

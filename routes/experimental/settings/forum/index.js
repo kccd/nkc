@@ -1,9 +1,33 @@
 const Router = require('koa-router');
 const router = new Router();
 router
+	.use('/', async (ctx, next) => {
+		const {db, data} = ctx;
+		const allForums = await db.ForumModel.find({}).sort({order: 1});
+		const forumChild = {};
+		const _forums = [];
+		for(const f of allForums) {
+			const forum = f.toObject();
+			_forums.push(forum);
+			if(forumChild[forum.fid]) {
+				forum.childForums = forumChild[forum.fid];
+			} else {
+				forum.childForums = [];
+				forumChild[forum.fid] = forum.childForums;
+			}
+			for(const pfid of forum.parentsId) {
+				if(!forumChild[pfid]) {
+					forumChild[pfid] = [];
+				}
+				forumChild[pfid].push(forum);
+			}
+		}
+		data.forums = _forums.filter(f => !f.parentsId.length);
+		data.allForums = allForums;
+		await next();
+	})
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
-		data.forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
 		data.forumSettings = await db.SettingModel.getSettings('forum');
 		data.forumCategories = await db.ForumCategoryModel.find().sort({order: 1});
 		data.type = 'forum';
@@ -16,25 +40,52 @@ router
 		await next();
 	})
 	.put('/', async (ctx, next) => {
-		const {db, body, nkcModules} = ctx;
+		const {db, body, nkcModules, data} = ctx;
+		const {allForums, forums} = data;
 		const {checkString} = nkcModules.checkData;
-		const {fidArr, categories, recycle} = body;
-		const forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
+		const {forumsInfo, categories, recycle} = body;
 		if(!recycle) ctx.throw(400, '回收站专业ID不能为空');
 		const forum = await db.ForumModel.findOne({fid: recycle});
 		if(!forum) ctx.throw(400, `回收站专业不存在 fid: ${recycle}`);
-		if(fidArr.length !== forums.length) {
-			ctx.throw(400, '参数错误');
+		if(forumsInfo.length !== allForums.length) {
+			ctx.throw(400, '专业数目错误，请刷新后再试');
 		}
-		for(let forum of forums) {
-			if(!fidArr.includes(forum.fid)) {
-				ctx.throw(400, '参数错误');
+		const forumsId = allForums.map(f => f.fid);
+		for(let forum of forumsInfo) {
+			if(!forumsId.includes(forum.fid)) {
+				ctx.throw(400, `专业ID错误 fid: ${forum.fid}`);
 			}
 		}
-		for(let forum of forums) {
-			const order = fidArr.indexOf(forum.fid) + 1;
-			await forum.update({order});
+		const forumsInfoObj = {};
+		forumsInfo.map(f => forumsInfoObj[f.fid] = f);
+
+		const updateForumInfo = async (arr) => {
+			let info = [];
+			for(const a of arr) {
+				info.push(forumsInfoObj[a.fid]);
+				if(a.childForums && a.childForums.length) {
+					await updateForumInfo(a.childForums);
+				}
+			}
+			info = info.sort((a, b) => {
+				return a.order > b.order? 1: -1
+			});
+			for(let i = 0; i < info.length; i++) {
+				const f = info[i];
+				await db.ForumModel.updateOne({fid: f.fid}, {
+					$set: {
+						threadListStyle: {
+							type: f.threadListStyle.type,
+							cover: f.threadListStyle.cover
+						},
+						order: (i + 1) * 10
+					}
+				});
+			}
 		}
+
+		await updateForumInfo(forums);
+
 		const cid = [];
 		if(!categories.length) ctx.throw(400, '专业分类不能为空');
 		for(let i = 0; i < categories.length; i ++) {

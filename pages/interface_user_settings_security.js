@@ -144,7 +144,7 @@ var app = new Vue({
 
     oldEmailCode: "",
     newEmail: data.unverifiedEmail,
-    newEmailCode: '',
+    newEmailCode: data.nationCode,
 
     newTime: 0,
     oldTime: 0
@@ -261,7 +261,7 @@ var mobileApp = new Vue({
     mobile: data.mobile,
     formType: !data.mobile? "bind": "",
     newMobile: data.unverifiedMobile,
-    newNationCode: "86",
+    newNationCode: data.nationCode || nationCode,
     newCode: "",
     oldCode: "",
 

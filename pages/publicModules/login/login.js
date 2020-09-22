@@ -82,19 +82,33 @@ NKC.modules.Login = function() {
             }
           }
           this.submitting = true;
+          // new Promise(function(resolve, reject){
+          //   var captcha1 = new TencentCaptcha('2065720350', resolve);
+          //   captcha1.show(); // 显示验证码
+          // })
+          // .then(function(res) {
+          //   if(res.ret !== 0) {
+          //     throw {error: "你取消了登录"};
+          //   }
+          //   console.log("验证码返回数据", res);
+          //   debugger;
+          // })
+          // .then(function() {
+          //   return nkcAPI("/login", "POST", body);
+          // })
           nkcAPI("/login", "POST", body)
-            .then(function() {
-              this_.succeed = true;
-              if(NKC.configs.isApp) {
-                NKC.methods.rn.emit("login")
-              } else {
-                window.location.reload();
-              }
-            })
-            .catch(function(data) {
-              throwError(data);
-              this_.submitting = false;
-            })
+          .then(function() {
+            this_.succeed = true;
+            if(NKC.configs.isApp) {
+              NKC.methods.rn.emit("login")
+            } else {
+              window.location.reload();
+            }
+          })
+          .catch(function(data) {
+            throwError(data);
+            this_.submitting = false;
+          })
         } else {
           if(!nationCode) return throwError("请选择国际区号");
           if(!mobile) return throwError("请输入手机号");
