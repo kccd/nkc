@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const loginBehaviorMap = require("../../tools/loginBehaviorMap");
 const loginRouter = new Router();
 loginRouter
 	.use('/', async (ctx, next) => {
@@ -22,7 +23,10 @@ loginRouter
 
 		let user;
 		let userPersonal;
-		let {password, username, mobile, nationCode, code, imgCode} = body;
+		let {password, username, mobile, nationCode, code, imgCode, behavior} = body;
+
+		// 生成登录行为图
+		// loginBehaviorMap(behavior);
 
 		const behaviorOptions = {
 			type: "login",

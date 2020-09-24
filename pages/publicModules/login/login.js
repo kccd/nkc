@@ -1,4 +1,4 @@
-var timeout;
+var timeout, loginBehavior = [];
 NKC.modules.Login = function() {
   var self = this;
   self.dom = $("#moduleLogin");
@@ -23,7 +23,7 @@ NKC.modules.Login = function() {
       error: "",
       info : "",
       submitting: false,
-      succeed: false,
+      succeed: false
     },
     methods: {
       selectCategory: function(category) {
@@ -56,7 +56,8 @@ NKC.modules.Login = function() {
             if(!password) return throwError("请输入密码");
             body = {
               username: username,
-              password: password
+              password: password,
+              behavior: loginBehavior
             };
           } else if(category === "mobile") {
             if(!nationCode) return throwError("请选择国际区号");
@@ -78,24 +79,10 @@ NKC.modules.Login = function() {
               nationCode: nationCode,
               mobile: mobile,
               imgCode: imgCode,
-              code: code
+              code: code,
             }
           }
           this.submitting = true;
-          // new Promise(function(resolve, reject){
-          //   var captcha1 = new TencentCaptcha('2065720350', resolve);
-          //   captcha1.show(); // 显示验证码
-          // })
-          // .then(function(res) {
-          //   if(res.ret !== 0) {
-          //     throw {error: "你取消了登录"};
-          //   }
-          //   console.log("验证码返回数据", res);
-          //   debugger;
-          // })
-          // .then(function() {
-          //   return nkcAPI("/login", "POST", body);
-          // })
           nkcAPI("/login", "POST", body)
           .then(function() {
             this_.succeed = true;
@@ -185,6 +172,7 @@ NKC.modules.Login = function() {
           })
       },
       close: function() {
+        loginBehavior.length = 0;
         if(NKC.configs.isApp) {
           NKC.methods.rn.emit("closeWebView");
         } else {
@@ -195,8 +183,33 @@ NKC.modules.Login = function() {
         self.dom.modal("show");
         self.app.type = type || "login";
         self.app.getSvgData();
+        self.app.startRecoredding();
+      },
+      // 开始记录用户行为
+      startRecoredding: function() {
+        var target = $(this.$el).find(".modal-content");
+        target.on("mousemove", function(e) {
+          console.log(e.originalEvent.clientX, e.originalEvent.clientY);
+          loginBehavior.push({
+            type: "mousemove",
+            x: e.originalEvent.clientX,
+            y: e.originalEvent.clientY
+          })
+        });
+        target.on("keydown", function(e) {
+          loginBehavior.push({
+            type: "keydown",
+            key: e.key
+          })
+        });
+        target.on("mousedown", function(e) {
+          loginBehavior.push({
+            type: "mousedown",
+            x: e.originalEvent.clientX,
+            y: e.originalEvent.clientY
+          })
+        })
       }
-
     }
   });
   self.open = self.app.open;
