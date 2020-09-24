@@ -1,0 +1,58 @@
+#moduleVerifications .modal-dialog {
+  margin: auto;
+  margin-top: 4rem;
+}
+#moduleVerifications .main-image,
+#moduleVerifications .secondary-image {
+  width: 300px;
+  overflow: hidden;
+  height: 40px;
+  display: inline-block;
+  position: relative;
+}
+#moduleVerifications .main-image div,
+#moduleVerifications .secondary-image div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+#moduleVerifications .main-image {
+  margin-bottom: 1px;
+}
+#moduleVerifications .vernier-caliper {
+  width: 320px;
+  user-select: none;
+  padding: 0 10px;
+  overflow: hidden;
+  border-radius: 3px;
+  background-color: #fff;
+  text-align: center;
+  margin: auto;
+}
+#moduleVerifications .question {
+  font-size: 1.3rem;
+  text-align: left;
+  padding: 2rem 1rem;
+}
+#moduleVerifications .question span {
+  font-weight: 700;
+}
+#moduleVerifications .images {
+  margin-bottom: 1rem;
+  font-size: 0;
+}
+#moduleVerifications .secondary-image {
+  position: relative;
+}
+#moduleVerifications .secondary-image img {
+  position: absolute;
+  user-select: none;
+  left: 0;
+  top: 0;
+}
+#moduleVerifications .button-content {
+  overflow: hidden;
+  padding: 1rem 0;
+}

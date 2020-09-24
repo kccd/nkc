@@ -23,6 +23,7 @@
     "ansi-escapes": "^4.3.1",
     "awesome-static": "^1.4.3",
     "bluebird": "^3.5.3",
+    "canvas": "^2.6.1",
     "chart.js": "^2.7.2",
     "cheerio": "^1.0.0-rc.3",
     "cli-cursor": "^3.1.0",
