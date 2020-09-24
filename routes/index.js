@@ -40,6 +40,7 @@ const nkcRouter = routers.nkc;
 const readerRouter = routers.reader;
 const stickerRouter = routers.sticker;
 const stickersRouter = routers.stickers;
+const verificationsRouter = routers.verifications;
 // 访问文库相关
 const libraryRouter = routers.library;
 const userAvatarRouter = routers.userAvatar;
@@ -105,4 +106,5 @@ router.use("/tools", siteToolsRouter.routes(), siteToolsRouter.allowedMethods())
 router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
+router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
 module.exports = router;

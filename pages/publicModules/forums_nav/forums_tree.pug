@@ -36,6 +36,16 @@ mixin renderForums(forums)
           .fa.fa-angle-down(onclick=`switchChildren("${forum.fid}", this)`)
           .forum-block-children(data-fid=forum.fid style="display: none")
               +renderForums(forum.childrenForums)
+mixin renderSimpleForums(forums)
+  for forum in forums
+    .forum-simple
+      a.forum-parent(href=tools.getUrl('forumHome', forum.fid) data-float-fid=forum.fid)=forum.displayName
+      for cf, index in forum.childrenForums
+        if index === 0
+          span ：
+        else
+          span |
+        a.forum-child(href=tools.getUrl('forumHome', forum.fid) data-float-fid=cf.fid style=`background-color: ${hexToRgba(cf.color, 0.1)}`)=cf.displayName
 
 if data.user && data.forum && state.subForums && state.subForums.length >0
   .m-b-1
@@ -75,11 +85,9 @@ for fc in state.categoryForums
   if fc.forums.length
     .m-b-1
       .panel-header(title=fc.description)=fc.name
-      +renderForums(fc.forums)
-//-
-  .m-b-1
-    .panel-header 话题
-    +renderForums(topics)
-  .m-b-1
-    .panel-header 学科
-    +renderForums(disciplines)
+      if fc.displayStyle === 'simple'
+        +renderSimpleForums(fc.forums)
+      else
+        +renderForums(fc.forums)
+
+

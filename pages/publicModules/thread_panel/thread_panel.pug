@@ -138,17 +138,10 @@ mixin displayPageCount
             .thread-panel-author
               span.anonymous-name= anonymousInfo.username
 
-          +displayForum
-
           .thread-panel-time=fromNow(thread.toc)
 
-          .thread-panel-button
-            if thread.firstPost.voteUp
-              .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
-            if thread.hits
-              .fa.fa-eye=` ${thread.hits}`
-            if thread.count
-              .fa.fa-comment=` ${thread.count}`
+          +displayForum
+
           if thread.from
             .thread-panel-from
               if thread.from === 'own'
@@ -163,6 +156,14 @@ mixin displayPageCount
                 span 收藏
               else if thread.from === 'subColumn'
                 span 关注的专栏
+
+          .thread-panel-button
+            if thread.firstPost.voteUp
+              .fa.fa-thumbs-up=` ${thread.firstPost.voteUp || ''}`
+            if thread.hits
+              .fa.fa-eye=` ${thread.hits}`
+            if thread.count
+              .fa.fa-comment=` ${thread.count}`
           if hasReply
             .thread-panel-brief-replay
               if !thread.lastPost.anonymous

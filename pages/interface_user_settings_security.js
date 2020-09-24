@@ -261,7 +261,7 @@ var mobileApp = new Vue({
     mobile: data.mobile,
     formType: !data.mobile? "bind": "",
     newMobile: data.unverifiedMobile,
-    newNationCode: data.nationCode,
+    newNationCode: data.nationCode || nationCode,
     newCode: "",
     oldCode: "",
 
