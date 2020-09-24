@@ -3,23 +3,6 @@
     margin: auto;
     margin-top: 4rem;
   }
-  .main-image, .secondary-image{
-    width: 300px;
-    overflow: hidden;
-    height: 40px;
-    display: inline-block;
-    position: relative;
-    div{
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 100%;
-    }
-  }
-  .main-image{
-    margin-bottom: 1px;
-  }
   .vernier-caliper{
     width: 320px;
     user-select: none;
@@ -29,27 +12,44 @@
     background-color: #fff;
     text-align: center;
     margin: auto;
-  }
-  .question{
-    font-size: 1.3rem;
-    text-align: left;
-    padding: 2rem 1rem;
-    //margin-bottom: 2rem;
-    span{
-      font-weight: 700;
+    .main-image, .secondary-image{
+      width: 300px;
+      overflow: hidden;
+      height: 40px;
+      display: inline-block;
+      position: relative;
+      div{
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+      }
     }
-  }
-  .images{
-    margin-bottom: 1rem;
-    font-size: 0;
-  }
-  .secondary-image{
-    position: relative;
-    img{
-      position: absolute;
-      user-select: none;
-      left: 0;
-      top: 0;
+    .main-image{
+      margin-bottom: 1px;
+    }
+    .question{
+      font-size: 1.3rem;
+      text-align: left;
+      padding: 2rem 1rem;
+      //margin-bottom: 2rem;
+      span{
+        font-weight: 700;
+      }
+    }
+    .images{
+      margin-bottom: 1rem;
+      font-size: 0;
+    }
+    .secondary-image{
+      position: relative;
+      img{
+        position: absolute;
+        user-select: none;
+        left: 0;
+        top: 0;
+      }
     }
   }
   .button-content{

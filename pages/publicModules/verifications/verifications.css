@@ -2,25 +2,6 @@
   margin: auto;
   margin-top: 4rem;
 }
-#moduleVerifications .main-image,
-#moduleVerifications .secondary-image {
-  width: 300px;
-  overflow: hidden;
-  height: 40px;
-  display: inline-block;
-  position: relative;
-}
-#moduleVerifications .main-image div,
-#moduleVerifications .secondary-image div {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-}
-#moduleVerifications .main-image {
-  margin-bottom: 1px;
-}
 #moduleVerifications .vernier-caliper {
   width: 320px;
   user-select: none;
@@ -31,22 +12,41 @@
   text-align: center;
   margin: auto;
 }
-#moduleVerifications .question {
+#moduleVerifications .vernier-caliper .main-image,
+#moduleVerifications .vernier-caliper .secondary-image {
+  width: 300px;
+  overflow: hidden;
+  height: 40px;
+  display: inline-block;
+  position: relative;
+}
+#moduleVerifications .vernier-caliper .main-image div,
+#moduleVerifications .vernier-caliper .secondary-image div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+#moduleVerifications .vernier-caliper .main-image {
+  margin-bottom: 1px;
+}
+#moduleVerifications .vernier-caliper .question {
   font-size: 1.3rem;
   text-align: left;
   padding: 2rem 1rem;
 }
-#moduleVerifications .question span {
+#moduleVerifications .vernier-caliper .question span {
   font-weight: 700;
 }
-#moduleVerifications .images {
+#moduleVerifications .vernier-caliper .images {
   margin-bottom: 1rem;
   font-size: 0;
 }
-#moduleVerifications .secondary-image {
+#moduleVerifications .vernier-caliper .secondary-image {
   position: relative;
 }
-#moduleVerifications .secondary-image img {
+#moduleVerifications .vernier-caliper .secondary-image img {
   position: absolute;
   user-select: none;
   left: 0;
