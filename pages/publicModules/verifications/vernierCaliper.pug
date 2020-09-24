@@ -10,9 +10,4 @@
         )
       //img(:src='vernierCaliper.data.secondaryImageBase64'
         //:style='"margin-left: " + (vernierCaliper.left) + "px;"')
-  .button-content
-    .pull-left
-      button.btn.btn-default(@click='getData') 重置
-    .pull-right
-      button.btn.btn-default(@click='close') 关闭
-      button.btn.btn-primary(@click='submit') 确定
+  include ./buttons
