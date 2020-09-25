@@ -15,7 +15,7 @@ block scripts
   include ../publicModules/verifications/verifications
   script.
     var v = new NKC.modules.Verifications();
-    v.open(function(data) {
-      console.log(data);
-    });
+    v.open()
+    .then(console.log)
+    .catch(console.error)
 

@@ -743,5 +743,6 @@
   "experimentalResourceLogs": "后台管理 - 附件上传记录",
 
   "donwloadNeedScore": "询问下载此附件是否需要积分",
-  "getVerifications": "获取验证码（游标卡尺、图形点选、图形旋转）"
+  "getVerifications": "获取验证码（游标卡尺、图形点选、图形旋转）",
+  "experimentalVerificationSettings": "后台管理 - 图形验证"
 }

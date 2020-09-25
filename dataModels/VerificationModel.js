@@ -108,12 +108,14 @@ schema.methods.verifyBaseInfo = async function() {
 * */
 schema.statics.getVerificationData = async (options) => {
   const verifications = require('../nkcModules/verification');
-  const types = Object.keys(verifications);
+  const SettingModel = mongoose.model('settings');
+  const verificationSettings = await SettingModel.getSettings('verification');
+  const types = verificationSettings.enabledTypes;
+  if(types.length === 0) return {type: 'unEnabled'};
   const type = types[Math.round(Math.random() * (types.length - 1))];
   const VerificationModel = mongoose.model('verifications');
   const data = await verifications[type].create();
   const {uid, ip, port} = options;
-  const SettingModel = mongoose.model('settings');
   const verification = VerificationModel({
     _id: SettingModel.newObjectId(),
     type,
@@ -157,13 +159,21 @@ schema.statics.verifyData = async (verificationData) => {
 schema.statics.verifySecret = async (options) => {
   const VerificationModel = mongoose.model('verifications');
   const {uid, ip, secret} = options;
-  const verification = await VerificationModel.findOne({
-    uid, ip, secret
-  });
-  if(!verification) await VerificationModel.throwFailedError();
-  if(verification.secretUsed) await VerificationModel.throwFailedError();
-  if(Date.now() - verification.toc > secretTimeout) await VerificationModel.throwFailedError();
-  await verification.update({secretUsed: true});
+  if(secret === 'unEnabled') {
+    // 未开启验证
+    const SettingModel = mongoose.model('settings');
+    const verificationSettings = await SettingModel.getSettings('verification');
+    if(verificationSettings.enabledTypes.length !== 0) await VerificationModel.throwFailedError();
+  } else {
+    // 已开启验证
+    const verification = await VerificationModel.findOne({
+      uid, ip, secret
+    });
+    if(!verification) await VerificationModel.throwFailedError();
+    if(verification.secretUsed) await VerificationModel.throwFailedError();
+    if(Date.now() - verification.toc > secretTimeout) await VerificationModel.throwFailedError();
+    await verification.update({secretUsed: true});
+  }
 }
 
 module.exports = mongoose.model('verifications', schema);

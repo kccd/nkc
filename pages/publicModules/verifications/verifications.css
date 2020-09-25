@@ -1,3 +1,7 @@
+#moduleVerifications {
+  z-index: 1150;
+  background-color: rgba(0, 0, 0, 0.5);
+}
 #moduleVerifications .modal-dialog {
   margin: auto;
   margin-top: 4rem;
@@ -101,14 +105,48 @@
 #moduleVerifications .touch-captcha .secondary-image {
   position: relative;
 }
-#moduleVerifications .vernier-caliper .secondary-image img,
-#moduleVerifications .touch-captcha .secondary-image img {
+#moduleVerifications .vernier-caliper .secondary-image .fa,
+#moduleVerifications .touch-captcha .secondary-image .fa {
   position: absolute;
-  user-select: none;
-  left: 0;
-  top: 0;
+  font-size: 1.6rem;
+  color: #666;
+  bottom: 0;
+  cursor: pointer;
+  height: 1.4rem;
+  width: 1.4rem;
+  text-align: center;
+  line-height: 1.4rem;
+}
+#moduleVerifications .vernier-caliper .secondary-image .left,
+#moduleVerifications .touch-captcha .secondary-image .left {
+  left: 5px;
+}
+#moduleVerifications .vernier-caliper .secondary-image .right,
+#moduleVerifications .touch-captcha .secondary-image .right {
+  right: 5px;
 }
 #moduleVerifications .button-content {
   overflow: hidden;
   padding: 1rem 0;
+}
+#moduleVerifications .loading {
+  text-align: center;
+  line-height: 10rem;
+  background-color: #fff;
+  position: relative;
+}
+#moduleVerifications .loading .loading-close {
+  position: absolute;
+  line-height: 3rem;
+  font-size: 1.3rem;
+  text-align: center;
+  top: 0;
+  right: 0;
+  height: 3rem;
+  width: 3rem;
+  color: #333;
+}
+#moduleVerifications .loading .loading-close:hover {
+  background-color: red;
+  color: #fff;
 }

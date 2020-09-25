@@ -33,9 +33,18 @@ class Verifications {
         }
       },
       methods: {
-        getData() {
+        getData(showModal = false) {
+          /*if(showModal) {
+            self.dom.modal('show');
+          }*/
           return nkcAPI(`/verifications`, 'GET')
             .then(data => {
+              if(data.verificationData.type === 'unEnabled') {
+                return self.done({secret: data.verificationData.type});
+              }
+              if(showModal) {
+                self.dom.modal('show');
+              }
               self.app.type = data.verificationData.type;
               self.app[self.app.type].data = data.verificationData;
               const initFunc = self.app[`${self.app.type}Init`];
@@ -46,14 +55,8 @@ class Verifications {
               sweetError(err);
             });
         },
-        open() {
-          this.getData()
-            .then(() => {
-              self.dom.modal('show');
-            })
-        },
         close() {
-          self.dom.modal('hide');
+          self.close();
         },
         vernierCaliperInit() {
           let tempLeft = 0;
@@ -71,6 +74,7 @@ class Verifications {
                 return e.screenX;
               }
             };
+
             const onMouseDown = (e) => {
               // console.log(`按下`, e);
               e.preventDefault();
@@ -96,6 +100,16 @@ class Verifications {
             document.addEventListener('touchmove', onMouseMove);
             document.addEventListener('touchend', onMouseUp);
 
+            const {moveLeft, moveRight} = this.$refs;
+            moveLeft.onclick = () => {
+              _this.vernierCaliper.answer --;
+              _this.vernierCaliper.tempLeft = _this.vernierCaliper.answer;
+            };
+            moveRight.onclick = () => {
+              _this.vernierCaliper.answer ++;
+              _this.vernierCaliper.tempLeft = _this.vernierCaliper.answer;
+            };
+
           }, 300);
         },
         touchCaptchaInit() {
@@ -119,7 +133,7 @@ class Verifications {
             verificationData
           })
             .then((data) => {
-              self.callback({
+              self.done({
                 secret: data.secret
               });
               self.close();
@@ -134,11 +148,35 @@ class Verifications {
     });
   }
   open(callback) {
-    this.callback = callback;
-    this.app.open();
+    if(callback) {
+      this.resolve = undefined;
+      this.reject = undefined;
+      this.callback = callback;
+      this.app.getData(true);
+    } else {
+      return new Promise((resolve, reject) => {
+        this.resolve = resolve;
+        this.reject = reject;
+        this.callback = undefined;
+        this.app.getData(true);
+      });
+    }
   }
   close() {
-    this.app.close();
+    const err = new Error('验证失败');
+    if(this.callback) {
+      this.callback(err);
+    } else {
+      this.reject(err);
+    }
+    this.dom.modal('hide');
+  }
+  done(res) {
+    if(this.callback) {
+      this.callback(undefined, res);
+    } else {
+      this.resolve(res);
+    }
   }
 }
 

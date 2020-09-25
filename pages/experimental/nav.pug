@@ -180,6 +180,9 @@
           if permission("experimentalRechargeSettings")
             li
               a(href=`/e/settings/recharge`) 充值/提现
+          if permission("experimentalVerificationSettings")
+            li
+              a(href=`/e/settings/verification`) 图形验证码
           <li role="separator" class="divider"></li>
           li
             a(href='/e/settings/home/notice') 网站首页
