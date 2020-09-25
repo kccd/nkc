@@ -57,7 +57,7 @@ NKC.modules.Login = function() {
             body = {
               username: username,
               password: password,
-              behavior: loginBehavior
+              // behavior: loginBehavior
             };
           } else if(category === "mobile") {
             if(!nationCode) return throwError("请选择国际区号");
@@ -183,7 +183,7 @@ NKC.modules.Login = function() {
         self.dom.modal("show");
         self.app.type = type || "login";
         self.app.getSvgData();
-        self.app.startRecoredding();
+        // self.app.startRecoredding();
       },
       // 开始记录用户行为
       startRecoredding: function() {

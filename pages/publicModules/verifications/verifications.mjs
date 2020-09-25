@@ -87,6 +87,9 @@ class Verifications {
 
           }, 300);
         },
+        touchCaptchaInit() {
+          console.log("初始化");
+        },
         submit() {
           const {data: verificationData, answer} = this[this.type];
           verificationData.answer = answer;

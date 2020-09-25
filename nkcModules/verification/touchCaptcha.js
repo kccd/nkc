@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path');
 const { createCanvas, loadImage } = require('canvas');
 
 // 文字库
@@ -76,10 +77,13 @@ async function makeCaptchaImage(){
   }
   ctx.putImageData(imageData, 0, 0);
 
-  const out = fs.createWriteStream('../tmp/captcha.png');
-  const stream = canvas.createPNGStream()
-  stream.pipe(out)
-  out.on('finish', () =>  console.log('The PNG file was created.'));
+  if(!global.NKC) {
+    let captchaTempImagePath = path.resolve(__dirname, "../../tmp/captcha.png");
+    const out = fs.createWriteStream(captchaTempImagePath);
+    const stream = canvas.createPNGStream();
+    stream.pipe(out)
+    out.on('finish', () =>  console.log('The PNG file was created.'));
+  }
 
   let answerSet = textInfoList.slice(0, 3);
   canvas.height
@@ -202,11 +206,11 @@ function markRound(info, ctx) {
 
 // 从public/captcha文件夹中随机获取一张图片
 async function getRandomBackgroundImage() {
-  let files = await fs.promises.readdir("../public/captcha");
+  let captchaImageDir = path.resolve(__dirname, "../../public/captcha");
+  let files = await fs.promises.readdir(captchaImageDir);
   let fileName = files[randomIn(files.length - 1, 0)];
-  return `../public/captcha/${fileName}`;
+  return `${captchaImageDir}/${fileName}`;
 }
-
 
 module.exports = {
   create: makeCaptchaImage,

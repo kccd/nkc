@@ -1,3 +1,4 @@
 module.exports = {
-  vernierCaliper: require('./vernierCaliper')
+  vernierCaliper: require('./vernierCaliper'),
+  touchCaptcha: require('./touchCaptcha')
 }

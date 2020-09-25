@@ -3,4 +3,6 @@
   .modal-dialog.modal-sm(role="document")#moduleVerificationsApp
     div(v-if='type === "vernierCaliper"')
       include ./vernierCaliper
+    div(v-if='type === "touchCaptcha"')
+      include ./touchCaptcha
 +includeJS('/publicModules/verifications/verifications.js')
