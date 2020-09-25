@@ -19,6 +19,17 @@ class Verifications {
             mainImageBase64: '',
             secondaryImageBase64: ''
           }
+        },
+        touchCaptcha: {
+          answer: [],
+          data: {
+            question: "",
+            image: {
+              base64: "",
+              width: 0,
+              height: 0
+            }
+          }
         }
       },
       methods: {
@@ -88,7 +99,18 @@ class Verifications {
           }, 300);
         },
         touchCaptchaInit() {
-          console.log("初始化");
+          let self = this;
+          this.touchCaptcha.answer.length = 0;
+        },
+        touchCaptchaClick(e) {
+          let {offsetX, offsetY, target} = e;
+          if(this.touchCaptcha.answer.length === 3) return;
+          this.touchCaptcha.answer.push({
+            x: offsetX - 10,
+            y: offsetY - 10,
+            w: target.width,
+            h: target.height
+          });
         },
         submit() {
           const {data: verificationData, answer} = this[this.type];
@@ -96,9 +118,9 @@ class Verifications {
           nkcAPI(`/verifications`, 'POST', {
             verificationData
           })
-            .then(() => {
+            .then((data) => {
               self.callback({
-                verificationData
+                secret: data.secret
               });
               self.close();
             })

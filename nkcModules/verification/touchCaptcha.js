@@ -99,15 +99,36 @@ async function makeCaptchaImage(){
 }
 
 // 验证点击位置
-function verify(captchaInfo, userPoints) {
+function verify(userAnswerInfo, captchaInfo) {
+  let {width: originWidth, height: originHeight} = captchaInfo.image;
+  let userPoints = userAnswerInfo.answer;
+  let answerPoints = captchaInfo.answer;
+  // 转换用户坐标到原始尺寸图像的坐标
+  userPoints = userPoints.map(point => {
+    let {w, h, x, y} = point;
+    if(w !== originWidth) {
+      point.x = originWidth * x / w;
+      delete point.w;
+    }
+    if(h !== originHeight) {
+      point.y = originHeight * y / h;
+      delete point.h;
+    }
+    return point;
+  });
+  console.log(userPoints);
+  console.log(answerPoints);
   // 计算用户点击点是否依次点击在了规定范围内
-  for(let index in captchaInfo) {
-    let {centerPoint, radius} = captchaInfo[index];
+  for(let index in answerPoints) {
+    let {centerPoint, radius} = answerPoints[index];
     let point = userPoints[index];
     let {abs, sqrt, pow} = Math;
     let distance = pow(sqrt(abs(centerPoint.x - point.x)) + sqrt(abs(centerPoint.y - point.y)), 2);
     if(distance === 0) return false;
-    if(distance > radius) return false; 
+    if(distance > radius) {
+      console.log(`点${index + 1}: 距离圆心 ${distance}，限制距离 ${radius}`)
+      return false
+    } 
   }
   return true;
 }
