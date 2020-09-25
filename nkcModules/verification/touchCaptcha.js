@@ -123,7 +123,7 @@ function verify(userAnswerInfo, captchaInfo) {
     if(distance > radius) {
       // console.log(`点${index + 1}: 距离圆心 ${distance}，限制距离 ${radius}`)
       return false
-    } 
+    }
   }
   return true;
 }
@@ -197,7 +197,7 @@ function drawText({
       y: textCenterY
     },
     // 文字的最大半径
-    radius: Math.sqrt(Math.pow(68 / 2, 2) + Math.pow(textBackgroundW / 2, 2)),
+    radius: Math.sqrt(Math.pow(68 / 2, 2) + Math.pow(textBackgroundW / 2, 2)) + 50,
     text
   }
 }
