@@ -136,10 +136,12 @@ resourceRouter
         data.enough = true;
         // 检测积分是否足够
         for(let score of myAllScore) {
-          if(score.number + operation[score.type] < 0) {
+          const operationScoreNumber = operation[score.type];
+          score.addNumber = operationScoreNumber;
+          if(operationScoreNumber >= 0) continue;
+          if(score.number + operationScoreNumber < 0) {
             data.enough = false;
           }
-          score.addNumber = operation[score.type];
         }
         data.myAllScore = myAllScore;
         data.rid = resource.rid;
@@ -248,104 +250,6 @@ resourceRouter
       await downloadLog.save();
     }
     await next();
-  })
-  // 询问下载附件是否需要积分
-  .get('/:rid/q', async (ctx, next) => {
-    const {query, params, data, db, fs, settings, nkcModules} = ctx;
-    const {rid} = params;
-    const resource = await db.ResourceModel.findOnly({rid, type: "resource"});
-    const {mediaType, ext} = resource;
-    if(mediaType !== "mediaAttachment") {
-      data.need = false;
-      return next();
-    }
-    const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
-      const {fileCountOneDay} = downloadOptions;
-      speed = downloadOptions.speed;
-      if(fileCountOneDay === 0) {
-        if(!data.user) {
-          ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
-        } else {
-          ctx.throw(403, '您当前账号等级无法下载附件，请发表优质内容提升等级。');
-        }
-      }
-      let downloadToday;
-      const match = {
-        toc: {
-          $gte: nkcModules.apiFunction.today()
-        }
-      };
-      if(!data.user) {
-        // 游客
-        match.ip = ctx.address;
-        match.uid = "";
-      } else {
-        // 已登录用户
-        match.uid = data.user.uid;
-      }
-      const logs = await db.DownloadLogModel.aggregate([
-        {
-          $match: match
-        },
-        {
-          $group: {
-            _id: "$rid",
-            count: {
-              $sum: 1
-            }
-          }
-        }
-      ]);
-      downloadToday = logs?logs.map(l => l._id): [];
-      if(!downloadToday.includes(resource.rid) && downloadToday.length >= fileCountOneDay) {
-        if(data.user) {
-          ctx.throw(403, "今日下载的附件数量已达上限，请明天再试。");
-        } else {
-          ctx.throw(403, `未登录用户每天只能下载${fileCountOneDay}个附件，请登录或注册后重试。`);
-        }
-      }
-
-      const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
-      const enabledScoreTypes = await db.SettingModel.getEnabledScoresType();
-      // 下载此附件是否需要积分状态位
-      let needScore = false;
-      // 此操作是否需要积分(更新状态位)
-      for(let typeName of enabledScoreTypes) {
-        let number = operation[typeName];
-        // 如果设置的操作花费的积分不为0才考虑扣积分
-        if(number !== 0) {
-          needScore = true;
-          break;
-        }
-      }
-      // 设置的次数为 0 表示关闭积分交易，不扣积分
-      if(operation.count === 0) needScore = false;
-      // 配置中下载需要积分
-      if(needScore) {
-        // 当前是游客
-        if(!data.user) {
-          ctx.throw(403, '你暂未登录，请登录或者注册后重试。');
-        }else {
-          let user = data.user;
-        // 当前是用户
-          // 此用户今日下载附件的总次数
-          let todayOperationCount = await db.ScoreOperationLogModel.getOperationLogCount(user, "attachmentDownload");
-          data.todayOperationCount = todayOperationCount;
-          // 此用户最后一次此附件的转账记录
-          let lastAttachmentDownloadLog = await db.ScoreOperationLogModel.getLastAttachmentDownloadLog(user, resource.rid);
-          let nowTime = new Date();
-          let lastAttachmentDownloadTime = lastAttachmentDownloadLog? lastAttachmentDownloadLog.toc : 0;
-          let howLongOneDay = 24 * 60 * 60 * 1000;
-          let howLongOneMinute =10* 1000;
-          data.resourceExpired = howLongOneDay;
-          // 如果最后一次下载到现在没有超过规定时间就不扣积分
-          if(nowTime - lastAttachmentDownloadTime <= data.resourceExpired /* 一分钟 */) needScore = false;
-          // 今日下载次数大于设置的次数 并且 设置的次数不为 -1 就不扣积分
-          if(todayOperationCount >= operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
-        }
-      }
-      data.need = needScore;
-      return next();
   })
   .post('/', async (ctx, next) => {
     const {db, data, nkcModules} = ctx;
