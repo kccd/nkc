@@ -1,6 +1,12 @@
-+includeCSS('/publicModules/verifications/verifications.css')
-.modal.fade#moduleVerifications(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
-  .modal-dialog.modal-sm(role="document")#moduleVerificationsApp
-    div(v-if='type === "vernierCaliper"')
-      include ./vernierCaliper
-+includeJS('/publicModules/verifications/verifications.js')
+if !isIncluded('verifications')
+  +includeCSS('/publicModules/verifications/verifications.css')
+  .modal.fade#moduleVerifications(tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+    .modal-dialog.modal-sm(role="document")#moduleVerificationsApp
+      div(v-if='type === "vernierCaliper"')
+        include ./vernierCaliper
+      div(v-else)
+        .loading.vernier-caliper
+          .fa.fa-remove.loading-close(@click='close')
+          | 加载中...
+          .fa.fa-spinner.fa-spin
+  +includeJS('/publicModules/verifications/verifications.js')

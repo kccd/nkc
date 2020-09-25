@@ -1,4 +1,6 @@
 #moduleVerifications {
+  z-index: 1150;
+  background-color: rgba(0,0,0,0.5);
   .modal-dialog{
     margin: auto;
     margin-top: 4rem;
@@ -44,11 +46,22 @@
     }
     .secondary-image{
       position: relative;
-      img{
+      .fa{
         position: absolute;
-        user-select: none;
-        left: 0;
-        top: 0;
+        font-size: 1.6rem;
+        color: #666;
+        bottom: 0;
+        cursor: pointer;
+        height: 1.4rem;
+        width: 1.4rem;
+        text-align: center;
+        line-height: 1.4rem;
+      }
+      .left{
+        left: 5px;
+      }
+      .right{
+        right: 5px;
       }
     }
   }
@@ -56,5 +69,27 @@
     overflow: hidden;
     padding: 1rem 0;
   }
+  .loading{
+    text-align: center;
+    line-height: 10rem;
+    background-color: #fff;
+    position: relative;
+    .loading-close{
+      position: absolute;
+      line-height: 3rem;
+      font-size: 1.3rem;
+      text-align: center;
+      top: 0;
+      right: 0;
+      height: 3rem;
+      width: 3rem;
+      color: #333;
+      &:hover{
+        background-color: red;
+        color: #fff;
+      }
+    }
+  }
+
 }
 

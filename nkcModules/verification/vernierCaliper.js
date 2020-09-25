@@ -122,7 +122,9 @@ function create() {
 }
 
 function verify(data, dataDB) {
-  console.log(data.answer, dataDB.answer);
+  if(global.NKC.NODE_ENV !== 'production') {
+    console.log(`上传：${data.answer}px 精准：${dataDB.answer}px`);
+  }
   return data.answer <= dataDB.answer + 1 && data.answer >= dataDB.answer - 1
 }
 

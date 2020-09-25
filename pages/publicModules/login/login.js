@@ -34,7 +34,7 @@ NKC.modules.Login = function() {
         this.type = type;
       },
       throwError: function(error) {
-        this.error = error.error || error;
+        this.error = error.error || error.message || error;
       },
       submit: function() {
         var throwError = this.throwError;
@@ -110,17 +110,27 @@ NKC.modules.Login = function() {
             this_.submitting = false;
           })
         } else {
+          if(!window.verifications) {
+            window.verifications = new NKC.modules.Verifications();
+          }
           if(!nationCode) return throwError("请选择国际区号");
           if(!mobile) return throwError("请输入手机号");
           if(!imgCode) return throwError("请输入图形验证码");
           if(!code) return throwError("请输入短信验证码");
           this.submitting = true;
-          nkcAPI("/register", "POST", {
-            nationCode: nationCode,
-            mobile: mobile,
-            code: code,
-            imgCode: imgCode
-          })
+          return Promise.resolve()
+            .then(function() {
+              return window.verifications.open();
+            })
+            .then(function(res) {
+              return nkcAPI("/register", "POST", {
+                secret: res.secret,
+                nationCode: nationCode,
+                mobile: mobile,
+                code: code,
+                imgCode: imgCode
+              })
+            })
             .then(function() {
               // window.location.reload();
               this_.succeed = true;

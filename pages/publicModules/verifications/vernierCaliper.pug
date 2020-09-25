@@ -8,6 +8,8 @@
       div(
         :style='"background-image: url(\'" + vernierCaliper.data.secondaryImageBase64 + "\');left: " + vernierCaliper.answer + "px;"'
         )
+      span.fa.fa-long-arrow-left.left(ref='moveLeft')
+      span.fa.fa-long-arrow-right.right(ref='moveRight')
       //img(:src='vernierCaliper.data.secondaryImageBase64'
         //:style='"margin-left: " + (vernierCaliper.left) + "px;"')
   include ./buttons
