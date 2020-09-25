@@ -5,6 +5,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
   //- class=post.pid===highlight?"highlight-dom":""
   //- 是否高亮
   div.single-post(id=(!disabledHighlight && post.pid===highlight)?"highlight":"")
+    -let showTimeStamp = false;
     if previousPost
       // 获取前一条post当天日期零点的时间戳
       -let prepostTimeStamp = new Date(previousPost.toc)
@@ -15,12 +16,18 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
       -postTimeStamp.setHours(0,0,0,0)
       -let postTimeStampStr = postTimeStamp.getTime()
       if postTimeStampStr > prepostTimeStampStr
-        div.single-post-time
-          div=format("YYYY-MM-DD HH:mm:ss", post.toc)
+        -showTimeStamp = true;
     // 如果两条评论日期时间跨度为24小时，则给第二条评论添加时间戳
     if !previousPost || (post.toc - previousPost.toc) > 24*60*60*1000
+      -showTimeStamp = true;
+    if hidePostTimeCount >= 4
+      -showTimeStamp = true;
+    if showTimeStamp
       div.single-post-time
-        div=post.toc.toLocaleString()
+        div=format("YYYY-MM-DD HH:mm:ss", post.toc)
+      -hidePostTimeCount = 0;
+    else
+      -hidePostTimeCount ++;
     .post-body.highlight(
       style=`${post.todraft?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`
     )

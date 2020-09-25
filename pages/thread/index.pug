@@ -7,6 +7,8 @@ block title
   meta#replytarget(value=`${data.replyTarget}`)
 
   -let modifyPostTimeLimit = 0;
+  //- 用于回复时间戳的显示
+  -let hidePostTimeCount = 0;
   for r in data.userRoles
     if r.modifyPostTimeLimit === -1
       -modifyPostTimeLimit = -1;
@@ -39,7 +41,7 @@ block title
     #wrap {
       color: black;
     }
-  
+
   mixin postOptions(post, targetThread, index, dropType)
     -dropType = dropType || "dropdown";
     .inline-block.post-options(style='margin-right: 0;color: #aaaaaa;' class=dropType)
