@@ -120,8 +120,8 @@ class Verifications {
           let {offsetX, offsetY, target} = e;
           if(this.touchCaptcha.answer.length === 3) return;
           this.touchCaptcha.answer.push({
-            x: offsetX - 10,
-            y: offsetY - 10,
+            x: offsetX,
+            y: offsetY,
             w: target.width,
             h: target.height
           });
