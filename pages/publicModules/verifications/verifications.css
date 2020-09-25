@@ -104,6 +104,7 @@
 #moduleVerifications .vernier-caliper .secondary-image,
 #moduleVerifications .touch-captcha .secondary-image {
   position: relative;
+  cursor: all-scroll;
 }
 #moduleVerifications .vernier-caliper .secondary-image .fa,
 #moduleVerifications .touch-captcha .secondary-image .fa {

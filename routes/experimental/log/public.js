@@ -28,7 +28,7 @@ router
       searchMap.operationId = c.operationId;
     }
     let logType = c.logType || "user";
-    data.c = encodeURIComponent(new Buffer(JSON.stringify(c)).toString('base64'));
+    data.c = encodeURIComponent(Buffer.from(JSON.stringify(c)).toString('base64'));
     let paging;
     data.result = [];
     if(!noopReturn) {
@@ -75,7 +75,7 @@ router
     }else if(del.logType === "visitor") {
       await db.VisitorLogModel.remove(delMap);
     }
-    
+
     await next();
   });
 module.exports = router;
