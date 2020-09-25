@@ -23,13 +23,16 @@ class Verifications {
       },
       methods: {
         getData(showModal = false) {
-          if(showModal) {
+          /*if(showModal) {
             self.dom.modal('show');
-          }
+          }*/
           return nkcAPI(`/verifications`, 'GET')
             .then(data => {
               if(data.verificationData.type === 'unEnabled') {
                 return self.done({secret: data.verificationData.type});
+              }
+              if(showModal) {
+                self.dom.modal('show');
               }
               self.app.type = data.verificationData.type;
               self.app[self.app.type].data = data.verificationData;
