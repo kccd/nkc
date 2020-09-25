@@ -1,16 +1,24 @@
+// 原始信息的过期时间 ms
+const baseInfoTimeout = 60 * 1000;
+// 加密串过期时间 ms
+const secretTimeout = 2 * 60 * 1000;
+
 const mongoose = require('../settings/database');
 const schema = new mongoose.Schema({
   _id: String,
+  // 验证的类型
   type: {
     type: String,
     required: 1,
     index: 1
   },
+  // 获取验证的用户ID
   uid: {
     type: String,
     default: '',
     index: 1
   },
+  // 获取验证的时间
   toc: {
     type: Date,
     default: Date.now,
@@ -25,10 +33,22 @@ const schema = new mongoose.Schema({
     type: String,
     default: '',
   },
-  disabled: {
+  // 是否已经对比过原始数据
+  used: {
     type: Boolean,
     default: false,
     index: 1
+  },
+  // 是否已经使用过验证通过后的加密串
+  secretUsed: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
+  secret: {
+    type: String,
+    index: 1,
+    default: ''
   },
   c: {
     type: mongoose.Schema.Types.Mixed,
@@ -39,17 +59,39 @@ const schema = new mongoose.Schema({
 });
 
 /*
+* 抛出验证失败的错误
+* */
+schema.statics.throwFailedError = async (message = '验证失败') => {
+  throwErr(400, message);
+};
+
+/*
+* 验证原始信息通过后生成加密串
+* */
+schema.statics.newSecret = async () => {
+  const apiFunction = require('../nkcModules/apiFunction');
+  const secret = apiFunction.getRandomString('aA0', 64);
+  const VerificationModel = mongoose.model('verifications');
+  const v = await VerificationModel.count({secret});
+  if(v !== 0) {
+    return await VerificationModel.newSecret();
+  } else {
+    return secret;
+  }
+};
+
+/*
 * 验证是否被使用过、或者是否超时
 * */
 schema.methods.verifyBaseInfo = async function() {
-  if(this.disabled) throwErr(400, '验证失败');
-  const timeout = 30 * 1000;
+  const VerificationModel = mongoose.model('verifications');
+  if(this.used) await VerificationModel.throwFailedError();
   let errorStr;
-  if(Date.now() - this.toc > timeout) {
+  if(Date.now() - this.toc > baseInfoTimeout) {
     errorStr = '验证失败';
   }
-  await this.update({disabled: true});
-  if(errorStr) throwErr(400, errorStr);
+  await this.update({used: true});
+  if(errorStr) await VerificationModel.throwFailedError();
 };
 
 
@@ -88,20 +130,40 @@ schema.statics.getVerificationData = async (options) => {
 }
 
 /*
-* 验证数据
+* 验证原始数据
 * */
 schema.statics.verifyData = async (verificationData) => {
   const VerificationModel = mongoose.model('verifications');
   const verifications = require('../nkcModules/verification');
+  const {_id, type, uid, ip} = verificationData;
   const verification = await VerificationModel.findOne({
-    _id: verificationData._id,
-    type: verificationData.type
+    _id, type, uid, ip
   });
-  if(!verification) throwErr(400, '验证失败');
+  if(!verification) await VerificationModel.throwFailedError();
   await verification.verifyBaseInfo();
   if(!verifications[verification.type].verify(verificationData, verification.c)) {
-    throwErr(400, `验证失败`);
+    await VerificationModel.throwFailedError();
   }
+  // 生成加密串
+  const secret = await VerificationModel.newSecret();
+  await verification.update({secret});
+  return secret;
+}
+
+
+/*
+* 验证加密串
+* */
+schema.statics.verifySecret = async (options) => {
+  const VerificationModel = mongoose.model('verifications');
+  const {uid, ip, secret} = options;
+  const verification = await VerificationModel.findOne({
+    uid, ip, secret
+  });
+  if(!verification) await VerificationModel.throwFailedError();
+  if(verification.secretUsed) await VerificationModel.throwFailedError();
+  if(Date.now() - verification.toc > secretTimeout) await VerificationModel.throwFailedError();
+  await verification.update({secretUsed: true});
 }
 
 module.exports = mongoose.model('verifications', schema);

@@ -10,9 +10,11 @@ router
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {body, db} = ctx;
+    const {body, db, data} = ctx;
     const {verificationData} = body;
-    await db.VerificationModel.verifyData(verificationData);
+    verificationData.ip = ctx.address;
+    verificationData.uid = data.user? data.user.uid: '';
+    data.secret = await db.VerificationModel.verifyData(verificationData);
     await next();
   });
 module.exports = router;

@@ -93,9 +93,9 @@ class Verifications {
           nkcAPI(`/verifications`, 'POST', {
             verificationData
           })
-            .then(() => {
+            .then((data) => {
               self.callback({
-                verificationData
+                secret: data.secret
               });
               self.close();
             })
