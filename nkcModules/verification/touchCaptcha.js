@@ -3,7 +3,7 @@ const path = require('path');
 const { createCanvas, loadImage } = require('canvas');
 
 // 文字库
-const chineseChars = "天地玄黄宇宙洪荒日月昃辰宿列张遐迩宾归王鸣凤在竹白驹食场容止若思安定".split("");
+const chineseChars = `天地玄黄宇宙洪荒日月辰宿列张来往秋收冬闰余成岁吕调阳云致雨结为金生丽水玉出昆冈剑号巨珠称夜光果珍菜芥海咸河淡羽翔龙师火帝鸟官人始制文字乃服衣推位让国有陶唐吊民伐罪周发汤坐朝问道拱平章臣伏戎一体率宾归王鸣凤在竹白驹食场化被草木及万方此身发四大五常恭惟养岂敢伤女贞洁男效才良知过必改得能莫忘谈彼短恃己长信使可器欲难悲丝染诗羔羊行贤克念作圣名立形表正`.split("");
 
 // 预选位置
 const predefinePosition = [
@@ -59,21 +59,13 @@ async function makeCaptchaImage(){
     if(Math.random() > 0.08) continue;
     // 随机灰度噪点
     let grayscale = Math.floor(Math.random() * (255 - 0) + 0);
-    data[i]     = grayscale; // red
-    data[i + 1] = grayscale; // green
-    data[i + 2] = grayscale; // blue
-    i += 4;
-    data[i]     = grayscale; // red
-    data[i + 1] = grayscale; // green
-    data[i + 2] = grayscale; // blue
-    i += 4;
-    data[i]     = grayscale; // red
-    data[i + 1] = grayscale; // green
-    data[i + 2] = grayscale; // blue
-    i += 4;
-    data[i]     = grayscale; // red
-    data[i + 1] = grayscale; // green
-    data[i + 2] = grayscale; // blue
+    Array(randomIn(20, 2)).fill().map(() => {
+      if(i > data.length) return;
+      data[i]     = grayscale; // red
+      data[i + 1] = grayscale; // green
+      data[i + 2] = grayscale; // blue
+      i += 1;
+    });
   }
   ctx.putImageData(imageData, 0, 0);
 
@@ -86,7 +78,6 @@ async function makeCaptchaImage(){
   }
 
   let answerSet = textInfoList.slice(0, 3);
-  canvas.height
   return {
     answer: answerSet,
     question: answerSet.map(ans => ans.text),
@@ -101,11 +92,15 @@ async function makeCaptchaImage(){
 // 验证点击位置
 function verify(userAnswerInfo, captchaInfo) {
   let {width: originWidth, height: originHeight} = captchaInfo.image;
-  let userPoints = userAnswerInfo.answer;
   let answerPoints = captchaInfo.answer;
   // 转换用户坐标到原始尺寸图像的坐标
-  userPoints = userPoints.map(point => {
+  let userPoints = userAnswerInfo.answer.map(point => {
     let {w, h, x, y} = point;
+    /**
+        原始x     原始宽度
+        ----  =  --------
+        实际x     实际宽度
+     */
     if(w !== originWidth) {
       point.x = originWidth * x / w;
       delete point.w;
@@ -114,10 +109,10 @@ function verify(userAnswerInfo, captchaInfo) {
       point.y = originHeight * y / h;
       delete point.h;
     }
+    // console.log(point);
     return point;
   });
-  console.log(userPoints);
-  console.log(answerPoints);
+  // console.log(answerPoints);
   // 计算用户点击点是否依次点击在了规定范围内
   for(let index in answerPoints) {
     let {centerPoint, radius} = answerPoints[index];
@@ -126,7 +121,7 @@ function verify(userAnswerInfo, captchaInfo) {
     let distance = pow(sqrt(abs(centerPoint.x - point.x)) + sqrt(abs(centerPoint.y - point.y)), 2);
     if(distance === 0) return false;
     if(distance > radius) {
-      console.log(`点${index + 1}: 距离圆心 ${distance}，限制距离 ${radius}`)
+      // console.log(`点${index + 1}: 距离圆心 ${distance}，限制距离 ${radius}`)
       return false
     } 
   }

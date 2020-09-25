@@ -4,7 +4,7 @@ if !isIncluded('verifications')
     .modal-dialog.modal-sm(role="document")#moduleVerificationsApp
       div(v-if='type === "vernierCaliper"')
         include ./vernierCaliper
-      div(v-if='type === "touchCaptcha"')
+      div(v-else-if='type === "touchCaptcha"')
         include ./touchCaptcha
       div(v-else)
         .loading.vernier-caliper

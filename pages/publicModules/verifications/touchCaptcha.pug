@@ -4,6 +4,6 @@
   .images
     .touch-captcha-image
       img(:src='touchCaptcha.data.image.base64' draggable="false" @click="touchCaptchaClick($event)")
-      .touch-captcha-user-point(v-for="(point, index) of touchCaptcha.answer" :style="'left: '+ point.x +'px;top: '+ point.y +'px'")
+      .touch-captcha-user-point(v-for="(point, index) of touchCaptcha.answer" :style="'left: '+ (point.x - 10) +'px;top: '+ (point.y - 10) +'px'")
         span.user-point-index {{index + 1}}
   include ./buttons
