@@ -43,6 +43,7 @@ const editorRouter = require("./editor");
 const rechargeRouter = require('./recharge');
 const userSensitiveRouter = require("./userSensitive");
 const userScoresRouter = require("./userScores");
+const verificationRouter = require('./verification');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -92,5 +93,6 @@ settingRouter
 	.use('/protocol', protocolRouter.routes(), protocolRouter.allowedMethods())
 	.use('/recharge', rechargeRouter.routes(), rechargeRouter.allowedMethods())
 	.use('/sensitive', userSensitiveRouter.routes(), userSensitiveRouter.allowedMethods())
+	.use('/verification', verificationRouter.routes(), verificationRouter.allowedMethods())
 	.use('/userScores', userScoresRouter.routes(), userScoresRouter.allowedMethods());
 module.exports = settingRouter;

@@ -22,9 +22,14 @@ class Verifications {
         }
       },
       methods: {
-        getData() {
+        getData(showModal = false) {
           return nkcAPI(`/verifications`, 'GET')
             .then(data => {
+              if(data.verificationData.type === 'unEnabled') {
+                return self.callback({secret: data.verificationData.type});
+              } else if(showModal) {
+                self.dom.modal('show');
+              }
               self.app.type = data.verificationData.type;
               self.app[self.app.type].data = data.verificationData;
               const initFunc = self.app[`${self.app.type}Init`];
@@ -36,10 +41,7 @@ class Verifications {
             });
         },
         open() {
-          this.getData()
-            .then(() => {
-              self.dom.modal('show');
-            })
+          this.getData(true);
         },
         close() {
           self.dom.modal('hide');

@@ -1,0 +1,23 @@
+extends ../../experimental
+block eTitle
+  title 图形验证码
+  +includeCSS('/experimental/settings/verification/verification.css')
+block eContent
+  .hidden#data=objToStr({verificationTypes: data.verificationTypes, verificationSettings: data.verificationSettings})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-12
+        .form.form-horizontal
+          .form-group
+            label.col-xs-2.control-label 已启用
+            .col-xs-10
+              .checkbox
+                label(v-for='type in types').m-r-1
+                  input(type='checkbox' :value='type.type' v-model='settings.enabledTypes')
+                  span {{type.name}}
+          .form-group
+            label.col-xs-2.control-label
+            .col-xs-10
+              button.btn.btn-primary(@click='save') 保存
+block scripts
+  +includeJS('/experimental/settings/verification/verification.js')
