@@ -6,6 +6,7 @@ module.exports = [
     abbr: '运',
     displayName: '运维',
     contentClass: [],
+    defaultRole: true,
     modifyPostTimeLimit: -1,
     type: 'system',
     operationsId: []
@@ -18,6 +19,7 @@ module.exports = [
     displayName: '普通用户',
     contentClass: [],
     modifyPostTimeLimit: 0.5,
+    defaultRole: true,
     type: 'system',
     operationsId: [
       "getAttachment",
@@ -367,6 +369,7 @@ module.exports = [
     abbr: '禁',
     displayName: '被封用户',
     contentClass: [],
+    defaultRole: true,
     modifyPostTimeLimit: 0,
     type: 'system',
     operationsId: [
@@ -470,6 +473,7 @@ module.exports = [
     displayName: '游客',
     contentClass: [],
     modifyPostTimeLimit: 0,
+    defaultRole: true,
     type: 'system',
     operationsId: [
       "getAttachment",
@@ -573,6 +577,7 @@ module.exports = [
     abbr: '专',
     displayName: '专家',
     contentClass: [],
+    defaultRole: true,
     modifyPostTimeLimit: 0,
     type: 'system',
     operationsId: [

@@ -57,7 +57,16 @@ block content
                     if index > 0
                       span ,
                     a(href=`/f/${f.fid}` target="_blank")=f.displayName
-              .review-input-div(v-if=`selectedPid.indexOf('${r.post.pid}') !== -1`)
+              if r.post.abstractCn
+                .review-post-content=`中文摘要：${r.post.abstractCn}`
+              if r.post.abstractEn
+                .review-post-content=`英文摘要：${r.post.abstractEn}`
+              if r.post.keyWordsCn.length
+                .review-post-content=`中文关键词：${r.post.keyWordsCn.join(', ')}`
+              if r.post.keyWordsEn.length
+                .review-post-content=`英文关键词：${r.post.keyWordsEn.join(', ')}`
+              .review-post-content!=r.post.c
+              .review-input-div(v-if=`1 || selectedPid.indexOf('${r.post.pid}') !== -1`)
                 .m-b-1
                   input(type="radio" :value="true" v-model=`review['${r.post.pid}'].pass`)
                   span.m-r-1 通过
@@ -77,15 +86,6 @@ block content
                     textarea.form-control(rows=5 placeholder="请说明理由" v-model=`review['${r.post.pid}'].reason`)
                 .m-t-1
                   button.btn.btn-sm.btn-primary(@click=`submit('${r.post.pid}')`) 提交
-              if r.post.abstractCn
-                .review-post-content=`中文摘要：${r.post.abstractCn}`
-              if r.post.abstractEn
-                .review-post-content=`英文摘要：${r.post.abstractEn}`
-              if r.post.keyWordsCn.length
-                .review-post-content=`中文关键词：${r.post.keyWordsCn.join(', ')}`
-              if r.post.keyWordsEn.length
-                .review-post-content=`英文关键词：${r.post.keyWordsEn.join(', ')}`
-              .review-post-content!=r.post.c
 
         .p-t-1
           include ../publicModules/paging/paging_input

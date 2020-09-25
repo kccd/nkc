@@ -213,6 +213,7 @@ function sweetSuccess(text, options) {
   }
 }
 function sweetError(text) {
+  console.log(text);
   text = text.error || text;
   text = text + "";
   Swal({

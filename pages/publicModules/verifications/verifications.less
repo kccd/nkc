@@ -1,0 +1,137 @@
+#moduleVerifications {
+  z-index: 1150;
+  background-color: rgba(0,0,0,0.5);
+  .modal-dialog{
+    margin: auto;
+    margin-top: 4rem;
+  }
+  .vernier-caliper,
+  .touch-captcha{
+    width: 320px;
+    user-select: none;
+    padding: 0 10px;
+    overflow: hidden;
+    border-radius: 3px;
+    background-color: #fff;
+    text-align: center;
+    margin: auto;
+    .main-image, .secondary-image{
+      width: 300px;
+      overflow: hidden;
+      height: 40px;
+      display: inline-block;
+      position: relative;
+      div{
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+      }
+    }
+    .main-image{
+      margin-bottom: 1px;
+    }
+    .question{
+      font-size: 1.3rem;
+      text-align: left;
+      padding: 2rem 1rem;
+      //margin-bottom: 2rem;
+      span{
+        font-weight: 700;
+      }
+    }
+    .images{
+      margin-bottom: 1rem;
+      font-size: 0;
+      .touch-captcha-image {
+        position: relative;
+        width: 100%;
+        img {
+          width: 100%;
+        }
+        .touch-captcha-user-point {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background-color: gainsboro;
+          box-shadow: 5px 5px 10px 0 #383838;
+          &::after {
+            content: "";
+            display: block;
+            width: 14px;
+            height: 14px;
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            z-index: 9;
+            background-color: green;
+            border-radius: 50%;
+          }
+          .user-point-index {
+            font-size: 12px;
+            color: white;
+            display: block;
+            width: 12px;
+            height: 12px;
+            position: absolute;
+            left: 4px;
+            top: 3px;
+            z-index: 10;
+          }
+        }
+      }
+    }
+    .secondary-image{
+      position: relative;
+      cursor: all-scroll;
+      .fa{
+        position: absolute;
+        font-size: 1.6rem;
+        color: #666;
+        bottom: 0;
+        cursor: pointer;
+        height: 1.4rem;
+        width: 1.4rem;
+        text-align: center;
+        line-height: 1.4rem;
+      }
+      .left{
+        left: 5px;
+      }
+      .right{
+        right: 5px;
+      }
+    }
+  }
+  .button-content{
+    overflow: hidden;
+    padding: 1rem 0;
+  }
+  .loading{
+    text-align: center;
+    line-height: 10rem;
+    background-color: #fff;
+    position: relative;
+    .loading-close{
+      position: absolute;
+      line-height: 3rem;
+      font-size: 1.3rem;
+      text-align: center;
+      top: 0;
+      right: 0;
+      height: 3rem;
+      width: 3rem;
+      color: #333;
+      &:hover{
+        background-color: red;
+        color: #fff;
+      }
+    }
+  }
+
+}
+

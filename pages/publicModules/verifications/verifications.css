@@ -1,0 +1,153 @@
+#moduleVerifications {
+  z-index: 1150;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+#moduleVerifications .modal-dialog {
+  margin: auto;
+  margin-top: 4rem;
+}
+#moduleVerifications .vernier-caliper,
+#moduleVerifications .touch-captcha {
+  width: 320px;
+  user-select: none;
+  padding: 0 10px;
+  overflow: hidden;
+  border-radius: 3px;
+  background-color: #fff;
+  text-align: center;
+  margin: auto;
+}
+#moduleVerifications .vernier-caliper .main-image,
+#moduleVerifications .touch-captcha .main-image,
+#moduleVerifications .vernier-caliper .secondary-image,
+#moduleVerifications .touch-captcha .secondary-image {
+  width: 300px;
+  overflow: hidden;
+  height: 40px;
+  display: inline-block;
+  position: relative;
+}
+#moduleVerifications .vernier-caliper .main-image div,
+#moduleVerifications .touch-captcha .main-image div,
+#moduleVerifications .vernier-caliper .secondary-image div,
+#moduleVerifications .touch-captcha .secondary-image div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+#moduleVerifications .vernier-caliper .main-image,
+#moduleVerifications .touch-captcha .main-image {
+  margin-bottom: 1px;
+}
+#moduleVerifications .vernier-caliper .question,
+#moduleVerifications .touch-captcha .question {
+  font-size: 1.3rem;
+  text-align: left;
+  padding: 2rem 1rem;
+}
+#moduleVerifications .vernier-caliper .question span,
+#moduleVerifications .touch-captcha .question span {
+  font-weight: 700;
+}
+#moduleVerifications .vernier-caliper .images,
+#moduleVerifications .touch-captcha .images {
+  margin-bottom: 1rem;
+  font-size: 0;
+}
+#moduleVerifications .vernier-caliper .images .touch-captcha-image,
+#moduleVerifications .touch-captcha .images .touch-captcha-image {
+  position: relative;
+  width: 100%;
+}
+#moduleVerifications .vernier-caliper .images .touch-captcha-image img,
+#moduleVerifications .touch-captcha .images .touch-captcha-image img {
+  width: 100%;
+}
+#moduleVerifications .vernier-caliper .images .touch-captcha-image .touch-captcha-user-point,
+#moduleVerifications .touch-captcha .images .touch-captcha-image .touch-captcha-user-point {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: gainsboro;
+  box-shadow: 5px 5px 10px 0 #383838;
+}
+#moduleVerifications .vernier-caliper .images .touch-captcha-image .touch-captcha-user-point::after,
+#moduleVerifications .touch-captcha .images .touch-captcha-image .touch-captcha-user-point::after {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  z-index: 9;
+  background-color: green;
+  border-radius: 50%;
+}
+#moduleVerifications .vernier-caliper .images .touch-captcha-image .touch-captcha-user-point .user-point-index,
+#moduleVerifications .touch-captcha .images .touch-captcha-image .touch-captcha-user-point .user-point-index {
+  font-size: 12px;
+  color: white;
+  display: block;
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  left: 4px;
+  top: 3px;
+  z-index: 10;
+}
+#moduleVerifications .vernier-caliper .secondary-image,
+#moduleVerifications .touch-captcha .secondary-image {
+  position: relative;
+  cursor: all-scroll;
+}
+#moduleVerifications .vernier-caliper .secondary-image .fa,
+#moduleVerifications .touch-captcha .secondary-image .fa {
+  position: absolute;
+  font-size: 1.6rem;
+  color: #666;
+  bottom: 0;
+  cursor: pointer;
+  height: 1.4rem;
+  width: 1.4rem;
+  text-align: center;
+  line-height: 1.4rem;
+}
+#moduleVerifications .vernier-caliper .secondary-image .left,
+#moduleVerifications .touch-captcha .secondary-image .left {
+  left: 5px;
+}
+#moduleVerifications .vernier-caliper .secondary-image .right,
+#moduleVerifications .touch-captcha .secondary-image .right {
+  right: 5px;
+}
+#moduleVerifications .button-content {
+  overflow: hidden;
+  padding: 1rem 0;
+}
+#moduleVerifications .loading {
+  text-align: center;
+  line-height: 10rem;
+  background-color: #fff;
+  position: relative;
+}
+#moduleVerifications .loading .loading-close {
+  position: absolute;
+  line-height: 3rem;
+  font-size: 1.3rem;
+  text-align: center;
+  top: 0;
+  right: 0;
+  height: 3rem;
+  width: 3rem;
+  color: #333;
+}
+#moduleVerifications .loading .loading-close:hover {
+  background-color: red;
+  color: #fff;
+}
