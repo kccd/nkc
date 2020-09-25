@@ -117,6 +117,7 @@ function verify(userAnswerInfo, captchaInfo) {
   for(let index in answerPoints) {
     let {centerPoint, radius} = answerPoints[index];
     let point = userPoints[index];
+    if(point === undefined) return false;
     let {abs, sqrt, pow} = Math;
     let distance = pow(sqrt(abs(centerPoint.x - point.x)) + sqrt(abs(centerPoint.y - point.y)), 2);
     if(distance === 0) return false;
