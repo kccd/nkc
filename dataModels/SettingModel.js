@@ -508,4 +508,20 @@ settingSchema.statics.isRecycle = async (fid) => {
   const recycleId = await SettingModel.getRecycleId();
   return fid === recycleId;
 };
+
+/*
+* 检测卖家是否活跃，不允许用户购买长时间未活动的用户的商品
+* @param {String} userId 用户ID
+* */
+settingSchema.statics.checkShopSellerByUid = async (uid) => {
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const shopSettings = await SettingModel.getSettings('shop');
+  const user = await UserModel.findOnly({uid});
+  const _time = Date.now() - (shopSettings.closeSale.lastVisitTime * 24 * 60 * 60 * 1000);
+  if(_time > user.tlv) {
+    throwErr(403, shopSettings.closeSale.description);
+  }
+};
+
 module.exports = mongoose.model('settings', settingSchema);

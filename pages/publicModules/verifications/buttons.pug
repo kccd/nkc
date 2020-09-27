@@ -3,4 +3,4 @@
     button.btn.btn-default.btn-sm(@click='getData') 重置
   .pull-right
     button.btn.btn-default.btn-sm(@click='close') 关闭
-    button.btn.btn-primary.btn-sm(@click='submit') 确定
+    button.btn.btn-primary.btn-sm(@click='submit' v-if='type !== "error"') 确定

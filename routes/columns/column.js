@@ -50,7 +50,8 @@ router
     const q = {
       columnId: column._id
     };
-    const fidOfCanGetThread = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
+    // const fidOfCanGetThread = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
+    const fidOfCanGetThread = await db.ForumModel.getReadableForumsIdByUid(data.user? data.user.uid: '');
     const sort = {};
     if(c) {
       const category = await db.ColumnPostCategoryModel.findById(c);
@@ -81,7 +82,7 @@ router
       const homeSettings = await db.SettingModel.getSettings("home");
       data.topped = homeSettings.columnsId.includes(data.column._id);
     }
-    
+
     await next();
   })
   .put("/", async (ctx, next) => {

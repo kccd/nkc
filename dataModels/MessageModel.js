@@ -949,6 +949,39 @@ messageSchema.statics.markAsRead = async (type, uid, tUid) => {
   });
 }
 
+/*
+* 消息文件大小检测
+* @param {File Object} file 文件对象
+* @pengxiguaa 2020-9-27
+* */
+
+messageSchema.statics.checkFileSize = async (file) => {
+  const SettingModel = mongoose.model('settings');
+  const {getSize} = require('../nkcModules/tools');
+  let {size, ext} = file;
+  if(!ext) {
+    const FILE = require('../nkcModules/file');
+    ext = await FILE.getFileExtension(file);
+  }
+  const messageSettings = await SettingModel.getSettings('message');
+  const {sizeLimit} = messageSettings;
+  // 检查文件大小是否符合要求
+  let settingSize;
+  for(const s of sizeLimit.others) {
+    if(s.ext === ext) {
+      settingSize = s.size;
+      break;
+    }
+  }
+  if(settingSize === undefined) {
+    settingSize = sizeLimit.default;
+  }
+  if(size <= settingSize * 1024) {}
+  else {
+    throwErr(400, `${ext}文件不能超过${getSize(settingSize * 1024, 1)}`);
+  }
+};
+
 const MessageModel = mongoose.model('messages', messageSchema);
 module.exports = MessageModel;
 

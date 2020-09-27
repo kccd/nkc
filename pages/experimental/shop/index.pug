@@ -1,23 +1,19 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
-  -const mainContainer1400 = true;
-  link(href='/experimental/index.css' rel='stylesheet')
+block eTitle
   title 商城设置
-block content
-
+block eContent
+  .hidden#data=objToStr({shopSettings: data.shopSettings})
   .container-fluid.max-width
     .row
-      include ../nav
       .col-xs-12.col-md-12
         .row#content
           .col-xs-12.col-sm-2.col-md-2(style='margin-bottom: 1rem;')
             ul#main-nav.nav.nav-tabs.nav-stacked(style='')
-              //- li
-              //-   a.list-group-item(href='/e/settings/shop/applys', type='button')
-              //-     i.fa.fa-cogs
-              //-     | 交易权限申请处理
-              //-     span.badge(style='background-color: #000000;color: #ffffff;')!=data.applysDealing.length
+              li
+                a.list-group-item(href=`/e/settings/shop`)
+                  i.fa.fa-cogs
+                  | &nbsp;基本设置
               li
                 a.list-group-item(href='/e/settings/shop/refunds', type='button')
                   i.fa.fa-cogs
@@ -25,25 +21,7 @@ block content
               li
                 a.list-group-item(href='/e/settings/shop/refunds/settings', type='button')
                   i.fa.fa-cogs
-                  | &nbsp;退款设置    
-              //- li
-              //-   a.list-group-item.nav-header.collapsed(href='#logisticsSetting', data-toggle='collapse', type='button')
-              //-     i.fa.fa-cogs
-              //-     | 展示设置
-              //-     span.pull-right.glyphicon.glyphicon-chevron-down
-              //-   ul#logisticsSetting.nav.nav-list.collapse.secondmenu(style='height: 0px;')
-              //-     li
-              //-       a.list-group-item(href='/e/settings/shop/homeSetting/carousel' style="padding-left: 30px;")
-              //-         | 首页轮播图
-              //-     li
-              //-       a.list-group-item(href='/e/settings/shop/homeSetting/featured' style="padding-left: 30px;")
-              //-         | 精选推荐
-              //-     li
-              //-       a.list-group-item(href='/e/settings/shop/homeSetting/recommendation' style="padding-left: 30px;")
-              //-         | 店铺推荐
-              //-     li
-              //-       a.list-group-item(href='/e/settings/shop/homeSetting/popular' style="padding-left: 30px;")
-              //-         | 最热商品
+                  | &nbsp;退款设置
               li
                 a.list-group-item(href='/e/settings/shop/auth', type='button')
                   i.fa.fa-cogs
@@ -52,16 +30,6 @@ block content
                 a.list-group-item(href=`/e/settings/shop/products` type="button")
                   i.fa.fa-cogs
                   | &nbsp;商品管理
-              //- a.list-group-item(href='/e/settings/role/default/users', type='button')
-              //-   | 普通用户
-              //-   span.badge(style='background-color: #234233;color: #ffffff;') 74537
-              //- a.list-group-item(href='/e/settings/role/banned/users', type='button')
-              //-   | 被封用户
-              //-   span.badge(style='background-color: #a23422;color: #ffffff;') 1560
-              //- a.list-group-item(href='/e/settings/role/visitor/users', type='button') 游客
-              //- a.list-group-item(href='/e/settings/role/moderator/users', type='button')
-              //-   | 版主
-              //-   span.badge(style='background-color: #aaaaaa;color: #ffffff;') 19
           block shopSettings
 block scripts
   block shopSettingScripts

@@ -93,9 +93,9 @@ style.
     height: 300px;
   }
 .row
-  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('banSaleProductParams')) 
+  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('banSaleProductParams'))
     if !product.adminBan
-      .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right") 
+      .col-xs-12.col-sm-12.col-md-12.col-lg-12(style="text-align:right")
         button.btn.btn-sm.btn-danger(style="padding:0" onclick=`banSale(${product.productId})`) 禁售
   .col-xs-12.col-sm-12.col-md-12.col-lg-6.pcSlide(style="padding-top:15px")#productImageDom
     ul#etalage
@@ -113,11 +113,11 @@ style.
       .pike_next
       .pike_spot
   .col-xs-12.col-sm-12.col-md-12.col-lg-6(style="padding-top:15px;")#productIntroDom
-    p.item 
+    p.item
       span#showText #{cutContent(post.abstractCn,60)}
       if post.abstractCn && post.abstractCn.length > 60
         span#hideText(style="display:none")!=`${post.abstractCn}`
-        span 
+        span
           a(onclick="showAbstract()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showAbstract") 展开
           a(onclick="hideAbstract()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideAbstract") 收起
     if product.keywords && product.keywords.length > 0
@@ -125,7 +125,7 @@ style.
         span#showWords #{cutContent(post.keywords,25)}
         if post.keywords && post.keywords.length > 25
           span#hideWords(style="display:none")!=`${post.keywords}`
-          span 
+          span
             a(onclick="showKeywords()" style="cursor:pointer;font-weight:bold;font-size:10px" class="showKeywords") 展开
             a(onclick="hideKeywords()" style="cursor:pointer;display:none;font-weight:bold;font-size:10px" class="hideKeywords") 收起
     //- if product.attentions && product.attentions.length > 0
@@ -180,7 +180,7 @@ style.
               for temp,index in product.freightTemplates
                 option(value=`${index}` dataaddprice=`${temp.addPrice}` datafirstprice=`${temp.firstPrice}`)!=`${temp.name}`
             span#freightPrice #{numToFloatTwo(product.freightTemplates[0].firstPrice)}
-            span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightTemplates[0].addPrice)}    
+            span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightTemplates[0].addPrice)}
             //- span#freightPrice #{numToFloatTwo(product.freightPrice.firstFreightPrice)}
             //- span#addFreightPrice(style="display:none") #{numToFloatTwo(product.freightPrice.addFreightPrice)}
             input#isFreePost(type="text" value="payPost" style="display:none")
@@ -204,7 +204,9 @@ style.
             span(class=para._id == paraId?"activeIndex":"normalIndex", href='#',style="margin-right:5px;margin-bottom:5px;display:inline-block" onclick=`choiceProductParams(this,"${product.productId}")` paraId=`${para._id}`)
               span=para.name
     div.item
-      if product.adminBan
+      if data.closeSaleDescription
+        p(style="text-align: center;background-color: tomato;padding:10px")=data.closeSaleDescription
+      else if product.adminBan
         p(style="text-align: center; background-color:tomato;padding:10px") 该商品已被禁售
       else
         if product.productStatus == "stopsale"
@@ -213,13 +215,13 @@ style.
           div(style="display:none")#paraId!=`${paraId}`
           if data.user
             a.btn.btn.buy(role='button' onclick=`submitProductToBill()` style="margin-left:10px") 立即购买
-            a.btn.btn.addCart(role='button' onclick=`addProductToCart()`) 
+            a.btn.btn.addCart(role='button' onclick=`addProductToCart()`)
               span.fa.fa-shopping-cart  加入购物车
           else
-            a.btn.btn.buy(role='button' onclick="NKC.methods.toLogin('login')" style="margin-left:10px") 立即购买  
-            a.btn.btn.addCart(role='button' onclick="NKC.methods.toLogin('login')") 
+            a.btn.btn.buy(role='button' onclick="NKC.methods.toLogin('login')" style="margin-left:10px") 立即购买
+            a.btn.btn.addCart(role='button' onclick="NKC.methods.toLogin('login')")
               span.fa.fa-shopping-cart  加入购物车
-  .col-xs-1.col-md-1 
+  .col-xs-1.col-md-1
 
   if product.dealInfo.dealAnnouncement
     .col-xs-12.col-md-12(style="margin-top:5px")
@@ -285,8 +287,8 @@ block scripts
     $("s").click(function (e) {
       SelCity(document.getElementById("city"),e);
     });
-    
-    window.onresize=function(){  
+
+    window.onresize=function(){
       if($(window).width() < 1350) {
         $("#productImageDom").addClass("col-lg-12");
         $("#productIntroDom").addClass("col-lg-12");
@@ -298,4 +300,4 @@ block scripts
         $("#productImageDom").removeClass("col-lg-12");
         $("#productIntroDom").removeClass("col-lg-12");
       }
-    } 
+    }

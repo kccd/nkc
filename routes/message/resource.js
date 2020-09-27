@@ -53,6 +53,9 @@ resourceRouter
 
     const {name, size, path} = file;
 
+    // 附件尺寸限制
+    await db.MessageModel.checkFileSize(file);
+
     // 确定文件格式
     let ext = PATH.extname(name);
     if(!ext) ctx.throw(400, '无法识别文件格式');
