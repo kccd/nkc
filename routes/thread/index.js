@@ -529,7 +529,12 @@ threadRouter
         }
       }
       data.userAddress = userAddress;
-
+      data.closeSaleDescription = '';
+      try{
+        await db.SettingModel.checkShopSellerByUid(data.product.uid);
+      } catch(err) {
+        data.closeSaleDescription = err.message || err.stack || err;
+      }
 		} else if(thread.type === "fund") { // 基金文章
 		  const user = data.user;
       let applicationForm = await db.FundApplicationFormModel.findOne({tid: thread.tid});

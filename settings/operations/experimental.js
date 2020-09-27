@@ -48,6 +48,7 @@ module.exports = {
     },
 		shop: {
 			GET: 'visitShopSettings',
+			PUT: 'visitShopSettings',
 			refunds: {
 				GET: 'visitShopRefundList',
 				refundDetail: {
