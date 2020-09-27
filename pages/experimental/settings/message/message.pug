@@ -129,9 +129,35 @@ block eContent
                         input(style="max-width: 6rem;" type="number" v-model="grade.messagePersonCountLimit")
                       th
                         input(style="max-width: 6rem;" type="number" v-model="grade.messageCountLimit")
-                button.btn.btn-primary.btn-block(@click='submit') 保存
 
-
+          .col-xs-12.col-md-12(v-if='messageSettings').m-t-3
+            .form.form-horizontal
+              .form-group.m-b-2
+                h4 文件大小限制
+                .col-sm-12
+                  table.table.table-bordered.m-b-05
+                    thead
+                      tr
+                        th 格式
+                        th 尺寸（KB）
+                        th 其他
+                    tbody
+                      tr(v-for='s, index in messageSettings.sizeLimit.others')
+                        th
+                          input.form-control(type='text' v-model.trim='s.ext')
+                        th
+                          input.form-control(type='text' v-model.number='s.size')
+                        th
+                          button.btn.btn-xs.btn-default(@click="removeFromArr(messageSettings.sizeLimit.others, index)") 删除
+                      tr
+                        th
+                          input.form-control(type='text' value='其他' disabled)
+                        th
+                          input.form-control(type='text' v-model.number='messageSettings.sizeLimit.default')
+                        th
+                  button.btn.btn-default.btn-sm(@click="addSizeLimit") 添加
+          .col-xs-12.col-md-12
+            button.btn.btn-primary.btn-block(@click='submit') 保存
 block scripts
   +includeJS("/interface_common.js")
   +includeJS("/experimental/settings/message/message.js")

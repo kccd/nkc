@@ -101,7 +101,10 @@ $(function() {
       // 系统强制限制 若未满足要求则无法给当前用户发送短消息
       showMandatoryLimitInfo: false,
       // 黑名单提示
-      blacklistInfo: ''
+      blacklistInfo: '',
+
+      // 文件大小限制
+      sizeLimit: ''
 
     },
     beforeCreate: function() {
@@ -349,6 +352,7 @@ $(function() {
       format: NKC.methods.format,
       fromNow: NKC.methods.fromNow,
       getUrl: NKC.methods.tools.getUrl,
+      getSize: NKC.methods.tools.getSize,
       secondToMinute: secondToMinute,
       startPlayAudio: startPlayAudio,
       stopPlayAudio: stopPlayAudio,
@@ -756,6 +760,7 @@ $(function() {
           .then(function(data) {
             if(app.target !== target) return;
             app.twemoji = data.twemoji;
+            app.sizeLimit = data.sizeLimit;
             app.targetUserSendLimit = data.targetUserSendLimit;
             app.showMandatoryLimitInfo = data.showMandatoryLimitInfo;
             app.blacklistInfo = data.blacklistInfo;
@@ -1175,9 +1180,30 @@ $(function() {
             message.status = 'failed';
           })
       },
+      checkFileSize: function(filename, size) {
+        var sizeLimit = this.sizeLimit;
+        if(!sizeLimit) return;
+        var ext = filename.split('.');
+        ext = ext.pop().toLowerCase();
+        var limit;
+        for(var i = 0; i < sizeLimit.others.length; i++) {
+          var s = sizeLimit.others[i];
+          if(s.ext.toLowerCase() === ext) {
+            limit = s;
+            break;
+          }
+        }
+        if(!limit) limit = {
+          ext: ext,
+          size: sizeLimit.default
+        };
+        var _limitSize = limit.size * 1024;
+        if(size > _limitSize) throw ext.toUpperCase() + '文件大小不能超过' + this.getSize(_limitSize, 1);
+      },
 
       // 上传资源
       uploadResource: function(e, again) {
+        var _this = this;
         var message;
         if(!again) {
 
@@ -1186,12 +1212,21 @@ $(function() {
           var targetUid = app.targetUser.uid;
           for(var i = 0; i < files.length; i++) {
             var file = files[i];
-            if(file.size > 200*1024*1024) {
-              app.uploadInfo = '文件大小不能超过200MB';
+            try{
+              _this.checkFileSize(file.name, file.size);
+            } catch(err) {
+              app.uploadInfo = err.message || err;
               return setTimeout(function() {
                 app.uploadInfo = '';
               }, 3000)
             }
+
+            /*if(file.size > 200*1024*1024) {
+              app.uploadInfo = '文件大小不能超过200MB';
+              return setTimeout(function() {
+                app.uploadInfo = '';
+              }, 3000)
+            }*/
             var formData = new FormData();
             formData.append('targetUid', targetUid);
             formData.append('socketId', socket.id);

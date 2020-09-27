@@ -136,6 +136,9 @@ router
     }
     data.messages2 = await db.MessageModel.extendMessages(data.user.uid, data.messages);
 
+    const messageSettings = await db.SettingModel.getSettings('message');
+    data.sizeLimit = messageSettings.sizeLimit;
+
     await db.MessageModel.markAsRead(type, user.uid, uid);
 
     ctx.template = 'message/appContentList/appContentList.pug';
