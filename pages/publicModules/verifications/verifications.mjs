@@ -145,6 +145,7 @@ class Verifications {
             .catch(err => {
               console.log(err);
               screenTopWarning(err);
+              self.app.getData();
             });
         }
       },
