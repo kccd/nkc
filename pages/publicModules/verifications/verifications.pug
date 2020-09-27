@@ -6,6 +6,8 @@ if !isIncluded('verifications')
         include ./vernierCaliper
       div(v-else-if='type === "touchCaptcha"')
         include ./touchCaptcha
+      div(v-else-if='type === "error"')
+        include ./error
       div(v-else)
         .loading.vernier-caliper
           .fa.fa-remove.loading-close(@click='close')

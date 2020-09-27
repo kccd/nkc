@@ -107,13 +107,14 @@ schema.methods.verifyBaseInfo = async function() {
 * @author pengxiguaa 2020-9-24
 * */
 schema.statics.getVerificationData = async (options) => {
+  const VerificationModel = mongoose.model('verifications');
+  await VerificationModel.verifyCountLimit(options);
   const verifications = require('../nkcModules/verification');
   const SettingModel = mongoose.model('settings');
   const verificationSettings = await SettingModel.getSettings('verification');
   const types = verificationSettings.enabledTypes;
   if(types.length === 0) return {type: 'unEnabled'};
   const type = types[Math.round(Math.random() * (types.length - 1))];
-  const VerificationModel = mongoose.model('verifications');
   const data = await verifications[type].create();
   const {uid, ip, port} = options;
   const verification = VerificationModel({
@@ -175,5 +176,24 @@ schema.statics.verifySecret = async (options) => {
     await verification.update({secretUsed: true});
   }
 }
+
+/*
+* 次数限制检测
+* */
+schema.statics.verifyCountLimit = async (options) => {
+  const VerificationModel = mongoose.model('verifications');
+  const SettingModel = mongoose.model('settings');
+  const verificationSettings = await SettingModel.getSettings('verification');
+  const {time, count} = verificationSettings.countLimit;
+  const {ip} = options;
+  const verificationCount = await VerificationModel.count({
+    ip,
+    toc: {
+      $gte: Date.now() - time * 60 * 1000
+    }
+  });
+  if(verificationCount >= count) throwErr(403, `获取图形验证码频率过快，请稍后再试`);
+};
+
 
 module.exports = mongoose.model('verifications', schema);
