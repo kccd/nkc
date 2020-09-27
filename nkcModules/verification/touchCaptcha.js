@@ -196,8 +196,8 @@ function drawText({
       x: textCenterX,
       y: textCenterY
     },
-    // 文字的最大半径
-    radius: Math.sqrt(Math.pow(68 / 2, 2) + Math.pow(textBackgroundW / 2, 2)),
+    // 检测半径
+    radius: Math.sqrt(Math.pow(68 / 2, 2) + Math.pow(textBackgroundW / 2, 2)) + 50,
     text
   }
 }
