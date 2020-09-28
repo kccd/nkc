@@ -105,12 +105,9 @@ function create() {
     ctx2.stroke();
   }
 
-  // 目标值
-  let question = Math.random() * (maxNumber - 15 - minNumber - 15) + minNumber + 15;
-
-  const answer = Number(((question - minNumber) * unitWidth - paddingLeft2).toFixed(1));
-
-  question = question.toFixed(1) + unit;
+  const {question, answer} = getQuestion({
+    minNumber, maxNumber, unitWidth, paddingLeft2
+  });
 
   return {
     question,
@@ -126,6 +123,28 @@ function verify(data, dataDB) {
     console.log(`上传：${data.answer}px 精准：${dataDB.answer}px`);
   }
   return data.answer <= dataDB.answer + 1 && data.answer >= dataDB.answer - 1
+}
+
+function getQuestion(options) {
+  const {
+    maxNumber,
+    minNumber,
+    unitWidth,
+    paddingLeft2
+  } = options;
+  // 目标值
+  let question = Math.random() * (maxNumber - 15 - minNumber - 4) + minNumber + 4;
+
+  const answer = Number(((question - minNumber) * unitWidth - paddingLeft2).toFixed(1));
+
+  if(answer >= -3 && answer <= 3) {
+    return getQuestion(options);
+  } else {
+    return {
+      question: question.toFixed(1) + unit,
+      answer,
+    }
+  }
 }
 
 module.exports = {

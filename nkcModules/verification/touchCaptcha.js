@@ -2,20 +2,22 @@ const fs = require('fs')
 const path = require('path');
 const { createCanvas, loadImage } = require('canvas');
 
+// 验证图图片大小(正方形图片)
+const imageSize = 300;
+// 绘制文字大小
+const fontSize = 40;
+// 噪点密度
+const noiseDensity = 0.04;
 // 文字库
 const chineseChars = `天地玄黄宇宙洪荒日月辰宿列张来往秋收冬闰余成岁吕调阳云致雨结为金生丽水玉出昆冈剑号巨珠称夜光果珍菜芥海咸河淡羽翔龙师火帝鸟官人始制文字乃服衣推位让国有陶唐吊民伐罪周发汤坐朝问道拱平章臣伏戎一体率宾归王鸣凤在竹白驹食场化被草木及万方此身发四大五常恭惟养岂敢伤女贞洁男效才良知过必改得能莫忘谈彼短恃己长信使可器欲难悲丝染诗羔羊行贤克念作圣名立形表正`.split("");
 
 // 预选位置
 const predefinePosition = [
-  {x: 250, y: 100},
-  {x: 250, y: 400},
-  {x: 100, y: 250},
-  {x: 400, y: 250},
-  {x: 100, y: 100},
-  {x: 400, y: 100},
-  {x: 100, y: 400},
-  {x: 400, y: 400},
-  {x: 250, y: 250}
+  {x: 60, y: 60},    {x: 150, y: 80},   {x: 240, y: 60},
+
+  {x: 70, y: 160},   {x: 140, y: 160},  {x: 210, y: 134},
+                      
+  {x: 60, y: 240},   {x: 160, y: 230},  {x: 240, y: 240},
 ];
 
 /**
@@ -23,13 +25,13 @@ const predefinePosition = [
  * 返回正确文字的位置信息和canvas对象
  */
 async function makeCaptchaImage(){
-  const canvas = createCanvas(500, 500);
+  const canvas = createCanvas(imageSize, imageSize);
   const ctx = canvas.getContext('2d');
 
   // 绘制背景图
   let backgroundImagePath = await getRandomBackgroundImage();
   const image = await loadImage(backgroundImagePath);
-  ctx.drawImage(image, 0, 0, 500, 500)
+  ctx.drawImage(image, 0, 0, imageSize, imageSize)
 
   // 总共绘制6个文字，3个正确文字
   // 随机选取6个文字并绘制
@@ -56,7 +58,7 @@ async function makeCaptchaImage(){
   // 生成随机噪点像素
   for (var i = 0; i < data.length; i += 4) {
     // 噪点密度控制
-    if(Math.random() > 0.08) continue;
+    if(Math.random() > noiseDensity) continue;
     // 随机灰度噪点
     let grayscale = Math.floor(Math.random() * (255 - 0) + 0);
     Array(randomIn(20, 2)).fill().map(() => {
@@ -117,13 +119,14 @@ function verify(userAnswerInfo, captchaInfo) {
   for(let index in answerPoints) {
     let {centerPoint, radius} = answerPoints[index];
     let point = userPoints[index];
+    if(point === undefined) return false;
     let {abs, sqrt, pow} = Math;
     let distance = pow(sqrt(abs(centerPoint.x - point.x)) + sqrt(abs(centerPoint.y - point.y)), 2);
     if(distance === 0) return false;
     if(distance > radius) {
       // console.log(`点${index + 1}: 距离圆心 ${distance}，限制距离 ${radius}`)
       return false
-    } 
+    }
   }
   return true;
 }
@@ -176,10 +179,10 @@ function drawText({
   ctx.rotate(rotate * Math.PI/180);
 
   // 画文字
-  ctx.font = "bold 68px Sans";
+  ctx.font = `bold ${fontSize}px Sans`;
   let metrics = ctx.measureText(text);
   let textBackgroundW = metrics.width;
-  let textBacjgroundH = 68;
+  let textBacjgroundH = fontSize;
   let textX = -(textBackgroundW / 2);
   let textY = -(textBacjgroundH / 2);
   ctx.fillStyle = "#e0e0e0";
@@ -196,8 +199,8 @@ function drawText({
       x: textCenterX,
       y: textCenterY
     },
-    // 检测半径
-    radius: Math.sqrt(Math.pow(68 / 2, 2) + Math.pow(textBackgroundW / 2, 2)) + 50,
+    // 文字的最大半径
+    radius: Math.sqrt(Math.pow(fontSize / 2, 2) + Math.pow(textBackgroundW / 2, 2)) + (fontSize * 0.74 /* 稍微给大一些检测范围 */),
     text
   }
 }

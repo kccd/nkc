@@ -56,12 +56,6 @@ include ../verifications/verifications
                   .row
                     .col-xs-6
                       .form-group
-                        input.form-control.input(type="text" placeholder="图形验证码" v-model.trim="imgCode" @change="throwError('')" @keyup.enter="submit")
-                    .col-xs-6
-                      .form-group.svg-data(v-html="svgData" @click="getSvgData")
-                  .row
-                    .col-xs-6
-                      .form-group
                         input.form-control.input(type="text" placeholder="短信验证码" v-model.trim="code" @change="throwError('')" @keyup.enter="submit")
                     .col-xs-6.text-right
                       .send-mobile-code(v-if="waiting === 0" @click="sendMobileCode") 发送验证码
@@ -75,12 +69,6 @@ include ../verifications/verifications
                     div(style="margin-top: 0.5rem;") 【海外用户】发表的内容可能需要经过人工审核才显示。
                 .form-group
                   input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @change="throwError('')" @keyup.enter="submit")
-                .row
-                  .col-xs-6
-                    .form-group
-                      input.form-control.input(type="text" placeholder="图形验证码" v-model.trim="imgCode" @change="throwError('')" @keyup.enter="submit")
-                  .col-xs-6
-                    .form-group.svg-data(v-html="svgData" @click="getSvgData")
                 .row
                   .col-xs-6
                     .form-group
