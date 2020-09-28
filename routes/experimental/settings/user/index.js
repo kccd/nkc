@@ -28,6 +28,12 @@ userRouter
     } else if(searchType === 'ip') {
       const usersPersonal = await db.UsersPersonalModel.find({regIP: searchContent.trim()}, {uid: 1});
       match.uid = {$in: usersPersonal.map(u => u.uid)};
+    } else if(searchType === 'mobile') {
+      const usersPersonal = await db.UsersPersonalModel.find({mobile: searchContent.trim()}, {uid: 1});
+      match.uid = {$in: usersPersonal.map(u => u.uid)};
+    } else if(searchType === 'email') {
+      const usersPersonal = await db.UsersPersonalModel.find({email: searchContent.trim()}, {uid: 1});
+      match.uid = {$in: usersPersonal.map(u => u.uid)};
     }
     const count = await db.UserModel.count(match);
     paging = nkcModules.apiFunction.paging(page, count);

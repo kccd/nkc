@@ -141,9 +141,8 @@ NKC.modules.Login = function() {
         }
         verifications
           .open()
-          .then(data => {
-            var secret = data.secret;
-            body.verifySecret = secret;
+          .then(function(data) {
+            body.verifySecret = data.secret;
             return nkcAPI(url, "POST", body);
           })
           .then(function() {
