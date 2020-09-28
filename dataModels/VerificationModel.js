@@ -39,17 +39,32 @@ const schema = new mongoose.Schema({
     default: false,
     index: 1
   },
+  // 原始数据比对是否通过
+  passed: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
   // 是否已经使用过验证通过后的加密串
   secretUsed: {
     type: Boolean,
     default: false,
     index: 1
   },
+  // 加密串比对是否通过
+  secretPassed: {
+    type: Boolean,
+    default: false,
+    index: 1
+  },
+  // 加密串
   secret: {
     type: String,
     index: 1,
     default: ''
   },
+  // 图形验证码数据
+  // 验证原始数据之后 会增加属性userAnswer，记录用户提交的答案
   c: {
     type: mongoose.Schema.Types.Mixed,
     required: true,
@@ -145,11 +160,18 @@ schema.statics.verifyData = async (verificationData) => {
   if(!verification) await VerificationModel.throwFailedError();
   await verification.verifyBaseInfo();
   if(!verifications[verification.type].verify(verificationData, verification.c)) {
+    await verification.update({
+      'c.userAnswer': verificationData.answer
+    });
     await VerificationModel.throwFailedError();
   }
   // 生成加密串
   const secret = await VerificationModel.newSecret();
-  await verification.update({secret});
+  await verification.update({
+    secret,
+    'c.userAnswer': verificationData.answer,
+    passed: true
+  });
   return secret;
 }
 
@@ -170,10 +192,16 @@ schema.statics.verifySecret = async (options) => {
     const verification = await VerificationModel.findOne({
       uid, ip, secret
     });
-    if(!verification) await VerificationModel.throwFailedError();
-    if(verification.secretUsed) await VerificationModel.throwFailedError();
-    if(Date.now() - verification.toc > secretTimeout) await VerificationModel.throwFailedError();
-    await verification.update({secretUsed: true});
+    if(
+      !verification ||
+      verification.secretUsed ||
+      (Date.now() - verification.toc) > secretTimeout
+    ) {
+      await verification.update({secretUsed: true});
+      await VerificationModel.throwFailedError();
+    } else {
+      await verification.update({secretUsed: true, secretPassed: true});
+    }
   }
 }
 
