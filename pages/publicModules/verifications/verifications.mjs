@@ -132,9 +132,12 @@ class Verifications {
         },
         submit() {
           const {data: verificationData, answer} = this[this.type];
-          verificationData.answer = answer;
           nkcAPI(`/verifications`, 'POST', {
-            verificationData
+            verificationData: {
+              answer,
+              _id: verificationData._id,
+              type: verificationData.type
+            }
           })
             .then((data) => {
               self.done({

@@ -196,19 +196,34 @@ settingSchema.statics.checkEmail = async (email, uid) => {
 /*
   根据用户的证书以及等级 获取用户与下载相关的设置
   @param {Schema Object} user 用户对象
+  @author pengxiguaa 2020-9-28
 */
 settingSchema.statics.getDownloadSettingsByUser = async (user) => {
   const SettingModel = mongoose.model("settings");
-  const {options} = await SettingModel.getSettings("download");
-  let fileCountOneDay = 0, speed = 1;
+  const {speed: settingsSpeed} = await SettingModel.getSettings("download");
+  let fileCountOneDay, speed;
+  const hour = new Date().getHours();
   const optionsObj = {};
-  for(const o of options) {
-    optionsObj[`${o.type}_${o.id}`] = o;
+  for(const o of settingsSpeed.others) {
+    optionsObj[o.type] = o;
   }
+
+  const getSpeedByHour = (arr) => {
+    for(const t of arr) {
+      const {startingTime, endTime, speed} = t;
+      if(hour >= startingTime && hour < endTime) {
+        return speed;
+      }
+    }
+    return 0;
+  };
+
   if(!user) {
-    const option = optionsObj[`role_visitor`];
-    fileCountOneDay = option.fileCountOneDay;
-    speed = option.speed;
+    const option = optionsObj[`role-visitor`];
+    if(option) {
+      fileCountOneDay = option.fileCount;
+      speed = getSpeedByHour(option.data);
+    }
   } else {
     if(!user.roles) {
       await user.extendRoles();
@@ -217,24 +232,30 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
       await user.extendGrade();
     }
     for(const role of user.roles) {
-      const option = optionsObj[`role_${role._id}`];
+      const option = optionsObj[`role-${role._id}`];
       if(!option) continue;
-      if(fileCountOneDay < option.fileCountOneDay) {
-        fileCountOneDay = option.fileCountOneDay;
+      if(fileCountOneDay === undefined || fileCountOneDay < option.fileCount) {
+        fileCountOneDay = option.fileCount;
       }
-      if(speed < option.speed) {
-        speed = option.speed;
+      const _speed = getSpeedByHour(option.data);
+      if(speed === undefined || speed < _speed) {
+        speed = _speed;
       }
     }
-    const gradeOption = optionsObj[`grade_${user.grade._id}`];
+    const gradeOption = optionsObj[`grade-${user.grade._id}`];
     if(gradeOption) {
-      if(fileCountOneDay < gradeOption.fileCountOneDay) {
-        fileCountOneDay = gradeOption.fileCountOneDay;
+      if(fileCountOneDay === undefined || fileCountOneDay < gradeOption.fileCount) {
+        fileCountOneDay = gradeOption.fileCount;
       }
-      if(speed < gradeOption.speed) {
-        speed = gradeOption.speed;
+      const _speed = getSpeedByHour(gradeOption.data);
+      if(speed === undefined || speed < _speed) {
+        speed = _speed;
       }
     }
+  }
+  if(fileCountOneDay === undefined || speed === undefined) {
+    fileCountOneDay = settingsSpeed.default.fileCount;
+    speed = getSpeedByHour(settingsSpeed.default.data);
   }
   return {
     speed,

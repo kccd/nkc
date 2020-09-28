@@ -19,26 +19,11 @@ registerRouter
   .post('/', async (ctx, next) => { // 手机注册
 	  const {db, body} = ctx;
 	  let user;
-		const {mobile, nationCode, code, imgCode, secret} = body;
-    await db.VerificationModel.verifySecret({
-      uid: '',
-      ip: ctx.address,
-      secret
-    });
+		const {mobile, nationCode, code} = body;
 	  if(!nationCode) ctx.throw(400, '请选择国家区号');
 	  if(!mobile) ctx.throw(400, '请输入手机号');
-    if(!imgCode) ctx.throw(400, '请输入图形验证码');
 	  if(!code) ctx.throw(400, '请输入短信验证码');
 		await db.SettingModel.checkMobile(nationCode, mobile);
-    let imgCodeId = ctx.getCookie("imgCodeId") || "";
-    if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
-
-    const imgCodeObj = await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
-
-    ctx.setCookie("imgCodeId", "");
-
-    await imgCodeObj.update({used: true});
-
 	  const userPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
 	  if(userPersonal) ctx.throw(400, '手机号码已被其他用户注册。');
 
@@ -55,8 +40,6 @@ registerRouter
 	  delete option.type;
 		user = await db.UserModel.createUser(option);
 		await user.extendGrade();
-    await imgCodeObj.update({uid: user.uid});
-
     const _usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
     ctx.setCookie("userInfo", {
       uid: user.uid,

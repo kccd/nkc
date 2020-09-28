@@ -23,10 +23,7 @@ loginRouter
 
 		let user;
 		let userPersonal;
-		let {password, username, mobile, nationCode, code, imgCode, behavior} = body;
-
-		// 生成登录行为图
-		// loginBehaviorMap(behavior);
+		let {password, username, mobile, nationCode, code} = body;
 
 		const behaviorOptions = {
 			type: "login",
@@ -116,15 +113,6 @@ loginRouter
 				type: 'login'
 			};
 
-			let imgCodeId = ctx.getCookie("imgCodeId") || "";
-			if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
-
-      const imgCodeObj = await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
-
-      ctx.setCookie("imgCodeId", "");
-
-      await imgCodeObj.update({used: true});
-
       // 验证短信验证码
 			let smsCode;
 			try{
@@ -149,8 +137,6 @@ loginRouter
 			userPersonal = userPersonal[0];
 
 			user = await db.UserModel.findOnly({uid: userPersonal.uid});
-
-      await imgCodeObj.update({uid: user.uid});
 
     } else {
 			ctx.throw(400, `未知的登录方式：${loginType}`);
