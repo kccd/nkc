@@ -3,15 +3,16 @@ const sendMessageRouter = new Router();
 sendMessageRouter
 	.post('/login', async (ctx, next) => {
 		const {db, body} = ctx;
-		const {nationCode, mobile, imgCode} = body;
-		if(!imgCode) ctx.throw(400, '图形验证码不能为空');
+		const {nationCode, mobile, verifySecret} = body;
 		if(!nationCode) ctx.throw(400, '国际区号不能为空');
 		if(!mobile) ctx.throw(400, '手机号不能为空');
-		let imgCodeId = ctx.getCookie("imgCodeId") || "";
-    if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
-    await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
 		const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
 		if(!otherPersonal) ctx.throw(400, '暂未有用户绑定该手机号');
+		await db.VerificationModel.verifySecret({
+			uid: "",
+			ip: ctx.address,
+			secret: verifySecret
+		});
 		const smsCodeObj = {
 			nationCode,
 			mobile,
@@ -28,13 +29,14 @@ sendMessageRouter
 	})
   .post('/register', async (ctx, next) => { // 手机号码注册
   	const {db, body} = ctx;
-  	const {nationCode, mobile, imgCode} = body;
-    if(!imgCode) ctx.throw(400, '图形验证码不能为空');
+		const {nationCode, mobile, verifySecret} = body;
   	if(!nationCode) ctx.throw(400, '国际区号不能为空');
   	if(!mobile) ctx.throw(400, '手机号不能为空');
-    let imgCodeId = ctx.getCookie("imgCodeId") || "";
-    if(imgCodeId) imgCodeId = imgCodeId.imgCodeId;
-    await db.ImgCodeModel.ensureCode(imgCodeId, imgCode);
+		await db.VerificationModel.verifySecret({
+			uid: "",
+			ip: ctx.address,
+			secret: verifySecret
+		});
 	  await db.SettingModel.checkMobile(nationCode, mobile);
   	const otherPersonal = await db.UsersPersonalModel.findOne({nationCode, mobile});
   	if(otherPersonal) ctx.throw(400, '手机号已被其他用户注册');

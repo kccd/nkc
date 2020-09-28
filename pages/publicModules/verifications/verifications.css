@@ -70,10 +70,10 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background-color: gainsboro;
+  background-color: #cacaca;
   box-shadow: 5px 5px 10px 0 #383838;
 }
 #moduleVerifications .vernier-caliper .images .touch-captcha-image .touch-captcha-user-point::after,
@@ -83,8 +83,8 @@
   width: 14px;
   height: 14px;
   position: absolute;
-  left: 3px;
-  top: 3px;
+  left: 4px;
+  top: 4px;
   z-index: 9;
   background-color: green;
   border-radius: 50%;
@@ -94,12 +94,14 @@
   font-size: 12px;
   color: white;
   display: block;
-  width: 12px;
-  height: 12px;
   position: absolute;
-  left: 4px;
-  top: 3px;
+  left: 0px;
+  top: 0px;
+  right: 0;
+  bottom: 0;
   z-index: 10;
+  line-height: 22px;
+  text-align: center;
 }
 #moduleVerifications .vernier-caliper .secondary-image,
 #moduleVerifications .touch-captcha .secondary-image {
