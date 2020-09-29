@@ -2,28 +2,38 @@
 +includeJS("/external_pkgs/plyr/plyr.min.js")
 include ./mask.pug
 
+script
+  include ./controls.js
 script.
-  NKC.methods.initVideo = function() {
-    var videoDom = $(".plyr-dom");
-    for (var i = 0; i < videoDom.length; i++) {
-      var dom = videoDom.eq(i);
-      var title = dom.attr("data-plyr-title");
-      var rid = dom.attr("data-rid");
-      var player = new Plyr(videoDom.eq(i), {
-        ratio: '4:3',
-        title: title,
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'pip', 'airplay', 'fullscreen'],
-        blankVideo: "/external_pkgs/plyr/blank.mp4",
-        autopause: true,
-      });
-      var url = "/r/" + rid + "?t=attachment";
-      if(NKC.methods.getRunType() === "app") {
-        url += "&apptype=app";
+  ;(function(){
+    var players = [];
+    NKC.methods.initVideo = function() {
+      var videoDom = $(".plyr-dom");
+      for (var i = 0; i < videoDom.length; i++) {
+        var dom = videoDom.eq(i);
+        var title = dom.attr("data-plyr-title");
+        var rid = dom.attr("data-rid");
+        var player = new Plyr(videoDom.eq(i), {
+          ratio: '4:3',
+          title: title,
+          controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'pip', 'airplay', 'fullscreen'],
+          blankVideo: "/external_pkgs/plyr/blank.mp4",
+          autopause: true,
+        });
+        var url = "/r/" + rid + "?t=attachment";
+        if(NKC.methods.getRunType() === "app") {
+          url += "&apptype=app";
+        }
+        player.download = url;
+        player.speed = 1;
+        NKC.methods.initPlyrMask(player);
+        players.push(player);
       }
-      player.download = url;
-      player.speed = 1;
-      NKC.methods.initPlyrMask(player);
-    }
-  };
-  NKC.methods.initVideo();
+
+      // 整页播放器集中控制
+      NKC.methods.initPlayerControls(players);
+    };
+    NKC.methods.initVideo();
+
+  }());
 
