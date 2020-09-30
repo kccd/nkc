@@ -23,13 +23,17 @@
             .error-list.b-s-10n(v-if="status === 'noNeedScore'")
               .resource-oname {{fileName}}
               .resource-size 大小：{{size}}
-              .resource-info.m-t-1 你已下载过此附件，下载或预览当前附件不需要花费积分
+              .resource-info.m-t-1 {{settingNoNeed? '':'你已下载过此附件，'}}下载或预览当前附件不需要花费积分
                 span.name 。
               .resource-control.m-t-1
                 a.download-button(:href="'/r/'+ rid +'?t=attachment&c=download&random=' + Math.random()") 立即下载
                 a(v-if="type === 'pdf'" :href="'/r/'+ rid +'?c=preview_pdf&random=' + Math.random()" target="_blank") 预览
             .error-list.b-s-10n(v-else-if="status === 'loadding'")
               .resource-info 加载中...
-        
+            .error-list.b-s-10n(v-else-if="status === 'error'")
+              .resource-info.text-danger {{errorInfo}}
+          .file-count-limit-content
+            include ../fileCountLimitInfo
+
 include ../moment
-+includeJS("/publicModules/downloadResource/downloadResource.js") 
++includeJS("/publicModules/downloadResource/downloadResource.js")

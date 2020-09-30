@@ -69,3 +69,8 @@
 #moduleDownloadResource .module-sd-body .module-content .resource-control a + a {
   margin-left: 10px;
 }
+#moduleDownloadResource .file-count-limit-content {
+  height: 20rem;
+  overflow-y: auto;
+  margin-top: 1rem;
+}

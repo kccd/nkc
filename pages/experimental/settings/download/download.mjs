@@ -3,11 +3,15 @@ const hours = [];
 for(let i = 0; i <=24; i++) {
   hours.push(i);
 }
+const gradeList = data.certList.filter(c => c.type.indexOf('grade-') === 0 || ['role-visitor'].includes(c.type));
+const roleList = data.certList.filter(c => c.type.indexOf('role-') === 0 && !['role-visitor'].includes(c.type));
 const app = new Vue({
   el: '#app',
   data: {
     hours,
     certList: data.certList,
+    gradeList,
+    roleList,
     settings: data.downloadSettings
   },
   methods: {
@@ -18,17 +22,33 @@ const app = new Vue({
         speed: 0
       });
     },
+    addFileCount(arr) {
+      arr.push({
+        startingTime: 0,
+        endTime: 24,
+        fileCount: 0
+      });
+    },
     removeFromArray(arr, index) {
       arr.splice(index, 1);
     },
-    addCert(arr) {
+    addCert(arr, type = 'speed') {
       const item = {
         type: '',
-        fileCount: 0,
         data: []
       };
-      this.addSpeed(item.data);
+      if(type === 'speed') {
+        this.addSpeed(item.data);
+      } else {
+        this.addFileCount(item.data);
+      }
       arr.push(item);
+    },
+    addRole(arr) {
+      arr.push({
+        type:'',
+        fileCount: 0
+      })
     },
     save() {
       nkcAPI('/e/settings/download', 'PUT', {

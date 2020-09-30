@@ -31,7 +31,7 @@ $(function() {
 			}*/
 		},
     mounted: function() {
-      this.getSvgData();
+      // this.getSvgData();
     },
 		methods: {
 			submit: function() {
@@ -186,18 +186,18 @@ $(function() {
 						app.warning.error = data.error || data;
 					})
 			},
-      getSvgData: function() {
-        nkcAPI("/register/code?t=" + Date.now(), "GET")
-          .then(function(data) {
-            app.svgData = data.svgData;
-          })
-          .catch(function(data) {
-            sweetError(data);
-          })
-      },
-      changeImgCode: function() {
-        this.getSvgData();
-      },
+      // getSvgData: function() {
+      //   nkcAPI("/register/code?t=" + Date.now(), "GET")
+      //     .then(function(data) {
+      //       app.svgData = data.svgData;
+      //     })
+      //     .catch(function(data) {
+      //       sweetError(data);
+      //     })
+      // },
+      // changeImgCode: function() {
+      //   this.getSvgData();
+      // },
 		},
 		directives: {
 			focus: {
