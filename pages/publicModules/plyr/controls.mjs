@@ -25,7 +25,6 @@ function onlyOnePlayingAnytime(players) {
 
 // 播放完前一个紧接着播放下一个音频
 function autoPlayNextAudio(players) {
-  console.log(players);
   players.map(player => 
     player.on("ended", event => {
       const currentPlayer = event.detail.plyr;
