@@ -52,6 +52,15 @@ var app = new Vue({
         .catch(function(data) {
           screenTopWarning(data.error || data);
         })
+    },
+    removeFromArr: function(arr, index) {
+      arr.splice(index, 1)
+    },
+    addSizeLimit: function() {
+      this.messageSettings.sizeLimit.others.push({
+        ext: '',
+        size: 0
+      });
     }
   },
   mounted: function() {

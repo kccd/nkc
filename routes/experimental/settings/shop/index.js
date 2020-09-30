@@ -8,18 +8,41 @@ const refundSettingsRouter = require("./refundSettings");
 const shopRouter = new Router();
 shopRouter
 	.use('/', async (ctx, next) => {
-		const {data,body,db} = ctx;
+		const {data, db} = ctx;
 		let homeSetting = await db.ShopSettingsModel.findOne({type: "homeSetting"});
 		if(!homeSetting){
 			homeSetting = new db.ShopSettingsModel({});
 			await homeSetting.save();
 		}
-		const applysDealing = await db.ShopApplyStoreModel.find({applyStatus: "dealing"});
-		data.applysDealing = applysDealing;
+		data.applysDealing = await db.ShopApplyStoreModel.find({applyStatus: "dealing"});
+		data.shopSettings = await db.SettingModel.getSettings('shop');
 		await next();
 	})
 	.get('/', async (ctx, next) => {
-		ctx.template = "experimental/shop/index.pug"
+		ctx.template = "experimental/shop/base/base.pug"
+		await next();
+	})
+	.put('/', async (ctx, next) => {
+		const {db, body, nkcModules} = ctx;
+		const {shopSettings} = body;
+		const {closeSale} = shopSettings;
+		const {checkNumber, checkString} = nkcModules.checkData;
+		checkNumber(closeSale.lastVisitTime, {
+			name: '活动时间',
+			min: 0.01,
+			fractionDigits: 2,
+		});
+		checkString(closeSale.description, {
+			name: '受限时的提示',
+			min: 1,
+			max: 500
+		});
+		await db.SettingModel.updateOne({_id: 'shop'}, {
+			$set: {
+				'c.closeSale': closeSale
+			}
+		});
+		await db.SettingModel.saveSettingsToRedis('shop');
 		await next();
 	})
 	.post('/', async (ctx, next) => {

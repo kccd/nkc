@@ -73,11 +73,13 @@ function generalRequest(type, url, method, data, progress) {
       if(type === "upload") {
         xhr.open(method || "POST", url,true);
         xhr.setRequestHeader("FROM","nkcAPI");
+        xhr.setRequestHeader("Accept", "*/*");
         xhr.send(data);
       } else {
         xhr.open(method, url,true);
         xhr.setRequestHeader("Content-type","application/json");
         xhr.setRequestHeader("FROM","nkcAPI");
+        xhr.setRequestHeader("Accept", "*/*");
         xhr.send(JSON.stringify(data));
       }
     }catch(err){

@@ -1,6 +1,10 @@
 module.exports = {
   _id: 'verification',
   c: {
-    enabledTypes: []
+    enabledTypes: [],
+    countLimit: {
+      time: 60,
+      count: 30
+    }
   }
 }

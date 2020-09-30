@@ -142,8 +142,7 @@ NKC.modules.Login = function() {
         verifications
           .open()
           .then(function(data) {
-            var secret = data.secret;
-            body.verifySecret = secret;
+            body.verifySecret = data.secret;
             return nkcAPI(url, "POST", body);
           })
           .then(function() {
@@ -183,32 +182,6 @@ NKC.modules.Login = function() {
         self.dom.modal("show");
         self.app.type = type || "login";
         self.app.getSvgData();
-        // self.app.startRecoredding();
-      },
-      // 开始记录用户行为
-      startRecoredding: function() {
-        var target = $(this.$el).find(".modal-content");
-        target.on("mousemove", function(e) {
-          console.log(e.originalEvent.clientX, e.originalEvent.clientY);
-          loginBehavior.push({
-            type: "mousemove",
-            x: e.originalEvent.clientX,
-            y: e.originalEvent.clientY
-          })
-        });
-        target.on("keydown", function(e) {
-          loginBehavior.push({
-            type: "keydown",
-            key: e.key
-          })
-        });
-        target.on("mousedown", function(e) {
-          loginBehavior.push({
-            type: "mousedown",
-            x: e.originalEvent.clientX,
-            y: e.originalEvent.clientY
-          })
-        })
       }
     }
   });

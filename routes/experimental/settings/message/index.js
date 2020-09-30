@@ -7,12 +7,13 @@ messageRouter
     data.messageTypesLanguage = state.language.messageTypes;
     data.roles = await db.RoleModel.find().sort({toc: 1});
     data.grades = await db.UsersGradeModel.find().sort({toc: 1});
-    data.messageSettings = (await db.SettingModel.findById("message")).c;
+    data.messageSettings = await db.SettingModel.getSettings('message');
     ctx.template = 'experimental/settings/message/message.pug';
     await next();
   })
   .put('/', async (ctx, next) => {
     const {body, db, nkcModules} = ctx;
+    const {checkNumber} = nkcModules.checkData;
     const {roles, grades, type, messageType, messageSettings} = body;
     if(type === "modifyMessageType") {
       const {templates, _id, name, description} = messageType;
@@ -52,6 +53,23 @@ messageRouter
       const grades_ = await db.UsersGradeModel.find({_id: {$in: messageSettings.mandatoryLimitGradeProtect}});
       const gradesId = grades_.map(g => g._id);
 
+      const {sizeLimit} = messageSettings;
+
+      // 尺寸限制
+      checkNumber(sizeLimit.default, {
+        name: '文件尺寸',
+        min: 0,
+      });
+      for(const s of sizeLimit.others) {
+        const {size, ext} = s;
+        if(!ext) ctx.throw(400, `文件尺寸设置中文件格式不能为空`);
+        s.ext = ext.toLowerCase();
+        checkNumber(size, {
+          name: '文件尺寸',
+          min: 0,
+        });
+      }
+
       await db.SettingModel.updateOne({
         _id: "message"
       }, {
@@ -64,6 +82,7 @@ messageRouter
           "c.adminRolesId": rolesId,
           "c.mandatoryLimitGradeProtect": gradesId,
           "c.customizeLimitInfo": messageSettings.customizeLimitInfo,
+          "c.sizeLimit": sizeLimit
         }
       });
 

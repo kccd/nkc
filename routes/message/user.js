@@ -69,6 +69,10 @@ userRouter
       const voiceExt = ['amr', 'aac'];
       const videoExt = ["mp4", "mov", "3gp", "avi"];
       const {name, size, path} = file;
+
+      // 附件尺寸限制
+      await db.MessageModel.checkFileSize(file);
+
       let ext = PATH.extname(name);
 
       if(!ext) ctx.throw(400, '无法识别文件格式');

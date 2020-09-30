@@ -10,6 +10,7 @@ class Verifications {
       el: '#moduleVerificationsApp',
       data: {
         type: '',
+        error: '',
         vernierCaliper: {
           init: false,
           answer: 0,
@@ -34,9 +35,7 @@ class Verifications {
       },
       methods: {
         getData(showModal = false) {
-          /*if(showModal) {
-            self.dom.modal('show');
-          }*/
+          this.error = '';
           return nkcAPI(`/verifications`, 'GET')
             .then(data => {
               if(data.verificationData.type === 'unEnabled') {
@@ -52,7 +51,12 @@ class Verifications {
             })
             .catch(err => {
               console.log(err);
-              sweetError(err);
+              // sweetError(err);
+              self.app.error = err.error || err.message || err;
+              self.app.type = 'error';
+              if(showModal) {
+                self.dom.modal('show');
+              }
             });
         },
         close() {
@@ -128,9 +132,12 @@ class Verifications {
         },
         submit() {
           const {data: verificationData, answer} = this[this.type];
-          verificationData.answer = answer;
           nkcAPI(`/verifications`, 'POST', {
-            verificationData
+            verificationData: {
+              answer,
+              _id: verificationData._id,
+              type: verificationData.type
+            }
           })
             .then((data) => {
               self.done({

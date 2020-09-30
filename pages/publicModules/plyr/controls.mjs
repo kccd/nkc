@@ -25,6 +25,7 @@ function onlyOnePlayingAnytime(players) {
 
 // 播放完前一个紧接着播放下一个音频
 function autoPlayNextAudio(players) {
+  console.log(players);
   players.map(player => 
     player.on("ended", event => {
       const currentPlayer = event.detail.plyr;
@@ -44,3 +45,11 @@ NKC.methods.initPlayerControls = function(players) {
   onlyOnePlayingAnytime(players);
   autoPlayNextAudio(players);
 }
+
+
+
+// let audio = document.createElement("audio");
+
+// $("#wrap > div.m-b-1 > div > div > div:nth-child(3) > div > div > div.h3.thread-title.text-center").on("click", () => {
+//   audio.webkitShowPlaybackTargetPicker();
+// });

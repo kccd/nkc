@@ -1,88 +1,82 @@
 const Router = require('koa-router');
 const router = new Router();
 router
-	.get('/', async (ctx, next) => {
-		const {data, db} = ctx;
-    const downloadSettings = await db.SettingModel.getSettings("download");
-    const {options} = downloadSettings;
-    const roles = await db.RoleModel.find({_id: {$nin: ["default", "banned"]}}).sort({toc: 1});
-    const grades = await db.UsersGradeModel.find().sort({toc: 1});
-    const optionsObj = {};
-    options.map(option => {
-      optionsObj[`${option.type}_${option.id}`] = option;
-    });
-    data.roleOptions = [];
-    data.gradeOptions = [];
-    roles.map(role => {
-      let option = optionsObj[`role_${role._id}`];
-      if(!option) {
-        option = {
-          id: role._id,
-          type: "role",
-          fileCountOneDay: 0,
-          speed: 1
-        };
-      }
-      option.name = role.displayName;
-      data.roleOptions.push(option);
-    });
-    grades.map(grade => {
-      let option = optionsObj[`grade_${grade._id}`];
-      if(!option) {
-        option = {
-          id: grade._id,
-          type: "grade",
-          fileCountOneDay: 0,
-          speed: 1
-        };
-      }
-      option.name = grade.displayName;
-      data.gradeOptions.push(option);
-    });
-    data.downloadSettings = downloadSettings;
-		ctx.template = 'experimental/settings/download.pug';
-		await next();
-	})
-	.put('/', async (ctx, next) => {
-    const {db, body, nkcModules} = ctx;
-    const {options, allSpeed} = body;
-    const options_ = [];
+  .use('/', async (ctx, next) => {
+    const {data, db} = ctx;
+    data.certList = await db.RoleModel.getCertList();
+    await next();
+  })
+  .get('/', async (ctx, next) => {
+    const {db, data} = ctx;
+    data.downloadSettings = await db.SettingModel.getSettings('download');
+    ctx.template = 'experimental/settings/download/download.pug';
+    await next();
+  })
+  .put('/', async (ctx, next) => {
+    const {db, data, body, nkcModules} = ctx;
+    const {downloadSettings} = body;
+    const {speed, allSpeed} = downloadSettings;
     const {checkNumber} = nkcModules.checkData;
-    for(const option of options) {
-      const {type, id, fileCountOneDay, speed} = option;
-      checkNumber(fileCountOneDay, {
-        name: "每天下载附件个数",
-        min: 0
-      });
-      checkNumber(speed, {
-        name: "下载速度",
-        min: 1
-      });
-      if(type === "role") {
-        const role = await db.RoleModel.findOne({_id: id});
-        if(!role) continue;
-      } else {
-        const grade = await db.UsersGradeModel.findOne({_id: id});
-        if(!grade) continue;
-      }
-      options_.push({
-        type,
-        id,
-        fileCountOneDay,
-        speed
-      });
+    const {certList} = data;
+    const certListObj = {};
+    for(const c of certList) {
+      certListObj[c.type] = c;
     }
     checkNumber(allSpeed, {
       name: '总下载速度',
       min: 0,
     });
-    await db.SettingModel.updateOne({_id: "download"}, {
+    const speedTypes = speed.others.map(o => o.type);
+    if([...new Set(speedTypes)].length !== speedTypes.length) {
+      ctx.throw(400, '类型重复，请检查');
+    }
+    const checkTimeSpeed = async (name, arr) => {
+      let number = 0;
+      for(const a of arr) {
+        const {startingTime, endTime, speed} = a;
+        checkNumber(startingTime, {
+          name: '速度限制起始时间',
+          min: 0,
+          max: 24
+        });
+        checkNumber(endTime, {
+          name: '速度限制结束时间',
+          min: 0,
+          max: 24
+        });
+        if(startingTime >= endTime) ctx.throw(400, `类型「${name}」速度限制中的起始时间必须小于结束时间`);
+        checkNumber(speed, {
+          name: '下载速度',
+          min: 0
+        });
+        number += (endTime - startingTime);
+      }
+      if(number !== 24) {
+        ctx.throw(400, `类型「${name}」速度限制中的时间范围设置错误`);
+      }
+    };
+
+    for(const o of speed.others) {
+      const cl = certListObj[o.type];
+      if(!cl) ctx.throw(400, `type error. type: ${o.type}`);
+      checkNumber(o.fileCount, {
+        name: `类型「${cl.name}」每天附件下载上限`,
+        min: 0,
+      });
+      await checkTimeSpeed(cl.name, o.data);
+    }
+    checkNumber(speed.default.fileCount, {
+      name: `类型「其他」每天附件下载上限`,
+      min: 0
+    });
+    await checkTimeSpeed('其他', speed.default.data);
+    await db.SettingModel.updateOne({_id: 'download'}, {
       $set: {
-        "c.options": options_,
+        'c.speed': speed,
         'c.allSpeed': allSpeed
       }
     });
-    await db.SettingModel.saveSettingsToRedis("download");
-		await next();
-	});
+    await db.SettingModel.saveSettingsToRedis('download');
+    await next();
+  });
 module.exports = router;

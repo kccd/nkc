@@ -7,7 +7,7 @@ const imageSize = 300;
 // 绘制文字大小
 const fontSize = 40;
 // 噪点密度
-const noiseDensity = 0.04;
+const noiseDensity = 0.03;
 // 文字库
 const chineseChars = `天地玄黄宇宙洪荒日月辰宿列张来往秋收冬闰余成岁吕调阳云致雨结为金生丽水玉出昆冈剑号巨珠称夜光果珍菜芥海咸河淡羽翔龙师火帝鸟官人始制文字乃服衣推位让国有陶唐吊民伐罪周发汤坐朝问道拱平章臣伏戎一体率宾归王鸣凤在竹白驹食场化被草木及万方此身发四大五常恭惟养岂敢伤女贞洁男效才良知过必改得能莫忘谈彼短恃己长信使可器欲难悲丝染诗羔羊行贤克念作圣名立形表正`.split("");
 
@@ -51,6 +51,12 @@ async function makeCaptchaImage(){
       text: char
     })
   });
+
+  // 圆形框线
+  // textInfoList.map(info => {
+  //   markRound(info, ctx);
+  //   console.log(info.centerPoint, info.text);
+  // })
 
   // 整体效果
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -212,13 +218,9 @@ function markRound(info, ctx) {
   ctx.lineWidth = 2;
   ctx.strokeStyle = "red";
   let centerPoint = info.centerPoint;
-  let init = ac({x: centerPoint.x, y: centerPoint.y}, info.radius, 0);
-  ctx.moveTo(init.x, init.y);
-  for(let i = 0; i <= 360; i++) {
-    let nextPoint = ac({x: centerPoint.x, y: centerPoint.y}, info.radius, i);
-    ctx.lineTo(nextPoint.x, nextPoint.y);
-    ctx.stroke();
-  }
+  ctx.beginPath();
+  ctx.arc(centerPoint.x, centerPoint.y, info.radius, 0, 2 * Math.PI);
+  ctx.stroke();
   ctx.restore();
 }
 

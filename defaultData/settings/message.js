@@ -27,6 +27,19 @@ module.exports = {
     ],
     mandatoryLimitGradeProtect: [
       0
-    ]
+    ],
+    sizeLimit: {
+      default: 10 * 1024,
+      others: [
+        {
+          ext: 'mp4',
+          size: 100 * 1024
+        },
+        {
+          ext: 'gif',
+          size: 5 * 1024
+        }
+      ]
+    }
   }
 };
