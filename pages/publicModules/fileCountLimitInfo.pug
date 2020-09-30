@@ -1,0 +1,24 @@
+h5 当前账号的附件下载数量限制如下：
+if fileCountLimitInfo
+  .file-count-limit-info
+    table.table.table-bordered
+      thead
+        tr
+          th 时段
+          th 个数
+      tbody
+        for f in fileCountLimitInfo
+          tr
+            th=`${f.startingTime}点 - ${f.endTime}点`
+            th= f.fileCount
+else
+  .file-count-limit-info(v-if='fileCountLimitInfo')
+    table.table.table-bordered
+      thead
+        tr
+          th 时段
+          th 个数
+      tbody
+        tr(v-for='f in fileCountLimitInfo')
+          th {{f.startingTime}}点 - {{f.endTime}}点
+          th {{f.fileCount}}
