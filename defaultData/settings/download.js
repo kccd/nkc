@@ -1,23 +1,7 @@
 module.exports = {
   _id: 'download',
   c: {
-    options: [
-       {
-        id: 'default',
-        type: "role",
-        fileCountOneDay: 3,
-        speed: 1024, // KB
-      },
-      {
-        id: 'visitor',
-        type: "role",
-        fileCountOneDay: 3,
-        speed: 1024, // KB
-      }
-    ],
-
     allSpeed: 100 * 1024, //总下载速度 KB
-
     speed: {
       default: {
         fileCount: 10,
@@ -54,5 +38,34 @@ module.exports = {
         }
       ]
     },
+    fileCountLimit: {
+      default: {
+        data: [
+          {
+            startingTime: 0,
+            endTime: 24,
+            fileCount: 10
+          }
+        ]
+      },
+      others: [
+        {
+          type: 'grade-0',
+          data: [
+            {
+              startingTime: 0,
+              endTime: 24,
+              fileCount: 2
+            }
+          ]
+        }
+      ],
+      roles: [
+        {
+          type: 'role-dev',
+          fileCount: 100
+        }
+      ]
+    }
   }
 };

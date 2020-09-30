@@ -32,29 +32,41 @@ resourceRouter
     // 告诉浏览器不要把这次的响应结果缓存下来
     ctx.set("Cache-Control", "no-store");
     if(mediaType === "mediaAttachment") {
+      data.fileCountLimitInfo = await db.SettingModel.getDownloadFileCountLimitInfoByUser(data.user);
       const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
-      const {fileCountOneDay} = downloadOptions;
+      const {fileCountLimit} = downloadOptions;
       speed = downloadOptions.speed;
-      if(fileCountOneDay === 0) {
+      if(fileCountLimit.fileCount === 0) {
         if(!data.user) {
           ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
         } else {
           ctx.throw(403, '您当前账号等级无法下载附件，请发表优质内容提升等级。');
         }
       }
-      let downloadToday;
+      let downloadLogs;
+      const today = nkcModules.apiFunction.today().getTime();
       const match = {
         toc: {
-          $gte: nkcModules.apiFunction.today()
+          $gte: new Date(today + fileCountLimit.startingTime * 60 * 60 * 1000),
+          $lt: new Date(today + fileCountLimit.endTime * 60 * 60 * 1000),
         }
+      };
+      const matchToday = {
+        toc: {
+          $gte: Date.now() - 24 * 60 * 60 * 1000
+        },
+        rid: resource.rid
       };
       if(!data.user) {
         // 游客
         match.ip = ctx.address;
         match.uid = "";
+        matchToday.ip = ctx.address;
+        matchToday.uid = '';
       } else {
         // 已登录用户
         match.uid = data.user.uid;
+        matchToday.uid = data.user.uid;
       }
       const logs = await db.DownloadLogModel.aggregate([
         {
@@ -69,12 +81,14 @@ resourceRouter
           }
         }
       ]);
-      downloadToday = logs?logs.map(l => l._id): [];
-      if(!downloadToday.includes(resource.rid) && downloadToday.length >= fileCountOneDay) {
+
+      const downloadedToday = await db.DownloadLogModel.findOne(matchToday); // 24小时内是否下载过此附件
+      downloadLogs = logs?logs.map(l => l._id): [];
+      if(!downloadedToday && downloadLogs.length >= fileCountLimit.fileCount) {
         if(data.user) {
-          ctx.throw(403, "今日下载的附件数量已达上限，请明天再试。");
+          ctx.throw(403, `当前时段（${fileCountLimit.startingTime}点 - ${fileCountLimit.endTime}点）下载的附件数量已达上限，请在下一个时段再试。`);
         } else {
-          ctx.throw(403, `未登录用户每天只能下载${fileCountOneDay}个附件，请登录或注册后重试。`);
+          ctx.throw(403, `未登录用户当前时段（${fileCountLimit.startingTime}点 - ${fileCountLimit.endTime}点）只能下载${fileCountLimit.fileCount}个附件，请登录或注册后重试。`);
         }
       }
 
@@ -84,6 +98,7 @@ resourceRouter
       // 下载此附件是否需要积分状态位
       let needScore = false;
       // 此操作是否需要积分(更新状态位)
+
       for(let typeName of enabledScoreTypes) {
         let number = operation[typeName];
         // 如果设置的操作花费的积分不为0才考虑扣积分
@@ -92,11 +107,12 @@ resourceRouter
           break;
         }
       }
+      // 设置的次数为 0 表示关闭积分交易，不扣积分
+      if(operation.count === 0) needScore = false;
+
       if(!needScore) {
         data.settingNoNeed = true;
       }
-      // 设置的次数为 0 表示关闭积分交易，不扣积分
-      if(operation.count === 0) needScore = false;
 
       // 临时添加 忽略pdf文件
       /*if(resource.ext === 'pdf') {
@@ -123,7 +139,10 @@ resourceRouter
           // 如果最后一次下载到现在没有超过规定时间就不扣积分
           if(nowTime - lastAttachmentDownloadTime <= data.resourceExpired /* 一分钟 */) needScore = false;
           // 今日下载次数大于设置的次数 并且 设置的次数不为 -1 就不扣积分
-          if(todayOperationCount >= operation.count && operation.count !== -1 && operation.count !== 0) needScore = false;
+          if(todayOperationCount >= operation.count && operation.count !== -1 && operation.count !== 0) {
+            needScore = false;
+            data.settingNoNeed = true;
+          }
         }
       }
       data.need = needScore;
@@ -194,7 +213,7 @@ resourceRouter
           // 如果只是获取附件和积分相关信息
           return next();
         }
-        if(c === "nkc_source_pdf") {
+        if(c === "preview_pdf") {
           return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid);
         }
       }

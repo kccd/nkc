@@ -49,14 +49,17 @@ block content
           if data.resource.ext === "pdf"
             | &nbsp;&nbsp;&nbsp;
             a.m-l-0(href=`/r/${rid}?c=preview_pdf&random=${Math.random()}` ) 预览
-          //-if data.enough
-            a.m-l-0.download-button(onclick=`payForDownloadResource(${rid})`) 立即下载
-            if data.resource.ext === "pdf"
-              | &nbsp;&nbsp;&nbsp;
-              a.m-l-0(onclick=`previewPDFResource(${rid})`) 预览
+            //-if data.enough
+              a.m-l-0.download-button(onclick=`payForDownloadResource(${rid})`) 立即下载
+              if data.resource.ext === "pdf"
+                | &nbsp;&nbsp;&nbsp;
+                a.m-l-0(onclick=`previewPDFResource(${rid})`) 预览
           else
             a.m-l-0(href=`/account/finance/recharge`) 充值
           | &nbsp;&nbsp;&nbsp;
           a(onclick="closePage()") 返回上一页
+        .m-t-1
+          -const fileCountLimitInfo = data.fileCountLimitInfo;
+          include ../publicModules/fileCountLimitInfo
 
   +includeJS("/resource/download.js")
