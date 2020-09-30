@@ -125,7 +125,7 @@ NKC.modules.downloadResource = class {
   const dr = new NKC.modules.downloadResource();
   let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
   attachments.forEach(attachment => {
-    $(attachment).find(".article-attachment-name").on("click", e => {
+    $(attachment).find("a.article-attachment-name").on("click", e => {
       e.preventDefault();
       e.stopPropagation();
       let rid = $(attachment).attr("data-id");
