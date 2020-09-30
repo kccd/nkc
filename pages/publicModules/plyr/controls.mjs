@@ -32,7 +32,7 @@ function autoPlayNextAudio(players) {
       if(index < 0) return;
       for(let i = index; i < players.length; i++) {
         const nextPlayer = players[index + 1];
-        if(nextPlayer.type === "audio") {
+        if(nextPlayer && nextPlayer.type === "audio") {
           return nextPlayer.play();
         }
       }
