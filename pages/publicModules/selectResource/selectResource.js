@@ -197,6 +197,12 @@ NKC.modules.SelectResource = function() {
             self.files.unshift(f);
             self.startUpload(f);
           }
+
+
+          /*var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
+          var files = [].slice.call(clipboardData.files);
+          if(files.length <= 0) return;
+          self.uploadSelectFile(files);*/
         });
       },
       pasteContent: function() {

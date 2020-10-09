@@ -23,7 +23,7 @@ userRouter
       const targetUser = await db.UserModel.findOne({uid: searchContent.trim()});
       match.uid = targetUser? targetUser.uid: '';
     } else if(searchType === 'username') {
-      const targetUser = await db.UserModel.findOne({usernameLowerCase: searchContent.trim()});
+      const targetUser = await db.UserModel.findOne({usernameLowerCase: searchContent.toLowerCase()});
       match.uid = targetUser? targetUser.uid: '';
     } else if(searchType === 'ip') {
       const usersPersonal = await db.UsersPersonalModel.find({regIP: searchContent.trim()}, {uid: 1});
@@ -32,7 +32,7 @@ userRouter
       const usersPersonal = await db.UsersPersonalModel.find({mobile: searchContent.trim()}, {uid: 1});
       match.uid = {$in: usersPersonal.map(u => u.uid)};
     } else if(searchType === 'email') {
-      const usersPersonal = await db.UsersPersonalModel.find({email: searchContent.trim()}, {uid: 1});
+      const usersPersonal = await db.UsersPersonalModel.find({email: searchContent.trim().toLowerCase()}, {uid: 1});
       match.uid = {$in: usersPersonal.map(u => u.uid)};
     }
     const count = await db.UserModel.count(match);
