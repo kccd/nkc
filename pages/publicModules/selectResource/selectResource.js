@@ -189,14 +189,9 @@ NKC.modules.SelectResource = function() {
         dom.off("paste");
         dom.one("paste", function(e) {
           var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
-          var files = clipboardData.items || [];
-          for(var i = 0; i < files.length; i ++) {
-            var file = files[i].getAsFile();
-            if(!file) continue;
-            var f = self.newFile(file);
-            self.files.unshift(f);
-            self.startUpload(f);
-          }
+          var files = [].slice.call(clipboardData.files);
+          if(files.length <= 0) return;
+          self.uploadSelectFile(files);
         });
       },
       pasteContent: function() {
