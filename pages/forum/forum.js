@@ -1,4 +1,5 @@
 var SubscribeTypes;
+var forumInfo = NKC.methods.getDataById('forumInfo');
 $(function() {
   if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
@@ -24,6 +25,7 @@ $(function() {
       modifyThreadUrl(s);
     });
   }
+  socket.on('test', console.log)
 });
 
 var threadUrlSwitchKey = 'forum_thread_a_target';

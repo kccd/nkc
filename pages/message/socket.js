@@ -1,11 +1,15 @@
-var pageName = '';
+var pageName = '', query = {
+  operationId: NKC.configs.refererOperationId,
+  forumId: NKC.configs.socketQueryForumId
+};
 var socket = io('/common', {
   forceNew: false,
   reconnection: true,
   autoConnect: true,
   transports: ['polling', 'websocket'],
   reconnectionDelay: 5000,
-  reconnectionDelayMax: 10000
+  reconnectionDelayMax: 10000,
+  query: query
 });
 
 // socket.open();

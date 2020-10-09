@@ -10,7 +10,8 @@ const func = async (socket, next) => {
     settings,
     tools,
     nkcModules,
-    data: {}
+    data: {},
+    query: {},
   };
   let address = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
   if(address !== '') {
@@ -19,6 +20,7 @@ const func = async (socket, next) => {
     address = address.length? address[0]:'';
   }
   socket.NKC.address = address;
+  socket.NKC.query = socket.handshake.query;
   await next();
 };
 module.exports = func;
