@@ -201,7 +201,7 @@ settingSchema.statics.checkEmail = async (email, uid) => {
 settingSchema.statics.getDownloadSettingsByUser = async (user) => {
   const SettingModel = mongoose.model("settings");
   const {speed: settingsSpeed} = await SettingModel.getSettings("download");
-  let fileCountOneDay, speed;
+  let speed;
   const hour = new Date().getHours();
   const optionsObj = {};
   for(const o of settingsSpeed.others) {
@@ -221,7 +221,6 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
   if(!user) {
     const option = optionsObj[`role-visitor`];
     if(option) {
-      fileCountOneDay = option.fileCount;
       speed = getSpeedByHour(option.data);
     }
   } else {
@@ -234,9 +233,6 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
     for(const role of user.roles) {
       const option = optionsObj[`role-${role._id}`];
       if(!option) continue;
-      if(fileCountOneDay === undefined || fileCountOneDay < option.fileCount) {
-        fileCountOneDay = option.fileCount;
-      }
       const _speed = getSpeedByHour(option.data);
       if(speed === undefined || speed < _speed) {
         speed = _speed;
@@ -244,23 +240,89 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
     }
     const gradeOption = optionsObj[`grade-${user.grade._id}`];
     if(gradeOption) {
-      if(fileCountOneDay === undefined || fileCountOneDay < gradeOption.fileCount) {
-        fileCountOneDay = gradeOption.fileCount;
-      }
       const _speed = getSpeedByHour(gradeOption.data);
       if(speed === undefined || speed < _speed) {
         speed = _speed;
       }
     }
   }
-  if(fileCountOneDay === undefined || speed === undefined) {
-    fileCountOneDay = settingsSpeed.default.fileCount;
+  if(speed === undefined) {
     speed = getSpeedByHour(settingsSpeed.default.data);
   }
+  const fileCountLimitInfo = await SettingModel.getDownloadFileCountLimitInfoByUser(user);
+  let fileCountLimit;
+  for(const f of fileCountLimitInfo) {
+    const {startingTime, endTime} = f;
+    if(hour >= startingTime && hour < endTime) {
+      fileCountLimit = f;
+      break;
+    }
+  }
+  if(!fileCountLimit) throwErr(500, `后台数量限制配置错误，请通过页脚的「报告问题」告知管理员`);
   return {
     speed,
-    fileCountOneDay
+    fileCountOneDay: fileCountLimit.fileCount,
+    fileCountLimit
   }
+};
+
+
+
+/*
+* 获取用户分时段下载附件的信息
+* @param {Object} user 用户对象
+* @author pengxiguaa 2020-9-29
+* */
+settingSchema.statics.getDownloadFileCountLimitInfoByUser = async (user) => {
+  const SettingModel = mongoose.model("settings");
+  const {fileCountLimit} = await SettingModel.getSettings("download");
+  const {default: settingsDefault, others, roles} = fileCountLimit;
+
+  // 判断证书
+  if(user) {
+    if(!user.roles) {
+      await user.extendRoles();
+    }
+    const rolesObj = {};
+    roles.map(role => rolesObj[role.type] = role);
+    let fileCount;
+    for(const role of user.roles) {
+      const r = rolesObj[`role-${role._id}`];
+      if(!r) continue;
+      if(fileCount === undefined || fileCount < r.fileCount) {
+        fileCount = r.fileCount;
+      }
+    }
+    if(fileCount !== undefined) {
+      return [
+        {
+          startingTime: 0,
+          endTime: 24,
+          fileCount,
+        }
+      ];
+    }
+  }
+
+  // 用户等级判断
+  let optionType;
+  if(!user) {
+    optionType = `role-visitor`;
+  } else {
+    if(!user.grade) {
+      await user.extendGrade();
+    }
+    optionType = `grade-${user.grade._id}`;
+  }
+  let option;
+  for(const o of others) {
+    if(o.type !== optionType) continue;
+    option = o;
+  }
+  if(!option) {
+    option = settingsDefault;
+  }
+  return option.data;
 };
 
 /*

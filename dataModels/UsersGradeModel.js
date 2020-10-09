@@ -108,6 +108,18 @@ const usersGradeSchema = new Schema({
   }
 });
 
+usersGradeSchema.statics.getGradeList = async (blacklist = []) => {
+  const GM = mongoose.model("usersGrades");
+  const grades = await GM.find({_id: {$nin: blacklist}}, {_id: 1, displayName: 1}).sort({_id: 1});
+  const data = [];
+  for(const grade of grades) {
+    data.push({
+      type: `grade-${grade._id}`,
+      name: `等级 - ${grade.displayName}`
+    });
+  }
+  return data;
+};
 
 const UsersGradeModel = mongoose.model('usersGrades', usersGradeSchema);
 module.exports = UsersGradeModel;

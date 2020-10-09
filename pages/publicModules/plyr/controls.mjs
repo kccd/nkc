@@ -25,14 +25,14 @@ function onlyOnePlayingAnytime(players) {
 
 // 播放完前一个紧接着播放下一个音频
 function autoPlayNextAudio(players) {
-  players.map(player => 
+  players.map(player =>
     player.on("ended", event => {
       const currentPlayer = event.detail.plyr;
       let index = players.indexOf(currentPlayer);
       if(index < 0) return;
       for(let i = index; i < players.length; i++) {
         const nextPlayer = players[index + 1];
-        if(nextPlayer.type === "audio") {
+        if(nextPlayer && nextPlayer.type === "audio") {
           return nextPlayer.play();
         }
       }

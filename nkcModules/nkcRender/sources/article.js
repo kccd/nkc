@@ -86,7 +86,8 @@ module.exports = {
           <img src="${fileCover}" alt="attachment icon">
         </span>
         <span class="article-attachment-content">
-          <a class="article-attachment-name" ${resource.isFileExist? `href="${url}?t=attachment"`: ""} title="${oname}" target="_blank">${oname}</a>
+          ${resource.isFileExist? `<a class="article-attachment-name" href="${url}?t=attachment" title="${oname}"  target="_blank">${oname}</a>`:
+            `<span class="article-attachment-name" title="${oname}" title="${oname}（附件已丢失）"  target="_blank">${oname}</span>`}
           <span class="article-attachment-info">
             <span class="article-attachment-size">${getSize(size)}</span>
             <span class="article-attachment-ext">${ext.toUpperCase()}</span>

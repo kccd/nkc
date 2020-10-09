@@ -11,7 +11,10 @@ NKC.modules.downloadResource = class {
         size: 0,
         costs: [],
         hold: [],
-        status: "loadding"
+        status: "loadding",
+        fileCountLimitInfo: '',
+        errorInfo: '',
+        settingNoNeed: false,
       },
       computed: {
         costMessage() {
@@ -24,7 +27,7 @@ NKC.modules.downloadResource = class {
       methods: {
         fromNow: NKC.methods.fromNow,
         initDom() {
-          const height = "20rem";
+          const height = "37rem";
           self.dom.css({
             height
           });
@@ -57,21 +60,24 @@ NKC.modules.downloadResource = class {
         },
         getResourceInfo(rid) {
           let self = this;
+          self.status = 'loadding';
+          self.errorInfo = '';
           // 下载此附件是否需要积分
           nkcAPI(`/r/${rid}?c=query&random=${Math.random()}`, "GET", {})
             .then(data => {
-              console.log(data);
+              self.fileCountLimitInfo = data.fileCountLimitInfo;
               let dataUrl = `/r/${rid}?t=attachment&c=download&random=${Math.random()}`;
-              if(data.settingNoNeed) {
+              /*if(data.settingNoNeed) {
                 let downloadLink = $("<a></a>");
                 downloadLink.attr("href", dataUrl);
                 downloadLink[0].click();
                 self.close();
                 return;
-              }
+              }*/
               self.status = data.need
                 ? "needScore"
                 : "noNeedScore"
+              self.settingNoNeed = data.settingNoNeed;
               self.rid = data.rid;
               self.fileName = data.resource.oname;
               self.type = data.resource.ext;
@@ -92,8 +98,11 @@ NKC.modules.downloadResource = class {
               });
             })
             .catch(data => {
-              self.close();
-              sweetError(data);
+              // self.close();
+              // sweetError(data);
+              self.fileCountLimitInfo = data.fileCountLimitInfo;
+              self.status = 'error';
+              self.errorInfo = data.error || data.message || data;
             })
         },
         open(rid) {
@@ -116,7 +125,7 @@ NKC.modules.downloadResource = class {
   const dr = new NKC.modules.downloadResource();
   let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
   attachments.forEach(attachment => {
-    $(attachment).find(".article-attachment-name").on("click", e => {
+    $(attachment).find("a.article-attachment-name").on("click", e => {
       e.preventDefault();
       e.stopPropagation();
       let rid = $(attachment).attr("data-id");

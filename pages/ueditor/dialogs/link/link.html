@@ -32,12 +32,6 @@
             <td><input class="txt" id="href" type="text" /></td>
         </tr>
         <tr>
-            <td><label for="title"> <var id="lang_input_title"></var></label></td>
-        </tr>
-        <tr>
-            <td><input class="txt" id="title" type="text"/></td>
-        </tr>
-        <tr>
              <td colspan="2">
                  <label for="target"><var id="lang_input_target"></var></label>
                  <input id="target" type="checkbox"/>
@@ -76,7 +70,7 @@
         }
 
     }
-    $G("title").value = url ? link.title : "";
+    // $G("title").value = url ? link.title : "";
     $G("href").value = url ? url: '';
     $G("target").checked = url && link.target == "_blank" ? true :  false;
     $focus($G("href"));
@@ -89,7 +83,7 @@
             var obj = {
                 'href' : href,
                 'target' : $G("target").checked ? "_blank" : '_self',
-                'title' : $G("title").value.replace(/^\s+|\s+$/g, ''),
+                // 'title' : $G("title").value.replace(/^\s+|\s+$/g, ''),
                 '_href':href
             };
             //修改链接内容的情况太特殊了，所以先做到这里了
@@ -128,7 +122,7 @@
         }
         handleDialogOk();
     };
-    $G('href').onkeydown = $G('title').onkeydown = function(evt){
+    $G('href').onkeydown = function(evt){
         evt = evt || window.event;
         if (evt.keyCode == 13) {
             handleDialogOk();

@@ -56,7 +56,7 @@ var Tools = function() {
         return '/a/' + id + t
       }
       case "pdf": {
-        return "/r/" + id + '?c=nkc_source_pdf';
+        return "/r/" + id + '?c=preview_pdf';
       }
       case "sticker": {
         return "/sticker/" + id;

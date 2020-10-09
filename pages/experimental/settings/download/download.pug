@@ -12,18 +12,17 @@ block eContent
   .hidden#data=objToStr({downloadSettings: data.downloadSettings, certList: data.certList})
   .container-fluid.max-width#app(v-cloak)
     .row
-      .col-xs-12.col-md-12.form-inline
+      .col-xs-12.col-md-12.form-inline.m-b-2
         span.h4 总下载速度：
         input.form-control(type='text' v-model.number='settings.allSpeed').m-r-05
         span KB / 进程
-      .col-xs-12.col-md-12
+      .col-xs-12.col-md-12.m-b-2
         h4 速度限制
         .table-responsive
           table.table.table-bordered
             thead
               tr
                 th 类型
-                th 每天附件下载上限
                 th 速度限制（时间必须覆盖0-24）
                 th 其他
             tbody
@@ -31,7 +30,7 @@ block eContent
                 th.select
                   select.form-control(v-model='t.type')
                     option(v-for='c in certList' :value='c.type') {{c.name}}
-                th.select
+                //-th.select
                   input.form-control(type='text' v-model.number='t.fileCount')
                 th
                   .m-b-05(v-for='s, index in t.data').form-inline
@@ -44,7 +43,7 @@ block eContent
                     span &nbsp;点整最大下载速度为
                     input.min(type='text' v-model.number='s.speed')
                     span &nbsp;KB
-                    button.btn.btn-xs.btn-danger(@click='removeFromArray(t.data, index)') 删除
+                    button.btn.btn-xs.btn-default(@click='removeFromArray(t.data, index)') 移除
                   button.btn.btn-xs.btn-default(@click='addSpeed(t.data)') 添加
                 th.text-center
                   button.btn.btn-danger.btn-sm(@click='removeFromArray(settings.speed.others, index)') 删除
@@ -52,8 +51,6 @@ block eContent
                 th
                   select.form-control(disabled)
                     option 其他
-                th.select
-                  input.form-control(type='text' v-model.number='settings.speed.default.fileCount')
                 th
                   .m-b-05(v-for='s, index in settings.speed.default.data').form-inline
                     span.h5 配置{{index+ 1}}：
@@ -65,12 +62,86 @@ block eContent
                     span &nbsp;点最大下载速度为
                     input.min(type='text' v-model.number='s.speed')
                     span &nbsp;KB
-                    button.btn.btn-xs.btn-danger(@click='removeFromArray(settings.speed.default.data, index)') 删除
+                    button.btn.btn-xs.btn-default(@click='removeFromArray(settings.speed.default.data, index)') 移除
                   button.btn.btn-xs.btn-default(@click='addSpeed(settings.speed.default.data)') 添加
                 th
           .m-t-1
             button.btn.btn-default(@click='addCert(settings.speed.others)') 添加
+      .col-xs-12.col-md-12.m-b-2
+        h4 附件个数限制（用户等级）
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th 类型
+                th 个数限制（时间必须覆盖0-24）
+                th 其他
+            tbody
+              tr(v-for='f, index in settings.fileCountLimit.others')
+                th.select
+                  select.form-control(v-model='f.type')
+                    option(v-for='c in gradeList' :value='c.type') {{c.name}}
+                th
+                  .m-b-05(v-for='s, index in f.data').form-inline
+                    span.h5 配置{{index+ 1}}：
+                    select(v-model='s.startingTime')
+                      option(v-for='h in hours' :value='h') {{h}}
+                    span &nbsp;点至
+                    select(v-model='s.endTime')
+                      option(v-for='h in hours' :value='h') {{h}}
+                    span &nbsp;点最大下载数量为
+                    input.min(type='text' v-model.number='s.fileCount')
+                    span &nbsp;个
+                    button.btn.btn-xs.btn-default(@click='removeFromArray(f.data, index)') 移除
+                  button.btn.btn-xs.btn-default(@click='addFileCount(f.data, true)') 添加
+                th.text-center
+                  button.btn.btn-danger.btn-sm(@click='removeFromArray(settings.fileCountLimit.others, index)') 删除
+              tr
+                th.select
+                  select.form-control(disabled)
+                    option 其他
+                th
+                  .m-b-05(v-for='s, index in settings.fileCountLimit.default.data').form-inline
+                    span.h5 配置{{index+ 1}}：
+                    select(v-model='s.startingTime')
+                      option(v-for='h in hours' :value='h') {{h}}
+                    span &nbsp;点至
+                    select(v-model='s.endTime')
+                      option(v-for='h in hours' :value='h') {{h}}
+                    span &nbsp;点最大下载数量为
+                    input.min(type='text' v-model.number='s.fileCount')
+                    span &nbsp;个
+                    button.btn.btn-xs.btn-default(@click='removeFromArray(settings.fileCountLimit.default.data, index)') 移除
+                  button.btn.btn-xs.btn-default(@click='addFileCount(settings.fileCountLimit.default.data)') 添加
+                th
           .m-t-1
-            button.btn.btn-primary(@click='save') 保存
+            button.btn.btn-default(@click='addCert(settings.fileCountLimit.others, true)') 添加
+      .col-xs-12.col-md-12.m-b-2
+        h4 附件个数限制（用户证书）
+        h5.text-danger 用户证书优先级大于用户等级
+        .table-responsive
+          table.table.table-bordered
+            thead
+              tr
+                th 类型
+                th 个数限制
+                th 其他
+            tbody
+              tr(v-for='f, index in settings.fileCountLimit.roles')
+                th.select
+                  select.form-control(v-model='f.type')
+                    option(v-for='c in roleList' :value='c.type') {{c.name}}
+                th
+                  .m-b-05.form-inline
+                    span 最大下载数量为
+                    input.min(type='text' v-model.number='f.fileCount')
+                    span &nbsp;个
+                th.text-center
+                  button.btn.btn-danger.btn-sm(@click='removeFromArray(settings.fileCountLimit.roles, index)') 删除
+          .m-t-1
+            button.btn.btn-default(@click='addRole(settings.fileCountLimit.roles)') 添加
+      .col-xs-12.col-md-12
+        .m-t-1
+          button.btn.btn-primary(@click='save') 保存
 block scripts
   +includeJS('/experimental/settings/download/download.js')

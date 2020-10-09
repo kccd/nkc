@@ -15,7 +15,7 @@ router
   .put('/', async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
     const {downloadSettings} = body;
-    const {speed, allSpeed} = downloadSettings;
+    const {speed, allSpeed, fileCountLimit} = downloadSettings;
     const {checkNumber} = nkcModules.checkData;
     const {certList} = data;
     const certListObj = {};
@@ -35,20 +35,24 @@ router
       for(const a of arr) {
         const {startingTime, endTime, speed} = a;
         checkNumber(startingTime, {
-          name: '速度限制起始时间',
+          name: `类型「${name}」速度限制起始时间`,
           min: 0,
           max: 24
         });
         checkNumber(endTime, {
-          name: '速度限制结束时间',
+          name: `类型「${name}」速度限制结束时间`,
           min: 0,
           max: 24
         });
         if(startingTime >= endTime) ctx.throw(400, `类型「${name}」速度限制中的起始时间必须小于结束时间`);
         checkNumber(speed, {
-          name: '下载速度',
+          name: `类型「${name}」下载速度`,
           min: 0
         });
+        /*checkNumber(fileCount, {
+          name: `类型「${name}」${startingTime}点到${endTime}点附件下载数量`,
+          min: 0,
+        });*/
         number += (endTime - startingTime);
       }
       if(number !== 24) {
@@ -56,24 +60,66 @@ router
       }
     };
 
+    const checkFileCount = async (name, arr) => {
+      let number = 0;
+      for(const a of arr) {
+        const {startingTime, endTime, fileCount} = a;
+        checkNumber(startingTime, {
+          name: `类型「${name}」附件个数限制起始时间`,
+          min: 0,
+          max: 24
+        });
+        checkNumber(endTime, {
+          name: `类型「${name}」附件个数限制结束时间`,
+          min: 0,
+          max: 24
+        });
+        if(startingTime >= endTime) ctx.throw(400, `类型「${name}」附件个数限制中的起始时间必须小于结束时间`);
+        checkNumber(fileCount, {
+          name: `类型「${name}」${startingTime}点到${endTime}点附件最大下载数量`,
+          min: 0,
+        });
+        number += (endTime - startingTime);
+      }
+      if(number !== 24) {
+        ctx.throw(400, `类型「${name}」附件个数限制中的时间范围设置错误`);
+      }
+    };
+
     for(const o of speed.others) {
       const cl = certListObj[o.type];
       if(!cl) ctx.throw(400, `type error. type: ${o.type}`);
-      checkNumber(o.fileCount, {
-        name: `类型「${cl.name}」每天附件下载上限`,
-        min: 0,
-      });
       await checkTimeSpeed(cl.name, o.data);
     }
-    checkNumber(speed.default.fileCount, {
-      name: `类型「其他」每天附件下载上限`,
-      min: 0
-    });
     await checkTimeSpeed('其他', speed.default.data);
+
+    // 验证下载文件数量限制
+    for(const f of fileCountLimit.others) {
+      const cl = certListObj[f.type];
+      if(!cl) ctx.throw(400, `type error. type: ${f.type}`);
+      await checkFileCount(cl.name, f.data);
+    }
+    await checkFileCount('其他', fileCountLimit.default.data);
+
+    // 验证特殊证书下载文件数量限制
+    let rolesType = new Set();
+    for(const r of fileCountLimit.roles) {
+      const {type, fileCount} = r;
+      rolesType.add(type);
+      const cl = certListObj[type];
+      if(!cl) ctx.throw(400, `type error. type: ${type}`);
+      checkNumber(fileCount, {
+        name: `证书「${cl.name}」附件个数限制`,
+        min: 0
+      });
+    }
+    if(rolesType.size !== fileCountLimit.roles.length) ctx.throw(400, `证书附件个数限制类型重复`);
+
     await db.SettingModel.updateOne({_id: 'download'}, {
       $set: {
         'c.speed': speed,
-        'c.allSpeed': allSpeed
+        'c.allSpeed': allSpeed,
+        'c.fileCountLimit': fileCountLimit
       }
     });
     await db.SettingModel.saveSettingsToRedis('download');

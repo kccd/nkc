@@ -137,21 +137,21 @@ block content
         if permissionsOr(["nkcManagement", "visitExperimentalStatus", "complaintGet", "review", "visitProblemList", "getLibraryLogs"])
           .nav-link-header 网站管理
           if permission("nkcManagement")
-            a.nav-link(href=`/nkc`)
+            a.nav-link(href=`/nkc` target='_blank')
               .icon-left
                 .fa.fa-cogs
               span 前台管理
               .icon-right
                 .fa.fa-angle-right
           if permission("visitExperimentalStatus")
-            a.nav-link(href=`/e`)
+            a.nav-link(href=`/e` target='_blank')
               .icon-left
                 .fa.fa-cogs
               span 后台管理
               .icon-right
                 .fa.fa-angle-right
           if permission("review")
-            a.nav-link(href=`/review`)
+            a.nav-link(href=`/review` target='_blank')
               .icon-left
                 .fa.fa-shield
               span 审核内容
@@ -160,7 +160,7 @@ block content
                   .icon-count=data.unReviewedCount
                 .fa.fa-angle-right
           if permission("complaintGet")
-            a.nav-link(href=`/complaint`)
+            a.nav-link(href=`/complaint` target='_blank')
               .icon-left
                 .fa.fa-minus-circle
               span 投诉列表
@@ -169,7 +169,7 @@ block content
                   .icon-count=data.unResolvedComplaintCount
                 .fa.fa-angle-right
           if permission("visitProblemList")
-            a.nav-link(href=`/problem/list`)
+            a.nav-link(href=`/problem/list` target='_blank')
               .icon-left
                 .fa.fa-exclamation-circle
               span 问题列表
@@ -179,14 +179,14 @@ block content
                 .fa.fa-angle-right
 
             if permission("getLibraryLogs")
-              a.nav-link(href=`/libraries/logs`)
+              a.nav-link(href=`/libraries/logs` target='_blank')
                 .icon-left
                   .fa.fa-book
                 span 文库记录
                 .icon-right
                   .fa.fa-angle-right
           .nav-link-header 其他
-          a.nav-link(href=`/problem/add`)
+          a.nav-link(href=`/problem/add` target='_blank')
             .icon-left
               .fa.fa-bug
             span 报告问题
