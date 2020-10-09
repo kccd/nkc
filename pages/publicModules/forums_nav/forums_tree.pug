@@ -45,7 +45,7 @@ mixin renderSimpleForums(forums)
           span ：
         else
           span |
-        a.forum-child(href=tools.getUrl('forumHome', forum.fid) data-float-fid=cf.fid style=`background-color: ${hexToRgba(cf.color, 0.1)}`)=cf.displayName
+        a.forum-child(href=tools.getUrl('forumHome', cf.fid) data-float-fid=cf.fid style=`background-color: ${hexToRgba(cf.color, 0.1)}`)=cf.displayName
 
 if data.user && data.forum && state.subForums && state.subForums.length >0
   .m-b-1

@@ -46,8 +46,12 @@ const schema = new Schema({
 * @author pengxiguaa 2020/06/05
 * */
 schema.statics.addUserToBlacklist = async (uid, tUid, from, pid = '') => {
+  if(uid === tUid) throwErr(400, `不允许添加自己到黑名单`);
   const BL = mongoose.model('blacklists');
   const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const targetUser = await UserModel.findOne({uid: tUid});
+  if(!targetUser) throwErr(400, `用户id错误 uid: ${tUid}`);
   let list = await BL.findOne({uid, tUid});
   if(list) throwErr(400, '对方已在黑名单中');
   list = BL({

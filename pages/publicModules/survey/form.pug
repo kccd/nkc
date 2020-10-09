@@ -17,7 +17,7 @@
         .option-info
           .option-resources(v-if="o.resourcesId && o.resourcesId.length")
             .option-resource
-              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
             //p {{o.description}}
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
@@ -34,7 +34,7 @@
         .option-info
           .option-resources
             .option-resource(v-if="o.resourcesId && o.resourcesId.length")
-              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
             //p {{o.description}}
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
@@ -47,7 +47,7 @@
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
-                  div(v-for="r in a.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+                  div(v-for="r in a.resourcesId" :style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
                 .option-links(v-if="a.links && a.links.length")
                   a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
             .option-status(v-if="showResult")
@@ -64,7 +64,7 @@
         .option-info
           .option-resources
             .option-resource(v-if="o.resourcesId && o.resourcesId.length")
-              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+              div(v-for="r in o.resourcesId" :style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
         .option-answers(v-if="o.answers && o.answers.length")
@@ -73,7 +73,7 @@
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
-                  div(v-for="r in a.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+                  div(v-for="r in a.resourcesId" :style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
                 //p {{o.description}}
                 .option-links(v-if="a.links && a.links.length")
                   a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
