@@ -24,7 +24,7 @@ div
               | 》下发表
               if draft.parentPostId
                 | 评论
-              else  
+              else
                 | 回复
           else if draft.type === "modifyPost"
             span 修改文章《
@@ -32,7 +32,7 @@ div
               | 》下的
               if draft.parentPostId
                 | 评论
-              else  
+              else
                 | 回复
           else if draft.type === "modifyThread"
             span 修改文章《
@@ -45,7 +45,22 @@ div
         a.account-post-content=draft.c || "未填写内容"
         .text-right.m-t-05.draft-button
           button(onclick=`draft.removeDraftSingle('${draft.did}')`) 删除
-          a(href=`/editor?type=redit&id=${draft.did}`) 继续创作
+          if draft.desType === 'post'
+            span.dropdown
+              -const dLabel = `dLabel_${draft.did}`;
+              button.p-a-0.m-a-0(style='color: #2b90d9' id=dLabel type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') 继续创作
+                span.caret
+              ul.dropdown-menu.dropdown-menu-right(aria-labelledby=dLabel)
+                li
+                  a(href=`/editor?type=redit&id=${draft.did}&o=copy` target='_blank')
+                    .fa.fa-clone
+                    span &nbsp;复制为新文章
+                li
+                  a(href=`/editor?type=redit&id=${draft.did}&o=update` target='_blank')
+                    .fa.fa-refresh
+                    span &nbsp;更新已发布的文章
+          else
+            a(href=`/editor?type=redit&id=${draft.did}&o=update` target='_blank') 继续创作
   if data.paging.pageCount > 1
     .m-t-05
       include ../../publicModules/paging/paging_input
