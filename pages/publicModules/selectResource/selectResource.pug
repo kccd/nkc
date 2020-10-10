@@ -107,7 +107,7 @@
             button.btn.btn-default.btn-sm(v-if='isApp' @click="takeVideo") 录像
             button.btn.btn-default.btn-sm(v-if='isApp' @click="recordAudio") 录音
             //-button.btn.btn-default.btn-sm(@click="crash") 刷新
-            #pasteContent.text-left.hidden-xs.hidden-sm(@click="readyPaste") 剪贴板上传，先点一下我，再 Ctrl+V 黏贴。
+            #pasteContent.text-left.hidden-xs.hidden-sm(@click="readyPaste") 将文件拖拽或粘贴到此处
             span.size-limit.hidden-xs.hidden-sm(@click='showFileSizeLimit' :title='fileSizeLimit' v-if='fileSizeLimit') 大小限制
               .fa.fa-question-circle
           //button(type="button" class="btn btn-default btn-sm" @click="close") 关闭
