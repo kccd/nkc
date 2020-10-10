@@ -529,6 +529,34 @@ NKC.modules.SelectResource = function() {
     }
   });
 
+  // 拖动上传
+  var $dragDom = self.dom.find("#pasteContent");
+  var originText = "";
+  $dragDom.on({
+    dragenter: function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      originText = $dragDom.text();
+      $dragDom.text("松开鼠标上传文件")
+    },
+    dragleave: function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      $dragDom.text(originText);
+    },
+    dragover: function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    drop: function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      $dragDom.text(originText);
+      var files = [].slice.call(e.originalEvent.dataTransfer.files);
+      self.app.uploadSelectFile(files);
+    }
+  });
+
   // var timer;
 
   // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
