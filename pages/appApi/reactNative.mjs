@@ -42,8 +42,8 @@ document.body.addEventListener('click', (e)  => {
   const target = e.target;
   const targetNodeName = target.nodeName.toLowerCase();
   const dataType = target.getAttribute('data-type');
-  let src = target.getAttribute('src');
-  if(!src) src = target.getAttribute('data-src');
+  let src = target.getAttribute('data-src');
+  if(!src) src = target.getAttribute('src');
   if(targetNodeName === 'img' && dataType === 'view' && src) {
     src = window.location.origin + src;
     // 图片处理
@@ -53,9 +53,9 @@ document.body.addEventListener('click', (e)  => {
     for(let i = 0; i < images.length; i++) {
       const image = images[i];
       const name = image.getAttribute('alt');
-      let _src = image.getAttribute('src');
+      let _src = image.getAttribute('data-src');
       if(!_src) {
-        _src = image.getAttribute('data-src');
+        _src = image.getAttribute('src');
       }
       if(!_src) return;
       _src = window.location.origin + _src;

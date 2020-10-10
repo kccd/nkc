@@ -4,7 +4,7 @@ if !state.isApp
   +includeJS("/external_pkgs/viewer/viewer.js")
   +includeJS("/external_pkgs/viewer/jquery-viewer.js")
   script.
-    NKC.methods.initImageViewer = function(selecter) {
+    NKC.methods.initImageViewer = function(selector) {
       var options = {
         navbar: false,
         title: false,
@@ -16,13 +16,12 @@ if !state.isApp
       $("#pikeImpor").viewer(options);
       //- $("#applicationForm").viewer(options);
       //- $("#applicationForm-comments").viewer(options);
-      if(!selecter) return;
-      if(typeof selecter === "string") {
-        selecter = [selecter];
+      if(!selector) return;
+      if(typeof selector === "string") {
+        selector = [selector];
       }
-      for(var i = 0; i < selecter.length; i++) {
-        $(selecter[i]).viewer(options);
-      }
+      options.url = 'data-src';
+      $(selector.join(', ')).viewer(options);
     }
     $(document).ready(function() {
       NKC.methods.initImageViewer();

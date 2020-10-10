@@ -83,19 +83,39 @@ router
         url: `/f/${forum.fid}`
       };
     } else if(type === "redit") { // 从草稿箱来
-      const {id} = query;
+      let {id, o} = query;
       let draft = await db.DraftModel.findOne({did: id, uid: user.uid});
       if(!draft) ctx.throw(400, "草稿不存在或已被删除");
       draft = draft.toObject();
-      data.draftId = draft.did;
+      if(!['copy', 'update'].includes(o)) {
+        o = 'update';
+      }
       const {
         mainForumsId, categoriesId, desType, desTypeId, parentPostId
       } = draft;
-      selectedForumsId = mainForumsId;
-      selectedCategoriesId = categoriesId;
-      data.post = draft;
 
-      if(desType === "forum") { // 发表新帖
+      // 更新原有内容
+      if(o === 'update') {
+        data.draftId = draft.did;
+        data.post = draft;
+        selectedForumsId = mainForumsId;
+        selectedCategoriesId = categoriesId;
+      } else {
+        // 复制为新文章
+        data.post = {
+          t: draft.t,
+          c: draft.c,
+          l: draft.l,
+          abstractCn: '',
+          abstractEn: '',
+          keyWordsCn: [],
+          keyWordsEn: [],
+          authorInfos: [],
+          mainForumsId: [],
+          categoriesId: []
+        }
+      }
+      if(desType === "forum" || o === 'copy') { // 发表新帖
         data.type = "newThread";
       } else if(desType === "thread") { // 发表新回复
         data.type = "newPost";
