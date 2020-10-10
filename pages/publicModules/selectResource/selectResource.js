@@ -196,6 +196,7 @@ NKC.modules.SelectResource = function() {
             if(!file) continue;
             _files.push(file);
           }
+          if(!_files.length) return;
           self.uploadSelectFile(_files);
 
           /*var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
