@@ -156,6 +156,20 @@ async function getDrawTextSize(text, fontsize) {
 }
 
 /**
+ * 获取视频的比特率(Bps)
+ * @param {string} inputPath 视频路径
+ */
+async function getVideoBitrate(inputPath) {
+  return new Promise((resolve, reject) => {
+    exec(`ffprobe -v error -of json -show_format ${inputPath}`,
+    function(err, stdout, stderr) {
+      let info = JSON.parse(stdout.trim());
+      resolve(parseInt(info.format.bit_rate));
+    })
+  });
+}
+
+/**
  * 获取图片的尺寸
  * @param {string} inputPath 视频路径
  */
@@ -319,6 +333,7 @@ module.exports = {
   getVideoSize,
   getImageSize,
   getDrawTextSize,
+  getVideoBitrate,
   ffmpegFilter,
   addImageWaterMask,
   addImageTextWaterMask,

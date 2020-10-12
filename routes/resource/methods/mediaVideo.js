@@ -44,10 +44,8 @@ module.exports = async (options) => {
     let videoPath = path.replace(/\\/g, "/");
 
     // 获得视频尺寸并计算出码率控制参数
-    let videoSize = await ffmpeg.getVideoSize(videoPath);
-    // console.log(videoSize);
     let {videoVBRControl} = await SettingModel.getSettings("upload");
-    let additionOptions = calcBitrateControlParameter(videoSize, videoVBRControl);
+    let additionOptions = await calcBitrateControlParameter(videoPath, videoVBRControl);
     // console.log(additionOptions);
 
     outputVideoPath = outputVideoPath.replace(/\\/g, "/");
@@ -267,6 +265,7 @@ module.exports = async (options) => {
   })
 }
 
+// 默认的视频码率和帧率控制参数
 const bitrateAndFPSControlParameter = {
   'c:v': 'libx264',                                            /* 指定编码器 */
   'r': '24',                                                   /* 帧率 */
@@ -286,7 +285,13 @@ function objectToParameterArray(obj) {
 }
 
 // 计算出码率控制参数
-function calcBitrateControlParameter(videoSize, videoVBRControl) {
+async function calcBitrateControlParameter(videoPath, videoVBRControl) {
+  // 获取视频尺寸
+  let videoSize = await ffmpeg.getVideoSize(videoPath);
+  // 获取视频比特率
+  let bitrate = await ffmpeg.getVideoBitrate(videoPath);
+  bitrate = bitrate / 1024 / 1024;
+  // console.log(videoSize);
   let params = {...bitrateAndFPSControlParameter};
   // 待选码率，因为可能匹配到多条配置，取其中最小的
   let waitCheakBitrates = [];
@@ -301,6 +306,13 @@ function calcBitrateControlParameter(videoSize, videoVBRControl) {
   }
   // 选出最小的平均码率
   let minAverageBitrate = new Big(Math.min.apply(this, waitCheakBitrates));
+  // 如果配置的平均码率比原视频的码率还小，就不使用配置
+  if(parseInt(minAverageBitrate) > bitrate) {
+    delete params["maxrate"];
+    delete params["minrate"];
+    delete params["b:v"];
+    return objectToParameterArray(params);
+  }
   // 计算最大和最小码率
   let maxBitrate = minAverageBitrate.plus(2);
   let minBitrate = minAverageBitrate.gte(3)
