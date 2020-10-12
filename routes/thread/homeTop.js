@@ -12,9 +12,12 @@ homeTopRouter
 		const {tid} = params;
 		const {valueName} = data;
 		const obj = {};
-		obj[`c.${valueName}`] = tid;
+		const homeSettings = await db.SettingModel.getSettings('home');
+		const threadsId = homeSettings[valueName];
+		if(!threadsId.includes(tid)) threadsId.unshift(tid);
+		obj[`c.${valueName}`] = threadsId;
 		await db.SettingModel.updateOne({_id: "home"}, {
-			$addToSet: obj
+			$set: obj
 		});
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
