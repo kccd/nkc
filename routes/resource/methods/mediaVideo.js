@@ -296,7 +296,7 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
   // 待选码率，因为可能匹配到多条配置，取其中最小的
   let waitCheakBitrates = [];
   // 匹配配置
-  let {configs} = videoVBRControl;
+  let {configs, defaultBV} = videoVBRControl;
   for(let config of configs) {
     let {type, from, to, bv} = config;
     let value = videoSize[type];
@@ -305,7 +305,12 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
     }
   }
   // 选出最小的平均码率
-  let minAverageBitrate = new Big(Math.min.apply(this, waitCheakBitrates));
+  let minAverageBitrate;
+  if(waitCheakBitrates.length === 0) {
+    minAverageBitrate = new Big(defaultBV);
+  } else {
+    minAverageBitrate = new Big(Math.min.apply(this, waitCheakBitrates));
+  }
   // 如果配置的平均码率比原视频的码率还小，就不使用配置
   if(parseInt(minAverageBitrate) > bitrate) {
     delete params["maxrate"];
