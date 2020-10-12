@@ -241,6 +241,12 @@
 .account-thread.draft-list .checkbox label {
   padding: 4px 0 0 20px;
 }
+.account-thread.draft-list .draft-button .dropdown-menu a {
+  color: #333;
+}
+.account-thread.draft-list .draft-button .dropdown-menu a .fa {
+  color: #444;
+}
 .account-thread.draft-list .draft-button a {
   color: #2b90d9;
 }

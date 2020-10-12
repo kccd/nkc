@@ -190,14 +190,14 @@ NKC.modules.SelectResource = function() {
         dom.one("paste", function(e) {
           var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
           var files = clipboardData.items || [];
+          var _files = [];
           for(var i = 0; i < files.length; i ++) {
             var file = files[i].getAsFile();
             if(!file) continue;
-            var f = self.newFile(file);
-            self.files.unshift(f);
-            self.startUpload(f);
+            _files.push(file);
           }
-
+          if(!_files.length) return;
+          self.uploadSelectFile(_files);
 
           /*var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
           var files = [].slice.call(clipboardData.files);
@@ -553,6 +553,7 @@ NKC.modules.SelectResource = function() {
       e.stopPropagation();
       $dragDom.text(originText);
       var files = [].slice.call(e.originalEvent.dataTransfer.files);
+      if(!files.length) return;
       self.app.uploadSelectFile(files);
     }
   });

@@ -59,6 +59,8 @@
   height: 5rem;
   display: inline-block;
   width: 7rem;
+  line-height: 5rem;
+  background-color: #000;
   margin: 0 0.5rem 0.5rem 0;
 }
 #moduleSurveyEdit .option-resource-img{
@@ -70,6 +72,12 @@
   font-size: 0;
   cursor: pointer;
   position: relative;
+  text-align: center;
+
+}
+#moduleSurveyEdit .option-resource img{
+  max-height: 100%;
+  max-width: 100%;
 }
 #moduleSurveyEdit .option-resource .fa{
   position: absolute;
@@ -114,6 +122,12 @@
 .module-survey-form .survey-form-description{
   font-size: 1.4rem;
   font-weight: 700;
+}
+.module-survey-form .option-resource>img{
+  height: 6rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 .module-survey-form .option-resource>div{
   height: 6rem;

@@ -42,7 +42,8 @@
                     button.btn.btn-default(@click="removeLink(o, index)") 删除
               .option-resources
                 .option-resource(v-for="r, index in o.resourcesId")
-                  .option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
+                  img(:src="'/rt/' + r" @click="visitUrl('/r/' + r)")
+                  //.option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
                   .fa.fa-remove(@click="removeResourceId(o, index)")
               .survey-option-buttons.m-t-05.m-b-05
                 button.btn.btn-default.btn-xs(@click="addLink(o)") 添加链接
@@ -65,7 +66,8 @@
                         button.btn.btn-default(@click="removeLink(a, index)") 删除
                   .option-resources
                     .option-resource(v-for="r, index in a.resourcesId")
-                      .option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
+                      img(:src="'/rt/' + r" @click="visitUrl('/r/' + r)")
+                      //.option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
                       .fa.fa-remove(@click="removeResourceId(a, index)")
                   button.btn.btn-default.btn-xs(@click="addLink(a)") 添加链接
                   button.btn.btn-default.btn-xs(@click="addResource(a)") 添加图片
