@@ -16,7 +16,7 @@ router
     const {fields, files} = body;
     const {checkNumber} = nkcModules.checkData;
     const uploadSettings = JSON.parse(fields.uploadSettings);
-    let {watermark, sizeLimit, countLimit, extensionLimit} = uploadSettings;
+    let {watermark, sizeLimit, countLimit, extensionLimit, videoVBRControl} = uploadSettings;
     watermark.enabled = !!watermark.enabled;
     if(watermark.transparency < 0) watermark.transparency = 0;
     if(watermark.transparency > 100) watermark.transparency = 100;
@@ -64,7 +64,8 @@ router
           watermark,
           sizeLimit,
           countLimit,
-          extensionLimit
+          extensionLimit,
+          videoVBRControl
         }
       }
     });

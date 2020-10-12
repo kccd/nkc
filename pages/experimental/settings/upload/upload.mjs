@@ -1,3 +1,5 @@
+const { forEachTransformDependencies } = require("mathjs");
+
 var data = NKC.methods.getDataById("data");
 const {extensionLimit} = data.uploadSettings;
 extensionLimit._defaultWhitelist = extensionLimit.defaultWhitelist.join(', ');
@@ -7,6 +9,7 @@ extensionLimit.others.map(o => {
   o._whitelist = o.whitelist.join(', ');
 });
 data.uploadSettings.watermark.buyNoWatermark /= 100;
+
 window.app = new Vue({
   el: "#app",
   data: {
@@ -62,6 +65,19 @@ window.app = new Vue({
           self[`${c}WatermarkFile`] = file;
         })
     },
+    // 新增一条视频码率控制配置
+    addVideoVBRControlConfig() {
+      this.us.videoVBRControl.configs.push({
+        type: "width",
+        from: 0,
+        to: 0,
+        bv: 1.16
+      });
+    },
+    // 删除一条视频码率控制配置
+    deleteVideoVBRControlConfig(index) {
+      this.us.videoVBRControl.configs.splice(index, 1);
+    },
     submit: function() {
       const us = JSON.parse(JSON.stringify(this.us));
       const {extensionLimit} = us;
@@ -79,6 +95,12 @@ window.app = new Vue({
       });
       // 积分乘以100用于存储
       us.watermark.buyNoWatermark *= 100;
+
+      // 校验视频码率控制的配置是否合法
+      let {ret, err} = verifyVideoVBRControlConfig(us.videoVBRControl);
+      if(!ret) {
+        return sweetError(err);
+      }
 
       const formData = new FormData();
       return Promise.resolve()
@@ -106,3 +128,34 @@ window.app = new Vue({
   }
 });
 
+
+
+
+// 校验视频码率控制的配置是否合法
+function verifyVideoVBRControlConfig(data) {
+  let {configs} = data;
+  for(let config of configs) {
+    if(config.from < 0 || config.to < 0 || config.bv < 0) {
+      return {ret: false, err: "视频尺寸范围和平均码率均不能小于0"};
+    }
+    if(config.from >= config.to) {
+      return {ret: false, err: `${config.from} 到 ${config.to}不是一个合理的范围`};
+    }
+    for(let sample of configs) {
+      if(config === sample) continue;
+      if(config.type !== sample.type) continue;
+      if(isOverlap({start: config.from, end: config.to}, {start: sample.from, end: sample.to})) {
+        return {ret: false, err: "视频尺寸范围存在重叠部分"};
+      }
+    }
+  }
+  return {ret: true};
+}
+
+// 判断两个区间是否有重叠(反证)(区间包括开始不包括结尾)
+function isOverlap(a, b) {
+  if(a.start === a.end || b.start === b.end) return false;
+  // a 在 b 前面或者 a 在 b 后面
+  if(a.end <= b.start || a.start >= b.end) return false;
+  return true;
+}

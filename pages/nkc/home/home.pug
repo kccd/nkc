@@ -3,7 +3,7 @@ block nkcTitle
   title 主页设置 - 前台管理
   +includeCSS('/nkc/home/home.css')
 block nkcContent
-  #data.hidden=objToStr({recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
+  #data.hidden=objToStr({recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
   .col-xs-12.col-md-12.management-home#app(v-cloak)
     ul.nav.nav-tabs
       li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
@@ -263,7 +263,25 @@ block nkcContent
                   a.pointer.home-goods-user(@click="visitUrl('/u/' + thread.firstPost.user.uid)" v-else)
                     img(:src="getUrl('userAvatar', thread.firstPost.user.avatar)" :onmouseover="floatUserInfo(thread.uid)")
                     span {{thread.firstPost.user.username}}
-          .m-t-1
+        .management-header 最新页置顶
+        .home-top-goods
+          .home-top-goods-body(v-for="thread, index in latestToppedThreads")
+            .home-goods-buttons
+              .fa.fa-angle-up(title="上移" @click="moveForum(latestToppedThreads, thread, 'left')")
+              .fa.fa-angle-down(title="下移" @click="moveForum(latestToppedThreads, thread, 'right')")
+              .fa.fa-trash(title="删除" @click="removeForum(latestToppedThreads, index)")
+            .home-goods-content
+              .home-goods-avatar(v-if="thread.firstPost.cover")
+                div(:style="'background-image: url('+getUrl('postCover', thread.firstPost.cover)+')'")
+              .home-goods-info
+                a.pointer(@click="visitUrl('/t/' + thread.tid)" :title="thread.firstPost.t").home-goods-name {{thread.firstPost.t}}
+                .home-goods-description {{thread.firstPost.abstract || thread.firstPost.c}}
+                .home-goods-other
+                  a.home-goods-user(v-if="thread.firstPost.anonymous") 匿名
+                  a.pointer.home-goods-user(@click="visitUrl('/u/' + thread.firstPost.user.uid)" v-else)
+                    img(:src="getUrl('userAvatar', thread.firstPost.user.avatar)" :onmouseover="floatUserInfo(thread.uid)")
+                    span {{thread.firstPost.user.username}}
+        .m-t-1
             button.management-button(@click="saveToppedThreads") 保存
       div.m-t-2
         .management-header 最新原创

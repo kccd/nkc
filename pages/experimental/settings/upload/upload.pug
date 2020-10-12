@@ -2,6 +2,16 @@ extends ../../experimental
 block eTitle
   title 上传设置
   +includeCSS('/experimental/settings/upload/upload.css')
+  style.
+    .select{
+      width: 15rem;
+    }
+    .min{
+      width: 7rem!important;
+    }
+    .macro-form {
+      line-heigth: 16px
+    }
 block eContent
   .container-fluid.max-width
     #data.hidden=objToStr({uploadSettings: data.uploadSettings, certList: data.certList})
@@ -60,6 +70,39 @@ block eContent
             label.col-sm-2.control-label=`去水印花费积分（${data.watermarkScore.name}/${data.watermarkScore.unit}）`
             .col-sm-10.form-inline
               input.form-control(type='text' v-model.number="us.watermark.buyNoWatermark")
+          .form-group
+            label.col-sm-2.control-label 视频码率控制
+            .col-sm-7
+              table.table.table-bordered.m-b-05
+                thead
+                  tr
+                    th 视频尺寸
+                    th 平均码率(Mbps)
+                    th 操作
+                tbody
+                  tr(v-for="(config, index) of us.videoVBRControl.configs")
+                    td
+                      .m-b-05.form-inline.macro-form
+                        select(v-model="config.type")
+                          option(value='width') 宽度
+                          option(value='heigth') 高度
+                        input.min(type='number' v-model.number="config.from")
+                        span 至
+                        input.min(type='number' v-model.number="config.to")
+                        span &nbsp;像素
+                    td
+                      input.form-control(v-model.number="config.bv")
+                    td
+                      button.btn.btn-xs.btn-default(@click="deleteVideoVBRControlConfig(index)") 删除
+                  tr
+                    td 其它尺寸
+                    td
+                      input.form-control(v-model.number="us.videoVBRControl.defaultBV")
+                    td
+              button.btn.btn-default.btn-sm(@click='addVideoVBRControlConfig') 添加
+              p * 1920 * 1080 尺寸的视频推荐平均码率为 1.16Mbps
+              p * 匹配到多条配置时平均码率取最小
+
         h4 文件设置
         .form.form-horizontal
           .form-group.m-b-2
