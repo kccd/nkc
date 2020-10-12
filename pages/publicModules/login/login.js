@@ -14,9 +14,11 @@ NKC.modules.Login = function() {
     data: {
       nationCodes: nationCodes,
       type: "login",
+      registerStep: 1,
       category: "username", // username, mobile, mobileCode
       username: "",
       password: "",
+      repeatPassword: '',
       nationCode: "86",
       code: "",
       mobile: "",
@@ -28,6 +30,9 @@ NKC.modules.Login = function() {
       succeed: false
     },
     methods: {
+      changeStep: function(number) {
+        this.registerStep = number;
+      },
       selectCategory: function(category) {
         this.category = category;
         this.throwError("");
