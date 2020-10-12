@@ -14,14 +14,14 @@ const fontFilePath = settings.statics.fontNotoSansHansMedium;
 const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");
 const tempImageForFFmpeg = settings.statics.deletedPhotoPath;
 
-// ffmpeg 码率和帧率控制命令行参数
+// ffmpeg 码率和帧率控制命令行参数 默认值
 const bitrateAndFPSControlParameter = [
   '-c:v', 'libx264',                                            /* 指定编码器 */
   '-r', '24',                                                   /* 帧率 */
   '-maxrate', '5M',                                             /* 最大码率 */
   '-minrate', '1M',                                             /* 最小码率 */
   '-b:v', '1.16M',                                              /* 平均码率 */
-]
+];
 
 const spawnProcess = (pathName, args, options = {}) => {
   return new Promise((resolve, reject) => {
@@ -173,15 +173,17 @@ const getImageSize = async (inputPath) => {
 /**
  * ffmpeg滤镜处理
  * @param {string} inputPath 输入文件路径
+ * @param {string} outputPath 输出路径
  * @param {array} filters 滤镜指令（数组，一层滤镜一个元素）
+ * @param {array} additionOptions 传给ffmpeg的额外参数
  */
-const ffmpegFilter = async (inputPath, outputPath, filters) => {
+const ffmpegFilter = async (inputPath, outputPath, filters, additionOptions = bitrateAndFPSControlParameter) => {
   return spawnProcess('ffmpeg',
     [
       ...['-i', inputPath],                                              /* 输入 */
       ...['-filter_complex', filters.join(";")],                         /* 滤镜表达式 */
       '-y',                                                              /* 覆盖输出 */
-      // ...bitrateAndFPSControlParameter,                                  /* 码率和帧率控制参数 */
+      ...additionOptions,                                                /* 额外参数 */
       outputPath                                                         /* 输出 */
     ]);
 }
@@ -213,13 +215,14 @@ const addImageWaterMask = async (op) => {
     output,
     position =  {x: 10, y: 10},
     flex = 0.1,
-    transparency = 0.5
+    transparency = 0.5,
+    additionOptions = bitrateAndFPSControlParameter /* 码率和帧率控制参数 */
   } = op;
   const {width: videoWidth, height: videoHeight} = await getVideoSize(videoPath);
   let width = (videoWidth > videoHeight? videoHeight: videoWidth) * flex;
   return spawnProcess('ffmpeg', [
     '-i', videoPath, '-i', imagePath, '-filter_complex', `[1:v]scale=${width}:${width}/a, lut=a=val*${transparency}[logo];[0:v][logo]overlay=${position.x}:${position.y}`, '-y',
-    ...bitrateAndFPSControlParameter,                                  /* 码率和帧率控制参数 */
+    ...additionOptions,                                  /* 额外参数 */
     output]);
 }
 
@@ -274,7 +277,8 @@ async function addImageTextWaterMaskForImage(op) {
     text,
     flex = 0.08,
     position = {x: 10, y: 10},
-    transparency = 0.5
+    transparency = 0.5,
+    additionOptions
   } = op;
   const {height: imageHeight, width: imageWidth} = await getImageSize(input);
   const logoSize = await getImageSize(image);
@@ -293,7 +297,7 @@ async function addImageTextWaterMaskForImage(op) {
     `[logo]scale=${logoWidth}:${logoHeight}[image]`,
     `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=${logoWidth + gap}:y=${logoHeight-textHeight}/2:text='${text}':fontsize=${fontSize}:fontcolor=fcfcfc:fontfile='${fontFilePathForFFmpeg}:shadowcolor=b1b1b1:shadowx=1:shadowy=1', lut=a=val*${transparency}[watermask]`,
     `[0:v][watermask]overlay=${position.x}:${position.y}`
-  ])
+  ], additionOptions)
 }
 
 

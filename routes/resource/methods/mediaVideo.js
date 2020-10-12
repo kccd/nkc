@@ -2,6 +2,7 @@
 * @param {File} file
 * @param {Object} resource
 * */
+const Big = require('big.js');
 const FILE = require('../../../nkcModules/file');
 const {AttachmentModel, ColumnModel, SettingModel} = require("../../../dataModels");
 const imageMagick = require("../../../tools/imageMagick");
@@ -41,6 +42,14 @@ module.exports = async (options) => {
     let waterSmallPath = await AttachmentModel.getWatermarkFilePath('small');
     let waterBigPath = await AttachmentModel.getWatermarkFilePath('normal');
     let videoPath = path.replace(/\\/g, "/");
+
+    // 获得视频尺寸并计算出码率控制参数
+    let videoSize = await ffmpeg.getVideoSize(videoPath);
+    // console.log(videoSize);
+    let {videoVBRControl} = await SettingModel.getSettings("upload");
+    let additionOptions = calcBitrateControlParameter(videoSize, videoVBRControl);
+    // console.log(additionOptions);
+
     outputVideoPath = outputVideoPath.replace(/\\/g, "/");
     // 右下角
     if(waterSetting.waterGravity === "southeast") {
@@ -54,7 +63,8 @@ module.exports = async (options) => {
             x: "W-w-10",
             y: "H-h-10"
           },
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "siteLogo") {
         await ffmpeg.addImageWaterMask({
@@ -63,7 +73,8 @@ module.exports = async (options) => {
           imagePath: waterBigPath,
           position: {x: "W-w-10", y: "H-h-10"},
           flex: 0.2,
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "singleLogo") {
         await ffmpeg.addImageWaterMask({
@@ -71,7 +82,8 @@ module.exports = async (options) => {
           output: outputVideoPath,
           imagePath: waterSmallPath,
           position: {x: "W-w-10", y: "H-h-10"},
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       }
     }
@@ -87,7 +99,8 @@ module.exports = async (options) => {
             x: "W-w-10",
             y: "10"
           },
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "siteLogo") {
         await ffmpeg.addImageWaterMask({
@@ -96,7 +109,8 @@ module.exports = async (options) => {
           imagePath: waterBigPath,
           position: {x: "W-w-10", y: "10"},
           flex: 0.2,
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "singleLogo") {
         await ffmpeg.addImageWaterMask({
@@ -104,7 +118,8 @@ module.exports = async (options) => {
           output: outputVideoPath,
           imagePath: waterSmallPath,
           position: {x: "W-w-10", y: "10"},
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       }
     }
@@ -120,7 +135,8 @@ module.exports = async (options) => {
             x: "10",
             y: "10"
           },
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "siteLogo") {
         await ffmpeg.addImageWaterMask({
@@ -129,7 +145,8 @@ module.exports = async (options) => {
           imagePath: waterBigPath,
           position: {x: "10", y: "10"},
           flex: 0.2,
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "singleLogo") {
         await ffmpeg.addImageWaterMask({
@@ -137,7 +154,8 @@ module.exports = async (options) => {
           output: outputVideoPath,
           imagePath: waterSmallPath,
           position: {x: "10", y: "10"},
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       }
     }
@@ -153,7 +171,8 @@ module.exports = async (options) => {
             x: "10",
             y: "H-h-10"
           },
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "siteLogo") {
         await ffmpeg.addImageWaterMask({
@@ -162,7 +181,8 @@ module.exports = async (options) => {
           imagePath: waterBigPath,
           position: {x: "10", y: "H-h-10"},
           flex: 0.2,
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "singleLogo") {
         await ffmpeg.addImageWaterMask({
@@ -170,7 +190,8 @@ module.exports = async (options) => {
           output: outputVideoPath,
           imagePath: waterSmallPath,
           position: {x: "10", y: "H-h-10"},
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       }
     }
@@ -186,7 +207,8 @@ module.exports = async (options) => {
             x: "(W-w)/2",
             y: "(H-h)/2"
           },
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "siteLogo") {
         await ffmpeg.addImageWaterMask({
@@ -198,7 +220,8 @@ module.exports = async (options) => {
             y: "(H-h)/2"
           },
           flex: 0.2,
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       } else if(waterSetting.waterStyle === "singleLogo") {
         await ffmpeg.addImageWaterMask({
@@ -209,7 +232,8 @@ module.exports = async (options) => {
             x: "(W-w)/2",
             y: "(H-h)/2"
           },
-          transparency: ffmpegTransparency
+          transparency: ffmpegTransparency,
+          additionOptions
         });
       }
     }
@@ -241,4 +265,49 @@ module.exports = async (options) => {
     height,
     width,
   })
+}
+
+const bitrateAndFPSControlParameter = {
+  'c:v': 'libx264',                                            /* 指定编码器 */
+  'r': '24',                                                   /* 帧率 */
+  'maxrate': '5M',                                             /* 最大码率 */
+  'minrate': '1M',                                             /* 最小码率 */
+  'b:v': '1.16M',                                              /* 平均码率 */
+};
+
+// 对象转参数数组
+function objectToParameterArray(obj) {
+  let arr = [];
+  Object.keys(obj).forEach(name => {
+    arr.push("-" + name);
+    arr.push(obj[name]);
+  });
+  return arr;
+}
+
+// 计算出码率控制参数
+function calcBitrateControlParameter(videoSize, videoVBRControl) {
+  let params = {...bitrateAndFPSControlParameter};
+  // 待选码率，因为可能匹配到多条配置，取其中最小的
+  let waitCheakBitrates = [];
+  // 匹配配置
+  let {configs} = videoVBRControl;
+  for(let config of configs) {
+    let {type, from, to, bv} = config;
+    let value = videoSize[type];
+    if(value >= from && value < to) {
+      waitCheakBitrates.push(bv);
+    }
+  }
+  // 选出最小的平均码率
+  let minAverageBitrate = new Big(Math.min.apply(this, waitCheakBitrates));
+  // 计算最大和最小码率
+  let maxBitrate = minAverageBitrate.plus(2);
+  let minBitrate = minAverageBitrate.gte(3)
+                    ? minAverageBitrate.minus(2)
+                    : 0;
+  params["maxrate"] = `${maxBitrate}M`;
+  params["minrate"] = `${minBitrate}M`;
+  params["b:v"] = `${minAverageBitrate}M`;
+  return objectToParameterArray(params);
 }
