@@ -10,7 +10,7 @@ for(var i = 0; i < data.results.length; i++) {
   review[p] = {
     pid: p,
     pass: true,
-    reason: "包括但不限于违反相关法律法规和政策，品质不佳，侵犯他人权益，分类错误",
+    reason: "",
     delType: "toDraft",
     isThread: isThread,
     noticeType: [true],
