@@ -10,27 +10,6 @@ extensionLimit.others.map(o => {
 });
 data.uploadSettings.watermark.buyNoWatermark /= 100;
 
-// 视频码率控制
-if(!data.uploadSettings.videoVBRControl) {
-  data.uploadSettings.videoVBRControl = {
-    configs: [
-      {
-        type: "width",
-        from: 0,
-        to: 1280,
-        bv: 0.6
-      },
-      {
-        type: "width",
-        from: 1280,
-        to: 1920,
-        bv: 1.16
-      }
-    ],
-    defaultBV: 1.16
-  }
-}
-
 window.app = new Vue({
   el: "#app",
   data: {
