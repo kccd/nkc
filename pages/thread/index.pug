@@ -300,6 +300,11 @@ block content
                                   button.btn.btn-default.btn-sm(onclick=`unHomeTop('${data.thread.tid}')`) 取消首页置顶
                                 else
                                   button.btn.btn-default.btn-sm(onclick=`homeTop('${data.thread.tid}')`) 首页置顶
+                                if data.latestTopped
+                                  button.btn.btn-default.btn-sm(onclick=`unLatestTop('${data.thread.tid}')`) 取消最新页置顶
+                                else
+                                  button.btn.btn-default.btn-sm(onclick=`latestTop('${data.thread.tid}')`) 最新页置顶
+
                               if data.userOperationsId.includes("pushGoodsToHome") && data.product
                                 if data.goodsHomeTopped
                                   button.btn.btn-default.btn-sm(onclick=`pushGoodsToHome('${data.product.productId}', 'unPush')`) 取消热销

@@ -1,31 +1,32 @@
 const Router = require('koa-router');
 const homeTopRouter = new Router();
 homeTopRouter
+	.use('/', async (ctx, next) => {
+		const {body, query, data} = ctx;
+		const latest = body.latest || query.latest;
+		data.valueName = latest? 'latestToppedThreadsId': 'toppedThreadsId';
+		await next();
+	})
 	.post('/', async (ctx, next) => {
-		const {params, db} = ctx;
+		const {params, db, data} = ctx;
 		const {tid} = params;
-		const homeSettings = await db.SettingModel.getSettings("home");
-		const {toppedThreadsId} = homeSettings;
-		if(toppedThreadsId.includes(tid)) ctx.throw(400, "文章已经被推送到首页了");
-		toppedThreadsId.unshift(tid);
+		const {valueName} = data;
+		const obj = {};
+		obj[`c.${valueName}`] = tid;
 		await db.SettingModel.updateOne({_id: "home"}, {
-			$set: {
-				"c.toppedThreadsId": toppedThreadsId
-			}
+			$addToSet: obj
 		});
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	})
 	.del('/', async (ctx, next) => {
-		const {params, db} = ctx;
+		const {params, db, data} = ctx;
 		const {tid} = params;
-		const homeSettings = await db.SettingModel.getSettings("home");
-		const {toppedThreadsId} = homeSettings;
-		if(!toppedThreadsId.includes(tid)) ctx.throw(400, "文章未被推送到首页");
+		const {valueName} = data;
+		const obj = {};
+		obj[`c.${valueName}`] = tid;
 		await db.SettingModel.updateOne({_id: "home"}, {
-			$pull: {
-				"c.toppedThreadsId": tid
-			}
+			$pull: obj
 		});
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();

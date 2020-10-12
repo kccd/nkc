@@ -39,7 +39,7 @@ router
     });
     // 主页是否显示热销商品板块
     data.showShopGoods = homeSettings.showShopGoods;
-    let threads = await db.ThreadModel.find({tid: {$in: homeSettings.toppedThreadsId}});
+    let threads = await db.ThreadModel.find({tid: {$in: homeSettings.toppedThreadsId.concat(homeSettings.latestToppedThreadsId)}});
     threads = await db.ThreadModel.extendThreads(threads, {
       forum: false,
       category: false,
@@ -52,9 +52,14 @@ router
     const threadsObj = {};
     threads.map(thread => threadsObj[thread.tid] = thread);
     data.toppedThreads = [];
+    data.latestToppedThreads = [];
     homeSettings.toppedThreadsId.map(tid => {
       const thread = threadsObj[tid];
       if(thread) data.toppedThreads.push(thread);
+    });
+    homeSettings.latestToppedThreadsId.map(tid => {
+      const thread = threadsObj[tid];
+      if(thread) data.latestToppedThreads.push(thread);
     });
     // 首页上 “最新原创” 板块文章条目显示模式 “simple”或空 - 简略， “full” - 完整
     data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
@@ -222,14 +227,15 @@ router
         }
       });
     } else if(operation === "saveToppedThreads") {
-      const {toppedThreadsId} = body;
-      for(const tid of toppedThreadsId) {
+      const {toppedThreadsId, latestToppedThreadsId} = body;
+      for(const tid of toppedThreadsId.concat(latestToppedThreadsId)) {
         const thread = await db.ThreadModel.findOne({tid});
         if(!thread) ctx.throw(400, `未找到ID为${tid}的文章`);
       }
       await db.SettingModel.updateOne({_id: "home"}, {
         $set: {
-          "c.toppedThreadsId": toppedThreadsId
+          "c.toppedThreadsId": toppedThreadsId,
+          'c.latestToppedThreadsId': latestToppedThreadsId
         }
       });
     } else if(operation === "saveOriginalThreadDisplayMode") {

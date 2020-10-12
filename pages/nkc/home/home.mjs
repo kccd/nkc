@@ -23,6 +23,7 @@ const app = new Vue({
     columns: data.columns,
     goods: data.goods,
     toppedThreads: data.toppedThreads,
+    latestToppedThreads: data.latestToppedThreads,
     showShopGoods: (data.showGoods? "t": ""),
     // 首页“最新原创”文章条目显示模式，为空就默认为简略显示
     originalThreadDisplayMode: data.originalThreadDisplayMode,
@@ -274,9 +275,11 @@ const app = new Vue({
     },
     saveToppedThreads() {
       const toppedThreadsId = this.toppedThreads.map(t => t.tid);
+      const latestToppedThreadsId = this.latestToppedThreads.map(t => t.tid);
       nkcAPI("/nkc/home", "PUT", {
         operation: "saveToppedThreads",
-        toppedThreadsId
+        toppedThreadsId,
+        latestToppedThreadsId
       })
         .then(() => {
           sweetSuccess("保存成功");
