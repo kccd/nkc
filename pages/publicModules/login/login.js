@@ -41,9 +41,9 @@ NKC.modules.Login = function() {
             var username = _this.username;
             var password = _this.password;
             var repeatPassword = _this.repeatPassword;
-            if(!username) throw `请输入用户名`;
-            if(!password) throw `请输入密码`;
-            if(!repeatPassword) throw `请输入密码`;
+            if(!username) throw '请输入用户名';
+            if(!password) throw '请输入密码';
+            if(!repeatPassword) throw '请输入密码';
             if(password !== repeatPassword) throw '两次输入的密码不相同';
             return nkcAPI('/register/check', 'POST', {
               username: username,

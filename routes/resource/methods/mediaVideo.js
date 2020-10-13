@@ -317,10 +317,8 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
     delete params["maxrate"];
     delete params["minrate"];
     delete params["b:v"];
-    console.log(`选择了码率不变`);
     return objectToParameterArray(params);
   }
-  console.log(`选择了配置码率: ${minAverageBitrate}Mbps`);
   // 计算最大和最小码率
   let maxBitrate = minAverageBitrate.plus(2);
   let minBitrate = minAverageBitrate.gte(3)
