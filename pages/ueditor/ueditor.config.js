@@ -401,7 +401,7 @@
 			footer: [],
 			h1:     ['class', 'style'],
 			h2:     ['class', 'style'],
-			h3:     ['class', 'style'],
+			h3:     ['style'],
 			h4:     ['class', 'style'],
 			h5:     ['class', 'style'],
 			h6:     ['class', 'style'],
