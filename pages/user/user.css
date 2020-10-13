@@ -382,3 +382,7 @@ body{
   border-radius: 2px;
   color: white;
 }
+.hidden-info{
+  font-size: 1.2rem;
+  font-weight: normal;
+}

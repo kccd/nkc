@@ -60,6 +60,7 @@ include ../verifications/verifications
                     .col-xs-6.text-right
                       .send-mobile-code(v-if="waiting === 0" @click="sendMobileCode") 发送验证码
                       .send-mobile-code.disabled(v-else) 发送验证码({{waiting}})
+              //- 有关注册
               div(v-else)
                 .form-group
                   select.form-control.input(v-model="nationCode" @change="throwError('')" @keyup.enter="submit")

@@ -1,6 +1,7 @@
 const HTTP = require('http');
 const HTTPS = require('https');
 const PATH = require('path');
+const mime = require('mime');
 const FILE = require('../nkcModules/file');
 const fs = require('fs');
 const upload = require('../settings/upload');
@@ -34,7 +35,11 @@ module.exports = async (url) => {
           } else {
             filename = url;
           }
-          const ext = PATH.extname(filename);
+          let ext = PATH.extname(filename);
+          if(!ext) {
+            ext = mime.getExtension(headers['content-type']);
+            if(ext) ext = '.' + ext;
+          }
           filename = `upload_downloader_${Date.now()}_${Math.ceil(Math.random() * 100000000)}${ext}`;
           const filePath = PATH.resolve(upload.uploadDir, `./${filename}`);
           fs.writeFile(filePath, data, 'binary', (err) => {

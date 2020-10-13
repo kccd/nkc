@@ -83,7 +83,11 @@ userRouter
         (await db.UserModel.contentNeedReview(targetUser.uid, 'thread')) ||
         (await db.UserModel.contentNeedReview(targetUser.uid, 'post'))
       ) {
-        nkcModules.throwError(403, "", "noPermissionToVisitNotReviewedUserHome");
+        data.contentNeedReview = true;
+        data.targetUser.username = '';
+        data.targetUser.description = '';
+        data.targetUser.avatar = '';
+        data.targetUser.banner = '';
       }
     }
     await db.UserModel.extendUsersInfo([targetUser]);

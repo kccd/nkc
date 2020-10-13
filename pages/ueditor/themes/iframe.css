@@ -125,3 +125,10 @@ nkcsource[data-type="xsf"] strong{
 [data-tag="nkcsource"][data-type="pre"] {
   display: block;
 }
+
+/* 同文章页 */
+p{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  line-height: 1.8;
+}

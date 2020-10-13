@@ -163,6 +163,10 @@ router
       } else {
         q.reviewed = true;
       }
+
+      // 最新页置顶文章
+      data.latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
+
     } else if(threadListType === "subscribe") {
       if(!d) d = "all";
       if(d === "all" || d === "column") {
