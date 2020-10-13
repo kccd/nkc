@@ -288,6 +288,8 @@ function objectToParameterArray(obj) {
 async function calcBitrateControlParameter(videoPath, videoVBRControl) {
   // 获取视频尺寸
   let videoSize = await ffmpeg.getVideoSize(videoPath);
+  // 计算视频像素
+  let videoPixel = videoSize.width * videoSize.height;
   // 获取视频比特率
   let bitrate = await ffmpeg.getVideoBitrate(videoPath);
   bitrate = bitrate / 1024 / 1024;
@@ -298,9 +300,8 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
   // 匹配配置
   let {configs, defaultBV} = videoVBRControl;
   for(let config of configs) {
-    let {type, from, to, bv} = config;
-    let value = videoSize[type];
-    if(value >= from && value < to) {
+    let {from, to, bv} = config;
+    if(videoPixel >= from && videoPixel < to) {
       waitCheakBitrates.push(bv);
     }
   }
@@ -316,8 +317,10 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
     delete params["maxrate"];
     delete params["minrate"];
     delete params["b:v"];
+    console.log(`选择了码率不变`);
     return objectToParameterArray(params);
   }
+  console.log(`选择了配置码率: ${minAverageBitrate}Mbps`);
   // 计算最大和最小码率
   let maxBitrate = minAverageBitrate.plus(2);
   let minBitrate = minAverageBitrate.gte(3)
@@ -326,5 +329,6 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
   params["maxrate"] = `${maxBitrate}M`;
   params["minrate"] = `${minBitrate}M`;
   params["b:v"] = `${minAverageBitrate}M`;
+  console.log(params);
   return objectToParameterArray(params);
 }
