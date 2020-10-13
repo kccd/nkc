@@ -75,7 +75,7 @@
   color: #555;
 }
 #moduleLogin .login-form .pull-left.link a{
-  color: #7f90a7;
+  color: #555;
 }
 #moduleLogin .login-form .pull-left.link a:hover, #moduleLogin .login-form .pull-left.link a:focus{
   text-decoration: none;
@@ -118,4 +118,9 @@
   font-size: 1.3rem;
   height: 2rem;
   color: #555;
+}
+#moduleLogin .register-step.register-step{
+  background-color: #fff;
+  color: #555;
+  border: 1px solid #555;
 }

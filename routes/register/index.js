@@ -19,7 +19,9 @@ registerRouter
   .post('/', async (ctx, next) => { // 手机注册
 	  const {db, body} = ctx;
 	  let user;
-		const {mobile, nationCode, code} = body;
+		const {mobile, nationCode, code, username, password} = body;
+		await db.UserModel.checkNewUsername(username);
+		await db.UserModel.checkNewPassword(password);
 	  if(!nationCode) ctx.throw(400, '请选择国家区号');
 	  if(!mobile) ctx.throw(400, '请输入手机号');
 	  if(!code) ctx.throw(400, '请输入短信验证码');
@@ -38,6 +40,8 @@ registerRouter
 	  option.regIP = ctx.address;
 	  option.regPort = ctx.port;
 	  delete option.type;
+	  option.username = username;
+	  option.password = password;
 		user = await db.UserModel.createUser(option);
 		await user.extendGrade();
     const _usersPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
@@ -62,6 +66,13 @@ registerRouter
     ctx.setCookie('share-token', '');
 
 	  await next();
+  })
+  .post('/check', async (ctx, next) => {
+    const {body, db} = ctx;
+    const {username, password} = body;
+    await db.UserModel.checkNewUsername(username);
+    await db.UserModel.checkNewPassword(password);
+    await next();
   })
 	.get('/code', async (ctx, next) => {
 		const {data, db} = ctx;
