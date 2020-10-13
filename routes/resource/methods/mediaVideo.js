@@ -327,6 +327,5 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
   params["maxrate"] = `${maxBitrate}M`;
   params["minrate"] = `${minBitrate}M`;
   params["b:v"] = `${minAverageBitrate}M`;
-  console.log(params);
   return objectToParameterArray(params);
 }
