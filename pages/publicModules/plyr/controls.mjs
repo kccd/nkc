@@ -14,7 +14,6 @@ function pauseAndGoToStart(player) {
 
 // 同时只能有一个在播放状态
 function onlyOnePlayingAnytime(players) {
-  console.log(players);
   function handle(event){
     const currentPlayer = event.detail.plyr;
     players.forEach(player => {
