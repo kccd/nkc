@@ -76,16 +76,13 @@ block eContent
               table.table.table-bordered.m-b-05
                 thead
                   tr
-                    th 视频尺寸
+                    th 像素(个)
                     th 平均码率(Mbps)
                     th 操作
                 tbody
                   tr(v-for="(config, index) of us.videoVBRControl.configs")
                     td
                       .m-b-05.form-inline.macro-form
-                        select(v-model="config.type")
-                          option(value='width') 宽度
-                          option(value='heigth') 高度
                         input.min(type='number' v-model.number="config.from")
                         span 至
                         input.min(type='number' v-model.number="config.to")
@@ -95,13 +92,12 @@ block eContent
                     td
                       button.btn.btn-xs.btn-default(@click="deleteVideoVBRControlConfig(index)") 删除
                   tr
-                    td 其它尺寸
+                    td 其它
                     td
                       input.form-control(v-model.number="us.videoVBRControl.defaultBV")
                     td
               button.btn.btn-default.btn-sm(@click='addVideoVBRControlConfig') 添加
-              p * 1920 * 1080 尺寸的视频推荐平均码率为 1.16Mbps
-              p * 匹配到多条配置时平均码率取最小
+              p * 1920x1080（2073600个像素）尺寸的视频推荐平均码率为 1.16Mbps
 
         h4 文件设置
         .form.form-horizontal

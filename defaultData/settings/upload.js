@@ -45,22 +45,20 @@ module.exports = {
       minWidth: 799,
       buyNoWatermark: 2000     // 购买去水印功能所需积分，默认2积分
     },
-    videoVBRControl: {
-      configs: [
-        {
-          type: "width",
-          from: 0,
-          to: 1280,
-          bv: 0.6
-        },
-        {
-          type: "width",
-          from: 1280,
-          to: 1920,
-          bv: 1.16
-        }
+    videoVBRControl : {
+      configs : [ 
+          {
+            from : 0,
+            to : 921600,
+            bv : 0.6
+          }, 
+          {
+            from : 921600,
+            to : 2073600,
+            bv : 1.16
+          }
       ],
-      defaultBV: 1.16
+      defaultBV : 1.16
     }
   }
 };

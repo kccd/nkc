@@ -101,18 +101,6 @@ block content
                   button.btn.btn-default.btn-sm(v-if='!mainForum' disabled title='请先选择主分类') 添加
                   button.btn.btn-default.btn-sm(v-else-if='minorForums.length >= minorForumCount.max' disabled title='辅分类数量已达上限') 添加
                   button.btn.btn-default.btn-sm(v-else @click='selectForumsByType("minorForum")') 添加
-            //-.m-b-2(v-if="['newThread'].indexOf(type) !== -1")
-              .editor-header 专业分类
-                small （必选，最多可选两个）
-              .editor-main-forums
-                .editor-main-forum(v-for="f, index in selectedForums")
-                  .editor-main-forum-avatar(:style="'background-color: ' + f.color" v-if="!f.logo" :data-float-fid="f.fid")
-                  img.editor-main-forum-avatar(:src="getUrl('forumLogo', f.logo)" v-else :data-float-fid="f.fid")
-                  .editor-main-forum-name(:data-float-fid="f.fid")
-                    span {{f.fName}}
-                    span(v-if="f.cName") ：{{f.cName}}
-                  .fa.fa-trash-o(@click="removeSelectedForums(index)" title="移除")
-                button.btn.btn-default.btn-sm(@click="selectForums") 添加
             .m-b-2(v-if="['newThread', 'modifyThread'].indexOf(type) !== -1")
               .editor-header 封面图
                 small （如未指定，默认从内容中选取）

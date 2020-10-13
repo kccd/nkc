@@ -14,5 +14,8 @@ module.exports = {
   subscribe: {
 	  GET: "registerSubscribe",
     POST: "registerSubscribe"
-  }
+  },
+	check: {
+		POST: 'submitRegister'
+	}
 };

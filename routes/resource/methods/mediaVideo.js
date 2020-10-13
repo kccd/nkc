@@ -288,6 +288,8 @@ function objectToParameterArray(obj) {
 async function calcBitrateControlParameter(videoPath, videoVBRControl) {
   // 获取视频尺寸
   let videoSize = await ffmpeg.getVideoSize(videoPath);
+  // 计算视频像素
+  let videoPixel = videoSize.width * videoSize.height;
   // 获取视频比特率
   let bitrate = await ffmpeg.getVideoBitrate(videoPath);
   bitrate = bitrate / 1024 / 1024;
@@ -298,9 +300,8 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
   // 匹配配置
   let {configs, defaultBV} = videoVBRControl;
   for(let config of configs) {
-    let {type, from, to, bv} = config;
-    let value = videoSize[type];
-    if(value >= from && value < to) {
+    let {from, to, bv} = config;
+    if(videoPixel >= from && videoPixel < to) {
       waitCheakBitrates.push(bv);
     }
   }

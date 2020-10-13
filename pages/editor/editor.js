@@ -59,7 +59,7 @@ function initVueApp() {
     el: "#postInfo",
     data: {
       // 辅助专业数量限制
-      minorForumCount: data.minorForumCount,
+      minorForumCount: data.minorForumCount || {},
       // 自动保存草稿
       saveDraftTimeout: 60000,
       // 原创申明最小字数限制
