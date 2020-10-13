@@ -734,7 +734,13 @@ userSchema.statics.createUser = async (option) => {
 	// 生成默认用户名，符号"-"和uid保证此用户名全局唯一
 	if(!userObj.username) {
 	  userObj.username = `${serverSettings.websiteCode}-${uid}`;
-    userObj.usernameLowerCase = userObj.username;
+  }
+  userObj.usernameLowerCase = userObj.username.toLowerCase();
+	if(userObj.password) {
+    const newPassword = apiFunction.newPasswordObject(userObj.password);
+    userObj.password = newPassword.password;
+    userObj.secret = newPassword.secret;
+    userObj.hashType = newPassword.hashType;
   }
 
 	const user = UserModel(userObj);
@@ -2229,4 +2235,33 @@ userSchema.statics.getUserBadRecords = async (uid) => {
   return results;
 };
 
+/*
+* 注册时验证用户名是否合法
+* @param {String} username 用户名
+* @author pengxiguaa 2020-10-13
+* */
+userSchema.statics.checkNewUsername = async (username) => {
+  const UserModel = mongoose.model('users');
+  const ColumnModel = mongoose.model('columns');
+  const SecretBehaviorModel = mongoose.model('secretBehaviors');
+  await UserModel.checkUsername(username);
+  username = username.toLowerCase();
+  let sameNameUser = await UserModel.findOne({usernameLowerCase: username});
+  if(sameNameUser) throwErr(400, `用户名已存在`);
+  sameNameUser = await ColumnModel.findOne({usernameLowerCase: username});
+  if(sameNameUser) throwErr(400, `用户名已存在`);
+  sameNameUser = await await SecretBehaviorModel.findOne({type: {$in: ['modifyUsername', "destroy"]}, oldUsernameLowerCase: username, toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
+  if(sameNameUser) throwErr(400, `用户名曾经被人使用过了，请更换`);
+}
+
+/*
+* 检测密码
+* @param {String} password 密码
+* @author pengxiguaa 2020-10-13
+* */
+userSchema.statics.checkNewPassword = async (password) => {
+  const {checkPass} = require('../tools/checkString');
+  if(password.length < 8) throwErr(400, `密码长度不能小于8位`);
+  if(!checkPass(password)) throwErr(400, `密码要具有数字、字母和符号三者中的至少两者`);
+};
 module.exports = mongoose.model('users', userSchema);
