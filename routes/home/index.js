@@ -9,6 +9,7 @@ router
     const {user} = data;
     data.c = c;
     data.d = d;
+    data.latestToppedThreads = [];
     if(s) data.s = s;
     if(user) {
       // 日常登陆

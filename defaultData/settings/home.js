@@ -79,7 +79,7 @@ module.exports = {
       minHeight: 479
     },
     // 游客默认显示 推荐、最新
-    visitorThreadList: "recommend",
+    visitorThreadList: "home",
     // 热门文章 条件
     hotThreads: {
       postCount: 50,

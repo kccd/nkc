@@ -171,7 +171,6 @@
                   label.m-r-1(v-for="g in grades")
                     input(type="checkbox" v-model="survey.permission.gradesId" :value="g._id")
                     span {{g.displayName}}
-                h5.text-danger 只允许已勾选等级的用户参与。
             if permission("showSurveyCertLimit")
               .form.col-sm-12
                 .form-group
@@ -180,18 +179,19 @@
                     label.m-r-1(v-for="r in roles")
                       input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
                       span {{r.displayName}}
-              .form.col-sm-12
-                .form-group
-                  label 指定用户：
-                  .selected-users(v-if="selectedUsers.length")
-                    .selected-user(v-for="u in selectedUsers")
-                      .selected-user-avatar
-                        img(:src="getUrl('userAvatar', u.avatar, 'sm')")
-                      .selected-user-name {{u.username}}
-                        .fa.fa-remove(@click="removeUser(index)")
+            h5.text-danger 用户必须同时满足以上条件才能参与。
+            .form.col-sm-12
+              .form-group
+                label 指定用户：
+                .selected-users(v-if="selectedUsers.length")
+                  .selected-user(v-for="u in selectedUsers")
+                    .selected-user-avatar
+                      img(:src="getUrl('userAvatar', u.avatar, 'sm')")
+                    .selected-user-name {{u.username}}
+                      .fa.fa-remove(@click="removeUser(index)")
 
-                  button.btn.btn-xs.btn-default(@click="selectUser") 选择用户
-                  h5.text-danger 指定的用户无需满足以上条件即可参与。
+                button.btn.btn-xs.btn-default(@click="selectUser") 选择用户
+                h5.text-danger 指定的用户无需满足以上条件即可参与。
       .form-group
         label.col-sm-2.control-label 时间
         .col-sm-9.m-t-05
