@@ -31,7 +31,7 @@ resourceRouter
     data.rid = resource.rid;
     // 开发模式告诉浏览器不要把这次的响应结果缓存下来
     if(!global.NKC.NODE_ENV === 'production') {
-      // ctx.set("Cache-Control", "no-store");
+      ctx.set("Cache-Control", "no-store");
     }
     if(mediaType === "mediaAttachment") {
       // 获取用户有关下载的时段和数量信息，用户前端展示给用户
