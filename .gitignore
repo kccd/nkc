@@ -26,4 +26,5 @@
 /pm2.cluster.config.js
 
 /test
-routes/.DS_Store
+
+.DS_Store

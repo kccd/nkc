@@ -6,7 +6,9 @@ const FILE = require("../../../nkcModules/file");
 const PATH = require('path');
 const fs = require('fs');
 const fsPromise = fs.promises;
-const {PDFDocument} = require("pdf-lib");
+const PDFPreviewFileWorker = require("../../../tools/PDFPreviewFileMaker");
+
+const pdfPreviewWorker = new PDFPreviewFileWorker();
 
 module.exports = async (options) => {
   const {file, resource} = options;
@@ -22,40 +24,10 @@ module.exports = async (options) => {
   if(ext.toLowerCase() === "pdf") {
     let pdfPreviewPath = PATH.resolve(fileFolder, `./${rid}_preview.${ext}`);
     // console.log("预览版pdf生成到:", pdfPreviewPath);
-    await makePDFPreviewPart({
+    pdfPreviewWorker.makeFile({
       path: targetFilePath,
-      output: pdfPreviewPath
-    });
+      output: pdfPreviewPath,
+      footerPDFPath: PATH.resolve(__dirname, "../../../public/default/preview_footer.pdf")
+    })
   }
-}
-
-// 生成预览版pdf要使用到的尾部
-const endTipPDFBuffer = fs.readFileSync(PATH.resolve(__dirname, '../../../public/default/preview_footer.pdf'), {flag: 'r'});
-
-async function makePDFPreviewPart({
-    path,
-    output
-}) {
-    const endPdfDoc = await PDFDocument.load(endTipPDFBuffer);
-    const fileBuffer = await fsPromise.readFile(path);
-    const pdfDoc = await PDFDocument.load(fileBuffer);
-    const pageCount = pdfDoc.getPageCount();
-
-    // 新建一个pdf
-    const newPdf = await PDFDocument.create();
-    let pages;
-    if(pageCount > 2) {
-        pages = await newPdf.copyPages(pdfDoc, [0, 1]);
-    } else {
-        pages = await newPdf.copyPages(pdfDoc, [0]);
-    }
-    pages.map(page => newPdf.addPage(page));
-
-    // 把尾部加上
-    const [endPage] = await newPdf.copyPages(endPdfDoc, [0]);
-    newPdf.addPage(endPage);
-
-    // 保存新的pdf
-    const newPdfBytes = await newPdf.save();
-    await fsPromise.writeFile(output, newPdfBytes);
 }
