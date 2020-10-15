@@ -14,9 +14,11 @@ NKC.modules.Login = function() {
     data: {
       nationCodes: nationCodes,
       type: "login",
+      registerStep: 1,
       category: "username", // username, mobile, mobileCode
       username: "",
       password: "",
+      repeatPassword: '',
       nationCode: "86",
       code: "",
       mobile: "",
@@ -28,6 +30,33 @@ NKC.modules.Login = function() {
       succeed: false
     },
     methods: {
+      changeStep: function(number) {
+        if(number === 1) {
+          return this.registerStep = number;
+        }
+        var _this = this;
+        var throwError = this.throwError;
+        return Promise.resolve()
+          .then(function() {
+            var username = _this.username;
+            var password = _this.password;
+            var repeatPassword = _this.repeatPassword;
+            if(!username) throw '请输入用户名';
+            if(!password) throw '请输入密码';
+            if(!repeatPassword) throw '请输入密码';
+            if(password !== repeatPassword) throw '两次输入的密码不相同';
+            return nkcAPI('/register/check', 'POST', {
+              username: username,
+              password: password
+            });
+          })
+          .then(function() {
+            _this.registerStep = number;
+          })
+          .catch(function(error) {
+            throwError(error.error || error.message || error);
+          });
+      },
       selectCategory: function(category) {
         this.category = category;
         this.throwError("");
@@ -96,6 +125,8 @@ NKC.modules.Login = function() {
             this_.submitting = false;
           })
         } else {
+          if(!username) return throwError('请输入用户名');
+          if(!password) return throwError('请输入密码');
           if(!nationCode) return throwError("请选择国际区号");
           if(!mobile) return throwError("请输入手机号");
           if(!code) return throwError("请输入短信验证码");
@@ -104,6 +135,8 @@ NKC.modules.Login = function() {
             nationCode: nationCode,
             mobile: mobile,
             code: code,
+            username: username,
+            password: password,
           })
           .then(function() {
             // window.location.reload();

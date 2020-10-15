@@ -97,9 +97,8 @@ block eContent
                       input.form-control(v-model.number="us.videoVBRControl.defaultBV")
                     td
               button.btn.btn-default.btn-sm(@click='addVideoVBRControlConfig') 添加
-              p * 平均码率越小，文件体积越小。只有将码率设置得比原视频码率小的时候才能起到压缩的作用。
-              p * 1920 * 1080 尺寸的视频(2073600像素)本站推荐平均码率 1.16Mbps
-        
+              p * 1920x1080（2073600个像素）尺寸的视频推荐平均码率为 1.16Mbps
+
         h4 文件设置
         .form.form-horizontal
           .form-group.m-b-2

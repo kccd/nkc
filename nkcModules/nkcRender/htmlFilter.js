@@ -47,7 +47,7 @@ module.exports = (html) => {
     },
     css: {
       whiteList: {
-        position: /^fixed|relative$/,
+        // position: /^fixed|relative$/, 2020-10-13 为了避免用户粘贴的html存在该样式造成布局错乱
         top: true,
         left: true,
         fontSize: true,
