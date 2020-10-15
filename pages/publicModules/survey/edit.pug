@@ -111,6 +111,19 @@
                 input(type="checkbox" v-model="survey.showResultAfterTheEnd" :value="true")
                 span 结束后展示结果
       .form-group
+        label.col-sm-2.control-label 显示参与人
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="always")
+              | 始终
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="after")
+              | 结束后
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="never")
+              | 不显示
+      .form-group
         label.col-sm-2.control-label 奖励
         .col-sm-9
           .radio
