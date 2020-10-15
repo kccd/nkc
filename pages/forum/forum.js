@@ -25,7 +25,9 @@ $(function() {
       modifyThreadUrl(s);
     });
   }
-  socket.on('test', console.log)
+  if(NKC.configs.uid) {
+    connectForumRoom();
+  }
 });
 
 var threadUrlSwitchKey = 'forum_thread_a_target';
@@ -72,4 +74,14 @@ function openEditSite() {
   } else {
     NKC.methods.visitUrl(url, true);
   }
+}
+/*
+* 连接上专业房间
+* */
+function connectForumRoom() {
+  if(!socket.connected) {
+    return setTimeout(connectForumRoom, 10 * 1000);
+  }
+  socket.emit('joinForumRoom', forumInfo.fid);
+  socket.on('test', console.log);
 }
