@@ -23,7 +23,7 @@ block content
         - })()
         .resource-oname= oname
         .resource-size= `大小：${tools.getSize(size)}`
-        .resource-info.m-t-1 下载或预览当前附件将花费&nbsp;
+        .resource-info.m-t-1 下载当前附件将花费&nbsp;
           for score, index in data.myAllScore
             if index !== 0
               span.name 、
@@ -48,7 +48,7 @@ block content
           a.m-l-0.download-button(href=`/r/${rid}?t=attachment&c=download&random=${Math.random()}`) 立即下载
           if data.resource.ext === "pdf"
             | &nbsp;&nbsp;&nbsp;
-            a.m-l-0(href=`/r/${rid}?c=preview_pdf&random=${Math.random()}` ) 预览
+            a.m-l-0(href=`/r/${rid}?c=preview_pdf&random=${Math.random()}` ) 免费预览
             //-if data.enough
               a.m-l-0.download-button(onclick=`payForDownloadResource(${rid})`) 立即下载
               if data.resource.ext === "pdf"
