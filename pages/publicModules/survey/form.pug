@@ -94,7 +94,7 @@
         //- 显示投票结果
         div(v-if="showResult")
           p {{postResult}}
-          .form-post-users
+          .form-post-users(v-if='users && users.length')
             a(onclick="NKC.methods.visitUrl('/u/' + user.uid)" :data-float-uid="user.uid" v-for="user in users")
               img(:src="getUrl('userAvatar', user.avatar)")
         //- 时间限制

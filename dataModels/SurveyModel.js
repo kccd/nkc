@@ -197,6 +197,12 @@ const schema = new Schema({
       default: 0
     }
   },
+  // 结束后显示参与者信息
+  showVoter: {
+    type: String,
+    default: 'always', // after: 结束后显示, always: 全程显示, never: 从不显示
+    index: 1
+  },
   // 是否屏蔽
   disabled: {
     type: Boolean,
@@ -380,7 +386,7 @@ schema.statics.modifySurvey = async (survey, checkData = true) => {
   const {
     st, et,
     reward, permission, description, options, showResult,
-    mid, showResultAfterTheEnd
+    mid, showResultAfterTheEnd, showVoter
   } = survey;
   const surveyDB = await SurveyModel.findOnly({_id: survey._id});
   // originId
@@ -394,6 +400,7 @@ schema.statics.modifySurvey = async (survey, checkData = true) => {
       mid: mid? mid: surveyDB.uid,
       et,
       reward,
+      showVoter,
       permission,
       description,
       options,
