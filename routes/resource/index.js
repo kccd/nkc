@@ -76,7 +76,7 @@ resourceRouter
           }
         } else if(c === "preview_pdf") {
           const pdfPath = await resource.getPDFPreviewFilePath();
-          if(!await nkcModules.file.access(pdfPath)) nkcModules.throwError(403, `当前文档暂不能预览`, 'previewPDF');
+          if(1 || !await nkcModules.file.access(pdfPath)) nkcModules.throwError(403, `当前文档暂不能预览`, 'previewPDF');
           const referer = ctx.get('referer');
           if(referer.includes('/reader/pdf/web/viewer')) {
             filePath = pdfPath;
