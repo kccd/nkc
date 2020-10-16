@@ -7,9 +7,9 @@ const PATH = require('path');
 const fs = require('fs');
 const fsPromise = fs.promises;
 const PDFPreviewFileWorker = require("../../../tools/PDFPreviewFileMaker");
-
+const statics = require('../../../settings/statics');
 const pdfPreviewWorker = new PDFPreviewFileWorker();
-
+const imageMagick = require('../../../tools/imageMagick');
 module.exports = async (options) => {
   const {file, resource} = options;
   const {path} = file;
@@ -24,10 +24,15 @@ module.exports = async (options) => {
   if(ext.toLowerCase() === "pdf") {
     let pdfPreviewPath = PATH.resolve(fileFolder, `./${rid}_preview.${ext}`);
     // console.log("预览版pdf生成到:", pdfPreviewPath);
-    pdfPreviewWorker.makeFile({
+    const {error} = await pdfPreviewWorker.makeFile({
       path: targetFilePath,
       output: pdfPreviewPath,
-      footerPDFPath: PATH.resolve(__dirname, "../../../public/default/preview_footer.pdf")
-    })
+      footerPDFPath: statics.defaultPreviewPDF
+    });
+    if(error) {
+      throw error;
+    } else {
+      await imageMagick.compressPDF(pdfPreviewPath, pdfPreviewPath);
+    }
   }
 }

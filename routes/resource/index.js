@@ -178,7 +178,12 @@ resourceRouter
       // 若匹配，则读取目标resource上的相关信息，并写入到新的resource中。封面图、
       if(!md5) ctx.throw(400, "md5不能为空");
       if(!fileName) ctx.throw(400, "文件名不能为空");
-      const resource = await db.ResourceModel.findOne({prid: '', hash: md5, mediaType: "mediaAttachment"});
+      const resource = await db.ResourceModel.findOne({
+        prid: '',
+        hash: md5,
+        mediaType: "mediaAttachment",
+        state: 'usable'
+      });
       if(
         !resource || // 未上传过
         !resource.ext // 上传过，但格式丢失
