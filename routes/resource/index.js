@@ -75,9 +75,11 @@ resourceRouter
             await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
           }
         } else if(c === "preview_pdf") {
+          const pdfPath = await resource.getPDFPreviewFilePath();
+          if(!await nkcModules.file.access(pdfPath)) nkcModules.throwError(403, `当前文档暂不能预览`, 'previewPDF');
           const referer = ctx.get('referer');
           if(referer.includes('/reader/pdf/web/viewer')) {
-            filePath = await resource.getPDFPreviewFilePath();
+            filePath = pdfPath;
           } else {
             return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid + '%3fc%3dpreview_pdf');
           }
