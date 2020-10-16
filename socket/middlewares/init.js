@@ -2,7 +2,7 @@ const db = require("../../dataModels");
 const settings = require("../../settings");
 const tools = require("../../tools");
 const nkcModules = require("../../nkcModules");
-
+const util = require('../util');
 const func = async (socket, next) => {
   socket.NKC = {
     state: {},
@@ -10,6 +10,8 @@ const func = async (socket, next) => {
     settings,
     tools,
     nkcModules,
+    util,
+    methods: {},
     data: {},
     query: {},
   };

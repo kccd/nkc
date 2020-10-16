@@ -2229,4 +2229,30 @@ userSchema.statics.getUserBadRecords = async (uid) => {
   return results;
 };
 
+/*
+* 获取用户拥有的权限
+* @param {Object} user 用户对象或null
+* @return {[String]} 权限数组
+* @author pengxiguaa 2020-10-16
+* */
+userSchema.methods.getUserOperationsId = async function() {
+  let operationsId = [];
+  if(!this.roles) {
+    await this.extendRoles();
+  }
+  for(const role of this.roles) {
+    operationsId = operationsId.concat(role.operationsId);
+  }
+  return [...new Set(operationsId)];
+};
+/*
+* 获取游客的权限
+* @return {[String]} 权限数组
+* @author pengxiguaa 2020-10-16
+* */
+userSchema.statics.getVisitorOperationsId = async () => {
+  const RoleModel = mongoose.model('roles');
+  const visitorRole = await RoleModel.extendRole('visitor');
+  return visitorRole.operationsId;
+}
 module.exports = mongoose.model('users', userSchema);

@@ -88,6 +88,6 @@ module.exports = async (ctx) => {
       );
     }
     // 网站后台控制台监看请求记录
-    global.NKC.io.of('/console').NKC.webMessage(d);
+    // global.NKC.io.of('/console').NKC.webMessage(d);
   }
 };
