@@ -84,6 +84,7 @@ NKC.modules.SurveyEdit = function() {
         et: "",
         showResult: "all",
         disabled: false,
+        showVoter: 'always',
         reward: { rewardedCount: 0, rewardCount: 0, onceKcb: 0, status: false },
         permission:
         {

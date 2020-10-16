@@ -22,6 +22,7 @@ module.exports = [
     defaultRole: true,
     type: 'system',
     operationsId: [
+      "getVerifications",
       "getAttachment",
       "APPGetNav",
       "APPcheckout",
@@ -373,6 +374,7 @@ module.exports = [
     modifyPostTimeLimit: 0,
     type: 'system',
     operationsId: [
+      "getVerifications",
       "getAttachment",
       "APPGetNav",
       "APPcheckout",
@@ -477,6 +479,7 @@ module.exports = [
     type: 'system',
     operationsId: [
       "getAttachment",
+      "getVerifications",
       "APPcheckout",
       "APPgetScoreChange",
       "activityApplyPost",

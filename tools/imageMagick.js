@@ -514,6 +514,15 @@ const stickerify = async (path, size = 100) => {
   }
 };
 
+// 压缩pdf
+const compressPDF = async (path, tpath) => {
+  const args = ['convert', '-resize', '800x', '-density', '150', '-compress', 'jpeg', '-quality', '15', path, tpath];
+  if(!linux) {
+    return spawnProcess('magick', args);
+  }
+  return spawnProcess(args.pop(), args);
+};
+
 module.exports = {
   stickerify,
   imageExtTurn,
@@ -555,7 +564,8 @@ module.exports = {
   shopCertImageify,
   shopCertSmallImageify,
   pictureRotate,
-  clearPictureExif
+  clearPictureExif,
+  compressPDF
 };
 
 
