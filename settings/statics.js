@@ -1,6 +1,6 @@
 const path = require('path');
 const defaultPath = path.resolve(__dirname, '../public/default');
-const staticPath = path.resolve(__dirname, '.../public/statics');
+const staticPath = path.resolve(__dirname, '../public/statics');
 const siteSpecificPath = path.resolve(staticPath, '/site');
 const attachIconPath = path.resolve(staticPath, './file_cover');
 const normalWatermark = path.resolve(defaultPath, './watermark_normal.png');
