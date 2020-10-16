@@ -21,7 +21,7 @@ module.exports = async (options) => {
     state: 'usable'
   });
   // 如果是pdf就再生成一个预览版
-  if(ext.toLowerCase() === "pdf") {
+  if(0 && ext.toLowerCase() === "pdf") {
     let pdfPreviewPath = PATH.resolve(fileFolder, `./${rid}_preview.${ext}`);
     // console.log("预览版pdf生成到:", pdfPreviewPath);
     const {error} = await pdfPreviewWorker.makeFile({
