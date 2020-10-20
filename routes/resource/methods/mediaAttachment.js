@@ -24,7 +24,7 @@ module.exports = async (options) => {
       hasPwd = await hasPassword(path);
     } catch (error) {
       if(error.message.includes("cannot authenticate password")) {
-        throw new Error("无法上传已加密的PDF");
+        throw new Error("无法上传已加密的PDF文件");
       }
     }
     hasPwd
