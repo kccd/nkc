@@ -23,6 +23,7 @@ module.exports = async (options) => {
   // 如果是pdf就再生成一个预览版
   if(ext.toLowerCase() === "pdf") {
     let pdfPreviewPath = PATH.resolve(fileFolder, `./${rid}_preview.${ext}`);
+    let pdfPreviewPathMini = PATH.resolve(fileFolder, `./${rid}_preview_mini.${ext}`);
     // console.log("预览版pdf生成到:", pdfPreviewPath);
     const {error} = await pdfPreviewWorker.makeFile({
       path: targetFilePath,
@@ -32,7 +33,17 @@ module.exports = async (options) => {
     if(error) {
       throw error;
     } else {
-      await imageMagick.compressPDF(pdfPreviewPath, pdfPreviewPath);
+      await imageMagick.compressPDF(pdfPreviewPath, pdfPreviewPathMini);
+    }
+    const previewFile = await fsPromise.stat(pdfPreviewPath);
+    const previewFileMini = await fsPromise.stat(pdfPreviewPathMini);
+    if(previewFileMini.size > previewFile.size) {
+      // 压缩后体积更大 则保留未压缩文件
+      await fsPromise.unlink(pdfPreviewPathMini);
+    } else {
+      // 压缩后体积更小 保留压缩文件
+      await fsPromise.unlink(pdfPreviewPath);
+      await fsPromise.rename(pdfPreviewPathMini, pdfPreviewPath);
     }
   }
 }
