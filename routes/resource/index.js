@@ -283,8 +283,8 @@ resourceRouter
         // 通知前端转换完成了
         global.NKC.io.of('/common').to(`user/${user.uid}`).send({rid: r.rid, state: "fileProcessFinish"});
       } catch(err) {
-        console.log(err);
-        global.NKC.io.of('/common').to(`user/${user.uid}`).send({err, state: "fileProcessFailed"});
+        console.log(err.stack || err);
+        global.NKC.io.of('/common').to(`user/${user.uid}`).send({err: err.message || err, state: "fileProcessFailed"});
         await r.update({state: 'useless'});
       }
     });
