@@ -17,12 +17,17 @@ const downloadGroups = {};
 */
 
 resourceRouter
-  .get('/:rid', async (ctx, next) => {
-    const {query, params, data, db, fs, settings, nkcModules} = ctx;
+  .use('/:rid', async (ctx, next) => {
+    const {data, db, params} = ctx;
     const {rid} = params;
+    data.resource = await db.ResourceModel.findOnly({rid, type: "resource"});
+    await next();
+  })
+  .get('/:rid', async (ctx, next) => {
+    const {query, data, db, fs, settings, nkcModules} = ctx;
     const {t, c} = query;
     const {cache} = settings;
-    const resource = await db.ResourceModel.findOnly({rid, type: "resource"});
+    const {resource} = data;
     const {mediaType, ext} = resource;
     const {user} = data;
     let filePath = await resource.getFilePath();
@@ -40,7 +45,9 @@ resourceRouter
       // 获取当前时段的最大下载速度
       speed = downloadOptions.speed;
       // 检测 分段下载数量是否超出限制
-      await resource.checkDownloadPermission(data.user, ctx.address);
+      if(c !== 'preview_pdf') {
+        await resource.checkDownloadPermission(data.user, ctx.address);
+      }
       // 检测 是否需要积分
       const freeTime = 24 * 60 * 60 * 1000;
       const {needScore, reason} = await resource.checkDownloadCost(data.user, freeTime);
@@ -284,6 +291,5 @@ resourceRouter
     await next();
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
-  .use("/:rid/fileConvertNotice", noticeRouter.routes(), noticeRouter.allowedMethods());
-
+  .use("/:rid/fileConvertNotice", noticeRouter.routes(), noticeRouter.allowedMethods())
 module.exports = resourceRouter;
