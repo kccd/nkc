@@ -13,8 +13,8 @@ async function PDFPreviewHandler({
 }) {
   const fileBuffer =      await fsPromise.readFile(path);
   const footerPDFBuffer = await fsPromise.readFile(footerPDFPath);
-  const pdfDoc =          await PDFDocument.load(fileBuffer);
-  const endPdfDoc =       await PDFDocument.load(footerPDFBuffer);
+  const pdfDoc =          await PDFDocument.load(fileBuffer, {ignoreEncryption: true});
+  const endPdfDoc =       await PDFDocument.load(footerPDFBuffer, {ignoreEncryption: true});
   const pageCount =       pdfDoc.getPageCount();
 
   // 新建一个pdf
