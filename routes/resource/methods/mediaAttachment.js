@@ -10,13 +10,27 @@ const PDFPreviewFileWorker = require("../../../tools/PDFPreviewFileMaker");
 const statics = require('../../../settings/statics');
 const pdfPreviewWorker = new PDFPreviewFileWorker();
 const imageMagick = require('../../../tools/imageMagick');
+const {cleanPassword, hasPassword} = require("../../../tools/mupdf");
+
 module.exports = async (options) => {
   const {file, resource} = options;
   const {path} = file;
   const {rid, toc, ext} = resource;
   const fileFolder = await FILE.getPath('mediaAttachment', toc);
   const targetFilePath = PATH.resolve(fileFolder, `./${rid}.${ext}`);
-  await fsPromise.copyFile(path, targetFilePath);
+  if(ext.toLowerCase() === "pdf") {
+    let hasPwd = false;
+    try {
+      hasPwd = await hasPassword(path);
+    } catch (error) {
+      if(error.message.includes("cannot authenticate password")) {
+        throw new Error("无法上传已加密的PDF");
+      }
+    }
+    hasPwd
+      ? await cleanPassword(path, targetFilePath)
+      : await fsPromise.copyFile(path, targetFilePath);
+  }
   await resource.update({
     state: 'usable'
   });
