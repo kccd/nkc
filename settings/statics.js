@@ -35,9 +35,9 @@ const disabledPhotoPath = defaultPath + '/disabled_photo.jpg';
 // 默认表情图
 const defaultStickerImage = defaultPath + '/default_avatar.gif';
 const defaultScoreIconPath = defaultPath + '/kcb.png';
-const defaultPreviewPDF = defaultPath + '/preview_footer.pdf';
+const defaultPreviewJPG = defaultPath + '/preview_footer.jpg';
 module.exports = {
-  defaultPreviewPDF,
+  defaultPreviewJPG,
   deletedPhotoPath,
   disabledPhotoPath,
   defaultScoreIconPath,
