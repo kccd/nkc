@@ -33,9 +33,22 @@ async function PDFPreviewHandler({
   }
   pages.map(page => newPdf.addPage(page));
 
+  // 获得目标pdf单页的宽度
+  let targetPageWidth = pages[0].getWidth();
+  // 获得footer pdf单页宽度
+  let footerPageWitdh = endPdfDoc.getPage(0).getWidth();
+
   // 把尾部加上
   const [endPage] = await newPdf.copyPages(endPdfDoc, [0]);
+  endPage.setWidth(targetPageWidth);
+  let translateX = (targetPageWidth - footerPageWitdh) / 2;
+  // console.log("footer内容水平移动: " + translateX);
+  endPage.translateContent(translateX, 0);
   newPdf.addPage(endPage);
+
+  // 文档信息
+  newPdf.setTitle("PDF");
+  newPdf.setCreator("预览版PDF生成器");
 
   // 保存新的pdf
   const newPdfBytes = await newPdf.save();
