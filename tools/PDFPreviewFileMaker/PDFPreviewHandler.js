@@ -1,6 +1,9 @@
+const PATH = require("path");
 const fsPromise = require("fs").promises;
 const {PDFDocument} = require("pdf-lib");
 const {maxGetPageScale, maxGetPageCount} = require("../../config/PDFPreview.json");
+
+
 
 async function PDFPreviewHandler({
   // 目标pdf文件路径
@@ -8,13 +11,11 @@ async function PDFPreviewHandler({
   // 输出路径
   output,
   // 尾部提示pdf文件的路径
-  footerPDFPath,
-
+  footerJPGPath,
 }) {
+  const footerJpgBytes =  await fsPromise.readFile(footerJPGPath);
   const fileBuffer =      await fsPromise.readFile(path);
-  const footerPDFBuffer = await fsPromise.readFile(footerPDFPath);
   const pdfDoc =          await PDFDocument.load(fileBuffer, {ignoreEncryption: true});
-  const endPdfDoc =       await PDFDocument.load(footerPDFBuffer, {ignoreEncryption: true});
   const pageCount =       pdfDoc.getPageCount();
 
   // 新建一个pdf
@@ -35,16 +36,18 @@ async function PDFPreviewHandler({
 
   // 获得目标pdf单页的宽度
   let targetPageWidth = pages[0].getWidth();
-  // 获得footer pdf单页宽度
-  let footerPageWitdh = endPdfDoc.getPage(0).getWidth();
 
   // 把尾部加上
-  const [endPage] = await newPdf.copyPages(endPdfDoc, [0]);
-  endPage.setWidth(targetPageWidth);
-  let translateX = (targetPageWidth - footerPageWitdh) / 2;
-  // console.log("footer内容水平移动: " + translateX);
-  endPage.translateContent(translateX, 0);
-  newPdf.addPage(endPage);
+  let pageSize = {width: targetPageWidth, height: 150}
+  const jpgImage = await newPdf.embedJpg(footerJpgBytes);
+  const scaledSize = jpgImage.scaleToFit(pageSize.width / 3, pageSize.height / 2);
+  const footerPage = newPdf.addPage([pageSize.width, pageSize.height]);
+  footerPage.drawImage(jpgImage, {
+    height: scaledSize.height,
+    width: scaledSize.width,
+    x: (pageSize.width - scaledSize.width) / 2,
+    y: (pageSize.height - scaledSize.height) / 2
+  })
 
   // 文档信息
   newPdf.setTitle("PDF");
