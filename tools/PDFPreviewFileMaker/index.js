@@ -12,8 +12,8 @@ class PDFPreviewFileWorker {
   runningTasks = new Map();
   maxTaskId = 0;
 
-  makeFile({ path, output, footerPDFPath }) {
-    return this.createTask({ path, output, footerPDFPath })
+  makeFile({ path, output, footerJPGPath }) {
+    return this.createTask({ path, output, footerJPGPath })
   }
 
   createTask(data, debug) {

@@ -42,7 +42,7 @@ module.exports = async (options) => {
     const {error} = await pdfPreviewWorker.makeFile({
       path: targetFilePath,
       output: pdfPreviewPath,
-      footerPDFPath: statics.defaultPreviewPDF
+      footerJPGPath: statics.defaultPreviewJPG
     });
     if(error) {
       throw error;
