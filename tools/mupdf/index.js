@@ -10,6 +10,9 @@ async function hasPassword(input) {
   return new Promise((resolve, reject) => {
     try {
       exec(`${toolPath} info -d - ${input}`,
+      {
+        maxBuffer: 200 * 1024 * 1024
+      },
       function(err, stdout, stderr) {
         if(err) return reject(err);
         resolve(stdout.includes("Encryption object"));
@@ -25,6 +28,9 @@ async function hasPassword(input) {
 async function cleanPassword(input, output) {
   return new Promise((resolve, reject) => {
     exec(`${toolPath} clean -p - ${input} ${output}`,
+    {
+      maxBuffer: 200 * 1024 * 1024
+    },
     function(err, stdout, stderr) {
       if(stderr) reject(stderr);
       resolve();
