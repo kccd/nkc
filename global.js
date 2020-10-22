@@ -28,3 +28,8 @@ Object.defineProperty(Array.prototype, "shuffle", {
     return array;
   }
 });
+
+// 处理EMFILE问题
+const fs = require('fs');
+const gfs = require('graceful-fs');
+gfs.gracefulify(fs);
