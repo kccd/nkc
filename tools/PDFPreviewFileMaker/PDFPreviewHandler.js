@@ -35,7 +35,7 @@ async function PDFPreviewHandler({
   pages.map(page => newPdf.addPage(page));
 
   // 获得目标pdf单页的宽度
-  let targetPageWidth = pages[0].getWidth();
+  let targetPageWidth = pages[pages.length - 1].getWidth();
 
   // 把尾部加上
   let pageSize = {width: targetPageWidth, height: 150}
