@@ -100,7 +100,8 @@
     "urllib": "^0.5.2",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "graceful-fs": "^4.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

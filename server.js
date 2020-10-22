@@ -1,5 +1,11 @@
 require('./global');
 const fs = require('fs');
+
+process.on('uncaughtException', function (err) {
+  console.log(`uncaughtException:`);
+  console.log(err.stack || err.message || err);
+});
+
 if(!fs.existsSync('./install/install.lock')) {
   return require('./install/server.js')
 }

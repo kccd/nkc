@@ -1,5 +1,6 @@
 const path = require('path');
 const fss = require('fs');
+const fsPromise = fss.promises;
 const utils = require('./utils');
 const {ThrottleGroup} = require("stream-throttle");
 
@@ -11,7 +12,7 @@ module.exports = async (ctx, next) => {
   if(filePath && ctx.method === 'GET') {
     let stats;
     try{
-      stats = fss.statSync(filePath);
+      stats = await fsPromise.stat(filePath);
     } catch(err) {
       ctx.throw(500, `file(${path.basename(filePath || '')}) not found`);
     }
