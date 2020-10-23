@@ -1,4 +1,5 @@
 var SubscribeTypes;
+var forumInfo = NKC.methods.getDataById('forumInfo');
 $(function() {
   if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
@@ -23,6 +24,9 @@ $(function() {
       var s = $(this).prop('checked');
       modifyThreadUrl(s);
     });
+  }
+  if(NKC.configs.uid) {
+    connectForumRoom();
   }
 });
 
@@ -70,4 +74,14 @@ function openEditSite() {
   } else {
     NKC.methods.visitUrl(url, true);
   }
+}
+/*
+* 连接上专业房间
+* */
+function connectForumRoom() {
+  if(!socket.connected) {
+    return setTimeout(connectForumRoom, 10 * 1000);
+  }
+  socket.emit('joinForumRoom', forumInfo.fid);
+  socket.on('test', console.log);
 }
