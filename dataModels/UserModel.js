@@ -2235,4 +2235,51 @@ userSchema.statics.getUserBadRecords = async (uid) => {
   return results;
 };
 
+/*
+* 注册时验证用户名是否合法
+* @param {String} username 用户名
+* @author pengxiguaa 2020-10-13
+* */
+userSchema.statics.checkNewUsername = async (username) => {
+  const UserModel = mongoose.model('users');
+  const ColumnModel = mongoose.model('columns');
+  const SecretBehaviorModel = mongoose.model('secretBehaviors');
+  await UserModel.checkUsername(username);
+  username = username.toLowerCase();
+  let sameNameUser = await UserModel.findOne({usernameLowerCase: username});
+  if(sameNameUser) throwErr(400, `用户名已存在`);
+  sameNameUser = await ColumnModel.findOne({usernameLowerCase: username});
+  if(sameNameUser) throwErr(400, `用户名已存在`);
+  sameNameUser = await await SecretBehaviorModel.findOne({type: {$in: ['modifyUsername', "destroy"]}, oldUsernameLowerCase: username, toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
+  if(sameNameUser) throwErr(400, `用户名曾经被人使用过了，请更换`);
+}
+
+/*
+* 检测密码
+* @param {String} password 密码
+* @author pengxiguaa 2020-10-13
+* */
+userSchema.statics.checkNewPassword = async (password) => {
+  const {checkPass} = require('../tools/checkString');
+  if(password.length < 8) throwErr(400, `密码长度不能小于8位`);
+  if(!checkPass(password)) throwErr(400, `密码要具有数字、字母和符号三者中的至少两者`);
+};
+
+/*
+* 获取用户所拥有的权限ID
+* @return {[String]}
+* @author pengxiguaa 2020-10-23
+* */
+userSchema.methods.getUserOperationsId = async function() {
+  if(!this.roles) {
+    await this.extendRoles();
+  }
+  let operations = [];
+  for(const role of this.roles) {
+    operations = operations.concat(role.operationsId);
+  }
+  return [...new Set(operations)];
+};
+
 module.exports = mongoose.model('users', userSchema);
+

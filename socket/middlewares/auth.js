@@ -3,7 +3,7 @@ const cookieConfig = require("../../config/cookie");
 const func = async (socket, next) => {
   // 从cookie中获取用户信息
   const {handshake, NKC} = socket;
-  const {db, data, address} = NKC;
+  const {db, data} = NKC;
   let userOperationsId, userRoles = [], userGrade, user;
   const cookies = new Cookies(handshake.headers.cookie, {
     keys: [cookieConfig.secret]
