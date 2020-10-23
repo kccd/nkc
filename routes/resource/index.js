@@ -44,13 +44,16 @@ resourceRouter
       const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
       // 获取当前时段的最大下载速度
       speed = downloadOptions.speed;
-      // 检测 分段下载数量是否超出限制
-      if(c !== 'preview_pdf') {
-        await resource.checkDownloadPermission(data.user, ctx.address);
-      }
+
       // 检测 是否需要积分
       const freeTime = 24 * 60 * 60 * 1000;
       const {needScore, reason} = await resource.checkDownloadCost(data.user, freeTime);
+
+      // 检测 分段下载数量是否超出限制
+      // 预览pdf时无需判断数量
+      if(c !== 'preview_pdf' || !needScore || resource.ext !== 'pdf') {
+        await resource.checkDownloadPermission(data.user, ctx.address);
+      }
 
       // 因为设置无需积分（与之对应的还有：因为重复下载而不需要积分）
       data.settingNoNeed = !needScore && reason === 'setting';
@@ -192,9 +195,15 @@ resourceRouter
         hash: md5,
         mediaType: "mediaAttachment",
         state: 'usable'
-      });
+      }).sort({toc: -1});
+      let existed = false;
+      if(resource) {
+        const filePath = await resource.getFilePath();
+        existed = await nkcModules.file.access(filePath);
+      }
       if(
         !resource || // 未上传过
+        !existed || // 源文件不存在
         !resource.ext // 上传过，但格式丢失
       ) {
         data.uploaded = false;

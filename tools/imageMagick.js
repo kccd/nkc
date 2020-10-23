@@ -25,7 +25,7 @@ const spawnProcess = (pathName, args, options = {}) => {
     });
     bat.on('close', (code) => {
       if(code !== 0) {
-        reject(err);
+        reject(new Error(err));
       }
       resolve(data);
     });
@@ -524,6 +524,7 @@ const compressPDF = async (path, tpath) => {
 };
 
 module.exports = {
+  spawnProcess,
   stickerify,
   imageExtTurn,
   avatarify,
