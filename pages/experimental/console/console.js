@@ -29,44 +29,9 @@ var app = new Vue({
     }
   },
   mounted: function() {
-    cs = io('/console', {
-      forceNew: false,
-      reconnection: true,
-      autoConnect: true,
-      transports: ['polling', 'websocket'],
-      reconnectionDelay: 5000,
-      reconnectionDelayMax: 10000
-    });
     var vm = this;
-    cs.on('connect', function() {
-      vm.status = 'connect';
-    });
-    cs.on('connecting', function() {
-      vm.status = 'connecting';
-    });
-    cs.on('disconnect', function(reason) {
-      vm.status = 'disconnect';
-    });
-    cs.on('reconnecting', function() {
-      vm.status = 'reconnecting';
-    });
-    cs.on('reconnect', function() {
-      vm.status = 'connect';
-    });
-    cs.on('connect_failed', function() {
-      vm.status = 'connect_failed';
-    });
-    cs.on('reconnect_failed', function() {
-      vm.status = 'reconnect_failed';
-    });
-    cs.on('error', function(err) {
-      console.log(err);
-      vm.status = 'error';
-    });
-    cs.on('connect_timeout', function() {
-      vm.status = 'connect_timeout';
-    });
-    cs.on('message', function(data) {
+    socket.on('consoleMessage', function(data) {
+      console.log(data)
       if(vm.messages.length > 500) {
         vm.messages.splice(0, 1);
       }

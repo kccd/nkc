@@ -3,7 +3,7 @@ const socketIo = require('socket.io');
 const socketConfig = require('../config/socket');
 const redisConfig = require("../config/redis");
 const socketIoRedis = require('socket.io-redis');
-const {init, auth, logger} = require("./middlewares");
+const {init, auth, logger, permission} = require("./middlewares");
 const common = require('./common');
 
 module.exports = async (server) => {
@@ -18,7 +18,8 @@ module.exports = async (server) => {
   const namespace = io.of(`/common`);
   await namespace.use(init);
   await namespace.use(auth);
+  await namespace.use(permission);
   await namespace.use(logger);
   await common(namespace);
-  global.NKC.io = io;
+  global.NKC.io = namespace;
 }

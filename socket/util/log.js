@@ -20,6 +20,14 @@ func.onDisconnectedSocket = async socket => {
       `${'/common'.bgBlue} ${'断开连接'.bgRed} ${address}`
     );
   }
+  socket.NKC.nkcModules.socket.sendConsoleMessage({
+    consoleType: 'socket',
+    reqTime: Date.now(),
+    processId: global.NKC.processId,
+    url: `/`,
+    uid: user? user.uid: '',
+    connect: false
+  });
 };
 
 func.onConnectedSocket = async socket => {
@@ -40,5 +48,13 @@ func.onConnectedSocket = async socket => {
       `${'/common'.bgBlue} ${'连接成功'.bgGreen} ${address}`
     );
   }
+  socket.NKC.nkcModules.socket.sendConsoleMessage({
+    consoleType: 'socket',
+    reqTime: Date.now(),
+    processId: global.NKC.processId,
+    url: `/`,
+    uid: user? user.uid: '',
+    connect: true
+  });
 };
 module.exports = func;

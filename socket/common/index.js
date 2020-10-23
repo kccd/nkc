@@ -48,5 +48,9 @@ module.exports = async (io) => {
       return await util.connect.disconnectSocket(socket);
     }
     await message(socket, io);
+    switch(query.operationId) {
+      case 'visitExperimentalConsole': return await require('./console')(socket, io);
+      default: return;
+    }
   });
 };
