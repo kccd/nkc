@@ -30,6 +30,8 @@ module.exports = async (options) => {
     hasPwd
       ? await cleanPassword(path, targetFilePath)
       : await fsPromise.copyFile(path, targetFilePath);
+  } else{
+    await fsPromise.copyFile(path, targetFilePath);
   }
   await resource.update({
     state: 'usable'

@@ -195,9 +195,15 @@ resourceRouter
         hash: md5,
         mediaType: "mediaAttachment",
         state: 'usable'
-      });
+      }).sort({toc: -1});
+      let existed = false;
+      if(resource) {
+        const filePath = await resource.getFilePath();
+        existed = await nkcModules.file.access(filePath);
+      }
       if(
         !resource || // 未上传过
+        !existed || // 源文件不存在
         !resource.ext // 上传过，但格式丢失
       ) {
         data.uploaded = false;
