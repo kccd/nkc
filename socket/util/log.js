@@ -1,23 +1,26 @@
 const func = {};
 const moment = require("moment");
 require('colors');
+const languages = require('../../languages');
 
 func.onDisconnectedSocket = async socket => {
-  const {data, address} = socket.NKC;
+  const {data, address, query} = socket.NKC;
+  const {operationId} = query;
+  const operationName = languages['zh_cn'].operations[operationId] || operationId;
   const {user} = data;
   if(user) {
     console.log(
       `${moment().format('YYYY/MM/DD HH:mm:ss').grey} `+
       `${(' '+global.NKC.processId + ' ').grey} `+
       `${' SOCKET '.bgGreen} ${user.uid.bgCyan} `+
-      `${'/common'.bgBlue} ${'断开连接'.bgRed} ${address}`
+      `${'/common'.bgBlue} ${'断开连接'.bgRed} ${address} ${operationName}`
     );
   } else {
     console.log(
       `${moment().format('YYYY/MM/DD HH:mm:ss').grey} `+
       `${(' '+global.NKC.processId + ' ').grey} `+
       `${' SOCKET '.bgGreen} visitor `+
-      `${'/common'.bgBlue} ${'断开连接'.bgRed} ${address}`
+      `${'/common'.bgBlue} ${'断开连接'.bgRed} ${address} ${operationName}`
     );
   }
   socket.NKC.nkcModules.socket.sendConsoleMessage({
@@ -31,21 +34,23 @@ func.onDisconnectedSocket = async socket => {
 };
 
 func.onConnectedSocket = async socket => {
-  const {data, address} = socket.NKC;
+  const {data, address, query} = socket.NKC;
+  const {operationId} = query;
+  const operationName = languages['zh_cn'].operations[operationId] || operationId;
   const {user} = data;
   if(user) {
     console.log(
       `${moment().format('YYYY/MM/DD HH:mm:ss').grey} `+
       `${(' '+global.NKC.processId + ' ').grey} `+
       `${' SOCKET '.bgGreen} ${user.uid.bgCyan} `+
-      `${'/common'.bgBlue} ${'连接成功'.bgGreen} ${address}`
+      `${'/common'.bgBlue} ${'连接成功'.bgGreen} ${address} ${operationName}`
     );
   } else {
     console.log(
       `${moment().format('YYYY/MM/DD HH:mm:ss').grey} `+
       `${(' '+global.NKC.processId + ' ').grey} `+
       `${' SOCKET '.bgGreen} visitor `+
-      `${'/common'.bgBlue} ${'连接成功'.bgGreen} ${address}`
+      `${'/common'.bgBlue} ${'连接成功'.bgGreen} ${address} ${operationName}`
     );
   }
   socket.NKC.nkcModules.socket.sendConsoleMessage({

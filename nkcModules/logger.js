@@ -46,7 +46,7 @@ module.exports = async (ctx) => {
     uid: log.uid,
     reqTime: log.reqTime,
     resTime: log.processTime,
-    consoleType: "web",
+    consoleType: "http",
     processId: global.NKC.processId,
     error: log.error,
     from: log.referer,
