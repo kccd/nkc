@@ -1008,12 +1008,13 @@ threadSchema.statics.publishArticle = async (options) => {
 /*
 * 获取首页置顶文章
 * */
-threadSchema.statics.getHomeToppedThreads = async (fid) => {
+threadSchema.statics.getHomeToppedThreads = async (fid = [], latest) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
   const ThreadModel = mongoose.model("threads");
-  const {toppedThreadsId} = homeSettings;
+  const toppedThreadsId = latest? homeSettings.latestToppedThreadsId: homeSettings.toppedThreadsId;
   let threads = await ThreadModel.find({
     tid: {$in: toppedThreadsId},
+    mainForumsId: {$in: fid},
     disabled: false,
     recycleMark: {$ne: true},
     reviewed: true
@@ -1034,6 +1035,12 @@ threadSchema.statics.getHomeToppedThreads = async (fid) => {
   });
   return results;
 };
+/*
+* 获取最新页置顶的文章
+* */
+threadSchema.statics.getLatestToppedThreads = async (fid) => {
+  return await mongoose.model('threads').getHomeToppedThreads(fid, true);
+}
 /*
 * 加载首页轮播图
 * @param {[String]} fid 能够从中读取文章的专业ID

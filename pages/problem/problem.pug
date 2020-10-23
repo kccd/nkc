@@ -74,7 +74,7 @@ block content
 
           .form-group
             label 修复详情
-            textarea.form-control#log(rows=23 disabled=cantEdit)= problem.restorLog
+            textarea.form-control#log(rows=10 disabled=cantEdit)= problem.restorLog
           if !problem.resolved
             .form-group
               .checkbox

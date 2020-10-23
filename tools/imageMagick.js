@@ -25,7 +25,7 @@ const spawnProcess = (pathName, args, options = {}) => {
     });
     bat.on('close', (code) => {
       if(code !== 0) {
-        reject(err);
+        reject(new Error(err));
       }
       resolve(data);
     });
@@ -514,7 +514,17 @@ const stickerify = async (path, size = 100) => {
   }
 };
 
+// 压缩pdf
+const compressPDF = async (path, tpath) => {
+  const args = ['convert', '-colorspace', 'RGB', '-resize', '800x', '-density', '100', '-compress', 'jpeg', '-quality', '20', path, tpath];
+  if(!linux) {
+    return spawnProcess('magick', args);
+  }
+  return spawnProcess(args.pop(), args);
+};
+
 module.exports = {
+  spawnProcess,
   stickerify,
   imageExtTurn,
   avatarify,
@@ -555,7 +565,8 @@ module.exports = {
   shopCertImageify,
   shopCertSmallImageify,
   pictureRotate,
-  clearPictureExif
+  clearPictureExif,
+  compressPDF
 };
 
 

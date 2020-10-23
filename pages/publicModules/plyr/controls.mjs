@@ -1,13 +1,15 @@
 // 从开头播放
 function playWithStart(player) {
-  player.currentTime = 0;
-  return player.play();
+  if(player.paused) {
+    player.currentTime = 0;
+    return player.play();
+  }
 }
 
 // 回到开头并暂停播放
 function pauseAndGoToStart(player) {
-  player.pause();
   player.currentTime = 0;
+  player.pause();
 }
 
 // 同时只能有一个在播放状态

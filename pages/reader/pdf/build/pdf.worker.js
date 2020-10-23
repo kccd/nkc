@@ -19,7 +19,7 @@
  * @licend The above is the entire license notice for the
  * Javascript code in this page
  */
-
+importScripts('/external_pkgs/polyfill/dist/polyfill.min.js');
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();

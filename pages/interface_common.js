@@ -1216,8 +1216,9 @@ if($('input[data-control="hue"]').length !== 0 && $('input[data-control="hue"]')
 }
 
 // 首页置顶
-function homeTop(tid) {
-	nkcAPI('/t/'+tid+'/hometop', 'POST', {})
+function homeTop(tid, latest) {
+  var body = latest? {latest: true}: {};
+	nkcAPI('/t/'+tid+'/hometop', 'POST', body)
 		.then(function() {
 			window.location.reload();
 		})
@@ -1226,14 +1227,26 @@ function homeTop(tid) {
 		})
 }
 // 取消首页置顶
-function unHomeTop(tid) {
-	nkcAPI('/t/'+tid+'/hometop', 'DELETE', {})
+function unHomeTop(tid, latest) {
+  var url = '/t/' + tid + '/hometop';
+  if(latest) {
+    url += '?latest=true';
+  }
+	nkcAPI(url, 'DELETE', {})
 		.then(function() {
 			window.location.reload();
 		})
 		.catch(function(data) {
 			screenTopWarning(data.error||data);
 		})
+}
+// 最新页置顶
+function latestTop(tid) {
+  homeTop(tid, 'latest');
+}
+// 取消最新页置顶
+function unLatestTop(tid) {
+  unHomeTop(tid, 'latest');
 }
 // 首页推荐
 function unHomeAd(tid) {

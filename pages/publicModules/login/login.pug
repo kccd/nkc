@@ -35,47 +35,56 @@ include ../verifications/verifications
               div(v-if="type === 'login'")
                 div(v-if="category === 'username'")
                   .form-group
-                    input.form-control.input(type="text" placeholder="用户名" v-model.trim="username" @change="throwError('')" @keyup.enter="submit")
+                    input.form-control.input(type="text" placeholder="用户名" v-model.trim="username" @input="throwError('')" @keyup.enter="submit")
                   .form-group
-                    input.form-control.input(type="password" placeholder="密码" v-model.trim="password" @change="throwError('')" @keyup.enter="submit")
+                    input.form-control.input(type="password" placeholder="密码" v-model.trim="password" @input="throwError('')" @keyup.enter="submit")
                 div(v-else-if="category === 'mobile'")
                   .form-group
-                    select.form-control.input(v-model="nationCode" @change="throwError('')" @keyup.enter="submit")
+                    select.form-control.input(v-model="nationCode" @input="throwError('')" @keyup.enter="submit")
                       option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
                   .form-group
                     <input type="password" name="txtPassword" style="display:none">
-                    input.form-control.input(name="txtPassword" type="text" placeholder="手机号" v-model.trim="mobile" @change="throwError('')" @keyup.enter="submit" autocomplete="off")
+                    input.form-control.input(name="txtPassword" type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit" autocomplete="off")
                   .form-group
-                    input.form-control.input(type="password" placeholder="密码" v-model.trim="password" @change="throwError('')" @keyup.enter="submit" autocomplete="newPassword")
+                    input.form-control.input(type="password" placeholder="密码" v-model.trim="password" @input="throwError('')" @keyup.enter="submit" autocomplete="newPassword")
                 div(v-else-if="category === 'mobileCode'")
                   .form-group
-                    select.form-control.input(v-model="nationCode" @change="throwError('')" @keyup.enter="submit")
+                    select.form-control.input(v-model="nationCode" @input="throwError('')" @keyup.enter="submit")
                       option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
                   .form-group
-                    input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @change="throwError('')" @keyup.enter="submit")
+                    input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit")
                   .row
                     .col-xs-6
                       .form-group
-                        input.form-control.input(type="text" placeholder="短信验证码" v-model.trim="code" @change="throwError('')" @keyup.enter="submit")
+                        input.form-control.input(type="text" placeholder="短信验证码" v-model.trim="code" @input="throwError('')" @keyup.enter="submit")
                     .col-xs-6.text-right
                       .send-mobile-code(v-if="waiting === 0" @click="sendMobileCode") 发送验证码
                       .send-mobile-code.disabled(v-else) 发送验证码({{waiting}})
+              //- 有关注册
               div(v-else)
-                .form-group
-                  select.form-control.input(v-model="nationCode" @change="throwError('')" @keyup.enter="submit")
-                    option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
-                  h5.text-danger(v-if="nationCode !== '86' && nationCode !== 86" style="font-size: 1rem")
-                    | 【海外用户】请注册后立即绑定邮箱，否则无密保功能。
-                    div(style="margin-top: 0.5rem;") 【海外用户】发表的内容可能需要经过人工审核才显示。
-                .form-group
-                  input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @change="throwError('')" @keyup.enter="submit")
-                .row
-                  .col-xs-6
-                    .form-group
-                      input.form-control.input(type="text" placeholder="短信验证码" v-model.trim="code" @change="throwError('')" @keyup.enter="submit")
-                  .col-xs-6.text-right
-                    .send-mobile-code(v-if="waiting === 0" @click="sendMobileCode('register')") 发送验证码
-                    .send-mobile-code.disabled(v-else) 发送验证码({{waiting}})
+                div(v-if='registerStep === 2')
+                  .form-group
+                    select.form-control.input(v-model="nationCode" @input="throwError('')" @keyup.enter="submit")
+                      option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
+                    h5.text-danger(v-if="nationCode !== '86' && nationCode !== 86" style="font-size: 1rem")
+                      | 【海外用户】请注册后立即绑定邮箱，否则无密保功能。
+                      div(style="margin-top: 0.5rem;") 【海外用户】发表的内容可能需要经过人工审核才显示。
+                  .form-group
+                    input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit")
+                  .row
+                    .col-xs-6
+                      .form-group
+                        input.form-control.input(type="text" placeholder="短信验证码" v-model.trim="code" @input="throwError('')" @keyup.enter="submit")
+                    .col-xs-6.text-right
+                      .send-mobile-code(v-if="waiting === 0" @click="sendMobileCode('register')") 发送验证码
+                      .send-mobile-code.disabled(v-else) 发送验证码({{waiting}})
+                div(v-else)
+                  .form-group
+                    input.form-control.input(type="text" placeholder="用户名" v-model.trim="username" @input="throwError('')" @keyup.enter="submit")
+                  .form-group
+                    input.form-control.input(type='password' placeholder='密码' v-model.trim='password' @input='throwError("")' @keyup.enter='submit')
+                  .form-group
+                    input.form-control.input(type='password' placeholder='重复密码' v-model.trim='repeatPassword' @input='throwError("")' @keyup.enter='submit')
               .form-group
                 .text-left.m-b-1
                   .text-danger(v-if="error")
@@ -93,9 +102,17 @@ include ../verifications/verifications
                   div(v-if="succeed")
                     button.btn.post-button.button-icon.succeed 跳转中..
                       //.fa.fa-check
-                  div(v-else)
-                    button.btn.post-button(@click="submit" v-if="!submitting") {{type==="login"?"登录":"注册"}}
+                  div(v-else-if='type === "login"')
+                    button.btn.post-button(@click="submit" v-if="!submitting") 登录
                     button.btn.post-button(v-else)
+                      .fa.fa-spinner.fa-spin.fa-3x.fa-fw.button-icon
+                  div(v-else)
+
+                    button.btn.post-button.register-step(v-if='registerStep === 2' @click='changeStep(1)') 上一步
+                    button.btn.post-button.register-step(v-if='registerStep === 1' @click='changeStep(2)') 下一步
+
+                    button.btn.post-button(@click="submit" v-if="!submitting && registerStep === 2 && !submitting") 注册
+                    button.btn.post-button(v-if='submitting')
                       .fa.fa-spinner.fa-spin.fa-3x.fa-fw.button-icon
 +includeJS("/nationCodes/nationCodes.js")
 +includeJS("/publicModules/login/login.js")

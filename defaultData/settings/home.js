@@ -79,7 +79,7 @@ module.exports = {
       minHeight: 479
     },
     // 游客默认显示 推荐、最新
-    visitorThreadList: "recommend",
+    visitorThreadList: "home",
     // 热门文章 条件
     hotThreads: {
       postCount: 50,
@@ -94,6 +94,7 @@ module.exports = {
     },
     originalThreadDisplayMode: "simple",     // 首页上“最新原创”板块文章的显示方式， “simple” 简略显示， “full” 完整显示
     subscribesDisplayMode: "row",            // 首页上“关注的专业”板块的显示方式，  “row” 横排， “column” 竖排
-    showActivityEnter: true                  // 显示活动入口
+    showActivityEnter: true,                  // 显示活动入口
+    latestToppedThreadsId: [],
   }
 };

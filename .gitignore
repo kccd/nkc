@@ -26,3 +26,5 @@
 /pm2.cluster.config.js
 
 /test
+
+.DS_Store

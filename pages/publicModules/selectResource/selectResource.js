@@ -190,13 +190,19 @@ NKC.modules.SelectResource = function() {
         dom.one("paste", function(e) {
           var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
           var files = clipboardData.items || [];
+          var _files = [];
           for(var i = 0; i < files.length; i ++) {
             var file = files[i].getAsFile();
             if(!file) continue;
-            var f = self.newFile(file);
-            self.files.unshift(f);
-            self.startUpload(f);
+            _files.push(file);
           }
+          if(!_files.length) return;
+          self.uploadSelectFile(_files);
+
+          /*var clipboardData = e.clipboardData || e.originalEvent && e.originalEvent.clipboardData || {};
+          var files = [].slice.call(clipboardData.files);
+          if(files.length <= 0) return;
+          self.uploadSelectFile(files);*/
         });
       },
       pasteContent: function() {
@@ -520,6 +526,35 @@ NKC.modules.SelectResource = function() {
       onTouch: function() {
         this.isTouchEmit = true;
       } */
+    }
+  });
+
+  // 拖动上传
+  var $dragDom = self.dom.find("#pasteContent");
+  var originText = "";
+  $dragDom.on({
+    dragenter: function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      originText = $dragDom.text();
+      $dragDom.text("松开鼠标上传文件")
+    },
+    dragleave: function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      $dragDom.text(originText);
+    },
+    dragover: function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    drop: function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      $dragDom.text(originText);
+      var files = [].slice.call(e.originalEvent.dataTransfer.files);
+      if(!files.length) return;
+      self.app.uploadSelectFile(files);
     }
   });
 

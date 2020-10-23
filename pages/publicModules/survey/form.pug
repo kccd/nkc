@@ -7,6 +7,12 @@
     .survey-form-description(v-if="survey.type !== 'vote'") {{survey.description}}
     .survey-form-description(v-else) {{survey.options[0].content}}
 
+    .option-resources(v-if="survey.type === 'vote'")
+      .option-resource
+        img(v-for="r in survey.options[0].resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
+      .option-links(v-if="survey.options[0].links && survey.options[0].links")
+        a.option-link(v-for="l in survey.options[0].links" @click="visitUrl(l)" :title="l") {{l}}
+
     // 投票
     .survey-form-options(v-if="survey.type === 'vote'")
       .survey-form-option.option-answer(v-for="o, index in survey.options[0].answers")
@@ -17,8 +23,7 @@
         .option-info
           .option-resources(v-if="o.resourcesId && o.resourcesId.length")
             .option-resource
-              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
-            //p {{o.description}}
+              img(v-for="r in o.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
         .option-status(v-if="showResult")
@@ -34,7 +39,7 @@
         .option-info
           .option-resources
             .option-resource(v-if="o.resourcesId && o.resourcesId.length")
-              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+              img(v-for="r in o.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
             //p {{o.description}}
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
@@ -47,7 +52,7 @@
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
-                  div(v-for="r in a.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+                  img(v-for="r in a.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
                 .option-links(v-if="a.links && a.links.length")
                   a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
             .option-status(v-if="showResult")
@@ -64,7 +69,7 @@
         .option-info
           .option-resources
             .option-resource(v-if="o.resourcesId && o.resourcesId.length")
-              div(v-for="r in o.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+              img(v-for="r in o.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
             .option-links(v-if="o.links && o.links.length")
               a.option-link(v-for="l in o.links" @click="visitUrl(l)" :title="l") {{l}}
         .option-answers(v-if="o.answers && o.answers.length")
@@ -73,7 +78,7 @@
             .option-info
               .option-resources
                 .option-resource(v-if="a.resourcesId && a.resourcesId.length")
-                  div(v-for="r in a.resourcesId" :style="'background-image:url(/r/'+r+')'" @click="visitUrl('/r/' + r)")
+                  img(v-for="r in a.resourcesId" :src="'/rt/' + r" :data-src="'/r/' + r" data-type='view')
                 //p {{o.description}}
                 .option-links(v-if="a.links && a.links.length")
                   a.option-link(v-for="l in a.links" @click="visitUrl(l)" :title="l") {{l}}
@@ -89,7 +94,7 @@
         //- 显示投票结果
         div(v-if="showResult")
           p {{postResult}}
-          .form-post-users
+          .form-post-users(v-if='users && users.length')
             a(onclick="NKC.methods.visitUrl('/u/' + user.uid)" :data-float-uid="user.uid" v-for="user in users")
               img(:src="getUrl('userAvatar', user.avatar)")
         //- 时间限制

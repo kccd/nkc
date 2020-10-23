@@ -159,6 +159,20 @@ resourceSchema.methods.getFilePath = async function() {
   const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
   return PATH.resolve(fileFolder, `./${rid}.${ext}`);
 };
+/*
+*  获取PDF预览文件
+* */
+resourceSchema.methods.getPDFPreviewFilePath = async function() {
+  const ResourceModel = mongoose.model('resources');
+  const {toc, ext, rid, prid} = this;
+  if(prid) {
+    const parentResource = await ResourceModel.findOne({rid: prid});
+    if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
+    return await parentResource.getPDFPreviewFilePath();
+  }
+  const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
+  return PATH.resolve(fileFolder, `./${rid}_preview.${ext}`);
+};
 
 // 检测html内容中的资源并将指定id存入resource.reference
 resourceSchema.statics.toReferenceSource = async function(id, declare) {
@@ -314,5 +328,179 @@ resourceSchema.statics.clearResourceState = async () => {
     }
   });
 }
+
+/*
+* 文件下载 时段、文件个数判断
+* @param {Object} user 用户对象
+* @param {String} ip 访问者的ip地址
+* @author pengxiguaa 2020-10-11
+* */
+resourceSchema.methods.checkDownloadPermission = async function(user, ip) {
+  const SettingModel = mongoose.model('settings');
+  const DownloadLogModel = mongoose.model('downloadLogs');
+  const apiFunction = require('../nkcModules/apiFunction');
+  const downloadOptions = await SettingModel.getDownloadSettingsByUser(user);
+  const {fileCountLimit} = downloadOptions;
+  const {fileCount, startingTime, endTime} = fileCountLimit;
+  if(fileCount === 0) {
+    if(!user) {
+      throwErr(403, `只有登录用户可以下载附件，请先登录或注册。`);
+    } else {
+      throwErr(403, `你当前的账号等级无法下载附件，请发表优质内容提升等级。`);
+    }
+  }
+  let downloadLogs;
+  const today = apiFunction.today().getTime();
+  const match = {
+    toc: {
+      $gte: new Date(today + startingTime * 60 * 60 * 1000),
+      $lt: new Date(today + endTime * 60 * 60 * 1000)
+    }
+  };
+  const matchToday = {
+    toc: {
+      $gte: Date.now() - 24 * 60 * 60 * 1000
+    },
+    rid: this.rid
+  };
+  if(!user) {
+    match.ip = ip;
+    match.uid = '';
+    matchToday.ip = ip;
+    matchToday.uid = ''
+  } else {
+    match.uid = user.uid;
+    matchToday.uid = user.uid;
+  }
+  // 判断24小时以内是否下载过
+  const downloadToday = await DownloadLogModel.findOne(matchToday);
+  if(!downloadToday) {
+    // 判断当前时段附件下载数量是否超过限制
+    const logs = await DownloadLogModel.aggregate([
+      {
+        $match: match
+      },
+      {
+        $group: {
+          _id: '$rid',
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]);
+    downloadLogs = logs? logs.map(l => l._id): [];
+    if(downloadLogs.length >= fileCount) {
+      if(user) {
+        throwErr(403, `当前时段（${startingTime}点 - ${endTime}点）下载的附件数量已达上限，请在下一个时段再试。`);
+      } else {
+        throwErr(403, `未登录用户当前时段（${startingTime}点 - ${endTime}点）只能下载${fileCount}个附件，请登录或注册后重试。`);
+      }
+    }
+  }
+};
+
+/*
+* 判断用户下载此附件是否需要积分
+* @param {Object} user 用户对象
+* @return {Object} 是否需要积分
+*   @param {Boolean} needScore 是否需要积分
+*   @param {String} reason 原因 setting: 因为后台设置，repeat: 重复下载
+* @author pengxiguaa 2020-10-15
+* */
+resourceSchema.methods.checkDownloadCost = async function(user, freeTime) {
+  const SettingModel = mongoose.model("settings");
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
+  let needScore = false;
+  // 获取下载附件时的积分设置
+  const operation = await ScoreOperationModel.getScoreOperationFromRedis(
+    "default", "attachmentDownload"
+  );
+  if(operation.count === 0) {
+    return {
+      needScore: false,
+      reason: 'setting'
+    };
+  }
+  // 获取已开启的积分
+  const enabledScoreTypes = await SettingModel.getEnabledScoresType();
+  for(const typeName of enabledScoreTypes) {
+    const number = operation[typeName];
+    if(number !== 0) {
+      needScore = true;
+      break;
+    }
+  }
+  if(needScore === false) {
+    return {
+      needScore: false,
+      reason: 'setting'
+    };
+  }
+  if(!user) {
+    ctx.throw(403, `你暂未登录，请登录或注册后重试。`);
+  }
+  const todayOperationCount = await ScoreOperationLogModel.getOperationLogCount(user, 'attachmentDownload');
+  const lastAttachmentDownloadLog = await ScoreOperationLogModel.getLastAttachmentDownloadLog(user, this.rid);
+  const nowTime = new Date();
+  const lastAttachmentDownloadTime = lastAttachmentDownloadLog? lastAttachmentDownloadLog.toc: 0;
+  if(nowTime - lastAttachmentDownloadTime <= freeTime) {
+    // 下载时间未超过24小时 不收费
+    return {
+      needScore: false,
+      reason: 'repeat'
+    };
+  }
+  if(
+    todayOperationCount >= operation.count &&
+    operation.count !== -1 && operation.count !== 0
+  ) {
+    // 下载的次数超过设置的值后不收费
+    return {
+      needScore: false,
+      reason: 'setting'
+    };
+  } else {
+    return {
+      needScore: true,
+      reason: 'setting'
+    };
+  }
+};
+
+
+/*
+* 判断用户下载所需的积分是否足够
+* @param {Object} user 用户对象
+* @return {Object}  用户积分是否足够
+*   @param {Boolean} enough 是否足够
+*   @param {[Object]} userScores 用户积分相关
+* @author pengxiguaa 2020-10-15
+* */
+resourceSchema.methods.checkUserScore = async function(user) {
+  const UserModel = mongoose.model('users');
+  const ScoreOperationModel = mongoose.model('scoreOperations');
+  await UserModel.updateUserScores(user.uid);
+  const userScores = await UserModel.getUserScores(user.uid);
+  const operation = await ScoreOperationModel.getScoreOperationFromRedis(
+    "default", "attachmentDownload"
+  );
+  let enough = true;
+  for(const score of userScores) {
+    const operationScoreNumber = operation[score.type];
+    score.addNumber = operationScoreNumber;
+    // 下载给积分，用户积分肯定是足够的
+    if(operationScoreNumber >= 0) continue;
+    // 下载扣积分
+    if((score.number + operationScoreNumber) < 0) {
+      enough = false;
+    }
+  }
+  return {
+    enough,
+    userScores: userScores
+  };
+};
 
 module.exports = mongoose.model('resources', resourceSchema);

@@ -77,12 +77,18 @@ block content
                 a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 推荐
                 a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
 
-            if !data.threads.length
+            if !data.threads.length && !data.latestToppedThreads.length
               .p-t-5.p-b-5.text-center
                 h4
                   b 空空如也~
             else
               include ../publicModules/paging/paging
+
+              if data.t === 'latest' && data.paging.page === 0 && data.latestToppedThreads.length > 0
+                -const defaultThreadListStyle = {type: 'minimalist'}
+                for thread in data.latestToppedThreads
+                  include ../publicModules/thread_panel/thread_panel
+                div.topped-thread-header - 以上是置顶 -
 
               for thread in data.threads
                 include ../publicModules/thread_panel/thread_panel

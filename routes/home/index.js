@@ -9,6 +9,7 @@ router
     const {user} = data;
     data.c = c;
     data.d = d;
+    data.latestToppedThreads = [];
     if(s) data.s = s;
     if(user) {
       // 日常登陆
@@ -163,6 +164,10 @@ router
       } else {
         q.reviewed = true;
       }
+
+      // 最新页置顶文章
+      data.latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
+
     } else if(threadListType === "subscribe") {
       if(!d) d = "all";
       if(d === "all" || d === "column") {

@@ -1,6 +1,6 @@
 const path = require('path');
-const defaultPath = path.resolve('public/default');
-const staticPath = path.resolve('public/statics');
+const defaultPath = path.resolve(__dirname, '../public/default');
+const staticPath = path.resolve(__dirname, '../public/statics');
 const siteSpecificPath = path.resolve(staticPath, '/site');
 const attachIconPath = path.resolve(staticPath, './file_cover');
 const normalWatermark = path.resolve(defaultPath, './watermark_normal.png');
@@ -35,7 +35,9 @@ const disabledPhotoPath = defaultPath + '/disabled_photo.jpg';
 // 默认表情图
 const defaultStickerImage = defaultPath + '/default_avatar.gif';
 const defaultScoreIconPath = defaultPath + '/kcb.png';
+const defaultPreviewJPG = defaultPath + '/preview_footer.jpg';
 module.exports = {
+  defaultPreviewJPG,
   deletedPhotoPath,
   disabledPhotoPath,
   defaultScoreIconPath,

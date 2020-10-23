@@ -42,7 +42,8 @@
                     button.btn.btn-default(@click="removeLink(o, index)") 删除
               .option-resources
                 .option-resource(v-for="r, index in o.resourcesId")
-                  .option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
+                  img(:src="'/rt/' + r" @click="visitUrl('/r/' + r)")
+                  //.option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
                   .fa.fa-remove(@click="removeResourceId(o, index)")
               .survey-option-buttons.m-t-05.m-b-05
                 button.btn.btn-default.btn-xs(@click="addLink(o)") 添加链接
@@ -65,7 +66,8 @@
                         button.btn.btn-default(@click="removeLink(a, index)") 删除
                   .option-resources
                     .option-resource(v-for="r, index in a.resourcesId")
-                      .option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
+                      img(:src="'/rt/' + r" @click="visitUrl('/r/' + r)")
+                      //.option-resource-img(:style="'background-image:url(/rt/'+r+')'" @click="visitUrl('/r/' + r)")
                       .fa.fa-remove(@click="removeResourceId(a, index)")
                   button.btn.btn-default.btn-xs(@click="addLink(a)") 添加链接
                   button.btn.btn-default.btn-xs(@click="addResource(a)") 添加图片
@@ -108,6 +110,19 @@
               label
                 input(type="checkbox" v-model="survey.showResultAfterTheEnd" :value="true")
                 span 结束后展示结果
+      .form-group
+        label.col-sm-2.control-label 显示参与人
+        .col-sm-9
+          .radio
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="always")
+              | 始终
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="after")
+              | 结束后
+            label.m-r-1
+              input(type="radio" v-model="survey.showVoter" value="never")
+              | 不显示
       .form-group
         label.col-sm-2.control-label 奖励
         .col-sm-9
@@ -169,7 +184,6 @@
                   label.m-r-1(v-for="g in grades")
                     input(type="checkbox" v-model="survey.permission.gradesId" :value="g._id")
                     span {{g.displayName}}
-                h5.text-danger 只允许已勾选等级的用户参与。
             if permission("showSurveyCertLimit")
               .form.col-sm-12
                 .form-group
@@ -178,18 +192,19 @@
                     label.m-r-1(v-for="r in roles")
                       input(type="checkbox" v-model="survey.permission.certsId" :value="r._id")
                       span {{r.displayName}}
-              .form.col-sm-12
-                .form-group
-                  label 指定用户：
-                  .selected-users(v-if="selectedUsers.length")
-                    .selected-user(v-for="u in selectedUsers")
-                      .selected-user-avatar
-                        img(:src="getUrl('userAvatar', u.avatar, 'sm')")
-                      .selected-user-name {{u.username}}
-                        .fa.fa-remove(@click="removeUser(index)")
+            h5.text-danger 用户必须同时满足以上条件才能参与。
+            .form.col-sm-12
+              .form-group
+                label 指定用户：
+                .selected-users(v-if="selectedUsers.length")
+                  .selected-user(v-for="u in selectedUsers")
+                    .selected-user-avatar
+                      img(:src="getUrl('userAvatar', u.avatar, 'sm')")
+                    .selected-user-name {{u.username}}
+                      .fa.fa-remove(@click="removeUser(index)")
 
-                  button.btn.btn-xs.btn-default(@click="selectUser") 选择用户
-                  h5.text-danger 指定的用户无需满足以上条件即可参与。
+                button.btn.btn-xs.btn-default(@click="selectUser") 选择用户
+                h5.text-danger 指定的用户无需满足以上条件即可参与。
       .form-group
         label.col-sm-2.control-label 时间
         .col-sm-9.m-t-05

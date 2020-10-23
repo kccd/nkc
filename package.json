@@ -22,6 +22,7 @@
     "@alicloud/pop-core": "^1.7.9",
     "ansi-escapes": "^4.3.1",
     "awesome-static": "^1.4.3",
+    "big.js": "^6.0.1",
     "bluebird": "^3.5.3",
     "canvas": "^2.6.1",
     "chart.js": "^2.7.2",
@@ -73,6 +74,7 @@
     "node-threads-pool": "^2.0.2",
     "nodemailer": "^4.4.2",
     "open": "^6.3.0",
+    "pdf-lib": "^1.11.2",
     "photoswipe": "^4.1.2",
     "pinyin": "^2.9.0",
     "pm2": "^4.4.0",
@@ -98,7 +100,8 @@
     "urllib": "^0.5.2",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "graceful-fs": "^4.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

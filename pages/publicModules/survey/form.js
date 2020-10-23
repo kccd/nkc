@@ -327,6 +327,7 @@ NKC.modules.SurveyForm = function(id) {
       this.checkTime();
       setTimeout(function() {
         floatUserPanel.initPanel();
+        NKC.methods.initImageViewer('.option-resource img');
       }, 300);
     }
   });

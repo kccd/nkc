@@ -14,7 +14,16 @@ router
     const {db, data} = ctx;
     const {survey} = data;
     data.havePermission = false;
-    data.users = await survey.getPostUsers();
+    data.users = [];
+    // 获取投票者
+    if(
+      survey.showVoter === 'always' || // 全程可见
+      ctx.permission('showSecretSurvey') || // 拥有特殊权限
+      data.user && data.user.uid === survey.uid || // 访问者为发起人
+      survey.showVoter === 'after' && Date.now() > new Date(survey.et).getTime() // 结束后显示
+    ) {
+      data.users = await survey.getPostUsers();
+    }
     data.allowedUsers = await db.UserModel.find({uid: {$in: survey.permission.uid}});
     data.targetUser = await db.UserModel.findOnly({uid: survey.uid});
     data.surveyRewardScore = await db.SettingModel.getScoreByOperationType('surveyRewardScore');
@@ -197,6 +206,7 @@ router
         if(sc.selectedCount < sc.minVoteCount) ctx.throw(400, "勾选选项的数目未达最低要求，请检查");
       }
     }
+
 
     if(type === "newPost") {
       surveyPost = db.SurveyPostModel({

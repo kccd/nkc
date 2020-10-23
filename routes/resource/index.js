@@ -17,153 +17,60 @@ const downloadGroups = {};
 */
 
 resourceRouter
-  .get('/:rid', async (ctx, next) => {
-    const {query, params, data, db, fs, settings, nkcModules} = ctx;
+  .use('/:rid', async (ctx, next) => {
+    const {data, db, params} = ctx;
     const {rid} = params;
+    data.resource = await db.ResourceModel.findOnly({rid, type: "resource"});
+    await next();
+  })
+  .get('/:rid', async (ctx, next) => {
+    const {query, data, db, fs, settings, nkcModules} = ctx;
     const {t, c} = query;
     const {cache} = settings;
-    const resource = await db.ResourceModel.findOnly({rid, type: "resource"});
+    const {resource} = data;
     const {mediaType, ext} = resource;
     const {user} = data;
     let filePath = await resource.getFilePath();
     let speed;
     data.resource = resource;
     data.rid = resource.rid;
-    // 告诉浏览器不要把这次的响应结果缓存下来
-    ctx.set("Cache-Control", "no-store");
+    // 开发模式告诉浏览器不要把这次的响应结果缓存下来
+    if(!global.NKC.NODE_ENV === 'production') {
+      ctx.set("Cache-Control", "no-store");
+    }
     if(mediaType === "mediaAttachment") {
+      // 获取用户有关下载的时段和数量信息，用户前端展示给用户
       data.fileCountLimitInfo = await db.SettingModel.getDownloadFileCountLimitInfoByUser(data.user);
       const downloadOptions = await db.SettingModel.getDownloadSettingsByUser(data.user);
-      const {fileCountLimit} = downloadOptions;
+      // 获取当前时段的最大下载速度
       speed = downloadOptions.speed;
-      if(fileCountLimit.fileCount === 0) {
-        if(!data.user) {
-          ctx.throw(403, '只有登录用户可以下载附件，请先登录或者注册。');
-        } else {
-          ctx.throw(403, '您当前账号等级无法下载附件，请发表优质内容提升等级。');
-        }
-      }
-      let downloadLogs;
-      const today = nkcModules.apiFunction.today().getTime();
-      const match = {
-        toc: {
-          $gte: new Date(today + fileCountLimit.startingTime * 60 * 60 * 1000),
-          $lt: new Date(today + fileCountLimit.endTime * 60 * 60 * 1000),
-        }
-      };
-      const matchToday = {
-        toc: {
-          $gte: Date.now() - 24 * 60 * 60 * 1000
-        },
-        rid: resource.rid
-      };
-      if(!data.user) {
-        // 游客
-        match.ip = ctx.address;
-        match.uid = "";
-        matchToday.ip = ctx.address;
-        matchToday.uid = '';
-      } else {
-        // 已登录用户
-        match.uid = data.user.uid;
-        matchToday.uid = data.user.uid;
-      }
-      const logs = await db.DownloadLogModel.aggregate([
-        {
-          $match: match
-        },
-        {
-          $group: {
-            _id: "$rid",
-            count: {
-              $sum: 1
-            }
-          }
-        }
-      ]);
 
-      const downloadedToday = await db.DownloadLogModel.findOne(matchToday); // 24小时内是否下载过此附件
-      downloadLogs = logs?logs.map(l => l._id): [];
-      if(!downloadedToday && downloadLogs.length >= fileCountLimit.fileCount) {
-        if(data.user) {
-          ctx.throw(403, `当前时段（${fileCountLimit.startingTime}点 - ${fileCountLimit.endTime}点）下载的附件数量已达上限，请在下一个时段再试。`);
-        } else {
-          ctx.throw(403, `未登录用户当前时段（${fileCountLimit.startingTime}点 - ${fileCountLimit.endTime}点）只能下载${fileCountLimit.fileCount}个附件，请登录或注册后重试。`);
-        }
+      // 检测 是否需要积分
+      const freeTime = 24 * 60 * 60 * 1000;
+      const {needScore, reason} = await resource.checkDownloadCost(data.user, freeTime);
+
+      // 检测 分段下载数量是否超出限制
+      // 预览pdf时无需判断数量
+      if(c !== 'preview_pdf' || !needScore || resource.ext !== 'pdf') {
+        await resource.checkDownloadPermission(data.user, ctx.address);
       }
 
-      const operation = await db.ScoreOperationModel.getScoreOperationFromRedis("default", "attachmentDownload");
-      // const operation = await db.SettingModel.getDefaultScoreOperationByType("attachmentDownload");
-      const enabledScoreTypes = await db.SettingModel.getEnabledScoresType();
-      // 下载此附件是否需要积分状态位
-      let needScore = false;
-      // 此操作是否需要积分(更新状态位)
+      // 因为设置无需积分（与之对应的还有：因为重复下载而不需要积分）
+      data.settingNoNeed = !needScore && reason === 'setting';
+      // 多长时间以内下载不需要积分
+      data.resourceExpired = freeTime;
 
-      for(let typeName of enabledScoreTypes) {
-        let number = operation[typeName];
-        // 如果设置的操作花费的积分不为0才考虑扣积分
-        if(number !== 0) {
-          needScore = true;
-          break;
-        }
-      }
-      // 设置的次数为 0 表示关闭积分交易，不扣积分
-      if(operation.count === 0) needScore = false;
-
-      if(!needScore) {
-        data.settingNoNeed = true;
-      }
-
-      // 临时添加 忽略pdf文件
-      /*if(resource.ext === 'pdf') {
-        needScore = false;
-      }*/
-
-      // 配置中下载需要积分
-      if(needScore) {
-        // 当前是游客
-        if(!data.user) {
-          ctx.throw(403, '你暂未登录，请登录或者注册后重试。');
-        }else {
-        // 当前是用户
-          // 此用户今日下载附件的总次数
-          let todayOperationCount = await db.ScoreOperationLogModel.getOperationLogCount(user, "attachmentDownload");
-          data.todayOperationCount = todayOperationCount;
-          // 此用户最后一次此附件的转账记录
-          let lastAttachmentDownloadLog = await db.ScoreOperationLogModel.getLastAttachmentDownloadLog(user, resource.rid);
-          let nowTime = new Date();
-          let lastAttachmentDownloadTime = lastAttachmentDownloadLog? lastAttachmentDownloadLog.toc : 0;
-          let howLongOneDay = 24 * 60 * 60 * 1000;
-          let howLongOneMinute =10* 1000;
-          data.resourceExpired = howLongOneDay;
-          // 如果最后一次下载到现在没有超过规定时间就不扣积分
-          if(nowTime - lastAttachmentDownloadTime <= data.resourceExpired /* 一分钟 */) needScore = false;
-          // 今日下载次数大于设置的次数 并且 设置的次数不为 -1 就不扣积分
-          if(todayOperationCount >= operation.count && operation.count !== -1 && operation.count !== 0) {
-            needScore = false;
-            data.settingNoNeed = true;
-          }
-        }
-      }
       data.need = needScore;
-      // 需要扣分的话进行下面的逻辑
-      if(needScore) {
-        // 此用户目前持有的所有积分
-        await db.UserModel.updateUserScores(user.uid);
-        let myAllScore = await db.UserModel.getUserScores(user.uid);
-        // 积分是否足够状态位
-        data.enough = true;
-        // 检测积分是否足够
-        for(let score of myAllScore) {
-          const operationScoreNumber = operation[score.type];
-          score.addNumber = operationScoreNumber;
-          if(operationScoreNumber >= 0) continue;
-          if(score.number + operationScoreNumber < 0) {
-            data.enough = false;
-          }
-        }
-        data.myAllScore = myAllScore;
+
+      if(needScore) { // 下载需要积分
+        // 判断用户积分是否足够
+        const {enough, userScores} = await resource.checkUserScore(data.user);
+        // 下载需要的积分，用于前端显示提示用户
+        data.myAllScore = userScores;
+        data.enough = enough;
+
         data.rid = resource.rid;
+
         if(c === "query") {
           // 如果只是获取附件和积分相关信息
           return next();
@@ -178,13 +85,13 @@ resourceRouter
             await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
           }
         } else if(c === "preview_pdf") {
-          // 积分不够，返回错误页面
-          if(!data.enough) {
-            return nkcModules.throwError(403, "", "scoreNotEnough");
+          const pdfPath = await resource.getPDFPreviewFilePath();
+          if(!await nkcModules.file.access(pdfPath)) nkcModules.throwError(403, `当前文档暂不能预览`, 'previewPDF');
+          const referer = ctx.get('referer');
+          if(referer.includes('/reader/pdf/web/viewer')) {
+            filePath = pdfPath;
           } else {
-            await db.KcbsRecordModel.insertSystemRecord("attachmentDownload", user, ctx);
-            // 重定向到预览页面
-            return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid);
+            return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid + '%3fc%3dpreview_pdf');
           }
         } else {
           // 结束路由，返回页面
@@ -208,7 +115,7 @@ resourceRouter
           ctx.template = "resource/download.pug";
           return next();
         }
-      } else {
+      } else { // 下载不需要积分
         if(c === "query") {
           // 如果只是获取附件和积分相关信息
           return next();
@@ -217,6 +124,7 @@ resourceRouter
           return ctx.redirect("/reader/pdf/web/viewer?file=%2fr%2f" + resource.rid);
         }
       }
+
     }
     if (mediaType === "mediaPicture") {
       try {
@@ -282,9 +190,20 @@ resourceRouter
       // 若匹配，则读取目标resource上的相关信息，并写入到新的resource中。封面图、
       if(!md5) ctx.throw(400, "md5不能为空");
       if(!fileName) ctx.throw(400, "文件名不能为空");
-      const resource = await db.ResourceModel.findOne({prid: '', hash: md5, mediaType: "mediaAttachment"});
+      const resource = await db.ResourceModel.findOne({
+        prid: '',
+        hash: md5,
+        mediaType: "mediaAttachment",
+        state: 'usable'
+      }).sort({toc: -1});
+      let existed = false;
+      if(resource) {
+        const filePath = await resource.getFilePath();
+        existed = await nkcModules.file.access(filePath);
+      }
       if(
         !resource || // 未上传过
+        !existed || // 源文件不存在
         !resource.ext // 上传过，但格式丢失
       ) {
         data.uploaded = false;
@@ -373,14 +292,13 @@ resourceRouter
         // 通知前端转换完成了
         global.NKC.io.of('/common').to(`user/${user.uid}`).send({rid: r.rid, state: "fileProcessFinish"});
       } catch(err) {
-        console.log(err);
-        global.NKC.io.of('/common').to(`user/${user.uid}`).send({err, state: "fileProcessFailed"});
+        console.log(err.stack || err);
+        global.NKC.io.of('/common').to(`user/${user.uid}`).send({err: err.message || err, state: "fileProcessFailed"});
         await r.update({state: 'useless'});
       }
     });
     await next();
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
-  .use("/:rid/fileConvertNotice", noticeRouter.routes(), noticeRouter.allowedMethods());
-
+  .use("/:rid/fileConvertNotice", noticeRouter.routes(), noticeRouter.allowedMethods())
 module.exports = resourceRouter;
