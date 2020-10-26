@@ -1,6 +1,6 @@
 var pageName = '', query = {
   operationId: NKC.configs.refererOperationId,
-  forumId: NKC.configs.socketQueryForumId,
+  data: NKC.configs.socketData || {},
 };
 var socket = io('/common', {
   forceNew: false,
