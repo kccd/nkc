@@ -3,9 +3,21 @@ var app = new Vue({
   el: '#app',
   data: {
     status: 'disconnect',
-    categories: ['web', 'socket'],
+    categories: ['http', 'socket'],
     messages: [],
-    message: ''
+    message: '',
+    pauseConsole: false,
+    pauseTime: null,
+  },
+  watch: {
+    pauseConsole: function() {
+      if(this.pauseConsole && !this.pauseTime) {
+        this.pauseTime = Date.now();
+      }
+      if(!this.pauseConsole && this.pauseTime) {
+        this.pauseTime = null;
+      }
+    }
   },
   computed: {
     messageInfo: function() {
@@ -30,14 +42,10 @@ var app = new Vue({
   },
   mounted: function() {
     var vm = this;
-    if(socket.connected) {
-      vm.status = "connect";
-    }
-    socket.on('connect', function() {
-      vm.status = "connect";
+    addSocketStatusChangedEvent(function(event) {
+      vm.status = event.type;
     });
     socket.on('consoleMessage', function(data) {
-      console.log(data)
       if(vm.messages.length > 500) {
         vm.messages.splice(0, 1);
       }
@@ -52,7 +60,7 @@ var app = new Vue({
   },
   updated: function() {
     var panel = app.$refs.panel;
-    if(panel.scrollTop + panel.clientHeight >= panel.scrollHeight-300) {
+    if(panel.scrollTop + panel.clientHeight >= panel.scrollHeight-50) {
       panel.scrollTo(0,999999999999999999999)
     }
   }
