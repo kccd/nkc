@@ -30,6 +30,12 @@ var app = new Vue({
   },
   mounted: function() {
     var vm = this;
+    if(socket.connected) {
+      vm.status = "connect";
+    }
+    socket.on('connect', function() {
+      vm.status = "connect";
+    });
     socket.on('consoleMessage', function(data) {
       console.log(data)
       if(vm.messages.length > 500) {
