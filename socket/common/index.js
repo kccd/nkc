@@ -50,6 +50,7 @@ module.exports = async (io) => {
     await message(socket, io);
     switch(query.operationId) {
       case 'visitExperimentalConsole': return await require('./console')(socket, io);
+      case 'visitForumHome': return await require('./forum')(socket, io);
       default: return;
     }
   });
