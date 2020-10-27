@@ -1,4 +1,5 @@
 var cs;
+
 var app = new Vue({
   el: '#app',
   data: {
@@ -38,13 +39,8 @@ var app = new Vue({
     });
 
     socket.on('connect', function() {
-      console.log(`触发连接成功`);
-      socket.emit('joinRoom', {
-        type: 'console'
-      });
-    })
-
-
+      vm.joinRoom();
+    });
 
     socket.on('consoleMessage', function(data) {
       if(vm.messages.length > 500) {
@@ -52,9 +48,17 @@ var app = new Vue({
       }
       vm.messages.push(data);
     });
+
+    vm.joinRoom();
+
   },
   methods: {
     format: NKC.methods.format,
+    joinRoom: function() {
+      socket.emit('joinRoom', {
+        type: 'console'
+      });
+    },
     selectMessage: function(m) {
       this.message = m;
     }

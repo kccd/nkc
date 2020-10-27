@@ -75,10 +75,26 @@ function openEditSite() {
     NKC.methods.visitUrl(url, true);
   }
 }
+
+/*
+* 连入房间
+* */
+function joinRoom() {
+  socket.emit('joinRoom', {
+    type: 'forum',
+    data: {
+      forumId: forumInfo.fid
+    }
+  });
+}
+
 /*
 * 连接上专业房间
 * */
 function connectForumRoom() {
+  socket.on('connect', function() {
+    joinRoom();
+  });
   socket.on('forumMessage', function(data) {
 
     var html = data.html;
@@ -112,4 +128,5 @@ function connectForumRoom() {
     floatUserPanel.initPanel();
     floatForumPanel.initPanel();
   });
+  joinRoom();
 }

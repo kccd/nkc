@@ -2,6 +2,7 @@ const map = {
   "console": "CONSOLE",
   "user"   : (uid) => `USER:${uid}`,
   "forum"  : (fid) => `FORUM:${fid}`,
+  "thread" : (tid) => `THREAD:${tid}`,
 };
 
 module.exports = function(type, ...params) {
