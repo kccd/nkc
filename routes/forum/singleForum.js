@@ -94,6 +94,8 @@ router
 		await db.KcbsRecordModel.insertSystemRecord('postToForum', data.user, ctx);
 		await thread.updateThreadMessage();
 
+		await nkcModules.socket.sendForumMessage({tid: _post.tid, pid: _post.pid, state: ctx.state});
+
 		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {

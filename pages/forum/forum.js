@@ -79,9 +79,37 @@ function openEditSite() {
 * 连接上专业房间
 * */
 function connectForumRoom() {
-  if(!socket.connected) {
-    return setTimeout(connectForumRoom, 10 * 1000);
-  }
-  socket.emit('joinForumRoom', forumInfo.fid);
-  socket.on('test', console.log);
+  socket.on('forumMessage', function(data) {
+
+    var html = data.html;
+    var tid = data.tid;
+    var threadList = $('div.normal-thread-list');
+    var targetThread = threadList.find('div[data-tid="'+tid+'"]');
+    var targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-counter');
+
+    var newPostCount = 0;
+
+    // 获取当前未读数
+    if(targetThreadCounter.length) {
+      newPostCount = Number(targetThreadCounter.attr('data-count'));
+    }
+
+    if(forumInfo.page === 0) {
+      // 处于专业首页 更新时先移除旧元素再在列表头部插入新元素
+      targetThread.remove();
+      targetThread = $(html);
+      threadList.prepend(targetThread);
+    } else {
+      if(!targetThread) return;
+      targetThreadCounter.remove();
+    }
+
+    newPostCount ++;
+
+    var counter = $("<span class='thread-panel-counter' data-count='"+newPostCount+"' title='"+newPostCount+"条更新'>"+newPostCount+"</span>");
+    targetThread.prepend(counter);
+
+    floatUserPanel.initPanel();
+    floatForumPanel.initPanel();
+  });
 }

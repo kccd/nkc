@@ -35,7 +35,7 @@ block content
       .forum-user-panel-body
         for targetUser in users
           include ../publicModules/user_panel/user_panel
-  .hidden#forumInfo=objToStr({fid: data.forum.fid})
+  .hidden#forumInfo=objToStr({fid: data.forum.fid, page: data.paging.page})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2.hidden-sm.hidden-xs.box-shadow-panel.p-r-0
@@ -157,8 +157,9 @@ block content
               for thread in data.toppedThreads
                 include ../publicModules/thread_panel/thread_panel
               div.topped-thread-header - 以上是置顶 -
-            for thread in data.threads
-              include ../publicModules/thread_panel/thread_panel
+            div.normal-thread-list
+              for thread in data.threads
+                include ../publicModules/thread_panel/thread_panel
             if canManagement
               .paging-button
                 a.button.radius-left.radius-right(onclick="managementThreads()") 管理

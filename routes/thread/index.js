@@ -899,8 +899,9 @@ threadRouter
       data.comment = comment;
       const template = Path.resolve("./pages/thread/comment.pug");
       data.html = nkcModules.render(template, data, ctx.state);
+    } else {
+      await nkcModules.socket.sendForumMessage({tid: data.post.tid, pid: data.post.pid, state: ctx.state});
     }
-
 		if(type === 'html') {
 			ctx.status = 303;
 			return ctx.redirect(`/t/${tid}`)

@@ -22,7 +22,7 @@ block eContent
         .e-panel
           .message-panel(ref='panel')
             div(v-for='m in messages' @click="selectMessage(m)").pointer
-              div(v-if='categories.indexOf(m.consoleType) !== -1 && (!pauseConsole || pauseTime > new Date(m.reqTime).getTime())')
+              div(v-if='categories.indexOf(m.consoleType) !== -1 && (!pauseConsole || pauseTime > new Date(m.reqTime).getTime())' title='点击查看详情')
                 .message(v-if='m.consoleType === "http"')
                   span.req-time {{format('YYYY-MM-DD HH:mm:ss', new Date(m.reqTime))}}
                   span.process 进程{{m.processId}}

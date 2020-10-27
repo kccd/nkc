@@ -1,6 +1,7 @@
 const map = {
   "console": "CONSOLE",
   "user"   : (uid) => `USER:${uid}`,
+  "forum"  : (fid) => `FORUM:${fid}`,
 };
 
 module.exports = function(type, ...params) {

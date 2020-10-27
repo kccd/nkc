@@ -1,4 +1,6 @@
 -const aTarget = threadPanelATarget || '_self';
+if data.singleThread
+  -thread = data.singleThread;
 mixin threadCover(klass)
   if thread.firstPost.cover
     .thread-panel-cover-big.hidden-xs.hidden-sm(class=klass)
@@ -73,7 +75,7 @@ mixin displayPageCount
   -threadPanelClass += ' p-b-0';
 -}
 
-.thread-panel(class=threadPanelClass)
+.thread-panel(class=threadPanelClass data-tid=thread.tid)
   if !thread.reviewed
     include ../module_review
   if thread.disabled
