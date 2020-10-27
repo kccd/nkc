@@ -1536,6 +1536,7 @@ $(function() {
 
 
       socket.on('message', function(data) {
+        // console.log("收到了用户消息: ", data);
 
         var message = data.message;
         var user = data.user;
@@ -1757,6 +1758,7 @@ $(function() {
 
       });
 
+      // 用户下线
       socket.on('userDisconnect', function(data) {
         var uid = data.targetUid;
         for(var i = 0; i < app.userList.length; i++) {
@@ -1772,6 +1774,8 @@ $(function() {
           }
         }
       });
+
+      // 用户上线
       socket.on('userConnect', function(data) {
         var uid = data.targetUid;
         for(var i = 0; i < app.userList.length; i++) {

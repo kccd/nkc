@@ -35,24 +35,24 @@ include ../verifications/verifications
               div(v-if="type === 'login'")
                 div(v-if="category === 'username'")
                   .form-group
-                    input.form-control.input(type="text" placeholder="用户名" v-model.trim="username" @input="throwError('')" @keyup.enter="submit")
+                    input.form-control.input(type="text" name="username" placeholder="用户名" v-model.trim="username" @input="throwError('')" @keyup.enter="submit" autocomplete="username")
                   .form-group
-                    input.form-control.input(type="password" placeholder="密码" v-model.trim="password" @input="throwError('')" @keyup.enter="submit")
+                    input.form-control.input(type="password" name="password" placeholder="密码" v-model.trim="password" @input="throwError('')" @keyup.enter="submit" autocomplete="current-password")
                 div(v-else-if="category === 'mobile'")
                   .form-group
                     select.form-control.input(v-model="nationCode" @input="throwError('')" @keyup.enter="submit")
                       option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
                   .form-group
                     <input type="password" name="txtPassword" style="display:none">
-                    input.form-control.input(name="txtPassword" type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit" autocomplete="off")
+                    input.form-control.input(name="txtPassword" type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit" autocomplete="tel")
                   .form-group
-                    input.form-control.input(type="password" placeholder="密码" v-model.trim="password" @input="throwError('')" @keyup.enter="submit" autocomplete="newPassword")
+                    input.form-control.input(type="password" placeholder="密码" v-model.trim="password" @input="throwError('')" @keyup.enter="submit" autocomplete="current-password")
                 div(v-else-if="category === 'mobileCode'")
                   .form-group
                     select.form-control.input(v-model="nationCode" @input="throwError('')" @keyup.enter="submit")
                       option(v-for="code in nationCodes" :value="code.code") +{{code.code}} {{code.chineseName}}
                   .form-group
-                    input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit")
+                    input.form-control.input(type="text" placeholder="手机号" v-model.trim="mobile" @input="throwError('')" @keyup.enter="submit" autocomplete="tel")
                   .row
                     .col-xs-6
                       .form-group
