@@ -70,8 +70,6 @@ block body
     script!=`NKC.configs.uid="${data.user.uid}";`
     script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
     script!=`NKC.configs.refererOperationId="${data.operationId}"`
-    if data.operationId === 'visitForumHome'
-      script!=`NKC.configs.socketQueryForumId="${data.forum.fid}"`
     +includeJS('/socket.io-client/dist/socket.io.js')
     //- 通用socket
     //if !state.isApp

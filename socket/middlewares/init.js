@@ -5,13 +5,11 @@ const nkcModules = require("../../nkcModules");
 const util = require('../util');
 const func = async (socket, next) => {
   socket.NKC = {
-    state: {},
     db,
     settings,
     tools,
     nkcModules,
     util,
-    methods: {},
     data: {},
     query: {},
   };

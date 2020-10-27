@@ -48,10 +48,14 @@ module.exports = async (io) => {
       return await util.connect.disconnectSocket(socket);
     }
     await message(socket, io);
-    switch(query.operationId) {
-      case 'visitExperimentalConsole': return await require('./console')(socket, io);
-      case 'visitForumHome': return await require('./forum')(socket, io);
-      default: return;
-    }
+
+    socket.on('joinRoom', async res => {
+      const {type, data} = res;
+      if(type === 'console') {
+        await require('./console')(socket, io, data);
+      } else if(type === 'forum') {
+        await require('./forum')(socket, io, data);
+      }
+    });
   });
 };

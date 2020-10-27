@@ -28,23 +28,24 @@ var app = new Vue({
       return message;
     },
     statusString: function() {
-      switch(this.status){
-        case 'connect': return '连接成功';
-        case 'connecting': return '连接中...';
-        case 'disconnect': return '连接已断开';
-        case 'reconnecting': return '正在重新连接...';
-        case 'connect_failed': return '连接失败，请刷新';
-        case 'reconnect_failed': return '重新连接失败，请刷新';
-        case 'error': return '连接出错，请刷新';
-        case 'connect_timeout': return '连接超时';
-      }
+      return this.status.name;
     }
   },
   mounted: function() {
     var vm = this;
     addSocketStatusChangedEvent(function(event) {
-      vm.status = event.type;
+      vm.status = event;
     });
+
+    socket.on('connect', function() {
+      console.log(`触发连接成功`);
+      socket.emit('joinRoom', {
+        type: 'console'
+      });
+    })
+
+
+
     socket.on('consoleMessage', function(data) {
       if(vm.messages.length > 500) {
         vm.messages.splice(0, 1);
