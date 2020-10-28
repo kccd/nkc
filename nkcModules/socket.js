@@ -12,6 +12,15 @@ func.sendUserMessage = (channel, messageObject) => {
   return sendMessageToUser(channel, messageObject);
 };
 
+func.sendDataMessage = (uid, options) => {
+  let {
+    event = "dataMessage",
+    data = {}
+  } = options;
+  const roomName = getRoomName('user', uid);
+  global.NKC.io.to(roomName).emit(event, data);
+}
+
 func.sendForumMessage = async (data) => {
   const render = require('./render');
   const {tid, state, pid} = data;
