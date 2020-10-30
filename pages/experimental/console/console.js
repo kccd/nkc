@@ -49,7 +49,9 @@ var app = new Vue({
       vm.messages.push(data);
     });
 
-    vm.joinRoom();
+    if(socket.connected) {
+      vm.joinRoom();
+    }
 
   },
   methods: {

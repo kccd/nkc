@@ -128,5 +128,7 @@ function connectForumRoom() {
     floatUserPanel.initPanel();
     floatForumPanel.initPanel();
   });
-  joinRoom();
+  if(socket.connected) {
+    joinRoom();
+  }
 }
