@@ -290,10 +290,17 @@ resourceRouter
           pictureType: resourceType,
         });
         // 通知前端转换完成了
-        global.NKC.io.of('/common').to(`user/${user.uid}`).send({rid: r.rid, state: "fileProcessFinish"});
+        ctx.nkcModules.socket.sendDataMessage(user.uid, {
+          event: "fileTransformProcess",
+          data: {rid: r.rid, state: "fileProcessFinish"}
+        });
       } catch(err) {
         console.log(err.stack || err);
-        global.NKC.io.of('/common').to(`user/${user.uid}`).send({err: err.message || err, state: "fileProcessFailed"});
+        // 通知前端转换失败了
+        ctx.nkcModules.socket.sendDataMessage(user.uid, {
+          event: "fileTransformProcess",
+          data: {err: err.message || err, state: "fileProcessFailed"}
+        });
         await r.update({state: 'useless'});
       }
     });
