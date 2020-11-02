@@ -936,9 +936,18 @@ $(function () {
         var times = $('[data-type="nkcTimestamp"]');
         for(var i = 0; i < times.length; i++) {
           var time = times.eq(i);
+          var timeType = time.attr('data-time-type');
           var number = time.attr('data-time');
           number = Number(number);
-          var newContent = NKC.methods.tools.fromNow(number);
+          var func;
+          if(timeType === 'fromNow') {
+            func = NKC.methods.tools.fromNow;
+          } else if(timeType === 'briefTime') {
+            func = NKC.methods.tools.briefTime;
+          } else {
+            continue;
+          }
+          var newContent = func(number);
           if(time.text() !== newContent) {
             time.text(newContent);
           }

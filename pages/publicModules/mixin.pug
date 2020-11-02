@@ -21,11 +21,20 @@ if !isIncluded('baseMixin')
     span(
       data-type='nkcTimestamp'
       data-time=(new Date(time)).getTime()
+      data-time-type='fromNow'
       title=tools.timeFormat(time)
       )=tools.fromNow(time)
   mixin timeFormat(time)
     span(
       data-type='nkcTimestamp'
       data-time=(new Date(time)).getTime()
+      data-time-type='format'
       title=tools.timeFormat(time)
       )=tools.timeFormat(time)
+  mixin briefTime(time)
+    span(
+      data-type='nkcTimestamp'
+      data-time=(new Date(time)).getTime()
+      data-time-type='briefTime'
+      title=tools.timeFormat(time)
+      )
