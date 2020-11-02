@@ -900,6 +900,7 @@ $(function () {
     });
   }
 
+  // 分页 快速跳转
   ;(function () {
     var input = document.getElementById("paging_nav_input");
     if (!input) return;
@@ -911,6 +912,7 @@ $(function () {
       }
     }
   })();
+  // 页面顶部 搜索
   ;(function() {
     var initInput = function(input) {
       var id = input.attr('id');
@@ -926,6 +928,25 @@ $(function () {
       var input = navInput.eq(i);
       initInput(input);
     }
+  })();
+  // 全局时间更新
+  ;(function() {
+    var updateTime = function() {
+      setTimeout(function() {
+        var times = $('[data-type="nkcTimestamp"]');
+        for(var i = 0; i < times.length; i++) {
+          var time = times.eq(i);
+          var number = time.attr('data-time');
+          number = Number(number);
+          var newContent = NKC.methods.tools.fromNow(number);
+          if(time.text() !== newContent) {
+            time.text(newContent);
+          }
+        }
+        updateTime();
+      }, 30 * 1000);
+    }
+    updateTime();
   })();
 
   // markDiv("#highlight");

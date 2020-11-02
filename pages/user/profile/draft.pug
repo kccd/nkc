@@ -15,7 +15,8 @@ div
           .checkbox.draft-checkbox
             label
               input(type="checkbox" data-did=draft.did)
-          .time(title=format("YYYY/MM/DD HH:mm:ss", draft.tlm || draft.toc))=`${fromNow(draft.tlm || draft.toc)}`
+          .time
+            +fromNow(draft.tlm || draft.toc)
           if draft.type === "newThread"
             span 发表文章
           else if draft.type === "newPost"

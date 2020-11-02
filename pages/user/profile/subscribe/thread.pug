@@ -32,7 +32,10 @@ div
           .account-thread-abstract=thread.firstPost.abstractCN || thread.firstPost.c
           .account-thread-info
             //-.thread-time=format("YYYY/MM/DD HH:mm:ss", thread.toc)
-            .thread-time=`${fromNow(thread.toc)}`
+            .thread-time
+              //-=`${fromNow(thread.toc)}`
+              +fromNow(thread.toc)
+
             a.thread-forum-link(href=`/f/${thread.forums[0].fid}` target="_blank")=thread.forums[0].displayName
 
             if thread.firstPost.anonymous

@@ -1,3 +1,4 @@
+include ../../publicModules/mixin
 -const aTarget = threadPanelATarget || '_self';
 if data.singleThread
   -thread = data.singleThread;
@@ -140,7 +141,9 @@ mixin displayPageCount
             .thread-panel-author
               span.anonymous-name= anonymousInfo.username
 
-          .thread-panel-time=fromNow(thread.toc)
+          .thread-panel-time
+            +fromNow(thread.toc)
+            //-=fromNow(thread.toc)
 
           +displayForum
 
@@ -174,7 +177,8 @@ mixin displayPageCount
                 span 匿名用户
               | &nbsp;
               a(href=lastPostUrl target=aTarget)
-                span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=`${fromNow(thread.lastPost.toc)}`
+                +fromNow(thread.lastPost.toc)
+                //-span(title=format('YYYY-MM-DD HH:mm:ss', thread.lastPost.toc))=`${fromNow(thread.lastPost.toc)}`
 
     else
       if postCoverPosition === 'left'
@@ -198,7 +202,9 @@ mixin displayPageCount
 
           +displayForum
 
-          .thread-panel-time=fromNow(thread.toc)
+          .thread-panel-time
+            // -=fromNow(thread.toc)
+            +fromNow(thread.toc)
 
           .thread-panel-button
             if thread.firstPost.voteUp
@@ -242,7 +248,10 @@ mixin displayPageCount
               a.thread-panel-url(href=`/t/${thread.tid}` target=aTarget).thread-panel-post=thread.firstPost.c.slice(0, 200)
             if hasReply
               .thread-panel-reply
-                a(href=lastPostUrl target=aTarget)=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
+                a(href=lastPostUrl target=aTarget)
+                  //-=fromNow(thread.lastPost.toc) + " · " + thread.lastPost.c.slice(0, 200)
+                  +fromNow(thread.lastPost.toc)
+                  span=`· ${thread.lastPost.c.slice(0, 200)}`
                 if !thread.lastPost.anonymous
                   a.thread-panel-reply-user(href=`/u/${thread.lastPost.uid}` target="_blank" data-float-uid=thread.lastPost.uid)
                     img(src=tools.getUrl("userAvatar", thread.lastPost.user.avatar, "sm"))

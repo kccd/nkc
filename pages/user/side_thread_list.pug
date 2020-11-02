@@ -10,4 +10,5 @@
             a(href=`/u/${t.uid}` target="_blank" data-float-uid=t.firstPost.user.uid)= t.firstPost.user.username
           else
             span=anonymousInfo.username
-          span=fromNow(t.toc)
+          +fromNow(t.toc)
+          //-span=fromNow(t.toc)
