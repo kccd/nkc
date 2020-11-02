@@ -1,11 +1,13 @@
-var SubscribeTypes;
-var forumInfo = NKC.methods.getDataById('forumInfo');
+let SubscribeTypes;
+const forumInfo = NKC.methods.getDataById('forumInfo');
+const {fid, page, digest, sort} = forumInfo;
+
 $(function() {
-  if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
+  if(!window.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
-  var dom = $("#navbar_custom_dom");
-  var leftDom = $("#leftDom");
+  const dom = $("#navbar_custom_dom");
+  const leftDom = $("#leftDom");
   dom.html(leftDom.html());
   if(NKC.configs.lid) {
     window.Library = new NKC.modules.Library({
@@ -16,12 +18,12 @@ $(function() {
       uploadResourcesId: NKC.configs.uploadResourcesId?NKC.configs.uploadResourcesId.split("-"):[]
     });
   }
-  var threadUrlSwitch = $('#threadUrlSwitch');
+  const threadUrlSwitch = $('#threadUrlSwitch');
   if(threadUrlSwitch.length) {
-    var threadUrlSwitchStatus = getThreadUrlSwitchStatus();
+    const threadUrlSwitchStatus = getThreadUrlSwitchStatus();
     modifyThreadUrl(threadUrlSwitchStatus);
     threadUrlSwitch.on("click", function() {
-      var s = $(this).prop('checked');
+      const s = $(this).prop('checked');
       modifyThreadUrl(s);
     });
   }
@@ -30,7 +32,7 @@ $(function() {
   }
 });
 
-var threadUrlSwitchKey = 'forum_thread_a_target';
+const threadUrlSwitchKey = 'forum_thread_a_target';
 
 function modifyThreadUrl(status) {
   var target = status? '_blank': '_self';
@@ -49,14 +51,8 @@ function setThreadUrlSwitchStatus(status) {
   localStorage.setItem(threadUrlSwitchKey, status);
 }
 
-function showSameForums() {
-  $(".sameForums").slideToggle();
-}
-
-
-function openEditSite() {
-  var fid = NKC.methods.getDataById("forumInfo").fid;
-  var url = window.location.origin + "/editor?type=forum&id=" + fid;
+window.openEditSite = function() {
+  const url = window.location.origin + "/editor?type=forum&id=" + fid;
 
   if(NKC.configs.platform === 'reactNative') {
     NKC.methods.rn.emit("openEditorPage", {
@@ -83,7 +79,7 @@ function joinRoom() {
   socket.emit('joinRoom', {
     type: 'forum',
     data: {
-      forumId: forumInfo.fid
+      forumId: fid
     }
   });
 }
@@ -96,21 +92,20 @@ function connectForumRoom() {
     joinRoom();
   });
   socket.on('forumMessage', function(data) {
-
-    var html = data.html;
-    var tid = data.tid;
-    var threadList = $('div.normal-thread-list');
-    var targetThread = threadList.find('div[data-tid="'+tid+'"]');
-    var targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-counter');
-
-    var newPostCount = 0;
-
+    const {html, tid, contentType} = data;
+    const threadList = $('div.normal-thread-list');
+    let targetThread = threadList.find('div[data-tid="'+tid+'"]');
+    const targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-counter');
+    let newPostCount = 0;
     // 获取当前未读数
     if(targetThreadCounter.length) {
       newPostCount = Number(targetThreadCounter.attr('data-count'));
     }
-
-    if(forumInfo.page === 0) {
+    if(
+      page === 0 && // 处于专业首页
+      digest === data.digest &&
+      (contentType === 'thread' || sort === 'tlm') // 发表文章或发表回复且按回复排序
+    ) {
       // 处于专业首页 更新时先移除旧元素再在列表头部插入新元素
       targetThread.remove();
       targetThread = $(html);
@@ -122,7 +117,7 @@ function connectForumRoom() {
 
     newPostCount ++;
 
-    var counter = $("<span class='thread-panel-counter' data-count='"+newPostCount+"' title='"+newPostCount+"条更新'>"+newPostCount+"</span>");
+    const counter = $("<span class='thread-panel-counter' data-count='"+newPostCount+"' title='"+newPostCount+"条更新'>"+newPostCount+"</span>");
     targetThread.prepend(counter);
 
     floatUserPanel.initPanel();
