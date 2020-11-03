@@ -128,5 +128,5 @@ var app = new Vue({
 
 
 function emitEventToUpdateLocalUser(data) {
-  if(NKC.configs.isApp) emitEvent("updateLocalUser", {user: data.user});
+  if(NKC.configs.isApp) NKC.methods.rn.emit("updateLocalUser", {});
 }
