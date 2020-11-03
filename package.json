@@ -44,6 +44,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",
     "fs-extra": "^7.0.1",
+    "graceful-fs": "^4.2.4",
     "hex-to-rgba": "^2.0.1",
     "icheck": "^1.0.2",
     "image-size": "^0.8.3",
@@ -100,8 +101,7 @@
     "urllib": "^0.5.2",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3",
-    "graceful-fs": "^4.2.4"
+    "xss": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

@@ -2,7 +2,6 @@ const Router = require('koa-router');
 const resourceRouter = new Router();
 const pathModule = require('path');
 const infoRouter = require("./info");
-const noticeRouter = require("./notice");
 const mediaMethods = require("./methods");
 const {ThrottleGroup} = require("stream-throttle");
 
@@ -307,5 +306,4 @@ resourceRouter
     await next();
   })
   .use("/:rid/info", infoRouter.routes(), infoRouter.allowedMethods())
-  .use("/:rid/fileConvertNotice", noticeRouter.routes(), noticeRouter.allowedMethods())
 module.exports = resourceRouter;

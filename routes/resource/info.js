@@ -8,6 +8,7 @@ router
     data.resource = resource;
     await next();
   })
+  // @todo: 要返回更详细的信息，包括此用户是否购买过此附件和用户的积分信息
   .get("/", async (ctx, next) => {
     const {db, data} = ctx;
     let resource = data.resource.toObject();
