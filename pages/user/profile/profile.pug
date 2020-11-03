@@ -114,7 +114,9 @@ block content
             div
               for vt in data.visitThreadLogs
                 .account-logs-thread
-                  span=fromNow(vt.timeStamp) + "看过"
+                  +fromNow(vt.timeStamp)
+                  span 看过
+                  //-span=fromNow(vt.timeStamp) + "看过"
                   a(href=`/t/${vt.tid}`)=vt.thread.firstPost.t
           .account-logs
             .account-header 看过的用户
@@ -128,7 +130,9 @@ block content
                     img(src=tools.getUrl("userAvatar", log.targetUser.avatar, "sm") data-float-uid=log.toUid)
                   .account-logs-user-info
                     a(href=`/u/${log.toUid}`).account-logs-user-name=log.targetUser.username
-                    .account-logs-user-time=fromNow(log.timeStamp)
+                    .account-logs-user-time
+                      //-=fromNow(log.timeStamp)
+                      +fromNow(log.timeStamp)
 
           .account-logs
             .account-header 我的读者排名
@@ -142,7 +146,9 @@ block content
                     img(src=tools.getUrl("userAvatar", log.user.avatar, "sm") data-float-uid=log.uid)
                   .account-logs-user-info
                     a(href=`/u/${log.uid}`).account-logs-user-name=log.user.username
-                    .account-logs-user-time=fromNow(log.timeStamp)
+                    .account-logs-user-time
+                      //-=fromNow(log.timeStamp)
+                      +fromNow(log.timeStamp)
 
         else if data.type === "thread"
           include ./thread

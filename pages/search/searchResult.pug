@@ -14,7 +14,9 @@
         span.clear-a-style.search-result-author
           img(src=anonymousInfo.avatar)
           span.anonymous-name=anonymousInfo.username
-      .search-result-time=fromNow(result.postTime)
+      .search-result-time
+        //-=fromNow(result.postTime)
+        +fromNow(result.postTime)
       span=result.docType==="thread"?"发表于":"回复于"
       for forum in result.forums
         a.clear-a-style.search-result-forum(href=`/f/${forum.fid}`)=forum.displayName
@@ -88,7 +90,9 @@
         img(src=tools.getUrl('columnAvatar', result.column.avatar))
         span=result.column.name
       span 专栏
-      .search-result-time=fromNow(result.page.toc)
+      .search-result-time
+        //-=fromNow(result.page.toc)
+        +fromNow(result.page.toc)
       if !result.page.t
         a(href=`/m/${result.page.columnId}/page/${result.page._id}` target="_blank")
           b 阅读原文
@@ -99,7 +103,9 @@
       a.clear-a-style.search-result-author(href=`/u/${result.resource.uid}`)
         img(src=tools.getUrl("userAvatar", result.resource.user.avatar, "sm"))
         span=result.resource.user.username
-      .search-result-time=fromNow(result.resource.tlm || result.resource.toc)
+      .search-result-time
+        //-=fromNow(result.resource.tlm || result.resource.toc)
+        +fromNow(result.resource.tlm || result.resource.toc)
     .search-result-abstract= "文件：" + (result.c || "暂无简介")
     .search-result-info.resource
       a(href=`/r/${result.resource.rid}` target="_blank")

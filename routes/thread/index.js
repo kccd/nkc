@@ -811,6 +811,7 @@ threadRouter
     const needReview = await db.UserModel.contentNeedReview(user.uid, "post");
     if(!needReview) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
+      _post.reviewed = true;
     } else {
       // await db.MessageModel.sendReviewMessage(_post.pid);
     }
@@ -899,7 +900,7 @@ threadRouter
       data.comment = comment;
       const template = Path.resolve("./pages/thread/comment.pug");
       data.html = nkcModules.render(template, data, ctx.state);
-    } else {
+    } else if(data.post.reviewed){
       await nkcModules.socket.sendForumMessage({tid: data.post.tid, pid: data.post.pid, state: ctx.state});
     }
 		if(type === 'html') {

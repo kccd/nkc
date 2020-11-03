@@ -26,6 +26,7 @@ func.sendForumMessage = async (data) => {
   const {tid, state, pid} = data;
   let thread = await db.ThreadModel.findOne({tid});
   if(!thread) return;
+  const contentType = thread.oc === pid? 'thread': 'post';
   thread = (await db.ThreadModel.extendThreads([thread], {
     htmlToText: true,
     count: 200,
@@ -40,6 +41,8 @@ func.sendForumMessage = async (data) => {
       html,
       pid,
       tid,
+      digest: thread.digest,
+      contentType,
     });
   }
 };
