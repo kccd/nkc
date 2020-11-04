@@ -733,8 +733,6 @@
   "getUserAllScores": "获取某用户的所有积分",
   "forumScoreSettings": "专业积分策略设置",
 
-  "fileConvertNotice": "连接文件转换进度通知通道",
-
   "viewUserScores": "可在用户名片查看用户积分",
 
   "showActivityEnter": "首页“活动”入口的显示和隐藏",
@@ -744,5 +742,8 @@
 
   "donwloadNeedScore": "询问下载此附件是否需要积分",
   "getVerifications": "获取验证码（游标卡尺、图形点选、图形旋转）",
-  "experimentalVerificationSettings": "后台管理 - 图形验证"
+  "experimentalVerificationSettings": "后台管理 - 图形验证",
+
+  "buyResource": "购买资源",
+  "resourceDetail": "资源详情"
 }

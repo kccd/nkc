@@ -18,7 +18,11 @@ module.exports = async (ctx, next) => {
     }
     const lastModified = (new Date(stats.mtime)).getTime();
     ctx.set("ETag", lastModified);
-    ctx.set('Cache-Control', 'public, max-age=604800');
+    if(ctx.dontCacheFile) {
+      ctx.set("Cache-Control", "no-store");
+    } else {
+      ctx.set('Cache-Control', 'public, max-age=604800');
+    }
 	  if(ctx.fresh) {
       ctx.status = 304;
       return
