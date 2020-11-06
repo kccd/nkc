@@ -78,7 +78,7 @@
             .list-options-link(
               v-if="f.ext === 'pdf'"
               title="预览"
-              @click="visitUrl(getUrl('pdf', f.rid), true)"
+              @click="visitUrl(getUrl('previewPDF', f.rid), true)"
             )
               .fa.fa-eye
             .list-options-link(

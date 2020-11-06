@@ -35,8 +35,8 @@
                   span {{p}}
           .r-info-d {{resource.description || "暂无简介"}}
           .r-info-bottom.text-right(v-if="resource.type !== 'folder'")
-            a.m-r-05.btn.btn-default.btn-sm(:href="getUrl('pdf', resource.rid)" v-if="resource.ext === 'pdf'" target="_blank") 预览
-            a.m-r-05.pointer.btn.btn-success.btn-sm(@click="visitUrl('/r/' + resource.rid, true)")
+            a.m-r-05.btn.btn-default.btn-sm(:href="getUrl('previewPDF', resource.rid)" v-if="resource.ext === 'pdf'" target="_blank") 预览
+            a.m-r-05.pointer.btn.btn-success.btn-sm(@click="download(resource.rid)")
               .fa.fa-cloud-download &nbsp;
               | 点击下载 
               span(v-if="resource.hits || (resource.resource && resource.resource.hits)") &nbsp;{{resource.hits ||resource.resource.hits}}

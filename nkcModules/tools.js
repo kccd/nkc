@@ -108,6 +108,9 @@ var Tools = function() {
       case 'defaultFile': {
         return "/default/" + id;
       }
+      case 'previewPDF': {
+        return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
+      }
     }
   };
   self.floatUserInfo = function(uid) {
