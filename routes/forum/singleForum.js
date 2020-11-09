@@ -94,6 +94,10 @@ router
 		await db.KcbsRecordModel.insertSystemRecord('postToForum', data.user, ctx);
 		await thread.updateThreadMessage();
 
+		if(thread.reviewed) {
+			await nkcModules.socket.sendForumMessage({tid: _post.tid, pid: _post.pid, state: ctx.state});
+		}
+
 		// 发表文章后进行跳转
 		const type = ctx.request.accepts('json', 'html');
     if(type === 'html') {
@@ -353,32 +357,13 @@ router
 		ctx.template = 'forum/forum.pug';
 		await next();
   })
-	.get('/', async (ctx, next) => {
+	.get(['/', '/library'], async (ctx, next) => {
 		const {data, db, query, state} = ctx;
 		const {pageSettings} = state;
 		const {forum} = data;
 		const recycleId = await db.SettingModel.getRecycleId();
 		let {page = 0, s, cat, d} = query;
 		page = parseInt(page);
-
-		// 满足以下条件，跳转到专业首页
-		// 1. 用户已登录
-		// 2. 访问最新文章列表第一页
-		// 3. 填写了专业说明
-		// 4. 用户未访问过此专业
-		/*if(data.user && page === 0 && forum.declare) {
-			const behavior = await db.UsersBehaviorModel.findOne({fid: forum.fid, uid: data.user.uid});
-			let url;
-			if(!behavior) {
-				url = `/f/${forum.fid}/home`;
-				const {token} = ctx.query;
-				if(token) {
-					url += `?token=${token}`;
-				}
-				return ctx.redirect(url);
-			}
-		}*/
-
 		// 构建查询条件
 		const match = {};
 		// 获取加精文章

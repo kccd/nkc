@@ -1,16 +1,40 @@
 //- 引入js
   @param url: js地址
   @author pengxiguaa 2019/2/15
-mixin includeJS(url)
-  script(src=`${url}?v=${startTime}`)
-//- 引入css
-  @param url: css地址  
-  @author pengxiguaa 2019/2/15
-mixin includeCSS(url)
-  link(rel="stylesheet", href=`${url}?v=${startTime}`)
+if !isIncluded('baseMixin')
+  mixin includeJS(url)
+    script(src=`${url}?v=${startTime}`)
+  //- 引入css
+    @param url: css地址
+    @author pengxiguaa 2019/2/15
+  mixin includeCSS(url)
+    link(rel="stylesheet", href=`${url}?v=${startTime}`)
 
-//-  标题
-mixin listHeader(name)
-  .list-header
-    span=name
-    .line
+  //-  标题
+  mixin listHeader(name)
+    .list-header
+      span=name
+      .line
+
+  //- 格式化时间
+  mixin fromNow(time)
+    span(
+      data-type='nkcTimestamp'
+      data-time=(new Date(time)).getTime()
+      data-time-type='fromNow'
+      title=tools.timeFormat(time)
+      )=tools.fromNow(time)
+  mixin timeFormat(time)
+    span(
+      data-type='nkcTimestamp'
+      data-time=(new Date(time)).getTime()
+      data-time-type='format'
+      title=tools.timeFormat(time)
+      )=tools.timeFormat(time)
+  mixin briefTime(time)
+    span(
+      data-type='nkcTimestamp'
+      data-time=(new Date(time)).getTime()
+      data-time-type='briefTime'
+      title=tools.timeFormat(time)
+      )

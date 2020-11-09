@@ -2264,4 +2264,22 @@ userSchema.statics.checkNewPassword = async (password) => {
   if(password.length < 8) throwErr(400, `密码长度不能小于8位`);
   if(!checkPass(password)) throwErr(400, `密码要具有数字、字母和符号三者中的至少两者`);
 };
+
+/*
+* 获取用户所拥有的权限ID
+* @return {[String]}
+* @author pengxiguaa 2020-10-23
+* */
+userSchema.methods.getUserOperationsId = async function() {
+  if(!this.roles) {
+    await this.extendRoles();
+  }
+  let operations = [];
+  for(const role of this.roles) {
+    operations = operations.concat(role.operationsId);
+  }
+  return [...new Set(operations)];
+};
+
 module.exports = mongoose.model('users', userSchema);
+

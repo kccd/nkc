@@ -76,7 +76,7 @@ module.exports = {
       const pdfUrl = getUrl("pdf", rid);
       pdfHTML = `
         <span class="article-attachment-reader">
-          <a href="${pdfUrl}" target="_blank">预览</a>
+          <a href="/reader/pdf/web/viewer?file=%2fr%2f${rid}" target="_blank">预览</a>
         </span>
       `.trim();
     }

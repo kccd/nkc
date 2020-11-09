@@ -46,7 +46,7 @@ module.exports = async (ctx) => {
     uid: log.uid,
     reqTime: log.reqTime,
     resTime: log.processTime,
-    consoleType: "web",
+    consoleType: "http",
     processId: global.NKC.processId,
     error: log.error,
     from: log.referer,
@@ -88,6 +88,6 @@ module.exports = async (ctx) => {
       );
     }
     // 网站后台控制台监看请求记录
-    global.NKC.io.of('/console').NKC.webMessage(d);
+    ctx.nkcModules.socket.sendConsoleMessage(d);
   }
 };

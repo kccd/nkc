@@ -558,24 +558,13 @@ NKC.modules.SelectResource = function() {
     }
   });
 
-  // var timer;
-
   // 监听socket发过来文件转换完成的消息，收到时刷新一下资源列表
-  socket.on("message", function(data) {
-    if(data.state === "fileProcessFinish") {
-      // console.log("文件处理完成");
-      // self.app.category = "all";
-      self.app.getResources(0);
-    }
-  })
-
-  // 监听文件处理失败信息
-  socket.on("message", function(data) {
+  socket.on("fileTransformProcess", function(data) {
     if(data.state === "fileProcessFailed") {
-      sweetError("文件处理失败\n" + data.err);
-      // self.app.category = "all";
-      self.app.getResources(0);
+      console.error(data.err);
+      sweetError("文件处理失败\n附件中含有不支持的特殊格式，请处理以后再上传");
     }
+    self.app.getResources(0);
   })
 
   self.open = self.app.open;

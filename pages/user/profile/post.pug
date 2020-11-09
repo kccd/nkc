@@ -21,7 +21,9 @@ div
         else if !post.reviewed
           .account-reason 审核中，仅自己可见，通过后对所有人可见。
         .account-post-thread-user
-          .time=`${fromNow(post.toc)}`
+          .time
+            //-=`${fromNow(post.toc)}`
+            +fromNow(post.toc)
           span=post.parentPostId? `评论`: '回复'
           if !post.thread
             span &nbsp;未知用户
@@ -51,7 +53,9 @@ div
               .account-thread-abstract=post.thread.firstPost.abstractCN || post.thread.firstPost.c
               .account-thread-info
                 //-.thread-time=format("YYYY/MM/DD HH:mm:ss", post.thread.toc)
-                .thread-time=`${fromNow(post.thread.toc)}`
+                .thread-time
+                  //-=`${fromNow(post.thread.toc)}`
+                  +fromNow(post.thread.toc)
                 a.thread-forum-link(href=`/f/${post.thread.forums[0].fid}` target="_blank")=post.thread.forums[0].displayName
                 if post.thread.firstPost.voteUp
                   .thread-thumbup

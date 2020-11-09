@@ -1,21 +1,11 @@
 require('colors');
-
-/*const Redis = require('redis');
-
-const pub = Redis.createClient();
-
-pub.on('error', (err) => {
-
-  console.log(`连接redis出错: `);
-  console.log(err);
-
-});*/
 const db = require('../dataModels');
 const cacheForums = require('./cacheForums');
+const socket = require("../nkcModules/socket");
+
 const pub = {};
 pub.publish = async (channel, message) => {
-  global.NKC.io.of('/common').NKC.sendMessage(channel, message);
-  global.NKC.io.of('/message').NKC.sendMessage(channel, message);
+  socket.sendUserMessage(channel, message);
 };
 
 const obj = {};
@@ -47,7 +37,6 @@ obj.pubMessage = async (message) => {
 };
 
 obj.pubWithdrawn = async (message) => {
-
   pub.publish('withdrawn', JSON.stringify(message));
 };
 

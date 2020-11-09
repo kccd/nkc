@@ -30,7 +30,9 @@
               img(src=anonymousInfo.avatar)
               span.anonymous-name=anonymousInfo.username
         .column-post-time
-          span.m-r-05=fromNow(toc)
+          span.m-r-05
+            //-=fromNow(toc)
+            +fromNow(toc)
           if data.column && from === "contribute"
             span 来自投稿
         .column-post-forums

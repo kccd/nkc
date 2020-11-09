@@ -18,16 +18,16 @@
               .resource-info 你当前剩余 {{holdMessage}}
                 span.name 。
               .resource-control.m-t-1
-                a.download-button(:href="'/r/'+ rid +'?t=attachment&c=download&random=' + Math.random()") 立即下载
-                a(v-if="type === 'pdf'" :href="'/r/'+ rid +'?c=preview_pdf&random=' + Math.random()" target="_blank") 免费预览
+                a.download-button(href="javascript:void(0);" @click="download") 支付积分并下载
+                a(v-if="type === 'pdf'" :href="'/reader/pdf/web/viewer?file=%2fr%2f' + rid" target="_blank") 免费预览
             .error-list.b-s-10n(v-if="status === 'noNeedScore'")
               .resource-oname {{fileName}}
               .resource-size 大小：{{size}}
-              .resource-info.m-t-1 {{settingNoNeed? '':'你已下载过此附件，'}}下载当前附件不需要花费积分
-                span.name 。
+              .resource-info.m-t-1(v-if="free") 当前附件免费。
+              .resource-info.m-t-1(v-else-if="paid") 你已购买过此附件，下载当前附件不需要花费积分。
               .resource-control.m-t-1
-                a.download-button(:href="'/r/'+ rid +'?t=attachment&c=download&random=' + Math.random()") 立即下载
-                a(v-if="type === 'pdf'" :href="'/r/'+ rid +'?c=preview_pdf&random=' + Math.random()" target="_blank") 免费预览
+                a.download-button(:href="'/r/'+ rid" target="_blank" :download="fileName") 下载
+                a(v-if="type === 'pdf'" :href="'/reader/pdf/web/viewer?file=%2fr%2f' + rid" target="_blank") 预览
             .error-list.b-s-10n(v-else-if="status === 'loadding'")
               .resource-info 加载中...
             .error-list.b-s-10n(v-else-if="status === 'error'")

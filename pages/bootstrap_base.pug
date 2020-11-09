@@ -69,6 +69,7 @@ block body
   if data.user
     script!=`NKC.configs.uid="${data.user.uid}";`
     script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
+    script!=`NKC.configs.refererOperationId="${data.operationId}"`
     +includeJS('/socket.io-client/dist/socket.io.js')
     //- 通用socket
     //if !state.isApp

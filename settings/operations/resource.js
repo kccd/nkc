@@ -29,17 +29,16 @@ module.exports = {
 	},*/
 	r: {// 资源
     POST: 'uploadResources',
-    // GET: "getUploadSettings",
 		PARAMETER: {
 			GET: 'getResources',
       info: {
 			  GET: "getResourceInfo"
 			},
-			fileConvertNotice: {
-				GET: "fileConvertNotice"
+			pay: {
+				POST: "buyResource"
 			},
-			q: {
-				GET: "getResources"
+			detail: {
+				GET: "resourceDetail"
 			}
 		}
 	},

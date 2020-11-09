@@ -58,6 +58,18 @@ NKC.modules.ResourceInfo = function() {
       },
       close: function() {
         self.dom.modal("hide");
+      },
+      download: function(rid) {
+        let fileName = this.resource.resource.oname;
+        nkcAPI(`/r/${rid}/pay`, "POST")
+          .then(() => {
+            let downloader = document.createElement("a");
+            downloader.setAttribute("download", fileName);
+            downloader.href = `/r/${rid}`;
+            downloader.target = "_blank";
+            downloader.click();
+          })
+          .catch(sweetError);
       }
     }
   });
