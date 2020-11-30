@@ -23,7 +23,7 @@ loginRouter
 
 		let user;
 		let userPersonal;
-		let {password, username, mobile, nationCode, code} = body;
+		let {password = '', username = '', mobile, nationCode, code} = body;
 
 		const behaviorOptions = {
 			type: "login",
@@ -47,18 +47,17 @@ loginRouter
 		// 验证次数
 		await db.AccountBehaviorModel.ensurePermission(behaviorOptions);
 
-
 		if(!loginType) {
 
 			// 账号+密码
 
-			if(!username || !password) {
+			if((!username || !password) && ctx.body.fields) {
 				username = ctx.body.fields.username;
 				password = ctx.body.fields.password;
 			}
 
 			if(!username || !password || username.length === 0 || password.length === 0) {
-				ctx.throw('缺少用户名或密码')
+				ctx.throw(400, '缺少用户名或密码')
 			}
 
 			const users = await db.UserModel.find({usernameLowerCase: username.toLowerCase()});
@@ -80,7 +79,7 @@ loginRouter
 				ctx.throw(400, '请选择国家区号');
 			}
 			if(!mobile || !password) {
-				ctx.throw('缺少手机号或密码');
+				ctx.throw(400, '缺少手机号或密码');
 			}
 			userPersonal = await db.UsersPersonalModel.find({mobile, nationCode});
 			if(userPersonal.length === 0) {
