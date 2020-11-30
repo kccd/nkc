@@ -63,9 +63,17 @@ const app = new Vue({
     },
     libraryOperation(fid, type) {
       const self = this;
-      nkcAPI("/f/" + fid + "/library", "POST", {
-        type: type
-      })
+      const typeName = {
+        create: '开设',
+        open: '开启',
+        close: '关闭'
+      }[type];
+      sweetQuestion(`确定要${typeName}专栏？`)
+        .then(() => {
+          return nkcAPI("/f/" + fid + "/library", "POST", {
+            type: type
+          });
+        })
         .then(function(data) {
           const {libraryClosed, library} = data;
           self.forum.lid = library._id;
