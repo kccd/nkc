@@ -207,11 +207,15 @@ resourceRouter
         await resource.checkDownloadPermission(data.user, ctx.address);
       }
 
+      // 下载需要积分，返回预览版
       if(needScore) {
-        // 下载需要积分，返回预览版
-        const pdfPath = await resource.getPDFPreviewFilePath();
-        if(!await nkcModules.file.access(pdfPath)) nkcModules.throwError(403, `当前文档暂不能预览`, 'previewPDF');
-        filePath = pdfPath;
+        if(resource.ext !== 'pdf') {
+          nkcModules.throwError(403, `当前附件需支付积分后才可下载`);
+        } else {
+          const pdfPath = await resource.getPDFPreviewFilePath();
+          if(!await nkcModules.file.access(pdfPath)) nkcModules.throwError(403, `当前文档暂不能预览`, 'previewPDF');
+          filePath = pdfPath;
+        }
       }
       // 不要把这次的响应结果缓存下来
       ctx.dontCacheFile = true;
