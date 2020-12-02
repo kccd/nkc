@@ -1,0 +1,21 @@
+.bullet-container {
+  top: 6rem;
+  height: 30rem;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.bullet {
+  position: fixed;
+  left: 100%;
+  top: 10rem;
+  display: inline-block;
+  height: 5rem;
+  width: 10rem;
+  background-color: red;
+  z-index: 1000;
+  transition: left 5000ms;
+  transition-timing-function: linear;
+}
