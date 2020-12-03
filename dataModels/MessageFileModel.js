@@ -72,7 +72,7 @@ messageFileSchema.statics.getFileFolder = async (fileType, toc) => {
 * */
 messageFileSchema.statics.getFileTypeByExtension = async (extension) => {
   const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'];
-  const voiceExt = ['amr', 'mp3'];
+  const voiceExt = ['amr', 'mp3', 'aac'];
   const videoExt = ["mp4", "mov", "3gp", "avi"];
   if(imageExt.includes(extension)) return 'image';
   if(voiceExt.includes(extension)) return 'voice';
