@@ -85,21 +85,18 @@ userRouter
       const _id = await db.SettingModel.operateSystemID('messageFiles', 1);
       const toc = Date.now();
       // 文件存储文件夹
-      let saveFileDir;
       let messageTy;
-      if(imageExt.includes(ext)) {
+      const fileType = await db.MessageFileModel.getFileTypeByExtension(ext);
+      let saveFileDir = await db.MessageFileModel.getFileFolder(fileType, toc);
+      if(fileType === 'image') {
         messageTy = "img"
-        saveFileDir = await FILE.getPath("messageImage", toc);
-      }else if(voiceExt.includes(ext)) {
+      }else if(fileType === 'voice') {
         messageTy = "voice"
-        saveFileDir = await FILE.getPath("messageVoice", toc);
         ext = "mp3";
-      }else if(videoExt.includes(ext)) {
+      }else if(fileType === 'video') {
         messageTy = "video"
-        saveFileDir = await FILE.getPath("messageVideo", toc);
       } else {
         messageTy = "file";
-        saveFileDir = await FILE.getPath("messageFiles", toc);
       }
       // 此文件的目标存储位置
       let targetPath = `${saveFileDir}/${_id}.${ext}`;

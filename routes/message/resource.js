@@ -4,18 +4,16 @@ const Router = require('koa-router');
 const resourceRouter = new Router();
 resourceRouter
   .get('/:_id', async (ctx, next) => {
-    const imageExt = ['jpg', 'jpeg', 'bmp', 'svg', 'png', 'gif'];
-    const videoExt = ["mp4", "mov", "3gp", "avi"];
     const {db, params, settings, fs, query, data} = ctx;
     const {_id} = params;
     const {user} = data;
     const {type, channel} = query;
     const messageFile = await db.MessageFileModel.findOnly({_id});
     if(messageFile.targetUid !== user.uid && messageFile.uid !== user.uid && !ctx.permission("getAllMessagesResources")) ctx.throw(403, '权限不足');
-    let {path, ext} = messageFile;
-    let filePath = path;
-
-    if(imageExt.includes(ext)) {
+    let {ext} = messageFile;
+    let filePath = await messageFile.getFilePath();
+    const fileType = await db.MessageFileModel.getFileTypeByExtension(ext);
+    if(fileType === 'image') {
       try {
         await fs.access(filePath);
       } catch(err) {
@@ -69,21 +67,18 @@ resourceRouter
     const _id = await db.SettingModel.operateSystemID('messageFiles', 1);
     const toc = Date.now();
     // 文件存储文件夹
-    let saveFileDir;
     let messageTy;
-    if(imageExt.includes(ext)) {
+    const fileType = await db.MessageFileModel.getFileTypeByExtension(ext);
+    let saveFileDir = await db.MessageFileModel.getFileFolder(fileType, toc);
+    if(fileType === 'image') {
       messageTy = "img"
-      saveFileDir = await FILE.getPath("messageImage", toc);
-    }else if(voiceExt.includes(ext)) {
+    }else if(fileType === 'voice') {
       messageTy = "voice"
-      saveFileDir = await FILE.getPath("messageVoice", toc);
       ext = "mp3";
-    }else if(videoExt.includes(ext)) {
+    }else if(fileType === 'video') {
       messageTy = "video"
-      saveFileDir = await FILE.getPath("messageVideo", toc);
     } else {
       messageTy = "file";
-      saveFileDir = await FILE.getPath("messageFiles", toc);
     }
     // 此文件的目标存储位置
     let targetPath = `${saveFileDir}/${_id}.${ext}`;
