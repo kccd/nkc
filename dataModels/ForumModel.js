@@ -1429,7 +1429,6 @@ forumSchema.statics.createNewThread = async function(options) {
   if(!options.uid) throwErr(400, "uid不可为空");
   if(!options.fids || options.fids.length === 0) throwErr(400, "目标专业fids不可为空");
   const SettingModel = mongoose.model('settings');
-  const SubscribeModel = mongoose.model("subscribes");
   const ThreadModel = mongoose.model('threads');
   const ForumModel = mongoose.model('forums');
   const tid = await SettingModel.operateSystemID('threads', 1);
@@ -1832,7 +1831,7 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
     const {rolesId, gradesId, relation} = permission[type];
     if(!accessible) throwErr(`专业「${displayName}」暂未开放，请更换专业`);
 
-    let hasRole = false, hasGrade = userGradeId && gradesId.includes(userGradeId);
+    let hasRole = false, hasGrade = userGradeId !== null && gradesId.includes(userGradeId);
     for(const userRoleId of userRolesId) {
       if(rolesId.includes(userRoleId)) {
         hasRole = true;

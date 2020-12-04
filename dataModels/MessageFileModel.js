@@ -15,7 +15,7 @@ const messageFileSchema = new Schema({
   },
   path: {
     type: String,
-    required: true
+    default: ''
   },
   oname: {
     type: String,
@@ -49,11 +49,17 @@ const messageFileSchema = new Schema({
 /*
 * 获取附件磁盘路径
 * */
-messageFileSchema.methods.getFilePath = async function() {
+messageFileSchema.methods.getFilePath = async function(t) {
   const MessageFileModel = mongoose.model('messageFiles');
   const fileType = await MessageFileModel.getFileTypeByExtension(this.ext);
   const fileFolder = await MessageFileModel.getFileFolder(fileType, this.toc);
-  return PATH.resolve(fileFolder, `./${this._id}.${this.ext}`);
+  const FILE = require('../nkcModules/file');
+  const normalPath = PATH.resolve(fileFolder, `./${this._id}.${this.ext}`);
+  if(t) {
+    const _path = PATH.resolve(fileFolder, `./${this._id}${t?('_' + t):''}.${this.ext}`);
+    if(await FILE.access(_path)) return _path;
+  }
+  return normalPath;
 }
 
 /*

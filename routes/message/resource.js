@@ -11,7 +11,7 @@ resourceRouter
     const messageFile = await db.MessageFileModel.findOnly({_id});
     if(messageFile.targetUid !== user.uid && messageFile.uid !== user.uid && !ctx.permission("getAllMessagesResources")) ctx.throw(403, '权限不足');
     let {ext} = messageFile;
-    let filePath = await messageFile.getFilePath();
+    let filePath = await messageFile.getFilePath(type);
     const fileType = await db.MessageFileModel.getFileTypeByExtension(ext);
     if(fileType === 'image') {
       try {
@@ -88,7 +88,6 @@ resourceRouter
       oname: name,
       size,
       ext,
-      path: targetPath,
       uid: user.uid,
       targetUid: targetUser.uid
     });
@@ -125,7 +124,7 @@ resourceRouter
         await ffmpeg.videoAVITransMP4(path, targetPath);
       }
       // 视频封面图路径
-      var videoCoverPath = `${saveFileDir}/${_id}-frame.jpg`;
+      var videoCoverPath = `${saveFileDir}/${_id}_cover.jpg`;
       await ffmpeg.videoFirstThumbTaker(targetPath, videoCoverPath);
     } else {
       await fsPromise.copyFile(path, targetPath);

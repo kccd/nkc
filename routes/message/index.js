@@ -75,7 +75,7 @@ messageRouter
       if(c.lmId) midArr.add(c.lmId);
     }
     const users = await db.UserModel.find({uid: {$in: [...uidArr]}});
-    const messages = await db.MessageModel.find({_id: {$in: [...midArr]}});
+    const messages = await db.MessageModel.find({_id: {$in: [...midArr]}}, {ip: 0, port: 0});
     const friendsArr = await db.FriendModel.find({uid: user.uid, tUid: {$in: [...uidArr]}});
     for(let u of users) {
       await u.extendGrade();
@@ -142,7 +142,7 @@ messageRouter
     let message;
     // 获取通知
     if(chat.systemInfo) {
-      message = await db.MessageModel.findOne({ty: 'STE'}).sort({tc: -1});
+      message = await db.MessageModel.findOne({ty: 'STE'}, {ip: 0, port: 0}).sort({tc: -1});
       if(message) {
         list.push({
           time: message?message.tc: new Date('2000-1-1'),
@@ -160,7 +160,7 @@ messageRouter
     }
     // 获取提醒
     if(chat.reminder) {
-      message = await db.MessageModel.findOne({ty: 'STU', r: user.uid}).sort({tc: -1});
+      message = await db.MessageModel.findOne({ty: 'STU', r: user.uid}, {ip: 0, port: 0}).sort({tc: -1});
       const messageType = await db.MessageTypeModel.findOnly({_id: "STU"});
       list.push({
         time: message?message.tc:new Date("2000-1-1"),
