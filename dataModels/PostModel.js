@@ -982,6 +982,7 @@ postSchema.statics.newPost = async (options) => {
   const UserModel = mongoose.model('users');
   const ThreadModel = mongoose.model('threads');
   const PostModel = mongoose.model('posts');
+  const IPModel = mongoose.model('ips');
   const {contentLength} = require('../tools/checkString');
   const {title, content, uid, ip, abstractCn, tid, keyWordsCn} = options;
   const thread = await ThreadModel.findOne({tid});
@@ -1001,14 +1002,15 @@ postSchema.statics.newPost = async (options) => {
     rpid = quote[2];
   }
   const pid = await SettingModel.operateSystemID('posts', 1);
+  const ipToken = await IPModel.saveIPAndGetToken(ip);
   const _post = await new PostModel({
     pid,
     c: content,
     t: title,
     abstractCn,
     keyWordsCn,
-    ipoc: ip,
-    iplm: ip,
+    ipoc: ipToken,
+    iplm: ipToken,
     l: 'html',
     mainForumsId: thread.mainForumsId,
     minorForumsId: thread.minorForumsId,

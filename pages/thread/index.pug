@@ -197,7 +197,7 @@ block title
           li
             -const ipoc = post.iplm || post.ipoc;
             a(onclick=`NKC.methods.getIpInfo('${ipoc}')` title=ipoc target='_blank')
-              span.fa.fa-map-marker(style='margin-left: 2px;')= ` ${ipoc}`
+              span.fa.fa-map-marker(style='margin-left: 2px;')= ` 点击查看IP`
 
   mixin postEditTime(post)
     if post.toc.toLocaleString() !== post.tlm.toLocaleString()

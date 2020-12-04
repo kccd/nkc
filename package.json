@@ -5,7 +5,8 @@
   "homepage": "https://www.kechuang.org",
   "main": "server.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node server.js "
+    "start": "cross-env NODE_ENV=production node server.js ",
+    "test": "mocha -t 10000"
   },
   "repository": {
     "type": "git",
@@ -101,7 +102,8 @@
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
     "xss": "^1.0.3",
-    "graceful-fs": "^4.2.4"
+    "graceful-fs": "^4.2.4",
+    "supertest": "^6.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
