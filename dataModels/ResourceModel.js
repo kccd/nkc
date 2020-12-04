@@ -134,7 +134,7 @@ resourceSchema.virtual('isFileExist')
 /**
  * 文件是否存在
  */
-resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture', 'mediaVideo', 'mediaAudio']) {
+resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture', 'mediaAudio']) {
   if(excludedMediaTypes.includes(this.mediaType)) return;
   const path = await this.getFilePath()
   try{
