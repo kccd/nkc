@@ -31,6 +31,7 @@ permissionRouter
       shareLimitCount, shareLimitTime, allowedAnonymousPost,
       moderators, subType, openReduceVisits, permission, orderBy
     } = body.forum;
+    const oldModerators = forum.moderators;
     const {read, write, writePost} = permission;
     shareLimitCount = Number(shareLimitCount);
     shareLimitTime = Number(shareLimitTime);
@@ -79,6 +80,18 @@ permissionRouter
         orderBy,
         shareLimitCount,
         subType, permission
+      }
+    });
+    const oldUserId = oldModerators.filter(uid => !moderators.includes(uid));
+    const newUserId = moderators.filter(uid => !oldModerators.includes(uid));
+    await db.UserModel.updateMany({uid: {$in: oldUserId}}, {
+      $pull: {
+        certs: 'moderator'
+      }
+    });
+    await db.UserModel.updateMany({uid: {$in: newUserId}}, {
+      $addToSet: {
+        certs: 'moderator'
       }
     });
     await redis.cacheForums();
