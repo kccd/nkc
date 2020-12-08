@@ -1185,6 +1185,7 @@ function pushGoodsToHome(productId, type) {
 		.catch(sweetError);
 }
 
+var threadData = NKC.methods.getDataById("threadForumsId");
 
 function moveThread() {
 	if(!window.MoveThread) {
@@ -1341,13 +1342,21 @@ $(function() {
 			window.location.hash = hash;
 		}, 1000)
 	}
-	window.bulletComments = new NKC.modules.BulletComments();
-	bulletComments.add({
-		username: 'spark',
-		avatarUrl: 'https://a.test/a/5fc44fd86c8ccc31886b09b4?c=userAvatar',
-		content: '测试弹幕数计',
-		contentUrl: 'https://a.test/t/82513'
-	});
+	if(NKC.configs.uid && socket) {
+		window.bulletComments = new NKC.modules.BulletComments();
+		bulletComments.add({
+			username: 'spark',
+			avatarUrl: 'https://a.test/a/5f0d659a351a5f1468797fd0?c=userAvatar',
+			content: '测试弹幕数计',
+			contentUrl: 'https://a.test/t/82513'
+		});
+		socket.emit('joinRoom', {
+			type: 'post',
+			data: {
+				postId: threadData.pid
+			}
+		});
+	}
 });
 
 if (NKC.configs.platform === 'reactNative') {

@@ -1,3 +1,16 @@
+class Bullet {
+  constructor({pid, avatarUrl, username, content, contentUrl}) {
+    this.info = {
+      pid,
+      avatarUrl,
+      username,
+      content,
+      contentUrl
+    };
+    this.id = `nkcBullet_${this.info.pid}`;
+  }
+}
+
 class BulletComments {
   constructor() {
     this.id = `nkcBullet${Date.now()}${Math.round(Math.random() * 1000)}`;
@@ -16,16 +29,24 @@ class BulletComments {
   }
   getBulletDomByBullet(bullet) {
     const {avatarUrl, username, content, contentUrl, id} = bullet;
-    return $(`<a href="${contentUrl}" class="bullet" id="${this.id + '_' +id}"><img class="bullet-avatar" src="${avatarUrl}"  alt="${username}"/><div class="bullet-content">${content}</div></a>`);
+    const dom = $(`<a href="${contentUrl}" class="bullet" id="${this.id + '_' +id}"><img class="bullet-avatar" src="${avatarUrl}"  alt="${username}"/><div class="bullet-content">${content}</div></a>`);
+    dom.on('mouseover', (e) => {
+      const {left} = dom.offset();
+      dom.attr('style', `left: ${left}px!important;`);
+    });
+    dom.on(`mouseleave`, () => {
+      dom.attr('style', `left: ${-1 * dom.width()}px!important;`);
+    });
+    return dom;
   }
   getBulletByComment(comment) {
-    const {avatar, username, content, url} = comment;
+    const {avatarUrl, username, content, contentUrl} = comment;
     const bullet = {
       status: 'unDisplay',
-      avatar,
+      avatarUrl,
       username,
       content,
-      url,
+      contentUrl,
       id: this.comments.length
     };
     this.comments.push(bullet);
@@ -60,7 +81,7 @@ class BulletComments {
         bullet.css('left', -1 * bulletWidth);
       }
       self.transition();
-    }, 1000);
+    }, 500);
   }
   start() {
 
