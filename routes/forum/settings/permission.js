@@ -31,7 +31,6 @@ permissionRouter
       shareLimitCount, shareLimitTime, allowedAnonymousPost,
       moderators, subType, openReduceVisits, permission, orderBy
     } = body.forum;
-    const oldModerators = forum.moderators;
     const {read, write, writePost} = permission;
     shareLimitCount = Number(shareLimitCount);
     shareLimitTime = Number(shareLimitTime);

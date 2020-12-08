@@ -1,20 +1,15 @@
 class Bullet {
-  constructor({pid, avatarUrl, username, content, contentUrl}) {
-    this.info = {
-      pid,
-      avatarUrl,
-      username,
-      content,
-      contentUrl
-    };
-    this.id = `nkcBullet_${this.info.pid}`;
+  constructor({postId, avatarUrl, username, content, contentUrl}) {
+    this.id = `nkcBullet_${postId}`;
+    this.dom = $(`<a href="${contentUrl}" class="bullet" id="${this.id}"><img class="bullet-avatar" src="${avatarUrl}" alt="${username}"/><div class="bullet-content">${content}</div></a>`);
+    this.left = '100%';
+    this.top = '0';
   }
 }
 
 class BulletComments {
   constructor() {
     this.id = `nkcBullet${Date.now()}${Math.round(Math.random() * 1000)}`;
-    this.comments = [];
     this.bullets = [];
     this.tracks = [];
     for(let i = 0; i < 5; i++) {
@@ -39,28 +34,13 @@ class BulletComments {
     });
     return dom;
   }
-  getBulletByComment(comment) {
-    const {avatarUrl, username, content, contentUrl} = comment;
-    const bullet = {
-      status: 'unDisplay',
-      avatarUrl,
-      username,
-      content,
-      contentUrl,
-      id: this.comments.length
-    };
-    this.comments.push(bullet);
-    return bullet;
-  }
   getTrack() {
     const index = Math.round(Math.random() * (this.tracks.length - 1));
     return this.tracks[index];
   }
   add(comment) {
-    const bullet = this.getBulletByComment(comment);
-    const bulletDom = this.getBulletDomByBullet(bullet);
-    const track = this.getTrack();
-    track.bullets.push(bulletDom);
+    const bullet = new Bullet(comment);
+    this.bullets.push(bullet);
   }
   transition() {
     const self = this;
