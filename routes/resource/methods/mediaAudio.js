@@ -6,6 +6,7 @@
 const FILE = require('../../../nkcModules/file');
 const fsPromise = require('fs').promises;
 const Path = require("path");
+const ffmpeg = require('../../../tools/ffmpeg');
 
 module.exports = async (options) => {
   let {file, resource} = options;
