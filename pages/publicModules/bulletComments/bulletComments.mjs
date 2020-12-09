@@ -10,6 +10,7 @@ class Bullet {
 class BulletComments {
   constructor() {
     this.id = `nkcBullet${Date.now()}${Math.round(Math.random() * 1000)}`;
+    this.setTimeoutId = null;
     this.bullets = [];
     this.tracks = [];
     for(let i = 0; i < 5; i++) {
@@ -44,8 +45,13 @@ class BulletComments {
   }
   transition() {
     const self = this;
-    const {tracks} = this;
-    setTimeout(() => {
+    const {
+      tracks,
+      bullets,
+      setTimeoutId
+    } = this;
+    if(setTimeoutId) return;
+    this.setTimeoutId = setTimeout(() => {
       for(let i = 0; i < tracks.length; i++) {
         const track = tracks[i];
         const {bullets} = track;
@@ -73,5 +79,6 @@ class BulletComments {
 
   }
 }
+
 
 NKC.modules.BulletComments = BulletComments;

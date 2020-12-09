@@ -6,12 +6,15 @@ const browserify = require("browserify"),
       buffer = require('vinyl-buffer');
 const glob = require('glob');
 const watch = require("gulp-watch");
+const uglify = require("gulp-uglify");
+const cleanCSS = require("gulp-clean-css");
 
 const lessPath = `pages/**/*.less`;
 const cssDest = `pages`;
 gulp.task("buildCSS", () => {
   return gulp.src(lessPath)
     .pipe(less())
+    .pipe(cleanCSS({compatibility: '*'}))
     .pipe(gulp.dest(cssDest));
 });
 
@@ -33,6 +36,7 @@ gulp.task('browserify', function (done) {
       })
       .pipe(stream(entry.replace('.mjs', '.js').replace('pages/', '')))
       .pipe(buffer())
+      .pipe(uglify())
       .pipe(gulp.dest('pages/'));
     })
   });
