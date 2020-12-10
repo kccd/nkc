@@ -47,6 +47,20 @@ func.sendForumMessage = async (data) => {
   }
 };
 
+func.sendPostMessage = async (data) => {
+  const post = await db.PostModel.findOne({
+    pid: data.targetPostId,
+    disabled: false,
+    reviewed: true,
+  });
+  if(!post) return;
+  const comment = await db.PostModel.getSocketCommentByPid(post);
+  const roomName = getRoomName('post', data.postId);
+  global.NKC.io.to(roomName).emit('postMessage', {
+    comment
+  });
+}
+
 func.sendThreadMessage = () => {
   const roomName = getRoomName('thread');
 };

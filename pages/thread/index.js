@@ -1343,18 +1343,17 @@ $(function() {
 		}, 1000)
 	}
 	if(NKC.configs.uid && socket) {
-		window.bulletComments = new NKC.modules.BulletComments();
-		bulletComments.add({
-			username: 'spark',
-			avatarUrl: 'https://a.test/a/5f0d659a351a5f1468797fd0?c=userAvatar',
-			content: '测试弹幕数计',
-			contentUrl: 'https://a.test/t/82513'
+		window.bulletComments = new NKC.modules.BulletComments({
+			offsetTop: NKC.configs.isApp? 20: 60
 		});
 		socket.emit('joinRoom', {
 			type: 'post',
 			data: {
 				postId: threadData.pid
 			}
+		});
+		socket.on('postMessage', function(data) {
+			bulletComments.add(data.comment);
 		});
 	}
 });

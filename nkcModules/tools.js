@@ -113,6 +113,12 @@ var Tools = function() {
       }
     }
   };
+  self.getAnonymousInfo = function() {
+    return {
+      username: '匿名用户',
+      avatarUrl: self.getUrl('anonymousUserAvatar')
+    }
+  };
   self.floatUserInfo = function(uid) {
     return "floatUserPanel.open(this, '" + uid + "')";
   };

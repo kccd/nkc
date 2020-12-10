@@ -1234,4 +1234,33 @@ postSchema.statics.ensureHidePostPermission = async (thread, user) => {
   }
   return false;
 };
+
+/*
+* 获取待推送的回复
+* */
+postSchema.statics.getSocketCommentByPid = async (post) => {
+  const UserModel = mongoose.model('users');
+  const tools = require('../nkcModules/tools');
+  const nkcRender = require('../nkcModules/nkcRender');
+  let avatarUrl, username, content, contentUrl;
+  if(post.anonymous) {
+    const anonymousInfo = tools.getAnonymousInfo();
+    avatarUrl = anonymousInfo.avatarUrl;
+    username = anonymousInfo.username;
+  } else {
+    const user = await UserModel.findOnly({uid: post.uid});
+    avatarUrl = tools.getUrl("userAvatar", user.avatar);
+    username = user.username;
+  }
+  content = nkcRender.htmlToPlain(post.c, 50)
+  contentUrl = tools.getUrl('post', post.pid);
+  return {
+    postId: post.pid,
+    avatarUrl,
+    username,
+    content,
+    contentUrl
+  };
+};
+
 module.exports = mongoose.model('posts', postSchema);

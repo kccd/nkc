@@ -3,6 +3,7 @@ const map = {
   "user"   : (uid) => `USER:${uid}`,
   "forum"  : (fid) => `FORUM:${fid}`,
   "thread" : (tid) => `THREAD:${tid}`,
+  "post"   : (pid) => `POST:${pid}`,
 };
 
 module.exports = function(type, ...params) {
