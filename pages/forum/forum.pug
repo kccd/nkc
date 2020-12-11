@@ -297,10 +297,10 @@ block content
         include ../publicModules/scrollTo
 
 block scripts
+  include ../publicModules/subscribeTypes/subscribeTypes
   if data.type === "home"
     include ../publicModules/nkcSource
   //-include ../publicModules/toTop
-  include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/moveThread/moveThread
   include ../publicModules/md5
   include ../publicModules/disabledPost/disabledPost

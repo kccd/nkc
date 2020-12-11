@@ -50,7 +50,6 @@ func.sendForumMessage = async (data) => {
 func.sendPostMessage = async (data) => {
   const post = await db.PostModel.findOne({
     pid: data.targetPostId,
-    disabled: false,
     reviewed: true,
   });
   if(!post) return;

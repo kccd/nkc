@@ -146,10 +146,9 @@ $(document).ready(function(){
 
 	var quoteDom = document.getElementById('quotePost');
 	if(quoteDom) {
-	  var s = JSON.parse(quoteDom.innerText);
-	  quotePost(s.pid, s.step, s.page);
-  }
-
+		var s = JSON.parse(quoteDom.innerText);
+		quotePost(s.pid, s.step, s.page);
+	}
 
 });
 function addToColumn(pid, columnId) {
@@ -1343,20 +1342,28 @@ $(function() {
 		}, 1000)
 	}
 	if(NKC.configs.uid && socket) {
+		NKC.methods.setThreadListNewPostCount($('#threadId').text().trim(), 0);
 		window.bulletComments = new NKC.modules.BulletComments({
 			offsetTop: NKC.configs.isApp? 20: 60
 		});
-		socket.emit('joinRoom', {
-			type: 'post',
-			data: {
-				postId: threadData.pid
-			}
-		});
+		socket.on('connect', joinPostRoom)
 		socket.on('postMessage', function(data) {
 			bulletComments.add(data.comment);
 		});
+		if(socket.connected) {
+			joinPostRoom();
+		}
 	}
 });
+
+function joinPostRoom() {
+	socket.emit('joinRoom', {
+		type: 'post',
+		data: {
+			postId: threadData.pid
+		}
+	});
+}
 
 if (NKC.configs.platform === 'reactNative') {
 	window._userSelect = true;
