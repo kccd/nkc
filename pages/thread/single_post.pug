@@ -118,6 +118,8 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
               if !post.anonymous && addKcb && post.uid !== data.user.uid
                 .inline-block.post-qrcode
                   .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`)
+              span(data-type='share' data-share-type='post' data-share-id=post.pid)
+                .fa.fa-share-square-o
               .inline-block.post-qrcode
                 .fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
                 .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;background: none')

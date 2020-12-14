@@ -1242,25 +1242,29 @@ postSchema.statics.getSocketCommentByPid = async (post) => {
   const UserModel = mongoose.model('users');
   const tools = require('../nkcModules/tools');
   const nkcRender = require('../nkcModules/nkcRender');
-  let avatarUrl, username, content, contentUrl;
+  let avatarUrl, username, content, contentUrl, uid;
   if(post.anonymous) {
     const anonymousInfo = tools.getAnonymousInfo();
     avatarUrl = anonymousInfo.avatarUrl;
     username = anonymousInfo.username;
+    uid = null;
   } else {
     const user = await UserModel.findOnly({uid: post.uid});
     avatarUrl = tools.getUrl("userAvatar", user.avatar);
     username = user.username;
+    uid = user.uid;
   }
   content = nkcRender.htmlToPlain(post.c, 50)
   contentUrl = tools.getUrl('post', post.pid);
   return {
     postId: post.pid,
     avatarUrl,
+    uid,
     username,
     content,
     contentUrl
   };
 };
+
 
 module.exports = mongoose.model('posts', postSchema);

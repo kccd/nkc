@@ -275,5 +275,25 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
     num
   }
 };
+/*
+* 获取分享链接中的token
+* @return {String}
+* @author pengxiguaa 2020-12-14
+* */
+shareSchema.statics.getNewToken = async () => {
+  const apiFunction = require('../nkcModules/apiFunction');
+  const ShareModel = mongoose.model('share');
+  let token, n = 0;
+  do{
+    n++;
+    if(n > 100) {
+      throwErr(500, `分享：生成唯一token失败`);
+    }
+    token = apiFunction.getRandomString("a0", 8);
+    const tokenCount = await ShareModel.count({token});
+    if(!tokenCount) break;
+  } while(1);
+  return token;
+};
 
 module.exports = mongoose.model('share', shareSchema, 'share');

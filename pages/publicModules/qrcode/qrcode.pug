@@ -6,21 +6,29 @@
 
 +includeJS("/qrcode/build/qrcode.js")
 script.
-  var qrcodeCanvas = document.getElementsByClassName("qrcode-canvas");
-  for(var i = 0; i < qrcodeCanvas.length; i ++) {
-    var dom = qrcodeCanvas[i];
-    var path = dom.getAttribute("data-path");
-    var origin = dom.getAttribute("data-origin");
-    if(!origin) origin = window.location.origin;
-    if(!path) path = window.location.pathname;
-    QRCode.toCanvas(dom, origin+path, {
-      margin: 1,
-      width: 114,
-      color: {
-        dark: "#333333"
-      }
-    }, function (err, url) {
-      if(err)
-        screenTopWarning(err);
-    });
+  NKC.methods.initQrcodeCanvas = function() {
+    var qrcodeCanvas = document.getElementsByClassName("qrcode-canvas");
+    for (var i = 0; i < qrcodeCanvas.length; i++) {
+      var dom = qrcodeCanvas[i];
+      var init = dom.getAttribute("data-init");
+      if(init === 'true') continue;
+      var url = dom.getAttribute('data-url');
+      var path = dom.getAttribute("data-path");
+      var origin = dom.getAttribute("data-origin");
+      if (!origin) origin = window.location.origin;
+      if (!path) path = window.location.pathname;
+      QRCode.toCanvas(dom, url? url: (origin + path), {
+        margin: 1,
+        width: 114,
+        color: {
+          dark: "#333333"
+        }
+      }, function (err, url) {
+        if (err)
+          screenTopWarning(err);
+      });
+      dom.setAttribute('data-init', 'true');
+    }
   }
+  NKC.methods.initQrcodeCanvas();
+

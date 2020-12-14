@@ -1348,6 +1348,8 @@ $(function() {
 		});
 		socket.on('connect', joinPostRoom)
 		socket.on('postMessage', function(data) {
+			// 排除自己的发表
+			// if(NKC.configs.uid === data.comment.uid) return;
 			bulletComments.add(data.comment);
 		});
 		if(socket.connected) {

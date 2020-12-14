@@ -1,18 +1,19 @@
-+includeJS('/moment/moment.js')
-+includeJS('/moment/locale/zh-cn.js')
-script.
-  /*
-  *  格式化时间
-  */
-  NKC.methods.format = function(m, t) {
-    if(typeof moment === "undefined") throw 'moment is not loaded';
-    return moment(t).format(m);
-  };
-  NKC.methods.fromNow = function(t) {
-    if(typeof moment === "undefined") throw 'moment is not loaded';
-    return moment(t).fromNow();
-  };
-  NKC.methods.timeFormat = function(t, m) {
-    if (typeof moment === "undefined") throw 'moment is not loaded';
-    return moment(t).format(m || 'YYYY/MM/DD HH:mm:ss');
-  }
+if !isIncluded('moment')
+  +includeJS('/moment/moment.js')
+  +includeJS('/moment/locale/zh-cn.js')
+  script.
+    /*
+    *  格式化时间
+    */
+    NKC.methods.format = function(m, t) {
+      if(typeof moment === "undefined") throw 'moment is not loaded';
+      return moment(t).format(m);
+    };
+    NKC.methods.fromNow = function(t) {
+      if(typeof moment === "undefined") throw 'moment is not loaded';
+      return moment(t).fromNow();
+    };
+    NKC.methods.timeFormat = function(t, m) {
+      if (typeof moment === "undefined") throw 'moment is not loaded';
+      return moment(t).format(m || 'YYYY/MM/DD HH:mm:ss');
+    }

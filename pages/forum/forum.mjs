@@ -90,14 +90,19 @@ function connectForumRoom() {
   socket.on('forumMessage', function(data) {
     const {html, tid, contentType} = data;
     const threadList = $('div.normal-thread-list');
-    let targetThread = threadList.find('div[data-tid="'+tid+'"]') || {a: 1};
+    let targetThread = threadList.find('div[data-tid="'+tid+'"]');
     if(
       page === 0 && // 处于专业首页
       digest === data.digest &&
       (contentType === 'thread' || sort === 'tlm') // 发表文章或发表回复且按回复排序
     ) {
-      // 处于专业首页 更新时先移除旧元素再在列表头部插入新元素
-      targetThread.remove();
+      // 如果文章存在则先移除再在列表头部创建
+      // 如果文章不存在则移除列表最后一项再在列表头部创建
+      if(targetThread.length) {
+        targetThread.remove();
+      } else {
+        removeLastThreadPanel();
+      }
       targetThread = $(html);
       threadList.prepend(targetThread);
     } else {
@@ -179,11 +184,27 @@ function createMouseEvents() {
 * */
 function setThreadListNewCount(tid, count) {
   const threadList = $('div.normal-thread-list');
-  const targetThread = threadList.find('div[data-tid="'+tid+'"]');
-  if(!targetThread.length) return;
-  const targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-counter');
+  const targetThreadInfo = threadList.find('div[data-tid="'+tid+'"] .thread-panel-author-info');
+  if(!targetThreadInfo.length) return;
+  const targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-point');
   targetThreadCounter.remove();
   if(count === 0) return;
-  const newCounter = $("<span class='thread-panel-counter' data-count='"+count+"' title='"+count+"条更新'>"+count+"</span>");
-  targetThread.prepend(newCounter);
+
+  // 显示条数
+  //const newCounter = $("<span class='thread-panel-counter' data-count='"+count+"' title='"+count+"条更新'>"+count+"</span>");
+
+  // 只显示红点
+  const newCounter = $("<span class='thread-panel-point' data-count='"+count+"'></span>");
+  targetThreadInfo.append(newCounter);
+}
+
+/*
+* 移除文章列表中的最后一条
+* @author pengxiguaa 2020-12-14
+* */
+function removeLastThreadPanel() {
+  const threadPanel = $('div.normal-thread-list>.thread-panel');
+  const length = threadPanel.length;
+  if(length === 0) return;
+  threadPanel.eq(length - 1).remove();
 }
