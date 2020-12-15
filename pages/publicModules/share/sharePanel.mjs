@@ -27,7 +27,9 @@ class SharePanel extends NKC.modules.DraggablePanel {
           {
             type: 'weibo'
           }
-        ]
+        ],
+        showQR: false,
+        clipboard: null,
       },
       computed: {
 
@@ -51,19 +53,43 @@ class SharePanel extends NKC.modules.DraggablePanel {
               self.app.title = title;
               self.app.description = description;
               self.app.loading = false;
+              const qr = $('.wechat-container.qrcode-canvas');
+              qr.attr('data-init', 'false');
               setTimeout(() => {
-                console.log()
                 NKC.methods.initQrcodeCanvas();
-              }, 2000);
-
+              }, 500);
             })
             .catch(sweetError);
         },
         close() {
+          this.showQR = false;
           self.hidePanel();
         },
         share(type) {
-
+          if(type === 'wechat') {
+            return this.showQR = !this.showQR;
+          }
+          const {url, title, description, cover} = this;
+          if(type === 'copy') {
+            if(this.clipboard) return;
+            this.clipboard = new ClipboardJS('#sharePanelButton', {
+              text: function(trigger) {
+                return self.app.url;
+              }
+            });
+            return this.clipboard.on('success', function() {
+              screenTopAlert("链接已复制到粘贴板");
+            });
+          }
+          const newWindow = window.open();
+          const pic = window.location.origin + cover;
+          if(type === 'QQ') {
+            newWindow.location = `http://connect.qq.com/widget/shareqq/index.html?url=${url}&title=${title}&pics=${pic}&summary=${description}`;
+          } else if(type === 'qzone') {
+            newWindow.location=`https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${url}&title=${title}&pics=${pic}&summary=${description}`;
+          } else {
+            newWindow.location=`http://v.t.sina.com.cn/share/share.php?url=${url}&title=${title}&pic=${pic}`;
+          }
         }
       }
     })
@@ -88,10 +114,10 @@ $(function() {
       });
     })
   }
-  sharePanel.open({
+  /*sharePanel.open({
     shareType: 'post',
     shareId: '888055'
-  })
+  })*/
 });
 
 

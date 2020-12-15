@@ -7,27 +7,33 @@
 +includeJS("/qrcode/build/qrcode.js")
 script.
   NKC.methods.initQrcodeCanvas = function() {
-    var qrcodeCanvas = document.getElementsByClassName("qrcode-canvas");
-    for (var i = 0; i < qrcodeCanvas.length; i++) {
-      var dom = qrcodeCanvas[i];
-      var init = dom.getAttribute("data-init");
-      if(init === 'true') continue;
+    var toCanvas = function(dom) {
       var url = dom.getAttribute('data-url');
       var path = dom.getAttribute("data-path");
       var origin = dom.getAttribute("data-origin");
       if (!origin) origin = window.location.origin;
       if (!path) path = window.location.pathname;
-      QRCode.toCanvas(dom, url? url: (origin + path), {
+      QRCode.toCanvas(dom, url ? url : (origin + path), {
         margin: 1,
         width: 114,
         color: {
           dark: "#333333"
         }
       }, function (err, url) {
-        if (err)
+        if (err) {
+          console.log(err);
           screenTopWarning(err);
+        } else {
+          dom.setAttribute('data-init', 'true');
+        }
       });
-      dom.setAttribute('data-init', 'true');
+    }
+    var qrcodeCanvas = document.getElementsByClassName("qrcode-canvas");
+    for (var i = 0; i < qrcodeCanvas.length; i++) {
+      var dom = qrcodeCanvas[i];
+      var init = dom.getAttribute("data-init");
+      if (init === 'true') continue;
+      toCanvas(dom);
     }
   }
   NKC.methods.initQrcodeCanvas();

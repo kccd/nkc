@@ -53,8 +53,8 @@ block content
                   .username.anonymous-name= anonymousInfo.username
                 span= fromNow(post.toc)
               .options
-                -var votePost = post;
                 include ../module_vote
+                +voteButtons(post, !!data.user)
                 if addKcb && data.user && post.uid !== data.user.uid
                   .options-fa.fa.fa-cny(onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励
                 if digestPost

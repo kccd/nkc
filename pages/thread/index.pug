@@ -478,9 +478,9 @@ block content
                             .inline-block
                               span.fa.fa-star(style='color: #ffbf16;' title='精选')
                               span &nbsp;
-                          - const votePost = thread.firstPost;
                           .inline-block(style="vertical-align: text-top;")
                             include ../module_vote
+                            +voteButtons(thread.firstPost, !!data.user)
                           //- 展开附件
                           if data.attachmentsCount > 0
                             .pointer.inline-block(style="color: #aaa;margin-right: 2px;" onclick="showAttachments()")

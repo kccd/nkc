@@ -66,8 +66,8 @@ if data.highlight === comment.pid
     .display-i-b.pull-right
       if comment.digest
         span.fa.fa-star.m-r-05(style='color: #ffbf16;' title='精选')
-      -const votePost = comment;
       include ../module_vote
+      +voteButtons(comment, !!data.user)
     -comment.c = hideContentByUser(comment.c, data.user, 'thread')
     .post-comment-content!=comment.c
     -let creditPost = comment;

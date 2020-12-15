@@ -17,13 +17,15 @@ include ../draggablePanel/draggablePanel
               .share-panel-title(:title='title') {{title}}
               .share-panel-description(:title="description") {{description}}
               .share-panel-url {{url}}
+                button#sharePanelButton(@click="share('copy')") 复制
           hr
           .share-panel-platform
             .share-panel-app(v-for='p in platforms' @click='share(p.type)')
               img(:src="getUrl('defaultFile', p.type + '.png')")
-            .wechat-container.qrcode-canvas(:data-url='url')
+            canvas.wechat-container(:data-url='url' :class="{'qrcode-canvas': !!url}" v-show='showQR')
 
 
 
 
++includeJS("/clipboard/clipboard.min.js")
 +includeJS('/publicModules/share/sharePanel.js')
