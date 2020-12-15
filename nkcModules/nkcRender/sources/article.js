@@ -40,13 +40,18 @@ module.exports = {
     } = resource;
     const poster = getUrl("videoCover", rid);
     const url = getUrl("resource", rid);
-    return `
+    if(resource.isFileExist) {
+      return `
       <span data-tag="nkcsource" data-type="video" data-id="${id}">
         <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
           <source src="${url}" type="video/mp4"> 你的浏览器不支持video标签，请升级。
         </video>
       </span>
     `.trim();
+    } else {
+      return `<span data-tag="nkcsource" data-type="video-not-found">视频已丢失</span>`
+    }
+
     //<span class="nkcsource-video-title">${resource.oname}</span>
   },
   audio(html = "", id, resource = {}) {

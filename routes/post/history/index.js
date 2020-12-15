@@ -30,6 +30,12 @@ router
     if(!t) {
       extendOptions.renderHTML = false;
     }
+    const ipToken = [];
+    histories.map(h => {
+      ipToken.push(h.iplm);
+      ipToken.push(h.ipoc);
+    })
+    const ipsObj = await db.IPModel.getIPByTokens(ipToken);
     histories = await db.PostModel.extendPosts(histories, extendOptions);
     if(!t) {
       histories.map(h => {
@@ -41,6 +47,8 @@ router
       if(!t) {
         history.c = nkcRender.htmlToPlain(history.c);
       }
+      history.ipoc = ipsObj[history.ipoc];
+      history.iplm = ipsObj[history.iplm];
       history.version = i + 1;
       data.histories.push(history);
     }

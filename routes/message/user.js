@@ -26,7 +26,7 @@ userRouter
       q._id = {$lt: firstMessageId};
     }
 
-    const messages = await db.MessageModel.find(q).sort({tc: -1}).limit(30);
+    const messages = await db.MessageModel.find(q, {ip: 0, port: 0}).sort({tc: -1}).limit(30);
     messages.map(m => {
       if(m.withdrawn) m.c = '';
     });
@@ -85,21 +85,18 @@ userRouter
       const _id = await db.SettingModel.operateSystemID('messageFiles', 1);
       const toc = Date.now();
       // 文件存储文件夹
-      let saveFileDir;
       let messageTy;
-      if(imageExt.includes(ext)) {
+      const fileType = await db.MessageFileModel.getFileTypeByExtension(ext);
+      let saveFileDir = await db.MessageFileModel.getFileFolder(fileType, toc);
+      if(fileType === 'image') {
         messageTy = "img"
-        saveFileDir = await FILE.getPath("messageImage", toc);
-      }else if(voiceExt.includes(ext)) {
+      }else if(fileType === 'voice') {
         messageTy = "voice"
-        saveFileDir = await FILE.getPath("messageVoice", toc);
         ext = "mp3";
-      }else if(videoExt.includes(ext)) {
+      }else if(fileType === 'video') {
         messageTy = "video"
-        saveFileDir = await FILE.getPath("messageVideo", toc);
       } else {
         messageTy = "file";
-        saveFileDir = await FILE.getPath("messageFiles", toc);
       }
       // 此文件的目标存储位置
       let targetPath = `${saveFileDir}/${_id}.${ext}`;
@@ -139,7 +136,7 @@ userRouter
           await ffmpeg.videoAVITransMP4(path, targetPath);
         }
         // 视频封面图路径
-        var videoCoverPath = `${saveFileDir}/${_id}-frame.jpg`;
+        var videoCoverPath = `${saveFileDir}/${_id}_cover.jpg`;
         await ffmpeg.videoFirstThumbTaker(targetPath, videoCoverPath);
       } else {
         await fsPromise.copyFile(path, targetPath);
@@ -159,6 +156,8 @@ userRouter
     });
     await message.save();
     // 判断是否已创建聊天
+    delete message.ip;
+    delete message.port;
     data.message2 = await db.MessageModel.extendMessage(data.user.uid, message);
     await db.CreatedChatModel.createChat(user.uid, uid, true);
     const message_ = message.toObject();

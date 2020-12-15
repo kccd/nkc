@@ -3874,6 +3874,19 @@ span[data-tag="nkcsource"][data-type="twemoji"]>img{
   max-width: 26px;
   max-height: 26px;
 }
+span[data-tag="nkcsource"][data-type="video-not-found"]{
+  display: block;
+  height: 20rem;
+  line-height: 20rem;
+  text-align: center;
+  width: 40rem;
+  margin: auto;
+  max-width: 100%;
+  background-color: #b9b9b9;
+  color: #919191;
+  border-radius: 2px;
+  font-size: 1.8rem;
+}
 /*文章中的图片 旧*/
 
 .article-img-body{

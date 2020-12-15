@@ -18,7 +18,6 @@ gulp.task("buildCSS", () => {
     .pipe(gulp.dest(cssDest));
 });
 
-
 const mjsPath = `pages/**/*.mjs`;
 
 gulp.task('browserify', function (done) {
