@@ -1,4 +1,4 @@
-var SubscribeTypes, UserInfo, surveyForms = [], draftId = "", author = {};
+var SubscribeTypes, surveyForms = [], draftId = "", author = {};
 var hidePostMaxHeight;
 var hidePostFloat;
 var Attachments;
@@ -47,9 +47,6 @@ $(document).ready(function(){
   if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
-  if(NKC.modules.UserInfo) {
-    UserInfo = new NKC.modules.UserInfo();
-	}
 
 	if($("#container").length) {
 		autoSaveDraft();
@@ -1057,25 +1054,8 @@ function disabledPostButtonByProtocol(allowed) {
   }
 }
 
-function getPostAuthor(pid) {
-  UserInfo.open({
-    type: "showUserByPid",
-    pid: pid
-  });
-}
 
 
-function anonymousPost(pid, anonymous) {
-  nkcAPI("/p/" + pid + "/anonymous", "POST", {
-    anonymous: !!anonymous
-  })
-    .then(function() {
-      window.location.reload();
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
-}
 function topPost(pid, topped) {
   nkcAPI("/p/" + pid + "/topped", "POST", {topped: !!topped})
     .then(function() {

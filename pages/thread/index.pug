@@ -6,15 +6,8 @@ block title
   title= `${thread.firstPost.t} - ${state.serverSettings.websiteName}`
   meta#replytarget(value=`${data.replyTarget}`)
 
-  -let modifyPostTimeLimit = 0;
   //- 用于回复时间戳的显示
   -let hidePostTimeCount = 0;
-  for r in data.userRoles
-    if r.modifyPostTimeLimit === -1
-      -modifyPostTimeLimit = -1;
-      -break;
-    if r.modifyPostTimeLimit > modifyPostTimeLimit
-      -modifyPostTimeLimit = r.modifyPostTimeLimit
 
   -const postTo = data.userOperationsId.includes('quotePost')
   -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
@@ -30,7 +23,8 @@ block title
 
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
-    link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+
+    +includeCSS("/external_pkgs/imageToBig/preview.css")
     +includeCSS("/jquery-ui-1.10.4.custom.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
     include ../publicModules/plyr/plyr.css.pug
@@ -42,190 +36,8 @@ block title
       color: black;
     }
 
-  mixin postOptions(post, targetThread, index, dropType)
-    -dropType = dropType || "dropdown";
-    .inline-block.post-options(style='margin-right: 0;color: #aaaaaa;' class=dropType)
-      div(class=`dropdown-toggle` data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
-        span.fa.fa-sliders
-        if targetThread
-          span &nbsp;操作
-      //-ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
-      ul.dropdown-menu(style='left: auto;right: 0;' data-stopPropagation=true)
-        if targetThread && data.authorColumn
-          li
-            if !data.addedToColumn
-              a(href=`javascript:addToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
-                span.fa.fa-share-square-o &nbsp;推送到我的专栏
-            else
-              a(href=`javascript:removeToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
-                span.fa.fa-share-square-o &nbsp;从我的专栏撤稿
-        li
-          a(href=`/p/${post.pid}` target="_blank")
-            span.fa.fa-newspaper-o &nbsp;
-            span 详情
-        if permission("getPostAuthor") && post.anonymous
-          li
-            a(onclick=`getPostAuthor('${post.pid}')`)
-              span.fa.fa-user-secret &nbsp;
-              span 作者
-        if permission("anonymousPost")
-          li
-            a(onclick=`anonymousPost('${post.pid}', ${!!!post.anonymous})`)
-              span.fa.fa-user-secret &nbsp;
-              span=post.anonymous? "取消匿名": "设为匿名"
-        if postTo && !thread.closed
-          if targetThread
-            li
-              a(onclick="quotePostWithout()")
-                span.fa.fa-comment-o &nbsp;
-                span 回复
-          else
-            li
-              a(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
-                span.fa.fa-comment-o &nbsp;
-                span 回复
-        if !thread.closed && !post.anonymous
-          li
-            a(onclick=`at('${post.user.username}')`)
-              span.fa.fa-at= ` ${post.user.username}`
-        if targetThread && targetThread.oc === post.pid && !targetThread.firstPost.anonymous
-          li
-            a(href=`/t/${thread.tid}?t=author`)
-              .fa.fa-filter &nbsp;只看作者
+  include ./postEditTime
 
-        if targetThread && targetThread.oc === post.pid && data.user && data.userOperationsId.includes('collectThread')
-
-          li
-            if data.collected
-              a(onclick=`SubscribeTypes.collectionThread('${thread.tid}', false)`)
-                span.fa.fa-folder-o &nbsp;已收藏
-            else
-              a(onclick=`SubscribeTypes.collectionThread('${thread.tid}', true)`)
-                span.fa.fa-folder-o &nbsp;加入收藏
-          li
-            if data.subscribed
-              a(onclick=`SubscribeTypes.subscribeThread('${thread.tid}', false)`)
-                span.fa.fa-bookmark-o &nbsp;取消关注
-            else
-              a(onclick=`SubscribeTypes.subscribeThread('${thread.tid}', true)`)
-                span.fa.fa-bookmark-o &nbsp;关注
-        if data.user && data.thread.oc !== post.pid && data.hasPermissionToHidePost
-          li
-            a(onclick=`openHidePostPanel('${post.pid}', '${post.hide}')`)
-              .fa.fa-compress &nbsp;折叠回复
-        if data.thread.oc !== post.pid && data.topPost
-          li
-            if data.thread.toppedPostsId.includes(post.pid)
-              a(onclick=`topPost('${post.pid}', false)`)
-               .fa.fa-thumb-tack &nbsp;取消置顶
-            else
-              a(onclick=`topPost('${post.pid}', true)`)
-               .fa.fa-thumb-tack &nbsp;置顶
-
-        if addCredit
-          li
-            a(onclick=`credit('${post.pid}', 'xsf')`)
-              span.fa.fa-graduation-cap &nbsp;
-              span 评学术分
-        if digestPost && !post.digest
-          li
-            a(onclick=`digestPost("${post.pid}")`)
-              span.fa.fa-star-o &nbsp;设为精选
-        if unDigestPost && post.digest
-          li
-            a(onclick=`unDigestPost("${post.pid}")`)
-              span.fa.fa-star &nbsp;取消精选
-        - var ownership = data.userOperationsId.includes('modifyOtherPosts')
-        - ownership = ownership?true:(post.ownPost)
-        //-if addKcb && post.uid !== data.user.uid
-          li
-            a(onclick=` credit("${post.pid}", 'kcb', ${data.user.kcb})`)
-              span.fa.fa-thumbs-o-up &nbsp;
-              span 鼓励
-        if permission("postWarningPost")
-          li
-            a(onclick=`openPostWarningDom("${post.pid}")`)
-              span.fa.fa-ambulance &nbsp;建议修改
-
-        if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
-          if (post.ownPost) || (data.isModerator && permission('modifyOtherPosts'))
-            if !targetThread || targetThread.type !== "fund"
-              li
-                a(href=`/editor?ver=ue&type=post&id=${post.pid}`)
-                  span.fa.fa-edit &nbsp;编辑
-                //-a(onclick=`NKC.methods.deletePost('${post.pid}')`)
-                //-  span.fa.fa-trash &nbsp;删除
-        if disablePost && !targetThread
-          li
-            a(onclick=`disabledThreadPost('${post.pid}')`)
-              span.fa.fa-eye-slash &nbsp;退修或删除
-        if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
-          if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
-            li
-              a(href=`/p/${post.pid}/history`)
-                span.fa.fa-history &nbsp;历史版本
-        if permission("violationRecord")
-          li
-            a(onclick=`NKC.modules.violationRecord.open({uid:'${post.uid}'})`)
-              span.fa.fa-newspaper-o &nbsp;
-              span 违规记录
-        if data.user
-          li.divider
-            if targetThread && targetThread.oc === post.pid
-              li
-                a(onclick=`moduleComplaint.open("thread", "${thread.tid}")`)
-                  span.fa.fa-minus-circle &nbsp;投诉
-            else
-              li
-                a(onclick=`moduleComplaint.open("post", "${post.pid}")`)
-                  span.fa.fa-minus-circle &nbsp;投诉
-          if post.uid
-            li
-              if data.blacklistUsersId.includes(post.uid)
-                //- 移出黑名单
-                a(onclick=`NKC.methods.removeUserFromBlacklist("${post.uid}")`)
-                  span.fa.fa-ban &nbsp;移出黑名单
-              else
-                //- 加入黑名单
-                a(onclick=`NKC.methods.addUserToBlacklist("${post.uid}", 'post', "${post.pid}")`)
-                  span.fa.fa-ban &nbsp;加入黑名单
-        li.divider
-        li
-          a
-            span.fa.fa-clock-o= ` ${post.toc.toLocaleString()}`
-        if disablePost
-          li
-            -const ipoc = post.iplm || post.ipoc;
-            a(onclick=`NKC.methods.getIpInfo('${ipoc}')` title=ipoc target='_blank')
-              span.fa.fa-map-marker(style='margin-left: 2px;')= ` 点击查看IP`
-
-  mixin postEditTime(post)
-    if post.toc.toLocaleString() !== post.tlm.toLocaleString()
-      p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-  mixin postCredits(post)
-    if post && post.credits && post.credits.length > 0
-      .nkcpanel.ThreadPostCredits
-        for c,index in post.credits
-          -var username = c.fromUser.username
-          -var profile = '/u/'+c.from
-          .ThreadPostCreditItem
-            if c.type === "creditKcb"
-              -c.num = c.num/100;
-            span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
-            span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
-            span.TPCIA
-              a(href=`${profile}` style='text-decoration: none;')
-                img.TPCIAI(src=tools.getUrl('userAvatar', c.fromUser.avatar, 'sm'))
-                span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
-            span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
-            span.TPCReason #{c.description}
-            if c.type === 'xsf' && data.user && permission('cancelXsf')
-              a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
-            if c.type === 'creditKcb' && data.user && permission('modifyKcbRecordReason')
-              if !c.hideDescription
-                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, true)`) 屏蔽
-              else
-                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, false)`) 取消屏蔽
 block content
   if !(state.isApp && state.platform === 'reactNative')
     include ../publicModules/mobile_drawer/right_drawer
@@ -449,14 +261,14 @@ block content
                           include ../fund/initData
                           div.thread-content.ThreadPostBody#thread-content
                             include ./fund/fund.pug
-                        +postEditTime(post)
+                        +postEditTime(post.toc, post.tlm)
                         -const creditPost = data.thread.firstPost;
                         include ./postCredits
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
                           div.ThreadPostBody#thread-content!= post.c
-                          +postEditTime(post)
+                          +postEditTime(post.toc, post.tlm)
                           -const creditPost = data.thread.firstPost;
                           include ./postCredits
                         .text-center
@@ -523,7 +335,9 @@ block content
                                         button(onclick=`copyLink('${thread.tid}')` id=`copyButton${thread.tid}`) 复制
                                       canvas#threadQrcode.inline-block(style="display:none")
                           if data.user
-                            +postOptions(thread.firstPost, thread, 0)
+                            span(data-type='postOption' data-pid=post.pid)
+                              .fa.fa-sliders
+                            //-+postOptions(thread.firstPost, thread, 0)
                       if data.attachmentsCount > 0
                         .thread-attachment.m-t-1
                           include ../publicModules/attachments/attachments
@@ -752,6 +566,7 @@ block scripts
   include ../ueditor/dialogs/mathformulaV2/mathformula
   include ../publicModules/bulletComments/bulletComments
   include ../publicModules/share/sharePanel
+  include ../post/options/options
   //- 下载资料询问框
   //if state.downloadNeedScore
   include ../publicModules/downloadResource/downloadResource

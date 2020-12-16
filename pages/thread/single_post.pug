@@ -81,9 +81,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
               -const quotePost = post.quotePost;
               include ./quotePost
             .ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!=post.c
-            if post.toc.toLocaleString() !== post.tlm.toLocaleString()
-              p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-            //+postCredits(post)
+            +postEditTime(post.toc, post.tlm)
             -let creditPost = post;
             include ./postCredits
           if !disabledHidePost
@@ -122,7 +120,9 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                 .fa.fa-share-square-o
               if data.user
                 -let dropType = "dropup";
-                +postOptions(post, '',index, dropType)
+                span(data-type='postOption' data-pid=post.pid)
+                  .fa.fa-sliders
+                //-+postOptions(post, '',index, dropType)
             .post-comments-div(id=`post_comments_${post.pid}`)
               .text-center 加载评论中，请稍候...
             if data.user

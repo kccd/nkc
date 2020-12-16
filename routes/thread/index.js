@@ -381,6 +381,8 @@ threadRouter
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 		// 拓展回复信息
     data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
+    const data_ = await db.PostModel.filterPostsInfo(data.posts);
+    console.log(data_);
     // 获取置顶文章
     if(paging.page === 0 && thread.toppedPostsId && thread.toppedPostsId.length) {
       match.pid = {$in: thread.toppedPostsId};

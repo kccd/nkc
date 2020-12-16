@@ -294,4 +294,16 @@ schema.post("remove", async function(columnPost) {
     await mongoose.model("threads").updateOne({tid: columnPost.tid}, obj);
   }
 });
+/*
+* 检测专栏中是否存在指定内容
+* @param {Number} columnId 专栏ID
+* @param {String} pid post ID
+* @return {Boolean} 是否存在
+* @author pengxiguaa 2020-12-15
+* */
+schema.statics.checkColumnPost = async (columnId, pid) => {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const count = await ColumnPostModel.count({columnId, pid});
+  return count > 0;
+}
 module.exports = mongoose.model("columnPosts", schema);

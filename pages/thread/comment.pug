@@ -34,35 +34,8 @@ if data.highlight === comment.pid
     if data.user
       span.comment-btn.pointer.m-l-05.m-r-05(onclick=`postComment('${comment.tid}', '${comment.pid}')`) 回评
     include ../thread/postOptions
-    .inline-block.post-qrcode.pull-right
-      .fa.display-b.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="margin-top:1px;")
-      .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;background: none')
-        .ThreadTitle22(style="border: 1px solid #bababa;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background: #ffffff;")
-          div.changeDis(style='width: 100%;')
-            p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
-            .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
-            p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;")= comment.pid
-            .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
-          div.changeDisNone.text-center(style='width: 100%;')
-            .col-xs-12.col-md-12
-              .col-xs-3.col-md-3(style="padding:0px")
-                a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qq', window.location.origin+'${comment.url}', '${data.thread.firstPost.t}', '${comment.pid}')`)
-                  img(src="/default/QQ.png" style="")
-              .col-xs-3.col-md-3(style="padding:0px")
-                a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qzone', window.location.origin+'${comment.url}', '${data.thread.firstPost.t}', '${comment.pid}')`)
-                  img(src="/default/qzone.png" style="")
-              .col-xs-3.col-md-3(style="padding:0px")
-                a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weibo', window.location.origin+'${comment.url}', '${data.thread.firstPost.t}', '${comment.pid}')`)
-                  img(src="/default/weibo.png" style="")
-              .col-xs-3.col-md-3(style="padding:0px")
-                a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weChat', window.location.origin+'${comment.url}', '${data.thread.firstPost.t}', '${comment.pid}')`)
-                  img(src="/default/weChat.png" style="")
-            .col-xs-12.col-md-12
-              a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+'${comment.url}', '${data.thread.firstPost.t}', '${comment.pid}')`) 获取分享链接
-            .col-xs-12.col-md-12(id=`copyArea${comment.pid}` style="display:none")
-              input(type="text", id=`copyLink${comment.pid}`, name=`copyLink${comment.pid}` style="width:inherit")
-              button(onclick=`copyLink('${comment.pid}')` id=`copyButton${comment.pid}`) 复制
-            canvas.qrcode(id=comment.pid + "Qrcode",data-pid=comment.pid,style="display:none").inline-block
+    span(data-type='share' data-share-type='post' data-share-id=comment.pid)
+      .fa.fa-share-square-o
     .display-i-b.pull-right
       if comment.digest
         span.fa.fa-star.m-r-05(style='color: #ffbf16;' title='精选')

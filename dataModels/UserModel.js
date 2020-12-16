@@ -2280,6 +2280,28 @@ userSchema.methods.getUserOperationsId = async function() {
   }
   return [...new Set(operations)];
 };
+/*
+* 获取用户修改post的最长时间
+* @param {String} uid user ID
+* @return {Number} 毫秒数
+* @author pengxiguaa 2020-12-15
+* */
+userSchema.statics.getModifyPostTimeLimitMS = async (uid) => {
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOnly({uid});
+  await user.extendRoles();
+  let modifyPostTimeLimit = 0;
+  for(const role of user.roles) {
+    if(role.modifyPostTimeLimit === -1) {
+      modifyPostTimeLimit = 876000;
+      break;
+    }
+    if(role.modifyPostTimeLimit > modifyPostTimeLimit) {
+      modifyPostTimeLimit = role.modifyPostTimeLimit;
+    }
+  }
+  return modifyPostTimeLimit * 60 * 60 * 1000;
+};
 
 module.exports = mongoose.model('users', userSchema);
 

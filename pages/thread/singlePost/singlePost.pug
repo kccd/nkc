@@ -1,0 +1,47 @@
+//- singlePost props
+
+  @param {String} pid post ID
+  @param {Number} floor 所在楼层
+  @param {Date} toc 内容发表时间
+  @param {Date} tlm 内容修改时间 未修改时此字段为null
+  @param {Number} count 评论数
+  @param {String} title 标题
+  @param {String} content html内容
+  @param {String} vote 支持反对 支持时为“up”, 反对时为“down”, 否则为null
+
+  @param {Object} user 发表人相关信息
+    @param {String} uid 用户ID 匿名时此字段为null
+    @param {String} username 用户名
+    @param {String} avatarUrl 用户头像链接
+    @param {String} gradeId 用户等级 匿名时此字段为null
+    @param {String} gradeName 用户等级名称 匿名时此字段为null
+
+  @param {Object} quote 引用内容 未引用内容时此字段为null
+    @param {String} pid 引用内容的ID
+    @param {String} uid 引用内容的发表者ID 引用内容匿名时此字段为null
+    @param {String} username 引用内容的发表者用户名
+    @param {String} floor 引用内容所在的楼层
+    @param {String} content 引用内容的摘要
+
+  @param {[kcbCredit, kcbCredit, ...]} kcbCredits 鼓励记录
+    @param {String} uid 发起人ID
+    @param {String} username 发起人用户名
+    @param {String} description 鼓励说明
+    @param {Date} toc 发起时间
+    @param {Number} number 鼓励数额
+
+  @param {[xsfCredit, xsfCredit, ...]} xsfCredits 学术分记录
+    @param {String} uid 发起人ID
+    @param {String} username 发起人用户名
+    @param {String} description 鼓励说明
+    @param {Date} toc 发起时间
+    @param {Number} number 鼓励数额
+
+
+if !isIncluded('singlePost')
+  include ./postTop
+  +includeCSS('/thread/singlePost/singlePost.css')
+  mixin singlePost(props)
+    +singlePostTop()
+    +singlePostCenter()
+    +singlePostBottom()

@@ -920,7 +920,6 @@ postSchema.statics.extendPosts = async (posts, options) => {
   return results;
 };
 
-
 postSchema.methods.updatePostsVote = async function() {
   const PostModel = mongoose.model('posts');
   const PostsVoteModel = mongoose.model('postsVotes');
@@ -1268,5 +1267,85 @@ postSchema.statics.getSocketCommentByPid = async (post) => {
   };
 };
 
+/*
+* 文章页回复列表 过滤掉postSchema.statics.extendPosts拓展之后的无用字段
+* @param {[post, post, ...]} 经postSchema.statics.extendPosts拓展之后的数据
+* @return {[object, object, ...]} 详见/pages/thread/singlePost/singlePost.pug
+* @author pengxiguaa 2020-12-16
+* */
+postSchema.statics.filterPostsInfo = async (posts) => {
+  const tools = require('../nkcModules/tools');
+  const anonymousUser = tools.getAnonymousInfo();
+  const results = [];
+  for(const post of posts) {
+    let user;
+    if(post.anonymous) {
+      user = {
+        uid: null,
+        username: anonymousUser.username,
+        avatarUrl: anonymousUser.avatarUrl,
+        gradeId: null,
+        gradeName: null
+      }
+    } else {
+      user = {
+        uid: post.user.uid,
+        username: post.user.username,
+        avatarUrl: tools.getUrl('userAvatar', post.user.avatar),
+        gradeId: post.user.grade._id,
+        gradeName: post.user.grade.displayName
+      }
+    }
+
+    let quote = null;
+    if(post.quotePost) {
+      quote = {
+        uid: post.quotePost.uid || null,
+        username: post.quotePost.uid? post.quotePost.username: anonymousUser.username,
+        floor: post.quotePost.step,
+        content: post.quotePost.c,
+        pid: post.quotePost.pid,
+      };
+    }
+
+    const kcb = [], xsf = [];
+    if(post.credits && post.credits.length) {
+      for(const credit of post.credits) {
+        const {num, type, fromUser, description, toc} = credit;
+        const c = {
+          uid: fromUser.uid,
+          username: fromUser.username,
+          description,
+          toc,
+          number: num
+        }
+        if(type === 'creditKcb') {
+          c.number = c.number / 100;
+          kcb.push(c);
+        } else {
+          xsf.push(c);
+        }
+      }
+    }
+
+    const result = {
+      pid: post.pid,
+      floor: post.step,
+      toc: post.toc,
+      tlm: post.toc === post.tlm? null: post.tlm,
+      count: post.postCount,
+      title: post.t,
+      content: post.c,
+      vote: post.usersVote || null,
+      user,
+      quote,
+      kcb,
+      xsf
+    };
+    results.push(result);
+  }
+
+  return results;
+};
 
 module.exports = mongoose.model('posts', postSchema);

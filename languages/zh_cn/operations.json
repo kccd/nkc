@@ -745,5 +745,6 @@
   "experimentalVerificationSettings": "后台管理 - 图形验证",
 
   "buyResource": "购买资源",
-  "resourceDetail": "资源详情"
+  "resourceDetail": "资源详情",
+  "getPostOption": "获取文章和回复的操作菜单"
 }

@@ -2,6 +2,9 @@ module.exports = {
 	PARAMETER: {
 		GET: 'visitPost',
 		PUT: 'modifyPost',
+		option: {
+			GET: 'getPostOption',
+		},
 		quote: {
 			GET: 'quotePost'
 		},

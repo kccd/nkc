@@ -246,4 +246,5 @@ function hidePostComments(pid, restorePagePosition) {
 function initUserPanel() {
   if(window.floatUserPanel) floatUserPanel.initPanel();
   if(NKC.methods.initStickerViewer) NKC.methods.initStickerViewer();
+  if(NKC.methods.initSharePanel) NKC.methods.initSharePanel();
 }

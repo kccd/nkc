@@ -73,6 +73,9 @@ var Tools = function() {
         }
         return "/p/" + id;
       }
+      case "postHome": {
+        return "/p/" + id;
+      }
       case "thread": {
         return "/t/" + id;
       }

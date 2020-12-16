@@ -63,6 +63,7 @@ class SharePanel extends NKC.modules.DraggablePanel {
         },
         close() {
           this.showQR = false;
+          self.app.loading = true;
           self.hidePanel();
         },
         share(type) {
@@ -98,13 +99,14 @@ class SharePanel extends NKC.modules.DraggablePanel {
     this.app.open(props, options);
   }
 }
+const sharePanel = new SharePanel();
 
-
-$(function() {
-  const sharePanel = new SharePanel();
+NKC.methods.initSharePanel = () => {
   const shareDom = $('[data-type="share"]');
   for(let i = 0; i < shareDom.length; i++) {
     const dom = shareDom.eq(i);
+    const init = dom.attr(`data-init`);
+    if(init === 'true') continue;
     dom.on('click', () => {
       const shareType = dom.attr('data-share-type');
       const shareId = dom.attr('data-share-id');
@@ -114,10 +116,8 @@ $(function() {
       });
     })
   }
-  /*sharePanel.open({
-    shareType: 'post',
-    shareId: '888055'
-  })*/
+};
+
+$(function() {
+  NKC.methods.initSharePanel();
 });
-
-
