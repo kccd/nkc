@@ -28,6 +28,7 @@ router
       history: null,
       violation: null,
       complaint: null,
+      reviewed: null
     };
     if(user) {
       // 推送到专栏
@@ -65,6 +66,10 @@ router
       // 加精
       if(ctx.permission('digestPost')) {
         optionStatus.digest = post.digest;
+      }
+      // 审核
+      if(ctx.permission('review')) {
+        optionStatus.reviewed = post.reviewed;
       }
       // 匿名
       if(ctx.permission('anonymousPost')) {
@@ -115,6 +120,7 @@ router
       optionStatus.ipInfo = ctx.permission('ipinfo')? post.iplm || post.ipoc: null;
     }
     data.options = optionStatus;
+    data.toc = post.toc;
     await next();
   });
 module.exports = router;

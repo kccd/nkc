@@ -97,6 +97,7 @@ var Tools = function() {
         return "/message/resource/" + id;
       }
       case "userHome": {
+        if(id === 'default') return false
         return "/u/" + id
       }
       case "messageCover": {

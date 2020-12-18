@@ -1,20 +1,31 @@
 //- singlePost props
 
   @param {String} pid post ID
+  @param {String} tid thread ID
   @param {Number} floor 所在楼层
   @param {Date} toc 内容发表时间
   @param {Date} tlm 内容修改时间 未修改时此字段为null
   @param {Number} count 评论数
   @param {String} title 标题
   @param {String} content html内容
-  @param {String} vote 支持反对 支持时为“up”, 反对时为“down”, 否则为null
+  @param {String} vote 当前用户点击的支持或反对 支持时为“up”, 反对时为“down”, 否则为null
+  @param {Number} voteUp 支持总数
+  @param {Boolean} reviewed 是否通过审核
+  @param {Boolean} disabled 是否被屏蔽
+  @param {Boolean} isAuthor 是否为作者
+  @param {String} type 内容类型 thread为文章，post为回复
+  @param {Boolean} digest 是否加精
+
+  @param {Object} draft 退修 未退修时此字段为null
+    @param {String} reason 退修理由或建议
 
   @param {Object} user 发表人相关信息
     @param {String} uid 用户ID 匿名时此字段为null
     @param {String} username 用户名
-    @param {String} avatarUrl 用户头像链接
+    @param {String} avatar 用户头像链接
     @param {String} gradeId 用户等级 匿名时此字段为null
     @param {String} gradeName 用户等级名称 匿名时此字段为null
+    @param {Boolean} banned 是否已被开除学籍
 
   @param {Object} quote 引用内容 未引用内容时此字段为null
     @param {String} pid 引用内容的ID
@@ -23,15 +34,24 @@
     @param {String} floor 引用内容所在的楼层
     @param {String} content 引用内容的摘要
 
-  @param {[kcbCredit, kcbCredit, ...]} kcbCredits 鼓励记录
+  @param {[kcbCredit, kcbCredit, ...]} kcb 鼓励记录
+    @param {Number} _id 积分交易记录ID
     @param {String} uid 发起人ID
+    @param {String} avatar 发起人头像链接
+    @param {String} type 固定为 kcb
+    @param {String} name 固定为kcb
     @param {String} username 发起人用户名
+    @param {Boolean} hide 是否隐藏description说明
     @param {String} description 鼓励说明
     @param {Date} toc 发起时间
     @param {Number} number 鼓励数额
 
-  @param {[xsfCredit, xsfCredit, ...]} xsfCredits 学术分记录
+  @param {[xsfCredit, xsfCredit, ...]} xsf 学术分记录
+    @param {Number} _id 学术分记录ID
     @param {String} uid 发起人ID
+    @param {String} avatar 发起人头像链接
+    @param {String} type 固定为 xsf
+    @param {String} name 固定为 学术分
     @param {String} username 发起人用户名
     @param {String} description 鼓励说明
     @param {Date} toc 发起时间
@@ -39,9 +59,42 @@
 
 
 if !isIncluded('singlePost')
-  include ./postTop
+  include ./singlePostTop
+  include ./singlePostCenter
+  include ./singlePostBottom
   +includeCSS('/thread/singlePost/singlePost.css')
   mixin singlePost(props)
-    +singlePostTop()
-    +singlePostCenter()
-    +singlePostBottom()
+    -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, draft} = props;
+    -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp} = props;
+    -var {digest, type, tid, highlight} = props;
+    .single-post-container(
+      data-un-reviewed=!reviewed
+      data-disabled=disabled
+      data-return=!!draft
+      data-highlight=highlight === pid
+      id=highlight === pid? 'highlight':''
+      )
+      if draft
+        .single-post-header
+          .reture 当前内容已被退回修改，请作者点击编辑按钮修改
+          span=`原因：${draft.reason}`
+      else if disabled
+        .single-post-header
+          .disabled
+            span.m-r-05 内容已被屏蔽
+            a(onclick=`enablePost('${pid}')`) 点击解封
+      else if !reviewed
+        .single-post-header
+          .review 内容待审核
+          if permission('review')
+            div
+              | 通过请点击
+              button.btn.btn-xs.btn-default(onclick=`reviewPost('${pid}')`) 通过
+              | &nbsp;  按钮，不通过请点击
+              button.btn.btn-xs.btn-default(onclick=`NKC.methods.disabledPosts('${pid}')`) 退修或删除
+              | 按钮。
+              a(href=`/review` target="_blank") 待审核列表
+
+      +singlePostTop(Object.assign({}, user, {pid, isAuthor, floor, reviewed, reason, toc, digest, tlm}))
+      +singlePostCenter({pid, title, content, quote, kcb, xsf})
+      +singlePostBottom({vote, voteUp, pid, count, tid})

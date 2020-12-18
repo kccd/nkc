@@ -159,6 +159,7 @@ threadRouter
     const extendPostOptions = {
       uid: data.user?data.user.uid: '',
       visitor: data.user, // 用于渲染页面时比对学术分隐藏
+      toDraftReason: true,
     };
     // 适配旧链接，去掉tid尾部非数字的部分
     try{
@@ -380,9 +381,8 @@ threadRouter
 		// 加载回复
 		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 		// 拓展回复信息
-    data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
-    const data_ = await db.PostModel.filterPostsInfo(data.posts);
-    console.log(data_);
+    // data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
+    data.newPosts = await db.PostModel.filterPostsInfo(data.posts);
     // 获取置顶文章
     if(paging.page === 0 && thread.toppedPostsId && thread.toppedPostsId.length) {
       match.pid = {$in: thread.toppedPostsId};

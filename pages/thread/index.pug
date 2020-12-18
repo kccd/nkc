@@ -368,6 +368,28 @@ block content
               a.button.radius-left(onclick="managePosts()") 管理
               a.button(onclick="markAllPosts()") 全选
               a.button.radius-right(onclick="disabledMarkedPosts()") 屏蔽或退修
+          mixin articleNav
+            .paging-button
+              a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "")  全部
+              a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "")  只看作者
+          .p-l-2.p-r-2
+            include ../publicModules/paging/paging
+            +articleNav
+            if disablePost
+              //- 回复的批量管理
+              +managePosts
+          div.p-a-0
+            include ./singlePost/singlePost
+            for post in data.newPosts
+              //- post数据格式详见/pages/thread/singlePost/singlePost.pug
+              -post.highlight = data.highlight;
+              +singlePost(post)
+          .p-l-2.p-r-2
+            include ../publicModules/paging/paging_input
+            +articleNav
+            if disablePost
+              //- 回复的批量管理
+              +managePosts
           div
             .row
               .thread-div
@@ -377,14 +399,11 @@ block content
                       include ../publicModules/paging/paging
                       //-include ../interface_navigation_paging
                       //-if- !data.thread.firstPost.anonymous
-                      .paging-button
-                        a.button.radius-left(href=`/t/${thread.tid}` class=data.t!=="author"?"active":"")  全部
-                        a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t==="author"?"active":"")  只看作者
                       if disablePost
                         //- 回复的批量管理
                         +managePosts
 
-                    .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
+                    //-.col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
                       for post, index in data.posts
                         //- 文章作者的post无需折叠
                         -let disabledHidePost;
@@ -399,7 +418,7 @@ block content
                         if index !== 1
                           -previousPost = data.posts[index-1];
                         include single_post
-                    .col-xs-12.col-md-12
+                    //-.col-xs-12.col-md-12
                       include ../publicModules/paging/paging_input
                       if disablePost
                         //- 回复的批量管理

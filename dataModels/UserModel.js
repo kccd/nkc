@@ -2303,5 +2303,115 @@ userSchema.statics.getModifyPostTimeLimitMS = async (uid) => {
   return modifyPostTimeLimit * 60 * 60 * 1000;
 };
 
+/*
+* 根据用户的等级以及身份认证信息
+* 判断用户是否有权加载编辑器以及发表相关说明
+* @param {String} uid 用户ID
+* @param {String} type 发表类型 thread文章，post回复
+* @return {Object}
+*   @param {Boolean} permit 是否有权发表
+*   @param {HTML String} warning 提示信息
+* @author pengxiguaa 20200-12-18
+* */
+userSchema.statics.getPostPermission = async (uid, type) => {
+  const SettingModel = mongoose.model('settings');
+  const UserModel = mongoose.model('users');
+  const PostModel = mongoose.model('posts');
+  let result = {
+    permit: false,
+    warning: null
+  };
+  if(!uid) return result;
+  const user = await UserModel.findOnly({uid});
+  const postSettings = await SettingModel.getSettings('post');
+  let settings, postType;
+  if(type === 'thread') {
+    settings = postSettings.postToForum;
+    postType = '文章';
+  } else {
+    settings = postSettings.postToThread;
+    postType = '回复/评论';
+  }
+  const {exam} = settings;
+  const authLevelMin = Number(settings.authLevelMin);
+  const {volumeA, volumeB, notPass} = exam;
+  const {status, unlimited, countLimit} = notPass;
+  const authLevel = await user.extendAuthLevel();
+
+  if(authLevel < authLevelMin) {
+    result = {
+      permit: false,
+      warning: `<div>你还未完成身份认证${authLevelMin}，点击<a href="/u/${uid}/settings/verify">这里</a>去完成。</div>`
+    }
+  } else {
+    if(user.volumeB) {
+      if(!volumeB) {
+        result = {
+          permit: false,
+          warning: `<div>发表${postType}功能已关闭</div>`
+        }
+      } else {
+        result = {
+          permit: true,
+          warning: null
+        }
+      }
+    } else if(user.volumeA) {
+      if(!volumeA) {
+        if(!volumeB) {
+          result = {
+            permit: false,
+            warning: `<div>发表${postType}功能已关闭</div>`
+          }
+        } else {
+          result = {
+            permit: false,
+            warning: `<div>你暂未通过B卷考试，不能发表${postType}。</div>`
+          }
+        }
+      } else {
+        result = {
+          permit: true,
+          warning: null
+        }
+      }
+    } else {
+      if(!status) {
+        if(volumeA) {
+          result = {
+            permit: false,
+            warning: `<div>你暂未通过A卷考试，不能发表${postType}。</div>`
+          }
+        } else if(volumeB) {
+          result = {
+            permit: false,
+            warning: `<div>你暂未通过B卷考试，不能发表${postType}。</div>`
+          }
+        } else {
+          result = {
+            permit: false,
+            warning: `<div>发表${postType}功能已关闭</div>`
+          }
+        }
+      } else if(unlimited) {
+        result = {
+          permit: true,
+          warning: null
+        }
+      } else {
+        const today = require('../nkcModules/apiFunction').today();
+        const count = await PostModel.count({type, uid, toc: {$gte: today}});
+        const contentName = `${type==='post'?'条': '篇'}${postType}`;
+        result = {
+          permit: count < countLimit,
+          warning: `<div>你还未参加考试，每天仅能发表${countLimit}${contentName}。今日已发表${count}${contentName}。
+<br>点击<a href="/exam" target="_blank">这里</a>参加考试，通过后将获得更多发言权限。</div>`
+        };
+      }
+    }
+  }
+  return result;
+};
+
 module.exports = mongoose.model('users', userSchema);
 

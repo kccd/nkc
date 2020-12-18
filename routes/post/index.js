@@ -260,6 +260,7 @@ router
       data.paging = paging;
       const template = Path.resolve("./pages/thread/comments.pug");
       data.html = nkcModules.render(template, data, ctx.state);
+      data.postPermission = await db.UserModel.getPostPermission(data.user?data.user.uid: null, 'post');
     } else {
       q.parentPostsId = pid;
       // 回复详情页 获取评论 平面

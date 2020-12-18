@@ -106,11 +106,11 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                 span.pointer.m-r-05(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
                   span.fa.fa-comment-o &nbsp;
                   span 回复
-              if post.postCount > 0
-                span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid} thread-post-comment-active`)=`评论(${post.postCount})`
-              else if data.user
-                span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论`
-              span.pointer.m-r-05(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`
+              //if post.postCount > 0
+              //  span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid} thread-post-comment-active`)=`评论(${post.postCount})`
+              //else if data.user
+              //  span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论`
+              //span.pointer.m-r-05(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`
               include ../module_vote
               +voteButtons(post, !!data.user)
               if !post.anonymous && addKcb && post.uid !== data.user.uid
@@ -123,10 +123,10 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                 span(data-type='postOption' data-pid=post.pid)
                   .fa.fa-sliders
                 //-+postOptions(post, '',index, dropType)
-            .post-comments-div(id=`post_comments_${post.pid}`)
-              .text-center 加载评论中，请稍候...
-            if data.user
-              -var comment = post;
-              include ./postEdit
-            .m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}', true)` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
-              span.fa.fa-angle-up
+            //.post-comments-div(id=`post_comments_${post.pid}`)
+            //  .text-center 加载评论中，请稍候...
+            //if data.user
+            //  -var comment = post;
+            //  include ./postEdit
+            //.m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}', true)` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
+            //  span.fa.fa-angle-up

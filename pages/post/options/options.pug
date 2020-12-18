@@ -52,6 +52,9 @@
     a.option(v-if='edit !== null' :href="'/editor?ver=ue&type=post&id=' + pid" target="_blank")
       .fa.fa-edit
       span 编辑
+    .option(v-if='reviewed === false' @click='reviewPost')
+      .fa.fa-check-circle-o
+      span 通过审核
     .option(v-if='disable !== null' @click='disablePost')
       .fa.fa-eye-slash
       span 退修或删除
@@ -71,4 +74,6 @@
     .option(v-if='ipInfo !== null' @click='displayIpInfo')
       .fa.fa-map-marker
       span 查看IP
+    .option.time
+      span {{format('YYYY/MM/DD HH:mm:ss', toc)}}
 +includeJS('/post/options/options.js')

@@ -43,7 +43,8 @@ window.PostOption = new Vue({
     violation: null,
     warningPost: null,
     xsf: null,
-    ipInfo: null
+    ipInfo: null,
+    reviewed: null,
   },
   computed: {
     position() {
@@ -67,6 +68,7 @@ window.PostOption = new Vue({
   },
   methods: {
     getUrl: NKC.methods.tools.getUrl,
+    format: NKC.methods.format,
     clickElement(e) {
       e.stopPropagation();
     },
@@ -82,7 +84,7 @@ window.PostOption = new Vue({
       self.loading = true;
       nkcAPI(`/p/${pid}/option`, 'GET')
         .then(data => {
-          const {tid, pid, options, userColumnId, postType, postUserId} = data;
+          const {tid, pid, toc, options, userColumnId, postType, postUserId} = data;
           self.anonymous = options.anonymous;
           self.anonymousUser = options.anonymousUser;
           self.blacklist = options.blacklist;
@@ -101,11 +103,13 @@ window.PostOption = new Vue({
           self.warningPost = options.warningPost;
           self.xsf = options.xsf;
           self.ipInfo = options.ipInfo;
+          self.reviewed = options.reviewed;
 
           self.userColumnId = userColumnId;
           self.postType = postType;
           self.tid = tid;
           self.pid = pid;
+          self.toc = toc;
 
           self.postUserId = postUserId;
 
@@ -234,6 +238,10 @@ window.PostOption = new Vue({
     },
     displayIpInfo() {
       NKC.methods.getIpInfo(this.ipInfo);
+    },
+    reviewPost() {
+      const {pid} = this;
+      reviewPost(pid)
     }
   }
 });
@@ -259,6 +267,6 @@ NKC.methods.initPostOption = () => {
 
 $(function() {
   NKC.methods.initPostOption();
-  const options = $('[data-type="postOption"]');
-  options.eq(0).click();
+  /*const options = $('[data-type="postOption"]');
+  options.eq(0).click();*/
 })

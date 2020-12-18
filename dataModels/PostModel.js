@@ -744,6 +744,7 @@ const defaultOptions = {
   excludeAnonymousPost: false,
   url: false,
   quote: true, // 仅支持同一篇文章
+  toDraftReason: false
 };
 postSchema.statics.extendPost = async (post, options) => {
   const PostModel = mongoose.model("posts");
@@ -758,19 +759,29 @@ postSchema.statics.extendPosts = async (posts, options) => {
   const PostModel = mongoose.model("posts");
   const ResourceModel = mongoose.model('resources');
   const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const DelPostLogModel = mongoose.model('delPostLog');
+  const ThreadModel = mongoose.model('threads');
   const XsfsRecordModel = mongoose.model('xsfsRecords');
+  const SettingModel = mongoose.model('settings');
+  const creditScore = await SettingModel.getScoreByOperationType('creditScore');
   const o = Object.assign({}, defaultOptions);
   Object.assign(o, options);
   o.usersVote = o.usersVote && !!o.uid;
   const uid = new Set(), usersObj = {}, pid = new Set(), resourcesObj = {}, voteObj = {}, kcbsRecordsObj = {}, xsfsRecordsObj = {};
   let postsId = [], postsObj = {};
+  let threadsId = new Set(), threadsAuthor = {};
   let grades, resources;
   posts.map(post => {
+    threadsId.add(post.tid);
     pid.add(post.pid);
     if(o.user) {
       uid.add(post.uid);
     }
   });
+  const threads = await ThreadModel.find({tid: {$in: [...threadsId]}}, {tid: 1, uid: 1});
+  for(const t of threads) {
+    threadsAuthor[t.tid] = t.uid;
+  }
   if(o.credit) {
     const kcbsRecords = await KcbsRecordModel.find({type: 'creditKcb', pid: {$in: [...pid]}}).sort({toc: 1});
     await KcbsRecordModel.hideSecretInfo(kcbsRecords);
@@ -836,6 +847,23 @@ postSchema.statics.extendPosts = async (posts, options) => {
     });
   }
 
+  let draftPostsObj = {};
+  if(o.toDraftReason) {
+    const draftPosts = await DelPostLogModel.find({
+      modifyType: false,
+      postType: 'post',
+      delType: 'toDraft',
+      postId: {$in: [...pid]}
+    }, {
+      postId: 1, reason: 1
+    });
+    for(const d of draftPosts) {
+      const {postId, reason} = d;
+      draftPostsObj[postId] = reason || "";
+    }
+  }
+
+
   const results = [];
   for(let post of posts) {
     if(post.toObject) {
@@ -874,6 +902,7 @@ postSchema.statics.extendPosts = async (posts, options) => {
       for(let r of post.credits) {
         if(r.from) {
           r.fromUser = usersObj[r.from];
+          r.creditName = creditScore.name;
         } else {
           r.fromUser = usersObj[r.operatorId];
           r.type = 'xsf';
@@ -915,6 +944,17 @@ postSchema.statics.extendPosts = async (posts, options) => {
       });
     }
     post.step = postsId.indexOf(post.pid);
+    // 退修理由
+    if(o.toDraftReason) {
+      const reason = draftPostsObj[post.pid];
+      if(reason !== undefined) {
+        post.draft = {
+          reason
+        };
+      }
+    }
+    // 是否为文章作者
+    post.isAuthor = !post.anonymous? post.uid === threadsAuthor[post.tid]:false;
     results.push(post);
   }
   return results;
@@ -1283,17 +1323,19 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       user = {
         uid: null,
         username: anonymousUser.username,
-        avatarUrl: anonymousUser.avatarUrl,
+        avatar: anonymousUser.avatarUrl,
         gradeId: null,
-        gradeName: null
+        gradeName: null,
+        banned: false,
       }
     } else {
       user = {
         uid: post.user.uid,
         username: post.user.username,
-        avatarUrl: tools.getUrl('userAvatar', post.user.avatar),
+        avatar: tools.getUrl('userAvatar', post.user.avatar),
         gradeId: post.user.grade._id,
-        gradeName: post.user.grade.displayName
+        gradeName: post.user.grade.displayName,
+        banned: post.user.certs.includes('banned'),
       }
     }
 
@@ -1311,32 +1353,46 @@ postSchema.statics.filterPostsInfo = async (posts) => {
     const kcb = [], xsf = [];
     if(post.credits && post.credits.length) {
       for(const credit of post.credits) {
-        const {num, type, fromUser, description, toc} = credit;
+        const {_id, hideDescription: hide, creditName, num, type, fromUser, description, toc} = credit;
         const c = {
+          _id,
           uid: fromUser.uid,
           username: fromUser.username,
+          avatar: tools.getUrl('userAvatar', fromUser.avatar),
           description,
           toc,
           number: num
         }
         if(type === 'creditKcb') {
           c.number = c.number / 100;
+          c.type = 'kcb';
+          c.name = creditName;
+          c.hide = hide;
           kcb.push(c);
         } else {
+          c.type = 'xsf';
+          c.name = '学术分';
           xsf.push(c);
         }
       }
     }
-
     const result = {
       pid: post.pid,
+      tid: post.tid,
       floor: post.step,
       toc: post.toc,
-      tlm: post.toc === post.tlm? null: post.tlm,
+      tlm: post.toc.toLocaleDateString() === post.tlm.toLocaleDateString()? null: post.tlm,
       count: post.postCount,
       title: post.t,
       content: post.c,
       vote: post.usersVote || null,
+      reviewed: post.reviewed,
+      draft: post.draft? {reason: post.draft.reason}: null,
+      disabled: post.disabled,
+      isAuthor: post.isAuthor,
+      type: post.type,
+      voteUp: post.voteUp,
+      digest: post.digest,
       user,
       quote,
       kcb,
@@ -1344,7 +1400,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
     };
     results.push(result);
   }
-
+  // console.log(results);
   return results;
 };
 

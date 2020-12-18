@@ -1,0 +1,33 @@
+//- 字段详情/pages/thread/singlePost/singlePost.pug
+if !isIncluded('singlePostTop')
+  mixin singlePostTop(props)
+    -var {pid, username, toc, uid, avatar, home, gradeId, gradeName} = props;
+    -var {reason, reviewed, isAuthor, floor, digest, tlm} = props;
+    .single-post-top
+      .single-post-avatar(
+        data-float-uid=uid
+        )
+        img(src=avatar)
+      .single-post-user
+        .single-post-username
+          a(
+            data-anonymous=!uid
+            href=tools.getUrl('userHome', uid)
+            target='_blank'
+            data-float-uid=uid
+          )=username
+          include ../../user/grade
+          +userGrade(gradeId, gradeName)
+          if digest
+            span.fa.fa-star(title='精选内容')
+          if isAuthor
+            span 作者
+        .single-post-toc
+          +fromNow(toc)
+          if tlm
+            | &nbsp;修改于
+            +fromNow(tlm)
+      .single-post-floor=floor + '楼'
+        .single-post-checkbox
+          label
+            input(type='checkbox' data-pid=pid)
