@@ -2,10 +2,11 @@ const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
     const {state, data, db, params} = ctx;
-    const {user} = data;
+    const {user, uid} = data;
     const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await db.ThreadModel.findOnly({tid: post.tid});
+    const isModerator = await db.PostModel.isModerator(uid, pid);
     const isThread = post.type === 'thread';
     const isPost = post.type === 'post';
     data.postType = isThread? 'thread': 'post';
@@ -45,8 +46,8 @@ router
       if(isPost) {
         // 回复置顶
         if(
-          (ctx.permission("topAllPost") ||
-            (user.uid === thread.uid && await db.PostModel.ensureToppingPermission(user.uid)))
+          (ctx.permission("topAllPost") || // 特殊指定权限
+            (user.uid === thread.uid && await db.PostModel.ensureToppingPermission(user.uid))) // 文章作者且具备置顶的条件
         ) {
           optionStatus.topped = thread.toppedPostsId.includes(post.pid);
         }
@@ -64,23 +65,23 @@ router
         data.postUserId = post.uid;
       }
       // 加精
-      if(ctx.permission('digestPost')) {
+      if(ctx.permission('digestPost') && isModerator) {
         optionStatus.digest = post.digest;
       }
       // 审核
-      if(ctx.permission('review')) {
+      if(ctx.permission('review') && isModerator) {
         optionStatus.reviewed = post.reviewed;
       }
       // 匿名
-      if(ctx.permission('anonymousPost')) {
+      if(ctx.permission('anonymousPost') && isModerator) {
         optionStatus.anonymous = post.anonymous;
         // 查看匿名用户
-        if(post.anonymous && ctx.permission('getPostAuthor')) {
+        if(post.anonymous && ctx.permission('getPostAuthor') && isModerator) {
           optionStatus.anonymousUser = true;
         }
       }
-      // 评学数分
-      if(ctx.permission('creditXsf')) {
+      // 评学术分
+      if(ctx.permission('creditXsf') && isModerator) {
         optionStatus.xsf = true;
       }
       // 鼓励
@@ -88,7 +89,7 @@ router
         optionStatus.kcb = true;
       }
       // 建议修改
-      if(ctx.permission('postWarningPost')) {
+      if(ctx.permission('postWarningPost') && isModerator) {
         optionStatus.warningPost = true;
       }
       // 编辑
@@ -106,11 +107,11 @@ router
       // 退修&删除
       if(isPost) {
         optionStatus.disable = (
-          ctx.permission('movePostsToRecycle') || ctx.permission('movePostsToDraft')
+          (ctx.permission('movePostsToRecycle') || ctx.permission('movePostsToDraft')) && isModerator
         )? true: null;
       }
       // 历史
-      if(post.tlm > post.toc && ctx.permission('visitPostHistory')) {
+      if(post.tlm > post.toc && ctx.permission('visitPostHistory') && isModerator) {
         optionStatus.history = (
           !post.hideHistories || ctx.permission('displayPostHideHistories')
         )? true: null;

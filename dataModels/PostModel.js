@@ -1380,6 +1380,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       pid: post.pid,
       tid: post.tid,
       floor: post.step,
+      cv: post.cv, // post内容版本
       toc: post.toc,
       tlm: post.toc.toLocaleDateString() === post.tlm.toLocaleDateString()? null: post.tlm,
       count: post.postCount,
@@ -1393,6 +1394,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       type: post.type,
       voteUp: post.voteUp,
       digest: post.digest,
+      hide: post.hide,
       user,
       quote,
       kcb,
@@ -1402,6 +1404,21 @@ postSchema.statics.filterPostsInfo = async (posts) => {
   }
   // console.log(results);
   return results;
+};
+
+/*
+* 判断当前用户是否为post所在专业的专家
+* @param {String} uid 用户ID
+* @param {String} pid post ID
+* @return {Boolean} 是否为专家
+* @author pengxiguaa 2020-12-21
+* */
+postSchema.statics.isModerator = async (uid, pid) => {
+  const PostModel = mongoose.model('posts');
+  const ForumModel = mongoose.model('forums');
+  const post = await PostModel.findOne({pid}, {mainForumsId: 1});
+  if(!post) return false;
+  return await ForumModel.isModerator(uid, post.mainForumsId);
 };
 
 module.exports = mongoose.model('posts', postSchema);

@@ -40,7 +40,7 @@
       span(v-else) 取消置顶
     .option(v-if='xsf !== null' @click='addXSF')
       .fa.fa-graduation-cap
-      span 评学数分
+      span 评学术分
     .option(v-if='digest !== null' @click='postDigest')
       .fa.fa-star-o(v-if='digest === false')
       .fa.fa-star(v-else)
@@ -58,7 +58,7 @@
     .option(v-if='disable !== null' @click='disablePost')
       .fa.fa-eye-slash
       span 退修或删除
-    a.option(v-if='history !== null' :href="'/p/' + pid + '/history'")
+    a.option(v-if='history !== null' :href="'/p/' + pid + '/history'" target="_blank")
       .fa.fa-history
       span 历史版本
     .option(v-if='violation !== null' @click='viewViolationRecord')

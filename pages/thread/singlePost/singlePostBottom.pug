@@ -4,6 +4,8 @@ if !isIncluded('singlePostBottom')
   mixin singlePostBottom(props)
     -var {pid, vote, voteUp, count, tid} = props;
     .single-post-bottom
+      .single-post-bottom-item.hidden.switch-hidden-status
+        .switch-hidden-status-button(onclick=`_singlePostModule.switchPostContent('${pid}')`)
       .single-post-bottom-item(onclick=`quotePost('${pid}')`)
         .fa.fa-comment-o.reply-icon
         span 回复
@@ -16,8 +18,9 @@ if !isIncluded('singlePostBottom')
       .single-post-bottom-item
         .post-vote-container
           +singlePostVote(pid, vote, voteUp)
-      .single-post-bottom-item(onclick=`credit('${pid}', 'kcb')` title='鼓励')
-        .fa.fa-cny.credit-kcb
+      if permission('creditKcb')
+        .single-post-bottom-item(onclick=`credit('${pid}', 'kcb')` title='鼓励')
+          .fa.fa-cny.credit-kcb
       .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=pid title='分享')
         .fa.fa-share-square-o.share-icon
       .single-post-bottom-item(data-type='postOption' data-pid=pid title='其他操作')

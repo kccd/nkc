@@ -3,6 +3,7 @@ if !isIncluded('singlePostTop')
   mixin singlePostTop(props)
     -var {pid, username, toc, uid, avatar, home, gradeId, gradeName} = props;
     -var {reason, reviewed, isAuthor, floor, digest, tlm} = props;
+    -var {cancelTopped} = props;
     .single-post-top
       .single-post-avatar(
         data-float-uid=uid
@@ -22,12 +23,14 @@ if !isIncluded('singlePostTop')
             span.fa.fa-star(title='精选内容')
           if isAuthor
             span 作者
+          if cancelTopped
+            span.single-post-cancel-topped(onclick=`topPost('${pid}', false)`) 取消置顶
         .single-post-toc
           +fromNow(toc)
           if tlm
             | &nbsp;修改于
             +fromNow(tlm)
-      .single-post-floor=floor + '楼'
+      a.single-post-floor(href=tools.getUrl('post', pid))=floor + '楼'
         .single-post-checkbox
           label
             input(type='checkbox' data-pid=pid)

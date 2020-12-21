@@ -1,6 +1,6 @@
 @import '../base';
 #moduleSharePanel{
-  height: 14.4rem;
+  height: 14.8rem;
   width: 30rem;
 }
 .share-panel{
@@ -53,18 +53,25 @@
     }
   }
   .share-panel-platform{
-    height: 2.4rem;
+    height: 3rem;
     text-align: center;
     position: relative;
     .share-panel-app{
-      height: 2.4rem;
-      width: 2.4rem;
+      height: 3rem;
+      width: 3rem;
       display: inline-block;
       margin: 0 0.5rem;
       cursor: pointer;
+      line-height: 3rem;
+      text-align: center;
       img{
-        width: 100%;
-        height: 100%;
+        width: 50%;
+        height: 50%;
+      }
+      background-color: #f4f4f4;
+      border-radius: 50%;
+      &.share-panel-link-icon{
+
       }
     }
     .wechat-container{

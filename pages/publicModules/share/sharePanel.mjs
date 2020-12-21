@@ -72,6 +72,7 @@ class SharePanel extends NKC.modules.DraggablePanel {
           }
           const {url, title, description, cover} = this;
           if(type === 'copy') {
+            console.log(this.clipboard)
             if(this.clipboard) return;
             this.clipboard = new ClipboardJS('#sharePanelButton', {
               text: function(trigger) {

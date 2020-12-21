@@ -6,6 +6,8 @@ window.PostOption = new Vue({
 
     loading: true,
 
+    jqDOM: null,
+
     uid: NKC.configs.uid,
     // 类型 thread、post
     pid: '',
@@ -48,10 +50,22 @@ window.PostOption = new Vue({
   },
   computed: {
     position() {
-      const {top, left, domHeight, domWidth} = this;
-      return {
-        top: top - domHeight,
-        left: left - domWidth
+      const {direction, jqDOM, domHeight, domWidth} = this;
+      if(jqDOM === null) return {
+        left: 0,
+        top: 0,
+      };
+      const {top, left} = jqDOM.offset();
+      if(direction === 'up') {
+        return {
+          top: top - domHeight,
+          left: left - domWidth + jqDOM.width()
+        }
+      } else {
+        return {
+          top: top + jqDOM.height(),
+          left: left + jqDOM.width() - domWidth
+        }
       }
     }
   },
@@ -76,9 +90,9 @@ window.PostOption = new Vue({
       this.show = false;
     },
     open(props) {
-      const {pid, top, left} = props;
-      this.top = top;
-      this.left = left;
+      const {pid, direction, jqDOM} = props;
+      this.jqDOM = jqDOM;
+      this.direction = direction;
       const self = this;
       self.show = true;
       self.loading = true;
@@ -255,10 +269,11 @@ NKC.methods.initPostOption = () => {
     dom.on('click', (e) => {
       let {left, top} = dom.offset();
       const pid = dom.attr('data-pid');
+      const direction = dom.attr('data-direction') || 'up';
       PostOption.open({
         pid,
-        left: left + dom.width(),
-        top: top - 2,
+        direction,
+        jqDOM: dom,
       });
       e.stopPropagation();
     });

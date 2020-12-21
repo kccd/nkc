@@ -15,6 +15,7 @@
   @param {Boolean} isAuthor 是否为作者
   @param {String} type 内容类型 thread为文章，post为回复
   @param {Boolean} digest 是否加精
+  @param {String} hide 隐藏内容 all全部，half部分，not不折叠，null默认
 
   @param {Object} draft 退修 未退修时此字段为null
     @param {String} reason 退修理由或建议
@@ -63,16 +64,20 @@ if !isIncluded('singlePost')
   include ./singlePostCenter
   include ./singlePostBottom
   +includeCSS('/thread/singlePost/singlePost.css')
+  +includeJS('/thread/singlePost/singlePost.js')
   mixin singlePost(props)
     -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, draft} = props;
     -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp} = props;
-    -var {digest, type, tid, highlight} = props;
+    -var {digest, type, tid, highlight, hide} = props;
+    -var {cancelTopped, hidePostBottom} = props;
     .single-post-container(
       data-un-reviewed=!reviewed
       data-disabled=disabled
       data-return=!!draft
       data-highlight=highlight === pid
-      id=highlight === pid? 'highlight':''
+      data-pid=pid
+      data-hide=isAuthor? 'not': hide
+      id=highlight === pid? 'highlight': undefined
       )
       if draft
         .single-post-header
@@ -95,6 +100,7 @@ if !isIncluded('singlePost')
               | 按钮。
               a(href=`/review` target="_blank") 待审核列表
 
-      +singlePostTop(Object.assign({}, user, {pid, isAuthor, floor, reviewed, reason, toc, digest, tlm}))
+      +singlePostTop(Object.assign({}, user, {pid, isAuthor, floor, reviewed, reason, toc, digest, tlm, cancelTopped}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
-      +singlePostBottom({vote, voteUp, pid, count, tid})
+      if !hidePostBottom
+        +singlePostBottom({vote, voteUp, pid, count, tid})

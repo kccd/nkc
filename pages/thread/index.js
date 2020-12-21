@@ -4,38 +4,18 @@ var hidePostFloat;
 var Attachments;
 var quotePostApp;
 $(document).ready(function(){
-  var DW = $(document).width();
-  hidePostFloat = NKC.configs.postHeight.float;
-  if(DW < 768) {
-    hidePostMaxHeight = NKC.configs.postHeight.xs;
-  } else if(DW < 992) {
-    hidePostMaxHeight = NKC.configs.postHeight.sm;
-  } else {
-    hidePostMaxHeight = NKC.configs.postHeight.md;
-  }
-  var hidePostDom = $(".hide-post.part");
-
   new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
   		setTimeout(function() {
   		  resolve();
-		  }, 500)
+		  }, 300)
 	  } else {
   		resolve();
 	  }
   })
 	  .then(function() {
-		  for(var i = 0; i < hidePostDom.length; i++) {
-			  var d = hidePostDom.eq(i);
-			  var contentDom = d.find(".thread-post-mask");
-			  var pid = d.attr("data-pid");
-			  if(contentDom.height() > hidePostMaxHeight) {
-				  hidePost(pid);
-				  $(".hide-post-button[data-pid='"+pid+"']").css({
-					  "display": "inline-block"
-				  });
-			  }
-		  }
+	  	// 内容折叠
+			_singlePostModule.autoHidePostContent();
 	  })
 	  .catch(function(data) {
 	  	console.error(data);
@@ -1064,58 +1044,6 @@ function topPost(pid, topped) {
     .catch(function(data) {
       sweetError(data);
     });
-}
-
-/*function hidePost(pid, type) {
-  nkcAPI("/p/" + pid + "/hide", "POST", {type: type})
-    .then(function() {
-      window.location.reload();
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
-}*/
-
-function hidePost(pid) {
-  var dom = $(".hide-post[data-pid='"+pid+"']");
-  var span = $(".hide-post-button[data-pid='"+pid+"']>button>span");
-  var fa = $(".hide-post-button[data-pid='"+pid+"']>button>.fa");
-  var mask = dom.find(".thread-post-mask");
-  dom.addClass("active");
-  mask.css({
-    "max-height": hidePostMaxHeight * hidePostFloat + "px"
-  });
-  span.text("加载全文");
-  fa.removeClass("fa-angle-up").addClass("fa-angle-down");
-}
-
-function showPost(pid) {
-  var dom = $(".hide-post[data-pid='"+pid+"']");
-  var span = $(".hide-post-button[data-pid='"+pid+"']>button>span");
-  var fa = $(".hide-post-button[data-pid='"+pid+"']>button>.fa");
-  dom.removeClass("active");
-  var mask = dom.find(".thread-post-mask");
-  mask.css({
-    "max-height": "none"
-  });
-  span.text("收起");
-  fa.removeClass("fa-angle-down").addClass("fa-angle-up");
-}
-
-function switchPost(pid) {
-	var dom = $(".hide-post[data-pid='"+pid+"']");
-  if(dom.hasClass("active")) {
-		var scrollY = $(document).scrollTop();
-		showPost(pid);
-		// 使滚动条卷去的高度不变，body向下伸展
-		scrollTo(0, scrollY);
-		// 使此条post移动到视口的顶部
-		// scrollTo(0, dom.parents(".single-post").offset().top - 45);
-  } else {
-		var pagePosition = new NKC.modules.PagePosition();
-		hidePost(pid);
-		pagePosition.restore();
-  }
 }
 
 /*function showAttachments(dom) {

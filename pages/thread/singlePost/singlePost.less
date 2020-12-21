@@ -1,7 +1,7 @@
 @import '../../publicModules/base';
 @postTopHeight: 3.2rem;
 .single-post-container{
-  padding: 1rem 2.5rem 1rem 2.5rem;
+  padding: 0.9rem 2.5rem 0.9rem 2.5rem;
   border-bottom: 1px solid #eee;
   transition: background-color 200ms;
   &:last-child{
@@ -37,6 +37,11 @@
     .disabled{
       color: #c70000;
     }
+  }
+}
+@media (max-width: 768px) {
+  .single-post-container{
+    padding: 1rem 1.2rem 1rem 1.2rem;
   }
 }
 .single-post-top{
@@ -93,40 +98,44 @@
 }
 .single-post-center{
   margin-bottom: 1rem;
-  //padding-left: 4rem;
+  overflow: hidden;
+}
+.single-post-cancel-topped{
+  cursor: pointer;
+  font-size: 1.2rem;
 }
 
 .single-post-bottom{
   text-align: right;
   font-size: 1rem;
-  .single-post-bottom-item{
-    display: inline-block;
-    vertical-align: top;
-    cursor: pointer;
-    margin-right: 0.3rem;
-    height: 1.6rem;
-    line-height: 1.6rem;
-    .reply-icon{
-      margin-right: 0.2rem;
-    }
-    .share-icon{
-      font-size: 1.2rem;
-      margin-top: 2px;
-      color: #999;
-    }
-    .option-icon{
-      font-size: 1.2rem;
-      color: #999;
-      margin-top: 0.5px;
-    }
-    .post-vote-container{
-      margin-top: 1px;
-    }
-    .credit-kcb{
-      font-size: 1.2rem;
-      color:#999;
-      margin-top: 2px;
-    }
+}
+.single-post-bottom-item{
+  display: inline-block;
+  vertical-align: top;
+  cursor: pointer;
+  margin-right: 0.3rem;
+  height: 1.6rem;
+  line-height: 1.6rem;
+  .reply-icon{
+    margin-right: 0.2rem;
+  }
+  .share-icon{
+    font-size: 1.2rem;
+    margin-top: 2px;
+    color: #999;
+  }
+  .option-icon{
+    font-size: 1.2rem;
+    color: #999;
+    margin-top: 0.5px;
+  }
+  .post-vote-container{
+    margin-top: 1px;
+  }
+  .credit-kcb{
+    font-size: 1.2rem;
+    color:#999;
+    margin-top: 2px;
   }
 }
 

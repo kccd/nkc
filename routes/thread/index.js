@@ -212,8 +212,6 @@ threadRouter
     }
     // 获取当前用户有权查看文章的专业ID
     const fidOfCanGetThreads = await db.ForumModel.getThreadForumsId(data.userRoles, data.userGrade, data.user);
-		// 获取当前文章所在的专业（不含用户无权访问的专业）
-    const mainForums = forums.filter(forum => thread.mainForumsId.includes(forum.fid));
     // 文章的专业导航
     data.forumsNav = [];
     for(const f of thread.mainForumsId) {
@@ -221,14 +219,7 @@ threadRouter
       if(nav.length) data.forumsNav.push(nav);
     }
     // 判断用户是否具有专家权限
-    let isModerator = ctx.permission('superModerator');
-    if(!isModerator) {
-      // 若用户为某个父级专业的专家，则用户具有专家权限
-      for(const f of mainForums) {
-        isModerator = await f.isModerator(data.user?data.user.uid: '');
-        if(isModerator) break;
-      }
-    }
+    const isModerator = await db.ForumModel.isModerator(data.uid, thread.mainForumsId);
     // 页面顶部导航
     data.threadNav = await thread.getThreadNav();
     data.collectedCount = await db.ThreadModel.getCollectedCountByTid(thread.tid);
@@ -366,23 +357,15 @@ threadRouter
 			page = pageCount -1;
 		}
 
-    // 设置标志 表示用户是否有权限置顶文章
-    if(
-      ctx.permission("topAllPost") ||
-      (data.user && data.user.uid === thread.uid && await db.PostModel.ensureToppingPermission(data.user.uid))
-    ) {
-      data.topPost = true;
-    }
-
 		// 获取文章下当前页的所有回复
     // 计算页数
 		const paging = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		data.paging = paging;
 		// 加载回复
-		const posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
+		let posts = await db.PostModel.find(match).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
 		// 拓展回复信息
-    // data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
-    data.newPosts = await db.PostModel.filterPostsInfo(data.posts);
+    data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
+    data.posts = await db.PostModel.filterPostsInfo(data.posts);
     // 获取置顶文章
     if(paging.page === 0 && thread.toppedPostsId && thread.toppedPostsId.length) {
       match.pid = {$in: thread.toppedPostsId};
@@ -401,6 +384,7 @@ threadRouter
         const p = toppedPostsObj[toppedPostId];
         if(p) data.toppedPosts.push(p);
       }
+      data.toopedPosts = await db.PostModel.filterPostsInfo(data.toppedPosts);
     }
     // 判断 如果文章为匿名发表，则清除作者信息
     if(thread.firstPost.anonymous) {
@@ -410,24 +394,6 @@ threadRouter
     }
     // 设置标志 表明当前用户是否为文章作者
     thread.firstPost.ownPost = data.user && data.user.uid === thread.uid;
-		// 【待改】给被退回的post加上标记
-		const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: tid}, {postId: 1, reason: 1});
-		const toDraftPostsId = toDraftPosts.map(post => post.postId);
-		data.posts.map(async post => {
-			const index = toDraftPostsId.indexOf(post.pid);
-			if(index !== -1) {
-				post.todraft = true;
-				post.reason = toDraftPosts[index].reason;
-			}
-		});
-		// data.posts = posts;
-		// console.log(data.posts)
-		// 加载文章所在专业位置，移动文章的选择框
-		// data.forumList = await db.ForumModel.visibleForums(data.userRoles, data.userGrade, data.user);
-		// data.parentForums = await forum.extendParentForum();
-		// data.forumsThreadTypes = await db.ThreadTypeModel.find().sort({order: 1});
-		// data.selectedArr = breadcrumbForums.map(f => f.fid);
-		// data.selectedArr.push(forum.fid);
 		data.cat = thread.cid;
 		// 若当前用户已登录，则加载用户已发表的文章
 		if(data.user) {
@@ -753,6 +719,7 @@ threadRouter
     // 帖子设置
     data.threadSettings = await db.SettingModel.getSettings("thread");
     data.postHeight = hidePostSettings.postHeight;
+    data.postPermission = await db.UserModel.getPostPermission(data.uid, 'post');
 		data.pid = pid;
 		data.step = step;
 		await next();

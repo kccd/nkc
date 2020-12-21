@@ -2281,6 +2281,15 @@ userSchema.methods.getUserOperationsId = async function() {
   return [...new Set(operations)];
 };
 /*
+* 判断用户是否为顶级专家
+* @return {Boolean}
+* @author pengxiguaa 2020-12-21
+* */
+userSchema.methods.isSuperModerator = async function() {
+  const userOperationsId = await this.getUserOperationsId();
+  return userOperationsId.includes(`superModerator`);
+};
+/*
 * 获取用户修改post的最长时间
 * @param {String} uid user ID
 * @return {Number} 毫秒数
