@@ -271,7 +271,7 @@ async function addImageTextWaterMask(op) {
   return ffmpegFilter(input, output, [
     `movie='${image}'[logo]`,
     `[logo]scale=${logoWidth}:${logoHeight}[image]`,
-    `[image]pad=${padWidth}:${padHeight}:0:0:white@0, drawtext=x=${logoWidth + gap}:y=${logoHeight-textHeight}/2:text='${text}':fontsize=${fontSize}:fontcolor=white:fontfile='${fontFilePathForFFmpeg}:shadowcolor=black:shadowx=1:shadowy=1', lut=a=val*${transparency}[watermask]`,
+    `[image]pad=${padWidth}:${padHeight + 1}:0:0:white@0, drawtext=x=${logoWidth + gap}:y=${logoHeight-textHeight}/2:text='${text}':fontsize=${fontSize}:fontcolor=white:fontfile='${fontFilePathForFFmpeg}:shadowcolor=black:shadowx=1:shadowy=1', lut=a=val*${transparency}[watermask]`,
     `[0:v][watermask]overlay=${position.x}:${position.y}`
   ])
 }
