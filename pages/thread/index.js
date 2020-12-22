@@ -1269,6 +1269,10 @@ $(function() {
 			// 仅在最后一页时才动态插入内容
 			if(!threadData.isLastPage) return;
 			var JQDOM = $(data.html).find('.single-post-container');
+			JQDOM = JQDOM[0];
+			// 公式渲染
+			MathJax.typesetPromise([JQDOM]);
+			JQDOM = $(JQDOM)
 			var parentDom = $('.single-posts-container');
 			parentDom.append(JQDOM);
 			// 用户悬浮面板
@@ -1281,6 +1285,8 @@ $(function() {
 			NKC.methods.initVideo();
 			// 操作
 			NKC.methods.initPostOption();
+			// 图片预览
+			NKC.methods.initImageViewer();
 			// 划词笔记
 			nkchl.push(new NKC.modules.NKCHL({
 				type: 'post',
