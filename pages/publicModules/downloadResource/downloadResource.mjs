@@ -66,6 +66,10 @@ NKC.modules.downloadResource = class {
             .then(data => {
               let {free, paid, resource, costScores, fileCountLimitInfo} = data.detail;
               self.fileCountLimitInfo = fileCountLimitInfo;
+              if(!resource.isFileExist) {
+                self.status = "fileNotExist";
+                return;
+              }
               self.status = (!free && !paid) ? "needScore": "noNeedScore";
               self.free = free;
               self.paid = paid;
@@ -124,14 +128,29 @@ NKC.modules.downloadResource = class {
 
 (function() {
   const dr = new NKC.modules.downloadResource();
-  let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
-  attachments.forEach(attachment => {
-    $(attachment).find("a.article-attachment-name").on("click", e => {
+  NKC.methods.openFilePanel = function(rid) {
+    dr.open(rid);
+  }
+
+  // 监听评论盒子
+  $("#wrap").on("click", function(e) {
+    let type = $(e.target).attr("data-type");
+    if(type === "clickAttachmentTitle") {
       e.preventDefault();
       e.stopPropagation();
-      let rid = $(attachment).attr("data-id");
+      let rid = $(e.target).attr("data-id");
       dr.open(rid);
       return false;
-    })
+    }
   })
+  // let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
+  // attachments.forEach(attachment => {
+  //   $(attachment).find("a.article-attachment-name").on("click", e => {
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //     let rid = $(attachment).attr("data-id");
+  //     dr.open(rid);
+  //     return false;
+  //   })
+  // })
 }());

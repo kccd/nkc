@@ -77,5 +77,31 @@
   "CRContent": "被投诉用户发表的内容类型",
   "CRContentURL": "被偷投诉用户发表的内容地址",
   "CRReason": "投诉原因",
-  "CRResult": "投诉处理结果"
+  "CRResult": "投诉处理结果",
+
+  "newForumReview": "新专业开办申请",
+  "NFRUserProfile": "申请人主页链接",
+  "NFRUserName": "申请人用户名",
+  "NFRName": "新专业名字",
+  "NFRReview": "审核页面链接",
+
+  "inviteFounder": "新专业创始人邀请",
+  "IFUserProfile": "邀请人主页链接",
+  "IFUserName": "邀请人用户名",
+  "IFName": "新专业名字",
+  "IFAccept": "接受邀请链接(访问即接受)",
+  "IFRefuse": "拒绝接受邀请链接(访问即拒绝)",
+
+  "newForumReviewResolve": "新专业申请审核通过",
+  "NFRSName": "专业名",
+  "NFRSUrl": "专业主页",
+  "NFRSExpired": "筹备截止日期",
+  
+  "newForumReviewReject": "新专业申请审核不通过",
+  "NFRJName": "专业名",
+  
+  "becomeFormalForum": "筹备专业状态变更",
+  "BFFName": "专业名",
+  "BFFUrl": "专业主页链接",
+  "BFFMessage": "变更信息"
 }

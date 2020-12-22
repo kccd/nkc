@@ -326,6 +326,11 @@ const forumSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+  // 创始人uid列表
+  founders: {
+    type: Array,
+    default: [],
   }
 }, {toObject: {
 		getters: true,
@@ -2237,4 +2242,43 @@ forumSchema.statics.checkForumCategoryBeforePost = async (_fids) => {
     }
   }
 };
+
+
+/**
+ * 创建专业
+ */
+forumSchema.statics.createForum = async (displayName, type ="forum") => {
+  if(!displayName) throwErr(400, '名称不能为空');
+  let ForumModel = mongoose.model("forums");
+  let ForumCategoryModel = mongoose.model('forumCategories');
+  let SettingModel = mongoose.model('settings');
+  const sameDisplayNameForum = await ForumModel.findOne({displayName});
+  if(sameDisplayNameForum) throwErr(400, '名称已存在');
+  let _id;
+  while(1) {
+    _id = await SettingModel.operateSystemID('forums', 1);
+    const sameIdForum = await ForumModel.findOne({fid: _id});
+    if(!sameIdForum) {
+      break;
+    }
+  }
+  const forumCategories = await ForumCategoryModel.getAllCategories();
+  const newForum = ForumModel({
+    fid: _id,
+    categoryId: forumCategories[0]._id,
+    displayName,
+    accessible: true,
+    visibility: false,
+    rolesId: ['dev', 'default'],
+    type
+  });
+
+  await newForum.save();
+  // 更新专业缓存
+  const cacheForums = require("../redis/cacheForums");
+  await cacheForums();
+  await ForumModel.saveForumToRedis(_id);
+  return newForum;
+};
+
 module.exports = mongoose.model('forums', forumSchema);

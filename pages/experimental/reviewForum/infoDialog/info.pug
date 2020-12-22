@@ -1,0 +1,40 @@
+mixin infoVueApp()
+  - let vueAppSelector = tools.createVueAppSelector();
+  .modal.fade(id=`${vueAppSelector}App` tabindex="-1" role="dialog" aria-labelledby="myModalLabel")
+    .modal-dialog(role="document")
+      .modal-content(id=vueAppSelector)
+        .modal-header
+          button(type="button" class="close" data-dismiss="modal" aria-label="Close")
+            span(aria-hidden="true") &times;
+          h5.modal-title 信息
+        .modal-body
+          .text-center.m-t-5.m-b-5(v-if="loadding") 加载中...
+          .form(v-else)
+            .form-group
+              label 申请人: 
+                a(:href="'/u/' + pForum.uid" target="_blank") {{pForum.username}}
+            .form-group
+              label 状态: 
+                span(v-if="pForum.review === 'pendding'") 待处理
+                span(v-if="pForum.review === 'resolved'") 已通过
+                span(v-if="pForum.review === 'rejected'") 已驳回
+            .form-group
+              label 创始人团队成员:
+                p(v-for="user of foundersInfo")
+                  a(:href="'/u/' + user.uid" target="_blank") {{user.username}}&nbsp;&nbsp;
+                  span {{!user.accept ? "未响应" : user.accept === "resolve" ? "已接受" : user.accept === "reject" ? "已拒绝" : "未响应"}}
+            .form-group
+              label 拟定专业名:
+                span {{pForum.info.newForumName}}
+            .form-group
+              label 开办理由:
+                span {{pForum.info.reason}}
+            .form-group
+              label 贡献计划:
+                span {{pForum.info.youWantToDo}}
+        .modal-footer
+          button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 关闭
+          button(type="button" class="btn btn-sm btn-primary" v-if="pForum && pForum.review === 'pendding'" @click="reviewPass()") 通过
+          button(type="button" class="btn btn-sm btn-danger" v-if="pForum && pForum.review === 'pendding'" @click="reviewReject()") 驳回
+  +includeJS("/nationCodes/nationCodes.js")
+  +includeVueApp("/experimental/reviewForum/infoDialog/info.js", vueAppSelector)

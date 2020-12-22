@@ -11,7 +11,7 @@ NKC.modules.SelectUser = function() {
       users: [],
       searchUsers: [],
       selectedUsersId: [],
-      userCount: 1,
+      userCount: 0,
       searchInfo: "",
       type: "username", // username, uid
       keyword: "",
@@ -46,7 +46,10 @@ NKC.modules.SelectUser = function() {
       },
       selectUser: function(u) {
         if(this.selectedUsersId.indexOf(u.uid) === -1) {
-          this.selectedUsersId.push(u.uid);
+          let selectedUserCount = this.selectedUsersId.length;
+          if(selectedUserCount < this.userCount) {
+            this.selectedUsersId.push(u.uid);
+          }
         }
       },
       search: function() {
@@ -97,6 +100,7 @@ NKC.modules.SelectUser = function() {
           self.app.searchUsers = [];
           self.app.type = "username";
           self.app.selectedUsersId = [];
+          self.app.userCount = 0;
         }, 1000);
       },
       done: function() {

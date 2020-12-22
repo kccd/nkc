@@ -488,6 +488,28 @@ router
 
 		state.threadListStyle = data.forum.threadListStyle;
 
+		// 查出是否是筹备专业
+		const [ pForum ] = await db.PreparationForumModel.find({ review: "resolved", fid: forum.fid, formal: false });
+		if(pForum) {
+			data.isPreparationForum = true;
+			// 读取创始人
+			let { founders } = pForum;
+			let list  = [];
+			for(let founder of founders) {
+				let { uid, accept } = founder;
+				if(accept !== "resolve") continue;
+				const user = await db.UserModel.findOne({uid});
+				list.push({
+					username: user.username,
+					uid,
+					avatar: user.avatar
+				})
+			}
+			data.founderList = list;
+		} else {
+			data.isPreparationForum = false;
+		}
+
 		await next();
 	})
   .use("/card", cardRouter.routes(), cardRouter.allowedMethods())

@@ -745,5 +745,13 @@
   "experimentalVerificationSettings": "后台管理 - 图形验证",
 
   "buyResource": "购买资源",
-  "resourceDetail": "资源详情"
+  "resourceDetail": "资源详情",
+
+  "myForum": "我的专业",
+  "commitForumApply": "提交开办专业申请",
+  "reviewForum": "审核专业",
+  "reviewForumFinal": "提交审核结果",
+  "reviewForumReject": "驳回开办申请",
+  "acceptFounderInvite": "处理创始人邀请",
+  "responseFounderInvite": "响应创始人邀请"
 }

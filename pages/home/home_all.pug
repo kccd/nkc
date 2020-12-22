@@ -146,6 +146,13 @@ block content
                 +detailedForumList(f)
               else
                 +normalForumList(f)
+        
+        if data.user && data.hasPermissionOpenNewForum
+          .m-b-1
+            .home-columns-link
+              a(href=`/u/${data.user.uid}/forum` target="_blank") 开办专业
+              .home-columns-link-info 你的账号已满足开办专业所需要的所有条件，点击按钮即可申请开办专业。
+              .home-columns-link-info 提交申请 → 筹备专业(30天) → 正式专业
 
 
         if data.goodsForums.length && data.showShopGoods
@@ -310,6 +317,7 @@ block content
               .home-columns-link
                 a(href=`/column/apply` target="_blank") 开设专栏
                 .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
+            
 
         if data.enableFund
           .home-forums-other.m-b-1

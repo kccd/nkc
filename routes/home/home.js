@@ -126,6 +126,23 @@ module.exports = async (options) => {
     data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
   }*/
   await nkcModules.apiFunction.extendManagementInfo(ctx);
-
+  // 是否有权限开办专业
+  data.hasPermissionOpenNewForum = false;
+  const forumSetting = await db.SettingModel.getSettings('forum');
+  const {
+    openNewForumCert = [],
+    openNewForumGrade = [],
+    openNewForumRelationship = "or"
+  } = forumSetting;
+  const certs = user.certs;
+  const grades = user.grade.id;
+  let allowCerts = openNewForumCert.filter(allowCert => certs.includes(allowCert));
+  let allowGrades = openNewForumGrade.filter(allowGrade => grades.includes(allowGrade));
+  if(openNewForumRelationship === "or") {
+    data.hasPermissionOpenNewForum = allowCerts.length || allowGrades.length;
+  }
+  if(openNewForumRelationship === "and") {
+    data.hasPermissionOpenNewForum = allowCerts.length && allowGrades.length;
+  }
   ctx.template = "home/home_all.pug";
 };

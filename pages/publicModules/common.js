@@ -890,3 +890,32 @@ NKC.methods.showNotification = function(title, body, time) {
     return toShow();
   }
 }
+
+
+
+// service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/serviceWorker/index.js')
+    .then(function(registration) {
+      return registration.update();
+    })
+    .then(function(registration) {
+      return new Promise(function(resolve, reject) {
+        if(registration.active) {
+          return resolve(registration.active);
+        } else {
+          registration.addEventListener("updatefound", function() {
+            if(registration.active) {
+              return resolve(registration.active);
+            }
+          });
+        }
+      });
+    })
+    .then(function(worker) {
+      NKC.modules.serviceWorker = worker;
+    })
+    .catch(function(error) {
+      console.log('Registration failed with ' + error);
+    })
+}
