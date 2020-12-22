@@ -28,7 +28,7 @@
           img(:src="getUrl('fileCover', a.ext)")
         .attachment-content
           .attachment-download
-            .fa.fa-cloud-download(@click="visitUrl('/r/' + a.rid, true)" title="点击下载")
+            .fa.fa-cloud-download(title="点击下载" :onclick="'NKC.methods.openFilePanel(\"'+a.rid+'\")'")
             .attachment-hits {{a.hits}}
           .attachment-name(@click="displayResourceInfo(a)") {{a.oname}}
           .attachment-info

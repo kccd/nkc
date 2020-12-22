@@ -24,6 +24,7 @@ NKC.modules.ResourceInfo = function() {
         self.app.type = "resource";
         nkcAPI("/r/" + rid + "/info", "GET")
           .then(function(data) {
+            delete data.resource.type;
             self.app.loading = false;
             self.app.resource = data.resource;
             self.app.forums = data.forums;
@@ -52,9 +53,9 @@ NKC.modules.ResourceInfo = function() {
         if(options.lid) {
           this.getLibrary(options.lid);
         } else if(options.rid) {
-          this.getResource(options.rid);  
+          this.getResource(options.rid);
         }
-        
+
       },
       close: function() {
         self.dom.modal("hide");

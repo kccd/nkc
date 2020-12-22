@@ -247,8 +247,6 @@ window.NKCHighlighter = class {
 
     let interval;
 
-    console.log('监听事件');
-
     document.addEventListener("mousedown", () => {
       clearInterval(interval);
     });
@@ -259,7 +257,6 @@ window.NKCHighlighter = class {
 
       interval = setTimeout(() => {
         self.initEvent();
-        console.log(1);
       }, 500);
     });
 
