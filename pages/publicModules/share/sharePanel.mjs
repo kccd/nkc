@@ -115,7 +115,8 @@ NKC.methods.initSharePanel = () => {
         shareType,
         shareId,
       });
-    })
+    });
+    dom.attr('data-init', 'true');
   }
 };
 

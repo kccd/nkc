@@ -39,7 +39,7 @@ block content
   -const {exactPost} = data
     .container-fluid.max-width
       .hidden#threadId= data.thread.tid
-      .hidden#threadForumsId=objToStr({notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
+      .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
@@ -337,7 +337,7 @@ block content
               //- 回复的批量管理
               +managePosts
           //- 回复列表内容
-          div.p-a-0
+          div.p-a-0.single-posts-container
             include ./singlePost/singlePost
             for post in data.posts
               //- post数据格式详见/pages/thread/singlePost/singlePost.pug
@@ -509,6 +509,8 @@ block scripts
   include ../publicModules/bulletComments/bulletComments
   include ../publicModules/share/sharePanel
   include ../post/options/options
+  //- 通用socket
+  include ../publicModules/socket/socket
   //- 下载资料询问框
   //if state.downloadNeedScore
   include ../publicModules/downloadResource/downloadResource

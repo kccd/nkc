@@ -1,4 +1,4 @@
-/* 
+/*
   events:
     select: 划词
     create: 创建实例
@@ -208,7 +208,7 @@ window.Source = class {
         node = node.splitText(startOffset);
       }
       if(node.textContent.length !== needLength) {
-        node.splitText(needLength);  
+        node.splitText(needLength);
       }
       return node;
     });
@@ -247,6 +247,8 @@ window.NKCHighlighter = class {
 
     let interval;
 
+    console.log('监听事件');
+
     document.addEventListener("mousedown", () => {
       clearInterval(interval);
     });
@@ -257,6 +259,7 @@ window.NKCHighlighter = class {
 
       interval = setTimeout(() => {
         self.initEvent();
+        console.log(1);
       }, 500);
     });
 

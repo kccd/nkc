@@ -12,7 +12,7 @@ if !isIncluded('singlePostBottom')
       .single-post-bottom-item
         if count > 0
           span(onclick=`viewPostComments('${tid}', '${pid}')` class=`show_comments_button_${pid} thread-post-comment-active`)=`评论(${count})`
-        else if data.user
+        else
           span(onclick=`viewPostComments('${tid}', '${pid}')` class=`show_comments_button_${pid}`)=`评论`
         span(onclick=`hidePostComments('${pid}')` class=`display-n hide_comments_button_${pid}`)=`折叠评论`
       .single-post-bottom-item

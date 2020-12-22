@@ -890,10 +890,13 @@ threadRouter
       uid: data.user.uid
     };
     await db.SubscribeModel.insertSubscribe("replay", data.user.uid, tid);
-    await nkcModules.socket.sendPostMessage({
-      postId: thread.oc,
-      targetPostId: _post.pid
-    });
+    // 仅推送回复不推送评论
+    if(postType !== 'comment') {
+      await nkcModules.socket.sendPostMessage({
+        postId: thread.oc,
+        targetPostId: _post.pid
+      });
+    }
     //-global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })

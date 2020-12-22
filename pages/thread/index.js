@@ -496,11 +496,14 @@ function submit(tid) {
       })
     })
     .then(function(data) {
-    	if(NKC.configs.platform === 'reactNative') {
+    	ue.setContent('');
+			setSubmitButton(false);
+    	return screenTopAlert('发送成功');
+    	/*if(NKC.configs.platform === 'reactNative') {
 				NKC.methods.visitUrlAndClose(data.redirect);
 			} else {
 				openToNewLocation(data.redirect);
-			}
+			}*/
     })
     .catch(function(data) {
       sweetError(data);
@@ -1259,6 +1262,23 @@ $(function() {
 			// 排除自己的发表
 			// if(NKC.configs.uid === data.comment.uid) return;
 			bulletComments.add(data.comment);
+			// 仅在最后一页时才动态插入内容
+			if(!threadData.isLastPage) return;
+			var JQDOM = $(data.html).find('.single-post-container');
+			var parentDom = $('.single-posts-container');
+			parentDom.append(JQDOM);
+			// 用户悬浮面板
+			floatUserPanel.initPanel();
+			// 分享
+			NKC.methods.initSharePanel();
+			// 操作
+			NKC.methods.initPostOption();
+			// 划词笔记
+			nkchl.push(new NKC.modules.NKCHL({
+				type: 'post',
+				targetId: data.comment.postId,
+				notes: []
+			}));
 		});
 		if(socket.connected) {
 			joinPostRoom();

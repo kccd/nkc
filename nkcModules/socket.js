@@ -54,9 +54,14 @@ func.sendPostMessage = async (data) => {
   });
   if(!post) return;
   const comment = await db.PostModel.getSocketCommentByPid(post);
+  let postData = await db.PostModel.extendPost(post);
+  postData = (await db.PostModel.filterPostsInfo([postData]))[0];
+  const render = require('../nkcModules/render');
+  const html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData});
   const roomName = getRoomName('post', data.postId);
   global.NKC.io.to(roomName).emit('postMessage', {
-    comment
+    comment,
+    html
   });
 }
 

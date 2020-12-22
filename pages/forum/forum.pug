@@ -74,6 +74,8 @@ block content
                     .count=data.forum.countPostsToday
                     .name 条更新
             .forum-buttons
+              if permission('visitForumInfoSettings')
+                a(href=`/f/${data.forum.fid}/settings`).btn-sm.forum-sub-btn.btn 设置
               if !data.forum.childrenForums || data.forum.childrenForums.length === 0
                 if data.user
                   if data.subscribed
@@ -297,6 +299,8 @@ block content
         include ../publicModules/scrollTo
 
 block scripts
+  //- 通用socket
+  include ../publicModules/socket/socket
   include ../publicModules/subscribeTypes/subscribeTypes
   if data.type === "home"
     include ../publicModules/nkcSource

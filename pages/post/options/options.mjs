@@ -277,11 +277,10 @@ NKC.methods.initPostOption = () => {
       });
       e.stopPropagation();
     });
+    dom.attr('data-init', 'true');
   }
 };
 
 $(function() {
   NKC.methods.initPostOption();
-  /*const options = $('[data-type="postOption"]');
-  options.eq(0).click();*/
 })

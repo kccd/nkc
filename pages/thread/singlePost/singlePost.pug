@@ -58,11 +58,14 @@
     @param {Date} toc 发起时间
     @param {Number} number 鼓励数额
 
+  @param {Boolean} cancelTopped 是否显示 取消置顶按钮 默认为false
+  @param {Boolean} hidePostBottom 是否隐藏底部操作菜单 默认为false
 
 if !isIncluded('singlePost')
   include ./singlePostTop
   include ./singlePostCenter
   include ./singlePostBottom
+  include ../../publicModules/mixin
   +includeCSS('/thread/singlePost/singlePost.css')
   +includeJS('/thread/singlePost/singlePost.js')
   mixin singlePost(props)
