@@ -498,6 +498,9 @@ function submit(tid) {
     .then(function(data) {
     	ue.setContent('');
 			setSubmitButton(false);
+			if(window.quotePostApp) {
+				window.quotePostApp.clear();
+			}
     	return screenTopAlert('发送成功');
     	/*if(NKC.configs.platform === 'reactNative') {
 				NKC.methods.visitUrlAndClose(data.redirect);
@@ -1260,8 +1263,9 @@ $(function() {
 		socket.on('connect', joinPostRoom)
 		socket.on('postMessage', function(data) {
 			// 排除自己的发表
-			// if(NKC.configs.uid === data.comment.uid) return;
-			bulletComments.add(data.comment);
+			if(NKC.configs.uid !== data.comment.uid) {
+				bulletComments.add(data.comment);
+			}
 			// 仅在最后一页时才动态插入内容
 			if(!threadData.isLastPage) return;
 			var JQDOM = $(data.html).find('.single-post-container');
@@ -1271,6 +1275,10 @@ $(function() {
 			floatUserPanel.initPanel();
 			// 分享
 			NKC.methods.initSharePanel();
+			// 表情
+			NKC.methods.initStickerViewer();
+			// 视频音频组件渲染
+			NKC.methods.initVideo();
 			// 操作
 			NKC.methods.initPostOption();
 			// 划词笔记

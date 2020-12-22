@@ -54,7 +54,7 @@ block content
                 .fa.fa-lightbulb-o
                 | 正在编辑&nbsp;
                 a(href=data.forum.url target="_blank")=`${data.forum.title}`
-                | &nbsp;的“最新”板块公告
+                | &nbsp;的最新页板块公告
             if data.type !== "modifyForumDeclare" && data.type !== "modifyForumLatestNotice"
               input.editor-title(placeholder="请输入标题..." id="title" onchange="PostInfo.getTitle(this)")
             hr
