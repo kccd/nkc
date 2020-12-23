@@ -9,20 +9,15 @@ const stepCheckerMap = new Map([
     }
   ],
   ["enter_info",   // 录入信息
-    function({ enterInfo }) {
-      return enterInfo.newForumName && enterInfo.reason && enterInfo.youWantToDo
-        ? {passed: true}
-        : {passed: false, message: "请先完整填写"}
-    }
-  ],
-  ["send_invite",  // 发送邀请
     function(vm) {
-      let sendInvite = vm.sendInvite;
-      if(sendInvite.userId.length < 3) {
-        return {passed: false, message: "至少选择3个人"}
+      let { enterInfo, sendInvite } = vm;
+      if(!enterInfo.newForumName || !enterInfo.reason || !enterInfo.youWantToDo) {
+        return {passed: false, message: "请先完整填写"}
+      }
+      if(sendInvite.userId.length < 2) {
+        return {passed: false, message: "至少选择2个人"}
       } else {
         vm.commitData();
-        return {passed: true}
       }
     }
   ],
@@ -51,9 +46,10 @@ new Vue({
       userId: [],
       users: []
     },
-    process: true,
     myPForums: data.myPForums,
-    reviewNewForumGuide: data.reviewNewForumGuide
+    reviewNewForumGuide: data.reviewNewForumGuide,
+    buttonName: "提交",
+    submitting: false
   },
   computed: {
     stepName() {
@@ -101,12 +97,23 @@ new Vue({
     commitData() {
       let { enterInfo, sendInvite } = this;
       let self = this;
+      self.buttonName = "提交中...";
+      self.submitting = true;
       return nkcAPI(`/u/${NKC.configs.uid}/forum`, "POST", {info: enterInfo, invites: sendInvite.userId})
         .then(() => {
           console.log("提交成功");
-          self.process = false;
+          self.buttonName = "提交";
+          self.submitting = false;
+          self.step = 2;
         })
-        .catch(sweetError);
+        .catch((data) => {
+          self.step = 1;
+          sweetError(data);
+        })
+        .finally(() => {
+          self.buttonName = "提交";
+          self.submitting = false;
+        })
     }
   }
 })
@@ -114,3 +121,4 @@ new Vue({
 
 // 选择用户组件
 const selectUserModule = new NKC.modules.SelectUser();
+
