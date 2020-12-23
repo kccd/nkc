@@ -61,7 +61,7 @@ typeSchema.statics.createPForum = async function(uid, info, founders) {
     founders: founders.map(uid => {
       return {
         uid,
-        accept: ""
+        accept: "pending"
       }
     })
   })

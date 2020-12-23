@@ -222,7 +222,15 @@ module.exports = {
 		},
 		forum: {
 			GET: "myForum",
-			POST: "commitForumApply"
+			POST: "commitForumApply",
+			apply: {
+				GET: 'applyForum',
+				POST: 'applyForum'
+			},
+			invitation: {
+				GET: 'applyForumInvitation',
+				POST: 'applyForumInvitation'
+			}
 		}
 	}
 };

@@ -579,7 +579,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       // 新专业名
       r.c.NFRName = newForumName;
       // 审核页面链接
-      r.c.NFRReview = "/e/reviewForum";
+      r.c.NFRReview = "/nkc/applyForum";
     }
 
     // 新专业创始人邀请相关

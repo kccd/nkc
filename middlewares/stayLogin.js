@@ -191,7 +191,7 @@ module.exports = async (ctx, next) => {
 	data.userRoles = userRoles;
 	data.userGrade = userGrade;
   data.user = user;
-  data.uid = user? user.uid: null;
+  ctx.state.uid = user? user.uid: null;
 
   // 专业树状结构
   if(!isResourcePost) {

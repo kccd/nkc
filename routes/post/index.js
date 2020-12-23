@@ -20,7 +20,7 @@ const router = new Router();
 
 router
   .get('/:pid', async (ctx, next) => {
-    const {nkcModules, data, db, query} = ctx;
+    const {nkcModules, data, db, query, state} = ctx;
 		const {token, page=0, highlight, redirect} = query;
     const {pid} = ctx.params;
     data.highlight = highlight;
@@ -260,7 +260,7 @@ router
       data.paging = paging;
       const template = Path.resolve("./pages/thread/comments.pug");
       data.html = nkcModules.render(template, data, ctx.state);
-      data.postPermission = await db.UserModel.getPostPermission(data.uid, 'post');
+      data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post');
     } else {
       q.parentPostsId = pid;
       // 回复详情页 获取评论 平面

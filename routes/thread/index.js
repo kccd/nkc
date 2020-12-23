@@ -219,7 +219,7 @@ threadRouter
       if(nav.length) data.forumsNav.push(nav);
     }
     // 判断用户是否具有专家权限
-    const isModerator = await db.ForumModel.isModerator(data.uid, thread.mainForumsId);
+    const isModerator = await db.ForumModel.isModerator(state.uid, thread.mainForumsId);
     // 页面顶部导航
     data.threadNav = await thread.getThreadNav();
     data.collectedCount = await db.ThreadModel.getCollectedCountByTid(thread.tid);
@@ -719,7 +719,7 @@ threadRouter
     // 帖子设置
     data.threadSettings = await db.SettingModel.getSettings("thread");
     data.postHeight = hidePostSettings.postHeight;
-    data.postPermission = await db.UserModel.getPostPermission(data.uid, 'post');
+    data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post');
 		data.pid = pid;
 		data.step = step;
 		await next();

@@ -64,5 +64,70 @@ router
       await db.MessageModel.sendInviteFounder({targetUid: uid, pfid});
     }
     return next();
+  })
+  .use('/', async (ctx, next) => {
+    
+    await next();
+  })
+  .use('/apply', async (ctx, next) => {
+
+    await next();
+  })
+  .get('/apply', async (ctx, next) => {
+    const {db, data, state} = ctx;
+    const forumSettings = await db.SettingModel.getSettings('forum');
+    data.reviewNewForumGuide = forumSettings.reviewNewForumGuide;
+    data.appliedForums = await db.PreparationForumModel.find({uid: state.uid});
+    ctx.template = "/user/forum/apply.pug";
+    await next();
+  })
+  .post('/apply', async (ctx, next) => {
+    const {state, db, body, nkcModules} = ctx;
+    const {uid} = state;
+    const {checkString} = nkcModules.checkData;
+    let {info, invites: founders} = body;
+    const {newForumName, reason, youWantToDo} = info;
+    for(const tUid of founders) {
+      const u = await db.UserModel.count({uid: tUid});
+      if(u === 0) ctx.throw(400, `uid错误 uid:${tUid}`);
+    }
+    if(founders.includes(uid)) ctx.throw(400, `无须邀请自己`);
+    if(founders.length < 3) ctx.throw(400, `请至少邀请3人作为新专业的共同创始人`);
+    checkString(newForumName, {
+      name: '专业名称',
+      minLength: 1,
+      maxLength: 20
+    });
+    const sameForum = await db.ForumModel.count({displayName: newForumName});
+    if(sameForum) ctx.throw(400, '专业名已存在，请更换');
+    checkString(reason, {
+      name: '开办理由',
+      minLength: 1,
+      maxLength: 1000
+    });
+    checkString(youWantToDo, {
+      name: '贡献计划',
+      minLength: 0,
+      maxLength: 1000
+    });
+    const pfid = await db.PreparationForumModel.createPForum(uid, info, founders);
+    const forumSettings = await db.SettingModel.getSettings("forum");
+    const {reviewNewForumCert} = forumSettings;
+    const users = await db.UserModel.find({certs: {$in: reviewNewForumCert}}, {uid: 1});
+    // 发送消息给审核员
+    for(const u of users) {
+      await db.MessageModel.sendNewForumReviewMessage({uid: u.uid, pfid})
+    }
+    // 发送消息给队友
+    for(const uid of founders) {
+      await db.MessageModel.sendInviteFounder({targetUid: uid, pfid});
+    }
+    await next();
+  })
+  .get('/invitation', async (ctx, next) => {
+
+  })
+  .post('/invitation', async (ctx, next) => {
+    await next();
   });
 module.exports = router;
