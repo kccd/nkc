@@ -69,5 +69,33 @@ typeSchema.statics.createPForum = async function(uid, info, founders) {
   return pfid;
 }
 
+// 某人是否有权限申请创建专业
+typeSchema.statics.isPremissonCreatePForum = async function(user) {
+  const UserModel = mongoose.model("users");
+  const SettingModel = mongoose.model("settings");
+  if(!user) return false;
+  let forumSetting = await SettingModel.getSettings("forum");
+  const {
+    openNewForumCert = [],
+    openNewForumGrade = [],
+    openNewForumRelationship = "or"
+  } = forumSetting;
+  const certs = user.certs;
+  const grades = user.grade.id;
+  let allowCerts = openNewForumCert.filter(allowCert => certs.includes(allowCert));
+  let allowGrades = openNewForumGrade.filter(allowGrade => grades.includes(allowGrade));
+  if(openNewForumRelationship === "or") {
+    if(!(allowCerts.length || allowGrades.length)) {
+      return false;
+    }
+  }
+  if(openNewForumRelationship === "and") {
+    if(!(allowCerts.length && allowGrades.length)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const preparationForumModel = mongoose.model('pForum', typeSchema);
 module.exports = preparationForumModel;
