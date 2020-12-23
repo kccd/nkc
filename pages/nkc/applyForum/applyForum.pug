@@ -11,6 +11,9 @@ block nkcTitle
     .management-apply-forum{
       font-size: 1rem;
     }
+    th{
+      max-width: 18rem;
+    }
 block nkcContent
   #data.hidden=objToStr({pForums: data.pForums})
   .col-xs-12.col-md-12.management-apply-forum#app(v-cloak)
@@ -27,7 +30,6 @@ block nkcContent
             th 开办理由
             th 贡献计划
             th 状态
-            th 其他
         tbody
           tr(v-for='f in pForums')
             th {{timeFormat(f.toc)}}
@@ -51,9 +53,7 @@ block nkcContent
             th
               span.text-success(v-if='f.review === "resolved"') 已通过
               span.text-danger(v-else-if='f.review === "rejected"') 已驳回
-              span(v-else) 待处理
-            th
-              div(v-if='f.review === "pending"')
+              span(v-else)
                 button.btn.btn-success.btn-xs(@click='agree(f)') 通过
                 button.btn.btn-danger.btn-xs(@click='disagree(f)') 驳回
     include ../../publicModules/paging/paging

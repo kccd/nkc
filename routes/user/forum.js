@@ -94,7 +94,7 @@ router
       const u = await db.UserModel.count({uid: tUid});
       if(u === 0) ctx.throw(400, `uid错误 uid:${tUid}`);
     }
-    if(founders.includes(uid)) ctx.throw(400, `无须邀请自己`);
+    if(founders.includes(uid)) ctx.throw(400, `无需邀请自己`);
     if(founders.length < 3) ctx.throw(400, `请至少邀请3人作为新专业的共同创始人`);
     checkString(newForumName, {
       name: '专业名称',

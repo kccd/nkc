@@ -398,7 +398,7 @@ module.exports = {
                 "NFRSExpired"
             ],
             type: "newForumReviewResolve",
-            content: "你申请创建的新专业[url=NFRSUrl(NFRSName)]已经通过了审核，进入筹备阶段，截止[text=NFRSExpired]，此专业内产出至少50篇帖子，本专业将自动转为正式专业"
+            content: "你申请创建的新专业[url=NFRSUrl(NFRSName)]已经通过了审核，进入筹备阶段。截止[text=NFRSExpired]，若专业内文章大于50篇，则本专业将自动转为正式专业，否则专业将会被删除（不会删除专业内的文章）。"
         },
         {
             parameters: [

@@ -46,7 +46,7 @@ NKC.modules.SelectUser = function() {
       },
       selectUser: function(u) {
         if(this.selectedUsersId.indexOf(u.uid) === -1) {
-          let selectedUserCount = this.selectedUsersId.length;
+          var selectedUserCount = this.selectedUsersId.length;
           if(selectedUserCount < this.userCount) {
             this.selectedUsersId.push(u.uid);
           }

@@ -564,8 +564,8 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
 
     // 新专业申请审核相关
     else if(type === "newForumReview") {
-      let fid = r.c.fid;
-      let pForum = await PreparationForumModel.findOne({fid});
+      let pfid = r.c.pfid;
+      let pForum = await PreparationForumModel.findOne({pfid});
       if(!pForum) {
         continue;
       }
