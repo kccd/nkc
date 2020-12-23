@@ -202,7 +202,26 @@ var Tools = function() {
     var second = fixTime(time.getSeconds());
     return year + '/' + month + '/' + day + ' ' + hour + ':' + minute + ':' + second;
   };
+  self.createVueAppSelector = function() {
+    var str = [];
+    for(var i = 0; i < 8; i++){
+      str[i] = elementIdChars[Math.floor(Math.random() * elementIdChars.length - 1)]
+    }
+    return str.join("")
+  };
+  self.getVueAppSelector = function() {
+    if(!document) return;
+    var scriptElem;
+    if(document.currentScript) {
+      scriptElem = document.currentScript;
+    } else {
+      scriptElem = document.scripts[document.scripts.length - 1];
+    }
+    return scriptElem.getAttribute("data-vue-app-selector");
+  }
 };
+
+var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 if(typeof window === "undefined") {
   module.exports = new Tools();

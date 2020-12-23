@@ -1,0 +1,39 @@
+extends ../experimental
+
+block eTitle
+  +includeCSS("/experimental/reviewForum/reviewForum.css")
+  title 审核专业
+
+block eContent
+  #data.hide= JSON.stringify({pForums: data.pForums})
+  .container-fluid.max-width
+    #app.row
+      .col-xs-12.col-md-8.col-md-offset-0
+        .panel.panel-default
+          .panel-heading
+            span 新专业开办申请
+          .panel-body
+            table.table.table-striped
+              thead
+                tr
+                  th 创建者(uid)
+                  th 专业名
+                  th 申请时间
+                  th 是否通过
+                  th 操作
+              tbody
+                tr(v-for="(forum, index) of pForums")
+                  th
+                    a(:href="'/u/' + forum.uid" target='_blank') {{forum.username}}
+                    span.uid(@click="copyUID($event)") {{'(' + forum.uid + ')'}}
+                  th {{forum.info.newForumName}}
+                  th {{timeFormat(forum.toc)}}
+                  th {{forum.review === "pendding" ? "待处理" : forum.review === "resolved" ? "已通过" : "已驳回"}}
+                  th
+                    button#review.btn.btn-default(@click="review(index)") 详情
+
+block scripts
+  include ../../publicModules/moment
+  include ./infoDialog/info
+  +infoVueApp()
+  +includeJS('/experimental/reviewForum/reviewForum.js')

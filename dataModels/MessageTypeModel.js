@@ -157,6 +157,53 @@ const getDomByType = (t) => {
   } else if(t === "CRResult") {
     return prefix + "result";
   }
+
+  // 新办专业申请审核相关
+  else if(t === "NFRUserProfile") {
+    return prefix + "NFRUserProfile";
+  } else if(t === "NFRUserName") {
+    return prefix + "NFRUserName";
+  } else if(t === "NFRName") {
+    return prefix + "NFRName";
+  } else if(t === "NFRReview") {
+    return prefix + "NFRReview";
+  }
+
+  // 新专业创始人邀请相关
+  else if(t === "IFUserProfile") {
+    return prefix + "IFUserProfile";
+  } else if(t === "IFUserName") {
+    return prefix + "IFUserName";
+  } else if(t === "IFName") {
+    return prefix + "IFName";
+  } else if(t === "IFAcceptPageUrl") {
+    return prefix + "IFAcceptPageUrl";
+  }
+
+  // 新专业申请通过相关
+  else if(t === "NFRSName") {
+    return prefix + "NFRSName";
+  } else if(t === "NFRSUrl") {
+    return prefix + "NFRSUrl";
+  } else if(t === "NFRSExpired") {
+    return prefix + "NFRSExpired";
+  }
+  
+  // 新专业申请审核不通过相关
+  else if(t === "NFRJName") {
+    return prefix + "NFRJName";
+  } else if(t === "NFRJUrl") {
+    return prefix + "NFRJUrl";
+  }
+  
+  // 筹备专业转正或者关闭相关
+  else if(t === "BFFName") {
+    return prefix + "BFFName";
+  } else if(t === "BFFUrl") {
+    return prefix + "BFFUrl";
+  } else if(t === "BFFMessage") {
+    return prefix + "BFFMessage";
+  }
 };
 const getAppVueDom = (template) => {
   let {content, parameters} = template;
@@ -357,6 +404,49 @@ schema.statics.getValue = (key, c) => {
         return c.reasonDescription
       case 'CRResult':
         return c.result
+
+      // 新办专业申请审核相关
+      case 'NFRUserProfile':
+        return c.NFRUserProfile
+      case 'NFRUserName':
+        return c.NFRUserName
+      case 'NFRName':
+        return c.NFRName
+      case 'NFRReview':
+        return c.NFRReview
+      
+      // 新专业创始人邀请相关
+      case 'IFUserProfile':
+        return c.IFUserProfile
+      case 'IFUserName':
+        return c.IFUserName
+      case 'IFName':
+        return c.IFName
+      case 'IFAcceptPageUrl':
+        return c.IFAcceptPageUrl
+      
+      // 新专业申请审核通过相关
+      case "NFRSName":
+        return c.NFRSName
+      case "NFRSUrl":
+        return c.NFRSUrl
+      case "NFRSExpired":
+        return c.NFRSExpired
+
+      // 新专业申请审核不通过相关
+      case "NFRJName":
+        return c.NFRJName
+      case "NFRJUrl":
+        return c.NFRJUrl
+
+      // 筹备专业转正或者关闭相关
+      case "BFFName":
+        return c.BFFName
+      case "BFFUrl":
+        return c.BFFUrl
+      case "BFFMessage":
+        return c.BFFMessage
+
       default: return key;
     }
   } catch(err) {

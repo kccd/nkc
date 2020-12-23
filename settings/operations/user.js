@@ -219,6 +219,10 @@ module.exports = {
 		},
 		violationRecord: {
 			GET: "violationRecord"
+		},
+		forum: {
+			GET: "myForum",
+			POST: "commitForumApply"
 		}
 	}
 };

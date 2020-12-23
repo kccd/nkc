@@ -4,7 +4,7 @@ var NKC = {
   configs: {
     imageExt: ["jpg", "jpeg", "png", "svg", "gif"],
     audioExt: ["mp3"],
-    videoExt: ["mp4"],
+    videoExt: ["mp4"]
   },
   events: {},
   eventsLog: {},
@@ -959,3 +959,32 @@ NKC.methods.removeLocalStorageByKey = function(key) {
   key = NKC.methods.getLocalStorageKey(key);
   localStorage.removeItem(key);
 };
+
+
+
+// service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/serviceWorker/index.js')
+    .then(function(registration) {
+      return registration.update();
+    })
+    .then(function(registration) {
+      return new Promise(function(resolve, reject) {
+        if(registration.active) {
+          return resolve(registration.active);
+        } else {
+          registration.addEventListener("updatefound", function() {
+            if(registration.active) {
+              return resolve(registration.active);
+            }
+          });
+        }
+      });
+    })
+    .then(function(worker) {
+      NKC.modules.serviceWorker = worker;
+    })
+    .catch(function(error) {
+      console.log('Registration failed with ' + error);
+    })
+}

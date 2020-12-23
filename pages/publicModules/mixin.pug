@@ -38,3 +38,5 @@ if !isIncluded('baseMixin')
       data-time-type='briefTime'
       title=tools.timeFormat(time)
       )
+  mixin includeVueApp(url, selector)
+    script(src=`${url}?v=${startTime}` data-vue-app-selector=selector)

@@ -8,8 +8,7 @@ router
     data.detail = detail;
     // 附件对象
     const {rid} = params;
-    const resource = await db.ResourceModel.findOne({rid, type: "resource"}, {ext:1, hits:1, oname:1, rid:1, size:1, state:1, toc:1});
-    detail.resource = resource;
+    const resource = await db.ResourceModel.findOne({rid, type: "resource"});
     // 附件所需积分信息和用户持有积分信息
     const {enough, userScores} = await resource.checkUserScore(user);
     detail.costScores = userScores;
@@ -26,6 +25,9 @@ router
     detail.free = !needScore && reason === "setting";
     // 此用户是否在租期内(支付过，没到期)
     detail.paid = !needScore && reason === "repeat";
+
+    await resource.setFileExist();
+    detail.resource = resource.toObject();
     return next();
   })
 module.exports = router;

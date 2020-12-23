@@ -23,10 +23,18 @@ window.app = new Vue({
   data: {
     levels,
     selectedLevels: levels,
+    selectedReviewForumCert: data.forumSettings.reviewNewForumCert || [],
+    selectedNewForumCert: data.forumSettings.openNewForumCert || [],
+    selectedNewForumGrade: data.forumSettings.openNewForumGrade || [],
+    selectedRelationship: data.forumSettings.openNewForumRelationship,
     forumName: '',
     forums,
     forumSettings: data.forumSettings,
     forumCategories: data.forumCategories,
+    reviewNewForumCerts: data.certs.roles,
+    reviewNewForumGrades: data.certs.grades,
+    reviewNewForumGuide: data.forumSettings.reviewNewForumGuide,
+    founderGuide: data.forumSettings.founderGuide,
     updating: false,
   },
   mounted() {
@@ -96,13 +104,23 @@ window.app = new Vue({
     },
     save() {
       const fidArr = this.forums.map(f => f.fid);
-      const {forumCategories, forumSettings} = this;
-      const {recycle} = forumSettings;
+      const {
+        forumCategories,
+        forumSettings,
+        selectedReviewForumCert,
+        reviewNewForumGuide,
+        founderGuide,
+        selectedNewForumCert,
+        selectedNewForumGrade,
+        selectedRelationship
+      } = this;
+      const {recycle, archive} = forumSettings;
       const {checkString} = NKC.methods.checkData;
       const forumsInfo = this.getForumsInfo();
       Promise.resolve()
         .then(() => {
           if(!recycle) throw '请输入回收站专业ID';
+          if(!archive) throw '请输入归档专业ID';
           for(const fc of forumCategories) {
             checkString(fc.name, {
               name: '分类名',
@@ -116,7 +134,18 @@ window.app = new Vue({
             });
           }
 
-          return nkcAPI('/e/settings/forum', 'PUT', {forumsInfo, categories: forumCategories, recycle});
+          return nkcAPI('/e/settings/forum', 'PUT', {
+            forumsInfo,
+            categories: forumCategories,
+            recycle,
+            archive,
+            selectedReviewForumCert,
+            reviewNewForumGuide,
+            founderGuide,
+            selectedNewForumCert,
+            selectedNewForumGrade,
+            selectedRelationship
+          });
         })
         .then(() => {
           sweetSuccess('保存成功');

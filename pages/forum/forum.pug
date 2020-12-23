@@ -56,6 +56,8 @@ block content
                 .forum-avatar-icon(style=`background-color: ${data.forum.color}`)
             .forum-info
               .forum-name=data.forum.displayName
+                if data.isPreparationForum
+                  span.forum-preparation 筹备
               .forum-abbr=data.forum.brief || "暂无专业简介"
               .forum-post-count
                 .count-group
@@ -224,6 +226,14 @@ block content
                 if !data.libraryClosed || permission("modifyAllResource")
                   include ../publicModules/library/library
       .col-xs-12.col-md-3.hidden-xs.hidden-sm#rightDom.box-shadow-panel
+        if data.isPreparationForum
+          .m-b-1
+            .panel-header 专业创始人
+            ul.forum-founder-list
+              for founder in data.founderList
+                li.forum-founder-item
+                  .forum-founder-avatar(style=`background-image: url(${tools.getUrl("userAvatar", founder.avatar)})`)
+                  a.fouum-founder-username(href=tools.getUrl("userHome", founder.uid) target="_blank" data-float-uid=founder.uid)= founder.username
         .m-b-1
           .panel-header 专业介绍
           .forum-description!= nkcRender.htmlFilter(data.forum.description) || "暂无专业介绍"

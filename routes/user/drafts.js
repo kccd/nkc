@@ -145,7 +145,6 @@ draftsRouter
       draftObj.desType = desType;
       draftObj.uid = user.uid;
       draftObj.did = await db.SettingModel.operateSystemID("drafts", 1);
-      console.log(draftObj)
       draft = db.DraftModel(draftObj);
       await draft.save();
       if(survey) {

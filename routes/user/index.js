@@ -20,6 +20,8 @@ const violationRouter = require("./violationRecord");
 const userRouter = new Router();
 // 隐藏用户主页
 const hideRouter = require("./hide");
+// 用户创建的专业
+const forumRouter = require("./forum");
 
 
 userRouter
@@ -517,5 +519,6 @@ userRouter
   .use("/:uid/destroy", destroyRouter.routes(), destroyRouter.allowedMethods())
   .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods())
   .use("/:uid/violationRecord", violationRouter.routes(), violationRouter.allowedMethods())
-  .use("/:uid/hide", hideRouter.routes(), hideRouter.allowedMethods());
+  .use("/:uid/hide", hideRouter.routes(), hideRouter.allowedMethods())
+  .use("/:uid/forum", forumRouter.routes(), forumRouter.allowedMethods());
 module.exports = userRouter;
