@@ -168,7 +168,7 @@ block eContent
                 | 或
             .checkbox
               label(v-for='cert in reviewNewForumGrades').m-r-1
-                input(type='checkbox' :value='cert.id' v-model='selectedNewForumGrade')
+                input(type='checkbox' :value='cert.id' v-model.number='selectedNewForumGrade')
                 span {{cert.name}}
           .form-group
             label 开办指南（给创始人阅读）

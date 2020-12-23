@@ -584,7 +584,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
 
     // 新专业创始人邀请相关
     else if(type === "inviteFounder") {
-      let { pfid } = r.c;
+      let { pfid, myUid } = r.c;
       let pForum = await PreparationForumModel.findOne({pfid});
       if(!pForum) {
         continue;
@@ -599,7 +599,8 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       // 新专业名
       r.c.IFName = newForumName;
       // 处理邀请页面
-      r.c.IFAcceptPageUrl = `/founderInvite/accept/${pfid}/page`;
+      // r.c.IFAcceptPageUrl = `/founderInvite/accept/${pfid}/page`;
+      r.c.IFAcceptPageUrl = `/u/${r.r}/forum/invitation?pfid=${pfid}`;
     }
 
     // 新专业申请审核通过相关

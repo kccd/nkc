@@ -34,7 +34,7 @@ const typeSchema = new Schema({
   review: {             // pendding 待处理，  resolved 已通过,   rejected 已驳回
     type: String,
     required: true,
-    default: "pendding"
+    default: "pending"
   },
   // 筹备专业的到期日期（审核通过之后才会有值）
   expired: {
@@ -69,28 +69,35 @@ typeSchema.statics.createPForum = async function(uid, info, founders) {
   return pfid;
 }
 
-// 某人是否有权限申请创建专业
-typeSchema.statics.isPremissonCreatePForum = async function(user) {
+/*
+* 某人是否有权限申请创建专业
+* @param {String} uid 用户ID
+* @return {Boolean}
+* */
+typeSchema.statics.hasPermissionToCreatePForum = async function(uid) {
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model("settings");
-  if(!user) return false;
+  if(!uid) return false;
+  const user = await UserModel.findOnly({uid});
+  await user.extendRoles();
+  await user.extendGrade();
   let forumSetting = await SettingModel.getSettings("forum");
   const {
     openNewForumCert = [],
     openNewForumGrade = [],
     openNewForumRelationship = "or"
   } = forumSetting;
-  const certs = user.certs;
-  const grades = user.grade.id;
+  const certs = user.roles.map(r => r._id);
+  const gradeId = user.grade._id;
   let allowCerts = openNewForumCert.filter(allowCert => certs.includes(allowCert));
-  let allowGrades = openNewForumGrade.filter(allowGrade => grades.includes(allowGrade));
+  let allowGrade = openNewForumGrade.includes(gradeId);
   if(openNewForumRelationship === "or") {
-    if(!(allowCerts.length || allowGrades.length)) {
+    if(!(allowCerts.length || allowGrade)) {
       return false;
     }
   }
   if(openNewForumRelationship === "and") {
-    if(!(allowCerts.length && allowGrades.length)) {
+    if(!(allowCerts.length && allowGrade)) {
       return false;
     }
   }

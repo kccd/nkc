@@ -1,0 +1,27 @@
+extends ../../bootstrap_base
+
+block title
+  title 创始人邀请
+  +includeCSS('/user/forum/invitation.css')
+
+block content
+  .hidden#data= JSON.stringify({founder: data.founder, pfid: data.pfid, forumName: data.forumName, founderGuide: data.founderGuide})
+  .container-fluid.max-width
+    .row#app(v-cloak)
+      .col-xs-12.col-md-6.col-md-offset-3#protocol
+        h3.m-b-1.text-center 用户
+          a(href=tools.getUrl('userHome', data.targetUser.uid) target="_blank"
+          data-float-uid=data.targetUser.uid
+          )=data.targetUser.username
+          | 邀请你成为专业
+          strong {{formName}}
+          | 的共同创始人
+        h5 共同创始人注意事项：
+        p.protocol-content {{protocolContent}}
+        .form.protocol-control.clearfix(v-if='agree === null')
+          button.btn.btn-primary.pull-right(@click="resolve()") 接受
+          button.btn.btn-warning.pull-right(@click="reject()") 拒绝
+
+
+block scripts
+  +includeJS('/user/forum/invitation.js')

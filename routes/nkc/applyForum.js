@@ -85,6 +85,7 @@ router
       });
       updateObj.fid = newForum.fid;
       updateObj.expired = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      await pForum.update(updateObj);
       // 发送审核通过消息
       await db.MessageModel.sendNewForumReviewResolve({
         pfid,
@@ -92,12 +93,12 @@ router
         targetUid: pForum.uid
       });
     } else {
+      await pForum.update(updateObj);
       await db.MessageModel.sendNewForumReviewReject({
         pfid,
         targetUid: pForum.uid
       });
     }
-    await pForum.update(updateObj);
     data.review = review;
     await next();
   });

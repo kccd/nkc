@@ -66,11 +66,14 @@ router
     return next();
   })
   .use('/', async (ctx, next) => {
-    
+    const {state, params} = ctx;
+    if(state.uid !== params.uid) ctx.throw(400, `权限不足`);
     await next();
   })
   .use('/apply', async (ctx, next) => {
-
+    const {db, state} = ctx;
+    const hasPermission = await db.PreparationForumModel.hasPermissionToCreatePForum(state.uid);
+    if(!hasPermission) ctx.throw(403, '权限不足');
     await next();
   })
   .get('/apply', async (ctx, next) => {
@@ -124,10 +127,54 @@ router
     }
     await next();
   })
+  .use('/invitation', async (ctx, next) => {
+    const {state, query, body, db, data} = ctx;
+    let {pfid} = query;
+    if(!pfid) pfid = body.pfid;
+    const pForum = await db.PreparationForumModel.findOnly({pfid});
+    let founder;
+    for(const f of pForum.founders) {
+      if(f.uid === state.uid) {
+        founder = f;
+        break;
+      }
+    }
+    if(!founder) ctx.throw(403, `权限不足`);
+    if(founder.accept === 'timeout') ctx.throw(403, `邀请已过期`);
+    else if(['resolved', 'rejected'].includes(founder.accept)) ctx.throw(403, `邀请已处理`);
+    data.founder = founder;
+    await next();
+  })
   .get('/invitation', async (ctx, next) => {
-
+    const {query, db, data} = ctx;
+    const {pfid} = query;
+    const pForum = await db.PreparationForumModel.findOnly({pfid});
+    const forumSettings = await db.SettingModel.getSettings('forum');
+    data.pfid = pForum.pfid;
+    data.forumName = pForum.info.newForumName;
+    data.founderGuide = forumSettings.founderGuide;
+    data.targetUser = await db.UserModel.findOnly({uid: pForum.uid}, {
+      uid: 1,
+      username: 1,
+    });
+    ctx.template = "user/forum/invitation.pug";
+    await next();
   })
   .post('/invitation', async (ctx, next) => {
+    const {db, body, state, data} = ctx;
+    const {res, pfid} = body;
+    if(!['resolved', 'rejected'].includes(res)) ctx.throw(400, `res参数错误 res: ${res}`);
+    const pForum = await db.PreparationForumModel.findOne({pfid});
+    const { founders } = pForum;
+    for(let founder of founders) {
+      if(founder.uid === state.uid) {
+        founder.accept = res;
+        await db.PreparationForumModel.update({pfid}, {
+          $set: { founders }
+        });
+        return next();
+      }
+    }
     await next();
   });
 module.exports = router;
