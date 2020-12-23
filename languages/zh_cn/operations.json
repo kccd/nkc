@@ -750,9 +750,7 @@
 
   "myForum": "我的专业",
   "commitForumApply": "提交开办专业申请",
-  "reviewForum": "审核专业",
-  "reviewForumFinal": "提交审核结果",
-  "reviewForumReject": "驳回开办申请",
   "acceptFounderInvite": "处理创始人邀请",
-  "responseFounderInvite": "响应创始人邀请"
+  "responseFounderInvite": "响应创始人邀请",
+  "nkcManagementApplyForum": "专业申请审核（给普通用户，路由有审核员证书判断）"
 }

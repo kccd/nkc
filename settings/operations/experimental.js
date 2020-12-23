@@ -372,14 +372,5 @@ module.exports = {
 	},
 	tools: {
 		GET: "visitToolsManager"
-	},
-	reviewForum: {
-		GET: "reviewForum",
-		resolve: {
-			POST: "reviewForumFinal"
-		},
-		reject: {
-			POST: "reviewForumReject"
-		}
 	}
 };

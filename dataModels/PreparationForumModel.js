@@ -8,8 +8,8 @@ const typeSchema = new Schema({
   },
   fid: {
     type: String,
-    unique: true,
-    required: false
+    index: 1,
+    default: ''
   },
   uid: {
     type: String,
@@ -21,7 +21,7 @@ const typeSchema = new Schema({
     required: true,
 	},
 	founders: {
-    type: Array,
+    type: Array, // {accept, uid}  @param {String} accept 是否同意 'pending': 未处理， ’rejected‘: 拒绝，’resolved‘: 同意, 'timeout': 过期（管理员同意前任未处理）
     required: true,
     index: 1
   },
@@ -31,10 +31,10 @@ const typeSchema = new Schema({
     default: Date.now,
     index: 1
   },
-  review: {             // pendding 待处理，  resolved 已通过,   rejected 已驳回
+  review: {             // pending 待处理，  resolved 已通过,   rejected 已驳回
     type: String,
     required: true,
-    default: "pendding"
+    default: "pending"
   },
   // 筹备专业的到期日期（审核通过之后才会有值）
   expired: {
@@ -61,7 +61,7 @@ typeSchema.statics.createPForum = async function(uid, info, founders) {
     founders: founders.map(uid => {
       return {
         uid,
-        accept: ""
+        accept: "pending"
       }
     })
   })

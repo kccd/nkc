@@ -144,46 +144,38 @@ block eContent
                       input(type='radio' value='null' v-model='f.threadListStyle.cover')
                       span 不显示
               //+renderForums(data.forums)
-        h4
-          b 新办专业申请审核
-          small 由谁审核开办新专业的申请
-        .m-b-1
-          .checkbox
-            label(v-for='cert in reviewNewForumCerts').m-r-1
-              input(type='checkbox' :value='cert.id' v-model='selectedReviewForumCert')
-              span {{cert.name}}
-        h4
-          b 开办指南内容
-          small 申请开办专业时会展示出来
-        .m-b-1
-          textarea.form-control(rows="6" v-model="reviewNewForumGuide")
-
-        h4
-          b 专业创始人指南内容
-          small 收到专业创始人邀请信息时会展示出来
-        .m-b-1
-          textarea.form-control(rows="6" v-model="founderGuide")
-
-        h4
-          b 申请开办新专业的条件
-          small 条件满足才会在主页上显示入口
-        .m-b-1
-          .checkbox
-            label(v-for='cert in reviewNewForumCerts').m-r-1
-              input(type='checkbox' :value='cert.id' v-model='selectedNewForumCert')
-              span {{cert.name}}
-          .radio
-            label
-              input(type="radio" value="and" v-model='selectedRelationship')
-              | 与
-            label
-              input(type="radio" value="or" v-model='selectedRelationship')
-              | 或
-          .checkbox
-            label(v-for='cert in reviewNewForumGrades').m-r-1
-              input(type='checkbox' :value='cert.id' v-model='selectedNewForumGrade')
-              span {{cert.name}}
-          
+        h4 申请开办新专业
+          small.m-l-05 满足条件的用户可申请开设新专业
+        .form
+          .form-group
+            label 审核员证书
+            .checkbox
+              label.m-r-1(v-for='cert in reviewNewForumCerts')
+                input(type='checkbox' :value='cert.id' v-model='selectedReviewForumCert')
+                span {{cert.name}}
+          .form-group
+            label 申请人证书、等级
+            .checkbox
+              label(v-for='cert in reviewNewForumCerts').m-r-1
+                input(type='checkbox' :value='cert.id' v-model='selectedNewForumCert')
+                span {{cert.name}}
+            .radio
+              label
+                input(type="radio" value="and" v-model='selectedRelationship')
+                | 与
+              label
+                input(type="radio" value="or" v-model='selectedRelationship')
+                | 或
+            .checkbox
+              label(v-for='cert in reviewNewForumGrades').m-r-1
+                input(type='checkbox' :value='cert.id' v-model='selectedNewForumGrade')
+                span {{cert.name}}
+          .form-group
+            label 开办指南（给创始人阅读）
+            textarea.form-control(rows="6" v-model="reviewNewForumGuide")
+          .form-group
+            label 开办指南（给被邀请人阅读）
+            textarea.form-control(rows="6" v-model="founderGuide")
         .m-t-05
           button.btn.btn-primary(@click='save') 保存
 block scripts

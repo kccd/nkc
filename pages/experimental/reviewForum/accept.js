@@ -10,7 +10,7 @@ new Vue({
   },
   methods: {
     resolve: function() {
-      nkcAPI("/founderInvite/accept/"+ pfid +"?res=resolve", "GET")
+      nkcAPI("/founderInvite/accept/"+ pfid +"?res=resolved", "GET")
         .then(function(data) {
           return Swal({
             confirmButtonText: "关闭",
@@ -22,7 +22,7 @@ new Vue({
         })
     },
     reject: function() {
-      nkcAPI("/founderInvite/accept/"+ pfid +"?res=reject", "GET")
+      nkcAPI("/founderInvite/accept/"+ pfid +"?res=rejectd", "GET")
         .then(function(data) {
           return Swal({
             confirmButtonText: "关闭",

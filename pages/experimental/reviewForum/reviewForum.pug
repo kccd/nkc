@@ -28,7 +28,7 @@ block eContent
                     span.uid(@click="copyUID($event)") {{'(' + forum.uid + ')'}}
                   th {{forum.info.newForumName}}
                   th {{timeFormat(forum.toc)}}
-                  th {{forum.review === "pendding" ? "待处理" : forum.review === "resolved" ? "已通过" : "已驳回"}}
+                  th {{forum.review === "pending" ? "待处理" : forum.review === "resolved" ? "已通过" : "已驳回"}}
                   th
                     button#review.btn.btn-default(@click="review(index)") 详情
 

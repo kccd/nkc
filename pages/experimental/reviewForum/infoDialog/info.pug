@@ -11,11 +11,11 @@ mixin infoVueApp()
           .text-center.m-t-5.m-b-5(v-if="loadding") 加载中...
           .form(v-else)
             .form-group
-              label 申请人: 
+              label 申请人:
                 a(:href="'/u/' + pForum.uid" target="_blank") {{pForum.username}}
             .form-group
-              label 状态: 
-                span(v-if="pForum.review === 'pendding'") 待处理
+              label 状态:
+                span(v-if="pForum.review === 'pending'") 待处理
                 span(v-if="pForum.review === 'resolved'") 已通过
                 span(v-if="pForum.review === 'rejected'") 已驳回
             .form-group
@@ -34,7 +34,7 @@ mixin infoVueApp()
                 span {{pForum.info.youWantToDo}}
         .modal-footer
           button(type="button" class="btn btn-sm btn-default" data-dismiss="modal") 关闭
-          button(type="button" class="btn btn-sm btn-primary" v-if="pForum && pForum.review === 'pendding'" @click="reviewPass()") 通过
-          button(type="button" class="btn btn-sm btn-danger" v-if="pForum && pForum.review === 'pendding'" @click="reviewReject()") 驳回
+          button(type="button" class="btn btn-sm btn-primary" v-if="pForum && pForum.review === 'pending'" @click="reviewPass()") 通过
+          button(type="button" class="btn btn-sm btn-danger" v-if="pForum && pForum.review === 'pending'" @click="reviewReject()") 驳回
   +includeJS("/nationCodes/nationCodes.js")
   +includeVueApp("/experimental/reviewForum/infoDialog/info.js", vueAppSelector)

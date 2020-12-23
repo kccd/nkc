@@ -5,7 +5,6 @@ const sysInfoRouter = require('./systemInfo');
 const consoleRouter = require('./console');
 const loginRouter = require("./login");
 const toolsRouter = require("./tools");
-const reviewForumRouter = require("./reviewForum");
 const experimentalRouter = new Router();
 experimentalRouter
   .use("/", async (ctx, next) => {
@@ -45,7 +44,6 @@ experimentalRouter
   .use("/login", loginRouter.routes(), loginRouter.allowedMethods())
   .use('/log', logRouter.routes(), logRouter.allowedMethods())
   .use('/tools', toolsRouter.routes(), toolsRouter.allowedMethods())
-  .use('/reviewForum', reviewForumRouter.routes(), reviewForumRouter.allowedMethods());
 
 
 module.exports = experimentalRouter;

@@ -23,5 +23,9 @@ module.exports = {
   section: {
     GET: "nkcManagementSection",
     POST: "nkcManagementSection"
+  },
+  applyForum: {
+    GET: 'nkcManagementApplyForum',
+    POST: "nkcManagementApplyForum"
   }
 };

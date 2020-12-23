@@ -9,7 +9,7 @@ router
     if(!user) {
       ctx.throw(503, "你无权访问");
     }
-    if(res !== "resolve" && res !== "reject") {
+    if(res !== "resolved" && res !== "rejected") {
       data.message = "你未进行处理";
       return next();
     }
@@ -21,7 +21,7 @@ router
         await db.PreparationForumModel.update({pfid}, {
           $set: { founders }
         });
-        if(res === "resolve") {
+        if(res === "resolved") {
           data.message = "你已接受邀请，你的账号名会显示在专业主页的\"专业创始人\"列表中";
         } else {
           data.message = "你已拒绝邀请";
