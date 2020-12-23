@@ -10,6 +10,8 @@ const {
   PreparationForumModel,
   ForumModel,
   ThreadModel,
+  PostModel,
+  SnapshotModel,
   MessageModel
 } = require("../dataModels");
 
@@ -61,7 +63,7 @@ async function startCheck() {
       await moveThread(fid, archiveId);
       console.log(`已移动所有文章到 fid: ${archiveId}(归档专业)`);
       // 删除此筹备专业(先打快照)
-      await db.SnapshotModel.snapshotForum(fid);
+      await SnapshotModel.snapshotForum(fid);
       await ForumModel.remove({ fid });
       console.log(`已删除筹备专业`);
       // 删除此筹备专业申请
@@ -79,20 +81,28 @@ async function moveThread(fid, targetFid) {
     mainForumsId: {
       $elemMatch: { $eq: fid }
     }
-  }, {mainForumsId: true});
-  for(let thread of threads) {
-    let forumIds = thread.mainForumsId;
-    if(!forumIds.length) continue;
-    let index = forumIds.indexOf(fid);
-    if(index >= 0) {
-      forumIds.splice(index, 1, targetFid);
+  }, {tid: 1});
+  const threadsId = threads.map(t => t.tid);
+  await ThreadModel.updateMany({tid: {$in: threadsId}}, {
+    $pull: {
+      mainForumsId: fid
     }
-    await thread.update({
-      $set: {
-        mainForumsId: forumIds
-      }
-    })
-  }
+  });
+  await ThreadModel.updateMany({tid: {$in: threadsId}}, {
+    $addToSet: {
+      mainForumsId: targetFid
+    }
+  });
+  await PostModel.updateMany({tid: {$in: threadsId}}, {
+    $pull: {
+      mainForumsId: fid
+    }
+  });
+  await PostModel.updateMany({tid: {$in: threadsId}}, {
+    $addToSet: {
+      mainForumsId: targetFid
+    }
+  });
 }
 
 
