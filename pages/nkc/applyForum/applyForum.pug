@@ -41,21 +41,21 @@ block nkcContent
                   img.user-avatar(:src="getUrl('userAvatar', u.user.avatar)")
                   span {{u.user.username}}
                 span &nbsp;
-                span(v-if='u.accept === "resolved"') 已接受
-                span(v-else-if='u.accept === "rejected"') 已拒绝
-                span(v-else-if='u.accept === "timeout"') 已过期
+                span.text-success(v-if='u.accept === "resolved"') 已接受
+                span.text-danger(v-else-if='u.accept === "rejected"') 已拒绝
+                span.text-danger(v-else-if='u.accept === "timeout"') 已过期
                 span(v-else) 待处理
             th {{f.info.newForumName}}
             th {{f.info.reason}}
             th {{f.info.youWantToDo}}
             th
-              span(v-if='f.review === "resolved"') 已通过
-              span(v-else-if='f.review === "rejected"') 已拒绝
+              span.text-success(v-if='f.review === "resolved"') 已通过
+              span.text-danger(v-else-if='f.review === "rejected"') 已驳回
               span(v-else) 待处理
             th
               div(v-if='f.review === "pending"')
                 button.btn.btn-success.btn-xs(@click='agree(f)') 通过
-                button.btn.btn-danger.btn-xs(@click='disagree(f)') 拒绝
+                button.btn.btn-danger.btn-xs(@click='disagree(f)') 驳回
     include ../../publicModules/paging/paging
 block nkcScripts
   include ../../publicModules/subscribeTypes/subscribeTypes
