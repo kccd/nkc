@@ -489,15 +489,12 @@ router
 		state.threadListStyle = data.forum.threadListStyle;
 
 		// 查出是否是筹备专业
-		const [ pForum ] = await db.PreparationForumModel.find({ review: "resolved", fid: forum.fid, formal: false });
-		if(pForum) {
-			data.isPreparationForum = true;
+		data.isPreparationForum = forum.type === "pForum";
+		if(data.isPreparationForum) {
 			// 读取创始人
-			let { founders } = pForum;
+			let { founders } = forum;
 			let list  = [];
-			for(let founder of founders) {
-				let { uid, accept } = founder;
-				if(accept !== "resolve") continue;
+			for(let uid of founders) {
 				const user = await db.UserModel.findOne({uid});
 				list.push({
 					username: user.username,
@@ -506,8 +503,6 @@ router
 				})
 			}
 			data.founderList = list;
-		} else {
-			data.isPreparationForum = false;
 		}
 
 		await next();
