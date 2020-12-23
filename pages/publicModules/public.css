@@ -197,7 +197,7 @@ table{
   padding-left: 2rem!important;
 }
 .p-l-3{
-  padding-left: 3rem;
+  padding-left: 3rem!important;
 }
 .p-l-4{
   padding-left: 4rem;
@@ -219,7 +219,7 @@ table{
   padding-right: 2rem!important;
 }
 .p-r-3{
-  padding-right: 3rem;
+  padding-right: 3rem!important;
 }
 .p-r-4{
   padding-right: 4rem;
@@ -1377,6 +1377,13 @@ footer.footer ul li{
   top: 0;
   z-index: 1000;
 }
+.thread-panel-point{
+  height: 6px;
+  display: inline-block;
+  width: 6px;
+  border-radius: 50%;
+  background-color: red;
+}
 .thread-panel.reviewed{
   border: 1px solid #ccc;
   margin: 0.5rem 0;
@@ -2379,7 +2386,15 @@ button.thread-author-subscribe:focus{
 */
 .render-content{
   overflow: hidden;
-  padding-bottom: 0.5rem;
+  /*padding-bottom: 0.5rem;*/
+  font-size: 16px;
+  word-break: break-all;
+}
+.render-content blockquote{
+  font-size: 1.1rem;
+  max-height: 12rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 [data-sticker-rid]{
@@ -2509,4 +2524,8 @@ div.user-banned{
   border-radius: 50%;
   font-size: 1.4rem;
   vertical-align: baseline;
+}
+a[data-anonymous]{
+  color: #888;
+  text-decoration: none;
 }

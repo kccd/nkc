@@ -1,11 +1,7 @@
-let SubscribeTypes;
 const forumInfo = NKC.methods.getDataById('forumInfo');
 const {fid, page, digest, sort} = forumInfo;
 
 $(function() {
-  if(!window.SubscribeTypes) {
-    SubscribeTypes = new NKC.modules.SubscribeTypes();
-  }
   const dom = $("#navbar_custom_dom");
   const leftDom = $("#leftDom");
   dom.html(leftDom.html());
@@ -95,35 +91,120 @@ function connectForumRoom() {
     const {html, tid, contentType} = data;
     const threadList = $('div.normal-thread-list');
     let targetThread = threadList.find('div[data-tid="'+tid+'"]');
-    const targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-counter');
-    let newPostCount = 0;
-    // 获取当前未读数
-    if(targetThreadCounter.length) {
-      newPostCount = Number(targetThreadCounter.attr('data-count'));
-    }
     if(
       page === 0 && // 处于专业首页
       digest === data.digest &&
       (contentType === 'thread' || sort === 'tlm') // 发表文章或发表回复且按回复排序
     ) {
-      // 处于专业首页 更新时先移除旧元素再在列表头部插入新元素
-      targetThread.remove();
+      // 如果文章存在则先移除再在列表头部创建
+      // 如果文章不存在则移除列表最后一项再在列表头部创建
+      if(targetThread.length) {
+        targetThread.remove();
+      } else {
+        removeLastThreadPanel();
+      }
       targetThread = $(html);
       threadList.prepend(targetThread);
     } else {
       if(!targetThread) return;
-      targetThreadCounter.remove();
     }
 
-    newPostCount ++;
+    let count = NKC.methods.getThreadListNewPostCount(tid);
 
-    const counter = $("<span class='thread-panel-counter' data-count='"+newPostCount+"' title='"+newPostCount+"条更新'>"+newPostCount+"</span>");
-    targetThread.prepend(counter);
+    count ++;
 
-    floatUserPanel.initPanel();
-    floatForumPanel.initPanel();
+    NKC.methods.setThreadListNewPostCount(tid, count);
+
+    setThreadListNewCount(tid, count);
+
+    createMouseEvents();
+
   });
   if(socket.connected) {
     joinRoom();
   }
+
+  createTimeoutToUpdateThreadListCount();
+  createClickEventToUpdateThreadListCount();
+  updateThreadListCount();
+}
+
+/*
+* 设置一个10秒的定时器 定时从本地获取条数更新dom
+* @author pengxiguaa 2020-12-11
+* */
+function createTimeoutToUpdateThreadListCount() {
+  setTimeout(() => {
+    updateThreadListCount();
+    createTimeoutToUpdateThreadListCount();
+  }, 10 * 1000);
+}
+function createClickEventToUpdateThreadListCount() {
+  document.body.addEventListener('click', function(e) {
+    let target = e.target;
+    if(target.tagName.toLowerCase() !== 'a') return;
+    target = $(target);
+    const href = target.attr('href');
+    const reg = /^\/t\/([0-9]+)\??/ig;
+    if(!reg.test(href)) return;
+    const tid = RegExp.$1;
+    NKC.methods.setThreadListNewPostCount(tid, 0);
+    setThreadListNewCount(tid, 0);
+  });
+}
+/*
+* 从本地获取数据更新dom
+* @author pengxiguaa 2020-12-11
+* */
+function updateThreadListCount() {
+  const threadList = $('div.normal-thread-list');
+  const threads = threadList.find('.thread-panel');
+  for(let i = 0; i < threads.length; i++) {
+    const thread = threads.eq(i);
+    const tid = thread.attr('data-tid');
+    const count = NKC.methods.getThreadListNewPostCount(tid);
+    setThreadListNewCount(tid, count);
+  }
+}
+
+/*
+* 添加鼠标事件
+* @author pengxiguaa 2020-12-11
+* */
+function createMouseEvents() {
+  floatUserPanel.initPanel();
+  floatForumPanel.initPanel();
+}
+
+/*
+* 设置文章的未读数
+* @param {String} tid 文章ID
+* @param {Number} count 未读数
+* @author pengxiguaa 2020-12-11
+* */
+function setThreadListNewCount(tid, count) {
+  const threadList = $('div.normal-thread-list');
+  const targetThreadInfo = threadList.find('div[data-tid="'+tid+'"] .thread-panel-author-info');
+  if(!targetThreadInfo.length) return;
+  const targetThreadCounter = threadList.find('div[data-tid="'+tid+'"] span.thread-panel-point');
+  targetThreadCounter.remove();
+  if(count === 0) return;
+
+  // 显示条数
+  //const newCounter = $("<span class='thread-panel-counter' data-count='"+count+"' title='"+count+"条更新'>"+count+"</span>");
+
+  // 只显示红点
+  const newCounter = $("<span class='thread-panel-point' data-count='"+count+"'></span>");
+  targetThreadInfo.append(newCounter);
+}
+
+/*
+* 移除文章列表中的最后一条
+* @author pengxiguaa 2020-12-14
+* */
+function removeLastThreadPanel() {
+  const threadPanel = $('div.normal-thread-list>.thread-panel');
+  const length = threadPanel.length;
+  if(length === 0) return;
+  threadPanel.eq(length - 1).remove();
 }

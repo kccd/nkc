@@ -47,7 +47,7 @@ NKC.modules.DraggablePanel = class {
       _index = Number(_index);
       if(maxIndex === undefined || maxIndex < _index) maxIndex = _index;
     }
-    maxIndex = (maxIndex || 10000) + 1;
+    maxIndex = (maxIndex || 5000) + 1;
     this.dom.css({
       'z-index': maxIndex
     });

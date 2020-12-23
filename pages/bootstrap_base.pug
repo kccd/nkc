@@ -72,10 +72,9 @@ block body
     script!=`NKC.configs.refererOperationId="${data.operationId}"`
     +includeJS('/socket.io-client/dist/socket.io.js')
     //- 通用socket
-    //if !state.isApp
+    if !state.isApp
       //- 接入即时通信
-      //- +includeJS('/socket/commonSocket.js')
-    +includeJS('/message/socket.js')
+      include ./publicModules/socket/socket
 
     //- 新增好评
     //- if data.user.newVoteUp > 0

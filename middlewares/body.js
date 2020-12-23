@@ -99,6 +99,9 @@ module.exports = async (ctx, next) => {
     if(type === 'json' && from === 'nkcAPI') {
 	    ctx.type = 'json';
 	    if(ctx.data.user) ctx.data.user = ctx.data.user.toObject();
+	    delete ctx.data.userGrade;
+	    delete ctx.data.userOperationsId;
+	    delete ctx.data.userRoles;
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';

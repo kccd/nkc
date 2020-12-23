@@ -1,4 +1,4 @@
-importScripts("/socket.io-client/dist/socket.io.js");
+/*importScripts("/socket.io-client/dist/socket.io.js");
 
 self.addEventListener('install', event => {
   return self.skipWaiting()
@@ -7,7 +7,7 @@ self.addEventListener('install', event => {
 self.addEventListener("message",  function(event){
   let message = event.data;
   console.log(message);
-})
+})*/
 
 // var socket = io('/common', {
 //   forceNew: false,

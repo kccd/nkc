@@ -806,6 +806,9 @@ function initVueApp() {
             } else if(type === "modifyForumDeclare") {
               desType = "forumDeclare";
               desTypeId = self.forum.fid;
+            } else if(type === 'modifyForumLatestNotice') {
+              desType = "forumLatestNotice";
+              desTypeId = self.forum.fid;
             } else {
               throw "未知的草稿类型";
             }

@@ -1,4 +1,4 @@
-/* 
+/*
   events:
     select: 划词
     create: 创建实例
@@ -208,7 +208,7 @@ window.Source = class {
         node = node.splitText(startOffset);
       }
       if(node.textContent.length !== needLength) {
-        node.splitText(needLength);  
+        node.splitText(needLength);
       }
       return node;
     });

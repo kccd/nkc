@@ -73,6 +73,9 @@ var Tools = function() {
         }
         return "/p/" + id;
       }
+      case "postHome": {
+        return "/p/" + id;
+      }
       case "thread": {
         return "/t/" + id;
       }
@@ -94,6 +97,7 @@ var Tools = function() {
         return "/message/resource/" + id;
       }
       case "userHome": {
+        if(id === 'default') return false
         return "/u/" + id
       }
       case "messageCover": {
@@ -111,6 +115,12 @@ var Tools = function() {
       case 'previewPDF': {
         return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
       }
+    }
+  };
+  self.getAnonymousInfo = function() {
+    return {
+      username: '匿名用户',
+      avatarUrl: self.getUrl('anonymousUserAvatar')
     }
   };
   self.floatUserInfo = function(uid) {

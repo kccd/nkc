@@ -165,7 +165,7 @@ router
       data.type = "modifyForumLatestNotice";
       const {id} = query;
       const forum = await db.ForumModel.findOnly({fid: id});
-      if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业“最新”板块公告");
+      if(!forum.moderators.includes(user.uid) && !ctx.permission("superModerator")) ctx.throw(403, "你没有权限编辑专业最新页板块公告");
       // 渲染nkcsource
       data.post = {
         c: forum.latestBlockNotice

@@ -106,7 +106,7 @@
       .search-result-time
         //-=fromNow(result.resource.tlm || result.resource.toc)
         +fromNow(result.resource.tlm || result.resource.toc)
-    .search-result-abstract= "文件：" + (result.c || "暂无简介")
+    .search-result-abstract!= "文件：" + (result.c || "暂无简介")
     .search-result-info.resource
       a(href=`/r/${result.resource.rid}` target="_blank")
         .fa.fa-cloud-download &nbsp;

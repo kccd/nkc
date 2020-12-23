@@ -72,7 +72,7 @@ const forumSchema = new Schema({
 		type: String,
 		default: ''
   },
-  // 专业“最新”板块公告
+  // 专业最新页板块公告
   latestBlockNotice: {
     type: String,
     default: ''
@@ -891,6 +891,28 @@ forumSchema.methods.isModerator = async function(uid) {
 		}
 	});
 	return isModerator;*/
+};
+
+
+/*
+* 判断用户是否为指定id专业的专家
+* @param {String} uid 用户ID
+* @param {[String]} [fid, fid, ...] 专业id组成的数据
+* @return {Boolean} 是否为专家
+* @author pengxiguaa 2020-12-21
+* */
+forumSchema.statics.isModerator = async (uid, forumsId = []) => {
+  const ForumModel = mongoose.model('forums');
+  const UserModel = mongoose.model('users');
+  const user = await UserModel.findOne({uid});
+  if(!user) return false;
+  const isSuperModerator = await user.isSuperModerator();
+  if(isSuperModerator) return true;
+  const forums = await ForumModel.find({fid: {$in: forumsId}}, {moderators: 1});
+  for(const forum of forums) {
+    if(forum.moderators.includes(uid)) return true;
+  }
+  return false;
 };
 // -----------------------------------------------------------------------
 

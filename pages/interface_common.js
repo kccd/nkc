@@ -1008,9 +1008,10 @@ function submitPostWarning() {
       dom.modal('hide');
       dom.attr("data-pid", "");
       text.val("");
+      sweetSuccess('提交成功');
     })
     .catch(function(data) {
-      screenTopWarning(data);
+      sweetError(data);
     })
 }
 

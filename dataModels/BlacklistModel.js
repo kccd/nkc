@@ -135,4 +135,17 @@ schema.statics.getBlacklistInfo = async (uid, tUid, canSendToEveryOne) => {
     }
   }
 }
+
+/*
+* 判断用户的黑名单中是否存在指定用户
+* @param {String} uid user ID
+* @param {String} tUid 目标用户ID
+* @return {Boolean}
+* @author pengxiguaa 2020-12-15
+* */
+schema.statics.checkUser = async (uid, tUid) => {
+  const BlacklistModel = mongoose.model('blacklists');
+  const count = await BlacklistModel.count({uid, tUid});
+  return count > 0;
+};
 module.exports = mongoose.model("blacklists", schema);

@@ -2,7 +2,7 @@ if creditPost && creditPost.credits && creditPost.credits.length > 0
   .nkcpanel.ThreadPostCredits
     for c,index in creditPost.credits
       .ThreadPostCreditItem
-        -let number = c.num;
+        -var number = c.num;
         if c.type === "creditKcb"
           -number = number/100;
         span.TPCQ!= `${(number > 0 ? '+' : '')}${number} &nbsp;`

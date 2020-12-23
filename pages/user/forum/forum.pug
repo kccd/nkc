@@ -12,10 +12,12 @@ block content
         p(v-if="myPForums.length") {{"你已经提交过" + myPForums.length + "个开办新专业申请了"}}
         .form.protocol-control
           .form-group
-            label
-              input.protocol-accept(type="checkbox" v-model="protocol.haveReadProtocol")
-              span &nbsp; 我已仔细阅读过了
-            button.btn.btn-primary.btn-block(@click="toStep(1)") 下一步
+            .checkbox
+              label
+                input.protocol-accept(type="checkbox" v-model="protocol.haveReadProtocol")
+                span 我已阅读并同意遵守与本次申请相关的全部协议
+          .form-group
+            button.btn.btn-primary.btn-block(@click="toStep(1)" :disabled='!protocol.haveReadProtocol') 下一步
 
       .col-xs-12.col-md-6.col-md-offset-3(v-show="stepName === 'enter_info'")
         .form
@@ -29,11 +31,6 @@ block content
             h4 你能为该专业做些什么？
             input.form-control(v-model="enterInfo.youWantToDo")
           .form-group
-            button.btn.btn-primary.btn-block(@click="toStep(2)") 下一步
-      
-      .col-xs-12.col-md-6.col-md-offset-3(v-show="stepName === 'send_invite'")
-        .form
-          .form-group
             h4 邀请至少2位本站用户作为新专业的创始人。
           .form-group
             button.btn.btn-primary(@click="selectUsers()") 选择用户
@@ -46,15 +43,11 @@ block content
               .founder-delete(@click="deleteFounder(index)")
                 .fa.fa-close
           .form-group
-            button.btn.btn-primary.btn-block(@click="toStep(3)") 提交
+            button.btn.btn-primary.btn-block(@click="toStep(2)" :disabled="submitting") {{buttonName}}
 
       .col-xs-12.col-md-6.col-md-offset-3(v-show="stepName === 'sucess_section'")
-        .info-commit-wrap(v-if="process")
+        .info-commit-wrap
           h3
-            <svg t="1605241668389" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4061" width="200" height="200"><path d="M512 329.325a33.868 33.868 0 0 0-34.101 33.589v224.1c0 1.535 0.744 2.884 0.93 4.372 0.326 2.466 0.605 4.746 1.443 6.979 0.79 2 1.86 3.722 2.93 5.443 1.117 1.907 2.187 3.722 3.722 5.443 1.582 1.721 3.443 2.884 5.397 4.466 1.256 0.838 2.093 2.187 3.536 2.885l195.162 103.745a34.148 34.148 0 0 0 16.143 4.001 34.148 34.148 0 0 0 30.054-17.632 33.403 33.403 0 0 0-13.864-45.592l-177.25-94.302V362.914A33.961 33.961 0 0 0 512 329.324z m454.386 179.251a33.822 33.822 0 0 0-34.008 33.636c0 228.612-188.556 414.516-420.331 414.516-231.823 0-420.332-185.904-420.332-414.516 0-228.659 188.51-414.563 420.332-414.563a426.612 426.612 0 0 1 146.778 26.797l-44.754 11.817a33.543 33.543 0 0 0 8.792 66.062 34.38 34.38 0 0 0 8.84-1.117l109.56-28.983a56.292 56.292 0 0 0 34.66-26.146 54.897 54.897 0 0 0 5.582-42.521L752.15 25.392a33.961 33.961 0 0 0-41.731-23.82A33.59 33.59 0 0 0 686.32 42.7l14.98 55.22A497.327 497.327 0 0 0 512 60.424c-269.366 0-488.487 216.144-488.487 481.788S242.634 1024 512 1024c269.32 0 488.487-216.144 488.487-481.741 0-18.61-15.26-33.683-34.1-33.683z" p-id="4062"></path></svg>
-          p 正在提交，请稍后...
-        .info-commit-wrap(v-else)
-          h3 
             <svg t="1605240786529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3259" width="200" height="200"><path d="M511.950005 512.049995m-447.956254 0a447.956254 447.956254 0 1 0 895.912508 0 447.956254 447.956254 0 1 0-895.912508 0Z" fill="#20B759" p-id="3260"></path><path d="M458.95518 649.636559L289.271751 479.95313c-11.698858-11.698858-30.697002-11.698858-42.39586 0s-11.698858 30.697002 0 42.395859l169.683429 169.68343c11.698858 11.698858 30.697002 11.698858 42.39586 0 11.798848-11.598867 11.798848-30.597012 0-42.39586z" fill="#FFFFFF" p-id="3261"></path><path d="M777.62406 332.267552c-11.698858-11.698858-30.697002-11.698858-42.39586 0L424.158578 643.437164c-11.698858 11.698858-11.698858 30.697002 0 42.39586s30.697002 11.698858 42.39586 0l311.069622-311.069622c11.798848-11.798848 11.798848-30.796992 0-42.49585z" fill="#FFFFFF" p-id="3262"></path></svg>
           p 提交成功，请等待管理员审核
 

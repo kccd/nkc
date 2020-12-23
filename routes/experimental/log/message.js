@@ -60,7 +60,7 @@ router
         }
         // ip筛选
         if(ip) {
-          q.ip = ip;
+          q.ip = await db.IPModel.getTokenByIP(ip);
         }
         // 内容筛选
         if(keyword) {
@@ -79,9 +79,12 @@ router
         const messages = await db.MessageModel.find(q).sort({tc: -1}).skip(paging.start).limit(paging.perpage);
         // 拓展信息信息
         const uids = new Set();
+        const ipToken = [];
         messages.map(m => {
           uids.add(m.s).add(m.r);
+          ipToken.push(m.ip);
         });
+        const ipsObj = await db.IPModel.getIPByTokens(ipToken);
         const users = await db.UserModel.find({uid: {$in: [...uids]}});
         const usersObj = {};
         users.map(u => {
@@ -94,7 +97,7 @@ router
             user: usersObj[s],
             targetUser: usersObj[r],
             toc: tc,
-            ip,
+            ip: ipsObj[ip],
             withdrawn,
             c
           };

@@ -338,9 +338,13 @@ threadSchema.methods.ensurePermission = async function(roles, grade, user) {
   if(!this.forums) {
     await this.extendForums(["mainForums"]);
   }
+  const isAuthor = user && user.uid === this.uid;
   for(const forum of this.forums) {
     try {
-      await forum.ensurePermission(roles, grade, user);
+      // 自己可查看自己未在回收站内的文章
+      if(forum.fid === recycleId || !isAuthor) {
+        await forum.ensurePermission(roles, grade, user);
+      }
     } catch(err) {
       let status = err.status;
       try{
@@ -575,6 +579,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     }
   }
   // 创建post数据
+  const IPModel = mongoose.model('ips');
+  const ipToken = await IPModel.saveIPAndGetToken(ip);
   let _post = await new PostModel({
     pid,
     c,
@@ -585,8 +591,8 @@ threadSchema.methods.newPost = async function(post, user, ip) {
     keyWordsEn,
     authorInfos: newAuthInfos,
     originState,
-    ipoc: ip,
-    iplm: ip,
+    ipoc: ipToken,
+    iplm: ipToken,
     quote,
     l,
     mainForumsId: this.mainForumsId,
@@ -1578,6 +1584,7 @@ threadSchema.methods.createNewPost = async function(post) {
   const MessageModel = mongoose.model('messages');
   const UserModel = mongoose.model('users');
   const UserGeneralModel = mongoose.model("usersGeneral");
+  const IPModel = mongoose.model('ips');
   const ReplyModel = mongoose.model('replies');
   const dbFn = require('../nkcModules/dbFunction');
   const apiFn = require('../nkcModules/apiFunction');
@@ -1610,6 +1617,7 @@ threadSchema.methods.createNewPost = async function(post) {
   if(quote && quote[2]) {
     rpid.push(quote[2]);
   }
+  const ipToken = await IPModel.saveIPAndGetToken(post.ip);
   let _post = await new PostModel({
     cover,
     pid,
@@ -1621,8 +1629,8 @@ threadSchema.methods.createNewPost = async function(post) {
     keyWordsEn,
     authorInfos: newAuthInfos,
     originState,
-    ipoc: post.ip,
-    iplm: post.ip,
+    ipoc: ipToken,
+    iplm: ipToken,
     l,
     mainForumsId: this.mainForumsId,
     minorForumsId: this.minorForumsId,

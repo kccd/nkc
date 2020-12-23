@@ -57,6 +57,8 @@ func.getDonationDirectAlipay = () => {
     notes: 转账备注，会显示在支付宝账单上
   @author pengxiguaa 2019/3/11
 */
+// 20201210 升级接口 transfer
+// 文档地址 https://opendocs.alipay.com/apis/api_28/alipay.fund.trans.uni.transfer
 func.transfer = async (o) => {
   const {account, name, id, money, notes} = o;
   if(!account) throwErr('收款方支付宝账号不能为空');
@@ -65,18 +67,23 @@ func.transfer = async (o) => {
   if(!money || money <= 0.1) throwErr('支付宝转账金额不能小于0.1');
   if(!notes) throwErr('转账备注不能为空');
   const params = {
-    amount: money,
+    trans_amount: money,
+    product_code: 'TRANS_ACCOUNT_NO_PWD',
     out_biz_no: id, // 系统唯一订单号
     payee_type: 'ALIPAY_LOGONID', // 对方账号类型 手机号或邮箱
-    payee_account: account, // 收款方支付宝账户
-    payee_real_name: name, // 收款方真实姓名
+    payee_info: {// 收款方支付宝账户
+      identity: account,
+      identity_type: 'ALIPAY_LOGON_ID',
+      name: name,
+    },
+    biz_scene: 'DIRECT_TRANSFER',
     remark: notes // 转账备注
   };
   const options = {
     app_id: transfer.app_id,
     biz_content: JSON.stringify(params),
     charset: 'UTF-8',
-    method: 'alipay.fund.trans.toaccount.transfer',
+    method: 'alipay.fund.trans.uni.transfer',
     sign_type: 'RSA2',
     timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
     version: '1.0'
@@ -95,7 +102,7 @@ func.transfer = async (o) => {
         } catch(err) {
           return reject(data);
         }
-        data = data.alipay_fund_trans_toaccount_transfer_response;
+        data = data.alipay_fund_trans_uni_transfer_response;
         const {code, sub_msg} = data;
         if(code === '10000') {
           resolve(data);
@@ -108,6 +115,7 @@ func.transfer = async (o) => {
       });
   });
 };
+
 /*
   收款 电脑网页收款
   @param options

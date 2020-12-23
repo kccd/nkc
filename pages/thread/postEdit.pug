@@ -4,9 +4,9 @@
     if data.thread.closed
       h5 主题已关闭，暂不能发表回复/评论
     else
-      -const {exam, authLevelMin} = state.postSettings.postToThread;
-      -const {volumeA, volumeB, notPass} = exam;
-      -const {unlimited, countLimit} = notPass;
+      -var {exam, authLevelMin} = state.postSettings.postToThread;
+      -var {volumeA, volumeB, notPass} = exam;
+      -var {unlimited, countLimit} = notPass;
       if data.user.authLevel < authLevelMin
         h5.text-danger 身份认证等级未达要求，
           |点击

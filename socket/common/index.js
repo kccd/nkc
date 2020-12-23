@@ -55,6 +55,8 @@ module.exports = async (io) => {
         await require('./console')(socket, io, data);
       } else if(type === 'forum') {
         await require('./forum')(socket, io, data);
+      } else if(type === 'post') {
+        await require('./post')(socket, io, data);
       }
     });
   });
