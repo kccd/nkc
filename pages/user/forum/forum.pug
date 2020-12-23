@@ -24,7 +24,7 @@ block content
             input.form-control(v-model="enterInfo.newForumName")
           .form-group
             h4 简单陈述一下你想开办此专业理由。
-            input.form-control(v-model="enterInfo.reason")
+            textarea.form-control(v-model="enterInfo.reason" rows="5")
           .form-group
             h4 你能为该专业做些什么？
             input.form-control(v-model="enterInfo.youWantToDo")
@@ -34,7 +34,7 @@ block content
       .col-xs-12.col-md-6.col-md-offset-3(v-show="stepName === 'send_invite'")
         .form
           .form-group
-            h4 邀请至少3位本站用户作为新专业的创始人。
+            h4 邀请至少2位本站用户作为新专业的创始人。
           .form-group
             button.btn.btn-primary(@click="selectUsers()") 选择用户
           .form-group

@@ -18,8 +18,8 @@ const stepCheckerMap = new Map([
   ["send_invite",  // 发送邀请
     function(vm) {
       let sendInvite = vm.sendInvite;
-      if(sendInvite.userId.length < 3) {
-        return {passed: false, message: "至少选择3个人"}
+      if(sendInvite.userId.length < 2) {
+        return {passed: false, message: "至少选择2个人"}
       } else {
         vm.commitData();
         return {passed: true}
@@ -112,7 +112,10 @@ new Vue({
           console.log("提交成功");
           self.process = false;
         })
-        .catch(sweetError);
+        .catch((data) => {
+          self.step = 1;
+          sweetError(data);
+        });
     }
   }
 })

@@ -40,6 +40,15 @@ router
     let { info, invites: founders } = body;
     // 在筹备专业表创建一个筹备专业
     let pfid = await db.PreparationForumModel.createPForum(uid, info, founders);
+    // 添加自己为创始人
+    await db.PreparationForumModel.update({pfid}, {
+      $push: {
+        founders: {
+          accept: "resolve",
+          uid
+        }
+      }
+    });
     // 发送消息给管理员，管理员审核通过后在专业表里创建一个筹备专业
     // 设置中查哪些角色可以审核
     let forumSetting = await db.SettingModel.getSettings('forum');

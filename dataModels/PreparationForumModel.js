@@ -8,8 +8,7 @@ const typeSchema = new Schema({
   },
   fid: {
     type: String,
-    unique: true,
-    required: false
+    default: ""
   },
   uid: {
     type: String,
