@@ -18,7 +18,11 @@ module.exports = async (ctx, next) => {
     }
     const lastModified = (new Date(stats.mtime)).getTime();
     ctx.set("ETag", lastModified);
-    ctx.set('Cache-Control', 'public, max-age=604800');
+    if(ctx.dontCacheFile) {
+      ctx.set("Cache-Control", "no-store");
+    } else {
+      ctx.set('Cache-Control', 'public, max-age=604800');
+    }
 	  if(ctx.fresh) {
       ctx.status = 304;
       return
@@ -95,6 +99,9 @@ module.exports = async (ctx, next) => {
     if(type === 'json' && from === 'nkcAPI') {
 	    ctx.type = 'json';
 	    if(ctx.data.user) ctx.data.user = ctx.data.user.toObject();
+	    delete ctx.data.userGrade;
+	    delete ctx.data.userOperationsId;
+	    delete ctx.data.userRoles;
 	    ctx.body = ctx.data;
     } else {
       ctx.type = 'html';

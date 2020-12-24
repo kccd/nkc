@@ -890,3 +890,101 @@ NKC.methods.showNotification = function(title, body, time) {
     return toShow();
   }
 }
+/*
+* 获取本地数据键名，区分uid
+* @param {String} 数据键名
+* @return {String}
+* @author pengxiguaa 2020-12-11
+* */
+NKC.methods.getLocalStorageKey = function(key) {
+  var uid = NKC.configs.uid || 'visitor';
+  return {
+    forumThreadList: 'forumThreadList_' + uid
+  }[key]
+};
+/*
+* 获取本地数据并反序列化
+* @param {String} key 键名
+* @return {Object} {tid1: count, tid2: count} 键值对 tid: count
+* @author pengxiguaa 2020-12-11
+* */
+NKC.methods.getObjectDataFromLocalStorage = function(key) {
+  var data = localStorage.getItem(key);
+  if(data === null) {
+    data = {};
+  } else {
+    data = JSON.parse(data);
+  }
+  if(typeof data === 'string') data = {};
+  return data;
+};
+/*
+* 将数据序列化 然后存到本地
+* @param {String} key 键名
+* @param {Object} data {tid1: count, tid2: count, ...} 键值对 tid: count
+* @author pengxiguaa 2020-12-11
+* */
+NKC.methods.setObjectDataToLocalStorage = function(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+};
+/*
+* 从本地数据中获取指定文章的未读数
+* @param {String} tid
+* @return {Number} 未读数
+* @author pengxiguaa 2020-12-11
+* */
+NKC.methods.getThreadListNewPostCount = function(tid) {
+  var key = NKC.methods.getLocalStorageKey('forumThreadList');
+  var data = NKC.methods.getObjectDataFromLocalStorage(key);
+  return data[tid] || 0;
+}
+/*
+* 设置本地数据中的指定文章的未读数
+* @param {String} tid 文章ID
+* @param {Number} count 未读数
+* @author pengxiguaa 2020-12-11
+* */
+NKC.methods.setThreadListNewPostCount = function(tid, count) {
+  var key = NKC.methods.getLocalStorageKey('forumThreadList');
+  var data = NKC.methods.getObjectDataFromLocalStorage(key);
+  data[tid] = count;
+  NKC.methods.setObjectDataToLocalStorage(key, data);
+}
+/*
+* 清除本地数据
+* @param {String} 数据键名
+* @author pengxiguaa 2020-12-11
+* */
+NKC.methods.removeLocalStorageByKey = function(key) {
+  key = NKC.methods.getLocalStorageKey(key);
+  localStorage.removeItem(key);
+};
+
+
+
+// service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/serviceWorker/index.js')
+    .then(function(registration) {
+      return registration.update();
+    })
+    .then(function(registration) {
+      return new Promise(function(resolve, reject) {
+        if(registration.active) {
+          return resolve(registration.active);
+        } else {
+          registration.addEventListener("updatefound", function() {
+            if(registration.active) {
+              return resolve(registration.active);
+            }
+          });
+        }
+      });
+    })
+    .then(function(worker) {
+      NKC.modules.serviceWorker = worker;
+    })
+    .catch(function(error) {
+      console.log('Registration failed with ' + error);
+    })
+}

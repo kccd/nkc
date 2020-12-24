@@ -1,0 +1,52 @@
+#modulePostOptions{
+  position: absolute;
+  z-index: 1000;
+  .loading{
+    text-align: center;
+  }
+  .post-options-panel{
+    padding: 0.5rem 0;
+    min-width: 12rem;
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    border: 1px solid rgba(0, 0, 0, .23);
+    border-radius: 4px;
+    transition: height 1s;
+    @optionHeight: 2rem;
+    .option{
+      &:hover{
+        background-color: #eee;
+      }
+      &.time{
+        padding-left: 0;
+        text-align: center;
+        border-top: 1px solid #eee;
+        font-size: 1rem;
+        padding-top: 0.25rem;
+        &:hover{
+          background-color: inherit;
+        }
+      }
+      display: block;
+      color: #333;
+      padding-left: 3.4rem;
+      height: @optionHeight;
+      line-height: @optionHeight;
+      position: relative;
+      cursor: pointer;
+      font-size: 1.15rem;
+      text-decoration: none;
+      .fa{
+        left: 1.4rem;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        position: absolute;
+        height: @optionHeight;
+        font-size: 1.25rem;
+        line-height: @optionHeight;
+      }
+    }
+  }
+}
+

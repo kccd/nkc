@@ -20,6 +20,7 @@ const frameImgRouter = require('./frameImg');
 const posterRouter = require('./poster');
 const pageRouter = require('./page');
 const appDownload = require("./appDownload");
+const founderInvite = require("./founderInvite");
 const testRouter = require('./test');
 otherRouter
 	.get([
@@ -66,5 +67,6 @@ otherRouter
   .use('frameImg', frameImgRouter.routes(), frameImgRouter.allowedMethods())
   .use('poster', posterRouter.routes(), posterRouter.allowedMethods())
 	.use("appDownload", appDownload.routes(), appDownload.allowedMethods())
+	.use("founderInvite", founderInvite.routes(), founderInvite.allowedMethods())
   .use('test', testRouter.routes(), testRouter.allowedMethods());
 module.exports = otherRouter;

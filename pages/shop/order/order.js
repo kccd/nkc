@@ -1,16 +1,1 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-"use strict";
-
-window.comfirmReceipt = function (orderId) {
-  sweetQuestion("确认收货后，货款将打入卖家账户，请再次确认。").then(function () {
-    nkcAPI('/shop/order/' + orderId + '/receipt', "PUT", {}).then(function (data) {
-      sweetSuccess("执行成功");
-      window.location.reload();
-    })["catch"](sweetErro);
-  })["catch"](function (err) {
-    return null;
-  });
-};
-
-},{}]},{},[1])
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm5vZGVfbW9kdWxlcy9icm93c2VyLXBhY2svX3ByZWx1ZGUuanMiLCJwYWdlcy9zaG9wL29yZGVyL29yZGVyLm1qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7O0FDQUEsTUFBTSxDQUFDLGNBQVAsR0FBd0IsVUFBUyxPQUFULEVBQWtCO0FBQ3hDLEVBQUEsYUFBYSxDQUFDLHdCQUFELENBQWIsQ0FDRyxJQURILENBQ1EsWUFBTTtBQUNWLElBQUEsTUFBTSxDQUFDLGlCQUFlLE9BQWYsR0FBdUIsVUFBeEIsRUFBb0MsS0FBcEMsRUFBMkMsRUFBM0MsQ0FBTixDQUNHLElBREgsQ0FDUSxVQUFTLElBQVQsRUFBZTtBQUNuQixNQUFBLFlBQVksQ0FBQyxNQUFELENBQVo7QUFDQSxNQUFBLE1BQU0sQ0FBQyxRQUFQLENBQWdCLE1BQWhCO0FBQ0QsS0FKSCxXQUtTLFNBTFQ7QUFNRCxHQVJILFdBU1MsVUFBQSxHQUFHO0FBQUEsV0FBSSxJQUFKO0FBQUEsR0FUWjtBQVVELENBWEQiLCJmaWxlIjoiZ2VuZXJhdGVkLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXNDb250ZW50IjpbIihmdW5jdGlvbigpe2Z1bmN0aW9uIHIoZSxuLHQpe2Z1bmN0aW9uIG8oaSxmKXtpZighbltpXSl7aWYoIWVbaV0pe3ZhciBjPVwiZnVuY3Rpb25cIj09dHlwZW9mIHJlcXVpcmUmJnJlcXVpcmU7aWYoIWYmJmMpcmV0dXJuIGMoaSwhMCk7aWYodSlyZXR1cm4gdShpLCEwKTt2YXIgYT1uZXcgRXJyb3IoXCJDYW5ub3QgZmluZCBtb2R1bGUgJ1wiK2krXCInXCIpO3Rocm93IGEuY29kZT1cIk1PRFVMRV9OT1RfRk9VTkRcIixhfXZhciBwPW5baV09e2V4cG9ydHM6e319O2VbaV1bMF0uY2FsbChwLmV4cG9ydHMsZnVuY3Rpb24ocil7dmFyIG49ZVtpXVsxXVtyXTtyZXR1cm4gbyhufHxyKX0scCxwLmV4cG9ydHMscixlLG4sdCl9cmV0dXJuIG5baV0uZXhwb3J0c31mb3IodmFyIHU9XCJmdW5jdGlvblwiPT10eXBlb2YgcmVxdWlyZSYmcmVxdWlyZSxpPTA7aTx0Lmxlbmd0aDtpKyspbyh0W2ldKTtyZXR1cm4gb31yZXR1cm4gcn0pKCkiLCJ3aW5kb3cuY29tZmlybVJlY2VpcHQgPSBmdW5jdGlvbihvcmRlcklkKSB7XHJcbiAgc3dlZXRRdWVzdGlvbihcIuehruiupOaUtui0p+WQju+8jOi0p+asvuWwhuaJk+WFpeWNluWutui0puaIt++8jOivt+WGjeasoeehruiupOOAglwiKVxyXG4gICAgLnRoZW4oKCkgPT4ge1xyXG4gICAgICBua2NBUEkoJy9zaG9wL29yZGVyLycrb3JkZXJJZCsnL3JlY2VpcHQnLCBcIlBVVFwiLCB7fSlcclxuICAgICAgICAudGhlbihmdW5jdGlvbihkYXRhKSB7XHJcbiAgICAgICAgICBzd2VldFN1Y2Nlc3MoXCLmiafooYzmiJDlip9cIik7XHJcbiAgICAgICAgICB3aW5kb3cubG9jYXRpb24ucmVsb2FkKCk7XHJcbiAgICAgICAgfSlcclxuICAgICAgICAuY2F0Y2goc3dlZXRFcnJvKVxyXG4gICAgfSlcclxuICAgIC5jYXRjaChlcnIgPT4gbnVsbClcclxufVxyXG4iXX0=
+!function t(o,i,u){function c(n,e){if(!i[n]){if(!o[n]){var r="function"==typeof require&&require;if(!e&&r)return r(n,!0);if(f)return f(n,!0);throw(r=new Error("Cannot find module '"+n+"'")).code="MODULE_NOT_FOUND",r}r=i[n]={exports:{}},o[n][0].call(r.exports,function(e){return c(o[n][1][e]||e)},r,r.exports,t,o,i,u)}return i[n].exports}for(var f="function"==typeof require&&require,e=0;e<u.length;e++)c(u[e]);return c}({1:[function(e,n,r){"use strict";window.comfirmReceipt=function(e){sweetQuestion("确认收货后，货款将打入卖家账户，请再次确认。").then(function(){nkcAPI("/shop/order/"+e+"/receipt","PUT",{}).then(function(e){sweetSuccess("执行成功"),window.location.reload()}).catch(sweetErro)}).catch(function(e){return null})}},{}]},{},[1]);

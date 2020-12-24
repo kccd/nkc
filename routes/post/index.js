@@ -15,11 +15,12 @@ const toppedRouter = require("./topped");
 const authorRouter = require("./author");
 const resourcesRouter = require("./resources");
 const markNotes = require('../../nkcModules/nkcRender/markNotes');
+const optionRouter = require('./option');
 const router = new Router();
 
 router
   .get('/:pid', async (ctx, next) => {
-    const {nkcModules, data, db, query} = ctx;
+    const {nkcModules, data, db, query, state} = ctx;
 		const {token, page=0, highlight, redirect} = query;
     const {pid} = ctx.params;
     data.highlight = highlight;
@@ -259,6 +260,7 @@ router
       data.paging = paging;
       const template = Path.resolve("./pages/thread/comments.pug");
       data.html = nkcModules.render(template, data, ctx.state);
+      data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post');
     } else {
       q.parentPostsId = pid;
       // 回复详情页 获取评论 平面
@@ -505,5 +507,6 @@ router
   .use("/:pid/anonymous", anonymousRouter.routes(), anonymousRouter.allowedMethods())
   .use("/:pid/resources", resourcesRouter.routes(), resourcesRouter.allowedMethods())
   .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods())
+  .use("/:pid/option", optionRouter.routes(), optionRouter.allowedMethods())
   .use("/:pid/delete", deleteRouter.routes(), deleteRouter.allowedMethods());
 module.exports = router;

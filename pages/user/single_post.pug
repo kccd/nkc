@@ -9,7 +9,9 @@
     .post-checkbox.checkbox
       label
         input(type="checkbox" data-pid=post.pid)
-    .post-time=fromNow(post.time)
+    .post-time
+      //-=fromNow(post.time)
+      +fromNow(post.time)
     if post.postType === "postToForum"
       .post-type=`${post.anonymous?"匿名":""}发表文章`
       a(href=`/t/${post.tid}`).post-title=post.title

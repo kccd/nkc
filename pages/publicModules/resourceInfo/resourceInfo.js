@@ -24,6 +24,7 @@ NKC.modules.ResourceInfo = function() {
         self.app.type = "resource";
         nkcAPI("/r/" + rid + "/info", "GET")
           .then(function(data) {
+            delete data.resource.type;
             self.app.loading = false;
             self.app.resource = data.resource;
             self.app.forums = data.forums;
@@ -52,12 +53,24 @@ NKC.modules.ResourceInfo = function() {
         if(options.lid) {
           this.getLibrary(options.lid);
         } else if(options.rid) {
-          this.getResource(options.rid);  
+          this.getResource(options.rid);
         }
-        
+
       },
       close: function() {
         self.dom.modal("hide");
+      },
+      download: function(rid) {
+        let fileName = this.resource.resource.oname;
+        nkcAPI(`/r/${rid}/pay`, "POST")
+          .then(() => {
+            let downloader = document.createElement("a");
+            downloader.setAttribute("download", fileName);
+            downloader.href = `/r/${rid}`;
+            downloader.target = "_blank";
+            downloader.click();
+          })
+          .catch(sweetError);
       }
     }
   });

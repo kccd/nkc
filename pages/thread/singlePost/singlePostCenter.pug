@@ -1,0 +1,12 @@
+//- 字段详情/pages/thread/singlePost/singlePost.pug
+if !isIncluded('singlePostCenter')
+  include ./singlePostQuote
+  include ./singlePostCredit
+  mixin singlePostCenter(props)
+    -var {content, title, quote, pid, kcb, xsf} = props;
+    .single-post-center
+      if quote
+        +singlePostQuote(quote)
+      .single-post-title=title
+      .single-post-content!=content
+      +singlePostCredit(pid, xsf.concat(kcb))

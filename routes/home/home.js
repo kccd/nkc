@@ -1,6 +1,6 @@
 module.exports = async (options) => {
   const {ctx, fidOfCanGetThreads} = options;
-  const {data, db, nkcModules} = ctx;
+  const {data, db, nkcModules, state} = ctx;
   const {user} = data;
 
   const homeSettings = await db.SettingModel.getSettings("home");
@@ -126,6 +126,7 @@ module.exports = async (options) => {
     data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
   }*/
   await nkcModules.apiFunction.extendManagementInfo(ctx);
-
+  // 是否有权限开办专业
+  data.hasPermissionOpenNewForum = await db.PreparationForumModel.hasPermissionToCreatePForum(state.uid);
   ctx.template = "home/home_all.pug";
 };

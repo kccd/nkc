@@ -270,6 +270,8 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model("problems");
   const PostsVoteModel = mongoose.model('postsVotes');
+  const ForumModel = mongoose.model('forums');
+  const PreparationForumModel = mongoose.model('pForum');
   const apiFunction = require("../nkcModules/apiFunction");
   const results = [];
 
@@ -560,6 +562,88 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       }
     }
 
+    // 新专业申请审核相关
+    else if(type === "newForumReview") {
+      let pfid = r.c.pfid;
+      let pForum = await PreparationForumModel.findOne({pfid});
+      if(!pForum) {
+        continue;
+      }
+      let { uid, info } = pForum;
+      let { newForumName } = info;
+      // 用户主页链接
+      r.c.NFRUserProfile = tools.getUrl("userHome", uid);
+      // 用户名
+      const user = await UserModel.findOne({uid}, {username: 1});
+      r.c.NFRUserName = user.username;
+      // 新专业名
+      r.c.NFRName = newForumName;
+      // 审核页面链接
+      r.c.NFRReview = "/nkc/applyForum";
+    }
+
+    // 新专业创始人邀请相关
+    else if(type === "inviteFounder") {
+      let { pfid, myUid } = r.c;
+      let pForum = await PreparationForumModel.findOne({pfid});
+      if(!pForum) {
+        continue;
+      }
+      let { uid, info } = pForum;
+      let { newForumName } = info;
+      // 用户主页链接
+      r.c.IFUserProfile = tools.getUrl("userHome", uid);
+      // 用户名
+      const user = await UserModel.findOne({uid}, {username: 1});
+      r.c.IFUserName = user.username;
+      // 新专业名
+      r.c.IFName = newForumName;
+      // 处理邀请页面
+      // r.c.IFAcceptPageUrl = `/founderInvite/accept/${pfid}/page`;
+      r.c.IFAcceptPageUrl = `/u/${r.r}/forum/invitation?pfid=${pfid}`;
+    }
+
+    // 新专业申请审核通过相关
+    else if(type === "newForumReviewResolve") {
+      let { pfid, fid } = r.c;
+      let forum = await ForumModel.findOne({fid});
+      let pForum = await PreparationForumModel.findOne({pfid});
+      if(!forum) continue;
+      let { displayName } = forum;
+      // 专业名
+      r.c.NFRSName = displayName;
+      // 专业主页
+      r.c.NFRSUrl = tools.getUrl("forumHome", fid);
+      // 筹备专业截止日期
+      r.c.NFRSExpired = tools.timeFormat(pForum.expired);
+    }
+
+    // 新专业申请审核不通过相关
+    else if(type === "newForumReviewReject") {
+      let { pfid } = r.c;
+      let pForum = await PreparationForumModel.findOne({pfid});
+      if(!pForum) continue;
+      let { info } = pForum;
+      let { newForumName } = info;
+      // 专业名
+      r.c.NFRJName = newForumName;
+      // 专业主页
+      r.c.NFRJUrl = tools.getUrl("forumHome", pfid);
+    }
+
+    // 筹备专业转正或者关闭相关
+    else if(type === "becomeFormalForum") {
+      let { name, formal } = r.c;
+      // 专业名
+      r.c.BFFName = name;
+      // 消息
+      if(formal) {
+        r.c.BFFMessage = "已转为正式专业";
+      } else {
+        r.c.BFFMessage = "已被关停，此筹备专业未能在30天内产出50篇文章";
+      }
+    }
+
     if(r.c.thread) {
       r.c.thread = (await ThreadModel.extendThreads([r.c.thread], {
         forum: false,
@@ -612,6 +696,110 @@ messageSchema.statics.sendShopMessage = async (options) => {
   await message.save();
   await redis.pubMessage(message);
 };
+
+/**
+ * 发送新办专业申请审核
+ */
+messageSchema.statics.sendNewForumReviewMessage = async ({uid, pfid}) => {
+  const MessageModel = mongoose.model("messages");
+  const SettingModel = mongoose.model("settings");
+  const redis = require("../redis");
+  const message = MessageModel({
+    _id: await SettingModel.operateSystemID("messages", 1),
+    r: uid,
+    ty: "STU",
+    c: {
+      type: "newForumReview",
+      pfid
+    }
+  });
+  await message.save();
+  await redis.pubMessage(message);
+}
+
+/**
+ * 发送新专业创始人邀请
+ */
+messageSchema.statics.sendInviteFounder = async ({pfid, targetUid}) => {
+  const MessageModel = mongoose.model("messages");
+  const SettingModel = mongoose.model("settings");
+  const redis = require("../redis");
+  const message = MessageModel({
+    _id: await SettingModel.operateSystemID("messages", 1),
+    r: targetUid,
+    ty: "STU",
+    c: {
+      type: "inviteFounder",
+      pfid
+    }
+  });
+  await message.save();
+  await redis.pubMessage(message);
+}
+
+/**
+ * 发送新专业申请审核通过消息
+ */
+messageSchema.statics.sendNewForumReviewResolve = async ({pfid, fid, targetUid}) => {
+  const MessageModel = mongoose.model("messages");
+  const SettingModel = mongoose.model("settings");
+  const redis = require("../redis");
+  const message = MessageModel({
+    _id: await SettingModel.operateSystemID("messages", 1),
+    r: targetUid,
+    ty: "STU",
+    c: {
+      type: "newForumReviewResolve",
+      fid,
+      pfid
+    }
+  });
+  await message.save();
+  await redis.pubMessage(message);
+}
+
+/**
+ * 发送新专业申请审核不通过消息
+ */
+messageSchema.statics.sendNewForumReviewReject = async ({pfid, targetUid}) => {
+  const MessageModel = mongoose.model("messages");
+  const SettingModel = mongoose.model("settings");
+  const redis = require("../redis");
+  const message = MessageModel({
+    _id: await SettingModel.operateSystemID("messages", 1),
+    r: targetUid,
+    ty: "STU",
+    c: {
+      type: "newForumReviewReject",
+      pfid
+    }
+  });
+  await message.save();
+  await redis.pubMessage(message);
+}
+
+/**
+ * 发送筹备专业转正或者关闭消息
+ */
+messageSchema.statics.sendBecomeFormalForum = async ({pfid, targetUid, formal}) => {
+  const MessageModel = mongoose.model("messages");
+  const SettingModel = mongoose.model("settings");
+  const PreparationForumModel   = mongoose.model("pForum");
+  const redis = require("../redis");
+  const pForum = await PreparationForumModel.findOne({pfid});
+  const message = MessageModel({
+    _id: await SettingModel.operateSystemID("messages", 1),
+    r: targetUid,
+    ty: "STU",
+    c: {
+      type: "becomeFormalForum",
+      name: pForum.info.newForumName,
+      formal
+    }
+  });
+  await message.save();
+  await redis.pubMessage(message);
+}
 
 messageSchema.statics.getUsersFriendsUid = async (uid) => {
   const CreatedChatModel = mongoose.model('createdChat');

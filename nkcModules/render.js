@@ -369,6 +369,7 @@ function getOriginLevel(index) {
 
 
 let pugRender = (template, data, state) => {
+	data.userOperationsId = data.userOperationsId || [];
   const language = state && state.language? state.language: languages['zh_cn'];
   let options = {
     markdown_safe: render.commonmark_safe,

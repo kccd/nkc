@@ -19,7 +19,7 @@ router
     const {body, data, db} = ctx;
     const {tUid, from, pid} = body;
     const {user} = data;
-    data.list = await db.BlacklistModel.addUserToBlacklist(user.uid, tUid, from, pid);
+    await db.BlacklistModel.addUserToBlacklist(user.uid, tUid, from, pid);
     await next();
   })
   .del('/', async (ctx, next) => {

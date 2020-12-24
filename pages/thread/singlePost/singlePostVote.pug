@@ -1,0 +1,8 @@
+if !isIncluded('singlePostVote')
+  mixin singlePostVote(pid, vote, voteUp)
+    .posts-vote
+      .posts-vote-up(class=vote === 'up' ? 'active' : '' data-pid=pid onclick=`postsVote("${pid}", "up")`)
+        .fa.fa-caret-up
+        .posts-vote-number(data-pid=pid)= voteUp || ''
+      .posts-vote-down(class=vote === 'down' ? 'active' : '' data-pid=pid onclick=`postsVote("${pid}", "down")`)
+        .fa.fa-caret-down

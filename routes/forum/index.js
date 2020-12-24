@@ -84,36 +84,11 @@ forumRouter
     await next();
   })
 	.post('/', async (ctx, next) => {
-		const {data, redis, db, body} = ctx;
-		const {displayName, forumType} = body;
-		if(!displayName) ctx.throw(400, '名称不能为空');
-		const sameDisplayNameForum = await db.ForumModel.findOne({displayName});
-		if(sameDisplayNameForum) ctx.throw(400, '名称已存在');
-		let _id;
-		while(1) {
-			_id = await db.SettingModel.operateSystemID('forums', 1);
-			const sameIdForum = await db.ForumModel.findOne({fid: _id});
-			if(!sameIdForum) {
-				break;
-			}
-		}
-		const forumCategories = await db.ForumCategoryModel.getAllCategories();
-		const newForum = db.ForumModel({
-			fid: _id,
-			categoryId: forumCategories[0]._id,
-			displayName,
-			accessible: true,
-			visibility: false,
-			rolesId: ['dev', 'default'],
-			type: 'forum'
-    });
-
-    await newForum.save();
-
-    // await newForum.createLibrary(data.user.uid);
-
-    await redis.cacheForums();
-		await db.ForumModel.saveForumToRedis(newForum.fid);
+		const {data, db, redis, body} = ctx;
+		const {displayName, type} = body;
+		const newForum = await db.ForumModel.createForum(displayName, type);
+		await redis.cacheForums();
+ 		await db.ForumModel.saveForumToRedis(newForum.fid);
 		data.forum = newForum;
 		data.forums = await db.ForumModel.find({parentsId: []}).sort({order: 1});
 		await next();
