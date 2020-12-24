@@ -22,10 +22,10 @@ block content
       .col-xs-12.col-md-6.col-md-offset-3(v-show="stepName === 'enter_info'")
         .form
           .form-group
-            h4 请输入开办专业名称
+            h4 请输入开办专业名称()
             input.form-control(v-model="enterInfo.newForumName")
           .form-group
-            h4 请输入开办专业理由
+            h4 请输入开办专业理由(200字以上)
             textarea.form-control(v-model="enterInfo.reason" rows="5")
           .form-group
             h4 你能为该专业做些什么？
