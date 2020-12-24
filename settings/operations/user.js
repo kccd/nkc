@@ -221,8 +221,6 @@ module.exports = {
 			GET: "violationRecord"
 		},
 		forum: {
-			GET: "myForum",
-			POST: "commitForumApply",
 			apply: {
 				GET: 'applyForum',
 				POST: 'applyForum'

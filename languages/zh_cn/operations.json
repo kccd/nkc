@@ -748,7 +748,6 @@
   "getPostOption": "获取文章和回复的操作菜单",
   "resourceDetail": "资源详情",
 
-  "myForum": "我的专业",
   "applyForum": "提交开办专业申请",
   "applyForumInvitation": "处理开办专业成员邀请",
   "nkcManagementApplyForum": "专业申请审核（给普通用户，路由有审核员证书判断）"

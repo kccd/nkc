@@ -22,8 +22,6 @@ module.exports = [
     defaultRole: true,
     type: 'system',
     operationsId: [
-      "acceptFounderInvite",
-      "refuseFounderInvite",
       "getVerifications",
       "getAttachment",
       "APPGetNav",
