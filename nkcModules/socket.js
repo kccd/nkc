@@ -32,18 +32,22 @@ func.sendForumMessage = async (data) => {
     count: 200,
   }))[0];
   const template = PATH.resolve(__dirname, `../pages/publicModules/thread_panel/thread_panel.pug`);
+  let usedForumsId = [];
   for(const fid of thread.mainForumsId) {
-    const forum = await db.ForumModel.findOne({fid});
-    if(!forum) continue;
-    const html = render(template, {singleThread: thread}, {...state, threadListStyle: forum.threadListStyle});
-    const roomName = getRoomName('forum', fid);
-    global.NKC.io.to(roomName).emit('forumMessage', {
-      html,
-      pid,
-      tid,
-      digest: thread.digest,
-      contentType,
-    });
+    const forums = await db.ForumModel.getForumNav(fid);
+    for(const forum of forums) {
+      if(usedForumsId.includes(forum.fid)) continue;
+      const html = render(template, {singleThread: thread}, {...state, threadListStyle: forum.threadListStyle});
+      const roomName = getRoomName('forum', forum.fid);
+      global.NKC.io.to(roomName).emit('forumMessage', {
+        html,
+        pid,
+        tid,
+        digest: thread.digest,
+        contentType,
+      });
+      usedForumsId.push(forum.fid);
+    }
   }
 };
 
