@@ -14,6 +14,9 @@ const stepCheckerMap = new Map([
       if(!enterInfo.newForumName || !enterInfo.reason || !enterInfo.youWantToDo) {
         return {passed: false, message: "请先完整填写"}
       }
+      if(enterInfo.reason.length < 200) {
+        return {passed: false, message: "申请理由至少200个字符"}
+      }
       if(sendInvite.userId.length < 3) {
         return {passed: false, message: "请至少选择3个人作为专业共同创始人"}
       } else {
