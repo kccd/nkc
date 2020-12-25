@@ -8,7 +8,7 @@
         .modal-title.text-center 选择用户
       .modal-body
         .selected-users
-          h5 已选择用户：
+          h5 已选择用户({{selectedUsersId.length + '/' + userCount}})：
             span(v-if="!selectedUsers.length") 无
           .selected-user(v-for="u, index in selectedUsers")
             .selected-user-avatar

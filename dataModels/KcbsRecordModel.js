@@ -500,7 +500,7 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
 kcbsRecordSchema.statics.hideSecretInfo = async (records) => {
   for(const record of records) {
     record.c = "";
-    if(record.hideDescription) record.description = "【鼓励理由不符合论坛相关规定，已隐藏】";
+    if(record.hideDescription) record.description = "「根据相关法律法规和政策，内容不予显示」";
   }
 };
 

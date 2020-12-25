@@ -370,6 +370,50 @@ module.exports = {
             ],
             type: "complaintsResolve",
             content: "你投诉的[text=CRType][url=CRTarget(CRTargetDesc)]已经被处理。\n投诉理由：[text=CRReason]\n处理说明：[text=CRResult]"
+        },
+        {
+            parameters: [
+                "NFRUserProfile",
+                "NFRUserName",
+                "NFRName",
+                "NFRReview",
+            ],
+            type: "newForumReview",
+            content: "用户[url=NFRUserProfile(NFRUserName)]申请创建专业[text=NFRName]，请及时[url=NFRReview(审核)]"
+        },
+        {
+            parameters: [
+                "IFUserProfile",
+                "IFUserName",
+                "IFName",
+                "IFAcceptPageUrl",
+            ],
+            type: "inviteFounder",
+            content: "用户[url=IFUserProfile(IFUserName)]邀请你成为新专业[text=IFName]的创始人 [url=IFAcceptPageUrl(处理邀请)]"
+        },
+        {
+            parameters: [
+                "NFRSName",
+                "NFRSUrl",
+                "NFRSExpired"
+            ],
+            type: "newForumReviewResolve",
+            content: "你申请创建的新专业[url=NFRSUrl(NFRSName)]已经通过了审核，进入筹备阶段。截止[text=NFRSExpired]，若专业内文章大于50篇，则本专业将自动转为正式专业，否则专业将会被删除（不会删除专业内的文章）。"
+        },
+        {
+            parameters: [
+                "NFRJName"
+            ],
+            type: "newForumReviewReject",
+            content: "你申请创建的新专业[text=NFRJName]未能通过审核"
+        },
+        {
+            parameters: [
+                "BFFName",
+                "BFFMessage"
+            ],
+            type: "becomeFormalForum",
+            content: "你的筹备专业[text=BFFName][text=BFFMessage]"
         }
     ]
 };

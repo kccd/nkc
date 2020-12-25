@@ -1,0 +1,56 @@
+extends ../../bootstrap_base
+block title
+  title 开办专业
+  +includeCSS("/user/forum/apply.css")
+block content
+  .hidden#data= objToStr({appliedForums: data.appliedForums, reviewNewForumGuide: data.reviewNewForumGuide})
+  .container-fluid.max-width
+    .row#app(v-cloak)
+      .col-xs-12.col-md-6.col-md-offset-3#protocol(v-show="stepName === 'protocol'")
+        h3.protocol-title 开办指南
+        p.protocol-content {{reviewNewForumGuide}}
+        .form
+          .form-group
+            .checkbox
+              label
+                input.protocol-accept(type="checkbox" v-model="protocol.haveReadProtocol")
+                span 我已阅读并同意遵守与本次申请相关的全部协议
+          .form-group
+            p(v-if="appliedForums.length") {{"你已经提交过" + appliedForums.length + "个开办新专业申请"}}
+            button.btn.btn-primary.btn-block(@click="toStep(1)" :disabled='!protocol.haveReadProtocol') 下一步
+
+      .col-xs-12.col-md-6.col-md-offset-3(v-show="stepName === 'enter_info'")
+        .form
+          .form-group
+            h4 请输入开办专业名称
+            input.form-control(v-model="enterInfo.newForumName")
+          .form-group
+            h4 请输入开办专业理由
+            textarea.form-control(v-model="enterInfo.reason" rows="5")
+          .form-group
+            h4 你能为该专业做些什么？
+            input.form-control(v-model="enterInfo.youWantToDo")
+          .form-group
+            h4 请至少邀请3人作为新专业的共同创始人
+          .form-group
+            button.btn.btn-primary(@click="selectUsers()") 选择用户
+          .form-group
+            .selected-founder(v-for="(user, index) of sendInvite.users")
+              .founder-avatar
+                img(:src="user.avatarUrl")
+              .founder-name
+                span {{user.username}}
+              .founder-delete(@click="deleteFounder(index)")
+                .fa.fa-close
+          .form-group
+            button.btn.btn-primary.btn-block(@click="toStep(2)" :disabled="submitting") {{buttonName}}
+
+      .col-xs-12.col-md-6.col-md-offset-3(v-show="stepName === 'sucess_section'")
+        .info-commit-wrap
+          h3
+            <svg t="1605240786529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3259" width="200" height="200"><path d="M511.950005 512.049995m-447.956254 0a447.956254 447.956254 0 1 0 895.912508 0 447.956254 447.956254 0 1 0-895.912508 0Z" fill="#20B759" p-id="3260"></path><path d="M458.95518 649.636559L289.271751 479.95313c-11.698858-11.698858-30.697002-11.698858-42.39586 0s-11.698858 30.697002 0 42.395859l169.683429 169.68343c11.698858 11.698858 30.697002 11.698858 42.39586 0 11.798848-11.598867 11.798848-30.597012 0-42.39586z" fill="#FFFFFF" p-id="3261"></path><path d="M777.62406 332.267552c-11.698858-11.698858-30.697002-11.698858-42.39586 0L424.158578 643.437164c-11.698858 11.698858-11.698858 30.697002 0 42.39586s30.697002 11.698858 42.39586 0l311.069622-311.069622c11.798848-11.798848 11.798848-30.796992 0-42.49585z" fill="#FFFFFF" p-id="3262"></path></svg>
+          p 提交成功，请等待管理员审核
+
+block scripts
+  include ../../publicModules/selectUser/selectUser
+  +includeJS("/user/forum/apply.js")

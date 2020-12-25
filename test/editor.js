@@ -1,4 +1,4 @@
-const api = require('nkcAPI');
+const api = require('./nkcAPI');
 const {
   users,
 } = require('./config');

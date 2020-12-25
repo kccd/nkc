@@ -56,6 +56,8 @@ NKC.modules.SelectDraft = class {
             info = `修改文章《${thread.title}》下的回复`;
           } else if(type === "modifyThread") {
             info = `修改文章《${thread.title}》`;
+          } else if(type === 'modifyForumLatestNotice') {
+            info = `修改专业《${forum.title}》最新页板块公告`;
           } else {
             info = `修改专业《${forum.title}》的专业说明`;
           }

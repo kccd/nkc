@@ -56,7 +56,9 @@ module.exports = [
   },
   {
     name: 'PDFPreview',
-    maxGetPageScale: 0.5,     // 生成预览版PDF文件时，在原pdf中最大取占比多少的页数
-    maxGetPageCount: 8        // 生成预览版PDF文件时，在原pdf中最大取多少页
+    data: {
+      maxGetPageScale: 0.5,     // 生成预览版PDF文件时，在原pdf中最大取占比多少的页数
+      maxGetPageCount: 8        // 生成预览版PDF文件时，在原pdf中最大取多少页
+    }
   }
 ];

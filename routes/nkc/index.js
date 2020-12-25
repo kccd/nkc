@@ -4,6 +4,7 @@ const stickerRouter = require("./sticker");
 const noteRouter = require("./note");
 const postRouter = require("./post");
 const section = require("./section");
+const applyForumRouter = require('./applyForum');
 const moment = require("moment");
 router
   .get("/", async (ctx, next) => {
@@ -180,6 +181,7 @@ router
     }
     await next();
   })
+  .use('/applyForum', applyForumRouter.routes(), applyForumRouter.allowedMethods())
   .use("/home", homeRouter.routes(), homeRouter.allowedMethods())
   .use("/note", noteRouter.routes(), noteRouter.allowedMethods())
   .use("/post", postRouter.routes(), postRouter.allowedMethods())

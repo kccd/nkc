@@ -219,6 +219,16 @@ module.exports = {
 		},
 		violationRecord: {
 			GET: "violationRecord"
+		},
+		forum: {
+			apply: {
+				GET: 'applyForum',
+				POST: 'applyForum'
+			},
+			invitation: {
+				GET: 'applyForumInvitation',
+				POST: 'applyForumInvitation'
+			}
 		}
 	}
 };

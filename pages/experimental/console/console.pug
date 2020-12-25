@@ -1,68 +1,59 @@
-extends ../../bootstrap_base
+extends ../experimental
 
-block title
-  -const mainContainer1400 = true;
-  -const hiddenFooter = true;
-  link(href='/experimental/index.css' rel='stylesheet')
-  link(rel='stylesheet' href=`/experimental/console/console.css?v=${startTime}`)
-  link(rel='stylesheet' href=`/mdui/css/mdui.min.css`)
+block eTitle
+  +includeCSS('/experimental/console/console.css')
   title 控制台
-block content
-
+block eContent
   .container-fluid.max-width
     .row
-      include ../nav
       .col-xs-12.col-md-12#app(v-cloak)
-        <label class="mdui-checkbox">
-          <input type="checkbox" value='web' v-model='categories'>
-          <i class="mdui-checkbox-icon"></i>
-          | WEB
-        </label>
-        span &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <label class="mdui-checkbox">
-          <input type="checkbox" value='socket' v-model='categories'>
-          <i class="mdui-checkbox-icon"></i>
-          | SOCKET
-        </label>
-        span &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        span(v-if='statusString' style='color: #555;') {{statusString}}
+        .checkbox.log-methods
+          label.m-r-1
+            input(type='checkbox' value='http' v-model='categories')
+            span http
+          label.m-r-1
+            input(type='checkbox' value='socket' v-model='categories')
+            span socket
+          label.m-r-1
+            input(type='checkbox' :value='true' v-model='pauseConsole')
+            span 暂停打印
+          span(v-if='statusString' style='color: #555;') {{statusString}}
 
         .e-panel
           .message-panel(ref='panel')
             div(v-for='m in messages' @click="selectMessage(m)").pointer
-              .message(v-if='m.consoleType === "web" && categories.indexOf("web") !== -1')
-                span.req-time {{format('YYYY-MM-DD HH:mm:ss', new Date(m.reqTime))}}
-                span.process 进程{{m.processId}}
-                span(v-if='m.consoleType === "web"').req-type WEB
-                span(v-else).req-type SOCKET
-                span.uid(v-if='m.uid') {{m.uid}}
-                span.uid(v-else) visitor
-                span.method {{m.method}}
-                span.url {{m.url}}
-                span.res-time {{m.resTime}}ms
-                span(v-if='m.status >= 200 && m.status < 300').status-success {{m.status}}
-                span(v-else-if='m.status >= 400').status-error {{m.status}}
-                span(v-else).status-warning {{m.status}}
-                span.ip(v-if='m.address') IP: 
-                  a(:href='"http://www.ip138.com/ips138.asp?ip=" + m.address + "&action=2"' target='_blank') {{m.address}}
-                span.from(v-if='m.from') 来自：
-                  a(:href='m.from' target='_blank') {{m.from}}
-                div(v-if='m.error').status-error {{JSON.stringify(m.error, '', 4)}}
-              .message(v-if='m.consoleType === "socket" && categories.indexOf("socket") !== -1')
-                span.req-time {{format('YYYY-MM-DD HH:mm:ss', new Date(m.reqTime))}}
-                span.process 进程{{m.processId}}
-                span(v-if='m.consoleType === "web"').req-type WEB
-                span(v-else).req-type SOCKET
-                span.uid(v-if='m.uid') {{m.uid}}
-                span.uid(v-else) visitor
-                span.url {{m.url}}
-                span.status-success(v-if='m.connect') 建立连接
-                span.status-warning(v-else) 断开连接
+              div(v-if='categories.indexOf(m.consoleType) !== -1 && (!pauseConsole || pauseTime > new Date(m.reqTime).getTime())' title='点击查看详情')
+                .message(v-if='m.consoleType === "http"')
+                  span.req-time {{format('YYYY-MM-DD HH:mm:ss', new Date(m.reqTime))}}
+                  span.process 进程{{m.processId}}
+                  span(v-if='m.consoleType === "http"').req-type http
+                  span(v-else).req-type socket
+                  span.uid(v-if='m.uid') {{m.uid}}
+                  span.uid(v-else) visitor
+                  span.method {{m.method}}
+                  span.url {{m.url}}
+                  span.res-time {{m.resTime}}ms
+                  span(v-if='m.status >= 200 && m.status < 300').status-success {{m.status}}
+                  span(v-else-if='m.status >= 400').status-error {{m.status}}
+                  span(v-else).status-warning {{m.status}}
+                  span.ip(v-if='m.address') IP:
+                    a(:href='"http://www.ip138.com/ips138.asp?ip=" + m.address + "&action=2"' target='_blank') {{m.address}}
+                  span.from(v-if='m.from') 来自：
+                    a(:href='m.from' target='_blank') {{m.from.length > 50? m.from.slice(0, 50)+'...' : m.from}}
+                  div(v-if='m.error').status-error {{JSON.stringify(m.error, '', 4)}}
+                .message(v-if='m.consoleType === "socket"')
+                  span.req-time {{format('YYYY-MM-DD HH:mm:ss', new Date(m.reqTime))}}
+                  span.process 进程{{m.processId}}
+                  span(v-if='m.consoleType === "web"').req-type WEB
+                  span(v-else).req-type SOCKET
+                  span.uid(v-if='m.uid') {{m.uid}}
+                  span.uid(v-else) visitor
+                  span.url {{m.url}}
+                  span.status-success(v-if='m.connect') 建立连接
+                  span.status-warning(v-else) 断开连接
         .e-panel(v-if="message" style='color: #fff;')
           p(v-html="messageInfo")
 
 block scripts
   include ../../publicModules/moment
-  script(src=`/interface_common.js?v=${global.NKC.startTime}`)
-  script(src=`/mdui/js/mdui.min.js?v=${global.NKC.startTime}`)
-  script(src=`/experimental/console/console.js?v=${global.NKC.startTime}`)
+  +includeJS('/experimental/console/console.js')

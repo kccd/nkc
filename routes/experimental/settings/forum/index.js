@@ -29,7 +29,23 @@ router
 	.get('/', async (ctx, next) => {
 		const {data, db} = ctx;
 		data.forumSettings = await db.SettingModel.getSettings('forum');
+		const certList = await db.RoleModel.getCertList();
+		// 预处理一下
+		const roles = [], grades = [];
+		for(let cert of certList) {
+			let { type, name } = cert;
+			if(type.startsWith("role-")) {
+				let id = type.substr(5);
+				let cn = name.substr("5");
+				roles.push({id, name: cn});
+			} else if(type.startsWith("grade-")) {
+				let id = type.substr(6);
+				let cn = name.substr("5");
+				grades.push({id, name: cn});
+			}
+		}
 		data.forumCategories = await db.ForumCategoryModel.find().sort({order: 1});
+		data.certs = { roles, grades };
 		data.type = 'forum';
 		ctx.template = 'experimental/settings/forum/forum.pug';
 		await next();
@@ -43,10 +59,24 @@ router
 		const {db, body, nkcModules, data} = ctx;
 		const {allForums, forums} = data;
 		const {checkString} = nkcModules.checkData;
-		const {forumsInfo, categories, recycle} = body;
+		const {
+			forumsInfo,
+			categories,
+			recycle,
+			archive,
+			selectedReviewForumCert,
+			reviewNewForumGuide,
+			founderGuide,
+			selectedNewForumCert,
+			selectedNewForumGrade,
+			selectedRelationship
+		} = body;
 		if(!recycle) ctx.throw(400, '回收站专业ID不能为空');
+		if(!archive) ctx.throw(400, '归档专业ID不能为空');
 		const forum = await db.ForumModel.findOne({fid: recycle});
+		const archiveForum = await db.ForumModel.findOne({fid: archive}, {fid: true});
 		if(!forum) ctx.throw(400, `回收站专业不存在 fid: ${recycle}`);
+		if(!archiveForum) ctx.throw(400, `归档专业不存在 fid: ${archive}`);
 		if(forumsInfo.length !== allForums.length) {
 			ctx.throw(400, '专业数目错误，请刷新后再试');
 		}
@@ -144,6 +174,12 @@ router
 				}
 			});
 		}
+		// 更新归档专业ID
+		await db.SettingModel.updateOne({_id: 'forum'}, {
+			$set: {
+				'c.archive': archive
+			}
+		});
 		await db.ForumCategoryModel.remove({_id: {$nin: cid}});
 		const forumCategories = await db.ForumCategoryModel.find();
 		const forumCategoriesId = forumCategories.map(f => f._id);
@@ -173,6 +209,18 @@ router
 			excludedCategoriesId = [...new Set(excludedCategoriesId)];
 			await fc.update({excludedCategoriesId});
 		}
+
+		await db.SettingModel.updateOne({_id: 'forum'}, {
+			$set: {
+				'c.reviewNewForumCert': selectedReviewForumCert || [],
+				'c.reviewNewForumGuide': reviewNewForumGuide || "",
+				'c.founderGuide': founderGuide || "",
+				'c.openNewForumCert': selectedNewForumCert || [],
+        'c.openNewForumGrade': selectedNewForumGrade || [],
+        'c.openNewForumRelationship': selectedRelationship || "or"
+			}
+		});
+
 		await db.SettingModel.saveSettingsToRedis("forum");
 		await db.ForumCategoryModel.saveCategoryToRedis();
 		await next();

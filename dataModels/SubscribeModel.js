@@ -670,4 +670,29 @@ schema.statics.insertSubscribe = async (type, uid, tid) => {
   await sub.save();
 };
 
+/*
+* 判断用户是否收藏过指定文章
+* @param {String} uid user ID
+* @param {String} tid thread ID
+* @return {Boolean}
+* @author pengxiguaa 2020-12-15
+* */
+schema.statics.checkCollectionThread = async (uid, tid) => {
+  const SubscribeModel = mongoose.model('subscribes');
+  const count = await SubscribeModel.count({uid, tid, type: 'collection'});
+  return count > 0;
+};
+/*
+* 判断用户是否关注过指定文章
+* @param {String} uid user ID
+* @param {String} tid thread ID
+* @return {Boolean}
+* @author pengxiguaa 2020-12-15
+* */
+schema.statics.checkSubscribeThread = async (uid, tid) => {
+  const SubscribeModel = mongoose.model('subscribes');
+  const count = await SubscribeModel.count({uid, tid, type: 'thread'});
+  return count > 0;
+};
+
 module.exports = mongoose.model('subscribes', schema);

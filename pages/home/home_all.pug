@@ -41,7 +41,9 @@ block content
                   .detailed-forum-latest-thread
                     .latest-thread-point
                     a(href=`/t/${thread.tid}` title=thread.post.t)=thread.post.t
-                    span.time=fromNow(thread.tlm)
+                    span.time
+                      //-=fromNow(thread.tlm)
+                      +fromNow(thread.tlm)
           if f.childrenForums.length && !disableChild
             .col-xs-12.col-md-12.detailed-forums-padding-left
               for ff in f.childrenForums
@@ -144,6 +146,13 @@ block content
                 +detailedForumList(f)
               else
                 +normalForumList(f)
+
+        if data.user && data.hasPermissionOpenNewForum
+          .m-b-1
+            .home-columns-link
+              a(href=`/u/${data.user.uid}/forum/apply` target="_blank") 开办专业
+              .home-columns-link-info 你的账号已满足开办专业所需要的所有条件，点击按钮即可申请开办专业。
+              .home-columns-link-info 提交申请 → 筹备专业(30天) → 正式专业
 
 
         if data.goodsForums.length && data.showShopGoods
@@ -309,6 +318,7 @@ block content
                 a(href=`/column/apply` target="_blank") 开设专栏
                 .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
 
+
         if data.enableFund
           .home-forums-other.m-b-1
             .panel-header 最新基金申请
@@ -338,7 +348,9 @@ block content
           .home-posts
             for post in data.latestPosts
               .home-post
-                .home-post-time=fromNow(post.toc)
+                .home-post-time
+                  //-=fromNow(post.toc)
+                  +fromNow(post.toc)
                 if !post.user
                   span 匿名用户
                 else

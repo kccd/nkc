@@ -52,5 +52,4 @@ CollectionSchema.methods.extendThread = async function() {
   return this.thread = targetThread;
 };
 
-
 module.exports = mongoose.model('collections', CollectionSchema);

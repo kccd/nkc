@@ -6,31 +6,19 @@ block title
   title= `${thread.firstPost.t} - ${state.serverSettings.websiteName}`
   meta#replytarget(value=`${data.replyTarget}`)
 
-  -let modifyPostTimeLimit = 0;
   //- 用于回复时间戳的显示
   -let hidePostTimeCount = 0;
-  for r in data.userRoles
-    if r.modifyPostTimeLimit === -1
-      -modifyPostTimeLimit = -1;
-      -break;
-    if r.modifyPostTimeLimit > modifyPostTimeLimit
-      -modifyPostTimeLimit = r.modifyPostTimeLimit
 
-  -const postTo = data.userOperationsId.includes('quotePost')
-  -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
-  -const addKcb = data.userOperationsId.includes('creditKcb')
   -const disablePost = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
   -const unblockPosts = permission("unblockPosts") && data.isModerator;
-  -const highlight = data.highlight;
-  -const digestPost = data.userOperationsId.includes('digestPost') && data.isModerator;
-  -const unDigestPost = data.userOperationsId.includes('unDigestPost')  && data.isModerator;
 
   if (thread.firstPost&&thread.firstPost.c)
     -var processed=thread.firstPost.c.replace(/\[.*?]|\#|\n|\<.*?>/gm,'').trim().slice(0,140)
 
     meta(name='description' content=`${processed}`)
     meta(name='keywords' content=`${thread.firstPost.t}`)
-    link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+
+    +includeCSS("/external_pkgs/imageToBig/preview.css")
     +includeCSS("/jquery-ui-1.10.4.custom.css")
     +includeJS("/external_pkgs/imageToBig/preview.js")
     include ../publicModules/plyr/plyr.css.pug
@@ -42,190 +30,8 @@ block title
       color: black;
     }
 
-  mixin postOptions(post, targetThread, index, dropType)
-    -dropType = dropType || "dropdown";
-    .inline-block.post-options(style='margin-right: 0;color: #aaaaaa;' class=dropType)
-      div(class=`dropdown-toggle` data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
-        span.fa.fa-sliders
-        if targetThread
-          span &nbsp;操作
-      //-ul.dropdown-menu.stop-propagation(style='left: auto;right: 0;' data-stopPropagation=true)
-      ul.dropdown-menu(style='left: auto;right: 0;' data-stopPropagation=true)
-        if targetThread && data.authorColumn
-          li
-            if !data.addedToColumn
-              a(href=`javascript:addToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
-                span.fa.fa-share-square-o &nbsp;推送到我的专栏
-            else
-              a(href=`javascript:removeToColumn("${targetThread.oc}", "${data.authorColumn._id}")`)
-                span.fa.fa-share-square-o &nbsp;从我的专栏撤稿
-        li
-          a(href=`/p/${post.pid}` target="_blank")
-            span.fa.fa-newspaper-o &nbsp;
-            span 详情
-        if permission("getPostAuthor") && post.anonymous
-          li
-            a(onclick=`getPostAuthor('${post.pid}')`)
-              span.fa.fa-user-secret &nbsp;
-              span 作者
-        if permission("anonymousPost")
-          li
-            a(onclick=`anonymousPost('${post.pid}', ${!!!post.anonymous})`)
-              span.fa.fa-user-secret &nbsp;
-              span=post.anonymous? "取消匿名": "设为匿名"
-        if postTo && !thread.closed
-          if targetThread
-            li
-              a(onclick="quotePostWithout()")
-                span.fa.fa-comment-o &nbsp;
-                span 回复
-          else
-            li
-              a(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
-                span.fa.fa-comment-o &nbsp;
-                span 回复
-        if !thread.closed && !post.anonymous
-          li
-            a(onclick=`at('${post.user.username}')`)
-              span.fa.fa-at= ` ${post.user.username}`
-        if targetThread && targetThread.oc === post.pid && !targetThread.firstPost.anonymous
-          li
-            a(href=`/t/${thread.tid}?t=author`)
-              .fa.fa-filter &nbsp;只看作者
+  include ./postEditTime
 
-        if targetThread && targetThread.oc === post.pid && data.user && data.userOperationsId.includes('collectThread')
-
-          li
-            if data.collected
-              a(onclick=`SubscribeTypes.collectionThread('${thread.tid}', false)`)
-                span.fa.fa-folder-o &nbsp;已收藏
-            else
-              a(onclick=`SubscribeTypes.collectionThread('${thread.tid}', true)`)
-                span.fa.fa-folder-o &nbsp;加入收藏
-          li
-            if data.subscribed
-              a(onclick=`SubscribeTypes.subscribeThread('${thread.tid}', false)`)
-                span.fa.fa-bookmark-o &nbsp;取消关注
-            else
-              a(onclick=`SubscribeTypes.subscribeThread('${thread.tid}', true)`)
-                span.fa.fa-bookmark-o &nbsp;关注
-        if data.user && data.thread.oc !== post.pid && data.hasPermissionToHidePost
-          li
-            a(onclick=`openHidePostPanel('${post.pid}', '${post.hide}')`)
-              .fa.fa-compress &nbsp;折叠回复
-        if data.thread.oc !== post.pid && data.topPost
-          li
-            if data.thread.toppedPostsId.includes(post.pid)
-              a(onclick=`topPost('${post.pid}', false)`)
-               .fa.fa-thumb-tack &nbsp;取消置顶
-            else
-              a(onclick=`topPost('${post.pid}', true)`)
-               .fa.fa-thumb-tack &nbsp;置顶
-
-        if addCredit
-          li
-            a(onclick=`credit('${post.pid}', 'xsf')`)
-              span.fa.fa-graduation-cap &nbsp;
-              span 评学术分
-        if digestPost && !post.digest
-          li
-            a(onclick=`digestPost("${post.pid}")`)
-              span.fa.fa-star-o &nbsp;设为精选
-        if unDigestPost && post.digest
-          li
-            a(onclick=`unDigestPost("${post.pid}")`)
-              span.fa.fa-star &nbsp;取消精选
-        - var ownership = data.userOperationsId.includes('modifyOtherPosts')
-        - ownership = ownership?true:(post.ownPost)
-        //-if addKcb && post.uid !== data.user.uid
-          li
-            a(onclick=` credit("${post.pid}", 'kcb', ${data.user.kcb})`)
-              span.fa.fa-thumbs-o-up &nbsp;
-              span 鼓励
-        if permission("postWarningPost")
-          li
-            a(onclick=`openPostWarningDom("${post.pid}")`)
-              span.fa.fa-ambulance &nbsp;建议修改
-
-        if(testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc))
-          if (post.ownPost) || (data.isModerator && permission('modifyOtherPosts'))
-            if !targetThread || targetThread.type !== "fund"
-              li
-                a(href=`/editor?ver=ue&type=post&id=${post.pid}`)
-                  span.fa.fa-edit &nbsp;编辑
-                //-a(onclick=`NKC.methods.deletePost('${post.pid}')`)
-                //-  span.fa.fa-trash &nbsp;删除
-        if disablePost && !targetThread
-          li
-            a(onclick=`disabledThreadPost('${post.pid}')`)
-              span.fa.fa-eye-slash &nbsp;退修或删除
-        if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
-          if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
-            li
-              a(href=`/p/${post.pid}/history`)
-                span.fa.fa-history &nbsp;历史版本
-        if permission("violationRecord")
-          li
-            a(onclick=`NKC.modules.violationRecord.open({uid:'${post.uid}'})`)
-              span.fa.fa-newspaper-o &nbsp;
-              span 违规记录
-        if data.user
-          li.divider
-            if targetThread && targetThread.oc === post.pid
-              li
-                a(onclick=`moduleComplaint.open("thread", "${thread.tid}")`)
-                  span.fa.fa-minus-circle &nbsp;投诉
-            else
-              li
-                a(onclick=`moduleComplaint.open("post", "${post.pid}")`)
-                  span.fa.fa-minus-circle &nbsp;投诉
-          if post.uid
-            li
-              if data.blacklistUsersId.includes(post.uid)
-                //- 移出黑名单
-                a(onclick=`NKC.methods.removeUserFromBlacklist("${post.uid}")`)
-                  span.fa.fa-ban &nbsp;移出黑名单
-              else
-                //- 加入黑名单
-                a(onclick=`NKC.methods.addUserToBlacklist("${post.uid}", 'post', "${post.pid}")`)
-                  span.fa.fa-ban &nbsp;加入黑名单
-        li.divider
-        li
-          a
-            span.fa.fa-clock-o= ` ${post.toc.toLocaleString()}`
-        if disablePost
-          li
-            -const ipoc = post.iplm || post.ipoc;
-            a(onclick=`NKC.methods.getIpInfo('${ipoc}')` title=ipoc target='_blank')
-              span.fa.fa-map-marker(style='margin-left: 2px;')= ` 点击查看IP`
-
-  mixin postEditTime(post)
-    if post.toc.toLocaleString() !== post.tlm.toLocaleString()
-      p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-  mixin postCredits(post)
-    if post && post.credits && post.credits.length > 0
-      .nkcpanel.ThreadPostCredits
-        for c,index in post.credits
-          -var username = c.fromUser.username
-          -var profile = '/u/'+c.from
-          .ThreadPostCreditItem
-            if c.type === "creditKcb"
-              -c.num = c.num/100;
-            span.TPCQ!= `${(c.num > 0 ? '+' : '')}${c.num} &nbsp;`
-            span.TPCType #{creditString(c.type)} &nbsp;&nbsp;
-            span.TPCIA
-              a(href=`${profile}` style='text-decoration: none;')
-                img.TPCIAI(src=tools.getUrl('userAvatar', c.fromUser.avatar, 'sm'))
-                span.TPCIssuer &nbsp;#{username} &nbsp;&nbsp;
-            span.TPCDate #{dateTimeString(c.toc).split(' ')[0]} &nbsp;&nbsp;
-            span.TPCReason #{c.description}
-            if c.type === 'xsf' && data.user && permission('cancelXsf')
-              a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`cancelXsf("${post.pid}", ${c._id})`) 撤销
-            if c.type === 'creditKcb' && data.user && permission('modifyKcbRecordReason')
-              if !c.hideDescription
-                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, true)`) 屏蔽
-              else
-                a(style='margin-left: 0.5rem;cursor: pointer;' onclick=`hideKcbRecordReason("${post.pid}", ${c._id}, false)`) 取消屏蔽
 block content
   if !(state.isApp && state.platform === 'reactNative')
     include ../publicModules/mobile_drawer/right_drawer
@@ -233,7 +39,7 @@ block content
   -const {exactPost} = data
     .container-fluid.max-width
       .hidden#threadId= data.thread.tid
-      .hidden#threadForumsId=objToStr({notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
+      .hidden#threadForumsId=objToStr({isLastPage: (data.paging.page + 1) === data.paging.pageCount, notes: data.notes, pid: data.thread.oc, tid: data.thread.tid, mainForumsId: data.thread.mainForumsId, categoriesId: data.thread.categoriesId})
       if data.step
         .hidden#quotePost= JSON.stringify({page: data.paging.page, step: data.step, pid: data.pid})
       include ../module_credit
@@ -449,14 +255,14 @@ block content
                           include ../fund/initData
                           div.thread-content.ThreadPostBody#thread-content
                             include ./fund/fund.pug
-                        +postEditTime(post)
+                        +postEditTime(post.toc, post.tlm)
                         -const creditPost = data.thread.firstPost;
                         include ./postCredits
                       else
                         div.thread-content(style='max-height: 10rem;')
                           .hiddenThreadContent
                           div.ThreadPostBody#thread-content!= post.c
-                          +postEditTime(post)
+                          +postEditTime(post.toc, post.tlm)
                           -const creditPost = data.thread.firstPost;
                           include ./postCredits
                         .text-center
@@ -478,188 +284,139 @@ block content
                             .inline-block
                               span.fa.fa-star(style='color: #ffbf16;' title='精选')
                               span &nbsp;
-                          - const votePost = thread.firstPost;
                           .inline-block(style="vertical-align: text-top;")
                             include ../module_vote
+                            +voteButtons(thread.firstPost, !!data.user)
                           //- 展开附件
                           if data.attachmentsCount > 0
                             .pointer.inline-block(style="color: #aaa;margin-right: 2px;" onclick="showAttachments()")
                               .fa.fa-file-o
                               span &nbsp;查看附件
-                          if !thread.firstPost.anonymous && addKcb && data.user && thread.firstPost.uid !== data.user.uid
-                            .inline-block(style='color: #aaa;')
-                              .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
-                          .highlight.fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: #aaa;") &nbsp;分享&nbsp;
-                          .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;width:90px;background:none')
-                            div(style="display:inline-block;width:100%;vertical-align:top;text-align:right;")
-                              .ThreadTitle2(style="display:inline-block;max-width:100%;vertical-align:top;")
-                                .ThreadTitle22(style="border: 1px solid #ddd;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background:#FFFFFF")
-                                  div.changeDis(style="width:100%")
-                                    p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
-                                    .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
-                                    -var tpid = thread.firstPost.pid
-                                    p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;") #{tpid}
-                                    .hrdiv(style="width:80%;height:1px;background-color:#ddd;margin:0 auto;")
-                                    p.lighttext.airnum3(style="text-align:center;") #{(thread.count)?(thread.count)+' 回复 /':''} #{thread.hits} 浏览
-                                  if !state.isApp
-                                    div.changeDisNone.text-center(style='width: 100%;')
-                                      .col-xs-12.col-md-12
-                                        .col-xs-3.col-md-3(style="padding:0px")
-                                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qq', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                            img(src="/default/QQ.png" style="")
-                                        .col-xs-3.col-md-3(style="padding:0px")
-                                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'qzone', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                            img(src="/default/qzone.png" style="")
-                                        .col-xs-3.col-md-3(style="padding:0px")
-                                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weibo', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                            img(src="/default/weibo.png" style="")
-                                        .col-xs-3.col-md-3(style="padding:0px")
-                                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'weChat', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`)
-                                            img(src="/default/weChat.png" style="")
-                                      .col-xs-12.col-md-12
-                                        a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('thread', 'link', window.location.origin+window.location.pathname, '${thread.firstPost.t}', "${thread.tid}")`) 获取分享链接
-                                      .col-xs-12.col-md-12(id=`copyArea${thread.tid}` style="display:none")
-                                        input(type="text", id=`copyLink${thread.tid}`, name=`copyLink${thread.tid}` style="width:inherit")
-                                        button(onclick=`copyLink('${thread.tid}')` id=`copyButton${thread.tid}`) 复制
-                                      canvas#threadQrcode.inline-block(style="display:none")
-                          if data.user
-                            +postOptions(thread.firstPost, thread, 0)
+                          if !thread.firstPost.anonymous && permission('creditKcb') && data.user && thread.firstPost.uid !== data.user.uid
+                            .single-post-bottom-item
+                              .fa.fa-cny.credit-kcb(title='鼓励' style='cursor:pointer;' onclick=`credit("${thread.firstPost.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励&nbsp;
+                          .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=thread.firstPost.pid title='分享')
+                            .fa.fa-share-square-o.share-icon &nbsp;分享
+                          .single-post-bottom-item(data-type='postOption' data-pid=thread.firstPost.pid title='其他操作' data-direction='down')
+                            .fa.fa-sliders.option-icon
                       if data.attachmentsCount > 0
                         .thread-attachment.m-t-1
                           include ../publicModules/attachments/attachments
+          //- 问卷调查组件
           if data.thread.firstPost.surveyId
             .m-b-1
               -const surveyFormId = `surveyForm${data.thread.firstPost.pid}`;
               -const surveyId = data.thread.firstPost.surveyId;
               include ../publicModules/survey/form
+          //- 被置顶的POST
           if data.toppedPosts && data.toppedPosts.length
-            .m-b-1
-              .row
-                .thread-div
-                  .topped-post
-                    .fa.fa-thumb-tack &nbsp;
-                    | 置顶回复
-                  .col-xs-12.col-md-12(style='margin-top: 1rem;')
-                    -const hidePostOptions = true;
-                    -const hidePostStep = true;
-                    //- 置顶的回复不折叠
-                    -const disabledHidePost = true;
-                    -const showPostUrl = true;
-                    -const disabledHighlight = true;
-                    for post, index in data.toppedPosts
-                      include single_post
-          //if data.posts.length
+            div
+              .topped-post
+                .fa.fa-thumb-tack &nbsp;
+                | 置顶回复
+            .m-b-1.p-a-0
+              include ./singlePost/singleToppedPost
+              for post in data.toopedPosts
+                +singleToppedPost(post)
+          //- 批量管理POST
           mixin managePosts
             .paging-button
               a.button.radius-left(onclick="managePosts()") 管理
               a.button(onclick="markAllPosts()") 全选
               a.button.radius-right(onclick="disabledMarkedPosts()") 屏蔽或退修
+          //- 发表人筛选
+          mixin articleNav
+            .paging-button
+              a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
+              a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
+          //- 回复列表头部分页、管理按钮
+          .p-l-2.p-r-2
+            include ../publicModules/paging/paging
+            +articleNav
+            if disablePost
+              //- 回复的批量管理
+              +managePosts
+          //- 回复列表内容
+          div.p-a-0.single-posts-container
+            include ./singlePost/singlePost
+            for post in data.posts
+              //- post数据格式详见/pages/thread/singlePost/singlePost.pug
+              -post.highlight = data.highlight;
+              +singlePost(post)
+          //- 回复列表尾部分页、管理按钮
+          .p-l-2.p-r-2
+            include ../publicModules/paging/paging_input
+            //-+articleNav
+            if disablePost
+              //- 回复的批量管理
+              +managePosts
+          //- 编辑器相关
           div
-            .row
-              .thread-div
-                .col-xs-12.col-md-12
-                  .row
-                    .col-xs-12.col-md-12(style='margin-top: 1rem;')
-                      include ../publicModules/paging/paging
-                      //-include ../interface_navigation_paging
-                      //-if- !data.thread.firstPost.anonymous
-                      .paging-button
-                        a.button.radius-left(href=`/t/${thread.tid}` class=data.t!=="author"?"active":"")  全部
-                        a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t==="author"?"active":"")  只看作者
-                      if disablePost
-                        //- 回复的批量管理
-                        +managePosts
-
-                    .col-xs-12.col-md-12(style='margin-top: 1rem;margin-bottom: 1rem;')#ThreadPostBody
-                      for post, index in data.posts
-                        //- 文章作者的post无需折叠
-                        -let disabledHidePost;
-                        if data.thread.uid && post.uid && data.thread.uid === post.uid
-                          //- 作者的回复不折叠
-                          -disabledHidePost = true;
+            if data.user
+              //- 回复的输入面板
+              mixin inputPanel
+                .m-b-1#quoteContent(v-cloak v-if="pid")
+                  blockquote.quote-post
+                    .quote-cancel(@click="clear")
+                      .fa.fa-remove
+                    .quote-position
+                      | 引用
+                      a(:href="'/u/' + uid" target="_blank" v-if="uid") {{username}}
+                      span(v-else) {{username}}
+                      | 发表于
+                      a(:href="getUrl('post', pid, true)" target="_blank") {{step}}
+                      | 楼的内容
+                    .quote-content {{c}}
+                //- 编辑器的编辑框
+                .m-b-1(style="background-color:#fff;")
+                  script#container(name='content', type='text/plain')
+                div
+                  //- 发表并添加到专栏
+                  label(style="font-size:16px") 专栏
+                  //- 快速创建专栏文章分类
+                  include ../editor/toColumn
+                  //- 发表匿名回复
+                  if data.sendAnonymousPost
+                    .checkbox
+                      label
+                        if data.user && data.thread && data.thread.firstPost && data.thread.firstPost.ownPost && data.thread.firstPost.anonymous
+                          input#sendAnonymousPost(type='checkbox' checked=true)
                         else
-                          //- 服务器根据证书判断的该用户的回复是否需要折叠
-                          -disabledHidePost = !['half', 'all'].includes(post.hidePost);
-                          //- -disabledHidePost = !post.hide;
-                        -let previousPost;
-                        if index !== 1
-                          -previousPost = data.posts[index-1];
-                        include single_post
-                    .col-xs-12.col-md-12
-                      include ../publicModules/paging/paging_input
-                      if disablePost
-                        //- 回复的批量管理
-                        +managePosts
-                    if data.user
-                      .col-xs-12.col-md-12
-                        - var hasMobile = data.user.authLevel > 0;
-
-                        //- 回复的输入面板
-                        mixin inputPanel
-                          .form-group
-                            #quoteContent(v-cloak v-if="pid")
-                              blockquote.quote-post
-                                .quote-cancel(@click="clear")
-                                  .fa.fa-remove
-                                .quote-position
-                                  | 引用
-                                  a(:href="'/u/' + uid" target="_blank" v-if="uid") {{username}}
-                                  span(v-else) {{username}}
-                                  | 发表于
-                                  a(:href="getUrl('post', pid, true)" target="_blank") {{step}}
-                                  | 楼的内容
-                                .quote-content {{c}}
-
-                          .form-group(style="background-color:#fff;")
-                            script#container(name='content', type='text/plain')
-                          .row
-                            .col-xs-12
-                              label(style="font-size:16px") 专栏
-                              include ../editor/toColumn
-
-                              if data.sendAnonymousPost
-                                .checkbox
-                                  label
-                                    if data.user && data.thread && data.thread.firstPost && data.thread.firstPost.ownPost && data.thread.firstPost.anonymous
-                                      input#sendAnonymousPost(type='checkbox' checked=true)
-                                    else
-                                      input#sendAnonymousPost(type='checkbox')
-                                    span 匿名发表
-                              //-
-                                if state.userColumn && !data.addedToColumn
-                                  -const column = state.userColumn
-                                  include ../publicModules/toColumn/selectCategories
-                              div
-                                .checkbox
-                                  label
-                                    input#protocolCheckbox(type="checkbox" checked=true)
-                                    span
-                                      | 我已阅读并同意遵守与本次发表相关的全部协议。
-                                      a(href=`/protocol` target="_blank") 查看协议
-                              .form-group
-                                button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
-                                button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
-                                button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
-                        //- 主题已关闭
-                        if thread.closed
-                          .col-xs-12.col-md-12(style='margin: 2rem 0;')
-                            .h4.text-center(style='color: #aaaaaa;')
-                              span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复/评论
-                        else
-                          //- 发表权限判断
-                          include ./postPermission
-                          if showEditor
-                            -const blacklistInfo = data.blacklistInfo;
-                            include ../publicModules/blacklistInfo
-                            +inputPanel
-
-                    else
-                      .col-xs-12.col-md-12
-                        p 想参与大家的讨论？现在就&nbsp;
-                          a.pointer(onclick="NKC.methods.toLogin('login')") 登录
-                          | &nbsp;或者&nbsp;
-                          a.pointer(onclick="NKC.methods.toLogin('register')") 注册
-                          | 。
+                          input#sendAnonymousPost(type='checkbox')
+                        span 匿名发表
+                  div
+                    .checkbox
+                      label
+                        input#protocolCheckbox(type="checkbox" checked=true)
+                        span
+                          | 我已阅读并同意遵守与本次发表相关的全部协议。
+                          a(href=`/protocol` target="_blank") 查看协议
+                  .form-group
+                    button#ButtonReply.btn.btn-primary(onclick=`submit(${thread.tid})`) 回复
+                    button#draft.btn.btn-primary(onclick=`saveDraft(${thread.tid},${data.user.uid})`) 保存草稿
+                    button#GoEditor.btn.btn-default(onclick='goEditor()') 去编辑器
+              //- 主题已关闭
+              if thread.closed
+                .col-xs-12.col-md-12(style='margin: 2rem 0;')
+                  .h4.text-center(style='color: #aaaaaa;')
+                    span.fa.fa-times &nbsp;主题已关闭，暂不能发表回复/评论
+              else
+                //- 发表权限判断
+                //- warning中的内容为html，由服务器根据发表设置动态渲染
+                if data.postPermission.warning
+                  .m-b-1.text-danger!=data.postPermission.warning
+                //- 是否显示编辑器
+                if data.postPermission.permit
+                  -const blacklistInfo = data.blacklistInfo;
+                  include ../publicModules/blacklistInfo
+                  +inputPanel
+            else
+              //- 游客
+              p 想参与大家的讨论？现在就&nbsp;
+                a.pointer(onclick="NKC.methods.toLogin('login')") 登录
+                | &nbsp;或者&nbsp;
+                a.pointer(onclick="NKC.methods.toLogin('register')") 注册
+                | 。
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"
@@ -727,7 +484,6 @@ block scripts
   script(src='/xbbcode-parser/xbbcode.js')
   script(src='/xss/dist/xss.js')
 
-  //+includeJS("/nkc_render.js")
   +includeJS("/interface_editor_reply.js")
   +includeJS('/external_pkgs/etalage/js/jquery.etalage.min.js')
   +includeJS('/shop/shop.js')
@@ -750,6 +506,11 @@ block scripts
   include ../publicModules/moveThread/moveThread
   include ../publicModules/disabledPost/disabledPost
   include ../ueditor/dialogs/mathformulaV2/mathformula
+  include ../publicModules/bulletComments/bulletComments
+  include ../publicModules/share/sharePanel
+  include ../post/options/options
+  //- 通用socket
+  include ../publicModules/socket/socket
   //- 下载资料询问框
   //if state.downloadNeedScore
   include ../publicModules/downloadResource/downloadResource

@@ -77,6 +77,15 @@ body{
   -webkit-line-clamp: 1;
   padding-right: 5rem;
 }
+.forum-info-body .forum-name .forum-preparation {
+  margin-left: 10px;
+  background-color: rgb(76, 175, 80);
+  color: white;
+  border-radius: 6px;
+  font-size: .8em;
+  font-weight: normal;
+  padding: 2px 4px;
+}
 .forum-abbr{
   padding-top: 0.25rem;
   font-size: 1.1rem;
@@ -338,4 +347,34 @@ body{
   text-decoration: none;
   color: #fff;
   font-size: 1.2rem;
+}
+
+.forum-founder-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.forum-founder-item::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.forum-founder-item + .forum-founder-item {
+  margin-top: 4px;
+}
+.forum-founder-avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 6px;
+  background-color: gray;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  float: left;
+}
+.fouum-founder-username {
+  float: left;
+  font-size: 18px;
+  line-height: 40px;
+  margin-left: 10px;
 }

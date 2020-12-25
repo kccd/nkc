@@ -19,12 +19,6 @@ block content
                 | 主页设置
                 if !permission("nkcManagementHome")
                   | （无权）
-            //- li(class=data.nav === 'section' ? "active" : "")
-            //-   a(href=`/nkc/section`)
-            //-     .fa.fa-puzzle-piece
-            //-     | 板块设置
-            //-     if !permission("nkcManagementSection")
-            //-       | （无权）
             li(class=data.nav === 'sticker' ? "active" : "")
               a(href=`/nkc/sticker?t=unReviewed`)
                 .fa.fa-smile-o
@@ -42,6 +36,12 @@ block content
                 .fa.fa-paper-plane
                 | 最新发表
                 if !permission("nkcManagementPost")
+                  | （无权）
+            li(class=data.nav === 'applyForum'? 'active':'')
+              a(href=`/nkc/applyForum`)
+                .fa.fa-paper-plane
+                | 专业申请
+                if !permission("nkcManagementApplyForum")
                   | （无权）
       .col-xs-12.col-md-10.box-shadow-panel
         block nkcContent

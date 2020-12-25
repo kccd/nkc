@@ -53,8 +53,8 @@ block content
                   .username.anonymous-name= anonymousInfo.username
                 span= fromNow(post.toc)
               .options
-                -var votePost = post;
                 include ../module_vote
+                +voteButtons(post, !!data.user)
                 if addKcb && data.user && post.uid !== data.user.uid
                   .options-fa.fa.fa-cny(onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励
                 if digestPost
@@ -161,6 +161,7 @@ block scripts
   include ../MathJax.pug
   include ../publicModules/disabledPost/disabledPost
   include ../publicModules/highlight/highlight
+  include ../publicModules/share/sharePanel
     //- 下载资料询问框
   if state.downloadNeedScore
     include ../publicModules/downloadResource/downloadResource

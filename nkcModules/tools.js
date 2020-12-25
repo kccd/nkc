@@ -73,6 +73,9 @@ var Tools = function() {
         }
         return "/p/" + id;
       }
+      case "postHome": {
+        return "/p/" + id;
+      }
       case "thread": {
         return "/t/" + id;
       }
@@ -94,6 +97,7 @@ var Tools = function() {
         return "/message/resource/" + id;
       }
       case "userHome": {
+        if(id === 'default') return false
         return "/u/" + id
       }
       case "messageCover": {
@@ -108,6 +112,15 @@ var Tools = function() {
       case 'defaultFile': {
         return "/default/" + id;
       }
+      case 'previewPDF': {
+        return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
+      }
+    }
+  };
+  self.getAnonymousInfo = function() {
+    return {
+      username: '匿名用户',
+      avatarUrl: self.getUrl('anonymousUserAvatar')
     }
   };
   self.floatUserInfo = function(uid) {
@@ -147,8 +160,68 @@ var Tools = function() {
   };
   self.getIpUrl = function(ip) {
     return "http://www.ip138.com/ips138.asp?ip=" + ip + "&action=2";
+  };
+  self.fromNow = function(time) {
+    var now = Math.floor(Date.now() / 1000);
+    time = new Date(time);
+    time = Math.floor(time.getTime() / 1000);
+    // 秒
+    if(now - time < 60) {
+      return ' 几秒前';
+    }
+    // 分
+    const m = Math.floor((now - time) / 60);
+    if(m < 60) {
+      return m + ' 分钟前';
+    }
+    // 时
+    const h = Math.floor(m / 60 );
+    if(h < 24) {
+      return h + ' 小时前';
+    }
+    const d = Math.floor(h / 24);
+    if(d < 30) {
+      return d + ' 天前';
+    }
+    const month = Math.floor(d / 30);
+    if(month < 12) {
+      return month + ' 个月前';
+    }
+    return Math.floor(month / 12) + ' 年前';
+  };
+  self.timeFormat = function(time) {
+    var fixTime = function(number) {
+      return number < 10? '0' + number: number;
+    }
+    time = new Date(time);
+    var year = time.getFullYear();
+    var month = fixTime(time.getMonth() + 1);
+    var day = fixTime(time.getDate());
+    var hour = fixTime(time.getHours());
+    var minute = fixTime(time.getMinutes());
+    var second = fixTime(time.getSeconds());
+    return year + '/' + month + '/' + day + ' ' + hour + ':' + minute + ':' + second;
+  };
+  self.createVueAppSelector = function() {
+    var str = [];
+    for(var i = 0; i < 8; i++){
+      str[i] = elementIdChars[Math.floor(Math.random() * elementIdChars.length - 1)]
+    }
+    return str.join("")
+  };
+  self.getVueAppSelector = function() {
+    if(!document) return;
+    var scriptElem;
+    if(document.currentScript) {
+      scriptElem = document.currentScript;
+    } else {
+      scriptElem = document.scripts[document.scripts.length - 1];
+    }
+    return scriptElem.getAttribute("data-vue-app-selector");
   }
 };
+
+var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 if(typeof window === "undefined") {
   module.exports = new Tools();

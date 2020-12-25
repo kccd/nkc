@@ -81,9 +81,7 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
               -const quotePost = post.quotePost;
               include ./quotePost
             .ThreadPostBody.m-t-1(style=`${postHeight?'overflow-y:scroll;max-height:'+postHeight:''}`)!=post.c
-            if post.toc.toLocaleString() !== post.tlm.toLocaleString()
-              p.lighttext [修改于 #{fromNow(post.tlm)} - #{dateString(post.tlm)}]
-            //+postCredits(post)
+            +postEditTime(post.toc, post.tlm)
             -let creditPost = post;
             include ./postCredits
           if !disabledHidePost
@@ -108,54 +106,27 @@ if !post.disabled || disablePost || (data.user && data.user.uid === post.uid)
                 span.pointer.m-r-05(onclick=`quotePost('${post.pid}', '${data.paging.start + index}', '${data.paging.page.toString()}')`)
                   span.fa.fa-comment-o &nbsp;
                   span 回复
-              if post.postCount > 0
-                span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid} thread-post-comment-active`)=`评论(${post.postCount})`
-              else if data.user
-                span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论`
-              span.pointer.m-r-05(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`
-              -const votePost = post;
+              //if post.postCount > 0
+              //  span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid} thread-post-comment-active`)=`评论(${post.postCount})`
+              //else if data.user
+              //  span.pointer.m-r-05(onclick=`viewPostComments('${post.tid}', '${post.pid}')` class=`show_comments_button_${post.pid}`)=`评论`
+              //span.pointer.m-r-05(onclick=`hidePostComments('${post.pid}')` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论`
               include ../module_vote
+              +voteButtons(post, !!data.user)
               if !post.anonymous && addKcb && post.uid !== data.user.uid
                 .inline-block.post-qrcode
-                  .fa.fa-cny(title='鼓励' style='cursor:pointer;' onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`)
-              .inline-block.post-qrcode
-                .fa.fa-qrcode.dropdown(class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false")
-                .dropdown-menu.stop-propagation(data-stopPropagation=true style='left: auto;right: 0;border: none;box-shadow: none;margin-right: 0.5rem;background: none')
-                  .ThreadTitle22(style="border: 1px solid #bababa;border-radius: 10px;overflow: hidden;padding: 3px 3px 0 3px;background: #ffffff;")
-                    div.changeDis(style='width: 100%;')
-                      p.lighttext.airnum1(style="font-size:21px;text-align:center;margin-top:0px;margin-bottom:0px;") 文 号
-                      .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
-                      p.lighttext.airnum2(style="font-size:21px;text-align:center;color:#cdf;margin-bottom:0px;margin-top:0px;")= post.pid
-                      .hrdiv(style="width:100%;height:1px;background-color:#ddd;margin:0 auto;")
-                    if !state.isApp
-                      div.changeDisNone.text-center(style='width: 100%;')
-                        .col-xs-12.col-md-12
-                          .col-xs-3.col-md-3(style="padding:0px")
-                            a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qq', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                              img(src="/default/QQ.png" style="")
-                          .col-xs-3.col-md-3(style="padding:0px")
-                            a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'qzone', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                              img(src="/default/qzone.png" style="")
-                          .col-xs-3.col-md-3(style="padding:0px")
-                            a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weibo', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                              img(src="/default/weibo.png" style="")
-                          .col-xs-3.col-md-3(style="padding:0px")
-                            a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'weChat', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`)
-                              img(src="/default/weChat.png" style="")
-                        .col-xs-12.col-md-12
-                          a.btn-block(style="display:inline-block" href="javascript:void(0);" onclick=`shareTo('post', 'link', window.location.origin+'/p/'+'${post.pid}', '${thread.firstPost.t}', '${post.pid}')`) 获取分享链接
-                        .col-xs-12.col-md-12(id=`copyArea${post.pid}` style="display:none")
-                          input(type="text", id=`copyLink${post.pid}`, name=`copyLink${post.pid}` style="width:inherit")
-                          button(onclick=`copyLink('${post.pid}')` id=`copyButton${post.pid}`) 复制
-                        canvas.qrcode(id=post.pid + "Qrcode",data-pid=post.pid,style="display:none").inline-block
+                  .fa.fa-cny.pointer(title='鼓励' onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`)
+              span(data-type='share' data-share-type='post' data-share-id=post.pid)
+                .fa.fa-share-square-o
               if data.user
                 -let dropType = "dropup";
-                +postOptions(post, '',index, dropType)
-            .post-comments-div(id=`post_comments_${post.pid}`)
-              .text-center 加载评论中，请稍候...
-            if data.user
-              -let comment = post;
-              include ./postEdit
-              //div(class=`edit_${post.pid}_container`)
-            .m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}', true)` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
-              span.fa.fa-angle-up
+                span(data-type='postOption' data-pid=post.pid)
+                  .fa.fa-sliders
+                //-+postOptions(post, '',index, dropType)
+            //.post-comments-div(id=`post_comments_${post.pid}`)
+            //  .text-center 加载评论中，请稍候...
+            //if data.user
+            //  -var comment = post;
+            //  include ./postEdit
+            //.m-t-1.m-b-1.pointer.text-center(onclick=`hidePostComments('${post.pid}', true)` class=`display-n hide_comments_button_${post.pid}`)=`折叠评论 `
+            //  span.fa.fa-angle-up

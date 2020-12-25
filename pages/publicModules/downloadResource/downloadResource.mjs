@@ -62,35 +62,29 @@ NKC.modules.downloadResource = class {
           let self = this;
           self.status = 'loadding';
           self.errorInfo = '';
-          // 下载此附件是否需要积分
-          nkcAPI(`/r/${rid}?c=query&random=${Math.random()}`, "GET", {})
+          nkcAPI(`/r/${rid}/detail`, "GET")
             .then(data => {
-              self.fileCountLimitInfo = data.fileCountLimitInfo;
-              let dataUrl = `/r/${rid}?t=attachment&c=download&random=${Math.random()}`;
-              /*if(data.settingNoNeed) {
-                let downloadLink = $("<a></a>");
-                downloadLink.attr("href", dataUrl);
-                downloadLink[0].click();
-                self.close();
+              let {free, paid, resource, costScores, fileCountLimitInfo} = data.detail;
+              self.fileCountLimitInfo = fileCountLimitInfo;
+              if(!resource.isFileExist) {
+                self.status = "fileNotExist";
                 return;
-              }*/
-              self.status = data.need
-                ? "needScore"
-                : "noNeedScore"
-              self.settingNoNeed = data.settingNoNeed;
-              self.rid = data.rid;
-              self.fileName = data.resource.oname;
-              self.type = data.resource.ext;
-              self.size = NKC.methods.getSize(data.resource.size);
-              let myAllScore = data.myAllScore;
-              if(!myAllScore) return;
-              self.costs = myAllScore.map(score => {
+              }
+              self.status = (!free && !paid) ? "needScore": "noNeedScore";
+              self.free = free;
+              self.paid = paid;
+              self.fileName = resource.oname;
+              self.rid = resource.rid;
+              self.type = resource.ext;
+              self.size = NKC.methods.getSize(resource.size);
+              if(!costScores) return;
+              self.costs = costScores.map(score => {
                 return {
                   name: score.name,
                   number: score.addNumber / 100 * -1
                 }
               });
-              self.hold = myAllScore.map(score => {
+              self.hold = costScores.map(score => {
                 return {
                   name: score.name,
                   number: score.number / 100
@@ -98,12 +92,23 @@ NKC.modules.downloadResource = class {
               });
             })
             .catch(data => {
-              // self.close();
-              // sweetError(data);
               self.fileCountLimitInfo = data.fileCountLimitInfo;
               self.status = 'error';
               self.errorInfo = data.error || data.message || data;
             })
+        },
+        download() {
+          let self = this;
+          let {rid, fileName} = this;
+          nkcAPI(`/r/${rid}/pay`, "POST")
+            .then(() => {
+              let downloader = document.createElement("a");
+              downloader.setAttribute("download", fileName);
+              downloader.href = `/r/${rid}`;
+              downloader.click();
+            })
+            .catch(sweetError)
+            .then(() => self.getResourceInfo(self.rid))
         },
         open(rid) {
           this.status = "loadding";
@@ -123,14 +128,29 @@ NKC.modules.downloadResource = class {
 
 (function() {
   const dr = new NKC.modules.downloadResource();
-  let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
-  attachments.forEach(attachment => {
-    $(attachment).find("a.article-attachment-name").on("click", e => {
+  NKC.methods.openFilePanel = function(rid) {
+    dr.open(rid);
+  }
+
+  // 监听评论盒子
+  $("#wrap").on("click", function(e) {
+    let type = $(e.target).attr("data-type");
+    if(type === "clickAttachmentTitle") {
       e.preventDefault();
       e.stopPropagation();
-      let rid = $(attachment).attr("data-id");
+      let rid = $(e.target).attr("data-id");
       dr.open(rid);
       return false;
-    })
+    }
   })
+  // let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
+  // attachments.forEach(attachment => {
+  //   $(attachment).find("a.article-attachment-name").on("click", e => {
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //     let rid = $(attachment).attr("data-id");
+  //     dr.open(rid);
+  //     return false;
+  //   })
+  // })
 }());

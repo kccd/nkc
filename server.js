@@ -48,6 +48,7 @@ const jobsInit = async () => {
   jobs.backupDatabase();
   jobs.moveRecycleMarkThreads();
   jobs.clearFileCache();
+  jobs.preparationForumCheck();    // 检查筹备专业
 };
 
 // 定时任务 隔一段时间执行

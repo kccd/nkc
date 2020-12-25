@@ -299,6 +299,15 @@ jobs.shop = () => {
     fork("./timedTasks/checkKcbsRecords.js");
   });
 };*/
+
+// 检查筹备专业
+jobs.preparationForumCheck = async () => {
+  const preparationForumCheck = require("./timedTasks/preparationForumCheck");
+  scheduleJob("0 0 4 * * *", async () => {
+    await preparationForumCheck();
+  });
+}
+
 // 自动将退修未修改的文章移动到回收站
 jobs.moveRecycleMarkThreads = () => {
   const ThreadModel = require("./dataModels/ThreadModel");

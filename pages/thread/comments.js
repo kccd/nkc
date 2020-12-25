@@ -117,7 +117,9 @@ function closePostComment(pid, restorePagePosition) {
   }
   $(".edit_"+pid+"_container").hide();
   closeSaveCommentDraft(pid);
-  if(pagePosition) pagePosition.restore();
+  if(pagePosition) {
+    pagePosition.restore();
+  }
 }
 
 function submitPostComment(tid, pid, firstInput) {
@@ -178,7 +180,6 @@ var comments = {};
 function viewPostComments(tid, pid, page, callback) {
   var commentsDiv = $("#post_comments_" + pid);
   commentsDiv.show();
-  postComment(tid, pid, true);
   $(".show_comments_button_" + pid).hide();
   $(".hide_comments_button_" + pid).show();
   var url = "/p/" + pid;
@@ -188,6 +189,18 @@ function viewPostComments(tid, pid, page, callback) {
   nkcAPI(url, "GET")
     .then(function(data) {
       var html = data.html;
+      var postPermission = data.postPermission;
+      var singlePostComment = $('.single-post-comment[data-type="singlePostComment"][data-pid="'+pid+'"]');
+      var postCommentWarning = singlePostComment.find('.post-comment-warning');
+      var editorNotice = singlePostComment.find('.post-editor-notice');
+      if(postPermission.permit) {
+        postComment(tid, pid, true);
+        editorNotice.show();
+      } else {
+        editorNotice.hide();
+      }
+      singlePostComment.show();
+      postCommentWarning.html(postPermission.warning);
       var buttonValue = data.paging.buttonValue;
       comments[pid] = html?html:" ";
       commentsDiv.html(html);
@@ -240,10 +253,12 @@ function hidePostComments(pid, restorePagePosition) {
   $(".show_comments_button_" + pid).show();
   $(".hide_comments_button_" + pid).hide();
   closePostComment(pid, restorePagePosition);
+  $('.single-post-comment[data-type="singlePostComment"][data-pid="'+pid+'"]').hide();
   $("#post_comments_" + pid).hide();
 }
 // 新生成的dom，注册事件
 function initUserPanel() {
   if(window.floatUserPanel) floatUserPanel.initPanel();
   if(NKC.methods.initStickerViewer) NKC.methods.initStickerViewer();
+  if(NKC.methods.initSharePanel) NKC.methods.initSharePanel();
 }

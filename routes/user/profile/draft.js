@@ -42,7 +42,11 @@ module.exports = async (ctx, next) => {
         d.type = "modifyPost";
       }
     } else {
-      d.type = "modifyForumDeclare";
+      if(desType === 'forumDeclare') {
+        d.type = "modifyForumDeclare";
+      } else {
+        d.type = "modifyForumLatestNotice";
+      }
       const forum = await db.ForumModel.findOne({fid: desTypeId});
       if(!forum) continue;
       d.forum = {

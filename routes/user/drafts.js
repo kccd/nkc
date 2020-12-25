@@ -26,10 +26,10 @@ draftsRouter
         };
       } else if(desType === "post") {
         const post = await db.PostModel.findOne({pid: desTypeId});
-        if(!post) continue;
+        if (!post) continue;
         const thread = await db.ThreadModel.findOne({tid: post.tid});
-        if(!thread) continue;
-        if(post.pid === thread.oc) {
+        if (!thread) continue;
+        if (post.pid === thread.oc) {
           d.thread = {
             url: `/t/${thread.tid}`,
             title: post.t
@@ -45,7 +45,11 @@ draftsRouter
           d.type = "modifyPost";
         }
       } else {
-        d.type = "modifyForumDeclare";
+        if(desType === 'forumDeclare') {
+          d.type = 'modifyForumDeclare';
+        } else {
+          d.type ='modifyForumLatestNotice';
+        }
         const forum = await db.ForumModel.findOne({fid: desTypeId});
         if(!forum) continue;
         d.forum = {
@@ -129,12 +133,12 @@ draftsRouter
         await db.SurveyModel.remove({uid: user.uid, _id: draft.surveyId});
       }
     } else {
-      if(!["forum", "thread", "post", "forumDeclare"].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
+      if(!["forum", "thread", "post", "forumDeclare", 'forumLatestNotice'].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
       if(desType === "thread") {
         await db.ThreadModel.findOnly({tid: desTypeId});
       } else if(desType === "post") {
         await db.PostModel.findOnly({pid: desTypeId});
-      } else if(desType === "forumDeclare") {
+      } else if(["forumDeclare", 'forumLatestNotice'].includes(desType)) {
         await db.ForumModel.findOnly({fid: desTypeId});
       }
       draftObj.desTypeId = desTypeId;

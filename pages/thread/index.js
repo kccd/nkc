@@ -1,41 +1,21 @@
-var SubscribeTypes, UserInfo, surveyForms = [], draftId = "", author = {};
+var SubscribeTypes, surveyForms = [], draftId = "", author = {};
 var hidePostMaxHeight;
 var hidePostFloat;
 var Attachments;
 var quotePostApp;
 $(document).ready(function(){
-  var DW = $(document).width();
-  hidePostFloat = NKC.configs.postHeight.float;
-  if(DW < 768) {
-    hidePostMaxHeight = NKC.configs.postHeight.xs;
-  } else if(DW < 992) {
-    hidePostMaxHeight = NKC.configs.postHeight.sm;
-  } else {
-    hidePostMaxHeight = NKC.configs.postHeight.md;
-  }
-  var hidePostDom = $(".hide-post.part");
-
   new Promise(function(resolve, reject) {
   	if(NKC.configs.isApp) {
   		setTimeout(function() {
   		  resolve();
-		  }, 500)
+		  }, 300)
 	  } else {
   		resolve();
 	  }
   })
 	  .then(function() {
-		  for(var i = 0; i < hidePostDom.length; i++) {
-			  var d = hidePostDom.eq(i);
-			  var contentDom = d.find(".thread-post-mask");
-			  var pid = d.attr("data-pid");
-			  if(contentDom.height() > hidePostMaxHeight) {
-				  hidePost(pid);
-				  $(".hide-post-button[data-pid='"+pid+"']").css({
-					  "display": "inline-block"
-				  });
-			  }
-		  }
+	  	// 内容折叠
+			_singlePostModule.autoHidePostContent();
 	  })
 	  .catch(function(data) {
 	  	console.error(data);
@@ -47,9 +27,6 @@ $(document).ready(function(){
   if(!window.SubscribeTypes && NKC.modules.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
-  if(NKC.modules.UserInfo) {
-    UserInfo = new NKC.modules.UserInfo();
-	}
 
 	if($("#container").length) {
 		autoSaveDraft();
@@ -146,10 +123,9 @@ $(document).ready(function(){
 
 	var quoteDom = document.getElementById('quotePost');
 	if(quoteDom) {
-	  var s = JSON.parse(quoteDom.innerText);
-	  quotePost(s.pid, s.step, s.page);
-  }
-
+		var s = JSON.parse(quoteDom.innerText);
+		quotePost(s.pid, s.step, s.page);
+	}
 
 });
 function addToColumn(pid, columnId) {
@@ -520,11 +496,17 @@ function submit(tid) {
       })
     })
     .then(function(data) {
-    	if(NKC.configs.platform === 'reactNative') {
+    	ue.setContent('');
+			setSubmitButton(false);
+			if(window.quotePostApp) {
+				window.quotePostApp.clear();
+			}
+    	return screenTopAlert('发送成功');
+    	/*if(NKC.configs.platform === 'reactNative') {
 				NKC.methods.visitUrlAndClose(data.redirect);
 			} else {
 				openToNewLocation(data.redirect);
-			}
+			}*/
     })
     .catch(function(data) {
       sweetError(data);
@@ -1058,25 +1040,8 @@ function disabledPostButtonByProtocol(allowed) {
   }
 }
 
-function getPostAuthor(pid) {
-  UserInfo.open({
-    type: "showUserByPid",
-    pid: pid
-  });
-}
 
 
-function anonymousPost(pid, anonymous) {
-  nkcAPI("/p/" + pid + "/anonymous", "POST", {
-    anonymous: !!anonymous
-  })
-    .then(function() {
-      window.location.reload();
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
-}
 function topPost(pid, topped) {
   nkcAPI("/p/" + pid + "/topped", "POST", {topped: !!topped})
     .then(function() {
@@ -1085,58 +1050,6 @@ function topPost(pid, topped) {
     .catch(function(data) {
       sweetError(data);
     });
-}
-
-/*function hidePost(pid, type) {
-  nkcAPI("/p/" + pid + "/hide", "POST", {type: type})
-    .then(function() {
-      window.location.reload();
-    })
-    .catch(function(data) {
-      sweetError(data);
-    })
-}*/
-
-function hidePost(pid) {
-  var dom = $(".hide-post[data-pid='"+pid+"']");
-  var span = $(".hide-post-button[data-pid='"+pid+"']>button>span");
-  var fa = $(".hide-post-button[data-pid='"+pid+"']>button>.fa");
-  var mask = dom.find(".thread-post-mask");
-  dom.addClass("active");
-  mask.css({
-    "max-height": hidePostMaxHeight * hidePostFloat + "px"
-  });
-  span.text("加载全文");
-  fa.removeClass("fa-angle-up").addClass("fa-angle-down");
-}
-
-function showPost(pid) {
-  var dom = $(".hide-post[data-pid='"+pid+"']");
-  var span = $(".hide-post-button[data-pid='"+pid+"']>button>span");
-  var fa = $(".hide-post-button[data-pid='"+pid+"']>button>.fa");
-  dom.removeClass("active");
-  var mask = dom.find(".thread-post-mask");
-  mask.css({
-    "max-height": "none"
-  });
-  span.text("收起");
-  fa.removeClass("fa-angle-down").addClass("fa-angle-up");
-}
-
-function switchPost(pid) {
-	var dom = $(".hide-post[data-pid='"+pid+"']");
-  if(dom.hasClass("active")) {
-		var scrollY = $(document).scrollTop();
-		showPost(pid);
-		// 使滚动条卷去的高度不变，body向下伸展
-		scrollTo(0, scrollY);
-		// 使此条post移动到视口的顶部
-		// scrollTo(0, dom.parents(".single-post").offset().top - 45);
-  } else {
-		var pagePosition = new NKC.modules.PagePosition();
-		hidePost(pid);
-		pagePosition.restore();
-  }
 }
 
 /*function showAttachments(dom) {
@@ -1185,6 +1098,7 @@ function pushGoodsToHome(productId, type) {
 		.catch(sweetError);
 }
 
+var threadData = NKC.methods.getDataById("threadForumsId");
 
 function moveThread() {
 	if(!window.MoveThread) {
@@ -1341,49 +1255,60 @@ $(function() {
 			window.location.hash = hash;
 		}, 1000)
 	}
+	if(NKC.configs.uid && socket) {
+		NKC.methods.setThreadListNewPostCount($('#threadId').text().trim(), 0);
+		window.bulletComments = new NKC.modules.BulletComments({
+			offsetTop: NKC.configs.isApp? 20: 60
+		});
+		socket.on('connect', joinPostRoom)
+		socket.on('postMessage', function(data) {
+			// 排除自己的发表
+			if(NKC.configs.uid !== data.comment.uid) {
+				bulletComments.add(data.comment);
+			}
+			// 仅在最后一页时才动态插入内容
+			if(!threadData.isLastPage) return;
+			var JQDOM = $(data.html).find('.single-post-container');
+			JQDOM = JQDOM[0];
+			// 公式渲染
+			MathJax.typesetPromise([JQDOM]);
+			JQDOM = $(JQDOM)
+			var parentDom = $('.single-posts-container');
+			parentDom.append(JQDOM);
+			// 用户悬浮面板
+			floatUserPanel.initPanel();
+			// 分享
+			NKC.methods.initSharePanel();
+			// 表情
+			NKC.methods.initStickerViewer();
+			// 视频音频组件渲染
+			NKC.methods.initVideo();
+			// 操作
+			NKC.methods.initPostOption();
+			// 图片预览
+			NKC.methods.initImageViewer();
+			// 划词笔记
+			nkchl.push(new NKC.modules.NKCHL({
+				type: 'post',
+				targetId: data.comment.postId,
+				notes: []
+			}));
+		});
+		if(socket.connected) {
+			joinPostRoom();
+		}
+	}
 });
+
+function joinPostRoom() {
+	socket.emit('joinRoom', {
+		type: 'post',
+		data: {
+			postId: threadData.pid
+		}
+	});
+}
 
 if (NKC.configs.platform === 'reactNative') {
 	window._userSelect = true;
 }
-
-
-
-/*EventTarget.prototype.once = function(name, handle) {
-	let self = this;
-	let newHandle = function(){
-		handle();
-		self.removeEventListener(name, newHandle);
-	}
-	self.addEventListener(name, newHandle);
-}
-
-var timer;
-document.addEventListener("selectionchange", function() {
-	document.once("mouseup", function(){
-		clearTimeout(timer);
-		timer = setTimeout(function() {
-			var selection = getSelection();
-			var range = selection.getRangeAt(0);
-			if(range.collapsed) return;
-			// 获取原文中需要处理的dom
-			var startNode = range.startContainer;
-			var endNode = range.endContainer;
-			if(startNode === endNode) {
-				console.log("[A]需要处理的Node：", startNode);
-			}else {
-				var nodeList = [startNode],
-					currentNode = startNode;
-				// 兄弟节点遍历
-				while(!currentNode.contains(endNode)) {
-					currentNode = currentNode.nextSibling;
-					nodeList.push(currentNode);
-				}
-				nodeList.push(endNode);
-				console.log("[B]需要处理的Node：", nodeList);
-			}
-			var frag = range.cloneContents();
-			console.log(frag);
-		}, 1000);
-	})
-})*/
