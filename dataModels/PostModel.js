@@ -1394,7 +1394,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       type: post.type,
       voteUp: post.voteUp,
       digest: post.digest,
-      hide: post.hide,
+      hide: post.hidePost || post.hide,
       user,
       quote,
       kcb,
