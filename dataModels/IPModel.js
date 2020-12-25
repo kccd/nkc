@@ -86,8 +86,8 @@ schema.statics.getIPByTokens = async (tokens) => {
 * @author pengxiguaa 2020-12-25
 * */
 schema.statics.getIPInfo = async (type, value) => {
-  const IPModel = mongoose.model('ip');
-  if(!['ip', 'token'].includes(type)) throwErr(500, `getIPInfo type类型错误`);
+  const IPModel = mongoose.model('ips');
+  if(!['ip', '_id'].includes(type)) throwErr(500, `getIPInfo type类型错误`);
   const match = {};
   match[type] = value;
   const ipData = await IPModel.findOne(match);
@@ -96,36 +96,42 @@ schema.statics.getIPInfo = async (type, value) => {
   if(ipData.adCode && ipData.tlm && ipData.tlm > (Date.now() - 180 * 24 * 60 * 60 * 1000)) {
     return {
       ip: ipData.ip,
-      token: ipData.token,
+      token: ipData._id,
       location: `${ipData.province} ${ipData.city}`
     };
   }
   const apiFunction = require('../nkcModules/apiFunction');
-  const {
-    province, city, adCode, rectangle
+  let {
+    province, city, adcode, rectangle
   } = await apiFunction.getIpAddress(ipData.ip);
+  if(typeof adcode !== 'string') {
+    province = '';
+    city = '';
+    adcode = '';
+    rectangle = '';
+  }
   await ipData.update({
     province,
     city,
-    adCode,
+    adCode: adcode,
     rectangle,
     tlm: Date.now()
   });
   return {
     ip: ipData.ip,
-    token: token,
-    location: `${province} ${city}`
+    token: ipData._id,
+    location: (province && city)?`${province} ${city}`: '未知'
   };
 };
 schema.statics.getIPInfoByToken = async (token) => {
-  const IPModel = mongoose.model('ip');
-  return await IPModel.getIPInfo('token', token);
+  const IPModel = mongoose.model('ips');
+  return await IPModel.getIPInfo('_id', token);
 };
 /*
 *
 * */
 schema.statics.getIPInfoByIP= async (ip) => {
-  const IPModel = mongoose.model('ip');
+  const IPModel = mongoose.model('ips');
   return await IPModel.getIPInfo('ip', ip);
 };
 module.exports = mongoose.model('ips', schema);
