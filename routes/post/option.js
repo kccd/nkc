@@ -2,7 +2,8 @@ const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
     const {state, data, db, params} = ctx;
-    const {user, uid} = data;
+    const {user} = data;
+    const {uid} = state;
     const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
     const thread = await db.ThreadModel.findOnly({tid: post.tid});

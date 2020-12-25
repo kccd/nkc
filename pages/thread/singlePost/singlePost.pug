@@ -90,7 +90,8 @@ if !isIncluded('singlePost')
         .single-post-header
           .disabled
             span.m-r-05 内容已被屏蔽
-            a(onclick=`enablePost('${pid}')`) 点击解封
+            if permission('unblockPosts')
+              a(onclick=`enablePost('${pid}')`) 点击解封
       else if !reviewed
         .single-post-header
           .review 内容待审核

@@ -93,7 +93,7 @@ function connectForumRoom() {
     let targetThread = threadList.find('div[data-tid="'+tid+'"]');
     if(
       page === 0 && // 处于专业首页
-      digest === data.digest &&
+      (!digest || digest && data.digest) &&
       (contentType === 'thread' || sort === 'tlm') // 发表文章或发表回复且按回复排序
     ) {
       // 如果文章存在则先移除再在列表头部创建

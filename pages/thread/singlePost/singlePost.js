@@ -18,10 +18,6 @@ var _singlePostModule = {
       var hide = c.attr('data-hide');
       var pid = c.attr('data-pid');
       if(hide === 'not') continue;
-      if(['all', 'half'].includes(hide)) {
-        _singlePostModule.hidePostContent(pid);
-        continue;
-      }
       var hidePostMaxHeight = _singlePostModule.getHidePostMaxHeight();
       var contentHeight = c.find('.single-post-center').height();
       if(contentHeight > hidePostMaxHeight) {
