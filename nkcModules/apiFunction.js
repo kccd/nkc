@@ -453,7 +453,7 @@ fn.doExchange = (arr) => {
 fn.getIpAddress = async (ip) => {
   const aliAppCode = require("../config/aliAppCode");
   const {appCode} = aliAppCode;
-  let options = {
+  const options = {
     hostname: `iploc.market.alicloudapi.com`,    //接口域
     path: `/v3/ip?ip=${ip}`,    //请求地址
     headers: {    //请求头
@@ -463,25 +463,23 @@ fn.getIpAddress = async (ip) => {
   }
   return new Promise((resolve, reject) => {
       // 发起请求
-      let req = http.request(options, res => {
-          let chunks = [];
+      const req = http.request(options, res => {
+          const chunks = [];
           res.on('data', chunk => {
               chunks.push(chunk);
           })
           res.on('end', () => {
-              let buffer = Buffer.concat(chunks).toString();
-              // 如果接口返回空值
-              let data = buffer ? JSON.parse(buffer) : {code: 1, data: 'ip接口没有返回值'};
-              resolve(data);
-          })
+              const buffer = Buffer.concat(chunks).toString();
+              resolve(JSON.parse(buffer));
+          });
       })
       // 请求出错
       req.on('error', err => {
-          resolve({code: 1, data: "请求ip接口出错"});
+          reject(err);
       })
       // 请求结束
       req.end();
-  })
+  });
 }
 
 fn.getTrackInfo = async (trackNumber, trackName) => {

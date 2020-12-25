@@ -6,6 +6,32 @@ const schema = new Schema({
     type: String,
     index: 1,
     default: ''
+  },
+  // 省份
+  province: {
+    type: String,
+    default: ''
+  },
+  // 城市
+  city: {
+    type: String,
+    default: ''
+  },
+  // 城市编码
+  adCode: {
+    type: String,
+    default: ''
+  },
+  // 定位
+  rectangle: {
+    type: String,
+    default: ''
+  },
+  // 更新时间
+  tlm: {
+    type: Date,
+    default: Date.now,
+    index: 1
   }
 }, {
   collection: 'ips'
@@ -49,4 +75,57 @@ schema.statics.getIPByTokens = async (tokens) => {
   return result;
 };
 
+/*
+* 通过ipToken获取ip信息
+* @param {String} type 类型 ip，token
+* @param {String} value type对应的值
+* @return {Object}
+*   @param {String} ip
+*   @param {String} token
+*   @param {String} location 位置信息
+* @author pengxiguaa 2020-12-25
+* */
+schema.statics.getIPInfo = async (type, value) => {
+  const IPModel = mongoose.model('ip');
+  if(!['ip', 'token'].includes(type)) throwErr(500, `getIPInfo type类型错误`);
+  const match = {};
+  match[type] = value;
+  const ipData = await IPModel.findOne(match);
+  if(!ipData) throwErr(400, `未找到IP信息 ${JSON.stringify(match)}`);
+  // 存在城市编码且时间未超过半年则无需调用ip信息查询接口
+  if(ipData.adCode && ipData.tlm && ipData.tlm > (Date.now() - 180 * 24 * 60 * 60 * 1000)) {
+    return {
+      ip: ipData.ip,
+      token: ipData.token,
+      location: `${ipData.province} ${ipData.city}`
+    };
+  }
+  const apiFunction = require('../nkcModules/apiFunction');
+  const {
+    province, city, adCode, rectangle
+  } = await apiFunction.getIpAddress(ipData.ip);
+  await ipData.update({
+    province,
+    city,
+    adCode,
+    rectangle,
+    tlm: Date.now()
+  });
+  return {
+    ip: ipData.ip,
+    token: token,
+    location: `${province} ${city}`
+  };
+};
+schema.statics.getIPInfoByToken = async (token) => {
+  const IPModel = mongoose.model('ip');
+  return await IPModel.getIPInfo('token', token);
+};
+/*
+*
+* */
+schema.statics.getIPInfoByIP= async (ip) => {
+  const IPModel = mongoose.model('ip');
+  return await IPModel.getIPInfo('ip', ip);
+};
 module.exports = mongoose.model('ips', schema);
