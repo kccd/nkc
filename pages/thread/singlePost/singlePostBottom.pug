@@ -5,7 +5,7 @@ if !isIncluded('singlePostBottom')
     -var {pid, vote, voteUp, count, tid} = props;
     .single-post-bottom
       .single-post-bottom-item.hidden.switch-hidden-status
-        .switch-hidden-status-button(onclick=`_singlePostModule.switchPostContent('${pid}')`)
+        .switch-hidden-status-button(onclick=`NKC.methods.switchPostContent('${pid}')`)
       .single-post-bottom-item(onclick=`quotePost('${pid}')`)
         .fa.fa-comment-o.reply-icon
         span 回复

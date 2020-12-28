@@ -15,7 +15,7 @@ $(document).ready(function(){
   })
 	  .then(function() {
 	  	// 内容折叠
-			_singlePostModule.autoHidePostContent();
+			NKC.methods.autoHidePostContent();
 	  })
 	  .catch(function(data) {
 	  	console.error(data);
