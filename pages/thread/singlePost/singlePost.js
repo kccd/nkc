@@ -35,7 +35,7 @@ var _singlePostModule = {
     });
     var buttonContainer = container.find('.switch-hidden-status');
     var button = buttonContainer.find('.switch-hidden-status-button');
-    button.html(`<div class="fa fa-angle-down"> 加载全文</div>`);
+    button.html("<div class='fa fa-angle-down'>加载全文</div>");
     container.attr('data-hidden', 'true');
     buttonContainer.removeClass('hidden');
   },
@@ -47,7 +47,7 @@ var _singlePostModule = {
     });
     var buttonContainer = container.find('.switch-hidden-status');
     var button = buttonContainer.find('.switch-hidden-status-button');
-    button.html(`<div class="fa fa-angle-up"> 收起</div>`);
+    button.html("<div class='fa fa-angle-up'>收起</div>");
     container.attr('data-hidden', 'false');
     buttonContainer.removeClass('hidden');
   },
