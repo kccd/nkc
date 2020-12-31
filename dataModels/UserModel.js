@@ -1453,6 +1453,12 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
     // 目前调取的地方都在发表相应内容之后，所以用户已发表内容的数量需要-1
     if(grade.type === "all" || grade.count > passedCount - 1) return true
   }
+
+
+  // 四、未验证手机号码的用户发表文章要送审
+  if(await UsersPersonalModel.shouldVerifyPhoneNumber(uid)) {
+    return true;
+  }
   return false
 };
 

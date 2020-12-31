@@ -6,7 +6,7 @@ const usersPersonalSchema = new Schema({
   uid: {
     type: String,
     unique: true,
-    required: true
+		required: true
   },
   email: {
     type: String,
@@ -292,6 +292,11 @@ const usersPersonalSchema = new Schema({
   	type: Number,
 		default: 0,
 		index:1
+	},
+	// 最后一次验证手机号的时间(时间戳)
+	lastVerifyPhoneNumberTime: {
+		type: Date,
+		index: 1
 	}
 },
   {
@@ -412,6 +417,32 @@ usersPersonalSchema.methods.ensurePassword = async function(passwordString) {
     default: throwErr(400, '未知的密码加密类型');
   }
 };
+
+/**
+ * 判断是否需要进行手机号验证
+ * @param {string} uid 用户id
+ */
+usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
+	const UserModel = mongoose.model("users");
+	const SettingModel = mongoose.model("settings");
+	const UsersPersonalModel = mongoose.model("usersPersonal");
+	const user = await UserModel.findOne({ uid });
+	if(!user) return false;
+	const safeSettings = await SettingModel.getSettings("safe");
+	const phoneVerify = safeSettings.phoneVerify;
+	// 如果需要进行手机号验证，验证是否已经过期
+	if(!phoneVerify.enable) return false;
+	const userPersonal = await UsersPersonalModel.findOne({uid: user.uid}, { lastVerifyPhoneNumberTime: 1 });
+	if(!userPersonal) return false;
+	if(!userPersonal.lastVerifyPhoneNumberTime) return true;
+	const lastVerifyPhoneNumberTime = userPersonal.lastVerifyPhoneNumberTime
+	const interval = phoneVerify.interval * 60 * 60 * 1000;
+	if(Date.now() - lastVerifyPhoneNumberTime.getTime() > interval) {
+		// 过期了
+		return true;
+	}
+	return false;
+}
 
 
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

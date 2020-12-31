@@ -255,7 +255,10 @@ module.exports = {
     },
     safe: {
       GET: "experimentalSafeSettings",
-      PUT: "experimentalSafeSettings"
+			PUT: "experimentalSafeSettings",
+			unverifiedPhone: {
+				GET: "unverifiedPhonePage"
+			}
     },
     auth: {
       GET: "experimentalUserAuth",
