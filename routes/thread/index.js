@@ -490,11 +490,10 @@ threadRouter
       // 获取用户地址信息
       let userAddress = "";
       if(data.user && thread.type === "product"){
-        let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
-        const {status, province, city} = ipInfo;
-        if(status && status == "1"){
-          userAddress = province + " " + city;
-        }
+        try{
+          const ipInfo = await db.IPModel.getIPInfoByIP(ctx.address);
+          userAddress = ipInfo.location;
+        } catch(err) {}
       }
       data.userAddress = userAddress;
       data.closeSaleDescription = '';

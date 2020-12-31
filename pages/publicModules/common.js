@@ -617,8 +617,9 @@ NKC.methods.getIpInfo = function(ip) {
 		.then(function(res) {return res.ipInfo})
 		.then(function(info){
 			if(!info) return sweetError("获取ip信息失败");
-			return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.province + info.city +"</p>")
+			return asyncSweetCustom("<p style='font-weight: normal;'>ip: "+ info.ip +"<br>位置: "+ info.location +"</p>")
 		})
+    .catch(sweetError)
 };
 
 
