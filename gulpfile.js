@@ -8,11 +8,13 @@ const glob = require('glob');
 const watch = require("gulp-watch");
 const uglify = require("gulp-uglify");
 const cleanCSS = require("gulp-clean-css");
+const cache = require('gulp-cached');
 
 const lessPath = `pages/**/*.less`;
 const cssDest = `pages`;
 gulp.task("buildCSS", () => {
   return gulp.src(lessPath)
+    .pipe(cache('NKCCSS'))
     .pipe(less())
     .pipe(cleanCSS({compatibility: '*'}))
     .pipe(gulp.dest(cssDest));
@@ -29,7 +31,7 @@ gulp.task('browserify', function (done) {
         debug: true
       })
       .transform("babelify", {presets: ['@babel/preset-env']})
-      .bundle()
+        .bundle()
       .on('error', function (error) {
         console.log(error.toString())
       })

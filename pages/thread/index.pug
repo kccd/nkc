@@ -30,6 +30,10 @@ block title
       color: black;
     }
 
+  //- 与post隐藏相关的设置
+  include ./hidePostContentSettings
+    +hidePostContentSettings(data.postHeight)
+
   include ./postEditTime
 
 block content
@@ -473,12 +477,6 @@ block content
 
 block scripts
   include ../publicModules/plyr/plyr.js.pug
-  script.
-    NKC.configs.postHeight = {};
-  script=`NKC.configs.postHeight.xs=${data.postHeight.xs}`
-  script=`NKC.configs.postHeight.sm=${data.postHeight.sm}`
-  script=`NKC.configs.postHeight.md=${data.postHeight.md}`
-  script=`NKC.configs.postHeight.float=${data.postHeight.float || 0.5}`
   script(src='/commonmark/dist/commonmark.js')
   script(src='/plainEscaper.js')
   script(src='/xbbcode-parser/xbbcode.js')

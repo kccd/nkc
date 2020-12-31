@@ -490,11 +490,10 @@ threadRouter
       // 获取用户地址信息
       let userAddress = "";
       if(data.user && thread.type === "product"){
-        let ipInfo = await nkcModules.apiFunction.getIpAddress(ctx.address);
-        const {status, province, city} = ipInfo;
-        if(status && status == "1"){
-          userAddress = province + " " + city;
-        }
+        try{
+          const ipInfo = await db.IPModel.getIPInfoByIP(ctx.address);
+          userAddress = ipInfo.location;
+        } catch(err) {}
       }
       data.userAddress = userAddress;
       data.closeSaleDescription = '';
@@ -890,13 +889,11 @@ threadRouter
       uid: data.user.uid
     };
     await db.SubscribeModel.insertSubscribe("replay", data.user.uid, tid);
-    // 仅推送回复不推送评论
-    if(postType !== 'comment') {
-      await nkcModules.socket.sendPostMessage({
-        postId: thread.oc,
-        targetPostId: _post.pid
-      });
-    }
+    // 推送回复、评论
+    await nkcModules.socket.sendPostMessage({
+      postId: thread.oc,
+      targetPostId: _post.pid
+    });
     //-global.NKC.io.of('/thread').NKC.postToThread(data.post);
 		await next();
   })
