@@ -244,8 +244,12 @@ class SinglePostModule {
     const editorApp = this.getEditorAppData(pid);
     if(!editorApp) return;
     clearTimeout(editorApp.timeoutId);
-    editorApp.app.destroy();
-    editorApp.container.remove();
+    if(editorApp.app && editorApp.app.destroy) {
+      editorApp.app.destroy();
+    }
+    if(editorApp.container && editorApp.container.remove) {
+      editorApp.container.remove();
+    }
     delete this.editors[pid];
   }
   getEditorAppData(pid) {
