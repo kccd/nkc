@@ -1,0 +1,5 @@
+include ./singleComment
+.single-comments(data-pid=data.pid)
+  for comment in data.comments
+    +singleComment(comment)
+

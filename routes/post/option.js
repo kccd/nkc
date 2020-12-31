@@ -10,7 +10,9 @@ router
     const isModerator = await db.PostModel.isModerator(uid, pid);
     const isThread = post.type === 'thread';
     const isPost = post.type === 'post';
+    const isComment = !!post.parentPostId;
     data.postType = isThread? 'thread': 'post';
+    data.isComment = isComment;
     data.tid = thread.tid;
     data.pid = pid;
     const optionStatus = {
@@ -24,6 +26,7 @@ router
       subscribe: null,
       hidePost: null,
       xsf: null,
+      kcb: null,
       warningPost: null,
       edit: null,
       disable: null,
@@ -47,13 +50,14 @@ router
       if(isPost) {
         // 回复置顶
         if(
+          !isComment &&
           (ctx.permission("topAllPost") || // 特殊指定权限
             (user.uid === thread.uid && await db.PostModel.ensureToppingPermission(user.uid))) // 文章作者且具备置顶的条件
         ) {
           optionStatus.topped = thread.toppedPostsId.includes(post.pid);
         }
         // 折叠回复
-        if(await db.PostModel.ensureHidePostPermission(thread, user)) {
+        if(!isComment && await db.PostModel.ensureHidePostPermission(thread, user)) {
           optionStatus.hidePost = post.hide;
         }
       }

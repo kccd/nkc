@@ -61,12 +61,12 @@ NKC.modules.ResourceInfo = function() {
         self.dom.modal("hide");
       },
       download: function(rid) {
-        let fileName = this.resource.resource.oname;
-        nkcAPI(`/r/${rid}/pay`, "POST")
-          .then(() => {
-            let downloader = document.createElement("a");
+        var fileName = this.resource.resource.oname;
+        nkcAPI("/r/"+rid+"/pay", "POST")
+          .then(function() {
+            var downloader = document.createElement("a");
             downloader.setAttribute("download", fileName);
-            downloader.href = `/r/${rid}`;
+            downloader.href = "/r/" + rid;
             downloader.target = "_blank";
             downloader.click();
           })

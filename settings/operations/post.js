@@ -62,6 +62,9 @@ module.exports = {
 		hide: {
 			PUT: "hidePost"
 		},
+		comments: {
+			GET: 'getPostComments'
+		}
 		/*delete: {
 			GET: "deletePost"
 		}*/

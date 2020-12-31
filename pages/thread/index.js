@@ -1271,7 +1271,12 @@ $(function() {
 			var JQDOM = $(data.html).find('.single-post-container');
 			JQDOM = JQDOM[0];
 			// 公式渲染
-			MathJax.typesetPromise([JQDOM]);
+			try{
+				MathJax.typesetPromise([JQDOM]);
+			} catch(err) {
+				console.log(err);
+			}
+
 			JQDOM = $(JQDOM)
 			var parentDom = $('.single-posts-container');
 			parentDom.append(JQDOM);
@@ -1293,6 +1298,16 @@ $(function() {
 				targetId: data.comment.postId,
 				notes: []
 			}));
+		});
+		socket.on('commentMessage', function(data) {
+			if(NKC.configs.uid !== data.comment.uid) {
+				bulletComments.add(data.comment);
+			}
+			NKC.methods.insertComment(
+				data.parentCommentId,
+				data.parentPostId,
+				data.html
+			);
 		});
 		if(socket.connected) {
 			joinPostRoom();

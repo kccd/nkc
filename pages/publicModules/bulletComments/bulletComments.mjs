@@ -128,7 +128,11 @@ class Bullet {
 class Track {
   constructor({top}) {
     // 轨道上弹幕的速度 130px~180px/s
-    this.speed = Math.round(Math.random() * 50 + 130);
+    if($(body).width() > 768) {
+      this.speed = Math.round(Math.random() * 50 + 130);
+    } else {
+      this.speed = Math.round(Math.random() * 50 + 80);
+    }
     // 轨道距离上边框的位置
     this.top = top;
     // 当前轨道上的最后一条弹幕
