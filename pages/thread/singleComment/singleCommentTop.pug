@@ -5,7 +5,7 @@ if !isIncluded('singleCommentTop')
     -var {uid, username, avatar, banned} = props;
     -var {voteUp, vote, pid, toc, tlm, parentUser} = props;
     .single-comment-top
-      img.single-comment-avatar(src=avatar)
+      img.single-comment-avatar(src=avatar class=banned? 'user-banned-avatar':'')
       .single-comment-user
         a.single-comment-username(
           data-anonymous=!uid

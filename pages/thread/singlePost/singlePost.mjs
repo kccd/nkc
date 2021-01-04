@@ -221,7 +221,7 @@ class SinglePostModule {
     button.attr('data-number', number + 1);
   }
   // 显示、隐藏评论
-  switchPostComment(pid, fixPosition ) {
+  switchPostComment(pid, fixPosition, page) {
     const container = this.getCommentContainer(pid);
     if(container.attr('data-hide') === 'false') {
       if(fixPosition) {
@@ -232,7 +232,7 @@ class SinglePostModule {
         this.hidePostComment(pid);
       }
     } else {
-      this.showPostComment(pid);
+      this.showPostComment(pid, page);
     }
   }
   // 获取post下的评论
@@ -467,8 +467,8 @@ NKC.methods.autoHidePostContent = function() {
 NKC.methods.switchPostContent = function(pid) {
   singlePostModule.switchPostContent(pid);
 }
-NKC.methods.switchPostComment = function(pid, fix) {
-  singlePostModule.switchPostComment(pid, fix);
+NKC.methods.switchPostComment = function(pid, fix, page) {
+  singlePostModule.switchPostComment(pid, fix, page);
 }
 NKC.methods.switchCommentForm  = function(pid) {
   singlePostModule.switchCommentForm (pid);

@@ -1459,6 +1459,7 @@ postSchema.statics.filterCommentsInfo = async (posts) => {
     }
     const result = {
       parentId: post.parentPostId,
+      parentsId: post.parentPostsId,
       parentUser: null,
       childPosts: [],
       pid: post.pid,
@@ -1489,8 +1490,14 @@ postSchema.statics.filterCommentsInfo = async (posts) => {
   const comments = [];
 
   for(const post of results) {
-    const {parentId} = post;
-    const parentPost = postsObj[parentId];
+    const {parentId, parentsId} = post;
+    let parentPost;
+    if(parentsId.length >= 5) {
+      // 限制层数 3
+      parentPost = postsObj[parentsId[4]];
+    } else {
+      parentPost = postsObj[parentId];
+    }
     if(!parentPost) {
       comments.push(post);
       continue;

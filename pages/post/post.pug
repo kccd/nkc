@@ -3,42 +3,25 @@ block title
   -var post = data.post;
   -var title = post.thread.firstPost.t;
   -var thread = data.thread;
-  -const addKcb = data.userOperationsId.includes('creditKcb')
-  -const addCredit = data.userOperationsId.includes('creditXsf') && data.isModerator
-  //- -const disablePost = data.userOperationsId.includes('disabledPost') || data.userOperationsId.includes('moveDraft')
-  -const disablePost = permissionsOr(["movePostsToRecycle", "movePostsToDraft"]) && data.isModerator;
   -const unblockPosts = permission("unblockPosts") && data.isModerator;
-  -const digestPost = data.userOperationsId.includes('digestPost') && data.isModerator;
 
-  -let modifyPostTimeLimit = 0;
-  -for(let i = 0; i < data.userRoles.length; i++)
-    -const r = data.userRoles[i];
-    if r.modifyPostTimeLimit > modifyPostTimeLimit
-      -modifyPostTimeLimit = r.modifyPostTimeLimit
-    if r.modifyPostTimeLimit === -1
-      -modifyPostTimeLimit = -1;
-      -break;
-
-  - var ownership = data.userOperationsId.includes('modifyOtherPosts')
-  - ownership = ownership?true:(data.user && data.user.uid===post.uid)
   title=`${title} - ${state.serverSettings.websiteName}`
   -var processed = post.c.replace(/<blockquote cite.*?blockquote>/igm, '')
   -processed = delAllCode(processed).trim().slice(0,140);
   meta(name='description' content=`${processed}`)
   meta(name='keywords' content=`${thread.firstPost.t}`)
-  link(rel='stylesheet' href=`/post/post.css?v=${global.NKC.startTime}`)
-  link(rel='stylesheet' href=`/external_pkgs/imageToBig/preview.css?v=${global.NKC.startTime}`)
+  +includeCSS('/post/post.css')
+  +includeCSS('/external_pkgs/imageToBig/preview.css')
   +includeJS("/external_pkgs/imageToBig/preview.js")
   include ../publicModules/plyr/plyr.css.pug
   include ../thread/singlePost/singlePost
 block content
-  -var mainContainer1400 = true
   .container-fluid.max-width
     include ../module_digest
     include ../module_credit
     .row
-      .col-xs-12.col-md-9
-        .nkcpanel.fullwidthpanel.ThreadBox.post
+      .col-xs-12.col-md-9.box-shadow-panel
+        .fullwidthpanel.ThreadBox.post
           if !post.reviewed
             -let reviewData = {reviewPid: post.pid, reviewType: "post"}
             include ../publicModules/module_review
@@ -52,34 +35,18 @@ block content
                 else
                   img.user-avatar(src=anonymousInfo.avatar)
                   .username.anonymous-name= anonymousInfo.username
-                span= fromNow(post.toc)
+                span
+                  +fromNow(post.toc)
               .options
                 include ../module_vote
                 +voteButtons(post, !!data.user)
-                if addKcb && data.user && post.uid !== data.user.uid
-                  .options-fa.fa.fa-cny(onclick=`credit("${post.pid}", 'kcb', ${data.user.kcb})`) &nbsp;鼓励
-                if digestPost
-                  if !post.digest
-                    .options-fa.fa.fa-star-o(onclick=`digestPost("${post.pid}")`) &nbsp;精选
-                  else
-                    .options-fa.fa.fa-star(onclick=`unDigestPost("${post.pid}")`)
-                      span &nbsp;取消精选
-                if addCredit
-                  .options-fa.fa.fa-graduation-cap(onclick=`credit("${post.pid}", 'xsf')`) &nbsp;评学术分
-                if testModifyTimeLimit(modifyPostTimeLimit, ownership, post.toc)
-                  if (data.user && data.user.uid === post.uid) || (data.isModerator && permission('modifyOtherPosts'))
-                    .options-fa.fa.fa-edit(onclick=`openToNewLocation("/editor?type=post&id=${post.pid}")`) &nbsp;编辑
-                if permission("getPostAuthor") && post.anonymous
-                  .options-fa.fa.fa-user-secret(onclick=`getPostAuthor('${post.pid}')`) &nbsp;作者
-                if disablePost
-                  .options-fa.fa.fa-eye-slash(onclick=`disabledThreadPost('${post.pid}')`) &nbsp;屏蔽
-                  if(post.tlm > post.toc && data.userOperationsId.includes('visitPostHistory'))
-                    if !post.hideHistories || data.userOperationsId.includes('displayPostHideHistories')
-                      a.options-fa(href=`/p/${post.pid}/history`)
-                        span.fa.fa-history &nbsp;历史
-                  -const ipoc = post.iplm || post.ipoc;
-                  a.options-fa(href=ipUrl(ipoc.toString()) title=ipoc target='_blank')
-                    span.fa.fa-map-marker(style='margin-left: 2px;') &nbsp;IP
+                if permission('creditKcb')
+                  .single-post-bottom-item(onclick=`credit('${post.pid}', 'kcb')` title='鼓励')
+                    .fa.fa-cny.credit-kcb &nbsp;鼓励
+                .single-post-bottom-item(data-type='share' data-share-type='post' data-share-id=post.pid title='分享')
+                  .fa.fa-share-square-o.share-icon &nbsp;分享
+                .single-post-bottom-item(data-type='postOption' data-pid=post.pid title='其他操作' data-direction='down')
+                  .fa.fa-sliders.option-icon &nbsp;操作
             span 发表于《
             a(href=data.postUrl )= post.thread.firstPost.t
             | 》
@@ -112,18 +79,22 @@ block content
           .m-t-1.m-b-1
             a.pointer.m-r-1(href=`/t/${post.tid}#container`) 回复
             if data.thread.oc !== data.post.pid
-              a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 评论
+              //- a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 评论
+              a.pointer.m-r-1(onclick=`NKC.methods.switchPostComment('${post.pid}')`) 评论
+          div
+            +singlePostComment({pid: post.pid})
           -let comment = post;
           include ../thread/postEdit
 
-          include ../publicModules/paging/paging
-          .post-comments-div
-          -let comments = data.posts
-          include ../thread/comments
+          //-
+            include ../publicModules/paging/paging
+            .post-comments-div
+            -let comments = data.posts
+            include ../thread/comments
 
-          include ../publicModules/paging/paging_input
-      .col-xs-12.col-md-3
-        .nkcpanel.post-share.fullwidthpanel
+            include ../publicModules/paging/paging_input
+      .col-xs-12.col-md-3.box-shadow-panel
+        .m-b-1
           .pid=`文号 / ${post.pid}`
           hr
           if !state.isApp
@@ -143,14 +114,14 @@ block content
           -var user = post.user
           include ../interface_thread_userpatch.pug
         if data.voteUpUsers.length !== 0
-          .nkcpanel.vote-user.fullwidthpanel
+          .vote-user.fullwidthpanel.m-b-1
             h4 点赞的用户
             for u, index in data.voteUpUsers
               if index < 30
                 a(href=`/u/${u.uid}` target='_blank' title=u.username)
                   img(src=tools.getUrl('userAvatar', u.avatar))
 block scripts
-  .hidden#data=objToStr({notes: data.notes})
+  .hidden#data=objToStr({notes: data.notes, pid: data.post.pid, page: data.page})
   include ../publicModules/complaint/complaint
   include ../publicModules/selectResource/selectResource
   include ../publicModules/sticker/selectSticker
@@ -163,6 +134,10 @@ block scripts
   include ../publicModules/disabledPost/disabledPost
   include ../publicModules/highlight/highlight
   include ../publicModules/share/sharePanel
+  include ../post/options/options
+  include ../publicModules/subscribeTypes/subscribeTypes
+  include ../publicModules/floatUserPanel/floatUserPanel.2.pug
+  include ../thread/singlePost/singlePost
     //- 下载资料询问框
   if state.downloadNeedScore
     include ../publicModules/downloadResource/downloadResource
@@ -195,9 +170,9 @@ block scripts
         pid: pid
       });
     }
+    var data = NKC.methods.getDataById("data");
     $(function () {
 
-      var data = NKC.methods.getDataById("data");
       NKC.oneAfter("mathJaxRendered", function(_data, next) {
         if (data.notes && data.notes.length) {
           for (var i = 0; i < data.notes.length; i++) {
@@ -211,6 +186,9 @@ block scripts
         }
       })
       NKC.methods.highlightBlockBySelector("[data-tag='nkcsource'][data-type='pre']");
+
+      NKC.methods.switchPostComment(data.pid, false, data.page);
+
     });
 
     if (NKC.configs.platform === 'reactNative') {
