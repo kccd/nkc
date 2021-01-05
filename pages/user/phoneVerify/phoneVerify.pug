@@ -1,0 +1,31 @@
+extends ../../bootstrap_base
+block title
+  title 验证手机号
+  
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-10#app(v-cloak)
+        .panel.panel-default
+          .panel-heading
+            span 验证手机号
+          .panel-body#mobileApp
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 已绑定手机号：
+                .col-sm-2
+                  h4= data.phone
+                .col-sm-5
+                  button.btn.btn-default(@click="toModifyPhoneNumber()") 修改手机号
+              .form-group
+                label.col-sm-2.control-label 验证码：
+                .col-sm-2
+                  input.form-control(type='text' placeholder='请输入验证码' v-model="code")
+                .col-sm-5
+                  button.btn.btn-primary(@click="sendSmsCode()" :disabled="statu !== 'wait' || complete") {{statu !== "countdown"? "获取验证码" : time + "秒后再次发送"}}
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(@click="submit()" :disabled="complete") 提交
+
+block scripts
+  +includeJS("/user/phoneVerify/phoneVerify.js")

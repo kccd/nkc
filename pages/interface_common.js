@@ -187,7 +187,7 @@ function jwarning(obj){
 
 function sweetAlert(text) {
   text = (text.error || text) + "";
-  Swal({
+  return Swal({
     confirmButtonText: "关闭",
     text: text
   });
@@ -218,7 +218,7 @@ function sweetError(text) {
   console.log(text);
   text = text.error || text;
   text = text + "";
-  Swal({
+  return Swal({
     type: "error",
     confirmButtonText: "关闭",
     text: text.error || text

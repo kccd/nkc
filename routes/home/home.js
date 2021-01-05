@@ -128,5 +128,8 @@ module.exports = async (options) => {
   await nkcModules.apiFunction.extendManagementInfo(ctx);
   // 是否有权限开办专业
   data.hasPermissionOpenNewForum = await db.PreparationForumModel.hasPermissionToCreatePForum(state.uid);
+  
+  // 是否需要进行手机号验证
+  data.needVerifyPhoneNumber = await db.UsersPersonalModel.shouldVerifyPhoneNumber(state.uid);
   ctx.template = "home/home_all.pug";
 };

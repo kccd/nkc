@@ -1,4 +1,6 @@
 var data = NKC.methods.getDataById('data');
+var phoneVerify = data.safeSettings.phoneVerify
+phoneVerify.enable = String(phoneVerify.enable);
 var app = new Vue({
   el: "#app",
   data: {

@@ -229,6 +229,13 @@ module.exports = {
 				GET: 'applyForumInvitation',
 				POST: 'applyForumInvitation'
 			}
+		},
+		phoneVerify: {
+			GET: "phoneVerifyPage",
+			POST: "phoneVerify",
+			sendSmsCode: {
+				POST: "sendPhoneVerifyCode"
+			}
 		}
 	}
 };
