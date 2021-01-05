@@ -56,7 +56,7 @@ if !isIncluded('singleComment')
   include ./singleCommentBottom
   include ../singlePost/singlePostWarningInfo
   mixin singleComment(props)
-    -var {user, voteUp, vote, pid, toc, tlm} = props;
+    -var {user, voteUp, vote, pid, toc, tlm, digest} = props;
     -var {parentUser, content, kcb, xsf, childPosts} = props;
     -var {disabled, reviewed, draft} = props;
     .single-comment(
@@ -66,6 +66,6 @@ if !isIncluded('singleComment')
       data-return=!!draft
       )
       +singlePostWarningInfo({disabled, draft, reviewed, pid})
-      +singleCommentTop(Object.assign({}, user, {voteUp, vote, pid, toc, parentUser}))
+      +singleCommentTop(Object.assign({}, user, {voteUp, vote, pid, toc, parentUser, digest}))
       +singleCommentCenter({content, kcb, xsf, pid})
       +singleCommentBottom({childPosts, pid})
