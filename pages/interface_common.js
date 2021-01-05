@@ -1547,7 +1547,7 @@ function obtainPureText(content, reduce, count) {
 }
 
 function postsVote(pid, type) {
-  if(type === 'login') return NKC.methods.toLogin('login');
+  if(!NKC.configs.uid || type === 'login') return NKC.methods.toLogin('login');
   var url = '/p/' + pid + '/vote/down';
   if(type === 'up') {
     url = '/p/' + pid + '/vote/up';

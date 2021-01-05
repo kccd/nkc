@@ -323,6 +323,9 @@ class SinglePostModule {
   }
   // 打开回评输入框
   switchCommentForm(pid) {
+    if(!NKC.configs.uid) {
+      return NKC.methods.toLogin();
+    }
     const singleComment = this.getSingleComment(pid);
     const singleCommentBottom = singleComment.children('.single-comment-bottom');
     const editorApp = this.getEditorApp(pid, singleCommentBottom);
