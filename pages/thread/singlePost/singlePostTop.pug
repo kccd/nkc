@@ -17,7 +17,8 @@ if !isIncluded('singlePostTop')
             target='_blank'
             data-float-uid=uid
           )=username
-          include ../../user/grade
+          if !banned
+            include ../../user/grade
           +userGrade(gradeId, gradeName)
           if digest
             span.fa.fa-star(title='精选内容')

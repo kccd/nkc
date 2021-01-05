@@ -508,7 +508,8 @@ block scripts
   include ../publicModules/share/sharePanel
   include ../post/options/options
   //- 通用socket
-  include ../publicModules/socket/socket
+  if data.user
+    include ../publicModules/socket/socket
   //- 下载资料询问框
   //if state.downloadNeedScore
   include ../publicModules/downloadResource/downloadResource

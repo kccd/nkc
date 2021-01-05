@@ -128,7 +128,8 @@ class SinglePostModule {
     const postContainer = this.getPostContainer(pid);
     postContainer.attr('data-show-comments', show? 'true': 'false');
   }
-  showPostComment(pid, page = 0) {
+  showPostComment(pid, page = 0, options={}) {
+    const {highlightCommentId = null} = options;
     this.removeAllEditorApp(pid);
     const self = this;
     const container = this.getCommentContainer(pid);
@@ -166,6 +167,11 @@ class SinglePostModule {
         });
         editorApp.show = true;
         editorApp.container.show();
+        if(highlightCommentId) {
+          const targetComment = $(`.single-comment[data-pid="${highlightCommentId}"]>.single-comment-center`);
+          NKC.methods.scrollToDom(targetComment);
+          NKC.methods.markDom(targetComment);
+        }
         self.autoSaveDraft(pid);
       })
       .then(() => {
@@ -481,6 +487,9 @@ NKC.methods.saveDraft = function(pid) {
 }
 NKC.methods.getPostCommentsByPage = function(pid, page) {
   singlePostModule.showPostComment(pid, page);
+}
+NKC.methods.showPostComment = function(pid, page, options) {
+  singlePostModule.showPostComment(pid, page, options);
 }
 NKC.methods.insertComment = function(parentCommentId, parentPostId, html) {
   singlePostModule.insertComment(parentCommentId, parentPostId, html);

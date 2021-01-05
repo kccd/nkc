@@ -310,7 +310,8 @@ block content
 
 block scripts
   //- 通用socket
-  include ../publicModules/socket/socket
+  if data.user
+    include ../publicModules/socket/socket
   include ../publicModules/subscribeTypes/subscribeTypes
   if data.type === "home"
     include ../publicModules/nkcSource
