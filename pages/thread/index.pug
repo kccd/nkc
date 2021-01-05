@@ -35,6 +35,7 @@ block title
     +hidePostContentSettings(data.postHeight)
 
   include ./postEditTime
+  include ../publicModules/floatForumNav
 
 block content
   if !(state.isApp && state.platform === 'reactNative')
@@ -421,6 +422,7 @@ block content
                 | &nbsp;或者&nbsp;
                 a.pointer(onclick="NKC.methods.toLogin('register')") 注册
                 | 。
+          +floatForumNav(data.threadNav)
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"
