@@ -297,6 +297,20 @@ const usersPersonalSchema = new Schema({
 	lastVerifyPhoneNumberTime: {
 		type: Date,
 		index: 1
+	},
+	// 需要送审的次数，与后台管理中的审核设置同时作用
+	// 这里的审核次数主要用于限制已经审核通过多篇文章的用户
+	// 比如用户早已脱离新手审核期（前几篇需审核）但出现违规，规定违规后3篇需审核
+	// -1: 全需要审核, 0: 不需要审核, 正整数: 具体多少篇需要审核
+	reviewCount: {
+  	thread: { // 发表文章
+			type: Number,
+			default: 0
+		},
+		post: { // 发表回复
+  		type: Number,
+			default: 0
+		}
 	}
 },
   {

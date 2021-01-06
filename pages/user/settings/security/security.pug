@@ -1,4 +1,4 @@
-extends bootstrap_base
+extends ../../../bootstrap_base
 block title
   title 账号安全
 block content
@@ -6,7 +6,7 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
-        include module_user_settings
+        include ../../../module_user_settings
       .col-xs-12.col-md-10
         .panel.panel-default
           .panel-heading
@@ -237,4 +237,4 @@ block content
 
 block scripts
   +includeJS("/nationCodes/nationCodes.js")
-  +includeJS("/interface_user_settings_security.js")
+  +includeJS("/user/settings/security/security.js")

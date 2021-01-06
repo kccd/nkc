@@ -335,7 +335,7 @@ block content
               a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
               a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
           //- 回复列表头部分页、管理按钮
-          .p-l-2.p-r-2
+          .p-l-2.p-r-2.m-b--05
             include ../publicModules/paging/paging
             +articleNav
             if disablePost
@@ -349,7 +349,7 @@ block content
               -post.highlight = data.highlight;
               +singlePost(post)
           //- 回复列表尾部分页、管理按钮
-          .p-l-2.p-r-2
+          .p-l-2.p-r-2.m-b--05
             include ../publicModules/paging/paging_input
             //-+articleNav
             if disablePost

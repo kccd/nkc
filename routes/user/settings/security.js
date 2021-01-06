@@ -17,7 +17,7 @@ router
     data.nationCode = nationCode;
     data.unverifiedEmail = unverifiedEmail;
     data.unverifiedMobile = unverifiedMobile;
-    ctx.template = "interface_user_settings_security.pug";
+    ctx.template = "user/settings/security/security.pug";
     await next();
   });
 module.exports = router;
