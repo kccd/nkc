@@ -20,7 +20,8 @@ block shopContent
         .form-group
           label.col-sm-2.control-label 辅助分类
           .col-sm-10
-            .forum(v-for="f in mainForums" :style="'background-color: ' + f.color") {{f.displayName}}
+            .forum(v-for="(f, index) in mainForums" :style="'background-color: ' + f.color") {{f.displayName}}
+              .m-l-05.pointer.fa.fa-remove(@click='removeFromArr(mainForums, index)')
             button.btn.btn-default.btn-sm(disabled v-if='!selectedShopForumId' title='请先选择商品分类') 选择
             button.btn.btn-default.btn-sm(@click="selectForum" v-else) 选择
         .form-group
@@ -268,8 +269,11 @@ block shopContent
 block shopScripts
   include ../../../publicModules/commonModal/commonModal
   include ../../../publicModules/forumSelector/forumSelector
-  //include ../../../publicModules/moveThread/moveThread
   include ../../../publicModules/selectResource/selectResource
+  include ../../../publicModules/selectDraft/selectDraft
+  include ../../../publicModules/sticker/selectSticker
+  include ../../../ueditor/dialogs/mathformulaV2/mathformula
+  include ../../../publicModules/insertHideContent/insertHideContent
   include ../../../ueditor/ueditor
   +includeJS("/bootstrap/js/bootstrap-datetimepicker.min.js")
   +includeJS("/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js")
