@@ -750,5 +750,6 @@
 
   "applyForum": "提交开办专业申请",
   "applyForumInvitation": "处理开办专业成员邀请",
-  "nkcManagementApplyForum": "专业申请审核（给普通用户，路由有审核员证书判断）"
+  "nkcManagementApplyForum": "专业申请审核（给普通用户，路由有审核员证书判断）",
+  "getPostComments": "获取文章回复下的评论"
 }

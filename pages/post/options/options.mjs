@@ -12,6 +12,7 @@ window.PostOption = new Vue({
     // 类型 thread、post
     pid: '',
     postType: '',
+    isComment: false,
     postUserId: '',
     tid: '',
     // 发表时间
@@ -98,7 +99,8 @@ window.PostOption = new Vue({
       self.loading = true;
       nkcAPI(`/p/${pid}/option`, 'GET')
         .then(data => {
-          const {tid, pid, toc, options, userColumnId, postType, postUserId} = data;
+          const {tid, pid, toc, options, userColumnId, postType, postUserId, isComment} = data;
+          self.isComment = isComment;
           self.anonymous = options.anonymous;
           self.anonymousUser = options.anonymousUser;
           self.blacklist = options.blacklist;
@@ -217,6 +219,10 @@ window.PostOption = new Vue({
     addXSF() {
       const {pid} = this;
       credit(pid, 'xsf');
+    },
+    addKCB() {
+      const {pid} = this;
+      credit(pid, 'kcb');
     },
     postDigest() {
       const {pid, digest} = this;

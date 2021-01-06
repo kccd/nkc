@@ -59,12 +59,25 @@ func.sendPostMessage = async (data) => {
   if(!post) return;
   const comment = await db.PostModel.getSocketCommentByPid(post);
   let postData = await db.PostModel.extendPost(post);
-  postData = (await db.PostModel.filterPostsInfo([postData]))[0];
+  const parentCommentId = post.parentPostId;
+  const parentPostId = post.parentPostsId[0];
   const render = require('../nkcModules/render');
-  const html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData});
+  let html, eventName;
+  if(!parentCommentId) {
+    postData = (await db.PostModel.filterPostsInfo([postData]))[0];
+    html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData});
+    eventName = 'postMessage';
+  } else {
+    postData = (await db.PostModel.filterCommentsInfo([postData]))[0];
+    html = render(PATH.resolve(__dirname, `../pages/thread/singleComment/singleCommentPage.pug`), {postData});
+    eventName = 'commentMessage';
+  }
+
   const roomName = getRoomName('post', data.postId);
-  global.NKC.io.to(roomName).emit('postMessage', {
+  global.NKC.io.to(roomName).emit(eventName, {
     comment,
+    parentPostId,
+    parentCommentId,
     html
   });
 }

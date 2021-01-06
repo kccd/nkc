@@ -409,29 +409,6 @@ NKC.methods.resourceToHtml = function(type, rid, name) {
   return hit? hit() : "";
 };
 
-/*NKC.methods.resourceToHtml = function(resource, type) {
-  var html = "";
-  if(type === "sticker") {
-    html = '<img src="' + NKC.methods.tools.getUrl('sticker', resource.rid) + '">';
-  } else if(type === "emoji") {
-    html = '<img src="' + NKC.methods.tools.getUrl('emoji', resource) + '">';
-  } else {
-    var name = resource.oname;
-    var rid = resource.rid;
-    var ext = resource.ext.toLowerCase();
-    if(NKC.configs.imageExt.indexOf(ext) !== -1) {
-      html = '<p><img src="' + '/r/' + rid + '" style="max-width:50%;"></p>';
-    } else if(NKC.configs.audioExt.indexOf(ext) !== -1) {
-      html = '<audio src="' + '/r/' + rid + '" controls>Your browser does not support the audio element</audio>';
-    } else if(NKC.configs.videoExt.indexOf(ext) !== -1) {
-      html = '<p><br></p><p><video src="' + '/r/' + rid + '" controls style="width: 50%;">video</video></p>';
-    } else {
-      html = '<p><a href="' + '/r/' + rid + '"><img src=' + '/default/default_thumbnail.png' + '>' + name + '</a></p>';
-    }
-  }
-
-  return html;
-};*/
 
 /*toAppLogin
 * 跳转到登录/注册。手机端打开登录window，网页端打开登录弹窗。
@@ -860,12 +837,12 @@ NKC.methods.search = function(inputId) {
 }
 
 
-var siteIconUrl = $(document.head).find("[rel='shortcut icon']").attr("href");
 /**
  * 发送原生消息提示
  */
 NKC.methods.showNotification = function(title, body, time) {
   if(!("Notification" in window)) return;
+  var siteIconUrl = $(document.head).find("[rel='shortcut icon']").attr("href");
   function toShow() {
     return new Promise(function(resolve, reject) {
       var notification = new Notification(title, {body: body, icon: siteIconUrl});
@@ -964,7 +941,7 @@ NKC.methods.removeLocalStorageByKey = function(key) {
 
 
 // service worker
-if ('serviceWorker' in navigator) {
+/*if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/serviceWorker/index.js')
     .then(function(registration) {
       return registration.update();
@@ -988,4 +965,4 @@ if ('serviceWorker' in navigator) {
     .catch(function(error) {
       console.log('Registration failed with ' + error);
     })
-}
+}*/

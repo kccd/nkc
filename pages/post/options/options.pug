@@ -3,7 +3,10 @@
   .post-options-panel(v-if='loading')
     .loading 加载中...
   .post-options-panel(v-else)
-    a.option(:href="getUrl('postHome', pid)" target='_blank')
+    a.option(:href="getUrl('postHome', pid)" target='_blank' v-if='!isComment')
+      .fa.fa-newspaper-o
+      span 详情
+    a.option(:href="getUrl('post', pid)" target='_blank' v-else)
       .fa.fa-newspaper-o
       span 详情
     .option(v-if='inColumn !== null' @click='toColumn')
@@ -17,7 +20,7 @@
     .option(v-if='anonymousUser !== null' @click='viewAuthorInfo')
       .fa.fa-share-square-o
       span 查看作者
-    .option(@click='replyPost' v-if='postType === "post"')
+    .option(@click='replyPost' v-if='postType === "post" && !isComment')
       .fa.fa-comment-o
       span 回复
     a.option(v-if='postType === "thread"' :href="'/t/' + tid + '?t=author'")
@@ -41,6 +44,9 @@
     .option(v-if='xsf !== null' @click='addXSF')
       .fa.fa-graduation-cap
       span 评学术分
+    .option(v-if='kcb !== null' @click='addKCB')
+      .fa.fa-cny
+      span 鼓励
     .option(v-if='digest !== null' @click='postDigest')
       .fa.fa-star-o(v-if='digest === false')
       .fa.fa-star(v-else)

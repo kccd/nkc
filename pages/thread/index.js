@@ -15,7 +15,7 @@ $(document).ready(function(){
   })
 	  .then(function() {
 	  	// 内容折叠
-			_singlePostModule.autoHidePostContent();
+			NKC.methods.autoHidePostContent();
 	  })
 	  .catch(function(data) {
 	  	console.error(data);
@@ -1271,7 +1271,12 @@ $(function() {
 			var JQDOM = $(data.html).find('.single-post-container');
 			JQDOM = JQDOM[0];
 			// 公式渲染
-			MathJax.typesetPromise([JQDOM]);
+			try{
+				MathJax.typesetPromise([JQDOM]);
+			} catch(err) {
+				console.log(err);
+			}
+
 			JQDOM = $(JQDOM)
 			var parentDom = $('.single-posts-container');
 			parentDom.append(JQDOM);
@@ -1286,13 +1291,23 @@ $(function() {
 			// 操作
 			NKC.methods.initPostOption();
 			// 图片预览
-			NKC.methods.initImageViewer();
+                        if(!NKC.configs.isApp) NKC.methods.initImageViewer();
 			// 划词笔记
 			nkchl.push(new NKC.modules.NKCHL({
 				type: 'post',
 				targetId: data.comment.postId,
 				notes: []
 			}));
+		});
+		socket.on('commentMessage', function(data) {
+			if(NKC.configs.uid !== data.comment.uid) {
+				bulletComments.add(data.comment);
+			}
+			NKC.methods.insertComment(
+				data.parentCommentId,
+				data.parentPostId,
+				data.html
+			);
 		});
 		if(socket.connected) {
 			joinPostRoom();

@@ -1,5 +1,33 @@
 @import '../../publicModules/base';
 @postTopHeight: 3.2rem;
+.single-post-container[data-disabled], .single-comment[data-disabled]  {
+  background-color: #bdbdbd;
+}
+.single-post-container[data-un-reviewed], .single-comment[data-un-reviewed] {
+  background-color: #ffd598;
+}
+.single-post-container[data-return], .single-comment[data-return] {
+  background-color: #ffdbd5;
+}
+.single-post-container[data-highlight], .single-comment[data-highlight] {
+  background-color: #ffdcb2;
+}
+.single-post-header{
+  text-align: center;
+  font-style: oblique;
+  button{
+    font-style: normal;
+  }
+  .return{
+    color: red;
+  }
+  .review{
+    color: red;
+  }
+  .disabled{
+    color: #c70000;
+  }
+}
 .single-post-container{
   padding: 0.9rem 2.5rem 0.9rem 2.5rem;
   border-bottom: 1px solid #eee;
@@ -10,34 +38,10 @@
   &:hover{
     //background-color: rgba(0, 0, 0, 0.05);
   }
-  &[data-disabled]{
-    background-color: #bdbdbd;
+  &[data-show-comments='true']{
+    background-color: #c3b7a7;
   }
-  &[data-un-reviewed]{
-    background-color: #ffd598;
-  }
-  &[data-return]{
-    background-color: #ffdbd5;
-  }
-  &[data-highlight]{
-    background-color: #ffdcb2;
-  }
-  .single-post-header{
-    text-align: center;
-    font-style: oblique;
-    button{
-      font-style: normal;
-    }
-    .reture{
-      color: red;
-    }
-    .review{
-      color: red;
-    }
-    .disabled{
-      color: #c70000;
-    }
-  }
+
 }
 @media (max-width: 768px) {
   .single-post-container{
@@ -113,6 +117,9 @@
   display: inline-block;
   vertical-align: top;
   cursor: pointer;
+  &.icon-item{
+    font-size: 0;
+  }
   margin-right: 0.3rem;
   height: 1.6rem;
   line-height: 1.6rem;
@@ -157,6 +164,153 @@
     .number{
       color: #CC0000;
 
+    }
+  }
+}
+// 评论相关样式
+.single-post-comment-container{
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1rem;
+  padding-top: 3em;
+  position: relative;
+  background-color: #fff;
+  margin-bottom: 1rem;
+  &:before{
+    content: '评论列表';
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+    display: block;
+    height: 2rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    line-height: 2rem;
+    background-color: #eee;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+  }
+  .single-comment-warning{
+    color: red;
+  }
+}
+.single-post-comment-container[data-hide="true"] {
+  display: none;
+}
+.single-post-comment-button{
+  user-select: none;
+  font-weight: 700;
+  color: #000;
+}
+.single-post-comment-button[data-number='0']{
+  font-weight: normal;
+}
+.single-post-comment-loading{
+ .fa{
+   margin-right: 0.5rem;
+ }
+}
+.single-post-comments{
+
+}
+.single-comments{
+  //background-color: #eee;
+  //padding-left: 2rem;
+}
+.single-comment{
+  margin-bottom: 0.5rem;
+  .single-comment{
+    //padding-left: 2rem;
+  }
+}
+.single-comment-content{
+  //padding-left: 2rem;
+}
+.single-comment-time{
+  color: #555;
+}
+.single-comment-top{
+  @avatarHeight: 1.8rem;
+  height: @avatarHeight;
+  padding-left: @avatarHeight + 0.5rem;
+  position: relative;
+  font-size: 1.1rem;
+  .single-comment-avatar{
+    height: @avatarHeight;
+    width: @avatarHeight;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .single-comment-user{
+    display: inline-block;
+    &>*{
+      margin-right: 0.355rem;
+    }
+  }
+  .single-comment-options{
+    float: right;
+  }
+}
+.single-comment-center{
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+}
+.single-comment-bottom{
+  padding-left: 2rem;
+}
+.single-comment-editor{
+  margin-bottom: 0.5rem;
+}
+.single-comment-prompt{
+  font-weight: 700;
+  color: #333;
+}
+.single-comment-button{
+  button{
+    margin-left: 0.5rem;
+  }
+  text-align: right;
+}
+.single-comment-editor-container{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.single-comment-reply-button{
+  color: #555;
+  cursor: pointer;
+  &:hover{
+    color: #000;
+  }
+}
+.single-comment-paging{
+  margin-bottom: 1rem;
+  span{
+    cursor: pointer;
+    height: 1.6rem;
+    display: inline-block;
+    line-height: 1.6rem;
+    padding: 0 0.5rem;
+    text-align: center;
+    margin-right: 0.3rem;
+    border-radius: 2px;
+    font-size: 1rem;
+    &.common{
+      background-color: @darkGray;
+      color: #fff;
+      &:hover{
+        background-color: @primary;
+      }
+    }
+    &.active{
+      background-color: @primary;
+      color: #fff;
+    }
+    &.null{
+      padding: 0;
     }
   }
 }
