@@ -278,7 +278,7 @@ shelfRouter
       // 检查发表权限
       await db.ForumModel.checkWritePermission(options.uid, options.fids);
       // 检测专业分类互斥
-      await db.ForumModel.checkForumCategoryBeforePost();
+      await db.ForumModel.checkForumCategoryBeforePost(options.fids);
       const productId = await db.SettingModel.operateSystemID("shopGoods", 1);
       product = db.ShopGoodsModel({
         productId,
