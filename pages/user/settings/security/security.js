@@ -269,7 +269,7 @@ var mobileApp = new Vue({
     oldTime: 0,
 
     phoneVerify: {
-      statu: "wait",
+      status: "wait",
       time: 0,
       code: "",
       complete: false
@@ -408,24 +408,24 @@ var mobileApp = new Vue({
 
     sendPhoneVerifySmsCode: function() {
       var self = this.phoneVerify;
-      self.statu = "sendding";
+      self.status = "sending";
       nkcAPI("/u/"+ NKC.configs.uid +"/phoneVerify/sendSmsCode", "POST")
         .then(function(data) {
           var countdownLen = data.countdownLen;
           self.time = countdownLen;
-          self.statu = "countdown";
+          self.status = "countdown";
           var timer = setInterval(function() {
             self.time -= 1;
             if(self.time === 0) {
               clearInterval(timer);
-              self.statu = "wait";
+              self.status = "wait";
               self.time = 0;
             }
           }, 1000);
         })
         .catch(function(data) {
           sweetError(data);
-          self.statu = "wait";
+          self.status = "wait";
           self.time = 0;
         })
     },

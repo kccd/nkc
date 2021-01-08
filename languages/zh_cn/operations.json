@@ -110,6 +110,7 @@
   "cancelXsf": "撤销学术分",
 
 
+  "sendPhoneMessage": "发送短信验证码",
   "sendGetBackPasswordMessage": "发送【找回密码】短信验证码",
   "search": "搜索",
   "visitPersonalForum": "访问专栏",
@@ -750,13 +751,14 @@
 
   "applyForum": "提交开办专业申请",
   "applyForumInvitation": "处理开办专业成员邀请",
+  "getPostComments": "获取文章回复下的评论",
   "nkcManagementApplyForum": "专业申请审核（给普通用户，路由有审核员证书判断）",
 
   "phoneVerifyPage": "访问手机号验证页面",
   "phoneVerify": "验证手机号",
   "sendPhoneVerifyCode": "发送验证手机号的验证码",
   "unverifiedPhonePage": "查看未验证的手机号列表",
-
   "experimentalKeywordSettings": "审核关键词设置",
-  "getPostComments": "获取文章回复下的评论"
+  "applyToChangeUnusedPhoneNumber": "申请修改失效手机号",
+  "nkcManagementSecurityApplication": "前台管理 - 手机号申诉"
 }

@@ -117,7 +117,9 @@ table{
 .m-r-6{
   margin-right: 6rem;
 }
-
+.m-b--05{
+  margin-bottom: -0.5rem;
+}
 /* padding-top */
 .p-r-05{
   padding-left: 0.5rem;
@@ -2528,4 +2530,7 @@ div.user-banned{
 a[data-anonymous]{
   color: #888;
   text-decoration: none;
+}
+.nkc-table{
+  font-size: 1rem;
 }

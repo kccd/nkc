@@ -8,3 +8,7 @@ block content
       include ./nav
       .col-xs-12.col-md-12
   block eContent
+  script.
+    if (NKC.configs.platform === 'reactNative') {
+      window._userSelect = true;
+    }

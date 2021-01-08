@@ -79,7 +79,11 @@ module.exports = {
 				GET: 'visitMobileSettings',
 				PUT: 'modifyMobile',
 				DELETE: "unbindMobile",
-				POST: 'bindMobile'
+				POST: 'bindMobile',
+				apply: {
+					GET: 'applyToChangeUnusedPhoneNumber',
+					POST: 'applyToChangeUnusedPhoneNumber'
+				}
 			},
 			email: {
 				GET: 'visitEmailSettings',

@@ -19,7 +19,7 @@ router
     data.unverifiedMobile = unverifiedMobile;
     // 是否需要验证手机号
     data.needPhoneVerify = await db.UsersPersonalModel.shouldVerifyPhoneNumber(uid);
-    ctx.template = "interface_user_settings_security.pug";
+    ctx.template = "user/settings/security/security.pug";
     await next();
   });
 module.exports = router;

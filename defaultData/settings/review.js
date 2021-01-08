@@ -138,7 +138,7 @@ module.exports = {
     },
     keyword: {
       enable: false,
-      list: ["毛泽东", "共产党", "习近平"],
+      list: ["关键词1", "关键词2"],
       condition: {
         leastKeywordTimes: 1,
         leastKeywordCount: 1,

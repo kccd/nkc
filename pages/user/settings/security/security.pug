@@ -1,4 +1,4 @@
-extends bootstrap_base
+extends ../../../bootstrap_base
 block title
   title 账号安全
 block content
@@ -6,7 +6,7 @@ block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
-        include module_user_settings
+        include ../../../module_user_settings
       .col-xs-12.col-md-10
         .panel.panel-default
           .panel-heading
@@ -32,67 +32,6 @@ block content
               .form-group
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(onclick=`submitPassword(${data.user.uid})`) 提交
-        //-.panel.panel-default
-          .panel-heading
-            span 绑定手机
-          .panel-body
-            .form-horizontal
-              if data.mobile
-                .form-group
-                  label.col-sm-2.control-label 已绑定手机号：
-                  .col-sm-4
-                    h4=`+${data.nationCode} ${data.mobile}`
-                #inputDiv(style='display: none;')
-                  .form-group
-                    label.col-sm-2.control-label 旧手机验证码：
-                    .col-sm-2
-                      input.form-control#oldCode(type='text' placeholder='请输入验证码')
-                    .col-sm-5
-                      button.btn.btn-primary(onclick=`sendMessage()`) 获取验证码
-                  .form-group
-                    label.col-sm-2.control-label 新手机国际区号：
-                    .col-sm-4
-                      include interface_nation_code
-                  .form-group
-                    label.col-sm-2.control-label 新手机号码：
-                    .col-sm-4
-                      input.form-control#mobile(type='text' placeholder='请输入验证码')
-
-                  .form-group
-                    label.col-sm-2.control-label 新手机验证码：
-                    .col-sm-2
-                      input.form-control#code(type='text' placeholder='请输入验证码')
-                    .col-sm-5
-                      button.btn.btn-primary(onclick=`sendMessage(true)`) 获取验证码
-
-                  .form-group
-                    .col-sm-4.col-sm-offset-2
-                      button.btn.btn-primary(onclick=`submitChangeMobile(${data.user.uid})`) 提交
-
-                .form-group#btnChangeNumber
-                  .col-sm-4.col-sm-offset-2
-                    button.btn.btn-primary(onclick=`changeNumber()`) 更换手机
-              else
-                .form-group
-                  label.col-sm-2.control-label 国际区号：
-                  .col-sm-4
-                    include interface_nation_code
-
-                .form-group
-                  label.col-sm-2.control-label 手机号码：
-                  .col-sm-4
-                    input.form-control#mobile(type='text' placeholder='请输入手机号码')
-
-                .form-group
-                  label.col-sm-2.control-label 手机验证码：
-                  .col-sm-2
-                    input.form-control#code(type='text' placeholder='请输入验证码')
-                  .col-sm-5
-                    button.btn.btn-primary(onclick=`bindMobileMessage()`) 获取验证码
-
-                .form-group
-                  .col-sm-4.col-sm-offset-2
-                    button.btn.btn-primary(onclick=`submitBindMobile(${data.user.uid})`) 提交
         .panel.panel-default
           .panel-heading
             span 绑定手机
@@ -100,15 +39,17 @@ block content
             .form-horizontal(v-if="mobile")
               .form-group
                 label.col-sm-2.control-label 已绑定手机号：
-                .col-sm-4
+                .col-sm-6
                   h4=`+${data.nationCode} ${data.mobile}`
+                  if data.needPhoneVerify 
+                    span.text-danger(v-if='!formType') 手机号待验证，请点击验证按钮验证手机号，以获取更多权限
               .form-group(v-if="!formType")
                 label.col-sm-2.control-label
                 .col-sm-4
                   button.btn.btn-primary(@click="formType = 'changeMobile'") 更换手机
-                  button.btn.btn-default(@click="formType = 'unbindMobile'") 解绑
                   if data.needPhoneVerify
-                    button.btn.btn-danger(@click="formType = 'phoneVerify'") 需要验证手机号
+                    button.btn.btn-primary(@click="formType = 'phoneVerify'") 验证
+                  button.btn.btn-default(@click="formType = 'unbindMobile'") 解绑  
             .form-horizontal(v-if="formType === 'bind'")
               .form-group
                 label.col-sm-2.control-label 国际区号：
@@ -134,6 +75,8 @@ block content
                 label.col-sm-2.control-label 旧手机验证码：
                 .col-sm-2
                   input.form-control(type='text' placeholder='请输入验证码' v-model="oldCode")
+                  .m-t-05
+                    a(href=`/u/${data.user.uid}/settings/mobile/apply` target='_blank') 无法接收短信验证码？
                 .col-sm-5
                   button.btn.btn-primary(@click=`sendMessage(false)` v-if="oldTime <= 0") 获取验证码
                   button.btn.btn-primary(v-else disabled) 获取验证码({{oldTime}})
@@ -175,10 +118,11 @@ block content
                 .col-sm-2
                   input.form-control(type='text' placeholder='请输入验证码' v-model="phoneVerify.code")
                 .col-sm-5
-                  button.btn.btn-primary(@click="sendPhoneVerifySmsCode()" :disabled="phoneVerify.statu !== 'wait' || phoneVerify.complete") {{phoneVerify.statu !== "countdown"? "获取验证码" : phoneVerify.time + "秒后再次发送"}}
+                  button.btn.btn-primary(@click="sendPhoneVerifySmsCode()" :disabled="phoneVerify.status !== 'wait' || phoneVerify.complete") {{phoneVerify.status !== "countdown"? "获取验证码" : phoneVerify.time + "秒后再次发送"}}
               .form-group
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(@click="submitPhoneVerify()" :disabled="phoneVerify.complete") 提交
+                  button.btn.btn-default(@click="formType = ''" :disabled="phoneVerify.complete") 取消
         .panel.panel-default
           .panel-heading
             span 绑定邮箱
@@ -249,4 +193,4 @@ block content
 
 block scripts
   +includeJS("/nationCodes/nationCodes.js")
-  +includeJS("/interface_user_settings_security.js")
+  +includeJS("/user/settings/security/security.js")

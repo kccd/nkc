@@ -2,10 +2,10 @@ if !isIncluded('singleCommentTop')
   include ../../publicModules/mixin
   include ../singlePost/singlePostVote
   mixin singleCommentTop(props)
-    -var {uid, username, avatar, banned} = props;
+    -var {uid, username, avatar, banned, digest} = props;
     -var {voteUp, vote, pid, toc, tlm, parentUser} = props;
     .single-comment-top
-      img.single-comment-avatar(src=avatar)
+      img.single-comment-avatar(src=avatar class=banned? 'user-banned-avatar':'')
       .single-comment-user
         a.single-comment-username(
           data-anonymous=!uid
@@ -22,6 +22,8 @@ if !isIncluded('singleCommentTop')
             data-float-uid=parentUser.uid
           )=parentUser.username
         span.single-comment-reply-button(onclick=`NKC.methods.switchCommentForm("${pid}")`) 回评
+        if digest
+          span.post-digest.fa.fa-star(title='精选内容')
       .single-comment-options
         +singlePostVote(pid, vote, voteUp)
         .single-post-bottom-item.icon-item(data-type='share' data-share-type='post' data-share-id=pid title='分享')

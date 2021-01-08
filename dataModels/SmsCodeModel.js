@@ -115,4 +115,11 @@ smsCodeSchema.statics.ensureSendPermission = async (obj) => {
 	}
 };
 
+/*
+* 标记短信验证码为已使用
+* @author pengxiguaa 2021-1-7
+* */
+smsCodeSchema.methods.mark = async function() {
+	await this.update({used: true});
+};
 module.exports = mongoose.model('smsCodes', smsCodeSchema, 'smsCodes');

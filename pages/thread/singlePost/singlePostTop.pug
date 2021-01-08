@@ -1,14 +1,14 @@
 //- 字段详情/pages/thread/singlePost/singlePost.pug
 if !isIncluded('singlePostTop')
   mixin singlePostTop(props)
-    -var {pid, username, toc, uid, avatar, home, gradeId, gradeName} = props;
+    -var {pid, username, toc, uid, avatar, home, gradeId, gradeName, banned} = props;
     -var {reason, reviewed, isAuthor, floor, digest, tlm} = props;
     -var {cancelTopped} = props;
     .single-post-top
       .single-post-avatar(
         data-float-uid=uid
         )
-        img(src=avatar)
+        img(src=avatar class=banned?'user-banned-avatar':'')
       .single-post-user
         .single-post-username
           a(
@@ -17,10 +17,11 @@ if !isIncluded('singlePostTop')
             target='_blank'
             data-float-uid=uid
           )=username
-          include ../../user/grade
+          if !banned
+            include ../../user/grade
           +userGrade(gradeId, gradeName)
           if digest
-            span.fa.fa-star(title='精选内容')
+            span.post-digest.fa.fa-star(title='精选内容')
           if isAuthor
             span 作者
           if cancelTopped
@@ -28,7 +29,7 @@ if !isIncluded('singlePostTop')
         .single-post-toc
           +fromNow(toc)
           if tlm
-            | &nbsp;修改于
+            | &nbsp;修改于&nbsp;
             +fromNow(tlm)
       a.single-post-floor(href=tools.getUrl('post', pid))=floor + '楼'
         .single-post-checkbox

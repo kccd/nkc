@@ -33,7 +33,8 @@ router
       history: null,
       violation: null,
       complaint: null,
-      reviewed: null
+      reviewed: null,
+      ipInfo: null,
     };
     if(user) {
       // 推送到专栏
