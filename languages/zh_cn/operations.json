@@ -757,5 +757,6 @@
   "sendPhoneVerifyCode": "发送验证手机号的验证码",
   "unverifiedPhonePage": "查看未验证的手机号列表",
 
-  "experimentalKeywordSettings": "审核关键词设置"
+  "experimentalKeywordSettings": "审核关键词设置",
+  "getPostComments": "获取文章回复下的评论"
 }

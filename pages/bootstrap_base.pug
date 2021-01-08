@@ -9,6 +9,7 @@ block head
   if state.isApp && state.platform === 'reactNative'
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
   link(rel='shortcut icon' href=state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}` : '/favicon.ico')
+  +includeJS('/publicModules/common.js')
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
@@ -44,8 +45,6 @@ block body
     audio.hidde#beep(data-notice=`${systemInfo}`, data-reminder=`${reminder}`, data-message=`${usersMessage}`)
   +includeJS('/jquery/jquery-1.11.1.js')
   +includeJS('/jquery/jquery-ui.1.11.4.min.js')
-  //- 新版common.js
-  +includeJS('/publicModules/common.js')
   //-app使用的js
   if state.isApp
     script!=`NKC.configs.isApp = true;NKC.configs.appOS="${state.appOS}";NKC.configs.platform="${state.platform}"`

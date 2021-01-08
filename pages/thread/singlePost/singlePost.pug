@@ -65,6 +65,8 @@ if !isIncluded('singlePost')
   include ./singlePostTop
   include ./singlePostCenter
   include ./singlePostBottom
+  include ./singlePostComment
+  include ./singlePostWarningInfo
   include ../../publicModules/mixin
   +includeCSS('/thread/singlePost/singlePost.css')
   +includeJS('/thread/singlePost/singlePost.js')
@@ -82,28 +84,10 @@ if !isIncluded('singlePost')
       data-hide=isAuthor? 'not': hide
       id=highlight === pid? 'highlight': undefined
       )
-      if draft
-        .single-post-header
-          .reture 当前内容已被退回修改，请作者点击编辑按钮修改
-          span=`原因：${draft.reason}`
-      else if disabled
-        .single-post-header
-          .disabled
-            span.m-r-05 内容已被屏蔽
-            a(onclick=`enablePost('${pid}')`) 点击解封
-      else if !reviewed
-        .single-post-header
-          .review 内容待审核
-          if permission('review')
-            div
-              | 通过请点击
-              button.btn.btn-xs.btn-default(onclick=`reviewPost('${pid}')`) 通过
-              | &nbsp;  按钮，不通过请点击
-              button.btn.btn-xs.btn-default(onclick=`NKC.methods.disabledPosts('${pid}')`) 退修或删除
-              | 按钮。
-              a(href=`/review` target="_blank") 待审核列表
+      +singlePostWarningInfo({disabled, draft, reviewed, pid})
 
       +singlePostTop(Object.assign({}, user, {pid, isAuthor, floor, reviewed, reason, toc, digest, tlm, cancelTopped}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
       if !hidePostBottom
         +singlePostBottom({vote, voteUp, pid, count, tid})
+      +singlePostComment({pid})

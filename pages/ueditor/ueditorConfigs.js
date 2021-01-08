@@ -30,7 +30,7 @@
       imgCount: 0,
       zIndex: 499
     },
-    
+
     // 文章页回复框
     postConfigs: {
       toolbars: [
@@ -56,17 +56,18 @@
       imgCount: 0,
       zIndex: 499
     },
-    
+
     // 文章页评论的编辑器
     commentConfigs: {
       toolbars: [
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          //'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', "|"
         ]
       ],
       maximumWords: 200, // 最大字符数
-      initialFrameHeight: 120, // 编辑器高度
+      initialFrameHeight: 100, // 编辑器高度
       autoHeightEnabled: true, // 编辑器是否随着行数增加而自动长高
       scaleEnabled: false, // 是否允许拉长
       autoFloatEnabled: true,
@@ -82,7 +83,7 @@
       imgCount: 0,
       zIndex: 499
     },
-    
+
     // 专栏自定义页编辑器
     columnPageConfigs: {
       toolbars: [
@@ -108,7 +109,7 @@
       imgCount: 0,
       zIndex: 499
     },
-    
+
     // 基金项目编辑器
     fundConfigs: {
       toolbars: [
@@ -134,7 +135,7 @@
       imgCount: 0,
       zIndex: 499
     },
-    
+
     // 商品编辑器
     shopConfigs: {
       toolbars: [
@@ -211,5 +212,5 @@
       zIndex: 499
     }
   };
-  
+
 })();

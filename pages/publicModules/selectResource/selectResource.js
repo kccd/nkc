@@ -374,6 +374,9 @@ NKC.modules.SelectResource = function() {
         if(f.constructor === Array) {
           // 这个数组中文件的顺序和用户选择的顺序相反，即先选的靠后，后选的靠前
           f.forEach(function(file) {
+            if(!file.name && file.type.indexOf('image') !== -1) {
+              file.name = Date.now() + Math.round(Math.random()*1000) + '.png';
+            }
             self.files.push(self.newFile(file));
           });
         } else {

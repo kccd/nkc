@@ -1,0 +1,4 @@
+if !isIncluded('singlePostComment')
+  mixin singlePostComment(props)
+    -var {pid} = props;
+    .single-post-comment-container(data-type='singlePostCommentContainer' data-pid=pid data-hide='true')

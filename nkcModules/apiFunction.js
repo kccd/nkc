@@ -4,6 +4,7 @@ const fs = require("fs");
 const moment = require('moment');
 const http = require("http");
 const randomatic = require('randomatic');
+const searchIp = require('node-ip2region').create();
 moment.locale('zh-cn');
 const defaultPerpage = paging.perpage;
 let fn = {};
@@ -453,35 +454,47 @@ fn.doExchange = (arr) => {
 fn.getIpAddress = async (ip) => {
   const aliAppCode = require("../config/aliAppCode");
   const {appCode} = aliAppCode;
-  let options = {
+  const options = {
     hostname: `iploc.market.alicloudapi.com`,    //接口域
     path: `/v3/ip?ip=${ip}`,    //请求地址
     headers: {    //请求头
-        "Content-Type": "application/json; charset=utf-8",
-        "Authorization": "APPCODE "+appCode
+      "Content-Type": "application/json; charset=utf-8",
+      "Authorization": "APPCODE " + appCode
     }
   }
   return new Promise((resolve, reject) => {
-      // 发起请求
-      let req = http.request(options, res => {
-          let chunks = [];
-          res.on('data', chunk => {
-              chunks.push(chunk);
-          })
-          res.on('end', () => {
-              let buffer = Buffer.concat(chunks).toString();
-              // 如果接口返回空值
-              let data = buffer ? JSON.parse(buffer) : {code: 1, data: 'ip接口没有返回值'};
-              resolve(data);
-          })
+    // 发起请求
+    const req = http.request(options, res => {
+      const chunks = [];
+      res.on('data', chunk => {
+        chunks.push(chunk);
       })
-      // 请求出错
-      req.on('error', err => {
-          resolve({code: 1, data: "请求ip接口出错"});
-      })
-      // 请求结束
-      req.end();
-  })
+      res.on('end', () => {
+        const buffer = Buffer.concat(chunks).toString();
+        resolve(JSON.parse(buffer));
+      });
+    })
+    // 请求出错
+    req.on('error', err => {
+      reject(err);
+    })
+    // 请求结束
+    req.end();
+  });
+}
+/*
+* 从本地ip库(ip2region)中获取ip位置信息
+* @param {String} ip
+* @return {String}
+* @author pengxiguaa 2020-12-25
+* */
+fn.getIpInfoFromLocalModule = async (ip) => {
+  return new Promise((resolve, reject) => {
+    searchIp.memorySearch(ip, (err, result) => {
+      if(err) return reject(err);
+      resolve(result);
+    });
+  });
 }
 
 fn.getTrackInfo = async (trackNumber, trackName) => {

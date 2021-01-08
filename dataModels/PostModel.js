@@ -1394,7 +1394,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       type: post.type,
       voteUp: post.voteUp,
       digest: post.digest,
-      hide: post.hide,
+      hide: post.hidePost || post.hide,
       user,
       quote,
       kcb,
@@ -1405,6 +1405,101 @@ postSchema.statics.filterPostsInfo = async (posts) => {
   // console.log(results);
   return results;
 };
+
+/*
+* 文章页的评论列表
+* */
+postSchema.statics.filterCommentsInfo = async (posts) => {
+  const tools = require('../nkcModules/tools');
+  const anonymousUser = tools.getAnonymousInfo();
+  const results = [];
+  for(const post of posts) {
+    let user;
+    if(post.anonymous) {
+      user = {
+        uid: null,
+        username: anonymousUser.username,
+        avatar: anonymousUser.avatarUrl,
+        banned: false,
+      }
+    } else {
+      user = {
+        uid: post.user.uid,
+        username: post.user.username,
+        avatar: tools.getUrl('userAvatar', post.user.avatar),
+        banned: post.user.certs.includes('banned'),
+      }
+    }
+
+    const kcb = [], xsf = [];
+    if(post.credits && post.credits.length) {
+      for(const credit of post.credits) {
+        const {_id, hideDescription: hide, creditName, num, type, fromUser, description, toc} = credit;
+        const c = {
+          _id,
+          uid: fromUser.uid,
+          username: fromUser.username,
+          avatar: tools.getUrl('userAvatar', fromUser.avatar),
+          description,
+          toc,
+          number: num
+        }
+        if(type === 'creditKcb') {
+          c.number = c.number / 100;
+          c.type = 'kcb';
+          c.name = creditName;
+          c.hide = hide;
+          kcb.push(c);
+        } else {
+          c.type = 'xsf';
+          c.name = '学术分';
+          xsf.push(c);
+        }
+      }
+    }
+    const result = {
+      parentId: post.parentPostId,
+      parentUser: null,
+      childPosts: [],
+      pid: post.pid,
+      tid: post.tid,
+      cv: post.cv, // post内容版本
+      toc: post.toc,
+      tlm: post.toc.toLocaleDateString() === post.tlm.toLocaleDateString()? null: post.tlm,
+      content: post.c,
+      vote: post.usersVote || null,
+      reviewed: post.reviewed,
+      draft: post.draft? {reason: post.draft.reason}: null,
+      disabled: post.disabled,
+      isAuthor: post.isAuthor,
+      type: post.type,
+      voteUp: post.voteUp,
+      digest: post.digest,
+      user,
+      kcb,
+      xsf
+    };
+    results.push(result);
+  }
+  let postsObj = {};
+  for(const post of results) {
+    postsObj[post.pid] = post;
+  }
+
+  const comments = [];
+
+  for(const post of results) {
+    const {parentId} = post;
+    const parentPost = postsObj[parentId];
+    if(!parentPost) {
+      comments.push(post);
+      continue;
+    }
+    post.parentUser = Object.assign({}, parentPost.user);
+    parentPost.childPosts.push(post);
+  }
+  return comments;
+}
 
 /*
 * 判断当前用户是否为post所在专业的专家
