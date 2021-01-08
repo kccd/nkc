@@ -235,7 +235,7 @@ module.exports = {
 			}
 		},
 		phoneVerify: {
-			GET: "phoneVerifyPage",
+			// GET: "phoneVerifyPage",
 			POST: "phoneVerify",
 			sendSmsCode: {
 				POST: "sendPhoneVerifyCode"
