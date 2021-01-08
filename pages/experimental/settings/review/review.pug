@@ -1,6 +1,36 @@
 extends ../../experimental
 block eTitle
   title 审核设置
+  style.
+    .keyword-list {
+      line-height: 30px;
+      margin-bottom: 20px;
+    }
+    .keyword-list > span {
+      background-color: rgb(244, 67, 54);
+      border-radius: 10px;
+      color: rgb(255, 255, 255);
+      padding: 4px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .keyword-list > span + span {
+      margin-left: 10px;
+    }
+    .review-condition {
+      margin-top: 12px;
+    }
+    .review-condition > input {
+      width: 80px;
+      text-align: center;
+      outline: none;
+      border: none;
+      border-bottom: 1px solid black;
+    }
+    .review-condition > input::-webkit-inner-spin-button {
+      display: none;
+    }
+
 block eContent
   .container-fluid.max-width
     .row
@@ -90,6 +120,33 @@ block eContent
                 a(:href="'/u/' + user.uid"  target="_blank" title="访问用户主页") {{user.username}}
                 .fa.fa-remove(@click="removeUser(user.uid, 'blacklist')" title="点击移除")
             div(v-else) 暂无用户
+
+          .m-t-3
+            h4
+              b 四、敏感词
+              small &nbsp;当用户发表的任何文章或回复文字内容包含以下其中一个或以上关键词时需要通过审核后才能显示
+            label
+              span 启用
+              input(type="checkbox" v-model="reviewSettings.keyword.enable" @change="triggerKeyword(reviewSettings.keyword.enable)")
+            p.keyword-list
+              span(v-for="(keyword, index) in reviewSettings.keyword.list" @click="deleteKeyword(index)") {{keyword}}
+            input(type="text" placeholder="请输入敏感词" v-model="keywordInput" @keyup.enter="!foundKeywordIndex ? addKeyword() : null" @input="searchKeyword()")
+            button(@click="addKeyword()" :disabled="foundKeywordIndex") 添加
+            .search-result(v-show="foundKeywordIndex")
+              h5 已存在
+              p.keyword-list
+                span(@click="deleteKeyword(foundKeywordIndex)") {{reviewSettings.keyword.list[foundKeywordIndex]}}
+            .review-condition
+              | 至少命中
+              input(type="number" v-model="leastKeywordCount" @change="updateReviewCondition()")
+              | 个敏感词
+              select(v-model="relationship" @change="updateReviewCondition()")
+                option(value="and") 并且
+                option(value="or") 或者
+              | 至少命中
+              input(type="number" v-model="leastKeywordTimes" @change="updateReviewCondition()")
+              | 次敏感词时，内容会被送审。
+              
 
 block scripts
   +includeJS("/experimental/settings/review/review.js")

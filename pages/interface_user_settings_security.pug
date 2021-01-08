@@ -107,6 +107,8 @@ block content
                 .col-sm-4
                   button.btn.btn-primary(@click="formType = 'changeMobile'") 更换手机
                   button.btn.btn-default(@click="formType = 'unbindMobile'") 解绑
+                  if data.needPhoneVerify
+                    button.btn.btn-danger(@click="formType = 'phoneVerify'") 需要验证手机号
             .form-horizontal(v-if="formType === 'bind'")
               .form-group
                 label.col-sm-2.control-label 国际区号：
@@ -167,6 +169,16 @@ block content
                 .col-sm-4.col-sm-offset-2
                   button.btn.btn-primary(@click=`submitUnbindMobile`) 提交
                   button.btn.btn-default(@click=`formType = ''`) 取消
+            .form-horizontal(v-else-if="formType === 'phoneVerify'")
+              .form-group
+                label.col-sm-2.control-label 验证码：
+                .col-sm-2
+                  input.form-control(type='text' placeholder='请输入验证码' v-model="phoneVerify.code")
+                .col-sm-5
+                  button.btn.btn-primary(@click="sendPhoneVerifySmsCode()" :disabled="phoneVerify.statu !== 'wait' || phoneVerify.complete") {{phoneVerify.statu !== "countdown"? "获取验证码" : phoneVerify.time + "秒后再次发送"}}
+              .form-group
+                .col-sm-4.col-sm-offset-2
+                  button.btn.btn-primary(@click="submitPhoneVerify()" :disabled="phoneVerify.complete") 提交
         .panel.panel-default
           .panel-heading
             span 绑定邮箱

@@ -40,6 +40,7 @@ block eContent
               input.form-control(type='password' v-model.trim='password2')
 
         h4 手机号验证
+        a(href="/e/settings/safe/unverifiedPhone" target="_blank") 查看未验证的手机号
         .form-horizontal
           .form-group
             label.col-sm-2.control-label 定时手机号验证
@@ -56,11 +57,6 @@ block eContent
             .col-sm-4
               input.form-control(type='text' v-model="safeSettings.phoneVerify.interval")
               h5.text-danger 每{{safeSettings.phoneVerify.interval}}小时需重新进行手机号验证，否则发表新内容会送审。
-          
-          .form-group
-            label.col-sm-2.control-label 查看未验证的手机号
-            .col-sm-4
-              a.btn.btn-default(href="/e/settings/safe/unverifiedPhone" target="_blank") 前往
 
           .form-group
             label.col-sm-2.control-label

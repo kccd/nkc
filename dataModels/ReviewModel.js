@@ -1,4 +1,6 @@
 const mongoose = require("../settings/database");
+const Mint = require('mint-filter').default
+
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
@@ -59,5 +61,36 @@ schema.statics.newReview = async (type, post, user, reason) => {
   }).save();
 };
 
+// 文章内容是否触发了敏感词送审条件
+schema.statics.includesKeyword = async (post) => {
+  const { t, c } = post;
+  const SettingModel = mongoose.model("settings");
+  const reviewSetting = await SettingModel.getSettings("review");
+  const keywordSetting = reviewSetting.keyword;
+  if(!keywordSetting) return false;
+  if(!keywordSetting.enable) return false;
+  const keywordList = keywordSetting.list;
+  const { leastKeywordTimes, leastKeywordCount, relationship } = keywordSetting.condition;
+  const mint = new Mint(keywordList);
+  const titleFilterValue = await mint.filter(t, { replace: false });
+  const contentFilterValue = await mint.filter(c, { replace: false });
+  if(titleFilterValue.pass && contentFilterValue.pass) return false;
+  // 命中敏感词个数
+  const hitWordsCount = titleFilterValue.words.length + contentFilterValue.words.length;
+  // 总命中次数
+  let hitCount = 0;
+  titleFilterValue.words.forEach(word => {
+    hitCount += (t.match(new RegExp(word, "g")) || []).length
+  });
+  contentFilterValue.words.forEach(word => {
+    hitCount += (c.match(new RegExp(word, "g")) || []).length
+  });
+  if(relationship === "or") {
+    if(hitWordsCount >= leastKeywordCount || hitCount >= leastKeywordTimes) return true;
+  } else if(relationship === "and") {
+    if(hitWordsCount >= leastKeywordCount && hitCount >= leastKeywordTimes) return true;
+  }
+  return false;
+}
 
 module.exports = mongoose.model("reviews", schema);

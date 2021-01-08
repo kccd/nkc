@@ -1454,7 +1454,6 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
     if(grade.type === "all" || grade.count > passedCount - 1) return true
   }
 
-
   // 四、未验证手机号码的用户发表文章要送审
   if(await UsersPersonalModel.shouldVerifyPhoneNumber(uid)) {
     return true;

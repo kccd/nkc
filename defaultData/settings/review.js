@@ -135,7 +135,15 @@ module.exports = {
         whitelistUid: [],
         blacklistUid: []
       }
+    },
+    keyword: {
+      enable: false,
+      list: ["毛泽东", "共产党", "习近平"],
+      condition: {
+        leastKeywordTimes: 1,
+        leastKeywordCount: 1,
+        relationship: "or"
+      }
     }
-
   }
 };

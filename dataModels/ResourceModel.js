@@ -439,7 +439,7 @@ resourceSchema.methods.checkDownloadCost = async function(user, freeTime) {
     };
   }
   if(!user) {
-    ctx.throw(403, `你暂未登录，请登录或注册后重试。`);
+    throwErr(403, `你暂未登录，请登录或注册后重试。`);
   }
   const todayOperationCount = await ScoreOperationLogModel.getOperationLogCount(user, 'attachmentDownload');
   const lastAttachmentDownloadLog = await ScoreOperationLogModel.getLastAttachmentDownloadLog(user, this.rid);

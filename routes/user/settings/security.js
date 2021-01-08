@@ -17,6 +17,8 @@ router
     data.nationCode = nationCode;
     data.unverifiedEmail = unverifiedEmail;
     data.unverifiedMobile = unverifiedMobile;
+    // 是否需要验证手机号
+    data.needPhoneVerify = await db.UsersPersonalModel.shouldVerifyPhoneNumber(uid);
     ctx.template = "interface_user_settings_security.pug";
     await next();
   });

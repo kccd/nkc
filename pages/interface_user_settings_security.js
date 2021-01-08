@@ -266,7 +266,14 @@ var mobileApp = new Vue({
     oldCode: "",
 
     newTime: 0,
-    oldTime: 0
+    oldTime: 0,
+
+    phoneVerify: {
+      statu: "wait",
+      time: 0,
+      code: "",
+      complete: false
+    }
   },
   methods: {
     timeout: function(t) {
@@ -397,6 +404,42 @@ var mobileApp = new Vue({
         .catch(function(data) {
           sweetError(data.error);
         })
+    },
+
+    sendPhoneVerifySmsCode: function() {
+      var self = this.phoneVerify;
+      self.statu = "sendding";
+      nkcAPI("/u/"+ NKC.configs.uid +"/phoneVerify/sendSmsCode", "POST")
+        .then(function(data) {
+          var countdownLen = data.countdownLen;
+          self.time = countdownLen;
+          self.statu = "countdown";
+          var timer = setInterval(function() {
+            self.time -= 1;
+            if(self.time === 0) {
+              clearInterval(timer);
+              self.statu = "wait";
+              self.time = 0;
+            }
+          }, 1000);
+        })
+        .catch(function(data) {
+          sweetError(data);
+          self.statu = "wait";
+          self.time = 0;
+        })
+    },
+    submitPhoneVerify: function() {
+      var self = this.phoneVerify;
+      nkcAPI("/u/"+ NKC.configs.uid +"/phoneVerify", "POST", { code: self.code })
+        .then(function() {
+          self.complete = true;
+          return sweetAlert("验证成功");
+        })
+        .then(function() {
+          location.reload();
+        })
+        .catch(sweetError)
     }
   }
 });

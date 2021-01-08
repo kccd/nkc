@@ -1,11 +1,13 @@
 extends ../../../../bootstrap_base
 block title
   title 未验证的手机号
+  +includeCSS('/experimental/index.css')
   +includeCSS("/experimental/settings/safe/unverifiedPhone/unverifiedPhone.css")
   
 block content
   .container-fluid.max-width
     #app.row(v-cloak)
+      include ../../../nav
       .col-xs-12.col-md-12
         h4 未验证的手机号
       .col-xs-12.col-md-12

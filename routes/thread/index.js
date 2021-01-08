@@ -776,8 +776,10 @@ threadRouter
 
 		const _post = await thread.newPost(post, user, ctx.address);
 
-    // 判断该用户的回复是否需要审核，如果不需要审核则标记回复状态为：已审核
-    const needReview = await db.UserModel.contentNeedReview(user.uid, "post");
+    // 是否需要审核
+    let needReview =
+      await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核 
+      || await db.ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
     if(!needReview) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
       _post.reviewed = true;
