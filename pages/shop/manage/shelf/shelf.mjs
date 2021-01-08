@@ -176,7 +176,7 @@ window.app = new Vue({
           if(self.type === "create") {
             self.content = editor.getContent();
             if(!self.selectedShopForumId) throw "请选择商品分类";
-            if(!self.mainForums.length) throw "请选择商品辅助分类";
+            // if(!self.mainForums.length) throw "请选择商品辅助分类";
             body.mainForumsId = [self.selectedShopForumId].concat(self.mainForums.map(forum => forum.fid));
             checkString(self.title, {
               name: "商品标题",
