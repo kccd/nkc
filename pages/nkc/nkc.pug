@@ -37,11 +37,17 @@ block content
                 | 最新发表
                 if !permission("nkcManagementPost")
                   | （无权）
-            li(class=data.nav === 'applyForum'? 'active':'')
+            li(class=data.nav === 'applyForum' ? 'active' : '')
               a(href=`/nkc/applyForum`)
                 .fa.fa-paper-plane
                 | 专业申请
                 if !permission("nkcManagementApplyForum")
+                  | （无权）
+            li(class=data.nav === 'securityApplication' ? 'active' : '')
+              a(href=`/nkc/securityApplication`)
+                .fa.fa-list-alt
+                | 手机号申诉
+                if !permission("nkcManagementSecurityApplication")
                   | （无权）
       .col-xs-12.col-md-10.box-shadow-panel
         block nkcContent

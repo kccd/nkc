@@ -74,7 +74,9 @@ window.app = new Vue({
         case 'reset': return '绑定新手机号';
         case 'withdraw': return '提现';
         case 'destroy': return '账号注销';
-        case "unbindMobile": return "解绑手机号"
+        case "unbindMobile": return "解绑手机号";
+        case 'changeUnusedPhoneNumber': return "更换失效的手机号";
+        case 'verifyPhoneNumber': return "定期验证手机号"
       }
     },
     testSendMessage: function() {

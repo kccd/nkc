@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const mobileRouter = new Router();
+const applyRouter = require('./apply');
 mobileRouter
 	.get('/', async (ctx, next) => {
 		ctx.template = 'interface_user_settings_mobile.pug';
@@ -118,5 +119,6 @@ mobileRouter
 		await behavior.save();
 		await userPersonal.update({nationCode: "", mobile: ""});
 		await next();
-	});
+	})
+	.use('/apply', applyRouter.routes(), applyRouter.allowedMethods())
 module.exports = mobileRouter;

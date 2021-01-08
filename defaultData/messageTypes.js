@@ -414,6 +414,18 @@ module.exports = {
             ],
             type: "becomeFormalForum",
             content: "你的筹备专业[text=BFFName][text=BFFMessage]"
+        },
+        {
+            parameters: [],
+            type: 'securityApplicationResolved',
+            content: "手机号申诉已通过审核。"
+        },
+        {
+            parameters: [
+                'reason',
+            ],
+            type: 'securityApplicationRejected',
+            content: '手机号申诉未通过审核，理由：[text=reason]'
         }
     ]
 };

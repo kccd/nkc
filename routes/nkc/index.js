@@ -5,6 +5,7 @@ const noteRouter = require("./note");
 const postRouter = require("./post");
 const section = require("./section");
 const applyForumRouter = require('./applyForum');
+const securityApplication = require('./securityApplication');
 const moment = require("moment");
 router
   .get("/", async (ctx, next) => {
@@ -186,5 +187,6 @@ router
   .use("/note", noteRouter.routes(), noteRouter.allowedMethods())
   .use("/post", postRouter.routes(), postRouter.allowedMethods())
   .use("/sticker", stickerRouter.routes(), stickerRouter.allowedMethods())
+  .use('/securityApplication', securityApplication.routes(), securityApplication.allowedMethods())
   .use("/section", section.routes(), section.allowedMethods());
 module.exports = router;

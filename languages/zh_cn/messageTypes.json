@@ -96,12 +96,14 @@
   "NFRSName": "专业名",
   "NFRSUrl": "专业主页",
   "NFRSExpired": "筹备截止日期",
-  
+
   "newForumReviewReject": "新专业申请审核不通过",
   "NFRJName": "专业名",
-  
+
   "becomeFormalForum": "筹备专业状态变更",
   "BFFName": "专业名",
   "BFFUrl": "专业主页链接",
-  "BFFMessage": "变更信息"
+  "BFFMessage": "变更信息",
+  "securityApplicationResolved": "手机号申诉通过审核",
+  "securityApplicationRejected": "手机号申诉未通过审核"
 }

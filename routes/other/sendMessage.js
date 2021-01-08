@@ -237,5 +237,24 @@ sendMessageRouter
 		await smsCode.save();
 		await nkcModules.sendMessage(smsCodeObj);
 		await next();
+	})
+	.post('/common', async (ctx, next) => {
+		const {nkcModules, db, data, body} = ctx;
+		const {number, nationCode, type} = body;
+		if(![
+			'changeUnusedPhoneNumber'
+		].includes(type)) ctx.throw(400, 'type error');
+		const smsCodeObj = {
+			nationCode,
+			mobile: number,
+			type,
+			ip: ctx.address,
+		}
+		await db.SmsCodeModel.ensureSendPermission(smsCodeObj);
+		smsCodeObj.code = nkcModules.apiFunction.random(6);
+		const smsCode = db.SmsCodeModel(smsCodeObj);
+		await smsCode.save();
+		await nkcModules.sendMessage(smsCodeObj);
+		await next();
 	});
 module.exports = sendMessageRouter;

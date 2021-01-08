@@ -1,4 +1,4 @@
-if data.user
+if data.user && !isIncluded('subscribeTypes')
   +includeCSS("/publicModules/subscribeTypes/subscribeTypes.css")
   .modal.fade#moduleSubscribeTypes(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-uid=data.user.uid)
     .modal-dialog.modal-sm(role="document")

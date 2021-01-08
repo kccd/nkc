@@ -270,6 +270,7 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
   const ComplaintModel = mongoose.model('complaints');
   const ProblemModel = mongoose.model("problems");
   const PostsVoteModel = mongoose.model('postsVotes');
+  const SecurityApplicationModel = mongoose.model('securityApplications');
   const ForumModel = mongoose.model('forums');
   const PreparationForumModel = mongoose.model('pForum');
   const apiFunction = require("../nkcModules/apiFunction");
@@ -642,6 +643,14 @@ messageSchema.statics.extendSTUMessages = async (arr) => {
       } else {
         r.c.BFFMessage = "已被关停，此筹备专业未能在30天内产出50篇文章";
       }
+    } else if([
+      'securityApplicationRejected',
+      'securityApplicationResolved'
+    ].includes(type)) {
+      const {securityApplicationId} = r.c;
+      const application = await SecurityApplicationModel.findOne({_id: securityApplicationId});
+      if(!application) continue;
+      r.c.rea = application.reason;
     }
 
     if(r.c.thread) {

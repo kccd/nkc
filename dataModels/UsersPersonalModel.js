@@ -458,5 +458,93 @@ usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
 	return false;
 }
 
+/*
+* 获取用户的邮箱地址
+* @param {String} uid 用户ID
+* @return {String || null} 邮箱地址或null
+* @author pengxiguaa 2021-1-7
+* */
+usersPersonalSchema.statics.getUserEmail = async (uid) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	return userPersonal.email || null;
+};
 
+/*
+* 获取用户的手机号
+* @param {String} uid 用户手机
+* @return {Object} {nationCode: String, number: String} 国际区号和手机号
+* @author pengxiguaa 2021-1-8
+* */
+usersPersonalSchema.statics.getUserPhoneNumber = async (uid) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	return {
+		nationCode: userPersonal.nationCode,
+		number: userPersonal.mobile
+	};
+}
+/*
+* 获取用户的认证等级
+* @param {String} uid 用户ID
+* @return {Number} 认证等级
+* @author pengxiguaa 2021-1-7
+* */
+usersPersonalSchema.statics.getUserAuthLevel = async (uid) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	return await userPersonal.getAuthLevel();
+}
+
+/*
+* 验证用户密码是否正确
+* @param {String} uid 用户ID
+* @param {String} password 待验证的密码
+* @return {Boolean} 密码是否正确
+* @author pengxiguaa 2021-1-7
+* */
+usersPersonalSchema.statics.checkUserPassword = async (uid, password) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	try{
+		await userPersonal.ensurePassword(password);
+		return true;
+	} catch(err) {
+		return false;
+	}
+}
+
+/*
+* 修改用的手机号并存记录
+* */
+usersPersonalSchema.statics.modifyUserPhoneNumber = async (props) => {
+	const {
+		uid,
+		phoneNumber,
+		ip,
+		port,
+	} = props;
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const SecretBehaviorModel= mongoose.model('secretBehaviors');
+	const samePhoneNumberUser = await UsersPersonalModel.findOne({
+		mobile: phoneNumber.number,
+		nationCode: phoneNumber.nationCode
+	});
+	if(samePhoneNumberUser) throwErr(400, `手机号已被其他用户绑定`);
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	await SecretBehaviorModel({
+		type: "modifyMobile",
+		uid,
+		ip,
+		port,
+		oldNationCode: userPersonal.nationCode,
+		oldMobile: userPersonal.mobile,
+		newNationCode: phoneNumber.nationCode,
+		newMobile: phoneNumber.number
+	}).save();
+	await userPersonal.update({
+		mobile: phoneNumber.number,
+		nationCode: phoneNumber.nationCode
+	});
+};
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

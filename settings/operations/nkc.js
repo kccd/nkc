@@ -27,5 +27,9 @@ module.exports = {
   applyForum: {
     GET: 'nkcManagementApplyForum',
     POST: "nkcManagementApplyForum"
+  },
+  securityApplication: {
+    GET: 'nkcManagementSecurityApplication',
+    POST: 'nkcManagementSecurityApplication'
   }
 };

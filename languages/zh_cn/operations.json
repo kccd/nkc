@@ -110,6 +110,7 @@
   "cancelXsf": "撤销学术分",
 
 
+  "sendPhoneMessage": "发送短信验证码",
   "sendGetBackPasswordMessage": "发送【找回密码】短信验证码",
   "search": "搜索",
   "visitPersonalForum": "访问专栏",
@@ -756,5 +757,7 @@
   "phoneVerifyPage": "访问手机号验证页面",
   "phoneVerify": "验证手机号",
   "sendPhoneVerifyCode": "发送验证手机号的验证码",
-  "unverifiedPhonePage": "查看未验证的手机号列表"
+  "unverifiedPhonePage": "查看未验证的手机号列表",
+  "applyToChangeUnusedPhoneNumber": "申请修改失效手机号",
+  "nkcManagementSecurityApplication": "前台管理 - 手机号申诉"
 }
