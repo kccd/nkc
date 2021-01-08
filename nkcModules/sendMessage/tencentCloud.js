@@ -1,6 +1,6 @@
 const QCloudSms = require('qcloudsms_js');
 module.exports = async (smsSettings, obj) => {
-  const {templateId, timeout, code, mobile, nationCode} = obj;
+  const {templateId, timeout, code, mobile, nationCode, description} = obj;
   const {appId, appKey, smsSign} = smsSettings;
 
   const qCloudSms = QCloudSms(appId, appKey);
@@ -19,6 +19,9 @@ module.exports = async (smsSettings, obj) => {
       }
     };
     const params = [code];
+    if(description) {
+      params.push(description);
+    }
     sSender.sendWithParam(nationCode?parseInt(nationCode):86, mobile, templateId, params, smsSign, "", "", callback);
   });
 }
