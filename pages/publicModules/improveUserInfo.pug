@@ -1,7 +1,7 @@
 if data.user
   -let reg = new RegExp(`^${state.serverSettings.websiteCode}-`);
   -const unsetUsername = reg.test(data.user.username) || !data.user.username;
-  if unsetUsername || !data.user.setPassword || !data.user.boundEmail || !data.user.boundMobile || !data.user.avatar || !data.user.banner || !data.user.description
+  if unsetUsername || !data.user.setPassword || !data.user.boundEmail || !data.user.boundMobile || !data.user.avatar || !data.user.banner || !data.user.description || data.needVerifyPhoneNumber
     .improve.m-t-1.m-b-1
       .panel-header 完善资料
       p 由于你还未完善以下资料，可能无法使用网站的全部功能。
@@ -47,5 +47,11 @@ if data.user
           span 未绑定邮箱
           .pull-right
             a(href=`/u/${data.user.uid}/settings/security` target="_blank") 去绑定
+      if data.needVerifyPhoneNumber
+        .improve-info
+          .fa.fa-exclamation-circle
+          span 验证手机号码使发表的内容跳过审核阶段
+          .pull-right
+            a(href=`/u/${data.user.uid}/settings/security` target="_self") 去验证
 
 

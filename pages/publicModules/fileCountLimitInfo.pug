@@ -1,6 +1,6 @@
-h5 当前账号的附件下载数量限制如下：
 if fileCountLimitInfo
   .file-count-limit-info
+    h5 当前账号的附件下载数量限制如下：
     table.table.table-bordered
       thead
         tr
@@ -13,6 +13,7 @@ if fileCountLimitInfo
             th= f.fileCount
 else
   .file-count-limit-info(v-if='fileCountLimitInfo')
+    h5 当前账号的附件下载数量限制如下：
     table.table.table-bordered
       thead
         tr

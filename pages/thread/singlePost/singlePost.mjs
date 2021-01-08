@@ -128,7 +128,8 @@ class SinglePostModule {
     const postContainer = this.getPostContainer(pid);
     postContainer.attr('data-show-comments', show? 'true': 'false');
   }
-  showPostComment(pid, page = 0) {
+  showPostComment(pid, page = 0, options={}) {
+    const {highlightCommentId = null} = options;
     this.removeAllEditorApp(pid);
     const self = this;
     const container = this.getCommentContainer(pid);
@@ -166,6 +167,11 @@ class SinglePostModule {
         });
         editorApp.show = true;
         editorApp.container.show();
+        if(highlightCommentId) {
+          const targetComment = $(`.single-comment[data-pid="${highlightCommentId}"]>.single-comment-center`);
+          NKC.methods.scrollToDom(targetComment);
+          NKC.methods.markDom(targetComment);
+        }
         self.autoSaveDraft(pid);
       })
       .then(() => {
@@ -221,7 +227,7 @@ class SinglePostModule {
     button.attr('data-number', number + 1);
   }
   // 显示、隐藏评论
-  switchPostComment(pid, fixPosition ) {
+  switchPostComment(pid, fixPosition, page) {
     const container = this.getCommentContainer(pid);
     if(container.attr('data-hide') === 'false') {
       if(fixPosition) {
@@ -232,7 +238,7 @@ class SinglePostModule {
         this.hidePostComment(pid);
       }
     } else {
-      this.showPostComment(pid);
+      this.showPostComment(pid, page);
     }
   }
   // 获取post下的评论
@@ -317,6 +323,9 @@ class SinglePostModule {
   }
   // 打开回评输入框
   switchCommentForm(pid) {
+    if(!NKC.configs.uid) {
+      return NKC.methods.toLogin();
+    }
     const singleComment = this.getSingleComment(pid);
     const singleCommentBottom = singleComment.children('.single-comment-bottom');
     const editorApp = this.getEditorApp(pid, singleCommentBottom);
@@ -467,8 +476,8 @@ NKC.methods.autoHidePostContent = function() {
 NKC.methods.switchPostContent = function(pid) {
   singlePostModule.switchPostContent(pid);
 }
-NKC.methods.switchPostComment = function(pid, fix) {
-  singlePostModule.switchPostComment(pid, fix);
+NKC.methods.switchPostComment = function(pid, fix, page) {
+  singlePostModule.switchPostComment(pid, fix, page);
 }
 NKC.methods.switchCommentForm  = function(pid) {
   singlePostModule.switchCommentForm (pid);
@@ -481,6 +490,9 @@ NKC.methods.saveDraft = function(pid) {
 }
 NKC.methods.getPostCommentsByPage = function(pid, page) {
   singlePostModule.showPostComment(pid, page);
+}
+NKC.methods.showPostComment = function(pid, page, options) {
+  singlePostModule.showPostComment(pid, page, options);
 }
 NKC.methods.insertComment = function(parentCommentId, parentPostId, html) {
   singlePostModule.insertComment(parentCommentId, parentPostId, html);

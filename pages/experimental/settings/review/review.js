@@ -12,7 +12,12 @@ var app = new Vue({
       whitelist: ""
     },
     conditions: [],
-    selectedCertId: ""
+    selectedCertId: "",
+    keywordInput: "",
+    foundKeywordIndex: null,
+    leastKeywordTimes: data.reviewSettings.keyword.condition.leastKeywordTimes,
+    leastKeywordCount: data.reviewSettings.keyword.condition.leastKeywordCount,
+    relationship: data.reviewSettings.keyword.condition.relationship
   },
   watch: {
     tab: function() {
@@ -241,6 +246,67 @@ var app = new Vue({
         .catch(function(data) {
           screenTopWarning(data);
         });
+    },
+    // 启停关键词功能
+    triggerKeyword: function(val) {
+      nkcAPI("/e/settings/review/keyword", "PUT", {
+        type: "enable",
+        value: val
+      });
+    },
+    // 删除关键词
+    deleteKeyword: function(index) {
+      var self = this;
+      sweetConfirm("确定要删除这个关键词吗?")
+        .then(function() {
+          var keyword = self.reviewSettings.keyword.list.splice(index, 1)[0];
+          return nkcAPI("/e/settings/review/keyword", "PUT", {
+            type: "deleteKeyword",
+            value: keyword
+          });
+        })
+        .then(function() {
+          self.foundKeywordIndex = null;
+        })
+    },
+    // 添加关键词
+    addKeyword: function() {
+      var keyword = this.keywordInput;
+      if(!keyword) return;
+      this.reviewSettings.keyword.list.push(keyword);
+      this.keywordInput = "";
+      nkcAPI("/e/settings/review/keyword", "PUT", {
+        type: "addKeyword",
+        value: keyword
+      });
+    },
+    // 搜索关键字
+    searchKeyword: function() {
+      var self = this;
+      if(!self.keywordInput) {
+        return this.foundKeywordIndex = null;
+      }
+      var list = data.reviewSettings.keyword.list;
+      for(var index in list) {
+        var keyword = list[index];
+        if(keyword === self.keywordInput) {
+          return self.foundKeywordIndex = index;
+        }
+      }
+      return self.foundKeywordIndex = null;
+    },
+    // 更新送审条件
+    updateReviewCondition: function() {
+      var self = this;
+      var update = {
+        leastKeywordTimes: self.leastKeywordTimes,
+        leastKeywordCount: self.leastKeywordCount,
+        relationship: self.relationship
+      };
+      nkcAPI("/e/settings/review/keyword", "PUT", {
+        type: "reviewCondition",
+        value: update
+      });
     }
   }
 });

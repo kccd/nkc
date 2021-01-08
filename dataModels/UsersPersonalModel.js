@@ -6,7 +6,7 @@ const usersPersonalSchema = new Schema({
   uid: {
     type: String,
     unique: true,
-    required: true
+		required: true
   },
   email: {
     type: String,
@@ -292,6 +292,25 @@ const usersPersonalSchema = new Schema({
   	type: Number,
 		default: 0,
 		index:1
+	},
+	// 最后一次验证手机号的时间(时间戳)
+	lastVerifyPhoneNumberTime: {
+		type: Date,
+		index: 1
+	},
+	// 需要送审的次数，与后台管理中的审核设置同时作用
+	// 这里的审核次数主要用于限制已经审核通过多篇文章的用户
+	// 比如用户早已脱离新手审核期（前几篇需审核）但出现违规，规定违规后3篇需审核
+	// -1: 全需要审核, 0: 不需要审核, 正整数: 具体多少篇需要审核
+	reviewCount: {
+  	thread: { // 发表文章
+			type: Number,
+			default: 0
+		},
+		post: { // 发表回复
+  		type: Number,
+			default: 0
+		}
 	}
 },
   {
@@ -413,5 +432,131 @@ usersPersonalSchema.methods.ensurePassword = async function(passwordString) {
   }
 };
 
+/**
+ * 判断是否需要进行手机号验证
+ * @param {string} uid 用户id
+ */
+usersPersonalSchema.statics.shouldVerifyPhoneNumber = async function(uid) {
+	const UserModel = mongoose.model("users");
+	const SettingModel = mongoose.model("settings");
+	const UsersPersonalModel = mongoose.model("usersPersonal");
+	const user = await UserModel.findOne({ uid });
+	if(!user) return false;
+	const safeSettings = await SettingModel.getSettings("safe");
+	const phoneVerify = safeSettings.phoneVerify;
+	// 如果需要进行手机号验证，验证是否已经过期
+	if(!phoneVerify.enable) return false;
+	const userPersonal = await UsersPersonalModel.findOne({uid: user.uid}, { lastVerifyPhoneNumberTime: 1 });
+	if(!userPersonal) return false;
+	if(!userPersonal.lastVerifyPhoneNumberTime) return true;
+	const lastVerifyPhoneNumberTime = userPersonal.lastVerifyPhoneNumberTime
+	const interval = phoneVerify.interval * 60 * 60 * 1000;
+	if(Date.now() - lastVerifyPhoneNumberTime.getTime() > interval) {
+		// 过期了
+		return true;
+	}
+	return false;
+}
 
+/*
+* 获取用户的邮箱地址
+* @param {String} uid 用户ID
+* @return {String || null} 邮箱地址或null
+* @author pengxiguaa 2021-1-7
+* */
+usersPersonalSchema.statics.getUserEmail = async (uid) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	return userPersonal.email || null;
+};
+
+/*
+* 获取用户的手机号
+* @param {String} uid 用户手机
+* @return {Object} {nationCode: String, number: String} 国际区号和手机号
+* @author pengxiguaa 2021-1-8
+* */
+usersPersonalSchema.statics.getUserPhoneNumber = async (uid) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	return {
+		nationCode: userPersonal.nationCode,
+		number: userPersonal.mobile
+	};
+}
+/*
+* 获取用户的认证等级
+* @param {String} uid 用户ID
+* @return {Number} 认证等级
+* @author pengxiguaa 2021-1-7
+* */
+usersPersonalSchema.statics.getUserAuthLevel = async (uid) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	return await userPersonal.getAuthLevel();
+}
+
+/*
+* 验证用户密码是否正确
+* @param {String} uid 用户ID
+* @param {String} password 待验证的密码
+* @return {Boolean} 密码是否正确
+* @author pengxiguaa 2021-1-7
+* */
+usersPersonalSchema.statics.checkUserPassword = async (uid, password) => {
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	try{
+		await userPersonal.ensurePassword(password);
+		return true;
+	} catch(err) {
+		return false;
+	}
+}
+
+/*
+* 修改用的手机号并存记录
+* */
+usersPersonalSchema.statics.modifyUserPhoneNumber = async (props) => {
+	const {
+		uid,
+		phoneNumber,
+		ip,
+		port,
+	} = props;
+	const UsersPersonalModel = mongoose.model('usersPersonal');
+	const SecretBehaviorModel= mongoose.model('secretBehaviors');
+	const samePhoneNumberUser = await UsersPersonalModel.findOne({
+		mobile: phoneNumber.number,
+		nationCode: phoneNumber.nationCode
+	});
+	if(samePhoneNumberUser) throwErr(400, `手机号已被其他用户绑定`);
+	const userPersonal = await UsersPersonalModel.findOnly({uid});
+	await SecretBehaviorModel({
+		type: "modifyMobile",
+		uid,
+		ip,
+		port,
+		oldNationCode: userPersonal.nationCode,
+		oldMobile: userPersonal.mobile,
+		newNationCode: phoneNumber.nationCode,
+		newMobile: phoneNumber.number
+	}).save();
+	await userPersonal.update({
+		mobile: phoneNumber.number,
+		nationCode: phoneNumber.nationCode
+	});
+};
+
+/* 
+  修改最后验证手机号的时间为当前时间
+*/
+usersPersonalSchema.statics.modifyVerifyPhoneNumberTime = async (uid) => {
+  const UsersPersonalModel = mongoose.model('usersPersonal');
+  await UsersPersonalModel.updateOne({uid}, {
+    $set: {
+      lastVerifyPhoneNumberTime: new Date(),
+    }
+  });
+}
 module.exports = mongoose.model('usersPersonal', usersPersonalSchema, 'usersPersonal');

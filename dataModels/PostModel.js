@@ -1128,19 +1128,27 @@ postSchema.statics.getUrl = async function(pid, redirect) {
   if(!isComment) {
     perpage = pageSettings.c.threadPostList;
     posts = await PostModel.find({type: "post", tid: post.tid, parentPostId: ""}, {pid: 1, _id: 0}).sort({toc: 1});
-  } else {
-    perpage = pageSettings.c.threadPostCommentList;
-    posts = await PostModel.find({type: "post", parentPostsId: post.parentPostsId[0]}).sort({toc: 1});
-  }
-  const postsId = posts.map(p => p.pid);
-  const step = postsId.indexOf(post.pid); // 0 - ..
-  // 文章内容
-  if(step === -1) return `/t/${post.tid}`;
-  const page = Math.floor(step/perpage);
-  if(!isComment) {
+    const postsId = posts.map(post => post.pid);
+    const step = postsId.indexOf(post.pid);
+    if(step === -1) return `/t/${post.tid}`;
+    const page = Math.floor(step/perpage);
     return `/t/${post.tid}?page=${page}&highlight=${post.pid}#highlight`;
   } else {
-    return `/p/${post.parentPostsId[0]}?page=${page}&highlight=${post.pid}#hightlight`;
+    perpage = pageSettings.c.threadPostCommentList;
+    const postId = post.parentPostsId[0];
+    // 获取post下最顶层的所有回复
+    posts = await PostModel.find({type: "post", parentPostId: postId}, {pid: 1}).sort({toc: 1});
+    const postsId = posts.map(p => p.pid);
+    let step;
+    if(post.parentPostsId.length >= 2) {
+      // 当前评论位于第二层或更底层，则分页按最顶层post分
+      step = postsId.indexOf(post.parentPostsId[1]);
+    } else {
+      // 如果当前评论位于最顶层，则分页按当前评论分
+      step = postsId.indexOf(post.pid);
+    }
+    const page = Math.floor(step/perpage);
+    return `/p/${postId}?page=${page}&highlight=${post.pid}`;
   }
 };
 
@@ -1459,6 +1467,7 @@ postSchema.statics.filterCommentsInfo = async (posts) => {
     }
     const result = {
       parentId: post.parentPostId,
+      parentsId: post.parentPostsId,
       parentUser: null,
       childPosts: [],
       pid: post.pid,
@@ -1489,8 +1498,14 @@ postSchema.statics.filterCommentsInfo = async (posts) => {
   const comments = [];
 
   for(const post of results) {
-    const {parentId} = post;
-    const parentPost = postsObj[parentId];
+    const {parentId, parentsId} = post;
+    let parentPost;
+    if(parentsId.length >= 5) {
+      // 限制层数 3
+      parentPost = postsObj[parentsId[4]];
+    } else {
+      parentPost = postsObj[parentId];
+    }
     if(!parentPost) {
       comments.push(post);
       continue;

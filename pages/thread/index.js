@@ -1291,7 +1291,7 @@ $(function() {
 			// 操作
 			NKC.methods.initPostOption();
 			// 图片预览
-                        if(!NKC.configs.isApp) NKC.methods.initImageViewer();
+      if(!NKC.configs.isApp) NKC.methods.initImageViewer();
 			// 划词笔记
 			nkchl.push(new NKC.modules.NKCHL({
 				type: 'post',

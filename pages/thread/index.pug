@@ -35,6 +35,7 @@ block title
     +hidePostContentSettings(data.postHeight)
 
   include ./postEditTime
+  include ../publicModules/floatForumNav
 
 block content
   if !(state.isApp && state.platform === 'reactNative')
@@ -334,7 +335,7 @@ block content
               a.button.radius-left(href=`/t/${thread.tid}` class=data.t !== "author" ? "active" : "" data-type='reload')  全部
               a.button.radius-right(href=`/t/${thread.tid}?t=author` class=data.t === "author" ? "active" : "" data-type='reload')  只看作者
           //- 回复列表头部分页、管理按钮
-          .p-l-2.p-r-2
+          .p-l-2.p-r-2.m-b--05
             include ../publicModules/paging/paging
             +articleNav
             if disablePost
@@ -348,7 +349,7 @@ block content
               -post.highlight = data.highlight;
               +singlePost(post)
           //- 回复列表尾部分页、管理按钮
-          .p-l-2.p-r-2
+          .p-l-2.p-r-2.m-b--05
             include ../publicModules/paging/paging_input
             //-+articleNav
             if disablePost
@@ -421,6 +422,7 @@ block content
                 | &nbsp;或者&nbsp;
                 a.pointer(onclick="NKC.methods.toLogin('register')") 注册
                 | 。
+          +floatForumNav(data.threadNav)
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"
@@ -508,7 +510,8 @@ block scripts
   include ../publicModules/share/sharePanel
   include ../post/options/options
   //- 通用socket
-  include ../publicModules/socket/socket
+  if data.user
+    include ../publicModules/socket/socket
   //- 下载资料询问框
   //if state.downloadNeedScore
   include ../publicModules/downloadResource/downloadResource

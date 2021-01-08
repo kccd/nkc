@@ -25,6 +25,7 @@ router
 		const {token, page=0, highlight, redirect} = query;
     const {pid} = ctx.params;
     data.highlight = highlight;
+    data.page = page;
     const post = await db.PostModel.findOnly({pid});
     if(redirect === "true") {
       const url = await db.PostModel.getUrl(post.pid, true);
@@ -151,7 +152,7 @@ router
       data.blacklistUsersId = await db.BlacklistModel.getBlacklistUsersId(data.user.uid);
     }
 
-    const from = ctx.get("FROM");
+    /*const from = ctx.get("FROM");
 
     // 修改post时间限制
     data.modifyPostTimeLimit = await db.UserModel.getModifyPostTimeLimit(data.user);
@@ -190,11 +191,11 @@ router
       q.reviewed = true;
       q.disabled = false;
       q.toDraft = null;
-    }
-    const {threadPostCommentList} = ctx.state.pageSettings;
-    const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: data.post.tid}, {postId: 1, reason: 1});
-    const toDraftPostsId = toDraftPosts.map(post => post.postId);
-    // 文章页 获取评论 树状
+    }*/
+    // const {threadPostCommentList} = ctx.state.pageSettings;
+    // const toDraftPosts = await db.DelPostLogModel.find({modifyType: false, postType: 'post', delType: 'toDraft', threadId: data.post.tid}, {postId: 1, reason: 1});
+    // const toDraftPostsId = toDraftPosts.map(post => post.postId);
+    /*// 文章页 获取评论 树状
     if(from === "nkcAPI") {
       q.parentPostId = pid;
       const count = await db.PostModel.count(q);
@@ -283,10 +284,10 @@ router
       const postsObj = {};
       parentPosts = await db.PostModel.extendPosts(parentPosts, extendPostOptions);
       parentPosts.map(p => {
-        /*const index = toDraftPostsId.indexOf(post.pid);
+        /!*const index = toDraftPostsId.indexOf(post.pid);
         if(index !== -1) {
           post.reason = toDraftPosts[index].reason;
-        }*/
+        }*!/
         postsObj[p.pid] = p;
       });
       posts.map(post => {
@@ -294,7 +295,7 @@ router
       });
       data.posts = posts;
       data.paging = paging;
-    }
+    }*/
     if(ctx.permission("viewNote")) {
       data.notes = await db.NoteModel.getNotesByPosts([{
         pid: data.post.pid,

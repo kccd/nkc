@@ -135,6 +135,13 @@ loginRouter
 			}
 			userPersonal = userPersonal[0];
 
+			// 更新最后一次验证手机号的时间
+			await userPersonal.update({
+				$set: {
+					lastVerifyPhoneNumberTime: String(Date.now())
+				}
+			});
+
 			user = await db.UserModel.findOnly({uid: userPersonal.uid});
 
     } else {

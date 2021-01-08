@@ -135,7 +135,15 @@ module.exports = {
         whitelistUid: [],
         blacklistUid: []
       }
+    },
+    keyword: {
+      enable: false,
+      list: ["关键词1", "关键词2"],
+      condition: {
+        leastKeywordTimes: 1,
+        leastKeywordCount: 1,
+        relationship: "or"
+      }
     }
-
   }
 };

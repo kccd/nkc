@@ -79,7 +79,11 @@ module.exports = {
 				GET: 'visitMobileSettings',
 				PUT: 'modifyMobile',
 				DELETE: "unbindMobile",
-				POST: 'bindMobile'
+				POST: 'bindMobile',
+				apply: {
+					GET: 'applyToChangeUnusedPhoneNumber',
+					POST: 'applyToChangeUnusedPhoneNumber'
+				}
 			},
 			email: {
 				GET: 'visitEmailSettings',
@@ -228,6 +232,13 @@ module.exports = {
 			invitation: {
 				GET: 'applyForumInvitation',
 				POST: 'applyForumInvitation'
+			}
+		},
+		phoneVerify: {
+			// GET: "phoneVerifyPage",
+			POST: "phoneVerify",
+			sendSmsCode: {
+				POST: "sendPhoneVerifyCode"
 			}
 		}
 	}

@@ -113,5 +113,39 @@ router
     data.reviewSettings = (await db.SettingModel.findById("review")).c;
     await db.SettingModel.saveSettingsToRedis("review");
     await next();
+  })
+  .put("/keyword", async (ctx, next) => {
+    const { db, body } = ctx;
+    const { type, value } = body;
+    if(type === "enable" && typeof value === "boolean") {
+      await db.SettingModel.update({ _id: "review" }, {
+        $set: {
+          "c.keyword.enable": value
+        }
+      });
+    } else if(type === "deleteKeyword" && typeof value === "string") {
+      await db.SettingModel.update({ _id: "review" }, {
+        $pull: {
+          "c.keyword.list": value
+        }
+      });
+    } else if(type === "addKeyword" && typeof value === "string") {
+      await db.SettingModel.update({ _id: "review" }, {
+        $addToSet: {
+          "c.keyword.list": value
+        }
+      });
+    } else if(type === "reviewCondition" && typeof value === "object") {
+      const { leastKeywordTimes, leastKeywordCount, relationship } = value;
+      await db.SettingModel.update({ _id: "review" }, {
+        "c.keyword.condition": {
+          leastKeywordTimes: leastKeywordTimes || 1,
+          leastKeywordCount: leastKeywordCount || 1,
+          relationship: relationship || "or"
+        }
+      });
+    }
+    await db.SettingModel.saveSettingsToRedis("review");
+    return next();
   });
 module.exports = router;

@@ -187,7 +187,7 @@ function jwarning(obj){
 
 function sweetAlert(text) {
   text = (text.error || text) + "";
-  Swal({
+  return Swal({
     confirmButtonText: "关闭",
     text: text
   });
@@ -218,7 +218,7 @@ function sweetError(text) {
   console.log(text);
   text = text.error || text;
   text = text + "";
-  Swal({
+  return Swal({
     type: "error",
     confirmButtonText: "关闭",
     text: text.error || text
@@ -1547,7 +1547,7 @@ function obtainPureText(content, reduce, count) {
 }
 
 function postsVote(pid, type) {
-  if(type === 'login') return NKC.methods.toLogin('login');
+  if(!NKC.configs.uid || type === 'login') return NKC.methods.toLogin('login');
   var url = '/p/' + pid + '/vote/down';
   if(type === 'up') {
     url = '/p/' + pid + '/vote/up';

@@ -20,7 +20,7 @@
     .option(v-if='anonymousUser !== null' @click='viewAuthorInfo')
       .fa.fa-share-square-o
       span 查看作者
-    .option(@click='replyPost' v-if='postType === "post" && !isComment')
+    .option(@click='replyPost' v-if='postType === "post" && !isComment && uid')
       .fa.fa-comment-o
       span 回复
     a.option(v-if='postType === "thread"' :href="'/t/' + tid + '?t=author'")

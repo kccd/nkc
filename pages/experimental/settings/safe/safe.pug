@@ -39,12 +39,32 @@ block eContent
             .col-sm-4
               input.form-control(type='password' v-model.trim='password2')
 
+        h4 手机号验证
+        a(href="/e/settings/safe/unverifiedPhone" target="_blank") 查看未验证的手机号
+        .form-horizontal
+          .form-group
+            label.col-sm-2.control-label 定时手机号验证
+            .col-sm-4.form-inline
+              .radio.m-r-2
+                | 开启
+                input(type="radio" value="true" v-model="safeSettings.phoneVerify.enable")
+              .radio
+                | 关闭
+                input(type="radio" value="false" v-model="safeSettings.phoneVerify.enable")
+
+          .form-group
+            label.col-sm-2.control-label 间隔时间(小时)
+            .col-sm-4
+              input.form-control(type='text' v-model="safeSettings.phoneVerify.interval")
+              h5.text-danger 每{{safeSettings.phoneVerify.interval}}小时需重新进行手机号验证，否则发表新内容会送审。
+
           .form-group
             label.col-sm-2.control-label
             .col-sm-4
               h5.text-danger(v-if="error") {{error}}
               h5.text-success(v-if="info") {{info}}
               button.btn.btn-primary.btn-block(@click='save') 保存
+
 
 
 block scripts

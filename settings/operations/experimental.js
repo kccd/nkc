@@ -255,7 +255,10 @@ module.exports = {
     },
     safe: {
       GET: "experimentalSafeSettings",
-      PUT: "experimentalSafeSettings"
+			PUT: "experimentalSafeSettings",
+			unverifiedPhone: {
+				GET: "unverifiedPhonePage"
+			}
     },
     auth: {
       GET: "experimentalUserAuth",
@@ -263,7 +266,10 @@ module.exports = {
     },
     review: {
       GET: "experimentalReviewSettings",
-      PUT: "experimentalReviewSettings"
+			PUT: "experimentalReviewSettings",
+			keyword: {
+				PUT: "experimentalKeywordSettings"
+			}
     },
     column: {
 		  GET: "experimentalColumnSettings",

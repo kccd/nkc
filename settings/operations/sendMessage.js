@@ -22,5 +22,8 @@ module.exports = {
 	},
 	unbindMobile: {
 		POST: "sendUnbindMobileMessage"
+	},
+	common: {
+		POST: "sendPhoneMessage",
 	}
 };

@@ -5,13 +5,14 @@ NKC.modules.downloadResource = class {
     self.app = new Vue({
       el: "#moduleDownloadResourceApp",
       data: {
+        uid: NKC.configs.uid,
         rid: "",
         fileName: "未知",
         type: "",
         size: 0,
         costs: [],
         hold: [],
-        status: "loadding",
+        status: "loading",
         fileCountLimitInfo: '',
         errorInfo: '',
         settingNoNeed: false,
@@ -60,7 +61,7 @@ NKC.modules.downloadResource = class {
         },
         getResourceInfo(rid) {
           let self = this;
-          self.status = 'loadding';
+          self.status = 'loading';
           self.errorInfo = '';
           nkcAPI(`/r/${rid}/detail`, "GET")
             .then(data => {
@@ -111,7 +112,7 @@ NKC.modules.downloadResource = class {
             .then(() => self.getResourceInfo(self.rid))
         },
         open(rid) {
-          this.status = "loadding";
+          this.status = "loading";
           this.initDom();
           this.getResourceInfo(rid);
         },
@@ -143,14 +144,4 @@ NKC.modules.downloadResource = class {
       return false;
     }
   })
-  // let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
-  // attachments.forEach(attachment => {
-  //   $(attachment).find("a.article-attachment-name").on("click", e => {
-  //     e.preventDefault();
-  //     e.stopPropagation();
-  //     let rid = $(attachment).attr("data-id");
-  //     dr.open(rid);
-  //     return false;
-  //   })
-  // })
 }());

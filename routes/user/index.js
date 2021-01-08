@@ -22,6 +22,8 @@ const userRouter = new Router();
 const hideRouter = require("./hide");
 // 用户创建的专业
 const forumRouter = require("./forum");
+// 手机号验证
+const phoneVerifyRouter = require("./phoneVerify");
 
 
 userRouter
@@ -520,5 +522,6 @@ userRouter
   .use("/:uid/myProblems", myProblemsRouter.routes(), myProblemsRouter.allowedMethods())
   .use("/:uid/violationRecord", violationRouter.routes(), violationRouter.allowedMethods())
   .use("/:uid/hide", hideRouter.routes(), hideRouter.allowedMethods())
-  .use("/:uid/forum", forumRouter.routes(), forumRouter.allowedMethods());
+  .use("/:uid/forum", forumRouter.routes(), forumRouter.allowedMethods())
+  .use("/:uid/phoneVerify", phoneVerifyRouter.routes(), phoneVerifyRouter.allowedMethods());
 module.exports = userRouter;

@@ -1534,6 +1534,7 @@ threadSchema.statics.postNewThread = async (options) => {
   const PostModel = mongoose.model("posts");
   const MessageModel = mongoose.model("messages");
   const DraftModel = mongoose.model("draft");
+  const ReviewModel = mongoose.model("reviews");
   // 检测专业ID
   await ForumModel.checkForumCategoryBeforePost(options.fids);
   // 1.检测发表权限
@@ -1543,8 +1544,10 @@ threadSchema.statics.postNewThread = async (options) => {
   const _post = await ForumModel.createNewThread(options);
   // 获取当前的thread
   const thread = await ThreadModel.findOnly({tid: _post.tid});
-  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
-  const needReview = await UserModel.contentNeedReview(options.uid, "thread");
+  // 是否需要审核
+  let needReview =
+      await UserModel.contentNeedReview(options.uid, "thread")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核 
+    || await ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
   if(!needReview) {
     await PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
     await ThreadModel.updateOne({tid: thread.tid}, {$set: {reviewed: true}});

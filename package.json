@@ -67,6 +67,7 @@
     "markdown-it": "^8.4.1",
     "mathjs": "^7.0.1",
     "mime": "^2.2.0",
+    "mint-filter": "^3.0.1",
     "mkdirp": "^1.0.4",
     "moment": "^2.20.1",
     "mongoose": "^4.13.10",

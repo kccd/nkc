@@ -7,6 +7,10 @@ module.exports = {
       hash: '',
       salt: '',
       secret: ''
+    },
+    phoneVerify: {
+      enable: false,
+      interval: 90 * 24
     }
   }
 };
