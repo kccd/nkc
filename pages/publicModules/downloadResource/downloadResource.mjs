@@ -143,14 +143,4 @@ NKC.modules.downloadResource = class {
       return false;
     }
   })
-  // let attachments = [].slice.call($("[data-tag='nkcsource'][data-type='attachment']"));
-  // attachments.forEach(attachment => {
-  //   $(attachment).find("a.article-attachment-name").on("click", e => {
-  //     e.preventDefault();
-  //     e.stopPropagation();
-  //     let rid = $(attachment).attr("data-id");
-  //     dr.open(rid);
-  //     return false;
-  //   })
-  // })
 }());

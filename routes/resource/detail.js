@@ -4,6 +4,7 @@ router
   .get("/", async (ctx, next) => {
     const {data, db, params} = ctx;
     const {user} = data;
+    if(!user) ctx.throw(403, "尚未登录不能查看附件详情");
     const detail = {};
     data.detail = detail;
     // 附件对象
