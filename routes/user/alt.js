@@ -65,6 +65,11 @@ router
               $sum: 1
             }
           }
+        },
+        {
+          $sort: {
+            count: -1
+          }
         }
       ]);
       return {
@@ -76,7 +81,6 @@ router
         ips: r
       };
     }));
-    console.log(JSON.stringify(data.results, '', 2));
     await next();
   });
 module.exports = router;
