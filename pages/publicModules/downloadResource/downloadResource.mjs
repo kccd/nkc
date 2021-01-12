@@ -134,7 +134,7 @@ NKC.modules.downloadResource = class {
   }
 
   // 监听评论盒子
-  $("#wrap").on("click", function(e) {
+  $("#wrap, .post").on("click", function(e) {
     let type = $(e.target).attr("data-type");
     if(type === "clickAttachmentTitle") {
       e.preventDefault();
@@ -143,5 +143,5 @@ NKC.modules.downloadResource = class {
       dr.open(rid);
       return false;
     }
-  })
+  });
 }());
