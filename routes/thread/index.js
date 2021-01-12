@@ -777,7 +777,7 @@ threadRouter
 
     // 是否需要审核
     let needReview =
-      await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核 
+      await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
       || await db.ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
     if(!needReview) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
@@ -891,12 +891,19 @@ threadRouter
       uid: data.user.uid
     };
     await db.SubscribeModel.insertSubscribe("replay", data.user.uid, tid);
-    // 推送回复、评论
-    await nkcModules.socket.sendPostMessage({
-      postId: thread.oc,
-      targetPostId: _post.pid
-    });
-    //-global.NKC.io.of('/thread').NKC.postToThread(data.post);
+    // 推送回复、评论 仅推送无需审核的post
+    if(_post.reviewed) {
+      await nkcModules.socket.sendPostMessage(_post.pid);
+    } else {
+      // 若post需要审核则将渲染好的内容返回
+      const singlePostData = await db.PostModel.getSocketSinglePostData(_post.pid);
+      data.renderedPost = {
+        postId: _post.pid,
+        html: singlePostData.html,
+        parentPostId: singlePostData.parentPostId,
+        parentCommentId: singlePostData.parentCommentId,
+      };
+    }
 		await next();
   })
 	//.use('/:tid/digest', digestRouter.routes(), digestRouter.allowedMethods())
