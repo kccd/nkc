@@ -111,6 +111,13 @@ NKC.modules.downloadResource = class {
             .catch(sweetError)
             .then(() => self.getResourceInfo(self.rid))
         },
+        fetchResource() {
+          let {rid, fileName} = this;
+          let downloader = document.createElement("a");
+          downloader.setAttribute("download", fileName);
+          downloader.href = `/r/${rid}`;
+          downloader.click();
+        },
         open(rid) {
           this.status = "loading";
           this.initDom();
