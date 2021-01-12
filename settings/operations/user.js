@@ -240,6 +240,9 @@ module.exports = {
 			sendSmsCode: {
 				POST: "sendPhoneVerifyCode"
 			}
+		},
+		alt: {
+			GET: 'getUserOtherAccount'
 		}
 	}
 };

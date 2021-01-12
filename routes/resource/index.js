@@ -190,6 +190,7 @@ resourceRouter
     let speed;
     data.resource = resource;
     data.rid = resource.rid;
+    let isPreviewPDF = false;
     if(mediaType === "mediaAttachment") {
       // 获取用户有关下载的时段和数量信息，用户前端展示给用户
       data.fileCountLimitInfo = await db.SettingModel.getDownloadFileCountLimitInfoByUser(data.user);
@@ -200,13 +201,14 @@ resourceRouter
       // 检测 是否需要积分
       const freeTime = 24 * 60 * 60 * 1000;
       const {needScore, reason} = await resource.checkDownloadCost(data.user, freeTime);
+      isPreviewPDF = needScore && resource.ext === 'pdf';
 
-      // 检测 分段下载数量是否超出限制
-      // 预览pdf时无需判断数量
-      if(c !== 'preview_pdf' || !needScore || resource.ext !== 'pdf') {
+      // 非pdf预览或者并且没有下载过，判断下载次数是否足够
+      if(
+        !(isPreviewPDF || reason === 'repeat')
+      ) {
         await resource.checkDownloadPermission(data.user, ctx.address);
       }
-
       // 下载需要积分，返回预览版
       if(needScore) {
         if(resource.ext !== 'pdf') {
@@ -261,14 +263,16 @@ resourceRouter
         downloadGroups[key] = speedObj;
       }
       ctx.tg = speedObj.tg;
-      // 写入下载记录
-      const downloadLog = db.DownloadLogModel({
-        uid: data.user? data.user.uid: "",
-        ip: ctx.address,
-        port: ctx.port,
-        rid: resource.rid
-      });
-      await downloadLog.save();
+      if(!isPreviewPDF) {
+        // 写入下载记录
+        const downloadLog = db.DownloadLogModel({
+          uid: data.user? data.user.uid: "",
+          ip: ctx.address,
+          port: ctx.port,
+          rid: resource.rid
+        });
+        await downloadLog.save();
+      }
     }
     await next();
   })

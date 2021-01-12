@@ -139,9 +139,8 @@ block scripts
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
   include ../thread/singlePost/singlePost
   include ../publicModules/bulletComments/bulletComments
-    //- 下载资料询问框
-  if state.downloadNeedScore
-    include ../publicModules/downloadResource/downloadResource
+  //- 下载资料询问框
+  include ../publicModules/downloadResource/downloadResource.pug
   if permission("viewNote")
     include ../publicModules/NKCHighlighter/NKCHighlighter
   +includeJS(`/thread/comments.js`)

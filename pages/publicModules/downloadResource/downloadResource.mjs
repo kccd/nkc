@@ -111,6 +111,13 @@ NKC.modules.downloadResource = class {
             .catch(sweetError)
             .then(() => self.getResourceInfo(self.rid))
         },
+        fetchResource() {
+          let {rid, fileName} = this;
+          let downloader = document.createElement("a");
+          downloader.setAttribute("download", fileName);
+          downloader.href = `/r/${rid}`;
+          downloader.click();
+        },
         open(rid) {
           this.status = "loading";
           this.initDom();
@@ -134,7 +141,7 @@ NKC.modules.downloadResource = class {
   }
 
   // 监听评论盒子
-  $("#wrap").on("click", function(e) {
+  $("#wrap, .post").on("click", function(e) {
     let type = $(e.target).attr("data-type");
     if(type === "clickAttachmentTitle") {
       e.preventDefault();
@@ -143,5 +150,5 @@ NKC.modules.downloadResource = class {
       dr.open(rid);
       return false;
     }
-  })
+  });
 }());

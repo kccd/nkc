@@ -51,30 +51,20 @@ func.sendForumMessage = async (data) => {
   }
 };
 
-func.sendPostMessage = async (data) => {
-  const post = await db.PostModel.findOne({
-    pid: data.targetPostId,
-    reviewed: true,
-  });
-  if(!post) return;
-  const comment = await db.PostModel.getSocketCommentByPid(post);
-  let postData = await db.PostModel.extendPost(post);
-  const parentCommentId = post.parentPostId;
-  const parentPostId = post.parentPostsId[0];
-  const render = require('../nkcModules/render');
-  let html, eventName;
-  if(!parentCommentId) {
-    postData = (await db.PostModel.filterPostsInfo([postData]))[0];
-    html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData});
-    eventName = 'postMessage';
-  } else {
-    postData = (await db.PostModel.filterCommentsInfo([postData]))[0];
-    html = render(PATH.resolve(__dirname, `../pages/thread/singleComment/singleCommentPage.pug`), {postData});
-    eventName = 'commentMessage';
-  }
-
-  const roomName = getRoomName('post', data.postId);
+func.sendPostMessage = async (pid) => {
+  const singlePostData = await db.PostModel.getSocketSinglePostData(pid);
+  const {
+    parentCommentId,
+    parentPostId,
+    comment,
+    html,
+    post,
+  } = singlePostData;
+  const eventName = await db.PostModel.getSocketEventName(pid);
+  const thread = await db.ThreadModel.findOnly({tid: post.tid});
+  const roomName = getRoomName('post', thread.oc);
   global.NKC.io.to(roomName).emit(eventName, {
+    postId: post.pid,
     comment,
     parentPostId,
     parentCommentId,
@@ -82,9 +72,6 @@ func.sendPostMessage = async (data) => {
   });
 }
 
-func.sendThreadMessage = () => {
-  const roomName = getRoomName('thread');
-};
 
 // 发送消息到用户
 async function sendMessageToUser(channel, message) {

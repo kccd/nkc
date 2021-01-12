@@ -3,12 +3,6 @@
   @param {[Object]} state.forumsTree 专业树状结构数组 通过方法ForumModel.getForumsTree获取
   @author pengxiguaa 2019-7-8
 
--let topics = [], disciplines = [];
-for forum in state.forumsTree
-  if forum.forumType === "topic"
-    -topics.push(forum);
-  else
-    -disciplines.push(forum);
 
 mixin renderForums(forums)
   for forum in forums
@@ -46,6 +40,15 @@ mixin renderSimpleForums(forums)
         else
           span |
         a.forum-child(href=tools.getUrl('forumHome', cf.fid) data-float-fid=cf.fid style=`background-color: ${hexToRgba(cf.color, 0.1)}`)=cf.displayName
+
+if data.forum && data.forum.childrenForums && data.forum.childrenForums.length
+  .m-b-1
+    .panel-header 细分专业
+    .home-topic-item-div
+      for forum in data.forum.childrenForums
+        .forum-block
+          .forum-block-info
+            a(href=`/f/${forum.fid}` data-float-fid=forum.fid).forum-block-name=forum.displayName
 
 if data.user && data.forum && state.subForums && state.subForums.length >0
   .m-b-1
