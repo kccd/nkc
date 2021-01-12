@@ -19,6 +19,10 @@ router
     const freeTime = 24 * 60 * 60 * 1000;
     const {needScore, reason} = await resource.checkDownloadCost(user, freeTime);
     if(needScore) {
+      // 因为后台设置了需要积分的情况则需要检查下载次数是否足够
+      if(reason === "setting") {
+        await resource.checkDownloadPermission(data.user, ctx.address);
+      }
       // 这里必须在data里指定rid，下面的 insertSystemRecord 函数要读
       data.rid = resource.rid;
       // 积分是否足够
