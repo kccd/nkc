@@ -1,8 +1,9 @@
 const router = require('koa-router')();
 router
   .get('/', async (ctx, next) => {
-    const {data, db} = ctx;
+    const {data, db, query} = ctx;
     const {targetUser} = data;
+    const {page = 0} = query;
     let ips = await db.UsersBehaviorModel.aggregate([
       {
         $match: {
@@ -29,20 +30,53 @@ router
     let otherUid = await db.UsersBehaviorModel.aggregate([
       {
         $match: {
-          uid: {$ne: 'visitor'},
+          uid: {$nin: ['visitor', targetUser.uid]},
           ip: {$in: ips}
         }
       },
       {
         $group: {
-          _id: '$uid'
+          _id: '$uid',
+          count: {
+            $sum: 1
+          }
+        }
+      },
+      {
+        $sort: {
+          count: -1
         }
       }
     ]);
     const usersId = otherUid.map(u => u._id);
-    const users = await db.UserModel.find({uid: usersId});
-    const usersObj = {};
-    users.map(u => usersObj[u.uid] = u);
+    const users = await db.UserModel.find({uid: usersId}).sort({toc: 1});
+    data.results = await Promise.all(users.map(async user =>{
+      const r = await db.UsersBehaviorModel.aggregate([
+        {
+          $match: {
+            uid: user.uid,
+            ip: {$in: ips}
+          }
+        },
+        {
+          $group: {
+            _id: '$ip',
+            count: {
+              $sum: 1
+            }
+          }
+        }
+      ]);
+      return {
+        user: {
+          uid: user.uid,
+          avatar: user.avatar,
+          username: user.username
+        },
+        ips: r
+      };
+    }));
+    console.log(JSON.stringify(data.results, '', 2));
     await next();
   });
 module.exports = router;
