@@ -131,7 +131,7 @@ block content
                 a(href=`/u/${data.targetUser.uid}/transaction` target="_blank").btn.btn-default.btn-sm 查看地址
                 button.btn.btn-default.btn-sm(onclick=`NKC.modules.violationRecord.open({uid:'${data.targetUser.uid}'})`) 违规信息
                 if permission('getUserOtherAccount')
-                  a(href=`/u/${data.targetUser.uid}/alt` target="_blank").btn.btn-default.btn-sm 同IP账号
+                  a(href=`/u/${data.targetUser.uid}/alt` target="_blank").btn.btn-default.btn-sm 查马甲
           .m-b-1.row
             include ../publicModules/share/user-card
           if data.user &&  data.user.uid !== data.targetUser.uid

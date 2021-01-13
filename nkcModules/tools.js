@@ -172,7 +172,7 @@ var Tools = function() {
     // 分
     const m = Math.floor((now - time) / 60);
     if(m < 60) {
-      return m + '分钟'+ (now-time) % 60 +'秒前';
+      return m + '分钟'+ (now - time) % 60 +'秒前';
     }
     // 时
     const h = Math.floor(m / 60 );
@@ -185,9 +185,9 @@ var Tools = function() {
     }
     const month = Math.floor(d / 30);
     if(month < 12) {
-      return month + '个月'+(d%30)+'天前';
+      return month + '个月'+ (d % 30) +'天前';
     }
-    return Math.floor(month / 12) + '年'+(month % 12)+'个月前';
+    return Math.floor(month / 12) + '年'+ (month % 12) +'个月前';
   };
   self.timeFormat = function(time) {
     var fixTime = function(number) {
