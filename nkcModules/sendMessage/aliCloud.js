@@ -1,6 +1,6 @@
 const Core = require('@alicloud/pop-core');
 module.exports = async (smsSettings, obj) => {
-  const {templateId, timeout, code, mobile, nationCode} = obj;
+  const {templateId, timeout, content, mobile, nationCode} = obj;
   const {appId, appKey, smsSign} = smsSettings;
 
   const client = new Core({
@@ -14,7 +14,7 @@ module.exports = async (smsSettings, obj) => {
     PhoneNumbers: `${nationCode}${mobile}`,
     SignName: smsSign,
     TemplateCode: templateId,
-    TemplateParam: JSON.stringify({code, minutes: timeout + ''})
+    TemplateParam: JSON.stringify({code: content, minutes: timeout + ''})
   };
   const requestOption = {
     method: 'POST'
