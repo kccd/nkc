@@ -4,7 +4,7 @@ router
     const {data, db, query} = ctx;
     const {targetUser} = data;
     const {page = 0} = query;
-    let ips = await db.UsersBehaviorModel.aggregate([
+    let ipsData = await db.UsersBehaviorModel.aggregate([
       {
         $match: {
           uid: targetUser.uid,
@@ -24,9 +24,22 @@ router
             $sum: 1
           }
         }
+      },
+      {
+        $sort: {
+          count: -1
+        }
       }
     ]);
-    ips = ips.map(i => i._id);
+    const ips = [];
+    for(const i of ipsData) {
+      const ipInfo = await db.IPModel.getIPInfoFromLocal(i._id);
+      ips.push(i._id);
+      i.ip = i._id;
+      delete i._id;
+      i.location = ipInfo.location;
+    }
+    data.ips = ipsData;
     let otherUid = await db.UsersBehaviorModel.aggregate([
       {
         $match: {
@@ -50,7 +63,7 @@ router
     ]);
     const usersId = otherUid.map(u => u._id);
     const users = await db.UserModel.find({uid: usersId}).sort({toc: 1});
-    data.results = await Promise.all(users.map(async user =>{
+     data.accounts = await Promise.all(users.map(async user =>{
       const r = await db.UsersBehaviorModel.aggregate([
         {
           $match: {
@@ -78,9 +91,17 @@ router
           avatar: user.avatar,
           username: user.username
         },
-        ips: r
+        ips: await Promise.all(r.map(async a => {
+          const ipInfo = await db.IPModel.getIPInfoFromLocal(a._id);
+          return {
+            ip: a._id,
+            location: ipInfo.location,
+            count: a.count
+          }
+        }))
       };
     }));
+    ctx.template = 'user/alt/alt.pug';
     await next();
   });
 module.exports = router;

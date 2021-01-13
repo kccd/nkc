@@ -1391,7 +1391,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       floor: post.step,
       cv: post.cv, // post内容版本
       toc: post.toc,
-      tlm: post.toc.toLocaleDateString() === post.tlm.toLocaleDateString()? null: post.tlm,
+      tlm: new Date(post.toc).getTime() === new Date(post.tlm).getTime()? null: post.tlm,
       count: post.postCount,
       title: post.t,
       content: post.c,
@@ -1475,7 +1475,7 @@ postSchema.statics.filterCommentsInfo = async (posts) => {
       tid: post.tid,
       cv: post.cv, // post内容版本
       toc: post.toc,
-      tlm: post.toc.toLocaleDateString() === post.tlm.toLocaleDateString()? null: post.tlm,
+      tlm: new Date(post.toc).getTime() === new Date(post.tlm).getTime()? null: post.tlm,
       content: post.c,
       vote: post.usersVote || null,
       reviewed: post.reviewed,
