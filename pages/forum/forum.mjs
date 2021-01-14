@@ -196,7 +196,7 @@ function setThreadListNewCount(tid, count) {
 
   // 只显示红点
   // const newCounter = $("<span class='thread-panel-point' data-count='"+count+"'></span>");
-  targetThreadInfo.append(newCounter);
+  // targetThreadInfo.append(newCounter);
 }
 
 /*
