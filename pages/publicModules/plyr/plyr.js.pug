@@ -8,6 +8,8 @@ include ./mask.pug
 script.
   ;(function(){
     var players = [];
+    var videoControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'];
+    var audioControls = ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'pip', 'airplay', 'fullscreen'];
     NKC.methods.initVideo = function() {
       var videoDom = $(".plyr-dom");
       for (var i = 0; i < videoDom.length; i++) {
@@ -17,7 +19,10 @@ script.
         var player = new Plyr(videoDom.eq(i), {
           ratio: '4:3',
           title: title,
-          controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'captions', 'pip', 'airplay', 'fullscreen'],
+          // controls: dom[0].tagName.toLowerCase() === 'video'? videoControls: audioControls,
+          controls: audioControls,
+          settings: ['quality'],
+          quality: { default: 720, options: [ 1080, 720] },
           blankVideo: "/external_pkgs/plyr/blank.mp4",
           autopause: true,
         });

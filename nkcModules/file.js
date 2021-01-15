@@ -13,8 +13,8 @@ const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
 
 const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
-const videoExtensions = ["mp4", "mov", "3gp", "avi"];
-const audioExtensions = ["wav", "amr", "mp3", "aac"];
+const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
+const audioExtensions = ["wav", "amr", "mp3", "aac", 'flac'];
 
 func.folders = {
   attachment: './attachment',

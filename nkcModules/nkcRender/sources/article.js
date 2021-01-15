@@ -44,7 +44,8 @@ module.exports = {
       return `
       <span data-tag="nkcsource" data-type="video" data-id="${id}">
         <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
-          <source src="${url}" type="video/mp4"> 你的浏览器不支持video标签，请升级。
+<!--          <source src="${url}" type="video/mp4" size="720"> 你的浏览器不支持video标签，请升级。-->
+          <source src="${url}" type="video/mp4" size="1080"> 你的浏览器不支持video标签，请升级。
         </video>
       </span>
     `.trim();

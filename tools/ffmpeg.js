@@ -103,6 +103,10 @@ const videoMOVTransMP4 = async (inputPath, outputPath) => {
 const videoAVITransMP4 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
 }
+// webm转码为mp4
+const videoWEBMTransMP4 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
+}
 
 // AMR转码为MP3
 const audioAMRTransMP3 = async (inputPath, outputPath) => {
@@ -123,6 +127,9 @@ const audioWMATransMP3 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
 }
 
+const audioFLACTransMP3 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath]);
+}
 /**
  * 获取视频的帧宽高
  * @param {string} inputPath 视频路径
@@ -327,7 +334,9 @@ module.exports = {
   videoMP4TransH264,
   videoMOVTransMP4,
   videoAVITransMP4,
+  videoWEBMTransMP4,
   audioAMRTransMP3,
+  audioFLACTransMP3,
   audioWAVTransMP3,
   audioWMATransMP3,
   getVideoSize,
