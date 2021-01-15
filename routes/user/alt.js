@@ -62,7 +62,7 @@ router
       }
     ]);
     const usersId = otherUid.map(u => u._id);
-    const users = await db.UserModel.find({uid: usersId}).sort({toc: 1});
+    const users = await db.UserModel.find({uid: usersId}, {uid: 1, avatar: 1, username: 1, certs: 1}).sort({toc: 1});
      data.accounts = await Promise.all(users.map(async user =>{
       const r = await db.UsersBehaviorModel.aggregate([
         {
@@ -89,7 +89,8 @@ router
         user: {
           uid: user.uid,
           avatar: user.avatar,
-          username: user.username
+          username: user.username,
+          banned: user.certs.includes('banned')
         },
         ips: await Promise.all(r.map(async a => {
           const ipInfo = await db.IPModel.getIPInfoFromLocal(a._id);

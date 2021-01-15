@@ -44,7 +44,11 @@ block content
                     th(style='min-width: 10rem;')
                       img(src=tools.getUrl('userAvatar', a.user.avatar))
                       | &nbsp;
-                      a(href=tools.getUrl('userHome', a.user.uid) data-float-uid=a.user.uid target="_blank")=a.user.username
+                      a(href=tools.getUrl('userHome', a.user.uid) data-float-uid=a.user.uid target="_blank")
+                        if a.user.banned
+                          del=a.user.username
+                        else
+                          span=a.user.username
                     th
                       for ip in a.ips
                         span.ip=`${ip.ip} 「${ip.count} ${ip.location}」`
