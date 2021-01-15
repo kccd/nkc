@@ -314,8 +314,17 @@ async function addImageTextWaterMaskForImage(op) {
   ], additionOptions)
 }
 
+async function changeVideoResolution(input, output, t) {
+  const {width, height} = await getVideoSize(input);
+  if(height > t) {
+    const _height = t;
+    const _width = width * _height / height;
+    return spawnProcess('ffmpeg', ['-i', input, '-vf', `scale=${_width}:${_height}`, output]);
+  }
+}
 
 module.exports = {
+  changeVideoResolution,
   videoFirstThumbTaker,
   videoTranscode,
   videoAviTransAvi,
