@@ -48,7 +48,7 @@ block eContent
                       button.btn.btn-danger.btn-sm(@click="smsSettings.restrictedNumber.splice(index,1)") 删除
           .form-group.m-b-2
             h4.control-label.col-sm-2 短信模板
-            .col-sm-8.p-t-1
+            .col-sm-10.p-t-1
               table.table.table-bordered
                 thead
                   tr
@@ -58,8 +58,9 @@ block eContent
                     th 有效时间(分钟)
                     th IP次数限制(每天)
                     th 手机号码次数限制(每天)
+                    th 参数内容 验证码{code} 过期时间{time}
                 tbody
-                  tr(v-for='t, index in smsSettings.templates')
+                  tr(v-for='(t, index) in smsSettings.templates')
                     th {{index + 1}}
                     th {{tran(t.name)}}
                     th
@@ -70,6 +71,8 @@ block eContent
                       input.form-control.table-input(v-model.number='t.sameIpOneDay')
                     th
                       input.form-control.table-input(v-model.number='t.sameMobileOneDay')
+                    th(style='min-width: 20rem')
+                      textarea.form-control(v-model.trim='t.content' rows=3)
               .form-inline
                 select.form-control(v-model='test.name')
                   option(v-for='t in smsSettings.templates' :value='t.name') {{tran(t.name)}}
@@ -80,7 +83,7 @@ block eContent
                 button.btn.btn-default(@click='testSendMessage') 发送
           .form-group.m-b-2
             .col-sm-2
-            .col-sm-8
+            .col-sm-10
               button.btn.btn-block.btn-primary(@click='save') 保存
 block scripts
   +includeJS("/nationCodes/nationCodes.js")

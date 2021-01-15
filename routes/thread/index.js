@@ -715,6 +715,21 @@ threadRouter
         );
     }
 
+    // 加载同级专业
+    const threadForums = thread.forums;
+    let parentForumsId = [];
+    const visibilityForumsIdFromRedis = await db.ForumModel.getVisibilityForumsIdFromRedis();
+    for(const tf of threadForums) {
+      parentForumsId = parentForumsId.concat(tf.parentsId);
+    }
+    data.sameLevelForums = await db.ForumModel.find({
+      fid: {
+        $in: fidOfCanGetThreads.concat(visibilityForumsIdFromRedis).filter(fid => !thread.mainForumsId.includes(fid)),
+      },
+      parentsId: {
+        $in: parentForumsId
+      }
+    }, {displayName: 1, fid: 1, parentsId: 1}).sort({order: 1});
     // 帖子设置
     data.threadSettings = await db.SettingModel.getSettings("thread");
     data.postHeight = hidePostSettings.postHeight;

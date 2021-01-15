@@ -79,6 +79,8 @@ block eContent
                   button.btn.btn-default.btn-xs(v-if='u.hidden' @click='hiddenUsersHome("one", false, u)') 显名片
                   button.btn.btn-default.btn-xs(v-else @click='hiddenUsersHome("one", true, u)') 隐名片
                   button.btn.btn-default.btn-xs(@click='editUser(u)') 编辑
+                  | &nbsp;
+                  a.btn.btn-default.btn-xs(:href='"/u/" + u.uid + "/alt"' target="_blank") 查马甲
                   button.btn.btn-default.btn-xs(@click='switchDetail(u)') 更多
                     .fa.fa-caret-down(v-if='!u.showDetail')
                     .fa.fa-caret-up(v-if='u.showDetail')

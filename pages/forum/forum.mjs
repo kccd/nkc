@@ -190,12 +190,13 @@ function setThreadListNewCount(tid, count) {
   targetThreadCounter.remove();
   if(count === 0) return;
 
+  // 暂时评论红点提示 当前仅仅指定文章而不显示红点
   // 显示条数
   //const newCounter = $("<span class='thread-panel-counter' data-count='"+count+"' title='"+count+"条更新'>"+count+"</span>");
 
   // 只显示红点
-  const newCounter = $("<span class='thread-panel-point' data-count='"+count+"'></span>");
-  targetThreadInfo.append(newCounter);
+  // const newCounter = $("<span class='thread-panel-point' data-count='"+count+"'></span>");
+  // targetThreadInfo.append(newCounter);
 }
 
 /*

@@ -246,6 +246,8 @@ module.exports = async (options) => {
     }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
       await ffmpeg.videoAviTransAvi(path, path);
       await ffmpeg.videoAVITransMP4(path, outputVideoPath);
+    } else if(['webm'].includes(extension.toLowerCase())) {
+      await ffmpeg.videoWEBMTransMP4(path, outputVideoPath);
     }
   }
 

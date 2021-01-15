@@ -123,16 +123,33 @@ router
           "c.keyword.enable": value
         }
       });
-    } else if(type === "deleteKeyword" && typeof value === "string") {
-      await db.SettingModel.update({ _id: "review" }, {
+    } else if(type === "deleteWordGroup" && typeof value === "string") {
+      await db.SettingModel.updateOne({ _id: "review" }, {
         $pull: {
-          "c.keyword.list": value
+          "c.keyword.wordGroup": {
+            name: value
+          }
         }
       });
-    } else if(type === "addKeyword" && typeof value === "string") {
+    } else if(type === "addWordGroup" && typeof value === "object") {
+      const { name, keywords } = value;
+      if(!name) ctx.throw(403, "未指定组名");
+      if(!keywords.length) ctx.throw(403, "未添加关键词");
+      if(
+        await db.SettingModel.findOne({
+          "c.keyword.wordGroup": { 
+            $elemMatch: { name }
+          }
+        })
+      ) {
+        ctx.throw(403, "词组名称重复");
+      }
       await db.SettingModel.update({ _id: "review" }, {
         $addToSet: {
-          "c.keyword.list": value
+          "c.keyword.wordGroup": {
+            name,
+            keywords
+          }
         }
       });
     } else if(type === "reviewCondition" && typeof value === "object") {

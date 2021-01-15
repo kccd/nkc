@@ -10,16 +10,20 @@ const sendMessage = async (obj) => {
   const smsSettings = await SettingModel.getSettings('sms');
   const {type} = obj;
   const {templates} = smsSettings;
-  let templateId, timeout;
+  let templateId, timeout, content;
   for(const template of templates) {
     if(template.name === type) {
       templateId = template.id;
       timeout = template.validityPeriod;
+      content = template.content;
       break;
     }
   }
   if(templateId === undefined) throw `${type}模板未定义`;
-  obj = Object.assign({}, obj, {templateId, timeout});
+  content = content
+    .replace(/{code}/g, obj.code)
+    .replace(/{time}/g, timeout);
+  obj = Object.assign({}, obj, {templateId, timeout, content});
   if(smsSettings.platform === 'aliCloud') {
     return aliCloud(smsSettings, obj);
   } else if(smsSettings.platform === 'alidayu'){
