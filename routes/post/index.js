@@ -484,8 +484,27 @@ router
         disabled: false,
         reviewed: false
       });
+      await db.ThreadModel.updateOne({ tid: singlePost.tid }, {
+        $set: {
+          reviewed: false
+        }
+      });
       postReviewed = false;
     }
+
+    // 检测敏感词，检测到则添加待审核
+    const needReview = await db.ReviewModel.includesKeyword(singlePost);
+    if(needReview) {
+      await singlePost.update({
+        reviewed: false
+      });
+      await db.ThreadModel.updateOne({ tid: singlePost.tid }, {
+        $set: {
+          reviewed: false
+        }
+      });
+    }
+
     // 帖子曾经在草稿箱中，发表时，删除草稿
     if(did) {
       await db.DraftModel.removeDraftById(did, data.user.uid);
