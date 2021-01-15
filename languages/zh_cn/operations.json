@@ -763,6 +763,5 @@
   "getUserOtherAccount": "查询用户可能存在的小号",
   "nkcManagementSecurityApplication": "前台管理 - 手机号申诉",
 
-  "visitForumReviewSettings": "访问专业审核设置页面",
-  "modifyForumReviewSettings": "修改专业审核设置"
+  "forumReviewSettings": "专业审核设置"
 }
