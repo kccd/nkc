@@ -760,5 +760,8 @@
   "unverifiedPhonePage": "查看未验证的手机号列表",
   "experimentalKeywordSettings": "审核关键词设置",
   "applyToChangeUnusedPhoneNumber": "申请修改失效手机号",
-  "nkcManagementSecurityApplication": "前台管理 - 手机号申诉"
+  "nkcManagementSecurityApplication": "前台管理 - 手机号申诉",
+
+  "visitForumReviewSettings": "访问专业审核设置页面",
+  "modifyForumReviewSettings": "修改专业审核设置"
 }
