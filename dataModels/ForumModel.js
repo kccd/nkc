@@ -331,6 +331,11 @@ const forumSchema = new Schema({
   founders: {
     type: Array,
     default: [],
+  },
+  // 敏感词审核使用的词组
+  keywordReviewUseGroup: {
+    type: [String],
+    default: [],
   }
 }, {toObject: {
 		getters: true,

@@ -13,11 +13,12 @@ var app = new Vue({
     },
     conditions: [],
     selectedCertId: "",
-    keywordInput: "",
-    foundKeywordIndex: null,
     leastKeywordTimes: data.reviewSettings.keyword.condition.leastKeywordTimes,
     leastKeywordCount: data.reviewSettings.keyword.condition.leastKeywordCount,
-    relationship: data.reviewSettings.keyword.condition.relationship
+    relationship: data.reviewSettings.keyword.condition.relationship,
+    wordGroup: data.reviewSettings.keyword.wordGroup || [],
+    newWordGroupName: "",
+    newWordGroupKeywords: null
   },
   watch: {
     tab: function() {
@@ -254,46 +255,44 @@ var app = new Vue({
         value: val
       });
     },
-    // 删除关键词
-    deleteKeyword: function(index) {
+    // 删除关键词库
+    deleteWordGroup: function(index) {
       var self = this;
-      sweetConfirm("确定要删除这个关键词吗?")
+      var name = self.wordGroup[index].name;
+      sweetConfirm("确定要删除这个关键词组吗?")
         .then(function() {
-          var keyword = self.reviewSettings.keyword.list.splice(index, 1)[0];
           return nkcAPI("/e/settings/review/keyword", "PUT", {
-            type: "deleteKeyword",
-            value: keyword
+            type: "deleteWordGroup",
+            value: name
           });
         })
         .then(function() {
-          self.foundKeywordIndex = null;
+          self.wordGroup.splice(index, 1);
         })
     },
-    // 添加关键词
-    addKeyword: function() {
-      var keyword = this.keywordInput;
-      if(!keyword) return;
-      this.reviewSettings.keyword.list.push(keyword);
-      this.keywordInput = "";
-      nkcAPI("/e/settings/review/keyword", "PUT", {
-        type: "addKeyword",
-        value: keyword
-      });
-    },
-    // 搜索关键字
-    searchKeyword: function() {
+    // 添加关键词组
+    addWordGroup: function() {
       var self = this;
-      if(!self.keywordInput) {
-        return this.foundKeywordIndex = null;
-      }
-      var list = data.reviewSettings.keyword.list;
-      for(var index in list) {
-        var keyword = list[index];
-        if(keyword === self.keywordInput) {
-          return self.foundKeywordIndex = index;
-        }
-      }
-      return self.foundKeywordIndex = null;
+      if(!self.newWordGroupName || !self.newWordGroupKeywords) return;
+      var newWordGroup = {
+        name: self.newWordGroupName,
+        keywords: self.newWordGroupKeywords
+      };
+      sweetConfirm("确认添加新敏感词词组:" + newWordGroup.name + "吗？包含关键词: " + newWordGroup.keywords.join("、"))
+        .then(function() {
+          return nkcAPI("/e/settings/review/keyword", "PUT", {
+            type: "addWordGroup",
+            value: newWordGroup
+          })
+        })
+        .then(function() {
+          self.wordGroup.push(newWordGroup);
+        })
+        .catch(sweetError)
+        .then(function() {
+          self.newWordGroupName = "";
+          self.newWordGroupKeywords = null;
+        })
     },
     // 更新送审条件
     updateReviewCondition: function() {
@@ -307,6 +306,32 @@ var app = new Vue({
         type: "reviewCondition",
         value: update
       });
+    },
+    // 选择了关键词文件
+    keywordFile: function(file) {
+      var self = this;
+      var reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function() {
+        var keywords = reader.result.split(/[\r]{0,1}\n/);
+        if(!keywords.length) {
+          return sweetWarning("无新的关键字");
+        }
+        self.newWordGroupKeywords = keywords;
+        // sweetConfirm("即将导入以下新关键字:\n" + filetedKeywords.join("、") + "\n确认导入?")
+        //   .then(function() {
+        //     return nkcAPI("/e/settings/review/keyword", "PUT", {
+        //       type: "addKeyword",
+        //       value: filetedKeywords
+        //     })
+        //   })
+        //   .then(() => {
+        //     sweetAlert("添加成功");
+        //     for(var newKeyword of filetedKeywords)
+        //       self.reviewSettings.keyword.list.push(newKeyword);
+        //   })
+        //   .catch(sweetError)
+      }
     }
   }
 });
