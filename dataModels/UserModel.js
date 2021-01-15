@@ -475,7 +475,7 @@ userSchema.statics.extendUsersSecretInfo = async (users) => {
     if(user.volumeB) {
       const paperB = await ExamsPaperModel.findOne({uid: user.uid, passed: true, cid: {$in: proExamsCategoriesId}}).sort({toc: 1});
       if(paperB) {
-        user.paperB = proExamsCategories[paperB.cid];
+        user.paperB = proExamsCategoriesObj[paperB.cid];
       }
     }
     results.push(user);
