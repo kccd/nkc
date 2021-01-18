@@ -172,16 +172,16 @@ var Tools = function() {
     // 分
     const m = Math.floor((now - time) / 60);
     if(m < 60) {
-      return m + '分钟'+ (now - time) % 60 +'秒前';
+      return m + '分'+ (now - time) % 60 +'秒前';
     }
     // 时
     const h = Math.floor(m / 60 );
     if(h < 24) {
-      return h + '小时'+ (m % 60) +'分钟前';
+      return h + '时'+ (m % 60) +'分前';
     }
     const d = Math.floor(h / 24);
     if(d < 30) {
-      return d + '天'+ (h % 24) +'小时前';
+      return d + '天'+ (h % 24) +'时前';
     }
     const month = Math.floor(d / 30);
     if(month < 12) {
