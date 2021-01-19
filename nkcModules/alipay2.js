@@ -168,7 +168,6 @@ func.transfer = async (o) => {
   return new Promise((resolve, reject) => {
     rp(link)
       .then((data) => {
-        console.log(data);
         try{
           data = JSON.parse(data);
         } catch(err) {
