@@ -79,7 +79,7 @@ block content
     .row
       .col-xs-12.col-md-12.box-shadow-panel
         //- 只有封面图的文章入口 轮播
-        .home-top
+        .home-top(style=state.isApp?'margin-top: 0':'')
           .home-covers
             .row
               .col-xs-12.col-md-6.home-covers-md
@@ -111,12 +111,12 @@ block content
                 if data.user
                   a(href=`/?t=subscribe`) 关注
                 else
-                  a(onclick=`Login.open()`) 关注
+                  a(onclick=`NKC.methods.toLogin()`) 关注
               .col-xs-4
                 if data.user
                   a(href=`/u/${data.user.uid}/profile`) 我的
                 else
-                  a(onclick=`Login.open()`) 我的
+                  a(onclick=`NKC.methods.toLogin()`) 我的
 
       //-修改默认用户名
       //-include ../publicModules/checkDefaultUsername

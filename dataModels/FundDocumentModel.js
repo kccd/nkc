@@ -133,11 +133,11 @@ documentSchema.methods.extendResources = async function() {
 
 documentSchema.pre('save', async function(next) {
 	const ResourceModel = mongoose.model('resources');
-	await ResourceModel.toReferenceSource(`fund-${this._id}`, this.c);
+	await ResourceModel.toReferenceSource(`fund-${this._id}`, this.c || '');
 	return next()
-	
+
 	/*try {
-		
+
 		const oldDocument = await FundDocumentModel.findOne({_id: this.id});
 		let oldResources = [];
 		if(oldDocument) {

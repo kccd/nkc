@@ -67,11 +67,10 @@ remittanceRouter
 
 				//支付宝
 				if(paymentType === 'alipay') {
-					const {alipay} = ctx.nkcModules;
-					const {transferError} = alipay;
+					const {alipay2} = ctx.nkcModules;
 					let alipayData;
 					try {
-						alipayData = await alipay.transfer({
+						alipayData = await alipay2.transfer({
 							account: number,
 							name,
 							money: r.money,
@@ -80,30 +79,23 @@ remittanceRouter
 						});
 						obj.otherInfo = {
 							paymentType: 'alipay',
-							transactionNumber: alipayData.alipayId,
+							transactionNumber: alipayData.orderId,
 							name,
 							account: number
 						}
             await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
 					} catch (err) {
-						const {subCode} = err;
-						let description;
-						for(let a of transferError) {
-							if(a.subCode === subCode) {
-								description = a.description;
-								break;
-							}
-						}
+						const errorInfo = err.message;
 						r.status = false;
-						r.subCode = subCode;
-						r.description = description;
+						r.subCode = errorInfo;
+						r.description = errorInfo;
 						const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 						const newDocument = db.FundDocumentModel({
 							_id: newId,
 							type: 'remittance',
 							uid: user.uid,
 							applicationFormId: applicationForm._id,
-							c: description,
+							c: errorInfo,
 							support: false
 						});
 						await applicationForm.update({remittance});
@@ -176,8 +168,7 @@ remittanceRouter
 			const balance = await db.FundBillModel.getBalance('fund', fund._id);
 			if(remittance[0].money > balance) ctx.throw(400, '该基金余额不足。');
 			const {number, name} = account;
-			const {alipay} = ctx.nkcModules;
-			const {transferError} = alipay;
+			const {alipay2} = ctx.nkcModules;
 			let alipayData;
 			const _id = Date.now();
 			const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
@@ -191,7 +182,7 @@ remittanceRouter
 			});
 			await newReport.save();
 			try {
-				alipayData = await alipay.transfer({
+				alipayData = await alipay2.transfer({
 					account: number,
 					name,
 					money,
@@ -217,7 +208,7 @@ remittanceRouter
 					uid: fund.admin.appointed[0],
 					otherInfo: {
 						paymentType: 'alipay',
-						transactionNumber: alipayData.alipayId,
+						transactionNumber: alipayData.orderId,
 						name,
 						account: number
 					}
@@ -236,21 +227,12 @@ remittanceRouter
 				});
 				await newReport.save();
 			} catch (err) {
-				const {subCode} = err;
+				const errorInfo = err.message;
 				const updateObj = {};
-				if(['PAYEE_USER_INFO_ERROR', 'PAYEE_NOT_EXIST'].includes(subCode)) {
-					updateObj['lock.submitted'] = false;
-				}
 				const documentId = await db.SettingModel.operateSystemID('fundDocuments', 1);
-				let description;
-				for(let a of transferError) {
-					if(a.subCode === subCode) {
-						description = a.description;
-						break;
-					}
-				}
+				let description = errorInfo;
 				remittance[0].status = false;
-				remittance[0].subCode = subCode;
+				remittance[0].subCode = description;
 				remittance[0].description = description;
 				updateObj.remittance = remittance;
 				const newDocument = db.FundDocumentModel({

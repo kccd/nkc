@@ -84,6 +84,7 @@ window.PostOption = new Vue({
   methods: {
     getUrl: NKC.methods.tools.getUrl,
     format: NKC.methods.format,
+    visitUrl: NKC.methods.visitUrl,
     clickElement(e) {
       e.stopPropagation();
     },
