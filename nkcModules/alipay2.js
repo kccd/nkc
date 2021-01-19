@@ -52,7 +52,7 @@ if(fs.existsSync(alipayCertPublicKeyPath)) {
 if(fs.existsSync(alipayRootCertPath)) {
   alipayRootCert = fs.readFileSync(alipayRootCertPath).toString();
 }
-if(appCertPublicKeyPath) {
+if(fs.existsSync(appCertPublicKeyPath)) {
   appCertPublicKey = fs.readFileSync(appCertPublicKeyPath).toString();
 }
 
@@ -63,15 +63,7 @@ func.getDonationDirectAlipay = () => {
 }
 
 const AlipaySdk = require('alipay-sdk').default;
-const alipaySDK = new AlipaySdk({
-  appId: transfer.app_id,
-  privateKey: privateKey,
-  keyType: 'PKCS1',
-  signType: 'RSA2',
-  alipayPublicCertContent: alipayCertPublicKey,
-  appCertContent: appCertPublicKey,
-  alipayRootCertContent: alipayRootCert,
-});
+let alipaySDK;
 
 /*
   单笔转账到支付宝账户
@@ -86,13 +78,25 @@ const alipaySDK = new AlipaySdk({
 // 20201210 升级接口 transfer
 // 文档地址 https://opendocs.alipay.com/apis/api_28/alipay.fund.trans.uni.transfer
 func.transfer = async (o) => {
+
+  if(!alipaySDK) {
+    alipaySDK = new AlipaySdk({
+      appId: transfer.app_id,
+      privateKey: privateKey,
+      keyType: 'PKCS1',
+      signType: 'RSA2',
+      alipayPublicCertContent: alipayCertPublicKey,
+      appCertContent: appCertPublicKey,
+      alipayRootCertContent: alipayRootCert,
+    });
+  }
+
   const {account, name, id, money, notes} = o;
   if(!account) throwErr('收款方支付宝账号不能为空');
   if(!id) throwErr('支付宝转账ID不能为空');
   if(!name) throwErr('收款方真实姓名不能为空');
   if(!money || money <= 0.1) throwErr('支付宝转账金额不能小于0.1');
   if(!notes) throwErr('转账备注不能为空');
-
   const params = {
     trans_amount: money,
     product_code: 'TRANS_ACCOUNT_NO_PWD',
