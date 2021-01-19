@@ -31,14 +31,29 @@ const receiptConfig = {
   sign_type: 'MD5'
 };
 
-let privateKey = '', publicKey = '';
+
+
+let privateKey = '', publicKey = '', alipayCertPublicKey = '', alipayRootCert = '', appCertPublicKey = '';
 const privateKeyPath = path.resolve(__dirname, '../key/rsa_private_key.pem');
-const publicKeyPath = path.resolve(__dirname, '../key/alipay_public_key.pem');
+const publicKeyPath = path.resolve(__dirname, '../key/rsa_public_key.pem');
+const alipayCertPublicKeyPath = path.resolve(__dirname, '../key/alipayCertPublicKey_RSA2.crt');
+const appCertPublicKeyPath = path.resolve(__dirname, '../key/appCertPublicKey.crt');
+const alipayRootCertPath = path.resolve(__dirname, '../key/alipayRootCert.crt');
 if(fs.existsSync(privateKeyPath)) {
-  privateKey = fs.readFileSync(privateKeyPath);
+  privateKey = fs.readFileSync(privateKeyPath).toString();
 }
 if(fs.existsSync(publicKeyPath)) {
-  publicKey = fs.readFileSync(publicKeyPath);
+  publicKey = fs.readFileSync(publicKeyPath).toString();
+}
+
+if(fs.existsSync(alipayCertPublicKeyPath)) {
+  alipayCertPublicKey = fs.readFileSync(alipayCertPublicKeyPath).toString();
+}
+if(fs.existsSync(alipayRootCertPath)) {
+  alipayRootCert = fs.readFileSync(alipayRootCertPath).toString();
+}
+if(appCertPublicKeyPath) {
+  appCertPublicKey = fs.readFileSync(appCertPublicKeyPath).toString();
 }
 
 const func = {};
@@ -46,6 +61,17 @@ const func = {};
 func.getDonationDirectAlipay = () => {
   return directAlipay;
 }
+
+const AlipaySdk = require('alipay-sdk').default;
+const alipaySDK = new AlipaySdk({
+  appId: transfer.app_id,
+  privateKey: privateKey,
+  keyType: 'PKCS1',
+  signType: 'RSA2',
+  alipayPublicCertContent: alipayCertPublicKey,
+  appCertContent: appCertPublicKey,
+  alipayRootCertContent: alipayRootCert,
+});
 
 /*
   单笔转账到支付宝账户
@@ -66,6 +92,7 @@ func.transfer = async (o) => {
   if(!name) throwErr('收款方真实姓名不能为空');
   if(!money || money <= 0.1) throwErr('支付宝转账金额不能小于0.1');
   if(!notes) throwErr('转账备注不能为空');
+
   const params = {
     trans_amount: money,
     product_code: 'TRANS_ACCOUNT_NO_PWD',
@@ -79,6 +106,46 @@ func.transfer = async (o) => {
     biz_scene: 'DIRECT_TRANSFER',
     remark: notes // 转账备注
   };
+
+  return new Promise((resolve, reject) => {
+    alipaySDK.exec(`alipay.fund.trans.uni.transfer`, {
+      charset: 'UTF-8',
+      biz_content: JSON.stringify(params),
+      sign_type: 'RSA2',
+      timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+      version: '1.0'
+    })
+      .then(data => {
+        /*error{
+          code: '40002',
+          msg: 'Invalid Arguments',
+          subCode: 'isv.missing-app-cert-sn',
+          subMsg: '缺少应用公钥证书序列号'
+        }
+        success{
+          code: '10000',
+          msg: 'Success',
+          orderId: '111',
+          outBizNo: '111',
+          payFundOrderId: '111',
+          status: 'SUCCESS',
+          transDate: '2021-01-19 17:36:14'
+        }
+        */
+        const {code, msg, subCode, subMsg} = data;
+        if(code === '10000') {
+          resolve(data);
+        } else {
+          reject(new Error(`${msg} | ${subCode} | ${subMsg}`));
+        }
+      })
+      .catch(err => {
+        reject(err);
+      })
+  });
+
+
+
   const options = {
     app_id: transfer.app_id,
     biz_content: JSON.stringify(params),
@@ -97,6 +164,7 @@ func.transfer = async (o) => {
   return new Promise((resolve, reject) => {
     rp(link)
       .then((data) => {
+        console.log(data);
         try{
           data = JSON.parse(data);
         } catch(err) {

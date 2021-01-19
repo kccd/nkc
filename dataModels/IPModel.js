@@ -37,7 +37,7 @@ const schema = new Schema({
   collection: 'ips'
 });
 
-schema.statics.saveIpAndGetIpData = async (ip) => {
+schema.statics.saveIpAndGetIpData = async (ip = '') => {
   const SettingModel = mongoose.model('settings');
   const IPModel = mongoose.model('ips');
   ip = ip.trim();

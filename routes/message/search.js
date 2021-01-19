@@ -9,7 +9,7 @@ router
     // 两者皆存在时将通过uid查找的用户放到最前面（一个或不存在），将通过username查找的用户分页返回
     const {nkcModules, data, db, query} = ctx;
     let {uid, username, page = 0, type = 'search'} = query;
-
+    page = Number(page);
     const {user} = data;
 
     if(type === 'getPage') {
