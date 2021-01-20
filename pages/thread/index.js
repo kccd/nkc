@@ -501,6 +501,7 @@ function submit(tid) {
 			if(window.quotePostApp) {
 				window.quotePostApp.clear();
 			}
+			insertRenderedPost(data.renderedPost);
     	return screenTopAlert('发送成功');
     	/*if(NKC.configs.platform === 'reactNative') {
 				NKC.methods.visitUrlAndClose(data.redirect);
@@ -1262,52 +1263,10 @@ $(function() {
 		});
 		socket.on('connect', joinPostRoom)
 		socket.on('postMessage', function(data) {
-			// 排除自己的发表
-			if(NKC.configs.uid !== data.comment.uid) {
-				bulletComments.add(data.comment);
-			}
-			// 仅在最后一页时才动态插入内容
-			if(!threadData.isLastPage) return;
-			var JQDOM = $(data.html).find('.single-post-container');
-			JQDOM = JQDOM[0];
-			// 公式渲染
-			try{
-				MathJax.typesetPromise([JQDOM]);
-			} catch(err) {
-				console.log(err);
-			}
-
-			JQDOM = $(JQDOM)
-			var parentDom = $('.single-posts-container');
-			parentDom.append(JQDOM);
-			// 用户悬浮面板
-			floatUserPanel.initPanel();
-			// 分享
-			NKC.methods.initSharePanel();
-			// 表情
-			NKC.methods.initStickerViewer();
-			// 视频音频组件渲染
-			NKC.methods.initVideo();
-			// 操作
-			NKC.methods.initPostOption();
-			// 图片预览
-      if(!NKC.configs.isApp) NKC.methods.initImageViewer();
-			// 划词笔记
-			nkchl.push(new NKC.modules.NKCHL({
-				type: 'post',
-				targetId: data.comment.postId,
-				notes: []
-			}));
+			insertRenderedPost(data);
 		});
 		socket.on('commentMessage', function(data) {
-			if(NKC.configs.uid !== data.comment.uid) {
-				bulletComments.add(data.comment);
-			}
-			NKC.methods.insertComment(
-				data.parentCommentId,
-				data.parentPostId,
-				data.html
-			);
+			insertRenderedComment(data);
 		});
 		if(socket.connected) {
 			joinPostRoom();
@@ -1324,6 +1283,57 @@ function joinPostRoom() {
 	});
 }
 
+function insertRenderedPost(renderedPost) {
+	if(!renderedPost) return;
+// 排除自己的发表
+	if(renderedPost.comment && NKC.configs.uid !== renderedPost.comment.uid) {
+		bulletComments.add(renderedPost.comment);
+	}
+	// 仅在最后一页时才动态插入内容
+	if(!threadData.isLastPage) return;
+	var JQDOM = $(renderedPost.html).find('.single-post-container');
+	JQDOM = JQDOM[0];
+	// 公式渲染
+	try{
+		MathJax.typesetPromise([JQDOM]);
+	} catch(err) {
+		console.log(err);
+	}
+
+	JQDOM = $(JQDOM)
+	var parentDom = $('.single-posts-container');
+	parentDom.append(JQDOM);
+	// 用户悬浮面板
+	floatUserPanel.initPanel();
+	// 分享
+	NKC.methods.initSharePanel();
+	// 表情
+	NKC.methods.initStickerViewer();
+	// 视频音频组件渲染
+	NKC.methods.initVideo();
+	// 操作
+	NKC.methods.initPostOption();
+	// 图片预览
+	if(!NKC.configs.isApp) NKC.methods.initImageViewer();
+	// 划词笔记
+	nkchl.push(new NKC.modules.NKCHL({
+		type: 'post',
+		targetId: renderedPost.postId,
+		notes: []
+	}));
+}
+function insertRenderedComment(renderedComment) {
+	if(!renderedComment) return;
+	if(renderedComment.comment && NKC.configs.uid !== renderedComment.comment.uid) {
+		bulletComments.add(renderedComment.comment);
+	}
+	NKC.methods.insertComment(
+		renderedComment.parentCommentId,
+		renderedComment.parentPostId,
+		renderedComment.html
+	);
+}
 if (NKC.configs.platform === 'reactNative') {
 	window._userSelect = true;
 }
+

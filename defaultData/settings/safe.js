@@ -10,7 +10,7 @@ module.exports = {
     },
     phoneVerify: {
       enable: false,
-      interval: 7 * 24
+      interval: 90 * 24
     }
   }
 };

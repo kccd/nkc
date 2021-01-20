@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const PATH = require('path');
 const nkcRender = require('../nkcModules/nkcRender');
 const {htmlToPlain, renderHTML} = nkcRender;
 const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
@@ -1390,7 +1391,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       floor: post.step,
       cv: post.cv, // post内容版本
       toc: post.toc,
-      tlm: post.toc.toLocaleDateString() === post.tlm.toLocaleDateString()? null: post.tlm,
+      tlm: new Date(post.toc).getTime() === new Date(post.tlm).getTime()? null: post.tlm,
       count: post.postCount,
       title: post.t,
       content: post.c,
@@ -1474,7 +1475,7 @@ postSchema.statics.filterCommentsInfo = async (posts) => {
       tid: post.tid,
       cv: post.cv, // post内容版本
       toc: post.toc,
-      tlm: post.toc.toLocaleDateString() === post.tlm.toLocaleDateString()? null: post.tlm,
+      tlm: new Date(post.toc).getTime() === new Date(post.tlm).getTime()? null: post.tlm,
       content: post.c,
       vote: post.usersVote || null,
       reviewed: post.reviewed,
@@ -1531,4 +1532,58 @@ postSchema.statics.isModerator = async (uid, pid) => {
   return await ForumModel.isModerator(uid, post.mainForumsId);
 };
 
+/*
+* 渲染post用于socket推送
+* @param {String} pid postID
+* @return {String} html
+* @author pengxiguaa 2021-1-11
+* */
+postSchema.statics.renderSinglePostToHTML = async (pid) => {
+  const render = require('../nkcModules/render');
+  const PostModel = mongoose.model('posts');
+  const post = await PostModel.findOnly({
+    pid,
+  });
+  let postData = await PostModel.extendPost(post);
+  const parentCommentId = post.parentPostId;
+  let html;
+  if(!parentCommentId) {
+    postData = (await PostModel.filterPostsInfo([postData]))[0];
+    html = render(PATH.resolve(__dirname, `../pages/thread/singlePost/singlePostPage.pug`), {postData});
+  } else {
+    postData = (await PostModel.filterCommentsInfo([postData]))[0];
+    html = render(PATH.resolve(__dirname, `../pages/thread/singleComment/singleCommentPage.pug`), {postData});
+  }
+  return html;
+}
+
+/*
+* 获取推送post的事件名称
+* */
+postSchema.statics.getSocketEventName = async (pid) => {
+  const PostModel = mongoose.model('posts');
+  const post = await PostModel.findOnly({pid}, {parentPostId: 1});
+  return post.parentPostId? 'commentMessage': 'postMessage';
+}
+
+/*
+* 获取单条post动态渲染推送的数据
+* */
+postSchema.statics.getSocketSinglePostData = async (pid) => {
+  const PostModel = mongoose.model('posts');
+  const post = await PostModel.findOnly({
+    pid,
+  });
+  const parentCommentId = post.parentPostId;
+  const parentPostId = post.parentPostsId[0];
+  const comment = await PostModel.getSocketCommentByPid(post);
+  const html = await PostModel.renderSinglePostToHTML(post.pid);
+  return {
+    parentCommentId,
+    parentPostId,
+    comment,
+    html,
+    post
+  };
+}
 module.exports = mongoose.model('posts', postSchema);

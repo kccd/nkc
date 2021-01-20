@@ -21,7 +21,6 @@ router
     const {
       newUseWordGroup      // 里面是敏感词组组名组成的数组
     } = body;
-    console.log(newUseWordGroup);
     if(newUseWordGroup instanceof Array) {
       await db.ForumModel.update({ fid: forum.fid }, {
         keywordReviewUseGroup: newUseWordGroup

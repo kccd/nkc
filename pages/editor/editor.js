@@ -123,6 +123,10 @@ function initVueApp() {
       editor.addListener("contentChange", function() {
         this_.watchContentChange();
       });
+      data.mainForums = data.mainForums || [];
+      for(var i = 0; i < data.mainForums.length; i++) {
+        this_.initForumCategory(data.mainForums[i]);
+      }
       this.selectedForums = data.mainForums || [];
       this.thread = data.thread;
       this.post = data.post;
@@ -425,6 +429,12 @@ function initVueApp() {
             contractCode: ""
           }
         });
+      },
+      // 如果专业不存在文章分类，则默认选择不分类
+      initForumCategory: function(f) {
+        if(!f.forum.threadTypes || !f.forum.threadTypes.length) {
+          f.cid = '';
+        }
       },
       // 上/下移动作者信息
       moveAuthor: function(index, type) {
@@ -766,7 +776,8 @@ function initVueApp() {
           .then(function(data) {
             self.showCloseInfo = false;
             if(NKC.configs.platform === 'reactNative') {
-              NKC.methods.visitUrlAndClose(data.redirect);
+              // NKC.methods.visitUrlAndClose(data.redirect);
+              self.visitUrl(data.redirect || "/");
             } else if(NKC.configs.platform === 'apiCloud') {
               self.visitUrl(data.redirect || "/");
               setTimeout(function() {

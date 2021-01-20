@@ -24,6 +24,8 @@ const hideRouter = require("./hide");
 const forumRouter = require("./forum");
 // 手机号验证
 const phoneVerifyRouter = require("./phoneVerify");
+// 查询可能存在的小号
+const altRouter = require('./alt');
 
 
 userRouter
@@ -523,5 +525,6 @@ userRouter
   .use("/:uid/violationRecord", violationRouter.routes(), violationRouter.allowedMethods())
   .use("/:uid/hide", hideRouter.routes(), hideRouter.allowedMethods())
   .use("/:uid/forum", forumRouter.routes(), forumRouter.allowedMethods())
-  .use("/:uid/phoneVerify", phoneVerifyRouter.routes(), phoneVerifyRouter.allowedMethods());
+  .use("/:uid/phoneVerify", phoneVerifyRouter.routes(), phoneVerifyRouter.allowedMethods())
+  .use("/:uid/alt", altRouter.routes(), altRouter.allowedMethods());
 module.exports = userRouter;

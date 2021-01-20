@@ -422,7 +422,17 @@ block content
                 | &nbsp;或者&nbsp;
                 a.pointer(onclick="NKC.methods.toLogin('register')") 注册
                 | 。
-          +floatForumNav(data.threadNav)
+          -var floatCategories = [];
+          for f in data.threadNav
+            -var {fid, name, cid} = f;
+            if cid
+              -floatCategories.push({fid, cid, displayName: name});
+          -var floatParentForums = [], floatParentForumsId = [];
+          for f in data.forumsNav
+            if f[0] && !floatParentForumsId.includes(f[0].fid)
+              -floatParentForums.push({fid: f[0].fid, displayName: f[0].displayName});
+              -floatParentForumsId.push(f[0].fid);
+          +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"

@@ -139,7 +139,7 @@ module.exports = {
     keyword: {
       enable: false,
       wordGroup: [
-        { name: "默认词组", keywords: [ "日你仙人" ] }
+        {name: "默认词组", keywords: []}
       ],
       condition: {
         leastKeywordTimes: 1,

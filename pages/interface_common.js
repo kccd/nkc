@@ -37,6 +37,7 @@ if (!HTMLCanvasElement.prototype.toBlob) {
 * @author pengxiguaa 2019-7-26
 * */
 function generalRequest(type, url, method, data, progress) {
+  data = data || {};
   return new Promise(function(resolve, reject) {
     var e_;
     var xhr = new XMLHttpRequest();

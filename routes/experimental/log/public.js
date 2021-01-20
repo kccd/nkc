@@ -22,7 +22,14 @@ router
       searchMap.ip = c.ip;
     }
     if(c.uid) {
-      searchMap.uid = c.uid;
+      const asUsername = await db.UserModel.findOne({usernameLowerCase: c.uid.toLowerCase()}, {uid: 1});
+      const asUserId = await db.UserModel.findOne({uid: c.uid}, {uid: 1});
+      let userIdArr = [];
+      if(asUsername) userIdArr.push(asUsername.uid);
+      if(asUserId) userIdArr.push(asUserId.uid);
+      searchMap.uid = {
+        $in: userIdArr
+      };
     }
     if(c.operationId) {
       searchMap.operationId = c.operationId;

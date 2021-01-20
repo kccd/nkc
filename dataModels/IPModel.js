@@ -37,7 +37,7 @@ const schema = new Schema({
   collection: 'ips'
 });
 
-schema.statics.saveIpAndGetIpData = async (ip) => {
+schema.statics.saveIpAndGetIpData = async (ip = '') => {
   const SettingModel = mongoose.model('settings');
   const IPModel = mongoose.model('ips');
   ip = ip.trim();
@@ -153,14 +153,21 @@ schema.statics.getIPInfoByIP= async (ip) => {
 * */
 schema.statics.getIPInfoFromLocal = async (ip, hideServiceProvider = false) => {
   const apiFunction = require('../nkcModules/apiFunction');
-  let {region} = await apiFunction.getIpInfoFromLocalModule(ip);
-  region = region.split('|').filter(v => v !== "0");
-  if(hideServiceProvider) {
-    region.pop();
+  let location = '';
+  try{
+    let {region} = await apiFunction.getIpInfoFromLocalModule(ip);
+    region = region.split('|').filter(v => v !== "0");
+    if(hideServiceProvider) {
+      region.pop();
+    }
+    location = region.join(' ');
+  } catch(err) {
+    location = `${err.message || err.stack || err}`;
   }
+
   return {
     ip,
-    location: region.join(' ')
+    location,
   };
 };
 module.exports = mongoose.model('ips', schema);

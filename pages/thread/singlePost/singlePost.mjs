@@ -379,11 +379,19 @@ class SinglePostModule {
           }
         })
       })
-      .then(() => {
+      .then((data) => {
         screenTopAlert('发表成功');
+        const renderedComment = data.renderedPost;
         self.clearEditorContent(pid);
         self.changeEditorButtonStatus(pid, false);
         self.switchCommentForm(pid);
+        if(renderedComment) {
+          self.insertComment(
+            renderedComment.parentCommentId,
+            renderedComment.parentPostId,
+            renderedComment.html
+          );
+        }
       })
       .catch(err => {
         sweetError(err);
