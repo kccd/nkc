@@ -20,15 +20,19 @@ module.exports = async (io) => {
     const {data, address, query, util} = socket.NKC;
     const {user} = data;
 
+    if(!user) {
+      return await util.connect.disconnectSocket(socket);
+    }
+
     // socket连接数量限制
-    const roomName = user? `user/${user.uid}`: `visitor/${address}`;
+    const roomName = await util.getRoomName('user', user.uid);
     const clients = await util.getRoomClientsId(io, roomName);
-    if(clients.length >= 10) {
-      let num = clients.length - 9;
-      for(let i = 0; i < num; i++) {
-        if(io.connected[clients[i]]) {
-          io.connected[clients[i]].disconnect(true);
-        }
+    const maxCount = 2;
+    for(let i = 0; i < (clients.length - maxCount + 1); i++) {
+      try{
+        await io.adapter.remoteDisconnect(clients[i], true);
+      } catch(err) {
+        console.log(err.message);
       }
     }
     // 平台判断
@@ -44,9 +48,6 @@ module.exports = async (io) => {
       }
     });
 
-    if(!socket.NKC.data.user) {
-      return await util.connect.disconnectSocket(socket);
-    }
     await message(socket, io);
 
     socket.on('joinRoom', async res => {
