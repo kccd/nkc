@@ -44,7 +44,7 @@ block content
                       a(onclick=` clearUserInfo("${data.targetUser.uid}", "description")`) 删除简介
             .user-banner-mask
             a(href=tools.getUrl('userAvatar', data.targetUser.avatar, 'lg') target="_blank").user-avatar
-              img(src=tools.getUrl('userAvatar', data.targetUser.avatar))
+              img(src=tools.getUrl('userAvatar', data.targetUser.avatar) style=(data.targetUser.certs.indexOf('banned') >= 0 ? "filter: grayscale(1);": ""))
             .user-banner(style=`background-image: url(${tools.getUrl('userBanner', data.targetUser.banner)});`)
           //- 用户名显示
           .user-name
