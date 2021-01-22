@@ -1,4 +1,10 @@
 var data = NKC.methods.getDataById("data");
+var wordGroup = data.reviewSettings.keyword.wordGroup;
+for(var i in wordGroup) {
+  wordGroup[i].status = "display";
+  wordGroup[i].input = "";
+}
+
 var app = new Vue({
   el: "#app",
   data: {
@@ -309,6 +315,9 @@ var app = new Vue({
     },
     // 选择了关键词文件
     keywordFile: function(file) {
+      var breakFilename = file.name.split(".");
+      if(breakFilename.length > 1) breakFilename.pop();
+      var groupName = breakFilename.join(".");
       var self = this;
       var reader = new FileReader();
       reader.readAsText(file);
@@ -318,20 +327,107 @@ var app = new Vue({
           return sweetWarning("无新的关键字");
         }
         self.newWordGroupKeywords = keywords;
-        // sweetConfirm("即将导入以下新关键字:\n" + filetedKeywords.join("、") + "\n确认导入?")
-        //   .then(function() {
-        //     return nkcAPI("/e/settings/review/keyword", "PUT", {
-        //       type: "addKeyword",
-        //       value: filetedKeywords
-        //     })
-        //   })
-        //   .then(() => {
-        //     sweetAlert("添加成功");
-        //     for(var newKeyword of filetedKeywords)
-        //       self.reviewSettings.keyword.list.push(newKeyword);
-        //   })
-        //   .catch(sweetError)
+        if(!self.newWordGroupName) {
+          self.newWordGroupName = groupName;
+        }
       }
+    },
+    // 添加关键词
+    addKeyword: function(groupIndex) {
+      var self= this;
+      var wordGroup = this.wordGroup;
+      var input = wordGroup[groupIndex].input;
+      var keywords = input.split(/\s+/);
+      sweetConfirm("确认向本组("+ wordGroup[groupIndex].name +")添加以下敏感词吗?:" + keywords.join("、"))
+        .then(function() {
+          return nkcAPI("/e/settings/review/keyword", "PUT", {
+            type: "addKeywords",
+            value: {
+              name: wordGroup[groupIndex].name,
+              keywords
+            }
+          })
+        })
+        .then(function(data) {
+          var added = data.added;
+          var addedCount = added.length;
+          for(var i in added) {
+            var newKeyword = added[i];
+            wordGroup[groupIndex].keywords.push(newKeyword);
+          }
+          self.cancelKeywordOperating(groupIndex);
+          setTimeout(function() {
+            $(self.$refs["keywordCount"+groupIndex][0]).attr("data-add-number", "+" + addedCount);
+          }, 50);
+          if(addedCount) {
+            return sweetAlert("已添加: " + added.join("、"))
+          } else {
+            return sweetAlert("没有添加新的敏感词");
+          }
+        })
+        .catch(sweetError);
+    },
+    // 删除关键词
+    deleteKeyword: function(groupIndex) {
+      var self = this;
+      var wordGroup = this.wordGroup;
+      var input = wordGroup[groupIndex].input;
+      var keywords = input.split(/\s+/);
+      sweetConfirm("确认删除本组("+ wordGroup[groupIndex].name +")中的以下敏感词吗?:" + keywords.join("、"))
+        .then(function() {
+          return nkcAPI("/e/settings/review/keyword", "PUT", {
+            type: "deleteKeywords",
+            value: {
+              name: wordGroup[groupIndex].name,
+              keywords
+            }
+          })
+        })
+        .then(function(data) {
+          var deleted = data.deleted;
+          var deletedCount = deleted.length;
+          for(var i in deleted) {
+            var deleteKeyword = deleted[i];
+            var group = wordGroup[groupIndex];
+            var index = group.keywords.indexOf(deleteKeyword);
+            if(index >= 0) {
+              group.keywords.splice(index, 1);
+            }
+          }
+          self.cancelKeywordOperating(groupIndex);
+          setTimeout(function() {
+            $(self.$refs["keywordCount"+groupIndex][0]).attr("data-add-number", "-" + deletedCount);
+          }, 50);
+          if(deletedCount) {
+            sweetAlert("已删除: " + deleted.join("、"))
+          } else {
+            sweetAlert("没有删除任何敏感词")
+          }
+        })
+        .catch(sweetError);
+    },
+    // 关键字操作
+    keywordOperating: function(groupIndex) {
+      var wordGroup = this.wordGroup;
+      for(var i in wordGroup) {
+        this.cancelKeywordOperating(i);
+      }
+      wordGroup[groupIndex].status = "add";
+    },
+    // 取消关键字操作
+    cancelKeywordOperating: function(groupIndex) {
+      var wordGroup = this.wordGroup;
+      wordGroup[groupIndex].status = "display";
+      wordGroup[groupIndex].input = "";
+    },
+    // 导出一个组的所有敏感词
+    exportWordGroup: function(groupIndex) {
+      var group = this.wordGroup[groupIndex];
+      var content = group.keywords.join("\n");
+      var downloader = document.createElement("a");
+      downloader.setAttribute("href", "data:text/plain;charset=utf-8," + content);
+      downloader.setAttribute("download", "敏感词组_" + group.name + ".txt");
+      downloader.click();
     }
   }
 });
