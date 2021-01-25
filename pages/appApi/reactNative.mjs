@@ -38,7 +38,7 @@ function urlPathEval(fromUrl, toUrl) {
 
 
 
-document.body.addEventListener('click', (e)  => {
+document.addEventListener('click', (e)  => {
   const target = e.target;
   const targetNodeName = target.nodeName.toLowerCase();
   const dataType = target.getAttribute('data-type');
