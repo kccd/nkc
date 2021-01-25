@@ -105,7 +105,7 @@ NKC.modules.downloadResource = class {
             .then(() => {
               let downloader = document.createElement("a");
               downloader.setAttribute("download", fileName);
-              downloader.href = `/r/${rid}`;
+              downloader.href = `/r/${rid}?d=attachment`;
               downloader.click();
             })
             .catch(sweetError)
@@ -115,7 +115,7 @@ NKC.modules.downloadResource = class {
           let {rid, fileName} = this;
           let downloader = document.createElement("a");
           downloader.setAttribute("download", fileName);
-          downloader.href = `/r/${rid}`;
+          downloader.href = `/r/${rid}?d=attachment`;
           downloader.click();
         },
         open(rid) {

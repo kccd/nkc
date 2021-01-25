@@ -84,7 +84,7 @@ var Tools = function() {
       }
       // 用户上传的附件
       case "resource": {
-        return "/r/" + id
+        return "/r/" + id + t
       }
       // 其他资源，包含avatar, banner等等
       case "attach": {

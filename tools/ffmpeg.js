@@ -7,8 +7,11 @@ const {platform} = require('os');
 const fs = require('fs');
 const {stat, unlink} = fs;
 const path = require('path');
+const PATH = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const {upload} = require('../settings');
+const videoSettings = require('../settings/video');
+const ff = require('fluent-ffmpeg');
 
 const fontFilePath = settings.statics.fontNotoSansHansMedium;
 const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");
@@ -22,6 +25,8 @@ const bitrateAndFPSControlParameter = [
   '-minrate', '1M',                                             /* 最小码率 */
   '-b:v', '1.16M',                                              /* 平均码率 */
 ];
+
+
 
 const spawnProcess = (pathName, args, options = {}) => {
   return new Promise((resolve, reject) => {
@@ -321,8 +326,60 @@ async function addImageTextWaterMaskForImage(op) {
   ], additionOptions)
 }
 
+/*
+* 生成指定分辨率的视频
+* @param {String} inputFile 原视频磁盘路径
+* @param {String} outputFile 生成视频的磁盘路径
+* @param {Object} props
+*   @param {Number} height 目标视频高
+*   @param {Number} fps
+*   @param {Number} bitrate 单位Kbps
+* @author pengxiguaa 2021-01-22
+* */
+async function createOtherSizeVideo(inputFile, outputFile, props) {
+  const {height, bitrate, fps} = props;
+  return new Promise((resolve, reject) => {
+    ff(inputFile)
+      .fps(fps)
+      .size(`?x${height}`)
+      .videoBitrate(bitrate + 'k')
+      .output(outputFile)
+      .on('end', resolve)
+      .on('error', reject)
+      .run()
+  });
+}
+/*
+* 获取视频信息
+* @param {String} inputFilePath 视频路径
+* @return {Object}
+*   @param {Object} format
+*     @param {}
+* */
+async function getVideoInfo(inputFilePath) {
+  return new Promise((resolve, reject) => {
+    ff.ffprobe(inputFilePath, (err, metadata) => {
+      if(err) return reject(err);
+      const {streams} = metadata;
+      const {
+        width, height, r_frame_rate, duration, bit_rate, display_aspect_ratio
+      } = streams[0];
+      const arr = r_frame_rate.split('/');
+      resolve({
+        width,
+        height,
+        duration,
+        bitRate: bit_rate,
+        displayAspectRatio: display_aspect_ratio,
+        fps: Number((arr[0] / arr[1]).toFixed(1))
+      });
+    });
+  })
+}
 
 module.exports = {
+  getVideoInfo,
+  createOtherSizeVideo,
   videoFirstThumbTaker,
   videoTranscode,
   videoAviTransAvi,
