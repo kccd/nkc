@@ -1,5 +1,5 @@
-const db = require("./dataModels");
-const tasks = require('./tasks');
+const db = require("../dataModels");
+const tasks = require('../tasks');
 const func = {};
 /*
 * 定时更新活跃用户的信息 主要是头像
