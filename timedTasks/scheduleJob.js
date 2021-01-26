@@ -5,14 +5,14 @@ const {fork} = require("child_process");
 const fs = require('fs');
 const fsPromise = fs.promises;
 const path = require('path');
-const mongodb = require('./config/mongodb');
+const mongodb = require('../config/mongodb');
 require('colors');
-
+const db = require("../dataModels");
 const {
   PostModel, ThreadModel, UserModel, ActiveUserModel,
   ShopOrdersModel, ShopRefundModel, ShopGoodsModel,
-  SettingModel
-} = require('./dataModels');
+  SettingModel, ForumModel
+} = db;
 
 const jobs = {};
 jobs.updateActiveUsers = cronStr => {
@@ -116,7 +116,6 @@ jobs.backupDatabase = () => {
 
 // 清除专业和文章上的今日更新
 jobs.clearForumAndThreadPostCount = () => {
-  const {ForumModel, ThreadModel} = require('./dataModels');
   scheduleJob(`0 0 0 * * *`, async () => {
     await ForumModel.updateMany({
       countPostsToday: {$ne: 0},
@@ -302,7 +301,7 @@ jobs.shop = () => {
 
 // 检查筹备专业
 jobs.preparationForumCheck = async () => {
-  const preparationForumCheck = require("./timedTasks/preparationForumCheck");
+  const preparationForumCheck = require("./preparationForumCheck");
   scheduleJob("0 0 4 * * *", async () => {
     await preparationForumCheck();
   });
@@ -310,7 +309,6 @@ jobs.preparationForumCheck = async () => {
 
 // 自动将退修未修改的文章移动到回收站
 jobs.moveRecycleMarkThreads = () => {
-  const ThreadModel = require("./dataModels/ThreadModel");
   scheduleJob("0 * * * * *", async () => {
     await ThreadModel.moveRecycleMarkThreads();
   });
@@ -331,7 +329,7 @@ const sleep = (t) => {
 * 清理文件上传缓存 24小时以前的缓存
 * */
 jobs.clearFileCache = async () => {
-  const {uploadDir} = require('./settings/upload');
+  const {uploadDir} = require('../settings/upload');
   scheduleJob("0 0 4 * * *", async () => {
     console.log(`正在清理文件缓存...`);
     let count = 0;
