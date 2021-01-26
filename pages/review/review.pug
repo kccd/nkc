@@ -41,6 +41,9 @@ block content
                     if index > 0
                       span ,
                     a(href=`/f/${f.fid}` target="_blank")=f.displayName
+                if r.reason
+                  .review-info 理由：
+                  span= r.reason
 
                 .review-info ，
                 .review-thread-title
@@ -57,6 +60,9 @@ block content
                     if index > 0
                       span ,
                     a(href=`/f/${f.fid}` target="_blank")=f.displayName
+                if r.reason
+                  .review-info 理由：
+                  span= r.reason
               if r.post.abstractCn
                 .review-post-content=`中文摘要：${r.post.abstractCn}`
               if r.post.abstractEn

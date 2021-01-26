@@ -366,6 +366,12 @@ threadRouter
 		// 拓展回复信息
     data.posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     data.posts = await db.PostModel.filterPostsInfo(data.posts);
+    // 回复是否是待审核状态，是的话读取送审原因
+    data.posts = await Promise.all(data.posts.map(async (post) => {
+      const reviewRecord = await db.ReviewModel.findOne({pid: post.pid}).sort({toc: -1});
+      post.reviewReason = reviewRecord? reviewRecord.reason : "";
+      return post;
+    }));
     // 获取置顶文章
     if(paging.page === 0 && thread.toppedPostsId && thread.toppedPostsId.length) {
       match.pid = {$in: thread.toppedPostsId};
@@ -444,7 +450,13 @@ threadRouter
       thread.uid = "";
     }
 		// 文章访问量加1
-		await thread.update({$inc: {hits: 1}});
+    await thread.update({$inc: {hits: 1}});
+    
+    // 如果是待审核，取出审核原因
+    if(!firstPost.reviewed) {
+      const reviewRecord = await db.ReviewModel.findOne({tid: firstPost.tid}).sort({toc: -1});
+      data.threadReviewReason = reviewRecord? reviewRecord.reason : "";
+    }
 
 		data.thread = thread;
 		data.forums = forums;
@@ -791,9 +803,11 @@ threadRouter
 		const _post = await thread.newPost(post, user, ctx.address);
 
     // 是否需要审核
-    let needReview =
-      await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
-      || await db.ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
+    // let needReview =
+    //   await db.UserModel.contentNeedReview(user.uid, "post")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
+    //   || await db.ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
+    // 自动送审
+    const needReview = await db.ReviewModel.autoPushToReview(_post);
     if(!needReview) {
       await db.PostModel.updateOne({pid: _post.pid}, {$set: {reviewed: true}});
       _post.reviewed = true;
