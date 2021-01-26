@@ -3,7 +3,7 @@ let opened = false;
 window.payForDownloadResource = function(rid) {
   let a = document.createElement("a");
   if(opened) {
-    a.href = `/r/${rid}?t=attachment&random=${Math.random()}`;
+    a.href = `/r/${rid}?d=attachment&random=${Math.random()}`;
   }else {
     a.href = `/r/${rid}?c=download&random=${Math.random()}`;
     a.setAttributeNode(document.createAttribute("download"));

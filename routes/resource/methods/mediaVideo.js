@@ -8,6 +8,9 @@ const {AttachmentModel, ColumnModel, SettingModel} = require("../../../dataModel
 const imageMagick = require("../../../tools/imageMagick");
 const ffmpeg = require("../../../tools/ffmpeg");
 const Path = require('path');
+const videoSize = require('../../../settings/video');
+const fs = require('fs');
+const fsPromises = fs.promises;
 
 module.exports = async (options) => {
   let {file, resource, user} = options;
@@ -257,6 +260,55 @@ module.exports = async (options) => {
   const videoCoverInfo = await imageMagick.info(videoCoverPath);
   let height = videoCoverInfo.height;
   let width = videoCoverInfo.width;
+
+  // 生成其他尺寸的视频文件
+  // 读取视频尺寸配置
+  const {sd, hd, fhd} = videoSize;
+  // 获取原视频尺寸
+  const {width: originWidth, height: originHeight} = await ffmpeg.getVideoInfo(outputVideoPath);
+  // 各个尺寸视频路径
+  const sdVideoPath = Path.resolve(videoDir, `./${rid}_sd.mp4`);
+  const hdVideoPath = Path.resolve(videoDir, `./${rid}_hd.mp4`);
+  const fhdVideoPath = Path.resolve(videoDir, `./${rid}_fhd.mp4`);
+  // 各个尺寸视频的宽度
+  const widthSD = sd.height * originWidth / originHeight;
+  const widthHD = hd.height * originWidth / originHeight;
+  const widthFHD = fhd.height * originWidth / originHeight;
+  // 各个视频的比特率
+  const bitrateSD = await SettingModel.getBitrateBySize(widthSD, sd.height);
+  const bitrateHD = await SettingModel.getBitrateBySize(widthHD, hd.height);
+  const bitrateFHD = await SettingModel.getBitrateBySize(widthFHD, fhd.height);
+
+  if(originHeight < hd.height) {
+    // 原视频小于720，则将其设置为480
+    await fsPromises.rename(outputVideoPath, sdVideoPath);
+  } else if(originHeight < fhd.height) {
+    // 原视频大于等于720且小于1080，则将其设置为720并生成480的视频
+    const newOutputVideoPath = hdVideoPath;
+    await fsPromises.rename(outputVideoPath, newOutputVideoPath);
+    await ffmpeg.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
+      height: sd.height,
+      bitrate: bitrateSD,
+      fps: sd.fps
+    });
+  } else {
+    // 原视频大于等于1080，则将其设置为1080并生成720和480的视频
+    const newOutputVideoPath = fhdVideoPath;
+    await fsPromises.rename(outputVideoPath, newOutputVideoPath);
+    const tasks = [
+      ffmpeg.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
+        height: sd.height,
+        bitrate: bitrateSD,
+        fps: sd.fps
+      }),
+      ffmpeg.createOtherSizeVideo(newOutputVideoPath, hdVideoPath, {
+        height: hd.height,
+        bitrate: bitrateHD,
+        fps: hd.fps
+      })
+    ];
+    await Promise.all(tasks);
+  }
 
   // 更新数据库记录 inProcess改为 usable
   await resource.update({

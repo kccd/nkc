@@ -5,7 +5,7 @@ const func = async (socket, next) => {
   const {handshake, NKC} = socket;
   const {db, data} = NKC;
   let userOperationsId, userRoles = [], userGrade, user;
-  const cookies = new Cookies(handshake.headers.cookie, {
+  const cookies = new Cookies(handshake.headers.cookie || handshake.query.secret, {
     keys: [cookieConfig.secret]
   });
   let userInfo = cookies.get('userInfo', {
