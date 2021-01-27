@@ -5,12 +5,6 @@ process.on('uncaughtException', function (err) {
   console.log(err.stack || err.message || err);
 });
 
-// 启动测试环境相关工具
-if(global.NKC.isDevelopment) {
-  require('./timedTask');
-  require('./watch.js');
-}
-
 require('colors');
 const http = require('http'),
   redisClient = require('./settings/redisClient'),
@@ -18,7 +12,6 @@ const http = require('http'),
   elasticSearch = require("./nkcModules/elasticSearch"),
   redLock = require('./nkcModules/redLock'),
   serverConfig = require('./config/server'),
-  socket = require('./socket'),
   {
     RoleModel,
     ForumModel,
@@ -40,15 +33,15 @@ const start = async () => {
   try {
     const startTime = global.NKC.startTime;
     const startTimeKey = `server:start:time`;
-    const lock = await redLock.lock(`server:start`, 60000);
+    const lock = await redLock.lock(`server:start`, 30 * 1000);
     const _startTime = await redisClient.getAsync(startTimeKey);
-    if(_startTime < startTime - 10000) {
-      console.log(`进程 ${global.NKC.processId} 正在更新缓存...`.green);
+    if(!_startTime || _startTime < startTime - 10000) {
+      console.log(`updating cache...`.green);
       await redisClient.setAsync(startTimeKey, startTime);
       const cacheBaseInfo = require('./redis/cache');
       await dataInit();
       await cacheBaseInfo();
-      console.log(`进程 ${global.NKC.processId} 缓存更新完成，正在启动其他进程...`.green);
+      console.log(`starting service...`.green);
     }
     await lock.unlock();
     await elasticSearch.init();
@@ -59,14 +52,21 @@ const start = async () => {
     server = http.createServer(app);
     server.keepAliveTimeout = 10 * 1000;
     server.listen(port, address, async () => {
-      await socket(server);
-      console.log(`NKC进程 ${global.NKC.processId} 启动成功 ${address}:${port}`.green);
+      console.log(`nkc service ${global.NKC.processId} is running at ${address}:${port}`.green);
     });
+
+    // 启动测试环境相关工具
+    if(global.NKC.isDevelopment) {
+      const socket = require('./socket/index');
+      await socket(server)
+      require('./timedTask');
+      require('./watch.js');
+    }
 
     process.on('message', function(msg) {
       if (msg === 'shutdown') {
         server.close();
-        console.log(`NKC进程 ${global.NKC.processId} 已停止运行`.green);
+        console.log(`nkc service ${global.NKC.processId} has stopped`.green);
         process.exit(0);
       }
     });

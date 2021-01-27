@@ -13,7 +13,7 @@ func.cacheActiveUsers = async () => {
     } finally {
       await func.cacheActiveUsers();
     }
-  }, 2 * 60 * 1000);
+  }, 10 * 60 * 1000);
 };
 
 func.clearTimeoutPageCache = async () => {
@@ -130,5 +130,4 @@ func.updateForumsMessage = async () => {
     }
   }, 30 * 60 * 1000);
 };
-
 module.exports = func;

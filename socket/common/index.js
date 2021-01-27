@@ -1,13 +1,42 @@
 const db = require('../../dataModels');
 const message = require('./message');
+
+const CommunicationClient = require('../../microServices/communication/client');
+const communicationConfig = require('../../microServices/serviceConfigs/communication');
+
+const socketClient = new CommunicationClient({
+  serviceName: communicationConfig.servicesName.socket,
+  serviceId: global.NKC.processId
+});
+
 module.exports = async (io) => {
-  // 启动时修改所有用户的状态为离线
-  await db.UserModel.updateMany({online: true}, {
-    $set: {
-      online: false,
-      onlineType: ''
+  socketClient.onMessage((req) => {
+    const {from, content} = req;
+    const {roomName, data, eventName} = content;
+    let rooms = [];
+    if(typeof roomName === 'string') {
+      rooms.push(roomName)
+    } else {
+      for(const r of roomName) {
+        rooms.push(r);
+      }
     }
+    let _io = io;
+    for(const r of rooms) {
+      _io = _io.to(r);
+    }
+    _io.emit(eventName, data);
   });
+
+  // 启动时修改所有用户的状态为离线
+  if(global.NKC.processId === 0) {
+    await db.UserModel.updateMany({online: true}, {
+      $set: {
+        online: false,
+        onlineType: ''
+      }
+    });
+  }
   io.on('connection', async socket => {
     socket.on('error', async err => {
       console.error(err);
@@ -27,7 +56,7 @@ module.exports = async (io) => {
     // socket连接数量限制
     const roomName = await util.getRoomName('user', user.uid);
     const clients = await util.getRoomClientsId(io, roomName);
-    const maxCount = 2;
+    const maxCount = 10;
     for(let i = 0; i < (clients.length - maxCount + 1); i++) {
       try{
         await io.adapter.remoteDisconnect(clients[i], true);

@@ -2,7 +2,7 @@ var pageName = '', query = {
   operationId: NKC.configs.refererOperationId,
   data: NKC.configs.socketData || {},
 };
-var socket = io('http://socket.a.test:2172/common', {
+var socket = io('/common', {
   forceNew: false,
   reconnection: true,
   autoConnect: true,

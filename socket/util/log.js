@@ -2,6 +2,7 @@ const func = {};
 const moment = require("moment");
 require('colors');
 const languages = require('../../languages');
+const getRoomName = require('../util/getRoomName');
 
 func.onDisconnectedSocket = async socket => {
   const {data, address, query} = socket.NKC;
@@ -23,6 +24,14 @@ func.onDisconnectedSocket = async socket => {
       `${'/common'.bgBlue} ${'断开连接'.bgRed} ${address} ${operationName}`
     );
   }
+  socket.nsp.to(getRoomName('console')).emit('consoleMessage', {
+    consoleType: 'socket',
+    reqTime: Date.now(),
+    processId: global.NKC.processId,
+    url: `/`,
+    uid: user? user.uid: '',
+    connect: false
+  });
   /*socket.NKC.nkcModules.socket.sendConsoleMessage({
     consoleType: 'socket',
     reqTime: Date.now(),
@@ -53,7 +62,7 @@ func.onConnectedSocket = async socket => {
       `${'/common'.bgBlue} ${'连接成功'.bgGreen} ${address} ${operationName}`
     );
   }
-  socket.NKC.nkcModules.socket.sendConsoleMessage({
+  socket.nsp.to(getRoomName('console')).emit('consoleMessage', {
     consoleType: 'socket',
     reqTime: Date.now(),
     processId: global.NKC.processId,
@@ -61,5 +70,13 @@ func.onConnectedSocket = async socket => {
     uid: user? user.uid: '',
     connect: true
   });
+  /*socket.NKC.nkcModules.socket.sendConsoleMessage({
+    consoleType: 'socket',
+    reqTime: Date.now(),
+    processId: global.NKC.processId,
+    url: `/`,
+    uid: user? user.uid: '',
+    connect: true
+  });*/
 };
 module.exports = func;

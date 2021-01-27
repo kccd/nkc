@@ -26,8 +26,11 @@ const common = require('./common');
   global.NKC.io = namespace;
 }*/
 
-const run = async () => {
-  const server = http.createServer();
+module.exports = async (server) => {
+  const existed = !!server;
+  if(!existed) {
+    server = http.createServer();
+  }
   const io = socketIo(server, socketConfig.options);
   io.on('error', err => {
     console.log(err);
@@ -43,15 +46,14 @@ const run = async () => {
   await namespace.use(logger);
   await common(namespace);
 
-  server.listen(socketConfig.port, socketConfig.address, () => {
-    console.log(`SOCKET服务已启动 ${socketConfig.address}:${socketConfig.port}`);
-  });
+  if(!existed) {
+    const port = socketConfig.port + Number(global.NKC.processId);
+    server.listen(port, socketConfig.address, () => {
+      console.log(`socket service ${global.NKC.processId} is running at ${socketConfig.address}:${port}`.green);
+    });
+  } else {
+    console.log(`socket service is running`.green);
+  }
 };
-
-run()
-  .catch(err => {
-    console.log(`SOCKET服务启动失败`.red);
-    console.log((err.stack || err.message || err).red);
-  });
 
 

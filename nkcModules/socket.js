@@ -1,11 +1,25 @@
 const getRoomName = require('../socket/util/getRoomName');
+const CommunicationClient = require('../microServices/communication/client');
+const communicationConfig = require('../microServices/serviceConfigs/communication');
 const PATH = require('path');
 const db = require('../dataModels');
 const func = {};
 
-func.sendConsoleMessage = (data) => {
+const socketClient = new CommunicationClient({
+  serviceName: communicationConfig.servicesName.nkc,
+  serviceId: global.NKC.processId
+});
+
+const socketServiceName = communicationConfig.servicesName.socket;
+
+func.sendConsoleMessage = async (data) => {
   const roomName = getRoomName('console');
-  global.NKC.io.to(roomName).emit('consoleMessage', data);
+  socketClient.sendMessage(socketServiceName, {
+    eventName: 'consoleMessage',
+    roomName,
+    data
+  })
+  // global.NKC.io.to(roomName).emit('consoleMessage', data);
 };
 
 func.sendUserMessage = (channel, messageObject) => {
@@ -18,7 +32,12 @@ func.sendDataMessage = (uid, options) => {
     data = {}
   } = options;
   const roomName = getRoomName('user', uid);
-  global.NKC.io.to(roomName).emit(event, data);
+  socketClient.sendMessage(socketServiceName, {
+    roomName,
+    eventName: event,
+    data
+  });
+  // global.NKC.io.to(roomName).emit(event, data);
 }
 
 func.sendForumMessage = async (data) => {
@@ -39,13 +58,24 @@ func.sendForumMessage = async (data) => {
       if(usedForumsId.includes(forum.fid)) continue;
       const html = render(template, {singleThread: thread}, {...state, threadListStyle: forum.threadListStyle});
       const roomName = getRoomName('forum', forum.fid);
-      global.NKC.io.to(roomName).emit('forumMessage', {
+      socketClient.sendMessage(socketServiceName, {
+        eventName: 'forumMessage',
+        roomName,
+        data: {
+          html,
+          pid,
+          tid,
+          digest: thread.digest,
+          contentType,
+        }
+      });
+      /*global.NKC.io.to(roomName).emit('forumMessage', {
         html,
         pid,
         tid,
         digest: thread.digest,
         contentType,
-      });
+      });*/
       usedForumsId.push(forum.fid);
     }
   }
@@ -63,71 +93,132 @@ func.sendPostMessage = async (pid) => {
   const eventName = await db.PostModel.getSocketEventName(pid);
   const thread = await db.ThreadModel.findOnly({tid: post.tid});
   const roomName = getRoomName('post', thread.oc);
-  global.NKC.io.to(roomName).emit(eventName, {
+  socketClient.sendMessage(socketServiceName, {
+    roomName,
+    eventName,
+    data: {
+      postId: post.pid,
+      comment,
+      parentPostId,
+      parentCommentId,
+      html
+    }
+  });
+  /*global.NKC.io.to(roomName).emit(eventName, {
     postId: post.pid,
     comment,
     parentPostId,
     parentCommentId,
     html
-  });
+  });*/
 }
 
 
 // 发送消息到用户
 async function sendMessageToUser(channel, message) {
-  let {io} = global.NKC;
+  // let {io} = global.NKC;
   let userRoom = uid => getRoomName("user", uid);
   let userMessage = "message";
 
-  message.socketId = io.id;
+  // message.socketId = io.id;
+  message.socektId = '';
 
   try{
     message = JSON.parse(message);
     const _message = await db.MessageModel.extendMessage(undefined, message);
     message._message = _message;
+
+
     if(channel === 'withdrawn') {                         // 撤回信息
       const {r, s, _id} = message;
-      io
+      const sc = {
+        eventName: 'withdrawn',
+        roomName: [userRoom(r), userRoom(s)],
+        data: {
+          uid: s,
+          messageId: _id
+        }
+      };
+      socketClient.sendMessage(socketServiceName, sc);
+      /*io
         .to(userRoom(r))
         .to(userRoom(s))
         .emit(userMessage, {
           uid: s,
           messageId: _id
-        });
+        });*/
     } else if(channel === 'message') {
       const {ty, s, r} = message;
       if(ty === 'STE') {                                  // 系统通知，通知给所有人
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: null,
+          data: {
+            message
+          }
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .emit(userMessage, {
             message
-          });
+          });*/
       } else if(ty === 'STU') {                           // 系统提醒，提醒某一个用户
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: userRoom(r),
+          data: {
+            message
+          }
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .to(userRoom(r))
           .emit(userMessage, {
             message
-          });
+          });*/
       } else if(ty === 'UTU') {                            // 用户间的私信
         const sUser = await db.UserModel.findOne({uid: s});
         const rUser = await db.UserModel.findOne({uid: r});
         if(!sUser || !rUser) return;
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: userRoom(r),
+          data: {
+            user: sUser,
+            targetUser: rUser,
+            myUid: r,
+            message
+          }
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .to(userRoom(r))
           .emit(userMessage, {
             user: sUser,
             targetUser: rUser,
             myUid: r,
             message
-          });
+          });*/
         message._message.position = 'right';
-        io
+        const sc_s = {
+          eventName: userMessage,
+          roomName: userRoom(s),
+          data: {
+            user: sUser,
+            targetUser: rUser,
+            myUid: s,
+            message
+          }
+        };
+        socketClient.sendMessage(socketServiceName, sc_s);
+        /*io
           .to(userRoom(s))
           .emit(userMessage, {
             user: sUser,
             targetUser: rUser,
             myUid: s,
             message
-          });
+          });*/
       } else if(ty === 'friendsApplication') {           // 好友申请
         const {respondentId, applicantId} = message;
         const respondent = await db.UserModel.findOne({uid: respondentId});
@@ -144,40 +235,82 @@ async function sendMessageToUser(channel, message) {
             agree: message.agree
           }
         };
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: userRoom(respondentId),
+          data
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .to(userRoom(respondentId))
-          .emit(userMessage, data);
+          .emit(userMessage, data);*/
         if(message.c === 'agree') {
-          io
+          const sc = {
+            eventName: userMessage,
+            roomName: userRoom(applicantId),
+            data
+          };
+          socketClient.sendMessage(socketServiceName, sc);
+          /*io
             .to(userRoom(applicantId))
-            .emit(userMessage, data);
+            .emit(userMessage, data);*/
         }
       } else if(ty === 'deleteFriend') {         // 删除好友
         const {deleterId, deletedId} = message;
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: [userRoom(deleterId), userRoom(deletedId)],
+          data: {message}
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .to(userRoom(deleterId))
           .to(userRoom(deletedId))
-          .emit(userMessage, {message});
+          .emit(userMessage, {message});*/
       } else if(ty === 'modifyFriend') {         // 修改好友设置
         const {friend} = message;
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: userRoom(friend.uid),
+          data: {message}
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .to(userRoom(friend.uid))
-          .emit(userMessage, {message});
+          .emit(userMessage, {message});*/
       } else if(ty === 'removeChat') {           // 删除与好友的聊天
         const {deleterId} = message;
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: userRoom(deleterId),
+          data: {message}
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .to(userRoom(deleterId))
-          .emit(userMessage, {message});
+          .emit(userMessage, {message});*/
       } else if(ty === 'markAsRead') {           // 多终端同步信息，标记为已读
         const {uid} = message;
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: userRoom(uid),
+          data: {message}
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .to(userRoom(uid))
-          .emit(userMessage, {message});
+          .emit(userMessage, {message});*/
       } else if(ty === 'editFriendCategory') {   // 编辑好友分组
         const {uid} = message.category;
-        io
+        const sc = {
+          eventName: userMessage,
+          roomName: userRoom(uid),
+          data: {message}
+        };
+        socketClient.sendMessage(socketServiceName, sc);
+        /*io
           .to(userRoom(uid))
-          .emit(userMessage, {message});
+          .emit(userMessage, {message});*/
       }
     }
   } catch(err) {

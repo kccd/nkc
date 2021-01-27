@@ -9,7 +9,6 @@ const updateDate = require("./settings/updateDate");
 
 const jobs = require('./timedTasks/scheduleJob');
 const timedTasks = require('./timedTasks/timedTasks');
-
 const run = async () => {
   // 以下任务固定时间执行
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
@@ -31,9 +30,9 @@ const run = async () => {
 
 run()
   .then(() => {
-    console.log(`定时任务启动成功`.green);
+    console.log(`timed task is running`.green);
   })
   .catch(err => {
-    console.log(`定时任务启动失败`.red);
+    console.log(`timed task has stopped`.red);
     console.log((err.stack || err.message || err).red);
   })
