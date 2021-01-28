@@ -644,7 +644,7 @@ function nkc_render(options){
         if(!resource) {
           return "（附件：" + plain_escape(v1) + "）";
         }
-        var resourceUrl = "/r/" + resource.rid + "?t=attachment";
+        var resourceUrl = "/r/" + resource.rid + "?d=attachment";
         var readerLinkDom = "";
         if(resource.ext === "pdf") {
           readerLinkDom = '<div class="article-attachment-reader"><a href="'+

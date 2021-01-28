@@ -1,8 +1,4 @@
 module.exports = async (namespace, roomName) => {
-  return new Promise((resolve, reject) => {
-    namespace.adapter.clients([roomName], (err, clients) => {
-      if(err) return reject(err);
-      resolve(clients);
-    })
-  });
+  const socketsID = await namespace.adapter.sockets(new Set([roomName]));
+  return [...socketsID];
 };

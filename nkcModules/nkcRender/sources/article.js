@@ -1,6 +1,7 @@
 const {getUrl, getSize} = require("../../tools");
 const cheerio = require("../customCheerio");
 const {htmlEscape} = require("../htmlEscape");
+const videoSize = require('../../../settings/video');
 module.exports = {
   picture(html = "", id, resource = {}) {
     const {
@@ -39,12 +40,17 @@ module.exports = {
       rid = id
     } = resource;
     const poster = getUrl("videoCover", rid);
-    const url = getUrl("resource", rid);
     if(resource.isFileExist) {
+      let sourceHtml = '';
+      for(const s of resource.videoSize) {
+        const {height} = videoSize[s];
+        const url = getUrl('resource', rid, s);
+        sourceHtml += `<source src="${url}" type="video/mp4" size="${height}"> 你的浏览器不支持video标签，请升级。`;
+      }
       return `
       <span data-tag="nkcsource" data-type="video" data-id="${id}">
         <video class="plyr-dom" preload="none" controls="controls" poster="${poster}" data-rid="${rid}" data-plyr-title="${oname}">
-          <source src="${url}" type="video/mp4"> 你的浏览器不支持video标签，请升级。
+          ${sourceHtml}
         </video>
       </span>
     `.trim();
@@ -92,7 +98,7 @@ module.exports = {
         </span>
         <span class="article-attachment-content">
           ${resource.isFileExist? `<span class="article-attachment-name" title="${oname}" data-type="clickAttachmentTitle" data-id="${id}">${oname}</span>`:
-            `<span class="article-attachment-name" title="${oname}" title="${oname}（附件已丢失）"  target="_blank">${oname}</span>`}
+            `<span class="article-attachment-name" title="${oname}" title="${oname}（附件已丢失）">${oname}</span>`}
           <span class="article-attachment-info">
             <span class="article-attachment-size">${getSize(size)}</span>
             <span class="article-attachment-ext">${ext.toUpperCase()}</span>
