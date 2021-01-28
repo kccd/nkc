@@ -50,6 +50,14 @@ module.exports = async (server) => {
     const port = socketConfig.port + Number(global.NKC.processId);
     server.listen(port, socketConfig.address, () => {
       console.log(`socket service ${global.NKC.processId} is running at ${socketConfig.address}:${port}`.green);
+      process.send('ready');
+    });
+    process.on('message', function(msg) {
+      if (msg === 'shutdown') {
+        server.close();
+        console.log(`socket service ${global.NKC.processId} has stopped`.green);
+        process.exit(0);
+      }
     });
   } else {
     console.log(`socket service is running`.green);

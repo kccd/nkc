@@ -32,7 +32,7 @@ class CommunicationClient {
     for(const eventName of eventsName) {
       this.socket.on(eventName, (err) => {
         console.log(`${serviceTag} ${eventName}`.blue);
-        if(err) console.log(err.red);
+        if(err) console.log(err);
       });
     }
   }

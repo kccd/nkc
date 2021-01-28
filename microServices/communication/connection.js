@@ -43,7 +43,7 @@ module.exports = async (socketIO) => {
     console.log(`${tag} connection`.blue);
     socket.on('error', err => {
       console.log(`${tag} error`.red);
-      console.log(err.red);
+      console.log(err);
     });
     socket.on('disconnect', () => {
       console.log(`${tag} disconnect`.blue);

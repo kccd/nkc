@@ -34,9 +34,10 @@ const start = async () => {
   try {
     const startTime = global.NKC.startTime;
     const startTimeKey = `server:start:time`;
+    process.send('ready');
     const lock = await redLock.lock(`server:start`, 30 * 1000);
     const _startTime = await redisClient.getAsync(startTimeKey);
-    if(!_startTime || _startTime < startTime - 10000) {
+    if(!_startTime || _startTime < startTime - 60000) {
       console.log(`updating cache...`.green);
       await redisClient.setAsync(startTimeKey, startTime);
       const cacheBaseInfo = require('./redis/cache');
