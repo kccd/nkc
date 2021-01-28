@@ -1,19 +1,15 @@
 const getRoomName = require('../socket/util/getRoomName');
-const CommunicationClient = require('../microServices/communication/client');
+const communication = require("./communication");
 const communicationConfig = require('../microServices/serviceConfigs/communication');
 const PATH = require('path');
 const db = require('../dataModels');
 const func = {};
 
-const socketClient = new CommunicationClient({
-  serviceName: communicationConfig.servicesName.nkc,
-  serviceId: global.NKC.processId
-});
-
 const socketServiceName = communicationConfig.servicesName.socket;
 
 func.sendConsoleMessage = async (data) => {
   const roomName = getRoomName('console');
+  const socketClient = await communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     eventName: 'consoleMessage',
     roomName,
@@ -32,6 +28,7 @@ func.sendDataMessage = (uid, options) => {
     data = {}
   } = options;
   const roomName = getRoomName('user', uid);
+  const socketClient = communication.getCommunicationClient();
   socketClient.sendMessage(socketServiceName, {
     roomName,
     eventName: event,
@@ -41,6 +38,7 @@ func.sendDataMessage = (uid, options) => {
 }
 
 func.sendForumMessage = async (data) => {
+  const socketClient = communication.getCommunicationClient();
   const render = require('./render');
   const {tid, state, pid} = data;
   let thread = await db.ThreadModel.findOne({tid});
@@ -82,6 +80,7 @@ func.sendForumMessage = async (data) => {
 };
 
 func.sendPostMessage = async (pid) => {
+  const socketClient = communication.getCommunicationClient();
   const singlePostData = await db.PostModel.getSocketSinglePostData(pid);
   const {
     parentCommentId,
@@ -116,6 +115,7 @@ func.sendPostMessage = async (pid) => {
 
 // 发送消息到用户
 async function sendMessageToUser(channel, message) {
+  const socketClient = communication.getCommunicationClient();
   // let {io} = global.NKC;
   let userRoom = uid => getRoomName("user", uid);
   let userMessage = "message";

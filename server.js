@@ -12,6 +12,7 @@ const http = require('http'),
   elasticSearch = require("./nkcModules/elasticSearch"),
   redLock = require('./nkcModules/redLock'),
   serverConfig = require('./config/server'),
+  communication = require('./nkcModules/communication'),
   {
     RoleModel,
     ForumModel,
@@ -47,6 +48,8 @@ const start = async () => {
     await elasticSearch.init();
     // console.log('ElasticSearch is ready...'.green);
 
+    communication.getCommunicationClient();
+
     const port = Number(serverConfig.port);
     const address = serverConfig.address;
     server = http.createServer(app);
@@ -57,6 +60,7 @@ const start = async () => {
 
     // 启动测试环境相关工具
     if(global.NKC.isDevelopment) {
+      require('./microServices/communication/server');
       const socket = require('./socket/index');
       await socket(server)
       require('./timedTask');

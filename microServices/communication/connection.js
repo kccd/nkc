@@ -33,17 +33,20 @@
 
 const {
   getRoomNameByServiceName,
-  getTargetSocketByServiceName
+  getTargetSocketByServiceName,
+  getTime,
 } = require('./util');
 const communicationConfig = require('../serviceConfigs/communication');
 module.exports = async (socketIO) => {
   socketIO.on('connection', async socket => {
-    console.log(`socket ${socket.id} is connected`.blue);
+    const tag = `communication server ${socket.state.serviceName}:${socket.state.serviceId}`;
+    console.log(`${tag} connection`.blue);
     socket.on('error', err => {
-      console.log(`socket client err`, err);
+      console.log(`${tag} error`.red);
+      console.log(err.red);
     });
     socket.on('disconnect', () => {
-      console.log(`socket ${socket.id} is disconnected`.blue);
+      console.log(`${tag} disconnect`.blue);
     });
     socket.on(communicationConfig.messageEventName, async (req, callback) => {
       const {to, content} = req;
@@ -56,6 +59,7 @@ module.exports = async (socketIO) => {
           }
         });
       } else {
+        console.log(`${getTime()} ${tag} >>> ${targetSocket.state.serviceName}:${targetSocket.state.serviceId}`);
         targetSocket.emit(communicationConfig.messageEventName, {
           from: socket.state.serviceName,
           content

@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 const func = {};
 /*
 * 获取目标服务的房间名
@@ -21,4 +23,10 @@ func.getTargetSocketByServiceName = async (socketIO, serviceName) => {
   const socketId = [...sockets][Math.round(Math.random() * 10000) % sockets.size];
   return socketIO.of('/').sockets.get(socketId);
 };
+
+func.getTime = (t) => {
+  t = t || new Date();
+  return moment(t).format(`YYYY/MM/DD HH:mm:ss`);
+}
+
 module.exports = func;
