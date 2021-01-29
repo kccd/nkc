@@ -344,7 +344,7 @@ var app = new Vue({
             type: "addKeywords",
             value: {
               name: wordGroup[groupIndex].name,
-              keywords
+              keywords: keywords
             }
           })
         })
@@ -379,7 +379,7 @@ var app = new Vue({
             type: "deleteKeywords",
             value: {
               name: wordGroup[groupIndex].name,
-              keywords
+              keywords: keywords,
             }
           })
         })
