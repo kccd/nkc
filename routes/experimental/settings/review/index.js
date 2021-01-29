@@ -131,6 +131,11 @@ router
           }
         }
       });
+      await db.ForumModel.updateMany({}, {
+        $pull: {
+          keywordReviewUseGroup: value
+        }
+      })
     } else if(type === "addWordGroup" && typeof value === "object") {
       const { name, keywords } = value;
       if(!name) ctx.throw(403, "未指定组名");

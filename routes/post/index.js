@@ -488,8 +488,8 @@ router
       postReviewed = false;
     }
 
-    // 检测敏感词，检测到则添加待审核
-    const needReview = await db.ReviewModel.includesKeyword(singlePost);
+    // 如果符合送审条件，自动内容送审
+    const needReview = await db.ReviewModel.autoPushToReview(singlePost);
     if(needReview) {
       await singlePost.update({
         reviewed: false
