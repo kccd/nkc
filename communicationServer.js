@@ -1,1 +1,0 @@
-require('./microServices/communication/server');
