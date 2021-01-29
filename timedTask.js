@@ -18,7 +18,6 @@ const run = async () => {
   jobs.moveRecycleMarkThreads();
   jobs.clearFileCache();
   jobs.preparationForumCheck();
-  jobs.nkcRestart();
   // 以下任务定时执行
   await timedTasks.cacheActiveUsers();
   await timedTasks.clearTimeoutPageCache();
@@ -26,7 +25,7 @@ const run = async () => {
   await timedTasks.clearResourceState();
   await timedTasks.updateAllForumLatestThread();
   await timedTasks.updateForumsMessage();
-  process.send('ready');
+  if(process.connected) process.send('ready');
   process.on('message', function(msg) {
     if (msg === 'shutdown') {
       console.log(`timed task service ${global.NKC.processId} stopped`.green);

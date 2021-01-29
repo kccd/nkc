@@ -465,7 +465,8 @@ router
       await log.update({"modifyType":true});
     }
     // 若post被退修则清除退修标记并标记为未审核
-    if(targetThread.oc === targetPost.pid) {
+    const isThreadContent = targetThread.oc === targetPost.pid;
+    if(isThreadContent) {
       if(targetThread.recycleMark) {
         await targetThread.update({
           recycleMark:false,
@@ -484,11 +485,6 @@ router
         disabled: false,
         reviewed: false
       });
-      await db.ThreadModel.updateOne({ tid: singlePost.tid }, {
-        $set: {
-          reviewed: false
-        }
-      });
       postReviewed = false;
     }
 
@@ -498,11 +494,13 @@ router
       await singlePost.update({
         reviewed: false
       });
-      await db.ThreadModel.updateOne({ tid: singlePost.tid }, {
-        $set: {
-          reviewed: false
-        }
-      });
+      if(isThreadContent) {
+        await db.ThreadModel.updateOne({ tid: singlePost.tid }, {
+          $set: {
+            reviewed: false
+          }
+        });
+      }
     }
 
     // 帖子曾经在草稿箱中，发表时，删除草稿

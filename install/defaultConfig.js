@@ -75,11 +75,5 @@ module.exports = [
         "pingInterval": 30000
       }
     }
-  },
-  {
-    name: 'scheduleJob',
-    data: {
-      nkcReload: `0 0 5 * * *`
-    }
   }
 ];

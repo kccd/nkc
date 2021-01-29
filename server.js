@@ -56,7 +56,7 @@ const start = async () => {
     server.keepAliveTimeout = 10 * 1000;
     server.listen(port, address, async () => {
       console.log(`nkc service ${global.NKC.processId} is running at ${address}:${port}`.green);
-      process.send('ready');
+      if(process.connected) process.send('ready');
     });
 
     // 启动测试环境相关工具

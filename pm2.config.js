@@ -38,6 +38,7 @@ module.exports = {
       exec_mode: 'cluster',
       restart_delay: 5000, // 崩溃后重启前的等待毫秒数
       increment_var: 'PROCESS_ID',
+      cron_restart: "0 0 5 * * *",
       env: {
         NODE_ENV: 'production',
         PROCESS_ID: 0,

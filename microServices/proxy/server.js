@@ -116,7 +116,7 @@ httpServer.listen(ports.httpPort, () => {
 
 httpsServer.listen(ports.httpsPort, () => {
   console.log(`PROXY: https server is running at ${ports.httpsPort}.`);
-  process.send('ready');
+  if(process.connected) process.send('ready');
 });
 
 process.on('message', function(msg) {

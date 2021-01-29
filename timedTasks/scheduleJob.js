@@ -1,13 +1,10 @@
 const {scheduleJob} = require('node-schedule');
-const pm2 = require('pm2');
 const moment = require('moment');
 const {spawn} = require('child_process');
-const {fork} = require("child_process");
 const fs = require('fs');
 const fsPromise = fs.promises;
 const path = require('path');
 const mongodb = require('../config/mongodb');
-const scheduleJobConfig = require("../config/scheduleJob.json")
 require('colors');
 const db = require("../dataModels");
 const {
@@ -351,28 +348,5 @@ jobs.clearFileCache = async () => {
   });
 }
 
-/*
-* pm2 每晚重启
-* */
-jobs.nkcRestart = async () => {
-  scheduleJob(scheduleJobConfig.nkcReload, async () => {
-    console.log(`正在重启nkc服务...`);
-    pm2.connect((err) => {
-      if(err) {
-        console.log(`pm2 connect error`.red);
-        console.log(err);
-        return;
-      }
-      pm2.reload('nkc', (err, proc) => {
-        if(err) {
-          console.log(`重启nkc服务失败`.red);
-          console.log(err);
-        } else {
-          console.log(`nkc服务已重启`.green);
-        }
-      });
-    })
-  });
-};
 
 module.exports = jobs;
