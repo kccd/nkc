@@ -20,6 +20,8 @@
   "author": "nkc",
   "license": "ISC",
   "dependencies": {
+    "@nkc/communication": "./microServices/communication",
+    "@nkc/proxy": "./microServices/proxy",
     "@alicloud/pop-core": "^1.7.9",
     "alipay-sdk": "^3.1.5",
     "ansi-escapes": "^4.3.1",

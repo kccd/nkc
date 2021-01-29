@@ -1,8 +1,8 @@
 const db = require('../../dataModels');
 const message = require('./message');
 
-const CommunicationClient = require('../../microServices/communication/client');
-const communicationConfig = require('../../microServices/serviceConfigs/communication');
+const CommunicationClient = require('../../tools/communicationClient');
+const communicationConfig = require('../../config/communication');
 
 const socketClient = new CommunicationClient({
   serviceName: communicationConfig.servicesName.socket,

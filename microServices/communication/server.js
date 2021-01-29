@@ -1,7 +1,8 @@
 require('colors');
+require('../../global');
 const SocketIO = require('socket.io');
 const HTTP = require('http');
-const communicationConfig = require('../serviceConfigs/communication');
+const communicationConfig = require('../../config/communication');
 const auth = require("./auth");
 const connection = require('./connection');
 

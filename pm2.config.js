@@ -1,6 +1,18 @@
 module.exports = {
   apps: [
     {
+      name: 'communication',
+      script: 'communicationServer.js',
+      wait_ready: true,
+      shutdown_with_message: true,
+      restart_delay: 5000, // 崩溃后重启前的等待毫秒数
+      increment_var: 'PROCESS_ID',
+      env: {
+        NODE_ENV: 'production',
+        PROCESS_ID: 0,
+      }
+    },
+    {
       name: 'nkc',
       script: 'server.js',
       shutdown_with_message: true,
@@ -29,10 +41,12 @@ module.exports = {
       }
     },
     {
-      name: 'timed task',
-      script: 'timedTask.js',
+      name: 'proxy',
+      script: 'proxyServer.js',
       wait_ready: true,
       shutdown_with_message: true,
+      instances: 2,
+      exec_mode: 'cluster',
       restart_delay: 5000, // 崩溃后重启前的等待毫秒数
       increment_var: 'PROCESS_ID',
       env: {
@@ -41,8 +55,8 @@ module.exports = {
       }
     },
     {
-      name: 'communication',
-      script: 'communicationServer.js',
+      name: 'timed task',
+      script: 'timedTask.js',
       wait_ready: true,
       shutdown_with_message: true,
       restart_delay: 5000, // 崩溃后重启前的等待毫秒数

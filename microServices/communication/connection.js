@@ -36,7 +36,7 @@ const {
   getTargetSocketByServiceName,
   getTime,
 } = require('./util');
-const communicationConfig = require('../serviceConfigs/communication');
+const communicationConfig = require('../../config/communication');
 module.exports = async (socketIO) => {
   socketIO.on('connection', async socket => {
     const tag = `communication server ${socket.state.serviceName}:${socket.state.serviceId}`;

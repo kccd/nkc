@@ -1,6 +1,6 @@
 require('colors');
 const SocketIO = require('socket.io-client');
-const communicationConfig = require('../serviceConfigs/communication');
+const communicationConfig = require('../config/communication');
 
 class CommunicationClient {
   constructor(props) {

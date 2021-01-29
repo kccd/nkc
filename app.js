@@ -9,7 +9,7 @@ const rateLimit = require('koa-ratelimit');
 const Redis = require('ioredis');
 const fs = require('fs');
 const helmet = require('koa-helmet');
-const static = require('awesome-static');
+const awesomeStatic = require('awesome-static');
 const staticServe = path => {
   return require('koa-static')(path, {
     setHeaders: function(response, path, stats) {
@@ -79,7 +79,7 @@ app
   .use(staticServe(path.resolve('./node_modules')))
   .use(staticServe(path.resolve('./pages')))
   .use(favicon(__dirname + '/public/statics/site/favicon.ico'))
-  .use(static("./resources/tools", {route: "/tools"}))
+  .use(awesomeStatic("./resources/tools", {route: "/tools"}))
   // 请求头安全设置
   .use(helmet())
   .use(koaBody(settings.upload.koaBodySetting))

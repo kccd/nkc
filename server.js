@@ -34,7 +34,6 @@ const start = async () => {
   try {
     const startTime = global.NKC.startTime;
     const startTimeKey = `server:start:time`;
-    process.send('ready');
     const lock = await redLock.lock(`server:start`, 30 * 1000);
     const _startTime = await redisClient.getAsync(startTimeKey);
     if(!_startTime || _startTime < startTime - 60000) {
@@ -57,6 +56,7 @@ const start = async () => {
     server.keepAliveTimeout = 10 * 1000;
     server.listen(port, address, async () => {
       console.log(`nkc service ${global.NKC.processId} is running at ${address}:${port}`.green);
+      process.send('ready');
     });
 
     // 启动测试环境相关工具

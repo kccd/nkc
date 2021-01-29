@@ -1,5 +1,5 @@
-const CommunicationClient = require('../microServices/communication/client');
-const communicationConfig = require('../microServices/serviceConfigs/communication');
+const CommunicationClient = require('../tools/communicationClient');
+const communicationConfig = require('../config/communication');
 let communicationClient;
 const func = {};
 func.getCommunicationClient = () => {

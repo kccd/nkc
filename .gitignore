@@ -20,7 +20,6 @@
 /pages/test
 
 
-
 /config/*
 /install/install.lock
 /pm2.cluster.config.js
@@ -28,4 +27,3 @@
 .DS_Store
 
 /test/config.js
-/microServices/serviceConfigs

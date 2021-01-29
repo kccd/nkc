@@ -29,7 +29,6 @@ const run = async () => {
   process.send('ready');
   process.on('message', function(msg) {
     if (msg === 'shutdown') {
-      server.close();
       console.log(`timed task service ${global.NKC.processId} has stopped`.green);
       process.exit(0);
     }

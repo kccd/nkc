@@ -1,6 +1,6 @@
 const getRoomName = require('../socket/util/getRoomName');
 const communication = require("./communication");
-const communicationConfig = require('../microServices/serviceConfigs/communication');
+const communicationConfig = require('../config/communication');
 const PATH = require('path');
 const db = require('../dataModels');
 const func = {};
