@@ -58,14 +58,24 @@ block eContent
               input.form-control(type='text' v-model="safeSettings.phoneVerify.interval")
               h5.text-danger 每{{safeSettings.phoneVerify.interval}}小时需重新进行手机号验证，否则发表新内容会送审。
 
+        h4 安全工具
+        .form-horizontal
           .form-group
-            label.col-sm-2.control-label
-            .col-sm-4
-              h5.text-danger(v-if="error") {{error}}
-              h5.text-success(v-if="info") {{info}}
-              button.btn.btn-primary.btn-block(@click='save') 保存
+            label.col-sm-2.control-label 弱密码检测
+            .col-sm-4.form-inline
+              .radio.m-r-2
+                button.btn.btn-default(@click="runWeakPasswordCheck()") 运行检测
+                h5.text-danger 将对所有用户的密码进行检测，<a href="/e/settings/safe/weakPasswordCheck/result" target="_blank">这里</a>可以查看最近次的检测结果
 
 
+        
+
+        .form-group
+          label.col-sm-2.control-label
+          .col-sm-4
+            h5.text-danger(v-if="error") {{error}}
+            h5.text-success(v-if="info") {{info}}
+            button.btn.btn-primary.btn-block(@click='save') 保存
 
 block scripts
   +includeJS('/experimental/settings/safe/safe.js')

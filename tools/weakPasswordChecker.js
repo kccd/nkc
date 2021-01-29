@@ -16,6 +16,7 @@ function checker(password) {
 }
 
 
+
 /**
  * Weak Password dictionary from {@link https://github.com/DictionaryHouse/Weak-password},
  * Merge `weak_pass_chinese.txt` with `weak_pass_top100.txt` of this repository
