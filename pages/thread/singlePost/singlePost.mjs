@@ -56,7 +56,7 @@ class SinglePostModule {
     });
     const buttonContainer = container.find('.switch-hidden-status');
     const button = buttonContainer.find('.switch-hidden-status-button');
-    button.html(`<div class="fa fa-angle-down"> 加载全文</div>`);
+    button.html(`<div class="fa fa-angle-down"><strong> 加载全文</strong></div>`);
     container.attr('data-hidden', 'true');
     buttonContainer.removeClass('hidden');
   }

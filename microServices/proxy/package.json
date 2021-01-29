@@ -1,0 +1,21 @@
+{
+  "name": "@nkc/proxy",
+  "version": "1.0.0",
+  "description": "node proxy",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "proxy"
+  ],
+  "author": "kccd",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "farmhash": "^3.1.0",
+    "http-proxy": "^1.18.1",
+    "moment": "^2.26.0"
+  }
+}

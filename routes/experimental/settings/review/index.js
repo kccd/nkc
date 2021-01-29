@@ -115,7 +115,7 @@ router
     await next();
   })
   .put("/keyword", async (ctx, next) => {
-    const { db, body } = ctx;
+    const { db, body, data } = ctx;
     const { type, value } = body;
     if(type === "enable" && typeof value === "boolean") {
       await db.SettingModel.update({ _id: "review" }, {
@@ -131,6 +131,11 @@ router
           }
         }
       });
+      await db.ForumModel.updateMany({}, {
+        $pull: {
+          keywordReviewUseGroup: value
+        }
+      })
     } else if(type === "addWordGroup" && typeof value === "object") {
       const { name, keywords } = value;
       if(!name) ctx.throw(403, "未指定组名");
@@ -160,6 +165,51 @@ router
           leastKeywordCount: leastKeywordCount || 1,
           relationship: relationship || "or"
         }
+      });
+    } else if(type === "addKeywords") {
+      const { name, keywords } = value;
+      const reviewSettings = await db.SettingModel.getSettings("review");
+      const wordGroups = reviewSettings.keyword.wordGroup;
+      const addedKeywords = [];
+      for(group of wordGroups) {
+        if(group.name === name) {
+          const keywordsSet = new Set(group.keywords);
+          keywords.forEach(keyword => {
+            const beforeSize = keywordsSet.size;
+            keywordsSet.add(keyword);
+            const afterSize = keywordsSet.size;
+            if(afterSize > beforeSize) {
+              addedKeywords.push(keyword);
+            }
+          });
+          group.keywords = Array.from(keywordsSet)
+          break;
+        }
+      }
+      data.added = addedKeywords;
+      await db.SettingModel.update({ _id: "review" }, {
+        "c.keyword.wordGroup": wordGroups
+      });
+    } else if(type === "deleteKeywords") {
+      const { name, keywords } = value;
+      const reviewSettings = await db.SettingModel.getSettings("review");
+      const wordGroups = reviewSettings.keyword.wordGroup;
+      const shouldDelete = [];
+      for(group of wordGroups) {
+        if(group.name === name) {
+          group.keywords = group.keywords.filter(keyword => {
+            if(keywords.includes(keyword)) {
+              shouldDelete.push(keyword);
+              return false;
+            }
+            return true;
+          });
+          break;
+        }
+      }
+      data.deleted = shouldDelete;
+      await db.SettingModel.update({ _id: "review" }, {
+        "c.keyword.wordGroup": wordGroups
       });
     }
     await db.SettingModel.saveSettingsToRedis("review");

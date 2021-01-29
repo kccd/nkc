@@ -26,6 +26,8 @@ block head
   block title
     meta(name="description" content="倡导科学理性，发展科技爱好")
     title bootstrap_base
+  if state.isApp && state.platform === 'reactNative'
+    +includeJS('/appApi/reactNative.js')
 
 block body
   block navbar
@@ -85,8 +87,6 @@ block body
 
   if (!state.isApp || state.platform === 'reactNative') && !data.user
     include ./publicModules/login/login
-  if state.isApp && state.platform === 'reactNative'
-    +includeJS('/appApi/reactNative.js')
   block scripts
   if !state.isApp
     //- 生成二维码 页脚

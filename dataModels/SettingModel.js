@@ -607,4 +607,74 @@ settingSchema.statics.checkShopSellerByUid = async (uid) => {
   }
 };
 
+/*
+* 获取指定尺寸视频的比特率
+* @param {Number} width
+* @param {Number} height
+* @return {Number} 比特率 单位Kbps
+* @author pengxiguaa 2020
+* */
+settingSchema.statics.getBitrateBySize = async (width, height) => {
+  const SettingModel = mongoose.model('settings');
+  const uploadSettings = await SettingModel.getSettings('upload');
+  const s = width * height;
+  const {configs, defaultBV} = uploadSettings.videoVBRControl;
+  let rate;
+  for(const v of configs) {
+    const {bv, from, to} = v;
+    if(s >= from && s < to) {
+      rate = bv;
+      break
+    }
+  }
+  if(!rate) {
+    rate = defaultBV;
+  }
+  return rate * 1024;
+}
+/*
+* 获取用户水印图片
+* @param {String} uid
+* @return {Object || null} 不打水印返回null
+*   @param {String} waterGravity 水印位置
+*     southeast: 右下角
+*     northeast: 右上角
+*     southwest: 左下角
+*     northwest: 左上角
+*     center: 正中间
+*   @param {Stream} watermarkStream 水印数据流
+* @author pengxiguaa 2021-01-22
+* */
+settingSchema.statics.getWatermarkInfoByUid = async (uid) => {
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const UserModel = mongoose.model('users');
+  const {waterSetting} = await UsersGeneralModel.findOnly({uid}, {waterSettings: 1});
+  const SettingModel = mongoose.model('settings');
+  const AttachmentModel = mongoose.model('attachments');
+  const createWatermark = require('../nkcModules/createWatermark');
+  const watermarkSettings = await SettingModel.getWatermarkSettings();
+  const {
+    waterGravity, waterStyle, waterAdd
+  } = waterSetting;
+  if(!waterAdd || !watermarkSettings.enabled) return null;
+  let imagePath = '', text = '';
+  if(waterStyle === 'siteLogo') {
+    imagePath = await AttachmentModel.getWatermarkFilePath('normal');
+  } else if(waterStyle === 'singleLogo') {
+    imagePath = await AttachmentModel.getWatermarkFilePath('small');
+  } else {
+    imagePath = await AttachmentModel.getWatermarkFilePath('small');
+    const user = await UserModel.findOnly({uid}, {username: 1, uid: 1});
+    text = user.username === ''? `KCID:${user.uid}`:user.username;
+  }
+  const watermarkStream = await createWatermark(
+    imagePath,
+    text,
+    watermarkSettings.transparency / 100
+  );
+  return {
+    waterGravity,
+    watermarkStream,
+  };
+}
 module.exports = mongoose.model('settings', settingSchema);

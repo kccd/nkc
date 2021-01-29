@@ -72,12 +72,15 @@ router
         type = "post";
         link = await db.PostModel.getUrl(post);
       }
+      // 从reviews表中读出送审原因
+      const reviewRecord = await db.ReviewModel.findOne({ pid: post.pid }).sort({ toc: -1 }).limit(1);
       data.results.push({
         post,
         user,
         thread,
         type,
-        link
+        link,
+        reason: reviewRecord? reviewRecord.reason : ""
       });
     }
     data.paging = paging;

@@ -17,7 +17,8 @@ block eContent
           label.m-r-1
             input(type='checkbox' :value='true' v-model='pauseConsole')
             span 暂停打印
-          span(v-if='statusString' style='color: #555;') {{statusString}}
+          span(v-if='statusString' style='color: #555;') SOCKET:{{statusString}}
+          button.btn.btn-sm.btn-default(@click='joinRoom') 立即连接控制台
 
         .e-panel
           .message-panel(ref='panel')

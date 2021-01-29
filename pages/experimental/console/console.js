@@ -39,7 +39,7 @@ var app = new Vue({
     });
 
     socket.on('connect', function() {
-      vm.joinRoom();
+      // vm.joinRoom();
     });
 
     socket.on('consoleMessage', function(data) {

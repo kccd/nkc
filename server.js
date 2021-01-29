@@ -1,28 +1,18 @@
 require('./global');
-const fs = require('fs');
 
 process.on('uncaughtException', function (err) {
   console.log(`uncaughtException:`);
   console.log(err.stack || err.message || err);
 });
 
-if(!fs.existsSync('./install/install.lock')) {
-  return require('./install/server.js')
-}
-
-// 启动测试环境相关工具
-if(global.NKC.NODE_ENV !== "production") {
-  require('./watch.js');
-}
-
 require('colors');
 const http = require('http'),
+  redisClient = require('./settings/redisClient'),
   app = require('./app'),
   elasticSearch = require("./nkcModules/elasticSearch"),
-  settings = require('./settings'),
+  redLock = require('./nkcModules/redLock'),
   serverConfig = require('./config/server'),
-  socket = require('./socket'),
-  {updateDate, upload} = settings,
+  communication = require('./nkcModules/communication'),
   {
     RoleModel,
     ForumModel,
@@ -39,49 +29,51 @@ const dataInit = async () => {
   await ForumModel.updateMany({}, {$addToSet: {rolesId: 'dev'}});
 };
 
-// 定时任务 每天固定时间执行
-const jobsInit = async () => {
-  const jobs = require('./scheduleJob');
-  jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
-  jobs.clearForumAndThreadPostCount();
-  jobs.shop();
-  jobs.backupDatabase();
-  jobs.moveRecycleMarkThreads();
-  jobs.clearFileCache();
-  jobs.preparationForumCheck();    // 检查筹备专业
-};
-
-// 定时任务 隔一段时间执行
-const timedTasksInit = async () => {
- const timedTasks = require("./timedTasks");
- await timedTasks.cacheActiveUsers();
- await timedTasks.clearTimeoutPageCache();
- await timedTasks.updateRecommendThreads();
- await timedTasks.clearResourceState();
- await timedTasks.updateAllForumLatestThread();
- await timedTasks.updateForumsMessage();
-};
 
 const start = async () => {
   try {
-    if(global.NKC.processId === 0) {
+    const startTime = global.NKC.startTime;
+    const startTimeKey = `server:start:time`;
+    const lock = await redLock.lock(`server:start`, 30 * 1000);
+    const _startTime = await redisClient.getAsync(startTimeKey);
+    if(!_startTime || _startTime < startTime - 60000) {
+      console.log(`updating cache...`.green);
+      await redisClient.setAsync(startTimeKey, startTime);
       const cacheBaseInfo = require('./redis/cache');
       await dataInit();
-      await jobsInit();
-      await upload.initFolders();
       await cacheBaseInfo();
-      await timedTasksInit();
+      console.log(`starting service...`.green);
     }
+    await lock.unlock();
     await elasticSearch.init();
-    console.log('ElasticSearch is ready...'.green);
+    // console.log('ElasticSearch is ready...'.green);
 
-    const port = Number(serverConfig.port) + global.NKC.processId;
+    communication.getCommunicationClient();
+
+    const port = Number(serverConfig.port);
     const address = serverConfig.address;
     server = http.createServer(app);
     server.keepAliveTimeout = 10 * 1000;
     server.listen(port, address, async () => {
-      await socket(server);
-      console.log(`nkc ${global.NKC.NODE_ENV} server listening on ${port}`.green);
+      console.log(`nkc service ${global.NKC.processId} is running at ${address}:${port}`.green);
+      if(process.connected) process.send('ready');
+    });
+
+    // 启动测试环境相关工具
+    if(global.NKC.isDevelopment) {
+      require('./microServices/communication/server');
+      const socket = require('./socket/index');
+      await socket(server)
+      require('./timedTask');
+      require('./watch.js');
+    }
+
+    process.on('message', function(msg) {
+      if (msg === 'shutdown') {
+        server.close();
+        console.log(`nkc service ${global.NKC.processId} stopped`.green);
+        process.exit(0);
+      }
     });
 
   } catch(err) {

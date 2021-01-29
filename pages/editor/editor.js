@@ -776,8 +776,11 @@ function initVueApp() {
           .then(function(data) {
             self.showCloseInfo = false;
             if(NKC.configs.platform === 'reactNative') {
-              // NKC.methods.visitUrlAndClose(data.redirect);
-              self.visitUrl(data.redirect || "/");
+              NKC.methods.visitUrlAndClose(data.redirect);
+              /*self.visitUrl(data.redirect || "/", true);
+              setTimeout(() => {
+                NKC.methods.appClosePage();
+              }, 1000);*/
             } else if(NKC.configs.platform === 'apiCloud') {
               self.visitUrl(data.redirect || "/");
               setTimeout(function() {

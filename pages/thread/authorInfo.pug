@@ -5,11 +5,12 @@
     else
       button.thread-author-subscribe.active(onclick=`SubscribeTypes.subscribeUser("${author.uid}", true)`) 关注
   .thread-author-avatar
-    img(src=tools.getUrl("userAvatar", author.avatar))
+    img(src=tools.getUrl("userAvatar", author.avatar)  style=(author.certs.indexOf('banned') >= 0 ? "filter: grayscale(1);": ""))
   .thread-author-base
     a(href=`/u/${author.uid}` target='_blank').thread-author-name=author.username
     .thread-author-cert
-      img(src=tools.getUrl("gradeIcon", author.grade._id) title=author.grade.displayName)
+      if author.certs.indexOf('banned') < 0
+        img(src=tools.getUrl("gradeIcon", author.grade._id) title=author.grade.displayName)
       span(title=author.info.certsName)=author.info.certsName
     .thread-author-number
       .group

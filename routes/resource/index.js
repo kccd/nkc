@@ -26,12 +26,12 @@ resourceRouter
   })
   .get('/:rid', async (ctx, next) => {
     const {query, data, db, fs, settings, nkcModules} = ctx;
-    const {t, c} = query;
+    const {t, c, d} = query;
     const {cache} = settings;
     const {resource} = data;
     const {mediaType, ext} = resource;
     const {user} = data;
-    let filePath = await resource.getFilePath();
+    let filePath = await resource.getFilePath(t);
     let speed;
     data.resource = resource;
     data.rid = resource.rid;
@@ -81,9 +81,9 @@ resourceRouter
     }
     ctx.filePath = filePath;
     // 表明客户端希望以附件的形式加载资源
-    if(t === "attachment") {
+    if(d === "attachment") {
       ctx.fileType = "attachment";
-    } else if(t === "object") {
+    } else if(d === "object") {
       // 返回数据对象
       data.resource = resource;
       ctx.filePath = undefined;

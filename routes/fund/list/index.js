@@ -55,7 +55,7 @@ listRouter
 		data.page = page;
 		data.sort = sort;
 
-		// 权限判断		
+		// 权限判断
 		if(token){
 			let share = await db.ShareModel.findOne({"token":token});
 			if(!share) ctx.throw(403, "无效的token");
@@ -73,7 +73,7 @@ listRouter
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
 				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
 			}
-			if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
+			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
 		}
 
 		const fund = await db.FundModel.findOnly({_id: fundId.toUpperCase(), disabled: false});

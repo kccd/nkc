@@ -131,33 +131,68 @@ resourceSchema.virtual('isFileExist')
     return this._isFileExist = val
   });
 
+resourceSchema.virtual('videoSize')
+  .get(function() {
+    return this._videoSize;
+  })
+  .set(function(val) {
+    return this._videoSize = val
+  });
+
 /**
  * 文件是否存在
  */
 resourceSchema.methods.setFileExist = async function(excludedMediaTypes = ['mediaPicture', 'mediaAudio']) {
   if(excludedMediaTypes.includes(this.mediaType)) return;
-  const path = await this.getFilePath()
-  try{
-    await fsPromise.access(path);
-    this.isFileExist = true;
-  } catch(err) {
-    this.isFileExist = false;
+  const FILE = require('../nkcModules/file');
+  if(this.mediaType === 'mediaVideo') {
+    const sdVideoPath = await this.getFilePath('sd');
+    const hdVideoPath = await this.getFilePath('hd');
+    const fhdVideoPath = await this.getFilePath('fhd');
+    const videoSize = [];
+    if(await FILE.access(sdVideoPath)) videoSize.push('sd');
+    if(await FILE.access(hdVideoPath)) videoSize.push('hd');
+    if(await FILE.access(fhdVideoPath)) videoSize.push('fhd');
+    this.isFileExist = videoSize.length !== 0;
+    this.videoSize = videoSize;
+  } else {
+    const path = await this.getFilePath();
+    this.isFileExist = await FILE.access(path);
   }
 }
 
 /*
   获取文件路径
 */
-resourceSchema.methods.getFilePath = async function() {
+resourceSchema.methods.getFilePath = async function(size) {
+  const videoSize = require('../settings/video');
+  const FILE = require('../nkcModules/file');
   const ResourceModel = mongoose.model('resources');
   const {toc, ext, rid, prid} = this;
   if(prid) {
     const parentResource = await ResourceModel.findOne({rid: prid});
     if(!parentResource) throwErr(500, `附件丢失 rid:${prid}`);
-    return await parentResource.getFilePath();
+    return await parentResource.getFilePath(size);
   }
   const fileFolder = await ResourceModel.getMediaPath(this.mediaType, toc);
-  return PATH.resolve(fileFolder, `./${rid}.${ext}`);
+  let filePath;
+  if(this.mediaType === 'mediaVideo') {
+    if(!Object.keys(videoSize).includes(size)) {
+      filePath = `./${rid}_sd.${ext}`;
+      for(const s of Object.keys(videoSize)) {
+        const _filePath = `./${rid}_${s}.${ext}`;
+        const targetPath = PATH.resolve(fileFolder, _filePath)
+        if(!await FILE.access(targetPath)) continue;
+        filePath = _filePath;
+        break;
+      }
+    } else {
+      filePath = `./${rid}_${size}.${ext}`;
+    }
+  } else {
+    filePath = `./${rid}.${ext}`;
+  }
+  return PATH.resolve(fileFolder, filePath);
 };
 /*
 *  获取PDF预览文件

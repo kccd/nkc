@@ -241,7 +241,7 @@ async function func() {
   key = `canNotDisplayOnNavForumsId`;
   await client.resetSetAsync(key, canNotDisplayOnNavForumsId);
 
-  console.log(`专业缓存更新完成`.green);
+  // console.log(`专业缓存更新完成`.green);
 
 }
 

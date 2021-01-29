@@ -71,7 +71,7 @@ if !isIncluded('singlePost')
   +includeCSS('/thread/singlePost/singlePost.css')
   +includeJS('/thread/singlePost/singlePost.js')
   mixin singlePost(props)
-    -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, draft} = props;
+    -var {pid, floor, toc, tlm, title, count, content, vote, reviewed, reviewReason, draft} = props;
     -var {user, quote, kcb, xsf, isAuthor, disabled, voteUp} = props;
     -var {digest, type, tid, highlight, hide} = props;
     -var {cancelTopped, hidePostBottom} = props;
@@ -84,9 +84,9 @@ if !isIncluded('singlePost')
       data-hide=isAuthor? 'not': hide
       id=highlight === pid? 'highlight': undefined
       )
-      +singlePostWarningInfo({disabled, draft, reviewed, pid})
+      +singlePostWarningInfo({disabled, draft, reviewed, reviewReason, pid})
 
-      +singlePostTop(Object.assign({}, user, {pid, isAuthor, floor, reviewed, reason, toc, digest, tlm, cancelTopped}))
+      +singlePostTop(Object.assign({}, user, {pid, isAuthor, floor, reviewed, reviewReason, reason, toc, digest, tlm, cancelTopped}))
       +singlePostCenter({pid, title, content, quote, kcb, xsf})
       if !hidePostBottom
         +singlePostBottom({vote, voteUp, pid, count, tid})
