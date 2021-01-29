@@ -29,7 +29,7 @@ const run = async () => {
   process.send('ready');
   process.on('message', function(msg) {
     if (msg === 'shutdown') {
-      console.log(`timed task service ${global.NKC.processId} has stopped`.green);
+      console.log(`timed task service ${global.NKC.processId} stopped`.green);
       process.exit(0);
     }
   });
@@ -41,6 +41,6 @@ run()
     console.log(`timed task is running`.green);
   })
   .catch(err => {
-    console.log(`timed task has stopped`.red);
+    console.log(`timed task stopped`.red);
     console.log((err.stack || err.message || err).red);
   })

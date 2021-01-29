@@ -12,7 +12,7 @@ server.listen(communicationConfig.serverPort, communicationConfig.serverHost, ()
   process.on('message', function(msg) {
     if (msg === 'shutdown') {
       server.close();
-      console.log(`communication service ${global.NKC.processId} has stopped`.green);
+      console.log(`communication service ${global.NKC.processId} stopped`.green);
       process.exit(0);
     }
   });

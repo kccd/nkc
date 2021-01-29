@@ -123,7 +123,7 @@ process.on('message', function(msg) {
   if (msg === 'shutdown') {
     httpServer.close();
     httpsServer.close();
-    console.log(`proxy service ${global.NKC.processId} has stopped`.green);
+    console.log(`proxy service ${global.NKC.processId} stopped`.green);
     process.exit(0);
   }
 });

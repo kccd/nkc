@@ -55,7 +55,7 @@ module.exports = async (server) => {
     process.on('message', function(msg) {
       if (msg === 'shutdown') {
         server.close();
-        console.log(`socket service ${global.NKC.processId} has stopped`.green);
+        console.log(`socket service ${global.NKC.processId} stopped`.green);
         process.exit(0);
       }
     });
