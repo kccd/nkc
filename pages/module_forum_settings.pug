@@ -27,7 +27,7 @@ if data.type !== 'category' && data.type !== 'merge'
       a.list-group-item(href=`/f/${data.forum.fid}/settings/merge`)
         span.fa.fa-user-circle &nbsp;&nbsp;
         span 合并专业
-    if permission('visitForumReviewSettings')
+    if permission('forumReviewSettings')
       a.list-group-item(href=`/f/${data.forum.fid}/settings/review`)
         span.fa.fa-user-circle &nbsp;&nbsp;
         span 审核设置

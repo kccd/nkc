@@ -1,4 +1,5 @@
 const Router = require("koa-router");
+
 const router = new Router();
 router
   .get("/", async (ctx, next) => {
@@ -186,6 +187,44 @@ router
       }
     );
     data.list = personalObj;
+    return next();
+  })
+  .get("/weakPasswordCheck", async (ctx, next) => {
+    const { db, data } = ctx;
+    if(db.WeakPasswordResultModel.isChecking()) {
+      ctx.throw(403, "检测尚未结束，请稍后直接查看结果");
+    }
+    db.WeakPasswordResultModel.weakPasswordCheck();
+    return next();
+  })
+  .get("/weakPasswordCheck/result", async (ctx, next) => {
+    ctx.template = "experimental/settings/safe/weakPasswordCheck/weakPasswordCheck.pug";
+    const { data, db, nkcModules, query } = ctx;
+    const { page = 0, type, content } = query;
+    const count = db.WeakPasswordResultModel.count();
+    const paging = nkcModules.apiFunction.paging(page, count);
+    data.paging = paging;
+    const list = await db.WeakPasswordResultModel.aggregate([
+      { $match: {} },
+      { $skip: paging.start },
+      { $limit: paging.perpage },
+      { $lookup: {
+          from: "users",
+          localField: "uid",
+          foreignField: "uid",
+          as: "userinfo"
+      } },
+      { $unwind: "$userinfo" },
+      { $project: {
+          uid: 1, 
+          password: 1,
+          toc: 1,
+          _id: 0,
+          "userinfo.username": 1,
+          "userinfo.avatar": 1
+      } }
+    ]);
+    data.list = list;
     return next();
   });
 module.exports = router;

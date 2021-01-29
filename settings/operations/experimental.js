@@ -258,7 +258,13 @@ module.exports = {
 			PUT: "experimentalSafeSettings",
 			unverifiedPhone: {
 				GET: "unverifiedPhonePage"
-			}
+      },
+      weakPasswordCheck: {
+        GET: "weakPasswordCheck",
+        result: {
+          GET: "weakPasswordCheckResult"
+        }
+      }
     },
     auth: {
       GET: "experimentalUserAuth",

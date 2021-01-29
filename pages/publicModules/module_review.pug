@@ -1,7 +1,9 @@
 .thread-review-info
-  -let {reviewPid, reviewType} = reviewData || {};
+  -let {reviewPid, reviewType, reviewReason} = reviewData || {};
   if permission("review") && reviewPid
     h4 内容未审核
+    if reviewReason
+      p= "送审理由：" + reviewReason
     | 通过请点击
     button.btn.btn-xs.btn-default(onclick=`reviewPost('${reviewPid}')`) 通过
     | &nbsp;  按钮，不通过请点击

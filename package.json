@@ -45,7 +45,6 @@
     "elasticsearch": "^14.0.0",
     "element-ui": "^2.13.2",
     "file-type": "^14.6.1",
-    "fluent-ffmpeg": "^2.1.2",
     "font-awesome": "^4.7.0",
     "fs-extra": "^7.0.1",
     "graceful-fs": "^4.2.4",
@@ -114,6 +113,7 @@
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
+    "@types/fluent-ffmpeg": "^2.1.16",
     "babel-cli": "^6.26.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",

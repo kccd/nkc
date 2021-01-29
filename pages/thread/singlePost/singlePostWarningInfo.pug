@@ -1,6 +1,6 @@
 if !isIncluded('singlePostWarningInfo')
   mixin singlePostWarningInfo(props)
-    -var {draft, disabled, pid, reviewed} = props;
+    -var {draft, disabled, pid, reviewed, reviewReason} = props;
     if draft
       .single-post-header
         .reture 当前内容已被退回修改，请作者点击编辑按钮修改
@@ -15,6 +15,8 @@ if !isIncluded('singlePostWarningInfo')
       .single-post-header
         .review 内容待审核
         if permission('review')
+          if reviewReason
+            span= "送审原因：" + reviewReason
           div
             | 通过请点击
             button.btn.btn-xs.btn-default(onclick=`reviewPost('${pid}')`) 通过

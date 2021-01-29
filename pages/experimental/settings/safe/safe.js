@@ -38,6 +38,13 @@ var app = new Vue({
           sweetSuccess('保存成功');
         })
         .catch(sweetError);
+    },
+    runWeakPasswordCheck: function() {
+      nkcAPI("/e/settings/safe/weakPasswordCheck", "GET")
+        .then(function() {
+          sweetAlert("检测已启动，将在后台执行，请大概5分钟后查看结果")
+        })
+        .catch(sweetError)
     }
   }
 });

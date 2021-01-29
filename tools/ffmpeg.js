@@ -11,7 +11,7 @@ const PATH = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const {upload} = require('../settings');
 const videoSettings = require('../settings/video');
-const ff = require('fluent-ffmpeg');
+const ff = require("fluent-ffmpeg");
 
 const fontFilePath = settings.statics.fontNotoSansHansMedium;
 const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");
@@ -361,9 +361,13 @@ async function getVideoInfo(inputFilePath) {
     ff.ffprobe(inputFilePath, (err, metadata) => {
       if(err) return reject(err);
       const {streams} = metadata;
+      const videoInfo = streams.filter(stream => stream["codec_type"] === "video").shift();
+      if(!videoInfo) {
+        return reject(new Error("cannot get video stream detail"));
+      }
       const {
         width, height, r_frame_rate, duration, bit_rate, display_aspect_ratio
-      } = streams[0];
+      } = videoInfo;
       const arr = r_frame_rate.split('/');
       resolve({
         width,
@@ -375,6 +379,38 @@ async function getVideoInfo(inputFilePath) {
       });
     });
   })
+}
+
+
+/**
+ * 视频打水印
+ */
+async function addWaterMask(options) {
+  let {
+    videoPath,
+    imageStream,
+    output,
+    position = {x: 10, y: 10},
+    flex = 0.4,
+    bitRate,
+    scalaByWidth
+  } = options;
+  const { width, height } = await getVideoInfo(videoPath);
+  return await new Promise((resolve, reject) => {
+    const imageWidth = Math.min(width, height) * flex;
+    ff(videoPath)
+      .input(imageStream)
+      .complexFilter([
+        `[1:v]scale=${imageWidth}:${imageWidth}/a[logo]`,
+        `[0:v][logo]overlay=${position.x}:${position.y}[o]`,
+        `[o]scale=${scalaByWidth}:${scalaByWidth}/a`
+      ])
+      .videoBitrate(bitRate)
+      .output(output)
+      .on("end", resolve)
+      .on("error", reject)
+      .run();
+  });
 }
 
 module.exports = {
@@ -403,5 +439,6 @@ module.exports = {
   ffmpegFilter,
   addImageWaterMask,
   addImageTextWaterMask,
-  addImageTextWaterMaskForImage
+  addImageTextWaterMaskForImage,
+  addWaterMask
 };

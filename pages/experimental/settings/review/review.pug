@@ -37,6 +37,33 @@ block eTitle
       padding: 3px;
       cursor: pointer;
     }
+    .keywords-count {
+      position: relative;
+    }
+    .keywords-count::after {
+      content: attr(data-add-number);
+      display: block;
+      color: red;
+      position: absolute;
+      left: 10px;
+      top: -2px;
+      width: 50px;
+      animation-name: keyword_count_change;
+      animation-duration: 5s;
+      animation-fill-mode: forwards;
+    }
+    @keyframes keyword_count_change {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-20px);
+          opacity: 0;
+        }
+    }
 
 block eContent
   .container-fluid.max-width
@@ -135,7 +162,7 @@ block eContent
               span 启用
               input(type="checkbox" v-model="reviewSettings.keyword.enable" @change="triggerKeyword(reviewSettings.keyword.enable)")
             .row
-              .keyword-pool.col-xs-3.col-md-3
+              .keyword-pool.col-xs-8.col-md-8
                 .table-responsive
                   table.table.table-bordered
                     thead
@@ -148,10 +175,20 @@ block eContent
                         td(colspan=3)
                           center 无
                       tr(v-for="(group, index) in wordGroup")
-                        td {{group.name}}
-                        td {{group.keywords.length}}
                         td
-                          button.btn.btn-danger.btn-xs(@click="deleteWordGroup(index)") 删除
+                          span {{group.name}}
+                        td(v-if="group.status === 'display'")
+                          span.keywords-count(:ref="'keywordCount'+index") {{group.keywords.length}}
+                        td(v-else-if="group.status === 'add'")
+                          .form-inline
+                            input.form-control(placeholder="多个用空格隔开" v-model="group.input")
+                            button.btn.btn-primary.btn-xs(@click="addKeyword(index)") 增加
+                            button.btn.btn-danger.btn-xs(@click="deleteKeyword(index)") 删除
+                            button.btn.btn-default.btn-xs(@click="cancelKeywordOperating(index)") 取消
+                        td
+                          button.btn.btn-default.btn-xs(:disabled="group.status === 'add'" @click="keywordOperating(index)") 敏感词增删
+                          button.btn.btn-default.btn-xs(@click="exportWordGroup(index)") 导出本组
+                          button.btn.btn-danger.btn-xs(@click="deleteWordGroup(index)") 删除本组
                       tr
                         td
                           input.form-control(type="text" v-model="newWordGroupName")
