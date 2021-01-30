@@ -40,8 +40,9 @@ script.
         });
         if(!isVideo) {
           player.download = "/r/" + rid + "?d=attachment";
+        } else {
+          addEvents(player, dom);
         }
-        addEvents(player, dom);
         player.speed = 1;
         NKC.methods.initPlyrMask(player);
         players.push(player);
