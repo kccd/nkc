@@ -475,7 +475,7 @@ userSchema.statics.extendUsersSecretInfo = async (users) => {
     if(user.volumeB) {
       const paperB = await ExamsPaperModel.findOne({uid: user.uid, passed: true, cid: {$in: proExamsCategoriesId}}).sort({toc: 1});
       if(paperB) {
-        user.paperB = proExamsCategories[paperB.cid];
+        user.paperB = proExamsCategoriesObj[paperB.cid];
       }
     }
     results.push(user);
@@ -2255,7 +2255,7 @@ userSchema.statics.checkNewUsername = async (username) => {
   if(sameNameUser) throwErr(400, `用户名已存在`);
   sameNameUser = await ColumnModel.findOne({usernameLowerCase: username});
   if(sameNameUser) throwErr(400, `用户名已存在`);
-  sameNameUser = await await SecretBehaviorModel.findOne({type: {$in: ['modifyUsername', "destroy"]}, oldUsernameLowerCase: username, toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
+  sameNameUser = await SecretBehaviorModel.findOne({type: {$in: ['modifyUsername', "destroy"]}, oldUsernameLowerCase: username, toc: {$gt: Date.now()-365*24*60*60*1000}}).sort({toc: -1});
   if(sameNameUser) throwErr(400, `用户名曾经被人使用过了，请更换`);
 }
 

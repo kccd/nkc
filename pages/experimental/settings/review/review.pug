@@ -30,6 +30,40 @@ block eTitle
     .review-condition > input::-webkit-inner-spin-button {
       display: none;
     }
+    .select-keyword-file {
+      white-space: nowrap;
+      border: 1px solid rgb(210 210 210);
+      border-radius: 4px;
+      padding: 3px;
+      cursor: pointer;
+    }
+    .keywords-count {
+      position: relative;
+    }
+    .keywords-count::after {
+      content: attr(data-add-number);
+      display: block;
+      color: red;
+      position: absolute;
+      left: 10px;
+      top: -2px;
+      width: 50px;
+      animation-name: keyword_count_change;
+      animation-duration: 5s;
+      animation-fill-mode: forwards;
+    }
+    @keyframes keyword_count_change {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-20px);
+          opacity: 0;
+        }
+    }
 
 block eContent
   .container-fluid.max-width
@@ -123,19 +157,47 @@ block eContent
 
           .m-t-3
             h4
-              b 四、敏感词
-              small &nbsp;当用户发表的任何文章或回复文字内容包含以下其中一个或以上关键词时需要通过审核后才能显示
+              b 四、敏感词词组
             label
               span 启用
               input(type="checkbox" v-model="reviewSettings.keyword.enable" @change="triggerKeyword(reviewSettings.keyword.enable)")
-            p.keyword-list
-              span(v-for="(keyword, index) in reviewSettings.keyword.list" @click="deleteKeyword(index)") {{keyword}}
-            input(type="text" placeholder="请输入敏感词" v-model="keywordInput" @keyup.enter="!foundKeywordIndex ? addKeyword() : null" @input="searchKeyword()")
-            button(@click="addKeyword()" :disabled="foundKeywordIndex") 添加
-            .search-result(v-show="foundKeywordIndex")
-              h5 已存在
-              p.keyword-list
-                span(@click="deleteKeyword(foundKeywordIndex)") {{reviewSettings.keyword.list[foundKeywordIndex]}}
+            .row
+              .keyword-pool.col-xs-8.col-md-8
+                .table-responsive
+                  table.table.table-bordered
+                    thead
+                      tr
+                        th 组名
+                        th 词数
+                        th 操作
+                    tbody
+                      tr(v-if="!wordGroup.length")
+                        td(colspan=3)
+                          center 无
+                      tr(v-for="(group, index) in wordGroup")
+                        td
+                          span {{group.name}}
+                        td(v-if="group.status === 'display'")
+                          span.keywords-count(:ref="'keywordCount'+index") {{group.keywords.length}}
+                        td(v-else-if="group.status === 'add'")
+                          .form-inline
+                            input.form-control(placeholder="多个用空格隔开" v-model="group.input")
+                            button.btn.btn-primary.btn-xs(@click="addKeyword(index)") 增加
+                            button.btn.btn-danger.btn-xs(@click="deleteKeyword(index)") 删除
+                            button.btn.btn-default.btn-xs(@click="cancelKeywordOperating(index)") 取消
+                        td
+                          button.btn.btn-default.btn-xs(:disabled="group.status === 'add'" @click="keywordOperating(index)") 敏感词增删
+                          button.btn.btn-default.btn-xs(@click="exportWordGroup(index)") 导出本组
+                          button.btn.btn-danger.btn-xs(@click="deleteWordGroup(index)") 删除本组
+                      tr
+                        td
+                          input.form-control(type="text" v-model="newWordGroupName")
+                        td
+                          label.select-keyword-file
+                            span {{newWordGroupKeywords? newWordGroupKeywords.length : "选择文件"}}
+                            input.hidden(type="file" accept=".txt" @change="keywordFile($event.target.files[0]);$event.target.value=''")
+                        td
+                          button.btn.btn-default.btn-xs(@click="addWordGroup()") 添加
             .review-condition
               | 至少命中
               input(type="number" v-model="leastKeywordCount" @change="updateReviewCondition()")

@@ -80,7 +80,7 @@ NKC.modules.Attachments = class {
         },
         request() {
           const {pid} = this;
-          return nkcAPI(`/p/${pid}/resources?t=attachment`, "GET");
+          return nkcAPI(`/p/${pid}/resources?d=attachment`, "GET");
         }
       }
     });

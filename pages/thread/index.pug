@@ -127,7 +127,7 @@ block content
                               if data.userOperationsId.includes('openThread') && thread.closed
                                 button.btn.btn-default.btn-sm(onclick=`openThread('${data.thread.tid}')`) 开放主题
                               if permission("moveThreads")
-                                 button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
+                                button.btn-sm.btn.btn-default(onclick="moveThread()") 移动
                               if permissionsOr(["movePostsToDraft", "movePostsToRecycle"])
                                 button.btn-sm.btn.btn-danger(onclick="deleteThread()") 退修/删除
                             if data.thread.type === "fund"
@@ -135,7 +135,7 @@ block content
                 .col-xs-12.col-md-12
                   .row
                     if !thread.reviewed
-                      -let reviewData = {reviewPid: thread.oc, reviewType: "thread"}
+                      -let reviewData = {reviewPid: thread.oc, reviewType: "thread", reviewReason: data.threadReviewReason}
                       include ../publicModules/module_review
                     .col-xs-12.col-md-12(style=`margin: 0.5rem 0 0 0;${thread.recycleMark?'border: 1px solid #ff5a0b;padding: 0.5rem;border-radius: 5px;background-color: #fafafa;':''}`)
                       if thread.recycleMark
@@ -422,7 +422,17 @@ block content
                 | &nbsp;或者&nbsp;
                 a.pointer(onclick="NKC.methods.toLogin('register')") 注册
                 | 。
-          +floatForumNav(data.threadNav)
+          -var floatCategories = [];
+          for f in data.threadNav
+            -var {fid, name, cid} = f;
+            if cid
+              -floatCategories.push({fid, cid, displayName: name});
+          -var floatParentForums = [], floatParentForumsId = [];
+          for f in data.forumsNav
+            if f[0] && !floatParentForumsId.includes(f[0].fid)
+              -floatParentForums.push({fid: f[0].fid, displayName: f[0].displayName});
+              -floatParentForumsId.push(f[0].fid);
+          +floatForumNav({forums: thread.forums, categories: floatCategories, parentForums: floatParentForums, sameLevelForums: data.sameLevelForums})
 
         .col-xs-12.col-md-3.box-shadow-panel#rightDom
           if data.thread.type === "fund"

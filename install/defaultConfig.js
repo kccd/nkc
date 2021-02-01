@@ -60,5 +60,20 @@ module.exports = [
       maxGetPageScale: 0.5,     // 生成预览版PDF文件时，在原pdf中最大取占比多少的页数
       maxGetPageCount: 8        // 生成预览版PDF文件时，在原pdf中最大取多少页
     }
+  },
+  {
+    name: 'socket',
+    data: {
+      "address": "0.0.0.0",
+      "port": 2170,
+      "options": {
+        "serverClient": false,
+        "transports": [
+          "polling",
+          "websocket"
+        ],
+        "pingInterval": 30000
+      }
+    }
   }
 ];

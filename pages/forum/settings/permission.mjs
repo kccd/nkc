@@ -68,7 +68,7 @@ const app = new Vue({
         open: '开启',
         close: '关闭'
       }[type];
-      sweetQuestion(`确定要${typeName}专栏？`)
+      sweetQuestion(`确定要${typeName}文库？`)
         .then(() => {
           return nkcAPI("/f/" + fid + "/library", "POST", {
             type: type

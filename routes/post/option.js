@@ -123,7 +123,7 @@ router
         )? true: null;
       }
       // 投诉
-      optionStatus.complaint = ctx.permission('complaintGet')? true: null;
+      optionStatus.complaint = ctx.permission('complaintPost')? true: null;
       optionStatus.ipInfo = ctx.permission('ipinfo')? post.iplm || post.ipoc: null;
     }
     data.options = optionStatus;

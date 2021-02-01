@@ -49,6 +49,10 @@ module.exports = {
 			score: {
 				GET: 'forumScoreSettings',
 				PUT: 'forumScoreSettings'
+			},
+			review: {
+				GET: 'forumReviewSettings', // 查看审核设置
+				PUT: 'forumReviewSettings' // 修改专业审核设置
 			}
 		},
 		subscribe: {

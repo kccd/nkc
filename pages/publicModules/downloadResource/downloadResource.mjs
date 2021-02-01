@@ -103,20 +103,23 @@ NKC.modules.downloadResource = class {
           let {rid, fileName} = this;
           nkcAPI(`/r/${rid}/pay`, "POST")
             .then(() => {
+              window.location.href = `/r/${rid}?d=attachment`;
+              /*
               let downloader = document.createElement("a");
               downloader.setAttribute("download", fileName);
-              downloader.href = `/r/${rid}`;
-              downloader.click();
+              downloader.href = `/r/${rid}?d=attachment`;
+              downloader.click();*/
             })
             .catch(sweetError)
             .then(() => self.getResourceInfo(self.rid))
         },
         fetchResource() {
           let {rid, fileName} = this;
-          let downloader = document.createElement("a");
+          window.location.href = `/r/${rid}?d=attachment`;
+          /*let downloader = document.createElement("a");
           downloader.setAttribute("download", fileName);
-          downloader.href = `/r/${rid}`;
-          downloader.click();
+          downloader.href = `/r/${rid}?d=attachment`;
+          downloader.click();*/
         },
         open(rid) {
           this.status = "loading";

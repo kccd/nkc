@@ -27,6 +27,10 @@ if data.type !== 'category' && data.type !== 'merge'
       a.list-group-item(href=`/f/${data.forum.fid}/settings/merge`)
         span.fa.fa-user-circle &nbsp;&nbsp;
         span 合并专业
+    if permission('forumReviewSettings')
+      a.list-group-item(href=`/f/${data.forum.fid}/settings/review`)
+        span.fa.fa-user-circle &nbsp;&nbsp;
+        span 审核设置
 if permission('deleteForum')
   button.btn.btn-danger.btn-block(onclick=`deleteForum("${data.forum.fid}")`) 删除当前专业
 h4 当前专业

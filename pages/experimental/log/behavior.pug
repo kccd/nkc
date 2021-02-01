@@ -39,6 +39,7 @@ block content
                         th 操作名
                         th 目标ID
                         th IP
+                        th 其他
                     tbody
                       for behavior in data.results
                         tr
@@ -68,6 +69,9 @@ block content
                                 a(href=`/u/${behavior.toUid}` target="_blank")=behavior.toUid
                           th
                             a(href=ipUrl(behavior.ip))=`${behavior.ip}: ${behavior.port}`
+                          th
+                            if behavior.user
+                              a(href=`/u/${behavior.user.uid}/alt` target="_blank") 查马甲
                 .m-t-05
                   include ../../publicModules/paging/paging_input
 

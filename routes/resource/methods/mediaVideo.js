@@ -8,6 +8,9 @@ const {AttachmentModel, ColumnModel, SettingModel} = require("../../../dataModel
 const imageMagick = require("../../../tools/imageMagick");
 const ffmpeg = require("../../../tools/ffmpeg");
 const Path = require('path');
+const videoSize = require('../../../settings/video');
+const fs = require('fs');
+const fsPromises = fs.promises;
 
 module.exports = async (options) => {
   let {file, resource, user} = options;
@@ -20,221 +23,58 @@ module.exports = async (options) => {
   let videoDir = await FILE.getPath("mediaVideo", toc);
   // 输出视频路径
   let outputVideoPath = Path.resolve(videoDir, `./${rid}.mp4`);
+  // 读取视频尺寸配置
+  const {sd, hd, fhd} = videoSize;
+  // 各个尺寸视频路径
+  const sdVideoPath = Path.resolve(videoDir, `./${rid}_sd.mp4`);
+  const hdVideoPath = Path.resolve(videoDir, `./${rid}_hd.mp4`);
+  const fhdVideoPath = Path.resolve(videoDir, `./${rid}_fhd.mp4`);
   // 视频封面图路径
   let videoCoverPath = Path.resolve(videoDir, `./${rid}_cover.jpg`);
   // 获取文件格式 extension
   let extension = ext;
 
-  const watermarkSettings = await SettingModel.getWatermarkSettings();
-  let ffmpegTransparency = (watermarkSettings.transparency / 100).toFixed(2);
-
   // 如果设置了需要加水印
   if(waterSetting.waterAdd) {
-    let text;
-    if(waterSetting.waterStyle === "userLogo"){
-      text = user? user.username : websiteName;
-    }else if(waterSetting.waterStyle === "coluLogo"){
-      const column = await ColumnModel.findOne({uid: user.uid});
-      text = column? column.name : user.username + "的专栏";
-    }else{
-      text = "";
-    }
-    let waterSmallPath = await AttachmentModel.getWatermarkFilePath('small');
-    let waterBigPath = await AttachmentModel.getWatermarkFilePath('normal');
-    let videoPath = path.replace(/\\/g, "/");
+    const { waterGravity, watermarkStream } = await SettingModel.getWatermarkInfoByUid(user.uid);
+    const videoPath = path;
 
-    // 获得视频尺寸并计算出码率控制参数
-    let {videoVBRControl} = await SettingModel.getSettings("upload");
-    let additionOptions = await calcBitrateControlParameter(videoPath, videoVBRControl);
-    // console.log(additionOptions);
+    // 获取原视频尺寸
+    const {width: videoWidth, height: videoHeight} = await ffmpeg.getVideoInfo(videoPath);
+    // 各个尺寸视频的宽度
+    const widthSD = sd.height * videoWidth / videoHeight;
+    const widthHD = hd.height * videoWidth / videoHeight;
+    const widthFHD = fhd.height * videoWidth / videoHeight;
+    // 各个视频的比特率
+    const bitrateSD = await SettingModel.getBitrateBySize(widthSD, sd.height);
+    const bitrateHD = await SettingModel.getBitrateBySize(widthHD, hd.height);
+    const bitrateFHD = await SettingModel.getBitrateBySize(widthFHD, fhd.height);
 
-    outputVideoPath = outputVideoPath.replace(/\\/g, "/");
-    // 右下角
-    if(waterSetting.waterGravity === "southeast") {
-      if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-        await ffmpeg.addImageTextWaterMask({
-          input: videoPath,
-          output: outputVideoPath,
-          image: waterSmallPath,
-          text,
-          position: {
-            x: "W-w-10",
-            y: "H-h-10"
-          },
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "siteLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterBigPath,
-          position: {x: "W-w-10", y: "H-h-10"},
-          flex: 0.2,
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "singleLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterSmallPath,
-          position: {x: "W-w-10", y: "H-h-10"},
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      }
-    }
-    // 右上角
-    if(waterSetting.waterGravity === "northeast") {
-      if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-        await ffmpeg.addImageTextWaterMask({
-          input: videoPath,
-          output: outputVideoPath,
-          image: waterSmallPath,
-          text,
-          position: {
-            x: "W-w-10",
-            y: "10"
-          },
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "siteLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterBigPath,
-          position: {x: "W-w-10", y: "10"},
-          flex: 0.2,
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "singleLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterSmallPath,
-          position: {x: "W-w-10", y: "10"},
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      }
-    }
-    // 左上角
-    if(waterSetting.waterGravity === "northwest") {
-      if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-        await ffmpeg.addImageTextWaterMask({
-          input: videoPath,
-          output: outputVideoPath,
-          image: waterSmallPath,
-          text,
-          position: {
-            x: "10",
-            y: "10"
-          },
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "siteLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterBigPath,
-          position: {x: "10", y: "10"},
-          flex: 0.2,
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "singleLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterSmallPath,
-          position: {x: "10", y: "10"},
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      }
-    }
-    // 左下角
-    if(waterSetting.waterGravity === "southwest") {
-      if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-        await ffmpeg.addImageTextWaterMask({
-          input: videoPath,
-          output: outputVideoPath,
-          image: waterSmallPath,
-          text,
-          position: {
-            x: "10",
-            y: "H-h-10"
-          },
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "siteLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterBigPath,
-          position: {x: "10", y: "H-h-10"},
-          flex: 0.2,
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "singleLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterSmallPath,
-          position: {x: "10", y: "H-h-10"},
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      }
-    }
-    // 正中间
-    if(waterSetting.waterGravity === "center") {
-      if(waterSetting.waterStyle === "userLogo" || waterSetting.waterStyle === "coluLogo") {
-        await ffmpeg.addImageTextWaterMask({
-          input: videoPath,
-          output: outputVideoPath,
-          image: waterSmallPath,
-          text,
-          position: {
-            x: "(W-w)/2",
-            y: "(H-h)/2"
-          },
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "siteLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterBigPath,
-          position: {
-            x: "(W-w)/2",
-            y: "(H-h)/2"
-          },
-          flex: 0.2,
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      } else if(waterSetting.waterStyle === "singleLogo") {
-        await ffmpeg.addImageWaterMask({
-          videoPath,
-          output: outputVideoPath,
-          imagePath: waterSmallPath,
-          position: {
-            x: "(W-w)/2",
-            y: "(H-h)/2"
-          },
-          transparency: ffmpegTransparency,
-          additionOptions
-        });
-      }
-    }
+    const isReachFHD = videoHeight >= fhd.height;
+    const isReachHD  = !isReachFHD && videoHeight >= hd.height;
+    const isReachSD  = !isReachHD  && videoHeight >= sd.height;
+    
+    const waterMaskPosition = gravityToPositionMap[waterGravity];
+    await ffmpeg.addWaterMask({
+      videoPath,
+      output: outputVideoPath,
+      imageStream: watermarkStream,
+      position: waterMaskPosition,
+      scalaByWidth: isReachFHD
+        ? widthFHD
+        : isReachHD
+        ? widthHD
+        : isReachSD
+        ? widthSD
+        : videoWidth,
+      bitRate: isReachFHD
+        ? bitrateFHD
+        : isReachHD
+        ? bitrateHD
+        : isReachSD
+        ? bitrateSD
+        : await SettingModel.getBitrateBySize(videoWidth, videoHeight)
+    });
   } else {
     // 视频转码
     if(['3gp'].indexOf(extension.toLowerCase()) > -1){
@@ -246,6 +86,8 @@ module.exports = async (options) => {
     }else if(['avi'].indexOf(extension.toLowerCase()) > -1) {
       await ffmpeg.videoAviTransAvi(path, path);
       await ffmpeg.videoAVITransMP4(path, outputVideoPath);
+    } else if(['webm'].includes(extension.toLowerCase())) {
+      await ffmpeg.videoWEBMTransMP4(path, outputVideoPath);
     }
   }
 
@@ -255,6 +97,49 @@ module.exports = async (options) => {
   const videoCoverInfo = await imageMagick.info(videoCoverPath);
   let height = videoCoverInfo.height;
   let width = videoCoverInfo.width;
+
+  // 获取原视频尺寸
+  const {width: originWidth, height: originHeight} = await ffmpeg.getVideoInfo(outputVideoPath);
+  // 各个尺寸视频的宽度
+  const widthSD = sd.height * originWidth / originHeight;
+  const widthHD = hd.height * originWidth / originHeight;
+  const widthFHD = fhd.height * originWidth / originHeight;
+  // 各个视频的比特率
+  const bitrateSD = await SettingModel.getBitrateBySize(widthSD, sd.height);
+  const bitrateHD = await SettingModel.getBitrateBySize(widthHD, hd.height);
+  const bitrateFHD = await SettingModel.getBitrateBySize(widthFHD, fhd.height);
+
+  // 生成其他尺寸的视频文件
+  if(originHeight < hd.height) {
+    // 原视频小于720，则将其设置为480
+    await fsPromises.rename(outputVideoPath, sdVideoPath);
+  } else if(originHeight < fhd.height) {
+    // 原视频大于等于720且小于1080，则将其设置为720并生成480的视频
+    const newOutputVideoPath = hdVideoPath;
+    await fsPromises.rename(outputVideoPath, newOutputVideoPath);
+    await ffmpeg.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
+      height: sd.height,
+      bitrate: bitrateSD,
+      fps: sd.fps
+    });
+  } else {
+    // 原视频大于等于1080，则将其设置为1080并生成720和480的视频
+    const newOutputVideoPath = fhdVideoPath;
+    await fsPromises.rename(outputVideoPath, newOutputVideoPath);
+    const tasks = [
+      ffmpeg.createOtherSizeVideo(newOutputVideoPath, sdVideoPath, {
+        height: sd.height,
+        bitrate: bitrateSD,
+        fps: sd.fps
+      }),
+      ffmpeg.createOtherSizeVideo(newOutputVideoPath, hdVideoPath, {
+        height: hd.height,
+        bitrate: bitrateHD,
+        fps: hd.fps
+      })
+    ];
+    await Promise.all(tasks);
+  }
 
   // 更新数据库记录 inProcess改为 usable
   await resource.update({
@@ -317,7 +202,7 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
     delete params["maxrate"];
     delete params["minrate"];
     delete params["b:v"];
-    return objectToParameterArray(params);
+    return params;
   }
   // 计算最大和最小码率
   let maxBitrate = minAverageBitrate.plus(2);
@@ -327,5 +212,30 @@ async function calcBitrateControlParameter(videoPath, videoVBRControl) {
   params["maxrate"] = `${maxBitrate}M`;
   params["minrate"] = `${minBitrate}M`;
   params["b:v"] = `${minAverageBitrate}M`;
-  return objectToParameterArray(params);
+  return params;
 }
+
+
+// 方位和position参数的映射关系
+const gravityToPositionMap = {
+  southeast: {
+    x: "W-w-10",
+    y: "H-h-10"
+  },
+  northeast: {
+    x: "W-w-10",
+    y: "10"
+  },
+  southwest: {
+    x: "10",
+    y: "10"
+  },
+  northwest: {
+    x: "10",
+    y: "H-h-10"
+  },
+  center: {
+    x: "(W-w)/2",
+    y: "(H-h)/2"
+  }
+};

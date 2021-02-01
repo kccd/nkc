@@ -7,7 +7,7 @@ const redLock = new RedLock([redisClient], {
   retryJitter:  200
 });
 redLock.on("clientError", (err) => {
-  if(global.NKC.NODE_ENV !== "production") {
+  if(global.NKC.isDevelopment) {
     console.log(err);
   }
 });

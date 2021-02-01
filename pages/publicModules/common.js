@@ -360,7 +360,7 @@ NKC.methods.getRandomColor = function() {
 * */
 NKC.methods.appResourceToHtml = function(resource) {
   // 兼容代码 为了兼容旧版app
-  return nkcAPI("/r/" + resource.rid + "?t=object", 'GET')
+  return nkcAPI("/r/" + resource.rid + "?d=object", 'GET')
     .then(function(data) {
       resource = data.resource;
       var mediaType = resource.mediaType;

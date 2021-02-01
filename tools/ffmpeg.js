@@ -7,8 +7,11 @@ const {platform} = require('os');
 const fs = require('fs');
 const {stat, unlink} = fs;
 const path = require('path');
+const PATH = require('path');
 const __projectRoot = path.resolve(__dirname, `../`);
 const {upload} = require('../settings');
+const videoSettings = require('../settings/video');
+const ff = require("fluent-ffmpeg");
 
 const fontFilePath = settings.statics.fontNotoSansHansMedium;
 const fontFilePathForFFmpeg = fontFilePath.replace(/\\/g, "/").replace(":", "\\:");
@@ -22,6 +25,8 @@ const bitrateAndFPSControlParameter = [
   '-minrate', '1M',                                             /* 最小码率 */
   '-b:v', '1.16M',                                              /* 平均码率 */
 ];
+
+
 
 const spawnProcess = (pathName, args, options = {}) => {
   return new Promise((resolve, reject) => {
@@ -103,6 +108,10 @@ const videoMOVTransMP4 = async (inputPath, outputPath) => {
 const videoAVITransMP4 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
 }
+// webm转码为mp4
+const videoWEBMTransMP4 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, '-movflags', 'faststart', '-y', ...bitrateAndFPSControlParameter, outputPath])
+}
 
 // AMR转码为MP3
 const audioAMRTransMP3 = async (inputPath, outputPath) => {
@@ -123,6 +132,9 @@ const audioWMATransMP3 = async (inputPath, outputPath) => {
   return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath])
 }
 
+const audioFLACTransMP3 = async (inputPath, outputPath) => {
+  return spawnProcess('ffmpeg', ['-i', inputPath, ...bitrateAndFPSControlParameter, outputPath]);
+}
 /**
  * 获取视频的帧宽高
  * @param {string} inputPath 视频路径
@@ -314,17 +326,96 @@ async function addImageTextWaterMaskForImage(op) {
   ], additionOptions)
 }
 
-async function changeVideoResolution(input, output, t) {
-  const {width, height} = await getVideoSize(input);
-  if(height > t) {
-    const _height = t;
-    const _width = width * _height / height;
-    return spawnProcess('ffmpeg', ['-i', input, '-vf', `scale=${_width}:${_height}`, output]);
-  }
+/*
+* 生成指定分辨率的视频
+* @param {String} inputFile 原视频磁盘路径
+* @param {String} outputFile 生成视频的磁盘路径
+* @param {Object} props
+*   @param {Number} height 目标视频高
+*   @param {Number} fps
+*   @param {Number} bitrate 单位Kbps
+* @author pengxiguaa 2021-01-22
+* */
+async function createOtherSizeVideo(inputFile, outputFile, props) {
+  const {height, bitrate, fps} = props;
+  return new Promise((resolve, reject) => {
+    ff(inputFile)
+      .fps(fps)
+      .size(`?x${height}`)
+      .videoBitrate(bitrate + 'k')
+      .output(outputFile)
+      .on('end', resolve)
+      .on('error', reject)
+      .run()
+  });
+}
+/*
+* 获取视频信息
+* @param {String} inputFilePath 视频路径
+* @return {Object}
+*   @param {Object} format
+*     @param {}
+* */
+async function getVideoInfo(inputFilePath) {
+  return new Promise((resolve, reject) => {
+    ff.ffprobe(inputFilePath, (err, metadata) => {
+      if(err) return reject(err);
+      const {streams} = metadata;
+      const videoInfo = streams.filter(stream => stream["codec_type"] === "video").shift();
+      if(!videoInfo) {
+        return reject(new Error("cannot get video stream detail"));
+      }
+      const {
+        width, height, r_frame_rate, duration, bit_rate, display_aspect_ratio
+      } = videoInfo;
+      const arr = r_frame_rate.split('/');
+      resolve({
+        width,
+        height,
+        duration,
+        bitRate: bit_rate,
+        displayAspectRatio: display_aspect_ratio,
+        fps: Number((arr[0] / arr[1]).toFixed(1))
+      });
+    });
+  })
+}
+
+
+/**
+ * 视频打水印
+ */
+async function addWaterMask(options) {
+  let {
+    videoPath,
+    imageStream,
+    output,
+    position = {x: 10, y: 10},
+    flex = 0.4,
+    bitRate,
+    scalaByWidth
+  } = options;
+  const { width, height } = await getVideoInfo(videoPath);
+  return await new Promise((resolve, reject) => {
+    const imageWidth = Math.min(width, height) * flex;
+    ff(videoPath)
+      .input(imageStream)
+      .complexFilter([
+        `[1:v]scale=${imageWidth}:${imageWidth}/a[logo]`,
+        `[0:v][logo]overlay=${position.x}:${position.y}[o]`,
+        `[o]scale=${scalaByWidth}:${scalaByWidth}/a`
+      ])
+      .videoBitrate(bitRate)
+      .output(output)
+      .on("end", resolve)
+      .on("error", reject)
+      .run();
+  });
 }
 
 module.exports = {
-  changeVideoResolution,
+  getVideoInfo,
+  createOtherSizeVideo,
   videoFirstThumbTaker,
   videoTranscode,
   videoAviTransAvi,
@@ -336,7 +427,9 @@ module.exports = {
   videoMP4TransH264,
   videoMOVTransMP4,
   videoAVITransMP4,
+  videoWEBMTransMP4,
   audioAMRTransMP3,
+  audioFLACTransMP3,
   audioWAVTransMP3,
   audioWMATransMP3,
   getVideoSize,
@@ -346,5 +439,6 @@ module.exports = {
   ffmpegFilter,
   addImageWaterMask,
   addImageTextWaterMask,
-  addImageTextWaterMaskForImage
+  addImageTextWaterMaskForImage,
+  addWaterMask
 };

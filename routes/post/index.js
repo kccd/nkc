@@ -465,7 +465,8 @@ router
       await log.update({"modifyType":true});
     }
     // 若post被退修则清除退修标记并标记为未审核
-    if(targetThread.oc === targetPost.pid) {
+    const isThreadContent = targetThread.oc === targetPost.pid;
+    if(isThreadContent) {
       if(targetThread.recycleMark) {
         await targetThread.update({
           recycleMark:false,
@@ -486,6 +487,22 @@ router
       });
       postReviewed = false;
     }
+
+    // 如果符合送审条件，自动内容送审
+    const needReview = await db.ReviewModel.autoPushToReview(singlePost);
+    if(needReview) {
+      await singlePost.update({
+        reviewed: false
+      });
+      if(isThreadContent) {
+        await db.ThreadModel.updateOne({ tid: singlePost.tid }, {
+          $set: {
+            reviewed: false
+          }
+        });
+      }
+    }
+
     // 帖子曾经在草稿箱中，发表时，删除草稿
     if(did) {
       await db.DraftModel.removeDraftById(did, data.user.uid);

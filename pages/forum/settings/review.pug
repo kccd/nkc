@@ -1,0 +1,71 @@
+extends ../../bootstrap_base
+block title
+  title 审核设置
+  style.
+    .group-name {
+      margin-left: 10px;
+    }
+    .group-keywords-count {
+      color: rgb(191, 191, 191);
+      font-size: .8em;
+      font-weight: normal;
+      margin-left: 10px;
+    }
+
+block content
+  #data.hidden= objToStr({wordGroupInfo: data.wordGroupInfo, fid: data.fid, useGroup: data.useGroup, allContentShouldReview: data.allContentShouldReview, roles: data.roles, grades: data.grades, roleGradeReview: data.roleGradeReview})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-2
+        include ../../module_forum_settings
+      .col-xs-12.col-md-10(v-cloak)#app
+        .panel.panel-default
+          .panel-heading
+            span 内容送审
+          .panel-body
+            div.form-horizontal
+              .form-group
+                label.col-sm-2.control-label 所有内容送审
+                .col-sm-10.m-t-05
+                  .form-group
+                    label
+                      input(type="checkbox" v-model="allContentShouldReview")
+              .form-group
+                label.col-sm-2.control-label 角色和等级的关系
+                .col-sm-10.m-t-05
+                  .form-group
+                    label
+                      select(v-model="roleGradeReview.relationship")
+                        option(value="and") 与
+                        option(value="or") 或
+              .form-group
+                .col-sm-2.control-label 角色
+                .col-sm-10.m-t-05
+                  label(v-for='r in roles').m-r-1
+                    input(type='checkbox' :value='r._id' v-model="roleGradeReview.roles")
+                    span {{r.displayName}}
+              .form-group
+                .col-sm-2.control-label 等级
+                .col-sm-10.m-t-05
+                  label(v-for='r in grades').m-r-1
+                    input(type='checkbox' :value='r._id' v-model="roleGradeReview.grades")
+                    span {{r.displayName}}
+
+        .panel.panel-default
+          .panel-heading
+            span 敏感内容送审
+          .panel-body
+            div.form-horizontal
+              .form-group
+                label.col-sm-2.control-label 使用敏感词组
+                .col-sm-10.m-t-05
+                  .form-group(v-for="(group, index) in keywordReview.wordGroupInfo")
+                    label
+                      input(type="checkbox" :value="group.name" v-model="keywordReview.selectedGroup")
+                      span.group-name {{group.name}}
+                      span.group-keywords-count 共{{group.len}}个敏感词
+        .m-t-1
+          button.btn.btn-primary.btn-block(@click="submit()") 保存
+
+block scripts
+  +includeJS('/forum/settings/review.js')

@@ -1,6 +1,6 @@
 const QCloudSms = require('qcloudsms_js');
 module.exports = async (smsSettings, obj) => {
-  const {templateId, timeout, code, mobile, nationCode, description} = obj;
+  const {templateId, timeout, content, mobile, nationCode, description} = obj;
   const {appId, appKey, smsSign} = smsSettings;
 
   const qCloudSms = QCloudSms(appId, appKey);
@@ -18,7 +18,7 @@ module.exports = async (smsSettings, obj) => {
         }
       }
     };
-    const params = [code];
+    const params = [content];
     if(description) {
       params.push(description);
     }

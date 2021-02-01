@@ -1,5 +1,5 @@
-const db = require("./dataModels");
-const tasks = require('./tasks');
+const db = require("../dataModels");
+const tasks = require('../tasks');
 const func = {};
 /*
 * 定时更新活跃用户的信息 主要是头像
@@ -13,7 +13,7 @@ func.cacheActiveUsers = async () => {
     } finally {
       await func.cacheActiveUsers();
     }
-  }, 2 * 60 * 1000);
+  }, 10 * 60 * 1000);
 };
 
 func.clearTimeoutPageCache = async () => {
@@ -130,5 +130,4 @@ func.updateForumsMessage = async () => {
     }
   }, 30 * 60 * 1000);
 };
-
 module.exports = func;

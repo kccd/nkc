@@ -7,6 +7,7 @@ const kindRouter = require('./kind');
 const permissionRouter = require('./permission');
 const mergeRouter = require('./merge');
 const scoreRouter = require('./score');
+const reviewRouter = require('./review');
 settingsRouter
 	.use('/', async (ctx, next) => {
 		const {data, db, params, url} = ctx;
@@ -43,5 +44,6 @@ settingsRouter
 	.use('/kind', kindRouter.routes(), kindRouter.allowedMethods())
 	.use('/info', infoRouter.routes(), infoRouter.allowedMethods())
 	.use('/score', scoreRouter.routes(), scoreRouter.allowedMethods())
-	.use('/merge', mergeRouter.routes(), mergeRouter.allowedMethods());
+	.use('/merge', mergeRouter.routes(), mergeRouter.allowedMethods())
+	.use('/review', reviewRouter.routes(), reviewRouter.allowedMethods());
 module.exports = settingsRouter;

@@ -760,6 +760,11 @@
   "unverifiedPhonePage": "查看未验证的手机号列表",
   "experimentalKeywordSettings": "审核关键词设置",
   "applyToChangeUnusedPhoneNumber": "申请修改失效手机号",
+  "getUserOtherAccount": "查询用户可能存在的小号",
   "nkcManagementSecurityApplication": "前台管理 - 手机号申诉",
-  "getUserOtherAccount": "查询用户可能存在的小号"
+
+  "forumReviewSettings": "专业审核设置",
+
+  "weakPasswordCheck": "弱密码检测",
+  "weakPasswordCheckResult": "查看弱密码检测结果"
 }

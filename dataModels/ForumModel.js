@@ -331,6 +331,25 @@ const forumSchema = new Schema({
   founders: {
     type: Array,
     default: [],
+  },
+  // 敏感词审核使用的词组
+  keywordReviewUseGroup: {
+    type: [String],
+    default: [],
+  },
+  // 是否本专业所有内容都需要送审
+  allContentShouldReview: {
+    type: Boolean,
+    default: false
+  },
+  // 按角色和等级之间的关系送审
+  roleGradeReview: {
+    roles: Array,
+    grades: Array,
+    relationship: {
+      type: String,
+      match: /^(and|or)$/
+    }
   }
 }, {toObject: {
 		getters: true,
