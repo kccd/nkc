@@ -23,6 +23,7 @@
     "@alicloud/pop-core": "^1.7.9",
     "@nkc/communication": "./microServices/communication",
     "@nkc/proxy": "./microServices/proxy",
+    "@nkc/backup": "./microServices/backup",
     "alipay-sdk": "^3.1.5",
     "ansi-escapes": "^4.3.1",
     "awesome-static": "^1.4.3",

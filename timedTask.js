@@ -14,7 +14,6 @@ const run = async () => {
   jobs.updateActiveUsers(updateDate.updateActiveUsersCronStr);
   jobs.clearForumAndThreadPostCount();
   jobs.shop();
-  jobs.backupDatabase();
   jobs.moveRecycleMarkThreads();
   jobs.clearFileCache();
   jobs.preparationForumCheck();
