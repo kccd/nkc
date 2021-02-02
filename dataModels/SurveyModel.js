@@ -555,8 +555,8 @@ schema.methods.computePostCount = async function() {
     for(const answer of option.answers) {
       answer.postCount = 0;
       answer.postScore = 0;
-      answer.postMaxScore = 0;
-      answer.postMinScore = 0;
+      answer.postMaxScore = null;
+      answer.postMinScore = null;
       option.answersObj[answer._id] = answer;
     }
     optionsObj[option._id] = option;
@@ -573,8 +573,8 @@ schema.methods.computePostCount = async function() {
       }
       if(this.type === "score") {
         answer.postScore += o.score || 0;
-        if(answer.postMinScore === 0 || answer.postMinScore > o.score) answer.postMinScore = o.score;
-        if(answer.postMaxScore < o.score) answer.postMaxScore = o.score;
+        if(answer.postMinScore === null || answer.postMinScore > o.score) answer.postMinScore = o.score;
+        if(answer.postMaxScore === null || answer.postMaxScore < o.score) answer.postMaxScore = o.score;
       } else {
         if(!o.selected) continue;
         answer.postCount ++;
