@@ -50,7 +50,7 @@ const start = async () => {
 
     communication.getCommunicationClient();
 
-    const port = Number(serverConfig.port);
+    const port = Number(serverConfig.port) + global.NKC.processId;
     const address = serverConfig.address;
     server = http.createServer(app);
     server.keepAliveTimeout = 10 * 1000;

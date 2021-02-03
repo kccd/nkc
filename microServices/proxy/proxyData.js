@@ -29,7 +29,7 @@ const secureContext = {
 const agent = new http.Agent(httpAgent);
 
 for(const s of servers) {
-  const {name, type, domains, https, target = [], disabled, socketTarget = []} = s;
+  const {name, type, domains, https, target = [], disabled, socketTarget = [], socketBalanceType, httpBalanceType} = s;
   if(disabled) continue;
   if(!domains.length || !target.length) throw 'domains, target不能为空';
   let _proxyServer;
@@ -96,7 +96,9 @@ for(const s of servers) {
       type,
       target,
       servers: proxyServers,
-      socketServers: socketServers
+      socketServers: socketServers,
+      socketBalanceType,
+      httpBalanceType,
     }
     if(https) {
       const cert = getCert(domain);

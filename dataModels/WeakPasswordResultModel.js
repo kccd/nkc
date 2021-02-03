@@ -1,8 +1,11 @@
+const path = require("path");
 const settings = require('../settings');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
 const encryption = require("../tools/encryption");
 const { dictionary } = require("../tools/weakPasswordChecker");
+const { isMainThread, Worker } = require("worker_threads");
+const UsersPersonalModel = require("./UsersPersonalModel");
 
 const schema = new Schema({
   uid: {
@@ -17,19 +20,23 @@ const schema = new Schema({
   }
 });
 
-let isChecking = false;
+let checkWorker = null;
 
 schema.statics.isChecking = function() {
-  return isChecking;
+  return !!checkWorker;
 }
 
 schema.statics.weakPasswordCheck = async function() {
-  if(isChecking) {
-    throw new Error("检测尚未结束，请稍后查看结果");
-  } else {
-    isChecking = true;
+  if(isMainThread) {
+    if(!checkWorker) {
+      checkWorker = new Worker(path.resolve(__dirname, "../tools/weakPasswordChecker/worker.js"));
+      checkWorker.on("exit", () => checkWorker = null);
+      checkWorker.on("error", () => checkWorker = null);
+      return;
+    } else {
+      throw new Error("检测尚未结束，请稍后查看结果");
+    }
   }
-  const UsersPersonalModel = mongoose.model("usersPersonal");
   const WeakPasswordResultModel = mongoose.model("weakPasswordResult");
   await WeakPasswordResultModel.remove({});
   const {
@@ -67,7 +74,6 @@ schema.statics.weakPasswordCheck = async function() {
     }
   }
   console.log("检测完毕");
-  isChecking = false;
 }
 
 module.exports = mongoose.model("weakPasswordResult", schema);

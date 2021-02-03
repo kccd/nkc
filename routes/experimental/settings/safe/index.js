@@ -85,10 +85,10 @@ router
         } },
         { $unwind: "$userinfo" },
         { $project: {
-            uid: 1, 
-            lastVerifyPhoneNumberTime: 1, 
-            nationCode: 1, 
-            mobile: 1, 
+            uid: 1,
+            lastVerifyPhoneNumberTime: 1,
+            nationCode: 1,
+            mobile: 1,
             _id: 0,
             "userinfo.username": 1,
             "userinfo.avatar": 1
@@ -113,10 +113,10 @@ router
           "userinfo.username": content
         } },
         { $project: {
-              uid: 1, 
-              lastVerifyPhoneNumberTime: 1, 
-              nationCode: 1, 
-              mobile: 1, 
+              uid: 1,
+              lastVerifyPhoneNumberTime: 1,
+              nationCode: 1,
+              mobile: 1,
               _id: 0,
               "userinfo.username": 1,
               "userinfo.avatar": 1
@@ -139,10 +139,10 @@ router
         } },
         { $unwind: "$userinfo" },
         { $project: {
-              uid: 1, 
-              lastVerifyPhoneNumberTime: 1, 
-              nationCode: 1, 
-              mobile: 1, 
+              uid: 1,
+              lastVerifyPhoneNumberTime: 1,
+              nationCode: 1,
+              mobile: 1,
               _id: 0,
               "userinfo.username": 1,
               "userinfo.avatar": 1
@@ -165,10 +165,10 @@ router
         } },
         { $unwind: "$userinfo" },
         { $project: {
-              uid: 1, 
-              lastVerifyPhoneNumberTime: 1, 
-              nationCode: 1, 
-              mobile: 1, 
+              uid: 1,
+              lastVerifyPhoneNumberTime: 1,
+              nationCode: 1,
+              mobile: 1,
               _id: 0,
               "userinfo.username": 1,
               "userinfo.avatar": 1
@@ -190,7 +190,7 @@ router
     return next();
   })
   .get("/weakPasswordCheck", async (ctx, next) => {
-    const { db, data } = ctx;
+    const { db } = ctx;
     if(db.WeakPasswordResultModel.isChecking()) {
       ctx.throw(403, "检测尚未结束，请稍后直接查看结果");
     }
@@ -201,10 +201,10 @@ router
     ctx.template = "experimental/settings/safe/weakPasswordCheck/weakPasswordCheck.pug";
     const { data, db, nkcModules, query } = ctx;
     const { page = 0, type, content } = query;
-    const count = db.WeakPasswordResultModel.count();
+    const count = await db.WeakPasswordResultModel.count();
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
-    const list = await db.WeakPasswordResultModel.aggregate([
+    data.list = await db.WeakPasswordResultModel.aggregate([
       { $match: {} },
       { $skip: paging.start },
       { $limit: paging.perpage },
@@ -216,7 +216,7 @@ router
       } },
       { $unwind: "$userinfo" },
       { $project: {
-          uid: 1, 
+          uid: 1,
           password: 1,
           toc: 1,
           _id: 0,
@@ -224,7 +224,6 @@ router
           "userinfo.avatar": 1
       } }
     ]);
-    data.list = list;
     return next();
   });
 module.exports = router;

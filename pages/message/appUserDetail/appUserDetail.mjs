@@ -94,7 +94,9 @@ window.app = new Vue({
     },
     // 添加联系电话
     addPhone() {
-      this.friend.info.phone.push('');
+      this.friend.info._phone.push({
+        number: ''
+      });
     },
     // 删除联系电话
     removePhone(index) {

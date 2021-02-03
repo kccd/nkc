@@ -12,6 +12,7 @@ const schema = new Schema({
     required: true,
     index: 1
   },
+  // 不为null表示该条数据是该ID对应数据的历史备份
   originId: {
     type: Number,
     default: null,
