@@ -190,7 +190,7 @@ router
     return next();
   })
   .get("/weakPasswordCheck", async (ctx, next) => {
-    const { db, data } = ctx;
+    const { db } = ctx;
     if(db.WeakPasswordResultModel.isChecking()) {
       ctx.throw(403, "检测尚未结束，请稍后直接查看结果");
     }

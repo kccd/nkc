@@ -1,27 +1,9 @@
 /**
- * 检查字符串中是否包含弱密码字符串
- * @param {string} password 密码
- * @returns {String[]} result.includes 字符串数组，包含哪些弱密码字符串(从字典中查到的)
- */
-function checker(password) {
-  const includes = [];
-  dict.forEach(wp => {
-    if(password.includes(wp)) 
-      includes.push(wp);
-  });
-  return {
-    pass: !includes.length,
-    includes
-  };
-}
-
-
-
-/**
  * Weak Password dictionary from {@link https://github.com/DictionaryHouse/Weak-password},
  * Merge `weak_pass_chinese.txt` with `weak_pass_top100.txt` of this repository
  */
-const dict = `abcd1234
+
+module.exports = `abcd1234
 abcd4321
 5201314
 1234abcd
@@ -162,6 +144,3 @@ woaini1314520
 123456asd
 aa123456789
 741852963`.split("\n");
-
-exports.checker = checker;
-exports.dictionary = dict;
