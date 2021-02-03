@@ -184,7 +184,7 @@ schema.statics.autoPushToReview = async function(post) {
       if(foreign.type === "all" || foreign.count > passedCount) {
         await ReviewModel.newReview("foreign", post, user, "海外手机号用户，审核通过的文章数量不足");
         return true
-      };
+      }
     }
 
     // 开启了未通过A卷考试的用户发表需审核
