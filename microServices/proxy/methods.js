@@ -15,7 +15,6 @@ func.getSocketServerId = (req, res, count, balanceType = 'random') => {
 };
 
 const reg = /^\/socket\.io\/\?/i;
-const obj = {};
 func.getProxyServer = (req, res, servers, socketServers, httpBalanceType, socketBalanceType) => {
   let serversArr;
   let balanceType;
@@ -27,9 +26,6 @@ func.getProxyServer = (req, res, servers, socketServers, httpBalanceType, socket
     balanceType = httpBalanceType;
   }
   const num = func.getSocketServerId(req, res, serversArr.length, balanceType);
-  if(obj[num] === undefined) obj[num] = 0;
-  obj[num] ++;
-  console.log(JSON.stringify(obj, '', 2));
   return serversArr[num];
 };
 func.getClientIp = (req) => {
