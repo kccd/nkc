@@ -24,6 +24,11 @@ if !isIncluded('singleCommentTop')
         span.single-comment-reply-button(onclick=`NKC.methods.switchCommentForm("${pid}")`) 回评
         if digest
           span.post-digest.fa.fa-star(title='精选内容')
+        div.single-comment-toc
+          +fromNow(toc)
+          if tlm
+            | &nbsp;修改于&nbsp;
+            +fromNow(tlm)
       .single-comment-options
         +singlePostVote(pid, vote, voteUp)
         .single-post-bottom-item.icon-item(data-type='share' data-share-type='post' data-share-id=pid title='分享')

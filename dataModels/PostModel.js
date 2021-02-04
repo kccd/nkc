@@ -1501,9 +1501,9 @@ postSchema.statics.filterCommentsInfo = async (posts) => {
   for(const post of results) {
     const {parentId, parentsId} = post;
     let parentPost;
-    if(parentsId.length >= 5) {
+    if(parentsId.length >= 4) {
       // 限制层数 3
-      parentPost = postsObj[parentsId[4]];
+      parentPost = postsObj[parentsId[3]];
     } else {
       parentPost = postsObj[parentId];
     }
