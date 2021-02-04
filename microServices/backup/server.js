@@ -38,10 +38,10 @@ schedule.scheduleJob(time, async () => {
   ];
 
   if(dbUsername && dbPassword) {
-    command.push('-u')
-      .push(dbUsername)
-      .push('-p')
-      .push(dbPassword)
+    command.push('-u');
+    command.push(dbUsername);
+    command.push('-p');
+    command.push(dbPassword);
   }
 
   const day = Number(moment().format("DD"));
