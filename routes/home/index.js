@@ -130,7 +130,8 @@ router
       data.visitedForums = await db.ForumModel.getForumsByFid(visitedForumsId);
     }
 
-    let subTid = [], subUid = [], subColumnId = [], subForumsId = [];
+    let subTid = [], subUid = [], subColumnId = [], subForumsId = [], subColumnPostsId = [];
+    let paging;
 
     if(threadListType === "latest") {
       q = {
@@ -169,12 +170,29 @@ router
       data.latestToppedThreads = await db.ThreadModel.getLatestToppedThreads(fidOfCanGetThreads);
 
     } else if(threadListType === "subscribe") {
+      const columnsObj = {};
+      const columnPostsObj = {};
+      const forumsObj = {};
       if(!d) d = "all";
       if(d === "all" || d === "column") {
         subColumnId = await db.SubscribeModel.getUserSubColumnsId(data.user.uid);
         if(subColumnId.length) {
-          const columns = await db.ColumnModel.find({_id: {$in: subColumnId}, disabled: false, closed: false}, {_id: 1});
+          const columns = await db.ColumnModel.find({
+            _id: {$in: subColumnId}, disabled: false, closed: false
+          }, {
+            _id: 1, name: 1, avatar: 1
+          });
+          subColumnId = [];
+          for(const c of columns) {
+            subColumnId.push(c._id);
+            columnsObj[c._id] = c;
+          }
           subColumnId = columns.map(c => c._id);
+          const subColumnPosts = await db.ColumnPostModel.find({columnId: {$in: subColumnId}, hidden: false}, {pid: 1, columnId: 1});
+          for(const sc of subColumnPosts) {
+            subColumnPostsId.push(sc.pid);
+            columnPostsObj[sc.pid] = columnsObj[sc.columnId];
+          }
         }
       }
       if(d === "all" || d === "user") {
@@ -183,15 +201,18 @@ router
       if(d === "all" || d === "thread") {
         subTid = await db.SubscribeModel.getUserSubThreadsId(data.user.uid, "sub");
       }
-      /*if(d === "all" || d === "own") {
-        subUid = subUid.concat(data.user.uid);
-      }*/
-      /*if(d === "all" || d === "reply") {
-        const subTid_ = await db.SubscribeModel.getUserSubThreadsId(data.user.uid, "replay");
-        subTid = subTid.concat(subTid_);
-      }*/
       if(d === "forum" || d === "all") {
         subForumsId = await db.SubscribeModel.getUserSubForumsId(data.user.uid);
+        const readableForumsId = await db.ForumModel.getReadableForumsIdByUid(data.user.uid);
+        subForumsId = subForumsId
+          .filter(fid => readableForumsId.includes(fid))
+          .filter(fid => fidOfCanGetThreads.includes(fid));
+        const forums = await db.ForumModel.getForumsByIdFromRedis(
+          subForumsId
+        );
+        for(const f of forums) {
+          forumsObj[f.fid] = f;
+        }
       }
 
       q = {
@@ -203,14 +224,18 @@ router
         },
         disabled: false,
         reviewed: true,
+        toDraft: {$ne: true},
         $or: [
           {
-            columnsId: {$in: subColumnId}
+            pid: {
+              $in: subColumnPostsId
+            },
           },
           {
             uid: {
               $in: subUid
-            }
+            },
+            anonymous: false,
           },
           {
             tid: {
@@ -220,10 +245,143 @@ router
           {
             mainForumsId: {
               $in: subForumsId
-            }
+            },
+            type: 'thread'
           }
         ]
       };
+
+      const count = await db.PostModel.count(q);
+      paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+      let posts = await db.PostModel.find(q, {
+        pid: 1,
+        tid: 1,
+        uid: 1,
+        toc: 1,
+        type: 1,
+        c: 1,
+        t: 1,
+        anonymous: 1,
+        cover: 1,
+        mainForumsId: 1,
+        columnsId: 1,
+      })
+        .sort({toc: -1})
+        .skip(paging.start)
+        .limit(paging.perpage)
+
+      posts = await db.PostModel.extendActivityPosts(posts);
+
+      const activity = [];
+      for(const post of posts) {
+        const {
+          pid,
+          tid,
+          user,
+          type,
+          toc,
+          url,
+          title,
+          content,
+          cover,
+          forumsId,
+          quote
+        } = post;
+
+
+        if(user.uid !== null) user.homeUrl = nkcModules.tools.getUrl('userHome', user.uid);
+        user.name = user.username;
+        user.id = user.uid;
+        user.dataFloatUid = user.uid;
+        if(quote !== null) {
+          if(quote.user.uid !== null) quote.user.homeUrl = nkcModules.tools.getUrl('userHome', quote.user.uid);
+          quote.user.id = quote.user.uid;
+          quote.user.name = quote.user.username;
+          quote.user.dataFloatUid = quote.user.uid;
+        }
+
+        let a;
+        if(subTid.includes(tid)) {
+          // 关注的文章
+          a = {
+            toc,
+            from: 'thread',
+            title,
+            content,
+            url,
+            cover,
+            user,
+            quote,
+          }
+        } else if(subUid.includes(user.uid)) {
+          // 关注的用户
+          a = {
+            toc,
+            from: 'user',
+            title,
+            content,
+            cover,
+            user,
+            url,
+            quote,
+          }
+        } else if(subColumnPostsId.includes(pid)) {
+          const column = columnPostsObj[pid];
+          // 关注的专栏
+          a = {
+            toc,
+            from: 'column',
+            user: {
+              id: column._id,
+              name: column.name,
+              avatar: nkcModules.tools.getUrl("columnAvatar", column.avatar),
+              homeUrl: nkcModules.tools.getUrl("columnHome", column._id),
+            },
+            quote: {
+              user,
+              title,
+              content,
+              cover,
+              toc,
+              url,
+            }
+          }
+        } else {
+          // 关注的专业
+          let forum;
+          for(const fid of forumsId) {
+            const _forum = forumsObj[fid];
+            if(_forum) {
+              forum = _forum;
+              break;
+            }
+          }
+          if(!forum) continue;
+          a = {
+            toc,
+            from: 'forum',
+            user: {
+              id: forum.fid,
+              name: forum.displayName,
+              avatar: forum.logo? nkcModules.tools.getUrl("forumLogo", forum.logo):null,
+              homeUrl: nkcModules.tools.getUrl("forumHome", forum.fid),
+              color: forum.color,
+              dataFloatFid: forum.fid
+            },
+            quote: {
+              user,
+              title,
+              content,
+              cover,
+              toc,
+              url,
+            }
+          }
+        }
+        activity.push(a);
+      }
+      data.activity = activity;
+
     } else if(threadListType === "recommend") {
       q = await db.ThreadModel.getRecommendMatch(fidOfCanGetThreads);
     } else if(threadListType === "column"){
@@ -240,24 +398,25 @@ router
       }
     }
     data.threads = [];
-    let paging;
-
-    const count = await db.ThreadModel.count(q);
-    paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
-    let sort = {tlm: -1};
-    if(s === "toc") sort = {toc: -1};
-    let threads = await db.ThreadModel.find(q, {
-      uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
-      tlm: 1, fid: 1, hasCover: 1,
-      mainForumsId: 1, hits: 1, count: 1,
-      digest: 1, reviewed: 1,
-      columnsId: 1,
-      categoriesId: 1,
-      disabled: 1, recycleMark: 1
-    }).skip(paging.start).limit(paging.perpage).sort(sort);
-    threads = await db.ThreadModel.extendThreads(threads, {
-      htmlToText: true
-    });
+    let threads = [];
+    if(threadListType !== 'subscribe') {
+      const count = await db.ThreadModel.count(q);
+      paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
+      let sort = {tlm: -1};
+      if(s === "toc") sort = {toc: -1};
+      threads = await db.ThreadModel.find(q, {
+        uid: 1, tid: 1, toc: 1, oc: 1, lm: 1,
+        tlm: 1, fid: 1, hasCover: 1,
+        mainForumsId: 1, hits: 1, count: 1,
+        digest: 1, reviewed: 1,
+        columnsId: 1,
+        categoriesId: 1,
+        disabled: 1, recycleMark: 1
+      }).skip(paging.start).limit(paging.perpage).sort(sort);
+      threads = await db.ThreadModel.extendThreads(threads, {
+        htmlToText: true
+      });
+    }
     const superModerator = ctx.permission("superModerator");
     let canManageFid = [];
     if(user) {
@@ -304,53 +463,57 @@ router
       }
       data.threads.push(thread);
     }
-    if(threadListType !== "latest") {
-      data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
-    }
 
-    if(threadListType !== "recommend") {
-      data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
-    }
-    if(ctx.permission("complaintGet")) {
-      data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});
-    }
-    if(ctx.permission("visitProblemList")) {
-      data.unResolvedProblemCount = await db.ProblemModel.count({resolved: false});
-    }
-    if(ctx.permission("review")) {
-      const q = {
-        reviewed: false,
-        disabled: false,
-        mainForumsId: {$ne: recycleId}
-      };
-      if(!ctx.permission("superModerator")) {
-        const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
-        const fid = forums.map(f => f.fid);
-        q.mainForumsId = {
-          $in: fid
-        }
+    if(!state.isApp) {
+      if(threadListType !== "latest") {
+        data.latestThreads = await db.ThreadModel.getLatestThreads(fidOfCanGetThreads);
       }
-      const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
-      const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
-      const threadsObj = {};
-      threads.map(thread => threadsObj[thread.tid] = thread);
-      let count = 0;
-      posts.map(post => {
-        const thread = threadsObj[post.tid];
-        if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
-          count++;
+
+      if(threadListType !== "recommend") {
+        data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
+      }
+      if(ctx.permission("complaintGet")) {
+        data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});
+      }
+      if(ctx.permission("visitProblemList")) {
+        data.unResolvedProblemCount = await db.ProblemModel.count({resolved: false});
+      }
+      if(ctx.permission("review")) {
+        const q = {
+          reviewed: false,
+          disabled: false,
+          mainForumsId: {$ne: recycleId}
+        };
+        if(!ctx.permission("superModerator")) {
+          const forums = await db.ForumModel.find({moderators: data.user.uid}, {fid: 1});
+          const fid = forums.map(f => f.fid);
+          q.mainForumsId = {
+            $in: fid
+          }
         }
-      });
-      data.unReviewedCount = count;
+        const posts = await db.PostModel.find(q, {tid: 1, pid: 1});
+        const threads = await db.ThreadModel.find({tid: {$in: posts.map(post => post.tid)}}, {recycleMark: 1, oc: 1, tid: 1});
+        const threadsObj = {};
+        threads.map(thread => threadsObj[thread.tid] = thread);
+        let count = 0;
+        posts.map(post => {
+          const thread = threadsObj[post.tid];
+          if(thread && (thread.oc !== post.pid || !thread.recycleMark)) {
+            count++;
+          }
+        });
+        data.unReviewedCount = count;
+      }
     }
     data.paging = paging;
 
     // 是否启用了基金
-    const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
-    let enableFund = fundSettings.c.enableFund;
+    const fundSettings = await db.SettingModel.getSettings('fund');
+    // const fundSettings = await db.SettingModel.findOne({_id: 'fund'});
+    let enableFund = fundSettings.enableFund;
     if(enableFund) {
       // 基金名称
-      data.fundName = fundSettings.c.fundName;
+      data.fundName = fundSettings.fundName;
       // 基金申请
       const queryOfFunding = {
         disabled: false,

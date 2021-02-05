@@ -1,0 +1,80 @@
+@import '../publicModules/base';
+.post-activity{
+  @avatarHeight: 1.6rem;
+  @coverHeight: 5.2rem;
+  @coverWidth: 8rem;
+  margin-bottom: 2rem;
+  .post-activity-header{
+    padding-left: @avatarHeight + 0.5rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  .post-activity-avatar{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: @avatarHeight;
+    width: @avatarHeight;
+  }
+  .post-activity-avatar>*{
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+  }
+  .post-activity-username{
+    display: inline-block;
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+    color: @primary;
+  }
+  .post-activity-time{
+    font-size: 1rem;
+    color: #555;
+  }
+  .post-activity-content{
+    margin-bottom: 0.6rem;
+  }
+  .post-activity-content-container{
+    position: relative;
+    margin-top: 0.3rem;
+    &.cover{
+      padding-right: @coverWidth + 1rem;
+      & .post-activity-abstract{
+        height: @coverHeight;
+      }
+    }
+  }
+  .post-activity-abstract{
+    max-height: @coverHeight;
+    font-size: 1.25rem;
+    overflow: hidden;
+    text-decoration: none;
+    color: #000;
+    .hideText(@line: 3);
+  }
+  .post-activity-title{
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000;
+    text-decoration: none;
+    transition: border-bottom 200ms;
+    border-bottom: 1px solid transparent;
+    &:hover{
+      border-bottom: 1px solid #000;
+    }
+  }
+  .post-activity-cover{
+    height: @coverHeight;
+    width: @coverWidth;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 3px;
+  }
+  .post-activity-quote{
+    border-radius: 10px;
+    background-color: #f6f2ee;
+    padding: 0.7rem 1.5rem 0.4rem 1.5rem;
+  }
+}

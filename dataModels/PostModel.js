@@ -1586,4 +1586,141 @@ postSchema.statics.getSocketSinglePostData = async (pid) => {
     post
   };
 }
+
+
+/*
+* 关注页拓展posts
+* @param {[Object]} posts 文章对象数组
+* @return {Object}
+*   @param {Object} user
+*     @param {String} uid 用户ID 匿名时为null
+*     @param {String} username 用户名
+*     @param {String} avatar 头像链接
+*     @param {Boolean} banned 是否被封禁
+*   @param {String} pid
+*   @param {String} tid
+*   @param {String} type 内容类型 "thread" or "post"
+*   @param {Date} toc 发表时间
+*   @param {String} title 标题
+*   @param {String} content 摘要
+*   @param {String} 封面图片链接
+*   @param {String} forumsId 主专业ID
+*   @param {Object} quote 当内容为文章时此字段为null，为回复时此字段表示回复所在的文章信息
+*     @param {Object} user 同上
+*     @param {Date} toc 同上
+*     @param {String} title 同上
+*     @param {String} content 同上
+*     @param {String} cover 同上
+* @author pengxiguaa 2021-2-4
+* */
+postSchema.statics.extendActivityPosts = async (posts) => {
+  const UserModel = mongoose.model('users');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const tools = require('../nkcModules/tools');
+  const nkcRender = require('../nkcModules/nkcRender');
+  let anonymousUser = tools.getAnonymousInfo();
+  anonymousUser = {
+    uid: null,
+    username: anonymousUser.username,
+    avatar: anonymousUser.avatarUrl,
+    banned: false,
+  };
+  const usersId = new Set();
+  const threadsId = new Set();
+  const firstPostsId = new Set();
+  const threadFirstPosts = {};
+  const usersObj = {};
+  for(const post of posts) {
+    const {type, uid, tid, anonymous} = post;
+    if(type === 'post') threadsId.add(tid);
+    if(!anonymous) usersId.add(uid);
+  }
+  const threads = await ThreadModel.find({tid: {$in: [...threadsId]}}, {oc: 1});
+  for(const thread of threads) {
+    firstPostsId.add(thread.oc);
+  }
+  const firstPosts = await PostModel.find({pid: {$in: [...firstPostsId]}}, {
+    tid: 1,
+    uid: 1,
+    pid: 1,
+    t: 1,
+    c: 1,
+    anonymous: 1,
+    toc: 1,
+    cover: 1
+  });
+  for(const fp of firstPosts) {
+    usersId.add(fp.uid);
+    threadFirstPosts[fp.tid] = fp;
+  }
+  const users = await UserModel.find({uid: {$in: [...usersId]}});
+  for(const user of users) {
+    const {uid, avatar, username, certs} = user;
+    usersObj[user.uid] = {
+      uid,
+      avatar: tools.getUrl('userAvatar', avatar),
+      username,
+      banned: certs.includes("banned")
+    };
+  }
+  const results = [];
+  for(const post of posts) {
+    const {
+      type,
+      pid,
+      toc,
+      tid,
+      uid,
+      c,
+      t,
+      anonymous,
+      cover,
+      mainForumsId,
+    } = post;
+    let user;
+    if(anonymous) {
+      user = anonymousUser;
+    } else {
+      user = usersObj[uid];
+    }
+    let quote = null;
+    let url = null;
+    if(type === 'post') {
+      const firstPost = threadFirstPosts[tid];
+      let quoteUser = null;
+      if(firstPost.anonymous) {
+        quoteUser = anonymousUser;
+      } else {
+        quoteUser = usersObj[firstPost.uid];
+      }
+      quote = {
+        user: quoteUser,
+        toc: firstPost.toc,
+        title: firstPost.t,
+        url: tools.getUrl('thread', firstPost.tid),
+        content: nkcRender.htmlToPlain(firstPost.c, 200),
+        cover: firstPost.cover? tools.getUrl('postCover', firstPost.cover):null
+      }
+      url = tools.getUrl('post', pid);
+    } else {
+      url = tools.getUrl('thread', tid);
+    }
+    results.push({
+      pid,
+      tid,
+      user,
+      type,
+      toc,
+      url,
+      title: t,
+      content: nkcRender.htmlToPlain(c, 200),
+      cover: cover? tools.getUrl('postCover', cover):null,
+      forumsId: mainForumsId,
+      quote
+    });
+  }
+  return results;
+};
+
 module.exports = mongoose.model('posts', postSchema);
