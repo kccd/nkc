@@ -225,6 +225,7 @@ router
         disabled: false,
         reviewed: true,
         toDraft: {$ne: true},
+        parentPostId: '',
         $or: [
           {
             pid: {
