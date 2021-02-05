@@ -10,6 +10,8 @@ block head
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
   link(rel='shortcut icon' href=state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}` : '/favicon.ico')
   +includeJS('/publicModules/common.js')
+  if data.user
+    script!=`NKC.configs.uid="${data.user.uid}";`
   if state.isApp && state.platform === 'apiCloud'
     +includeJS("/appAPi/api.js")
   +includeCSS('/bootstrap/css/bootstrap.css')
@@ -68,7 +70,6 @@ block body
   //- 旧版common.js兼容旧的页面
   +includeJS('/interface_common.js')
   if data.user
-    script!=`NKC.configs.uid="${data.user.uid}";`
     script!=`NKC.configs.selectTypesWhenSubscribe=!!${data.user.generalSettings.subscribeSettings.selectTypesWhenSubscribe};`
     script!=`NKC.configs.refererOperationId="${data.operationId}"`
     +includeJS('/socket.io-client/dist/socket.io.js')

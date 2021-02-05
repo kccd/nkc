@@ -5,7 +5,7 @@ block title
   +includeCSS("/home/home.css")
 
 block content
-  -const canManagement = permission("superModerator");
+  -var canManagement = permission("superModerator") && data.t !== 'subscribe';
   .container-fluid.max-width
     .row
       include ../publicModules/checkDefaultUsername
@@ -77,31 +77,44 @@ block content
                 a.button(href=`/?t=recommend` class=data.t === "recommend" ? "active" : "" data-type="reload") 推荐
                 a.radius-right.button(href=`/?t=column` class=data.t === "column" ? "active" : "" data-type="reload") 专栏
 
-            if !data.threads.length && !data.latestToppedThreads.length
-              .p-t-5.p-b-5.text-center
-                h4
-                  b 空空如也~
+            if data.t === "subscribe"
+              if !data.activity || data.activity.length === 0
+                .p-t-5.p-b-5.text-center
+                  h4
+                    b 空空如也~
+              else
+                -showPagingSortButton = false;
+                include ../publicModules/paging/paging
+                include ./postActivity
+                  for a in data.activity
+                    +postActivity(a)
+                include ../publicModules/paging/paging_input
             else
-              include ../publicModules/paging/paging
+              if !data.threads.length && !data.latestToppedThreads.length
+                .p-t-5.p-b-5.text-center
+                  h4
+                    b 空空如也~
+              else
+                include ../publicModules/paging/paging
 
-              if data.t === 'latest' && data.paging.page === 0 && data.latestToppedThreads.length > 0
-                -const defaultThreadListStyle = {type: 'minimalist'}
-                for thread in data.latestToppedThreads
+                if data.t === 'latest' && data.paging.page === 0 && data.latestToppedThreads.length > 0
+                  -const defaultThreadListStyle = {type: 'minimalist'}
+                  for thread in data.latestToppedThreads
+                    include ../publicModules/thread_panel/thread_panel
+                  div.topped-thread-header - 以上是置顶 -
+
+                for thread in data.threads
                   include ../publicModules/thread_panel/thread_panel
-                div.topped-thread-header - 以上是置顶 -
-
-              for thread in data.threads
-                include ../publicModules/thread_panel/thread_panel
-              -showPagingSortButton = false;
-              -showHomeButton = false;
-              if canManagement
-                .paging-button
-                  a.button.radius-left.radius-right(onclick="managementThreads()") 管理
-                .paging-button.management-thread-panel
-                  a.button.radius-left(onclick="selectAll()") 全选
-                  a.button(onclick="moveSelectedThreads()") 移动
-                  a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
-              include ../publicModules/paging/paging_input
+                -showPagingSortButton = false;
+                -showHomeButton = false;
+                if canManagement
+                  .paging-button
+                    a.button.radius-left.radius-right(onclick="managementThreads()") 管理
+                  .paging-button.management-thread-panel
+                    a.button.radius-left(onclick="selectAll()") 全选
+                    a.button(onclick="moveSelectedThreads()") 移动
+                    a.button.radius-right(onclick="disabledSelectedPosts()") 删除或退修
+                include ../publicModules/paging/paging_input
       .col-xs-12.col-md-3
         .hidden-xs.hidden-sm#rightDom.box-shadow-panel
           .hidden-xs.hidden-sm.m-b-1

@@ -46,6 +46,9 @@ var Tools = function() {
       case "columnBanner": {
         return "/a/" + id + t
       }
+      case "columnHome": {
+        return "/m/" + id
+      }
       case "homeBigLogo": {
         return "/a/" + id + t
       }
