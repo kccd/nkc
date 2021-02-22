@@ -59,6 +59,14 @@ const app = new Vue({
         a.active = a.id === page.id;
       });
       return arr;
+    },
+    threadCount() {
+      const {automaticProportion, count} = this.recommendThreads[this.page.id];
+      const automaticCount = Math.round(count * automaticProportion / (automaticProportion + 1));
+      return {
+        automaticCount,
+        manualCount: count - automaticCount
+      };
     }
   },
   methods: {

@@ -115,6 +115,10 @@ router
       if(!['fixed', 'random'].includes(options.order)) {
         ctx.throw(400, '请选择显示方式');
       }
+      checkNumber(options.count, {
+        name: '总推荐条数',
+        min: 1
+      });
       checkNumber(options.automaticProportion, {
         name: '比例（手动:自动）',
         min: 0.01,
@@ -126,7 +130,7 @@ router
         fractionDigits: 2
       });
       checkNumber(options.automaticCount, {
-        name: '文章数量',
+        name: '自动推荐文章数量',
         min: 1
       });
       checkNumber(options.timeOfPost.min, {

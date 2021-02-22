@@ -10,7 +10,11 @@ block nkcContent
         a.pointer {{n.name}}
     div(v-if='["fixed", "movable"].includes(page.id)')
       div
-        .form.form-horizontal
+        .form.form-horizontal.p-t-1
+          .form-group.form-inline
+            label.col-sm-3.control-label 总推荐条数
+            .col-sm-9
+              input.form-control(type='text' v-model.number='recommendThreads[page.id].count')
           .form-group
             label.col-sm-3.control-label 显示类型
             .col-sm-9
@@ -36,16 +40,17 @@ block nkcContent
                   span 正序
           span(v-if='recommendThreads[page.id].displayType !== "manual"')
             .form-group.form-inline(v-if='recommendThreads[page.id].displayType === "all"')
-              label.col-sm-3.control-label 比例（手动:自动）
+              label.col-sm-3.control-label 比例（自动/手动）
               .col-sm-9
                 input.form-control(type='text' v-model.number='recommendThreads[page.id].automaticProportion')
+                h5.text-info 手动推荐 {{threadCount.automaticCount}} 条，自动推荐 {{threadCount.manualCount}} 条
             .form-group.form-inline
               label.col-sm-3.control-label 更新间隔（小时）
               .col-sm-9
                 span
                 input.form-control(type='text' v-model.number='recommendThreads[page.id].timeInterval')
             .form-group.form-inline
-              label.col-sm-3.control-label 文章数量
+              label.col-sm-3.control-label 自动推荐文章数量
               .col-sm-9
                 input.form-control(type='text' v-model.number='recommendThreads[page.id].automaticCount')
                 .m-t-05 更新时缓存的文章数量

@@ -7,6 +7,7 @@ module.exports = {
         manuallySelectedThreads: [], // 手动推荐的文章
         automaticallySelectedThreads: [], // 自动推荐的文章
         displayType: 'manual', // manual: 手动, automatic: 自动, all: 混合
+        count: 6,
         automaticProportion: 1, // 当现实方式为「混合」时，自动推荐的文章所占的比例
         automaticCount: 20, // 自动选择推荐文章的数量
         timeOfPost: { // 文章的发表时间限制
@@ -32,6 +33,7 @@ module.exports = {
         manuallySelectedThreads: [], // 手动推荐的文章
         automaticallySelectedThreads: [], // 自动推荐的文章
         displayType: 'manual', // manual: 手动, automatic: 自动, all: 混合
+        count: 8,
         automaticProportion: 1, // 当现实方式为「混合」时，自动推荐的文章所占的比例
         automaticCount: 20, // 自动选择推荐文章的数量
         timeOfPost: { // 文章的发表时间限制
