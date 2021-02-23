@@ -1,13 +1,33 @@
 const Router = require('koa-router');
 const listRouter = new Router();
 listRouter
-  .get('/', async (ctx, next) => {
+	.get('/', async (ctx, next) => {
+		const {data, db, query, nkcModules} = ctx;
+		const {page = 0, c} = query;
+		const match = {};
+		if(c === 'unsolved') {
+			match.resolved = false;
+		}
+		const count = await db.ProblemModel.count(match);
+		const paging = nkcModules.apiFunction.paging(page, count, 100);
+		const problems = await db.ProblemModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
+		data.problems = await Promise.all(problems.map(async p => {
+			await p.extendUser();
+			await p.extendRestorer();
+			return p;
+		}));
+		ctx.template = 'problem/list.pug';
+		data.paging = paging;
+		data.c = c;
+		await next();
+	})
+	/*.get('/', async (ctx, next) => {
     const {data, db, query, nkcModules} = ctx;
     const {cid = 0, page = 0} = query;
     const typeId = Number(cid);
     data.problemsType = await db.ProblemsTypeModel.findOnly({_id: typeId});
     const count = await db.ProblemModel.count({typeId});
-    const paging = nkcModules.apiFunction.paging(page, count);
+    const paging = nkcModules.apiFunction.paging(page, count, 100);
     data.problemsTypes = await db.ProblemsTypeModel.find({}).sort({order: 1});
     for(const type of data.problemsTypes) {
       await type.updateProblemsCount();
@@ -18,11 +38,11 @@ listRouter
       await p.extendRestorer();
       return p;
     }));
-    ctx.template = 'problem/problem_list.pug';
+    ctx.template = 'problem/list.pug';
     data.cid = typeId;
     data.paging = paging;
     await next();
-  })
+  })*/
 	/*.get('/', async (ctx, next) => {
 		const {data, db, query} = ctx;
 		let {type, page} = query;
