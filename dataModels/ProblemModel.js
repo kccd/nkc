@@ -39,6 +39,23 @@ const problemSchema = new Schema({
 		maxlength: [2048, '内容不能超过10000个字'],
 		required: true
 	},
+	nationCode: {
+		type: String,
+		default: '',
+	},
+	phoneNumber: {
+		type: String,
+		default: ''
+	},
+	referrer: {
+		type: String,
+		default: ''
+	},
+	// 图片ID attachments表ID
+	attachId: {
+		type: [String],
+		default: []
+	},
 	ip: {
 		type: String,
 		required: true,
@@ -59,7 +76,7 @@ const problemSchema = new Schema({
 		index: 1
 	},
 	QQ: {
-		type: Number,
+		type: String,
 		maxlength: [15, 'QQ位数不能超过15位']
 	},
 	// 是否提醒了用户
@@ -87,6 +104,14 @@ problemSchema.virtual('restorer')
 		this._restorer = restorer;
 	});
 
+problemSchema.virtual('imagesUrl')
+	.get(function() {
+		return this._imagesUrl;
+	})
+	.set(function(imagesUrl) {
+		this._imagesUrl = imagesUrl;
+	});
+
 problemSchema.methods.extendUser = async function() {
 	const UserModel = mongoose.model('users');
 	return this.user = await UserModel.findOne({uid: this.uid});
@@ -110,6 +135,5 @@ problemSchema.statics.ensureSubmitPermission = async function(option) {
 		throw error;
 	}
 };
-
 const ProblemModel = mongoose.model('problems', problemSchema);
 module.exports = ProblemModel;

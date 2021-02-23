@@ -42,4 +42,6 @@ module.exports = {
   mediaAudio: './resource/audio',
   // 上传附件 附件
   mediaAttachment: './resource/attachment',
+  // 上报问题 图片
+  problemImage: './attachment/problem'
 };
