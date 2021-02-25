@@ -2,6 +2,7 @@ const settings = require('../settings');
 const PATH = require('path');
 const nkcRender = require('../nkcModules/nkcRender');
 const {htmlToPlain, renderHTML} = nkcRender;
+const customCheerio = require('../nkcModules/nkcRender/customCheerio');
 const {getQueryObj, obtainPureText} = require('../nkcModules/apiFunction');
 const mongoose = settings.database;
 const {Schema} = mongoose;
@@ -498,8 +499,75 @@ postSchema.pre("save", async function(next) {
 });
 */
 
-// 保存POST前检测内容是否有@
+// 解析@信息
 postSchema.pre('save', async function(next) {
+  const UserModel = mongoose.model('users');
+  const {c} = this;
+  const atUsers = [];
+  const atUsersId = [];
+  const $ = customCheerio.load(c);
+  const html = $('body')[0];
+  const texts = [];
+  const getNodesText = function(node) {
+    if(!node.children || node.children.length === 0) return;
+    for(let i = 0; i < node.children.length; i++) {
+      const c = node.children[i];
+      if(c.type === 'text') {
+        if(c.data.length > 0) texts.push(c.data);
+      } else if(c.type === 'tag') {
+        if(['a', 'blockquote', 'code', 'pre'].includes(c.name)) continue;
+        if(c.attribs['data-tag'] === 'nkcsource') continue;
+        getNodesText(c);
+      }
+    }
+  }
+  // 获取文本内容，已排除掉特殊格dom中的文本
+  getNodesText(html);
+
+  for(let text of texts) {
+    // 排除不包含@的内容
+    if(!text.includes('@')) continue;
+    text = text.toLowerCase();
+    // 获取当前文本中@之后的文本
+    const arr = text.split('@');
+    // 去掉第@之前的文本
+    arr.shift();
+    for(let item of arr) {
+      // 最多取@之后的30个字来判断是否为用户名
+      item = item.slice(0, 30);
+      // 去掉空格后边的字符
+      item = item.split(' ')[0];
+      // 排除空字符
+      if(item.length === 0) continue;
+      // 去数据库查询用户名是否存在
+      const usernames = [];
+      const textLength = item.length;
+      for(let i = 1; i <= textLength; i++) {
+        usernames.push(item.slice(0, i));
+      }
+      const targetUsers = await UserModel.find({usernameLowerCase: {$in: usernames}}, {username: 1, usernameLowerCase: 1, uid: 1});
+      let user;
+      // 取用户名最长的用户为目标用户
+      for(const u of targetUsers) {
+        if(user === undefined || user.username.length < u.username.length) {
+          user = u;
+        }
+      }
+      if(!user) continue;
+      if(atUsersId.includes(user.uid)) continue;
+      atUsersId.push(user.uid);
+      atUsers.push({
+        uid: user.uid,
+        username: user.username
+      });
+    }
+  }
+  this.atUsers = atUsers;
+  await next();
+});
+
+// 保存POST前检测内容是否有@
+/*postSchema.pre('save', async function(next) {
   // analyzing the content(post.c) to find p.atUsers change
   try {
     const UserModel = mongoose.model('users');
@@ -592,7 +660,7 @@ postSchema.pre('save', async function(next) {
   } catch(e) {
     return next(e)
   }
-});
+});*/
 
 // postSchema.pre('save', async function(next) {
 //   // analyzing the content(post.c) to find p.atUsers change
