@@ -300,6 +300,9 @@ module.exports = {
 		recharge: {
 			GET: 'experimentalRechargeSettings',
 			PUT: 'experimentalRechargeSettings',
+		},
+		sensitiveWords: {
+			GET: "sensitiveWords"
 		}
 	},
 	systemInfo: {

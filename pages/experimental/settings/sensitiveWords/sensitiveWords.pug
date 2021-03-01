@@ -1,0 +1,129 @@
+extends ../../experimental
+block eTitle
+  title 敏感词
+  style.
+    .select-keyword-file {
+      white-space: nowrap;
+      border: 1px solid rgb(210 210 210);
+      border-radius: 4px;
+      padding: 3px;
+      cursor: pointer;
+    }
+    .review-condition {
+      margin-top: 12px;
+    }
+    .review-condition > input {
+      width: 80px;
+      text-align: center;
+      outline: none;
+      border: none;
+      border-bottom: 1px solid black;
+    }
+    .review-condition > input::-webkit-inner-spin-button {
+      display: none;
+    }
+    .keyword {
+      background-color: #2196f3;
+      color: #ffffff;
+      padding: 4px;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .keyword + .keyword {
+      margin-left: 8px;
+    }
+    .add-keyword {
+      background-color: #64b5f6;
+      color: #ffffff;
+      padding: 4px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .keyword-search,
+    .view-container,
+    .keyword-search-result {
+      margin-bottom: 8px;
+    }
+block eContent
+  .hidden#data=objToStr({keywordSetting: data.keywordSetting ? data.keywordSetting : null, users: data.users})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-7
+        div#app(v-cloak)
+          label
+            span 启用
+            input(type="checkbox" v-model="keywordSetting.enable" @change="triggerKeyword(keywordSetting.enable)")
+          hr
+          button.btn.btn-default.btn-sm(@click='add = !add') 新建敏感词组
+            span.caret
+          div(v-if='add')
+            h3 新建敏感词组
+            hr  
+            .form-horizontal
+              .form-group
+                label.col-sm-2.control-label 词组名称
+                .col-sm-10
+                  input.form-control(v-model.trim='form.groupName' placeholder='请输入词组名称')
+              .form-group
+                label.col-sm-2.control-label 导入词库
+                .col-sm-10
+                  label.select-keyword-file
+                    span {{form.keywords ? form.keywords.length + "个敏感词" : "选择文件"}}
+                    input.hidden(type="file" accept=".txt" @change="keywordFile($event.target.files[0]);$event.target.value=''")
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-10
+                  button.btn.btn-primary.btn-block(@click="addWordGroup()") 提交
+          hr
+          .review-condition
+            | 至少命中
+            input(type="number" v-model.number="keywordSetting.condition.leastKeywordCount" @change="updateReviewCondition()")
+            | 个敏感词
+            select(v-model="keywordSetting.condition.relationship" @change="updateReviewCondition()")
+              option(value="and") 并且
+              option(value="or") 或者
+            | 至少命中
+            input(type="number" v-model.number="keywordSetting.condition.leastKeywordTimes" @change="updateReviewCondition()")
+            | 次敏感词时，内容会被送审。
+          hr
+          .form-horizontal
+            .form-group
+              label.col-sm-1.control-label 
+              .col-sm-12
+                table.table.table-bordered
+                  thead
+                    tr
+                      th 词组ID
+                      th 词组名称
+                      th 词数
+                      th 操作
+                  tbody(v-for="(group, groupIndex) in keywordSetting.wordGroup")
+                    tr
+                      th {{group.id}}
+                      th
+                        div(v-if="group.rename")
+                          input(type="text", name="" v-model="group.name")
+                          button.btn.btn-xs.btn-primary(@click="renameGroup(groupIndex)") 确定
+                        span(v-else) {{group.name}}
+                      th
+                        span {{group.keywords.length}}&nbsp;
+                        a.m-r-1(href="javascript:void(0);" @click="group.keywordView = !group.keywordView") {{group.keywordView? "(简略)" : "(详细)"}}
+                      th
+                        button.btn.btn-danger.btn-xs(href="javascript:void(0);" @click="deleteWordGroup(groupIndex)") 删除
+                        button.btn.btn-default.btn-xs(href="javascript:void(0);" @click="group.rename = !group.rename") {{group.rename ? "取消重命名" : "重命名"}}
+                        button.btn.btn-default.btn-xs(href="javascript:void(0);" @click="exportWordGroup(groupIndex)") 导出
+                        button.btn.btn-primary.btn-xs(href="javascript:void(0);" @click="applyAllForums(groupIndex)") 应用到所有专业
+                    tr(v-show="group.keywordView")
+                      th(colspan="4")
+                        .keyword-search 
+                          input(type="text" placeholder="请输入关键字" v-model="group.searchInputText" @input="searchWordInputChange($event.target, groupIndex)")
+                        .keyword-search-result(v-if="group.searchInputText")
+                          span.keyword(v-if="group.searchedWords.length" v-for="word in group.searchedWords" @click="deleteSearchedKeyword(groupIndex, word)") {{word}}
+                          span(v-else) 没有搜索到关键字
+                        .view-container(v-if="!group.searchInputText")
+                          span.keyword(v-for="(word, wordIndex) in group.keywords" @click="deleteKeyword(groupIndex, wordIndex)") {{word}}
+                          span.add-keyword(@click="addKeyword(groupIndex)") +
+
+        
+block scripts
+  +includeJS('/experimental/settings/sensitiveWords/sensitiveWords.js')                          

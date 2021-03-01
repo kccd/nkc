@@ -766,5 +766,7 @@
   "forumReviewSettings": "专业审核设置",
 
   "weakPasswordCheck": "弱密码检测",
-  "weakPasswordCheckResult": "查看弱密码检测结果"
+  "weakPasswordCheckResult": "查看弱密码检测结果",
+
+  "sensitiveWords": "敏感词设置"
 }
