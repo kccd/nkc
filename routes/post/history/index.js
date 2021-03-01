@@ -37,11 +37,6 @@ router
     })
     const ipsObj = await db.IPModel.getIPByTokens(ipToken);
     histories = await db.PostModel.extendPosts(histories, extendOptions);
-    if(!t) {
-      histories.map(h => {
-        h.c = nkcRender.htmlToPlain(h.c);
-      });
-    }
     for(let i = 0; i < histories.length; i++) {
       const history = histories[i];
       if(!t) {

@@ -48,6 +48,7 @@ window.PostOption = new Vue({
     xsf: null,
     ipInfo: null,
     reviewed: null,
+    commentControl: null,
   },
   computed: {
     position() {
@@ -121,6 +122,7 @@ window.PostOption = new Vue({
           self.xsf = options.xsf;
           self.ipInfo = options.ipInfo;
           self.reviewed = options.reviewed;
+          self.commentControl = options.commentControl;
 
           self.userColumnId = userColumnId;
           self.postType = postType;
@@ -263,6 +265,13 @@ window.PostOption = new Vue({
     reviewPost() {
       const {pid} = this;
       reviewPost(pid)
+    },
+    toCommentControl() {
+      const {pid} = this;
+      if(!window.commentControl) {
+        window.commentControl = new NKC.modules.CommentControl();
+      }
+      window.commentControl.open(pid);
     }
   }
 });
@@ -272,7 +281,7 @@ NKC.methods.initPostOption = () => {
   for(let i = 0; i < options.length; i++) {
     const dom = options.eq(i);
     const init = dom.attr('data-init');
-    if(init === "true") continue;
+    if(init === 'true') continue;
     dom.on('click', (e) => {
       let {left, top} = dom.offset();
       const pid = dom.attr('data-pid');

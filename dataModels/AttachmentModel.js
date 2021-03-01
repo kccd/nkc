@@ -528,5 +528,50 @@ schema.statics.saveDraftCover = async (did, file) => {
   await draft.update({cover: aid});
 };
 
+schema.statics.saveProblemImages = async (_id, files = []) => {
+  const ProblemModel = mongoose.model('problems');
+  const AttachmentModel = mongoose.model('attachments');
+  const FILE = require('../nkcModules/file');
+  const problem = await ProblemModel.findOne({_id});
+  if(!problem) throwErr(500, `图片保存失败`);
+  let attachId = [];
+  for(const file of files) {
+    let ext;
+    try{
+      ext = await FILE.getFileExtension(file, ['jpg', 'jpeg', 'png']);
+    } catch(err) {
+      continue;
+    }
+    const _id = await AttachmentModel.getNewId();
+    const {size, hash, name, path} = file;
+    const toc = new Date();
+    const fileFolder = await FILE.getPath('problemImage', toc);
+    const filePath = PATH.resolve(fileFolder, `./${_id}.${ext}`);
+    const filePathSM = PATH.resolve(fileFolder, `./${_id}_sm.${ext}`);
+    const a = AttachmentModel({
+      toc,
+      _id,
+      ext,
+      hash,
+      size,
+      name,
+      type: 'problemImage'
+    });
+    await a.save();
+    await ei.resize({
+      src: path,
+      dst: filePathSM,
+      height: 200,
+      width: 200,
+      background: "#ffffff",
+      quality: 90
+    });
+    await fsPromise.copyFile(path, filePath);
+    await fsPromise.unlink(path);
+    attachId.push(_id);
+  }
+  await problem.update({attachId});
+};
+
 
 module.exports = mongoose.model('attachments', schema);

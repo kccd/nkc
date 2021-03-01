@@ -16,7 +16,8 @@ const authorRouter = require("./author");
 const resourcesRouter = require("./resources");
 const markNotes = require('../../nkcModules/nkcRender/markNotes');
 const optionRouter = require('./option');
-const commentsRouter = require('./comment');
+const commentsRouter = require('./comments');
+const commentRouter = require('./comment');
 const router = new Router();
 
 router
@@ -528,5 +529,6 @@ router
   .use("/:pid/post", postRouter.routes(), postRouter.allowedMethods())
   .use("/:pid/option", optionRouter.routes(), optionRouter.allowedMethods())
   .use('/:pid/comments', commentsRouter.routes(), commentsRouter.allowedMethods())
+  .use('/:pid/comment', commentRouter.routes(), commentRouter.allowedMethods())
   .use("/:pid/delete", deleteRouter.routes(), deleteRouter.allowedMethods());
 module.exports = router;

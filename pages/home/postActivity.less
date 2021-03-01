@@ -1,6 +1,7 @@
 @import '../publicModules/base';
 .post-activity{
   @avatarHeight: 1.6rem;
+  @avatarMDHeight: 2.8rem;
   @coverHeight: 5.2rem;
   @coverWidth: 8rem;
   margin-bottom: 2rem;
@@ -8,6 +9,18 @@
     padding-left: @avatarHeight + 0.5rem;
     position: relative;
     margin-bottom: 0.5rem;
+  }
+  .post-activity-main-header{
+    padding-left: @avatarMDHeight + 0.5rem;
+    min-height: @avatarMDHeight;
+    .post-activity-avatar{
+      height: @avatarMDHeight;
+      width: @avatarMDHeight;
+      top: 2px;
+    }
+    .post-activity-avatar>*{
+      border-radius: 4px;
+    }
   }
   .post-activity-avatar{
     position: absolute;
@@ -26,6 +39,14 @@
     margin-right: 0.5rem;
     font-size: 1.2rem;
     color: @primary;
+  }
+  .post-activity-time-sm{
+    font-size: 1rem;
+    color: #000;
+  }
+  .post-activity-from{
+    color:#000;
+    font-size: 1.2rem;
   }
   .post-activity-time{
     font-size: 1rem;
@@ -74,8 +95,9 @@
     border-radius: 3px;
   }
   .post-activity-quote{
-    border-radius: 10px;
+    border-radius: 5px;
     background-color: #f6f2ee;
     padding: 0.7rem 1.5rem 0.4rem 1.5rem;
+    border: 2px solid #eae6e2;
   }
 }

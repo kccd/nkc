@@ -21,6 +21,26 @@ block title
       padding-right: 1em;
       font-size: 0.8em;
     }
+    .problem-image{
+      display: inline-block;
+      height: 7rem;
+      line-height: 7rem;
+      width: 7rem;
+      margin: 0 0.5rem 0.5rem 0;
+      position: relative;
+      border: 1px solid #ccc;
+    }
+    .problem-image img{
+      max-height: 100%;
+      max-width: 100%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      cursor: pointer;
+      left: 0;
+      margin: auto;
+    }
 block content
   .container-fluid.max-width
     .row
@@ -55,6 +75,16 @@ block content
               span.label.label-danger 未完成
           .h2.text-center#title= problem.t
           #content= problem.c
+          if problem.attachId && problem.attachId.length > 0
+            .problem-images.p-t-1
+              for aid in problem.attachId
+                .problem-image
+                  img(src=tools.getUrl('problemImage', aid, 'sm') data-src=tools.getUrl('problemImage', aid))
+          if problem.referrer
+            h5=`链接：`
+              a(href=problem.referrer target="_blank")=problem.referrer
+          if problem.nationCode && problem.phoneNumber
+            h5=`手机号：+${problem.nationCode} ${problem.phoneNumber}`
           if problem.QQ
             h5#QQDiv=`QQ：${problem.QQ || '暂未填写'}`
           if problem.email
@@ -93,5 +123,6 @@ block scripts
   include ../publicModules/highlight/highlight
   //- Mackdown转html
   include ../publicModules/mdToHtml
+  include ../publicModules/imageViewer
   //- 验证样式
-  script(src=`/problem/problem.js?v=${startTime}`)
+  +includeJS(`/problem/problem.js`)

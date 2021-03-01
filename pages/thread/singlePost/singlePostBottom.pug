@@ -2,7 +2,7 @@
 if !isIncluded('singlePostBottom')
   include ./singlePostVote
   mixin singlePostBottom(props)
-    -var {pid, vote, voteUp, count, tid} = props;
+    -var {pid, vote, voteUp, count, tid, cRead} = props;
     .single-post-bottom
       .single-post-bottom-item.hidden.switch-hidden-status
         .switch-hidden-status-button(onclick=`NKC.methods.switchPostContent('${pid}')`)
@@ -10,13 +10,16 @@ if !isIncluded('singlePostBottom')
         .fa.fa-comment-o.reply-icon
         span 回复
       .single-post-bottom-item
-        span.single-post-comment-button(
-          onclick=`NKC.methods.switchPostComment("${pid}")`
-          data-show-number='true'
-          data-type='singlePostCommentButton'
-          data-pid=pid
-          data-number=count
-          )=`评论${count>0? `(${count})`:``}`
+        if 1
+          span.single-post-comment-button(
+            onclick=`NKC.methods.switchPostComment("${pid}")`
+            data-show-number='true'
+            data-type='singlePostCommentButton'
+            data-pid=pid
+            data-number=count
+            )=`评论${count>0? `(${count})`:``}`
+        else
+          span.single-post-comment-button.disabled(title='当前回复不允许评论') 评论
       //-.single-post-bottom-item
         if count > 0
           span(onclick=`viewPostComments('${tid}', '${pid}')` class=`show_comments_button_${pid} thread-post-comment-active`)=`评论(${count})`

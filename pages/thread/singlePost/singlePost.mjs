@@ -2,6 +2,8 @@ class SinglePostModule {
   constructor() {
     this.editors = {};
     this.tid = null;
+    // 如果不允许评论，此字段为相关说明
+    this.cWriteInfo = true;
     this.postPermission = {
       permit: false,
       warning: null
@@ -135,8 +137,19 @@ class SinglePostModule {
     const container = this.getCommentContainer(pid);
     this.switchPostBackgroundColor(pid, true);
     const button = this.getCommentButton(pid);
+
+    const _loadDom = container.find('.single-post-comment-loading');
+    const _errorDom = container.find('.single-post-comment-error');
+    if(_loadDom.length > 0) {
+      _loadDom.remove();
+    }
+    if(_errorDom.length > 0) {
+      _errorDom.remove();
+    }
     const loading = $(`<div class="single-post-comment-loading"><div class='fa fa-spinner fa-spin'></div>加载中...</div>`);
-    if(container.attr('data-opened') !== 'true') container.append(loading);
+    if(container.attr('data-opened') !== 'true') {
+      container.append(loading);
+    }
     container.attr('data-hide', 'false');
     button.attr('data-show-number', 'false');
     this.renderPostCommentNumber(pid);
@@ -165,8 +178,13 @@ class SinglePostModule {
           keepOpened: true,
           position: 'bottom'
         });
-        editorApp.show = true;
-        editorApp.container.show();
+        this.cWriteInfo = data.cWriteInfo;
+        if(!data.cWriteInfo) {
+          editorApp.show = true;
+          editorApp.container.show();
+        } else {
+          container.append($(`<div class="text-danger single-post-comment-error">${data.cWriteInfo}</div>`));
+        }
         if(highlightCommentId) {
           const targetComment = $(`.single-comment[data-pid="${highlightCommentId}"]>.single-comment-center`);
           NKC.methods.scrollToDom(targetComment);
@@ -177,7 +195,10 @@ class SinglePostModule {
       .then(() => {
         self.initNKCSource();
       })
-      .catch(sweetError)
+      .catch(data => {
+        const errorDom = $(`<div class="single-post-comment-error text-danger">${data.error}</div>`);
+        container.html(errorDom);
+      });
   }
   initNKCSource() {
     floatUserPanel.initPanel();
@@ -327,6 +348,10 @@ class SinglePostModule {
       return NKC.methods.toLogin();
     }
     const singleComment = this.getSingleComment(pid);
+    singleComment.find('.single-post-comment-error').remove();
+    if(this.cWriteInfo) {
+      return singleComment.append($(`<div class="single-post-comment-error text-danger">${this.cWriteInfo}</div>`));
+    }
     const singleCommentBottom = singleComment.children('.single-comment-bottom');
     const editorApp = this.getEditorApp(pid, singleCommentBottom);
     if(editorApp.show) {

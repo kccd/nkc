@@ -64,6 +64,10 @@ module.exports = {
 		},
 		comments: {
 			GET: 'getPostComments'
+		},
+		comment: {
+			GET: 'postCommentControl',
+			POST: 'postCommentControl'
 		}
 		/*delete: {
 			GET: "deletePost"

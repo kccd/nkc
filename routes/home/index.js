@@ -302,11 +302,13 @@ router
         }
 
         let a;
+        let postType = type === 'post'? '回复': '文章'
         if(subTid.includes(tid)) {
           // 关注的文章
           a = {
             toc,
-            from: 'thread',
+            type,
+            from: `发表${postType}`,
             title,
             content,
             url,
@@ -318,7 +320,8 @@ router
           // 关注的用户
           a = {
             toc,
-            from: 'user',
+            type,
+            from: `发表${postType}`,
             title,
             content,
             cover,
@@ -331,7 +334,8 @@ router
           // 关注的专栏
           a = {
             toc,
-            from: 'column',
+            from: `添加${postType}`,
+            type,
             user: {
               id: column._id,
               name: column.name,
@@ -360,7 +364,7 @@ router
           if(!forum) continue;
           a = {
             toc,
-            from: 'forum',
+            from: `添加${postType}`,
             user: {
               id: forum.fid,
               name: forum.displayName,
