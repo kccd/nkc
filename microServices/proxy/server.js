@@ -15,10 +15,10 @@ const httpServer = http.createServer((req, res) => {
   const httpsPS = httpsProxyServer[host];
   // http server
   if(httpPS) {
-    const {type, target, servers, socketServers} = httpPS;
+    const {type, target, servers, socketServers, httpBalanceType, socketBalanceType} = httpPS;
     if(type === 'proxy') {
       // 代理
-      const _server = getProxyServer(req, res, servers, socketServers);
+      const _server = getProxyServer(req, res, servers, socketServers, httpBalanceType, socketBalanceType);
       return _server.web(req, res);
     } else if(type === 'redirect') {
       // 重定向
@@ -62,9 +62,9 @@ const httpsServer = https.createServer(httpsOptions, (req, res) => {
   const httpsPS = httpsProxyServer[host];
 
   if(httpsPS) {
-    const {type, target, servers, socketServers} = httpsPS;
+    const {type, target, servers, socketServers, httpBalanceType, socketBalanceType} = httpsPS;
     if(type === 'proxy') {
-      const _server = getProxyServer(req, res, servers, socketServers);
+      const _server = getProxyServer(req, res, servers, socketServers, httpBalanceType, socketBalanceType);
       return _server.web(req, res);
     } else if(type === 'redirect') {
       // 重定向
@@ -92,7 +92,7 @@ function upgrade(req, socket, head) {
   const {host} = req.headers;
   const PS = httpsProxyServer[host] || httpProxyServer[host];
   if(PS) {
-    const server = getProxyServer(req, null, PS.servers, PS.socketServers);
+    const server = getProxyServer(req, null, PS.servers, PS.socketServers, PS.httpBalanceType, PS.socketBalanceType);
     server.ws(req, socket, head);
   }
   socket.setKeepAlive(false, 0);

@@ -4,24 +4,28 @@ const {httpsDomains, httpDomains} = require('./proxyData');
 const fs = require('fs');
 const farmHash = require('farmhash');
 
-func.getSocketServerId = (req, res, count) => {
-  const ip = func.getClientIp(req);
-  if(count === 1) {
-    return 0
+func.getSocketServerId = (req, res, count, balanceType = 'random') => {
+  if(count === 1) return 0;
+  if(balanceType === 'ipHash') {
+    const ip = func.getClientIp(req);
+    return farmHash.hash32(ip) % count;
+  } else {
+    return Math.round(Math.random() * 10000) % count
   }
-  return farmHash.hash32(ip)%count;
 };
 
 const reg = /^\/socket\.io\/\?/i;
-
-func.getProxyServer = (req, res, servers, socketServers) => {
+func.getProxyServer = (req, res, servers, socketServers, httpBalanceType, socketBalanceType) => {
   let serversArr;
+  let balanceType;
   if(reg.test(req.url) && socketServers.length) {
     serversArr = socketServers;
+    balanceType = socketBalanceType;
   } else {
     serversArr = servers;
+    balanceType = httpBalanceType;
   }
-  const num = func.getSocketServerId(req, res, serversArr.length);
+  const num = func.getSocketServerId(req, res, serversArr.length, balanceType);
   return serversArr[num];
 };
 func.getClientIp = (req) => {

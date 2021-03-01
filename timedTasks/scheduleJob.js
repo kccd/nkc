@@ -52,67 +52,6 @@ jobs.updateActiveUsers = cronStr => {
   })
 };
 
-jobs.backupDatabase = () => {
-  if(!mongodb.backupTime || !mongodb.backupDir) return;
-	scheduleJob(mongodb.backupTime, async () => {
-		fs.appendFile(`${path.resolve(__dirname)}/backup.log`, `\n\n${moment().format('YYYY-MM-DD HH:mm:ss')} 开始备份数据...\n`, (err) => {
-			if(err) {
-				console.log(err);
-			}
-		});
-		console.log(`\n\n${moment().format('YYYY-MM-DD HH:mm:ss')} 开始备份数据...\n`);
-    let data = '', error = '';
-    const command = [
-      '--gzip',
-      '-u',
-      mongodb.username,
-      '-p',
-      mongodb.password,
-      '--host',
-      `${mongodb.address}:${mongodb.port}`,
-      '--db',
-      mongodb.database,
-      '--out',
-      `${path.resolve(mongodb.backupDir)}/${moment().format('YYYYMMDD')}`,
-    ];
-    const day = Number(moment().format("DD"));
-    if(day % 4 !== 0) {
-      command.push(`--excludeCollection`);
-      command.push(`logs`);
-    }
-    if(day % 12 !== 0) {
-      command.push(`--excludeCollection`);
-      command.push(`visitorLogs`);
-    }
-		const process = spawn('mongodump.exe', command);
-		process.stdout.on('data', (d) => {
-			d = d.toString();
-			console.log(d);
-			data += (d+'\n');
-		});
-		process.stderr.on('data', (d) => {
-			d = d.toString();
-			console.log(d);
-			error += (d+'\n');
-		});
-		process.on('close', (code) => {
-			let info = '';
-			if (code === 0) {
-				info = `${moment().format('YYYY-MM-DD HH:mm:ss')} 备份完成`;
-			} else {
-				info = `${moment().format('YYYY-MM-DD HH:mm:ss')} 备份失败\n${error}`;
-			}
-			console.log(info);
-			fs.appendFile(`${path.resolve(__dirname)}/backup.log`, info, (err) => {
-				if(err) {
-					console.log(err);
-				}
-			})
-		});
-	});
-	console.log(`数据库自动备份已启动`.green);
-};
-
 // 清除专业和文章上的今日更新
 jobs.clearForumAndThreadPostCount = () => {
   scheduleJob(`0 0 0 * * *`, async () => {
