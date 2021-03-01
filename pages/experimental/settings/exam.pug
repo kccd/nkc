@@ -25,12 +25,19 @@ block content
             .col-sm-4
               input.form-control(type='number' v-model.number='examSettings.waitingTime')        
               h5.text-danger 考试次数达到总次数限制后，该用户将会被禁考一段时间。
+    
+        h4 考试须知
+        .form-horizontal
+          .form-group
+            #editor.col-sm-8!= data.examSettings.examNotes
           .form-group
             label.col-sm-2.control-label
             .col-sm-4
-              button.btn.btn-primary.btn-block(@click='save') 保存   
+              button.btn.btn-primary.btn-block(@click='save') 保存
+
 
               
         
 block scripts
+  script(src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js")
   +includeJS('/experimental/settings/exam.js')
