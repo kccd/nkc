@@ -10,7 +10,7 @@ router
   .put('/', async (ctx, next) => {
     const {db, body} = ctx;
     const {examSettings} = body;
-    let {count, countOneDay, waitingTime} = examSettings;
+    let {count, countOneDay, waitingTime, examNotes} = examSettings;
     count = Number(count);
     countOneDay = Number(countOneDay);
     waitingTime = Number(waitingTime);
@@ -18,11 +18,16 @@ router
     if(count < 1) ctx.throw(400, '总次数限制不能小于1');
     if(countOneDay < 1) ctx.throw(400, '每天最多考试次数不能小于1');
     if(waitingTime < 0) ctx.throw(400, '禁考时间不能小于0');
-    await db.SettingModel.update({_id: 'exam'}, {$set: {c: {
-      count,
-      countOneDay,
-      waitingTime
-    }}});
+    await db.SettingModel.update({_id: 'exam'}, {
+      $set: {
+        c: {
+          count,
+          countOneDay,
+          waitingTime,
+          examNotes
+        }
+      }
+    });
     await db.SettingModel.saveSettingsToRedis("exam");
     await next();
   });

@@ -139,7 +139,8 @@ router
     } else if(type === "addWordGroup" && typeof value === "object") {
       const { name, keywords } = value;
       if(!name) ctx.throw(403, "未指定组名");
-      if(!keywords.length) ctx.throw(403, "未添加关键词");
+      const filterEmptyKeywords = keywords.filter(keyword => !!keyword);
+      if(!filterEmptyKeywords.length) ctx.throw(403, "未添加关键词");
       if(
         await db.SettingModel.findOne({
           "c.keyword.wordGroup": { 
@@ -155,7 +156,7 @@ router
           "c.keyword.wordGroup": {
             id: newId,
             name,
-            keywords
+            keywords: filterEmptyKeywords
           }
         }
       });

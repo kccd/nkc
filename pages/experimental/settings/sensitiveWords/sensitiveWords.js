@@ -128,7 +128,7 @@ var app = new Vue({
         if(!keywords.length) {
           return sweetWarning("无新的关键字");
         }
-        self.form.keywords = keywords;
+        self.form.keywords = keywords.filter(keyword => !!keyword);
         if(!self.form.groupName) {
           self.form.groupName = groupName;
         }
