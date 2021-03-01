@@ -35,6 +35,7 @@ router
       complaint: null,
       reviewed: null,
       ipInfo: null,
+      commentControl: null,
     };
     if(user) {
       // 推送到专栏
@@ -60,6 +61,9 @@ router
         // 折叠回复
         if(!isComment && await db.PostModel.ensureHidePostPermission(thread, user)) {
           optionStatus.hidePost = post.hide;
+        }
+        if(ctx.permission('postCommentControl')) {
+          optionStatus.commentControl = true;
         }
       }
       // 未匿名

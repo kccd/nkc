@@ -268,6 +268,11 @@ const postSchema = new Schema({
     type: Boolean,
     default: false,
     index: 1
+  },
+  // 有关下级评论的控制
+  comment: {
+    type: String, // 'r': 可查看, 'rw': 可看看可评论, 'n': 不可看不可评论
+    default: 'rw',
   }
 }, {toObject: {
   getters: true,
@@ -1472,6 +1477,7 @@ postSchema.statics.filterPostsInfo = async (posts) => {
       voteUp: post.voteUp,
       digest: post.digest,
       hide: post.hidePost || post.hide,
+      cRead: ['r', 'rw'].includes(post.comment),
       user,
       quote,
       kcb,
@@ -1789,6 +1795,28 @@ postSchema.statics.extendActivityPosts = async (posts) => {
     });
   }
   return results;
+};
+
+/*
+* 判断是否可以在当前post下发表评论
+* @param {String} pid
+* @param {String} type 权限类型 read: 查看评论, write: 发表评论
+* @return {Boolean}
+* @author pengxiguaa 2021-3-1
+* */
+postSchema.statics.checkPostCommentPermission = async (pid, type) => {
+  const PostModel = mongoose.model('posts');
+  let post = await PostModel.findOnly({pid}, {parentPostId: 1, parentPostsId: 1, pid, comment: 1});
+  if(post.type === 'thread') return false;
+  if(post.parentPostsId.length > 0) {
+    post = await PostModel.findOnly({pid: post.parentPostsId[0]}, {comment: 1});
+  }
+  if(!['read', 'write'].includes(type)) throwErr(500, `评论控制类型错误 type: ${type}`);
+  if(type === 'read') {
+    return ['r', 'rw'].includes(post.comment);
+  } else {
+    return ['rw'].includes(post.comment);
+  }
 };
 
 module.exports = mongoose.model('posts', postSchema);

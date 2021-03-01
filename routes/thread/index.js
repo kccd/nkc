@@ -266,7 +266,6 @@ threadRouter
 		  data.t = t;
       match.anonymous = !!data.anonymous;
       match.uid = thread.uid
-
     }
 		const $and = [];
 		// 若没有查看被屏蔽的post的权限，判断用户是否为该专业的专家，专家可查看
@@ -451,7 +450,7 @@ threadRouter
     }
 		// 文章访问量加1
     await thread.update({$inc: {hits: 1}});
-    
+
     // 如果是待审核，取出审核原因
     if(!firstPost.reviewed) {
       const reviewRecord = await db.ReviewModel.findOne({tid: firstPost.tid}).sort({toc: -1});
@@ -788,7 +787,13 @@ threadRouter
 		// 权限判断
 		// await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
     await db.ForumModel.checkWritePostPermission(data.user.uid, thread.mainForumsId);
-
+    // 评论权限判断
+    if(
+      postType === 'comment' &&
+      !await db.PostModel.checkPostCommentPermission(post.parentPostId, 'write')
+    ) {
+      ctx.throw(403, `当前回复不允许评论`);
+    }
 		const {columnCategoriesId = [], anonymous = false, did} = post;
 		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
 		if(postType === "comment" && post.c.length > 2000) {
