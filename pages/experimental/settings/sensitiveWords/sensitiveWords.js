@@ -37,7 +37,9 @@ var app = new Vue({
         type: "enable",
         value: val
       })
-      .then(() => sweetAlert(val ? "已启用" : "已禁用"))
+      .then(function() {
+        sweetAlert(val ? "已启用" : "已禁用")
+      })
       .catch(sweetError)
     },
     // 删除关键词组
@@ -94,7 +96,7 @@ var app = new Vue({
           newName: newName
         }
       })
-      .then(() => {
+      .then(function() {
         group.rename = false;
       })
       .catch(sweetError)
@@ -110,7 +112,8 @@ var app = new Vue({
       nkcAPI("/e/settings/review/keyword", "PUT", {
         type: "reviewCondition",
         value: update
-      });
+      })
+      .catch(sweetError)
     },
     // 选择了关键词文件
     keywordFile: function(file) {
@@ -206,7 +209,7 @@ var app = new Vue({
       group.searchedWords.length = 0;
       if(!group.searchInputText) return;
       group.keywords.forEach(function(keyword) {
-        if(keyword.includes(el.value)) {
+        if(keyword.indexOf(el.value) !== -1) {
           group.searchedWords.push(keyword);
         }
       });
