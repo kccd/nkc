@@ -272,7 +272,7 @@ NKC.methods.initPostOption = () => {
   for(let i = 0; i < options.length; i++) {
     const dom = options.eq(i);
     const init = dom.attr('data-init');
-    if(init === 'ture') continue;
+    if(init === "true") continue;
     dom.on('click', (e) => {
       let {left, top} = dom.offset();
       const pid = dom.attr('data-pid');
