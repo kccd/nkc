@@ -61,7 +61,7 @@ block content
                 .col-sm-10.m-t-05
                   .form-group(v-for="(group, index) in keywordReview.wordGroupInfo")
                     label
-                      input(type="checkbox" :value="group.name" v-model="keywordReview.selectedGroup")
+                      input(type="checkbox" :value="group.id" v-model="keywordReview.selectedGroup")
                       span.group-name {{group.name}}
                       span.group-keywords-count 共{{group.len}}个敏感词
         .m-t-1

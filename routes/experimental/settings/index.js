@@ -44,6 +44,7 @@ const rechargeRouter = require('./recharge');
 const userSensitiveRouter = require("./userSensitive");
 const userScoresRouter = require("./userScores");
 const verificationRouter = require('./verification');
+const sensitiveWordsRouter = require('./sensitiveWords');
 settingRouter
 	.get('/', async (ctx, next) => {
 		await next();
@@ -94,5 +95,6 @@ settingRouter
 	.use('/recharge', rechargeRouter.routes(), rechargeRouter.allowedMethods())
 	.use('/sensitive', userSensitiveRouter.routes(), userSensitiveRouter.allowedMethods())
 	.use('/verification', verificationRouter.routes(), verificationRouter.allowedMethods())
-	.use('/userScores', userScoresRouter.routes(), userScoresRouter.allowedMethods());
+	.use('/userScores', userScoresRouter.routes(), userScoresRouter.allowedMethods())
+	.use('/sensitiveWords', sensitiveWordsRouter.routes(), sensitiveWordsRouter.allowedMethods());
 module.exports = settingRouter;
