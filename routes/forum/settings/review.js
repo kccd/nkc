@@ -10,6 +10,7 @@ router
     const reviewSettings = await db.SettingModel.getSettings("review");
     const wordGroup = reviewSettings.keyword.wordGroup;
     data.wordGroupInfo = wordGroup.map(group => ({
+      id: group.id,
       name: group.name,
       len: group.keywords.length
     }));

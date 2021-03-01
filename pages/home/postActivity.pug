@@ -3,28 +3,30 @@ if !isIncluded('postActivity')
   mixin postActivity(props)
     -var {from, user, quote, title, content, toc, cover, url, type} = props;
     mixin postActivityHeader(headerData)
-      -var {from, user, toc, type} = headerData;
-      .post-activity-header
+      -var {toc, type} = headerData;
+      .post-activity-header(class=headerData.from?'post-activity-main-header':'')
         .post-activity-avatar
-          if user.avatar
-            img(src=user.avatar)
+          if headerData.user.avatar
+            img(src=headerData.user.avatar)
           else
-            div(style=`background-color: ${user.color}`)
+            div(style=`background-color: ${headerData.user.color}`)
         .post-activity-user
-          if user.homeUrl
+          if headerData.user.homeUrl
             a(
-              href=user.homeUrl target="_blank"
-              data-float-uid=user.dataFloatUid || undefined
-              data-float-fid=user.dataFloatFid || undefined
-              ).post-activity-username=user.name
+              href=headerData.user.homeUrl target="_blank"
+              data-float-uid=headerData.user.dataFloatUid || undefined
+              data-float-fid=headerData.user.dataFloatFid || undefined
+              ).post-activity-username=headerData.user.name
           else
-            .post-activity-username=user.name
-          +fromNow(toc)
-          //-
-            if type === 'post'
-              span 发表回复
-            else
-              span 发表文章
+            .post-activity-username=headerData.user.name
+          if !headerData.from
+            +fromNow(toc)
+            span &nbsp;
+          if headerData.from
+            span.post-activity-from=`${headerData.from}`
+          if headerData.from
+            .post-activity-time-sm
+              +fromNow(toc)
     mixin postActivityContent(contentData)
       -var {cover, title, content, url} = contentData;
       .post-activity-content
@@ -37,10 +39,10 @@ if !isIncluded('postActivity')
             .post-activity-cover(style=`background-image: url(${cover})`)
     .post-activity
       .post-activity-content
-        +postActivityHeader({form, user, toc, type})
+        +postActivityHeader({from, user, toc, type})
         +postActivityContent({title, content, cover, url})
       if quote
         .post-activity-content.post-activity-quote
-          +postActivityHeader(Object.assign({from: 'user'}, quote))
+          +postActivityHeader(quote)
           +postActivityContent(quote)
 

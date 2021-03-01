@@ -1,0 +1,210 @@
+extends ../bootstrap_base
+block title
+  title 报告问题
+  style.
+    .problem-images{
+      font-size: 0;
+    }
+    .problem-image{
+      height: 6rem;
+      line-height: 6rem;
+      text-align: center;
+      width: 7rem;
+      border: 1px solid #c1c1c1;
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      margin: 0 0.5rem 0.5rem 0;
+    }
+    .problem-image:hover{
+      background-color: #eee;
+    }
+    .problem-image::before{
+      content: '+';
+      font-size: 1.6rem;
+    }
+    .problem-image img{
+      max-height: 100%;
+      max-width: 100%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      margin: auto;
+    }
+block content
+  .hidden#data=objToStr({content: data.c, referrer: data.referrer})
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-6.col-md-offset-3.box-shadow-panel#app(v-cloak)
+        if data.user
+          .form.m-b-1
+            .form-group.m-b-0
+              if data.userOperationsId.includes('visitProblemList')
+                a.btn.btn-default.m-r-1(href='/problem/list') 问题列表
+              a.btn.btn-default(href=`/u/${data.user.uid}/myProblems`) 已报告的问题
+            //-if data.problemsType
+              h4(id='cid' data-cid=data.problemsType._id)=`添加记录到分类：`
+                a(href=`/problem/list?cid=${data.problemsType._id}`)= data.problemsType.name
+        .form
+          .form-group
+            label 标题
+            input.form-control(type='text' placeholder='请一句话概括您所遇到的问题' v-model.trim='title')
+          .form-group
+            label 详细内容
+            textarea.form-control(placeholder='请详细描述您所遇到问题，如果能附上问题页面的链接那就更好了。' rows=10 v-model='content')
+          .form-group
+            label 页面链接（选填）
+            textarea.form-control(rows=2 v-model='referrer')
+          .form-group
+            label 上传图片（可选，最多5张）
+            input.hidden(type='file' accept='image/jpeg,png,jpg' ref='input' @change='selectedLocalFile' multiple=true)
+            .problem-images
+              .problem-image(v-for='image of images')
+                img(:src='image.url')
+              .problem-image(@click='selectLocalFile' title='选择本地图片')
+
+
+          .form-group
+            h5.text-danger 请留下您的联系方式，当问题被修复后我们将会第一时间通知您。
+          .form-group
+            label 国际区号
+            select.form-control(v-model='nationCode')
+              option(v-for='n of nationCodes' :value='n.code') +{{n.code}} {{n.chineseName}}
+          .form-group
+            label 手机号（选填）
+            input.form-control(type='text' v-model.trim='phoneNumber')
+          .form-group
+            label 邮箱（选填）
+            input.form-control(type='text' v-model.trim='email')
+          .form-group
+            label QQ（选填）
+            input.form-control(type='text' v-model.trim='qq')
+          .form-group
+            button.btn.btn-primary.btn-block(@click='submit' v-if='!submitting') 提交
+            button.btn.btn-primary.btn-block(v-else-if='progress !== 100' disabled) 提交中... {{progress}}%
+            button.btn.btn-primary.btn-block(v-else disabled) 处理中...
+          .form-group
+            h4=`${state.serverSettings.websiteName}值班室：${state.serverSettings.telephone}`
+
+block scripts
+  //+includeJS("/problem/add_problem.js")
+  +includeJS('/nationCodes/nationCodes.js')
+  script.
+    var data = NKC.methods.getDataById('data');
+    var app = new Vue({
+      el: '#app',
+      data: {
+        title: '',
+        content: data.content || '',
+        referrer: data.referrer || '',
+        nationCode: '86',
+        phoneNumber: '',
+        email: '',
+        qq: '',
+        images: [], // {file, url}
+
+        nationCodes: nationCodes,
+
+        submitting: false,
+        progress: 0,
+      },
+      methods: {
+        checkString: NKC.methods.checkData.checkString,
+        selectLocalFile: function() {
+          var input = this.$refs.input;
+          input.click();
+        },
+        selectedLocalFile: function() {
+          var input = this.$refs.input;
+          var files = input.files;
+          for(var i = 0; i < files.length; i ++) {
+            var file = files[i];
+            if(file.size > 1024 * 1024 * 3) {
+              screenTopWarning('图片大小不能超过3MB');
+            } else {
+              this.insertFile(file);
+            }
+          }
+        },
+        insertFile: function(file) {
+          NKC.methods.fileToUrl(file)
+            .then(function (url) {
+              if(app.images.length >= 5) throw new Error('最多可上传5张图片');
+              app.images.push({
+                file: file,
+                url: url
+              })
+            })
+            .catch(screenTopWarning);
+        },
+        submit: function() {
+          var self = this;
+          return Promise.resolve()
+            .then(function() {
+              self.checkString(self.title, {
+                name: '标题',
+                minLength: 1,
+                maxLength: 100,
+              });
+              self.checkString(self.content, {
+                name: '详细内容',
+                minLength: 1,
+                maxLength: 5000,
+              });
+              self.checkString(self.referrer, {
+                name: '页面链接',
+                minLength: 0,
+                maxLength: 1000,
+              });
+              if(self.images.length > 5) throw new Error('最多允许上传5张图片');
+              self.checkString(self.phoneNumber, {
+                name: '手机号',
+                minLength: 0,
+                maxLength: 100,
+              });
+              if(self.phoneNumber.length > 0 && !self.nationCode.length) {
+                throw new Error('请选择国际区号')
+              }
+              self.checkString(self.email, {
+                name: '邮箱',
+                minLength: 0,
+                maxLength: 100,
+              });
+              self.checkString(self.qq, {
+                name: 'QQ',
+                minLength: 0,
+                maxLength: 20
+              });
+              var formData = new FormData();
+              formData.append('title', self.title);
+              formData.append('content', self.content);
+              formData.append('referrer', self.referrer);
+              for(var i = 0; i < self.images.length; i++) {
+                var image = self.images[i];
+                formData.append('files', image.file);
+              }
+              formData.append('nationCode', self.nationCode);
+              formData.append('phoneNumber', self.phoneNumber);
+              formData.append('email', self.email);
+              formData.append('qq', self.qq);
+              self.submitting = true;
+              return nkcUploadFile('/problem/add', 'POST', formData, function(d, e) {
+                self.progress = e;
+              })
+            })
+            .then(function() {
+              self.submitting = false;
+              screenTopAlert('感谢您的反馈！网站工程师将会第一时间处理该问题。');
+              setTimeout(function() {
+                window.location.reload();
+              }, 2000)
+            })
+            .catch(function(err) {
+              self.submitting = false;
+              sweetError(err);
+            });
+        }
+      }
+    });

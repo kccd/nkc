@@ -20,13 +20,17 @@ var app = new Vue({
       }, 1000);
     },
     sendEmail: function() {
-      if(!this.username) return screenTopWarning('请输入用户名');
-      if(!this.email) return screenTopWarning('请输入邮箱地址');
-      if(!this.reg.test(this.email)) return screenTopWarning('邮箱格式不正确');
-      nkcAPI('/forgotPassword/email','POST',{
-        username: this.username,
-        email: this.email
-      })
+      var self = this;
+      return Promise.resolve()
+        .then(function() {
+          if(!self.username) throw new Error('请输入用户名');
+          if(!self.email) throw new Error('请输入邮箱地址');
+          NKC.methods.checkData.checkEmail(self.email);
+          return nkcAPI('/forgotPassword/email','POST',{
+            username: self.username,
+            email: self.email
+          })
+        })
         .then(function() {
           screenTopAlert('邮件发送成功，请查收');
           app.time = 120;
@@ -38,22 +42,25 @@ var app = new Vue({
         })
     },
     save: function() {
-      if(!this.username) return screenTopWarning('请输入用户名');
-      if(!this.email) return screenTopWarning('请输入邮箱地址');
-      if(!this.reg.test(this.email)) return screenTopWarning('邮箱格式不正确');
-      if(!this.code) return screenTopWarning('请输入邮件验证码');
-      if(!this.password) return screenTopWarning('请输入新密码');
-      if(this.password !== this.password2) return screenTopWarning('两次输入的密码不一致');
-      nkcAPI('/forgotPassword/email', 'PUT', {
-        username: this.username,
-        email: this.email,
-        code: this.code,
-        password: this.password
-      })
+      var self = this;
+      return Promise.resolve()
+        .then(function() {
+          if(!self.username) throw new Error('请输入用户名');
+          if(!self.email) throw new Error('请输入邮箱地址');
+          NKC.methods.checkData.checkEmail(self.email);
+          if(!self.code) throw new Error('请输入邮件验证码');
+          if(!self.password) throw new Error('请输入新密码');
+          if(self.password !== self.password2) throw new Error('两次输入的密码不一致');
+          return nkcAPI('/forgotPassword/email', 'PUT', {
+            username: self.username,
+            email: self.email,
+            code: self.code,
+            password: self.password
+          });
+        })
         .then(function() {
           screenTopAlert('密码修改成功，正在前往登录页面');
           setTimeout(function() {
-            // window.location.href = '/login';
             openToNewLocation("/login");
           }, 1000)
         })

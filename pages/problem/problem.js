@@ -82,4 +82,9 @@ function checkMark() {
 	}
 }
 
+
+$(function() {
+	NKC.methods.initImageViewer('.problem-images')
+})
+
 checkMark();

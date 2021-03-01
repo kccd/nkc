@@ -22,6 +22,9 @@ var Tools = function() {
       case "postCover": {
         return '/a/' + id + t;
       }
+      case 'problemImage': {
+        return '/a/' + id + t;
+      }
       case "cover": {
         return "/nr/cover/" + id + t
       }

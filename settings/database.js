@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 const mongodbConfig = require('../config/mongodb.json');
-const {username, password, database, address, port} = mongodbConfig;
+const {
+  username,
+  password,
+  database,
+  address,
+  port,
+  poolSize,
+  keepAlive
+} = mongodbConfig;
 let account = '';
 if(username && password) {
   account = `${username}:${password}@`;
@@ -8,9 +16,10 @@ if(username && password) {
 const options = {
   promiseLibrary: Promise,
   autoIndex: true,
-  poolSize: 20,
-  keepAlive: 30000,
-  useMongoClient: true
+  poolSize,
+  keepAlive,
+  useMongoClient: true,
+  autoReconnect: true,
 
   // 新属性
   // useNewUrlParser: true,

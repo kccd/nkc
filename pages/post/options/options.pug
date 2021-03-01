@@ -61,6 +61,9 @@
     .option(v-if='reviewed === false' @click='reviewPost')
       .fa.fa-check-circle-o
       span 通过审核
+    .option(v-if='commentControl' @click='toCommentControl')
+      .fa.fa-commenting
+      span 评论控制
     .option(v-if='disable !== null' @click='disablePost')
       .fa.fa-eye-slash
       span 退修或删除

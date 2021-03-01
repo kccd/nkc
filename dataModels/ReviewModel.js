@@ -69,7 +69,7 @@ schema.statics.includesKeyword = async (post) => {
   const targetFid = mainForumsId[0];
   // 拿到目标专业中对敏感词词组的设置
   const ForumModel = mongoose.model("forums");
-  const { keywordReviewUseGroup } = await ForumModel.findOne({ fid: targetFid }, { keywordReviewUseGroup: 1 });
+  const { keywordReviewUseGroup } = await ForumModel.findOne({ fid: targetFid }, { keywordReviewUseGroup: 1 });   // id数组
   // 拿到全局的敏感词设置
   const SettingModel = mongoose.model("settings");
   const reviewSetting = await SettingModel.getSettings("review");
@@ -81,8 +81,8 @@ schema.statics.includesKeyword = async (post) => {
   // 把对应词组的敏感词聚合到一个数组中
   let keywordList = [];
   wordGroup.forEach(group => {
-    const { name, keywords } = group;
-    if(keywordReviewUseGroup.includes(name)) {
+    const { id, keywords } = group;
+    if(keywordReviewUseGroup.includes(id)) {
       keywordList = keywordList.concat(keywords);
     }
   });

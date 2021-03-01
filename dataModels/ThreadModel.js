@@ -1548,7 +1548,7 @@ threadSchema.statics.postNewThread = async (options) => {
   const thread = await ThreadModel.findOnly({tid: _post.tid});
   // 是否需要审核
   // let needReview =
-  //     await UserModel.contentNeedReview(options.uid, "thread")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核 
+  //     await UserModel.contentNeedReview(options.uid, "thread")  // 判断该用户是否需要审核，如果不需要审核则标记文章状态为：已审核
   //   || await ReviewModel.includesKeyword(_post);                // 文章内容是否触发了敏感词送审条件
   // 自动送审
   const needReview = await ReviewModel.autoPushToReview(_post);
@@ -1926,7 +1926,8 @@ threadSchema.statics.getHomeRecommendThreadsByType = async (type, fid = []) => {
   const options = homeSettings.recommendThreads[type];
   let {
     displayType, order, manuallySelectedThreads,
-    automaticallySelectedThreads, automaticProportion
+    automaticallySelectedThreads, automaticProportion,
+    count
   } = options;
   let threadsId = manuallySelectedThreads.concat(
     automaticallySelectedThreads
@@ -1945,41 +1946,26 @@ threadSchema.statics.getHomeRecommendThreadsByType = async (type, fid = []) => {
     if(order === 'random') {
       manuallySelectedThreads = apiFunction.arrayShuffle(manuallySelectedThreads);
     }
-    if(type === 'fixed') {
-      results = manuallySelectedThreads.slice(0, 6);
-    } else {
-      results = manuallySelectedThreads;
-    }
+    results = manuallySelectedThreads.slice(0, count);
   } else if(displayType === 'automatic') {
     // 只从自动推荐文章中选取
     if(order === 'random') {
       automaticallySelectedThreads = apiFunction.arrayShuffle(automaticallySelectedThreads);
     }
-    if(type === 'fixed') {
-      results = automaticallySelectedThreads.slice(0, 6);
-    } else {
-      results = automaticallySelectedThreads;
-    }
+    results = automaticallySelectedThreads.slice(0, count);
   } else {
     // 根据比例从手动和自动推荐文章中选取
-    if(type === 'fixed') {
-      const automaticCount = 6 / (automaticProportion + 1);
-      const manualCount = 6 - automaticCount;
-      if(order === 'random') {
-        manuallySelectedThreads = apiFunction.arrayShuffle(manuallySelectedThreads);
-        automaticallySelectedThreads = apiFunction.arrayShuffle(automaticallySelectedThreads);
-      }
-      results = manuallySelectedThreads.slice(0, manualCount).concat(
-        automaticallySelectedThreads.slice(0, automaticCount)
-      );
-      if(order === 'random') {
-        results = apiFunction.arrayShuffle(results);
-      }
-    } else {
-      results = manuallySelectedThreads.concat(automaticallySelectedThreads);
-      if(order === 'random') {
-        results = apiFunction.arrayShuffle(results);
-      }
+    const automaticCount = Math.round(count * automaticProportion / (automaticProportion + 1));
+    const manualCount = count - automaticCount;
+    if(order === 'random') {
+      manuallySelectedThreads = apiFunction.arrayShuffle(manuallySelectedThreads);
+      automaticallySelectedThreads = apiFunction.arrayShuffle(automaticallySelectedThreads);
+    }
+    results = manuallySelectedThreads.slice(0, manualCount).concat(
+      automaticallySelectedThreads.slice(0, automaticCount)
+    );
+    if(order === 'random') {
+      results = apiFunction.arrayShuffle(results);
     }
   }
   return results;

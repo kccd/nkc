@@ -74,14 +74,41 @@ class NKCRender {
         return method(_html, id, resource, user);
       });
     }
-    html = $("body").safeHtml();
+
+    // 处理文本中的@信息，将@+用户名改为#nkcat{uid}用于后边插入a标签
+    const replaceATInfo = function(node, atUsers) {
+      if(!node.children || node.children.length === 0) return;
+      for(let i = 0; i < node.children.length; i++) {
+        const c = node.children[i];
+        if(c.type === 'text') {
+          for(const atUser of atUsers) {
+            const str = `@${atUser.username}`;
+            const strLowerCase = str.toLowerCase();
+            c.data = c.data.replace(new RegExp(str, 'ig'), `#nkcat{${atUser.uid}}`);
+            c.data = c.data.replace(new RegExp(strLowerCase, 'ig'), `#nkcat{${atUser.uid}}`);
+          }
+        } else if(c.type === 'tag') {
+          if(['a', 'blockquote', 'code', 'pre'].includes(c.name)) continue;
+          if(c.attribs['data-tag'] === 'nkcsource') continue;
+          replaceATInfo(c, atUsers);
+        }
+      }
+    }
+
+    const body = $('body');
+
+    if(type === 'article') {
+      replaceATInfo(body[0], atUsers);
+    }
+    html = body.safeHtml();
     if(type === "article") {
-      // @检测
+      // 将#nkcat{uid}替换成a标签
       if(atUsers && atUsers.length) {
         for(const u of atUsers) {
-          const str = `@${u.username}`;
-          const reg = new RegExp(str, "g");
-          html = html.replace(reg, `<a href="/u/${u.uid}" target="_blank" data-tag="nkcsource" data-type="at">${str}</a>`);
+          html = html.replace(
+            new RegExp(`#nkcat\\{${u.uid}}`, 'ig'),
+            `<a href="/u/${u.uid}" target="_blank" data-tag="nkcsource" data-type="at">@${u.username}</a>`
+          );
         }
       }
       // twemoji本地化

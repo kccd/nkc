@@ -46,7 +46,13 @@ function toQueryString(object) {
 }
 
 function htmlDiff(earlier,later){
-  let diff = jsdiff.diffChars(earlier,later);
+	let diff;
+	// jsdiff.diffChars方法虽然比较效果好但是非常耗资源
+	if(earlier.length >= 10000 || later.length >= 10000) {
+		diff = jsdiff.diffWords(earlier, later);
+	} else {
+		diff = jsdiff.diffChars(earlier, later);
+	}
   let outputHTML = '';
 
   diff.forEach(function(part){

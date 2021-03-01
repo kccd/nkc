@@ -127,7 +127,7 @@ router
       await db.SettingModel.updateOne({ _id: "review" }, {
         $pull: {
           "c.keyword.wordGroup": {
-            name: value
+            id: value
           }
         }
       });
@@ -139,7 +139,8 @@ router
     } else if(type === "addWordGroup" && typeof value === "object") {
       const { name, keywords } = value;
       if(!name) ctx.throw(403, "未指定组名");
-      if(!keywords.length) ctx.throw(403, "未添加关键词");
+      const filterEmptyKeywords = keywords.filter(keyword => !!keyword);
+      if(!filterEmptyKeywords.length) ctx.throw(403, "未添加关键词");
       if(
         await db.SettingModel.findOne({
           "c.keyword.wordGroup": { 
@@ -149,14 +150,17 @@ router
       ) {
         ctx.throw(403, "词组名称重复");
       }
+      const newId = db.SettingModel.newObjectId().toString();
       await db.SettingModel.update({ _id: "review" }, {
         $addToSet: {
           "c.keyword.wordGroup": {
+            id: newId,
             name,
-            keywords
+            keywords: filterEmptyKeywords
           }
         }
       });
+      data.id = newId;
     } else if(type === "reviewCondition" && typeof value === "object") {
       const { leastKeywordTimes, leastKeywordCount, relationship } = value;
       await db.SettingModel.update({ _id: "review" }, {
@@ -167,50 +171,55 @@ router
         }
       });
     } else if(type === "addKeywords") {
-      const { name, keywords } = value;
+      const { groupId, keyword: shouldAddKeyword } = value;
       const reviewSettings = await db.SettingModel.getSettings("review");
       const wordGroups = reviewSettings.keyword.wordGroup;
-      const addedKeywords = [];
-      for(group of wordGroups) {
-        if(group.name === name) {
-          const keywordsSet = new Set(group.keywords);
-          keywords.forEach(keyword => {
-            const beforeSize = keywordsSet.size;
-            keywordsSet.add(keyword);
-            const afterSize = keywordsSet.size;
-            if(afterSize > beforeSize) {
-              addedKeywords.push(keyword);
-            }
-          });
-          group.keywords = Array.from(keywordsSet)
-          break;
-        }
+      const group = wordGroups.find(group => group.id === groupId);
+      if(!group) {
+        ctx.throw(403, "不存在此词组");
       }
-      data.added = addedKeywords;
+      if(group.keywords.includes(shouldAddKeyword)) {
+        data.added = false;
+      } else {
+        group.keywords.push(shouldAddKeyword);
+        data.added = true;
+      }
       await db.SettingModel.update({ _id: "review" }, {
         "c.keyword.wordGroup": wordGroups
       });
     } else if(type === "deleteKeywords") {
-      const { name, keywords } = value;
+      const { groupId, keyword: shouldRemoveKeyword } = value;
       const reviewSettings = await db.SettingModel.getSettings("review");
       const wordGroups = reviewSettings.keyword.wordGroup;
-      const shouldDelete = [];
-      for(group of wordGroups) {
-        if(group.name === name) {
-          group.keywords = group.keywords.filter(keyword => {
-            if(keywords.includes(keyword)) {
-              shouldDelete.push(keyword);
-              return false;
-            }
-            return true;
-          });
-          break;
-        }
+      const group = wordGroups.find(group => group.id === groupId);
+      if(!group) {
+        ctx.throw(403, "不存在此词组");
       }
-      data.deleted = shouldDelete;
+      group.keywords = group.keywords.filter(keyword => keyword !== shouldRemoveKeyword);
       await db.SettingModel.update({ _id: "review" }, {
         "c.keyword.wordGroup": wordGroups
       });
+    } else if(type === "renameWordGroup") {
+      const { id, newName } = value;
+      const reviewSettings = await db.SettingModel.getSettings("review");
+      const wordGroups = reviewSettings.keyword.wordGroup;
+      for(group of wordGroups) {
+        if(group.id === id) {
+          group.name = newName;
+          break;
+        }
+      }
+      await db.SettingModel.update({ _id: "review" }, {
+        "c.keyword.wordGroup": wordGroups
+      });
+    } else if(type === "applyAllForums") {
+      await db.ForumModel.updateMany({}, {
+        $addToSet: {
+          keywordReviewUseGroup: value
+        }
+      })
+    } else {
+      ctx.throw(403, "参数不正确");
     }
     await db.SettingModel.saveSettingsToRedis("review");
     return next();

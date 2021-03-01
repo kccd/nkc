@@ -81,8 +81,9 @@ block content
             //if data.thread.oc !== data.post.pid
             //  //- a.pointer.m-r-1(onclick=`postComment('${post.tid}', '${post.pid}')`) 评论
             //  a.pointer.m-r-1(onclick=`NKC.methods.switchPostComment('${post.pid}')`) 评论
-          div
-            +singlePostComment({pid: post.pid})
+          if post.type === 'post'
+            div
+              +singlePostComment({pid: post.pid})
           -let comment = post;
           include ../thread/postEdit
 
@@ -134,6 +135,7 @@ block scripts
   include ../publicModules/disabledPost/disabledPost
   include ../publicModules/highlight/highlight
   include ../publicModules/share/sharePanel
+  include ../publicModules/commentControl/commentControl
   include ../post/options/options
   include ../publicModules/subscribeTypes/subscribeTypes
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
