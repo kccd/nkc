@@ -63,7 +63,7 @@ const start = async () => {
     if(global.NKC.isDevelopment) {
       require('./microServices/communication/server');
       const socket = require('./socket/index');
-      await socket(server)
+      await socket(server);
       require('./timedTask');
       require('./watch.js');
     }
@@ -75,6 +75,8 @@ const start = async () => {
         process.exit(0);
       }
     });
+
+    process.on('warning', e => console.warn(e.stack));
 
   } catch(err) {
     console.error(`error occured when initialize the server.\n${err.stack}`.red);

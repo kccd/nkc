@@ -29,7 +29,8 @@ block content
         h4 考试须知
         .form-horizontal
           .form-group
-            #editor.col-sm-8!= data.examSettings.examNotes
+            .col-sm-6
+              textarea.form-control(rows="10" v-model="examSettings.examNotes")= data.examSettings.examNotes
           .form-group
             label.col-sm-2.control-label
             .col-sm-4
@@ -39,5 +40,4 @@ block content
               
         
 block scripts
-  script(src="https://cdn.jsdelivr.net/npm/wangeditor@latest/dist/wangEditor.min.js")
   +includeJS('/experimental/settings/exam.js')

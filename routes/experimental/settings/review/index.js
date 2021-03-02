@@ -5,7 +5,8 @@ router
     const {data, db} = ctx;
     ctx.template = "experimental/settings/review/review.pug";
     data.grades = await db.UsersGradeModel.find({}).sort({_id: 1});
-    data.reviewSettings = (await db.SettingModel.findById("review")).c;
+    data.reviewSettings = await db.SettingModel.getSettings('review');
+    // data.reviewSettings = (await db.SettingModel.findById("review")).c;
     data.certs = await db.RoleModel.find().sort({toc: -1});
     let uid = data.reviewSettings.post.special.whitelistUid;
     uid = uid.concat(data.reviewSettings.post.special.blacklistUid);
@@ -143,7 +144,7 @@ router
       if(!filterEmptyKeywords.length) ctx.throw(403, "未添加关键词");
       if(
         await db.SettingModel.findOne({
-          "c.keyword.wordGroup": { 
+          "c.keyword.wordGroup": {
             $elemMatch: { name }
           }
         })
