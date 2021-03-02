@@ -170,3 +170,7 @@
 .question-option{
   margin-right: 1rem;
 }
+
+.pre-content {
+  white-space: pre;
+}
