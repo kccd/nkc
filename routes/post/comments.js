@@ -7,10 +7,10 @@ router
     const {pid} = params;
     const post = await db.PostModel.findOnly({pid});
     if(!await db.PostModel.checkPostCommentPermission(pid, 'read')) {
-      ctx.throw(403, `当前回复的评论不予许查看`);
+      ctx.throw(403, `根据相关法律法规和政策，当前回复的评论不予显示`);
     }
     // 是否可以发表评论
-    data.cWriteInfo = await db.PostModel.checkPostCommentPermission(pid, 'write')?null  :'当前回复不允许发表评论';
+    data.cWriteInfo = await db.PostModel.checkPostCommentPermission(pid, 'write')?null  :'当前回复不允许添加新的评论';
     const {uid, pageSettings} = state;
     const {threadPostCommentList} = pageSettings;
     const isModerator = await db.PostModel.isModerator(uid, pid);
