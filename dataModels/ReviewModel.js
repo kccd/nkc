@@ -131,7 +131,7 @@ schema.statics.autoPushToReview = async function(post) {
   const reviewSettings = (await SettingModel.findById("review")).c;
   const review = reviewSettings[type];
 
-  const needReview = (async () => {
+  const needReview = await (async () => {
     // 一、特殊限制
     const {whitelistUid, blacklistUid} = review.special;
     // 1. 白名单
