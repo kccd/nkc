@@ -1,26 +1,21 @@
 extends ../bootstrap_base
 block title
   title=`${state.serverSettings.websiteName} | 考试系统`
-  -const {countOneDay, count, waitingTime} = data.examSettings;
+  -const {countOneDay, count, waitingTime, examNotes} = data.examSettings;
   +includeCSS('/exam/exam.css')
 block content
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-8.bg-color-ffffff
-        h2.m-b-2 参与考试获得证书
-        ul
-          li
-            h5 通过A卷考试可获得普通证书，可以参加所有普通话题的交流。
-          li
-            h5 通过B卷考试可获得高级证书，可参与相应特种科技爱好话题的交流。
-          li
-            h5 通过A卷考试的用户将来可以再参加B卷考试。
-          li
-            h5=`同一用户每天最多进行 ${countOneDay} 次考试。`
-          li
-            h5=`同一用户的考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`
-        .row.m-t-2
+        .row.m-t-1
           .col-xs-12.col-md-12
+            h2 考试须知
+        .row.m-t-1
+          .col-xs-12.col-md-12
+            .pre-content= examNotes
+        .row.m-t-1
+          .col-xs-12.col-md-12
+            h5= `每天最多进行 ${countOneDay} 次考试，考试次数累计达到 ${count} 次时，在 ${waitingTime} 天之内将无法再次参加考试。`
 
         .row.m-t-2.exam-link
           .col-xs-12.col-md-6
