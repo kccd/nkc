@@ -45,5 +45,7 @@
   "waterPay": "购买水印服务",
   "digestPost": "回复被加精",
   "unDigestPost": "回复被取消加精",
-  "attachmentDownload": "附件下载"
+  "attachmentDownload": "附件下载",
+
+  "scoreExchange": "积分兑换"
 }
