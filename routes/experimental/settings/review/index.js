@@ -172,7 +172,8 @@ router
         }
       });
     } else if(type === "addKeywords") {
-      const { groupId, keyword: shouldAddKeyword } = value;
+      const { groupId, keyword } = value;
+      const shouldAddKeyword = keyword.toLowerCase();
       const reviewSettings = await db.SettingModel.getSettings("review");
       const wordGroups = reviewSettings.keyword.wordGroup;
       const group = wordGroups.find(group => group.id === groupId);
