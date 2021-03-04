@@ -128,7 +128,9 @@ var app = new Vue({
         if(!keywords.length) {
           return sweetWarning("无新的关键字");
         }
-        self.form.keywords = keywords.filter(keyword => !!keyword);
+        self.form.keywords = keywords.filter(function(keyword) {
+          return !!keyword;
+        });
         if(!self.form.groupName) {
           self.form.groupName = groupName;
         }
@@ -140,7 +142,7 @@ var app = new Vue({
       var group = wordGroup[groupIndex];
       var keyword = window.prompt("请输入一个关键词(中、英(不区分大小)、数字)", "");
       if(!keyword) return;
-      const shouldAddKeyword = keyword.toLowerCase();
+      var shouldAddKeyword = keyword.toLowerCase();
       nkcAPI("/e/settings/review/keyword", "PUT", {
         type: "addKeywords",
         value: {
