@@ -138,20 +138,21 @@ var app = new Vue({
     addKeyword: function(groupIndex) {
       var wordGroup = this.keywordSetting.wordGroup;
       var group = wordGroup[groupIndex];
-      var keyword = window.prompt("请输入一个关键词(中、英、数字)", "");
+      var keyword = window.prompt("请输入一个关键词(中、英(不区分大小)、数字)", "");
       if(!keyword) return;
+      const shouldAddKeyword = keyword.toLowerCase();
       nkcAPI("/e/settings/review/keyword", "PUT", {
         type: "addKeywords",
         value: {
           groupId: group.id,
-          keyword: keyword
+          keyword: shouldAddKeyword
         }
       })
       .then(function(data) {
         var added = data.added;
         if(added) {
           sweetAlert("已添加");
-          group.keywords.push(keyword);
+          group.keywords.push(shouldAddKeyword);
         } else {
           sweetWarning("重复添加");
         }
