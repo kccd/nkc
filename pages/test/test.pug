@@ -14,8 +14,25 @@ block scripts
   include ../publicModules/forumSelector/forumSelector.pug
   include ../publicModules/verifications/verifications
   script.
-    var v = new NKC.modules.Verifications();
-    v.open()
-    .then(console.log)
-    .catch(console.error)
+    function RUN(count) {
+      for(var i = 0 ; i < count ; i++) {
+        var socket = io('/common', {
+          forceNew: false,
+          reconnection: true,
+          autoConnect: true,
+          transports: ['websocket'],
+          reconnectionDelay: 5000,
+          reconnectionDelayMax: 10000,
+          query: {
+            operationId: NKC.configs.refererOperationId
+          }
+        });
+        socket.on('connect', () => {
+          console.log('连接成功');
+        });
+        socket.on('disconnect', () => {
+          console.log('连接失败');
+        });
+      }
+    }
 

@@ -28,7 +28,10 @@ addRouter
 			email,
 			qq
 		} = fields;
-		const images = files.files;
+		let images = files.files;
+		if(!Array.isArray(images)) {
+			images = [images];
+		}
 		const {checkString} = nkcModules.checkData;
 		checkString(title, {
 			name: '标题',
