@@ -24,6 +24,7 @@
     "@nkc/backup": "./microServices/backup",
     "@nkc/communication": "./microServices/communication",
     "@nkc/proxy": "./microServices/proxy",
+    "axios": "^0.21.1",
     "alipay-sdk": "^3.1.5",
     "ansi-escapes": "^4.3.1",
     "awesome-static": "^1.4.3",
