@@ -15595,6 +15595,26 @@ UE.plugins['list'] = function () {
         adjustListStyle(me.document)
     });
 
+    // 粘贴内容中的超链接失效，并在它们各自之前的位置插入一个明文链接
+    me.addListener("beforepaste", function(type, box) {
+        var div = document.createElement("div");
+        div.innerHTML = box.html;
+        var links = [].slice.call(div.getElementsByTagName("a"));
+        links.forEach(function(link) {
+            if(link.host === location.host) return;
+            var a = document.createElement("a");
+            a.target = "_blank";
+            a.href = link.href;
+            a.innerText = link.href;
+            a.style.fontSize = "13px";
+            link.parentNode.insertBefore(a, link);
+            link.removeAttribute("href");
+            link.style.border = "1px solid rgb(177,177,177)";
+            a.style.borderTop = "none";
+        });
+        box.html = div.innerHTML;
+    });
+
     function adjustListStyle(doc,ignore){
         utils.each(domUtils.getElementsByTagName(doc,'ol ul'),function(node){
 
