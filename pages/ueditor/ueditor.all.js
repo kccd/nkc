@@ -15595,22 +15595,19 @@ UE.plugins['list'] = function () {
         adjustListStyle(me.document)
     });
 
-    // 粘贴内容中的超链接失效，并在它们各自之前的位置插入一个明文链接
+    // 粘贴内容中的超链接，它们各自之前的位置插入一个链接url
     me.addListener("beforepaste", function(type, box) {
         var div = document.createElement("div");
         div.innerHTML = box.html;
         var links = [].slice.call(div.getElementsByTagName("a"));
         links.forEach(function(link) {
             if(link.host === location.host) return;
-            var a = document.createElement("a");
-            a.target = "_blank";
-            a.href = link.href;
-            a.innerText = link.href;
-            a.style.fontSize = "13px";
-            link.parentNode.insertBefore(a, link);
-            link.removeAttribute("href");
-            link.style.border = "1px solid rgb(177,177,177)";
-            a.style.borderTop = "none";
+            var br = document.createElement("br");
+            var span = document.createElement("span");
+            span.innerText = link.href;
+            span.style.fontSize = "10px";
+            link.insertBefore(br, link.firstChild);
+            link.insertBefore(span, link.firstChild);
         });
         box.html = div.innerHTML;
     });
