@@ -3,6 +3,8 @@ const fss = require('fs');
 const fsPromise = fss.promises;
 const utils = require('./utils');
 const {ThrottleGroup} = require("stream-throttle");
+const onFinished = require('on-finished');
+const destroy = require('destroy');
 
 let allSpeedLimit;
 
@@ -87,10 +89,11 @@ module.exports = async (ctx, next) => {
     } else {
       ctx.body = createdStream.pipe(allSpeedLimit.tg.throttle());
     }
-
+    onFinished(ctx.res, (err) => {
+      destroy(createdStream);
+    });
     ctx.set('Content-Disposition', contentDisposition);
     ctx.set(`Content-Length`, contentLength);
-
     await next();
   } else {
     ctx.logIt = true; // if the request is request to a content, log it;

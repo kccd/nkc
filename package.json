@@ -110,7 +110,9 @@
     "urllib": "^0.5.2",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "on-finished": "^2.3.0",
+    "destroy": "^1.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
