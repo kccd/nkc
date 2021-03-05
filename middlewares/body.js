@@ -85,13 +85,22 @@ module.exports = async (ctx, next) => {
     }
 
     if(tg) {
-      ctx.body = createdStream.pipe(tg.throttle()).pipe(allSpeedLimit.tg.throttle());
+      const tgThrottle = tg.throttle();
+      const globalTgThrottle = allSpeedLimit.tg.throttle();
+      ctx.body = createdStream.pipe(tgThrottle).pipe(globalTgThrottle);
+      onFinished(ctx.res, (err) => {
+        destroy(globalTgThrottle);
+        destroy(tgThrottle);
+        destroy(createdStream);
+      });
     } else {
+      const globalTgThrottle = allSpeedLimit.tg.throttle();
       ctx.body = createdStream.pipe(allSpeedLimit.tg.throttle());
+      onFinished(ctx.res, (err) => {
+        destroy(globalTgThrottle);
+        destroy(createdStream);
+      });
     }
-    onFinished(ctx.res, (err) => {
-      destroy(createdStream);
-    });
     ctx.set('Content-Disposition', contentDisposition);
     ctx.set(`Content-Length`, contentLength);
     await next();
