@@ -1,37 +1,62 @@
-/*importScripts("/socket.io-client/dist/socket.io.js");
+importScripts("/serviceWorker/socket.io.min.js");
 
-self.addEventListener('install', event => {
-  return self.skipWaiting()
-})
+self.addEventListener("install", event => self.skipWaiting());
 
-self.addEventListener("message",  function(event){
-  let message = event.data;
-  console.log(message);
-})*/
+const query = {
+  serviceWorker: true,
+  data: {},
+}
 
-// var socket = io('/common', {
-//   forceNew: false,
-//   reconnection: true,
-//   autoConnect: true,
-//   transports: ['polling', 'websocket'],
-//   reconnectionDelay: 5000,
-//   reconnectionDelayMax: 10000,
-//   query: {
-//     operationId: "reviewForum",
-//     data: {},
-//   },
-//   jsonp: false
-// });
+const socket = io("/common", {
+  forceNew: false,
+  reconnection: true,
+  autoConnect: true,
+  transports: ["polling", "websocket"],
+  reconnectionDelay: 5000,
+  reconnectionDelayMax: 10000,
+  jsonp: false,
+  query
+});
 
-// // socket.open();
+// 可以取到当前所有的同源页面
+function attachClients() {
+  return self.clients.matchAll({
+    includeUncontrolled: true,
+    type: "window"
+  });
+}
 
-// socket.on('connect', function () {
-//   console.log('Service Worker socket连接成功');
-// });
-// socket.on('error', function() {
-//   console.log('Service Worker socket连接出错');
-//   socket.disconnect();
-// });
-// socket.on('disconnect', function() {
-//   console.log('Service Worker socket连接已断开');
-// });
+// 发送消息到所有页面
+function postMessageToClients(data) {
+  attachClients()
+    .then(function(clients) {
+      clients.forEach(function(client) {
+        client.postMessage(data);
+      });
+    })
+}
+
+socket.on("connect", function() {
+  console.log("service worker socket.io 连接成功");
+});
+socket.on("disconnect", function() {
+  console.log("service worker socket.io 连接断开");
+});
+
+// socket.io触发任何事件时都要传递到页面去
+socket.onAny(function() {
+  const args = [].slice.call(arguments);
+  // console.log("触发事件: ", args);
+  postMessageToClients({
+    type: "socket_event_trigger",
+    detail: {
+      name: args[0],
+      args: args.slice(1)
+    }
+  });
+});
+
+// 页面发过来的消息
+self.addEventListener("message", event => {
+  console.log("页面发来的消息: ", event);
+});
