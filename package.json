@@ -86,7 +86,7 @@
     "photoswipe": "^4.1.2",
     "pinyin": "^2.9.0",
     "pm2": "^4.5.1",
-    "pug": "^2.0.0-rc.4",
+    "pug": "^3.0.1",
     "qcloudsms_js": "^0.1.0",
     "qr-image": "^3.2.0",
     "qrcode": "^1.2.0",
@@ -95,8 +95,8 @@
     "redlock": "^4.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "socket.io": "3.1.0",
-    "socket.io-client": "3.1.0",
+    "socket.io": "3.1.2",
+    "socket.io-client": "3.1.2",
     "socket.io-redis": "6.0.1",
     "stream-throttle": "^0.1.3",
     "supertest": "^6.0.1",
@@ -110,7 +110,9 @@
     "urllib": "^0.5.2",
     "vue": "^2.5.16",
     "xbbcode-parser": "^0.1.2",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "on-finished": "^2.3.0",
+    "destroy": "^1.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

@@ -5,7 +5,7 @@ block title
 block content
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-8.col-md-offset-2
+      .col-xs-12.col-md-8.col-md-offset-2.box-shadow-panel
         #data.hidden= objToStr({mainScore: data.mainScore, countToday: data.countToday, withdrawSettings: data.withdrawSettings, userMainScore: data.userMainScore, alipayAccounts: data.alipayAccounts, bankAccounts: data.bankAccounts})
         div#app(v-cloak)
           .row(v-if="succeed").text-center.m-t-4

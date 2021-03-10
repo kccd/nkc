@@ -7,6 +7,10 @@ module.exports = {
     withdraw: {
       GET: 'accountWithdraw',
       POST: "accountWithdraw"
+    },
+    exchange: {
+      GET: 'accountExchange',
+      POST: 'accountExchange'
     }
   },
   contribute: {

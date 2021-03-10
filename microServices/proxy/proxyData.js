@@ -1,4 +1,4 @@
-const httpProxy = require('http-proxy');
+const httpProxy = require('http-proxy-ws');
 const PATH = require('path');
 const http = require('http');
 const tls = require('tls');
