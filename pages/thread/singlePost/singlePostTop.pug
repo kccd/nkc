@@ -31,7 +31,8 @@ if !isIncluded('singlePostTop')
           if tlm
             | &nbsp;修改于&nbsp;
             +fromNow(tlm)
-      a.single-post-floor(href=tools.getUrl('post', pid))=floor + '楼'
+      .single-post-floor
+        a(href=tools.getUrl('post', pid))=floor + '楼'
         .single-post-checkbox
           label
             input(type='checkbox' data-pid=pid)
