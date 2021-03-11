@@ -27,6 +27,32 @@ NKC.methods.rn.onMessage = function(res) {
   }
 }
 
+NKC.methods.rn.updateMusicListAndPlay = function(targetRid) {
+  var elements = $('span[data-tag="nkcsource"][data-type="audio"]');
+  var audiosId = [];
+  for(var i = 0; i < elements.length; i ++) {
+    var e = elements.eq(i);
+    var rid = e.attr('data-id');
+    if(audiosId.indexOf(rid) === -1) {
+      audiosId.push(rid)
+    }
+  }
+  var index = audiosId.indexOf(targetRid);
+  if(index > 0) {
+
+    var _audiosId = audiosId.splice(0, index);
+    audiosId = audiosId.concat(_audiosId);
+  }
+  var list = [];
+  for(var i = 0; i < audiosId.length; i ++) {
+    list.push({
+      url: window.location.origin + '/r/' + audiosId[i]
+    });
+  }
+  NKC.methods.rn.emit('updateMusicListAndPlay', {list: list});
+}
+
+
 function urlPathEval(fromUrl, toUrl) {
   if (!toUrl) {
     toUrl = fromUrl;
