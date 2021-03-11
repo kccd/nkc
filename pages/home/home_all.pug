@@ -314,10 +314,12 @@ block content
                       if column.latestThreadToc
                         span=tools.briefTime(column.latestThreadToc) + "更新 "
                       span= "共" + column.threadsCount + "篇文章"
-            if !state.userColumn && data.user && state.columnPermission
-              .home-columns-link
-                a(href=`/column/apply` target="_blank") 开设专栏
-                .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
+            .m-t-05
+              a.home-threads-more-link(href=`/m`) 查看更多
+          if !state.userColumn && data.user && state.columnPermission
+            .home-columns-link.m-b-1
+              a(href=`/column/apply` target="_blank") 开设专栏
+              .home-columns-link-info 你的账号已满足开设专栏所需要的所有条件，点击按钮即可开设个人专栏。
 
 
         if data.enableFund

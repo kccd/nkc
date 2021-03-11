@@ -93,7 +93,7 @@ NKC.modules.downloadResource = class {
               });
             })
             .catch(data => {
-              self.fileCountLimitInfo = data.fileCountLimitInfo;
+              self.fileCountLimitInfo = data.detail.fileCountLimitInfo;
               self.status = 'error';
               self.errorInfo = data.error || data.message || data;
             })

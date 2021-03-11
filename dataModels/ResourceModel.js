@@ -381,7 +381,7 @@ resourceSchema.methods.checkDownloadPermission = async function(user, ip) {
     if(!user) {
       throwErr(403, `只有登录用户可以下载附件，请先登录或注册。`);
     } else {
-      throwErr(403, `你当前的账号等级无法下载附件，请发表优质内容提升等级。`);
+      throwErr(403, `当前时段（${startingTime}点 - ${endTime}点）暂不允许下载附件，请下一个时段再试。`);
     }
   }
   let downloadLogs;
