@@ -27,6 +27,8 @@ script.
       for (var i = 0; i < videoDom.length; i++) {
         var dom = videoDom.eq(i);
         var isVideo = dom[0].tagName.toLowerCase() === 'video';
+        if(!isVideo && NKC.configs.platform === 'reactNative') continue;
+        // if(!isVideo) continue;
         var title = dom.attr("data-plyr-title");
         var rid = dom.attr("data-rid");
         var player = new Plyr(videoDom.eq(i), {
@@ -54,23 +56,44 @@ script.
     NKC.methods.initVideo();
 
     if(NKC.configs.platform === 'reactNative') {
-      //NKC.methods.updateMusicListAndPlay('${id}')
       var elements = $('[data-tag="nkcsource"][data-type="audio"]');
 
-      var initEvent = function (element, rid) {
-        element.onclick = function () {
-          NKC.methods.rn.updateMusicListAndPlay(rid);
-        };
+      for(var i = 0; i < elements.length; i++) {
+        var element = elements.eq(i);
+        var title = element.find('span.nkcsource-audio-title');
+        if(title) title = title.text();
+        var rid = element.attr('data-id');
+        var size = element.find('audio[data-size]');
+        if(size.length) {
+          size = Number(size.attr('data-size'));
+        } else {
+          size = 0;
+        }
+        size = NKC.methods.tools.getSize(size);
+        var url = "/r/" + rid + "?d=attachment";
+        var appAudio = $('<div class="app-audio"><div class="fa fa-play app-audio-icon" onclick="NKC.methods.rn.updateMusicListAndPlay(\''+rid
+          +'\')"></div><div class="app-audio-container"><a class="app-audio-title" href="'+url
+          +'" target="_blank" data-type="download" data-title="'+title
+          +'">'+title
+          +'</a><div class="app-audio-info">'+size
+          +'</div></div></div>')
+        element.html(appAudio);
       }
 
-      for (var i = 0; i < elements.length; i++) {
-        var e = elements.eq(i);
-        var rid = e.attr('data-id');
-        if (rid === '') continue;
-        var audioTitle = e.find('span.nkcsource-audio-title');
-        var element = audioTitle[0];
-        if(element) initEvent(element, rid);
-      }
+      // var initEvent = function (element, rid) {
+      //   element.onclick = function () {
+      //     NKC.methods.rn.updateMusicListAndPlay(rid);
+      //   };
+      // }
+      //
+      // for (var i = 0; i < elements.length; i++) {
+      //   var e = elements.eq(i);
+      //   var rid = e.attr('data-id');
+      //   if (rid === '') continue;
+      //   var audioTitle = e.find('span.nkcsource-audio-title');
+      //   var element = audioTitle[0];
+      //   if(element) initEvent(element, rid);
+      // }
     }
   }());
 
