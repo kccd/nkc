@@ -1,3 +1,4 @@
+@import '../../publicModules/base';
 .plyr {
   .plyr-mask {
     position: absolute;
@@ -51,4 +52,48 @@
 
 #plyrMask {
   display: none;
+}
+
+.app-audio{
+  height: 5rem;
+  width: 100%;
+  padding-left: 6rem;
+  padding-right: 1rem;
+  position: relative;
+  .app-audio-icon{
+    height: 5rem;
+    width: 5rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+    text-align: center;
+    border-radius: 3px;
+    line-height: 5rem;
+    font-size: 1.6rem;
+    background-color: rgba(255, 0, 0, 0.6);
+    color: #fff;
+    &:active{
+      opacity: 0.7;
+    }
+  }
+  .app-audio-container{
+    width: 100%;
+    overflow: hidden;
+    .app-audio-title{
+      margin-top: 0.3rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #272727;
+      height: 2rem;
+      .hideText(@line: 1);
+      text-decoration: none;
+    }
+    .app-audio-info{
+      margin-top: 0.3rem;
+      height: 2rem;
+      line-height: 2rem;
+      color: #3e3e3e;
+      font-size: 1.2rem;
+    }
+  }
 }

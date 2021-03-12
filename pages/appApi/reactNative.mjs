@@ -112,7 +112,17 @@ document.addEventListener('click', (e)  => {
       href = $a.getAttribute('href');
       title = $a.getAttribute('title');
     }
-    if(href && $a.getAttribute('data-type') !== 'reload') {
+    if(!href) return;
+    const aDataType = $a.getAttribute('data-type');
+    const aDataTitle = $a.getAttribute('data-title');
+    if(aDataType === 'download') {
+      e.preventDefault();
+      const targetUrl = urlPathEval(location.href, href);
+      NKC.methods.rn.emit('downloadFile', {
+        url: targetUrl,
+        filename: aDataTitle || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file')
+      });
+    } else if(aDataType !== 'reload') {
       e.preventDefault();
       const targetUrl = urlPathEval(location.href, href);
       NKC.methods.rn.emit('openNewPage', {
