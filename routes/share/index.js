@@ -201,7 +201,7 @@ shareRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {data, body, db, nkcModules} = ctx;
+    const {data, body, db, nkcModules, state} = ctx;
     const {ShareModel} = db;
     let {str, type, targetId} = body;
     const {user} = data;
@@ -289,6 +289,7 @@ shareRouter
     });
     await shareLogs.save();
     data.newUrl = "/s/" + token;
+    data.logoUrl = nkcModules.tools.getUrl('siteIcon', state.serverSettings.siteIcon);
     await lock.unlock();
     await next();
   });

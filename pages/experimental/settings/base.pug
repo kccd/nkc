@@ -4,6 +4,11 @@ block title
   -const mainContainer1400 = true;
   link(href='/experimental/index.css' rel='stylesheet')
   title 网站基本设置
+  style.
+    .site-icon{
+      width: 12rem;
+      max-width: 100%;
+    }
 block content
 
   .container-fluid.max-width
@@ -60,14 +65,15 @@ block content
           .form-group
             label.col-sm-2.control-label 网站图标
             .col-sm-8
-              img(:src=`
+              img.site-icon(:src=`tempSiteIcon || '${tools.getUrl("siteIcon", state.serverSettings.siteIcon, "sm")}'` @click="selectSiteIcon()" id="selectSiteIcon")
+              //img(:src=`
                 tempSiteIcon 
                   ? tempSiteIcon
                   : serverSettings.siteIcon
                   ? '/a/'+serverSettings.siteIcon
                   : '/favicon.ico'`
                 @click="selectSiteIcon()" id="selectSiteIcon")
-              input.hide(type="file" accept="image/x-icon" ref="selectSiteIconInput" @change="selectSiteIconInputChange()")
+              input.hide(type="file" accept="image/*" ref="selectSiteIconInput" @change="selectSiteIconInputChange()")
           .form-group
             label.col-sm-2.control-label 网页背景
             .col-sm-8

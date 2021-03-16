@@ -29,24 +29,30 @@ NKC.methods.rn.onMessage = function(res) {
 
 NKC.methods.rn.updateMusicListAndPlay = function(targetRid) {
   var elements = $('span[data-tag="nkcsource"][data-type="audio"]');
-  var audiosId = [];
+  var audiosId = [], audiosTitle = [];
   for(var i = 0; i < elements.length; i ++) {
     var e = elements.eq(i);
     var rid = e.attr('data-id');
+    var title = e.find('.app-audio-title');
+    if(title.length) title = title.text();
     if(audiosId.indexOf(rid) === -1) {
-      audiosId.push(rid)
+      audiosId.push(rid);
+      audiosTitle.push(title);
     }
   }
   var index = audiosId.indexOf(targetRid);
   if(index > 0) {
-
     var _audiosId = audiosId.splice(0, index);
+    var _audiosTitle = audiosTitle.splice(0, index);
     audiosId = audiosId.concat(_audiosId);
+    audiosTitle = audiosTitle.concat(_audiosTitle);
   }
   var list = [];
-  for(var i = 0; i < audiosId.length; i ++) {
+  for(let i = 0; i < audiosId.length; i ++) {
     list.push({
-      url: window.location.origin + '/r/' + audiosId[i]
+      url: window.location.origin + '/r/' + audiosId[i],
+      name: audiosTitle[i],
+      from: window.location.href,
     });
   }
   NKC.methods.rn.emit('updateMusicListAndPlay', {list: list});
@@ -118,10 +124,15 @@ document.addEventListener('click', (e)  => {
     if(aDataType === 'download') {
       e.preventDefault();
       const targetUrl = urlPathEval(location.href, href);
-      NKC.methods.rn.emit('downloadFile', {
-        url: targetUrl,
-        filename: aDataTitle || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file')
-      });
+      const filename = aDataTitle || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file');
+      return sweetQuestion(`确定要下载「${filename}」?`)
+        .then(() => {
+          NKC.methods.rn.emit('downloadFile', {
+            url: targetUrl,
+            filename
+          });
+        })
+
     } else if(aDataType !== 'reload') {
       e.preventDefault();
       const targetUrl = urlPathEval(location.href, href);

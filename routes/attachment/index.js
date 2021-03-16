@@ -7,10 +7,14 @@ router
     const {statics} = settings;
     const {id} = params;
     const {t, c} = query;
-    if(t && !['sm', 'lg', 'md'].includes(t)) ctx.throw(400, '未知的文件尺寸');
+    if(t && !['sm', 'lg', 'md', 'ico'].includes(t)) ctx.throw(400, '未知的文件尺寸');
     const a = await db.AttachmentModel.findOne({_id: id});
     if(a) {
-      ctx.filePath = await a.getFilePath(t);
+      if(c === 'siteIcon') {
+        ctx.filePath = await db.AttachmentModel.getSiteIconFilePath(t);
+      } else {
+        ctx.filePath = await a.getFilePath(t);
+      }
       ctx.type = a.ext;
     }
     let notFoundFile;
@@ -27,6 +31,8 @@ router
           ctx.filePath = statics.defaultUserBannerPath; break;
         case 'scoreIcon':
           ctx.filePath = statics.defaultScoreIconPath; break;
+        case 'siteIcon':
+          ctx.filePath = statics.defaultSiteIconPath; break;  
         default: ctx.filePath = statics.defaultAvatarPath;
         // default: ctx.throw(400, '数据未找到');
       }

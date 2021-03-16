@@ -8,7 +8,7 @@ block head
   meta(name="google-site-verification" content="daD64Dm9iV1usCNqLOqzBdBP_wqJYXNBr3ACy979VwY")
   if state.isApp && state.platform === 'reactNative'
     meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
-  link(rel='shortcut icon' href=state.serverSettings.siteIcon? `/a/${state.serverSettings.siteIcon}`: '/favicon.ico')
+  link(rel='shortcut icon' href=tools.getUrl('siteIcon', state.serverSettings.siteIcon, 'ico'))
   +includeJS('/publicModules/common.js')
   if data.user
     script!=`NKC.configs.uid="${data.user.uid}";`
