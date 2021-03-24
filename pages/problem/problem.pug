@@ -81,8 +81,13 @@ block content
                 .problem-image
                   img(src=tools.getUrl('problemImage', aid, 'sm') data-src=tools.getUrl('problemImage', aid))
           if problem.referrer
-            h5=`链接：`
-              a(href=problem.referrer target="_blank")=problem.referrer
+            h5.m-b-05=`链接：`
+            div
+              -var urls = problem.referrer.split(' ');
+              for url, index in urls
+                if index !== 0
+                  br
+                a(href=url target="_blank")=url
           if problem.nationCode && problem.phoneNumber
             h5=`手机号：+${problem.nationCode} ${problem.phoneNumber}`
           if problem.QQ
