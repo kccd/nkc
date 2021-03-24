@@ -1,5 +1,5 @@
 const wechatPayConfigs = require('../../config/wechatPay.json');
-const {getHeaderAuthInfo} = require('./util');
+const {getHeaderAuthInfo} = require('./utils');
 const axios = require('axios');
 const func = {};
 
@@ -8,31 +8,31 @@ const func = {};
 * 待验证，等审核通过后再完善
 * */
 func.getH5PaymentUrl = async (props) => {
-  const {description, orderId, money, clientIp} = props;
+  const {description, recordId, money, clientIp, attach} = props;
   const timeExpire = new Date(Date.now() + wechatPayConfigs.orderTimeout);
   const data = {
     appid: wechatPayConfigs.appId,
     mchid: wechatPayConfigs.mchId,
     time_expire: timeExpire.toISOString(),
     description,
-    out_trade_no: orderId,
-    attach: JSON.stringify({orderId}),
+    out_trade_no: recordId,
+    attach,
     notify_url: wechatPayConfigs.notifyUrl,
     amount: {
       currency: 'CNY',
       total: money
     },
     scene_info: {
-      payer_client_ip: '127.0.0.1',
+      payer_client_ip: clientIp,
       h5_info: {
-        type: 'wap' // ios, android, wap
+        type: 'iOSAndroidWap' // ios, android, wap
       }
     }
   };
   const authorization = await getHeaderAuthInfo(wechatPayConfigs.H5Url, 'POST', data);
   return axios({
     method: 'POST',
-    url: wechatPayConfigs.nativeUrl,
+    url: wechatPayConfigs.H5Url,
     data,
     headers: {
       'Authorization': authorization

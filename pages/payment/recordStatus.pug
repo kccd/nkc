@@ -1,0 +1,58 @@
+extends ../bootstrap_base
+block title
+  title 付款
+  style.
+    body{
+      background-color: #fff;
+    }
+    .record-status-icon{
+      margin: 0 auto 1rem auto;
+      height: 5rem;
+      width: 5rem;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 5rem;
+      font-size: 2.5rem;
+      overflow: hidden;
+      color: #fff;
+    }
+    .record-status-icon.waiting{
+      background-color: #aaa;
+    }
+    .record-status-icon.success {
+      background-color: green;
+    }
+    .record-status-icon.timeout, .record-status-icon.fail{
+      background-color: red;
+    }
+    .record-status-desc{
+      text-align: center;
+      color: #000;
+      font-size: 1.6rem;
+    }
+    .record-status-qr{
+      text-align: center;
+    }
+    .record-links{
+      text-align: center;
+    }
+block content
+  #data.hidden=objToStr({record: data.record})
+  .container-fluid.max-width#app(v-cloak)
+    .row
+      .col-xs-12.col-md-12.p-t-3.p-b-4
+        .record-status-icon(:class="recordStatus")
+          .fa.fa-clock-o(v-if='recordStatus === "waiting"')
+          .fa.fa-check(v-if='recordStatus === "success"')
+          .fa.fa-exclamation(v-if='recordStatus === "fail" || recordStatus === "timeout"')
+        .record-status-desc.m-b-05 {{recordStatusDesc}}
+        .record-links.m-b-1(v-if='uid && recordStatus === "success"')
+          a(href='/account/finance/recharge') 充值中心
+          span &nbsp;&nbsp;
+          a(:href="'/u/' + uid + '/profile/finance'") 我的账单
+        .record-status-qr(v-if='apiType === "native" && recordStatus === "waiting"')
+          canvas.qrcode-canvas(data-url=data.record.url)
+          .m-t-05
+            span 请通过微信扫一扫完成支付
+block scripts
+  +includeJS('/payment/recordStatus.js')

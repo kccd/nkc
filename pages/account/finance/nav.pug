@@ -1,14 +1,13 @@
-.row
-  .col-xs-12.col-xs-12
-    h4 我的资产
-      for score in targetUserScores
-        small.p-l-1.text-success=`${score.name} `
-          strong.h4.text-danger=score.number / 100
-          span=` ${score.unit}`
-      if showRechargeButton
-        .display-i-b.p-l-1
-          a.btn.btn-success.btn-sm(href="/account/finance/recharge" target="_blank") 充值
-          span &nbsp;
-          a.btn.btn-default.btn-sm(href="/account/finance/withdraw" target="_blank") 提现
-          span &nbsp;
-          a.btn.btn-default.btn-sm(href="/account/finance/exchange" target="_blank") 兑换
+div
+  h4 我的资产
+    for score in targetUserScores
+      small.p-l-1.text-success=`${score.name} `
+        strong.h4.text-danger=score.number / 100
+        span=` ${score.unit}`
+    if showRechargeButton
+      .display-i-b.p-l-1
+        a.btn.btn-success.btn-sm(href="/account/finance/recharge" target="_blank") 充值
+        span &nbsp;
+        a.btn.btn-default.btn-sm(href="/account/finance/withdraw" target="_blank") 提现
+        span &nbsp;
+        a.btn.btn-default.btn-sm(href="/account/finance/exchange" target="_blank") 兑换

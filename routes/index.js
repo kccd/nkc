@@ -56,6 +56,8 @@ const ipinfoRouter = routers.ipinfo;
 const blacklistRouter = routers.blacklist;
 // 附件
 const attachmentRouter = routers.attachment;
+// 支付
+const paymentRouter = routers.payment;
 
 router.use('/', homeRouter.routes(), homeRouter.allowedMethods());
 router.use("/nr", newResourceRouter.routes(), newResourceRouter.allowedMethods());
@@ -107,4 +109,5 @@ router.use("/ipinfo", ipinfoRouter.routes(), ipinfoRouter.allowedMethods());
 router.use('/blacklist', blacklistRouter.routes(), blacklistRouter.allowedMethods());
 router.use('/a', attachmentRouter.routes(), attachmentRouter.allowedMethods());
 router.use('/verifications', verificationsRouter.routes(), verificationsRouter.allowedMethods());
+router.use('/payment', paymentRouter.routes(), paymentRouter.allowedMethods());
 module.exports = router;

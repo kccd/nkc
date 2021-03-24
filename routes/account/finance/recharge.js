@@ -1,6 +1,88 @@
 const Router = require('koa-router');
 const router = new Router();
 router
+  .post('/payment', async (ctx, next) => {
+    const {db, body, state, data} = ctx;
+    const {uid} = state;
+    const rechargeSettings = await db.SettingModel.getSettings('recharge');
+    const {
+      min: minRecharge,
+      max: maxRecharge,
+      enabled: rechargeEnabled,
+    } = rechargeSettings.recharge;
+    if(!rechargeEnabled) ctx.throw(403, `充值功能已关闭，请刷新`);
+    const {
+      paymentType,
+      finalPrice,
+      totalPrice,
+      apiType,
+    } = body;
+    if(!['aliPay', 'weChat'].includes(paymentType)) ctx.throw(400, `支付方式错误，请刷新后重试`);
+    const paymentSettings = rechargeSettings.recharge[paymentType];
+    const {
+      fee,
+      enabled: paymentEnabled
+    } = paymentSettings;
+    if(!paymentEnabled) ctx.throw(403, `支付方式已关闭，请刷新`);
+    const _totalPrice = Math.ceil(finalPrice * (1 + fee));
+    if(_totalPrice !== totalPrice) ctx.throw(400, `充值金额错误，请刷新后重试`);
+    if(totalPrice < minRecharge) ctx.throw(400, `充值金额不能小于${minRecharge / 100}元`);
+    if(totalPrice > maxRecharge) ctx.throw(400, `充值金额不能大于${maxRecharge / 100}元`);
+    const mainScore = await db.SettingModel.getMainScore();
+    const description = `${mainScore.name}充值`
+    let paymentId;
+    let weChatPaymentInfo;
+    let aliPaymentInfo;
+    if(paymentType === 'aliPay') {
+      const aliPaymentUrl = await db.KcbsRecordModel.getAlipayUrl({
+        uid,
+        money: totalPrice / 100,
+        score: finalPrice,
+        ip: ctx.address,
+        port: ctx.port,
+        title: '充值',
+        fee,
+        notes: description,
+        backParams: {
+          type: 'recharge'
+        }
+      });
+      aliPaymentInfo = {
+        url: aliPaymentUrl
+      };
+    } else {
+      // 微信支付
+      if(!['native', 'H5'].includes(apiType)) ctx.throw(400, `微信支付apiType error`);
+      const weChatPaymentRecord = await db.WeChatPaymentModel.getPaymentRecord({
+        apiType,
+        description,
+        money: totalPrice,
+        uid: state.uid,
+        attach: {},
+        clientIp: ctx.address,
+        clientPort: ctx.port,
+      });
+      paymentId = weChatPaymentRecord._id;
+      weChatPaymentInfo = {
+        paymentId,
+        url: weChatPaymentRecord.url
+      }
+    }
+    await db.KcbsRecordModel.createRechargeRecord({
+      paymentType,
+      paymentId,
+      uid,
+      ip: ctx.address,
+      port: ctx.port,
+      num: finalPrice,
+      fee: (totalPrice - finalPrice) / 100,
+      paymentNum: totalPrice / 100,
+      description,
+    });
+    data.weChatPaymentInfo = weChatPaymentInfo;
+    data.aliPaymentInfo = aliPaymentInfo;
+    await next();
+  })
   .get('/', async (ctx, next) => {
     const {query, data, nkcModules, db} = ctx;
     const {user} = data;
