@@ -67,18 +67,18 @@ router
         paymentId,
         url: weChatPaymentRecord.url
       }
+      await db.KcbsRecordModel.createRechargeRecord({
+        paymentType,
+        paymentId,
+        uid,
+        ip: ctx.address,
+        port: ctx.port,
+        num: finalPrice,
+        fee: (totalPrice - finalPrice) / 100,
+        paymentNum: totalPrice / 100,
+        description,
+      });
     }
-    await db.KcbsRecordModel.createRechargeRecord({
-      paymentType,
-      paymentId,
-      uid,
-      ip: ctx.address,
-      port: ctx.port,
-      num: finalPrice,
-      fee: (totalPrice - finalPrice) / 100,
-      paymentNum: totalPrice / 100,
-      description,
-    });
     data.weChatPaymentInfo = weChatPaymentInfo;
     data.aliPaymentInfo = aliPaymentInfo;
     await next();
