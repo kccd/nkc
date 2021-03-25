@@ -9,7 +9,10 @@ var socket = io('/common', {
   transports: ['polling', 'websocket'],
   reconnectionDelay: 5000,
   reconnectionDelayMax: 10000,
-  query: query
+  query: query,
+  extraHeaders: {
+    "X-socket-io": "polling"
+  }
 });
 
 // socket.open();
