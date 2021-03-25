@@ -26,8 +26,10 @@ if !isIncluded('plyr')
         var audios = $('span[data-tag="nkcsource"][data-type="audio"]');
         for(var i = 0; i < audios.length; i++) {
           var audio = audios.eq(i);
+          if(audio.attr('data-init') === 'true') continue;
           var rid = audio.attr('data-id');
           var title = audio.find('span.nkcsource-audio-title');
+          title.find('span').remove();
           if (title.length !== 0) title = title.text();
           if(NKC.configs.platform === 'reactNative') {
             var size = audio.find('audio[data-size]');
@@ -45,6 +47,7 @@ if !isIncluded('plyr')
               + '</a><div class="app-audio-info"><span class="m-r-05">' + size
               + '</span><a href="' + url + '" target="_blank" data-type="download" data-title="' + title + '">下载</a></div></div></div>')
             audio.html(appAudio);
+            audio.attr('data-init', 'true')
           } else {
             var plyrDom = audio.find('.plyr-dom');
             if(plyrDom.length === 0) continue;
