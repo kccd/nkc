@@ -78,38 +78,36 @@ schema.statics.includesKeyword = async (post) => {
   if(!keywordSetting.enable) return false;
   const wordGroup = keywordSetting.wordGroup;
   if(!wordGroup.length) return false;
-  // 把对应词组的敏感词聚合到一个数组中
-  let keywordList = [];
-  wordGroup.forEach(group => {
-    const { id, keywords } = group;
-    if(keywordReviewUseGroup.includes(id)) {
-      keywordList = keywordList.concat(keywords);
-    }
-  });
   // 把待检测文本聚合起来并提取纯文字（无标点符号和空格）
   const content = (t + c).replace(pureWordRegExp, "").toLowerCase();
-  // 同样的，把配置的敏感词也提取纯文字
-  keywordList = keywordList.map(keyword => keyword.replace(pureWordRegExp, "").toLowerCase());
-  // 读取判断逻辑配置
-  const { leastKeywordTimes, leastKeywordCount, relationship } = keywordSetting.condition;
-  // 开始检测
-  const mint = new Mint(keywordList);
-  const contentFilterValue = await mint.filter(content, { replace: false });
-  // 保存结果
-  MatchedKeyword.result = [].slice.call(contentFilterValue.words);
-  // 开始分析检测结果
-  if(contentFilterValue.pass) return false;
-  // 命中敏感词个数
-  const hitWordsCount = contentFilterValue.words.length;
-  // 总命中次数
-  let hitCount = 0;
-  contentFilterValue.words.forEach(word => {
-    hitCount += (content.match(new RegExp(word, "g")) || []).length;
-  });
-  if(relationship === "or") {
-    if(hitWordsCount >= leastKeywordCount || hitCount >= leastKeywordTimes) return true;
-  } else if(relationship === "and") {
-    if(hitWordsCount >= leastKeywordCount && hitCount >= leastKeywordTimes) return true;
+  // 循环采用每一个设置的敏感词组做一遍检测
+  for(const group of wordGroup) {
+    const { id } = group;
+    if(!keywordReviewUseGroup.includes(id)) continue;
+    let keywordList = group.keywords;
+    // 把此组中配置的敏感词也提取纯文字
+    keywordList = keywordList.map(keyword => keyword.replace(pureWordRegExp, "").toLowerCase());
+    // 读取判断逻辑配置
+    const { times: leastKeywordTimes, count: leastKeywordCount, logic: relationship } = group.conditions;
+    // 开始检测
+    const mint = new Mint(keywordList);
+    const contentFilterValue = await mint.filter(content, { replace: false });
+    // 保存结果
+    MatchedKeyword.result = [].slice.call(contentFilterValue.words);
+    // 开始分析检测结果
+    if(contentFilterValue.pass) continue;   // 代表没有命中任何关键词
+    // 命中敏感词个数
+    const hitWordsCount = contentFilterValue.words.length;
+    // 总命中次数
+    let hitCount = 0;
+    contentFilterValue.words.forEach(word => {
+      hitCount += (content.match(new RegExp(word, "g")) || []).length;
+    });
+    if(relationship === "or") {
+      if(hitWordsCount >= leastKeywordCount || hitCount >= leastKeywordTimes) return true;
+    } else if(relationship === "and") {
+      if(hitWordsCount >= leastKeywordCount && hitCount >= leastKeywordTimes) return true;
+    }
   }
   return false;
 }

@@ -1,57 +1,11 @@
 extends ../../experimental
 block eTitle
   title 敏感词
-  style.
-    .select-keyword-file {
-      white-space: nowrap;
-      border: 1px solid rgb(210 210 210);
-      border-radius: 4px;
-      padding: 3px;
-      cursor: pointer;
-    }
-    .review-condition {
-      margin-top: 12px;
-    }
-    .review-condition > input {
-      width: 80px;
-      text-align: center;
-      outline: none;
-      border: none;
-      border-bottom: 1px solid black;
-    }
-    .review-condition > input::-webkit-inner-spin-button {
-      display: none;
-    }
-    .keyword {
-      display: inline-block;
-      background-color: #2196f3;
-      color: #ffffff;
-      height: 1.8rem;
-      line-height: 1.8rem;
-      padding: 0 0.5rem;
-      margin: 0 0.5rem 0.2rem 0;
-      cursor: pointer;
-    }
-    .keyword + .keyword {
-      /*margin-left: 8px;*/
-    }
-    .add-keyword {
-      background-color: #64b5f6;
-      color: #ffffff;
-      padding: 4px;
-      cursor: pointer;
-      margin-left: 8px;
-    }
-    .keyword-search,
-    .view-container,
-    .keyword-search-result {
-      margin-bottom: 8px;
-    }
 block eContent
   .hidden#data=objToStr({keywordSetting: data.keywordSetting ? data.keywordSetting : null, users: data.users})
   .container-fluid.max-width
     .row
-      .col-xs-12.col-md-9
+      .col-xs-12.col-md-12
         div#app(v-cloak)
           label
             span 启用
@@ -78,17 +32,6 @@ block eContent
                 .col-sm-10
                   button.btn.btn-primary.btn-block(@click="addWordGroup()") 提交
           hr
-          .review-condition
-            | 至少命中
-            input(type="number" v-model.number="keywordSetting.condition.leastKeywordCount" @change="updateReviewCondition()")
-            | 个敏感词
-            select(v-model="keywordSetting.condition.relationship" @change="updateReviewCondition()")
-              option(value="and") 并且
-              option(value="or") 或者
-            | 至少命中
-            input(type="number" v-model.number="keywordSetting.condition.leastKeywordTimes" @change="updateReviewCondition()")
-            | 次敏感词时，内容会被送审。
-          hr
           .form-horizontal
             .form-group
               label.col-sm-1.control-label
@@ -99,6 +42,7 @@ block eContent
                       th 词组ID
                       th 词组名称
                       th 词数
+                      th 送审条件
                       th 操作
                   tbody(v-for="(group, groupIndex) in keywordSetting.wordGroup")
                     tr
@@ -112,6 +56,17 @@ block eContent
                       th
                         span {{group.keywords.length}}&nbsp;
                         a.m-r-1(href="javascript:void(0);" @click="group.keywordView = !group.keywordView") {{group.keywordView? "(简略)" : "(详细)"}}
+                      th
+                        p.condition
+                          |命中至少
+                          span.conditions-count(contenteditable="true" @focus="startEdit($event.target)" @blur="endEdit($event.target, group, 'count')") {{group.conditions.count}}
+                          |个敏感词
+                          select.condition-logic(v-model="group.conditions.logic" @change="updateReviewCondition(group)")
+                            option(value="or") 或者
+                            option(value="and") 并且
+                          |至少
+                          span.conditions-times(contenteditable="true" @focus="startEdit($event.target)" @blur="endEdit($event.target, group, 'times')") {{group.conditions.times}}
+                          |次敏感词
                       th
                         button.btn.btn-danger.btn-xs(href="javascript:void(0);" @click="deleteWordGroup(groupIndex)") 删除
                         button.btn.btn-default.btn-xs(href="javascript:void(0);" @click="group.rename = !group.rename") {{group.rename ? "取消重命名" : "重命名"}}
@@ -132,3 +87,4 @@ block eContent
 
 block scripts
   +includeJS('/experimental/settings/sensitiveWords/sensitiveWords.js')
+  +includeCSS("/experimental/settings/sensitiveWords/sensitiveWords.css")
