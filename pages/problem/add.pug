@@ -55,7 +55,7 @@ block content
             label 详细内容
             textarea.form-control(placeholder='请详细描述您所遇到问题，如果能附上问题页面的链接那就更好了。' rows=10 v-model='content')
           .form-group
-            label 页面链接（选填）
+            label 页面链接（选填，多个链接以空格分隔）
             textarea.form-control(rows=2 v-model='referrer')
           .form-group
             label 上传图片（可选，最多5张）
@@ -108,7 +108,7 @@ block scripts
         nationCodes: nationCodes,
 
         submitting: false,
-        progress: 0,
+        progress: 0
       },
       methods: {
         checkString: NKC.methods.checkData.checkString,

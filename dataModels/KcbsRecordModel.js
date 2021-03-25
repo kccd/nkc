@@ -103,6 +103,20 @@ const kcbsRecordSchema = new Schema({
     default: "",
     index: 1
   },
+
+  // 支付平台
+  paymentType: {
+    type: String,
+    enum: ['weChat', 'aliPay', ''],
+    default: ''
+  },
+  // 支付记录ID
+  paymentId: {
+    type: String,
+    default: '',
+    index: 1
+  },
+
   verify: {
     type: Boolean,
     index: 1,
@@ -496,6 +510,53 @@ kcbsRecordSchema.statics.getAlipayUrl = async (options) => {
   };
   return await alipay2.receipt(o);
 };
+/*
+* 微信支付 生成账单
+* @param {Object} props
+*   @param {String} paymentType 支付平台 weChat/aliPay
+*   @param {String} paymentId 支付ID
+*   @param {String} uid 用户ID,
+*   @param {String} ip
+*   @param {String} port
+*   @param {Number} fee 手续费 元
+*   @param {Number} paymentNum 总付款数额 元
+*   @param {String} description 有关当前记录的简介
+* */
+kcbsRecordSchema.statics.createRechargeRecord = async (props) => {
+  const KcbsRecordModel = mongoose.model('kcbsRecords');
+  const SettingModel = mongoose.model('settings');
+  const {
+    paymentType,
+    paymentId,
+    uid,
+    ip,
+    port,
+    fee,
+    num,
+    paymentNum,
+    description,
+  } = props;
+  const mainScore = await SettingModel.getMainScore();
+  const kcbsRecordId = await SettingModel.operateSystemID('kcbsRecords', 1);
+  const record = KcbsRecordModel({
+    _id: kcbsRecordId,
+    scoreType: mainScore.type,
+    from: 'bank',
+    to: uid,
+    type: 'recharge',
+    fee,
+    num: num,
+    payment: paymentNum,
+    paymentType,
+    paymentId,
+    ip,
+    port,
+    verify: false,
+    description
+  });
+  await record.save();
+  return record;
+}
 
 kcbsRecordSchema.statics.hideSecretInfo = async (records) => {
   for(const record of records) {
@@ -503,5 +564,22 @@ kcbsRecordSchema.statics.hideSecretInfo = async (records) => {
     if(record.hideDescription) record.description = "「根据相关法律法规和政策，内容不予显示」";
   }
 };
+
+/*
+* 充值时，当接收到支付平台的支付通知之后，调用次方法改变账单状态并更新用户积分
+* */
+kcbsRecordSchema.methods.verifyPass = async function() {
+  const UserModel = mongoose.model('users');
+  const {
+    verify: _verify
+  } = this;
+  if(_verify) return;
+  if(!_verify) {
+    this.verify = true;
+    await this.save();
+    await UserModel.updateUserScore(this.to, this.scoreType);
+  }
+  // 修改订单信息等等..
+}
 
 module.exports = mongoose.model('kcbsRecords', kcbsRecordSchema);
