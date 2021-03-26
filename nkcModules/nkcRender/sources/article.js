@@ -64,7 +64,7 @@ module.exports = {
     const url = getUrl("resource", id);
     return `
       <span data-tag="nkcsource" data-type="audio" data-id="${id}">
-        <audio class="plyr-dom" preload="none" controls data-rid="${id}">
+        <audio class="plyr-dom" preload="none" controls data-rid="${id}" data-size="${resource.size}">
           <source src="${url}" type="audio/mp3"/>
           你的浏览器不支持audio标签，请升级。
         </audio>

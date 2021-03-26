@@ -1,0 +1,90 @@
+extends ../bootstrap_base
+block title
+  title 专栏
+  style.
+    .columns-container{
+      font-size: 0;
+      text-align: center;
+    }
+    .column{
+      border-radius: 5px;
+      width: 17rem;
+      height: 20rem;
+      margin: 0.6rem;
+      display: inline-block;
+      background-color: #fff;
+      border: 1px solid #eaeaea;
+      overflow: hidden;
+      padding: 2rem 1rem 2rem 1rem;
+    }
+    .column .column-avatar{
+      height: 6.4rem;
+      width: 6.4rem;
+      border-radius: 50%;
+      margin-bottom: 0.6rem;
+    }
+    .column .column-abbr{
+      font-size: 1rem;
+      margin-bottom: 0.6rem;
+    }
+    .column .column-name{
+      font-size: 1.4rem;
+      display: block;
+      height: 2rem;
+      overflow: hidden;
+      margin-bottom: 0.6rem;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+    }
+    .column .column-description{
+      font-size: 1.2rem;
+      height: 5rem;
+      overflow: hidden;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+    }
+    @media(max-width: 767px) {
+      .column .column-avatar{
+        height: 3rem;
+        width: 3rem;
+        margin-bottom: 0.2rem;
+      }
+      .column{
+        width: 10rem;
+        height: 12rem;
+        padding: 0.5rem 0.3rem 0.5rem 0.3rem;
+      }
+      .column .column-name{
+        font-size: 1.2rem;
+        margin-bottom: 0.2rem;
+      }
+      .column .column-description{
+        height: 3.2rem;
+      }
+      .column .column-abbr{
+        margin-bottom: 0.2rem;
+      }
+    }
+block content
+  .container-fluid.max-width
+    .row
+      .col-xs-12.col-md-12
+        include ../publicModules/paging/paging
+        .columns-container
+          for column in data.columns
+            .column
+              img.column-avatar(src=tools.getUrl('columnAvatar', column.avatar))
+              a(href=tools.getUrl('columnHome', column._id) target="_blank").column-name=column.name
+              .column-abbr
+                if column.subCount > 0
+                  span=`${column.subCount}人关注`
+                if column.threadsCount > 0
+                  span=`，${column.threadsCount}篇文章`
+              .column-description=column.abbr
+        include ../publicModules/paging/paging_input
+block scripts
+

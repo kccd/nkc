@@ -27,6 +27,32 @@ NKC.methods.rn.onMessage = function(res) {
   }
 }
 
+NKC.methods.rn.updateMusicListAndPlay = function(targetRid) {
+  var elements = $('span[data-tag="nkcsource"][data-type="audio"]');
+  var audiosId = [];
+  for(var i = 0; i < elements.length; i ++) {
+    var e = elements.eq(i);
+    var rid = e.attr('data-id');
+    if(audiosId.indexOf(rid) === -1) {
+      audiosId.push(rid)
+    }
+  }
+  var index = audiosId.indexOf(targetRid);
+  if(index > 0) {
+
+    var _audiosId = audiosId.splice(0, index);
+    audiosId = audiosId.concat(_audiosId);
+  }
+  var list = [];
+  for(var i = 0; i < audiosId.length; i ++) {
+    list.push({
+      url: window.location.origin + '/r/' + audiosId[i]
+    });
+  }
+  NKC.methods.rn.emit('updateMusicListAndPlay', {list: list});
+}
+
+
 function urlPathEval(fromUrl, toUrl) {
   if (!toUrl) {
     toUrl = fromUrl;
@@ -86,7 +112,17 @@ document.addEventListener('click', (e)  => {
       href = $a.getAttribute('href');
       title = $a.getAttribute('title');
     }
-    if(href && $a.getAttribute('data-type') !== 'reload') {
+    if(!href) return;
+    const aDataType = $a.getAttribute('data-type');
+    const aDataTitle = $a.getAttribute('data-title');
+    if(aDataType === 'download') {
+      e.preventDefault();
+      const targetUrl = urlPathEval(location.href, href);
+      NKC.methods.rn.emit('downloadFile', {
+        url: targetUrl,
+        filename: aDataTitle || (Date.now()+ '_' + Math.floor(Math.random() * 1000) + '.file')
+      });
+    } else if(aDataType !== 'reload') {
       e.preventDefault();
       const targetUrl = urlPathEval(location.href, href);
       NKC.methods.rn.emit('openNewPage', {

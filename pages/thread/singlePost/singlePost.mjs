@@ -196,7 +196,7 @@ class SinglePostModule {
         self.initNKCSource();
       })
       .catch(data => {
-        const errorDom = $(`<div class="single-post-comment-error text-danger">${data.error}</div>`);
+        const errorDom = $(`<div class="single-post-comment-error text-danger">${data.error || data.message || data}</div>`);
         container.html(errorDom);
       });
   }
