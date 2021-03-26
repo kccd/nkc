@@ -29,7 +29,9 @@ if !isIncluded('plyr')
           if(audio.attr('data-init') === 'true') continue;
           var rid = audio.attr('data-id');
           var title = audio.find('span.nkcsource-audio-title');
-          title.find('span').remove();
+          if(NKC.configs.platform === 'reactNative') {
+            title.find('span').remove();
+          }
           if (title.length !== 0) title = title.text();
           if(NKC.configs.platform === 'reactNative') {
             var size = audio.find('audio[data-size]');
