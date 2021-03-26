@@ -2427,5 +2427,18 @@ userSchema.statics.getPostPermission = async (uid, type) => {
   return result;
 };
 
+/*
+* 是否能够接受所有人的消息
+* */
+userSchema.statics.allowAllMessage = async function(uid) {
+  const UsersGeneralModel = mongoose.model('usersGeneral');
+  const ShopGoodsModel = mongoose.model('shopGoods');
+  // 确定是否有商品正在出售
+  const count = await ShopGoodsModel.count({uid, disabled: false, productStatus: 'insale'});
+  const onSale = count > 0;
+  const targetUserGeneral = await UsersGeneralModel.findOnly({uid}, {messageSettings: 1});
+  return targetUserGeneral.messageSettings.allowAllMessageWhenSale && onSale;
+}
+
 module.exports = mongoose.model('users', userSchema);
 

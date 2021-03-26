@@ -1,12 +1,7 @@
 var data = NKC.methods.getDataById("data");
 var keywordSetting = data.keywordSetting || {
   enable: false,
-  wordGroup: [],
-  condition : {
-    leastKeywordTimes : 1,
-    leastKeywordCount : 0,
-    relationship : "or"
-  }
+  wordGroup: []
 };
 function initGroup(group) {
   group.rename = false;
@@ -63,7 +58,12 @@ var app = new Vue({
       if(!self.form.keywords) return;
       var newWordGroup = {
         name: self.form.groupName,
-        keywords: self.form.keywords
+        keywords: self.form.keywords,
+        conditions: {
+          count: 1,
+          times: 1,
+          logic: "or"
+        }
       };
       initGroup(newWordGroup);
       sweetConfirm("确认添加新敏感词词组:" + newWordGroup.name + "吗？共包含关键词: " + newWordGroup.keywords.length + "个关键词。")
@@ -102,16 +102,13 @@ var app = new Vue({
       .catch(sweetError)
     },
     // 更新送审条件
-    updateReviewCondition: function() {
-      var self = this;
-      var update = {
-        leastKeywordTimes: self.keywordSetting.condition.leastKeywordTimes,
-        leastKeywordCount: self.keywordSetting.condition.leastKeywordCount,
-        relationship: self.keywordSetting.condition.relationship
-      };
+    updateReviewCondition: function(group) {
       nkcAPI("/e/settings/review/keyword", "PUT", {
         type: "reviewCondition",
-        value: update
+        value: {
+          id: group.id,
+          conditions: group.conditions
+        }
       })
       .catch(sweetError)
     },
@@ -241,6 +238,17 @@ var app = new Vue({
           group.searchedWords.length = 0;
         })
         .catch(sweetError);
+    },
+
+    // 打开送审条件编辑
+    startEdit: function(target) {
+      
+    },
+    // 关闭送审条件编辑
+    endEdit: function(target, group, key) {
+      var number = parseInt(target.innerText, 10);
+      group.conditions[key] = number;
+      this.updateReviewCondition(group)
     }
   }
 });

@@ -2,7 +2,10 @@ module.exports = {
   finance: {
     recharge: {
       GET: 'accountRecharge',
-      POST: 'rechargePost'
+      POST: 'rechargePost',
+      payment: {
+        POST: 'accountRecharge'
+      }
     },
     withdraw: {
       GET: 'accountWithdraw',

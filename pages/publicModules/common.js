@@ -938,6 +938,19 @@ NKC.methods.removeLocalStorageByKey = function(key) {
   localStorage.removeItem(key);
 };
 
+/*
+* 判断是否为手机浏览器
+* */
+NKC.methods.isMobilePhoneBrowser = function() {
+  var reg = /(iPhone|iPad|iPod|iOS|Android)/i;
+  return reg.test(window.navigator.userAgent);
+}
+/*
+* 判断是否为电脑浏览器
+* */
+NKC.methods.isPcBrowser = function() {
+  return !NKC.methods.isMobilePhoneBrowser();
+}
 
 
 // service worker

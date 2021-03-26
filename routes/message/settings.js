@@ -4,7 +4,7 @@ settingsRouter
   .put('/', async (ctx, next) => {
     const {data, db, body} = ctx;
     const {user} = data;
-    const {beep, onlyReceiveFromFriends, messageSettings, limit} = body;
+    const {beep, onlyReceiveFromFriends, messageSettings, limit, allowAllMessageWhenSale} = body;
     const usersGeneral = await db.UsersGeneralModel.findOnly({uid: user.uid});
     if(messageSettings) {
       await usersGeneral.update({
@@ -23,7 +23,8 @@ settingsRouter
       await usersGeneral.update({
         'messageSettings.beep': beep,
         'messageSettings.onlyReceiveFromFriends': onlyReceiveFromFriends,
-        "messageSettings.limit": limit
+        "messageSettings.limit": limit,
+        'messageSettings.allowAllMessageWhenSale': allowAllMessageWhenSale
       });
     }
     await next();

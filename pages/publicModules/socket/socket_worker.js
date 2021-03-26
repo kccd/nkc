@@ -1,30 +1,83 @@
-var pageName = '', query = {
-  operationId: NKC.configs.refererOperationId,
-  data: NKC.configs.socketData || {},
+var socket = {
+  _store: {},
+  on: function(type, handler) {
+    // console.log("listening socket " + type + " event");
+    if(!socket._store[type]) {
+      socket._store[type] = [];
+    }
+    socket._store[type].push(handler);
+  },
+  emit: function(type, args) {
+    if(!socket._store[type]) return;
+    var handlers = socket._store[type];
+    handlers.forEach(function(fn) {
+      fn.apply(null, args);
+    });
+  },
+  connected: true,
+  disconnect: false
 };
-var socket = io('/common', {
-  forceNew: false,
-  reconnection: true,
-  autoConnect: true,
-  transports: ['polling', 'websocket'],
-  reconnectionDelay: 5000,
-  reconnectionDelayMax: 10000,
-  query: query,
-  extraHeaders: {
-    "X-socket-io": "polling"
-  }
-});
+
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register('/serviceWorker/index.js')
+    .then(function(registration) {
+      return registration.update();
+    })
+    .then(function(registration) {
+      return new Promise(function(resolve, reject) {
+        if(registration.active) {
+          return resolve(registration.active);
+        } else {
+          registration.addEventListener("updatefound", function() {
+            if(registration.active) {
+              return resolve(registration.active);
+            }
+          });
+        }
+      });
+    })
+    .then(function(worker) {
+      NKC.modules.serviceWorker = worker;
+      socket.emit("connect");
+      navigator.serviceWorker.addEventListener("message", function(event) {
+        var data = event.data;
+        if(data.type === "socket_event_trigger") {
+          var detail = data.detail;
+          console.log(detail);
+          socket.emit(detail.name, detail.args);
+        }
+      });
+    })
+    .catch(function(error) {
+      console.log("Registration failed with " + error);
+    });
+} else {
+  var pageName = '', query = {
+    operationId: NKC.configs.refererOperationId,
+    data: NKC.configs.socketData || {},
+  };
+  socket = io('/common', {
+    forceNew: false,
+    reconnection: true,
+    autoConnect: true,
+    transports: ['polling', 'websocket'],
+    reconnectionDelay: 5000,
+    reconnectionDelayMax: 10000,
+    query: query
+  });
+}
 
 // socket.open();
 
-socket.on('connect', function () {
+socket.on("connect", function () {
   console.log('socket连接成功');
 });
-socket.on('error', function() {
+socket.on("error", function() {
   console.log('socket连接出错');
   socket.disconnect();
 });
-socket.on('disconnect', function() {
+socket.on("disconnect", function() {
   console.log('socket连接已断开');
 });
 
@@ -119,3 +172,6 @@ function newMessageRemind(name) {
   var number = getNewMessageNumber();
   setNewMessageNumber(number+1);
 }
+
+
+

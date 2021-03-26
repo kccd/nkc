@@ -138,6 +138,11 @@ const usersGeneralSchema = new Schema({
         type: Boolean,
         default: false
       }
+    },
+    // 出售商品时允许所有人向我发消息
+    allowAllMessageWhenSale: {
+      type: Boolean,
+      default: true,
     }
   },
   lotterySettings: {

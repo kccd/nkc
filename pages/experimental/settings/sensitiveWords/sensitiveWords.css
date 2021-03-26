@@ -1,0 +1,58 @@
+.select-keyword-file {
+  white-space: nowrap;
+  border: 1px solid rgb(210 210 210);
+  border-radius: 4px;
+  padding: 3px;
+  cursor: pointer;
+}
+.review-condition {
+  margin-top: 12px;
+}
+.review-condition > input {
+  width: 80px;
+  text-align: center;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid black;
+}
+.review-condition > input::-webkit-inner-spin-button {
+  display: none;
+}
+.keyword {
+  display: inline-block;
+  background-color: #2196f3;
+  color: #ffffff;
+  height: 1.8rem;
+  line-height: 1.8rem;
+  padding: 0 0.5rem;
+  margin: 0 0.5rem 0.2rem 0;
+  cursor: pointer;
+}
+.add-keyword {
+  background-color: #64b5f6;
+  color: #ffffff;
+  padding: 4px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.keyword-search,
+.view-container,
+.keyword-search-result {
+  margin-bottom: 8px;
+}
+
+.condition-logic {
+  appearance: none;
+  outline: none;
+  border: none;
+  border-bottom: 1px dashed rgb(244,67,54);
+  cursor: pointer;
+}
+.conditions-count,
+.conditions-times {
+  outline: none;
+  border: none;
+  border-bottom: 1px dashed rgb(244,67,54);
+  cursor: pointer;
+  padding: 0 5px;
+}

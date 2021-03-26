@@ -121,6 +121,9 @@ var Tools = function() {
       case 'previewPDF': {
         return "/reader/pdf/web/viewer?file=%2fr%2f" + id;
       }
+      case 'siteIcon': {
+        return "/a/" + id + t
+      }
     }
   };
   self.getAnonymousInfo = function() {

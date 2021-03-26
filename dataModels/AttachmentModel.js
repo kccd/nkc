@@ -173,22 +173,57 @@ schema.statics.saveHomeBigLogo = async file => {
  */
 schema.statics.saveSiteIcon = async file => {
   const FILE = require("../nkcModules/file");
-  const ext = await FILE.getFileExtension(file, ["ico"]);
+  const ext = await FILE.getFileExtension(file, ["ico", 'jpg', 'jpeg', 'png']);
   const AM = mongoose.model('attachments');
   const SM = mongoose.model('settings');
   const toc = new Date();
   const fileFolder = await FILE.getPath('siteIcon', toc);
   const aid = AM.getNewId();
-  const fileName = `${aid}.${ext}`;
+  const fileName = `${aid}.png`;
+  const fileNameSM = `${aid}_sm.png`;
+  const fileNameLG = `${aid}_lg.png`;
+  const fileNameICO = `${aid}.ico`;
   const realPath = PATH.resolve(fileFolder, `./${fileName}`);
+  const realPathSM = PATH.resolve(fileFolder, `./${fileNameSM}`);
+  const realPathLG = PATH.resolve(fileFolder, `./${fileNameLG}`);
+  const realPathICO = PATH.resolve(fileFolder, `./${fileNameICO}`);
   const {path, size, name} = file;
-  await fsPromise.copyFile(path, realPath);
+
+  // 生成ico图标
+  await ei.resize({
+    src: path,
+    dst: realPathICO,
+    height: 96,
+    width: 96,
+  });
+  // 生成小logo
+  await ei.resize({
+    src: path,
+    dst: realPathSM,
+    height: 128,
+    width: 128
+  });
+  // 生成中等logo
+  await ei.resize({
+    src: path,
+    dst: realPath,
+    height: 256,
+    width: 256,
+  });
+  // 生成中等logo
+  await ei.resize({
+    src: path,
+    dst: realPathLG,
+    height: 512,
+    width: 512,
+  });
+
   const attachment = AM({
     _id: aid,
     toc,
     size,
     name,
-    ext,
+    ext: 'png',
     type: 'siteIcon',
     hash: file.hash
   });
@@ -255,10 +290,31 @@ schema.statics.getHomeBigLogo = async () => {
 /**
  * 获取网站图标附件ID
  */
-schema.statics.getSiteIcon = async () => {
+schema.statics.getSiteIconFilePath = async (t) => {
+  const AttachmentModel = mongoose.model('attachments');
   const SM = mongoose.model('settings');
   const serverSettings = await SM.getSettings('server');
-  return serverSettings.siteIcon;
+  const attachId = serverSettings.siteIcon;
+  const FILE = require('../nkcModules/file');
+  const attachment = await AttachmentModel.findOne({_id: attachId});
+  if(!attachment) {
+    return PATH.resolve(__dirname, `../public/statics/site/favicon.ico`);
+  }
+  const {type, toc, _id, ext} = attachment;
+  const fileFolderPath = await FILE.getPath(type, toc);
+  const defaultFilePath = PATH.resolve(fileFolderPath, `./${_id}.${ext}`);
+  let filePath;
+  if(t === 'ico') {
+    filePath = PATH.resolve(fileFolderPath, `./${_id}.ico`);
+  } else if(t === 'sm') {
+    filePath = PATH.resolve(fileFolderPath, `./${_id}_sm.${ext}`);
+  } else if(t === 'lg') {
+    filePath = PATH.resolve(fileFolderPath, `./${_id}_lg.${ext}`);
+  }
+  if(!filePath || !await FILE.access(filePath)) {
+    filePath = defaultFilePath;
+  }
+  return filePath;
 }
 
 /*

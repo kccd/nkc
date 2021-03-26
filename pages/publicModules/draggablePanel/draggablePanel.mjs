@@ -20,6 +20,9 @@ NKC.modules.DraggablePanel = class {
     self.dom.on("click", function() {
       self.active();
     });
+    window.addEventListener("popstate", event => {
+      self.hidePanel();
+    })
   }
   resetPosition() {
     const dom = this.dom;
@@ -74,9 +77,14 @@ NKC.modules.DraggablePanel = class {
     this.setSize('show');
     this.active();
     this.dom.css('display', 'block');
+    window.history.pushState({ sign: "draggablePanel" }, "", "" );
+    window.history.go(1);
   }
   hidePanel() {
     this.dom.css('display', 'none');
     this.setSize('hide');
+    if(window.history.state && window.history.state.sign === "draggablePanel") {
+      window.history.go(-1);
+    }
   }
 }

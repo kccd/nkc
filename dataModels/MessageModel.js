@@ -116,6 +116,8 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
   const recycleId = await SettingModel.getRecycleId();
   const targetUser = await UserModel.findOne({uid: tUid});
   if(!targetUser) throwErr(500, `user not found, uid: ${tUid}`);
+  const allowAllMessage = await UserModel.allowAllMessage(targetUser.uid);
+  if(allowAllMessage) return;
   await targetUser.extendGrade();
   const messageSettings = await SettingModel.getSettings("message");
   const {mandatoryLimitInfo, mandatoryLimit, adminRolesId, mandatoryLimitGradeProtect} = messageSettings;
@@ -216,6 +218,10 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     tUid: fromUid
   });
   if(blackList) throwErr(403, "你在对方的黑名单中，对方可能不希望与你交流。");
+
+  const allowAllMessage = await UserModel.allowAllMessage(targetUser.uid);
+
+  if(allowAllMessage) return;
 
   // 好友间发消息无需防骚扰判断
   const friendRelationship = await FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});

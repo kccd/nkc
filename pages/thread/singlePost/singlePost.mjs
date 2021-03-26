@@ -305,6 +305,16 @@ class SinglePostModule {
         const promptDom = $(`<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`);
         const buttonDom = $(`<div class="single-comment-button"></div>`);
         const onclick = `NKC.methods.${cancelEvent}("${pid}", true)`;
+        /*buttonDom.append($(`
+          <div>
+            <label>
+              <input type="checkbox" id="commentAnonymousRelease_${pid}" /> 匿名发表
+            </label><br>
+            <label>
+              <input type="checkbox" checked="checked" id="commentProtocol_${pid}" /> 我已阅读并同意遵守与本次发表相关的全部协议。<a href="/protocol" target="_blank">查看协议</a>
+            </label>
+          </div>
+        `));*/
         buttonDom.append($(`<button class="btn btn-default btn-sm" onclick='${onclick}'>取消</button>`));
         buttonDom
           .append($(`<button class="btn btn-default btn-sm" onclick="NKC.methods.saveDraft('${pid}')">存草稿</button>`));
@@ -338,6 +348,7 @@ class SinglePostModule {
         pid: pid,
         show: false,
         timeoutId: null,
+        prevDraft: ""
       };
     }
     return this.editors[pid];
@@ -394,12 +405,16 @@ class SinglePostModule {
     return Promise.resolve()
       .then(() => {
         if(!content) throw '评论内容不能为空';
+        // if(!$(`#commentProtocol_${pid}`)[0].checked) throw "请先阅读并勾选同意遵守协议";
+        // const isAnonymous = $(`#commentAnonymousRelease_${pid}`)[0].checked;
         self.changeEditorButtonStatus(pid, true);
         return nkcAPI("/t/" + self.tid, "POST", {
           postType: "comment",
           post: {
             c: content,
             l: "html",
+            // anonymous: isAnonymous,
+            anonymous: false,
             parentPostId: pid
           }
         })
@@ -426,7 +441,14 @@ class SinglePostModule {
   // 保存草稿
   saveDraftData(pid) {
     const editorApp = this.getEditorApp(pid);
+    const { prevDraft } = editorApp;
     const content = this.getEditorContent(pid);
+    if(prevDraft === content) {
+      console.log("内容相同，不保存新草稿");
+      return Promise.resolve();
+    } else {
+      editorApp.prevDraft = content;
+    }
     const self = this;
     return Promise.resolve()
       .then(() => {

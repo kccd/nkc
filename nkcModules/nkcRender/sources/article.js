@@ -68,7 +68,7 @@ module.exports = {
           <source src="${url}" type="audio/mp3"/>
           你的浏览器不支持audio标签，请升级。
         </audio>
-        <span class="nkcsource-audio-title">${resource.oname}</span>
+        <span class="nkcsource-audio-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span></span>
       </span>
     `.trim();
   },
