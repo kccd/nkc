@@ -15595,6 +15595,23 @@ UE.plugins['list'] = function () {
         adjustListStyle(me.document)
     });
 
+    // 粘贴内容中的超链接，它们各自之前的位置插入一个链接url
+    me.addListener("beforepaste", function(type, box) {
+        var div = document.createElement("div");
+        div.innerHTML = box.html;
+        var links = [].slice.call(div.getElementsByTagName("a"));
+        links.forEach(function(link) {
+            if(link.host === location.host) return;
+            var br = document.createElement("br");
+            var span = document.createElement("span");
+            span.innerText = link.href;
+            span.style.fontSize = "10px";
+            link.insertBefore(br, link.firstChild);
+            link.insertBefore(span, link.firstChild);
+        });
+        box.html = div.innerHTML;
+    });
+
     function adjustListStyle(doc,ignore){
         utils.each(domUtils.getElementsByTagName(doc,'ol ul'),function(node){
 

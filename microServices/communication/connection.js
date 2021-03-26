@@ -59,7 +59,7 @@ module.exports = async (socketIO) => {
           }
         });
       } else {
-        console.log(`${getTime()} ${tag} >>> ${targetSocket.state.serviceName}:${targetSocket.state.serviceId}`);
+        // console.log(`${getTime()} ${tag} >>> ${targetSocket.state.serviceName}:${targetSocket.state.serviceId}`);
         targetSocket.emit(communicationConfig.messageEventName, {
           from: socket.state.serviceName,
           content

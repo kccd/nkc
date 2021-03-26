@@ -54,6 +54,7 @@ router
         data.showMandatoryLimitInfo = true;
       }
       data.blacklistInfo = await db.BlacklistModel.getBlacklistInfo(targetUser.uid, data.user.uid);
+      data.targetUserAllowAllMessage = await db.UserModel.allowAllMessage(targetUser.uid);
     } else if(type === "STE") {
       const q = {
         ty: 'STE'

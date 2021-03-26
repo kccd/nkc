@@ -94,8 +94,10 @@ $(function() {
         timeLimit: false,
         xsfLimit: false,
         digestLimit: false,
-        gradeLimit: 0
+        gradeLimit: 0,
       },
+      allowAllMessageWhenSale: false,
+      targetUserAllowAllMessage: false,
       grades: grades,
 
       // 系统强制限制 若未满足要求则无法给当前用户发送短消息
@@ -180,6 +182,7 @@ $(function() {
     computed: {
       // 用户防骚扰限制 若未满足要求则无法给当前用户发送短消息
       showCustomizeLimitInfo: function() {
+        if(this.targetUserAllowAllMessage) return;
         if(this.systemInfoViewed) return;
         var targetUser = this.targetUser;
         var targetUserSendLimit = this.targetUserSendLimit;
@@ -205,6 +208,7 @@ $(function() {
       },
       // 系统提醒 若未满足要求则显示系统提醒，但任然可以给当前用户发送短消息
       showSystemLimitInfo: function() {
+        if(this.targetUserAllowAllMessage) return;
         if(this.systemInfoViewed) return;
         var targetUser = this.targetUser;
         var targetUserSendLimit = this.targetUserSendLimit;
@@ -761,9 +765,14 @@ $(function() {
             if(app.target !== target) return;
             app.twemoji = data.twemoji;
             app.sizeLimit = data.sizeLimit;
-            app.targetUserSendLimit = data.targetUserSendLimit;
-            app.showMandatoryLimitInfo = data.showMandatoryLimitInfo;
             app.blacklistInfo = data.blacklistInfo;
+            app.targetUserAllowAllMessage = data.targetUserAllowAllMessage;
+            if(app.targetUserAllowAllMessage) {
+              app.showMandatoryLimitInfo = '';
+            } else {
+              app.showMandatoryLimitInfo = data.showMandatoryLimitInfo;
+            }
+            app.targetUserSendLimit = data.targetUserSendLimit;
             app.targetUserGrade = data.targetUserGrade;
             if(data.messages.length === 0) {
               app.info = '没有了~';
@@ -877,6 +886,7 @@ $(function() {
               var beep = messageSettings.beep;
               app.onlyReceiveFromFriends = messageSettings.onlyReceiveFromFriends;
               app.messageLimit = messageSettings.limit;
+              app.allowAllMessageWhenSale = messageSettings.allowAllMessageWhenSale;
               app.messageLimitArr = [];
               if(app.messageLimit.timeLimit) {
                 app.messageLimitArr.push("time");
@@ -936,7 +946,8 @@ $(function() {
         nkcAPI('/message/settings', 'PUT', {
           beep: beep,
           onlyReceiveFromFriends: app.onlyReceiveFromFriends,
-          limit: messageLimit
+          limit: messageLimit,
+          allowAllMessageWhenSale: this.allowAllMessageWhenSale
         })
           .then(function() {
             updateBeep(beep);

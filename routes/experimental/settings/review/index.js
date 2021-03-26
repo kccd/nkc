@@ -138,7 +138,7 @@ router
         }
       })
     } else if(type === "addWordGroup" && typeof value === "object") {
-      const { name, keywords } = value;
+      const { name, keywords, conditions } = value;
       if(!name) ctx.throw(403, "未指定组名");
       const filterEmptyKeywords = keywords.filter(keyword => !!keyword);
       if(!filterEmptyKeywords.length) ctx.throw(403, "未添加关键词");
@@ -157,20 +157,22 @@ router
           "c.keyword.wordGroup": {
             id: newId,
             name,
-            keywords: filterEmptyKeywords
+            keywords: filterEmptyKeywords,
+            conditions
           }
         }
       });
       data.id = newId;
     } else if(type === "reviewCondition" && typeof value === "object") {
-      const { leastKeywordTimes, leastKeywordCount, relationship } = value;
-      await db.SettingModel.update({ _id: "review" }, {
-        "c.keyword.condition": {
-          leastKeywordTimes: leastKeywordTimes || 1,
-          leastKeywordCount: leastKeywordCount || 1,
-          relationship: relationship || "or"
+      const { id, conditions } = value;
+      await db.SettingModel.update(
+        { _id: "review", "c.keyword.wordGroup.id": id }, 
+        {
+          $set: {
+            "c.keyword.wordGroup.$.conditions": conditions
+          }
         }
-      });
+      );
     } else if(type === "addKeywords") {
       const { groupId, keyword } = value;
       const shouldAddKeyword = keyword.toLowerCase();

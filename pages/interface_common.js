@@ -186,36 +186,63 @@ function jwarning(obj){
   }
 }
 
+// 将页面移动到弹窗打开的状态，返回一个函数，执行此函数以回到之前的状态
+function toAlertOpenState(onBack) {
+  var complete = false;
+  var handler = function(event) {
+    onBack();
+    window.removeEventListener("popstate", handler);
+    complete = true;
+  };
+  window.addEventListener("popstate", handler);
+  window.history.pushState({ sign: "swal" }, "alert", "" );
+  window.history.go(1);
+  return function() {
+    if(complete) return;
+    window.history.go(-1);
+  }
+}
+
 function sweetAlert(text) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   text = (text.error || text) + "";
   return Swal({
     confirmButtonText: "关闭",
     text: text
-  });
+  })
+  .then(backState)
 }
 
 function sweetSuccess(text, options) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   options = options || {
     autoHide: true,
     timer: 2000
   };
   text = text + "";
   if(options.autoHide) {
-    Swal({
+    return Swal({
       type: "success",
       confirmButtonText: "关闭",
       timer: options.timer,
       text: text
-    });
+    }).then(backState);
   } else {
-    Swal({
+    return Swal({
       type: "success",
       confirmButtonText: "关闭",
       text: text
-    });
+    }).then(backState);
   }
 }
 function sweetError(text) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   console.log(text);
   text = text.error || text;
   text = text + "";
@@ -223,25 +250,37 @@ function sweetError(text) {
     type: "error",
     confirmButtonText: "关闭",
     text: text.error || text
-  });
+  })
+  .then(backState)
 }
 function sweetInfo(text) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   text = text + "";
   Swal({
     type: "info",
     confirmButtonText: "关闭",
     text: text
-  });
+  })
+  .then(backState);
 }
 function sweetWarning(text) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   text = text + "";
   Swal({
     type: "warning",
     confirmButtonText: "关闭",
     text: text
-  });
+  })
+  .then(backState)
 }
 function sweetConfirm(text) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   text = text + "";
   return new Promise(function(resolve, reject) {
     Swal({
@@ -252,14 +291,19 @@ function sweetConfirm(text) {
       showCancelButton: true,
       reverseButtons: true
     })
-      .then(function(result) {
-        if(result.value === true) {
-          resolve();
-        }
-      })
+    .then(function(result) {
+      if(result.value === true) {
+        resolve();
+      } else {
+        backState();
+      }
+    })
   });
 }
 function sweetQuestion(text) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   text = text + "";
   return new Promise(function(resolve, reject) {
     Swal({
@@ -274,20 +318,27 @@ function sweetQuestion(text) {
         if(result.value === true) {
           resolve();
         } else {
-          // reject();
+          backState();
         }
       })
   });
 }
 // html内容弹窗
 function asyncSweetCustom(html) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   return Swal({
     confirmButtonText: "关闭",
     html: html || ""
   })
+  .then(backState);
 }
 // promise版本弹框
 function asyncSweetSuccess(text, options) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   return new Promise(function(resolve, reject) {
     options = options || {
       autoHide: true,
@@ -313,8 +364,12 @@ function asyncSweetSuccess(text, options) {
       });
     }
   })
+  .then(backState);
 }
 function asyncSweetError(text) {
+  var backState = toAlertOpenState(function() {
+    Swal.close();
+  });
   return new Promise(function(resolve, reject) {
     text = text.error || text;
     text = text + "";
@@ -326,6 +381,7 @@ function asyncSweetError(text) {
       resolve();
     });
   })
+  .then(backState);
 }
 
 function screenTopAlert(text){

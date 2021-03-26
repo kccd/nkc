@@ -8,7 +8,7 @@ var app = new Vue({
     recordId: data.record.recordId,
     recordStatus: data.record.status,
     url: data.record.url,
-    delay: [1000, 2000, 2000, 5000, 5000, 10000]
+    delay: [1000, 1000, 1000, 2000, 2000, 2000, 5000, 5000, 5000, 10000]
   },
   computed: {
     recordStatusDesc: function() {
