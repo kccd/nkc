@@ -45,5 +45,30 @@ module.exports = {
     'modifyFundObject',
     'unToppedThread',
     'bannedUser'
+  ],
+  files: [
+    "getAttachment",
+    "getUserAvatar",
+    "getUserBanner",
+    "column_single_avatar_get",
+    "column_single_Banner_get",
+    "getHomeLogo",
+    "getActivityPoster",
+    "getForumAvatar",
+    "getResources",
+    "getThumbs",
+    "getMediums",
+    "getDefaultImage",
+    "getOrigins",
+    "getThreadCover",
+    "getVideoImg",
+    "getSiteSpecific",
+    "getAttachmentIcon",
+    "getFundLogo",
+    "getFundBanner",
+    "getPhoto",
+    "getSmallPhoto",
+    "visitForumBanner",
+    "getMessageFile"
   ]
 }
