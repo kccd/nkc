@@ -45,12 +45,16 @@ function autoPlayNextAudio(players) {
 NKC.methods.initPlayerControls = function(players) {
   onlyOnePlayingAnytime(players);
   autoPlayNextAudio(players);
+  // 视频进入全屏时，自动切换到最高画质
+  whenFullscreenSwitchHighestQuality(players);
 }
 
-
-
-// let audio = document.createElement("audio");
-
-// $("#wrap > div.m-b-1 > div > div > div:nth-child(3) > div > div > div.h3.thread-title.text-center").on("click", () => {
-//   audio.webkitShowPlaybackTargetPicker();
-// });
+// 全屏时自动切换到最高画质
+function whenFullscreenSwitchHighestQuality(players) {
+  for(const player of players) {
+    if(player.type === "audio") continue;
+    player.on("enterfullscreen", () => {
+      player.quality = 1080;
+    })
+  }
+}
