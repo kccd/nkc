@@ -34,10 +34,11 @@ block nkcContent
   .col-xs-12.col-md-12.m-b-1#app(v-cloak)
     h5 操作统计
     .m-b-1
+      span 排序：
       button.btn.btn-default(:class='{"btn-primary": sortType === "count"}' @click='changeSortType("count")') 访问次数
       button.btn.btn-default(:class='{"btn-primary": sortType === "averageTime"}' @click='changeSortType("averageTime")') 平均耗时
       button.btn.btn-default(:class='{"btn-primary": sortType === "maxTime"}' @click='changeSortType("maxTime")') 最大耗时
-      button.btn.btn-default(:class='{"btn-primary": sortType === "minTime"}' @click='changeSortType("minTime")') 最小耗时
+      button.m-r-1.btn.btn-default(:class='{"btn-primary": sortType === "minTime"}' @click='changeSortType("minTime")') 最小耗时
       button.btn.btn-danger(@click="clearData") 清空记录
     .m-b-1
       table.table.nkc-table
