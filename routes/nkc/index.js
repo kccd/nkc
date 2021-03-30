@@ -11,6 +11,7 @@ router
   .get("/", async (ctx, next) => {
     const {db, query, data, nkcModules} = ctx;
     data.type = 'status';
+    const {redisClient} = ctx.settings;
     const {type} = query;
     const x = [];
     const usersData = [];
@@ -178,7 +179,43 @@ router
           });
         }
       }
+      // 获取统计
+      const keysString = await nkcModules.getRedisKeys('operationStatistics', '*');
+      const keys = await redisClient.keysAsync(keysString);
+      const operationArray = await redisClient.mgetAsync(keys);
+      const statisticsOperation = [];
+      for(const o of operationArray) {
+        const result = JSON.parse(o);
+        const [
+          operationId,
+          count,
+          time,
+          maxTime,
+          minTime
+        ] = result;
+        statisticsOperation.push({
+          operationId,
+          operationName: ctx.state.lang('operations', operationId),
+          count,
+          time,
+          averageTime: (time / count).toFixed(2),
+          maxTime,
+          minTime
+        });
+      }
+      data.statisticsOperation = statisticsOperation;
       ctx.template = "nkc/status/status.pug";
+    }
+    await next();
+  })
+  .post('/', async (ctx, next) => {
+    const {body, settings, nkcModules} = ctx;
+    const {type} = body;
+    const {redisClient} = settings;
+    if(type === 'removeStatisticsOperation') {
+      const keysString = await nkcModules.getRedisKeys('operationStatistics', '*');
+      const keys = await redisClient.keysAsync(keysString);
+      await redisClient.delAsync(keys);
     }
     await next();
   })

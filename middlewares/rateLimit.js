@@ -6,11 +6,11 @@ const path = require('path');
 const rateLimitErrorInfo = fs.readFileSync(path.resolve(__dirname, `../pages/error/429.html`));
 const {files: fileOperations} = require('../settings/operationsType');
 const {
-  total: rateLimitTotal,
-  totalFile: rateLimitTotalFile,
-  totalHtml: rateLimitTotalHtml,
-  userFile: rateLimitUserFile,
-  userHtml: rateLimitUserHtml,
+  total: rateLimitTotal, // 总限制 包含：静态资源、图片、视频、音频、附件、html以及json
+  totalFile: rateLimitTotalFile, // 总的文件限制 包含：图片、视频、音频以及附件
+  totalHtml: rateLimitTotalHtml, // 总的除附件以外的限制 包含：html和json
+  userFile: rateLimitUserFile, // 同IP文件限制 包含：图片、视频、音频以及附件
+  userHtml: rateLimitUserHtml, // 同IP除附件以外的限制 包含：html和json
 } = require('../config/rateLimit.json');
 module.exports = {
   total: rateLimit({

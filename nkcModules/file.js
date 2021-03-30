@@ -53,7 +53,7 @@ func.getBasePath = async (t) => {
   for(const a of attachmentConfig) {
     const {path, startingTime, endTime} = a;
     const _path = PATH.resolve(path);
-    if(!await func.access(path)) throwErr `指定的目录 ${path} 不存在`;
+    if(!await func.access(path)) throwErr(500, `指定的目录 ${path} 不存在`);
     // if(!fs.existsSync(path)) throwErr `指定的目录 ${path} 不存在`;
     const sTime = new Date(startingTime + ' 00:00:00').getTime();
     const eTime = new Date(endTime + ' 00:00:00').getTime();

@@ -112,3 +112,38 @@ function display(results) {
 window.getResults = getResults;
 window.reset = reset;
 window.getData = getData;
+
+const data = NKC.methods.getDataById('data');
+window.app = new Vue({
+  el: '#app',
+  data: {
+    originOperations: data.operations,
+    sortType: 'count'
+  },
+  methods: {
+    clearData() {
+      return sweetQuestion(`确定要清除记录？`)
+        .then(() => {
+          return nkcAPI('/nkc', 'POST', {
+            type: 'removeStatisticsOperation'
+          });
+        })
+
+        .then(() => {
+          sweetSuccess(`清除成功`);
+        })
+        .catch(sweetError);
+    },
+    changeSortType(sortType) {
+      this.sortType = sortType;
+    }
+  },
+  computed: {
+    operations() {
+      const {sortType, originOperations} = this;
+      return originOperations.sort(function(v1, v2) {
+        return v2[sortType] - v1[sortType];
+      });
+    }
+  },
+});

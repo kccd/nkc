@@ -59,10 +59,13 @@ app
   .use(urlRewrite)
   .use(init)
   // 全局 频次限制 文件
+
   .use(rateLimit.totalFile)
   .use(rateLimit.totalHtml)
+
   .use(rateLimit.userFile)
   .use(rateLimit.userHtml)
+
   .use(stayLogin)
   .use(cache)
   .use(permission)
