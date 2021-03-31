@@ -42,7 +42,14 @@ const schema = new Schema({
     type: Boolean,
     default: false
   },
+  // 专栏创建时间
   toc: {
+    type: Date,
+    default: Date.now,
+    index: 1
+  },
+  // 专栏更新时间
+  tlm: {
     type: Date,
     default: Date.now,
     index: 1
@@ -80,7 +87,14 @@ const schema = new Schema({
   // 专栏的关注数
   subCount: {
     type: Number,
+    index: 1,
     default: 0
+  },
+  // 专栏文章数
+  postCount: {
+    type: Number,
+    index: 1,
+    default: 0,
   },
   // 自定义链接
   links: {
@@ -320,6 +334,25 @@ schema.statics.getToppedColumns = async () => {
     if(column) results.push(column);
   });
   return results;
+};
+
+/*
+* 统计并设置专栏文章数
+* @return {Number} 文章数
+* @author pengxiguaa 2021-3-31
+* */
+schema.methods.updateBasicInfo = async function() {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const {_id} = this;
+  const postCount = await ColumnPostModel.count({columnId: _id});
+  const lastPost = await ColumnPostModel.findOne({columnId: _id}, {toc: 1}).sort({toc: -1});
+  const newData = {
+    postCount,
+    tlm: this.toc,
+  };
+  if(lastPost) newData.tlm = lastPost.toc;
+  await this.update(newData);
+  return postCount;
 };
 
 module.exports = mongoose.model("columns", schema);

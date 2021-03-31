@@ -10,5 +10,7 @@ module.exports = {
     threadCount: 10,
     adminCertsId: ["editor"],
     pageCount: 5, // 自定义页面个数
+    columnHomeSort: 'updateTime', // updateTime, subscription
+    columnHomePostCountMin: 0, // 在专栏首页显示的专栏最小文章数
   }
 };
