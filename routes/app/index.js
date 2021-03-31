@@ -26,14 +26,14 @@ appRouter
     const app = await db.AppVersionModel.findOne(q);
     if (!app) ctx.throw(404, "未找到相关数据");
     if(app.disabled) ctx.throw(403, "此版本下载通道已关闭");
-    const url = `${androidSavePath}/${hash}.apk`;
+    const path = `${androidSavePath}/${hash}.apk`;
     try{
-      await fs.access(url);
+      await fs.access(path);
     } catch(err) {
       ctx.throw(404, "安装包不存在或已被删除");
     }
     ctx.type = "apk";
-    ctx.filePath = url;
+    ctx.filePath = path;
     await next();
   })
   .get('/ios/:hash', async (ctx, next) => {
