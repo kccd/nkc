@@ -118,6 +118,7 @@
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
     "@types/fluent-ffmpeg": "^2.1.16",
+    "@types/koa-router": "^7.4.1",
     "babel-cli": "^6.26.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
