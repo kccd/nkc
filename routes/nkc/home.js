@@ -65,6 +65,7 @@ router
     data.originalThreadDisplayMode = homeSettings.originalThreadDisplayMode;
     // 是否在首页上显示“活动”入口
     data.showActivityEnter = homeSettings.showActivityEnter;
+    data.columnListPosition = homeSettings.columnListPosition;
     ctx.template = "nkc/home/home.pug";
     await next();
   })
@@ -208,14 +209,16 @@ router
         }
       });
     } else if(operation === "saveColumns") {
-      const {columnsId} = body;
+      const {columnsId, columnListPosition} = body;
+      if(!['main', 'side', 'null'].includes(columnListPosition)) ctx.throw(400, `首页专栏显示位置设置错误`);
       for(const columnId of columnsId) {
         const column = await db.ColumnModel.findOne({_id: columnId});
         if(!column) ctx.throw(400, `未找到ID为${columnId}的专业`);
       }
       await db.SettingModel.updateOne({_id: "home"}, {
         $set: {
-          "c.columnsId": columnsId
+          "c.columnsId": columnsId,
+          "c.columnListPosition": columnListPosition,
         }
       });
     } else if(operation === "saveGoods") {

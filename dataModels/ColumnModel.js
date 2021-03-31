@@ -300,6 +300,8 @@ schema.statics.saveAllColumnToElasticSearch = async () => {
 * */
 schema.statics.getToppedColumns = async () => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const PostModel = mongoose.model('posts');
   if(!homeSettings.columnsId.length) return [];
   let columnsId = [];
   if(homeSettings.columnsId.length <= 6) {
@@ -318,20 +320,52 @@ schema.statics.getToppedColumns = async () => {
   }
   const columns = await mongoose.model("columns").find({_id: {$in: columnsId}});
   const columnsObj = {};
-  columns.map(column => columnsObj[column._id] = column);
+  const postsId = [], columnIdObj = {};
+  const tocObj = {};
   for(let column of columns) {
     let {_id} = column;
-    let threads = await mongoose.model("columnPosts")         // 查出此专栏的所有可访问文章
-      .find({columnId: parseInt(_id), hidden: false}, {toc: 1})
-      .sort({toc: -1});                                       // 按从新到旧排序
-    column.threadsCount = threads.length;
-
-    column.latestThreadToc = threads.length? threads[0].toc: null;
+    columnsObj[column._id] = column;
+    const columnPosts = await ColumnPostModel.find({
+      columnId: _id,
+      hidden: false,
+      type: 'thread'
+    }, {
+      pid: 1,
+      columnId: 1,
+      toc: 1,
+    }).sort({order: -1}).limit(3);
+    for(const cp of columnPosts) {
+      const {pid, columnId, toc} = cp;
+      tocObj[pid] = toc;
+      if(!columnIdObj[columnId]) columnIdObj[columnId] = [];
+      columnIdObj[columnId].push(pid);
+      postsId.push(pid);
+    }
   }
+  const posts = await PostModel.find({pid: {$in: postsId}}, {
+    pid: 1,
+    tid: 1,
+    t: 1,
+  });
+  const postsObj = {};
+  posts.map(post => {
+    post.toc = tocObj[post.pid];
+    postsObj[post.pid] = post;
+  });
   const results = [];
   columnsId.map(cid => {
-    const column = columnsObj[cid];
-    if(column) results.push(column);
+    let column = columnsObj[cid];
+    if(!column) return;
+    column = column.toObject();
+    const postsId = columnIdObj[column._id];
+    const posts = [];
+    for(const pid of postsId) {
+      const post = postsObj[pid];
+      if(!post) continue;
+      posts.push(post);
+    }
+    column.posts = posts;
+    results.push(column);
   });
   return results;
 };
