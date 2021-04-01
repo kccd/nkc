@@ -290,7 +290,7 @@ jobs.clearFileCache = async () => {
 * 清空24小时之前的图形验证码图片字段
 * */
 jobs.clearVerificationData = async () => {
-  scheduleJob(`0 * * * * *`, async () => {
+  scheduleJob(`0 0 5 * * *`, async () => {
     console.log(`正在清理图形验证码...`);
     await VerificationModel.updateMany({
       toc: {$lte: Date.now() - 24 * 60 * 60 * 1000}

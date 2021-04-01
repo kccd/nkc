@@ -12,6 +12,45 @@ $(function() {
   if(NKC.modules.SubscribeTypes) {
     SubscribeTypes = new NKC.modules.SubscribeTypes();
   }
+  var columnSubscribe = $('.column-subscribe');
+  var columnButton = columnSubscribe.find('.column-button');
+  var columnNumber = columnSubscribe.find('.column-number');
+  var columnId = columnSubscribe.attr('data-column-id');
+  columnButton.on('click', function() {
+    if(columnButton.attr('data-disabled') === 'true') return;
+    var subscribed = columnSubscribe.attr('data-subscribed') === 'true';
+    var number = Number(columnSubscribe.attr('data-number'));
+    columnSubscribe.attr('data-subscribed', !subscribed);
+    return Promise.resolve()
+      .then(function() {
+        columnButton.attr('data-disabled', 'true');
+        return SubscribeTypes.subscribeColumnPromise(columnId, !subscribed);
+      })
+      .then(function() {
+        number += subscribed? -1: 1;
+        if(number <= 0) {
+          columnNumber.addClass('hidden')
+        } else {
+          columnNumber.removeClass('hidden')
+        }
+        columnNumber.text(number);
+        columnSubscribe.attr('data-number', number);
+        columnSubscribe.attr('data-subscribed', !subscribed);
+
+        columnButton.attr('data-disabled', 'false');
+
+        /*if(subscribed) {
+          screenTopAlert('取关成功');
+        } else {
+          screenTopAlert('关注成功');
+        }*/
+
+      })
+      .catch(function(err) {
+        columnButton.attr('data-disabled', 'false');
+        sweetError(err);
+      });
+  });
 });
 
 function showSetDom() {

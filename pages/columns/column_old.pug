@@ -1,25 +1,25 @@
 extends ./columnBase
 block columnTitle
   title=`${data.column.name}`
+  style.
+    body{
+      padding-top: 0;
+      background-color: #f6f6f6;
+    }
+  style=`body{background-color: ${data.column.color};}`
 block content
-  include ./modules/columnHeader
-  include ./modules/contribute
-  +mixinColumnHeader({
-    user: data.user,
-    column: data.column,
-    subColumnsId: state.subColumnsId,
-    navCategories: data.navCategories,
-    categories: data.categories,
-    hideBanner: false
-  })
+  include ./modules/banner
+  div.m-t-2.box-shadow-panel
+    .column
+      include ./modules/nav
   .container-fluid.max-width
     .column
       .row
-        .col-xs-12.col-md-8.box-shadow-panel.m-t-1.p-r-0
+        .col-xs-12.col-md-8.box-shadow-panel.m-t-2
           div
             if data.category
               .column-category-nav
-                a(href=`/m/${data.column._id}`) 首页
+                a(href=`/m/${data.column._id}`) 全部
                 for c, index in data.categoriesNav
                   span /
                   a(href=`/m/${data.column._id}?c=${c._id}`)= c.name
@@ -49,8 +49,7 @@ block content
                   if data.paging.page !== 0 || !data.toppedId.includes(columnPost._id)
                     include ./singleColumnPost
             include ../publicModules/paging/paging_input
-        .col-xs-12.col-md-4.box-shadow-panel.m-t-1
-          +mixinColumnContribute(data.user, data.column)
+        .col-xs-12.col-md-4.box-shadow-panel.m-t-2
           include ./modules/management
           include ./modules/info
 block scripts
@@ -59,4 +58,3 @@ block scripts
   include ../publicModules/subscribeTypes/subscribeTypes
   +includeJS("/columns/column.js")
   +includeJS("/columns/management.js")
-  +mixinColumnNavLinkScript()

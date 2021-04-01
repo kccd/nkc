@@ -1,6 +1,6 @@
--const {column, from, type, post, thread, categories, columnId, toc} = columnPost
--const {firstPost} = thread;
-.column-post
+-var {column, from, type, post, thread, categories, columnId, toc} = columnPost
+-var {firstPost} = thread;
+.column-posts-post
   .column-post-body(class=thread.firstPost.cover?"cover":"")
     if thread.firstPost.cover
       .column-post-cover
@@ -16,7 +16,8 @@
           | ：
           span=post.c
       .column-post-title
-        a(href=post.url target='_blank')=firstPost.t
+        //a(href=post.url target='_blank')=firstPost.t
+        a(href=tools.getUrl('columnPost', data.column._id, post.pid))=firstPost.t
       if type === "thread"
         .column-post-content= post.c
       .column-post-info
