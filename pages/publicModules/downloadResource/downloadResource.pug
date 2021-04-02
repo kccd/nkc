@@ -16,7 +16,8 @@ if !isIncluded("downloadResource")
                 .resource-size 大小：{{size}}
                 .resource-info.m-t-1 下载当前附件将花费 {{costMessage}}
                   span.name 。
-                .resource-info 你当前剩余 {{holdMessage}}
+                .resource-info.m-t-1(v-if='description') {{description}}
+                .resource-info.m-t-1 你当前剩余 {{holdMessage}}
                   span.name 。
                 .resource-control.m-t-1
                   a.download-button.pointer(@click="download") 支付积分并下载

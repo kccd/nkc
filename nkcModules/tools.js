@@ -124,6 +124,12 @@ var Tools = function() {
       case 'siteIcon': {
         return "/a/" + id + t
       }
+      case 'columnPost': {
+        return "/m/" + id + '/post/' + size;
+      }
+      case 'columnCategory': {
+        return "/m/" + id + '?c=' + size;
+      }
     }
   };
   self.getAnonymousInfo = function() {
@@ -227,7 +233,14 @@ var Tools = function() {
       scriptElem = document.scripts[document.scripts.length - 1];
     }
     return scriptElem.getAttribute("data-vue-app-selector");
-  }
+  };
+  self.briefNumber = function(number) {
+    if(number < 10000) {
+      return number;
+    } else {
+      return (number / 10000).toFixed(1) + '万'
+    }
+  };
 };
 
 var elementIdChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';

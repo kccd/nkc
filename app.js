@@ -5,9 +5,6 @@ const path = require('path');
 const koaBody = require('koa-body');
 const koaCompress = require('koa-compress');
 const settings = require('./settings');
-const rateLimit = require('koa-ratelimit');
-const Redis = require('ioredis');
-const fs = require('fs');
 const helmet = require('koa-helmet');
 const awesomeStatic = require('awesome-static');
 const staticServe = path => {
@@ -17,7 +14,11 @@ const staticServe = path => {
     }
   });
 };
-const app = new Koa();
+const serverConfigs = require('./config/server.json');
+const app = new Koa({
+  proxy: serverConfigs.proxy,
+  maxIpsCount: serverConfigs.maxIpsCount,
+});
 const conditional = require('koa-conditional-get');
 const etag = require('koa-etag');
 app.on('error', err => {
@@ -29,48 +30,18 @@ app.on('error', err => {
 });
 const favicon = require('koa-favicon');
 
-const {stayLogin, init, body, urlRewrite, permission, logger, cache} = require('./middlewares');
+const {rateLimit, stayLogin, init, body, urlRewrite, permission, logger, cache} = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
 
 app.keys = [cookieConfig.secret];
 app
-  // 限制单位时间相同ip（60s）请求数
-  .use(rateLimit({
-    db: new Redis(),
-    duration: 60000,
-    errorMessage: fs.readFileSync('./pages/error/503.html').toString(),
-    id: (ctx) => {
-      const {req, ip} = ctx;
-      return req.headers['x-forwarded-for'] ||
-        req.connection.remoteAddress ||
-        req.socket.remoteAddress ||
-        req.connection.socket.remoteAddress || ip;
-    },
-    headers: {
-      remaining: 'Rate-Limit-Remaining',
-      reset: 'Rate-Limit-Reset',
-      total: 'Rate-Limit-Total'
-    },
-    max: 2000,
-    disableHeader: false,
-  }))
-  // 限制单位时间（60s）所有请求数
-  .use(rateLimit({
-    db: new Redis(),
-    duration: 60000,
-    errorMessage: fs.readFileSync('./pages/error/503.html').toString(),
-    id: () => {
-      return 'nkc'
-    },
-    headers: {
-      remaining: 'Rate-Limit-Remaining',
-      reset: 'Rate-Limit-Reset',
-      total: 'Rate-Limit-Total'
-    },
-    max: 300000,
-    disableHeader: false,
-  }))
+  .use(async (ctx, next) => {
+    ctx.address = ctx.ip.replace(/^::ffff:/, '');
+    ctx.port = ctx.get(`X-Forwarded-Remote-Port`) || ctx.req.connection.remotePort;
+    await next();
+  })
+  .use(rateLimit.total)
   // gzip
   .use(koaCompress({threshold: 2048}))
   // 静态文件映射
@@ -88,6 +59,14 @@ app
   .use(etag())
   .use(urlRewrite)
   .use(init)
+  // 全局 频次限制 文件
+
+  .use(rateLimit.totalFile)
+  .use(rateLimit.totalHtml)
+
+  .use(rateLimit.userFile)
+  .use(rateLimit.userHtml)
+
   .use(stayLogin)
   .use(cache)
   .use(permission)

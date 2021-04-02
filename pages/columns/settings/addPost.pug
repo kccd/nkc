@@ -26,7 +26,7 @@ block settingsContent
             .column-thread-info(data-info-tid=thread.tid)
               if thread.firstPost.cover
                 .column-thread-cover
-                  img(src=`${tools.getUrl('postCover', thread.firstPost.cover)}`)
+                  div(style=`background-image: url(${tools.getUrl('postCover', thread.firstPost.cover)})`)
               .column-thread-content
                 .column-thread-abstract=thread.firstPost.c
                 .column-thread-forums.m-t-05

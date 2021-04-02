@@ -66,6 +66,7 @@ module.exports = {
           fileCount: 100
         }
       ]
-    }
+    },
+    freeTime: 24, // 下载附加后免费再次下载的时间
   }
 };

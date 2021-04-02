@@ -98,5 +98,6 @@ module.exports = {
     subscribesDisplayMode: "row",            // 首页上“关注的专业”板块的显示方式，  “row” 横排， “column” 竖排
     showActivityEnter: true,                  // 显示活动入口
     latestToppedThreadsId: [],
+    columnListPosition: 'side', // 专栏显示位置 main: 中间, side: 侧边, null: 不显示
   }
 };

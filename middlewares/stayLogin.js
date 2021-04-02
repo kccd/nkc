@@ -1,34 +1,11 @@
 const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
-const resourceOperations = [
-  "getAttachment",
-  "getUserAvatar",
-  "getUserBanner",
-  "column_single_avatar_get",
-  "column_single_Banner_get",
-  "getHomeLogo",
-  "getActivityPoster",
-  "getForumAvatar",
-  "getResources",
-  "getThumbs",
-  "getMediums",
-  "getDefaultImage",
-  "getOrigins",
-  "getThreadCover",
-  "getVideoImg",
-  "getSiteSpecific",
-  "getAttachmentIcon",
-  "getFundLogo",
-  "getFundBanner",
-  "getPhoto",
-  "getSmallPhoto",
-  "visitForumBanner",
-  "getMessageFile"
-];
+const {files: fileOperations} = require('../settings/operationsType');
+
 module.exports = async (ctx, next) => {
 
-  const isResourcePost = resourceOperations.includes(ctx.data.operationId);
+  const isResourcePost = fileOperations.includes(ctx.data.operationId);
   const {data, db, redis} = ctx;
 	// cookie
   let userInfo = ctx.getCookie("userInfo");

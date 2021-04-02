@@ -10,7 +10,7 @@ const db = require("../dataModels");
 const {
   PostModel, ThreadModel, UserModel, ActiveUserModel,
   ShopOrdersModel, ShopRefundModel, ShopGoodsModel,
-  SettingModel, ForumModel
+  SettingModel, ForumModel, VerificationModel
 } = db;
 
 const jobs = {};
@@ -286,6 +286,21 @@ jobs.clearFileCache = async () => {
     console.log(`文件缓存清理完成，共清理文件${count}个`);
   });
 }
-
+/*
+* 清空24小时之前的图形验证码图片字段
+* */
+jobs.clearVerificationData = async () => {
+  scheduleJob(`0 0 5 * * *`, async () => {
+    console.log(`正在清理图形验证码...`);
+    await VerificationModel.updateMany({
+      toc: {$lte: Date.now() - 24 * 60 * 60 * 1000}
+    }, {
+      $set: {
+        c: null
+      }
+    });
+    console.log(`图形验证码清理完成`);
+  });
+}
 
 module.exports = jobs;

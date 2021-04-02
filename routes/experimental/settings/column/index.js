@@ -10,18 +10,25 @@ router
     await next();
   })
   .put("/", async (ctx, next) => {
-    const {body, db} = ctx;
+    const {body, db, nkcModules} = ctx;
+    const {checkNumber} = nkcModules.checkData;
     let {
       xsfCount, digestCount, userGrade,
       contributeInfo, threadCount, transferInfo, closeColumnInfo,
-      adminCertsId, pageCount
+      adminCertsId, pageCount, columnHomePostCountMin, columnHomeSort
     } = body;
-    xsfCount = parseInt(xsfCount);
-    if(xsfCount < 0) ctx.throw(400, "学术分不能小于0");
-    digestCount = parseInt(digestCount);
-    if(digestCount < 0) ctx.throw(400, "精华数不能小于0");
-    threadCount = parseInt(threadCount);
-    if(threadCount < 0) ctx.throw(400, "文章数不能小于0");
+    checkNumber(xsfCount, {
+      name: '开设条件 学术分',
+      min: 0
+    });
+    checkNumber(digestCount, {
+      name: '开设条件 精华数',
+      min: 0
+    });
+    checkNumber(threadCount, {
+      name: '开设条件 文章数',
+      min: 0
+    });
     userGrade = await Promise.all(userGrade.filter(async _id => {
       const g = await db.UsersGradeModel.findOne({_id});
       return !!g;
@@ -33,8 +40,15 @@ router
     if(!contributeInfo) ctx.throw(400, "投稿说明不能为空");
     if(!transferInfo) ctx.throw(400, "专栏转让说明不能为空");
     if(!closeColumnInfo) ctx.throw(400, "关闭专栏说明不能为空");
-    pageCount = parseInt(pageCount);
-    if(pageCount < 0) ctx.throw(400, "自定义页面个数不能小于0");
+    checkNumber(pageCount, {
+      name: '专栏设置 自定义页面个数',
+      min: 0
+    });
+    checkNumber(columnHomePostCountMin, {
+      name: '专栏列表 最小文章数',
+      min: 0
+    });
+    if(!['updateTime', 'subscription'].includes(columnHomeSort)) ctx.throw(400, `专栏列表排序设置错误`);
     await db.SettingModel.updateOne({
       _id: "column"
     }, {
@@ -47,7 +61,9 @@ router
         "c.pageCount": pageCount,
         "c.transferInfo": transferInfo,
         "c.closeColumnInfo": closeColumnInfo,
-        "c.adminCertsId": adminCertsId
+        "c.adminCertsId": adminCertsId,
+        "c.columnHomePostCountMin": columnHomePostCountMin,
+        "c.columnHomeSort": columnHomeSort
       }
     });
     await db.SettingModel.saveSettingsToRedis("column");

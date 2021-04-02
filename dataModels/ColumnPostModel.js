@@ -258,6 +258,7 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
     });
     await columnPost.save();
   }
+  await column.updateBasicInfo();
 };
 /*
 * 标记专栏文章所对应的thread，inColumn字段;
@@ -293,6 +294,8 @@ schema.post("remove", async function(columnPost) {
     }
     await mongoose.model("threads").updateOne({tid: columnPost.tid}, obj);
   }
+  const column = await mongoose.model('columns').findOne({_id: columnPost.columnId});
+  if(column) await column.updateBasicInfo();
 });
 /*
 * 检测专栏中是否存在指定内容

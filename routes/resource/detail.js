@@ -14,7 +14,7 @@ router
     // 租期时长
     const leaseDuration = 24 * 60 * 60 * 1000;
     // 是否免费
-    const {needScore, reason} = await resource.checkDownloadCost(user, leaseDuration);
+    const {needScore, reason, description} = await resource.checkDownloadCost(user, leaseDuration);
     if(reason !== 'repeat') {
       await resource.checkDownloadPermission(user, ctx.address);
     }
@@ -29,6 +29,9 @@ router
     detail.free = !needScore && reason === "setting";
     // 此用户是否在租期内(支付过，没到期)
     detail.paid = !needScore && reason === "repeat";
+
+    detail.needScore = needScore;
+    detail.description = description;
 
     await resource.setFileExist();
     detail.resource = resource.toObject();

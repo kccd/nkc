@@ -3,7 +3,7 @@
   @param data.timeline 内容统计
 
 -var canManagement = permission("column_single_disabled");
-.m-b-2
+.m-b-1
   .column-user
     .column-user-avatar
       a(href=`/u/${data.column.uid}`)
@@ -18,10 +18,10 @@
           a.pointer(onclick=`SubscribeTypes.subscribeUser("${data.column.uid}", true)` target="_blank") 关注
     if data.column.user.description
       .column-user-description=data.column.user.description
-.m-b-2
+.m-b-1
   include ../../publicModules/share/column
 if data.column.notice && (!data.column.noticeDisabled || canManagement)
-  div.m-b-2
+  div.m-b-1
     .column-threads
       .column-header
         .fa.fa-bullhorn &nbsp;公告通知
@@ -31,7 +31,7 @@ if data.column.notice && (!data.column.noticeDisabled || canManagement)
             else
               .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, 'notice', true)`) &nbsp;屏蔽
       p!=markdown_safe(data.column.notice)
-div.m-b-2
+div.m-b-1
   .column-management
     .column-header
       .fa.fa-list &nbsp;文章分类
@@ -53,7 +53,7 @@ div.m-b-2
                 .column-category-count=c.count
               .fa.fa-angle-right
 if data.timeline && data.timeline.length > 0
-  div.m-b-2
+  div.m-b-1
     .column-management
       .column-header
         .fa.fa-calendar &nbsp;内容统计
@@ -63,7 +63,7 @@ if data.timeline && data.timeline.length > 0
             .pull-right=`${t.count} 篇`
 if !data.column.blocksDisabled || canManagement
   if canManagement || data.column.blocks.length > 0
-    div.m-b-2
+    div.m-b-1
       .column-block
         .column-header 自定义内容
           if data.column.blocksDisabled
@@ -72,13 +72,13 @@ if !data.column.blocksDisabled || canManagement
             .column-management-button.fa.fa-minus-circle(onclick=`managementColumn(${data.column._id}, "blocks", true)`) &nbsp;屏蔽
   for block, index in data.column.blocks
     if block.show
-      div.m-b-2
+      div.m-b-1
         .column-block
           .column-header=block.name
           p!=markdown_safe(block.content)
 if data.column.otherLinks && data.column.otherLinks.length > 0
   if !data.column.otherLinksDisabled || canManagement
-    div.m-b-2
+    div.m-b-1
       .column-threads
         .column-header
           .fa.fa-link &nbsp;友情链接

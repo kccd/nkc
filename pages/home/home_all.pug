@@ -134,7 +134,48 @@ block content
               for thread in data.toppedThreads
                 include ../publicModules/thread_panel/thread_panel
 
+        // 专栏列表
+        if data.columnListPosition === 'main' && data.columns && data.columns.length > 0
+          mixin columnPanel(column)
+            .home-main-column.row
+              .col-xs-12.col-md-6
+                .home-main-column-left
+                  .home-main-column-avatar
+                    img(src=tools.getUrl('columnAvatar', column.avatar))
+                  .home-main-column-info
+                    a(href=tools.getUrl('columnHome', column._id) target="_blank").home-main-column-name=column.name
+                    .home-main-column-desc(title=column.abbr)=column.abbr || '暂无简介'
+              .col-xs-12.col-md-6
+                .home-main-column-right
+                  .home-main-column-posts(style=`border-left: 3px solid ${0 || '#ccc'};`)
+                    for  p in column.posts
+                      .home-main-column-post
+                        .latest-thread-point
+                        a(href=`/t/${p.tid}` target="_blank" title=p.t)=p.t
+                        .home-main-column-post-time
+                          +fromNow(p.toc)
 
+          .home-forums-list.m-b-1
+            .panel-header 热门专栏
+            .home-main-columns
+              for column in data.columns
+                +columnPanel(column)
+
+
+            //-.home-columns
+              for column in data.columns
+                a(href=`/m/${column._id}` target="_blank").home-column
+                  .home-column-avatar
+                    img(src=tools.getUrl("columnAvatar", column.avatar))
+                  .home-column-info
+                    .home-column-title= column.name
+                    .home-column-description= column.abbr || "无简介"
+                    .home-column-statics
+                      if column.latestThreadToc
+                        span=tools.briefTime(column.latestThreadToc) + "更新 "
+                      span= "共" + column.threadsCount + "篇文章"
+            .m-t-05
+              a.home-threads-more-link(href=`/m` target="_blank") 查看更多
         for cf in data.categoryForums
           .home-forums-list.m-b-1.category-forums
             .panel-header=cf.name
@@ -295,7 +336,7 @@ block content
                 .home-app-img
                   img(src=`/statics/apps/tools.png`)
                 .home-app-name 计算工具
-        if data.columns.length
+        if data.columnListPosition === 'side' && data.columns && data.columns.length > 0
           .home-forums-list.m-b-1
             .panel-header 热门专栏
             //-.home-header
@@ -311,9 +352,8 @@ block content
                     .home-column-title= column.name
                     .home-column-description= column.abbr || "无简介"
                     .home-column-statics
-                      if column.latestThreadToc
-                        span=tools.briefTime(column.latestThreadToc) + "更新 "
-                      span= "共" + column.threadsCount + "篇文章"
+                      span=tools.briefTime(column.tlm) + "更新 "
+                      span= "共" + column.postCount + "篇文章"
             .m-t-05
               a.home-threads-more-link(href=`/m`) 查看更多
           if !state.userColumn && data.user && state.columnPermission

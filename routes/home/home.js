@@ -118,6 +118,7 @@ module.exports = async (options) => {
   data.siteToolEnabled = toolSettings.enabled;
   // 是否显示“活动”入口
   data.showActivityEnter = homeSettings.showActivityEnter;
+  data.columnListPosition = homeSettings.columnListPosition;
   // 首页大Logo
   data.homeBigLogo = await db.AttachmentModel.getHomeBigLogo();
   // 浏览过的专业
