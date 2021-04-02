@@ -94,10 +94,10 @@ block content
               a(href=tools.getUrl('columnHome', column._id) target="_blank").column-name=column.name
               .column-abbr
                 span=`${column.subCount}人关注，${column.postCount}篇文章`
-              .column-description=column.abbr
+              .column-description(title=column.abbr)=column.abbr
               .column-subsription
                 a.m-r-05.btn.btn-sm.btn-default(href=tools.getUrl('columnHome', column._id) target='_blank') 进入专栏
-                -var subscribed = state.subColumnsId.includes(column._id);
+                -var subscribed = state.subColumnsId?state.subColumnsId.includes(column._id): false;
                 -var klass = subscribed? 'btn-default': 'btn-primary';
                 -var text = subscribed? '已关注': '关注'
                 button.column-subscription.btn.btn-sm(
@@ -113,6 +113,9 @@ block scripts
       window.SubscribeTypes = new NKC.modules.SubscribeTypes();
     }
     function subscribeColumn(columnId) {
+      if(!NKC.configs.uid) {
+        return NKC.methods.toLogin();
+      }
       var dom = $('.column[data-column-id="'+columnId+'"] .column-subscription');
       var subscribed = dom.attr('data-subscribed');
       if(subscribed === 'true') {

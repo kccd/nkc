@@ -52,3 +52,6 @@ function shareToOther(shareType, type, title, pid, description, avatar){
   }
 }
 
+window.onerror  = function(e) {
+  alert(e.message || e.toString())
+}
