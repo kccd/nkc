@@ -2,9 +2,19 @@ const wechatPayConfigs = require('../../config/wechatPay.json');
 const {getRandomString} = require('../apiFunction');
 const fs = require('fs');
 const crypto = require('crypto');
-const privateKey = fs.readFileSync(wechatPayConfigs.certFilePath).toString();
-
+// const privateKey = fs.readFileSync(wechatPayConfigs.certFilePath).toString();
+const FILE = require('../file');
 const func = {};
+
+func.getPrivateKey = async () => {
+  const privateKeyPath = wechatPayConfigs.certFilePath;
+  if(await FILE.access(privateKeyPath)) {
+    return await fs.promises.readFile(privateKeyPath).toString();
+  } else {
+    throwErr(500, `微信证书不存在`);
+  }
+}
+
 
 /*
 * 解密来自微信的请求
@@ -65,6 +75,7 @@ func.getHeaderAuthInfo = async (url, method, data) => {
 
   const sign = crypto.createSign('RSA-SHA256');
   sign.update(Buffer.from(content, 'utf-8'));
+  const privateKey = await func.getPrivateKey();
   const signBase64 = sign.sign(privateKey, 'base64');
 
   return (`WECHATPAY2-SHA256-RSA2048 mchid="${wechatPayConfigs.mchId}"` +
