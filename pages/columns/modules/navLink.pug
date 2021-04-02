@@ -125,7 +125,6 @@ mixin mixinColumnNavLinkScript
     function initMenuEvent(el) {
       var categoriesString = el.attr('data-categories');
       var categories = NKC.methods.strToObj(categoriesString).categories;
-
       el.on('mouseover', function() {
         var left = el.offset().left;
         var top = el.offset().top;

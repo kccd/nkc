@@ -16,8 +16,8 @@
           | ：
           span=post.c
       .column-post-title
-        //a(href=post.url target='_blank')=firstPost.t
-        a(href=tools.getUrl('columnPost', data.column._id, post.pid))=firstPost.t
+        a(href=post.url target='_blank')=firstPost.t
+        //a(href=tools.getUrl('columnPost', data.column._id, post.pid))=firstPost.t
       if type === "thread"
         .column-post-content= post.c
       .column-post-info

@@ -124,6 +124,12 @@ var Tools = function() {
       case 'siteIcon': {
         return "/a/" + id + t
       }
+      case 'columnPost': {
+        return "/m/" + id + '/post/' + size;
+      }
+      case 'columnCategory': {
+        return "/m/" + id + '?c=' + size;
+      }
     }
   };
   self.getAnonymousInfo = function() {

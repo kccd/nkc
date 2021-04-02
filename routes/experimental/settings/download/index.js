@@ -15,7 +15,7 @@ router
   .put('/', async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
     const {downloadSettings} = body;
-    const {speed, allSpeed, fileCountLimit} = downloadSettings;
+    const {speed, allSpeed, fileCountLimit, freeTime} = downloadSettings;
     const {checkNumber} = nkcModules.checkData;
     const {certList} = data;
     const certListObj = {};
@@ -115,11 +115,18 @@ router
     }
     if(rolesType.size !== fileCountLimit.roles.length) ctx.throw(400, `证书附件个数限制类型重复`);
 
+    checkNumber(freeTime, {
+      name: '免费重复下载附件的最大时间',
+      min: 0,
+      fractionDigits: 2,
+    });
+
     await db.SettingModel.updateOne({_id: 'download'}, {
       $set: {
         'c.speed': speed,
         'c.allSpeed': allSpeed,
-        'c.fileCountLimit': fileCountLimit
+        'c.fileCountLimit': fileCountLimit,
+        'c.freeTime': freeTime
       }
     });
     await db.SettingModel.saveSettingsToRedis('download');
