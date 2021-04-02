@@ -142,6 +142,11 @@ block eContent
                   button.btn.btn-danger.btn-sm(@click='removeFromArray(settings.fileCountLimit.roles, index)') 删除
           .m-t-1
             button.btn.btn-default(@click='addRole(settings.fileCountLimit.roles)') 添加
+      .col-xs-12.col-md-12.m-b-2
+        .h4.form-inline
+          span 免费下载附件：
+          input.form-control.m-r-05(type='text' v-model.number="settings.freeTime")
+          span 小时内重复下载附件免费
       .col-xs-12.col-md-12
         .m-t-1
           button.btn.btn-primary(@click='save') 保存

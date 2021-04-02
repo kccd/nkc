@@ -16,6 +16,7 @@ NKC.modules.downloadResource = class {
         fileCountLimitInfo: '',
         errorInfo: '',
         settingNoNeed: false,
+        description: ''
       },
       computed: {
         costMessage() {
@@ -65,7 +66,8 @@ NKC.modules.downloadResource = class {
           self.errorInfo = '';
           nkcAPI(`/r/${rid}/detail`, "GET")
             .then(data => {
-              let {free, paid, resource, costScores, fileCountLimitInfo} = data.detail;
+              let {free, paid, resource, costScores, fileCountLimitInfo, needScore, description} = data.detail;
+              self.description = description;
               self.fileCountLimitInfo = fileCountLimitInfo;
               if(!resource.isFileExist) {
                 self.status = "fileNotExist";
