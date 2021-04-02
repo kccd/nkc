@@ -488,7 +488,8 @@ resourceSchema.methods.checkDownloadCost = async function(user) {
   let description = '';
   if(lastAttachmentDownloadLog) {
     const lastAttachmentDownloadTime = lastAttachmentDownloadLog.toc;
-    if(nowTime - lastAttachmentDownloadTime <= freeTime * 60 * 60 * 1000) {
+    const timeout = nowTime - lastAttachmentDownloadTime - freeTime * 60 * 60 * 1000;
+    if(timeout <= 0) {
       // 下载时间未超过24小时 不收费
       return {
         needScore: false,
@@ -496,7 +497,7 @@ resourceSchema.methods.checkDownloadCost = async function(user) {
         description: `${freeTime}小时以内重复下载免费。`
       };
     } else {
-      description = `你已于${moment(lastAttachmentDownloadTime).format("YYYY-MM-DD HH:mm:ss")}下载过此附件，再次下载将花费积分。`;
+      description = `您曾于${moment(lastAttachmentDownloadTime).format("YYYY年MM月DD日")}下载该附件，现已超过${(Math.ceil(timeout / (60 * 60 * 1000)))}小时，再次下载将花费积分。`;
     }
   }
   if(
