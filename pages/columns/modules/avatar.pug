@@ -1,4 +1,5 @@
 mixin mixinColumnAvatar(user, column, subColumnsId, hideBanner)
+  -subColumnsId = subColumnsId || []
   .column-avatar-body(class=hideBanner?'hide-banner':"")
     .column
       .column-avatar-container

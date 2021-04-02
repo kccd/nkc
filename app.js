@@ -14,9 +14,10 @@ const staticServe = path => {
     }
   });
 };
+const serverConfigs = require('./config/server.json');
 const app = new Koa({
-  proxy: true,
-  maxIpsCount: 1,
+  proxy: serverConfigs.proxy,
+  maxIpsCount: serverConfigs.maxIpsCount,
 });
 const conditional = require('koa-conditional-get');
 const etag = require('koa-etag');
@@ -38,6 +39,8 @@ app
   .use(async (ctx, next) => {
     ctx.address = ctx.ip.replace(/^::ffff:/, '');
     ctx.port = ctx.get(`X-Forwarded-Remote-Port`) || ctx.req.connection.remotePort;
+    console.log(ctx.address, ctx.port)
+    console.log(ctx.ips);
     await next();
   })
   .use(rateLimit.total)
