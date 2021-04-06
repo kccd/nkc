@@ -53,9 +53,10 @@ module.exports = {
           ${sourceHtml}
         </video>
       </span>
+      <span class="nkcsource-video-title">${resource.oname} <span class="display-i-b text-danger" style="font-weight: 700">${getSize(resource.size)}</span></span>
     `.trim();
     } else {
-      return `<span data-tag="nkcsource" data-type="video-not-found">视频已丢失</span>`
+      return `<span data-tag="nkcsource" data-type="video-not-found">视频已丢失（${oname}）</span>`
     }
 
     //<span class="nkcsource-video-title">${resource.oname}</span>
@@ -88,6 +89,7 @@ module.exports = {
       pdfHTML = `
         <span class="article-attachment-reader">
           <a href="/reader/pdf/web/viewer?file=%2fr%2f${rid}" target="_blank">预览</a>
+          <span class="fa fa-question-circle" title="预览文件已被压缩处理，并不代表真实文件质量"></span>
         </span>
       `.trim();
     }
