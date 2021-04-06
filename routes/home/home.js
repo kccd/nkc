@@ -47,7 +47,14 @@ module.exports = async (options) => {
   // 推荐专业
   // data.recommendForums = await db.ForumModel.getRecommendForums(fidOfCanGetThreads);
   // 热门专栏
-  data.columns = await db.ColumnModel.getToppedColumns();
+  if(homeSettings.columnListPosition === 'main') {
+    data.columns = await db.ColumnModel.getToppedColumns(20);
+  } else if(homeSettings.columnListPosition === 'side') {
+    data.columns = await db.ColumnModel.getToppedColumns(6);
+  } else {
+    data.columns = [];
+  }
+
   // 一周活跃用户
   data.activeUsers = await db.ActiveUserModel.getActiveUsersFromCache();
   // 热销商品
