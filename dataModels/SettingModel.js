@@ -215,9 +215,16 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
   const getSpeedByHour = (arr) => {
     for(const t of arr) {
       const {startingTime, endTime, speed} = t;
-      if(hour >= startingTime && hour < endTime) {
-        return speed;
+      if(startingTime < endTime) {
+        if(hour >= startingTime && hour < endTime) {
+          return speed;
+        }
+      } else {
+        if(hour >= startingTime || hour < endTime) {
+          return speed;
+        }
       }
+
     }
     return 0;
   };
@@ -257,10 +264,18 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
   let fileCountLimit;
   for(const f of fileCountLimitInfo) {
     const {startingTime, endTime} = f;
-    if(hour >= startingTime && hour < endTime) {
-      fileCountLimit = f;
-      break;
+    if(startingTime < endTime) {
+      if(hour >= startingTime && hour < endTime) {
+        fileCountLimit = f;
+        break;
+      }
+    } else {
+      if(hour >= startingTime || hour < endTime) {
+        fileCountLimit = f;
+        break;
+      }
     }
+
   }
   if(!fileCountLimit) throwErr(500, `后台数量限制配置错误，请通过页脚的「报告问题」告知管理员`);
   return {

@@ -376,6 +376,7 @@ resourceSchema.methods.checkDownloadPermission = async function(user, ip) {
   const DownloadLogModel = mongoose.model('downloadLogs');
   const apiFunction = require('../nkcModules/apiFunction');
   const downloadOptions = await SettingModel.getDownloadSettingsByUser(user);
+  const {freeTime} = await SettingModel.getSettings('download');
   const {fileCountLimit} = downloadOptions;
   const {fileCount, startingTime, endTime} = fileCountLimit;
   if(fileCount === 0) {
@@ -387,15 +388,36 @@ resourceSchema.methods.checkDownloadPermission = async function(user, ip) {
   }
   let downloadLogs;
   const today = apiFunction.today().getTime();
-  const match = {
-    toc: {
-      $gte: new Date(today + startingTime * 60 * 60 * 1000),
-      $lt: new Date(today + endTime * 60 * 60 * 1000)
+  const now = new Date();
+  const hour = now.getHours();
+  let match;
+  if(startingTime < endTime) {
+    match = {
+      toc: {
+        $gte: new Date(today + startingTime * 60 * 60 * 1000),
+        $lt: new Date(today + endTime * 60 * 60 * 1000)
+      }
+    };
+  } else {
+    if(hour >= startingTime) {
+      match = {
+        toc: {
+          $gte: new Date(today + startingTime * 60 * 60 * 1000),
+          $lt: now
+        }
+      }
+    } else {
+      match = {
+        toc: {
+          $gte: new Date(today + (startingTime - 24) * 60 * 60 * 1000),
+          $lt: now
+        }
+      }
     }
-  };
+  }
   const matchToday = {
     toc: {
-      $gte: Date.now() - 24 * 60 * 60 * 1000
+      $gte: Date.now() - freeTime * 60 * 60 * 1000
     },
     rid: this.rid
   };
