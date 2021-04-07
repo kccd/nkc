@@ -298,27 +298,31 @@ schema.statics.saveAllColumnToElasticSearch = async () => {
 /*
 * 获取置顶专栏
 * */
-schema.statics.getToppedColumns = async () => {
+schema.statics.getToppedColumns = async (columnCount) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
+  if(columnCount === undefined) {
+    columnCount = homeSettings.columnCount;
+  }
   const ColumnPostModel = mongoose.model('columnPosts');
   const PostModel = mongoose.model('posts');
   if(!homeSettings.columnsId.length) return [];
   let columnsId = [];
-  if(homeSettings.columnsId.length <= 6) {
+  if(homeSettings.columnsId.length <= columnCount) {
     columnsId = homeSettings.columnsId;
   } else {
     const {getRandomNumber$2} = require('../nkcModules/apiFunction');
     const arr = getRandomNumber$2({
       min: 0,
       max: homeSettings.columnsId.length - 1,
-      count: 6,
+      count: columnCount,
       repeat: false
     });
     for(const index of arr) {
       columnsId.push(homeSettings.columnsId[index]);
     }
   }
-  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}});
+  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}}).sort({tlm: -1});
+  columnsId = columns.map(c => c._id);
   const columnsObj = {};
   const postsId = [], columnIdObj = {};
   const tocObj = {};
@@ -333,7 +337,7 @@ schema.statics.getToppedColumns = async () => {
       pid: 1,
       columnId: 1,
       toc: 1,
-    }).sort({order: -1}).limit(3);
+    }).sort({toc: -1}).limit(3);
     for(const cp of columnPosts) {
       const {pid, columnId, toc} = cp;
       tocObj[pid] = toc;
@@ -357,7 +361,7 @@ schema.statics.getToppedColumns = async () => {
     let column = columnsObj[cid];
     if(!column) return;
     column = column.toObject();
-    const postsId = columnIdObj[column._id];
+    const postsId = columnIdObj[column._id] || [];
     const posts = [];
     for(const pid of postsId) {
       const post = postsObj[pid];

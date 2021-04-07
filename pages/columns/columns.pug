@@ -87,6 +87,11 @@ block content
         h4 专栏列表
       .col-xs-12.col-md-12
         include ../publicModules/paging/paging
+        .paging-button
+          a.button.radius-left(href=`/m?t=l` class=data.t==='l'?"active":"") 最近更新
+          a.button(href=`/m?t=s` class=data.t==="s"?'active':"") 最多订阅
+          a.button.radius-right(href=`/m?t=p` class=data.t==='p'?'active':'') 最多文章
+
         .columns-container
           for column in data.columns
             .column(data-column-id=column._id)
@@ -94,6 +99,9 @@ block content
               a(href=tools.getUrl('columnHome', column._id) target="_blank").column-name=column.name
               .column-abbr
                 span=`${column.subCount}人关注，${column.postCount}篇文章`
+                div.m-t-05
+                  +fromNow(column.tlm)
+                  | 更新
               .column-description(title=column.abbr)=column.abbr
               .column-subsription
                 a.m-r-05.btn.btn-sm.btn-default(href=tools.getUrl('columnHome', column._id) target='_blank') 进入专栏

@@ -19,9 +19,9 @@ module.exports = async (smsSettings, obj) => {
       }
     };
     const params = [content];
-    if(description) {
+    /*if(description) {
       params.push(description);
-    }
+    }*/
     sSender.sendWithParam(nationCode?parseInt(nationCode):86, mobile, templateId, params, smsSign, "", "", callback);
   });
 }

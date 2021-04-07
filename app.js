@@ -14,11 +14,7 @@ const staticServe = path => {
     }
   });
 };
-const serverConfigs = require('./config/server.json');
-const app = new Koa({
-  proxy: serverConfigs.proxy,
-  maxIpsCount: serverConfigs.maxIpsCount,
-});
+const app = new Koa();
 const conditional = require('koa-conditional-get');
 const etag = require('koa-etag');
 app.on('error', err => {
@@ -30,17 +26,12 @@ app.on('error', err => {
 });
 const favicon = require('koa-favicon');
 
-const {rateLimit, stayLogin, init, body, urlRewrite, permission, logger, cache} = require('./middlewares');
+const {setIP, rateLimit, stayLogin, init, body, urlRewrite, permission, logger, cache} = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
 
 app.keys = [cookieConfig.secret];
 app
-  .use(async (ctx, next) => {
-    ctx.address = ctx.ip.replace(/^::ffff:/, '');
-    ctx.port = ctx.get(`X-Forwarded-Remote-Port`) || ctx.req.connection.remotePort;
-    await next();
-  })
   .use(rateLimit.total)
   // gzip
   .use(koaCompress({threshold: 2048}))
@@ -58,6 +49,7 @@ app
   .use(conditional())
   .use(etag())
   .use(urlRewrite)
+  .use(setIP)
   .use(init)
   // 全局 频次限制 文件
 

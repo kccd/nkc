@@ -1,5 +1,6 @@
 const db = require("../../dataModels");
 const settings = require("../../settings");
+const serverConfigs = require('../../config/server.json');
 const tools = require("../../tools");
 const util = require('../util');
 const func = async (socket, next) => {
@@ -11,12 +12,18 @@ const func = async (socket, next) => {
     data: {},
     query: {},
   };
-  let address = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-  if(address !== '') {
-    address = address.replace(/::ffff:/ig, '');
-    address = address.split(':');
-    address = address.length? address[0]:'';
+
+  let ip = socket.handshake.address;
+  let address = '';
+  if(serverConfigs.proxy) {
+    let xForwardedFor = socket.handshake.headers['x-forwarded-for'];
+    xForwardedFor =	xForwardedFor.split(',');
+    xForwardedFor.push(ip);
+    xForwardedFor.reverse();
+    const _ip = xForwardedFor[serverConfigs.maxIpsCount - 1];
+    address = _ip || ip;
   }
+  address = address.replace(/::ffff:/ig, '');
   socket.NKC.address = address;
   socket.NKC.query = socket.handshake.query;
   await next();
