@@ -99,5 +99,6 @@ module.exports = {
     showActivityEnter: true,                  // 显示活动入口
     latestToppedThreadsId: [],
     columnListPosition: 'side', // 专栏显示位置 main: 中间, side: 侧边, null: 不显示
+    columnCount: 12, // 首页热门专栏数量
   }
 };

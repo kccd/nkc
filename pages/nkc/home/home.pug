@@ -3,7 +3,7 @@ block nkcTitle
   title 主页设置 - 前台管理
   +includeCSS('/nkc/home/home.css')
 block nkcContent
-  #data.hidden=objToStr({columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
+  #data.hidden=objToStr({columnCount: data.columnCount, columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
   .col-xs-12.col-md-12.management-home#app(v-cloak)
     ul.nav.nav-tabs
       li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
@@ -229,6 +229,9 @@ block nkcContent
               label
                 input(type='radio' value='null' v-model='columnListPosition')
                 span 不显示
+          .m-t-1.form-inline
+            span 专栏数量：
+            input.form-control(type='text' v-model.number='columnCount')
           .m-t-1
             button.management-button(@click="saveColumns") 保存
       div.m-t-2

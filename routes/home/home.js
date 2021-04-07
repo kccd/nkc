@@ -48,7 +48,7 @@ module.exports = async (options) => {
   // data.recommendForums = await db.ForumModel.getRecommendForums(fidOfCanGetThreads);
   // 热门专栏
   if(homeSettings.columnListPosition === 'main') {
-    data.columns = await db.ColumnModel.getToppedColumns(20);
+    data.columns = await db.ColumnModel.getToppedColumns();
   } else if(homeSettings.columnListPosition === 'side') {
     data.columns = await db.ColumnModel.getToppedColumns(6);
   } else {

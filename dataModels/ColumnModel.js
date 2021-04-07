@@ -298,8 +298,11 @@ schema.statics.saveAllColumnToElasticSearch = async () => {
 /*
 * 获取置顶专栏
 * */
-schema.statics.getToppedColumns = async (columnCount = 6) => {
+schema.statics.getToppedColumns = async (columnCount) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
+  if(columnCount === undefined) {
+    columnCount = homeSettings.columnCount;
+  }
   const ColumnPostModel = mongoose.model('columnPosts');
   const PostModel = mongoose.model('posts');
   if(!homeSettings.columnsId.length) return [];
@@ -318,7 +321,8 @@ schema.statics.getToppedColumns = async (columnCount = 6) => {
       columnsId.push(homeSettings.columnsId[index]);
     }
   }
-  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}});
+  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}}).sort({tlm: -1});
+  columnsId = columns.map(c => c._id);
   const columnsObj = {};
   const postsId = [], columnIdObj = {};
   const tocObj = {};
@@ -333,7 +337,7 @@ schema.statics.getToppedColumns = async (columnCount = 6) => {
       pid: 1,
       columnId: 1,
       toc: 1,
-    }).sort({order: -1}).limit(3);
+    }).sort({toc: -1}).limit(3);
     for(const cp of columnPosts) {
       const {pid, columnId, toc} = cp;
       tocObj[pid] = toc;
