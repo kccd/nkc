@@ -16,7 +16,7 @@ const func = async (socket, next) => {
   let ip = socket.handshake.address;
   let address = '';
   if(serverConfigs.proxy) {
-    let xForwardedFor = socket.handshake.headers['x-forwarded-for'];
+    let xForwardedFor = socket.handshake.headers['x-forwarded-for'] || '';
     xForwardedFor =	xForwardedFor.split(',');
     xForwardedFor.push(ip);
     xForwardedFor.reverse();
