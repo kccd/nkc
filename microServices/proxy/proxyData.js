@@ -75,8 +75,18 @@ for(const s of servers) {
       }
     });
     server.on('proxyReq', (proxyReq, req, res) => {
+      const portKey = `x-forwarded-remote-port`;
       try{
-        proxyReq.setHeader('X-forwarded-Remote-Port', req.connection.remotePort);
+        const remotePort = req.connection.remotePort;
+        let remotePortStr = req.headers[portKey];
+        if(remotePortStr) {
+          remotePortStr = remotePortStr.split(',');
+        } else {
+          remotePortStr = [];
+        }
+        remotePortStr.push(remotePort);
+        remotePortStr = remotePortStr.join(',');
+        proxyReq.setHeader(portKey, remotePortStr);
       } catch(err) {
         const {host} = req.headers;
         console.log(`${` ERROR `.bgRed} ${moment().format('YYYY-MM-DD HH:mm:ss')} ${(' ' + host + ' ').bgGreen} ${err.message.bgRed}`);

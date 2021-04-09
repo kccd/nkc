@@ -26,7 +26,7 @@ app.on('error', err => {
 });
 const favicon = require('koa-favicon');
 
-const {setIP, rateLimit, stayLogin, init, body, urlRewrite, permission, logger, cache} = require('./middlewares');
+const {rateLimit, stayLogin, init, body, urlRewrite, permission, logger, cache} = require('./middlewares');
 
 const cookieConfig = require("./config/cookie");
 
@@ -49,7 +49,6 @@ app
   .use(conditional())
   .use(etag())
   .use(urlRewrite)
-  .use(setIP)
   .use(init)
   // 全局 频次限制 文件
 
