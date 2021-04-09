@@ -26,7 +26,7 @@ const schema = new Schema({
   },
   color: {
     type: String,
-    default: "#f6f6f6"
+    default: "#eee"
   },
   topped: {
     type: [Number],
@@ -143,6 +143,21 @@ const schema = new Schema({
   contacted: {
     type: Boolean,
     default: false
+  },
+  // 专栏内文章总阅读数
+  postHits: {
+    type: Number,
+    default: 0
+  },
+  // 专栏内文章的点赞数
+  postVoteUp: {
+    type: Number,
+    default: 0
+  },
+  // 获赞数、阅读数的更新时间
+  refreshTime: {
+    type: Date,
+    default: null,
   }
 }, {
   collection: "columns"
@@ -381,16 +396,51 @@ schema.statics.getToppedColumns = async (columnCount) => {
 * */
 schema.methods.updateBasicInfo = async function() {
   const ColumnPostModel = mongoose.model('columnPosts');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
   const {_id} = this;
-  const postCount = await ColumnPostModel.count({columnId: _id});
+  const columnPosts = await ColumnPostModel.find({columnId: _id}, {pid: 1});
+  const postsId = columnPosts.map(cp => cp.pid);
+  const columnPostCount = columnPosts.length;
+  let hits = await ThreadModel.aggregate([
+    {
+      $match: {
+        oc: {$in: postsId}
+      }
+    },
+    {
+      $group: {
+        _id: "count",
+        count: {
+          $sum: "$hits"
+        }
+      }
+    }
+  ]);
+  hits = hits.length? hits[0].count: 0;
+  let voteUp = await PostModel.aggregate([
+    {
+      $match: {
+        pid: {$in: postsId}
+      }
+    },
+    {
+      $group: {
+        _id: 'count',
+        count: {
+          $sum: "$voteUp"
+        }
+      }
+    }
+  ]);
+  voteUp = voteUp.length? voteUp[0].count: 0;
   const lastPost = await ColumnPostModel.findOne({columnId: _id}, {toc: 1}).sort({toc: -1});
-  const newData = {
-    postCount,
-    tlm: this.toc,
-  };
-  if(lastPost) newData.tlm = lastPost.toc;
-  await this.update(newData);
-  return postCount;
+  this.postCount = columnPostCount;
+  this.tlm = lastPost? lastPost.toc: this.toc;
+  this.refreshTime = Date.now();
+  this.postHits = hits;
+  this.postVoteUp = voteUp;
+  await this.save();
 };
 
 module.exports = mongoose.model("columns", schema);

@@ -4,18 +4,18 @@ block columnTitle
 block settingsContent
   .hidden#data=objToStr({column: data.column})
   .row#app(v-cloak)
-    .col-xs-12.col-md-8.m-t-3.m-b-3
+    .col-xs-12.col-md-8.col-md-offset-2.m-t-3.m-b-3
       .column-settings-banner(@click="selectBanner")
         img(:src="bannerUrl")
       .text-center
-        .column-settings-avatar(@click="selectAvatar")
+        .pointer.column-settings-avatar(@click="selectAvatar")
           img(:src="avatarUrl")
       .form
         .form-group.p-t-1
           h4 专栏名（不超过30字符）
           input.form-control(type="text" v-model.trim="column.name")
         .form-group.p-t-1
-          h4 专栏简介（不超过60字符）
+          h4 专栏简介（不超过120字符）
           textarea.form-control(rows=3 v-model.trim="column.abbr")
         //-.form-group.p-t-1
           h4 专栏介绍（不超过1000字符）
@@ -123,8 +123,9 @@ block settingsContent
 
         .form-group.p-t-1
           h5.text-danger(v-if="error") {{error}}
-          h5.text-success(v-if="info") {{info}}
-          button.btn.btn-primary.btn-block(@click="submit") 保存
+          //h5.text-success(v-if="info") {{info}}
+          button.btn.btn-primary.btn-block(v-if='info' disabled) {{info}}
+          button.btn.btn-primary.btn-block(v-else @click="submit") 保存
           .m-t-1.text-right
             a.m-r-1(href=`/m/${data.column._id}/settings/transfer`) 专栏转让
             a(href=`/m/${data.column._id}/settings/close`) 关闭专栏

@@ -91,3 +91,38 @@ function pushToHome(id, type) {
     })
     .catch(sweetError);
 }
+function subscribeColumn(columnId) {
+  if(!NKC.configs.uid) return NKC.methods.toLogin();
+  var subscriptionButton = $('[data-type="subscriptionButton"][data-column-id="'+columnId+'"]');
+  var subscriptionNumber = $('[data-type="subscriptionNumber"][data-column-id="'+columnId+'"]');
+  var subscribed = subscriptionButton.attr('data-subscribed') === 'true';
+  var number = Number(subscriptionNumber.attr('data-number'));
+
+  return Promise.resolve()
+    .then(function() {
+      return SubscribeTypes.subscribeColumnPromise(columnId, !subscribed);
+    })
+    .then(function() {
+      if(subscribed) {
+        // 取消关注
+        number --;
+        subscriptionButton
+          .attr('data-subscribed', 'false')
+          .removeClass('btn-default')
+          .addClass('btn-primary')
+          .text('关注');
+      } else {
+        // 关注
+        number ++;
+        subscriptionButton
+          .attr('data-subscribed', 'true')
+          .removeClass('btn-primary')
+          .addClass('btn-default')
+          .text('已关注');
+      }
+      subscriptionNumber
+        .attr('data-number', number)
+        .text(NKC.methods.tools.briefNumber(number));
+    })
+    .catch(sweetError);
+}

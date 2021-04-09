@@ -1,6 +1,6 @@
 @import '../publicModules/base';
 body{
-  background-color: #fff;
+  background-color: #f4f4f4;
 }
 .nkcshade{
   background-color: rgba(255, 255, 255, 1);
@@ -229,7 +229,7 @@ img.apply-column-banner{
   cursor: pointer;
 }
 .column-settings-banner:after{
-  content: "点击选择图片";
+  content: "点击更换专栏背景";
   font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
@@ -253,7 +253,7 @@ img.apply-column-banner{
   position: relative;
 }
 .column-settings-avatar:after{
-  content: "点击选择图片";
+  content: "点击更换专栏头像";
   font-size: 1.2rem;
   position: absolute;
   padding-top: 6rem;
@@ -359,8 +359,8 @@ img.apply-column-banner{
   overflow: hidden;
   word-break: break-all;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  max-height: 4.5rem;
+  -webkit-line-clamp: 1;
+  max-height: 2.4rem;
 }
 .column-post-title a{
   font-size: 1.6rem;
@@ -395,26 +395,27 @@ img.apply-column-banner{
   vertical-align: top;
 }
 .column-post-cover>div{
-  width: 17rem;
+  width: 14rem;
   border-radius: 3px;
   margin-right: 1rem;
   background-size: cover;
-  height: 12rem;
+  height: 10rem;
 }
 .column-post-abstract{
   width: 100%;
 }
 .column-post-body.cover .column-post-abstract{
   vertical-align: top;
-  padding-top: 0.3rem;
+  padding-top: 0;
   width: 10000px;
   display: table-cell;
 }
 .column-post-content{
-  max-height: 3rem;
+  max-height: 3.4rem;
   margin-top: 1rem;
   overflow: hidden;
-  color: #515d6d;
+  font-size: 1.2rem;
+  color: #000;
   word-break: break-all;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -443,7 +444,8 @@ img.apply-column-banner{
 }
 .column-post-time{
   display: inline-block;
-  color: #9baec8;
+  color: #555;
+  font-size: 1rem;
 }
 .column-post-forums{
   display: inline-block;
@@ -460,11 +462,13 @@ img.apply-column-banner{
   margin-right: 0.2rem;
 }
 .column-post-author{
-  color: #9baec8;
+  color: #555;
+  font-size: 1rem;
 }
 .column-post-forum{
-  color: #9baec8;
+  color: #555;
   margin-right: 0.5rem;
+  font-size: 1rem;
 }
 .column-post-forum:hover, .column-post-forum:focus, .column-post-author:hover, .column-post-author:focus{
   color: #9baec8;
@@ -593,7 +597,7 @@ img.apply-column-banner{
   font-size: 1.2rem;
   font-weight: 700;
   color: #282c37;
-  /*background-color: #d9e1e8;*/
+  background-color: #f4f4f4;
 }
 .column-category{
   display: block;
@@ -787,9 +791,9 @@ img.apply-column-banner{
 
 
 .column-avatar-body{
-  @avatarBodyHeight: 8rem;
+  @avatarBodyHeight: 6rem;
   @avatarImageHeight: 10rem;
-  @avatarSubscribeHeight: 15rem;
+  @avatarSubscribeHeight: 28rem;
   position: relative;
   width: 100%;
   //padding-top:  5rem;
@@ -821,29 +825,33 @@ img.apply-column-banner{
       top: -1 * (@avatarImageHeight - @avatarBodyHeight);
       height: @avatarImageHeight;
       width: @avatarImageHeight;
-      border-radius: 50%;
-      background-color: #fff;
+      //-moz-box-shadow:2px 2px 5px #333333; -webkit-box-shadow:2px 2px 5px #333333; box-shadow:2px 2px 5px #333333;
+      //border-radius: 50%;
+      border-radius: 1rem;
+      background-color: rgba(0, 0, 0, 0.2);
       @media (max-width: 991px) {
         height: @avatarImageHeight / 1.3;
         width: @avatarImageHeight / 1.3;
         left: 0.5rem;
+        top: -1 * (@avatarImageHeight - @avatarBodyHeight) + 0.5rem;
       }
       img{
-        border: 4px solid #fff;
+        border: 4px solid rgba(255, 255, 255, 0.9);
         box-sizing: border-box;
         height: 100%;
         width: 100%;
-        border-radius: 50%;
+        border-radius: 1rem;
       }
     }
     .column-name-info{
       height: 100%;
       overflow: hidden;
       .column-name{
-        margin-top: 2rem;
+        margin-top: 1rem;
         @media (max-width: 991px) {
-          margin-top: 1rem;
+          margin-top: 0.5rem;
           font-size: 1.3rem;
+          height: 2rem;
         }
         font-weight: 600;
         font-size: 1.8rem;
@@ -864,8 +872,40 @@ img.apply-column-banner{
         }
         margin-top: 0.5rem;
         font-size: 1.2rem;
-        color: #555;
+        color: #000;
         .hideText(@line:1);
+      }
+    }
+    .column-name-numbers{
+      height: 100%;
+      padding-top: 1rem;
+      width: @avatarSubscribeHeight;
+      position: absolute;
+      top: 0;
+      right: 0;
+      text-align: right;
+      .column-name-number{
+        width: 6rem;
+        border: 1px solid #ddd;
+        display: inline-block;
+        background-color: #fff;
+        text-align: center;
+        border-radius: 5px;
+        overflow: hidden;
+        h5{
+          height: 2.5rem;
+          line-height: 2.5rem;
+          background-color: #d9e1e8;
+          font-size: 1rem;
+          margin: 0;
+        }
+        span{
+          font-size: 1.2rem;
+          height: 2.5rem;
+          line-height: 2.5rem;
+          font-style: oblique;
+          font-weight: 700;
+        }
       }
     }
     .column-subscribe{
@@ -978,7 +1018,7 @@ img.apply-column-banner{
   }
 }
 .column-nav-body{
-  padding-top: 1rem;
+  padding-top: 0.5rem;
   user-select: none;
   #dropdownApp>div{
     position: absolute;
@@ -1040,7 +1080,7 @@ img.apply-column-banner{
         text-align: center;
         line-height: @aHeight;
         color: #000;
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         text-decoration: none;
         @media (max-width: 991px) {
           //@aHeight: 3rem;

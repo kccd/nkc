@@ -38,6 +38,10 @@ router
         passed: null
       });
     }
+    const timeout = 24 * 60 * 60 * 1000;
+    if(!column.refreshTime || Date.now() - new Date(column.refreshTime).getTime() > timeout) {
+      await column.updateBasicInfo();
+    }
     await next();
   })
   .get("/", async (ctx, next) => {
@@ -100,7 +104,7 @@ router
       } = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
-      if(contentLength(name) > 60) ctx.throw(400, "专栏名不能超过60字符");
+      if(contentLength(name) > 30) ctx.throw(400, "专栏名不能超过30字符");
       let sameName = await db.ColumnModel.findOne({_id: {$ne: column._id}, nameLowerCase: name.toLowerCase()});
       if(sameName) ctx.throw(400, "专栏名已存在，请更换");
       sameName = await db.UserModel.findOne({uid: {$ne: data.user.uid}, usernameLowerCase: name.toLowerCase()});
