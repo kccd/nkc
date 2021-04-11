@@ -94,47 +94,46 @@ var app = new Vue({
       this.error = "";
       this.info = "";
       var column = this.column;
-      if(!column.name) return this.error = "请输入专栏名";
-      if(!column.abbr) return this.error = "请输入专栏简介";
-      // if(!column.description) return this.error = "请输入专栏介绍";
+      var self = this;
       var formData = new FormData();
-      if(this.avatar) {
-        formData.append("avatar", this.avatar);
-      }
-      if(this.banner) {
-        formData.append("banner", this.banner);
-      }
-      if(column.notice) {
-        formData.append("notice", column.notice);
-      }
-      formData.append("links", JSON.stringify(column.links));
-      formData.append("otherLinks", JSON.stringify(column.otherLinks));
-      formData.append("name", column.name);
-      formData.append("abbr", column.abbr);
-      formData.append("description", column.description);
-      formData.append("navCategory", column.navCategory);
-      formData.append("perpage", column.perpage);
-      formData.append("hideDefaultCategory", column.hideDefaultCategory);
-      if(column.color) formData.append("color", column.color);
-
-      for(var i = 0; i < column.blocks.length; i++) {
-        var block = column.blocks[i];
-        if(!block.name) return this.error = "自定义内容标题不能为空";
-        if(!block.content) return this.error = "自定义内容不能为空";
-        block.show = !!block.show;
-      }
-
-      formData.append("blocks", JSON.stringify(column.blocks));
-
-      uploadFilePromise("/m/" + this.column._id, formData, function(e, a) {
-        app.info = "提交中..." + a;
-      }, "PUT")
+      return Promise.resolve()
         .then(function() {
-          app.info = "提交成功";
+          if(!column.name) throw new Error('请输入专栏名');
+          if(!column.abbr) throw new Error('请输入专栏简介');
+          if(self.avatar) formData.append('avatar', self.avatar);
+          if(self.banner) formData.append('banner', self.banner);
+          if(column.notice) formData.append('notice', column.notice);
+          formData.append("links", JSON.stringify(column.links));
+          formData.append("otherLinks", JSON.stringify(column.otherLinks));
+          formData.append("name", column.name);
+          formData.append("abbr", column.abbr);
+          formData.append("description", column.description);
+          formData.append("navCategory", column.navCategory);
+          formData.append("perpage", column.perpage);
+          formData.append("hideDefaultCategory", column.hideDefaultCategory);
+          if(column.color) formData.append("color", column.color);
+          for(var i = 0; i < column.blocks.length; i++) {
+            var block = column.blocks[i];
+            if(!block.name) throw new Error("自定义内容标题不能为空");
+            if(!block.content) throw new Error("自定义内容不能为空");
+            block.show = !!block.show;
+          }
+          formData.append("blocks", JSON.stringify(column.blocks));
+          return uploadFilePromise("/m/" + self.column._id, formData, function(e, a) {
+            if(a === 100) {
+              app.info = "处理中，请稍候";
+            } else {
+              app.info = "提交中..." + a + '%';
+            }
+          }, "PUT")
+        })
+        .then(function() {
+          app.info = '';
+          sweetSuccess('提交成功');
         })
         .catch(function(data) {
-          app.info = "";
-          app.error = data.error || data;
+          app.info = '';
+          sweetError(data);
         })
     },
     addLink: function(otherLink) {
