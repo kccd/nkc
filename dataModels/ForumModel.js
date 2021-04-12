@@ -332,6 +332,12 @@ const forumSchema = new Schema({
     type: Array,
     default: [],
   },
+  // 敏感词检测用于哪部分（仅文章、仅回复或者全部）和下面的审核方案类似
+  keywordReviewPlanUseTo: {
+    type: String,
+    default: "all",
+    match: /^(all|only_thread|only_reply)$/
+  },
   // 敏感词审核使用的词组
   keywordReviewUseGroup: {
     type: [String],

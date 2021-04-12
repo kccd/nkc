@@ -14,6 +14,7 @@ router
       name: group.name,
       len: group.keywords.length
     }));
+    data.keywordReviewPlanUseTo = forum.keywordReviewPlanUseTo;
     data.useGroup = forum.keywordReviewUseGroup;
     data.reviewPlan = forum.reviewPlan;
     data.fid = forum.fid;
@@ -24,12 +25,14 @@ router
     const {data, db, body} = ctx;
     const { forum } = data;
     const {
+      keywordReviewPlanUseTo, // 敏感词检测用于哪部分
       newUseWordGroup,      // 里面是敏感词组组名组成的数组
       reviewPlan,   // 是否本专业所有内容都需要送审
       roleGradeReview,          // 按角色和等级之间关系送审
     } = body;
     if(newUseWordGroup instanceof Array) {
       await db.ForumModel.update({ fid: forum.fid }, {
+        keywordReviewPlanUseTo,
         keywordReviewUseGroup: newUseWordGroup,
         reviewPlan,
         roleGradeReview

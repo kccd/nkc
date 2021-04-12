@@ -13,7 +13,7 @@ block title
     }
 
 block content
-  #data.hidden= objToStr({wordGroupInfo: data.wordGroupInfo, fid: data.fid, useGroup: data.useGroup, reviewPlan: data.reviewPlan, roles: data.roles, grades: data.grades, roleGradeReview: data.roleGradeReview})
+  #data.hidden= objToStr({wordGroupInfo: data.wordGroupInfo, fid: data.fid, keywordReviewPlanUseTo: data.keywordReviewPlanUseTo, useGroup: data.useGroup, reviewPlan: data.reviewPlan, roles: data.roles, grades: data.grades, roleGradeReview: data.roleGradeReview})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -71,6 +71,21 @@ block content
             span 敏感内容送审
           .panel-body
             div.form-horizontal
+              .form-group
+                label.col-sm-2.control-label 敏感词检测策略
+                .col-sm-10.m-t-05
+                  .form-group
+                    //- label
+                      input(type="checkbox" v-model="allContentShouldReview")
+                    label.col-sm-10.m-t-05
+                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="all")
+                      | 检测文章和回复
+                    label.col-sm-10.m-t-05
+                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="only_thread")
+                      | 只检测文章
+                    label.col-sm-10.m-t-05
+                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="only_reply")
+                      | 只检测回复
               .form-group
                 label.col-sm-2.control-label 使用敏感词组
                 .col-sm-10.m-t-05

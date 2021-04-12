@@ -216,16 +216,25 @@ schema.statics.autoPushToReview = async function(post) {
       return true;
     }
 
-    // 取出专业审核中的审核策略配置
+    
     const fid = post.mainForumsId[0];
     const forum = await ForumModel.findOne({ fid });
-    const reviewPlan = forum.reviewPlan;
+
+    // 取出专业审核中的敏感词检测策略
+    const keywordReviewPlanUseTo = forum.keywordReviewPlanUseTo;
 
     // 五、敏感词
-    if(await ReviewModel.includesKeyword({   content: post.t + post.c,    fid })) {
-      await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${MatchedKeyword.result.join("、")}`);
-      return true;
+    if(keywordReviewPlanUseTo === "only_thread" && post.type === "thread"
+      || keywordReviewPlanUseTo === "only_reply" && post.type === "post"
+      || keywordReviewPlanUseTo === "all") {
+      if(await ReviewModel.includesKeyword({   content: post.t + post.c,    fid })) {
+        await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${MatchedKeyword.result.join("、")}`);
+        return true;
+      }
     }
+
+    // 取出专业审核中的审核策略配置
+    const reviewPlan = forum.reviewPlan;
 
     // 六、专业审核是否设置了一律送审
     if(reviewPlan === "all_no_rule") {

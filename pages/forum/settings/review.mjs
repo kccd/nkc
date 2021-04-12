@@ -1,6 +1,7 @@
 const data = NKC.methods.getDataById('data');
 const fid = data.fid;
 const wordGroupInfo = data.wordGroupInfo;
+const keywordReviewPlanUseTo = data.keywordReviewPlanUseTo;
 const useGroup = data.useGroup;
 const reviewPlan = data.reviewPlan;
 const roleGradeReview = data.roleGradeReview;
@@ -11,6 +12,7 @@ const app = new Vue({
     grades: data.grades,
     keywordReview: {
       wordGroupInfo,
+      keywordReviewPlanUseTo,
       selectedGroup: useGroup || [],
     },
     reviewPlan,
@@ -28,6 +30,7 @@ const app = new Vue({
         roleGradeReview
       } = this;
       return nkcAPI(`/f/${fid}/settings/review`, "PUT", {
+        keywordReviewPlanUseTo: keywordReview.keywordReviewPlanUseTo,
         newUseWordGroup: keywordReview.selectedGroup,
         reviewPlan,
         roleGradeReview
