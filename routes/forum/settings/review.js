@@ -15,7 +15,7 @@ router
       len: group.keywords.length
     }));
     data.useGroup = forum.keywordReviewUseGroup;
-    data.allContentShouldReview = forum.allContentShouldReview;
+    data.reviewPlan = forum.reviewPlan;
     data.fid = forum.fid;
 		ctx.template = 'forum/settings/review.pug';
 		await next();
@@ -25,13 +25,13 @@ router
     const { forum } = data;
     const {
       newUseWordGroup,      // 里面是敏感词组组名组成的数组
-      allContentShouldReview,   // 是否本专业所有内容都需要送审
+      reviewPlan,   // 是否本专业所有内容都需要送审
       roleGradeReview,          // 按角色和等级之间关系送审
     } = body;
     if(newUseWordGroup instanceof Array) {
       await db.ForumModel.update({ fid: forum.fid }, {
         keywordReviewUseGroup: newUseWordGroup,
-        allContentShouldReview,
+        reviewPlan,
         roleGradeReview
       })
     }

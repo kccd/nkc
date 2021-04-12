@@ -64,9 +64,8 @@ schema.statics.newReview = async (type, post, user, reason) => {
 const pureWordRegExp = /([^\u4e00-\u9fa5a-zA-Z0-9])/gi;
 const MatchedKeyword = { result: [] };
 // 文章内容是否触发了敏感词送审条件
-schema.statics.includesKeyword = async (post) => {
-  const { t, c, mainForumsId } = post;
-  const targetFid = mainForumsId[0];
+schema.statics.includesKeyword = async ({content, fid}) => {
+  const targetFid = fid;
   // 拿到目标专业中对敏感词词组的设置
   const ForumModel = mongoose.model("forums");
   const { keywordReviewUseGroup } = await ForumModel.findOne({ fid: targetFid }, { keywordReviewUseGroup: 1 });   // id数组
@@ -79,7 +78,7 @@ schema.statics.includesKeyword = async (post) => {
   const wordGroup = keywordSetting.wordGroup;
   if(!wordGroup.length) return false;
   // 把待检测文本聚合起来并提取纯文字（无标点符号和空格）
-  const content = (t + c).replace(pureWordRegExp, "").toLowerCase();
+  let pure_content = content.replace(pureWordRegExp, "").toLowerCase();
   // 循环采用每一个设置的敏感词组做一遍检测
   for(const group of wordGroup) {
     const { id } = group;
@@ -91,7 +90,7 @@ schema.statics.includesKeyword = async (post) => {
     const { times: leastKeywordTimes, count: leastKeywordCount, logic: relationship } = group.conditions;
     // 开始检测
     const mint = new Mint(keywordList);
-    const contentFilterValue = await mint.filter(content, { replace: false });
+    const contentFilterValue = await mint.filter(pure_content, { replace: false });
     // 保存结果
     MatchedKeyword.result = [].slice.call(contentFilterValue.words);
     // 开始分析检测结果
@@ -217,36 +216,47 @@ schema.statics.autoPushToReview = async function(post) {
       return true;
     }
 
+    // 取出专业审核中的审核策略配置
+    const fid = post.mainForumsId[0];
+    const forum = await ForumModel.findOne({ fid });
+    const reviewPlan = forum.reviewPlan;
+
     // 五、敏感词
-    if(await ReviewModel.includesKeyword(post)) {
+    if(await ReviewModel.includesKeyword({   content: post.t + post.c,    fid })) {
       await ReviewModel.newReview("includesKeyword", post, user, `内容中包含敏感词 ${MatchedKeyword.result.join("、")}`);
       return true;
     }
 
-    // 六、专业内设置是否送审
-    const fid = post.mainForumsId[0];
-    const forum = await ForumModel.findOne({ fid });
-    if(forum.allContentShouldReview) {
-      await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置所有内容送审`);
+    // 六、专业审核是否设置了一律送审
+    if(reviewPlan === "all_no_rule") {
+      await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置所有内容送审(忽略送审规则)`);
       return true;
     }
-    const roleGradeReview = forum.roleGradeReview;
-    if(!roleGradeReview) return false;
-    await user.extendRoles();
-    await user.extendGrade();
-    const userCerts = user.roles.map(role => role._id);
-    const userGrade = user.grade._id;
-    if(roleGradeReview.relationship === "and") {
-      if(includesArrayElement(userCerts, roleGradeReview.roles) && roleGradeReview.grades.includes(userGrade)) {
-        await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置内容送审，满足角色和等级关系而被送审`);
-        return true;
-      }
-    } else if(roleGradeReview.relationship === "or") {
-      if(includesArrayElement(userCerts, roleGradeReview.roles) || roleGradeReview.grades.includes(userGrade)) {
-        await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置内容送审，满足角色和等级关系而被送审`);
-        return true;
+
+    // 七、专业审核设置了送审规则（按角色和等级的关系送审）
+    if(reviewPlan === "only_thread" && post.type === "thread"
+      || reviewPlan === "only_reply" && post.type === "post"
+      || reviewPlan === "all") {
+      const roleGradeReview = forum.roleGradeReview;
+      if(!roleGradeReview) return false;
+      await user.extendRoles();
+      await user.extendGrade();
+      const userCerts = user.roles.map(role => role._id);
+      const userGrade = user.grade._id;
+      if(roleGradeReview.relationship === "and") {
+        if(includesArrayElement(userCerts, roleGradeReview.roles) && roleGradeReview.grades.includes(userGrade)) {
+          await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置内容送审，满足角色和等级关系而被送审`);
+          return true;
+        }
+      } else if(roleGradeReview.relationship === "or") {
+        if(includesArrayElement(userCerts, roleGradeReview.roles) || roleGradeReview.grades.includes(userGrade)) {
+          await ReviewModel.newReview("forumSettingReview", post, user, `此专业(fid:${fid}, name:${forum.displayName})设置内容送审，满足角色和等级关系而被送审`);
+          return true;
+        }
       }
     }
+
+
     return false
   })();
 

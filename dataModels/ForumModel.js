@@ -338,9 +338,16 @@ const forumSchema = new Schema({
     default: [],
   },
   // 是否本专业所有内容都需要送审
-  allContentShouldReview: {
-    type: Boolean,
-    default: false
+  // WARNNING: 这个字段改为了 reviewPlan(审核策略)
+  // allContentShouldReview: {
+  //   type: Boolean,
+  //   default: false
+  // },
+  // 审核方案
+  reviewPlan: {
+    type: String,
+    default: "all",
+    match: /^(all|all_no_rule|only_thread|only_reply)$/
   },
   // 按角色和等级之间的关系送审
   roleGradeReview: {

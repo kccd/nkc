@@ -2,7 +2,7 @@ const data = NKC.methods.getDataById('data');
 const fid = data.fid;
 const wordGroupInfo = data.wordGroupInfo;
 const useGroup = data.useGroup;
-const allContentShouldReview = data.allContentShouldReview;
+const reviewPlan = data.reviewPlan;
 const roleGradeReview = data.roleGradeReview;
 const app = new Vue({
   el: '#app',
@@ -13,7 +13,7 @@ const app = new Vue({
       wordGroupInfo,
       selectedGroup: useGroup || [],
     },
-    allContentShouldReview,
+    reviewPlan,
     roleGradeReview: {
       roles: roleGradeReview.roles || [],
       grades: roleGradeReview.grades || [],
@@ -24,12 +24,12 @@ const app = new Vue({
     submit() {
       const {
         keywordReview,
-        allContentShouldReview,
+        reviewPlan,
         roleGradeReview
       } = this;
       return nkcAPI(`/f/${fid}/settings/review`, "PUT", {
         newUseWordGroup: keywordReview.selectedGroup,
-        allContentShouldReview,
+        reviewPlan,
         roleGradeReview
       })
       .then(() => sweetAlert("保存成功"))
