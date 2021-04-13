@@ -35,7 +35,7 @@ categoryRouter
         delete f.countB;
         questionsCount += count;
         if(type === 'pub') {
-          const pubCount = await db.QuestionModel.count({
+          const pubCount = await db.QuestionModel.countDocuments({
             disabled: false,
             auth: true,
             public: true,
@@ -43,7 +43,7 @@ categoryRouter
           });
           if(count > pubCount) ctx.throw(400, '公共题库试题数目不足，请刷新');
         } else {
-          const questionCount = await db.QuestionModel.count({
+          const questionCount = await db.QuestionModel.countDocuments({
             disabled: false,
             auth: true,
             volume,
@@ -70,7 +70,7 @@ categoryRouter
       time,
       disabled
     };
-    await categoryDB.update(q);
+    await categoryDB.updateOne(q);
     await next();
   });
 module.exports = categoryRouter;

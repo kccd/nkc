@@ -33,7 +33,7 @@ router
     }
     data.column = column;
     if(user && user.uid === data.column.uid) {
-      data.contributeCount = await db.ColumnContributeModel.count({
+      data.contributeCount = await db.ColumnContributeModel.countDocuments({
         columnId: column._id,
         passed: null
       });
@@ -74,7 +74,7 @@ router
       data.toppedId = data.column.topped;
       sort[`order.cid_default`] = -1;
     }
-    const count = await db.ColumnPostModel.count(q);
+    const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
@@ -172,7 +172,7 @@ router
       }
       perpage = parseInt(perpage);
       if(isNaN(perpage) || perpage <= 0) perpage = 1;
-      await column.update({
+      await column.updateOne({
         name,
         color,
         perpage,
@@ -195,7 +195,7 @@ router
       await db.ColumnModel.toSearch(column._id);
     } else if(type === "color") {
       const {color} = body;
-      await column.update({
+      await column.updateOne({
         color
       });
     }

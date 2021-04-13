@@ -11,7 +11,7 @@ router
     } else {
       if(!post.anonymous) ctx.throw(400, "作者尚未匿名，请刷新");
     }
-    await post.update({anonymous: !!anonymous});
+    await post.updateOne({anonymous: !!anonymous});
     data.anonymous = !!anonymous;
     await next();
   });

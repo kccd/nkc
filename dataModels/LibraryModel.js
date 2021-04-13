@@ -137,7 +137,7 @@ schema.statics.newFolder = async (options = {}) => {
   const SettingModel = mongoose.model("settings");
   const type = "folder";
   await LibraryModel.checkLibraryInfo(type, options);
-  const userCount = await mongoose.model("users").count({uid});
+  const userCount = await mongoose.model("users").countDocuments({uid});
   if(!userCount) throwErr(500, `user not found. uid: ${uid}`);
   let pl;
   if(lid) {
@@ -182,7 +182,7 @@ schema.statics.newFile = async (options = {}) => {
     throwErr(500, `文件类型错误，category: ${category}`);
   }
   const {uid, size, ext, rid} = resource;
-  const userCount = await mongoose.model("users").count({uid});
+  const userCount = await mongoose.model("users").countDocuments({uid});
   if(!userCount) throwErr(500, `资源uid异常，rid: ${rid}, uid: ${uid}`);
   const pl = await LibraryModel.findOne({_id: lid});
   if(!pl) throwErr(500, `文件夹id异常，lid: ${lid}`);
@@ -234,7 +234,7 @@ schema.statics.checkLibraryInfo = async (type, options) => {
   if(_id) {
     q._id = {$ne: _id};
   }
-  const saveName = await LibraryModel.count(q);
+  const saveName = await LibraryModel.countDocuments(q);
   if(saveName !== 0) throwErr(400, `当前目录下${valueName}名已存在`);
 }
 
@@ -331,13 +331,13 @@ schema.methods.computeCount = async function() {
   nav.reverse();
   for(const n of nav) {
     const folders = await LibraryModel.find({lid: n._id, type: "folder", deleted: false}, {fileCount: 1, folderCount: 1});
-    let fileCount = await LibraryModel.count({lid: n._id, type: "file", deleted: false});
+    let fileCount = await LibraryModel.countDocuments({lid: n._id, type: "file", deleted: false});
     let folderCount = folders.length;
     folders.map(f => {
       folderCount += (f.folderCount || 0);
       fileCount += (f.fileCount || 0);
     });
-    await n.update({fileCount, folderCount});
+    await n.updateOne({fileCount, folderCount});
   }
 };
 
@@ -421,7 +421,7 @@ schema.statics.saveAllLibraryFileToElasticSearch = async () => {
     type: 'file',
     deleted: false,
   };
-  const count = await LibraryModel.count(match);
+  const count = await LibraryModel.countDocuments(match);
   const limit = 2000;
   for(let i = 0; i <= count; i+=limit) {
     const files = await LibraryModel.find(match, {_id: 1}).sort({toc: 1}).skip(i).limit(limit);

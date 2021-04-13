@@ -15,7 +15,7 @@ router
     let newCarts = [];
     for(const c of carts) {
       if(!c.productParam) {
-        await db.ShopCartModel.remove({_id: c._id});
+        await db.ShopCartModel.deleteOne({_id: c._id});
       }else{
         newCarts.push(c);
       }
@@ -61,7 +61,7 @@ router
       let cart = await db.ShopCartModel.findOne({productId, productParamId, uid: user.uid});
       // 若商品已存在则数量+1，若商品不存在则添加
       if(cart) {
-        await cart.update({$inc: {count: count}, toc: Date.now()});
+        await cart.updateOne({$inc: {count: count}, toc: Date.now()});
       } else {
         cart = db.ShopCartModel({
           _id: await db.SettingModel.operateSystemID('shopCarts', 1),

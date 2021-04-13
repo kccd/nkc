@@ -524,11 +524,11 @@ userSchema.methods.updateUserMessage = async function() {
 
   const {uid} = this;
 	// 发帖回帖统计
-  const threadCount = await ThreadModel.count({uid});
+  const threadCount = await ThreadModel.countDocuments({uid});
   // const threads = await ThreadModel.find({uid}, {oc: 1, _id: 0});
   // const threadsOc = threads.map(t => t.oc);
   // const threadCount = threads.length;
-  const disabledThreadsCount = await ThreadModel.count({
+  const disabledThreadsCount = await ThreadModel.countDocuments({
     uid, $or: [
       {
         disabled: true
@@ -538,12 +538,12 @@ userSchema.methods.updateUserMessage = async function() {
       }
     ]
   });
-  const digestThreadsCount = await ThreadModel.count({uid, digest: true});
-  const toppedThreadsCount = await ThreadModel.count({uid, topped: true});
-	const allDigestPostsCount = await PostModel.count({uid, digest: true});
+  const digestThreadsCount = await ThreadModel.countDocuments({uid, digest: true});
+  const toppedThreadsCount = await ThreadModel.countDocuments({uid, topped: true});
+	const allDigestPostsCount = await PostModel.countDocuments({uid, digest: true});
 	const digestPostsCount = allDigestPostsCount - digestThreadsCount;
-	const postCount = await PostModel.count({uid, type: "post"});
-	const disabledPostsCount = await PostModel.count({
+	const postCount = await PostModel.countDocuments({uid, type: "post"});
+	const disabledPostsCount = await PostModel.countDocuments({
     uid, type: "post", $or: [
       {
         disabled: true
@@ -553,21 +553,21 @@ userSchema.methods.updateUserMessage = async function() {
       }
     ]
 	});
-  // const postCount = await PostModel.count({pid: {$nin: threadsOc}, uid});
-  // const disabledPostsCount = await PostModel.count({pid: {$nin: threadsOc}, uid, disabled: true});
+  // const postCount = await PostModel.countDocuments({pid: {$nin: threadsOc}, uid});
+  // const disabledPostsCount = await PostModel.countDocuments({pid: {$nin: threadsOc}, uid, disabled: true});
 	// 日常登录统计
-  const dailyLoginCount = await UsersScoreLogModel.count({
+  const dailyLoginCount = await UsersScoreLogModel.countDocuments({
 	  uid,
 	  type: 'score',
 	  operationId: 'dailyLogin'
   });
 	// 被赞统计
-	/*const recommendCount = await UsersScoreLogModel.count({
+	/*const recommendCount = await UsersScoreLogModel.countDocuments({
 		targetUid: uid,
 		type: 'score',
 		operationId: 'recommendPost'
 	});
-	const unRecommendCount = await UsersScoreLogModel.count({
+	const unRecommendCount = await UsersScoreLogModel.countDocuments({
 		targetUid: uid,
 		type: 'score',
 		operationId: 'UNRecommendPost'
@@ -593,7 +593,7 @@ userSchema.methods.updateUserMessage = async function() {
 		recCount = results[0].recCount;
 	}
 	// 违规统计
-	const violationCount = await UsersScoreLogModel.count({
+	const violationCount = await UsersScoreLogModel.countDocuments({
 		uid,
 		type: 'score',
 		operationId: 'violation'
@@ -655,7 +655,7 @@ userSchema.methods.updateUserMessage = async function() {
     voteDownCount
 	};
 
-  await this.update(updateObj);
+  await this.updateOne(updateObj);
   for(const key in updateObj) {
   	if(!updateObj.hasOwnProperty(key)) continue;
   	this[key] = updateObj[key];
@@ -685,7 +685,7 @@ userSchema.methods.calculateScore = async function() {
 		scoreOfRecommend = coefficients.thumbsUp*Math.sqrt(recCount);
 	}
 	const score = scoreOfDailyLogin + scoreOfDigestThreadCount + scoreOfDigestPostCount + scoreOfPostToForum + scoreOfPostToThread + scoreOfXsf + scoreOfRecommend + scoreOfViolation;
-	await this.update({score});
+	await this.updateOne({score});
 };
 
 /*
@@ -779,23 +779,23 @@ userSchema.statics.createUser = async (option) => {
       await log.save();
     }
 	} catch (error) {
-		await UserModel.remove({uid});
-		await UsersPersonalModel.remove({uid});
-		await UsersGeneraModel.remove({uid});
-		await SystemInfoLogModel.remove({uid});
-		await SubscribeModel.remove({
+		await UserModel.deleteOne({uid});
+		await UsersPersonalModel.deleteOne({uid});
+		await UsersGeneraModel.deleteOne({uid});
+		await SystemInfoLogModel.deleteOne({uid});
+		await SubscribeModel.deleteMany({
       uid,
       type: "forum",
       fid: {$in: defaultSubscribeForumsId}
     });
-		await SubscribeTypeModel.remove({uid});
+		await SubscribeTypeModel.deleteMany({uid});
 		throwErr(500, `创建用户出错:${error.message || error}`);
 	}
 	return user;
 };
 
 userSchema.methods.extendDraftCount = async function() {
-  return this.draftCount = await mongoose.model("draft").count({uid: this.uid});
+  return this.draftCount = await mongoose.model("draft").countDocuments({uid: this.uid});
 };
 
 userSchema.methods.extendGrade = async function() {
@@ -831,8 +831,8 @@ userSchema.methods.getNewMessagesCount = async function() {
 	const FriendsApplicationModel = mongoose.model("friendsApplications");
 	const SystemInfoLogModel = mongoose.model('systemInfoLogs');
 	// 系统通知
-  const allSystemInfoCount = await MessageModel.count({ty: 'STE'});
-  const viewedSystemInfoCount = await SystemInfoLogModel.count({uid: this.uid});
+  const allSystemInfoCount = await MessageModel.countDocuments({ty: 'STE'});
+  const viewedSystemInfoCount = await SystemInfoLogModel.countDocuments({uid: this.uid});
   const newSystemInfoCount = allSystemInfoCount - viewedSystemInfoCount;
   // 可能会生成多条相同的阅读记录 以下判断用于消除重复的数据
   if(newSystemInfoCount < 0) {
@@ -856,19 +856,19 @@ userSchema.methods.getNewMessagesCount = async function() {
       const logs = await SystemInfoLogModel.find({mid: log._id, uid: this.uid});
       for(let i = 0; i < logs.length; i++) {
         if(i > 0) {
-          await logs[i].remove();
+          await logs[i].deleteOne();
         }
       }
     }
   }
 	// 系统提醒
-  const newReminderCount = await MessageModel.count({ty: 'STU', r: this.uid, vd: false});
-  const newApplicationsCount = await FriendsApplicationModel.count({
+  const newReminderCount = await MessageModel.countDocuments({ty: 'STU', r: this.uid, vd: false});
+  const newApplicationsCount = await FriendsApplicationModel.countDocuments({
     agree: "null",
     respondentId: this.uid
   });
 	// 用户信息
-  const newUsersMessagesCount = await MessageModel.count({ty: 'UTU', s: {$ne: this.uid}, r: this.uid, vd: false});
+  const newUsersMessagesCount = await MessageModel.countDocuments({ty: 'UTU', s: {$ne: this.uid}, r: this.uid, vd: false});
 	return {
 		newSystemInfoCount,
     newApplicationsCount,
@@ -1094,13 +1094,13 @@ userSchema.statics.updateUserKcb= async (uid) => {
   const income = toRecords.length? toRecords[0].total: 0;
   const total = income - expenses;
   if(uid === "bank") {
-    await SettingModel.update({_id: "kcb"}, {
+    await SettingModel.updateOne({_id: "kcb"}, {
       $set: {
         "c.totalMoney": total
       }
     });
   } else {
-    await UserModel.update({
+    await UserModel.updateOne({
       uid
     }, {
       $set: {
@@ -1133,28 +1133,28 @@ userSchema.methods.ensureSubLimit = async function(type) {
   } = subSettings.c;
   if(type === "user") {
     if(subUserCountLimit <= 0) throwErr(400, "关注用户功能已关闭");
-    const userCount = await SubscribeModel.count({
+    const userCount = await SubscribeModel.countDocuments({
       uid: this.uid,
       type: "user"
     });
     if(userCount >= subUserCountLimit) throwErr(400, "关注用户数量已达上限");
   } else if(type === "forum") {
     if(subForumCountLimit <= 0) throwErr(400, "关注专业已关闭");
-    const forumCount = await SubscribeModel.count({
+    const forumCount = await SubscribeModel.countDocuments({
       uid: this.uid,
       type: "forum"
     });
     if(forumCount >= subForumCountLimit) throwErr(400, "关注专业数量已达上限");
   } else if(type === "thread") {
     if (subThreadCountLimit <= 0) throwErr(400, "关注文章功能已关闭");
-    const threadCount = await SubscribeModel.count({
+    const threadCount = await SubscribeModel.countDocuments({
       uid: this.uid,
       type: "thread"
     });
     if (threadCount >= subThreadCountLimit) throwErr(400, "关注文章数量已达上限");
   } else if(type === "column") {
     if(subColumnCountLimit <= 0) throwErr(400, "关注专栏功能已关闭");
-    const columnCount = await SubscribeModel.count({
+    const columnCount = await SubscribeModel.countDocuments({
       uid: this.uid,
       type: "column"
     });
@@ -1410,13 +1410,13 @@ userSchema.statics.contentNeedReview = async (uid, type) => {
   // 三、黑名单（海外手机号、未通过A卷和用户等级）
   let passedCount = 0;
   if(type === "post") {
-    passedCount = await PostModel.count({
+    passedCount = await PostModel.countDocuments({
       disabled: false,
       reviewed: true,
       uid
     });
   } else {
-    passedCount = await ThreadModel.count({
+    passedCount = await ThreadModel.countDocuments({
       disabled: false,
       reviewed: true,
       mainForumsId: {$ne: recycleId},
@@ -1474,7 +1474,7 @@ userSchema.statics.publishingCheck = async (user) => {
   const {status, countLimit, unlimited} = notPass;
   const apiFunction = require('../nkcModules/apiFunction');
   const today = apiFunction.today();
-  const todayThreadCount = await ThreadModel.count({toc: {$gt: today}, uid: user.uid});
+  const todayThreadCount = await ThreadModel.countDocuments({toc: {$gt: today}, uid: user.uid});
   if(authLevelMin > user.authLevel) throwErr(403, `身份认证等级未达要求，发表文章至少需要完成身份认证 ${authLevelMin}`);
   // ab卷考试是否开启或通过
   if((!volumeB || !user.authLevel) && (!volumeA || !user.volumeA)) {
@@ -1507,14 +1507,14 @@ userSchema.statics.ensureApplyColumnPermission = async (uid) => {
   if(user.xsf < xsfCount) return false;
   if(!user.grade) await user.extendGrade();
   if(!userGrade.includes(user.grade._id)) return false;
-  const userThreadCount = await mongoose.model("threads").count({
+  const userThreadCount = await mongoose.model("threads").countDocuments({
     uid: user.uid,
     disabled: false,
     recycleMark: {$ne: true},
     reviewed: true
   });
   if(userThreadCount < threadCount) return false;
-  const count = await mongoose.model("threads").count({uid: user.uid, digest: true, disabled: false, recycleMark: {$ne: true}, reviewed: true});
+  const count = await mongoose.model("threads").countDocuments({uid: user.uid, digest: true, disabled: false, recycleMark: {$ne: true}, reviewed: true});
   return count >= digestCount;
 };
 /*
@@ -1534,7 +1534,7 @@ userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId, foru
   const {uid, status, defaultCertGradesId, rolesId} = postSettings[type].anonymous;
   if(!status) return false;
   if(forumsId) {
-    const forumCount = await ForumModel.count({fid: {$in: forumsId}, allowedAnonymousPost: true});
+    const forumCount = await ForumModel.countDocuments({fid: {$in: forumsId}, allowedAnonymousPost: true});
     if(forumCount === 0) return false;
   }
   const user = await UserModel.findOne({uid: userId});
@@ -1658,7 +1658,7 @@ userSchema.statics.ensurePostThreadPermission = async (uid) => {
   const {volumeA, volumeB, notPass} = exam;
   const {status, countLimit, unlimited} = notPass;
   const today = apiFunction.today();
-  const todayCount = await ThreadModel.count({toc: {$gt: today}, uid: user.uid});
+  const todayCount = await ThreadModel.countDocuments({toc: {$gt: today}, uid: user.uid});
   if(authLevelMin > user.authLevel) {
     if(authLevelMin === 1) throwErr(403, "你还未绑定手机号");
     if(authLevelMin === 2) throwErr(403, "你还未完成身份认证2");
@@ -1800,33 +1800,33 @@ userSchema.statics.checkStatusForDestroyAccount = async (uid) => {
   await UserModel.extendUserInfo(user);
   if(user.column) status.column = false;
   // 判断用户出售的商品是否均停售，订单是否都已完成
-  const productCount = await ShopGoodsModel.count({uid, productStatus: "insale"});
+  const productCount = await ShopGoodsModel.countDocuments({uid, productStatus: "insale"});
   if(productCount > 0) status.shopSeller = false;
-  const sellOrderCount = await ShopOrdersModel.count({
+  const sellOrderCount = await ShopOrdersModel.countDocuments({
     sellUid: uid,
     closeStatus: {$ne: true},
     orderStatus: {$ne: "finish"}
   });
   if(sellOrderCount > 0) status.shopSeller = false;
   // 判断用户购买的商品是否都已完成
-  const buyOrderCount = await ShopOrdersModel.count({
+  const buyOrderCount = await ShopOrdersModel.countDocuments({
     buyUid: uid,
     closeStatus: {$ne: true},
     orderStatus: {$ne: "finish"}
   });
   if(buyOrderCount > 0) status.shopBuyer = false;
   // 判断用户申请的基金是否都已完成
-  const fundApplicationCount = await FundApplicationFormModel.count({
+  const fundApplicationCount = await FundApplicationFormModel.countDocuments({
     uid,
     useless: null,
     disabled: false,
     "status.completed": null
   });
   if(fundApplicationCount > 0) status.fund = false;
-  const forumCount = await ForumModel.count({moderators: uid});
+  const forumCount = await ForumModel.countDocuments({moderators: uid});
   if(forumCount > 0) status.forum = false;
   // 判断用户发布的活动是否都已完成
-  const activityCount = await ActivityModel.count({
+  const activityCount = await ActivityModel.countDocuments({
     uid,
     activityType: {$ne: "close"},
     isBlock: {$ne: true},
@@ -1919,7 +1919,7 @@ userSchema.statics.destroyAccount = async (options) => {
     newBanner
   });
   await secret.save();
-  await user.update({
+  await user.updateOne({
     avatar: newAvatar,
     banner: newBanner,
     username: newUsername,
@@ -1928,7 +1928,7 @@ userSchema.statics.destroyAccount = async (options) => {
     postSign: newPostSign,
     destroyed: true
   });
-  await usersPersonal.update({
+  await usersPersonal.updateOne({
     mobile: newMobile,
     nationCode: newNationCode,
     email: newEmail,
@@ -1945,7 +1945,7 @@ userSchema.methods.setRedEnvelope = async function() {
   const PostModel = mongoose.model("posts");
   const SettingModel = mongoose.model("settings");
   const apiFn = require("../nkcModules/apiFunction");
-  const postCountToday = await PostModel.count({uid: this.uid, toc: {$gte: apiFn.today()}});
+  const postCountToday = await PostModel.countDocuments({uid: this.uid, toc: {$gte: apiFn.today()}});
   if(postCountToday !== 1) return;
 
   if(!this.generalSettings) {
@@ -1957,7 +1957,7 @@ userSchema.methods.setRedEnvelope = async function() {
   const {chance} = redEnvelopeSettings.random;
   const number = Math.ceil(Math.random()*100);
   if(number <= chance) {
-    await this.generalSettings.update({'lotterySettings.status': true});
+    await this.generalSettings.updateOne({'lotterySettings.status': true});
   }
 };
 
@@ -2115,7 +2115,7 @@ userSchema.statics.updateUserScores = async (uid) => {
 * */
 userSchema.statics.saveAllUserToElasticSearch = async () => {
   const UserModel = mongoose.model('users');
-  const count = await UserModel.count();
+  const count = await UserModel.countDocuments();
   const limit = 2000;
   for(let i = 0; i <= count; i+=limit) {
     const users = await UserModel.find().sort({toc: 1}).skip(i).limit(limit);
@@ -2170,11 +2170,11 @@ userSchema.statics.updateNumberOfOtherUserOperation = async (uid) => {
   const timeKey = getRedisKeys(`timeToSetOtherUserOperationNumber`);
   const numberKey = getRedisKeys(`numberOfOtherUserOperation`, uid);
   match.operationId = 'visitThread';
-  const numberOfRead = await UsersBehaviorModel.count(match);
+  const numberOfRead = await UsersBehaviorModel.countDocuments(match);
   match.opeartionId = 'post-vote-up';
-  const numberOfVoteUp = await UsersBehaviorModel.count(match);
+  const numberOfVoteUp = await UsersBehaviorModel.countDocuments(match);
   match.operationId = 'postToThread';
-  const numberOfPost = await UsersBehaviorModel.count(match);
+  const numberOfPost = await UsersBehaviorModel.countDocuments(match);
   await redisClient.setAsync(numberKey, JSON.stringify({
     read: numberOfRead,
     voteUp: numberOfVoteUp,
@@ -2414,7 +2414,7 @@ userSchema.statics.getPostPermission = async (uid, type) => {
         }
       } else {
         const today = require('../nkcModules/apiFunction').today();
-        const count = await PostModel.count({type, uid, toc: {$gte: today}});
+        const count = await PostModel.countDocuments({type, uid, toc: {$gte: today}});
         const contentName = `${type==='post'?'条': '篇'}${postType}`;
         result = {
           permit: count < countLimit,
@@ -2434,7 +2434,7 @@ userSchema.statics.allowAllMessage = async function(uid) {
   const UsersGeneralModel = mongoose.model('usersGeneral');
   const ShopGoodsModel = mongoose.model('shopGoods');
   // 确定是否有商品正在出售
-  const count = await ShopGoodsModel.count({uid, disabled: false, productStatus: 'insale'});
+  const count = await ShopGoodsModel.countDocuments({uid, disabled: false, productStatus: 'insale'});
   const onSale = count > 0;
   const targetUserGeneral = await UsersGeneralModel.findOnly({uid}, {messageSettings: 1});
   return targetUserGeneral.messageSettings.allowAllMessageWhenSale && onSale;

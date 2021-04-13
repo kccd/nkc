@@ -41,7 +41,7 @@ router
 		}
 		const digestTime = Date.now();
 		post.digest = true;
-		await post.update({digest: true, digestTime});
+		await post.updateOne({digest: true, digestTime});
 		const log = {
 			user: targetUser,
 			type: 'kcb',
@@ -55,7 +55,7 @@ router
     const messageId = await db.SettingModel.operateSystemID('messages', 1);
     ctx.state._scoreOperationForumsId = thread.mainForumsId;
 		if(thread.oc === pid) {
-			await thread.update({digest: true, digestTime});
+			await thread.updateOne({digest: true, digestTime});
 			// await db.UsersScoreLogModel.insertLog(log);
       if(!redEnvelopeSettings.c.draftFee.close) {
         const record = db.KcbsRecordModel({
@@ -130,7 +130,7 @@ router
       await nkcModules.elasticSearch.save("post", post);
 		}
 		if(!redEnvelopeSettings.c.draftFee.close) {
-      await usersGeneralSettings.update({$inc: {'draftFeeSettings.kcb': num}});
+      await usersGeneralSettings.updateOne({$inc: {'draftFeeSettings.kcb': num}});
     }
     await ctx.redis.pubMessage(message);
     data.targetUser.kcb = await db.UserModel.updateUserKcb(data.targetUser.uid);
@@ -167,7 +167,7 @@ router
 		  additionalReward = rewardLog.num;
     }
 		post.digest = false;
-		await post.update({digest: false});
+		await post.updateOne({digest: false});
 		const log = {
 			user: targetUser,
 			type: 'kcb',
@@ -179,7 +179,7 @@ router
 		};
 		ctx.state._scoreOperationForumsId = thread.mainForumsId;
 		if(thread.oc === pid) {
-			await thread.update({digest: false});
+			await thread.updateOne({digest: false});
 			// await db.UsersScoreLogModel.insertLog(log);
       await db.KcbsRecordModel.insertSystemRecord('unDigestThread', data.targetUser, ctx, additionalReward);
 			log.type = 'score';

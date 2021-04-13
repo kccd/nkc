@@ -542,7 +542,7 @@ usersPersonalSchema.statics.modifyUserPhoneNumber = async (props) => {
 		newNationCode: phoneNumber.nationCode,
 		newMobile: phoneNumber.number
 	}).save();
-	await userPersonal.update({
+	await userPersonal.updateOne({
 		mobile: phoneNumber.number,
 		nationCode: phoneNumber.nationCode
 	});

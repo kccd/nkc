@@ -133,7 +133,7 @@ schema.statics.collectionSticker = async (originSticker, uid) => {
     tUid: originSticker.tUid,
     rid: originSticker.rid
   });
-  await originSticker.update({$inc: {hits: 1}});
+  await originSticker.updateOne({$inc: {hits: 1}});
   await sticker.save();
   return sticker;
 };

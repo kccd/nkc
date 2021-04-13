@@ -104,7 +104,7 @@ reportRouter
 				if(!support) {
 					str = `第 ${i+1} 期拨款申请未通过审核\n${c}`;
 				}
-				await applicationForm.update({remittance, submittedReport: false});
+				await applicationForm.updateOne({remittance, submittedReport: false});
 				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newReport = db.FundDocumentModel({
 					_id: newId,

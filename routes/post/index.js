@@ -105,7 +105,7 @@ router
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
 			let nowTimeStamp = parseInt(new Date().getTime());
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
         await post.ensurePermission(options);
 			}
 			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
@@ -199,7 +199,7 @@ router
     /*// 文章页 获取评论 树状
     if(from === "nkcAPI") {
       q.parentPostId = pid;
-      const count = await db.PostModel.count(q);
+      const count = await db.PostModel.countDocuments(q);
       let paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
       if(paging.page >= paging.pageCount) {
         if(paging.pageCount > 0) paging.page = paging.pageCount - 1;
@@ -267,7 +267,7 @@ router
     } else {
       q.parentPostsId = pid;
       // 回复详情页 获取评论 平面
-      const count = await db.PostModel.count(q);
+      const count = await db.PostModel.countDocuments(q);
       const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
       let posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
       posts = await db.PostModel.extendPosts(posts, extendPostOptions);
@@ -463,17 +463,17 @@ router
     // 删除日志中modifyType改为true
     const delPostLog = await db.DelPostLogModel.find({"postId":pid,"modifyType":false});
     for(const log of delPostLog) {
-      await log.update({"modifyType":true});
+      await log.updateOne({"modifyType":true});
     }
     // 若post被退修则清除退修标记并标记为未审核
     const isThreadContent = targetThread.oc === targetPost.pid;
     if(isThreadContent) {
       if(targetThread.recycleMark) {
-        await targetThread.update({
+        await targetThread.updateOne({
           recycleMark:false,
           reviewed: false
         });
-        await targetPost.update({
+        await targetPost.updateOne({
           reviewed: false
         });
       }
@@ -482,7 +482,7 @@ router
     const singlePost = await db.PostModel.findOnly({pid});
     let postReviewed = singlePost.reviewed;
     if(singlePost.disabled && singlePost.toDraft) {
-      await singlePost.update({
+      await singlePost.updateOne({
         disabled: false,
         reviewed: false
       });
@@ -492,7 +492,7 @@ router
     // 如果符合送审条件，自动内容送审
     const needReview = await db.ReviewModel.autoPushToReview(singlePost);
     if(needReview) {
-      await singlePost.update({
+      await singlePost.updateOne({
         reviewed: false
       });
       if(isThreadContent) {

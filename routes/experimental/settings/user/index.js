@@ -35,7 +35,7 @@ userRouter
       const usersPersonal = await db.UsersPersonalModel.find({email: searchContent.trim().toLowerCase()}, {uid: 1});
       match.uid = {$in: usersPersonal.map(u => u.uid)};
     }
-    const count = await db.UserModel.count(match);
+    const count = await db.UserModel.countDocuments(match);
     paging = nkcModules.apiFunction.paging(page, count);
     users = await db.UserModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     await Promise.all(users.map(async user => {
@@ -165,8 +165,8 @@ userRouter
       userPersonalObj.password = newPassword.password;
       userPersonalObj.hashType = newPassword.hashType;
     }
-    await targetUser.update(userObj);
-    await targetUsersPersonal.update(userPersonalObj);
+    await targetUser.updateOne(userObj);
+    await targetUsersPersonal.updateOne(userPersonalObj);
     await next();
 	});
 module.exports = userRouter;

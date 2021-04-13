@@ -25,7 +25,7 @@ const problemsTypeSchema = new Schema({
 });
 problemsTypeSchema.methods.updateProblemsCount = async function() {
   const ProblemModel = mongoose.model('problems');
-  this.count = await ProblemModel.count({typeId: this._id});
+  this.count = await ProblemModel.countDocuments({typeId: this._id});
   await this.save();
 };
 const ProblemsTypeModel = mongoose.model('problemsTypes', problemsTypeSchema);
@@ -39,7 +39,7 @@ const defaultData = {
     let type = await ProblemsTypeModel.findOne({_id: defaultData._id});
     if(type) return;
     await mongoose.model('problems').updateMany({}, {$set: {typeId: 0}});
-    defaultData.count = await mongoose.model('problems').count();
+    defaultData.count = await mongoose.model('problems').countDocuments();
     type = ProblemsTypeModel(defaultData);
     await type.save();
   } catch(err) {

@@ -142,7 +142,7 @@ router
       await fs.unlink(path);
       q.hasImage = true;
     }
-    await questionDB.update(q);
+    await questionDB.updateOne(q);
     await next();
   })
   .get('/:_id/image', async (ctx, next) => {
@@ -161,7 +161,7 @@ router
     const question = await db.QuestionModel.findOnly({_id});
     if(question.uid !== user.uid && !ctx.permission('removeAllQuestion')) ctx.throw(403, '仅能删除自己的且未能通过审核的试题');
     if(question.auth !== false) ctx.throw(400, '只能删除未通过审核的试题');
-    await question.remove();
+    await question.deleteOne();
     await next();
   })
   .post('/:_id/disabled', async (ctx, next) => {
@@ -172,14 +172,14 @@ router
     if(!reason) ctx.throw(400, '原因不能为空');
     if(contentLength(reason) > 500) ctx.throw(400, '原因字数不能超过500');
     const question = await db.QuestionModel.findOnly({_id});
-    await question.update({disabled: true, reason});
+    await question.updateOne({disabled: true, reason});
     await next();
   })
   .del('/:_id/disabled', async (ctx, next) => {
     const {db, params} = ctx;
     const {_id} = params;
     const question = await db.QuestionModel.findOnly({_id});
-    await question.update({disabled: false});
+    await question.updateOne({disabled: false});
     await next();
   });
 module.exports = router;

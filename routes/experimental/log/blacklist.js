@@ -5,7 +5,7 @@ router
     const {page = 0, t} = query;
     data.t = t;
     if(!t) {
-      const count = await db.BlacklistModel.count();
+      const count = await db.BlacklistModel.countDocuments();
       const paging = nkcModules.apiFunction.paging(page, count);
       const bl = await db.BlacklistModel.find().sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       const usersId = [];

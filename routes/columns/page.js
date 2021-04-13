@@ -5,7 +5,7 @@ router
     const {data, db, body} = ctx;
     const {column, user} = data;
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
-    const pageCount = await db.ColumnPageModel.count({columnId: column._id});
+    const pageCount = await db.ColumnPageModel.countDocuments({columnId: column._id});
     const columnSettings = await db.SettingModel.getSettings("column");
     if(pageCount >= columnSettings.pageCount) ctx.throw(400, `最多允许创建${columnSettings.pageCount}个自定义页面`);
     const {title, content} = body;
@@ -40,7 +40,7 @@ router
     } else if(type === "hide") {
       let {hidden} = body;
       hidden = !!hidden;
-      await page.update({
+      await page.updateOne({
         hidden
       });
     } else if(type === "toNav") {
@@ -53,7 +53,7 @@ router
         }
       }
       if(!added) {
-        await column.update({
+        await column.updateOne({
           $addToSet: {
             links: {
               name: page.t || "新建导航",
@@ -73,7 +73,7 @@ router
     if(column.uid !== user.uid) ctx.throw(403, "权限不足");
     const page = await db.ColumnPageModel.findOne({columnId: column._id, _id: pageId});
     if(!page) ctx.throw(400, `未找到ID为${pageId}的自定义页面`);
-    await page.remove();
+    await page.deleteOne();
     await next();
   })
   .get("/:pageId", async (ctx, next) => {

@@ -15,7 +15,7 @@ followerRouter
 		  type: "forum",
       fid: forum.fid
     };
-		const count = await db.SubscribeModel.count(q);
+		const count = await db.SubscribeModel.countDocuments(q);
 		const paging = apiFunction.paging(page, count, pageSettings.forumUserList);
 		data.paging = paging;
 		const sub = await db.SubscribeModel.find(q, {uid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

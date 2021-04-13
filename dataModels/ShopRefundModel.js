@@ -319,7 +319,7 @@ schema.methods.returnMoney = async function () {
     // 退单一商品
 
     // 将订单的状态改为正常 并从订单总金额中减去退掉的商品的总价
-    await ShopOrdersModel.update({orderId: orderId}, {
+    await ShopOrdersModel.updateOne({orderId: orderId}, {
       $set: {
         refundStatus: ""
       },
@@ -329,7 +329,7 @@ schema.methods.returnMoney = async function () {
       }
     });
     // 将单一商品的状态改为退款成功
-    await ShopCostRecordModel.update({costId: param.costId}, {
+    await ShopCostRecordModel.updateOne({costId: param.costId}, {
       $set: {
         refundStatus: "success",
         refundMoney: money
@@ -339,7 +339,7 @@ schema.methods.returnMoney = async function () {
     // 退全部
 
     // 将订单的状态改为关闭
-    await ShopOrdersModel.update({orderId: orderId}, {
+    await ShopOrdersModel.updateOne({orderId: orderId}, {
       $set: {
         refundStatus: "success",
         closeStatus: true,
@@ -403,7 +403,7 @@ schema.methods.ensureRefundPermission = async function(reason, operations) {
 schema.methods.platformAgreeRM = async function() {
   const ShopRefundModel = mongoose.model("shopRefunds");
   const {time} = await this.ensureRefundPermission("", "P_APPLY_RM");
-  await ShopRefundModel.update({_id: this._id}, {
+  await ShopRefundModel.updateOne({_id: this._id}, {
     $set: {
       tlm: time,
       status: "P_AGREE_RM"
@@ -445,7 +445,7 @@ schema.methods.sellerAgreeRM = async function(reason) {
     "B_INPUT_INFO",
     "B_INPUT_CERT_RM"
   ]);
-  await ShopRefundModel.update({_id: this._id}, {
+  await ShopRefundModel.updateOne({_id: this._id}, {
     $set: {
       tlm: time,
       status: "S_AGREE_RM"
@@ -469,7 +469,7 @@ schema.methods.sellerAgreeRM = async function(reason) {
   const costRecord = await ShopCostRecordModel.findOne({orderId: this.orderId});
   const productParam = await ShopProductsParamModel.findOne({_id: costRecord.productParamId});
   let newPlus = productParam.stocksSurplus + costRecord.count;
-  await productParam.update({$set: {stocksSurplus: newPlus}})
+  await productParam.updateOne({$set: {stocksSurplus: newPlus}})
 };
 
 /**
@@ -485,7 +485,7 @@ schema.methods.sellerDisagreeRM = async function(reason) {
     "B_APPLY_RM",
     "B_INPUT_INFO"
   ]);
-  await ShopRefundModel.update({_id: this._id}, {
+  await ShopRefundModel.updateOne({_id: this._id}, {
     $set: {
       tlm: time,
       status: "S_DISAGREE_RM",
@@ -502,7 +502,7 @@ schema.methods.sellerDisagreeRM = async function(reason) {
 
   await this.refundFail();
 
-  await ShopOrdersModel.update({orderId: order.orderId}, {
+  await ShopOrdersModel.updateOne({orderId: order.orderId}, {
     $set: {
       applyToPlatform: true
     }
@@ -541,7 +541,7 @@ schema.methods.sellerAgreeRP = async function(reason, sellerInfo) {
   const {time} = await this.ensureRefundPermission(reason, [
     "B_APPLY_RP"
   ]);
-  await ShopRefundModel.update({_id: this._id}, {
+  await ShopRefundModel.updateOne({_id: this._id}, {
     $set: {
       sellerInfo,
       tlm: time,
@@ -571,7 +571,7 @@ schema.methods.platformDisagreeRM = async function(reason) {
   if(!reason) throwErr(400, "拒绝理由不能为空");
   const ShopRefundModel = mongoose.model("shopRefunds");
   const {time, order} = await this.ensureRefundPermission(reason, "P_APPLY_RM");
-  await ShopRefundModel.update({_id: this._id}, {
+  await ShopRefundModel.updateOne({_id: this._id}, {
     $set: {
       tlm: time,
       status: "P_DISAGREE_RM",
@@ -611,7 +611,7 @@ schema.methods.sellerDisagreeRP = async function(reason) {
   const ShopRefundModel = mongoose.model("shopRefunds");
 
   const {time} = await this.ensureRefundPermission(reason, "B_APPLY_RP");
-  await ShopRefundModel.update({_id: this._id}, {
+  await ShopRefundModel.updateOne({_id: this._id}, {
     $set: {
       tlm: time,
       status: "S_DISAGREE_RP",
@@ -652,7 +652,7 @@ schema.methods.buyerGiveUp = async function(reason) {
     "P_AGREE_RP",
     "B_INPUT_CERT_RM"
   ]);
-  await ShopRefundModel.update({_id: this._id}, {
+  await ShopRefundModel.updateOne({_id: this._id}, {
     $set: {
       status: "B_GU",
       tlm: time,
@@ -684,7 +684,7 @@ schema.methods.insertTrackNumber = async function(number) {
     "P_AGREE_RP"
   ]);
   const ShopRefundModel = mongoose.model("shopRefunds");
-  await ShopRefundModel.update({_id: this._id}, {
+  await ShopRefundModel.updateOne({_id: this._id}, {
     $set: {
       status: "B_INPUT_INFO",
       tlm: time,
@@ -719,7 +719,7 @@ schema.methods.refundFail = async function() {
   if(paramId) {
     const param = await ShopCostRecordModel.findOne({costId: paramId});
     if(!param) throwErr(404, `订单${orderId}上未发现规格ID为${paramId}的商品`);
-    await order.update({
+    await order.updateOne({
       $set: {
         refundStatus: ""
       },
@@ -727,13 +727,13 @@ schema.methods.refundFail = async function() {
         autoReceiveTime: Date.now() - this.toc
       }
     });
-    await param.update({
+    await param.updateOne({
       $set: {
         refundStatus: ""
       }
     });
   } else {
-    await order.update({
+    await order.updateOne({
       $set: {
         refundStatus: "fail"
       },

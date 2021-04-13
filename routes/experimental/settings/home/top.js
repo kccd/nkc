@@ -27,7 +27,7 @@ router
 		const {ads, operation} = body;
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		if(operation === 'modifyOrder') {
-			await homeSettings.update({'c.ads': ads});
+			await homeSettings.updateOne({'c.ads': ads});
 		}
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();

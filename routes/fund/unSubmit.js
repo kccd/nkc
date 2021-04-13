@@ -7,7 +7,7 @@ router
 		const q = {
 			'status.submitted': {$ne: true}
 		};
-		const count = await db.FundApplicationFormModel.count(q);
+		const count = await db.FundApplicationFormModel.countDocuments(q);
 		const paging = nkcModules.apiFunction.paging(page, count);
 		const applicationForm = await db.FundApplicationFormModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 		await Promise.all(applicationForm.map(async a => {

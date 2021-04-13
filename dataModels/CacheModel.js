@@ -82,7 +82,7 @@ schema.methods.clear = async function() {
   for(const key of _keys) {
     await redisClient.delAsync(key);
   }
-  await this.remove();
+  await this.deleteOne();
 };
 
 /*

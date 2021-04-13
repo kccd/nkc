@@ -79,7 +79,7 @@ router
     // 用户删除
     const {data} = ctx;
     const {noteContent} = data;
-    await noteContent.update({deleted: true});
+    await noteContent.updateOne({deleted: true});
     await next();
   })
   .post("/", async (ctx, next) => {

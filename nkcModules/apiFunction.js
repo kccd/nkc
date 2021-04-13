@@ -513,7 +513,7 @@ fn.getTrackInfo = async (trackNumber, trackName) => {
     let nowToc = Date.now()-2*60*60*1000;
     if(nowToc > Number(cacheData.toc)){
       let newObjInfo = await fn.getTrackInfoData(trackNumber, trackName);
-      await cacheData.update({toc:Date.now(), c:JSON.stringify(newObjInfo)})
+      await cacheData.updateOne({toc:Date.now(), c:JSON.stringify(newObjInfo)})
     }
     objInfo = JSON.parse(cacheData.c)
   }
@@ -780,10 +780,10 @@ fn.extendManagementInfo = async (ctx) => {
   // 管理操作
   const {data, db} = ctx;
   if(ctx.permission("complaintGet")) {
-    data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});
+    data.unResolvedComplaintCount = await db.ComplaintModel.countDocuments({resolved: false});
   }
   if(ctx.permission("visitProblemList")) {
-    data.unResolvedProblemCount = await db.ProblemModel.count({resolved: false});
+    data.unResolvedProblemCount = await db.ProblemModel.countDocuments({resolved: false});
   }
   if(ctx.permission("review")) {
     const recycleId = await db.SettingModel.getRecycleId();

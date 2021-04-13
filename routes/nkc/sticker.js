@@ -21,7 +21,7 @@ router
     } else if(t === "disabled") {
       q.disabled = true;
     }
-    const count = await db.StickerModel.count(q);
+    const count = await db.StickerModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, 100);
     let stickers = await db.StickerModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.stickers = [];
@@ -51,7 +51,7 @@ router
           reviewed: null
         });
         if(!sticker) continue;
-        await sticker.update({
+        await sticker.updateOne({
           shared: !!s.status,
           reviewed: !!s.status,
           reason: s.reason
@@ -71,7 +71,7 @@ router
           _id: s._id
         });
         if(!sticker) continue;
-        await sticker.update({
+        await sticker.updateOne({
           disabled: !!disabled
         });
       }

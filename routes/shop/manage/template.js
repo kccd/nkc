@@ -23,7 +23,7 @@ templateRouter
     const {user} = data;
     const {templates} = body;
     const dealInfo = await db.ShopDealInfoModel.findOne({uid: user.uid});
-    await dealInfo.update({$set:{templates}})
+    await dealInfo.updateOne({$set:{templates}})
     await next();
   })
 module.exports = templateRouter;

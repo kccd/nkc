@@ -16,7 +16,7 @@ router
     if(close) {
       q['lotterySettings.status'] = false;
     }
-    await user.generalSettings.update(q);
+    await user.generalSettings.updateOne(q);
     await next();
   });
 module.exports = router;

@@ -5,14 +5,14 @@ router
 		const {db, params} = ctx;
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
-		await thread.update({closed: true});
+		await thread.updateOne({closed: true});
 		await next();
 	})
 	.del('/', async (ctx, next) => {
 		const {db, params} = ctx;
 		const {tid} = params;
 		const thread = await db.ThreadModel.findOnly({tid});
-		await thread.update({closed: false});
+		await thread.updateOne({closed: false});
 		await next();
 	});
 module.exports = router;

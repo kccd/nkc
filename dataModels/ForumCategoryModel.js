@@ -65,7 +65,7 @@ schema.statics.saveCategoryToRedis = async () => {
       mutuallyExclusiveWithSelf,
       excludedCategoriesId,
     } = fc;
-    const count = await ForumModel.count({categoryId: _id});
+    const count = await ForumModel.countDocuments({categoryId: _id});
     _forumCategories.push({
       _id,
       name,

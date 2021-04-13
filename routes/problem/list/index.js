@@ -8,7 +8,7 @@ listRouter
 		if(c === 'unsolved') {
 			match.resolved = false;
 		}
-		const count = await db.ProblemModel.count(match);
+		const count = await db.ProblemModel.countDocuments(match);
 		const paging = nkcModules.apiFunction.paging(page, count, 100);
 		const problems = await db.ProblemModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 		data.problems = await Promise.all(problems.map(async p => {
@@ -26,7 +26,7 @@ listRouter
     const {cid = 0, page = 0} = query;
     const typeId = Number(cid);
     data.problemsType = await db.ProblemsTypeModel.findOnly({_id: typeId});
-    const count = await db.ProblemModel.count({typeId});
+    const count = await db.ProblemModel.countDocuments({typeId});
     const paging = nkcModules.apiFunction.paging(page, count, 100);
     data.problemsTypes = await db.ProblemsTypeModel.find({}).sort({order: 1});
     for(const type of data.problemsTypes) {
@@ -58,7 +58,7 @@ listRouter
 		} else if(type === 'resolved') {
 			q.resolved = true;
 		}
-		const count = await db.ProblemModel.count(q);
+		const count = await db.ProblemModel.countDocuments(q);
 		const {apiFunction} = ctx.nkcModules;
 		const paging = apiFunction.paging(page, count);
 		data.paging = paging;
@@ -69,8 +69,8 @@ listRouter
 			return p;
 		}));
 		ctx.template = 'problem/problem_list.pug';
-		data.resolvedCount = await db.ProblemModel.count({resolved: true});
-		data.unsolvedCount = await db.ProblemModel.count({resolved: {$ne: true}});
+		data.resolvedCount = await db.ProblemModel.countDocuments({resolved: true});
+		data.unsolvedCount = await db.ProblemModel.countDocuments({resolved: {$ne: true}});
 		await next();
 	})*/
 	.get('/:_id', async (ctx, next) => {
@@ -80,7 +80,7 @@ listRouter
 		data.problem.restorer = await db.UserModel.findOne({uid: data.problem.restorerId});;
 		await data.problem.extendUser();
 		await data.problem.extendRestorer();
-		await data.problem.update({viewed: true});
+		await data.problem.updateOne({viewed: true});
 		data.problem.viewed = true;
 		data.problemsTypes = await db.ProblemsTypeModel.find();
 		ctx.template = 'problem/problem.pug';
@@ -107,7 +107,7 @@ listRouter
 			body.restorerId = '';
 		}
 		body.resolved = problem.resolved ? problem.resolved : body.resolved
-		await problem.update(body);
+		await problem.updateOne(body);
 		// 更新数据库后 发送消息给问题提出者
 		if (resolved && !problem.resolved && problem.uid && reminded) {
 			const message = db.MessageModel({
@@ -128,7 +128,7 @@ listRouter
 		const {params, db} = ctx;
 		const {_id} = params;
 		const problem = await db.ProblemModel.findOnly({_id});
-		await problem.remove();
+		await problem.deleteOne();
 		await next();
 	});
 module.exports = listRouter;

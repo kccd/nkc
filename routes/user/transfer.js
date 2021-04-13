@@ -25,12 +25,12 @@ router
 
     if(!order) ctx.throw(403, "对方未购买过你出售的商品，无法转账");
 
-    const transferCount = await db.KcbsRecordModel.count({
+    const transferCount = await db.KcbsRecordModel.countDocuments({
       from: user.uid,
       type: "transferToUser",
       toc: {$gte: today}
     });
-    const transferToUserCount = await db.KcbsRecordModel.count({
+    const transferToUserCount = await db.KcbsRecordModel.countDocuments({
       from: user.uid,
       type: "transferToUser",
       toc: {$gte: today},

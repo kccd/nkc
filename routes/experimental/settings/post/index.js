@@ -61,7 +61,7 @@ router
       }
       await db.SettingModel.updateOne({_id: 'post'}, {$set: q});
       await Promise.all(roles.map(async role => {
-        await db.RoleModel.update({_id: role._id}, {
+        await db.RoleModel.updateOne({_id: role._id}, {
           $set: {
             postToForum: role.postToForum,
             postToThread: role.postToThread,
@@ -69,7 +69,7 @@ router
         })
       }));
       await Promise.all(grades.map(async grade => {
-        await db.UsersGradeModel.update({_id: grade._id}, {
+        await db.UsersGradeModel.updateOne({_id: grade._id}, {
           $set: {
             postToForum: grade.postToForum,
             postToThread: grade.postToThread,

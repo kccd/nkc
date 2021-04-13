@@ -24,7 +24,7 @@ roleRouter
           certs: role._id
         };
       }
-      role.userCount = await db.UserModel.count(q);
+      role.userCount = await db.UserModel.countDocuments(q);
       return role;
     }));
     ctx.template = 'experimental/settings/role/roles.pug';

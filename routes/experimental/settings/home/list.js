@@ -25,7 +25,7 @@ router
     if(recommend.voteUpTotal < 0) ctx.throw(400, "推荐条件中的点赞总数不能小于0");
     if(recommend.voteUpMax < 0) ctx.throw(400, "推荐条件中的独立点赞数不能小于0");
     if(recommend.encourageTotal < 0) ctx.throw(400, "推荐条件中的鼓励总数不能小于0");
-    await db.SettingModel.update({_id: 'home'}, {
+    await db.SettingModel.updateOne({_id: 'home'}, {
       $set: {
         'c.list.topic': !!topic,
         'c.list.discipline': !!discipline,

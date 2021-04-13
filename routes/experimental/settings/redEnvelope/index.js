@@ -41,7 +41,7 @@ redEnvelopeRouter
       if(s.kcb <= 0) ctx.throw(400, '分享奖励数额不能小于1');
       if(s.kcb > s.maxKcb) ctx.throw(400, '分享奖励数额不能大于奖励上限');
     }
-    await db.SettingModel.update({_id: 'redEnvelope'}, {$set: {'c.random': random, 'c.draftFee': draftFee, 'c.share': share}});
+    await db.SettingModel.updateOne({_id: 'redEnvelope'}, {$set: {'c.random': random, 'c.draftFee': draftFee, 'c.share': share}});
     await db.SettingModel.saveSettingsToRedis("redEnvelope");
     await next();
   });

@@ -98,7 +98,7 @@ remittanceRouter
 							c: errorInfo,
 							support: false
 						});
-						await applicationForm.update({remittance});
+						await applicationForm.updateOne({remittance});
 						await newDocument.save();
             await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
 						return await next();
@@ -127,7 +127,7 @@ remittanceRouter
 			obj['status.remittance'] = true;
 			obj.submittedReport = false;
 		}
-		await applicationForm.update(obj);
+		await applicationForm.updateOne(obj);
     await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
 
     await next();
@@ -161,7 +161,7 @@ remittanceRouter
 					money: applicationForm.money,
 					status: null
 				}];
-				await applicationForm.update({remittance});
+				await applicationForm.updateOne({remittance});
 			}
 			if(remittance[0].status) ctx.throw(400, '拨款已成功，请勿重复提交。');
 			if(account.paymentType !== 'alipay') ctx.throw(400, '系统审核只支持支付宝账号。');
@@ -215,7 +215,7 @@ remittanceRouter
 				});
 				await newBill.save();
 				remittance[0].status = true;
-				await applicationForm.update({'status.remittance': true, remittance});
+				await applicationForm.updateOne({'status.remittance': true, remittance});
 				const newId = await db.SettingModel.operateSystemID('fundDocuments', 1);
 				const newReport = db.FundDocumentModel({
 					_id: newId,
@@ -243,7 +243,7 @@ remittanceRouter
 					c: description,
 					support: false
 				});
-				await applicationForm.update(updateObj);
+				await applicationForm.updateOne(updateObj);
 				await newDocument.save();
 			}
       await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
@@ -308,7 +308,7 @@ remittanceRouter
 							r.passed = null;
 							r.apply = true;
 						}
-						await applicationForm.update({remittance, submittedReport: i !== 0})
+						await applicationForm.updateOne({remittance, submittedReport: i !== 0})
 					}
 					break;
 				}
@@ -351,7 +351,7 @@ remittanceRouter
 			c: `第 ${number + 1} 期申请人确认收款`
 		});
 		await newReport.save();
-		await applicationForm.update({remittance});
+		await applicationForm.updateOne({remittance});
 		await next();
 	});
 module.exports = remittanceRouter;

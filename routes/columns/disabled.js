@@ -36,7 +36,7 @@ router
         obj.otherLinksDisabled = disabled;
       }
     }
-    await column.update(obj);
+    await column.updateOne(obj);
     if(disabled) {
       const message = db.MessageModel({
         _id: await db.SettingModel.operateSystemID("messages", 1),
@@ -54,7 +54,7 @@ router
       await message.save();
       await ctx.redis.pubMessage(message);
     } else {
-      await column.update({contacted: false});
+      await column.updateOne({contacted: false});
     }
     await next();
   });

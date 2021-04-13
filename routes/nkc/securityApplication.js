@@ -9,7 +9,7 @@ router
     const match = {
       status: t
     };
-    const count = await db.SecurityApplicationModel.count(match);
+    const count = await db.SecurityApplicationModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
     const applications = await db.SecurityApplicationModel
       .find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -99,7 +99,7 @@ router
       messageType = 'securityApplicationRejected';
     }
     // 更新申请表的状态
-    await application.update({
+    await application.updateOne({
       mUid: state.uid,
       status,
       reason,

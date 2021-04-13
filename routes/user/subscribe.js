@@ -110,7 +110,7 @@ subscribeRouter
     });
     if(!sub) ctx.throw(400, '您之前没有关注过该用户，操作无效');
     const cid = sub.cid;
-    await sub.remove();
+    await sub.deleteOne();
     await db.SubscribeModel.saveUserSubUsersId(user.uid);
     await db.SubscribeTypeModel.updateCount(cid);
     ctx.data.targetUser = await db.UserModel.findOnly({uid});

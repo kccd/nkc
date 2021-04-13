@@ -17,7 +17,7 @@ router
     } else if(t === "uid") {
       q.delUserId = c;
     }
-    const count = await db.DelPostLogModel.count(q);
+    const count = await db.DelPostLogModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const delLogs = await db.DelPostLogModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.logs = [];

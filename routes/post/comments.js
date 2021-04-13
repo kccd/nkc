@@ -51,7 +51,7 @@ router
       q.disabled = false;
       q.toDraft = null;
     }
-    const count = await db.PostModel.count(q);
+    const count = await db.PostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
     let parentPosts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
     const parentPostsId = []

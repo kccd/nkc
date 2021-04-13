@@ -55,7 +55,7 @@ operationTypeSchema.pre('save', function(next) {
 
 operationTypeSchema.methods.extendOperationCount = async function() {
 	const OperationModel = mongoose.model('operations');
-	const count = await OperationModel.count({typeId: this._id});
+	const count = await OperationModel.countDocuments({typeId: this._id});
 	return this.operationCount = count;
 };
 

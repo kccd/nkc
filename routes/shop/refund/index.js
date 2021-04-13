@@ -125,7 +125,7 @@ router
         });
       }
       if(param) {
-        await db.ShopCostRecordModel.update({costId: param.costId}, {
+        await db.ShopCostRecordModel.updateMany({costId: param.costId}, {
           $set: {
             refundStatus: "ing"
           }
@@ -137,7 +137,7 @@ router
           }
         });
       }
-      await db.ShopOrdersModel.update({
+      await db.ShopOrdersModel.updateMany({
         orderId: order.orderId
       }, {
         $set: {

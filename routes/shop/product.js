@@ -72,7 +72,7 @@ productRouter
 		const {productId} = body;
 		const product = await db.ShopGoodsModel.findOne({productId: productId});
 		if(product) {
-			await product.update({$set: {adminBan:true}});
+			await product.updateOne({$set: {adminBan:true}});
 		}
 		await next();
   })

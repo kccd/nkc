@@ -17,7 +17,7 @@ router
         disabled: false,
         deleted: false
       };
-      const count = await db.StickerModel.count(q);
+      const count = await db.StickerModel.countDocuments(q);
       let limit, paging;
       if(perpage) {
         limit = Number(perpage);
@@ -63,7 +63,7 @@ router
         const sticker = await db.StickerModel.findOne({uid: data.user.uid, _id});
         if(!sticker) continue;
         const order = await db.StickerModel.getNewOrder(data.user.uid);
-        await sticker.update({order});
+        await sticker.updateOne({order});
       }
     } else if(type === "collection") {
       for(const _id of stickersId) {
@@ -76,7 +76,7 @@ router
         const sticker = await db.StickerModel.findOne({_id, from: "upload", tUid: data.user.uid, shared: false});
         if(!sticker) continue;
         // 更改审核状态，管理员后台可见
-        await sticker.update({
+        await sticker.updateOne({
           reviewed: null
         });
       }

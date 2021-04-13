@@ -115,13 +115,13 @@ modifyRouter
         //   });
         //   await targetChat.save();
         // }
-        // const total = await db.MessageModel.count({$or: [{s: user.uid, r: uid}, {r: user.uid, s: uid}]});
+        // const total = await db.MessageModel.countDocuments({$or: [{s: user.uid, r: uid}, {r: user.uid, s: uid}]});
 
-        // await targetChat.update({
+        // await targetChat.updateOne({
         //   tlm: message.tc,
         //   lmId: message._id,
         //   total,
-        //   unread: await db.MessageModel.count({s: user.uid, r: uid, vd: false})
+        //   unread: await db.MessageModel.countDocuments({s: user.uid, r: uid, vd: false})
         // });
         // const message_ = message.toObject();
         await ctx.redis.pubMessage(message);
@@ -185,13 +185,13 @@ modifyRouter
         });
         await targetChat.save();
       }
-      const total = await db.MessageModel.count({$or: [{s: user.uid, r: uid}, {r: user.uid, s: uid}]});
+      const total = await db.MessageModel.countDocuments({$or: [{s: user.uid, r: uid}, {r: user.uid, s: uid}]});
 
-      await targetChat.update({
+      await targetChat.updateOne({
         tlm: message.tc,
         lmId: message._id,
         total,
-        unread: await db.MessageModel.count({s: user.uid, r: uid, vd: false})
+        unread: await db.MessageModel.countDocuments({s: user.uid, r: uid, vd: false})
       });
       const message_ = message.toObject();
       await ctx.redis.pubMessage(message_);

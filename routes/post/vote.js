@@ -48,10 +48,10 @@ voteRouter
       await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
     } else {
       if(vote.type === 'up') {
-        await vote.remove();
+        await vote.deleteOne();
         await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
       } else {
-        await vote.update({tlm: Date.now(), type: 'up', num: weights});
+        await vote.updateOne({tlm: Date.now(), type: 'up', num: weights});
         await db.KcbsRecordModel.insertSystemRecord('liked', data.targetUser, ctx);
       }
     }
@@ -80,9 +80,9 @@ voteRouter
       await vote.save();
     } else {
       if(vote.type === 'down') {
-        await vote.remove();
+        await vote.deleteOne();
       } else {
-        await vote.update({tlm: Date.now(), type: 'down', num: weights});
+        await vote.updateOne({tlm: Date.now(), type: 'down', num: weights});
         await db.KcbsRecordModel.insertSystemRecord('unLiked', data.targetUser, ctx);
       }
     }

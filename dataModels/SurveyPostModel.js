@@ -87,7 +87,7 @@ schema.statics.rewardPost = async (options) => {
     port
   });
   await record.save();
-  await survey.update({
+  await survey.updateOne({
     $inc: {
       "reward.rewardedCount": 1
     }

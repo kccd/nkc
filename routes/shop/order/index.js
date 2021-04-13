@@ -25,7 +25,7 @@ router
     } else if(t === "close") {
       q.closeStatus = true;
     }
-    const count = await db.ShopOrdersModel.count(q);
+    const count = await db.ShopOrdersModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     let orders = await db.ShopOrdersModel.find(q).sort({orderToc: -1}).skip(paging.start).limit(paging.perpage);
     orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
@@ -53,7 +53,7 @@ router
     }else if(orderStatus == "close") {
       q.closeStatus = true;
     }
-    const count = await db.ShopOrdersModel.count(q);
+    const count = await db.ShopOrdersModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
     let sort = {orderToc: -1};
@@ -243,10 +243,10 @@ router
       await db.ShopProductsParamModel.productParamReduceStock(orders,'orderReduceStock');
       // 删除购物车记录
       for(const c of cartArr) {
-        await c.remove();
+        await c.deleteOne();
       }
       for(const cert of certArr) {
-        await cert.update({orderId: order.orderId});
+        await cert.updateOne({orderId: order.orderId});
       }
       // 通知卖家有新的订单
       const message = db.MessageModel({
@@ -348,7 +348,7 @@ router
         };
         let shopCost = db.ShopCostRecordModel(cartObj);
         if(paramCert[newCart.productParamId]) {
-          await db.ShopCertModel.update({_id: paramCert[newCart.productParamId]}, {
+          await db.ShopCertModel.updateOne({_id: paramCert[newCart.productParamId]}, {
             $set: {
               orderId,
               paramId: costId || ""
@@ -366,9 +366,9 @@ router
             count: newCart.count
           }
         }
-        await buyProduct.update({$set: {buyRecord: buyRecord}});
+        await buyProduct.updateOne({$set: {buyRecord: buyRecord}});
         // 下单完毕，将商品从购物车中清除
-        await db.ShopCartModel.remove({uid: user.uid, productParamId: newCart.productParamId});
+        await db.ShopCartModel.deleteMany({uid: user.uid, productParamId: newCart.productParamId});
         newCarts.push(cartObj);
         productPrice += cartObj.singlePrice * cartObj.count;
         let newMaxFreightPrice = newCart.product.freightPrice.firstFreightPrice + (newCart.product.freightPrice.addFreightPrice * (newCart.count-1))

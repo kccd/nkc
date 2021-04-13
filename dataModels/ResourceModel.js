@@ -276,7 +276,7 @@ resourceSchema.statics.checkUploadPermission = async (user, file) => {
 
   // 检查用户当前上传的文件总数是否达到极限
   const today = require("../nkcModules/apiFunction").today();
-  const uploadedCount = await ResourceModel.count({uid: user.uid, toc: {$gte: today}});
+  const uploadedCount = await ResourceModel.countDocuments({uid: user.uid, toc: {$gte: today}});
   const certList = [];
   certList.push(`grade-${user.grade._id}`);
   user.roles.map(role => {

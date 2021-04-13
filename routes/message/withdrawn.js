@@ -12,7 +12,7 @@ router
     if(message.ty !== 'UTU') ctx.throw(400, '仅支持私信撤回');
     if(message.withdrawn) ctx.throw(400, '该信息已被撤回');
     if(message.tc < (Date.now() - 60*1000)) ctx.throw(400, '仅支持撤回一分钟以内所发送的信息');
-    await message.update({withdrawn: true});
+    await message.updateOne({withdrawn: true});
     message.withdrawn = true;
     await redis.pubWithdrawn(message);
     await next();

@@ -49,7 +49,7 @@ protocolRouter
     const protocol = await db.ProtocolModel.findOne({protocolTypeId: id});
     // 富文本内容中每一个source添加引用
     await db.ResourceModel.toReferenceSource("protocol-" + protocolTypeId, protocolContent);
-    await protocol.update({$set: {
+    await protocol.updateOne({$set: {
       protocolName,
       protocolTypeId,
       protocolTypeName,
@@ -64,7 +64,7 @@ protocolRouter
     const {id} = body;
     const protocol = await db.ProtocolModel.findOne({protocolTypeId: id});
     if(!protocol) ctx.throw(400, "当前协议已被删除");
-    await protocol.remove();
+    await protocol.deleteOne();
     await next();
   })
   // 后台更新协议

@@ -47,7 +47,7 @@ router
       console.log(err);
       q.buyUid = "null";
     }
-    const count = await db.ShopOrdersModel.count(q);
+    const count = await db.ShopOrdersModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const orders = await db.ShopOrdersModel.find(q).sort({orderToc: -1}).skip(paging.start).limit(paging.perpage);
     data.orders = await db.ShopOrdersModel.storeExtendOrdersInfo(orders);

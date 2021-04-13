@@ -43,7 +43,7 @@ router
 			}
 			if(!homeSettings.c.logos.includes(id)) ctx.throw(400, '图片无效');
 		}
-		await homeSettings.update({c: q});
+		await homeSettings.updateOne({c: q});
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	})
@@ -53,7 +53,7 @@ router
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
 		if(homeSettings.c.logo === id || homeSettings.c.smallLogo === id) ctx.throw(400, '暂不能删除默认图片');
 		if(!homeSettings.c.logos.includes(id)) ctx.throw(400, '图片无效');
-		await homeSettings.update({$pull: {'c.logos': id}});
+		await homeSettings.updateOne({$pull: {'c.logos': id}});
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	});

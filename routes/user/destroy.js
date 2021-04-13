@@ -70,8 +70,8 @@ router
       });
     }
     if(type === "destroy") {
-      if(mobileCodeObj) await mobileCodeObj.update({used: true});
-      if(emailCodeObj) await mobileCodeObj.update({used: true});
+      if(mobileCodeObj) await mobileCodeObj.updateOne({used: true});
+      if(emailCodeObj) await mobileCodeObj.updateOne({used: true});
       await db.UserModel.destroyAccount({
         uid: user.uid,
         ip: ctx.address,

@@ -76,7 +76,7 @@ decorationRouter
 	  const targetFile = shopLogoPath + '/' + saveName;
     await fs.renameSync(path, targetFile);
     const storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
-    await storeDecoration.update({$set:{storeSignImage:true}});
+    await storeDecoration.updateOne({$set:{storeSignImage:true}});
 		await next(); 
   }) 
   .post('/service', async (ctx, next) => {
@@ -84,7 +84,7 @@ decorationRouter
     const storeId = params.account;
     const {serviceTimeWork, serviceTimeRest, serviceMobile, servicePhone} = body;
     const storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
-    await storeDecoration.update({$set:{serviceTimeWork, serviceTimeRest, serviceMobile, servicePhone}})
+    await storeDecoration.updateOne({$set:{serviceTimeWork, serviceTimeRest, serviceMobile, servicePhone}})
 		await next(); 
   })
   .post('/search', async (ctx, next) => {
@@ -92,7 +92,7 @@ decorationRouter
     const storeId = params.account;
     const {presetKey, recommendKeys} = body;
     const storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
-    await storeDecoration.update({$set:{presetKey, recommendKeys}});
+    await storeDecoration.updateOne({$set:{presetKey, recommendKeys}});
     await next();
   })
   // 获取全部商品
@@ -130,7 +130,7 @@ decorationRouter
     if(nullIndex > -1) {
       arr.splice(nullIndex, 1)
     }
-    await storeDecoration.update({$set:{storeLeftFeatureds: arr}})
+    await storeDecoration.updateOne({$set:{storeLeftFeatureds: arr}})
     await next();
   })
   .put('/addClass', async (ctx, next) => {
@@ -144,7 +144,7 @@ decorationRouter
       productsArr:[]
     }
     storeDecoration.storeClassFeatureds.push(newClassObj);
-    await storeDecoration.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
+    await storeDecoration.updateOne({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
     await next();
   })
   .get('/singleClass', async (ctx, next) => {
@@ -178,7 +178,7 @@ decorationRouter
     const storeId = params.account;
     let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
     storeDecoration.storeClassFeatureds[index].productsArr = arr;
-    await storeDecoration.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
+    await storeDecoration.updateOne({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
     await next();
   })
   .put('/delClass', async(ctx, next) => {
@@ -187,7 +187,7 @@ decorationRouter
     const {index} = body;
     let storeDecoration = await db.ShopDecorationsModel.findOne({storeId});
     storeDecoration.storeClassFeatureds.splice(index, 1);
-    await db.ShopDecorationsModel.update({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
+    await db.ShopDecorationsModel.updateOne({$set:{storeClassFeatureds:storeDecoration.storeClassFeatureds}});
     await next();
   })
 module.exports = decorationRouter;

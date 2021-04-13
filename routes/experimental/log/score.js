@@ -12,7 +12,7 @@ router
 		}
 		q.type = 'score';
 		data.type = 'score';
-		const count = await db.UsersScoreLogModel.count(q);
+		const count = await db.UsersScoreLogModel.countDocuments(q);
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
 		const logs = await db.UsersScoreLogModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

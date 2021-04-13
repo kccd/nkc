@@ -18,7 +18,7 @@ router
         q.uid = "null";
       }
     }
-    const count = await db.LibraryModel.count(q);
+    const count = await db.LibraryModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, 60);
     const libraries = await db.LibraryModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.libraries = [];

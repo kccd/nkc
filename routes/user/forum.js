@@ -27,7 +27,7 @@ router
     let {info, invites: founders} = body;
     const {newForumName, reason, youWantToDo} = info;
     for(const tUid of founders) {
-      const u = await db.UserModel.count({uid: tUid});
+      const u = await db.UserModel.countDocuments({uid: tUid});
       if(u === 0) ctx.throw(400, `uid错误 uid:${tUid}`);
     }
     if(founders.includes(uid)) ctx.throw(400, `无需邀请自己`);
@@ -37,7 +37,7 @@ router
       minLength: 1,
       maxLength: 20
     });
-    const sameForum = await db.ForumModel.count({displayName: newForumName});
+    const sameForum = await db.ForumModel.countDocuments({displayName: newForumName});
     if(sameForum) ctx.throw(400, '专业名已存在，请更换');
     checkString(reason, {
       name: '开办理由',
@@ -105,7 +105,7 @@ router
     for(let founder of founders) {
       if(founder.uid === state.uid) {
         founder.accept = res;
-        await db.PreparationForumModel.update({pfid}, {
+        await db.PreparationForumModel.updateOne({pfid}, {
           $set: { founders }
         });
         return next();

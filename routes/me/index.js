@@ -35,7 +35,7 @@ meRouter
     }
     queryMap.type = "resource";
     let newSkip = quota * skip;
-    let mediaCount = await db.ResourceModel.find(queryMap).count();
+    let mediaCount = await db.ResourceModel.find(queryMap).countDocuments();
     data.paging = nkcModules.apiFunction.paging(skip, mediaCount, quota);
     let maxSkip = Math.ceil(mediaCount / quota);
     if(maxSkip < 1) maxSkip = 1;

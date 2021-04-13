@@ -119,7 +119,7 @@ router
     const { db, body, data } = ctx;
     const { type, value } = body;
     if(type === "enable" && typeof value === "boolean") {
-      await db.SettingModel.update({ _id: "review" }, {
+      await db.SettingModel.updateOne({ _id: "review" }, {
         $set: {
           "c.keyword.enable": value
         }
@@ -152,7 +152,7 @@ router
         ctx.throw(403, "词组名称重复");
       }
       const newId = db.SettingModel.newObjectId().toString();
-      await db.SettingModel.update({ _id: "review" }, {
+      await db.SettingModel.updateOne({ _id: "review" }, {
         $addToSet: {
           "c.keyword.wordGroup": {
             id: newId,
@@ -165,7 +165,7 @@ router
       data.id = newId;
     } else if(type === "reviewCondition" && typeof value === "object") {
       const { id, conditions } = value;
-      await db.SettingModel.update(
+      await db.SettingModel.updateOne(
         { _id: "review", "c.keyword.wordGroup.id": id }, 
         {
           $set: {
@@ -188,7 +188,7 @@ router
         group.keywords.push(shouldAddKeyword);
         data.added = true;
       }
-      await db.SettingModel.update({ _id: "review" }, {
+      await db.SettingModel.updateOne({ _id: "review" }, {
         "c.keyword.wordGroup": wordGroups
       });
     } else if(type === "deleteKeywords") {
@@ -200,7 +200,7 @@ router
         ctx.throw(403, "不存在此词组");
       }
       group.keywords = group.keywords.filter(keyword => keyword !== shouldRemoveKeyword);
-      await db.SettingModel.update({ _id: "review" }, {
+      await db.SettingModel.updateOne({ _id: "review" }, {
         "c.keyword.wordGroup": wordGroups
       });
     } else if(type === "renameWordGroup") {
@@ -213,7 +213,7 @@ router
           break;
         }
       }
-      await db.SettingModel.update({ _id: "review" }, {
+      await db.SettingModel.updateOne({ _id: "review" }, {
         "c.keyword.wordGroup": wordGroups
       });
     } else if(type === "applyAllForums") {

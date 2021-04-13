@@ -40,7 +40,7 @@ router
     data.result = [];
     if(!noopReturn) {
       if(t !== "visitor" && logType === "user") {
-        const count = await db.LogModel.count(searchMap);
+        const count = await db.LogModel.countDocuments(searchMap);
         paging = nkcModules.apiFunction.paging(page, count, 60);
         const logs = await db.LogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
         data.result = await Promise.all(logs.map(async behavior => {
@@ -49,7 +49,7 @@ router
         }));
       } else {
         // 游客
-        const count = await db.VisitorLogModel.count(searchMap);
+        const count = await db.VisitorLogModel.countDocuments(searchMap);
         paging = nkcModules.apiFunction.paging(page, count, 60);
         data.result = await db.VisitorLogModel.find(searchMap).sort({reqTime:-1}).skip(paging.start).limit(paging.perpage);
       }
@@ -78,9 +78,9 @@ router
     }
 
     if(del.logType === "user") {
-      await db.LogModel.remove(delMap);
+      await db.LogModel.deleteMany(delMap);
     }else if(del.logType === "visitor") {
-      await db.VisitorLogModel.remove(delMap);
+      await db.VisitorLogModel.deleteMany(delMap);
     }
 
     await next();

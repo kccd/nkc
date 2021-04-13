@@ -119,7 +119,7 @@ router
     // 创建管理员账号
     console.log(`creating the admin account ...`);
     const user = await db.UserModel.createUser({});
-    await user.update({
+    await user.updateOne({
       certs: ['dev'],
       username,
       usernameLowerCase: username.toLowerCase(),
@@ -127,7 +127,7 @@ router
       volumeB: true,
     });
     const passwordObj = apiFunction.newPasswordObject(password);
-    await db.UsersPersonalModel.update({password: passwordObj.password, hashType: passwordObj.hashType});
+    await db.UsersPersonalModel.updateOne({password: passwordObj.password, hashType: passwordObj.hashType});
     console.log(`done`);
     const article = require('../defaultData/articles');
     const forum = await db.ForumModel.findOne({parentId: {$ne: ''}}).sort({toc: 1});

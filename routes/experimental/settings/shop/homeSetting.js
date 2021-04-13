@@ -47,7 +47,7 @@ homeSettingRouter
     let homeSetting = data.homeSetting;
     const featuredIndex = homeSetting.carousels.indexOf(obj);
     homeSetting.carousels.push(obj);
-    await homeSetting.update({carousels: homeSetting.carousels});
+    await homeSetting.updateOne({carousels: homeSetting.carousels});
     data.homeSetting = homeSetting;
     await next();
   })
@@ -56,7 +56,7 @@ homeSettingRouter
     const {index} = body;
     let homeSetting = data.homeSetting;
     homeSetting.carousels.splice(index, 1);
-    await homeSetting.update({carousels: homeSetting.carousels});
+    await homeSetting.updateOne({carousels: homeSetting.carousels});
     data.homeSetting = homeSetting;
     await next();
   })
@@ -89,7 +89,7 @@ homeSettingRouter
       const featuredIndex = homeSetting.featureds.indexOf(productId);
       if(featuredIndex < 0){
         homeSetting.featureds.push(productId);
-        await homeSetting.update({featureds: homeSetting.featureds});
+        await homeSetting.updateOne({featureds: homeSetting.featureds});
         data.homeSetting = homeSetting;
       }else {
         ctx.throw(400, "商品已在精选列表中")
@@ -99,7 +99,7 @@ homeSettingRouter
       const product = await db.ShopGoodsModel.findOne({productId});
       if(!productId) ctx.throw(400, "商品不存在");
       let homeSetting = data.homeSetting;
-      await homeSetting.update({$pull:{featureds:productId}})
+      await homeSetting.updateOne({$pull:{featureds:productId}})
     }
     await next();
   })
@@ -122,7 +122,7 @@ homeSettingRouter
       const recommendationIndex = homeSetting.recommendations.indexOf(storeId);
       if(recommendationIndex < 0){
         homeSetting.recommendations.push(storeId);
-        await homeSetting.update({recommendations: homeSetting.recommendations});
+        await homeSetting.updateOne({recommendations: homeSetting.recommendations});
         data.homeSetting = homeSetting;
       }else {
         ctx.throw(400, "店铺已在推荐列表中")
@@ -132,7 +132,7 @@ homeSettingRouter
       const store = await db.ShopStoresModel.findOne({storeId});
       if(!storeId) ctx.throw(400, "店铺不存在");
       let homeSetting = data.homeSetting;
-      await homeSetting.update({$pull:{recommendations:storeId}})
+      await homeSetting.updateOne({$pull:{recommendations:storeId}})
     }
     await next();
   })
@@ -155,7 +155,7 @@ homeSettingRouter
       const featuredIndex = homeSetting.populars.indexOf(productId);
       if(featuredIndex < 0){
         homeSetting.populars.push(productId);
-        await homeSetting.update({populars: homeSetting.populars});
+        await homeSetting.updateOne({populars: homeSetting.populars});
         data.homeSetting = homeSetting;
       }else {
         ctx.throw(400, "商品已在精选列表中")
@@ -165,7 +165,7 @@ homeSettingRouter
       const product = await db.ShopGoodsModel.findOne({productId});
       if(!productId) ctx.throw(400, "商品不存在");
       let homeSetting = data.homeSetting;
-      await homeSetting.update({$pull:{populars:productId}})
+      await homeSetting.updateOne({$pull:{populars:productId}})
     }
     await next();
   })

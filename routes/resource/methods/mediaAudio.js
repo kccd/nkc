@@ -35,7 +35,7 @@ module.exports = async (options) => {
   oname[oname.length - 1] = 'mp3';
   oname = oname.join('.');
   // 更新数据库记录 inProcess改为 usable
-  await resource.update({
+  await resource.updateOne({
     state: 'usable',
     oname,
     ext: 'mp3'

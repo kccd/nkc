@@ -17,7 +17,7 @@ certRouter
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
 		const {privacy} = userPersonal;
 		privacy.certPhoto = displayPhoto;
-		await userPersonal.update({privacy});
+		await userPersonal.updateOne({privacy});
 		await next();
 	});
 module.exports = certRouter;

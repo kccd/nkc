@@ -39,7 +39,7 @@ defaultData.init = async () => {
   }
 
   const forumCategories = require("./forumCategory");
-  const fcDB = await db.ForumCategoryModel.count();
+  const fcDB = await db.ForumCategoryModel.countDocuments();
   let firstForumCategoryId;
   if(fcDB === 0) {
     for(const f of forumCategories) {
@@ -89,12 +89,12 @@ defaultData.init = async () => {
   const operationsDB = await db.OperationModel.find();
   for(const operation of operationsDB) {
     if(!operationsId.includes(operation._id)) {
-      await operation.remove();
+      await operation.deleteOne();
       console.log(`removing operation '${operation._id}' from database`);
     }
   }
   const forums = require('./forums');
-  const forumsCount = await db.ForumModel.count();
+  const forumsCount = await db.ForumModel.countDocuments();
   if(forumsCount === 0) {
     for(const forum of forums) {
       forum.categoryId = firstForumCategoryId;
@@ -104,7 +104,7 @@ defaultData.init = async () => {
     }
   }
   const messageTypes = require('./messageTypes');
-  const messageTypesCount = await db.MessageTypeModel.count();
+  const messageTypesCount = await db.MessageTypeModel.countDocuments();
   if(messageTypesCount === 0) {
     const f = db.MessageTypeModel(messageTypes);
     await f.save();
@@ -130,7 +130,7 @@ defaultData.init = async () => {
   });
   // 把新增的模板插入数据库
   for(let newTemplate of waitInsert) {
-    await STU.update({
+    await STU.updateOne({
       $push: {
         templates: newTemplate
       }

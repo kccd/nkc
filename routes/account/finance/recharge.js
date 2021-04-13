@@ -180,7 +180,7 @@ router
         if(record.payment !== totalAmount) {
           updateObj.error = '系统账单金额与支付宝账单金额不相等';
         }
-        await record.update(updateObj);
+        await record.updateOne(updateObj);
         await db.UserModel.updateUserScores(record.to);
         // await db.UserModel.updateUserKcb(record.to);
       } else {
@@ -198,7 +198,7 @@ router
           const order = await db.ShopOrdersModel.findOne({orderId: id});
           if(!order) {
             updateObj.error = `支付宝回调信息中的订单ID(${id})不存在`;
-            await record.update(updateObj);
+            await record.updateOne(updateObj);
             return ctx.body = 'success';
           }
           orders.push(order);
@@ -207,7 +207,7 @@ router
         // 若订单价格总计不等于充值金额
         if(totalMoney !== record.num) {
           updateObj.error = '系统账单金额与支付宝账单金额不相等';
-          await record.update(updateObj);
+          await record.updateOne(updateObj);
           return ctx.body = 'success';
         }
         orders = await db.ShopOrdersModel.userExtendOrdersInfo(orders);
@@ -240,7 +240,7 @@ router
           });
         }
 
-        await record.update(updateObj);
+        await record.updateOne(updateObj);
         await db.ShopProductsParamModel.productParamReduceStock(orders,'payReduceStock');
         // await db.UserModel.updateUserKcb(record.from);
         await db.UserModel.updateUserScores(record.from);

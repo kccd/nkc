@@ -106,7 +106,7 @@ auditRouter
 				if(support) {
 					if(total*0.8 > suggest) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
 				}
-				await applicationForm.update({budgetMoney});
+				await applicationForm.updateOne({budgetMoney});
       }
 			
       for(const d of docArr) {
@@ -152,7 +152,7 @@ auditRouter
 						budgetMoney[i].fact = m;
 					}
 					if(total*0.8 > fact) ctx.throw(400, '建议的金额小于原金额的80%，只能选择不通过。');
-					await applicationForm.update({budgetMoney});
+					await applicationForm.updateOne({budgetMoney});
 				}
 			} else {
 				applicationForm.lock.submitted = false;

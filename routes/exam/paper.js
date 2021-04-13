@@ -19,16 +19,16 @@ paperRouter
     // 限制条件
     const examSettings = await db.SettingModel.findOnly({_id: 'exam'});
     const {count, countOneDay, waitingTime} = examSettings.c;
-    const paperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
+    const paperCount = await db.ExamsPaperModel.countDocuments({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
     if(paperCount >= countOneDay) ctx.throw(403, `一天之内只能参加${countOneDay}次考试，今日您的考试次数已用完，请明天再试。`);
     const now = Date.now();
     let {stageTime} = user.generalSettings.examSettings;
-    // const allPaperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: waitingTime*24*60*60*1000}});
-    const allPaperCount = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: stageTime}});
+    // const allPaperCount = await db.ExamsPaperModel.countDocuments({uid: user.uid, toc: {$gte: waitingTime*24*60*60*1000}});
+    const allPaperCount = await db.ExamsPaperModel.countDocuments({uid: user.uid, toc: {$gte: stageTime}});
     stageTime = new Date(stageTime).getTime();
     if(allPaperCount >= count) {
       if(now > stageTime + waitingTime*24*60*60*1000) {
-        await user.generalSettings.update({'examSettings.stageTime': now});
+        await user.generalSettings.updateOne({'examSettings.stageTime': now});
       } else {
         ctx.throw(403, `您观看考题数量过多或考试次数达到${count}次，需等待${waitingTime}天后才能再次参加考试，请于${new Date(stageTime + waitingTime*24*60*60*1000).toLocaleString()}之后再试。`);
       }
@@ -190,7 +190,7 @@ paperRouter
     };
     data.category = category;
     data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
-    data.countToday = await db.ExamsPaperModel.count({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
+    data.countToday = await db.ExamsPaperModel.countDocuments({uid: user.uid, toc: {$gte: nkcModules.apiFunction.today()}});
     ctx.template = 'exam/paper.pug';
     await next();
   })
@@ -249,12 +249,12 @@ paperRouter
       if(category.volume === 'B') {
         userObj.volumeA = true;
       }
-      await user.update(userObj);
+      await user.updateOne(userObj);
       for(const id of category.rolesId) {
-        if(id) await user.update({$addToSet: {certs: id}});
+        if(id) await user.updateOne({$addToSet: {certs: id}});
       }
     }
-    await paper.update(q);
+    await paper.updateOne(q);
     data.passed = q.passed;
     await next();
   });

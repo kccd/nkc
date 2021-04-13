@@ -126,7 +126,7 @@ billsRouter
 	.del('/:billId', async (ctx, next) => {
 		// if(ctx.data.userLevel < 7) ctx.throw(403,'权限不足');
 		const {bill} = ctx.data;
-		await bill.remove();
+		await bill.deleteOne();
 		await next();
 	})
 	.put('/:billId', async(ctx, next) => {
@@ -141,7 +141,7 @@ billsRouter
 		const {bill} = ctx.data;
 		bill.uid = user.uid;
 		bill.tlm = Date.now();
-		await bill.update(billObj);
+		await bill.updateOne(billObj);
 		await next();
 	});
 module.exports = billsRouter;

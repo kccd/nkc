@@ -142,7 +142,7 @@ module.exports = async (options) => {
   }
 
   // 更新数据库记录 inProcess改为 usable
-  await resource.update({
+  await resource.updateOne({
     state: 'usable',
     ext: 'mp4',
     height,

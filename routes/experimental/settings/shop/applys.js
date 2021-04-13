@@ -16,7 +16,7 @@ applysRouter
 		const apply = await db.ShopApplyStoreModel.findOne({_id:id});
 		if(!apply) ctx.throw(404, "找不到申请");
 		let nowStamp = new Date();
-		await apply.update({$set:{applyStatus: "approve", dealApplyToc:nowStamp, dealUid:user.uid}});
+		await apply.updateOne({$set:{applyStatus: "approve", dealApplyToc:nowStamp, dealUid:user.uid}});
 		const storeId = await db.SettingModel.operateSystemID('stores', 1);
 		const userPersonal = await db.UsersPersonalModel.findOne({uid:user.uid});
 		if(!userPersonal || !userPersonal.mobile) ctx.throw(400, "该用户尚未绑定手机号,请驳回开店申请");
@@ -38,7 +38,7 @@ applysRouter
 		const apply = await db.ShopApplyStoreModel.findOne({_id:id});
 		if(!apply) ctx.throw(404, "找不到申请");
 		let nowStamp = new Date();
-		await apply.update({$set:{applyStatus: "reject", dealApplyToc:nowStamp, dealUid:user.uid}});
+		await apply.updateOne({$set:{applyStatus: "reject", dealApplyToc:nowStamp, dealUid:user.uid}});
 		await next();
 	})
 module.exports = applysRouter;

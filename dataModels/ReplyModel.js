@@ -57,7 +57,7 @@ replySchema.methods.extendToPost = async function() {
 
 
 replySchema.methods.view = async function() {
-  return await this.update({viewed: true});
+  return await this.updateOne({viewed: true});
 };
 
 

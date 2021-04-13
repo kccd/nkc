@@ -179,7 +179,7 @@ module.exports = async (options) => {
   const pictureInfo = await imageMagick.info(normalPath);
   const newHeight = pictureInfo.height;
   const newWidth = pictureInfo.width;
-  await resource.update({
+  await resource.updateOne({
     width: newWidth,
     height: newHeight,
     originId,

@@ -79,7 +79,7 @@ waterRouter
         scoreType: scoreObject.type
       }).save();
       // 更新此用户的水印设置
-      await db.UsersGeneralModel.update({uid: user.uid}, {
+      await db.UsersGeneralModel.updateOne({uid: user.uid}, {
         $set: {
           'waterSetting.waterPayInfo': true,
           'waterSetting.waterPayTime': Date.now(),
@@ -90,7 +90,7 @@ waterRouter
     if(type === "save"){
       const userWaterSetting = await db.UsersGeneralModel.findOne({uid: user.uid});
       if(userWaterSetting){
-        await db.UsersGeneralModel.update({uid:user.uid},{$set: {'waterSetting.waterAdd':waterAdd,'waterSetting.waterGravity':waterGravity,'waterSetting.waterStyle':waterStyle,}})
+        await db.UsersGeneralModel.updateOne({uid:user.uid},{$set: {'waterSetting.waterAdd':waterAdd,'waterSetting.waterGravity':waterGravity,'waterSetting.waterStyle':waterStyle,}})
       }else{
         await new db.UsersGeneralModel({uid:user.uid}).save()
       }

@@ -21,7 +21,7 @@ friendsRouter
       tUid: uid,
       uid: user.uid
     });
-    if(blackList) await blackList.remove();
+    if(blackList) await blackList.deleteOne();
 
     if(description.length > 100) ctx.throw(400, '验证信息不能超过100个字');
     const friend = await db.FriendModel.findOne({uid: user.uid, tUid: uid});
