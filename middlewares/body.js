@@ -5,7 +5,9 @@ const utils = require('./utils');
 const {ThrottleGroup} = require("stream-throttle");
 const onFinished = require('on-finished');
 const destroy = require('destroy');
-
+const FILE = require('../nkcModules/file');
+const pictureExtensions = FILE.getExtensionByType('mediaPicture');
+const breakpointExtensions = FILE.getExtensionByType('breakpoint');
 let allSpeedLimit;
 
 module.exports = async (ctx, next) => {
@@ -33,8 +35,8 @@ module.exports = async (ctx, next) => {
     let ext = path.extname(ctx.filePath);
     ext = ext.replace('.', '');
     ext = ext.toLowerCase();
-    const extArr = ['jpg', 'png', 'jpeg', 'bmp', 'svg', 'gif'];
-    const rangeExt = ["pdf", "mp3", "mp4"];
+    const extArr = pictureExtensions;
+    const rangeExt = breakpointExtensions;
     let name;
     if(resource) {
       name = resource.oname;

@@ -12,10 +12,10 @@ const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
 
-const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
+const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
 const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
 const audioExtensions = ["wav", "amr", "mp3", "aac", 'flac'];
-
+const breakpointExtensions = ['mp4', 'mp3', 'pdf'];
 func.folders = {
   attachment: './attachment',
   resource: './resource',
@@ -111,6 +111,21 @@ func.getMediaTypeByExtension = (extension) => {
     return 'mediaAttachment'
   }
 };
+/*
+* 获取制定类型的文件格式
+* */
+func.getExtensionByType = (type) => {
+  if(type === 'mediaPicture') {
+    return pictureExtensions;
+  } else if(type === 'mediaVideo') {
+    return videoExtensions;
+  } else if(type === 'mediaAudio') {
+    return audioExtensions;
+  } else if(type === 'breakpoint') {
+    return breakpointExtensions;
+  }
+  return []
+}
 
 /**
  * 存储专栏头像2.0
