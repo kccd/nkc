@@ -19,6 +19,7 @@ const optionRouter = require('./option');
 const commentsRouter = require('./comments');
 const commentRouter = require('./comment');
 const router = new Router();
+const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 
 router
   .get('/:pid', async (ctx, next) => {
@@ -320,7 +321,7 @@ router
       survey, did, cover = ""
     } = post;
     const {pid} = ctx.params;
-    const {state, data, db} = ctx;
+    const {state, data, db, nkcModules} = ctx;
     const {user} = data;
     // const authLevel = await user.extendAuthLevel();
 	  // if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
@@ -328,20 +329,30 @@ router
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const _targetPost = targetPost.toObject();
-    if(targetPost.parentPostId && c.length > 2000) ctx.throw(400, "评论内容不能超过1000字节");
     const targetThread = await targetPost.extendThread();
+
     if(targetThread.oc === pid) {
-      ctx.nkcModules.checkData.checkString(t, {
-        name: "标题",
-        minLength: 6,
-        maxLength: 200
-      });
+      if(t.length < 3) ctx.throw(400, `标题不能少于3个字`);
+      if(t.length > 100) ctx.throw(400, `标题不能超过100个字`);
     }
-    ctx.nkcModules.checkData.checkString(c, {
+
+    const content = customCheerio.load(c).text();
+
+    if(content.length < 3) ctx.throw(400, `内容不能少于3个字`);
+    // 字数限制
+    if(targetPost.parentPostId) {
+      // 作为评论 不能超过200字
+      if(content.length > 200) ctx.throw(400, `内容不能超过200字`);
+    } else {
+      // 作为文章、回复 不能超过10万字
+      if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
+    }
+    nkcModules.checkData.checkString(c, {
       name: "内容",
-      minLength: 6,
-      maxLength: 100000
+      minLength: 1,
+      maxLength: 2000000
     });
+
     const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
     for(let targetForum of targetForums){
