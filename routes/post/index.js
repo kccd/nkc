@@ -322,9 +322,9 @@ router
     const {pid} = ctx.params;
     const {state, data, db} = ctx;
     const {user} = data;
-    const authLevel = await user.extendAuthLevel();
-	  if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
-	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
+    // const authLevel = await user.extendAuthLevel();
+	  // if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+	  // if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const _targetPost = targetPost.toObject();
