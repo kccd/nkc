@@ -7,7 +7,7 @@ const toppedRouter = require('./topped');
 const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
 const Path = require("path");
-
+const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 threadRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query, nkcModules} = ctx;
@@ -795,11 +795,22 @@ threadRouter
       ctx.throw(403, `当前回复不允许评论`);
     }
 		const {columnCategoriesId = [], anonymous = false, did} = post;
-		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		if(postType === "comment" && post.c.length > 2000) {
-      ctx.throw(400, "评论内容不能超过1000字符");
+    if(post.t && post.t.length > 100) ctx.throw(400, `标题不能超过100个字`);
+    const content = customCheerio.load(post.c).text();
+    if(content.length < 3) ctx.throw(400, `内容不能少于3个字`);
+    // 字数限制
+    if(postType === 'comment') {
+      // 作为评论 不能超过200字
+      if(content.length > 200) ctx.throw(400, `内容不能超过200字`);
+    } else {
+      // 作为回复 不能超过10万字
+      if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
     }
-
+    nkcModules.checkData.checkString(post.c, {
+      name: "内容",
+      minLength: 1,
+      maxLength: 2000000
+    });
 		// 判断前台有没有提交匿名标志，未提交则默认false
     if(anonymous && !await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid, thread.mainForumsId)) {
       ctx.throw(400, "你没有权限或文章所在专业不允许发表匿名内容");
