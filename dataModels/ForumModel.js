@@ -1027,7 +1027,11 @@ forumSchema.methods.ensurePermission = async function(roles, grade, user) {
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user);
   if(!fid.includes(this.fid)) {
-    throwError(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`, "noPermissionToReadForum");
+    if(this.permission.read.rolesId.includes('default')) {
+      throwError(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`, "noPermissionToReadForum");
+    } else {
+      throwError(403, `根据相关法律法规和政策，页面不予显示`, "simpleErrorPage");
+    }
   }
 };
 
