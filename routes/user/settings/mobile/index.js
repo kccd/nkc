@@ -45,9 +45,9 @@ mobileRouter
 		} catch(err) {
 			ctx.throw(400, `新手机${err.message}`);
 		}
-		await smsCodeOld.update({used: true});
-		await smsCode.update({used: true});
-		await userPersonal.update({nationCode, mobile, unverifiedMobile: ''});
+		await smsCodeOld.updateOne({used: true});
+		await smsCode.updateOne({used: true});
+		await userPersonal.updateOne({nationCode, mobile, unverifiedMobile: ''});
 		await db.SecretBehaviorModel({
 			type: "modifyMobile",
 			uid: user.uid,
@@ -75,10 +75,10 @@ mobileRouter
 			nationCode,
 			type: 'bindMobile'
 		});
-		await smsCode.update({used: true});
+		await smsCode.updateOne({used: true});
 		await db.SettingModel.checkMobile(nationCode, mobile, user.uid);
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: user.uid});
-		await userPersonal.update({nationCode, mobile, unverifiedMobile: ''});
+		await userPersonal.updateOne({nationCode, mobile, unverifiedMobile: ''});
 		await db.SecretBehaviorModel({
 			type: "bindMobile",
 			uid: user.uid,
@@ -115,9 +115,9 @@ mobileRouter
 			ip: ctx.address,
 			port: ctx.port
 		});
-		await smsCode.update({used: true});
+		await smsCode.updateOne({used: true});
 		await behavior.save();
-		await userPersonal.update({nationCode: "", mobile: ""});
+		await userPersonal.updateOne({nationCode: "", mobile: ""});
 		await next();
 	})
 	.use('/apply', applyRouter.routes(), applyRouter.allowedMethods())

@@ -35,7 +35,7 @@ emailRouter
     if(!reg.test(pass)) {
       obj["c.smtpConfig.auth.pass"] = pass;
     }
-    await emailSettingsDB.update({$set: obj});
+    await emailSettingsDB.updateOne({$set: obj});
     await db.SettingModel.saveSettingsToRedis("email");
     await next();
   })

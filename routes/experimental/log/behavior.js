@@ -25,7 +25,7 @@ router
     if(uid) {
       q.uid = uid;
     }
-    const count = await db.UsersBehaviorModel.count(q);
+    const count = await db.UsersBehaviorModel.countDocuments(q);
 		const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
     const logs = await db.UsersBehaviorModel.find(q).sort({timeStamp:-1}).skip(paging.start).limit(paging.perpage);

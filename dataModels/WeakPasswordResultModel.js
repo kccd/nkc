@@ -38,12 +38,12 @@ schema.statics.weakPasswordCheck = async function() {
     }
   }
   const WeakPasswordResultModel = mongoose.model("weakPasswordResult");
-  await WeakPasswordResultModel.remove({});
+  await WeakPasswordResultModel.deleteOne({});
   const {
     encryptInMD5WithSalt,
     encryptInSHA256HMACWithSalt,
   } = encryption;
-  const count = await UsersPersonalModel.count();
+  const count = await UsersPersonalModel.countDocuments();
   const chunkSize = 5000, everyCastTime = 6;
   const chunkCount = Math.ceil(count / chunkSize);
   for(let i = 0; i < chunkCount; i++) {

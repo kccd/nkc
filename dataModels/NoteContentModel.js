@@ -120,7 +120,7 @@ schema.methods.cloneAndUpdateContent = async function(content) {
   nc.deleted = true;
   const newNodeContent = NoteContentModel(nc);
   await newNodeContent.save();
-  await this.update({
+  await this.updateOne({
     content,
     tlm
   });

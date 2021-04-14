@@ -634,9 +634,9 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 			const {lifePhotosId} = u;
 			for(let _id of lifePhotosId) {
 				const photo = await PhotoModel.findOnly({_id});
-				if(photo.type === 'fund') await photo.remove();
+				if(photo.type === 'fund') await photo.deleteOne();
 			}
-			await u.update({removed: true});
+			await u.updateOne({removed: true});
 		}
 	} else {
 		if(!applicationMethod.team) throw '该基金不允许团队申请！';
@@ -693,7 +693,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
 					b.suggest = total;
 				}
 			}
-			await this.update({budgetMoney});
+			await this.updateOne({budgetMoney});
 		}
 	} else {
 		this.remittance = [];
@@ -757,7 +757,7 @@ fundApplicationFormSchema.methods.ensureInformation = async function() {
     await ThreadModel.updateOne({tid: formPost.tid}, {$set: {reviewed: true}});
     await PostModel.updateOne({pid: formPost.pid}, {$set: {reviewed: true}});
   } else {
-    await formThread.update({mainForumsId: fundForumsId});
+    await formThread.updateOne({mainForumsId: fundForumsId});
     const formPost = await PostModel.findOnly({pid: formThread.oc});
     formPost.c = project.c;
     formPost.t = project.t;

@@ -31,7 +31,7 @@ router
       const q = {
         usernameLowerCase: new RegExp(username.toLowerCase(), 'i')
       };
-      const count = await db.UserModel.count(q);
+      const count = await db.UserModel.countDocuments(q);
       const paging = nkcModules.apiFunction.paging(page, count);
       const u = await db.UserModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       users = users.concat(u);

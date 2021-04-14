@@ -24,7 +24,7 @@ router
     const {db, params} = ctx;
     const {_id} = params;
     const cart = await db.ShopCartModel.findById(_id);
-    await cart.remove();
+    await cart.deleteOne();
     await next();
   });
 module.exports = router;

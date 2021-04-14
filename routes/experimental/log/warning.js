@@ -5,7 +5,7 @@ router
     const {nkcModules, query, data, db} = ctx;
     const {page=0} = query;
     const q = {};
-    const count = await db.PostWarningModel.count(q);
+    const count = await db.PostWarningModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
     const logs = await db.PostWarningModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

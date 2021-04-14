@@ -322,18 +322,18 @@ fundSchema.methods.getConflictingByUser = async function(user) {
 	// 与自己冲突
 	if(self) {
 		q.fundId = this._id;
-		const selfCount = await FundApplicationFormModel.count(q);
+		const selfCount = await FundApplicationFormModel.countDocuments(q);
 		if(selfCount !== 0) return '您之前申请的该基金项目尚未完成，请完成后再申请。';
 	}
 	//与其他基金冲突
 	if(other) {
 		q['conflict.other'] = true;
-		const selfCount = await FundApplicationFormModel.count(q);
+		const selfCount = await FundApplicationFormModel.countDocuments(q);
 		if(selfCount !== 0) return '您之前申请的与该基金冲突的基金项目尚未完成 ，请完成后再申请。';
 	}
 	//年申请次数限制
 	const year = (new Date()).getFullYear();
-	const count = await FundApplicationFormModel.count({
+	const count = await FundApplicationFormModel.countDocuments({
 		uid: user.uid,
 		fundId: this._id,
 		year,

@@ -38,7 +38,7 @@ async function operateSystemID(type, op) {
       $set: {}
     };
     obj.$set[`c.${type}`] = 1;
-    await setting.update(obj);
+    await setting.updateOne(obj);
   } else {
     setting.c[type] += op;
   }
@@ -153,7 +153,7 @@ settingSchema.statics.checkMobile = async (nationCode, mobile, uid) => {
   const UsersPersonalModel = mongoose.model("usersPersonal");
   const SecretBehaviorModel = mongoose.model("secretBehaviors");
   const {mobileCountLimit} = regSettings;
-  const used = await UsersPersonalModel.count({nationCode, mobile});
+  const used = await UsersPersonalModel.countDocuments({nationCode, mobile});
   if(used) throwErr(403, "此号码已被其他账号绑定");
   const secretBehaviors = await SecretBehaviorModel.find({
     $or: [
@@ -182,7 +182,7 @@ settingSchema.statics.checkEmail = async (email, uid) => {
   const SecretBehaviorModel= mongoose.model("secretBehaviors");
   const SettingModel = mongoose.model("settings");
   const {emailCountLimit} = await SettingModel.getSettings("register");
-  const used = await UsersPersonalModel.count({email});
+  const used = await UsersPersonalModel.countDocuments({email});
   if(used) throwErr(403, "此邮箱已被其他账号绑定");
   const secretBehaviors = await SecretBehaviorModel.find({
     $or: [

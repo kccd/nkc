@@ -33,7 +33,7 @@ authRouter
 		if((targetUserAuthLevel+1) !== number) {
 			ctx.throw(400, '参数错误');
 		}
-		await targetUserPersonal.update({submittedAuth: false});
+		await targetUserPersonal.updateOne({submittedAuth: false});
 		await next();
 	})
 	.post('/2', async (ctx, next) => {
@@ -58,7 +58,7 @@ authRouter
 		if(idCardA.status === 'deleted' || idCardB.status === 'deleted') {
 			ctx.throw(400, '照片已被删除，请重新上传');
 		}
-		await targetUserPersonal.update({submittedAuth: true});
+		await targetUserPersonal.updateOne({submittedAuth: true});
 		await next();
 	})
 	.put('/2', async (ctx, next) => {
@@ -72,14 +72,14 @@ authRouter
 		if(passed) {
 			if(!time) ctx.throw(400, '过期时间不能为空');
 			const timeObj = new Date(time);
-			await idCardA.update({status: 'passed', expiryDate: timeObj});
-			await idCardB.update({status: 'passed', expiryDate: timeObj});
+			await idCardA.updateOne({status: 'passed', expiryDate: timeObj});
+			await idCardB.updateOne({status: 'passed', expiryDate: timeObj});
 		} else {
 			if(!reason) ctx.throw(400, '原因不能为空');
-			await idCardA.update({status: 'notPassed', description: reason});
-			await idCardB.update({status: 'notPassed', description: reason});
+			await idCardA.updateOne({status: 'notPassed', description: reason});
+			await idCardB.updateOne({status: 'notPassed', description: reason});
 		}
-		await targetUserPersonal.update({submittedAuth: false});
+		await targetUserPersonal.updateOne({submittedAuth: false});
 		await next();
 	})
 	.post('/3', async (ctx, next) => {
@@ -105,7 +105,7 @@ authRouter
 		if(handheldIdCard.status === 'deleted') {
 			ctx.throw(400, '照片已被删除，请重新上传');
 		}
-		await targetUserPersonal.update({submittedAuth: true});
+		await targetUserPersonal.updateOne({submittedAuth: true});
 		await next();
 	})
 	.put('/3', async (ctx, next) => {
@@ -119,12 +119,12 @@ authRouter
 		if(passed) {
 			if(!time) ctx.throw(400, '过期时间不能为空');
 			const timeObj = new Date(time);
-			await handheldIdCard.update({status: 'passed', expiryDate: timeObj});
+			await handheldIdCard.updateOne({status: 'passed', expiryDate: timeObj});
 		} else {
 			if(!reason) ctx.throw(400, '原因不能为空');
-			await handheldIdCard.update({status: 'notPassed', description: reason});
+			await handheldIdCard.updateOne({status: 'notPassed', description: reason});
 		}
-		await targetUserPersonal.update({submittedAuth: false});
+		await targetUserPersonal.updateOne({submittedAuth: false});
 		await next();
 	})
   .use("/:_id", async (ctx, next) => {

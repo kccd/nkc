@@ -14,7 +14,7 @@ router
         if(a.account === account.account) {
           if(a.default && alipayAccounts.length > 1) ctx.throw(400, "无法删除默认支付宝账号");
           alipayAccounts.splice(i, 1);
-          await db.UsersPersonalModel.update({uid: user.uid}, {
+          await db.UsersPersonalModel.updateOne({uid: user.uid}, {
             $set: {
               alipayAccounts
             }
@@ -36,7 +36,7 @@ router
         a.time = time;
       }
       if(!hasDefault && accounts.length) accounts[0].default = true;
-      await db.UsersPersonalModel.update({uid: user.uid}, {
+      await db.UsersPersonalModel.updateOne({uid: user.uid}, {
         $set: {
           alipayAccounts: accounts
         }

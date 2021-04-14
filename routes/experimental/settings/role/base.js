@@ -15,7 +15,7 @@ baseRouter
 		displayName = displayName.trim();
 		const sameDisplayNameRole = await db.RoleModel.findOne({displayName});
 		if(sameDisplayNameRole && sameDisplayNameRole._id !== role._id) ctx.throw(400, '角色名称已存在');
-		await role.update({displayName, abbr, color, description, modifyPostTimeLimit});
+		await role.updateOne({displayName, abbr, color, description, modifyPostTimeLimit});
 		await db.RoleModel.saveRolesToRedis();
 		await next();
 	});

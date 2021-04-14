@@ -13,7 +13,7 @@ applysRouter
       q.succeed = {$ne: null}
     }
     data.t = t;
-    const count = await db.ShopRefundModel.count(q);
+    const count = await db.ShopRefundModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const refunds = await db.ShopRefundModel.find(q).sort({toc:-1}).skip(paging.start).limit(paging.perpage);
     data.refunds = [];

@@ -32,7 +32,7 @@ router
 				}
 			}
 		}
-		await homeSettings.update({'c.noticeThreadsId': noticeThreadsId});
+		await homeSettings.updateOne({'c.noticeThreadsId': noticeThreadsId});
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	})
@@ -40,7 +40,7 @@ router
 		const {db, query} = ctx;
 		const {oc} = query;
 		const homeSettings = await db.SettingModel.findOnly({_id: 'home'});
-		await homeSettings.update({$pull: {'c.noticeThreadsId': oc}});
+		await homeSettings.updateOne({$pull: {'c.noticeThreadsId': oc}});
 		await db.SettingModel.saveSettingsToRedis("home");
 		await next();
 	});

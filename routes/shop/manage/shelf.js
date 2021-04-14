@@ -99,7 +99,7 @@ shelfRouter
     let resourcesId = imgIntroductions.filter(i => !!i);
     resourcesId = [...new Set(resourcesId)];
     if(!resourcesId.length) ctx.throw(400, "请至少选择一张商品图");
-    const resourceCount = await db.ResourceModel.count({rid: {$in: resourcesId}, mediaType: "mediaPicture", ext: {$in: ["jpg", "jpeg", "png"]}});
+    const resourceCount = await db.ResourceModel.countDocuments({rid: {$in: resourcesId}, mediaType: "mediaPicture", ext: {$in: ["jpg", "jpeg", "png"]}});
     if(resourcesId.length !== resourceCount) ctx.throw(400, "商品图错误，请重新选择");
     const imgMaster = resourcesId[0];
     // 验证商品规格
@@ -317,7 +317,7 @@ shelfRouter
       }
     } else {
       // 修改已上架的商品
-      await product.update({
+      await product.updateOne({
         purchaseLimitCount,
         imgIntroductions,
         imgMaster,

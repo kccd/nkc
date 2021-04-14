@@ -9,7 +9,7 @@ router
     const q = {
       uid: user.uid
     };
-    const count = await db.ColumnContributeModel.count(q);
+    const count = await db.ColumnContributeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
     const contributes = await db.ColumnContributeModel.find({uid: user.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

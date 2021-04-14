@@ -227,7 +227,7 @@ schema.statics.getTimeline = async (columnId) => {
   }
   const results = [];
   for(const t of time) {
-    const count = await ColumnPostModel.count({
+    const count = await ColumnPostModel.countDocuments({
       columnId,
       toc: {
         $gte: t.begin,
@@ -297,7 +297,7 @@ schema.statics.saveColumnToElasticSearch = async (column) => {
 * */
 schema.statics.saveAllColumnToElasticSearch = async () => {
   const ColumnModel = mongoose.model('columns');
-  const count = await ColumnModel.count();
+  const count = await ColumnModel.countDocuments();
   const limit = 2000;
   for(let i = 0; i <= count; i+=limit) {
     const columns = await ColumnModel.find().sort({toc: 1}).skip(i).limit(limit);

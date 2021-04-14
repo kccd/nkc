@@ -20,7 +20,7 @@ settingsRouter
 		const obj = {
 		  c: settingsObj
     };
-		await fundSettings.update({$set: obj});
+		await fundSettings.updateOne({$set: obj});
 		await db.SettingModel.saveSettingsToRedis("fund");
 		await next();
 	});

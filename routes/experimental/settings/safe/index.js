@@ -58,7 +58,7 @@ router
     const earliestDate = new Date(Date.now() - interval * 60 * 60 * 1000);
     let personal;
     if(!type || !content) {
-      const count = await db.UsersPersonalModel.count({
+      const count = await db.UsersPersonalModel.countDocuments({
         $or: [{
           lastVerifyPhoneNumberTime: { $exists: false }
         }, {
@@ -201,7 +201,7 @@ router
     ctx.template = "experimental/settings/safe/weakPasswordCheck/weakPasswordCheck.pug";
     const { data, db, nkcModules, query } = ctx;
     const { page = 0, type, content } = query;
-    const count = await db.WeakPasswordResultModel.count();
+    const count = await db.WeakPasswordResultModel.countDocuments();
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
     data.list = await db.WeakPasswordResultModel.aggregate([

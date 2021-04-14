@@ -58,7 +58,7 @@ router
       }
       let parentPostCount;
       if(data.post.parentPostId) {
-        parentPostCount = await db.PostModel.count({pid: data.post.parentPostId});
+        parentPostCount = await db.PostModel.countDocuments({pid: data.post.parentPostId});
       }
 
       data.thread = {
@@ -261,7 +261,7 @@ router
 
     // 判断用户是否已经将文章转发到专栏
     if(["modifyPost", "modifyThread", "newPost"].includes(data.type) && state.userColumn) {
-      data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: data.thread.tid})) > 0;
+      data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "thread", tid: data.thread.tid})) > 0;
     }
     if(["modifyThread", "newThread"].includes(data.type)) {
       // 判断用户是否有权限发起调查

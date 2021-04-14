@@ -91,7 +91,7 @@ jobs.shop = () => {
       try {
         await order.confirmReceipt();
       } catch(err) {
-        await order.update({
+        await order.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -114,7 +114,7 @@ jobs.shop = () => {
           `卖家处理超时，默认同意${refund.status === "B_APPLY_RM"? "退款": "退货退款"}申请`
         );
       } catch(err) {
-        await refund.update({
+        await refund.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -134,7 +134,7 @@ jobs.shop = () => {
           "卖家处理超时，默认卖家确认收货"
         );
       } catch(err) {
-        await refund.update({
+        await refund.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -154,7 +154,7 @@ jobs.shop = () => {
           "卖家处理超时，默认卖家同意退款"
         );
       } catch(err) {
-        await refund.update({
+        await refund.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -174,7 +174,7 @@ jobs.shop = () => {
           "买家发货超时，默认取消申请"
         );
       } catch(err) {
-        await refund.update({
+        await refund.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -195,7 +195,7 @@ jobs.shop = () => {
           "买家未在规定的时间内完成付款，订单已被取消"
         );
       } catch(err) {
-        order.update({
+        order.updateOne({
           error: err.message || JSON.stringify(err)
         })
       }
@@ -222,7 +222,7 @@ jobs.shop = () => {
       try {
         await product.onshelf();
       } catch(err) {
-        await product.update({
+        await product.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }

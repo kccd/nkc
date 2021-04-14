@@ -7,7 +7,7 @@ settingsRouter
     const {beep, onlyReceiveFromFriends, messageSettings, limit, allowAllMessageWhenSale} = body;
     const usersGeneral = await db.UsersGeneralModel.findOnly({uid: user.uid});
     if(messageSettings) {
-      await usersGeneral.update({
+      await usersGeneral.updateOne({
         messageSettings
       });
     } else {
@@ -20,7 +20,7 @@ settingsRouter
         !limit.volumeB &&
         Number(limit.gradeLimit) < 2
       ) ctx.throw(400, "请至少勾选一项防骚扰设置");
-      await usersGeneral.update({
+      await usersGeneral.updateOne({
         'messageSettings.beep': beep,
         'messageSettings.onlyReceiveFromFriends': onlyReceiveFromFriends,
         "messageSettings.limit": limit,

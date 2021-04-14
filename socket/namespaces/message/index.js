@@ -79,7 +79,7 @@ const message = async (i) => {
       console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgBlue} ${'/message'.bgBlue} ${'连接成功'.bgGreen}`);
       global.NKC.io.of('/console').NKC.socketMessage('/message', true, uid);
     });
-    await db.UserModel.update({uid}, {
+    await db.UserModel.updateOne({uid}, {
       $set: {
         online: true,
         onlineType
@@ -194,7 +194,7 @@ async function disconnect(io, socket) {
   console.log(`${moment().format('YYYY/MM/DD HH:mm:ss').grey} ${(' '+global.NKC.processId + ' ').grey} ${' SOCKET '.bgGreen} ${uid.bgCyan} ${'/message'.bgBlue} ${'断开连接'.bgRed}`);
   global.NKC.io.of('/console').NKC.socketMessage('/message', false, uid);
   if(clients.length !== 0) return;
-  await  db.UserModel.update({uid}, {
+  await  db.UserModel.updateOne({uid}, {
     $set: {
       online: false
     }

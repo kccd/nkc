@@ -40,7 +40,7 @@ baseRouter
 			const attachment = await AttachmentModel.saveSiteIcon(siteicon);
 			obj.c.siteIcon = attachment._id;
 		}
-		await serverSettings.update(obj);
+		await serverSettings.updateOne(obj);
 		await db.SettingModel.saveSettingsToRedis("server");
 		await next();
 	});

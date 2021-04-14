@@ -14,7 +14,7 @@ socialRouter
 		const {uid} = params;
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid});
 		const {accounts} = body;
-		await userPersonal.update({accounts});
+		await userPersonal.updateOne({accounts});
 		await next();
 	});
 module.exports = socialRouter;

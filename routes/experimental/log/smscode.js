@@ -26,7 +26,7 @@ router
     if(c.phonenumber) {
       searchMap.mobile = c.phonenumber;
     }
-    let count = await db.SmsCodeModel.count(searchMap);
+    let count = await db.SmsCodeModel.countDocuments(searchMap);
     let paging = nkcModules.apiFunction.paging(page, count, 40);
     data.result = await db.SmsCodeModel
       .find(searchMap)

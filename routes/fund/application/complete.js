@@ -65,7 +65,7 @@ completeRouter
 		});
 		if(!fixedMoney) {
 			if(actualMoney.length === 0) ctx.throw(400, '请输入实际使用金额。');
-			await applicationForm.update({actualMoney});
+			await applicationForm.updateOne({actualMoney});
 		}
 		applicationForm.threadsId.completed = selectedThreads.map(t => t.tid);
 		applicationForm.status.successful = successful;
@@ -112,9 +112,9 @@ completeRouter
 		});
 		await newDocument.save();
 		if(type === 'pass') {
-			await applicationForm.update({'status.completed': true, completedAudit: false, tlm: Date.now()});
+			await applicationForm.updateOne({'status.completed': true, completedAudit: false, tlm: Date.now()});
 		} else {
-			await applicationForm.update({'status.completed': false, completedAudit: false});
+			await applicationForm.updateOne({'status.completed': false, completedAudit: false});
 		}
     await db.MessageModel.sendFundMessage(applicationForm._id, "applicant");
 		await next();

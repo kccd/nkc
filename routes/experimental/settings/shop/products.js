@@ -9,7 +9,7 @@ productsRouter
 		let queryMap = {
 			type: "product"
 		}
-		const count = await db.ThreadModel.count(queryMap);
+		const count = await db.ThreadModel.countDocuments(queryMap);
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
 		if(productType && productType == "adminBan") {
@@ -32,7 +32,7 @@ productsRouter
 		const {productId} = body;
 		const product = await db.ShopGoodsModel.findOne({productId: productId});
 		if(product) {
-			await product.update({$set: {adminBan:true}});
+			await product.updateOne({$set: {adminBan:true}});
 		}
 		await next();
 	})
@@ -41,7 +41,7 @@ productsRouter
 		const {productId} = body;
 		const product = await db.ShopGoodsModel.findOne({productId: productId});
 		if(product) {
-			await product.update({$set: {adminBan: false}})
+			await product.updateOne({$set: {adminBan: false}})
 		}
 	})
 module.exports = productsRouter;

@@ -79,7 +79,7 @@ module.exports = async (ctx, next) => {
       user.setPassword = userPersonal.password.salt && userPersonal.password.hash;
       user.boundMobile = userPersonal.nationCode && userPersonal.mobile;
       user.boundEmail = userPersonal.email;
-      user.draftCount = await db.DraftModel.count({uid: user.uid});
+      user.draftCount = await db.DraftModel.countDocuments({uid: user.uid});
       user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
       languageName = user.generalSettings.language;
       if(user.generalSettings.lotterySettings.status) {
@@ -89,7 +89,7 @@ module.exports = async (ctx, next) => {
         }
       }
       if(user.generalSettings.draftFeeSettings.kcb !== 0) {
-        await user.generalSettings.update({'draftFeeSettings.kcb': 0});
+        await user.generalSettings.updateOne({'draftFeeSettings.kcb': 0});
       }
       // 获取新点赞数
       const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"}, {_id: 1, uid: 1, pid: 1});

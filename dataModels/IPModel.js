@@ -118,7 +118,7 @@ schema.statics.getIPInfo = async (type, value) => {
     adcode = '';
     rectangle = '';
   }
-  await ipData.update({
+  await ipData.updateOne({
     province,
     city,
     adCode: adcode,

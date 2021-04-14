@@ -18,7 +18,7 @@ router
 			ctx.throw(403, '您没有权限给该文章加精');
 		}
 		if(thread.digest) ctx.throw(400, '文章已被设置精华');
-		await thread.update({digest: true});
+		await thread.updateOne({digest: true});
 		const targetUser = await thread.extendUser();
 		// 并生成记录
 		await db.UsersScoreLogModel.insertLog({
@@ -57,7 +57,7 @@ router
       ctx.throw(400, '您没有权限给该文章取消加精');
 		}
 		if(!thread.digest) ctx.throw(400, '文章未被设置精华');
-		await thread.update({digest: false});
+		await thread.updateOne({digest: false});
 		const targetUser = await thread.extendUser();
 		// 并生成记录
 		await db.UsersScoreLogModel.insertLog({

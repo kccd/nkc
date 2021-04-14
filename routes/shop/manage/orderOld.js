@@ -25,7 +25,7 @@ orderRouter
 		}else if(orderStatus == "close") {
 			searchMap.closeStatus = true;
 		}
-		const count = await db.ShopOrdersModel.count(searchMap);
+		const count = await db.ShopOrdersModel.countDocuments(searchMap);
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
 		const orders = await db.ShopOrdersModel.find(searchMap).sort({orderToc: -1}).skip(paging.start).limit(paging.perpage);
@@ -45,7 +45,7 @@ orderRouter
     var time = new Date();
     const shopSettings = await db.SettingModel.findOnly({_id: "shop"});
     const autoReceiveTime = Date.now() + shopSettings.c.refund.buyerReceive * 60 * 60 * 1000;
-		await order.update({$set: {trackName:trackName,trackNumber:trackNumber, orderStatus:"unSign", shipToc:time, autoReceiveTime}});
+		await order.updateOne({$set: {trackName:trackName,trackNumber:trackNumber, orderStatus:"unSign", shipToc:time, autoReceiveTime}});
 		await db.MessageModel.sendShopMessage({
       type: "shopSellerShip",
       r: order.buyUid,
@@ -60,7 +60,7 @@ orderRouter
 		if(!orderId || !trackNumber) ctx.throw(400, "请填写快递单号");
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order) ctx.throw(400, "订单无效");
-		await order.update({$set:{trackName:trackName, trackNumber:trackNumber}})
+		await order.updateOne({$set:{trackName:trackName, trackNumber:trackNumber}})
 		await next();
 	})
 	// 无物流发货
@@ -72,7 +72,7 @@ orderRouter
     var time = new Date();
     const shopSettings = await db.SettingModel.findOnly({_id: "shop"});
     const autoReceiveTime = Date.now() + shopSettings.c.refund.buyerReceive * 60 * 60 * 1000;
-		await order.update({$set: {trackName:"",trackNumber:"no", orderStatus:"unSign", shipToc:time, autoReceiveTime}});
+		await order.updateOne({$set: {trackName:"",trackNumber:"no", orderStatus:"unSign", shipToc:time, autoReceiveTime}});
 		await next();
 	})
   // 修改订单价格
@@ -86,7 +86,7 @@ orderRouter
 		let orders = await db.ShopOrdersModel.storeExtendOrdersInfo([order]);
 		data.order = orders[0];
     if(user.uid !== data.order.sellUid) ctx.throw(400, "您无权修改此订单价格");
-    await order.update({$set:{"orderPrice":price}});
+    await order.updateOne({$set:{"orderPrice":price}});
     await next();
 	})
 	.put('/editOrderTrackNumber', async(ctx, next) => {
@@ -96,7 +96,7 @@ orderRouter
 		if(!orderId) ctx.throw(400, "订单号有误");
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order || order.orderStatus !== "unSign" || order.closeStatus == true || order.refundStatus == "success") ctx.throw(400, "该状态订单不可修改运单号");
-		await order.update({$set: {"trackNumber":trackNumber}});
+		await order.updateOne({$set: {"trackNumber":trackNumber}});
 		await next();
 	})
 	// 查看订单详情
@@ -150,7 +150,7 @@ orderRouter
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order) ctx.throw(400, "未找到该订单");
 		if(sellMessage.length == 0) ctx.throw(400, "卖家备注不可为空");
-		await order.update({$set: {"sellMessage":sellMessage}});
+		await order.updateOne({$set: {"sellMessage":sellMessage}});
 		await next();
 	})
 	// 修改购买记录中的价格
@@ -190,7 +190,7 @@ orderRouter
             _id: costRecord.productParamId, 
             productId: costRecord.productId
           });
-          await productParam.update({
+          await productParam.updateOne({
             $inc: {
               sellCount: -1 * reduce,
               stocksSurplus: reduce
@@ -205,7 +205,7 @@ orderRouter
 				orderPrice += count * singlePrice;
 			});
 		}
-		await order.update({orderPrice, orderFreightPrice: freightPrice});
+		await order.updateOne({orderPrice, orderFreightPrice: freightPrice});
 		await next();
 	})
 	/*.put('/editCostRecord', async (ctx, next) => {
@@ -215,12 +215,12 @@ orderRouter
 		const costRecord = await db.ShopCostRecordModel.findOne({costId});
 		if(!costRecord) ctx.throw(400, "商品规格未找到");
 		const {count, singlePrice} = costObj;
-		await costRecord.update({$set: {count, singlePrice}});
+		await costRecord.updateOne({$set: {count, singlePrice}});
 		// 找出订单并修改
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order) ctx.throw(400, "订单未找到");
 		const {orderFreightPrice, orderPrice} = orderObj;
-		await order.update({$set: {orderFreightPrice, orderPrice}});
+		await order.updateOne({$set: {orderFreightPrice, orderPrice}});
 		await next();
 	})*/
 	// 修改购买订单中的价格
@@ -231,7 +231,7 @@ orderRouter
 		const order = await db.ShopOrdersModel.findOne({orderId});
 		if(!order) ctx.throw(400, "订单未找到");
 		const {orderFreightPrice, orderPrice} = orderObj;
-		await order.update({$set: {orderFreightPrice, orderPrice}})
+		await order.updateOne({$set: {orderFreightPrice, orderPrice}})
 		await next();
 	})
 	// 订单导出

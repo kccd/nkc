@@ -46,7 +46,7 @@ voteRouter
 					status: null
 				}];
 			}
-			await applicationForm.update(obj);
+			await applicationForm.updateOne(obj);
 
 			// 如果是自动审核，当通过网友支持后无需管理员处理，只需要通知用户即可
 			if(fund.auditType === 'system') {

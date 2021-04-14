@@ -32,7 +32,7 @@ applicationRouter
 		} else { //所有
 			
 		}
-		const length = await db.FundApplicationFormModel.count(q);
+		const length = await db.FundApplicationFormModel.countDocuments(q);
 		const paging = apiFn.paging(page, length);
 		data.paging = paging;
 		const applicationForms = await db.FundApplicationFormModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -135,7 +135,7 @@ applicationRouter
         toDraft: {$ne: true}
       };
       // if(!fund.ensureOperatorPermission('admin', user)) q.disabled = false;
-      const length = await db.PostModel.count(q);
+      const length = await db.PostModel.countDocuments(q);
       const paging = apiFn.paging(page, length);
       data.paging = paging;
       const comments = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
@@ -211,7 +211,7 @@ applicationRouter
 			tlm: Date.now()
 		};
 		if(applicationForm.modifyCount >= fund.modifyCount) {
-			await applicationForm.update({useless: 'exceededModifyCount'});
+			await applicationForm.updateOne({useless: 'exceededModifyCount'});
 			throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
 		}
 		if(s === 1) {
@@ -223,7 +223,7 @@ applicationRouter
 				  await db.FundApplicationUserModel.updateMany({uid: aUser.uid}, {$set: {removed: true}});
 				}
 				updateObj.from = 'personal';
-				await applicationForm.update(updateObj);
+				await applicationForm.updateOne(updateObj);
 			} else if(from === 'team') {
 				if(!fund.applicationMethod.team) ctx.throw(400, '抱歉！该基金暂不允许团队申请。');
 				// 判断申请人的信息是否存在，不存在则写入
@@ -269,7 +269,7 @@ applicationRouter
 					}
 				}
 				updateObj.from = 'team';
-				await applicationForm.update(updateObj);
+				await applicationForm.updateOne(updateObj);
 			} else {
 				ctx.throw(400, '未知的申请方式。');
 			}
@@ -283,7 +283,7 @@ applicationRouter
 					const photo = await db.PhotoModel.findOne({_id});
 					if(!photo) continue;
 					if(photo.type === 'fund') {
-						await photo.remove();
+						await photo.deleteOne();
 					}
 				}
 			}
@@ -314,9 +314,9 @@ applicationRouter
 				await newPhoto.save();
 				newApplicant.lifePhotosId.splice(i, 1, newId);
 			}
-			await applicant.update(newApplicant);
+			await applicant.updateOne(newApplicant);
 			updateObj.account = account;
-			await applicationForm.update(updateObj);
+			await applicationForm.updateOne(updateObj);
 		}
 		// 填写项目信息
 		if(s === 3) {
@@ -338,7 +338,7 @@ applicationRouter
 				});
 				await newDocument.save();
 				updateObj.projectId = documentId;
-				await applicationForm.update(updateObj);
+				await applicationForm.updateOne(updateObj);
 			} else {
 				if(project){
 					applicationForm.project.t = project.t;
@@ -359,7 +359,7 @@ applicationRouter
 			if(budgetMoney) updateObj.budgetMoney = budgetMoney;
 			if(threadsId) updateObj['threadsId.applying'] = threadsId;
 			if(category) updateObj.category = category;
-			await applicationForm.update(updateObj);
+			await applicationForm.updateOne(updateObj);
 		}
 		//最后提交验证
 		if(s === 5) {
@@ -431,7 +431,7 @@ applicationRouter
 		} else if(type === 'withdraw') {
 			if(applicationForm.remittance[0].status !== false) ctx.throw(400, '无法完成该操作。');
 			applicationForm.lock.submitted = false;
-			await applicationForm.update({
+			await applicationForm.updateOne({
 				'lock.submitted': false
 			});
 			return await next();
@@ -450,7 +450,7 @@ applicationRouter
 			ctx.throw(403, '权限不足');
 		}
 		if(operation === 'restore' && applicationForm.useless === 'giveUp') {
-			await applicationForm.update({useless: null});
+			await applicationForm.updateOne({useless: null});
 		}
 		await next();
 	})

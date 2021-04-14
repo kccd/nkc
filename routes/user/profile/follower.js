@@ -7,7 +7,7 @@ module.exports = async (ctx, next) => {
     type: "user",
     tUid: targetUser.uid
   };
-  const count = await db.SubscribeModel.count(match);
+  const count = await db.SubscribeModel.countDocuments(match);
   const paging = nkcModules.apiFunction.paging(page, count);
   const subscribes = await db.SubscribeModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   data.subscribes = await db.SubscribeModel.extendSubscribes(subscribes);

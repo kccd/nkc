@@ -179,7 +179,7 @@ schema.statics.productParamReduceStock = async (orders, reduceMethod) => {
       const productParam = await ShopProductParamModel.findOne({_id: param.productParamId});
       // 判断减库存条件
       if(productParam && stockCostMethod == reduceMethod) {
-        await productParam.update({$set: {sellCount: Number(productParam.sellCount)+Number(param.count) , stocksSurplus: (Number(productParam.stocksSurplus) - Number(param.count))}});
+        await productParam.updateOne({$set: {sellCount: Number(productParam.sellCount)+Number(param.count) , stocksSurplus: (Number(productParam.stocksSurplus) - Number(param.count))}});
       }
     }
   }
@@ -202,7 +202,7 @@ schema.statics.refundRestoreStock = async (refund) => {
   // 根据订单中的paramId取出productParam
   const productParam = await ShopProductParamModel.findOne({_id: order.paramId});
   // 根据订单中的购买数量恢复规格中的剩余库存
-  await productParam.update({$set: {stocksSurplus: (Number(productParam.stocksSurplus) + Number(order.count))}});
+  await productParam.updateOne({$set: {stocksSurplus: (Number(productParam.stocksSurplus) + Number(order.count))}});
 }
 
 const ShopProductsParamModel = mongoose.model('shopProductsParams', schema);

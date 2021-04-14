@@ -25,7 +25,7 @@ router
           toppedPostsId.splice(index, 1);
         }
       }
-      await thread.update({
+      await thread.updateOne({
         toppedPostsId
       });
     } else {

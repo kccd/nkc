@@ -70,7 +70,7 @@ resumeRouter
 				i.timeE = new Date(i.timeE+' 00:00:00');
 			}
 		}
-		await userPersonal.update({personalInfo, education, industries, privacy});
+		await userPersonal.updateOne({personalInfo, education, industries, privacy});
 		await next();
 	});
 module.exports = resumeRouter;

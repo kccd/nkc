@@ -38,7 +38,7 @@ router
         data.targetUser = await thread.extendUser();
         data.thread = thread;
         data.post = post;
-        await thread.update({recycleMark: true});
+        await thread.updateOne({recycleMark: true});
         const delLog = db.DelPostLogModel({
           delUserId: thread.uid,
           userId: user.uid,
@@ -87,7 +87,7 @@ router
           threads.push(thread);
           threadsId.push(thread.tid);
         }
-        await post.update({toDraft: true, disabled: true});
+        await post.updateOne({toDraft: true, disabled: true});
         if(!post.reviewed) await db.ReviewModel.newReview("returnPost", post, data.user, reason);
         const firstPost = await db.PostModel.findOnly({pid: thread.oc});
         const delLog = db.DelPostLogModel({

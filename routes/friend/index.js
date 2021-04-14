@@ -17,12 +17,12 @@ router
     const friend = await db.FriendModel.findOne(q1);
     const targetFriend = await db.FriendModel.findOne(q2);
     if(!friend && !targetFriend) ctx.throw(400, '该用户暂未与您建立好友关系');
-    await friend.remove();
-    await targetFriend.remove();
+    await friend.deleteOne();
+    await targetFriend.deleteOne();
     const chat = await db.CreatedChatModel.findOne(q1);
     const targetChat = await db.CreatedChatModel.findOne(q2);
-    if(chat) await chat.remove();
-    if(targetChat) await targetChat.remove();
+    if(chat) await chat.deleteOne();
+    if(targetChat) await targetChat.deleteOne();
     const message = {
       ty: 'deleteFriend',
       deleterId: user.uid,

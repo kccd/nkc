@@ -38,7 +38,7 @@ listRouter
 		if(fundObj.auditType === 'system' && fundObj.admin.appointed.length === 0) {
 			ctx.throw(400, '系统审核必须指定管理员UID。');
 		}
-		await fund.update(fundObj);
+		await fund.updateOne(fundObj);
 		data.fund = fund;
 		await next();
 	})
@@ -71,7 +71,7 @@ listRouter
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
 			let nowTimeStamp = parseInt(new Date().getTime());
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
 			}
 			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
 		}
@@ -106,7 +106,7 @@ listRouter
 		} else { // 全部
 
 		}
-		const length = await FundApplicationFormModel.count(query);
+		const length = await FundApplicationFormModel.countDocuments(query);
 		const paging = apiFn.paging(page, length);
 		const applicationForms = await FundApplicationFormModel.find(query).sort(sortObj).skip(paging.start).limit(paging.perpage);
 		data.applicationForms = await Promise.all(applicationForms.map(async a => {

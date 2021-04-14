@@ -104,14 +104,14 @@ billsRouter
 	})
 	.del('/:billId', async (ctx, next) => {
 		const {bill} = ctx.data;
-		await bill.remove();
+		await bill.deleteOne();
 		await next();
 	})
 	.put('/:billId', async (ctx, next) => {
 		const {body} = ctx;
 		const {obj} = body;
 		const {bill} = ctx.data;
-		await bill.update(obj);
+		await bill.updateOne(obj);
 		await next();
 	});
 module.exports = billsRouter;

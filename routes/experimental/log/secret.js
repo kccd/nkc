@@ -46,7 +46,7 @@ router
         }
       ];
     }
-    const count = await db.SecretBehaviorModel.count(q);
+    const count = await db.SecretBehaviorModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const secrets = await db.SecretBehaviorModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.secrets = [];
@@ -126,7 +126,7 @@ router
         ip: ctx.address,
         port: ctx.port
       };
-      const sameUsernameCount = await db.UserModel.count({usernameLowerCase: oldUsernameLowerCase});
+      const sameUsernameCount = await db.UserModel.countDocuments({usernameLowerCase: oldUsernameLowerCase});
       const warning = [];
       if(sameUsernameCount > 0) {
         newBehavior.newUsername = newUsername;
@@ -136,14 +136,14 @@ router
         newBehavior.newUsername = oldUsername;
         newBehavior.newUsernameLowerCase = oldUsernameLowerCase;
       }
-      const sameEmailCount = await db.UsersPersonalModel.count({email: oldEmail});
+      const sameEmailCount = await db.UsersPersonalModel.countDocuments({email: oldEmail});
       if(sameEmailCount > 0) {
         newBehavior.newEmail = newEmail;
         warning.push("邮箱冲突");
       } else {
         newBehavior.newEmail = oldEmail;
       }
-      const sameMobileCount = await db.UsersPersonalModel.count({mobile: oldMobile, nationCode: oldNationCode});
+      const sameMobileCount = await db.UsersPersonalModel.countDocuments({mobile: oldMobile, nationCode: oldNationCode});
       if(sameMobileCount > 0) {
         newBehavior.newMobile = newMobile;
         newBehavior.newNationCode = newNationCode;

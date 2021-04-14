@@ -49,7 +49,7 @@ const getKcb = async (uid, latestRecordId) => {
 };
 
 (async () => {
-  const usersCount = await UserModel.count();
+  const usersCount = await UserModel.countDocuments();
   let num = 0;
   const limit = 1000;
   console.log(`正在核对用户kcb记录`);
@@ -65,7 +65,7 @@ const getKcb = async (uid, latestRecordId) => {
         userGeneral.kcbSettings.recordId = -1;
         userGeneral.kcbSettings.total = 0;
         userGeneral.kcbSettings.diff = false;
-        await userGeneral.update({
+        await userGeneral.updateOne({
           $set: {
             kcbSettings: userGeneral.kcbSettings
           }
@@ -77,7 +77,7 @@ const getKcb = async (uid, latestRecordId) => {
       const totalNew = await getKcb(user.uid, recordId);
       if(totalNew !== total) {
         // 存在差异
-        await userGeneral.update({
+        await userGeneral.updateOne({
           $set: {
             "kcbSettings.diff": true,
             "kcbSettings.totalNew": totalNew,
@@ -101,7 +101,7 @@ const getKcb = async (uid, latestRecordId) => {
       const latestRecordId = latestRecord._id;
       // 统计该条记录之前的
       const totalLatest = await getKcb(user.uid, latestRecordId);
-      await userGeneral.update({
+      await userGeneral.updateOne({
         $set: {
           "kcbSettings.recordId": latestRecordId,
           "kcbSettings.total": totalLatest,

@@ -35,7 +35,7 @@ passwordRouter
 			newHash: newPassword.password.hash,
 			newSalt: newPassword.password.salt
 		};
-		await userPersonal.update({
+		await userPersonal.updateOne({
 			password: newPassword.password,
 			secret: newPassword.secret,
 			hashType: newPassword.hashType

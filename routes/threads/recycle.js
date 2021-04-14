@@ -44,7 +44,7 @@ router
         forumsId.push(recycleId);
         updateForumsId = updateForumsId.concat(forumsId);
         //  更新文章的专业为回收站，并标记为已屏蔽，且设置审核状态为已通过
-        await thread.update({
+        await thread.updateOne({
           mainForumsId: [recycleId],
           categoriesId: [],
           disabled: true,
@@ -114,7 +114,7 @@ router
           threads.push(thread);
           threadsId.push(thread.tid);
         }
-        await post.update({toDraft: false, reviewed: true, disabled: true});
+        await post.updateOne({toDraft: false, reviewed: true, disabled: true});
         await db.KcbsRecordModel.insertSystemRecord('postBlocked', targetUser, ctx);
         const firstPost = await db.PostModel.findOnly({pid: thread.oc});
         const delLog = db.DelPostLogModel({

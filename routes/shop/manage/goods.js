@@ -17,7 +17,7 @@ router
     } else {
       q.productStatus = "notonshelf";
     }
-    const count = await db.ShopGoodsModel.count(q);
+    const count = await db.ShopGoodsModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const products = await db.ShopGoodsModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.products = await db.ShopGoodsModel.extendProductsInfo(products);

@@ -30,7 +30,7 @@ operationRouter
     } else {
       if(!collection) ctx.throw(400, "文章未在收藏夹中，请刷新");
       const {cid} = collection;
-      await collection.remove();
+      await collection.deleteOne();
       await db.SubscribeTypeModel.updateCount(cid);
     }
     await db.SubscribeModel.saveUserCollectionThreadsId(user.uid);

@@ -30,7 +30,7 @@ async function startCheck() {
     console.log(`筹备专业 fid:${fid} 已到期`);
     // 到了截止日期
     // 查出此专业的文章数
-    const threadCount = await ThreadModel.count({
+    const threadCount = await ThreadModel.countDocuments({
       mainForumsId: {
         $elemMatch: { $eq: fid }
       }
@@ -38,7 +38,7 @@ async function startCheck() {
     if(threadCount >= minThreadCount) {           // 合格
       console.log(`文章数 ${threadCount} 合格`);
       // 修改为已转为正式专业
-      await forum.update({
+      await forum.updateOne({
         $set: {
           formal: true
         }
@@ -64,10 +64,10 @@ async function startCheck() {
       console.log(`已移动所有文章到 fid: ${archiveId}(归档专业)`);
       // 删除此筹备专业(先打快照)
       await SnapshotModel.snapshotForum(fid);
-      await ForumModel.remove({ fid });
+      await ForumModel.deleteMany({ fid });
       console.log(`已删除筹备专业`);
       // 删除此筹备专业申请
-      await forum.remove();
+      await forum.deleteOne();
       console.log(`已删除筹备专业申请记录`);
     }
   }
@@ -114,7 +114,7 @@ module.exports = async () => {
 
 
 // (async () => {
-//   await PreparationForumModel.update({pfid: "8"}, {
+//   await PreparationForumModel.updateOne({pfid: "8"}, {
 //     expired: new Date()
 //   });
 //   console.log("ok");

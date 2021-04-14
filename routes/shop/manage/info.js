@@ -34,7 +34,7 @@ infoRouter
 			});
 			await dealInfo.save();
 		}
-		await dealInfo.update({$set:{
+		await dealInfo.updateOne({$set:{
 			dealAnnouncement: dealAnnouncement, 
 			dealDescription:dealDescription, 
 			address:address,

@@ -237,7 +237,7 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
     let columnPost = await ColumnPostModel.findOne({columnId, pid});
     const order = await ColumnPostModel.getCategoriesOrder(categoriesId);
     if(columnPost) {
-      await columnPost.update({
+      await columnPost.updateOne({
         cid: categoriesId,
         order
       });
@@ -277,7 +277,7 @@ schema.post("save", async function(columnPost) {
 });
 schema.post("remove", async function(columnPost) {
   if(columnPost.type === "thread") {
-    const count = await mongoose.model("columnPosts").count({
+    const count = await mongoose.model("columnPosts").countDocuments({
       _id: {$ne: columnPost._id},
       type: "thread",
       tid: columnPost.tid
@@ -306,7 +306,7 @@ schema.post("remove", async function(columnPost) {
 * */
 schema.statics.checkColumnPost = async (columnId, pid) => {
   const ColumnPostModel = mongoose.model('columnPosts');
-  const count = await ColumnPostModel.count({columnId, pid});
+  const count = await ColumnPostModel.countDocuments({columnId, pid});
   return count > 0;
 }
 module.exports = mongoose.model("columnPosts", schema);

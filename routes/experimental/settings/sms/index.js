@@ -51,7 +51,7 @@ smsRouter
     obj["c.templates"] = templates;
     obj["c.restrictedNumber"] = restrictedNumber;
 
-    await smsSettingsDB.update({
+    await smsSettingsDB.updateOne({
       $set: obj
     });
     await db.SettingModel.saveSettingsToRedis("sms");

@@ -53,7 +53,7 @@ emailCodeSchema.statics.ensureSendPermission = async (obj) => {
 		err.status = 400;
 		throw err;
 	}
-	const emailCodesCount = await EmailCodeModel.count({ip, type, toc: {$gt: (Date.now() - 24*60*60*1000)}});
+	const emailCodesCount = await EmailCodeModel.countDocuments({ip, type, toc: {$gt: (Date.now() - 24*60*60*1000)}});
 	if(emailCodesCount >= sameIpSendEmailCount) {
 		const err = new Error(`24小时内同一IP发送邮件不能超过${sameIpSendEmailCount}封。`);
 		err.status = 400;

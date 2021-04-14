@@ -679,7 +679,7 @@ schema.statics.insertSubscribe = async (type, uid, tid) => {
 * */
 schema.statics.checkCollectionThread = async (uid, tid) => {
   const SubscribeModel = mongoose.model('subscribes');
-  const count = await SubscribeModel.count({uid, tid, type: 'collection'});
+  const count = await SubscribeModel.countDocuments({uid, tid, type: 'collection'});
   return count > 0;
 };
 /*
@@ -691,7 +691,7 @@ schema.statics.checkCollectionThread = async (uid, tid) => {
 * */
 schema.statics.checkSubscribeThread = async (uid, tid) => {
   const SubscribeModel = mongoose.model('subscribes');
-  const count = await SubscribeModel.count({uid, tid, type: 'thread'});
+  const count = await SubscribeModel.countDocuments({uid, tid, type: 'thread'});
   return count > 0;
 };
 

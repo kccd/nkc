@@ -64,7 +64,7 @@ router
 				if(!insert) grades_.push(g);
 			}
 		});
-		await db.UsersGradeModel.remove({});
+		await db.UsersGradeModel.deleteMany({});
 		for(let i = 0; i < grades_.length; i++) {
 			let grade = grades_[i];
 			grade._id = i;

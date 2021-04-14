@@ -4,7 +4,7 @@ router
   .get("/", async (ctx, next) => {
     const {data, db} = ctx;
     data.cacheSettings = await db.SettingModel.getSettings("cache");
-    data.cachePageCount = await db.CacheModel.count();
+    data.cachePageCount = await db.CacheModel.countDocuments();
     ctx.template = "experimental/settings/cache/cache.pug";
     await next();
   })

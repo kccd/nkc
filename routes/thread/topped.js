@@ -18,7 +18,7 @@ router
 			ctx.throw(403, '您没有权限给该文章设置置顶');
 		}
 		if(thread.topped) ctx.throw(400, '该文章已被设置置顶');
-		await thread.update({topped: true});
+		await thread.updateOne({topped: true});
 		await next();
 	})
 	.del('/', async (ctx, next) => {
@@ -38,7 +38,7 @@ router
 			ctx.throw(403, '您没有权限取消给该文章设置置顶');
 		}
 		if(!thread.topped) ctx.throw(400, '该文章未被设置置顶');
-		await thread.update({topped: false});
+		await thread.updateOne({topped: false});
 		await next();
 	});
 module.exports = router;

@@ -16,7 +16,7 @@ router
     } else {
       sort[`order.cid_default`] = -1;
     }
-    const count = await db.ColumnPostModel.count(q);
+    const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.columnPosts = await db.ColumnPostModel.extendColumnPosts(columnPosts);
@@ -43,7 +43,7 @@ router
         let columnPost = await db.ColumnPostModel.findOne({columnId: column._id, pid});
         const order = await db.ColumnPostModel.getCategoriesOrder(categoriesId);
         if(columnPost) {
-          await columnPost.update({
+          await columnPost.updateOne({
             cid: categoriesId,
             order
           });
@@ -68,17 +68,17 @@ router
       for(const _id of postsId) {
         const columnPost = await db.ColumnPostModel.findOne({_id, columnId: column._id});
         if(columnPost) {
-          await columnPost.remove();
+          await columnPost.deleteOne();
         }
-        await db.ColumnModel.update({_id: column._id}, {$pull: {topped: _id}});
+        await db.ColumnModel.updateOne({_id: column._id}, {$pull: {topped: _id}});
       }
       await db.ColumnPostCategoryModel.removeToppedThreads(column._id);
     } else if(type === "removeColumnPostByPid") { // 通过pid删除专栏内容
       for(const pid of postsId) {
         const post = await db.ColumnPostModel.findOne({columnId: column._id, pid});
         if(post) {
-          await post.remove();
-          await db.ColumnModel.update({_id: column._id}, {$pull: {topped: post._id}});
+          await post.deleteOne();
+          await db.ColumnModel.updateOne({_id: column._id}, {$pull: {topped: post._id}});
         }
       }
       await db.ColumnPostCategoryModel.removeToppedThreads(column._id);
@@ -116,7 +116,7 @@ router
         if(!column.topped.includes(_id)) column.topped.unshift(_id);
       }
 
-      await column.update({
+      await column.updateOne({
         topped: column.topped
       });
 
@@ -131,7 +131,7 @@ router
       }
       column.topped = column.topped.filter(_id => !arr.includes(_id));
 
-      await column.update({
+      await column.updateOne({
         topped: column.topped
       });
 
@@ -159,13 +159,13 @@ router
         for(const p of arr) {
           const updateObj = {};
           updateObj[keyName] = await db.SettingModel.operateSystemID("columnPostOrders", 1);
-          await p.update(updateObj);
+          await p.updateOne(updateObj);
         }
       } else if(type === "categoryToBottom") {
         for(const p of arr) {
           const updateObj = {};
           updateObj[keyName] = await db.SettingModel.operateSystemID("columnPostDownOrders", -1);
-          await p.update(updateObj);
+          await p.updateOne(updateObj);
         }
       }
     } else if(["categoryUp", "categoryDown"].includes(type) ) { // 上移、下移
@@ -200,10 +200,10 @@ router
 
         let updateObj = {};
         updateObj[keyName] = newOrder;
-        await columnPost.update(updateObj);
+        await columnPost.updateOne(updateObj);
         updateObj = {};
         updateObj[keyName] = oldOrder;
-        await columnPost_.update(updateObj);
+        await columnPost_.updateOne(updateObj);
       }
     } else if(["categoryTop", "unCategoryTop"].includes(type)) { // 专栏置顶、取消专栏置顶
       const category = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: categoryId});
@@ -211,13 +211,13 @@ router
       const columnPost = await db.ColumnPostModel.findOne({columnId: column._id, _id: postsId, cid: categoryId});
       if(!columnPost) ctx.throw(400, `找不到ID为${postsId}的专栏文章记录`);
       if(type === "categoryTop") {
-        await category.update({
+        await category.updateOne({
           $addToSet: {
             topped: columnPost._id
           }
         });
       } else {
-        await category.update({
+        await category.updateOne({
           $pull: {
             topped: columnPost._id
           }

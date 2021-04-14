@@ -294,7 +294,7 @@ kcbsRecordSchema.statics.insertSystemRecord_old = async (type, u, ctx, additiona
   } else if(kcbsType.count !== -1) {
     // 获取今日已触发该操作的次数
     const today = nkcModules.apiFunction.today();
-    const recordsCount = await db.KcbsRecordModel.count({
+    const recordsCount = await db.KcbsRecordModel.countDocuments({
       type,
       $or: [
         {

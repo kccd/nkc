@@ -5,7 +5,7 @@ draftsRouter
     const {data, db, query, nkcModules} = ctx;
     const {user} = data;
     const {page = 0} = query;
-    const count = await db.DraftModel.count({uid: user.uid});
+    const count = await db.DraftModel.countDocuments({uid: user.uid});
     const paging = nkcModules.apiFunction.paging(page, count);
     const drafts = await db.DraftModel.find({uid: user.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
@@ -102,7 +102,7 @@ draftsRouter
       survey, parentPostId = ""
     } = post;
     const {user} = data;
-    const draftCount = await db.DraftModel.count({uid: user.uid});
+    const draftCount = await db.DraftModel.countDocuments({uid: user.uid});
     if(draftCount >= 100) ctx.throw(400, "草稿箱已满");
     let draft;
     if(draftId) {
@@ -118,7 +118,7 @@ draftsRouter
     };
     if(draft) { // 存在草稿
       draftObj.tlm = Date.now();
-      await draft.update(draftObj);
+      await draft.updateOne(draftObj);
       if(survey) { // 调查表数据
         if(draft.surveyId) { // 若草稿上已有调查表ID，则只需更新调查表数据。
           survey._id = draft.surveyId;
@@ -126,11 +126,11 @@ draftsRouter
         } else { // 若草稿上没有调查表数据，则创建调查表。
           survey.uid = user.uid;
           const surveyDB = await db.SurveyModel.createSurvey(survey, false);
-          await draft.update({surveyId: surveyDB._id});
+          await draft.updateOne({surveyId: surveyDB._id});
         }
       } else if(desType === "forum" && draft.surveyId) { // 只有在发表新帖的时候可以取消创建调查表，其他情况不允许取消。
-        await draft.update({surveyId: null});
-        await db.SurveyModel.remove({uid: user.uid, _id: draft.surveyId});
+        await draft.updateOne({surveyId: null});
+        await db.SurveyModel.deleteOne({uid: user.uid, _id: draft.surveyId});
       }
     } else {
       if(!["forum", "thread", "post", "forumDeclare", 'forumLatestNotice'].includes(desType)) ctx.throw(400, `未知的草稿类型：${desType}`);
@@ -150,7 +150,7 @@ draftsRouter
       if(survey) {
         survey.uid = user.uid;
         const surveyDB = await db.SurveyModel.createSurvey(survey, false);
-        await draft.update({surveyId: surveyDB._id});
+        await draft.updateOne({surveyId: surveyDB._id});
       }
     }
     if(files && files.postCover) {
@@ -201,8 +201,8 @@ draftsRouter
     }else{
         let datestr = Date.now()
         const toeditdraft = await db.DraftModel.findOnly({did:body.did});
-        await toeditdraft.update({t:body.t,c:body.c,tlm:datestr,abstractCn: body.abstractCn, abstractEn: body.abstractEn, authorInfos:body.authorInfos, keyWordsCn: body.keyWordsCn, keyWordsEn: body.keyWordsEn, originState: body.originState});
-        // await db.DraftModel.update({t:body.t},{$set: {c:body.c,toc:datestr}});
+        await toeditdraft.updateOne({t:body.t,c:body.c,tlm:datestr,abstractCn: body.abstractCn, abstractEn: body.abstractEn, authorInfos:body.authorInfos, keyWordsCn: body.keyWordsCn, keyWordsEn: body.keyWordsEn, originState: body.originState});
+        // await db.DraftModel.updateOne({t:body.t},{$set: {c:body.c,toc:datestr}});
         data.status = "success";
         data.did = body.did
     }

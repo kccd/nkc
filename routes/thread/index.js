@@ -7,7 +7,7 @@ const toppedRouter = require('./topped');
 const closeRouter = require('./close');
 const subscribeRouter = require("./subscribe");
 const Path = require("path");
-
+const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 threadRouter
 	.get('/', async (ctx, next) => {
 		const {data, db, query, nkcModules} = ctx;
@@ -26,7 +26,7 @@ threadRouter
           recycleMark: {$ne: true},
           reviewed: true
         };
-        const count = await db.ThreadModel.count(q);
+        const count = await db.ThreadModel.countDocuments(q);
         const paging = nkcModules.apiFunction.paging(page, count);
         data.paging = paging;
         threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -117,7 +117,7 @@ threadRouter
       const threads = [];
       let targetThreads = [];
       if(self === 'true') {
-        const length = await db.ThreadModel.count({uid: user.uid, disabled: false});
+        const length = await db.ThreadModel.countDocuments({uid: user.uid, disabled: false});
         const paging= perpage(page, length);
         targetThreads = await db.ThreadModel.find({uid: user.uid, disabled: false}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
         data.paging = paging;
@@ -136,7 +136,7 @@ threadRouter
         }
         const targetUser = await db.UserModel.findOne({usernameLowerCase: keywords.toLowerCase()});
         if(targetUser !== null && usersId.includes(targetUser.uid)) {
-          const length = await db.ThreadModel.count({uid: targetUser.uid, disabled: false});
+          const length = await db.ThreadModel.countDocuments({uid: targetUser.uid, disabled: false});
           const paging = perpage(page, length);
           targetThreads = await db.ThreadModel.find({uid: targetUser.uid, disabled: false}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
           data.paging = paging;
@@ -205,7 +205,7 @@ threadRouter
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
 			let nowTimeStamp = parseInt(new Date().getTime());
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
 				await thread.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}
 			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
@@ -324,7 +324,7 @@ threadRouter
     // 获取分页设置
     const {pageSettings} = state;
     // 获取当前文章下回复的总数目
-    const count = await db.PostModel.count(match);
+    const count = await db.PostModel.countDocuments(match);
 		const paging_ = nkcModules.apiFunction.paging(page, count, pageSettings.threadPostList);
 		const {pageCount} = paging_;
 
@@ -333,7 +333,7 @@ threadRouter
 		for(let postSin of postAll){
 			let onLog = await db.DelPostLogModel.findOne({delType: 'toDraft', postType: 'post', postId: postSin.pid, modifyType: false, toc: {$lt: Date.now()-3*24*60*60*1000}})
 			if(onLog){
-				await postSin.update({"toDraft":false, reviewed: true});
+				await postSin.updateOne({"toDraft":false, reviewed: true});
 				const tUser = await db.UserModel.findOne({uid: onLog.delUserId});
 				data.post = await db.PostModel.findOne({pid: onLog.postId});
 				if(tUser && data.post) {
@@ -404,7 +404,7 @@ threadRouter
 		if(data.user) {
 		  data.usersThreads = await data.user.getUsersThreads();
 			if(state.userColumn) {
-			  data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
+			  data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
       }
 			if(thread.uid === data.user.uid) {
 			  // 标记未读的回复提醒为已读状态
@@ -449,7 +449,7 @@ threadRouter
       thread.uid = "";
     }
 		// 文章访问量加1
-    await thread.update({$inc: {hits: 1}});
+    await thread.updateOne({$inc: {hits: 1}});
 
     // 如果是待审核，取出审核原因
     if(!firstPost.reviewed) {
@@ -683,8 +683,8 @@ threadRouter
 				// 加载考试设置
 				// data.examSettings = (await db.SettingModel.findOnly({_id: 'exam'})).c;
 				const today = nkcModules.apiFunction.today();
-        const todayThreadCount = await db.ThreadModel.count({toc: {$gt: today}, uid: data.user.uid});
-        let todayPostCount = await db.PostModel.count({toc: {$gt: today}, uid: data.user.uid});
+        const todayThreadCount = await db.ThreadModel.countDocuments({toc: {$gt: today}, uid: data.user.uid});
+        let todayPostCount = await db.PostModel.countDocuments({toc: {$gt: today}, uid: data.user.uid});
         data.userPostCountToday = todayPostCount - todayThreadCount;
       }
       data.hasPermissionToHidePost = await db.PostModel.ensureHidePostPermission(data.thread, data.user)
@@ -698,7 +698,7 @@ threadRouter
     ) {
       const allPosts = await db.PostModel.find({tid: data.thread.tid}, {pid: 1});
       const pid = allPosts.map(p => p.pid);
-      data.attachmentsCount = await db.ResourceModel.count({mediaType: "mediaAttachment", references: {$in: pid}});
+      data.attachmentsCount = await db.ResourceModel.countDocuments({mediaType: "mediaAttachment", references: {$in: pid}});
     }
     const hidePostSettings = await db.SettingModel.getSettings("hidePost");
     // 加载笔记信息
@@ -795,11 +795,22 @@ threadRouter
       ctx.throw(403, `当前回复不允许评论`);
     }
 		const {columnCategoriesId = [], anonymous = false, did} = post;
-		if(post.c.length < 6) ctx.throw(400, '内容太短，至少6个字节');
-		if(postType === "comment" && post.c.length > 2000) {
-      ctx.throw(400, "评论内容不能超过1000字符");
+    if(post.t && post.t.length > 100) ctx.throw(400, `标题不能超过100个字`);
+    const content = customCheerio.load(post.c).text();
+    if(content.length < 3) ctx.throw(400, `内容不能少于3个字`);
+    // 字数限制
+    if(postType === 'comment') {
+      // 作为评论 不能超过200字
+      if(content.length > 200) ctx.throw(400, `内容不能超过200字`);
+    } else {
+      // 作为回复 不能超过10万字
+      if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
     }
-
+    nkcModules.checkData.checkString(post.c, {
+      name: "内容",
+      minLength: 1,
+      maxLength: 2000000
+    });
 		// 判断前台有没有提交匿名标志，未提交则默认false
     if(anonymous && !await db.UserModel.havePermissionToSendAnonymousPost("postToThread", user.uid, thread.mainForumsId)) {
       ctx.throw(400, "你没有权限或文章所在专业不允许发表匿名内容");
@@ -866,7 +877,7 @@ threadRouter
 
       await ctx.redis.pubMessage(message);
 		}
-		await thread.update({$inc: [{count: 1}, {hits: 1}]});
+		await thread.updateOne({$inc: [{count: 1}, {hits: 1}]});
 		const type = ctx.request.accepts('json', 'html');
     await thread.updateThreadMessage();
     const newThread = await db.ThreadModel.findOnly({tid});

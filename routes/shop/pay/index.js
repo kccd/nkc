@@ -139,7 +139,7 @@ router
       });
       await r.save();
       // 更改订单状态为已付款，添加付款时间。
-      await db.ShopOrdersModel.update({orderId: order.orderId}, {$set: {
+      await db.ShopOrdersModel.updateMany({orderId: order.orderId}, {$set: {
         orderStatus: 'unShip',
         payToc: r.toc
       }});

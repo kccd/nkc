@@ -6,7 +6,7 @@ router
     const {data, db, query, nkcModules} = ctx;
     const {t, id} = query;
     const {column} = data;
-    data.pageCount = await db.ColumnPageModel.count({columnId: column._id});
+    data.pageCount = await db.ColumnPageModel.countDocuments({columnId: column._id});
     data.columnSettings = await db.SettingModel.getSettings("column");
     data.pageUrl = `${serverConfig.domain}/m/${column._id}/page/`;
     if(t === "add") {

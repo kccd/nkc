@@ -25,7 +25,7 @@ router
     agree = checkNum(agree);
     buyerTrack = checkNum(buyerTrack);
     sellerTrack = checkNum(sellerTrack);
-    await db.SettingModel.update({_id: "shop"}, {$set: {
+    await db.SettingModel.updateOne({_id: "shop"}, {$set: {
       "c.refund": {
         cert,
         sellerReceive,

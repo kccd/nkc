@@ -41,7 +41,7 @@ imageRouter
     await tools.imageMagick.friendImageify(path, targetFilePath);
     await fs.unlink(path);
 
-    await friend.update({'info.image': true});
+    await friend.updateOne({'info.image': true});
     data.friend = friend;
 
     await next();

@@ -14,10 +14,10 @@ router
       const isModerator = ctx.permission("superModerator") || await thread.isModerator(user, "or");
       if(!isModerator) ctx.throw(403, `您没有权限处理ID为${postId}的post`);
       if(!post.disabled) ctx.throw(400, `ID为${post.pid}的回复未被屏蔽，请刷新`);
-      await post.update({disabled: false, toDraft: null});
+      await post.updateOne({disabled: false, toDraft: null});
       const delPostLog = await db.DelPostLogModel.find({postId: post.pid, modifyType: false});
       for(const log of delPostLog) {
-        await log.update({modifyType: true});
+        await log.updateOne({modifyType: true});
       }
     }
     await next();

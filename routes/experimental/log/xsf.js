@@ -33,7 +33,7 @@ xsfRouter
         }
       ]
     }
-    const count = await db.XsfsRecordModel.count(q);
+    const count = await db.XsfsRecordModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const xsfsRecords = await db.XsfsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.xsfsRecords = await db.XsfsRecordModel.extendXsfsRecords(xsfsRecords);

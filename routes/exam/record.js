@@ -8,7 +8,7 @@ router
     const q = {
       uid: user.uid
     };
-    const count = await db.QuestionModel.count(q);
+    const count = await db.QuestionModel.countDocuments(q);
     const paging = await nkcModules.apiFunction.paging(page, count);
     const questions = await db.QuestionModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.questions = await db.QuestionModel.extendQuestions(questions);
@@ -49,7 +49,7 @@ router
         }
       ]
     }
-    const count = await db.ExamsPaperModel.count(q);
+    const count = await db.ExamsPaperModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const papers = await db.ExamsPaperModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.papers = await db.ExamsPaperModel.extendPapers(papers);

@@ -18,7 +18,7 @@ module.exports = async (ctx, next) => {
       }
     ]
   }
-  const count = await db.KcbsRecordModel.count(q);
+  const count = await db.KcbsRecordModel.countDocuments(q);
   const paging = nkcModules.apiFunction.paging(page, count);
   let kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   await db.KcbsRecordModel.hideSecretInfo(kcbsRecords);

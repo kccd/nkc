@@ -41,7 +41,7 @@ router
           ip: content
         };
       }
-      const count = await db.ExamsPaperModel.count(q);
+      const count = await db.ExamsPaperModel.countDocuments(q);
       const paging = nkcModules.apiFunction.paging(page, count);
       const papers = await db.ExamsPaperModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       data.papers = await db.ExamsPaperModel.extendPapers(papers, {secretInfo: true});

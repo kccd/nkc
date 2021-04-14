@@ -10,6 +10,7 @@ const cardRouter = require("./card");
 const Router = require('koa-router');
 const router = new Router();
 const nkcRender = require("../../nkcModules/nkcRender");
+const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 router
 	.post('/', async (ctx, next) => {
 		const {data, params, db, address: ip, fs, query, nkcModules, state} = ctx;
@@ -25,15 +26,15 @@ router
       ctx.throw(403, `因为缺少必要的账户信息，无法完成该操作。具体信息：${err.message}`);
     }
 		const {c, t, fids, cids, cat, mid, columnCategoriesId = [], anonymous = false, survey} = post;
-    nkcModules.checkData.checkString(t, {
-      name: "标题",
-      minLength: 6,
-      maxLength: 200
-    });
+		if(t.length < 3) ctx.throw(400, `标题不能少于3个字`);
+		if(t.length > 100) ctx.throw(400, `标题不能超过100个字`);
+		const content = customCheerio.load(c).text();
+		if(content.length < 3) ctx.throw(400, `内容不能少于3个字`);
+		if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
     nkcModules.checkData.checkString(c, {
       name: "内容",
-      minLength: 6,
-      maxLength: 100000
+      minLength: 1,
+      maxLength: 2000000
     });
 		/*if(fids.length === 0) ctx.throw(400, "请至少选择一个专业");
 		if(fids.length  > 2) ctx.throw(400, "最多只能选择两个专业");*/
@@ -57,7 +58,7 @@ router
       options.surveyId = surveyDB._id;
     }
 		const _post = await db.ThreadModel.postNewThread(options);
-    if(surveyDB) await surveyDB.update({pid: _post.pid});
+    if(surveyDB) await surveyDB.updateOne({pid: _post.pid});
 
 		// 根据thread生成封面图
     const thread = await db.ThreadModel.findOne({tid: _post.tid});
@@ -121,7 +122,7 @@ router
 		if(allChildrenFid.length !== 0) {
 			ctx.throw(400, `该专业下仍有${allChildrenFid.length}个专业, 请转移后再删除该专业`);
 		}
-    const count = await ThreadModel.count({$or: [
+    const count = await ThreadModel.countDocuments({$or: [
       {
         mainForumsId: fid
       },
@@ -133,7 +134,7 @@ router
       ctx.throw(422, `该板块下仍有${count}个文章, 请转移后再删除板块`);
       return next()
     } else {
-      await forum.remove()
+      await forum.deleteOne()
 		}
     await redis.cacheForums();
     await db.ForumModel.saveAllForumsToRedis();
@@ -183,7 +184,7 @@ router
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
 			let nowTimeStamp = parseInt(new Date().getTime());
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
 				await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
 			}
 			// if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
@@ -297,9 +298,9 @@ router
 			data.sameLevelForums = await db.ForumModel.find({parentsId: [], fid: {$in: visibleFidArr}});
 		}
 
-		data.subUsersCount = await db.SubscribeModel.count({fid, type: "forum"});
+		data.subUsersCount = await db.SubscribeModel.countDocuments({fid, type: "forum"});
 		if(data.user) {
-      const sub = await db.SubscribeModel.count({
+      const sub = await db.SubscribeModel.countDocuments({
         uid: data.user.uid,
         type: "forum",
         fid
@@ -427,7 +428,7 @@ router
 		} else {
 			match.reviewed = true;
 		}
-		const count = await db.ThreadModel.count(match);
+		const count = await db.ThreadModel.countDocuments(match);
 		const {apiFunction} = ctx.nkcModules;
 		const paging = apiFunction.paging(page, count, pageSettings.forumThreadList);
 		data.paging = paging;

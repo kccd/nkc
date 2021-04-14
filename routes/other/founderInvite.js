@@ -18,7 +18,7 @@ router
     for(let founder of founders) {
       if(founder.uid === user.uid) {
         founder.accept = res;
-        await db.PreparationForumModel.update({pfid}, {
+        await db.PreparationForumModel.updateOne({pfid}, {
           $set: { founders }
         });
         if(res === "resolved") {

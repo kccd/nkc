@@ -33,7 +33,7 @@ module.exports = async (options) => {
   } else{
     await fsPromise.copyFile(path, targetFilePath);
   }
-  await resource.update({
+  await resource.updateOne({
     state: 'usable'
   });
   // 如果是pdf就再生成一个预览版

@@ -17,7 +17,7 @@ photoRouter
 		const {displayPhoto} = body;
 		const {privacy} = userPersonal;
 		privacy.lifePhoto = displayPhoto;
-		await userPersonal.update({privacy});
+		await userPersonal.updateOne({privacy});
 		await next();
 	});
 module.exports = photoRouter;

@@ -14,7 +14,7 @@ router
       match.disabled = false;
     }
     match.postCount = {$gte: columnSettings.columnHomePostCountMin};
-    const count = await db.ColumnModel.count(match);
+    const count = await db.ColumnModel.countDocuments(match);
     const paging = ctx.nkcModules.apiFunction.paging(page, count);
     const sort = {};
     if(t === undefined) {

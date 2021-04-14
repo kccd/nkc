@@ -132,7 +132,7 @@ schema.statics.ensurePermission = async (options) => {
     } = await AccountBehaviorModel.getCountLimitByType(type);
     const t = moment().format("YYYY-MM-DD HH:00:00");
     if(username) {
-      const count = await AccountBehaviorModel.count({
+      const count = await AccountBehaviorModel.countDocuments({
         type,
         usernameLowerCase: username.toLowerCase(),
         toc: {
@@ -144,7 +144,7 @@ schema.statics.ensurePermission = async (options) => {
       }
     }
     if(ip) {
-      const count = await AccountBehaviorModel.count({
+      const count = await AccountBehaviorModel.countDocuments({
         type,
         ip,
         toc: {
@@ -156,7 +156,7 @@ schema.statics.ensurePermission = async (options) => {
       }
     }
     if(mobile && nationCode) {
-      const count = await AccountBehaviorModel.count({
+      const count = await AccountBehaviorModel.countDocuments({
         type,
         nationCode,
         mobile,
@@ -169,7 +169,7 @@ schema.statics.ensurePermission = async (options) => {
       }
     }
     if(email) {
-      const count = await AccountBehaviorModel.count({
+      const count = await AccountBehaviorModel.countDocuments({
         type,
         email,
         toc: {

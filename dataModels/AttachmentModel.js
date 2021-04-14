@@ -581,7 +581,7 @@ schema.statics.saveDraftCover = async (did, file) => {
     type: 'postCover'
   });
   await a.save();
-  await draft.update({cover: aid});
+  await draft.updateOne({cover: aid});
 };
 
 schema.statics.saveProblemImages = async (_id, files = []) => {
@@ -626,7 +626,7 @@ schema.statics.saveProblemImages = async (_id, files = []) => {
     await fsPromise.unlink(path);
     attachId.push(_id);
   }
-  await problem.update({attachId});
+  await problem.updateOne({attachId});
 };
 
 

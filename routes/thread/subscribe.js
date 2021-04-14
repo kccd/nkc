@@ -43,7 +43,7 @@ router
     let cid = [];
     if(sub) {
       cid = sub.cid;
-      await sub.remove();
+      await sub.deleteOne();
       await db.SubscribeTypeModel.updateCount(cid);
       await db.SubscribeModel.saveUserSubThreadsId(user.uid);
     }

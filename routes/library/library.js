@@ -107,7 +107,7 @@ router
       description,
       lid: library.lid
     });
-    await library.update(obj);
+    await library.updateOne(obj);
     if(library.type === "file") {
       await db.LibraryModel.saveToES(library._id);
     }

@@ -14,7 +14,7 @@ disabledRouter
     if(type) {
       fids = new Set(thread.mainForumsId);
       fids.add(recycleId);
-      await thread.update({mainForumsId: [recycleId]});
+      await thread.updateOne({mainForumsId: [recycleId]});
     } else {
       const fundForums = await db.ForumModel.find({kindName: "fund"});
       fids = new Set();
@@ -22,7 +22,7 @@ disabledRouter
         fids.add(forum.fid);
       }
       fids.add(applicationForm.category);
-      await thread.update({mainForumsId: [...fids]});
+      await thread.updateOne({mainForumsId: [...fids]});
       fids.add(recycleId);
     }
     const targetUser = await db.UserModel.findOnly({uid: applicationForm.uid});

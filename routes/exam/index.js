@@ -15,7 +15,7 @@ examRouter
     const now = Date.now();
     await Promise.all(papers.map(async paper => {
       if(now - paper.toc >= paper.time*60*1000) {
-        await paper.update({
+        await paper.updateOne({
           timeOut: true,
           tlm: paper.toc + paper.time*60*1000,
           passed: false
@@ -23,8 +23,8 @@ examRouter
       }
     }));
     if(data.user) {
-      data.unViewedCount = await db.QuestionModel.count({uid: data.user.uid, viewed: false});
-      data.unauthCount = await db.QuestionModel.count({
+      data.unViewedCount = await db.QuestionModel.countDocuments({uid: data.user.uid, viewed: false});
+      data.unauthCount = await db.QuestionModel.countDocuments({
         disabled: false,
         auth: null
       });

@@ -38,7 +38,7 @@ kcbRouter
       q.scoreType = scoreType;
     }
     data.kcbsTypes = state.language['kcbsTypes'];
-    const count = await db.KcbsRecordModel.count(q);
+    const count = await db.KcbsRecordModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const kcbsRecords = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.kcbsRecords = await db.KcbsRecordModel.extendKcbsRecords(kcbsRecords);
@@ -139,7 +139,7 @@ kcbRouter
     };
 
     const totalLatest = await getKcb(uid, latestRecordId);
-    await db.UsersGeneralModel.update({uid}, {
+    await db.UsersGeneralModel.updateOne({uid}, {
       $set: {
         "kcbSettings.recordId": latestRecordId,
         "kcbSettings.total": totalLatest,

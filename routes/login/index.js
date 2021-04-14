@@ -122,7 +122,7 @@ loginRouter
 				ctx.throw(err.status, err.message);
 			}
 
-			await smsCode.update({used: true});
+			await smsCode.updateOne({used: true});
 
 			userPersonal = await db.UsersPersonalModel.find({mobile, nationCode});
 
@@ -136,7 +136,7 @@ loginRouter
 			userPersonal = userPersonal[0];
 
 			// 更新最后一次验证手机号的时间
-			await userPersonal.update({
+			await userPersonal.updateOne({
 				$set: {
 					lastVerifyPhoneNumberTime: new Date()
 				}

@@ -23,9 +23,9 @@ router
       public: true,
       volume: 'A'
     }
-    const pubCountA = await db.QuestionModel.count(pubQ);
+    const pubCountA = await db.QuestionModel.countDocuments(pubQ);
     pubQ.volume = 'B';
-    const pubCountB = await db.QuestionModel.count(pubQ);
+    const pubCountB = await db.QuestionModel.countDocuments(pubQ);
     const obj = {
       type: 'pub'
     }
@@ -50,10 +50,10 @@ router
         volume: 'A',
         fid
       };
-      const countA = await db.QuestionModel.count(q);
+      const countA = await db.QuestionModel.countDocuments(q);
       obj.countA = countA;
       q.volume = 'B';
-      const countB = await db.QuestionModel.count(q);
+      const countB = await db.QuestionModel.countDocuments(q);
       obj.countB = countB;
       if(countA === 0 && countB === 0) continue;
       from.push(obj);
@@ -96,7 +96,7 @@ router
         delete f.countB;
         questionsCount += count;
         if(type === 'pub') {
-          const pubCount = await db.QuestionModel.count({
+          const pubCount = await db.QuestionModel.countDocuments({
             disabled: false,
             auth: true,
             public: true,
@@ -104,7 +104,7 @@ router
           });
           if(count > pubCount) ctx.throw(400, '公共题库试题数目不足，请刷新');
         } else {
-          const questionCount = await db.QuestionModel.count({
+          const questionCount = await db.QuestionModel.countDocuments({
             disabled: false,
             auth: true,
             volume,

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const uriFormat = require('mongodb-uri')
 const mongodbConfig = require('../config/mongodb.json');
 const {
   username,
@@ -18,19 +19,26 @@ const options = {
   autoIndex: true,
   poolSize,
   keepAlive,
-  useMongoClient: true,
-  autoReconnect: true,
 
   // 新属性
-  // useNewUrlParser: true,
-  // useUnifiedTopology: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 };
 
-// 新属性
-// mongoose.set("useCreateIndex", true);
+
+mongoose.set("useCreateIndex", true);
+mongoose.set('useFindAndModify', false);
+
+function encodeMongoURI (urlString) {
+  if (urlString) {
+    let parsed = uriFormat.parse(urlString)
+    urlString = uriFormat.format(parsed);
+  }
+  return urlString;
+}
 
 mongoose.Promise = Promise;
-mongoose.connect(`mongodb://${account}${address}:${port}/${database}`, options)
+mongoose.connect(encodeMongoURI(`mongodb://${account}${address}:${port}/${database}`), options)
   .then(() => {
     // console.log('database connected.'.green)
   })
@@ -52,12 +60,16 @@ mongoose.plugin(function(schema) {
       throw err;
     return docs[0]
   };
+
   schema.post('init', function(doc, next) {
     doc._initial_state_ = JSON.parse(JSON.stringify(doc._doc));
     // doc._doc is the pure data of a document,
     // deep copy it to the doc so that you can compare the difference
     // conviniently
-    return next()
+    // return next()
+
+    // mongoose 5.12.3
+    // init hooks are now fully synchronous and do not receive next() as a parameter.
   });
   schema.post('save', function(doc, next) {
     // same as when initializing..

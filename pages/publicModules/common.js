@@ -2,7 +2,7 @@ var NKC = {
   methods: {},
   modules: {},
   configs: {
-    imageExt: ["jpg", "jpeg", "png", "svg", "gif"],
+    imageExt: ["jpg", "jpeg", "png", "svg", "gif", "webp"],
     audioExt: ["mp3"],
     videoExt: ["mp4"]
   },

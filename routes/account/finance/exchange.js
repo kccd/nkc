@@ -63,8 +63,8 @@ router
       await fromRecord.save();
       await toRecord.save();
     } catch(err) {
-      await fromRecord.remove();
-      await toRecord.remove();
+      await fromRecord.deleteOne();
+      await toRecord.deleteOne();
       throw err;
     }
     await db.UserModel.updateUserScores(uid);

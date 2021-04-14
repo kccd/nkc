@@ -52,7 +52,7 @@ router
       data.targetColumn = state.userColumn;
       data.targetColumnPermission = state.columnPermission;
     }
-    const noteCount = await db.NoteContentModel.count({
+    const noteCount = await db.NoteContentModel.countDocuments({
       uid: targetUser.uid,
       deleted: false
     });
@@ -224,7 +224,7 @@ router
               type: 'blacklist',
               name: '黑名单',
               url: `/u/${targetUser.uid}/profile/blacklist`,
-              count: await db.BlacklistModel.count({
+              count: await db.BlacklistModel.countDocuments({
                 uid: targetUser.uid
               }),
             }

@@ -38,7 +38,7 @@ billRouter
 				}
 			]
 		}
-		const length = await db.FundBillModel.count(q);
+		const length = await db.FundBillModel.countDocuments(q);
 		const {apiFunction} = ctx.nkcModules;
 		const paging = apiFunction.paging(page, length);
 		data.paging = paging;

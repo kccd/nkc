@@ -4,7 +4,7 @@ router
     // 将最新的post直接渲染到页面上
     const {data, db, query, nkcModules} = ctx;
     const {page = 0} = query;
-    const count = await db.PostModel.count();
+    const count = await db.PostModel.countDocuments();
     const paging = nkcModules.apiFunction.paging(page, count, 50);
     let posts = await db.PostModel.find({})
       .sort({toc: -1}).skip(paging.start).limit(paging.perpage);

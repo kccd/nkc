@@ -25,7 +25,7 @@ router
     } else if(t === "ip") {
       q.ip = content;
     }
-    const count = await db.KcbsRecordModel.count(q);
+    const count = await db.KcbsRecordModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const records = await db.KcbsRecordModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.records = await db.KcbsRecordModel.extendKcbsRecords(records);

@@ -14,7 +14,7 @@ router
     const {password} = body;
     const usersPersonal = await db.UsersPersonalModel.findOne({uid: user.uid});
     await usersPersonal.ensurePassword(password);
-    await column.update({
+    await column.updateOne({
       closed: true
     });
     await next();

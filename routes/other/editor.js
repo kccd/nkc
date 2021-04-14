@@ -37,7 +37,7 @@ editorRouter
         const forum = await db.ForumModel.findOne({fid: id});
         if(forum) {
           data.forumType = forum.forumType;
-          const childForumCount = await db.ForumModel.count({parentsId: id});
+          const childForumCount = await db.ForumModel.countDocuments({parentsId: id});
           if(!childForumCount) data.forum = forum;
           await forum.ensurePermission(data.userRoles, data.userGrade, data.user);
           const breadcrumbForums = await forum.getBreadcrumbForums();
@@ -88,7 +88,7 @@ editorRouter
         contentType = "postToThread";
       }
       if(state.userColumn) {
-        data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: targetThread.tid})) > 0;
+        data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "thread", tid: targetThread.tid})) > 0;
       }
       const forums = await targetThread.extendForums(['mainForums']);
       let isModerator = ctx.permission('superModerator');
@@ -130,7 +130,7 @@ editorRouter
     	const thread = await db.ThreadModel.findOnly({tid: id});
     	data.targetForumsId = thread.mainForumsId;
       if(state.userColumn) {
-        data.addedToColumn = (await db.ColumnPostModel.count({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
+        data.addedToColumn = (await db.ColumnPostModel.countDocuments({columnId: state.userColumn._id, type: "thread", tid: thread.tid})) > 0;
       }
     	if(thread.closed) ctx.throw(403,'主题已关闭，暂不能发表回复');
     }

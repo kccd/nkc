@@ -57,7 +57,7 @@ schema.statics.extendCategories = async (categories) => {
   const results = [];
   for(let c of categories) {
     c = c.toObject();
-    c.count = await ColumnPostModel.count({cid: c._id});
+    c.count = await ColumnPostModel.countDocuments({cid: c._id});
     results.push(c);
   }
   return results;
@@ -80,7 +80,7 @@ schema.statics.getCategoryTree = async (columnId) => {
     return c;
   });
   for(const c of categories) {
-    c.count = await mongoose.model("columnPosts").count({cid: c._id});
+    c.count = await mongoose.model("columnPosts").countDocuments({cid: c._id});
     let insert = false;
     if(c.parentId) {
       const parent = categoriesObj[c.parentId];
@@ -231,7 +231,7 @@ schema.statics.removeToppedThreads = async (columnId) => {
       }
     }
     topped = topped.filter(t => !markId.includes(t));
-    await c.update({topped});
+    await c.updateOne({topped});
   }));
 };
 

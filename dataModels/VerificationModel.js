@@ -87,7 +87,7 @@ schema.statics.newSecret = async () => {
   const apiFunction = require('../nkcModules/apiFunction');
   const secret = apiFunction.getRandomString('aA0', 64);
   const VerificationModel = mongoose.model('verifications');
-  const v = await VerificationModel.count({secret});
+  const v = await VerificationModel.countDocuments({secret});
   if(v !== 0) {
     return await VerificationModel.newSecret();
   } else {
@@ -105,7 +105,7 @@ schema.methods.verifyBaseInfo = async function() {
   if(Date.now() - this.toc > baseInfoTimeout) {
     errorStr = '验证失败';
   }
-  await this.update({used: true});
+  await this.updateOne({used: true});
   if(errorStr) await VerificationModel.throwFailedError();
 };
 
@@ -160,14 +160,14 @@ schema.statics.verifyData = async (verificationData) => {
   if(!verification) await VerificationModel.throwFailedError();
   await verification.verifyBaseInfo();
   if(!verifications[verification.type].verify(verificationData, verification.c)) {
-    await verification.update({
+    await verification.updateOne({
       'c.userAnswer': verificationData.answer
     });
     await VerificationModel.throwFailedError();
   }
   // 生成加密串
   const secret = await VerificationModel.newSecret();
-  await verification.update({
+  await verification.updateOne({
     secret,
     'c.userAnswer': verificationData.answer,
     passed: true
@@ -197,10 +197,10 @@ schema.statics.verifySecret = async (options) => {
       verification.secretUsed ||
       (Date.now() - verification.toc) > secretTimeout
     ) {
-      await verification.update({secretUsed: true});
+      await verification.updateOne({secretUsed: true});
       await VerificationModel.throwFailedError();
     } else {
-      await verification.update({secretUsed: true, secretPassed: true});
+      await verification.updateOne({secretUsed: true, secretPassed: true});
     }
   }
 }
@@ -214,7 +214,7 @@ schema.statics.verifyCountLimit = async (options) => {
   const verificationSettings = await SettingModel.getSettings('verification');
   const {time, count} = verificationSettings.countLimit;
   const {ip} = options;
-  const verificationCount = await VerificationModel.count({
+  const verificationCount = await VerificationModel.countDocuments({
     ip,
     toc: {
       $gte: Date.now() - time * 60 * 1000

@@ -230,7 +230,7 @@ router
         });
         if(record && record.num !== undefined) {
           data.rewardNum = record.num;
-          await surveyPost.update({
+          await surveyPost.updateOne({
             rewardNum: record.num
           });
         }
@@ -240,7 +240,7 @@ router
       }
     } else {
       const surveyPostDB = surveyPost.toObject();
-      await surveyPost.update({
+      await surveyPost.updateOne({
         options,
         toc: Date.now()
       });

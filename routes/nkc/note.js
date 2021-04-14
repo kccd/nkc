@@ -6,7 +6,7 @@ router
     const match = {
 
     };
-    const count = await db.NoteContentModel.count(match);
+    const count = await db.NoteContentModel.countDocuments(match);
     const paging = nkcModules.apiFunction.paging(page, count);
     const noteContent = await db.NoteContentModel.find(match).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.noteContent = await db.NoteContentModel.extendNoteContent(noteContent, {
@@ -34,9 +34,9 @@ router
       const nc = await db.NoteContentModel.extendNoteContent(noteContent);
       data.noteContentHTML = nc.html;
     } else if(type === "disable") {
-      await noteContent.update({disabled: true});
+      await noteContent.updateOne({disabled: true});
     } else if(type === "cancelDisable") {
-      await noteContent.update({disabled: false});
+      await noteContent.updateOne({disabled: false});
     }
     await next();
   });

@@ -17,8 +17,8 @@ emailRouter
 			token,
 			type: 'bindEmail'
 		});
-		await emailCode.update({used: true});
-		await userPersonal.update({email, unverifiedEmail: ''});
+		await emailCode.updateOne({used: true});
+		await userPersonal.updateOne({email, unverifiedEmail: ''});
 		await db.SecretBehaviorModel({
 			type: "bindEmail",
 			uid: user.uid,
@@ -42,7 +42,7 @@ emailRouter
 			token,
 			type: "unbindEmail"
 		});
-		await emailCode.update({used: true});
+		await emailCode.updateOne({used: true});
 		const behavior = db.SecretBehaviorModel({
 			uid: user.uid,
 			type: "unbindEmail",
@@ -52,7 +52,7 @@ emailRouter
 			port: ctx.port
 		});
 		await behavior.save();
-		await userPersonal.update({email: ""});
+		await userPersonal.updateOne({email: ""});
 		await next();
 	})
 	// 验证新邮箱
@@ -82,9 +82,9 @@ emailRouter
 			ctx.throw(400, `新邮箱${err.message}`);
 		}
 		await db.SettingModel.checkEmail(email, user.uid);
-		await oldSmsCode.update({used: true});
-		await smsCode.update({used: true});
-		await userPersonal.update({email});
+		await oldSmsCode.updateOne({used: true});
+		await smsCode.updateOne({used: true});
+		await userPersonal.updateOne({email});
 		await db.SecretBehaviorModel({
 			type: "changeEmail",
 			uid: user.uid,

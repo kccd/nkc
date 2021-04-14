@@ -12,7 +12,7 @@ xsfRouter
     const {addLimit, reduceLimit} = body.xsfSettings;
     if(addLimit <= 0) ctx.throw(400, '加学术分分值不能小于1');
     if(reduceLimit <= 0) ctx.throw(400, '减学术分分值不能小于1');
-    await db.SettingModel.update({_id: 'xsf'}, {$set: {'c.addLimit': addLimit, 'c.reduceLimit': reduceLimit}});
+    await db.SettingModel.updateOne({_id: 'xsf'}, {$set: {'c.addLimit': addLimit, 'c.reduceLimit': reduceLimit}});
     await db.SettingModel.saveSettingsToRedis("xsf");
     await next();
   });

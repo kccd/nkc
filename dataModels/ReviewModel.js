@@ -158,13 +158,13 @@ schema.statics.autoPushToReview = async function(post) {
     // 三、黑名单（海外手机号、未通过A卷和用户等级）
     let passedCount = 0;
     if(type === "post") {
-      passedCount = await PostModel.count({
+      passedCount = await PostModel.countDocuments({
         disabled: false,
         reviewed: true,
         uid
       });
     } else {
-      passedCount = await ThreadModel.count({
+      passedCount = await ThreadModel.countDocuments({
         disabled: false,
         reviewed: true,
         mainForumsId: {$ne: recycleId},

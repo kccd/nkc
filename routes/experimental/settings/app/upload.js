@@ -26,7 +26,7 @@ router
     const {file} = body.files;
     const {name, size, path, hash} = file;
     const {appPlatform, appVersion, appDescription, appToc} = body.fields || {};
-    const repeatVersion = await db.AppVersionModel.count({appVersion});
+    const repeatVersion = await db.AppVersionModel.countDocuments({appVersion});
     if (repeatVersion) {
       ctx.throw(400, "版本号重复！");
     }
@@ -69,7 +69,7 @@ router
     await fsPromise.copyFile(path, appPath);
 
     // 添加上传记录
-    await db.AppVersionModel.update({latest:true,appPlatForm:appPlatform}, {
+    await db.AppVersionModel.updateMany({latest:true,appPlatForm:appPlatform}, {
       $set: {
         latest: false
       }

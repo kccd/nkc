@@ -120,6 +120,6 @@ smsCodeSchema.statics.ensureSendPermission = async (obj) => {
 * @author pengxiguaa 2021-1-7
 * */
 smsCodeSchema.methods.mark = async function() {
-	await this.update({used: true});
+	await this.updateOne({used: true});
 };
 module.exports = mongoose.model('smsCodes', smsCodeSchema, 'smsCodes');
