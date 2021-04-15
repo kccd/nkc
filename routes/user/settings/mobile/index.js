@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const mobileRouter = new Router();
 const applyRouter = require('./apply');
+const verifyRouter = require('./verify');
 mobileRouter
 	.get('/', async (ctx, next) => {
 		ctx.template = 'interface_user_settings_mobile.pug';
@@ -121,4 +122,5 @@ mobileRouter
 		await next();
 	})
 	.use('/apply', applyRouter.routes(), applyRouter.allowedMethods())
+	.use('/verify', verifyRouter.routes(), verifyRouter.allowedMethods());
 module.exports = mobileRouter;

@@ -55,15 +55,34 @@ block content
               .row
                 .col-xs-12.col-md-12
                   hr
-                  .form-horizontal
+                  .form-horizontal(v-if='!verificationRecordId')
+                    .form-group
+                      label.col-sm-3.control-label 原国际区号
+                      .col-sm-4
+                        select.form-control(v-model="originNationCode")
+                          option(v-for="n in nationCodes" :value="n.code") +{{n.code}} {{n.chineseName}}
+                    .form-group
+                      label.col-sm-3.control-label 原手机号
+                      .col-sm-4
+                        input.form-control(type='text' v-model='originNumber' placeholder='请输入手机号')
+                    .form-group
+                      label.col-sm-3
+                      .col-sm-4
+                        button.btn.btn-primary(@click='verifyPhoneNumber') 提交
+                  .form-horizontal(v-else)
                     .form-group
                       label.control-label.col-sm-3 常用登录地点
                       .col-sm-9
                         span.address(v-for='(a, index) in addresses')
                           span.m-r-05 {{a}}
                           .fa.fa-remove(@click='removeFromArr(addresses, index)')
-                        button.btn.btn-default.btn-sm(@click='addLoginLocation') 添加
+                        button.btn.btn-default.btn-sm(@click='addLoginLocation' v-if='addresses.length < 3') 添加
+                        button.btn.btn-default.btn-sm(v-else disabled) 添加
                         div.warning-info 至少1个，最多3个
+                    .form-group
+                      label.control-label.col-sm-3 申诉说明
+                      .col-sm-4
+                        textarea.form-control(rows=3 placeholder='请输入申诉说明' v-model='description')
                     .form-group
                       label.col-sm-3.control-label 登录密码
                       .col-sm-4
@@ -111,8 +130,14 @@ block scripts
         password: '',
         newNationCode: '86',
         newNumber: '',
+        originNationCode: '86',
+        originNumber: '',
         newCode: '',
         nationCodes: nationCodes,
+
+        verificationRecordId: '',
+
+        description: ''
       },
       methods: {
         removeFromArr: function(arr, index) {
@@ -164,6 +189,7 @@ block scripts
           var self = this;
           Promise.resolve()
             .then(function() {
+              if(!self.verificationRecordId) throw '请先验证原手机号';
               if (self.addresses.length < 1) throw '请至少选择一个常用登录地址';
               if (self.addresses.length > 3) throw '最多选择三个常用登录地址';
               if(!self.password) throw '请输入登录密码';
@@ -175,12 +201,30 @@ block scripts
                 type: 'changeUnusedPhoneNumber',
                 code: self.newCode,
                 password: self.password,
-                addresses: self.addresses
+                addresses: self.addresses,
+                verificationRecordId: self.verificationRecordId,
+                description: self.description
               });
             })
             .then(function() {
               sweetSuccess('提交成功');
               self.pendingApplication = true;
+            })
+            .catch(sweetError);
+        },
+        verifyPhoneNumber: function() {
+          var self = this;
+          Promise.resolve()
+            .then(function() {
+              if (!self.originNationCode) throw '原国际区号不能为空';
+              if (!self.originNumber) throw '原手机号不能为空';
+              return nkcAPI('/u/' + NKC.configs.uid + '/settings/mobile/verify', 'POST', {
+                phoneNumber: self.originNumber,
+                nationCode: self.originNationCode,
+              });
+            })
+            .then(function(data) {
+              self.verificationRecordId = data.recordId;
             })
             .catch(sweetError);
         }

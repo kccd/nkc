@@ -21,10 +21,11 @@ router
     if(data.pendingApplication)  ctx.throw(400, `申请已提交，请耐心等待~ `);
     const {checkString} = nkcModules.checkData;
     const {
-      phoneNumber, nationCode,
-      type, code, password, addresses
+      phoneNumber, nationCode, description,
+      type, code, password, addresses, verificationRecordId
     } = body;
     const {user} = data;
+    await db.VerificationRecordModel.verifyRecord(user.uid, verificationRecordId);
     if(addresses.length < 1) ctx.throw(400, '常用登录地点不能为空');
     if(addresses.length > 3) ctx.throw(400, '常用登录地点不能超过3个');
     for(const a of addresses) {
@@ -34,6 +35,7 @@ router
         maxLength: 50
       });
     }
+    if(description && description.length > 1000) ctx.throw(400, '申诉说明不能超过1000字');
     if(!password) ctx.throw(400, '登录密码不能为空');
     if(!await db.UsersPersonalModel.checkUserPassword(user.uid, password)) {
       ctx.throw(400, '登录密码错误');
@@ -63,7 +65,8 @@ router
       newPhoneNumber: {
         nationCode,
         number: phoneNumber
-      }
+      },
+      description
     });
     await next();
   });

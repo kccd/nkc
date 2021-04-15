@@ -39,6 +39,7 @@ block nkcContent
             th 旧手机号
             th 常用登录地址
             th IP
+            th 申诉说明
             th 状态
             th 其他
         tbody
@@ -52,6 +53,7 @@ block nkcContent
             th
               div(v-for='(l, index) in a.addresses') {{index + 1}}. {{l}}
             th {{a.ip}}
+            th(style='width: 10rem;') {{a.description}}
             th
               span(v-if='a.status === "pending"') 待处理
               span.text-success(v-else-if='a.status === "resolved"') 已通过
