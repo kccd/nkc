@@ -9,10 +9,10 @@ block title
       margin-right: 0.5rem;
     }
     .problem-title{
-      max-width: 20rem;
+      /*max-width: 20rem;*/
     }
     .problem-title a{
-      font-size: 1.25rem;
+      /*font-size: 1.25rem;*/
     }
 block content
   .container-fluid.max-width
@@ -24,8 +24,8 @@ block content
               a(href=`/problem/list` data-type='reload') 全部
             li(class=data.c === 'unsolved'? 'active':'')
               a(href=`/problem/list?c=unsolved` data-type='reload') 未处理
+          include ../publicModules/paging/paging
           .table-responsive
-            include ../publicModules/paging/paging
             table.table.table-bordered.nkc-table
               thead
                 tr
@@ -65,6 +65,6 @@ block content
                         span.text-danger 未处理
                       else
                         span.text-success 已处理
-            include ../publicModules/paging/paging_input
+          include ../publicModules/paging/paging_input
 block scripts
   include ../publicModules/floatUserPanel/floatUserPanel.2.pug
