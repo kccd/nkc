@@ -1530,6 +1530,7 @@ userSchema.statics.havePermissionToSendAnonymousPost = async (type, userId, foru
   const UserModel = mongoose.model("users");
   const SettingModel = mongoose.model("settings");
   const ForumModel = mongoose.model("forums");
+  if(!userId) return false;
   const postSettings = await SettingModel.getSettings("post");
   const {uid, status, defaultCertGradesId, rolesId} = postSettings[type].anonymous;
   if(!status) return false;

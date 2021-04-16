@@ -797,7 +797,7 @@ threadRouter
 		const {columnCategoriesId = [], anonymous = false, did} = post;
     if(post.t && post.t.length > 100) ctx.throw(400, `标题不能超过100个字`);
     const content = customCheerio.load(post.c).text();
-    if(content.length < 3) ctx.throw(400, `内容不能少于3个字`);
+    if(content.length < 2) ctx.throw(400, `内容不能少于2个字`);
     // 字数限制
     if(postType === 'comment') {
       // 作为评论 不能超过200字

@@ -633,8 +633,8 @@ function initVueApp() {
         if(contentText.length > 100000) {
           throw new Error('内容不能超过10万字');
         }
-        if(contentText.length < 3) {
-          throw new Error('内容不能少于3个字');
+        if(contentText.length < 2) {
+          throw new Error('内容不能少于2个字');
         }
       },
       // 检测摘要

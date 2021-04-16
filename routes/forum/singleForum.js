@@ -29,7 +29,7 @@ router
 		if(t.length < 3) ctx.throw(400, `标题不能少于3个字`);
 		if(t.length > 100) ctx.throw(400, `标题不能超过100个字`);
 		const content = customCheerio.load(c).text();
-		if(content.length < 3) ctx.throw(400, `内容不能少于3个字`);
+		if(content.length < 2) ctx.throw(400, `内容不能少于2个字`);
 		if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
     nkcModules.checkData.checkString(c, {
       name: "内容",

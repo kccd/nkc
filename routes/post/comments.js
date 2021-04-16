@@ -77,7 +77,8 @@ router
       PATH.resolve(__dirname, `../../pages/thread/singleComment/singleComments.pug`),
       {...data, comments},
       state
-    )
+    );
+    data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", state.uid, post.mainForumsId);
     await next();
   });
 module.exports = router;
