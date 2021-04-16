@@ -146,3 +146,10 @@ document.addEventListener('click', (e)  => {
 
 // 同步cookie信息
 NKC.methods.rn.emit('syncPageInfo', {uid: NKC.configs.uid});
+
+
+NKC.methods.rn.alert = function(msg) {
+  NKC.methods.rn.emit('alert_message', {
+    message: msg
+  });
+}

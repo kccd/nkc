@@ -18,3 +18,7 @@ window.logout = function() {
       screenTopWarning(data);
     })
 };
+
+window.updateApp = function() {
+  NKC.methods.rn.emit('check_and_update_app');
+}
