@@ -156,7 +156,6 @@ class SinglePostModule {
     this.renderPostCommentNumber(pid);
     this.getPostComments(pid, page)
       .then(data => {
-        console.log(data);
         loading.remove();
         const {tid, htmlContent, paging, postPermission} = data;
         if(paging.page+1 >= paging.pageCount) {
