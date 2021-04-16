@@ -77,22 +77,22 @@ block content
           .panel-body
             div.form-horizontal
               .form-group
-                label.col-sm-2.control-label 敏感词检测策略
+                label.col-sm-2.control-label 敏感词检测范围
                 .col-sm-10
                   .radio
                     //- label
                       input(type="checkbox" v-model="allContentShouldReview")
                     label
                       input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="all")
-                      | 检测文章和回复
+                      | 文章和回复
                   .radio
                     label
                       input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="only_thread")
-                      | 只检测文章
+                      | 仅文章
                   .radio
                     label
                       input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="only_reply")
-                      | 只检测回复
+                      | 仅回复
               .form-group
                 label.col-sm-2.control-label 使用敏感词组
                 .col-sm-10
