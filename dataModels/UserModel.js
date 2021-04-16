@@ -2323,14 +2323,16 @@ userSchema.statics.getModifyPostTimeLimitMS = async (uid) => {
 * 判断用户是否有权加载编辑器以及发表相关说明
 * @param {String} uid 用户ID
 * @param {String} type 发表类型 thread文章，post回复
+* @param {String} fids 内容所在的专业
 * @return {Object}
 *   @param {Boolean} permit 是否有权发表
 *   @param {HTML String} warning 提示信息
 * @author pengxiguaa 20200-12-18
 * */
-userSchema.statics.getPostPermission = async (uid, type) => {
+userSchema.statics.getPostPermission = async (uid, type, fids = []) => {
   const SettingModel = mongoose.model('settings');
   const UserModel = mongoose.model('users');
+  const ForumModel = mongoose.model('forums');
   const PostModel = mongoose.model('posts');
   let result = {
     permit: false,
@@ -2422,6 +2424,20 @@ userSchema.statics.getPostPermission = async (uid, type) => {
           warning: `<div>你还未参加考试，每天仅能发表${countLimit}${contentName}。今日已发表${count}${contentName}。
 <br>点击<a href="/exam" target="_blank">这里</a>参加考试，通过后将获得更多发言权限。</div>`
         };
+      }
+    }
+  }
+  if(fids.length > 0) {
+    try{
+      if(type === 'thread') {
+        await ForumModel.checkWritePermission(uid, fids);
+      } else {
+        await ForumModel.checkWritePostPermission(uid, fids);
+      }
+    } catch(err) {
+      result = {
+        permit: false,
+        warning: `<div>${err.message}</div>`
       }
     }
   }

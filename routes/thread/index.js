@@ -744,7 +744,7 @@ threadRouter
     // 帖子设置
     data.threadSettings = await db.SettingModel.getSettings("thread");
     data.postHeight = hidePostSettings.postHeight;
-    data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post');
+    data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post', thread.mainForumsId);
 		data.pid = pid;
 		data.step = step;
 		await next();

@@ -264,7 +264,7 @@ function initVueApp() {
       // 判断发表权限
       alertPermissionInfo: function() {
         if(data.permissionInfo) {
-          sweetInfo("你暂无法发表内容，因为" + data.permissionInfo + "。");
+          sweetInfo(data.permissionInfo);
         }
       },
       // app判断本地存储

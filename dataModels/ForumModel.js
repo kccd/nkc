@@ -1894,11 +1894,11 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
       (relation === 'and' && (!hasRole || !hasGrade))
     ) {
       if(type === 'read') {
-        throwErr(403, `你没有权限阅读专业「${displayName}」下的内容，请更换专业`);
+        throwErr(403, `你没有权限阅读专业「${displayName}」下的内容，请更换专业。`);
       } else if(type === 'write') {
-        throwErr(403, `你没有权限在专业「${displayName}」下发表文章，请更换专业`);
+        throwErr(403, `你没有权限在专业「${displayName}」下发表文章，请更换专业。`);
       } else {
-        throwErr(403, `你没有权限在专业「${displayName}」下发表回复或评论，请更换专业`);
+        throwErr(403, `你没有权限在专业「${displayName}」下发表回复或评论，请更换专业。`);
       }
     }
   }

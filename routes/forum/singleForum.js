@@ -144,7 +144,7 @@ router
 	.use('/settings', settingsRouter.routes(), settingsRouter.allowedMethods())
 	// .use(['/home', '/latest', '/followers', '/visitors', "/library"], async (ctx, next) => {
 	.use("/", async (ctx, next) => {
-		const {data, db, params, query, url, method} = ctx;
+		const {data, db, params, query, url, method, state} = ctx;
 		let _url = url.replace(/\?.*/g, "");
 		_url = _url.replace(/^\/f\/[0-9a-zA-Z]+?\/(.+)/i, "$1");
 		const {fid} = params;
@@ -354,7 +354,11 @@ router
 			},
 			user: data.user
 		});
-
+		try{
+			await db.ForumModel.checkWritePermission(state.uid, [fid]);
+		} catch(err) {
+			data.noPermissionReason = err.message;
+		}
 		ctx.template = 'forum/forum.pug';
 		await next();
   })

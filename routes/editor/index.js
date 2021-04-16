@@ -10,6 +10,8 @@ router
     await db.UserModel.checkUserBaseInfo(user);
     ctx.template = "editor/editor.pug";
 
+    data.notice = '';
+
     // 需要预制的专业和文章分类
     let selectedForumsId = [];
     let selectedCategoriesId = [];
@@ -23,7 +25,13 @@ router
     } else if(type === "forum") { // 在专业进编辑器，需要预制当前专业
       const {id} = query;
       data.type = "newThread";
-      selectedForumsId = [id];
+      // 判断用户是否用有制定专业的发表权限
+      try{
+        await db.ForumModel.checkWritePermission(state.uid, [id]);
+        selectedForumsId = [id];
+      } catch(err) {
+        data.permissionInfo = err.message;
+      }
     } else if(type === "thread") {
       data.type = "newPost";
       const {id} = query;
@@ -276,7 +284,7 @@ router
       try{
         await db.UserModel.ensurePostThreadPermission(user.uid);
       } catch(err) {
-        data.permissionInfo = err.message;
+        data.permissionInfo = `你暂无法发表内容，因为${err.message}。`;
       }
     }
     state.editorSettings = await db.SettingModel.getSettings("editor");
