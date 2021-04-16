@@ -21,12 +21,12 @@ router
         columnId: column._id
       }
     }
-    const count = await db.ColumnContributeModel.count(q);
+    const count = await db.ColumnContributeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const contributes = await db.ColumnContributeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.contributes = await db.ColumnContributeModel.extendContributes(contributes);
-    data.resolvedCount = await db.ColumnContributeModel.count({columnId: column._id, passed: {$ne: null}});
-    data.unresolvedCount = await db.ColumnContributeModel.count({columnId: column._id, passed: null});
+    data.resolvedCount = await db.ColumnContributeModel.countDocuments({columnId: column._id, passed: {$ne: null}});
+    data.unresolvedCount = await db.ColumnContributeModel.countDocuments({columnId: column._id, passed: null});
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
     ctx.template = "columns/settings/contribute.pug";
     data.paging = paging;
@@ -50,7 +50,7 @@ router
       if(!contribute || contribute.passed !== null) continue;
       const thread = await db.ThreadModel.findOne({tid: contribute.tid});
       if(!thread) continue;
-      await contribute.update({
+      await contribute.updateOne({
         tlm: Date.now(),
         reason,
         passed: type === "agree"

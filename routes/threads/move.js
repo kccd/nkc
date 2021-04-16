@@ -43,7 +43,7 @@ router
         categoriesId = categoriesId.concat([...threadTypesId]);
         const newMainForumsId = [...new Set(mainForumsId)];
         const newCategoriesId = [...new Set(categoriesId)];
-        await thread.update({
+        await thread.updateOne({
           mainForumsId: newMainForumsId,
           categoriesId: newCategoriesId
         });
@@ -56,7 +56,7 @@ router
       for(const thread of threads) {
         const {mainForumsId} = thread;
         oldForumsId = oldForumsId.concat(mainForumsId);
-        await thread.update({
+        await thread.updateOne({
           mainForumsId: [...forumsId],
           categoriesId: [...threadTypesId],
           disabled: false

@@ -33,10 +33,14 @@ router
     }
     data.column = column;
     if(user && user.uid === data.column.uid) {
-      data.contributeCount = await db.ColumnContributeModel.count({
+      data.contributeCount = await db.ColumnContributeModel.countDocuments({
         columnId: column._id,
         passed: null
       });
+    }
+    const timeout = 24 * 60 * 60 * 1000;
+    if(!column.refreshTime || Date.now() - new Date(column.refreshTime).getTime() > timeout) {
+      await column.updateBasicInfo();
     }
     await next();
   })
@@ -70,7 +74,7 @@ router
       data.toppedId = data.column.topped;
       sort[`order.cid_default`] = -1;
     }
-    const count = await db.ColumnPostModel.count(q);
+    const count = await db.ColumnPostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, column.perpage);
     const columnPosts = await db.ColumnPostModel.find(q).sort(sort).skip(paging.start).limit(paging.perpage);
     data.paging = paging;
@@ -82,7 +86,8 @@ router
       const homeSettings = await db.SettingModel.getSettings("home");
       data.topped = homeSettings.columnsId.includes(data.column._id);
     }
-
+    const homeSettings = await db.SettingModel.getSettings('home');
+    data.columnTopped = homeSettings.columnsId.includes(column._id);
     await next();
   })
   .put("/", async (ctx, next) => {
@@ -99,7 +104,7 @@ router
       } = fields;
       const {avatar, banner} = files;
       if(!name) ctx.throw(400, "专栏名不能为空");
-      if(contentLength(name) > 60) ctx.throw(400, "专栏名不能超过60字符");
+      if(contentLength(name) > 30) ctx.throw(400, "专栏名不能超过30字符");
       let sameName = await db.ColumnModel.findOne({_id: {$ne: column._id}, nameLowerCase: name.toLowerCase()});
       if(sameName) ctx.throw(400, "专栏名已存在，请更换");
       sameName = await db.UserModel.findOne({uid: {$ne: data.user.uid}, usernameLowerCase: name.toLowerCase()});
@@ -167,7 +172,7 @@ router
       }
       perpage = parseInt(perpage);
       if(isNaN(perpage) || perpage <= 0) perpage = 1;
-      await column.update({
+      await column.updateOne({
         name,
         color,
         perpage,
@@ -190,7 +195,7 @@ router
       await db.ColumnModel.toSearch(column._id);
     } else if(type === "color") {
       const {color} = body;
-      await column.update({
+      await column.updateOne({
         color
       });
     }

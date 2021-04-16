@@ -41,7 +41,7 @@ router
     const {user} = data;
     const warning = await db.PostWarningModel.findOnly({_id: warningId});
     if(!reason) ctx.throw(400, "修改建议不能为空");
-    await warning.update({
+    await warning.updateOne({
       reason,
       modifierId: user.uid,
       modifiedTime: new Date()

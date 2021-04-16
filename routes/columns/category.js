@@ -8,7 +8,7 @@ router
     const {t} = query;
     if(t === "list") {
       data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
-      data.count = await db.ColumnPostModel.count({columnId: column._id});
+      data.count = await db.ColumnPostModel.countDocuments({columnId: column._id});
     } else {
       const categories = await db.ColumnPostCategoryModel.find({columnId: column._id}).sort({toc: 1});
       data.categories = await db.ColumnPostCategoryModel.extendCategories(categories);
@@ -51,7 +51,7 @@ router
     for(let i = 0; i < categoriesId.length; i++) {
       const category = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: categoriesId[i]});
       if(category) {
-        await category.update({order: i+1});
+        await category.updateOne({order: i+1});
       }
     }
     await next();
@@ -75,7 +75,7 @@ router
       const parentCategory = await db.ColumnPostCategoryModel.findOne({columnId: column._id, _id: parentId});
       if(!parentCategory) ctx.throw(400, "父分类设置错误，请刷新");
     }
-    await category.update({
+    await category.updateOne({
       name,
       parentId,
       description
@@ -92,14 +92,14 @@ router
     const category = await db.ColumnPostCategoryModel.findById(categoryId);
     if(!category) ctx.throw(400, "分类不存在");
     if(category.default) ctx.throw(400, "无法删除默认分类");
-    const children = await db.ColumnPostCategoryModel.count({
+    const children = await db.ColumnPostCategoryModel.countDocuments({
       columnId: column._id,
       parentId: categoryId
     });
     if(children > 0) ctx.throw(400, "该分类下还有其他分类，无法删除");
-    const postCount = await db.ColumnPostModel.count({columnId: column._id, cid: categoryId});
+    const postCount = await db.ColumnPostModel.countDocuments({columnId: column._id, cid: categoryId});
     if(postCount > 0) ctx.throw(400, "该分类下存在内容，无法删除");
-    await db.ColumnPostCategoryModel.remove({columnId: column._id, _id: category._id});
+    await db.ColumnPostCategoryModel.deleteOne({columnId: column._id, _id: category._id});
     await next();
   });
 module.exports = router;

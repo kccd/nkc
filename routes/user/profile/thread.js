@@ -6,7 +6,7 @@ module.exports = async (ctx, next) => {
   const q = {
     uid: targetUser.uid
   };
-  const count = await db.ThreadModel.count(q);
+  const count = await db.ThreadModel.countDocuments(q);
   const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
   let threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   data.paging = paging;

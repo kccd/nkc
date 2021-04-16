@@ -47,7 +47,7 @@ router
       } else {
         ctx.throw(400, `${type_.description}的科创币变化值设置错误`)
       }
-      await type_.update({count, num});
+      await type_.updateOne({count, num});
     }
     const c = {
       minCount,
@@ -79,12 +79,12 @@ router
     if(record.c && [true, false].includes(record.c.alipayInterface)) ctx.throw(400, "当前记录无需人工操作");
     if(!record.verify) ctx.throw(400, "当前记录无需人工操作");
     if(type === "success") {
-      await record.update({
+      await record.updateOne({
         "c.alipayInterface": true
       });
     } else if(type === "fail") {
 
-      await record.update({
+      await record.updateOne({
         "c.alipayInterface": false
       });
 

@@ -23,7 +23,7 @@ router
     if(c.emailAddr) {
       searchMap.email = c.emailAddr;
     }
-    let count = await db.EmailCodeModel.count(searchMap);
+    let count = await db.EmailCodeModel.countDocuments(searchMap);
     let paging = nkcModules.apiFunction.paging(page, count, 40);
     let result = await db.EmailCodeModel
       .find(searchMap)

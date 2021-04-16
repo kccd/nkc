@@ -24,7 +24,7 @@ singleRouter
       let shareTimeStamp = parseInt(new Date(share.toc).getTime());
       let nowTimeStamp = parseInt(new Date().getTime());
       if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-        await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+        await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
       }
       if(share.shareUrl.indexOf(ctx.path) == -1) ctx.throw(403, "无效的token")
     }
@@ -127,7 +127,7 @@ singleRouter
     }
     
     const apply = await db.ActivityApplyModel.findOne({"uid":user.uid,"acid":acid});
-    await apply.update({enrollInfo: post.enrollInfo})
+    await apply.updateOne({enrollInfo: post.enrollInfo})
     // if(!activity.signUser.includes(user.uid)){
     //   activity.signUser.push(user.uid);
     //   await activity.save()
@@ -152,7 +152,7 @@ singleRouter
     const {acid} = params;
     const activity = await db.ActivityModel.findOne({"acid":acid});
     if(activity){
-      await activity.signUser.remove(user.uid);
+      await activity.signUser.deleteOne(user.uid);
       await activity.save();
     }
     const activityApply = await db.ActivityApplyModel.findOne({"uid":user.uid,"acid":acid});

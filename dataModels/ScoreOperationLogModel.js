@@ -58,7 +58,7 @@ schema.statics.getOperationLogCount = async function(user, type, fid = '') {
     fid,
     toc: {$gte: apiFunction.today()}
   };
-  return await ScoreOperationLogModel.count(match);
+  return await ScoreOperationLogModel.countDocuments(match);
 }
 
 /**

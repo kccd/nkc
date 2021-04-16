@@ -9,7 +9,7 @@ settingsRouter
 		if(applicationForm.disabled) ctx.throw(403,'抱歉！该申请表已被屏蔽。');
 		if(applicationForm.useless !== null) ctx.throw(403,'申请表已失效，无法完成该操作。');
 		if(applicationForm.modifyCount >= fund.modifyCount) {
-			await applicationForm.update({useless: 'exceededModifyCount'});
+			await applicationForm.updateOne({useless: 'exceededModifyCount'});
 			throw '抱歉！申请表的修改次数已超过限制，无法提交修改。';
 		}
 		const {lock} = applicationForm;
@@ -46,7 +46,7 @@ settingsRouter
 		const userPersonal = await db.UsersPersonalModel.findOnly({uid: applicationForm.uid});
 		data.lifePhotos = await userPersonal.extendLifePhotos();
 		ctx.template = 'fund/apply/editForm.pug';
-		await applicationForm.update({'lock.submitted': false});
+		await applicationForm.updateOne({'lock.submitted': false});
 		if(applicationForm.toObject) {
       data.applicationForm = applicationForm.toObject();
     }

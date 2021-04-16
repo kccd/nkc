@@ -5,7 +5,7 @@ luckRouter
     const {nkcModules, data, db} = ctx;
     const {user} = data;
     const today = nkcModules.apiFunction.today();
-    const postCount = await db.PostModel.count({uid: user.uid, toc: {$gt: today}});
+    const postCount = await db.PostModel.countDocuments({uid: user.uid, toc: {$gt: today}});
     if(postCount !== 1) ctx.throw(403, '权限不足');
     ctx.template = 'lottery/lottery.pug';
     await next();
@@ -61,7 +61,7 @@ luckRouter
         };
         data.result = result;
       }
-      await user.generalSettings.update({'lotterySettings.status': false});
+      await user.generalSettings.updateOne({'lotterySettings.status': false});
     } catch(err) {
       await lock.unlock();
       throw err;
@@ -71,7 +71,7 @@ luckRouter
   .del('/', async (ctx, next) => {
     const {data} = ctx;
     const {user} = data;
-    await user.generalSettings.update({'lotterySettings.status': false});
+    await user.generalSettings.updateOne({'lotterySettings.status': false});
     await next();
   });
 module.exports = luckRouter;

@@ -9,23 +9,44 @@ var app = new Vue({
     info: ""
   },
   methods: {
+    checkNumber: NKC.methods.checkData.checkNumber,
     save: function() {
+      var self = this;
       this.error = "";
       this.info = "";
       var columnSet = this.columnSettings;
-      if(columnSet.xsfCount < 0) return this.error = "学术分不能小于0";
-      if(columnSet.digestCount < 0) return this.error = "精华数不能小于0";
-      if(columnSet.userGrade < 0) return this.error = "至少勾选一个用户等级";
-      if(columnSet.threadCount < 0) return this.error = "文章数不能小于0";
-      if(columnSet.pageCount < 0) return this.error = "自定义页面个数不能小于0";
-      if(!columnSet.contributeInfo) return this.error = "请输入投稿说明";
-      if(!columnSet.transferInfo) return this.error = "请输入专栏转让说明";
-      nkcAPI("/e/settings/column", "PUT", columnSet)
+      return Promise.resolve()
         .then(function() {
-          app.info = "保存成功";
+          self.checkNumber(columnSet.xsfCount, {
+            name: '开设条件 学术分',
+            min: 0
+          });
+          self.checkNumber(columnSet.digestCount, {
+            name: '开设条件 精华数',
+            min: 0,
+          });
+          self.checkNumber(columnSet.threadCount, {
+            name: '开设条件 文章数',
+            min: 0
+          });
+          if(columnSet.userGrade < 0) throw new Error("至少勾选一个用户等级");
+          if(!columnSet.contributeInfo) throw new Error("请输入投稿说明");
+          if(!columnSet.transferInfo) throw new Error("请输入专栏转让说明");
+          self.checkNumber(columnSet.pageCount, {
+            name: '专栏设置 自定义页面个数',
+            min: 0
+          });
+          self.checkNumber(columnSet.columnHomePostCountMin, {
+            name: '专栏列表 最小文章数',
+            min: 0
+          });
+          return nkcAPI("/e/settings/column", "PUT", columnSet)
+        })
+        .then(function() {
+          sweetSuccess('保存成功');
         })
         .catch(function(data) {
-          screenTopWarning(data);
+          sweetError(data);
         })
     }
   }

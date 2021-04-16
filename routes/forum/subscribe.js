@@ -42,7 +42,7 @@ subscribeRouter
       fid
     });
     await sub.save();
-    /*await forum.update({
+    /*await forum.updateOne({
       $inc: {followerCount: 1}
     });*/
     await db.SubscribeModel.saveUserSubForumsId(user.uid);
@@ -65,8 +65,8 @@ subscribeRouter
     });
 		if(!sub) ctx.throw(400, "您未关注过该专业，请刷新");
 		const {cid} = sub;
-    await sub.remove();
-    /*await forum.update({
+    await sub.deleteOne();
+    /*await forum.updateOne({
       $inc: {followerCount: -1}
     });*/
     await db.SubscribeModel.saveUserSubForumsId(user.uid);

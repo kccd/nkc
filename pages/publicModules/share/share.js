@@ -51,4 +51,3 @@ function shareToOther(shareType, type, title, pid, description, avatar){
       })
   }
 }
-

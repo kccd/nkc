@@ -78,6 +78,7 @@ const ipinfo = require('./ipinfo');
 const blacklist = require('./blacklist');
 const attachment = require("./attachment");
 const verifications = require('./verifications');
+const payment = require('./payment');
 const operationObj = {};
 
 
@@ -271,6 +272,7 @@ operationObj.operationTree = {
 		blacklist, // 黑名单
 		a: attachment, // 网站附件， 通用接口
 		verifications, // 图形验证码相关
+		payment, // 支付相关
     test,
 	}
 };

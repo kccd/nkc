@@ -2,7 +2,7 @@ module.exports = async (ctx, next) => {
   const {data, db, query, nkcModules} = ctx;
   const {targetUser} = data;
   const {page = 0, perpage = 30} = query;
-  const count = await db.DraftModel.count({uid: targetUser.uid});
+  const count = await db.DraftModel.countDocuments({uid: targetUser.uid});
   const paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
   const drafts = await db.DraftModel.find({uid: targetUser.uid}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   data.paging = paging;

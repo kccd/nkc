@@ -29,6 +29,14 @@ module.exports = async (ctx, next) => {
   ctx.reqTime = new Date();
   ctx.data = Object.create(null);
   ctx.nkcModules = nkcModules;
+  const {ip, port} = nkcModules.getRealIP({
+    remoteIp: ctx.ip,
+    remotePort: ctx.req.connection.remotePort,
+    xForwardedFor: ctx.get('x-forwarded-for'),
+    xForwardedRemotePort: ctx.get(`x-forwarded-remote-port`)
+  });
+  ctx.address = ip;
+  ctx.port = port;
   Object.defineProperty(ctx, 'template', {
     get: function() {
       return './pages/' + this.__templateFile
@@ -37,19 +45,11 @@ module.exports = async (ctx, next) => {
       this.__templateFile = fileName
     }
   });
-  let port = ctx.get(`X-Forwarded-Remote-Port`) || ctx.req.connection.remotePort;
-  let XFF = ctx.get('X-Forwarded-For') || ctx.req.connection.remoteAddress;
-  let ip = '';
-  if(XFF !== '') {
-    XFF = XFF.replace(/::ffff:/ig, '');
-    const [ip_] = XFF.split(',');
-    if(ip_) ip = ip_;
-  }
   try{
     ctx.data.operationId = nkcModules.permission.getOperationId(ctx.url, ctx.method);
   } catch(err) {
     if(err.status === 404) {
-      console.log(`未知请求：${ip} ${ctx.method} ${ctx.url}`.bgRed);
+      console.log(`未知请求：${ctx.address} ${ctx.method} ${ctx.url}`.bgRed);
       ctx.template = "error/error.pug";
       ctx.status = 404;
       ctx.data.status = 404;
@@ -61,8 +61,6 @@ module.exports = async (ctx, next) => {
     return;
   }
   try {
-	  ctx.address = ip;
-	  ctx.port = port;
     ctx.body = ctx.request.body;
     const _body= Object.assign({}, ctx.query, ctx.body);
     if(_body.password) {

@@ -119,13 +119,13 @@ shareSchema.statics.ensureEffective = async function(token, id) {
     }
     const arr = reg.exec(shareUrl);
     if(!arr || arr[1]) { // 从shareUrl中无法提取出相应的ID
-      await share.update({tokenLife: 'invalid'});
+      await share.updateOne({tokenLife: 'invalid'});
       throwErr(500,'url数据错误');
     }
     targetId = arr[1];
   }
   if(id !== undefined && targetId !== id) { // 记录的ID与传入的ID不匹配
-    await share.update({tokenLife: 'invalid'});
+    await share.updateOne({tokenLife: 'invalid'});
     throwErr(403, 'token无效');
   }
   let defaultLimit = await ShareLimitModel.findOne({type: 'all'});
@@ -170,7 +170,7 @@ shareSchema.statics.ensureEffective = async function(token, id) {
   }
   const difference = Date.now() - new Date(toc).getTime();
   if(difference > 1000*60*60*shareLimitTime) { // token过期
-    await share.update({tokenLife: 'invalid'});
+    await share.updateOne({tokenLife: 'invalid'});
     throwErr('token无效');
   }
 };
@@ -267,7 +267,7 @@ shareSchema.methods.computeReword = async function(type, ip, port) {
     status = true;
     num = typeSettings.kcb;
   }
-  await this.update(updateObj);
+  await this.updateOne(updateObj);
   // await mongoose.model("users").updateUserKcb(uid);
   await mongoose.model('users').updateUserScores(uid);
   return {
@@ -290,7 +290,7 @@ shareSchema.statics.getNewToken = async () => {
       throwErr(500, `分享：生成唯一token失败`);
     }
     token = apiFunction.getRandomString("a0", 8);
-    const tokenCount = await ShareModel.count({token});
+    const tokenCount = await ShareModel.countDocuments({token});
     if(!tokenCount) break;
   } while(1);
   return token;

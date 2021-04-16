@@ -23,7 +23,7 @@ router
         data.fid = fid;
       }
     }
-    const count = await db.QuestionModel.count(q);
+    const count = await db.QuestionModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count); 
     const questions = await db.QuestionModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.questions = await db.QuestionModel.extendQuestions(questions);
@@ -31,13 +31,13 @@ router
     const forums = await db.ForumModel.find({fid: {$in: fids}});
     data.paging = paging;
     data.forums = await Promise.all(forums.map(async f => {
-      const count = await db.QuestionModel.count({
+      const count = await db.QuestionModel.countDocuments({
         fid: f.fid,
         disabled: false,
         auth: true,
         public: false
       });
-      const allCount = await db.QuestionModel.count({
+      const allCount = await db.QuestionModel.countDocuments({
         fid: f.fid,
         public: false
       });
@@ -48,21 +48,21 @@ router
         allCount
       }
     }));
-    data.allPubCount = await db.QuestionModel.count({
+    data.allPubCount = await db.QuestionModel.countDocuments({
       public: true
     });
-    data.pubCount = await db.QuestionModel.count({
+    data.pubCount = await db.QuestionModel.countDocuments({
       public: true,
       disabled: false,
       auth: true
     });
-    data.allCount = await db.QuestionModel.count();
-    data.count = await db.QuestionModel.count({
+    data.allCount = await db.QuestionModel.countDocuments();
+    data.count = await db.QuestionModel.countDocuments({
       disabled: false,
       auth: true
     });
-    data.unCount = await db.QuestionModel.count({auth: false});
-    data.waitingCount = await db.QuestionModel.count({auth: null});
+    data.unCount = await db.QuestionModel.countDocuments({auth: false});
+    data.waitingCount = await db.QuestionModel.countDocuments({auth: null});
     ctx.template = 'exam/questions.pug';
     await next();
   });

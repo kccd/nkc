@@ -3,7 +3,7 @@ const config = require('../../../config/server.json');
 const checkRouter = new Router();
 checkRouter
   .get('/', async (ctx, next) => {
-    const { data, db, query } = ctx;
+    const { data, db, query, state} = ctx;
     if(ctx.req.headers.cookie) {
       data.cookie = Buffer.from(ctx.req.headers.cookie).toString('base64');
     }

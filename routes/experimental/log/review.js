@@ -4,7 +4,7 @@ router
   .get("/", async (ctx, next) => {
     const {nkcModules, data, db, query} = ctx;
     const {page=0} = query;
-    const count = await db.ReviewModel.count();
+    const count = await db.ReviewModel.countDocuments();
     const paging = nkcModules.apiFunction.paging(page, count);
     const reviews = await db.ReviewModel.find().sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     const uids = new Set(), pids = new Set(), tids = new Set();

@@ -127,9 +127,9 @@ draftSchema.statics.removeDraftById = async (id, uid) => {
   const draft = await DraftModel.findOne({did: id, uid});
   if(!draft) return;
   // if(!draft) throwErr(500, `未找到ID为${id}的草稿`);
-  await draft.remove();
+  await draft.deleteOne();
   if(draft.surveyId) {
-    await SurveyModel.remove({uid, _id: draft.surveyId});
+    await SurveyModel.deleteOne({uid, _id: draft.surveyId});
   }
 };
 

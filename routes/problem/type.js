@@ -22,7 +22,7 @@ router
     name = name.trim();
     const sameName = await db.ProblemsTypeModel.findOne({name, _id: {$ne: typeId}});
     if(sameName) ctx.throw(400, '分类名已存在');
-    await db.ProblemsTypeModel.update({_id: typeId}, {$set: {name}});
+    await db.ProblemsTypeModel.updateOne({_id: typeId}, {$set: {name}});
     await next();
   })
   .del('/:typeId', async (ctx, next) => {
@@ -32,7 +32,7 @@ router
     if(typeId === 0) ctx.throw(400, '默认分类不可删除');
     const type = await db.ProblemsTypeModel.findOnly({_id: typeId});
     await db.ProblemModel.updateMany({typeId: type._id}, {$set: {typeId: 0}});
-    await type.remove();
+    await type.deleteOne();
     await next();
   });
 module.exports = router;

@@ -7,7 +7,7 @@ module.exports = async (ctx, next) => {
     uid: targetUser.uid,
     type: "post"
   };
-  const count = await db.PostModel.count(q);
+  const count = await db.PostModel.countDocuments(q);
   const paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
   let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
   const accessibleForumsId = await db.ForumModel.getAccessibleForumsId(user.roles, user.grade, user);

@@ -7,7 +7,7 @@ module.exports = async (ctx, next) => {
   match.uid = targetUser.uid;
   match.type = "forum";
   match.fid = {$in: subDisciplinesId};
-  const count = await db.SubscribeModel.count(match);
+  const count = await db.SubscribeModel.countDocuments(match);
   const paging = await nkcModules.apiFunction.paging(page, count);
   const subscribes = await db.SubscribeModel.find(match);
   const subscribesObj = {};

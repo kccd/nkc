@@ -15,7 +15,7 @@ router
   .put('/', async (ctx, next) => {
     const {db, data, body, nkcModules} = ctx;
     const {downloadSettings} = body;
-    const {speed, allSpeed, fileCountLimit} = downloadSettings;
+    const {speed, allSpeed, fileCountLimit, freeTime} = downloadSettings;
     const {checkNumber} = nkcModules.checkData;
     const {certList} = data;
     const certListObj = {};
@@ -44,7 +44,7 @@ router
           min: 0,
           max: 24
         });
-        if(startingTime >= endTime) ctx.throw(400, `类型「${name}」速度限制中的起始时间必须小于结束时间`);
+        // if(startingTime >= endTime) ctx.throw(400, `类型「${name}」速度限制中的起始时间必须小于结束时间`);
         checkNumber(speed, {
           name: `类型「${name}」下载速度`,
           min: 0
@@ -53,7 +53,11 @@ router
           name: `类型「${name}」${startingTime}点到${endTime}点附件下载数量`,
           min: 0,
         });*/
-        number += (endTime - startingTime);
+        if(endTime > startingTime) {
+          number += (endTime - startingTime);
+        } else {
+          number += (24 - startingTime + endTime);
+        }
       }
       if(number !== 24) {
         ctx.throw(400, `类型「${name}」速度限制中的时间范围设置错误`);
@@ -74,12 +78,16 @@ router
           min: 0,
           max: 24
         });
-        if(startingTime >= endTime) ctx.throw(400, `类型「${name}」附件个数限制中的起始时间必须小于结束时间`);
+        // if(startingTime >= endTime) ctx.throw(400, `类型「${name}」附件个数限制中的起始时间必须小于结束时间`);
         checkNumber(fileCount, {
           name: `类型「${name}」${startingTime}点到${endTime}点附件最大下载数量`,
           min: 0,
         });
-        number += (endTime - startingTime);
+        if(endTime > startingTime) {
+          number += (endTime - startingTime);
+        } else {
+          number += (24 - startingTime + endTime);
+        }
       }
       if(number !== 24) {
         ctx.throw(400, `类型「${name}」附件个数限制中的时间范围设置错误`);
@@ -115,11 +123,18 @@ router
     }
     if(rolesType.size !== fileCountLimit.roles.length) ctx.throw(400, `证书附件个数限制类型重复`);
 
+    checkNumber(freeTime, {
+      name: '免费重复下载附件的最大时间',
+      min: 0,
+      fractionDigits: 2,
+    });
+
     await db.SettingModel.updateOne({_id: 'download'}, {
       $set: {
         'c.speed': speed,
         'c.allSpeed': allSpeed,
-        'c.fileCountLimit': fileCountLimit
+        'c.fileCountLimit': fileCountLimit,
+        'c.freeTime': freeTime
       }
     });
     await db.SettingModel.saveSettingsToRedis('download');

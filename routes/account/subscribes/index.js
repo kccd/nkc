@@ -31,7 +31,7 @@ router
     } else {
       ctx.throw(400, `未知的参数类型：c = ${c}`);
     }
-    const count = await db.SubscribeModel.count(q);
+    const count = await db.SubscribeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const subscribes = await db.SubscribeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.subscribes = await db.SubscribeModel.extendSubscribes(subscribes);
@@ -57,7 +57,7 @@ router
         const sub = await db.SubscribeModel.findOne({_id});
         if(!sub) continue;
         typesId_ = typesId_.concat(sub.cid);
-        await sub.update({
+        await sub.updateOne({
           cid: typesId
         });
       }

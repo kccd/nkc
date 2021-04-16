@@ -387,6 +387,17 @@ block content
         span &nbsp;系统通知&nbsp;&nbsp;
         input(type="checkbox" value="reminder" v-model="beep")
         span &nbsp;系统提醒&nbsp;&nbsp;
+    .ms-settings-options
+      .ms-settings-options-name 出售商品时允许所有人向我发消息：
+      .ms-settings-options-content
+        .radio
+          label.m-r-05
+            input(type='radio' :value='true' v-model='allowAllMessageWhenSale')
+            span 是
+          label
+            input(type='radio' :value='false' v-model='allowAllMessageWhenSale')
+            span 否
+
     //-.ms-settings-options
       .ms-settings-options-name 只接收好友聊天信息
       .ms-settings-options-content
@@ -395,12 +406,15 @@ block content
         input(type="radio" value="false" v-model="onlyReceiveFromFriends")
         | &nbsp;否&nbsp;&nbsp;
     .ms-settings-options
-      .ms-settings-options-name 短消息防骚扰
+      .ms-settings-options-name 短消息防骚扰：
         span &nbsp;&nbsp;
-        input(type="radio" :value="true" v-model="messageLimit.status")
-        | 开启
-        input(type="radio" :value="false" v-model="messageLimit.status")
-        | 关闭
+        .radio
+          label.m-r-05
+            input(type="radio" :value="true" v-model="messageLimit.status")
+            span 开启
+          label
+            input(type="radio" :value="false" v-model="messageLimit.status")
+            span 关闭
       .ms-settings-options-content(v-if="messageLimit.status")
         div(style="margin: 0.5rem;")
           input(type="checkbox" v-model="messageLimitArr" value="time")
@@ -702,10 +716,10 @@ block content
             .ms-right-body.new-content-body(@click="showEmoji = false" ref='content')
               +messageContent
             .ms-right-input(v-if='target === "UTU"')
-              div(v-if="showMandatoryLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.mandatoryLimitInfo}}
-              div(v-else-if="blacklistInfo" style="padding: 1rem;").p-t-2 {{blacklistInfo}}
+              div(v-if="blacklistInfo" style="padding: 1rem;").p-t-2 {{blacklistInfo}}
                 if permission('canSendToEveryOne')
                   button.btn.btn-default.btn-sm(@click='blacklistInfo = ""') 继续
+              div(v-else-if="showMandatoryLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.mandatoryLimitInfo}}
               div(v-else-if="showCustomizeLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.customizeLimitInfo}}
               div(v-else-if="showSystemLimitInfo" style="padding: 1rem;").p-t-2 {{messageSettings.systemLimitInfo}}
                 .m-t-1.text-center
@@ -795,10 +809,10 @@ block content
               .left.fa.fa-angle-left(@click="initialization")
           // 聊天窗口 footer
           .mobile-footer-input-div(v-if='target === "UTU"')
-            div(v-if="showMandatoryLimitInfo" style="height: 6rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.mandatoryLimitInfo}}
-            div(v-else-if="blacklistInfo" style="height: 12rem;padding: 0.5rem;text-align: center;").p-t-2 {{blacklistInfo}}
+            div(v-if="blacklistInfo" style="height: 12rem;padding: 0.5rem;text-align: center;").p-t-2 {{blacklistInfo}}
               if permission('canSendToEveryOne')
                 button.btn.btn-default.btn-sm(@click='blacklistInfo = ""') 继续
+            div(v-else-if="showMandatoryLimitInfo" style="height: 6rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.mandatoryLimitInfo}}
             div(v-else-if="showCustomizeLimitInfo" style="height: 6rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.customizeLimitInfo}}
             div(v-else-if="showSystemLimitInfo" style="height: 12rem;padding: 0.5rem;text-align: center;").p-t-2 {{messageSettings.systemLimitInfo}}
               .m-t-1.text-center

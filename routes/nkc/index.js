@@ -11,6 +11,7 @@ router
   .get("/", async (ctx, next) => {
     const {db, query, data, nkcModules} = ctx;
     data.type = 'status';
+    const {redisClient} = ctx.settings;
     const {type} = query;
     const x = [];
     const usersData = [];
@@ -25,9 +26,9 @@ router
         x.push(`${i}点 - ${i+1}点`);
         const minTime = new Date(time + ' ' + i + ':00:00');
         const maxTime = new Date(time + ' ' + (i + 1) + ':00:00');
-        const usersCount = await db.UserModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const postsCount = await db.PostModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const threadsCount = await db.ThreadModel.count({toc: {$gt: minTime, $lt: maxTime}});
+        const usersCount = await db.UserModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const postsCount = await db.PostModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const threadsCount = await db.ThreadModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
@@ -58,9 +59,9 @@ router
         } else {
           maxTime = new Date(year + '-' + month + '-' +(i+1)+ ' 00:00:00');
         }
-        const usersCount = await db.UserModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const postsCount = await db.PostModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const threadsCount = await db.ThreadModel.count({toc: {$gt: minTime, $lt: maxTime}});
+        const usersCount = await db.UserModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const postsCount = await db.PostModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const threadsCount = await db.ThreadModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
@@ -82,9 +83,9 @@ router
         minTime += i*oneDay;
         x.push(new Date(minTime).toLocaleDateString());
         const maxTime = minTime + oneDay;
-        const usersCount = await db.UserModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const postsCount = await db.PostModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const threadsCount = await db.ThreadModel.count({toc: {$gt: minTime, $lt: maxTime}});
+        const usersCount = await db.UserModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const postsCount = await db.PostModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const threadsCount = await db.ThreadModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
@@ -124,9 +125,9 @@ router
         x.push(`${firstYear + i}年`);
         const minTime = new Date(`${firstYear+i}-01-01 00:00:00`);
         const maxTime = new Date(`${firstYear+i+1}-01-01 00:00:00`);
-        const usersCount = await db.UserModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const postsCount = await db.PostModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const threadsCount = await db.ThreadModel.count({toc: {$gt: minTime, $lt: maxTime}});
+        const usersCount = await db.UserModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const postsCount = await db.PostModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const threadsCount = await db.ThreadModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
@@ -147,9 +148,9 @@ router
         const minTime = firstTime;
         const maxTime = firstTime + oneDay;
         x.push(new Date(minTime).toLocaleDateString());
-        const usersCount = await db.UserModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const postsCount = await db.PostModel.count({toc: {$gt: minTime, $lt: maxTime}});
-        const threadsCount = await db.ThreadModel.count({toc: {$gt: minTime, $lt: maxTime}});
+        const usersCount = await db.UserModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const postsCount = await db.PostModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
+        const threadsCount = await db.ThreadModel.countDocuments({toc: {$gt: minTime, $lt: maxTime}});
         usersData.push(usersCount);
         postsData.push(postsCount - threadsCount);
         threadsData.push(threadsCount);
@@ -164,12 +165,12 @@ router
       };
     } else {
       data.onlineUsers = [];
-      data.onlineUsersCount = await db.UserModel.count({online: true});
+      data.onlineUsersCount = await db.UserModel.countDocuments({online: true});
       const onlineUsers = await db.UserModel.find({online: true}).sort({toc: 1}).limit(5000);
       for(const onlineUser of onlineUsers) {
         const targetSocket = await db.SocketModel.find({uid: onlineUser.uid});
         if(!targetSocket) {
-          await onlineUser.update({online: false});
+          await onlineUser.updateOne({online: false});
         } else {
           data.onlineUsers.push({
             uid: onlineUser.uid,
@@ -178,7 +179,43 @@ router
           });
         }
       }
+      // 获取统计
+      const keysString = await nkcModules.getRedisKeys('operationStatistics', '*');
+      const keys = await redisClient.keysAsync(keysString);
+      const operationArray = await redisClient.mgetAsync(keys);
+      const statisticsOperation = [];
+      for(const o of operationArray) {
+        const result = JSON.parse(o);
+        const [
+          operationId,
+          count,
+          time,
+          maxTime,
+          minTime
+        ] = result;
+        statisticsOperation.push({
+          operationId,
+          operationName: ctx.state.lang('operations', operationId),
+          count,
+          time,
+          averageTime: (time / count).toFixed(2),
+          maxTime,
+          minTime
+        });
+      }
+      data.statisticsOperation = statisticsOperation;
       ctx.template = "nkc/status/status.pug";
+    }
+    await next();
+  })
+  .post('/', async (ctx, next) => {
+    const {body, settings, nkcModules} = ctx;
+    const {type} = body;
+    const {redisClient} = settings;
+    if(type === 'removeStatisticsOperation') {
+      const keysString = await nkcModules.getRedisKeys('operationStatistics', '*');
+      const keys = await redisClient.keysAsync(keysString);
+      await redisClient.delAsync(keys);
     }
     await next();
   })

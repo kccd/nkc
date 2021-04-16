@@ -30,6 +30,8 @@ const app = new Vue({
     // 是否在首页显示“活动”入口
     showActivityEnter: data.showActivityEnter ? "show" : "hidden",
     updating: false,
+    columnListPosition: data.columnListPosition,
+    columnCount: data.columnCount
   },
   mounted() {
     window.SelectImage = new NKC.methods.selectImage();
@@ -261,7 +263,9 @@ const app = new Vue({
       const columnsId = this.columns.map(c => c._id);
       nkcAPI("/nkc/home", "PUT", {
         operation: "saveColumns",
-        columnsId
+        columnsId,
+        columnListPosition: this.columnListPosition,
+        columnCount: this.columnCount
       })
         .then(() => {
           sweetSuccess("保存成功");

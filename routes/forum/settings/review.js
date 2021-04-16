@@ -31,9 +31,8 @@ router
       roleGradeReview,          // 按角色和等级之间关系送审
     } = body;
     if(newUseWordGroup instanceof Array) {
-      await db.ForumModel.update({ fid: forum.fid }, {
+      await db.ForumModel.updateOne({ fid: forum.fid }, {
         keywordReviewPlanUseTo,
-        keywordReviewUseGroup: newUseWordGroup,
         reviewPlan,
         roleGradeReview
       })

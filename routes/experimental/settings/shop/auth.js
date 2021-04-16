@@ -22,7 +22,7 @@ authRouter
 		if(shopSetting.banList) banList = shopSetting.banList;
 		if(banList.indexOf(sign) > -1) ctx.throw(400, "该用户已在封禁名单中")
 		banList.push(sign);
-		await shopSetting.update({$set:{banList:banList}});
+		await shopSetting.updateOne({$set:{banList:banList}});
 		await next();
 	})
 	.put('/delban', async (ctx, next) => {
@@ -37,7 +37,7 @@ authRouter
 		}else{
 			banList.splice(signIndex, 1);
 		}
-		await shopSetting.update({$set:{banList: banList}});
+		await shopSetting.updateOne({$set:{banList: banList}});
 		await next();
 	})
 module.exports = authRouter;

@@ -29,7 +29,7 @@ router
       await message.save();
       await ctx.redis.pubMessage(message);
     }
-    await column.update({contacted: true});
+    await column.updateOne({contacted: true});
     await next();
   });
 module.exports = router;

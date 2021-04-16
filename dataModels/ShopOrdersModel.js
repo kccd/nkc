@@ -554,14 +554,14 @@ shopOrdersSchema.methods.confirmReceipt = async function() {
     ordersId: [orderId]
   });
   await record.save();
-  await ShopOrdersModel.update({orderId}, {$set: {
+  await ShopOrdersModel.updateOne({orderId}, {$set: {
     orderStatus: "finish",
     finishToc: time
   }});
-  await SettingModel.update({_id: 'kcb'}, {$inc: {
+  await SettingModel.updateOne({_id: 'kcb'}, {$inc: {
     "c.totalMoney": -1 * (orderPrice+orderFreightPrice)
   }});
-  await UserModel.update({uid: order.sellUid}, {$inc: {
+  await UserModel.updateOne({uid: order.sellUid}, {$inc: {
     kcb: (orderPrice+orderFreightPrice)
   }});
   await MessageModel.sendShopMessage({
@@ -626,14 +626,14 @@ shopOrdersSchema.methods.cancelOrder = async function(reason) {
     ]
   });
   await refund.save();
-  await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
+  await ShopOrdersModel.updateOne({orderId: this.orderId}, {$set: {
     closeToc: time,
     closeStatus: true,
     refundStatus: "success"
   }});
   // 恢复库存(拍下减库存)
   if(product.stockCostMethod === "orderReduceStock") {
-    await productParam.update({$set: {stocksSurplus: productParam.stocksSurplus + refuCount}})
+    await productParam.updateOne({$set: {stocksSurplus: productParam.stocksSurplus + refuCount}})
   }
 };
 
@@ -686,7 +686,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
     description += `${p.count}x${p.product.name}(${p.productParam.name}) `
   }
   if(order.orderStatus === "unCost") {
-    await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
+    await ShopOrdersModel.updateOne({orderId: this.orderId}, {$set: {
       closeToc: time,
       closeStatus: true,
       refundStatus: "success"
@@ -713,7 +713,7 @@ shopOrdersSchema.methods.sellerCancelOrder = async function(reason, money) {
       num: money,
       ordersId: [order.orderId]
     });
-    await ShopOrdersModel.update({orderId: this.orderId}, {$set: {
+    await ShopOrdersModel.updateOne({orderId: this.orderId}, {$set: {
       closeToc: time,
       closeStatus: true,
       refundStatus: "success"

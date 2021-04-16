@@ -35,7 +35,7 @@ router
     } else if(t === "token") {
       q.code = c;
     }
-    const count = await db.ShareLogsModel.count(q);
+    const count = await db.ShareLogsModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     data.paging = paging;
     const shareLogs = await db.ShareLogsModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

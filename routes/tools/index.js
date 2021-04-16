@@ -54,7 +54,7 @@ router
     }
     // 更新工具信息
     let toolsModel = db.ToolsModel;
-    await toolsModel.where({_id: fields._id}).update(info);
+    await toolsModel.where({_id: fields._id}).updateOne(info);
     // 把解压好的文件夹移动到最终位置(如果有)
     if(completePath) {
       await deleteFolder(filePath);
@@ -68,7 +68,7 @@ router
     let id = query._id;
     if(!id) ctx.throw(400, "缺少参数 _id");
     let toolsModel = db.ToolsModel;
-    await toolsModel.where({_id: id}).remove();
+    await toolsModel.where({_id: id}).deleteOne();
     const {toolsPath} = ctx.settings.upload;
     await deleteFolder(toolsPath + `/${id}`);
     await next();
@@ -118,7 +118,7 @@ router
     let result = await toolsModel.findOne({_id: id});
     let toolinfo = result.toObject();
     let isHide = toolinfo.isHide;
-    await toolsModel.where({_id: id}).update({isHide: !isHide});
+    await toolsModel.where({_id: id}).updateOne({isHide: !isHide});
     await next();
   })
   // 网站工具的启用和禁用

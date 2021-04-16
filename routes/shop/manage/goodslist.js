@@ -23,7 +23,7 @@ goodslistRouter
     }else{
       searchMap.productStatus = "notonshelf";
     }
-    const count = await db.ShopGoodsModel.count(searchMap);
+    const count = await db.ShopGoodsModel.countDocuments(searchMap);
 		const paging = nkcModules.apiFunction.paging(page, count);
 		data.paging = paging;
     const products = await db.ShopGoodsModel.find(searchMap).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -84,7 +84,7 @@ goodslistRouter
     } else {
       price = originPrice;
     }
-    await productParam.update({
+    await productParam.updateOne({
       name,
       stocksSurplus,
       originPrice,
@@ -137,13 +137,13 @@ goodslistRouter
     if(product.paraIdArr){
       oldParaIdArr = product.paraIdArr;
     }
-    await db.ShopProductsParamModel.remove({_id:{$in:oldParaIdArr}})
+    await db.ShopProductsParamModel.deleteMany({_id:{$in:oldParaIdArr}})
     // 删除旧的独立规格
     let oldSingleParaIdArr = [];
     if(product.singleParaIdArr) {
       oldSingleParaIdArr = product.singleParaIdArr;
     }
-    await db.ShopProductsParamModel.remove({_id:{$in:oldSingleParaIdArr}});
+    await db.ShopProductsParamModel.deleteMany({_id:{$in:oldSingleParaIdArr}});
     // 添加新的销售规格
     let paraIdArr = [];
     for(const p of productParams) {
@@ -172,7 +172,7 @@ goodslistRouter
       await sd.save();
     }
     // 修改产品属性列表
-    await product.update({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice, params, paraIdArr, singleParaIdArr,vipDiscount,vipDisGroup,productSettings,imgIntroductions,imgMaster, freightTemplates}});
+    await product.updateOne({$set:{stockCostMethod, purchaseLimitCount, uploadCert, uploadCertDescription,isFreePost, freightPrice, params, paraIdArr, singleParaIdArr,vipDiscount,vipDisGroup,productSettings,imgIntroductions,imgMaster, freightTemplates}});
     await next();
   })
   // 立即上架
@@ -190,7 +190,7 @@ goodslistRouter
     const product = await db.ShopGoodsModel.findOne({productId});
     if(!product) ctx.throw(400, "商品不存在");
     if(product.productStatus === "stopsale") ctx.throw(400, "该商品已处于停售状态");
-    await product.update({$set:{productStatus: "stopsale"}})
+    await product.updateOne({$set:{productStatus: "stopsale"}})
     await next();
   })
   // 商品复售
@@ -200,7 +200,7 @@ goodslistRouter
     const product = await db.ShopGoodsModel.findOne({productId});
     if(!product) ctx.throw(400, "商品不存在");
     if(product.productStatus === "insale") ctx.throw(400, "商品已处于售卖状态");
-    await product.update({$set:{productStatus: "insale"}});
+    await product.updateOne({$set:{productStatus: "insale"}});
     await next();
   })
 module.exports = goodslistRouter;

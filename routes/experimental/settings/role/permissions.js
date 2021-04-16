@@ -21,7 +21,7 @@ permissionsRouter
 				newOperationsId.push(operationId);
 			}
 		}
-		await role.update({operationsId: newOperationsId});
+		await role.updateOne({operationsId: newOperationsId});
 		await db.RoleModel.saveRolesToRedis();
 		await next();
 	});

@@ -49,7 +49,7 @@ router
 		try{
       await targetUser.save();
     } catch(err) {
-      await newRecord.remove();
+      await newRecord.deleteOne();
       throw(err);
     }
 		await targetUser.calculateScore();
@@ -94,7 +94,7 @@ router
     targetUser.xsf -= record.num;
     await targetUser.save();
     try{
-      await record.update(
+      await record.updateOne(
         {
           reason,
           tlm: Date.now(),
@@ -162,7 +162,7 @@ router
 			type: 'kcb',
 			q: num
 		};
-		await post.update({$push: {credits: updateObjForPost}});
+		await post.updateOne({$push: {credits: updateObjForPost}});
     await thread.updateThreadEncourage();
     // 发消息
     const message = db.MessageModel({

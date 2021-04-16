@@ -12,10 +12,10 @@ const PATH = require('path');
 const attachmentConfig = require("../config/attachment.json");
 const mkdirp = require("mkdirp");
 
-const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif"];
+const pictureExtensions = ["jpg", "jpeg", "png", "bmp", "svg", "gif", "webp"];
 const videoExtensions = ["mp4", "mov", "3gp", "avi", 'webm'];
 const audioExtensions = ["wav", "amr", "mp3", "aac", 'flac'];
-
+const breakpointExtensions = ['mp4', 'mp3', 'pdf'];
 func.folders = {
   attachment: './attachment',
   resource: './resource',
@@ -53,7 +53,7 @@ func.getBasePath = async (t) => {
   for(const a of attachmentConfig) {
     const {path, startingTime, endTime} = a;
     const _path = PATH.resolve(path);
-    if(!await func.access(path)) throwErr `指定的目录 ${path} 不存在`;
+    if(!await func.access(path)) throwErr(500, `指定的目录 ${path} 不存在`);
     // if(!fs.existsSync(path)) throwErr `指定的目录 ${path} 不存在`;
     const sTime = new Date(startingTime + ' 00:00:00').getTime();
     const eTime = new Date(endTime + ' 00:00:00').getTime();
@@ -111,6 +111,21 @@ func.getMediaTypeByExtension = (extension) => {
     return 'mediaAttachment'
   }
 };
+/*
+* 获取制定类型的文件格式
+* */
+func.getExtensionByType = (type) => {
+  if(type === 'mediaPicture') {
+    return pictureExtensions;
+  } else if(type === 'mediaVideo') {
+    return videoExtensions;
+  } else if(type === 'mediaAudio') {
+    return audioExtensions;
+  } else if(type === 'breakpoint') {
+    return breakpointExtensions;
+  }
+  return []
+}
 
 /**
  * 存储专栏头像2.0
@@ -139,7 +154,7 @@ func.saveColumnAvatar$2 = async (columnId, file) => {
     uid: column.uid
   });
   await attachment.save();
-  await column.update({avatar: aid});
+  await column.updateOne({avatar: aid});
   const imgTypes = ["columnAvatar", "columnAvatarSM", "columnAvatarLG"];
   for(const imgType of imgTypes) {
     const log = await db.ImageLogModel({
@@ -159,7 +174,7 @@ func.saveColumnAvatar$2 = async (columnId, file) => {
 // 删除专栏头像文件
 func.deleteColumnAvatar = async (columnId) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
-  await column.update({avatar: ""});
+  await column.updateOne({avatar: ""});
 };
 
 /**
@@ -189,7 +204,7 @@ func.saveColumnBanner$2 = async (columnId, file) => {
     uid: column.uid
   });
   await attachment.save();
-  await column.update({banner: aid});
+  await column.updateOne({banner: aid});
   const imgTypes = ["columnBanner", "columnBannerSM"];
   for(const imgType of imgTypes) {
     const log = await db.ImageLogModel({
@@ -209,7 +224,7 @@ func.saveColumnBanner$2 = async (columnId, file) => {
 // 删除专栏背景文件
 func.deleteColumnBanner = async (columnId) => {
   const column = await db.ColumnModel.findOnly({_id: columnId});
-  await column.update({banner: ""});
+  await column.updateOne({banner: ""});
 };
 
 /**
@@ -240,7 +255,7 @@ func.saveUserAvatar$2 = async (uid, file) => {
     uid,
   });
   await attachment.save();
-  await user.update({avatar: aid});
+  await user.updateOne({avatar: aid});
   return attachment;
 }
 
@@ -252,7 +267,7 @@ func.saveUserAvatar$2 = async (uid, file) => {
 * */
 func.deleteUserAvatar = async (uid) =>{
   const user = await db.UserModel.findOnly({uid});
-  await user.update({avatar: ""});
+  await user.updateOne({avatar: ""});
 };
 
 
@@ -290,7 +305,7 @@ func.saveUserBanner$2 = async (uid, file) => {
     type: "userChangeBanner"
   });
   await log.save();
-  await user.update({banner: aid});
+  await user.updateOne({banner: aid});
   return aid;
 };
 
@@ -301,7 +316,7 @@ func.saveUserBanner$2 = async (uid, file) => {
 * */
 func.deleteUserBanner = async (uid) =>{
   const user = await db.UserModel.findOnly({uid});
-  await user.update({banner: ""});
+  await user.updateOne({banner: ""});
 };
 
 /*
@@ -335,7 +350,7 @@ func.saveResourceCover = async (rid, file) => {
     background: "#ffffff",
     quality: 90
   });
-  await resource.update({cover: hash});
+  await resource.updateOne({cover: hash});
   await fsSync.unlink(path);
 };
 
@@ -382,7 +397,7 @@ func.modifyPostCovers = async (pid, covers) => {
       quality: 90
     });
   }
-  await post.update({covers: coversHash});
+  await post.updateOne({covers: coversHash});
 };
 
 /*
@@ -411,7 +426,7 @@ func.createPostCoverByPostId = async (pid) => {
       width: 800,
       quality: 90
     });
-    await post.update({cover: pid});
+    await post.updateOne({cover: pid});
   }
 };
 /*

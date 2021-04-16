@@ -346,9 +346,9 @@ schema.statics.checkSurveyData = async (survey) => {
       name: "点赞数",
       min: 0
     });
-    const gradesCount = await mongoose.model("usersGrades").count({_id: {$in: gradesId}});
+    const gradesCount = await mongoose.model("usersGrades").countDocuments({_id: {$in: gradesId}});
     if(gradesCount !== gradesId.length) throwErr(400, "用户等级数据错误，请刷新后重试");
-    const certsCount = await mongoose.model("roles").count({_id: {$in: certsId}});
+    const certsCount = await mongoose.model("roles").countDocuments({_id: {$in: certsId}});
     if(certsCount !== certsId.length) throwErr(400, "证书数据错误，请刷新后重试");
 
     const uidArr = [];
@@ -584,7 +584,7 @@ schema.methods.computePostCount = async function() {
   for(const o of options) {
     delete o.answersObj;
   }
-  await this.update({postCount: count, options});
+  await this.updateOne({postCount: count, options});
   return await mongoose.model("surveys").findOne({_id: this._id});
 };
 /*

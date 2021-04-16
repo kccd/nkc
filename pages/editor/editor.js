@@ -624,19 +624,18 @@ function initVueApp() {
       },
       // 检测标题
       checkTitle: function() {
-        this.checkString(this.title, {
-          name: "标题",
-          minLength: 6,
-          maxLength: 200
-        });
+        if(this.title.length < 3) throw new Error('标题不能少于3个字');
+        if(this.title.length > 100) throw new Error('标题不能超过100个字');
       },
       // 检测内容
       checkContent: function() {
-        this.checkString(this.content, {
-          name: "内容",
-          minLength: 1,
-          maxLength: 100000
-        });
+        var contentText = $(this.content).text();
+        if(contentText.length > 100000) {
+          throw new Error('内容不能超过10万字');
+        }
+        if(contentText.length < 3) {
+          throw new Error('内容不能少于3个字');
+        }
       },
       // 检测摘要
       checkAbstract: function() {

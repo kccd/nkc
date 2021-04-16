@@ -252,7 +252,7 @@ router
         ]
       };
 
-      const count = await db.PostModel.count(q);
+      const count = await db.PostModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let posts = await db.PostModel.find(q, {
         pid: 1,
@@ -405,7 +405,7 @@ router
     data.threads = [];
     let threads = [];
     if(threadListType !== 'subscribe') {
-      const count = await db.ThreadModel.count(q);
+      const count = await db.ThreadModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.homeThreadList);
       let sort = {tlm: -1};
       if(s === "toc") sort = {toc: -1};
@@ -478,10 +478,10 @@ router
         data.recommendThreads = await db.ThreadModel.getRecommendThreads(fidOfCanGetThreads);
       }
       if(ctx.permission("complaintGet")) {
-        data.unResolvedComplaintCount = await db.ComplaintModel.count({resolved: false});
+        data.unResolvedComplaintCount = await db.ComplaintModel.countDocuments({resolved: false});
       }
       if(ctx.permission("visitProblemList")) {
-        data.unResolvedProblemCount = await db.ProblemModel.count({resolved: false});
+        data.unResolvedProblemCount = await db.ProblemModel.countDocuments({resolved: false});
       }
       if(ctx.permission("review")) {
         const q = {

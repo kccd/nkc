@@ -237,7 +237,7 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
     let columnPost = await ColumnPostModel.findOne({columnId, pid});
     const order = await ColumnPostModel.getCategoriesOrder(categoriesId);
     if(columnPost) {
-      await columnPost.update({
+      await columnPost.updateOne({
         cid: categoriesId,
         order
       });
@@ -258,6 +258,7 @@ schema.statics.addColumnPosts = async (columnId, categoriesId, postsId) => {
     });
     await columnPost.save();
   }
+  await column.updateBasicInfo();
 };
 /*
 * 标记专栏文章所对应的thread，inColumn字段;
@@ -276,7 +277,7 @@ schema.post("save", async function(columnPost) {
 });
 schema.post("remove", async function(columnPost) {
   if(columnPost.type === "thread") {
-    const count = await mongoose.model("columnPosts").count({
+    const count = await mongoose.model("columnPosts").countDocuments({
       _id: {$ne: columnPost._id},
       type: "thread",
       tid: columnPost.tid
@@ -293,6 +294,8 @@ schema.post("remove", async function(columnPost) {
     }
     await mongoose.model("threads").updateOne({tid: columnPost.tid}, obj);
   }
+  const column = await mongoose.model('columns').findOne({_id: columnPost.columnId});
+  if(column) await column.updateBasicInfo();
 });
 /*
 * 检测专栏中是否存在指定内容
@@ -303,7 +306,7 @@ schema.post("remove", async function(columnPost) {
 * */
 schema.statics.checkColumnPost = async (columnId, pid) => {
   const ColumnPostModel = mongoose.model('columnPosts');
-  const count = await ColumnPostModel.count({columnId, pid});
+  const count = await ColumnPostModel.countDocuments({columnId, pid});
   return count > 0;
 }
 module.exports = mongoose.model("columnPosts", schema);

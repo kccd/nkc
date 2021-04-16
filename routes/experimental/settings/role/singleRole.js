@@ -68,7 +68,7 @@ router
       const operations = await db.OperationModel.find({_id: {$in: operationsId}});
       updateObj.operationsId = operations.map(o => o._id);
     }
-    await roleDB.update(updateObj);
+    await roleDB.updateOne(updateObj);
     await db.RoleModel.saveRolesToRedis();
     await next();
   })
@@ -78,7 +78,7 @@ router
     const {role} = data;
     const {file} = body.files;
     await fsPromise.copyFile(file.path, defaultRoleIconPath + '/' + role._id + '.png');
-    await role.update({hasIcon: true});
+    await role.updateOne({hasIcon: true});
     await db.RoleModel.saveRolesToRedis();
     await next();
   })
@@ -89,7 +89,7 @@ router
 		if(role.type === 'system') ctx.throw(400, '无法删除系统类证书');
     await db.UserModel.updateMany({certs: _id}, {$pull: {certs: _id}});
     await db.ForumModel.updateMany({rolesId: _id}, {$pull: {rolesId: _id}});
-		await role.remove();
+		await role.deleteOne();
     await db.RoleModel.saveRolesToRedis();
 		await next();
   });

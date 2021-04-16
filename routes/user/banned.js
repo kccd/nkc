@@ -6,7 +6,7 @@ bannedRouter
 		const {uid} = params;
 		const targetUser = await db.UserModel.findOnly({uid});
 		if(!targetUser.certs.includes('banned')) ctx.throw(400, '该用户未被封禁');
-		await targetUser.update({$pull: {certs: 'banned'}});
+		await targetUser.updateOne({$pull: {certs: 'banned'}});
 		await next();
 		/*} else {
 			if(certs.indexOf('moderator') >= 0 ||
@@ -24,7 +24,7 @@ bannedRouter
 			if(certs.includes('banned')) {
 				ctx.throw(400, '该用户已经被封禁，请刷新。');
 			}
-			await targetUser.update({$addToSet: {certs: 'banned'}});
+			await targetUser.updateOne({$addToSet: {certs: 'banned'}});
 		}
 		await next();*/
 	})
@@ -39,7 +39,7 @@ bannedRouter
 			if(!rolesId.includes('editor')) ctx.throw(403, '权限不足');
 		}
 		if(targetUser.certs.includes('banned')) ctx.throw(400, '该用户已被封禁');
-		await targetUser.update({$addToSet: {certs: 'banned'}});
+		await targetUser.updateOne({$addToSet: {certs: 'banned'}});
 		await next();
 	});
 module.exports = bannedRouter;

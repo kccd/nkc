@@ -36,7 +36,7 @@ registerRouter
 		  nationCode
 	  };
 	  const smsCode = await db.SmsCodeModel.ensureCode(option);
-	  await smsCode.update({used: true});
+	  await smsCode.updateOne({used: true});
 	  option.regIP = ctx.address;
 	  option.regPort = ctx.port;
 	  delete option.type;

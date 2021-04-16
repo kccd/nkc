@@ -259,7 +259,7 @@ userRouter
       } else {
         q.reviewed = true;
       }
-      const count = await db.PostModel.count(q);
+      const count = await db.PostModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
       const posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
       const results = [];
@@ -378,7 +378,7 @@ userRouter
       } else {
         q.reviewed = true;
       }
-      const count = await db.ThreadModel.count(q);
+      const count = await db.ThreadModel.countDocuments(q);
       paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardThreadList);
       let threads = await db.ThreadModel.find(q, {
         tid: 1,
@@ -468,7 +468,7 @@ userRouter
           uid: targetUser.uid,
           type: "user"
         };
-        const count = await db.SubscribeModel.count(q);
+        const count = await db.SubscribeModel.countDocuments(q);
         paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardUserList);
         if(!data.noPromission) {
           const subs = await db.SubscribeModel.find(q, {tUid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
@@ -480,7 +480,7 @@ userRouter
           tUid: targetUser.uid,
           type: "user"
         };
-        const count = await db.SubscribeModel.count(q);
+        const count = await db.SubscribeModel.countDocuments(q);
         paging = nkcModules.apiFunction.paging(page, count, pageSettings.userCardUserList);
         if(!data.noPromission) {
           const subs = await db.SubscribeModel.find(q, {uid: 1}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

@@ -19,7 +19,7 @@ router
   .get('/', async (ctx, next) => {
     const {db, data, query, nkcModules} = ctx;
     const {page = 0} = query;
-    const count = await db.PreparationForumModel.count();
+    const count = await db.PreparationForumModel.countDocuments();
     const paging = nkcModules.apiFunction.paging(page, count);
     const pForums = await db.PreparationForumModel.find({}).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     const result = [];
@@ -78,14 +78,14 @@ router
       // 把创始人名单添加到记录中
       const agreeUsersId = pForum.founders.filter(f => f.accept === 'resolved').map(f => f.uid);
       agreeUsersId.unshift(pForum.uid);
-      await db.ForumModel.update({fid: newForum.fid}, {
+      await db.ForumModel.updateOne({fid: newForum.fid}, {
         $set: {
           founders: agreeUsersId
         }
       });
       updateObj.fid = newForum.fid;
       updateObj.expired = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-      await pForum.update(updateObj);
+      await pForum.updateOne(updateObj);
       // 发送审核通过消息
       await db.MessageModel.sendNewForumReviewResolve({
         pfid,
@@ -93,7 +93,7 @@ router
         targetUid: pForum.uid
       });
     } else {
-      await pForum.update(updateObj);
+      await pForum.updateOne(updateObj);
       await db.MessageModel.sendNewForumReviewReject({
         pfid,
         targetUid: pForum.uid

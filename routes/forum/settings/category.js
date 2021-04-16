@@ -31,10 +31,10 @@ categoryRouter
 			const {parentId} = body;
 			if(parentId === forum.fid) ctx.throw(400, '板块不能成为自己的子版块');
 			if(!parentId) {
-				await forum.update({parentsId: []});
+				await forum.updateOne({parentsId: []});
 			} else {
 				const targetForum = await db.ForumModel.findOnly({fid: parentId});
-				await forum.update({parentsId:[parentId], categoryId:targetForum.categoryId});
+				await forum.updateOne({parentsId:[parentId], categoryId:targetForum.categoryId});
         forum.parentsId = [parentId];
         const fids = await forum.getAllChildForumsId();
         await db.ForumModel.updateMany({fid: {$in: fids}}, {$set: {
@@ -49,12 +49,12 @@ categoryRouter
 			for(let i = 0; i < childrenFid.length; i++) {
 				const fid = childrenFid[i];
 				const childrenForum = await db.ForumModel.findOnly({fid});
-				await childrenForum.update({order: i});
+				await childrenForum.updateOne({order: i});
 			}
 			for(let i = 0; i < threadTypesCid.length; i++) {
 				const cid = threadTypesCid[i];
 				const threadType = await db.ThreadTypeModel.findOnly({cid});
-				await threadType.update({order: i});
+				await threadType.updateOne({order: i});
 			}
 			const forumsId = await forum.getAllChildForumsId();
 			forumsId.push(forum.fid);
@@ -68,7 +68,7 @@ categoryRouter
 			const threadType = await db.ThreadTypeModel.findOne({name: oldName, fid: forum.fid});
 			if(!threadType) ctx.throw(400, '原分类名不存在');
 			if(!name) ctx.throw(400, '新分类名不能为空');
-			await threadType.update({name});
+			await threadType.updateOne({name});
 		}
 		await db.ForumModel.saveForumsIdToRedis("topic");
     await db.ForumModel.saveForumsIdToRedis("discipline");
@@ -108,7 +108,7 @@ categoryRouter
 		const threadType = await db.ThreadTypeModel.findOne({fid: forum.fid, name});
 		if(!threadType) ctx.throw(400, '分类不存在');
 		await db.ThreadModel.updateMany({categoriesId: threadType.cid}, {$pull: {categoriesId: threadType.cid}});
-    await threadType.remove();
+    await threadType.deleteOne();
     // await redis.cacheForums();
 		await next();
 	})

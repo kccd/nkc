@@ -4055,9 +4055,7 @@ span[data-tag="nkcsource"][data-type="audio"]{
   margin-bottom: 0.3rem;
 }
 .nkcsource-video-title {
-  position: absolute;
-  width: 100%;
-  padding-top: 0.3rem;
+  /*font-style: oblique;*/
 }
 
 /* 文章中的附件 旧*/

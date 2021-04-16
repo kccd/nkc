@@ -71,7 +71,7 @@ router
     if(column) {
       let url = `/m/${column._id}`;
       if(column.closed) {
-        await column.update({closed: false});
+        await column.updateOne({closed: false});
       }
       return ctx.redirect(url);
     }

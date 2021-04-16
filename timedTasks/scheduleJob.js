@@ -10,7 +10,7 @@ const db = require("../dataModels");
 const {
   PostModel, ThreadModel, UserModel, ActiveUserModel,
   ShopOrdersModel, ShopRefundModel, ShopGoodsModel,
-  SettingModel, ForumModel
+  SettingModel, ForumModel, VerificationModel
 } = db;
 
 const jobs = {};
@@ -91,7 +91,7 @@ jobs.shop = () => {
       try {
         await order.confirmReceipt();
       } catch(err) {
-        await order.update({
+        await order.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -114,7 +114,7 @@ jobs.shop = () => {
           `卖家处理超时，默认同意${refund.status === "B_APPLY_RM"? "退款": "退货退款"}申请`
         );
       } catch(err) {
-        await refund.update({
+        await refund.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -134,7 +134,7 @@ jobs.shop = () => {
           "卖家处理超时，默认卖家确认收货"
         );
       } catch(err) {
-        await refund.update({
+        await refund.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -154,7 +154,7 @@ jobs.shop = () => {
           "卖家处理超时，默认卖家同意退款"
         );
       } catch(err) {
-        await refund.update({
+        await refund.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -174,7 +174,7 @@ jobs.shop = () => {
           "买家发货超时，默认取消申请"
         );
       } catch(err) {
-        await refund.update({
+        await refund.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -195,7 +195,7 @@ jobs.shop = () => {
           "买家未在规定的时间内完成付款，订单已被取消"
         );
       } catch(err) {
-        order.update({
+        order.updateOne({
           error: err.message || JSON.stringify(err)
         })
       }
@@ -222,7 +222,7 @@ jobs.shop = () => {
       try {
         await product.onshelf();
       } catch(err) {
-        await product.update({
+        await product.updateOne({
           error: err.message || JSON.stringify(err)
         });
       }
@@ -286,6 +286,21 @@ jobs.clearFileCache = async () => {
     console.log(`文件缓存清理完成，共清理文件${count}个`);
   });
 }
-
+/*
+* 清空24小时之前的图形验证码图片字段
+* */
+jobs.clearVerificationData = async () => {
+  scheduleJob(`0 0 5 * * *`, async () => {
+    console.log(`正在清理图形验证码...`);
+    await VerificationModel.updateMany({
+      toc: {$lte: Date.now() - 24 * 60 * 60 * 1000}
+    }, {
+      $set: {
+        c: null
+      }
+    });
+    console.log(`图形验证码清理完成`);
+  });
+}
 
 module.exports = jobs;

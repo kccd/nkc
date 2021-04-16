@@ -3,7 +3,7 @@ block nkcTitle
   title 主页设置 - 前台管理
   +includeCSS('/nkc/home/home.css')
 block nkcContent
-  #data.hidden=objToStr({recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
+  #data.hidden=objToStr({columnCount: data.columnCount, columnListPosition: data.columnListPosition, recommendThreads: data.recommendThreads, ads: data.ads, recommendForums: data.recommendForums, columns: data.columns, showGoods: data.showShopGoods, goods: data.goods, latestToppedThreads: data.latestToppedThreads, toppedThreads: data.toppedThreads, originalThreadDisplayMode: data.originalThreadDisplayMode, showActivityEnter: data.showActivityEnter})
   .col-xs-12.col-md-12.management-home#app(v-cloak)
     ul.nav.nav-tabs
       li(v-for='n in nav' :class='{"active": n.active}' @click='selectPage(n)')
@@ -217,6 +217,21 @@ block nkcContent
             .home-top-forum-info
               img.home-top-forum-icon( :src="getUrl('columnAvatar', f._id)")
               a.pointer(@click="visitUrl('/m/' + f._id, true)").home-top-forum-name {{f.name}}
+          .m-t-1
+            span 专栏列表位置：
+            .radio
+              label.m-r-1
+                input(type='radio' value='main' v-model='columnListPosition')
+                span 主栏
+              label.m-r-1
+                input(type='radio' value='side' v-model='columnListPosition')
+                span 侧边
+              label
+                input(type='radio' value='null' v-model='columnListPosition')
+                span 不显示
+          .m-t-1.form-inline
+            span 专栏数量：
+            input.form-control(type='text' v-model.number='columnCount')
           .m-t-1
             button.management-button(@click="saveColumns") 保存
       div.m-t-2

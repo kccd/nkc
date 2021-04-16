@@ -19,7 +19,7 @@ router
         $in: fid
       }
     }
-    const count = await db.PostModel.count(q);
+    const count = await db.PostModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, 100);
     let posts = await db.PostModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     posts = await db.PostModel.extendPosts(posts, {
@@ -107,12 +107,12 @@ router
     if(!isModerator) ctx.throw(403, `您没有权限审核该内容，pid: ${pid}`);
 
     let type = "passPost";
-    await post.update({
+    await post.updateOne({
       reviewed: true
     });
     const thread = await db.ThreadModel.findOnly({tid: post.tid});
     if(thread.oc === post.pid) {
-      await thread.update({
+      await thread.updateOne({
         reviewed: true
       });
       type = "passThread";

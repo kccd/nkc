@@ -70,7 +70,7 @@ module.exports = async (io) => {
       onlineType = 'computer';
     }
     socket.NKC.onlineType = onlineType;
-    await db.UserModel.update({uid: user.uid}, {
+    await db.UserModel.updateOne({uid: user.uid}, {
       $set: {
         online: true,
         onlineType

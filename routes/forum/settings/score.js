@@ -48,7 +48,7 @@ router
         type
       });
       if(forumScoreOperation) {
-        await forumScoreOperation.update(_operation);
+        await forumScoreOperation.updateOne(_operation);
       } else {
         _operation._id = await db.SettingModel.operateSystemID('scoreOperations', 1);
         forumScoreOperation = db.ScoreOperationModel(_operation);
@@ -57,7 +57,7 @@ router
       _forumScoreOperationsId.delete(forumScoreOperation._id);
     }
     // 删除前端未提交的当前专业积分策略
-    await db.ScoreOperationModel.remove({
+    await db.ScoreOperationModel.deleteMany({
       _id: {$in: [..._forumScoreOperationsId]},
       from: 'forum',
       fid: forum.fid

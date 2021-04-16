@@ -180,7 +180,7 @@ router
 				'c.archive': archive
 			}
 		});
-		await db.ForumCategoryModel.remove({_id: {$nin: cid}});
+		await db.ForumCategoryModel.deleteMany({_id: {$nin: cid}});
 		const forumCategories = await db.ForumCategoryModel.find();
 		const forumCategoriesId = forumCategories.map(f => f._id);
 		for(let i = 0; i < forumCategories.length; i++) {
@@ -207,7 +207,7 @@ router
 			}
 
 			excludedCategoriesId = [...new Set(excludedCategoriesId)];
-			await fc.update({excludedCategoriesId});
+			await fc.updateOne({excludedCategoriesId});
 		}
 
 		await db.SettingModel.updateOne({_id: 'forum'}, {

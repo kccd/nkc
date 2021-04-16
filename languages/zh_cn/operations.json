@@ -771,5 +771,9 @@
   "postCommentControl": "回复中评论的控制",
 
   "sensitiveWords": "敏感词设置",
-  "accountExchange": "积分兑换"
+  "accountExchange": "积分兑换",
+  "receiveWeChatPaymentInfo": "接收微信支付通知",
+  "postWeChatPayInfo": "发起微信支付",
+  "receiveAliPayPaymentInfo": "接收支付宝支付通知",
+  "postAliPayInfo": "发起支付宝支付"
 }

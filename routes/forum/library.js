@@ -37,11 +37,11 @@ router
       data.library = library;
       if(type === "open") {
         if(!library.closed) ctx.throw(400, "文库未关闭");
-        await library.update({closed: false});
+        await library.updateOne({closed: false});
         data.libraryClosed = false;
       } else {
         if(library.closed) ctx.throw(400, "文库已关闭");
-        await library.update({closed: true});
+        await library.updateOne({closed: true});
         data.libraryClosed = true;
       }
     }

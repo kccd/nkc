@@ -16,8 +16,10 @@ block eContent
         span.h4 总下载速度：
         input.form-control(type='text' v-model.number='settings.allSpeed').m-r-05
         span KB / 进程
+        span.text-danger （包含图片、音频、视频以及附件）
       .col-xs-12.col-md-12.m-b-2
         h4 速度限制
+          small.text-danger （仅包含附件）
         .table-responsive
           table.table.table-bordered
             thead
@@ -26,7 +28,7 @@ block eContent
                 th 速度限制（时间必须覆盖0-24）
                 th 其他
             tbody
-              tr(v-for='t, index in settings.speed.others')
+              tr(v-for='(t, index) in settings.speed.others')
                 th.select
                   select.form-control(v-model='t.type')
                     option(v-for='c in certList' :value='c.type') {{c.name}}
@@ -140,6 +142,11 @@ block eContent
                   button.btn.btn-danger.btn-sm(@click='removeFromArray(settings.fileCountLimit.roles, index)') 删除
           .m-t-1
             button.btn.btn-default(@click='addRole(settings.fileCountLimit.roles)') 添加
+      .col-xs-12.col-md-12.m-b-2
+        .h4.form-inline
+          span 免费下载附件：
+          input.form-control.m-r-05(type='text' v-model.number="settings.freeTime")
+          span 小时内重复下载附件免费
       .col-xs-12.col-md-12
         .m-t-1
           button.btn.btn-primary(@click='save') 保存

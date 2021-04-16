@@ -74,7 +74,7 @@ router
         if(et) {
           q.tc = {$lte: et}
         }
-        const count = await db.MessageModel.count(q);
+        const count = await db.MessageModel.countDocuments(q);
         const paging = nkcModules.apiFunction.paging(page, count);
         const messages = await db.MessageModel.find(q).sort({tc: -1}).skip(paging.start).limit(paging.perpage);
         // 拓展信息信息

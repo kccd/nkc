@@ -8,7 +8,7 @@ router
       deleted: false,
       shared: true
     };
-    const count = await db.StickerModel.count(q);
+    const count = await db.StickerModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, Number(perpage));
     data.stickers = await db.StickerModel.find(q).sort({hits: -1}).skip(paging.start).limit(paging.perpage);
     data.paging = paging;

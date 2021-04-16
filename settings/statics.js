@@ -1,7 +1,7 @@
 const path = require('path');
 const defaultPath = path.resolve(__dirname, '../public/default');
 const staticPath = path.resolve(__dirname, '../public/statics');
-const siteSpecificPath = path.resolve(staticPath, '/site');
+const siteSpecificPath = path.resolve(staticPath, './site');
 const attachIconPath = path.resolve(staticPath, './file_cover');
 const normalWatermark = path.resolve(defaultPath, './watermark_normal.png');
 const smallWatermark = path.resolve(defaultPath, './watermark_small.png')
@@ -32,6 +32,7 @@ const defaultRoleIconPath = staticPath + '/role_icon';
 const defaultHomeBigLogo = siteSpecificPath + '/kclogo_misaka1.png';
 const deletedPhotoPath = defaultPath + '/deleted_photo.jpg';
 const disabledPhotoPath = defaultPath + '/disabled_photo.jpg';
+const defaultSiteIconPath = siteSpecificPath + '/favicon.ico';
 // 默认表情图
 const defaultStickerImage = defaultPath + '/default_avatar.gif';
 const defaultScoreIconPath = defaultPath + '/kcb.png';
@@ -41,6 +42,7 @@ module.exports = {
   deletedPhotoPath,
   disabledPhotoPath,
   defaultScoreIconPath,
+  defaultSiteIconPath,
   siteSpecificPath,
   defaultRoleIconPath,
   watermark: normalWatermark,

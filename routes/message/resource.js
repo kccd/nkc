@@ -21,7 +21,7 @@ resourceRouter
       }
       ctx.set('Cathe-Control', `public, max-age=${settings.cache.maxAge}`);
     }
-    await messageFile.update({$inc: {hits: 1}});
+    await messageFile.updateOne({$inc: {hits: 1}});
     ctx.filePath = filePath;
     ctx.resource = messageFile;
     ctx.type = ext;

@@ -22,7 +22,7 @@ router
     status = !!status;
     if(!status && reason === '') ctx.throw(400, '原因不能为空');
     if(contentLength(reason) > 500) ctx.throw(400, '原因字数不能超过500');
-    await question.update({
+    await question.updateOne({
       auth: status, 
       reason, 
       viewed: false,

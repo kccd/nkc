@@ -1,5 +1,6 @@
 module.exports = {
   GET: "nkcManagement",
+  POST: "nkcManagement",
   home: {
     GET: "nkcManagementHome",
     POST: "nkcManagementHome",

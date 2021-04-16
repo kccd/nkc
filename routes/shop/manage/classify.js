@@ -24,7 +24,7 @@ classifyRouter
       productIds: []
     }
     store.storeClassifys.push(classify);
-    await store.update({$set:{storeClassifys: store.storeClassifys}})
+    await store.updateOne({$set:{storeClassifys: store.storeClassifys}})
 		await next();
   })
   .post('/del', async (ctx, next) => {
@@ -42,7 +42,7 @@ classifyRouter
       }
     }
     store.storeClassifys.splice(claIndex, 1);
-    await store.update({$set:{storeClassifys: store.storeClassifys}})
+    await store.updateOne({$set:{storeClassifys: store.storeClassifys}})
     await next();
   })
 module.exports = classifyRouter;

@@ -90,4 +90,23 @@ module.exports = async (ctx) => {
     // 网站后台控制台监看请求记录
     ctx.nkcModules.socket.sendConsoleMessage(d);
   }
+  // 统计请求
+  try{
+    const redisKey = ctx.nkcModules.getRedisKeys('operationStatistics', operationId);
+    let operationStatistics = await ctx.settings.redisClient.getAsync(redisKey);
+    if(!operationStatistics) {
+      operationStatistics = [operationId, 0, 0, null, null]; // 「操作名，次数，总耗时，最大耗时，最小耗时」
+    } else {
+      operationStatistics = JSON.parse(operationStatistics);
+    }
+    operationStatistics[1] ++;
+    operationStatistics[2] += passed;
+    if(operationStatistics[3] === null || passed > operationStatistics[3]) operationStatistics[3] = passed;
+    if(operationStatistics[4] === null || passed < operationStatistics[4]) operationStatistics[4] = passed;
+    await ctx.settings.redisClient.setAsync(redisKey, JSON.stringify(operationStatistics));
+  } catch(err) {
+    if(global.NKC.isDevelopment) {
+      console.log(err)
+    }
+  }
 };

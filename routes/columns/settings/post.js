@@ -6,7 +6,7 @@ router
     const {data, db} = ctx;
     const {column} = data;
     data.categories = await db.ColumnPostCategoryModel.getCategoryList(column._id);
-    data.count = await db.ColumnPostModel.count({columnId: column._id});
+    data.count = await db.ColumnPostModel.countDocuments({columnId: column._id});
     data.highlight = "post";
     await next();
   })
@@ -25,7 +25,7 @@ router
       reviewed: true,
       oc: {$nin: columnPostsId}
     };
-    const count = await db.ThreadModel.count(q);
+    const count = await db.ThreadModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count, perpage);
     data.c = paging.perpage;
     const threads = await db.ThreadModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);

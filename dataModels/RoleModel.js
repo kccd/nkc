@@ -159,7 +159,7 @@ roleSchema.methods.extendUserCount = async function() {
 	} else {
 		q.certs = this._id;
 	}
-	const count = await UserModel.count(q);
+	const count = await UserModel.countDocuments(q);
 	return this.userCount = count;
 };
 

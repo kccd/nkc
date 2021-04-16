@@ -116,6 +116,8 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
   const recycleId = await SettingModel.getRecycleId();
   const targetUser = await UserModel.findOne({uid: tUid});
   if(!targetUser) throwErr(500, `user not found, uid: ${tUid}`);
+  const allowAllMessage = await UserModel.allowAllMessage(targetUser.uid);
+  if(allowAllMessage) return;
   await targetUser.extendGrade();
   const messageSettings = await SettingModel.getSettings("message");
   const {mandatoryLimitInfo, mandatoryLimit, adminRolesId, mandatoryLimitGradeProtect} = messageSettings;
@@ -124,7 +126,7 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
     if(adminRolesId.includes(cert)) return;
   }
   const {threadCount, postCount} = mandatoryLimit;
-  const userThreadCount = await ThreadModel.count({
+  const userThreadCount = await ThreadModel.countDocuments({
     uid,
     reviewed: true,
     disabled: false,
@@ -132,7 +134,7 @@ messageSchema.statics.ensureSystemLimitPermission = async (uid, tUid) => {
     mainForumsId: {$ne: recycleId}
   });
   if(userThreadCount < threadCount) throwErr(403, mandatoryLimitInfo);
-  const userPostCount = await PostModel.count({
+  const userPostCount = await PostModel.countDocuments({
     uid,
     reviewed: true,
     disabled: false,
@@ -164,7 +166,7 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   const today = apiFunction.today();
   // 消息管理员无需权限判断
   if(sendToEveryOne) return;
-  const messageCount = await MessageModel.count({
+  const messageCount = await MessageModel.countDocuments({
     s: user.uid,
     ty: 'UTU',
     tc: {
@@ -217,6 +219,10 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
   });
   if(blackList) throwErr(403, "你在对方的黑名单中，对方可能不希望与你交流。");
 
+  const allowAllMessage = await UserModel.allowAllMessage(targetUser.uid);
+
+  if(allowAllMessage) return;
+
   // 好友间发消息无需防骚扰判断
   const friendRelationship = await FriendModel.findOne({uid: user.uid, tUid: targetUser.uid});
   if(friendRelationship) return;
@@ -235,7 +241,7 @@ messageSchema.statics.ensurePermission = async (fromUid, toUid, sendToEveryOne) 
     if(timeLimit && user.toc > Date.now() - 30*24*60*60*1000) throwLimitError();
     // 有加入精选的文章
     if(digestLimit) {
-      const count = await ThreadModel.count({
+      const count = await ThreadModel.countDocuments({
         digest: true,
         uid: user.uid
       });

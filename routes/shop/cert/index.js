@@ -42,7 +42,7 @@ router
       ctx.throw(403, "您没有权限删除别人的凭证");
     }
     if(!cert.deletable) ctx.throw(400, "已提交的凭证无法删除");
-    await db.ShopCertModel.update({_id}, {$set: {deleted: true}});
+    await db.ShopCertModel.updateOne({_id}, {$set: {deleted: true}});
     data.cert = cert;
     await next();
   })
@@ -75,7 +75,7 @@ router
       if(![sellUid, buyUid].includes(user.uid)) {
         ctx.throw(403, "您没有权限上传凭证");
       }
-      const certCount = await db.ShopCertModel.count({
+      const certCount = await db.ShopCertModel.countDocuments({
         uid: user.uid,
         deleted: false,
         orderId,

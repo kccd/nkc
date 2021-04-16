@@ -11,7 +11,7 @@ router
       type: "thread",
       uid: user.uid
     };
-    const count = await db.SubscribeModel.count(q);
+    const count = await db.SubscribeModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const sub = await db.SubscribeModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     const subTid = sub.map(s => s.tid);

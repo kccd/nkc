@@ -4,7 +4,7 @@
 -var canManagement = permission("column_single_disabled");
 .hidden#data=objToStr({columnId: data.column._id, color: data.column.color})
 if canManagement
-  .m-b-2
+  .m-b-1
     .column-management
       .column-header
         .fa.fa-shield &nbsp;管理
@@ -13,6 +13,17 @@ if canManagement
           h4.text-danger.col-xs-12.text-center 专栏已屏蔽
         else if data.column.closed
           h4.text-danger.col-xs-12.text-center 专栏已关闭
+
+        //- 专栏置顶
+        if permission("pushColumnToHome")
+          if data.columnTopped
+            a(onclick=`pushToHome(${data.column._id}, 'unPush')` title="取消设为热门专栏").col-xs-4
+              .fa.fa-fire
+              .name 取消热门专栏
+          else
+            a(onclick=`pushToHome(${data.column._id}, 'push')` title="设为热门专栏").col-xs-4
+              .fa.fa-fire
+              .name 设为热门专栏
 
         if !data.column.disabled
           a(onclick=`managementColumn(${data.column._id}, 'column', true)`).col-xs-4
@@ -35,7 +46,7 @@ if canManagement
           .fa.fa-align-center
           .name 删除简介
 if data.user && data.user.uid === data.column.uid
-  .m-b-2
+  .m-b-1
     .column-management
       .column-header
         .fa.fa-cog &nbsp;专栏管理
@@ -43,24 +54,24 @@ if data.user && data.user.uid === data.column.uid
         //-a(href=`/m/${data.column._id}/status` target="_blank").col-xs-4
           .fa.fa-line-chart
           .name 统计
-        a(href=`/m/${data.column._id}/settings/post`).col-xs-4
+        a(href=`/m/${data.column._id}/settings/post` target='_blank').col-xs-4
           .fa.fa-newspaper-o
           .name 文章管理
-        a(href=`/m/${data.column._id}/settings/contribute`).col-xs-4
+        a(href=`/m/${data.column._id}/settings/contribute` target='_blank').col-xs-4
           .fa.fa-bell-o
           .name 投稿通知
           if data.contributeCount > 0
             .contribute-count=data.contributeCount
-        a(href=`/m/${data.column._id}/settings/post/add`).col-xs-4
+        a(href=`/m/${data.column._id}/settings/post/add` target='_blank').col-xs-4
           .fa.fa-plus-circle
           .name 添加文章
-        a(href=`/m/${data.column._id}/settings/category`).col-xs-4
+        a(href=`/m/${data.column._id}/settings/category` target='_blank').col-xs-4
           .fa.fa-list
           .name 分类管理
-        a(href=`/m/${data.column._id}/settings`).col-xs-4
+        a(href=`/m/${data.column._id}/settings` target='_blank').col-xs-4
           .fa.fa-wrench
           .name 专栏设置
-        a(href=`/m/${data.column._id}/settings/page`).col-xs-4
+        a(href=`/m/${data.column._id}/settings/page` target='_blank').col-xs-4
           .fa.fa-window-restore
           .name 自定义页
       .row.m-t-1.text-center.column-fast-set-btn

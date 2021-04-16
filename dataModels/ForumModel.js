@@ -577,16 +577,16 @@ forumSchema.statics.updateForumsMessage = async () => {
   // 先更新最底层的专业，作为上层专业的信息来源，无需再查数据库
   for(const c of children) {
     const {fid} = c;
-    const countPosts = await PostModel.count({
+    const countPosts = await PostModel.countDocuments({
       type: 'post',
       mainForumsId: fid,
       parentPostId: ''
     });
-    const countThreads = await PostModel.count({
+    const countThreads = await PostModel.countDocuments({
       type: 'thread',
       mainForumsId: fid,
     });
-    const digest = await ThreadModel.count({
+    const digest = await ThreadModel.countDocuments({
       mainForumsId: fid, digest: true,
     });
     const tCount = {
@@ -594,7 +594,7 @@ forumSchema.statics.updateForumsMessage = async () => {
       normal: countThreads - digest
     };
     const today = apiFunction.today();
-    const countPostsToday = await PostModel.count({
+    const countPostsToday = await PostModel.countDocuments({
       mainForumsId: fid,
       toc: {$gte: today},
       parentPostId: ''
@@ -671,7 +671,7 @@ forumSchema.statics.updateCount = async function (threads, isAdd) {
       }
     });
     countPostsToday = countPostsToday>0?countPostsToday:0;
-    await forum.update({countThreads, countPosts, countPostsToday});
+    await forum.updateOne({countThreads, countPosts, countPostsToday});
     if(forum.parentsId.length === 0) return;
     await updateParentForums(await ForumModel.findOne({fid: forum.parentsId}), tif);
   };
@@ -710,7 +710,7 @@ forumSchema.methods.newPost = async function(post, user, ip, cids, toMid, fids) 
   }
   const thread = await new ThreadModel(t).save();
   const _post = await thread.newPost(post, user, ip);
-  await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
+  await thread.updateOne({$set:{lm: _post.pid, oc: _post.pid, count: 1, hits: 1}});
   // await ForumModel.updateMany({fid: {$in: fids}}, {$inc: {
   //   'tCount.normal': 1,
   //   'countPosts': 1,
@@ -1513,7 +1513,7 @@ forumSchema.statics.createNewThread = async function(options) {
   const thread = await new ThreadModel(t).save();
   options.postType = "thread";
   const _post = await thread.createNewPost(options);
-  await thread.update({$set:{lm: _post.pid, oc: _post.pid, count: 0, hits: 0}});
+  await thread.updateOne({$set:{lm: _post.pid, oc: _post.pid, count: 0, hits: 0}});
   await ForumModel.updateCount([thread], true);
   return _post;
 };
@@ -1563,7 +1563,7 @@ forumSchema.methods.createLibrary = async function(uid) {
     description: this.description,
     uid
   });
-  await this.update({lid: library._id});
+  await this.updateOne({lid: library._id});
   return library;
 };
 
@@ -1983,7 +1983,7 @@ forumSchema.statics.checkGlobalPostPermission = async (uid, type) => {
     throwErr(403, `身份认证等级未达要求，发表${settingsType.name}至少需要完成身份认证 ${authLevelMin}`)
   }
   const today = apiFunction.today();
-  const todayCount = await PostModel.count({toc: {$gte: today}, uid: user.uid, type});
+  const todayCount = await PostModel.countDocuments({toc: {$gte: today}, uid: user.uid, type});
   if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
     if(!status) throwErr(403, '权限不足，请提升账号等级');
     if(!unlimited && countLimit <= todayCount) throwErr(403, `今日发表${settingsType.name}次数已用完，请明天再试。`);

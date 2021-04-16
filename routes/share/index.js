@@ -43,7 +43,7 @@ shareRouter
     } else {
       shareUrl = share.shareUrl + '?token=' + token;
     }
-    await share.update({$inc: {hits: 1}});
+    await share.updateOne({$inc: {hits: 1}});
     let shareAccessLog = await db.SharesAccessLogModel.findOne({token, ip: ctx.address});
     if(shareAccessLog) {
       await lock.unlock();
@@ -89,7 +89,7 @@ shareRouter
     // targetUser.kcb = await db.UserModel.updateUserKcb(targetUser.uid);
     // 将分享者获得的kcb写入当前用户访问的记录上
     if(status) {
-      await shareLogs.update({kcb: num});
+      await shareLogs.updateOne({kcb: num});
     }
     await lock.unlock();
     return ctx.redirect(shareUrl);
@@ -152,7 +152,7 @@ shareRouter
       share.registerReward = false;
     } else {
       const today = nkcModules.apiFunction.today();
-      const shareCountByType = await db.ShareModel.count({
+      const shareCountByType = await db.ShareModel.countDocuments({
         uid: user.uid,
         toc: {
           $gte: today
@@ -201,7 +201,7 @@ shareRouter
     await next();
   })
   .post('/', async (ctx, next) => {
-    const {data, body, db, nkcModules} = ctx;
+    const {data, body, db, nkcModules, state} = ctx;
     const {ShareModel} = db;
     let {str, type, targetId} = body;
     const {user} = data;
@@ -252,7 +252,7 @@ shareRouter
       share.registerReward = false;
     } else {
       const today = nkcModules.apiFunction.today();
-      const shareCountByType = await db.ShareModel.count({uid: user.uid, toc: {$gte: today}, tokenType: type});
+      const shareCountByType = await db.ShareModel.countDocuments({uid: user.uid, toc: {$gte: today}, tokenType: type});
       // 若此类型今日分享次数已达上限则不给予分享者奖励
       if(shareCountByType >= count) share.shareReward = false;
     }
@@ -289,6 +289,7 @@ shareRouter
     });
     await shareLogs.save();
     data.newUrl = "/s/" + token;
+    data.logoUrl = nkcModules.tools.getUrl('siteIcon', state.serverSettings.siteIcon);
     await lock.unlock();
     await next();
   });

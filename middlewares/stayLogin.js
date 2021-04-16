@@ -1,34 +1,11 @@
 const Cookies = require('cookies-string-parse');
 const languages = require('../languages');
 const cookieConfig = require("../config/cookie");
-const resourceOperations = [
-  "getAttachment",
-  "getUserAvatar",
-  "getUserBanner",
-  "column_single_avatar_get",
-  "column_single_Banner_get",
-  "getHomeLogo",
-  "getActivityPoster",
-  "getForumAvatar",
-  "getResources",
-  "getThumbs",
-  "getMediums",
-  "getDefaultImage",
-  "getOrigins",
-  "getThreadCover",
-  "getVideoImg",
-  "getSiteSpecific",
-  "getAttachmentIcon",
-  "getFundLogo",
-  "getFundBanner",
-  "getPhoto",
-  "getSmallPhoto",
-  "visitForumBanner",
-  "getMessageFile"
-];
+const {files: fileOperations} = require('../settings/operationsType');
+
 module.exports = async (ctx, next) => {
 
-  const isResourcePost = resourceOperations.includes(ctx.data.operationId);
+  const isResourcePost = fileOperations.includes(ctx.data.operationId);
   const {data, db, redis} = ctx;
 	// cookie
   let userInfo = ctx.getCookie("userInfo");
@@ -102,7 +79,7 @@ module.exports = async (ctx, next) => {
       user.setPassword = userPersonal.password.salt && userPersonal.password.hash;
       user.boundMobile = userPersonal.nationCode && userPersonal.mobile;
       user.boundEmail = userPersonal.email;
-      user.draftCount = await db.DraftModel.count({uid: user.uid});
+      user.draftCount = await db.DraftModel.countDocuments({uid: user.uid});
       user.generalSettings = await db.UsersGeneralModel.findOnly({uid: user.uid});
       languageName = user.generalSettings.language;
       if(user.generalSettings.lotterySettings.status) {
@@ -112,7 +89,7 @@ module.exports = async (ctx, next) => {
         }
       }
       if(user.generalSettings.draftFeeSettings.kcb !== 0) {
-        await user.generalSettings.update({'draftFeeSettings.kcb': 0});
+        await user.generalSettings.updateOne({'draftFeeSettings.kcb': 0});
       }
       // 获取新点赞数
       const votes = await db.PostsVoteModel.find({tUid: user.uid, toc: {$gt: oldUser.tlv}, type: "up"}, {_id: 1, uid: 1, pid: 1});

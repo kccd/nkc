@@ -11,7 +11,7 @@ router
     const rechargeSettings = await db.SettingModel.getSettings('recharge');
     data.withdrawSettings = await rechargeSettings.withdraw;
     const today = nkcModules.apiFunction.today();
-    data.countToday = await db.KcbsRecordModel.count({
+    data.countToday = await db.KcbsRecordModel.countDocuments({
       from: user.uid,
       to: "bank",
       type: "withdraw",
@@ -38,7 +38,7 @@ router
       const payment = rechargeSettings.withdraw[to];
       if(!enabled) ctx.throw(403, "提现功能已关闭");
       const today = nkcModules.apiFunction.today();
-      const countToday = await db.KcbsRecordModel.count({
+      const countToday = await db.KcbsRecordModel.countDocuments({
         from: user.uid,
         to: "bank",
         type: "withdraw",
@@ -75,7 +75,7 @@ router
         nationCode: usersPersonal.nationCode
       };
       const smsCode = await db.SmsCodeModel.ensureCode(smsObj);
-      await smsCode.update({used: true});
+      await smsCode.updateOne({used: true});
       let now = new Date();
       // 验证登录密码
       await usersPersonal.ensurePassword(password);
@@ -121,13 +121,13 @@ router
             notes: description
           });
 
-          await record.update({
+          await record.updateOne({
             "c.alipayInterface": true
           });
           await db.UserModel.updateUserScores(user.uid);
 
         } catch(err) {
-          await record.update({
+          await record.updateOne({
             verify: false,
             "c.alipayInterface": false,
             error: JSON.stringify(err)

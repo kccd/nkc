@@ -450,7 +450,7 @@ threadSchema.methods.updateThreadVote = async function() {
 
   const voteUpMax = await PostModel.findOne({tid: this.tid}).sort({voteUp: -1});
   updateObj.voteUpMax = voteUpMax? voteUpMax.voteUp: 0;
-  await this.update(updateObj);
+  await this.updateOne(updateObj);
 };
 /*
 * 更新文章的鼓励数量
@@ -460,8 +460,8 @@ threadSchema.methods.updateThreadEncourage = async function() {
   const KcbsRecordModel = mongoose.model("kcbsRecords");
   const posts = await PostModel.find({tid: this.tid}, {pid: 1});
   const pid = posts.map(p => p.pid);
-  const encourageTotal = await KcbsRecordModel.count({type: "creditKcb", pid: {$in: pid}});
-  await this.update({encourageTotal});
+  const encourageTotal = await KcbsRecordModel.countDocuments({type: "creditKcb", pid: {$in: pid}});
+  await this.updateOne({encourageTotal});
 };
 // threadSchema.methods.addCount = async function () {
 //   const ThreadModel = mongoose.model("threads");
@@ -513,9 +513,9 @@ threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
   updateObj.toc = oc.toc;
   updateObj.lm = lm?lm.pid:'';
   updateObj.oc = oc.pid;
-  updateObj.count = await PostModel.count({tid: thread.tid, type: "post", parentPostId: ""});
-  updateObj.countToday = await PostModel.count({tid: thread.tid, type: "post", toc: {$gt: today}, parentPostId: ""});
-  updateObj.countRemain = await PostModel.count({tid: thread.tid, type: "post", disabled: {$ne: true}, parentPostId: ""});
+  updateObj.count = await PostModel.countDocuments({tid: thread.tid, type: "post", parentPostId: ""});
+  updateObj.countToday = await PostModel.countDocuments({tid: thread.tid, type: "post", toc: {$gt: today}, parentPostId: ""});
+  updateObj.countRemain = await PostModel.countDocuments({tid: thread.tid, type: "post", disabled: {$ne: true}, parentPostId: ""});
   const userCount = await PostModel.aggregate([
     {
       $match: {
@@ -530,7 +530,7 @@ threadSchema.methods.updateThreadMessage = async function(toSearch = true) {
   ]);
   updateObj.replyUserCount = userCount.length - 1;
   // 更新文章 统计数据
-  await thread.update(updateObj);
+  await thread.updateOne(updateObj);
   await PostModel.updateOne({pid: oc.pid}, {
     $set: {
       threadPostCount: updateObj.count
@@ -606,7 +606,7 @@ threadSchema.methods.newPost = async function(post, user, ip) {
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
   _post = _post.toObject();
-  await this.update({
+  await this.updateOne({
     lm: pid,
     tlm: Date.now()
   });
@@ -948,7 +948,7 @@ threadSchema.statics.ensurePublishPermission = async (options) => {
   const {volumeA, volumeB, notPass} = exam;
   const {status, countLimit, unlimited} = notPass;
   const today = apiFunction.today();
-  const todayThreadCount = await ThreadModel.count({toc: {$gt: today}, uid: user.uid});
+  const todayThreadCount = await ThreadModel.countDocuments({toc: {$gt: today}, uid: user.uid});
   if(authLevelMin > user.authLevel) throwErr(403,`身份认证等级未达要求，发表文章至少需要完成身份认证 ${authLevelMin}`);
   if((!volumeB || !user.volumeB) && (!volumeA || !user.volumeA)) { // a, b考试未开启或用户未通过
     if(!status) throwErr(403, '权限不足，请提升账号等级');
@@ -1002,7 +1002,7 @@ threadSchema.statics.publishArticle = async (options) => {
     uid,
     tid
   });
-  await thread.update({$set:{oc: post.pid, count: 1, hits: 1}});
+  await thread.updateOne({$set:{oc: post.pid, count: 1, hits: 1}});
   // // 判断该用户的文章是否需要审核，如果不需要审核则标记文章状态为：已审核
   // const needReview = await UserModel.contentNeedReview(thread.uid, "thread");
   // 自动送审
@@ -1477,7 +1477,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
     // 将文章移动到回收站
     const _threadMainForumsId = thread.mainForumsId;
     forumsId = forumsId.concat(thread.mainForumsId);
-    await thread.update({
+    await thread.updateOne({
       recycleMark: false,
       mainForumsId: [recycleId],
       disabled: true,
@@ -1487,7 +1487,7 @@ threadSchema.statics.moveRecycleMarkThreads = async () => {
     // 更新文章信息（将文章下所有post的mainForumsId改为["recycle"]）
     await thread.updateThreadMessage();
     // 标记为已移动到回收站
-    await delThreadLog.update({
+    await delThreadLog.updateOne({
       delType: "toRecycle"
     });
     const tUser = await UserModel.findOne({uid: thread.uid});
@@ -1648,11 +1648,11 @@ threadSchema.methods.createNewPost = async function(post) {
     type: postType,
     rpid
   });
-  if(!this.oc) await this.update({oc: pid});
+  if(!this.oc) await this.updateOne({oc: pid});
   await _post.save();
   // 由于需要将部分信息（是否存在引用）带到路由，所有将post转换成普通对象
   _post = _post.toObject();
-  await this.update({
+  await this.updateOne({
     lm: pid,
     tlm: Date.now()
   });
@@ -1688,7 +1688,7 @@ threadSchema.methods.createNewPost = async function(post) {
 
     }
   }
-  await this.update({lm: pid});
+  await this.updateOne({lm: pid});
   // 红包奖励判断
   const user = await UserModel.findOnly({uid: post.uid});
   await user.setRedEnvelope();
@@ -1699,9 +1699,9 @@ threadSchema.methods.createNewPost = async function(post) {
       const {chance} = redEnvelopeSettings.c.random;
       const number = Math.ceil(Math.random()*100);
       if(number <= chance) {
-        const postCountToday = await PostModel.count({uid: post.uid, toc: {$gte: apiFn.today()}});
+        const postCountToday = await PostModel.countDocuments({uid: post.uid, toc: {$gte: apiFn.today()}});
         if(postCountToday === 1) {
-          await userGeneral.update({'lotterySettings.status': true});
+          await userGeneral.updateOne({'lotterySettings.status': true});
         }
       }
     }
@@ -2026,7 +2026,7 @@ threadSchema.methods.getThreadNav = async function() {
 * */
 threadSchema.statics.getCollectedCountByTid = async (tid) => {
   const SubscribeModel = mongoose.model('subscribes');
-  return await SubscribeModel.count({
+  return await SubscribeModel.countDocuments({
     type: 'collection',
     tid
   });

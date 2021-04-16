@@ -80,7 +80,7 @@ const postSchema = new Schema({
   // 上级post
   parentPostId: {
     type: String,
-    default: [],
+    default: '',
     index: 1
   },
   // 下一级post数目
@@ -485,7 +485,7 @@ postSchema.pre("save", async function(next) {
         noteDB._id = await SettingModel.operateSystemID("notes", 1);
         noteDB = NoteModel(noteDB);
         // 存入新的选区
-        await _noteDB.update({latest: false});
+        await _noteDB.updateOne({latest: false});
         await noteDB.save();
       }
     }
@@ -728,7 +728,7 @@ postSchema.statics.updateElasticSearch = async function(post) {
 * */
 postSchema.statics.saveAllPostToElasticSearch = async function() {
   const PostModel = mongoose.model('posts');
-  const count = await PostModel.count();
+  const count = await PostModel.countDocuments();
   const limit = 2000;
   for(let i = 0; i <= count; i+=limit) {
     const posts = await PostModel.find().sort({toc: 1}).skip(i).limit(limit);
@@ -1070,7 +1070,7 @@ postSchema.methods.updatePostsVote = async function() {
   this.voteUpTotal = upNumTotal;
   this.voteDownTotal = downNumTotal;
 
-  await this.update({
+  await this.updateOne({
     voteUp: upNum,
     voteDown: downNum,
     voteUpTotal: upNumTotal,
@@ -1133,7 +1133,7 @@ postSchema.statics.newPost = async (options) => {
     rpid
   });
   await _post.save();
-  await thread.update({
+  await thread.updateOne({
     lm: pid,
     tlm: Date.now()
   });
@@ -1188,8 +1188,8 @@ postSchema.statics.getUrl = async function(pid, redirect) {
 
   const PostModel = mongoose.model('posts');
   const SettingModel = mongoose.model("settings");
-  const pageSettings = await SettingModel.findOnly({_id: "page"});
-
+  // const pageSettings = await SettingModel.findOnly({_id: "page"});
+  const pageSettings = await SettingModel.getSettings('page');
   let post;
   if(typeof(pid) == "string") {
     post = await PostModel.findOnly({pid});
@@ -1200,7 +1200,7 @@ postSchema.statics.getUrl = async function(pid, redirect) {
   const isComment = post.parentPostsId.length !== 0;
   let posts, perpage;
   if(!isComment) {
-    perpage = pageSettings.c.threadPostList;
+    perpage = pageSettings.threadPostList;
     posts = await PostModel.find({type: "post", tid: post.tid, parentPostId: ""}, {pid: 1, _id: 0}).sort({toc: 1});
     const postsId = posts.map(post => post.pid);
     const step = postsId.indexOf(post.pid);
@@ -1208,7 +1208,7 @@ postSchema.statics.getUrl = async function(pid, redirect) {
     const page = Math.floor(step/perpage);
     return `/t/${post.tid}?page=${page}&highlight=${post.pid}#highlight`;
   } else {
-    perpage = pageSettings.c.threadPostCommentList;
+    perpage = pageSettings.threadPostCommentList;
     const postId = post.parentPostsId[0];
     // 获取post下最顶层的所有回复
     posts = await PostModel.find({type: "post", parentPostId: postId}, {pid: 1}).sort({toc: 1});

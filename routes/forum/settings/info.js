@@ -15,7 +15,7 @@ infoRouter
 			// 富文本内容中每一个source添加引用
 			await db.ResourceModel.toReferenceSource("forum-" + forum.fid, declare);
 			// if(!declare) ctx.throw(400, '专业说明不能为空');
-			await forum.update({declare});
+			await forum.updateOne({declare});
 			if(did) {
 				await db.DraftModel.removeDraftById(did, data.user.uid);
 			}
@@ -25,7 +25,7 @@ infoRouter
 			const {content} = body;
 			// 富文本内容中每一个source添加引用
 			await db.ResourceModel.toReferenceSource("forum-notice-" + forum.fid, content);
-			await forum.update({latestBlockNotice: content});
+			await forum.updateOne({latestBlockNotice: content});
 			data.redirect = `/f/${forum.fid}`;
 			return await next();
 		}
@@ -46,13 +46,13 @@ infoRouter
 			minLength: 1,
 			maxLength: 30
 		});
-		let sameName = await db.ForumModel.count({fid: {$ne: forum.fid}, displayName});
+		let sameName = await db.ForumModel.countDocuments({fid: {$ne: forum.fid}, displayName});
 		if(sameName) ctx.throw(400, "专业名称已存在");
 		checkString(abbr, {
 			name: '专业简称',
 			minLength: 1,
 		});
-		sameName = await db.ForumModel.count({fid: {$ne: forum.fid}, abbr});
+		sameName = await db.ForumModel.countDocuments({fid: {$ne: forum.fid}, abbr});
 		if(sameName) ctx.throw(400, "专业简称已存在");
 		checkString(brief, {
 			name: '专业简介',
@@ -70,7 +70,7 @@ infoRouter
 		valuableThreadsId = valuableThreadsId.filter(b => postsId.includes(b));
 		noticeThreadsId = noticeThreadsId.filter(b => postsId.includes(b));
 
-		await forum.update({
+		await forum.updateOne({
 			displayName, abbr, color, description,
 			brief,
 			noteOfPost,

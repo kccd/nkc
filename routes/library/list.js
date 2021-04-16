@@ -49,12 +49,12 @@ router
         continue;
       }
 
-      const sameName = await db.LibraryModel.count({lid: targetFolderId, type: folder.type, name: folder.name, deleted: false});
+      const sameName = await db.LibraryModel.countDocuments({lid: targetFolderId, type: folder.type, name: folder.name, deleted: false});
       if(sameName) {
         ignoreCount++;
         continue;
       }
-      await folder.update({lid: targetFolderId});
+      await folder.updateOne({lid: targetFolderId});
     }
     // 重新计算源文件夹及目标文件夹的文件和文件夹数量
     await targetFolder.computeCount();
@@ -85,12 +85,12 @@ router
         ignoreCount ++;
         continue;
       }
-      const foldersCount = await db.LibraryModel.count({lid: id, deleted: false});
+      const foldersCount = await db.LibraryModel.countDocuments({lid: id, deleted: false});
       if(foldersCount > 0) {
         ignoreCount ++;
         continue;
       }
-      await db.LibraryModel.update({_id: id}, {
+      await db.LibraryModel.updateOne({_id: id}, {
         $set: {
           deleted: true
         }

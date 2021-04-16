@@ -69,9 +69,9 @@ router
 		const {operation} = body;
 		const targetPost = await db.PostModel.findOnly({pid});
 		if(operation === 'disableHistories') {
-			await targetPost.update({hideHistories: true});
+			await targetPost.updateOne({hideHistories: true});
 		} else if(operation === 'unDisableHistories') {
-			await targetPost.update({hideHistories: false});
+			await targetPost.updateOne({hideHistories: false});
 		}
 		await next();
 	})

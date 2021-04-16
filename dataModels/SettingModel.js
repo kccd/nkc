@@ -38,7 +38,7 @@ async function operateSystemID(type, op) {
       $set: {}
     };
     obj.$set[`c.${type}`] = 1;
-    await setting.update(obj);
+    await setting.updateOne(obj);
   } else {
     setting.c[type] += op;
   }
@@ -50,6 +50,10 @@ settingSchema.statics.operateSystemID = operateSystemID;
 settingSchema.statics.newObjectId = () => {
   return mongoose.Types.ObjectId();
 };
+
+settingSchema.statics.getNewId = () => {
+  return mongoose.Types.ObjectId().toString();
+}
 
 settingSchema.methods.extend = async function() {
   const ThreadModel = require('./ThreadModel');
@@ -149,7 +153,7 @@ settingSchema.statics.checkMobile = async (nationCode, mobile, uid) => {
   const UsersPersonalModel = mongoose.model("usersPersonal");
   const SecretBehaviorModel = mongoose.model("secretBehaviors");
   const {mobileCountLimit} = regSettings;
-  const used = await UsersPersonalModel.count({nationCode, mobile});
+  const used = await UsersPersonalModel.countDocuments({nationCode, mobile});
   if(used) throwErr(403, "此号码已被其他账号绑定");
   const secretBehaviors = await SecretBehaviorModel.find({
     $or: [
@@ -178,7 +182,7 @@ settingSchema.statics.checkEmail = async (email, uid) => {
   const SecretBehaviorModel= mongoose.model("secretBehaviors");
   const SettingModel = mongoose.model("settings");
   const {emailCountLimit} = await SettingModel.getSettings("register");
-  const used = await UsersPersonalModel.count({email});
+  const used = await UsersPersonalModel.countDocuments({email});
   if(used) throwErr(403, "此邮箱已被其他账号绑定");
   const secretBehaviors = await SecretBehaviorModel.find({
     $or: [
@@ -211,9 +215,16 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
   const getSpeedByHour = (arr) => {
     for(const t of arr) {
       const {startingTime, endTime, speed} = t;
-      if(hour >= startingTime && hour < endTime) {
-        return speed;
+      if(startingTime < endTime) {
+        if(hour >= startingTime && hour < endTime) {
+          return speed;
+        }
+      } else {
+        if(hour >= startingTime || hour < endTime) {
+          return speed;
+        }
       }
+
     }
     return 0;
   };
@@ -253,10 +264,18 @@ settingSchema.statics.getDownloadSettingsByUser = async (user) => {
   let fileCountLimit;
   for(const f of fileCountLimitInfo) {
     const {startingTime, endTime} = f;
-    if(hour >= startingTime && hour < endTime) {
-      fileCountLimit = f;
-      break;
+    if(startingTime < endTime) {
+      if(hour >= startingTime && hour < endTime) {
+        fileCountLimit = f;
+        break;
+      }
+    } else {
+      if(hour >= startingTime || hour < endTime) {
+        fileCountLimit = f;
+        break;
+      }
     }
+
   }
   if(!fileCountLimit) throwErr(500, `后台数量限制配置错误，请通过页脚的「报告问题」告知管理员`);
   return {

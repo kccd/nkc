@@ -139,10 +139,10 @@ permissionRouter
     for(let uid of oldModerators) {
       if(!moderators.includes(uid)) {
         // 移除当前专业的专家身份，若在其他专业都不为专家，则移除专家证书
-        const forumsCount = await db.ForumModel.count({fid: {$ne: forum.fid}, moderators: uid});
+        const forumsCount = await db.ForumModel.countDocuments({fid: {$ne: forum.fid}, moderators: uid});
         if(!forumsCount) {
           const user = await db.UserModel.findOnly({uid});
-          await user.update({$pull: {certs: 'moderator'}});
+          await user.updateOne({$pull: {certs: 'moderator'}});
         }
       }
     }
@@ -152,10 +152,10 @@ permissionRouter
       const targetUser = await db.UserModel.findOne({uid});
       if(targetUser) {
         moderators_.push(uid);
-        await targetUser.update({$addToSet: {certs: 'moderator'}})
+        await targetUser.updateOne({$addToSet: {certs: 'moderator'}})
       }
     }));
-		await forum.update(
+		await forum.updateOne(
 		  {
         class: klass, accessible,
         displayOnParent, visibility,

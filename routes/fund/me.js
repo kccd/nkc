@@ -31,7 +31,7 @@ meRouter
 			q.disabled = false;
 			q.useless = null;
 		}
-		const length = await db.FundApplicationFormModel.count(q);
+		const length = await db.FundApplicationFormModel.countDocuments(q);
 		const paging = apiFn.paging(page, length);
 		const applicationForms = await db.FundApplicationFormModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
 		data.applicationForms = await Promise.all(applicationForms.map(async a => {

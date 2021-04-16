@@ -2,7 +2,7 @@ var NKC = {
   methods: {},
   modules: {},
   configs: {
-    imageExt: ["jpg", "jpeg", "png", "svg", "gif"],
+    imageExt: ["jpg", "jpeg", "png", "svg", "gif", "webp"],
     audioExt: ["mp3"],
     videoExt: ["mp4"]
   },
@@ -937,3 +937,45 @@ NKC.methods.removeLocalStorageByKey = function(key) {
   key = NKC.methods.getLocalStorageKey(key);
   localStorage.removeItem(key);
 };
+
+/*
+* 判断是否为手机浏览器
+* */
+NKC.methods.isMobilePhoneBrowser = function() {
+  var reg = /(iPhone|iPad|iPod|iOS|Android)/i;
+  return reg.test(window.navigator.userAgent);
+}
+/*
+* 判断是否为电脑浏览器
+* */
+NKC.methods.isPcBrowser = function() {
+  return !NKC.methods.isMobilePhoneBrowser();
+}
+
+
+// service worker
+/*if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/serviceWorker/index.js')
+    .then(function(registration) {
+      return registration.update();
+    })
+    .then(function(registration) {
+      return new Promise(function(resolve, reject) {
+        if(registration.active) {
+          return resolve(registration.active);
+        } else {
+          registration.addEventListener("updatefound", function() {
+            if(registration.active) {
+              return resolve(registration.active);
+            }
+          });
+        }
+      });
+    })
+    .then(function(worker) {
+      NKC.modules.serviceWorker = worker;
+    })
+    .catch(function(error) {
+      console.log('Registration failed with ' + error);
+    })
+}*/

@@ -21,7 +21,7 @@ shareRouter
     const {shareLimit} = body;
     for(var i in shareLimit){
       if(shareLimit[i]._id){
-        await db.ShareLimitModel.update({"shareType": shareLimit[i].shareType}, {
+        await db.ShareLimitModel.updateMany({"shareType": shareLimit[i].shareType}, {
           $set: {
             shareLimitTime: shareLimit[i].shareLimitTime,
             shareLimitCount: shareLimit[i].shareLimitCount

@@ -74,7 +74,7 @@ schema.statics.addUserToBlacklist = async (uid, tUid, from, pid = '') => {
 schema.statics.removeUserFromBlacklist = async (uid, tUid) => {
   const BL = mongoose.model('blacklists');
   const list = await BL.findOne({uid, tUid});
-  if(list) await list.remove();
+  if(list) await list.deleteOne();
 };
 
 /*
@@ -109,8 +109,8 @@ schema.statics.getBlacklistUsersId = async (uid) => {
 * */
 schema.statics.getBlacklistCount = async (uid) => {
   const BlacklistModel = mongoose.model("blacklists");
-  const count = await BlacklistModel.count({uid});
-  const tCount = await BlacklistModel.count({tUid: uid});
+  const count = await BlacklistModel.countDocuments({uid});
+  const tCount = await BlacklistModel.countDocuments({tUid: uid});
   return {
     count,
     tCount
@@ -145,7 +145,7 @@ schema.statics.getBlacklistInfo = async (uid, tUid, canSendToEveryOne) => {
 * */
 schema.statics.checkUser = async (uid, tUid) => {
   const BlacklistModel = mongoose.model('blacklists');
-  const count = await BlacklistModel.count({uid, tUid});
+  const count = await BlacklistModel.countDocuments({uid, tUid});
   return count > 0;
 };
 module.exports = mongoose.model("blacklists", schema);

@@ -17,6 +17,7 @@ const run = async () => {
   jobs.moveRecycleMarkThreads();
   jobs.clearFileCache();
   jobs.preparationForumCheck();
+  jobs.clearVerificationData();
   // 以下任务定时执行
   await timedTasks.cacheActiveUsers();
   await timedTasks.clearTimeoutPageCache();

@@ -1,4 +1,5 @@
 const settings = require('../settings');
+const moment = require('moment');
 const cheerio = require('../nkcModules/nkcRender/customCheerio');
 const mongoose = settings.database;
 const Schema = mongoose.Schema;
@@ -275,7 +276,7 @@ resourceSchema.statics.checkUploadPermission = async (user, file) => {
 
   // 检查用户当前上传的文件总数是否达到极限
   const today = require("../nkcModules/apiFunction").today();
-  const uploadedCount = await ResourceModel.count({uid: user.uid, toc: {$gte: today}});
+  const uploadedCount = await ResourceModel.countDocuments({uid: user.uid, toc: {$gte: today}});
   const certList = [];
   certList.push(`grade-${user.grade._id}`);
   user.roles.map(role => {
@@ -375,6 +376,7 @@ resourceSchema.methods.checkDownloadPermission = async function(user, ip) {
   const DownloadLogModel = mongoose.model('downloadLogs');
   const apiFunction = require('../nkcModules/apiFunction');
   const downloadOptions = await SettingModel.getDownloadSettingsByUser(user);
+  const {freeTime} = await SettingModel.getSettings('download');
   const {fileCountLimit} = downloadOptions;
   const {fileCount, startingTime, endTime} = fileCountLimit;
   if(fileCount === 0) {
@@ -386,15 +388,36 @@ resourceSchema.methods.checkDownloadPermission = async function(user, ip) {
   }
   let downloadLogs;
   const today = apiFunction.today().getTime();
-  const match = {
-    toc: {
-      $gte: new Date(today + startingTime * 60 * 60 * 1000),
-      $lt: new Date(today + endTime * 60 * 60 * 1000)
+  const now = new Date();
+  const hour = now.getHours();
+  let match;
+  if(startingTime < endTime) {
+    match = {
+      toc: {
+        $gte: new Date(today + startingTime * 60 * 60 * 1000),
+        $lt: new Date(today + endTime * 60 * 60 * 1000)
+      }
+    };
+  } else {
+    if(hour >= startingTime) {
+      match = {
+        toc: {
+          $gte: new Date(today + startingTime * 60 * 60 * 1000),
+          $lt: now
+        }
+      }
+    } else {
+      match = {
+        toc: {
+          $gte: new Date(today + (startingTime - 24) * 60 * 60 * 1000),
+          $lt: now
+        }
+      }
     }
-  };
+  }
   const matchToday = {
     toc: {
-      $gte: Date.now() - 24 * 60 * 60 * 1000
+      $gte: Date.now() - freeTime * 60 * 60 * 1000
     },
     rid: this.rid
   };
@@ -441,12 +464,15 @@ resourceSchema.methods.checkDownloadPermission = async function(user, ip) {
 * @return {Object} 是否需要积分
 *   @param {Boolean} needScore 是否需要积分
 *   @param {String} reason 原因 setting: 因为后台设置，repeat: 重复下载
+*   @param {String} description 具体说明
 * @author pengxiguaa 2020-10-15
 * */
-resourceSchema.methods.checkDownloadCost = async function(user, freeTime) {
+resourceSchema.methods.checkDownloadCost = async function(user) {
   const SettingModel = mongoose.model("settings");
   const ScoreOperationModel = mongoose.model('scoreOperations');
   const ScoreOperationLogModel = mongoose.model('scoreOperationLogs');
+  const downloadSettings = await SettingModel.getSettings('download');
+  const {freeTime} = downloadSettings;
   let needScore = false;
   // 获取下载附件时的积分设置
   const operation = await ScoreOperationModel.getScoreOperationFromRedis(
@@ -455,7 +481,8 @@ resourceSchema.methods.checkDownloadCost = async function(user, freeTime) {
   if(operation.count === 0) {
     return {
       needScore: false,
-      reason: 'setting'
+      reason: 'setting',
+      description: ''
     };
   }
   // 获取已开启的积分
@@ -470,7 +497,8 @@ resourceSchema.methods.checkDownloadCost = async function(user, freeTime) {
   if(needScore === false) {
     return {
       needScore: false,
-      reason: 'setting'
+      reason: 'setting',
+      description: ''
     };
   }
   if(!user) {
@@ -479,13 +507,20 @@ resourceSchema.methods.checkDownloadCost = async function(user, freeTime) {
   const todayOperationCount = await ScoreOperationLogModel.getOperationLogCount(user, 'attachmentDownload');
   const lastAttachmentDownloadLog = await ScoreOperationLogModel.getLastAttachmentDownloadLog(user, this.rid);
   const nowTime = new Date();
-  const lastAttachmentDownloadTime = lastAttachmentDownloadLog? lastAttachmentDownloadLog.toc: 0;
-  if(nowTime - lastAttachmentDownloadTime <= freeTime) {
-    // 下载时间未超过24小时 不收费
-    return {
-      needScore: false,
-      reason: 'repeat'
-    };
+  let description = '';
+  if(lastAttachmentDownloadLog) {
+    const lastAttachmentDownloadTime = lastAttachmentDownloadLog.toc;
+    const timeout = nowTime - lastAttachmentDownloadTime - freeTime * 60 * 60 * 1000;
+    if(timeout <= 0) {
+      // 下载时间未超过24小时 不收费
+      return {
+        needScore: false,
+        reason: 'repeat',
+        description: `${freeTime}小时以内重复下载免费。`
+      };
+    } else {
+      description = `您曾于${moment(lastAttachmentDownloadTime).format("YYYY年MM月DD日")}下载该附件，现已超过${(Math.ceil(timeout / (60 * 60 * 1000)))}小时，再次下载将花费积分。`;
+    }
   }
   if(
     todayOperationCount >= operation.count &&
@@ -494,12 +529,14 @@ resourceSchema.methods.checkDownloadCost = async function(user, freeTime) {
     // 下载的次数超过设置的值后不收费
     return {
       needScore: false,
-      reason: 'setting'
+      reason: 'setting',
+      description: ``
     };
   } else {
     return {
       needScore: true,
-      reason: 'setting'
+      reason: 'setting',
+      description
     };
   }
 };

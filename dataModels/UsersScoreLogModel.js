@@ -193,7 +193,7 @@ usersScoreLogSchema.statics.insertLog = async (options) => {
       fid
     });
     await log.save();
-    await user.update({$inc: q});
+    await user.updateOne({$inc: q});
     user[key] += change;
     await user.calculateScore();
   }
@@ -210,7 +210,7 @@ usersScoreLogSchema.statics.insertLog = async (options) => {
 		const targetUser = await UserModel.findOnly({uid: kcbSettings.defaultUid});
 		const {change, count} = typeOfScoreChange;
 		if(count !== -1) {
-			const userLogCount = await UsersScoreLogModel.count({type: 'kcb', uid: user.uid, operationId: typeIdOfScoreChange, toc: {$gt: today()}});
+			const userLogCount = await UsersScoreLogModel.countDocuments({type: 'kcb', uid: user.uid, operationId: typeIdOfScoreChange, toc: {$gt: today()}});
 			if(count <= userLogCount) return;
 		}
 		const log = UsersScoreLogModel({
@@ -227,9 +227,9 @@ usersScoreLogSchema.statics.insertLog = async (options) => {
 			tid,
 			fid
 		});
-		await user.update({$inc: {kcb: change}});
+		await user.updateOne({$inc: {kcb: change}});
 		user.kcb += change;
-		await targetUser.update({$inc: {kcb: -1*change}});
+		await targetUser.updateOne({$inc: {kcb: -1*change}});
 		targetUser.kcb += -1*change;
 		await log.save();
 	} else if(type === 'score') {
@@ -249,7 +249,7 @@ usersScoreLogSchema.statics.insertLog = async (options) => {
 			tid,
 			fid
 		});
-		await user.update({$inc: q});
+		await user.updateOne({$inc: q});
 		user[key] += change;
 		await user.calculateScore();
 		await log.save();

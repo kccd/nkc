@@ -52,8 +52,8 @@ schema.statics.updateCount = async (subscribeTypesId) => {
   for(const id of subscribeTypesId) {
     const type = await SubscribeTypeModel.findOne({_id: id});
     if(!type) continue;
-    const count = await SubscribeModel.count({cid: id});
-    await type.update({count});
+    const count = await SubscribeModel.countDocuments({cid: id});
+    await type.updateOne({count});
   }
 };
 /*

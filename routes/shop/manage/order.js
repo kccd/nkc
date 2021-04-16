@@ -17,10 +17,10 @@ orderRouter
     };
 
     data.counter = {
-      unCost: await db.ShopOrdersModel.count({sellUid: user.uid, closeStatus: false, orderStatus: "unCost"}),
-      unShip: await db.ShopOrdersModel.count({sellUid: user.uid, closeStatus: false, orderStatus: "unShip"}),
-      unSign: await db.ShopOrdersModel.count({sellUid: user.uid, closeStatus: false, orderStatus: "unSign"}),
-      refunding: await db.ShopOrdersModel.count({sellUid: user.uid, closeStatus: false, refundStatus: "ing"})
+      unCost: await db.ShopOrdersModel.countDocuments({sellUid: user.uid, closeStatus: false, orderStatus: "unCost"}),
+      unShip: await db.ShopOrdersModel.countDocuments({sellUid: user.uid, closeStatus: false, orderStatus: "unShip"}),
+      unSign: await db.ShopOrdersModel.countDocuments({sellUid: user.uid, closeStatus: false, orderStatus: "unSign"}),
+      refunding: await db.ShopOrdersModel.countDocuments({sellUid: user.uid, closeStatus: false, refundStatus: "ing"})
     };    
 
     if(t === "refunding") {
@@ -32,7 +32,7 @@ orderRouter
       searchMap.orderStatus = t;
     }
 
-    const count = await db.ShopOrdersModel.count(searchMap);
+    const count = await db.ShopOrdersModel.countDocuments(searchMap);
     const paging = nkcModules.apiFunction.paging(page, count);
     const orders = await db.ShopOrdersModel.find(searchMap).sort({orderToc: -1}).skip(paging.start).limit(paging.perpage);
     data.orders = await db.ShopOrdersModel.storeExtendOrdersInfo(orders);

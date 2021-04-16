@@ -12,7 +12,7 @@ router
       ctx.throw(403, "权限不足");
     }
     if(!["null", "half", "all", "not"].includes(hide)) ctx.throw(400, "未知的折叠类型");
-    await post.update({hide});
+    await post.updateOne({hide});
     await next();
   });
 module.exports = router;

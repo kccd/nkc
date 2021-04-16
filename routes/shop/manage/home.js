@@ -21,17 +21,17 @@ homeRouter
 			statistics.visitCount = 0;
 		}
 		// 统计所有商品的售卖数量
-		const productSellCount = await db.ShopOrdersModel.count({sellUid:user.uid, orderStatus:"finish"});
+		const productSellCount = await db.ShopOrdersModel.countDocuments({sellUid:user.uid, orderStatus:"finish"});
 		statistics.sellCount = productSellCount;
 		// 统计商品讨论总量
 		let threadIds = [];
 		for(var i in products) {
 			threadIds.push(products[i].tid)
 		}
-		const productTalkCount = await db.PostModel.count({pid:{$in:threadIds}});
+		const productTalkCount = await db.PostModel.countDocuments({pid:{$in:threadIds}});
 		statistics.talkCount = productTalkCount;
 		// 统计粉丝数量
-		statistics.funsCount = await db.SubscribeModel.count({type: "user", tUid: user.uid});
+		statistics.funsCount = await db.SubscribeModel.countDocuments({type: "user", tUid: user.uid});
 		// 统计商品信息
 		let productInsaleCount = 0;
 		let productNosaleCount = 0;

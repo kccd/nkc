@@ -26,7 +26,7 @@ const schema = new Schema({
   },
   color: {
     type: String,
-    default: "#f6f6f6"
+    default: "#eee"
   },
   topped: {
     type: [Number],
@@ -42,7 +42,14 @@ const schema = new Schema({
     type: Boolean,
     default: false
   },
+  // 专栏创建时间
   toc: {
+    type: Date,
+    default: Date.now,
+    index: 1
+  },
+  // 专栏更新时间
+  tlm: {
     type: Date,
     default: Date.now,
     index: 1
@@ -80,7 +87,14 @@ const schema = new Schema({
   // 专栏的关注数
   subCount: {
     type: Number,
+    index: 1,
     default: 0
+  },
+  // 专栏文章数
+  postCount: {
+    type: Number,
+    index: 1,
+    default: 0,
   },
   // 自定义链接
   links: {
@@ -129,6 +143,21 @@ const schema = new Schema({
   contacted: {
     type: Boolean,
     default: false
+  },
+  // 专栏内文章总阅读数
+  postHits: {
+    type: Number,
+    default: 0
+  },
+  // 专栏内文章的点赞数
+  postVoteUp: {
+    type: Number,
+    default: 0
+  },
+  // 获赞数、阅读数的更新时间
+  refreshTime: {
+    type: Date,
+    default: null,
   }
 }, {
   collection: "columns"
@@ -198,7 +227,7 @@ schema.statics.getTimeline = async (columnId) => {
   }
   const results = [];
   for(const t of time) {
-    const count = await ColumnPostModel.count({
+    const count = await ColumnPostModel.countDocuments({
       columnId,
       toc: {
         $gte: t.begin,
@@ -268,7 +297,7 @@ schema.statics.saveColumnToElasticSearch = async (column) => {
 * */
 schema.statics.saveAllColumnToElasticSearch = async () => {
   const ColumnModel = mongoose.model('columns');
-  const count = await ColumnModel.count();
+  const count = await ColumnModel.countDocuments();
   const limit = 2000;
   for(let i = 0; i <= count; i+=limit) {
     const columns = await ColumnModel.find().sort({toc: 1}).skip(i).limit(limit);
@@ -284,42 +313,134 @@ schema.statics.saveAllColumnToElasticSearch = async () => {
 /*
 * 获取置顶专栏
 * */
-schema.statics.getToppedColumns = async () => {
+schema.statics.getToppedColumns = async (columnCount) => {
   const homeSettings = await mongoose.model("settings").getSettings("home");
+  if(columnCount === undefined) {
+    columnCount = homeSettings.columnCount;
+  }
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const PostModel = mongoose.model('posts');
   if(!homeSettings.columnsId.length) return [];
   let columnsId = [];
-  if(homeSettings.columnsId.length <= 6) {
+  if(homeSettings.columnsId.length <= columnCount) {
     columnsId = homeSettings.columnsId;
   } else {
     const {getRandomNumber$2} = require('../nkcModules/apiFunction');
     const arr = getRandomNumber$2({
       min: 0,
       max: homeSettings.columnsId.length - 1,
-      count: 6,
+      count: columnCount,
       repeat: false
     });
     for(const index of arr) {
       columnsId.push(homeSettings.columnsId[index]);
     }
   }
-  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}});
+  const columns = await mongoose.model("columns").find({_id: {$in: columnsId}}).sort({tlm: -1});
+  columnsId = columns.map(c => c._id);
   const columnsObj = {};
-  columns.map(column => columnsObj[column._id] = column);
+  const postsId = [], columnIdObj = {};
+  const tocObj = {};
   for(let column of columns) {
     let {_id} = column;
-    let threads = await mongoose.model("columnPosts")         // 查出此专栏的所有可访问文章
-      .find({columnId: parseInt(_id), hidden: false}, {toc: 1})
-      .sort({toc: -1});                                       // 按从新到旧排序
-    column.threadsCount = threads.length;
-
-    column.latestThreadToc = threads.length? threads[0].toc: null;
+    columnsObj[column._id] = column;
+    const columnPosts = await ColumnPostModel.find({
+      columnId: _id,
+      hidden: false,
+      type: 'thread'
+    }, {
+      pid: 1,
+      columnId: 1,
+      toc: 1,
+    }).sort({toc: -1}).limit(3);
+    for(const cp of columnPosts) {
+      const {pid, columnId, toc} = cp;
+      tocObj[pid] = toc;
+      if(!columnIdObj[columnId]) columnIdObj[columnId] = [];
+      columnIdObj[columnId].push(pid);
+      postsId.push(pid);
+    }
   }
+  const posts = await PostModel.find({pid: {$in: postsId}}, {
+    pid: 1,
+    tid: 1,
+    t: 1,
+  });
+  const postsObj = {};
+  posts.map(post => {
+    post.toc = tocObj[post.pid];
+    postsObj[post.pid] = post;
+  });
   const results = [];
   columnsId.map(cid => {
-    const column = columnsObj[cid];
-    if(column) results.push(column);
+    let column = columnsObj[cid];
+    if(!column) return;
+    column = column.toObject();
+    const postsId = columnIdObj[column._id] || [];
+    const posts = [];
+    for(const pid of postsId) {
+      const post = postsObj[pid];
+      if(!post) continue;
+      posts.push(post);
+    }
+    column.posts = posts;
+    results.push(column);
   });
   return results;
+};
+
+/*
+* 统计并设置专栏文章数
+* @return {Number} 文章数
+* @author pengxiguaa 2021-3-31
+* */
+schema.methods.updateBasicInfo = async function() {
+  const ColumnPostModel = mongoose.model('columnPosts');
+  const ThreadModel = mongoose.model('threads');
+  const PostModel = mongoose.model('posts');
+  const {_id} = this;
+  const columnPosts = await ColumnPostModel.find({columnId: _id}, {pid: 1});
+  const postsId = columnPosts.map(cp => cp.pid);
+  const columnPostCount = columnPosts.length;
+  let hits = await ThreadModel.aggregate([
+    {
+      $match: {
+        oc: {$in: postsId}
+      }
+    },
+    {
+      $group: {
+        _id: "count",
+        count: {
+          $sum: "$hits"
+        }
+      }
+    }
+  ]);
+  hits = hits.length? hits[0].count: 0;
+  let voteUp = await PostModel.aggregate([
+    {
+      $match: {
+        pid: {$in: postsId}
+      }
+    },
+    {
+      $group: {
+        _id: 'count',
+        count: {
+          $sum: "$voteUp"
+        }
+      }
+    }
+  ]);
+  voteUp = voteUp.length? voteUp[0].count: 0;
+  const lastPost = await ColumnPostModel.findOne({columnId: _id}, {toc: 1}).sort({toc: -1});
+  this.postCount = columnPostCount;
+  this.tlm = lastPost? lastPost.toc: this.toc;
+  this.refreshTime = Date.now();
+  this.postHits = hits;
+  this.postVoteUp = voteUp;
+  await this.save();
 };
 
 module.exports = mongoose.model("columns", schema);

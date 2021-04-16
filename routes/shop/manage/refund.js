@@ -108,7 +108,7 @@ router
           deletable: false
         }
       });
-      await db.ShopRefundModel.update({_id: refund._id}, {
+      await db.ShopRefundModel.updateOne({_id: refund._id}, {
         $set: {
           tlm: time,
           status: newStatus

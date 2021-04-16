@@ -63,7 +63,7 @@ const ensureStatus = async (photo) => {
 	if(photo) {
 		const {expiryDate, status} = photo;
 		if(expiryDate !== null && status === 'passed' && Date.now() > expiryDate) {
-			await photo.update({status: 'outdated'});
+			await photo.updateOne({status: 'outdated'});
 			photo.status = 'outdated';
 		}
 	}
@@ -98,7 +98,7 @@ photoSchema.pre('save', async function(next) {
 	const userPersonal = await UsersPersonalModel.findOnly({uid});
 	const authLevel = await userPersonal.getAuthLevel();
 	if(type !== 'fund' && type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
-		await this.remove();
+		await this.deleteOne();
 		return next(new Error('正在等待审核，请勿修改图片！'));
 	}
 	const {idCardA, idCardB, handheldIdCard} = await userPersonal.extendIdPhotos();
@@ -129,7 +129,7 @@ photoSchema.methods.removeReference = async function() {
 	const {type, uid} = this;
 	const userPersonal = await UsersPersonalModel.findOnly({uid: this.uid});
 	if(type !== 'fund' && type !== 'life' && type !== 'cert' && userPersonal.submittedAuth) {
-		await this.remove();
+		await this.deleteOne();
 		return next(new Error('正在等待审核，请勿修改图片！'));
 	}
 	const {idCardA, idCardB, handheldIdCard} = userPersonal.extendIdPhotos();
@@ -143,13 +143,13 @@ photoSchema.methods.removeReference = async function() {
 				return next(new Error(err));
 	}
 	// 没有真正的删除照片和数据
-	await this.update({status: 'deleted'});
+	await this.updateOne({status: 'deleted'});
 	/*
 	// 真正的删除照片和数据
 	if(type !== 'life' || type !== 'cert') {
-		await this.remove();
+		await this.deleteOne();
 	} else {
-		await this.update({status: 'deleted'});
+		await this.updateOne({status: 'deleted'});
 	}*/
 };
 

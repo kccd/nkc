@@ -405,7 +405,7 @@ shopGoodsSchema.methods.onshelf = async function() {
   const post = await ThreadModel.postNewThread(threadInfo);
   // const thread = await ThreadModel.publishArticle(threadInfo);
   const {tid, pid} = post;
-  await ShopGoodsModel.update({productId}, {$set: {
+  await ShopGoodsModel.updateMany({productId}, {$set: {
     tid,
     oc: pid,
     productStatus: "insale",

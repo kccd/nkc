@@ -3,6 +3,7 @@ block nkcTitle
   title 网站总览 - 前台管理
   +includeCSS("/bootstrap/css/bootstrap-datetimepicker.min.css")
 block nkcContent
+  #data.hidden=objToStr({operations: data.statisticsOperation})
   .col-xs-12.col-md-12.m-b-1
     .e-panel
       button.btn.btn-default(onclick="getResults({type: 'today'})") 今日
@@ -23,13 +24,40 @@ block nkcContent
       div(style='margin-top: 2rem;')
         div#main(style="width: 100%;height: 45rem;")
   if data.onlineUsers && data.onlineUsersCount > 0
-    .col-xs-12.col-md-12(style='margin-bottom: 2rem;')
+    .col-xs-12.col-md-12.m-b-1
       .e-panel
         h5=`当前在线总人数：${data.onlineUsersCount}`
         if data.onlineUsersCount > 5000
           h5 最近活动的5000名在线用户
         for targetUser in data.onlineUsers
           a.m-r-05.m-b-05.display-i-b(href=`/u/${targetUser.uid}` data-float-uid=targetUser.uid)=targetUser.username
+  .col-xs-12.col-md-12.m-b-1#app(v-cloak)
+    h5 操作统计
+    .m-b-1
+      span 排序：
+      button.btn.btn-default(:class='{"btn-primary": sortType === "count"}' @click='changeSortType("count")') 访问次数
+      button.btn.btn-default(:class='{"btn-primary": sortType === "averageTime"}' @click='changeSortType("averageTime")') 平均耗时
+      button.btn.btn-default(:class='{"btn-primary": sortType === "maxTime"}' @click='changeSortType("maxTime")') 最大耗时
+      button.m-r-1.btn.btn-default(:class='{"btn-primary": sortType === "minTime"}' @click='changeSortType("minTime")') 最小耗时
+      button.btn.btn-danger(@click="clearData") 清空记录
+    .m-b-1
+      table.table.nkc-table
+        thead
+          tr
+            th 操作名
+            th 总次数
+            th 平均耗时（ms）
+            th 最大耗时（ms）
+            th 最小耗时（ms）
+        tbody
+          tr(v-for='o in operations')
+            th {{o.operationName}}({{o.operationId}})
+            th {{o.count}}
+            th {{o.averageTime}}
+            th {{o.maxTime}}
+            th {{o.minTime}}
+
+
 block nkcScripts
   include ../../publicModules/subscribeTypes/subscribeTypes
   include ../../publicModules/floatUserPanel/floatUserPanel.2.pug

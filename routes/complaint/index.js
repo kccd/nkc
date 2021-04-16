@@ -17,7 +17,7 @@ router
       q = {}
     }
     data.t = t;
-    const count = await db.ComplaintModel.count(q);
+    const count = await db.ComplaintModel.countDocuments(q);
     const paging = nkcModules.apiFunction.paging(page, count);
     const complaints = await db.ComplaintModel.find(q).sort({toc: -1}).skip(paging.start).limit(paging.perpage);
     data.complaints = await db.ComplaintModel.extendComplaints(complaints);
@@ -38,7 +38,7 @@ router
   .post("/", async (ctx, next) => {
     const {tools, nkcModules, db, body, data} = ctx;
     const {user} = data;
-    const complaintCount = await db.ComplaintModel.count({
+    const complaintCount = await db.ComplaintModel.countDocuments({
       uid: user.uid,
       toc: {
         $gte: nkcModules.apiFunction.today()
@@ -80,7 +80,7 @@ router
       const {_id, result, informed} = c;
       const complaint = await db.ComplaintModel.findById(_id);
       if(complaint.resolved) continue;
-      await complaint.update({
+      await complaint.updateOne({
         $set: {
           resolved: true,
           handlerId: user.uid,

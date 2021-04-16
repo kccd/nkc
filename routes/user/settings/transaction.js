@@ -58,7 +58,7 @@ transactionRouter
         mobile
       });
     }
-    await userPersonal.update({addresses: userAddresses});
+    await userPersonal.updateOne({addresses: userAddresses});
     data.addresses = userAddresses;
 		await next();
 	});

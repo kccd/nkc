@@ -194,7 +194,7 @@ router
     }
     data.freightPrices = freightPrices;
     // 修改购物车中的商品数量
-    await cart.update({$set:{count: cart.count+1}});
+    await cart.updateOne({$set:{count: cart.count+1}});
 
     await next();
   })
@@ -226,7 +226,7 @@ router
     }
     data.freightPrices = freightPrices;
     // 修改购物车中的商品数量
-    await cart.update({$set:{count: cart.count-1}});
+    await cart.updateOne({$set:{count: cart.count-1}});
     await next();
   })
 module.exports = router;

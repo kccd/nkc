@@ -77,7 +77,7 @@ resourceRouter
     }
     // 在resource中添加点击次数
     if(!ctx.request.headers['range']){
-      await resource.update({$inc:{hits:1}});
+      await resource.updateOne({$inc:{hits:1}});
     }
     ctx.filePath = filePath;
     // 表明客户端希望以附件的形式加载资源
@@ -244,7 +244,7 @@ resourceRouter
           event: "fileTransformProcess",
           data: {err: err.message || err, state: "fileProcessFailed"}
         });
-        await r.update({state: 'useless'});
+        await r.updateOne({state: 'useless'});
       }
     });
     await next();

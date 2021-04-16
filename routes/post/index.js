@@ -19,6 +19,7 @@ const optionRouter = require('./option');
 const commentsRouter = require('./comments');
 const commentRouter = require('./comment');
 const router = new Router();
+const customCheerio = require('../../nkcModules/nkcRender/customCheerio');
 
 router
   .get('/:pid', async (ctx, next) => {
@@ -105,7 +106,7 @@ router
 			let shareTimeStamp = parseInt(new Date(share.toc).getTime());
 			let nowTimeStamp = parseInt(new Date().getTime());
 			if(nowTimeStamp - shareTimeStamp > 1000*60*60*shareLimitTime){
-				await db.ShareModel.update({"token": token}, {$set: {tokenLife: "invalid"}});
+				await db.ShareModel.updateOne({"token": token}, {$set: {tokenLife: "invalid"}});
         await post.ensurePermission(options);
 			}
 			if(share.shareUrl.indexOf(ctx.path) === -1) ctx.throw(403, "无效的token")
@@ -199,7 +200,7 @@ router
     /*// 文章页 获取评论 树状
     if(from === "nkcAPI") {
       q.parentPostId = pid;
-      const count = await db.PostModel.count(q);
+      const count = await db.PostModel.countDocuments(q);
       let paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
       if(paging.page >= paging.pageCount) {
         if(paging.pageCount > 0) paging.page = paging.pageCount - 1;
@@ -267,7 +268,7 @@ router
     } else {
       q.parentPostsId = pid;
       // 回复详情页 获取评论 平面
-      const count = await db.PostModel.count(q);
+      const count = await db.PostModel.countDocuments(q);
       const paging = nkcModules.apiFunction.paging(page, count, threadPostCommentList);
       let posts = await db.PostModel.find(q).sort({toc: 1}).skip(paging.start).limit(paging.perpage);
       posts = await db.PostModel.extendPosts(posts, extendPostOptions);
@@ -320,28 +321,38 @@ router
       survey, did, cover = ""
     } = post;
     const {pid} = ctx.params;
-    const {state, data, db} = ctx;
+    const {state, data, db, nkcModules} = ctx;
     const {user} = data;
-    const authLevel = await user.extendAuthLevel();
-	  if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
-	  if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
+    // const authLevel = await user.extendAuthLevel();
+	  // if(authLevel < 1) ctx.throw(403,'您的账号还未实名认证，请前往账号安全设置处绑定手机号码。');
+	  // if(!user.volumeA) ctx.throw(403, '您还未通过A卷考试，未通过A卷考试不能发表回复。');
     if(!c) ctx.throw(400, '参数不正确');
     const targetPost = await db.PostModel.findOnly({pid});
     const _targetPost = targetPost.toObject();
-    if(targetPost.parentPostId && c.length > 2000) ctx.throw(400, "评论内容不能超过1000字节");
     const targetThread = await targetPost.extendThread();
+
     if(targetThread.oc === pid) {
-      ctx.nkcModules.checkData.checkString(t, {
-        name: "标题",
-        minLength: 6,
-        maxLength: 200
-      });
+      if(t.length < 3) ctx.throw(400, `标题不能少于3个字`);
+      if(t.length > 100) ctx.throw(400, `标题不能超过100个字`);
     }
-    ctx.nkcModules.checkData.checkString(c, {
+
+    const content = customCheerio.load(c).text();
+
+    if(content.length < 3) ctx.throw(400, `内容不能少于3个字`);
+    // 字数限制
+    if(targetPost.parentPostId) {
+      // 作为评论 不能超过200字
+      if(content.length > 200) ctx.throw(400, `内容不能超过200字`);
+    } else {
+      // 作为文章、回复 不能超过10万字
+      if(content.length > 100000) ctx.throw(400, `内容不能超过10万字`);
+    }
+    nkcModules.checkData.checkString(c, {
       name: "内容",
-      minLength: 6,
-      maxLength: 100000
+      minLength: 1,
+      maxLength: 2000000
     });
+
     const targetForums = await targetThread.extendForums(['mainForums']);
     let isModerator;
     for(let targetForum of targetForums){
@@ -463,17 +474,17 @@ router
     // 删除日志中modifyType改为true
     const delPostLog = await db.DelPostLogModel.find({"postId":pid,"modifyType":false});
     for(const log of delPostLog) {
-      await log.update({"modifyType":true});
+      await log.updateOne({"modifyType":true});
     }
     // 若post被退修则清除退修标记并标记为未审核
     const isThreadContent = targetThread.oc === targetPost.pid;
     if(isThreadContent) {
       if(targetThread.recycleMark) {
-        await targetThread.update({
+        await targetThread.updateOne({
           recycleMark:false,
           reviewed: false
         });
-        await targetPost.update({
+        await targetPost.updateOne({
           reviewed: false
         });
       }
@@ -482,7 +493,7 @@ router
     const singlePost = await db.PostModel.findOnly({pid});
     let postReviewed = singlePost.reviewed;
     if(singlePost.disabled && singlePost.toDraft) {
-      await singlePost.update({
+      await singlePost.updateOne({
         disabled: false,
         reviewed: false
       });
@@ -492,7 +503,7 @@ router
     // 如果符合送审条件，自动内容送审
     const needReview = await db.ReviewModel.autoPushToReview(singlePost);
     if(needReview) {
-      await singlePost.update({
+      await singlePost.updateOne({
         reviewed: false
       });
       if(isThreadContent) {

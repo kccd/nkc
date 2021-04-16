@@ -14,7 +14,7 @@ productionRouter
 		if(productionCode.uid) ctx.throw(400, '序列号已被使用。');
 		productionCode.uid = uid;
 		await productionCode.save();
-		await user.update({volumeA: true});
+		await user.updateOne({volumeA: true});
 		await next();
 	});
 module.exports = productionRouter;

@@ -93,7 +93,7 @@ router
     const category = await db.FriendsCategoryModel.findOnly({ _id, uid: user.uid});
     await db.FriendModel.updateMany({uid: user.uid, tUid: {$in: category.friendsId}}, {$pull: {cid: _id}});
     const friends = await db.FriendModel.find({uid: user.uid, tUid: {$in: category.friendsId}});
-    await category.remove();
+    await category.deleteOne();
     for(const friend of friends) {
       friend.targetUser = await db.UserModel.findOnly({uid: friend.tUid});
       await redis.pubMessage({
