@@ -13,7 +13,7 @@ block title
     }
 
 block content
-  #data.hidden= objToStr({wordGroupInfo: data.wordGroupInfo, fid: data.fid, useGroup: data.useGroup, allContentShouldReview: data.allContentShouldReview, roles: data.roles, grades: data.grades, roleGradeReview: data.roleGradeReview})
+  #data.hidden= objToStr({wordGroupInfo: data.wordGroupInfo, fid: data.fid, keywordReviewPlanUseTo: data.keywordReviewPlanUseTo, useGroup: data.useGroup, reviewPlan: data.reviewPlan, roles: data.roles, grades: data.grades, roleGradeReview: data.roleGradeReview})
   .container-fluid.max-width
     .row
       .col-xs-12.col-md-2
@@ -25,31 +25,51 @@ block content
           .panel-body
             div.form-horizontal
               .form-group
-                label.col-sm-2.control-label 所有内容送审
-                .col-sm-10.m-t-05
-                  .form-group
-                    label
+                label.col-sm-2.control-label 送审范围
+                .col-sm-10
+                  .radio
+                    //- label
                       input(type="checkbox" v-model="allContentShouldReview")
-              .form-group
-                label.col-sm-2.control-label 角色和等级的关系
-                .col-sm-10.m-t-05
-                  .form-group
                     label
-                      select(v-model="roleGradeReview.relationship")
-                        option(value="and") 与
-                        option(value="or") 或
+                      input(type="radio" v-model="reviewPlan" value="all")
+                      | 文章和回复
+                  .radio
+                    label
+                      input(type="radio" v-model="reviewPlan" value="only_thread")
+                      | 仅文章
+                  .radio
+                    label
+                      input(type="radio" v-model="reviewPlan" value="only_reply")
+                      | 仅回复
+                  .radio
+                    label
+                      input(type="radio" v-model="reviewPlan" value="all_no_rule")
+                      | 所有用户的文章和回复均送审（无视以下规则）
+              .form-group
+                label.col-sm-2.control-label 送审规则:
+                .col-sm-10.m-t-05
+                  span(style="color:#848484") 勾选的才会纳入匹配（即黑名单制）
               .form-group
                 .col-sm-2.control-label 角色
-                .col-sm-10.m-t-05
-                  label(v-for='r in roles').m-r-1
-                    input(type='checkbox' :value='r._id' v-model="roleGradeReview.roles")
-                    span {{r.displayName}}
+                .col-sm-10
+                  .checkbox
+                    label(v-for='r in roles').m-r-1
+                      input(type='checkbox' :value='r._id' v-model="roleGradeReview.roles")
+                      span {{r.displayName}}
+              .form-group
+                label.col-sm-2.control-label
+                .col-sm-10
+                  label
+                    select(v-model="roleGradeReview.relationship")
+                      option(value="and") 与
+                      option(value="or") 或
               .form-group
                 .col-sm-2.control-label 等级
-                .col-sm-10.m-t-05
-                  label(v-for='r in grades').m-r-1
-                    input(type='checkbox' :value='r._id' v-model="roleGradeReview.grades")
-                    span {{r.displayName}}
+                .col-sm-10
+                  .checkbox
+                    label(v-for='r in grades').m-r-1
+                      input(type='checkbox' :value='r._id' v-model="roleGradeReview.grades")
+                      span {{r.displayName}}
 
         .panel.panel-default
           .panel-heading
@@ -57,9 +77,26 @@ block content
           .panel-body
             div.form-horizontal
               .form-group
+                label.col-sm-2.control-label 敏感词检测范围
+                .col-sm-10
+                  .radio
+                    //- label
+                      input(type="checkbox" v-model="allContentShouldReview")
+                    label
+                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="all")
+                      | 文章和回复
+                  .radio
+                    label
+                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="only_thread")
+                      | 仅文章
+                  .radio
+                    label
+                      input(type="radio" v-model="keywordReview.keywordReviewPlanUseTo" value="only_reply")
+                      | 仅回复
+              .form-group
                 label.col-sm-2.control-label 使用敏感词组
-                .col-sm-10.m-t-05
-                  .form-group(v-for="(group, index) in keywordReview.wordGroupInfo")
+                .col-sm-10
+                  .checkbox(v-for="(group, index) in keywordReview.wordGroupInfo")
                     label
                       input(type="checkbox" :value="group.id" v-model="keywordReview.selectedGroup")
                       span.group-name {{group.name}}

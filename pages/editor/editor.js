@@ -264,7 +264,7 @@ function initVueApp() {
       // 判断发表权限
       alertPermissionInfo: function() {
         if(data.permissionInfo) {
-          sweetInfo("你暂无法发表内容，因为" + data.permissionInfo + "。");
+          sweetInfo(data.permissionInfo);
         }
       },
       // app判断本地存储
@@ -633,8 +633,8 @@ function initVueApp() {
         if(contentText.length > 100000) {
           throw new Error('内容不能超过10万字');
         }
-        if(contentText.length < 3) {
-          throw new Error('内容不能少于3个字');
+        if(contentText.length < 2) {
+          throw new Error('内容不能少于2个字');
         }
       },
       // 检测摘要

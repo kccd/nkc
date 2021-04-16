@@ -83,6 +83,9 @@ module.exports = {
 				apply: {
 					GET: 'applyToChangeUnusedPhoneNumber',
 					POST: 'applyToChangeUnusedPhoneNumber'
+				},
+				verify: {
+					POST: 'applyToChangeUnusedPhoneNumber'
 				}
 			},
 			email: {

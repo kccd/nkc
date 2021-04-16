@@ -129,11 +129,11 @@ class Track {
   constructor({top}) {
     // 轨道上弹幕的速度
     if($(body).width() > 768) {
-      // 130px~180px/s
-      this.speed = Math.round(Math.random() * 50 + 130);
+      // 60px~110px/s
+      this.speed = Math.round(Math.random() * 50 + 60);
     } else {
-      // 80px~130px/s
-      this.speed = Math.round(Math.random() * 50 + 80);
+      // 40px~90px/s
+      this.speed = Math.round(Math.random() * 50 + 40);
     }
     // 轨道距离上边框的位置
     this.top = top;

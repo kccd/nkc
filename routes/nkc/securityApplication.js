@@ -33,7 +33,7 @@ router
     for(const a of applications) {
       const {
         _id, status, toc, addresses, oldPhoneNumber, newPhoneNumber,
-        ip, port, uid, mUid, remarks, reason
+        ip, port, uid, mUid, remarks, reason, description
       } = a;
       const user = usersObj[uid];
       let _ip = ips[ip];
@@ -50,6 +50,7 @@ router
         newPhoneNumber,
         user,
         port,
+        description,
         remarks,
         reason,
         ip: _ip || null,

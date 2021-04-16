@@ -69,7 +69,7 @@ router
     };
     posts = await db.PostModel.extendPosts(posts, extendPostOptions);
     const comments = await db.PostModel.filterCommentsInfo(posts);
-    data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post');
+    data.postPermission = await db.UserModel.getPostPermission(state.uid, 'post', post.mainForumsId);
     data.tid = post.tid;
     data.pid = post.pid;
     data.paging = paging;
@@ -77,7 +77,8 @@ router
       PATH.resolve(__dirname, `../../pages/thread/singleComment/singleComments.pug`),
       {...data, comments},
       state
-    )
+    );
+    data.sendAnonymousPost = await db.UserModel.havePermissionToSendAnonymousPost("postToThread", state.uid, post.mainForumsId);
     await next();
   });
 module.exports = router;

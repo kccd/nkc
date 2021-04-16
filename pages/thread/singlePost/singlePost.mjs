@@ -8,6 +8,7 @@ class SinglePostModule {
       permit: false,
       warning: null
     };
+    this.sendAnonymousPost = false;
   }
   getPostHeightFloat() {
     let postHeight = $('.hidden[data-type="hidePostContentSettings"]');
@@ -155,6 +156,7 @@ class SinglePostModule {
     this.renderPostCommentNumber(pid);
     this.getPostComments(pid, page)
       .then(data => {
+        console.log(data);
         loading.remove();
         const {tid, htmlContent, paging, postPermission} = data;
         if(paging.page+1 >= paging.pageCount) {
@@ -164,6 +166,7 @@ class SinglePostModule {
         }
         self.postPermission = postPermission;
         self.tid = tid;
+        self.sendAnonymousPost = data.sendAnonymousPost;
         const comments = this.createCommentElements(pid);
         comments.html(htmlContent);
         const pagesDom = self.getPages(pid, paging);
@@ -303,23 +306,28 @@ class SinglePostModule {
       if(this.postPermission.permit) {
         editorDom = $(`<div class="single-comment-editor" id="singlePostEditor_${pid}">`);
         const promptDom = $(`<div class="single-comment-prompt">200字以内，仅用于支线交流，主线讨论请采用回复功能。</div>`);
-        const buttonDom = $(`<div class="single-comment-button"></div>`);
+        const buttonDom = $(`<div class="single-comment-button" data-type="${pid}"></div>`);
         const onclick = `NKC.methods.${cancelEvent}("${pid}", true)`;
-        /*buttonDom.append($(`
-          <div>
+        if(this.sendAnonymousPost) {
+          buttonDom.append($(`
+          <div class="checkbox">
             <label>
-              <input type="checkbox" id="commentAnonymousRelease_${pid}" /> 匿名发表
-            </label><br>
-            <label>
-              <input type="checkbox" checked="checked" id="commentProtocol_${pid}" /> 我已阅读并同意遵守与本次发表相关的全部协议。<a href="/protocol" target="_blank">查看协议</a>
+              <input type="checkbox" data-type="anonymous" /> 匿名发表
             </label>
           </div>
-        `));*/
-        buttonDom.append($(`<button class="btn btn-default btn-sm" onclick='${onclick}'>取消</button>`));
+        `));
+        }
+        buttonDom.append($(`
+          <div class="checkbox">  
+            <label>
+              <input type="checkbox" checked="checked" data-type="protocol" onchange="NKC.methods.setProtocolStatus('${pid}')" /> 我已阅读并同意遵守与本次发表相关的全部协议。<a href="/protocol" target="_blank">查看协议</a>
+            </label>
+          </div>
+        `));
         buttonDom
-          .append($(`<button class="btn btn-default btn-sm" onclick="NKC.methods.saveDraft('${pid}')">存草稿</button>`));
-        buttonDom
-          .append($(`<button class="btn btn-primary btn-sm" data-type="post-button" onclick="NKC.methods.postData('${pid}')">提交</button>`));
+          .append($(`<button class="btn btn-primary btn-sm" data-type="post-button" onclick="NKC.methods.postData('${pid}')">提交</button>`))
+          .append($(`<button class="btn btn-default btn-sm" onclick="NKC.methods.saveDraft('${pid}')">存草稿</button>`))
+          .append($(`<button class="btn btn-default btn-sm" onclick='${onclick}'>取消</button>`));
 
         editorContainer
           .append(promptDom)
@@ -405,16 +413,16 @@ class SinglePostModule {
     return Promise.resolve()
       .then(() => {
         if(!content) throw '评论内容不能为空';
-        // if(!$(`#commentProtocol_${pid}`)[0].checked) throw "请先阅读并勾选同意遵守协议";
-        // const isAnonymous = $(`#commentAnonymousRelease_${pid}`)[0].checked;
+        const buttonDom = $(`.single-comment-button[data-type="${pid}"]`);
+        const anonymousButton = buttonDom.find(`input[data-type="anonymous"]`);
+        const isAnonymous = anonymousButton.prop('checked');
         self.changeEditorButtonStatus(pid, true);
         return nkcAPI("/t/" + self.tid, "POST", {
           postType: "comment",
           post: {
             c: content,
             l: "html",
-            // anonymous: isAnonymous,
-            anonymous: false,
+            anonymous: isAnonymous,
             parentPostId: pid
           }
         })
@@ -443,12 +451,13 @@ class SinglePostModule {
     const editorApp = this.getEditorApp(pid);
     const { prevDraft } = editorApp;
     const content = this.getEditorContent(pid);
-    if(prevDraft === content) {
+    /*if(prevDraft === content) {
       console.log("内容相同，不保存新草稿");
       return Promise.resolve();
     } else {
       editorApp.prevDraft = content;
-    }
+    }*/
+    editorApp.prevDraft = content;
     const self = this;
     return Promise.resolve()
       .then(() => {
@@ -521,6 +530,17 @@ class SinglePostModule {
     this.renderPostCommentNumber(parentPostId);
     this.initNKCSource();
   }
+  setProtocolStatus(pid) {
+    const buttonDom = $(`.single-comment-button[data-type="${pid}"]`);
+    const protocolButton = buttonDom.find(`input[data-type="protocol"]`);
+    const postButton = buttonDom.find(`button[data-type="post-button"]`);
+    const checked = protocolButton.prop('checked');
+    if(checked) {
+      postButton.removeAttr('disabled');
+    } else {
+      postButton.attr('disabled', 'disabled');
+    }
+  }
 }
 
 const singlePostModule = new SinglePostModule();
@@ -551,4 +571,7 @@ NKC.methods.showPostComment = function(pid, page, options) {
 }
 NKC.methods.insertComment = function(parentCommentId, parentPostId, html) {
   singlePostModule.insertComment(parentCommentId, parentPostId, html);
+}
+NKC.methods.setProtocolStatus = function(pid) {
+  singlePostModule.setProtocolStatus(pid);
 }

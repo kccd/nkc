@@ -81,6 +81,11 @@ const schema = new mongoose.Schema({
     type: String,
     default: 'pending',
     index: 1
+  },
+  // 申诉者填写的申诉说明
+  description: {
+    type: String,
+    default: ''
   }
 }, {
   collection: 'securityApplications'
@@ -105,7 +110,7 @@ schema.statics.createApplication = async (props) => {
   const {checkString} = require('../nkcModules/checkData');
   const {
     ip: address, port, uid, oldPhoneNumber, newPhoneNumber,
-    addresses
+    addresses, description
   } = props;
   if(addresses.length < 1) throwErr(400, `请至少选择一个常用登录地址`);
   if(addresses.length > 3) throwErr(400, `最多选择三个常用登录地址`);
@@ -125,6 +130,7 @@ schema.statics.createApplication = async (props) => {
     uid,
     addresses,
     oldPhoneNumber,
+    description,
     newPhoneNumber
   });
   await securityApplication.save();

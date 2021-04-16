@@ -10,12 +10,12 @@ block content
         .complaint-header 投诉列表
         .complaint-body.b-s-10
           .paging-button
-            a.radius-left.button(href='/complaint' class=!data.t?"active": "") 全部
-            a.button(href='/complaint?t=unresolved' class=data.t==="unresolved"?"active":"") 未处理
-            a.radius-right.button(href='/complaint?t=resolved' class=data.t==="resolved"?"active":"") 已处理
+            a.radius-left.button(href='/complaint' class=!data.t?"active": "" data-type='reload') 全部
+            a.button(href='/complaint?t=unresolved' class=data.t==="unresolved"?"active":"" data-type='reload') 未处理
+            a.radius-right.button(href='/complaint?t=resolved' class=data.t==="resolved"?"active":"" data-type='reload') 已处理
           .paging-button
-            a.radius-left.button(href='javascript:app.selectAll()' ) 全选
-            a.radius-right.button(href='javascript:app.saveAll()'  v-if="selectedComplaintsId.length > 1") 处理已勾选
+            a.radius-left.button(onclick='app.selectAll()' ) 全选
+            a.radius-right.button(onclick='app.saveAll()'  v-if="selectedComplaintsId.length > 1") 处理已勾选
           include ../publicModules/paging/paging
           .complaint-single(v-for="c in complaints")
             .complaint-reason-type.success(v-if="c.resolved") 已处理

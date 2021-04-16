@@ -332,15 +332,28 @@ const forumSchema = new Schema({
     type: Array,
     default: [],
   },
+  // 敏感词检测用于哪部分（仅文章、仅回复或者全部）和下面的审核方案类似
+  keywordReviewPlanUseTo: {
+    type: String,
+    default: "all",
+    match: /^(all|only_thread|only_reply)$/
+  },
   // 敏感词审核使用的词组
   keywordReviewUseGroup: {
     type: [String],
     default: [],
   },
   // 是否本专业所有内容都需要送审
-  allContentShouldReview: {
-    type: Boolean,
-    default: false
+  // WARNNING: 这个字段改为了 reviewPlan(审核策略)
+  // allContentShouldReview: {
+  //   type: Boolean,
+  //   default: false
+  // },
+  // 审核方案
+  reviewPlan: {
+    type: String,
+    default: "all",
+    match: /^(all|all_no_rule|only_thread|only_reply)$/
   },
   // 按角色和等级之间的关系送审
   roleGradeReview: {
@@ -1027,7 +1040,11 @@ forumSchema.methods.ensurePermission = async function(roles, grade, user) {
   const ForumModel = mongoose.model('forums');
   const fid = await ForumModel.getAccessibleForumsId(roles, grade, user);
   if(!fid.includes(this.fid)) {
-    throwError(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`, "noPermissionToReadForum");
+    if(this.permission.read.rolesId.includes('default')) {
+      throwError(403, `您没有权限访问专业【${this.displayName}】，且无法在该专业下发表任何内容。`, "noPermissionToReadForum");
+    } else {
+      throwError(403, `根据相关法律法规和政策，页面不予显示`, "simpleErrorPage");
+    }
   }
 };
 
@@ -1890,11 +1907,11 @@ forumSchema.statics.checkPermission = async (type, user, fid = []) => {
       (relation === 'and' && (!hasRole || !hasGrade))
     ) {
       if(type === 'read') {
-        throwErr(403, `你没有权限阅读专业「${displayName}」下的内容，请更换专业`);
+        throwErr(403, `你没有权限阅读专业「${displayName}」下的内容，请更换专业。`);
       } else if(type === 'write') {
-        throwErr(403, `你没有权限在专业「${displayName}」下发表文章，请更换专业`);
+        throwErr(403, `你没有权限在专业「${displayName}」下发表文章，请更换专业。`);
       } else {
-        throwErr(403, `你没有权限在专业「${displayName}」下发表回复或评论，请更换专业`);
+        throwErr(403, `你没有权限在专业「${displayName}」下发表回复或评论，请更换专业。`);
       }
     }
   }
