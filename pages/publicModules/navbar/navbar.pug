@@ -118,7 +118,7 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
                     a(href=`/u/${data.user.uid}/profile/draft` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-inbox
                       | 我的草稿
-                      //-.count(class=data.user.draftCount?"":"hidden")=data.user.draftCount
+                      .count(class=data.user.draftCount?"":"hidden")=data.user.draftCount
                     a(href=`/u/${data.user.uid}/settings` target='_blank').col-xs-6.nav-user-link
                       .fa.fa-cog
                       | 资料设置
@@ -237,6 +237,8 @@ nav.navbar.navbar-default.navbar-fixed-top.nkcshade(style="min-height: 45px;marg
         li
           a(href=`/u/${data.user.uid}/profile/draft`)
             span.fa.fa-inbox &nbsp;我的草稿
+              if data.user && data.user.draftCount > 0
+                span=`(${data.user.draftCount})`
             span.pull-right.fa.fa-angle-right
         li
           a(href=`/u/${data.user.uid}/profile/finance?t=all`)
