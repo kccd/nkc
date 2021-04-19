@@ -270,9 +270,9 @@ schema.statics.autoPushToReview = async function(post) {
   })();
 
   // 如果不需要审核，更改状态为已审核通过
-  if(!needReview) {
-    await PostModel.updateOne({pid}, {$set: {reviewed: true}});
-  }
+  // if(!needReview) {
+  //   await PostModel.updateOne({pid}, {$set: {reviewed: true}});
+  // }
 
   return needReview;
 }
