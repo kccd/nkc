@@ -401,7 +401,7 @@ router
       targetPost.cv ++;
     }*/
     targetPost.uidlm = user.uid;
-    targetPost.iplm = ctx.address;
+    targetPost.iplm = await db.IPModel.saveIPAndGetToken(ctx.address);
     targetPost.t = t;
     targetPost.c = c;
     targetPost.cover = cover;
