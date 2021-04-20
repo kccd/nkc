@@ -134,9 +134,10 @@ router
       });
       await db.ForumModel.updateMany({}, {
         $pull: {
-          keywordReviewUseGroup: value
+          "reviewSettings.keyword.rule.thread.useGroups": value,
+          "reviewSettings.keyword.rule.reply.useGroups": value
         }
-      })
+      });
     } else if(type === "addWordGroup" && typeof value === "object") {
       const { name, keywords, conditions } = value;
       if(!name) ctx.throw(403, "未指定组名");
@@ -219,9 +220,10 @@ router
     } else if(type === "applyAllForums") {
       await db.ForumModel.updateMany({}, {
         $addToSet: {
-          keywordReviewUseGroup: value
+          "reviewSettings.keyword.rule.thread.useGroups": value,
+          "reviewSettings.keyword.rule.reply.useGroups": value
         }
-      })
+      });
     } else {
       ctx.throw(403, "参数不正确");
     }
