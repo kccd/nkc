@@ -5,6 +5,7 @@
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
         "target": "es6",
+        "allowJs": true,
         "noImplicitAny": true,
         "moduleResolution": "node",
         "sourceMap": true,

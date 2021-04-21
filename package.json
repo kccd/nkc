@@ -7,8 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node server.js ",
     "serve": "node ./server.js",
-    "test": "mocha -t 10000",
-    "script": "ts-node"
+    "test": "mocha -t 10000"
   },
   "repository": {
     "type": "git",

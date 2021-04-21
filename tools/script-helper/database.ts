@@ -16,7 +16,6 @@ const client = new MongoClient(encodeMongoURI(`mongodb://${account}${address}:${
 
 onExit(() => {
   client.close();
-  console.log("[DB closed]");
 });
 
 function encodeMongoURI (url: string) {
@@ -27,7 +26,6 @@ function encodeMongoURI (url: string) {
 export async function useDB(): Promise<Db> {
   if(!client.isConnected()) {
     await client.connect();
-    console.log("[DB opend]");
   }
   return client.db(database);
 }
