@@ -10,7 +10,7 @@
       toolbars: [
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
         ]
       ],
       maximumWords: 100000, // 最大字符数
@@ -36,7 +36,7 @@
       toolbars: [
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
         ]
       ],
       maximumWords: 100000, // 最大字符数
@@ -63,7 +63,7 @@
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
           //'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', "|"
         ]
       ],
       maximumWords: 200, // 最大字符数
@@ -89,7 +89,7 @@
       toolbars: [
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
         ]
       ],
       maximumWords: 100000, // 最大字符数
@@ -115,7 +115,7 @@
       toolbars: [
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
         ]
       ],
       maximumWords: 100000, // 最大字符数
@@ -141,7 +141,7 @@
       toolbars: [
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
         ]
       ],
       maximumWords: 100000, // 最大字符数
@@ -166,7 +166,7 @@
       toolbars: [
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
         ]
       ],
       maximumWords: 100000, // 最大字符数
@@ -191,7 +191,7 @@
       toolbars: [
         [
           //'fullscreen', 'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode'
-          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
+          'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', '|', 'blockquote', 'horizontal', 'superscript', 'subscript', '|', 'fontfamily', 'fontsize', 'forecolor', 'backcolor', '|', 'indent', '|', 'link', 'unlink', '|', 'inserttable', '|', 'removeformat', 'pasteplain', '|', 'justifyleft', 'justifycenter', 'justifyright', '|', 'insertcode', "|"
         ]
       ],
       maximumWords: 100000, // 最大字符数
